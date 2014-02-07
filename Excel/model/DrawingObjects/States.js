@@ -728,7 +728,7 @@ function handleGroupState(drawingObjects, drawingObjectsController, group, e, x,
     drawingObjectsController.resetSelection();
     drawingObjectsController.changeCurrentState(new NullState(drawingObjectsController, drawingObjects));
     drawingObjects.OnUpdateOverlay();
-    asc["editor"].asc_endAddShape();
+    //asc["editor"].asc_endAddShape();
     return false;
 }
 
@@ -928,7 +928,7 @@ function handleNullState(drawingObjectsController, drawingObjects, e, x, y)
     drawingObjectsController.changeCurrentState(new NullState(drawingObjectsController, drawingObjects));
     drawingObjectsController.updateSelectionState();
     drawingObjects.OnUpdateOverlay();
-    asc["editor"].asc_endAddShape();
+    //asc["editor"].asc_endAddShape();
 }
 
 function handleNullStateCursorType(drawingObjectsController, drawingObjects, e, x, y)
@@ -1436,7 +1436,7 @@ function MoveInternalChartObjectState(drawingObjectsController, drawingObjects, 
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.OnUpdateOverlay();
         this.drawingObjectsController.changeCurrentState(new ChartState(this.drawingObjectsController, this.drawingObjects, this.chartElement.chartGroup));
-        asc["editor"].asc_endAddShape();
+        //asc["editor"].asc_endAddShape();
     };
 
     this.onKeyDown = function(e)
@@ -2197,7 +2197,7 @@ function PreRotateState(drawingObjectsController, drawingObjects, majorObject)
     {
         this.drawingObjectsController.clearPreTrackObjects();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-        asc["editor"].asc_endAddShape();
+        //asc["editor"].asc_endAddShape();
 
     };
 
@@ -2288,7 +2288,7 @@ function RotateState(drawingObjectsController, drawingObjects, majorObject)
         this.drawingObjects.OnUpdateOverlay();
 
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-		asc["editor"].asc_endAddShape();
+		//asc["editor"].asc_endAddShape();
     };
 
     this.onKeyPress = function(e)
@@ -2422,7 +2422,7 @@ function ResizeState(drawingObjectsController, drawingObjects, majorObject, card
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.OnUpdateOverlay();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-        asc["editor"].asc_endAddShape();
+        //asc["editor"].asc_endAddShape();
     };
 
     this.drawSelection = function(drawingDocument)
@@ -2748,7 +2748,7 @@ function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, 
                 if(gr_obj.isChart())
                 {
                     this.drawingObjectsController.changeCurrentState(new ExtpectDoubleClickState(this.drawingObjectsController, this.drawingObjects, gr_obj, x, y));
-					asc["editor"].asc_endAddShape();
+					//asc["editor"].asc_endAddShape();
                     return;
                     /* if(false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : gr_obj.Parent, CheckType : changestype_Paragraph_Content} )) {
                      var chart = this.graphicObjects.majorGraphicObject.GraphicObj.chart.serializeChart();
@@ -2781,7 +2781,7 @@ function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, 
             }
         }
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-        asc["editor"].asc_endAddShape();
+        //asc["editor"].asc_endAddShape();
 
     };
 
@@ -2944,7 +2944,7 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.OnUpdateOverlay();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-		asc["editor"].asc_endAddShape();
+		//asc["editor"].asc_endAddShape();
     };
 
     this.onKeyDown = function(e)
@@ -2990,7 +2990,7 @@ function PreChangeAdjState(drawingObjectsController, drawingObjects, majorObject
     {
         this.drawingObjectsController.clearPreTrackObjects();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-        asc["editor"].asc_endAddShape();
+        //asc["editor"].asc_endAddShape();
 
     };
 
@@ -3069,7 +3069,7 @@ function ChangeAdjState(drawingObjectsController, drawingObjects)
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.OnUpdateOverlay();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-        asc["editor"].asc_endAddShape();
+        //asc["editor"].asc_endAddShape();
     };
 
     this.onKeyDown = function(e)
@@ -3570,7 +3570,7 @@ function MoveChartTitleGroup(drawingObjectsController, drawingObjects, group, ch
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.OnUpdateOverlay();
         this.drawingObjectsController.changeCurrentState(new ChartGroupState(this.drawingObjectsController, this.drawingObjects, this.group, this.chart));
-        asc["editor"].asc_endAddShape();
+        //asc["editor"].asc_endAddShape();
     };
 
     this.drawSelection = function(drawingDocument)
@@ -4415,7 +4415,7 @@ function SplineBezierState(drawingObjectsController, drawingObjects)
     {
 
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-        asc["editor"].asc_endAddShape();
+        //asc["editor"].asc_endAddShape();
 
     };
 
@@ -4499,12 +4499,12 @@ function SplineBezierState2(drawingObjectsController, drawingObjects, startX, st
         {
             History.Create_NewPoint();
             var shape = this.spline.createShape(null, this.drawingObjects);
-            asc["editor"].asc_endAddShape();
+            //asc["editor"].asc_endAddShape();
 
             this.drawingObjectsController.clearTrackObjects();
             this.drawingObjects.OnUpdateOverlay();
             this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-            asc["editor"].asc_endAddShape();
+            //asc["editor"].asc_endAddShape();
 
             this.drawingObjects.objectLocker.reset();
             this.drawingObjects.objectLocker.addObjectId(shape.Get_Id());
@@ -4559,12 +4559,12 @@ function SplineBezierState3(drawingObjectsController, drawingObjects, startX, st
         {
             History.Create_NewPoint();
             var shape = this.spline.createShape(this.drawingObjects);
-            asc["editor"].asc_endAddShape();
+            //asc["editor"].asc_endAddShape();
 
             this.drawingObjectsController.clearTrackObjects();
             this.drawingObjects.OnUpdateOverlay();
             this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-            asc["editor"].asc_endAddShape();
+            //asc["editor"].asc_endAddShape();
 
 
             this.drawingObjects.objectLocker.reset();
@@ -4654,12 +4654,12 @@ function SplineBezierState4(drawingObjectsController, drawingObjects, spline)
         {
             History.Create_NewPoint();
             var shape = this.spline.createShape(this.drawingObjects);
-            asc["editor"].asc_endAddShape();
+            //asc["editor"].asc_endAddShape();
 
             this.drawingObjectsController.clearTrackObjects();
             this.drawingObjects.OnUpdateOverlay();
             this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-            asc["editor"].asc_endAddShape();
+            //asc["editor"].asc_endAddShape();
 
             this.drawingObjects.objectLocker.reset();
             this.drawingObjects.objectLocker.addObjectId(shape.Get_Id());
@@ -4767,11 +4767,11 @@ function SplineBezierState5(drawingObjectsController, drawingObjects, startX, st
         {
             History.Create_NewPoint();
             var shape = this.spline.createShape(this.drawingObjects);
-            asc["editor"].asc_endAddShape();
+            //asc["editor"].asc_endAddShape();
             this.drawingObjectsController.clearTrackObjects();
             this.drawingObjects.OnUpdateOverlay();
             this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-            asc["editor"].asc_endAddShape();
+            //asc["editor"].asc_endAddShape();
 
             this.drawingObjects.objectLocker.reset();
             this.drawingObjects.objectLocker.addObjectId(shape.Get_Id());
@@ -4894,7 +4894,7 @@ function PolyLineAddState(drawingObjectsController, drawingObjects)
     this.onMouseUp = function(e, x, y)
     {
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-        asc["editor"].asc_endAddShape();
+        //asc["editor"].asc_endAddShape();
 
     };
 
@@ -4957,7 +4957,7 @@ function PolyLineAddState2(drawingObjectsController, drawingObjects, minDistance
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.OnUpdateOverlay();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-        asc["editor"].asc_endAddShape();
+        //asc["editor"].asc_endAddShape();
 
 
     };
@@ -5040,7 +5040,7 @@ function AddPolyLine2State2(drawingObjectsController, drawingObjects, x, y, poly
         if(e.ClickCount > 1)
         {
             this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-            asc["editor"].asc_endAddShape();
+            //asc["editor"].asc_endAddShape();
 
         }
     };
@@ -5097,7 +5097,7 @@ function AddPolyLine2State3(drawingObjectsController, drawingObjects, polyline)
             this.drawingObjectsController.clearTrackObjects();
             this.drawingObjects.OnUpdateOverlay();
             this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-            asc["editor"].asc_endAddShape();
+            //asc["editor"].asc_endAddShape();
 
         }
     };

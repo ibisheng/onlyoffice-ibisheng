@@ -77,6 +77,8 @@
 			//----- declaration -----
 			this.canvas = undefined;
 			this.canvasOverlay = undefined;
+			this.canvasGraphic = undefined;
+			this.canvasGraphicOverlay = undefined;
 			this.wsActive = -1;
 			this.wsViews = [];
 			this.cellEditor = undefined;
@@ -100,6 +102,8 @@
 			this.buffers = {};
 			this.drawingCtx = undefined;
 			this.overlayCtx = undefined;
+			this.drawingGraphicCtx = undefined;
+			this.overlayGraphicCtx = undefined;
 			this.stringRender = undefined;
 			this.drawingCtxCharts = undefined;
 
@@ -140,31 +144,39 @@
 				this.element.innerHTML = '<div id="ws-canvas-outer">\
 											<canvas id="ws-canvas"></canvas>\
 											<canvas id="ws-canvas-overlay"></canvas>\
+											<canvas id="ws-canvas-graphic"></canvas>\
+											<canvas id="ws-canvas-graphic-overlay"></canvas>\
 											<canvas id="id_target_cursor" class="block_elem" width="1" height="1"\
 												style="width:2px;height:13px;display:none;z-index:1004;"></canvas>\
 										</div>';
 
 				this.canvas = document.getElementById("ws-canvas");
 				this.canvasOverlay = document.getElementById("ws-canvas-overlay");
+				this.canvasGraphic = document.getElementById("ws-canvas-graphic");
+				this.canvasGraphicOverlay = document.getElementById("ws-canvas-graphic-overlay");
 				this._canResize();
 			}
 
-			this.buffers.main = asc_DC({canvas: this.canvas, units: 1/*pt*/,
-				fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
-			this.buffers.overlay = asc_DC({canvas: this.canvasOverlay, units: 1/*pt*/,
-				fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
+			this.buffers.main = asc_DC({canvas: this.canvas, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
+			this.buffers.overlay = asc_DC({canvas: this.canvasOverlay, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
 			this.buffers.overlay.ctx.isOverlay = true;		// Для разруливания _activateOverlayCtx / _deactivateOverlayCtx
+			
+			this.buffers.mainGraphic = asc_DC({canvas: this.canvasGraphic, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
+			this.buffers.overlayGraphic = asc_DC({canvas: this.canvasGraphicOverlay, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
+			
 
 			this.drawingCtx = this.buffers.main;
 			this.overlayCtx = this.buffers.overlay;
+			this.drawingGraphicCtx = this.buffers.mainGraphic;
+			this.overlayGraphicCtx = this.buffers.overlayGraphic;
 
 			// Shapes
 			this.buffers.shapeCtx = new CGraphics();
-			this.buffers.shapeCtx.init(this.drawingCtx.ctx, this.drawingCtx.getWidth(0), this.drawingCtx.getHeight(0), this.drawingCtx.getWidth(3), this.drawingCtx.getHeight(3));
+			this.buffers.shapeCtx.init(this.drawingGraphicCtx.ctx, this.drawingGraphicCtx.getWidth(0), this.drawingGraphicCtx.getHeight(0), this.drawingGraphicCtx.getWidth(3), this.drawingGraphicCtx.getHeight(3));
 			this.buffers.shapeCtx.m_oFontManager = this.fmgrGraphics[2];
 
 			this.buffers.shapeOverlayCtx = new CGraphics();
-			this.buffers.shapeOverlayCtx.init(this.overlayCtx.ctx, this.overlayCtx.getWidth(0), this.overlayCtx.getHeight(0), this.overlayCtx.getWidth(3), this.overlayCtx.getHeight(3));
+			this.buffers.shapeOverlayCtx.init(this.overlayGraphicCtx.ctx, this.overlayGraphicCtx.getWidth(0), this.overlayGraphicCtx.getHeight(0), this.overlayGraphicCtx.getWidth(3), this.overlayGraphicCtx.getHeight(3));
 			this.buffers.shapeOverlayCtx.m_oFontManager = this.fmgrGraphics[2];
 
 			this.drawingCtxCharts	= asc_DC({units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
@@ -177,7 +189,7 @@
 
 			if (!window["NATIVE_EDITOR_ENJINE"]) {
 			    // initialize events controller
-			    this.controller.init(this, this.element, this.canvasOverlay, /*handlers*/{
+			    this.controller.init(this, this.element, /*this.canvasOverlay*/ this.canvasGraphicOverlay, /*handlers*/{
 				    "resize":					function () {self.resize.apply(self, arguments);},
 				    "reinitializeScroll":		function () {self._onScrollReinitialize.apply(self, arguments);},
 				    "scrollY":					function () {self._onScrollY.apply(self, arguments);},
@@ -1170,8 +1182,8 @@
 			if (oldWidth === width && oldHeight === height)
 				return false;
 
-			this.canvas.width = this.canvasOverlay.width = width;
-			this.canvas.height = this.canvasOverlay.height = height;
+			this.canvas.width = this.canvasOverlay.width = this.canvasGraphic.width = this.canvasGraphicOverlay.width = width;
+			this.canvas.height = this.canvasOverlay.height = this.canvasGraphic.height = this.canvasGraphicOverlay.height = height;
 
 			// При смене ориентации у планшета, сбрасываются флаги у canvas!
 			this.drawingCtx.initContextSmoothing();
@@ -1207,6 +1219,8 @@
 
 			this.buffers.main.changeZoom(factor);
 			this.buffers.overlay.changeZoom(factor);
+			this.buffers.mainGraphic.changeZoom(factor);
+			this.buffers.overlayGraphic.changeZoom(factor);
 			this.drawingCtxCharts.changeZoom(factor);
 
 			var item;

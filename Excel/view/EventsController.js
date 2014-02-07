@@ -65,9 +65,7 @@
 			this.targetInfo = undefined;
 			this.isResizeMode = false;
 			this.isResizeModeMove = false;
-			// Выставляем при клике в объект(_onMouseDown)
-			this.isGraphicMode = false;
-			
+						
 			// Режим автозаполнения
 			this.isFillHandleMode = false;
 			this.isMoveRangeMode = false;
@@ -80,7 +78,10 @@
 			
 			// Обработчик кликов для граф.объектов
 			this.clickCounter = new ClickCounter();
-			this.isLocked = false;
+			this.isMousePressed = false;
+			this.isShapeAction = false;
+			// Для обработки _onMouseUp и _onWindowMouseUp
+			this.isMouseDownMode = false;
 
 			// Был ли DblClick обработан в onMouseDown эвенте
 			this.isDblClickInMouseDown = false;
@@ -284,7 +285,7 @@
 
 			var coord = t._getCoordinates(event);
 			var graphicsInfo = t.handlers.trigger("getGraphicsInfo", coord.x, coord.y);
-			if ( asc["editor"].isStartAddShape || (graphicsInfo && graphicsInfo.isGraphicObject) )
+			if ( t.isShapeAction || graphicsInfo )
 				return;
 
 			setTimeout(function () {
@@ -614,7 +615,7 @@
 
 			t.__retval = true;
 
-			//for Mac OS
+			// Mac OS
 			if ( event.metaKey )
 				event.ctrlKey = true;
 
@@ -632,14 +633,9 @@
 			}
 
 			var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
-			if ( !t.isLocked && graphicObjects.length && t.enableKeyEvents ) {
-				var result = t.handlers.trigger("graphicObjectWindowKeyDown", event);
-				if (t.isCellEditMode) {
-					t.handlers.trigger("stopCellEditing");
-					t.isCellEditMode = false;
-				}
-				if (result)
-					return result;
+			if ( !t.isMousePressed && graphicObjects.length && t.enableKeyEvents ) {
+				if (t.handlers.trigger("graphicObjectWindowKeyDown", event))
+					return true;
 			}
 
 			// Двигаемся ли мы в выделенной области
@@ -947,15 +943,14 @@
 			if (t.settings.isViewerMode || t.isSelectionDialogMode) {return true;}
 
 			var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
-			if ( !t.isLocked && graphicObjects.length && t.enableKeyEvents ) {
+			if ( !t.isMousePressed && graphicObjects.length && t.enableKeyEvents ) {
 				if (!( (event.ctrlKey || event.metaKey) && (event.which == 99 || event.which == 118 || event.which == 120) )) {		// Mozilla Firefox Fix #20080 (Ctrl+C, Ctrl+V, Ctrl+X)
-					if (t.handlers.trigger("graphicObjectWindowKeyPress", event)) {
-						if (t.isCellEditMode) {
-							t.handlers.trigger("stopCellEditing");
-							t.isCellEditMode = false;
-						}
-						return true;
+					if (t.isCellEditMode) {
+						t.handlers.trigger("stopCellEditing");
+						t.isCellEditMode = false;
 					}
+					if (t.handlers.trigger("graphicObjectWindowKeyPress", event))
+						return true;
 				}
 			}
 
@@ -1013,8 +1008,8 @@
             else if( this.vsbApiLockMouse )
                 this.vsbApi.mouseDown ? this.vsbApi.evt_mousemove.call(this.vsbApi,event) : false;
 				
-			event.isLocked = t.isLocked;
-			if (asc["editor"].isStartAddShape && t.isGraphicMode)
+			event.isLocked = t.isMousePressed;
+			if (t.isShapeAction && t.isMouseDownMode)
 				t.handlers.trigger("graphicObjectMouseMove", event, coord.x, coord.y);
 
 			return true;
@@ -1023,17 +1018,15 @@
 		/** @param event {jQuery.Event} */
 		asc_CEventsController.prototype._onWindowMouseUp = function (event) {
 
-//            this.vsbApi.evt_mouseup(event);
-//            this.hsbApi.evt_mouseup(event);
+			// this.vsbApi.evt_mouseup(event);
+			// this.hsbApi.evt_mouseup(event);
 
-			// Shapes
 			var coord = this._getCoordinates(event);
 			
-			// Отправляем событие только вне канвы
-			if ( this.isGraphicMode  && asc["editor"].isStartAddShape ) {
-				this.isLocked = false;
-				event.isLocked = false;
-				this.isGraphicMode = false;
+			// Shapes
+			if ( this.isMouseDownMode && this.isShapeAction ) {
+				event.isLocked = this.isMousePressed = false;
+				this.isMouseDownMode = false;
 				event.ClickCount = this.clickCounter.clickCount;
 				this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
 				this._changeSelectionDone(event);
@@ -1144,8 +1137,7 @@
 		asc_CEventsController.prototype._onMouseDown = function (event) {
 			var t = this;
 			var coord = t._getCoordinates(event);
-			event.isLocked = true;
-			t.isLocked = true;
+			event.isLocked = t.isMousePressed = true;
 
 			if (t.handlers.trigger("isGlobalLockEditCell"))
 				return;
@@ -1156,33 +1148,30 @@
 
 			// Shapes
 			var graphicsInfo = t.handlers.trigger("getGraphicsInfo", coord.x, coord.y);
-			if ( asc["editor"].isStartAddShape || (graphicsInfo && graphicsInfo.isGraphicObject) ) {
+			if ( asc["editor"].isStartAddShape || graphicsInfo ) {
 				// При выборе диапазона не нужно выделять автофигуру
 				if (t.isSelectionDialogMode)
 					return;
-				if ( t.isCellEditMode )
-					t.handlers.trigger("stopCellEditing");
+				
+				t.isShapeAction = true;
+				t.isMouseDownMode = true;
 					
-				//for Mac OS
-				if (event.metaKey)
+				// Mac OS
+				if ( event.metaKey )
 					event.ctrlKey = true;
-
-				this.clickCounter.mouseDownEvent(coord.x, coord.y, event.button);
-				event.ClickCount = this.clickCounter.clickCount;
-
-				if ( (event.ClickCount == 2) && asc["editor"].isStartAddShape )
-					this.isDblClickInMouseDown = true;
-
-				asc["editor"].isStartAddShape = true;
+				
+				t.clickCounter.mouseDownEvent(coord.x, coord.y, event.button);
+				event.ClickCount = t.clickCounter.clickCount;
+				
+				if ( (event.ClickCount == 2) && t.isShapeAction ) 
+					t.isDblClickInMouseDown = true;
+				
 				t.handlers.trigger("graphicObjectMouseDown", event, coord.x, coord.y);
-				t.isGraphicMode = true;
-
-				if (asc["editor"].isStartAddShape) {
-					// SelectionChanged
-					t.handlers.trigger("updateSelectionShape", /*isSelectOnShape*/true);
-					return;
-				}
+				t.handlers.trigger("updateSelectionShape", /*isSelectOnShape*/true);
+				return;
 			}
+			else
+				t.isShapeAction = false;
 
 			if (2 === event.detail) {
 				// Это означает, что это MouseDown для dblClick эвента (его обрабатывать не нужно)
@@ -1310,22 +1299,20 @@
 
 			// Shapes
 			var coord = this._getCoordinates(event);
-			event.isLocked = false;
-			this.isLocked = false;
+			event.isLocked = this.isMousePressed = false;
 
-			this.handlers.trigger("graphicObjectMouseUpEx", event, coord.x, coord.y);
-			if ( asc["editor"].isStartAddShape ) {
-
-				//for Mac OS
+			if ( this.isShapeAction ) {
+				// Mac OS
 				if ( event.metaKey )
 					event.ctrlKey = true;
-
-				//console.log("_onMouseUp: " + this.clickCounter.clickCount);
-
+				if (this.isCellEditMode) {
+					this.handlers.trigger("stopCellEditing");
+					this.isCellEditMode = false;
+				}
+				
 				event.ClickCount = this.clickCounter.clickCount;
 				this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
-				this._changeSelectionDone(event);
-				this.isGraphicMode = false;
+				this.isMouseDownMode = false;
 				return true;
 			}
 
@@ -1365,13 +1352,13 @@
 		asc_CEventsController.prototype._onMouseMove = function (event) {
 			var t = this;
 			var coord = t._getCoordinates(event);
-			event.isLocked = t.isLocked;
+			event.isLocked = t.isMousePressed;
 
 			t.hasCursor = true;
 
 			// Shapes
 			var graphicsInfo = t.handlers.trigger("getGraphicsInfo", coord.x, coord.y);
-			if ( graphicsInfo && graphicsInfo.isGraphicObject )
+			if ( graphicsInfo )
 				this.clickCounter.mouseMoveEvent(coord.x, coord.y);
 
 			if (t.isSelectMode) {
@@ -1408,7 +1395,7 @@
 				return true;
 			}
 
-			if (asc["editor"].isStartAddShape || graphicsInfo) {
+			if (t.isShapeAction || graphicsInfo) {
 				t.handlers.trigger("graphicObjectMouseMove", event, coord.x, coord.y);
 				t.handlers.trigger("updateWorksheet", t.element, coord.x, coord.y, event.ctrlKey, function(info){t.targetInfo = info;});
 				return true;

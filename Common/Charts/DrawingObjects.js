@@ -2940,13 +2940,13 @@ function DrawingObjects() {
 		documentId = api.documentId;
 		worksheet = currentSheet;
 		
-		drawingCtx = currentSheet.drawingCtx;
-		overlayCtx = currentSheet.overlayCtx;
+		drawingCtx = currentSheet.drawingGraphicCtx;
+		overlayCtx = currentSheet.overlayGraphicCtx;
 		shapeCtx = currentSheet.shapeCtx;
 		shapeOverlayCtx = currentSheet.shapeOverlayCtx;
 		
 		trackOverlay = new COverlay();
-		trackOverlay.init( shapeOverlayCtx.m_oContext, "ws-canvas-overlay", 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );
+		trackOverlay.init( shapeOverlayCtx.m_oContext, "ws-canvas-graphic-overlay", 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );
 		
 		autoShapeTrack = new CAutoshapeTrack();
 		autoShapeTrack.init( trackOverlay, 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );
@@ -3151,7 +3151,11 @@ function DrawingObjects() {
     };
 
     _this.OnUpdateOverlay = function(bFull) {
-        
+	
+		// test
+		_this.drawingArea.drawSelection(_this.drawingDocument);
+		return;
+	        
         var overlay = trackOverlay;
 		var ctx = overlay.m_oContext;
 		var drDoc = this.drawingDocument;
@@ -3173,7 +3177,7 @@ function DrawingObjects() {
 		}
 		
 		// Clip
-		_this.clipGraphicsCanvas(shapeOverlayCtx);
+		//_this.clipGraphicsCanvas(shapeOverlayCtx);
 		
 		worksheet._drawCollaborativeElements(false);
 		
@@ -3232,7 +3236,7 @@ function DrawingObjects() {
         }
 		
 		// Restore
-		_this.restoreGraphicsCanvas(shapeOverlayCtx);
+		//_this.restoreGraphicsCanvas(shapeOverlayCtx);
 		
         return true;
     };
@@ -3259,7 +3263,7 @@ function DrawingObjects() {
 		shapeOverlayCtx.init( overlayCtx.ctx, overlayCtx.getWidth(0), overlayCtx.getHeight(0), overlayCtx.getWidth(3), overlayCtx.getHeight(3) );
 		shapeOverlayCtx.CalculateFullTransform();
 		
-		trackOverlay.init( shapeOverlayCtx.m_oContext, "ws-canvas-overlay", 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );
+		trackOverlay.init( shapeOverlayCtx.m_oContext, "ws-canvas-graphic-overlay", 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );
 		autoShapeTrack.init( trackOverlay, 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );		
 		autoShapeTrack.Graphics.CalculateFullTransform();
 	}
@@ -3389,7 +3393,7 @@ function DrawingObjects() {
 		if ( coords ) {
 			
 			var range = asc_Range( coords.from.col, coords.from.row, coords.to.col, coords.to.row );
-			var r_ = range.intersection(worksheet.visibleRange);			
+			var r_ = range.intersection(worksheet.visibleRange);
 			
 			if ( r_ ) {
 				var offsetX = worksheet.cols[worksheet.getFirstVisibleCol(true)].left - worksheet.cellsLeft;
@@ -3419,6 +3423,8 @@ function DrawingObjects() {
 	}
 
 	_this.raiseLayerDrawingObjects = function() {
+	
+		return;
 		
 		var bRedraw = false;
 		var selection = worksheet.activeRange.clone(true);
@@ -3567,16 +3573,16 @@ function DrawingObjects() {
 		
 		if ( drawingCtx ) {
 			if ( clearCanvas ) {
-				_this.clearDrawingObjects(graphicOption);
-				worksheet._drawGraphic();
+				//_this.clearDrawingObjects(graphicOption);
+				//worksheet._drawGraphic();
 			}
 
 			if ( aObjects.length ) {
 				// Clip
-				_this.clipGraphicsCanvas(shapeCtx, graphicOption);
+				//_this.clipGraphicsCanvas(shapeCtx, graphicOption);
 				
 				// Area for update
-				if ( graphicOption ) {
+				/*if ( graphicOption ) {
 					var updatedRect = { x: 0, y: 0, w: 0, h: 0 };
 					var updatedRange = graphicOption.getUpdatedRange();
 					
@@ -3595,23 +3601,23 @@ function DrawingObjects() {
 					updatedRect.w = ptToMm(w);
 					updatedRect.h = ptToMm(h);
 					
-					/*shapeCtx.m_oContext.beginPath();
+					shapeCtx.m_oContext.beginPath();
 					shapeCtx.m_oContext.strokeStyle = "#FF0000";
 					shapeCtx.m_oContext.rect(mmToPx(updatedRect.x) + scrollOffset.getX(), mmToPx(updatedRect.y) + scrollOffset.getY(), mmToPx(updatedRect.w), mmToPx(updatedRect.h));
-					shapeCtx.m_oContext.stroke();*/
+					shapeCtx.m_oContext.stroke();
 					
 					shapeCtx.updatedRect = updatedRect;
 					
 					if ( graphicOption.type === c_oAscGraphicOption.AddText ) {
 						drawingCtx.clearRect( x1, y1, w, h );
 						drawingCtx.setFillStyle(worksheet.settings.cells.defaultState.background).fillRect(x1, y1, w, h);
-						worksheet._drawGrid(/*drawingCtx*/undefined, updatedRange);
-						worksheet._drawCells(/*drawingCtx*/undefined, updatedRange);
-						worksheet._drawCellsBorders(/*drawingCtx*/undefined, updatedRange);
+						worksheet._drawGrid(undefined, updatedRange);
+						worksheet._drawCells(undefined, updatedRange);
+						worksheet._drawCellsBorders(undefined, updatedRange);
 					}
 				}
 				else
-					shapeCtx.updatedRect = null;
+					shapeCtx.updatedRect = null;*/
 				
 				for (var i = 0; i < aObjects.length; i++) {
 
@@ -3620,11 +3626,11 @@ function DrawingObjects() {
 					//if ( drawingObject.graphicObject.isChart() )
 					//	drawingObject.graphicObject.syncAscChart();
 					
-					if ( !printOptions ) {
+					/*if ( !printOptions ) {
 						if ( !drawingObject.inVisibleArea(graphicOption) ) {
 							continue;
 						}
-					}
+					}*/
 					
 					//console.log("draw object: " + (i + 1));
 						
@@ -3650,12 +3656,12 @@ function DrawingObjects() {
 							}
 						}
 						else {
-							drawingObject.graphicObject.draw( shapeCtx );
+							//drawingObject.graphicObject.draw( shapeCtx );
+							this.drawingArea.drawObject(drawingObject);
 						}
 					}
 				}
-				// Restore
-				_this.restoreGraphicsCanvas(shapeCtx);
+				//_this.restoreGraphicsCanvas(shapeCtx);
 			}
 			worksheet.model.Drawings = aObjects;
 		}
@@ -3665,8 +3671,6 @@ function DrawingObjects() {
 			if ( aObjects.length ) {
 				if ( _this.controller.selectedObjects.length )
 					_this.OnUpdateOverlay();
-				//else
-				//	_this.raiseLayerDrawingObjects();
 			}
 		}
 	}
@@ -3803,7 +3807,7 @@ function DrawingObjects() {
 			maxRow: 0
 		}
 
-		for (var i = 0; i < aObjects.length; i++) {
+		for (var i = 0; aObjects && (i < aObjects.length); i++) {
 			
 			var drawingObject = aObjects[i];
 			if ( drawingObject.to.col >= metrics.maxCol )
@@ -3870,6 +3874,7 @@ function DrawingObjects() {
 		worksheet._drawCells(/*drawingCtx*/undefined, range, offsetLeft, offsetTop);
 		worksheet._drawCellsBorders(/*drawingCtx*/undefined, range, offsetLeft, offsetTop);
 	};
+	
 	_this.drawWorksheetLayer = function (range) {
 		var c1, c2, r1, r2, tmpRange;
 		var vr = worksheet.getVisibleRange();
@@ -4969,7 +4974,7 @@ function DrawingObjects() {
 		
 		if ( shapeCtx && shapeOverlayCtx && autoShapeTrack ) {
 			
-			var x = scrollOffset.getX();
+			/*var x = scrollOffset.getX();
 			var y = scrollOffset.getY();
 
 			shapeCtx.m_oCoordTransform.tx = x;
@@ -4986,8 +4991,12 @@ function DrawingObjects() {
             this.controller.recalculateCurPos();
 			
 			if ( _this.selectedGraphicObjectsExists() )
-				this.controller.updateSelectionState();
+				this.controller.updateSelectionState();*/
 		}
+	}
+	
+	_this.getDrawingCanvas = function() {
+		return { shapeCtx: shapeCtx, shapeOverlayCtx: shapeOverlayCtx, autoShapeTrack: autoShapeTrack, trackOverlay: trackOverlay };
 	}
 	
 	_this.convertMetric = function(val, from, to) {
@@ -5111,20 +5120,29 @@ function DrawingObjects() {
 	//-----------------------------------------------------------------------------------
 	
 	_this.graphicObjectMouseDown = function(e, x, y) {
-		_this.controller.onMouseDown( e, pxToMm(x - scrollOffset.getX()), pxToMm(y - scrollOffset.getY()) );
+		var offsets = _this.drawingArea.getOffsets(x, y);
+		if ( offsets )
+			_this.controller.onMouseDown( e, pxToMm(x - offsets.x), pxToMm(y - offsets.y) );
+			
+		//_this.controller.onMouseDown( e, pxToMm(x - scrollOffset.getX()), pxToMm(y - scrollOffset.getY()) );
 	}
 	
 	_this.graphicObjectMouseMove = function(e, x, y) {
 		e.IsLocked = e.isLocked;
 		
-		for ( var i = 0; i < _this.drawingArea.frozenPlaces.length; i++ ) {
-			_this.drawingArea.frozenPlaces[i].isPointInside(x, y);
-		}
-		_this.controller.onMouseMove( e, pxToMm(x - scrollOffset.getX()), pxToMm(y - scrollOffset.getY()) );
+		var offsets = _this.drawingArea.getOffsets(x, y);
+		if ( offsets )
+			_this.controller.onMouseMove( e, pxToMm(x - offsets.x), pxToMm(y - offsets.y) );
+		
+		//_this.controller.onMouseMove( e, pxToMm(x - scrollOffset.getX()), pxToMm(y - scrollOffset.getY()) );
 	}
 	
 	_this.graphicObjectMouseUp = function(e, x, y) {
-		_this.controller.onMouseUp( e, pxToMm(x - scrollOffset.getX()), pxToMm(y - scrollOffset.getY()) );
+		var offsets = _this.drawingArea.getOffsets(x, y);
+		if ( offsets )
+			_this.controller.onMouseUp( e, pxToMm(x - offsets.x), pxToMm(y - offsets.y) );
+		
+		//_this.controller.onMouseUp( e, pxToMm(x - scrollOffset.getX()), pxToMm(y - scrollOffset.getY()) );
 	}
 	
 	// keyboard
@@ -5403,22 +5421,20 @@ function DrawingObjects() {
 	}
 
 	_this.checkCursorDrawingObject = function(x, y) {
-	
-		//if ( !aObjects.length )
-		//	return null;
-
-		var objectInfo = { cursor: null, id: null, object: null, isGraphicObject: false };
-		var graphicObjectInfo = _this.controller.isPointInDrawingObjects( pxToMm(x - scrollOffset.getX()), pxToMm(y - scrollOffset.getY()) );
-		
-		if ( graphicObjectInfo && graphicObjectInfo.objectId ) {
-			objectInfo.id = graphicObjectInfo.objectId;
-			objectInfo.object = _this.getDrawingBase(graphicObjectInfo.objectId);
-			objectInfo.cursor = graphicObjectInfo.cursorType;
-            objectInfo.hyperlink = graphicObjectInfo.hyperlink;
-			objectInfo.isGraphicObject = true;
+		var offsets = _this.drawingArea.getOffsets(x, y);
+		if ( offsets ) {
+			var objectInfo = { cursor: null, id: null, object: null };
+			var graphicObjectInfo = _this.controller.isPointInDrawingObjects( pxToMm(x - offsets.x), pxToMm(y - offsets.y) );
 			
-			return objectInfo;
-		}		
+			if ( graphicObjectInfo && graphicObjectInfo.objectId ) {
+				objectInfo.id = graphicObjectInfo.objectId;
+				objectInfo.object = _this.getDrawingBase(graphicObjectInfo.objectId);
+				objectInfo.cursor = graphicObjectInfo.cursorType;
+				objectInfo.hyperlink = graphicObjectInfo.hyperlink;
+				
+				return objectInfo;
+			}
+		}
 		return null;
 	}
 
@@ -5624,8 +5640,10 @@ function ClickCounter() {
 	_this.mouseDownEvent = function(x, y, button) {
 	
 		var currTime = getCurrentTime();
-		if ( (_this.button === button) && (_this.x === x) && (_this.y === y) && (currTime - _this.time < 500) )
-			_this.clickCount = 2;
+		if ( (_this.button === button) && (_this.x === x) && (_this.y === y) && (currTime - _this.time < 500) ) {
+			_this.clickCount = _this.clickCount + 1;
+			_this.clickCount = Math.min(_this.clickCount, 3);
+		}
 		else
 			_this.clickCount = 1;
 		
@@ -5740,321 +5758,6 @@ function CoordsManager(ws, bLog) {
 			coords.x = worksheet.getCellLeft(cell.col, 0) + worksheet.objectRender.convertMetric(cell.colOff, 3, 0) - worksheet.getCellLeft(0, 0);
 		}
 		return coords;
-	}
-}
-
-//-----------------------------------------------------------------------------------
-// Drawing area manager
-//-----------------------------------------------------------------------------------
-
-// Type
-var FrozenAreaType = {
-
-	Top				: "Top",
-	Bottom			: "Bottom",
-	Left			: "Left",
-	Right			: "Right",
-	Center			: "Center",		// Default without frozen places
-	
-	LeftTop			: "LeftTop",
-	RightTop		: "RightTop",
-	LeftBottom		: "LeftBottom",
-	RightBottom		: "RightBottom"
-};
-
-// Frozen place
-function FrozenPlace(ws, type) {
-	var log = false;
-	var _this = this;
-	var asc = window["Asc"];
-	var asc_Range = asc.Range;
-	
-	_this.worksheet = ws;
-	_this.type = type;
-	_this.range = null;
-	_this.frozenCell = {
-		col: _this.worksheet.topLeftFrozenCell ? _this.worksheet.topLeftFrozenCell.getCol0() : 0,
-		row: _this.worksheet.topLeftFrozenCell ? _this.worksheet.topLeftFrozenCell.getRow0() : 0
-	};
-	_this.isValid = true;
-	
-	var convertMetrics = _this.worksheet.objectRender.convertMetric;
-	
-	switch (_this.type) {
-		
-		case FrozenAreaType.Top: {
-			if ( !_this.frozenCell.col && _this.frozenCell.row )
-				_this.range = new asc_Range(0, 0, _this.worksheet.getLastVisibleCol(), _this.frozenCell.row);
-			else
-				_this.isValid = false;
-		}
-		break;
-		
-		case FrozenAreaType.Bottom: {
-			if ( !_this.frozenCell.col && _this.frozenCell.row )
-				_this.range = new asc_Range(0, _this.frozenCell.row, _this.worksheet.getLastVisibleCol(), _this.worksheet.getLastVisibleRow());
-			else
-				_this.isValid = false;
-		}
-		break;
-		
-		case FrozenAreaType.Left: {
-			if ( _this.frozenCell.col && !_this.frozenCell.row )
-				_this.range = new asc_Range(0, 0, _this.frozenCell.col, _this.worksheet.getLastVisibleRow());
-			else
-				_this.isValid = false;
-		}
-		break;
-		
-		case FrozenAreaType.Right: {
-			if ( _this.frozenCell.col && !_this.frozenCell.row )
-				_this.range = new asc_Range(_this.frozenCell.col, 0, _this.worksheet.getLastVisibleCol(), _this.worksheet.getLastVisibleRow());
-			else
-				_this.isValid = false;
-		}
-		break;
-		
-		case FrozenAreaType.Center: {
-			if ( !_this.frozenCell.col && !_this.frozenCell.row )
-				_this.range = new asc_Range(0, 0, _this.worksheet.getLastVisibleCol(), _this.worksheet.getLastVisibleRow());
-			else
-				_this.isValid = false;
-		}
-		break;
-		
-		// Other
-		case FrozenAreaType.LeftTop: {
-			if ( _this.frozenCell.col && _this.frozenCell.row )
-				_this.range = new asc_Range(0, 0, _this.frozenCell.col, _this.frozenCell.row);
-			else
-				_this.isValid = false;
-		}
-		break;
-		
-		case FrozenAreaType.RightTop: {
-			if ( _this.frozenCell.col && _this.frozenCell.row )
-				_this.range = new asc_Range(_this.frozenCell.col, 0, _this.worksheet.getLastVisibleCol(), _this.frozenCell.row);
-			else
-				_this.isValid = false;
-		}
-		break;
-		
-		case FrozenAreaType.LeftBottom: {
-			if ( _this.frozenCell.col && _this.frozenCell.row )
-				_this.range = new asc_Range(0, _this.frozenCell.row, _this.frozenCell.col, _this.worksheet.getLastVisibleRow());
-			else
-				_this.isValid = false;
-		}
-		break;
-		
-		case FrozenAreaType.RightBottom: {
-			if ( _this.frozenCell.col && _this.frozenCell.row )
-				_this.range = new asc_Range(_this.frozenCell.col, _this.frozenCell.row, _this.worksheet.getLastVisibleCol(), _this.worksheet.getLastVisibleRow());
-			else
-				_this.isValid = false;
-		}
-		break;
-	}
-	
-	// Methods
-	
-	_this.getFirstVisible = function() {
-		return { col : _this.worksheet.getFirstVisibleCol(),
-				 row : _this.worksheet.getFirstVisibleRow(),
-				 col0 : _this.worksheet.getFirstVisibleCol(true),
-				 rrow0 : _this.worksheet.getFirstVisibleRow(true) };
-	}
-	
-	_this.getRect = function() {
-		var rect = { x: 0, y: 0, w: 0, h: 0 };
-		var fv = _this.getFirstVisible();
-		
-		switch (_this.type) {
-			// Two places
-			case FrozenAreaType.Top: {
-			}
-			break;
-			case FrozenAreaType.Bottom: {
-			}
-			break;
-			case FrozenAreaType.Left: {
-			}
-			break;
-			case FrozenAreaType.Right: {
-			}
-			break;
-			
-			// Four places
-			case FrozenAreaType.LeftTop: {
-			}
-			break;
-			case FrozenAreaType.RightTop: {
-			}
-			break;
-			case FrozenAreaType.LeftBottom: {
-			}
-			break;
-			case FrozenAreaType.RightBottom: {
-			}
-			break;
-			
-			// No frozen areas
-			case FrozenAreaType.Center: {
-				/*rect.x = _this.worksheet.getCellLeft(_this.range.c1, 0);
-				rect.y = _this.worksheet.getCellTop(_this.range.r1, 0);
-				rect.w = _this.worksheet.getCellLeft(_this.range.c2, 0) - rect.x;
-				rect.h = _this.worksheet.getCellTop(_this.range.r2, 0) - rect.y;*/
-			}
-			break;
-		}
-		
-		rect.x = _this.worksheet.getCellLeft(_this.range.c1, 0);
-		rect.y = _this.worksheet.getCellTop(_this.range.r1, 0);
-		rect.w = _this.worksheet.getCellLeft(_this.range.c2, 0) - rect.x;
-		rect.h = _this.worksheet.getCellTop(_this.range.r2, 0) - rect.y;
-		
-		return rect;
-	}
-	
-	_this.isPointInside = function(x, y) {
-		var rect = _this.getRect();
-		var result = (x > rect.x ) && (y > rect.y) && (x <= rect.x + rect.w) && (y <= rect.y + rect.h);
-		if ( log && result )
-			console.log( x + "," + y + " in " +  _this.type);
-		return result;			
-	}
-	
-	_this.getVerticalScroll = function() {
-		
-		// No scroll for Top, LeftTop, RightTop
-		var fv = _this.getFirstVisible();
-		
-		switch (_this.type) {
-			// Two places
-			case FrozenAreaType.Top: {
-			}
-			break;
-			case FrozenAreaType.Bottom: {
-			}
-			break;
-			case FrozenAreaType.Left: {
-			}
-			break;
-			case FrozenAreaType.Right: {
-			}
-			break;
-			
-			// Four places
-			case FrozenAreaType.LeftTop: {
-			}
-			break;
-			case FrozenAreaType.RightTop: {
-			}
-			break;
-			case FrozenAreaType.LeftBottom: {
-			}
-			break;
-			case FrozenAreaType.RightBottom: {
-			}
-			break;
-			
-			// No frozen areas
-			case FrozenAreaType.Center: {
-				return convertMetrics( (_this.worksheet.rows[fv.row].top - _this.worksheet.cellsTop), 1, 0 ) - _this.worksheet.getCellTop(0, 0);
-			}
-			break;
-		}
-	}
-	
-	_this.getHorizontalScroll = function() {
-		
-		// No scroll for Left, LeftTop, LeftBottom
-		var fv = _this.getFirstVisible();
-		
-		switch (_this.type) {
-			// Two places
-			case FrozenAreaType.Top: {
-			}
-			break;
-			case FrozenAreaType.Bottom: {
-			}
-			break;
-			case FrozenAreaType.Left: {
-			}
-			break;
-			case FrozenAreaType.Right: {
-			}
-			break;
-			
-			// Four places
-			case FrozenAreaType.LeftTop: {
-			}
-			break;
-			case FrozenAreaType.RightTop: {
-			}
-			break;
-			case FrozenAreaType.LeftBottom: {
-			}
-			break;
-			case FrozenAreaType.RightBottom: {
-			}
-			break;
-			
-			// No frozen areas
-			case FrozenAreaType.Center: {
-				return convertMetrics( (_this.worksheet.cols[fv.col].left - _this.worksheet.cellsLeft), 1, 0 ) + _this.worksheet.getCellLeft(0, 0);
-			}
-			break;
-		}
-	}
-	
-	_this.getClipRect = function() {
-		var rect = { x: 0, y: 0, w: 0, h: 0 };
-		return rect;
-	}
-}
-
-// Container
-function DrawingArea(ws) {
-
-	var _this = this;
-	_this.worksheet = ws;
-	
-	_this.frozenPlaces = [];
-	
-	// Methods
-	_this.init = function() {
-		if ( _this.worksheet ) {
-			if ( _this.worksheet.topLeftFrozenCell ) {
-				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.Top);
-				if ( place.isValid )
-					_this.frozenPlaces.push(place);
-				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.Bottom);
-				if ( place.isValid )
-					_this.frozenPlaces.push(place);
-				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.Left);
-				if ( place.isValid )
-					_this.frozenPlaces.push(place);
-				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.Right);
-				if ( place.isValid )
-					_this.frozenPlaces.push(place);
-					
-				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.LeftTop);
-				if ( place.isValid )
-					_this.frozenPlaces.push(place);
-				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.RightTop);
-				if ( place.isValid )
-					_this.frozenPlaces.push(place);
-				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.LeftBottom);
-				if ( place.isValid )
-					_this.frozenPlaces.push(place);
-				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.RightBottom);
-				if ( place.isValid )
-					_this.frozenPlaces.push(place);
-			}
-			else
-				_this.frozenPlaces.push(new FrozenPlace(_this.worksheet, FrozenAreaType.Center));
-		}
 	}
 }
 

@@ -2556,7 +2556,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			setEndPointHistory: function(){History.EndTransaction()},
 
 			asc_startAddShape: function(sPreset) {
-				this.isStartAddShape = true;
+				this.isStartAddShape = this.controller.isShapeAction = true;
 				var ws = this.wb.getWorksheet();
 				ws.objectRender.controller.startTrackNewShape(sPreset);
 			},
@@ -2600,8 +2600,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 			
 			asc_getGraphicObjectProps: function() {
-				var ws = this.wb.getWorksheet();
-				return ws.objectRender.controller.getGraphicObjectProps();
+				//var ws = this.wb.getWorksheet();
+				//return ws.objectRender.controller.getGraphicObjectProps();
+				return [];
 			},
 			
 			asc_setGraphicObjectProps: function(props) {

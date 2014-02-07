@@ -258,6 +258,8 @@ DrawingObjectsController.prototype =
                 if(!(e.CtrlKey || e.ShiftKey) && !is_selected)
                     selector.resetSelection();
                 selector.selectObject(object);
+				if(!is_selected)
+					this.updateOverlay();
                 this.checkSelectedObjectsForMove(group);
 				if(!isRealObject(group))
 				{

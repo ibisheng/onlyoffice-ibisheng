@@ -304,6 +304,10 @@
 			this.buffers = buffers;
 			this.drawingCtx = this.buffers.main;
 			this.overlayCtx = this.buffers.overlay;
+			
+			this.drawingGraphicCtx = this.buffers.mainGraphic;
+			this.overlayGraphicCtx = this.buffers.overlayGraphic;
+			
 			this.shapeCtx = this.buffers.shapeCtx;
 			this.shapeOverlayCtx = this.buffers.shapeOverlayCtx;
 
@@ -2876,9 +2880,9 @@
 		};
 
 		/** Рисует закрепление областей */
-		WorksheetView.prototype._drawFrozenPaneLines = function () {
+		WorksheetView.prototype._drawFrozenPaneLines = function (canvas) {
 			if (this.topLeftFrozenCell) {
-				var ctx = this.drawingCtx;
+				var ctx = canvas ? canvas : this.drawingCtx;
 				var row = this.topLeftFrozenCell.getRow0();
 				var col = this.topLeftFrozenCell.getCol0();
 				ctx.setLineWidth(1).setStrokeStyle(this.settings.frozenColor).beginPath();
