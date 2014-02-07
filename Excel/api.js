@@ -55,6 +55,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			this.DocumentName = "";
 			this.documentId = undefined;
+			this.documentUserId = undefined;
 			this.documentUrl = "null";
 			this.documentTitle = "null";
 			this.documentTitleWithoutExtention = "null";
@@ -420,6 +421,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				
 				if(this.DocInfo){
 					this.documentId     		= this.DocInfo["Id"];
+					this.documentUserId			= this.DocInfo["UserId"];
 					this.documentUrl    		= this.DocInfo["Url"];
 					this.documentTitle  		= this.DocInfo["Title"];
 					this.documentFormat 		= this.DocInfo["Format"];
@@ -527,6 +529,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					var rdata = {
 						"c"			: "getsettings",
 						"id"		: this.DocInfo["Id"],
+						"userid"	: this.DocInfo["UserId"],
 						"format"	: this.DocInfo["Format"],
 						"vkey"		: this.DocInfo["VKey"],
 						"editorid"	: c_oEditorId.Speadsheet
@@ -540,7 +543,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_getLicense : function () {
 				var t = this;
 				var rdata = {
-					"c" : "getlicense"
+					"c": "getlicense",
+					"id": this.DocInfo["Id"],
+					"userid": this.DocInfo["UserId"]
 				};
 				this._asc_sendCommand(function (response) {t._onGetLicense(response);}, rdata);
 			},
@@ -749,7 +754,19 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Open) {
 							this.documentFormatSaveCsvCodepage = option.asc_getCodePage();
 							this.documentFormatSaveCsvDelimiter = option.asc_getDelimiter();
-							var v = {"id":this.documentId, "format": this.documentFormat, "vkey": this.documentVKey, "editorid": c_oEditorId.Speadsheet, "c":"reopen", "url": this.documentUrl, "title": this.documentTitle, "embeddedfonts": this.isUseEmbeddedCutFonts, "delimiter": option.asc_getDelimiter(), "codepage": option.asc_getCodePage()};
+							var v = {
+							"id":this.documentId,
+							"userid": this.documentUserId,
+							"format": this.documentFormat,
+							"vkey": this.documentVKey,
+							"editorid": c_oEditorId.Speadsheet,
+							"c":"reopen",
+							"url": this.documentUrl,
+							"title": this.documentTitle,
+							"embeddedfonts": this.isUseEmbeddedCutFonts,
+							"delimiter": option.asc_getDelimiter(),
+							"codepage": option.asc_getCodePage()};
+							
 							this._asc_sendCommand(function (response) {t._startOpenDocument(response);}, v);
 						} else if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Save)
 							this._asc_downloadAs(c_oAscFileType.CSV, function(incomeObject){
@@ -902,11 +919,25 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 										callback(incomeObject);
 									break;
 								case "waitopen":
-									var rData = {"id":oThis.documentId, "format": oThis.documentFormat, "vkey": oThis.documentVKey, "editorid": c_oEditorId.Spreadsheet, "c":"chopen"};
+									var rData = {
+										"id":oThis.documentId,
+										"userid": oThis.documentUserId,
+										"format": oThis.documentFormat,
+										"vkey": oThis.documentVKey,
+										"editorid": c_oEditorId.Spreadsheet,
+										"c":"chopen"};
+										
 									setTimeout(function(){oThis._asc_sendCommand(callback, rData);}, 3000);
 									break;
 								case "waitsave":
-									var rData = {"id": oThis.documentId, "vkey": oThis.documentVKey, "title": oThis.documentTitleWithoutExtention, "c": "chsave", "data": incomeObject["data"]};
+									var rData = {
+										"id": oThis.documentId,
+										"userid": oThis.documentUserId,
+										"vkey": oThis.documentVKey,
+										"title": oThis.documentTitleWithoutExtention,
+										"c": "chsave",
+										"data": incomeObject["data"]};
+										
 									setTimeout(function(){oThis._asc_sendCommand(callback, rData);}, 3000);
 									break;
 								case "savepart":
@@ -988,6 +1019,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				} else {
                     var v = {
                         "id"            : this.documentId,
+						"userid"		: this.documentUserId,
                         "format"        : this.documentFormat,
                         "vkey"          : this.documentVKey,
                         "editorid"      : c_oEditorId.Speadsheet,
@@ -1019,6 +1051,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				var oAdditionalData = {};
 				oAdditionalData["c"] = "save";
 				oAdditionalData["id"] = this.documentId;
+				oAdditionalData["userid"] = this.documentUserId,
 				oAdditionalData["vkey"] = this.documentVKey;
 				oAdditionalData["outputformat"] = this.documentFormatSave;
 				if(c_oAscFileType.CSV == this.documentFormatSave)
@@ -1040,6 +1073,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				var oAdditionalData = {};
 				oAdditionalData["c"] = "save";
 				oAdditionalData["id"] = this.documentId;
+				oAdditionalData["userid"] = this.documentUserId,
 				oAdditionalData["vkey"] = this.documentVKey;
 				oAdditionalData["outputformat"] = sFormat;
 				if(null != sSaveKey)
@@ -1079,7 +1113,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						}
 					}
 				} else if (c_oAscFileType.CSV === sFormat && !options) {
-					var v = {"id":this.documentId, "vkey": this.documentVKey, "c":"getcodepage"};
+					var v = {
+						"id":this.documentId,
+						"userid": this.documentUserId,
+						"vkey": this.documentVKey,
+						"c":"getcodepage"};
+						
 					return this._asc_sendCommand (fCallback, v);
 				} else {
 					this.wb._initCommentsToSave();
@@ -2384,7 +2423,13 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			asc_addImageDrawingObject: function(imageUrl) {
-				var rData = {"id":this.documentId, "vkey": this.documentVKey, "c":"imgurl", "data": imageUrl};
+				var rData = {
+					"id":this.documentId,
+					"userid":this.documentUserId,
+					"vkey": this.documentVKey,
+					"c":"imgurl",
+					"data": imageUrl};
+					
 				var oThis = this;
 				this.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 				this._asc_sendCommand( function(incomeObject){
