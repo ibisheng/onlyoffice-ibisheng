@@ -457,19 +457,51 @@ CIterators.prototype.init = function()
     this.setDimension(2, 1);
     this.setContent();
 }
-CIterators.prototype.setDistanceIters = function(oMeasure)
+CIterators.prototype.old_old_setDistanceIters = function(oMeasure)
 {
-    /*var descF = this.elements[0][0].size.height - this.elements[0][0].size.center ,
-        ascS = this.elements[1][0].size.center;*/
-
     var upIter  = this.elements[0][0].size,
         lowIter = this.elements[1][0].size;
 
-    /*var FontSize = this.getCtrPrp().FontSize,
-        shCent = DIV_CENT*FontSize;*/
+    var mgCtrPrp = this.mergeCtrTPrp();
+
+    var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
+
+    var upDesc = upIter.height - upIter.ascent + shCenter,
+        lowAsc = 1.2*(lowIter.ascent - shCenter);
+
+    var up = 0;
+    var down = 0;
+    if(this.lUp  > upDesc)
+    {
+        up = this.lUp - upDesc;
+        this.upper = upIter.height - upDesc;
+    }
+    else
+    {
+        up = 0;
+        this.upper = upIter.height - this.lUp;
+    }
+
+    if( this.lD > lowAsc )
+        down = this.lD - lowAsc;
+
+    var minGap = 1.1*shCenter;
+
+    if( up + down < minGap)
+    {
+        this.dH = minGap;
+    }
+    else
+    {
+        this.dH = up + down;
+    }
+}
+CIterators.prototype.old_setDistanceIters = function(oMeasure)
+{
+    var upIter  = this.elements[0][0].size,
+        lowIter = this.elements[1][0].size;
 
     var mgCtrPrp = this.mergeCtrTPrp();
-    //var ctrPrp = this.getCtrPrp();
 
     var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
 
@@ -493,7 +525,7 @@ CIterators.prototype.setDistanceIters = function(oMeasure)
     if( this.lD > lowAsc )
         down = this.lD - lowAsc;
 
-    var minGap = 1.1*shCenter;
+    var minGap = 0.78*shCenter;
 
     if( up + down < minGap)
     {
@@ -504,25 +536,32 @@ CIterators.prototype.setDistanceIters = function(oMeasure)
         this.dH = up + down;
     }
 }
-/*CIterators.prototype.getAscent = function()
+CIterators.prototype._setDistanceIters = function(oMeasure)
 {
-    var ascent = 0;
-    var upIter  = this.elements[0][0].size;
+    var upIter  = this.elements[0][0].size,
+        lowIter = this.elements[1][0].size;
 
-    *//*var FontSize = this.getCtrPrp().FontSize,
-        shCent = DIV_CENT*FontSize;*//*
+    var mgCtrPrp = this.mergeCtrTPrp();
 
-    var shCenter = this.getShiftCenter();
+    var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
 
-    var upDesc = upIter.height - upIter.ascent + shCent;
+    var upDesc = upIter.height - upIter.ascent + 1.1*shCenter,
+        lowAsc = 1.2*(lowIter.ascent - shCenter);
 
-    if(this.lUp > upDesc)
-        ascent = upIter.height - upDesc + this.lUp;
+    var minGap = 0.78*shCenter;
+
+    var gapUpper = upIter.height - 1.668*shCenter;
+        gapLower = lowIter.height - 1.668*shCenter;
+
+    this.dH = 0.78*shCenter;
+
+    if(gapUpper > 0)
+    {
+        this.upper = gapUpper;
+    }
     else
-        ascent = upIter.height + shCent;
-
-    return ascent;
-}*/
+        this.upper = 0;
+}
 CIterators.prototype.getUpperIterator = function()
 {
     return this.elements[0][0];
@@ -540,6 +579,7 @@ function CDegreeSubSup()
 {
     this.kind = MATH_DEGREESubSup;
 
+    this.gapBase = 0;
     this.type = DEGREE_SubSup;
     this.alnScr = false;    // не выровнены, итераторы идут в соответствии с наклоном буквы/мат. объекта
     CSubMathBase.call(this);
@@ -557,9 +597,6 @@ CDegreeSubSup.prototype.init = function(props)
 }
 CDegreeSubSup.prototype.init_2 = function(props, oBase)
 {
-    /*if( typeof(props.type)!=="undefined"|| props.type !== null)
-        this.type = props.type;*/
-
     if(props.type === DEGREE_SubSup)
         this.type = DEGREE_SubSup;
     else if(props.type === DEGREE_PreSubSup)
@@ -587,9 +624,8 @@ CDegreeSubSup.prototype.init_2 = function(props, oBase)
     }
 
 }
-CDegreeSubSup.prototype.recalculateSize = function(oMeasure)
+CDegreeSubSup.prototype.old_old_recalculateSize = function(oMeasure)
 {
-    //var ctrPrp = this.getCtrPrp();
     var mgCtrPrp = this.mergeCtrTPrp();
 
     var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
@@ -604,17 +640,11 @@ CDegreeSubSup.prototype.recalculateSize = function(oMeasure)
     {
         iters = this.elements[0][1];
         base  = this.elements[0][0];
-
     }
     else if(this.type == DEGREE_PreSubSup)
     {
         iters = this.elements[0][0];
         base  = this.elements[0][1];
-
-        /*this.elements[0][0].lUp = this.elements[0][1].size.center;
-        this.elements[0][0].lD = this.elements[0][1].size.height - this.elements[0][1].size.center;
-        this.elements[0][0].setDistance();
-        this.elements[0][0].recalculateSize();*/
     }
 
     iters.lUp = base.size.ascent - shCenter; // center of base
@@ -622,8 +652,6 @@ CDegreeSubSup.prototype.recalculateSize = function(oMeasure)
     iters.setDistanceIters(oMeasure);
     iters.recalculateSize();
 
-    //this.dW = 0.18*shCenter;
-    //this.dW = 0;
 
     var smallAsc = mgCtrPrp.FontSize*0.23;
 
@@ -633,14 +661,282 @@ CDegreeSubSup.prototype.recalculateSize = function(oMeasure)
         this.dW = 0.2*shCenter;
 
     width  = iters.size.width + base.size.width + this.dW;
-    //height = shCenter + iters.lUp;
     height = iters.size.height;
 
     ascent = iters.upper + base.size.ascent;
 
     this.size = {width: width, height: height, ascent: ascent};
+}
+CDegreeSubSup.prototype.old_recalculateSize = function(oMeasure)
+{
+    var mgCtrPrp = this.mergeCtrTPrp();
 
-    //CSubMathBase.superclass.recalculateSize.call(this);
+    var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
+    shCenter *= 1.2;
+
+    var width = 0, height = 0,
+        ascent = 0;
+
+    var iters, base;
+
+    if(this.type == DEGREE_SubSup)
+    {
+        iters = this.elements[0][1];
+        base  = this.elements[0][0];
+    }
+    else if(this.type == DEGREE_PreSubSup)
+    {
+        iters = this.elements[0][0];
+        base  = this.elements[0][1];
+    }
+
+    // distance for iterators
+
+    var iterUp = iters.elements[0][0].size,
+        iterDown = iters.elements[1][0].size;
+
+    var lUp    = base.size.ascent - shCenter; // center of base
+    var lDown  = base.size.height - lUp; // height - center of base
+
+    var ctrPrpIter = iters.mergeCtrTPrp();
+    var shIter = this.Composition.GetShiftCenter(oMeasure, ctrPrpIter); //смещение
+
+    //var upDesc = iterUp.height - iterUp.ascent + 1.2*shIter, // смещенный descent верхнего итератора
+    //    downAsc = iterDown.ascent + 0.6*shIter; // смещенный ascent нижнего оператора
+
+    var upDesc = iterUp.height - shIter,
+        downAsc = iterDown.height - shIter;
+
+    var up = 0,     // расстояние от центра основания до верхнего итератора
+        down = 0;   // расстояние от центра основания до нижнего итератора
+
+    if(lUp  > upDesc)
+    {
+        up = lUp - upDesc;
+        this.gapBase = iterUp.height - upDesc;
+    }
+    else
+    {
+        up = 0;
+        this.gapBase = iterUp.height - lUp;
+    }
+
+    if( lDown > downAsc )
+        down = lDown - downAsc;
+
+    var minGap =  0.78*shIter;
+
+    if( up + down < minGap)
+        iters.dH = minGap;
+    else
+        iters.dH = up + down;
+
+    iters.recalculateSize();
+
+
+    /*var smallAsc = mgCtrPrp.FontSize*0.23;
+
+    if(base.ascent < smallAsc)
+        this.dW = 0;
+    else
+        this.dW = 0.2*shCenter;*/
+
+    width  = iters.size.width + base.size.width + this.dW;
+    height = iters.size.height;
+
+    ascent = base.size.ascent + this.gapBase;
+
+    this.size = {width: width, height: height, ascent: ascent};
+}
+CDegreeSubSup.prototype._recalculateSize = function(oMeasure)
+{
+    var mgCtrPrp = this.mergeCtrTPrp();
+
+    var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
+    shCenter *= 1.4;
+
+    var width = 0, height = 0,
+        ascent = 0;
+
+    var iters, base;
+
+    if(this.type == DEGREE_SubSup)
+    {
+        iters = this.elements[0][1];
+        base  = this.elements[0][0];
+    }
+    else if(this.type == DEGREE_PreSubSup)
+    {
+        iters = this.elements[0][0];
+        base  = this.elements[0][1];
+    }
+
+    // distance for iterators
+
+    var iterUp = iters.elements[0][0].size,
+        iterDown = iters.elements[1][0].size;
+
+    var lUp    = base.size.ascent - shCenter; // center of base
+    var lDown  = base.size.height - lUp; // height - center of base
+
+    var ctrPrpIter = iters.mergeCtrTPrp();
+    var shIter = this.Composition.GetShiftCenter(oMeasure, ctrPrpIter); //смещение
+
+    //var upDesc = iterUp.height - iterUp.ascent + 1.2*shIter, // смещенный descent верхнего итератора
+    //    downAsc = iterDown.ascent + 0.6*shIter; // смещенный ascent нижнего оператора
+
+
+
+    var up = 0,     // расстояние от центра основания до верхнего итератора
+        down = 0;   // расстояние от центра основания до нижнего итератора
+
+    var minGap =  0.7*shIter;
+
+    /*if(base.size.height > upDesc + downAsc + minGap)
+    {
+        iters.dH = base.size.height - upDesc - downAsc;
+        this.gapBase = iterUp.height - upDesc;
+    }
+    else
+    {
+        iters.dH = minGap;
+        this.gapBase = iterUp.height - (lUp - minGap/2);
+    }*/
+
+    if(base.IsPlaceholder())
+    {
+        iters.dH = minGap;
+        this.gapBase = iterUp.height - (lUp - minGap/2);
+    }
+    else
+    {
+        var upDesc = iterUp.height - 0.5*shIter,
+            downAsc = iterDown.height - shIter;
+
+        if(base.size.ascent > upDesc + downAsc + minGap )
+        {
+            iters.dH = base.size.height - upDesc - downAsc;
+            this.gapBase = iterUp.height - upDesc;
+        }
+        else
+        {
+            iters.dH = minGap;
+            this.gapBase = iterUp.height - (lUp - minGap/2);
+        }
+    }
+
+
+
+
+   /* if(lUp  > upDesc)
+    {
+        up = lUp - upDesc;
+        this.gapBase = iterUp.height - upDesc;
+    }
+    else
+    {
+        up = 0;
+        this.gapBase = iterUp.height - lUp;
+    }
+
+    if( lDown > downAsc )
+        down = lDown - downAsc;*/
+
+
+
+    /*if( up + down < minGap)
+        iters.dH = minGap;
+    else
+        iters.dH = up + down;*/
+
+    iters.recalculateSize();
+
+
+    /*var smallAsc = mgCtrPrp.FontSize*0.23;
+
+     if(base.ascent < smallAsc)
+     this.dW = 0;
+     else
+     this.dW = 0.2*shCenter;*/
+
+    width  = iters.size.width + base.size.width + this.dW;
+    height = iters.size.height;
+
+    ascent = base.size.ascent + this.gapBase;
+
+    this.size = {width: width, height: height, ascent: ascent};
+}
+CDegreeSubSup.prototype.recalculateSize = function(oMeasure)
+{
+    var mgCtrPrp = this.mergeCtrTPrp();
+
+    var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
+    shCenter *= 1.4;
+
+    var iters, base;
+
+    if(this.type == DEGREE_SubSup)
+    {
+        iters = this.elements[0][1];
+        base  = this.elements[0][0];
+    }
+    else if(this.type == DEGREE_PreSubSup)
+    {
+        iters = this.elements[0][0];
+        base  = this.elements[0][1];
+    }
+
+    // distance for iterators
+
+    var iterUp = iters.elements[0][0].size,
+        iterDown = iters.elements[1][0].size;
+
+    var lUp    = base.size.ascent - shCenter; // center of base
+    var lDown  = base.size.height - lUp; // height - center of base
+
+    var ctrPrpIter = iters.mergeCtrTPrp();
+    var shIter = this.Composition.GetShiftCenter(oMeasure, ctrPrpIter); //смещение
+
+    var minGap =  0.7*shIter;
+
+    var upDesc = 0,
+        downAsc = 0;
+
+    if(base.IsOnlyText())
+    {
+        upDesc = 1.5*shIter;
+        downAsc = 1.2*shIter;
+    }
+    else
+    {
+        upDesc = iterUp.height - iterUp.ascent + shIter;
+        downAsc = iterDown.ascent - shIter;
+    }
+
+    var up = lUp > upDesc ? lUp - upDesc : 0,     // расстояние от центра основания до верхнего итератора
+        down = lDown > downAsc ? lDown - downAsc : 0;   // расстояние от центра основания до нижнего итератора
+
+
+    if(up + down > minGap)
+    {
+        this.gapBase = iterUp.height + up - lUp;
+        iters.dH = up + down;
+    }
+    else
+    {
+        iters.dH = minGap;
+        this.gapBase = iterUp.height - lUp + minGap/2;
+    }
+
+    iters.recalculateSize();
+
+    var width  = iters.size.width + base.size.width + this.dW;
+    var height = iters.size.height;
+
+    var ascent = base.size.ascent + this.gapBase;
+
+    this.size = {width: width, height: height, ascent: ascent};
+
 }
 CDegreeSubSup.prototype.old_setPosition = function(pos)
 {
@@ -658,7 +954,7 @@ CDegreeSubSup.prototype.old_setPosition = function(pos)
     }
 
 }
-CDegreeSubSup.prototype.align = function(x, y)
+CDegreeSubSup.prototype.old_align = function(x, y)
 {
     var _x = 0, _y = 0;
 
@@ -671,6 +967,23 @@ CDegreeSubSup.prototype.align = function(x, y)
     {
         if(x == 0 && y == 1)
             _y = this.elements[0][0].upper;
+    }
+
+    return {x: _x, y: _y};
+}
+CDegreeSubSup.prototype.align = function(x, y)
+{
+    var _x = 0, _y = 0;
+
+    if(this.type == DEGREE_SubSup)
+    {
+        if(x == 0 && y == 0)
+            _y = this.gapBase;
+    }
+    else
+    {
+        if(x == 0 && y == 1)
+            _y = this.gapBase;
     }
 
     return {x: _x, y: _y};
