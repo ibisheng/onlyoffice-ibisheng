@@ -483,17 +483,8 @@ DrawingContext.prototype = {
 	setCanvas: function (canvas) {
 		if (null == canvas) {return;}
 		this.canvas = canvas;
-		var ctx = this.ctx = this.canvas.getContext("2d");
-
-		// Не убирать. Баг на android при scroll!!!
-		if (ctx.imageSmoothingEnabled)
-			ctx.imageSmoothingEnabled = false;
-		if (ctx.mozImageSmoothingEnabled)
-			ctx.mozImageSmoothingEnabled = false;
-		if (ctx.oImageSmoothingEnabled)
-			ctx.oImageSmoothingEnabled = false;
-		if (ctx.webkitImageSmoothingEnabled)
-			ctx.webkitImageSmoothingEnabled = false;
+		this.ctx = this.canvas.getContext("2d");
+		this.initContextSmoothing();
 	},
 
 	/**
@@ -595,6 +586,22 @@ DrawingContext.prototype = {
 			this.canvas.height = h;
 		}
 		return this;
+	},
+
+	/**
+	 * Delete smoothing
+	 */
+	initContextSmoothing: function () {
+		var ctx = this.ctx;
+		// Не убирать. Баг на android при scroll!!!
+		if (ctx.imageSmoothingEnabled)
+			ctx.imageSmoothingEnabled = false;
+		if (ctx.mozImageSmoothingEnabled)
+			ctx.mozImageSmoothingEnabled = false;
+		if (ctx.oImageSmoothingEnabled)
+			ctx.oImageSmoothingEnabled = false;
+		if (ctx.webkitImageSmoothingEnabled)
+			ctx.webkitImageSmoothingEnabled = false;
 	},
 
 	// Canvas methods
