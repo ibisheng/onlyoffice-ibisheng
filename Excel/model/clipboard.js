@@ -393,7 +393,8 @@
 				{
 					var t = this;
 					var  table = t._makeTableNode(range, worksheet, isCut);
-					t.copyText = t._getTextFromTable(table);
+					if(table !== false)
+						t.copyText = t._getTextFromTable(table);
 					return true;
 				}
 				return false;
