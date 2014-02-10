@@ -2119,6 +2119,21 @@ Hyperlink.prototype = {
 	}
 };
 /** @constructor */
+function SheetFormatPr(){
+	this.nBaseColWidth = null;
+	this.dDefaultColWidth = null;
+	this.oAllRow = null;
+};
+SheetFormatPr.prototype = {
+	clone : function(){
+		var oRes = new SheetFormatPr();
+		oRes.nBaseColWidth = this.nBaseColWidth;
+		oRes.dDefaultColWidth = this.dDefaultColWidth;
+		if(null != this.oAllRow)
+			oRes.oAllRow = this.oAllRow.clone();
+	}
+}
+/** @constructor */
 function Col(worksheet, index)
 {
 	this.ws = worksheet;

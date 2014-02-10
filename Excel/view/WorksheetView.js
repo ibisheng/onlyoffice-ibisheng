@@ -1103,7 +1103,7 @@
 		};
 
 		WorksheetView.prototype._initWorksheetDefaultWidth = function () {
-			this.nBaseColWidth = this.model.nBaseColWidth || this.nBaseColWidth;
+			this.nBaseColWidth = this.model.oSheetFormatPr.nBaseColWidth || this.nBaseColWidth;
 			// Теперь рассчитываем число px
 			var defaultColWidthChars = this._charCountToModelColWidth(this.nBaseColWidth);
 			this.defaultColWidthPx = this._modelColWidthToColWidth(defaultColWidthChars) * asc_getcvt(1/*pt*/, 0/*px*/, 96);
@@ -1323,7 +1323,7 @@
 				y = this.rows[i - 1].top + this.rows[i - 1].height;
 			}
 			for (; ((0 !== fullRecalc) ? i < l || y + hiddenH < visibleH : i < this.rows.length) && i < gc_nMaxRow; ++i) {
-				row = this.model._getRowNoEmpty(i);
+				row = this.model._getRowNoEmptyWithAll(i);
 				if (!row) {
 					h = -1; // Будет использоваться дефолтная высота строки
 					isCustomHeight = false;
@@ -8837,7 +8837,7 @@
 					functionModelAction = function () {
 						// Приводим к px (чтобы было ровно)
 						val = val / 0.75; val = (val | val) * 0.75;		// 0.75 - это размер 1px в pt (можно было 96/72)
-						t.model.setRowHeight(Math.min(val, t.maxRowHeight), arn.r1, arn.r2);
+						t.model.setRowHeight(Math.min(val, t.maxRowHeight), checkRange.r1, checkRange.r2);
 						isUpdateRows = true;
 						fullRecalc = true;
 					};

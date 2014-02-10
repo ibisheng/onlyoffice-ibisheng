@@ -211,7 +211,9 @@ var c_oSerSheetFormatPrTypes =
 {
     DefaultColWidth		: 0,
     DefaultRowHeight	: 1,
-	BaseColWidth		: 2
+	BaseColWidth		: 2,
+	CustomHeight		: 3,
+	ZeroHeight			: 4
 };
 /** @enum */
 var c_oSerRowTypes =
@@ -2341,8 +2343,8 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 			var oRes = {BestFit: col.BestFit, hd: col.hd, Max: nMax, Min: nMin, xfsid: null, width: col.width, CustomWidth: col.CustomWidth};
 			if(null == oRes.width)
 			{
-				if(null != ws.dDefaultColWidth)
-					oRes.width = ws.dDefaultColWidth;
+				if(null != ws.oSheetFormatPr.dDefaultColWidth)
+					oRes.width = ws.oSheetFormatPr.dDefaultColWidth;
 				else
 					oRes.width = gc_dDefaultColWidthCharsAttribute;
 			}
@@ -2493,21 +2495,37 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 	};
     this.WriteSheetFormatPr = function(ws)
     {
-        if(null !== ws.dDefaultColWidth) {
-            this.memory.WriteByte(c_oSerSheetFormatPrTypes.DefaultColWidth);
-            this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble2(ws.dDefaultColWidth);
-        }
-        if(null !== ws.dDefaultheight) {
-            this.memory.WriteByte(c_oSerSheetFormatPrTypes.DefaultRowHeight);
-            this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble2(ws.dDefaultheight);
-        }
-		if (null !== ws.nBaseColWidth) {
+		if (null !== ws.oSheetFormatPr.nBaseColWidth) {
 			this.memory.WriteByte(c_oSerSheetFormatPrTypes.BaseColWidth);
 			this.memory.WriteByte(c_oSerPropLenType.Long);
-			this.memory.WriteLong(ws.nBaseColWidth);
+			this.memory.WriteLong(ws.oSheetFormatPr.nBaseColWidth);
 		}
+        if(null !== ws.oSheetFormatPr.dDefaultColWidth) {
+            this.memory.WriteByte(c_oSerSheetFormatPrTypes.DefaultColWidth);
+            this.memory.WriteByte(c_oSerPropLenType.Double);
+            this.memory.WriteDouble2(ws.oSheetFormatPr.dDefaultColWidth);
+        }
+        if(null !== ws.oSheetFormatPr.oAllRow) {
+			var oAllRow = ws.oSheetFormatPr.oAllRow;
+			if(oAllRow.h)
+			{
+				this.memory.WriteByte(c_oSerSheetFormatPrTypes.DefaultRowHeight);
+				this.memory.WriteByte(c_oSerPropLenType.Double);
+				this.memory.WriteDouble2(oAllRow.h);
+			}
+			if(oAllRow.CustomHeight)
+			{
+				this.memory.WriteByte(c_oSerSheetFormatPrTypes.CustomHeight);
+				this.memory.WriteByte(c_oSerPropLenType.Byte);
+				this.memory.WriteBool(oAllRow.CustomHeight);
+			}
+			if(oAllRow.hd)
+			{
+				this.memory.WriteByte(c_oSerSheetFormatPrTypes.ZeroHeight);
+				this.memory.WriteByte(c_oSerPropLenType.Byte);
+				this.memory.WriteBool(oAllRow.hd);
+			}
+        }
     };
 	this.WritePageMargins = function(oMargins)
     {
@@ -5293,11 +5311,24 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
     {
         var res = c_oSerConstants.ReadOk;
         if ( c_oSerSheetFormatPrTypes.DefaultColWidth == type )
-            oWorksheet.dDefaultColWidth = this.stream.GetDoubleLE();
-        else if ( c_oSerSheetFormatPrTypes.DefaultRowHeight == type )
-            oWorksheet.dDefaultheight = this.stream.GetDoubleLE();
+            oWorksheet.oSheetFormatPr.dDefaultColWidth = this.stream.GetDoubleLE();
 		else if (c_oSerSheetFormatPrTypes.BaseColWidth === type)
-			oWorksheet.nBaseColWidth = this.stream.GetULongLE();
+			oWorksheet.oSheetFormatPr.nBaseColWidth = this.stream.GetULongLE();
+		else if ( c_oSerSheetFormatPrTypes.DefaultRowHeight == type )
+		{
+			var oAllRow = oWorksheet.getAllRow();
+            oAllRow.h = this.stream.GetDoubleLE();
+		}
+		else if ( c_oSerSheetFormatPrTypes.CustomHeight == type )
+		{
+			var oAllRow = oWorksheet.getAllRow();
+            oAllRow.CustomHeight = this.stream.GetBool();
+		}
+		else if ( c_oSerSheetFormatPrTypes.ZeroHeight == type )
+		{
+			var oAllRow = oWorksheet.getAllRow();
+            oAllRow.hd = this.stream.GetBool();
+		}
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
