@@ -388,6 +388,9 @@ function FontMetrics(ascender, descender, lineGap) {
 	return this;
 }
 
+FontMetrics.prototype.clone = function () {
+	return new FontMetrics(this.ascender, this.descender, this.lineGap);
+};
 
 
 /**
