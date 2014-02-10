@@ -8403,14 +8403,12 @@
 									var comment;
 									for(var i = 0; i < val.aComments.length; i++)
 									{
-										comment = Asc.clone(val.aComments[i]);
-										if(comment.nCol == pasteCol && comment.nRow == pasteRow)
-										{
-											//change nRow, nCol
-											comment.nCol = c + autoC*plCol;
-											comment.nRow = r + autoR*plRow;
-
+										comment = val.aComments[i];
+										if (comment.nCol == pasteCol && comment.nRow == pasteRow) {
 											var commentData = new asc_CCommentData(comment);
+											//change nRow, nCol
+											commentData.nCol = c + autoC*plCol;
+											commentData.nRow = r + autoR*plRow;
 											commentData.setId();
 											t.cellCommentator.addCommentSerialize(commentData);
 										}
