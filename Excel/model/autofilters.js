@@ -1989,7 +1989,7 @@ var gUndoInsDelCellsFlag = true;
 				else if(activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2)//если ячейка выделенная одна
 					mainAdjacentCells = this._getAdjacentCellsAF(activeCells,aWs);
 				else//выделено > 1 ячейки
-					mainAdjacentCells = Asc.clone(activeCells);
+					mainAdjacentCells = activeCells;
 					
 				//имеется ввиду то, что при выставленном флаге title используется первая строка в качестве заголовка, в противном случае - добавлются заголовки
 				var isTitle = this._isAddNameColumn(mainAdjacentCells);
@@ -2617,7 +2617,7 @@ var gUndoInsDelCellsFlag = true;
 			{
 				var ws = this.worksheet;
 				var cell = ws.model.getCell( new CellAddress(ar.r1, ar.c1, 0)).getCells();
-				var cloneActiveRange = Asc.clone(ar);
+				var cloneActiveRange = ar.clone(true); // ToDo слишком много клонирования
 				var isEnd = true;
 				var range;
 				var merged;

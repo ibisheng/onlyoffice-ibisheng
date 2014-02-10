@@ -3938,9 +3938,14 @@
                 c_oAscCanChangeColWidth.all === canChangeColWidth)) {
                 colWidth = this.cols[col].innerWidth;
                 // Измеряем целую часть числа
-                sstr = c.getValue2(gc_nMaxDigCountView, function(){return true;});
-                //todo убрать Asc.clone на другой clone или изменить truncFracPart, чтобы не изменяла исходный массив
-                if ("General" === numFormatStr) {sstr = truncFracPart(Asc.clone(sstr));}
+				sstr = c.getValue2(gc_nMaxDigCountView, function(){return true;});
+                if ("General" === numFormatStr) {
+					// truncFracPart изменяет исходный массив, поэтому клонируем
+					var fragmentsTmp = [];
+					for (var k = 0; k < sstr.length; ++k)
+						fragmentsTmp.push(sstr[k].clone());
+					sstr = truncFracPart(fragmentsTmp);
+				}
                 sfl = asc_clone(fl);
                 sfl.wrapText = false;
                 stm = this._roundTextMetrics( this.stringRender.measureString(sstr, sfl, colWidth) );
