@@ -4843,218 +4843,227 @@ CMathContent.prototype =
             right = null;
         var curr = this.content[posCurr].value;
 
-        var EQUAL   = 0x3D,
-            PLUS    = 0x2B,
-            MINUS   = 0x2212,
-            MULT    = 0x2217,
-            LESS    = 0x3C,
-            GREATER = 0x3E;
-
-
-        var t = posCurr - 1;
-        while( t > 0 )
+        if(this.argSize < 0)
         {
-            if(this.content[t].value.typeObj == MATH_TEXT || this.content[t].value.typeObj == MATH_COMP)
-            {
-                left = this.content[t].value;
-                break;
-            }
-            t--;
+            // выставим нулевые gaps для случая, если при копировании/вставки часть контента добавили в итератор
+            this.content[posCurr].gaps.left  = 0;
+            this.content[posCurr].gaps.right = 0;
         }
-
-        t = posCurr + 1;
-        while( t < this.content.length )
+        else
         {
-            if(this.content[t].value.typeObj == MATH_TEXT || this.content[t].value.typeObj == MATH_COMP)
+            var EQUAL   = 0x3D,
+                PLUS    = 0x2B,
+                MINUS   = 0x2212,
+                MULT    = 0x2217,
+                LESS    = 0x3C,
+                GREATER = 0x3E;
+
+
+            var t = posCurr - 1;
+            while( t > 0 )
             {
-                right = this.content[t].value;
-                break;
-            }
-            t++;
-        }
-
-        var coeffLeft = 0,
-            coeffRight = 0;
-
-        var bLeft  = left !== null,
-            bRight = right !== null;
-
-        var txtPrp = this.getTxtPrp(posCurr);
-        var wTextRPrp = this.mergeTxtPrp(txtPrp);
-
-        var bLeftComp  = bLeft  ? left.typeObj == MATH_COMP : false,
-            bRightComp = bRight ? right.typeObj == MATH_COMP : false,
-            bLeftText  = bLeft  ? left.typeObj == MATH_TEXT : false,
-            bRightText = bRight ? right.typeObj == MATH_TEXT : false;
-
-        var currCode  = curr.typeObj == MATH_TEXT ? curr.getCodeChr() : null,
-            leftCode  = bLeftText ? left.getCodeChr() : null,
-            rightCode = bRightText ? right.getCodeChr() : null;
-
-        var gapLeftComp = 0,
-            gapRightComp = 0;
-
-        if(bLeftComp)
-            gapLeftComp = this.getGapsMComp(left).right;
-
-        if(bRightComp)
-            gapRightComp = this.getGapsMComp(right).left;
-
-        if(curr.typeObj == MATH_TEXT)
-        {
-            var bSign = false;
-
-            if(this.checkOperSign(currCode)) // plus, minus, greater, less
-            {
-                bSign = true;
-
-                if(bLeft)
+                if(this.content[t].value.typeObj == MATH_TEXT || this.content[t].value.typeObj == MATH_COMP)
                 {
-                    if(this.checkZEROSign(leftCode))
-                        coeffLeft = 0;
-                    else if(leftCode == EQUAL)
-                        coeffLeft = 0.26;
-                    else
-                        coeffLeft = 0.52;
+                    left = this.content[t].value;
+                    break;
                 }
-
-                if(bRight)
-                {
-                    var bZero = this.checkZEROSign(rightCode);
-                    if(rightCode == EQUAL || bZero)
-                        coeffRight = 0;
-                    else
-                        coeffRight = 0.49;
-                }
-            }
-            else if(currCode === MULT) // multiplication
-            {
-                bSign = true;
-
-                if(bLeft)
-                {
-                    var bZeroLeft = this.checkZEROSign(leftCode),
-                        bOperLeft = this.checkOperSign(leftCode);
-
-                    if(leftCode == EQUAL || bOperLeft || bZeroLeft)
-                        coeffLeft = 0;
-                    else if(bLeft)
-                        coeffLeft = 0.46;
-                }
-
-                if(bRight)
-                {
-                    var bZeroRight = this.checkZEROSign(rightCode),
-                        bOperRight = this.checkOperSign(rightCode);
-
-                    if(rightCode == EQUAL || bOperRight || bZeroRight)
-                        coeffRight = 0;
-                    else if(bRight)
-                        coeffRight = 0.49;
-                }
-
-            }
-            else if(currCode === EQUAL) // equal
-            {
-                bSign = true;
-
-                if(bLeft)
-                {
-                    var bZero = this.checkZEROSign(leftCode);
-                    if(leftCode == EQUAL || bZero)
-                        coeffLeft = 0;
-                    else if(this.checkOperSign(leftCode))
-                        coeffLeft = 0.35;
-                    else
-                        coeffLeft = 0.7;
-                }
-
-                if(bRight)
-                {
-                    var bZero = this.checkZEROSign(rightCode);
-                    if(rightCode == EQUAL || bZero)
-                        coeffRight = 0;
-                    else if(this.checkOperSign(rightCode))
-                        coeffRight = 0.25;
-                    else
-                        coeffRight = 0.5;
-                }
+                t--;
             }
 
-            if(bSign && bLeftComp)
-                coeffLeft = coeffLeft - gapLeftComp;
-
-            if(bSign && bRightComp)
-                coeffRight = coeffRight - gapRightComp;
-
-            coeffLeft = Math.ceil(coeffLeft*10)/10;
-            coeffRight = Math.ceil(coeffRight*10)/10;
-
-        }
-        else if(curr.typeObj == MATH_COMP)
-        {
-            var currGaps = this.getGapsMComp(curr);
-            if(bLeft)
+            t = posCurr + 1;
+            while( t < this.content.length )
             {
-                coeffLeft =  currGaps.left;
-
-                if(bLeftComp)
+                if(this.content[t].value.typeObj == MATH_TEXT || this.content[t].value.typeObj == MATH_COMP)
                 {
-                    if(gapLeftComp/2 < coeffLeft)
-                        coeffLeft = gapLeftComp/2;
+                    right = this.content[t].value;
+                    break;
                 }
+                t++;
             }
-            if(bRight)
-            {
-                coeffRight = currGaps.right;
 
-                if(bRightComp)
-                {
-                    if(coeffRight/2 > gapRightComp )
-                        coeffRight -= gapRightComp;
-                    else
-                        coeffRight /=2;
-                }
-            }
-        }
-
-        if(bLeftText)
-        {
-            if(leftCode == 0x28 || leftCode == 0x5B || leftCode == 0x7B)
-                coeffLeft = 0;
-        }
-
-        if(bRightText)
-        {
-            if(rightCode == 0x29 || rightCode == 0x5D || rightCode == 0x7D)
+            var coeffLeft = 0,
                 coeffRight = 0;
-        }
 
+            var bLeft  = left !== null,
+                bRight = right !== null;
 
-        var gapSign = 0.1513*wTextRPrp.FontSize;
+            var txtPrp = this.getTxtPrp(posCurr);
+            var wTextRPrp = this.mergeTxtPrp(txtPrp);
 
-        this.content[posCurr].gaps.left  = Math.ceil(coeffLeft*gapSign*10)/10; // если ни один случай не выполнился, выставляем "нулевые" gaps (default): необходимо, если что-то удалили и объект стал первый или последним в контенте
-        this.content[posCurr].gaps.right = Math.ceil(coeffRight*gapSign*10)/10;
+            var bLeftComp  = bLeft  ? left.typeObj == MATH_COMP : false,
+                bRightComp = bRight ? right.typeObj == MATH_COMP : false,
+                bLeftText  = bLeft  ? left.typeObj == MATH_TEXT : false,
+                bRightText = bRight ? right.typeObj == MATH_TEXT : false;
 
-        /*if(this.bRoot)
-        {
-            if(bSign)
+            var currCode  = curr.typeObj == MATH_TEXT ? curr.getCodeChr() : null,
+                leftCode  = bLeftText ? left.getCodeChr() : null,
+                rightCode = bRightText ? right.getCodeChr() : null;
+
+            var gapLeftComp = 0,
+                gapRightComp = 0;
+
+            if(bLeftComp)
+                gapLeftComp = this.getGapsMComp(left).right;
+
+            if(bRightComp)
+                gapRightComp = this.getGapsMComp(right).left;
+
+            if(curr.typeObj == MATH_TEXT)
             {
-                var code = this.content[posCurr].value.getCodeChr();
-                console.log("  " + String.fromCharCode(code));
+                var bSign = false;
+
+                if(this.checkOperSign(currCode)) // plus, minus, greater, less
+                {
+                    bSign = true;
+
+                    if(bLeft)
+                    {
+                        if(this.checkZEROSign(leftCode))
+                            coeffLeft = 0;
+                        else if(leftCode == EQUAL)
+                            coeffLeft = 0.26;
+                        else
+                            coeffLeft = 0.52;
+                    }
+
+                    if(bRight)
+                    {
+                        var bZero = this.checkZEROSign(rightCode);
+                        if(rightCode == EQUAL || bZero)
+                            coeffRight = 0;
+                        else
+                            coeffRight = 0.49;
+                    }
+                }
+                else if(currCode === MULT) // multiplication
+                {
+                    bSign = true;
+
+                    if(bLeft)
+                    {
+                        var bZeroLeft = this.checkZEROSign(leftCode),
+                            bOperLeft = this.checkOperSign(leftCode);
+
+                        if(leftCode == EQUAL || bOperLeft || bZeroLeft)
+                            coeffLeft = 0;
+                        else if(bLeft)
+                            coeffLeft = 0.46;
+                    }
+
+                    if(bRight)
+                    {
+                        var bZeroRight = this.checkZEROSign(rightCode),
+                            bOperRight = this.checkOperSign(rightCode);
+
+                        if(rightCode == EQUAL || bOperRight || bZeroRight)
+                            coeffRight = 0;
+                        else if(bRight)
+                            coeffRight = 0.49;
+                    }
+
+                }
+                else if(currCode === EQUAL) // equal
+                {
+                    bSign = true;
+
+                    if(bLeft)
+                    {
+                        var bZero = this.checkZEROSign(leftCode);
+                        if(leftCode == EQUAL || bZero)
+                            coeffLeft = 0;
+                        else if(this.checkOperSign(leftCode))
+                            coeffLeft = 0.35;
+                        else
+                            coeffLeft = 0.7;
+                    }
+
+                    if(bRight)
+                    {
+                        var bZero = this.checkZEROSign(rightCode);
+                        if(rightCode == EQUAL || bZero)
+                            coeffRight = 0;
+                        else if(this.checkOperSign(rightCode))
+                            coeffRight = 0.25;
+                        else
+                            coeffRight = 0.5;
+                    }
+                }
+
+                if(bSign && bLeftComp)
+                    coeffLeft = coeffLeft - gapLeftComp;
+
+                if(bSign && bRightComp)
+                    coeffRight = coeffRight - gapRightComp;
+
+                coeffLeft = Math.ceil(coeffLeft*10)/10;
+                coeffRight = Math.ceil(coeffRight*10)/10;
+
             }
             else if(curr.typeObj == MATH_COMP)
             {
-                console.log(curr.constructor.name + " :")
+                var currGaps = this.getGapsMComp(curr);
+                if(bLeft)
+                {
+                    coeffLeft =  currGaps.left;
+
+                    if(bLeftComp)
+                    {
+                        if(gapLeftComp/2 < coeffLeft)
+                            coeffLeft = gapLeftComp/2;
+                    }
+                }
+                if(bRight)
+                {
+                    coeffRight = currGaps.right;
+
+                    if(bRightComp)
+                    {
+                        if(coeffRight/2 > gapRightComp )
+                            coeffRight -= gapRightComp;
+                        else
+                            coeffRight /=2;
+                    }
+                }
             }
 
-            if(bSign || curr.typeObj == MATH_COMP)
+            if(bLeftText)
             {
-                console.log("coeff left  " + coeffLeft + ",  coeff right  " + coeffRight );
-                console.log("gap left :  " + this.content[posCurr].gaps.left + ",  gap right :  " + this.content[posCurr].gaps.right);
-                console.log("");
+                if(leftCode == 0x28 || leftCode == 0x5B || leftCode == 0x7B)
+                    coeffLeft = 0;
             }
-        }*/
+
+            if(bRightText)
+            {
+                if(rightCode == 0x29 || rightCode == 0x5D || rightCode == 0x7D)
+                    coeffRight = 0;
+            }
+
+
+            var gapSign = 0.1513*wTextRPrp.FontSize;
+
+            this.content[posCurr].gaps.left  = Math.ceil(coeffLeft*gapSign*10)/10; // если ни один случай не выполнился, выставляем "нулевые" gaps (default): необходимо, если что-то удалили и объект стал первый или последним в контенте
+            this.content[posCurr].gaps.right = Math.ceil(coeffRight*gapSign*10)/10;
+
+            /*if(this.bRoot)
+             {
+             if(bSign)
+             {
+             var code = this.content[posCurr].value.getCodeChr();
+             console.log("  " + String.fromCharCode(code));
+             }
+             else if(curr.typeObj == MATH_COMP)
+             {
+             console.log(curr.constructor.name + " :")
+             }
+
+             if(bSign || curr.typeObj == MATH_COMP)
+             {
+             console.log("coeff left  " + coeffLeft + ",  coeff right  " + coeffRight );
+             console.log("gap left :  " + this.content[posCurr].gaps.left + ",  gap right :  " + this.content[posCurr].gaps.right);
+             console.log("");
+             }
+             }*/
+        }
 
     },
     getGapsMComp: function(MComp)
@@ -5153,12 +5162,13 @@ CMathContent.prototype =
         return code == MULT || code == DIVISION || code == B_SLASH;
 
     },
-    checkOperSign: function(code) // "+", "-", "<", ">"
+    checkOperSign: function(code) // "+", "-", "<", ">", "±"
     {
-        var PLUS    = 0x2B,
-            MINUS   = 0x2212,
-            LESS    = 0x3C,
-            GREATER = 0x3E;
+        var PLUS       = 0x2B,
+            MINUS      = 0x2212,
+            LESS       = 0x3C,
+            GREATER    = 0x3E,
+            PLUS_MINUS = 0xB1;
 
         return code == PLUS || code == MINUS || code == LESS || code == GREATER;
     },
@@ -6587,119 +6597,8 @@ CMathContent.prototype =
     },
     Save_Changes: function(Data, Writer)
     {
-        Writer.WriteLong( historyitem_type_Math );
 
-        var Type = Data.Type;
-        // Пишем тип
-        Writer.WriteLong( Type );
-		
-		var Math = this.Composition.Parent;
-
-        switch ( Type )
-		{
-			case historyitem_Math_AddItem:
-			{
-				var bArray = Data.UseArray;
-                var Count  = Data.Items.length;
-
-                Writer.WriteLong( Count );
-				
-				for ( var Index = 0; Index < Count; Index++ )
-                {
-                    if ( true === bArray )
-                        Writer.WriteLong( Data.PosArray[Index] );
-                    else
-                        Writer.WriteLong( Data.Pos + Index );
-
-                    Math.Write_MathElemToBinary(Writer, Data.Items[Index]);
-				}
-				break;
-			}
-			case historyitem_Math_RemoveItem:
-			{
-				/*var bArray = Data.UseArray;
-                var Count  = Data.Items.length;
-
-                var StartPos = Writer.GetCurPosition();
-                Writer.Skip(4);
-                var RealCount = Count;
-
-                for ( var Index = 0; Index < Count; Index++ )
-                {
-                    if ( true === bArray )
-                    {
-                        if ( false === Data.PosArray[Index] )
-                            RealCount--;
-                        else
-                            Writer.WriteLong( Data.PosArray[Index] );
-                    }
-                    else
-                        Writer.WriteLong( Data.Pos );
-						
-                }
-
-                var EndPos = Writer.GetCurPosition();
-                Writer.Seek( StartPos );
-                Writer.WriteLong( RealCount );
-                Writer.Seek( EndPos );
-
-                break;*/
-			}			
-		}
-		
-		/*var oThis = this;
-		this.bs = new BinaryCommonWriter(Writer);
-		this.boMaths = new Binary_oMathWriter(Writer);
-		
-		this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteArgNodes(oThis.Data);});
-		*/
     },
-	Load_Changes : function(Reader)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        var ClassType = Reader.GetLong();
-        if ( historyitem_type_Math != ClassType )
-            return;
-
-		var paraMath = this.Composition.Parent;
-        var Type = Reader.GetLong();
-
-        switch ( Type )
-        {
-            case  historyitem_Math_AddItem:
-            {
-				var Count = Reader.GetLong();
-	
-				//var oMathComp = new CMathComposition;
-                for ( var Index = 0; Index < Count; Index++ )
-                {
-                    var Pos     = Reader.GetLong()
-                    var elem = paraMath.Read_MathElemFromBinary(Reader);
-					
-
-                    if ( null != elem )
-                    {
-						//paraMath.Math.AddToComposition(Item.Math.Root);
-			
-						// TODO: Подумать над тем как по минимуму вставлять отметки совместного редактирования
-						var Element = new mathElem(elem);
-                        this.content.splice( Pos, 0, new ParaCollaborativeChangesEnd() );
-                        this.content.splice( Pos, 0, Element );
-                        this.content.splice( Pos, 0, new ParaCollaborativeChangesStart() );
-
-                        CollaborativeEditing.Add_ChangedClass(this);
-                    }
-                }
-
-                this.DeleteCollaborativeMarks = false;
-
-                break;
-			}
-		}
-	},
     Refresh_RecalcData: function()
     {
         this.Composition.Refresh_RecalcData2(); // Refresh_RecalcData сообщает родительскому классу, что у него произошли изменения, нужно пересчитать
@@ -7091,14 +6990,6 @@ CMathContent.prototype =
         this.setEndPos_Selection(1);
         //this.setEnd_Selection(1);
         //this.selection.active = false;
-    },
-	Get_Id : function()
-    {
-        return this.GetId();
-    },
-	GetId : function()
-    {
-        return this.Id;
     }
     /////////////////////////////////////////////////////////////////
 
@@ -7154,10 +7045,6 @@ function CMathComposition()
     };
 
     this.Init();
-	
-	//для совместного редактирования каждый элемент записываем в глобальную таблицу
-	//this.Id = g_oIdCounter.Get_NewId();
-	//g_oTableId.Add( this, this.Id );
 }
 CMathComposition.prototype =
 {
@@ -7907,8 +7794,6 @@ CMathComposition.prototype =
         var Pos = this.SelectContent.CurPos,
             EndPos = this.SelectContent.CurPos + 1;
 
-		//для совместного редактирования
-		this.CurrentContent.Id = this.Id;
         History.Add(this.CurrentContent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: EndPos});
     },
     CreateEquation: function(indef)

@@ -131,7 +131,12 @@ CDegree.prototype.recalculateSup = function(oMeasure)
     if(bBaseOnlyText)
     {
         var UpBaseline =  1.786*shCenter; // baseline итератора
-        if(UpBaseline + iter.ascent> base.ascent)
+
+        // iter.height - UpBaseline - iter.ascent + base.ascent  > 2/3 * base.height
+
+        if(iter.height - UpBaseline - iter.ascent + base.ascent  > 2/3 * base.ascent)
+            this.upBase = iter.height - 2/3*base.ascent;
+        else if(UpBaseline + iter.ascent > base.ascent)
             this.upBase = UpBaseline + iter.ascent - base.ascent;
         else
             this.upIter = base.ascent - UpBaseline - iter.ascent;
@@ -139,9 +144,9 @@ CDegree.prototype.recalculateSup = function(oMeasure)
     else
     {
         this.upBase = iter.ascent - 1.2*shCenter;
-
-        if(iter.height - this.upBase > 0.5*base.ascent)
-            this.upBase = iter.height - 0.5*base.ascent;
+        var ascBase = base.ascent - shCenter > 0.27*mgCtrPrp.FontSize ? base.ascent - shCenter : 2/3*base.ascent;
+        if(iter.height - this.upBase > ascBase)
+            this.upBase = iter.height - ascBase;
     }
 
     var height = this.upBase + base.height;
@@ -157,6 +162,7 @@ CDegree.prototype.recalculateSup = function(oMeasure)
 
     this.size = {width: width, height: height, ascent: ascent};
 }
+
 CDegree.prototype.recalculateSubScript = function(oMeasure)
 {
     var base = this.elements[0][0].size,
@@ -171,10 +177,15 @@ CDegree.prototype.recalculateSubScript = function(oMeasure)
 
     if(bBaseOnlyText)
     {
-        this.upIter = base.ascent + 0.9*shCenter - iter.ascent;
+        var DownBaseline = 0.9*shCenter;
 
-        if(base.ascent/2 > this.upIter)
-            this.upIter = base.ascent/2;
+        if(iter.ascent - DownBaseline > 3/4*base.ascent)
+            this.upIter = 1/4*base.ascent;
+        else
+            this.upIter = base.ascent + DownBaseline - iter.ascent;
+
+        /*if(base.ascent/2 > this.upIter)
+            this.upIter = base.ascent/2;*/
     }
     else
     {
