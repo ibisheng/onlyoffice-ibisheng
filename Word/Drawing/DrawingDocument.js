@@ -5001,13 +5001,12 @@ function CDrawingDocument()
 
     this.EndTableStylesCheck = function()
     {
+		this.TableStylesSheckLookFlag = false;
         if (this.TableStylesSheckLook != null)
         {
             this.CheckTableStyles(this.TableStylesSheckLook);
             this.TableStylesSheckLook = null;
         }
-
-        this.TableStylesSheckLookFlag = false;
     }
 
     this.CheckTableStyles = function(tableLook)
