@@ -2990,8 +2990,7 @@
 			
 			_insertImagesFromBinary: function(ws, data)
 			{
-				var pasteRange = ws.autoFilters._refToRange(this.activeRange);
-				var activeRange = Asc.clone(ws.activeRange);
+				var activeRange = ws.activeRange;
 				var curCol;
 				var curRow;
 				var startCol;
@@ -3042,7 +3041,7 @@
 							}	
 						}
 					}
-				};
+				}
 				for(var i = 0; i < data.Drawings.length; i++)
 				{
 					if(i == 0)
@@ -3093,7 +3092,7 @@
 						drawingObject.graphicObject.addToDrawingObjects();
 						drawingObject.graphicObject.select(ws.objectRender.controller);
 					}
-				};
+				}
 				History.EndTransaction();
 			},
 			
