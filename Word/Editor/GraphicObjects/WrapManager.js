@@ -190,7 +190,7 @@ CWrapPolygon.prototype =
                 {
                     case WRAP_TEXT_SIDE_BOTH_SIDES:
                     {
-                        ret2.push({X0: this.left, X1: this.right, Y1: y1});
+                        ret2.push({X0: this.left, X1: this.right, Y1: this.bottom});
                         break;
                     }
                     case WRAP_TEXT_SIDE_LARGEST:

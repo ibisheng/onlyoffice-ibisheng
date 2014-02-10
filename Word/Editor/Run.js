@@ -410,7 +410,8 @@ ParaRun.prototype =
             }
         }
 
-        return new CParaPos( ( LinesCount === 1 ? this.Lines[0].RangesLength - 1 + this.StartRange : this.Lines[0].RangesLength - 1 ), LinesCount - 1 + this.StartLine, 0, 0 );
+        // Значит курсор стоит в самом конце, поэтому посылаем последний отрезок
+        return new CParaPos( ( LinesCount === 1 ? this.Lines[0].RangesLength - 1 + this.StartRange : this.Lines[LinesCount - 1].RangesLength - 1 ), LinesCount - 1 + this.StartLine, 0, 0 );
     },
 
     Get_ParaPosByContentPos : function(ContentPos, Depth)
@@ -647,9 +648,10 @@ ParaRun.prototype =
 //-----------------------------------------------------------------------------------
 
     // Выставляем начальную строку и обнуляем массив строк
-    Recalculate_Reset : function(StartLine, RecalcInfo)
+    Recalculate_Reset : function(StartRange, StartLine, RecalcInfo)
     {
         this.StartLine   = StartLine;
+        this.StartRange  = StartRange;
         this.LinesLength = 0;
 
         if ( null === RecalcInfo )
@@ -688,9 +690,9 @@ ParaRun.prototype =
 
             if ( para_Drawing === Item.Type )
             {
-                Item.Parent          = this;
-                Item.DocumentContent = this.Parent.Parent;
-                Item.DrawingDocument = this.Parent.Parent.DrawingDocument;
+                Item.Parent          = this.Paragraph;
+                Item.DocumentContent = this.Paragraph.Parent;
+                Item.DrawingDocument = this.Paragraph.Parent.DrawingDocument;
             }
 
             Item.Measure( g_oTextMeasurer, Pr );
@@ -708,25 +710,29 @@ ParaRun.prototype =
         var PRS = g_oPRSW;
 
         var CurLine  = PRS.Line - this.StartLine;
+        var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
 
-        if ( 0 !== CurLine )
+        // Если это первый отрезок в данной строке, тогда нам надо добавить строку (первую строку не добавляем,
+        // т.к. она всегда есть)
+        if ( 0 === CurRange )
         {
-            this.Lines[CurLine] = new CParaRunLine();
-            this.LinesLength    = CurLine + 1;
-        }
-        else
-        {
-            this.LinesLength  = CurLine + 1;
+            if ( 0 !== CurLine )
+            {
+                this.Lines[CurLine] = new CParaRunLine();
+                this.LinesLength    = CurLine + 1;
+            }
+            else
+            {
+                this.LinesLength  = CurLine + 1;
+            }
         }
 
         var Para = PRS.Paragraph;
 
         var RangeStartPos = 0;
-        var RangeEndPos   = -1;
+        var RangeEndPos   = 0;
 
         // Вычислим RangeStartPos
-        var CurRange = PRS.Range;
-
         if ( 0 === CurLine )
         {
             if ( 0 !== CurRange )
@@ -746,7 +752,7 @@ ParaRun.prototype =
         else
         {
             var _Line = this.Lines[CurLine];
-            RangeStartPos = Line.Ranges[CurRange - 1].EndPos;
+            RangeStartPos = _Line.Ranges[CurRange - 1].EndPos;
         }
 
         var MoveToLBP       = PRS.MoveToLBP;
@@ -893,7 +899,6 @@ ParaRun.prototype =
                                 EmptyLine       = false;
                                 SpaceLen        = 0;
                                 WordLen         = 0;
-                                //SpacesCount     = 0;
                             }
                         }
                     }
@@ -914,10 +919,7 @@ ParaRun.prototype =
                         EmptyLine   = false;
                         SpaceLen    = 0;
                         WordLen     = 0;
-                        //SpacesCount = 1;
                     }
-                    //else
-                    //    SpacesCount++;
 
                     // На пробеле не делаем перенос. Перенос строки или внутристрочный
                     // перенос делаем при добавлении любого непробельного символа
@@ -948,7 +950,6 @@ ParaRun.prototype =
                             EmptyLine   = false;
                             SpaceLen    = 0;
                             WordLen     = 0;
-                            //SpacesCount = 0;
                         }
 
                         if ( X + SpaceLen + Item.Width > XEnd && ( false === FirstItemOnLine || false === Para.Internal_Check_Ranges( ParaLine, ParaRange ) ) )
@@ -982,13 +983,9 @@ ParaRun.prototype =
                         }
 
                         SpaceLen    = 0;
-                        //SpacesCount = 0;
                     }
                     else
                     {
-                        // TODO: переделать здесь
-                        Para.Internal_Recalculate_1_AnchorDrawing();
-
                         // Основная обработка происходит в Recalculate_Range_Spaces. Здесь обрабатывается единственный случай,
                         // когда после второго пересчета с уже добавленной картинкой оказывается, что место в параграфе, где
                         // идет картинка ушло на следующую страницу. В этом случае мы ставим перенос страницы перед картинкой.
@@ -1005,26 +1002,9 @@ ParaRun.prototype =
                             // Добавляем разрыв страницы. Если это первая страница, тогда ставим разрыв страницы в начале параграфа,
                             // если нет, тогда в начале текущей строки.
 
-                            if ( null != this.Get_DocumentPrev() && true != Para.Parent.Is_TableCellContent() && 0 === CurPage )
+                            if ( null != Para.Get_DocumentPrev() && true != Para.Parent.Is_TableCellContent() && 0 === CurPage )
                             {
-                                // TODO: Переделать
-//                                // Мы должны из соответствующих FlowObjects удалить все Flow-объекты, идущие до этого места в параграфе
-//                                for ( var TempPos = StartPos; TempPos < Pos; TempPos++ )
-//                                {
-//                                    var TempItem = this.Content[TempPos];
-//                                    if ( para_Drawing === TempItem.Type && drawing_Anchor === TempItem.DrawingType && true === TempItem.Use_TextWrap() )
-//                                    {
-//                                        DrawingObjects.removeById( TempItem.PageNum, TempItem.Get_Id() );
-//                                    }
-//                                }
-
-                                Para.Pages[CurPage].Set_EndLine( -1 );
-                                if ( 0 === CurLine )
-                                {
-                                    Para.Lines[-1] = new CParaLine(0);
-                                    Para.Lines[-1].Set_EndPos( -1 );
-                                }
-
+                                Para.Recalculate_Drawing_AddPageBreak( 0, 0, true );
                                 PRS.RecalcResult = recalcresult_NextPage;
                                 return;
                             }
@@ -1032,19 +1012,13 @@ ParaRun.prototype =
                             {
                                 if ( ParaLine != Para.Pages[CurPage].FirstLine )
                                 {
-                                    this.Pages[CurPage].Set_EndLine( ParaLine - 1 );
-                                    if ( 0 === ParaLine )
-                                    {
-                                        this.Lines[-1] = new CParaLine(0);
-                                        this.Lines[-1].Set_EndPos( -1 );
-                                    }
-
+                                    Para.Recalculate_Drawing_AddPageBreak( CurLine, CurPage, false );
                                     PRS.RecalcResult = recalcresult_NextPage;
                                     return;
                                 }
                                 else
                                 {
-                                    RangeEndPos = Pos;
+                                    RangeEndPos  = Pos;
                                     NewRange     = true;
                                     ForceNewPage = true;
                                 }
@@ -1061,7 +1035,6 @@ ParaRun.prototype =
                                 Word        = false;
                                 SpaceLen    = 0;
                                 WordLen     = 0;
-                                //SpacesCount = 0;
                             }
                         }
                     }
@@ -1083,7 +1056,6 @@ ParaRun.prototype =
                         EmptyLine   = false;
                         SpaceLen    = 0;
                         WordLen     = 0;
-                        //SpacesCount = 0;
                     }
 
                     // Если на строке начиналось какое-то слово, тогда данная строка уже не пустая
@@ -1108,7 +1080,6 @@ ParaRun.prototype =
                     }
 
                     SpaceLen    = 0;
-                    //SpacesCount = 0;
 
                     break;
                 }
@@ -1210,7 +1181,6 @@ ParaRun.prototype =
                         Word        = false;
                         X          += SpaceLen;
                         SpaceLen    = 0;
-                        //SpacesCount = 0;
                     }
 
                     break;
@@ -1232,7 +1202,6 @@ ParaRun.prototype =
                         {
                             X += SpaceLen;
                             SpaceLen    = 0;
-                            //SpacesCount = 0;
                             WordLen     = 0;
                         }
 
@@ -1310,14 +1279,17 @@ ParaRun.prototype =
                 this.Lines.length = this.LinesLength;
         }
 
-        if ( 0 === CurLine && 0 === PRS.Range )
+        if ( 0 === CurLine && 0 === CurRange )
         {
             this.Range.StartPos = RangeStartPos;
             this.Range.EndPos   = RangeEndPos;
             this.Lines[0].RangesLength = 1;
+
+            if ( this.Lines[0].Ranges.length > 1 )
+                this.Lines[0].Ranges.length = 1;
         }
         else
-            this.Lines[CurLine].Add_Range( PRS.Range, RangeStartPos, RangeEndPos );
+            this.Lines[CurLine].Add_Range( CurRange, RangeStartPos, RangeEndPos );
 
         this.RecalcInfo.Recalc = false;
     },
@@ -1325,15 +1297,17 @@ ParaRun.prototype =
     Recalculate_Set_RangeEndPos : function(PRS, PRP, Depth)
     {
         var CurLine  = PRS.Line - this.StartLine;
-        var CurRange = PRS.Range;
+        var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
         var CurPos   = PRP.Get(Depth);
 
         this.Lines[CurLine].Ranges[CurRange].EndPos = CurPos;
     },
 
-    Recalculate_Range_Width : function(PRSC, _CurLine, CurRange)
+    Recalculate_Range_Width : function(PRSC, _CurLine, _CurRange)
     {
         var CurLine  = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
         var Range    = this.Lines[CurLine].Ranges[CurRange];
         var StartPos = Range.StartPos;
         var EndPos   = Range.EndPos;
@@ -1393,7 +1367,7 @@ ParaRun.prototype =
                 case para_Drawing:
                 {
                     PRSC.Range.Words++;
-                    PRSC.Range.W += PRS2.SpaceLen;
+                    PRSC.Range.W += PRSC.SpaceLen;
 
                     if ( PRSC.Range.Words > 1 )
                         PRSC.Range.Spaces += PRSC.SpacesCount;
@@ -1404,7 +1378,7 @@ ParaRun.prototype =
                     PRSC.SpacesCount = 0;
                     PRSC.SpaceLen    = 0;
 
-                    if ( true === Item.Is_Inline() || true === PRS2.Paragraph.Parent.Is_DrawingShape() )
+                    if ( true === Item.Is_Inline() || true === PRSC.Paragraph.Parent.Is_DrawingShape() )
                         PRSC.Range.W += Item.Width;
 
                     break;
@@ -1412,7 +1386,7 @@ ParaRun.prototype =
                 case para_PageNum:
                 {
                     PRSC.Range.Words++;
-                    PRSC.Range.W += PRS2.SpaceLen;
+                    PRSC.Range.W += PRSC.SpaceLen;
 
                     if ( PRSC.Range.Words > 1 )
                         PRSC.Range.Spaces += PRSC.SpacesCount;
@@ -1469,9 +1443,11 @@ ParaRun.prototype =
         }
     },
 
-    Recalculate_Range_Spaces : function(PRSA, _CurLine, CurRange, CurPage)
+    Recalculate_Range_Spaces : function(PRSA, _CurLine, _CurRange, CurPage)
     {
-        var CurLine = _CurLine - this.StartLine;
+        var CurLine  = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
         var Range    = this.Lines[CurLine].Ranges[CurRange];
         var StartPos = Range.StartPos;
         var EndPos   = Range.EndPos;
@@ -1562,6 +1538,13 @@ ParaRun.prototype =
                     }
                     else
                     {
+                        if ( true === PRSA.RecalcFast )
+                        {
+                            // Если у нас быстрый пересчет, тогда мы не трогаем плавающие картинки
+                            // TODO: Если здесь привязка к символу, тогда быстрый пересчет надо отменить
+                            break;
+                        }
+
                         // У нас Flow-объект. Если он с обтеканием, тогда мы останавливаем пересчет и
                         // запоминаем текущий объект. В функции Internal_Recalculate_2 пересчитываем
                         // его позицию и сообщаем ее внешнему классу.
@@ -1905,6 +1888,21 @@ ParaRun.prototype =
     {
         this.RecalcInfo.Reset();
     },
+
+    Is_EmptyRange : function(_CurLine, _CurRange)
+    {
+        var CurLine  = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+        var Range = this.Lines[CurLine].Ranges[CurRange];
+        var StartPos = Range.StartPos;
+        var EndPos   = Range.EndPos;
+
+        if ( EndPos <= StartPos )
+            return true;
+
+        return false;
+    },
 //-----------------------------------------------------------------------------------
 // Функции отрисовки
 //-----------------------------------------------------------------------------------
@@ -1913,7 +1911,7 @@ ParaRun.prototype =
         var pGraphics = PDSH.Graphics;
 
         var CurLine   = PDSH.Line - this.StartLine;
-        var CurRange  = PDSH.Range;
+        var CurRange  = ( 0 === CurLine ? PDSH.Range - this.StartRange : PDSH.Range );
 
         var aHigh     = PDSH.High;
         var aColl     = PDSH.Coll;
@@ -2050,7 +2048,8 @@ ParaRun.prototype =
     Draw_Elements : function(PDSE)
     {
         var CurLine  = PDSE.Line - this.StartLine;
-        var CurRange = PDSE.Range;
+        var CurRange = ( 0 === CurLine ? PDSE.Range - this.StartRange : PDSE.Range );
+        var CurPage  = PDSE.Page;
 
         var Range    = this.Lines[CurLine].Ranges[CurRange];
         var StartPos = Range.StartPos;
@@ -2109,7 +2108,10 @@ ParaRun.prototype =
                         if ( para_PageNum != Item.Type )
                             Item.Draw( X, Y - this.YOffset, pGraphics );
                         else
-                            Item.Draw( X, Y - this.YOffset, pGraphics, Para.Get_StartPage_Absolute() + CurPage, Pr.ParaPr.Jc );
+                        {
+                            var ParaJc = Para.Get_CompiledPr2(false).ParaPr.Jc;
+                            Item.Draw( X, Y - this.YOffset, pGraphics, Para.Get_StartPage_Absolute() + CurPage, ParaJc );
+                        }
 
                         X += Item.WidthVisible;
                     }
@@ -2182,7 +2184,7 @@ ParaRun.prototype =
     Draw_Lines : function(PDSL)
     {
         var CurLine  = PDSL.Line - this.StartLine;
-        var CurRange = PDSL.Range;
+        var CurRange = ( 0 === CurLine ? PDSL.Range - this.StartRange : PDSL.Range );
 
         var Range = this.Lines[CurLine].Ranges[CurRange];
 
@@ -2429,6 +2431,14 @@ ParaRun.prototype =
                     SearchPos.Pos.Update( EndPos, Depth );
                 }
             }
+        }
+
+        // Такое возможно, если все раны до этого (в том числе и этот) были пустыми, тогда, чтобы не возвращать
+        // неправильную позицию вернем позицию начала данного путого рана.
+        if ( SearchPos.DiffX > 1000000 - 1 )
+        {
+            SearchPos.Pos.Update( StartPos, Depth );
+            Result = true;
         }
 
         return Result;
@@ -2885,7 +2895,8 @@ ParaRun.prototype =
                 }
                 else
                 {
-                    SelectionDraw.StartX += Item.WidthVisible;
+                    if ( para_Drawing !== Item.Type || true === Item.Is_Inline() )
+                        SelectionDraw.StartX += Item.WidthVisible;
                 }
             }
             else
@@ -3759,6 +3770,9 @@ CParaRunLine.prototype =
             this.Ranges[0].EndPos   = EndPos;
             this.RangesLength = 1;
         }
+
+        if ( this.Ranges.length > this.RangesLength )
+            this.Ranges.legth = this.RangesLength;
     },
 
     Copy : function()
@@ -3777,19 +3791,17 @@ CParaRunLine.prototype =
     },
 
 
-    Compare : function(OtherLine)
+    Compare : function(OtherLine, CurRange)
     {
-        if ( this.RangesLength !== OtherLine.RangesLength )
+        // Сначала проверим наличие данного отрезка в обеих строках
+        if ( this.RangesLength <= CurRange || OtherLine.RangesLength <= CurRange )
             return false;
 
-        for ( var CurRange = 0; CurRange < this.RangesLength; CurRange++ )
-        {
-            var OtherRange = OtherLine.Ranges[CurRange];
-            var ThisRange  = this.Ranges[CurRange];
+        var OtherRange = OtherLine.Ranges[CurRange];
+        var ThisRange  = this.Ranges[CurRange];
 
-            if ( OtherRange.StartPos !== ThisRange.StartPos || OtherRange.EndPos !== ThisRange.EndPos )
-                return false;
-        }
+        if ( OtherRange.StartPos !== ThisRange.StartPos || OtherRange.EndPos !== ThisRange.EndPos )
+            return false;
 
         return true;
     }

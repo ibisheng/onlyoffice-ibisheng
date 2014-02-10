@@ -3250,7 +3250,7 @@ Paragraph.prototype =
         //-------------------------------------------------------------------------------------------------------------
         // Пересчитываем сдвиги элементов внутри параграфа и видимые ширины пробелов, в зависимости от align.
         //-------------------------------------------------------------------------------------------------------------
-        var RecalcResultAlign = this.Recalculate_Lines_Align(PRS, CurPage, ParaPr);
+        var RecalcResultAlign = this.Recalculate_Lines_Align(PRS, CurPage, ParaPr, false);
 
         if ( recalcresult_NextElement !== RecalcResultAlign )
             return RecalcResultAlign;
@@ -3791,7 +3791,7 @@ Paragraph.prototype =
         if ( 0 === CurLine && 0 === CurRange )
             StartPos = 0;
         else if ( CurRange > 0 )
-            StartPos = this.Lines[CurLine].Ranges[CurRanges - 1].EndPos;
+            StartPos = this.Lines[CurLine].Ranges[CurRange - 1].EndPos;
         else
             StartPos = this.Lines[CurLine - 1].Ranges[ this.Lines[CurLine - 1].Ranges.length - 1 ].EndPos;
 
@@ -3825,9 +3825,9 @@ Paragraph.prototype =
         {
             var Item = this.Content[Pos];
 
-            if ( ( 0 === Pos && 0 === CurLine ) || Pos !== StartPos )
+            if ( ( 0 === Pos && 0 === CurLine && 0 === CurRange ) || Pos !== StartPos )
             {
-                Item.Recalculate_Reset( CurLine, ( 0 === Pos && 0 === CurLine ? null : this.Content[Pos - 1].Get_RecalcInfo() ) );
+                Item.Recalculate_Reset( CurRange, CurLine, ( 0 === Pos && 0 === CurLine ? null : this.Content[Pos - 1].Get_RecalcInfo() ) );
             }
 
             PRS.Update_CurPos( Pos, 0 );
@@ -3866,6 +3866,14 @@ Paragraph.prototype =
 
         this.Lines.length = CurLine + 1;
         this.Lines[CurLine] = new CParaLine();
+
+        if ( true === PRS.RangeY )
+        {
+            PRS.RangeY = false;
+            this.Lines[CurLine].RangeY = true;
+        }
+        else
+            this.Lines[CurLine].RangeY = false;
 
         // Проверим висячую строку
         if ( this.Parent instanceof CDocument && true === this.Parent.RecalcInfo.Check_WidowControl(this, CurLine) )
@@ -4195,7 +4203,7 @@ Paragraph.prototype =
             else
             {
                 if ( CurLine > 0 )
-                    this.Lines[CurLine].Y = Y - this.Pages[CurPage].Y;
+                    this.Lines[CurLine].Y = PRS.Y - this.Pages[CurPage].Y;
                 else
                     this.Lines[0].Y = 0;
             }
@@ -4208,14 +4216,14 @@ Paragraph.prototype =
         {
             if ( true === this.Lines[CurLine].RangeY )
             {
-                this.Lines[CurLine].Y = Y - this.Pages[CurPage].Y;
+                this.Lines[CurLine].Y = PRS.Y - this.Pages[CurPage].Y;
             }
             else
             {
                 if ( CurLine > 0 )
                 {
                     // Первая линия на странице не должна двигаться
-                    if ( CurLine != this.Pages[CurPage].FirstLine )
+                    if ( CurLine != this.Pages[CurPage].FirstLine && ( true === PRS.End || true !== PRS.EmptyLine || RangesCount <= 0 ) )
                         PRS.Y += this.Lines[CurLine - 1].Metrics.Descent + this.Lines[CurLine - 1].Metrics.LineGap +  this.Lines[CurLine].Metrics.Ascent;
 
                     this.Lines[CurLine].Y = PRS.Y - this.Pages[CurPage].Y;
@@ -4244,13 +4252,18 @@ Paragraph.prototype =
                         RangesMaxY = Ranges[Index].Y1;
                 }
 
-                if ( Math.abs(RangesMaxY - Y) < 0.001  )
+                if ( Math.abs(RangesMaxY - PRS.Y) < 0.001  )
                     PRS.Y = RangesMaxY + 1; // смещаемся по 1мм
                 else
                     PRS.Y = RangesMaxY + 0.001; // Добавляем 0.001, чтобы избавиться от погрешности
 
+                // Отмечаем, что данная строка переносится по Y из-за обтекания
+                PRS.RangeY = true;
+
                 // Пересчитываем заново данную строку
+                PRS.Reset_Ranges();
                 PRS.RecalcResult = recalcresult_CurLine;
+
                 return;
             }
 
@@ -4273,8 +4286,6 @@ Paragraph.prototype =
             // В последней строке могут быть заполнены не все отрезки обтекания
             for ( var TempRange = CurRange + 1; TempRange <= RangesCount; TempRange++ )
                 this.Lines[CurLine].Set_RangeStartPos( TempRange, Pos );
-
-            //this.Lines[CurLine].Set_EndPos( Pos, this );
 
             // Проверим висячую строку
             if ( true === ParaPr.WidowControl && CurLine === this.Pages[CurPage].StartLine && CurLine >= 1 )
@@ -4369,7 +4380,7 @@ Paragraph.prototype =
         }
     },
 
-    Recalculate_Lines_Align : function(PRSW, CurPage, ParaPr)
+    Recalculate_Lines_Align : function(PRSW, CurPage, ParaPr, Fast)
     {
         // Здесь мы пересчитываем ширину пробелов (и в особенных случаях дополнительное
         // расстояние между символами) с учетом прилегания параграфа.
@@ -4399,8 +4410,9 @@ Paragraph.prototype =
         var LinesCount = this.Lines.length;
 
         var PRSA = g_oPRSA;
-        PRSA.Paragraph = this;
-        PRSA.LastW     = 0;
+        PRSA.Paragraph  = this;
+        PRSA.LastW      = 0;
+        PRSA.RecalcFast = Fast;
 
         for ( var CurLine = StartLine; CurLine <= EndLine; CurLine++ )
         {
@@ -4512,6 +4524,30 @@ Paragraph.prototype =
         }
 
         return recalcresult_NextElement;
+    },
+
+    Recalculate_Drawing_AddPageBreak : function(CurLine, CurPage, RemoveDrawings)
+    {
+        if ( true === RemoveDrawings )
+        {
+            // Мы должны из соответствующих FlowObjects удалить все Flow-объекты, идущие до этого места в параграфе
+            for ( var TempPage = 0; TempPage <= CurPage; TempPage++ )
+            {
+                var DrawingsLen = this.Pages[TempPage].Drawings.length;
+                for ( var CurPos = 0; CurPos < DrawingsLen; CurPos++ )
+                {
+                    var Item = this.Pages[TempPage].Drawings[CurPos];
+                    DrawingObjects.removeById( Item.PageNum, Item.Get_Id() );
+                }
+
+                this.Pages[TempPage].Drawings = new Array();
+            }
+        }
+
+        this.Pages[CurPage].Set_EndLine( CurLine - 1 );
+
+        if ( 0 === CurLine )
+            this.Lines[-1] = new CParaLine(0);
     },
 
     // Пересчитываем заданную позицию элемента или текущую позицию курсора.
@@ -4991,6 +5027,23 @@ Paragraph.prototype =
         return ClearLen;
     },
 
+    Is_EmptyRange : function(CurLine, CurRange)
+    {
+        var Line  = this.Lines[CurLine];
+        var Range = Line.Ranges[CurRange];
+
+        var StartPos = Range.StartPos;
+        var EndPos   = Range.EndPos;
+
+        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+        {
+            if ( false === this.Content[CurPos].Is_EmptyRange( CurLine, CurRange ) )
+                return false;
+        }
+
+        return true;
+    },
+
     Recalculate_Fast : function(SimpleChanges)
     {
         var Run = SimpleChanges[0].Class;
@@ -5019,48 +5072,102 @@ Paragraph.prototype =
         var Line  = ParaPos.Line;
         var Range = ParaPos.Range;
 
+        // Если мы находимся в строке, которая была полностью перенесена из-за обтекания,  и мы добавляем пробел, или
+        // удаляем символ, тогда нам запускать обычный пересчет, т.к. первое слово может начать убираться в промежутках
+        // обтекания, которых у нас нет в отрезках строки
+        if ( true === this.Lines[Line].RangeY )
+        {
+            // TODO: Сделать проверку на добавление пробела и удаление
+            return -1;
+        }
+
         // Мы должны пересчитать как минимум 3 отрезка: текущий, предыдущий и следующий, потому что при удалении элемента
         // или добавлении пробела первое слово в данном отрезке может убраться в предыдущем отрезке, и кроме того при
-        // удалении возможен вариант, когда мы неправильно определили отрезок (т.е. более ранний взяли)
+        // удалении возможен вариант, когда мы неправильно определили отрезок (т.е. более ранний взяли). Но возможен
+        // вариант, при котором предыдущий или/и следующий отрезки - пустые, т.е. там нет ни одного текстового элемента
+        // тогда мы начинаем проверять с отрезка, в котором есть хоть что-то.
 
-        if ( Range > 0 || Line > 0 )
+        var PrevLine  = Line;
+        var PrevRange = Range;
+
+        while ( PrevLine >= 0 )
         {
-            var PrevLine  = Line;
-            var PrevRange = 0;
+            PrevRange--;
 
-            if ( Range > 0 )
-                PrevRange = Range - 1;
-            else
+            if ( PrevRange < 0 )
             {
-                PrevLine  = Line - 1;
+                PrevLine--;
+
+                if ( PrevLine < 0 )
+                    break;
+
                 PrevRange = this.Lines[PrevLine].Ranges.length - 1;
             }
 
-            if ( -1 === this.Recalculate_Fast_Range(PrevLine, PrevRange) )
-                return -1;
+            if ( true === this.Is_EmptyRange( PrevLine, PrevRange ) )
+                continue;
+            else
+                break;
         }
 
-        var Result = this.Recalculate_Fast_Range( Line, Range );
-        if ( -1 === Result )
-            return -1;
-
-        if ( Range < this.Lines[Line].Ranges.length - 1 || Line < this.Lines.length - 1 )
+        if ( PrevLine < 0 )
         {
-            var NextLine  = Line;
-            var NextRange = 0;
+            PrevLine  = Line;
+            PrevRange = Range;
+        }
 
-            if ( Range < this.Lines[Line].Ranges.length - 1 )
-                NextRange = Range + 1;
-            else
+        var NextLine  = Line;
+        var NextRange = Range;
+
+        var LinesCount = this.Lines.length;
+
+        while ( NextLine <= LinesCount - 1 )
+        {
+            NextRange++;
+
+            if ( NextRange > this.Lines[NextLine].Ranges.length - 1 )
             {
-                NextLine  = Line + 1;
+                NextLine++
+
+                if ( NextLine > LinesCount - 1 )
+                    break;
+
                 NextRange = 0;
             }
 
-            if ( -1 === this.Recalculate_Fast_Range(NextLine, NextRange) )
-                return -1;
+            if ( true === this.Is_EmptyRange( NextLine, NextRange ) )
+                continue;
+            else
+                break;
         }
 
+        if ( NextLine > LinesCount - 1 )
+        {
+            NextLine  = Line;
+            NextRange = Range;
+        }
+
+        var CurLine  = PrevLine;
+        var CurRange = PrevRange;
+
+        var Result;
+        while ( ( CurLine < NextLine ) || ( CurLine === NextLine && CurRange <= NextRange ) )
+        {
+            var TempResult = this.Recalculate_Fast_Range(CurLine, CurRange);
+            if ( -1 === TempResult )
+                return -1;
+
+            if ( CurLine === Line && CurRange === Range )
+                Result = TempResult;
+
+            CurRange++;
+
+            if ( CurRange > this.Lines[CurLine].Ranges.length - 1 )
+            {
+                CurLine++;
+                CurRange = 0;
+            }
+        }
 
         // Во время пересчета сбрасываем привязку курсора к строке.
         this.CurPos.Line = -1;
@@ -5091,7 +5198,7 @@ Paragraph.prototype =
         }
 
         if ( -1 === CurPage )
-            return false;
+            return -1;
 
         if ( 0 === CurPage )//|| ( undefined != this.Get_FramePr() && this.Parent instanceof CDocument ) )
         {
@@ -5122,6 +5229,7 @@ Paragraph.prototype =
         PRS.Line  = _Line;
         PRS.Range = _Range;
 
+        PRS.RangesCount = this.Lines[CurLine].Ranges.length - 1;
 
         PRS.Paragraph = this;
 
@@ -5160,7 +5268,7 @@ Paragraph.prototype =
 
 
             // Нам нужно проверить только строку с номером CurLine
-            if ( false === SavedLines[CurLine - Item.StartLine].Compare( Item.Lines[CurLine - Item.StartLine] ) )
+            if ( false === SavedLines[CurLine - Item.StartLine].Compare( Item.Lines[CurLine - Item.StartLine], ( CurLine - Item.StartLine === 0 ? CurRange - Item.StartRange : CurRange ) ) )
                 return -1;
 
             Item.Restore_Lines( SL );
@@ -5185,7 +5293,7 @@ Paragraph.prototype =
         }
         //------------------------------------------------
 
-        var RecalcResultAlign = this.Recalculate_Lines_Align(PRS, CurPage, ParaPr);
+        var RecalcResultAlign = this.Recalculate_Lines_Align(PRS, CurPage, ParaPr, true);
 
         if ( recalcresult_NextElement !== RecalcResultAlign )
             return -1;
@@ -8507,7 +8615,7 @@ Paragraph.prototype =
 
             this.Set_Tabs( Tabs );
 
-            this.Set_ParaContentPos( this.Get_EndPos( false ), -1, false );
+            this.Set_ParaContentPos( this.Get_EndPos( false ), false, -1, -1 );
             this.Add( new ParaTab() );
         }
     },
@@ -8857,7 +8965,7 @@ Paragraph.prototype =
         return ContentPos;
     },
 
-    Set_ParaContentPos : function(ContentPos, Line, CorrectEndLinePos)
+    Set_ParaContentPos : function(ContentPos, CorrectEndLinePos, Line, Range)
     {
         var Pos = ContentPos.Get(0);
 
@@ -8866,7 +8974,7 @@ Paragraph.prototype =
         this.Correct_ContentPos(CorrectEndLinePos);
 
         this.CurPos.Line  = Line;
-        this.CurPos.Range = 0;
+        this.CurPos.Range = Range;
     },
 
     Set_SelectionContentPos : function(StartContentPos, EndContentPos)
@@ -8979,11 +9087,16 @@ Paragraph.prototype =
         // Определим отрезок, в который мы попадаем
         var CurRange = 0;
         var RangesCount = this.Lines[CurLine].Ranges.length;
-        for ( ; CurRange < RangesCount; CurRange++ )
+
+        if ( RangesCount > 1 )
         {
-            var _Range = this.Lines[CurLine].Ranges[CurRange];
-            if ( X < _Range.XEnd )
-                break;
+            for ( ; CurRange < RangesCount - 1; CurRange++ )
+            {
+                var _CurRange  = this.Lines[CurLine].Ranges[CurRange];
+                var _NextRange = this.Lines[CurLine].Ranges[CurRange + 1];
+                if ( X < (_CurRange.XEnd + _NextRange.X) / 2 )
+                    break;
+            }
         }
 
         if ( CurRange >= RangesCount )
@@ -9052,7 +9165,18 @@ Paragraph.prototype =
         else
             SearchPos.InText = false;
 
-        SearchPos.Line = CurLine;
+        // Такое возможно, если все раны до этого (в том числе и этот) были пустыми, тогда, чтобы не возвращать
+        // неправильную позицию вернем позицию начала данного путого рана.
+        if ( SearchPos.DiffX > 1000000 - 1 )
+        {
+            SearchPos.Line  = -1;
+            SearchPos.Range = -1;
+        }
+        else
+        {
+            SearchPos.Line  = CurLine;
+            SearchPos.Range = CurRange;
+        }
 
         return SearchPos;
     },
@@ -9102,7 +9226,7 @@ Paragraph.prototype =
                         SelectPos = EndSelectionPos;
 
                     this.Selection_Remove();
-                    this.Set_ParaContentPos( SelectPos, -1, true );
+                    this.Set_ParaContentPos( SelectPos, true, -1, -1 );
                 }
                 else
                 {
@@ -9151,7 +9275,7 @@ Paragraph.prototype =
                 {
                     if ( true === SearchPos.Found )
                     {
-                        this.Set_ParaContentPos( SearchPos.Pos, -1, true );
+                        this.Set_ParaContentPos( SearchPos.Pos, true, -1, -1 );
                     }
                     else
                     {
@@ -9164,7 +9288,7 @@ Paragraph.prototype =
             if ( true === this.Selection.Use )
             {
                 var SelectionEndPos = this.Get_ParaContentPos( true, false );
-                this.Set_ParaContentPos( SelectionEndPos, -1, false );
+                this.Set_ParaContentPos( SelectionEndPos, false, -1, -1 );
             }
 
             this.Internal_Recalculate_CurPos( this.CurPos.ContentPos, true, false, false );
@@ -9226,7 +9350,7 @@ Paragraph.prototype =
 
                         this.Selection_Remove();
 
-                        this.Set_ParaContentPos( SelectPos, -1, true );
+                        this.Set_ParaContentPos( SelectPos, true, -1, -1 );
                     }
                 }
                 else
@@ -9276,7 +9400,7 @@ Paragraph.prototype =
                 {
                     if ( true === SearchPos.Found )
                     {
-                        this.Set_ParaContentPos( SearchPos.Pos, -1, true );
+                        this.Set_ParaContentPos( SearchPos.Pos, true, -1, -1 );
                     }
                     else
                     {
@@ -9289,7 +9413,7 @@ Paragraph.prototype =
             if ( true === this.Selection.Use )
             {
                 var SelectionEndPos = this.Get_ParaContentPos( true, false );
-                this.Set_ParaContentPos( SelectionEndPos, -1, false );
+                this.Set_ParaContentPos( SelectionEndPos, false, -1, -1 );
             }
 
             this.Internal_Recalculate_CurPos( this.CurPos.ContentPos, true, false, false );
@@ -9340,7 +9464,7 @@ Paragraph.prototype =
         {
             var SearchPosXY = this.Get_ParaContentPosByXY( X, Y, PageNum, bLine, false );
 
-            this.Set_ParaContentPos( SearchPosXY.Pos, SearchPosXY.Line, false );
+            this.Set_ParaContentPos( SearchPosXY.Pos, false, SearchPosXY.Line, SearchPosXY.Range );
             this.Internal_Recalculate_CurPos(-1, false, false, false );
 
             if ( bDontChangeRealPos != true )
@@ -9518,7 +9642,8 @@ Paragraph.prototype =
         var StartPos = Range.StartPos;
         var EndPos   = Range.EndPos;
 
-        SearchPos.Line = CurLine;
+        SearchPos.Line  = CurLine;
+        SearchPos.Range = CurRange;
 
         // Ищем в данном отрезке
         for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
@@ -9541,7 +9666,8 @@ Paragraph.prototype =
         var StartPos = Range.StartPos;
         var EndPos   = Range.EndPos;
 
-        SearchPos.Line = CurLine;
+        SearchPos.Line  = CurLine;
+        SearchPos.Range = CurRange;
 
         // Ищем в данном отрезке
         for ( var CurPos = EndPos; CurPos >= StartPos; CurPos-- )
@@ -9773,11 +9899,12 @@ Paragraph.prototype =
                     if ( SelectionStartPos.Compare( SelectionEndPos ) > 0 )
                         TopPos = SelectionEndPos;
 
-                    var LinePos = this.Get_ParaPosByContentPos( TopPos );
-                    var CurLine = LinePos.Line;
+                    var LinePos  = this.Get_ParaPosByContentPos( TopPos );
+                    var CurLine  = LinePos.Line;
+                    var CurRange = LinePos.Range;
 
                     // Пересчитаем координату точки TopPos
-                    this.Set_ParaContentPos( TopPos, CurLine, false );
+                    this.Set_ParaContentPos( TopPos, false, CurLine, CurRange );
 
                     this.Internal_Recalculate_CurPos(0, true, false, false );
                     this.CurPos.RealX = this.CurPos.X;
@@ -10035,11 +10162,12 @@ Paragraph.prototype =
                     if ( SelectionStartPos.Compare( SelectionEndPos ) > 0 )
                         BottomPos = SelectionStartPos;
 
-                    var LinePos = this.Get_ParaPosByContentPos( BottomPos );
-                    var CurLine = LinePos.Line;
+                    var LinePos  = this.Get_ParaPosByContentPos( BottomPos );
+                    var CurLine  = LinePos.Line;
+                    var CurRange = LinePos.Range;
 
                     // Пересчитаем координату BottomPos
-                    this.Set_ParaContentPos( BottomPos, CurLine, false );
+                    this.Set_ParaContentPos( BottomPos, false, CurLine, CurRange );
 
                     this.Internal_Recalculate_CurPos(0, true, false, false );
                     this.CurPos.RealX = this.CurPos.X;
@@ -10193,7 +10321,7 @@ Paragraph.prototype =
 
                     this.Selection_Remove();
 
-                    this.Set_ParaContentPos( SearchPos.Pos, SearchPos.Line, false );
+                    this.Set_ParaContentPos( SearchPos.Pos, false, SearchPos.Line, SearchPos.Range );
                 }
             }
             else
@@ -10209,7 +10337,7 @@ Paragraph.prototype =
                 }
                 else
                 {
-                    this.Set_ParaContentPos( SearchPos.Pos, SearchPos.Line, false );
+                    this.Set_ParaContentPos( SearchPos.Pos, false, SearchPos.Line, SearchPos.Range );
                 }
             }
 
@@ -10217,7 +10345,7 @@ Paragraph.prototype =
             if ( true === this.Selection.Use )
             {
                 var SelectionEndPos = this.Get_ParaContentPos( true, false );
-                this.Set_ParaContentPos( SelectionEndPos, -1, false );
+                this.Set_ParaContentPos( SelectionEndPos, false, -1, -1 );
             }
 
             this.Internal_Recalculate_CurPos( this.CurPos.ContentPos, true, false, false );
@@ -10319,7 +10447,7 @@ Paragraph.prototype =
 
                     this.Selection_Remove();
 
-                    this.Set_ParaContentPos( SearchPos.Pos, SearchPos.Line, false );
+                    this.Set_ParaContentPos( SearchPos.Pos, false, SearchPos.Line, SearchPos.Range );
                 }
             }
             else
@@ -10336,7 +10464,7 @@ Paragraph.prototype =
                 }
                 else
                 {
-                    this.Set_ParaContentPos( SearchPos.Pos, SearchPos.Line, false );
+                    this.Set_ParaContentPos( SearchPos.Pos, false, SearchPos.Line, SearchPos.Range );
                 }
             }
 
@@ -10344,7 +10472,7 @@ Paragraph.prototype =
             if ( true === this.Selection.Use )
             {
                 var SelectionEndPos = this.Get_ParaContentPos( true, false );
-                this.Set_ParaContentPos( SelectionEndPos, -1, false );
+                this.Set_ParaContentPos( SelectionEndPos, false, -1, -1 );
             }
 
             this.Internal_Recalculate_CurPos( this.CurPos.ContentPos, true, false, false );
@@ -12359,7 +12487,7 @@ Paragraph.prototype =
             this.Selection.Flag     = selectionflag_Common;
 
             // Выставим текущую позицию
-            this.Set_ParaContentPos( SearchPosXY2.Pos, SearchPosXY2.Line, true );
+            this.Set_ParaContentPos( SearchPosXY2.Pos, true, SearchPosXY2.Line, SearchPosXY2.Range );
 
             // Выставляем селект
             this.Set_SelectionContentPos( SearchPosXY.Pos, SearchPosXY.Pos );
@@ -12575,7 +12703,7 @@ Paragraph.prototype =
             var SearchPosXY2 = this.Get_ParaContentPosByXY( X, Y, PageNum, false, false );
 
             // Выставим в полученном месте текущую позицию курсора
-            this.Set_ParaContentPos( SearchPosXY2.Pos, SearchPosXY2.Line, true );
+            this.Set_ParaContentPos( SearchPosXY2.Pos, true, SearchPosXY2.Line, SearchPosXY2.Range );
 
             if ( true === SearchPosXY.End )
             {
@@ -12607,7 +12735,7 @@ Paragraph.prototype =
                 if ( true === SearchPosXY.Numbering && undefined != NumPr )
                 {
                     // Передвигаем курсор в начало параграфа
-                    this.Set_ParaContentPos(this.Get_StartPos(), -1, true);
+                    this.Set_ParaContentPos(this.Get_StartPos(), true, -1, -1);
 
                     // Производим выделение нумерации
                     this.Parent.Document_SelectNumbering( NumPr );
@@ -19381,6 +19509,8 @@ function CParaPage(X, Y, XLimit, YLimit, FirstLine)
     this.StartLine = FirstLine; // Номер строки, с которой начинается данная страница
     this.EndLine   = FirstLine; // Номер последней строки на данной странице
     this.TextPr    = null;      // Расситанные текстовые настройки для начала страницы
+
+    this.Drawings  = new Array();
 }
 
 CParaPage.prototype =
@@ -19394,6 +19524,7 @@ CParaPage.prototype =
         this.FirstLine = FirstLine;
         this.Bounds    = new CDocumentBounds( X, Y, XLimit, Y );
         this.StartLine = FirstLine;
+        this.Drawings  = new Array();
     },
 
     Shift : function(Dx, Dy)
@@ -19408,6 +19539,11 @@ CParaPage.prototype =
     Set_EndLine : function(EndLine)
     {
         this.EndLine = EndLine;
+    },
+
+    Add_Drawing : function(Item)
+    {
+        this.Drawings.push(Item);
     }
 };
 
@@ -19704,6 +19840,7 @@ function CParagraphRecalculateStateWrap()
     this.NewPage  = false; // Переходим на новую страницу
     this.NewRange = false; // Переходим к новому отрезку
     this.End      = false;
+    this.RangeY   = false; // Текущая строка переносится по Y из-за обтекания
 
     this.CurPos       = new CParagraphContentPos();
 
@@ -19818,6 +19955,8 @@ function CParagraphRecalculateStateAlign()
     this.LastW         = 0; // Ширина последнего элемента (необходимо для позиционирования картинки)
     this.Paragraph     = undefined;
     this.RecalcResult  = 0x00;//recalcresult_NextElement;
+
+    this.RecalcFast    = false; // Если пересчет быстрый, тогда все "плавающие" объекты мы не трогаем
 }
 
 var g_oPRSW = new CParagraphRecalculateStateWrap();
@@ -20004,6 +20143,7 @@ function CParagraphSearchPos()
     this.Found = false;                      // Нашли или нет
 
     this.Line  = -1;
+    this.Range = -1;
 
     this.Stage       = 0; // Номера этапов для поиска начала и конца слова
     this.Shift       = false;
@@ -20022,6 +20162,8 @@ function CParagraphSearchPosXY()
     this.NumberingDiffX = 1000000; // километра для ограничения должно хватить
 
     this.Line      = 0;
+    this.Range     = 0;
+
     this.InText    = false;
     this.Numbering = false;
     this.End       = false;
