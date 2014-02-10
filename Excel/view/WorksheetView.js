@@ -882,9 +882,11 @@
 					isNumberFormat = (null === cellType || CellValueType.Number === cellType);
 					if (isNumberFormat) {
 						// Это число, мы нашли то, что искали
-						topCell = asc_clone(cell);
-						topCell.r = r;
-						topCell.c = ar.startCol;
+						topCell = {
+							c: ar.startCol,
+							r: r,
+							isFormula: cell.isFormula
+						};
 						// смотрим вторую ячейку
 						if (topCell.isFormula && r-1 >= vr.r1) {
 							cell = this._getCellTextCache(ar.startCol, r-1);
@@ -906,9 +908,10 @@
 						isNumberFormat = (null === cellType || CellValueType.Number === cellType);
 						if (isNumberFormat) {
 							// Это число, мы нашли то, что искали
-							leftCell = asc_clone(cell);
-							leftCell.r = ar.startRow;
-							leftCell.c = c;
+							leftCell = {
+								r: ar.startRow,
+								c: c
+							};
 							break;
 						}
 					}
