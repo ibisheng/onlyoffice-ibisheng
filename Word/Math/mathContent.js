@@ -5170,7 +5170,7 @@ CMathContent.prototype =
             GREATER    = 0x3E,
             PLUS_MINUS = 0xB1;
 
-        return code == PLUS || code == MINUS || code == LESS || code == GREATER;
+        return code == PLUS || code == MINUS || code == LESS || code == GREATER || code == PLUS_MINUS;;
     },
     IsOnlyText: function()
     {
@@ -6597,8 +6597,119 @@ CMathContent.prototype =
     },
     Save_Changes: function(Data, Writer)
     {
+        Writer.WriteLong( historyitem_type_Math );
 
+        var Type = Data.Type;
+        // Пишем тип
+        Writer.WriteLong( Type );
+		
+		var Math = this.Composition.Parent;
+
+        switch ( Type )
+		{
+			case historyitem_Math_AddItem:
+			{
+				var bArray = Data.UseArray;
+                var Count  = Data.Items.length;
+
+                Writer.WriteLong( Count );
+				
+				for ( var Index = 0; Index < Count; Index++ )
+                {
+                    if ( true === bArray )
+                        Writer.WriteLong( Data.PosArray[Index] );
+                    else
+                        Writer.WriteLong( Data.Pos + Index );
+
+                    Math.Write_MathElemToBinary(Writer, Data.Items[Index]);
+				}
+				break;
+			}
+			case historyitem_Math_RemoveItem:
+			{
+				/*var bArray = Data.UseArray;
+                var Count  = Data.Items.length;
+
+                var StartPos = Writer.GetCurPosition();
+                Writer.Skip(4);
+                var RealCount = Count;
+
+                for ( var Index = 0; Index < Count; Index++ )
+                {
+                    if ( true === bArray )
+                    {
+                        if ( false === Data.PosArray[Index] )
+                            RealCount--;
+                        else
+                            Writer.WriteLong( Data.PosArray[Index] );
+                    }
+                    else
+                        Writer.WriteLong( Data.Pos );
+						
+                }
+
+                var EndPos = Writer.GetCurPosition();
+                Writer.Seek( StartPos );
+                Writer.WriteLong( RealCount );
+                Writer.Seek( EndPos );
+
+                break;*/
+			}			
+		}
+		
+		/*var oThis = this;
+		this.bs = new BinaryCommonWriter(Writer);
+		this.boMaths = new Binary_oMathWriter(Writer);
+		
+		this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteArgNodes(oThis.Data);});
+		*/
     },
+	Load_Changes : function(Reader)
+    {
+        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
+        // Long : тип класса
+        // Long : тип изменений
+
+        var ClassType = Reader.GetLong();
+        if ( historyitem_type_Math != ClassType )
+            return;
+
+		var paraMath = this.Composition.Parent;
+        var Type = Reader.GetLong();
+
+        switch ( Type )
+        {
+            case  historyitem_Math_AddItem:
+            {
+				var Count = Reader.GetLong();
+	
+				//var oMathComp = new CMathComposition;
+                for ( var Index = 0; Index < Count; Index++ )
+                {
+                    var Pos     = Reader.GetLong()
+                    var elem = paraMath.Read_MathElemFromBinary(Reader);
+					
+
+                    if ( null != elem )
+                    {
+						//paraMath.Math.AddToComposition(Item.Math.Root);
+			
+						// TODO: Подумать над тем как по минимуму вставлять отметки совместного редактирования
+						var Element = new mathElem(elem);
+                        this.content.splice( Pos, 0, new ParaCollaborativeChangesEnd() );
+                        this.content.splice( Pos, 0, Element );
+                        this.content.splice( Pos, 0, new ParaCollaborativeChangesStart() );
+
+                        CollaborativeEditing.Add_ChangedClass(this);
+                    }
+                }
+
+                this.DeleteCollaborativeMarks = false;
+
+                break;
+			}
+		}
+	},
     Refresh_RecalcData: function()
     {
         this.Composition.Refresh_RecalcData2(); // Refresh_RecalcData сообщает родительскому классу, что у него произошли изменения, нужно пересчитать
@@ -6990,6 +7101,14 @@ CMathContent.prototype =
         this.setEndPos_Selection(1);
         //this.setEnd_Selection(1);
         //this.selection.active = false;
+    },
+	Get_Id : function()
+    {
+        return this.GetId();
+    },
+	GetId : function()
+    {
+        return this.Id;
     }
     /////////////////////////////////////////////////////////////////
 
@@ -7045,6 +7164,10 @@ function CMathComposition()
     };
 
     this.Init();
+	
+	//для совместного редактирования каждый элемент записываем в глобальную таблицу
+	//this.Id = g_oIdCounter.Get_NewId();
+	//g_oTableId.Add( this, this.Id );
 }
 CMathComposition.prototype =
 {
@@ -7794,6 +7917,8 @@ CMathComposition.prototype =
         var Pos = this.SelectContent.CurPos,
             EndPos = this.SelectContent.CurPos + 1;
 
+		//для совместного редактирования
+		this.CurrentContent.Id = this.Id;
         History.Add(this.CurrentContent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: EndPos});
     },
     CreateEquation: function(indef)
