@@ -154,7 +154,6 @@
 				this.canvasOverlay = document.getElementById("ws-canvas-overlay");
 				this.canvasGraphic = document.getElementById("ws-canvas-graphic");
 				this.canvasGraphicOverlay = document.getElementById("ws-canvas-graphic-overlay");
-				this._canResize();
 			}
 
 			this.buffers.main = asc_DC({canvas: this.canvas, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
@@ -164,11 +163,15 @@
 			this.buffers.mainGraphic = asc_DC({canvas: this.canvasGraphic, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
 			this.buffers.overlayGraphic = asc_DC({canvas: this.canvasGraphicOverlay, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
 			
-
 			this.drawingCtx = this.buffers.main;
 			this.overlayCtx = this.buffers.overlay;
 			this.drawingGraphicCtx = this.buffers.mainGraphic;
 			this.overlayGraphicCtx = this.buffers.overlayGraphic;
+			
+			this.drawingCtxCharts	= asc_DC({units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
+			
+			// Обновляем размеры (чуть ниже, потому что должны быть проинициализированы ctx)
+			this._canResize();
 
 			// Shapes
 			this.buffers.shapeCtx = new CGraphics();
@@ -178,8 +181,6 @@
 			this.buffers.shapeOverlayCtx = new CGraphics();
 			this.buffers.shapeOverlayCtx.init(this.overlayGraphicCtx.ctx, this.overlayGraphicCtx.getWidth(0), this.overlayGraphicCtx.getHeight(0), this.overlayGraphicCtx.getWidth(3), this.overlayGraphicCtx.getHeight(3));
 			this.buffers.shapeOverlayCtx.m_oFontManager = this.fmgrGraphics[2];
-
-			this.drawingCtxCharts	= asc_DC({units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
 
 			this.stringRender		= asc_SR(this.buffers.main);
 			this.stringRender.setDefaultFont(this.defaultFont);
@@ -1186,12 +1187,9 @@
 			this.canvas.height = this.canvasOverlay.height = this.canvasGraphic.height = this.canvasGraphicOverlay.height = height;
 
 			// При смене ориентации у планшета, сбрасываются флаги у canvas!
-			if ( this.drawingCtx )
-				this.drawingCtx.initContextSmoothing();
-			if ( this.overlayCtx )
-				this.overlayCtx.initContextSmoothing();
-			if ( this.drawingCtxCharts )
-				this.drawingCtxCharts.initContextSmoothing();
+			this.drawingCtx.initContextSmoothing();
+			this.overlayCtx.initContextSmoothing();
+			this.drawingCtxCharts.initContextSmoothing();
 			return true;
 		};
 
