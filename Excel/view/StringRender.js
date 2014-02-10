@@ -21,7 +21,6 @@
 		var asc_debug   = asc.outputDebugStr;
 		var asc_typeof  = asc.typeOf;
 		var asc_round   = asc.round;
-		var asc_clone   = asc.clone;
 		var asc_FP      = asc.FontProperties;
 		var asc_TM      = asc.TextMetrics;
 
@@ -36,19 +35,64 @@
 			this.end = undefined;
 			this.startX = undefined;
 		}
+		LineInfo.prototype.assign = function (tw, th, bl, a, d) {
+			if (tw !== undefined) {this.tw = tw;}
+			if (th !== undefined) {this.th = th;}
+			if (bl !== undefined) {this.bl = bl;}
+			if (a !== undefined) {this.a = a;}
+			if (d !== undefined) {this.d = d;}
+		};
 
-		LineInfo.prototype = {
+		/** @constructor */
+		function lineMetrics() {
+			this.th = 0;
+			this.bl = 0;
+			this.bl2 = 0;
+			this.a = 0;
+			this.d = 0;
+		}
+		lineMetrics.prototype.clone = function () {
+			var oRes = new lineMetrics();
+			oRes.th = this.th;
+			oRes.bl = this.bl;
+			oRes.bl2 = this.bl2;
+			oRes.a = this.a;
+			oRes.d = this.d;
+			return oRes;
+		};
 
-			constructor: LineInfo,
-
-			assign: function (tw, th, bl, a, d) {
-				if (tw !== undefined) {this.tw = tw;}
-				if (th !== undefined) {this.th = th;}
-				if (bl !== undefined) {this.bl = bl;}
-				if (a !== undefined) {this.a = a;}
-				if (d !== undefined) {this.d = d;}
-			}
-
+		/** @constructor */
+		function charProperties() {
+			this.c = undefined;
+			this.lm = undefined;
+			this.fm = undefined;
+			this.fsz = undefined;
+			this.font = undefined;
+			this.va = undefined;
+			this.nl = undefined;
+			this.hp = undefined;
+			this.delta = undefined;
+			this.skip = undefined;
+			this.repeat = undefined;
+			this.total = undefined;
+			this.wrd = undefined;
+		}
+		charProperties.prototype.clone = function () {
+			var oRes = new charProperties();
+			oRes.c = (undefined !== this.c) ? this.c.clone() : null;
+			oRes.lm = (undefined !== this.lm) ? this.lm.clone() : null;
+			oRes.fm = (undefined !== this.fm) ? this.fm.clone() : null;
+			oRes.fsz = (undefined !== this.fsz) ? this.fsz.clone() : null;
+			oRes.font = (undefined !== this.font) ? this.font.clone() : null;
+			oRes.va = this.va;
+			oRes.nl = this.nl;
+			oRes.hp = this.hp;
+			oRes.delta = this.delta;
+			oRes.skip = this.skip;
+			oRes.repeat = this.repeat;
+			oRes.total = this.total;
+			oRes.wrd = this.wrd;
+			return oRes;
 		};
 
 
@@ -530,7 +574,7 @@
 			},
 
 			_calcLineMetrics: function (f, va, fm, ppi) {
-				var l = {th: 0, bl: 0, bl2: 0, a: 0, d: 0};
+				var l = new lineMetrics();
 
 				var hpt = f * 1.275;
 				var fpx = f * ppi / 72;
@@ -735,7 +779,7 @@
 
 				function charPropAt(index) {
 					var prop = self.charProps[index];
-					if (!prop) {prop = self.charProps[index] = {};}
+					if (!prop) {prop = self.charProps[index] = new charProperties();}
 					return prop;
 				}
 
@@ -803,7 +847,8 @@
 
 					f = this._makeFont(fmt);
 					pIndex = this.chars.length;
-					p = asc_clone(this.charProps[pIndex] || {});
+					p = this.charProps[pIndex];
+					p = p ? p.clone() : new charProperties();
 
 					// reduce font size for subscript and superscript chars
 					va = fmt.va !== undefined ? fmt.va.toLowerCase() : "";
