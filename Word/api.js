@@ -776,6 +776,9 @@ asc_docs_api.prototype.sync_BeginCatchSelectedElements = function()
 }
 asc_docs_api.prototype.sync_EndCatchSelectedElements = function()
 {
+    if (this.WordControl && this.WordControl.m_oDrawingDocument)
+        this.WordControl.m_oDrawingDocument.EndTableStylesCheck();
+    
 	if ( (this.chartStyleManager &&  this.chartPreviewManager)&&(!this.chartStyleManager.isReady() || !this.chartPreviewManager.isReady()) )
 	{
 		for ( var i = 0; i < this.SelectedObjectsStack.length; i++ )
@@ -799,9 +802,6 @@ asc_docs_api.prototype.sync_EndCatchSelectedElements = function()
 		}
 	}
     this.asc_fireCallback("asc_onFocusObject", this.SelectedObjectsStack);
-
-    if (this.WordControl && this.WordControl.m_oDrawingDocument)
-        this.WordControl.m_oDrawingDocument.EndTableStylesCheck();
 }
 asc_docs_api.prototype.getSelectedElements = function(bUpdate)
 {
