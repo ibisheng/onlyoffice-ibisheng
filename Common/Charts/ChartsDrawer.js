@@ -2234,14 +2234,18 @@ drawBarChart.prototype =
     {
         var xaxispos      = this.chartProp.xaxispos;
 		var widthGraph    = this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right;
+		
+		//TODO - передавать overlap из меню!
+		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 100 : 0;
+		var overlap       = this.cShapeDrawer.chart.plotArea.chart.overlap ? this.cShapeDrawer.chart.plotArea.chart.overlap : defaultOverlap;
         var width         = widthGraph / this.chartProp.series[0].val.numRef.numCache.pts.length;
 		
 		var val;
 		var paths;
 		
-		var individualBarWidth = width / (this.chartProp.series.length + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
-		if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
-			individualBarWidth = width / (1 + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
+		var individualBarWidth = width / (this.chartProp.series.length - (this.chartProp.series.length - 1) * (overlap / 100) + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
+		
+		var widthOverLap = individualBarWidth * (overlap / 100);
 		
 		var hmargin = (this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100 * individualBarWidth) / 2;
 		
@@ -2271,10 +2275,16 @@ drawBarChart.prototype =
 				else
 					height = (val / (this.chartProp.max - this.chartProp.min)) * this.chartProp.trueHeight;
 				
+				
+				if(i == 0)
+					startX = (j * width) + this.chartProp.chartGutter._left + hmargin + i * (individualBarWidth);
+				else
+					startX = (j * width) + this.chartProp.chartGutter._left + hmargin + (i * individualBarWidth - i * widthOverLap);
+				
+				
 				//обработка для диаграмм с накоплениями
 				if(this.chartProp.subType == "stacked")
 				{
-					startX = (j * width) + this.chartProp.chartGutter._left + hmargin;
 					diffYVal = 0;
 					for(var k = 0; k < seriesHeight.length; k++)
 					{
@@ -2286,7 +2296,6 @@ drawBarChart.prototype =
 				}
 				else if(this.chartProp.subType == "stackedPer")
 				{
-					startX = (j * width) + this.chartProp.chartGutter._left + hmargin;
 					diffYVal = 0;
 					for(var k = 0; k < seriesHeight.length; k++)
 					{
@@ -2307,13 +2316,12 @@ drawBarChart.prototype =
 						summBarVal[j] = temp;
 					}
 					
-					height = ((val*100/summBarVal[j]) / (this.chartProp.max - this.chartProp.min)) * this.chartProp.trueHeight;
+					height = ((val * 100/summBarVal[j]) / (this.chartProp.max - this.chartProp.min)) * this.chartProp.trueHeight;
 					startY = this.chartProp.nullPositionOX - diffYVal;
 					seriesHeight[i][j] = height;
 				}
 				else
 				{
-					startX = (j * width) + this.chartProp.chartGutter._left + hmargin + (i * individualBarWidth);
 					startY = this.chartProp.nullPositionOX;
 				}
 
