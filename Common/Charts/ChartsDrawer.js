@@ -357,14 +357,8 @@ CChartsDrawer.prototype =
 				this.calcProp.min = this._getMinValueArray(this.calcProp.data);
 			}
 			else if (this.calcProp.subType == 'stackedPer') {
-				var copyData = Asc.clone(this.calcProp.data);
-				for (var j = 0; j < (this.calcProp.data.length - 1); j++) {
-					for (var i = 0; i < this.calcProp.data[j].length; i++) {
-						this.calcProp.data[j + 1][i] = this.calcProp.data[j + 1][i] + this.calcProp.data[j][i]
-					}
-				}
-				var tempData = this.calcProp.data;
-				var firstData = copyData;
+				var firstData = this.calcProp.data;
+				
 				var summValue = [];
 				for (var j = 0; j < (firstData[0].length); j++) {
 					summValue[j] = 0;
@@ -372,6 +366,14 @@ CChartsDrawer.prototype =
 						summValue[j] += Math.abs(firstData[i][j])
 					}
 				}
+				
+				for (var j = 0; j < (this.calcProp.data.length - 1); j++) {
+					for (var i = 0; i < this.calcProp.data[j].length; i++) {
+						this.calcProp.data[j + 1][i] = this.calcProp.data[j + 1][i] + this.calcProp.data[j][i]
+					}
+				}
+				
+				var tempData = this.calcProp.data;
 
 				for (var j = 0; j < (tempData[0].length); j++) {
 					for (var i = 0; i < tempData.length; i++) {
