@@ -2972,27 +2972,27 @@ drawHBarChart.prototype =
         var trueWidth = this.chartProp.trueWidth;
 		var trueHeight = this.chartProp.trueHeight;
 		
+		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 100 : 0;
+		var overlap        = this.cShapeDrawer.chart.plotArea.chart.overlap ? this.cShapeDrawer.chart.plotArea.chart.overlap : defaultOverlap;
+		
+		var tempMax = this.chartProp.xmax;
+		var tempMin = this.chartProp.xmin;
+		var height  = trueHeight / this.chartProp.data.length;
+		
+		var barHeight, width, vmargin, seria, heightOverLap, summBarVal;
 		var seriesHeight = [];
 		for (var i = 0; i < this.chartProp.series.length; i++) {
-			var width;
-			var summBarVal = [];
+			summBarVal = [];
 			seriesHeight[i] = [];
-		
-			var tempMax = this.chartProp.xmax;
-			var tempMin = this.chartProp.xmin;
-			var height  = trueHeight / this.chartProp.data.length;
 			
-			var barHeight = height / (this.chartProp.series.length + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
-			if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
-				barHeight = height / (1 + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
 			
-			var vmargin = (this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100 * barHeight) / 2;
+			barHeight = height / (this.chartProp.series.length - (this.chartProp.series.length - 1) * (overlap / 100) + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
+			heightOverLap = barHeight * (overlap / 100);
 			
-			var seria = this.chartProp.series[i].val.numRef.numCache.pts;
+			vmargin = (this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100 * barHeight) / 2;
+			seria = this.chartProp.series[i].val.numRef.numCache.pts;
 			
 			for (var j = 0; j < seria.length; j++) {
-
-				var width;
 				var val = parseFloat(seria[j].val);
 				
 				if(this.chartProp.subType == "stackedPer")
@@ -3023,13 +3023,16 @@ drawHBarChart.prototype =
 					width = ((val < 0 ? (val + tempMin): val - tempMin) / (tempMax - tempMin)) * (trueWidth);
 			
 
-				/*var barHeight = (height - (2 * this.chartProp.vmargin)) / this.chartProp.series.length;
-				if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
-					barHeight = height - (2 * this.chartProp.vmargin);*/
-				
 				var startX;
 				var startY;
 				var diffYVal = 0;
+				
+				if(i == 0)
+					startY = trueHeight  + this.chartProp.chartGutter._top - vmargin - (j * height + i * barHeight);
+				else
+					startY = trueHeight  + this.chartProp.chartGutter._top - vmargin - (j * height + i * barHeight) + i * heightOverLap;
+					
+					
 				
 				//для накопительных диаграмм
 				if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
@@ -3041,13 +3044,10 @@ drawHBarChart.prototype =
 							diffYVal += seriesHeight[k][j];
 					}
 					seriesHeight[i][j] = width;
-					startY = trueHeight  + this.chartProp.chartGutter._top - vmargin - (j * height);
 					
 					if(tempMax <=0 && tempMin < 0)
 						diffYVal = -1*diffYVal;
 				}
-				else
-					startY = trueHeight  + this.chartProp.chartGutter._top - vmargin - (j * height + i * barHeight);
 				
 				if(tempMin < 0 && tempMax < 0)
 					startX = this.chartProp.nullPositionOX - width;
