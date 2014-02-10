@@ -7806,9 +7806,10 @@ ParaMath.prototype =
 	{
 		var ctrPrp = new CTextPr();
 		oElem.setCtrPrp(ctrPrp);
-		oElem.init(props);
 		if (oParent)
-			oParent.addElementToContent(oElem);	
+			oParent.addElementToContent(oElem);
+
+        oElem.init(props); // прокидываем свойства после добавления в формулу, т.к. дефолтные настройки(общие для всей формулы, к-ые передаются из settings) хранятся в Composition
 	},
 	
 	CreateFraction : function (oFraction,oParentElem,props,sNumText,sDenText)
