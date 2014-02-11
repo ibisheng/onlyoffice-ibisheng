@@ -3737,6 +3737,9 @@ TreeRB.prototype = {
 	},
 	getNodeAll : function(){
 		return this.enumerate(-Number.MAX_VALUE, Number.MAX_VALUE);
+	},
+	isEmpty : function(){
+		return this.nil == this.root.left;
 	}
 };
 
@@ -4185,6 +4188,8 @@ CellArea.prototype = {
 			if(cellElem)
 			{
 				row.deleteNode(cellElem);
+				if(row.isEmpty())
+					this.rows.deleteNode(rowElem);
 				if(null != this.fChange)
 					this.fChange.call(this, cellElem.storedValue.data, cellElem.storedValue.bbox, null);
 			}
