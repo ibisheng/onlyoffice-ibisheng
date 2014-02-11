@@ -601,12 +601,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				if (isDocumentSaved) {
 					// Запускаем таймер автосохранения
 					this.autoSaveInit();
-					//если нет совместного редактирования, надо всегда чистить кешированную копию файла, иначе будет всегда одна версия файла.
-					if(!this.CoAuthoringApi.get_onlineWork())
-					{
-						var rData = {"id": this.documentId, "vkey": this.documentVKey, "format": this.documentFormat, "c":"cc"};
-						this._asc_sendCommand(function(){}, rData);
-					}
 				} else {
 					this.CoAuthoringApi.disconnect();
 				}
