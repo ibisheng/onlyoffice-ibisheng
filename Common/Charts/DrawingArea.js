@@ -426,12 +426,14 @@ function FrozenPlace(ws, type) {
 		_this.clip(canvas.shapeCtx);
 		object.graphicObject.draw(canvas.shapeCtx);
 		
-		// Lock		
-		canvas.shapeCtx.SetIntegerGrid(false);
-		canvas.shapeCtx.transform3(object.graphicObject.transform, false);
-		canvas.shapeCtx.DrawLockObjectRect(object.graphicObject.lockType, 0, 0, object.graphicObject.extX, object.graphicObject.extY );
-		canvas.shapeCtx.reset();
-		canvas.shapeCtx.SetIntegerGrid(true);
+		// Lock
+		if ( (object.graphicObject.lockType != undefined) && (object.graphicObject.lockType != c_oAscLockTypes.kLockTypeNone) ) {
+			canvas.shapeCtx.SetIntegerGrid(false);
+			canvas.shapeCtx.transform3(object.graphicObject.transform, false);
+			canvas.shapeCtx.DrawLockObjectRect(object.graphicObject.lockType, 0, 0, object.graphicObject.extX, object.graphicObject.extY );
+			canvas.shapeCtx.reset();
+			canvas.shapeCtx.SetIntegerGrid(true);
+		}
 					
 		_this.restore(canvas.shapeCtx);
 	}
