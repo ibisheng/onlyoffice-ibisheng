@@ -416,12 +416,6 @@ function FrozenPlace(ws, type) {
 			_this.worksheet.overlayGraphicCtx.clearRect( x, y, w, h );
 		else {
 			_this.worksheet.drawingGraphicCtx.clearRect( x, y, w, h );
-			//_this.worksheet.drawingGraphicCtx.setFillStyle(_this.worksheet.settings.cells.defaultState.background).fillRect( x, y, w, h );
-			//_this.worksheet._drawGrid(undefined, _this.getVisibleRange());
-			//_this.worksheet._drawCells(undefined, _this.getVisibleRange());
-			//_this.worksheet._drawCellsBorders(undefined, _this.getVisibleRange());
-			//_this.worksheet._drawFrozenPaneLines();
-			//_this.worksheet.objectRender.drawWorksheetLayer(_this.getVisibleRange());
 		}
 	}
 	
@@ -431,6 +425,14 @@ function FrozenPlace(ws, type) {
 		
 		_this.clip(canvas.shapeCtx);
 		object.graphicObject.draw(canvas.shapeCtx);
+		
+		// Lock		
+		canvas.shapeCtx.SetIntegerGrid(false);
+		canvas.shapeCtx.transform3(object.graphicObject.transform, false);
+		canvas.shapeCtx.DrawLockObjectRect(object.graphicObject.lockType, 0, 0, object.graphicObject.extX, object.graphicObject.extY );
+		canvas.shapeCtx.reset();
+		canvas.shapeCtx.SetIntegerGrid(true);
+					
 		_this.restore(canvas.shapeCtx);
 	}
 	
@@ -541,7 +543,6 @@ function DrawingArea(ws) {
 		
 		_this.worksheet.overlayCtx.clear();
 		_this.worksheet.overlayGraphicCtx.clear();
-		//shapeOverlayCtx.m_oContext.clearRect(0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix);
 		_this.worksheet._drawCollaborativeElements(false);
 		
 		/*for ( var i = 0; i < _this.worksheet.objectRender.controller.selectedObjects.length; i++ ) {

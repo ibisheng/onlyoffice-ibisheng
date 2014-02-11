@@ -3011,8 +3011,6 @@
 			if (!this.isSelectionDialogMode) {
 				this._drawCollaborativeElements(/*bIsDrawObjects*/true);
 				this._drawSelectionRange(range);
-				if (this.objectRender.selectedGraphicObjectsExists())
-					this.objectRender.raiseLayerDrawingObjects();
 			} else {
 				this._drawSelectionRange(range);
 			}
@@ -3326,9 +3324,6 @@
 
 			// restore canvas' original clipping range
 			ctx.restore();
-
-			if ( !this.isChartAreaEditMode )
-			this.objectRender.raiseLayerDrawingObjects();
 
 			if (!isFrozen) {
 				this._drawActiveHeaders();
@@ -7181,9 +7176,6 @@
 				this.moveRangeDrawingObjectTo = ar;
 			}
 			this._drawSelection();
-
-			// слой c объектами должен быть выше селекта
-			this.objectRender.raiseLayerDrawingObjects();
 
 			return { ar: ret, d:d };
 		};

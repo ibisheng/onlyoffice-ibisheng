@@ -850,7 +850,7 @@ DrawingObjectsController.prototype =
         this.curState = newState;
         if(newState.id === STATES_ID_TEXT_ADD ||  newState.id === STATES_ID_TEXT_ADD_IN_GROUP)
         {
-            this.drawingObjects.OnUpdateOverlay(true);
+            this.drawingObjects.OnUpdateOverlay();
         }
 
 		this.updateSelectionState();
