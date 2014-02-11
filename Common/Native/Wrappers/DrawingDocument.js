@@ -115,7 +115,12 @@ CDrawingDocument.prototype =
     // convert coords
     ConvertCoordsToCursorWR : function(x, y, pageIndex, transform)
     {
-        var _return = this.Native["ConvertCoordsToCursor"](x, y, pageIndex, transform);
+        var _return = null;
+        if (!transform)
+            _return = this.Native["ConvertCoordsToCursor"](x, y, pageIndex);
+        else
+            _return = this.Native["ConvertCoordsToCursor"](x, y, pageIndex,
+                transform.sx, transform.shy, transform.shx, transform.sy, transform.tx, transform.ty);
         return { X : _return[0], Y : _return[1], Error: _return[2] };
     },
 

@@ -53,7 +53,7 @@ CTextMeasurerWrapper.prototype =
             _lastSetUp.SetUpSize = font.FontSize;
             _lastSetUp.SetUpStyle = oFontStyle;
 
-            var _info = this.GetLoadInfoForMeasurer(window.g_font_infos[_lastSetUp.SetUpIndex], _lastSetUp.SetUpStyle);
+            var _info = GetLoadInfoForMeasurer(window.g_font_infos[_lastSetUp.SetUpIndex], _lastSetUp.SetUpStyle);
             var flag = 0;
             if (_info.NeedBold)     flag |= 0x01;
             if (_info.NeedItalic)   flag |= 0x02;
@@ -164,7 +164,7 @@ CTextMeasurerWrapper.prototype =
             _lastFont.SetUpSize = _lastFont.Size;
             _lastFont.SetUpStyle = _style;
 
-            var _info = this.GetLoadInfoForMeasurer(window.g_font_infos[_lastFont.SetUpIndex], _lastFont.SetUpStyle);
+            var _info = GetLoadInfoForMeasurer(window.g_font_infos[_lastFont.SetUpIndex], _lastFont.SetUpStyle);
             var flag = 0;
             if (_info.NeedBold)     flag |= 0x01;
             if (_info.NeedItalic)   flag |= 0x02;
@@ -226,150 +226,150 @@ CTextMeasurerWrapper.prototype =
     GetHeight : function()
     {
         return this.Height;
-    },
-
-    GetLoadInfoForMeasurer : function(info, lStyle)
-    {
-        // подбираем шрифт по стилю
-        var sReturnName = info.Name;
-        var bNeedBold   = false;
-        var bNeedItalic = false;
-
-        var index       = -1;
-        var faceIndex   = 0;
-
-        var bSrcItalic  = false;
-        var bSrcBold    = false;
-
-        switch (lStyle)
-        {
-            case FontStyle.FontStyleBoldItalic:
-            {
-                bSrcItalic  = true;
-                bSrcBold    = true;
-
-                bNeedBold   = true;
-                bNeedItalic = true;
-                if (-1 != info.indexBI)
-                {
-                    index = info.indexBI;
-                    faceIndex = info.faceIndexBI;
-                    bNeedBold   = false;
-                    bNeedItalic = false;
-                }
-                else if (-1 != info.indexB)
-                {
-                    index = info.indexB;
-                    faceIndex = info.faceIndexB;
-                    bNeedBold = false;
-                }
-                else if (-1 != info.indexI)
-                {
-                    index = info.indexI;
-                    faceIndex = info.faceIndexI;
-                    bNeedItalic = false;
-                }
-                else
-                {
-                    index = info.indexR;
-                    faceIndex = info.faceIndexR;
-                }
-                break;
-            }
-            case FontStyle.FontStyleBold:
-            {
-                bSrcBold    = true;
-
-                bNeedBold   = true;
-                bNeedItalic = false;
-                if (-1 != info.indexB)
-                {
-                    index = info.indexB;
-                    faceIndex = info.faceIndexB;
-                    bNeedBold = false;
-                }
-                else if (-1 != info.indexR)
-                {
-                    index = info.indexR;
-                    faceIndex = info.faceIndexR;
-                }
-                else if (-1 != info.indexBI)
-                {
-                    index = info.indexBI;
-                    faceIndex = info.faceIndexBI;
-                    bNeedBold = false;
-                }
-                else
-                {
-                    index = info.indexI;
-                    faceIndex = info.faceIndexI;
-                }
-                break;
-            }
-            case FontStyle.FontStyleItalic:
-            {
-                bSrcItalic  = true;
-
-                bNeedBold   = false;
-                bNeedItalic = true;
-                if (-1 != info.indexI)
-                {
-                    index = info.indexI;
-                    faceIndex = info.faceIndexI;
-                    bNeedItalic = false;
-                }
-                else if (-1 != info.indexR)
-                {
-                    index = info.indexR;
-                    faceIndex = info.faceIndexR;
-                }
-                else if (-1 != info.indexBI)
-                {
-                    index = info.indexBI;
-                    faceIndex = info.faceIndexBI;
-                    bNeedItalic = false;
-                }
-                else
-                {
-                    index = info.indexB;
-                    faceIndex = info.faceIndexB;
-                }
-                break;
-            }
-            case FontStyle.FontStyleRegular:
-            {
-                bNeedBold   = false;
-                bNeedItalic = false;
-                if (-1 != info.indexR)
-                {
-                    index = info.indexR;
-                    faceIndex = info.faceIndexR;
-                }
-                else if (-1 != info.indexI)
-                {
-                    index = info.indexI;
-                    faceIndex = info.faceIndexI;
-                }
-                else if (-1 != info.indexB)
-                {
-                    index = info.indexB;
-                    faceIndex = info.faceIndexB;
-                }
-                else
-                {
-                    index = info.indexBI;
-                    faceIndex = info.faceIndexBI;
-                }
-            }
-        }
-
-        return {
-            Path        : window.g_font_files[index].Id,
-            FaceIndex   : faceIndex,
-            NeedBold    : bNeedBold,
-            NeedItalic  : bNeedItalic,
-            SrcBold     : bSrcBold,
-            SrcItalic   : bSrcItalic
-        };
     }
 };
+
+function GetLoadInfoForMeasurer(info, lStyle)
+{
+    // подбираем шрифт по стилю
+    var sReturnName = info.Name;
+    var bNeedBold   = false;
+    var bNeedItalic = false;
+
+    var index       = -1;
+    var faceIndex   = 0;
+
+    var bSrcItalic  = false;
+    var bSrcBold    = false;
+
+    switch (lStyle)
+    {
+        case FontStyle.FontStyleBoldItalic:
+        {
+            bSrcItalic  = true;
+            bSrcBold    = true;
+
+            bNeedBold   = true;
+            bNeedItalic = true;
+            if (-1 != info.indexBI)
+            {
+                index = info.indexBI;
+                faceIndex = info.faceIndexBI;
+                bNeedBold   = false;
+                bNeedItalic = false;
+            }
+            else if (-1 != info.indexB)
+            {
+                index = info.indexB;
+                faceIndex = info.faceIndexB;
+                bNeedBold = false;
+            }
+            else if (-1 != info.indexI)
+            {
+                index = info.indexI;
+                faceIndex = info.faceIndexI;
+                bNeedItalic = false;
+            }
+            else
+            {
+                index = info.indexR;
+                faceIndex = info.faceIndexR;
+            }
+            break;
+        }
+        case FontStyle.FontStyleBold:
+        {
+            bSrcBold    = true;
+
+            bNeedBold   = true;
+            bNeedItalic = false;
+            if (-1 != info.indexB)
+            {
+                index = info.indexB;
+                faceIndex = info.faceIndexB;
+                bNeedBold = false;
+            }
+            else if (-1 != info.indexR)
+            {
+                index = info.indexR;
+                faceIndex = info.faceIndexR;
+            }
+            else if (-1 != info.indexBI)
+            {
+                index = info.indexBI;
+                faceIndex = info.faceIndexBI;
+                bNeedBold = false;
+            }
+            else
+            {
+                index = info.indexI;
+                faceIndex = info.faceIndexI;
+            }
+            break;
+        }
+        case FontStyle.FontStyleItalic:
+        {
+            bSrcItalic  = true;
+
+            bNeedBold   = false;
+            bNeedItalic = true;
+            if (-1 != info.indexI)
+            {
+                index = info.indexI;
+                faceIndex = info.faceIndexI;
+                bNeedItalic = false;
+            }
+            else if (-1 != info.indexR)
+            {
+                index = info.indexR;
+                faceIndex = info.faceIndexR;
+            }
+            else if (-1 != info.indexBI)
+            {
+                index = info.indexBI;
+                faceIndex = info.faceIndexBI;
+                bNeedItalic = false;
+            }
+            else
+            {
+                index = info.indexB;
+                faceIndex = info.faceIndexB;
+            }
+            break;
+        }
+        case FontStyle.FontStyleRegular:
+        {
+            bNeedBold   = false;
+            bNeedItalic = false;
+            if (-1 != info.indexR)
+            {
+                index = info.indexR;
+                faceIndex = info.faceIndexR;
+            }
+            else if (-1 != info.indexI)
+            {
+                index = info.indexI;
+                faceIndex = info.faceIndexI;
+            }
+            else if (-1 != info.indexB)
+            {
+                index = info.indexB;
+                faceIndex = info.faceIndexB;
+            }
+            else
+            {
+                index = info.indexBI;
+                faceIndex = info.faceIndexBI;
+            }
+        }
+    }
+
+    return {
+        Path        : window.g_font_files[index].Id,
+        FaceIndex   : faceIndex,
+        NeedBold    : bNeedBold,
+        NeedItalic  : bNeedItalic,
+        SrcBold     : bSrcBold,
+        SrcItalic   : bSrcItalic
+    };
+}
