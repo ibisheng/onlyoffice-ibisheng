@@ -3380,6 +3380,207 @@ drawPieChart.prototype =
 };
 
 
+//*****Doughnut CHART*****
+function drawDoughnutChart()
+{
+	this.tempAngle = null;
+	this.paths = {};
+}
+
+drawDoughnutChart.prototype =
+{
+    draw : function(chartProp, cShapeDrawer)
+    {
+		this.chartProp = chartProp.calcProp;
+		this.cChartDrawer = chartProp;
+		this.cShapeDrawer = cShapeDrawer;
+		this._drawPie();
+	},
+	
+	reCalculate : function(chartProp, cShapeDrawer)
+	{
+		this.chartProp = chartProp.calcProp;
+		this.cChartDrawer = chartProp;
+		this.cShapeDrawer = cShapeDrawer;
+		this.tempAngle = null;
+		this.paths = {};
+		this._reCalculatePie();
+	},	
+	
+	_drawPie: function ()
+    {
+		var brush, pen, val;
+		var path;
+		
+        for(var n = 0; n < this.chartProp.series.length; n++) {
+			for (var k = 0; k < this.chartProp.series[n].val.numRef.numCache.pts.length; k++) {
+				val = this.chartProp.series[0].val.numRef.numCache.pts[k];
+				brush = val.brush;
+				pen = val.pen;
+				path = this.paths.series[n][k];
+				this._drawPath(path, brush, pen);
+			}
+		}
+    },
+	
+	_reCalculatePie: function ()
+    {
+		var trueWidth = this.chartProp.trueWidth;
+		var trueHeight = this.chartProp.trueHeight;
+
+		var numCache = this.chartProp.series[0].val.numRef.numCache.pts;
+		var sumData;
+		var outRadius = trueHeight/2;
+		var defaultSize = 50;
+		
+		var holeSize = this.cShapeDrawer.chart.holeSize ? this.cShapeDrawer.chart.holeSize : defaultSize;
+		
+		var radius = outRadius * (holeSize / 100);
+		var step = (outRadius - radius) / this.chartProp.series.length;
+		
+		var xCenter = this.chartProp.chartGutter._left + trueWidth/2;
+		var yCenter = this.chartProp.chartGutter._top + trueHeight/2;
+		
+		
+		for(var n = 0; n < this.chartProp.series.length; n++)
+		{
+			this.tempAngle = Math.PI/2;
+			sumData = this.cChartDrawer._getSumArray(this.chartProp.series[n].val.numRef.numCache.pts, true);
+			
+			//рисуем против часовой стрелки, поэтому цикл с конца
+			for (var k = this.chartProp.series[n].val.numRef.numCache.pts.length - 1; k >= 0; k--) {
+				
+				var angle = Math.abs((parseFloat(this.chartProp.series[n].val.numRef.numCache.pts[k].val / sumData)) * (Math.PI * 2));
+				if(!this.paths.series)
+					this.paths.series = [];
+				if(!this.paths.series[n])
+					this.paths.series[n] = [];
+				this.paths.series[n][k] = this._calculateSegment(angle, radius, xCenter, yCenter, radius + step * (n + 1), radius + step * n);
+			}
+		}
+       
+    },
+	
+	_calculateSegment: function (angle, radius, xCenter, yCenter, radius1, radius2)
+    {
+		var startAngle = (this.tempAngle);
+		var endAngle   = angle;
+		
+		if(radius < 0)
+			radius = 0;
+		var path = this._calculateArc(radius, startAngle, endAngle, xCenter, yCenter, radius1, radius2);
+
+        this.tempAngle += angle;
+		
+		return path;
+    },
+	
+	_calculateArc : function(radius, stAng, swAng, xCenter, yCenter, radius1, radius2)
+	{	
+		var path  = new Path();
+		
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+		var gdLst = [];
+		
+		path.pathH = pathH;
+		path.pathW = pathW;
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
+		
+		var pxToMm = this.chartProp.pxToMM;
+		
+		var x0 = xCenter + radius1*Math.cos(stAng);
+		var y0 = yCenter - radius1*Math.sin(stAng);
+		
+		var x1 = xCenter + radius2*Math.cos(stAng);
+		var y1 = yCenter - radius2*Math.sin(stAng);
+		
+		var x2 = xCenter + radius1*Math.cos(stAng + swAng);
+		var y2 = yCenter - radius1*Math.sin(stAng + swAng);
+		
+		var x3 = xCenter + radius2*Math.cos(stAng + swAng);
+		var y3 = yCenter - radius2*Math.sin(stAng + swAng);
+		
+		path.moveTo(x1  /pxToMm * pathW, y1 / pxToMm * pathH);
+		path.lnTo(x0  /pxToMm * pathW, y0 / pxToMm * pathH);
+		path.arcTo(radius1 / pxToMm * pathW, radius1 / pxToMm * pathH, -1 * stAng*cToDeg, -1 * swAng*cToDeg);
+		path.lnTo(x3 / pxToMm * pathW, y3 / pxToMm * pathH);
+		path.arcTo(radius2 / pxToMm * pathW, radius2 / pxToMm * pathH,  -1 * stAng*cToDeg - swAng*cToDeg, swAng*cToDeg);
+		
+
+		path.recalculate(gdLst);
+		return path;	
+	},
+	
+	_calculateDLbl: function(chartSpace, ser, val)
+	{
+		return {x: 0, y: 0};
+		var pxToMm = this.chartProp.pxToMM;
+		var path = this.paths.series[val].ArrPathCommand;
+		var centerX = path[0].X;
+		var centerY = path[0].Y;
+		
+		var radius = path[2].hR;
+		var stAng = path[2].stAng;
+		var swAng = path[2].swAng;
+		
+		var point = this.chartProp.series[0].val.numRef.numCache.pts[val];
+		
+		var constMargin = 5 / pxToMm;
+		
+		var width = point.compiledDlb.extX;
+		var height = point.compiledDlb.extY;
+		
+		//TODO высчитать позиции, как в екселе +  ограничения
+		switch ( point.compiledDlb.dLblPos )
+		{
+			case DLBL_POS_BEST_FIT:
+			{
+				break;
+			}
+			case DLBL_POS_CTR:
+			{
+				centerX = centerX + (radius / 2) * Math.cos(-1 * stAng - swAng / 2) - width / 2;
+				centerY = centerY - (radius / 2) * Math.sin(-1 * stAng - swAng / 2) - height / 2;
+				break;
+			}
+			case DLBL_POS_IN_BASE:
+			{
+				centerX = centerX + (radius / 2) * Math.cos(-1 * stAng - swAng / 2) - width / 2;
+				centerY = centerY - (radius / 2) * Math.sin(-1 * stAng - swAng / 2) - height / 2;
+				/*centerX = centerX + radius * Math.cos(-1 * stAng - swAng / 2) - width / 2;
+				centerY = centerY - radius * Math.sin(-1 * stAng - swAng / 2) - height / 2;*/
+				break;
+			}
+			case DLBL_POS_IN_END:
+			{
+				//centerY = centerY + 27 / pxToMm;
+				break;
+			}
+			case DLBL_POS_OUT_END:
+			{
+				//centerY = centerY + 27 / pxToMm;
+				break;
+			}
+		}
+		if(centerX < 0)
+			centerX = 0;
+		
+		return {x: centerX, y: centerY};
+	},
+	
+	_drawPath : function(path, brush, pen)
+	{
+		var cGeometry = new CGeometry2();
+		this.cShapeDrawer.Clear();
+		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
+		
+		cGeometry.AddPath(path);
+		this.cShapeDrawer.draw(cGeometry);
+	}
+};
+
 
 //*****Scatter CHART*****
 function drawScatterChart()
