@@ -129,6 +129,8 @@
                     this.widget.addEventListener("touchmove"	, function (e) {self._onMouseMove(e.touches[0]); return false;}			, false);
                     this.widget.addEventListener("touchend"	, function (e) {self._onMouseUp(e.changedTouches[0]); return false;}	, false);
                 }
+                /*раньше события на ресайз вызывался из меню через контроллер. теперь контроллер в меню не доступен, для ресайза подписываемся на глобальный ресайз от window.*/
+                window.addEventListener("resize", function () {self._onWindowResize.apply(self, arguments);}, false);
 //                this.element.addEventListener("dblclick"	, function () {alert("123");/*return self._onMouseDblClick.apply(self, arguments);*/}	, false);
                 return;
             }
@@ -368,8 +370,10 @@
             else{
                 this.hsb.style.zIndex = -10;
                 this.hsb.style.right = 0;
+                this.hsb.style.display = "none";
                 this.vsb.style.zIndex = -10;
                 this.vsb.style.bottom = 0;
+                this.vsb.style.display = "none";
             }
 
 
