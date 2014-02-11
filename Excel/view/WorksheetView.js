@@ -31,7 +31,6 @@
 		var asc_Range   = asc.Range;
 		var asc_ActiveRange   = asc.ActiveRange;
 		var asc_FP      = asc.FontProperties;
-		var asc_clone   = asc.clone;
 		var asc_AF     = asc.AutoFilters;
 
 		var asc_CCellFlag		= asc.asc_CCellFlag;
@@ -266,6 +265,21 @@
 			//   ]
 			//
 			// }
+		}
+
+		function CellFlags() {
+			this.wrapText = false;
+			this.shrinkToFit = false;
+			this.isMerged = false;
+			this.textAlign = kNone;
+		}
+		CellFlags.prototype.clone = function () {
+			var oRes = new CellFlags();
+			oRes.wrapText = this.wrapText;
+			oRes.shrinkToFit = this.shrinkToFit;
+			oRes.isMerged = this.isMerged;
+			oRes.textAlign = this.textAlign;
+			return oRes;
 		}
 
 
@@ -3946,7 +3960,7 @@
 						fragmentsTmp.push(sstr[k].clone());
 					sstr = truncFracPart(fragmentsTmp);
 				}
-                sfl = asc_clone(fl);
+                sfl = fl.clone();
                 sfl.wrapText = false;
                 stm = this._roundTextMetrics( this.stringRender.measureString(sstr, sfl, colWidth) );
                 // Если целая часть числа не убирается в ячейку, то расширяем столбец
@@ -4377,7 +4391,7 @@
 
 		WorksheetView.prototype._getCellFlags = function (col, row) {
 			var c = row !== undefined ? this._getCell(col, row) : col;
-			var fl = {wrapText: false, shrinkToFit: false, isMerged: false, textAlign: kNone};
+			var fl = new CellFlags();
 			if (c !== undefined) {
 				fl.wrapText = c.getWrap();
 				fl.shrinkToFit = c.getShrinkToFit();
