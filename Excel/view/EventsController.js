@@ -120,14 +120,14 @@
 
                 if (__hasTouch)
                 {
-                    this.element.addEventListener("touchstart"	, function (e) {self._onTouchStart(e); return false;}			, false);
-                    this.element.addEventListener("touchmove"	, function (e) {self._onTouchMove(e); return false;}			, false);
-                    this.element.addEventListener("touchend"	, function (e) {self._onTouchEnd(e); return false;}	, false);
+                    this.widget.addEventListener("touchstart"	, function (e) {self._onTouchStart(e); return false;}			, false);
+                    this.widget.addEventListener("touchmove"	, function (e) {self._onTouchMove(e); return false;}			, false);
+                    this.widget.addEventListener("touchend"	, function (e) {self._onTouchEnd(e); return false;}	, false);
                 }
                 else{
-                    this.element.addEventListener("touchstart"	, function (e) {self._onMouseDown(e.touches[0]); return false;}			, false);
-                    this.element.addEventListener("touchmove"	, function (e) {self._onMouseMove(e.touches[0]); return false;}			, false);
-                    this.element.addEventListener("touchend"	, function (e) {self._onMouseUp(e.changedTouches[0]); return false;}	, false);
+                    this.widget.addEventListener("touchstart"	, function (e) {self._onMouseDown(e.touches[0]); return false;}			, false);
+                    this.widget.addEventListener("touchmove"	, function (e) {self._onMouseMove(e.touches[0]); return false;}			, false);
+                    this.widget.addEventListener("touchend"	, function (e) {self._onMouseUp(e.changedTouches[0]); return false;}	, false);
                 }
 //                this.element.addEventListener("dblclick"	, function () {alert("123");/*return self._onMouseDblClick.apply(self, arguments);*/}	, false);
                 return;
