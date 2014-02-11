@@ -521,10 +521,15 @@ function DrawingArea(ws) {
 				_this.frozenPlaces.push(new FrozenPlace(_this.worksheet, FrozenAreaType.Center));
 		}
 	}
-		
-	_this.drawObject = function(object, canvas) {
+
+	_this.clear = function() {
 		for ( var i = 0; i < _this.frozenPlaces.length; i++ ) {
 			_this.frozenPlaces[i].clear();
+		}
+	}
+	
+	_this.drawObject = function(object, canvas) {
+		for ( var i = 0; i < _this.frozenPlaces.length; i++ ) {
 			if ( _this.frozenPlaces[i].isObjectInside(object) ) {
 				_this.frozenPlaces[i].drawObject(object, canvas);
 			}

@@ -3390,6 +3390,7 @@ function DrawingObjects() {
 		if ( drawingCtx ) {
 			if ( clearCanvas ) {
 			}
+			this.drawingArea.clear();
 
 			if ( aObjects.length ) {
 								
