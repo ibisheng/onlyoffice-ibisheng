@@ -1043,7 +1043,8 @@ CMathBase.prototype =
             this.CurPos_Y = startY;
             var movement = this.elements[endX][endY].selection_End(X, Y);
             SelectContent = movement.SelectContent;
-            state = true;
+            state = movement.state;
+            //state = true;
         }
         else
             state = false;

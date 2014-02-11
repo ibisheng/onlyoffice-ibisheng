@@ -283,12 +283,32 @@ CNaryOvr.prototype.init = function(sign)
 
     this.addMCToContent(sign, iter);
 }
-CNaryOvr.prototype.setDistance = function()
+CNaryOvr.prototype.old_setDistance = function()
 {
     var zetta = this.getCtrPrp().FontSize* 25.4/96;
     this.dH = zetta*0.1;
 }
-CNaryOvr.prototype.getAscent = function()
+CNaryOvr.prototype.recalculateSize = function()
+{
+    var FontSize = this.getCtrPrp().FontSize;
+    var zetta = FontSize*25.4/96;
+
+    var minGapBottom = zetta*0.1,
+        DownBaseline = FontSize*0.23;
+
+    var nOper = this.elements[0][0].size,
+        iter = this.elements[1][0].size;
+
+    this.dH = DownBaseline > iter.ascent + minGapBottom ? DownBaseline - iter.ascent : minGapBottom;
+
+    var ascent = nOper.ascent;
+    var width = nOper.width > iter.width ? nOper.width : iter.width;
+
+    var height = nOper.height + this.dH + iter.height;
+
+    this.size = {width: width, height: height, ascent: ascent};
+}
+CNaryOvr.prototype.old_getAscent = function()
 {
     return this.elements[0][0].size.ascent;
 }
@@ -318,9 +338,16 @@ CNaryUndOvr.prototype.init = function(sign)
 }
 CNaryUndOvr.prototype.recalculateSize = function()
 {
-    var zetta = this.getCtrPrp().FontSize* 25.4/96;
+    var FontSize = this.getCtrPrp().FontSize;
+    var zetta = FontSize*25.4/96;
     this.gapTop = zetta*0.25;
-    this.gapBottom = zetta*0.1;
+    //this.gapBottom = zetta*0.1;
+
+    var minGapBottom = zetta*0.1,
+        DownBaseline = FontSize*0.23;
+
+    var ascLIter = this.elements[2][0].size.ascent;
+    this.gapBottom = DownBaseline > ascLIter + minGapBottom ? DownBaseline - ascLIter : minGapBottom;
 
     var ascent = this.elements[0][0].size.height + this.gapTop + this.elements[1][0].size.ascent;
 

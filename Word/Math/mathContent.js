@@ -339,6 +339,8 @@ CMathContent.prototype =
 
         if(check)
         {
+            // складываем здесь, чтобы не потерять собственные настройки argSize: при добавлении в итератор формулы из меню; при добавлении готовых формул, когда есть вложенность формул с итераторами
+            // не будет работать при копиравнии в случае, если argSize будет отличатся от нуля для копируемой части контента
             var val = this.argSize + argSize;
 
             if(val < -2)
@@ -6248,6 +6250,7 @@ CMathContent.prototype =
         if( this.argSize > -2 )
             this.argSize--;
     },
+
     old_old_checkRunPrp: function()
     {
         var bEmpty = this.IsEmpty(),
@@ -8205,7 +8208,6 @@ function TEST_COEFF_ITERATORS()
     // a*36*36 + b*36 + c = 0.728*tPrp.FontSize = 26
     // a*14*14 + b*14 + c = 9
     // a*72*72 + b*72 + c = 55
-
 
 
     //FSize = 0.0006*FSize*FSize + 0.743*FSize - 1.53;

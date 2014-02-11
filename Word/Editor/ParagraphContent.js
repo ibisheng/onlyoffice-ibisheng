@@ -7806,10 +7806,13 @@ ParaMath.prototype =
 	{
 		var ctrPrp = new CTextPr();
 		oElem.setCtrPrp(ctrPrp);
+
 		if (oParent)
 			oParent.addElementToContent(oElem);
 
         oElem.init(props); // прокидываем свойства после добавления в формулу, т.к. дефолтные настройки(общие для всей формулы, к-ые передаются из settings) хранятся в Composition
+        oElem.setArgSize(oParent.argSize);
+
 	},
 	
 	CreateFraction : function (oFraction,oParentElem,props,sNumText,sDenText)
@@ -7975,6 +7978,10 @@ ParaMath.prototype =
     {
         this.Math.Cursor_MoveToEndPos();
     },
+    /*Apply_TextPr: function(TextPr)
+    {
+        this.Math.Apply_TextPr(TextPr);
+    },*/
 
     Copy : function()
     {
