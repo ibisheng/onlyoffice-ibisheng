@@ -261,7 +261,7 @@ ParaRun.prototype =
                 }
 
                 // Особый случай, когда мы добавляем элемент в самый последний ран
-                if ( Pos === this.Content.length - 1 )
+                if ( Pos === this.Content.length - 1 && LinesCount - 1 === CurLine )
                 {
                     this.Lines[CurLine].Ranges[RangesCount - 1].EndPos++;
                 }
@@ -619,10 +619,20 @@ ParaRun.prototype =
             for ( CurRange = 0; CurRange < RangesCount; CurRange++ )
             {
                 var Range = this.Lines[CurLine].Ranges[CurRange];
-                if  ( ( historyitem_ParaRun_AddItem === Type && Pos < Range.EndPos && Pos >= Range.StartPos ) || ( ( historyitem_ParaRun_RemoveItem === Type && Pos <= Range.EndPos && Pos >= Range.StartPos ) ) )
+                if  ( ( historyitem_ParaRun_AddItem === Type && Pos < Range.EndPos && Pos >= Range.StartPos ) || ( historyitem_ParaRun_RemoveItem === Type && Pos < Range.EndPos && Pos >= Range.StartPos ) || ( historyitem_ParaRun_RemoveItem === Type && Pos >= Range.EndPos && CurLine === LinesCount - 1 && CurRange === RangesCount - 1 ) )
+                {
+                    // Если отрезок остается пустым, тогда надо все заново пересчитывать
+                    if ( Range.StartPos === Range.EndPos )
+                        return null;
+
                     return new CParaPos( ( CurLine === 0 ? CurRange + this.StartRange : CurRange ), CurLine + this.StartLine, 0, 0 );
+                }
             }
         }
+
+        // Если отрезок остается пустым, тогда надо все заново пересчитывать
+        if ( this.Range.StartPos === this.Range.EndPos )
+            return null;
 
         return new CParaPos( this.StartRange, this.StartLine, 0, 0 );
     },
@@ -1153,25 +1163,31 @@ ParaRun.prototype =
                 {
                     if ( break_Page === Item.BreakType )
                     {
-                        // PageBreak вне самого верхнего документа не надо учитывать, поэтому мы его с радостью удаляем
+                        if ( true === PRS.SkipPageBreak && Item === PRS.PageBreak )
+                            continue;
+
+                        // PageBreak вне самого верхнего документа не надо учитывать
                         if ( !(Para.Parent instanceof CDocument) )
                         {
-                            this.Internal_Content_Remove( Pos );
-                            Pos--;
-                            break;
+                            // TODO: Продумать, как избавиться от данного элемента, т.к. удалять его при пересчете нельзя,
+                            //       иначе будут проблемы с совместным редактированием.
+
+                            continue;
                         }
 
                         NewPage       = true;
                         NewRange      = true;
                         BreakPageLine = true;
+
+                        PRS.PageBreak = Item;
                     }
                     else
                     {
-                        RangeEndPos = Pos + 1;
-
                         NewRange  = true;
                         EmptyLine = false;
                     }
+
+                    RangeEndPos = Pos + 1;
 
                     X += WordLen;
 
@@ -1902,6 +1918,49 @@ ParaRun.prototype =
             return true;
 
         return false;
+    },
+
+    Check_BreakPageInRange : function(_CurLine, _CurRange)
+    {
+        var CurLine  = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+        var Range = this.Lines[CurLine].Ranges[CurRange];
+        var StartPos = Range.StartPos;
+        var EndPos   = Range.EndPos;
+
+        for ( var CurPos = StartPos; CurPos < EndPos; CurPos++ )
+        {
+            var Element = this.Content[CurPos];
+            if ( para_NewLine === Element.Type && break_Page === Element.BreakType )
+                return true;
+        }
+
+        return false;
+    },
+
+    Check_BreakPageEnd : function(PBChecker)
+    {
+        var ContentLen = this.Content.length;
+        for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
+        {
+            var Element = this.Content[CurPos];
+
+            if ( true === PBChecker.FindPB )
+            {
+                if ( Element === PBChecker.PageBreak )
+                    PBChecker.FindPB = false;
+            }
+            else
+            {
+                if ( para_End === Element.Type )
+                    return true;
+                else if ( para_Drawing !== Element.Type || drawing_Anchor !== Element.Get_DrawingType() )
+                    return false;
+            }
+        }
+
+        return true;
     },
 //-----------------------------------------------------------------------------------
 // Функции отрисовки
