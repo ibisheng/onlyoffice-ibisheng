@@ -3262,8 +3262,15 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                     break;
                 case para_PageNum:
                     this.WriteText();
-                    this.WriteRun(function(){
-                        oThis.memory.WriteByte(c_oSerRunType.pagenum);
+					var sField = " PAGE   \\* MERGEFORMAT ";
+					this.WriteRun(function(){
+                        oThis.memory.WriteByte(c_oSerRunType.fldstart);
+                        oThis.memory.WriteString2(sField);
+                    });
+					this.sCurText += (item.CurPage + 1) + "";
+					this.WriteText();
+					this.WriteRun(function(){
+                        oThis.memory.WriteByte(c_oSerRunType.fldend);
                         oThis.memory.WriteLong(c_oSerPropLenType.Null);
                     });
                     break;
