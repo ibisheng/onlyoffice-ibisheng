@@ -1647,10 +1647,18 @@
 						}
 						else
 						{
-							worksheet.setSelectionInfo('paste',t,false,true);
-							window.GlobalPasteFlag = false;
-							window.GlobalPasteFlagCounter = 0;
-							return;
+							if(t.lStorage.htmlInShape)
+							{
+								node = t.lStorage.htmlInShape;
+								pasteFragment = node;
+							}
+							else
+							{
+								worksheet.setSelectionInfo('paste',t,false,true);
+								window.GlobalPasteFlag = false;
+								window.GlobalPasteFlagCounter = 0;
+								return;
+							}
 						}	
 					}
 				}
