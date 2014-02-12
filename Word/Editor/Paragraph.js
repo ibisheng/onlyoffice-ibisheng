@@ -8716,187 +8716,274 @@ Paragraph.prototype =
 
     IncDec_FontSize : function(bIncrease)
     {
-        this.RecalcInfo.Set_Type_0(pararecalc_0_All);
-        var StartTextPr = this.Get_CompiledPr().TextPr;
-
-        if ( true === this.ApplyToAll )
+        if ( true !== Debug_ParaRunMode )
         {
-            var StartFontSize = this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize );
-            this.Internal_Content_Add( 0, new ParaTextPr( { FontSize : StartFontSize } ) );
+            this.RecalcInfo.Set_Type_0(pararecalc_0_All);
+            var StartTextPr = this.Get_CompiledPr().TextPr;
 
-            for ( var Index = 1; Index < this.Content.length; Index++ )
+            if ( true === this.ApplyToAll )
             {
-                var Item = this.Content[Index];
-                if ( para_TextPr === Item.Type )
+                var StartFontSize = this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize );
+                this.Internal_Content_Add( 0, new ParaTextPr( { FontSize : StartFontSize } ) );
+
+                for ( var Index = 1; Index < this.Content.length; Index++ )
                 {
-                    if ( undefined != Item.Value.FontSize )
-                        Item.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, Item.Value.FontSize ) );
-                    else
-                        Item.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize ) );
+                    var Item = this.Content[Index];
+                    if ( para_TextPr === Item.Type )
+                    {
+                        if ( undefined != Item.Value.FontSize )
+                            Item.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, Item.Value.FontSize ) );
+                        else
+                            Item.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize ) );
+                    }
                 }
-            }
 
-            // Выставляем настройки для символа параграфа
-            if ( undefined != this.TextPr.Value.FontSize )
-                this.TextPr.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, this.TextPr.Value.FontSize ) );
-            else
-                this.TextPr.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize ) );
-
-            return true;
-        }
-
-        // найдем текущую позицию
-        var Line   = this.Content;
-        var CurPos = this.CurPos.ContentPos;
-        if ( true === this.Selection.Use )
-        {
-            var StartPos = this.Selection.StartPos;
-            var EndPos   = this.Selection.EndPos;
-
-            if ( StartPos > EndPos )
-            {
-                var Temp = EndPos;
-                EndPos   = StartPos;
-                StartPos = Temp;
-            }
-
-            // Если селект продолжается до конца параграфа, не ставим отметку в конце
-            var LastPos = this.Internal_GetEndPos();
-            var bEnd = false;
-            if ( EndPos > LastPos )
-            {
-                EndPos = LastPos;
-                bEnd = true;
-            }
-
-            // Рассчитываем настройки, которые используются после селекта
-            var TextPr_end   = this.Internal_GetTextPr( EndPos );
-            var TextPr_start = this.Internal_GetTextPr( StartPos );
-
-            if ( undefined != TextPr_start.FontSize )
-                TextPr_start.FontSize = this.Internal_IncDecFontSize( bIncrease, TextPr_start.FontSize );
-            else
-                TextPr_start.FontSize = this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize );
-
-            this.Internal_Content_Add( StartPos, new ParaTextPr( TextPr_start ) );
-            if ( false === bEnd )
-                this.Internal_Content_Add( EndPos + 1, new ParaTextPr( TextPr_end ) );
-            else
-            {
                 // Выставляем настройки для символа параграфа
                 if ( undefined != this.TextPr.Value.FontSize )
                     this.TextPr.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, this.TextPr.Value.FontSize ) );
                 else
                     this.TextPr.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize ) );
+
+                return true;
             }
 
-            for ( var Pos = StartPos + 1; Pos < EndPos; Pos++ )
+            // найдем текущую позицию
+            var Line   = this.Content;
+            var CurPos = this.CurPos.ContentPos;
+            if ( true === this.Selection.Use )
             {
-                Item = this.Content[Pos];
-                if ( para_TextPr === Item.Type )
+                var StartPos = this.Selection.StartPos;
+                var EndPos   = this.Selection.EndPos;
+
+                if ( StartPos > EndPos )
                 {
-                    if ( undefined != Item.Value.FontSize )
-                        Item.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, Item.Value.FontSize ) );
-                    else
-                        Item.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize ) );
+                    var Temp = EndPos;
+                    EndPos   = StartPos;
+                    StartPos = Temp;
                 }
+
+                // Если селект продолжается до конца параграфа, не ставим отметку в конце
+                var LastPos = this.Internal_GetEndPos();
+                var bEnd = false;
+                if ( EndPos > LastPos )
+                {
+                    EndPos = LastPos;
+                    bEnd = true;
+                }
+
+                // Рассчитываем настройки, которые используются после селекта
+                var TextPr_end   = this.Internal_GetTextPr( EndPos );
+                var TextPr_start = this.Internal_GetTextPr( StartPos );
+
+                if ( undefined != TextPr_start.FontSize )
+                    TextPr_start.FontSize = this.Internal_IncDecFontSize( bIncrease, TextPr_start.FontSize );
+                else
+                    TextPr_start.FontSize = this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize );
+
+                this.Internal_Content_Add( StartPos, new ParaTextPr( TextPr_start ) );
+                if ( false === bEnd )
+                    this.Internal_Content_Add( EndPos + 1, new ParaTextPr( TextPr_end ) );
+                else
+                {
+                    // Выставляем настройки для символа параграфа
+                    if ( undefined != this.TextPr.Value.FontSize )
+                        this.TextPr.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, this.TextPr.Value.FontSize ) );
+                    else
+                        this.TextPr.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize ) );
+                }
+
+                for ( var Pos = StartPos + 1; Pos < EndPos; Pos++ )
+                {
+                    Item = this.Content[Pos];
+                    if ( para_TextPr === Item.Type )
+                    {
+                        if ( undefined != Item.Value.FontSize )
+                            Item.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, Item.Value.FontSize ) );
+                        else
+                            Item.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize ) );
+                    }
+                }
+
+                return true;
             }
 
-            return true;
-        }
+            // 1. Если мы в конце параграфа, тогда добавляем запись о шрифте (применимо к знаку конца параграфа)
+            // 2. Если справа или слева стоит пробел (начало параграфа или перенос строки(командный)), тогда ставим метку со шрифтом и фокусим канву.
+            // 3. Если мы посередине слова, тогда меняем шрифт для данного слова
 
-        // 1. Если мы в конце параграфа, тогда добавляем запись о шрифте (применимо к знаку конца параграфа)
-        // 2. Если справа или слева стоит пробел (начало параграфа или перенос строки(командный)), тогда ставим метку со шрифтом и фокусим канву.
-        // 3. Если мы посередине слова, тогда меняем шрифт для данного слова
+            var oEnd   = this.Internal_FindForward ( CurPos, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_End, para_NewLine] );
+            var oStart = this.Internal_FindBackward( CurPos - 1, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine] );
+            var CurType = this.Content[CurPos].Type;
 
-        var oEnd   = this.Internal_FindForward ( CurPos, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_End, para_NewLine] );
-        var oStart = this.Internal_FindBackward( CurPos - 1, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine] );
-        var CurType = this.Content[CurPos].Type;
+            if ( !oEnd.Found )
+                return false;
 
-        if ( !oEnd.Found )
-            return false;
+            if ( para_End == oEnd.Type )
+            {
+                // Вставляем запись о новых настройках перед концом параграфа, а текущую позицию выставляем на конец параграфа
+                var Pos = oEnd.LetterPos;
+                var TextPr_start = this.Internal_GetTextPr( Pos );
 
-        if ( para_End == oEnd.Type )
-        {
-            // Вставляем запись о новых настройках перед концом параграфа, а текущую позицию выставляем на конец параграфа
-            var Pos = oEnd.LetterPos;
-            var TextPr_start = this.Internal_GetTextPr( Pos );
+                if ( undefined != TextPr_start.FontSize )
+                    TextPr_start.FontSize = this.Internal_IncDecFontSize( bIncrease, TextPr_start.FontSize );
+                else
+                    TextPr_start.FontSize = this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize );
 
-            if ( undefined != TextPr_start.FontSize )
-                TextPr_start.FontSize = this.Internal_IncDecFontSize( bIncrease, TextPr_start.FontSize );
+                this.Internal_Content_Add( Pos, new ParaTextPr( TextPr_start ) );
+                this.Set_ContentPos( Pos + 1, true, -1 );
+
+                // Выставляем настройки для символа параграфа
+                if ( undefined != this.TextPr.Value.FontSize )
+                    this.TextPr.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, this.TextPr.Value.FontSize ) );
+                else
+                    this.TextPr.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize ) );
+
+                return true;
+            }
+            else if ( para_PageNum === CurType || para_Drawing === CurType || para_Tab == CurType || para_Space == CurType || para_NewLine == CurType || !oStart.Found || para_NewLine == oEnd.Type || para_Space == oEnd.Type || para_NewLine == oStart.Type || para_Space == oStart.Type || para_Tab == oEnd.Type || para_Tab == oStart.Type || para_Drawing == oEnd.Type || para_Drawing == oStart.Type || para_PageNum == oEnd.Type || para_PageNum == oStart.Type )
+            {
+                var TextPr_old = this.Internal_GetTextPr( CurPos );
+                var TextPr_new = TextPr_old.Copy();
+
+                if ( undefined != TextPr_new.FontSize )
+                    TextPr_new.FontSize = this.Internal_IncDecFontSize( bIncrease, TextPr_new.FontSize );
+                else
+                    TextPr_new.FontSize = this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize );
+
+                this.Internal_Content_Add( CurPos, new ParaTextPr( TextPr_old ) );
+                this.Internal_Content_Add( CurPos, new ParaEmpty(true) );
+                this.Internal_Content_Add( CurPos, new ParaTextPr( TextPr_new ) );
+
+                this.Set_ContentPos( CurPos + 1, true, -1 );
+                this.RecalculateCurPos();
+                return false;
+            }
             else
-                TextPr_start.FontSize = this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize );
+            {
+                // Мы находимся посередине слова. В начале слова ставим запись о новом размере шрифта,
+                // а в конце слова старый размер шрифта. Кроме этого, надо заменить все записи о размерах шрифте внутри слова.
 
-            this.Internal_Content_Add( Pos, new ParaTextPr( TextPr_start ) );
-            this.Set_ContentPos( Pos + 1, true, -1 );
+                // Найдем начало слова
+                var oWordStart = this.Internal_FindBackward( CurPos, [para_PageNum, para_Drawing, para_Tab, para_Space, para_NewLine] );
+                if ( !oWordStart.Found )
+                    oWordStart = this.Internal_FindForward( 0, [para_Text] );
+                else
+                    oWordStart.LetterPos++;
 
-            // Выставляем настройки для символа параграфа
-            if ( undefined != this.TextPr.Value.FontSize )
-                this.TextPr.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, this.TextPr.Value.FontSize ) );
-            else
-                this.TextPr.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize ) );
+                var oWordEnd   = this.Internal_FindForward( CurPos, [para_PageNum, para_Drawing, para_Tab, para_Space, para_End, para_NewLine] );
 
-            return true;
-        }
-        else if ( para_PageNum === CurType || para_Drawing === CurType || para_Tab == CurType || para_Space == CurType || para_NewLine == CurType || !oStart.Found || para_NewLine == oEnd.Type || para_Space == oEnd.Type || para_NewLine == oStart.Type || para_Space == oStart.Type || para_Tab == oEnd.Type || para_Tab == oStart.Type || para_Drawing == oEnd.Type || para_Drawing == oStart.Type || para_PageNum == oEnd.Type || para_PageNum == oStart.Type )
-        {
-            var TextPr_old = this.Internal_GetTextPr( CurPos );
-            var TextPr_new = TextPr_old.Copy();
+                if ( !oWordStart.Found || !oWordEnd.Found )
+                    return;
 
-            if ( undefined != TextPr_new.FontSize )
-                TextPr_new.FontSize = this.Internal_IncDecFontSize( bIncrease, TextPr_new.FontSize );
-            else
-                TextPr_new.FontSize = this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize );
+                // Рассчитываем настройки, которые используются после слова
+                var TextPr_end   = this.Internal_GetTextPr( oWordEnd.LetterPos );
+                var TextPr_start = this.Internal_GetTextPr( oWordStart.LetterPos );
 
-            this.Internal_Content_Add( CurPos, new ParaTextPr( TextPr_old ) );
-            this.Internal_Content_Add( CurPos, new ParaEmpty(true) );
-            this.Internal_Content_Add( CurPos, new ParaTextPr( TextPr_new ) );
+                if ( undefined != TextPr_start.FontSize )
+                    TextPr_start.FontSize = this.Internal_IncDecFontSize( bIncrease, TextPr_start.FontSize );
+                else
+                    TextPr_start.FontSize = this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize );
 
-            this.Set_ContentPos( CurPos + 1, true, -1 );
-            this.RecalculateCurPos();
-            return false;
+                this.Internal_Content_Add( oWordStart.LetterPos, new ParaTextPr( TextPr_start ) );
+                this.Internal_Content_Add( oWordEnd.LetterPos + 1 /* из-за предыдущего Internal_Content_Add */, new ParaTextPr( TextPr_end ) );
+
+                this.Set_ContentPos( CurPos + 1, true, -1 );
+
+                // Если внутри слова были изменения размера шрифта, тогда заменяем их.
+                for ( var Pos = oWordStart.LetterPos + 1; Pos < oWordEnd.LetterPos; Pos++ )
+                {
+                    Item = this.Content[Pos];
+                    if ( para_TextPr === Item.Type )
+                    {
+                        if ( undefined != Item.Value.FontSize )
+                            Item.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, Item.Value.FontSize ) );
+                        else
+                            Item.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize ) );
+                    }
+                }
+
+                return true;
+            }
         }
         else
         {
-            // Мы находимся посередине слова. В начале слова ставим запись о новом размере шрифта,
-            // а в конце слова старый размер шрифта. Кроме этого, надо заменить все записи о размерах шрифте внутри слова.
+            // Удалим все лишние пустые раны из параграфа
+            this.Remove_EmptyRuns();
 
-            // Найдем начало слова
-            var oWordStart = this.Internal_FindBackward( CurPos, [para_PageNum, para_Drawing, para_Tab, para_Space, para_NewLine] );
-            if ( !oWordStart.Found )
-                oWordStart = this.Internal_FindForward( 0, [para_Text] );
-            else
-                oWordStart.LetterPos++;
-
-            var oWordEnd   = this.Internal_FindForward( CurPos, [para_PageNum, para_Drawing, para_Tab, para_Space, para_End, para_NewLine] );
-
-            if ( !oWordStart.Found || !oWordEnd.Found )
-                return;
-
-            // Рассчитываем настройки, которые используются после слова
-            var TextPr_end   = this.Internal_GetTextPr( oWordEnd.LetterPos );
-            var TextPr_start = this.Internal_GetTextPr( oWordStart.LetterPos );
-
-            if ( undefined != TextPr_start.FontSize )
-                TextPr_start.FontSize = this.Internal_IncDecFontSize( bIncrease, TextPr_start.FontSize );
-            else
-                TextPr_start.FontSize = this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize );
-
-            this.Internal_Content_Add( oWordStart.LetterPos, new ParaTextPr( TextPr_start ) );
-            this.Internal_Content_Add( oWordEnd.LetterPos + 1 /* из-за предыдущего Internal_Content_Add */, new ParaTextPr( TextPr_end ) );
-
-            this.Set_ContentPos( CurPos + 1, true, -1 );
-
-            // Если внутри слова были изменения размера шрифта, тогда заменяем их.
-            for ( var Pos = oWordStart.LetterPos + 1; Pos < oWordEnd.LetterPos; Pos++ )
+            if ( true === this.ApplyToAll )
             {
-                Item = this.Content[Pos];
-                if ( para_TextPr === Item.Type )
+                // Применяем настройки ко всем элементам параграфа
+                var ContentLen = this.Content.length;
+
+                for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
                 {
-                    if ( undefined != Item.Value.FontSize )
-                        Item.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, Item.Value.FontSize ) );
+                    this.Content[CurPos].Apply_TextPr( undefined, bIncrease );
+                }
+
+                // Выставляем настройки для символа параграфа
+                this.TextPr.Apply_TextPr( TextPr );
+            }
+            else
+            {
+                if ( true === this.Selection.Use )
+                {
+                    this.Apply_TextPr( undefined, bIncrease );
+                }
+                else
+                {
+                    var CurParaPos = this.Get_ParaContentPos( false, false );
+                    var CurPos = CurParaPos.Get(0);
+
+                    // Сначала посмотрим на элемент слева и справа(текущий)
+                    var SearchLPos = new CParagraphSearchPos();
+                    this.Get_LeftPos( SearchLPos, CurParaPos );
+
+                    var RItem = this.Get_RunElementByPos( CurParaPos );
+                    var LItem = ( false === SearchLPos.Found ? null : this.Get_RunElementByPos( SearchLPos.Pos ) );
+
+                    // 1. Если мы находимся в конце параграфа, тогда применяем заданную настройку к знаку параграфа
+                    //    и добавляем пустой ран с заданными настройками.
+                    // 2. Если мы находимся в середине слова (справа и слева текстовый элемент, причем оба не пунктуация),
+                    //    тогда меняем настройки для данного слова.
+                    // 3. Во всех остальных случаях вставляем пустой ран с заданными настройкми и переносим курсор в этот
+                    //    ран, чтобы при последующем наборе текст отрисовывался с нужными настройками.
+
+                    if ( null === RItem || para_End === RItem.Type )
+                    {
+                        this.Apply_TextPr( undefined, bIncrease );
+
+                        // Выставляем настройки для символа параграфа
+                        var EndTextPr = this.Get_CompiledPr2( false).TextPr.Copy();
+                        EndTextPr.Merge( this.TextPr.Value );
+
+                        // TODO: Как только перенесем историю изменений TextPr в сам класс CTextPr, переделать тут
+                        this.TextPr.Set_FontSize( FontSize_IncreaseDecreaseValue( bIncrease, EndTextPr.FontSize ) );
+                    }
+                    else if ( null !== RItem && null !== LItem && para_Text === RItem.Type && para_Text === LItem.Type && false === RItem.Is_Punctuation() && false === LItem.Is_Punctuation() )
+                    {
+                        var SearchSPos = new CParagraphSearchPos();
+                        var SearchEPos = new CParagraphSearchPos();
+
+                        this.Get_WordStartPos( SearchSPos, CurParaPos );
+                        this.Get_WordEndPos( SearchEPos, CurParaPos );
+
+                        // Такого быть не должно, т.к. мы уже проверили, что справа и слева точно есть текст
+                        if ( true !== SearchSPos.Found || true !== SearchEPos.Found )
+                            return;
+
+                        // Выставим временно селект от начала и до конца слова
+                        this.Selection.Use = true;
+                        this.Set_SelectionContentPos( SearchSPos.Pos, SearchEPos.Pos );
+
+                        this.Apply_TextPr( undefined, bIncrease );
+
+                        // Убираем селект
+                        this.Selection_Remove();
+                    }
                     else
-                        Item.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize ) );
+                    {
+                        this.Apply_TextPr( undefined, bIncrease );
+                    }
                 }
             }
 
@@ -11593,7 +11680,7 @@ Paragraph.prototype =
         }
     },
 
-    Apply_TextPr : function(TextPr)
+    Apply_TextPr : function(TextPr, IncFontSize)
     {
         // Данная функция работает по следующему принципу: если задано выделение, тогда применяем настройки к
         // выделенной части, а если выделения нет, тогда в текущее положение вставляем пустой ран с заданными настройками
@@ -11606,7 +11693,7 @@ Paragraph.prototype =
 
             if ( StartPos === EndPos )
             {
-                var NewElements = this.Content[EndPos].Apply_TextPr( TextPr );
+                var NewElements = this.Content[EndPos].Apply_TextPr( TextPr, IncFontSize );
 
                 if ( para_Run === this.Content[EndPos].Type )
                 {
@@ -11636,15 +11723,15 @@ Paragraph.prototype =
 
                 for ( var CurPos = StartPos + 1; CurPos < EndPos; CurPos++ )
                 {
-                    this.Content[CurPos].Apply_TextPr( TextPr );
+                    this.Content[CurPos].Apply_TextPr( TextPr, IncFontSize );
                 }
 
 
-                var NewElements = this.Content[EndPos].Apply_TextPr( TextPr );
+                var NewElements = this.Content[EndPos].Apply_TextPr( TextPr, IncFontSize );
                 if ( para_Run === this.Content[EndPos].Type )
                     this.Internal_ReplaceRun( EndPos, NewElements );
 
-                var NewElements = this.Content[StartPos].Apply_TextPr( TextPr );
+                var NewElements = this.Content[StartPos].Apply_TextPr( TextPr, IncFontSize );
                 if ( para_Run === this.Content[StartPos].Type )
                     this.Internal_ReplaceRun( StartPos, NewElements );
 
@@ -11656,7 +11743,7 @@ Paragraph.prototype =
         {
             var Pos = this.CurPos.ContentPos;
             var Element = this.Content[Pos];
-            var NewElements = Element.Apply_TextPr( TextPr );
+            var NewElements = Element.Apply_TextPr( TextPr, IncFontSize );
 
             if ( para_Run === Element.Type )
             {

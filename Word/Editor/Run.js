@@ -3105,7 +3105,7 @@ ParaRun.prototype =
         this.Recalc_CompiledPr(true);
     },
 
-    Apply_TextPr : function(TextPr)
+    Apply_TextPr : function(TextPr, IncFontSize)
     {
         var Result = [];
         var LRun = this, CRun = null, RRun = null;
@@ -3143,7 +3143,16 @@ ParaRun.prototype =
                 LRun.Selection_Remove();
 
             CRun.Select_All();
-            CRun.Apply_Pr( TextPr );
+
+            if ( undefined === IncFontSize )
+                CRun.Apply_Pr( TextPr );
+            else
+            {
+                var _TextPr = new CTextPr();
+                var CurTextPr = this.Get_CompiledPr( false );
+
+                CRun.Set_FontSize( FontSize_IncreaseDecreaseValue( IncFontSize, CurTextPr.FontSize ) );
+            }
 
             if ( null !== RRun )
                 RRun.Selection_Remove();
@@ -3184,7 +3193,19 @@ ParaRun.prototype =
 
             CRun.Selection_Remove();
             CRun.Cursor_MoveToStartPos();
-            CRun.Apply_Pr( TextPr );
+
+            if ( undefined === IncFontSize )
+            {
+                CRun.Apply_Pr( TextPr );
+            }
+            else
+            {
+                var _TextPr = new CTextPr();
+                var CurTextPr = this.Get_CompiledPr( false );
+
+                CRun.Set_FontSize( FontSize_IncreaseDecreaseValue( IncFontSize, CurTextPr.FontSize ) );
+            }
+
 
             if ( null !== RRun )
                 RRun.Selection_Remove();
@@ -3876,4 +3897,69 @@ function CParaRunCollaborativeMark(Pos, Type)
 {
     this.Pos  = Pos;
     this.Type = Type;
+}
+
+
+function FontSize_IncreaseDecreaseValue(bIncrease, Value)
+{
+    // Закон изменения размеров :
+    // 1. Если значение меньше 8, тогда мы увеличиваем/уменьшаем по 1 (от 1 до 8)
+    // 2. Если значение больше 72, тогда мы увеличиваем/уменьшаем по 10 (от 80 до бесконечности
+    // 3. Если значение в отрезке [8,72], тогда мы переходим по следующим числам 8,9,10,11,12,14,16,18,20,22,24,26,28,36,48,72
+
+    var Sizes = [8,9,10,11,12,14,16,18,20,22,24,26,28,36,48,72];
+
+    var NewValue = Value;
+    if ( true === bIncrease )
+    {
+        if ( Value < Sizes[0] )
+        {
+            if ( Value >= Sizes[0] - 1 )
+                NewValue = Sizes[0];
+            else
+                NewValue = Math.floor(Value + 1);
+        }
+        else if ( Value >= Sizes[Sizes.length - 1] )
+        {
+            NewValue = Math.min( 300, Math.floor( Value / 10 + 1 ) * 10 );
+        }
+        else
+        {
+            for ( var Index = 0; Index < Sizes.length; Index++ )
+            {
+                if ( Value < Sizes[Index] )
+                {
+                    NewValue = Sizes[Index];
+                    break;
+                }
+            }
+        }
+    }
+    else
+    {
+        if ( Value <= Sizes[0] )
+        {
+            NewValue = Math.max( Math.floor( Value - 1 ), 1 );
+        }
+        else if ( Value > Sizes[Sizes.length - 1] )
+        {
+            if ( Value <= Math.floor( Sizes[Sizes.length - 1] / 10 + 1 ) * 10 )
+                NewValue = Sizes[Sizes.length - 1];
+            else
+                NewValue = Math.floor( Math.ceil(Value / 10) - 1 ) * 10;
+        }
+        else
+        {
+            for ( var Index = Sizes.length - 1; Index >= 0; Index-- )
+            {
+                if ( Value > Sizes[Index] )
+                {
+                    NewValue = Sizes[Index];
+                    break;
+                }
+            }
+        }
+    }
+
+    return NewValue;
 }
