@@ -1084,6 +1084,10 @@
 					if(bodyFrame && bodyFrame != null)
 					{
 						t._editorPasteExec(worksheet, frameWindow.document.body,isText);
+						
+						window.GlobalPasteFlag = false;
+						window.GlobalPasteFlagCounter = 0;
+						
 						bExist = true;
 					}
 					ifr.style.display  = ELEMENT_DISPAY_STYLE;
