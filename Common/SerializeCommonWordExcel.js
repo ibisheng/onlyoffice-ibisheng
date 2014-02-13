@@ -1157,7 +1157,7 @@ BinaryChartWriter.prototype.WriteSeria = function(chart, seria, nIndex)
 	if(null != seria.TxCache)
 	{
 		var TxCache = seria.TxCache;
-		if(null != TxCache.Formula)
+		if(TxCache.Formula)
 		{
 			var oTempNumCache = {Formula: TxCache.Formula, NumCache: [{val: TxCache.Tx, index: 0}]};
 			this.bs.WriteItem(c_oSer_ChartSeriesType.TxRef, function(){oThis.WriteSeriesNumCache(oTempNumCache);});
@@ -1184,13 +1184,13 @@ BinaryChartWriter.prototype.WriteSeria = function(chart, seria, nIndex)
 		oTempSpPr.Fill = oFill;
 		this.bs.WriteItem(c_oSer_ChartSeriesType.SpPr, function(){window.global_pptx_content_writer.WriteSpPr(oThis.memory, oTempSpPr);});
 	}
-	if(c_oAscChartType.scatter != chart.type && null != seria.Cat && (null != seria.Cat.Formula || seria.Cat.NumCache.length > 0))
+	if(c_oAscChartType.scatter != chart.type && null != seria.Cat && (seria.Cat.Formula || seria.Cat.NumCache.length > 0))
 		this.bs.WriteItem(c_oSer_ChartSeriesType.Cat, function(){oThis.WriteSeriesNumCache(seria.Cat);});
 };
 BinaryChartWriter.prototype.WriteSeriesNumCache = function(oCache)
 {
     var oThis = this;
-	if(null != oCache.Formula)
+	if(oCache.Formula)
 	{
 		this.memory.WriteByte(c_oSer_ChartSeriesNumCacheType.Formula);
 		this.memory.WriteString2(oCache.Formula);
