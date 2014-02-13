@@ -53,7 +53,21 @@ var gUndoInsDelCellsFlag = true;
 					case this.Properties.visible: this.visible = value;break;
 				}
 			},
-
+			
+			clone : function()
+			{
+				var res = new AutoFiltersOptionsElements();
+				
+				res.val = this.val;
+				res.val2 = this.val2;
+				res.visible = this.visible;
+				res.rep = this.rep;
+				res.And = this.And;
+				res.Properties = this.Properties;
+				
+				return res;
+			},
+			
 			asc_getVal: function () { return this.val; },
 			asc_getVisible: function () { return this.visible; },
 			asc_setVal: function (val) { this.val = val; },
@@ -323,7 +337,7 @@ var gUndoInsDelCellsFlag = true;
 							{
 								case "changeStyle":
 								{
-									var cloneFilterOld = Asc.clone(filterChange);
+									var cloneFilterOld = filterChange.clone();
 									filterChange.TableStyleInfo.Name = lTable;
 									splitRange = filterChange.Ref.split(':');
 									t._setColorStyleTable(splitRange[0], splitRange[1], filterChange);
@@ -353,7 +367,7 @@ var gUndoInsDelCellsFlag = true;
 											isVis:  false
 										};
 										result = newRes.result;
-										changesElemHistory = Asc.clone(aWs.AutoFilter);
+										changesElemHistory = aWs.AutoFilter.clone();
 										delete aWs.AutoFilter;
 									}
 									else
@@ -364,9 +378,9 @@ var gUndoInsDelCellsFlag = true;
 												result: allAutoFilters[apocal.num - 1].result,
 												isVis:  false
 											};
-											changesElemHistory = Asc.clone(aWs.TableParts[apocal.num - 1]);
+											changesElemHistory = aWs.TableParts[apocal.num - 1].clone();
 											delete aWs.TableParts[apocal.num - 1].AutoFilter;
-											isReDrawFilter = Asc.clone(aWs.TableParts[apocal.num - 1]);
+											isReDrawFilter = aWs.TableParts[apocal.num - 1].clone();
 										}
 										else
 										{
@@ -374,9 +388,9 @@ var gUndoInsDelCellsFlag = true;
 												result: allAutoFilters[apocal.num].result,
 												isVis:  false
 											};
-											changesElemHistory = Asc.clone(aWs.TableParts[apocal.num]);
+											changesElemHistory = aWs.TableParts[apocal.num].clone();
 											delete aWs.TableParts[apocal.num].AutoFilter;
-											isReDrawFilter = Asc.clone(aWs.TableParts[apocal.num]);
+											isReDrawFilter = aWs.TableParts[apocal.num].clone();
 										}	
 									}
 									t._addHistoryObj(changesElemHistory, historyitem_AutoFilter_Add,
@@ -422,7 +436,7 @@ var gUndoInsDelCellsFlag = true;
 										result: allAutoFilters[apocal.num].result,
 										isVis:  false
 									};
-									changesElemHistory = Asc.clone(aWs.AutoFilter);
+									changesElemHistory = aWs.AutoFilter.clone();
 									delete aWs.AutoFilter;
 									if(addNameColumn && rangeShift && !isTurnOffHistory)
 									{
@@ -448,10 +462,10 @@ var gUndoInsDelCellsFlag = true;
 											//if(!isTurnOffHistory)
 												//range.setNumFormat("@");
 										}
-										tableColumns[j] = 
-										{
-											Name: strNum
-										};
+										
+										tableColumns[j] = new TableColumn();
+										tableColumns[j].Name = strNum;
+
 										j++;
 										
 									}
@@ -470,14 +484,14 @@ var gUndoInsDelCellsFlag = true;
 									{
 										var idCell = new CellAddress(activeCells.r1, col, 0);
 										var idCellNext = new CellAddress(activeCells.r2, col, 0);
-										result[n] = {
-											x: ws.cols[col].left,
-											y: ws.rows[activeCells.r1].top,
-											width: ws.cols[col].width,
-											height: ws.rows[activeCells.r1].height,
-											id: idCell.getID(),
-											idNext: idCellNext.getID()
-										};
+										result[n] = new Result();
+										result[n].x = ws.cols[col].left;
+										result[n].y = ws.rows[activeCells.r1].top;
+										result[n].width = ws.cols[col].width;
+										result[n].height = ws.rows[activeCells.r1].height;
+										result[n].id = idCell.getID();
+										result[n].idNext = idCellNext.getID();
+										
 										n++;
 									}
 									//добавляем структуру нового фильтра
@@ -545,7 +559,7 @@ var gUndoInsDelCellsFlag = true;
 								}
 								case 'changeStyleWithoutFilter':
 								{
-									changesElemHistory = Asc.clone(filterChange);
+									changesElemHistory = filterChange.clone();
 									filterChange.TableStyleInfo.Name = lTable;
 									splitRange = filterChange.Ref.split(':');
 									t._setColorStyleTable(splitRange[0], splitRange[1], filterChange);
@@ -564,7 +578,7 @@ var gUndoInsDelCellsFlag = true;
 								}
 								case 'setStyleTableForAutoFilter':
 								{
-									changesElemHistory = Asc.clone(allAutoFilters[apocal.num -1]);
+									changesElemHistory = allAutoFilters[apocal.num -1].clone();
 									var ref = allAutoFilters[apocal.num - 1].Ref;
 									allAutoFilters[apocal.num - 1].AutoFilter = 
 									{
@@ -574,12 +588,11 @@ var gUndoInsDelCellsFlag = true;
 								}
 								case 'setStyleTableForAutoFilter1':
 								{
-									changesElemHistory = Asc.clone(allAutoFilters[apocal.num]);
+									changesElemHistory = allAutoFilters[apocal.num].clone();
 									var ref = allAutoFilters[apocal.num].Ref;
-									allAutoFilters[apocal.num].AutoFilter = 
-									{
-										Ref: allAutoFilters[apocal.num].Ref
-									};
+									allAutoFilters[apocal.num].AutoFilter = new AutoFilter();
+									allAutoFilters[apocal.num].AutoFilter.Ref = allAutoFilters[apocal.num].Ref;
+
 									break;
 								}
 							}
@@ -636,10 +649,9 @@ var gUndoInsDelCellsFlag = true;
 											var strNum = "Column" + (col - mainAdjacentCells.c1 + 1).toString();
 											if(!isTurnOffHistory)
 												range.setValue(strNum);
-											tableColumns[j] = 
-											{
-												Name: strNum
-											};
+											tableColumns[j] = new TableColumn();
+											tableColumns[j].Name = strNum;
+
 											j++;
 										}
 									}
@@ -675,10 +687,9 @@ var gUndoInsDelCellsFlag = true;
 											var strNum = "Column" + (col - activeCells.c1 + 1).toString();
 											if(!isTurnOffHistory)
 												range.setValue(strNum);
-											tableColumns[j] = 
-											{
-												Name: strNum
-											};
+											tableColumns[j] = new TableColumn();
+											tableColumns[j].Name = strNum;
+											
 											j++;
 										}
 									}
@@ -722,14 +733,15 @@ var gUndoInsDelCellsFlag = true;
 										var idCell = new CellAddress(mainAdjacentCells.r1, col, 0);
 										var idCellNext = new CellAddress(mainAdjacentCells.r2, col, 0);
 										curCell = ws.model.getCell( idCell ).getCells();
-										result[n] = {
-											x: ws.cols[col] ? ws.cols[col].left : null,
-											y: ws.rows[mainAdjacentCells.r1] ? ws.rows[mainAdjacentCells.r1].top : null,
-											width: ws.cols[col] ? ws.cols[col].width : null,
-											height: ws.rows[mainAdjacentCells.r1] ? ws.rows[mainAdjacentCells.r1].height : null,
-											id: idCell.getID(),
-											idNext: idCellNext.getID()
-										};
+										
+										result[n] = new Result();
+										result[n].x = ws.cols[col] ? ws.cols[col].left : null;
+										result[n].y = ws.rows[mainAdjacentCells.r1] ? ws.rows[mainAdjacentCells.r1].top : null;
+										result[n].width = ws.cols[col] ? ws.cols[col].width : null;
+										result[n].height = ws.rows[mainAdjacentCells.r1] ? ws.rows[mainAdjacentCells.r1].height : null;
+										result[n].id = idCell.getID();
+										result[n].idNext = idCellNext.getID();
+										
 										n++;
 									}
 								}
@@ -737,14 +749,15 @@ var gUndoInsDelCellsFlag = true;
 								{
 									var idCell = new CellAddress(activeCells.r1, activeCells.c1, 0);
 									var idCellNext = new CellAddress(activeCells.r2, activeCells.c2, 0);
-									result[0] = {
-										x: ws.cols[activeCells.c1] ? ws.cols[activeCells.c1].left : null,
-										y: ws.rows[activeCells.r1] ? ws.rows[activeCells.r1].top : null,
-										width: ws.cols[activeCells.c1] ? ws.cols[activeCells.c1].width : null,
-										height: ws.rows[activeCells.c1] ? ws.rows[activeCells.c1].height : null,
-										id: idCell.getID(),
-										idNext: idCellNext.getID()
-									}
+									
+									result[0] = new Result();
+									result[0].x = ws.cols[activeCells.c1] ? ws.cols[activeCells.c1].left : null;
+									result[0].y = ws.rows[activeCells.r1] ? ws.rows[activeCells.r1].top : null;
+									result[0].width = ws.cols[activeCells.c1] ? ws.cols[activeCells.c1].width : null;
+									result[0].height = ws.rows[activeCells.c1] ? ws.rows[activeCells.c1].height : null;
+									result[0].id = idCell.getID();
+									result[0].idNext = idCellNext.getID();
+									
 								}
 								else if(val == '' && !mainAdjacentCells || (lTable && !mainAdjacentCells))//если она непустая и не имеет непустые смежные
 								{
@@ -752,14 +765,15 @@ var gUndoInsDelCellsFlag = true;
 									{
 										var idCell = new CellAddress(activeCells.r1, activeCells.c1, 0);
 										var idCellNext = new CellAddress(activeCells.r2 + 1, activeCells.c2, 0);
-										result[0] = {
-											x: ws.cols[activeCells.c1] ? ws.cols[activeCells.c1].left : null,
-											y: ws.rows[activeCells.r1] ? ws.rows[activeCells.r1].top : null,
-											width: ws.cols[activeCells.c1] ? ws.cols[activeCells.c1].width : null,
-											height: ws.rows[activeCells.c1] ? ws.rows[activeCells.c1].height : null,
-											id: idCell.getID(),
-											idNext: idCellNext.getID()
-										}
+										
+										result[0] = new Result();
+										result[0].x = ws.cols[activeCells.c1] ? ws.cols[activeCells.c1].left : null;
+										result[0].y = ws.rows[activeCells.r1] ? ws.rows[activeCells.r1].top : null;
+										result[0].width = ws.cols[activeCells.c1] ? ws.cols[activeCells.c1].width : null;
+										result[0].height = ws.rows[activeCells.c1] ? ws.rows[activeCells.c1].height : null;
+										result[0].id = idCell.getID();
+										result[0].idNext = idCellNext.getID();
+										
 									}
 									else
 									{
@@ -785,14 +799,15 @@ var gUndoInsDelCellsFlag = true;
 								{
 									var idCell = new CellAddress(activeCells.r1, col, 0);
 									var idCellNext = new CellAddress(activeCells.r2, col, 0);
-									result[n] = {
-										x: ws.cols[col] ? ws.cols[col].left : null,
-										y: ws.rows[activeCells.r1] ? ws.rows[activeCells.r1].top : null,
-										width: ws.cols[col] ? ws.cols[col].width : null,
-										height: ws.rows[activeCells.r1] ? ws.rows[activeCells.r1].height : null,
-										id: idCell.getID(),
-										idNext: idCellNext.getID()
-									};
+									
+									result[n] = new Result();
+									result[n].x = ws.cols[col] ? ws.cols[col].left : null;
+									result[n].y = ws.rows[activeCells.r1] ? ws.rows[activeCells.r1].top : null;
+									result[n].width = ws.cols[col] ? ws.cols[col].width : null;
+									result[n].height = ws.rows[activeCells.r1] ? ws.rows[activeCells.r1].height : null;
+									result[n].id = idCell.getID();
+									result[n].idNext = idCellNext.getID();
+									
 									n++;
 								}
 							}
@@ -935,13 +950,8 @@ var gUndoInsDelCellsFlag = true;
 						{
 							var startCells = this._idToRange(currentFil.Ref.split(":")[0]);
 							var endCells = this._idToRange(currentFil.Ref.split(":")[1]);
-							activeCells = 
-							{
-								r1: startCells.r1,
-								r2: endCells.r1,
-								c1: startCells.c1,
-								c2: endCells.c1
-							};
+							activeCells = new Asc.Range(startCells.c1, startCells.r1, endCells.c1, endCells.r1);
+
 							var rowAdd = 0;
 							var tableColumns = [];
 							var j = 0;
@@ -952,7 +962,7 @@ var gUndoInsDelCellsFlag = true;
 							}
 							paramsForCallBack = 'changeAllFOnTable';
 							rangeShift1 = t._getAscRange(activeCells,rowAdd);
-							selectionTable = Asc.clone(rangeShift1);
+							selectionTable = rangeShift1.clone();
 						}	
 						else
 						{
@@ -1058,15 +1068,15 @@ var gUndoInsDelCellsFlag = true;
 							//скрыты ли какие-нибудь строки данной ячейкой, если да, то добавляем их в массив this.hiddenRowsArr
 							//this._addRowsInHiddenArray(cellId,sCell,eCell,ws);
 
-							result[n] = {
-								x: ws.cols[col].left,
-								y: ws.rows[sCell.first.row - 1].top,
-								width: ws.cols[col].width,
-								height: ws.rows[startCol].height,
-								id: cellId,
-								idNext: idCellNext.getID(),
-								showButton: this._isShowButton(aWs.AutoFilter.FilterColumns, col - startCol)
-							};
+							result[n] = new Result();
+							result[n].x = ws.cols[col].left;
+							result[n].y = ws.rows[sCell.first.row - 1].top;
+							result[n].width = ws.cols[col].width;
+							result[n].height = ws.rows[startCol].height;
+							result[n].id = cellId;
+							result[n].idNext = idCellNext.getID();
+							result[n].showButton = this._isShowButton(aWs.AutoFilter.FilterColumns, col - startCol);
+							
 							n++;
 						}
 					}
@@ -1089,14 +1099,15 @@ var gUndoInsDelCellsFlag = true;
 							var cellId = idCell.getID();
 							//скрыты ли какие-нибудь строки данной ячейкой, если да, то добавляем их в массив this.hiddenRowsArr
 							//this._addRowsInHiddenArray(cellId,sCell,eCell,ws);
-							result[n] = {
-								x: ws.cols[col].left,
-								y: ws.rows[sCell.first.row - 1].top,
-								width: ws.cols[col].width,
-								height: ws.rows[startCol].height,
-								id: cellId,
-								idNext: idCellNext.getID()
-							};
+							
+							result[n] = new Result();
+							result[n].x = ws.cols[col].left;
+							result[n].y = ws.rows[sCell.first.row - 1].top;
+							result[n].width = ws.cols[col].width;
+							result[n].height = ws.rows[startCol].height;
+							result[n].id = cellId;
+							result[n].idNext = idCellNext.getID();
+							
 							n++;
 						}
 					}
@@ -1128,7 +1139,7 @@ var gUndoInsDelCellsFlag = true;
 					}
 					rangeShift1 = t._getAscRange(mainAdjacentCells,rowAdd);
 					if(lTable)
-						selectionTable = Asc.clone(rangeShift1);
+						selectionTable = rangeShift1.clone();
 					if(isTurnOffHistory)
 						onAddAutoFiltersCallback(true);
 					else
@@ -1156,7 +1167,7 @@ var gUndoInsDelCellsFlag = true;
 					}
 					rangeShift1 = t._getAscRange(activeCells,rowAdd);
 					if(lTable)
-						selectionTable = Asc.clone(rangeShift1);
+						selectionTable = rangeShift1.clone();
 					if(isTurnOffHistory)
 						onAddAutoFiltersCallback(true);
 					else
@@ -1355,7 +1366,7 @@ var gUndoInsDelCellsFlag = true;
 				var DeleteColumns = (insertType == c_oAscDeleteOptions.DeleteColumns && type == 'delCell') ? true : false;
                 if(typeof val == 'object')
 				{
-					activeCells = Asc.clone(val);
+					activeCells = val.clone();
 					val = activeCells.c2 - activeCells.c1 + 1;
 				}
 				else
@@ -1389,7 +1400,7 @@ var gUndoInsDelCellsFlag = true;
 				var DeleteRows = (insertType == c_oAscDeleteOptions.DeleteRows && type == 'delCell') ? true : false;
                 if(typeof val == 'object')
 				{
-					activeCells = Asc.clone(val);
+					activeCells = val.clone();
 					val = activeCells.r2 - activeCells.r1 + 1;
 				}
 				else
@@ -1439,14 +1450,13 @@ var gUndoInsDelCellsFlag = true;
 						//изменяем содержимое фильтра
 						if(!currentFilter.SortState)
 						{
-							currentFilter.SortState = {
-								Ref: currentFilter.Ref,
-								SortConditions:[]
-							};
-							currentFilter.SortState.SortConditions[0] = {};
+							currentFilter.SortState = new SortState();
+							currentFilter.SortState.Ref = currentFilter.Ref;
+							currentFilter.SortState.SortConditions = [];
+							currentFilter.SortState.SortConditions[0] = new SortCondition();
 						}
 						if(!currentFilter.SortState.SortConditions[0])
-							currentFilter.SortState.SortConditions[0] = {};
+							currentFilter.SortState.SortConditions[0] = new SortCondition();
 							
 						currentFilter.SortState.SortConditions[0].Ref = cellId + ":" + newEndId;
 						currentFilter.SortState.SortConditions[0].ConditionDescending = type;
@@ -1572,7 +1582,7 @@ var gUndoInsDelCellsFlag = true;
 				{
 					currentFilter = aWs.TableParts[filtersOp[0]];
 				}
-				oldFilter = Asc.clone(currentFilter);
+				oldFilter = currentFilter.clone();
 				var rangeCell = currentFilter.Ref.split(':');
 				var startCell = t._idToRange(rangeCell[0]);
 				var endCell = t._idToRange(rangeCell[1]);
@@ -1608,7 +1618,7 @@ var gUndoInsDelCellsFlag = true;
 					//смотрим находится ли фильтр внутри выделенного фрагмента
 					if(activeCells.r1 <= bbox.r1 && activeCells.r2 >= bbox.r2 && activeCells.c1 <= bbox.c1 && activeCells.c2 >= bbox.c2)
 					{
-						var oldFilter = Asc.clone(aWs.AutoFilter);
+						var oldFilter = aWs.AutoFilter.clone();
 						aWs.AutoFilter = null;
 						//открываем скрытые строки
 						aWs.setRowHidden(false, bbox.r1, bbox.r2);
@@ -1626,7 +1636,7 @@ var gUndoInsDelCellsFlag = true;
 					var k = 0;
 					for(var i = 0; i < aWs.TableParts.length; i++)
 					{
-						var oCurFilter = Asc.clone(aWs.TableParts[i]);
+						var oCurFilter = aWs.TableParts[i].clone();
 						var oRange = aWs.getRange2(oCurFilter.Ref);
 						if(insCells)
 							oCurFilter.insCells = true;
@@ -1737,7 +1747,12 @@ var gUndoInsDelCellsFlag = true;
 				var ws  = data.worksheet;
 				var aWs = this._getCurrentWS();
 				data = data.undo;
-				var cloneData = Asc.clone(data);
+				var cloneData;
+				if(data.clone)
+					cloneData = data.clone();
+				else
+					cloneData = Asc.clone(data);
+					
 				if(!cloneData)
 					return;
 				if(cloneData.insCells)
@@ -1775,7 +1790,11 @@ var gUndoInsDelCellsFlag = true;
 							{
 								if(cloneData.Ref == aWs.TableParts[l].Ref)
 								{
-									var cloneResult = Asc.clone(cloneData.result);
+									var cloneResult = [];
+									for(var k = 0; k < cloneData.result.length; k++)
+									{
+										cloneResult[k] = cloneData.result[k].clone();
+									}
 									if(!aWs.TableParts[l].AutoFilter && cloneData.AutoFilter)
 										this._addButtonAF({result: cloneResult,isVis: true});
 									else if(aWs.TableParts[l].AutoFilter && !cloneData.AutoFilter)
@@ -2274,7 +2293,7 @@ var gUndoInsDelCellsFlag = true;
 						arrayFil[n] = isHidden;
 					n++;
 				}
-				var oldFilter = Asc.clone(currentFilter);
+				var oldFilter = currentFilter.clone();
 				//**добавляем данные в aWs.AutoFilter или aWs.TableParts**
 				this._addCustomFilters(filtersOp,aWs,conFilter,isMerged);
 				
@@ -2294,8 +2313,12 @@ var gUndoInsDelCellsFlag = true;
 				var isArray = true;
 				if(!array)
 				{
+					array = [];
 					cellId = autoFiltersObject.cellId;
-					array = Asc.clone(autoFiltersObject.result);
+					for(var i = 0; i < autoFiltersObject.result.length; i++)
+					{
+						array[i] = autoFiltersObject.result[i].clone();
+					}
 					isArray = false;
 				}
 				else
@@ -2346,7 +2369,7 @@ var gUndoInsDelCellsFlag = true;
 					ref = aWs.TableParts[filtersOp[0]].AutoFilter.Ref;
 					filterObj = aWs.TableParts[filtersOp[0]];
 				}
-				var oldFilter = Asc.clone(filterObj);
+				var oldFilter = filterObj.clone();
 				var cell = ws.model.getCell( new CellAddress(activeCells.r1, activeCells.c1,0));
 				var rangeStart = this._idToRange(ref.split(':')[0]);
 				if(newAcCells.c1 == (rangeStart.c1 + parseInt(filtersOp[1])))
@@ -2496,10 +2519,9 @@ var gUndoInsDelCellsFlag = true;
 							}
 							else
 							{
-								currentFilter[isCurFilter] = {
-									ColId: filtersOp[1],
-									Filters:{}
-								};
+								currentFilter[isCurFilter] = new FilterColumn();
+								currentFilter[isCurFilter].ColId = filtersOp[1];
+								currentFilter[isCurFilter].Filters = new Filters();
 							}
 							currentFilter[isCurFilter].Filters.Values = [];
 						}
@@ -2819,7 +2841,9 @@ var gUndoInsDelCellsFlag = true;
 						newRange.r2 = cloneActiveRange.r2;
 					if(!newRange.c2)
 						newRange.c2 = cloneActiveRange.c2;
-						
+					
+					newRange = Asc.Range(newRange.c1, newRange.r1, newRange.c2, newRange.r2);
+					
 					cloneActiveRange = newRange;
 				}
 			
@@ -3272,13 +3296,9 @@ var gUndoInsDelCellsFlag = true;
 					var cCell = allF[i].Ref.split(':');
 					var fromCell = ws.model.getCell(new CellAddress(cCell[0]));
 					var toCell = ws.model.getCell(new CellAddress(cCell[1]));
-					var range = 
-					{
-						c1: fromCell.first.col - 1,
-						r1: fromCell.first.row - 1,
-						c2: toCell.first.col - 1,
-						r2: toCell.first.row - 1
-					};
+					
+					var range = Asc.Range(fromCell.first.col - 1, fromCell.first.row - 1, toCell.first.col - 1, toCell.first.row - 1);
+					
 					if(!allF[i].AutoFilter && !allF[i].TableStyleInfo)
 					{
 						numAll = 
@@ -3290,7 +3310,7 @@ var gUndoInsDelCellsFlag = true;
 					}
 					if(activeCells.c1 >= range.c1 && activeCells.c2 <= range.c2 && activeCells.r1 >= range.r1 && activeCells.r2 <= range.r2)
 					{
-						var curRange = Asc.clone(range);
+						var curRange = range.clone();
 						if(allF[i].TableStyleInfo)
 						{
 							if(!allF[i].AutoFilter)
@@ -3541,8 +3561,7 @@ var gUndoInsDelCellsFlag = true;
 				if((bbox.c2 - bbox.c1) > maxValCol)
 					bbox.c2 = bbox.c1 + maxValCol;
 				
-				//todo убрать Asc.clone
-				var style = Asc.clone(options.TableStyleInfo);
+				var style = options.TableStyleInfo.clone();
 				var styleForCurTable;
 				//todo из файла
 				var headerRowCount = 1;
@@ -4078,20 +4097,23 @@ var gUndoInsDelCellsFlag = true;
 			
 			_addNewFilter: function(val,tableColumns,aWs,isAll,style)
 			{
+				var newFilter, ref;
 				if(isAll)
 				{
 					if(!aWs.AutoFilter)
 					{
-						aWs.AutoFilter = {
-							result:val,
-							Ref: val[0].id + ':' + val[val.length - 1].idNext 
-						};
+						newFilter = new AutoFilter();
+						newFilter.result = val;
+						ref = val[0].id + ':' + val[val.length - 1].idNext;
+						newFilter.Ref =  ref;
+						aWs.AutoFilter = newFilter;
 					}
+					
 					//проходимся по 1 строчке в поиске мерженных областей
 					var startCol = this._idToRange(val[0].id);
 					var endCol = this._idToRange(val[val.length - 1].idNext);
 					var row = startCol.r1;
-					var cell;
+					var cell, filterColumn;
 					for(var col = startCol.c1; col <= endCol.c1; col++)
 					{
 						cell = aWs.getCell( new CellAddress(row, col, 0) );
@@ -4100,38 +4122,42 @@ var gUndoInsDelCellsFlag = true;
 						{
 							if(!aWs.AutoFilter.FilterColumns)
 								aWs.AutoFilter.FilterColumns = [];
-							aWs.AutoFilter.FilterColumns[aWs.AutoFilter.FilterColumns.length] = 
-							{
-								ColId: col - startCol.c1,
-								ShowButton: false
-							}
+							filterColumn = new FilterColumn();
+							filterColumn.ColId = col - startCol.c1;
+							filterColumn.ShowButton = false;
+							aWs.AutoFilter.FilterColumns[aWs.AutoFilter.FilterColumns.length] = filterColumn;
+							
 							aWs.AutoFilter.result[col - startCol.c1].showButton = false;
 						}
 					}
-					
 					return 	aWs.AutoFilter;
 				}
 				else
 				{
 					if(!aWs.TableParts)
 						aWs.TableParts = [];
-					var ref = val[0].id + ':' + val[val.length - 1].idNext;
-					aWs.TableParts[aWs.TableParts.length] = 
-					{
-						result:val,
-						Ref: ref,
-						AutoFilter: {Ref: ref},
-						TableStyleInfo: 
-						{
-							Name: style,
-							ShowColumnStripes: false,
-							ShowFirstColumn: false,
-							ShowLastColumn: false,
-							ShowRowStripes: true 
-						},
-						TableColumns: tableColumns,
-						DisplayName: aWs.workbook.oNameGenerator.getNextTableName(aWs, ref)
-					};
+					ref = val[0].id + ':' + val[val.length - 1].idNext;
+					
+					newFilter = new TablePart();
+					newFilter.Ref = ref;
+					newFilter.result = val;
+					
+					newFilter.AutoFilter = new AutoFilter();
+					newFilter.AutoFilter.Ref = ref;
+					
+					newFilter.DisplayName = aWs.workbook.oNameGenerator.getNextTableName(aWs, ref);
+					
+					newFilter.TableStyleInfo = new TableStyleInfo();
+					newFilter.TableStyleInfo.Name = style;
+					newFilter.TableStyleInfo.ShowColumnStripes = false;
+					newFilter.TableStyleInfo.ShowFirstColumn = false;
+					newFilter.TableStyleInfo.ShowLastColumn = false;
+					newFilter.TableStyleInfo.ShowRowStripes = true;
+					
+					newFilter.TableColumns = tableColumns;
+					
+					aWs.TableParts[aWs.TableParts.length] = newFilter;
+
 					return 	aWs.TableParts[aWs.TableParts.length - 1];
 				}
 			},
@@ -4139,14 +4165,7 @@ var gUndoInsDelCellsFlag = true;
 			_idToRange: function(id)
 			{
 				var cell = new CellAddress(id);
-				var range = 
-				{
-					r1: cell.row - 1,
-					c1: cell.col - 1,
-					r2: cell.row - 1,
-					c2: cell.col - 1
-				};
-				return range;
+				return Asc.Range(cell.col - 1, cell.row - 1, cell.col - 1, cell.row - 1);
 			},
 			
 			_rangeToId: function(range)
@@ -4203,41 +4222,37 @@ var gUndoInsDelCellsFlag = true;
 			
 			_addNewCustomFilter: function (valFilter,colId)
 			{
-				var result = 
-				{
-					ColId: colId,
-					CustomFiltersObj:{}
-				};
+				var result = new FilterColumns();
+				result.ColId = colId;
+				result.CustomFiltersObj = new CustomFilters();
 				
 				if(valFilter.filter1 && valFilter.valFilter1 != null && valFilter.valFilter1 != undefined)
 				{
-					result.CustomFiltersObj = {};
+					result.CustomFiltersObj = new CustomFilters();
 					result.CustomFiltersObj.CustomFilters = [];
-					result.CustomFiltersObj.CustomFilters[0] = {
-						Operator: valFilter.filter1,
-						Val:valFilter.valFilter1
-					}
+					result.CustomFiltersObj.CustomFilters[0] = new CustomFilter();
+					result.CustomFiltersObj.CustomFilters[0].Operator = valFilter.filter1;
+					result.CustomFiltersObj.CustomFilters[0].Val = valFilter.valFilter1;
 				}
 					
 				if(valFilter.filter2 && valFilter.valFilter2 != null && valFilter.valFilter2 != undefined)
 				{
 					if(result.CustomFiltersObj.CustomFilters[0])
 					{
-						result.CustomFiltersObj.CustomFilters[1] = {
-							Operator: valFilter.filter2,
-							Val: valFilter.valFilter2
-						};
+						result.CustomFiltersObj.CustomFilters[1] = new CustomFilter();
+						result.CustomFiltersObj.CustomFilters[1].Operator = valFilter.filter2;
+						result.CustomFiltersObj.CustomFilters[1].Val = valFilter.valFilter2;
+
 						if(valFilter.isChecked == true)
 							result.CustomFiltersObj.And = true;
 					}
 					else
 					{
-						result.CustomFiltersObj = {};
+						result.CustomFiltersObj = new CustomFilters();
 						result.CustomFiltersObj.CustomFilters = [];
-						result.CustomFiltersObj.CustomFilters[0] = {
-							Operator: valFilter.filter2,
-							Val:valFilter.valFilter2
-						}
+						result.CustomFiltersObj.CustomFilters[0] = new CustomFilter();
+						result.CustomFiltersObj.CustomFilters[0].Operator = valFilter.filter2;
+						result.CustomFiltersObj.CustomFilters[0].Val = valFilter.valFilter2;
 					}
 				}
 				return result;
@@ -4587,7 +4602,7 @@ var gUndoInsDelCellsFlag = true;
 					if(filter.AutoFilter)
 						filterColums = filter.AutoFilter.FilterColumns;
 				}
-				var oldFilter = Asc.clone(filter);
+				var oldFilter = filter.clone();
 				
 				if(val < 0)
 				{
@@ -4714,7 +4729,16 @@ var gUndoInsDelCellsFlag = true;
 						
 					//filter.Ref = this._rangeToId(cRange.start) + ":" + this._rangeToId(cRange.end);
 					var inFilter = this._rangeToId(cRange.start) + ":" + this._rangeToId(cRange.end);
-					var cloneFilterColums = Asc.clone(filterColums);
+					var cloneFilterColums = [];
+					
+					if(filterColums)
+					{
+						for(var k = 0; k < filterColums.length; k++)
+						{
+							cloneFilterColums[k] = filterColums[k].clone();
+						}
+					}
+					
 					//change result into filter and change info in button
 					if(filter.result && filter.result.length > 0)
 					{
@@ -4751,15 +4775,16 @@ var gUndoInsDelCellsFlag = true;
 									}
 									var id = this._rangeToId(localChangeCol);
 									var nextId = this._rangeToId(localNextCol);
-									newResult[n] = 
-									{
-										x: curFilter.x,
-										y: curFilter.y,
-										width: curFilter.width,
-										height: curFilter.height,
-										id: id,
-										idNext: nextId
-									};
+									
+									newResult[n] = new Result();
+									newResult[n].x =curFilter.x;
+									newResult[n].y = curFilter.y;
+									newResult[n].width = curFilter.width;
+									newResult[n].height = curFilter.height;
+									newResult[n].id = id;
+									newResult[n].idNext = nextId;
+									
+									
 									newResult[n].hiddenRows = [];
 									var num = 1;
 									this._changeContentButton(newResult[n],num,'add',inFilter);
@@ -4927,19 +4952,17 @@ var gUndoInsDelCellsFlag = true;
 												l = l + 1;
 											var tempArray = newTableColumn.concat(filter.TableColumns);
 											var newNameColumn = this._generateColumnName(tempArray, startCell - 1);
-											newTableColumn[l] = 
-											{	
-												Name: newNameColumn
-											};
+											newTableColumn[l] = new TableColumn();
+											newTableColumn[l].Name = newNameColumn;
+
 											ws.model.getCell(new CellAddress(range2.r1,range2.c1 + l,0)).setValue(newNameColumn);
 										}
 									}
 									else
 									{
-										newTableColumn[l] = 
-										{	
-											Name: columnValue
-										};
+										newTableColumn[l] = new TableColumn();
+										newTableColumn[l].Name = columnValue;
+
 										isN++;
 									}
 								}
@@ -5703,6 +5726,7 @@ var gUndoInsDelCellsFlag = true;
 			_generateColumnNameWithoutTitle: function(range, isTurnOffHistory)
 			{
 				var ws = this.worksheet;
+				var newTableColumn;
 				var tableColumns = [];
 				var cell;
 				var val;
@@ -5728,9 +5752,10 @@ var gUndoInsDelCellsFlag = true;
 					};
 					//if(!isTurnOffHistory)
 						//cell.setNumFormat("@");
-					tableColumns[col1 - range.c1] = {
-						Name: valNew
-					};
+					newTableColumn = new TableColumn();
+					newTableColumn.Name = valNew;
+					
+					tableColumns[col1 - range.c1] = newTableColumn;
 				}
 				return tableColumns;
 			},
@@ -5805,7 +5830,7 @@ var gUndoInsDelCellsFlag = true;
 					{
 						if(!oCurFilter)
 							oCurFilter = [];
-						oCurFilter[i] = Asc.clone(findFilters[i])
+						oCurFilter[i] = findFilters[i].clone();
 						ref = findFilters[i].Ref;
 						range = this._refToRange(ref);
 						newRange = Asc.Range(range.c1 + diffCol, range.r1 + diffRow, range.c2 + diffCol, range.r2 + diffRow);

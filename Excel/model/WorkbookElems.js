@@ -4348,6 +4348,8 @@ function TablePart() {
 	this.SortState = null;
 	this.TableColumns = null;
 	this.TableStyleInfo = null;
+	
+	this.result = null;
 }
 TablePart.prototype.clone = function(ws) {
 	var i, res = new TablePart();
@@ -4365,8 +4367,14 @@ TablePart.prototype.clone = function(ws) {
 	}
 	if (this.TableStyleInfo)
 		res.TableStyleInfo = this.TableStyleInfo.clone();
-
-	res.recalc(ws);
+	
+	if (this.result) {
+		res.result = [];
+		for (i = 0; i < this.result.length; ++i)
+			res.result.push(this.result[i].clone());
+	}
+	
+	//res.recalc(ws);
 	return res;
 };
 TablePart.prototype.recalc = function(ws) {
@@ -4377,6 +4385,8 @@ function AutoFilter() {
 	this.Ref = null;
 	this.FilterColumns = null;
 	this.SortState = null;
+	
+	this.result = null;
 }
 AutoFilter.prototype.clone = function() {
 	var i, res = new AutoFilter();
@@ -4386,10 +4396,31 @@ AutoFilter.prototype.clone = function() {
 		for (i = 0; i < this.FilterColumns.length; ++i)
 			res.FilterColumns.push(this.FilterColumns[i].clone());
 	}
+	
 	if (this.SortState)
 		res.SortState = this.SortState.clone();
+		
+	if (this.result) {
+		res.result = [];
+		for (i = 0; i < this.result.length; ++i)
+			res.result.push(this.result[i].clone());
+	}
+	
 	return res;
 };
+
+function FilterColumns() {
+	this.ColId = null;
+	this.CustomFiltersObj = null;
+}
+FilterColumns.prototype.clone = function() {
+	var i, res = new FilterColumns();
+	res.ColId = this.ColId;
+	res.CustomFiltersObj = this.CustomFiltersObj;
+	
+	return res;
+};
+
 /** @constructor */
 function SortState() {
 	this.Ref = null;
@@ -4596,5 +4627,25 @@ SortCondition.prototype.clone = function() {
 	res.ConditionDescending = this.ConditionDescending;
 	if (this.dxf)
 		res.dxf = this.dxf.clone();
+	return res;
+};
+
+function Result() {
+	this.x = null;
+	this.y = null;
+	this.width = null;
+	this.heigth = null;
+	this.id = null;
+	this.idNext = null;
+}
+Result.prototype.clone = function() {
+	var res = new Result();
+	res.x = this.x;
+	res.y = this.y;
+	res.width = this.width;
+	res.heigth = this.heigth;
+	res.id = this.id;
+	res.idNext = this.idNext;
+	
 	return res;
 };
