@@ -45,6 +45,7 @@ function CMobileTouchManager()
     this.ZoomValueMax = 300;
 
     this.iScroll = null;
+    this.ctrl = null;
 
     this.TableMovePoint = null;
     this.TableHorRulerPoints = null;
@@ -63,14 +64,22 @@ function CMobileTouchManager()
     this.TableCurrentMoveValueMax = null;
 
     this.ShowMenuTimerId = -1;
+
+    this.longTapFlag = false;
+    this.longTapTimer = -1;
+    this.mylatesttap = null
+    this.zoomFactor = 1;
+    this.wasZoom = false;
+    this.canZoom = true;
+    this.wasMove = false;
 }
 CMobileTouchManager.prototype = {
     Init : function(ctrl)
     {
+        this.ctrl = ctrl;
         this.iScroll = new window.CTouchScroll(ctrl,{hScrollbar:true,vScrollbar:true,momentum:false}/*, { onAnimationEnd : function(param) {
             param.api.MobileTouchManager.OnScrollAnimationEnd();
         } }*/);
-//        LoadMobileImages();
     },
 
     MoveCursorToPoint : function(e)
@@ -93,9 +102,24 @@ CMobileTouchManager.prototype = {
 
     onTouchStart : function(e)
     {
+        this.longTapFlag = true;
+        this.wasMove = false;
+        var thas = this, evt = e,
+            point = arguments[0].touches ? arguments[0].touches[0] : arguments[0];
+        function longTapDetected(){
+            if(thas.longTapFlag)
+                alert ("clientX " + point.clientX + " clientY " + point.clientY)
+            thas.longTapFlag = false;
+            clearInterval(this.longTapTimer);
+        }
+
+        this.DownPointOriginal.X = point.clientX;
+        this.DownPointOriginal.Y = point.clientY;
+
         this.iScroll._start(e);
         e.preventDefault();
         e.returnValue = false;
+//        this.longTapTimer = setTimeout(longTapDetected,1000,e);
         return false;
 //        if (null != this.DrawingDocument.m_oDocumentRenderer)
 //            return this.onTouchStart_renderer(e);
@@ -104,7 +128,7 @@ CMobileTouchManager.prototype = {
 //        global_mouseEvent.LockMouse();
 //        this.HtmlPage.m_oApi.asc_fireCallback("asc_onHidePopMenu");
 
-        this.ScrollH = this.HtmlPage.m_dScrollX;
+/*        this.ScrollH = this.HtmlPage.m_dScrollX;
         this.ScrollV = this.HtmlPage.m_dScrollY;
 
         this.TableCurrentMoveValueMin = null;
@@ -113,7 +137,7 @@ CMobileTouchManager.prototype = {
         this.MoveAfterDown = false;
         this.TimeDown = new Date().getTime();
 
-/*        var bIsKoefPixToMM = false;
+        var bIsKoefPixToMM = false;
         var _matrix = this.DrawingDocument.TextMatrix;
         if (_matrix && global_MatrixTransformer.IsIdentity(_matrix))
             _matrix = null;*/
@@ -417,7 +441,7 @@ CMobileTouchManager.prototype = {
                 }
                 global_mouseEvent.KoefPixToMM = 1;
             }
-        }*/
+        }
 
         if (e.touches && 2 == e.touches.length)
         {
@@ -552,19 +576,23 @@ CMobileTouchManager.prototype = {
             else
                 e.returnValue = false;
             return false;
-        }
+        }*/
     },
     onTouchMove : function(e)
     {
+        this.longTapFlag = false;
+        this.wasMove = true;
+//        clearInterval(this.longTapTimer);
         this.iScroll._move(e);
         e.preventDefault();
         e.returnValue = false;
+//        this.canZoom = false;
         return false;
     /*    if (null != this.DrawingDocument.m_oDocumentRenderer)
             return this.onTouchMove_renderer(e);
 
         if (this.Mode != MobileTouchMode.FlowObj && this.Mode != MobileTouchMode.TableMove)
-            check_MouseMoveEvent(e.touches ? e.touches[0] : e);*/
+            check_MouseMoveEvent(e.touches ? e.touches[0] : e);
 
         if (!this.MoveAfterDown)
         {
@@ -626,15 +654,15 @@ CMobileTouchManager.prototype = {
                     var _offsetY = global_mouseEvent.Y - this.DownPointOriginal.Y;
 
                     this.iScroll._move(e);
-                    /*
-                     if (_offsetX != 0 && this.HtmlPage.m_dScrollX_max > 0)
-                     {
-                     this.HtmlPage.m_oScrollHorApi.scrollToX(this.ScrollH - _offsetX);
-                     }
-                     if (_offsetY != 0 && this.HtmlPage.m_dScrollY_max > 0)
-                     {
-                     this.HtmlPage.m_oScrollVerApi.scrollToY(this.ScrollV - _offsetY);
-                     }*/
+
+//                     if (_offsetX != 0 && this.HtmlPage.m_dScrollX_max > 0)
+//                     {
+//                     this.HtmlPage.m_oScrollHorApi.scrollToX(this.ScrollH - _offsetX);
+//                     }
+//                     if (_offsetY != 0 && this.HtmlPage.m_dScrollY_max > 0)
+//                     {
+//                     this.HtmlPage.m_oScrollVerApi.scrollToY(this.ScrollV - _offsetY);
+//                     }
 
                     e.preventDefault();
                     e.returnValue = false;
@@ -750,15 +778,46 @@ CMobileTouchManager.prototype = {
             }
             default:
                 break;
-        }
+        }*/
     },
     onTouchEnd : function(e)
     {
+        this.longTapFlag = false;
+//        clearInterval(this.longTapTimer);
         this.iScroll._end(e);
+
+        var now = new Date().getTime(), point = e.changedTouches ? e.changedTouches[0] : e;
+
+/*        this.mylatesttap = this.mylatesttap||now+1
+        var timesince = now - this.mylatesttap;
+        if((timesince < 300) && (timesince > 0)){
+//            this.ctrl.handlers.trigger("asc_onDoubleTapEvent",e);
+            this.mylatesttap = null;
+            if ( this.wasZoom ) {
+                this.zoomFactor = 1;
+                this.wasZoom = false;
+            }
+            else {
+                this.zoomFactor = 2;
+                this.wasZoom = true;
+            }
+            this.ctrl._onScrollY(0);
+            this.ctrl._onScrollX(0);
+            this.ctrl.changeZoom( this.zoomFactor );
+            this.iScroll.zoom( point.clientX, point.clientY, this.zoomFactor );
+        }else{
+            // too much time to be a doubletap
+            this.mylatesttap = now+1;
+        }*/
+
+        if(Math.abs(this.DownPointOriginal.X - point.clientX) < this.ctrl.controller.settings.hscrollStep && Math.abs(this.DownPointOriginal.Y - point.clientY) < this.ctrl.controller.settings.vscrollStep)
+            this.ctrl.handlers.trigger("asc_onTapEvent",e);
+
         e.preventDefault();
         e.returnValue = false;
+        this.wasMove = false;
         return;
-
+/*
         if (null != this.DrawingDocument.m_oDocumentRenderer)
             return this.onTouchEnd_renderer(e);
 
@@ -939,7 +998,7 @@ CMobileTouchManager.prototype = {
         }
 
         // если есть селект - то показать меню
-        this.CheckSelectEnd(true);
+        this.CheckSelectEnd(true);*/
     },
 
     onTouchStart_renderer : function(e)

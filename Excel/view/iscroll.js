@@ -1201,8 +1201,10 @@
             that.x = that.x > 0 ? 0 : that.x < that.maxScrollX ? that.maxScrollX : that.x;
             that.y = that.y > that.minScrollY ? that.minScrollY : that.y < that.maxScrollY ? that.maxScrollY : that.y;
 
-            that.scroller.style[transitionDuration] = time + 'ms';
-            that.scroller.style[transform] = 'translate(' + that.x + 'px,' + that.y + 'px) scale(' + scale + ')' + translateZ;
+            if(that.scroller){
+                that.scroller.style[transitionDuration] = time + 'ms';
+                that.scroller.style[transform] = 'translate(' + that.x + 'px,' + that.y + 'px) scale(' + scale + ')' + translateZ;
+            }
             that.zoomed = false;
         },
 
