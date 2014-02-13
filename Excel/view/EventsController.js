@@ -670,7 +670,6 @@
 			switch (event.which) {
 
 				case 113: // F2
-					var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
 					if (isViewerMode || t.isCellEditMode || t.isSelectionDialogMode || graphicObjects.length) {return true;}
 					if (AscBrowser.isOpera) {stop();}
 					// Выставляем блокировку на выход из редактора по клавишам-стрелкам
