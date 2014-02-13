@@ -1751,7 +1751,7 @@ var gUndoInsDelCellsFlag = true;
 				if(data.clone)
 					cloneData = data.clone();
 				else
-					cloneData = Asc.clone(data);
+					cloneData = data;
 					
 				if(!cloneData)
 					return;
