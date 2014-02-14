@@ -1,6 +1,6 @@
 ﻿function CDrawingStream()
 {
-    this.Native = null;
+    this.Native = window.native;
 
     this.m_oTextPr      = null;
     this.m_oLastFont    = new CFontSetup();

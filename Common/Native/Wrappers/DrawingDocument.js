@@ -16,6 +16,11 @@
 
 CDrawingDocument.prototype =
 {
+	RenderPage : function(nPageIndex)
+	{
+		var _graphics = new CDrawingStream();
+		this.LogicDocument.DrawPage(nPageIndex, _graphics);
+	},
     // init lock objects draw
     Start_CollaborationEditing : function()
     {

@@ -341,6 +341,12 @@ function GetNativePageBase64(pageIndex)
     return window.memory1;
 }
 
+function GetNativePageMeta(pageIndex)
+{
+	_api.WordControl.m_oDrawingDocument.LogicDocument = _api.WordControl.m_oDrawingDocument.m_oLogicDocument;
+    _api.WordControl.m_oDrawingDocument.RenderPage(pageIndex);
+}
+
 function GetNativeId()
 {
     return window.native.GetFileId();
