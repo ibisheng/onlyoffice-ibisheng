@@ -337,7 +337,7 @@ var gUndoInsDelCellsFlag = true;
 							{
 								case "changeStyle":
 								{
-									var cloneFilterOld = filterChange.clone();
+									var cloneFilterOld = filterChange.clone(aWs);
 									filterChange.TableStyleInfo.Name = lTable;
 									splitRange = filterChange.Ref.split(':');
 									t._setColorStyleTable(splitRange[0], splitRange[1], filterChange);
@@ -378,9 +378,9 @@ var gUndoInsDelCellsFlag = true;
 												result: allAutoFilters[apocal.num - 1].result,
 												isVis:  false
 											};
-											changesElemHistory = aWs.TableParts[apocal.num - 1].clone();
+											changesElemHistory = aWs.TableParts[apocal.num - 1].clone(aWs);
 											delete aWs.TableParts[apocal.num - 1].AutoFilter;
-											isReDrawFilter = aWs.TableParts[apocal.num - 1].clone();
+											isReDrawFilter = aWs.TableParts[apocal.num - 1].clone(aWs);
 										}
 										else
 										{
@@ -388,9 +388,9 @@ var gUndoInsDelCellsFlag = true;
 												result: allAutoFilters[apocal.num].result,
 												isVis:  false
 											};
-											changesElemHistory = aWs.TableParts[apocal.num].clone();
+											changesElemHistory = aWs.TableParts[apocal.num].clone(aWs);
 											delete aWs.TableParts[apocal.num].AutoFilter;
-											isReDrawFilter = aWs.TableParts[apocal.num].clone();
+											isReDrawFilter = aWs.TableParts[apocal.num].clone(aWs);
 										}	
 									}
 									t._addHistoryObj(changesElemHistory, historyitem_AutoFilter_Add,
@@ -559,7 +559,7 @@ var gUndoInsDelCellsFlag = true;
 								}
 								case 'changeStyleWithoutFilter':
 								{
-									changesElemHistory = filterChange.clone();
+									changesElemHistory = filterChange.clone(aWs);
 									filterChange.TableStyleInfo.Name = lTable;
 									splitRange = filterChange.Ref.split(':');
 									t._setColorStyleTable(splitRange[0], splitRange[1], filterChange);
@@ -578,7 +578,7 @@ var gUndoInsDelCellsFlag = true;
 								}
 								case 'setStyleTableForAutoFilter':
 								{
-									changesElemHistory = allAutoFilters[apocal.num -1].clone();
+									changesElemHistory = allAutoFilters[apocal.num -1].clone(aWs);
 									var ref = allAutoFilters[apocal.num - 1].Ref;
 									allAutoFilters[apocal.num - 1].AutoFilter = 
 									{
@@ -588,7 +588,7 @@ var gUndoInsDelCellsFlag = true;
 								}
 								case 'setStyleTableForAutoFilter1':
 								{
-									changesElemHistory = allAutoFilters[apocal.num].clone();
+									changesElemHistory = allAutoFilters[apocal.num].clone(aWs);
 									var ref = allAutoFilters[apocal.num].Ref;
 									allAutoFilters[apocal.num].AutoFilter = new AutoFilter();
 									allAutoFilters[apocal.num].AutoFilter.Ref = allAutoFilters[apocal.num].Ref;
@@ -1582,7 +1582,7 @@ var gUndoInsDelCellsFlag = true;
 				{
 					currentFilter = aWs.TableParts[filtersOp[0]];
 				}
-				oldFilter = currentFilter.clone();
+				oldFilter = currentFilter.clone(aWs);
 				var rangeCell = currentFilter.Ref.split(':');
 				var startCell = t._idToRange(rangeCell[0]);
 				var endCell = t._idToRange(rangeCell[1]);
@@ -1636,7 +1636,7 @@ var gUndoInsDelCellsFlag = true;
 					var k = 0;
 					for(var i = 0; i < aWs.TableParts.length; i++)
 					{
-						var oCurFilter = aWs.TableParts[i].clone();
+						var oCurFilter = aWs.TableParts[i].clone(aWs);
 						var oRange = aWs.getRange2(oCurFilter.Ref);
 						if(insCells)
 							oCurFilter.insCells = true;
@@ -1749,7 +1749,7 @@ var gUndoInsDelCellsFlag = true;
 				data = data.undo;
 				var cloneData;
 				if(data.clone)
-					cloneData = data.clone();
+					cloneData = data.clone(aWs);
 				else
 					cloneData = data;
 					
@@ -2293,7 +2293,7 @@ var gUndoInsDelCellsFlag = true;
 						arrayFil[n] = isHidden;
 					n++;
 				}
-				var oldFilter = currentFilter.clone();
+				var oldFilter = currentFilter.clone(aWs);
 				//**добавляем данные в aWs.AutoFilter или aWs.TableParts**
 				this._addCustomFilters(filtersOp,aWs,conFilter,isMerged);
 				
@@ -2369,7 +2369,7 @@ var gUndoInsDelCellsFlag = true;
 					ref = aWs.TableParts[filtersOp[0]].AutoFilter.Ref;
 					filterObj = aWs.TableParts[filtersOp[0]];
 				}
-				var oldFilter = filterObj.clone();
+				var oldFilter = filterObj.clone(aWs);
 				var cell = ws.model.getCell( new CellAddress(activeCells.r1, activeCells.c1,0));
 				var rangeStart = this._idToRange(ref.split(':')[0]);
 				if(newAcCells.c1 == (rangeStart.c1 + parseInt(filtersOp[1])))
@@ -4602,7 +4602,7 @@ var gUndoInsDelCellsFlag = true;
 					if(filter.AutoFilter)
 						filterColums = filter.AutoFilter.FilterColumns;
 				}
-				var oldFilter = filter.clone();
+				var oldFilter = filter.clone(aWs);
 				
 				if(val < 0)
 				{
@@ -5830,7 +5830,7 @@ var gUndoInsDelCellsFlag = true;
 					{
 						if(!oCurFilter)
 							oCurFilter = [];
-						oCurFilter[i] = findFilters[i].clone();
+						oCurFilter[i] = findFilters[i].clone(aWs);
 						ref = findFilters[i].Ref;
 						range = this._refToRange(ref);
 						newRange = Asc.Range(range.c1 + diffCol, range.r1 + diffRow, range.c2 + diffCol, range.r2 + diffRow);

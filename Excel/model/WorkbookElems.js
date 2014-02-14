@@ -4374,7 +4374,7 @@ TablePart.prototype.clone = function(ws) {
 			res.result.push(this.result[i].clone());
 	}
 	
-	//res.recalc(ws);
+	res.recalc(ws);
 	return res;
 };
 TablePart.prototype.recalc = function(ws) {
