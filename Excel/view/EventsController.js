@@ -117,22 +117,19 @@
             this._createScrollBars();
             if( this.view.Api.isMobileVersion ){
                 var __hasTouch = 'ontouchstart' in window;
-
-                if (__hasTouch)
-                {
+                if (__hasTouch) {
                     this.widget.addEventListener("touchstart"	, function (e) {self._onTouchStart(e); return false;}			, false);
                     this.widget.addEventListener("touchmove"	, function (e) {self._onTouchMove(e); return false;}			, false);
-                    this.widget.addEventListener("touchend"	, function (e) {self._onTouchEnd(e); return false;}	, false);
-                }
-                else{
+                    this.widget.addEventListener("touchend"		, function (e) {self._onTouchEnd(e); return false;}	, false);
+                } else {
                     this.widget.addEventListener("touchstart"	, function (e) {self._onMouseDown(e.touches[0]); return false;}			, false);
                     this.widget.addEventListener("touchmove"	, function (e) {self._onMouseMove(e.touches[0]); return false;}			, false);
-                    this.widget.addEventListener("touchend"	, function (e) {self._onMouseUp(e.changedTouches[0]); return false;}	, false);
+                    this.widget.addEventListener("touchend"		, function (e) {self._onMouseUp(e.changedTouches[0]); return false;}	, false);
                 }
                 /*раньше события на ресайз вызывался из меню через контроллер. теперь контроллер в меню не доступен, для ресайза подписываемся на глобальный ресайз от window.*/
                 window.addEventListener("resize", function () {self._onWindowResize.apply(self, arguments);}, false);
 //                this.element.addEventListener("dblclick"	, function () {alert("123");/*return self._onMouseDblClick.apply(self, arguments);*/}	, false);
-                return;
+                return this;
             }
 
 			// initialize events
@@ -162,10 +159,11 @@
 				this.element.addEventListener("mousemove"	, function () {return self._onMouseMove.apply(self, arguments);}		, false);
 				this.element.addEventListener("mouseleave"	, function () {return self._onMouseLeave.apply(self, arguments);}		, false);
 				this.element.addEventListener("dblclick"	, function () {return self._onMouseDblClick.apply(self, arguments);}	, false);
-
-				this.element.addEventListener("mousewheel"	, function () {return self._onMouseWheel.apply(self, arguments);}		, false);
+			}
+			if (this.widget.addEventListener) {
+				this.widget.addEventListener("mousewheel"	, function () {return self._onMouseWheel.apply(self, arguments);}		, false);
 				// for Mozilla Firefox (можно делать проверку на window.MouseScrollEvent || window.WheelEvent для FF)
-				this.element.addEventListener("DOMMouseScroll", function () {return self._onMouseWheel.apply(self, arguments);}		, false);
+				this.widget.addEventListener("DOMMouseScroll", function () {return self._onMouseWheel.apply(self, arguments);}		, false);
 			}
 
 			// Курсор для графических объектов. Определяем mousedown и mouseup для выделения текста.
