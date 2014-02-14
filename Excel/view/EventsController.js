@@ -638,6 +638,10 @@
 
 			var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
 			if ( !t.isMousePressed && graphicObjects.length && t.enableKeyEvents ) {
+				// Mac OS
+				if ( event.metaKey )
+					event.ctrlKey = true;
+					
 				if (t.handlers.trigger("graphicObjectWindowKeyDown", event))
 					return true;
 			}

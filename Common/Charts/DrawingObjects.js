@@ -2723,8 +2723,10 @@ function DrawingObjects() {
 			if ( (_t.graphicObject.x < 0) || (_t.graphicObject.y < 0) || (_t.graphicObject.extX <= 0) || (_t.graphicObject.extY <= 0) )
 				return;
 			
-			var fromCell = _this.coordsManager.calculateCell( mmToPx(_t.graphicObject.x), mmToPx(_t.graphicObject.y) );
-			var toCell = _this.coordsManager.calculateCell( mmToPx(_t.graphicObject.x + _t.graphicObject.extX), mmToPx(_t.graphicObject.y + _t.graphicObject.extY) );
+			//var fromCell = _this.coordsManager.calculateCell( mmToPx(_t.graphicObject.x), mmToPx(_t.graphicObject.y) );
+			//var toCell = _this.coordsManager.calculateCell( mmToPx(_t.graphicObject.x + _t.graphicObject.extX), mmToPx(_t.graphicObject.y + _t.graphicObject.extY) );
+			var fromCell = _this.drawingArea.calculateCell( mmToPx(_t.graphicObject.x), mmToPx(_t.graphicObject.y) );
+			var toCell = _this.drawingArea.calculateCell( mmToPx(_t.graphicObject.x + _t.graphicObject.extX), mmToPx(_t.graphicObject.y + _t.graphicObject.extY) );
 			
 			_t.from.col = fromCell.col;
 			_t.from.colOff = fromCell.colOff;
@@ -3199,32 +3201,36 @@ function DrawingObjects() {
 
 	_this._uploadMessage = function(event) {
 		if ( null != event && null != event.data ) {
-
-			var data = JSON.parse(event.data);
-			if ((null != data) && (null != data["type"]))
-			{
-				if (PostMessageType.UploadImage == data["type"]) {
-					if (c_oAscServerError.NoError == data["error"]) {
-						var sheetId = null;
-						if (null != data["input"])
-							sheetId = data["input"]["sheetId"];
-						var urls = data["urls"];
-						
-						if (urls && urls.length > 0 && sheetId == worksheet.model.getId()) {
-							var url = urls[0];
-							if ( api.isImageChangeUrl || api.isShapeImageChangeUrl )
-								_this.editImageDrawingObject(url);
+			try {
+				var data = JSON.parse(event.data);
+				if ((null != data) && (null != data["type"]))
+				{
+					if (PostMessageType.UploadImage == data["type"]) {
+						if (c_oAscServerError.NoError == data["error"]) {
+							var sheetId = null;
+							if (null != data["input"])
+								sheetId = data["input"]["sheetId"];
+							var urls = data["urls"];
+							
+							if (urls && urls.length > 0 && sheetId == worksheet.model.getId()) {
+								var url = urls[0];
+								if ( api.isImageChangeUrl || api.isShapeImageChangeUrl )
+									_this.editImageDrawingObject(url);
+								else
+									_this.addImageDrawingObject(url, null);
+							}
 							else
-								_this.addImageDrawingObject(url, null);
+								worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 						}
-						else
+						else {
+							worksheet.model.workbook.handlers.trigger("asc_onError", api.asc_mapAscServerErrorToAscError(data["error"]), c_oAscError.Level.NoCritical);
 							worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-					}
-					else {
-						worksheet.model.workbook.handlers.trigger("asc_onError", api.asc_mapAscServerErrorToAscError(data["error"]), c_oAscError.Level.NoCritical);
-						worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+						}
 					}
 				}
+			}
+			catch(e) {
+				var msg = e.message;
 			}
 		}
 	}
@@ -3333,22 +3339,7 @@ function DrawingObjects() {
 				worksheet._drawCellsBorders(/*drawingCtx*/undefined, r_);
 			}
 		}
-	}
-
-	_this.getFrozenOffset = function() {
-		
-		var offsetX = 0, offsetY = 0, cFrozen = 0, rFrozen = 0, diffWidth = 0, diffHeight = 0;
-		if ( _this.worksheet.topLeftFrozenCell ) {
-			cFrozen = _this.worksheet.topLeftFrozenCell.getCol0();
-			rFrozen = _this.worksheet.topLeftFrozenCell.getRow0();
-			diffWidth = _this.worksheet.cols[cFrozen].left - _this.worksheet.cols[0].left;
-			diffHeight = _this.worksheet.rows[rFrozen].top - _this.worksheet.rows[0].top;
-			
-			offsetX = _this.worksheet.cols[_this.worksheet.visibleRange.c1].left - _this.worksheet.cellsLeft - diffWidth;
-			offsetY = _this.worksheet.rows[_this.worksheet.visibleRange.r1].top - _this.worksheet.cellsTop - diffHeight;
-		}
-		return { offsetX: offsetX, offsetY: offsetY };
-	}
+	}	
 	
 	//-----------------------------------------------------------------------------------
 	// Drawing objects
@@ -4757,28 +4748,11 @@ function DrawingObjects() {
 	}
 	
 	_this.setScrollOffset = function() {
-		
-		if ( shapeCtx && shapeOverlayCtx && autoShapeTrack ) {
-			
-			/*var x = scrollOffset.getX();
-			var y = scrollOffset.getY();
-
-			shapeCtx.m_oCoordTransform.tx = x;
-			shapeCtx.m_oCoordTransform.ty = y;
-			shapeCtx.CalculateFullTransform();
-			
-			shapeOverlayCtx.m_oCoordTransform.tx = x;
-			shapeOverlayCtx.m_oCoordTransform.ty = y;
-			shapeOverlayCtx.CalculateFullTransform();
-			
-			autoShapeTrack.Graphics.m_oCoordTransform.tx = x;
-			autoShapeTrack.Graphics.m_oCoordTransform.ty = y;
-			autoShapeTrack.Graphics.CalculateFullTransform();
-            this.controller.recalculateCurPos();
-			
-			if ( _this.selectedGraphicObjectsExists() )
-				this.controller.updateSelectionState();*/
-		}
+		/*if ( shapeCtx && shapeOverlayCtx && autoShapeTrack ) {
+			for (var i = 0; i < _this.drawingArea.frozenPlaces.length; i++) {
+				_this.drawingArea.frozenPlaces[i].setTransform(shapeCtx, shapeOverlayCtx, autoShapeTrack);
+			}
+		}*/
 	}
 	
 	_this.getDrawingCanvas = function() {
@@ -5197,6 +5171,7 @@ function DrawingObjects() {
 	}
 
 	_this.checkCursorDrawingObject = function(x, y) {
+	
 		var offsets = _this.drawingArea.getOffsets(x, y);
 		if ( offsets ) {
 			var objectInfo = { cursor: null, id: null, object: null };
@@ -5537,9 +5512,7 @@ function CoordsManager(ws, bLog) {
 	}
 }
 
-//-----------------------------------------------------------------------------------
-// Common
-//-----------------------------------------------------------------------------------
+//{ Common
 
 function writeToBinaryDocContent(docContent, w)
 {
@@ -5745,3 +5718,4 @@ function getTextString(docContent)
     }
     return ret;
 }
+//}

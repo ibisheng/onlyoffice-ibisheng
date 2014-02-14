@@ -1414,8 +1414,8 @@
 				ws = t.getWorksheet();
 
 				// Запрещаем копирование диаграмм в iframe
-				if ( t.Api.isChartEditor && ws.objectRender.selectedGraphicObjectsExists() )
-					return;
+				//if ( t.Api.isChartEditor && ws.objectRender.selectedGraphicObjectsExists() )
+				//	return;
 
 				t.clipboard.copyRange(ws.getSelectedRange(), ws, true);
 				ws.emptySelection(c_oAscCleanOptions.All);

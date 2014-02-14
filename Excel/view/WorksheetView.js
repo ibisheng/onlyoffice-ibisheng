@@ -6273,6 +6273,7 @@
 		};
 
 		WorksheetView.prototype.changeSelectionStartPoint = function (x, y, isCoord, isSelectMode) {
+		
 			var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1]: this.activeRange;
 			var sc = ar.startCol, sr = ar.startRow, ret = {};
 			var isChangeSelectionShape = false;
