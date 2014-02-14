@@ -684,34 +684,6 @@
 		    }
 		    return true;
 		}
-
-		// $.extend не копирует объекты созданные с помощью конструктора, поэтому используем свою реализацию
-		function clone(Obj)
-		{
-			if( !Obj || !(kObjectL == typeof(Obj) || kArrayL == typeof(Obj)) )
-			{
-				return Obj;
-			}
-
-			var c = kFunctionL === typeof Obj.pop ? [] : {};
-			var p, v;
-			for(p in Obj)
-			{
-				if(Obj.hasOwnProperty(p))
-				{
-					v = Obj[p];
-					if(v && kObjectL === typeof v )
-					{
-						c[p] = clone(v);
-					}
-					else
-					{
-						c[p] = v;
-					}
-				}
-			}
-			return c;
-		}
 		
 		function trim(val)
 		{
@@ -1267,7 +1239,6 @@
 		window["Asc"].inherit = inherit;
 		window["Asc"].outputDebugStr = outputDebugStr;
 		window["Asc"].isEqual = isEqual;
-		window["Asc"].clone = clone;
 		window["Asc"].profileTime = profileTime;
 		window["Asc"].isNumber = isNumber;
 		window["Asc"].trim = trim;
