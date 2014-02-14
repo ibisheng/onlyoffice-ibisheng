@@ -53,10 +53,6 @@ CDrawingStream.prototype =
     {
         this.Native["transform"](sx,shy,shx,sy,tx,ty);
     },
-    CalculateFullTransform : function(isInvertNeed)
-    {
-        this.Native["CalculateFullTransform"](isInvertNeed);
-    },
     // path commands
     _s : function()
     {
@@ -292,7 +288,7 @@ CDrawingStream.prototype =
             if (_info.SrcBold)      flag |= 0x04;
             if (_info.SrcItalic)    flag |= 0x08;
 
-            this.Native["LoadFont"](_info.Path, _info.FaceIndex, font.FontSize, flag);
+            this.Native["LoadFont"](_info.Path, _info.FaceIndex, _lastFont.SetUpSize, flag);
         }
     },
 
@@ -477,12 +473,12 @@ CDrawingStream.prototype =
 
     StartClipPath : function()
     {
-        // nothing
+        this.Native["StartClipPath"]();
     },
 
     EndClipPath : function()
     {
-        this.Native["Clip"]();
+        this.Native["EndClipPath"]();
     },
 
     StartCheckTableDraw : function()
@@ -502,22 +498,7 @@ CDrawingStream.prototype =
 
     AddSmartRect : function(x, y, w, h, pen_w)
     {
-        return this.Native["SetTextClipRect"](x, y, w, h, pen_w);
-    },
-
-    CheckUseFonts2 : function(m)
-    {
-        this.IsUseFonts2 = this.Native["CheckUseFonts2"](m.sx,m.shy,m.shx,m.sy,m.tx,m.ty);
-        if (this.IsUseFonts2)
-        {
-            if (null == this.m_oLastFont2)
-                this.m_oLastFont2 = new CFontSetup();
-        }
-    },
-
-    UncheckUseFonts2 : function()
-    {
-        this.IsUseFonts2 = false;
+        return this.Native["AddSmartRect"](x, y, w, h, pen_w);
     },
 
     Drawing_StartCheckBounds : function(x, y, w, h)

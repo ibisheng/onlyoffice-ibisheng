@@ -20,49 +20,49 @@ CDrawingDocument.prototype =
     Start_CollaborationEditing : function()
     {
         this.IsLockObjectsEnable = true;
-        this.Native["Start_CollaborationEditing"]();
+        this.Native["DD_Start_CollaborationEditing"]();
     },
 
     // cursor types
     SetCursorType : function(sType, Data)
     {
         this.m_sLockedCursorType = sType;
-        this.Native["SetCursorType"](sType, Data);
+        this.Native["DD_SetCursorType"](sType, Data);
     },
     LockCursorType : function(sType)
     {
         this.m_sLockedCursorType = sType;
-        this.Native["LockCursorType"](sType);
+        this.Native["DD_LockCursorType"](sType);
     },
     LockCursorTypeCur : function()
     {
-        this.m_sLockedCursorType = this.Native["get_LockCursorType"]();
+        this.m_sLockedCursorType = this.Native["DD_get_LockCursorType"]();
     },
     UnlockCursorType : function()
     {
         this.m_sLockedCursorType = "";
-        this.Native["UnlockCursorType"]();
+        this.Native["DD_UnlockCursorType"]();
     },
 
     // calculatePages
     OnStartRecalculate : function(pageCount)
     {
-        this.Native["OnStartRecalculate"](pageCount);
+        this.Native["DD_OnStartRecalculate"](pageCount);
     },
     OnRecalculatePage : function(index, pageObject)
     {
-        this.Native["OnRecalculatePage"](index, pageObject.Width, pageObject.Height,
+        this.Native["DD_OnRecalculatePage"](index, pageObject.Width, pageObject.Height,
             pageObject.Margins.Left, pageObject.Margins.Top, pageObject.Margins.Right, pageObject.Margins.Bottom);
     },
     OnEndRecalculate : function(isFull, isBreak)
     {
-        this.Native["OnEndRecalculate"](isFull, isBreak);
+        this.Native["DD_OnEndRecalculate"](isFull, isBreak);
     },
 
     // repaint pages
     OnRepaintPage : function(index)
     {
-        this.Native["OnRepaintPage"](index);
+        this.Native["DD_OnRepaintPage"](index);
     },
     ChangePageAttack : function(pageIndex)
     {
@@ -70,19 +70,19 @@ CDrawingDocument.prototype =
     },
     ClearCachePages : function()
     {
-        this.Native["ClearCachePages"]();
+        this.Native["DD_ClearCachePages"]();
     },
 
     // is freeze
     IsFreezePage : function(pageIndex)
     {
-        return this.Native["IsFreezePage"](pageIndex);
+        return this.Native["DD_IsFreezePage"](pageIndex);
     },
 
     RenderPageToMemory : function(pageIndex)
     {
         var _stream = new CDrawingStream();
-        _stream.Native = this.Native["GetPageStream"]();
+        _stream.Native = this.Native["DD_GetPageStream"]();
         this.LogicDocument.DrawPage(pageIndex, _stream);
         return _stream.Native;
     },
@@ -104,12 +104,12 @@ CDrawingDocument.prototype =
 
     FirePaint : function()
     {
-        this.Native["FirePaint"]();
+        this.Native["DD_FirePaint"]();
     },
 
     IsCursorInTableCur : function(x, y, page)
     {
-        return this.Native["IsCursorInTable"](x, y, page);
+        return this.Native["DD_IsCursorInTable"](x, y, page);
     },
 
     // convert coords
@@ -117,52 +117,52 @@ CDrawingDocument.prototype =
     {
         var _return = null;
         if (!transform)
-            _return = this.Native["ConvertCoordsToCursor"](x, y, pageIndex);
+            _return = this.Native["DD_ConvertCoordsToCursor"](x, y, pageIndex);
         else
-            _return = this.Native["ConvertCoordsToCursor"](x, y, pageIndex,
+            _return = this.Native["DD_ConvertCoordsToCursor"](x, y, pageIndex,
                 transform.sx, transform.shy, transform.shx, transform.sy, transform.tx, transform.ty);
         return { X : _return[0], Y : _return[1], Error: _return[2] };
     },
 
     ConvertCoordsToAnotherPage : function(x, y, pageCoord, pageNeed)
     {
-        var _return = this.Native["ConvertCoordsToAnotherPage"](x, y, pageCoord, pageNeed);
+        var _return = this.Native["DD_ConvertCoordsToAnotherPage"](x, y, pageCoord, pageNeed);
         return { X : _return[0], Y : _return[1], Error: _return[2] };
     },
 
     // targer
     TargetStart : function()
     {
-        this.Native["TargetStart"]();
+        this.Native["DD_TargetStart"]();
     },
     TargetEnd : function()
     {
-        this.Native["TargetEnd"]();
+        this.Native["DD_TargetEnd"]();
     },
     SetTargetColor : function(r, g, b)
     {
-        this.Native["SetTargetColor"](r, g, b);
+        this.Native["DD_SetTargetColor"](r, g, b);
     },
     UpdateTargetTransform : function(matrix)
     {
         if (matrix)
-            this.Native["UpdateTargetTransform"](matrix.sx, matrix.shy, matrix.shx, matrix.sy, matrix.tx, matrix.ty);
+            this.Native["DD_UpdateTargetTransform"](matrix.sx, matrix.shy, matrix.shx, matrix.sy, matrix.tx, matrix.ty);
         else
-            this.Native["RemoveTargetTransform"]();
+            this.Native["DD_RemoveTargetTransform"]();
     },
     UpdateTarget : function(x, y, pageIndex)
     {
         this.LogicDocument.Set_TargetPos( x, y, pageIndex );
-        this.Native["UpdateTarget"](x, y, pageIndex);
+        this.Native["DD_UpdateTarget"](x, y, pageIndex);
     },
     SetTargetSize : function(size)
     {
         this.m_dTargetSize = size;
-        this.Native["SetTargetSize"](size);
+        this.Native["DD_SetTargetSize"](size);
     },
     TargetShow : function()
     {
-        this.Native["TargetShow"]();
+        this.Native["DD_TargetShow"]();
     },
 
     // track images
@@ -184,21 +184,21 @@ CDrawingDocument.prototype =
     // current page
     SetCurrentPage : function(PageIndex)
     {
-        this.m_lCurrentPage = this.Native["SetCurrentPage"](PageIndex);
+        this.m_lCurrentPage = this.Native["DD_SetCurrentPage"](PageIndex);
     },
 
     // select
     SelectEnabled : function(bIsEnabled)
     {
-        this.Native["SelectEnabled"](bIsEnabled);
+        this.Native["DD_SelectEnabled"](bIsEnabled);
     },
     SelectClear : function()
     {
-        this.Native["SelectClear"]();
+        this.Native["DD_SelectClear"]();
     },
     AddPageSelection : function(pageIndex, x, y, w, h)
     {
-        this.Native["AddPageSelection"](pageIndex, x, y, w, h);
+        this.Native["DD_AddPageSelection"](pageIndex, x, y, w, h);
     },
     OnSelectEnd : function()
     {
@@ -211,11 +211,11 @@ CDrawingDocument.prototype =
     // search
     StartSearch : function()
     {
-        this.Native["StartSearch"]();
+        this.Native["DD_StartSearch"]();
     },
     EndSearch : function(bIsChange)
     {
-        this.Native["EndSearch"](bIsChange);
+        this.Native["DD_EndSearch"](bIsChange);
     },
 
     // ruler states
@@ -225,7 +225,7 @@ CDrawingDocument.prototype =
         this.Table = markup.Table;
 
         // TODO:
-        this.Native["Set_RulerState_Table"](markup, transform);
+        this.Native["DD_Set_RulerState_Table"](markup, transform);
     },
 
     Set_RulerState_Paragraph : function(margins)
@@ -233,18 +233,18 @@ CDrawingDocument.prototype =
         this.Table = null;
         if (margins && margins.Frame)
         {
-            this.Native["Set_RulerState_Paragraph"](margins.L, margins.T, margins.R, margins.B, true, margins.PageIndex);
+            this.Native["DD_Set_RulerState_Paragraph"](margins.L, margins.T, margins.R, margins.B, true, margins.PageIndex);
             this.Frame = margins.Frame;
         }
         else if (margins)
         {
             this.Frame = null;
-            this.Native["Set_RulerState_Paragraph"](margins.L, margins.T, margins.R, margins.B);
+            this.Native["DD_Set_RulerState_Paragraph"](margins.L, margins.T, margins.R, margins.B);
         }
         else
         {
             this.Frame = null;
-            this.Native["Set_RulerState_Paragraph"]();
+            this.Native["DD_Set_RulerState_Paragraph"]();
         }
     },
 
@@ -252,7 +252,7 @@ CDrawingDocument.prototype =
     {
         this.Frame = null;
         this.Table = null;
-        this.Native["Set_RulerState_HdrFtr"](bHeader, Y0, Y1);
+        this.Native["DD_Set_RulerState_HdrFtr"](bHeader, Y0, Y1);
     },
 
     Update_ParaTab : function(Default_Tab, ParaTabs)
@@ -279,7 +279,7 @@ CDrawingDocument.prototype =
             _arr_pos.push(__tabs[i].Pos);
         }
 
-        this.Native["Update_ParaTab"](Default_Tab, _arr_pos, _arr_types);
+        this.Native["DD_Update_ParaTab"](Default_Tab, _arr_pos, _arr_types);
     },
 
     CorrectRulerPosition : function(pos)
@@ -292,13 +292,13 @@ CDrawingDocument.prototype =
 
     UpdateTableRuler : function(isCols, index, position)
     {
-        this.Native["UpdateTableRuler"](isCols, index, position);
+        this.Native["DD_UpdateTableRuler"](isCols, index, position);
     },
 
     // convert pixels
     GetDotsPerMM : function(value)
     {
-        return value * this.Native["GetDotsPerMM"]();
+        return value * this.Native["DD_GetDotsPerMM"]();
     },
     GetMMPerDot : function(value)
     {
@@ -306,7 +306,7 @@ CDrawingDocument.prototype =
     },
     GetVisibleMMHeight : function()
     {
-        return this.Native["GetVisibleMMHeight"]();
+        return this.Native["DD_GetVisibleMMHeight"]();
     },
 
     // вот оооочень важная функция. она выкидывает из кэша неиспользуемые шрифты
@@ -316,9 +316,9 @@ CDrawingDocument.prototype =
 
         for (var i in map_used)
         {
-            this.Native["CheckFontCacheAdd"](map_used[i].Name, map_used[i].Style, map_used[i].Size);
+            this.Native["DD_CheckFontCacheAdd"](map_used[i].Name, map_used[i].Style, map_used[i].Size);
         }
-        this.Native["CheckFontCache"]();
+        this.Native["DD_CheckFontCache"]();
     },
 
     // при загрузке документа - нужно понять какие шрифты используются
@@ -330,33 +330,33 @@ CDrawingDocument.prototype =
     DrawTrack : function(type, matrix, left, top, width, height, isLine, canRotate)
     {
         if (matrix)
-            this.AutoShapesTrack["TrackMatrix"](matrix.sx, matrix.shy, matrix.shx, matrix.sy, matrix.tx, matrix.ty);
+            this.AutoShapesTrack["DD_TrackMatrix"](matrix.sx, matrix.shy, matrix.shx, matrix.sy, matrix.tx, matrix.ty);
         else
-            this.AutoShapesTrack["TrackMatrix"]();
+            this.AutoShapesTrack["DD_TrackMatrix"]();
 
-        this.AutoShapesTrack["DrawTrack"](type, left, top, width, height, isLine, canRotate);
+        this.AutoShapesTrack["DD_DrawTrack"](type, left, top, width, height, isLine, canRotate);
     },
     DrawTrackSelectShapes : function(x, y, w, h)
     {
-        this.AutoShapesTrack["DrawTrackSelectShapes"](x, y, w, h);
+        this.AutoShapesTrack["DD_DrawTrackSelectShapes"](x, y, w, h);
     },
     DrawAdjustment : function(matrix, x, y)
     {
         if (matrix)
-            this.AutoShapesTrack["TrackMatrix"](matrix.sx, matrix.shy, matrix.shx, matrix.sy, matrix.tx, matrix.ty);
+            this.AutoShapesTrack["DD_TrackMatrix"](matrix.sx, matrix.shy, matrix.shx, matrix.sy, matrix.tx, matrix.ty);
         else
-            this.AutoShapesTrack["TrackMatrix"]();
+            this.AutoShapesTrack["DD_TrackMatrix"]();
 
-        this.AutoShapesTrack["DrawAdjustment"](x, y);
+        this.AutoShapesTrack["DD_DrawAdjustment"](x, y);
     },
 
     LockTrackPageNum : function(nPageNum)
     {
-        this.Native["AutoShapesTrackLockPageNum"](nPageNum);
+        this.Native["DD_AutoShapesTrackLockPageNum"](nPageNum);
     },
     UnlockTrackPageNum : function()
     {
-        this.Native["AutoShapesTrackLockPageNum"](-1);
+        this.Native["DD_AutoShapesTrackLockPageNum"](-1);
     },
 
     IsMobileVersion : function()
@@ -366,20 +366,20 @@ CDrawingDocument.prototype =
 
     DrawVerAnchor : function(pageNum, xPos)
     {
-        this.Native["DrawVerAnchor"](pageNum, xPos);
+        this.Native["DD_DrawVerAnchor"](pageNum, xPos);
     },
     DrawHorAnchor : function(pageNum, yPos)
     {
-        this.Native["DrawHorAnchor"](pageNum, yPos);
+        this.Native["DD_DrawHorAnchor"](pageNum, yPos);
     },
 
     // track text (inline)
     StartTrackText : function()
     {
-        this.Native["StartTrackText"]();
+        this.Native["DD_StartTrackText"]();
     },
     EndTrackText : function()
     {
-        this.Native["EndTrackText"]();
+        this.Native["DD_EndTrackText"]();
     }
 };

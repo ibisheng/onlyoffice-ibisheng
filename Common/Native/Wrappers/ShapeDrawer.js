@@ -343,7 +343,7 @@ CShapeDrawer.prototype =
                     var _cx = (this.min_x + this.max_x) / 2;
                     var _cy = (this.min_y + this.max_y) / 2;
                     var _r = Math.max(this.max_x - this.min_x, this.max_y - this.min_y) / 2;
-                    gradObj = _ctx.createRadialGradient(_cx, _cy, 1, _cx, _cy, _r);
+                    this.Graphics["put_BrushGradientRadial"](_cx, _cy, 1, _cx, _cy, _r);
                 }
                 else
                 {
