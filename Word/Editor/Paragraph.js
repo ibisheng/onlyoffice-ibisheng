@@ -20045,7 +20045,7 @@ CParagraphRecalculateStateWrap.prototype =
         this.PageBreak           = null;
         this.SkipPageBreak       = false;
         this.ExtendBoundToBottom = false;
-    },
+    }
 };
 
 function CParagraphRecalculateStateCounter()
