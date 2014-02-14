@@ -6908,15 +6908,21 @@ CMathContent.prototype =
             this.LogicalSelect.end   = 1;
             this.RealSelect.endPos    = 1;
 
-            var start = this.RealSelect.startPos,
-                current   = this.content[this.CurPos].value.typeObj,
-                selectStart = this.content[start].value.typeObj;    // only for draw select
-                                                                    // logical select is "RealPosSelect"
-
-            if(current == MATH_COMP && selectStart == MATH_COMP)
+            // проверка на то, чтобы CEmpty был включен !!! когда идем из мат объекта(например из числителя) и идем наверх, выходим за пределы формулы
+            // если стоим в конце, то this.RealSelect.endPos равен this.content.length и соответственно, нужно сделать проверку на то, что запрашиваем у существующего объекта typeObj (!)
+            var start = this.RealSelect.startPos; // проверяем именно тот, который идет на отрисовку, т.к. логический мб выставлен на мат. объект
+            if(start < this.content.length)
             {
-                this.RealSelect.startPos++;
+                var current   = this.content[this.CurPos].value.typeObj;
+                var selectStart = this.content[start].value.typeObj;    // only for draw select
+
+                if(current == MATH_COMP && selectStart == MATH_COMP)
+                {
+                    this.RealSelect.startPos++;
+                }
             }
+
+
 
            /* if(this.content[this.RealSelect.startPos].value.typeObj == MATH_COMP)
                 console.log("Select is composition");
@@ -7188,29 +7194,6 @@ CMathComposition.prototype =
     },
     SetProperties: function(props)
     {
-        // defaultJc
-        // выравнивание формулы в документе
-
-        // dispDef
-        // свойство: применять/ не применять paragraph settings (в тч defaultJc)
-
-        // added to paragraph settings for margins
-        // rMargin
-        // lMargin
-
-        // mathFont: в качестве font поддерживается только Cambria Math
-        // остальные шрифты  возможно будут поддержаны MS в будущем
-
-        // Default font for math zones
-        // Gives a drop-down list of math fonts that can be used as the default math font to be used in the document.
-        // Currently only Cambria Math has thorough math support, but others such as the STIX fonts are coming soon.
-
-        // http://blogs.msdn.com/b/murrays/archive/2008/10/27/default-document-math-properties.aspx
-
-        // RichEdit Hot Keys
-        // http://blogs.msdn.com/b/murrays/archive/2013/10/30/richedit-hot-keys.aspx
-
-
         if(props.naryLim == NARY_UndOvr || props.naryLim  == NARY_SubSup)
             this.props.naryLim = props.naryLim;
 
@@ -7228,6 +7211,43 @@ CMathComposition.prototype =
         // в случае если smallFrac = true,
         if(props.smallFrac == true || props.smallFrac == false)
             this.props.smallFrac = props.smallFrac;
+
+        // http://msdn.microsoft.com/en-us/library/ff529906(v=office.12).aspx
+        // Word ignores the interSp attribute and fails to write it back out.
+        this.props.interSp = props.interSp;
+
+        // http://msdn.microsoft.com/en-us/library/ff529301(v=office.12).aspx
+        // Word does not implement this feature and does not write the intraSp element.
+
+        // for document
+
+        // defaultJc
+        // выравнивание формулы в документе
+
+        this.props.defJc = props.defJc;
+
+        // dispDef
+        // свойство: применять/ не применять paragraph settings (в тч defaultJc)
+
+        this.props.dispDef = props.dispDef;
+
+
+
+        // added to paragraph settings for margins
+        // rMargin
+        // lMargin
+
+        // mathFont: в качестве font поддерживается только Cambria Math
+        // остальные шрифты  возможно будут поддержаны MS в будущем
+
+        // Default font for math zones
+        // Gives a drop-down list of math fonts that can be used as the default math font to be used in the document.
+        // Currently only Cambria Math has thorough math support, but others such as the STIX fonts are coming soon.
+
+        // http://blogs.msdn.com/b/murrays/archive/2008/10/27/default-document-math-properties.aspx
+
+        // RichEdit Hot Keys
+        // http://blogs.msdn.com/b/murrays/archive/2013/10/30/richedit-hot-keys.aspx
 
     },
     GetShiftCenter: function(oMeasure, font)

@@ -18,7 +18,7 @@ CSignRadical.prototype.draw = function(x, y, pGraphics)
     var x1 = this.pos.x + x,
         x2 = x1 + 0.25*this.widthSlash;
 
-    var y2 = this.pos.y + y + this.size.height -this.sizeTick.height,
+    var y2 = this.pos.y + y + this.size.height - this.sizeTick.height,
         y1 = y2 + 0.11*this.widthSlash;
 
 
