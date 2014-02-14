@@ -281,7 +281,7 @@ CDrawingStream.prototype =
             _lastFont.SetUpSize = _lastFont.Size;
             _lastFont.SetUpStyle = _style;
 
-            var _info = GetLoadInfoForMeasurer(window.g_font_infos[_lastFont.SetUpIndexx], _style);
+            var _info = GetLoadInfoForMeasurer(window.g_font_infos[_lastFont.SetUpIndex], _style);
             var flag = 0;
             if (_info.NeedBold)     flag |= 0x01;
             if (_info.NeedItalic)   flag |= 0x02;
