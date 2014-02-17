@@ -3042,7 +3042,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				ws.objectRender.controller.applyColorScheme();
 
 				// На view-режиме не нужно отправлять стили
-				if (true !== this.asc_getViewerMode()) {
+				if (true !== this.asc_getViewerMode() && !this.isMobileVersion) {
 					// Отправка стилей
 					this._sendWorkbookStyles();
 				}
