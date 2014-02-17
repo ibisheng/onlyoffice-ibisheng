@@ -856,39 +856,7 @@ CChartsDrawer.prototype =
 		var trueWidth = this.calcProp.trueWidth;
 		var trueHeight = this.calcProp.trueHeight;
 		
-		if ('Bar' == this.calcProp.type || 'HBar' == this.calcProp.type) {
-			var mainKoff = 0.43;
-			var data = this.calcProp.data[0];
-			var lengthOfData = this.calcProp.data.length;
-			if (this.calcProp.subType == 'stacked' && 'Bar' == this.calcProp.type || this.calcProp.subType == 'stackedPer' || this.calcProp.subType == 'stacked') {
-				data = this.calcProp.data;
-				mainKoff = 0.597;
-			}
-			else if (1 == this.calcProp.data.length) {
-				mainKoff = 0.597;
-			}
-			else if (2 == this.calcProp.data.length) {
-				mainKoff = 0.43;
-			}
-			else {
-				var tempKoff = 0.188;
-				for (var j = 2; j < this.calcProp.data.length; j++) {
-					mainKoff = mainKoff - tempKoff / (j);
-					if(mainKoff < 0.05)
-						break;
-					if(mainKoff - tempKoff / (j+1) < 0)
-						tempKoff = tempKoff/10;
-				}
-			}
-
-
-			var pointKoff = 1 - Math.abs(mainKoff);
-			if ('HBar' == this.calcProp.type)
-				this.calcProp.vmargin = ((trueHeight - trueHeight * pointKoff) / 2) / (lengthOfData);
-			else
-				this.calcProp.hmargin = ((trueWidth - trueWidth * pointKoff) / 2) / lengthOfData;
-		}
-		else if('Line' == this.calcProp.type)
+		if('Line' == this.calcProp.type)
 		{
 			var lengthOfData = this.calcProp.data[0].length;
 			var widthChart = (trueWidth/lengthOfData)*(lengthOfData - 1) + 5;
