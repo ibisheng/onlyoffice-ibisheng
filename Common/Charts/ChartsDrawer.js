@@ -880,8 +880,9 @@ CChartsDrawer.prototype =
 		
 		var w = widthCanvas - (this.calcProp.chartGutter._left - this.calcProp.chartGutter._right) / this.calcProp.pxToMM;
 		var h = heightCanvas - (this.calcProp.chartGutter._top - this.calcProp.chartGutter._bottom) / this.calcProp.pxToMM;
+		
 
-        return {w: w/this.calcProp.pxToMM, h: h/this.calcProp.pxToMM};
+        return {w: w / this.calcProp.pxToMM, h: h / this.calcProp.pxToMM, startX: this.calcProp.chartGutter._left / this.calcProp.pxToMM, startY: this.calcProp.chartGutter._top / this.calcProp.pxToMM};
 	},
 	
 	_calculateMarginsChart: function(chartSpace) {
@@ -2121,8 +2122,8 @@ CChartsDrawer.prototype =
 		var convertMatrix = [[1, 0, 0, p], [0, 1, 0, q], [0, 0, 0, r], [0, 0, 0, 1]];
 		
 		var qC = x * convertMatrix[0][3] + y * convertMatrix[1][3] + z * convertMatrix[2][3] + 1;
-		var newX = (x * convertMatrix[0][0] + y * convertMatrix[1][0] + z1 * convertMatrix[2][0] - 0)/(qC);
-		var newY = (x * convertMatrix[0][1] + y * convertMatrix[1][1] + z1 * convertMatrix[2][1] - 0)/(qC);
+		var newX = (x * convertMatrix[0][0] + y * convertMatrix[1][0] + z * convertMatrix[2][0] - 0)/(qC);
+		var newY = (x * convertMatrix[0][1] + y * convertMatrix[1][1] + z * convertMatrix[2][1] - 0)/(qC);
 		return {x: newX, y: newY};
 	},
 	
