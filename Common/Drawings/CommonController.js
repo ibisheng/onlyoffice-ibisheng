@@ -1191,25 +1191,6 @@ DrawingObjectsController.prototype =
 
     getAscChartObject: function()
     {
-        /*if (this.selectedObjects.length === 1)
-         {
-         if ( this.selectedObjects[0].isChart() ) {
-         this.selectedObjects[0].syncAscChart();
-         return new asc_CChart(this.selectedObjects[0].chart);
-         }
-
-         if ( isRealObject(this.curState.group) )
-         {
-         if(this.curState.group.selectedObjects.length === 1)
-         {
-         if ( this.curState.group.selectedObjects[0].isChart() ) {
-         this.curState.group.selectedObjects[0].syncAscChart();
-         return new asc_CChart(this.curState.group.selectedObjects[0].chart);
-         }
-         }
-         }
-         }*/
-
         var chart = null;
         for (var i = 0; i < this.selectedObjects.length; i++) {
             if ( this.selectedObjects[i].isChart() ) {
@@ -1284,15 +1265,15 @@ DrawingObjectsController.prototype =
                 {
                     case "normal":
                     {
-                        return CreateLineChart(chart.series, GROUPING_STANDARD);
+                        return CreateLineChart(chart, GROUPING_STANDARD);
                     }
                     case "stacked":
                     {
-                        return CreateLineChart(chart.series, GROUPING_STACKED);
+                        return CreateLineChart(chart, GROUPING_STACKED);
                     }
                     case "stackedper":
                     {
-                        return CreateLineChart(chart.series, GROUPING_PERCENT_STACKED);
+                        return CreateLineChart(chart, GROUPING_PERCENT_STACKED);
                     }
                 }
                 break;
@@ -1303,18 +1284,18 @@ DrawingObjectsController.prototype =
                 {
                     case "normal":
                     {
-                        return CreateBarChart(chart.series, BAR_GROUPING_CLUSTERED);
+                        return CreateBarChart(chart, BAR_GROUPING_CLUSTERED);
                     }
                     case "stacked":
                     {
-                        return CreateBarChart(chart.series, BAR_GROUPING_STACKED);
+                        return CreateBarChart(chart, BAR_GROUPING_STACKED);
                     }
                     case "stackedper":
                     {
-                        return CreateBarChart(chart.series, BAR_GROUPING_PERCENT_STACKED);
+                        return CreateBarChart(chart, BAR_GROUPING_PERCENT_STACKED);
                     }
                 }
-				break;
+                break;
             }
             case "HBar":
             {
@@ -1322,51 +1303,50 @@ DrawingObjectsController.prototype =
                 {
                     case "normal":
                     {
-                        return CreateHBarChart(chart.series, BAR_GROUPING_CLUSTERED);
+                        return CreateHBarChart(chart, BAR_GROUPING_CLUSTERED);
                     }
                     case "stacked":
                     {
-                        return CreateHBarChart(chart.series, BAR_GROUPING_STACKED);
+                        return CreateHBarChart(chart, BAR_GROUPING_STACKED);
                     }
                     case "stackedper":
                     {
-                        return CreateHBarChart(chart.series, BAR_GROUPING_PERCENT_STACKED);
+                        return CreateHBarChart(chart, BAR_GROUPING_PERCENT_STACKED);
                     }
                 }
                 break;
             }
-			case "Area":
-			{
-				switch(chart.subType.toLowerCase())
-				{
-					case "normal":
+            case "Area":
+            {
+                switch(chart.subType.toLowerCase())
+                {
+                    case "normal":
                     {
-                        return CreateAreaChart(chart.series, GROUPING_STANDARD);
+                        return CreateAreaChart(chart, GROUPING_STANDARD);
                     }
                     case "stacked":
                     {
-                        return CreateAreaChart(chart.series, GROUPING_STACKED);
+                        return CreateAreaChart(chart, GROUPING_STACKED);
                     }
                     case "stackedper":
                     {
-                        return CreateAreaChart(chart.series, GROUPING_PERCENT_STACKED);
-                    } 
-				}
-				break;
-			}
-			case "Pie":
-			{
-				return CreatePieChart(chart.series);
-			}
-			case "Scatter":
-			{
-				return CreateScatterChart(chart.series);
-			}
-			case "Stock":
-			{
-				return CreateStockChart(chart.series);
-				break;
-			}
+                        return CreateAreaChart(chart, GROUPING_PERCENT_STACKED);
+                    }
+                }
+                break;
+            }
+            case "Pie":
+            {
+                return CreatePieChart(chart);
+            }
+            case "Scatter":
+            {
+                return CreateScatterChart(chart);
+            }
+            case "Stock":
+            {
+                return CreateStockChart(chart);
+            }
         }
         return null;
     },

@@ -1397,7 +1397,7 @@ CSchemeColor.prototype =
     }
 };
 
-function CUniColor()
+    function CUniColor()
 {
     this.color = null;
     this.Mods = null;//new CColorModifiers();
@@ -2282,7 +2282,7 @@ CSolidFill.prototype =
         {
             case historyitem_SolidFill_SetColor:
             {
-                thos.color = data.oldColor;
+                this.color = data.oldColor;
                 break;
             }
         }
@@ -2295,7 +2295,7 @@ CSolidFill.prototype =
         {
             case historyitem_SolidFill_SetColor:
             {
-                thos.color = data.newColor;
+                this.color = data.newColor;
                 break;
             }
         }

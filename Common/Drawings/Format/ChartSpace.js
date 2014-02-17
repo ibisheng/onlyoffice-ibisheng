@@ -1930,8 +1930,9 @@ CPageSetup.prototype =
     }
 };
 
-function CreateLineChart(asc_series, type)
+function CreateLineChart(asc_chart, type)
 {
+    var asc_series = asc_chart.series;
     var chart_space = new CChartSpace();
     chart_space.setDate1904(false);
     chart_space.setLang("ru-Ru");
@@ -1965,9 +1966,9 @@ function CreateLineChart(asc_series, type)
     var plot_area = chart.plotArea;
     plot_area.setLayout(new CLayout());
     plot_area.setChart(new CLineChart());
-    plot_area.setCatAx(new CAxis());
+    plot_area.setCatAx(new CCatAx());
     plot_area.catAx.setTitle(new CTitle());
-    plot_area.setValAx(new CAxis());
+    plot_area.setValAx(new CValAx());
     plot_area.valAx.setTitle(new CTitle());
     var title = plot_area.valAx.title;
     title.setTxPr(new CTextBody());
@@ -1981,6 +1982,9 @@ function CreateLineChart(asc_series, type)
     line_chart.setSmooth(false);
     line_chart.addAxId(plot_area.catAx);
     line_chart.addAxId(plot_area.valAx);
+    plot_area.valAx.setCrosses(2);
+    plot_area.valAx.setCrosses(2);
+    var parsedHeaders = asc_chart.parseSeriesHeaders();
     for(var i = 0; i < asc_series.length; ++i)
     {
         var series = new CLineSeries();
@@ -2005,7 +2009,41 @@ function CreateLineChart(asc_series, type)
             pt.setVal(asc_series[i].Val.NumCache[j].val);
             num_cache.addPt(pt);
         }
+        if(parsedHeaders.bTop)
+        {
+            series.setCat(new CCat());
+            var cat = series.cat;
+            cat.setStrRef(new CStrRef());
+            var str_ref = cat.strRef;
+            str_ref.setF(asc_series[i].Cat.Formula);
+            str_ref.setStrCache(new CStrCache());
+            var str_cache = str_ref.strCache;
+            var cat_num_cache = asc_series[i].Cat.NumCache;
+            str_cache.setPtCount(cat_num_cache.length);
+            for(var j= 0; j < cat_num_cache.length; ++j)
+            {
+                var string_pt = new CStringPoint();
+                string_pt.setIdx(j);
+                string_pt.setVal(cat_num_cache[j].val);
+                str_cache.addPt(string_pt);
+            }
+        }
+        if(parsedHeaders.bLeft && asc_series[i].TxCache)
+        {
+            series.setTx(new CTx());
+            var tx= series.tx;
+            tx.setStrRef(new CStrRef());
+            var str_ref = tx.strRef;
+            str_ref.setF(asc_series[i].TxCache.Formula);
+            str_ref.setStrCache(new CStrCache());
+            var str_cache = str_ref.strCache;
+            str_cache.setPtCount(1);
+            str_cache.addPt(new CStringPoint());
+            var pt = str_cache.pt[0];
+            pt.setVal(asc_series[i].TxCache.Tx);
+        }
         line_chart.addSer(series);
+
     }
     var d_lbls = line_chart.dLbls;
     d_lbls.setShowLegendKey(false);
@@ -2073,8 +2111,10 @@ function CreateLineChart(asc_series, type)
     return chart_space;
 }
 
-function CreateBarChart(asc_series, type)
+function CreateBarChart(asc_chart, type)
 {
+
+    var asc_series = asc_chart.series;
     var chart_space = new CChartSpace();
     chart_space.setDate1904(false);
     chart_space.setLang("ru-Ru");
@@ -2091,12 +2131,13 @@ function CreateBarChart(asc_series, type)
     var plot_area = chart.plotArea;
     plot_area.setLayout(new CLayout());
     plot_area.setChart(new CBarChart());
-    plot_area.setCatAx(new CAxis());
-    plot_area.setValAx(new CAxis());
+    plot_area.setCatAx(new CCatAx());
+    plot_area.setValAx(new CValAx());
     var bar_chart = plot_area.chart;
     bar_chart.setBarDir(BAR_DIR_COL);
     bar_chart.setGrouping(type);
     bar_chart.setVaryColors(false);
+    var parsedHeaders = asc_chart.parseSeriesHeaders();
     for(var i = 0; i < asc_series.length; ++i)
     {
         var series = new CBarSeries();
@@ -2118,6 +2159,39 @@ function CreateBarChart(asc_series, type)
             pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
             pt.setVal(asc_series[i].Val.NumCache[j].val);
             num_cache.addPt(pt);
+        }
+        if(parsedHeaders.bTop)
+        {
+            series.setCat(new CCat());
+            var cat = series.cat;
+            cat.setStrRef(new CStrRef());
+            var str_ref = cat.strRef;
+            str_ref.setF(asc_series[i].Cat.Formula);
+            str_ref.setStrCache(new CStrCache());
+            var str_cache = str_ref.strCache;
+            var cat_num_cache = asc_series[i].Cat.NumCache;
+            str_cache.setPtCount(cat_num_cache.length);
+            for(var j= 0; j < cat_num_cache.length; ++j)
+            {
+                var string_pt = new CStringPoint();
+                string_pt.setIdx(j);
+                string_pt.setVal(cat_num_cache[j].val);
+                str_cache.addPt(string_pt);
+            }
+        }
+        if(parsedHeaders.bLeft && asc_series[i].TxCache)
+        {
+            series.setTx(new CTx());
+            var tx= series.tx;
+            tx.setStrRef(new CStrRef());
+            var str_ref = tx.strRef;
+            str_ref.setF(asc_series[i].TxCache.Formula);
+            str_ref.setStrCache(new CStrCache());
+            var str_cache = str_ref.strCache;
+            str_cache.setPtCount(1);
+            str_cache.addPt(new CStringPoint());
+            var pt = str_cache.pt[0];
+            pt.setVal(asc_series[i].TxCache.Tx);
         }
         bar_chart.addSer(series);
     }
@@ -2190,8 +2264,9 @@ function CreateBarChart(asc_series, type)
     return chart_space;
 }
 
-function CreateHBarChart(asc_series, type)
+function CreateHBarChart(asc_chart, type)
 {
+    var asc_series = asc_chart.series;
     var chart_space = new CChartSpace();
     chart_space.setDate1904(false);
     chart_space.setLang("ru-Ru");
@@ -2208,12 +2283,13 @@ function CreateHBarChart(asc_series, type)
     var plot_area = chart.plotArea;
     plot_area.setLayout(new CLayout());
     plot_area.setChart(new CBarChart());
-    plot_area.setCatAx(new CAxis());
-    plot_area.setValAx(new CAxis());
+    plot_area.setCatAx(new CCatAx());
+    plot_area.setValAx(new CValAx());
     var bar_chart = plot_area.chart;
     bar_chart.setBarDir(BAR_DIR_BAR);
     bar_chart.setGrouping(type);
     bar_chart.setVaryColors(false);
+    var parsedHeaders = asc_chart.parseSeriesHeaders();
     for(var i = 0; i < asc_series.length; ++i)
     {
         var series = new CBarSeries();
@@ -2236,6 +2312,41 @@ function CreateHBarChart(asc_series, type)
             pt.setVal(asc_series[i].Val.NumCache[j].val);
             num_cache.addPt(pt);
         }
+
+        if(parsedHeaders.bTop)
+        {
+            series.setCat(new CCat());
+            var cat = series.cat;
+            cat.setStrRef(new CStrRef());
+            var str_ref = cat.strRef;
+            str_ref.setF(asc_series[i].Cat.Formula);
+            str_ref.setStrCache(new CStrCache());
+            var str_cache = str_ref.strCache;
+            var cat_num_cache = asc_series[i].Cat.NumCache;
+            str_cache.setPtCount(cat_num_cache.length);
+            for(var j= 0; j < cat_num_cache.length; ++j)
+            {
+                var string_pt = new CStringPoint();
+                string_pt.setIdx(j);
+                string_pt.setVal(cat_num_cache[j].val);
+                str_cache.addPt(string_pt);
+            }
+        }
+        if(parsedHeaders.bLeft && asc_series[i].TxCache)
+        {
+            series.setTx(new CTx());
+            var tx= series.tx;
+            tx.setStrRef(new CStrRef());
+            var str_ref = tx.strRef;
+            str_ref.setF(asc_series[i].TxCache.Formula);
+            str_ref.setStrCache(new CStrCache());
+            var str_cache = str_ref.strCache;
+            str_cache.setPtCount(1);
+            str_cache.addPt(new CStringPoint());
+            var pt = str_cache.pt[0];
+            pt.setVal(asc_series[i].TxCache.Tx);
+        }
+
         bar_chart.addSer(series);
     }
     bar_chart.setDLbls(new CDLbls());
@@ -2308,8 +2419,9 @@ function CreateHBarChart(asc_series, type)
     return chart_space;
 }
 
-function CreateAreaChart(asc_series, type)
+function CreateAreaChart(asc_chart, type)
 {
+    var asc_series = asc_chart.series;
     var chart_space = new CChartSpace();
     chart_space.setDate1904(false);
     chart_space.setLang("ru-Ru");
@@ -2326,11 +2438,12 @@ function CreateAreaChart(asc_series, type)
     var plot_area = chart.plotArea;
     plot_area.setLayout(new CLayout());
     plot_area.setChart(new CAreaChart());
-    plot_area.setCatAx(new CAxis());
-    plot_area.setValAx(new CAxis());
+    plot_area.setCatAx(new CCatAx());
+    plot_area.setValAx(new CValAx());
     var area_chart = plot_area.chart;
     area_chart.setGrouping(GROUPING_STANDARD);
     area_chart.setVaryColors(false);
+    var parsedHeaders = asc_chart.parseSeriesHeaders();
     for(var i = 0; i < asc_series.length; ++i)
     {
         var series = new CAreaSeries();
@@ -2352,6 +2465,41 @@ function CreateAreaChart(asc_series, type)
             pt.setVal(asc_series[i].Val.NumCache[j].val);
             num_cache.addPt(pt);
         }
+
+        if(parsedHeaders.bTop)
+        {
+            series.setCat(new CCat());
+            var cat = series.cat;
+            cat.setStrRef(new CStrRef());
+            var str_ref = cat.strRef;
+            str_ref.setF(asc_series[i].Cat.Formula);
+            str_ref.setStrCache(new CStrCache());
+            var str_cache = str_ref.strCache;
+            var cat_num_cache = asc_series[i].Cat.NumCache;
+            str_cache.setPtCount(cat_num_cache.length);
+            for(var j= 0; j < cat_num_cache.length; ++j)
+            {
+                var string_pt = new CStringPoint();
+                string_pt.setIdx(j);
+                string_pt.setVal(cat_num_cache[j].val);
+                str_cache.addPt(string_pt);
+            }
+        }
+        if(parsedHeaders.bLeft && asc_series[i].TxCache)
+        {
+            series.setTx(new CTx());
+            var tx= series.tx;
+            tx.setStrRef(new CStrRef());
+            var str_ref = tx.strRef;
+            str_ref.setF(asc_series[i].TxCache.Formula);
+            str_ref.setStrCache(new CStrCache());
+            var str_cache = str_ref.strCache;
+            str_cache.setPtCount(1);
+            str_cache.addPt(new CStringPoint());
+            var pt = str_cache.pt[0];
+            pt.setVal(asc_series[i].TxCache.Tx);
+        }
+
         area_chart.addSer(series);
     }
     area_chart.setDLbls(new CDLbls());
@@ -2423,8 +2571,9 @@ function CreateAreaChart(asc_series, type)
 }
 
 
-function CreatePieChart(asc_series, type)
+function CreatePieChart(asc_chart, type)
 {
+    var asc_series = asc_chart.series;
     var chart_space = new CChartSpace();
     chart_space.setDate1904(false);
     chart_space.setLang("ru-Ru");
@@ -2439,8 +2588,9 @@ function CreatePieChart(asc_series, type)
     plot_area.setChart(new CPieChart());
     var pie_chart = plot_area.chart;
     pie_chart.setVaryColors(true);
-    plot_area.setCatAx(new CAxis());
-    plot_area.setValAx(new CAxis());
+    plot_area.setCatAx(new CCatAx());
+    plot_area.setValAx(new CValAx());
+    var parsedHeaders = asc_chart.parseSeriesHeaders();
     for(var i = 0; i < asc_series.length; ++i)
     {
         var series = new CPieSeries();
@@ -2462,6 +2612,41 @@ function CreatePieChart(asc_series, type)
             pt.setVal(asc_series[i].Val.NumCache[j].val);
             num_cache.addPt(pt);
         }
+
+        if(parsedHeaders.bTop)
+        {
+            series.setCat(new CCat());
+            var cat = series.cat;
+            cat.setStrRef(new CStrRef());
+            var str_ref = cat.strRef;
+            str_ref.setF(asc_series[i].Cat.Formula);
+            str_ref.setStrCache(new CStrCache());
+            var str_cache = str_ref.strCache;
+            var cat_num_cache = asc_series[i].Cat.NumCache;
+            str_cache.setPtCount(cat_num_cache.length);
+            for(var j= 0; j < cat_num_cache.length; ++j)
+            {
+                var string_pt = new CStringPoint();
+                string_pt.setIdx(j);
+                string_pt.setVal(cat_num_cache[j].val);
+                str_cache.addPt(string_pt);
+            }
+        }
+        if(parsedHeaders.bLeft && asc_series[i].TxCache)
+        {
+            series.setTx(new CTx());
+            var tx= series.tx;
+            tx.setStrRef(new CStrRef());
+            var str_ref = tx.strRef;
+            str_ref.setF(asc_series[i].TxCache.Formula);
+            str_ref.setStrCache(new CStrCache());
+            var str_cache = str_ref.strCache;
+            str_cache.setPtCount(1);
+            str_cache.addPt(new CStringPoint());
+            var pt = str_cache.pt[0];
+            pt.setVal(asc_series[i].TxCache.Tx);
+        }
+
         pie_chart.addSer(series);
     }
     pie_chart.setDLbls(new CDLbls());
@@ -2498,8 +2683,9 @@ function CreatePieChart(asc_series, type)
 }
 
 
-function CreateScatterChart(asc_series)
+function CreateScatterChart(asc_chart)
 {
+    var asc_series = asc_chart.series;
     var chart_space = new CChartSpace();
     chart_space.setDate1904(false);
     chart_space.setLang("ru-Ru");
@@ -2515,35 +2701,36 @@ function CreateScatterChart(asc_series)
     var scatter_chart = plot_area.chart;
     scatter_chart.setScatterStyle(SCATTER_STYLE_LINE_MARKER);
     scatter_chart.setVaryColors(false);
-    plot_area.setCatAx(new CAxis());
-    plot_area.setValAx(new CAxis());
-	
-	var first_series = asc_series.length > 1 ? asc_series[0] : null;
+    plot_area.setCatAx(new CCatAx());
+    plot_area.setValAx(new CValAx());
+
+    var first_series = asc_series.length > 1 ? asc_series[0] : null;
     var start_index = asc_series.length > 1 ? 1 : 0;
+    var parsedHeaders = asc_chart.parseSeriesHeaders();
     for(var i = start_index; i < asc_series.length; ++i)
     {
         var series = new CScatterSeries();
         series.setIdx(i);
         series.setOrder(i);
-		if(first_series)
-		{
-			series.setXVal(new CXVal());
-			var x_val = series.xVal;
-			x_val.setNumRef(new CNumRef());
-			var num_ref = x_val.numRef;
-			num_ref.setF(first_series.Val.Formula);
-			num_ref.setNumCache(new CNumLit());
-			var num_cache = num_ref.numCache;
-			num_cache.setPtCount(first_series.Val.NumCache.length);
-			for(var j = 0; j < first_series.Val.NumCache.length; ++j)
-			{
-				var pt = new CNumericPoint();
-				pt.setIdx(j);
-				pt.setFormatCode(first_series.Val.NumCache[j].numFormatStr);
-				pt.setVal(first_series.Val.NumCache[j].val);
-				num_cache.addPt(pt);
-			}
-		}
+        if(first_series)
+        {
+            series.setXVal(new CXVal());
+            var x_val = series.xVal;
+            x_val.setNumRef(new CNumRef());
+            var num_ref = x_val.numRef;
+            num_ref.setF(first_series.Val.Formula);
+            num_ref.setNumCache(new CNumLit());
+            var num_cache = num_ref.numCache;
+            num_cache.setPtCount(first_series.Val.NumCache.length);
+            for(var j = 0; j < first_series.Val.NumCache.length; ++j)
+            {
+                var pt = new CNumericPoint();
+                pt.setIdx(j);
+                pt.setFormatCode(first_series.Val.NumCache[j].numFormatStr);
+                pt.setVal(first_series.Val.NumCache[j].val);
+                num_cache.addPt(pt);
+            }
+        }
         series.setYVal(new CYVal());
         var y_val = series.yVal;
         y_val.setNumRef(new CNumRef());
@@ -2560,9 +2747,42 @@ function CreateScatterChart(asc_series)
             pt.setVal(asc_series[i].Val.NumCache[j].val);
             num_cache.addPt(pt);
         }
+        if(parsedHeaders.bTop)
+        {
+            series.setCat(new CCat());
+            var cat = series.cat;
+            cat.setStrRef(new CStrRef());
+            var str_ref = cat.strRef;
+            str_ref.setF(asc_series[i].Cat.Formula);
+            str_ref.setStrCache(new CStrCache());
+            var str_cache = str_ref.strCache;
+            var cat_num_cache = asc_series[i].Cat.NumCache;
+            str_cache.setPtCount(cat_num_cache.length);
+            for(var j= 0; j < cat_num_cache.length; ++j)
+            {
+                var string_pt = new CStringPoint();
+                string_pt.setIdx(j);
+                string_pt.setVal(cat_num_cache[j].val);
+                str_cache.addPt(string_pt);
+            }
+        }
+        if(parsedHeaders.bLeft && asc_series[i].TxCache)
+        {
+            series.setTx(new CTx());
+            var tx= series.tx;
+            tx.setStrRef(new CStrRef());
+            var str_ref = tx.strRef;
+            str_ref.setF(asc_series[i].TxCache.Formula);
+            str_ref.setStrCache(new CStrCache());
+            var str_cache = str_ref.strCache;
+            str_cache.setPtCount(1);
+            str_cache.addPt(new CStringPoint());
+            var pt = str_cache.pt[0];
+            pt.setVal(asc_series[i].TxCache.Tx);
+        }
         scatter_chart.addSer(series);
     }
-	scatter_chart.setDLbls(new CDLbls());
+    scatter_chart.setDLbls(new CDLbls());
     scatter_chart.addAxId(plot_area.catAx);
     scatter_chart.addAxId(plot_area.valAx);
     var d_lbls = scatter_chart.dLbls;
@@ -2624,8 +2844,9 @@ function CreateScatterChart(asc_series)
     return chart_space;
 }
 
-function CreateStockChart(asc_series)
+function CreateStockChart(asc_chart)
 {
+    var asc_series = asc_chart.series;
     var chart_space = new CChartSpace();
     chart_space.setDate1904(false);
     chart_space.setLang("ru-Ru");
@@ -2644,8 +2865,8 @@ function CreateStockChart(asc_series)
     var plot_area = chart.plotArea;
     plot_area.setLayout(new CLayout());
     plot_area.setChart(new CStockChart());
-    plot_area.setCatAx(new CAxis());
-    plot_area.setValAx(new CAxis());
+    plot_area.setCatAx(new CCatAx());
+    plot_area.setValAx(new CValAx());
     var line_chart = plot_area.chart;
     line_chart.setDLbls(new CDLbls());
     line_chart.addAxId(plot_area.catAx);
@@ -2655,6 +2876,7 @@ function CreateStockChart(asc_series)
     line_chart.upDownBars.setGapWidth(150);
     line_chart.upDownBars.setUpBars(new CSpPr());
     line_chart.upDownBars.setDownBars(new CSpPr());
+    var parsedHeaders = asc_chart.parseSeriesHeaders();
     for(var i = 0; i < asc_series.length; ++i)
     {
         var series = new CLineSeries();
@@ -2679,6 +2901,41 @@ function CreateStockChart(asc_series)
             pt.setVal(asc_series[i].Val.NumCache[j].val);
             num_cache.addPt(pt);
         }
+
+        if(parsedHeaders.bTop)
+        {
+            series.setCat(new CCat());
+            var cat = series.cat;
+            cat.setStrRef(new CStrRef());
+            var str_ref = cat.strRef;
+            str_ref.setF(asc_series[i].Cat.Formula);
+            str_ref.setStrCache(new CStrCache());
+            var str_cache = str_ref.strCache;
+            var cat_num_cache = asc_series[i].Cat.NumCache;
+            str_cache.setPtCount(cat_num_cache.length);
+            for(var j= 0; j < cat_num_cache.length; ++j)
+            {
+                var string_pt = new CStringPoint();
+                string_pt.setIdx(j);
+                string_pt.setVal(cat_num_cache[j].val);
+                str_cache.addPt(string_pt);
+            }
+        }
+        if(parsedHeaders.bLeft && asc_series[i].TxCache)
+        {
+            series.setTx(new CTx());
+            var tx= series.tx;
+            tx.setStrRef(new CStrRef());
+            var str_ref = tx.strRef;
+            str_ref.setF(asc_series[i].TxCache.Formula);
+            str_ref.setStrCache(new CStrCache());
+            var str_cache = str_ref.strCache;
+            str_cache.setPtCount(1);
+            str_cache.addPt(new CStringPoint());
+            var pt = str_cache.pt[0];
+            pt.setVal(asc_series[i].TxCache.Tx);
+        }
+
         line_chart.addSer(series);
     }
     var d_lbls = line_chart.dLbls;

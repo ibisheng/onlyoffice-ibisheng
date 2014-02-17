@@ -217,8 +217,8 @@ function CAreaSeries()
     this.spPr           = null;
     this.trendline      = null;
 
-	this.tx  = null;
-	this.val = null; 
+    this.tx  = null;
+    this.val = null;
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -239,102 +239,102 @@ CAreaSeries.prototype =
         w.WriteLong(this.getObjectType());
         w.WriteString2(this.Get_Id());
     },
-	
-	getSeriesName: function()
-	{
-		if(this.tx)
-		{
-			if(typeof this.tx.val === "string")
-			{
-				return this.tx.val;
-			}
-			if(this.tx.strRef 
-			&& this.tx.strRef.strCache 
-			&& this.tx.strRef.strCache.pt.length > 0
-			&& this.tx.strRef.strCache.pt[0]
-			&& typeof this.tx.strRef.strCache.pt[0].val === "string")
-			{
-				return this.tx.strRef.strCache.pt[0].val;
-			}
-		}
-		return "Series " + this.idx;
-	},
-	
-	getCatName: function(idx)
-	{
-		var pts;
-		var cat;
-		if(this.cat)
-		{
-			cat = this.cat;
-		}
-		else if(this.xVal)
-		{
-			cat = this.xVal;
-		}
-		
-		if(cat)
-		{
-			if(cat && cat.strRef && cat.strRef.strCache)
-			{
-				pts = cat.strRef.strCache.pt;
-			}
-			else if(cat.numRef && cat.numRef.numCache)
-			{
-				pts = cat.numRef.numCache.pts;
-			}
-			if(Array.isArray(pts))
-			{
-				for(var i = 0; i < pts.length; ++i)
-				{
-					if(pts[i].idx === idx)
-					{
-						return pts[i].val + "";
-					}
-				}
-			}
-		}
-		return idx + "";
-	},
 
-	getValByIndex: function(idx)
-	{
-		var pts;
-		var val;
-		if(this.val)
-		{
-			val = this.val;
-		}
-		else if(this.yVal)
-		{
-			val = this.yVal;
-		}
-		
-		if(val)
-		{
-			if(val && val.strRef && val.strRef.strCache)
-			{
-				pts = val.strRef.strCache.pt;
-			}
-			else if(val.numRef && val.numRef.numCache)
-			{
-				pts = val.numRef.numCache.pts;
-			}
-			if(Array.isArray(pts))
-			{
-				for(var i = 0; i < pts.length; ++i)
-				{
-					if(pts[i].idx === idx)
-					{
-						return pts[i].val + "";
-					}
-				}
-			}
-		}
-		return "";
-	},
-	
-	setCat: function(pr)
+    getSeriesName: function()
+    {
+        if(this.tx)
+        {
+            if(typeof this.tx.val === "string")
+            {
+                return this.tx.val;
+            }
+            if(this.tx.strRef
+                && this.tx.strRef.strCache
+                && this.tx.strRef.strCache.pt.length > 0
+                && this.tx.strRef.strCache.pt[0]
+                && typeof this.tx.strRef.strCache.pt[0].val === "string")
+            {
+                return this.tx.strRef.strCache.pt[0].val;
+            }
+        }
+        return "Series " + this.idx;
+    },
+
+    getCatName: function(idx)
+    {
+        var pts;
+        var cat;
+        if(this.cat)
+        {
+            cat = this.cat;
+        }
+        else if(this.xVal)
+        {
+            cat = this.xVal;
+        }
+
+        if(cat)
+        {
+            if(cat && cat.strRef && cat.strRef.strCache)
+            {
+                pts = cat.strRef.strCache.pt;
+            }
+            else if(cat.numRef && cat.numRef.numCache)
+            {
+                pts = cat.numRef.numCache.pts;
+            }
+            if(Array.isArray(pts))
+            {
+                for(var i = 0; i < pts.length; ++i)
+                {
+                    if(pts[i].idx === idx)
+                    {
+                        return pts[i].val + "";
+                    }
+                }
+            }
+        }
+        return idx + "";
+    },
+
+    getValByIndex: function(idx)
+    {
+        var pts;
+        var val;
+        if(this.val)
+        {
+            val = this.val;
+        }
+        else if(this.yVal)
+        {
+            val = this.yVal;
+        }
+
+        if(val)
+        {
+            if(val && val.strRef && val.strRef.strCache)
+            {
+                pts = val.strRef.strCache.pt;
+            }
+            else if(val.numRef && val.numRef.numCache)
+            {
+                pts = val.numRef.numCache.pts;
+            }
+            if(Array.isArray(pts))
+            {
+                for(var i = 0; i < pts.length; ++i)
+                {
+                    if(pts[i].idx === idx)
+                    {
+                        return pts[i].val + "";
+                    }
+                }
+            }
+        }
+        return "";
+    },
+
+    setCat: function(pr)
     {
         History.Add(this, {Type: historyitem_AreaSeries_SetCat, oldPr: this.cat, newPr: pr});
         this.cat = pr;
@@ -378,14 +378,14 @@ CAreaSeries.prototype =
     {
         History.Add(this, {Type: historyitem_AreaSeries_SetTrendline, oldPr: this.trendline, newPr: pr});
         this.trendline = pr;
-    }, 
-	setTx: function(pr)
+    },
+    setTx: function(pr)
     {
         History.Add(this, {Type: historyitem_AreaSeries_SetTrendline, oldPr: this.trendline, newPr: pr});
         this.tx = pr;
     },
 
-	setVal: function(pr)
+    setVal: function(pr)
     {
         History.Add(this, {Type: historyitem_AreaSeries_SetTrendline, oldPr: this.trendline, newPr: pr});
         this.val = pr;
@@ -1370,6 +1370,598 @@ CAxis.prototype =
     }
 };
 
+
+
+function CCatAx()
+{
+    this.auto            = null;
+    this.axId            = null;
+    this.axPos           = null;
+    this.crossAx         = null;
+    this.crosses         = null;
+    this.crossesAt       = null;
+    this.bDelete          = null;
+    this.extLst          = null;
+    this.lblAlgn         = null;
+    this.lblOffset       = null;
+    this.majorGridlines  = null;
+    this.majorTickMark   = null;
+    this.minorGridlines  = null;
+    this.minorTickMark   = null;
+    this.noMultiLvlLbl   = null;
+    this.numFmt          = null;
+    this.scaling         = null;
+    this.spPr            = null;
+    this.tickLblPos      = null;
+    this.tickLblSkip     = null;
+    this.tickMarkSkip    = null;
+    this.title           = null;
+    this.txPr            = null;
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
+
+}
+
+
+CCatAx.prototype =
+{
+    getObjectType: function()
+    {
+        return historyitem_type_CatAx;
+    },
+
+    Write_ToBinary: function(w)
+    {
+        w.WriteLong(this.getObjectType());
+        w.WriteString2(this.Get_Id());
+    },
+
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.GetString2();
+    },
+
+    setAuto: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CatAxSetAuto, oldPr: this.auto, newPr:pr});
+        this.auto = pr;
+    },
+    setAxId: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CatAxSetAxId, oldPr: this.axId, newPr:pr});
+        this.axId = pr;
+    },
+    setAxPos: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CatAxSetAxPos, oldPr: this.axPos, newPr:pr});
+        this.axPos = pr;
+    },
+    setCrossAx: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CatAxSetCrossAx, oldPr: this.crossAx, newPr:pr});
+        this.crossAx = pr;
+    },
+    setCrosses: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CatAxSetCrosses, oldPr: this.crosses, newPr:pr});
+        this.crosses = pr;
+    },
+    setCrossesAt: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CatAxSetCrossesAt, oldPr: this.crossesAt, newPr:pr});
+        this.crossesAt = pr;
+    },
+    setDelete: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CatAxSetDelete, oldPr: this.bDelete, newPr:pr});
+        this.bDelete = pr;
+    },
+    setExtLst: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CatAxSetExtLst, oldPr: this.extLst, newPr:pr});
+        this.extLst = pr;
+    },
+    setLblAlgn: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CatAxSetLblAlgn, oldPr: this.lblAlgn, newPr:pr});
+        this.lblAlgn = pr;
+    },
+    setLblOffset: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CatAxSetLblOffset, oldPr: this.lblOffset, newPr:pr});
+        this.lblOffset = pr;
+    },
+    setMajorGridlines: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CatAxSetMajorGridlines, oldPr: this.majorGridlines, newPr:pr});
+        this.majorGridlines = pr;
+    },
+    setMajorTickMark: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CatAxSetMajorTickMark, oldPr: this.majorTickMark, newPr:pr});
+        this.majorTickMark = pr;
+    },
+    setMinorGridlines: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CatAxSetMinorGridlines, oldPr: this.minorGridlines, newPr:pr});
+        this.minorGridlines = pr;
+    },
+    setMinorTickMark: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CatAxSetMinorTickMark, oldPr: this.minorTickMark, newPr:pr});
+        this.minorTickMark = pr;
+    },
+    setNoMultiLvlLbl: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CatAxSetNoMultiLvlLbl, oldPr: this.noMultiLvlLbl, newPr:pr});
+        this.noMultiLvlLbl = pr;
+    },
+    setNumFmt: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CatAxSetNumFmt, oldPr: this.numFmt, newPr:pr});
+        this.numFmt = pr;
+    },
+    setScaling: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CatAxSetScaling, oldPr: this.scaling, newPr:pr});
+        this.scaling = pr;
+    },
+    setSpPr: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CatAxSetSpPr, oldPr: this.spPr, newPr:pr});
+        this.spPr = pr;
+    },
+    setTickLblPos: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CatAxSetTickLblPos, oldPr: this.tickLblPos, newPr:pr});
+        this.tickLblPos = pr;
+    },
+    setTickLblSkip: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CatAxSetTickLblSkip, oldPr: this.tickLblSkip, newPr:pr});
+        this.tickLblSkip = pr;
+    },
+    setTickMarkSkip: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CatAxSetTickMarkSkip, oldPr: this.tickMarkSkip, newPr:pr});
+        this.tickMarkSkip = pr;
+    },
+    setTitle: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CatAxSetTitle, oldPr: this.title, newPr:pr});
+        this.title = pr;
+    },
+    setTxPr: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CatAxSetTxPr, oldPr: this.txPr, newPr:pr});
+        this.txPr = pr;
+    },
+
+    Undo: function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_CatAxSetAuto:
+            {
+                this.auto = data.oldPr;
+                break;
+            }
+            case historyitem_CatAxSetAxId:
+            {
+                this.axId = data.oldPr;
+                break;
+            }
+            case historyitem_CatAxSetAxPos:
+            {
+                this.axPos = data.oldPr;
+                break;
+            }
+            case historyitem_CatAxSetCrossAx:
+            {
+                this.crossAx = data.oldPr;
+                break;
+            }
+            case historyitem_CatAxSetCrosses:
+            {
+                this.crosses = data.oldPr;
+                break;
+            }
+            case historyitem_CatAxSetCrossesAt:
+            {
+                this.crossesAt = data.oldPr;
+                break;
+            }
+            case historyitem_CatAxSetDelete:
+            {
+                this.bDelete = data.oldPr;
+                break;
+            }
+            case historyitem_CatAxSetExtLst:
+            {
+                this.extLst = data.oldPr;
+                break;
+            }
+            case historyitem_CatAxSetLblAlgn:
+            {
+                this.lblAlgn = data.oldPr;
+                break;
+            }
+            case historyitem_CatAxSetLblOffset:
+            {
+                this.lblOffset = data.oldPr;
+                break;
+            }
+            case historyitem_CatAxSetMajorGridlines:
+            {
+                this.majorGridlines = data.oldPr;
+                break;
+            }
+            case historyitem_CatAxSetMajorTickMark:
+            {
+                this.majorTickMark = data.oldPr;
+                break;
+            }
+            case historyitem_CatAxSetMinorGridlines:
+            {
+                this.minorGridlines = data.oldPr;
+                break;
+            }
+            case historyitem_CatAxSetMinorTickMark:
+            {
+                this.minorTickMark = data.oldPr;
+                break;
+            }
+            case historyitem_CatAxSetNoMultiLvlLbl:
+            {
+                this.noMultiLvlLbl = data.oldPr;
+                break;
+            }
+            case historyitem_CatAxSetNumFmt:
+            {
+                this.numFmt = data.oldPr;
+                break;
+            }
+            case historyitem_CatAxSetScaling:
+            {
+                this.scaling = data.oldPr;
+                break;
+            }
+            case historyitem_CatAxSetSpPr:
+            {
+                this.spPr = data.oldPr;
+                break;
+            }
+            case historyitem_CatAxSetTickLblPos:
+            {
+                this.tickLblPos = data.oldPr;
+                break;
+            }
+            case historyitem_CatAxSetTickLblSkip:
+            {
+                this.tickLblSkip = data.oldPr;
+                break;
+            }
+            case historyitem_CatAxSetTickMarkSkip:
+            {
+                this.tickMarkSkip = data.oldPr;
+                break;
+            }
+            case historyitem_CatAxSetTitle:
+            {
+                this.title = data.oldPr;
+                break;
+            }
+            case historyitem_CatAxSetTxPr:
+            {
+                this.txPr = data.oldPr;
+                break;
+            }
+        }
+    },
+
+    Redo: function(data)
+    {
+
+        switch(data.Type)
+        {
+            case historyitem_CatAxSetAuto:
+            {
+                this.auto = data.newPr;
+                break;
+            }
+            case historyitem_CatAxSetAxId:
+            {
+                this.axId = data.newPr;
+                break;
+            }
+            case historyitem_CatAxSetAxPos:
+            {
+                this.axPos = data.newPr;
+                break;
+            }
+            case historyitem_CatAxSetCrossAx:
+            {
+                this.crossAx = data.newPr;
+                break;
+            }
+            case historyitem_CatAxSetCrosses:
+            {
+                this.crosses = data.newPr;
+                break;
+            }
+            case historyitem_CatAxSetCrossesAt:
+            {
+                this.crossesAt = data.newPr;
+                break;
+            }
+            case historyitem_CatAxSetDelete:
+            {
+                this.bDelete = data.newPr;
+                break;
+            }
+            case historyitem_CatAxSetExtLst:
+            {
+                this.extLst = data.newPr;
+                break;
+            }
+            case historyitem_CatAxSetLblAlgn:
+            {
+                this.lblAlgn = data.newPr;
+                break;
+            }
+            case historyitem_CatAxSetLblOffset:
+            {
+                this.lblOffset = data.newPr;
+                break;
+            }
+            case historyitem_CatAxSetMajorGridlines:
+            {
+                this.majorGridlines = data.newPr;
+                break;
+            }
+            case historyitem_CatAxSetMajorTickMark:
+            {
+                this.majorTickMark = data.newPr;
+                break;
+            }
+            case historyitem_CatAxSetMinorGridlines:
+            {
+                this.minorGridlines = data.newPr;
+                break;
+            }
+            case historyitem_CatAxSetMinorTickMark:
+            {
+                this.minorTickMark = data.newPr;
+                break;
+            }
+            case historyitem_CatAxSetNoMultiLvlLbl:
+            {
+                this.noMultiLvlLbl = data.newPr;
+                break;
+            }
+            case historyitem_CatAxSetNumFmt:
+            {
+                this.numFmt = data.newPr;
+                break;
+            }
+            case historyitem_CatAxSetScaling:
+            {
+                this.scaling = data.newPr;
+                break;
+            }
+            case historyitem_CatAxSetSpPr:
+            {
+                this.spPr = data.newPr;
+                break;
+            }
+            case historyitem_CatAxSetTickLblPos:
+            {
+                this.tickLblPos = data.newPr;
+                break;
+            }
+            case historyitem_CatAxSetTickLblSkip:
+            {
+                this.tickLblSkip = data.newPr;
+                break;
+            }
+            case historyitem_CatAxSetTickMarkSkip:
+            {
+                this.tickMarkSkip = data.newPr;
+                break;
+            }
+            case historyitem_CatAxSetTitle:
+            {
+                this.title = data.newPr;
+                break;
+            }
+            case historyitem_CatAxSetTxPr:
+            {
+                this.txPr = data.newPr;
+                break;
+            }
+        }
+    },
+
+
+    Save_Changes: function()
+    {},
+
+    Load_Changes: function()
+    {}
+};
+
+
+
+function CValAx()
+{
+    this.axId           = null;
+    this.axPos          = null;
+    this.crossAx        = null;
+    this.crossBetween   = null;
+    this.crosses        = null;
+    this.crossesAt      = null;
+    this.bDelete        = null;
+    this.dispUnits      = null;
+    this.extLst         = null;
+    this.majorGridlines = null;
+    this.majorTickMark  = null;
+    this.majorUnit      = null;
+    this.minorGridlines = null;
+    this.minorTickMark  = null;
+    this.minorUnit      = null;
+    this.numFmt         = null;
+    this.scaling        = null;
+    this.spPr           = null;
+    this.tickLblPos     = null;
+    this.title          = null;
+    this.txPr           = null;
+
+
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
+}
+
+
+CValAx.prototype =
+{
+    getObjectType: function()
+    {
+        return historyitem_type_ValAx;
+    },
+
+    Write_ToBinary: function(w)
+    {
+        w.WriteLong(this.getObjectType());
+        w.WriteString2(this.Get_Id());
+    },
+
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.GetString2();
+    },
+
+
+    setAxId: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ValAxSetAxId, oldPr: this.axId, newPr: pr});
+        this.axId = pr;
+    },
+    setAxPos: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ValAxSetAxPos, oldPr: this.axPos, newPr: pr});
+        this.axPos = pr;
+    },
+    setCrossAx: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ValAxSetCrossAx, oldPr: this.crossAx, newPr: pr});
+        this.crossAx = pr;
+    },
+    setCrossBetween: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ValAxSetCrossBetween, oldPr: this.crossBetween, newPr: pr});
+        this.crossBetween = pr;
+    },
+    setCrosses: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ValAxSetCrosses, oldPr: this.crosses, newPr: pr});
+        this.crosses = pr;
+    },
+    setCrossesAt: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ValAxSetCrossesAt, oldPr: this.crossesAt, newPr: pr});
+        this.crossesAt = pr;
+    },
+    setDelete: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ValAxSetDelete, oldPr: this.bDelete, newPr: pr});
+        this.bDelete = pr;
+    },
+    setDispUnits: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ValAxSetDispUnits, oldPr: this.dispUnits, newPr: pr});
+        this.dispUnits = pr;
+    },
+    setExtLst: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ValAxSetExtLst, oldPr: this.extLst, newPr: pr});
+        this.extLst = pr;
+    },
+    setMajorGridlines: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ValAxSetMajorGridlines, oldPr: this.majorGridlines, newPr: pr});
+        this.majorGridlines = pr;
+    },
+    setMajorTickMark: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ValAxSetMajorTickMark, oldPr: this.majorTickMark, newPr: pr});
+        this.majorTickMark = pr;
+    },
+    setMajorUnit: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ValAxSetMajorUnit, oldPr: this.majorUnit, newPr: pr});
+        this.majorUnit = pr;
+    },
+    setMinorGridlines: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ValAxSetMinorGridlines, oldPr: this.minorGridlines, newPr: pr});
+        this.minorGridlines = pr;
+    },
+    setMinorTickMark: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ValAxSetMinorTickMark, oldPr: this.minorTickMark, newPr: pr});
+        this.minorTickMark = pr;
+    },
+    setMinorUnit: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ValAxSetMinorUnit, oldPr: this.minorUnit, newPr: pr});
+        this.minorUnit = pr;
+    },
+    setNumFmt: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ValAxSetNumFmt, oldPr: this.numFmt, newPr: pr});
+        this.numFmt = pr;
+    },
+    setScaling: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ValAxSetScaling, oldPr: this.scaling, newPr: pr});
+        this.scaling = pr;
+    },
+    setSpPr: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ValAxSetSpPr, oldPr: this.spPr, newPr: pr});
+        this.spPr = pr;
+    },
+    setTickLblPos: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ValAxSetTickLblPos, oldPr: this.tickLblPos, newPr: pr});
+        this.tickLblPos = pr;
+    },
+    setTitle: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ValAxSetTitle, oldPr: this.title, newPr: pr});
+        this.title = pr;
+    },
+    setTxPr: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ValAxSetTxPr, oldPr: this.txPr, newPr: pr});
+        this.txPr = pr;
+    },
+
+    Undo: function()
+    {},
+
+
+    Redo: function()
+    {},
+
+    Save_Changes: function()
+    {},
+
+    Load_Changes: function()
+    {}
+};
+
+
 function CBandFmt()
 {
     this.idx = null;
@@ -1841,11 +2433,11 @@ CBarSeries.prototype =
         w.WriteLong(this.getObjectType());
         w.WriteString2(this.Get_Id());
     },
-	
-	getSeriesName: CAreaSeries.prototype.getSeriesName,
-	getCatName: CAreaSeries.prototype.getCatName,
-	getValByIndex: CAreaSeries.prototype.getValByIndex,
-	
+
+    getSeriesName: CAreaSeries.prototype.getSeriesName,
+    getCatName: CAreaSeries.prototype.getCatName,
+    getValByIndex: CAreaSeries.prototype.getValByIndex,
+
     setCat: function(pr)
     {
         History.Add(this, {Type: historyitem_BarSeries_SetCat, oldPr: this.cat, newPr: pr});
@@ -2479,9 +3071,9 @@ CBubbleSeries.prototype =
         return historyitem_type_BubbleSeries;
     },
 
-	getSeriesName: CAreaSeries.prototype.getSeriesName,
-	getCatName: CAreaSeries.prototype.getCatName,
-	getValByIndex: CAreaSeries.prototype.getValByIndex,
+    getSeriesName: CAreaSeries.prototype.getSeriesName,
+    getCatName: CAreaSeries.prototype.getCatName,
+    getValByIndex: CAreaSeries.prototype.getValByIndex,
 
     Write_ToBinary: function(w)
     {
@@ -2821,7 +3413,7 @@ function CCat()
     this.strLit         = null;
     this.strRef         = null;
 
-    this.Id = g_IdCounter.Get_NewId();
+    this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
 
@@ -2860,7 +3452,7 @@ CCat.prototype =
     setStrRef: function(pr)
     {
         History.Add(this, {Type: historyitem_Cat_SetMultiLvlStrRef, oldPr: this.multiLvlStrRef, newPr: pr});
-        this.multiLvlStrRef = pr;
+        this.strRef = pr;
     },
 
     Undo: function(data)
@@ -2994,26 +3586,26 @@ CChartText.prototype =
     {
         return this.Id;
     },
-	
-	merge: function(tx, noCopyTextBody)
-	{
-		if(tx.rich)
-		{
-			if(noCopyTextBody === true)
-			{
-				this.setRich(tx.rich);
-			}
-			else
-			{
-				this.setRich(tx.rich.createDuplicate());
-			}
-			this.rich.setParent(this);
-		}
-		if(tx.strRef)
-		{
-			this.strRef = tx.strRef; 
-		}
-	},
+
+    merge: function(tx, noCopyTextBody)
+    {
+        if(tx.rich)
+        {
+            if(noCopyTextBody === true)
+            {
+                this.setRich(tx.rich);
+            }
+            else
+            {
+                this.setRich(tx.rich.createDuplicate());
+            }
+            this.rich.setParent(this);
+        }
+        if(tx.strRef)
+        {
+            this.strRef = tx.strRef;
+        }
+    },
 
     getObjectType: function()
     {
@@ -3141,41 +3733,42 @@ function CDLbl()
     this.tx = null;
     this.txPr = null;
 
-	this.parent = null;
-	
-	this.anchorX = null;
-	this.anchorY = null;
-	
-	this.recalcInfo = 
-	{
-		recalcTransform: true, 
-		recalcTransformText: true,
-		recalcStyle: true,
-		recalculateTxBody: true,
-		recalculateBrush: true,
-		recalculatePen: true,
-        recalculateContent: true
-	};
-	
-	this.chart = null;//������������ ��� ���������
-	this.series = null;//������������ ��� ���������
-	
-	this.x = 0;
-	this.y = 0;
-	this.calcX = null;
-	this.calcY = null;
-	
+    this.parent = null;
 
-	
-	this.txBody = null;
-	
-	this.transform = new CMatrix();
-	this.transformText = new CMatrix();
+    this.anchorX = null;
+    this.anchorY = null;
+
+    this.recalcInfo =
+    {
+        recalcTransform: true,
+        recalcTransformText: true,
+        recalcStyle: true,
+        recalculateTxBody: true,
+        recalculateBrush: true,
+        recalculatePen: true,
+        recalculateContent: true
+    };
+
+    this.chart = null;//������������ ��� ���������
+    this.series = null;//������������ ��� ���������
+
+    this.x = 0;
+    this.y = 0;
+    this.calcX = null;
+    this.calcY = null;
+
+
+    this.relPosX = null;
+    this.relPosY = null;
+
+    this.txBody = null;
+
+    this.transform = new CMatrix();
+    this.transformText = new CMatrix();
     this.ownTransform = new CMatrix();
     this.ownTransformText = new CMatrix();
 
-
-	this.compiledStyles = null;
+    this.compiledStyles = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -3192,90 +3785,100 @@ CDLbl.prototype =
     {
         return historyitem_type_DLbl;
     },
-	
-	getCompiledFill: function()
-	{
-		return this.spPr && this.spPr.Fill ? this.spPr.Fill : null;
-	},
-	
-	getCompiledLine: function()
-	{
-		return this.spPr && this.spPr.ln ? this.spPr.ln : null;
-	},
-	
-	getCompiledTransparent: function()
-	{
-		return this.spPr && this.spPr.Fill ? this.spPr.Fill.transparent : null;
-	},
-	
-	recalculate: function()
-	{	
-		if(this.bDelete)
-			return;
-		ExecuteNoHistory(function()
-		{
-			if(this.recalcInfo.recalculateBrush)
-			{
-				this.recalculateBrush();
-				this.recalcInfo.recalculateBrush = true;
-			}
-			if(this.recalcInfo.recalculatePen)
-			{
-				this.recalculatePen();
-				this.recalcInfo.recalculatePen = true;
-			}
-			if(this.recalcInfo.recalcStyle)
-			{
-				this.recalculateStyle();
-				this.recalcInfo.recalcStyle = false;
-			}
-			if(this.recalcInfo.recalculateTxBody)
-			{
-				this.recalculateTxBody();
-				this.recalcInfo.recalculateTxBody = false;
-			}
+
+    getCompiledFill: function()
+    {
+        return this.spPr && this.spPr.Fill ? this.spPr.Fill : null;
+    },
+
+    getCompiledLine: function()
+    {
+        return this.spPr && this.spPr.ln ? this.spPr.ln : null;
+    },
+
+    getCompiledTransparent: function()
+    {
+        return this.spPr && this.spPr.Fill ? this.spPr.Fill.transparent : null;
+    },
+
+    getTextWidth: function()
+    {
+
+    },
+
+    getTextHeight: function()
+    {
+
+    },
+
+    recalculate: function()
+    {
+        if(this.bDelete)
+            return;
+        ExecuteNoHistory(function()
+        {
+            if(this.recalcInfo.recalculateBrush)
+            {
+                this.recalculateBrush();
+                this.recalcInfo.recalculateBrush = false;
+            }
+            if(this.recalcInfo.recalculatePen)
+            {
+                this.recalculatePen();
+                this.recalcInfo.recalculatePen = false;
+            }
+            if(this.recalcInfo.recalcStyle)
+            {
+                this.recalculateStyle();
+                //this.recalcInfo.recalcStyle = false;
+            }
+            if(this.recalcInfo.recalculateTxBody)
+            {
+                this.recalculateTxBody();
+                this.recalcInfo.recalculateTxBody = false;
+            }
             if(this.recalcInfo.recalculateContent)
             {
                 this.recalculateContent();
-                this.recalcInfo.recalculateContent = false;
+                //this.recalcInfo.recalculateContent = false;
             }
-			if(this.recalcInfo.recalcTransform)
-			{
-				this.recalculateTransform();
-				this.recalcInfo.recalcTransform = false;
-			}
-			if(this.recalcInfo.recalcTransformText)
-			{
-				this.recalculateTransformText();
-				this.recalcInfo.recalcTransformText = false;
-			}
-			if(this.chart)
-			{
-				this.chart.addToSetPosition(this);
-			}
-		}, this, []);
-	},
-	
-	recalculateBrush: CShape.prototype.recalculateBrush,
-	recalculatePen: CShape.prototype.recalculatePen,
-	
-	getCompiledStyle: function()
-	{
-		return null;
-	},
-	
-	getParentObjects: function()
-	{
-		return this.chart.getParentObjects;
-	},
-	
-	recalculateTransform: function()
-	{
+            if(this.recalcInfo.recalcTransform)
+            {
+                this.recalculateTransform();
+                //this.recalcInfo.recalcTransform = false;
+            }
+            if(this.recalcInfo.recalcTransformText)
+            {
+                this.recalculateTransformText();
+                //this.recalcInfo.recalcTransformText = false;
+            }
+            if(this.chart)
+            {
+                this.chart.addToSetPosition(this);
+            }
+        }, this, []);
+    },
 
-	},
-	
-	recalculateTransformText: function()
-	{
+    recalculateBrush: CShape.prototype.recalculateBrush,
+    recalculatePen: CShape.prototype.recalculatePen,
+
+    getCompiledStyle: function()
+    {
+        return null;
+    },
+
+    getParentObjects: function()
+    {
+        return this.chart.getParentObjects;
+    },
+
+    recalculateTransform: function()
+    {
+
+    },
+
+    recalculateTransformText: function()
+    {
         if (this.txBody === null)
             return;
         this.ownTransformText.Reset();
@@ -3586,89 +4189,96 @@ CDLbl.prototype =
         }
 
         this.transformText = this.ownTransformText.CreateDublicate();
-	},
-	
-	recalculateStyle: function()
-	{
-		ExecuteNoHistory(function()
-		{
-			var styles = new CStyles();
-			var style = new CStyle("dataLblStyle", null, null, null);
-			var text_pr = new CTextPr();
-			text_pr.FontSize = 10;
-			var parent_objects = this.chart.getParentObjects();
-			var theme = parent_objects.theme;
-			
-			var para_pr = new CParaPr();
-			para_pr.Spacing.Before = 0.0;
-			para_pr.Spacing.After = 0.0;
-			para_pr.Spacing.Line = 1;
-			para_pr.Spacing.LineRule = linerule_Auto;
-			style.ParaPr = para_pr;
-			var font_name = theme.themeElements.fontScheme.minorFont.latin;
-			text_pr.RFonts.Ascii    = {Name: font_name, Index: -1};
-			text_pr.RFonts.EastAsia = {Name: font_name, Index: -1};
-			text_pr.RFonts.HAnsi    = {Name: font_name, Index: -1};
-			text_pr.RFonts.CS       = {Name: font_name, Index: -1};
-			text_pr.RFonts.Hint     = {Name: font_name, Index: -1};
-			
-			style.TextPr = text_pr;
+    },
 
-            var chart_text_pr;
-
-			if(this.chart.txPr 
-			&& this.chart.txPr.content 
-			&& this.chart.txPr.content.Content[0]
-			&& this.chart.txPr.content.Content[0].Pr
-			&& this.chart.txPr.content.Content[0].Pr.DefaultRunPr)
-			{
-                chart_text_pr = this.chart.txPr.content.Content[0].Pr.DefaultRunPr;
-				style.TextPr.Merge(chart_text_pr);
-			}
-            if(this instanceof  CTitle)
+    recalculateStyle: function()
+    {
+        ExecuteNoHistory(function()
             {
-                style.TextPr.Bold = true;
-                if(this.parent instanceof CChart)
+                var styles = new CStyles();
+                var style = new CStyle("dataLblStyle", null, null, null);
+                var text_pr = new CTextPr();
+                text_pr.FontSize = 10;
+                var parent_objects = this.chart.getParentObjects();
+                var theme = parent_objects.theme;
+
+                var para_pr = new CParaPr();
+                para_pr.Spacing.Before = 0.0;
+                para_pr.Spacing.After = 0.0;
+                para_pr.Spacing.Line = 1;
+                para_pr.Spacing.LineRule = linerule_Auto;
+                style.ParaPr = para_pr;
+                var font_name = theme.themeElements.fontScheme.minorFont.latin;
+                text_pr.RFonts.Ascii    = {Name: font_name, Index: -1};
+                text_pr.RFonts.EastAsia = {Name: font_name, Index: -1};
+                text_pr.RFonts.HAnsi    = {Name: font_name, Index: -1};
+                text_pr.RFonts.CS       = {Name: font_name, Index: -1};
+                text_pr.RFonts.Hint     = {Name: font_name, Index: -1};
+
+                style.TextPr = text_pr;
+
+                var chart_text_pr;
+
+                if(this.chart.txPr
+                    && this.chart.txPr.content
+                    && this.chart.txPr.content.Content[0]
+                    && this.chart.txPr.content.Content[0].Pr
+                    && this.chart.txPr.content.Content[0].Pr.DefaultRunPr)
                 {
-                    if(chart_text_pr && typeof chart_text_pr.FontSize === "number")
-                        style.TextPr.FontSize *= 1.2;
-                    else
-                        style.TextPr.FontSize = 18;
+                    chart_text_pr = this.chart.txPr.content.Content[0].Pr.DefaultRunPr;
+                    style.TextPr.Merge(chart_text_pr);
                 }
-            }
-			if(this.txPr 
-			&& this.txPr.content
-			&& this.txPr.content.Content[0]
-			&& this.txPr.content.Content[0].Pr
-			&& this.txPr.content.Content[0].Pr.DefaultRunPr)
-			{
-				style.TextPr.Merge(this.txPr.content.Content[0].Pr.DefaultRunPr);
-			}
-			styles.Add(style);
-			this.compiledStyles = {lastId: style.Id, styles: styles};
-		},
-		this, []);
-	},
-	
-	Get_Styles: function(lvl)
-	{
-		if(this.recalcInfo.recalcStyle)
-		{
-			this.recalculateStyle();
-			this.recalcInfo.recalcStyle = false;
-		}
-		return this.compiledStyles;
-	},
-	
-	checkNoLbl: function()
-	{
-		if(this.tx && this.tx.rich)
-			return false;
-		else
-		{
-			return !(this.showSerName || this.showCatName || this.showVal);
-		}
-	},
+                if(this instanceof  CTitle)
+                {
+                    style.TextPr.Bold = true;
+                    if(this.parent instanceof CChart)
+                    {
+                        if(chart_text_pr && typeof chart_text_pr.FontSize === "number")
+                            style.TextPr.FontSize *= 1.2;
+                        else
+                            style.TextPr.FontSize = 18;
+                    }
+                }
+                if(this.txPr
+                    && this.txPr.content
+                    && this.txPr.content.Content[0]
+                    && this.txPr.content.Content[0].Pr
+                    && this.txPr.content.Content[0].Pr.DefaultRunPr)
+                {
+                    style.TextPr.Merge(this.txPr.content.Content[0].Pr.DefaultRunPr);
+                }
+                styles.Add(style);
+                this.compiledStyles = {lastId: style.Id, styles: styles};
+            },
+            this, []);
+    },
+
+    Get_Styles: function(lvl)
+    {
+        if(this.recalcInfo.recalcStyle)
+        {
+            this.recalculateStyle();
+            this.recalcInfo.recalcStyle = false;
+        }
+        return this.compiledStyles;
+    },
+
+    checkNoLbl: function()
+    {
+        if(this.tx && this.tx.rich)
+            return false;
+        else
+        {
+            return !(this.showSerName || this.showCatName || this.showVal);
+        }
+    },
+
+
+    getSizes: function()
+    {
+        var arr_x = [], arr_y = [];
+        arr_x.push(this.ownTransform.TransformPointX())
+    },
 
     getDefaultTextForTxBody: function()
     {
@@ -3695,23 +4305,30 @@ CDLbl.prototype =
 
     getMaxWidth: function(bodyPr)
     {
-        switch (bodyPr.vert)
+        if(!(this.parent && this.chart && this.chart.plotArea && this.chart.plotArea.valAx === this.parent))
         {
-            case nVertTTeaVert:
-            case nVertTTmongolianVert:
-            case nVertTTvert:
-            case nVertTTwordArtVert:
-            case nVertTTwordArtVertRtl:
-            case nVertTTvert270:
+            switch (bodyPr.vert)
             {
-                return this.chart.extY/2;
+                case nVertTTeaVert:
+                case nVertTTmongolianVert:
+                case nVertTTvert:
+                case nVertTTwordArtVert:
+                case nVertTTwordArtVertRtl:
+                case nVertTTvert270:
+                {
+                    return this.chart.extY/2;
+                }
+                case nVertTThorz:
+                {
+                    return this.chart.extX/5
+                }
             }
-            case nVertTThorz:
-            {
-                return this.chart.extX/5
-            }
+            return this.chart.extX/5;
         }
-        return this.chart.extX/5;
+        else
+        {
+            return 20000;//надписи для осей значений не переносятся поэтому выставляем большую ширину.
+        }
     },
 
 
@@ -3719,8 +4336,6 @@ CDLbl.prototype =
     {
         var ret = new CBodyPr();
         ret.setDefault();
-        if(this.parent && this.chart && this.chart.plotArea && this.chart.plotArea.valAx === this.parent)
-            ret.vert = nVertTTvert;
         if(this.txPr && this.txPr.bodyPr)
         {
             ret.merge(this.txPr.bodyPr);
@@ -3811,128 +4426,128 @@ CDLbl.prototype =
         }
     },
 
-	recalculateTxBody: function()
-	{
-		if(this.tx && this.tx.rich)
-		{
-			this.txBody = this.tx.rich;
-		}
-		else
-		{
-			this.txBody = CreateTextBodyFromString(this.getDefaultTextForTxBody(), this.chart.getDrawingDocument(), this);
-		}
-	},
+    recalculateTxBody: function()
+    {
+        if(this.tx && this.tx.rich)
+        {
+            this.txBody = this.tx.rich;
+        }
+        else
+        {
+            this.txBody = CreateTextBodyFromString(this.getDefaultTextForTxBody(), this.chart.getDrawingDocument(), this);
+        }
+    },
 
-	initDefault: function()
-	{
-		this.setDelete(false);
-		this.setDLblPos(DLBL_POS_IN_BASE);
-		this.setIdx(null);
-		this.setLayout(null);
-		this.setNumFmt(null);
-		this.setSeparator(null);
-		this.setShowBubbleSize(false);
-		this.setShowCatName(false);
-		this.setShowLegendKey(false);
-		this.setShowPercent(false);
-		this.setShowSerName(false);
-		this.setShowVal(false);
-		this.setSpPr(null);
-		this.setTx(null);
-		this.setTxPr(null);
-	},
-	
-	merge: function(dLbl, noCopyTxBody)
-	{
-		if(!dLbl)
-			return;
-		if(dLbl.bDelete != null)
-			this.setDelete(dLbl.bDelete);
-		if(dLbl.dLblPos != null)
-			this.setDLblPos(dLbl.dLblPos);
-			
-		if(dLbl.idx != null)
-			this.setIdx(dLbl.idx);
-			
-		if(dLbl.numFmt != null)
-			this.setNumFmt(dLbl.numFmt);
-			
-		if(dLbl.showBubbleSize != null)
-			this.setShowBubbleSize(dLbl.showBubbleSize);
-			
-		if(dLbl.showCatName != null)
-			this.setShowCatName(dLbl.showCatName);
-			
-		if(dLbl.showLegendKey != null)
-			this.setShowLegendKey(dLbl.showLegendKey);
-			
-		if(dLbl.showPercent != null)
-			this.setShowPercent(dLbl.showPercent);
-			
-		if(dLbl.showSerName != null)
-			this.setShowSerName(dLbl.showSerName);
-			
-			
-		if(dLbl.showVal != null)
-			this.setShowVal(dLbl.showVal);
-		
-		if(dLbl.spPr != null)
-		{			
-			if(this.spPr == null)
-			{
-				this.setSpPr(new CSpPr());
-			}
-			if(dLbl.spPr.Fill)
-			{
-				if(this.spPr.Fill == null)
-				{
-					this.spPr.setFill(new CUniFill());
-				}
-				this.spPr.Fill.merge(dLbl.spPr.Fill);
-			}
-			if(dLbl.spPr.ln)
-			{
-				if(this.spPr.ln == null)
-				{
-					this.spPr.setLn(new CLn());
-				}
-				this.spPr.ln.merge(dLbl.spPr.ln);
-			}
-		}
-		if(dLbl.tx)
-		{
-			if(this.tx == null)
-			{
-				this.setTx(new CChartText());
-			}
-			this.tx.merge(dLbl.tx, noCopyTxBody);
-		}
-		if(dLbl.txPr)
-		{
-			if(noCopyTxBody === true)
-			{
-				this.setTxPr(dLbl.txPr);
-			}
-			else
-			{
-				this.setTxPr(dLbl.txPr.createDuplicate());
-			}
-			this.txPr.setParent(this);
-		}
-	},
-	
-    
-	draw: CShape.prototype.draw, 
-	
-	
-	isEmptyPlaceholder: function()
-	{
-		return false;
-	},
-	setPosition: function(x, y)
-	{
-		this.x = x;
-		this.y = y;
+    initDefault: function()
+    {
+        this.setDelete(false);
+        this.setDLblPos(DLBL_POS_IN_BASE);
+        this.setIdx(null);
+        this.setLayout(null);
+        this.setNumFmt(null);
+        this.setSeparator(null);
+        this.setShowBubbleSize(false);
+        this.setShowCatName(false);
+        this.setShowLegendKey(false);
+        this.setShowPercent(false);
+        this.setShowSerName(false);
+        this.setShowVal(false);
+        this.setSpPr(null);
+        this.setTx(null);
+        this.setTxPr(null);
+    },
+
+    merge: function(dLbl, noCopyTxBody)
+    {
+        if(!dLbl)
+            return;
+        if(dLbl.bDelete != null)
+            this.setDelete(dLbl.bDelete);
+        if(dLbl.dLblPos != null)
+            this.setDLblPos(dLbl.dLblPos);
+
+        if(dLbl.idx != null)
+            this.setIdx(dLbl.idx);
+
+        if(dLbl.numFmt != null)
+            this.setNumFmt(dLbl.numFmt);
+
+        if(dLbl.showBubbleSize != null)
+            this.setShowBubbleSize(dLbl.showBubbleSize);
+
+        if(dLbl.showCatName != null)
+            this.setShowCatName(dLbl.showCatName);
+
+        if(dLbl.showLegendKey != null)
+            this.setShowLegendKey(dLbl.showLegendKey);
+
+        if(dLbl.showPercent != null)
+            this.setShowPercent(dLbl.showPercent);
+
+        if(dLbl.showSerName != null)
+            this.setShowSerName(dLbl.showSerName);
+
+
+        if(dLbl.showVal != null)
+            this.setShowVal(dLbl.showVal);
+
+        if(dLbl.spPr != null)
+        {
+            if(this.spPr == null)
+            {
+                this.setSpPr(new CSpPr());
+            }
+            if(dLbl.spPr.Fill)
+            {
+                if(this.spPr.Fill == null)
+                {
+                    this.spPr.setFill(new CUniFill());
+                }
+                this.spPr.Fill.merge(dLbl.spPr.Fill);
+            }
+            if(dLbl.spPr.ln)
+            {
+                if(this.spPr.ln == null)
+                {
+                    this.spPr.setLn(new CLn());
+                }
+                this.spPr.ln.merge(dLbl.spPr.ln);
+            }
+        }
+        if(dLbl.tx)
+        {
+            if(this.tx == null)
+            {
+                this.setTx(new CChartText());
+            }
+            this.tx.merge(dLbl.tx, noCopyTxBody);
+        }
+        if(dLbl.txPr)
+        {
+            if(noCopyTxBody === true)
+            {
+                this.setTxPr(dLbl.txPr);
+            }
+            else
+            {
+                this.setTxPr(dLbl.txPr.createDuplicate());
+            }
+            this.txPr.setParent(this);
+        }
+    },
+
+
+    draw: CShape.prototype.draw,
+
+
+    isEmptyPlaceholder: function()
+    {
+        return false;
+    },
+    setPosition: function(x, y)
+    {
+        this.x = x;
+        this.y = y;
 
         if(this.layout && this.layout.manualLayout)
         {
@@ -3973,13 +4588,20 @@ CDLbl.prototype =
         {
             global_MatrixTransformer.MultiplyAppend(this.transformText, this.chart.getTransformMatrix());
         }
-        this.invertTransform = global_MatrixTransformer.Invert(this.transformText);
+        this.invertTransformText = global_MatrixTransformer.Invert(this.transformText);
 
-        if(this.recalcInfo.recalcTransformText)
-		    this.recalculateTransformText();
-	},
-	
-	Write_ToBinary2: function(w)
+      //  if(this.recalcInfo.recalcTransformText)
+      //      this.recalculateTransformText();
+    },
+
+    setPositionRelative: function(x, y)
+    {
+        this.relPosX = x;
+        this.relPosY = y;
+        this.setPosition(x, y);
+    },
+
+    Write_ToBinary2: function(w)
     {
         w.Write_ToBinary2(this.getObjectType());
         w.WriteString2(this.Id);
@@ -4065,7 +4687,7 @@ CDLbl.prototype =
         History.Add(this, {Type: historyitem_DLbl_SetTxPr, oldPr: this.txPr  , newPr: pr});
         this.txPr = pr;
     },
-	
+
     Undo: function(data)
     {
         switch(data.Type)
@@ -4508,16 +5130,16 @@ CDLbls.prototype =
     {
         return historyitem_type_DLbls;
     },
-	
-	findDLblByIdx: function(idx)
-	{
-		for(var i = 0; i < this.dLbl.length; ++i)
-		{
-			if(this.dLbl[i].idx === idx)
-				return this.dLbl[i];
-		}
-		return null;
-	},
+
+    findDLblByIdx: function(idx)
+    {
+        for(var i = 0; i < this.dLbl.length; ++i)
+        {
+            if(this.dLbl[i].idx === idx)
+                return this.dLbl[i];
+        }
+        return null;
+    },
 
     Write_ToBinary2: function(w)
     {
@@ -4617,14 +5239,14 @@ CDLbls.prototype =
             }
             case historyitem_DLbls_SetDLbl:
             {
-				for(var i = this.dLbl.length - 1; i > -1; --i)
-				{
-					if(this.dLbl[i] === data.newPr)
-					{
-						this.dLbl.splice(i, 1);
-						break;
-					}               
-				}
+                for(var i = this.dLbl.length - 1; i > -1; --i)
+                {
+                    if(this.dLbl[i] === data.newPr)
+                    {
+                        this.dLbl.splice(i, 1);
+                        break;
+                    }
+                }
                 break;
             }
             case historyitem_DLbls_SetDLblPos:
@@ -4828,11 +5450,11 @@ CDLbls.prototype =
             }
             case historyitem_DLbls_SetDLbl:
             {
-				var d_lbl = readObject(r);
-				if(d_lbl)
-				{
-					this.dLbl.push(d_lbl);
-				}
+                var d_lbl = readObject(r);
+                if(d_lbl)
+                {
+                    this.dLbl.push(d_lbl);
+                }
                 break;
             }
             case historyitem_DLbls_SetDLblPos:
@@ -4913,13 +5535,13 @@ function CDPt()
     this.marker           = null;
     this.pictureOptions   = null;
     this.spPr             = null;
-	
-	
-	this.recalcInfo = 
-	{
-		recalcLbl: true
-	}
-	this.compiledLbl = null;
+
+
+    this.recalcInfo =
+    {
+        recalcLbl: true
+    }
+    this.compiledLbl = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -5482,6 +6104,16 @@ var BUILT_IN_UNIT_TEN_MILLIONS = 5;
 var BUILT_IN_UNIT_TEN_THOUSANDS = 6;
 var BUILT_IN_UNIT_TRILLIONS = 7;
 
+var UNIT_MULTIPLIERS = [];
+UNIT_MULTIPLIERS[BUILT_IN_UNIT_BILLIONS]           = 1.0/1000000000.0;
+UNIT_MULTIPLIERS[BUILT_IN_UNIT_HUNDRED_MILLIONS]   = 1.0/100000000.0;
+UNIT_MULTIPLIERS[BUILT_IN_UNIT_HUNDREDS]           = 1.0/100.0;
+UNIT_MULTIPLIERS[BUILT_IN_UNIT_HUNDRED_THOUSANDS]  = 1.0/100000.0;
+UNIT_MULTIPLIERS[BUILT_IN_UNIT_MILLIONS]           = 1.0/1000000.0;
+UNIT_MULTIPLIERS[BUILT_IN_UNIT_TEN_MILLIONS]       = 1.0/10000000.0;
+UNIT_MULTIPLIERS[BUILT_IN_UNIT_TEN_THOUSANDS]      = 1.0/10000.0;
+UNIT_MULTIPLIERS[BUILT_IN_UNIT_TRILLIONS]          = 1.0/1000000000000.0;
+
 function CDispUnits()
 {
     this.builtInUnit  = null;
@@ -5496,6 +6128,18 @@ CDispUnits.prototype =
     Get_Id: function()
     {
         return this.Id;
+    },
+
+    getMultiplier: function()
+    {
+        if(isRealNumber(this.builtInUnit))
+        {
+            if(isRealNumber(UNIT_MULTIPLIERS[this.builtInUnit]))
+                return UNIT_MULTIPLIERS[this.builtInUnit];
+        }
+        else if(isRealNumber(this.custUnit))
+            return this.custUnit;
+        return 1;
     },
 
     getObjectType: function()
@@ -7352,18 +7996,18 @@ CLineChart.prototype =
 
 function CalculateSeriesPenBrush()
 {
-	var is_on = History.IS_On();
-	if(is_on)
-	{
-		History.TurnOff();
-	}
-	
-	var brush = new CUniFill();
-	
-	if(is_on)
-	{
-		History.TurnOn();
-	}
+    var is_on = History.IS_On();
+    if(is_on)
+    {
+        History.TurnOff();
+    }
+
+    var brush = new CUniFill();
+
+    if(is_on)
+    {
+        History.TurnOn();
+    }
 }
 
 function CLineSeries()
@@ -7380,7 +8024,7 @@ function CLineSeries()
     this.trendline     = null;
     this.tx            = null;
     this.val           = null;
-	
+
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -7397,11 +8041,11 @@ CLineSeries.prototype =
     {
         return historyitem_type_LineSeries;
     },
-	
-	getSeriesName: CAreaSeries.prototype.getSeriesName,
-	getCatName: CAreaSeries.prototype.getCatName,
-	getValByIndex: CAreaSeries.prototype.getValByIndex,
-	
+
+    getSeriesName: CAreaSeries.prototype.getSeriesName,
+    getCatName: CAreaSeries.prototype.getCatName,
+    getValByIndex: CAreaSeries.prototype.getValByIndex,
+
     Write_ToBinary: function(w)
     {
         w.WriteLong(this.getObjectType());
@@ -7412,11 +8056,11 @@ CLineSeries.prototype =
     {
         this.Id = r.GetString2();
     },
-	
-	recalculateBrush: function()
-	{
-		
-	},
+
+    recalculateBrush: function()
+    {
+
+    },
 
     setCat: function(pr)
     {
@@ -7772,41 +8416,41 @@ CMarker.prototype =
     {
         this.Id = r.GetString2();
     },
-	
-	merge: function(otherMarker)
-	{
-		if(isRealObject(otherMarker))
-		{
-			if(isRealNumber(otherMarker.size))
-			{
-				this.size = otherMarker.size;
-			}		
-			if(isRealNumber(otherMarker.symbol))
-			{
-				this.symbol = otherMarker.symbol;
-			}
-			if(otherMarker.spPr && (otherMarker.spPr.Fill || otherMarker.spPr.ln))
-			{
-				if(!this.spPr)
-				{
-					this.setSpPr(new CSpPr());
-				}
-				if(otherMarker.spPr.Fill)
-				{
-					this.spPr.setFill(otherMarker.spPr.Fill.createDuplicate());
-				}
-				if(otherMarker.spPr.ln)
-				{
-					if(!this.spPr.ln)
-					{
-						this.spPr.setLn(new CLn());
-					}
-					this.spPr.ln.merge(otherMarker.spPr.ln);
-				}
-			}
-		}
-	},
-	
+
+    merge: function(otherMarker)
+    {
+        if(isRealObject(otherMarker))
+        {
+            if(isRealNumber(otherMarker.size))
+            {
+                this.size = otherMarker.size;
+            }
+            if(isRealNumber(otherMarker.symbol))
+            {
+                this.symbol = otherMarker.symbol;
+            }
+            if(otherMarker.spPr && (otherMarker.spPr.Fill || otherMarker.spPr.ln))
+            {
+                if(!this.spPr)
+                {
+                    this.setSpPr(new CSpPr());
+                }
+                if(otherMarker.spPr.Fill)
+                {
+                    this.spPr.setFill(otherMarker.spPr.Fill.createDuplicate());
+                }
+                if(otherMarker.spPr.ln)
+                {
+                    if(!this.spPr.ln)
+                    {
+                        this.spPr.setLn(new CLn());
+                    }
+                    this.spPr.ln.merge(otherMarker.spPr.ln);
+                }
+            }
+        }
+    },
+
     setSize: function(pr)
     {
         History.Add(this, {Type: historyitem_Marker_SetSize, oldPr: this.size, newPr: pr});
@@ -9705,10 +10349,10 @@ CPieSeries.prototype =
     {
         return historyitem_type_PieSeries;
     },
-	
-	getSeriesName: CAreaSeries.prototype.getSeriesName,
-	getCatName: CAreaSeries.prototype.getCatName,
-	getValByIndex: CAreaSeries.prototype.getValByIndex,
+
+    getSeriesName: CAreaSeries.prototype.getSeriesName,
+    getCatName: CAreaSeries.prototype.getCatName,
+    getValByIndex: CAreaSeries.prototype.getValByIndex,
 
     Write_ToBinary: function(w)
     {
@@ -10667,10 +11311,10 @@ CRadarSeries.prototype =
         return historyitem_type_RadarSeries;
     },
 
-	getSeriesName: CAreaSeries.prototype.getSeriesName,
-	getCatName: CAreaSeries.prototype.getCatName,
-	getValByIndex: CAreaSeries.prototype.getValByIndex,
-	
+    getSeriesName: CAreaSeries.prototype.getSeriesName,
+    getCatName: CAreaSeries.prototype.getCatName,
+    getValByIndex: CAreaSeries.prototype.getValByIndex,
+
     Write_ToBinary2: function()
     {
         w.WriteLong(this.getObjectType());
@@ -11347,11 +11991,11 @@ CScatterSeries.prototype =
         return historyitem_type_ScatterSer;
     },
 
-	
-	getSeriesName: CAreaSeries.prototype.getSeriesName,
-	getCatName: CAreaSeries.prototype.getCatName,
-	getValByIndex: CAreaSeries.prototype.getValByIndex,
-	
+
+    getSeriesName: CAreaSeries.prototype.getSeriesName,
+    getCatName: CAreaSeries.prototype.getCatName,
+    getValByIndex: CAreaSeries.prototype.getValByIndex,
+
     Write_ToBinary2: function(w)
     {
         w.WriteLong(this.getObjectType());
@@ -11760,7 +12404,7 @@ function CTx()
     this.strRef = null;
     this.val    = null;
 
-    this.Id = g_oIdCouter.Get_NewId();
+    this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
 
@@ -12125,13 +12769,13 @@ CStrCache.prototype =
 
     addPt: function(pr)
     {
-        History.Add(this, {Type: historyitem_StrCache_Pt, newPr: pr});
+        History.Add(this, {Type: historyitem_StrCache_AddPt, newPr: pr});
         this.pt.push(pr);
     },
 
     setPtCount: function(pr)
     {
-        History.Add(this, {Type: historyitem_StrCache_PtCount, oldPr: this.ptCount, newPr: pr});
+        History.Add(this, {Type: historyitem_StrCache_SetPtCount, oldPr: this.ptCount, newPr: pr});
         this.ptCount = pr;
     },
 
@@ -12139,19 +12783,19 @@ CStrCache.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_StrCache_Pt:
+            case historyitem_StrCache_AddPt:
             {
-				for(var i = 0; i < this.pt.length; ++i)
-				{
-					if(this.pt[i] === data.newPr)
-					{
-						this.pt.splice(i, 1);
-						break;
-					}
-				}
+                for(var i = 0; i < this.pt.length; ++i)
+                {
+                    if(this.pt[i] === data.newPr)
+                    {
+                        this.pt.splice(i, 1);
+                        break;
+                    }
+                }
                 break;
             }
-            case historyitem_StrCache_PtCount:
+            case historyitem_StrCache_SetPtCount:
             {
                 this.ptCount = data.oldPr;
                 break;
@@ -12163,12 +12807,12 @@ CStrCache.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_StrCache_Pt:
+            case historyitem_StrCache_AddPt:
             {
                 this.pt.push(data.newPr);
                 break;
             }
-            case historyitem_StrCache_PtCount:
+            case historyitem_StrCache_SetPtCount:
             {
                 this.ptCount = data.newPr;
                 break;
@@ -12181,12 +12825,12 @@ CStrCache.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_StrCache_Pt:
+            case historyitem_StrCache_AddPt:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_StrCache_PtCount:
+            case historyitem_StrCache_SetPtCount:
             {
                 writeLong(w, data.newPr);
                 break;
@@ -12199,16 +12843,16 @@ CStrCache.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_StrCache_Pt:
+            case historyitem_StrCache_AddPt:
             {
-				var pt = readObject(r);
-				if(pt)
-				{
-					this.pt.push(pt);
-				}
+                var pt = readObject(r);
+                if(pt)
+                {
+                    this.pt.push(pt);
+                }
                 break;
             }
-            case historyitem_StrCache_PtCount:
+            case historyitem_StrCache_SetPtCount:
             {
                 this.ptCount = readLong(r);
                 break;
@@ -12801,11 +13445,11 @@ CSurfaceSeries.prototype =
     {
         return historyitem_type_SurfaceSeries;
     },
-	
-	
-	getSeriesName: CAreaSeries.prototype.getSeriesName,
-	getCatName: CAreaSeries.prototype.getCatName,
-	getValByIndex: CAreaSeries.prototype.getValByIndex,
+
+
+    getSeriesName: CAreaSeries.prototype.getSeriesName,
+    getCatName: CAreaSeries.prototype.getCatName,
+    getValByIndex: CAreaSeries.prototype.getValByIndex,
 
     Write_ToBinary: function(w)
     {
@@ -14850,3 +15494,80 @@ function CreateTextBodyFromString(str, drawingDocument, parent)
     return tx_body;
 
 }
+
+function CValAxisLabels(chart)
+{
+    this.x = null;
+    this.y = null;
+    this.extX = null;
+    this.extY = null;
+    this.transform = new CMatrix();
+    this.arrLabels = [];
+    this.chart = chart;
+}
+
+CValAxisLabels.prototype =
+{
+    recalculateExtX: function()
+    {
+        var max_ext_x = 0;
+        for(var i = 0; i < this.arrLabels.length; ++i)
+        {
+            if(this.arrLabels[i].extX > max_ext_x)
+            {
+                max_ext_x = this.arrLabels[i].extX;
+            }
+        }
+        this.extX = max_ext_x;
+    },
+
+    getMinWidth: function()
+    {
+        var max_min_width = this.arrLabels[0].txBody.content.Recalculate_MinMaxContentWidth().Min;
+        for(var i = 1; i < this.arrLabels.length; ++i)
+        {
+            var t = this.arrLabels[i].txBody.content.Recalculate_MinMaxContentWidth().Min;
+            if(t > max_min_width)
+                max_min_width = t;
+        }
+        return max_min_width;
+    },
+
+    draw: function(g)
+    {
+        if(this.chart)
+        {
+            g.SetIntegerGrid(false);
+            g.p_width(70);
+            g.transform3(this.chart.transform, false);
+            g.p_color(0, 0, 0, 255);
+            g._s();
+            g._m(this.x, this.y);
+            g._l(this.x + this.extX, this.y + 0);
+            g._l(this.x + this.extX, this.y + this.extY);
+            g._l(this.x + 0, this.y + this.extY);
+            g._z();
+            g.ds();
+            g.SetIntegerGrid(true);
+        }
+        for(var i = 0; i < this.arrLabels.length; ++i)
+        {
+            if(this.arrLabels[i])
+                this.arrLabels[i].draw(g);
+        }
+    },
+
+    setPosition: function(x, y)
+    {
+        this.x = x;
+        this.y = y;
+        for(var i = 0; i < this.arrLabels.length; ++i)
+        {
+            if(this.arrLabels[i])
+            {
+                var lbl = this.arrLabels[i];
+                lbl.setPosition(lbl.relPosX + x, lbl.relPosY + y);
+            }
+        }
+    }
+};

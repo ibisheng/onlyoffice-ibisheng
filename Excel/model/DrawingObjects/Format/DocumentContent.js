@@ -7639,7 +7639,6 @@ CDocumentContent.prototype =
                 }
             }
         }
-
         return false;
     }
 

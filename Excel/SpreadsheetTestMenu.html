@@ -471,6 +471,23 @@
     text-align: center;
     vertical-align: top;
 }
+.chart_type_label
+{
+    background: #ffffff;
+}
+.chart_type_label_selected
+{
+    background: #303030;
+}
+
+.chart_subtype_label
+{
+    background: #ffffff;
+}
+.chart_subtype_label_selected
+{
+    background: #303030;
+}
 </style>
 </head>
 <body>
@@ -2238,6 +2255,26 @@ Format
             <input type='radio' name='legendRadio' id='legendTop' style='margin-left: 10px;'>Top<br>
             <input type='radio' name='legendRadio' id='legendBottom' style='margin-left: 10px;'>Bottom<br>
         </fieldset>
+    </div>
+</div>
+
+<div id="chartAddMenu" style="position: absolute;width: 400px;z-index: 500;display: none; background: #dddddd">
+    <div >
+        <div id="chartTypeMenu" style="height: inherit; width: auto;float:left">
+            <div class="chart_type_label chart_type_label_no_selected" id="gist"><p>Гистограмма</p></div>
+            <div class="chart_type_label chart_type_label_no_selected" id="graphic"><p>График</p></div>
+            <div class="chart_type_label chart_type_label_no_selected" id="pie"><p>Круговая</p></div>
+            <div class="chart_type_label chart_type_label_no_selected" id="hbar"><p>Линейчатая</p></div>
+            <div class="chart_type_label chart_type_label_no_selected" id="area"><p>С областями</p></div>
+            <div class="chart_type_label chart_type_label_no_selected" id="scatter"><p>Точечная</p></div>
+            <div class="chart_type_label chart_type_label_no_selected" id="stock"><p>Биржевая</p></div>
+        </div>
+        <div id="right_subtype" style="float: left; background: #ffffff"></div>
+    </div>
+    <br>
+    <div>
+        <button id="ok_add_chart_button">Ok</button>
+        <button id="cancel_add_chart_button">Cancel</button>
     </div>
 </div>
 <div id="shapeBox" class="options hidden">
