@@ -3428,19 +3428,19 @@ drawDoughnutChart.prototype =
 		var trueWidth = this.chartProp.trueWidth;
 		var trueHeight = this.chartProp.trueHeight;
 
-		var numCache = this.chartProp.series[0].val.numRef.numCache.pts;
 		var sumData;
 		var outRadius = trueHeight/2;
-		var defaultSize = 50;
 		
+		//% from out radius  
+		var defaultSize = 50;
 		var holeSize = this.cShapeDrawer.chart.holeSize ? this.cShapeDrawer.chart.holeSize : defaultSize;
 		
+		//inner radius
 		var radius = outRadius * (holeSize / 100);
 		var step = (outRadius - radius) / this.chartProp.series.length;
 		
 		var xCenter = this.chartProp.chartGutter._left + trueWidth/2;
 		var yCenter = this.chartProp.chartGutter._top + trueHeight/2;
-		
 		
 		for(var n = 0; n < this.chartProp.series.length; n++)
 		{
@@ -3458,7 +3458,6 @@ drawDoughnutChart.prototype =
 				this.paths.series[n][k] = this._calculateSegment(angle, radius, xCenter, yCenter, radius + step * (n + 1), radius + step * n);
 			}
 		}
-       
     },
 	
 	_calculateSegment: function (angle, radius, xCenter, yCenter, radius1, radius2)
@@ -3490,82 +3489,76 @@ drawDoughnutChart.prototype =
 		
 		var pxToMm = this.chartProp.pxToMM;
 		
-		var x0 = xCenter + radius1*Math.cos(stAng);
-		var y0 = yCenter - radius1*Math.sin(stAng);
+		var x2 = xCenter + radius1*Math.cos(stAng);
+		var y2 = yCenter - radius1*Math.sin(stAng);
 		
 		var x1 = xCenter + radius2*Math.cos(stAng);
 		var y1 = yCenter - radius2*Math.sin(stAng);
 		
-		var x2 = xCenter + radius1*Math.cos(stAng + swAng);
-		var y2 = yCenter - radius1*Math.sin(stAng + swAng);
+		var x3 = xCenter + radius1*Math.cos(stAng + swAng);
+		var y3 = yCenter - radius1*Math.sin(stAng + swAng);
 		
-		var x3 = xCenter + radius2*Math.cos(stAng + swAng);
-		var y3 = yCenter - radius2*Math.sin(stAng + swAng);
+		var x4 = xCenter + radius2*Math.cos(stAng + swAng);
+		var y4 = yCenter - radius2*Math.sin(stAng + swAng);
 		
 		path.moveTo(x1  /pxToMm * pathW, y1 / pxToMm * pathH);
-		path.lnTo(x0  /pxToMm * pathW, y0 / pxToMm * pathH);
+		path.lnTo(x2  /pxToMm * pathW, y2 / pxToMm * pathH);
 		path.arcTo(radius1 / pxToMm * pathW, radius1 / pxToMm * pathH, -1 * stAng*cToDeg, -1 * swAng*cToDeg);
-		path.lnTo(x3 / pxToMm * pathW, y3 / pxToMm * pathH);
+		path.lnTo(x4 / pxToMm * pathW, y4 / pxToMm * pathH);
 		path.arcTo(radius2 / pxToMm * pathW, radius2 / pxToMm * pathH,  -1 * stAng*cToDeg - swAng*cToDeg, swAng*cToDeg);
+		path.moveTo(xCenter  /pxToMm * pathW, yCenter / pxToMm * pathH);
 		
-
 		path.recalculate(gdLst);
 		return path;	
 	},
 	
 	_calculateDLbl: function(chartSpace, ser, val)
 	{
-		return {x: 0, y: 0};
 		var pxToMm = this.chartProp.pxToMM;
-		var path = this.paths.series[val].ArrPathCommand;
-		var centerX = path[0].X;
-		var centerY = path[0].Y;
+		var path = this.paths.series[ser][val].ArrPathCommand;
+		var x1 = path[0].X;
+		var y1 = path[0].Y;
 		
-		var radius = path[2].hR;
+		var x2 = path[1].X;
+		var y2 = path[1].Y;
+		
+		var radius1 = path[2].hR;
 		var stAng = path[2].stAng;
 		var swAng = path[2].swAng;
 		
-		var point = this.chartProp.series[0].val.numRef.numCache.pts[val];
+		var radius2 = path[4].hR;
+		var xCenter = path[5].X;
+		var yCenter = path[5].Y;
 		
-		var constMargin = 5 / pxToMm;
+		
+		var newRadius = radius2 + (radius1 - radius2) / 2;
+		var centerX = xCenter + newRadius * Math.cos(-1 * stAng - swAng / 2); 
+		var centerY = yCenter - newRadius * Math.sin(-1 * stAng - swAng / 2); 
+		
+		var point = this.chartProp.series[ser].val.numRef.numCache.pts[val];
 		
 		var width = point.compiledDlb.extX;
 		var height = point.compiledDlb.extY;
 		
-		//TODO высчитать позиции, как в екселе +  ограничения
 		switch ( point.compiledDlb.dLblPos )
 		{
-			case DLBL_POS_BEST_FIT:
-			{
-				break;
-			}
 			case DLBL_POS_CTR:
 			{
-				centerX = centerX + (radius / 2) * Math.cos(-1 * stAng - swAng / 2) - width / 2;
-				centerY = centerY - (radius / 2) * Math.sin(-1 * stAng - swAng / 2) - height / 2;
+				centerX = centerX  - width / 2;
+				centerY = centerY - height / 2;
 				break;
 			}
 			case DLBL_POS_IN_BASE:
 			{
-				centerX = centerX + (radius / 2) * Math.cos(-1 * stAng - swAng / 2) - width / 2;
-				centerY = centerY - (radius / 2) * Math.sin(-1 * stAng - swAng / 2) - height / 2;
-				/*centerX = centerX + radius * Math.cos(-1 * stAng - swAng / 2) - width / 2;
-				centerY = centerY - radius * Math.sin(-1 * stAng - swAng / 2) - height / 2;*/
-				break;
-			}
-			case DLBL_POS_IN_END:
-			{
-				//centerY = centerY + 27 / pxToMm;
-				break;
-			}
-			case DLBL_POS_OUT_END:
-			{
-				//centerY = centerY + 27 / pxToMm;
+				centerX = centerX  - width / 2;
+				centerY = centerY - height / 2;
 				break;
 			}
 		}
 		if(centerX < 0)
 			centerX = 0;
+		if(centerY < 0)
+			centerY = 0;
 		
 		return {x: centerX, y: centerY};
 	},
