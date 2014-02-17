@@ -293,15 +293,17 @@ CChartSpace.prototype.recalculate = function()
             this.recalculateAxisLabels();
             this.recalcInfo.recalculateAxisLabels = false;
         }
-        if(this.recalcInfo.recalculateChart)
-        {
-            this.recalculateChart();
-            this.recalcInfo.recalculateChart = false;
-        }
+
         if(this.recalcInfo.recalculateAxisVal)
         {
             this.recalculateAxis();
             //this.recalcInfo.recalculateAxisVal = false;
+        }
+
+        if(this.recalcInfo.recalculateChart)
+        {
+            this.recalculateChart();
+            this.recalcInfo.recalculateChart = false;
         }
 
 
