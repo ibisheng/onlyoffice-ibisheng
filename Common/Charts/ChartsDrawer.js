@@ -895,6 +895,9 @@ CChartsDrawer.prototype =
 		this.calcProp.chartGutter._left = standartMargin;
 		if(chartSpace.chart.plotArea.valAx.title != null)
 			this.calcProp.chartGutter._left += chartSpace.chart.plotArea.valAx.title.extX * pxToMM;
+			
+		if(!chartSpace.chart.plotArea.valAx.bDelete && chartSpace.chart.plotArea.valAx.labels)
+			this.calcProp.chartGutter._left += chartSpace.chart.plotArea.valAx.labels.extX * pxToMM;
 		
 		//right margin = legend;
 		this.calcProp.chartGutter._right = standartMargin;
@@ -908,6 +911,8 @@ CChartsDrawer.prototype =
 		this.calcProp.chartGutter._bottom = standartMargin;
 		if(chartSpace.chart.plotArea.catAx.title != null)
 			this.calcProp.chartGutter._bottom += chartSpace.chart.plotArea.catAx.title.extY * pxToMM;
+		if(!chartSpace.chart.plotArea.catAx.bDelete && chartSpace.chart.plotArea.catAx.labels)
+			this.calcProp.chartGutter._bottom += chartSpace.chart.plotArea.catAx.labels.extY * pxToMM;
 	},
 	
 	_getNullPosition: function()
