@@ -951,6 +951,11 @@ CHeaderFooter.prototype =
         return this.Content.Get_AllParagraphs_ByNumbering( NumPr, ParaArray );
     },
 
+    Get_PrevElementEndInfo : function(CurElement)
+    {
+        return null;
+    },
+
     // Убираем селект
     Selection_Remove : function()
     {

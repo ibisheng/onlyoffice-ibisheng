@@ -642,6 +642,10 @@ Paragraph.prototype =
 
             if ( this.CurPos.ContentPos > Pos )
                 this.CurPos.ContentPos--;
+
+            // Удаляем комментарий, если это необходимо
+            if ( true === this.DeleteCommentOnRemove && para_Comment === Item.Type )
+                this.LogicDocument.Remove_Comment( Item.Id, true );
         }
     },
 
@@ -3229,6 +3233,10 @@ Paragraph.prototype =
             if ( this.Lines[Index].Metrics.LineGap < 0 )
                 this.Lines[Index].Y += this.Lines[Index].Metrics.LineGap;
         }
+        //-------------------------------------------------------------------------------------------------------------
+        // Получаем некоторую информацию для следующей страницы (например незакрытые комментарии)
+        //-------------------------------------------------------------------------------------------------------------
+        this.Recalculate_PageEndInfo(CurPage);
 
         //-------------------------------------------------------------------------------------------------------------
         // Рассчитываем ширину каждого отрезка, количество слов и пробелов в нем
@@ -4510,6 +4518,55 @@ Paragraph.prototype =
         return recalcresult_NextElement;
     },
 
+    Get_EndInfo : function()
+    {
+        var PagesCount = this.Pages.length;
+
+        if ( PagesCount > 0 )
+            return this.Pages[PagesCount - 1].EndInfo.Copy();
+        else
+            return null;
+    },
+
+    Get_EndInfoByPage : function(CurPage)
+    {
+        // Здесь может приходить отрицательное значение
+
+        if ( CurPage < 0 )
+            return this.Parent.Get_PrevElementEndInfo(this);
+        else
+            return this.Pages[CurPage].EndInfo.Copy();
+    },
+
+    Recalculate_PageEndInfo : function(CurPage)
+    {
+        var PrevInfo = ( 0 === CurPage ? this.Parent.Get_PrevElementEndInfo( this ) : this.Pages[CurPage - 1].EndInfo.Copy() );
+
+        var PRSI = g_oPRSI;
+
+        PRSI.Reset( PrevInfo );
+
+        var StartLine = this.Pages[CurPage].StartLine;
+        var EndLine   = this.Pages[CurPage].EndLine;
+        var LinesCount = this.Lines.length;
+
+        for ( var CurLine = StartLine; CurLine <= EndLine; CurLine++ )
+        {
+            var RangesCount = this.Lines[CurLine].Ranges.length;
+            for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
+            {
+                var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
+                var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
+                for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+                {
+                    this.Content[CurPos].Recalculate_PageEndInfo( PRSI, CurLine, CurRange );
+                }
+            }
+        }
+
+        this.Pages[CurPage].EndInfo.Comments = PRSI.Comments;
+    },
+
     Recalculate_Drawing_AddPageBreak : function(CurLine, CurPage, RemoveDrawings)
     {
         if ( true === RemoveDrawings )
@@ -5281,27 +5338,29 @@ Paragraph.prototype =
         {
             var Item = this.Content[Pos];
 
-            // TODO: разобраться с нумерацией
-            PRS.Update_CurPos( Pos, 0 );
-
-            var SL = Item.Save_Lines();
-            var SavedLines = SL.Lines;
-
-            Item.Recalculate_Range( ParaPr );
-
-            if ( ( true === PRS.NewRange && Pos !== EndPos ) || ( Pos === EndPos && true !== PRS.NewRange ) )
-                return -1;
-            else if ( Pos === EndPos && true === PRS.NewRange && true === PRS.MoveToLBP )
+            if ( para_Comment !== Item.Type )
             {
-                Item.Recalculate_Set_RangeEndPos(PRS, PRS.LineBreakPos, 1);
+                PRS.Update_CurPos( Pos, 0 );
+
+                var SL = Item.Save_Lines();
+                var SavedLines = SL.Lines;
+
+                Item.Recalculate_Range( ParaPr );
+
+                if ( ( true === PRS.NewRange && Pos !== EndPos ) || ( Pos === EndPos && true !== PRS.NewRange ) )
+                    return -1;
+                else if ( Pos === EndPos && true === PRS.NewRange && true === PRS.MoveToLBP )
+                {
+                    Item.Recalculate_Set_RangeEndPos(PRS, PRS.LineBreakPos, 1);
+                }
+
+
+                // Нам нужно проверить только строку с номером CurLine
+                if ( false === SavedLines[CurLine - Item.StartLine].Compare( Item.Lines[CurLine - Item.StartLine], ( CurLine - Item.StartLine === 0 ? CurRange - Item.StartRange : CurRange ) ) )
+                    return -1;
+
+                Item.Restore_Lines( SL );
             }
-
-
-            // Нам нужно проверить только строку с номером CurLine
-            if ( false === SavedLines[CurLine - Item.StartLine].Compare( Item.Lines[CurLine - Item.StartLine], ( CurLine - Item.StartLine === 0 ? CurRange - Item.StartRange : CurRange ) ) )
-                return -1;
-
-            Item.Restore_Lines( SL );
         }
 
         // Recalculate_Lines_Width
@@ -6221,7 +6280,7 @@ Paragraph.prototype =
             var DrawFind = editor.WordControl.m_oLogicDocument.SearchEngine.Selection;
             var DrawColl = ( undefined === pGraphics.RENDERER_PDF_FLAG ? false : true );
 
-            PDSH.Reset( this, pGraphics, DrawColl, DrawFind, DrawComm, CommentsFlag );
+            PDSH.Reset( this, pGraphics, DrawColl, DrawFind, DrawComm, this.Get_EndInfoByPage(CurPage - 1) );
 
             var StartLine = _Page.StartLine;
             var EndLine   = _Page.EndLine;
@@ -6413,7 +6472,7 @@ Paragraph.prototype =
                     //----------------------------------------------------------------------------------------------------------
                     // Рисуем комментарии
                     //----------------------------------------------------------------------------------------------------------
-                    var aComm = PDSH.High;
+                    var aComm = PDSH.Comm;
                     Element = aComm.Get_Next();
                     while ( null != Element )
                     {
@@ -6430,7 +6489,7 @@ Paragraph.prototype =
                     //----------------------------------------------------------------------------------------------------------
                     // Рисуем выделение совместного редактирования
                     //----------------------------------------------------------------------------------------------------------
-                    var aColl = PDSH.High;
+                    var aColl = PDSH.Coll;
                     Element = aColl.Get_Next();
                     while ( null != Element )
                     {
@@ -6441,7 +6500,7 @@ Paragraph.prototype =
                     //----------------------------------------------------------------------------------------------------------
                     // Рисуем выделение поиска
                     //----------------------------------------------------------------------------------------------------------
-                    var aFind = PDSH.High;
+                    var aFind = PDSH.Find;
                     Element = aFind.Get_Next();
                     while ( null != Element )
                     {
@@ -7765,6 +7824,7 @@ Paragraph.prototype =
 
                         this.CurPos.ContentPos = StartPos;
                         this.Content[StartPos].Cursor_MoveToStartPos();
+                        this.Correct_ContentPos2();
                     }
                 }
                 else
@@ -7778,6 +7838,7 @@ Paragraph.prototype =
 
                         this.CurPos.ContentPos = EndPos;
                         this.Content[EndPos].Cursor_MoveToStartPos();
+                        this.Correct_ContentPos2();
                     }
 
                     for ( var CurPos = EndPos - 1; CurPos > StartPos; CurPos-- )
@@ -7823,6 +7884,7 @@ Paragraph.prototype =
 
                         this.CurPos.ContentPos = ContentPos;
                         this.Content[ContentPos].Cursor_MoveToStartPos();
+                        this.Correct_ContentPos2();
                     }
                     else
                     {
@@ -9069,6 +9131,26 @@ Paragraph.prototype =
         this.CurPos.ContentPos = CurPos;
     },
 
+    Correct_ContentPos2 : function()
+    {
+        var Count  = this.Content.length;
+        var CurPos = this.CurPos.ContentPos;
+        // Может так случиться, что текущий элемент окажется непригодным для расположения курсора, тогда мы ищем ближайший пригодный
+        while ( CurPos > 0 && false === this.Content[CurPos].Is_CursorPlaceable() )
+        {
+            CurPos--;
+            this.Content[CurPos].Cursor_MoveToEndPos();
+        }
+
+        while ( CurPos < Count && false === this.Content[CurPos].Is_CursorPlaceable() )
+        {
+            CurPos++;
+            this.Content[CurPos].Cursor_MoveToStartPos(false);
+        }
+
+        this.CurPos.ContentPos = CurPos;
+    },
+
     Get_ParaContentPos : function(bSelection, bStart)
     {
         var ContentPos = new CParagraphContentPos();
@@ -9089,6 +9171,8 @@ Paragraph.prototype =
         this.CurPos.ContentPos = Pos;
         this.Content[Pos].Set_ParaContentPos( ContentPos, 1 );
         this.Correct_ContentPos(CorrectEndLinePos);
+
+        this.Correct_ContentPos2();
 
         this.CurPos.Line  = Line;
         this.CurPos.Range = Range;
@@ -10670,6 +10754,7 @@ Paragraph.prototype =
                 this.CurPos.ContentPos = 0;
                 this.Content[0].Cursor_MoveToStartPos();
                 this.Correct_ContentPos(false);
+                this.Correct_ContentPos2();
             }
         }
     },
@@ -10759,6 +10844,7 @@ Paragraph.prototype =
                     this.CurPos.ContentPos = this.Content.length - 1;
                     this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos();
                     this.Correct_ContentPos(false);
+                    this.Correct_ContentPos2();
                 }
             }
         }
@@ -12946,18 +13032,21 @@ Paragraph.prototype =
         }
         else
         {
-            var StartPos = this.Selection.StartPos;
-            var EndPos   = this.Selection.EndPos;
-
-            if ( StartPos > EndPos )
+            if ( true === this.Selection.Use )
             {
-                StartPos = this.Selection.EndPos;
-                EndPos   = this.Selection.StartPos;
-            }
+                var StartPos = this.Selection.StartPos;
+                var EndPos   = this.Selection.EndPos;
 
-            for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-            {
-                this.Content[CurPos].Selection_Remove();
+                if ( StartPos > EndPos )
+                {
+                    StartPos = this.Selection.EndPos;
+                    EndPos   = this.Selection.StartPos;
+                }
+
+                for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+                {
+                    this.Content[CurPos].Selection_Remove();
+                }
             }
 
             this.Selection.Use      = false;
@@ -13589,6 +13678,40 @@ Paragraph.prototype =
         Para.Internal_Content_Add( Para.Content.length, new ParaEmpty(), false );
 
         DocContent.Add( new CSelectedElement( Para, false ) );
+    },
+
+    Get_Paragraph_TextPr : function()
+    {
+        var TextPr;
+        if ( true === this.Selection.Use )
+        {
+            var StartPos = this.Selection.StartPos;
+            var EndPos   = this.Selection.EndPos;
+
+            if ( StartPos > EndPos )
+            {
+                StartPos = this.Selection.EndPos;
+                EndPos   = this.Selection.StartPos;
+            }
+
+            while ( true === this.Content[StartPos].Selection_IsEmpty() && StartPos < EndPos )
+                StartPos++;
+
+            TextPr = this.Content[StartPos].Get_CompiledTextPr();
+
+            for ( var CurPos = StartPos + 1; CurPos <= EndPos; CurPos++ )
+            {
+                var TempTextPr = this.Content[CurPos].Get_CompiledTextPr();
+                if ( null !== TempTextPr && undefined !== TempTextPr && true !== this.Content[CurPos].Selection_IsEmpty() )
+                    TextPr = TextPr.Compare( TempTextPr );
+            }
+        }
+        else
+        {
+            TextPr = this.Content[this.CurPos.ContentPos].Get_CompiledTextPr();
+        }
+
+        return TextPr;
     },
 
     // Проверяем пустой ли параграф
@@ -16655,8 +16778,10 @@ Paragraph.prototype =
         }
         else
         {
-            // TODO: Обработать здесь гиперссылки и комментарии
+            // TODO: Обработать здесь гиперссылки
 
+            NewParagraph.DeleteCommentOnRemove = false;
+            this.DeleteCommentOnRemove         = false;
 
             // Обнулим селект и курсор
             this.Selection_Remove();
@@ -16706,6 +16831,9 @@ Paragraph.prototype =
 
             this.Cursor_MoveToEndPos( false, false );
             NewParagraph.Cursor_MoveToStartPos( false );
+
+            NewParagraph.DeleteCommentOnRemove = true;
+            this.DeleteCommentOnRemove         = true;
         }
     },
 
@@ -16728,13 +16856,15 @@ Paragraph.prototype =
         }
         else
         {
-            // TODO: разобраться с комментариями
+            this.DeleteCommentOnRemove = false;
 
             // Убираем метку конца параграфа у данного параграфа
             this.Remove_ParaEnd();
 
             // Добавляем содержимое второго параграфа к первому
             this.Internal_Content_Concat( Para.Content );
+
+            this.DeleteCommentOnRemove = true;
         }
     },
 
@@ -18886,107 +19016,208 @@ Paragraph.prototype =
 //-----------------------------------------------------------------------------------
     Add_Comment : function(Comment, bStart, bEnd)
     {
-        var CursorPos_max = this.Internal_GetEndPos();
-        var CursorPos_min = this.Internal_GetStartPos();
-
-        if ( true === this.ApplyToAll )
+        if ( true !== Debug_ParaRunMode )
         {
-            if ( true === bEnd )
+            var CursorPos_max = this.Internal_GetEndPos();
+            var CursorPos_min = this.Internal_GetStartPos();
+
+            if ( true === this.ApplyToAll )
             {
-                var PagePos = this.Internal_GetXYByContentPos( CursorPos_max );
-                var Line    = this.Lines[PagePos.Internal.Line];
-                var LineA   = Line.Metrics.Ascent;
-                var LineH   = Line.Bottom - Line.Top;
-                Comment.Set_EndInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.Get_Id() );
-
-                var Item = new ParaCommentEnd(Comment.Get_Id());
-                this.Internal_Content_Add( CursorPos_max, Item );
-            }
-
-            if ( true === bStart )
-            {
-                var PagePos = this.Internal_GetXYByContentPos( CursorPos_min );
-                var Line    = this.Lines[PagePos.Internal.Line];
-                var LineA   = Line.Metrics.Ascent;
-                var LineH   = Line.Bottom - Line.Top;
-                Comment.Set_StartInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.Get_Id() );
-
-                var Item = new ParaCommentStart(Comment.Get_Id());
-                this.Internal_Content_Add( CursorPos_min, Item );
-            }
-        }
-        else
-        {
-            if ( true === this.Selection.Use )
-            {
-                var StartPos, EndPos;
-                if ( this.Selection.StartPos < this.Selection.EndPos )
-                {
-                    StartPos = this.Selection.StartPos;
-                    EndPos   = this.Selection.EndPos;
-                }
-                else
-                {
-                    StartPos = this.Selection.EndPos;
-                    EndPos   = this.Selection.StartPos;
-                }
-
                 if ( true === bEnd )
                 {
-                    EndPos = Math.max( CursorPos_min, Math.min( CursorPos_max, EndPos ) );
-
-                    var PagePos = this.Internal_GetXYByContentPos( EndPos );
+                    var PagePos = this.Internal_GetXYByContentPos( CursorPos_max );
                     var Line    = this.Lines[PagePos.Internal.Line];
                     var LineA   = Line.Metrics.Ascent;
                     var LineH   = Line.Bottom - Line.Top;
                     Comment.Set_EndInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.Get_Id() );
 
                     var Item = new ParaCommentEnd(Comment.Get_Id());
-                    this.Internal_Content_Add( EndPos, Item );
+                    this.Internal_Content_Add( CursorPos_max, Item );
                 }
 
                 if ( true === bStart )
                 {
-                    StartPos = Math.max( CursorPos_min, Math.min( CursorPos_max, StartPos ) );
-
-                    var PagePos = this.Internal_GetXYByContentPos( StartPos );
+                    var PagePos = this.Internal_GetXYByContentPos( CursorPos_min );
                     var Line    = this.Lines[PagePos.Internal.Line];
                     var LineA   = Line.Metrics.Ascent;
                     var LineH   = Line.Bottom - Line.Top;
                     Comment.Set_StartInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.Get_Id() );
 
                     var Item = new ParaCommentStart(Comment.Get_Id());
-                    this.Internal_Content_Add( StartPos, Item );
+                    this.Internal_Content_Add( CursorPos_min, Item );
                 }
             }
             else
             {
+                if ( true === this.Selection.Use )
+                {
+                    var StartPos, EndPos;
+                    if ( this.Selection.StartPos < this.Selection.EndPos )
+                    {
+                        StartPos = this.Selection.StartPos;
+                        EndPos   = this.Selection.EndPos;
+                    }
+                    else
+                    {
+                        StartPos = this.Selection.EndPos;
+                        EndPos   = this.Selection.StartPos;
+                    }
+
+                    if ( true === bEnd )
+                    {
+                        EndPos = Math.max( CursorPos_min, Math.min( CursorPos_max, EndPos ) );
+
+                        var PagePos = this.Internal_GetXYByContentPos( EndPos );
+                        var Line    = this.Lines[PagePos.Internal.Line];
+                        var LineA   = Line.Metrics.Ascent;
+                        var LineH   = Line.Bottom - Line.Top;
+                        Comment.Set_EndInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.Get_Id() );
+
+                        var Item = new ParaCommentEnd(Comment.Get_Id());
+                        this.Internal_Content_Add( EndPos, Item );
+                    }
+
+                    if ( true === bStart )
+                    {
+                        StartPos = Math.max( CursorPos_min, Math.min( CursorPos_max, StartPos ) );
+
+                        var PagePos = this.Internal_GetXYByContentPos( StartPos );
+                        var Line    = this.Lines[PagePos.Internal.Line];
+                        var LineA   = Line.Metrics.Ascent;
+                        var LineH   = Line.Bottom - Line.Top;
+                        Comment.Set_StartInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.Get_Id() );
+
+                        var Item = new ParaCommentStart(Comment.Get_Id());
+                        this.Internal_Content_Add( StartPos, Item );
+                    }
+                }
+                else
+                {
+                    if ( true === bEnd )
+                    {
+                        var Pos = Math.max( CursorPos_min, Math.min( CursorPos_max, this.CurPos.ContentPos ) );
+
+                        var PagePos = this.Internal_GetXYByContentPos( Pos );
+                        var Line    = this.Lines[PagePos.Internal.Line];
+                        var LineA   = Line.Metrics.Ascent;
+                        var LineH   = Line.Bottom - Line.Top;
+                        Comment.Set_EndInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.Get_Id() );
+
+                        var Item = new ParaCommentEnd(Comment.Get_Id());
+                        this.Internal_Content_Add( Pos, Item );
+                    }
+
+                    if ( true === bStart )
+                    {
+                        var Pos = Math.max( CursorPos_min, Math.min( CursorPos_max, this.CurPos.ContentPos ) );
+
+                        var PagePos = this.Internal_GetXYByContentPos( Pos );
+                        var Line    = this.Lines[PagePos.Internal.Line];
+                        var LineA   = Line.Metrics.Ascent;
+                        var LineH   = Line.Bottom - Line.Top;
+                        Comment.Set_StartInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.Get_Id() );
+
+                        var Item = new ParaCommentStart(Comment.Get_Id());
+                        this.Internal_Content_Add( Pos, Item );
+                    }
+                }
+            }
+        }
+        else
+        {
+            if ( true == this.ApplyToAll )
+            {
                 if ( true === bEnd )
                 {
-                    var Pos = Math.max( CursorPos_min, Math.min( CursorPos_max, this.CurPos.ContentPos ) );
+                    var EndContentPos = this.Get_EndPos( false );
+                    var EndPos = EndContentPos.Get(0);
+                    var NewElement = this.Content[EndPos].Split( EndContentPos, 1 );
 
-                    var PagePos = this.Internal_GetXYByContentPos( Pos );
-                    var Line    = this.Lines[PagePos.Internal.Line];
-                    var LineA   = Line.Metrics.Ascent;
-                    var LineH   = Line.Bottom - Line.Top;
-                    Comment.Set_EndInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.Get_Id() );
+                    if ( null !== NewElement )
+                        this.Internal_Content_Add( EndPos + 1, NewElement );
 
-                    var Item = new ParaCommentEnd(Comment.Get_Id());
-                    this.Internal_Content_Add( Pos, Item );
+                    var CommentEnd = new ParaComment( false, Comment.Get_Id() );
+                    this.Internal_Content_Add( EndPos + 1, CommentEnd );
                 }
 
                 if ( true === bStart )
                 {
-                    var Pos = Math.max( CursorPos_min, Math.min( CursorPos_max, this.CurPos.ContentPos ) );
+                    var StartContentPos = this.Get_StartPos();
+                    var StartPos = StartContentPos.Get(0);
+                    var NewElement = this.Content[StartPos].Split( StartContentPos, 1 );
 
-                    var PagePos = this.Internal_GetXYByContentPos( Pos );
-                    var Line    = this.Lines[PagePos.Internal.Line];
-                    var LineA   = Line.Metrics.Ascent;
-                    var LineH   = Line.Bottom - Line.Top;
-                    Comment.Set_StartInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.Get_Id() );
+                    if ( null !== NewElement )
+                        this.Internal_Content_Add( StartPos + 1, NewElement );
 
-                    var Item = new ParaCommentStart(Comment.Get_Id());
-                    this.Internal_Content_Add( Pos, Item );
+                    var CommentStart = new ParaComment( true, Comment.Get_Id() );
+                    this.Internal_Content_Add( StartPos + 1, CommentStart );
+                }
+            }
+            else
+            {
+                if ( true === this.Selection.Use )
+                {
+                    var StartContentPos = this.Get_ParaContentPos( true, true );
+                    var EndContentPos   = this.Get_ParaContentPos( true, false );
+
+                    if ( StartContentPos.Compare( EndContentPos ) > 0 )
+                    {
+                        var Temp = StartContentPos;
+                        StartContentPos = EndContentPos;
+                        EndContentPos   = Temp;
+                    }
+
+                    if ( true === bEnd )
+                    {
+                        var EndPos = EndContentPos.Get(0);
+                        var NewElement = this.Content[EndPos].Split( EndContentPos, 1 );
+
+                        if ( null !== NewElement )
+                            this.Internal_Content_Add( EndPos + 1, NewElement );
+
+                        var CommentEnd = new ParaComment( false, Comment.Get_Id() );
+                        this.Internal_Content_Add( EndPos + 1, CommentEnd );
+                    }
+
+                    if ( true === bStart )
+                    {
+                        var StartPos = StartContentPos.Get(0);
+                        var NewElement = this.Content[StartPos].Split( StartContentPos, 1 );
+
+                        if ( null !== NewElement )
+                            this.Internal_Content_Add( StartPos + 1, NewElement );
+
+                        var CommentStart = new ParaComment( true, Comment.Get_Id() );
+                        this.Internal_Content_Add( StartPos + 1, CommentStart );
+                    }
+                }
+                else
+                {
+                    var ContentPos = this.Get_ParaContentPos( false, false );
+
+                    if ( true === bEnd )
+                    {
+                        var EndPos = ContentPos.Get(0);
+                        var NewElement = this.Content[EndPos].Split( ContentPos, 1 );
+
+                        if ( null !== NewElement )
+                            this.Internal_Content_Add( EndPos + 1, NewElement );
+
+                        var CommentEnd = new ParaComment( false, Comment.Get_Id() );
+                        this.Internal_Content_Add( EndPos + 1, CommentEnd );
+                    }
+
+                    if ( true === bStart )
+                    {
+                        var StartPos = ContentPos.Get(0);
+                        var NewElement = this.Content[StartPos].Split( ContentPos, 1 );
+
+                        if ( null !== NewElement )
+                            this.Internal_Content_Add( StartPos + 1, NewElement );
+
+                        var CommentStart = new ParaComment( true, Comment.Get_Id() );
+                        this.Internal_Content_Add( StartPos + 1, CommentStart );
+                    }
                 }
             }
         }
@@ -19041,21 +19272,38 @@ Paragraph.prototype =
 
     Remove_CommentMarks : function(Id)
     {
-        var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
-        var Count = this.Content.length;
-        for ( var Pos = 0; Pos < Count; Pos++ )
+        if ( true !== Debug_ParaRunMode )
         {
-            var Item = this.Content[Pos];
-            if ( ( para_CommentStart === Item.Type || para_CommentEnd === Item.Type ) && Id === Item.Id )
+            var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
+            var Count = this.Content.length;
+            for ( var Pos = 0; Pos < Count; Pos++ )
             {
-                if ( para_CommentStart === Item.Type )
-                    DocumentComments.Set_StartInfo( Item.Id, 0, 0, 0, 0, null );
-                else
-                    DocumentComments.Set_EndInfo( Item.Id, 0, 0, 0, 0, null );
+                var Item = this.Content[Pos];
+                if ( ( para_CommentStart === Item.Type || para_CommentEnd === Item.Type ) && Id === Item.Id )
+                {
+                    if ( para_CommentStart === Item.Type )
+                        DocumentComments.Set_StartInfo( Item.Id, 0, 0, 0, 0, null );
+                    else
+                        DocumentComments.Set_EndInfo( Item.Id, 0, 0, 0, 0, null );
 
-                this.Internal_Content_Remove( Pos );
-                Pos--;
-                Count--;
+                    this.Internal_Content_Remove( Pos );
+                    Pos--;
+                    Count--;
+                }
+            }
+        }
+        else
+        {
+            var Count = this.Content.length;
+            for ( var Pos = 0; Pos < Count; Pos++ )
+            {
+                var Item = this.Content[Pos];
+                if ( para_Comment === Item.Type && Id === Item.Id )
+                {
+                    this.Internal_Content_Remove( Pos );
+                    Pos--;
+                    Count--;
+                }
             }
         }
     },
@@ -19615,6 +19863,28 @@ CDocumentBounds.prototype =
     }
 };
 
+function CParagraphPageEndInfo()
+{
+    this.Comments = new Array(); // Массив незакрытых комментариев на данной странице (комментарии, которые были
+                                 // открыты до данной страницы и не закрыты на этой тут тоже присутствуют)
+}
+
+CParagraphPageEndInfo.prototype =
+{
+    Copy : function()
+    {
+        var NewPageEndInfo = new CParagraphPageEndInfo();
+
+        var CommentsCount = this.Comments.length;
+        for ( var Index = 0; Index < CommentsCount; Index++ )
+        {
+            NewPageEndInfo.Comments.push( this.Comments[Index] );
+        }
+
+        return NewPageEndInfo;
+    }
+};
+
 function CParaPage(X, Y, XLimit, YLimit, FirstLine)
 {
     this.X         = X;
@@ -19628,6 +19898,7 @@ function CParaPage(X, Y, XLimit, YLimit, FirstLine)
     this.TextPr    = null;      // Расситанные текстовые настройки для начала страницы
 
     this.Drawings  = new Array();
+    this.EndInfo   = new CParagraphPageEndInfo();
 }
 
 CParaPage.prototype =
@@ -19720,7 +19991,8 @@ CParaDrawingRangeLines.prototype =
         {
             var PrevEl = this.Elements[Count - 1];
 
-            if ( Math.abs( PrevEl.y0 - Element.y0 ) < 0.001 && Math.abs( PrevEl.y1 - Element.y1 ) < 0.001 && Math.abs( PrevEl.x1 - Element.x0 ) < 0.001 && Math.abs( PrevEl.w - Element.w ) < 0.001 && PrevEl.r === Element.r && PrevEl.g === Element.g && PrevEl.b === Element.b )
+            if ( Math.abs( PrevEl.y0 - Element.y0 ) < 0.001 && Math.abs( PrevEl.y1 - Element.y1 ) < 0.001 && Math.abs( PrevEl.x1 - Element.x0 ) < 0.001 && Math.abs( PrevEl.w - Element.w ) < 0.001 && PrevEl.r === Element.r && PrevEl.g === Element.g && PrevEl.b === Element.b
+                && ( (undefined === PrevEl.Additional && undefined === Element.Additional) || ( undefined !== PrevEl.Additional && undefined !== Element.Additional && PrevEl.Additional.Active === Element.Additional.Active ) ) )
             {
                 Element.x0 = PrevEl.x0;
                 Count--;
@@ -20085,9 +20357,49 @@ function CParagraphRecalculateStateAlign()
     this.RecalcFast    = false; // Если пересчет быстрый, тогда все "плавающие" объекты мы не трогаем
 }
 
+function CParagraphRecalculateStateInfo()
+{
+    this.Comments = new Array();
+}
+
+CParagraphRecalculateStateInfo.prototype =
+{
+    Reset : function(PrevInfo)
+    {
+        if ( null !== PrevInfo && undefined !== PrevInfo )
+        {
+            this.Comments = PrevInfo.Comments;
+        }
+        else
+        {
+            this.Comments = new Array();
+        }
+    },
+
+    Add_Comment : function(Id)
+    {
+        this.Comments.push( Id );
+    },
+
+    Remove_Comment : function(Id)
+    {
+        var CommentsLen = this.Comments.length;
+        for (var CurPos = 0; CurPos < CommentsLen; CurPos++)
+        {
+            if ( this.Comments[CurPos] === Id )
+            {
+                this.Comments.splice( CurPos, 1 );
+                break;
+            }
+        }
+    }
+}
+
+
 var g_oPRSW = new CParagraphRecalculateStateWrap();
 var g_oPRSC = new CParagraphRecalculateStateCounter();
 var g_oPRSA = new CParagraphRecalculateStateAlign();
+var g_oPRSI = new CParagraphRecalculateStateInfo();
 
 function CParagraphDrawStateHightlights()
 {
@@ -20099,14 +20411,14 @@ function CParagraphDrawStateHightlights()
 
     this.DrawColl = false;
     this.DrawFind = false;
-    this.DrawComm = false;
-
-    this.CommentsFlag = comments_NoComment;
 
     this.High   = new CParaDrawingRangeLines();
     this.Coll   = new CParaDrawingRangeLines();
     this.Find   = new CParaDrawingRangeLines();
     this.Comm   = new CParaDrawingRangeLines();
+
+    this.Comments     = new Array();
+    this.CommentsFlag = comments_NoComment;
 
     this.Paragraph = undefined;
     this.Graphics  = undefined;
@@ -20120,17 +20432,18 @@ function CParagraphDrawStateHightlights()
 
 CParagraphDrawStateHightlights.prototype =
 {
-    Reset : function(Paragraph, Graphics, DrawColl, DrawFind, DrawComm, CommentsFlag)
+    Reset : function(Paragraph, Graphics, DrawColl, DrawFind, DrawComm, PageEndInfo)
     {
         this.Paragraph = Paragraph;
         this.Graphics  = Graphics;
 
         this.DrawColl = DrawColl;
         this.DrawFind = DrawFind;
-        this.DrawComm = DrawComm;
-        this.CommentsFlag = CommentsFlag;
 
         this.CurPos = new CParagraphContentPos();
+
+        this.Comments = PageEndInfo.Comments;
+        this.Check_CommentsFlag();
     },
 
     Reset_Range : function(Page, Line, Range, X, Y0, Y1, SpacesCount)
@@ -20149,6 +20462,50 @@ CParagraphDrawStateHightlights.prototype =
         this.Y1 = Y1;
 
         this.Spaces = SpacesCount;
+    },
+
+    Add_Comment : function(Id)
+    {
+        this.Comments.push( Id );
+
+        this.Check_CommentsFlag();
+    },
+
+    Remove_Comment : function(Id)
+    {
+        var CommentsLen = this.Comments.length;
+        for (var CurPos = 0; CurPos < CommentsLen; CurPos++)
+        {
+            if ( this.Comments[CurPos] === Id )
+            {
+                this.Comments.splice( CurPos, 1 );
+                break;
+            }
+        }
+
+        this.Check_CommentsFlag();
+    },
+
+    Check_CommentsFlag : function()
+    {
+        // Проверяем флаг
+        var Para = this.Paragraph;
+        var DocumentComments = Para.LogicDocument.Comments;
+        var CurComment = DocumentComments.Get_CurrentId();
+        var CommLen = this.Comments.length;
+
+        // Сначала проверим есть ли вообще комментарии
+        this.CommentsFlag = ( CommLen > 0 ? comments_NonActiveComment : comments_NoComment );
+
+        // Проверим является ли какой-либо комментарий активным
+        for ( var CurPos = 0; CurPos < CommLen; CurPos++ )
+        {
+            if ( CurComment === this.Comments[CurPos] )
+            {
+                this.CommentsFlag = comments_ActiveComment;
+                break
+            }
+        }
     }
 };
 

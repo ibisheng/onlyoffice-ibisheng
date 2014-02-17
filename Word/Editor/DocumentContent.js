@@ -6840,10 +6840,17 @@ CDocumentContent.prototype =
 
                     if ( type_Paragraph === ItemType )
                     {
-                        if ( Direction > 0 )
-                            Item.Selection.EndPos   = Item.Content.length - 1;
+                        if ( true !== Debug_ParaRunMode )
+                        {
+                            if ( Direction > 0 )
+                                Item.Selection.EndPos   = Item.Content.length - 1;
+                            else
+                                Item.Selection.StartPos = Item.Content.length - 1;
+                        }
                         else
-                            Item.Selection.StartPos = Item.Content.length - 1;
+                        {
+                            Item.Selection_SetBegEnd( ( Direction > 0 ? false : true ), false );
+                        }
                     }
                     else //if ( type_Table === ItemType )
                     {
@@ -6865,10 +6872,17 @@ CDocumentContent.prototype =
 
                     if ( type_Paragraph === ItemType )
                     {
-                        if ( Direction > 0 )
-                            Item.Selection.StartPos = Item.Internal_GetStartPos();
+                        if ( true !== Debug_ParaRunMode )
+                        {
+                            if ( Direction > 0 )
+                                Item.Selection.StartPos = Item.Internal_GetStartPos();
+                            else
+                                Item.Selection.EndPos   = Item.Internal_GetStartPos();
+                        }
                         else
-                            Item.Selection.EndPos   = Item.Internal_GetStartPos();
+                        {
+                            Item.Selection_SetBegEnd( ( Direction > 0 ? true : false ), true );
+                        }
                     }
                     else //if ( type_Table === ItemType )
                     {
@@ -6888,15 +6902,22 @@ CDocumentContent.prototype =
 
                     if ( type_Paragraph === ItemType )
                     {
-                        if ( Direction > 0 )
+                        if ( true !== Debug_ParaRunMode )
                         {
-                            Item.Selection.StartPos = Item.Internal_GetStartPos();
-                            Item.Selection.EndPos   = Item.Content.length - 1;
+                            if ( Direction > 0 )
+                            {
+                                Item.Selection.Set_StartPos(Item.Internal_GetStartPos(), -1);
+                                Item.Selection.Set_EndPos(Item.Content.length - 1, -1);
+                            }
+                            else
+                            {
+                                Item.Selection.Set_EndPos(Item.Internal_GetStartPos(), -1);
+                                Item.Selection.Set_StartPos(Item.Content.length - 1, -1);
+                            }
                         }
                         else
                         {
-                            Item.Selection.EndPos   = Item.Internal_GetStartPos();
-                            Item.Selection.StartPos = Item.Content.length - 1;
+                            Item.Select_All( Direction );
                         }
                     }
                     else //if ( type_Table === ItemType )
@@ -8316,11 +8337,16 @@ CDocumentContent.prototype =
                         EndPos   = this.Selection.StartPos;
                     }
 
-                    if ( true === bStart )
-                        this.Content[StartPos].Add_Comment( Comment, true, false );
+                    if ( StartPos === EndPos )
+                        this.Content[StartPos].Add_Comment( Comment, bStart, bEnd );
+                    else
+                    {
+                        if ( true === bStart )
+                            this.Content[StartPos].Add_Comment( Comment, true, false );
 
-                    if ( true === bEnd )
-                        this.Content[EndPos].Add_Comment( Comment, false, true );
+                        if ( true === bEnd )
+                            this.Content[EndPos].Add_Comment( Comment, false, true );
+                    }
                 }
                 else
                 {
@@ -8369,6 +8395,29 @@ CDocumentContent.prototype =
         }
 
         return false;
-    }
+    },
+
+    Get_EndInfo : function()
+    {
+        var ContentLen = this.Content.length;
+        if ( ContentLen > 0 )
+            return this.Content[ContentLen - 1].Get_EndInfo();
+        else
+            return null;
+    },
+
+    Get_PrevElementEndInfo : function(CurElement)
+    {
+        var PrevElement = CurElement.Get_DocumentPrev();
+
+        if ( null !== PrevElement && undefined !== PrevElement )
+        {
+            return PrevElement.Get_EndInfo();
+        }
+        else
+        {
+            return this.Parent.Get_PrevElementEndInfo( this );
+        }
+    },
 
 };

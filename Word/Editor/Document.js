@@ -6923,22 +6923,35 @@ CDocument.prototype =
                             EndPos   = Temp;
                         }
 
-                        if ( type_Paragraph == this.Content[StartPos].GetType() )
-                            VisTextPr = this.Content[StartPos].Selection_CalculateTextPr();
-                        else if ( type_Table == this.Content[StartPos].GetType() )
+                        if ( true !== Debug_ParaRunMode )
+                        {
+                            if ( type_Paragraph == this.Content[StartPos].GetType() )
+                                VisTextPr = this.Content[StartPos].Selection_CalculateTextPr();
+                            else if ( type_Table == this.Content[StartPos].GetType() )
+                                VisTextPr = this.Content[StartPos].Get_Paragraph_TextPr();
+
+                            for ( var Index = StartPos + 1; Index <= EndPos; Index++ )
+                            {
+                                var Item = this.Content[Index];
+
+                                var CurPr;
+                                if ( type_Paragraph == Item.GetType() )
+                                    CurPr = Item.Selection_CalculateTextPr();
+                                else if ( type_Table == Item.GetType() )
+                                    CurPr = Item.Get_Paragraph_TextPr();
+
+                                VisTextPr = VisTextPr.Compare(CurPr);
+                            }
+                        }
+                        else
+                        {
                             VisTextPr = this.Content[StartPos].Get_Paragraph_TextPr();
 
-                        for ( var Index = StartPos + 1; Index <= EndPos; Index++ )
-                        {
-                            var Item = this.Content[Index];
-
-                            var CurPr;
-                            if ( type_Paragraph == Item.GetType() )
-                                CurPr = Item.Selection_CalculateTextPr();
-                            else if ( type_Table == Item.GetType() )
-                                CurPr = Item.Get_Paragraph_TextPr();
-
-                            VisTextPr = VisTextPr.Compare(CurPr);
+                            for ( var Index = StartPos + 1; Index <= EndPos; Index++ )
+                            {
+                                var CurPr = this.Content[Index].Get_Paragraph_TextPr();
+                                VisTextPr = VisTextPr.Compare( CurPr );
+                            }
                         }
 
                         break;
@@ -6966,14 +6979,21 @@ CDocument.prototype =
             }
             else
             {
-                var Item = this.Content[this.CurPos.ContentPos];
-                if ( type_Paragraph == Item.GetType() )
+                if ( true !== Debug_ParaRunMode )
                 {
-                    Result_TextPr = Item.Internal_CalculateTextPr( Item.CurPos.ContentPos - 1 );
+                    var Item = this.Content[this.CurPos.ContentPos];
+                    if ( type_Paragraph == Item.GetType() )
+                    {
+                        Result_TextPr = Item.Internal_CalculateTextPr( Item.CurPos.ContentPos - 1 );
+                    }
+                    else if ( type_Table == Item.GetType() )
+                    {
+                        Result_TextPr = Item.Get_Paragraph_TextPr();
+                    }
                 }
-                else if ( type_Table == Item.GetType() )
+                else
                 {
-                    Result_TextPr = Item.Get_Paragraph_TextPr();
+                    Result_TextPr = this.Content[this.CurPos.ContentPos].Get_Paragraph_TextPr();
                 }
             }
 
@@ -12279,8 +12299,15 @@ CDocument.prototype =
                         EndPos   = this.Selection.StartPos;
                     }
 
-                    this.Content[StartPos].Add_Comment( Comment, true, false );
-                    this.Content[EndPos].Add_Comment( Comment, false, true );
+                    if ( StartPos === EndPos )
+                    {
+                        this.Content[StartPos].Add_Comment( Comment, true, true );
+                    }
+                    else
+                    {
+                        this.Content[StartPos].Add_Comment( Comment, true, false );
+                        this.Content[EndPos].Add_Comment( Comment, false, true );
+                    }
                 }
                 else
                 {
@@ -12288,8 +12315,16 @@ CDocument.prototype =
                 }
             }
 
-            this.DrawingDocument.ClearCachePages();
-            this.DrawingDocument.FirePaint();
+            if ( true === Debug_ParaRunMode )
+            {
+                // TODO: Продумать, как избавиться от пересчета
+                this.Recalculate();
+            }
+            else
+            {
+                this.DrawingDocument.ClearCachePages();
+                this.DrawingDocument.FirePaint();
+            }
         }
 
         return Comment;
@@ -12307,8 +12342,16 @@ CDocument.prototype =
 
         if ( true === this.Comments.Remove_ById( Id ) )
         {
-            this.DrawingDocument.ClearCachePages();
-            this.DrawingDocument.FirePaint();
+            if ( true === Debug_ParaRunMode )
+            {
+                // TODO: Продумать как избавиться от пересчета при удалении комментария
+                this.Recalculate();
+            }
+            else
+            {
+                this.DrawingDocument.ClearCachePages();
+                this.DrawingDocument.FirePaint();
+            }
 
             if ( true === bSendEvent )
                 editor.sync_RemoveComment( Id );
@@ -12401,6 +12444,18 @@ CDocument.prototype =
         this.Comments.Set_Current(null);
         this.DrawingDocument.ClearCachePages();
         this.DrawingDocument.FirePaint();
+    },
+
+    Get_PrevElementEndInfo : function(CurElement)
+    {
+        var PrevElement = CurElement.Get_DocumentPrev();
+
+        if ( null !== PrevElement && undefined !== PrevElement )
+        {
+            return PrevElement.Get_EndInfo();
+        }
+        else
+            return null;
     },
 //-----------------------------------------------------------------------------------
 // Функции для работы с textbox

@@ -1657,34 +1657,12 @@ ParaRun.prototype =
 
                     break;
                 }
-
-                    // TODO : Реализовать на уровен Run
-//                case para_CommentStart:
-//                {
-//                    var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
-//
-//                    var CommentId = Item.Id;
-//                    var CommentY  = this.Pages[CurPage].Y + this.Lines[CurLine].Top;
-//                    var CommentH  = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
-//
-//                    DocumentComments.Set_StartInfo( CommentId, this.Get_StartPage_Absolute() + CurPage, X, CommentY, CommentH, this.Id );
-//
-//                    break;
-//                }
-//
-//                case para_CommentEnd:
-//                {
-//                    var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
-//
-//                    var CommentId = Item.Id;
-//                    var CommentY  = this.Pages[CurPage].Y + this.Lines[CurLine].Top;
-//                    var CommentH  = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
-//
-//                    DocumentComments.Set_EndInfo( CommentId, this.Get_StartPage_Absolute() + CurPage, X, CommentY, CommentH, this.Id );
-//                    break;
-//                }
             }
         }
+    },
+
+    Recalculate_PageEndInfo : function(PRSI, _CurLine, _CurRange)
+    {
     },
 
     Internal_Recalculate_Numbering : function(Item, Para, ParaPr, _X, _LineAscent, CurPage, CurLine, CurRange)
@@ -1986,13 +1964,11 @@ ParaRun.prototype =
 
         var bDrawFind = PDSH.DrawFind;
         var bDrawColl = PDSH.DrawColl;
-        var bDrawComm = PDSH.DrawComm;
 
         var X  = PDSH.X;
         var Y0 = PDSH.Y0;
         var Y1 = PDSH.Y1;
 
-        var bDrawComments = bDrawComm;
         var CommentsFlag  = PDSH.CommentsFlag;
 
         var HighLight = this.Get_CompiledPr(false).HighLight;
@@ -2000,8 +1976,6 @@ ParaRun.prototype =
         for ( var Pos = StartPos; Pos < EndPos; Pos++ )
         {
             var Item = this.Content[Pos];
-
-            //CurParaPos.Update( Pos, CurDepth );
 
             // Определим попадание в поиск и совместное редактирование. Попадание в комментарий определять не надо,
             // т.к. класс CParaRun попадает или не попадает в комментарий целиком.
@@ -2047,7 +2021,7 @@ ParaRun.prototype =
                     if ( para_Drawing === Item.Type && drawing_Anchor === Item.DrawingType )
                         break;
 
-                    if ( CommentsFlag != comments_NoComment && true === bDrawComments )
+                    if ( CommentsFlag != comments_NoComment )
                         aComm.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false } );
                     else if ( highlight_None != HighLight )
                         aHigh.Add( Y0, Y1, X, X + Item.WidthVisible, 0, HighLight.r, HighLight.g, HighLight.b );
@@ -2067,7 +2041,7 @@ ParaRun.prototype =
                     // Пробелы в конце строки (и строку состоящую из пробелов) не подчеркиваем, не зачеркиваем и не выделяем
                     if ( PDSH.Spaces > 0 )
                     {
-                        if ( CommentsFlag != comments_NoComment && bDrawComments )
+                        if ( CommentsFlag != comments_NoComment )
                             aComm.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false } );
                         else if ( highlight_None != HighLight )
                             aHigh.Add( Y0, Y1, X, X + Item.WidthVisible, 0, HighLight.r, HighLight.g, HighLight.b );
@@ -2347,6 +2321,11 @@ ParaRun.prototype =
 // Функции для работы с курсором
 //-----------------------------------------------------------------------------------
     // Находится ли курсор в начале рана
+    Is_CursorPlaceable : function()
+    {
+        return true;
+    },
+
     Cursor_Is_Start : function()
     {
         if ( this.State.ContentPos <= 0 )
@@ -3040,6 +3019,24 @@ ParaRun.prototype =
         return this.Pr.Copy();
     },
 
+    Get_CompiledTextPr : function()
+    {
+        if ( true === this.State.Selection.Use && true === this.Selection_CheckParaEnd() )
+        {
+            var ThisTextPr = this.Get_CompiledPr( true );
+
+            var Para       = this.Paragraph;
+            var EndTextPr  = Para.Get_CompiledPr2(false).TextPr.Copy();
+            EndTextPr.Merge( Para.TextPr.Value );
+
+            ThisTextPr = ThisTextPr.Compare( EndTextPr );
+
+            return ThisTextPr;
+        }
+        else
+            return this.Get_CompiledPr(true);
+    },
+
     Recalc_CompiledPr : function(RecalcMeasure)
     {
         this.RecalcInfo.TextPr  = true;
@@ -3165,7 +3162,19 @@ ParaRun.prototype =
 
             if ( true === this.Selection_CheckParaEnd() )
             {
-                this.Paragraph.TextPr.Apply_TextPr( TextPr );
+                if ( undefined === IncFontSize )
+                    this.Paragraph.TextPr.Apply_TextPr( TextPr );
+                else
+                {
+                    var Para = this.Paragraph;
+
+                    // Выставляем настройки для символа параграфа
+                    var EndTextPr = Para.Get_CompiledPr2(false).TextPr.Copy();
+                    EndTextPr.Merge( Para.TextPr.Value );
+
+                    // TODO: Как только перенесем историю изменений TextPr в сам класс CTextPr, переделать тут
+                    Para.TextPr.Set_FontSize( FontSize_IncreaseDecreaseValue( IncFontSize, EndTextPr.FontSize ) );
+                }
             }
         }
         else

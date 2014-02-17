@@ -2550,6 +2550,22 @@ CTable.prototype =
         }
     },
 
+    Get_EndInfo : function()
+    {
+        var RowsCount = this.Content.length;
+        if ( RowsCount > 0 )
+            return this.Content[RowsCount - 1].Get_EndInfo();
+
+        return null;
+    },
+
+    Get_PrevElementEndInfo : function(RowIndex)
+    {
+        if ( 0 === RowIndex )
+            return this.Parent.Get_PrevElementEndInfo(this);
+        else
+            return this.Content[RowIndex - 1].Get_EndInfo();
+    },
 //-----------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //-----------------------------------------------------------------------------------
@@ -18467,6 +18483,23 @@ CTableRow.prototype =
         this.Metrics.X_min = x_min;
         this.Metrics.X_max = x_max;
     },
+
+    Get_EndInfo : function()
+    {
+        var CellsCount = this.Content.length;
+        if ( CellsCount > 0 )
+            return this.Content[CellsCount - 1].Get_EndInfo();
+        else
+            return null;
+    },
+
+    Get_PrevElementEndInfo : function(CellIndex)
+    {
+        if ( 0 === CellIndex )
+            return this.Table.Get_PrevElementEndInfo( this.Index );
+        else
+            return this.Content[CellIndex - 1].Get_EndInfo();
+    },
 //-----------------------------------------------------------------------------------
 // Работаем с стилем строки
 //-----------------------------------------------------------------------------------
@@ -19790,6 +19823,16 @@ CTableCell.prototype =
         this.Metrics.X_cell_end      = X_cell_end;
         this.Metrics.X_content_start = X_content_start;
         this.Metrics.X_content_end   = X_content_end;
+    },
+
+    Get_EndInfo : function()
+    {
+        return this.Content.Get_EndInfo();
+    },
+
+    Get_PrevElementEndInfo : function(CurElement)
+    {
+        return this.Row.Get_PrevElementEndInfo( this.Index );
     },
 //-----------------------------------------------------------------------------------
 // Работаем с стилем ячейки

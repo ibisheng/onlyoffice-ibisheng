@@ -42,6 +42,7 @@ var para_PresentationNumbering     = 0x0025; // Элемент, обознача
 var para_Math                      = 0x0026; // Формула
 var para_Run                       = 0x0027; // Текстовый элемент
 var para_Sym                       = 0x0028; // Символ
+var para_Comment                   = 0x0029; // Метка начала или конца комментария
 
 var break_Line = 0x01;
 var break_Page = 0x02;
