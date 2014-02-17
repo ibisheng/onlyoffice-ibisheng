@@ -242,9 +242,13 @@
                     that.hScrollbarWrapper.appendChild( bar );
                     that.hScrollbarIndicator = bar;
                 }
+                var percentInViewH;
 
                 that.hScrollbarSize = that.hScrollbarWrapper.clientWidth;
-                that.hScrollbarIndicatorSize = m.max( m.round( that.hScrollbarSize * that.hScrollbarSize / that.scrollerW ), 8 );
+                percentInViewH = ( Math.abs(that.maxScrollX) + that.hScrollbarSize ) / that.hScrollbarSize;
+
+                that.hScrollbarIndicatorSize = m.min( that.hScrollbarSize, m.max( Math.ceil( 1 / percentInViewH * that.hScrollbarSize ), 8 ) );
+
                 that.hScrollbarIndicator.style.width = that.hScrollbarIndicatorSize + 'px';
                 that.hScrollbarMaxScroll = that.hScrollbarSize - that.hScrollbarIndicatorSize;
                 that.hScrollbarProp = that.hScrollbarMaxScroll / that.maxScrollX;
@@ -292,8 +296,12 @@
                     that.vScrollbarIndicator = bar;
                 }
 
+                var percentInViewW;
                 that.vScrollbarSize = that.vScrollbarWrapper.clientHeight;
-                that.vScrollbarIndicatorSize = m.max( m.round( that.vScrollbarSize * that.vScrollbarSize / that.scrollerH ), 8 );
+                percentInViewW = ( Math.abs(that.maxScrollY) + that.vScrollbarSize ) / that.vScrollbarSize;
+
+                that.vScrollbarIndicatorSize = m.min( that.vScrollbarSize, m.max( Math.ceil( 1 / percentInViewW * that.vScrollbarSize ), 8 ) );
+
                 that.vScrollbarIndicator.style.height = that.vScrollbarIndicatorSize + 'px';
                 that.vScrollbarMaxScroll = that.vScrollbarSize - that.vScrollbarIndicatorSize;
                 that.vScrollbarProp = that.vScrollbarMaxScroll/that.maxScrollY;
