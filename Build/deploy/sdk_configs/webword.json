@@ -41,6 +41,7 @@
                 "../../Common/Drawings/Format/Constants.js",
                 "../../Common/Drawings/Format/Format.js",
                 "../../Common/trackFile.js",
+				"../../Excel/apiDefines.js",
                 "../../Common/Charts/libraries/OfficeExcel.common.core.js",
                 "../../Common/Charts/libraries/OfficeExcel.common.key.js",
                 "../../Common/Charts/libraries/OfficeExcel.bar.js",
