@@ -79,7 +79,7 @@ CShapeDrawer.prototype =
     {
         this.IsRectShape    = false;
         this.Shape          = shape;
-        this.Graphics       = graphics;
+        this.Graphics       = window.native;
         this.UniFill        = shape.brush;
         this.Ln             = shape.pen;
         this.Transform      = shape.TransformMatrix;
