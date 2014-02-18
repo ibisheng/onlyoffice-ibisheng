@@ -888,6 +888,9 @@ CChartsDrawer.prototype =
 	_calculateMarginsChart: function(chartSpace) {
 		this.calcProp.chartGutter = {};
 		
+		if(!this.calcProp.pxToMM)
+			this.calcProp.pxToMM = 1 / chartSpace.convertPixToMM(1);
+		
 		var pxToMM = this.calcProp.pxToMM;
 		var standartMargin = 13;
 		
