@@ -776,8 +776,36 @@ var historyitem_Paragraph_PresentationPr_Level      = 33; // Изменяем у
 var historyitem_Paragraph_FramePr                   = 34; // Изменяем настройки рамки
 var historyitem_Paragraph_Shd                       = 35; // Изменяем настройки заливки целиком
 
-var historyitem_Run_AddItem    = 1;
-var historyitem_Run_RemoveItem = 2;
+// Типы изменений в классе ParaRun
+var historyitem_ParaRun_AddItem         =  1;
+var historyitem_ParaRun_RemoveItem      =  2;
+var historyitem_ParaRun_Bold            =  3;
+var historyitem_ParaRun_Italic          =  4;
+var historyitem_ParaRun_Strikeout       =  5; // �������� ������������ ������
+var historyitem_ParaRun_Underline       =  6; // �������� ������������� ������
+var historyitem_ParaRun_FontFamily      =  7; // �������� ��� ������
+var historyitem_ParaRun_FontSize        =  8; // �������� ������ ������
+var historyitem_ParaRun_Color           =  9; // �������� ���� ������
+var historyitem_ParaRun_VertAlign       = 10; // �������� ������������ ����������
+var historyitem_ParaRun_HighLight       = 11; // �������� ��������� ������
+var historyitem_ParaRun_RStyle          = 12; // �������� ����� ������
+var historyitem_ParaRun_Spacing         = 13; // �������� ���������� ����� ���������
+var historyitem_ParaRun_DStrikeout      = 14; // �������� ������� ������������
+var historyitem_ParaRun_Caps            = 15; // �������� ��� ����� �� ���������
+var historyitem_ParaRun_SmallCaps       = 16; // �������� ��� ����� �� ����� ���������
+var historyitem_ParaRun_Position        = 17; // �������� ������������ ���������
+var historyitem_ParaRun_Value           = 18; // �������� ������� ��� ���������
+var historyitem_ParaRun_RFonts          = 19; // �������� ��������� �������
+var historyitem_ParaRun_Lang            = 20; // �������� ��������� �����
+var historyitem_ParaRun_RFonts_Ascii    = 21; // �������� ��������� �������
+var historyitem_ParaRun_RFonts_HAnsi    = 22; // �������� ��������� �������
+var historyitem_ParaRun_RFonts_CS       = 23; // �������� ��������� �������
+var historyitem_ParaRun_RFonts_EastAsia = 24; // �������� ��������� �������
+var historyitem_ParaRun_RFonts_Hint     = 25; // �������� ��������� �������
+var historyitem_ParaRun_Lang_Bidi       = 26; // �������� ��������� �����
+var historyitem_ParaRun_Lang_EastAsia   = 27; // �������� ��������� �����
+var historyitem_ParaRun_Lang_Val        = 28; // �������� ��������� �����
+var historyitem_ParaRun_TextPr          = 29; // �������� ��� ��������� �������
 
 // Типы изменений в классе ParaTextPr
 var historyitem_TextPr_Change     =  1; // Изменяем настройку
@@ -933,8 +961,10 @@ var historyitem_Comment_Change   = 1; // Изменили комментарий
 var historyitem_Comment_TypeInfo = 2; // Изменили информацию о типе комментария
 
 // Типы изменений в классе CParaHyperlinkStart
-var historyitem_Hyperlink_Value   = 1; // Изменяем значение гиперссылки
-var historyitem_Hyperlink_ToolTip = 2; // Изменяем подсказку гиперссылки
+var historyitem_Hyperlink_Value      = 1; // Изменяем значение гиперссылки
+var historyitem_Hyperlink_ToolTip    = 2; // Изменяем подсказку гиперссылки
+var historyitem_Hyperlink_AddItem    = 3;
+var historyitem_Hyperlink_RemoveItem = 4;
 
 //Типы изменений в классе CGraphicObjects
 var historyitem_AddNewGraphicObject = 0;
