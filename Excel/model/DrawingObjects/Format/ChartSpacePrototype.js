@@ -1111,7 +1111,6 @@ CChartSpace.prototype.getCalcProps = function()
     {
         this.chartObj = new CChartsDrawer()
     }
-    this.chartObj.reCalculate(this);
     this.chartObj.preCalculateData(this);
     return this.chartObj.calcProp;
 };
@@ -1122,7 +1121,6 @@ CChartSpace.prototype.getValAxisValues = function()
     {
         this.chartObj = new CChartsDrawer()
     }
-    this.chartObj.reCalculate(this);
     this.chartObj.preCalculateData(this);
     var ret = [];
     ret = ret.concat(this.chartObj.calcProp.scale);
@@ -1716,7 +1714,6 @@ CChartSpace.prototype.recalculateAxis = function()
         var plot_area = this.chart.plotArea;
         var chart_object = plot_area.chart;
         var i;
-        var rect = {x: 0, y:0,w:this.extX, h: this.extY};
         switch(chart_object)
         {
             case historyitem_type_ScatterChart:
@@ -1744,6 +1741,11 @@ CChartSpace.prototype.recalculateAxis = function()
                 }
                 if(val_ax && cat_ax)
                 {
+
+                    val_ax.labels  = null;
+                    cat_ax.labels  = null;
+                    var sizes = this.getChartSizes();
+                    var rect = {x: sizes.startX, y:sizes.startY,w:sizes.w, h: sizes.h};
                     var arr_val =  this.getValAxisValues();
                     //Получим строки для оси значений с учетом формата и единиц
                     var arr_strings = [];
@@ -1777,6 +1779,7 @@ CChartSpace.prototype.recalculateAxis = function()
                     {
                         val_ax.labels = new CValAxisLabels(this);
                         var max_width = 0;
+                        val_ax.labels.yPoints = [];
                         for(i = 0; i < arr_strings.length; ++i)
                         {
                             var dlbl = new CDLbl();
@@ -1790,6 +1793,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             if(dlbl.tx.rich.content.XLimit > max_width)
                                 max_width = dlbl.tx.rich.content.XLimit;
                             val_ax.labels.arrLabels.push(dlbl);
+                            val_ax.labels.yPoints.push({val: arr_val[i], pos: null})
                         }
                     }
                     for(i = 0; i < arr_strings.length; ++i)
@@ -1849,12 +1853,12 @@ CChartSpace.prototype.recalculateAxis = function()
                     if(left_points_width < val_ax.labels.extX)//подписи верт. оси выходят за пределы области построения
                     {
                         point_width = (rect.w - val_ax.labels.extX)/(string_pts.length - crosses);//делим ширину оставшуюся после вычета ширины на количество оставшихся справа точек
-                        val_ax.labels.x = 0;
+                        val_ax.labels.x = rect.x;
                     }
                     else
                     {
                         point_width = rect.w/string_pts.length;
-                        val_ax.labels.x = left_points_width - val_ax.labels.extX;
+                        val_ax.labels.x = rect.x + left_points_width - val_ax.labels.extX;
                     }
 
                     //проверим умещаются ли подписи горизонтальной оси в point_width
@@ -1899,8 +1903,6 @@ CChartSpace.prototype.recalculateAxis = function()
                             if(cur_height > max_height)
                                 max_height = cur_height;
                         }
-
-
                         val_ax.labels.y = rect.y;
                         val_ax.labels.extY = rect.h;
 
@@ -1923,16 +1925,15 @@ CChartSpace.prototype.recalculateAxis = function()
                         for(i = 0; i <cat_ax.labels.arrLabels.length; ++i)
                         {
                             cat_ax.labels.arrLabels[i].setPosition(cat_ax.labels.x + point_width*i, cat_ax.labels.y + gap_hor_axis);
-                            cat_ax.xPoints.push(cat_ax.labels.x + point_width*i/2);
+                            cat_ax.xPoints.push({pos: cat_ax.labels.x + point_width*i/2, val: i});
                         }
 
-                        val_ax.yPoints = [];
                         var dist = val_ax.labels.extY/(val_ax.labels.arrLabels.length-1);
                         for(i = 0; i < val_ax.labels.arrLabels.length; ++i)
                         {
                             val_ax.labels.arrLabels[i].setPosition(val_ax.labels.x, val_ax.labels.y + dist*(val_ax.labels.arrLabels.length - i -1)
                                 -val_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
-                            val_ax.yPoints.push(val_ax.labels.y + dist*(val_ax.labels.arrLabels.length - i -1));
+                            val_ax.yPoints[i].pos = val_ax.labels.y + dist*(val_ax.labels.arrLabels.length - i -1);
                         }
                     }
                     else
@@ -1962,8 +1963,6 @@ CChartSpace.prototype.recalculateAxis = function()
                         {
                             cat_ax.labels.x = min_x > rect.x + rect.w - point_width*string_pts.length ? rect.x + rect.w - point_width*string_pts.length : min_x;
                         }
-
-
                         val_ax.labels.y = rect.y;
                         val_ax.labels.extY = rect.h;
 
@@ -1983,13 +1982,12 @@ CChartSpace.prototype.recalculateAxis = function()
                             cat_ax.labels.y = val_ax.labels.y + val_ax.labels.extY - ((arr_val[arr_val.length-1] - crosses_at)/interval)*val_ax.labels.extY;
                         }
 
-                        val_ax.yPoints = [];
                         var dist = val_ax.labels.extY/(val_ax.labels.arrLabels.length-1);
                         for(i = 0; i < val_ax.labels.arrLabels.length; ++i)
                         {
                             val_ax.labels.arrLabels[i].setPosition(val_ax.labels.x, val_ax.labels.y + dist*(val_ax.labels.arrLabels.length - i -1)
                                 -val_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
-                            val_ax.yPoints.push(val_ax.labels.y + dist*(val_ax.labels.arrLabels.length - i -1));
+                            val_ax.yPoints[i].y = val_ax.labels.y + dist*(val_ax.labels.arrLabels.length - i -1);
                         }
 
                         cat_ax.xPoints = [];
@@ -2010,15 +2008,13 @@ CChartSpace.prototype.recalculateAxis = function()
                             global_MatrixTransformer.TranslateAppend(t, xc, yc + max_width/2);
                             global_MatrixTransformer.MultiplyAppend(t, this.getTransformMatrix());
 
-                            cat_ax.xPoints.push(rect.x + rect.w - (cat_ax.labels.arrLabels.length - 1 - i)*point_width - point_width/2);
+                            cat_ax.xPoints.push({pos:rect.x + rect.w - (cat_ax.labels.arrLabels.length - 1 - i)*point_width - point_width/2, val: i});
                         }
                     }
 
                     val_ax.posX = val_ax.x + val_ax.extX;
                     cat_ax.posY = cat_ax.y;
                 }
-
-
                 break;
             }
         }
