@@ -5,7 +5,7 @@ function CChartsDrawer()
 {
 	this.graphics = null;
 	
-	this.calcProp = null;
+	this.calcProp = {};
 	
 	this.allAreaChart = null;
 	this.gridChart = null;
@@ -14,10 +14,10 @@ function CChartsDrawer()
 
 CChartsDrawer.prototype =
 {
-    reCalculate : function(chartProp)
+    reCalculate : function(chartSpace)
     {
 		this.calcProp = {};
-		this._calculateProperties(chartProp);
+		this._calculateProperties(chartSpace);
 
 		//создаём область
 		this.allAreaChart = new allAreaChart();
@@ -84,25 +84,25 @@ CChartsDrawer.prototype =
 		this.areaChart.reCalculate(this.calcProp, null, this);
 		this.gridChart.reCalculate(this.calcProp, null, this);
 		this.allAreaChart.reCalculate(this.calcProp);
-		this.catAxisChart.reCalculate(this.calcProp, null, chartProp);
-		this.valAxisChart.reCalculate(this.calcProp, null, chartProp);
+		this.catAxisChart.reCalculate(this.calcProp, null, chartSpace);
+		this.valAxisChart.reCalculate(this.calcProp, null, chartSpace);
 		
-		this.chart.reCalculate(this, chartProp);
+		this.chart.reCalculate(this, chartSpace);
 	},
 	
-	draw : function(chartProp, graphics)
+	draw : function(chartSpace, graphics)
     {
 		var cShapeDrawer = new CShapeDrawer();
 		cShapeDrawer.Graphics = graphics;
-		this.calcProp.series = chartProp.chart.plotArea.chart.series;
+		this.calcProp.series = chartSpace.chart.plotArea.chart.series;
 		
 		//отрисовываем без пересчёта
-		this.allAreaChart.draw(this.calcProp, cShapeDrawer, chartProp);
-		this.areaChart.draw(this.calcProp, cShapeDrawer, chartProp);
-		this.catAxisChart.draw(this.calcProp, cShapeDrawer, chartProp);
-		this.valAxisChart.draw(this.calcProp, cShapeDrawer, chartProp);
-		this.gridChart.draw(this.calcProp, cShapeDrawer, chartProp);
-		this.chart.draw(this, cShapeDrawer, chartProp);
+		this.allAreaChart.draw(this.calcProp, cShapeDrawer, chartSpace);
+		this.areaChart.draw(this.calcProp, cShapeDrawer, chartSpace);
+		this.catAxisChart.draw(this.calcProp, cShapeDrawer, chartSpace);
+		this.valAxisChart.draw(this.calcProp, cShapeDrawer, chartSpace);
+		this.gridChart.draw(this.calcProp, cShapeDrawer, chartSpace);
+		this.chart.draw(this, cShapeDrawer, chartSpace);
 	},
 	
 	reCalculatePositionText : function(type, chartSpace, ser, val)
@@ -878,8 +878,8 @@ CChartsDrawer.prototype =
 		var widthCanvas = chartSpace.extX;
 		var heightCanvas = chartSpace.extY;
 		
-		var w = widthCanvas - (this.calcProp.chartGutter._left - this.calcProp.chartGutter._right) / this.calcProp.pxToMM;
-		var h = heightCanvas - (this.calcProp.chartGutter._top - this.calcProp.chartGutter._bottom) / this.calcProp.pxToMM;
+		var w = widthCanvas - (this.calcProp.chartGutter._left + this.calcProp.chartGutter._right) / this.calcProp.pxToMM;
+		var h = heightCanvas - (this.calcProp.chartGutter._top + this.calcProp.chartGutter._bottom) / this.calcProp.pxToMM;
 		
 
         return {w: w / this.calcProp.pxToMM, h: h / this.calcProp.pxToMM, startX: this.calcProp.chartGutter._left / this.calcProp.pxToMM, startY: this.calcProp.chartGutter._top / this.calcProp.pxToMM};
