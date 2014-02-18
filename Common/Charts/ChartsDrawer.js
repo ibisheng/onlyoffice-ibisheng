@@ -882,7 +882,7 @@ CChartsDrawer.prototype =
 		var h = heightCanvas - (this.calcProp.chartGutter._top + this.calcProp.chartGutter._bottom) / this.calcProp.pxToMM;
 		
 
-        return {w: w / this.calcProp.pxToMM, h: h / this.calcProp.pxToMM, startX: this.calcProp.chartGutter._left / this.calcProp.pxToMM, startY: this.calcProp.chartGutter._top / this.calcProp.pxToMM};
+        return {w: w , h: h , startX: this.calcProp.chartGutter._left / this.calcProp.pxToMM, startY: this.calcProp.chartGutter._top / this.calcProp.pxToMM};
 	},
 	
 	_calculateMarginsChart: function(chartSpace) {
