@@ -689,7 +689,7 @@ function asc_CCellCommentator(currentSheet) {
 		return (findCol && findRow) ? _this.asc_getComments(findCol.col, findRow.row) : [];
 	}
 
-	_this.drawCommentCells = function(updatedRange, offsetX, offsetY) {
+	_this.drawCommentCells = function() {
 	
 		if ( isViewerMode() || !_this.bShow )
 			return;
@@ -697,43 +697,45 @@ function asc_CCellCommentator(currentSheet) {
 		var drawCells = []; 	// Associative array
 		function getCellId(col, row) { return (col + "_" + row) };
 
-		//_this.calcCommentsCoords();
-		var frozenOffset = _this.getFrozenOffset();
-
-		for (var i = 0; i < _this.aComments.length; i++) {
-
-			// Get cell metrics
-			var commentCell = _this.aComments[i];
+		for (var n = 0; n < _this.worksheet.drawingArea.frozenPlaces.length; n++) {
+			var frozenPlace = _this.worksheet.drawingArea.frozenPlaces[n];
+			var fv = frozenPlace.getFirstVisible();
+			var lvr = _this.worksheet.getLastVisibleRow();
+			var lvc = _this.worksheet.getLastVisibleCol();
 			
-			if ( updatedRange ) {
-				if ( !((commentCell.nCol >= updatedRange.c1) && (commentCell.nCol <= updatedRange.c2) && (commentCell.nRow >= updatedRange.r1) && (commentCell.nRow <= updatedRange.r2)) )
+			for (var i = 0; i < _this.aComments.length; i++) {
+
+				// Get cell metrics
+				var commentCell = _this.aComments[i];
+				
+				var mergedRange = _this.worksheet.model.getMergedByCell(commentCell.nRow, commentCell.nCol);
+				var drawCol = mergedRange ? mergedRange.c2 : commentCell.nCol;
+				var drawRow = mergedRange ? mergedRange.r1 : commentCell.nRow;
+
+				if ( !frozenPlace.isCellInside({ col: drawCol, row: drawRow }) )
 					continue;
+				if ( commentCell.asc_getDocumentFlag() || commentCell.asc_getHiddenFlag() || commentCell.asc_getSolved() || (drawCol < fv.col) || (drawRow < fv.row) || (drawCol > lvc) || (drawRow > lvr) )
+					continue;
+
+				var cellId = getCellId(commentCell.nCol, commentCell.nRow);
+				if (drawCells[cellId])
+					continue;
+
+				var metrics = _this.getCellMetrics(drawCol, drawRow);
+				if ( !metrics.result || (metrics.width <= 0) || (metrics.height <= 0) )
+					continue;
+
+				_this.drawingCtx.beginPath();
+				_this.drawingCtx.setFillStyle(_this.commentIconColor);
+
+				_this.drawingCtx.moveTo(metrics.left + metrics.width - _this.pxToPt(7), metrics.top);
+				_this.drawingCtx.lineTo(metrics.left + metrics.width - _this.pxToPt(1), metrics.top);
+				_this.drawingCtx.lineTo(metrics.left + metrics.width - _this.pxToPt(1), metrics.top + _this.pxToPt(6));
+				_this.drawingCtx.closePath();
+				_this.drawingCtx.fill();
+
+				drawCells[cellId] = cellId;
 			}
-			if (commentCell.asc_getDocumentFlag() || commentCell.asc_getHiddenFlag() || commentCell.asc_getSolved())
-				continue;
-
-			var mergedRange = _this.worksheet.model.getMergedByCell(commentCell.nRow, commentCell.nCol);
-			var drawCol = mergedRange ? mergedRange.c2 : commentCell.nCol;
-			var drawRow = mergedRange ? mergedRange.r1 : commentCell.nRow;
-
-			var cellId = getCellId(commentCell.nCol, commentCell.nRow);
-			if (drawCells[cellId])
-				continue;
-
-			var metrics = _this.getCellMetrics(drawCol, drawRow, mergedRange, updatedRange, offsetX, offsetY);
-			if ( !metrics.result || (metrics.width <= 0) || (metrics.height <= 0) )
-				continue;
-
-			_this.drawingCtx.beginPath();
-			_this.drawingCtx.setFillStyle(_this.commentIconColor);
-
-			_this.drawingCtx.moveTo(metrics.left + metrics.width - _this.pxToPt(7), metrics.top);
-			_this.drawingCtx.lineTo(metrics.left + metrics.width - _this.pxToPt(1), metrics.top);
-			_this.drawingCtx.lineTo(metrics.left + metrics.width - _this.pxToPt(1), metrics.top + _this.pxToPt(6));
-			_this.drawingCtx.closePath();
-			_this.drawingCtx.fill();
-
-			drawCells[cellId] = cellId;
 		}
 		if (_this.lastSelectedId)
 			_this.asc_selectComment(_this.lastSelectedId, false);
@@ -752,42 +754,46 @@ function asc_CCellCommentator(currentSheet) {
 		return metrics;
 	}
 
-	_this.getCellMetrics = function(col, row, mergedRange, updatedRange, offsetX, offsetY) {
+	_this.getCellMetrics = function(col, row) {
 
-		var ws = _this.worksheet;
-		var metrics = { top: 0, left: 0, width: 0, height: 0, result: false }; 	// pt
+		var metrics = { top: 0, left: 0, width: 0, height: 0, result: false }; 	// px
 
-		updatedRange = updatedRange ? updatedRange : ws.getVisibleRange();
-		offsetX = undefined !== offsetX ? offsetX : ws.getCellLeft(updatedRange.c1, 1) - ws.getCellLeft(0, 1);
-		offsetY = undefined !== offsetY ? offsetY : ws.getCellTop(updatedRange.r1, 1) - ws.getCellTop(0, 1);
+		for (var n = 0; n < _this.worksheet.drawingArea.frozenPlaces.length; n++) {
+			var frozenPlace = _this.worksheet.drawingArea.frozenPlaces[n];
+			if ( !frozenPlace.isCellInside({ col: col, row: row }) )
+				continue;
+			
+			var fv = frozenPlace.getFirstVisible();
+			var mergedRange = _this.worksheet.model.getMergedByCell(row, col);
 
-		mergedRange = (undefined === mergedRange) ? ws.model.getMergedByCell(row, col) : mergedRange;
+			if (mergedRange && (fv.col < mergedRange.c2) && (fv.row < mergedRange.r2)) {
 
-		if (mergedRange && (updatedRange.c1 < mergedRange.c2) && (updatedRange.r1 < mergedRange.r2)) {
+				var startCol = (mergedRange.c1 > fv.col) ? mergedRange.c1 : fv.col;
+				var startRow = (mergedRange.r1 > fv.row) ? mergedRange.r1 : fv.row;
 
-			var startCol = Math.max(mergedRange.c1, updatedRange.c1);
-			var startRow = Math.max(mergedRange.r1, updatedRange.r1);
+				metrics.top = _this.worksheet.getCellTop(startRow, 1) /*- _this.worksheet.getCellTop(fv.row, 1) + _this.worksheet.getCellTop(0, 1)*/ + _this.pxToPt(frozenPlace.getVerticalScroll()) - _this.worksheet.getCellTop(0, 1);
+				metrics.left = _this.worksheet.getCellLeft(startCol, 1) /*- _this.worksheet.getCellLeft(fv.col, 1) + _this.worksheet.getCellLeft(0, 1)*/ + _this.pxToPt(frozenPlace.getHorizontalScroll()) - _this.worksheet.getCellLeft(0, 1);
 
-			metrics.left = ws.getCellLeft(startCol, 1) - offsetX;
-			metrics.top = ws.getCellTop(startRow, 1) - offsetY;
-
-			for (var i = startCol; i <= mergedRange.c2; i++) {
-				metrics.width += ws.getColumnWidth(i, 1);
+				for (var i = startCol; i <= mergedRange.c2; i++) {
+					metrics.width += _this.worksheet.getColumnWidth(i, 1)
+				}
+				for (var i = startRow; i <= mergedRange.r2; i++) {
+					metrics.height += _this.worksheet.getRowHeight(i, 1)
+				}
+				metrics.result = true;
 			}
-			for (var i = startRow; i <= mergedRange.r2; i++) {
-				metrics.height += ws.getRowHeight(i, 1);
+			else if ((fv.row <= row) && (fv.col <= col)) {
+
+				metrics.top = _this.worksheet.getCellTop(row, 1) /*- _this.worksheet.getCellTop(fv.row, 1) + _this.worksheet.getCellTop(0, 1)*/ + _this.pxToPt(frozenPlace.getVerticalScroll()) - _this.worksheet.getCellTop(0, 1);
+				metrics.left = _this.worksheet.getCellLeft(col, 1) /*- _this.worksheet.getCellLeft(fv.col, 1) + _this.worksheet.getCellLeft(0, 1)*/ + _this.pxToPt(frozenPlace.getHorizontalScroll()) - _this.worksheet.getCellLeft(0, 1);
+				metrics.width = _this.worksheet.getColumnWidth(col, 1);
+				metrics.height = _this.worksheet.getRowHeight(row, 1);
+				metrics.result = true;
 			}
-			metrics.result = true;
-		} else if ((updatedRange.r1 <= row) && (updatedRange.c1 <= col)) {
-			metrics.left = ws.getCellLeft(col, 1) - offsetX;
-			metrics.top = ws.getCellTop(row, 1) - offsetY;
-			metrics.width = ws.getColumnWidth(col, 1);
-			metrics.height = ws.getRowHeight(row, 1);
-			metrics.result = true;
 		}
 
 		return metrics;
-	};
+	}
 
 	_this.updateCommentPosition = function() {
 		var _this = this;

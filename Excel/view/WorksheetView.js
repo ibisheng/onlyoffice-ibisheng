@@ -414,6 +414,7 @@
 			
 			// Auto filters
 			this.autoFilters = new asc_AF(this);
+			this.drawingArea = new DrawingArea(this);
 			this.cellCommentator = new asc_CCellCommentator(this);
 			this.objectRender = null;
 
@@ -1832,7 +1833,8 @@
 			this._drawFrozenPaneLines();
 			this._fixSelectionOfMergedCells();
 			this._fixSelectionOfHiddenCells();
-			this._drawGraphic();
+			this._drawAutoF();
+			this.cellCommentator.drawCommentCells();
 			this.objectRender.showDrawingObjects(false);
 			if (this.overlayCtx) {
 				this._drawSelection();
@@ -3398,12 +3400,11 @@
 			}
 		};
 
-		WorksheetView.prototype._drawGraphic = function (updatedRange, offsetX, offsetY) {
+		WorksheetView.prototype._drawAutoF = function (updatedRange, offsetX, offsetY) {
 			if (updatedRange) {
 				this.autoFilters.drawAutoF(updatedRange, offsetX, offsetY);
-				this.cellCommentator.drawCommentCells(updatedRange, offsetX, offsetY);
 			} else {
-				this._drawElements(this, this._drawGraphic);
+				this._drawElements(this, this._drawAutoF);
 			}
 		};
 
@@ -5035,7 +5036,7 @@
 				this._drawGrid(/*drawingCtx*/ undefined, range);
 				this._drawCells(/*drawingCtx*/undefined, range);
 				this._drawCellsBorders(/*drawingCtx*/undefined, range);
-				this._drawGraphic(range, offsetX, offsetY);
+				this._drawAutoF(range, offsetX, offsetY);
 				if (0 < cFrozen) {
 					range.c1 = 0;
 					range.c2 = cFrozen - 1;
@@ -5043,7 +5044,7 @@
 					this._drawGrid(/*drawingCtx*/ undefined, range, offsetX);
 					this._drawCells(/*drawingCtx*/undefined, range, offsetX);
 					this._drawCellsBorders(/*drawingCtx*/undefined, range, offsetX);
-					this._drawGraphic(range, offsetX, offsetY);
+					this._drawAutoF(range, offsetX, offsetY);
 				}
 				// Отрисовывать нужно всегда, вдруг бордеры
 				this._drawFrozenPaneLines();
@@ -5057,6 +5058,7 @@
 				this.handlers.trigger("reinitializeScrollY");
 
 			this.cellCommentator.updateCommentPosition();
+			this.cellCommentator.drawCommentCells();
 			//ToDo this.drawDepCells();
 			this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollVertical, rangeGraphic));
 			return this;
@@ -5128,7 +5130,7 @@
 				this._drawGrid(/*drawingCtx*/ undefined, range);
 				this._drawCells(/*drawingCtx*/undefined, range);
 				this._drawCellsBorders(/*drawingCtx*/undefined, range);
-				this._drawGraphic(range, offsetX, offsetY);
+				this._drawAutoF(range, offsetX, offsetY);
 				if (rFrozen) {
 					range.r1 = 0;
 					range.r2 = rFrozen - 1;
@@ -5136,7 +5138,7 @@
 					this._drawGrid(/*drawingCtx*/ undefined, range, undefined, offsetY);
 					this._drawCells(/*drawingCtx*/undefined, range, undefined, offsetY);
 					this._drawCellsBorders(/*drawingCtx*/undefined, range, undefined, offsetY);
-					this._drawGraphic(range, offsetX, offsetY);
+					this._drawAutoF(range, offsetX, offsetY);
 				}
 				// Отрисовывать нужно всегда, вдруг бордеры
 				this._drawFrozenPaneLines();
@@ -5148,6 +5150,7 @@
 				this.handlers.trigger("reinitializeScrollX");
 
 			this.cellCommentator.updateCommentPosition();
+			this.cellCommentator.drawCommentCells();
 			//ToDo this.drawDepCells();
 			this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollHorizontal, rangeGraphic));
 			return this;

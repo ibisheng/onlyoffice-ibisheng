@@ -2776,7 +2776,8 @@ function DrawingObjects() {
 			case c_oAscCellAnchorType.cellanchorOneCell: 
 				{
 					var coordsFrom = _this.coordsManager.calculateCoords(_t.from);
-					var cellTo = _this.coordsManager.calculateCell( coordsFrom.x + mmToPx(_t.ext.cx), coordsFrom.y + mmToPx(_t.ext.cy) );
+					//var cellTo = _this.coordsManager.calculateCell( coordsFrom.x + mmToPx(_t.ext.cx), coordsFrom.y + mmToPx(_t.ext.cy) );
+					var cellTo = _this.drawingArea.calculateCell( coordsFrom.x + mmToPx(_t.ext.cx), coordsFrom.y + mmToPx(_t.ext.cy) );
 
 					_t.to.col = cellTo.col;
 					_t.to.colOff = cellTo.colOff;
@@ -2792,13 +2793,15 @@ function DrawingObjects() {
 					if ( _t.Pos.Y < 0 )
 						_t.Pos.Y = 0;
 						
-					var cellFrom = _this.coordsManager.calculateCell( mmToPx(_t.Pos.X), mmToPx(_t.Pos.Y) );
+					//var cellFrom = _this.coordsManager.calculateCell( mmToPx(_t.Pos.X), mmToPx(_t.Pos.Y) );
+					var cellFrom = _this.drawingArea.calculateCell( mmToPx(_t.Pos.X), mmToPx(_t.Pos.Y) );
 					_t.from.col = cellFrom.col;
 					_t.from.colOff = cellFrom.colOff;
 					_t.from.row = cellFrom.row;
 					_t.from.rowOff = cellFrom.rowOff;
 
-					var cellTo = _this.coordsManager.calculateCell( mmToPx(_t.Pos.X + _t.ext.cx), mmToPx(_t.Pos.Y + _t.ext.cy));
+					//var cellTo = _this.coordsManager.calculateCell( mmToPx(_t.Pos.X + _t.ext.cx), mmToPx(_t.Pos.Y + _t.ext.cy));
+					var cellTo = _this.drawingArea.calculateCell( mmToPx(_t.Pos.X + _t.ext.cx), mmToPx(_t.Pos.Y + _t.ext.cy));
 					_t.to.col = cellTo.col;
 					_t.to.colOff = cellTo.colOff;
 					_t.to.row = cellTo.row;
@@ -2955,7 +2958,7 @@ function DrawingObjects() {
 		shapeCtx.m_oAutoShapesTrack = autoShapeTrack;
 		
 		_this.objectLocker = new ObjectLocker(worksheet);
-		_this.drawingArea = new DrawingArea(worksheet);
+		_this.drawingArea = currentSheet.drawingArea;
 		_this.drawingArea.init();
 		_this.coordsManager = new CoordsManager(worksheet, true);
 		_this.drawingDocument = new CDrawingDocument(this);
@@ -3275,8 +3278,12 @@ function DrawingObjects() {
 		if ( checker ) {
 			var coords = { from: null, to: null };
 			
-			coords.from = _this.coordsManager.calculateCell( mmToPx(checker.Bounds.min_x), mmToPx(checker.Bounds.min_y) );
-			coords.to = _this.coordsManager.calculateCell( mmToPx(checker.Bounds.max_x), mmToPx(checker.Bounds.max_y) );
+			//coords.from = _this.coordsManager.calculateCell( mmToPx(checker.Bounds.min_x), mmToPx(checker.Bounds.min_y) );
+			//coords.to = _this.coordsManager.calculateCell( mmToPx(checker.Bounds.max_x), mmToPx(checker.Bounds.max_y) );
+			
+			coords.from = _this.drawingArea.calculateCell( mmToPx(checker.Bounds.min_x), mmToPx(checker.Bounds.min_y) );
+			coords.to = _this.drawingArea.calculateCell( mmToPx(checker.Bounds.max_x), mmToPx(checker.Bounds.max_y) );
+			
 			return coords;
 		}
 		return null;
@@ -3759,7 +3766,8 @@ function DrawingObjects() {
 					width /= metricCoeff;
 				}
 				
-				var cellTo = _this.coordsManager.calculateCell(realLeftOffset + width, realTopOffset + height);
+				//var cellTo = _this.coordsManager.calculateCell(realLeftOffset + width, realTopOffset + height);
+				var cellTo = _this.drawingArea.calculateCell(realLeftOffset + width, realTopOffset + height);
 				object.to.col = cellTo.col;
 				object.to.colOff = cellTo.colOff;
 				object.to.row = cellTo.row;
@@ -4932,8 +4940,11 @@ function DrawingObjects() {
 			//worksheet._initCellsArea(true);
 			worksheet.changeWorksheet("update");
 		}
-	
-		aObjects = [];
+		for (var i = 0; i < aObjects.length; i++) {
+			aObjects[i].graphicObject.deleteDrawingBase();
+		}
+		aBoundsCheckers = [];
+		
 		worksheet._clean();			
 		var listRange = new Range(worksheet.model, 0, 0, worksheet.nRowsCount - 1, worksheet.nColsCount - 1);
 		listRange.cleanAll();
@@ -5156,7 +5167,8 @@ function DrawingObjects() {
 			var drawingObject = aObjects[i];
 
 			var coords = _this.coordsManager.calculateCoords(drawingObject.from);
-			var cellTo = _this.coordsManager.calculateCell(coords.x + drawingObject.size.width, coords.y + drawingObject.size.height);
+			//var cellTo = _this.coordsManager.calculateCell(coords.x + drawingObject.size.width, coords.y + drawingObject.size.height);
+			var cellTo = _this.drawingArea.calculateCell(coords.x + drawingObject.size.width, coords.y + drawingObject.size.height);
 			drawingObject.to.col = cellTo.col;
 			drawingObject.to.colOff = cellTo.colOff;
 			drawingObject.to.row = cellTo.row;
