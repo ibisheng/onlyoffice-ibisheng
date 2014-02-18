@@ -1961,6 +1961,10 @@ function CBinaryFileWriter()
     this.CorrectUniColorAlpha = function(color, trans)
     {
         // делаем прозрачность
+        if(!color.Mods)
+        {
+            color.setMods(new CColorModifiers());
+        }
         var mods = color.Mods.Mods;
         var _len = mods.length;
 
