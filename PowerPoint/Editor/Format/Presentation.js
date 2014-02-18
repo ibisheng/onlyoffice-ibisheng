@@ -3005,7 +3005,7 @@ CPresentation.prototype =
                 case STATES_ID_NULL:
                 {
                     var a_drawing_bases = this.Slides[this.CurPage].cSld.spTree;
-                    if(!e.SshiftKey)
+                    if(!e.ShiftKey)
                     {
                         var last_selected = null, last_selected_index = null;
                         for(var i = a_drawing_bases.length - 1;  i > -1; --i)
@@ -3138,7 +3138,8 @@ CPresentation.prototype =
                     break;
                 }
             }
-            bRetValue = true;
+            
+			bRetValue = true;
         }
         else if ( e.KeyCode == 13 && false === editor.isViewMode ) // Enter
         {
