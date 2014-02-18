@@ -1793,7 +1793,8 @@ CChartSpace.prototype.recalculateAxis = function()
                             if(dlbl.tx.rich.content.XLimit > max_width)
                                 max_width = dlbl.tx.rich.content.XLimit;
                             val_ax.labels.arrLabels.push(dlbl);
-                            val_ax.yPoints.push({val: arr_val[i], pos: null})
+                            val_ax.yPoints.push({val: arr_val[i], pos: null});
+
                         }
                     }
                     for(i = 0; i < arr_strings.length; ++i)
@@ -1925,7 +1926,7 @@ CChartSpace.prototype.recalculateAxis = function()
                         for(i = 0; i <cat_ax.labels.arrLabels.length; ++i)
                         {
                             cat_ax.labels.arrLabels[i].setPosition(cat_ax.labels.x + point_width*i, cat_ax.labels.y + gap_hor_axis);
-                            cat_ax.xPoints.push({pos: cat_ax.labels.x + point_width*i/2, val: i});
+                            cat_ax.xPoints.push({pos: cat_ax.labels.x + point_width*(i+0.5), val: i});
                         }
 
                         var dist = val_ax.labels.extY/(val_ax.labels.arrLabels.length-1);
@@ -2011,7 +2012,6 @@ CChartSpace.prototype.recalculateAxis = function()
                             cat_ax.xPoints.push({pos:rect.x + rect.w - (cat_ax.labels.arrLabels.length - 1 - i)*point_width - point_width/2, val: i});
                         }
                     }
-
                     val_ax.posX = val_ax.x + val_ax.extX;
                     cat_ax.posY = cat_ax.y;
                 }
