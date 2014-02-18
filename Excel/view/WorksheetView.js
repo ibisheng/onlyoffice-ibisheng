@@ -7492,7 +7492,7 @@
 
 				History.EndTransaction();
 			};
-			if ("paste" === prop) {
+			if ("paste" === prop && val.onlyImages !== true) {
 				// Для past свой диапазон
 				if(isLocal === "binary")
 					checkRange = t._pasteFromBinary(val, true);
