@@ -1779,7 +1779,7 @@ CChartSpace.prototype.recalculateAxis = function()
                     {
                         val_ax.labels = new CValAxisLabels(this);
                         var max_width = 0;
-                        val_ax.labels.yPoints = [];
+                        val_ax.yPoints = [];
                         for(i = 0; i < arr_strings.length; ++i)
                         {
                             var dlbl = new CDLbl();
@@ -1793,7 +1793,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             if(dlbl.tx.rich.content.XLimit > max_width)
                                 max_width = dlbl.tx.rich.content.XLimit;
                             val_ax.labels.arrLabels.push(dlbl);
-                            val_ax.labels.yPoints.push({val: arr_val[i], pos: null})
+                            val_ax.yPoints.push({val: arr_val[i], pos: null})
                         }
                     }
                     for(i = 0; i < arr_strings.length; ++i)
