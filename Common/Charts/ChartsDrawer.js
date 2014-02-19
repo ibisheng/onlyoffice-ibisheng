@@ -82,7 +82,7 @@ CChartsDrawer.prototype =
 		
 		//делаем полный пресчёт
 		this.areaChart.reCalculate(this.calcProp, null, this);
-		this.gridChart.reCalculate(this.calcProp, null, this);
+		this.gridChart.reCalculate(this.calcProp, null, chartSpace);
 		this.allAreaChart.reCalculate(this.calcProp);
 		this.catAxisChart.reCalculate(this.calcProp, null, chartSpace);
 		this.valAxisChart.reCalculate(this.calcProp, null, chartSpace);
@@ -193,39 +193,39 @@ CChartsDrawer.prototype =
 		
 		
 		//count line of chart grid
-		this.calcProp.numhlines = this.calcProp.scale.length - 1;
+		this.calcProp.numhlines = chartProp.chart.plotArea.valAx.yPoints.length - 1;
 		if(this.calcProp.type == "Bar")
 		{
-			this.calcProp.numvlines = this.calcProp.data.length;
+			this.calcProp.numvlines = chartProp.chart.plotArea.catAx.xPoints.length;
 			
 			this.calcProp.numvMinorlines = 2;
 			this.calcProp.numhMinorlines = 5;
 		}
 		else if(this.calcProp.type == "HBar")
 		{
-			this.calcProp.numhlines = this.calcProp.data.length;
-			this.calcProp.numvlines = this.calcProp.scale.length - 1;
+			this.calcProp.numhlines = chartProp.chart.plotArea.catAx.xPoints.length;
+			this.calcProp.numvlines = chartProp.chart.plotArea.valAx.yPoints.length;
 			
 			this.calcProp.numhMinorlines = 2;
 			this.calcProp.numvMinorlines = 5;
 		}
 		else if(this.calcProp.type == "Line" || this.calcProp.type == "Stock")
 		{
-			this.calcProp.numvlines = this.calcProp.data[0].length;
+			this.calcProp.numvlines = chartProp.chart.plotArea.catAx.xPoints.length;
 			
 			this.calcProp.numvMinorlines = 2;
 			this.calcProp.numhMinorlines = 5;
 		}
 		else if(this.calcProp.type == "Scatter")
 		{
-			this.calcProp.numvlines = this.calcProp.xScale.length - 1;
+			this.calcProp.numvlines = chartProp.chart.plotArea.catAx.xPoints.length;
 			
 			this.calcProp.numvMinorlines = 5;
 			this.calcProp.numhMinorlines = 5;
 		}
 		else if(this.calcProp.type == "Area")
 		{
-			this.calcProp.numvlines = this.calcProp.data[0].length - 1;
+			this.calcProp.numvlines = chartProp.chart.plotArea.catAx.xPoints.length;
 			
 			this.calcProp.numvMinorlines = 2;
 			this.calcProp.numhMinorlines = 5;
@@ -1099,7 +1099,7 @@ CChartsDrawer.prototype =
 			if('Bar' == mainObj.type)
 			{
 				for (var j=0; j < 11; j++) {
-					massRes[j] = (maxValue - step*j);
+					massRes[j] = (maxValue - step*j) / 100;
 					if(massRes[j] == 0)
 					{
 						break;
@@ -1113,7 +1113,7 @@ CChartsDrawer.prototype =
 			else
 			{
 				for (var j=0; j < 11; j++) {
-					massRes[j] = -(maxValue - step*j);
+					massRes[j] = -(maxValue - step*j) / 100;
 					if(massRes[j] == 0)
 					{
 						break;
@@ -1127,7 +1127,7 @@ CChartsDrawer.prototype =
 		else if(max > 0 && min > 0)
 		{
 			for (var j=0; j < 11; j++) {
-				massRes[j] = maxValue - step*j;
+				massRes[j] = (maxValue - step*j) / 100;
 				if(massRes[j] == 0)
 				{
 					massRes = this._array_reverse(massRes);
@@ -1140,13 +1140,14 @@ CChartsDrawer.prototype =
 		else
 		{
 			 for (var j=0; j < 11; j++) {
-				massRes[j] = maxValue - step*j;
-				if(massRes[j] <= newMin)
+				massRes[j] = (maxValue - step*j) / 100;
+				if(massRes[j] <= newMin / 100)
 				{
 					massRes = this._array_reverse(massRes);
 					break;
 				}
 			}
+			
 			mainObj.ymax = this._array_exp(maxValue);
 			mainObj.ymin = massRes[0] - step;
 		}
@@ -2030,14 +2031,17 @@ CChartsDrawer.prototype =
 			varMin = varMin/degreeNum;
 			stepOY = stepOY/degreeNum;
 			axisXMax = axisXMax/degreeNum;
-			 for (var k=0; k <= 11; k++) {
+			for (var k=0; k <= 11; k++) {
 				massRes[k] = this._round_val((varMin + (k)*(stepOY)));
-				if(massRes[k] > axisXMax)
+				if(minVal < 0 && maxVal <= 0)
+					massRes[k] = - massRes[k];
+				if(Math.abs(massRes[k]) > axisXMax)
 				{
 					break;
 				}
-		
 			}
+			if(minVal < 0 && maxVal <= 0)
+				massRes = this._array_reverse(massRes);
 		}
 		
 		if('line' == mainObj.type && max > 0 && min < 0)
@@ -2455,18 +2459,20 @@ drawLineChart.prototype =
 	
 	_calculateLines: function ()
 	{
+		//соответствует подписям оси категорий(OX)
+		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
+		//соответствует подписям оси значений(OY)
+		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
+		
 		var trueWidth = this.chartProp.trueWidth;
 		var trueHeight = this.chartProp.trueHeight;
-		var min = this.chartProp.scale[0];
-		var max = this.chartProp.scale[this.chartProp.scale.length - 1];
+		
+		var min = yPoints[0].val;
+		var max = yPoints[yPoints.length - 1].val;
 			
 		var digHeight = Math.abs(max - min);
-		
-		if(this.chartProp.min < 0 && this.chartProp.max <= 0 && this.chartProp.subType != "stackedPer")
-			min = -1*max;
 
-		var koffX = trueWidth/this.chartProp.numvlines;
-		var koffY = trueHeight/digHeight;
+		var koffY = trueHeight / digHeight;
 		
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 		
@@ -2485,8 +2491,8 @@ drawLineChart.prototype =
 				y  = trueHeight - (val)*koffY + this.chartProp.chartGutter._top;
 				y1 = trueHeight - (nextVal)*koffY + this.chartProp.chartGutter._top;
 				
-				x  = this.chartProp.chartGutter._left + (n)*koffX + koffX/2; 
-				x1 = this.chartProp.chartGutter._left + (n + 1)*koffX + koffX/2;
+				x  = xPoints[n].pos * this.chartProp.pxToMM; 
+				x1 = xPoints[n + 1].pos * this.chartProp.pxToMM;
 				
 				if(!this.paths.series)
 					this.paths.series = [];
@@ -2494,15 +2500,6 @@ drawLineChart.prototype =
 					this.paths.series[i] = []
 				
 				this.paths.series[i][n] = this._calculateLine(x, y, x1, y1);
-				
-				//caclculate dataLablels
-				/*posDlbl = this._calculateDLbl(dataSeries[n - 1], x, y);
-				dataSeries[n - 1].compiledDlb.setPosition(posDlbl.x, posDlbl.y);
-				if(n == dataSeries.length - 1)
-				{
-					posDlbl = this._calculateDLbl(dataSeries[n], x1, y1);
-					dataSeries[n].compiledDlb.setPosition(posDlbl.x, posDlbl.y);
-				}*/
 			}
 		}
 	},
@@ -2624,7 +2621,7 @@ drawLineChart.prototype =
 					summVal += Math.abs(tempVal);
 				}
 			}
-			val = val*100/summVal;
+			val = val / summVal;
 		}
 		else
 		{
@@ -2689,29 +2686,32 @@ drawAreaChart.prototype =
 		this._drawLines();
 	},
 	
-	reCalculate : function(chartProp, cShapeDrawer)
+	reCalculate : function(chartProp, cChartSpace)
     {
 		this.paths = {};
 		this.chartProp = chartProp.calcProp;
 		this.cChartDrawer = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
+		this.cChartSpace = cChartSpace;
 		this._calculateLines(true);
 	},
 	
 	_calculateLines: function (/*isSkip*/)
-    {
-        var trueWidth = this.chartProp.trueWidth;
+    {	
+		//соответствует подписям оси категорий(OX)
+		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
+		//соответствует подписям оси значений(OY)
+		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
+		
+		var trueWidth = this.chartProp.trueWidth;
 		var trueHeight = this.chartProp.trueHeight;
-		var min = this.chartProp.scale[0];
-		var max = this.chartProp.scale[this.chartProp.scale.length - 1];
+		
+		var min = yPoints[0].val;
+		var max = yPoints[yPoints.length - 1].val;
 			
 		var digHeight = Math.abs(max - min);
+
+		var koffY = trueHeight / digHeight;
 		
-		if(this.chartProp.min < 0 && this.chartProp.max <= 0 && this.chartProp.subType != "stackedPer")
-			min = -1*max;
-		
-		var koffX = trueWidth/this.chartProp.numvlines;
-		var koffY = trueHeight/digHeight;	
 		
 		var seria;
 		for (var i = 0; i < this.chartProp.series.length; i++) {
@@ -2733,8 +2733,8 @@ drawAreaChart.prototype =
 				y  = trueHeight - (nextVal)*koffY + this.chartProp.chartGutter._top;
 				y1 = trueHeight - (val)*koffY + this.chartProp.chartGutter._top;
 				
-				x  = this.chartProp.chartGutter._left + n*koffX; 
-				x1 = this.chartProp.chartGutter._left + (n + 1)*koffX;
+				x  = xPoints[n].pos * this.chartProp.pxToMM; 
+				x1 = xPoints[n + 1].pos * this.chartProp.pxToMM;
 				
 				if(!this.paths.series)
 					this.paths.series = [];
@@ -2870,7 +2870,7 @@ drawAreaChart.prototype =
 					summVal += Math.abs(tempVal);
 				}
 			}
-			val = val*100/summVal;
+			val = val / summVal;
 		}
 		else
 		{
