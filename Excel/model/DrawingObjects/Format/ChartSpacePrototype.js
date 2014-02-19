@@ -112,6 +112,11 @@ CChartSpace.prototype.handleUpdateChart = function()
     this.recalcChart();
     this.addToRecalculate();
 };
+CChartSpace.prototype.handleUpdateStyle = function()
+{
+    this.setRecalculateInfo();
+    this.addToRecalculate();
+};
 CChartSpace.prototype.canGroup = CShape.prototype.canGroup;
 CChartSpace.prototype.convertPixToMM = CShape.prototype.convertPixToMM;
 CChartSpace.prototype.getCanvasContext = CShape.prototype.getCanvasContext;
@@ -1971,7 +1976,6 @@ CChartSpace.prototype.recalculateAxis = function()
                         var interval = arr_val[arr_val.length-1] - arr_val[0];
                         cat_ax.labels.y = val_ax.labels.y + val_ax.labels.extY - ((arr_val[arr_val.length-1] - crosses_at)/interval)*val_ax.labels.extY;
 
-
                         cat_ax.labels.extX = rect.x + rect.w - cat_ax.labels.x;
                         cat_ax.labels.extY = max_height + gap_hor_axis;
 
@@ -2001,19 +2005,17 @@ CChartSpace.prototype.recalculateAxis = function()
                             var y1 = cat_ax.labels.y + gap_hor_axis/Math.sqrt(2);
                             var xc = x1 - max_width/(2*Math.sqrt(2));
                             var yc = y1 - max_width/(2*Math.sqrt(2));
-
                             var t = cat_ax.labels.arrLabels[i].transformText;
                             t.Reset();
                             global_MatrixTransformer.TranslateAppend(t, -max_width/2, 0);
                             global_MatrixTransformer.RotateRadAppend(t, Math.PI/4);
                             global_MatrixTransformer.TranslateAppend(t, xc, yc + max_width/2);
                             global_MatrixTransformer.MultiplyAppend(t, this.getTransformMatrix());
-
                             cat_ax.xPoints.push({pos:rect.x + rect.w - (cat_ax.labels.arrLabels.length - 1 - i)*point_width - point_width/2, val: i});
                         }
                     }
-                    val_ax.posX = val_ax.x + val_ax.extX;
-                    cat_ax.posY = cat_ax.y;
+                    val_ax.posX = val_ax.labels.x + val_ax.labels.extX;
+                    cat_ax.posY = cat_ax.labels.y;
                 }
                 break;
             }
