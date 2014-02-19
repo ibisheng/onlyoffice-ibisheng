@@ -446,6 +446,7 @@
 				opt.rightSide.forEach(function (e,i,a) {a[i] = e + dx;});
 				opt.bottomSide.forEach(function (e,i,a) {a[i] = e + dy;});
 
+				// ToDo выставлять опции (т.к. при scroll редактор должен пересчитываться)
 				t._adjustCanvas();
 				t._renderText();
 				t._drawSelection();

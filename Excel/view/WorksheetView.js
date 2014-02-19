@@ -6449,8 +6449,7 @@
 		WorksheetView.prototype.changeSelectionDone = function () {
 			if (this.isFormulaEditMode && this.arrActiveFormulaRanges.length > 0) {
 				// Нормализуем range
-
-						this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1].normalize();
+				this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1].normalize();
 			} else {
 				// Нормализуем range
 				this.activeRange.normalize();
@@ -10042,12 +10041,17 @@
 			if (!t.isFormulaEditMode)
 				return;
 
-			var ar = t.arrActiveFormulaRanges[t.arrActiveFormulaRanges.length - 1];
+			var ar = t.arrActiveFormulaRanges[t.arrActiveFormulaRanges.length - 1].clone(true);
+			// Замерженную ячейку должны отдать только левую верхнюю.
+			var mergedRange = this.model.getMergedByCell(ar.r1, ar.c1);
+			if (mergedRange && ar.isEqual(mergedRange)) {
+				ar.r2 = ar.r1;
+				ar.c2 = ar.c1;
+			}
+
 			var s = t.getActiveRange(ar);
 
 			editor.enterCellRange(s);
-
-			return true;
 		};
 
 		WorksheetView.prototype.changeCellRange = function (editor,range){
@@ -10091,12 +10095,14 @@
 		};
 
 		WorksheetView.prototype.addFormulaRange = function (range) {
-			var r = range !== undefined ? range : this.activeRange.clone(true);
+			var r = range !== undefined ? range :
+				new asc_Range(this.activeRange.c1, this.activeRange.r1, this.activeRange.c2, this.activeRange.r2);
 			if (r.startCol === undefined || r.startRow === undefined) {
 				r.startCol = r.c1;
 				r.startRow = r.r1;
 			}
 			this.arrActiveFormulaRanges.push(r);
+			this._fixSelectionOfMergedCells();
 		};
 
 		WorksheetView.prototype.changeFormulaRange = function (range) {

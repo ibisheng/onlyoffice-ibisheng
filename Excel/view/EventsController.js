@@ -926,7 +926,7 @@
 								if (t.isFormulaEditMode) {
 									t.handlers.trigger("enterCellRange");
 								} else if (t.isCellEditMode) {
-									if (!t.handlers.trigger("stopCellEditing")) {return true;}
+									t.handlers.trigger("stopCellEditing");
 								}
 							});
 				}
