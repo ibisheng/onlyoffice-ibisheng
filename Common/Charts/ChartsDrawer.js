@@ -1099,14 +1099,13 @@ CChartsDrawer.prototype =
 			if('Bar' == mainObj.type)
 			{
 				for (var j=0; j < 11; j++) {
-					massRes[j] = (maxValue - step*j) / 100;
+					massRes[j] = - (maxValue - step*j) / 100;
 					if(massRes[j] == 0)
 					{
 						break;
 					}
 				}
 				mainObj.xaxispos = 'top';
-				massRes = this._array_reverse(massRes);
 				mainObj.ymax = massRes[massRes.length - 1];
 				mainObj.ymin = 0;
 			}
@@ -2034,8 +2033,15 @@ CChartsDrawer.prototype =
 			for (var k=0; k <= 11; k++) {
 				massRes[k] = this._round_val((varMin + (k)*(stepOY)));
 				if(minVal < 0 && maxVal <= 0)
+				{
 					massRes[k] = - massRes[k];
-				if(Math.abs(massRes[k]) > axisXMax)
+					if(Math.abs(massRes[k]) > axisXMax)
+					{
+						break;
+					}
+				}
+					
+				if(massRes[k] > axisXMax)
 				{
 					break;
 				}
@@ -2299,7 +2305,7 @@ drawBarChart.prototype =
 						summBarVal[j] = temp;
 					}
 					
-					height = ((val * 100/summBarVal[j]) / (this.chartProp.max - this.chartProp.min)) * this.chartProp.trueHeight;
+					height = ((val / summBarVal[j]) / (this.chartProp.max - this.chartProp.min)) * this.chartProp.trueHeight;
 					startY = this.chartProp.nullPositionOX - diffYVal;
 					seriesHeight[i][j] = height;
 				}
@@ -2464,35 +2470,24 @@ drawLineChart.prototype =
 		//соответствует подписям оси значений(OY)
 		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
 		
-		var trueWidth = this.chartProp.trueWidth;
-		var trueHeight = this.chartProp.trueHeight;
-		
-		var min = yPoints[0].val;
-		var max = yPoints[yPoints.length - 1].val;
-			
-		var digHeight = Math.abs(max - min);
-
-		var koffY = trueHeight / digHeight;
-		
+		var y, y1, x, x1, val, nextVal, tempVal, seria, dataSeries;
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 		
-			var seria = this.chartProp.series[i];
+			seria = this.chartProp.series[i];
 			
-			var dataSeries = seria.val.numRef.numCache.pts;
+			dataSeries = seria.val.numRef.numCache.pts;
 			
-			var y, y1, x, x1, val, nextVal, tempVal;
-		
 			for(var n = 0; n < dataSeries.length - 1; n++)
 			{
 				//рассчитываем значения				
-				val = this._getYVal(n, i) - min;
-				nextVal = this._getYVal(n + 1, i) - min;
+				val = this._getYVal(n, i);
+				nextVal = this._getYVal(n + 1, i);
 				
-				y  = trueHeight - (val)*koffY + this.chartProp.chartGutter._top;
-				y1 = trueHeight - (nextVal)*koffY + this.chartProp.chartGutter._top;
+				y  = this._getYPosition(val, yPoints);
+				y1 = this._getYPosition(nextVal, yPoints);
 				
-				x  = xPoints[n].pos * this.chartProp.pxToMM; 
-				x1 = xPoints[n + 1].pos * this.chartProp.pxToMM;
+				x  = xPoints[n].pos; 
+				x1 = xPoints[n + 1].pos;
 				
 				if(!this.paths.series)
 					this.paths.series = [];
@@ -2502,6 +2497,25 @@ drawLineChart.prototype =
 				this.paths.series[i][n] = this._calculateLine(x, y, x1, y1);
 			}
 		}
+	},
+	
+	_getYPosition: function(val, yPoints)
+	{
+		//позиция в заисимости от положения точек на оси OY
+		var result;
+		var resPos;
+		var resVal;
+		for(var s = 0; s < yPoints.length; s++)
+		{
+			if(val >= yPoints[s].val && val <= yPoints[s + 1].val)
+			{
+				resPos = Math.abs(yPoints[s + 1].pos - yPoints[s].pos);
+				resVal = yPoints[s + 1].val - yPoints[s].val;
+				result =  - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+				break;
+			}
+		}
+		return result;
 	},
 	
 	_calculateDLbl: function(chartSpace, ser, val)
@@ -2643,9 +2657,8 @@ drawLineChart.prototype =
 		gdLst["w"] = 1;
 		gdLst["h"] = 1;
 		
-		var pxToMm = this.chartProp.pxToMM;
-		path.moveTo(x / pxToMm * pathW, y / pxToMm * pathH);
-		path.lnTo(x1 / pxToMm * pathW, y1 / pxToMm * pathH);
+		path.moveTo(x * pathW, y * pathH);
+		path.lnTo(x1 * pathW, y1 * pathH);
 		path.recalculate(gdLst);
 		
 		return path;
