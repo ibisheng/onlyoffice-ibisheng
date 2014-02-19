@@ -6441,6 +6441,7 @@
 					this.handlers.trigger("selectionRangeChanged", this.getSelectionRangeValue());
 				}
 			}
+			this.model.workbook.handlers.trigger("asc_onHideComment");
 
 			return ret;
 		};
@@ -6850,6 +6851,8 @@
 
 			// Смотрим, ушли ли мы за границу видимой области
 			ret = this._calcFillHandleOffset(activeFillHandleCopy);
+			this.model.workbook.handlers.trigger("asc_onHideComment");
+			
 			return ret;
 		};
 
@@ -7068,6 +7071,9 @@
 			};
 			while ( this._isColDrawnPartially( this.activeMoveRange.c2, this.visibleRange.c1 + d.deltaX) ) {++d.deltaX;}
 			while ( this._isRowDrawnPartially( this.activeMoveRange.r2, this.visibleRange.r1 + d.deltaY) ) {++d.deltaY;}
+			
+			this.model.workbook.handlers.trigger("asc_onHideComment");
+			
 			return d;
 		};
 
