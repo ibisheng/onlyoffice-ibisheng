@@ -908,14 +908,12 @@ function ParaComment(Start, Id)
 
     this.StartLine  = 0;
     this.StartRange = 0;
-
-    this.RecalcInfo = new CParaRunRecalcInfo();
 }
 
 ParaComment.prototype =
 {
 
-    Reset_Parent : function()
+    Set_Paragraph : function()
     {
     },
 
@@ -937,7 +935,7 @@ ParaComment.prototype =
 // Функции пересчета
 //-----------------------------------------------------------------------------------
 
-    Recalculate_Reset : function(StartRange, StartLine, RecalcInfo)
+    Recalculate_Reset : function(StartRange, StartLine)
     {
         this.StartLine   = StartLine;
         this.StartRange  = StartRange;
@@ -985,16 +983,6 @@ ParaComment.prototype =
 
     Restore_Lines : function(SL)
     {
-    },
-
-    Get_RecalcInfo : function()
-    {
-        return this.RecalcInfo;
-    },
-
-    Reset_RecalcInfo : function()
-    {
-        this.RecalcInfo.Reset();
     },
 
     Is_EmptyRange : function(_CurLine, _CurRange)

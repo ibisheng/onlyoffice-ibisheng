@@ -615,7 +615,7 @@ CDocument.prototype =
                     {
                         if ( false === bWord )
                         {
-                            Run = new ParaRun( this, Para );
+                            Run = new ParaRun( Para );
                             Para.Content.push( Run );
                             bWord = true;
                         }
@@ -627,7 +627,7 @@ CDocument.prototype =
                         if ( true === bWord )
                         {
                             bWord = false;
-                            Run = new ParaRun( this, Para );
+                            Run = new ParaRun( Para );
                             Para.Content.push( Run );
                         }
 
@@ -635,7 +635,7 @@ CDocument.prototype =
                     }
                 }
 
-                Run = new ParaRun( this, Para );
+                Run = new ParaRun( Para );
                 Run.Content.push( new ParaEnd() );
                 Para.Content.push( Run );
 
@@ -652,7 +652,7 @@ CDocument.prototype =
             }
         }
 
-        Run = new ParaRun( this, Para );
+        Run = new ParaRun( Para );
         Run.Content.push( new ParaEnd() );
         Para.Content.push( Run );
 
@@ -718,19 +718,19 @@ CDocument.prototype =
                 {
                     if ( " " != Strings[i].charAt( Index )  )
                     {
-                        Run = new ParaRun( this, Para );
+                        Run = new ParaRun( Para );
                         Para.Content.push( Run );
                         Run.Content.push( new ParaText( Strings[i].charAt( Index ) ) );
                     }
                     else
                     {
-                        Run = new ParaRun( this, Para );
+                        Run = new ParaRun( Para );
                         Para.Content.push( Run );
                         Run.Content.push( new ParaSpace() );
                     }
                 }
 
-                Run = new ParaRun( this, Para );
+                Run = new ParaRun( Para );
                 Run.Content.push( new ParaEnd() );
                 Para.Content.push( Run );
 
@@ -747,7 +747,7 @@ CDocument.prototype =
             }
         }
 
-        Run = new ParaRun( this, Para );
+        Run = new ParaRun( Para );
         Run.Content.push( new ParaEnd() );
         Para.Content.push( Run );
 
@@ -788,7 +788,7 @@ CDocument.prototype =
 
         var bWord = false;
         var Run = undefined;
-        Run = new ParaRun( this, Para );
+        Run = new ParaRun( Para );
         Para.Content.push( Run );
         this.Content = [];
         this.Content.push( Para );
@@ -846,7 +846,7 @@ CDocument.prototype =
                 Para = new Paragraph( this.DrawingDocument, this, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
                 Para.Content = [];
 
-                Run = new ParaRun( this, Para );
+                Run = new ParaRun( Para );
                 Para.Content.push( Run );
 
                 oldPara.Set_DocumentNext(Para);

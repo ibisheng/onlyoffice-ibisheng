@@ -71,7 +71,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
     }
     else
     {
-        var EndRun = new ParaRun(editor, this);
+        var EndRun = new ParaRun(this);
         EndRun.Content[0] = new ParaEnd();
 
         this.Content[0] = EndRun;
@@ -463,7 +463,7 @@ Paragraph.prototype =
             if ( this.Selection.EndPos >= Pos )
                 this.Selection.EndPos++;
 
-            Item.Reset_Parent( this, this );
+            Item.Set_Paragraph( this );
         }
     },
 
@@ -529,8 +529,8 @@ Paragraph.prototype =
             // Нам нужно сбросить рассчет всех добавленных элементов и выставить у них родительский класс и параграф
             for ( var CurPos = StartPos; CurPos < this.Content.length; CurPos++ )
             {
-                this.Content[CurPos].Reset_Parent( this, this );
-                this.Content[CurPos].Reset_RecalcInfo();
+                this.Content[CurPos].Set_Paragraph( this );
+                //this.Content[CurPos].Reset_RecalcInfo();
             }
 
             // TODO: Разобраться с орфографией
@@ -3033,6 +3033,9 @@ Paragraph.prototype =
         PRS.Paragraph = this;
         PRS.Page      = CurPage;
 
+        PRS.RunRecalcInfoLast  = ( 0 === CurPage ? null : this.Pages[CurPage - 1].EndInfo.RunRecalcInfo );
+        PRS.RunRecalcInfoBreak = PRS.RunRecalcInfoLast;
+
         var Pr     = this.Get_CompiledPr();
         var ParaPr = Pr.ParaPr;
 
@@ -3185,6 +3188,8 @@ Paragraph.prototype =
                 CurLine++;
                 PRS.Reset_Ranges();
                 PRS.Reset_PageBreak();
+                PRS.Reset_RunRecalcInfo();
+
                 continue;
             }
             else if ( recalcresult_CurLine === RecalcResult )
@@ -3193,6 +3198,8 @@ Paragraph.prototype =
                 // когда у нас появляются плавающие объекты, относительно которых необходимо произвести обтекание.
                 // В данном случае мы ничего не делаем, т.к. номер строки не меняется, а новые отрезки обтекания
                 // были заполнены при последнем неудачном рассчете.
+
+                PRS.Restore_RunRecalcInfo();
                 continue;
             }
             else if ( recalcresult_NextElement === RecalcResult || recalcresult_NextPage === RecalcResult )
@@ -3236,7 +3243,7 @@ Paragraph.prototype =
         //-------------------------------------------------------------------------------------------------------------
         // Получаем некоторую информацию для следующей страницы (например незакрытые комментарии)
         //-------------------------------------------------------------------------------------------------------------
-        this.Recalculate_PageEndInfo(CurPage);
+        this.Recalculate_PageEndInfo(PRS, CurPage);
 
         //-------------------------------------------------------------------------------------------------------------
         // Рассчитываем ширину каждого отрезка, количество слов и пробелов в нем
@@ -3823,11 +3830,11 @@ Paragraph.prototype =
 
             if ( ( 0 === Pos && 0 === CurLine && 0 === CurRange ) || Pos !== StartPos )
             {
-                Item.Recalculate_Reset( CurRange, CurLine, ( 0 === Pos && 0 === CurLine ? null : this.Content[Pos - 1].Get_RecalcInfo() ) );
+                Item.Recalculate_Reset( CurRange, CurLine );
             }
 
             PRS.Update_CurPos( Pos, 0 );
-            Item.Recalculate_Range(  ParaPr );
+            Item.Recalculate_Range( ParaPr, 1 );
 
             if ( true === PRS.NewRange )
             {
@@ -4538,7 +4545,7 @@ Paragraph.prototype =
             return this.Pages[CurPage].EndInfo.Copy();
     },
 
-    Recalculate_PageEndInfo : function(CurPage)
+    Recalculate_PageEndInfo : function(PRSW, CurPage)
     {
         var PrevInfo = ( 0 === CurPage ? this.Parent.Get_PrevElementEndInfo( this ) : this.Pages[CurPage - 1].EndInfo.Copy() );
 
@@ -4564,7 +4571,8 @@ Paragraph.prototype =
             }
         }
 
-        this.Pages[CurPage].EndInfo.Comments = PRSI.Comments;
+        this.Pages[CurPage].EndInfo.Comments      = PRSI.Comments;
+        this.Pages[CurPage].EndInfo.RunRecalcInfo = PRSW.RunRecalcInfoBreak;
     },
 
     Recalculate_Drawing_AddPageBreak : function(CurLine, CurPage, RemoveDrawings)
@@ -5123,6 +5131,7 @@ Paragraph.prototype =
 
     Recalculate_Fast : function(SimpleChanges)
     {
+        return -1;
         var Run = SimpleChanges[0].Class;
 
         var StartLine  = Run.StartLine;
@@ -5345,7 +5354,7 @@ Paragraph.prototype =
                 var SL = Item.Save_Lines();
                 var SavedLines = SL.Lines;
 
-                Item.Recalculate_Range( ParaPr );
+                Item.Recalculate_Range( ParaPr, 1 );
 
                 if ( ( true === PRS.NewRange && Pos !== EndPos ) || ( Pos === EndPos && true !== PRS.NewRange ) )
                     return -1;
@@ -12356,42 +12365,99 @@ Paragraph.prototype =
 
     Hyperlink_Add : function(HyperProps)
     {
-        var Hyperlink = new ParaHyperlinkStart();
-        Hyperlink.Set_Value( HyperProps.Value );
-
-        if ( "undefined" != typeof(HyperProps.ToolTip) && null != HyperProps.ToolTip )
-            Hyperlink.Set_ToolTip( HyperProps.ToolTip );
-
-        if ( true === this.Selection.Use )
+        if ( true !== Debug_ParaRunMode )
         {
-            this.Add( Hyperlink );
-        }
-        else if ( null != HyperProps.Text && "" != HyperProps.Text ) // добавлять ссылку, без селекта и с пустым текстом нельзя
-        {
-            var TextPr_hyper = this.Internal_GetTextPr(this.CurPos.ContentPos);
-            var Styles = editor.WordControl.m_oLogicDocument.Get_Styles();
-            TextPr_hyper.RStyle    = Styles.Get_Default_Hyperlink();
-            TextPr_hyper.Color     = undefined;
-            TextPr_hyper.Underline = undefined;
+            var Hyperlink = new ParaHyperlinkStart();
+            Hyperlink.Set_Value( HyperProps.Value );
 
-            var TextPr_old = this.Internal_GetTextPr(this.CurPos.ContentPos);
+            if ( "undefined" != typeof(HyperProps.ToolTip) && null != HyperProps.ToolTip )
+                Hyperlink.Set_ToolTip( HyperProps.ToolTip );
 
-            var Pos = this.CurPos.ContentPos;
-            this.Internal_Content_Add( Pos, new ParaTextPr( TextPr_old ) );
-            this.Internal_Content_Add( Pos, new ParaHyperlinkEnd() );
-            this.Internal_Content_Add( Pos, new ParaTextPr( TextPr_hyper ) );
-            this.Internal_Content_Add( Pos, Hyperlink );
-
-            for ( var NewPos = 0; NewPos < HyperProps.Text.length; NewPos++ )
+            if ( true === this.Selection.Use )
             {
-                var Char = HyperProps.Text.charAt( NewPos );
-                if ( " " == Char )
-                    this.Internal_Content_Add( Pos + 2 + NewPos, new ParaSpace() );
-                else
-                    this.Internal_Content_Add( Pos + 2 + NewPos, new ParaText(Char) );
+                this.Add( Hyperlink );
             }
+            else if ( null != HyperProps.Text && "" != HyperProps.Text ) // добавлять ссылку, без селекта и с пустым текстом нельзя
+            {
+                var TextPr_hyper = this.Internal_GetTextPr(this.CurPos.ContentPos);
+                var Styles = editor.WordControl.m_oLogicDocument.Get_Styles();
+                TextPr_hyper.RStyle    = Styles.Get_Default_Hyperlink();
+                TextPr_hyper.Color     = undefined;
+                TextPr_hyper.Underline = undefined;
 
-            this.Set_ContentPos( Pos + 2, false, -1 ); // чтобы курсор встал после TextPr
+                var TextPr_old = this.Internal_GetTextPr(this.CurPos.ContentPos);
+
+                var Pos = this.CurPos.ContentPos;
+                this.Internal_Content_Add( Pos, new ParaTextPr( TextPr_old ) );
+                this.Internal_Content_Add( Pos, new ParaHyperlinkEnd() );
+                this.Internal_Content_Add( Pos, new ParaTextPr( TextPr_hyper ) );
+                this.Internal_Content_Add( Pos, Hyperlink );
+
+                for ( var NewPos = 0; NewPos < HyperProps.Text.length; NewPos++ )
+                {
+                    var Char = HyperProps.Text.charAt( NewPos );
+                    if ( " " == Char )
+                        this.Internal_Content_Add( Pos + 2 + NewPos, new ParaSpace() );
+                    else
+                        this.Internal_Content_Add( Pos + 2 + NewPos, new ParaText(Char) );
+                }
+
+                this.Set_ContentPos( Pos + 2, false, -1 ); // чтобы курсор встал после TextPr
+            }
+        }
+        else
+        {
+            if ( true === this.Selection.Use )
+            {
+
+            }
+            else if ( null !== HyperProps.Text && "" !== HyperProps.Text )
+            {
+                var ContentPos = this.Get_ParaContentPos(false, false);
+                var CurPos = ContentPos.Get(0);
+
+                var TextPr = this.Get_TextPr(ContentPos);
+
+                // Создаем гиперссылку
+                var Hyperlink = new ParaHyperlink();
+
+                // Создаем текстовый ран в гиперссылке
+                var HyperRun = new ParaRun(this);
+
+                // Добавляем ран в гиперссылку
+                Hyperlink.Add_ToContent( 0, HyperRun, false );
+
+                // Задаем текстовые настройки рана (те, которые шли в текущей позиции + стиль гиперссылки)
+                var Styles = editor.WordControl.m_oLogicDocument.Get_Styles();
+                HyperRun.Set_Pr( TextPr.Copy() );
+                HyperRun.Set_Color( undefined );
+                HyperRun.Set_Underline( undefined );
+                HyperRun.Set_RStyle( Styles.Get_Default_Hyperlink() );
+
+                // Заполняем ран гиперссылки текстом
+                for ( var NewPos = 0; NewPos < HyperProps.Text.length; NewPos++ )
+                {
+                    var Char = HyperProps.Text.charAt( NewPos );
+
+                    if ( " " == Char )
+                        HyperRun.Add_ToContent( NewPos, new ParaSpace(), false );
+                    else
+                        HyperRun.Add_ToContent( NewPos, new ParaText(Char), false );
+                }
+
+                // Разделяем текущий элемент (возвращается правая часть)
+                var NewElement = this.Content[CurPos].Split( ContentPos, 1 );
+
+                if ( null !== NewElement )
+                    this.Internal_Content_Add( CurPos + 1, NewElement );
+
+                // Добавляем гиперссылку в содержимое параграфа
+                this.Internal_Content_Add( CurPos + 1, Hyperlink );
+
+                // Перемещаем кусор в конец гиперссылки
+                this.CurPos.ContentPos = CurPos + 1;
+                Hyperlink.Cursor_MoveToEndPos( false );
+            }
         }
     },
 
@@ -16801,7 +16867,7 @@ Paragraph.prototype =
 
             if ( null === NewElement )
             {
-                NewElement = new ParaRun( this.LogicDocument, NewParagraph );
+                NewElement = new ParaRun( NewParagraph );
                 NewElement.Set_Pr( TextPr.Copy() );
             }
 
@@ -16815,7 +16881,7 @@ Paragraph.prototype =
             this.Internal_Content_Remove2( CurPos + 1, this.Content.length - CurPos - 1 );
 
             // В старый параграф добавим ран с концом параграфа
-            var EndRun = new ParaRun( this.LogicDocument, this );
+            var EndRun = new ParaRun( this );
             EndRun.Content[0] = new ParaEnd();
 
             this.Internal_Content_Add( this.Content.length, EndRun );
@@ -16889,7 +16955,7 @@ Paragraph.prototype =
 
             // Копируем последние настройки текста
             var TextPr = this.Get_TextPr();
-            var NewRun = new ParaRun( this.LogicDocument, NewParagraph );
+            var NewRun = new ParaRun( NewParagraph );
             NewRun.Set_Pr( TextPr );
 
             NewParagraph.Internal_Content_Add( 0, NewRun );
@@ -19867,6 +19933,8 @@ function CParagraphPageEndInfo()
 {
     this.Comments = new Array(); // Массив незакрытых комментариев на данной странице (комментарии, которые были
                                  // открыты до данной страницы и не закрыты на этой тут тоже присутствуют)
+
+    this.RunRecalcInfo = null;
 }
 
 CParagraphPageEndInfo.prototype =
@@ -20243,6 +20311,9 @@ function CParagraphRecalculateStateWrap()
     this.PageBreak     = null;      // Текущий PageBreak
     this.SkipPageBreak = false;     // Нужно ли пропускать PageBreak
 
+    this.RunRecalcInfoLast  = null; // RecalcInfo последнего рана
+    this.RunRecalcInfoBreak = null; // RecalcInfo рана, на котором произошел разрыв отрезка/строки
+
     this.RecalcResult = 0x00;//recalcresult_NextElement;
 }
 
@@ -20317,6 +20388,16 @@ CParagraphRecalculateStateWrap.prototype =
         this.PageBreak           = null;
         this.SkipPageBreak       = false;
         this.ExtendBoundToBottom = false;
+    },
+
+    Reset_RunRecalcInfo : function()
+    {
+        this.RunRecalcInfoBreak = this.RunRecalcInfoLast;
+    },
+
+    Restore_RunRecalcInfo : function()
+    {
+        this.RunRecalcInfoLast = this.RunRecalcInfoBreak;
     }
 };
 
@@ -20442,7 +20523,11 @@ CParagraphDrawStateHightlights.prototype =
 
         this.CurPos = new CParagraphContentPos();
 
-        this.Comments = PageEndInfo.Comments;
+        if ( null !== PageEndInfo )
+            this.Comments = PageEndInfo.Comments;
+        else
+            this.Comments = new Array();
+
         this.Check_CommentsFlag();
     },
 

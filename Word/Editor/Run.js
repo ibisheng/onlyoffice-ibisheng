@@ -4,13 +4,11 @@
  * Time: 18:28
  */
 
-function ParaRun(Document,Parent)
+function ParaRun(Paragraph)
 {
     this.Id         = g_oIdCounter.Get_NewId();  // Id данного элемента
     this.Type       = para_Run;                  // тип данного элемента
-    this.Document   = Document;                  // Ссылка на верхний класс документа
-    this.Parent     = Parent;                    // Ссылка на родительский класс
-    this.Paragraph  = Parent;                    // Ссылка на параграф
+    this.Paragraph  = Paragraph;                 // Ссылка на параграф
     this.Pr         = new CTextPr();             // Текстовые настройки данного run
     this.Content    = new Array();               // Содержимое данного run
     this.State      = new CParaRunState();       // Положение курсора и селекта в данного run
@@ -59,24 +57,13 @@ ParaRun.prototype =
         return this.Id;
     },
 
-    Set_Parent : function(Paragraph)
-    {
-        this.Parent = Paragraph;
-    },
-
-    Get_Parent : function()
-    {
-        return this.Parent;
-    },
-
     Get_Paragraph : function()
     {
-        return this.Parent;
+        return this.Paragraph;
     },
 
-    Reset_Parent : function(Parent, Paragraph)
+    Set_Paragraph : function(Paragraph)
     {
-        this.Parent    = Parent;
         this.Paragraph = Paragraph;
     },
 //-----------------------------------------------------------------------------------
@@ -411,7 +398,7 @@ ParaRun.prototype =
         }
 
         // Значит курсор стоит в самом конце, поэтому посылаем последний отрезок
-        return new CParaPos( ( LinesCount === 1 ? this.Lines[0].RangesLength - 1 + this.StartRange : this.Lines[LinesCount - 1].RangesLength - 1 ), LinesCount - 1 + this.StartLine, 0, 0 );
+        return new CParaPos( ( LinesCount <= 1 ? this.Lines[0].RangesLength - 1 + this.StartRange : this.Lines[LinesCount - 1].RangesLength - 1 ), LinesCount - 1 + this.StartLine, 0, 0 );
     },
 
     Get_ParaPosByContentPos : function(ContentPos, Depth)
@@ -642,7 +629,7 @@ ParaRun.prototype =
         var CurPos = ContentPos.Get(Depth);
 
         // Создаем новый ран
-        var NewRun = new ParaRun(this.Document, this.Parent);
+        var NewRun = new ParaRun(this.Paragraph);
 
         // Копируем настройки
         NewRun.Set_Pr( this.Pr.Copy() );
@@ -658,21 +645,11 @@ ParaRun.prototype =
 //-----------------------------------------------------------------------------------
 
     // Выставляем начальную строку и обнуляем массив строк
-    Recalculate_Reset : function(StartRange, StartLine, RecalcInfo)
+    Recalculate_Reset : function(StartRange, StartLine)
     {
         this.StartLine   = StartLine;
         this.StartRange  = StartRange;
         this.LinesLength = 0;
-
-        if ( null === RecalcInfo )
-            this.RecalcInfo.NumberingAdd = true;
-        else
-        {
-            this.RecalcInfo.NumberingAdd = RecalcInfo.NumberingAdd;
-        }
-
-        this.RecalcInfo.NumberingUse  = false;
-        this.RecalcInfo.NumberingItem = null;
     },
 
     // Пересчитываем размеры всех элементов
@@ -712,7 +689,7 @@ ParaRun.prototype =
         this.RecalcInfo.Measure = false;
     },
 
-    Recalculate_Range : function( ParaPr)
+    Recalculate_Range : function(ParaPr, Depth)
     {
         // Сначала измеряем элементы (можно вызывать каждый раз, внутри разруливается, чтобы измерялось 1 раз)
         this.Recalculate_MeasureContent();
@@ -721,6 +698,25 @@ ParaRun.prototype =
 
         var CurLine  = PRS.Line - this.StartLine;
         var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
+
+        // Если мы рассчитываем первый отрезок в первой строке, тогда нам нужно обновить информацию о нумерации
+        if ( 0 === CurRange && 0 === CurLine )
+        {
+            var PrevRecalcInfo = PRS.RunRecalcInfoLast;
+
+            // Либо до этого ничего не было (изначально первая строка и первый отрезок), либо мы заново пересчитываем
+            // первую строку и первый отрезок (из-за обтекания, например).
+            if ( null === PrevRecalcInfo )
+                this.RecalcInfo.NumberingAdd = true;
+            else
+                this.RecalcInfo.NumberingAdd = PrevRecalcInfo.NumberingAdd;
+
+            this.RecalcInfo.NumberingUse  = false;
+            this.RecalcInfo.NumberingItem = null;
+        }
+
+        // Сохраняем ссылку на информацию пересчета данного рана
+        PRS.RunRecalcInfoLast = this.RecalcInfo;
 
         // Если это первый отрезок в данной строке, тогда нам надо добавить строку (первую строку не добавляем,
         // т.к. она всегда есть)
@@ -1851,7 +1847,7 @@ ParaRun.prototype =
 
     Refresh_RecalcData : function(Data)
     {
-        this.Parent.Refresh_RecalcData2(0);
+        this.Paragraph.Refresh_RecalcData2(0);
     },
 
     Save_Lines : function()
@@ -1871,16 +1867,6 @@ ParaRun.prototype =
         this.Lines       = SL.Lines;
         this.LinesLength = SL.LinesLength;
         this.Range       = this.Lines[0].Ranges[0];
-    },
-
-    Get_RecalcInfo : function()
-    {
-        return this.RecalcInfo;
-    },
-
-    Reset_RecalcInfo : function()
-    {
-        this.RecalcInfo.Reset();
     },
 
     Is_EmptyRange : function(_CurLine, _CurRange)
@@ -3062,7 +3048,7 @@ ParaRun.prototype =
 
     Internal_Compile_Pr : function ()
     {
-        if ( undefined === this.Parent )
+        if ( undefined === this.Paragraph )
         {
             // Сюда мы никогда не должны попадать, но на всякий случай,
             // чтобы не выпадало ошибок сгенерим дефолтовые настройки
@@ -3072,12 +3058,12 @@ ParaRun.prototype =
         }
 
         // Получим настройки текста, для данного параграфа
-        var TextPr = this.Parent.Get_CompiledPr2(false).TextPr.Copy();
+        var TextPr = this.Paragraph.Get_CompiledPr2(false).TextPr.Copy();
 
         // Если в прямых настройках задан стиль, тогда смержим настройки стиля
         if ( undefined != this.Pr.RStyle )
         {
-            var Styles = this.Document.Get_Styles();
+            var Styles = this.Paragraph.Parent.Get_Styles();
             var StyleTextPr = Styles.Get_Pr( this.Pr.RStyle, styletype_Character ).TextPr;
             TextPr.Merge( StyleTextPr );
         }
@@ -3230,7 +3216,7 @@ ParaRun.prototype =
     Split_Run : function(Pos)
     {
         // Создаем новый ран
-        var NewRun = new ParaRun(this.Document, this.Parent);
+        var NewRun = new ParaRun(this.Paragraph);
 
         // Копируем настройки
         NewRun.Set_Pr( this.Pr.Copy() );
