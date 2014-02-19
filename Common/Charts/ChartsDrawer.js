@@ -146,7 +146,7 @@ CChartsDrawer.prototype =
 		
 		var widthTitle = chartSpace.chart.title.extX;
 		var heightTitle = chartSpace.chart.title.extY;
-		var standartMargin = 13;
+		var standartMargin = 7;
 		
 		var y = standartMargin / this.calcProp.pxToMM;
 		var x = widthGraph / 2 - widthTitle / 2;
@@ -908,7 +908,7 @@ CChartsDrawer.prototype =
 		//top margin = legend + title;
 		this.calcProp.chartGutter._top = standartMargin;
 		if(chartSpace.chart.title !== null)
-			this.calcProp.chartGutter._top += chartSpace.chart.title.extY * pxToMM;
+			this.calcProp.chartGutter._top = 7 + chartSpace.chart.title.extY * pxToMM + standartMargin;
 		
 		//bottom margin = legend + horizontal title +  horizontal axis(if min y == 0);
 		this.calcProp.chartGutter._bottom = standartMargin;
