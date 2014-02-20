@@ -2321,7 +2321,7 @@ drawBarChart.prototype =
 			}
 			
 			height = nullPositionOX - this._getYPosition((val / this.summBarVal[j]), yPoints) * this.chartProp.pxToMM;
-			startY = tnullPositionOX - diffYVal;
+			startY = nullPositionOX - diffYVal;
 		}
 		else
 		{
@@ -2505,11 +2505,42 @@ drawLineChart.prototype =
 				val = this._getYVal(n, i);
 				nextVal = this._getYVal(n + 1, i);
 				
-				y  = this._getYPosition(val, yPoints);
-				y1 = this._getYPosition(nextVal, yPoints);
+				//точки находятся внутри диапазона
+				if(val >= yPoints[0].val && val <= yPoints[yPoints.length - 1].val && nextVal >= yPoints[0].val && nextVal <= yPoints[yPoints.length - 1].val)
+				{
+					y  = this._getYPosition(val, yPoints);
+					y1 = this._getYPosition(nextVal, yPoints);
+					
+					x  = xPoints[n].pos; 
+					x1 = xPoints[n + 1].pos;
+				}
+				//первая точка выходит за пределы диапазона || вторая точка выходит за пределы диапазона
+				else if(( nextVal >= yPoints[0].val && nextVal <= yPoints[yPoints.length - 1].val ) || ( val >= yPoints[0].val && val <= yPoints[yPoints.length - 1].val ))
+				{
+					y  = this._getYPosition(val, yPoints);
+					y1 = this._getYPosition(nextVal, yPoints);
+					
+					if(val < yPoints[0].val)
+						yk = this._getYPosition(yPoints[0].val, yPoints);
+					else
+						yk = this._getYPosition(yPoints[yPoints.length - 1].val, yPoints);
+					
+					x  = xPoints[n].pos; 
+					x1 = xPoints[n + 1].pos; 
+					
+					//находим из двух точек уравнение, из третьей координаты y находим x
+					if(nextVal >= yPoints[0].val && nextVal <= yPoints[yPoints.length - 1].val)
+					{
+						x = (yk * (x - x1) + x1 * y + x1 * y1) / (y - y1);
+						y = yk;
+					}
+					else
+					{
+						x1 = (yk * (x - x1) + x1 * y + x1 * y1) / (y - y1);
+						y1 = yk;
+					}
+				}
 				
-				x  = xPoints[n].pos; 
-				x1 = xPoints[n + 1].pos;
 				
 				if(!this.paths.series)
 					this.paths.series = [];
@@ -2527,16 +2558,35 @@ drawLineChart.prototype =
 		var result;
 		var resPos;
 		var resVal;
-		for(var s = 0; s < yPoints.length; s++)
+		var diffVal;
+		if(val < yPoints[0].val)
 		{
-			if(val >= yPoints[s].val && val <= yPoints[s + 1].val)
+			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
+			resVal = yPoints[1].val - yPoints[0].val;
+			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
+			result = yPoints[0].pos - (diffVal / resVal) * resPos;
+		}
+		else if(val > yPoints[yPoints.length - 1].val)
+		{	
+			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
+			resVal = yPoints[1].val - yPoints[0].val;
+			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
+			result = yPoints[0].pos + (diffVal / resVal) * resPos;
+		}
+		else
+		{
+			for(var s = 0; s < yPoints.length; s++)
 			{
-				resPos = Math.abs(yPoints[s + 1].pos - yPoints[s].pos);
-				resVal = yPoints[s + 1].val - yPoints[s].val;
-				result =  - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
-				break;
+				if(val >= yPoints[s].val && val <= yPoints[s + 1].val)
+				{
+					resPos = Math.abs(yPoints[s + 1].pos - yPoints[s].pos);
+					resVal = yPoints[s + 1].val - yPoints[s].val;
+					result =  - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+					break;
+				}
 			}
 		}
+		
 		return result;
 	},
 	
