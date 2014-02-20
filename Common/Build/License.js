@@ -1,5 +1,5 @@
 /**
-* @license Copyright (c) Ascensio System SIA 2012-2013. All rights reserved
+* @license Copyright (c) Ascensio System SIA 2012-2014. All rights reserved
 *
 * http://www.teamlab.com
 *
