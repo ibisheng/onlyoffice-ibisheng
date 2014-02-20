@@ -213,6 +213,11 @@ var native = CreateNativeEngine();
 window.native = native;
 window["native"] = native;
 
+window.native.Call_OnUpdateOverlay = function(param)
+{
+    // TODO:
+}
+
 function GetNativeEngine()
 {
 	return window.native;
