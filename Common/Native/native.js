@@ -213,11 +213,6 @@ var native = CreateNativeEngine();
 window.native = native;
 window["native"] = native;
 
-window.native.Call_OnUpdateOverlay = function(param)
-{
-    // TODO:
-}
-
 function GetNativeEngine()
 {
 	return window.native;
@@ -373,3 +368,9 @@ var OfficeExcel = window["OfficeExcel"];
 var console = {
 	log : function(param) { window.native.ConsoleLog(param); }
 };
+
+// HTML page interface
+window.native.Call_OnUpdateOverlay = function(param)
+{
+    _api.WordControl.m_oDrawingDocument.OnUpdateOverlay();
+}
