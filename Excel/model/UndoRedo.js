@@ -3006,7 +3006,6 @@ UndoRedoWoorksheet.prototype = {
 				col.setWidthProp(Data.oOldVal);
 			else
 				col.setWidthProp(Data.oNewVal);
-			this.wb.handlers.trigger("changeWorksheetUpdate", nSheetId);
 		}
 		else if(historyitem_Worksheet_RowProp == Type)
 		{
@@ -3025,7 +3024,6 @@ UndoRedoWoorksheet.prototype = {
 				row.setHeightProp(Data.oOldVal);
 			else
 				row.setHeightProp(Data.oNewVal);
-			this.wb.handlers.trigger("changeWorksheetUpdate", nSheetId);
 		}
 		else if(historyitem_Worksheet_AddRows == Type || historyitem_Worksheet_RemoveRows == Type)
 		{

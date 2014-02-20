@@ -1028,6 +1028,8 @@
 
 			this.bIsOn = false;
 			this.bIsReInit = false;
+			this.bChangeWorksheetUpdate = false;
+			this.oChangeWorksheetUpdate = {};
 		}
 
 		/** @constructor */

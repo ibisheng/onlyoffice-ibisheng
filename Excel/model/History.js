@@ -405,6 +405,8 @@ CHistory.prototype =
 
 		var isReInit = false;
 		var isRedrawAll = true;
+		var bChangeWorksheetUpdate = false;
+		var oChangeWorksheetUpdate = {};
 		var oCurWorksheet = this.workbook.getWorksheet(this.workbook.getActive());
 		if(null != Point.nLastSheetId && Point.nLastSheetId != oCurWorksheet.getId())
 			this.workbook.handlers.trigger("showWorksheet", Point.nLastSheetId);
@@ -416,6 +418,11 @@ CHistory.prototype =
 				Item.Class.Undo( Item.Type, Item.Data, Item.SheetId );
 			else	
 				Item.Class.Undo(Item.Data);
+			if (g_oUndoRedoWorksheet === Item.Class && (historyitem_Worksheet_RowProp == Item.Type || historyitem_Worksheet_ColProp == Item.Type))
+			{
+				bChangeWorksheetUpdate = true;
+				oChangeWorksheetUpdate[Item.SheetId] = Item.SheetId;
+			}
 			if (g_oUndoRedoWorksheet === Item.Class && historyitem_Worksheet_SetViewSettings === Item.Type)
 				isReInit = true;
 			if (g_oUndoRedoGraphicObjects === Item.Class)
@@ -428,6 +435,11 @@ CHistory.prototype =
 			this.workbook.handlers.trigger("setSelection", Point.SelectRange.clone(), /*validRange*/false);
 		if ( Point.SelectionState != null )
 			this.workbook.handlers.trigger("setSelectionState", Point.SelectionState);
+		if(bChangeWorksheetUpdate)
+		{
+			for(var i in oChangeWorksheetUpdate)
+				this.workbook.handlers.trigger("changeWorksheetUpdate", oChangeWorksheetUpdate[i]);
+		}
 
 
 		this._sendCanUndoRedo();
@@ -476,6 +488,11 @@ CHistory.prototype =
 		Class.Redo( Type, Data, sheetid );
 		if (g_oUndoRedoWorksheet === Class && historyitem_Worksheet_SetViewSettings === Type)
 			oRedoObjectParam.bIsReInit = true;
+		if (g_oUndoRedoWorksheet === Class && (historyitem_Worksheet_RowProp == Type || historyitem_Worksheet_ColProp == Type))
+		{
+			oRedoObjectParam.bChangeWorksheetUpdate = true;
+			oRedoObjectParam.oChangeWorksheetUpdate[sheetid] = sheetid;
+		}
 	},
 	RedoExecute : function(Point, oRedoObjectParam)
 	{
@@ -489,6 +506,11 @@ CHistory.prototype =
 				Item.Class.Redo(Item.Data);
 			if (g_oUndoRedoWorksheet === Item.Class && historyitem_Worksheet_SetViewSettings === Item.Type)
 				oRedoObjectParam.bIsReInit = true;
+			if (g_oUndoRedoWorksheet === Item.Class && (historyitem_Worksheet_RowProp == Item.Type || historyitem_Worksheet_ColProp == Item.Type))
+			{
+				oRedoObjectParam.bChangeWorksheetUpdate = true;
+				oRedoObjectParam.oChangeWorksheetUpdate[Item.SheetId] = Item.SheetId;
+			}
         }
         // Восстанавливаем состояние на следующую точку
         var State = null;
@@ -523,6 +545,11 @@ CHistory.prototype =
 			this.workbook.handlers.trigger("cleanCellCache", i, Point.UpdateRigions[i]);
 		if(null != oSelectRange)
 			this.workbook.handlers.trigger("setSelection", oSelectRange.clone());
+		if(oRedoObjectParam.bChangeWorksheetUpdate)
+		{
+			for(var i in oRedoObjectParam.oChangeWorksheetUpdate)
+				this.workbook.handlers.trigger("changeWorksheetUpdate", oRedoObjectParam.oChangeWorksheetUpdate[i]);
+		}
 		//if (Point.SelectionState != null)
 		//	this.workbook.handlers.trigger("setSelectionState", Point.SelectionState);
 		
