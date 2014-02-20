@@ -1448,11 +1448,8 @@ asc_CCellCommentator.prototype = {
 		oComment.setId();
 
 		if (!oComment.bDocument) {
-			var selectedCell = _this.worksheet.getSelectedRange();
-			var oFirst = selectedCell.getFirst();
-
-			oComment.asc_putCol(oFirst.col - 1);
-			oComment.asc_putRow(oFirst.row - 1);
+			oComment.asc_putCol(_this.worksheet.getSelectedColumnIndex());
+			oComment.asc_putRow(_this.worksheet.getSelectedRowIndex());
 
 			if ((oComment.nCol != null) && (oComment.nRow != null)) {
 				var cellAddress = new CellAddress(oComment.nRow, oComment.nCol, 0);
@@ -1463,7 +1460,6 @@ asc_CCellCommentator.prototype = {
 		function callbackFunc(result) {
 			if ( !result ) {
 				_this.worksheet.model.workbook.handlers.trigger("asc_onLockComment", oComment.asc_getId(), oComment.asc_getUserId());
-				return;
 			}
 			else {
 				_this.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", oComment.asc_getId());
