@@ -1719,7 +1719,7 @@ CChartSpace.prototype.recalculateAxis = function()
         var plot_area = this.chart.plotArea;
         var chart_object = plot_area.chart;
         var i;
-        switch(chart_object)
+        switch(chart_object.getObjectType())
         {
             case historyitem_type_ScatterChart:
             {
