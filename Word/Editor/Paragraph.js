@@ -7861,6 +7861,23 @@ Paragraph.prototype =
                     if ( true === this.Content[StartPos].Is_Empty() )
                         this.Internal_Content_Remove( StartPos );
                 }
+
+                if ( true !== this.Content[this.CurPos.ContentPos].Selection_IsUse() )
+                {
+                    this.Selection_Remove();
+                }
+                else
+                {
+                    this.Selection.Use      = true;
+                    this.Selection.Start    = false;
+                    this.Selection.Flag     = selectionflag_Common;
+                    this.Selection.StartPos = this.CurPos.ContentPos;
+                    this.Selection.EndPos   = this.CurPos.ContentPos;
+
+                    this.Document_SetThisElementCurrent(true);
+
+                    return true;
+                }
             }
             else
             {
@@ -7881,6 +7898,19 @@ Paragraph.prototype =
                     else
                         this.Content[ContentPos].Cursor_MoveToStartPos();
 
+                }
+
+                if ( true === this.Content[ContentPos].Selection_IsUse() )
+                {
+                    this.Selection.Use      = true;
+                    this.Selection.Start    = false;
+                    this.Selection.Flag     = selectionflag_Common;
+                    this.Selection.StartPos = ContentPos;
+                    this.Selection.EndPos   = ContentPos;
+
+                    this.Document_SetThisElementCurrent(true);
+
+                    return true;
                 }
 
                 if ( ContentPos < 0 || ContentPos >= this.Content.length )
@@ -9229,21 +9259,34 @@ Paragraph.prototype =
         {
             this.Content[StartPos].Set_SelectionContentPos( StartContentPos, EndContentPos, Depth + 1, 0, 0 );
         }
-        else if ( StartPos > EndPos )
+        else
         {
-            this.Content[StartPos].Set_SelectionContentPos( StartContentPos, null, Depth + 1, 0, 1 );
-            this.Content[EndPos].Set_SelectionContentPos( null, EndContentPos, Depth + 1, -1, 0 );
+            if ( StartPos > EndPos )
+            {
+                this.Content[StartPos].Set_SelectionContentPos( StartContentPos, null, Depth + 1, 0, 1 );
+                this.Content[EndPos].Set_SelectionContentPos( null, EndContentPos, Depth + 1, -1, 0 );
 
-            for ( var CurPos = EndPos + 1; CurPos < StartPos; CurPos++ )
-                this.Content[CurPos].Select_All( -1 );
-        }
-        else// if ( StartPos < EndPos )
-        {
-            this.Content[StartPos].Set_SelectionContentPos( StartContentPos, null, Depth + 1, 0, -1 );
-            this.Content[EndPos].Set_SelectionContentPos( null, EndContentPos, Depth + 1, 1, 0 );
+                for ( var CurPos = EndPos + 1; CurPos < StartPos; CurPos++ )
+                    this.Content[CurPos].Select_All( -1 );
+            }
+            else// if ( StartPos < EndPos )
+            {
+                this.Content[StartPos].Set_SelectionContentPos( StartContentPos, null, Depth + 1, 0, -1 );
+                this.Content[EndPos].Set_SelectionContentPos( null, EndContentPos, Depth + 1, 1, 0 );
 
-            for ( var CurPos = StartPos + 1; CurPos < EndPos; CurPos++ )
-                this.Content[CurPos].Select_All( 1 );
+                for ( var CurPos = StartPos + 1; CurPos < EndPos; CurPos++ )
+                    this.Content[CurPos].Select_All( 1 );
+            }
+
+            // TODO: Реализовать выделение гиперссылки целиком (само выделение тут сделано, но непонятно как
+            //       дальше обрабатывать Shift + влево/вправо)
+
+            // Делаем как в Word: гиперссылка выделяется целиком, если выделение выходит за пределы гиперссылки
+//            if ( para_Hyperlink === this.Content[StartPos].Type && true !== this.Content[StartPos].Selection_IsEmpty(true) )
+//                this.Content[StartPos].Select_All( StartPos > EndPos ? -1 : 1 );
+//
+//            if ( para_Hyperlink === this.Content[EndPos].Type && true !== this.Content[EndPos].Selection_IsEmpty(true) )
+//                this.Content[EndPos].Select_All( StartPos > EndPos ? -1 : 1 );
         }
     },
 
@@ -11756,6 +11799,12 @@ Paragraph.prototype =
 
     Remove_EmptyRuns : function()
     {
+        // TODO: Надо переделать данную функцию. Надо удалять только спаренные пустые раны и добавлять новые пустые раны
+        //       в места, где нет ранов, например, если параграф начинается не с рана, или заканчивается не раном, или у
+        //       нас идут 2 гиперссылки подряд.
+
+        return;
+
         var ContentLen = this.Content.length;
         for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
         {

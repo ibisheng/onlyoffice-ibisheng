@@ -2851,6 +2851,11 @@ ParaRun.prototype =
         Selection.Use      = true;
     },
 
+    Selection_IsUse : function()
+    {
+        return this.State.Selection.Use;
+    },
+
     Selection_Stop : function()
     {
     },
