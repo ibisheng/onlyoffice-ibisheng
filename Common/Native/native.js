@@ -374,3 +374,29 @@ window.native.Call_OnUpdateOverlay = function(param)
 {
     _api.WordControl.m_oDrawingDocument.OnUpdateOverlay();
 }
+
+window.native.Call_OnMouseDown = function(e)
+{
+    _api.WordControl.m_oDrawingDocument.OnMouseDown(e);
+}
+window.native.Call_OnMouseUp = function(e)
+{
+    _api.WordControl.m_oDrawingDocument.OnMouseUp(e);
+}
+window.native.Call_OnMouseMove = function(e)
+{
+    _api.WordControl.m_oDrawingDocument.OnMouseMove(e);
+}
+
+window.native.Call_OnKeyDown = function(e)
+{
+    _api.WordControl.m_oDrawingDocument.OnKeyDown(e);
+}
+window.native.Call_OnKeyPress = function(e)
+{
+    _api.WordControl.m_oDrawingDocument.OnKeyPress(e);
+}
+window.native.Call_OnKeyUp = function(e)
+{
+    _api.WordControl.m_oDrawingDocument.OnKeyPress(e);
+}
