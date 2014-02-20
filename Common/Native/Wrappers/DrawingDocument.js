@@ -11,9 +11,19 @@
 
     this.Frame = null;
     this.Table = null;
-    this.AutoShapesTrack        = null;
+    this.AutoShapesTrack        = new Object();
     
     this.m_oWordControl = window.native;
+
+    this.IsUpdateOverlayOnlyEnd         = false;
+    this.IsUpdateOverlayOnlyEndReturn   = false;
+    this.IsUpdateOverlayOnEndCheck      = false;
+
+    this.m_bIsSelection         = false;
+    this.m_bIsMouseLock         = false;
+
+    this.IsKeyDownButNoPress    = false;
+    this.bIsUseKeyPress         = false;
 }
 
 CDrawingDocument.prototype =
@@ -197,7 +207,13 @@ CDrawingDocument.prototype =
     // select
     SelectEnabled : function(bIsEnabled)
     {
-        this.Native["DD_SelectEnabled"](bIsEnabled);
+        this.m_bIsSelection = bIsEnabled;
+        if (false === this.m_bIsSelection)
+        {
+            this.SelectClear();
+            this.OnUpdateOverlay();
+        }
+        //this.Native["DD_SelectEnabled"](bIsEnabled);
     },
     SelectClear : function()
     {
@@ -213,6 +229,7 @@ CDrawingDocument.prototype =
     },
     SelectShow : function()
     {
+        this.OnUpdateOverlay();
     },
 
     // search
@@ -359,11 +376,13 @@ CDrawingDocument.prototype =
 
     LockTrackPageNum : function(nPageNum)
     {
-        this.Native["DD_AutoShapesTrackLockPageNum"](nPageNum);
+        this.AutoShapesTrackLockPageNum = nPageNum;
+        //this.Native["DD_AutoShapesTrackLockPageNum"](nPageNum);
     },
     UnlockTrackPageNum : function()
     {
-        this.Native["DD_AutoShapesTrackLockPageNum"](-1);
+        this.AutoShapesTrackLockPageNum = -1;
+        //this.Native["DD_AutoShapesTrackLockPageNum"](-1);
     },
 
     IsMobileVersion : function()
@@ -388,5 +407,225 @@ CDrawingDocument.prototype =
     EndTrackText : function()
     {
         this.Native["DD_EndTrackText"]();
+    },
+
+    // html page
+    StartUpdateOverlay : function()
+    {
+        this.IsUpdateOverlayOnlyEnd = true;
+    },
+    EndUpdateOverlay : function()
+    {
+        if (this.IsUpdateOverlayOnlyEndReturn)
+            return;
+
+        this.IsUpdateOverlayOnlyEnd = false;
+        if (this.IsUpdateOverlayOnEndCheck)
+            this.OnUpdateOverlay();
+
+        this.IsUpdateOverlayOnEndCheck = false;
+    },
+    OnUpdateOverlay : function()
+    {
+        if (this.IsUpdateOverlayOnlyEnd)
+        {
+            this.IsUpdateOverlayOnEndCheck = true;
+            return false;
+        }
+
+        this.Native["DD_Overlay_Clear"]();
+
+        var drawingFirst    = this.Native["GetDrawingFirstPage"]();
+        var drawingEnd      = this.Native["GetDrawingEndPage"]();
+        if (this.m_bIsSelection)
+        {
+            this.Native["DD_Overlay_StartDrawSelection"]();
+
+            for (var i = drawingFirst; i <= drawingEnd; i++)
+            {
+                if (!this.IsFreezePage(i))
+                    this.LogicDocument.Selection_Draw_Page(i);
+            }
+
+            this.Native["DD_Overlay_EndDrawSelection"]();
+        }
+
+        // проверки - внутри
+        this.Native["DD_Overlay_DrawTableOutline"]();
+
+        // drawShapes (+ track)
+        if (this.LogicDocument.DrawingObjects)
+        {
+            for (var indP = drawingFirst; indP <= drawingEnd; indP++)
+            {
+                this.AutoShapesTrack.PageIndex = indP;
+                this.LogicDocument.DrawingObjects.drawSelect(indP);
+            }
+
+            if (this.LogicDocument.DrawingObjects.needUpdateOverlay())
+            {
+                this.AutoShapesTrack.PageIndex = -1;
+                this.LogicDocument.DrawingObjects.drawOnOverlay(this.AutoShapesTrack);
+                this.AutoShapesTrack.CorrectOverlayBounds();
+            }
+        }
+
+        this.Native["DD_Overlay_DrawTableTrack"]();
+        this.Native["DD_Overlay_DrawFrameTrack"]();
+        this.Native["DD_Overlay_DrawInlineTextTrackEnabled"]();
+        this.Native["DD_Overlay_DrawHorVerAnchor"]();
+
+        return true;
+    },
+
+    OnMouseDown : function(e)
+    {
+        check_MouseDownEvent(e, true);
+
+        // у Илюхи есть проблема при вводе с клавы, пока нажата кнопка мыши
+        if ((0 == global_mouseEvent.Button) || (undefined == global_mouseEvent.Button))
+            this.m_bIsMouseLock = true;
+
+        this.StartUpdateOverlay();
+
+        if ((0 == global_mouseEvent.Button) || (undefined == global_mouseEvent.Button))
+        {
+            var pos = null;
+            if (this.AutoShapesTrackLockPageNum == -1)
+                pos = this.Native["DD_ConvertCoordsFromCursor"](global_mouseEvent.X, global_mouseEvent.Y);
+            else
+                pos = this.Native["DD_ConvetToPageCoords"](global_mouseEvent.X, global_mouseEvent.Y, this.AutoShapesTrackLockPageNum);
+
+            if (pos.Page == -1)
+            {
+                this.EndUpdateOverlay();
+                return;
+            }
+
+            if (this.IsFreezePage(pos.Page))
+            {
+                this.EndUpdateOverlay();
+                return;
+            }
+
+            // теперь проверить трек таблиц
+            var ret = this.Native["checkMouseDown_Drawing"](pos.X, pos.Y, pos.Page);
+            if (ret === true)
+                return;
+
+            this.Native["DD_NeedScrollToTargetFlag"](true);
+            this.LogicDocument.OnMouseDown(global_mouseEvent, pos.X, pos.Y, pos.Page);
+            this.Native["DD_NeedScrollToTargetFlag"](false);
+        }
+
+        this.Native["DD_CheckTimerScroll"](true);
+        this.EndUpdateOverlay();
+    },
+
+    OnMouseUp : function(e)
+    {
+        check_MouseUpEvent(e);
+
+        var pos = null;
+        if (this.AutoShapesTrackLockPageNum == -1)
+            pos = this.Native["DD_ConvertCoordsFromCursor"](global_mouseEvent.X, global_mouseEvent.Y);
+        else
+            pos = this.Native["DD_ConvetToPageCoords"](global_mouseEvent.X, global_mouseEvent.Y, this.AutoShapesTrackLockPageNum);
+
+        if (pos.Page == -1)
+            return;
+
+        if (this.IsFreezePage(pos.Page))
+            return;
+
+        this.UnlockCursorType();
+
+        this.StartUpdateOverlay();
+
+        // восстанавливаем фокус
+        this.m_bIsMouseLock = false;
+
+        var is_drawing = this.Native["checkMouseUp_Drawing"](pos.X, pos.Y, pos.Page);
+        if (is_drawing === true)
+            return;
+
+        this.Native["DD_CheckTimerScroll"](false);
+
+        this.Native.m_bIsMouseUpSend = true;
+
+        this.Native["DD_NeedScrollToTargetFlag"](true);
+        this.LogicDocument.OnMouseUp(global_mouseEvent, pos.X, pos.Y, pos.Page);
+        this.Native["DD_NeedScrollToTargetFlag"](false);
+
+        this.Native.m_bIsMouseUpSend = false;
+        this.LogicDocument.Document_UpdateInterfaceState();
+        this.LogicDocument.Document_UpdateRulersState();
+
+        this.EndUpdateOverlay();
+    },
+
+    OnMouseMove : function(e)
+    {
+        check_MouseMoveEvent(e);
+        var pos = null;
+        if (this.AutoShapesTrackLockPageNum == -1)
+            pos = this.Native["DD_ConvertCoordsFromCursor"](global_mouseEvent.X, global_mouseEvent.Y);
+        else
+            pos = this.Native["DD_ConvetToPageCoords"](global_mouseEvent.X, global_mouseEvent.Y, this.AutoShapesTrackLockPageNum);
+
+        if (pos.Page == -1)
+            return;
+
+        if (this.IsFreezePage(pos.Page))
+            return;
+
+        if (this.m_sLockedCursorType != "")
+            this.SetCursorType("default");
+
+        this.StartUpdateOverlay();
+        var is_drawing = this.Native["checkMouseMove_Drawing"](pos.X, pos.Y, pos.Page);
+        if (is_drawing === true)
+            return;
+
+        this.LogicDocument.OnMouseMove(global_mouseEvent, pos.X, pos.Y, pos.Page);
+        this.EndUpdateOverlay();
+    },
+
+    OnKeyDown : function()
+    {
+        check_KeyboardEvent(e);
+
+        if (this.IsFreezePage(this.m_lCurrentPage))
+            return;
+
+        this.StartUpdateOverlay();
+
+        this.IsKeyDownButNoPress = true;
+        this.bIsUseKeyPress = (this.LogicDocument.OnKeyDown(global_keyboardEvent) === true) ? false : true;
+
+        this.EndUpdateOverlay();
+    },
+
+    OnKeyUp : function()
+    {
+        global_keyboardEvent.AltKey     = false;
+        global_keyboardEvent.CtrlKey    = false;
+        global_keyboardEvent.ShiftKey   = false;
+    },
+
+    OnKeyPress : function()
+    {
+        if (false === this.bIsUseKeyPress)
+            return;
+
+        if (this.IsFreezePage(this.m_lCurrentPage))
+            return;
+
+        check_KeyboardEvent(e);
+
+        this.StartUpdateOverlay();
+        var retValue = this.LogicDocument.OnKeyPress(global_keyboardEvent);
+        this.EndUpdateOverlay();
+        return retValue;
     }
 };
