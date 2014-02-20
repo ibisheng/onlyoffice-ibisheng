@@ -78,8 +78,9 @@ CShapeDrawer.prototype =
     fromShape : function(shape, graphics)
     {
         this.IsRectShape    = false;
-        this.Shape          = shape;
-        this.Graphics       = window.native;
+        this.Shape          = shape;		
+
+        this.Graphics       = (graphics.IsSlideBoundsCheckerType !== undefined) ? graphics : window.native;
         this.UniFill        = shape.brush;
         this.Ln             = shape.pen;
         this.Transform      = shape.TransformMatrix;
@@ -178,6 +179,9 @@ CShapeDrawer.prototype =
 
             this.StrokeWidth = (this.Ln.w == null) ? 12700 : parseInt(this.Ln.w);
             this.StrokeWidth /= 36000.0;
+			
+			if (graphics.IsSlideBoundsCheckerType && !this.bIsNoStrokeAttack)
+                graphics.LineWidth = this.StrokeWidth;
         }
 
         if (this.bIsTexture || bIsCheckBounds)
@@ -193,6 +197,32 @@ CShapeDrawer.prototype =
     {
         if (this.bIsNoStrokeAttack && this.bIsNoFillAttack)
             return;
+			
+		if (this.Graphics.IsSlideBoundsCheckerType)
+		{
+			// slide bounds checker
+			if(geom)
+	        {
+	            geom.draw(this);
+	        }
+	        else
+	        {
+	            this._s();
+	            this._m(0, 0);
+	            this._l(this.Shape.extX, 0);
+	            this._l(this.Shape.extX, this.Shape.extY);
+	            this._l(0, this.Shape.extY);
+	            this._z();
+	            this.drawFillStroke(true, "norm", true && !this.bIsNoStrokeAttack);
+	            this._e();
+	        }
+
+	        if (this.Graphics.IsSlideBoundsCheckerType && this.Graphics.AutoCheckLineWidth)
+	        {
+	            this.Graphics.CorrectBounds2();
+	        }
+			return;
+		}
 
         this.Graphics["PD_StartShapeDraw"](this.IsRectShape);
         if(geom)
@@ -215,6 +245,8 @@ CShapeDrawer.prototype =
 
     p_width : function(w)
     {
+		if (this.Graphics.IsSlideBoundsCheckerType)
+			return this.Graphics.p_width(w);
         this.Graphics["PD_p_width"](w);
     },
 
@@ -225,6 +257,8 @@ CShapeDrawer.prototype =
             this.CheckPoint(x, y);
             return;
         }
+		if (this.Graphics.IsSlideBoundsCheckerType)
+			return this.Graphics._m(x, y);
         this.Graphics["PD_PathMoveTo"](x, y);
     },
     _l : function(x, y)
@@ -234,6 +268,8 @@ CShapeDrawer.prototype =
             this.CheckPoint(x, y);
             return;
         }
+		if (this.Graphics.IsSlideBoundsCheckerType)
+			return this.Graphics._l(x, y);
         this.Graphics["PD_PathLineTo"](x, y);
     },
     _c : function(x1, y1, x2, y2, x3, y3)
@@ -245,6 +281,8 @@ CShapeDrawer.prototype =
             this.CheckPoint(x3, y3);
             return;
         }
+		if (this.Graphics.IsSlideBoundsCheckerType)
+			return this.Graphics._c(x1, y1, x2, y2, x3, y3);
         this.Graphics["PD_PathCurveTo"](x1, y1, x2, y2, x3, y3);
     },
     _c2 : function(x1, y1, x2, y2)
@@ -255,20 +293,28 @@ CShapeDrawer.prototype =
             this.CheckPoint(x2, y2);
             return;
         }
+		if (this.Graphics.IsSlideBoundsCheckerType)
+			return this.Graphics._c2(x1, y1, x2, y2);
         this.Graphics["PD_PathCurveTo2"](x1, y1, x2, y2);
     },
     _z : function()
     {
         if (this.bIsCheckBounds)
             return;
-        this.Graphics["PD_PathClose"]();
+		if (this.Graphics.IsSlideBoundsCheckerType)
+			return this.Graphics._z();
+		this.Graphics["PD_PathClose"]();
     },
     _s : function()
     {
+		if (this.Graphics.IsSlideBoundsCheckerType)
+			return this.Graphics._s();
         this.Graphics["PD_PathStart"]();
     },
     _e : function()
     {
+		if (this.Graphics.IsSlideBoundsCheckerType)
+			return this.Graphics._e();
         this.Graphics["PD_PathEnd"]();
     },
 
@@ -276,6 +322,9 @@ CShapeDrawer.prototype =
     {
         if (mode == "none" || this.bIsNoFillAttack)
             return;
+			
+		if (this.Graphics.IsSlideBoundsCheckerType)
+			return;
 
         var _fill = this.UniFill.fill;
         switch (_fill.type)
@@ -392,6 +441,9 @@ CShapeDrawer.prototype =
     {
         if (this.bIsNoStrokeAttack)
             return;
+			
+		if (this.Graphics.IsSlideBoundsCheckerType)
+			return;
 
         if (this.Ln.Join != null && this.Ln.Join.type != null)
         {

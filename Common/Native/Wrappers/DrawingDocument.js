@@ -12,6 +12,8 @@
     this.Frame = null;
     this.Table = null;
     this.AutoShapesTrack        = null;
+    
+    this.m_oWordControl = window.native;
 }
 
 CDrawingDocument.prototype =
