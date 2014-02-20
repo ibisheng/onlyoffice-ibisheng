@@ -1725,9 +1725,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			_onTryResetLockedGraphicObject: function (id) {
 				if (this.wb) {
-					return this.wb.getWorksheet().objectRender.tryResetLockedGraphicObject(id);
+					for (var key in this.wb.wsViews) {
+						var ws = this.wb.wsViews[key];
+						ws.objectRender.tryResetLockedGraphicObject(id);
+					}
 				}
-				return false;
 			},
 			
 			_onShowComments: function () {

@@ -1318,6 +1318,7 @@
 				event.ClickCount = this.clickCounter.clickCount;
 				this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
 				this.isMouseDownMode = false;
+				this._changeSelectionDone(event);
 				return true;
 			}
 
