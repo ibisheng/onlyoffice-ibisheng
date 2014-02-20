@@ -9779,19 +9779,19 @@
 			return true;
 		};
 
-		WorksheetView.prototype.openCellEditor = function (editor, x, y, isCoord, fragments, cursorPos, isFocus, isClearCell,
-								  isHideCursor, activeRange) {
-			var t = this, vr = t.visibleRange, tc = t.cols, tr = t.rows, col, row, c, fl, mc, bg;
-			var offsetFrozen = t.getFrozenPaneOffset();
+		WorksheetView.prototype.openCellEditor = function (editor, x, y, isCoord, fragments, cursorPos,
+														   isFocus, isClearCell, isHideCursor, activeRange) {
+			var t = this, vr = t.visibleRange.clone(), tc = t.cols, tr = t.rows, col, row, c, fl, mc, bg;
+			var offsetX = 0, offsetY = 0;
 			var ar = t.activeRange;
 			if (activeRange)
 				t.activeRange = activeRange.clone();
 
-			if ( t.objectRender.checkCursorDrawingObject(x, y) )
+			if (t.objectRender.checkCursorDrawingObject(x, y))
 				return false;
 
 			function getLeftSide(col) {
-				var i, res = [], offs = t.cols[vr.c1].left - t.cols[0].left - offsetFrozen.offsetX;
+				var i, res = [], offs = t.cols[vr.c1].left - t.cols[0].left - offsetX;
 				for (i = col; i >= vr.c1; --i) {
 					if (t.width_1px < t.cols[i].width)
 						res.push(t.cols[i].left - offs);
@@ -9800,7 +9800,7 @@
 			}
 
 			function getRightSide(col) {
-				var i, w, res = [], offs = t.cols[vr.c1].left - t.cols[0].left - offsetFrozen.offsetX;
+				var i, w, res = [], offs = t.cols[vr.c1].left - t.cols[0].left - offsetX;
 
 				// Для замерженных ячеек, можем уйти за границу
 				if (fl.isMerged && col > vr.c2)
@@ -9819,7 +9819,7 @@
 			}
 
 			function getBottomSide(row) {
-				var i, h, res = [], offs = t.rows[vr.r1].top - t.rows[0].top - offsetFrozen.offsetY;
+				var i, h, res = [], offs = t.rows[vr.r1].top - t.rows[0].top - offsetY;
 
 				// Для замерженных ячеек, можем уйти за границу
 				if (fl.isMerged && row > vr.r2)
@@ -9865,27 +9865,46 @@
 				var bIsUpdateX = false;
 				var bIsUpdateY = false;
 				if (mc.c1 < vr.c1) {
-					vr.c1 = mc.c1;
+					t.visibleRange.c1 = vr.c1 = mc.c1;
 					bIsUpdateX = true;
 					t._calcVisibleColumns();
 				}
 				if (mc.r1 < vr.r1) {
-					vr.r1 = mc.r1;
+					t.visibleRange.r1 = vr.r1 = mc.r1;
 					bIsUpdateY = true;
 					t._calcVisibleRows();
 				}
 				if (bIsUpdateX && bIsUpdateY) {
 					this.handlers.trigger("reinitializeScroll");
-				}
-				else if (bIsUpdateX) {
+				} else if (bIsUpdateX) {
 					this.handlers.trigger("reinitializeScrollX");
-				}
-				else if (bIsUpdateY) {
+				} else if (bIsUpdateY) {
 					this.handlers.trigger("reinitializeScrollY");
 				}
 
 				if (bIsUpdateX || bIsUpdateY) {
 					t.draw();
+				}
+			}
+
+			if (this.topLeftFrozenCell) {
+				var cFrozen = this.topLeftFrozenCell.getCol0();
+				var rFrozen = this.topLeftFrozenCell.getRow0();
+				if (0 < cFrozen) {
+					if (col > cFrozen)
+						offsetX = tc[cFrozen].left - tc[0].left;
+					else {
+						vr.c1 = 0;
+						vr.c2 = cFrozen - 1;
+					}
+				}
+				if (0 < rFrozen) {
+					if (row > rFrozen)
+						offsetY = tr[rFrozen].top - tr[0].top;
+					else {
+						vr.r1 = 0;
+						vr.r2 = rFrozen - 1;
+					}
 				}
 			}
 
@@ -9906,8 +9925,8 @@
 			}
 
 			editor.open({
-				cellX: t.cellsLeft + tc[!fl.isMerged ? col : mc.c1].left - tc[vr.c1].left + offsetFrozen.offsetX,
-				cellY: t.cellsTop + tr[!fl.isMerged ? row : mc.r1].top - tr[vr.r1].top + offsetFrozen.offsetY,
+				cellX: t.cellsLeft + tc[!fl.isMerged ? col : mc.c1].left - tc[vr.c1].left + offsetX,
+				cellY: t.cellsTop + tr[!fl.isMerged ? row : mc.r1].top - tr[vr.r1].top + offsetY,
 				leftSide: getLeftSide(!fl.isMerged ? col : mc.c1),
 				rightSide: getRightSide(!fl.isMerged ? col : mc.c2),
 				bottomSide: getBottomSide(!fl.isMerged ? row : mc.r2),
