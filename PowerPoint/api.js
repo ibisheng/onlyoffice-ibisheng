@@ -1789,7 +1789,7 @@ asc_docs_api.prototype.onSaveCallback = function (e) {
         safe_Apply_Changes();
 
 		// Сохраняем файл на сервер
-		var data = this.WordControl.SaveDocument();
+		/*var data = this.WordControl.SaveDocument();
 		var oAdditionalData = new Object();
 		oAdditionalData["c"] = "save";
 		oAdditionalData["id"] = documentId;
@@ -1802,7 +1802,7 @@ asc_docs_api.prototype.onSaveCallback = function (e) {
 		sendCommand(editor, function(incomeObject){
 			if(null != incomeObject && "save" == incomeObject["type"])
 				editor.processSavedFile(incomeObject["data"], true);
-		}, oAdditionalData);
+		}, oAdditionalData);*/
 
 		// Пересылаем свои изменения (ToDo)
 		CollaborativeEditing.Send_Changes();
@@ -1815,6 +1815,7 @@ asc_docs_api.prototype.onSaveCallback = function (e) {
 		// Если не автосохранение, то продолжаем показывать Block-сообщение
 		if (!t.isAutoSave)
 			t.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+		editor.processSavedFile("", true);
 	} else {
 		nState = t.CoAuthoringApi.get_state();
 		if (3 === nState) {
@@ -5054,6 +5055,9 @@ function sendCommand(editor, fCallback, rdata){
 					if(fCallback)
 						fCallback(incomeObject);
                 break;
+				case "updateversion":
+					alert("need updateversion");
+				break;
 				default:
 					if(fCallback)
 						fCallback(incomeObject);

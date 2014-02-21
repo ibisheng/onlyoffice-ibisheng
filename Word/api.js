@@ -2699,7 +2699,7 @@ function OnSave_Callback(e)
             window['qtDocBridge']['savedDocument'] (data);
             
         } else {
-            var oAdditionalData = {};
+            /*var oAdditionalData = {};
 			oAdditionalData["c"] = "save";
 			oAdditionalData["id"] = documentId;
 			oAdditionalData["userid"] = documentUserId;
@@ -2717,7 +2717,7 @@ function OnSave_Callback(e)
             sendCommand(editor, function(incomeObject){
 				if(null != incomeObject && "save" == incomeObject["type"])
 					editor.processSavedFile(incomeObject["data"], true);
-			}, oAdditionalData);
+			}, oAdditionalData);*/
         }
 
 		// Пересылаем свои изменения
@@ -2731,6 +2731,7 @@ function OnSave_Callback(e)
 		// Если не автосохранение, то продолжаем показывать Block-сообщение
 		if (!editor.isAutoSave)
 			editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+		editor.processSavedFile("", true);
     } else {
 		nState = editor.CoAuthoringApi.get_state();
 		if (3 === nState) {
@@ -6292,7 +6293,6 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                     this.isApplyChangesOnOpen = true;
                     CollaborativeEditing.Apply_Changes();
                     CollaborativeEditing.Release_Locks();
-                    return;
                 }
 
                 //Recalculate HdrFtr
@@ -7110,6 +7110,9 @@ function sendCommand(editor, fCallback, rdata){
 					if(fCallback)
 						fCallback(incomeObject);
                 break;
+				case "updateversion":
+					alert("need updateversion");
+					break;
 				default:
 					if(fCallback)
                         fCallback(incomeObject);

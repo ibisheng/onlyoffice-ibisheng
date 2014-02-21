@@ -950,6 +950,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 									if(callback)
 										callback(result);
 									break;
+								case "updateversion":
+									alert("need updateversion");
+									break;
 								default:
 									if(callback)
 										callback(incomeObject);
@@ -1863,7 +1866,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					t.collaborativeEditing.applyChanges();
 
 					// Сохраняем файл на сервер
-					this._asc_save();
+					//this._asc_save();
 
 					// Cбросим флаги модификации
 					History.Save();
@@ -1882,6 +1885,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					// Если не автосохранение, то продолжаем показывать Block-сообщение
 					if (!this.isAutoSave)
 						this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+					this.asc_processSavedFile("", true);
 				} else {
 					nState = t.CoAuthoringApi.get_state();
 					if (3 === nState) {
