@@ -585,13 +585,6 @@ function CCollaborativeEditing()
 
     this.Apply_Changes = function()
     {
-        // Пока не началось совместное редактирование, мы ничего не делаем
-        if ( true != this.m_bUse )
-        {
-            editor.CoAuthoringApi.saveChanges( new Array() );
-            return;
-        }
-
         editor.WordControl.m_oLogicDocument.Stop_Recalculate();
 
 		editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.ApplyChanges);
