@@ -229,6 +229,9 @@ function NativeOpenFile()
     {
         _api = new window["asc_docs_api"]("");       
         _api.asc_nativeOpenFile(doc_bin);
+        
+        if (_api.WordControl.m_oDrawingDocument.AfterLoad)
+            _api.WordControl.m_oDrawingDocument.AfterLoad();
     }
     else
     {
@@ -251,6 +254,9 @@ function NativeOpenFile2()
     {
         _api = new window["asc_docs_api"]("");       
         _api.asc_nativeOpenFile(doc_bin);
+        
+        if (_api.WordControl.m_oDrawingDocument.AfterLoad)
+            _api.WordControl.m_oDrawingDocument.AfterLoad();
     }
     else
     {
@@ -404,4 +410,4 @@ window.native.Call_OnKeyUp = function(e)
 window.native.Call_CalculateResume = function()
 {
     Document_Recalculate_Page();
-}
+};

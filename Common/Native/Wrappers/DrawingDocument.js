@@ -5,6 +5,8 @@
 
     this.IsLockObjectsEnable    = false;
     this.LogicDocument          = null;
+    
+    this.CanvasHitContext       = CreateHitControl();
 
     this.m_dTargetSize          = 0;
     this.m_lCurrentPage         = -1;
@@ -24,10 +26,18 @@
 
     this.IsKeyDownButNoPress    = false;
     this.bIsUseKeyPress         = false;
+    
+    this.AutoShapesTrackLockPageNum = -1;
 }
 
 CDrawingDocument.prototype =
 {
+    AfterLoad : function()
+    {
+        this.m_oWordControl = this;
+        this.LogicDocument  = window.editor.WordControl.m_oLogicDocument;
+        this.LogicDocument.DrawingDocument = this;        
+    },
 	RenderPage : function(nPageIndex)
 	{
 		var _graphics = new CDrawingStream();
@@ -147,7 +157,7 @@ CDrawingDocument.prototype =
         return { X : _return[0], Y : _return[1], Error: _return[2] };
     },
 
-    // targer
+    // target
     TargetStart : function()
     {
         this.Native["DD_TargetStart"]();
@@ -453,6 +463,7 @@ CDrawingDocument.prototype =
         // проверки - внутри
         this.Native["DD_Overlay_DrawTableOutline"]();
 
+/*
         // drawShapes (+ track)
         if (this.LogicDocument.DrawingObjects)
         {
@@ -469,6 +480,7 @@ CDrawingDocument.prototype =
                 this.AutoShapesTrack.CorrectOverlayBounds();
             }
         }
+*/
 
         this.Native["DD_Overlay_DrawTableTrack"]();
         this.Native["DD_Overlay_DrawFrameTrack"]();
@@ -627,6 +639,32 @@ CDrawingDocument.prototype =
         var retValue = this.LogicDocument.OnKeyPress(global_keyboardEvent);
         this.EndUpdateOverlay();
         return retValue;
+    },
+    
+    ///////////////////////////////////////////
+    StartTableStylesCheck : function()
+    {        
+    },
+
+    EndTableStylesCheck : function()
+    {
+    },
+
+    CheckTableStyles : function(tableLook)
+    {
+    },
+    
+    SendControlColors : function()
+    {
+    },
+    SendThemeColorScheme : function()
+    {
+    },
+    DrawImageTextureFillShape : function()
+    {
+    },
+    DrawGuiCanvasTextProps : function()
+    {
     }
 };
 
