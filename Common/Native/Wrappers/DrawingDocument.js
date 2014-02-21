@@ -13,7 +13,7 @@
     this.Table = null;
     this.AutoShapesTrack        = new Object();
     
-    this.m_oWordControl = window.native;
+    this.m_oWordControl = this;
 
     this.IsUpdateOverlayOnlyEnd         = false;
     this.IsUpdateOverlayOnlyEndReturn   = false;
