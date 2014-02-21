@@ -84,9 +84,13 @@ CChartsDrawer.prototype =
 		this.areaChart.reCalculate(this.calcProp, null, this);
 		this.gridChart.reCalculate(this.calcProp, null, chartSpace);
 		this.allAreaChart.reCalculate(this.calcProp);
-		this.catAxisChart.reCalculate(this.calcProp, null, chartSpace);
-		this.valAxisChart.reCalculate(this.calcProp, null, chartSpace);
 		
+		if(this.calcProp.type != "Pie")
+		{
+			this.catAxisChart.reCalculate(this.calcProp, null, chartSpace);
+			this.valAxisChart.reCalculate(this.calcProp, null, chartSpace);
+		}
+
 		this.chart.reCalculate(this, chartSpace);
 	},
 	
@@ -99,8 +103,13 @@ CChartsDrawer.prototype =
 		//отрисовываем без пересчёта
 		this.allAreaChart.draw(this.calcProp, cShapeDrawer, chartSpace);
 		this.areaChart.draw(this.calcProp, cShapeDrawer, chartSpace);
-		this.catAxisChart.draw(this.calcProp, cShapeDrawer, chartSpace);
-		this.valAxisChart.draw(this.calcProp, cShapeDrawer, chartSpace);
+		
+		if(this.calcProp.type != "Pie")
+		{
+			this.catAxisChart.draw(this.calcProp, cShapeDrawer, chartSpace);
+			this.valAxisChart.draw(this.calcProp, cShapeDrawer, chartSpace);
+		}
+		
 		this.gridChart.draw(this.calcProp, cShapeDrawer, chartSpace);
 		this.chart.draw(this, cShapeDrawer, chartSpace);
 	},
@@ -193,43 +202,47 @@ CChartsDrawer.prototype =
 		
 		
 		//count line of chart grid
-		this.calcProp.numhlines = chartProp.chart.plotArea.valAx.yPoints.length - 1;
-		if(this.calcProp.type == "Bar")
-		{
-			this.calcProp.numvlines = chartProp.chart.plotArea.catAx.xPoints.length;
-			
-			this.calcProp.numvMinorlines = 2;
-			this.calcProp.numhMinorlines = 5;
+		if(chartProp.chart.plotArea.valAx.yPoints && chartProp.chart.plotArea.catAx.xPoints)
+		{	
+			this.calcProp.numhlines = chartProp.chart.plotArea.valAx.yPoints.length - 1;
+			if(this.calcProp.type == "Bar")
+			{
+				this.calcProp.numvlines = chartProp.chart.plotArea.catAx.xPoints.length;
+				
+				this.calcProp.numvMinorlines = 2;
+				this.calcProp.numhMinorlines = 5;
+			}
+			else if(this.calcProp.type == "HBar")
+			{
+				this.calcProp.numhlines = chartProp.chart.plotArea.catAx.xPoints.length;
+				this.calcProp.numvlines = chartProp.chart.plotArea.valAx.yPoints.length;
+				
+				this.calcProp.numhMinorlines = 2;
+				this.calcProp.numvMinorlines = 5;
+			}
+			else if(this.calcProp.type == "Line" || this.calcProp.type == "Stock")
+			{
+				this.calcProp.numvlines = chartProp.chart.plotArea.catAx.xPoints.length;
+				
+				this.calcProp.numvMinorlines = 2;
+				this.calcProp.numhMinorlines = 5;
+			}
+			else if(this.calcProp.type == "Scatter")
+			{
+				this.calcProp.numvlines = chartProp.chart.plotArea.catAx.xPoints.length;
+				
+				this.calcProp.numvMinorlines = 5;
+				this.calcProp.numhMinorlines = 5;
+			}
+			else if(this.calcProp.type == "Area")
+			{
+				this.calcProp.numvlines = chartProp.chart.plotArea.catAx.xPoints.length;
+				
+				this.calcProp.numvMinorlines = 2;
+				this.calcProp.numhMinorlines = 5;
+			}
 		}
-		else if(this.calcProp.type == "HBar")
-		{
-			this.calcProp.numhlines = chartProp.chart.plotArea.catAx.xPoints.length;
-			this.calcProp.numvlines = chartProp.chart.plotArea.valAx.yPoints.length;
-			
-			this.calcProp.numhMinorlines = 2;
-			this.calcProp.numvMinorlines = 5;
-		}
-		else if(this.calcProp.type == "Line" || this.calcProp.type == "Stock")
-		{
-			this.calcProp.numvlines = chartProp.chart.plotArea.catAx.xPoints.length;
-			
-			this.calcProp.numvMinorlines = 2;
-			this.calcProp.numhMinorlines = 5;
-		}
-		else if(this.calcProp.type == "Scatter")
-		{
-			this.calcProp.numvlines = chartProp.chart.plotArea.catAx.xPoints.length;
-			
-			this.calcProp.numvMinorlines = 5;
-			this.calcProp.numhMinorlines = 5;
-		}
-		else if(this.calcProp.type == "Area")
-		{
-			this.calcProp.numvlines = chartProp.chart.plotArea.catAx.xPoints.length;
-			
-			this.calcProp.numvMinorlines = 2;
-			this.calcProp.numhMinorlines = 5;
-		}
+		
 		
 		if(this.calcProp.type != "Scatter")
 			this.calcProp.nullPositionOX = this._getNullPosition();
