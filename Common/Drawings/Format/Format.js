@@ -10206,6 +10206,36 @@ function CBodyPr()
         this.vert = val;
     };
 
+    this.setRot = function(val)
+    {
+        this.rot = val;
+    };
+
+    this.reset = function()
+    {
+        this.flatTx           = null;
+        this.anchor           = null;
+        this.anchorCtr        = null;
+        this.bIns             = null;
+        this.compatLnSpc      = null;
+        this.forceAA          = null;
+        this.fromWordArt      = null;
+        this.horzOverflow     = null;
+        this.lIns             = null;
+        this.numCol           = null;
+        this.rIns             = null;
+        this.rot              = null;
+        this.rtlCol           = null;
+        this.spcCol           = null;
+        this.spcFirstLastPara = null;
+        this.tIns             = null;
+        this.upright          = null;
+        this.vert             = null;
+        this.vertOverflow     = null;
+        this.wrap             = null;
+        this.textFit          = null;
+    };
+
 	
     this.Write_ToBinary2 = function(w)
     {

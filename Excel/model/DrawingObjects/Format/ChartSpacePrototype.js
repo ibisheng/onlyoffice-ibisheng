@@ -1127,9 +1127,17 @@ CChartSpace.prototype.getValAxisValues = function()
         this.chartObj = new CChartsDrawer()
     }
     this.chartObj.preCalculateData(this);
-    var ret = [];
-    ret = ret.concat(this.chartObj.calcProp.scale);
-    return ret;
+    return [].concat(this.chartObj.calcProp.scale);
+};
+
+CChartSpace.prototype.getXValAxisValues = function()
+{
+    if(!this.chartObj)
+    {
+        this.chartObj = new CChartsDrawer()
+    }
+    this.chartObj.preCalculateData(this);
+    return [].concat(this.chartObj.calcProp.xScale);
 };
 
 
@@ -1723,7 +1731,208 @@ CChartSpace.prototype.recalculateAxis = function()
         {
             case historyitem_type_ScatterChart:
             {
-                //TODO
+                var gap_hor_axis = 4;
+                var axis = chart_object.axId;
+                var x_ax, y_ax;
+                for(i = 0; i < axis.length; ++i)
+                {
+                    if(!x_ax && axis[i].axPos === AX_POS_B)
+                    {
+                        x_ax = axis[i];
+                    }
+                    if(!y_ax && axis[i].axPos === AX_POS_L)
+                    {
+                        y_ax = axis[i];
+                    }
+                    if(x_ax && y_ax)
+                        break;
+                }
+                if(x_ax && y_ax)
+                {
+                    y_ax.labels  = null;
+                    x_ax.labels  = null;
+                    var sizes = this.getChartSizes();
+                    var rect = {x: sizes.startX, y:sizes.startY, w:sizes.w, h: sizes.h};
+                    var arr_val =  this.getValAxisValues();
+                    //Получим строки для оси значений с учетом формата и единиц
+                    var arr_strings = [];
+                    var multiplier;
+                    if(y_ax.dispUnits)
+                        multiplier = y_ax.dispUnits.getMultiplier;
+                    else
+                        multiplier = 1;
+                    var num_fmt = y_ax.numFmt;
+                    if(num_fmt && typeof num_fmt.formatCode === "string" /*&& !(num_fmt.formatCode === "General")*/)
+                    {
+                        var num_format = oNumFormatCache.get(num_fmt.formatCode);
+                        for(i = 0; i < arr_val.length; ++i)
+                        {
+                            var calc_value = arr_val[i]*multiplier;
+                            var rich_value = num_format.format(calc_value, CellValueType.number, 15);
+                            arr_strings.push(rich_value[0].text);
+                        }
+                    }
+                    else
+                    {
+                        for(i = 0; i < arr_val.length; ++i)
+                        {
+                            var calc_value = arr_val[i]*multiplier;
+                            arr_strings.push(calc_value + "");
+                        }
+                    }
+
+                    //расчитаем подписи для вертикальной оси найдем ширину максимальной и возьмем её удвоенную за ширину подписей верт оси
+                    for(i = 0; i < arr_strings.length; ++i)
+                    {
+                        y_ax.labels = new CValAxisLabels(this);
+                        var max_width = 0;
+                        y_ax.yPoints = [];
+                        for(i = 0; i < arr_strings.length; ++i)
+                        {
+                            var dlbl = new CDLbl();
+                            dlbl.parent = y_ax;
+                            dlbl.chart = this;
+                            dlbl.spPr = y_ax.spPr;
+                            dlbl.txPr = y_ax.txPr;
+                            dlbl.tx = new CChartText();
+                            dlbl.tx.rich = CreateTextBodyFromString(arr_strings[i], this.getDrawingDocument(), dlbl);
+                            dlbl.recalculate();
+                            if(dlbl.tx.rich.content.XLimit > max_width)
+                                max_width = dlbl.tx.rich.content.XLimit;
+                            y_ax.labels.arrLabels.push(dlbl);
+                            y_ax.yPoints.push({val: arr_val[i], pos: null});
+                        }
+                    }
+                    for(i = 0; i < arr_strings.length; ++i)
+                    {
+                        y_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(true);
+                        y_ax.labels.arrLabels[i].tx.rich.content.Set_ParagraphAlign(align_Right);
+                        y_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(false);
+                        y_ax.labels.arrLabels[i].tx.rich.content.Reset(0,0, max_width, 20000);
+                        y_ax.labels.arrLabels[i].tx.rich.content.Recalculate_Page(0, true);
+                    }
+                    y_ax.labels.extX = max_width*2;
+
+                    //расчитаем подписи для горизонтальной оси
+                    var arr_x_val = this.getXValAxisValues();
+                    var num_fmt = x_ax.numFmt;
+                    var string_pts = [];
+                    if(num_fmt && typeof num_fmt.formatCode === "string" /*&& !(num_fmt.formatCode === "General")*/)
+                    {
+                        var num_format = oNumFormatCache.get(num_fmt.formatCode);
+                        for(i = 0; i < arr_x_val.length; ++i)
+                        {
+                            var calc_value = arr_x_val[i]*multiplier;
+                            var rich_value = num_format.format(calc_value, CellValueType.number, 15);
+                            string_pts.push({val:rich_value[0].text});
+                        }
+                    }
+                    else
+                    {
+                        for(i = 0; i < arr_x_val.length; ++i)
+                        {
+                            var calc_value = arr_x_val[i]*multiplier;
+                            string_pts.push({val:calc_value + ""});
+                        }
+                    }
+
+
+                    //расчитаем ширину интервала без учета горизонтальной оси;
+                    var crosses = y_ax.crosses;
+                    if(crosses === CROSSES_AUTO_ZERO)
+                    {
+                        crosses = 0;
+                    }
+                    else
+                    {
+                        crosses -=1;
+                    }
+                    var point_width = rect.w/string_pts.length;
+                    //смотрим выходят ли подписи верт. оси влево: TODO:вправо нужно потом рассмотреть
+                    var left_points_width = point_width*crosses;//общая ширина левых точек если считать что точки занимают все пространство
+                    if(left_points_width < y_ax.labels.extX)//подписи верт. оси выходят за пределы области построения
+                    {
+                        point_width = (rect.w - y_ax.labels.extX)/(string_pts.length - crosses - 1);//делим ширину оставшуюся после вычета ширины на количество оставшихся справа точек
+                        y_ax.labels.x = rect.x;
+                    }
+                    else
+                    {
+                        point_width = rect.w/string_pts.length;
+                        y_ax.labels.x = rect.x + left_points_width - y_ax.labels.extX;
+                    }
+
+                    //проверим умещаются ли подписи горизонтальной оси в point_width
+                    x_ax.labels = new CValAxisLabels(this);
+                    var tick_lbl_skip = isRealNumber(x_ax.tickLblSkip) ? x_ax.tickLblSkip : 1;
+                    var max_min_width = 0;
+                    var max_max_width = 0;
+
+                    var max_height = 0;
+                    var cur_height;
+                    for(i = 0; i < string_pts.length; ++i)
+                    {
+                        var dlbl = null;
+                        if(i%tick_lbl_skip === 0)
+                        {
+                            dlbl = new CDLbl();
+                            dlbl.parent = x_ax;
+                            dlbl.chart = this;
+                            dlbl.spPr = x_ax.spPr;
+                            dlbl.txPr = x_ax.txPr;
+                            dlbl.tx = new CChartText();
+                            dlbl.tx.rich = CreateTextBodyFromString(string_pts[i].val, this.getDrawingDocument(), dlbl);
+                            dlbl.recalculate();
+                            cur_height = dlbl.tx.rich.content.Get_SummaryHeight();
+                            if(cur_height > max_height)
+                                max_height = cur_height;
+                        }
+                        x_ax.labels.arrLabels.push(dlbl);
+                    }
+
+
+                    y_ax.labels.y = rect.y;
+                    y_ax.labels.extY = rect.h;
+
+                    x_ax.labels.extY = max_height + gap_hor_axis;
+                    x_ax.labels.x = y_ax.labels.x+y_ax.labels.extX - left_points_width;
+                    x_ax.labels.extX = point_width*(string_pts.length - 1);
+
+                    var crosses_at = isRealNumber(x_ax.crossesAt) ? x_ax.crossesAt : arr_val[arr_val.length-1];
+                    var interval = arr_val[arr_val.length-1] - arr_val[0];
+                    x_ax.labels.y = y_ax.labels.y + y_ax.labels.extY - ((arr_val[arr_val.length-1] - crosses_at)/interval)*y_ax.labels.extY;
+                    //посмотрим на сколько выходят подписи вниз за пределы ректа
+                    var gap = x_ax.labels.y + x_ax.labels.extY - (rect.y + rect.h);
+                    if(gap > 0)
+                    {
+                        y_ax.labels.extY *= ((rect.h - gap)/rect.h);
+                        x_ax.labels.y = y_ax.labels.y + y_ax.labels.extY - ((arr_val[arr_val.length-1] - crosses_at)/interval)*y_ax.labels.extY;
+                    }
+
+
+                    var dist = y_ax.labels.extY/(y_ax.labels.arrLabels.length-1);
+                    for(i = 0; i < y_ax.labels.arrLabels.length; ++i)
+                    {
+                        y_ax.labels.arrLabels[i].setPosition(y_ax.labels.x, y_ax.labels.y + dist*(y_ax.labels.arrLabels.length - i -1)
+                            -y_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
+                        y_ax.yPoints[i].pos = y_ax.labels.y + dist*(y_ax.labels.arrLabels.length - i -1);
+                    }
+
+
+                    x_ax.xPoints = [];
+                    for(i = 0; i < x_ax.labels.arrLabels.length; ++i)
+                    {
+                        if(x_ax.labels.arrLabels[i])
+                        {
+                            x_ax.labels.arrLabels[i].setPosition(x_ax.labels.x + point_width*i - x_ax.labels.arrLabels[i].tx.rich.content.XLimit/2, x_ax.labels.y + gap_hor_axis);
+                        }
+                        x_ax.xPoints.push({val: arr_x_val[i], pos: x_ax.labels.x + point_width*i})
+                    }
+
+
+
+                    y_ax.posX = y_ax.labels.x + y_ax.labels.extX;
+                    x_ax.posY = x_ax.labels.y;
+                }
                 break;
             }
             case historyitem_type_PieChart:
@@ -1746,11 +1955,10 @@ CChartSpace.prototype.recalculateAxis = function()
                 }
                 if(val_ax && cat_ax)
                 {
-
                     val_ax.labels  = null;
                     cat_ax.labels  = null;
                     var sizes = this.getChartSizes();
-                    var rect = {x: sizes.startX, y:sizes.startY,w:sizes.w, h: sizes.h};
+                    var rect = {x: sizes.startX, y:sizes.startY, w:sizes.w, h: sizes.h};
                     var arr_val =  this.getValAxisValues();
                     //Получим строки для оси значений с учетом формата и единиц
                     var arr_strings = [];
@@ -1992,7 +2200,7 @@ CChartSpace.prototype.recalculateAxis = function()
                         {
                             val_ax.labels.arrLabels[i].setPosition(val_ax.labels.x, val_ax.labels.y + dist*(val_ax.labels.arrLabels.length - i -1)
                                 -val_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
-                            val_ax.yPoints[i].y = val_ax.labels.y + dist*(val_ax.labels.arrLabels.length - i -1);
+                            val_ax.yPoints[i].pos = val_ax.labels.y + dist*(val_ax.labels.arrLabels.length - i -1);
                         }
 
                         cat_ax.xPoints = [];

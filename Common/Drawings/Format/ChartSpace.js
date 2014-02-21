@@ -280,6 +280,7 @@ CChartSpace.prototype =
     {
         History.Add(this, {Type: historyitem_ChartSpace_SetStyle, oldStyle: this.style, newStyle: style});
         this.style = style;
+        this.handleUpdateStyle();
     },
     setTxPr: function(txPr)
     {
@@ -2701,7 +2702,7 @@ function CreateScatterChart(asc_chart)
     var scatter_chart = plot_area.chart;
     scatter_chart.setScatterStyle(SCATTER_STYLE_LINE_MARKER);
     scatter_chart.setVaryColors(false);
-    plot_area.setCatAx(new CCatAx());
+    plot_area.setCatAx(new CValAx());
     plot_area.setValAx(new CValAx());
 
     var first_series = asc_series.length > 1 ? asc_series[0] : null;
@@ -2747,39 +2748,39 @@ function CreateScatterChart(asc_chart)
             pt.setVal(asc_series[i].Val.NumCache[j].val);
             num_cache.addPt(pt);
         }
-        if(parsedHeaders.bTop)
-        {
-            series.setCat(new CCat());
-            var cat = series.cat;
-            cat.setStrRef(new CStrRef());
-            var str_ref = cat.strRef;
-            str_ref.setF(asc_series[i].Cat.Formula);
-            str_ref.setStrCache(new CStrCache());
-            var str_cache = str_ref.strCache;
-            var cat_num_cache = asc_series[i].Cat.NumCache;
-            str_cache.setPtCount(cat_num_cache.length);
-            for(var j= 0; j < cat_num_cache.length; ++j)
-            {
-                var string_pt = new CStringPoint();
-                string_pt.setIdx(j);
-                string_pt.setVal(cat_num_cache[j].val);
-                str_cache.addPt(string_pt);
-            }
-        }
-        if(parsedHeaders.bLeft && asc_series[i].TxCache)
-        {
-            series.setTx(new CTx());
-            var tx= series.tx;
-            tx.setStrRef(new CStrRef());
-            var str_ref = tx.strRef;
-            str_ref.setF(asc_series[i].TxCache.Formula);
-            str_ref.setStrCache(new CStrCache());
-            var str_cache = str_ref.strCache;
-            str_cache.setPtCount(1);
-            str_cache.addPt(new CStringPoint());
-            var pt = str_cache.pt[0];
-            pt.setVal(asc_series[i].TxCache.Tx);
-        }
+       //if(parsedHeaders.bTop)
+       //{
+       //    series.setCat(new CCat());
+       //    var cat = series.cat;
+       //    cat.setStrRef(new CStrRef());
+       //    var str_ref = cat.strRef;
+       //    str_ref.setF(asc_series[i].Cat.Formula);
+       //    str_ref.setStrCache(new CStrCache());
+       //    var str_cache = str_ref.strCache;
+       //    var cat_num_cache = asc_series[i].Cat.NumCache;
+       //    str_cache.setPtCount(cat_num_cache.length);
+       //    for(var j= 0; j < cat_num_cache.length; ++j)
+       //    {
+       //        var string_pt = new CStringPoint();
+       //        string_pt.setIdx(j);
+       //        string_pt.setVal(cat_num_cache[j].val);
+       //        str_cache.addPt(string_pt);
+       //    }
+       //}
+       //if(parsedHeaders.bLeft && asc_series[i].TxCache)
+       //{
+       //    series.setTx(new CTx());
+       //    var tx= series.tx;
+       //    tx.setStrRef(new CStrRef());
+       //    var str_ref = tx.strRef;
+       //    str_ref.setF(asc_series[i].TxCache.Formula);
+       //    str_ref.setStrCache(new CStrCache());
+       //    var str_cache = str_ref.strCache;
+       //    str_cache.setPtCount(1);
+       //    str_cache.addPt(new CStringPoint());
+       //    var pt = str_cache.pt[0];
+       //    pt.setVal(asc_series[i].TxCache.Tx);
+       //}
         scatter_chart.addSer(series);
     }
     scatter_chart.setDLbls(new CDLbls());
@@ -2801,10 +2802,6 @@ function CreateScatterChart(asc_chart)
     cat_ax.setTickLblPos(TICK_LABEL_POSITION_NEXT_TO);
     cat_ax.setCrossAx(plot_area.valAx);
     cat_ax.setCrosses(CROSSES_AUTO_ZERO);
-    cat_ax.setAuto(true);
-    cat_ax.setLblAlgn(LBL_ALG_CTR);
-    cat_ax.setLblOffset(100);
-    cat_ax.setNoMultiLvlLbl(false);
     cat_ax.scaling.setOrientation(ORIENTATION_MIN_MAX);
     var val_ax = plot_area.valAx;
     val_ax.setScaling(new CScaling());
