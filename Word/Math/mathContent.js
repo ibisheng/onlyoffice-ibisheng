@@ -41,7 +41,8 @@
 /// TODO
 
 // 1. Посмотреть стрелки и прочее для delimiters (которые используются для accent), при необходимости привести к одному типу
-// 2. Убрать ненужные(!!) setTxtPrp и getTxtPrp
+// 2. Убрать ненужные(!!) setTxtPrp и
+// getTxtPrp
 // 3. Проверить что будет, если какие-то настройки убрать/добавить из ctrPrp, влияют ли они на отрисовку управляющих элементов (например, Italic, Bold)
 // 4. Протестировать n-арные операторы, когда добавляется текст вместо оператора (mouseDown не работает, выравнено как alignTop)
 
@@ -94,19 +95,45 @@ function CMathRunPrp()
 }
 CMathRunPrp.prototype =
 {
-    Merge: function(rPrp)
+    Merge: function(MRunPrp)
     {
-        this.textPrp.Merge(rPrp);
+        // only For object of CMathRunPrp
+        var checkTxtPrp = MRunPrp.textPrp !== null && typeof(MRunPrp.textPrp)!== "undefined",
+            checkMPrp = MRunPrp.mathPrp !== null && typeof(MRunPrp.mathPrp)!== "undefined";
+        if(checkTxtPrp && checkMPrp)
+        {
+            this.textPrp.Merge(MRunPrp.textPrp);
+            this.mathPrp.Merge(MRunPrp.mathPrp);
+        }
+    },
+    old_Merge: function(oWPrp)
+    {
+        this.textPrp.Merge(oWPrp);
     },
     /*getWRunPrp: function()
     {
         // смержить c MRunPrp
         return this.textPrp;
     },*/
-    getGeneralPrp: function()
+    getMergedWPrp: function()
     {
+        var oWPrp = new CTextPr();
+        var mPrp = new CTextPr();
+        mPrp.italic = this.mathPrp.italic;
+        mPrp.bold = this.mathPrp.bold;
+
         // смержить c MRunPrp
-        return this.textPrp;
+        if(!this.mathPrp.nor)
+        {
+            oWPrp.Merge(this.textPrp); // FontFamily, FontSize etc
+            oWPrp.Merge(mPrp); // bold, italic
+        }
+        else
+        {
+            oWPrp.Merge(this.textPrp);
+        }
+
+        return oWPrp;
     },
     getTxtPrp: function()
     {
@@ -144,7 +171,7 @@ function CMPrp()
     this.scr    = SCR_ROMAN;
     this.italic = true;
     this.bold   = false;
-    this.plain  = false;     // plain тоже самое, что и щкьфд, только нельзы поставить другой шрифт, другой размер шрифта и тп
+    this.plain  = false;     // plain тоже самое, что и normal, только нельзя поставить другой шрифт, другой размер шрифта и тп
 
 }
 CMPrp.prototype =
@@ -228,8 +255,11 @@ CMPrp.prototype =
                 props.sty = "bi";
             else if(Bold)
                 props.sty = "b";
+            else if(Italic)
+                props.sty = "i";
             else if(Plain)
                 props.sty = "p";
+
         }
 
         if(this.aln)
@@ -341,6 +371,7 @@ CMathContent.prototype =
         {
             // складываем здесь, чтобы не потерять собственные настройки argSize: при добавлении в итератор формулы из меню; при добавлении готовых формул, когда есть вложенность формул с итераторами
             // не будет работать при копиравнии в случае, если argSize будет отличатся от нуля для копируемой части контента
+            // поэтому при копировании свойство argSize не учитываем (копируем только массив элекентов вместе с Run Properties)
             var val = this.argSize + argSize;
 
             if(val < -2)
@@ -562,26 +593,27 @@ CMathContent.prototype =
             mathElem.relate(this);
             //mathElem.setComposition(this.Composition);
 
-            var ctrPrp = new CTextPr();
+            var runPrp = new CMathRunPrp();
 
             if(this.CurPos > 0) // т.к. всегда добавляем только в текущий контент, то если контент не пуст, в начале стоят либо runPrp, либо другой MathObj
             {
-                ctrPrp = this.getCurrTxtPrp();
+                runPrp = this.getRunPrp(this.CurPos);
             }
             else if(!this.bRoot && this.content.length == 1) // нет RunPrp, добавляем мат. объект
             {
-                ctrPrp.Merge( this.Parent.getCtrPrp() );
+                runPrp = this.Parent.getRunPrp();
             }
             else if(this.bRoot && this.content.length == 1)
             {
-                ctrPrp.Merge( this.Composition.GetTxtPrp() );
+                runPrp.Merge( this.Composition.GetDefaultRunPrp() );
             }
             else //на всякий случай
             {
-                ctrPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
+                runPrp.Merge( this.Composition.GetDefaultRunPrp() );
             }
 
-            mathElem.setCtrPrp(ctrPrp);
+            mathElem.setRPrp(runPrp);
+            //mathElem.setCtrPrp(ctrPrp);
 
             var shift;
             if(this.content[this.CurPos].value.typeObj === MATH_RUN_PRP)
@@ -594,7 +626,7 @@ CMathContent.prototype =
             var empty = new CEmpty();
             this.addToContent(empty, shift);
 
-            this.verifyRPrp_MC(ctrPrp);
+            this.verifyRPrp_MC(runPrp);
 
         }
 
@@ -618,8 +650,7 @@ CMathContent.prototype =
 
         if(obj.typeObj == MATH_COMP)
             obj.setArgSize(this.argSize);
-        //this.setStart_Selection(this.CurPos);
-        //this.selection.active = false;
+
     },
     addToContent: function(obj, shift)   // for "edit"
     {
@@ -680,7 +711,7 @@ CMathContent.prototype =
             if(CurLastType == MATH_TEXT && SubLastType == MATH_EMPTY) // добавляем RunPrp, если в конце добавляемого контента стоит мат. объект
             {
                 var rPrp = new CMathRunPrp();
-                rPrp.Merge( this.getCurrTxtPrp() );
+                rPrp.Merge( this.getRunPrp(this.CurPos) );
                 subContent.push( new mathElem(rPrp) );
             }
         }
@@ -3712,17 +3743,10 @@ CMathContent.prototype =
     {
         var placeholder = new CMathText();
         placeholder.relate(this);
-        //placeholder.addCode(StartTextElement);
         placeholder.fillPlaceholders();
-        //placeholder.setTxtPrp(this.getTxtPrp());
 
         this.content.push( new mathElem( placeholder ) );
     },
-    setCtrPrp: function(ctrPrp)
-    {
-
-    },
-
     /////////   перемещение     //////////
     old_old_cursor_moveRight: function()
     {
@@ -4566,10 +4590,6 @@ CMathContent.prototype =
 
         return posChange;
     },
-    getTypeLRObj: function(order)
-    {
-
-    },
     // выставить курсор в начало конента
     cursor_MoveToStartPos: function()  //  home => cursor_MoveToStartPos
     {
@@ -4700,31 +4720,33 @@ CMathContent.prototype =
             }
             else if(type == MATH_RUN_PRP)
             {
-                var txtRPrp = this.content[i].value.getGeneralPrp();
+                var mergedWPrp = this.content[i].value.getMergedWPrp();
+                var oWPrp = new CTextPr();
+                oWPrp.Merge(mergedWPrp);
 
                 /*var txtPrp = new CMathTextPrp();
                 txtPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
                 txtPrp.Merge(runPrp);*/
 
-                var wTextRPrp = this.mergeTxtPrp(txtRPrp);
-                bItalic = wTextRPrp.Italic;
-                wTextRPrp.Italic = false;
+                this.applyArgSize(oWPrp);
+                bItalic = oWPrp.Italic;
+                oWPrp.Italic = false;
 
-                oMeasure.SetFont(wTextRPrp);
+                oMeasure.SetFont(oWPrp);
             }
             else if(type == MATH_PLACEHOLDER)
             {
                 if(!this.bRoot)
                 {
-                    var ctrPrp = this.Parent.getCtrPrp();
+                    var oWPrp = this.Parent.getCtrPrp();
 
                     /*var txtPrp = new CMathTextPrp();
                     txtPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
                     txtPrp.Merge(ctrPrp);*/
-                    var wTextRPrp = this.mergeTxtPrp(ctrPrp);
-                    wTextRPrp.Italic = false;
+                    this.applyArgSize(oWPrp);
+                    oWPrp.Italic = false;
 
-                    oMeasure.SetFont(wTextRPrp);
+                    oMeasure.SetFont(oWPrp);
 
                     this.content[i].value.Resize(oMeasure);
                 }
@@ -4756,10 +4778,10 @@ CMathContent.prototype =
             {
                 var coeff = 0;
 
-                var txtPrp = this.getTxtPrp(posLeft);
+                var oWPrp = this.getTextPrpMObj(posLeft);
 
-                var wTextRPrp = this.mergeTxtPrp(txtPrp);
-                gapSign = this.Composition.GetGapSign(oMeasure, wTextRPrp);
+                this.applyArgSize(oWPrp);
+                gapSign = this.Composition.GetGapSign(oMeasure, oWPrp);
 
                 if(bPrevComp)
                 {
@@ -4772,9 +4794,9 @@ CMathContent.prototype =
                     else if(prevKind == MATH_BOX)
                     {
                         //TEST
-                        /*var txtPrp = this.getTxtPrp(posLeft);
+                        /*var txtPrp = this.getTextPrpMObj(posLeft);
 
-                        var wTextRPrp = this.mergeTxtPrp(txtPrp);
+                        var wTextRPrp = this.applyArgSize(txtPrp);
                         oMeasure.SetFont ( wTextRPrp );
 
                         var height = g_oTextMeasurer.GetHeight();*/
@@ -4800,7 +4822,6 @@ CMathContent.prototype =
 
             if(bCurrSign || bCurrComp)
             {
-
                 var coeff = 0;
 
                 if(bCurrComp)
@@ -4829,14 +4850,13 @@ CMathContent.prototype =
                 else
                     coeff = 0.45;
 
-                var txtPrp = this.getTxtPrp(posCurr);
+                var txtPrp = this.getTextPrpMObj(posCurr);
 
-                var wTextRPrp = this.mergeTxtPrp(txtPrp);
+                var wTextRPrp = this.applyArgSize(txtPrp);
                 gapSign = this.Composition.GetGapSign(oMeasure, wTextRPrp);
 
                 this.content[posCurr].gaps.left = coeff*gapSign;
             }
-
         }
     },
     checkGapsSign: function(oMeasure, posCurr)
@@ -4889,8 +4909,6 @@ CMathContent.prototype =
             var bLeft  = left !== null,
                 bRight = right !== null;
 
-            var txtPrp = this.getTxtPrp(posCurr);
-            var wTextRPrp = this.mergeTxtPrp(txtPrp);
 
             var bLeftComp  = bLeft  ? left.typeObj == MATH_COMP : false,
                 bRightComp = bRight ? right.typeObj == MATH_COMP : false,
@@ -5040,8 +5058,11 @@ CMathContent.prototype =
                     coeffRight = 0;
             }
 
+            var runPrp = this.getRunPrp(posCurr);
+            var oWPrp = runPrp.getMergedWPrp();
+            this.applyArgSize(oWPrp);
 
-            var gapSign = 0.1513*wTextRPrp.FontSize;
+            var gapSign = 0.1513*oWPrp.FontSize;
 
             this.content[posCurr].gaps.left  = Math.ceil(coeffLeft*gapSign*10)/10; // если ни один случай не выполнился, выставляем "нулевые" gaps (default): необходимо, если что-то удалили и объект стал первый или последним в контенте
             this.content[posCurr].gaps.right = Math.ceil(coeffRight*gapSign*10)/10;
@@ -5162,7 +5183,6 @@ CMathContent.prototype =
             B_SLASH  = 0x5C;
 
         return code == MULT || code == DIVISION || code == B_SLASH;
-
     },
     checkOperSign: function(code) // "+", "-", "<", ">", "±"
     {
@@ -5223,10 +5243,13 @@ CMathContent.prototype =
                     /*var rPrp = new CMathTextPrp();
                     rPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
                     rPrp.Merge( this.content[i].value.getWRunPrp() );*/
-                    var txtPrp = this.content[i].value.getGeneralPrp();
-                    var wTextPrp = this.mergeTxtPrp(txtPrp);
-                    wTextPrp.Italic = false;
-                    pGraphics.SetFont(wTextPrp);
+                    var mgWPrp = this.content[i].value.getMergedWPrp();
+                    var oWPrp = new CTextPr();
+                    oWPrp.Merge(mgWPrp);
+
+                    this.applyArgSize(oWPrp);
+                    oWPrp.Italic = false;
+                    pGraphics.SetFont(oWPrp);
                 }
                 else if(this.content[i].value.typeObj == MATH_PLACEHOLDER)
                 {
@@ -5236,9 +5259,13 @@ CMathContent.prototype =
                     /*var rPrp = new CMathTextPrp();
                     rPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
                     rPrp.Merge(ctrPrp);*/
-                    var wTextPrp = this.mergeTxtPrp(ctrPrp);
-                    wTextPrp.Italic = false;
-                    pGraphics.SetFont(wTextPrp);
+
+                    var oWPrp = new CTextPr();
+                    oWPrp.Merge(ctrPrp);
+
+                    this.applyArgSize(oWPrp);
+                    oWPrp.Italic = false;
+                    pGraphics.SetFont(oWPrp);
 
                     this.content[i].value.draw(x, y, pGraphics);
                 }
@@ -5303,12 +5330,13 @@ CMathContent.prototype =
         rPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
         rPrp.Merge(this.getCurrRunPrp());*/
 
-        var txtPrp = this.getCurrTxtPrp();
-        var wTextPrp = this.mergeTxtPrp(txtPrp);
+        var runPrp = this.getRunPrp(this.CurPos);
+        var oWPrp = runPrp.getMergedWPrp();
+        this.applyArgSize(oWPrp);
 
         var absPos = this.Composition.absPos;
 
-        var sizeCursor = wTextPrp.FontSize*g_dKoef_pt_to_mm;
+        var sizeCursor = oWPrp.FontSize*g_dKoef_pt_to_mm;
         var position = {x: this.pos.x + absPos.x + this.content[this.CurPos].widthToEl, y: this.pos.y + absPos.y + this.size.ascent - sizeCursor*0.8 };
 
         editor.WordControl.m_oLogicDocument.DrawingDocument.SetTargetSize( sizeCursor );
@@ -5366,12 +5394,12 @@ CMathContent.prototype =
             }
         }
 
-        // проверка на RunPrp
+        // проверка на RunPrp, смещенная позиция
         pos = this.verifyCurPos(pos);
 
         return pos;
     },
-    verifyCurPos: function(pos)  // проверка на RunPrp
+    verifyCurPos: function(pos)  // проверка на RunPrp, смещенная позиция
     {
         var currType  = this.content[pos].value.typeObj,
             prevType = pos > 0 ? this.content[pos-1].value.typeObj : null,
@@ -5569,7 +5597,7 @@ CMathContent.prototype =
             if(!this.IsEmpty() && this.CurPos == 0 && this.content[this.CurPos+1].value.typeObj === MATH_RUN_PRP) // если удалили мат. объект и стоим в начале, то позиция курсора будет перед RunPrp, а нужно после
                 this.CurPos++;
 
-            // проверка на RunPrp
+            // проверка на RunPrp, смещенная позиция
             this.CurPos = this.verifyCurPos(this.CurPos);
             this.setLogicalPosition(this.CurPos);
 
@@ -5835,9 +5863,7 @@ CMathContent.prototype =
             {
                 if(this.content[i].value.typeObj == MATH_RUN_PRP)
                 {
-                    bAddRPrp = true;
-                    var rPrp = new CMathRunPrp();
-                    rPrp.Merge( this.getTxtPrp(end - 1) );
+                    var rPrp = this.getRunPrp(end - 1);
                     var element = new mathElem(rPrp);
 
                     var startContent = this.content.splice(0, end);
@@ -5909,8 +5935,9 @@ CMathContent.prototype =
                 {
                     if(this.content[i].value.typeObj === MATH_RUN_PRP)
                     {
-                        var currTPrp = this.content[pos+2].value.getGeneralPrp();
-                        var prevTPrp = this.content[i].value.getGeneralPrp();
+                        // сравниваем смерженные(!) текстовые настройки
+                        var currTPrp = this.content[pos+2].value.getMergedWPrp();
+                        var prevTPrp = this.content[i].value.getMergedWPrp();
                         bSelectRunPrp = currTPrp.isEqual(currTPrp, prevTPrp);
                         break;
                     }
@@ -6068,17 +6095,12 @@ CMathContent.prototype =
     },
 
     ///////// RunPrp, CtrPrp
-    addRunPrp: function(txtPrp)          // for "edit"
+    addRunPrp: function(rPrp)
     {
-        this.addRunPrpToContent(txtPrp);
-        this.CurPos++;
-    },
-    addRunPrpToContent: function(txtPrp)
-    {
-        var rPrp = new CMathRunPrp();
-        rPrp.Merge(txtPrp);
+        var RunPrp = new CMathRunPrp();
+        RunPrp.Merge(rPrp);
 
-        var element = new mathElem(rPrp);
+        var element = new mathElem(RunPrp);
 
         var tmp = this.content.splice(0, this.CurPos + 1);
         tmp.push(element);
@@ -6086,17 +6108,9 @@ CMathContent.prototype =
 
         this.content.length = 0;
         this.content = tmp;
-    },
-    /*addRunPrpToContent_2: function(runPrp) // for "read"
-    {
-        var rPrp = new CMathRunPrp();
-        rPrp.Merge(runPrp);
 
-        var element = new mathElem(rPrp);
-
-        this.content.push(element);
         this.CurPos++;
-    },*/
+    },
     old_readContent: function()          // for "read"
     {
         var result = new Array();
@@ -6126,11 +6140,11 @@ CMathContent.prototype =
 
         return result;
     },
-    getCurrTxtPrp: function()
+    old_getCurrTxtPrp: function()
     {
-        return this.getTxtPrp(this.CurPos);
+        return this.getTextPrpMObj(this.CurPos);
     },
-    getTxtPrp: function(position)
+    old_getTextPrpMObj: function(position)
     {
         var textPrp = new CTextPr();
 
@@ -6152,7 +6166,7 @@ CMathContent.prototype =
 
                     if(obj.typeObj == MATH_RUN_PRP)
                     {
-                        textPrp.Merge(obj.getGeneralPrp());
+                        textPrp.Merge(obj.getMergedWPrp());
                         break;
                     }
                     else if(obj.typeObj == MATH_COMP)
@@ -6171,33 +6185,77 @@ CMathContent.prototype =
 
         return textPrp;
     },
-    getFirstTxtPrp:    function()
+    getRunPrp: function(position) // по позиции возвращаем ближайшие RunPrp
     {
-        var txtPrp =  new CMathTextPrp();
-        txtPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
+        var RunPrp = new CMathRunPrp();
 
         if(this.content.length > 1)
         {
-            if(this.content[1].value.typeObj === MATH_RUN_PRP) // если первый объект - буква
+            if( this.IsPlaceholder())
             {
-                var gTPrp = this.content[1].value.getGeneralPrp();
-                txtPrp.Merge(gTPrp);
+                RunPrp.Merge(this.Parent.getRunPrp());
             }
-            else if(this.content[1].value.typeObj === MATH_COMP)
+            else if(position == 0 && this.content[1].value.typeObj == MATH_COMP)
             {
-                //var ctrPrp = this.content[1].value.getCtrPrp();
-                var ctrPrp = this.content[1].value. getCtrPrpForFirst();// иначе зациклимся на getCtrPrp
-                txtPrp.Merge(ctrPrp);
+                var rPrp = this.content[1].value.getRunPrp();
+                RunPrp.Merge(rPrp);
+            }
+            else
+            {
+                for(var i = position; i > 0; i--)
+                {
+                    var obj = this.content[i].value;
+
+                    if(obj.typeObj === MATH_RUN_PRP)
+                    {
+                        RunPrp.Merge(obj);
+                        break;
+                    }
+                    else if(obj.typeObj === MATH_COMP)
+                    {
+                        RunPrp.Merge(obj.getRunPrp());
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            var defaultRPrp = this.Composition.GetDefaultRunPrp();
+            RunPrp.Merge(defaultRPrp);
+        }
+
+        return RunPrp;
+    },
+    getFirstRPrp:    function()
+    {
+        var rPrp =  new CMathRunPrp();
+        var defaultRPrp = this.Composition.GetDefaultRunPrp();
+        rPrp.Merge(defaultRPrp);
+
+        if(this.content.length > 1)
+        {
+            var obj = this.content[1].value;
+            if(obj.typeObj === MATH_RUN_PRP) // если первый объект - буква
+            {
+                rPrp.Merge(obj);
+            }
+            else if(obj.typeObj === MATH_COMP)
+            {
+                var FirstRPrp = obj.getCtrPrpForFirst();// иначе зациклимся на getCtrPrp
+                rPrp.Merge(FirstRPrp);
             }
         }
 
-        return txtPrp;
+        return rPrp;
     },
-    mergeTxtPrp: function(txtPrp)
+    applyArgSize: function(oWPrp)
     {
         var tPrp = new CTextPr();
-        tPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
-        tPrp.Merge(txtPrp);
+        var defaultRPrp = this.Composition.GetDefaultRunPrp();
+        var gWPrp = defaultRPrp.getMergedWPrp();
+        tPrp.Merge(gWPrp);
+        tPrp.Merge(oWPrp);
 
         var FSize = tPrp.FontSize;
 
@@ -6221,24 +6279,17 @@ CMathContent.prototype =
 
         tPrp.FontSize = FSize;
 
-        return tPrp;
-    },
-    old_mergeTxtPrp: function(txtPrp)
-    {
-        var tPrp = new CTextPr();
-        tPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
-        tPrp.Merge(txtPrp);
+        oWPrp.Merge(tPrp);
 
-        if(this.argSize == -1)
-        //tPrp.FontSize *= 0.8;
-            tPrp.FontSize *= 0.728;
-        //tPrp.FontSize *= 0.65;
-        else if(this.argSize == -2)
-        //tPrp.FontSize *= 0.65;
-            tPrp.FontSize *= 0.53;
-        //tPrp.FontSize *= 0.473;
-
-        return tPrp;
+        /*
+         if(this.argSize == -1)
+         //tPrp.FontSize *= 0.8;
+         tPrp.FontSize *= 0.728;
+         //tPrp.FontSize *= 0.65;
+         else if(this.argSize == -2)
+         //tPrp.FontSize *= 0.65;
+         tPrp.FontSize *= 0.53;
+         //tPrp.FontSize *= 0.473;*/
     },
     increaseArgSize: function()
     {
@@ -6250,7 +6301,6 @@ CMathContent.prototype =
         if( this.argSize > -2 )
             this.argSize--;
     },
-
     old_old_checkRunPrp: function()
     {
         var bEmpty = this.IsEmpty(),
@@ -6327,22 +6377,23 @@ CMathContent.prototype =
         //this.addToBeginningRPrp(txtPrp);
 
     },
-    verifyRPrp_MC: function(txtPrp)
+    verifyRPrp_MC: function(runPrp)
     {
         // добавляем RunPrp для текста, они будут такие же как и ctrPrp
+        // mathTextPrp при этом слетают,  в ворде кстати, тоже
         if(this.CurPos !== this.content.length - 1 && this.content[this.CurPos].value.typeObj !== MATH_RUN_PRP) // после того как добавили мат. объект, текущий объект не RunPrp, а текст
         {
-            var TextPrp = Common_CopyObj(txtPrp);
-            this.addRunPrp(TextPrp);
+            var RunPrp = Common_CopyObj(runPrp);
+            this.addRunPrp(RunPrp);
         }
     },
-    verifyRPrp_MC_2: function(txtPrp) // for "menu"
+    verifyRPrp_MC_2: function(runPrp) // for "menu"
     {
         // добавляем RunPrp для текста, они будут такие же как и ctrPrp
         if(this.CurPos !== this.content.length - 1 && this.content[this.CurPos].value.typeObj !== MATH_TEXT) // после того как добавили мат. объект, текущий объект не RunPrp, а текст
         {
-            var TextPrp = Common_CopyObj(txtPrp);
-            this.addRunPrp(TextPrp);
+            var TextPrp = Common_CopyObj(runPrp);
+            this.addRunPrp(runPrp);
         }
     },
     verifyRPrp_Letter: function()
@@ -6359,19 +6410,20 @@ CMathContent.prototype =
 
         if(this.bRoot && bEmpty)
         {
-            var txtPrp = this.Composition.DEFAULT_RUN_PRP;
-            this.addRunPrp(txtPrp);
+            var defaultRPrp = this.Composition.GetDefaultRunPrp();
+            this.addRunPrp(defaultRPrp);
         }
         else if(bEmpty)
         {
-            var txtPrp = this.Parent.getCtrPrp();
-            this.addRunPrp(txtPrp);
+            var parentRPrp = this.Parent.getRunPrp();
+            this.addRunPrp(parentRPrp);
         }
         else if(OnlyRunPrp)
         {
-            // переделать
-            var ctrPrp = this.Parent.getCtrPrp();
+            var parentRPrp = this.Parent.getRunPrp();
+            this.content[1].value.Merge(parentRPrp);
 
+            /*
             var Run = this.content[1].value;
             var txtPrp = Run.getTxtPrp();
 
@@ -6379,41 +6431,21 @@ CMathContent.prototype =
             currTPrp.Merge(txtPrp);
             currTPrp.Merge(ctrPrp);
 
-            Run.Merge(currTPrp); // set TxtPrp
+            Run.Merge(currTPrp); // set TxtPrp*/
         }
         else if(bPreComposition)
         {
             // стоим после CEmpty, который относится к Composition, и соответственно дальше текста нет (либо конец формулы, либо между двумя мат объектами)
 
-            var rPrp = this.content[this.CurPos - 1].value.getCtrPrp();
+            var rPrp = this.content[this.CurPos - 1].value.getRunPrp();
             this.addRunPrp(rPrp);
         }
         else if(bFirstComp)
         {
             // если стоим в начале перед CEmpty и после идет Composition
-            var rPrp = this.content[1].value.getCtrPrp();
+            var rPrp = this.content[1].value.getRunPrp();
             this.addRunPrp(rPrp);
         }
-    },
-    old_addToBeginningRPrp: function(rPrp) // чтобы не возникало ошибок при добавлении RunPrp в начало, если уже выставлены некоторые RunPrp
-    {
-        var bEmpty = this.IsEmpty(),
-            OnlyRunPrp = this.content.length == 2 && this.content[1].value.typeObj == MATH_RUN_PRP;
-
-        if(bEmpty)
-        {
-            this.addRunPrp(rPrp);
-        }
-        else if( OnlyRunPrp)
-        {
-            var Run = this.content[1].value.runPrp;
-            var currRun = new CTextPr();
-            currRun.Merge(Run);
-
-            Run.Merge(rPrp);
-            Run.Merge(currRun);
-        }
-
     },
     setItalic: function(flag)
     {
@@ -6433,7 +6465,7 @@ CMathContent.prototype =
             }
         }
     },
-    addRPrpForSelect: function(rPrp)
+    old_addRPrpForSelect: function(rPrp)
     {
         var start   = this.RealSelect.startPos,
             end     = this.RealSelect.endPos;
@@ -6458,24 +6490,24 @@ CMathContent.prototype =
             }
         }
     },
-    setRPrp: function(rPrp)
+    setRPrp: function(RunPrp) //object CMathRun
     {
         for(var i = 0; i < this.content.length; i++)
         {
             var obj = this.content[i].value;
             if(obj.typeObj == MATH_RUN_PRP)
             {
-                obj.Merge(rPrp);
+                obj.Merge(RunPrp);
             }
             else if(obj.typeObj == MATH_COMP)
             {
-                obj.setRPrp(rPrp);
+                obj.setRPrp(RunPrp);
             }
         }
     },
-    apply_TextPr: function(TextPr)
+    apply_RunPr: function(RunPrp)
     {
-        this.setRPrp(TextPr);
+        this.setRPrp(RunPrp);
     },
     ////////////////////////
 
@@ -7156,21 +7188,15 @@ function CMathComposition()
         intLim:     NARY_SubSup,
         brkBin:     BREAK_BEFORE,
         brkSubBin:  BREAK_MIN_MIN,
-        smallFrac:  false
+        wrapIndent: 0,
+        smallFrac:  false,
+        wrapRight:  false
     };
 
     this.CurrentContent    = null;
     this.SelectContent     = null;
 
-    this.DEFAULT_RUN_PRP =
-    {
-        FontFamily:     {Name  : "Cambria Math", Index : -1 },
-        FontSize:       11,
-        Italic:         true,
-        Bold:           false,
-        RFonts:         {},
-        Lang:           {}
-    };
+    this.DEFAULT_RUN_PRP = new CMathRunPrp();
 
     this.Init();
 	
@@ -7194,6 +7220,10 @@ CMathComposition.prototype =
     },
     SetProperties: function(props)
     {
+        //******  FOR FORMULA  ******//
+
+        // В документации везде, где нет примера использования свояства, означает, что Word не поддерживает это свойство !
+
         if(props.naryLim == NARY_UndOvr || props.naryLim  == NARY_SubSup)
             this.props.naryLim = props.naryLim;
 
@@ -7212,14 +7242,22 @@ CMathComposition.prototype =
         if(props.smallFrac == true || props.smallFrac == false)
             this.props.smallFrac = props.smallFrac;
 
-        // http://msdn.microsoft.com/en-us/library/ff529906(v=office.12).aspx
-        // Word ignores the interSp attribute and fails to write it back out.
-        this.props.interSp = props.interSp;
+        if(props.wrapIndent + 0 == props.wrapIndent && isNaN(props.wrapIndent)) // проверка на число
+            this.props.wrapIndent = props.wrapIndent/1440;
 
-        // http://msdn.microsoft.com/en-us/library/ff529301(v=office.12).aspx
-        // Word does not implement this feature and does not write the intraSp element.
+        //*********  check for element 0x1FFD - 0xA721  ********//
+        // This element specifies the right justification of the wrapped line of an instance of mathematical text
+        // Instance : Arrows 0x2190-0x21B3, 0x21B6, 0x21B7, 0x21BA-0x21E9, 0x21F4-0x21FF,
+        // 0x3D, 0x2234 - 0x2237, 0x2239, 0x223B - 0x228B, 0x228F - 0x2292, 0x22A2 - 0x22B9,
+        // 0x22C8-0x22CD, 0x22D0, 0x22D1, 0x22D5 - 0x22EE,0x22F0-0x22FF, 0x27F0 - 0x297F (arrows and fishes), 0x29CE - 0x29D5
+        // 0x2A66 - 0x2AF0 (equals), 0x2AF2-0x2AF3, 0x2AF7 - 0x2AFA
 
-        // for document
+
+        if(props.wrapRight == true || props.wrapRight == false)
+            this.props.wrapRight = props.wrapRight;
+
+
+        //******  FOR DOCUMENT  ******//
 
         // defaultJc
         // выравнивание формулы в документе
@@ -7231,20 +7269,43 @@ CMathComposition.prototype =
 
         this.props.dispDef = props.dispDef;
 
-
-
         // added to paragraph settings for margins
         // rMargin
         // lMargin
 
+        this.props.lMargin = props.lMargin;
+        this.props.rMargin = props.rMargin;
+
+        //******  НЕПОДДЕРЖИВАЕМЫЕ Вордом свойства  ******//
+
         // mathFont: в качестве font поддерживается только Cambria Math
         // остальные шрифты  возможно будут поддержаны MS в будущем
+
+        this.props.mathFont = props.mathFont;
 
         // Default font for math zones
         // Gives a drop-down list of math fonts that can be used as the default math font to be used in the document.
         // Currently only Cambria Math has thorough math support, but others such as the STIX fonts are coming soon.
 
         // http://blogs.msdn.com/b/murrays/archive/2008/10/27/default-document-math-properties.aspx
+
+
+        //******  FOR FORMULA  ******//
+
+        // http://msdn.microsoft.com/en-us/library/ff529906(v=office.12).aspx
+        // Word ignores the interSp attribute and fails to write it back out.
+        this.props.interSp = props.interSp;
+
+        // http://msdn.microsoft.com/en-us/library/ff529301(v=office.12).aspx
+        // Word does not implement this feature and does not write the intraSp element.
+        this.props.intraSp = intraSp;
+
+        //******  FOR DOCUMENT  ******//
+
+        // http://msdn.microsoft.com/en-us/library/ff533406(v=office.12).aspx
+        // Word ignores and discards postSp
+        this.props.postSp = props.postSp;
+        this.props.preSp = props.preSp;
 
         // RichEdit Hot Keys
         // http://blogs.msdn.com/b/murrays/archive/2013/10/30/richedit-hot-keys.aspx
@@ -7486,7 +7547,7 @@ CMathComposition.prototype =
     },
     TestMouseDown: function()
     {
-        var txtPrp = this.Root.getFirstPrp();
+        var txtPrp = this.Root.getFirstRPrp();
         txtPrp.Merge(this.DEFAULT_RUN_PRP);
         var sh = txtPrp.FontSize*0.017;
 
@@ -7762,6 +7823,20 @@ CMathComposition.prototype =
         this.SelectContent  = this.Root;
 
         this.Root.relate(-1); // корень
+
+        var oWPrp =
+        {
+            FontFamily:     {Name  : "Cambria Math", Index : -1 },
+            FontSize:       11,
+            Italic:         true,
+            Bold:           false,
+            RFonts:         {},
+            Lang:           {}
+        };
+
+        this.DEFAULT_RUN_PRP.setTxtPrp(oWPrp);
+        // Math Run Properties default прокинуты
+
     },
     /*SetTestRunPrp: function()
     {
@@ -7770,9 +7845,12 @@ CMathComposition.prototype =
 
         this.Root.addRunPrp(runPrp);
     },*/
-    GetTxtPrp: function()
+    GetDefaultRunPrp: function()
     {
-        return this.DEFAULT_RUN_PRP;
+        var rPrp = new CMathRunPrp();
+        rPrp.Merge(this.DEFAULT_RUN_PRP);
+
+        return rPrp;
     },
     //TODO
     // position вычислить естественно до того, как придет Draw, чтобы не пришлось пересчитывать при изменении в тексте документа
@@ -7783,9 +7861,9 @@ CMathComposition.prototype =
         if(this.Root.content.length > 1)
             this.Root.draw(this.absPos.x, this.absPos.y , pGraphics);
     },
-    GetFirstPrp: function()
+    GetFirstRPrp: function()
     {
-        return this.Root.getFirstTxtPrp();
+        return this.Root.getFirstRPrp();
     },
     Cursor_MoveLeft: function(bShiftKey, bCtrlKey)
     {
@@ -8024,7 +8102,9 @@ CMathComposition.prototype =
     },
     Apply_TextPr: function(TextPr)
     {
-        this.Root.apply_TextPr(TextPr);
+        var RunPrp = new CMathRunPrp();
+        RunPrp.setTxtPrp(TextPr);
+        this.Root.setRPrp(RunPrp);
     },
 
     /////////  for Undo/Redo ////////
@@ -8077,9 +8157,9 @@ CMathComposition.prototype =
         History.Add(this.CurrentContent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
 
     },
-    GetCurrentRPrp: function()
+    GetCurrentRunPrp: function()
     {
-        return this.CurrentContent.getCurrTxtPrp();
+        return this.CurrentContent.getRunPrp(this.CurrentContent.CurPos);
     }
 
     //////////////////////////////

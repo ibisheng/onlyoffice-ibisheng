@@ -25,6 +25,7 @@ function CMathBase()
     this.Composition = null; // ссылка на общую формулу
 
     this.CtrPrp = new CTextPr();
+    this.RunPrp = new CMathRunPrp();
 
 
     //this.textPrp = new CMathTextPrp(); // для рассчета размера расстояний
@@ -87,36 +88,51 @@ CMathBase.prototype =
     setCtrPrp: function(txtPrp)
     {
         this.CtrPrp.Merge(txtPrp); // only runPrp for paragraph
+        this.RunPrp.setTxtPrp(txtPrp);
     },
     getCtrPrp: function()
     {
         var ctrPrp = new CTextPr();
-        ctrPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
-        ctrPrp.Merge(this.Composition.GetFirstPrp() );
+        var defaultRPrp = this.Composition.GetFirstRPrp();
+        var gWPrp = defaultRPrp.getMergedWPrp();
+        ctrPrp.Merge(gWPrp);
         ctrPrp.Merge(this.CtrPrp);
         return ctrPrp;
+    },
+    getRunPrp: function()
+    {
+        var runPrp = new CMathRunPrp();
+        var defaultRPrp = this.Composition.GetFirstRPrp();
+        runPrp.Merge(defaultRPrp);
+        runPrp.Merge(this.RunPrp);
+        return runPrp;
     },
     getCtrPrpForFirst: function()
     {
         var ctrPrp = new CTextPr();
-        ctrPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
+        var defaultRPrp = this.Composition.GetDefaultRunPrp();
+        var gWPrp = defaultRPrp.getMergedWPrp();
+        ctrPrp.Merge(gWPrp);
         ctrPrp.Merge(this.CtrPrp);
 
         return ctrPrp;
     },
-    // для управляющих символов в приоритете GetFirstPrp
+    // для управляющих символов в приоритете GetFirstRunPrp
     // если первый элемент - мат объект, то берутся его CtrPrp
     getPrpToControlLetter: function()
     {
         var rPrp = new CTextPr();
-        rPrp.Merge( this.Composition.GetFirstPrp() );
+        rPrp.Merge( this.Composition.GetFirstRPrp() );
 
         return rPrp;
     },
     setRPrp: function(rPrp)
     {
+        this.RunPrp.Merge(rPrp);
+
         this.CtrPrp = new CTextPr();
-        this.CtrPrp.Merge(rPrp);
+        var gPrp  = rPrp.getMergedWPrp();
+        this.CtrPrp.Merge(gPrp);
 
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)

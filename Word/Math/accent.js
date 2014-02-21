@@ -606,10 +606,11 @@ CSign.prototype.fixSize = function(oMeasure, stretch, bIncline)
     var ctrPrp = this.Parent.getCtrPrp();
 
     var rPrp = new CMathTextPrp();
-    var defaultRPrp = this.Parent.Composition.DEFAULT_RUN_PRP;
-    rPrp.Merge(defaultRPrp);
+    var defaultRPrp = this.Parent.Composition.GetDefaultRunPrp();
+    rPrp.Merge(defaultRPrp.getMergedWPrp());
     rPrp.Merge(ctrPrp);
-    rPrp.Italic = false;
+    rPrp.Italic = false; // не меняем значок
+    rPrp.Bold = false;
 
     oMeasure.SetFont(rPrp);
 

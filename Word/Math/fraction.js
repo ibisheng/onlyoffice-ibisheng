@@ -494,6 +494,10 @@ CNumerator.prototype.getCtrPrp = function()
 {
     return this.Parent.getCtrPrp();
 }
+CNumerator.prototype.getRunPrp = function()
+{
+    return this.Parent.getRunPrp();
+}
 
 function CDenominator()
 {
@@ -559,6 +563,10 @@ CDenominator.prototype.getElement = function(txt)
 CDenominator.prototype.getCtrPrp = function()
 {
     return this.Parent.getCtrPrp();
+}
+CDenominator.prototype.getRunPrp = function()
+{
+    return this.Parent.getRunPrp();
 }
 
 //////////

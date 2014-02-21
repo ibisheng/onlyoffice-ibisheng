@@ -238,7 +238,9 @@ CRadical.prototype.recalculateSize = function()
         var wTick = this.signRadical.sizeTick.width,
             hTick = this.signRadical.sizeTick.height;
 
-        var width = degr.width - wTick + sign.width;
+        var wDegree = degr.width > wTick ? degr.width - wTick : 0;
+        var width = wDegree + sign.width;
+        //var width = degr.width - wTick + sign.width;
 
         var txtPrp = this.getCtrPrp();
         var plH = 9.877777777777776 * txtPrp.FontSize /36;
@@ -291,7 +293,10 @@ CRadical.prototype.setPosition = function(pos)
             base = this.elements[0][1].size,
             sign = this.signRadical.size;
 
-        var hDg = degr.height + this.gap + this.signRadical.sizeTick.height;
+        var wTick = this.signRadical.sizeTick.width,
+            hTick = this.signRadical.sizeTick.height;
+
+        var hDg = degr.height + this.gap + hTick;
         this.topDegr = this.size.height - hDg;
 
         var x1 = this.pos.x,
@@ -299,7 +304,8 @@ CRadical.prototype.setPosition = function(pos)
 
         this.elements[0][0].setPosition({x: x1, y: y1});
 
-        var x2 = this.pos.x + degr.width - this.signRadical.sizeTick.width,
+        var wDegree = degr.width > wTick ? degr.width - wTick : 0;
+        var x2 = this.pos.x + wDegree,
             y2 = this.pos.y + this.size.height - sign.height;
 
         this.signRadical.setPosition({x: x2, y: y2});

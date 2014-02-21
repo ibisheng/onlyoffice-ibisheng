@@ -93,8 +93,8 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
     if(this.bTop)
     {
         var x1 = this.pos.x + x,
-         x2 = this.pos.x + x + this.size.width - penW/2,
-         y1 = this.pos.y + y;
+            x2 = this.pos.x + x + this.size.width - penW/2,
+            y1 = this.pos.y + y;
 
          pGraphics.p_color(0,0,0, 255);
          pGraphics.drawHorLine(0, y1, x1, x2, penW);
