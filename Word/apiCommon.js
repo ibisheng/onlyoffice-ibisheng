@@ -2,7 +2,7 @@
 
 function CAscColorScheme()
 {
-    this.Colors = new Array();
+    this.Colors = [];
     this.Name = "";
 }
 CAscColorScheme.prototype.get_colors = function() { return this.Colors; }
@@ -38,7 +38,7 @@ function CAscColor()
 
     this.Auto = false;
 
-    this.Mods = new Array();
+    this.Mods = [];
     this.ColorSchemeId = -1;
 
 	if (1 === arguments.length) {
@@ -339,8 +339,8 @@ function CreateAscFill(unifill)
             {
                 if (0 == i)
                 {
-                    ret.fill.Colors = new Array();
-                    ret.fill.Positions = new Array();
+                    ret.fill.Colors = [];
+                    ret.fill.Positions = [];
                 }
 
                 ret.fill.Colors.push(CreateAscColor(_fill.colors[i].color));
@@ -876,8 +876,8 @@ CAscThemeInfo.prototype.get_Index = function() { return this.Index; }
 
 function CAscThemes()
 {
-    this.EditorThemes = new Array();
-    this.DocumentThemes = new Array();
+    this.EditorThemes = [];
+    this.DocumentThemes = [];
 
     var _count = _presentation_editor_themes.length;
     for (var i = 0; i < _count; i++)

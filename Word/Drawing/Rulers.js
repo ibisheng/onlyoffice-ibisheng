@@ -25,9 +25,9 @@ function CHorRulerRepaintChecker()
     this.MarginRight = 0;
 
     // table column check
-    this.tableCols = new Array();
-    this.marginsLeft = new Array();
-    this.marginsRight = new Array();
+    this.tableCols = [];
+    this.marginsLeft = [];
+    this.marginsRight = [];
 
     // blit to main params
     this.BlitAttack = false;
@@ -60,8 +60,8 @@ function CVerRulerRepaintChecker()
     this.HeaderBottom = 0;
 
     // table column check
-    this.rowsY = new Array();
-    this.rowsH = new Array();
+    this.rowsY = [];
+    this.rowsH = [];
 
     // blit params
     this.BlitAttack = false;
@@ -84,7 +84,7 @@ function CHorRuler()
 
     // реализация tab'ов
     this.m_dDefaultTab              = 12.5;
-    this.m_arrTabs                  = new Array();
+    this.m_arrTabs                  = [];
     this.m_lCurrentTab              = -1;
     this.m_dCurrentTabNewPosition   = -1;
     this.m_dMaxTab                  = 0;
@@ -1477,7 +1477,7 @@ function CHorRuler()
             checker.BlitTabs = null;
             if (0 != this.m_arrTabs.length)
             {
-                checker.BlitTabs = new Array();
+                checker.BlitTabs = [];
                 var _len = this.m_arrTabs.length;
                 for (var ii = 0; ii < _len; ii++)
                 {

@@ -795,7 +795,7 @@ function CMetafile(width, height)
     this.m_oBrush.Color2.R  = -1;
 
     this.m_oTransform       = new CMatrix();
-    this.m_arrayCommands    = new Array();
+    this.m_arrayCommands    = [];
 
     this.Memory = null;
     this.VectorMemoryForPrint = null;
@@ -1436,7 +1436,7 @@ CMetafile.prototype =
 
 function CDocumentRenderer()
 {
-    this.m_arrayPages   = new Array();
+    this.m_arrayPages   = [];
     this.m_lPagesCount  = 0;
     //this.DocumentInfo = "";
     this.Memory = new CMemory();

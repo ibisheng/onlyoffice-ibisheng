@@ -114,7 +114,7 @@
         // но тогда нужно хранить base64 строки. Это не круто. По памяти - даже
         // выигрыш будет. Не особо то шрифты жмутся lzw или deflate
         // поэтому лучше из памяти будем удалять base64 строки
-        this.fonts_streams = new Array();
+        this.fonts_streams = [];
 
         // теперь вся информация о всех возможных шрифтах. Они во всех редакторах должны быть одни и те же
         this.fontFilesPath = "";
@@ -124,14 +124,14 @@
 
         // теперь вся информация о всех встроенных шрифтах. Они должны удаляться при подгрузке нового файла
         this.embeddedFilesPath = "";
-        this.embeddedFontFiles = new Array();
-        this.embeddedFontInfos = new Array();
+        this.embeddedFontFiles = [];
+        this.embeddedFontInfos = [];
 
         // динамическая подгрузка шрифтов
         this.ThemeLoader = null;
         this.Api = null;
-        this.fonts_loading = new Array();
-        this.fonts_loading_after_style = new Array();
+        this.fonts_loading = [];
+        this.fonts_loading_after_style = [];
         this.bIsLoadDocumentFirst = false;
         this.currentInfoLoaded = null;
 
@@ -227,7 +227,7 @@
                 return this.embedded_cut_manager.load_cut_fonts();
 
             // в конце метода нужно отдать список шрифтов
-            var gui_fonts = new Array();
+            var gui_fonts = [];
             var gui_count = 0;
             for (var i = 0; i < this.fontInfos.length; i++)
             {

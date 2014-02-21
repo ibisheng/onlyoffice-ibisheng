@@ -184,7 +184,7 @@ function check_MouseMoveEvent(e)
 
 function CreateMouseUpEventObject(x, y)
 {
-    var e = new Object();
+    var e = {};
     e.PageX = x;
     e.PageY = y;
 

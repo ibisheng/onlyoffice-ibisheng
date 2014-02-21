@@ -45,10 +45,10 @@ function CTableMarkup(Table)
     this.Table = Table;
     this.X = 0; // Смещение таблицы от начала страницы до первой колонки
 
-    this.Cols    = new Array(); // массив ширин колонок
-    this.Margins = new Array(); // массив левых и правых маргинов
+    this.Cols    = []; // массив ширин колонок
+    this.Margins = []; // массив левых и правых маргинов
 
-    this.Rows    = new Array(); // массив позиций, высот строк(для данной страницы)
+    this.Rows    = []; // массив позиций, высот строк(для данной страницы)
                                 // Rows = [ { Y : , H :  }, ... ]
 
     this.CurCol = 0; // текущая колонка
@@ -845,7 +845,7 @@ function CCacheImage()
 
 function CCacheManager()
 {
-    this.arrayImages = new Array();
+    this.arrayImages = [];
     this.arrayCount = 0;
     this.countValidImage = 1;
 
@@ -943,8 +943,8 @@ function CPage()
 
     this.pageIndex      = -1;
 
-    this.searchingArray = new Array();
-    this.selectionArray = new Array();
+    this.searchingArray = [];
+    this.selectionArray = [];
     this.drawingPage = new CDrawingPage();
 
     this.Draw = function(context, xDst, yDst, wDst, hDst, contextW, contextH)
@@ -1715,7 +1715,7 @@ function CDrawingDocument()
     this.m_oLogicDocument   = null;
  	this.m_oDocumentRenderer = null;
 
-    this.m_arrPages         = new Array();
+    this.m_arrPages         = [];
     this.m_lPagesCount      = 0;
 
     this.m_lDrawingFirst    = -1;
@@ -1815,12 +1815,12 @@ function CDrawingDocument()
     this.HorVerAnchors = [];
 
     // массивы ректов для поиска
-    this._search_HdrFtr_All          = new Array(); // Поиск в колонтитуле, который находится на всех страницах
-    this._search_HdrFtr_All_no_First = new Array(); // Поиск в колонтитуле, который находится на всех страницах, кроме первой
-    this._search_HdrFtr_First        = new Array(); // Поиск в колонтитуле, который находится только на первой странице
-    this._search_HdrFtr_Even         = new Array(); // Поиск в колонтитуле, который находится только на нечетных страницах
-    this._search_HdrFtr_Odd          = new Array(); // Поиск в колонтитуле, который находится только на четных страницах, включая первую
-    this._search_HdrFtr_Odd_no_First = new Array(); // Поиск в колонтитуле, который находится только на нечетных страницах, кроме первой
+    this._search_HdrFtr_All          = []; // Поиск в колонтитуле, который находится на всех страницах
+    this._search_HdrFtr_All_no_First = []; // Поиск в колонтитуле, который находится на всех страницах, кроме первой
+    this._search_HdrFtr_First        = []; // Поиск в колонтитуле, который находится только на первой странице
+    this._search_HdrFtr_Even         = []; // Поиск в колонтитуле, который находится только на нечетных страницах
+    this._search_HdrFtr_Odd          = []; // Поиск в колонтитуле, который находится только на четных страницах, включая первую
+    this._search_HdrFtr_Odd_no_First = []; // Поиск в колонтитуле, который находится только на нечетных страницах, кроме первой
 
     this.Start_CollaborationEditing = function()
     {
@@ -4092,7 +4092,7 @@ function CDrawingDocument()
         {
             if (margins)
             {
-                var cachedPage = new Object();
+                var cachedPage = {};
                 cachedPage.width_mm = this.m_arrPages[this.m_lCurrentPage].width_mm;
                 cachedPage.height_mm = this.m_arrPages[this.m_lCurrentPage].height_mm;
 
@@ -4108,7 +4108,7 @@ function CDrawingDocument()
                 hor_ruler.IsCanMoveMargins = false;
                 ver_ruler.IsCanMoveMargins = false;
 
-                this.LastParagraphMargins = new Object();
+                this.LastParagraphMargins = {};
                 this.LastParagraphMargins.L = margins.L;
                 this.LastParagraphMargins.T = margins.T;
                 this.LastParagraphMargins.R = margins.R;
@@ -4335,7 +4335,7 @@ function CDrawingDocument()
     this.CheckFontNeeds = function()
     {
         var map_keys = this.m_oWordControl.m_oLogicDocument.Document_Get_AllFontNames();
-        var dstfonts = new Array();
+        var dstfonts = [];
         for (var i in map_keys)
         {
             dstfonts[dstfonts.length] = new CFont(i, 0, "", 0, null);
@@ -4393,7 +4393,7 @@ function CDrawingDocument()
         }
 
         // теперь просто пробегаем и заполняем все объектами
-        var dstfonts = new Array();
+        var dstfonts = [];
         for (var i in map_keys)
         {
             dstfonts[dstfonts.length] = new CFont(i, 0, "", 0, map_keys[i]);
@@ -4555,7 +4555,7 @@ function CDrawingDocument()
 
     this.SendThemeColorScheme = function()
     {
-        var infos = new Array();
+        var infos = [];
         var _index = 0;
 
         var _c = null;
@@ -5755,7 +5755,7 @@ function CStylesPainter()
         if (null != this.docStyles)
             _count_doc = this.docStyles.length;
 		
-		var aPriorityStyles = new Array();
+		var aPriorityStyles = [];
 		var fAddToPriorityStyles = function(style){
 			var index = style.uiPriority;
 			if(null == index)
@@ -5763,7 +5763,7 @@ function CStylesPainter()
 			var aSubArray = aPriorityStyles[index];
 			if(null == aSubArray)
 			{
-				aSubArray = new Array();
+				aSubArray = [];
 				aPriorityStyles[index] = aSubArray;
 			}
 			aSubArray.push(style);
@@ -5784,7 +5784,7 @@ function CStylesPainter()
 				fAddToPriorityStyles(style);
         }
 		
-		this.mergedStyles = new Array();
+		this.mergedStyles = [];
 		for(var index in aPriorityStyles)
 		{
 			var aSubArray = aPriorityStyles[index];

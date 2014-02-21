@@ -220,7 +220,7 @@ function CControlContainer()
 
     this.AbsolutePosition = new CBounds();
 	
-    this.Controls       = new Array();
+    this.Controls       = [];
 
     this.AddControl = function(ctrl)
     {

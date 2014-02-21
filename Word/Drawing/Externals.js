@@ -1038,13 +1038,16 @@ function DecodeBase64Char(ch)
     return -1;
 }
 
-var b64_decode = new Array();
-for (var i = charA; i <= charZ; i++)
-    b64_decode[i] = i - charA + 0;
-for (var i = chara; i <= charz; i++)
-    b64_decode[i] = i - chara + 26;
-for (var i = char0; i <= char9; i++)
-    b64_decode[i] = i - char0 + 52;
+var b64_decode = [];
+(function(){
+	var i;
+	for (i = charA; i <= charZ; i++)
+		b64_decode[i] = i - charA + 0;
+	for (i = chara; i <= charz; i++)
+		b64_decode[i] = i - chara + 26;
+	for (i = char0; i <= char9; i++)
+		b64_decode[i] = i - char0 + 52;
+})();
 b64_decode[charp] = 62;
 b64_decode[chars] = 63;
 
@@ -1312,7 +1315,7 @@ function CreateFontData4(szSrc)
 }
 
 
-var g_fonts_streams = new Array();
+var g_fonts_streams = [];
 // сначала хотел писать "вытеснение" из этого мапа.
 // но тогда нужно хранить base64 строки. Это не круто. По памяти - даже
 // выигрыш будет. Не особо то шрифты жмутся lzw или deflate

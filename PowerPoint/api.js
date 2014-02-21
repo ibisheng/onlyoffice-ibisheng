@@ -3813,15 +3813,12 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                 if (this.isApplyChangesOnOpenEnabled)
                 {
                     this.isApplyChangesOnOpenEnabled = false;
-                    if (CollaborativeEditing.m_bUse == true)
-                    {
-                        this.isApplyChangesOnOpen = true;
-                        this.bNoSendComments = true;
-                        CollaborativeEditing.Apply_Changes();
-                        CollaborativeEditing.Release_Locks();
-                        this.bNoSendComments = false;
-                        return;
-                    }
+                    this.isApplyChangesOnOpen = true;
+                    this.bNoSendComments = true;
+                    CollaborativeEditing.Apply_Changes();
+                    CollaborativeEditing.Release_Locks();
+                    this.bNoSendComments = false;
+                    return;
                 }
             }
             this.WordControl.m_oLogicDocument.RecalculateAfterOpen();

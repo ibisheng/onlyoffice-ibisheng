@@ -332,13 +332,13 @@ function CLineInfo()
     this.Ex = 1;
     this.Ey = 0;
 
-    //this.offsets = new Array();
+    //this.offsets = [];
     this.text = "";
 }
 
 function CDocMeta()
 {
-    this.Fonts = new Array();
+    this.Fonts = [];
     this.ImageMap = {};
 
     this.Pages = null;
@@ -354,7 +354,7 @@ function CDocMeta()
     this.CountSymbols = 0;
     this.CountSpaces = 0;
 
-    this.Drawings = new Array();
+    this.Drawings = [];
 
     this.Selection = new CDocMetaSelection();
     this.TextMatrix = new CMatrix();
@@ -899,7 +899,7 @@ function CDocMeta()
         var _linePrevCharX = 0;
         var _lineCharCount = 0;
         var _lineLastGlyphWidth = 0;
-        var _arrayGlyphOffsets = new Array();
+        var _arrayGlyphOffsets = [];
 
         var _numLine = -1;
 
@@ -1476,7 +1476,7 @@ function CDocMeta()
         var _linePrevCharX = 0;
         var _lineCharCount = 0;
         var _lineLastGlyphWidth = 0;
-        var _arrayGlyphOffsets = new Array();
+        var _arrayGlyphOffsets = [];
 
         var _numLine = -1;
 
@@ -1846,7 +1846,7 @@ function CDocMeta()
         var s = this.stream;
         s.Seek(page.start);
 
-        var lineSpans = new Array();
+        var lineSpans = [];
         var curSpan = new CSpan();
         var isChangeSpan = false;
 
@@ -2117,7 +2117,7 @@ function CDocMeta()
         var _SeekToNextPoint = 0;
         var _SeekLinePrevCharX = 0;
 
-        var arrayLines = new Array();
+        var arrayLines = [];
         var curLine = null;
 
         while (s.pos < page.end)
@@ -2368,7 +2368,7 @@ function CDocMeta()
                         if (glyphsFindCount == glyphsEqualFound)
                         {
                             var _text = "";
-                            var _rects = new Array();
+                            var _rects = [];
                             for (var i = _findLine; i <= _numLine; i++)
                             {
                                 var ps = 0;
@@ -2427,7 +2427,7 @@ function CDocMeta()
                                 var _find = { text: "", navigator : navigator };
                                 editor.WordControl.m_oApi.sync_SearchFoundCallback(_find);
 
-                                var _rect = new Array();
+                                var _rect = [];
                                 _rect[0] = { PageNum : pageNum, X : navigator.X, Y : navigator.Y, W : navigator.W, H : navigator.H };
                                 editor.WordControl.m_oDrawingDocument.AddPageSearch("", _rect);
                             }
@@ -2603,7 +2603,7 @@ function CDocMeta()
         var _SeekToNextPoint = 0;
         var _SeekLinePrevCharX = 0;
 
-        var arrayLines = new Array();
+        var arrayLines = [];
         var curLine = null;
 
         while (s.pos < page.end)
@@ -2868,7 +2868,7 @@ function CDocMeta()
                         _findLineOffsetR = _linePrevCharX + _lineLastGlyphWidth;
                         if (glyphsFindCount == glyphsEqualFound)
                         {
-                            var _rects = new Array();
+                            var _rects = [];
                             for (var i = _findLine; i <= _numLine; i++)
                             {
                                 var ps = 0;

@@ -126,7 +126,7 @@ function CEditorPage(api)
     this.m_oScrollHorApi        = null;
     this.m_oScrollVerApi        = null;
 
-    this.arrayEventHandlers     = new Array();
+    this.arrayEventHandlers     = [];
 
     this.m_oTimerScrollSelect   = -1;
     this.IsFocus = true;

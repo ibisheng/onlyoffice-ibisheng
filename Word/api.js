@@ -605,7 +605,7 @@ function asc_docs_api(name)
 
     this.DocumentOrientation = orientation_Portrait ? true : false;
 
-    this.SelectedObjectsStack = new Array();
+    this.SelectedObjectsStack = [];
 
     this.noCreatePoint = false;
 	this.isDocumentEditor = true;
@@ -1862,7 +1862,7 @@ CParagraphTab.prototype.put_Pos = function (v){ this.Pos = v; }
 
 function CParagraphTabs (obj)
 {
-    this.Tabs = new Array();
+    this.Tabs = [];
 
     if ( undefined != obj )
     {
@@ -2472,7 +2472,7 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr)
     //}
 
 	// var prgrhPr = this.get_TextProps();
-	// var prProp = new Object();
+	// var prProp = {};
 	// prProp.Ind = prgrhPr.ParaPr.Ind;
 	// prProp.ContextualSpacing = prgrhPr.ParaPr.ContextualSpacing;
 	// prProp.Spacing = prgrhPr.ParaPr.Spacing;
@@ -2699,7 +2699,7 @@ function OnSave_Callback(e)
             window['qtDocBridge']['savedDocument'] (data);
             
         } else {
-            var oAdditionalData = new Object();
+            var oAdditionalData = {};
 			oAdditionalData["c"] = "save";
 			oAdditionalData["id"] = documentId;
 			oAdditionalData["userid"] = documentUserId;
@@ -5590,7 +5590,7 @@ function asc_CCommentData( obj )
         this.m_sQuoteText = (undefined != obj.m_sQuoteText) ? obj.m_sQuoteText : null;
         this.m_bSolved    = (undefined != obj.m_bSolved   ) ? obj.m_bSolved    : false;
         this.m_sUserName  = (undefined != obj.m_sUserName ) ? obj.m_sUserName  : "";
-        this.m_aReplies   = new Array();
+        this.m_aReplies   = [];
         if ( undefined != obj.m_aReplies )
         {
             var Count = obj.m_aReplies.length;
@@ -5609,7 +5609,7 @@ function asc_CCommentData( obj )
         this.m_sQuoteText = null;
         this.m_bSolved    = false;
         this.m_sUserName  = "";
-        this.m_aReplies   = new Array();
+        this.m_aReplies   = [];
     }
 }
 
@@ -5761,7 +5761,7 @@ asc_docs_api.prototype.sync_UnLockComment = function(Id)
 
 asc_docs_api.prototype.asc_getComments = function()
 {
-    var ResComments = new Array();
+    var ResComments = [];
     var LogicDocument = this.WordControl.m_oLogicDocument;
     if ( undefined != LogicDocument )
     {
@@ -6289,13 +6289,10 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                 if (this.isApplyChangesOnOpenEnabled)
                 {
                     this.isApplyChangesOnOpenEnabled = false;
-                    if (CollaborativeEditing.m_bUse == true)
-                    {
-                        this.isApplyChangesOnOpen = true;
-                        CollaborativeEditing.Apply_Changes();
-                        CollaborativeEditing.Release_Locks();
-                        return;
-                    }
+                    this.isApplyChangesOnOpen = true;
+                    CollaborativeEditing.Apply_Changes();
+                    CollaborativeEditing.Release_Locks();
+                    return;
                 }
 
                 //Recalculate HdrFtr
@@ -7141,7 +7138,7 @@ function sendTrack(fCallback, url, rdata){
 function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey)
 {
 	var sData;
-	var oAdditionalData = new Object();
+	var oAdditionalData = {};
 	oAdditionalData["c"] = "save";
 	oAdditionalData["id"] = documentId;
 	oAdditionalData["userid"] = documentUserId;
@@ -7448,7 +7445,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 
         var bAddMenu = true;
 		var MathElement = new ParaMath(bAddMenu);		
-		var props = new Object();
+		var props = {};
 		var oFName;
 		switch (Type)
 		{
