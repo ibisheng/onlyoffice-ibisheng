@@ -1718,6 +1718,14 @@ CDocument.prototype =
             
             if (window["NATIVE_EDITOR_ENJINE_SYNC_RECALC"] === true)
             {
+                if (window["native"]["WC_CheckSuspendRecalculate"])
+                {
+                    if (window["native"]["WC_CheckSuspendRecalculate"]())
+                    {
+                        return;
+                    }
+                }
+
                 this.Recalculate_Page( _PageIndex, _bStart, _StartIndex );
                 return;
             }
