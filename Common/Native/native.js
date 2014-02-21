@@ -400,3 +400,8 @@ window.native.Call_OnKeyUp = function(e)
 {
     _api.WordControl.m_oDrawingDocument.OnKeyUp(e);
 };
+
+window.native.Call_CalculateResume = function()
+{
+    Document_Recalculate_Page();
+}

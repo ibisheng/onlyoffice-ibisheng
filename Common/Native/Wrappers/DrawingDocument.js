@@ -591,7 +591,7 @@ CDrawingDocument.prototype =
         this.EndUpdateOverlay();
     },
 
-    OnKeyDown : function()
+    OnKeyDown : function(e)
     {
         check_KeyboardEvent(e);
 
@@ -606,14 +606,14 @@ CDrawingDocument.prototype =
         this.EndUpdateOverlay();
     },
 
-    OnKeyUp : function()
+    OnKeyUp : function(e)
     {
         global_keyboardEvent.AltKey     = false;
         global_keyboardEvent.CtrlKey    = false;
         global_keyboardEvent.ShiftKey   = false;
     },
 
-    OnKeyPress : function()
+    OnKeyPress : function(e)
     {
         if (false === this.bIsUseKeyPress)
             return;
@@ -629,3 +629,69 @@ CDrawingDocument.prototype =
         return retValue;
     }
 };
+
+function check_KeyboardEvent(e)
+{
+    global_keyboardEvent.AltKey     = ((e.Flags & 0x01) == 0x01);
+    global_keyboardEvent.CtrlKey    = ((e.Flags & 0x02) == 0x02);
+    global_keyboardEvent.ShiftKey   = ((e.Flags & 0x04) == 0x04);
+
+    global_keyboardEvent.Sender = null;
+
+    global_keyboardEvent.CharCode   = e.CharCode;
+    global_keyboardEvent.KeyCode    = e.KeyCode;
+    global_keyboardEvent.Which      = null;
+}
+
+function check_MouseDownEvent(e, isClicks)
+{
+    global_mouseEvent.X = e.X;
+    global_mouseEvent.Y = e.Y;
+
+    global_mouseEvent.AltKey     = ((e.Flags & 0x01) == 0x01);
+    global_mouseEvent.CtrlKey    = ((e.Flags & 0x02) == 0x02);
+    global_mouseEvent.ShiftKey   = ((e.Flags & 0x04) == 0x04);
+
+    global_mouseEvent.Type      = g_mouse_event_type_down;
+    global_mouseEvent.Button    = e.Button;
+
+    global_mouseEvent.Sender    = null;
+
+    if (isClicks)
+    {
+        global_mouseEvent.ClickCount = e.ClickCount;
+    }
+    else
+    {
+        global_mouseEvent.ClickCount     = 1;
+    }
+}
+
+function check_MouseMoveEvent(e)
+{
+    global_mouseEvent.X = e.X;
+    global_mouseEvent.Y = e.Y;
+
+    global_mouseEvent.AltKey     = ((e.Flags & 0x01) == 0x01);
+    global_mouseEvent.CtrlKey    = ((e.Flags & 0x02) == 0x02);
+    global_mouseEvent.ShiftKey   = ((e.Flags & 0x04) == 0x04);
+
+    global_mouseEvent.Type      = g_mouse_event_type_move;
+    global_mouseEvent.Button    = e.Button;
+}
+
+function check_MouseUpEvent(e)
+{
+    global_mouseEvent.X = e.X;
+    global_mouseEvent.Y = e.Y;
+
+    global_mouseEvent.AltKey     = ((e.Flags & 0x01) == 0x01);
+    global_mouseEvent.CtrlKey    = ((e.Flags & 0x02) == 0x02);
+    global_mouseEvent.ShiftKey   = ((e.Flags & 0x04) == 0x04);
+
+    global_mouseEvent.Type      = g_mouse_event_type_up;
+    global_mouseEvent.Button    = e.Button;
+
+    global_mouseEvent.Sender    = null;
+}
+
