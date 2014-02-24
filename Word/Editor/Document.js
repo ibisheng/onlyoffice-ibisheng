@@ -11557,6 +11557,9 @@ CDocument.prototype =
             this.Content[Pos].Hyperlink_Remove();
         }
 
+        if ( true === Debug_ParaRunMode )
+            this.Recalculate();
+
         this.Document_UpdateInterfaceState();
     },
 

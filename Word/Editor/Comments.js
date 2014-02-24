@@ -908,6 +908,9 @@ function ParaComment(Start, Id)
 
     this.StartLine  = 0;
     this.StartRange = 0;
+
+    this.Lines = new Array();
+    this.LinesLength = 0;
 }
 
 ParaComment.prototype =
@@ -979,9 +982,11 @@ ParaComment.prototype =
 
     Save_Lines : function()
     {
+        var CommentLines = new CParagraphLinesInfo(this.StartLine, this.StartRange);
+        return CommentLines;
     },
 
-    Restore_Lines : function(SL)
+    Restore_Lines : function(CommentLines)
     {
     },
 

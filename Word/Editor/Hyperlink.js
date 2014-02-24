@@ -66,6 +66,14 @@ ParaHyperlink.prototype =
         return this.Content[0].Is_StartFromNewLine();
     },
 
+    Get_TextPr : function(_ContentPos, Depth)
+    {
+        if ( undefined === _ContentPos )
+            return this.Content[0].Get_TextPr();
+        else
+            return this.Content[_ContentPos.Get(Depth)].Get_TextPr( _ContentPos, Depth + 1 );
+    },
+
     Get_CompiledTextPr : function()
     {
         var TextPr = null;
@@ -325,71 +333,82 @@ ParaHyperlink.prototype =
         return new CParaPos( this.StartRange, this.StartLine, 0, 0 );
     },
 
-    Apply_TextPr : function(TextPr, IncFontSize)
+    Apply_TextPr : function(TextPr, IncFontSize, ApplyToAll)
     {
-        var Selection = this.State.Selection;
-
-        if ( true === Selection.Use )
+        if ( true === ApplyToAll )
         {
-            var StartPos = Selection.StartPos;
-            var EndPos   = Selection.EndPos;
-
-            if ( StartPos === EndPos )
+            var ContentLen = this.Content.length;
+            for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
             {
-                var NewElements = this.Content[EndPos].Apply_TextPr( TextPr, IncFontSize );
-
-                if ( para_Run === this.Content[EndPos].Type )
-                {
-                    var CenterRunPos = this.Internal_ReplaceRun( EndPos, NewElements );
-
-                    if ( StartPos === this.State.ContentPos )
-                        this.State.ContentPos = CenterRunPos;
-
-                    // Подправим метки селекта
-                    Selection.StartPos = CenterRunPos;
-                    Selection.EndPos   = CenterRunPos;
-                }
-            }
-            else
-            {
-                var Direction = 1;
-                if ( StartPos > EndPos )
-                {
-                    var Temp = StartPos;
-                    StartPos = EndPos;
-                    EndPos = Temp;
-
-                    Direction = -1;
-                }
-
-                for ( var CurPos = StartPos + 1; CurPos < EndPos; CurPos++ )
-                {
-                    this.Content[CurPos].Apply_TextPr( TextPr, IncFontSize );
-                }
-
-
-                var NewElements = this.Content[EndPos].Apply_TextPr( TextPr, IncFontSize );
-                if ( para_Run === this.Content[EndPos].Type )
-                    this.Internal_ReplaceRun( EndPos, NewElements );
-
-                var NewElements = this.Content[StartPos].Apply_TextPr( TextPr, IncFontSize );
-                if ( para_Run === this.Content[StartPos].Type )
-                    this.Internal_ReplaceRun( StartPos, NewElements );
-
-                // Заметим, что здесь не нужно подправлять метки выделения, за счет того, что EndPos - StartPos > 1 и
-                // сами метки подправляются в функциях Add_ToContent.
+                this.Content[CurPos].Apply_TextPr( TextPr, IncFontSize, true );
             }
         }
         else
         {
-            var Pos = this.State.ContentPos;
-            var Element = this.Content[Pos];
-            var NewElements = Element.Apply_TextPr( TextPr, IncFontSize );
+            var Selection = this.State.Selection;
 
-            if ( para_Run === Element.Type )
+            if ( true === Selection.Use )
             {
-                var CenterRunPos = this.Internal_ReplaceRun( Pos, NewElements );
-                this.State.ContentPos = CenterRunPos;
+                var StartPos = Selection.StartPos;
+                var EndPos   = Selection.EndPos;
+
+                if ( StartPos === EndPos )
+                {
+                    var NewElements = this.Content[EndPos].Apply_TextPr( TextPr, IncFontSize, false );
+
+                    if ( para_Run === this.Content[EndPos].Type )
+                    {
+                        var CenterRunPos = this.Internal_ReplaceRun( EndPos, NewElements );
+
+                        if ( StartPos === this.State.ContentPos )
+                            this.State.ContentPos = CenterRunPos;
+
+                        // Подправим метки селекта
+                        Selection.StartPos = CenterRunPos;
+                        Selection.EndPos   = CenterRunPos;
+                    }
+                }
+                else
+                {
+                    var Direction = 1;
+                    if ( StartPos > EndPos )
+                    {
+                        var Temp = StartPos;
+                        StartPos = EndPos;
+                        EndPos = Temp;
+
+                        Direction = -1;
+                    }
+
+                    for ( var CurPos = StartPos + 1; CurPos < EndPos; CurPos++ )
+                    {
+                        this.Content[CurPos].Apply_TextPr( TextPr, IncFontSize, false );
+                    }
+
+
+                    var NewElements = this.Content[EndPos].Apply_TextPr( TextPr, IncFontSize, false );
+                    if ( para_Run === this.Content[EndPos].Type )
+                        this.Internal_ReplaceRun( EndPos, NewElements );
+
+                    var NewElements = this.Content[StartPos].Apply_TextPr( TextPr, IncFontSize, false );
+                    if ( para_Run === this.Content[StartPos].Type )
+                        this.Internal_ReplaceRun( StartPos, NewElements );
+
+                    // Заметим, что здесь не нужно подправлять метки выделения, за счет того, что EndPos - StartPos > 1 и
+                    // сами метки подправляются в функциях Add_ToContent.
+                }
+            }
+            else
+            {
+                var Pos = this.State.ContentPos;
+                var Element = this.Content[Pos];
+                var NewElements = Element.Apply_TextPr( TextPr, IncFontSize, false );
+
+                if ( para_Run === Element.Type )
+                {
+                    var CenterRunPos = this.Internal_ReplaceRun( Pos, NewElements );
+                    this.State.ContentPos = CenterRunPos;
+                }
             }
         }
     },
@@ -579,12 +598,36 @@ ParaHyperlink.prototype =
 
     Save_Lines : function()
     {
-        // TODO: Реализовать Save_Lines
+        var HyperLines = new CParagraphLinesInfo(this.StartLine, this.StartRange);
+
+        for ( var CurLine = 0; CurLine < this.LinesLength; CurLine++ )
+        {
+            HyperLines.Lines.push( this.Lines[CurLine].Copy() );
+        }
+
+        HyperLines.LinesLength = this.LinesLength;
+
+        var ContentLen = this.Content.length;
+        for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
+        {
+            var ContentLines = this.Content[CurPos].Save_Lines();
+            HyperLines.Content.push( ContentLines );
+        }
+
+        return HyperLines;
     },
 
-    Restore_Lines : function(SL)
+    Restore_Lines : function(HyperLines)
     {
-        // TODO: Реализовать Restore_Lines
+        this.Lines       = HyperLines.Lines;
+        this.LinesLength = HyperLines.LinesLength;
+        this.Range       = this.Lines[0].Ranges[0];
+
+        var ContentLen = this.Content.length;
+        for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
+        {
+            this.Content[CurPos].Restore_Lines( HyperLines.Content[CurPos] );
+        }
     },
 
     Is_EmptyRange : function(_CurLine, _CurRange)
@@ -635,6 +678,13 @@ ParaHyperlink.prototype =
         return true;
     },
 
+    Get_ParaPosByContentPos : function(ContentPos, Depth)
+    {
+        var Pos = ContentPos.Get(Depth);
+
+        return this.Content[Pos].Get_ParaPosByContentPos( ContentPos, Depth + 1 );
+    },
+
     Recalculate_CurPos : function(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
     {
         var CurLine  = _CurLine - this.StartLine;
@@ -681,6 +731,8 @@ ParaHyperlink.prototype =
 
     Draw_Elements : function(PDSE)
     {
+        PDSE.VisitedHyperlink = this.Visited;
+
         var CurLine  = PDSE.Line - this.StartLine;
         var CurRange = ( 0 === CurLine ? PDSE.Range - this.StartRange : PDSE.Range );
 
@@ -691,10 +743,14 @@ ParaHyperlink.prototype =
         {
             this.Content[CurPos].Draw_Elements( PDSE );
         }
+
+        PDSE.VisitedHyperlink = false;
     },
 
     Draw_Lines : function(PDSL)
     {
+        PDSL.VisitedHyperlink = this.Visited;
+
         var CurLine  = PDSL.Line - this.StartLine;
         var CurRange = ( 0 === CurLine ? PDSL.Range - this.StartRange : PDSL.Range );
 
@@ -705,6 +761,8 @@ ParaHyperlink.prototype =
         {
             this.Content[CurPos].Draw_Lines( PDSL );
         }
+
+        PDSL.VisitedHyperlink = false;
     },
 //-----------------------------------------------------------------------------------
 // Функции для работы с курсором
@@ -716,10 +774,18 @@ ParaHyperlink.prototype =
 
     Cursor_Is_Start : function()
     {
-        if ( 0 === this.State.ContentPos && this.Content.length > 0 )
-            return this.Content[0].Cursor_Is_Start();
+        var ContentLen = this.Content.length;
+        var CurPos = 0;
 
-        return false;
+        while ( CurPos < this.State.ContentPos && CurPos < this.Content.length - 1 )
+        {
+            if ( true === this.Content[CurPos].Is_Empty() )
+                CurPos++;
+            else
+                return false;
+        }
+
+        return this.Content[CurPos].Cursor_Is_Start();
     },
 
     Cursor_Is_NeededCorrectPos : function()
@@ -729,10 +795,17 @@ ParaHyperlink.prototype =
 
     Cursor_Is_End : function()
     {
-        if ( this.Content.length - 1 === this.State.ContentPos && this.Content.length > 0 )
-            return this.Content[this.Content.length - 1].Cursor_Is_End();
+        var CurPos = this.Content.length - 1;
 
-        return false;
+        while ( CurPos > this.State.ContentPos && CurPos > 0 )
+        {
+            if ( true === this.Content[CurPos].Is_Empty() )
+                CurPos--;
+            else
+                return false;
+        }
+
+        return this.Content[CurPos].Cursor_Is_End();
     },
 
     Cursor_MoveToStartPos : function()
@@ -805,7 +878,7 @@ ParaHyperlink.prototype =
 
     Get_LeftPos : function(SearchPos, ContentPos, Depth, UseContentPos)
     {
-        var CurPos = ( true === UseContentPos ? this.Content.length - 1 : ContentPos.Get(Depth) );
+        var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.Content.length - 1 );
 
         this.Content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, UseContentPos);
         SearchPos.Pos.Update( CurPos, Depth );
@@ -858,7 +931,7 @@ ParaHyperlink.prototype =
 
     Get_WordStartPos : function(SearchPos, ContentPos, Depth, UseContentPos)
     {
-        var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.Content.lenght - 1 );
+        var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.Content.length - 1 );
 
         this.Content[CurPos].Get_WordStartPos(SearchPos, ContentPos, Depth + 1, UseContentPos);
 
@@ -943,7 +1016,7 @@ ParaHyperlink.prototype =
         if ( StartPos >= this.Content.length || StartPos < 0 )
             return false;
 
-        var Result = this.Content[StartPos].Get_EndRangePos( _CurLine, _CurRange, SearchPos, Depth + 1 );
+        var Result = this.Content[StartPos].Get_StartRangePos( _CurLine, _CurRange, SearchPos, Depth + 1 );
 
         if ( true === Result )
             SearchPos.Pos.Update( StartPos, Depth );
@@ -976,6 +1049,17 @@ ParaHyperlink.prototype =
 //-----------------------------------------------------------------------------------
     Set_SelectionContentPos : function(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag)
     {
+        var Selection = this.State.Selection;
+
+        var OldStartPos = Selection.StartPos;
+        var OldEndPos   = Selection.EndPos;
+
+        if ( OldStartPos > OldEndPos )
+        {
+            OldStartPos = Selection.EndPos;
+            OldEndPos   = Selection.StartPos;
+        }
+
         var StartPos = 0;
         switch (StartFlag)
         {
@@ -992,16 +1076,51 @@ ParaHyperlink.prototype =
             case  0: EndPos = EndContentPos.Get(Depth); break;
         }
 
-        var Selection = this.State.Selection;
+        // Удалим отметки о старом селекте
+        if ( OldStartPos < StartPos && OldStartPos < EndPos )
+        {
+            var TempLimit = Math.min( StartPos, EndPos );
+            for ( var CurPos = OldStartPos; CurPos < TempLimit; CurPos++ )
+            {
+                this.Content[CurPos].Selection_Remove();
+            }
+        }
+
+        if ( OldEndPos > StartPos && OldEndPos > EndPos )
+        {
+            var TempLimit = Math.max( StartPos, EndPos );
+            for ( var CurPos = TempLimit + 1; CurPos <= OldEndPos; CurPos++ )
+            {
+                this.Content[CurPos].Selection_Remove();
+            }
+        }
+
+        // Выставим метки нового селекта
+
+        Selection.Use      = true;
         Selection.StartPos = StartPos;
         Selection.EndPos   = EndPos;
-        Selection.Use      = true;
-
 
         if ( StartPos != EndPos )
         {
             this.Content[StartPos].Set_SelectionContentPos( StartContentPos, null, Depth + 1, StartFlag, StartPos > EndPos ? 1 : -1 );
             this.Content[EndPos].Set_SelectionContentPos( null, EndContentPos, Depth + 1, StartPos > EndPos ? -1 : 1, EndFlag );
+
+            var _StartPos = StartPos;
+            var _EndPos   = EndPos;
+            var Direction = 1;
+
+            if ( _StartPos > _EndPos )
+            {
+                _StartPos = EndPos;
+                _EndPos   = StartPos;
+                Direction = -1;
+            }
+
+            for ( var CurPos = _StartPos + 1; CurPos < _EndPos; CurPos++ )
+            {
+                this.Content[CurPos].Select_All( Direction );
+            }
         }
         else
         {
@@ -1021,6 +1140,7 @@ ParaHyperlink.prototype =
     Selection_Remove : function()
     {
         var Selection = this.State.Selection;
+
         if ( true === Selection.Use )
         {
             var StartPos = Selection.StartPos;
@@ -1085,7 +1205,7 @@ ParaHyperlink.prototype =
     Selection_IsEmpty : function(CheckEnd)
     {
         var StartPos = this.State.Selection.StartPos;
-        var EndPos   = this.State.Selection.StartPos;
+        var EndPos   = this.State.Selection.EndPos;
 
         if ( StartPos > EndPos )
         {
@@ -1107,6 +1227,110 @@ ParaHyperlink.prototype =
         // В гиперссылку не должен попадать ParaEnd
 
         return false;
+    },
+
+//-----------------------------------------------------------------------------------
+// Работаем со значениями
+//-----------------------------------------------------------------------------------
+    Get_Text : function(Text)
+    {
+        var ContentLen = this.Content.length;
+        for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
+        {
+            this.Content[CurPos].Get_Text( Text );
+        }
+    },
+
+    Set_Visited : function(Value)
+    {
+        this.Visited = Value;
+    },
+
+    Get_Visited : function()
+    {
+        return this.Visited;
+    },
+
+    Set_ToolTip : function(ToolTip)
+    {
+        History.Add( this, { Type : historyitem_Hyperlink_ToolTip, New : ToolTip, Old : this.ToolTip } );
+        this.ToolTip = ToolTip;
+    },
+
+    Get_ToolTip : function()
+    {
+        if ( null === this.ToolTip )
+        {
+            if ( "string" === typeof(this.Value) )
+                return this.Value;
+            else
+                return "";
+        }
+        else
+            return this.ToolTip;
+    },
+
+    Get_Value : function()
+    {
+        return this.Value;
+    },
+
+    Set_Value : function(Value)
+    {
+        History.Add( this, { Type : historyitem_Hyperlink_Value, New : Value, Old : this.Value } );
+        this.Value = Value;
+    },
+
+    Copy : function()
+    {
+        var Hyperlink_new = new ParaHyperlinkStart();
+
+        Hyperlink_new.Value   = this.Value;
+        Hyperlink_new.Visited = this.Visited;
+        Hyperlink_new.ToolTip = this.ToolTip;
+
+        return Hyperlink_new;
+    },
+
+//-----------------------------------------------------------------------------------
+// Undo/Redo функции
+//-----------------------------------------------------------------------------------
+    Undo : function(Data)
+    {
+        var Type = Data.Type;
+        switch(Type)
+        {
+            case historyitem_Hyperlink_Value :
+            {
+                this.Value = Data.Old;
+                break;
+            }
+
+            case historyitem_Hyperlink_ToolTip :
+            {
+                this.ToolTip = Data.Old;
+                break;
+            }
+        }
+    },
+
+    Redo : function(Data)
+    {
+        var Type = Data.Type;
+        switch(Type)
+        {
+            case historyitem_Hyperlink_Value :
+            {
+                this.Value = Data.New;
+                break;
+            }
+
+            case historyitem_Hyperlink_ToolTip :
+            {
+                this.ToolTip = Data.New;
+                break;
+            }
+        }
     },
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования

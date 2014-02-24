@@ -70,6 +70,39 @@ ParaRun.prototype =
 // Функции для работы с содержимым данного рана
 //-----------------------------------------------------------------------------------
 
+    Get_Text : function(Text)
+    {
+        if ( null === Text.Text )
+            return;
+
+        var ContentLen = this.Content.length;
+
+        for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
+        {
+            var Item = this.Content[CurPos];
+            var bBreak = false;
+
+            switch ( Item.Type )
+            {
+                case para_Drawing:
+                case para_End:
+                case para_PageNum:
+                {
+                    Text.Text = null;
+                    bBreak = true;
+                    break;
+                }
+
+                case para_Text : Text.Text += Item.Value; break;
+                case para_Space:
+                case para_Tab  : Text.Text += " "; break;
+            }
+
+            if ( true === bBreak )
+                break;
+        }
+    },
+
     // Проверяем пустой ли ран
     Is_Empty : function(Props)
     {
@@ -1852,20 +1885,22 @@ ParaRun.prototype =
 
     Save_Lines : function()
     {
-        var Lines = new Array();
+        var RunLines = new CParagraphLinesInfo(this.StartLine, this.StartRange);
 
         for ( var CurLine = 0; CurLine < this.LinesLength; CurLine++ )
         {
-            Lines.push( this.Lines[CurLine].Copy() );
+            RunLines.Lines.push( this.Lines[CurLine].Copy() );
         }
 
-        return { Lines : Lines, LinesLength : this.LinesLength } ;
+        RunLines.LinesLength = this.LinesLength;
+
+        return RunLines;
     },
 
-    Restore_Lines : function(SL)
+    Restore_Lines : function(RunLines)
     {
-        this.Lines       = SL.Lines;
-        this.LinesLength = SL.LinesLength;
+        this.Lines       = RunLines.Lines;
+        this.LinesLength = RunLines.LinesLength;
         this.Range       = this.Lines[0].Ranges[0];
     },
 
@@ -3093,129 +3128,146 @@ ParaRun.prototype =
         this.Recalc_CompiledPr(true);
     },
 
-    Apply_TextPr : function(TextPr, IncFontSize)
+    Apply_TextPr : function(TextPr, IncFontSize, ApplyToAll)
     {
-        var Result = [];
-        var LRun = this, CRun = null, RRun = null;
-
-        if ( true === this.State.Selection.Use )
+        if ( true === ApplyToAll )
         {
-            var StartPos = this.State.Selection.StartPos;
-            var EndPos   = this.State.Selection.EndPos;
-
-            if ( StartPos > EndPos )
-            {
-                var Temp = StartPos;
-                StartPos = EndPos;
-                EndPos = Temp;
-            }
-
-            // Если выделено не до конца, тогда разделяем по последней точке
-            if ( EndPos < this.Content.length )
-            {
-                RRun = LRun.Split_Run( EndPos );
-            }
-
-            // Если выделено не с начала, тогда делим по начальной точке
-            if ( StartPos > 0 )
-            {
-                CRun = LRun.Split_Run( StartPos );
-            }
-            else
-            {
-                CRun = LRun;
-                LRun = null;
-            }
-
-            if ( null !== LRun )
-                LRun.Selection_Remove();
-
-            CRun.Select_All();
-
             if ( undefined === IncFontSize )
-                CRun.Apply_Pr( TextPr );
+            {
+                this.Apply_Pr( TextPr );
+            }
             else
             {
                 var _TextPr = new CTextPr();
                 var CurTextPr = this.Get_CompiledPr( false );
 
-                CRun.Set_FontSize( FontSize_IncreaseDecreaseValue( IncFontSize, CurTextPr.FontSize ) );
-            }
-
-            if ( null !== RRun )
-                RRun.Selection_Remove();
-
-            // Дополнительно проверим, если у нас para_End лежит в данном ране и попадает в выделение, тогда
-            // применим заданные настроки к символу конца параграфа
-
-            // TODO: Возможно, стоит на этапе пересчета запонимать, лежит ли para_End в данном ране. Чтобы в каждом
-            //       ране потом не бегать каждый раз по всему массиву в поисках para_End.
-
-            if ( true === this.Selection_CheckParaEnd() )
-            {
-                if ( undefined === IncFontSize )
-                    this.Paragraph.TextPr.Apply_TextPr( TextPr );
-                else
-                {
-                    var Para = this.Paragraph;
-
-                    // Выставляем настройки для символа параграфа
-                    var EndTextPr = Para.Get_CompiledPr2(false).TextPr.Copy();
-                    EndTextPr.Merge( Para.TextPr.Value );
-
-                    // TODO: Как только перенесем историю изменений TextPr в сам класс CTextPr, переделать тут
-                    Para.TextPr.Set_FontSize( FontSize_IncreaseDecreaseValue( IncFontSize, EndTextPr.FontSize ) );
-                }
+                this.Set_FontSize( FontSize_IncreaseDecreaseValue( IncFontSize, CurTextPr.FontSize ) );
             }
         }
         else
         {
-            var CurPos = this.State.ContentPos;
+            var Result = [];
+            var LRun = this, CRun = null, RRun = null;
 
-            // Если выделено не до конца, тогда разделяем по последней точке
-            if ( CurPos < this.Content.length )
+            if ( true === this.State.Selection.Use )
             {
-                RRun = LRun.Split_Run( CurPos );
-            }
+                var StartPos = this.State.Selection.StartPos;
+                var EndPos   = this.State.Selection.EndPos;
 
-            if ( CurPos > 0 )
-            {
-                CRun = LRun.Split_Run( CurPos );
+                if ( StartPos > EndPos )
+                {
+                    var Temp = StartPos;
+                    StartPos = EndPos;
+                    EndPos = Temp;
+                }
+
+                // Если выделено не до конца, тогда разделяем по последней точке
+                if ( EndPos < this.Content.length )
+                {
+                    RRun = LRun.Split_Run( EndPos );
+                }
+
+                // Если выделено не с начала, тогда делим по начальной точке
+                if ( StartPos > 0 )
+                {
+                    CRun = LRun.Split_Run( StartPos );
+                }
+                else
+                {
+                    CRun = LRun;
+                    LRun = null;
+                }
+
+                if ( null !== LRun )
+                    LRun.Selection_Remove();
+
+                CRun.Select_All();
+
+                if ( undefined === IncFontSize )
+                    CRun.Apply_Pr( TextPr );
+                else
+                {
+                    var _TextPr = new CTextPr();
+                    var CurTextPr = this.Get_CompiledPr( false );
+
+                    CRun.Set_FontSize( FontSize_IncreaseDecreaseValue( IncFontSize, CurTextPr.FontSize ) );
+                }
+
+                if ( null !== RRun )
+                    RRun.Selection_Remove();
+
+                // Дополнительно проверим, если у нас para_End лежит в данном ране и попадает в выделение, тогда
+                // применим заданные настроки к символу конца параграфа
+
+                // TODO: Возможно, стоит на этапе пересчета запонимать, лежит ли para_End в данном ране. Чтобы в каждом
+                //       ране потом не бегать каждый раз по всему массиву в поисках para_End.
+
+                if ( true === this.Selection_CheckParaEnd() )
+                {
+                    if ( undefined === IncFontSize )
+                        this.Paragraph.TextPr.Apply_TextPr( TextPr );
+                    else
+                    {
+                        var Para = this.Paragraph;
+
+                        // Выставляем настройки для символа параграфа
+                        var EndTextPr = Para.Get_CompiledPr2(false).TextPr.Copy();
+                        EndTextPr.Merge( Para.TextPr.Value );
+
+                        // TODO: Как только перенесем историю изменений TextPr в сам класс CTextPr, переделать тут
+                        Para.TextPr.Set_FontSize( FontSize_IncreaseDecreaseValue( IncFontSize, EndTextPr.FontSize ) );
+                    }
+                }
             }
             else
             {
-                CRun = LRun;
-                LRun = null;
+                var CurPos = this.State.ContentPos;
+
+                // Если выделено не до конца, тогда разделяем по последней точке
+                if ( CurPos < this.Content.length )
+                {
+                    RRun = LRun.Split_Run( CurPos );
+                }
+
+                if ( CurPos > 0 )
+                {
+                    CRun = LRun.Split_Run( CurPos );
+                }
+                else
+                {
+                    CRun = LRun;
+                    LRun = null;
+                }
+
+                if ( null !== LRun )
+                    LRun.Selection_Remove();
+
+                CRun.Selection_Remove();
+                CRun.Cursor_MoveToStartPos();
+
+                if ( undefined === IncFontSize )
+                {
+                    CRun.Apply_Pr( TextPr );
+                }
+                else
+                {
+                    var _TextPr = new CTextPr();
+                    var CurTextPr = this.Get_CompiledPr( false );
+
+                    CRun.Set_FontSize( FontSize_IncreaseDecreaseValue( IncFontSize, CurTextPr.FontSize ) );
+                }
+
+
+                if ( null !== RRun )
+                    RRun.Selection_Remove();
             }
 
-            if ( null !== LRun )
-                LRun.Selection_Remove();
+            Result.push( LRun );
+            Result.push( CRun );
+            Result.push( RRun );
 
-            CRun.Selection_Remove();
-            CRun.Cursor_MoveToStartPos();
-
-            if ( undefined === IncFontSize )
-            {
-                CRun.Apply_Pr( TextPr );
-            }
-            else
-            {
-                var _TextPr = new CTextPr();
-                var CurTextPr = this.Get_CompiledPr( false );
-
-                CRun.Set_FontSize( FontSize_IncreaseDecreaseValue( IncFontSize, CurTextPr.FontSize ) );
-            }
-
-
-            if ( null !== RRun )
-                RRun.Selection_Remove();
+            return Result;
         }
-
-        Result.push( LRun );
-        Result.push( CRun );
-        Result.push( RRun );
-
-        return Result;
     },
 
     Split_Run : function(Pos)
@@ -3272,46 +3324,46 @@ ParaRun.prototype =
     Apply_Pr : function(TextPr)
     {
         if ( undefined != TextPr.Bold )
-            this.Set_Bold( TextPr.Bold );
+            this.Set_Bold( null === TextPr.Bold ? undefined : TextPr.Bold );
 
         if ( undefined != TextPr.Italic )
-            this.Set_Italic( TextPr.Italic );
+            this.Set_Italic( null === TextPr.Italic ? undefined : TextPr.Italic );
 
         if ( undefined != TextPr.Strikeout )
-            this.Set_Strikeout( TextPr.Strikeout );
+            this.Set_Strikeout( null === TextPr.Strikeout ? undefined : TextPr.Strikeout );
 
-        if ( undefined != TextPr.Underline )
-            this.Set_Underline( TextPr.Underline );
+        if ( undefined !== TextPr.Underline )
+            this.Set_Underline( null === TextPr.Underline ? undefined : TextPr.Underline );
 
         if ( undefined != TextPr.FontSize )
-            this.Set_FontSize( TextPr.FontSize );
+            this.Set_FontSize( null === TextPr.FontSize ? undefined : TextPr.FontSize );
 
-        if ( undefined != TextPr.Color )
-            this.Set_Color( TextPr.Color );
+        if ( undefined !== TextPr.Color )
+            this.Set_Color( null === TextPr.Color ? undefined : TextPr.Color );
 
         if ( undefined != TextPr.VertAlign )
-            this.Set_VertAlign( TextPr.VertAlign );
+            this.Set_VertAlign( null === TextPr.VertAlign ? undefined : TextPr.VertAlign );
 
         if ( undefined != TextPr.HighLight )
-            this.Set_HighLight( TextPr.HighLight );
+            this.Set_HighLight( null === TextPr.HighLight ? undefined : TextPr.HighLight );
 
-        if ( undefined != TextPr.RStyle )
-            this.Set_RStyle( TextPr.RStyle );
+        if ( undefined !== TextPr.RStyle )
+            this.Set_RStyle( null === TextPr.RStyle ? undefined : TextPr.RStyle );
 
         if ( undefined != TextPr.Spacing )
-            this.Set_Spacing( TextPr.Spacing );
+            this.Set_Spacing( null === TextPr.Spacing ? undefined : TextPr.Spacing );
 
         if ( undefined != TextPr.DStrikeout )
-            this.Set_DStrikeout( TextPr.DStrikeout );
+            this.Set_DStrikeout( null === TextPr.DStrikeout ? undefined : TextPr.DStrikeout );
 
         if ( undefined != TextPr.Caps )
-            this.Set_Caps( TextPr.Caps );
+            this.Set_Caps( null === TextPr.Caps ? undefined : TextPr.Caps );
 
         if ( undefined != TextPr.SmallCaps )
-            this.Set_SmallCaps( TextPr.SmallCaps );
+            this.Set_SmallCaps( null === TextPr.SmallCaps ? undefined : TextPr.SmallCaps );
 
         if ( undefined != TextPr.Position )
-            this.Set_Position( TextPr.Position );
+            this.Set_Position( null === TextPr.Position ? undefined : TextPr.Position );
 
         if ( undefined != TextPr.RFonts )
             this.Set_RFonts2( TextPr.RFonts );
