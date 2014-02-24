@@ -5144,13 +5144,11 @@ CGeometry2.prototype =
 
     AddPath: function(path)
     {
-        History.Add(g_oUndoRedoGraphicObjects,  historyitem_AutoShapes_Add_Path, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddObject(path.Id)), null);
         this.pathLst.push(path);
     },
 	
     AddRect: function(l, t, r, b)
     {
-        History.Add(g_oUndoRedoGraphicObjects,  historyitem_AutoShapes_Add_GeometryRect, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddGeometryRect(l, t, r, b)), null);
         this.rectS = {};
         this.rectS.l = l;
         this.rectS.t = t;

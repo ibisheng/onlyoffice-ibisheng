@@ -3884,8 +3884,11 @@ function DrawingObjects() {
 			if ( _range )
 				chart.range.intervalObject = _range;
 
-			chart.rebuildSeries();
-			chart.worksheet = worksheet; 	// Для формул серий
+            ExecuteNoHistory(function()
+            {
+                chart.rebuildSeries();
+                chart.worksheet = worksheet; 	// Для формул серий
+            }, this, []);
 			
 			return this.controller.addChartDrawingObject(chart, options);
 		}

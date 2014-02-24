@@ -86,3 +86,83 @@ var vertalign_SuperScript = 1;
 var vertalign_SubScript   = 2;
 var hdrftr_Header = 0x01;
 var hdrftr_Footer = 0x02;
+
+
+var c_oAscChartTitleShowSettings =
+{
+    none: 0,
+    overlay: 1,
+    noOverlay: 2
+};
+
+var c_oAscChartHorAxisLabelShowSettings =
+{
+    none: 0,
+    noOverlay: 1
+};
+
+
+var c_oAscChartVertAxisLabelShowSettings =
+{
+    none: 0,
+    rotated: 1,
+    vertical: 2,
+    horizontal: 3
+};
+
+var c_oAscChartLegendShowSettings =
+{
+    none: 0,
+    left: 1,
+    top: 2,
+    right: 3,
+    bottom: 4,
+    leftOverlay: 5,
+    rightOverlay: 6
+};
+
+var c_oAscChartDataLabelsPos =
+{
+    none: 0,
+    b: 1,
+    bestFit: 2,
+    ctr: 3,
+    inBase: 4,
+    inEnd: 5,
+    l: 6,
+    outEnd: 7,
+    r: 8,
+    t: 9
+};
+
+var c_oAscChartCatAxisSettings =
+{
+    none: 0,
+    leftToRight: 1,
+    rightToLeft: 2,
+    noLabels: 3
+};
+
+var c_oAscChartValAxisSettings =
+{
+    none: 0,
+    byDefault: 1,
+    thousands: 2,
+    millions: 3,
+    billions: 4,
+    log: 5
+};
+
+var c_oAscAxisTypeSettings =
+{
+    vert: 0,
+    hor: 1
+};
+
+var c_oAscGridLinesSettings =
+{
+    none: 0,
+    major: 1,
+    minor: 2,
+    majorMinor: 3
+};

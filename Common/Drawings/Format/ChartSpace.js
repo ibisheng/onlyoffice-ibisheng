@@ -1967,9 +1967,9 @@ function CreateLineChart(asc_chart, type)
     var plot_area = chart.plotArea;
     plot_area.setLayout(new CLayout());
     plot_area.setChart(new CLineChart());
-    plot_area.setCatAx(new CCatAx());
+    plot_area.addAxis(new CCatAx());
     plot_area.catAx.setTitle(new CTitle());
-    plot_area.setValAx(new CValAx());
+    plot_area.addAxis(new CValAx());
     plot_area.valAx.setTitle(new CTitle());
     var title = plot_area.valAx.title;
     title.setTxPr(new CTextBody());
@@ -2132,8 +2132,8 @@ function CreateBarChart(asc_chart, type)
     var plot_area = chart.plotArea;
     plot_area.setLayout(new CLayout());
     plot_area.setChart(new CBarChart());
-    plot_area.setCatAx(new CCatAx());
-    plot_area.setValAx(new CValAx());
+    plot_area.addAxis(new CCatAx());
+    plot_area.addAxis(new CValAx());
     var bar_chart = plot_area.chart;
     bar_chart.setBarDir(BAR_DIR_COL);
     bar_chart.setGrouping(type);
@@ -2284,8 +2284,8 @@ function CreateHBarChart(asc_chart, type)
     var plot_area = chart.plotArea;
     plot_area.setLayout(new CLayout());
     plot_area.setChart(new CBarChart());
-    plot_area.setCatAx(new CCatAx());
-    plot_area.setValAx(new CValAx());
+    plot_area.addAxis(new CCatAx());
+    plot_area.addAxis(new CValAx());
     var bar_chart = plot_area.chart;
     bar_chart.setBarDir(BAR_DIR_BAR);
     bar_chart.setGrouping(type);
@@ -2439,8 +2439,8 @@ function CreateAreaChart(asc_chart, type)
     var plot_area = chart.plotArea;
     plot_area.setLayout(new CLayout());
     plot_area.setChart(new CAreaChart());
-    plot_area.setCatAx(new CCatAx());
-    plot_area.setValAx(new CValAx());
+    plot_area.addAxis(new CCatAx());
+    plot_area.addAxis(new CValAx());
     var area_chart = plot_area.chart;
     area_chart.setGrouping(GROUPING_STANDARD);
     area_chart.setVaryColors(false);
@@ -2589,8 +2589,8 @@ function CreatePieChart(asc_chart, type)
     plot_area.setChart(new CPieChart());
     var pie_chart = plot_area.chart;
     pie_chart.setVaryColors(true);
-    plot_area.setCatAx(new CCatAx());
-    plot_area.setValAx(new CValAx());
+    plot_area.addAxis(new CCatAx());
+    plot_area.addAxis(new CValAx());
     var parsedHeaders = asc_chart.parseSeriesHeaders();
     for(var i = 0; i < asc_series.length; ++i)
     {
@@ -2702,8 +2702,8 @@ function CreateScatterChart(asc_chart)
     var scatter_chart = plot_area.chart;
     scatter_chart.setScatterStyle(SCATTER_STYLE_LINE_MARKER);
     scatter_chart.setVaryColors(false);
-    plot_area.setCatAx(new CValAx());
-    plot_area.setValAx(new CValAx());
+    plot_area.addAxis(new CValAx());
+    plot_area.addAxis(new CValAx());
 
     var first_series = asc_series.length > 1 ? asc_series[0] : null;
     var start_index = asc_series.length > 1 ? 1 : 0;
@@ -2862,8 +2862,8 @@ function CreateStockChart(asc_chart)
     var plot_area = chart.plotArea;
     plot_area.setLayout(new CLayout());
     plot_area.setChart(new CStockChart());
-    plot_area.setCatAx(new CCatAx());
-    plot_area.setValAx(new CValAx());
+    plot_area.addAxis(new CCatAx());
+    plot_area.addAxis(new CValAx());
     var line_chart = plot_area.chart;
     line_chart.setDLbls(new CDLbls());
     line_chart.addAxId(plot_area.catAx);

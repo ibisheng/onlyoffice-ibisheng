@@ -172,11 +172,25 @@ function ExecuteNoHistory(f, oThis, args)
 	{
 		History.TurnOff();
 	}
+
+    var b_table_id = false;
+    if(g_oTableId && !g_oTableId.m_bTurnOff)
+    {
+        g_oTableId.m_bTurnOff = true;
+        b_table_id = true;
+    }
+
+
+
 	var ret = f.apply(oThis, args);	
 	if(is_on)
 	{
 		History.TurnOn();
 	}
+    if(b_table_id)
+    {
+        g_oTableId.m_bTurnOff = false;
+    }
 	return ret;
 }
 

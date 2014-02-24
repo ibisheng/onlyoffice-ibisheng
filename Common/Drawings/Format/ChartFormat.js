@@ -3715,6 +3715,19 @@ var DLBL_POS_OUT_END = 6;
 var DLBL_POS_R = 7;
 var DLBL_POS_T = 8;
 
+
+var DLBL_POS_DEFINES_MAP = [];
+DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.b]       =   DLBL_POS_B;
+DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.bestFit] =   DLBL_POS_BEST_FIT;
+DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.ctr]     =   DLBL_POS_CTR;
+DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.inBase]  =   DLBL_POS_IN_BASE;
+DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.inEnd]   =   DLBL_POS_IN_END;
+DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.l]       =   DLBL_POS_L;
+DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.outEnd]  =   DLBL_POS_OUT_END;
+DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.r]       =   DLBL_POS_R;
+DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.t]       =   DLBL_POS_T;
+
+
 function CDLbl()
 {
     this.bDelete = null;
@@ -4044,21 +4057,21 @@ CDLbl.prototype =
                 _alpha = Math.atan2(_dy_t, _dx_t);
                 if (_body_pr.vert === nVertTTvert) {
                     if (_dx_lt_rb * _dy_t - _dy_lt_rb * _dx_t <= 0) {
-                        global_MatrixTransformer.RotateRadAppend(_text_transform, -_alpha - Math.PI * 0.5 - (isRealNumber(_body_pr.rot) ? _body_pr.rot : 0));
+                        global_MatrixTransformer.RotateRadAppend(_text_transform, -_alpha - Math.PI * 0.5 + (isRealNumber(_body_pr.rot) ? _body_pr.rot : 0));
                         global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_rt, _t_y_rt);
                     }
                     else {
-                        global_MatrixTransformer.RotateRadAppend(_text_transform, Math.PI * 0.5 - _alpha - (isRealNumber(_body_pr.rot) ? _body_pr.rot : 0));
+                        global_MatrixTransformer.RotateRadAppend(_text_transform, Math.PI * 0.5 - _alpha + (isRealNumber(_body_pr.rot) ? _body_pr.rot : 0));
                         global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_lt, _t_y_lt);
                     }
                 }
                 else {
                     if (_dx_lt_rb * _dy_t - _dy_lt_rb * _dx_t <= 0) {
-                        global_MatrixTransformer.RotateRadAppend(_text_transform, -_alpha - Math.PI * 1.5 - (isRealNumber(_body_pr.rot) ? _body_pr.rot : 0));
+                        global_MatrixTransformer.RotateRadAppend(_text_transform, -_alpha - Math.PI * 1.5 + (isRealNumber(_body_pr.rot) ? _body_pr.rot : 0));
                         global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_lb, _t_y_lb);
                     }
                     else {
-                        global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI * 0.5 - _alpha - (isRealNumber(_body_pr.rot) ? _body_pr.rot : 0));
+                        global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI * 0.5 - _alpha + (isRealNumber(_body_pr.rot) ? _body_pr.rot : 0));
                         global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_rb, _t_y_rb);
                     }
                 }
@@ -4416,8 +4429,23 @@ CDLbl.prototype =
                 }
                 default:
                 {
-                    this.extX = max_width + 1.25;
-                    this.extY = this.txBody.content.Get_SummaryHeight() + SCALE_INSET_COEFF;
+                    var _rot = isRealNumber(bodyPr.rot) ? bodyPr.rot : 0;
+                    var t = new CMatrix();
+                    global_MatrixTransformer.RotateRadAppend(t, -_rot);
+                    var w, h, x0, y0, x1, y1, x2, y2, x3, y3;
+                    w = max_width;
+                    h = this.txBody.content.Get_SummaryHeight();
+                    x0 = 0;
+                    y0 = 0;
+                    x1 = t.TransformPointX(w, 0);
+                    y1 = t.TransformPointY(w, 0);
+                    x2 = t.TransformPointX(w, h);
+                    y2 = t.TransformPointY(w, h);
+                    x3 = t.TransformPointX(0, h);
+                    y3 = t.TransformPointY(0, h);
+
+                    this.extX = Math.max(x0, x1, x2, x3) - Math.min(x0, x1, x2, x3) + 1.25;
+                    this.extY =  Math.max(y0, y1, y2, y3) - Math.min(y0, y1, y2, y3) + SCALE_INSET_COEFF;
                     this.x = 0;
                     this.y = 0;
                     break;
@@ -7213,6 +7241,16 @@ var LEGEND_POS_T = 1;
 var LEGEND_POS_R = 2;
 var LEGEND_POS_B = 3;
 var LEGEND_POS_TR = 4;
+
+
+var LEGEND_POS_MAP = [];
+LEGEND_POS_MAP[c_oAscChartLegendShowSettings.left] = LEGEND_POS_L;
+LEGEND_POS_MAP[c_oAscChartLegendShowSettings.top] = LEGEND_POS_T;
+LEGEND_POS_MAP[c_oAscChartLegendShowSettings.right] = LEGEND_POS_R;
+LEGEND_POS_MAP[c_oAscChartLegendShowSettings.bottom] = LEGEND_POS_B;
+LEGEND_POS_MAP[c_oAscChartLegendShowSettings.leftOverlay] = LEGEND_POS_L;
+LEGEND_POS_MAP[c_oAscChartLegendShowSettings.rightOverlay] = LEGEND_POS_R;
+
 
 function CLegend()
 {
@@ -10812,13 +10850,18 @@ CPivotFmt.prototype =
 function CPlotArea()
 {
     this.chart = null;
-    this.catAx = null;
-    this.dateAx = null;
     this.dTable = null;
     this.layout = null;
     this.serAx = null;
     this.spPr = null;
+
+    //ТоDo
     this.valAx = null;
+    this.catAx = null;
+    this.dateAx = null;
+
+    //
+    this.axis = [];
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -10845,6 +10888,19 @@ CPlotArea.prototype =
     Read_FromBinary2: function(r)
     {
         this.Id = r.GetString2();
+    },
+
+
+    addAxis: function(axis)
+    {
+        History.Add(this, {Type: historyitem_PlotArea_AddAxis, newPr:axis});
+        this.axis.push(axis);
+
+        //TODO: полей catAx и valAx не должно быть все оси бадут лежать в одном массиве
+        if(axis instanceof CCatAx)
+            this.catAx = axis;
+        if(axis instanceof CValAx)
+            this.valAx = axis;
     },
 
     setChart: function(pr)
@@ -10895,6 +10951,18 @@ CPlotArea.prototype =
         this.valAx = pr;
     },
 
+
+    getHorizontalAxis: function()
+    {
+        return this.catAx; //TODO
+    },
+
+
+    getVerticalAxis: function()
+    {
+        return this.valAx;  //TODO
+    },
+
     Undo: function(data)
     {
         switch (data.Type)
@@ -10932,6 +11000,18 @@ CPlotArea.prototype =
             case historyitem_PlotArea_SetValAx:
             {
                 this.valAx = data.oldPr;
+                break;
+            }
+            case historyitem_PlotArea_AddAxis:
+            {
+                for(var  i = this.axis.length; i > -1; --i)
+                {
+                    if(this.axis[i] === data.newPr)
+                    {
+                        this.axis.splice(i, 1);
+                        break;
+                    }
+                }
                 break;
             }
         }
@@ -10976,6 +11056,11 @@ CPlotArea.prototype =
                 this.valAx = data.newPr;
                 break;
             }
+            case historyitem_PlotArea_AddAxis:
+            {
+                this.axis.push(data.newPr);
+                break;
+            }
         }
     },
 
@@ -10991,6 +11076,7 @@ CPlotArea.prototype =
             case historyitem_PlotArea_SetSerAx:
             case historyitem_PlotArea_SetSpPr:
             case historyitem_PlotArea_SetValAx:
+            case historyitem_PlotArea_AddAxis:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -11036,6 +11122,12 @@ CPlotArea.prototype =
             case historyitem_PlotArea_SetValAx:
             {
                 this.valAx = readObject(r);
+                break;
+            }
+            case historyitem_PlotArea_AddAxis:
+            {
+                var axis = readObject(r);
+                this.axis.push(axis);
                 break;
             }
         }

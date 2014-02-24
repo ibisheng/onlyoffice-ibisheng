@@ -141,6 +141,7 @@ var historyitem_PlotArea_SetLayout = 2137;
 var historyitem_PlotArea_SetSerAx  = 2138;
 var historyitem_PlotArea_SetSpPr  = 2139;
 var historyitem_PlotArea_SetValAx = 2140;
+var historyitem_PlotArea_AddAxis = 2141;
 var historyitem_Axis_SetType               = 2141;
 var historyitem_Axis_SetAuto               = 2142;
 var historyitem_Axis_SetAxId               = 2143;

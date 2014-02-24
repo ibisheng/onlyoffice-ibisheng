@@ -188,7 +188,186 @@
 		prot["put_b"]	= prot.put_b;
 		prot["getA"]	= prot.getA;
 		prot["get_hex"]	= prot.get_hex;
-	}
+
+        function asc_ChartSettings()
+        {
+            this.style         = null;
+            this.title         = null;
+            this.rowCols       = null;
+            this.horAxisLabel  = null;
+            this.vertAxisLabel = null;
+            this.legendPos     = null;
+            this.dataLabelsPos = null;
+            this.vertAx        = null;
+            this.horAx         = null;
+            this.horGridLines  = null;
+            this.vertGridLines = null;
+        }
+        asc_ChartSettings.prototype =
+        {
+            putStyle: function(index)
+            {
+                this.style = index;
+            },
+
+            getStyle: function()
+            {
+                return this.style;
+            },
+
+            putTitle: function(v)
+            {
+                this.title = v;
+            },
+
+            getTitle: function()
+            {
+                return this.title;
+            },
+
+            putRowCols: function(v)
+            {
+                this.rowCols = v;
+            },
+
+            getRowCols: function()
+            {
+                return this.rowCols;
+            },
+
+            putHorAxisLabel: function(v)
+            {
+                this.horAxisLabel = v;
+            },
+            putVertAxisLabel: function(v)
+            {
+                this.vertAxisLabel = v;
+            },
+            putLegendPos: function(v)
+            {
+                this.legendPos = v;
+            },
+            putDataLabelsPos: function(v)
+            {
+                this.dataLabelsPos = v;
+            },
+            putCatAx: function(v)
+            {
+                this.vertAx = v;
+            },
+            putValAx: function(v)
+            {
+                this.horAx = v;
+            },
+
+            getHorAxisLabel: function(v)
+            {
+                return this.horAxisLabel;
+            },
+            getVertAxisLabel: function(v)
+            {
+                return this.vertAxisLabel;
+            },
+            getLegendPos: function(v)
+            {
+                return this.legendPos;
+            },
+            getDataLabelsPos: function(v)
+            {
+                return this.dataLabelsPos;
+            },
+            getVertAx: function(v)
+            {
+                return this.vertAx;
+            },
+            getHorAx: function(v)
+            {
+                return this.horAx;
+            },
+
+            putHorGridLines: function(v)
+            {
+                this.horGridLines = v;
+            },
+
+            getHorGridLines: function(v)
+            {
+                return this.horGridLines;
+            },
+
+            putVertGridLines: function(v)
+            {
+                this.vertGridLines = v;
+            },
+
+            getVertGridLines: function()
+            {
+                return this.vertGridLines;
+            }
+        };
+
+        prot = asc_ChartSettings.prototype;
+        prot["putStyle"]         = prot.putStyle;
+        prot["putTitle"]         = prot.putTitle;
+        prot["putRowCols"]       = prot.putRowCols;
+        prot["putHorAxisLabel"]  = prot.putHorAxisLabel;
+        prot["putVertAxisLabel"] = prot.putVertAxisLabel;
+        prot["putLegendPos"]     = prot.putLegendPos;
+        prot["putDataLabelsPos"] = prot.putDataLabelsPos;
+        prot["putCatAx"]         = prot.putCatAx;
+        prot["putValAx"]         = prot.putValAx;
+        prot["getStyle"]         = prot.getStyle;
+        prot["getTitle"]         = prot.getTitle;
+        prot["getRowCols"]       = prot.getRowCols;
+        prot["getHorAxisLabel"]  = prot.getHorAxisLabel;
+        prot["getVertAxisLabel"] = prot.getVertAxisLabel;
+        prot["getLegendPos"]     = prot.getLegendPos;
+        prot["getDataLabelsPos"] = prot.getDataLabelsPos;
+        prot["getHorAx"]         = prot.getHorAx;
+        prot["getVertAx"]        = prot.getVertAx;
+        prot["getHorGridLines"]         = prot.getVertGridLines;
+        prot["putHorGridLines"]        = prot.putVertGridLines;
+        prot["getVertGridLines"]         = prot.getVertGridLines;
+        prot["putVertGridLines"]        = prot.putVertGridLines;
+
+        window["asc_ChartSettings"] = asc_ChartSettings;
+        function asc_AxisSettings()
+        {
+            this.type = null;
+            this.settings = null;
+        }
+        asc_AxisSettings.prototype =
+        {
+            putType: function(val)
+            {
+                this.type = val;
+            },
+
+            putSettings: function(val)
+            {
+                this.settings = val;
+            },
+
+            getType: function()
+            {
+                return this.type;
+            },
+
+            getSettings: function()
+            {
+                return this.settings;
+            }
+        };
+        prot = asc_AxisSettings.prototype;
+        prot["putType"] = prot.putType;
+        prot["putSettings"] = prot.putSettings;
+        prot["getType"] = prot.getType;
+        prot["getSettings"] = prot.getSettings;
+
+        window["asc_AxisSettings"] = asc_AxisSettings;
+}
 )(window);
 
 var CColor = window["CColor"];
+var asc_ChartSettings = window["asc_ChartSettings"];
+var asc_AxisSettings = window["asc_AxisSettings"];
