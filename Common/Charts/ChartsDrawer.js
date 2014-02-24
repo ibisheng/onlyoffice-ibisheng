@@ -4098,18 +4098,14 @@ drawStockChart.prototype =
 	
 	_calculateLines: function ()
 	{	
-		var trueWidth = this.chartProp.trueWidth;
-		var trueHeight = this.chartProp.trueHeight;
-		var min = this.chartProp.scale[0];
-		var max = this.chartProp.scale[this.chartProp.scale.length - 1];
-			
-		var digHeight = Math.abs(max - min);
+		//соответствует подписям оси категорий(OX)
+		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
+		//соответствует подписям оси значений(OY)
+		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
 		
-		if(this.chartProp.min < 0 && this.chartProp.max <= 0)
-			min = -1*max;
+		var trueWidth = this.chartProp.trueWidth;
 
 		var koffX = trueWidth / this.chartProp.series[0].val.numRef.numCache.pts.length;
-		var koffY = trueHeight / digHeight;
 		var widthBar = koffX / (1 + this.cChartSpace.chart.plotArea.chart.upDownBars.gapWidth / 100);
 		
 		var val1, val2, val3, val4, xVal, yVal1, yVal2, yVal3, yVal4;
@@ -4139,21 +4135,64 @@ drawStockChart.prototype =
 			if(!this.paths.values[i])
 				this.paths.values[i] = {};
 			
-			xVal = this.chartProp.chartGutter._left + (i)*koffX + koffX/2;
-			yVal1 = trueHeight - (val1 - min)*koffY + this.chartProp.chartGutter._top;
-			yVal2 = trueHeight - (val2 - min)*koffY + this.chartProp.chartGutter._top;
-			yVal3 = trueHeight - (val3 - min)*koffY + this.chartProp.chartGutter._top;
-			yVal4 = trueHeight - (val4 - min)*koffY + this.chartProp.chartGutter._top;
+			xVal = this._getYPosition(i, xPoints, true);
+			yVal1 = this._getYPosition(val1, yPoints);
+			yVal2 = this._getYPosition(val2, yPoints);
+			yVal3 = this._getYPosition(val3, yPoints);
+			yVal4 = this._getYPosition(val4, yPoints);
 			
 			this.paths.values[i].lowLines = this._calculateLine(xVal, yVal2, xVal, yVal1);
 			this.paths.values[i].highLines = this._calculateLine(xVal, yVal4, xVal, yVal3);
 			
 			if(parseFloat(val1) > parseFloat(val4))
-				this.paths.values[i].downBars = this._calculateUpDownBars(xVal, yVal1, xVal, yVal4, widthBar);
+				this.paths.values[i].downBars = this._calculateUpDownBars(xVal, yVal1, xVal, yVal4, widthBar / this.chartProp.pxToMM);
 			else
-				this.paths.values[i].upBars = this._calculateUpDownBars(xVal, yVal1, xVal, yVal4, widthBar);
+				this.paths.values[i].upBars = this._calculateUpDownBars(xVal, yVal1, xVal, yVal4, widthBar / this.chartProp.pxToMM);
 		}
 	},
+	
+	_getYPosition: function(val, yPoints, isOx)
+	{
+		//позиция в заисимости от положения точек на оси OY
+		var result;
+		var resPos;
+		var resVal;
+		var diffVal;
+		if(val < yPoints[0].val)
+		{
+			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
+			resVal = yPoints[1].val - yPoints[0].val;
+			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
+			result = yPoints[0].pos - (diffVal / resVal) * resPos;
+		}
+		else if(val > yPoints[yPoints.length - 1].val)
+		{	
+			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
+			resVal = yPoints[1].val - yPoints[0].val;
+			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
+			result = yPoints[0].pos + (diffVal / resVal) * resPos;
+		}
+		else
+		{
+			for(var s = 0; s < yPoints.length; s++)
+			{
+				if(val >= yPoints[s].val && val <= yPoints[s + 1].val)
+				{
+					resPos = Math.abs(yPoints[s + 1].pos - yPoints[s].pos);
+					resVal = yPoints[s + 1].val - yPoints[s].val;
+					if(!isOx)
+						result =  - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+					else	
+						result = (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+						
+					break;
+				}
+			}
+		}
+		
+		return result;
+	},
+
 	
 	_drawLines: function (isRedraw/*isSkip*/)
     {
@@ -4197,9 +4236,8 @@ drawStockChart.prototype =
 		gdLst["w"] = 1;
 		gdLst["h"] = 1;
 		
-		var pxToMm = this.chartProp.pxToMM;
-		path.moveTo(x / pxToMm * pathW, y / pxToMm * pathH);
-		path.lnTo(x1 / pxToMm * pathW, y1 / pxToMm * pathH);
+		path.moveTo(x * pathW, y * pathH);
+		path.lnTo(x1 * pathW, y1 * pathH);
 		path.recalculate(gdLst);
 		
 		return path;
@@ -4291,11 +4329,11 @@ drawStockChart.prototype =
 		gdLst["h"] = 1;
 		
 		var pxToMm = this.chartProp.pxToMM;
-		path.moveTo((x - width/2) / pxToMm * pathW, y / pxToMm * pathH);
-		path.lnTo((x - width/2) / pxToMm * pathW, y1 / pxToMm * pathH);
-		path.lnTo((x + width/2) / pxToMm * pathW, y1 / pxToMm * pathH);
-		path.lnTo((x + width/2) / pxToMm * pathW, y / pxToMm * pathH);
-		path.lnTo((x - width/2) / pxToMm * pathW, y / pxToMm * pathH);
+		path.moveTo((x - width/2) * pathW, y * pathH);
+		path.lnTo((x - width/2) * pathW, y1 * pathH);
+		path.lnTo((x + width/2) * pathW, y1 * pathH);
+		path.lnTo((x + width/2) * pathW, y * pathH);
+		path.lnTo((x - width/2) * pathW, y * pathH);
 		path.recalculate(gdLst);
 		
 		return path;
