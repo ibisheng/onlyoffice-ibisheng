@@ -920,7 +920,7 @@ CChartsDrawer.prototype =
 		
 		//top margin = legend + title;
 		this.calcProp.chartGutter._top = standartMargin;
-		if(chartSpace.chart.title !== null)
+		if(chartSpace.chart.title !== null && !chartSpace.chart.title.overlay)
 			this.calcProp.chartGutter._top = 7 + chartSpace.chart.title.extY * pxToMM + standartMargin;
 		
 		//bottom margin = legend + horizontal title +  horizontal axis(if min y == 0);
