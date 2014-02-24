@@ -2387,7 +2387,7 @@ drawBarChart.prototype =
 		
 		var centerX, centerY;
 				
-		switch ( DLBL_POS_IN_END )
+		switch ( point.compiledDlb.dLblPos )
 		{
 			case DLBL_POS_BEST_FIT:
 			{
