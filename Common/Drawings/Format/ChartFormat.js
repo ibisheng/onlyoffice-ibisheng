@@ -10965,16 +10965,26 @@ CPlotArea.prototype =
 
     getAxisByTypes: function()
     {
-       //var  ret = {valAx:[], catAx: [], dateAx: []};
-       //for(var i = 0; i < this.axis.length; ++i)
-       //{
-       //    var axis = this.axis[i];
-       //
-       //    switch(this.axi)
-       //}
-       //this.valAx = null;
-       //this.catAx = null;
-       //this.dateAx = null;
+       var  ret = {valAx:[], catAx: [], dateAx: []};
+       for(var i = 0; i < this.axis.length; ++i)
+       {
+           var axis = this.axis[i];
+           switch(axis.getObjectType())
+           {
+               case historyitem_type_CatAx:
+               {
+                   ret.catAx.push(axis);
+                   break;
+               }
+               case historyitem_type_ValAx:
+               {
+                   ret.valAx.push(axis);
+                   break;
+               }
+                   //TODO DATE Axis
+           }
+       }
+        return ret;
     },
 
     Undo: function(data)
@@ -13832,7 +13842,26 @@ CTitle.prototype =
     getCompiledLine: CDLbl.prototype.getCompiledLine,
     getCompiledTransparent: CDLbl.prototype.getCompiledTransparent,
     Get_Styles: CDLbl.prototype.Get_Styles,
-    draw: CDLbl.prototype.draw,
+    draw: function(graphics)
+    {
+        if(this.chart)
+        {
+            graphics.SetIntegerGrid(false);
+            graphics.p_width(70);
+            graphics.transform3(this.chart.transform, false);
+            graphics.p_color(0, 0, 0, 255);
+            graphics._s();
+            graphics._m(this.x, this.y);
+            graphics._l(this.x + this.extX, this.y + 0);
+            graphics._l(this.x + this.extX, this.y + this.extY);
+            graphics._l(this.x + 0, this.y + this.extY);
+            graphics._z();
+            graphics.ds();
+            graphics.SetIntegerGrid(true);
+        }
+        CDLbl.prototype.draw.call(this, graphics);
+    },
+
     isEmptyPlaceholder: CDLbl.prototype.isEmptyPlaceholder,
 
     recalculatePen: CShape.prototype.recalculatePen,

@@ -713,8 +713,6 @@ CChartSpace.prototype.recalculateSeriesColors = function()
         {
             var style = CHART_STYLE_MANAGER.getStyleByIndex(this.style);
             var series = this.chart.plotArea.chart.series;
-
-
             var parents = this.getParentObjects();
             var RGBA = {R: 0, G: 0, B: 0, A: 255};
             if(this.chart.plotArea.chart.varyColors && series.length === 1 || this.chart.plotArea.chart instanceof CPieChart)
@@ -2229,9 +2227,46 @@ CChartSpace.prototype.recalculateAxis = function()
         }
         else if(chart_type === historyitem_type_BarChart && chart_object.barDir === BAR_DIR_BAR)
         {
-            //var cat_ax, val_ax;
-            //var axis_arr = plot_area.axis;
-            //for(i = 0; i < axis_arr.length; ++a)
+            var cat_ax, val_ax;
+            var axis_by_types = plot_area.getAxisByTypes();
+            cat_ax = axis_by_types.catAx[0];
+            val_ax = axis_by_types.valAx[0];
+            if(cat_ax && val_ax)
+            {
+                var sizes = this.getChartSizes();
+                var rect = {x: sizes.startX, y:sizes.startY, w:sizes.w, h: sizes.h};
+                //расчитаем подписи для вертикальной оси
+                var hor_gap = 4;//пока 4mm
+                var ser = chart_object.series[0];
+                var string_pts = [], pts_len = 0;
+                if(ser && ser.cat)
+                {
+                    if(ser.cat.strRef && ser.cat.strRef.strCache)
+                    {
+                        string_pts = ser.cat.strRef.strCache.pt;
+                        pts_len = string_pts.length;
+                    }
+                    else if(ser.cat.strLit)
+                    {
+                        string_pts = ser.cat.strLit.pt;
+                        pts_len = string_pts.length;
+                    }
+                }
+                if(string_pts.length === 0)
+                {
+                    if(ser.val)
+                    {
+                        if(ser.val.numRef && ser.val.numRef.numCache)
+                            pts_len = ser.val.numRef.numCache.pts.length;
+                        else if(ser.val.numLit)
+                            pts_len = ser.val.numLit.pts.length;
+                    }
+                    for(i = 0; i < pts_len; ++i)
+                    {
+                        string_pts.push({val:i+1 + ""});
+                    }
+                }
+            }
         }
     }
 };
