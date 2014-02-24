@@ -348,68 +348,68 @@
 						formula: "SUM(C1:C6)"
 					}
 */
-			consolelog(
-				"cell: " + info.asc_getName() + ", " +
-
-				"font: " + info.asc_getFont().asc_getName() + " " + info.asc_getFont().asc_getSize() +
-				(info.asc_getFont().asc_getBold() ? " bold" : "") +
-				(info.asc_getFont().asc_getItalic() ? " italic" : "") +
-				(info.asc_getFont().asc_getUnderline() ? " underline" : "") + ", " +
-
-				"color: " + (info.asc_getFont().asc_getColor() == null ? "0" : info.asc_getFont().asc_getColor().get_hex()) + ", " +
-
-				"fill: " + (info.asc_getFill().asc_getColor() == null ? "0" : info.asc_getFill().asc_getColor().get_hex()) + ", " +
-
-				"halign: " + info.asc_getHorAlign() + ", " +
-
-				"valign: " + info.asc_getVertAlign() + ", " +
-
-				"wrap: " + info.asc_getFlags().asc_getWrapText() + ", " +
-
-				"merge: " + info.asc_getFlags().asc_getMerge() + ", " +
-
-				"text: " + info.asc_getText() +
-
-				", formula: " + info.asc_getFormula()
-
-			);
-			if(info.asc_getFormula())
-				$("#cv1").val("="+info.asc_getFormula())
-			else
-				$("#cv1").val(info.asc_getText())
-
-			info.asc_getFlags().asc_getWrapText() ? $("#td_text_wrap").addClass("iconPressed") : $("#td_text_wrap").removeClass("iconPressed");
-
-			info.asc_getFlags().asc_getMerge() ? $("#td_mergeCells").addClass("iconPressed") : $("#td_mergeCells").removeClass("iconPressed");
-
-			info.asc_getFont().asc_getBold() ? $("#td_bold").addClass("iconPressed") : $("#td_bold").removeClass("iconPressed");
-
-			info.asc_getFont().asc_getItalic() ? $("#td_italic").addClass("iconPressed") : $("#td_italic").removeClass("iconPressed");
-
-			info.asc_getFont().asc_getUnderline() ? $("#td_underline").addClass("iconPressed") : $("#td_underline").removeClass("iconPressed");
-
-			$("#fontSelectVal").text(info.asc_getFont().asc_getName());
-			$("#fontSizeSelectVal").text(info.asc_getFont().asc_getSize()+"pt");
-			$("#cellStyleSelectVal").text(info.asc_getStyleName());
-
-			switch(info.asc_getHorAlign()){
-				case "right":
-					$("li[id*='td_ta']").removeClass("iconPressed");
-					$("#td_ta_right").addClass("iconPressed");
-					break;
-				case "left":
-					$("li[id*='td_ta']").removeClass("iconPressed");
-					$("#td_ta_left").addClass("iconPressed");
-					break;
-				case "center":
-					$("li[id*='td_ta']").removeClass("iconPressed");
-					$("#td_ta_center").addClass("iconPressed");
-					break;
-				case "justify":
-					$("li[id*='td_ta']").removeClass("iconPressed");
-					$("#td_ta_justify").addClass("iconPressed");
-					break;
-			}
+			//consolelog(
+			//	"cell: " + info.asc_getName() + ", " +
+            //
+			//	"font: " + info.asc_getFont().asc_getName() + " " + info.asc_getFont().asc_getSize() +
+			//	(info.asc_getFont().asc_getBold() ? " bold" : "") +
+			//	(info.asc_getFont().asc_getItalic() ? " italic" : "") +
+			//	(info.asc_getFont().asc_getUnderline() ? " underline" : "") + ", " +
+            //
+			//	"color: " + (info.asc_getFont().asc_getColor() == null ? "0" : info.asc_getFont().asc_getColor().get_hex()) + ", " +
+            //
+			//	"fill: " + (info.asc_getFill().asc_getColor() == null ? "0" : info.asc_getFill().asc_getColor().get_hex()) + ", " +
+            //
+			//	"halign: " + info.asc_getHorAlign() + ", " +
+            //
+			//	"valign: " + info.asc_getVertAlign() + ", " +
+            //
+			//	"wrap: " + info.asc_getFlags().asc_getWrapText() + ", " +
+            //
+			//	"merge: " + info.asc_getFlags().asc_getMerge() + ", " +
+            //
+			//	"text: " + info.asc_getText() +
+            //
+			//	", formula: " + info.asc_getFormula()
+            //
+			//);
+			//if(info.asc_getFormula())
+			//	$("#cv1").val("="+info.asc_getFormula())
+			//else
+			//	$("#cv1").val(info.asc_getText())
+            //
+			//info.asc_getFlags().asc_getWrapText() ? $("#td_text_wrap").addClass("iconPressed") : $("#td_text_wrap").removeClass("iconPressed");
+            //
+			//info.asc_getFlags().asc_getMerge() ? $("#td_mergeCells").addClass("iconPressed") : $("#td_mergeCells").removeClass("iconPressed");
+            //
+			//info.asc_getFont().asc_getBold() ? $("#td_bold").addClass("iconPressed") : $("#td_bold").removeClass("iconPressed");
+            //
+			//info.asc_getFont().asc_getItalic() ? $("#td_italic").addClass("iconPressed") : $("#td_italic").removeClass("iconPressed");
+            //
+			//info.asc_getFont().asc_getUnderline() ? $("#td_underline").addClass("iconPressed") : $("#td_underline").removeClass("iconPressed");
+            //
+			//$("#fontSelectVal").text(info.asc_getFont().asc_getName());
+			//$("#fontSizeSelectVal").text(info.asc_getFont().asc_getSize()+"pt");
+			//$("#cellStyleSelectVal").text(info.asc_getStyleName());
+            //
+			//switch(info.asc_getHorAlign()){
+			//	case "right":
+			//		$("li[id*='td_ta']").removeClass("iconPressed");
+			//		$("#td_ta_right").addClass("iconPressed");
+			//		break;
+			//	case "left":
+			//		$("li[id*='td_ta']").removeClass("iconPressed");
+			//		$("#td_ta_left").addClass("iconPressed");
+			//		break;
+			//	case "center":
+			//		$("li[id*='td_ta']").removeClass("iconPressed");
+			//		$("#td_ta_center").addClass("iconPressed");
+			//		break;
+			//	case "justify":
+			//		$("li[id*='td_ta']").removeClass("iconPressed");
+			//		$("#td_ta_justify").addClass("iconPressed");
+			//		break;
+			//}
 
 	}
 
@@ -2109,7 +2109,9 @@
 	
 	// Charts
 	function showChartDialog() {
-		var chart = api.asc_getChartObject();
+        var chart;
+        ExecuteNoHistory(function(){chart = api.asc_getChartObject();}, this, []);
+
 		var objectsExist = api.asc_drawingObjectsExist();
 		if (!chart)		// selected image
 			return;
@@ -2242,11 +2244,10 @@
 								else if (chartForm.find("#legendBottom").is(":checked"))
 									legend.asc_setPosition("bottom");
 
-								if (isSelected)
-									api.asc_editChartDrawingObject(chart);
-								else
-									api.asc_addChartDrawingObject(chart);
-
+                                    if (isSelected)
+                                        api.asc_editChartDrawingObject(chart);
+                                    else
+                                        api.asc_addChartDrawingObject(chart);
 								$(this).dialog("close");
 							}
 						},
@@ -2607,4 +2608,297 @@
 	$("#showHeaders").change(function () {
 		onChangeView();
 	});
+
+    var chart_subtype_image_map = {};
+    chart_subtype_image_map["gist"] =
+        ["menu/img/chartProps/image1.png",
+            "menu/img/chartProps/image2.png",
+            "menu/img/chartProps/image3.png"];
+    chart_subtype_image_map["graphic"] =
+        ["menu/img/chartProps/image4.png",
+            "menu/img/chartProps/image5.png",
+            "menu/img/chartProps/image6.png",
+            "menu/img/chartProps/image7.png",
+            "menu/img/chartProps/image8.png",
+            "menu/img/chartProps/image9.png"];
+    chart_subtype_image_map["pie"] =
+        ["menu/img/chartProps/image10.png"];
+    chart_subtype_image_map["hbar"] =
+        ["menu/img/chartProps/image11.png",
+            "menu/img/chartProps/image12.png",
+            "menu/img/chartProps/image13.png"];
+    chart_subtype_image_map["area"] =
+        ["menu/img/chartProps/image14.png",
+            "menu/img/chartProps/image15.png",
+            "menu/img/chartProps/image16.png"];
+    chart_subtype_image_map["scatter"] =
+        ["menu/img/chartProps/image17.png",
+            "menu/img/chartProps/image18.png",
+            "menu/img/chartProps/image19.png"];
+    chart_subtype_image_map["stock"] =
+        ["menu/img/chartProps/image20.png"];
+    function createDivChartSubtypes(type)
+    {
+        if(Array.isArray(chart_subtype_image_map[type]))
+        {
+            var div = document.createElement("div");
+            div.style.display = "none";
+            div.style.float = "left";
+            div.style.width = "inherit";
+            div.style.height = "inherit";
+
+            div.id = type + "_subtype_menu";
+            var image_arr = chart_subtype_image_map[type];
+            for(var i = 0; i < image_arr.length; ++i)
+            {
+                var img_div = document.createElement("div");
+                img_div.style.width = "54px";
+                img_div.style.height = "54px";
+                img_div.style.float = "left";
+                img_div.className = "chart_subtype_label";
+                var img = document.createElement("img");
+                img.src = image_arr[i];
+                img.style.position = "relative";
+                img.style.left = "4px";
+                img.style.top = "4px";
+                img_div.appendChild(img);
+                div.appendChild(img_div);
+            }
+            return div;
+        }
+        return null;
+    }
+    for(var key in chart_subtype_image_map )
+    {
+        if(chart_subtype_image_map.hasOwnProperty(key))
+        {
+            var div = createDivChartSubtypes(key);
+            var chart_menu = document.getElementById("right_subtype");
+            if(div)
+            {
+                chart_menu.appendChild(div);
+            }
+        }
+    }
+    $("#chartAddMenu").draggable();
+    var mouseOverHandlerChart = function()
+    {
+        if(!$(this).hasClass("chart_type_label_selected") && !$(this).hasClass("chart_subtype_label_selected"))
+            $(this).css("background", "#808080");
+        else
+            $(this).css("background", "#555555");
+    };
+    $(".chart_type_label").mouseover(mouseOverHandlerChart);
+    $(".chart_subtype_label").mouseover(mouseOverHandlerChart);
+
+    var mouseleaveHandlerChart =  function()
+    {
+        if(!$(this).hasClass("chart_type_label_selected"))
+            $(this).css("background", "#ffffff");
+        else
+            $(this).css("background", "#595959");
+    };
+    $(".chart_type_label").mouseleave(mouseleaveHandlerChart);
+    $(".chart_subtype_label").mouseleave(mouseleaveHandlerChart);
+
+    $(".chart_type_label").mousedown(
+        handleMouseDownChartTypeLabel
+    );
+
+    function handleMouseDownChartTypeLabel()
+    {
+        var arr = $(".chart_type_label");
+        for(var i = 0; i <arr.length; ++i)
+        {
+            (function()
+            {
+                $(this).removeClass("chart_type_label_selected");
+                $(this).css("background", "#ffffff");
+                var id = $(this).attr('id');
+                $("#"+id+"_subtype_menu").css("display", "none");
+            }).call(arr[i]);
+        }
+
+        $(".chart_type_label").removeClass("chart_type_label_selected");
+        $(".chart_type_label").css("background", "#ffffff");
+        $(this).addClass("chart_type_label_selected");
+        $(this).css("background", "#595959");
+        var id = $(this).attr('id');
+        $("#"+id+"_subtype_menu").css("display", "");
+    }
+
+    function showChartAddDialog()
+    {
+        $("#chartAddMenu").css("display", "");
+        var left = ($("#ws-canvas-outer").width() - $("#chartAddMenu").width())/2;
+        var top =  ($("#ws-canvas-outer").height() - $("#chartAddMenu").height())/2;
+        $("#chartAddMenu").css("display", "");
+        $("#chartAddMenu").css("left",left +"px");
+        $("#chartAddMenu").css("top", top +"px");
+        $("#right_subtype").css("width",  $("#chartAddMenu").width() -  $("#chartTypeMenu").width());
+        handleMouseDownChartTypeLabel.call($("#gist"));
+    }
+
+    $("#chartPropsMenuDiv").draggable();
+
+
+
+
+    api.asc_registerCallback("asc_onSelectChart", function (chartSpace) {
+        $("#chartPropsMenuDiv").css("display", "");
+        $("#styleIndexInput").attr( "value", chartSpace.style + "");
+        var value = chartSpace.chart.title ? (chartSpace.chart.title.overlay ? "overlay" : "no_overlay") : "none";
+        $("#chartTitleSelect").attr("value", value);
+        var plot_area = chartSpace.chart.plotArea;
+        value = plot_area.catAx ? ("overlay") : "none";
+        $("#chartHorAxisSelect").attr("value", value);
+        value = plot_area.valAx ? ("overlay") : "none";
+        $("#chartVertAxisSelect").attr("value", value);
+    });
+
+    $("#applyStyleButton").on("click",
+    function()
+    {
+        var style_index = parseInt($("#styleIndexInput").attr("value"), 10);
+        if(!isNaN(style_index) && style_index > 0 && style_index < 49)
+        {
+            var settings = new asc_ChartSettings();
+            settings.putStyle(style_index);
+            api.asc_editChartDrawingObject(settings);
+        }
+    });
+
+    $("#chartTitleSelect").change(function()
+    {
+        var val = $("#chartTitleSelect").attr("value");
+        var map = {"none": c_oAscChartTitleShowSettings.none, "overlay": c_oAscChartTitleShowSettings.overlay, "no_overlay": c_oAscChartTitleShowSettings.noOverlay};
+        var settings = new asc_ChartSettings();
+        settings.putTitle(map[val]);
+        api.asc_editChartDrawingObject(settings);
+    });
+
+    $("#chartHorAxisSelect").change(function()
+    {
+        var val = $("#chartHorAxisSelect").attr("value");
+        var map = {"none": c_oAscChartHorAxisLabelShowSettings.none, "no_overlay": c_oAscChartHorAxisLabelShowSettings.noOverlay};
+        var settings = new asc_ChartSettings();
+        settings.putHorAxisLabel(map[val]);
+        api.asc_editChartDrawingObject(settings);
+    });
+
+
+    $("#chartVertAxisSelect").change(function()
+    {
+        var val = $("#chartVertAxisSelect").attr("value");
+        var map = {"none": c_oAscChartVertAxisLabelShowSettings.none, "rotated": c_oAscChartVertAxisLabelShowSettings.rotated, "horizontal": c_oAscChartVertAxisLabelShowSettings.horizontal, "vertical": c_oAscChartVertAxisLabelShowSettings.vertical};
+        var settings = new asc_ChartSettings();
+        settings.putVertAxisLabel(map[val]);
+        api.asc_editChartDrawingObject(settings);
+    });
+
+    $("#chartLegendSelect").change(function()
+    {
+        var val = $("#chartLegendSelect").attr("value");
+        var map = {
+            "none":            c_oAscChartLegendShowSettings.none,
+            "left":            c_oAscChartLegendShowSettings.left,
+            "top":             c_oAscChartLegendShowSettings.top,
+            "right":           c_oAscChartLegendShowSettings.right,
+            "bottom":          c_oAscChartLegendShowSettings.bottom,
+            "right_overlay":   c_oAscChartLegendShowSettings.rightOverlay,
+            "left_overlay":    c_oAscChartLegendShowSettings.leftOverlay
+        };
+        var settings = new asc_ChartSettings();
+        settings.putLegendPos(map[val]);
+        api.asc_editChartDrawingObject(settings);
+    });
+    $("#chartHorAxis").change(
+        function()
+        {
+            var val = $("#chartHorAxis").attr("value");
+            var map = {
+                "none":            c_oAscChartLegendShowSettings.none,
+                "left":            c_oAscChartLegendShowSettings.left,
+                "top":             c_oAscChartLegendShowSettings.top,
+                "right":           c_oAscChartLegendShowSettings.right,
+                "bottom":          c_oAscChartLegendShowSettings.bottom,
+                "right_overlay":   c_oAscChartLegendShowSettings.rightOverlay,
+                "left_overlay":    c_oAscChartLegendShowSettings.leftOverlay
+            };
+            var settings = new asc_ChartSettings();
+            settings.putLegendPos(map[val]);
+            api.asc_editChartDrawingObject(settings);
+        }
+    );
+
+
+    $("#chartVertAxis").change(
+        function()
+        {
+            var val = $("#chartVertAxis").attr("value");
+            var map = {
+                "none":            c_oAscChartLegendShowSettings.none,
+                "left":            c_oAscChartLegendShowSettings.left,
+                "top":             c_oAscChartLegendShowSettings.top,
+                "right":           c_oAscChartLegendShowSettings.right,
+                "bottom":          c_oAscChartLegendShowSettings.bottom,
+                "right_overlay":   c_oAscChartLegendShowSettings.rightOverlay,
+                "left_overlay":    c_oAscChartLegendShowSettings.leftOverlay
+            };
+            var settings = new asc_ChartSettings();
+            settings.putLegendPos(map[val]);
+            api.asc_editChartDrawingObject(settings);
+        }
+    );
+
+    $("#chartDataLabels").change(
+        function()
+        {
+            var val = $("#chartDataLabels").attr("value");
+            var map = {
+                "none"           : c_oAscChartDataLabelsPos.none,
+                "center"         : c_oAscChartDataLabelsPos.ctr,
+                "inner_top"      : c_oAscChartDataLabelsPos.inEnd,
+                "in_base"        : c_oAscChartDataLabelsPos.inBase,
+                "out_end"        : c_oAscChartDataLabelsPos.outEnd
+            };
+            var settings = new asc_ChartSettings();
+            settings.putDataLabelsPos(map[val]);
+            api.asc_editChartDrawingObject(settings);
+        }
+    );
+
+    $("#chartHorGridLines").change(
+        function()
+        {
+            var val = $("#chartHorGridLines").attr("value");
+            var map = {
+                "none"           : c_oAscGridLinesSettings.none,
+                "major"         : c_oAscGridLinesSettings.major,
+                "minor"      : c_oAscGridLinesSettings.minor,
+                "minor_major" : c_oAscGridLinesSettings.majorMinor
+            };
+            var settings = new asc_ChartSettings();
+            settings.putHorGridLines(map[val]);
+            api.asc_editChartDrawingObject(settings);
+        }
+    );
+
+    $("#chartVertGridLines").change(
+        function()
+        {
+            var val = $("#chartVertGridLines").attr("value");
+            var map = {
+                "none"           : c_oAscGridLinesSettings.none,
+                "major"         : c_oAscGridLinesSettings.major,
+                "minor"      : c_oAscGridLinesSettings.minor,
+                "minor_major" : c_oAscGridLinesSettings.majorMinor
+            };
+            var settings = new asc_ChartSettings();
+            settings.putVertGridLines(map[val]);
+            api.asc_editChartDrawingObject(settings);
+        }
+    );
+
 });
+

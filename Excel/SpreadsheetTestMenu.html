@@ -487,6 +487,16 @@
 {
     background: #303030;
 }
+.right_panel_drawing_props
+{
+    position: absolute;
+    left:166px;
+    top: 7px;
+    width: 446px;
+    height: 470px;
+    background: #ffffff;
+    border: 1px solid rgb(127,157,185);
+}
 </style>
 </head>
 <body>
@@ -2276,6 +2286,138 @@ Format
         <button id="cancel_add_chart_button">Cancel</button>
     </div>
 </div>
+
+<div id="chartPropsMenuDiv"  style="background: #ece9d8; z-index:500; width: 619px; height: 515px; position: absolute; left:100px; top:100px; font-family: Tahoma; display: none">
+    <div id="leftPanelChartPropsDiv" style="position:absolute;  left: 7px; top: 7px; height: 470px; width: 150px; background: #ffffff;border: 1px solid rgb(127,157,185)">
+        <div class="leftPanelCharPropsItemDiv" id="designChartLeft">
+            <p>Design</p>
+        </div>
+        <div class="leftPanelCharPropsItemDiv" id="layoutChartLeft">
+            <p>Layout</p>
+        </div>
+    </div>
+    <div id="rightPanelChartPropsDiv" class="right_panel_drawing_props">
+        <div><p style="font-size: 14pt">Design</p></div>
+        <button id="chageChartTypeButton">Change Type</button>
+        <button id="rowColsButton">Rows/Cols</button>
+        <button id="selectDataButton">Select Data</button>
+        <br>
+        <label style="font-size: 11pt">Style Index</label>
+        <input type="text" id="styleIndexInput">
+        <button id="applyStyleButton">Apply Style</button>
+        <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
+        <div><p style="font-size: 14pt">Layout</p></div>
+        <label style="font-size: 11pt">Chart Title</label>
+        <select id="chartTitleSelect">
+            <option value="none">None</option>
+            <option value="overlay">Overlay</option>
+            <option value="no_overlay">No Overlay</option>
+        </select>
+        <br>
+        <label style="font-size: 11pt">Hor Axis Title</label>
+        <select id="chartHorAxisSelect">
+            <option value="none">None</option>
+            <option value="no_overlay">No Overlay</option>
+        </select>
+        <br>
+        <label style="font-size: 11pt">Hor Axis Title</label>
+        <select id="chartVertAxisSelect">
+            <option value="none">None</option>
+            <option value="rotated">Rotated</option>
+            <option value="horizontal">Horizontal</option>
+        </select>
+        <br>
+        <label style="font-size: 11pt">Legend</label>
+        <select id="chartLegendSelect">
+            <option value="none">None</option>
+            <option value="left">Left</option>
+            <option value="top">Top</option>
+            <option value="right">Right</option>
+            <option value="bottom">Bottom</option>
+            <option value="right_overlay">Right Overlay</option>
+            <option value="left_overlay">Left Overlay</option>
+        </select>
+        <br>
+        <label style="font-size: 11pt">Data Labels</label>
+        <select id="chartDataLabels">
+            <option value="none">None</option>
+            <option value="center">Center</option>
+            <option value="inner_top">Inner Top</option>
+            <option value="in_base">In Base</option>
+            <option value="out_end">Out End</option>
+            <option value="right_overlay">Right Overlay</option>
+            <option value="left_overlay">Left Overlay</option>
+        </select>
+        <br>
+        <label style="font-size: 11pt">Hor Axis</label>
+        <select id="chartHorAxis">
+            <option value="none">None</option>
+            <option value="leftToRight">Left To Right</option>
+            <option value="noLabels">No Labels</option>
+            <option value="rightToLeft">Right To Left</option>
+        </select>
+        <br>
+        <label style="font-size: 11pt">Vert Axis</label>
+        <select id="chartVertAxis">
+            <option value="none">None</option>
+            <option value="byDefault">By Default</option>
+            <option value="log">Log</option>
+        </select>
+
+
+
+        <br>
+        <label style="font-size: 11pt">Hor Grid Lines</label>
+        <select id="chartHorGridLines">
+            <option value="none">None</option>
+            <option value="major">Major</option>
+            <option value="minor">Minor</option>
+            <option value="minor_major">Major&Minor</option>
+        </select>
+
+        <br>
+        <label style="font-size: 11pt">Vert Grid Lines</label>
+        <select id="chartVertGridLines">
+            <option value="none">None</option>
+            <option value="major">Major</option>
+            <option value="minor">Minor</option>
+            <option value="minor_major">Major&Minor</option>
+        </select>
+    </div>
+</div>
+
+<div id="vertAxisMenuDiv" style="display: none;background: #ece9d8; z-index: 8000; width: 619px; height: 515px; position: absolute; left: 0px; top:0px">
+ <div id="leftPanelDiv">
+     <div class="leftPanelItem" id="vertAxisOptionsDiv">
+         <p>Axis Options</p>
+     </div>
+     <div class="leftPanelItem" id="vertAxisNumberDiv">
+         <p>Number</p>
+     </div>
+     <div class="leftPanelItem" id="vertAxisFillDiv">
+         <p>Fill</p>
+     </div>
+     <div class="leftPanelItem" id="vertAxisLineColorDiv">
+         <p>Line Color</p>
+     </div>
+     <div class="leftPanelItem" id="vertAxisLineTypeDiv">
+         <p>Line Type</p>
+     </div>
+     <div class="leftPanelItem" id="vertAxisShadowDiv">
+         <p>Shadow</p>
+     </div>
+     <div class="leftPanelItem" id="vertAxisGlowDiv">
+         <p>Glow</p>
+     </div>
+     <div class="leftPanelItem" id="vertAxis3DFormatDiv">
+         <p>3D Format</p>
+     </div>
+     <div class="leftPanelItem" id="vertAxisTextAlignmentDiv">
+         <p>Text Alignment</p>
+     </div>
+ </div>
+</div>
+
 <div id="shapeBox" class="options hidden">
 <table>
 <tr>

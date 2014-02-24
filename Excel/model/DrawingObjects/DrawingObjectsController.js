@@ -736,21 +736,10 @@ DrawingObjectsController.prototype =
 		
 		var chart = null;
 		for (var i = 0; i < this.selectedObjects.length; i++) {
-			if ( this.selectedObjects[i].isChart() ) {
-				if ( chart != null )
-					return null;
-                this.selectedObjects[i].syncAscChart();
-				chart = new asc_CChart(this.selectedObjects[0].chart);
-			}
-			if ( this.selectedObjects[i].isGroup() ) {
-				for ( var j = 0; j < this.selectedObjects[i].arrGraphicObjects.length; j++ ) {
-					if ( this.selectedObjects[i].arrGraphicObjects[j].isChart() ) {
-						if ( chart != null )
-							return null;
-                        this.selectedObjects[i].arrGraphicObjects[j].syncAscChart();
-						chart = new asc_CChart(this.selectedObjects[i].arrGraphicObjects[j].chart);
-					}
-				}
+			if ( this.selectedObjects[i].isChart() )
+            {
+                this.selectedObjects[i].drObjects = this;
+                return this.selectedObjects[i];
 			}
 		}
         return chart;
