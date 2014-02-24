@@ -424,6 +424,7 @@ function CreateUniFillSolidFillWidthTintOrShade(unifill, effectVal)
     var unicolor = ret.fill.color;
     if(effectVal !== 0)
     {
+        effectVal*=100000.0;
         unicolor.setMods(new CColorModifiers());
         var mod = new CColorMod();
         if(effectVal > 0)
@@ -515,8 +516,8 @@ function getArrayFillsFromBase(arrBaseFills, needFillsCount)
     {
         for (var j = 0; j < count_base; j++)
         {
-            var percent = (-70 + 140 * ( (i + 1) / (need_create + 1) )) * 1000;
-            var color = CreateUniFillSolidFillWidthTintOrShade(arrBaseFills[j], 100000 - percent);
+            var percent = (-70 + 140 * ( (i + 1) / (need_create + 1) )) /100;
+            var color = CreateUniFillSolidFillWidthTintOrShade(arrBaseFills[j], 1 - percent);
             ret.push( color );
         }
     }
@@ -537,6 +538,10 @@ CChartSpace.prototype.recalculateGridLines = function()
                 {
                     var compiled_grid_lines = new CLn();
                     compiled_grid_lines.merge(subtleLine);
+                    if(compiled_grid_lines.Fill && compiled_grid_lines.Fill.fill && compiled_grid_lines.Fill.fill.color && compiled_grid_lines.Fill.fill.color.Mods)
+                    {
+                        compiled_grid_lines.Fill.fill.color.Mods.Mods.length = 0;
+                    }
                     if(!compiled_grid_lines.Fill)
                     {
                         compiled_grid_lines.setFill(new CUniFill());
@@ -2224,7 +2229,9 @@ CChartSpace.prototype.recalculateAxis = function()
         }
         else if(chart_type === historyitem_type_BarChart && chart_object.barDir === BAR_DIR_BAR)
         {
-
+            //var cat_ax, val_ax;
+            //var axis_arr = plot_area.axis;
+            //for(i = 0; i < axis_arr.length; ++a)
         }
     }
 };

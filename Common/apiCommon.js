@@ -325,8 +325,8 @@
         prot["getDataLabelsPos"] = prot.getDataLabelsPos;
         prot["getHorAx"]         = prot.getHorAx;
         prot["getVertAx"]        = prot.getVertAx;
-        prot["getHorGridLines"]         = prot.getVertGridLines;
-        prot["putHorGridLines"]        = prot.putVertGridLines;
+        prot["getHorGridLines"]         = prot.getHorGridLines;
+        prot["putHorGridLines"]        = prot.putHorGridLines;
         prot["getVertGridLines"]         = prot.getVertGridLines;
         prot["putVertGridLines"]        = prot.putVertGridLines;
 

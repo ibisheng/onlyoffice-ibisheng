@@ -1442,10 +1442,8 @@ DrawingObjectsController.prototype =
                 }
             };
 
-            setAxisGridLines(plot_area.getHorizontalAxis(), chartSettings.getHorGridLines());
-            setAxisGridLines(plot_area.getVerticalAxis(), chartSettings.getVertGridLines());
-
-
+            setAxisGridLines(plot_area.getVerticalAxis(), chartSettings.getHorGridLines());
+            setAxisGridLines(plot_area.getHorizontalAxis(), chartSettings.getVertGridLines());
 
             var chart_type = plot_area.chart;
             //Data Labels

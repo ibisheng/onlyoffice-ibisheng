@@ -10963,6 +10963,20 @@ CPlotArea.prototype =
         return this.valAx;  //TODO
     },
 
+    getAxisByTypes: function()
+    {
+       //var  ret = {valAx:[], catAx: [], dateAx: []};
+       //for(var i = 0; i < this.axis.length; ++i)
+       //{
+       //    var axis = this.axis[i];
+       //
+       //    switch(this.axi)
+       //}
+       //this.valAx = null;
+       //this.catAx = null;
+       //this.dateAx = null;
+    },
+
     Undo: function(data)
     {
         switch (data.Type)
