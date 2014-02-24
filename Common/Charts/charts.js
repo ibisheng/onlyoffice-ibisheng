@@ -43,7 +43,8 @@ function ChartStyleManager() {
 	//-----------------------------------------------------------------------------------
 	
 	_this.init = function(options) {
-		
+
+		/** proprietary begin **/
 		_this.colorMap = [];		
 		var api_doc = window["editor"];
 		var api_sheet = window["Asc"]["editor"];
@@ -93,6 +94,7 @@ function ChartStyleManager() {
 		}
 		
 		bReady = true;
+		/** proprietary end **/
 	}
 	
 	_this.isReady = function() {
@@ -148,6 +150,7 @@ function ChartPreviewManager() {
 	
 	_this.init = function(options) {
 	
+		/** proprietary begin **/
 		var startTime = new Date();
 	
 		var api_doc = window["editor"];
@@ -481,6 +484,8 @@ function ChartPreviewManager() {
 			}
 		}
 		bReady = true;
+		
+		/** proprietary end **/
 		
 		//var endTime = new Date();
 		//console.log( "ChartPreviewManager init: " + (endTime.getTime() - startTime.getTime()) );
