@@ -598,7 +598,7 @@ DrawingContext.prototype = {
 	 */
 	initContextSmoothing: function () {
 		var ctx = this.ctx;
-		if (null === ctx)
+		if (!window.g_isMobileVersion || null === ctx)
 			return;
 
 		// Не убирать. Баг на android при scroll!!!
