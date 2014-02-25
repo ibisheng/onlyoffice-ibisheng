@@ -13,7 +13,7 @@
 
     this.Frame = null;
     this.Table = null;
-    this.AutoShapesTrack        = new Object();
+    this.AutoShapesTrack        = new CAutoshapeTrack();
     
     this.m_oWordControl = this;
 

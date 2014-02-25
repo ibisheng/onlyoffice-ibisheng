@@ -1,11 +1,11 @@
 ﻿function CAutoshapeTrack()
 {
-    this.IsTrack = true;
+    this.IsTrack            = true;
 
-    this.PageIndex = -1;
-    this.CurrentPageInfo = null;
+    this.PageIndex          = -1;
+    this.CurrentPageInfo    = null;
 
-    this.Native = window.native;
+    this.Native = CreateAutoShapesTrackControl();
 }
 
 CAutoshapeTrack.prototype =
@@ -19,7 +19,7 @@ CAutoshapeTrack.prototype =
         if (nPageIndex == this.PageIndex)
             return;
 
-        this.Native["AST_SetCurrentPage"]();
+        this.Native["DD_SetCurrentPage"](nPageIndex);
     },
 
     /*************************************************************************/
@@ -28,50 +28,65 @@ CAutoshapeTrack.prototype =
     DrawTrack : function(type, matrix, left, top, width, height, isLine, isCanRotate)
     {
         if (!matrix)
-            this.Native["AST_DrawTrackTransform"]();
+            this.Native["DD_DrawTrackTransform"]();
         else
-            this.Native["AST_DrawTrackTransform"](matrix.sx, matrix.shy, matrix.shx, matrix.sy, matrix.tx, matrix.ty);
+            this.Native["DD_DrawTrackTransform"](matrix.sx, matrix.shy, matrix.shx, matrix.sy, matrix.tx, matrix.ty);
 
-        this.Native["AST_DrawTrack"](type, matrix, left, top, width, height, isLine, isCanRotate);
+        this.Native["DD_DrawTrack"](type, matrix, left, top, width, height, isLine, isCanRotate);
     },
 
     DrawTrackSelectShapes : function(x, y, w, h)
     {
-        this.Native["AST_DrawTrackSelectShapes"](x, y, w, h);
+        this.Native["DD_DrawTrackSelectShapes"](x, y, w, h);
     },
 
     DrawAdjustment : function(matrix, x, y)
     {
         if (!matrix)
-            this.Native["AST_DrawTrackTransform"]();
+            this.Native["DD_DrawTrackTransform"]();
         else
-            this.Native["AST_DrawTrackTransform"](matrix.sx, matrix.shy, matrix.shx, matrix.sy, matrix.tx, matrix.ty);
+            this.Native["DD_DrawTrackTransform"](matrix.sx, matrix.shy, matrix.shx, matrix.sy, matrix.tx, matrix.ty);
 
-        this.Native["AST_DrawAdjustment"](x, y);
+        this.Native["DD_DrawAdjustment"](x, y);
     },
 
     DrawEditWrapPointsPolygon : function(points, matrix)
     {
-        // TODO:
+        if (!matrix)
+            this.Native["DD_DrawTrackTransform"]();
+        else
+            this.Native["DD_DrawTrackTransform"](matrix.sx, matrix.shy, matrix.shx, matrix.sy, matrix.tx, matrix.ty);
+
+        this.Native["DD_DrawEditWrapPointsPolygon"](points);
     },
 
     DrawEditWrapPointsTrackLines : function(points, matrix)
     {
-        // TODO:
+        if (!matrix)
+            this.Native["DD_DrawTrackTransform"]();
+        else
+            this.Native["DD_DrawTrackTransform"](matrix.sx, matrix.shy, matrix.shx, matrix.sy, matrix.tx, matrix.ty);
+
+        this.Native["DD_DrawEditWrapPointsTrackLines"](points);
     },
 
     DrawInlineMoveCursor : function(x, y, h, matrix)
     {
-        // TODO:
+        if (!matrix)
+            this.Native["DD_DrawTrackTransform"]();
+        else
+            this.Native["DD_DrawTrackTransform"](matrix.sx, matrix.shy, matrix.shx, matrix.sy, matrix.tx, matrix.ty);
+
+        this.Native["DD_DrawInlineMoveCursor"](x, y, h);
     },
 
     drawFlowAnchor : function(x, y)
     {
-        this.Native["AST_drawFlowAnchor"](x, y);
+        this.Native["DD_drawFlowAnchor"](x, y);
     },
 
     DrawPresentationComment : function(type, x, y, w, h)
     {
-        this.Native["AST_DrawPresentationComment"](type, x, y, w, h);
+        this.Native["DD_DrawPresentationComment"](type, x, y, w, h);
     }
 };

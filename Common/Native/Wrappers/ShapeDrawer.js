@@ -78,9 +78,14 @@ CShapeDrawer.prototype =
     fromShape : function(shape, graphics)
     {
         this.IsRectShape    = false;
-        this.Shape          = shape;		
+        this.Shape          = shape;
 
-        this.Graphics       = (graphics.IsSlideBoundsCheckerType !== undefined) ? graphics : window.native;
+        this.Graphics = window.native;
+        if (graphics.IsSlideBoundsCheckerType)
+            this.Graphics = graphics;
+        else if (graphics.IsTrack)
+            this.Graphics = graphics;
+
         this.UniFill        = shape.brush;
         this.Ln             = shape.pen;
         this.Transform      = shape.TransformMatrix;
