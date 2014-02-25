@@ -51,6 +51,7 @@ CChartSpace.prototype.setRecalculateInfo = function()
     };
     this.baseColors = [];
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
+    this.chartObj = null;
 };
 CChartSpace.prototype.recalcTransform = function()
 {
@@ -93,6 +94,7 @@ CChartSpace.prototype.handleUpdatePosition = function()
     this.recalcTransform();
     this.recalcBounds();
     this.recalcDLbls();
+    this.setRecalculateInfo();
     this.addToRecalculate();
 };
 CChartSpace.prototype.handleUpdateExtents = function()
@@ -100,16 +102,19 @@ CChartSpace.prototype.handleUpdateExtents = function()
     this.recalcChart();
     this.recalcBounds();
     this.recalcDLbls();
+    this.setRecalculateInfo();
     this.addToRecalculate();
 };
 CChartSpace.prototype.handleUpdateFlip = function()
 {
     this.recalcTransform();
+    this.setRecalculateInfo();
     this.addToRecalculate();
 };
 CChartSpace.prototype.handleUpdateChart = function()
 {
     this.recalcChart();
+    this.setRecalculateInfo();
     this.addToRecalculate();
 };
 CChartSpace.prototype.handleUpdateStyle = function()
@@ -148,7 +153,7 @@ CChartSpace.prototype.draw = function(graphics)
     graphics.SetIntegerGrid(false);
     graphics.transform3(this.transform, false);
 
-    this.chartObj.draw(this, graphics);
+    //this.chartObj.draw(this, graphics);
     graphics.reset();
     graphics.SetIntegerGrid(intGrid);
 
@@ -2265,6 +2270,8 @@ CChartSpace.prototype.recalculateAxis = function()
                 val_ax.labels = new CValAxisLabels(this);
                 var tick_lbl_skip = isRealNumber(cat_ax.tickLblSkip) ? cat_ax.tickLblSkip : 1;
                 //расчитаем вертикальную ось без учета горизонтальной
+                max_max_width = 0;
+                max_min_width = 0;
                 for(i = 0; i < pts_len; ++i)
                 {
                     var dlbl = null;
