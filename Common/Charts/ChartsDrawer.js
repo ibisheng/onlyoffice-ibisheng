@@ -2895,46 +2895,62 @@ drawAreaChart.prototype =
 		this._calculateLines(true);
 	},
 	
-	_calculateLines: function (/*isSkip*/)
-    {	
+	_calculateLines: function ()
+	{
 		//соответствует подписям оси категорий(OX)
 		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
 		//соответствует подписям оси значений(OY)
 		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
 		
-		var trueWidth = this.chartProp.trueWidth;
-		var trueHeight = this.chartProp.trueHeight;
-		
-		var min = yPoints[0].val;
-		var max = yPoints[yPoints.length - 1].val;
-			
-		var digHeight = Math.abs(max - min);
-
-		var koffY = trueHeight / digHeight;
-		
-		
-		var seria;
+		var y, y1, x, x1, val, nextVal, tempVal, seria, dataSeries;
 		for (var i = 0; i < this.chartProp.series.length; i++) {
+		
+			seria = this.chartProp.series[i];
 			
-			//в случае накопительных дигарамм, рисуем в обратном порядке
-			if(this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked")
-				seria = this.chartProp.series[this.chartProp.series.length - 1 - i];
-			else
-				seria = this.chartProp.series[i];
+			dataSeries = seria.val.numRef.numCache.pts;
 			
-			var dataSeries = seria.val.numRef.numCache.pts;
-			var y, y1, x, x1, val, nextVal, tempVal;
 			for(var n = 0; n < dataSeries.length - 1; n++)
 			{
 				//рассчитываем значения				
-				nextVal = this._getYVal(n, i) - min;
-				val = this._getYVal(n + 1, i) - min;
+				val = this._getYVal(n, i);
+				nextVal = this._getYVal(n + 1, i);
 				
-				y  = trueHeight - (nextVal)*koffY + this.chartProp.chartGutter._top;
-				y1 = trueHeight - (val)*koffY + this.chartProp.chartGutter._top;
+				//точки находятся внутри диапазона
+				if(val >= yPoints[0].val && val <= yPoints[yPoints.length - 1].val && nextVal >= yPoints[0].val && nextVal <= yPoints[yPoints.length - 1].val)
+				{
+					y  = this._getYPosition(val, yPoints);
+					y1 = this._getYPosition(nextVal, yPoints);
+					
+					x  = xPoints[n].pos; 
+					x1 = xPoints[n + 1].pos;
+				}
+				//первая точка выходит за пределы диапазона || вторая точка выходит за пределы диапазона
+				else if(( nextVal >= yPoints[0].val && nextVal <= yPoints[yPoints.length - 1].val ) || ( val >= yPoints[0].val && val <= yPoints[yPoints.length - 1].val ))
+				{
+					y  = this._getYPosition(val, yPoints);
+					y1 = this._getYPosition(nextVal, yPoints);
+					
+					if(val < yPoints[0].val)
+						yk = this._getYPosition(yPoints[0].val, yPoints);
+					else
+						yk = this._getYPosition(yPoints[yPoints.length - 1].val, yPoints);
+					
+					x  = xPoints[n].pos; 
+					x1 = xPoints[n + 1].pos; 
+					
+					//находим из двух точек уравнение, из третьей координаты y находим x
+					if(nextVal >= yPoints[0].val && nextVal <= yPoints[yPoints.length - 1].val)
+					{
+						x = (yk * (x - x1) + x1 * y + x1 * y1) / (y - y1);
+						y = yk;
+					}
+					else
+					{
+						x1 = (yk * (x - x1) + x1 * y + x1 * y1) / (y - y1);
+						y1 = yk;
+					}
+				}
 				
-				x  = xPoints[n].pos * this.chartProp.pxToMM; 
-				x1 = xPoints[n + 1].pos * this.chartProp.pxToMM;
 				
 				if(!this.paths.series)
 					this.paths.series = [];
@@ -2943,8 +2959,46 @@ drawAreaChart.prototype =
 				
 				this.paths.series[i][n] = this._calculateLine(x, y, x1, y1);
 			}
-        }
-    },
+		}
+	},
+	
+	_getYPosition: function(val, yPoints)
+	{
+		//позиция в заисимости от положения точек на оси OY
+		var result;
+		var resPos;
+		var resVal;
+		var diffVal;
+		if(val < yPoints[0].val)
+		{
+			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
+			resVal = yPoints[1].val - yPoints[0].val;
+			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
+			result = yPoints[0].pos - (diffVal / resVal) * resPos;
+		}
+		else if(val > yPoints[yPoints.length - 1].val)
+		{	
+			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
+			resVal = yPoints[1].val - yPoints[0].val;
+			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
+			result = yPoints[0].pos + (diffVal / resVal) * resPos;
+		}
+		else
+		{
+			for(var s = 0; s < yPoints.length; s++)
+			{
+				if(val >= yPoints[s].val && val <= yPoints[s + 1].val)
+				{
+					resPos = Math.abs(yPoints[s + 1].pos - yPoints[s].pos);
+					resVal = yPoints[s + 1].val - yPoints[s].val;
+					result =  - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+					break;
+				}
+			}
+		}
+		
+		return result;
+	},
 	
 	_calculateDLbl: function(chartSpace, ser, val)
 	{
@@ -3093,11 +3147,11 @@ drawAreaChart.prototype =
 		gdLst["h"] = 1;
 		
 		var pxToMm = this.chartProp.pxToMM;
-		path.moveTo(x / pxToMm * pathW, y / pxToMm * pathH);
-		path.lnTo(x1 / pxToMm * pathW, y1 / pxToMm * pathH);
-		path.lnTo(x1 / pxToMm * pathW, this.chartProp.nullPositionOX / pxToMm * pathH);
-		path.lnTo(x / pxToMm * pathW, this.chartProp.nullPositionOX / pxToMm * pathH);
-		path.lnTo(x / pxToMm * pathW, y / pxToMm * pathH);
+		path.moveTo(x * pathW, y * pathH);
+		path.lnTo(x1 * pathW, y1 * pathH);
+		path.lnTo(x1 * pathW, this.chartProp.nullPositionOX / pxToMm * pathH);
+		path.lnTo(x * pathW, this.chartProp.nullPositionOX / pxToMm * pathH);
+		path.lnTo(x * pathW, y * pathH);
 		path.recalculate(gdLst);
 		
 		return path;
