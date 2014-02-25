@@ -1791,7 +1791,6 @@ DrawingObjectsController.prototype =
     },
 
 
-
     onKeyDown: function(e)
     {
         return this.curState.onKeyDown(e);

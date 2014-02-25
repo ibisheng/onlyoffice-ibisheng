@@ -2392,11 +2392,11 @@ function CreateHBarChart(asc_chart, type)
     scaling.setOrientation(ORIENTATION_MIN_MAX);
     var num_fmt = val_ax.numFmt;
     var format_code;
-    if(type === GROUPING_PERCENT_STACKED)
+    /*if(type === GROUPING_PERCENT_STACKED)
     {
         format_code = "0%";
     }
-    else
+    else */
     {
         format_code = "General";
     }
@@ -2704,6 +2704,8 @@ function CreateScatterChart(asc_chart)
     scatter_chart.setVaryColors(false);
     plot_area.addAxis(new CValAx());
     plot_area.addAxis(new CValAx());
+    plot_area.catAx = plot_area.axis[0];
+    plot_area.valAx = plot_area.axis[1];
 
     var first_series = asc_series.length > 1 ? asc_series[0] : null;
     var start_index = asc_series.length > 1 ? 1 : 0;

@@ -1167,7 +1167,7 @@ CChartSpace.prototype.recalculateAxisValLabels = function()
                 var arr_strings = [];
                 var multiplier;
                 if(val_ax.dispUnits)
-                    multiplier = val_ax.dispUnits.getMultiplier;
+                    multiplier = val_ax.dispUnits.getMultiplier();
                 else
                     multiplier = 1;
                 var num_fmt = val_ax.numFmt;
@@ -1761,7 +1761,7 @@ CChartSpace.prototype.recalculateAxis = function()
                 var arr_strings = [];
                 var multiplier;
                 if(y_ax.dispUnits)
-                    multiplier = y_ax.dispUnits.getMultiplier;
+                    multiplier = y_ax.dispUnits.getMultiplier();
                 else
                     multiplier = 1;
                 var num_fmt = y_ax.numFmt;
@@ -1892,7 +1892,6 @@ CChartSpace.prototype.recalculateAxis = function()
                     x_ax.labels.arrLabels.push(dlbl);
                 }
 
-
                 y_ax.labels.y = rect.y;
                 y_ax.labels.extY = rect.h;
 
@@ -1931,8 +1930,6 @@ CChartSpace.prototype.recalculateAxis = function()
                     x_ax.xPoints.push({val: arr_x_val[i], pos: x_ax.labels.x + point_width*i})
                 }
 
-
-
                 y_ax.posX = y_ax.labels.x + y_ax.labels.extX;
                 x_ax.posY = x_ax.labels.y;
             }
@@ -1963,7 +1960,7 @@ CChartSpace.prototype.recalculateAxis = function()
                 var arr_strings = [];
                 var multiplier;
                 if(val_ax.dispUnits)
-                    multiplier = val_ax.dispUnits.getMultiplier;
+                    multiplier = val_ax.dispUnits.getMultiplier();
                 else
                     multiplier = 1;
                 var num_fmt = val_ax.numFmt;
@@ -1987,27 +1984,24 @@ CChartSpace.prototype.recalculateAxis = function()
                 }
 
                 //расчитаем подписи для вертикальной оси найдем ширину максимальной и возьмем её удвоенную за ширину подписей верт оси
+                val_ax.labels = new CValAxisLabels(this);
+                var max_width = 0;
+                val_ax.yPoints = [];
                 for(i = 0; i < arr_strings.length; ++i)
                 {
-                    val_ax.labels = new CValAxisLabels(this);
-                    var max_width = 0;
-                    val_ax.yPoints = [];
-                    for(i = 0; i < arr_strings.length; ++i)
-                    {
-                        var dlbl = new CDLbl();
-                        dlbl.parent = val_ax;
-                        dlbl.chart = this;
-                        dlbl.spPr = val_ax.spPr;
-                        dlbl.txPr = val_ax.txPr;
-                        dlbl.tx = new CChartText();
-                        dlbl.tx.rich = CreateTextBodyFromString(arr_strings[i], this.getDrawingDocument(), dlbl);
-                        dlbl.recalculate();
-                        if(dlbl.tx.rich.content.XLimit > max_width)
-                            max_width = dlbl.tx.rich.content.XLimit;
-                        val_ax.labels.arrLabels.push(dlbl);
-                        val_ax.yPoints.push({val: arr_val[i], pos: null});
+                    var dlbl = new CDLbl();
+                    dlbl.parent = val_ax;
+                    dlbl.chart = this;
+                    dlbl.spPr = val_ax.spPr;
+                    dlbl.txPr = val_ax.txPr;
+                    dlbl.tx = new CChartText();
+                    dlbl.tx.rich = CreateTextBodyFromString(arr_strings[i], this.getDrawingDocument(), dlbl);
+                    dlbl.recalculate();
+                    if(dlbl.tx.rich.content.XLimit > max_width)
+                        max_width = dlbl.tx.rich.content.XLimit;
+                    val_ax.labels.arrLabels.push(dlbl);
+                    val_ax.yPoints.push({val: arr_val[i], pos: null});
 
-                    }
                 }
                 for(i = 0; i < arr_strings.length; ++i)
                 {
@@ -2237,6 +2231,7 @@ CChartSpace.prototype.recalculateAxis = function()
                 var rect = {x: sizes.startX, y:sizes.startY, w:sizes.w, h: sizes.h};
                 //расчитаем подписи для вертикальной оси
                 var hor_gap = 4;//пока 4mm
+                var gap_hor_axis = 4;//пока 4 mm
                 var ser = chart_object.series[0];
                 var string_pts = [], pts_len = 0;
                 if(ser && ser.cat)
@@ -2266,6 +2261,206 @@ CChartSpace.prototype.recalculateAxis = function()
                         string_pts.push({val:i+1 + ""});
                     }
                 }
+                cat_ax.labels = new CValAxisLabels(this);
+                val_ax.labels = new CValAxisLabels(this);
+                var tick_lbl_skip = isRealNumber(cat_ax.tickLblSkip) ? cat_ax.tickLblSkip : 1;
+                //расчитаем вертикальную ось без учета горизонтальной
+                for(i = 0; i < pts_len; ++i)
+                {
+                    var dlbl = null;
+                    if(i%tick_lbl_skip === 0)
+                    {
+                        dlbl = new CDLbl();
+                        dlbl.parent = cat_ax;
+                        dlbl.chart = this;
+                        dlbl.spPr = cat_ax.spPr;
+                        dlbl.txPr = cat_ax.txPr;
+                        dlbl.tx = new CChartText();
+                        dlbl.tx.rich = CreateTextBodyFromString(string_pts[i].val, this.getDrawingDocument(), dlbl);
+                        dlbl.recalculate();
+                        var min_max =  dlbl.tx.rich.content.Recalculate_MinMaxContentWidth();
+                        var max_min_content_width = min_max.Min;
+                        if(max_min_content_width > max_min_width)
+                            max_min_width = max_min_content_width;
+                        if(min_max.Max > max_max_width)
+                            max_max_width = min_max.Max;
+                    }
+                    cat_ax.labels.arrLabels.push(dlbl);
+                }
+                var content_width;
+                if(max_max_width + hor_gap < rect.w/2 || !(max_min_content_width  + hor_gap < rect.w))//вроде бы у MS ширина вертикальной оси не может быть больше чем в 2 раз ширины рабочей области
+                {
+                    content_width = max_max_width;
+                }
+                else if(max_min_content_width  + hor_gap < rect.w)
+                {
+                    content_width = max_min_content_width;
+                }
+                for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
+                {
+                    cat_ax.labels.arrLabels[i].tx.rich.content.Reset(0, 0, content_width, 20000);
+                    cat_ax.labels.arrLabels[i].tx.rich.content.Recalculate_Page(0, true);
+                }
+                cat_ax.labels.extX = hor_gap + content_width;
+                cat_ax.labels.y = rect.y;
+                var crosses;
+                var arr_val =  this.getValAxisValues();
+                if(isRealNumber(cat_ax.crosses))
+                {
+                    switch(cat_ax.crosses)
+                    {
+                        case CROSSES_AUTO_ZERO:
+                        {
+                            if(arr_val[0] <= 0 && arr_val[arr_val.length-1] >= 0)
+                            {
+                                crosses = 0;
+                            }
+                            else if(arr_val[0] > 0)
+                            {
+                                crosses = arr_val[0];
+                            }
+                            else
+                            {
+                                crosses = arr_val[arr_val.length-1];
+                            }
+                            break;
+                        }
+                        case CROSSES_MIN:
+                        {
+                            crosses = arr_val[0];//ось пересекает категорию с индексом 0
+                            break;
+                        }
+                        case CROSSES_MAX:
+                        {
+                            crosses = arr_val[arr_val.length-1];
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    crosses = isRealNumber(cat_ax.crossesAt) ? cat_ax.crossesAt : arr_val[0];
+                }
+
+                var plot_area_width;
+                var crosses_width = rect.w*(crosses - arr_val[0])/(arr_val[arr_val.length - 1] - arr_val[0]);
+                if(crosses_width > cat_ax.labels.extX)
+                {
+                    cat_ax.labels.x = rect.x + crosses_width - cat_ax.labels.extX;
+                    plot_area_width = rect.w;
+                }
+                else
+                {
+                    cat_ax.labels.x = rect.x;
+                    plot_area_width = ((rect.w - cat_ax.labels.extX)*(arr_val[arr_val.length-1]-arr_val[0]))/(arr_val[arr_val.length-1] - crosses);
+                }
+                val_ax.labels.x = rect.x + rect.w - plot_area_width;
+
+                //Получим строки для оси значений с учетом формата и единиц
+                var arr_strings = [];
+                var multiplier;
+                if(val_ax.dispUnits)
+                    multiplier = val_ax.dispUnits.getMultiplier();
+                else
+                    multiplier = 1;
+                var num_fmt = val_ax.numFmt;
+                if(num_fmt && typeof num_fmt.formatCode === "string" /*&& !(num_fmt.formatCode === "General")*/)
+                {
+                    var num_format = oNumFormatCache.get(num_fmt.formatCode);
+                    for(i = 0; i < arr_val.length; ++i)
+                    {
+                        var calc_value = arr_val[i]*multiplier;
+                        var rich_value = num_format.format(calc_value, CellValueType.number, 15);
+                        arr_strings.push(rich_value[0].text);
+                    }
+                }
+                else
+                {
+                    for(i = 0; i < arr_val.length; ++i)
+                    {
+                        var calc_value = arr_val[i]*multiplier;
+                        arr_strings.push(calc_value + "");
+                    }
+                }
+                var max_width = 0;
+                val_ax.yPoints = [];
+                var max_height = 0;
+                for(i = 0; i < arr_strings.length; ++i)
+                {
+                    var dlbl = new CDLbl();
+                    dlbl.parent = val_ax;
+                    dlbl.chart = this;
+                    dlbl.spPr = val_ax.spPr;
+                    dlbl.txPr = val_ax.txPr;
+                    dlbl.tx = new CChartText();
+                    dlbl.tx.rich = CreateTextBodyFromString(arr_strings[i], this.getDrawingDocument(), dlbl);
+                    dlbl.recalculate();
+                    val_ax.labels.arrLabels.push(dlbl);
+                    val_ax.yPoints.push({val: arr_val[i], pos: null});
+                    var cur_height = dlbl.tx.rich.content.Get_SummaryHeight();
+                    if(cur_height > max_height)
+                    {
+                        max_height = cur_height;
+                    }
+                }
+                val_ax.labels.extY = max_height + gap_hor_axis;
+                var point_width = rect.h / string_pts.length;  //Ширина точки без учета высоты оси значений
+                var crosses;
+                if(isRealNumber(val_ax.crosses))
+                {
+                    switch (val_ax.crosses)
+                    {
+                        case CROSSES_AUTO_ZERO:
+                        case CROSSES_MIN:
+                        {
+                            crosses = 0;//ось пересекает категорию с индексом 0
+                            break;
+                        }
+                        case CROSSES_MAX:
+                        {
+                            crosses = string_pts.length - 1;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    crosses = isRealNumber(val_ax.crossesAt) ? val_ax.crossesAt - 1 : 0;
+                }
+                var plot_area_height;
+                var crosses_height = crosses*rect.h/string_pts.length;
+                if(crosses_height > val_ax.labels.extY)
+                {
+                    plot_area_height = rect.h;
+                    val_ax.labels.y = rect.y + rect.h - crosses_height;
+                }
+                else
+                {
+                    plot_area_height = ((rect.h - cat_ax.labels.extY)*(string_pts.length))/(string_pts.length - crosses);
+                    val_ax.labels.y =  rect.y + rect.h -  val_ax.labels.extY;
+                }
+                cat_ax.labels.extY = plot_area_height;
+                var point_height = plot_area_height/cat_ax.labels.arrLabels.length;
+                cat_ax.yPoints = [];
+                for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
+                {
+                    if(cat_ax.labels.arrLabels[i])
+                    {
+                        cat_ax.labels.arrLabels[i].setPosition(cat_ax.labels.x, (cat_ax.labels.arrLabels.length- i - 0.5)*point_height - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
+                    }
+                    cat_ax.yPoints.push({val: i, pos: (cat_ax.labels.arrLabels.length- i - 0.5)*point_height});
+                }
+
+                val_ax.labels.extX = plot_area_width;
+                val_ax.xPoints = [];
+                var hor_interval = val_ax.labels.extX/(arr_val.length-1);
+                for(i = 0;  i < val_ax.labels.arrLabels.length; ++i)
+                {
+                    val_ax.labels.arrLabels[i].setPosition(val_ax.labels.x + hor_interval*i - val_ax.labels.arrLabels[i].tx.rich.content.XLimit/2, val_ax.labels.y + gap_hor_axis);
+                    val_ax.xPoints.push({pos: val_ax.labels.x + hor_interval*i, val: arr_val[0]});
+                }
+                val_ax.posY = val_ax.labels.y;
+                cat_ax.posX = cat_ax.labels.x + cat_ax.labels.extX;
             }
         }
     }
