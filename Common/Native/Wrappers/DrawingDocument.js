@@ -467,7 +467,6 @@ CDrawingDocument.prototype =
         // проверки - внутри
         this.Native["DD_Overlay_DrawTableOutline"]();
 
-/*
         // drawShapes (+ track)
         if (this.LogicDocument.DrawingObjects)
         {
@@ -484,7 +483,6 @@ CDrawingDocument.prototype =
                 this.AutoShapesTrack.CorrectOverlayBounds();
             }
         }
-*/
 
         this.Native["DD_Overlay_DrawTableTrack"]();
         this.Native["DD_Overlay_DrawFrameTrack"]();
