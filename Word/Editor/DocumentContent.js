@@ -1588,7 +1588,7 @@ CDocumentContent.prototype =
         var bTableBorder = (null === this.Is_TableBorder(X, Y, PageNum_Abs) ? false : true);
 
         // Ничего не делаем
-        if ( this.Parent instanceof CHeaderFooter && true === this.LogicDocument.DrawingObjects.updateCursorType(PageNum_Abs, X, Y, MouseEvent, ( true === bInText || true === bTableBorder ? true : false )) )
+        if ( this.Parent instanceof CHeaderFooter && true === this.LogicDocument.DrawingObjects.updateCursorType(PageNum_Abs, X, Y, {}, ( true === bInText || true === bTableBorder ? true : false )) )
             return;
 
         var ContentPos = this.Internal_GetContentPosByXY( X, Y, PageNum);
