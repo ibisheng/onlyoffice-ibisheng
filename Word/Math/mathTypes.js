@@ -87,12 +87,20 @@ var ACCENT_ARROW_LR             = 28;
 var ACCENT_HALF_ARROW_LEFT      = 29;
 var ACCENT_HALF_ARROW_RIGHT     = 30;
 
-var SCR_ROMAN                   =  0;
+var TXT_NORMAL                  =  0;
+var TXT_ROMAN                   =  1;   // math roman
+var TXT_SCRIPT                  =  2;
+var TXT_FRAKTUR                 =  2;
+var TXT_DOUBLE_STRUCK           =  3;
+var TXT_SANS_SERIF              =  4;
+var TXT_MONOSPACE               =  5;
+
+/*var SCR_ROMAN                 =  0;
 var SCR_SCRIPT                  =  1;
 var SCR_FRAKTUR                 =  2;
 var SCR_DOUBLE_STRUCK           =  3;
 var SCR_SANS_SERIF              =  4;
-var SCR_MONOSPACE               =  5;
+var SCR_MONOSPACE               =  5;*/
 
 var OPER_DELIMITER              =  0;
 var OPER_SEPARATOR              =  1;

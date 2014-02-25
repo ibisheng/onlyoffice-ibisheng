@@ -56,7 +56,7 @@ function CMathText()
     this.value = null;
 
     this.bJDraw = false;
-    this.bMText  = false;
+    this.type  = TXT_ROMAN;
 
     //this.Parent = null;
 
@@ -94,14 +94,15 @@ CMathText.prototype =
     {
         var code = this.value;
 
-        if( this.bMText )
+        var bCapitale = (code > 0x0040 && code < 0x005B),
+            bSmall = (code > 0x0060 && code < 0x007b);
+
+        if(this.type == TXT_ROMAN )
         {
             if(code == 0x0068) // h
                 code = 0x210E;
 
-            var bCapitale = (code > 0x0040 && code < 0x005B),
-                bSmall = (code > 0x0060 && code < 0x007b),
-                bDigit = (code > 0x002F && code < 0x003A),
+            var bDigit = (code > 0x002F && code < 0x003A),
                 bCapGreek = (code > 0x0390 && code < 0x03AA ),
                 bSmallGreek = (code > 0x03B0 && code < 0x03CA);
 
@@ -119,28 +120,41 @@ CMathText.prototype =
             else if(code == 0x237) // "j" without dot
                 code = 0x1D6A5;
         }
-        /*else
-         {
-         if(code == 0x210E) // h
-         code = 0x0068;
-
-         var bCapitale = (code >= 0x1D434 && code <= 0x1D44D),
-         bSmall = (code >= 0x1D44E && code <= 0x1D467);
-
-         if(bCapitale)
-         code  = code - 0x1D3F3;
-         else if(bSmall)
-         code  = code - 0x1D3ED;
-         else if(bCapGreek)
-         code = code - 0x1D351;
-         else if(bSmallGreek)
-         code = code - 0x1D34B;
-
-         if(code == 0x1D6A4) // "i" without dot
-         code = 0x131;
-         else if(code == 0x1D6A5) // "j" without dot
-         code = 0x237;
-         }*/
+        else if(this.type == TXT_DOUBLE_STRUCK)
+        {
+            if(bCapitale)
+                code  = code + 0x1D4F8;
+            else if(bSmall)
+                code  = code + 0x1D4F2;
+        }
+        else if(this.type == TXT_MONOSPACE)
+        {
+            if(bCapitale)
+                code  = code + 0x1D630;
+            else if(bSmall)
+                code  = code + 0x1D62A;
+        }
+        else if(this.type == TXT_FRAKTUR)
+        {
+            if(bCapitale)
+                code  = code + 0x1D4C4;
+            else if(bSmall)
+                code  = code + 0x1D4BE;
+        }
+        else if(this.type == TXT_SANS_SERIF)
+        {
+            if(bCapitale)
+                code  = code + 0x1D5CB;
+            else if(bSmall)
+                code  = code + 0x1D5C5;
+        }
+        else if(this.type == TXT_SCRIPT)
+        {
+            if(bCapitale)
+                code  = code + 0x1D45C;
+            else if(bSmall)
+                code  = code + 0x1D456;
+        }
 
         return code;
     },
@@ -395,9 +409,9 @@ CMathText.prototype =
     {
         this.bJDraw = bJustDraw;
     },
-    setMText: function(flag)
+    setMText: function(type)
     {
-        this.bMText = flag;
+        this.type = type;
     },
     // заглушка для текста (для n-арных операторов, когда выставляется текст вместо оператора)
     setComposition: function() // заглушка

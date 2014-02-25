@@ -118,13 +118,11 @@ CMathRunPrp.prototype =
     getMergedWPrp: function()
     {
         var oWPrp = new CTextPr();
-        var mPrp = new CTextPr();
-        mPrp.italic = this.mathPrp.italic;
-        mPrp.bold = this.mathPrp.bold;
 
-        // смержить c MRunPrp
-        if(!this.mathPrp.nor)
+        if(!this.mathPrp.nor) // math text, style: plain
         {
+            var mPrp = this.mathPrp.getTxtPrp();
+
             oWPrp.Merge(this.textPrp); // FontFamily, FontSize etc
             oWPrp.Merge(mPrp); // bold, italic
         }
@@ -145,7 +143,7 @@ CMathRunPrp.prototype =
     },
     setMathRunPrp: function(oMPrp)
     {
-        this.mathPrp.Merge(oMPrp);
+        this.mathPrp.setMathProps(oMPrp);
     },
     draw: function() {},
     setPosition: function() {},
@@ -158,60 +156,38 @@ CMathRunPrp.prototype =
         props.mathRunPrp = this.mathPrp.getPropsForWrite();
 
         return props;
+    },
+    getTypeText: function()
+    {
+        return this.mathPrp.getTypeText();
     }
 }
 
 function CMPrp()
 {
-    this.aln    = false;
-    this.brk    = false;
-    this.lit    = false;
-    this.nor    = false;        // если normal = false, то берем TextPrp отсюда (в wRunPrp bold/italic не учитываем, выставляем отсюда)
+    this.aln      = false;
+    this.brk      = false;
+    this.lit      = false;
+    this.nor      = false;       // если normal = false, то берем TextPrp отсюда (в wRunPrp bold/italic не учитываем, выставляем отсюда)
                                 // если normal = true, то их Word не учитывает и берет TextPr из wRunPrp
-    this.scr    = SCR_ROMAN;
-    this.italic = true;
-    this.bold   = false;
-    this.plain  = false;     // plain тоже самое, что и normal, только нельзя поставить другой шрифт, другой размер шрифта и тп
+    this.typeText = TXT_ROMAN;
+    this.italic   = true;
+    this.bold     = false;
+    this.plain    = false;
 
 }
 CMPrp.prototype =
 {
     Merge:  function(mPrp)
     {
-        this.SetBProp(this.aln, mPrp.aln);
-        this.SetBProp(this.brk, mPrp.brk);
-        this.SetBProp(this.lit, mPrp.lit);
-        this.SetBProp(this.nor, mPrp.nor);
-
-        // если приходит несколько параметров style из xml, то запоминается последний
-        if(mPrp.sty === "i")
-            this.italic = true;
-        else if(mPrp.sty === "bi")
-        {
-            this.italic = true;
-            this.bold = true;
-        }
-        else if(mPrp.sty === "b")
-        {
-            this.italic = false;
-            this.bold = true;
-        }
-        else if(mPrp.sty === "p")
-        {
-            this.plain = true;
-        }
-
-        if(mPrp.scr === "double-struck")
-            this.scr = SCR_DOUBLE_STRUCK;
-        else if(mPrp.scr === "monospace")
-            this.scr = SCR_MONOSPACE;
-        else if(mPrp.scr === "fraktur")
-            this.scr = SCR_FRAKTUR;
-        else if(mPrp.scr === "sans-serif")
-            this.scr = SCR_SANS_SERIF;
-        else if(mPrp.scr === "script")
-            this.scr = SCR_SCRIPT;
-
+        this.aln      = mPrp.aln;
+        this.brk      = mPrp.brk;
+        this.lit      = mPrp.lit;
+        this.nor      = mPrp.nor;
+        this.typeText = mPrp.typeText;
+        this.italic   = mPrp.italic;
+        this.bold     = mPrp.bold;
+        this.plain    = mPrp.plain;
     },
     SetBProp:    function(obj, prp)
     {
@@ -227,11 +203,11 @@ CMPrp.prototype =
             align:      this.aln,
             brk:        this.brk,
             literal:    this.lit,
-            normal:     this.nor,
             script:     this.src,
             italic:     this.italic,
             bold:       this.bold,
-            plain:      this.plain
+            plain:      this.plain,
+            typeText:   this.typeText
         };
 
         return props;
@@ -245,7 +221,7 @@ CMPrp.prototype =
             Bold       = this.bold && !this.italic,
             Plain      = this.plain;
 
-        if(this.nor)
+        if(this.typeText == TXT_NORMAL)
         {
             props.nor = 1;
         }
@@ -259,7 +235,6 @@ CMPrp.prototype =
                 props.sty = "i";
             else if(Plain)
                 props.sty = "p";
-
         }
 
         if(this.aln)
@@ -272,25 +247,86 @@ CMPrp.prototype =
             props.lit = 1;
 
 
-        if( this.scr === SCR_DOUBLE_STRUCK)
+        if(this.typeText === TXT_DOUBLE_STRUCK)
             props.scr = "double-struck";
-        else if(this.scr === SCR_MONOSPACE)
+        else if(this.typeText === TXT_MONOSPACE)
             props.scr = "monospace";
-        else if(this.scr === SCR_FRAKTUR)
+        else if(this.typeText === TXT_FRAKTUR)
             props.scr = "fraktur";
-        else if(this.scr === SCR_SANS_SERIF)
+        else if(this.typeText === TXT_SANS_SERIF)
             props.scr = "sans-serif";
-        else if(this.scr === SCR_SCRIPT)
+        else if(this.typeText === TXT_SCRIPT)
             props.scr = "script";
-        
 
         return props;
+    },
+    setMathProps: function(props)
+    {
+        this.SetBProp(this.aln, props.aln);
+        this.SetBProp(this.brk, props.brk);
+        this.SetBProp(this.lit, props.lit);
+        //this.SetBProp(this.nor, props.nor);
+
+        // если приходит несколько параметров style из xml, то запоминается последний
+        if(props.sty === "i")
+            this.italic = true;
+        else if(props.sty === "bi")
+        {
+            this.italic = true;
+            this.bold = true;
+        }
+        else if(props.sty === "b")
+        {
+            this.italic = false;
+            this.bold = true;
+        }
+        else if(props.sty === "p")
+        {
+            // plain text ?!
+            this.plain = true;
+        }
+
+        if(props.scr === "double-struck")    // U+1D538 - U+1D56B
+            this.typeText = TXT_DOUBLE_STRUCK;
+        else if(props.scr === "monospace")   // U+1D670 - U+1D6A3
+            this.typeText = TXT_MONOSPACE;
+        else if(props.scr === "fraktur")     // U+1D504 - U+1D537
+            this.typeText = TXT_FRAKTUR;
+        else if(props.scr === "sans-serif")  // U+1D608 - U+1D63B
+            this.typeText = TXT_SANS_SERIF;
+        else if(props.scr === "script")      // U+1D49C - U+1D4CF
+            this.typeText = TXT_SCRIPT;
+
+        if(props.nor)
+            this.typeText = TXT_NORMAL;
+
+    },
+    getTypeText: function()
+    {
+        var type= this.typeText;
+
+        if(type == TXT_ROMAN && this.italic == false) // если MATH TEXT и не курсив, то подменяем на NORMAL TEXT
+            type = TXT_NORMAL;
+
+        return type;
+    },
+    getTxtPrp: function()
+    {
+        var textPrp = new CTextPr();
+
+        textPrp.italic = this.mathPrp.italic;
+        textPrp.bold = this.mathPrp.bold;
+
+        if(this.typeText == TXT_ROMAN)
+            textPrp.Italic = false;
+
+        return textPrp;
     }
 }
 
 
 //TODO
-// доделать GroupCharacter / Delimiter в качестве cheracter может быть любой символ
+// доделать GroupCharacter / Delimiter в качестве character может быть любой символ
 
 //TODO
 //переделать/продумать DotIndef, т.к. при перетаскивании из одного места в другое флаг DotIndef может измениться для другого контента
@@ -4695,7 +4731,7 @@ CMathContent.prototype =
     },
     Resize: function(oMeasure)      // пересчитываем всю формулу
     {
-        var bItalic = true;
+        var typeTxt = TXT_ROMAN; // default MATH Text
         //var posPrev  = -1;
 
         for(var i = 0; i < this.content.length; i++)
@@ -4704,19 +4740,16 @@ CMathContent.prototype =
 
             if(type == MATH_TEXT)
             {
-                this.content[i].value.setMText(bItalic);
+                this.content[i].value.setMText(typeTxt);
                 this.content[i].value.Resize(oMeasure);
 
                 this.checkGapsSign(oMeasure, i);
-
-                //posPrev = i;
             }
             else if(type == MATH_COMP)
             {
                 this.content[i].value.Resize(oMeasure);
 
                 this.checkGapsSign(oMeasure, i);
-                //posPrev = i;
             }
             else if(type == MATH_RUN_PRP)
             {
@@ -4724,13 +4757,13 @@ CMathContent.prototype =
                 var oWPrp = new CTextPr();
                 oWPrp.Merge(mergedWPrp);
 
-                /*var txtPrp = new CMathTextPrp();
-                txtPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
-                txtPrp.Merge(runPrp);*/
+                this.applyArgSize(oWPrp); // здесь мержим с DEFAULT_RUN_PRP
 
-                this.applyArgSize(oWPrp);
-                bItalic = oWPrp.Italic;
-                oWPrp.Italic = false;
+                typeTxt = oWPrp.getTypeText();
+
+                /*if(typeTxt == TXT_ROMAN) // MATH TEXT, наклон не меняем, если italic
+                    oWPrp.Italic = false;*/
+
 
                 oMeasure.SetFont(oWPrp);
             }
@@ -5240,15 +5273,12 @@ CMathContent.prototype =
                 if(this.content[i].value.typeObj == MATH_RUN_PRP)
                 {
                     pGraphics.b_color1(0,0,0,255);
-                    /*var rPrp = new CMathTextPrp();
-                    rPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
-                    rPrp.Merge( this.content[i].value.getWRunPrp() );*/
                     var mgWPrp = this.content[i].value.getMergedWPrp();
                     var oWPrp = new CTextPr();
                     oWPrp.Merge(mgWPrp);
 
                     this.applyArgSize(oWPrp);
-                    oWPrp.Italic = false;
+
                     pGraphics.SetFont(oWPrp);
                 }
                 else if(this.content[i].value.typeObj == MATH_PLACEHOLDER)
