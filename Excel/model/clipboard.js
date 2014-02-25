@@ -2982,11 +2982,11 @@
                                 Drawing.setAscChart(new asc_CChart());
 								break;
 							}
-							default :
+							/*default :
 							{
 								Drawing = CreateImageFromBinary(src);
 								break;
-							}
+							}*/
 						}
 						if(positionX && positionY && ws.objectRender)
 							Drawing.readFromBinaryForCopyPaste(reader,null, ws.objectRender,ws.objectRender.convertMetric(positionX,1,3),ws.objectRender.convertMetric(positionY,1,3));
