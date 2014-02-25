@@ -1001,12 +1001,19 @@ CChartsDrawer.prototype =
 				top += chartSpace.chart.plotArea.catAx.title.extY;
 			else if(this.calcProp.type == "HBar" && chartSpace.chart.plotArea.valAx.title != null)
 				top += chartSpace.chart.plotArea.valAx.title.extY;
+				
+			if(chartSpace.chart.title !== null && !chartSpace.chart.title.overlay)
+				top += chartSpace.chart.title.extY;
 		}
 		else
+		{
 			top += standartMargin;
+			if(chartSpace.chart.title !== null && !chartSpace.chart.title.overlay)
+				top += chartSpace.chart.title.extY + standartMargin / 2;
+		}
+			
 		
-		if(chartSpace.chart.title !== null && !chartSpace.chart.title.overlay)
-			top += chartSpace.chart.title.extY;
+		
 		
 		//KEY
 		
