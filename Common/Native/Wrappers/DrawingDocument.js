@@ -27,6 +27,8 @@
     this.IsKeyDownButNoPress    = false;
     this.bIsUseKeyPress         = false;
     
+    this.m_sLockedCursorType    = "";
+    
     this.AutoShapesTrackLockPageNum = -1;
 }
 
@@ -53,8 +55,10 @@ CDrawingDocument.prototype =
     // cursor types
     SetCursorType : function(sType, Data)
     {
-        this.m_sLockedCursorType = sType;
-        this.Native["DD_SetCursorType"](sType, Data);
+        if ("" == this.m_sLockedCursorType)
+            this.Native["DD_SetCursorType"](sType, Data);
+        else
+            this.Native["DD_SetCursorType"](this.m_sLockedCursorType, Data);
     },
     LockCursorType : function(sType)
     {
@@ -703,6 +707,8 @@ function check_MouseDownEvent(e, isClicks)
     {
         global_mouseEvent.ClickCount     = 1;
     }
+    
+    global_mouseEvent.IsLocked = true;
 }
 
 function check_MouseMoveEvent(e)
@@ -731,5 +737,7 @@ function check_MouseUpEvent(e)
     global_mouseEvent.Button    = e.Button;
 
     global_mouseEvent.Sender    = null;
+    
+    global_mouseEvent.IsLocked  = false;
 }
 
