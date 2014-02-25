@@ -905,30 +905,116 @@ CChartsDrawer.prototype =
 			this.calcProp.pxToMM = 1 / chartSpace.convertPixToMM(1);
 		
 		var pxToMM = this.calcProp.pxToMM;
-		var standartMargin = 13;
+		var standartMargin = 13 / pxToMM;
 		
-		//left margin = vertical axis(if min x == 0) + vertical title + width of legend;
-		this.calcProp.chartGutter._left = standartMargin;
-		if(chartSpace.chart.plotArea.valAx.title != null)
-			this.calcProp.chartGutter._left += chartSpace.chart.plotArea.valAx.title.extX * pxToMM;
+		
+		var left = 0, right = 0, top = 0, bottom = 0, hbarbottom;
+		//cat / val
+		if(chartSpace.chart.plotArea.catAx.labels && !chartSpace.chart.plotArea.catAx.bDelete)
+		{
+			if(!chartSpace.chart.plotArea.catAx.tickLblPos || chartSpace.chart.plotArea.catAx.tickLblPos == TICK_LABEL_POSITION_LOW || chartSpace.chart.plotArea.catAx.tickLblPos == TICK_LABEL_POSITION_NEXT_TO)
+			{
+				bottom = ( chartSpace.chart.plotArea.catAx.labels.y + chartSpace.chart.plotArea.catAx.labels.extY ) - chartSpace.chart.plotArea.catAx.posY;
+			}
+			else if(chartSpace.chart.plotArea.catAx.tickLblPos == TICK_LABEL_POSITION_HIGH)
+			{
+				top = ( chartSpace.chart.plotArea.catAx.labels.y + chartSpace.chart.plotArea.catAx.labels.extY ) - chartSpace.chart.plotArea.catAx.posY;
+			}	
+		}
+		
+		
+		if(chartSpace.chart.plotArea.valAx.labels && !chartSpace.chart.plotArea.valAx.bDelete)
+		{
+			if(chartSpace.chart.plotArea.valAx.tickLblPos == TICK_LABEL_POSITION_LOW || chartSpace.chart.plotArea.valAx.tickLblPos == TICK_LABEL_POSITION_NEXT_TO)
+			{
+				left = chartSpace.chart.plotArea.valAx.labels.extX;
+			}
+			else if(chartSpace.chart.plotArea.catAx.tickLblPos == TICK_LABEL_POSITION_HIGH)
+			{
+				right = ( chartSpace.chart.plotArea.catAx.labels.y + chartSpace.chart.plotArea.catAx.labels.extY ) - chartSpace.chart.plotArea.catAx.posY;
+			}	
+		}
+
+		
+		if(this.calcProp.type == "HBar")	
+		{
+			hbarbottom = left;
+			left = bottom;
+			right = top;
+			top = right;
+			bottom = left;
+		}
+		
+		
+		
+		//****left*****
+		if(left || !right)
+		{
+			if(chartSpace.chart.plotArea.valAx.title != null && this.calcProp.type != "HBar")
+				left += chartSpace.chart.plotArea.valAx.title.extX + standartMargin;
+			else if(this.calcProp.type == "HBar" && chartSpace.chart.plotArea.catAx.title != null)
+				left += chartSpace.chart.plotArea.catAx.title.extX + standartMargin;
+			else
+				left += standartMargin / 2;
+		}
+		else
+			left += standartMargin;
 			
-		if(!chartSpace.chart.plotArea.valAx.bDelete && chartSpace.chart.plotArea.valAx.labels)
-			this.calcProp.chartGutter._left += chartSpace.chart.plotArea.valAx.labels.extX * pxToMM;
+		//KEY
 		
-		//right margin = legend;
-		this.calcProp.chartGutter._right = standartMargin;
 		
-		//top margin = legend + title;
-		this.calcProp.chartGutter._top = standartMargin;
+		//****right*****
+		if(right)
+		{
+			right += standartMargin / 2;
+			if(chartSpace.chart.plotArea.valAx.title != null && this.calcProp.type != "HBar")
+				right += chartSpace.chart.plotArea.valAx.title.extX;
+			else if(this.calcProp.type == "HBar" && chartSpace.chart.plotArea.catAx.title != null)
+				right += chartSpace.chart.plotArea.catAx.title.extX;
+		}
+		else
+			right += standartMargin;
+		
+		//KEY
+		
+		//****bottom*****
+		if(bottom || !top)
+		{
+			if(chartSpace.chart.plotArea.catAx.title != null && this.calcProp.type != "HBar")
+				bottom += chartSpace.chart.plotArea.catAx.title.extY + standartMargin;
+			else if(this.calcProp.type == "HBar" && chartSpace.chart.plotArea.valAx.title != null)
+				bottom += chartSpace.chart.plotArea.valAx.title.extY + standartMargin;
+			else
+				bottom += standartMargin / 2;
+		}
+		else
+			bottom += standartMargin;
+			
+		//KEY
+		
+		
+		//****top*****
+		if(top)
+		{
+			top += standartMargin / 2;
+			if(chartSpace.chart.plotArea.catAx.title != null && this.calcProp.type != "HBar")
+				top += chartSpace.chart.plotArea.catAx.title.extY;
+			else if(this.calcProp.type == "HBar" && chartSpace.chart.plotArea.valAx.title != null)
+				top += chartSpace.chart.plotArea.valAx.title.extY;
+		}
+		else
+			top += standartMargin;
+		
 		if(chartSpace.chart.title !== null && !chartSpace.chart.title.overlay)
-			this.calcProp.chartGutter._top = 7 + chartSpace.chart.title.extY * pxToMM + standartMargin;
+			top += chartSpace.chart.title.extY;
 		
-		//bottom margin = legend + horizontal title +  horizontal axis(if min y == 0);
-		this.calcProp.chartGutter._bottom = standartMargin;
-		if(chartSpace.chart.plotArea.catAx.title != null)
-			this.calcProp.chartGutter._bottom += chartSpace.chart.plotArea.catAx.title.extY * pxToMM;
-		if(!chartSpace.chart.plotArea.catAx.bDelete && chartSpace.chart.plotArea.catAx.labels)
-			this.calcProp.chartGutter._bottom += chartSpace.chart.plotArea.catAx.labels.extY * pxToMM;
+		//KEY
+		
+		this.calcProp.chartGutter._left = left * pxToMM;
+		this.calcProp.chartGutter._right = right * pxToMM;
+		this.calcProp.chartGutter._top = top * pxToMM;
+		this.calcProp.chartGutter._bottom = bottom * pxToMM;
+	
 	},
 	
 	_getNullPosition: function()
