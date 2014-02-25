@@ -153,7 +153,7 @@ CChartSpace.prototype.draw = function(graphics)
     graphics.SetIntegerGrid(false);
     graphics.transform3(this.transform, false);
 
-    //this.chartObj.draw(this, graphics);
+    this.chartObj.draw(this, graphics);
     graphics.reset();
     graphics.SetIntegerGrid(intGrid);
 
