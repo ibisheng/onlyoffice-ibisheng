@@ -4406,8 +4406,7 @@
 			var c = row !== undefined ? this._getCell(col, row) : col;
 			if (undefined === c)
 				return true;
-			var fl = this._getCellFlags(c);
-			if (fl.isMerged)
+			if (null !== c.hasMerged())
 				return false;
 			return c.getValue().search(/[^ ]/) < 0;
 		};
@@ -4416,8 +4415,7 @@
 			var c = row !== undefined ? this._getCell(col, row) : col;
 			if (undefined === c)
 				return true;
-			var fl = this._getCellFlags(c);
-			if (fl.isMerged)
+			if (null !== c.hasMerged())
 				return false;
 			var bg = c.getFill();
 			if (null !== bg)
