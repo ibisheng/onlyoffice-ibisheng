@@ -5,7 +5,7 @@
     this.PageIndex          = -1;
     this.CurrentPageInfo    = null;
 
-    this.Native = CreateAutoShapesTrackControl();
+    this.Native = window.native["CreateAutoShapesTrackControl"]();
 }
 
 CAutoshapeTrack.prototype =
