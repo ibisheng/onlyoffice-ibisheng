@@ -202,9 +202,10 @@ CChartsDrawer.prototype =
 		
 		
 		//count line of chart grid
-		if(chartProp.chart.plotArea.valAx.yPoints && chartProp.chart.plotArea.catAx.xPoints)
+		if((chartProp.chart.plotArea.valAx.yPoints && chartProp.chart.plotArea.catAx.xPoints) || (chartProp.chart.plotArea.catAx.yPoints && chartProp.chart.plotArea.valAx.xPoints))
 		{	
-			this.calcProp.numhlines = chartProp.chart.plotArea.valAx.yPoints.length - 1;
+			if(chartProp.chart.plotArea.valAx.yPoints)
+				this.calcProp.numhlines = chartProp.chart.plotArea.valAx.yPoints.length - 1;
 			if(this.calcProp.type == "Bar")
 			{
 				this.calcProp.numvlines = chartProp.chart.plotArea.catAx.xPoints.length;
@@ -214,8 +215,8 @@ CChartsDrawer.prototype =
 			}
 			else if(this.calcProp.type == "HBar")
 			{
-				this.calcProp.numhlines = chartProp.chart.plotArea.catAx.xPoints.length;
-				this.calcProp.numvlines = chartProp.chart.plotArea.valAx.yPoints.length;
+				this.calcProp.numhlines = chartProp.chart.plotArea.catAx.yPoints.length;
+				this.calcProp.numvlines = chartProp.chart.plotArea.valAx.xPoints.length - 1;
 				
 				this.calcProp.numhMinorlines = 2;
 				this.calcProp.numvMinorlines = 5;
@@ -914,11 +915,17 @@ CChartsDrawer.prototype =
 		{
 			if(!chartSpace.chart.plotArea.catAx.tickLblPos || chartSpace.chart.plotArea.catAx.tickLblPos == TICK_LABEL_POSITION_LOW || chartSpace.chart.plotArea.catAx.tickLblPos == TICK_LABEL_POSITION_NEXT_TO)
 			{
-				bottom = ( chartSpace.chart.plotArea.catAx.labels.y + chartSpace.chart.plotArea.catAx.labels.extY ) - chartSpace.chart.plotArea.catAx.posY;
+				if(this.calcProp.type == "HBar" && chartSpace.chart.plotArea.valAx.xPoints[0].pos > chartSpace.chart.plotArea.catAx.labels.extX)
+					left = chartSpace.chart.plotArea.catAx.labels.extX;
+				else
+					bottom = ( chartSpace.chart.plotArea.catAx.labels.y + chartSpace.chart.plotArea.catAx.labels.extY ) - chartSpace.chart.plotArea.catAx.posY;
 			}
 			else if(chartSpace.chart.plotArea.catAx.tickLblPos == TICK_LABEL_POSITION_HIGH)
 			{
-				top = ( chartSpace.chart.plotArea.catAx.labels.y + chartSpace.chart.plotArea.catAx.labels.extY ) - chartSpace.chart.plotArea.catAx.posY;
+				if(this.calcProp.type == "HBar")
+					right = ( chartSpace.chart.plotArea.catAx.labels.x + chartSpace.chart.plotArea.catAx.labels.extX ) - chartSpace.chart.plotArea.catAx.posX;
+				else
+					top = ( chartSpace.chart.plotArea.catAx.labels.y + chartSpace.chart.plotArea.catAx.labels.extY ) - chartSpace.chart.plotArea.catAx.posY;
 			}	
 		}
 		
@@ -927,23 +934,20 @@ CChartsDrawer.prototype =
 		{
 			if(chartSpace.chart.plotArea.valAx.tickLblPos == TICK_LABEL_POSITION_LOW || chartSpace.chart.plotArea.valAx.tickLblPos == TICK_LABEL_POSITION_NEXT_TO)
 			{
-				left = chartSpace.chart.plotArea.valAx.labels.extX;
+				if(this.calcProp.type == "HBar")
+					bottom = ( chartSpace.chart.plotArea.valAx.labels.y + chartSpace.chart.plotArea.valAx.labels.extY ) - chartSpace.chart.plotArea.valAx.posY;
+				else
+					left = chartSpace.chart.plotArea.valAx.labels.extX;
 			}
 			else if(chartSpace.chart.plotArea.catAx.tickLblPos == TICK_LABEL_POSITION_HIGH)
 			{
-				right = ( chartSpace.chart.plotArea.catAx.labels.y + chartSpace.chart.plotArea.catAx.labels.extY ) - chartSpace.chart.plotArea.catAx.posY;
+				if(this.calcProp.type == "HBar")
+					top = ( chartSpace.chart.plotArea.valAx.labels.y + chartSpace.chart.plotArea.valAx.labels.extY ) - chartSpace.chart.plotArea.valAx.posY;
+				else
+					right = ( chartSpace.chart.plotArea.catAx.labels.y + chartSpace.chart.plotArea.catAx.labels.extY ) - chartSpace.chart.plotArea.catAx.posY;
 			}	
 		}
 
-		
-		if(this.calcProp.type == "HBar")	
-		{
-			hbarbottom = left;
-			left = bottom;
-			right = top;
-			top = right;
-			bottom = left;
-		}
 		
 		
 		
@@ -3200,114 +3204,156 @@ drawHBarChart.prototype =
 		this._drawBars();
 	},
 	
-	_recalculateBars: function ()
+	_recalculateBars: function (/*isSkip*/)
     {
-        var trueWidth = this.chartProp.trueWidth;
-		var trueHeight = this.chartProp.trueHeight;
+        //соответствует подписям оси категорий(OX)
+		var xPoints = this.cShapeDrawer.chart.plotArea.valAx.xPoints;
+		//соответствует подписям оси значений(OY)
+		var yPoints = this.cShapeDrawer.chart.plotArea.catAx.yPoints;
 		
+		var xaxispos      = this.chartProp.xaxispos;
+		var heightGraph    = this.chartProp.heightCanvas - this.chartProp.chartGutter._top - this.chartProp.chartGutter._bottom;
+		
+		//TODO - передавать overlap из меню!
 		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 100 : 0;
 		var overlap        = this.cShapeDrawer.chart.plotArea.chart.overlap ? this.cShapeDrawer.chart.plotArea.chart.overlap : defaultOverlap;
+        var height          = heightGraph / this.chartProp.series[0].val.numRef.numCache.pts.length;
 		
-		var tempMax = this.chartProp.xmax;
-		var tempMin = this.chartProp.xmin;
-		var height  = trueHeight / this.chartProp.data.length;
 		
-		var barHeight, width, vmargin, seria, heightOverLap, summBarVal;
-		var seriesHeight = [];
+		var individualBarHeight = height / (this.chartProp.series.length - (this.chartProp.series.length - 1) * (overlap / 100) + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
+		var widthOverLap = individualBarHeight * (overlap / 100);
+		var hmargin = (this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100 * individualBarHeight) / 2;
+		
+		var width, startX, startY, diffYVal, val, paths, seriesHeight = [], seria, startXColumnPosition, startYPosition;
+		
 		for (var i = 0; i < this.chartProp.series.length; i++) {
-			summBarVal = [];
+		
+			seria = this.chartProp.series[i].val.numRef.numCache.pts;
 			seriesHeight[i] = [];
 			
-			
-			barHeight = height / (this.chartProp.series.length - (this.chartProp.series.length - 1) * (overlap / 100) + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
-			heightOverLap = barHeight * (overlap / 100);
-			
-			vmargin = (this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100 * barHeight) / 2;
-			seria = this.chartProp.series[i].val.numRef.numCache.pts;
-			
 			for (var j = 0; j < seria.length; j++) {
-				var val = parseFloat(seria[j].val);
 				
-				if(this.chartProp.subType == "stackedPer")
-				{
-					var tempVal;
-					var temp = 0;
-					if(!summBarVal[j])
-					{
-						for(var k = 0; k < this.chartProp.series.length; k++)
-						{
-							tempVal = parseFloat(this.chartProp.series[k].val.numRef.numCache.pts[j].val);
-							if(tempVal)
-								temp += Math.abs(tempVal);
-						}
-						summBarVal[j] = temp;
-					}
-					
-					val = val*100/summBarVal[j];
-				}
-				
-				if(tempMin < 0 && tempMax > 0)
-					width = (val) / (tempMax - tempMin) * (trueWidth);
-				else if(tempMin < 0 && tempMax < 0)
-					width = ((val - tempMin) / (tempMax - tempMin)) * (trueWidth);
-				else if(tempMin < 0 && tempMax == 0)
-					width = trueWidth - ((val - tempMin) / (tempMax - tempMin)) * (trueWidth);
-				else
-					width = ((val < 0 ? (val + tempMin): val - tempMin) / (tempMax - tempMin)) * (trueWidth);
-			
+				//стартовая позиция колонки Y(+ высота с учётом поправок на накопительные диаграммы)
+				val = parseFloat(seria[j].val);
+				startXColumnPosition = this._getStartYColumnPosition(seriesHeight, j, val, xPoints);
+				startX = startXColumnPosition.startY / this.chartProp.pxToMM;
+				width = startXColumnPosition.width / this.chartProp.pxToMM;
 
-				var startX;
-				var startY;
-				var diffYVal = 0;
+				seriesHeight[i][j] = width;
 				
+				//стартовая позиция колонки Y
+				if(j != 0)
+					startYPosition = yPoints[j].pos - (yPoints[j].pos - yPoints[j - 1].pos) / 2;
+				else
+					startYPosition = this.cShapeDrawer.chart.plotArea.valAx.posY;
 				if(i == 0)
-					startY = trueHeight  + this.chartProp.chartGutter._top - vmargin - (j * height + i * barHeight);
+					startY = startYPosition * this.chartProp.pxToMM - hmargin - i * (individualBarHeight);
 				else
-					startY = trueHeight  + this.chartProp.chartGutter._top - vmargin - (j * height + i * barHeight) + i * heightOverLap;
-					
-					
+					startY = startYPosition * this.chartProp.pxToMM - hmargin - (i * individualBarHeight - i * widthOverLap);
 				
-				//для накопительных диаграмм
-				if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
+				if(height != 0)
 				{
-					diffYVal = 0;
-					for(var k = 0; k < seriesHeight.length; k++)
-					{
-						if(seriesHeight[k][j] && ((val > 0 && seriesHeight[k][j] > 0) || (val < 0 && seriesHeight[k][j] < 0) || (tempMax <=0 && tempMin < 0)))
-							diffYVal += seriesHeight[k][j];
-					}
-					seriesHeight[i][j] = width;
+					paths = this._calculateRect(startX, startY / this.chartProp.pxToMM, width, individualBarHeight / this.chartProp.pxToMM);
 					
-					if(tempMax <=0 && tempMin < 0)
-						diffYVal = -1*diffYVal;
+					if(!this.paths.series)
+						this.paths.series = [];
+					if(!this.paths.series[i])
+						this.paths.series[i] = [];
+					this.paths.series[i][j] = paths;
 				}
-				
-				if(tempMin < 0 && tempMax < 0)
-					startX = this.chartProp.nullPositionOX - width;
-				else if(0 > val && tempMin < 0 && tempMax > 0)
-					startX = this.chartProp.nullPositionOX;
-				else if(0 > val)
-					startX = this.chartProp.nullPositionOX - width;
-				else
-					startX = this.chartProp.nullPositionOX;
-				
-				startX = startX + diffYVal;
-				
-				if (width < 0) {
-					startX += width;
-					width *= -1;
+			}
+        }
+    },
+	
+	_getStartYColumnPosition: function (seriesHeight, j, val, xPoints, summBarVal)
+	{
+		var startY, diffYVal, width;
+		var nullPositionOX = this.chartProp.nullPositionOX/*this.cShapeDrawer.chart.plotArea.catAx.posY * this.chartProp.pxToMM*/;
+		if(this.chartProp.subType == "stacked")
+		{
+			diffYVal = 0;
+			for(var k = 0; k < seriesHeight.length; k++)
+			{
+				if(seriesHeight[k][j] && ((val > 0 && seriesHeight[k][j] > 0) || (val < 0 && seriesHeight[k][j] < 0)))
+					diffYVal += seriesHeight[k][j];
+			}
+			startY = nullPositionOX - diffYVal;
+			width = nullPositionOX - this._getYPosition(val, xPoints, true) * this.chartProp.pxToMM;
+		}
+		else if(this.chartProp.subType == "stackedPer")
+		{
+			diffYVal = 0;
+			for(var k = 0; k < seriesHeight.length; k++)
+			{
+				if(seriesHeight[k][j] && ((val > 0 && seriesHeight[k][j] > 0) || (val < 0 && seriesHeight[k][j] < 0)))
+					diffYVal += seriesHeight[k][j];
+			}
+			
+			var tempVal;
+			var temp = 0;
+			if(!this.summBarVal[j])
+			{
+				for(var k = 0; k < this.chartProp.series.length; k++)
+				{
+					tempVal = parseFloat(this.chartProp.series[k].val.numRef.numCache.pts[j].val);
+					if(tempVal)
+						temp += Math.abs(tempVal);
 				}
-				
-				if(!this.paths.series)
-					this.paths.series = [];
-				if(!this.paths.series[i])
-					this.paths.series[i] = [];
-					
-				if(width != 0)
-					this.paths.series[i][j] = this._calculateRect(startX, startY, width, barHeight);
+				this.summBarVal[j] = temp;
+			}
+			
+			width = nullPositionOX - this._getYPosition((val / this.summBarVal[j]), xPoints, true) * this.chartProp.pxToMM;
+			startY = nullPositionOX - diffYVal;
+		}
+		else
+		{
+			width = this._getYPosition(val, xPoints, true) * this.chartProp.pxToMM - nullPositionOX;
+			startY = nullPositionOX;
+		}	
+		
+		return {startY: startY, width: width};
+	},
+	
+	_getYPosition: function(val, yPoints, isOx)
+	{
+		//позиция в заисимости от положения точек на оси OY
+		var result;
+		var resPos;
+		var resVal;
+		var diffVal;
+		if(val < yPoints[0].val)
+		{
+			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
+			resVal = yPoints[1].val - yPoints[0].val;
+			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
+			result = yPoints[0].pos - (diffVal / resVal) * resPos;
+		}
+		else if(val > yPoints[yPoints.length - 1].val)
+		{	
+			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
+			resVal = yPoints[1].val - yPoints[0].val;
+			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
+			result = yPoints[0].pos + (diffVal / resVal) * resPos;
+		}
+		else
+		{
+			for(var s = 0; s < yPoints.length; s++)
+			{
+				if(val >= yPoints[s].val && val <= yPoints[s + 1].val)
+				{
+					resPos = Math.abs(yPoints[s + 1].pos - yPoints[s].pos);
+					resVal = yPoints[s + 1].val - yPoints[s].val;
+					if(!isOx)
+						result =  - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+					else	
+						result = (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+					break;
+				}
 			}
 		}
-    },
+		
+		return result;
+	},
 	
 	_drawBars: function ()
     {
@@ -3417,11 +3463,11 @@ drawHBarChart.prototype =
 		
 		var pxToMm = this.chartProp.pxToMM;
 		
-		path.moveTo(x / pxToMm * pathW, y / pxToMm * pathH);
-		path.lnTo(x / pxToMm * pathW, (y - h) / pxToMm * pathH);
-		path.lnTo((x + w) / pxToMm * pathW, (y - h) / pxToMm * pathH);
-		path.lnTo((x + w) / pxToMm * pathW, y / pxToMm * pathH);
-		path.lnTo(x / pxToMm * pathW, y / pxToMm * pathH);
+		path.moveTo(x * pathW, y * pathH);
+		path.lnTo(x * pathW, (y - h) * pathH);
+		path.lnTo((x + w) * pathW, (y - h) * pathH);
+		path.lnTo((x + w) * pathW, y * pathH);
+		path.lnTo(x * pathW, y * pathH);
 		path.recalculate(gdLst);
 		
 		return path;
@@ -4780,23 +4826,28 @@ catAxisChart.prototype =
 		{
 			if(this.chartProp.type == "HBar")
 			{
-				var stepY = (this.chartProp.heightCanvas - this.chartProp.chartGutter._top - this.chartProp.chartGutter._bottom)/(this.chartProp.numhlines);
-				var minorStep = stepX / this.chartProp.numvMinorlines;
+				var yPoints = this.chartSpace.chart.plotArea.catAx.yPoints;
+
+				var stepY = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[1].pos - this.chartProp.chartGutter._bottom / this.chartProp.pxToMM);
+				var minorStep = stepY / this.chartProp.numhMinorlines;
 				
-				var posX = this.chartProp.nullPositionOX;
+				var posX = this.chartSpace.chart.plotArea.valAx.posX;
+
 				var posY;
 				var posMinorY;
-				for(var i = 0; i <= this.chartProp.numvlines; i++)
+				for(var i = 0; i < yPoints.length; i++)
 				{
-					posY = i*stepY + this.chartProp.chartGutter._top;
+					//основные линии
+					posY = yPoints[i].pos;
+					
 					if(!this.paths.tickMarks)
 						this.paths.tickMarks = [];
-					this.paths.tickMarks[i] = this._calculateLine(posX, posY, posX + widthLine, posY);
+					this.paths.tickMarks[i] = this._calculateLine(posX, posY, posX + widthLine / this.chartProp.pxToMM, posY);
 					
 					//промежуточные линии
 					if(widthMinorLine !== 0)
 					{
-						for(var n = 0; n < this.chartProp.numvMinorlines; n++)
+						for(var n = 0; n < this.chartProp.numhMinorlines; n++)
 						{
 							posMinorY = posY + n * minorStep;
 							if(!this.paths.minorTickMarks)
@@ -4804,7 +4855,7 @@ catAxisChart.prototype =
 							if(!this.paths.minorTickMarks[i])
 								this.paths.minorTickMarks[i] = [];
 							
-							this.paths.minorTickMarks[i][n] = this._calculateLine(posX, posMinorY, posX + widthLine, posMinorY);
+							this.paths.minorTickMarks[i][n] = this._calculateLine(posX, posMinorY, posX + widthMinorLine / this.chartProp.pxToMM, posMinorY);
 						}
 					}
 				}
@@ -5012,24 +5063,25 @@ valAxisChart.prototype =
 		{
 			if(this.chartProp.type == "HBar")
 			{
-				var stepX = (this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right)/(this.chartProp.numvlines);
-				var minorStep = stepX / this.chartProp.numhMinorlines;
+				var yPoints = this.chartSpace.chart.plotArea.catAx.yPoints;
 				
-				//в зависимости от того, наружу или внутрь они направлены
-				var posY = this.chartProp.nullPositionOX;
+				var stepX = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[1].pos - this.chartProp.chartGutter._bottom / this.chartProp.pxToMM);
+				var minorStep = stepX / this.chartProp.numvMinorlines;
+				
+				var posY = this.chartSpace.chart.plotArea.catAx.posY;
 				var posX;
 				var posMinorX;
-				for(var i = 0; i <= this.chartProp.numhlines; i++)
+				for(var i = 0; i < yPoints.length; i++)
 				{
-					posX = i*stepX + this.chartProp.chartGutter._left;
+					posX = yPoints[i].pos;
 					if(!this.paths.tickMarks)
 						this.paths.tickMarks = [];
-					this.paths.tickMarks[i] = this._calculateLine(posX, posY, posX, posY + widthLine);
+					this.paths.tickMarks[i] = this._calculateLine(posX, posY, posX, posY + widthLine / this.chartProp.pxToMM);
 					
 					//промежуточные линии
 					if(widthMinorLine !== 0)
 					{
-						for(var n = 0; n < this.chartProp.numhMinorlines; n++)
+						for(var n = 0; n < this.chartProp.numvMinorlines; n++)
 						{
 							posMinorX = posX + n * minorStep;
 							if(!this.paths.minorTickMarks)
@@ -5037,7 +5089,7 @@ valAxisChart.prototype =
 							if(!this.paths.minorTickMarks[i])
 								this.paths.minorTickMarks[i] = [];
 							
-							this.paths.minorTickMarks[i][n] = this._calculateLine(posMinorX, posY, posMinorX, posY + widthMinorLine);
+							this.paths.minorTickMarks[i][n] = this._calculateLine(posMinorX, posY, posMinorX, posY + widthMinorLine / this.chartProp.pxToMM);
 						}
 					}
 				}
