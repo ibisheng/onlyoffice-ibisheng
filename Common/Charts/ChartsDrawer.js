@@ -3419,7 +3419,7 @@ drawHBarChart.prototype =
 				centerX = x;
 				centerY = y - h/2 - height/2;
 				if( point.val < 0 )
-					centerX = x + w - width;
+					centerX = x - width;
 				break;
 			}
 			case DLBL_POS_IN_END:
@@ -3427,7 +3427,7 @@ drawHBarChart.prototype =
 				centerX = x + w - width;
 				centerY = y - h/2 - height/2;
 				if( point.val < 0 )
-					centerX = x;
+					centerX = x + w;
 				break;
 			}
 			case DLBL_POS_OUT_END:
@@ -3435,7 +3435,7 @@ drawHBarChart.prototype =
 				centerX = x + w;
 				centerY = y - h/2 - height/2;
 				if( point.val < 0 )
-					centerX = x - width;
+					centerX = x + w - width;
 				break;
 			}
 		}
