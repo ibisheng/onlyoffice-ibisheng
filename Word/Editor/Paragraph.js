@@ -12892,7 +12892,7 @@ Paragraph.prototype =
 
     Hyperlink_CanAdd : function(bCheckInHyperlink)
     {
-        if ( true === Debug_ParaRunMode )
+        if ( true !== Debug_ParaRunMode )
         {
             if ( true === bCheckInHyperlink )
             {
