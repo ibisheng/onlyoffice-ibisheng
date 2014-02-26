@@ -367,25 +367,15 @@ CDrawingDocument.prototype =
     // треки
     DrawTrack : function(type, matrix, left, top, width, height, isLine, canRotate)
     {
-        if (matrix)
-            this.AutoShapesTrack["DD_TrackMatrix"](matrix.sx, matrix.shy, matrix.shx, matrix.sy, matrix.tx, matrix.ty);
-        else
-            this.AutoShapesTrack["DD_TrackMatrix"]();
-
-        this.AutoShapesTrack["DD_DrawTrack"](type, left, top, width, height, isLine, canRotate);
+        this.AutoShapesTrack.DrawTrack(type, matrix, left, top, width, height, isLine, canRotate);        
     },
     DrawTrackSelectShapes : function(x, y, w, h)
     {
-        this.AutoShapesTrack["DD_DrawTrackSelectShapes"](x, y, w, h);
+        this.AutoShapesTrack.DrawTrackSelectShapes(x, y, w, h);
     },
     DrawAdjustment : function(matrix, x, y)
     {
-        if (matrix)
-            this.AutoShapesTrack["DD_TrackMatrix"](matrix.sx, matrix.shy, matrix.shx, matrix.sy, matrix.tx, matrix.ty);
-        else
-            this.AutoShapesTrack["DD_TrackMatrix"]();
-
-        this.AutoShapesTrack["DD_DrawAdjustment"](x, y);
+        this.DrawAdjustment.DrawAdjustment(matrix, x, y);
     },
 
     LockTrackPageNum : function(nPageNum)

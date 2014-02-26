@@ -13,6 +13,14 @@ CAutoshapeTrack.prototype =
     SetFont : function(font)
     {
     },
+    init2 : function()
+    {
+    },
+    
+    CorrectOverlayBounds : function()
+    {
+        this.Native["DD_CorrectOverlayBounds"]();
+    },
 
     SetCurrentPage : function(nPageIndex)
     {
@@ -20,6 +28,16 @@ CAutoshapeTrack.prototype =
             return;
 
         this.Native["DD_SetCurrentPage"](nPageIndex);
+    },
+    
+    transform3 : function(m)
+    {
+        this.Native["PD_transform3"](m.sx,m.shy,m.shx,m.sy,m.tx,m.ty);
+    },
+    
+    reset : function()
+    {
+        this.Native["PD_reset"]();
     },
 
     /*************************************************************************/
@@ -32,7 +50,7 @@ CAutoshapeTrack.prototype =
         else
             this.Native["DD_DrawTrackTransform"](matrix.sx, matrix.shy, matrix.shx, matrix.sy, matrix.tx, matrix.ty);
 
-        this.Native["DD_DrawTrack"](type, matrix, left, top, width, height, isLine, isCanRotate);
+        this.Native["DD_DrawTrack"](type, left, top, width, height, isLine, isCanRotate);
     },
 
     DrawTrackSelectShapes : function(x, y, w, h)
@@ -82,11 +100,11 @@ CAutoshapeTrack.prototype =
 
     drawFlowAnchor : function(x, y)
     {
-        this.Native["DD_drawFlowAnchor"](x, y);
+        this.Native["PD_drawFlowAnchor"](x, y);
     },
 
     DrawPresentationComment : function(type, x, y, w, h)
     {
-        this.Native["DD_DrawPresentationComment"](type, x, y, w, h);
+        this.Native["PD_DrawPresentationComment"](type, x, y, w, h);
     }
 };
