@@ -314,8 +314,8 @@ CMPrp.prototype =
     {
         var textPrp = new CTextPr();
 
-        textPrp.italic = this.mathPrp.italic;
-        textPrp.bold = this.mathPrp.bold;
+        textPrp.italic = this.italic;
+        textPrp.bold = this.bold;
 
         if(this.typeText == TXT_ROMAN)
             textPrp.Italic = false;
@@ -4736,7 +4736,8 @@ CMathContent.prototype =
 
         for(var i = 0; i < this.content.length; i++)
         {
-            var type = this.content[i].value.typeObj;
+            var obj = this.content[i].value,
+                type = obj.typeObj;
 
             if(type == MATH_TEXT)
             {
@@ -4753,13 +4754,13 @@ CMathContent.prototype =
             }
             else if(type == MATH_RUN_PRP)
             {
-                var mergedWPrp = this.content[i].value.getMergedWPrp();
+                var mergedWPrp = obj.getMergedWPrp();
                 var oWPrp = new CTextPr();
                 oWPrp.Merge(mergedWPrp);
 
                 this.applyArgSize(oWPrp); // здесь мержим с DEFAULT_RUN_PRP
 
-                typeTxt = oWPrp.getTypeText();
+                typeTxt = obj.getTypeText();
 
                 /*if(typeTxt == TXT_ROMAN) // MATH TEXT, наклон не меняем, если italic
                     oWPrp.Italic = false;*/

@@ -7771,7 +7771,7 @@ ParaMath.prototype =
             this.Math.AddLetter( 0x0020 );
         else if ( para_Math === Type )
         {
-            var rPr = this.Math.GetCurrentRPrp();
+            var rPr = this.Math.GetCurrentRunPrp();
             Item.Math.Root.setRPrp(rPr);
             this.Math.AddToComposition(Item.Math.Root);
         }
@@ -7803,19 +7803,18 @@ ParaMath.prototype =
 			}
 		}
     },
-	
-	CreateElem : function (oElem, oParent, props)
-	{
-		var ctrPrp = new CTextPr();
-		oElem.setCtrPrp(ctrPrp);
 
-		if (oParent)
-			oParent.addElementToContent(oElem);
+    CreateElem : function (oElem, oParent, props)
+    {
+        /*var ctrPrp = new CTextPr();
+         oElem.setCtrPrp(ctrPrp);*/
+        oElem.relate(oParent);
+        oElem.init(props);
 
-        oElem.init(props); // прокидываем свойства после добавления в формулу, т.к. дефолтные настройки(общие для всей формулы, к-ые передаются из settings) хранятся в Composition
-        oElem.setArgSize(oParent.argSize);
+        if (oParent)
+            oParent.addElementToContent(oElem);
 
-	},
+    },
 	
 	CreateFraction : function (oFraction,oParentElem,props,sNumText,sDenText)
 	{
@@ -7923,13 +7922,13 @@ ParaMath.prototype =
 
     Selection_IsEmpty : function()
     {
-        console.log("Selection_IsEmpty " + this.Math.Selection_IsEmpty());
+        //console.log("Selection_IsEmpty " + this.Math.Selection_IsEmpty());
         return this.Math.Selection_IsEmpty();
     },
 
     Selection_IsUse : function()
     {
-        console.log("Selection_IsUse " + ( true === this.Math.Selection_IsEmpty() ? false : true ));
+        //console.log("Selection_IsUse " + ( true === this.Math.Selection_IsEmpty() ? false : true ));
         return ( true === this.Math.Selection_IsEmpty() ? false : true );
     },
 
