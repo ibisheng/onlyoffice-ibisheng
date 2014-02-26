@@ -512,7 +512,7 @@ asc_docs_api.prototype._coAuthoringInit = function () {
 	};
 
     this.CoAuthoringApi.init (editor.User, documentId, 'fghhfgsjdgfjs', window.location.host, g_sMainServiceLocalUrl, function(){
-    }, c_oEditorId.Presentation);
+    }, c_oEditorId.Presentation, documentFormatSave);
 
     // ToDo init other callbacks
 };

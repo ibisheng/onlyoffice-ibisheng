@@ -708,7 +708,8 @@
                     "locks":docsCoApi.ownedLockBlocks,
                     "sessionId":docsCoApi._id,
 					"serverHost": docsCoApi._serverHost,
-					"serverPath": docsCoApi._serverPath
+					"serverPath": docsCoApi._serverPath,
+					"documentFormatSave": docsCoApi._documentFormatSave
                 });
 
         };
@@ -754,7 +755,7 @@
     }
 
 
-    DocsCoApi.prototype.init = function (user, docid, token, serverHost, serverPath, callback, editorType) {
+    DocsCoApi.prototype.init = function (user, docid, token, serverHost, serverPath, callback, editorType, documentFormatSave) {
         this._user = user;
         this._docid = docid;
         this._token = token;
@@ -770,6 +771,7 @@
 		this._isExcel = c_oEditorId.Speadsheet === editorType;
 		this._isPresentation = c_oEditorId.Presentation === editorType;
 		this._isAuth = false;
+		this._documentFormatSave = documentFormatSave;
 
         this.dataHandler =
         {
