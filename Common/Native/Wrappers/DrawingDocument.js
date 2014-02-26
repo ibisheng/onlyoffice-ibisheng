@@ -375,7 +375,7 @@ CDrawingDocument.prototype =
     },
     DrawAdjustment : function(matrix, x, y)
     {
-        this.DrawAdjustment.DrawAdjustment(matrix, x, y);
+        this.AutoShapesTrack.DrawAdjustment(matrix, x, y);
     },
 
     LockTrackPageNum : function(nPageNum)
@@ -462,16 +462,18 @@ CDrawingDocument.prototype =
         {
             for (var indP = drawingFirst; indP <= drawingEnd; indP++)
             {
-                this.AutoShapesTrack.PageIndex = indP;
+                this.AutoShapesTrack.SetPageIndexSimple(indP);
                 this.LogicDocument.DrawingObjects.drawSelect(indP);
             }
 
+            this.AutoShapesTrack.SetCurrentPage(-100);
             if (this.LogicDocument.DrawingObjects.needUpdateOverlay())
             {
                 this.AutoShapesTrack.PageIndex = -1;
                 this.LogicDocument.DrawingObjects.drawOnOverlay(this.AutoShapesTrack);
                 this.AutoShapesTrack.CorrectOverlayBounds();
             }
+            this.AutoShapesTrack.SetCurrentPage(-101);
         }
 
         this.Native["DD_Overlay_DrawTableTrack"]();

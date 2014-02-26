@@ -84,7 +84,7 @@ CShapeDrawer.prototype =
         if (graphics.IsSlideBoundsCheckerType)
             this.Graphics = graphics;
         else if (graphics.IsTrack)
-            this.Graphics = graphics;
+            this.Graphics = graphics.Native;
 
         this.UniFill        = shape.brush;
         this.Ln             = shape.pen;

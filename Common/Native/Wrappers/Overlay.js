@@ -30,6 +30,11 @@ CAutoshapeTrack.prototype =
         this.Native["DD_SetCurrentPage"](nPageIndex);
     },
     
+    SetPageIndexSimple : function(nPageIndex)
+    {
+        this.Native["DD_SetPageIndexSimple"](nPageIndex);
+    },
+    
     transform3 : function(m)
     {
         this.Native["PD_transform3"](m.sx,m.shy,m.shx,m.sy,m.tx,m.ty);
