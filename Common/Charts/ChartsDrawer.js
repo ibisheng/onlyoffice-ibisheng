@@ -1725,7 +1725,8 @@ CChartsDrawer.prototype =
 					massRes[k] =  - this._round_val(varMin + (k)*(stepOY));
 					if('HBar' == mainObj.type && mainObj.subType == 'stackedPer')
 					{
-						if(Math.abs(massRes[k]) >= axisXMax)
+						massRes[k] = massRes[k] / 100;
+						if(Math.abs(massRes[k]) >= axisXMax / 100)
 						{
 							break;
 						}
@@ -1761,7 +1762,8 @@ CChartsDrawer.prototype =
 					massRes[k] = this._round_val(parseFloat(varMin + (k)*(stepOY)));
 					if('HBar' == mainObj.type && mainObj.subType == 'stackedPer')
 					{
-						if(massRes[k] >= axisXMax || massRes[k] >= 100)
+						massRes[k] = massRes[k] / 100;
+						if(massRes[k] >= axisXMax / 100 || massRes[k] >= 1)
 						{
 							break;
 						}
@@ -3183,6 +3185,8 @@ function drawHBarChart()
 	this.cChartDrawer = null;
 	this.cShapeDrawer = null;
 	this.paths = {};
+	
+	this.summBarVal = [];
 }
 
 drawHBarChart.prototype =
@@ -3193,6 +3197,7 @@ drawHBarChart.prototype =
 		this.chartProp = chartProp.calcProp;
 		this.cChartDrawer = chartProp;
 		this.cShapeDrawer = cShapeDrawer;
+		this.summBarVal = [];
 		this._recalculateBars();
 	},
 	
@@ -3239,7 +3244,7 @@ drawHBarChart.prototype =
 				startX = startXColumnPosition.startY / this.chartProp.pxToMM;
 				width = startXColumnPosition.width / this.chartProp.pxToMM;
 
-				seriesHeight[i][j] = width;
+				seriesHeight[i][j] = startXColumnPosition.width;
 				
 				//стартовая позиция колонки Y
 				if(j != 0)
@@ -3277,8 +3282,8 @@ drawHBarChart.prototype =
 				if(seriesHeight[k][j] && ((val > 0 && seriesHeight[k][j] > 0) || (val < 0 && seriesHeight[k][j] < 0)))
 					diffYVal += seriesHeight[k][j];
 			}
-			startY = nullPositionOX - diffYVal;
-			width = nullPositionOX - this._getYPosition(val, xPoints, true) * this.chartProp.pxToMM;
+			startY = nullPositionOX + diffYVal;
+			width = this._getYPosition(val, xPoints, true) * this.chartProp.pxToMM - nullPositionOX;
 		}
 		else if(this.chartProp.subType == "stackedPer")
 		{
@@ -3302,8 +3307,8 @@ drawHBarChart.prototype =
 				this.summBarVal[j] = temp;
 			}
 			
-			width = nullPositionOX - this._getYPosition((val / this.summBarVal[j]), xPoints, true) * this.chartProp.pxToMM;
-			startY = nullPositionOX - diffYVal;
+			width = this._getYPosition((val / this.summBarVal[j]), xPoints, true) * this.chartProp.pxToMM - nullPositionOX;
+			startY = nullPositionOX + diffYVal;
 		}
 		else
 		{
