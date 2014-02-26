@@ -841,9 +841,9 @@ CChartSpace.prototype.recalculateSeriesColors = function()
                     compiled_line.merge(default_line);
                     compiled_line.Fill.merge(base_line_fills[i]);
                     compiled_line.w *= style.line3;
-                    if(ser.spPr && spPr.ln)
+                    if(ser.spPr && ser.spPr.ln)
                     {
-                        compiled_line.merge(spPr.ln);
+                        compiled_line.merge(ser.spPr.ln);
                     }
                     if(Array.isArray(ser.dPt))
                     {
@@ -2230,6 +2230,8 @@ CChartSpace.prototype.recalculateAxis = function()
             val_ax = axis_by_types.valAx[0];
             if(cat_ax && val_ax)
             {
+                cat_ax.labels = null;
+                val_ax.labels = null;
                 var sizes = this.getChartSizes();
                 var rect = {x: sizes.startX, y:sizes.startY, w:sizes.w, h: sizes.h};
                 //расчитаем подписи для вертикальной оси
@@ -2470,6 +2472,13 @@ CChartSpace.prototype.recalculateAxis = function()
     }
 };
 
+
+CChartSpace.prototype.getAllSeries =  function()
+{
+    //TODO:Переделать когда будем поддерживать насколько вложенных чартов
+    return this.chart.plotArea.chart.series;
+};
+
 CChartSpace.prototype.recalculateLegend = function()
 {
     if(this.chart && this.chart.legend)
@@ -2478,9 +2487,50 @@ CChartSpace.prototype.recalculateLegend = function()
         var arr_str_labels = [], i, series = this.chart.plotArea.chart.series;
         for(i = 0; i < series.length; ++i)
             arr_str_labels.push(series[i].getSeriesName());
+
+        var calc_entryes = legend.calcEntryes;
+        calc_entryes.length = 0;
+
         for(i = 0; i < arr_str_labels.length; ++i)
         {
+            var calc_entry = new CalcLegendEntry(legend, this);
+            calc_entry.txBody = CreateTextBodyFromString(arr_strings[i], this.getDrawingDocument(), calc_entry);
+            var entry = legend.findLegendEntryByIndex(i);
+            if(entry)
+                calc_entry.txPr = entry.txPr;
+            calc_entryes.push(calc_entry);
+        }
 
+        var legend_pos;
+        if(isRealNumber(legend.legendPos))
+        {
+            legend_pos = legend.legendPos;
+        }
+        else if(!isRealObject(legend.layout) || !isRealObject(legend.layout.manualLayout))
+        {
+            legend_pos = LEGEND_POS_L;
+        }
+        if(isRealNumber(legend_pos))
+        {
+            if(legend_pos === LEGEND_POS_L || legend_pos === LEGEND_POS_R || legend_pos === LEGEND_POS_TR)
+            {
+                var max_width = 0, cur_width, max_font_size = 0, cur_font_size;
+                for(i = 0; i < calc_entryes.length; ++i)
+                {
+                    calc_entry = calc_entryes[i];
+                    cur_width = calc_entry.txBody.getRectWidth(2000);
+                    if(cur_width > max_width)
+                        max_width = cur_width;
+
+                    cur_font_size = calc_entry.txBody.content.Content[0].CompiledPr.Pr.TextPr.FontSize;
+                    if(cur_font_size > max_font_size)
+                        max_font_size = cur_font_size;
+
+                }
+            }
+            else
+            {
+            }
         }
     }
 };

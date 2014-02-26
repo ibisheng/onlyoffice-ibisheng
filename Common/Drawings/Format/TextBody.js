@@ -1015,7 +1015,6 @@ CTextBody.prototype =
         var r_ins = body_pr.rIns;
         var l_ins = body_pr.lIns;
         var max_content_width = maxWidth - r_ins - l_ins;
-        this.content.RecalculateNumbering();
         this.content.Reset(0, 0, max_content_width, 20000);
         this.content.Recalculate_Page(0, true);
         var max_width = 0;

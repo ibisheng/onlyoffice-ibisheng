@@ -4204,64 +4204,81 @@ CDLbl.prototype =
         this.transformText = this.ownTransformText.CreateDublicate();
     },
 
+
+    getStyles: function()
+    {
+        var styles = new CStyles();
+        var style = new CStyle("dataLblStyle", null, null, null);
+        var text_pr = new CTextPr();
+        text_pr.FontSize = 10;
+        var parent_objects = this.chart.getParentObjects();
+        var theme = parent_objects.theme;
+
+        var para_pr = new CParaPr();
+        para_pr.Spacing.Before = 0.0;
+        para_pr.Spacing.After = 0.0;
+        para_pr.Spacing.Line = 1;
+        para_pr.Spacing.LineRule = linerule_Auto;
+        style.ParaPr = para_pr;
+        var font_name = theme.themeElements.fontScheme.minorFont.latin;
+        text_pr.RFonts.Ascii    = {Name: font_name, Index: -1};
+        text_pr.RFonts.EastAsia = {Name: font_name, Index: -1};
+        text_pr.RFonts.HAnsi    = {Name: font_name, Index: -1};
+        text_pr.RFonts.CS       = {Name: font_name, Index: -1};
+        text_pr.RFonts.Hint     = {Name: font_name, Index: -1};
+
+        style.TextPr = text_pr;
+
+        var chart_text_pr;
+
+        if(this.chart.txPr
+            && this.chart.txPr.content
+            && this.chart.txPr.content.Content[0]
+            && this.chart.txPr.content.Content[0].Pr
+            && this.chart.txPr.content.Content[0].Pr.DefaultRunPr)
+        {
+            chart_text_pr = this.chart.txPr.content.Content[0].Pr.DefaultRunPr;
+            style.TextPr.Merge(chart_text_pr);
+        }
+        if(this instanceof  CTitle)
+        {
+            style.TextPr.Bold = true;
+            if(this.parent instanceof CChart)
+            {
+                if(chart_text_pr && typeof chart_text_pr.FontSize === "number")
+                    style.TextPr.FontSize *= 1.2;
+                else
+                    style.TextPr.FontSize = 18;
+            }
+        }
+        if(this instanceof  CalcLegendEntry
+            && this.legend
+            && this.legend.txPr
+            && this.legend.txPr.content
+            && this.legend.txPr.content.Content[0]
+            && this.legend.txPr.content.Content[0].Pr
+            && this.legend.txPr.content.Content[0].Pr.DefaultRunPr)
+        {
+            style.TextPr.Merge(this.legend.txPr.content.Content[0].Pr.DefaultRunPr);
+        }
+        if(this.txPr
+            && this.txPr.content
+            && this.txPr.content.Content[0]
+            && this.txPr.content.Content[0].Pr
+            && this.txPr.content.Content[0].Pr.DefaultRunPr)
+        {
+            style.TextPr.Merge(this.txPr.content.Content[0].Pr.DefaultRunPr);
+        }
+        styles.Add(style);
+        return {lastId: style.Id, styles: styles};
+    },
+
     recalculateStyle: function()
     {
         ExecuteNoHistory(function()
             {
-                var styles = new CStyles();
-                var style = new CStyle("dataLblStyle", null, null, null);
-                var text_pr = new CTextPr();
-                text_pr.FontSize = 10;
-                var parent_objects = this.chart.getParentObjects();
-                var theme = parent_objects.theme;
 
-                var para_pr = new CParaPr();
-                para_pr.Spacing.Before = 0.0;
-                para_pr.Spacing.After = 0.0;
-                para_pr.Spacing.Line = 1;
-                para_pr.Spacing.LineRule = linerule_Auto;
-                style.ParaPr = para_pr;
-                var font_name = theme.themeElements.fontScheme.minorFont.latin;
-                text_pr.RFonts.Ascii    = {Name: font_name, Index: -1};
-                text_pr.RFonts.EastAsia = {Name: font_name, Index: -1};
-                text_pr.RFonts.HAnsi    = {Name: font_name, Index: -1};
-                text_pr.RFonts.CS       = {Name: font_name, Index: -1};
-                text_pr.RFonts.Hint     = {Name: font_name, Index: -1};
-
-                style.TextPr = text_pr;
-
-                var chart_text_pr;
-
-                if(this.chart.txPr
-                    && this.chart.txPr.content
-                    && this.chart.txPr.content.Content[0]
-                    && this.chart.txPr.content.Content[0].Pr
-                    && this.chart.txPr.content.Content[0].Pr.DefaultRunPr)
-                {
-                    chart_text_pr = this.chart.txPr.content.Content[0].Pr.DefaultRunPr;
-                    style.TextPr.Merge(chart_text_pr);
-                }
-                if(this instanceof  CTitle)
-                {
-                    style.TextPr.Bold = true;
-                    if(this.parent instanceof CChart)
-                    {
-                        if(chart_text_pr && typeof chart_text_pr.FontSize === "number")
-                            style.TextPr.FontSize *= 1.2;
-                        else
-                            style.TextPr.FontSize = 18;
-                    }
-                }
-                if(this.txPr
-                    && this.txPr.content
-                    && this.txPr.content.Content[0]
-                    && this.txPr.content.Content[0].Pr
-                    && this.txPr.content.Content[0].Pr.DefaultRunPr)
-                {
-                    style.TextPr.Merge(this.txPr.content.Content[0].Pr.DefaultRunPr);
-                }
-                styles.Add(style);
-                this.compiledStyles = {lastId: style.Id, styles: styles};
+                this.compiledStyles = this.getStyles();
             },
             this, []);
     },
@@ -7261,6 +7278,13 @@ function CLegend()
     this.spPr = null;
     this.txPr = null;
 
+    this.x = null;
+    this.y = null;
+    this.extX = null;
+    this.extY = null;
+    this.calcEntryes = [];
+    this.transform = new CMatrix();
+
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -7316,6 +7340,16 @@ CLegend.prototype =
     {
         History.Add(this, {Type: historyitem_Legend_SetTxPr,oldPr: this.txPr, newPr: txPr});
         this.txPr = txPr;
+    },
+
+    findLegendEntryByIndex: function(idx)
+    {
+        for(var i = 0; i < this.legendEntryes.length; ++i)
+        {
+            if(this.legendEntryes[i].idx === idx)
+                return this.legendEntryes[i];
+        }
+        return null;
     },
 
     Undo: function(data)
@@ -7536,6 +7570,7 @@ function CLegendEntry()
     this.bDelete = null;
     this.idx = null;
     this.txPr  = null;
+
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -8398,17 +8433,17 @@ CLineSeries.prototype =
 };
 
 
-var SYMBOL_CIRCLE = 0;
-var SYMBOL_DASH = 1;
-var SYMBOL_DIAMOND = 2;
-var SYMBOL_DOT = 3;
-var SYMBOL_NONE = 4;
-var SYMBOL_PICTURE = 5;
-var SYMBOL_PLUS = 6;
-var SYMBOL_SQUARE = 7;
-var SYMBOL_STAR = 8;
+var SYMBOL_CIRCLE   = 0;
+var SYMBOL_DASH     = 1;
+var SYMBOL_DIAMOND  = 2;
+var SYMBOL_DOT      = 3;
+var SYMBOL_NONE     = 4;
+var SYMBOL_PICTURE  = 5;
+var SYMBOL_PLUS     = 6;
+var SYMBOL_SQUARE   = 7;
+var SYMBOL_STAR     = 8;
 var SYMBOL_TRIANGLE = 9;
-var SYMBOL_X = 10;
+var SYMBOL_X        = 10;
 
 
 var MARKER_SYMBOL_TYPE = [];
@@ -15705,4 +15740,33 @@ CValAxisLabels.prototype =
             }
         }
     }
+};
+
+
+function CalcLegendEntry(legend, chart)
+{
+    this.chart = chart;
+    this.legend = legend;
+    this.x = null;
+    this.y = null;
+    this.extX = null;
+    this.extY = null;
+    this.marker = null;
+    this.txBody = null;
+    this.txPr = null;
+
+    this.recalcInfo =
+    {
+        recalcStyle: true
+    };
+}
+
+CalcLegendEntry.prototype =
+{
+    recalculate: function()
+    {
+    },
+    getStyles: CDLbl.prototype.getStyles,
+    recalculateStyle: CDLbl.prototype.recalculateStyle,
+    Get_Styles: CDLbl.prototype.Get_Styles
 };
