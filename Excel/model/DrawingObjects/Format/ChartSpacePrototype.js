@@ -712,35 +712,185 @@ CChartSpace.prototype.recalculateMarkers = function()
 
 CChartSpace.prototype.recalculateSeriesColors = function()
 {
-    ExecuteNoHistory(function()
+
+    if(this.chart && this.chart.plotArea && this.chart.plotArea.chart && this.chart.plotArea.chart.series)
     {
-        if(this.chart && this.chart.plotArea && this.chart.plotArea.chart && this.chart.plotArea.chart.series)
+        var style = CHART_STYLE_MANAGER.getStyleByIndex(this.style);
+        var series = this.chart.plotArea.chart.series;
+        var parents = this.getParentObjects();
+        var RGBA = {R: 0, G: 0, B: 0, A: 255};
+        if(this.chart.plotArea.chart.varyColors && series.length === 1 || this.chart.plotArea.chart instanceof CPieChart)
         {
-            var style = CHART_STYLE_MANAGER.getStyleByIndex(this.style);
-            var series = this.chart.plotArea.chart.series;
-            var parents = this.getParentObjects();
-            var RGBA = {R: 0, G: 0, B: 0, A: 255};
-            if(this.chart.plotArea.chart.varyColors && series.length === 1 || this.chart.plotArea.chart instanceof CPieChart)
+            var pts;
+            var ser = series[0];
+            if(ser.val)
             {
-                var pts;
-                var ser = series[0];
-                if(ser.val)
+                pts = ser.val.numRef.numCache.pts;
+            }
+            else if(ser.yVal)
+            {
+                pts = ser.yVal.numRef.numCache.pts;
+            }
+            else
+            {
+                pts = [];
+            }
+
+            if(!(this.chart.plotArea.chart instanceof CLineChart))
+            {
+                var base_fills = getArrayFillsFromBase(style.fill2, pts.length);
+                for(var i = 0; i < pts.length; ++i)
                 {
-                    pts = ser.val.numRef.numCache.pts;
-                }
-                else if(ser.yVal)
-                {
-                    pts = ser.yVal.numRef.numCache.pts;
-                }
-                else
-                {
-                    pts = [];
+                    var compiled_brush = new CUniFill();
+                    compiled_brush.merge(base_fills[i]);
+                    if(ser.spPr && ser.spPr.Fill)
+                    {
+                        compiled_brush.merge(ser.spPr.Fill);
+                    }
+                    if(Array.isArray(ser.dPt))
+                    {
+                        for(var j = 0; j < ser.dPt.length; ++j)
+                        {
+                            if(ser.dPt[j].idx === pts[i].idx)
+                            {
+                                if(ser.dPt[j].spPr)
+                                {
+                                    compiled_brush.merge(ser.dPt[j].spPr.Fill);
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    pts[i].brush = compiled_brush;
+                    pts[i].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
                 }
 
-                if(!(this.chart.plotArea.chart instanceof CLineChart))
+                if(style.line1 === EFFECT_SUBTLE)
                 {
-                    var base_fills = getArrayFillsFromBase(style.fill2, pts.length);
-                    for(var i = 0; i < pts.length; ++i)
+                    var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
+
+                    var base_line_fills = [];
+                    if(this.style !== 34)
+                    {
+                        for(i = 0; i < pts.length; ++i)
+                        {
+                            var compiled_line = new CLn();
+                            compiled_line.merge(default_line);
+                            compiled_line.Fill.merge(style.line2[0]);
+                            if(ser.spPr && spPr.ln)
+                            {
+                                compiled_line.merge(spPr.ln);
+                            }
+                            if(Array.isArray(ser.dPt))
+                            {
+                                for(var j = 0; j < ser.dPt.length; ++j)
+                                {
+                                    if(ser.dPt[j].idx === pts[i].idx)
+                                    {
+                                        if(ser.dPt[j].spPr)
+                                        {
+                                            compiled_line.merge(ser.dPt[j].spPr.ln);
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                            pts[i].pen = compiled_line;
+                            pts[i].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                        }
+                    }
+                    else
+                    {
+                        var base_line_fills = getArrayFillsFromBase(style.line2, pts.length);
+                        for(i = 0; i < pts.length; ++i)
+                        {
+                            var compiled_line = new CLn();
+                            compiled_line.merge(default_line);
+                            compiled_line.Fill.merge(base_line_fills[i]);
+                            if(ser.spPr && spPr.ln)
+                            {
+                                compiled_line.merge(spPr.ln);
+                            }
+                            if(Array.isArray(ser.dPt))
+                            {
+                                for(var j = 0; j < ser.dPt.length; ++j)
+                                {
+                                    if(ser.dPt[j].idx === pts[i].idx)
+                                    {
+                                        if(ser.dPt[j].spPr)
+                                        {
+                                            compiled_line.merge(ser.dPt[j].spPr.ln);
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                            pts[i].pen = compiled_line;
+                            pts[i].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
+                var base_line_fills = getArrayFillsFromBase(style.line4, pts.length);
+                for(var i = 0; i < pts.length; ++i)
+                {
+                    var compiled_line = new CLn();
+                    compiled_line.merge(default_line);
+                    compiled_line.Fill.merge(base_line_fills[i]);
+                    compiled_line.w *= style.line3;
+                    if(ser.spPr && spPr.ln)
+                    {
+                        compiled_line.merge(spPr.ln);
+                    }
+                    if(Array.isArray(ser.dPt))
+                    {
+                        for(var j = 0; j < ser.dPt.length; ++j)
+                        {
+                            if(ser.dPt[j].idx === pts[i].idx)
+                            {
+                                if(ser.dPt[j].spPr)
+                                {
+                                    compiled_line.merge(ser.dPt[j].spPr.ln);
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    pts[i].brush = null;
+                    pts[i].pen = compiled_line;
+                    pts[i].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                }
+            }
+        }
+        else
+        {
+            if(!(this.chart.plotArea.chart instanceof CLineChart || this.chart.plotArea.chart instanceof  CScatterChart))
+            {
+                var base_fills = getArrayFillsFromBase(style.fill2, series.length);
+                var base_line_fills = null;
+                if(style.line1 === EFFECT_SUBTLE && this.style === 34)
+                    base_line_fills	= getArrayFillsFromBase(style.line2, series.length);
+                for(var i = 0; i < series.length; ++i)
+                {
+                    var ser = series[i];
+                    var pts;
+                    if(ser.val)
+                    {
+                        pts = ser.val.numRef.numCache.pts;
+                    }
+                    else if(ser.yVal)
+                    {
+                        pts = ser.yVal.numRef.numCache.pts;
+                    }
+                    else
+                    {
+                        pts = [];
+                    }
+
+                    for(var j = 0; j < pts.length; ++j)
                     {
                         var compiled_brush = new CUniFill();
                         compiled_brush.merge(base_fills[i]);
@@ -750,30 +900,30 @@ CChartSpace.prototype.recalculateSeriesColors = function()
                         }
                         if(Array.isArray(ser.dPt))
                         {
-                            for(var j = 0; j < ser.dPt.length; ++j)
+                            for(var k = 0; k < ser.dPt.length; ++k)
                             {
-                                if(ser.dPt[j].idx === pts[i].idx)
+                                if(ser.dPt[k].idx === pts[j].idx)
                                 {
-                                    if(ser.dPt[j].spPr)
+                                    if(ser.dPt[k].spPr)
                                     {
-                                        compiled_brush.merge(ser.dPt[j].spPr.Fill);
+                                        compiled_brush.merge(ser.dPt[k].spPr.Fill);
                                     }
                                     break;
                                 }
                             }
                         }
-                        pts[i].brush = compiled_brush;
-                        pts[i].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                        pts[j].brush = compiled_brush;
+                        pts[j].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
                     }
+
 
                     if(style.line1 === EFFECT_SUBTLE)
                     {
                         var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
 
-                        var base_line_fills = [];
                         if(this.style !== 34)
                         {
-                            for(i = 0; i < pts.length; ++i)
+                            for(var j = 0; j < pts.length; ++j)
                             {
                                 var compiled_line = new CLn();
                                 compiled_line.merge(default_line);
@@ -784,25 +934,24 @@ CChartSpace.prototype.recalculateSeriesColors = function()
                                 }
                                 if(Array.isArray(ser.dPt))
                                 {
-                                    for(var j = 0; j < ser.dPt.length; ++j)
+                                    for(var k = 0; k < ser.dPt.length; ++k)
                                     {
-                                        if(ser.dPt[j].idx === pts[i].idx)
+                                        if(ser.dPt[k].idx === pts[j].idx)
                                         {
-                                            if(ser.dPt[j].spPr)
+                                            if(ser.dPt[k].spPr)
                                             {
-                                                compiled_line.merge(ser.dPt[j].spPr.ln);
+                                                compiled_line.merge(ser.dPt[k].spPr.ln);
                                             }
                                             break;
                                         }
                                     }
                                 }
-                                pts[i].pen = compiled_line;
-                                pts[i].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                                pts[j].pen = compiled_line;
+                                pts[j].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
                             }
                         }
                         else
                         {
-                            var base_line_fills = getArrayFillsFromBase(style.line2, pts.length);
                             for(i = 0; i < pts.length; ++i)
                             {
                                 var compiled_line = new CLn();
@@ -832,11 +981,29 @@ CChartSpace.prototype.recalculateSeriesColors = function()
                         }
                     }
                 }
-                else
+            }
+            else
+            {
+
+                var base_line_fills = getArrayFillsFromBase(style.line4, series.length);
+                for(var i = 0; i < series.length; ++i)
                 {
                     var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
-                    var base_line_fills = getArrayFillsFromBase(style.line4, pts.length);
-                    for(var i = 0; i < pts.length; ++i)
+                    var ser = series[i];
+                    var pts;
+                    if(ser.val)
+                    {
+                        pts = ser.val.numRef.numCache.pts;
+                    }
+                    else if(ser.yVal)
+                    {
+                        pts = ser.yVal.numRef.numCache.pts;
+                    }
+                    else
+                    {
+                        pts = [];
+                    }
+                    for(var j = 0; j < pts.length; ++j)
                     {
                         var compiled_line = new CLn();
                         compiled_line.merge(default_line);
@@ -848,195 +1015,26 @@ CChartSpace.prototype.recalculateSeriesColors = function()
                         }
                         if(Array.isArray(ser.dPt))
                         {
-                            for(var j = 0; j < ser.dPt.length; ++j)
+                            for(var k = 0; k < ser.dPt.length; ++k)
                             {
-                                if(ser.dPt[j].idx === pts[i].idx)
+                                if(ser.dPt[k].idx === pts[j].idx)
                                 {
-                                    if(ser.dPt[j].spPr)
+                                    if(ser.dPt[k].spPr)
                                     {
-                                        compiled_line.merge(ser.dPt[j].spPr.ln);
+                                        compiled_line.merge(ser.dPt[k].spPr.ln);
                                     }
                                     break;
                                 }
                             }
                         }
-                        pts[i].brush = null;
-                        pts[i].pen = compiled_line;
-                        pts[i].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-                    }
-                }
-            }
-            else
-            {
-                if(!(this.chart.plotArea.chart instanceof CLineChart || this.chart.plotArea.chart instanceof  CScatterChart))
-                {
-                    var base_fills = getArrayFillsFromBase(style.fill2, series.length);
-                    var base_line_fills = null;
-                    if(style.line1 === EFFECT_SUBTLE && this.style === 34)
-                        base_line_fills	= getArrayFillsFromBase(style.line2, series.length);
-                    for(var i = 0; i < series.length; ++i)
-                    {
-                        var ser = series[i];
-                        var pts;
-                        if(ser.val)
-                        {
-                            pts = ser.val.numRef.numCache.pts;
-                        }
-                        else if(ser.yVal)
-                        {
-                            pts = ser.yVal.numRef.numCache.pts;
-                        }
-                        else
-                        {
-                            pts = [];
-                        }
-
-                        for(var j = 0; j < pts.length; ++j)
-                        {
-                            var compiled_brush = new CUniFill();
-                            compiled_brush.merge(base_fills[i]);
-                            if(ser.spPr && ser.spPr.Fill)
-                            {
-                                compiled_brush.merge(ser.spPr.Fill);
-                            }
-                            if(Array.isArray(ser.dPt))
-                            {
-                                for(var k = 0; k < ser.dPt.length; ++k)
-                                {
-                                    if(ser.dPt[k].idx === pts[j].idx)
-                                    {
-                                        if(ser.dPt[k].spPr)
-                                        {
-                                            compiled_brush.merge(ser.dPt[k].spPr.Fill);
-                                        }
-                                        break;
-                                    }
-                                }
-                            }
-                            pts[j].brush = compiled_brush;
-                            pts[j].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-                        }
-
-
-                        if(style.line1 === EFFECT_SUBTLE)
-                        {
-                            var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
-
-                            if(this.style !== 34)
-                            {
-                                for(var j = 0; j < pts.length; ++j)
-                                {
-                                    var compiled_line = new CLn();
-                                    compiled_line.merge(default_line);
-                                    compiled_line.Fill.merge(style.line2[0]);
-                                    if(ser.spPr && spPr.ln)
-                                    {
-                                        compiled_line.merge(spPr.ln);
-                                    }
-                                    if(Array.isArray(ser.dPt))
-                                    {
-                                        for(var k = 0; k < ser.dPt.length; ++k)
-                                        {
-                                            if(ser.dPt[k].idx === pts[j].idx)
-                                            {
-                                                if(ser.dPt[k].spPr)
-                                                {
-                                                    compiled_line.merge(ser.dPt[k].spPr.ln);
-                                                }
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    pts[j].pen = compiled_line;
-                                    pts[j].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-                                }
-                            }
-                            else
-                            {
-                                for(i = 0; i < pts.length; ++i)
-                                {
-                                    var compiled_line = new CLn();
-                                    compiled_line.merge(default_line);
-                                    compiled_line.Fill.merge(base_line_fills[i]);
-                                    if(ser.spPr && spPr.ln)
-                                    {
-                                        compiled_line.merge(spPr.ln);
-                                    }
-                                    if(Array.isArray(ser.dPt))
-                                    {
-                                        for(var j = 0; j < ser.dPt.length; ++j)
-                                        {
-                                            if(ser.dPt[j].idx === pts[i].idx)
-                                            {
-                                                if(ser.dPt[j].spPr)
-                                                {
-                                                    compiled_line.merge(ser.dPt[j].spPr.ln);
-                                                }
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    pts[i].pen = compiled_line;
-                                    pts[i].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-
-                    var base_line_fills = getArrayFillsFromBase(style.line4, series.length);
-                    for(var i = 0; i < series.length; ++i)
-                    {
-                        var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
-                        var ser = series[i];
-                        var pts;
-                        if(ser.val)
-                        {
-                            pts = ser.val.numRef.numCache.pts;
-                        }
-                        else if(ser.yVal)
-                        {
-                            pts = ser.yVal.numRef.numCache.pts;
-                        }
-                        else
-                        {
-                            pts = [];
-                        }
-                        for(var j = 0; j < pts.length; ++j)
-                        {
-                            var compiled_line = new CLn();
-                            compiled_line.merge(default_line);
-                            compiled_line.Fill.merge(base_line_fills[i]);
-                            compiled_line.w *= style.line3;
-                            if(ser.spPr && spPr.ln)
-                            {
-                                compiled_line.merge(spPr.ln);
-                            }
-                            if(Array.isArray(ser.dPt))
-                            {
-                                for(var k = 0; k < ser.dPt.length; ++k)
-                                {
-                                    if(ser.dPt[k].idx === pts[j].idx)
-                                    {
-                                        if(ser.dPt[k].spPr)
-                                        {
-                                            compiled_line.merge(ser.dPt[k].spPr.ln);
-                                        }
-                                        break;
-                                    }
-                                }
-                            }
-                            pts[j].brush = null;
-                            pts[j].pen = compiled_line;
-                            pts[j].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-                        }
+                        pts[j].brush = null;
+                        pts[j].pen = compiled_line;
+                        pts[j].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
                     }
                 }
             }
         }
-    }, this, []);
+    }
 };
 
 CChartSpace.prototype.recalculateHiLowLines = function()
@@ -2390,7 +2388,7 @@ CChartSpace.prototype.recalculateAxis = function()
                     }
                 }
                 var max_width = 0;
-                val_ax.yPoints = [];
+                val_ax.xPoints = [];
                 var max_height = 0;
                 for(i = 0; i < arr_strings.length; ++i)
                 {
@@ -2403,7 +2401,6 @@ CChartSpace.prototype.recalculateAxis = function()
                     dlbl.tx.rich = CreateTextBodyFromString(arr_strings[i], this.getDrawingDocument(), dlbl);
                     dlbl.recalculate();
                     val_ax.labels.arrLabels.push(dlbl);
-                    val_ax.yPoints.push({val: arr_val[i], pos: null});
                     var cur_height = dlbl.tx.rich.content.Get_SummaryHeight();
                     if(cur_height > max_height)
                     {
@@ -2464,11 +2461,26 @@ CChartSpace.prototype.recalculateAxis = function()
                 for(i = 0;  i < val_ax.labels.arrLabels.length; ++i)
                 {
                     val_ax.labels.arrLabels[i].setPosition(val_ax.labels.x + hor_interval*i - val_ax.labels.arrLabels[i].tx.rich.content.XLimit/2, val_ax.labels.y + gap_hor_axis);
-                    val_ax.xPoints.push({pos: val_ax.labels.x + hor_interval*i, val: arr_val[0]});
+                    val_ax.xPoints.push({pos: val_ax.labels.x + hor_interval*i, val: arr_val[i]});
                 }
                 val_ax.posY = val_ax.labels.y;
                 cat_ax.posX = cat_ax.labels.x + cat_ax.labels.extX;
             }
+        }
+    }
+};
+
+CChartSpace.prototype.recalculateLegend = function()
+{
+    if(this.chart && this.chart.legend)
+    {
+        var legend = this.chart.legend;
+        var arr_str_labels = [], i, series = this.chart.plotArea.chart.series;
+        for(i = 0; i < series.length; ++i)
+            arr_str_labels.push(series[i].getSeriesName());
+        for(i = 0; i < arr_str_labels.length; ++i)
+        {
+
         }
     }
 };
