@@ -3402,17 +3402,150 @@ Woorksheet.prototype._BuildDependencies=function(cellRange){
 	/*
 		Построение графа зависимостей.
 	*/
-	var c, ca;
+	var c, ca, oLengthCache = {};
 	for(var i in cellRange){
 		ca = g_oCellAddressUtils.getCellAddress(i);
 		c = this._getCellNoEmpty(ca.getRow0(),ca.getCol0());
 
 		if( c && c.sFormula ){
-			c.formulaParsed = new parserFormula( c.sFormula, c.oId.getID(), this );
-            c.formulaParsed.parse();
-			c.formulaParsed.buildDependencies();
+			var elem = oLengthCache[c.sFormula.length];
+			if(null == elem)
+			{
+				elem = [];
+				oLengthCache[c.sFormula.length] = elem;
+			}
+			elem.push(c);
 		}
 	}
+	for(var i in oLengthCache)
+	{
+		var temp = oLengthCache[i];
+		var aCache = [];
+		for(var j = 0, length2 = temp.length; j < length2; j++)
+		{
+			var c = temp[j];
+			var aRefs = [];
+			var cache = inCache(aCache, c.sFormula, aRefs);
+			var bInCache = false;
+			if(cache)
+			{
+				bInCache = true;
+				var oNewFormula = cache.formulaParsed.clone(c.sFormula, c.oId.getID(), this);
+				var RefPos = cache.formulaParsed.RefPos;
+				for(var k = 0, length3 = RefPos.length; k < length3; k++)
+				{
+					var pos = RefPos[k];
+					var elem = oNewFormula.outStack[pos.index];
+					if(elem)
+					{
+						var ref = aRefs[k];
+						var range = Asc.g_oRangeCache.getAscRange(ref);
+						if(null != range)
+						{
+							var oNewElem;
+							if(range.isOneCell())
+							{
+								if(elem instanceof cRef3D)
+									oNewElem = new cRef3D(ref, elem.ws.getName(), elem._wb);
+								else if(elem instanceof cArea3D)
+								{
+									var wsFrom = elem._wb.getWorksheetById( elem.wsFrom ).getName();
+									var wsTo = elem._wb.getWorksheetById( elem.wsTo ).getName();
+									oNewElem = new cArea3D(ref, wsFrom, wsTo, elem._wb);
+								}
+								else
+									oNewElem = new cRef(ref, elem.ws);
+							}
+							else
+							{
+								if(elem instanceof cRef3D)
+									oNewElem = new cArea3D(ref, elem.ws.getName(), elem.ws.getName(), elem._wb);
+								else if(elem instanceof cArea3D)
+								{
+									var wsFrom = elem._wb.getWorksheetById( elem.wsFrom ).getName();
+									var wsTo = elem._wb.getWorksheetById( elem.wsTo ).getName();
+									oNewElem = new cArea3D(ref, wsFrom, wsTo, elem._wb);
+								}
+								else
+									oNewElem = new cArea(ref, elem.ws);
+							}
+							if ( ref.indexOf( "$" ) > -1 )
+								oNewElem.isAbsolute = true;
+							oNewFormula.outStack[pos.index] = oNewElem;
+						}
+						else
+							bInCache = false;
+					}
+				}
+				if(bInCache)
+				{
+					c.formulaParsed = oNewFormula;
+					c.formulaParsed.buildDependencies();
+				}
+			}
+			if(!bInCache)
+			{
+				c.formulaParsed = new parserFormula( c.sFormula, c.oId.getID(), this );
+				c.formulaParsed.parse();
+				c.formulaParsed.buildDependencies();
+				aCache.push(c);
+			}
+		}
+	}
+}
+function inCache(aCache, sFormula, aRefs)
+{
+	var oRes = null;
+	for(var i = 0, length = aCache.length; i < length; i++)
+	{
+		var cache = aCache[i];
+		var sCurFormula = cache.sFormula;
+		var RefPos = cache.formulaParsed.RefPos;
+		if(inCacheStrcmp(sCurFormula, sFormula, RefPos, aRefs))
+		{
+			oRes = cache;
+			break;
+		}
+	}
+	return oRes;
+}
+function inCacheStrcmp(str1, str2, RefPos, aRefs)
+{
+	var bRes = true;
+	var nStartIndex = 0;
+	for(var i = 0, length = RefPos.length; i < length; i++)
+	{
+		var mask = RefPos[i];
+		for(var j = nStartIndex; j < mask.start; j++)
+		{
+			if(str1[j] != str2[j])
+			{
+				bRes = false;
+				break;
+			}
+		}
+		nStartIndex = mask.end;
+	}
+	if(bRes)
+	{
+		for(var i = nStartIndex; i < str1.length; i++)
+		{
+			if(str1[i] != str2[i])
+			{
+				bRes = false;
+				break;
+			}
+		}
+	}
+	if(bRes)
+	{
+		for(var i = 0, length = RefPos.length; i < length; i++)
+		{
+			var mask = RefPos[i];
+			aRefs.push(str2.substring(mask.start, mask.end));
+		}
+	}
+	return bRes;
 }
 Woorksheet.prototype._RecalculatedFunctions=function(cell,bad){
     function adjustCellFormat( c ) {

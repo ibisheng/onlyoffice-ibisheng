@@ -972,6 +972,14 @@ function cBaseType( val ) {
 }
 cBaseType.prototype = {
     constructor:cBaseType,
+	cloneTo : function(oRes){
+		oRes.needRecalc = this.needRecalc;
+		oRes.numFormat = this.numFormat;
+		oRes.type = this.type;
+		oRes.value = this.value;
+		oRes.ca = this.ca;
+		oRes.node = this.node;
+	},
     tryConvert:function () {
         return this;
     },
@@ -1483,6 +1491,12 @@ function cArea( val, _ws ) {/*Area means "A1:E5" for example*/
     // this._valid = this.range ? true : false;
 }
 cArea.prototype = Object.create( cBaseType.prototype );
+cArea.prototype.clone = function () {
+	var oRes = new cArea(this._cells, this.ws);
+	cBaseType.prototype.cloneTo.call( this, oRes );
+	oRes.isAbsolute = this.isAbsolute;
+    return oRes;
+};
 cArea.prototype.getWsId = function () {
     return this.ws.Id;
 };
@@ -1695,10 +1709,21 @@ function cRef( val, _ws ) {/*Ref means A1 for example*/
     this.wb = _ws.workbook;
     this.isAbsolute = false;
     this.type = cElementType.cell;
-    this.range = _ws.getRange2( val );
-    this._valid = new CellAddress( val.replace( rx_space_g, "" ) ).isValid();
+	var ca = g_oCellAddressUtils.getCellAddress( val.replace( rx_space_g, "" ) );
+	this.range = null;
+	this._valid = ca.isValid();
+	if(this._valid)
+		this.range = _ws.getRange3( ca.getRow0(), ca.getCol0(), ca.getRow0(), ca.getCol0() );
+	else
+		this.range = _ws.getRange3( 0, 0, 0, 0 );
 }
 cRef.prototype = Object.create( cBaseType.prototype );
+cRef.prototype.clone = function () {
+	var oRes = new cRef(this._cells, this.ws);
+	cBaseType.prototype.cloneTo.call( this, oRes );
+	oRes.isAbsolute = oRes.isAbsolute;
+    return oRes;
+};
 cRef.prototype.getWsId = function () {
     return this.ws.Id;
 };
@@ -1761,6 +1786,14 @@ function cArea3D( val, _wsFrom, _wsTo, wb ) {/*Area3D means "Sheat1!A1:E5" for e
     this.wsTo = this._wb.getWorksheetByName( _wsTo ).getId();
 }
 cArea3D.prototype = Object.create( cBaseType.prototype );
+cArea3D.prototype.clone = function () {
+	var wsFrom = this._wb.getWorksheetById( this.wsFrom ).getName();
+	var wsTo = this._wb.getWorksheetById( this.wsTo ).getName();
+    var oRes = new cArea3D(this._cells, wsFrom, wsTo, this._wb);
+	cBaseType.prototype.cloneTo.call( this, oRes );
+	oRes.isAbsolute = this.isAbsolute;
+	return oRes;
+};
 cArea3D.prototype.wsRange = function () {
     var r = [];
     if ( !this.wsTo ) this.wsTo = this.wsFrom;
@@ -2060,6 +2093,12 @@ function cRef3D( val, _wsFrom, wb ) {/*Ref means Sheat1!A1 for example*/
     this.ws = this._wb.getWorksheetByName( _wsFrom );
 }
 cRef3D.prototype = Object.create( cBaseType.prototype );
+cRef3D.prototype.clone = function () {
+    var oRes = new cRef3D(this._cells, this.ws.getName(), this._wb);
+	cBaseType.prototype.cloneTo.call( this, oRes );
+	oRes.isAbsolute = this.isAbsolute;
+	return oRes;
+};
 cRef3D.prototype.getWsId = function () {
     return this.ws.Id;
 };
@@ -2325,37 +2364,67 @@ function parserFormula( formula, _cellId, _ws ) {
     var that = this;
     this.is3D = false;
     this.cellId = _cellId;
-    this.cellAddress = new CellAddress( this.cellId );
+    this.cellAddress = g_oCellAddressUtils.getCellAddress( this.cellId );
     this.ws = _ws;
     this.wb = this.ws.workbook
     this.value = null;
-    this.pCurrPos = 0;
-    this.elemArr = [];
     this.outStack = [];
-    this.operand_str = null;
     this.error = [];
     this.Formula = formula;
-    this.undoParser = {formula:null, outStack:[]};
     this.isParsed = false;
+	//для функции parse и parseDiagramRef
+	this.pCurrPos = 0;
+	this.elemArr = [];
+	this.RefPos = [];
+	this.operand_str = null;
 }
 parserFormula.prototype = {
 
     /** @type parserFormula */
     constructor:parserFormula,
 
+	clone : function(formula, cellId, ws)
+	{
+		if(null == formula)
+			formula = this.Formula;
+		if(null == cellId)
+			cellId = this.cellId;
+		if(null == ws)
+			ws = this.ws;
+		var oRes = new parserFormula(formula, cellId, ws);
+		oRes.is3D = this.is3D;
+		oRes.value = this.value;
+		oRes.pCurrPos = this.pCurrPos;
+		oRes.elemArr = [];
+		for(var i = 0, length = this.outStack.length; i < length; i++)
+		{
+			var oCurElem = this.outStack[i];
+			if(oCurElem.clone)
+				oRes.outStack.push(oCurElem.clone());
+			else
+				oRes.outStack.push(oCurElem);
+		}
+		oRes.RefPos = [];
+		oRes.operand_str = this.operand_str;
+		oRes.error = this.error.concat();
+		oRes.isParsed = this.isParsed;
+		return oRes;
+	},
+	
     setFormula:function ( formula ) {
         this.Formula = formula;
         this.value = null;
         this.pCurrPos = 0;
         this.elemArr = [];
         this.outStack = [];
+		this.RefPos = [];
         this.operand_str = null;
 
     },
 
     setCellId:function ( cellId ) {
         this.cellId = cellId;
-        this.cellAddress = new CellAddress( cellId );
+        this.cellAddress = g_oCellAddressUtils.getCellAddress( cellId );
     },
 
     parse:function () {
@@ -2622,11 +2691,13 @@ parserFormula.prototype = {
                         return false;
                     }
                     if ( parserHelp.isArea.call( this, this.Formula, this.pCurrPos ) ) {
+						this.RefPos.push({start: this.pCurrPos - this.operand_str.length, end: this.pCurrPos, index: this.outStack.length});
                         found_operand = new cArea3D( this.operand_str.toUpperCase(), _wsFrom, _wsTo, this.wb );
                         if ( this.operand_str.indexOf( "$" ) > -1 )
                             found_operand.isAbsolute = true;
                     }
                     else if ( parserHelp.isRef.call( this, this.Formula, this.pCurrPos ) ) {
+						this.RefPos.push({start: this.pCurrPos - this.operand_str.length, end: this.pCurrPos, index: this.outStack.length});
                         if ( _wsTo != _wsFrom ) {
                             found_operand = new cArea3D( this.operand_str.toUpperCase(), _wsFrom, _wsTo, this.wb );
                         }
@@ -2643,12 +2714,14 @@ parserFormula.prototype = {
                 }
                 /* Referens to cells area A1:A10 */
                 else if ( parserHelp.isArea.call( this, this.Formula, this.pCurrPos ) ) {
+					this.RefPos.push({start: this.pCurrPos - this.operand_str.length, end: this.pCurrPos, index: this.outStack.length});
                     found_operand = new cArea( this.operand_str.toUpperCase(), this.ws );
                     if ( this.operand_str.indexOf( "$" ) > -1 )
                         found_operand.isAbsolute = true;
                 }
                 /* Referens to cell A4 */
                 else if ( parserHelp.isRef.call( this, this.Formula, this.pCurrPos, true ) ) {
+					this.RefPos.push({start: this.pCurrPos - this.operand_str.length, end: this.pCurrPos, index: this.outStack.length});
                     found_operand = new cRef( this.operand_str.toUpperCase(), this.ws );
                     if ( this.operand_str.indexOf( "$" ) > -1 )
                         found_operand.isAbsolute = true;
@@ -2903,12 +2976,6 @@ parserFormula.prototype = {
      cellId - какую ячейку сдвигаем
      */
     shiftCells:function ( offset, oBBox, node, wsId, toDelete ) {
-
-        this.undoParser.formula = this.Formula
-        for ( var i = 0; i < this.outStack.length; i++ ) {
-            this.undoParser.outStack[i] = this.outStack[i];
-        }
-
         for ( var i = 0; i < this.outStack.length; i++ ) {
             if ( this.outStack[i] instanceof cRef ) {
                 if ( this.ws.Id != wsId ) {
