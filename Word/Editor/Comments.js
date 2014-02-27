@@ -934,6 +934,20 @@ ParaComment.prototype =
     {
         return false;
     },
+
+    Get_DrawingObjectRun : function(Id)
+    {
+        return null;
+    },
+
+    Get_DrawingObjectContentPos : function(Id, ContentPos, Depth)
+    {
+        return false;
+    },
+
+    Get_Layout : function(DrawingLayout, UseContentPos, ContentPos, Depth)
+    {
+    },
 //-----------------------------------------------------------------------------------
 // Функции пересчета
 //-----------------------------------------------------------------------------------

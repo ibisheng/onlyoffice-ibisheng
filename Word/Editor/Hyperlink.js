@@ -12,6 +12,7 @@ function ParaHyperlink()
     this.ToolTip = "";
 
     this.State = new CParaRunState();
+    this.Selection = this.State.Selection;
 
     this.Content = new Array();
 
@@ -24,6 +25,8 @@ function ParaHyperlink()
 
     this.Range = this.Lines[0].Ranges[0];
 
+    this.NearPosArray = new Array();
+
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
 }
@@ -33,6 +36,41 @@ ParaHyperlink.prototype =
     Get_Id : function()
     {
         return this.Id;
+    },
+
+    Copy : function(Selected)
+    {
+        var NewHyperlink = new ParaHyperlink();
+
+        NewHyperlink.Set_Value( this.Value );
+        NewHyperlink.Set_ToolTip( this.ToolTip );
+
+        var StartPos = 0;
+        var EndPos   = this.Content.length - 1;
+
+        if ( true === Selected && true === this.State.Selection.Use )
+        {
+            StartPos = this.State.Selection.StartPos;
+            EndPos   = this.State.Selection.EndPos;
+
+            if ( StartPos > EndPos )
+            {
+                StartPos = this.State.Selection.EndPos;
+                EndPos   = this.State.Selection.StartPos;
+            }
+        }
+
+        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+        {
+            var Item = this.Content[CurPos];
+
+            if ( StartPos === CurPos || EndPos === CurPos )
+                NewHyperlink.Add_ToContent( CurPos - StartPos, Item.Copy(Selected) );
+            else
+                NewHyperlink.Add_ToContent( CurPos - StartPos, Item.Copy(false) );
+        }
+
+        return NewHyperlink;
     },
 
     Set_Paragraph : function(Paragraph)
@@ -161,6 +199,18 @@ ParaHyperlink.prototype =
                 }
             }
         }
+
+        // Обновляем позиции в NearestPos
+        var NearPosLen = this.NearPosArray.length;
+        for ( var Index = 0; Index < NearPosLen; Index++ )
+        {
+            var HyperNearPos = this.NearPosArray[Index];
+            var ContentPos = HyperNearPos.NearPos.ContentPos;
+            var Depth      = HyperNearPos.Depth;
+
+            if ( ContentPos.Data[Depth] >= Pos )
+                ContentPos.Data[Depth]++;
+        }
     },
 
     Remove_FromContent : function(Pos, Count, UpdatePosition)
@@ -229,6 +279,20 @@ ParaHyperlink.prototype =
                         Range.EndPos = Math.max( 0 , Pos );
                 }
             }
+        }
+
+        // Обновляем позиции в NearestPos
+        var NearPosLen = this.NearPosArray.length;
+        for ( var Index = 0; Index < NearPosLen; Index++ )
+        {
+            var HyperNearPos = this.NearPosArray[Index];
+            var ContentPos = HyperNearPos.NearPos.ContentPos;
+            var Depth      = HyperNearPos.Depth;
+
+            if ( ContentPos.Data[Depth] > Pos + Count )
+                ContentPos.Data[Depth] -= Count;
+            else if ( ContentPos.Data[Depth] > Pos )
+                ContentPos.Data[Depth] = Math.max( 0 , Pos );
         }
     },
 
@@ -440,6 +504,71 @@ ParaHyperlink.prototype =
             this.Add_ToContent( CenterRunPos + 1, RRun, true );
 
         return CenterRunPos;
+    },
+
+    Check_NearestPos : function(ParaNearPos, Depth)
+    {
+        var HyperNearPos = new CParagraphElementNearPos();
+        HyperNearPos.NearPos = ParaNearPos.NearPos;
+        HyperNearPos.Depth   = Depth;
+
+        this.NearPosArray.push( HyperNearPos );
+        ParaNearPos.Classes.push( this );
+
+        var CurPos = ParaNearPos.NearPos.ContentPos.Get(Depth);
+        this.Content[CurPos].Check_NearestPos( ParaNearPos, Depth + 1 );
+    },
+
+    Get_DrawingObjectRun : function(Id)
+    {
+        var Run = null;
+
+        var ContentLen = this.Content.length;
+        for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
+        {
+            var Element = this.Content[CurPos];
+            Run = Element.Get_DrawingObjectRun( Id );
+            if ( null !== Run )
+                return Run;
+        }
+
+        return Run;
+    },
+
+    Get_DrawingObjectContentPos : function(Id, ContentPos, Depth)
+    {
+        var ContentLen = this.Content.length;
+        for ( var Index = 0; Index < ContentLen; Index++ )
+        {
+            var Element = this.Content[Index];
+
+            if ( true === Element.Get_DrawingObjectContentPos(Id, ContentPos, Depth + 1) )
+            {
+                ContentPos.Update2( Index, Depth );
+                return true;
+            }
+        }
+
+        return false;
+    },
+
+    Get_Layout : function(DrawingLayout, UseContentPos, ContentPos, Depth)
+    {
+        var CurLine  = DrawingLayout.Line - this.StartLine;
+        var CurRange = ( 0 === CurLine ? DrawingLayout.Range - this.StartRange : DrawingLayout.Range );
+
+        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
+        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
+
+        var CurContentPos = ( true === UseContentPos ? ContentPos.Get(Depth) : -1 );
+
+        for ( var CurPos = StartPos; CurPos < EndPos; CurPos++ )
+        {
+            this.Content[CurPos].Get_Layout(DrawingLayout, ( CurPos === CurContentPos ? true : false ), ContentPos, Depth + 1 );
+
+            if ( null !== DrawingLayout.Layout )
+                return;
+        }
     },
 //-----------------------------------------------------------------------------------
 // Функции пересчета
@@ -1279,17 +1408,6 @@ ParaHyperlink.prototype =
     {
         History.Add( this, { Type : historyitem_Hyperlink_Value, New : Value, Old : this.Value } );
         this.Value = Value;
-    },
-
-    Copy : function()
-    {
-        var Hyperlink_new = new ParaHyperlinkStart();
-
-        Hyperlink_new.Value   = this.Value;
-        Hyperlink_new.Visited = this.Visited;
-        Hyperlink_new.ToolTip = this.ToolTip;
-
-        return Hyperlink_new;
     },
 
 //-----------------------------------------------------------------------------------

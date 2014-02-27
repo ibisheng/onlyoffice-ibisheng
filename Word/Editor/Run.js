@@ -12,6 +12,7 @@ function ParaRun(Paragraph)
     this.Pr         = new CTextPr();             // Текстовые настройки данного run
     this.Content    = new Array();               // Содержимое данного run
     this.State      = new CParaRunState();       // Положение курсора и селекта в данного run
+    this.Selection  = this.State.Selection;
     this.CompiledPr = new CTextPr();             // Скомпилированные настройки
     this.RecalcInfo = new CParaRunRecalcInfo();  // Флаги для пересчета (там же флаг пересчета стиля)
 
@@ -36,6 +37,8 @@ function ParaRun(Paragraph)
     this.StartRange  = 0;
 
     this.CollaborativeMarks = new Array(); // Массив CParaRunCollaborativeMark
+
+    this.NearPosArray = new Array();
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -69,6 +72,38 @@ ParaRun.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с содержимым данного рана
 //-----------------------------------------------------------------------------------
+    Copy : function(Selected)
+    {
+        var NewRun = new ParaRun(this.Paragraph);
+
+        NewRun.Set_Pr( this.Pr.Copy() );
+
+        var StartPos = 0;
+        var EndPos   = this.Content.length;
+
+        if ( true === Selected && true === this.State.Selection.Use )
+        {
+            StartPos = this.State.Selection.StartPos;
+            EndPos   = this.State.Selection.EndPos;
+
+            if ( StartPos > EndPos )
+            {
+                StartPos = this.State.Selection.EndPos;
+                EndPos   = this.State.Selection.StartPos;
+            }
+        }
+
+        for ( var CurPos = StartPos; CurPos < EndPos; CurPos++ )
+        {
+            var Item = this.Content[CurPos];
+
+            // TODO: Как только перенесем para_End в сам параграф (как и нумерацию) убрать здесь
+            if ( para_End !== Item.Type )
+                NewRun.Add_ToContent( CurPos - StartPos, Item.Copy(), false );
+        }
+
+        return NewRun;
+    },
 
     Get_Text : function(Text)
     {
@@ -236,7 +271,7 @@ ParaRun.prototype =
         if ( -1 === Pos )
             return false;
 
-        this.Remove_FromContent( Pos, ContentLen - Pos );
+        this.Remove_FromContent( Pos, ContentLen - Pos, true );
 
         return true;
     },
@@ -287,7 +322,7 @@ ParaRun.prototype =
                 }
             }
 
-            // TODO: Поиск, NearPos, SpellCheck
+            // TODO: Поиск, SpellCheck
 
 //            for ( var CurSearch in this.SearchResults )
 //            {
@@ -298,14 +333,20 @@ ParaRun.prototype =
 //                    this.SearchResults[CurSearch].EndPos++;
 //            }
 //
-//            for ( var Id in this.NearPosArray )
-//            {
-//                var NearPos = this.NearPosArray[Id];
-//                if ( NearPos.ContentPos >= Pos )
-//                    NearPos.ContentPos++;
-//            }
 //
 //            this.SpellChecker.Update_OnAdd( this, Pos, Item );
+        }
+
+        // Обновляем позиции в NearestPos
+        var NearPosLen = this.NearPosArray.length;
+        for ( var Index = 0; Index < NearPosLen; Index++ )
+        {
+            var RunNearPos = this.NearPosArray[Index];
+            var ContentPos = RunNearPos.NearPos.ContentPos;
+            var Depth      = RunNearPos.Depth;
+
+            if ( ContentPos.Data[Depth] >= Pos )
+                ContentPos.Data[Depth]++;
         }
 
         // Отмечаем, что надо перемерить элементы в данном ране
@@ -379,20 +420,24 @@ ParaRun.prototype =
                 }
             }
 
-            // TODO: Поиск, NearPos, Spelling
-
-//            for ( var Id in this.NearPosArray )
-//            {
-//                var NearPos = this.NearPosArray[Id];
-//
-//                if ( NearPos.ContentPos > Pos + Count )
-//                    NearPos.ContentPos -= Count;
-//                else if ( NearPos.ContentPos > Pos )
-//                    NearPos.ContentPos = Math.max( 0 , Pos );
-//            }
+            // TODO: Поиск, Spelling
 //
 //            // Передвинем все метки слов для проверки орфографии
 //            this.SpellChecker.Update_OnRemove( this, Pos, Count );
+        }
+
+        // Обновляем позиции в NearestPos
+        var NearPosLen = this.NearPosArray.length;
+        for ( var Index = 0; Index < NearPosLen; Index++ )
+        {
+            var RunNearPos = this.NearPosArray[Index];
+            var ContentPos = RunNearPos.NearPos.ContentPos;
+            var Depth      = RunNearPos.Depth;
+
+            if ( ContentPos.Data[Depth] > Pos + Count )
+                ContentPos.Data[Depth] -= Count;
+            else if ( ContentPos.Data[Depth] > Pos )
+                ContentPos.Data[Depth] = Math.max( 0 , Pos );
         }
 
         // Отмечаем, что надо перемерить элементы в данном ране
@@ -672,6 +717,146 @@ ParaRun.prototype =
         this.Remove_FromContent( CurPos, this.Content.length - CurPos, true );
 
         return NewRun;
+    },
+
+    Check_NearestPos : function(ParaNearPos, Depth)
+    {
+        var RunNearPos = new CParagraphElementNearPos();
+        RunNearPos.NearPos = ParaNearPos.NearPos;
+        RunNearPos.Depth   = Depth;
+
+        this.NearPosArray.push( RunNearPos );
+        ParaNearPos.Classes.push( this );
+    },
+
+    Get_DrawingObjectRun : function(Id)
+    {
+        var ContentLen = this.Content.length;
+        for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
+        {
+            var Element = this.Content[CurPos];
+
+            if ( para_Drawing === Element.Type && Id === Element.Get_Id() )
+                return this;
+        }
+
+        return null;
+    },
+
+    Get_DrawingObjectContentPos : function(Id, ContentPos, Depth)
+    {
+        var ContentLen = this.Content.length;
+        for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
+        {
+            var Element = this.Content[CurPos];
+
+            if ( para_Drawing === Element.Type && Id === Element.Get_Id() )
+            {
+                ContentPos.Update( CurPos, Depth );
+                return true;
+            }
+        }
+
+        return false;
+    },
+
+    Remove_DrawingObject : function(Id)
+    {
+        var ContentLen = this.Content.length;
+        for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
+        {
+            var Element = this.Content[CurPos];
+
+            if ( para_Drawing === Element.Type && Id === Element.Get_Id() )
+            {
+                this.Remove_FromContent( CurPos, 1 );
+                return;
+            }
+        }
+    },
+
+    Get_Layout : function(DrawingLayout, UseContentPos, ContentPos, Depth)
+    {
+        var CurLine  = DrawingLayout.Line - this.StartLine;
+        var CurRange = ( 0 === CurLine ? DrawingLayout.Range - this.StartRange : DrawingLayout.Range );
+
+        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
+        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
+
+        var CurContentPos = ( true === UseContentPos ? ContentPos.Get(Depth) : -1 );
+
+        var CurPos = StartPos;
+        for ( ; CurPos < EndPos; CurPos++ )
+        {
+            var Item = this.Content[CurPos];
+
+            if ( CurContentPos === CurPos )
+                break;
+
+            switch ( Item.Type )
+            {
+                case para_Text:
+                case para_Space:
+                case para_PageNum:
+                {
+                    DrawingLayout.LastW = Item.WidthVisible;
+
+                    break;
+                }
+                case para_Drawing:
+                {
+                    if ( true === Item.Is_Inline() || true === DrawingLayout.Paragraph.Parent.Is_DrawingShape() )
+                    {
+                        DrawingLayout.LastW = Item.WidthVisible;
+                    }
+
+                    break;
+                }
+            }
+
+            DrawingLayout.X += Item.WidthVisible;
+        }
+
+        if ( CurContentPos === CurPos )
+        {
+            var Para    = DrawingLayout.Paragraph;
+            var CurPage = DrawingLayout.Page;
+            var Drawing = DrawingLayout.Drawing;
+
+            var DrawingObjects = Para.Parent.DrawingObjects;
+            var PageLimits     = Para.Parent.Get_PageLimits(Para.PageNum + CurPage);
+            var PageFields     = Para.Parent.Get_PageFields(Para.PageNum + CurPage);
+
+            var ColumnStartX = (0 === CurPage ? Para.X_ColumnStart : Para.Pages[CurPage].X);
+            var ColumnEndX   = (0 === CurPage ? Para.X_ColumnEnd   : Para.Pages[CurPage].XLimit);
+
+            var Top_Margin    = Y_Top_Margin;
+            var Bottom_Margin = Y_Bottom_Margin;
+            var Page_H        = Page_Height;
+
+            if ( true === Para.Parent.Is_TableCellContent() && undefined != Drawing && true == Drawing.Use_TextWrap() )
+            {
+                Top_Margin    = 0;
+                Bottom_Margin = 0;
+                Page_H        = 0;
+            }
+
+            if ( undefined != Drawing && true != Drawing.Use_TextWrap() )
+            {
+                PageFields.X      = X_Left_Field;
+                PageFields.Y      = Y_Top_Field;
+                PageFields.XLimit = X_Right_Field;
+                PageFields.YLimit = Y_Bottom_Field;
+
+                PageLimits.X = 0;
+                PageLimits.Y = 0;
+                PageLimits.XLimit = Page_Width;
+                PageLimits.YLimit = Page_Height;
+            }
+
+            DrawingLayout.Layout = new CParagraphLayout( DrawingLayout.X, DrawingLayout.Y , Para.Get_StartPage_Absolute() + CurPage, DrawingLayout.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y );
+            DrawingLayout.Limits = PageLimits;
+        }
     },
 //-----------------------------------------------------------------------------------
 // Функции пересчета
@@ -975,6 +1160,8 @@ ParaRun.prototype =
 
                         if ( true === StartWord )
                             FirstItemOnLine = false;
+
+                        Item.YOffset = this.YOffset;
 
                         // Если до этого было слово, тогда не надо проверять убирается ли оно, но если стояли пробелы,
                         // тогда мы их учитываем при проверке убирается ли данный элемент, и добавляем только если
@@ -3607,6 +3794,8 @@ ParaRun.prototype =
 
             History.Add( this, { Type : historyitem_ParaRun_Position, New : Value, Old : OldValue } );
             this.Recalc_CompiledPr( false );
+
+            this.YOffset = this.Get_Position();
         }
     },
 

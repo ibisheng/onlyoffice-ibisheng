@@ -130,9 +130,9 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
 
     this.SearchResults = new Object();
 
-    this.SpellChecker = new CParaSpellChecker();
+    this.SpellChecker  = new CParaSpellChecker();
 
-    this.NearPosArray = new Array();
+    this.NearPosArray  = new Array();
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -463,8 +463,29 @@ Paragraph.prototype =
             if ( this.Selection.EndPos >= Pos )
                 this.Selection.EndPos++;
 
+            // Обновляем позиции в NearestPos
+            var NearPosLen = this.NearPosArray.length;
+            for ( var Index = 0; Index < NearPosLen; Index++ )
+            {
+                var ParaNearPos = this.NearPosArray[Index];
+                var ParaContentPos = ParaNearPos.NearPos.ContentPos;
+
+                if ( ParaContentPos.Data[0] >= Pos )
+                    ParaContentPos.Data[0]++;
+            }
+
             Item.Set_Paragraph( this );
         }
+    },
+
+    Add_ToContent : function(Pos, Item)
+    {
+        this.Internal_Content_Add( Pos, Item );
+    },
+
+    Remove_FromContent : function(Pos, Count)
+    {
+        this.Internal_Content_Remove2(Pos, Count);
     },
 
     Internal_Content_Add2 : function (Pos, Item, bCorrectPos)
@@ -530,8 +551,9 @@ Paragraph.prototype =
             for ( var CurPos = StartPos; CurPos < this.Content.length; CurPos++ )
             {
                 this.Content[CurPos].Set_Paragraph( this );
-                //this.Content[CurPos].Reset_RecalcInfo();
             }
+
+            // Обновлять позиции в NearestPos не надо, потому что мы добавляем новые элементы в конец массива
 
             // TODO: Разобраться с орфографией
         }
@@ -642,6 +664,17 @@ Paragraph.prototype =
 
             if ( this.CurPos.ContentPos > Pos )
                 this.CurPos.ContentPos--;
+
+            // Обновляем позиции в NearestPos
+            var NearPosLen = this.NearPosArray.length;
+            for ( var Index = 0; Index < NearPosLen; Index++ )
+            {
+                var ParaNearPos = this.NearPosArray[Index];
+                var ParaContentPos = ParaNearPos.NearPos.ContentPos;
+
+                if ( ParaContentPos.Data[0] > Pos )
+                    ParaContentPos.Data[0]--;
+            }
 
             // Удаляем комментарий, если это необходимо
             if ( true === this.DeleteCommentOnRemove && para_Comment === Item.Type )
@@ -3843,7 +3876,7 @@ Paragraph.prototype =
         }
 
         if ( Pos >= ContentLen )
-            Pos = ContentLen;
+            Pos = ContentLen - 1;
 
         if ( recalcresult_NextLine === PRS.RecalcResult )
         {
@@ -5490,6 +5523,8 @@ Paragraph.prototype =
         }
         else
         {
+            this.Clear_NearestPosArray();
+
             // Во время пересчета сбрасываем привязку курсора к строке.
             this.CurPos.Line = -1;
 
@@ -7883,25 +7918,25 @@ Paragraph.prototype =
 
                 }
 
-                if ( true === this.Content[ContentPos].Selection_IsUse() )
-                {
-                    this.Correct_Content(ContentPos, ContentPos);
-
-                    this.Selection.Use      = true;
-                    this.Selection.Start    = false;
-                    this.Selection.Flag     = selectionflag_Common;
-                    this.Selection.StartPos = ContentPos;
-                    this.Selection.EndPos   = ContentPos;
-
-                    this.Document_SetThisElementCurrent(true);
-
-                    return true;
-                }
-
                 if ( ContentPos < 0 || ContentPos >= this.Content.length )
                     Result = false;
                 else
                 {
+                    if ( true === this.Content[ContentPos].Selection_IsUse() )
+                    {
+                        this.Correct_Content(ContentPos, ContentPos);
+
+                        this.Selection.Use      = true;
+                        this.Selection.Start    = false;
+                        this.Selection.Flag     = selectionflag_Common;
+                        this.Selection.StartPos = ContentPos;
+                        this.Selection.EndPos   = ContentPos;
+
+                        this.Document_SetThisElementCurrent(true);
+
+                        return true;
+                    }
+
                     if ( ContentPos !== this.Content.length - 1 && true === this.Content[ContentPos].Is_Empty() )
                     {
                         this.Internal_Content_Remove( ContentPos );
@@ -10903,9 +10938,17 @@ Paragraph.prototype =
 
     Cursor_MoveToNearPos : function(NearPos)
     {
-        this.Selection.Use = false;
-        this.Set_ContentPos( NearPos.ContentPos, true, -1 );
-        this.CurPos.ContentPos2 = -1;
+        if ( true !== Debug_ParaRunMode )
+        {
+            this.Selection.Use = false;
+            this.Set_ContentPos( NearPos.ContentPos, true, -1 );
+            this.CurPos.ContentPos2 = -1;
+        }
+        else
+        {
+            this.Selection.Use = false;
+            this.Set_ParaContentPos( NearPos.ContentPos, true, -1, -1 );
+        }
     },
 
     Cursor_MoveUp_To_LastRow : function(X, Y, AddToSelect)
@@ -13904,6 +13947,37 @@ Paragraph.prototype =
         }
         else
         {
+            var SelSP = this.Get_ParaContentPos( true, true );
+            var SelEP = this.Get_ParaContentPos( true, false );
+
+            if ( SelSP.Compare( SelEP ) > 0 )
+            {
+                var Temp = SelSP;
+                SelSP = SelEP;
+                SelEP = Temp;
+            }
+
+            if ( undefined !== NearPos )
+            {
+                if ( this === NearPos.Paragraph && ( ( true === this.Selection.Use && NearPos.ContentPos.Compare( SelSP ) >= 0 && NearPos.ContentPos.Compare( SelEP ) <= 0 ) || true === this.ApplyToAll ) )
+                    return true;
+
+                return false;
+            }
+            else
+            {
+                var PageIndex = Page_Abs - this.Get_StartPage_Absolute();
+                if ( PageIndex < 0 || PageIndex >= this.Pages.length || true != this.Selection.Use )
+                    return false;
+
+                var SearchPosXY = this.Get_ParaContentPosByXY( X, Y, PageIndex, false, false );
+
+                if ( SearchPosXY.Pos.Compare( SelSP ) >= 0 && SearchPosXY.Pos.Compare( SelEP ) <= 0 )
+                    return true;
+
+                return false;
+            }
+
             // TODO: реализовать Selection_Check
             return false;
         }
@@ -14114,47 +14188,79 @@ Paragraph.prototype =
         if ( true !== this.Selection.Use )
             return;
 
-        var StartPos = this.Selection.StartPos;
-        var EndPos   = this.Selection.EndPos;
-        if ( StartPos > EndPos )
+        if ( true !== Debug_ParaRunMode )
         {
-            StartPos = this.Selection.EndPos;
-            EndPos   = this.Selection.StartPos;
+            var StartPos = this.Selection.StartPos;
+            var EndPos   = this.Selection.EndPos;
+            if ( StartPos > EndPos )
+            {
+                StartPos = this.Selection.EndPos;
+                EndPos   = this.Selection.StartPos;
+            }
+
+            var _StartPos = this.Internal_GetStartPos();
+            var _EndPos   = this.Internal_GetEndPos();
+
+            // Если выделен параграф целиком, тогда просто его копируем
+            if ( StartPos <= _StartPos && EndPos >= _EndPos )
+            {
+                DocContent.Add( new CSelectedElement( this.Copy(this.Parent), true ) );
+                return;
+            }
+
+            var Para = new Paragraph(this.DrawingDocument, this.Parent, 0, 0, 0, 0, 0);
+
+            // Копируем настройки
+            Para.Set_Pr(this.Pr.Copy());
+            Para.TextPr.Set_Value( this.TextPr.Value );
+            Para.Internal_Content_Remove2(0, Para.Content.length);
+
+            var StartTextPr = this.Internal_GetTextPr( StartPos );
+            Para.Internal_Content_Add( Para.Content.length, new ParaTextPr( StartTextPr ), false );
+
+            // Копируем содержимое параграфа
+            for ( var Pos = StartPos; Pos < EndPos; Pos++ )
+            {
+                var Item     = this.Content[Pos];
+                var ItemType = Item.Type;
+                if ( true === Item.Is_RealContent() && para_End !== ItemType && para_Empty !== ItemType )
+                    Para.Internal_Content_Add( Para.Content.length, Item.Copy(), false );
+            }
+
+            Para.Internal_Content_Add( Para.Content.length, new ParaEnd(), false );
+            Para.Internal_Content_Add( Para.Content.length, new ParaEmpty(), false );
+
+            DocContent.Add( new CSelectedElement( Para, false ) );
         }
-
-        var _StartPos = this.Internal_GetStartPos();
-        var _EndPos   = this.Internal_GetEndPos();
-
-        // Если выделен параграф целиком, тогда просто его копируем
-        if ( StartPos <= _StartPos && EndPos >= _EndPos )
+        else
         {
-            DocContent.Add( new CSelectedElement( this.Copy(this.Parent), true ) );
-            return;
+            var StartPos = this.Selection.StartPos;
+            var EndPos   = this.Selection.EndPos;
+            if ( StartPos > EndPos )
+            {
+                StartPos = this.Selection.EndPos;
+                EndPos   = this.Selection.StartPos;
+            }
+
+            var Para = new Paragraph(this.DrawingDocument, this.Parent, 0, 0, 0, 0, 0);
+
+            // Копируем настройки
+            Para.Set_Pr(this.Pr.Copy());
+            Para.TextPr.Set_Value( this.TextPr.Value );
+
+            // Копируем содержимое параграфа
+            for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
+            {
+                var Item = this.Content[Pos];
+
+                if ( StartPos === Pos || EndPos === Pos )
+                    Para.Internal_Content_Add( Pos - StartPos, Item.Copy(true), false );
+                else
+                    Para.Internal_Content_Add( Pos - StartPos, Item.Copy(false), false );
+            }
+
+            DocContent.Add( new CSelectedElement( Para, false ) );
         }
-
-        var Para = new Paragraph(this.DrawingDocument, this.Parent, 0, 0, 0, 0, 0);
-
-        // Копируем настройки
-        Para.Set_Pr(this.Pr.Copy());
-        Para.TextPr.Set_Value( this.TextPr.Value );
-        Para.Internal_Content_Remove2(0, Para.Content.length);
-
-        var StartTextPr = this.Internal_GetTextPr( StartPos );
-        Para.Internal_Content_Add( Para.Content.length, new ParaTextPr( StartTextPr ), false );
-
-        // Копируем содержимое параграфа
-        for ( var Pos = StartPos; Pos < EndPos; Pos++ )
-        {
-            var Item     = this.Content[Pos];
-            var ItemType = Item.Type;
-            if ( true === Item.Is_RealContent() && para_End !== ItemType && para_Empty !== ItemType )
-                Para.Internal_Content_Add( Para.Content.length, Item.Copy(), false );
-        }
-
-        Para.Internal_Content_Add( Para.Content.length, new ParaEnd(), false );
-        Para.Internal_Content_Add( Para.Content.length, new ParaEmpty(), false );
-
-        DocContent.Add( new CSelectedElement( Para, false ) );
     },
 
     Get_Paragraph_TextPr : function()
@@ -15601,6 +15707,24 @@ Paragraph.prototype =
         return this.Internal_Get_ParaPos_By_Pos( Pos).Page;
     },
 
+    // Возвращаем ран в котором лежит данный объект
+    Get_DrawingObjectRun : function(Id)
+    {
+        var Run = null;
+        var ContentLen = this.Content.length;
+        for ( var Index = 0; Index < ContentLen; Index++ )
+        {
+            var Element = this.Content[Index];
+
+            Run = Element.Get_DrawingObjectRun(Id);
+
+            if ( null !== Run )
+                return Run;
+        }
+
+        return Run;
+    },
+
     // Ищем графический объект по Id и удаляем запись он нем в параграфе
     Remove_DrawingObject : function(Id)
     {
@@ -15621,183 +15745,381 @@ Paragraph.prototype =
         return -1;
     },
 
+    Get_DrawingObjectContentPos : function(Id)
+    {
+        var ContentPos = new CParagraphContentPos();
+
+        var ContentLen = this.Content.length;
+        for ( var Index = 0; Index < ContentLen; Index++ )
+        {
+            var Element = this.Content[Index];
+
+            if ( true === Element.Get_DrawingObjectContentPos(Id, ContentPos, 1) )
+            {
+                ContentPos.Update2( Index, 0 );
+                return ContentPos;
+            }
+        }
+
+        return null;
+    },
+
     Internal_CorrectAnchorPos : function(Result, Drawing, PageNum)
     {
-        // Поправляем позицию
-        var RelH = Drawing.PositionH.RelativeFrom;
-        var RelV = Drawing.PositionV.RelativeFrom;
-
-        var ContentPos = 0;
-
-        if ( c_oAscRelativeFromH.Character != RelH || c_oAscRelativeFromV.Line != RelV )
+        if ( true !== Debug_ParaRunMode )
         {
-            var CurLine = Result.Internal.Line;
+            // Поправляем позицию
+            var RelH = Drawing.PositionH.RelativeFrom;
+            var RelV = Drawing.PositionV.RelativeFrom;
+
+            var ContentPos = 0;
+
+            if ( c_oAscRelativeFromH.Character != RelH || c_oAscRelativeFromV.Line != RelV )
+            {
+                var CurLine = Result.Internal.Line;
+                if ( c_oAscRelativeFromV.Line != RelV )
+                {
+                    var CurPage = Result.Internal.Page;
+                    CurLine = this.Pages[CurPage].StartLine;
+                }
+
+
+                var StartLinesPos = this.Lines[CurLine].StartPos;
+                var EndLinesPos   = this.Lines[CurLine].EndPos;
+                var CurRange = this.Internal_Get_ParaPos_By_Pos( StartLinesPos).Range;
+
+                Result.X = this.Lines[CurLine].Ranges[CurRange].X - 3.8;
+                ContentPos = Math.min( StartLinesPos + 1, EndLinesPos );
+            }
+
             if ( c_oAscRelativeFromV.Line != RelV )
             {
                 var CurPage = Result.Internal.Page;
-                CurLine = this.Pages[CurPage].StartLine;
+                var CurLine = this.Pages[CurPage].StartLine;
+                Result.Y = this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent;
             }
 
-            var StartLinesPos = this.Lines[CurLine].StartPos;
-            var EndLinesPos   = this.Lines[CurLine].EndPos;
-            var CurRange = this.Internal_Get_ParaPos_By_Pos( StartLinesPos).Range;
-            Result.X = this.Lines[CurLine].Ranges[CurRange].X - 3.8;
-            ContentPos = Math.min( StartLinesPos + 1, EndLinesPos );
-        }
-
-        if ( c_oAscRelativeFromV.Line != RelV )
-        {
-            var CurPage = Result.Internal.Page;
-            var CurLine = this.Pages[CurPage].StartLine;
-            Result.Y = this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent;
-        }
-
-        if ( c_oAscRelativeFromH.Character === RelH  )
-        {
-            // Ничего не делаем
-        }
-        else if ( c_oAscRelativeFromV.Line === RelV )
-        {
-            var CurLine = this.Internal_Get_ParaPos_By_Pos( Result.ContentPos).Line;
-            Result.ContentPos = this.Lines[CurLine].StartPos;
+            if ( c_oAscRelativeFromH.Character === RelH  )
+            {
+                // Ничего не делаем
+            }
+            else if ( c_oAscRelativeFromV.Line === RelV )
+            {
+                var CurLine = this.Internal_Get_ParaPos_By_Pos( Result.ContentPos).Line;
+                Result.ContentPos = this.Lines[CurLine].StartPos;
+            }
+            else
+            {
+                Result.ContentPos = ContentPos;
+            }
         }
         else
         {
-            Result.ContentPos = ContentPos;
+            // Поправляем позицию
+            var RelH = Drawing.PositionH.RelativeFrom;
+            var RelV = Drawing.PositionV.RelativeFrom;
+
+            var ContentPos = 0;
+
+            if ( c_oAscRelativeFromH.Character != RelH || c_oAscRelativeFromV.Line != RelV )
+            {
+                var CurLine = Result.Internal.Line;
+                if ( c_oAscRelativeFromV.Line != RelV )
+                {
+                    var CurPage = Result.Internal.Page;
+                    CurLine = this.Pages[CurPage].StartLine;
+                }
+
+                Result.X = this.Lines[CurLine].Ranges[0].X - 3.8;
+            }
+
+            if ( c_oAscRelativeFromV.Line != RelV )
+            {
+                var CurPage = Result.Internal.Page;
+                var CurLine = this.Pages[CurPage].StartLine;
+                Result.Y = this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent;
+            }
+
+            if ( c_oAscRelativeFromH.Character === RelH  )
+            {
+                // Ничего не делаем
+            }
+            else if ( c_oAscRelativeFromV.Line === RelV )
+            {
+                // Ничего не делаем, пусть ссылка будет в позиции, которая записана в NearPos
+            }
+            else if ( 0 === Result.Internal.Page )
+            {
+                // Перемещаем ссылку в начало параграфа
+                Result.ContentPos = this.Get_StartPos();
+            }
         }
     },
 
     // Получем ближающую возможную позицию курсора
     Get_NearestPos : function(PageNum, X, Y, bAnchor, Drawing)
     {
-        var ContentPos = this.Internal_GetContentPosByXY( X, Y, false, PageNum ).Pos;
-        var Result = this.Internal_Recalculate_CurPos( ContentPos, false, false, true );
+        if ( true !== Debug_ParaRunMode )
+        {
+            var ContentPos = this.Internal_GetContentPosByXY( X, Y, false, PageNum ).Pos;
+            var Result = this.Internal_Recalculate_CurPos( ContentPos, false, false, true );
 
-        // Сохраняем параграф и найденное место в параграфе
-        Result.ContentPos = ContentPos;
-        Result.Paragraph  = this;
+            // Сохраняем параграф и найденное место в параграфе
+            Result.ContentPos = ContentPos;
+            Result.Paragraph  = this;
 
-        if ( true === bAnchor && undefined != Drawing && null != Drawing )
-            this.Internal_CorrectAnchorPos( Result, Drawing, PageNum - this.PageNum );
+            if ( true === bAnchor && undefined != Drawing && null != Drawing )
+                this.Internal_CorrectAnchorPos( Result, Drawing, PageNum - this.PageNum );
 
-        return Result;
+            return Result;
+        }
+        else
+        {
+            var SearchPosXY = this.Get_ParaContentPosByXY( X, Y, PageNum, false, false );
+
+            this.Set_ParaContentPos( SearchPosXY.Pos, true, SearchPosXY.Line, SearchPosXY.Range );
+            var ContentPos = this.Get_ParaContentPos( false, false );
+
+            var Result = this.Internal_Recalculate_CurPos( ContentPos, false, false, true );
+
+            // Сохраняем параграф и найденное место в параграфе
+            Result.ContentPos = ContentPos;
+            Result.Paragraph  = this;
+
+            if ( true === bAnchor && undefined != Drawing && null != Drawing )
+                this.Internal_CorrectAnchorPos( Result, Drawing, PageNum - this.PageNum );
+
+            return Result;
+
+        }
     },
 
     Check_NearestPos : function(NearPos)
     {
-        this.NearPosArray.push( NearPos );
+        if ( true !== Debug_ParaRunMode )
+        {
+            this.NearPosArray.push( NearPos );
+        }
+        else
+        {
+            var ParaNearPos = new CParagraphNearPos();
+            ParaNearPos.NearPos = NearPos;
+
+            this.NearPosArray.push( ParaNearPos );
+            ParaNearPos.Classes.push( this );
+
+            var CurPos = NearPos.ContentPos.Get(0);
+            this.Content[CurPos].Check_NearestPos( ParaNearPos, 1 );
+        }
+    },
+
+    Clear_NearestPosArray : function()
+    {
+        var ArrayLen = this.NearPosArray.length;
+
+        for (var Pos = 0; Pos < ArrayLen; Pos++)
+        {
+            var ParaNearPos = this.NearPosArray[Pos];
+
+            var ArrayLen2 = ParaNearPos.Classes.length;
+
+            // 0 элемент это сам класс Paragraph, массив в нем очищаем в данной функции в конце
+            for ( var Pos2 = 1; Pos2 < ArrayLen2; Pos2++ )
+            {
+                var Class = ParaNearPos.Classes[Pos2];
+                Class.NearPosArray = new Array();
+            }
+        }
+
+        this.NearPosArray = new Array();
+    },
+
+    Get_ParaNearestPos : function(NearPos)
+    {
+        var ArrayLen = this.NearPosArray.length;
+
+        for (var Pos = 0; Pos < ArrayLen; Pos++)
+        {
+            var ParaNearPos = this.NearPosArray[Pos];
+
+            if ( NearPos === ParaNearPos.NearPos )
+                return ParaNearPos;
+        }
+
+        return null;
     },
 
     Get_Layout : function(ContentPos, Drawing)
     {
-        var LinePos = this.Internal_Get_ParaPos_By_Pos( ContentPos );
-
-        var CurLine  = LinePos.Line;
-        var CurRange = LinePos.Range;
-        var CurPage  = LinePos.Page;
-
-        var X = this.Lines[CurLine].Ranges[CurRange].XVisible;
-        var Y = this.Pages[CurPage].Y + this.Lines[CurLine].Y;
-
-        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-        if ( StartPos < this.Numbering.Pos )
-            X += this.Numbering.WidthVisible;
-
-        var LastW = 0;
-        for ( var ItemNum = StartPos; ItemNum < this.Content.length; ItemNum++ )
+        if ( true !== Debug_ParaRunMode )
         {
-            var Item = this.Content[ItemNum];
+            var LinePos = this.Internal_Get_ParaPos_By_Pos( ContentPos );
 
-            if ( ItemNum === ContentPos )
+            var CurLine  = LinePos.Line;
+            var CurRange = LinePos.Range;
+            var CurPage  = LinePos.Page;
+
+            var X = this.Lines[CurLine].Ranges[CurRange].XVisible;
+            var Y = this.Pages[CurPage].Y + this.Lines[CurLine].Y;
+
+            var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
+            if ( StartPos < this.Numbering.Pos )
+                X += this.Numbering.WidthVisible;
+
+            var LastW = 0;
+            for ( var ItemNum = StartPos; ItemNum < this.Content.length; ItemNum++ )
             {
-                var DrawingObjects = this.Parent.DrawingObjects;
-                var PageLimits = this.Parent.Get_PageLimits(this.PageNum + CurPage);
-                var PageFields = this.Parent.Get_PageFields(this.PageNum + CurPage);
+                var Item = this.Content[ItemNum];
 
-                var ColumnStartX = (0 === CurPage ? this.X_ColumnStart : this.Pages[CurPage].X);
-                var ColumnEndX   = (0 === CurPage ? this.X_ColumnEnd   : this.Pages[CurPage].XLimit);
-
-                var Top_Margin    = Y_Top_Margin;
-                var Bottom_Margin = Y_Bottom_Margin;
-                var Page_H        = Page_Height;
-
-                if ( true === this.Parent.Is_TableCellContent() && undefined != Drawing && true == Drawing.Use_TextWrap() )
+                if ( ItemNum === ContentPos )
                 {
-                    Top_Margin    = 0;
-                    Bottom_Margin = 0;
-                    Page_H        = 0;
-                }
+                    var DrawingObjects = this.Parent.DrawingObjects;
+                    var PageLimits = this.Parent.Get_PageLimits(this.PageNum + CurPage);
+                    var PageFields = this.Parent.Get_PageFields(this.PageNum + CurPage);
 
-                if ( undefined != Drawing && true != Drawing.Use_TextWrap() )
-                {
-                    PageFields.X      = X_Left_Field;
-                    PageFields.Y      = Y_Top_Field;
-                    PageFields.XLimit = X_Right_Field;
-                    PageFields.YLimit = Y_Bottom_Field;
+                    var ColumnStartX = (0 === CurPage ? this.X_ColumnStart : this.Pages[CurPage].X);
+                    var ColumnEndX   = (0 === CurPage ? this.X_ColumnEnd   : this.Pages[CurPage].XLimit);
 
-                    PageLimits.X = 0;
-                    PageLimits.Y = 0;
-                    PageLimits.XLimit = Page_Width;
-                    PageLimits.YLimit = Page_Height;
-                }
+                    var Top_Margin    = Y_Top_Margin;
+                    var Bottom_Margin = Y_Bottom_Margin;
+                    var Page_H        = Page_Height;
 
-                return { ParagraphLayout : new CParagraphLayout( X, Y , this.Get_StartPage_Absolute() + CurPage, LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, this.Pages[CurPage].Y ), PageLimits : PageLimits };
-            }
-
-            switch ( Item.Type )
-            {
-                case para_Text:
-                case para_Space:
-                case para_PageNum:
-                {
-                    LastW = Item.WidthVisible;
-
-                    break;
-                }
-                case para_Drawing:
-                {
-                    if ( true === Item.Is_Inline() || true === this.Parent.Is_DrawingShape() )
+                    if ( true === this.Parent.Is_TableCellContent() && undefined != Drawing && true == Drawing.Use_TextWrap() )
                     {
-                        LastW = Item.WidthVisible;
+                        Top_Margin    = 0;
+                        Bottom_Margin = 0;
+                        Page_H        = 0;
                     }
 
-                    break;
+                    if ( undefined != Drawing && true != Drawing.Use_TextWrap() )
+                    {
+                        PageFields.X      = X_Left_Field;
+                        PageFields.Y      = Y_Top_Field;
+                        PageFields.XLimit = X_Right_Field;
+                        PageFields.YLimit = Y_Bottom_Field;
+
+                        PageLimits.X = 0;
+                        PageLimits.Y = 0;
+                        PageLimits.XLimit = Page_Width;
+                        PageLimits.YLimit = Page_Height;
+                    }
+
+                    return { ParagraphLayout : new CParagraphLayout( X, Y , this.Get_StartPage_Absolute() + CurPage, LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, this.Pages[CurPage].Y ), PageLimits : PageLimits };
                 }
+
+                switch ( Item.Type )
+                {
+                    case para_Text:
+                    case para_Space:
+                    case para_PageNum:
+                    {
+                        LastW = Item.WidthVisible;
+
+                        break;
+                    }
+                    case para_Drawing:
+                    {
+                        if ( true === Item.Is_Inline() || true === this.Parent.Is_DrawingShape() )
+                        {
+                            LastW = Item.WidthVisible;
+                        }
+
+                        break;
+                    }
+                }
+
+                X += Item.WidthVisible;
             }
 
-            X += Item.WidthVisible;
+            return undefined;
         }
+        else
+        {
+            var LinePos = this.Get_ParaPosByContentPos( ContentPos );
 
-        return undefined;
+            var CurLine  = LinePos.Line;
+            var CurRange = LinePos.Range;
+            var CurPage  = LinePos.Page;
+
+            var X = this.Lines[CurLine].Ranges[CurRange].XVisible;
+            var Y = this.Pages[CurPage].Y + this.Lines[CurLine].Y;
+
+            if ( true === this.Numbering.Check_Range(CurRange, CurLine) )
+                X += this.Numbering.WidthVisible;
+
+            var DrawingLayout = new CParagraphDrawingLayout(Drawing, this, X, Y, CurLine, CurRange, CurPage);
+
+            var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
+            var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
+
+            var CurContentPos = ContentPos.Get(0);
+
+            for ( var CurPos = StartPos; CurPos < EndPos; CurPos++ )
+            {
+                this.Content[CurPos].Get_Layout(DrawingLayout, ( CurPos === CurContentPos ? true : false ), ContentPos, 1);
+
+                if ( null !== DrawingLayout.Layout )
+                    return { ParagraphLayout : DrawingLayout.Layout, PageLimits : DrawingLayout.Limits };
+            }
+
+            return undefined;
+        }
     },
 
     Get_AnchorPos : function(Drawing)
     {
-        // Ищем, где находится наш объект
-        var ContentPos = -1;
-        var Count = this.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
+        if ( true !== Debug_ParaRunMode )
         {
-            var Item = this.Content[Index];
-
-            if ( para_Drawing === Item.Type && Item.Get_Id() === Drawing.Get_Id() )
+            // Ищем, где находится наш объект
+            var ContentPos = -1;
+            var Count = this.Content.length;
+            for ( var Index = 0; Index < Count; Index++ )
             {
-                ContentPos = Index;
-                break;
+                var Item = this.Content[Index];
+
+                if ( para_Drawing === Item.Type && Item.Get_Id() === Drawing.Get_Id() )
+                {
+                    ContentPos = Index;
+                    break;
+                }
             }
+
+            var CurPage = this.Internal_Get_ParaPos_By_Pos( ContentPos).Page;
+
+            if ( -1 === ContentPos )
+                return { X : 0, Y : 0, Height : 0 };
+
+            var Result = this.Internal_Recalculate_CurPos( ContentPos, false, false, true );
+            Result.Paragraph  = this;
+            Result.ContentPos = ContentPos;
+
+            this.Internal_CorrectAnchorPos( Result, Drawing, CurPage );
+
+            return Result;
         }
+        else
+        {
+            var ContentPos = this.Get_DrawingObjectContentPos( Drawing.Get_Id() );
 
-        var CurPage = this.Internal_Get_ParaPos_By_Pos( ContentPos).Page;
+            if ( null === ContentPos )
+                return { X : 0, Y : 0, Height : 0 };
 
-        if ( -1 === ContentPos )
-            return { X : 0, Y : 0, Height : 0 };
+            var ParaPos = this.Get_ParaPosByContentPos( ContentPos );
 
-        var Result = this.Internal_Recalculate_CurPos( ContentPos, false, false, true );
-        Result.Paragraph  = this;
-        Result.ContentPos = ContentPos;
-        this.Internal_CorrectAnchorPos( Result, Drawing, CurPage );
+            // Можем не бояться изменить положение курсора, т.к. данная функция работает, только когда у нас идет
+            // выделение автофигуры, а значит курсора нет на экране.
 
-        return Result;
+            this.Set_ParaContentPos( ContentPos, false, -1, -1 );
+
+            var Result = this.Internal_Recalculate_CurPos( ContentPos, false, false, true );
+
+            Result.Paragraph  = this;
+            Result.ContentPos = ContentPos;
+
+            this.Internal_CorrectAnchorPos( Result, Drawing, CurPage );
+
+            return Result;
+        }
     },
 
     Set_DocumentNext : function(Object)
@@ -21283,6 +21605,33 @@ function CParagraphCheckPageBreakEnd(PageBreak)
 function CParagraphGetText()
 {
     this.Text = "";
+}
+
+function CParagraphNearPos()
+{
+    this.NearPos = null;
+    this.Classes = new Array();
+}
+
+function CParagraphElementNearPos()
+{
+    this.NearPos = null;
+    this.Depth   = 0;
+}
+
+function CParagraphDrawingLayout(Drawing, Paragraph, X, Y, Line, Range, Page)
+{
+    this.Paragraph = Paragraph;
+    this.Drawing   = Drawing;
+    this.Line      = Line;
+    this.Range     = Range;
+    this.Page      = Page;
+    this.X         = X;
+    this.Y         = Y;
+    this.LastW     = 0;
+
+    this.Layout    = null;
+    this.Limits    = null;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -3586,35 +3586,84 @@ CDocumentContent.prototype =
         var FirstElement = SelectedContent.Elements[0];
         if ( 1 === ElementsCount && true !== FirstElement.SelectedAll && type_Paragraph === FirstElement.Element.GetType() )
         {
-            // Нам нужно в заданный параграф вставить выделенный текст
-            var NewPara = FirstElement.Element;
-            var NewElementsCount = NewPara.Content.length;
-            var InsertedCount = 0;
-
-            var OldTextPr = Para.Internal_GetTextPr( NearContentPos );
-
-            for ( var Index = 0; Index < NewElementsCount; Index++ )
+            if ( true !== Debug_ParaRunMode )
             {
-                var Item = NewPara.Content[Index];
-                var ItemType = Item.Type;
-                if ( para_Empty !== ItemType && para_End !== ItemType )
+                // Нам нужно в заданный параграф вставить выделенный текст
+                var NewPara = FirstElement.Element;
+                var NewElementsCount = NewPara.Content.length;
+                var InsertedCount = 0;
+
+                var OldTextPr = Para.Internal_GetTextPr( NearContentPos );
+
+                for ( var Index = 0; Index < NewElementsCount; Index++ )
                 {
-                    Para.Internal_Content_Add( NearContentPos + InsertedCount, Item, false );
-                    InsertedCount++;
+                    var Item = NewPara.Content[Index];
+                    var ItemType = Item.Type;
+                    if ( para_Empty !== ItemType && para_End !== ItemType )
+                    {
+                        Para.Internal_Content_Add( NearContentPos + InsertedCount, Item, false );
+                        InsertedCount++;
+                    }
                 }
+
+                Para.Internal_Content_Add( NearContentPos + InsertedCount, new ParaTextPr(OldTextPr), false );
+                InsertedCount++;
+
+                Para.Selection.Use      = true;
+                Para.Selection.StartPos = NearContentPos;
+                Para.Selection.EndPos   = NearContentPos + InsertedCount;
+
+                this.Selection.Start    = false;
+                this.Selection.Use      = true;
+                this.Selection.StartPos = DstIndex;
+                this.Selection.EndPos   = DstIndex;
             }
+            else
+            {
+                // Нам нужно в заданный параграф вставить выделенный текст
+                var NewPara = FirstElement.Element;
+                var NewElementsCount = NewPara.Content.length - 1; // Последний ран с para_End не добавляем
 
-            Para.Internal_Content_Add( NearContentPos + InsertedCount, new ParaTextPr(OldTextPr), false );
-            InsertedCount++;
+                var ParaNearPos = Para.Get_ParaNearestPos( NearPos );
+                if ( null === ParaNearPos || ParaNearPos.Classes.length < 2 )
+                    return;
 
-            Para.Selection.Use      = true;
-            Para.Selection.StartPos = NearContentPos;
-            Para.Selection.EndPos   = NearContentPos + InsertedCount;
+                var LastClass = ParaNearPos.Classes[ParaNearPos.Classes.length - 1];
+                if ( para_Run !== LastClass.Type )
+                    return;
 
-            this.Selection.Start    = false;
-            this.Selection.Use      = true;
-            this.Selection.StartPos = DstIndex;
-            this.Selection.EndPos   = DstIndex;
+                var NewElement = LastClass.Split( ParaNearPos.NearPos.ContentPos, ParaNearPos.Classes.length - 1 );
+                var PrevClass = ParaNearPos.Classes[ParaNearPos.Classes.length - 2];
+                var PrevPos   = ParaNearPos.NearPos.ContentPos.Data[ParaNearPos.Classes.length - 2];
+
+                PrevClass.Add_ToContent( PrevPos + 1, NewElement );
+
+                for ( var Index = 0; Index < NewElementsCount; Index++ )
+                {
+                    var Item = NewPara.Content[Index];
+                    PrevClass.Add_ToContent( PrevPos + 1 + Index, Item );
+
+                    Item.Select_All();
+                }
+
+                PrevClass.Selection.Use = true;
+                PrevClass.Selection.StartPos = PrevPos + 1;
+                PrevClass.Selection.EndPos   = PrevPos + 1 + NewElementsCount - 1;
+
+                for ( var Index = 0; Index < ParaNearPos.Classes.length - 2; Index++ )
+                {
+                    var Class    = ParaNearPos.Classes[Index];
+                    var ClassPos = ParaNearPos.NearPos.ContentPos.Data[Index];
+
+                    Class.Selection.Use      = true;
+                    Class.Selection.StartPos = ClassPos;
+                    Class.Selection.EndPos   = ClassPos;
+                }
+
+                this.Selection.Use      = true;
+                this.Selection.StartPos = DstIndex;
+                this.Selection.EndPos   = DstIndex;
+            }
         }
         else
         {
@@ -3656,9 +3705,23 @@ CDocumentContent.prototype =
 
                 StartIndex++;
 
-                ParaS.Selection.Use      = true;
-                ParaS.Selection.StartPos = NearContentPos;
-                ParaS.Selection.EndPos   = ParaS.Content.length - 1;
+                if ( true !== Debug_ParaRunMode )
+                {
+                    ParaS.Selection.Use      = true;
+                    ParaS.Selection.StartPos = NearContentPos;
+                    ParaS.Selection.EndPos   = ParaS.Content.length - 1;
+                }
+                else
+                {
+                    var TempPara = Elements[0].Element;
+
+                    // Вызываем так, чтобы выделить все внутренние элементы
+                    TempPara.Select_All();
+
+                    ParaS.Selection.Use      = true;
+                    ParaS.Selection.StartPos = ParaS.Content.length - TempPara.Content.length;
+                    ParaS.Selection.EndPos   = ParaS.Content.length - 1;
+                }
             }
 
             var EndIndex = ElementsCount - 1;
@@ -3666,7 +3729,12 @@ CDocumentContent.prototype =
             {
                 var _ParaE = Elements[ElementsCount - 1].Element;
 
-                var TempCount = _ParaE.Internal_GetEndPos();
+                var TempCount = ( true !== Debug_ParaRunMode ? _ParaE.Internal_GetEndPos() : _ParaE.Content.length - 1 );
+
+                if ( true === Debug_ParaRunMode )
+                {
+                    _ParaE.Select_All();
+                }
 
                 _ParaE.Concat( ParaE );
                 _ParaE.Set_Pr( ParaE.Pr );
