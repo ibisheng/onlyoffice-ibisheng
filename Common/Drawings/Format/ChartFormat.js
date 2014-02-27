@@ -8522,6 +8522,13 @@ CMarker.prototype =
                 }
             }
         }
+        return this;
+    },
+
+
+    createDuplicate: function()
+    {
+        return (new CMarker()).merge(this);
     },
 
     setSize: function(pr)
@@ -13922,6 +13929,8 @@ CTitle.prototype =
         }
     },
 
+    getStyles: CDLbl.prototype.getStyles,
+
     recalculateStyle: CDLbl.prototype.recalculateStyle,
 
     recalculateTxBody: CDLbl.prototype.recalculateTxBody,
@@ -15770,3 +15779,144 @@ CalcLegendEntry.prototype =
     recalculateStyle: CDLbl.prototype.recalculateStyle,
     Get_Styles: CDLbl.prototype.Get_Styles
 };
+
+
+function CompiledMarker()
+{
+    this.spPr = new CSpPr();
+    this.x = null;
+    this.y = null;
+    this.extX = null;
+    this.extY = null;
+
+    this.transform = new CMatrix();
+    this.pen = null;
+    this.brush = null;
+}
+
+CompiledMarker.prototype =
+{
+    draw: CShape.prototype.draw
+};
+
+function CUnionMarker()
+{
+    this.lineMarker = null;
+    this.marker = null;
+}
+
+CUnionMarker.prototype =
+{
+    draw: function(g)
+    {
+        this.lineMarker && this.lineMarker.draw(g);
+        this.marker && this.marker.draw(g);
+    }
+};
+
+function CreateMarkerGeometryByType(type, src)
+{
+    var ret = new CGeometry();
+    var w = 43200, h = 43200;
+    function AddRect(geom, w, h)
+    {
+        geom.AddPathCommand(1, "0", "0");
+        geom.AddPathCommand(2, w+"", "0");
+        geom.AddPathCommand(2, w+"", h+"");
+        geom.AddPathCommand(2, "0", h+"");
+        geom.AddPathCommand(6);
+    }
+
+    function AddPlus(geom, w, h)
+    {
+        geom.AddPathCommand(0,undefined, undefined, undefined, w, h);
+        geom.AddPathCommand(1, w/2+"", "0");
+        geom.AddPathCommand(2, w/2+"", "h");
+        geom.AddPathCommand(2, "0", h/2+"");
+        geom.AddPathCommand(2, w+"", h/2+"");
+    }
+
+    function AddX(geom, w, h)
+    {
+        geom.AddPathCommand(0,undefined, undefined, undefined, w, h);
+        geom.AddPathCommand(1, "0", "0");
+        geom.AddPathCommand(2, "w", "h");
+        geom.AddPathCommand(2, "w", "0");
+        geom.AddPathCommand(2, "0", "h");
+    }
+
+    switch(type)
+    {
+        case SYMBOL_CIRCLE:
+        {
+            ret.AddPathCommand(0,undefined, undefined, undefined, w, h);
+            ret.AddPathCommand(1, "0", h/2+"");
+            ret.AddPathCommand(3, w/2+"", h/2 + "", "cd2", "cd4");
+            ret.AddPathCommand(3, w/2+"", h/2 + "", "_3cd4", "cd4");
+            ret.AddPathCommand(3, w/2+"", h/2 + "", "0", "cd4");
+            ret.AddPathCommand(3, w/2+"", h/2 + "", "cd4", "cd4");
+            ret.AddPathCommand(6);
+            break;
+        }
+        case SYMBOL_DASH:
+        case SYMBOL_DOT:
+        {
+            ret.AddPathCommand(0,undefined, undefined, undefined, w, h);
+            ret.AddPathCommand(1, type === SYMBOL_DASH ? "0" : w/2+"", h/2 +"");
+            ret.AddPathCommand(2, w+"", "0");
+            break;
+        }
+        case SYMBOL_DIAMOND:
+        {
+            ret.AddPathCommand(0,undefined, undefined, undefined, w, h);
+            ret.AddPathCommand(1, w/2+"", "0");
+            ret.AddPathCommand(2, w+"", h/2+"");
+            ret.AddPathCommand(2, w/2 + "", h+"");
+            ret.AddPathCommand(2, "0", h/2+"");
+            ret.AddPathCommand(6);
+            break;
+        }
+        case SYMBOL_NONE:
+        {
+            break;
+        }
+        case SYMBOL_PICTURE:
+        case SYMBOL_SQUARE:
+        {
+            ret.AddPathCommand(0,undefined, undefined, undefined, w, h);
+            AddRect(ret, w, h);
+            break;
+        }
+        case SYMBOL_PLUS:
+        {
+            ret.AddPathCommand(0,undefined, undefined, false, w, h);
+            AddRect(ret, w, h);
+            AddPlus(ret, w, h);
+            break;
+        }
+        case SYMBOL_STAR:
+        {
+            ret.AddPathCommand(0,undefined, undefined, false, w, h);
+            AddRect(ret, w, h);
+            AddPlus(ret, w, h);
+            AddX(ret, w, h);
+            break;
+        }
+        case SYMBOL_TRIANGLE:
+        {
+            ret.AddPathCommand(0,undefined, undefined, undefined, w, h);
+            ret.AddPathCommand(1, w/2+"", "0");
+            ret.AddPathCommand(2, w+"", h + "");
+            ret.AddPathCommand(2, "0", h+"");
+            ret.AddPahCommand(6);
+            break;
+        }
+        case SYMBOL_X:
+        {
+            ret.AddPathCommand(0,undefined, undefined, false, w, h);
+            AddRect(ret, w, h);
+            AddX(ret, w, h);
+            break;
+        }
+    }
+}
