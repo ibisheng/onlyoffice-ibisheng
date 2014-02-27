@@ -907,7 +907,7 @@ CChartsDrawer.prototype =
 		
 		var pxToMM = this.calcProp.pxToMM;
 		var standartMargin = 13 / pxToMM;
-		
+		var isHBar = (chartSpace.chart.plotArea.chart.getObjectType() == historyitem_type_BarChart && chartSpace.chart.plotArea.chart.barDir != 1) ? true : false;
 		
 		var left = 0, right = 0, top = 0, bottom = 0, hbarbottom;
 		//cat / val
@@ -915,14 +915,14 @@ CChartsDrawer.prototype =
 		{
 			if(!chartSpace.chart.plotArea.catAx.tickLblPos || chartSpace.chart.plotArea.catAx.tickLblPos == TICK_LABEL_POSITION_LOW || chartSpace.chart.plotArea.catAx.tickLblPos == TICK_LABEL_POSITION_NEXT_TO)
 			{
-				if(this.calcProp.type == "HBar" && chartSpace.chart.plotArea.valAx.xPoints[0].pos > chartSpace.chart.plotArea.catAx.labels.extX)
+				if(isHBar && chartSpace.chart.plotArea.valAx.xPoints[0].pos > chartSpace.chart.plotArea.catAx.labels.extX)
 					left = chartSpace.chart.plotArea.catAx.labels.extX;
 				else
 					bottom = ( chartSpace.chart.plotArea.catAx.labels.y + chartSpace.chart.plotArea.catAx.labels.extY ) - chartSpace.chart.plotArea.catAx.posY;
 			}
 			else if(chartSpace.chart.plotArea.catAx.tickLblPos == TICK_LABEL_POSITION_HIGH)
 			{
-				if(this.calcProp.type == "HBar")
+				if(isHBar)
 					right = ( chartSpace.chart.plotArea.catAx.labels.x + chartSpace.chart.plotArea.catAx.labels.extX ) - chartSpace.chart.plotArea.catAx.posX;
 				else
 					top = ( chartSpace.chart.plotArea.catAx.labels.y + chartSpace.chart.plotArea.catAx.labels.extY ) - chartSpace.chart.plotArea.catAx.posY;
@@ -934,14 +934,14 @@ CChartsDrawer.prototype =
 		{
 			if(chartSpace.chart.plotArea.valAx.tickLblPos == TICK_LABEL_POSITION_LOW || chartSpace.chart.plotArea.valAx.tickLblPos == TICK_LABEL_POSITION_NEXT_TO)
 			{
-				if(this.calcProp.type == "HBar")
+				if(isHBar)
 					bottom = ( chartSpace.chart.plotArea.valAx.labels.y + chartSpace.chart.plotArea.valAx.labels.extY ) - chartSpace.chart.plotArea.valAx.posY;
 				else
 					left = chartSpace.chart.plotArea.valAx.labels.extX;
 			}
 			else if(chartSpace.chart.plotArea.catAx.tickLblPos == TICK_LABEL_POSITION_HIGH)
 			{
-				if(this.calcProp.type == "HBar")
+				if(isHBar)
 					top = ( chartSpace.chart.plotArea.valAx.labels.y + chartSpace.chart.plotArea.valAx.labels.extY ) - chartSpace.chart.plotArea.valAx.posY;
 				else
 					right = ( chartSpace.chart.plotArea.catAx.labels.y + chartSpace.chart.plotArea.catAx.labels.extY ) - chartSpace.chart.plotArea.catAx.posY;
@@ -954,9 +954,9 @@ CChartsDrawer.prototype =
 		//****left*****
 		if(left || !right)
 		{
-			if(chartSpace.chart.plotArea.valAx.title != null && this.calcProp.type != "HBar")
+			if(chartSpace.chart.plotArea.valAx.title != null && !isHBar)
 				left += chartSpace.chart.plotArea.valAx.title.extX + standartMargin;
-			else if(this.calcProp.type == "HBar" && chartSpace.chart.plotArea.catAx.title != null)
+			else if(isHBar && chartSpace.chart.plotArea.catAx.title != null)
 				left += chartSpace.chart.plotArea.catAx.title.extX + standartMargin;
 			else
 				left += standartMargin / 2;
@@ -971,9 +971,9 @@ CChartsDrawer.prototype =
 		if(right)
 		{
 			right += standartMargin / 2;
-			if(chartSpace.chart.plotArea.valAx.title != null && this.calcProp.type != "HBar")
+			if(chartSpace.chart.plotArea.valAx.title != null && !isHBar)
 				right += chartSpace.chart.plotArea.valAx.title.extX;
-			else if(this.calcProp.type == "HBar" && chartSpace.chart.plotArea.catAx.title != null)
+			else if(isHBar && chartSpace.chart.plotArea.catAx.title != null)
 				right += chartSpace.chart.plotArea.catAx.title.extX;
 		}
 		else
@@ -984,9 +984,9 @@ CChartsDrawer.prototype =
 		//****bottom*****
 		if(bottom || !top)
 		{
-			if(chartSpace.chart.plotArea.catAx.title != null && this.calcProp.type != "HBar")
+			if(chartSpace.chart.plotArea.catAx.title != null && !isHBar)
 				bottom += chartSpace.chart.plotArea.catAx.title.extY + standartMargin;
-			else if(this.calcProp.type == "HBar" && chartSpace.chart.plotArea.valAx.title != null)
+			else if(isHBar && chartSpace.chart.plotArea.valAx.title != null)
 				bottom += chartSpace.chart.plotArea.valAx.title.extY + standartMargin;
 			else
 				bottom += standartMargin / 2;
@@ -1001,9 +1001,9 @@ CChartsDrawer.prototype =
 		if(top)
 		{
 			top += standartMargin / 2;
-			if(chartSpace.chart.plotArea.catAx.title != null && this.calcProp.type != "HBar")
+			if(chartSpace.chart.plotArea.catAx.title != null && !isHBar)
 				top += chartSpace.chart.plotArea.catAx.title.extY;
-			else if(this.calcProp.type == "HBar" && chartSpace.chart.plotArea.valAx.title != null)
+			else if(isHBar && chartSpace.chart.plotArea.valAx.title != null)
 				top += chartSpace.chart.plotArea.valAx.title.extY;
 				
 			if(chartSpace.chart.title !== null && !chartSpace.chart.title.overlay)
@@ -4767,10 +4767,10 @@ catAxisChart.prototype =
 	
 	_calculateAxis : function()
 	{
-		var nullPoisition = this.chartSpace.chart.plotArea.catAx.posY;
+		var nullPoisition = this.chartProp.nullPositionOX;
 		if(this.chartProp.type == "HBar")
 		{	
-			this.paths.axisLine = this._calculateLine( nullPoisition, this.chartProp.chartGutter._top, nullPoisition, this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom);
+			this.paths.axisLine = this._calculateLine( nullPoisition / this.chartProp.pxToMM, this.chartProp.chartGutter._top / this.chartProp.pxToMM, nullPoisition / this.chartProp.pxToMM, (this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom) / this.chartProp.pxToMM);
 		}
 		else
 		{
@@ -4827,6 +4827,12 @@ catAxisChart.prototype =
 			}
 		};
 		
+		if(this.chartProp.type == "HBar")
+		{
+			widthMinorLine = - widthMinorLine;
+			widthLine = - widthLine;
+		}
+		
 		if(!(widthLine === 0 && widthMinorLine === 0))
 		{
 			if(this.chartProp.type == "HBar")
@@ -4836,7 +4842,7 @@ catAxisChart.prototype =
 				var stepY = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[1].pos - this.chartProp.chartGutter._bottom / this.chartProp.pxToMM);
 				var minorStep = stepY / this.chartProp.numhMinorlines;
 				
-				var posX = this.chartSpace.chart.plotArea.valAx.posX;
+				var posX = this.chartSpace.chart.plotArea.catAx.posX;
 
 				var posY;
 				var posMinorY;
@@ -5007,7 +5013,8 @@ valAxisChart.prototype =
 		var nullPoisition = this.chartSpace.chart.plotArea.valAx.posX;
 		if(this.chartProp.type == "HBar")
 		{	
-			this.paths.axisLine = this._calculateLine( this.chartProp.chartGutter._left, this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom, this.chartProp.widthCanvas - this.chartProp.chartGutter._right, this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom );
+			nullPoisition = this.chartSpace.chart.plotArea.valAx.posY;
+			this.paths.axisLine = this._calculateLine( this.chartProp.chartGutter._left / this.chartProp.pxToMM, nullPoisition, (this.chartProp.widthCanvas - this.chartProp.chartGutter._right) / this.chartProp.pxToMM, nullPoisition );
 		}
 		else
 		{
@@ -5064,16 +5071,22 @@ valAxisChart.prototype =
 			}
 		};
 		
+		if(this.chartProp.type == "HBar")
+		{
+			widthMinorLine = - widthMinorLine;
+			widthLine = - widthLine;
+		}
+		
 		if(!(widthLine === 0 && widthMinorLine === 0))
 		{
 			if(this.chartProp.type == "HBar")
 			{
-				var yPoints = this.chartSpace.chart.plotArea.catAx.yPoints;
+				var yPoints = this.chartSpace.chart.plotArea.valAx.xPoints;
 				
 				var stepX = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[1].pos - this.chartProp.chartGutter._bottom / this.chartProp.pxToMM);
 				var minorStep = stepX / this.chartProp.numvMinorlines;
 				
-				var posY = this.chartSpace.chart.plotArea.catAx.posY;
+				var posY = this.chartSpace.chart.plotArea.valAx.posY;
 				var posX;
 				var posMinorX;
 				for(var i = 0; i < yPoints.length; i++)
