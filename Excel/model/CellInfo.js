@@ -153,6 +153,7 @@
 			this.innertext = null;
 			this.numFormat = null;
 			this.hyperlink = null;
+			this.comments = [];
 			this.isLocked = false;
 			this.isFormatTable = false;
 			this.styleName = null;
@@ -173,6 +174,7 @@
 			asc_getInnerText: function(){ return this.innertext; },
 			asc_getNumFormat: function(){ return this.numFormat; },
 			asc_getHyperlink: function(){ return this.hyperlink; },
+			asc_getComments: function(){ return this.comments; },
 			asc_getLocked: function(){ return this.isLocked; },
 			asc_getIsFormatTable: function () { return this.isFormatTable; },
 			asc_getStyleName: function () { return this.styleName; },
@@ -195,6 +197,7 @@
 		prot["asc_getInnerText"]		= prot.asc_getInnerText;
 		prot["asc_getNumFormat"]		= prot.asc_getNumFormat;
 		prot["asc_getHyperlink"]		= prot.asc_getHyperlink;
+		prot["asc_getComments"]			= prot.asc_getComments;
 		prot["asc_getLocked"]			= prot.asc_getLocked;
 		prot["asc_getIsFormatTable"]	= prot.asc_getIsFormatTable;
 		prot["asc_getStyleName"]		= prot.asc_getStyleName;

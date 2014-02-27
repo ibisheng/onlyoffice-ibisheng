@@ -1441,9 +1441,11 @@ asc_CCellCommentator.prototype = {
 		return null;
 	},
 
-	asc_addComment: function(oComment) {
+	asc_addComment: function(comment) {
 
 		var _this = this;
+		var oComment = comment;
+		var bChange = false;
 		oComment.wsId = _this.worksheet.model.getId();
 		oComment.setId();
 
@@ -1451,9 +1453,16 @@ asc_CCellCommentator.prototype = {
 			oComment.asc_putCol(_this.worksheet.getSelectedColumnIndex());
 			oComment.asc_putRow(_this.worksheet.getSelectedRowIndex());
 
-			if ((oComment.nCol != null) && (oComment.nRow != null)) {
-				var cellAddress = new CellAddress(oComment.nRow, oComment.nCol, 0);
-				oComment.sQuoteText = cellAddress.getID() + " : " + _this.worksheet.model.getCell(cellAddress).getValueWithFormat();
+			var existComments = _this.asc_getComments(oComment.nCol, oComment.nRow);
+			if ( existComments.length ) {
+				oComment = existComments[0];
+				bChange = true;
+			}
+			else {
+				if ((oComment.nCol != null) && (oComment.nRow != null)) {
+					var cellAddress = new CellAddress(oComment.nRow, oComment.nCol, 0);
+					oComment.sQuoteText = cellAddress.getID() + " : " + _this.worksheet.model.getCell(cellAddress).getValueWithFormat();
+				}
 			}
 		}
 		
@@ -1464,12 +1473,14 @@ asc_CCellCommentator.prototype = {
 			else {
 				_this.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", oComment.asc_getId());
 				
-				History.Create_NewPoint();
-				History.Add(g_oUndoRedoComment, historyitem_Comment_Add, _this.worksheet.model.getId(), null, new asc_CCommentData(oComment));
+				// Add new comment
+				if ( !bChange ) {
+					History.Create_NewPoint();
+					History.Add(g_oUndoRedoComment, historyitem_Comment_Add, _this.worksheet.model.getId(), null, new asc_CCommentData(oComment));
 
-				_this.aComments.push(oComment);
-				_this.drawCommentCells();
-
+					_this.aComments.push(oComment);
+					_this.drawCommentCells();
+				}
 				_this.worksheet.model.workbook.handlers.trigger("asc_onAddComment", oComment.asc_getId(), oComment);
 			}
 		}

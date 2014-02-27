@@ -6059,6 +6059,7 @@
 			} else
 				cell_info.hyperlink = null;
 
+			cell_info.comments = this.cellCommentator.asc_getComments(ar.c1, ar.r1);
 			cell_info.flags.merge = null !== range.hasMerged();
 
 			if (bExt) {
