@@ -128,7 +128,9 @@ CMathBase.prototype =
     },
     setRPrp: function(rPrp)
     {
-        this.RunPrp.Merge(rPrp);
+        //this.RunPrp.Merge(rPrp);
+        this.RunPrp.mathPrp.bold = rPrp.mathPrp.bold; // как в Ворде, все остальные стили не поддерживаются
+        this.RunPrp.setTxtPrp(rPrp.textPrp); // Merge wTxtPrp
 
         this.CtrPrp = new CTextPr();
         var gPrp  = rPrp.getMergedWPrp();
@@ -934,13 +936,15 @@ CMathBase.prototype =
         
         return res;
     },
-    getAscent: function(_height)
+    getAscent: function(_height, oMeasure)
     {
         var Ascent = 0;
         if(this.nRow > 1)
         {
             Ascent = _height || this.size.height;
             Ascent /=2;
+            var mgCtrPrp = this.mergeCtrTPrp();
+            Ascent += this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
         }
         else
             for(var i=0; i< this.nCol; i++)

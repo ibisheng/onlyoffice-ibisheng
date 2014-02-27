@@ -168,7 +168,7 @@ CMathMatrix.prototype.setRuleGap = function(space, rule, gap, minGap)
     space.value = Value;*/
 
 }
-CMathMatrix.prototype.recalculateSize = function()
+CMathMatrix.prototype.recalculateSize = function(oMeasure)
 {
     var txtPrp = this.mergeCtrTPrp();
 
@@ -220,7 +220,7 @@ CMathMatrix.prototype.recalculateSize = function()
         }
     }
     else /*this.baseJc == 0*/
-        ascent = this.getAscent(height);
+        ascent = this.getAscent(height, oMeasure);
         //center = height/2;
 
     this.size = {width: width, height: height, ascent: ascent};

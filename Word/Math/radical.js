@@ -13,6 +13,8 @@ CSignRadical.prototype.draw = function(x, y, pGraphics)
     //var txtPrp = this.Parent.getTxtPrp();
     var penW = txtPrp.FontSize*g_dKoef_pt_to_mm*0.042;
 
+    y += penW/2; // смещаем, для отрисовки верхней линии радикала
+
     var plH = 9.877777777777776 * txtPrp.FontSize /36;
 
     var x1 = this.pos.x + x,
@@ -187,9 +189,9 @@ CRadical.prototype.init = function(props)
     else if(props.type === DEGREE_RADICAL)
         this.type = DEGREE_RADICAL;
 
-    if(props.degHide === true && props.degHide === 1)
+    if(props.degHide === true || props.degHide === 1)
         this.type = SQUARE_RADICAL;
-    else if(props.degHide == false && props.degHide === 0)
+    else if(props.degHide == false || props.degHide === 0)
         this.type = DEGREE_RADICAL;
 
     this.setDimension(1, 1);
@@ -217,23 +219,28 @@ CRadical.prototype.recalculateSize = function()
 {
     this.signRadical.recalculateSize();
 
+    var txtPrp = this.getCtrPrp();
+    var gapTop = 2.2*txtPrp.FontSize /36,
+        sign = this.signRadical.size;
+
+
     if(this.type == SQUARE_RADICAL)
     {
-        var sign = this.signRadical.size;
-        var arg = this.elements[0][0].size;
+        var base = this.elements[0][0].size;
+
+        var shTop = (sign.height - gapTop - base.height)/2;
 
         var height = sign.height,
             width  = sign.width,
-            ascent = height - (arg.height - arg.ascent);
-            //center = (height - arg.height)*0.6  + arg.center;
+            ascent = gapTop + shTop + base.ascent;
+            //ascent = height - (base.height - base.ascent);
 
         this.size = {width: width, height: height, ascent: ascent};
     }
     else if(this.type == DEGREE_RADICAL)
     {
         var degr = this.elements[0][0].size,
-            base = this.elements[0][1].size,
-            sign = this.signRadical.size;
+            base = this.elements[0][1].size;
 
         var wTick = this.signRadical.sizeTick.width,
             hTick = this.signRadical.sizeTick.height;
@@ -242,7 +249,6 @@ CRadical.prototype.recalculateSize = function()
         var width = wDegree + sign.width;
         //var width = degr.width - wTick + sign.width;
 
-        var txtPrp = this.getCtrPrp();
         var plH = 9.877777777777776 * txtPrp.FontSize /36;
 
         if( sign.height < plH )
@@ -254,18 +260,19 @@ CRadical.prototype.recalculateSize = function()
             h2 = sign.height;
 
         var height, ascent;
+        var shTop = (sign.height - gapTop - base.height)/2;
 
         if(h1 > h2)
         {
             height =  h1;
-            ascent =  height - (base.height - base.ascent);
-            //center = h1 - h2 + (sign.height - base.height)*0.6  + base.center;
+            ascent = height - shTop - (base.height - base.ascent);
+            //ascent =  height - (base.height - base.ascent);
         }
         else
         {
             height =  h2;
-            ascent =  height - (base.height - base.ascent);
-            //center = (sign.height - base.height)*0.6  + base.center;
+            ascent = height - shTop - (base.height - base.ascent);
+            //ascent =  height - (base.height - base.ascent);
         }
 
         this.size = {width: width, height: height, ascent: ascent};

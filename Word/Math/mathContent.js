@@ -157,9 +157,9 @@ CMathRunPrp.prototype =
 
         return props;
     },
-    getTypeText: function()
+    getTxtSettings: function()
     {
-        return this.mathPrp.getTypeText();
+        return this.mathPrp.getTxtSettings();
     }
 }
 
@@ -301,14 +301,20 @@ CMPrp.prototype =
             this.typeText = TXT_NORMAL;
 
     },
-    getTypeText: function()
+    getTxtSettings: function()
     {
-        var type= this.typeText;
+        var type = this.typeText;
 
         if(type == TXT_ROMAN && this.italic == false) // если MATH TEXT и не курсив, то подменяем на NORMAL TEXT
             type = TXT_NORMAL;
 
-        return type;
+        var settings =
+        {
+            type:   type,
+            lit:    this.lit
+        };
+
+        return settings;
     },
     getTxtPrp: function()
     {
@@ -4731,7 +4737,12 @@ CMathContent.prototype =
     },
     Resize: function(oMeasure)      // пересчитываем всю формулу
     {
-        var typeTxt = TXT_ROMAN; // default MATH Text
+        // default для случая с плейсхолдером, RunPrp в контенте отсутствуют
+        var TxtSettings =
+        {
+            type:   TXT_ROMAN,
+            lit:    false
+        }; // default type is TXT_ROMAN (MATH Text)
         //var posPrev  = -1;
 
         for(var i = 0; i < this.content.length; i++)
@@ -4741,10 +4752,11 @@ CMathContent.prototype =
 
             if(type == MATH_TEXT)
             {
-                this.content[i].value.setMText(typeTxt);
+                this.content[i].value.setMText(TxtSettings.type);
                 this.content[i].value.Resize(oMeasure);
 
-                this.checkGapsSign(oMeasure, i);
+                if(TxtSettings.type !== TXT_NORMAL && TxtSettings.lit === false)
+                    this.checkGapsSign(oMeasure, i);
             }
             else if(type == MATH_COMP)
             {
@@ -4760,7 +4772,7 @@ CMathContent.prototype =
 
                 this.applyArgSize(oWPrp); // здесь мержим с DEFAULT_RUN_PRP
 
-                typeTxt = obj.getTypeText();
+                TxtSettings = obj.getTxtSettings();
 
                 /*if(typeTxt == TXT_ROMAN) // MATH TEXT, наклон не меняем, если italic
                     oWPrp.Italic = false;*/
@@ -6006,6 +6018,10 @@ CMathContent.prototype =
     {
         //return (this.selection.startPos !== this.selection.endPos);
         return this.RealSelect.startPos !== this.RealSelect.endPos;
+    },
+    setCtrPrp: function()
+    {
+
     },
     old_setStart_Selection: function(StartIndSelect)
     {
