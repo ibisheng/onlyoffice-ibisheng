@@ -2623,41 +2623,12 @@ drawLineChart.prototype =
 				nextVal = this._getYVal(n + 1, i);
 				
 				//точки находятся внутри диапазона
-				if(val >= yPoints[0].val && val <= yPoints[yPoints.length - 1].val && nextVal >= yPoints[0].val && nextVal <= yPoints[yPoints.length - 1].val)
-				{
-					y  = this._getYPosition(val, yPoints);
-					y1 = this._getYPosition(nextVal, yPoints);
-					
-					x  = xPoints[n].pos; 
-					x1 = xPoints[n + 1].pos;
-				}
-				//первая точка выходит за пределы диапазона || вторая точка выходит за пределы диапазона
-				else if(( nextVal >= yPoints[0].val && nextVal <= yPoints[yPoints.length - 1].val ) || ( val >= yPoints[0].val && val <= yPoints[yPoints.length - 1].val ))
-				{
-					y  = this._getYPosition(val, yPoints);
-					y1 = this._getYPosition(nextVal, yPoints);
-					
-					if(val < yPoints[0].val)
-						yk = this._getYPosition(yPoints[0].val, yPoints);
-					else
-						yk = this._getYPosition(yPoints[yPoints.length - 1].val, yPoints);
-					
-					x  = xPoints[n].pos; 
-					x1 = xPoints[n + 1].pos; 
-					
-					//находим из двух точек уравнение, из третьей координаты y находим x
-					if(nextVal >= yPoints[0].val && nextVal <= yPoints[yPoints.length - 1].val)
-					{
-						x = (yk * (x - x1) + x1 * y + x1 * y1) / (y - y1);
-						y = yk;
-					}
-					else
-					{
-						x1 = (yk * (x - x1) + x1 * y + x1 * y1) / (y - y1);
-						y1 = yk;
-					}
-				}
+
+				y  = this._getYPosition(val, yPoints);
+				y1 = this._getYPosition(nextVal, yPoints);
 				
+				x  = xPoints[n].pos; 
+				x1 = xPoints[n + 1].pos;
 				
 				if(!this.paths.series)
 					this.paths.series = [];
@@ -4774,7 +4745,7 @@ catAxisChart.prototype =
 		}
 		else
 		{
-			this.paths.axisLine = this._calculateLine( this.chartProp.chartGutter._left / this.chartProp.pxToMM, nullPoisition, (this.chartProp.widthCanvas - this.chartProp.chartGutter._right) / this.chartProp.pxToMM, nullPoisition );
+			this.paths.axisLine = this._calculateLine( this.chartProp.chartGutter._left / this.chartProp.pxToMM, nullPoisition / this.chartProp.pxToMM, (this.chartProp.widthCanvas - this.chartProp.chartGutter._right) / this.chartProp.pxToMM, nullPoisition / this.chartProp.pxToMM );
 		}
 	},
 	
