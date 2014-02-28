@@ -909,47 +909,10 @@ CChartsDrawer.prototype =
 		var standartMargin = 13 / pxToMM;
 		var isHBar = (chartSpace.chart.plotArea.chart.getObjectType() == historyitem_type_BarChart && chartSpace.chart.plotArea.chart.barDir != 1) ? true : false;
 		
-		var left = 0, right = 0, top = 0, bottom = 0, hbarbottom;
-		//cat / val
-		if(chartSpace.chart.plotArea.catAx.labels && !chartSpace.chart.plotArea.catAx.bDelete)
-		{
-			if(!chartSpace.chart.plotArea.catAx.tickLblPos || chartSpace.chart.plotArea.catAx.tickLblPos == TICK_LABEL_POSITION_LOW || chartSpace.chart.plotArea.catAx.tickLblPos == TICK_LABEL_POSITION_NEXT_TO)
-			{
-				if(isHBar && chartSpace.chart.plotArea.valAx.xPoints[0].pos > chartSpace.chart.plotArea.catAx.labels.extX)
-					left = chartSpace.chart.plotArea.catAx.labels.extX;
-				else
-					bottom = ( chartSpace.chart.plotArea.catAx.labels.y + chartSpace.chart.plotArea.catAx.labels.extY ) - chartSpace.chart.plotArea.catAx.posY;
-			}
-			else if(chartSpace.chart.plotArea.catAx.tickLblPos == TICK_LABEL_POSITION_HIGH)
-			{
-				if(isHBar)
-					right = ( chartSpace.chart.plotArea.catAx.labels.x + chartSpace.chart.plotArea.catAx.labels.extX ) - chartSpace.chart.plotArea.catAx.posX;
-				else
-					top = ( chartSpace.chart.plotArea.catAx.labels.y + chartSpace.chart.plotArea.catAx.labels.extY ) - chartSpace.chart.plotArea.catAx.posY;
-			}	
-		}
+		//высчитываем выходящие за пределы подписи осей
+		var labelsMargin = this._calculateMarginLabels(chartSpace);
 		
-		
-		if(chartSpace.chart.plotArea.valAx.labels && !chartSpace.chart.plotArea.valAx.bDelete)
-		{
-			if(chartSpace.chart.plotArea.valAx.tickLblPos == TICK_LABEL_POSITION_LOW || chartSpace.chart.plotArea.valAx.tickLblPos == TICK_LABEL_POSITION_NEXT_TO)
-			{
-				if(isHBar)
-					bottom = ( chartSpace.chart.plotArea.valAx.labels.y + chartSpace.chart.plotArea.valAx.labels.extY ) - chartSpace.chart.plotArea.valAx.posY;
-				else
-					left = chartSpace.chart.plotArea.valAx.labels.extX;
-			}
-			else if(chartSpace.chart.plotArea.catAx.tickLblPos == TICK_LABEL_POSITION_HIGH)
-			{
-				if(isHBar)
-					top = ( chartSpace.chart.plotArea.valAx.labels.y + chartSpace.chart.plotArea.valAx.labels.extY ) - chartSpace.chart.plotArea.valAx.posY;
-				else
-					right = ( chartSpace.chart.plotArea.catAx.labels.y + chartSpace.chart.plotArea.catAx.labels.extY ) - chartSpace.chart.plotArea.catAx.posY;
-			}	
-		}
-
-		
-		
+		var left = labelsMargin.left, right = labelsMargin.right, top = labelsMargin.top, bottom = labelsMargin.bottom;
 		
 		//****left*****
 		if(left || !right)
@@ -1018,7 +981,6 @@ CChartsDrawer.prototype =
 			
 		
 		
-		
 		//KEY
 		
 		this.calcProp.chartGutter._left = left * pxToMM;
@@ -1026,6 +988,173 @@ CChartsDrawer.prototype =
 		this.calcProp.chartGutter._top = top * pxToMM;
 		this.calcProp.chartGutter._bottom = bottom * pxToMM;
 	
+	},
+	
+	_calculateMarginLabels: function(chartSpace)
+	{
+		var isHBar = this.calcProp.type;
+		var left = 0, right = 0, bottom = 0, top = 0;
+		
+		var leftDownPointX, leftDownPointY, rightUpPointX, rightUpPointY;
+		
+		var valAx = chartSpace.chart.plotArea.valAx;
+		var catAx = chartSpace.chart.plotArea.catAx;
+		
+
+		if(isHBar === 'HBar' && catAx.yPoints && valAx.xPoints)
+		{
+			if(catAx.yPoints.length > 1)
+			{
+				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+					leftDownPointY = catAx.yPoints[0].pos - (catAx.yPoints[1].pos - catAx.yPoints[0].pos) / 2;
+				else
+					leftDownPointY = catAx.yPoints[0].pos;
+			}
+			else
+				leftDownPointY = catAx.labels.x;
+
+			
+			leftDownPointX = valAx.xPoints[0].pos;
+			
+			
+			if(catAx.yPoints.length > 1)
+			{
+				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+					rightUpPointY = catAx.yPoints[0].pos - Math.abs((catAx.yPoints[1].pos - catAx.yPoints[0].pos) / 2);
+				else
+					rightUpPointY = catAx.yPoints[catAx.yPoints.length - 1].pos;
+			}
+			else
+				rightUpPointY = catAx.labels.x;
+
+			
+			rightUpPointX = valAx.xPoints[valAx.xPoints.length - 1].pos;
+			
+			
+			
+			if(catAx.labels && !catAx.bDelete)
+			{
+				//подпись оси OY находится левее крайней левой точки
+				if(leftDownPointX >= catAx.labels.x)
+				{
+					left = leftDownPointX - catAx.labels.x;
+				}
+				else if((catAx.labels.x + catAx.labels.extX) >= rightUpPointX)//правее крайней правой точки
+				{
+					right = catAx.labels.x + catAx.labels.extX - rightUpPointX;
+				}
+			}
+			
+			
+			if(valAx.labels && !valAx.bDelete)
+			{
+				//подпись оси OX находится ниже крайней нижней точки
+				if((valAx.labels.y + valAx.labels.extY) >= leftDownPointY)
+				{
+					bottom = (valAx.labels.y + valAx.labels.extY) - leftDownPointY;
+				}
+				else if(valAx.labels.y <= rightUpPointY)//выше верхней
+				{
+					top = rightUpPointY - valAx.labels.y;
+				}
+			}
+		}
+		else if(isHBar === 'Scatter' && catAx.xPoints && valAx.yPoints)
+		{
+			leftDownPointX = catAx.xPoints[0].pos;
+			leftDownPointY = valAx.yPoints[0].pos;
+
+			rightUpPointX = catAx.xPoints[catAx.xPoints.length - 1].pos;
+			rightUpPointY = valAx.yPoints[valAx.yPoints.length - 1].pos;
+			
+			if(valAx.labels && !valAx.bDelete)
+			{
+				//подпись оси OY находится левее крайней левой точки
+				if(leftDownPointX >= valAx.labels.x)
+				{
+					left = leftDownPointX - valAx.labels.x;
+				}
+				else if((valAx.labels.x + valAx.labels.extX) >= rightUpPointY)//правее крайней правой точки
+				{
+					right = valAx.labels.x + valAx.labels.extX - rightUpPointY;
+				}
+			}
+			
+			
+			if(catAx.labels && !catAx.bDelete)
+			{
+				//подпись оси OX находится ниже крайней нижней точки
+				if((catAx.labels.y + catAx.labels.extY) >= leftDownPointY)
+				{
+					bottom = (catAx.labels.y + catAx.labels.extY) - leftDownPointY;
+				}
+				else if(catAx.labels.y <= rightUpPointY)//выше верхней
+				{
+					top = rightUpPointY - catAx.labels.y;
+				}
+			}
+		}
+		else if(isHBar !== undefined && catAx.xPoints && valAx.yPoints)
+		{
+			if(catAx.xPoints.length > 1)
+			{
+				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+					leftDownPointX = catAx.xPoints[0].pos - (catAx.xPoints[1].pos - catAx.xPoints[0].pos) / 2;
+				else
+					leftDownPointX = catAx.xPoints[0].pos;
+			}
+			else
+				leftDownPointX = catAx.labels.x;
+
+			
+			leftDownPointY = valAx.yPoints[0].pos;
+			
+			
+			if(catAx.xPoints.length > 1)
+			{
+				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+					rightUpPointX = catAx.xPoints[catAx.xPoints.length - 1].pos + (catAx.xPoints[1].pos - catAx.xPoints[0].pos) / 2;
+				else
+					rightUpPointX = catAx.xPoints[catAx.xPoints.length - 1].pos;
+			}
+			else
+				rightUpPointX = catAx.labels.x;
+
+			
+			rightUpPointY = valAx.yPoints[valAx.yPoints.length - 1].pos;
+			
+			
+			
+			if(valAx.labels && !valAx.bDelete)
+			{
+				//подпись оси OY находится левее крайней левой точки
+				if(leftDownPointX >= valAx.labels.x)
+				{
+					left = leftDownPointX - valAx.labels.x;
+				}
+				else if((valAx.labels.x + valAx.labels.extX) >= rightUpPointY)//правее крайней правой точки
+				{
+					right = valAx.labels.x + valAx.labels.extX - rightUpPointY;
+				}
+			}
+			
+			
+			if(catAx.labels && !catAx.bDelete)
+			{
+				//подпись оси OX находится ниже крайней нижней точки
+				if((catAx.labels.y + catAx.labels.extY) >= leftDownPointY)
+				{
+					bottom = (catAx.labels.y + catAx.labels.extY) - leftDownPointY;
+				}
+				else if(catAx.labels.y <= rightUpPointY)//выше верхней
+				{
+					top = rightUpPointY - catAx.labels.y;
+				}
+			}
+			}
+		
+		
+		return {left: left, right: right, top: top, bottom: bottom};
 	},
 	
 	_getNullPosition: function()
