@@ -36,8 +36,6 @@
 		var asc_CCellFlag		= asc.asc_CCellFlag;
 		var asc_CFont			= asc.asc_CFont;
 		var asc_CFill			= asc.asc_CFill;
-		var asc_CBorder			= asc.asc_CBorder;
-		var asc_CBorders		= asc.asc_CBorders;
 		var asc_CCellInfo		= asc.asc_CCellInfo;
 		var asc_CCellRect		= asc.asc_CCellRect;
 		var asc_CHyperlink		= asc.asc_CHyperlink;
@@ -125,33 +123,7 @@
 			}
 			this.columnsWithText = {};							// Колонки, в которых есть текст
 			this.columns = {};
-			this.erasedRB = {};
-			this.erasedLB = {};
-			return this;
-		}
-
-
-		/**
-		 * @param {String} style
-		 * @param {Number} color
-		 * @param {Number} width
-		 * @param {Boolean} isErased
-		 * @param {Boolean} isActive
-		 */
-		function CellBorder(style, color, width, isErased, isActive) {
-			if ( !(this instanceof CellBorder) ) {
-				return new CellBorder(style, color, width, isErased, isActive);
-			}
-			/** @type {String} */
-			this.s = style !== undefined ? style : c_oAscBorderStyles.None;
-			/** @type {Number} */
-			this.c = color !== undefined ? color : new CColor(0, 0, 0);
-			/** @type {Number} */
-			this.w = width !== undefined ? width : 0;
-			/** @type {Boolean} */
-			this.isErased = isErased !== undefined ? isErased : false;
-			/** @type {Boolean} */
-			this.isActive = isActive !== undefined ? isActive : true;
+			this.erased = {};
 			return this;
 		}
 
@@ -231,14 +203,6 @@
 			//     0 : {
 			//       columns : {
 			//         0 : {
-			//           borders : {
-			//             b : CellBorder,
-			//             l : CellBorder,
-			//             r : CellBorder,
-			//             t : CellBorder,
-			//             dd : CellBorder,
-			//             du : CellBorder
-			//           },
 			//           text : {
 			//             cellHA  : String,
 			//             cellVA  : String,
@@ -251,11 +215,8 @@
 			//           }
 			//         }
 			//       },
-			//       erasedLB : {
+			//       erased : {
 			//         1 : true, 2 : true
-			//       },
-			//       erasedRB : {
-			//         0 : true, 1 : true
 			//       }
 			//     }
 			//   },
@@ -2639,8 +2600,8 @@
 		WorksheetView.prototype._drawCellsBorders = function (drawingCtx, range, mergedCellsStage, leftFieldInPt, topFieldInPt) {
 			//TODO: использовать стили линий при рисовании границ
 			if (range === undefined) {
-					range = this.visibleRange;
-				}
+				range = this.visibleRange;
+			}
 			var t = this;
 			var ctx = (drawingCtx) ? drawingCtx : this.drawingCtx;
 			var c = this.cols;
@@ -2661,7 +2622,7 @@
 
 			// ToDo в одну функцию
 			function drawBorderHor(border, x1, y, x2) {
-				if (border.s !== c_oAscBorderStyles.None && !border.isErased) {
+				if (border.s !== c_oAscBorderStyles.None) {
 					if (bc !== border.c) {
 						bc = border.c;
 						ctx.setStrokeStyle(bc);
@@ -2674,7 +2635,7 @@
 			}
 
 			function drawBorderVer(border, x1, y1, y2) {
-				if (border.s !== c_oAscBorderStyles.None && !border.isErased) {
+				if (border.s !== c_oAscBorderStyles.None) {
 					if (bc !== border.c) {
 						bc = border.c;
 						ctx.setStrokeStyle(bc);
@@ -2687,7 +2648,7 @@
 			}
 
 			function drawDiagonal(border, x1, y1, x2, y2) {
-				if (border.s !== c_oAscBorderStyles.None && !border.isErased) {
+				if (border.s !== c_oAscBorderStyles.None) {
 					if (bc !== border.c) {
 						bc = border.c;
 						ctx.setStrokeStyle(bc);
@@ -2699,8 +2660,25 @@
 				}
 			}
 
+			function drawVerticalBorder2(borderLeft, borderRight, x, y1, y2) {
+				var border;
+				if (borderLeft && borderLeft.r.w)
+					border = borderLeft.r;
+				else if (borderRight && borderRight.l.w)
+					border = borderRight.l;
+				if (!border || border.w < 1) {return;}
+
+				// ToDo переделать рассчет
+				var tbw = t._calcMaxBorderWidth(borderLeft && borderLeft.t, borderRight && borderRight.t); // top border width
+				var bbw = t._calcMaxBorderWidth(borderLeft && borderLeft.b, borderRight && borderRight.b); // bottom border width
+				var dy1 = tbw > border.w ? tbw - 1 : (tbw > 1 ? -1 : 0);
+				var dy2 = bbw > border.w ? -2 : (bbw > 2 ? 1 : 0);
+
+				drawBorderVer(border, x, y1 + (-1 + dy1) * t.height_1px, y2 + (1 + dy2) * t.height_1px);
+			}
+
 			function drawVerticalBorder(bor, tb1, tb2, bb1, bb2, x, y1, y2) {
-				if (bor.w < 1 || bor.isErased) {return;}
+				if (bor.w < 1) {return;}
 
 				// ToDo переделать рассчет
 				var tbw = t._calcMaxBorderWidth(tb1, tb2); // top border width
@@ -2709,6 +2687,23 @@
 				var dy2 = bbw > bor.w ? -2 : (bbw > 2 ? 1 : 0);
 
 				drawBorderVer(bor, x, y1 + (-1 + dy1) * t.height_1px, y2 + (1 + dy2) * t.height_1px);
+			}
+
+			function drawHorizontalBorder2(borderTop, borderBottom, x1, y, x2) {
+				var border;
+				if (borderTop && borderTop.b.w)
+					border = borderTop.b;
+				else if (borderBottom && borderBottom.t.w)
+					border = borderBottom.t;
+
+				if (border && border.w > 0) {
+					// ToDo переделать рассчет
+					var lbw = t._calcMaxBorderWidth(borderTop && borderTop.l, borderBottom && borderBottom.l);
+					var rbw = t._calcMaxBorderWidth(borderTop && borderTop.r, borderBottom && borderBottom.r);
+					var dx1 = border.w > lbw ? (lbw > 1 ? -1 : 0) : (lbw > 2 ? 2 : 1);
+					var dx2 = border.w > rbw ? (rbw > 2 ? 1 : 0) : (rbw > 1 ? -2 : -1);
+					drawBorderHor(border, x1 + (-1 + dx1) * t.width_1px, y, x2 + (1 + dx2) * t.width_1px);
+				}
 			}
 
 			function drawHorizontalBorder(bor, lb, lbOther, rb, rbOther, x1, y, x2) {
@@ -2730,87 +2725,111 @@
 					.clip();
 			}
 
-			for (var row = range.r1; row <= range.r2 && row < this.nRowsCount; ++row) {
-				if (r[row].height < this.height_1px) {continue;}
+			var arrPrevRow = [];
+			var arrCurrRow = [];
+			var arrNextRow = [];
+			var bCur, bPrev, bNext, bTopCur, bTopPrev, bTopNext, bBotCur, bBotPrev, bBotNext;
+			var row = range.r1 - 1, col, prevCol = range.c1 - 1;
+			// Сначала пройдемся по верхней строке (над отрисовываемым диапазоном)
+			while (0 <= row) {
+				if (r[row].height >= t.height_1px) {
+					for (col = prevCol; col <= range.c2 && col < t.nColsCount; ++col) {
+						if (0 > col || c[col].width < t.width_1px) {continue;}
+						arrPrevRow[col] = t._getVisibleCell(col, row).getBorder();
+					}
+					break;
+				}
+				--row;
+			}
+			// Теперь определим первую колонку (т.к. могут быть скрытые колонки)
+			while (0 <= prevCol && c[prevCol].width < t.width_1px)
+				--prevCol;
+
+			var isPrevColExist = (0 <= prevCol);
+			for (row = range.r1; row <= range.r2 && row < t.nRowsCount; ++row) {
+				if (r[row].height < t.height_1px) {continue;}
 				var isFirstRow = row === range.r1;
 				var isLastRow  = row === range.r2;
+				var nextRow = row + 1;
+
+				var rowCache = t._fetchRowCache(row);
 				var y1 = r[row].top - offsetY;
 				var y2 = y1 + r[row].height - this.height_1px;
-				var mc = null;
 
-				for (var isMerged = false, hasHideCol = false, col = range.c1; col <= range.c2 && col < this.nColsCount; ++col, isMerged = false) {
-					if (c[col].width < this.width_1px) {hasHideCol = true; continue;}
+				for (col = range.c1; col <= range.c2 && col < t.nColsCount; ++col) {
+					if (c[col].width < this.width_1px) {continue;}
 					var isFirstCol = col === range.c1;
+					var nextCol = col + 1;
 
-					if (!mergedCellsStage) {
-						// ToDo возможно можно оптимизировать
-						mc = this.model.getMergedByCell(row, col);
-						if (mc) {
-							if ((col === mc.c1 || isFirstCol) && (row === mc.r1 || isFirstRow)) {
-								mc = mc.intersectionSimple(this.visibleRange);
-								if (null === mc) {
-									break;
-								}
-								this._drawCellsBorders(drawingCtx, mc, true, leftFieldInPt, topFieldInPt);
-							}
-							isMerged = true;
-							col = mc.c2;
-							// Проверка на выход за границы
-							if (col >= this.nColsCount)
-								col = this.nColsCount - 1;
-						}
-					}
+					// ToDo merge ячейки
 
 					var x1 = c[col].left - offsetX;
 					var x2 = x1 + c[col].width - this.width_1px;
-					//
-					var dd = this._getActiveBorder(col, row, kcbidDiagonalDown);
-					var du = this._getActiveBorder(col, row, kcbidDiagonalUp);
-					//
-					var lb     = (isFirstCol || hasHideCol) ? this._getActiveBorder(col, row, kcbidLeft) : rb;
-					var lbPrev = (isFirstCol || hasHideCol) ? this._getActiveBorder(col, row - 1, kcbidLeft) : rbPrev;
-					var lbNext = (isFirstCol || hasHideCol) ? this._getActiveBorder(col, row + 1, kcbidLeft) : rbNext;
-					var tbPrev = (isFirstCol || hasHideCol) ? this._getActiveBorder(col - 1, row, kcbidTop) : tb;
-					var bbPrev = (isFirstCol || hasHideCol) ? this._getActiveBorder(col - 1, row, kcbidBottom) : bb;
-					var tb     = (isFirstCol || hasHideCol) ? this._getActiveBorder(col, row, kcbidTop) : tbNext;
-					var bb     = (isFirstCol || hasHideCol) ? this._getActiveBorder(col, row, kcbidBottom) : bbNext;
-					//
-					var rb     = this._getActiveBorder(col, row, kcbidRight);
-					var rbPrev = this._getActiveBorder(col, row - 1, kcbidRight);
-					var rbNext = this._getActiveBorder(col, row + 1, kcbidRight);
-					var tbNext = this._getActiveBorder(col + 1, row, kcbidTop);
-					var bbNext = this._getActiveBorder(col + 1, row, kcbidBottom);
 
-					if (isMerged || mergedCellsStage &&
-						row !== range.r1 && row !== range.r2&& col !== range.c1 && col !== range.c2) {continue;}
+					if (row === t.nRowsCount) {
+						bBotPrev = bBotCur = bBotNext = undefined;
+					} else {
+						if (isFirstCol) {
+							bBotPrev = arrNextRow[prevCol] = isPrevColExist ?
+								t._getVisibleCell(prevCol, nextRow).getBorder() : undefined;
+							bBotCur = arrNextRow[col] = t._getVisibleCell(col, nextRow).getBorder();
+						} else {
+							bBotPrev = bBotCur;
+							bBotCur = bBotNext;
+						}
+					}
 
-					var hasDD = dd.w > 0 && dd.s !== c_oAscBorderStyles.None;
-					var hasDU = du.w > 0 && du.s !== c_oAscBorderStyles.None;
-					if ( (hasDD || hasDU) && (!mergedCellsStage || row === range.r1 && col === range.c1) ) {
+					if (isFirstCol) {
+						bPrev = arrCurrRow[prevCol] = isPrevColExist ?
+							t._getVisibleCell(prevCol, row).getBorder() : undefined;
+						arrCurrRow[col] = bCur = t._getVisibleCell(col, row).getBorder();
+						bTopPrev = arrPrevRow[prevCol];
+						bTopCur = arrPrevRow[col];
+					} else {
+						bPrev = bCur;
+						bCur = bNext;
+						bTopPrev = bTopCur;
+						bTopCur = bTopNext;
+					}
+
+					if (col === t.nColsCount) {
+						bNext = undefined;
+						bTopNext = undefined;
+					} else {
+						bNext = arrCurrRow[nextCol] = t._getVisibleCell(nextCol, row).getBorder();
+						bTopNext = arrPrevRow[nextCol];
+
+						if (row === t.nRowsCount)
+							bBotNext = undefined;
+						else
+							bBotNext = arrNextRow[nextCol] = t._getVisibleCell(nextCol, nextRow).getBorder();
+					}
+
+					// draw diagonal borders
+					if (bCur.dd || bCur.du) {
 						var x2Diagonal = x2;
 						var y2Diagonal = y2;
 						if (mergedCellsStage) {
 							// Merge cells
-							x2Diagonal = c[range.c2].left + c[range.c2].width - offsetX - this.width_1px;
-							y2Diagonal = r[range.r2].top + r[range.r2].height - offsetY - this.height_1px;
+							x2Diagonal = c[range.c2].left + c[range.c2].width - offsetX - t.width_1px;
+							y2Diagonal = r[range.r2].top + r[range.r2].height - offsetY - t.height_1px;
 						}
-
 						// ToDo Clip diagonal borders
 						/*ctx.save()
-								.beginPath()
-								.rect(x1 + this.width_1px * (lb.w < 1 ? -1 : (lb.w < 3 ? 0 : +1)),
-									  y1 + this.width_1px * (tb.w < 1 ? -1 : (tb.w < 3 ? 0 : +1)),
-									  c[col].width + this.width_1px * ( -1 + (lb.w < 1 ? +1 : (lb.w < 3 ? 0 : -1)) + (rb.w < 1 ? +1 : (rb.w < 2 ? 0 : -1)) ),
-									  r[row].height + this.height_1px * ( -1 + (tb.w < 1 ? +1 : (tb.w < 3 ? 0 : -1)) + (bb.w < 1 ? +1 : (bb.w < 2 ? 0 : -1)) ))
-								.clip();
-						*/
-						if (hasDD) {
+							 .beginPath()
+							 .rect(x1 + this.width_1px * (lb.w < 1 ? -1 : (lb.w < 3 ? 0 : +1)),
+								 y1 + this.width_1px * (tb.w < 1 ? -1 : (tb.w < 3 ? 0 : +1)),
+								 c[col].width + this.width_1px * ( -1 + (lb.w < 1 ? +1 : (lb.w < 3 ? 0 : -1)) + (rb.w < 1 ? +1 : (rb.w < 2 ? 0 : -1)) ),
+								 r[row].height + this.height_1px * ( -1 + (tb.w < 1 ? +1 : (tb.w < 3 ? 0 : -1)) + (bb.w < 1 ? +1 : (bb.w < 2 ? 0 : -1)) ))
+							 .clip();
+						 */
+						if (bCur.dd) {
 							// draw diagonal line l,t - r,b
-							drawDiagonal(dd, x1 - this.width_1px, y1 - this.height_1px, x2Diagonal, y2Diagonal);
+							drawDiagonal(bCur.d, x1 - t.width_1px, y1 - t.height_1px, x2Diagonal, y2Diagonal);
 						}
-						if (hasDU) {
+						if (bCur.du) {
 							// draw diagonal line l,b - r,t
-							drawDiagonal(du, x1 - this.width_1px, y2Diagonal, x2Diagonal, y1 - this.height_1px);
+							drawDiagonal(bCur.d, x1 - t.width_1px, y2Diagonal, x2Diagonal, y1 - t.height_1px);
 						}
 						// ToDo Clip diagonal borders
 						//ctx.restore();
@@ -2818,40 +2837,42 @@
 						//bc = undefined;
 					}
 
-					if (isFirstCol) {
-						// draw left border
-						drawVerticalBorder.call(this, lb, tb, tbPrev, bb, bbPrev, x1 - this.width_1px, y1, y2);
+					// draw left border
+					if (isFirstCol && !t._isLeftBorderErased1(col, rowCache)) {
+						drawVerticalBorder2(bPrev, bCur, x1 - t.width_1px, y1, y2);
 						// Если мы в печати и печатаем первый столбец, то нужно напечатать бордеры
-						if (lb.w >= 1 && false == lb.isErased && drawingCtx && 0 === col) {
+//						if (lb.w >= 1 && drawingCtx && 0 === col) {
 							// Иначе они будут не такой ширины
 							// ToDo посмотреть что с этим ? в печати будет обрезка
-							drawVerticalBorder.call(this, lb, tb, tbPrev, bb, bbPrev, x1, y1, y2);
-						}
+//							drawVerticalBorder(lb, tb, tbPrev, bb, bbPrev, x1, y1, y2);
+//						}
 					}
-					if (!mergedCellsStage || col === range.c2) {
-						// draw right border
-						drawVerticalBorder.call(this, rb, tb, tbNext, bb, bbNext, x2, y1, y2);
+					// draw right border
+					if ((!mergedCellsStage || col === range.c2) && !t._isRightBorderErased1(col, rowCache)) {
+						drawVerticalBorder2(bCur, bNext, x2, y1, y2);
 					}
-
+					// draw top border
 					if (isFirstRow) {
-						// draw top border
-						drawHorizontalBorder.call(this, tb, lb, lbPrev, rb, rbPrev, x1, y1 - this.height_1px, x2);
+						drawHorizontalBorder2(bTopCur, bCur, x1, y1 - t.height_1px, x2);
 						// Если мы в печати и печатаем первую строку, то нужно напечатать бордеры
-						if (tb.w > 0 && drawingCtx && 0 === row) {
+//						if (tb.w > 0 && drawingCtx && 0 === row) {
 							// ToDo посмотреть что с этим ? в печати будет обрезка
-							drawHorizontalBorder.call(this, tb, lb, lbPrev, rb, rbPrev, x1, y1, x2);
-						}
+//							drawHorizontalBorder.call(this, tb, lb, lbPrev, rb, rbPrev, x1, y1, x2);
+//						}
 					}
 					if (!mergedCellsStage || isLastRow) {
 						// draw bottom border
-						drawHorizontalBorder.call(this, bb, lb, lbNext, rb, rbNext, x1, y2, x2);
+						drawHorizontalBorder2(bCur, bBotCur, x1, y2, x2);
 					}
 				}
+
+				arrPrevRow = arrCurrRow;
+				arrCurrRow = arrNextRow;
+				arrNextRow = [];
 			}
 
-			if (!drawingCtx) {
+			if (!drawingCtx)
 				ctx.restore();
-			}
 		};
 
 		/** Рисует закрепленные области областей */
@@ -3701,35 +3722,15 @@
 
 			for (r = range.r1; r <= range.r2; ++r) {
 				row = t.cache.rows[r];
-				for (c = range.c1; c <= range.c2; ++c) {
-					if (row !== undefined) {
+				if (row !== undefined) {
+					// Должны еще крайнюю удалить
+					c = range.c1;
+					if (row.erased[c - 1]) {delete row.erased[c - 1];}
+					for (; c <= range.c2; ++c) {
 						if (row.columns[c]) {delete row.columns[c];}
 						if (row.columnsWithText[c]) {delete row.columnsWithText[c];}
-						if (row.erasedLB[c]) {delete row.erasedLB[c];}
-						if (row.erasedRB[c-1]) {delete row.erasedRB[c-1];}
+						if (row.erased[c]) {delete row.erased[c];}
 					}
-				}
-				if (row !== undefined) {
-					if (row.erasedLB[c]) {delete row.erasedLB[c];}
-					if (row.erasedRB[c-1]) {delete row.erasedRB[c-1];}
-					if (row.columns) {
-						if (row.columns[range.c1-1] && row.columns[range.c1-1].borders) {delete row.columns[range.c1-1].borders.r;}
-						if (row.columns[range.c2+1] && row.columns[range.c2+1].borders) {delete row.columns[range.c2+1].borders.l;}
-					}
-				}
-			}
-
-			row = t.cache.rows[range.r1-1];
-			if (row !== undefined) {
-				for (c = range.c1; c <= range.c2; ++c) {
-					if (row.columns[c] && row.columns[c].borders) {delete row.columns[c].borders.b;}
-				}
-			}
-
-			row = t.cache.rows[range.r2+1];
-			if (row !== undefined) {
-				for (c = range.c1; c <= range.c2; ++c) {
-					if (row.columns[c] && row.columns[c].borders) {delete row.columns[c].borders.t;}
 				}
 			}
 		};
@@ -4068,13 +4069,13 @@
             this._fetchCellCacheText(col, row).hasText = true;
 
             if (cto.leftSide !== 0 || cto.rightSide !== 0) {
-                    this._addErasedBordersToCache(col - cto.leftSide, col + cto.rightSide, row);
-                }
+				this._addErasedBordersToCache(col - cto.leftSide, col + cto.rightSide, row);
+			}
 
             // update row's descender
             if (va !== kvaTop && va !== kvaCenter && !fl.isMerged) {
-					rowInfo.descender = Math.max(rowInfo.descender, tm.height - tm.baseline);
-                }
+				rowInfo.descender = Math.max(rowInfo.descender, tm.height - tm.baseline);
+            }
 
 			rowHeight = rowInfo.height;
 
@@ -4191,148 +4192,20 @@
 		WorksheetView.prototype._addErasedBordersToCache = function (colBeg, colEnd, row) {
 			var rc = this._fetchRowCache(row);
 			for (var col = colBeg; col < colEnd; ++col) {
-				rc.erasedRB[col] = true;
-				rc.erasedLB[col + 1] = true;
+				rc.erased[col] = true;
 			}
 		};
 
-		WorksheetView.prototype._isLeftBorderErased = function (col, row) {
-			return this._fetchRowCache(row).erasedLB[col] === true;
+		WorksheetView.prototype._isLeftBorderErased1 = function (col, rowCache) {
+			return rowCache.erased[col - 1] === true;
 		};
-
-		WorksheetView.prototype._isRightBorderErased = function (col, row) {
-			return this._fetchRowCache(row).erasedRB[col] === true;
-		};
-
-		WorksheetView.prototype._getBorderPropById = function (border, border_id) {
-			var border_prop = undefined;
-			switch (border_id) {
-				case kcbidLeft:
-					border_prop = border.l;
-					break;
-
-				case kcbidRight:
-					border_prop = border.r;
-					break;
-
-				case kcbidTop:
-					border_prop = border.t;
-					break;
-
-				case kcbidBottom:
-					border_prop = border.b;
-					break;
-
-				case kcbidDiagonal:
-					border_prop = border.d;
-					break;
-
-				case kcbidDiagonalDown:
-					border_prop = border.dd;
-					break;
-
-				case kcbidDiagonalUp:
-					border_prop = border.du;
-					break;
-			}
-			return border_prop;
-		};
-
-		WorksheetView.prototype._getBordersCache = function (col, row) {
-			var self = this;
-
-			if(col < 0 || row < 0) {
-				return {
-					l: new CellBorder(),
-					r: new CellBorder(),
-					t: new CellBorder(),
-					b: new CellBorder(),
-					dd: new CellBorder(),
-					du: new CellBorder()
-				};
-			}
-
-			function makeBorder(border, type, isActive) {
-				var tmpBorder = self._getBorderPropById(border, type);
-				return new CellBorder(
-					tmpBorder.s, tmpBorder.c, tmpBorder.w,
-					type === kcbidLeft ? self._isLeftBorderErased(col, row) : (type === kcbidRight ?
-						self._isRightBorderErased(col, row) : false),
-					isActive !== undefined ? isActive : false);
-			}
-
-			var cc = self._fetchCellCache(col, row);
-			var cb = cc.borders = ( cc.borders || {} );
-			var mc;
-
-			if (!cb.l || !cb.r || !cb.t || !cb.b || !cb.dd || !cb.du) {
-				mc = this.model.getMergedByCell(row, col);
-				var b = self._getVisibleCell(col, row).getBorder();
-				if (!cb.l) {cb.l = !mc || col === mc.c1 ? makeBorder(b, kcbidLeft) : new CellBorder();}
-				if (!cb.r) {cb.r = !mc || col === mc.c2 ? makeBorder(b, kcbidRight) : new CellBorder();}
-				if (!cb.t) {cb.t = !mc || row === mc.r1 ? makeBorder(b, kcbidTop) : new CellBorder();}
-				if (!cb.b) {cb.b = !mc || row === mc.r2 ? makeBorder(b, kcbidBottom) : new CellBorder();}
-				if (!cb.dd) {
-					cb.dd = !mc || col === mc.c1 && row === mc.r1 ? makeBorder(b, kcbidDiagonal, true) : new CellBorder();
-					if (!b.dd) {cb.dd.w = 0;}
-				}
-				if (!cb.du) {
-					cb.du = !mc || col === mc.c1 && row === mc.r1 ? makeBorder(b, kcbidDiagonal, true) : new CellBorder();
-					if (!b.du) {cb.du.w = 0;}
-				}
-			}
-			return cb;
-		};
-
-		WorksheetView.prototype._getActiveBorder = function (col, row, type) {
-			var bor = this._getBordersCache(col, row);
-			var border = this._getBorderPropById(bor, type);
-
-			function calcActiveBorder(prev, next) {
-				var ab = next && (next.s !== c_oAscBorderStyles.None || !prev) ? next : prev;
-				if (prev && prev !== ab) {
-					prev.s = ab.s;
-					prev.c = ab.c;
-					prev.w = ab.w;
-					prev.isActive = true;
-				}
-				if (next && next !== ab) {
-					next.s = ab.s;
-					next.c = ab.c;
-					next.w = ab.w;
-					next.isActive = true;
-				}
-				ab.isActive = true;
-				return ab;
-			}
-
-			if (!border.isActive && !border.isErased) {
-				var side = undefined;
-				switch (type) {
-					case kcbidLeft:
-						side = this._getBordersCache(col - 1, row).r;
-						calcActiveBorder(side, bor.l);
-						break;
-					case kcbidRight:
-						side = this._getBordersCache(col + 1, row).l;
-						calcActiveBorder(bor.r, side);
-						break;
-					case kcbidTop:
-						side = this._getBordersCache(col, row - 1).b;
-						calcActiveBorder(side, bor.t);
-						break;
-					case kcbidBottom:
-						side = this._getBordersCache(col, row + 1).t;
-						calcActiveBorder(bor.b, side);
-						break;
-				}
-			}
-
-			return this._getBorderPropById(bor, type);
+		WorksheetView.prototype._isRightBorderErased1 = function (col, rowCache) {
+			return rowCache.erased[col] === true;
 		};
 
 		WorksheetView.prototype._calcMaxBorderWidth = function (b1, b2) {
-			return Math.max(b1.isErased ? 0 : b1.w, b2.isErased ? 0 : b2.w);
+			// ToDo пересмотреть
+			return Math.max(b1 && b1.w, b2 && b2.w);
 		};
 
 
@@ -5997,7 +5870,6 @@
 
 			var fc = c.getFontcolor();
 			var bg = c.getFill();
-			var b = this._getBordersCache(c1, r1);
 			var fa = c.getFontAlign().toLowerCase();
 			var cellType = c.getType();
 			var isNumberFormat = (!cellType || CellValueType.Number === cellType);
@@ -6035,14 +5907,6 @@
 			cell_info.font.color = (fc ? asc_obj2Color(fc) : new CAscColor(c_opt.defaultState.color));
 
 			cell_info.fill = new asc_CFill((null != bg) ? asc_obj2Color(bg) : bg);
-
-			cell_info.border = new asc_CBorders();
-			cell_info.border.left = new asc_CBorder(b.l.s, b.l.c);
-			cell_info.border.top = new asc_CBorder(b.t.s, b.t.c);
-			cell_info.border.right = new asc_CBorder(b.r.s, b.r.c);
-			cell_info.border.bottom = new asc_CBorder(b.b.s, b.b.c);
-			cell_info.border.diagDown = new asc_CBorder(b.dd.s, b.dd.c);
-			cell_info.border.diagUp = new asc_CBorder(b.du.s, b.du.c);
 
 			cell_info.numFormatType = c.getNumFormatType();
 
