@@ -8486,6 +8486,6 @@ CDocumentContent.prototype =
         {
             return this.Parent.Get_PrevElementEndInfo( this );
         }
-    },
+    }
 
 };
