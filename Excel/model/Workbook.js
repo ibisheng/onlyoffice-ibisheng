@@ -7195,8 +7195,7 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 		}
 		History.SetSelectionRedo(oSelectionRedo);
 	}
-	//this._promoteFromTo(oBBox, oPromoteAscRange, true, oCanPromote, bCtrl, bVertical, nIndex);
-	this._promoteFromTo(oBBox, oPromoteAscRange, false, oCanPromote, bCtrl, bVertical, nIndex);
+	this._promoteFromTo(oBBox, oPromoteAscRange, true, oCanPromote, bCtrl, bVertical, nIndex);
 }
 Range.prototype._promoteFromTo=function(from, to, bIsPromote, oCanPromote, bCtrl, bVertical, nIndex){
 	lockDraw(this.worksheet.workbook);
