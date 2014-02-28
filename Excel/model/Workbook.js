@@ -7098,8 +7098,20 @@ Range.prototype.promoteFromTo=function(from, to){
 			if(null != oCanPromote)
 			{
 				History.Create_NewPoint();
-				History.SetSelection(to);
-				History.SetSelectionRedo(from);
+				var oSelection = History.GetSelection();
+				if(null != oSelection)
+				{
+					oSelection = oSelection.clone();
+					oSelection.assign(from.c1, from.r1, from.c2, from.r2);
+					History.SetSelection(oSelection);
+				}
+				var oSelectionRedo = History.GetSelectionRedo();
+				if(null != oSelectionRedo)
+				{
+					oSelectionRedo = oSelectionRedo.clone();
+					oSelectionRedo.assign(to.c1, to.r1, to.c2, to.r2);
+					History.SetSelectionRedo(oSelectionRedo);
+				}
 				this._promoteFromTo(from, to, false, oCanPromote, false, bVertical, nIndex);
 			}
 		}
@@ -7425,7 +7437,8 @@ Range.prototype._promoteFromTo=function(from, to, bIsPromote, oCanPromote, bCtrl
 					if(null != oFromCell)
 					{
 						oCopyCell.setStyle(oFromCell.getStyle());
-						oCopyCell.setType(oFromCell.getType());
+						if(bIsPromote)
+							oCopyCell.setType(oFromCell.getType());
 					}
 					if(bIsPromote)
 					{
