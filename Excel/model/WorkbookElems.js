@@ -2220,6 +2220,10 @@ Col.prototype =
 				this.BestFit = null;
 		}
 	},
+	getStyle : function()
+	{
+		return this.xfs;
+	},
 	setStyle : function(xfs)
 	{
 		var oldVal = this.xfs;
@@ -2422,7 +2426,7 @@ Row.prototype =
 	},
 	isEmpty : function()
 	{
-		if(null != this.xfs || null != this.h || null != this.hd || null != this.CustomHeight)
+		if(!this.isEmptyProp())
 			return false;
 		var bEmptyCells = true;
 		for(var i in this.c)
@@ -2433,6 +2437,10 @@ Row.prototype =
 		if(false == bEmptyCells)
 			return false;
 		return true;
+	},
+	isEmptyProp : function()
+	{
+		return null == this.xfs && null == this.h && null == this.hd && null == this.CustomHeight;
 	},
 	Remove : function()
 	{
@@ -2494,6 +2502,10 @@ Row.prototype =
 		this.h = otherRow.h;
 		this.CustomHeight = otherRow.CustomHeight;
 		this.hd = otherRow.hd;
+	},
+	getStyle : function()
+	{
+		return this.xfs;
 	},
 	setStyle : function(xfs)
 	{
