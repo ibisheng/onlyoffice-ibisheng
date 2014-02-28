@@ -7567,6 +7567,7 @@ function PromoteHelper(bVerical, bReverse, bbox){
 	this.bReverse = bReverse;
 	this.bbox = bbox;
 	this.oDataRow = {};
+	this.nDataRowMaxIndex = -1;
 	//для get
 	this.oCurRow = null;
 	this.nCurColIndex = null;
@@ -7592,6 +7593,8 @@ PromoteHelper.prototype = {
 		{
 			row = {};
 			this.oDataRow[nRow] = row;
+			if(this.nDataRowMaxIndex < nRow)
+				this.nDataRowMaxIndex = nRow;
 		}
 		row[nCol] = {nCol: nCol, nVal: nVal, bDelimiter: bDelimiter, sPrefix: sPrefix, bDate: bDate, oAdditional: oAdditional, oSequence: null, nCurValue: null};
 	},
@@ -7885,6 +7888,8 @@ PromoteHelper.prototype = {
 		}
 	},
 	setIndex: function(index){
+		if(-1 != this.nDataRowMaxIndex && this.nDataRowMaxIndex < index)
+			index = index % (this.nDataRowMaxIndex + 1);
 		this.oCurRow = this.oDataRow[index];
 		this.nCurColIndex = 0;
 	},
