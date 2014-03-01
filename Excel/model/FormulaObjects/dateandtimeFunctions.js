@@ -57,9 +57,22 @@ cFormulaFunction.DateAndTime = {
 }
 
 function cDATE() {
-    cBaseFunction.call( this, "DATE" );
-    this.setArgumentsMin( 3 );
-    this.setArgumentsMax( 3 );
+//    cBaseFunction.call( this, "DATE" );
+//    this.setArgumentsMin( 3 );
+//    this.setArgumentsMax( 3 );
+
+    this.name = "DATE";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 3;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cDATE.prototype = Object.create( cBaseFunction.prototype )
 cDATE.prototype.Calculate = function ( arg ) {
@@ -114,12 +127,24 @@ cDATE.prototype.getInfo = function () {
 }
 
 function cDATEDIF() {
-    cBaseFunction.call( this, "DATEDIF" );
-    this.setArgumentsMin( 3 );
-    this.setArgumentsMax( 3 );
-    this.setFormat( this.formatType.noneFormat );
-}
+//    cBaseFunction.call( this, "DATEDIF" );
+//    this.setArgumentsMin( 3 );
+//    this.setArgumentsMax( 3 );
+//    this.setFormat( this.formatType.noneFormat );
 
+    this.name = "DATEIF";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 3;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
+}
 cDATEDIF.prototype = Object.create( cBaseFunction.prototype )
 cDATEDIF.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -217,10 +242,23 @@ cDATEDIF.prototype.getInfo = function () {
 }
 
 function cDATEVALUE() {
-    cBaseFunction.call( this, "DATEVALUE" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 1 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "DATEVALUE" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 1 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "DATEVALUE";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 1;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cDATEVALUE.prototype = Object.create( cBaseFunction.prototype )
 cDATEVALUE.prototype.Calculate = function ( arg ) {
@@ -256,10 +294,23 @@ cDATEVALUE.prototype.getInfo = function () {
 }
 
 function cDAY() {
-    cBaseFunction.call( this, "DAY" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 1 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "DAY" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 1 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "DAY";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 1;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cDAY.prototype = Object.create( cBaseFunction.prototype )
 cDAY.prototype.Calculate = function ( arg ) {
@@ -319,10 +370,23 @@ cDAY.prototype.getInfo = function () {
 }
 
 function cDAYS360() {
-    cBaseFunction.call( this, "DAYS360" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 3 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "DAYS360" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 3 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "DAYS360";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 3;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cDAYS360.prototype = Object.create( cBaseFunction.prototype )
 cDAYS360.prototype.Calculate = function ( arg ) {
@@ -374,10 +438,23 @@ cDAYS360.prototype.getInfo = function () {
 }
 
 function cEDATE() {
-    cBaseFunction.call( this, "EDATE" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 2 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "EDATE" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 2 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "EDATE";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 2;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cEDATE.prototype = Object.create( cBaseFunction.prototype )
 cEDATE.prototype.Calculate = function ( arg ) {
@@ -442,10 +519,23 @@ cEDATE.prototype.getInfo = function () {
 }
 
 function cEOMONTH() {
-    cBaseFunction.call( this, "EOMONTH" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 2 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "EOMONTH" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 2 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "EOMONTH";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 2;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cEOMONTH.prototype = Object.create( cBaseFunction.prototype )
 cEOMONTH.prototype.Calculate = function ( arg ) {
@@ -502,10 +592,23 @@ cEOMONTH.prototype.getInfo = function () {
 }
 
 function cHOUR() {
-    cBaseFunction.call( this, "HOUR" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 1 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "HOUR" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 1 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "HOUR";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 1;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cHOUR.prototype = Object.create( cBaseFunction.prototype )
 cHOUR.prototype.Calculate = function ( arg ) {
@@ -562,10 +665,23 @@ cHOUR.prototype.getInfo = function () {
 }
 
 function cMINUTE() {
-    cBaseFunction.call( this, "MINUTE" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 1 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "MINUTE" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 1 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "MINUTE";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 1;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cMINUTE.prototype = Object.create( cBaseFunction.prototype )
 cMINUTE.prototype.Calculate = function ( arg ) {
@@ -624,10 +740,23 @@ cMINUTE.prototype.getInfo = function () {
 }
 
 function cMONTH() {
-    cBaseFunction.call( this, "MONTH" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 1 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "MONTH" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 1 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "MONTH";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 1;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cMONTH.prototype = Object.create( cBaseFunction.prototype )
 cMONTH.prototype.Calculate = function ( arg ) {
@@ -686,10 +815,23 @@ cMONTH.prototype.getInfo = function () {
 }
 
 function cNETWORKDAYS() {
-    cBaseFunction.call( this, "NETWORKDAYS" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 3 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "NETWORKDAYS" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 3 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "NETWORKDAYS";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 3;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cNETWORKDAYS.prototype = Object.create( cBaseFunction.prototype )
 cNETWORKDAYS.prototype.Calculate = function ( arg ) {
@@ -809,9 +951,22 @@ function cNETWORKDAYS_INTL() {
 cNETWORKDAYS_INTL.prototype = Object.create( cBaseFunction.prototype )
 
 function cNOW() {
-    cBaseFunction.call( this, "NOW" );
-    this.setArgumentsMin( 0 );
-    this.setArgumentsMax( 0 );
+//    cBaseFunction.call( this, "NOW" );
+//    this.setArgumentsMin( 0 );
+//    this.setArgumentsMax( 0 );
+
+    this.name = "NOW";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 0;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 0;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cNOW.prototype = Object.create( cBaseFunction.prototype )
 cNOW.prototype.Calculate = function () {
@@ -828,10 +983,23 @@ cNOW.prototype.getInfo = function () {
 }
 
 function cSECOND() {
-    cBaseFunction.call( this, "SECOND" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 1 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "SECOND" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 1 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "SECOND";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 1;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cSECOND.prototype = Object.create( cBaseFunction.prototype )
 cSECOND.prototype.Calculate = function ( arg ) {
@@ -890,9 +1058,22 @@ cSECOND.prototype.getInfo = function () {
 }
 
 function cTIME() {
-    cBaseFunction.call( this, "TIME" );
-    this.setArgumentsMin( 3 );
-    this.setArgumentsMax( 3 );
+//    cBaseFunction.call( this, "TIME" );
+//    this.setArgumentsMin( 3 );
+//    this.setArgumentsMax( 3 );
+
+    this.name = "TIME";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 3;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cTIME.prototype = Object.create( cBaseFunction.prototype )
 cTIME.prototype.Calculate = function ( arg ) {
@@ -943,10 +1124,23 @@ cTIME.prototype.getInfo = function () {
 }
 
 function cTIMEVALUE() {
-    cBaseFunction.call( this, "TIMEVALUE" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 1 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "TIMEVALUE" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 1 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "TIMEVALUE";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 1;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cTIMEVALUE.prototype = Object.create( cBaseFunction.prototype )
 cTIMEVALUE.prototype.Calculate = function ( arg ) {
@@ -982,9 +1176,22 @@ cTIMEVALUE.prototype.getInfo = function () {
 }
 
 function cTODAY() {
-    cBaseFunction.call( this, "TODAY" );
-    this.setArgumentsMin( 0 );
-    this.setArgumentsMax( 0 );
+//    cBaseFunction.call( this, "TODAY" );
+//    this.setArgumentsMin( 0 );
+//    this.setArgumentsMax( 0 );
+
+    this.name = "TODAY";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 0;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 0;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cTODAY.prototype = Object.create( cBaseFunction.prototype )
 cTODAY.prototype.Calculate = function () {
@@ -1001,10 +1208,23 @@ cTODAY.prototype.getInfo = function () {
 }
 
 function cWEEKDAY() {
-    cBaseFunction.call( this, "WEEKDAY" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 2 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "WEEKDAY" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 2 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "WEEKDAY";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 2;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cWEEKDAY.prototype = Object.create( cBaseFunction.prototype )
 cWEEKDAY.prototype.Calculate = function ( arg ) {
@@ -1078,10 +1298,23 @@ cWEEKDAY.prototype.getInfo = function () {
 }
 
 function cWEEKNUM() {
-    cBaseFunction.call( this, "WEEKNUM" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 2 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "WEEKNUM" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 2 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "WEEKNUM";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 2;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cWEEKNUM.prototype = Object.create( cBaseFunction.prototype )
 cWEEKNUM.prototype.Calculate = function ( arg ) {
@@ -1187,10 +1420,23 @@ cWEEKNUM.prototype.getInfo = function () {
 }
 
 function cWORKDAY() {
-    cBaseFunction.call( this, "WORKDAY" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 3 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "WORKDAY" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 3 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "WORKDAY";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 3;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cWORKDAY.prototype = Object.create( cBaseFunction.prototype )
 cWORKDAY.prototype.Calculate = function ( arg ) {
@@ -1306,10 +1552,23 @@ function cWORKDAY_INTL() {
 cWORKDAY_INTL.prototype = Object.create( cBaseFunction.prototype )
 
 function cYEAR() {
-    cBaseFunction.call( this, "YEAR" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 1 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "YEAR" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 1 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "YEAR";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 1;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cYEAR.prototype = Object.create( cBaseFunction.prototype )
 cYEAR.prototype.Calculate = function ( arg ) {
@@ -1365,10 +1624,23 @@ cYEAR.prototype.getInfo = function () {
 }
 
 function cYEARFRAC() {
-    cBaseFunction.call( this, "YEARFRAC" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 3 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "YEARFRAC" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 3 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "YEARFRAC";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 3;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cYEARFRAC.prototype = Object.create( cBaseFunction.prototype )
 cYEARFRAC.prototype.Calculate = function ( arg ) {

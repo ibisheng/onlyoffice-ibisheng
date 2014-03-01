@@ -30,9 +30,22 @@ cFormulaFunction.LookupAndReference = {
 }
 
 function cADDRESS() {
-    cBaseFunction.call( this, "ADDRESS" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 5 );
+//    cBaseFunction.call( this, "ADDRESS" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 5 );
+
+    this.name = "ADDRESS";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 5;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cADDRESS.prototype = Object.create( cBaseFunction.prototype )
 cADDRESS.prototype.Calculate = function ( arg ) {
@@ -137,9 +150,22 @@ function cAREAS() {
 cAREAS.prototype = Object.create( cBaseFunction.prototype )
 
 function cCHOOSE() {
-    cBaseFunction.call( this, "CHOOSE" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 30 );
+//    cBaseFunction.call( this, "CHOOSE" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 30 );
+
+    this.name = "CHOOSE";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 30;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cCHOOSE.prototype = Object.create( cBaseFunction.prototype )
 cCHOOSE.prototype.Calculate = function ( arg ) {
@@ -172,9 +198,22 @@ cCHOOSE.prototype.getInfo = function () {
 }
 
 function cCOLUMN() {
-    cBaseFunction.call( this, "COLUMN" );
-    this.setArgumentsMin( 0 );
-    this.setArgumentsMax( 1 );
+//    cBaseFunction.call( this, "COLUMN" );
+//    this.setArgumentsMin( 0 );
+//    this.setArgumentsMax( 1 );
+
+    this.name = "COLUMN";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 0;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 1;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cCOLUMN.prototype = Object.create( cBaseFunction.prototype )
 cCOLUMN.prototype.Calculate = function ( arg ) {
@@ -211,9 +250,22 @@ cCOLUMN.prototype.getInfo = function () {
 }
 
 function cCOLUMNS() {
-    cBaseFunction.call( this, "COLUMNS" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 1 );
+//    cBaseFunction.call( this, "COLUMNS" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 1 );
+
+    this.name = "COLUMNS";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 1;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cCOLUMNS.prototype = Object.create( cBaseFunction.prototype )
 cCOLUMNS.prototype.Calculate = function ( arg ) {
@@ -250,9 +302,22 @@ cGETPIVOTDATA.prototype = Object.create( cBaseFunction.prototype )
 var g_oHLOOKUPCache = new VHLOOKUPCache(true);
 
 function cHLOOKUP() {
-    cBaseFunction.call( this, "HLOOKUP" );
-    this.setArgumentsMin( 3 );
-    this.setArgumentsMax( 4 );
+//    cBaseFunction.call( this, "HLOOKUP" );
+//    this.setArgumentsMin( 3 );
+//    this.setArgumentsMax( 4 );
+
+    this.name = "HLOOKUP";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 4;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cHLOOKUP.prototype = Object.create( cBaseFunction.prototype )
 cHLOOKUP.prototype.Calculate = function ( arg ) {
@@ -350,7 +415,6 @@ cHLOOKUP.prototype.Calculate = function ( arg ) {
 
     }
 
-
     if ( min > valueForSearching ) {
         return this.value = new cError( cErrorType.not_available );
     }
@@ -387,9 +451,22 @@ function cINDEX() {
 cINDEX.prototype = Object.create( cBaseFunction.prototype )
 
 function cINDIRECT() {
-    cBaseFunction.call( this, "INDIRECT" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 2 );
+//    cBaseFunction.call( this, "INDIRECT" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 2 );
+
+    this.name = "INDIRECT";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 2;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cINDIRECT.prototype = Object.create( cBaseFunction.prototype )
 cINDIRECT.prototype.Calculate = function ( arg ) {
@@ -484,9 +561,22 @@ cINDIRECT.prototype.getInfo = function () {
 }
 
 function cLOOKUP() {
-    cBaseFunction.call( this, "LOOKUP" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 3 );
+//    cBaseFunction.call( this, "LOOKUP" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 3 );
+
+    this.name = "LOOKUP";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 3;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cLOOKUP.prototype = Object.create( cBaseFunction.prototype )
 cLOOKUP.prototype.Calculate = function ( arg ) {
@@ -630,9 +720,22 @@ function cOFFSET() {
 cOFFSET.prototype = Object.create( cBaseFunction.prototype )
 
 function cROW() {
-    cBaseFunction.call( this, "ROW" );
-    this.setArgumentsMin( 0 );
-    this.setArgumentsMax( 1 );
+//    cBaseFunction.call( this, "ROW" );
+//    this.setArgumentsMin( 0 );
+//    this.setArgumentsMax( 1 );
+
+    this.name = "ROW";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 0;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 1;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cROW.prototype = Object.create( cBaseFunction.prototype )
 cROW.prototype.Calculate = function ( arg ) {
@@ -669,9 +772,22 @@ cROW.prototype.getInfo = function () {
 }
 
 function cROWS() {
-    cBaseFunction.call( this, "ROWS" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 1 );
+//    cBaseFunction.call( this, "ROWS" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 1 );
+
+    this.name = "ROWS";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 1;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cROWS.prototype = Object.create( cBaseFunction.prototype )
 cROWS.prototype.Calculate = function ( arg ) {
@@ -817,9 +933,22 @@ VHLOOKUPCache.prototype.clean = function(){
 var g_oVLOOKUPCache = new VHLOOKUPCache(false);
 
 function cVLOOKUP() {
-    cBaseFunction.call( this, "VLOOKUP" );
-    this.setArgumentsMin( 3 );
-    this.setArgumentsMax( 4 );
+//    cBaseFunction.call( this, "VLOOKUP" );
+
+    this.name = "VLOOKUP";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 4;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
+//    this.setArgumentsMin( 3 );
+//    this.setArgumentsMax( 4 );
 }
 cVLOOKUP.prototype = Object.create( cBaseFunction.prototype )
 cVLOOKUP.prototype.Calculate = function ( arg ) {

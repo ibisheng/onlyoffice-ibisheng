@@ -1,5 +1,5 @@
 ﻿"use strict";
-
+var __fc__ = 0;
 /** @enum */
 var cElementType = {
     number:0,
@@ -1026,8 +1026,21 @@ parentRight.prototype.toString = function () {
 }
 
 function cUnarMinusOperator() {
-    cBaseOperator.apply( this, ['un_minus'/**name operator*/, 50/**priority of operator*/, 1/**count arguments*/] );
+//    cBaseOperator.apply( this, ['un_minus'/**name operator*/, 50/**priority of operator*/, 1/**count arguments*/] );
+
+    this.name = "un_minus";
     this.isRightAssociative = true;
+
+    this.priority = 50;
+    this.type = cElementType.operator;
+    this.argumentsCurrent = 1;
+    this.value = null;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cUnarMinusOperator.prototype = Object.create( cBaseOperator.prototype );
 cUnarMinusOperator.prototype.Calculate = function ( arg ) {
@@ -1055,8 +1068,21 @@ cUnarMinusOperator.prototype.Assemble = function ( arg ) {
 }
 
 function cUnarPlusOperator() {
-    cBaseOperator.apply( this, ['un_plus', 50, 1] );
+//    cBaseOperator.apply( this, ['un_plus', 50, 1] );
+
+    this.name = "un_plus";
     this.isRightAssociative = true;
+
+    this.priority = 50;
+    this.type = cElementType.operator;
+    this.argumentsCurrent = 1;
+    this.value = null;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+
+    this.numFormat = this.formatType.def;
 }
 cUnarPlusOperator.prototype = Object.create( cBaseOperator.prototype );
 cUnarPlusOperator.prototype.Calculate = function ( arg ) {
@@ -1075,7 +1101,20 @@ cUnarPlusOperator.prototype.Assemble = function ( arg ) {
 }
 
 function cPlusOperator() {
-    cBaseOperator.apply( this, ['+', 20] );
+//    cBaseOperator.apply( this, ['+', 20] );
+
+    this.name = "+";
+
+    this.priority = 20;
+    this.type = cElementType.operator;
+    this.isRightAssociative = false;
+    this.argumentsCurrent = 2;
+    this.value = null;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
 }
 cPlusOperator.prototype = Object.create( cBaseOperator.prototype );
 cPlusOperator.prototype.Calculate = function ( arg ) {
@@ -1084,7 +1123,20 @@ cPlusOperator.prototype.Calculate = function ( arg ) {
 }
 
 function cMinusOperator() {
-    cBaseOperator.apply( this, ['-', 20] );
+//    cBaseOperator.apply( this, ['-', 20] );
+
+    this.name = "-";
+
+    this.priority = 20;
+    this.type = cElementType.operator;
+    this.isRightAssociative = false;
+    this.argumentsCurrent = 2;
+    this.value = null;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
 }
 cMinusOperator.prototype = Object.create( cBaseOperator.prototype );
 cMinusOperator.prototype.Calculate = function ( arg ) {
@@ -1093,8 +1145,20 @@ cMinusOperator.prototype.Calculate = function ( arg ) {
 }
 
 function cPercentOperator() {
-    cBaseOperator.apply( this, ['%', 45, 1] );
+//    cBaseOperator.apply( this, ['%', 45, 1] );
+
+    this.name = "%";
     this.isRightAssociative = true;
+
+    this.priority = 45;
+    this.type = cElementType.operator;
+    this.argumentsCurrent = 1;
+    this.value = null;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
 }
 cPercentOperator.prototype = Object.create( cBaseOperator.prototype );
 cPercentOperator.prototype.Calculate = function ( arg ) {
@@ -1121,7 +1185,21 @@ cPercentOperator.prototype.Assemble = function ( arg ) {
 }
 
 function cPowOperator() {
-    cBaseOperator.apply( this, ['^', 40] );
+//    cBaseOperator.apply( this, ['^', 40] );
+
+    this.name = "^";
+
+    this.priority = 40;
+    this.type = cElementType.operator;
+    this.isRightAssociative = false;
+    this.argumentsCurrent = 2;
+    this.value = null;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cPowOperator.prototype = Object.create( cBaseOperator.prototype );
 cPowOperator.prototype.Calculate = function ( arg ) {
@@ -1146,7 +1224,20 @@ cPowOperator.prototype.Calculate = function ( arg ) {
 }
 
 function cMultOperator() {
-    cBaseOperator.apply( this, ['*', 30] );
+//    cBaseOperator.apply( this, ['*', 30] );
+
+    this.name = "*";
+
+    this.priority = 30;
+    this.type = cElementType.operator;
+    this.isRightAssociative = false;
+    this.argumentsCurrent = 2;
+    this.value = null;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
 }
 cMultOperator.prototype = Object.create( cBaseOperator.prototype );
 cMultOperator.prototype.Calculate = function ( arg ) {
@@ -1155,7 +1246,20 @@ cMultOperator.prototype.Calculate = function ( arg ) {
 }
 
 function cDivOperator() {
-    cBaseOperator.apply( this, ['/', 30] );
+//    cBaseOperator.apply( this, ['/', 30] );
+
+    this.name = "/";
+
+    this.priority = 30;
+    this.type = cElementType.operator;
+    this.isRightAssociative = false;
+    this.argumentsCurrent = 2;
+    this.value = null;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
 }
 cDivOperator.prototype = Object.create( cBaseOperator.prototype );
 cDivOperator.prototype.Calculate = function ( arg ) {
@@ -1164,7 +1268,20 @@ cDivOperator.prototype.Calculate = function ( arg ) {
 }
 
 function cConcatSTROperator() {
-    cBaseOperator.apply( this, ['&', 15] );
+//    cBaseOperator.apply( this, ['&', 15] );
+
+    this.name = "&";
+
+    this.priority = 15;
+    this.type = cElementType.operator;
+    this.isRightAssociative = false;
+    this.argumentsCurrent = 2;
+    this.value = null;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
 }
 cConcatSTROperator.prototype = Object.create( cBaseOperator.prototype );
 cConcatSTROperator.prototype.Calculate = function ( arg ) {
@@ -1184,7 +1301,21 @@ cConcatSTROperator.prototype.Calculate = function ( arg ) {
 }
 
 function cEqualsOperator() {
-    cBaseOperator.apply( this, ['=', 10] );
+//    cBaseOperator.apply( this, ['=', 10] );
+
+    this.name = "=";
+
+    this.priority = 10;
+    this.type = cElementType.operator;
+    this.isRightAssociative = false;
+    this.argumentsCurrent = 2;
+    this.value = null;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cEqualsOperator.prototype = Object.create( cBaseOperator.prototype );
 cEqualsOperator.prototype.Calculate = function ( arg ) {
@@ -1193,7 +1324,20 @@ cEqualsOperator.prototype.Calculate = function ( arg ) {
 }
 
 function cNotEqualsOperator() {
-    cBaseOperator.apply( this, ['<>', 10] );
+//    cBaseOperator.apply( this, ['<>', 10] );
+
+    this.name = "<>";
+
+    this.priority = 10;
+    this.type = cElementType.operator;
+    this.isRightAssociative = false;
+    this.argumentsCurrent = 2;
+    this.value = null;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
 }
 cNotEqualsOperator.prototype = Object.create( cBaseOperator.prototype );
 cNotEqualsOperator.prototype.Calculate = function ( arg ) {
@@ -1202,7 +1346,20 @@ cNotEqualsOperator.prototype.Calculate = function ( arg ) {
 }
 
 function cLessOperator() {
-    cBaseOperator.apply( this, ['<', 10] );
+//    cBaseOperator.apply( this, ['<', 10] );
+
+    this.name = "<";
+
+    this.priority = 10;
+    this.type = cElementType.operator;
+    this.isRightAssociative = false;
+    this.argumentsCurrent = 2;
+    this.value = null;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
 }
 cLessOperator.prototype = Object.create( cBaseOperator.prototype );
 cLessOperator.prototype.Calculate = function ( arg ) {
@@ -1211,7 +1368,20 @@ cLessOperator.prototype.Calculate = function ( arg ) {
 }
 
 function cLessOrEqualOperator() {
-    cBaseOperator.apply( this, ['<=', 10] );
+//    cBaseOperator.apply( this, ['<=', 10] );
+
+    this.name = "<=";
+
+    this.priority = 10;
+    this.type = cElementType.operator;
+    this.isRightAssociative = false;
+    this.argumentsCurrent = 2;
+    this.value = null;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
 }
 cLessOrEqualOperator.prototype = Object.create( cBaseOperator.prototype );
 cLessOrEqualOperator.prototype.Calculate = function ( arg ) {
@@ -1220,7 +1390,20 @@ cLessOrEqualOperator.prototype.Calculate = function ( arg ) {
 }
 
 function cGreaterOperator() {
-    cBaseOperator.apply( this, ['>', 10] );
+//    cBaseOperator.apply( this, ['>', 10] );
+
+    this.name = ">";
+
+    this.priority = 10;
+    this.type = cElementType.operator;
+    this.isRightAssociative = false;
+    this.argumentsCurrent = 2;
+    this.value = null;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
 }
 cGreaterOperator.prototype = Object.create( cBaseOperator.prototype );
 cGreaterOperator.prototype.Calculate = function ( arg ) {
@@ -1229,7 +1412,20 @@ cGreaterOperator.prototype.Calculate = function ( arg ) {
 }
 
 function cGreaterOrEqualOperator() {
-    cBaseOperator.apply( this, ['>=', 10] );
+//    cBaseOperator.apply( this, ['>=', 10] );
+
+    this.name = ">=";
+
+    this.priority = 10;
+    this.type = cElementType.operator;
+    this.isRightAssociative = false;
+    this.argumentsCurrent = 2;
+    this.value = null;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
 }
 cGreaterOrEqualOperator.prototype = Object.create( cBaseOperator.prototype );
 cGreaterOrEqualOperator.prototype.Calculate = function ( arg ) {
@@ -1266,10 +1462,8 @@ var cFormulaOperators = {
     '/':cDivOperator,
     '+':cPlusOperator,
     '-':cMinusOperator,
-    '&'://concat str
-        cConcatSTROperator,
-    '=':// equals
-        cEqualsOperator,
+    '&':cConcatSTROperator /*concat str*/,
+    '=':cEqualsOperator/*equals*/,
     '<>':cNotEqualsOperator,
     '<':cLessOperator,
     '<=':cLessOrEqualOperator,
@@ -1307,7 +1501,13 @@ function getFormulasInfo() {
 /*Basic types of an elements used into formulas*/
 /** @constructor */
 function cNumber( val ) {
-    cBaseType.apply( this, arguments );
+//    cBaseType.apply( this, arguments );
+//    cBaseType.call( this, val );
+    this.needRecalc = false;
+    this.numFormat = null;
+    this.ca = false;
+    this.node = undefined;
+
     this.type = cElementType.number;
     this.value = parseFloat( val );
     if ( !isNaN( this.value ) && Math.abs( this.value ) != Infinity )
@@ -1331,7 +1531,14 @@ cNumber.prototype.tocBool = function () {
 
 /** @constructor */
 function cString( val ) {
-    cBaseType.apply( this, arguments );
+//    cBaseType.call( this, val );
+
+    this.needRecalc = false;
+    this.numFormat = null;
+    this.value = val;
+    this.ca = false;
+    this.node = undefined;
+
     this.type = cElementType.string;
 }
 cString.prototype = Object.create( cBaseType.prototype );
@@ -1373,7 +1580,13 @@ cString.prototype.tryConvert = function () {
 
 /** @constructor */
 function cBool( val ) {
-    cBaseType.apply( this, arguments );
+    cBaseType.call( this, val );
+
+    this.needRecalc = false;
+    this.numFormat = null;
+    this.ca = false;
+    this.node = undefined;
+
     this.type = cElementType.bool;
     var v = val.toString().toUpperCase();
     if ( v == "TRUE" )
@@ -1403,7 +1616,14 @@ cBool.prototype.toBool = function () {
 
 /** @constructor */
 function cError( val ) {
-    cBaseType.apply( this, arguments );
+//    cBaseType.call( this, val );
+
+    this.needRecalc = false;
+    this.numFormat = null;
+    this.value = val;
+    this.ca = false;
+    this.node = undefined;
+
     this.type = cElementType.error;
     this.errorType = -1;
 
@@ -1481,7 +1701,14 @@ cError.prototype.tocNumber = cError.prototype.tocString = cError.prototype.tocBo
 
 /** @constructor */
 function cArea( val, _ws ) {/*Area means "A1:E5" for example*/
-    cBaseType.apply( this, arguments );
+//    cBaseType.call( this, val, _ws );
+
+    this.needRecalc = false;
+    this.numFormat = null;
+    this.value = val;
+    this.ca = false;
+    this.node = undefined;
+
     this.ws = _ws;
     this.wb = _ws.workbook;
     this._cells = val;
@@ -1493,7 +1720,8 @@ function cArea( val, _ws ) {/*Area means "A1:E5" for example*/
 cArea.prototype = Object.create( cBaseType.prototype );
 cArea.prototype.clone = function () {
 	var oRes = new cArea(this._cells, this.ws);
-	cBaseType.prototype.cloneTo.call( this, oRes );
+//	cBaseType.prototype.cloneTo.call( this, oRes );
+    this.constructor.prototype.cloneTo.call( this, oRes );
 	oRes.isAbsolute = this.isAbsolute;
     return oRes;
 };
@@ -1703,7 +1931,15 @@ cArea.prototype.getMatrix = function () {
 
 /** @constructor */
 function cRef( val, _ws ) {/*Ref means A1 for example*/
-    cBaseType.apply( this, arguments );
+//    cBaseType.apply( this, arguments );
+//    cBaseType.call( this, val, _ws );
+
+    this.needRecalc = false;
+    this.numFormat = null;
+    this.value = val;
+    this.ca = false;
+    this.node = undefined;
+
     this._cells = val;
     this.ws = _ws;
     this.wb = _ws.workbook;
@@ -1720,7 +1956,8 @@ function cRef( val, _ws ) {/*Ref means A1 for example*/
 cRef.prototype = Object.create( cBaseType.prototype );
 cRef.prototype.clone = function () {
 	var oRes = new cRef(this._cells, this.ws);
-	cBaseType.prototype.cloneTo.call( this, oRes );
+//	cBaseType.prototype.cloneTo.call( this, oRes );
+	this.constructor.prototype.cloneTo.call( this, oRes );
 	oRes.isAbsolute = oRes.isAbsolute;
     return oRes;
 };
@@ -1777,7 +2014,14 @@ cRef.prototype.isValid = function () {
 
 /** @constructor */
 function cArea3D( val, _wsFrom, _wsTo, wb ) {/*Area3D means "Sheat1!A1:E5" for example*/
-    cBaseType.apply( this, arguments );
+//    cBaseType.call( this, val, _wsFrom, _wsTo, wb );
+
+    this.needRecalc = false;
+    this.numFormat = null;
+    this.value = val;
+    this.ca = false;
+    this.node = undefined;
+
     this._wb = wb;
     this._cells = val;
     this.isAbsolute = false;
@@ -1790,8 +2034,9 @@ cArea3D.prototype.clone = function () {
 	var wsFrom = this._wb.getWorksheetById( this.wsFrom ).getName();
 	var wsTo = this._wb.getWorksheetById( this.wsTo ).getName();
     var oRes = new cArea3D(this._cells, wsFrom, wsTo, this._wb);
-	cBaseType.prototype.cloneTo.call( this, oRes );
-	oRes.isAbsolute = this.isAbsolute;
+//	cBaseType.prototype.cloneTo.call( this, oRes );
+    this.constructor.prototype.cloneTo.call( this, oRes );
+    oRes.isAbsolute = this.isAbsolute;
 	return oRes;
 };
 cArea3D.prototype.wsRange = function () {
@@ -2085,7 +2330,14 @@ cArea3D.prototype.foreach2 = function ( action ) {
 
 /** @constructor */
 function cRef3D( val, _wsFrom, wb ) {/*Ref means Sheat1!A1 for example*/
-    cBaseType.apply( this, arguments );
+//    cBaseType.call( this, val, _wsFrom, wb );
+
+    this.needRecalc = false;
+    this.numFormat = null;
+    this.value = val;
+    this.ca = false;
+    this.node = undefined;
+
     this._wb = wb;
     this._cells = val;
     this.isAbsolute = false;
@@ -2095,7 +2347,8 @@ function cRef3D( val, _wsFrom, wb ) {/*Ref means Sheat1!A1 for example*/
 cRef3D.prototype = Object.create( cBaseType.prototype );
 cRef3D.prototype.clone = function () {
     var oRes = new cRef3D(this._cells, this.ws.getName(), this._wb);
-	cBaseType.prototype.cloneTo.call( this, oRes );
+//	cBaseType.prototype.cloneTo.call( this, oRes );
+    this.constructor.prototype.cloneTo.call( this, oRes );
 	oRes.isAbsolute = this.isAbsolute;
 	return oRes;
 };
@@ -2171,7 +2424,14 @@ cRef3D.prototype.getWS = function () {
 
 /** @constructor */
 function cEmpty() {
-    cBaseType.apply( this, [""] );
+//    cBaseType.call( this );
+
+    this.needRecalc = false;
+    this.numFormat = null;
+    this.value = "";
+    this.ca = false;
+    this.node = undefined;
+
     this.type = cElementType.empty;
 }
 cEmpty.prototype = Object.create( cBaseType.prototype );
@@ -2190,7 +2450,14 @@ cEmpty.prototype.toString = function () {
 
 /** @constructor */
 function cName( val, wb ) {
-    cBaseType.apply( this, arguments );
+//    cBaseType.call( this, val, wb );
+
+    this.needRecalc = false;
+    this.numFormat = null;
+    this.value = val;
+    this.ca = false;
+    this.node = undefined;
+
     this.wb = wb;
     this.type = cElementType.name;
 }
@@ -2217,7 +2484,14 @@ cName.prototype.toRef = function ( wsID ) {
 
 /** @constructor */
 function cArray() {
-    cBaseType.apply( this, arguments );
+//    cBaseType.call( this );
+
+    this.needRecalc = false;
+    this.numFormat = null;
+    this.value = undefined;
+    this.ca = false;
+    this.node = undefined;
+
     this.array = [];
     this.rowCount = 0;
     this.countElementInRow = [];
@@ -2358,6 +2632,353 @@ cArray.prototype.fillFromArray = function ( arr ) {
         this.countElement += arr[i].length;
     }
 }
+
+function isalpha(c){
+    c = c.toUpperCase();
+    return c >= "A" && c <= "Z";
+}
+function isalnum(c){
+    return isdigit(c) || rg_str_allLang.test(c);
+}
+function isdigit( n ) {
+    return n == "0" || n == "1" ||
+        n == "2" || n == "3" ||
+        n == "4" || n == "5" ||
+        n == "6" || n == "7" ||
+        n == "8" || n == "9";
+}
+function isoper(c){
+//    return ":, ^*/+-&=<><<=>>=%".indexOf(c) > -1;
+    /*return ( c == ":" || c == "," || c == " " || c == "^" ||
+
+             c == "*" || c == "/" || c == "+" || c == "-" ||
+
+             c == "&" || c == "=" || c == "<>" || c == "<" ||
+
+            c == "<=" || c == ">" || c == ">=" || c == "%" )*/
+    return rx_operators.test(c)
+}
+function isOperator( str, pos ) {
+    skipSpace.call( this );
+    var op = this.Formula[this.pCurrPos];
+    switch ( op ) {
+        case "-":
+        case "%":
+        case "^":
+        case "*":
+        case "/":
+        case "+":
+        case "&":
+        case "=":
+        {
+            this.operand_str = op;
+            this.pCurrPos += op.length;
+            return true;
+        }
+        case "<":
+        {
+            if ( this.Formula[this.pCurrPos + 1] == ">" || this.Formula[this.pCurrPos + 1] == "=" ) {
+                this.operand_str = op + this.Formula[this.pCurrPos + 1];
+                this.pCurrPos += this.operand_str.length;
+                return true
+            }
+            this.operand_str = op;
+            this.pCurrPos += op.length;
+            return true;
+        }
+        case ">":
+        {
+            if ( this.Formula[this.pCurrPos + 1] == "=" ) {
+                this.operand_str = op + this.Formula[this.pCurrPos + 1];
+                this.pCurrPos += this.operand_str.length;
+                return true
+            }
+            this.operand_str = op;
+            this.pCurrPos += op.length;
+            return true;
+        }
+    }
+    return false;
+}
+function skipSpace( str, pos ) {
+    while ( this.Formula[this.pCurrPos] == " " ) this.pCurrPos++;
+}
+function isLeftParentheses( str, pos ) {
+    skipSpace.call( this );
+    var op = this.Formula[this.pCurrPos];
+    if ( op == "(" ) {
+        this.operand_str = op;
+        this.pCurrPos += op.length;
+        return true;
+    }
+    return false;
+}
+function isRightParentheses( str, pos ) {
+    skipSpace.call( this );
+    var op = this.Formula[this.pCurrPos];
+    if ( op == ")" ) {
+        this.operand_str = op;
+        this.pCurrPos += op.length;
+        return true;
+    }
+    return false;
+}
+function isLeftBrace( str, pos ) {
+    skipSpace.call( this );
+    var op = this.Formula[this.pCurrPos];
+    if ( op == "{" ) {
+        this.operand_str = op;
+        this.pCurrPos += op.length;
+        return true;
+    }
+    return false;
+}
+function isRightBrace( str, pos ) {
+    skipSpace.call( this );
+    var op = this.Formula[this.pCurrPos];
+    if ( op == "}" ) {
+        this.operand_str = op;
+        this.pCurrPos += op.length;
+        return true;
+    }
+    return false;
+}
+function isComma( str, pos ) {
+    skipSpace.call( this );
+    var op = this.Formula[this.pCurrPos];
+    if ( op == "," || op == ";" ) {
+        this.operand_str = op;
+        this.pCurrPos += op.length;
+        return true;
+    }
+    return false;
+}
+function isNumber( str, pos ) {
+    skipSpace.call( this );
+    var k = this.pCurrPos, pos = this.pCurrPos;
+    if ( isdigit( this.Formula[pos] ) ) {
+        pos++;
+        while ( isdigit( this.Formula[pos] ) ) pos++;
+    }
+    if ( this.Formula[pos] == '.' )//Дробная часть
+    {
+        pos++;
+        if ( isdigit( this.Formula[pos] ) ) {
+            pos++;
+            while ( isdigit( this.Formula[pos] ) ) pos++;
+        }
+        else return false;
+    }
+    if ( k!= pos && ((this.Formula[pos] == 'e') || (this.Formula[pos] == 'E')) ) {//Показатель
+        pos++;
+        if ( (this.Formula[pos] == '+') || (this.Formula[pos] == '-') ) pos++;
+        if ( isdigit( this.Formula[pos] ) ) {
+            pos++;
+            while ( isdigit( this.Formula[pos] ) ) pos++;
+        }
+        else return false;
+    }
+    var op = this.Formula.substring( k, pos );
+    if ( op.length > 0 ) {
+        this.operand_str = op;
+        this.pCurrPos = pos;
+        return true;
+    }
+    return false;
+}
+function isString( str, pos ){
+    skipSpace.call( this );
+    var op = this.Formula[this.pCurrPos], pos = this.pCurrPos, isString = true,
+        str = "", quoteCounts = 0, res = false;
+    if( op != '"' ) return res;
+    pos++;
+    while( true && pos < this.Formula.length ){
+        if( this.Formula[pos] == '"' && this.Formula[pos+1] == '"' ){
+            str += '"';
+            pos += 2;
+            continue;
+        }
+        else if( this.Formula[pos] == '"' && (this.Formula[pos+1] != '"' || this.Formula[pos+1] != '!')){
+            pos++;
+            res = true;
+            break;
+        }
+
+        str += this.Formula[pos];
+        pos++;
+    }
+    if( res ){
+        this.operand_str = str;
+        this.pCurrPos = pos;
+    }
+    return res;
+}
+function isRef( str, pos ){
+    skipSpace.call( this );
+    var op = this.Formula[this.pCurrPos], pos = this.pCurrPos, res = false, countChar = 3, ref = "", col = "", row = "";
+    while( pos < this.Formula.length ){
+        op = this.Formula[pos].toUpperCase();
+        if( op >= "A" && op <= "Z" ){
+            ref += op;
+            col += op;
+            countChar --;
+            pos++;
+            continue;
+        }
+        else if( isdigit(op) ){
+            ref += op;
+            row += op;
+            pos++;
+            continue;
+        }
+        else if( op == "$" ){
+            ref += op;
+            pos++;
+            continue;
+        }
+        else if( op=="(" )
+        {
+            return false;
+        }
+        break;
+    }
+
+    if( col == "" || row == "" ){
+        res = false;
+    }
+    else
+        res = true;
+
+    if(res){
+        this.pCurrPos = pos;
+        this.operand_str = ref;
+    }
+
+    return res;
+
+}
+function isArea( str, pos ){
+    skipSpace.call( this );
+    var op = this.Formula[this.pCurrPos], pos = this.pCurrPos, res = false, wasDelim = false, ref = "", wasDigit = false;
+
+    while(pos<this.Formula.length){
+
+        op = this.Formula[pos];
+
+        if( isalpha(op) ){
+
+            if( wasDigit )
+                return false;
+
+//            ref+=op;
+            pos++;
+        }
+        else if( isdigit(op) ){
+//            ref+=op;
+            pos++;
+            wasDigit = true;
+        }
+        else if( op == ":" ){
+//            ref+=op;
+            pos++;
+            wasDigit = false;
+            wasDelim = true;
+        }
+        else if( op == "$" ){
+            pos++;
+        }
+        else if( wasDelim ){
+            res = true;
+            break;
+        }else
+            return false;
+
+    }
+
+    if(pos == this.Formula.length && wasDelim){
+        res = true;
+    }
+
+    if(res){
+        this.operand_str = this.Formula.substring(this.pCurrPos,pos);
+        this.pCurrPos = pos;
+    }
+
+    return res;
+
+}
+function is3DRef(str,pos){
+    skipSpace.call( this );
+    var op = this.Formula[this.pCurrPos], pos = this.pCurrPos, sheetDelimPos = -1, sheetDelimPosCount = 0;
+    if( op == "'"){
+        var wasAp = false;
+        pos++;
+        if( this.Formula[pos] == "["){
+            return [false];//ToDo!!!!!
+        }
+        else{
+            op = this.Formula[pos];
+            if( op == "'" || op=="*" || op == "[" || op == "]" || op == "\\" || op == ":" || op == "/" || op == "?" ){
+                return [false];
+            }
+            while ( pos < this.Formula.length ) {
+                pos++;
+                op = this.Formula[pos];
+                if(op==":"){
+                    if( wasAp ) return [false];
+                    sheetDelimPos = pos;
+                    sheetDelimPosCount++;
+                }
+                else if( isoper(op) || op == "[" || op == "]" || op == "\\" || op == "?" ){
+                    return [false];
+                }
+                else if( op=="'" ){
+                    wasAp = !wasAp;
+                }
+                else if( op=="!" ){
+                    if( !wasAp )
+                        return [false];
+                    break;
+                }
+            }
+        }
+    }
+    else if( op == "[" ){
+        return [false];//ToDo!!!!!
+    }
+    else if( !isoper(op) && !(op == "'" || op == "[" || op == "]" || op == "\\" || op == "?" )){
+        while ( pos < this.Formula.length && op != "!" ) {
+            pos++;
+            op = this.Formula[pos];
+            if(op==":"){
+                sheetDelimPos = pos;
+                sheetDelimPosCount++;
+            }
+            else if( isoper(op) || op == "'" || op == "[" || op == "]" || op == "\\" || op == "?" || op == "(" || op==")" ){
+                return [false];
+            }
+        }
+        if( pos == this.Formula.length ){
+            return [false];
+        }
+    }
+
+    if ( sheetDelimPosCount > 1 ) return [false];
+
+    var s = this.operand_str = this.Formula.substring( this.pCurrPos, pos );
+    pos++;
+    this.pCurrPos = pos;
+    if( s.indexOf("'") > -1 ){
+        s = s.substring( 1, s.length-1 ).replace(/''/g,"'");
+//        s = s.replace(/''/g,"'");
+    }
+    if ( sheetDelimPos > -1 ) {
+        s = s.split( ":" );
+        return [true, s[0], s[1]];
+    }
+    return [true, s, s];
+}
+
 /** класс отвечающий за парсинг строки с формулой, подсчета формулы, перестройки формулы при манипуляции с ячейкой*/
 /** @constructor */
 function parserFormula( formula, _cellId, _ws ) {
@@ -2440,6 +3061,7 @@ parserFormula.prototype = {
         while ( this.pCurrPos < this.Formula.length ) {
             /* Operators*/
             if ( parserHelp.isOperator.call( this, this.Formula, this.pCurrPos )/*  || isNextPtg(this.formula,this.pCurrPos) */ ) {
+//            if ( isOperator.call( this, this.Formula, this.pCurrPos )/*  || isNextPtg(this.formula,this.pCurrPos) */ ) {
                 wasLeftParentheses = false;
                 var found_operator = null;
 
@@ -2485,12 +3107,6 @@ parserFormula.prototype = {
                         }
                     }
                 }
-                else {
-                    this.error.push( c_oAscError.ID.FrmlWrongOperator );
-                    this.outStack = [];
-                    this.elemArr = [];
-                    return false;
-                }
 
                 while ( this.elemArr.length != 0 && (
                     found_operator.isRightAssociative ?
@@ -2504,13 +3120,15 @@ parserFormula.prototype = {
             }
 
             /* Left & Right Parentheses */
-            else if ( parserHelp.isLeftParentheses.call( this, this.Formula, this.pCurrPos ) ) {
+//            else if ( parserHelp.isLeftParentheses.call( this, this.Formula, this.pCurrPos ) ) {
+            else if ( isLeftParentheses.call( this, this.Formula, this.pCurrPos ) ) {
                 operand_expected = true;
                 wasLeftParentheses = true;
                 this.elemArr.push( new cFormulaOperators[this.operand_str]() );
             }
 
-            else if ( parserHelp.isRightParentheses.call( this, this.Formula, this.pCurrPos ) ) {
+//            else if ( parserHelp.isRightParentheses.call( this, this.Formula, this.pCurrPos ) ) {
+            else if ( isRightParentheses.call( this, this.Formula, this.pCurrPos ) ) {
                 var top_elem = null;
                 if ( this.elemArr.length != 0 && ( (top_elem = this.elemArr[this.elemArr.length - 1]).name == "(" ) && operand_expected ) {
                     if ( top_elem.getArguments() > 1 ) {
@@ -2579,7 +3197,8 @@ parserFormula.prototype = {
             }
 
             /*Comma & arguments union*/
-            else if ( parserHelp.isComma.call( this, this.Formula, this.pCurrPos ) ) {
+//            else if ( parserHelp.isComma.call( this, this.Formula, this.pCurrPos ) ) {
+            else if ( isComma.call( this, this.Formula, this.pCurrPos ) ) {
                 wasLeftParentheses = false;
                 /* if( operand_expected ){
                  this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
@@ -2621,11 +3240,11 @@ parserFormula.prototype = {
             /* Array */
             else if ( parserHelp.isArray.call( this, this.Formula, this.pCurrPos ) ) {
                 wasLeftParentheses = false;
-                var pH = new parserHelper(), tO = {pCurrPos:0, Formula:this.operand_str};
-                var pos = 0, arr = new cArray();
+                var pH = new parserHelper(), tO = {pCurrPos:0, Formula:this.operand_str,operand_str:""};
+                var pos = 0, arr = new cArray(), operator = { isOperator: false, operatorName: ""};
                 while ( tO.pCurrPos < tO.Formula.length ) {
 
-                    if ( pH.isComma.call( tO, tO.Formula, tO.pCurrPos ) ) {
+                    if ( isComma.call( tO, tO.Formula, tO.pCurrPos ) ) {
                         if ( tO.operand_str == ";" ) {
                             arr.addRow();
                         }
@@ -2639,8 +3258,24 @@ parserFormula.prototype = {
                     else if ( pH.isError.call( tO, tO.Formula, tO.pCurrPos ) ) {
                         arr.addElement( new cError( tO.operand_str ) );
                     }
-                    else if ( pH.isNumber.call( tO, tO.Formula, tO.pCurrPos ) ) {
+                    else if ( isNumber.call( tO, tO.Formula, tO.pCurrPos ) ) {
+                        if( operator.isOperator ){
+                            if( operator.operatorName == "+" || operator.operatorName == "-" ){
+                                tO.operand_str = operator.operatorName +""+ tO.operand_str
+                            }
+                            else{
+                                this.outStack = [];
+                                this.elemArr = [];
+                                this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
+                                return false;
+                            }
+                        }
                         arr.addElement( new cNumber( parseFloat( tO.operand_str ) ) );
+                        operator = { isOperator: false, operatorName: ""};
+                    }
+                    else if( isOperator.call( tO, tO.Formula, tO.pCurrPos ) ){
+                        operator.isOperator = true;
+                        operator.operatorName = tO.operand_str;
                     }
                 }
                 if ( !arr.isValidArray() ) {
@@ -2671,6 +3306,7 @@ parserFormula.prototype = {
 
                 /* Strings */
                 else if ( parserHelp.isString.call( this, this.Formula, this.pCurrPos ) ) {
+//                else if ( isString.call( this, this.Formula, this.pCurrPos ) ) {
                     found_operand = new cString( this.operand_str );
                 }
 
@@ -2681,6 +3317,8 @@ parserFormula.prototype = {
 
                 /* Referens to 3D area: Sheet1:Sheet3!A1:B3, Sheet1:Sheet3!B3, Sheet1!B3*/
                 else if ( (_3DRefTmp = parserHelp.is3DRef.call( this, this.Formula, this.pCurrPos ))[0] ) {
+//                else if ( (_3DRefTmp = is3DRef.call( this, this.Formula, this.pCurrPos ))[0] ) {
+
                     this.is3D = true;
                     var _wsFrom = _3DRefTmp[1],
                         _wsTo = ( (_3DRefTmp[2] !== null) && (_3DRefTmp[2] !== undefined) ) ? _3DRefTmp[2] : _wsFrom;
@@ -2697,6 +3335,7 @@ parserFormula.prototype = {
                             found_operand.isAbsolute = true;
                     }
                     else if ( parserHelp.isRef.call( this, this.Formula, this.pCurrPos ) ) {
+//                    else if ( isRef.call( this, this.Formula, this.pCurrPos ) ) {
 						this.RefPos.push({start: this.pCurrPos - this.operand_str.length, end: this.pCurrPos, index: this.outStack.length});
                         if ( _wsTo != _wsFrom ) {
                             found_operand = new cArea3D( this.operand_str.toUpperCase(), _wsFrom, _wsTo, this.wb );
@@ -2714,6 +3353,7 @@ parserFormula.prototype = {
                 }
                 /* Referens to cells area A1:A10 */
                 else if ( parserHelp.isArea.call( this, this.Formula, this.pCurrPos ) ) {
+//                else if ( isArea.call( this, this.Formula, this.pCurrPos ) ) {
 					this.RefPos.push({start: this.pCurrPos - this.operand_str.length, end: this.pCurrPos, index: this.outStack.length});
                     found_operand = new cArea( this.operand_str.toUpperCase(), this.ws );
                     if ( this.operand_str.indexOf( "$" ) > -1 )
@@ -2721,6 +3361,7 @@ parserFormula.prototype = {
                 }
                 /* Referens to cell A4 */
                 else if ( parserHelp.isRef.call( this, this.Formula, this.pCurrPos, true ) ) {
+//                else if ( isRef.call( this, this.Formula, this.pCurrPos, true ) ) {
 					this.RefPos.push({start: this.pCurrPos - this.operand_str.length, end: this.pCurrPos, index: this.outStack.length});
                     found_operand = new cRef( this.operand_str.toUpperCase(), this.ws );
                     if ( this.operand_str.indexOf( "$" ) > -1 )
@@ -2729,6 +3370,7 @@ parserFormula.prototype = {
 
                 /* Numbers*/
                 else if ( parserHelp.isNumber.call( this, this.Formula, this.pCurrPos ) ) {
+//                else if ( /*isdigit(this.Formula[this.pCurrPos] ) &&*/ isNumber.call( this, this.Formula, this.pCurrPos ) ) {
                     if ( this.operand_str != "." ) {
                         found_operand = new cNumber( parseFloat( this.operand_str ) );
                     }
@@ -2828,6 +3470,7 @@ parserFormula.prototype = {
     },
 
     calculate:function () {
+        __fc__++;
         if ( this.outStack.length < 1 ) {
             return this.value = new cError( cErrorType.wrong_name );
         }
@@ -3391,7 +4034,7 @@ parserFormula.prototype = {
 }
 
 function parseNum( str ) {
-    if ( str.indexOf( "x" ) > -1 || str == "" )//исключаем запись числа в 16-ричной форме из числа.
+    if ( str.indexOf( "x" ) > -1 || str == "" || str.match(/\s+/) )//исключаем запись числа в 16-ричной форме из числа.
         return false;
     return !isNaN( str );
 }

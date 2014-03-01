@@ -160,10 +160,23 @@ function cEFFECT() {
 cEFFECT.prototype = Object.create( cBaseFunction.prototype )
 
 function cFV() {
-    cBaseFunction.call( this, "FV" );
-    this.setArgumentsMin( 3 );
-    this.setArgumentsMax( 5 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "FV" );
+//    this.setArgumentsMin( 3 );
+//    this.setArgumentsMax( 5 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "FV";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 5;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cFV.prototype = Object.create( cBaseFunction.prototype )
 cFV.prototype.Calculate = function ( arg ) {
@@ -276,10 +289,23 @@ function cNOMINAL() {
 cNOMINAL.prototype = Object.create( cBaseFunction.prototype )
 
 function cNPER() {
-    cBaseFunction.call( this, "NPER" );
-    this.setArgumentsMin( 3 );
-    this.setArgumentsMax( 5 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "NPER" );
+//    this.setArgumentsMin( 3 );
+//    this.setArgumentsMax( 5 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "NPER";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 5;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cNPER.prototype = Object.create( cBaseFunction.prototype )
 cNPER.prototype.Calculate = function ( arg ) {
@@ -358,10 +384,23 @@ cNPER.prototype.getInfo = function () {
 }
 
 function cNPV() {
-    cBaseFunction.call( this, "NPV" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 255 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "NPV" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 255 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "NPV";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cNPV.prototype = Object.create( cBaseFunction.prototype )
 cNPV.prototype.Calculate = function ( arg ) {
@@ -449,10 +488,23 @@ function cODDLYIELD() {
 cODDLYIELD.prototype = Object.create( cBaseFunction.prototype )
 
 function cPMT() {
-    cBaseFunction.call( this, "PMT" );
-    this.setArgumentsMin( 3 );
-    this.setArgumentsMax( 5 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "PMT" );
+//    this.setArgumentsMin( 3 );
+//    this.setArgumentsMax( 5 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "PMT";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 5;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cPMT.prototype = Object.create( cBaseFunction.prototype )
 cPMT.prototype.Calculate = function ( arg ) {
@@ -549,10 +601,23 @@ function cPRICEMAT() {
 cPRICEMAT.prototype = Object.create( cBaseFunction.prototype )
 
 function cPV() {
-    cBaseFunction.call( this, "PV" );
-    this.setArgumentsMin( 3 );
-    this.setArgumentsMax( 5 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "PV" );
+//    this.setArgumentsMin( 3 );
+//    this.setArgumentsMax( 5 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "PV";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 5;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cPV.prototype = Object.create( cBaseFunction.prototype )
 cPV.prototype.Calculate = function ( arg ) {

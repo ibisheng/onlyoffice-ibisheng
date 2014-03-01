@@ -133,9 +133,22 @@ cFormulaFunction.Statistical = {
     'ZTEST':cZTEST
 }
 function cAVEDEV() {
-    cBaseFunction.call( this, "AVEDEV" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 255 );
+//    cBaseFunction.call( this, "AVEDEV" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
+
+    this.name = "AVEDEV";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cAVEDEV.prototype = Object.create( cBaseFunction.prototype )
 cAVEDEV.prototype.Calculate = function ( arg ) {
@@ -196,9 +209,22 @@ cAVEDEV.prototype.getInfo = function () {
 
 
 function cAVERAGE() {
-    cBaseFunction.call( this, "AVERAGE" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 255 );
+//    cBaseFunction.call( this, "AVERAGE" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
+
+    this.name = "AVERAGE";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cAVERAGE.prototype = Object.create( cBaseFunction.prototype )
 cAVERAGE.prototype.Calculate = function ( arg ) {
@@ -264,9 +290,22 @@ cAVERAGE.prototype.getInfo = function () {
 }
 
 function cAVERAGEA() {
-    cBaseFunction.call( this, "AVERAGEA" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 255 );
+//    cBaseFunction.call( this, "AVERAGEA" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
+
+    this.name = "AVERAGEA";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cAVERAGEA.prototype = Object.create( cBaseFunction.prototype )
 cAVERAGEA.prototype.Calculate = function ( arg ) {
@@ -334,9 +373,22 @@ cAVERAGEA.prototype.getInfo = function () {
 }
 
 function cAVERAGEIF() {
-    cBaseFunction.call( this, "AVERAGEIF" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 3 );
+//    cBaseFunction.call( this, "AVERAGEIF" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 3 );
+
+    this.name = "AVERAGEIF";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 3;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cAVERAGEIF.prototype = Object.create( cBaseFunction.prototype )
 cAVERAGEIF.prototype.Calculate = function ( arg ) {
@@ -430,9 +482,22 @@ function cBETAINV() {/*Нет реализации в Google Docs*/
 cBETAINV.prototype = Object.create( cBaseFunction.prototype )
 
 function cBINOMDIST() {
-    cBaseFunction.call( this, "BINOMDIST" );
-    this.setArgumentsMin( 4 );
-    this.setArgumentsMax( 4 );
+//    cBaseFunction.call( this, "BINOMDIST" );
+//    this.setArgumentsMin( 4 );
+//    this.setArgumentsMax( 4 );
+
+    this.name = "BINOMDIST";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 4;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 4;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cBINOMDIST.prototype = Object.create( cBaseFunction.prototype )
 cBINOMDIST.prototype.Calculate = function ( arg ) {
@@ -519,9 +584,22 @@ function cCHITEST() {
 cCHITEST.prototype = Object.create( cBaseFunction.prototype )
 
 function cCONFIDENCE() {
-    cBaseFunction.call( this, "CONFIDENCE" );
-    this.setArgumentsMin( 3 );
-    this.setArgumentsMax( 3 );
+//    cBaseFunction.call( this, "CONFIDENCE" );
+//    this.setArgumentsMin( 3 );
+//    this.setArgumentsMax( 3 );
+
+    this.name = "CONFIDENCE";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 3;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cCONFIDENCE.prototype = Object.create( cBaseFunction.prototype )
 cCONFIDENCE.prototype.Calculate = function ( arg ) {
@@ -570,9 +648,22 @@ cCONFIDENCE.prototype.getInfo = function () {
 }
 
 function cCORREL() {
-    cBaseFunction.call( this, "CORREL" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 2 );
+//    cBaseFunction.call( this, "CORREL" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 2 );
+
+    this.name = "CORREL";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 2;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cCORREL.prototype = Object.create( cBaseFunction.prototype )
 cCORREL.prototype.Calculate = function ( arg ) {
@@ -649,10 +740,23 @@ cCORREL.prototype.getInfo = function () {
 }
 
 function cCOUNT() {
-    cBaseFunction.call( this, "COUNT" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 255 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "COUNT" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "COUNT";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cCOUNT.prototype = Object.create( cBaseFunction.prototype )
 cCOUNT.prototype.Calculate = function ( arg ) {
@@ -699,10 +803,23 @@ cCOUNT.prototype.getInfo = function () {
 }
 
 function cCOUNTA() {
-    cBaseFunction.call( this, "COUNTA" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 255 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "COUNTA" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "COUNTA";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cCOUNTA.prototype = Object.create( cBaseFunction.prototype )
 cCOUNTA.prototype.Calculate = function ( arg ) {
@@ -744,10 +861,23 @@ cCOUNTA.prototype.getInfo = function () {
 }
 
 function cCOUNTBLANK() {
-    cBaseFunction.call( this, "COUNTBLANK" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 1 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "COUNTBLANK" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 1 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "COUNTBLANK";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 4;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 4;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cCOUNTBLANK.prototype = Object.create( cBaseFunction.prototype )
 cCOUNTBLANK.prototype.Calculate = function ( arg ) {
@@ -768,9 +898,22 @@ cCOUNTBLANK.prototype.getInfo = function () {
 }
 
 function cCOUNTIF() {
-    cBaseFunction.call( this, "COUNTIF" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 2 );
+//    cBaseFunction.call( this, "COUNTIF" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 2 );
+
+    this.name = "COUNTIF";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 2;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cCOUNTIF.prototype = Object.create( cBaseFunction.prototype )
 cCOUNTIF.prototype.Calculate = function ( arg ) {
@@ -835,9 +978,22 @@ function cCOUNTIFS() {
 cCOUNTIFS.prototype = Object.create( cBaseFunction.prototype )
 
 function cCOVAR() {
-    cBaseFunction.call( this, "COVAR" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 2 );
+//    cBaseFunction.call( this, "COVAR" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 2 );
+
+    this.name = "COVAR";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 2;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cCOVAR.prototype = Object.create( cBaseFunction.prototype )
 cCOVAR.prototype.Calculate = function ( arg ) {
@@ -909,9 +1065,22 @@ cCOVAR.prototype.getInfo = function () {
 }
 
 function cCRITBINOM() {
-    cBaseFunction.call( this, "CRITBINOM" );
-    this.setArgumentsMin( 3 );
-    this.setArgumentsMax( 3 );
+//    cBaseFunction.call( this, "CRITBINOM" );
+//    this.setArgumentsMin( 3 );
+//    this.setArgumentsMax( 3 );
+
+    this.name = "CRITBINOM";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 3;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cCRITBINOM.prototype = Object.create( cBaseFunction.prototype )
 cCRITBINOM.prototype.Calculate = function ( arg ) {
@@ -989,9 +1158,22 @@ cCRITBINOM.prototype.getInfo = function () {
 }
 
 function cDEVSQ() {
-    cBaseFunction.call( this, "DEVSQ" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 255 );
+//    cBaseFunction.call( this, "DEVSQ" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
+
+    this.name = "DEVSQ";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cDEVSQ.prototype = Object.create( cBaseFunction.prototype )
 cDEVSQ.prototype.Calculate = function ( arg ) {
@@ -1063,9 +1245,22 @@ cDEVSQ.prototype.getInfo = function () {
 }
 
 function cEXPONDIST() {
-    cBaseFunction.call( this, "EXPONDIST" );
-    this.setArgumentsMin( 3 );
-    this.setArgumentsMax( 3 );
+//    cBaseFunction.call( this, "EXPONDIST" );
+//    this.setArgumentsMin( 3 );
+//    this.setArgumentsMax( 3 );
+
+    this.name = "EXPODIST";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 3;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cEXPONDIST.prototype = Object.create( cBaseFunction.prototype )
 cEXPONDIST.prototype.Calculate = function ( arg ) {
@@ -1127,9 +1322,22 @@ function cFINV() {
 cFINV.prototype = Object.create( cBaseFunction.prototype )
 
 function cFISHER() {
-    cBaseFunction.call( this, "FISHER" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 1 );
+//    cBaseFunction.call( this, "FISHER" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 1 );
+
+    this.name = "FISHER";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 1;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cFISHER.prototype = Object.create( cBaseFunction.prototype )
 cFISHER.prototype.Calculate = function ( arg ) {
@@ -1171,9 +1379,22 @@ cFISHER.prototype.getInfo = function () {
 }
 
 function cFISHERINV() {
-    cBaseFunction.call( this, "FISHERINV" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 1 );
+//    cBaseFunction.call( this, "FISHERINV" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 1 );
+
+    this.name = "FISHERINV";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 1;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cFISHERINV.prototype = Object.create( cBaseFunction.prototype )
 cFISHERINV.prototype.Calculate = function ( arg ) {
@@ -1215,9 +1436,22 @@ cFISHERINV.prototype.getInfo = function () {
 }
 
 function cFORECAST() {
-    cBaseFunction.call( this, "FORECAST" );
-    this.setArgumentsMin( 3 );
-    this.setArgumentsMax( 3 );
+//    cBaseFunction.call( this, "FORECAST" );
+//    this.setArgumentsMin( 3 );
+//    this.setArgumentsMax( 3 );
+
+    this.name = "FORECAST";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 3;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cFORECAST.prototype = Object.create( cBaseFunction.prototype )
 cFORECAST.prototype.Calculate = function ( arg ) {
@@ -1307,10 +1541,23 @@ cFORECAST.prototype.getInfo = function () {
 }
 
 function cFREQUENCY() {
-    cBaseFunction.call( this, "FREQUENCY" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 2 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "FREQUENCY" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 2 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "FREQUENCY";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 2;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cFREQUENCY.prototype = Object.create( cBaseFunction.prototype )
 cFREQUENCY.prototype.Calculate = function ( arg ) {
@@ -1416,9 +1663,22 @@ function cGAMMAINV() {
 cGAMMAINV.prototype = Object.create( cBaseFunction.prototype )
 
 function cGAMMALN() {
-    cBaseFunction.call( this, "GAMMALN" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 1 );
+//    cBaseFunction.call( this, "GAMMALN" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 1 );
+
+    this.name = "GAMMALN";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 1;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cGAMMALN.prototype = Object.create( cBaseFunction.prototype )
 cGAMMALN.prototype.Calculate = function ( arg ) {
@@ -1459,9 +1719,22 @@ cGAMMALN.prototype.getInfo = function () {
 }
 
 function cGEOMEAN() {
-    cBaseFunction.call( this, "GEOMEAN" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 255 );
+//    cBaseFunction.call( this, "GEOMEAN" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
+
+    this.name = "GEOMEAN";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cGEOMEAN.prototype = Object.create( cBaseFunction.prototype )
 cGEOMEAN.prototype.Calculate = function ( arg ) {
@@ -1535,9 +1808,22 @@ function cGROWTH() {
 cGROWTH.prototype = Object.create( cBaseFunction.prototype )
 
 function cHARMEAN() {
-    cBaseFunction.call( this, "HARMEAN" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 255 );
+//    cBaseFunction.call( this, "HARMEAN" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
+
+    this.name = "HARMEAN";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cHARMEAN.prototype = Object.create( cBaseFunction.prototype )
 cHARMEAN.prototype.Calculate = function ( arg ) {
@@ -1610,9 +1896,22 @@ cHARMEAN.prototype.getInfo = function () {
 }
 
 function cHYPGEOMDIST() {
-    cBaseFunction.call( this, "HYPGEOMDIST" );
-    this.setArgumentsMin( 4 );
-    this.setArgumentsMax( 4 );
+//    cBaseFunction.call( this, "HYPGEOMDIST" );
+//    this.setArgumentsMin( 4 );
+//    this.setArgumentsMax( 4 );
+
+    this.name = "HYPGEOMDIST";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 4;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 4;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cHYPGEOMDIST.prototype = Object.create( cBaseFunction.prototype )
 cHYPGEOMDIST.prototype.Calculate = function ( arg ) {
@@ -1677,9 +1976,22 @@ cHYPGEOMDIST.prototype.getInfo = function () {
 }
 
 function cINTERCEPT() {
-    cBaseFunction.call( this, "INTERCEPT" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 2 );
+//    cBaseFunction.call( this, "INTERCEPT" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 2 );
+
+    this.name = "INTERCEPT";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 2;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cINTERCEPT.prototype = Object.create( cBaseFunction.prototype )
 cINTERCEPT.prototype.Calculate = function ( arg ) {
@@ -1758,9 +2070,22 @@ cINTERCEPT.prototype.getInfo = function () {
 }
 
 function cKURT() {
-    cBaseFunction.call( this, "KURT" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 255 );
+//    cBaseFunction.call( this, "KURT" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
+
+    this.name = "KURT";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cKURT.prototype = Object.create( cBaseFunction.prototype )
 cKURT.prototype.Calculate = function ( arg ) {
@@ -1843,10 +2168,23 @@ cKURT.prototype.getInfo = function () {
 }
 
 function cLARGE() {
-    cBaseFunction.call( this, "LARGE" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 2 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "LARGE" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 2 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "LARGE";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 2;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cLARGE.prototype = Object.create( cBaseFunction.prototype )
 cLARGE.prototype.Calculate = function ( arg ) {
@@ -1922,9 +2260,22 @@ function cLOGEST() {
 cLOGEST.prototype = Object.create( cBaseFunction.prototype )
 
 function cLOGINV() {
-    cBaseFunction.call( this, "LOGINV" );
-    this.setArgumentsMin( 3 );
-    this.setArgumentsMax( 3 );
+//    cBaseFunction.call( this, "LOGINV" );
+//    this.setArgumentsMin( 3 );
+//    this.setArgumentsMax( 3 );
+
+    this.name = "LOGINV";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 3;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cLOGINV.prototype = Object.create( cBaseFunction.prototype )
 cLOGINV.prototype.Calculate = function ( arg ) {
@@ -1977,9 +2328,22 @@ cLOGINV.prototype.getInfo = function () {
 }
 
 function cLOGNORMDIST() {
-    cBaseFunction.call( this, "LOGNORMDIST" );
-    this.setArgumentsMin( 3 );
-    this.setArgumentsMax( 3 );
+//    cBaseFunction.call( this, "LOGNORMDIST" );
+//    this.setArgumentsMin( 3 );
+//    this.setArgumentsMax( 3 );
+
+    this.name = "LOGNORMDIST";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 3;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cLOGNORMDIST.prototype = Object.create( cBaseFunction.prototype )
 cLOGNORMDIST.prototype.Calculate = function ( arg ) {
@@ -2032,9 +2396,22 @@ cLOGNORMDIST.prototype.getInfo = function () {
 }
 
 function cMAX() {
-    cBaseFunction.call( this, "MAX" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 255 );
+//    cBaseFunction.call( this, "MAX" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
+
+    this.name = "MAX";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cMAX.prototype = Object.create( cBaseFunction.prototype )
 cMAX.prototype.Calculate = function ( arg ) {
@@ -2106,9 +2483,22 @@ cMAX.prototype.getInfo = function () {
 }
 
 function cMAXA() {
-    cBaseFunction.call( this, "MAXA" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 255 );
+//    cBaseFunction.call( this, "MAXA" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
+
+    this.name = "MAXA";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cMAXA.prototype = Object.create( cBaseFunction.prototype )
 cMAXA.prototype.Calculate = function ( arg ) {
@@ -2182,9 +2572,22 @@ cMAXA.prototype.getInfo = function () {
 }
 
 function cMEDIAN() {
-    cBaseFunction.call( this, "MEDIAN" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 255 );
+//    cBaseFunction.call( this, "MEDIAN" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
+
+    this.name = "MEDIAN";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cMEDIAN.prototype = Object.create( cBaseFunction.prototype )
 cMEDIAN.prototype.Calculate = function ( arg ) {
@@ -2256,9 +2659,22 @@ cMEDIAN.prototype.getInfo = function () {
 }
 
 function cMIN() {
-    cBaseFunction.call( this, "MIN" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 255 );
+//    cBaseFunction.call( this, "MIN" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
+
+    this.name = "MIN";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cMIN.prototype = Object.create( cBaseFunction.prototype )
 cMIN.prototype.Calculate = function ( arg ) {
@@ -2331,9 +2747,22 @@ cMIN.prototype.getInfo = function () {
 }
 
 function cMINA() {
-    cBaseFunction.call( this, "MINA" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 255 );
+//    cBaseFunction.call( this, "MINA" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
+
+    this.name = "MINA";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cMINA.prototype = Object.create( cBaseFunction.prototype )
 cMINA.prototype.Calculate = function ( arg ) {
@@ -2409,9 +2838,22 @@ cMINA.prototype.getInfo = function () {
 }
 
 function cMODE() {
-    cBaseFunction.call( this, "MODE" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 255 );
+//    cBaseFunction.call( this, "MODE" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
+
+    this.name = "MODE";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cMODE.prototype = Object.create( cBaseFunction.prototype )
 cMODE.prototype.Calculate = function ( arg ) {
@@ -2503,9 +2945,22 @@ cMODE.prototype.getInfo = function () {
 }
 
 function cNEGBINOMDIST() {
-    cBaseFunction.call( this, "NEGBINOMDIST" );
-    this.setArgumentsMin( 3 );
-    this.setArgumentsMax( 3 );
+//    cBaseFunction.call( this, "NEGBINOMDIST" );
+//    this.setArgumentsMin( 3 );
+//    this.setArgumentsMax( 3 );
+
+    this.name = "NEGBINOMDIST";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 3;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cNEGBINOMDIST.prototype = Object.create( cBaseFunction.prototype )
 cNEGBINOMDIST.prototype.Calculate = function ( arg ) {
@@ -2561,9 +3016,22 @@ cNEGBINOMDIST.prototype.getInfo = function () {
 }
 
 function cNORMDIST() {
-    cBaseFunction.call( this, "NORMDIST" );
-    this.setArgumentsMin( 4 );
-    this.setArgumentsMax( 4 );
+//    cBaseFunction.call( this, "NORMDIST" );
+//    this.setArgumentsMin( 4 );
+//    this.setArgumentsMax( 4 );
+
+    this.name = "NORMDIST";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 4;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 4;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cNORMDIST.prototype = Object.create( cBaseFunction.prototype )
 cNORMDIST.prototype.Calculate = function ( arg ) {
@@ -2630,9 +3098,22 @@ cNORMDIST.prototype.getInfo = function () {
 }
 
 function cNORMINV() {
-    cBaseFunction.call( this, "NORMINV" );
-    this.setArgumentsMin( 3 );
-    this.setArgumentsMax( 3 );
+//    cBaseFunction.call( this, "NORMINV" );
+//    this.setArgumentsMin( 3 );
+//    this.setArgumentsMax( 3 );
+
+    this.name = "NORMINV";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 3;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cNORMINV.prototype = Object.create( cBaseFunction.prototype )
 cNORMINV.prototype.Calculate = function ( arg ) {
@@ -2685,9 +3166,22 @@ cNORMINV.prototype.getInfo = function () {
 }
 
 function cNORMSDIST() {
-    cBaseFunction.call( this, "NORMSDIST" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 1 );
+//    cBaseFunction.call( this, "NORMSDIST" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 1 );
+
+    this.name = "NORMSDIST";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 1;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cNORMSDIST.prototype = Object.create( cBaseFunction.prototype )
 cNORMSDIST.prototype.Calculate = function ( arg ) {
@@ -2723,9 +3217,22 @@ cNORMSDIST.prototype.getInfo = function () {
 }
 
 function cNORMSINV() {
-    cBaseFunction.call( this, "NORMSINV" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 1 );
+//    cBaseFunction.call( this, "NORMSINV" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 1 );
+
+    this.name = "NORMSINV";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 1;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cNORMSINV.prototype = Object.create( cBaseFunction.prototype )
 cNORMSINV.prototype.Calculate = function ( arg ) {
@@ -2769,9 +3276,22 @@ cNORMSINV.prototype.getInfo = function () {
 }
 
 function cPEARSON() {
-    cBaseFunction.call( this, "PEARSON" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 2 );
+//    cBaseFunction.call( this, "PEARSON" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 2 );
+
+    this.name = "PEARSON";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 2;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cPEARSON.prototype = Object.create( cBaseFunction.prototype )
 cPEARSON.prototype.Calculate = function ( arg ) {
@@ -2849,10 +3369,23 @@ cPEARSON.prototype.getInfo = function () {
 }
 
 function cPERCENTILE() {
-    cBaseFunction.call( this, "PERCENTILE" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 2 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "PERCENTILE" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 2 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "PERCENTILE";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 2;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cPERCENTILE.prototype = Object.create( cBaseFunction.prototype )
 cPERCENTILE.prototype.Calculate = function ( arg ) {
@@ -2932,9 +3465,22 @@ cPERCENTILE.prototype.getInfo = function () {
 }
 
 function cPERCENTRANK() {
-    cBaseFunction.call( this, "PERCENTRANK" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 3 );
+//    cBaseFunction.call( this, "PERCENTRANK" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 3 );
+
+    this.name = "PERCEBTRANK";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 3;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cPERCENTRANK.prototype = Object.create( cBaseFunction.prototype )
 cPERCENTRANK.prototype.Calculate = function ( arg ) {
@@ -3043,9 +3589,22 @@ cPERCENTRANK.prototype.getInfo = function () {
 }
 
 function cPERMUT() {
-    cBaseFunction.call( this, "PERMUT" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 2 );
+//    cBaseFunction.call( this, "PERMUT" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 2 );
+
+    this.name = "PERMUT";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 2;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cPERMUT.prototype = Object.create( cBaseFunction.prototype )
 cPERMUT.prototype.Calculate = function ( arg ) {
@@ -3126,9 +3685,22 @@ cPERMUT.prototype.getInfo = function () {
 }
 
 function cPOISSON() {
-    cBaseFunction.call( this, "POISSON" );
-    this.setArgumentsMin( 3 );
-    this.setArgumentsMax( 3 );
+//    cBaseFunction.call( this, "POISSON" );
+//    this.setArgumentsMin( 3 );
+//    this.setArgumentsMax( 3 );
+
+    this.name = "POISSON";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 3;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cPOISSON.prototype = Object.create( cBaseFunction.prototype )
 cPOISSON.prototype.Calculate = function ( arg ) {
@@ -3195,10 +3767,23 @@ cPOISSON.prototype.getInfo = function () {
 }
 
 function cPROB() {
-    cBaseFunction.call( this, "PROB" );
-    this.setArgumentsMin( 3 );
-    this.setArgumentsMax( 4 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "PROB" );
+//    this.setArgumentsMin( 3 );
+//    this.setArgumentsMax( 4 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "PROB";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 4;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cPROB.prototype = Object.create( cBaseFunction.prototype )
 cPROB.prototype.Calculate = function ( arg ) {
@@ -3302,10 +3887,23 @@ cPROB.prototype.getInfo = function () {
 }
 
 function cQUARTILE() {
-    cBaseFunction.call( this, "QUARTILE" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 2 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "QUARTILE" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 2 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "QUARTILE";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 2;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cQUARTILE.prototype = Object.create( cBaseFunction.prototype )
 cQUARTILE.prototype.Calculate = function ( arg ) {
@@ -3416,9 +4014,22 @@ function cRANK() {
 cRANK.prototype = Object.create( cBaseFunction.prototype )
 
 function cRSQ() {
-    cBaseFunction.call( this, "RSQ" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 2 );
+//    cBaseFunction.call( this, "RSQ" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 2 );
+
+    this.name = "RSQ";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 2;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cRSQ.prototype = Object.create( cBaseFunction.prototype )
 cRSQ.prototype.Calculate = function ( arg ) {
@@ -3497,9 +4108,22 @@ cRSQ.prototype.getInfo = function () {
 }
 
 function cSKEW() {
-    cBaseFunction.call( this, "SKEW" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 255 );
+//    cBaseFunction.call( this, "SKEW" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
+
+    this.name = "SKEW";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cSKEW.prototype = Object.create( cBaseFunction.prototype )
 cSKEW.prototype.Calculate = function ( arg ) {
@@ -3585,9 +4209,22 @@ cSKEW.prototype.getInfo = function () {
 }
 
 function cSLOPE() {
-    cBaseFunction.call( this, "SLOPE" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 2 );
+//    cBaseFunction.call( this, "SLOPE" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 2 );
+
+    this.name = "SLOPE";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 2;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cSLOPE.prototype = Object.create( cBaseFunction.prototype )
 cSLOPE.prototype.Calculate = function ( arg ) {
@@ -3665,10 +4302,23 @@ cSLOPE.prototype.getInfo = function () {
 }
 
 function cSMALL() {
-    cBaseFunction.call( this, "SMALL" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 2 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "SMALL" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 2 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "SMALL";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 2;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cSMALL.prototype = Object.create( cBaseFunction.prototype )
 cSMALL.prototype.Calculate = function ( arg ) {
@@ -3734,9 +4384,22 @@ cSMALL.prototype.getInfo = function () {
 }
 
 function cSTANDARDIZE() {
-    cBaseFunction.call( this, "STANDARDIZE" );
-    this.setArgumentsMin( 3 );
-    this.setArgumentsMax( 3 );
+//    cBaseFunction.call( this, "STANDARDIZE" );
+//    this.setArgumentsMin( 3 );
+//    this.setArgumentsMax( 3 );
+
+    this.name = "STANDARDIZE";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 3;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cSTANDARDIZE.prototype = Object.create( cBaseFunction.prototype )
 cSTANDARDIZE.prototype.Calculate = function ( arg ) {
@@ -3789,10 +4452,23 @@ cSTANDARDIZE.prototype.getInfo = function () {
 }
 
 function cSTDEV() {
-    cBaseFunction.call( this, "STDEV" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 255 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "STDEV" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "STDEV";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cSTDEV.prototype = Object.create( cBaseFunction.prototype )
 cSTDEV.prototype.Calculate = function ( arg ) {
@@ -3852,10 +4528,23 @@ cSTDEV.prototype.getInfo = function () {
 }
 
 function cSTDEVA() {
-    cBaseFunction.call( this, "STDEVA" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 255 );
-    this.setFormat( this.formatType.noneFormat );
+//    cBaseFunction.call( this, "STDEVA" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
+//    this.setFormat( this.formatType.noneFormat );
+
+    this.name = "STDEVA";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cSTDEVA.prototype = Object.create( cBaseFunction.prototype )
 cSTDEVA.prototype.Calculate = function ( arg ) {
@@ -3955,9 +4644,22 @@ function cTTEST() {
 cTTEST.prototype = Object.create( cBaseFunction.prototype )
 
 function cVAR() {
-    cBaseFunction.call( this, "VAR" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 255 );
+//    cBaseFunction.call( this, "VAR" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
+
+    this.name = "VAR";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cVAR.prototype = Object.create( cBaseFunction.prototype )
 cVAR.prototype.Calculate = function ( arg ) {

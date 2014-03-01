@@ -20,9 +20,22 @@ cFormulaFunction.Logical = {
 }
 
 function cAND() {
-    cBaseFunction.call( this, "AND" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 255 );
+//    cBaseFunction.call( this, "AND" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
+
+    this.name = "AND";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cAND.prototype = Object.create( cBaseFunction.prototype )
 cAND.prototype.Calculate = function ( arg ) {
@@ -89,9 +102,21 @@ cAND.prototype.getInfo = function () {
 }
 
 function cFALSE() {
-    cBaseFunction.call( this, "FALSE" );
-    this.setArgumentsMin( 0 );
-    this.setArgumentsMax( 0 );
+//    cBaseFunction.call( this, "FALSE" );
+//    this.setArgumentsMin( 0 );
+//    this.setArgumentsMax( 0 );
+
+    this.name = "FALSE";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 0;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 0;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
 }
 cFALSE.prototype = Object.create( cBaseFunction.prototype )
 cFALSE.prototype.Calculate = function () {
@@ -105,9 +130,22 @@ cFALSE.prototype.getInfo = function () {
 }
 
 function cIF() {
-    cBaseFunction.call( this, "IF" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 3 );
+//    cBaseFunction.call( this, "IF" );
+
+    this.name = "IF";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 3;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 3 );
 }
 cIF.prototype = Object.create( cBaseFunction.prototype )
 cIF.prototype.Calculate = function ( arg ) {
@@ -148,9 +186,22 @@ cIF.prototype.getInfo = function () {
 }
 
 function cIFERROR() {
-    cBaseFunction.call( this, "IFERROR" );
-    this.setArgumentsMin( 2 );
-    this.setArgumentsMax( 2 );
+//    cBaseFunction.call( this, "IFERROR" );
+//    this.setArgumentsMin( 2 );
+//    this.setArgumentsMax( 2 );
+
+    this.name = "IFERROR";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 2;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cIFERROR.prototype = Object.create( cBaseFunction.prototype )
 cIFERROR.prototype.Calculate = function ( arg ) {
@@ -177,9 +228,22 @@ cIFERROR.prototype.getInfo = function () {
 }
 
 function cNOT() {
-    cBaseFunction.call( this, "NOT" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 1 );
+//    cBaseFunction.call( this, "NOT" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 1 );
+
+    this.name = "NOT";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 1;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cNOT.prototype = Object.create( cBaseFunction.prototype )
 cNOT.prototype.Calculate = function ( arg ) {
@@ -211,9 +275,22 @@ cNOT.prototype.getInfo = function () {
 }
 
 function cOR() {
-    cBaseFunction.call( this, "OR" );
-    this.setArgumentsMin( 1 );
-    this.setArgumentsMax( 255 );
+//    cBaseFunction.call( this, "OR" );
+//    this.setArgumentsMin( 1 );
+//    this.setArgumentsMax( 255 );
+
+    this.name = "OR";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cOR.prototype = Object.create( cBaseFunction.prototype )
 cOR.prototype.Calculate = function ( arg ) {
@@ -275,9 +352,22 @@ cOR.prototype.getInfo = function () {
 }
 
 function cTRUE() {
-    cBaseFunction.call( this, "TRUE" );
-    this.setArgumentsMin( 0 );
-    this.setArgumentsMax( 0 );
+//    cBaseFunction.call( this, "TRUE" );
+//    this.setArgumentsMin( 0 );
+//    this.setArgumentsMax( 0 );
+
+    this.name = "TRUE";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 0;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 0;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cTRUE.prototype = Object.create( cBaseFunction.prototype )
 cTRUE.prototype.Calculate = function () {
