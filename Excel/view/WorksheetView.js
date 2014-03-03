@@ -2827,7 +2827,7 @@
 
 					// draw left border
 					if (isFirstCol && !t._isLeftBorderErased1(col, rowCache)) {
-						drawVerticalBorder2(bPrev, bCur, x1 - t.width_1px, y1, y2);
+						drawVerticalBorder(bPrev, bCur, x1 - t.width_1px, y1, y2);
 						// Если мы в печати и печатаем первый столбец, то нужно напечатать бордеры
 //						if (lb.w >= 1 && drawingCtx && 0 === col) {
 							// Иначе они будут не такой ширины
@@ -2837,11 +2837,11 @@
 					}
 					// draw right border
 					if ((!isMerged || isLastCol) && !t._isRightBorderErased1(col, rowCache)) {
-						drawVerticalBorder2(bCur, bNext, x2, y1, y2);
+						drawVerticalBorder(bCur, bNext, x2, y1, y2);
 					}
 					// draw top border
 					if (isFirstRow) {
-						drawHorizontalBorder2(bTopCur, bCur, x1, y1 - t.height_1px, x2);
+						drawHorizontalBorder(bTopCur, bCur, x1, y1 - t.height_1px, x2);
 						// Если мы в печати и печатаем первую строку, то нужно напечатать бордеры
 //						if (tb.w > 0 && drawingCtx && 0 === row) {
 							// ToDo посмотреть что с этим ? в печати будет обрезка
@@ -2850,7 +2850,7 @@
 					}
 					if (!isMerged || isLastRow) {
 						// draw bottom border
-						drawHorizontalBorder2(bCur, bBotCur, x1, y2, x2);
+						drawHorizontalBorder(bCur, bBotCur, x1, y2, x2);
 					}
 				}
 
