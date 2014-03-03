@@ -182,6 +182,11 @@ CChartsDrawer.prototype =
 		var y = (this.calcProp.chartGutter._top + this.calcProp.trueHeight / 2) / this.calcProp.pxToMM - heightTitle / 2;
 		var x = standartMargin / this.calcProp.pxToMM;
 		
+		if(chartSpace.chart.legend && !chartSpace.chart.legend.overlay && chartSpace.chart.legend.legendPos == LEGEND_POS_L)
+		{
+			x += chartSpace.chart.legend.extX;
+		}
+		
 		return {x: x, y: y}
 	},
 	
@@ -194,6 +199,11 @@ CChartsDrawer.prototype =
 		var y = (this.calcProp.heightCanvas - standartMargin) / this.calcProp.pxToMM -  heightTitle;
 		var x = (this.calcProp.chartGutter._left + this.calcProp.trueWidth / 2) / this.calcProp.pxToMM - widthTitle / 2;
 		
+		if(chartSpace.chart.legend && !chartSpace.chart.legend.overlay && chartSpace.chart.legend.legendPos == LEGEND_POS_B)
+		{
+			y -= chartSpace.chart.legend.extY;
+		}
+			
 		return {x: x, y: y}
 	},
 	
@@ -216,6 +226,11 @@ CChartsDrawer.prototype =
 			{
 				x = this.calcProp.widthCanvas / 2 / this.calcProp.pxToMM - widthLegend / 2;
 				y = standartMargin / 2 / this.calcProp.pxToMM;
+				
+				if(chartSpace.chart.title !== null && !chartSpace.chart.title.overlay)
+				{
+					y += chartSpace.chart.title.extY + standartMargin / 2 / this.calcProp.pxToMM;
+				}
 				break;
 			}
 			case LEGEND_POS_R:
@@ -234,6 +249,11 @@ CChartsDrawer.prototype =
 			{
 				x = (this.calcProp.widthCanvas - standartMargin / 2) / this.calcProp.pxToMM  - widthLegend;
 				y = standartMargin / 2 / this.calcProp.pxToMM;
+				
+				if(chartSpace.chart.title !== null && !chartSpace.chart.title.overlay)
+				{
+					y += chartSpace.chart.title.extY + standartMargin / 2 / this.calcProp.pxToMM;
+				}
 				break;
 			}
 			default:
