@@ -2660,7 +2660,7 @@
 				}
 			}
 
-			function drawVerticalBorder2(borderLeft, borderRight, x, y1, y2) {
+			function drawVerticalBorder(borderLeft, borderRight, x, y1, y2) {
 				var border;
 				if (borderLeft && borderLeft.r.w)
 					border = borderLeft.r;
@@ -2677,19 +2677,7 @@
 				drawBorderVer(border, x, y1 + (-1 + dy1) * t.height_1px, y2 + (1 + dy2) * t.height_1px);
 			}
 
-			function drawVerticalBorder(bor, tb1, tb2, bb1, bb2, x, y1, y2) {
-				if (bor.w < 1) {return;}
-
-				// ToDo переделать рассчет
-				var tbw = t._calcMaxBorderWidth(tb1, tb2); // top border width
-				var bbw = t._calcMaxBorderWidth(bb1, bb2); // bottom border width
-				var dy1 = tbw > bor.w ? tbw - 1 : (tbw > 1 ? -1 : 0);
-				var dy2 = bbw > bor.w ? -2 : (bbw > 2 ? 1 : 0);
-
-				drawBorderVer(bor, x, y1 + (-1 + dy1) * t.height_1px, y2 + (1 + dy2) * t.height_1px);
-			}
-
-			function drawHorizontalBorder2(borderTop, borderBottom, x1, y, x2) {
+			function drawHorizontalBorder(borderTop, borderBottom, x1, y, x2) {
 				var border;
 				if (borderTop && borderTop.b.w)
 					border = borderTop.b;
@@ -2703,17 +2691,6 @@
 					var dx1 = border.w > lbw ? (lbw > 1 ? -1 : 0) : (lbw > 2 ? 2 : 1);
 					var dx2 = border.w > rbw ? (rbw > 2 ? 1 : 0) : (rbw > 1 ? -2 : -1);
 					drawBorderHor(border, x1 + (-1 + dx1) * t.width_1px, y, x2 + (1 + dx2) * t.width_1px);
-				}
-			}
-
-			function drawHorizontalBorder(bor, lb, lbOther, rb, rbOther, x1, y, x2) {
-				if (bor.w > 0) {
-					// ToDo переделать рассчет
-					var lbw = t._calcMaxBorderWidth(lb, lbOther);
-					var rbw = t._calcMaxBorderWidth(rb, rbOther);
-					var dx1 = bor.w > lbw ? (lbw > 1 ? -1 : 0) : (lbw > 2 ? 2 : 1);
-					var dx2 = bor.w > rbw ? (rbw > 2 ? 1 : 0) : (rbw > 1 ? -2 : -1);
-					drawBorderHor(bor, x1 + (-1 + dx1) * t.width_1px, y, x2 + (1 + dx2) * t.width_1px);
 				}
 			}
 
