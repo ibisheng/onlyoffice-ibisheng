@@ -1041,6 +1041,23 @@ CTextBody.prototype =
         var t_ins = isRealNumber(this.bodyPr.tIns) ? this.bodyPr.tIns : 1.27;
         var b_ins = isRealNumber(this.bodyPr.bIns) ? this.bodyPr.bIns : 1.27;
         return content_height + t_ins + b_ins;
+    },
+
+    getMaxContentWidth: function(maxWidth)
+    {
+        this.content.Reset(0, 0, maxWidth - 0.01, 20000);
+        this.content.Recalculate_Page(0, true);
+        var max_width = 0, arr_content = this.content.Content, paragraph_lines, i, j;
+        for(i = 0;  i < arr_content.length; ++i)
+        {
+            paragraph_lines = arr_content[i].Lines;
+            for(j = 0;  j < paragraph_lines.length; ++j)
+            {
+                if(paragraph_lines[j].Ranges[0].W > max_width)
+                    max_width = paragraph_lines[j].Ranges[0].W;
+            }
+        }
+        return max_width + 0.01;
     }
 };
 

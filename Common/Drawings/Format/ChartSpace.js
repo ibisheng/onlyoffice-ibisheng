@@ -175,8 +175,6 @@ function CreateUniFillSchemeColorWidthTint(schemeColorId, tintVal)
 	this, [schemeColorId, tintVal]);
 }
 
-
-
 function CChartSpace()
 {
     this.chart = null;
@@ -1984,7 +1982,6 @@ function CreateLineChart(asc_chart, type)
     line_chart.addAxId(plot_area.catAx);
     line_chart.addAxId(plot_area.valAx);
     plot_area.valAx.setCrosses(2);
-    plot_area.valAx.setCrosses(2);
     var parsedHeaders = asc_chart.parseSeriesHeaders();
     for(var i = 0; i < asc_series.length; ++i)
     {
@@ -2044,7 +2041,6 @@ function CreateLineChart(asc_chart, type)
             pt.setVal(asc_series[i].TxCache.Tx);
         }
         line_chart.addSer(series);
-
     }
     var d_lbls = line_chart.dLbls;
     d_lbls.setShowLegendKey(false);
@@ -2571,7 +2567,6 @@ function CreateAreaChart(asc_chart, type)
     return chart_space;
 }
 
-
 function CreatePieChart(asc_chart, type)
 {
     var asc_series = asc_chart.series;
@@ -2682,7 +2677,6 @@ function CreatePieChart(asc_chart, type)
     page_margins.setFooter(0.3);
     return chart_space;
 }
-
 
 function CreateScatterChart(asc_chart)
 {

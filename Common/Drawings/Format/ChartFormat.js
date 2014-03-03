@@ -4234,11 +4234,15 @@ CDLbl.prototype =
         if(this.chart.txPr
             && this.chart.txPr.content
             && this.chart.txPr.content.Content[0]
-            && this.chart.txPr.content.Content[0].Pr
-            && this.chart.txPr.content.Content[0].Pr.DefaultRunPr)
+            && this.chart.txPr.content.Content[0].Pr)
         {
-            chart_text_pr = this.chart.txPr.content.Content[0].Pr.DefaultRunPr;
-            style.TextPr.Merge(chart_text_pr);
+            style.ParaPr.Merge(this.chart.txPr.content.Content[0].Pr);
+            if(this.chart.txPr.content.Content[0].Pr.DefaultRunPr)
+            {
+                chart_text_pr = this.chart.txPr.content.Content[0].Pr.DefaultRunPr;
+                style.TextPr.Merge(chart_text_pr);
+            }
+
         }
         if(this instanceof  CTitle)
         {
@@ -4256,18 +4260,20 @@ CDLbl.prototype =
             && this.legend.txPr
             && this.legend.txPr.content
             && this.legend.txPr.content.Content[0]
-            && this.legend.txPr.content.Content[0].Pr
-            && this.legend.txPr.content.Content[0].Pr.DefaultRunPr)
+            && this.legend.txPr.content.Content[0].Pr)
         {
-            style.TextPr.Merge(this.legend.txPr.content.Content[0].Pr.DefaultRunPr);
+            style.ParaPr.Merge(this.legend.txPr.content.Content[0].Pr);
+            if(this.legend.txPr.content.Content[0].Pr.DefaultRunPr)
+                style.TextPr.Merge(this.legend.txPr.content.Content[0].Pr.DefaultRunPr);
         }
         if(this.txPr
             && this.txPr.content
             && this.txPr.content.Content[0]
-            && this.txPr.content.Content[0].Pr
-            && this.txPr.content.Content[0].Pr.DefaultRunPr)
+            && this.txPr.content.Content[0].Pr)
         {
-            style.TextPr.Merge(this.txPr.content.Content[0].Pr.DefaultRunPr);
+            style.ParaPr.Merge(this.txPr.content.Content[0].Pr);
+            if(this.txPr.content.Content[0].Pr.DefaultRunPr)
+                style.TextPr.Merge(this.txPr.content.Content[0].Pr.DefaultRunPr);
         }
         styles.Add(style);
         return {lastId: style.Id, styles: styles};
@@ -7304,6 +7310,63 @@ CLegend.prototype =
     Read_FromBinary2: function (r)
     {
         this.Id = r.GetString2();
+    },
+
+
+    draw: function(g)
+    {
+        if(this.chart)
+        {
+            g.SetIntegerGrid(false);
+            g.p_width(70);
+            g.transform3(this.chart.transform, false);
+            g.p_color(0, 0, 0, 255);
+            g._s();
+            g._m(this.x, this.y);
+            g._l(this.x + this.extX, this.y + 0);
+            g._l(this.x + this.extX, this.y + this.extY);
+            g._l(this.x + 0, this.y + this.extY);
+            g._z();
+            g.ds();
+            g.SetIntegerGrid(true);
+        }
+        for(var i = 0; i < this.calcEntryes.length; ++i)
+        {
+            this.calcEntryes[i].draw(g);
+        }
+    },
+
+    setPosition: function(x, y)
+    {
+        this.x = x;
+        this.y = y;
+        this.transform.Reset();
+        global_MatrixTransformer.TranslateAppend(this.transform, this.x, this.y);
+        if(this.chart)
+            global_MatrixTransformer.MultiplyAppend(this.transform, this.chart.transform);
+        var entry;
+        for(var i = 0; i < this.calcEntryes.length; ++i)
+        {
+            entry = this.calcEntryes[i];
+            entry.transformText.Reset();
+            global_MatrixTransformer.TranslateAppend(entry.transformText, entry.localX, entry.localY);
+            if(this.chart)
+                global_MatrixTransformer.MultiplyAppend(entry.transformText, this.transform);
+
+            entry.calcMarkerUnion.marker.transform.Reset();
+            global_MatrixTransformer.TranslateAppend(entry.calcMarkerUnion.marker.transform, entry.calcMarkerUnion.marker.localX, entry.calcMarkerUnion.marker.localY);
+            if(this.chart)
+                global_MatrixTransformer.MultiplyAppend(entry.calcMarkerUnion.marker.transform, this.transform);
+
+            if(entry.calcMarkerUnion.lineMarker)
+            {
+                entry.calcMarkerUnion.lineMarker.transform.Reset();
+                global_MatrixTransformer.TranslateAppend(entry.calcMarkerUnion.lineMarker.transform, entry.calcMarkerUnion.lineMarker.localX, entry.calcMarkerUnion.lineMarker.localY);
+                if(this.chart)
+                    global_MatrixTransformer.MultiplyAppend(entry.calcMarkerUnion.lineMarker.transform, this.transform);
+            }
+
+        }
     },
 
     getObjectType: function()
@@ -12909,6 +12972,16 @@ CStrCache.prototype =
         return this.Id;
     },
 
+    getPtByIndex: function(idx)
+    {
+        for(var i = 0; i < this.pt.length; ++i)
+        {
+            if(this.pt[i].idx === idx)
+                return this.pt[i];
+        }
+        return null;
+    },
+
     getObjectType: function()
     {
         return historyitem_type_StrCache;
@@ -15760,9 +15833,14 @@ function CalcLegendEntry(legend, chart)
     this.y = null;
     this.extX = null;
     this.extY = null;
-    this.marker = null;
+    this.calcMarkerUnion = null;
     this.txBody = null;
     this.txPr = null;
+    this.spPr = new CSpPr();
+    this.transform = new CMatrix();
+    this.transformText = new CMatrix();
+    this.localX = null;
+    this.localY = null;
 
     this.recalcInfo =
     {
@@ -15777,7 +15855,20 @@ CalcLegendEntry.prototype =
     },
     getStyles: CDLbl.prototype.getStyles,
     recalculateStyle: CDLbl.prototype.recalculateStyle,
-    Get_Styles: CDLbl.prototype.Get_Styles
+    Get_Styles: CDLbl.prototype.Get_Styles,
+
+    draw: function(g)
+    {
+        CShape.prototype.draw.call(this, g);
+        if(this.calcMarkerUnion)
+            this.calcMarkerUnion.draw(g);
+    },
+
+    isEmptyPlaceholder: function()
+    {
+        return false;
+    }
+
 };
 
 
@@ -15788,7 +15879,8 @@ function CompiledMarker()
     this.y = null;
     this.extX = null;
     this.extY = null;
-
+    this.localX = null;
+    this.localY = null;
     this.transform = new CMatrix();
     this.pen = null;
     this.brush = null;
@@ -15796,7 +15888,13 @@ function CompiledMarker()
 
 CompiledMarker.prototype =
 {
-    draw: CShape.prototype.draw
+    draw: CShape.prototype.draw,
+
+
+    isEmptyPlaceholder: function()
+    {
+        return false;
+    }
 };
 
 function CUnionMarker()
@@ -15811,12 +15909,16 @@ CUnionMarker.prototype =
     {
         this.lineMarker && this.lineMarker.draw(g);
         this.marker && this.marker.draw(g);
+    },
+
+    setWidth: function(w)
+    {
     }
 };
 
 function CreateMarkerGeometryByType(type, src)
 {
-    var ret = new CGeometry();
+    var ret = new Geometry();
     var w = 43200, h = 43200;
     function AddRect(geom, w, h)
     {
@@ -15908,7 +16010,7 @@ function CreateMarkerGeometryByType(type, src)
             ret.AddPathCommand(1, w/2+"", "0");
             ret.AddPathCommand(2, w+"", h + "");
             ret.AddPathCommand(2, "0", h+"");
-            ret.AddPahCommand(6);
+            ret.AddPathCommand(6);
             break;
         }
         case SYMBOL_X:
@@ -15919,4 +16021,7 @@ function CreateMarkerGeometryByType(type, src)
             break;
         }
     }
+    var ret2 = new CompiledMarker();
+    ret2.spPr.geometry = ret;
+    return ret2;
 }
