@@ -883,7 +883,7 @@ CMathBase.prototype =
     {
         return this.Parent.remove(order);
     },
-    recalculateSize: function()
+    recalculateSize: function(oMeasure)
     {
         var _width = 0;
         var _height = 0;
@@ -905,7 +905,7 @@ CMathBase.prototype =
 
         _width += this.dW*(this.nCol - 1);
 
-        var _ascent =  this.getAscent(_height);
+        var _ascent =  this.getAscent(_height, oMeasure);
 
         this.size = {width: _width, height: _height, ascent: _ascent};
     },

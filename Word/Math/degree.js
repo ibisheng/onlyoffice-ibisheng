@@ -939,7 +939,7 @@ CDegreeSubSup.prototype.recalculateSize = function(oMeasure)
         this.gapBase = iterUp.height - lUp + minGap/2;
     }
 
-    iters.recalculateSize();
+    iters.recalculateSize(oMeasure);
 
     var width  = iters.size.width + base.size.width + this.dW;
     var height = iters.size.height;

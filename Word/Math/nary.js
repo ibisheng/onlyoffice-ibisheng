@@ -531,7 +531,7 @@ CNaryOperator.prototype.recalculateSize = function()
 }
 CNaryOperator.prototype.Resize = function()
 {
-    this.recalculateSize(); //бычный пересчет, oMeasure не нужен
+    this.recalculateSize(); //обычный пересчет, oMeasure не нужен
 }
 CNaryOperator.prototype.setComposition = function(Compos)
 {
@@ -2888,7 +2888,8 @@ CContourIntegral.prototype.draw = function(x, y, pGraphics)
         HH = coord2.H;
 
     //var textScale =  this.getTxtPrp().FontSize/850;// 1000 pt
-    var textScale =  this.getCtrPrp().FontSize/850;// 1000 pt
+    var FontSize = this.getCtrPrp().FontSize;
+    var textScale =  FontSize/850;// 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
 
     var shX = (WW - W)*alpha/2,
@@ -2908,11 +2909,13 @@ CContourIntegral.prototype.draw = function(x, y, pGraphics)
         YY[i] = this.pos.y + y + YY[i]*alpha;
     }
 
+    var penCircle = 750*FontSize/32;
 
     var intGrid = pGraphics.GetIntegerGrid();
     pGraphics.SetIntegerGrid(false);
 
-    pGraphics.p_width(750);
+    //pGraphics.p_width(750);
+    pGraphics.p_width(penCircle);
 
     pGraphics.b_color1(0,0,0, 255);
     pGraphics.p_color(0,0,0, 255);
@@ -3391,9 +3394,8 @@ CSurfaceIntegral.prototype.draw = function(x, y, pGraphics)
         WW = 1.6*coord2.W,
         HH = coord2.H;
 
-
-    //var textScale =  this.getTxtPrp().FontSize/850; // 1000 pt
-    var textScale =  this.getCtrPrp().FontSize/850; // 1000 pt
+    var FontSize = this.getCtrPrp().FontSize;
+    var textScale =  FontSize/850; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
 
 
@@ -3414,11 +3416,12 @@ CSurfaceIntegral.prototype.draw = function(x, y, pGraphics)
         YY[i] = this.pos.y + y + YY[i]*alpha;
     }
 
+    var penSurface = 750*FontSize/32;
 
     var intGrid = pGraphics.GetIntegerGrid();
     pGraphics.SetIntegerGrid(false);
 
-    pGraphics.p_width(750);
+    pGraphics.p_width(penSurface);
 
     pGraphics.b_color1(0,0,0, 255);
     pGraphics.p_color(0,0,0, 255);
@@ -3967,8 +3970,8 @@ CVolumeIntegral.prototype.draw = function(x, y, pGraphics)
         WW = 2.1*coord2.W,
         HH = coord2.H;
 
-
-    var textScale =  this.getCtrPrp().FontSize/850; // 1000 pt
+    var FontSize = this.getCtrPrp().FontSize;
+    var textScale = FontSize/850; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
 
 
@@ -3988,11 +3991,12 @@ CVolumeIntegral.prototype.draw = function(x, y, pGraphics)
         YY[i] = this.pos.y + y + YY[i]*alpha;
     }
 
+    var penVolume = 750*FontSize/32;
 
     var intGrid = pGraphics.GetIntegerGrid();
     pGraphics.SetIntegerGrid(false);
 
-    pGraphics.p_width(750);
+    pGraphics.p_width(penVolume);
 
     pGraphics.b_color1(0,0,0, 255);
     pGraphics.p_color(0,0,0, 255);

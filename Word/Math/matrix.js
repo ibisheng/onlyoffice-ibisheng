@@ -380,6 +380,7 @@ CMathMatrix.prototype.addRow = function()
         //this.elements[this.nRow-1][j].setComposition(this.Composition);
     }
 
+    // не будет работать, т.к. нужен для пересчета oMeasure
     this.recalculateSize();
 }
 
