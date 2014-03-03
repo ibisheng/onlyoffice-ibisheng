@@ -309,16 +309,17 @@ CChartSpace.prototype.recalculate = function()
             this.recalcInfo.recalculateAxisLabels = false;
         }
 
-        if(this.recalcInfo.recalculateAxisVal)
-        {
-            this.recalculateAxis();
-            //this.recalcInfo.recalculateAxisVal = false;
-        }
-
         if(this.recalcInfo.recalculateLegend)
         {
             this.recalculateLegend();
             //this.recalcInfo.recalculateLegend = false;
+        }
+
+
+        if(this.recalcInfo.recalculateAxisVal)
+        {
+            this.recalculateAxis();
+            //this.recalcInfo.recalculateAxisVal = false;
         }
 
         if(this.recalcInfo.recalculateChart)
@@ -352,6 +353,11 @@ CChartSpace.prototype.recalculate = function()
         {
             var pos = this.chartObj.reCalculatePositionText("catAx", this, this.chart.plotArea.catAx.title);
             this.chart.plotArea.catAx.title.setPosition(pos.x, pos.y);
+        }
+        if(this.chart && this.chart.legend)
+        {
+           var pos = this.chartObj.reCalculatePositionText("legend", this, this.chart.legend);
+           this.chart.legend.setPosition(pos.x, pos.y);
         }
         this.recalcInfo.axisLabels.length = 0;
 
