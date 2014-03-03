@@ -139,6 +139,16 @@ CChartsDrawer.prototype =
 				pos = this._calculatePositionCatAx(chartSpace);
 				break;
 			}
+			case "legend":
+			{
+				pos = this._calculatePositionLegend(chartSpace);
+				break;
+			}
+			default:
+			{
+				pos = {x: 0, y: 0};
+				break;
+			}
 		}
 		return {x: pos.x, y : pos.y};
 	},
@@ -183,6 +193,56 @@ CChartsDrawer.prototype =
 		
 		var y = (this.calcProp.heightCanvas - standartMargin) / this.calcProp.pxToMM -  heightTitle;
 		var x = (this.calcProp.chartGutter._left + this.calcProp.trueWidth / 2) / this.calcProp.pxToMM - widthTitle / 2;
+		
+		return {x: x, y: y}
+	},
+	
+	_calculatePositionLegend: function(chartSpace)
+	{	
+		var widthLegend = chartSpace.chart.legend.extX;
+		var heightLegend = chartSpace.chart.legend.extY;
+		var standartMargin = 13;
+		var x, y;
+		
+		switch ( chartSpace.chart.legend.legendPos )
+		{
+			case LEGEND_POS_L:
+			{
+				x = standartMargin / 2 / this.calcProp.pxToMM;
+				y = this.calcProp.heightCanvas / 2 / this.calcProp.pxToMM - heightLegend / 2;
+				break;
+			}
+			case LEGEND_POS_T:
+			{
+				x = this.calcProp.widthCanvas / 2 / this.calcProp.pxToMM - widthLegend / 2;
+				y = standartMargin / 2 / this.calcProp.pxToMM;
+				break;
+			}
+			case LEGEND_POS_R:
+			{
+				x = (this.calcProp.widthCanvas - standartMargin / 2) / this.calcProp.pxToMM  - widthLegend;
+				y = (this.calcProp.heightCanvas / 2) / this.calcProp.pxToMM - heightLegend / 2;
+				break;
+			}
+			case LEGEND_POS_B:
+			{
+				x = this.calcProp.widthCanvas / 2 / this.calcProp.pxToMM - widthLegend / 2;
+				y = (this.calcProp.heightCanvas - standartMargin / 2) / this.calcProp.pxToMM - heightLegend;
+				break;
+			}
+			case LEGEND_POS_TR:
+			{
+				x = (this.calcProp.widthCanvas - standartMargin / 2) / this.calcProp.pxToMM  - widthLegend;
+				y = standartMargin / 2 / this.calcProp.pxToMM;
+				break;
+			}
+			default:
+			{
+				x = (this.calcProp.widthCanvas  - standartMargin / 2) / this.calcProp.pxToMM  - widthLegend;
+				y = (this.calcProp.heightCanvas) / this.calcProp.pxToMM - heightLegend / 2;
+				break;
+			}
+		}
 		
 		return {x: x, y: y}
 	},
