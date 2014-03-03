@@ -3466,11 +3466,12 @@ function DrawingObjects() {
 		}
 		
 		if ( !printOptions ) {
-		
 			if ( aObjects.length ) {
 				if ( _this.controller.selectedObjects.length )
 					_this.OnUpdateOverlay();
 			}
+			else
+				worksheet._drawSelection();
 		}
 	}
 
