@@ -986,8 +986,6 @@ CChartsDrawer.prototype =
 		}
 		else
 			left += standartMargin;
-			
-		//KEY
 		
 		
 		//****right*****
@@ -1002,7 +1000,6 @@ CChartsDrawer.prototype =
 		else
 			right += standartMargin;
 		
-		//KEY
 		
 		//****bottom*****
 		if(bottom || !top)
@@ -1016,8 +1013,6 @@ CChartsDrawer.prototype =
 		}
 		else
 			bottom += standartMargin;
-			
-		//KEY
 		
 		
 		//****top*****
@@ -1040,8 +1035,38 @@ CChartsDrawer.prototype =
 		}
 			
 		
-		
 		//KEY
+		if(chartSpace.chart.legend && !chartSpace.chart.legend.overlay)
+		{
+			switch ( chartSpace.chart.legend.legendPos )
+			{
+				case LEGEND_POS_L:
+				{
+					left += chartSpace.chart.legend.extX;
+					break;
+				}
+				case LEGEND_POS_T:
+				{
+					top += chartSpace.chart.legend.extY;
+					break;
+				}
+				case LEGEND_POS_R:
+				{
+					right += chartSpace.chart.legend.extX;
+					break;
+				}
+				case LEGEND_POS_B:
+				{
+					bottom += chartSpace.chart.legend.extY;
+					break;
+				}
+				case LEGEND_POS_TR:
+				{
+					right += chartSpace.chart.legend.extX;
+					break;
+				}
+			}
+		}
 		
 		this.calcProp.chartGutter._left = left * pxToMM;
 		this.calcProp.chartGutter._right = right * pxToMM;
