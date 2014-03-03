@@ -2633,21 +2633,23 @@ cArray.prototype.fillFromArray = function ( arr ) {
     }
 }
 
-function isalpha(c){
+function testPars(){}
+testPars.prototype = {
+ isalpha:function(c){
     c = c.toUpperCase();
     return c >= "A" && c <= "Z";
-}
-function isalnum(c){
+},
+ isalnum:function(c){
     return isdigit(c) || rg_str_allLang.test(c);
-}
-function isdigit( n ) {
+},
+ isdigit:function( n ) {
     return n == "0" || n == "1" ||
         n == "2" || n == "3" ||
         n == "4" || n == "5" ||
         n == "6" || n == "7" ||
         n == "8" || n == "9";
-}
-function isoper(c){
+},
+ isoper:function(c){
 //    return ":, ^*/+-&=<><<=>>=%".indexOf(c) > -1;
     /*return ( c == ":" || c == "," || c == " " || c == "^" ||
 
@@ -2657,8 +2659,8 @@ function isoper(c){
 
             c == "<=" || c == ">" || c == ">=" || c == "%" )*/
     return rx_operators.test(c)
-}
-function isOperator( str, pos ) {
+},
+ isOperator:function( str, pos ) {
     skipSpace.call( this );
     var op = this.Formula[this.pCurrPos];
     switch ( op ) {
@@ -2699,11 +2701,11 @@ function isOperator( str, pos ) {
         }
     }
     return false;
-}
-function skipSpace( str, pos ) {
+},
+ skipSpace:function( str, pos ) {
     while ( this.Formula[this.pCurrPos] == " " ) this.pCurrPos++;
-}
-function isLeftParentheses( str, pos ) {
+},
+ isLeftParentheses:function( str, pos ) {
     skipSpace.call( this );
     var op = this.Formula[this.pCurrPos];
     if ( op == "(" ) {
@@ -2712,8 +2714,8 @@ function isLeftParentheses( str, pos ) {
         return true;
     }
     return false;
-}
-function isRightParentheses( str, pos ) {
+},
+ isRightParentheses:function( str, pos ) {
     skipSpace.call( this );
     var op = this.Formula[this.pCurrPos];
     if ( op == ")" ) {
@@ -2722,8 +2724,8 @@ function isRightParentheses( str, pos ) {
         return true;
     }
     return false;
-}
-function isLeftBrace( str, pos ) {
+},
+ isLeftBrace:function( str, pos ) {
     skipSpace.call( this );
     var op = this.Formula[this.pCurrPos];
     if ( op == "{" ) {
@@ -2732,8 +2734,8 @@ function isLeftBrace( str, pos ) {
         return true;
     }
     return false;
-}
-function isRightBrace( str, pos ) {
+},
+ isRightBrace:function( str, pos ) {
     skipSpace.call( this );
     var op = this.Formula[this.pCurrPos];
     if ( op == "}" ) {
@@ -2742,8 +2744,8 @@ function isRightBrace( str, pos ) {
         return true;
     }
     return false;
-}
-function isComma( str, pos ) {
+},
+ isComma:function( str, pos ) {
     skipSpace.call( this );
     var op = this.Formula[this.pCurrPos];
     if ( op == "," || op == ";" ) {
@@ -2752,8 +2754,8 @@ function isComma( str, pos ) {
         return true;
     }
     return false;
-}
-function isNumber( str, pos ) {
+},
+ isNumber:function( str, pos ) {
     skipSpace.call( this );
     var k = this.pCurrPos, pos = this.pCurrPos;
     if ( isdigit( this.Formula[pos] ) ) {
@@ -2785,8 +2787,8 @@ function isNumber( str, pos ) {
         return true;
     }
     return false;
-}
-function isString( str, pos ){
+},
+ isString:function( str, pos ){
     skipSpace.call( this );
     var op = this.Formula[this.pCurrPos], pos = this.pCurrPos, isString = true,
         str = "", quoteCounts = 0, res = false;
@@ -2812,8 +2814,8 @@ function isString( str, pos ){
         this.pCurrPos = pos;
     }
     return res;
-}
-function isRef( str, pos ){
+},
+ isRef:function( str, pos ){
     skipSpace.call( this );
     var op = this.Formula[this.pCurrPos], pos = this.pCurrPos, res = false, countChar = 3, ref = "", col = "", row = "";
     while( pos < this.Formula.length ){
@@ -2856,8 +2858,8 @@ function isRef( str, pos ){
 
     return res;
 
-}
-function isArea( str, pos ){
+},
+ isArea:function( str, pos ){
     skipSpace.call( this );
     var op = this.Formula[this.pCurrPos], pos = this.pCurrPos, res = false, wasDelim = false, ref = "", wasDigit = false;
 
@@ -2906,8 +2908,8 @@ function isArea( str, pos ){
 
     return res;
 
-}
-function is3DRef(str,pos){
+},
+ is3DRef:function(str,pos){
     skipSpace.call( this );
     var op = this.Formula[this.pCurrPos], pos = this.pCurrPos, sheetDelimPos = -1, sheetDelimPosCount = 0;
     if( op == "'"){
@@ -2978,7 +2980,7 @@ function is3DRef(str,pos){
     }
     return [true, s, s];
 }
-
+}
 /** класс отвечающий за парсинг строки с формулой, подсчета формулы, перестройки формулы при манипуляции с ячейкой*/
 /** @constructor */
 function parserFormula( formula, _cellId, _ws ) {
@@ -3120,15 +3122,15 @@ parserFormula.prototype = {
             }
 
             /* Left & Right Parentheses */
-//            else if ( parserHelp.isLeftParentheses.call( this, this.Formula, this.pCurrPos ) ) {
-            else if ( isLeftParentheses.call( this, this.Formula, this.pCurrPos ) ) {
+            else if ( parserHelp.isLeftParentheses.call( this, this.Formula, this.pCurrPos ) ) {
+//            else if ( isLeftParentheses.call( this, this.Formula, this.pCurrPos ) ) {
                 operand_expected = true;
                 wasLeftParentheses = true;
                 this.elemArr.push( new cFormulaOperators[this.operand_str]() );
             }
 
-//            else if ( parserHelp.isRightParentheses.call( this, this.Formula, this.pCurrPos ) ) {
-            else if ( isRightParentheses.call( this, this.Formula, this.pCurrPos ) ) {
+            else if ( parserHelp.isRightParentheses.call( this, this.Formula, this.pCurrPos ) ) {
+//            else if ( isRightParentheses.call( this, this.Formula, this.pCurrPos ) ) {
                 var top_elem = null;
                 if ( this.elemArr.length != 0 && ( (top_elem = this.elemArr[this.elemArr.length - 1]).name == "(" ) && operand_expected ) {
                     if ( top_elem.getArguments() > 1 ) {
@@ -3197,8 +3199,8 @@ parserFormula.prototype = {
             }
 
             /*Comma & arguments union*/
-//            else if ( parserHelp.isComma.call( this, this.Formula, this.pCurrPos ) ) {
-            else if ( isComma.call( this, this.Formula, this.pCurrPos ) ) {
+            else if ( parserHelp.isComma.call( this, this.Formula, this.pCurrPos ) ) {
+//            else if ( isComma.call( this, this.Formula, this.pCurrPos ) ) {
                 wasLeftParentheses = false;
                 /* if( operand_expected ){
                  this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
@@ -3244,7 +3246,7 @@ parserFormula.prototype = {
                 var pos = 0, arr = new cArray(), operator = { isOperator: false, operatorName: ""};
                 while ( tO.pCurrPos < tO.Formula.length ) {
 
-                    if ( isComma.call( tO, tO.Formula, tO.pCurrPos ) ) {
+                    if ( pH.isComma.call( tO, tO.Formula, tO.pCurrPos ) ) {
                         if ( tO.operand_str == ";" ) {
                             arr.addRow();
                         }
@@ -3258,7 +3260,7 @@ parserFormula.prototype = {
                     else if ( pH.isError.call( tO, tO.Formula, tO.pCurrPos ) ) {
                         arr.addElement( new cError( tO.operand_str ) );
                     }
-                    else if ( isNumber.call( tO, tO.Formula, tO.pCurrPos ) ) {
+                    else if ( pH.isNumber.call( tO, tO.Formula, tO.pCurrPos ) ) {
                         if( operator.isOperator ){
                             if( operator.operatorName == "+" || operator.operatorName == "-" ){
                                 tO.operand_str = operator.operatorName +""+ tO.operand_str
