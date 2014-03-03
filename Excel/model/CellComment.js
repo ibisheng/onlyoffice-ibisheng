@@ -1389,15 +1389,19 @@ asc_CCellCommentator.prototype = {
 			var col = comment.asc_getCol();
 			var row = comment.asc_getRow();
 			var vr = _this.worksheet.visibleRange;
+			var fvc = _this.worksheet.getFirstVisibleCol(true);
+			var fvr = _this.worksheet.getFirstVisibleRow(true);
+			var lvc = _this.worksheet.getLastVisibleCol();
+			var lvr = _this.worksheet.getLastVisibleRow();
 			
 			if ( bMove ) {
-				if ( (row < vr.r1) || (row > vr.r2) ) {
-					var offset = row - vr.r1 - Math.round(( vr.r2 - vr.r1 ) / 2);
+				if ( (row < fvr) || (row > lvr) ) {
+					var offset = row - fvr - Math.round(( lvr - fvr ) / 2);
 					_this.worksheet.scrollVertical(offset);
 					_this.worksheet.handlers.trigger("reinitializeScrollY");
 				}
-				if ( (col < vr.c1) || (col > vr.c2) ) {
-					var offset = col - vr.c1 - Math.round(( vr.c2 - vr.c1 ) / 2);
+				if ( (col < fvc) || (col > lvc) ) {
+					var offset = col - fvc - Math.round(( lvc - fvc ) / 2);
 					_this.worksheet.scrollHorizontal(offset);
 					_this.worksheet.handlers.trigger("reinitializeScrollX");
 				}
