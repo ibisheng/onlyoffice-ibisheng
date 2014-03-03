@@ -1062,27 +1062,27 @@ CChartsDrawer.prototype =
 			{
 				case LEGEND_POS_L:
 				{
-					left += chartSpace.chart.legend.extX;
+					left += chartSpace.chart.legend.extX + standartMargin / 2;
 					break;
 				}
 				case LEGEND_POS_T:
 				{
-					top += chartSpace.chart.legend.extY;
+					top += chartSpace.chart.legend.extY + standartMargin / 2;
 					break;
 				}
 				case LEGEND_POS_R:
 				{
-					right += chartSpace.chart.legend.extX;
+					right += chartSpace.chart.legend.extX + standartMargin / 2;
 					break;
 				}
 				case LEGEND_POS_B:
 				{
-					bottom += chartSpace.chart.legend.extY;
+					bottom += chartSpace.chart.legend.extY + standartMargin / 2;
 					break;
 				}
 				case LEGEND_POS_TR:
 				{
-					right += chartSpace.chart.legend.extX;
+					right += chartSpace.chart.legend.extX + standartMargin / 2;
 					break;
 				}
 			}
