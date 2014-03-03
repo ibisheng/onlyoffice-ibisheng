@@ -1761,7 +1761,7 @@
 				if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
 
 				// Отрисовываем бордеры
-				this._drawCellsBorders(drawingCtx, range, /*mergedCellsStage*/undefined, offsetX, offsetY);
+				this._drawCellsBorders(drawingCtx, range, offsetX, offsetY);
 
                 if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
 
@@ -2597,7 +2597,7 @@
 		};
 
 		/** Рисует рамки для ячеек */
-		WorksheetView.prototype._drawCellsBorders = function (drawingCtx, range, mergedCellsStage, leftFieldInPt, topFieldInPt) {
+		WorksheetView.prototype._drawCellsBorders = function (drawingCtx, range, leftFieldInPt, topFieldInPt) {
 			//TODO: использовать стили линий при рисовании границ
 			if (range === undefined) {
 				range = this.visibleRange;
@@ -2745,6 +2745,7 @@
 			while (0 <= prevCol && c[prevCol].width < t.width_1px)
 				--prevCol;
 
+			var mc, isMerged;
 			var isPrevColExist = (0 <= prevCol);
 			for (row = range.r1; row <= range.r2 && row < t.nRowsCount; ++row) {
 				if (r[row].height < t.height_1px) {continue;}
@@ -2756,12 +2757,19 @@
 				var y1 = r[row].top - offsetY;
 				var y2 = y1 + r[row].height - this.height_1px;
 
-				for (col = range.c1; col <= range.c2 && col < t.nColsCount; ++col) {
+				for (col = range.c1, isMerged = false; col <= range.c2 && col < t.nColsCount; ++col, isMerged = false) {
 					if (c[col].width < this.width_1px) {continue;}
 					var isFirstCol = col === range.c1;
+					var isLastCol = col === range.c2;
 					var nextCol = col + 1;
 
-					// ToDo merge ячейки
+					if (mc && mc.c2 >= col) {
+						isMerged = true;
+					} else {
+						mc = this.model.getMergedByCell(row, col);
+						if (mc)
+							isMerged = true;
+					}
 
 					var x1 = c[col].left - offsetX;
 					var x2 = x1 + c[col].width - this.width_1px;
@@ -2805,14 +2813,17 @@
 							bBotNext = arrNextRow[nextCol] = t._getVisibleCell(nextCol, nextRow).getBorder();
 					}
 
+					if (isMerged && row !== mc.r1 && row !== mc.r2 && col !== mc.c1 && col !== mc.c2)
+						continue;
+
 					// draw diagonal borders
-					if (bCur.dd || bCur.du) {
+					if ((bCur.dd || bCur.du) && (!isMerged || (row === mc.r1 && col === mc.c1))) {
 						var x2Diagonal = x2;
 						var y2Diagonal = y2;
-						if (mergedCellsStage) {
+						if (isMerged) {
 							// Merge cells
-							x2Diagonal = c[range.c2].left + c[range.c2].width - offsetX - t.width_1px;
-							y2Diagonal = r[range.r2].top + r[range.r2].height - offsetY - t.height_1px;
+							x2Diagonal = c[mc.c2].left + c[mc.c2].width - offsetX - t.width_1px;
+							y2Diagonal = r[mc.r2].top + r[mc.r2].height - offsetY - t.height_1px;
 						}
 						// ToDo Clip diagonal borders
 						/*ctx.save()
@@ -2848,7 +2859,7 @@
 //						}
 					}
 					// draw right border
-					if ((!mergedCellsStage || col === range.c2) && !t._isRightBorderErased1(col, rowCache)) {
+					if ((!isMerged || isLastCol) && !t._isRightBorderErased1(col, rowCache)) {
 						drawVerticalBorder2(bCur, bNext, x2, y1, y2);
 					}
 					// draw top border
@@ -2860,11 +2871,13 @@
 //							drawHorizontalBorder.call(this, tb, lb, lbPrev, rb, rbPrev, x1, y1, x2);
 //						}
 					}
-					if (!mergedCellsStage || isLastRow) {
+					if (!isMerged || isLastRow) {
 						// draw bottom border
 						drawHorizontalBorder2(bCur, bBotCur, x1, y2, x2);
 					}
 				}
+
+				mc = undefined;
 
 				arrPrevRow = arrCurrRow;
 				arrCurrRow = arrNextRow;
