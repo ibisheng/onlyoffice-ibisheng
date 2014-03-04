@@ -4,8 +4,17 @@ function CSignRadical()
     this.pos = null;
 
     this.size = null;
-    this.sizeTick = null;
-    this.widthSlash = null;
+
+    this.measure =
+    {
+        heightTick:     0,
+        widthTick:      0,
+        widthSlash:     0,
+        bHigh:          false
+    };
+
+    //this.sizeTick = null;
+    //this.widthSlash = null;
 }
 CSignRadical.prototype.draw = function(x, y, pGraphics)
 {
@@ -16,75 +25,46 @@ CSignRadical.prototype.draw = function(x, y, pGraphics)
     y += penW/2; // смещаем, для отрисовки верхней линии радикала
 
     var x1 = this.pos.x + x,
-        //x2 = x1 + 0.2*this.widthSlash;
-        x2 = x1 + 0.044*txtPrp.FontSize;
+        x2 = x1 + 0.048*txtPrp.FontSize;
 
-    var y2 = this.pos.y + y + this.size.height - this.sizeTick.height,
-        y1 = y2 + 0.11*this.widthSlash;
+    var y2 = this.pos.y + y + this.size.height - this.measure.heightTick,
+        y1 = y2 + 0.0242*txtPrp.FontSize;
 
-
-    var tX = 1.7*penW * 0.5 * 25.4/96,
-        tY = (-1)*tX * 11/25 *0.5; // 11/25 - тангенс угла наклона
-
-    var tg =  0.2/0.11;
+    var tg =  0.048/0.0242;
     var tX = tg*0.85*penW,
         tY = 0.92*penW / tg;
 
     var x3 = x2,
         y3 = y2 - tY;
 
-    /*var minHeight = plH * 1.1304931640625,
-     maxHeight = plH * 7.029296875;
-
-     var maxWidth = plH * 0.81171875;
-
-     var k = 0.2*maxWidth/(maxHeight - minHeight),
-     b = maxWidth*0.3 - k*minHeight;*/
-
-    var plH = 9.877777777777776 * txtPrp.FontSize /36;
-
-    // widthSlash = plH * 0.81171875;
-    // 1.393 * widthSlash
-
-    /*var k = 0.00343247*this.widthSlash,
-        b = 0.3*this.widthSlash - 1.130493*plH*k;*/
-
-    /*var k = 0.00343247*this.widthSlash,
-        b = 0.3*this.widthSlash - 1.393*this.widthSlash*k;*/
-
-
-    /*if(this.size.height < plH*7.029296875)
-        x4 = x3 + k*this.size.height + b;
-    else
-        x4 = x1 + this.widthSlash;*/
-
-    var x4, y4,
-        x5, y5;
-
-    y4 = this.pos.y + y + this.size.height - penW;
+    //var plH = 9.877777777777776 * txtPrp.FontSize /36;
 
     var sin = 0.876,
         cos = 0.474;
 
-    y5 = y4 + penW/2*cos;
+    var y4 = this.pos.y + y + this.size.height - penW;
+    var y5 = y4 + penW/2*cos;
 
-    if(this.size.height < plH*7.029296875)
+    // 0.048*txtPrp.FontSize + (- penW + this.measure.heightTick  + 0.92*penW / tg )/ tg
+
+    var x4, x5;
+
+    if( !this.measure.bHigh )
     {
         x4 = x3 + (y4-y3)/tg;
+        x5 = x4 + penW/2*sin;
     }
     else
     {
-        x4 = x1 + this.widthSlash - penW/3*sin;
+        x4 = x1 + this.measure.widthSlash - penW/3*sin;
+        x5 = x1 + this.measure.widthSlash;
     }
 
-    x5 = x4 + penW/2*sin;
-
-    var x6 = x1 + this.widthSlash,
+    var x6 = x1 + this.measure.widthSlash,
         x7 = this.pos.x + x + this.size.width;
 
     var y6 = this.pos.y + y,
         y7 = this.pos.y + y;
-
 
 
     pGraphics.p_width(penW*0.8*1000);
@@ -121,10 +101,101 @@ CSignRadical.prototype.draw = function(x, y, pGraphics)
     pGraphics.b_color1(0,0,0, 255);
 
     pGraphics._s();
-    pGraphics._m(x4 - penW*0.6*sin, y4 - penW/6);
-    pGraphics._l(x5 + penW/3*sin, y4 - penW/6);
+    pGraphics._m(x4 - penW*0.6*sin, y4 - penW/4);
+    pGraphics._l(x5 + penW/3*sin, y4 - penW/4);
     pGraphics.ds();
 
+}
+CSignRadical.prototype.recalculateSize = function()
+{
+    var txtPrp = this.Parent.getCtrPrp();
+    var sizeArg = this.Parent.getBase().size;
+
+    var height, width;
+
+    var top = txtPrp.FontSize*g_dKoef_pt_to_mm*0.15,
+        heightArg = sizeArg.height + top,
+        widthArg  = sizeArg.width;
+
+    /////  height  //////
+    var plH = 9.877777777777776 * txtPrp.FontSize /36;
+    var H0 = plH*1.2,
+        H1 = plH*1.50732421875,
+        H2 = plH*2.760986328125,
+        H3 = plH*4.217578125,
+        H4 = plH*5.52197265625,
+        H5 = plH*7.029296875;
+
+    this.measure.bHigh = false;
+
+    if( heightArg < H0 )
+        height = H1*0.85;
+    else if( heightArg < H1 )
+        height = H1;
+    else if( heightArg < H2 )
+        height = H2;
+    else if( heightArg < H3 )
+        height = H3;
+    else if( heightArg < H4 )
+        height = H4;
+    else if( heightArg < H5 )
+        height = H5;
+    else
+    {
+        height = heightArg;
+        this.measure.bHigh = true;
+    }
+
+    //////
+
+    ///// Size of tick //////
+    var minHgtRad = plH * 1.130493164,
+        maxHgtRad = plH * 7.029296875;
+
+    var minHgtTick = plH*0.6,
+        maxHgtTick = 1.2*plH;
+
+    var heightTick, widthSlash,
+        gap;
+
+    if ( heightArg > maxHgtRad )
+    {
+        heightTick = maxHgtTick;
+        widthSlash = plH * 0.67;
+
+        gap = 0.2*plH;
+    }
+    else
+    {
+        var H;
+
+        if(heightArg < H1)
+        {
+            H = H1;
+            widthSlash = plH * 0.75;
+        }
+        else
+        {
+            H = height;
+            widthSlash = plH * 0.8681086138556986;
+        }
+        var alpha =  (H - minHgtRad)/(2*maxHgtRad);
+        heightTick = minHgtTick*(1 + alpha);
+
+        gap = 0.12683105468750022* plH;
+    }
+
+
+    this.measure.widthSlash = widthSlash;
+
+    this.measure.heightTick = heightTick;
+    this.measure.widthTick = 0.1196002747872799*txtPrp.FontSize;
+
+    ////// width //////
+    width = widthSlash + gap + widthArg;
+    //////
+
+    this.size = {height: height, width: width};
 }
 CSignRadical.prototype.old_draw = function(x, y, pGraphics)
 {
@@ -243,7 +314,7 @@ CSignRadical.prototype.old_recalculateSize = function()
         maxHgtRad = plH * 7.029296875;
 
     var minHgtTick = plH*0.6,
-        //maxHgtTick = plH * 1.50732422;
+    //maxHgtTick = plH * 1.50732422;
         maxHgtTick = 0.9*plH;
 
     var heightTick, widthTick;
@@ -265,90 +336,6 @@ CSignRadical.prototype.old_recalculateSize = function()
     //var widthSlash = plH * 0.9385498046875003;
     var widthSlash = plH * 0.81171875;
     gap = 0.12683105468750022* plH;
-    width = widthSlash + gap + widthArg;
-    //////
-
-    this.sizeTick =
-    {
-        width : widthTick,
-        height : heightTick
-    };
-
-    this.widthSlash = widthSlash;
-
-    this.size = {height: height, width: width};
-}
-
-CSignRadical.prototype.recalculateSize = function()
-{
-    //var txtPrp = this.Parent.getTxtPrp();
-    var txtPrp = this.Parent.getCtrPrp();
-    var sizeArg = this.Parent.getBase().size;
-
-    var height, width;
-
-    var top = txtPrp.FontSize*g_dKoef_pt_to_mm*0.15,
-        heightArg = sizeArg.height + top,
-        widthArg = sizeArg.width;
-
-    ///// height //////
-    var plH = 9.877777777777776 * txtPrp.FontSize /36;
-    var H0 = plH,
-        H1 = plH*1.50732421875,
-        H2 = plH*2.760986328125,
-        H3 = plH*4.217578125,
-        H4 = plH*5.52197265625,
-        H5 = plH*7.029296875;
-
-    if(heightArg < H0)
-        height = H1*0.75;
-    else if( heightArg < H1 )
-        height = H1;
-    else if( heightArg < H2 )
-        height = H2;
-    else if( heightArg < H3 )
-        height = H3;
-    else if( heightArg < H4 )
-        height = H4;
-    else if(heightArg < H5)
-        height = H5;
-    else
-        height = heightArg;
-
-    //////
-
-    ///// height tick //////
-    var minHgtRad = plH * 1.130493164,
-        maxHgtRad = plH * 7.029296875;
-
-    var minHgtTick = plH*0.6,
-        maxHgtTick = 1.25*plH;
-
-    var heightTick, widthTick,
-        gap, widthSlash;
-
-    if ( heightArg > maxHgtRad )
-    {
-        heightTick = maxHgtTick;
-        widthTick = 0.1196002747872799*txtPrp.FontSize;
-
-        widthSlash = plH * 0.7;
-        gap = 0.12683105468750022* plH;
-    }
-    else
-    {
-        var alpha = (heightArg - minHgtRad)/maxHgtRad;
-        heightTick = minHgtTick*(1 + alpha);
-
-        widthSlash = plH * 0.81171875;
-        gap = 0.12683105468750022* plH;
-
-        widthTick = 0.1196002747872799*txtPrp.FontSize;
-    }
-
-    ////// width //////
-    //var widthSlash = plH * 0.9385498046875003;
-
     width = widthSlash + gap + widthArg;
     //////
 
@@ -447,8 +434,8 @@ CRadical.prototype.recalculateSize = function()
         var degr = this.elements[0][0].size,
             base = this.elements[0][1].size;
 
-        var wTick = this.signRadical.sizeTick.width,
-            hTick = this.signRadical.sizeTick.height;
+        var wTick = this.signRadical.measure.widthTick,
+            hTick = this.signRadical.measure.heightTick;
 
         var wDegree = degr.width > wTick ? degr.width - wTick : 0;
         var width = wDegree + sign.width;
@@ -505,8 +492,8 @@ CRadical.prototype.setPosition = function(pos)
             base = this.elements[0][1].size,
             sign = this.signRadical.size;
 
-        var wTick = this.signRadical.sizeTick.width,
-            hTick = this.signRadical.sizeTick.height;
+        var wTick = this.signRadical.measure.widthTick,
+            hTick = this.signRadical.measure.heightTick;
 
         var hDg = degr.height + this.gap + hTick;
         this.topDegr = this.size.height - hDg;

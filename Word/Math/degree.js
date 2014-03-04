@@ -837,9 +837,7 @@ CDegreeSubSup.prototype._recalculateSize = function(oMeasure)
     }
 
 
-
-
-   /* if(lUp  > upDesc)
+    /*if(lUp  > upDesc)
     {
         up = lUp - upDesc;
         this.gapBase = iterUp.height - upDesc;
@@ -854,14 +852,12 @@ CDegreeSubSup.prototype._recalculateSize = function(oMeasure)
         down = lDown - downAsc;*/
 
 
-
     /*if( up + down < minGap)
         iters.dH = minGap;
     else
         iters.dH = up + down;*/
 
     iters.recalculateSize();
-
 
     /*var smallAsc = mgCtrPrp.FontSize*0.23;
 
