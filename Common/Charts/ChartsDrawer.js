@@ -6137,6 +6137,11 @@ drawBar3DChart.prototype =
 	
 	_reCalculateBars: function (/*isSkip*/)
     {
+		  //соответствует подписям оси категорий(OX)
+		var xPoints = this.cShapeDrawer.chart.plotArea.catAx.xPoints;
+		//соответствует подписям оси значений(OY)
+		var yPoints = this.cShapeDrawer.chart.plotArea.valAx.yPoints;
+		
 		var widthGraph    = this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right;
 		
 		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 100 : 0;
@@ -6164,6 +6169,7 @@ drawBar3DChart.prototype =
 		var x1, y1, z1, x1, y2, z2, x2, y3, z3, x3, x4, y4, z4, x5, y5, z5, x6, y6, z6, x7, y7, z7, x8, y8, z8;
 		var point1, point2, point3, point4, point5, point6, point7, point8;
 		var perspectiveVal = 50;
+		var startXPosition, startYColumnPosition;
 		
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 
@@ -6172,66 +6178,23 @@ drawBar3DChart.prototype =
 			seriesHeight[i] = [];
 			for (var j = 0; j < seria.length; ++j) {
 				
-				individualBarWidth = (width - (2 * hmargin)) / this.chartProp.series.length;
-				if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
-					individualBarWidth = width - (2 * hmargin);
-					
+				//стартовая позиция колонки Y(+ высота с учётом поправок на накопительные диаграммы)
 				val = parseFloat(seria[j].val);
-				if(this.chartProp.scale[0] > 0 && this.chartProp.scale[this.chartProp.scale.length - 1] > 0)
-				{
-					if(val > 0)
-						height = ((val - this.chartProp.scale[0]) / (this.chartProp.max - this.chartProp.min)) * this.chartProp.trueHeight;
-					else
-						height = ((val + this.chartProp.scale[0]) / (this.chartProp.max - this.chartProp.min)) * this.chartProp.trueHeight;
-				}
-				else
-					height = (val / (this.chartProp.max - this.chartProp.min)) * this.chartProp.trueHeight;
+				startYColumnPosition = this._getStartYColumnPosition(seriesHeight, j, val, yPoints);
+				startY = startYColumnPosition.startY;
+				height = startYColumnPosition.height;
+
+				seriesHeight[i][j] = height;
 				
-				//обработка для диаграмм с накоплениями
-				if(this.chartProp.subType == "stacked")
-				{
-					startX = (j * width) + this.chartProp.chartGutter._left + hmargin;
-					diffYVal = 0;
-					for(var k = 0; k < seriesHeight.length; k++)
-					{
-						if(seriesHeight[k][j] && ((val > 0 && seriesHeight[k][j] > 0) || (val < 0 && seriesHeight[k][j] < 0)))
-							diffYVal += seriesHeight[k][j];
-					}
-					startY = this.chartProp.nullPositionOX - diffYVal;
-					seriesHeight[i][j] = height;
-				}
-				else if(this.chartProp.subType == "stackedPer")
-				{
-					startX = (j * width) + this.chartProp.chartGutter._left + hmargin;
-					diffYVal = 0;
-					for(var k = 0; k < seriesHeight.length; k++)
-					{
-						if(seriesHeight[k][j] && ((val > 0 && seriesHeight[k][j] > 0) || (val < 0 && seriesHeight[k][j] < 0)))
-							diffYVal += seriesHeight[k][j];
-					}
-					
-					var tempVal;
-					var temp = 0;
-					if(!summBarVal[j])
-					{
-						for(var k = 0; k < this.chartProp.series.length; k++)
-						{
-							tempVal = parseFloat(this.chartProp.series[k].val.numRef.numCache.pts[j].val);
-							if(tempVal)
-								temp += Math.abs(tempVal);
-						}
-						summBarVal[j] = temp;
-					}
-					
-					height = ((val*100/summBarVal[j]) / (this.chartProp.max - this.chartProp.min)) * this.chartProp.trueHeight;
-					startY = this.chartProp.nullPositionOX - diffYVal;
-					seriesHeight[i][j] = height;
-				}
+				//стартовая позиция колонки X
+				if(j != 0)
+					startXPosition = xPoints[j].pos - (xPoints[j].pos - xPoints[j - 1].pos) / 2;
 				else
-				{
-					startX = (j * width) + this.chartProp.chartGutter._left + hmargin + (i * individualBarWidth);
-					startY = this.chartProp.nullPositionOX;
-				}
+					startXPosition = this.cShapeDrawer.chart.plotArea.valAx.posX;
+				if(i == 0)
+					startX = startXPosition * this.chartProp.pxToMM + hmargin + i * (individualBarWidth);
+				else
+					startX = startXPosition * this.chartProp.pxToMM + hmargin + (i * individualBarWidth - i * widthOverLap);
 
 				if(height != 0)
 				{
@@ -6377,12 +6340,95 @@ drawBar3DChart.prototype =
 		path.recalculate(gdLst);
 		paths[5] = path;
 		
-		
-		
-		
-		
 		return paths;
 	}, 
+	
+	_getYPosition: function(val, yPoints)
+	{
+		//позиция в заисимости от положения точек на оси OY
+		var result;
+		var resPos;
+		var resVal;
+		var diffVal;
+		if(val < yPoints[0].val)
+		{
+			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
+			resVal = yPoints[1].val - yPoints[0].val;
+			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
+			result = yPoints[0].pos - (diffVal / resVal) * resPos;
+		}
+		else if(val > yPoints[yPoints.length - 1].val)
+		{	
+			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
+			resVal = yPoints[1].val - yPoints[0].val;
+			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
+			result = yPoints[0].pos + (diffVal / resVal) * resPos;
+		}
+		else
+		{
+			for(var s = 0; s < yPoints.length; s++)
+			{
+				if(val >= yPoints[s].val && val <= yPoints[s + 1].val)
+				{
+					resPos = Math.abs(yPoints[s + 1].pos - yPoints[s].pos);
+					resVal = yPoints[s + 1].val - yPoints[s].val;
+					result =  - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+					break;
+				}
+			}
+		}
+		
+		return result;
+	},
+	
+	_getStartYColumnPosition: function (seriesHeight, j, val, yPoints, summBarVal)
+	{
+		var startY, diffYVal, height;
+		var nullPositionOX = this.chartProp.nullPositionOX/*this.cShapeDrawer.chart.plotArea.catAx.posY * this.chartProp.pxToMM*/;
+		if(this.chartProp.subType == "stacked")
+		{
+			diffYVal = 0;
+			for(var k = 0; k < seriesHeight.length; k++)
+			{
+				if(seriesHeight[k][j] && ((val > 0 && seriesHeight[k][j] > 0) || (val < 0 && seriesHeight[k][j] < 0)))
+					diffYVal += seriesHeight[k][j];
+			}
+			startY = nullPositionOX - diffYVal;
+			height = nullPositionOX - this._getYPosition(val, yPoints) * this.chartProp.pxToMM;
+		}
+		else if(this.chartProp.subType == "stackedPer")
+		{
+			diffYVal = 0;
+			for(var k = 0; k < seriesHeight.length; k++)
+			{
+				if(seriesHeight[k][j] && ((val > 0 && seriesHeight[k][j] > 0) || (val < 0 && seriesHeight[k][j] < 0)))
+					diffYVal += seriesHeight[k][j];
+			}
+			
+			var tempVal;
+			var temp = 0;
+			if(!this.summBarVal[j])
+			{
+				for(var k = 0; k < this.chartProp.series.length; k++)
+				{
+					tempVal = parseFloat(this.chartProp.series[k].val.numRef.numCache.pts[j].val);
+					if(tempVal)
+						temp += Math.abs(tempVal);
+				}
+				this.summBarVal[j] = temp;
+			}
+			
+			height = nullPositionOX - this._getYPosition((val / this.summBarVal[j]), yPoints) * this.chartProp.pxToMM;
+			startY = nullPositionOX - diffYVal;
+		}
+		else
+		{
+			height = nullPositionOX - this._getYPosition(val, yPoints) * this.chartProp.pxToMM;
+			startY = nullPositionOX;
+		}	
+		
+		return {startY : startY, height: height};
+	},
 	
 	_calculateDLbl: function()
 	{
