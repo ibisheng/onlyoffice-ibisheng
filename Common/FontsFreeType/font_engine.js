@@ -3717,7 +3717,7 @@ function find_unicode_charmap(face)
     if (null == face || null == face.charmaps)
         return 38;
 
-    var count = face.charmaps.length;
+    var count = Math.min(face.charmaps.length, face.num_charmaps);
     if (0 == count)
         return 38;
 
