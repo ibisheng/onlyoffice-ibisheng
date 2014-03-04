@@ -2866,7 +2866,7 @@ Woorksheet.prototype._removeCell=function(nRow, nCol, cell){
 				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(nCol, nRow, nCol, nRow), new UndoRedoData_CellSimpleData(nRow, nCol, oUndoRedoData_CellData, null));
 			}
 			if(cell.formulaParsed)
-				this.wb.dependencyFormulas.deleteMasterNodes2( this.getId(), cell.getName() );
+				this.workbook.dependencyFormulas.deleteMasterNodes2( this.getId(), cell.getName() );
 
 			// addToArrRecalc(this.workbook, this.getId(), cell.getName());
             // if( this.workbook.dependencyFormulas.getNode(this.getId(),this.getName()) && !this.workbook.needRecalc[ getVertexId(this.getId(),cell.getName()) ] ){
