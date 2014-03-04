@@ -737,8 +737,8 @@ function asc_CCellCommentator(currentSheet) {
 				drawCells[cellId] = cellId;
 			}
 		}
-		if (_this.lastSelectedId)
-			_this.asc_selectComment(_this.lastSelectedId, false);
+		//if (_this.lastSelectedId)
+		//	_this.asc_selectComment(_this.lastSelectedId, false);
 	}
 
 	_this.getTextMetrics = function(text, units) {
