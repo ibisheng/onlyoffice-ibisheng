@@ -30779,6 +30779,7 @@ function TT_Driver()
             return null;
         }
 
+		FT_Error = 0;
         return face;
     }
 }
@@ -36745,6 +36746,7 @@ function CFF_Driver()
             return null;
         }
 
+		FT_Error = 0;
         return face;
     }
 }
@@ -40380,6 +40382,7 @@ function T1_Driver()
             return null;
         }
 
+		FT_Error = 0;
         return face;
     }
 }
