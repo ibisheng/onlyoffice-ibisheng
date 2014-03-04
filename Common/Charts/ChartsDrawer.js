@@ -150,7 +150,7 @@ CChartsDrawer.prototype =
 				break;
 			}
 		}
-		return {x: pos.x, y : pos.y};
+		return {x: pos ? pos.x : undefined, y : pos ? pos.y : undefined};
 	},
 	
 	_calculatePositionDlbl: function(chartSpace, ser, val)
@@ -1116,7 +1116,7 @@ CChartsDrawer.prototype =
 					leftDownPointY = catAx.yPoints[0].pos;
 			}
 			else
-				leftDownPointY = catAx.labels.x;
+				leftDownPointY = valAx.labels.y;
 
 			
 			leftDownPointX = valAx.xPoints[0].pos;
@@ -3384,11 +3384,14 @@ drawAreaChart.prototype =
 		var point = this.chartProp.series[ser].val.numRef.numCache.pts[val];
 		var path;
 		
-		if(val == this.chartProp.series[ser].val.numRef.numCache.pts.length - 1)
+		if(this.paths.series && this.paths.series[ser] && this.paths.series[ser][val - 1] && val == this.chartProp.series[ser].val.numRef.numCache.pts.length - 1)
 			path = this.paths.series[ser][val - 1].ArrPathCommand[1];
-		else
+		else if(this.paths.series && this.paths.series[ser] && this.paths.series[ser][val])
 			path = this.paths.series[ser][val].ArrPathCommand[0];
 			
+		if(!path)
+			return;
+		
 		var x = path.X;
 		var y = path.Y;
 		
@@ -5237,7 +5240,7 @@ catAxisChart.prototype =
 			{
 				var yPoints = this.chartSpace.chart.plotArea.catAx.yPoints;
 
-				var stepY = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[1].pos - this.chartProp.chartGutter._bottom / this.chartProp.pxToMM);
+				var stepY = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[0].pos - this.chartProp.chartGutter._bottom / this.chartProp.pxToMM);
 				var minorStep = stepY / this.chartProp.numhMinorlines;
 				
 				var posX = this.chartSpace.chart.plotArea.catAx.posX;
