@@ -1435,9 +1435,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					// Изменений не было
 					this.IsSendDocumentLoadCompleate = true;
 					this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-				} else {
-					// При открытии после принятия изменений мы должны сбросить пересчетные индексы
-					this.collaborativeEditing.sendChanges();
 				}
 			},
 
@@ -1679,6 +1676,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			_onUpdateAfterApplyChanges: function () {
 				if (!this.IsSendDocumentLoadCompleate) {
+					// При открытии после принятия изменений мы должны сбросить пересчетные индексы
+					this.collaborativeEditing.sendChanges();
 					this.IsSendDocumentLoadCompleate = true;
 					this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
 				}
