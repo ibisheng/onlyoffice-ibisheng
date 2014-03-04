@@ -474,6 +474,20 @@ Paragraph.prototype =
                     ParaContentPos.Data[0]++;
             }
 
+            // Обновляем позиции в SearchResults
+            for ( var Id in this.SearchResults )
+            {
+                var ContentPos = this.SearchResults[Id].StartPos;
+
+                if ( ContentPos.Data[0] >= Pos )
+                    ContentPos.Data[0]++;
+
+                ContentPos = this.SearchResults[Id].EndPos;
+
+                if ( ContentPos.Data[0] >= Pos )
+                    ContentPos.Data[0]++;
+            }
+
             Item.Set_Paragraph( this );
         }
     },
@@ -674,6 +688,20 @@ Paragraph.prototype =
 
                 if ( ParaContentPos.Data[0] > Pos )
                     ParaContentPos.Data[0]--;
+            }
+
+            // Обновляем позиции в SearchResults
+            for ( var Id in this.SearchResults )
+            {
+                var ContentPos = this.SearchResults[Id].StartPos;
+
+                if ( ContentPos.Data[0] > Pos )
+                    ContentPos.Data[0]--;
+
+                ContentPos = this.SearchResults[Id].EndPos;
+
+                if ( ContentPos.Data[0] > Pos )
+                    ContentPos.Data[0]--;
             }
 
             // Удаляем комментарий, если это необходимо
@@ -9987,6 +10015,53 @@ Paragraph.prototype =
 
         this.Content[ContentLen - 1].Get_EndPos( BehindEnd, ContentPos, Depth + 1 );
         return ContentPos;
+    },
+
+    Get_NextRunElements : function(RunElements)
+    {
+        var ContentPos = RunElements.ContentPos;
+        var CurPos     = ContentPos.Get(0);
+        var ContentLen = this.Content.length;
+
+        this.Content[CurPos].Get_NextRunElements( RunElements, true,  1 );
+
+        if ( RunElements.Count <= 0 )
+            return;
+
+        CurPos++;
+
+        while ( CurPos < ContentLen )
+        {
+            this.Content[CurPos].Get_NextRunElements( RunElements, false,  1 );
+
+            if ( RunElements.Count <= 0 )
+                break;
+
+            CurPos++;
+        }
+    },
+
+    Get_PrevRunElements : function(RunElements)
+    {
+        var ContentPos = RunElements.ContentPos;
+        var CurPos     = ContentPos.Get(0);
+
+        this.Content[CurPos].Get_PrevRunElements( RunElements, true,  1 );
+
+        if ( RunElements.Count <= 0 )
+            return;
+
+        CurPos--;
+
+        while ( CurPos >= 0 )
+        {
+            this.Content[CurPos].Get_PrevRunElements( RunElements, false,  1 );
+
+            if ( RunElements.Count <= 0 )
+                break;
+
+            CurPos--;
+        }
     },
 
     Cursor_MoveUp : function(Count, AddToSelect)
@@ -21336,7 +21411,6 @@ function CParagraphDrawStateHightlights()
     this.CurPos = new CParagraphContentPos();
 
     this.DrawColl = false;
-    this.DrawFind = false;
 
     this.High   = new CParaDrawingRangeLines();
     this.Coll   = new CParaDrawingRangeLines();
@@ -21345,6 +21419,8 @@ function CParagraphDrawStateHightlights()
 
     this.Comments     = new Array();
     this.CommentsFlag = comments_NoComment;
+
+    this.SearchCounter = 0;
 
     this.Paragraph = undefined;
     this.Graphics  = undefined;
@@ -21367,6 +21443,8 @@ CParagraphDrawStateHightlights.prototype =
         this.DrawFind = DrawFind;
 
         this.CurPos = new CParagraphContentPos();
+
+        this.SearchCounter = 0;
 
         if ( null !== PageEndInfo )
             this.Comments = PageEndInfo.Comments;
@@ -21691,3 +21769,10 @@ CParagraphLinesInfo.prototype =
         return true;
     }
 };
+
+function CParagraphRunElements(ContentPos, Count)
+{
+    this.ContentPos = ContentPos;
+    this.Elements   = new Array();
+    this.Count      = Count;
+}

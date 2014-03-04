@@ -948,6 +948,14 @@ ParaComment.prototype =
     Get_Layout : function(DrawingLayout, UseContentPos, ContentPos, Depth)
     {
     },
+
+    Get_NextRunElements : function(RunElements, UseContentPos, Depth)
+    {
+    },
+
+    Get_PrevRunElements : function(RunElements, UseContentPos, Depth)
+    {
+    },
 //-----------------------------------------------------------------------------------
 // Функции пересчета
 //-----------------------------------------------------------------------------------

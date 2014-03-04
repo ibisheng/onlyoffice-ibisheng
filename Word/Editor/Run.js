@@ -39,6 +39,7 @@ function ParaRun(Paragraph)
     this.CollaborativeMarks = new Array(); // Массив CParaRunCollaborativeMark
 
     this.NearPosArray = new Array();
+    this.SearchMarks  = new Array();
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -349,6 +350,18 @@ ParaRun.prototype =
                 ContentPos.Data[Depth]++;
         }
 
+        // Обновляем позиции в поиске
+        var SearchMarksCount = this.SearchMarks.length;
+        for ( var Index = 0; Index < SearchMarksCount; Index++ )
+        {
+            var Mark       = this.SearchMarks[Index];
+            var ContentPos = ( true === Mark.Start ? Mark.SearchResult.StartPos : Mark.SearchResult.EndPos );
+            var Depth      = Mark.Depth;
+
+            if ( ContentPos.Data[Depth] >= Pos )
+                ContentPos.Data[Depth]++;
+        }
+
         // Отмечаем, что надо перемерить элементы в данном ране
         this.RecalcInfo.Measure = true;
     },
@@ -433,6 +446,20 @@ ParaRun.prototype =
             var RunNearPos = this.NearPosArray[Index];
             var ContentPos = RunNearPos.NearPos.ContentPos;
             var Depth      = RunNearPos.Depth;
+
+            if ( ContentPos.Data[Depth] > Pos + Count )
+                ContentPos.Data[Depth] -= Count;
+            else if ( ContentPos.Data[Depth] > Pos )
+                ContentPos.Data[Depth] = Math.max( 0 , Pos );
+        }
+
+        // Обновляем позиции в поиске
+        var SearchMarksCount = this.SearchMarks.length;
+        for ( var Index = 0; Index < SearchMarksCount; Index++ )
+        {
+            var Mark       = this.SearchMarks[Index];
+            var ContentPos = ( true === Mark.Start ? Mark.SearchResult.StartPos : Mark.SearchResult.EndPos );
+            var Depth      = Mark.Depth;
 
             if ( ContentPos.Data[Depth] > Pos + Count )
                 ContentPos.Data[Depth] -= Count;
@@ -856,6 +883,48 @@ ParaRun.prototype =
 
             DrawingLayout.Layout = new CParagraphLayout( DrawingLayout.X, DrawingLayout.Y , Para.Get_StartPage_Absolute() + CurPage, DrawingLayout.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y );
             DrawingLayout.Limits = PageLimits;
+        }
+    },
+
+    Get_NextRunElements : function(RunElements, UseContentPos, Depth)
+    {
+        var StartPos   = ( true === UseContentPos ? RunElements.ContentPos.Get(Depth) : 0 );
+        var ContentLen = this.Content.length;
+
+        for ( var CurPos = StartPos; CurPos < ContentLen; CurPos++ )
+        {
+            var Item = this.Content[CurPos];
+            var ItemType = Item.Type;
+
+            if ( para_Text === ItemType || para_Space === ItemType || para_Tab === ItemType )
+            {
+                RunElements.Elements.push( Item );
+                RunElements.Count--;
+
+                if ( RunElements.Count <= 0 )
+                    return;
+            }
+        }
+    },
+
+    Get_PrevRunElements : function(RunElements, UseContentPos, Depth)
+    {
+        var StartPos   = ( true === UseContentPos ? RunElements.ContentPos.Get(Depth) - 1 : this.Content.length - 1 );
+        var ContentLen = this.Content.length;
+
+        for ( var CurPos = StartPos; CurPos >= 0; CurPos-- )
+        {
+            var Item = this.Content[CurPos];
+            var ItemType = Item.Type;
+
+            if ( para_Text === ItemType || para_Space === ItemType || para_Tab === ItemType )
+            {
+                RunElements.Elements.push( Item );
+                RunElements.Count--;
+
+                if ( RunElements.Count <= 0 )
+                    return;
+            }
         }
     },
 //-----------------------------------------------------------------------------------
@@ -2181,6 +2250,8 @@ ParaRun.prototype =
 
         var HighLight = this.Get_CompiledPr(false).HighLight;
 
+        var SearchMarksCount = this.SearchMarks.length;
+
         for ( var Pos = StartPos; Pos < EndPos; Pos++ )
         {
             var Item = this.Content[Pos];
@@ -2188,21 +2259,16 @@ ParaRun.prototype =
             // Определим попадание в поиск и совместное редактирование. Попадание в комментарий определять не надо,
             // т.к. класс CParaRun попадает или не попадает в комментарий целиком.
 
-            var bDrawSearch = false;
+            for ( var SPos = 0; SPos < SearchMarksCount; SPos++)
+            {
+                var Mark = this.SearchMarks[SPos];
+                var MarkPos = Mark.SearchResult.StartPos.Get(Mark.Depth);
 
-            // TODO: Переделать поиск
-//            if ( true === bDrawSearch )
-//            {
-//                for ( var SId in SearchResults )
-//                {
-//                    var SResult = SearchResults[SId];
-//                    if ( CurParaPos.Compare( SResult.StartPos ) >= 0 && CurParaPos.Compare( SResult.EndPos ) <= 0 )
-//                    {
-//                        bDrawSearch = true;
-//                        break;
-//                    }
-//                }
-//            }
+                if ( Pos === MarkPos && true === Mark.Start )
+                    PDSH.SearchCounter++;
+            }
+
+            var DrawSearch = ( PDSH.SearchCounter > 0 ? true : false );
 
             var nCollaborativeChanges = 0;
             if ( true === bDrawColl )
@@ -2234,7 +2300,7 @@ ParaRun.prototype =
                     else if ( highlight_None != HighLight )
                         aHigh.Add( Y0, Y1, X, X + Item.WidthVisible, 0, HighLight.r, HighLight.g, HighLight.b );
 
-                    if ( true === bDrawSearch )
+                    if ( true === DrawSearch )
                         aFind.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0  );
                     else if ( nCollaborativeChanges > 0 )
                         aColl.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0  );
@@ -2257,7 +2323,7 @@ ParaRun.prototype =
                         PDSH.Spaces--;
                     }
 
-                    if ( true === bDrawSearch )
+                    if ( true === DrawSearch )
                         aFind.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0  );
                     else if ( nCollaborativeChanges > 0 )
                         aColl.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0  );
@@ -2279,6 +2345,15 @@ ParaRun.prototype =
                     X += Item.WidthVisible;
                     break;
                 }
+            }
+
+            for ( var SPos = 0; SPos < SearchMarksCount; SPos++)
+            {
+                var Mark = this.SearchMarks[SPos];
+                var MarkPos = Mark.SearchResult.EndPos.Get(Mark.Depth);
+
+                if ( Pos + 1 === MarkPos && true !== Mark.Start )
+                    PDSH.SearchCounter--;
             }
         }
 

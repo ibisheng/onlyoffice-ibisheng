@@ -26,6 +26,7 @@ function ParaHyperlink()
     this.Range = this.Lines[0].Ranges[0];
 
     this.NearPosArray = new Array();
+    this.SearchMarks  = new Array();
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -211,6 +212,18 @@ ParaHyperlink.prototype =
             if ( ContentPos.Data[Depth] >= Pos )
                 ContentPos.Data[Depth]++;
         }
+
+        // Обновляем позиции в поиске
+        var SearchMarksCount = this.SearchMarks.length;
+        for ( var Index = 0; Index < SearchMarksCount; Index++ )
+        {
+            var Mark       = this.SearchMarks[Index];
+            var ContentPos = ( true === Mark.Start ? Mark.SearchResult.StartPos : Mark.SearchResult.EndPos );
+            var Depth      = Mark.Depth;
+
+            if ( ContentPos.Data[Depth] >= Pos )
+                ContentPos.Data[Depth]++;
+        }
     },
 
     Remove_FromContent : function(Pos, Count, UpdatePosition)
@@ -288,6 +301,20 @@ ParaHyperlink.prototype =
             var HyperNearPos = this.NearPosArray[Index];
             var ContentPos = HyperNearPos.NearPos.ContentPos;
             var Depth      = HyperNearPos.Depth;
+
+            if ( ContentPos.Data[Depth] > Pos + Count )
+                ContentPos.Data[Depth] -= Count;
+            else if ( ContentPos.Data[Depth] > Pos )
+                ContentPos.Data[Depth] = Math.max( 0 , Pos );
+        }
+
+        // Обновляем позиции в поиске
+        var SearchMarksCount = this.SearchMarks.length;
+        for ( var Index = 0; Index < SearchMarksCount; Index++ )
+        {
+            var Mark       = this.SearchMarks[Index];
+            var ContentPos = ( true === Mark.Start ? Mark.SearchResult.StartPos : Mark.SearchResult.EndPos );
+            var Depth      = Mark.Depth;
 
             if ( ContentPos.Data[Depth] > Pos + Count )
                 ContentPos.Data[Depth] -= Count;
@@ -568,6 +595,51 @@ ParaHyperlink.prototype =
 
             if ( null !== DrawingLayout.Layout )
                 return;
+        }
+    },
+
+    Get_NextRunElements : function(RunElements, UseContentPos, Depth)
+    {
+        var CurPos     = ( true === UseContentPos ? RunElements.ContentPos.Get(Depth) : 0 );
+        var ContentLen = this.Content.length;
+
+        this.Content[CurPos].Get_NextRunElements( RunElements, UseContentPos,  Depth + 1 );
+
+        if ( RunElements.Count <= 0 )
+            return;
+
+        CurPos++;
+
+        while ( CurPos < ContentLen )
+        {
+            this.Content[CurPos].Get_NextRunElements( RunElements, false,  Depth + 1 );
+
+            if ( RunElements.Count <= 0 )
+                break;
+
+            CurPos++;
+        }
+    },
+
+    Get_PrevRunElements : function(RunElements, UseContentPos, Depth)
+    {
+        var CurPos = ( true === UseContentPos ? RunElements.ContentPos.Get(Depth) : this.Content.length - 1 );
+
+        this.Content[CurPos].Get_PrevRunElements( RunElements, UseContentPos,  Depth + 1 );
+
+        if ( RunElements.Count <= 0 )
+            return;
+
+        CurPos--;
+
+        while ( CurPos >= 0 )
+        {
+            this.Content[CurPos].Get_PrevRunElements( RunElements, false,  Depth + 1 );
+
+            if ( RunElements.Count <= 0 )
+                break;
+
+            CurPos--;
         }
     },
 //-----------------------------------------------------------------------------------
