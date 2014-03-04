@@ -549,8 +549,10 @@ function FrozenPlace(ws, type) {
 function DrawingArea(ws) {
 
 	var _this = this;
-	_this.worksheet = ws;
+	var asc = window["Asc"];
+	var api = asc["editor"];
 	
+	_this.worksheet = ws;
 	_this.frozenPlaces = [];
 	
 	// Methods
@@ -617,6 +619,9 @@ function DrawingArea(ws) {
 		_this.worksheet.overlayCtx.clear();
 		_this.worksheet.overlayGraphicCtx.clear();
 		_this.worksheet._drawCollaborativeElements(false);
+		
+		if ( !_this.worksheet.objectRender.controller.selectedObjects.length && !api.isStartAddShape )
+			_this.worksheet._drawSelection();
 		
 		/*for ( var i = 0; i < _this.worksheet.objectRender.controller.selectedObjects.length; i++ ) {
 			if ( _this.worksheet.objectRender.controller.selectedObjects[i].isChart() ) {

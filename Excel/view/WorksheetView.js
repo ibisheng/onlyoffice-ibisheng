@@ -6143,12 +6143,11 @@
 			}
 
 			if (isCoord) {
-				isChangeSelectionShape = this._checkSelectionShape();
-
 				// move active range to coordinates x,y
 				this._moveActiveCellToXY(x, y);
-
-			} else {
+				isChangeSelectionShape = this._checkSelectionShape();
+			}
+			else {
 				// move active range to offset x,y
 				this._moveActiveCellToOffset(x, y);
 				ret = this._calcActiveRangeOffset();
@@ -6168,7 +6167,9 @@
 				}
 			}
 
-			this._drawSelection();
+			if ( !isChangeSelectionShape )
+				this._drawSelection();
+			
 			//ToDo this.drawDepCells();
 
 			return ret;
