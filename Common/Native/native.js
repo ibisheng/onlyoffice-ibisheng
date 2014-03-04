@@ -229,9 +229,6 @@ function NativeOpenFile()
     {
         _api = new window["asc_docs_api"]("");       
         _api.asc_nativeOpenFile(doc_bin);
-        
-        if (_api.WordControl.m_oDrawingDocument.AfterLoad)
-            _api.WordControl.m_oDrawingDocument.AfterLoad();
     }
     else
     {
