@@ -203,21 +203,24 @@
 				if (!this.isCoAuthoringExcellEnable())
 					return;
 
+				// Когда не совместное редактирование чистить ничего не нужно, но отправлять нужно.
+				var bIsCollaborative = this.getCollaborativeEditing();
+
 				var bCheckRedraw = false;
 				var bRedrawGraphicObjects = false;
-				if (0 < this.m_arrNeedUnlock.length ||
-					0 < this.m_arrNeedUnlock2.length) {
+				if (bIsCollaborative && (0 < this.m_arrNeedUnlock.length ||
+					0 < this.m_arrNeedUnlock2.length)) {
 					bCheckRedraw = true;
 					this.handlers.trigger("cleanSelection");
 				}
 
 				var oLock = null;
 				// Очищаем свои изменения
-				while (0 < this.m_arrNeedUnlock2.length) {
+				while (bIsCollaborative && 0 < this.m_arrNeedUnlock2.length) {
 					oLock = this.m_arrNeedUnlock2.shift();
 					oLock.setType(c_oAscLockTypes.kLockTypeNone, false);
-					if ( oLock.Element["type"] == c_oAscLockTypeElem.Object ) {
-						if ( this.handlers.trigger("tryResetLockedGraphicObject", oLock.Element["rangeOrObjectId"]) )
+					if (oLock.Element["type"] == c_oAscLockTypeElem.Object) {
+						if (this.handlers.trigger("tryResetLockedGraphicObject", oLock.Element["rangeOrObjectId"]))
 							bRedrawGraphicObjects = true;
 					}
 					this.handlers.trigger("releaseLocks", oLock.Element["guid"]);
@@ -225,11 +228,11 @@
 				// Очищаем примененные чужие изменения
 				var nIndex = 0;
 				var nCount = this.m_arrNeedUnlock.length;
-				for (; nIndex < nCount; ++nIndex) {
+				for (;bIsCollaborative && nIndex < nCount; ++nIndex) {
 					oLock = this.m_arrNeedUnlock[nIndex];
 					if (c_oAscLockTypes.kLockTypeOther2 === oLock.getType()) {
-						if ( oLock.Element["type"] == c_oAscLockTypeElem.Object ) {
-							if ( this.handlers.trigger("tryResetLockedGraphicObject", oLock.Element["rangeOrObjectId"]) )
+						if (oLock.Element["type"] == c_oAscLockTypeElem.Object) {
+							if (this.handlers.trigger("tryResetLockedGraphicObject", oLock.Element["rangeOrObjectId"]))
 								bRedrawGraphicObjects = true;
 						}
 						this.m_arrNeedUnlock.splice(nIndex, 1);
@@ -241,30 +244,32 @@
 				// Отправляем на сервер изменения
 				this.handlers.trigger("sendChanges", this.getRecalcIndexSave(this.m_oRecalcIndexColumns), this.getRecalcIndexSave(this.m_oRecalcIndexRows));
 
-				// Пересчитываем lock-и от чужих пользователей
-				this._recalcLockArrayOthers();
+				if (bIsCollaborative) {
+					// Пересчитываем lock-и от чужих пользователей
+					this._recalcLockArrayOthers();
 
-				// Очищаем свои изменения (удаляем массив добавленных строк/столбцов)
-				delete this.m_oInsertColumns;
-				delete this.m_oInsertRows;
-				this.m_oInsertColumns = {};
-				this.m_oInsertRows = {};
-				// Очищаем свои пересчетные индексы
-				this.clearRecalcIndex();
+					// Очищаем свои изменения (удаляем массив добавленных строк/столбцов)
+					delete this.m_oInsertColumns;
+					delete this.m_oInsertRows;
+					this.m_oInsertColumns = {};
+					this.m_oInsertRows = {};
+					// Очищаем свои пересчетные индексы
+					this.clearRecalcIndex();
 
-				// Чистим Undo/Redo
-				History.Clear();
+					// Чистим Undo/Redo
+					History.Clear();
 
-				// Перерисовываем
-				if (bCheckRedraw) {
-					this.handlers.trigger("drawSelection");
-					this.handlers.trigger("updateAllSheetsLock");
-					this.handlers.trigger("unlockComments");
-					this.handlers.trigger("showComments");
+					// Перерисовываем
+					if (bCheckRedraw) {
+						this.handlers.trigger("drawSelection");
+						this.handlers.trigger("updateAllSheetsLock");
+						this.handlers.trigger("unlockComments");
+						this.handlers.trigger("showComments");
+					}
+
+					if (bCheckRedraw || bRedrawGraphicObjects)
+						this.handlers.trigger("showDrawingObjects");
 				}
-				
-				if ( bCheckRedraw || bRedrawGraphicObjects )
-					this.handlers.trigger("showDrawingObjects");
 			},
 
 			getRecalcIndexSave: function (oRecalcIndex) {

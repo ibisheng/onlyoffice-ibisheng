@@ -1664,8 +1664,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			_onSaveChanges: function (recalcIndexColumns, recalcIndexRows) {
 				if (this.IsSendDocumentLoadCompleate) {
 					var arrChanges = this.wbModel.SerializeHistory();
-					arrChanges.push({"index" : recalcIndexColumns, "type" : "0"});
-					arrChanges.push({"index" : recalcIndexRows, "type" : "1"});
+					if (this.collaborativeEditing.getCollaborativeEditing()) {
+						// Пересчетные индексы добавляем только если мы не одни
+						arrChanges.push({"index" : recalcIndexColumns, "type" : "0"});
+						arrChanges.push({"index" : recalcIndexRows, "type" : "1"});
+					}
 					this.CoAuthoringApi.saveChanges(arrChanges);
 				}
 			},
@@ -1871,10 +1874,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					// Cбросим флаги модификации
 					History.Save();
 
-					// Пересылаем, только если началось совместное редактирование, чтобы не отключилось undo
+					// Пересылаем всегда, но чистим только если началось совместное редактирование
+					// Пересылаем свои изменения
+					this.collaborativeEditing.sendChanges();
 					if (this.collaborativeEditing.getCollaborativeEditing()) {
-						// Пересылаем свои изменения
-						this.collaborativeEditing.sendChanges();
 						// Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
 						this.wb._onWSSelectionChanged(/*info*/null);
 					}
@@ -3502,7 +3505,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			};
 
 			init(obj);
-		};
+		}
 		/*
 		 * Export
 		 * -----------------------------------------------------------------------------

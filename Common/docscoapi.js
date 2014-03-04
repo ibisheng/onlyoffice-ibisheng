@@ -407,7 +407,8 @@
 		}
 
 		this._send({"type": "savechanges", "changes": JSON.stringify(arrayChanges.slice(startIndex, endIndex)),
-			"endSaveChanges": (endIndex == arrayChanges.length), "isExcel": this._isExcel});
+			"startSaveChanges": (startIndex === 0), "endSaveChanges": (endIndex === arrayChanges.length),
+			"isCoAuthoring": this.isCoAuthoring, "isExcel": this._isExcel});
 	};
 
     DocsCoApi.prototype.getUsers = function () {
@@ -581,6 +582,8 @@
 			var allChanges = [];
 			for (var changeId in allServerChanges) {
 				var change = allServerChanges[changeId];
+				if (change["skipChange"])
+					continue;
 				var changesOneUser = change["changes"];
 				if (changesOneUser) {
 					changesOneUser = JSON.parse(changesOneUser);
@@ -645,8 +648,7 @@
 			if (isStartEvent) {
 				if (this.onAuthParticipantsChanged)
 					this.onAuthParticipantsChanged (this._participants);
-			}
-			else {
+			} else {
 				if (this.onParticipantsChanged)
 					this.onParticipantsChanged (this._participants, countEditUsers);
 			}
