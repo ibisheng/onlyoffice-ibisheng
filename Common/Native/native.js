@@ -416,4 +416,5 @@ window.native.Call_TurnOffRecalculate = function()
 window.native.Call_TurnOnRecalculate = function()
 {
     _api.WordControl.m_oLogicDocument.TurnOffRecalc = false;
+    _api.WordControl.m_oLogicDocument.Recalculate();
 };
