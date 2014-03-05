@@ -1722,7 +1722,8 @@ CDocument.prototype =
                 {
                     if (window["native"]["WC_CheckSuspendRecalculate"]())
                     {
-                        return;
+                        if ( _PageIndex > this.FullRecalc.StartPage + 2 )
+                            return;
                     }
                 }
 

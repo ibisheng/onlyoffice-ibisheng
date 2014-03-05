@@ -408,3 +408,12 @@ window.native.Call_CalculateResume = function()
 {
     Document_Recalculate_Page();
 };
+
+window.native.Call_TurnOffRecalculate = function()
+{
+    _api.WordControl.m_oLogicDocument.TurnOffRecalc = true;
+};
+window.native.Call_TurnOnRecalculate = function()
+{
+    _api.WordControl.m_oLogicDocument.TurnOffRecalc = false;
+};
