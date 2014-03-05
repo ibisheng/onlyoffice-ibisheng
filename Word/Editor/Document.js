@@ -1118,6 +1118,8 @@ CDocument.prototype =
         // Получаем данные об произошедших изменениях
         var RecalcData = ( undefined === _RecalcData ? History.Get_RecalcData() : _RecalcData );
 
+        History.Reset_RecalcIndex();
+
         // 1. Пересчитываем все автофигуры, которые нужно пересчитать. Изменения в них ни на что не влияют.
         for ( var GraphIndex = 0; GraphIndex < RecalcData.Flow.length; GraphIndex++ )
         {

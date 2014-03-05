@@ -10,6 +10,7 @@ function CHistory(Document)
 {
     this.Index      = -1;
     this.SavedIndex = -1;          // Номер точки отката, на которой произошло последнее сохранение
+    this.RecIndex   = -1;          // Номер точки, на которой произошел последний пересчет
     this.Points     = new Array(); // Точки истории, в каждой хранится массив с изменениями после текущей точки
     this.Document   = Document;
 
@@ -354,20 +355,30 @@ CHistory.prototype =
     {
         if ( this.Index >= 0 )
         {
-            // Считываем изменения, начиная с последней точки, и смотрим что надо пересчитать.
-            var Point = this.Points[this.Index];
+            var LastPoint = this.RecIndex;
 
             this.Internal_RecalcData_Clear();
 
-            // Выполняем все действия в прямом порядке
-            for ( var Index = 0; Index < Point.Items.length; Index++ )
+            for ( var Pos = this.RecIndex + 1; Pos <= this.Index; Pos++ )
             {
-                var Item = Point.Items[Index];
-                Item.Class.Refresh_RecalcData( Item.Data );
+                // Считываем изменения, начиная с последней точки, и смотрим что надо пересчитать.
+                var Point = this.Points[Pos];
+
+                // Выполняем все действия в прямом порядке
+                for ( var Index = 0; Index < Point.Items.length; Index++ )
+                {
+                    var Item = Point.Items[Index];
+                    Item.Class.Refresh_RecalcData( Item.Data );
+                }
             }
         }
 
         return this.RecalculateData;
+    },
+
+    Reset_RecalcIndex : function()
+    {
+        this.RecIndex = this.Index;
     },
 
     Is_SimpleChanges : function()
