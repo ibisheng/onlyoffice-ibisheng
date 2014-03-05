@@ -1095,11 +1095,7 @@
 				ws.resize(true);
 			else if (ws.updateZoom)
 				ws.changeZoom(true);
-
-			if (isResized)
-				ws.objectRender.resizeCanvas();
-
-			ws.objectRender.setScrollOffset();
+			
 			ws.draw();
 			this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
 			this._onWSSelectionChanged(ws.getSelectionInfo());

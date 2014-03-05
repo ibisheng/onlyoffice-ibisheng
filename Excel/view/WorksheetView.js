@@ -505,6 +505,9 @@
 				this._cleanCellsTextMetricsCache();
 				this._prepareCellTextMetricsCache(this.visibleRange);
 				this.updateResize = false;
+				
+				this.objectRender.resizeCanvas();
+				this.objectRender.setScrollOffset();
 			} else {
 				this.updateResize = true;
 			}
