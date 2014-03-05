@@ -1088,9 +1088,14 @@
 			this.wsActive = index;
 
 			ws = this.getWorksheet(index);
-			// Мы меняли zoom, но не перерисовывали данный лист (он был не активный)
-			if (ws.updateZoom)
+			// Мы делали resize или меняли zoom, но не перерисовывали данный лист (он был не активный)
+			if (ws.updateResize && ws.updateZoom)
+				ws.changeZoomResize();
+			else if (ws.updateResize)
+				ws.resize(true);
+			else if (ws.updateZoom)
 				ws.changeZoom(true);
+
 			if (isResized)
 				ws.objectRender.resizeCanvas();
 
@@ -1195,7 +1200,13 @@
 		/** @param event {jQuery.Event} */
 		WorkbookView.prototype.resize = function (event) {
 			if (this._canResize()) {
-				this.getWorksheet().resize();
+				var item;
+				var activeIndex = this.model.getActive();
+				for(var i in this.wsViews) if (this.wsViews.hasOwnProperty(i)) {
+					item = this.wsViews[i];
+					// Делаем resize (для не активных сменим как только сделаем его активным)
+					item.resize(/*isDraw*/i == activeIndex);
+				}
 				this.showWorksheet(undefined, true);
 
 			} else {
@@ -1225,16 +1236,14 @@
 
 			var item;
 			var activeIndex = this.model.getActive();
-			for(var i in this.wsViews) {
-				if (this.wsViews.hasOwnProperty(i)) {
-					item = this.wsViews[i];
-					// Меняем zoom (для не активных сменим как только сделаем его активным)
-					item.changeZoom(/*isDraw*/i == activeIndex);
-					item.objectRender.changeZoom(this.drawingCtx.scaleFactor);
-					if (i == activeIndex) {
-						item.draw();
-						//ToDo item.drawDepCells();
-					}
+			for(var i in this.wsViews) if (this.wsViews.hasOwnProperty(i)) {
+				item = this.wsViews[i];
+				// Меняем zoom (для не активных сменим как только сделаем его активным)
+				item.changeZoom(/*isDraw*/i == activeIndex);
+				item.objectRender.changeZoom(this.drawingCtx.scaleFactor);
+				if (i == activeIndex) {
+					item.draw();
+					//ToDo item.drawDepCells();
 				}
 			}
 

@@ -288,6 +288,8 @@
 
 			this.stringRender = stringRender;
 
+			// Флаг, сигнализирует о том, что мы сделали resize, но это не активный лист (поэтому как только будем показывать, нужно перерисовать и пересчитать кеш)
+			this.updateResize = false;
 			// Флаг, сигнализирует о том, что мы сменили zoom, но это не активный лист (поэтому как только будем показывать, нужно перерисовать и пересчитать кеш)
 			this.updateZoom = false;
 
@@ -496,11 +498,16 @@
 			return this._getRange(this.activeRange.c1, this.activeRange.r1, this.activeRange.c2, this.activeRange.r2);
 		};
 
-		WorksheetView.prototype.resize = function () {
-			this._initCellsArea(true);
-			this._normalizeViewRange();
-			this._cleanCellsTextMetricsCache();
-			this._prepareCellTextMetricsCache(this.visibleRange);
+		WorksheetView.prototype.resize = function (isUpdate) {
+			if (isUpdate) {
+				this._initCellsArea(true);
+				this._normalizeViewRange();
+				this._cleanCellsTextMetricsCache();
+				this._prepareCellTextMetricsCache(this.visibleRange);
+				this.updateResize = false;
+			} else {
+				this.updateResize = true;
+			}
 			return this;
 		};
 
@@ -524,6 +531,20 @@
 				this.updateZoom = true;
 			}
 			return this;
+		};
+		WorksheetView.prototype.changeZoomResize = function () {
+			this.cleanSelection();
+			this._initConstValues();
+			this._initCellsArea(true);
+			this._normalizeViewRange();
+			this._cleanCellsTextMetricsCache();
+			this._shiftVisibleRange();
+			this._prepareCellTextMetricsCache(this.visibleRange);
+			this._shiftVisibleRange();
+			this.cellCommentator.updateCommentPosition();
+
+			this.updateResize = false;
+			this.updateZoom = false;
 		};
 
 		WorksheetView.prototype.getCellTextMetrics = function (col, row) {
