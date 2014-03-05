@@ -465,7 +465,7 @@ function CCollaborativeChanges()
 
 function CCollaborativeEditing()
 {
-    this.m_bUse         = false; // началось ли совместное редактирование
+    this.m_bUse         = true; // началось ли совместное редактирование
 
     this.m_aUsers       = []; // Список текущих пользователей, редактирующих данный документ
     this.m_aChanges     = []; // Массив с изменениями других пользователей
