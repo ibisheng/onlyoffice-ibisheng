@@ -216,7 +216,8 @@ var c_oAscSelectionType = {
 	RangeChart		: 6,
 	RangeShape		: 7,
 	RangeShapeText	: 8,
-	RangeChartText	: 9
+	RangeChartText	: 9,
+	RangeFrozen		: 10
 };
 
 var c_oAscGraphicOption = {

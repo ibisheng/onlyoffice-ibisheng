@@ -75,6 +75,8 @@
 			this.isSelectionDialogMode = false;
 			// Режим формулы
 			this.isFormulaEditMode = false;
+			// Режим установки закреплённых областей
+			this.isFrozenAnchorMode = false;
 			
 			// Обработчик кликов для граф.объектов
 			this.clickCounter = new ClickCounter();
@@ -561,6 +563,21 @@
 					asc_applyFunction(callback);
 				},
 				event.ctrlKey);
+		};
+		
+		/** @param event {jQuery.Event} */
+		asc_CEventsController.prototype._moveFrozenAnchorHandle = function (event, targetInfo) {
+			var t = this;
+			var coord = t._getCoordinates(event);
+			t.handlers.trigger("moveFrozenAnchorHandle", coord.x, coord.y, targetInfo);
+		};
+		
+		/** @param event {jQuery.Event} */
+		asc_CEventsController.prototype._moveFrozenAnchorHandleDone = function (event, targetInfo) {
+			// Закрепляем область
+			var t = this;
+			var coord = t._getCoordinates(event);
+			t.handlers.trigger("moveFrozenAnchorHandleDone", coord.x, coord.y, targetInfo);
 		};
 
 		/** @param event {jQuery.Event} */
@@ -1242,6 +1259,12 @@
 						t._moveResizeRangeHandle(event, t.targetInfo);
 						return;
 					}
+					else if ( t.targetInfo && ((t.targetInfo.target === "frozenAnchorV") || (t.targetInfo.target === "frozenAnchorH")) ) {
+						// Режим установки закреплённых областей
+						this.isFrozenAnchorMode = true;
+						t._moveFrozenAnchorHandle(event, t.targetInfo);
+						return;
+					}
 				}
 			} else {
 				if (!t.isFormulaEditMode) {
@@ -1350,6 +1373,11 @@
 				this._moveResizeRangeHandleDone(event, this.targetInfo);
 				return true;
 			}
+			// Режим установки закреплённых областей
+			if (this.isFrozenAnchorMode) {
+				this.isFrozenAnchorMode = false;
+				this._moveFrozenAnchorHandleDone(event, this.targetInfo);
+			}
 
 			// Мы можем dblClick и не отработать, если вышли из области и отпустили кнопку мыши, нужно отработать
 			this.showCellEditorCursor();
@@ -1399,6 +1427,12 @@
 
 			if (t.isMoveResizeRange) {
 				t._moveResizeRangeHandle(event, t.targetInfo);
+				return true;
+			}
+			
+			// Режим установки закреплённых областей
+			if (t.isFrozenAnchorMode) {
+				t._moveFrozenAnchorHandle(event, this.targetInfo);
 				return true;
 			}
 

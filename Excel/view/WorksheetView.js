@@ -385,6 +385,7 @@
 			this.highlightedCol = -1;
 			this.highlightedRow = -1;
 			this.topLeftFrozenCell = null;	// Верхняя ячейка для закрепления диапазона
+			this.frozenAnchorWidth = 1;		// Ширина элемента управления закреплёнными областями
 			this.visibleRange = asc_Range(0, 0, 0, 0);
 			this.activeRange = new asc_ActiveRange(0, 0, 0, 0);
 			this.isChanged = false;
@@ -1867,6 +1868,7 @@
 			this._drawCellsBorders(/*drawingCtx*/undefined);
 			this._drawFrozenPane();
 			this._drawFrozenPaneLines();
+			this._drawFrozenAnchor();
 			this._fixSelectionOfMergedCells();
 			this._fixSelectionOfHiddenCells();
 			this._drawAutoF();
@@ -2990,7 +2992,7 @@
 				var ctx = canvas ? canvas : this.drawingCtx;
 				var row = this.topLeftFrozenCell.getRow0();
 				var col = this.topLeftFrozenCell.getCol0();
-				ctx.setLineWidth(1).setStrokeStyle(this.settings.frozenColor).beginPath();
+				ctx.setLineWidth(1).setStrokeStyle(/*this.settings.frozenColor*/this.settings.activeCellBorderColor).beginPath();
 				if (0 < row) {
 					ctx.lineHor(0, this.rows[row].top - this.height_1px, ctx.getWidth());
 				}
@@ -3000,6 +3002,138 @@
 				ctx.stroke();
 			}
 		};
+		
+		WorksheetView.prototype._drawFrozenAnchor = function(canvas) {
+			if (false === this.model.sheetViews[0].asc_getShowRowColHeaders())
+				return;
+			
+			// Ширина элемента управления закреплёнными областями
+			var _this = this;
+			var anchorWidth = _this.frozenAnchorWidth * asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
+			var frozenCell = this.topLeftFrozenCell ? this.topLeftFrozenCell : new CellAddress(0, 0, 0);
+			
+			function drawAnchor(x, y, w, h) {
+				_this.drawingCtx.beginPath()
+								.rect(_x, _y, w, h)
+								.setFillStyle(_this.settings.activeCellBorderColor)
+								.fill();
+			}
+
+			// vertical
+			var _x = this.getCellLeft(frozenCell.getCol0(), 1) - anchorWidth/2 - 0.5;
+			var _y = _this.headersTop;
+			var w = anchorWidth;
+			var h = _this.headersHeight;
+			drawAnchor(_x, _y, w, h);
+			
+			// horizontal
+			_x = _this.headersLeft
+			_y = this.getCellTop(frozenCell.getRow0(), 1) - anchorWidth/2 - 0.5;
+			w = _this.headersWidth;
+			h = anchorWidth;
+			drawAnchor(_x, _y, w, h);
+		};
+		
+		WorksheetView.prototype._isFrozenAnchor = function(x, y) {
+			
+			var result = { result: false, cursor: "move", name: "" };
+			if (false === this.model.sheetViews[0].asc_getShowRowColHeaders())
+				return result;
+				
+			var _this = this;
+			var anchorWidth = _this.frozenAnchorWidth * asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
+			var frozenCell = this.topLeftFrozenCell ? this.topLeftFrozenCell : new CellAddress(0, 0, 0);
+			
+			x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
+			y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
+			
+			function isPointInAnchor(x, y, rectX, rectY, rectW, rectH) {
+				var delta = 2 * asc_getcvt(0/*px*/, 1/*pt*/, _this._getPPIX());
+				if ( (x >= rectX - delta) && (x <= rectX + rectW + delta) && (y >= rectY - delta) && (y <= rectY + rectH + delta) )
+					return true;
+				else
+					return false;
+			}
+			
+			// vertical
+			var _x = this.getCellLeft(frozenCell.getCol0(), 1) - anchorWidth/2 - 0.5;
+			var _y = _this.headersTop;
+			var w = anchorWidth;
+			var h = _this.headersHeight;
+			if ( isPointInAnchor(x, y, _x, _y, w, h) ) {
+				result.result = true;
+				result.name = "frozenAnchorV";
+			}
+			
+			// horizontal
+			_x = _this.headersLeft;
+			_y = this.getCellTop(frozenCell.getRow0(), 1) - anchorWidth/2 - 0.5;
+			w = _this.headersWidth;
+			h = anchorWidth;
+			if ( isPointInAnchor(x, y, _x, _y, w, h) ) {
+				result.result = true;
+				result.name = "frozenAnchorH";
+			}
+			
+			return result;
+		};
+		
+		WorksheetView.prototype._applyFrozenAnchor = function(x, y, targetInfo, bMove) {
+			if ( !targetInfo )
+				return;
+		
+			var _this = this;
+			var col = 0, row = 0;
+			var ctx = _this.overlayCtx;
+			if ( bMove )
+				ctx.clear();
+				
+			x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
+			y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
+			
+			switch (targetInfo.target) {
+				case "frozenAnchorV":
+					var _col = _this._findColUnderCursor(x, true);
+					if ( _col && (_col.col >= 0) ) {
+						col = _col.col;
+						if ( bMove ) {
+							ctx.setLineWidth(1).setStrokeStyle(_this.settings.activeCellBorderColor).beginPath();
+							ctx.lineVer(_this.cols[col].left - _this.width_1px, 0, ctx.getHeight());
+							ctx.stroke();
+						}
+						else {
+							if ( _this.topLeftFrozenCell )
+								_this.topLeftFrozenCell.col = col + 1;
+							else
+								_this.topLeftFrozenCell = new CellAddress(0, col, 0);
+						}
+					}
+					break;
+				case "frozenAnchorH":
+					var _row = _this._findRowUnderCursor(y, true);
+					if ( _row && (_row.row >= 0) ) {
+						row = _row.row;
+						if ( bMove ) {
+							ctx.setLineWidth(1).setStrokeStyle(_this.settings.activeCellBorderColor).beginPath();
+							ctx.lineHor(0, _this.rows[row].top - _this.height_1px, ctx.getWidth());
+							ctx.stroke();
+						}
+						else {
+							if ( _this.topLeftFrozenCell )
+								_this.topLeftFrozenCell.row = row + 1;
+							else
+								_this.topLeftFrozenCell = new CellAddress(row, 0, 0);
+						}
+					}
+					break;
+			}
+			if ( !bMove ) {
+				_this.visibleRange.r1 = _this.topLeftFrozenCell.getRow0();
+				_this.visibleRange.c1 = _this.topLeftFrozenCell.getCol0();
+				_this.objectRender.drawingArea.init();
+				_this.draw();
+			}
+		}
 
 		WorksheetView.prototype._drawSelectionElement = function (visibleRange, offsetX, offsetY, args) {
 			var range = args[0], isDashLine = args[1], lineWidth = args[2], strokeColor = args[3],
@@ -5276,6 +5410,11 @@
 			var c, r, f, i, offsetX, offsetY, arIntersection, left, top, right, bottom, cellCursor,
 				sheetId = this.model.getId(), userId, lockRangePosLeft, lockRangePosTop, lockInfo, oHyperlink,
 				widthDiff = 0, heightDiff = 0, isLocked = false, ar = this.activeRange;
+				
+			var frozenCursor = this._isFrozenAnchor(x, y);
+			if (frozenCursor.result) {
+				return {cursor: frozenCursor.cursor, target: frozenCursor.name, col: -1, row: -1};
+			}
 
 			if (this.isFormatPainter)
 				return {cursor: kCurFormatPainter, target: "cells"};

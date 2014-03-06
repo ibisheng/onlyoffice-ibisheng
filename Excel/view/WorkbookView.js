@@ -250,7 +250,11 @@
 				    "graphicObjectWindowKeyPress":	function () {return self._onGraphicObjectWindowKeyPress.apply(self, arguments);},
 				    "getGraphicsInfo":				function () {return self._onGetGraphicsInfo.apply(self, arguments);},
 				    "getSelectedGraphicObjects":	function () {return self._onGetSelectedGraphicObjects.apply(self, arguments);},
-				    "updateSelectionShape":			function () {return self._onUpdateSelectionShape.apply(self, arguments);}
+				    "updateSelectionShape":			function () {return self._onUpdateSelectionShape.apply(self, arguments);},
+					
+					// Frozen anchor
+					"moveFrozenAnchorHandle":			function () {self._onMoveFrozenAnchorHandle.apply(self, arguments);},
+					"moveFrozenAnchorHandleDone":		function () {self._onMoveFrozenAnchorHandleDone.apply(self, arguments);}
 			    });
 
 			    this.model.handlers.add("cleanCellCache", function (wsId, range, canChangeColWidth, bLockDraw) {
@@ -758,6 +762,20 @@
 		WorkbookView.prototype._onMoveResizeRangeHandleDone = function (target, callback) {
 			var ws = this.getWorksheet();
 			var d = ws.applyMoveResizeRangeHandle(target);
+		};
+		
+		// Frozen anchor
+		WorkbookView.prototype._onMoveFrozenAnchorHandle = function (x, y, targetInfo) {
+			var ws = this.getWorksheet();
+			if ( ws )
+				ws._applyFrozenAnchor(x, y, targetInfo, true);
+		};
+		
+		WorkbookView.prototype._onMoveFrozenAnchorHandleDone = function (x, y, targetInfo) {
+			// Закрепляем область
+			var ws = this.getWorksheet();
+			if ( ws )
+				ws._applyFrozenAnchor(x, y, targetInfo, false);
 		};
 
 		WorkbookView.prototype._onAutoFiltersClick = function (x, y) {

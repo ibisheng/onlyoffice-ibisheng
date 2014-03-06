@@ -2966,7 +2966,7 @@ function DrawingObjects() {
 		_this.drawingDocument.TargetHtmlElement = document.getElementById('id_target_cursor');
 		_this.drawingDocument.InitGuiCanvasShape(api.shapeElementId);
 				
-		_this.isViewerMode =  function() { return worksheet.handlers.trigger("getViewerMode"); };
+		_this.isViewerMode = function() { return worksheet.handlers.trigger("getViewerMode"); };
 
 		aObjects = [];
 		aImagesSync = [];

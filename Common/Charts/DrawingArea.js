@@ -557,6 +557,7 @@ function DrawingArea(ws) {
 	
 	// Methods
 	_this.init = function() {
+		_this.frozenPlaces = [];
 		if ( _this.worksheet ) {
 			if ( _this.worksheet.topLeftFrozenCell ) {
 				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.Top);
