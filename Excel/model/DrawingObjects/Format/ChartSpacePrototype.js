@@ -536,7 +536,7 @@ CChartSpace.prototype.hitToAdjustment = function()
 
 CChartSpace.prototype.getNeedColorCount = function()
 {
-    var b_vary_markers = this.chart.plotArea.chart instanceof CPieChart || (this.chart.plotArea.chart.varyColors && this.chart.plotArea.chart.series.length === 1);
+    var b_vary_markers = this.chart.plotArea.chart instanceof CDoughnutChart || this.chart.plotArea.chart instanceof CPieChart || (this.chart.plotArea.chart.varyColors && this.chart.plotArea.chart.series.length === 1);
     var need_colors;
     if(!b_vary_markers)
     {
@@ -777,7 +777,7 @@ CChartSpace.prototype.recalculateSeriesColors = function()
         var series = this.chart.plotArea.chart.series;
         var parents = this.getParentObjects();
         var RGBA = {R: 0, G: 0, B: 0, A: 255};
-        if(this.chart.plotArea.chart.varyColors && series.length === 1 || (this.chart.plotArea.chart instanceof CPieChart && this.chart.plotArea.chart.varyColors))
+        if(this.chart.plotArea.chart.varyColors && series.length === 1 || ((this.chart.plotArea.chart instanceof CPieChart || this.chart.plotArea.chart instanceof CDoughnutChart)  && this.chart.plotArea.chart.varyColors))
         {
             var pts;
             var ser = series[0];
