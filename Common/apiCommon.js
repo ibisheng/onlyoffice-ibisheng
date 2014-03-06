@@ -202,6 +202,7 @@
             this.horAx         = null;
             this.horGridLines  = null;
             this.vertGridLines = null;
+            this.type = null;
         }
         asc_ChartSettings.prototype =
         {
@@ -303,6 +304,16 @@
             getVertGridLines: function()
             {
                 return this.vertGridLines;
+            },
+
+            getType: function()
+            {
+                return this.type;
+            },
+
+            putType: function(v)
+            {
+                return this.type = v;
             }
         };
 
@@ -329,6 +340,8 @@
         prot["putHorGridLines"]        = prot.putHorGridLines;
         prot["getVertGridLines"]         = prot.getVertGridLines;
         prot["putVertGridLines"]        = prot.putVertGridLines;
+        prot["getType"]         = prot.getType;
+        prot["putType"]         = prot.putType;
 
         window["asc_ChartSettings"] = asc_ChartSettings;
         function asc_AxisSettings()

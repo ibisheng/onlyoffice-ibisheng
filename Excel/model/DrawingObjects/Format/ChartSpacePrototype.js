@@ -230,6 +230,8 @@ CChartSpace.prototype.recalculate = function()
 {
     ExecuteNoHistory(function()
     {
+        this.updateLinks();
+
         if(this.recalcInfo.recalculateTransform)
         {
             this.recalculateTransform();
@@ -303,17 +305,19 @@ CChartSpace.prototype.recalculate = function()
             this.recalculateUpDownBars();
             this.recalcInfo.recalculateUpDownBars = false;
         }
-        if(this.recalcInfo.recalculateAxisLabels)
-        {
-            this.recalculateAxisLabels();
-            this.recalcInfo.recalculateAxisLabels = false;
-        }
 
         if(this.recalcInfo.recalculateLegend)
         {
             this.recalculateLegend();
             //this.recalcInfo.recalculateLegend = false;
         }
+
+        if(this.recalcInfo.recalculateAxisLabels)
+        {
+            this.recalculateAxisLabels();
+            this.recalcInfo.recalculateAxisLabels = false;
+        }
+
 
 
         if(this.recalcInfo.recalculateAxisVal)
@@ -327,7 +331,6 @@ CChartSpace.prototype.recalculate = function()
             this.recalculateChart();
             this.recalcInfo.recalculateChart = false;
         }
-
 
         for(var i = 0; i < this.recalcInfo.dataLbls.length; ++i)
         {
@@ -362,6 +365,39 @@ CChartSpace.prototype.recalculate = function()
         this.recalcInfo.axisLabels.length = 0;
 
     }, this, []);
+};
+
+
+CChartSpace.prototype.updateLinks = function()
+{
+    //Этот метод нужен, т. к. мы не полностью поддерживаем формат в котором в одном plotArea может быть несколько разных диаграмм(конкретных типов).
+    // Здесь мы берем первую из диаграмм лежащих в массиве plotArea.charts, а также выставляем ссылки для осей ;
+    if(this.chart && this.chart.plotArea)
+    {
+        this.chart.plotArea.chart = this.chart.plotArea.charts[0];
+        if(this.chart.plotArea.chart.getAxisByTypes)
+        {
+            var axis_by_types = this.chart.plotArea.chart.getAxisByTypes();
+            if(axis_by_types.valAx.length === 1 && axis_by_types.catAx.length === 1)
+            {
+                this.chart.plotArea.valAx = axis_by_types.valAx[0];
+                this.chart.plotArea.catAx = axis_by_types.catAx[0];
+            }
+            else
+            {
+                if(axis_by_types.valAx.length > 1)
+                {
+                    this.chart.plotArea.valAx = axis_by_types.valAx[1];
+                    this.chart.plotArea.catAx = axis_by_types.valAx[0];
+                }
+            }
+        }
+        else
+        {
+            this.chart.plotArea.valAx = null;
+            this.chart.plotArea.catAx = null;
+        }
+    }
 };
 
 CChartSpace.prototype.recalculateAxisLabels = function()
@@ -554,6 +590,8 @@ CChartSpace.prototype.recalculateGridLines = function()
     {
         var calcMajorMinorGridLines = function (axis, defaultStyle, subtleLine, parents)
         {
+            if(!axis)
+                return;
             function calcGridLine(defaultStyle, spPr, subtleLine, parents)
             {
                 if(spPr)
@@ -1772,7 +1810,6 @@ CChartSpace.prototype.recalculateAxis = function()
         var plot_area = this.chart.plotArea;
         var chart_object = plot_area.chart;
         var i;
-
         var chart_type = chart_object.getObjectType();
         if(chart_type === historyitem_type_ScatterChart)
         {
@@ -1857,7 +1894,6 @@ CChartSpace.prototype.recalculateAxis = function()
                     y_ax.labels.arrLabels[i].tx.rich.content.Recalculate_Page(0, true);
                 }
                 y_ax.labels.extX = max_width*2;
-
                 //расчитаем подписи для горизонтальной оси
                 var arr_x_val = this.getXValAxisValues();
                 var num_fmt = x_ax.numFmt;
@@ -1880,8 +1916,6 @@ CChartSpace.prototype.recalculateAxis = function()
                         string_pts.push({val:calc_value + ""});
                     }
                 }
-
-
                 //расчитаем ширину интервала без учета горизонтальной оси;
                 var crosses = y_ax.crosses;
                 if(crosses === CROSSES_AUTO_ZERO)
@@ -1968,6 +2002,9 @@ CChartSpace.prototype.recalculateAxis = function()
                     }
                     x_ax.xPoints.push({val: arr_x_val[i], pos: x_ax.labels.x + point_width*i})
                 }
+
+                x_ax.xPoints.sort(function(a, b){return a.val - b.val});
+                y_ax.yPoints.sort(function(a, b){return a.val - b.val});
 
                 y_ax.posX = y_ax.labels.x + y_ax.labels.extX;
                 x_ax.posY = x_ax.labels.y;
@@ -2256,12 +2293,16 @@ CChartSpace.prototype.recalculateAxis = function()
                 }
                 val_ax.posX = val_ax.labels.x + val_ax.labels.extX;
                 cat_ax.posY = cat_ax.labels.y;
+
+
+                cat_ax.xPoints.sort(function(a, b){return a.val - b.val});
+                val_ax.yPoints.sort(function(a, b){return a.val - b.val});
             }
         }
         else if(chart_type === historyitem_type_BarChart && chart_object.barDir === BAR_DIR_BAR)
         {
             var cat_ax, val_ax;
-            var axis_by_types = plot_area.getAxisByTypes();
+            var axis_by_types = chart_object.getAxisByTypes();
             cat_ax = axis_by_types.catAx[0];
             val_ax = axis_by_types.valAx[0];
             if(cat_ax && val_ax)
@@ -2397,6 +2438,7 @@ CChartSpace.prototype.recalculateAxis = function()
                     cat_ax.labels.x = rect.x;
                     plot_area_width = ((rect.w - cat_ax.labels.extX)*(arr_val[arr_val.length-1]-arr_val[0]))/(arr_val[arr_val.length-1] - crosses);
                 }
+
                 val_ax.labels.x = rect.x + rect.w - plot_area_width;
 
                 //Получим строки для оси значений с учетом формата и единиц
@@ -2478,7 +2520,7 @@ CChartSpace.prototype.recalculateAxis = function()
                 }
                 else
                 {
-                    plot_area_height = ((rect.h - cat_ax.labels.extY)*(string_pts.length))/(string_pts.length - crosses);
+                    plot_area_height = ((rect.h - val_ax.labels.extY)*(string_pts.length))/(string_pts.length - crosses);
                     val_ax.labels.y =  rect.y + rect.h -  val_ax.labels.extY;
                 }
                 cat_ax.labels.extY = plot_area_height;
@@ -2488,9 +2530,9 @@ CChartSpace.prototype.recalculateAxis = function()
                 {
                     if(cat_ax.labels.arrLabels[i])
                     {
-                        cat_ax.labels.arrLabels[i].setPosition(cat_ax.labels.x, (cat_ax.labels.arrLabels.length- i - 0.5)*point_height - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
+                        cat_ax.labels.arrLabels[i].setPosition(cat_ax.labels.x, cat_ax.labels.y + (cat_ax.labels.arrLabels.length- i - 0.5)*point_height - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
                     }
-                    cat_ax.yPoints.push({val: i, pos: (cat_ax.labels.arrLabels.length- i - 0.5)*point_height});
+                    cat_ax.yPoints.push({val: i, pos: cat_ax.labels.y + (cat_ax.labels.arrLabels.length- i - 0.5)*point_height});
                 }
 
                 val_ax.labels.extX = plot_area_width;
@@ -2503,6 +2545,8 @@ CChartSpace.prototype.recalculateAxis = function()
                 }
                 val_ax.posY = val_ax.labels.y;
                 cat_ax.posX = cat_ax.labels.x + cat_ax.labels.extX;
+                val_ax.xPoints.sort(function(a, b){return a.val - b.val});
+                cat_ax.yPoints.sort(function(a, b){return a.val - b.val});
             }
         }
     }
@@ -2649,7 +2693,6 @@ CChartSpace.prototype.recalculateLegend = function()
                 union_marker.marker.lineMarker && union_marker.marker.lineMarker.pen && union_marker.marker.lineMarker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
             }
         }
-
         var marker_size;
         var distance_to_text;
         var line_marker_width;
@@ -2671,9 +2714,12 @@ CChartSpace.prototype.recalculateLegend = function()
                     }
                     calc_entry.calcMarkerUnion.lineMarker.penWidth = calc_entry.calcMarkerUnion.lineMarker.pen && isRealNumber(calc_entry.calcMarkerUnion.lineMarker.pen.w) ? calc_entry.calcMarkerUnion.lineMarker.pen.w/36000 : 0;
                 }
-                calc_entryes[i].calcMarkerUnion.marker.spPr.geometry.Recalculate(marker_size, marker_size);
-                calc_entryes[i].calcMarkerUnion.marker.extX = marker_size;
-                calc_entryes[i].calcMarkerUnion.marker.extY = marker_size;
+                if(calc_entryes[i].calcMarkerUnion.marker)
+                {
+                    calc_entryes[i].calcMarkerUnion.marker.spPr.geometry.Recalculate(marker_size, marker_size);
+                    calc_entryes[i].calcMarkerUnion.marker.extX = marker_size;
+                    calc_entryes[i].calcMarkerUnion.marker.extY = marker_size;
+                }
             }
             distance_to_text = marker_size;
         }
@@ -2769,8 +2815,11 @@ CChartSpace.prototype.recalculateLegend = function()
                     for(i = 0; i <  cut_index; ++i)
                     {
                         calc_entry = calc_entryes[i];
-                        calc_entry.calcMarkerUnion.marker.localX = distance_to_text + line_marker_width/2 - calc_entry.calcMarkerUnion.marker.extX/2;
-                        calc_entry.calcMarkerUnion.marker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2 - marker_size/2;
+                        if(calc_entry.calcMarkerUnion.marker)
+                        {
+                            calc_entry.calcMarkerUnion.marker.localX = distance_to_text + line_marker_width/2 - calc_entry.calcMarkerUnion.marker.extX/2;
+                            calc_entry.calcMarkerUnion.marker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2 - marker_size/2;
+                        }
                         calc_entry.calcMarkerUnion.lineMarker.localX = distance_to_text;
                         calc_entry.calcMarkerUnion.lineMarker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2;// - calc_entry.calcMarkerUnion.lineMarker.penWidth/2;
                         calc_entry.localX = calc_entry.calcMarkerUnion.lineMarker.localX + line_marker_width + distance_to_text;
@@ -2836,8 +2885,11 @@ CChartSpace.prototype.recalculateLegend = function()
                     for(i = 0; i <  cut_index; ++i)
                     {
                         calc_entry = calc_entryes[i];
-                        calc_entry.calcMarkerUnion.marker.localX = distance_to_text;
-                        calc_entry.calcMarkerUnion.marker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2 - marker_size/2;
+                        if(calc_entry.calcMarkerUnion.marker)
+                        {
+                            calc_entry.calcMarkerUnion.marker.localX = distance_to_text;
+                            calc_entry.calcMarkerUnion.marker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2 - marker_size/2;
+                        }
                         calc_entry.localX = 2*distance_to_text + marker_size;
                         calc_entry.localY = summ_h;
                         summ_h+=arr_heights[i];

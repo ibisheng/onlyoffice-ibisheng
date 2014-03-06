@@ -166,3 +166,27 @@ var c_oAscGridLinesSettings =
     minor: 2,
     majorMinor: 3
 };
+
+
+var c_oAscChartTypeSettings =
+{
+    barNormal           : 0,
+    barStacked          : 1,
+    barStackedPer       : 2,
+    lineNormal          : 3,
+    lineStacked         : 4,
+    lineStackedPer      : 5,
+    lineNormalMarker    : 6,
+    lineStackedMarker   : 7,
+    lineStackedPerMarker: 8,
+    pie                 : 9,
+    hBarNormal          : 10,
+    hBarStacked         : 11,
+    hBarStackedPer      : 12,
+    areaNormal          : 13,
+    areaStacked         : 14,
+    areaStackedPer      : 15,
+    scatter             : 16,
+    scatterLine         : 17,
+    scatterSmooth       : 18
+};

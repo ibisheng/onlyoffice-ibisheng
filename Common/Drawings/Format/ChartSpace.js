@@ -1964,7 +1964,7 @@ function CreateLineChart(asc_chart, type)
     chart.setShowDLblsOverMax(false);
     var plot_area = chart.plotArea;
     plot_area.setLayout(new CLayout());
-    plot_area.setChart(new CLineChart());
+    plot_area.addChart(new CLineChart());
     plot_area.addAxis(new CCatAx());
     plot_area.catAx.setTitle(new CTitle());
     plot_area.addAxis(new CValAx());
@@ -1973,7 +1973,7 @@ function CreateLineChart(asc_chart, type)
     title.setTxPr(new CTextBody());
     title.txPr.setBodyPr(new CBodyPr());
     title.txPr.bodyPr.setVert(nVertTTvert);
-    var line_chart = plot_area.chart;
+    var line_chart = plot_area.charts[0];
     line_chart.setGrouping(type);
     line_chart.setVaryColors(false);
     line_chart.setDLbls(new CDLbls());
@@ -2110,7 +2110,6 @@ function CreateLineChart(asc_chart, type)
 
 function CreateBarChart(asc_chart, type)
 {
-
     var asc_series = asc_chart.series;
     var chart_space = new CChartSpace();
     chart_space.setDate1904(false);
@@ -2127,10 +2126,10 @@ function CreateBarChart(asc_chart, type)
     chart.setShowDLblsOverMax(false);
     var plot_area = chart.plotArea;
     plot_area.setLayout(new CLayout());
-    plot_area.setChart(new CBarChart());
+    plot_area.addChart(new CBarChart());
     plot_area.addAxis(new CCatAx());
     plot_area.addAxis(new CValAx());
-    var bar_chart = plot_area.chart;
+    var bar_chart = plot_area.charts[0];
     bar_chart.setBarDir(BAR_DIR_COL);
     bar_chart.setGrouping(type);
     bar_chart.setVaryColors(false);
@@ -2279,10 +2278,10 @@ function CreateHBarChart(asc_chart, type)
     chart.setShowDLblsOverMax(false);
     var plot_area = chart.plotArea;
     plot_area.setLayout(new CLayout());
-    plot_area.setChart(new CBarChart());
+    plot_area.addChart(new CBarChart());
     plot_area.addAxis(new CCatAx());
     plot_area.addAxis(new CValAx());
-    var bar_chart = plot_area.chart;
+    var bar_chart = plot_area.charts[0];
     bar_chart.setBarDir(BAR_DIR_BAR);
     bar_chart.setGrouping(type);
     bar_chart.setVaryColors(false);
@@ -2375,7 +2374,7 @@ function CreateHBarChart(asc_chart, type)
     var val_ax = plot_area.valAx;
     val_ax.setScaling(new CScaling());
     val_ax.setDelete(false);
-    val_ax.setAxPos(AX_POS_L);
+    val_ax.setAxPos(AX_POS_B);
     val_ax.setMajorGridlines(new CSpPr());
     val_ax.setNumFmt(new CNumFmt());
     val_ax.setMajorTickMark(TICK_MARK_OUT);
@@ -2434,10 +2433,10 @@ function CreateAreaChart(asc_chart, type)
     chart.setShowDLblsOverMax(false);
     var plot_area = chart.plotArea;
     plot_area.setLayout(new CLayout());
-    plot_area.setChart(new CAreaChart());
+    plot_area.addChart(new CAreaChart());
     plot_area.addAxis(new CCatAx());
     plot_area.addAxis(new CValAx());
-    var area_chart = plot_area.chart;
+    var area_chart = plot_area.charts[0];
     area_chart.setGrouping(GROUPING_STANDARD);
     area_chart.setVaryColors(false);
     var parsedHeaders = asc_chart.parseSeriesHeaders();
@@ -2581,11 +2580,9 @@ function CreatePieChart(asc_chart, type)
     chart.setPlotArea(new CPlotArea());
     var plot_area = chart.plotArea;
     plot_area.setLayout(new CLayout());
-    plot_area.setChart(new CPieChart());
-    var pie_chart = plot_area.chart;
+    plot_area.addChart(new CPieChart());
+    var pie_chart = plot_area.charts[0];
     pie_chart.setVaryColors(true);
-    plot_area.addAxis(new CCatAx());
-    plot_area.addAxis(new CValAx());
     var parsedHeaders = asc_chart.parseSeriesHeaders();
     for(var i = 0; i < asc_series.length; ++i)
     {
@@ -2692,15 +2689,14 @@ function CreateScatterChart(asc_chart)
     chart.setPlotArea(new CPlotArea());
     var plot_area = chart.plotArea;
     plot_area.setLayout(new CLayout());
-    plot_area.setChart(new CScatterChart());
-    var scatter_chart = plot_area.chart;
+    plot_area.addChart(new CScatterChart());
+    var scatter_chart = plot_area.charts[0];
     scatter_chart.setScatterStyle(SCATTER_STYLE_LINE_MARKER);
     scatter_chart.setVaryColors(false);
     plot_area.addAxis(new CValAx());
     plot_area.addAxis(new CValAx());
-    plot_area.catAx = plot_area.axis[0];
-    plot_area.valAx = plot_area.axis[1];
-
+    plot_area.catAx = plot_area.axId[0];
+    plot_area.valAx = plot_area.axId[1];
     var first_series = asc_series.length > 1 ? asc_series[0] : null;
     var start_index = asc_series.length > 1 ? 1 : 0;
     var parsedHeaders = asc_chart.parseSeriesHeaders();
@@ -2857,10 +2853,10 @@ function CreateStockChart(asc_chart)
     chart.setShowDLblsOverMax(false);
     var plot_area = chart.plotArea;
     plot_area.setLayout(new CLayout());
-    plot_area.setChart(new CStockChart());
+    plot_area.addChart(new CStockChart());
     plot_area.addAxis(new CCatAx());
     plot_area.addAxis(new CValAx());
-    var line_chart = plot_area.chart;
+    var line_chart = plot_area.charts[0];
     line_chart.setDLbls(new CDLbls());
     line_chart.addAxId(plot_area.catAx);
     line_chart.addAxId(plot_area.valAx);
@@ -2988,4 +2984,80 @@ function CreateStockChart(asc_chart)
     page_margins.setHeader(0.3);
     page_margins.setFooter(0.3);
     return chart_space;
+}
+
+
+function CreateDefaultAxises(valFormatCode)
+{
+    var cat_ax = new CCatAx();
+    cat_ax.setScaling(new CScaling());
+    cat_ax.setDelete(false);
+    cat_ax.setAxPos(AX_POS_B);
+    cat_ax.setMajorTickMark(TICK_MARK_OUT);
+    cat_ax.setMinorTickMark(TICK_MARK_NONE);
+    cat_ax.setCrosses(CROSSES_AUTO_ZERO);
+    cat_ax.setAuto(true);
+    cat_ax.setLblAlgn(LBL_ALG_CTR);
+    cat_ax.setLblOffset(100);
+    cat_ax.setNoMultiLvlLbl(false);
+    var scaling = cat_ax.scaling;
+    scaling.setOrientation(ORIENTATION_MIN_MAX);
+    var val_ax = new CValAx();
+    val_ax.setScaling(new CScaling());
+    val_ax.setDelete(false);
+    val_ax.setAxPos(AX_POS_L);
+    val_ax.setMajorGridlines(new CSpPr());
+    val_ax.setNumFmt(new CNumFmt());
+    var num_fmt = val_ax.numFmt;
+    num_fmt.setFormatCode(valFormatCode);
+    num_fmt.setSourceLinked(true);
+    val_ax.setMajorTickMark(TICK_MARK_OUT);
+    val_ax.setMinorTickMark(TICK_MARK_NONE);
+    val_ax.setTickLblPos(TICK_LABEL_POSITION_NEXT_TO);
+    val_ax.setCrossAx(cat_ax);
+    val_ax.setCrosses(CROSSES_AUTO_ZERO);
+    val_ax.setCrossBetween(CROSS_BETWEEN_BETWEEN);
+    scaling = val_ax.scaling;
+    scaling.setOrientation(ORIENTATION_MIN_MAX);
+    cat_ax.setCrossAx(val_ax);
+    cat_ax.setTitle(new CTitle());
+    val_ax.setTitle(new CTitle());
+    var title = val_ax.title;
+    title.setTxPr(new CTextBody());
+    title.txPr.setBodyPr(new CBodyPr());
+    title.txPr.bodyPr.setVert(nVertTTvert);
+    return {valAx: val_ax, catAx: cat_ax};
+}
+
+function CreateScatterAxis()
+{
+    var cat_ax = new CValAx();
+    var val_ax = new CValAx();
+    cat_ax.setScaling(new CScaling());
+    cat_ax.setDelete(false);
+    cat_ax.setAxPos(AX_POS_B);
+    cat_ax.setMajorTickMark(TICK_MARK_OUT);
+    cat_ax.setMinorTickMark(TICK_MARK_NONE);
+    cat_ax.setTickLblPos(TICK_LABEL_POSITION_NEXT_TO);
+    cat_ax.setCrossAx(val_ax);
+    cat_ax.setCrosses(CROSSES_AUTO_ZERO);
+    cat_ax.scaling.setOrientation(ORIENTATION_MIN_MAX);
+    val_ax.setScaling(new CScaling());
+    val_ax.setDelete(false);
+    val_ax.setAxPos(AX_POS_L);
+    val_ax.setMajorGridlines(new CSpPr());
+    val_ax.setNumFmt(new CNumFmt());
+    val_ax.setMajorTickMark(TICK_MARK_OUT);
+    val_ax.setMinorTickMark(TICK_MARK_NONE);
+    val_ax.setTickLblPos(TICK_LABEL_POSITION_NEXT_TO);
+    val_ax.setCrossAx(val_ax);
+    val_ax.setCrosses(CROSSES_AUTO_ZERO);
+    val_ax.setCrossBetween(CROSS_BETWEEN_BETWEEN);
+    var scaling = val_ax.scaling;
+    scaling.setOrientation(ORIENTATION_MIN_MAX);
+    var num_fmt = val_ax.numFmt;
+    var format_code = "General";
+    num_fmt.setFormatCode(format_code);
+    num_fmt.setSourceLinked(true);
+    return {valAx: val_ax, catAx: cat_ax};
 }

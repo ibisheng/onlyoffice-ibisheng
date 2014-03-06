@@ -43,9 +43,6 @@ function isRealBool(b)
 }
 
 
-
-
-
 function writeLong(w, val)
 {
     w.WriteBool(isRealNumber(val));
@@ -3432,7 +3429,7 @@ CUniFill.prototype =
 
 	Set_FromObject: function(o)
 	{
-		//TODO
+		//TODO:
 	},
 	
     Undo: function(data)
@@ -8797,7 +8794,7 @@ CBgPr.prototype =
         return this.Id;
     },
 
-    getObjecType: function()
+    getObjectType: function()
     {
         return historyitem_type_BgPr;
     },

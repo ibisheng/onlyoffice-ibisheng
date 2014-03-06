@@ -2900,5 +2900,35 @@
         }
     );
 
+    $("#changeChartTypeSelect").change(function()
+    {
+        var val = $("#changeChartTypeSelect").attr("value");
+        var map =
+        {
+            "barNormal"           : c_oAscChartTypeSettings.barNormal           ,
+            "barStacked"          : c_oAscChartTypeSettings.barStacked          ,
+            "barStackedPer"       : c_oAscChartTypeSettings.barStackedPer       ,
+            "lineNormal"          : c_oAscChartTypeSettings.lineNormal          ,
+            "lineStacked"         : c_oAscChartTypeSettings.lineStacked         ,
+            "lineStackedPer"      : c_oAscChartTypeSettings.lineStackedPer      ,
+            "lineNormalMarker"    : c_oAscChartTypeSettings.lineNormalMarker    ,
+            "lineStackedMarker"   : c_oAscChartTypeSettings.lineStackedMarker   ,
+            "lineStackedPerMarker": c_oAscChartTypeSettings.lineStackedPerMarker,
+            "pie"                 : c_oAscChartTypeSettings.pie                 ,
+            "hBarNormal"          : c_oAscChartTypeSettings.hBarNormal          ,
+            "hBarStacked"         : c_oAscChartTypeSettings.hBarStacked         ,
+            "hBarStackedPer"      : c_oAscChartTypeSettings.hBarStackedPer      ,
+            "areaNormal"          : c_oAscChartTypeSettings.areaNormal          ,
+            "areaStacked"         : c_oAscChartTypeSettings.areaStacked         ,
+            "areaStackedPer"      : c_oAscChartTypeSettings.areaStackedPer      ,
+            "scatter"             : c_oAscChartTypeSettings.scatter
+        };
+
+        var settings = new asc_ChartSettings();
+        settings.putType(map[val]);
+        api.asc_editChartDrawingObject(settings);
+    });
+
+
 });
 

@@ -2298,7 +2298,32 @@ Format
     </div>
     <div id="rightPanelChartPropsDiv" class="right_panel_drawing_props">
         <div><p style="font-size: 14pt">Design</p></div>
-        <button id="chageChartTypeButton">Change Type</button>
+        <!--<button id="chageChartTypeButton">Change Type</button> -->
+        <select id="changeChartTypeSelect">
+            <option value="barNormal" style="background: #7F9DB9">Bar Normal</option>
+            <option value="barStacked">Bar Stacked</option>
+            <option value="barStackedPer">Bar Stacked Per</option>
+
+            <option value="lineNormal" style="background: #7F9DB9">Line Normal</option>
+            <option value="lineStacked">Line Stacked</option>
+            <option value="lineStackedPer">Line Stacked Per</option>
+            <option value="lineNormalMarker">Line Normal Marker</option>
+            <option value="lineStackedMarker">Line Stacked Marker</option>
+            <option value="lineStackedPerMarker">Line Stacked Per Marker</option>
+
+            <option value="pie" style="background: #7F9DB9">Pie</option>
+
+            <option value="hBarNormal" style="background: #7F9DB9">HBar Normal</option>
+            <option value="hBarStacked">HBar Stacked</option>
+            <option value="hBarStackedPer">HBar Stacked Per</option>
+
+            <option value="areaNormal" style="background: #7F9DB9">Area Normal</option>
+            <option value="areaStacked">Area Stacked</option>
+            <option value="areaStackedPer">Area Stacked Per</option>
+
+            <option value="scatter" style="background: #7F9DB9">Scatter</option>
+            <option value="scatter">Scatter Line</option>
+        </select>
         <button id="rowColsButton">Rows/Cols</button>
         <button id="selectDataButton">Select Data</button>
         <br>
@@ -2384,6 +2409,55 @@ Format
             <option value="minor_major">Major&Minor</option>
         </select>
     </div>
+</div>
+
+
+<div id="changeChartTypeDiv" style="background: #ece9d8; z-index:500; width: 619px; height: 515px; position: absolute; left:100px; top:100px; font-family: Tahoma; display: none">
+    <div id="leftPanelChartType" style="position:absolute;  left: 7px; top: 7px; height: 470px; width: 150px; background: #ffffff;border: 1px solid rgb(127,157,185)">
+        <div class="leftPanelCharPropsItemDiv" id="barTypeLeftPanel">
+            <p>Bar</p>
+        </div>
+        <div class="leftPanelCharPropsItemDiv" id="lineTypeLeftPanel">
+            <p>Line</p>
+        </div>
+        <div class="leftPanelCharPropsItemDiv" id="pieTypeLeftPanel">
+            <p>Pie</p>
+        </div>
+        <div class="leftPanelCharPropsItemDiv" id="hBarTypeLeftPanel">
+            <p>HBar</p>
+        </div>
+        <div class="leftPanelCharPropsItemDiv" id="areaTypeLeftPanel">
+            <p>Area</p>
+        </div>
+        <div class="leftPanelCharPropsItemDiv" id="scatterTypeLeftPanel">
+            <p>Scatter</p>
+        </div>
+        <div class="leftPanelCharPropsItemDiv" id="stockTypeLeftPanel">
+            <p>Stock</p>
+        </div>
+    </div>
+    <div class="right_panel_drawing_props" id="barTypeRightPanel" style="display: none">
+
+    </div>
+    <div class="right_panel_drawing_props" id="lineTypeRightPanel" style="display: none">
+        <p>Line</p>
+    </div>
+    <div class="right_panel_drawing_props" id="pieTypeRightPanel" style="display: none">
+        <p>Pie</p>
+    </div>
+    <div class="right_panel_drawing_props" id="hBarTypeRightPanel" style="display: none">
+        <p>HBar</p>
+    </div>
+    <div class="right_panel_drawing_props" id="areaTypeRightPanel" style="display: none">
+        <p>Area</p>
+    </div>
+    <div class="right_panel_drawing_props" id="scatterTypeRightPanel" style="display: none">
+        <p>Scatter</p>
+    </div>
+    <div class="right_panel_drawing_props" id="stockTypeRightPanel" style="display: none">
+        <p>Stock</p>
+    </div>
+
 </div>
 
 <div id="vertAxisMenuDiv" style="display: none;background: #ece9d8; z-index: 8000; width: 619px; height: 515px; position: absolute; left: 0px; top:0px">

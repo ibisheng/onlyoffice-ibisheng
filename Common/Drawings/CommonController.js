@@ -1288,15 +1288,13 @@ DrawingObjectsController.prototype =
             }
             //Row/Cols
             if(chartSettings.getRowCols() !== null)
-            {
                 chart_space.swapData();
-            }
             var plot_area = chart.plotArea;
             //horAxisLabel
             var hor_axis_label_setting = chartSettings.getHorAxisLabel();
             if(hor_axis_label_setting !== null)
             {
-                var hor_axis = plot_area.getHorizontalAxis();
+                var hor_axis = plot_area.getHorizontalAxis();   //TODO: запрашивать у chart_type
                 if(hor_axis)
                 {
                     switch (hor_axis_label_setting)
@@ -1323,7 +1321,7 @@ DrawingObjectsController.prototype =
             var vert_axis_labels_settings = chartSettings.getVertAxisLabel();
             if(vert_axis_labels_settings !== null)
             {
-                var vert_axis = plot_area.getVerticalAxis();
+                var vert_axis = plot_area.getVerticalAxis(); //TODO: запрашивать у chart_type
                 if(vert_axis)
                 {
                     switch (vert_axis_labels_settings)
@@ -1470,6 +1468,320 @@ DrawingObjectsController.prototype =
                 }
             }
             //Vert Axis
+            //TODO
+
+            //Hor Axis
+            //TODO
+            var i;
+            var type = chartSettings.getType();
+
+            var need_groupping, need_num_fmt, need_bar_dir;
+            var val_axis, new_chart_type, object_type, axis_obj ;
+            var axis_by_types;
+            object_type = chart_type.getObjectType();
+            switch(type)
+            {
+                case c_oAscChartTypeSettings.barNormal     :
+                case c_oAscChartTypeSettings.barStacked    :
+                case c_oAscChartTypeSettings.barStackedPer :
+                case c_oAscChartTypeSettings.hBarNormal    :
+                case c_oAscChartTypeSettings.hBarStacked   :
+                case c_oAscChartTypeSettings.hBarStackedPer:
+                {
+                    if(type === c_oAscChartTypeSettings.barNormal || type === c_oAscChartTypeSettings.hBarNormal)
+                        need_groupping = BAR_GROUPING_CLUSTERED;
+                    else if(type === c_oAscChartTypeSettings.barStacked || type === c_oAscChartTypeSettings.hBarStacked)
+                        need_groupping = BAR_GROUPING_STACKED;
+                    else
+                        need_groupping = BAR_GROUPING_PERCENT_STACKED;
+
+                    if(type === c_oAscChartTypeSettings.barNormal || type === c_oAscChartTypeSettings.barStacked
+                        || type === c_oAscChartTypeSettings.barNormal || type === c_oAscChartTypeSettings.barStacked
+                        || type === c_oAscChartTypeSettings.hBarNormal || type === c_oAscChartTypeSettings.hBarStacked
+                        || type === c_oAscChartTypeSettings.hBarNormal || type === c_oAscChartTypeSettings.hBarStacked)
+                        need_num_fmt = "General";
+                    else
+                        need_num_fmt = "0%";
+
+                    if(type === c_oAscChartTypeSettings.barNormal || type === c_oAscChartTypeSettings.barStacked || type === c_oAscChartTypeSettings.barStackedPer)
+                        need_bar_dir = BAR_DIR_COL;
+                    else
+                        need_bar_dir = BAR_DIR_BAR;
+
+                    if(chart_type.getObjectType() === historyitem_type_BarChart)
+                    {
+                        if(chart_type.grouping !== need_groupping)
+                            chart_type.setGrouping(need_groupping);
+
+                        axis_by_types = chart_type.getAxisByTypes();
+                        if(chart_type.barDir !== need_bar_dir)
+                        {
+                            val_axis = axis_by_types.valAx;
+                            if(need_bar_dir === BAR_DIR_BAR)
+                            {
+                                for(i = 0; i < val_axis.length; ++i)
+                                    val_axis[i].setAxPos(AX_POS_B);
+
+                                for(i = 0; i < axis_by_types.catAx.length; ++i)
+                                    axis_by_types.catAx[i].setAxPos(AX_POS_L);
+                            }
+                            chart_type.setBarDir(need_bar_dir);
+                        }
+
+                        val_axis = axis_by_types.valAx;
+                        for(i = 0; i < val_axis.length; ++i)
+                        {
+                            if(val_axis[i].numFmt.formatCode !== need_num_fmt)
+                                val_axis[i].numFmt.setFormatCode(need_num_fmt);
+                        }
+                    }
+                    else
+                    {
+                        new_chart_type = new CBarChart();
+                        new_chart_type.setGapWidth(150);
+                        plot_area.addChart(new_chart_type, 0);
+                        plot_area.removeCharts(1, plot_area.charts.length - 1);
+                        var series = chart_type.series;
+                        var new_ser, ser;
+                        switch (object_type)
+                        {
+                            case historyitem_type_PieChart:
+                            case historyitem_type_AreaChart:
+                            case historyitem_type_LineChart:
+                            {
+                                new_chart_type.setFromOtherChart(chart_type);
+                                if(object_type === historyitem_type_PieChart)
+                                {
+                                    axis_obj = CreateDefaultAxises(need_num_fmt);
+                                    plot_area.addAxis(axis_obj.valAx);
+                                    plot_area.addAxis(axis_obj.catAx);
+                                    new_chart_type.addAxId(axis_obj.valAx);
+                                    new_chart_type.addAxId(axis_obj.catAx);
+                                }
+                                break;
+                            }
+                            case historyitem_type_ScatterChart:
+                            {
+                                ne
+                                break;
+                            }
+                        }
+                        new_chart_type.setGrouping(need_groupping);
+                        new_chart_type.setBarDir(need_bar_dir);
+                        axis_by_types = new_chart_type.getAxisByTypes();
+                        val_axis = axis_by_types.valAx;
+                        for(i = 0; i < val_axis.length; ++i)
+                        {
+                            if(val_axis[i].numFmt.formatCode !== need_num_fmt)
+                                val_axis[i].numFmt.setFormatCode(need_num_fmt);
+                            if(need_bar_dir = BAR_DIR_BAR)
+                                val_axis[i].setAxPos(AX_POS_B);
+                        }
+
+                        if(need_bar_dir = BAR_DIR_BAR)
+                        {
+                            for(i = 0; i < axis_by_types.catAx.length; ++i)
+                                axis_by_types.catAx[i].setAxPos(AX_POS_L);
+                        }
+                    }
+                    break;
+                }
+                case c_oAscChartTypeSettings.lineNormal           :
+                case c_oAscChartTypeSettings.lineStacked          :
+                case c_oAscChartTypeSettings.lineStackedPer      :
+                case c_oAscChartTypeSettings.lineNormalMarker    :
+                case c_oAscChartTypeSettings.lineStackedMarker   :
+                case c_oAscChartTypeSettings.lineStackedPerMarker:
+                {
+
+                    if(type === c_oAscChartTypeSettings.lineNormal || type === c_oAscChartTypeSettings.lineNormalMarker)
+                        need_groupping = GROUPING_STANDARD;
+                    else if(type === c_oAscChartTypeSettings.lineStacked || type === c_oAscChartTypeSettings.lineStackedMarker)
+                        need_groupping = GROUPING_STACKED;
+                    else
+                        need_groupping = GROUPING_PERCENT_STACKED;
+
+                    if(type === c_oAscChartTypeSettings.lineNormal || type === c_oAscChartTypeSettings.lineStacked
+                        || type === c_oAscChartTypeSettings.lineNormalMarker || type === c_oAscChartTypeSettings.lineStackedMarker)
+                        need_num_fmt = "General";
+                    else
+                        need_num_fmt = "0%";
+
+                    var b_marker = type ===  c_oAscChartTypeSettings.lineNormalMarker|| type === c_oAscChartTypeSettings.lineStackedMarker || type === c_oAscChartTypeSettings.lineStackedPerMarker;
+
+
+                    if(chart_type.getObjectType() === historyitem_type_LineChart)
+                    {
+                        if(chart_type.grouping !== need_groupping)
+                            chart_type.setGrouping(need_groupping);
+                        val_axis = chart_type.getAxisByTypes().valAx;
+                        for(i = 0; i < val_axis.length; ++i)
+                        {
+                            if(val_axis[i].numFmt.formatCode !== need_num_fmt)
+                                val_axis[i].numFmt.setFormatCode(need_num_fmt);
+                        }
+
+                        if(chart_type.marker !== b_marker)
+                            chart_type.setMarker(b_marker);
+                    }
+                    else
+                    {
+                        new_chart_type = new CLineChart();
+                        plot_area.addChart(new_chart_type, 0);
+                        plot_area.removeCharts(1, plot_area.charts.length - 1);
+                        switch (object_type)
+                        {
+                            case historyitem_type_PieChart:
+                            case historyitem_type_AreaChart:
+                            case historyitem_type_BarChart:
+                            {
+                                new_chart_type.setFromOtherChart(chart_type);
+                                if(object_type === historyitem_type_PieChart)
+                                {
+                                    axis_obj = CreateDefaultAxises(need_num_fmt);
+                                    new_chart_type.addAxId(axis_obj.valAx);
+                                    new_chart_type.addAxId(axis_obj.catAx);
+                                }
+                                break;
+                            }
+                            /*case historyitem_type_AreaChart:
+                             case historyitem_type_LineChart:
+                             case historyitem_type_OfPieChart:
+                             case historyitem_type_RadarChart:
+                             case historyitem_type_StockChart:
+                             case historyitem_type_BubbleChart:
+                             case historyitem_type_ScatterChart:
+                             case historyitem_type_SurfaceChart:
+                             case historyitem_type_DoughnutChart:*/
+                        }
+                        val_axis = new_chart_type.getAxisByTypes().valAx;
+                        for(i = 0; i < val_axis.length; ++i)
+                        {
+                            if(val_axis[i].numFmt.formatCode !== need_num_fmt)
+                                val_axis[i].numFmt.setFormatCode(need_num_fmt);
+                        }
+
+                        new_chart_type.setMarker(b_marker);
+                        new_chart_type.setGrouping(need_groupping);
+                    }
+                    break;
+                }
+                case c_oAscChartTypeSettings.pie:
+                {
+                    if(chart_type.getObjectType() !== historyitem_type_PieChart)
+                    {
+                        new_chart_type = new CPieChart();
+                        plot_area.addChart(new_chart_type, 0);
+                        plot_area.removeCharts(1, plot_area.charts.length - 1);
+                        switch (object_type)
+                        {
+                            case historyitem_type_BarChart:
+                            case historyitem_type_AreaChart:
+                            case historyitem_type_LineChart:
+                            case historyitem_type_BarChart:
+                            {
+                                new_chart_type.setFromOtherChart(chart_type);
+                                break;
+                            }
+                            /*case historyitem_type_AreaChart:
+                             case historyitem_type_LineChart:
+                             case historyitem_type_OfPieChart:
+                             case historyitem_type_RadarChart:
+                             case historyitem_type_StockChart:
+                             case historyitem_type_BubbleChart:
+                             case historyitem_type_ScatterChart:
+                             case historyitem_type_SurfaceChart:
+                             case historyitem_type_DoughnutChart:*/
+                        }
+                        new_chart_type.setVaryColors(true);
+                    }
+                    break;
+                }
+                case c_oAscChartTypeSettings.areaNormal:
+                case c_oAscChartTypeSettings.areaStacked:
+                case c_oAscChartTypeSettings.areaStackedPer:
+                {
+
+                    if(type === c_oAscChartTypeSettings.areaNormal)
+                        need_groupping = GROUPING_STANDARD;
+                    else if(type === c_oAscChartTypeSettings.areaStacked)
+                        need_groupping = GROUPING_STACKED;
+                    else
+                        need_groupping = GROUPING_PERCENT_STACKED;
+
+                    if(type === c_oAscChartTypeSettings.areaNormal || type === c_oAscChartTypeSettings.areaStacked)
+                        need_num_fmt = "General";
+                    else
+                        need_num_fmt = "0%";
+
+                    if(chart_type.getObjectType() === historyitem_type_AreaChart)
+                    {
+                        if(chart_type.grouping !== need_groupping)
+                            chart_type.setGrouping(need_groupping);
+                        val_axis = chart_type.getAxisByTypes().valAx;
+                        for(i = 0; i < val_axis.length; ++i)
+                        {
+                            if(val_axis[i].numFmt.formatCode !== need_num_fmt)
+                                val_axis[i].numFmt.setFormatCode(need_num_fmt);
+                        }
+                    }
+                    else
+                    {
+                        new_chart_type = new CAreaChart();
+                        plot_area.addChart(new_chart_type, 0);
+                        plot_area.removeCharts(1, plot_area.charts.length - 1);
+                        switch (object_type)
+                        {
+                            case historyitem_type_PieChart:
+                            case historyitem_type_LineChart:
+                            case historyitem_type_BarChart:
+                            {
+                                new_chart_type.setFromOtherChart(chart_type);
+                                if(object_type === historyitem_type_PieChart)
+                                {
+                                    axis_obj = CreateDefaultAxises(need_num_fmt);
+                                    new_chart_type.addAxId(axis_obj.valAx);
+                                    new_chart_type.addAxId(axis_obj.catAx);
+                                }
+                                break;
+                            }
+                        }
+                        val_axis = new_chart_type.getAxisByTypes().valAx;
+                        for(i = 0; i < val_axis.length; ++i)
+                        {
+                            if(val_axis[i].numFmt.formatCode !== need_num_fmt)
+                                val_axis[i].numFmt.setFormatCode(need_num_fmt);
+                        }
+                        new_chart_type.setGrouping(need_groupping);
+                    }
+                    break;
+                }
+                case c_oAscChartTypeSettings.scatter:
+                case c_oAscChartTypeSettings.scatterLine:
+                case c_oAscChartTypeSettings.scatterSmooth:
+                {
+                    if(chart_type.getObjectType() === historyitem_type_ScatterChart)
+                    {}
+                    else
+                    {
+                        new_chart_type = new CScatterChart();
+                        plot_area.addChart(new_chart_type, 0);
+                        plot_area.removeCharts(1, plot_area.charts.length - 1);
+                        new_chart_type.setFromOtherChart(chart_type);
+                        axis_obj = CreateScatterAxis(); //cat - 0, val - 1
+                        new_chart_type.addAxId(axis_obj.catAx);
+                        new_chart_type.addAxId(axis_obj.valAx);
+                        /*val_axis = new_chart_type.getAxisByTypes().valAx;
+                        for(i = 0; i < val_axis.length; ++i)
+                        {
+                            if(val_axis[i].numFmt.formatCode !== need_num_fmt)
+                                val_axis[i].numFmt.setFormatCode(need_num_fmt);
+                        }
+                        new_chart_type.setGrouping(need_groupping);      */
+                    }
+                    break;
+                }
+            }
             chart_space.addToRecalculate();  //TODO
             chart_space.setRecalculateInfo();//TODO: обязательно переделать
             this.startRecalculate();
