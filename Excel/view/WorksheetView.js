@@ -3028,7 +3028,7 @@
 			drawAnchor(_x, _y, w, h);
 			
 			// horizontal
-			_x = _this.headersLeft
+			_x = _this.headersLeft;
 			_y = this.getCellTop(frozenCell.getRow0(), 1) - anchorWidth/2 - 0.5;
 			w = _this.headersWidth;
 			h = anchorWidth;
@@ -3128,7 +3128,7 @@
 					}
 					break;
 			}
-		}
+		};
 		
 		WorksheetView.prototype.setFrozenCell = function(col, row, bRedraw) {
 			this.topLeftFrozenCell = new CellAddress(row, col, 0);
