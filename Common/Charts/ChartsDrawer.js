@@ -288,7 +288,7 @@ CChartsDrawer.prototype =
 		
 		
 		//count line of chart grid
-		if((chartProp.chart.plotArea.valAx.yPoints && chartProp.chart.plotArea.catAx.xPoints) || (chartProp.chart.plotArea.catAx.yPoints && chartProp.chart.plotArea.valAx.xPoints))
+		if((chartProp.chart.plotArea.valAx && chartProp.chart.plotArea.catAx && chartProp.chart.plotArea.valAx.yPoints && chartProp.chart.plotArea.catAx.xPoints) || (chartProp.chart.plotArea.catAx && chartProp.chart.plotArea.valAx && chartProp.chart.plotArea.catAx.yPoints && chartProp.chart.plotArea.valAx.xPoints))
 		{	
 			if(chartProp.chart.plotArea.valAx.yPoints)
 				this.calcProp.numhlines = chartProp.chart.plotArea.valAx.yPoints.length - 1;
@@ -1017,9 +1017,9 @@ CChartsDrawer.prototype =
 		//****left*****
 		if(left || !right)
 		{
-			if(chartSpace.chart.plotArea.valAx.title != null && !isHBar)
+			if(chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.title != null && !isHBar)
 				left += chartSpace.chart.plotArea.valAx.title.extX + standartMargin;
-			else if(isHBar && chartSpace.chart.plotArea.catAx.title != null)
+			else if(isHBar && chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.title != null)
 				left += chartSpace.chart.plotArea.catAx.title.extX + standartMargin;
 			else
 				left += standartMargin / 2;
@@ -1032,9 +1032,9 @@ CChartsDrawer.prototype =
 		if(right)
 		{
 			right += standartMargin / 2;
-			if(chartSpace.chart.plotArea.valAx.title != null && !isHBar)
+			if(chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.title != null && !isHBar)
 				right += chartSpace.chart.plotArea.valAx.title.extX;
-			else if(isHBar && chartSpace.chart.plotArea.catAx.title != null)
+			else if(isHBar && chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.title != null)
 				right += chartSpace.chart.plotArea.catAx.title.extX;
 		}
 		else
@@ -1044,9 +1044,9 @@ CChartsDrawer.prototype =
 		//****bottom*****
 		if(bottom || !top)
 		{
-			if(chartSpace.chart.plotArea.catAx.title != null && !isHBar)
+			if(chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.title != null && !isHBar)
 				bottom += chartSpace.chart.plotArea.catAx.title.extY + standartMargin;
-			else if(isHBar && chartSpace.chart.plotArea.valAx.title != null)
+			else if(isHBar && chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.title != null)
 				bottom += chartSpace.chart.plotArea.valAx.title.extY + standartMargin;
 			else
 				bottom += standartMargin / 2;
@@ -1059,9 +1059,9 @@ CChartsDrawer.prototype =
 		if(top)
 		{
 			top += standartMargin / 2;
-			if(chartSpace.chart.plotArea.catAx.title != null && !isHBar)
+			if(chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.title != null && !isHBar)
 				top += chartSpace.chart.plotArea.catAx.title.extY;
-			else if(isHBar && chartSpace.chart.plotArea.valAx.title != null)
+			else if(isHBar && chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.title != null)
 				top += chartSpace.chart.plotArea.valAx.title.extY;
 				
 			if(chartSpace.chart.title !== null && !chartSpace.chart.title.overlay)
@@ -1126,7 +1126,7 @@ CChartsDrawer.prototype =
 		var catAx = chartSpace.chart.plotArea.catAx;
 		
 
-		if(isHBar === 'HBar' && catAx.yPoints && valAx.xPoints)
+		if(isHBar === 'HBar' && catAx && valAx && catAx.yPoints && valAx.xPoints)
 		{
 			if(catAx.yPoints.length > 1)
 			{
@@ -1184,7 +1184,7 @@ CChartsDrawer.prototype =
 				}
 			}
 		}
-		else if(isHBar === 'Scatter' && catAx.xPoints && valAx.yPoints)
+		else if(isHBar === 'Scatter' && catAx && valAx && catAx.xPoints && valAx.yPoints)
 		{
 			leftDownPointX = catAx.xPoints[0].pos;
 			leftDownPointY = valAx.yPoints[0].pos;
@@ -1219,7 +1219,7 @@ CChartsDrawer.prototype =
 				}
 			}
 		}
-		else if(isHBar !== undefined && catAx.xPoints && valAx.yPoints)
+		else if(isHBar !== undefined && valAx && catAx && catAx.xPoints && valAx.yPoints)
 		{
 			if(catAx.xPoints.length > 1)
 			{
@@ -1276,7 +1276,7 @@ CChartsDrawer.prototype =
 					top = rightUpPointY - catAx.labels.y;
 				}
 			}
-			}
+		}
 		
 		
 		return {left: left, right: right, top: top, bottom: bottom};
