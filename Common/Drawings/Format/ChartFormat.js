@@ -6937,7 +6937,6 @@ CDoughnutChart.prototype =
     },
 
 
-    getAxisByTypes: CPlotArea.prototype.getAxisByTypes,
 
     setFromOtherChart: function(c)
     {
@@ -11018,7 +11017,7 @@ CPieChart.prototype =
             this.setDLbls(c.dLbls);
 
         if(isRealNumber(c.firstSliceAng))
-            this.setFirstSliceAng(c.firstSliceAng)
+            this.setFirstSliceAng(c.firstSliceAng);
 
 
         if(Array.isArray(c.series))

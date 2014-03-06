@@ -2010,7 +2010,7 @@ CChartSpace.prototype.recalculateAxis = function()
                 x_ax.posY = x_ax.labels.y;
             }
         }
-        else if(chart_type !== historyitem_type_BarChart && chart_type !== historyitem_type_PieChart
+        else if(chart_type !== historyitem_type_BarChart && (chart_type !== historyitem_type_PieChart && chart_type !== historyitem_type_DoughnutChart)
             || (chart_type === historyitem_type_BarChart && chart_object.barDir === BAR_DIR_COL))
         {
             var gap_hor_axis = 4;
@@ -2574,7 +2574,7 @@ CChartSpace.prototype.recalculateLegend = function()
         var max_width = 0, cur_width, max_font_size = 0, cur_font_size, ser, b_line_series;
         var max_word_width = 0;
         this.chart.legend.chart = this;
-        if( !this.chart.plotArea.chart.varyColors || this.chart.plotArea.chart.getObjectType() !== historyitem_type_PieChart && series.length !== 1)
+        if( !this.chart.plotArea.chart.varyColors || (this.chart.plotArea.chart.getObjectType() !== historyitem_type_PieChart || this.chart.plotArea.chart.getObjectType() !== historyitem_type_DoughnutChart) && series.length !== 1)
         {
             for(i = 0; i < series.length; ++i)
             {
