@@ -1,5 +1,6 @@
 ﻿"use strict";
 
+var global3DPersperctive;
 //*****MAIN*****
 function CChartsDrawer()
 {
@@ -4568,18 +4569,16 @@ drawScatterChart.prototype =
 		
 		var path;
 		
-		if(this.paths.series)
+		/*if(this.paths.series && this.paths.series[ser - 1])
 		{
 			if(val == this.chartProp.series[ser - 1].yVal.numRef.numCache.pts.length - 1)
 				path = this.paths.series[ser - 1][val - 1].ArrPathCommand[1];
 			else
 				path = this.paths.series[ser - 1][val].ArrPathCommand[0];
 		}
-		else if(this.paths.points)
+		else*/ if(this.paths.points)
 		{
-			if(this.paths.points[ser - 1] && this.paths.points[ser - 1][val])
-				path = this.paths.points[ser - 1][val].path.ArrPathCommand[0];
-			else if(this.paths.points[ser] && this.paths.points[ser][val])
+			if(this.paths.points[ser] && this.paths.points[ser][val])
 				path = this.paths.points[ser][val].path.ArrPathCommand[0];	
 		}
 	
@@ -6005,6 +6004,7 @@ function drawBar3DChart()
 	this.cChartDrawer = null;
 	this.cShapeDrawer = null;
 	this.chartSpace = null;
+	this.summBarVal = [];
 	
 	this.paths = {};
 }
@@ -6017,6 +6017,7 @@ drawBar3DChart.prototype =
 		this.cChartDrawer = chartProp;
 		this.cShapeDrawer = cShapeDrawer;
 		this.paths = {};
+		this.summBarVal = [];
 		
 		this._reCalculateBars();
 	},
@@ -6027,6 +6028,7 @@ drawBar3DChart.prototype =
 		this.cChartDrawer = chartProp;
 		this.cShapeDrawer = cShapeDrawer;
 		this.chartSpace = chartSpace;
+		this.summBarVal = [];
 
 		this._DrawBars();
 	},
@@ -6168,7 +6170,7 @@ drawBar3DChart.prototype =
 		var summBarVal = [];
 		var x1, y1, z1, x1, y2, z2, x2, y3, z3, x3, x4, y4, z4, x5, y5, z5, x6, y6, z6, x7, y7, z7, x8, y8, z8;
 		var point1, point2, point3, point4, point5, point6, point7, point8;
-		var perspectiveVal = 50;
+		var perspectiveVal = 20;
 		var startXPosition, startYColumnPosition;
 		
 		for (var i = 0; i < this.chartProp.series.length; i++) {
@@ -6210,7 +6212,7 @@ drawBar3DChart.prototype =
 					
 					
 					//поворот относительно осей
-					var p =0, q = 0, r = 0.002;
+					var p = 0, q = 0, r = global3DPersperctive ? global3DPersperctive / 10000 : 0.002;
 					point1 = this._convertAndTurnPoint(x1, y1, z1, angleOx, angleOy, angleOz, p, q, r);
 					point2 = this._convertAndTurnPoint(x2, y2, z2, angleOx, angleOy, angleOz, p, q, r);
 					point3 = this._convertAndTurnPoint(x3, y3, z3, angleOx, angleOy, angleOz, p, q, r);
@@ -6484,7 +6486,7 @@ grid3DChart.prototype =
 		var widthLine = this.chartProp.widthCanvas - (this.chartProp.chartGutter._left + this.chartProp.chartGutter._right);
 		var heightLine = this.chartProp.heightCanvas - (this.chartProp.chartGutter._top + this.chartProp.chartGutter._bottom);
 		
-		var perspectiveValue = 100;
+		var perspectiveValue = 50;
 		
 		var firstX = this.chartProp.chartGutter._left - widthLine/2;
 		var firstY;
@@ -6522,7 +6524,7 @@ grid3DChart.prototype =
 			//перемножение на матрицу  - трехточечное перспективное преобразование
 			p = 0;
 			q = 0;
-			r = 0.002;
+			r = global3DPersperctive ? global3DPersperctive / 10000 : 0.002;
 			
 			convertResult = this.cShapeDrawer._convert3DTo2D(x1, y1, z1, p, q, r)
 			x1n = convertResult.x + diff;
@@ -6568,7 +6570,7 @@ grid3DChart.prototype =
 		var heightLine = this.chartProp.heightCanvas - (this.chartProp.chartGutter._top + this.chartProp.chartGutter._bottom);
 		var widthLine = this.chartProp.widthCanvas - (this.chartProp.chartGutter._left + this.chartProp.chartGutter._right);
 		
-		var perspectiveValue = 100;
+		var perspectiveValue = 50;
 		
 		var firstY = this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom - heightLine/2;
 		var firstX;
@@ -6606,7 +6608,7 @@ grid3DChart.prototype =
 			//перемножение на матрицу  - трехточечное перспективное преобразование
 			p = 0;
 			q = 0;
-			r = 0.002;
+			r = global3DPersperctive ? global3DPersperctive / 10000 : 0.002;
 			
 			convertResult = this.cShapeDrawer._convert3DTo2D(x1, y1, z1, p, q, r)
 			x1n = convertResult.x + diff;
@@ -6665,8 +6667,11 @@ grid3DChart.prototype =
 	
 	_drawHorisontalLines: function()
 	{
+		if(!this.paths.horisontalLines)
+			return;
+		
 		var pen;
-		var path;
+		var path;	
 		for(var i = 0; i < this.paths.horisontalLines.length; i++)
 		{
 			if(this.chartProp.type == "HBar")
@@ -6681,6 +6686,9 @@ grid3DChart.prototype =
 	
 	_drawVerticalLines: function()
 	{
+		if(!this.paths.verticalLines)
+			return;
+		
 		var pen;
 		var path;
 		for(var i = 0; i < this.paths.verticalLines.length; i++)
