@@ -465,7 +465,7 @@ function CCollaborativeChanges()
 
 function CCollaborativeEditing()
 {
-    this.m_bUse         = true; // началось ли совместное редактирование
+    this.m_bUse         = false; // началось ли совместное редактирование
 
     this.m_aUsers       = []; // Список текущих пользователей, редактирующих данный документ
     this.m_aChanges     = []; // Массив с изменениями других пользователей
@@ -606,17 +606,23 @@ function CCollaborativeEditing()
 
     this.Send_Changes = function()
     {
-        // Пока не началось совместное редактирование, мы ничего не делаем
-        if ( true != this.m_bUse )
-            return;
-
         // Пересчитываем позиции
         this.Refresh_DCChanges();
 
-        // Генерируем свои изменения (ненужные точки предварительно удаляем)
-        History.Clear_Redo();
+        // Генерируем свои изменения
+        var PointsCount = 0;
+        if ( true === m_bUse )
+        {
+            // (ненужные точки предварительно удаляем)
+            History.Clear_Redo();
+            PointsCount = History.Points.length;
+        }
+        else
+        {
+            PointsCount = History.Index + 1;
+        }
+
         var aChanges = new Array();
-        var PointsCount = History.Points.length;
         for ( var PointIndex = 0; PointIndex < PointsCount; PointIndex++ )
         {
             var Point = History.Points[PointIndex];
@@ -645,8 +651,10 @@ function CCollaborativeEditing()
 
         editor.CoAuthoringApi.saveChanges(aChanges);
 
-        // Чистим Undo/Redo
-        History.Clear();
+        // Чистим Undo/Redo только во время совместного редактирования
+        if ( true === m_bUse )
+            History.Clear();
+
         editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
         editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
 
