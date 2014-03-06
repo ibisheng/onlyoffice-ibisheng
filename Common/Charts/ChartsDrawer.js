@@ -637,7 +637,7 @@ CChartsDrawer.prototype =
 		var min = 0; 
 		var minY = 0;
 		var maxY = 0;
-		var newArr, formatAdobeLabel;
+		var newArr, formatAdobeLabel, xNumCache, yNumCache;
 		
 		var series = chart.chart.plotArea.chart.series;
 		if(series && series.length != 0 && this.calcProp.type != 'Scatter')//берём данные из NumCache
@@ -793,13 +793,22 @@ CChartsDrawer.prototype =
 			for(var l = 0; l < series.length; ++l)
 			{
 				newArr[l] = [];
-				for(var j = 0; j < series[l].yVal.numRef.numCache.pts.length; ++j)
+				yNumCache = series[l].yVal.numRef.numCache ? series[l].yVal.numRef.numCache : series[l].yVal.numLit;
+				for(var j = 0; j < yNumCache.pts.length; ++j)
 				{
-					yVal = parseFloat(series[l].yVal.numRef.numCache.pts[j].val);
-					if(series[l].xVal)
-						xVal = parseFloat(series[l].xVal.numRef.numCache.pts[j].val);
+					yVal = parseFloat(yNumCache.pts[j].val);
+					
+					xNumCache = series[l].xVal && series[l].xVal.numRef ? series[l].xVal.numRef.numCache : series[l].xVal && series[l].xVal.numLit ? series[l].xVal.numLit : null;
+					if(xNumCache && xNumCache.pts[j] && xNumCache.pts[j].val)
+					{
+						if(!isNaN(parseFloat(xNumCache.pts[j].val)))
+							xVal = parseFloat(xNumCache.pts[j].val);
+						else
+							xVal = j + 1;
+					}
 					else
 						xVal = j + 1;
+					
 					newArr[l][j] = [xVal, yVal];
 					
 					if(l == 0 && j == 0)
@@ -4297,11 +4306,11 @@ drawScatterChart.prototype =
 			{
 				yVal = parseFloat(yNumCache.pts[n].val);
 				
-				xNumCache = seria.xVal && seria.xVal.numRef.numCache ? seria.xVal.numRef.numCache : seria.xVal && seria.xVal.numRef.numLit ? seria.xVal.numRef.numLit : null;
+				xNumCache = seria.xVal && seria.xVal.numRef ? seria.xVal.numRef.numCache : seria.xVal && seria.xVal.numLit ? seria.xVal.numLit : null;
 				if(xNumCache && xNumCache.pts[n] && xNumCache.pts[n].val)
 				{
-					if(!isNaN(parseFloat(seria.xVal.numRef.numCache.pts[n].val)))
-						xVal = parseFloat(seria.xVal.numRef.numCache.pts[n].val);
+					if(!isNaN(parseFloat(xNumCache.pts[n].val)))
+						xVal = parseFloat(xNumCache.pts[n].val);
 					else
 						xVal = n + 1;
 				}
