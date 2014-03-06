@@ -726,6 +726,7 @@
 					// http://bugzserver/show_bug.cgi?id=14631 - наш баг на редактор
 					// Перехватим Esc и отключим дефалтовую обработку
 					stop();
+					t.handlers.trigger("stopFormatPainter");
 					return t.__retval;
 
 				case 144: //Num Lock

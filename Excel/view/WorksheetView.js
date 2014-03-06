@@ -95,18 +95,6 @@
 		var kCurSEResize	= "se-resize";
 		var kCurNEResize	= "ne-resize";
 
-		/**
-		 * cell border id
-		 * @const
-		 */
-		var	kcbidLeft	= 1;
-		var kcbidRight	= 2;
-		var kcbidTop	= 3;
-		var kcbidBottom = 4;
-		var kcbidDiagonal = 5;
-		var kcbidDiagonalDown = 6;
-		var kcbidDiagonalUp = 7;
-
 		var kNewLine = "\n";
 
 		var kPaneStateFrozen = "frozen";
@@ -344,6 +332,8 @@
 			this.isChartAreaEditMode = false;
 			this.lockDraw = false;
 			this.isSelectOnShape = false;	// Выделен shape
+
+			this.isFormatPainter = false;
 
 			this.isSelectionDialogMode = false;
 			this.copyOfActiveRange = null;
@@ -3334,6 +3324,8 @@
 			if (!isFrozen && this.isSelectionDialogMode) {
 				this._drawSelectRange(this.activeRange.clone(true));
 			}
+			if (!isFrozen && this.isFormatPainter)
+				this._drawFormatPainterRange();
 
 			if (null !== this.activeMoveRange) {
 				ctx.setStrokeStyle(new CColor(0, 0, 0))
@@ -3365,6 +3357,11 @@
 			if (!isFrozen) {
 				this._drawActiveHeaders();
 			}
+		};
+
+		WorksheetView.prototype._drawFormatPainterRange = function () {
+			var lineWidth = 1, isDashLine = true, strokeColor = new CColor(0, 0, 0);
+			this._drawElements(this, this._drawSelectionElement, this.copyOfActiveRange, isDashLine, lineWidth, strokeColor);
 		};
 
 		WorksheetView.prototype._drawFormulaRanges = function (arrRanges){
@@ -6332,6 +6329,8 @@
 			} else {
 				// Нормализуем range
 				this.activeRange.normalize();
+				if (this.isFormatPainter)
+					this.applyFormatPainter();
 			}
 		};
 
@@ -6364,6 +6363,36 @@
 
 
 		// ----- Changing cells -----
+
+		WorksheetView.prototype.applyFormatPainter = function () {
+			var t = this;
+			var onApplyMoveRangeHandleCallback = function (isSuccess) {
+				// Очищаем выделение
+				t.cleanSelection();
+
+				if (true === isSuccess)
+					t._getRange(0, 0, 0, 0).promoteFromTo(t.copyOfActiveRange, t.activeRange);
+
+				// Сбрасываем параметры
+				t._updateCellsRange(t.activeRange, /*canChangeColWidth*/c_oAscCanChangeColWidth.none);
+				t.formatPainter();
+				// Перерисовываем
+				t._drawSelection();
+			};
+
+			this._isLockedCells (this.activeRange, null, onApplyMoveRangeHandleCallback);
+		};
+		WorksheetView.prototype.formatPainter = function () {
+			this.isFormatPainter = !this.isFormatPainter;
+			if (this.isFormatPainter) {
+				this.copyOfActiveRange = this.activeRange.clone(true);
+				this._drawFormatPainterRange();
+			} else {
+				this.cleanSelection();
+				this.copyOfActiveRange = null;
+				this._drawSelection();
+			}
+		};
 
 		/* Функция для работы автозаполнения (selection). (x, y) - координаты точки мыши на области */
 		WorksheetView.prototype.changeSelectionFillHandle = function (x, y) {
@@ -7092,15 +7121,13 @@
 				t.cleanSelection();
 				t._drawSelection();
 				return false;
-			}
-			else if( resmove == -1 ){
+			} else if( resmove == -1 ){
 				t.model.workbook.handlers.trigger("asc_onConfirmAction",
 												  c_oAscConfirm.ConfirmReplaceRange,
 												  function(can){t.moveRangeHandle(arnFrom, arnTo, can, ctrlKey)}
 				);
 
-			}
-			else{
+			} else {
 				t.moveRangeHandle(arnFrom, arnTo, true, ctrlKey)
 			}
 

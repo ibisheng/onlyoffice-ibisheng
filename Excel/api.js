@@ -2886,9 +2886,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			// Увеличение размера шрифта
 			asc_increaseFontSize: function () {
                 var ws = this.wb.getWorksheet();
-                if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.increaseFontSize )
+                if (ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.increaseFontSize)
                     ws.objectRender.controller.increaseFontSize();
-                else{
+                else {
                     this.wb.changeFontSize("changeFontSize", true);
                     this.wb.restoreFocus();
                 }
@@ -2897,12 +2897,17 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			// Уменьшение размера шрифта
 			asc_decreaseFontSize: function () {
                 var ws = this.wb.getWorksheet();
-                if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.decreaseFontSize )
+                if (ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.decreaseFontSize)
                     ws.objectRender.controller.decreaseFontSize();
-                else{
+                else {
                     this.wb.changeFontSize("changeFontSize", false);
                     this.wb.restoreFocus();
                 }
+			},
+
+			// Формат по образцу
+			asc_formatPainter: function () {
+				this.wb.getWorksheet().formatPainter();
 			},
 
 			asc_onMouseUp: function (x, y) {
@@ -3699,6 +3704,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_decreaseCellDigitNumbers"] = prot.asc_decreaseCellDigitNumbers;
 		prot["asc_increaseFontSize"] = prot.asc_increaseFontSize;
 		prot["asc_decreaseFontSize"] = prot.asc_decreaseFontSize;
+		prot["asc_formatPainter"] = prot.asc_formatPainter;
 
 		prot["asc_onMouseUp"] = prot.asc_onMouseUp;
 		prot["asc_mapAscServerErrorToAscError"] = prot.asc_mapAscServerErrorToAscError;

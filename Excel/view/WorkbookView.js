@@ -239,6 +239,7 @@
 				    "commentCellClick":			function () {self._onCommentCellClick.apply(self, arguments);},
 				    "isGlobalLockEditCell":		function () {return self.collaborativeEditing.getGlobalLockEditCell();},
 				    "updateSelectionName":		function () {self._onUpdateSelectionName.apply(self, arguments);},
+					"stopFormatPainter":		function () {self._onStopFormatPainter.apply(self, arguments);},
 
 				    // Shapes
 				    "graphicObjectMouseDown":		function () {self._onGraphicObjectMouseDown.apply(self, arguments);},
@@ -777,6 +778,12 @@
 				var ws = this.getWorksheet();
 				this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
 			}
+		};
+
+		WorkbookView.prototype._onStopFormatPainter = function () {
+			var ws = this.getWorksheet();
+			if (ws.isFormatPainter)
+				ws.formatPainter();
 		};
 
 		// Shapes
