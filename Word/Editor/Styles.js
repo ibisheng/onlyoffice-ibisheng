@@ -6046,45 +6046,25 @@ CRFonts.prototype =
 
     Compare : function(RFonts)
     {
-        var Result_RFonts = new CRFonts();
-
         // Ascii
-        if ( undefined != this.Ascii && undefined != RFonts.Ascii && this.Ascii.Name === RFonts.Ascii.Name )
-        {
-            Result_RFonts.Ascii = {};
-            Result_RFonts.Ascii.Name  = RFonts.Ascii.Name;
-            Result_RFonts.Ascii.Index = -1;
-        }
+        if ( undefined !== this.Ascii && ( undefined === RFonts.Ascii || this.Ascii.Name !== RFonts.Ascii.Name ) )
+            this.Ascii = undefined;
 
         // EastAsia
-        if ( undefined != this.EastAsia && undefined != RFonts.EastAsia && this.EastAsia.Name === RFonts.EastAsia.Name )
-        {
-            Result_RFonts.EastAsia = {};
-            Result_RFonts.EastAsia.Name  = RFonts.EastAsia.Name;
-            Result_RFonts.EastAsia.Index = -1;
-        }
+        if ( undefined !== this.EastAsia && ( undefined === RFonts.EastAsia || this.EastAsia.Name !== RFonts.EastAsia.Name ) )
+            this.EastAsia = undefined;
 
-        // Ascii
-        if ( undefined != this.HAnsi && undefined != RFonts.HAnsi && this.HAnsi.Name === RFonts.HAnsi.Name )
-        {
-            Result_RFonts.HAnsi = {};
-            Result_RFonts.HAnsi.Name  = RFonts.HAnsi.Name;
-            Result_RFonts.HAnsi.Index = -1;
-        }
+        // HAnsi
+        if ( undefined !== this.HAnsi && ( undefined === RFonts.HAnsi || this.HAnsi.Name !== RFonts.HAnsi.Name ) )
+            this.HAnsi = undefined;
 
-        // Ascii
-        if ( undefined != this.CS && undefined != RFonts.CS && this.CS.Name === RFonts.CS.Name )
-        {
-            Result_RFonts.CS = {};
-            Result_RFonts.CS.Name  = RFonts.CS.Name;
-            Result_RFonts.CS.Index = -1;
-        }
+        // CS
+        if ( undefined !== this.CS && ( undefined === RFonts.CS || this.CS.Name !== RFonts.CS.Name ) )
+            this.CS = undefined;
 
         // Hint
-        if ( this.Hint === RFonts.Hint )
-            Result_RFonts.Hint = RFonts.Hint;
-
-        return Result_RFonts;
+        if ( undefined !== this.Hint && ( undefined === RFonts.Hint || this.Hint !== RFonts.Hint ) )
+            this.Hint = undefined;
     },
 
     Write_ToBinary : function(Writer)
@@ -6201,21 +6181,17 @@ CLang.prototype =
 
     Compare : function(Lang)
     {
-        var Result_Lang = new CLang();
-
         // Bidi
-        if ( this.Bidi === Lang.Bidi )
-            Result_Lang.Bidi = Lang.Bidi;
+        if ( undefined !== this.Bidi && this.Bidi !== Lang.Bidi )
+            this.Bidi = undefined;
 
         // EastAsia
-        if ( this.EastAsia === Lang.EastAsia )
-            Result_Lang.EastAsia = Lang.EastAsia;
+        if ( undefined !== this.EastAsia && this.EastAsia !== Lang.EastAsia )
+            this.EastAsia = undefined;
 
         // Val
-        if ( this.Val === Lang.Val )
-            Result_Lang.Val = Lang.Val;
-
-        return Result_Lang;
+        if ( undefined !== this.Val && this.Val !== Lang.Val )
+            this.Val = undefined;
     },
 
     Write_ToBinary : function(Writer)
@@ -6540,105 +6516,94 @@ CTextPr.prototype =
 
     Compare : function(TextPr)
     {
-        var Result_TextPr = new CTextPr();
-
         // Bold
-        if ( this.Bold === TextPr.Bold )
-            Result_TextPr.Bold = TextPr.Bold;
+        if ( undefined !== this.Bold && this.Bold !== TextPr.Bold )
+            this.Bold = undefined;
 
         // Italic
-        if ( this.Italic === TextPr.Italic )
-            Result_TextPr.Italic = TextPr.Italic;
+        if ( undefined !== this.Italic && this.Italic !== TextPr.Italic )
+            this.Italic = undefined;
 
         // Strikeout
-        if ( this.Strikeout === TextPr.Strikeout )
-            Result_TextPr.Strikeout = TextPr.Strikeout;
+        if ( undefined !== this.Strikeout && this.Strikeout !== TextPr.Strikeout )
+            this.Strikeout = undefined;
 
         // Underline
-        if ( this.Underline === TextPr.Underline )
-            Result_TextPr.Underline = TextPr.Underline;
+        if ( undefined !== this.Underline && this.Underline !== TextPr.Underline )
+            this.Underline = undefined;
 
         // FontFamily
-        if ( undefined != this.FontFamily && undefined != TextPr.FontFamily && this.FontFamily.Name === TextPr.FontFamily.Name )
-        {
-            Result_TextPr.FontFamily = {};
-            Result_TextPr.FontFamily.Name  = TextPr.FontFamily.Name;
-            Result_TextPr.FontFamily.Index = -1;
-        }
+        if ( undefined !== this.FontFamily && ( undefined === TextPr.FontFamily || this.FontFamily.Name !== TextPr.FontFamily.Name ) )
+            this.FontFamily = undefined;
 
         // FontSize
-        if ( undefined != this.FontSize && undefined != TextPr.FontSize && Math.abs( this.FontSize - TextPr.FontSize ) < 0.001 )
-            Result_TextPr.FontSize = TextPr.FontSize;
+        if ( undefined !== this.FontSize && ( undefined === TextPr.FontSize || Math.abs( this.FontSize - TextPr.FontSize ) >= 0.001 ) )
+            this.FontSize = undefined;
 
         // Color
-        if ( undefined != this.Color && undefined != TextPr.Color && true === this.Color.Compare(TextPr.Color) )
-            Result_TextPr.Color = new CDocumentColor( TextPr.Color.r, TextPr.Color.g, TextPr.Color.b, TextPr.Color.Auto );
+        if ( undefined !== this.Color && ( undefined === TextPr.Color || true !== this.Color.Compare(TextPr.Color) ) )
+            this.Color = undefined;
 
         // VertAlign
-        if ( this.VertAlign === TextPr.VertAlign )
-            Result_TextPr.VertAlign = TextPr.VertAlign;
+        if ( undefined !== this.VertAlign && this.VertAlign !== TextPr.VertAlign )
+            this.VertAlign = undefined;
 
         // HighLight
-        if ( undefined != this.HighLight && undefined != TextPr.HighLight )
-        {
-            if ( highlight_None === this.HighLight && highlight_None === TextPr.HighLight )
-                Result_TextPr.HighLight = highlight_None;
-            else if ( highlight_None != this.HighLight && highlight_None != TextPr.HighLight && this.HighLight.Compare( TextPr.HighLight ) )
-                Result_TextPr.HighLight = new CDocumentColor( TextPr.HighLight.r, TextPr.HighLight.g, TextPr.HighLight.b );
-        }
+        if ( undefined !== this.HighLight && ( undefined === TextPr.HighLight || ( highlight_None === this.HighLight && highlight_None !== TextPr.HighLight )  || ( highlight_None !== this.HighLight && highlight_None === TextPr.HighLight ) || ( highlight_None !== this.HighLight && highlight_None !== TextPr.HighLight && true !== this.HighLight.Compare( TextPr.HighLight ) ) ) )
+            this.HighLight = undefined;
 
         // RStyle
-        if ( undefined != this.RStyle && undefined != TextPr.RStyle && this.RStyle === TextPr.RStyle )
-            Result_TextPr.RStyle = TextPr.RStyle;
+        if ( undefined !== this.RStyle && ( undefined === TextPr.RStyle || this.RStyle !== TextPr.RStyle ) )
+            this.RStyle = undefined;
 
         // Spacing
-        if ( undefined != this.Spacing && undefined != TextPr.Spacing && Math.abs(this.Spacing - TextPr.Spacing) < 0.001 )
-            Result_TextPr.Spacing = TextPr.Spacing;
+        if ( undefined !== this.Spacing && ( undefined === TextPr.Spacing || Math.abs(this.Spacing - TextPr.Spacing) >= 0.001 ) )
+            this.Spacing = undefined;
 
         // DStrikeout
-        if ( undefined != this.DStrikeout && undefined != TextPr.DStrikeout && this.DStrikeout === TextPr.DStrikeout )
-            Result_TextPr.DStrikeout = TextPr.DStrikeout;
+        if ( undefined !== this.DStrikeout && ( undefined === TextPr.DStrikeout || this.DStrikeout !== TextPr.DStrikeout ) )
+            this.DStrikeout = undefined;
 
         // Caps
-        if ( undefined != this.Caps && undefined != TextPr.Caps && this.Caps === TextPr.Caps )
-            Result_TextPr.Caps = TextPr.Caps;
+        if ( undefined !== this.Caps && ( undefined === TextPr.Caps || this.Caps !== TextPr.Caps ) )
+            this.Caps = undefined;
 
         // SmallCaps
-        if ( undefined != this.SmallCaps && undefined != TextPr.SmallCaps && this.SmallCaps === TextPr.SmallCaps )
-            Result_TextPr.SmallCaps = TextPr.SmallCaps;
+        if ( undefined !== this.SmallCaps && ( undefined === TextPr.SmallCaps || this.SmallCaps !== TextPr.SmallCaps ) )
+            this.SmallCaps = undefined;
 
         // Position
-        if ( undefined != this.Position && undefined != TextPr.Position && Math.abs(this.Position - TextPr.Position) < 0.001 )
-            Result_TextPr.Position = TextPr.Position;
+        if ( undefined !== this.Position && ( undefined === TextPr.Position || Math.abs(this.Position - TextPr.Position) >= 0.001 ) )
+            this.Position = undefined;
 
         // RFonts
-        Result_TextPr.RFonts = this.RFonts.Compare( TextPr.RFonts );
+        this.RFonts.Compare( TextPr.RFonts );
 
         // BoldCS
-        if ( this.BoldCS === TextPr.BoldCS )
-            Result_TextPr.BoldCS = TextPr.BoldCS;
+        if ( undefined !== this.BoldCS && this.BoldCS !== TextPr.BoldCS )
+            this.BoldCS = undefined;
 
         // ItalicCS
-        if ( this.ItalicCS === TextPr.ItalicCS )
-            Result_TextPr.ItalicCS = TextPr.ItalicCS;
+        if ( undefined !== this.ItalicCS && this.ItalicCS !== TextPr.ItalicCS )
+            this.ItalicCS = undefined;
 
         // FontSizeCS
-        if ( undefined != this.FontSizeCS && undefined != TextPr.FontSizeCS && Math.abs( this.FontSizeCS - TextPr.FontSizeCS ) < 0.001 )
-            Result_TextPr.FontSizeCS = TextPr.FontSizeCS;
+        if ( undefined !== this.FontSizeCS && ( undefined === TextPr.FontSizeCS || Math.abs( this.FontSizeCS - TextPr.FontSizeCS ) >= 0.001 ) )
+            this.FontSizeCS = undefined;
 
         // CS
-        if ( this.CS === TextPr.CS )
-            Result_TextPr.CS = TextPr.CS;
+        if ( undefined !== this.CS && this.CS !== TextPr.CS )
+            this.CS = undefined;
 
         // RTL
-        if ( this.RTL === TextPr.RTL )
-            Result_TextPr.RTL = TextPr.RTL;
+        if ( undefined !== this.RTL && this.RTL !== TextPr.RTL )
+            this.RTL = undefined;
 
         // Lang
-        Result_TextPr.Lang = this.Lang.Compare( TextPr.Lang );
-        Result_TextPr.Unifill = CompareUniFill(this.Unifill, TextPr.Unifill);
-		
-        return Result_TextPr;
+        this.Lang.Compare( TextPr.Lang );
+        //Result_TextPr.Unifill = CompareUniFill(this.Unifill, TextPr.Unifill);
+
+        return this;
     },
 
     Write_ToBinary : function(Writer)
