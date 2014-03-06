@@ -162,8 +162,7 @@
             "sdk": {
                 "files": {
                     "<%= pkg.menu_path %>/Word/": [
-                        "../../Word/sdk-all.js",
-                        "../../Word/Images/*.cur"
+                        "../../Word/sdk-all.js"
                     ]
                 }
             },
@@ -194,7 +193,8 @@
                         "../../Common/docscoapisettings.js",
                         "../../Common/commonDefines.js",
                         "../../Common/apiCommon.js",
-                        "../../Common/downloaderfiles.js"
+                        "../../Common/downloaderfiles.js",
+						"../../Common/Images/*.cur"
                     ]
                 }
             },
