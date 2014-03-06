@@ -1384,13 +1384,10 @@ DrawingObjectsController.prototype =
                     if(isRealNumber(LEGEND_POS_MAP[legend_pos_settings]))
                     {
                         chart.legend.setLegendPos(LEGEND_POS_MAP[legend_pos_settings]);
-                        if(legend_pos_settings === c_oAscChartLegendShowSettings.leftOverlay
-                            || legend_pos_settings === c_oAscChartLegendShowSettings.rightOverlay)
+                        var b_overlay = c_oAscChartLegendShowSettings.leftOverlay === legend_pos_settings || legend_pos_settings === c_oAscChartLegendShowSettings.rightOverlay;
+                        if(chart.legend.overlay !== b_overlay)
                         {
-                            if(chart.legend.overlay !== true)
-                            {
-                                chart.legend.setOverlay(true);
-                            }
+                            chart.legend.setOverlay(b_overlay);
                         }
                     }
                 }
@@ -1562,7 +1559,6 @@ DrawingObjectsController.prototype =
                             }
                             case historyitem_type_ScatterChart:
                             {
-                                ne
                                 break;
                             }
                         }
@@ -1870,8 +1866,9 @@ DrawingObjectsController.prototype =
                 break;
             }
             case "Pie":
+            case "Doughnut":
             {
-                return CreatePieChart(chart);
+                return CreatePieChart(chart, chart.type === "Doughnut");
             }
             case "Scatter":
             {

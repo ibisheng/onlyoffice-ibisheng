@@ -2566,7 +2566,7 @@ function CreateAreaChart(asc_chart, type)
     return chart_space;
 }
 
-function CreatePieChart(asc_chart, type)
+function CreatePieChart(asc_chart, bDoughnut)
 {
     var asc_series = asc_chart.series;
     var chart_space = new CChartSpace();
@@ -2580,7 +2580,7 @@ function CreatePieChart(asc_chart, type)
     chart.setPlotArea(new CPlotArea());
     var plot_area = chart.plotArea;
     plot_area.setLayout(new CLayout());
-    plot_area.addChart(new CPieChart());
+    plot_area.addChart(bDoughnut ? new CDoughnutChart() : new CPieChart());
     var pie_chart = plot_area.charts[0];
     pie_chart.setVaryColors(true);
     var parsedHeaders = asc_chart.parseSeriesHeaders();
@@ -2650,8 +2650,9 @@ function CreatePieChart(asc_chart, type)
     pie_chart.dLbls.setShowPercent(false);
     pie_chart.dLbls.setShowBubbleSize(false);
     pie_chart.dLbls.setShowLeaderLines(true);
-    pie_chart.setFirstSliceAng(false);
-
+    pie_chart.setFirstSliceAng(0);
+    if(bDoughnut)
+        pie_chart.setHoleSize(50);
     chart.setLegend(new CLegend());
     var legend = chart.legend;
     legend.setLegendPos(LEGEND_POS_R);

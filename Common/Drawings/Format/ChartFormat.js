@@ -88,13 +88,16 @@ CPlotArea.prototype =
                 for(var j = 0; j  < this.charts.length; ++j)
                 {
                     var other_chart = this.charts[j];
-                    for(var k = 0;  k  < other_chart.axId.length; ++k)
+                    if(Array.isArray(other_chart.axId))
                     {
-                        if(other_chart.axId[k] === axis)
+                        for(var k = 0;  k  < other_chart.axId.length; ++k)
+                        {
+                            if(other_chart.axId[k] === axis)
+                                break;
+                        }
+                        if(k < other_chart.axId.length)
                             break;
                     }
-                    if(k < other_chart.axId.length)
-                        break;
                 }
                 if(j === this.charts.length)
                     this.removeAxis(axis);
@@ -12765,8 +12768,8 @@ CScatterSeries.prototype =
             this.setYVal(o.yVal);
         if(o.cat)
         {
-           //this.setXVal(new CXVal());
-           //this.xVal.setFromOtherObject(o.cat);
+           this.setXVal(new CXVal());
+           this.xVal.setFromOtherObject(o.cat);
         }
         if(o.val)
         {
