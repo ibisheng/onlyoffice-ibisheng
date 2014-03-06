@@ -3104,9 +3104,9 @@
 						}
 						else {
 							if ( _this.topLeftFrozenCell )
-								_this.topLeftFrozenCell.col = col + 1;
+								_this.setFrozenCell(col, _this.topLeftFrozenCell.getRow0(), true);
 							else
-								_this.topLeftFrozenCell = new CellAddress(0, col, 0);
+								_this.setFrozenCell(col, 0, true);
 						}
 					}
 					break;
@@ -3121,19 +3121,42 @@
 						}
 						else {
 							if ( _this.topLeftFrozenCell )
-								_this.topLeftFrozenCell.row = row + 1;
+								_this.setFrozenCell(_this.topLeftFrozenCell.getCol0(), row, true);
 							else
-								_this.topLeftFrozenCell = new CellAddress(row, 0, 0);
+								_this.setFrozenCell(0, row, true);
 						}
 					}
 					break;
 			}
-			if ( !bMove ) {
-				_this.visibleRange.r1 = _this.topLeftFrozenCell.getRow0();
-				_this.visibleRange.c1 = _this.topLeftFrozenCell.getCol0();
-				_this.objectRender.drawingArea.init();
-				_this.draw();
-			}
+		}
+		
+		WorksheetView.prototype.setFrozenCell = function(col, row, bRedraw) {
+			this.topLeftFrozenCell = new CellAddress(row, col, 0);
+			this.visibleRange.c1 = col;
+			this.visibleRange.r1 = row;
+			this.objectRender.drawingArea.init();
+			if ( bRedraw )
+				this.draw();
+		}
+		
+		WorksheetView.prototype.clearFrozenCell = function() {
+			this.topLeftFrozenCell = null;
+			this.visibleRange.c1 = 0;
+			this.visibleRange.r1 = 0;
+			this.objectRender.drawingArea.init();
+			this.draw();
+		}
+		
+		WorksheetView.prototype.setSelectedFrozenCell = function() {
+			this.setFrozenCell(this.getSelectedColumnIndex(), this.getSelectedRowIndex(), true);
+		}
+		
+		WorksheetView.prototype.setFirstFrozenCol = function() {
+			this.setFrozenCell(1, 0, true);
+		}
+		
+		WorksheetView.prototype.setFirstFrozenRow = function() {
+			this.setFrozenCell(0, 1, true);
 		}
 
 		WorksheetView.prototype._drawSelectionElement = function (visibleRange, offsetX, offsetY, args) {
