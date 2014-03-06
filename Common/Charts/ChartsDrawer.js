@@ -78,6 +78,11 @@ CChartsDrawer.prototype =
 				newChart = new drawStockChart();
 				break;
 			}
+			case "DoughnutChart":
+			{
+				newChart = new drawDoughnutChart();
+				break;
+			}
 		}
 		this.chart = newChart;
 		
@@ -86,7 +91,7 @@ CChartsDrawer.prototype =
 		this.gridChart.reCalculate(this.calcProp, this, chartSpace);
 		this.allAreaChart.reCalculate(this.calcProp);
 		
-		if(this.calcProp.type != "Pie")
+		if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart")
 		{
 			this.catAxisChart.reCalculate(this.calcProp, null, chartSpace);
 			this.valAxisChart.reCalculate(this.calcProp, null, chartSpace);
@@ -105,7 +110,7 @@ CChartsDrawer.prototype =
 		this.allAreaChart.draw(this.calcProp, cShapeDrawer, chartSpace);
 		this.areaChart.draw(this.calcProp, cShapeDrawer, chartSpace);
 		
-		if(this.calcProp.type != "Pie")
+		if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart")
 		{
 			this.catAxisChart.draw(this.calcProp, cShapeDrawer, chartSpace);
 			this.valAxisChart.draw(this.calcProp, cShapeDrawer, chartSpace);
@@ -384,6 +389,11 @@ CChartsDrawer.prototype =
 			case historyitem_type_StockChart:
 			{
 				this.calcProp.type = "Stock";
+				break;
+			}
+			case historyitem_type_DoughnutChart:
+			{
+				this.calcProp.type = "DoughnutChart";
 				break;
 			}
 		};
@@ -755,16 +765,16 @@ CChartsDrawer.prototype =
 							formatAdobeLabel = null;
 						value = 0;
 					}
-					if(this.calcProp.type == 'Pie')
+					if(this.calcProp.type == 'Pie' || this.calcProp.type == "DoughnutChart")
 						arrValues[numSeries][n] = Math.abs(value);
 					else
 						arrValues[numSeries][n] = value;
 					arrFormatAdobeLabels[numSeries][n] = formatAdobeLabel;
 					if(chart.bShowCatName && this.calcProp.type != 'Scatter')
 					{
-						if(series[numSeries] && series[numSeries].Cat && series[numSeries].Cat.NumCache[col] && this.calcProp.type != "Pie")
+						if(series[numSeries] && series[numSeries].Cat && series[numSeries].Cat.NumCache[col] && this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart")
 							catNameLabels[numSeries][n] = series[numSeries].Cat.NumCache[col].val;
-						else if(this.calcProp.type != "Pie" && series[numSeries] && series[numSeries].TxCache)
+						else if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart" && series[numSeries] && series[numSeries].TxCache)
 							catNameLabels[numSeries][n] = series[numSeries].TxCache.Tx;
 						else if(series[numSeries] && series[numSeries] && series[numSeries].TxCache)
 							catNameLabels[numSeries][n] = series[numSeries].TxCache.Tx;
@@ -898,7 +908,7 @@ CChartsDrawer.prototype =
 		{
 			if(isSeries)
 			{
-				if(this.calcProp.type == 'HBar' || this.calcProp.type == 'Bar' || this.calcProp.type == 'Stock' || this.calcProp.type == 'Pie')
+				if(this.calcProp.type == 'HBar' || this.calcProp.type == 'Bar' || this.calcProp.type == 'Stock' || this.calcProp.type == 'Pie' || this.calcProp.type == 'DoughnutChart')
 				{
 					arrValuesRev = arrReverse(arrValues);
 					this.calcProp.arrFormatAdobeLabels = arrReverse(arrFormatAdobeLabels);
