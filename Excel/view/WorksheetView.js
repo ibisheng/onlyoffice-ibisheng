@@ -94,6 +94,7 @@
 		var kCurMove		= "move";
 		var kCurSEResize	= "se-resize";
 		var kCurNEResize	= "ne-resize";
+		var kCurAutoFilter	= "pointer";
 
 		// ToDo стоит перенести в common-ы
 		var kCurFormatPainter = "";
@@ -5409,15 +5410,12 @@
 		WorksheetView.prototype.getCursorTypeFromXY = function (x, y, isViewerMode) {
 			var c, r, f, i, offsetX, offsetY, arIntersection, left, top, right, bottom, cellCursor,
 				sheetId = this.model.getId(), userId, lockRangePosLeft, lockRangePosTop, lockInfo, oHyperlink,
-				widthDiff = 0, heightDiff = 0, isLocked = false, ar = this.activeRange;
+				widthDiff = 0, heightDiff = 0, isLocked = false, ar = this.activeRange, target = "cells", row = -1, col = -1;
 				
 			var frozenCursor = this._isFrozenAnchor(x, y);
 			if (frozenCursor.result) {
 				return {cursor: frozenCursor.cursor, target: frozenCursor.name, col: -1, row: -1};
 			}
-
-			if (this.isFormatPainter)
-				return {cursor: kCurFormatPainter, target: "cells"};
 
 			var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
 			if (asc["editor"].isStartAddShape && CheckIdSatetShapeAdd(this.objectRender.controller.curState.id))
@@ -5452,12 +5450,30 @@
 					userId: userId, lockRangePosLeft: lockRangePosLeft, lockRangePosTop: lockRangePosTop};
 			}
 
-			var autoFilterCursor = this.autoFilters.isButtonAFClick(x, y);
-			if (autoFilterCursor)
-				return {cursor: autoFilterCursor, target: "aFilterObject", col: -1, row: -1};
-
 			x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
 			y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
+
+			if (this.isFormatPainter) {
+				if (x <= this.cellsLeft && y >= this.cellsTop) {
+					r = this._findRowUnderCursor(y, true);
+					if (r !== null) {
+						target = "rowheader";
+						row = r.row;
+					}
+				}
+				if (y <= this.cellsTop && x >= this.cellsLeft) {
+					c = this._findColUnderCursor(x, true);
+					if (c !== null) {
+						target = "colheader";
+						col = c.col;
+					}
+				}
+				return {cursor: kCurFormatPainter, target: target, col: col, row: row};
+			}
+
+			var autoFilterInfo = this.autoFilters.checkCursor(x, y);
+			if (autoFilterInfo)
+				return {cursor: kCurAutoFilter, target: "aFilterObject", col: -1, row: -1, idFilter: autoFilterInfo.id};
 
 			offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
 			offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;

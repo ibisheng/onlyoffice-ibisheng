@@ -598,10 +598,8 @@
 				});
 		};
 
-		asc_CEventsController.prototype._autoFiltersClick = function (event) {
-			var t = this;
-			var coord = t._getCoordinates(event);
-			this.handlers.trigger("autoFiltersClick", coord.x, coord.y);
+		asc_CEventsController.prototype._autoFiltersClick = function (idFilter) {
+			this.handlers.trigger("autoFiltersClick", idFilter);
 		};
 
 		asc_CEventsController.prototype._commentCellClick = function (event) {
@@ -1247,7 +1245,7 @@
 						return;
 					}
 					else if (t.targetInfo && (t.targetInfo.target === "aFilterObject")) {
-						  t._autoFiltersClick(event);
+						  t._autoFiltersClick(t.targetInfo.idFilter);
 						  return;
 					}
 					else if (t.targetInfo && (undefined !== t.targetInfo.commentIndexes) && (false === this.settings.isViewerMode)) {

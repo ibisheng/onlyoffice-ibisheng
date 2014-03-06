@@ -778,9 +778,8 @@
 				ws._applyFrozenAnchor(x, y, targetInfo, false);
 		};
 
-		WorkbookView.prototype._onAutoFiltersClick = function (x, y) {
-			var ws = this.getWorksheet();
-			ws.autoFilters.autoFocusClick(x,y);
+		WorkbookView.prototype._onAutoFiltersClick = function (idFilter) {
+			this.getWorksheet().autoFilters.onAutoFilterClick(idFilter);
 		};
 
 		WorkbookView.prototype._onCommentCellClick = function (x, y) {

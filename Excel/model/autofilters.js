@@ -1212,51 +1212,33 @@ var gUndoInsDelCellsFlag = true;
 				}
 			},
 			//попал ли курсор на кнопку фильтра
-			isButtonAFClick: function(x,y)
-			{
-				if(!this.allButtonAF)
+			checkCursor: function (x, y) {
+				if (!this.allButtonAF)
 					return false;
 				var ws = this.worksheet;
-				var buttons =  this.allButtonAF;
-				var kof = 96 / 72;
-				var zoom = ws.getZoom();
-				var width = 13*zoom;
-				var height = 13*zoom;
-				for(var i = 0; i < buttons.length; i++)
-				{
-					var width2 =  (buttons[i].x)*kof + width;
-					var width1 = (buttons[i].x)*kof;
-					var height1 = (buttons[i].y)*kof;
-					var height2 = (buttons[i].y + height)*kof;
-					if(x >= width1 && x <= width2 && y >= height1 && y <= height2 && height1 >= ws.rows[0].top && width1 >= ws.cols[0].left)
-					{
-						return 'pointer';
+				var offset = ws.getCellsOffset(1/*pt*/);
+				var width = 11.25;
+				var height = 11.25;
+
+				var button;
+				for (var i = 0; i < this.allButtonAF.length; i++) {
+					button = this.allButtonAF[i];
+					var x1 = button.x;
+					var x2 = button.x + width;
+					var y1 = button.y;
+					var y2 = button.y + height;
+					if (x >= x1 && x <= x2 && y >= y1 && y <= y2 && y1 >= offset.top && x1 >= offset.left) {
+						return {id: i, target: "aFilterObject", col: -1, row: -1};
 					}
 				}
+				return false;
 			},
 			//клик по кнопке конкретного фильтра
-			autoFocusClick: function(x,y)
-			{
+			onAutoFilterClick: function (idFilter) {
 				if(!this.allButtonAF)
 					return;
-				var ws = this.worksheet;
-				var buttons =  this.allButtonAF;
 				var kof = 96 / 72;
-				var zoom = ws.getZoom();
-				var width = 13*zoom;
-				var height = 13*zoom;
-				for(var i = 0; i < buttons.length; i++)
-				{
-					var width2 =  (buttons[i].x)*kof + width;
-					var width1 = (buttons[i].x)*kof;
-					var height1 = (buttons[i].y)*kof;
-					var height2 = (buttons[i].y + height)*kof;
-					if(x >= width1 && x <= width2 && y >= height1 && y <= height2 && height1 >= ws.rows[0].top && width1 >= ws.cols[0].left)
-					{
-						this._showAutoFilterDialog(buttons[i],kof);
-						return;
-					}
-				}
+				this._showAutoFilterDialog(this.allButtonAF[idFilter], kof);
 			},
 
 			drawAutoF: function (updatedRange, offsetX, offsetY) {
