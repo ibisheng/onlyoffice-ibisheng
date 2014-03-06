@@ -2567,17 +2567,18 @@ drawBarChart.prototype =
 	
 	_DrawBars: function()
 	{
-		var brush, pen, seria;
+		var brush, pen, seria, numCache;
 		for (var i = 0; i < this.paths.series.length; i++) {
 			seria = this.chartProp.series[i];
 			brush = seria.brush;
 			pen = seria.pen;
 
 			for (var j = 0; j < this.paths.series[i].length; j++) {
-				if(seria.val.numRef.numCache.pts[j].pen)
-					pen = seria.val.numRef.numCache.pts[j].pen;
-				if(seria.val.numRef.numCache.pts[j].brush)
-					brush = seria.val.numRef.numCache.pts[j].brush;
+				numCache = seria.val.numRef ? seria.val.numRef.numCache : seria.val.numLit;
+				if(numCache.pts[j].pen)
+					pen = numCache.pts[j].pen;
+				if(numCache.pts[j].brush)
+					brush = numCache.pts[j].brush;
 					
 				this._drawPaths(this.paths.series[i][j], brush, pen);
 			}
@@ -2597,7 +2598,8 @@ drawBarChart.prototype =
 		//TODO - передавать overlap из меню!
 		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 100 : 0;
 		var overlap        = this.cShapeDrawer.chart.plotArea.chart.overlap ? this.cShapeDrawer.chart.plotArea.chart.overlap : defaultOverlap;
-        var width          = widthGraph / this.chartProp.series[0].val.numRef.numCache.pts.length;
+		var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
+        var width          = widthGraph / numCache.pts.length;
 		
 		
 		var individualBarWidth = width / (this.chartProp.series.length - (this.chartProp.series.length - 1) * (overlap / 100) + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
@@ -2608,7 +2610,8 @@ drawBarChart.prototype =
 		
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 		
-			seria = this.chartProp.series[i].val.numRef.numCache.pts;
+			numCache = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache : this.chartProp.series[i].val.numLit;
+			seria = numCache.pts;
 			seriesHeight[i] = [];
 			
 			for (var j = 0; j < seria.length; j++) {
@@ -2648,7 +2651,7 @@ drawBarChart.prototype =
 	
 	_getStartYColumnPosition: function (seriesHeight, j, val, yPoints, summBarVal)
 	{
-		var startY, diffYVal, height;
+		var startY, diffYVal, height, numCache;
 		var nullPositionOX = this.chartProp.nullPositionOX/*this.cShapeDrawer.chart.plotArea.catAx.posY * this.chartProp.pxToMM*/;
 		if(this.chartProp.subType == "stacked")
 		{
@@ -2676,7 +2679,8 @@ drawBarChart.prototype =
 			{
 				for(var k = 0; k < this.chartProp.series.length; k++)
 				{
-					tempVal = parseFloat(this.chartProp.series[k].val.numRef.numCache.pts[j].val);
+					numCache = this.chartProp.series[k].val.numRef ? this.chartProp.series[k].val.numRef.numCache : this.chartProp.series[k].val.numLit;
+					tempVal = parseFloat(numCache.pts[j].val);
 					if(tempVal)
 						temp += Math.abs(tempVal);
 				}
@@ -2716,7 +2720,7 @@ drawBarChart.prototype =
 	
 	_calculateDLbl: function(chartSpace, ser, val)
 	{
-		var point = this.chartProp.series[ser].val.numRef.numCache.pts[val];
+		var point = this.chartProp.series[ser].val.numRef ? this.chartProp.series[ser].val.numRef.numCache.pts[val] : this.chartProp.series[ser].val.numLit.pts[val];
 		var path = this.paths.series[ser][val].ArrPathCommand;
 			
 		var x = path[0].X;
@@ -2860,7 +2864,7 @@ drawLineChart.prototype =
 		
 			seria = this.chartProp.series[i];
 			
-			dataSeries = seria.val.numRef.numCache.pts;
+			dataSeries = seria.val.numRef ? seria.val.numRef.numCache.pts : seria.val.numLit.pts;
 			
 			if(dataSeries.length == 1)
 			{
@@ -3074,12 +3078,13 @@ drawLineChart.prototype =
 	
 	_calculateDLbl: function(chartSpace, ser, val)
 	{
-		var point = this.chartProp.series[ser].val.numRef.numCache.pts[val];
+		var numCache = this.chartProp.series[ser].val.numRef ? this.chartProp.series[ser].val.numRef.numCache : this.chartProp.series[ser].val.numLit;
+		var point = numCache.pts[val];
 		var path;
 		
 		if(this.paths.series)
 		{
-			if(val == this.chartProp.series[ser].val.numRef.numCache.pts.length - 1)
+			if(val == numCache.pts.length - 1)
 				path = this.paths.series[ser][val - 1].ArrPathCommand[1];
 			else
 				path = this.paths.series[ser][val].ArrPathCommand[0];
@@ -3151,7 +3156,7 @@ drawLineChart.prototype =
 	
 	_drawLines: function (isRedraw/*isSkip*/)
     {
-		var brush, pen, dataSeries, seria, markerBrush, markerPen;
+		var brush, pen, dataSeries, seria, markerBrush, markerPen, numCache;
 		
 		this.cShapeDrawer.Graphics.SaveGrState();
 		this.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, this.chartProp.chartGutter._top / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
@@ -3160,13 +3165,14 @@ drawLineChart.prototype =
 			brush = seria.brush;
 			pen = seria.pen;
 			
-			dataSeries = seria.val.numRef.numCache.pts;
+			numCache = seria.val.numRef ? seria.val.numRef.numCache : seria.val.numLit;
+			dataSeries = numCache.pts;
 			for(var n = 0; n < dataSeries.length - 1; n++)
 			{
-				if(seria.val.numRef.numCache.pts[n].pen)
-					pen = seria.val.numRef.numCache.pts[n].pen;
-				if(seria.val.numRef.numCache.pts[n].brush)
-					brush = seria.val.numRef.numCache.pts[n].brush;
+				if(numCache.pts[n].pen)
+					pen = numCache.pts[n].pen;
+				if(numCache.pts[n].brush)
+					brush = numCache.pts[n].brush;
 					
 				this._drawPath(this.paths.series[i][n], brush, pen);
 			}
@@ -3174,8 +3180,8 @@ drawLineChart.prototype =
 			//draw point
 			for(var k = 0; k < this.paths.points[i].length; k++)
 			{	
-				markerBrush = this.chartProp.series[i].val.numRef.numCache.pts[k].compiledMarker.brush;
-				markerPen = this.chartProp.series[i].val.numRef.numCache.pts[k].compiledMarker.pen;
+				markerBrush = numCache.pts[k].compiledMarker.brush;
+				markerPen = numCache.pts[k].compiledMarker.pen;
 				
 				//frame of point
 				if(this.paths.points[i][0].framePaths)
@@ -3191,11 +3197,13 @@ drawLineChart.prototype =
 	{
 		var tempVal;
 		var val = 0;
+		var numCache;
 		if(this.chartProp.subType == "stacked")
 		{
 			for(var k = 0; k <= i; k++)
 			{
-				tempVal = parseFloat(this.chartProp.series[k].val.numRef.numCache.pts[n].val);
+				numCache = this.chartProp.series[k].val.numRef ? this.chartProp.series[k].val.numRef.numCache :  this.chartProp.series[k].val.numLit;
+				tempVal = parseFloat(numCache.pts[n].val);
 				if(tempVal)
 					val += tempVal;
 			}
@@ -3205,7 +3213,8 @@ drawLineChart.prototype =
 			var summVal = 0;
 			for(var k = 0; k < this.chartProp.series.length; k++)
 			{
-				tempVal = parseFloat(this.chartProp.series[k].val.numRef.numCache.pts[n].val);
+				numCache = this.chartProp.series[k].val.numRef ? this.chartProp.series[k].val.numRef.numCache :  this.chartProp.series[k].val.numLit;
+				tempVal = parseFloat(numCache.pts[n].val);
 				if(tempVal)
 				{
 					if(k <= i)
@@ -3217,7 +3226,8 @@ drawLineChart.prototype =
 		}
 		else
 		{
-			val = parseFloat(this.chartProp.series[i].val.numRef.numCache.pts[n].val);
+			numCache = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache :  this.chartProp.series[i].val.numLit;
+			val = parseFloat(numCache.pts[n].val);
 		}
 		return val;
 	},
@@ -3298,7 +3308,7 @@ drawAreaChart.prototype =
 		
 			seria = this.chartProp.series[i];
 			
-			dataSeries = seria.val.numRef.numCache.pts;
+			dataSeries = seria.val.numRef ? seria.val.numRef.numCache.pts : seria.val.numLit.pts;
 			
 			for(var n = 0; n < dataSeries.length - 1; n++)
 			{
@@ -3393,10 +3403,11 @@ drawAreaChart.prototype =
 	
 	_calculateDLbl: function(chartSpace, ser, val)
 	{
-		var point = this.chartProp.series[ser].val.numRef.numCache.pts[val];
+		var numCache = this.chartProp.series[ser].val.numRef ? this.chartProp.series[ser].val.numRef.numCache : this.chartProp.series[ser].val.numLit;
+		var point = numCache.pts[val];
 		var path;
 		
-		if(this.paths.series && this.paths.series[ser] && this.paths.series[ser][val - 1] && val == this.chartProp.series[ser].val.numRef.numCache.pts.length - 1)
+		if(this.paths.series && this.paths.series[ser] && this.paths.series[ser][val - 1] && val == numCache.pts.length - 1)
 			path = this.paths.series[ser][val - 1].ArrPathCommand[1];
 		else if(this.paths.series && this.paths.series[ser] && this.paths.series[ser][val])
 			path = this.paths.series[ser][val].ArrPathCommand[0];
@@ -3479,13 +3490,13 @@ drawAreaChart.prototype =
 			brush = seria.brush;
 			pen = seria.pen;
 
-			dataSeries = seria.val.numRef.numCache.pts;
+			dataSeries = seria.val.numRef ? seria.val.numRef.numCache.pts : seria.val.numLit.pts;
 			for(var n = 0; n < dataSeries.length - 1; n++)
 			{
-				if(seria.val.numRef.numCache.pts[n].pen)
-					pen = seria.val.numRef.numCache.pts[n].pen;
-				if(seria.val.numRef.numCache.pts[n].brush)
-					brush = seria.val.numRef.numCache.pts[n].brush;
+				if(dataSeries[n].pen)
+					pen = dataSeries[n].pen;
+				if(dataSeries[n].brush)
+					brush = dataSeries[n].brush;
 				
 				this._drawPath(this.paths.series[i][n], brush, pen);
 			}
@@ -3496,11 +3507,14 @@ drawAreaChart.prototype =
 	{
 		var tempVal;
 		var val = 0;
+		var numCache;
+		
 		if(this.chartProp.subType == "stacked")
 		{
 			for(var k = 0; k <= (this.chartProp.series.length - i - 1); k++)
 			{
-				tempVal = parseFloat(this.chartProp.series[k].val.numRef.numCache.pts[n].val);
+				numCache = this.chartProp.series[k].val.numRef ? this.chartProp.series[k].val.numRef.numCache : this.chartProp.series[k].val.numLit;
+				tempVal = parseFloat(numCache.pts[n].val);
 				if(tempVal)
 					val += tempVal;
 			}
@@ -3510,7 +3524,8 @@ drawAreaChart.prototype =
 			var summVal = 0;
 			for(var k = 0; k < this.chartProp.series.length; k++)
 			{
-				tempVal = parseFloat(this.chartProp.series[k].val.numRef.numCache.pts[n].val);
+				numCache = this.chartProp.series[k].val.numRef ? this.chartProp.series[k].val.numRef.numCache : this.chartProp.series[k].val.numLit;
+				tempVal = parseFloat(numCache.pts[n].val);
 				if(tempVal)
 				{
 					if(k <= (this.chartProp.series.length - i - 1))
@@ -3522,8 +3537,10 @@ drawAreaChart.prototype =
 		}
 		else
 		{
-			val = parseFloat(this.chartProp.series[i].val.numRef.numCache.pts[n].val);
+			numCache = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache : this.chartProp.series[i].val.numLit;
+			val = parseFloat(numCache.pts[n].val);
 		}
+		
 		return val;
 	},
 	
@@ -3610,7 +3627,8 @@ drawHBarChart.prototype =
 		//TODO - передавать overlap из меню!
 		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 100 : 0;
 		var overlap        = this.cShapeDrawer.chart.plotArea.chart.overlap ? this.cShapeDrawer.chart.plotArea.chart.overlap : defaultOverlap;
-        var height          = heightGraph / this.chartProp.series[0].val.numRef.numCache.pts.length;
+		var numCache       = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
+        var height         = heightGraph / numCache.pts.length;
 		
 		
 		var individualBarHeight = height / (this.chartProp.series.length - (this.chartProp.series.length - 1) * (overlap / 100) + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
@@ -3621,6 +3639,7 @@ drawHBarChart.prototype =
 		
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 		
+			numCache = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache : his.chartProp.series[i].val.numLit;
 			seria = this.chartProp.series[i].val.numRef.numCache.pts;
 			seriesHeight[i] = [];
 			
@@ -3660,7 +3679,7 @@ drawHBarChart.prototype =
 	
 	_getStartYColumnPosition: function (seriesHeight, j, val, xPoints, summBarVal)
 	{
-		var startY, diffYVal, width;
+		var startY, diffYVal, width, numCache;
 		var nullPositionOX = this.chartProp.nullPositionOX/*this.cShapeDrawer.chart.plotArea.catAx.posY * this.chartProp.pxToMM*/;
 		if(this.chartProp.subType == "stacked")
 		{
@@ -3688,6 +3707,7 @@ drawHBarChart.prototype =
 			{
 				for(var k = 0; k < this.chartProp.series.length; k++)
 				{
+					numCache = this.chartProp.series[k].val.numRef ? this.chartProp.series[k].val.numRef.numCache : this.chartProp.series[k].val.numLit;
 					tempVal = parseFloat(this.chartProp.series[k].val.numRef.numCache.pts[j].val);
 					if(tempVal)
 						temp += Math.abs(tempVal);
@@ -3759,13 +3779,13 @@ drawHBarChart.prototype =
 			seria = this.chartProp.series[i];
 			brush = seria.brush;
 			pen = seria.pen;
-			dataSeries = this.chartProp.series[i].val.numRef.numCache.pts;
+			dataSeries = seria.val.numRef ? seria.val.numRef.numCache.pts : seria.val.numLit.pts;
 			
 			for (var j = 0; j < dataSeries.length; j++) {
-				if(seria.val.numRef.numCache.pts[j].pen)
-					pen = seria.val.numRef.numCache.pts[j].pen;
-				if(seria.val.numRef.numCache.pts[j].brush)
-					brush = seria.val.numRef.numCache.pts[j].brush;
+				if(dataSeries[j].pen)
+					pen = dataSeries[j].pen;
+				if(dataSeries[j].brush)
+					brush = dataSeries[j].brush;
 			
 				this._drawPath(this.paths.series[i][j], brush, pen);
 			}
@@ -3774,7 +3794,7 @@ drawHBarChart.prototype =
 	
 	_calculateDLbl: function(chartSpace, ser, val)
 	{
-		var point = this.chartProp.series[ser].val.numRef.numCache.pts[val];
+		var point = this.chartProp.series[ser].val.numRef ? this.chartProp.series[ser].val.numRef.numCache.pts[val] : this.chartProp.series[ser].val.numLit.pts[val];
 		var path = this.paths.series[ser][val].ArrPathCommand;
 			
 		var x = path[0].X;
@@ -3907,11 +3927,11 @@ drawPieChart.prototype =
 	
 	_drawPie: function ()
     {
-		var numCache = this.chartProp.series[0].val.numRef.numCache.pts;
+		var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache.pts : this.chartProp.series[0].val.numLit.pts;
 		var brush, pen, val;
 		var path;
         for (var i = 0,len = numCache.length; i < len; i++) {
-			val = this.chartProp.series[0].val.numRef.numCache.pts[i];
+			val = numCache[i];
 			brush = val.brush;
 			pen = val.pen;
 			path = this.paths.series[i];
@@ -3925,7 +3945,7 @@ drawPieChart.prototype =
 		var trueWidth = this.chartProp.trueWidth;
 		var trueHeight = this.chartProp.trueHeight;
 
-		var numCache = this.chartProp.series[0].val.numRef.numCache.pts;
+		var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache.pts : this.chartProp.series[0].val.numLit.pts;
 		var sumData = this.cChartDrawer._getSumArray(numCache, true);
 		var radius = trueHeight/2;
 		var xCenter = this.chartProp.chartGutter._left + trueWidth/2;
@@ -3993,7 +4013,7 @@ drawPieChart.prototype =
 		var stAng = path[2].stAng;
 		var swAng = path[2].swAng;
 		
-		var point = this.chartProp.series[0].val.numRef.numCache.pts[val];
+		var point = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache.pts[val] : this.chartProp.series[0].val.numLit.pts[val];
 		
 		var constMargin = 5 / pxToMm;
 		
@@ -4081,9 +4101,13 @@ drawDoughnutChart.prototype =
     {
 		var brush, pen, val;
 		var path;
+		var numCache, curNumCache;
 		
         for(var n = 0; n < this.chartProp.series.length; n++) {
-			for (var k = 0; k < this.chartProp.series[n].val.numRef.numCache.pts.length; k++) {
+			numCache = this.chartProp.series[n].val.numRef ? this.chartProp.series[n].val.numRef.numCache : this.chartProp.series[n].val.numLit;
+			
+			for (var k = 0; k < numCache.pts.length; k++) {
+				curNumCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
 				val = this.chartProp.series[0].val.numRef.numCache.pts[k];
 				brush = val.brush;
 				pen = val.pen;
@@ -4103,7 +4127,7 @@ drawDoughnutChart.prototype =
 		
 		//% from out radius  
 		var defaultSize = 50;
-		var holeSize = this.cShapeDrawer.chart.holeSize ? this.cShapeDrawer.chart.holeSize : defaultSize;
+		var holeSize = this.cShapeDrawer.chart.plotArea.chart.holeSize ? this.cShapeDrawer.chart.plotArea.chart.holeSize : defaultSize;
 		
 		//inner radius
 		var radius = outRadius * (holeSize / 100);
@@ -4112,15 +4136,17 @@ drawDoughnutChart.prototype =
 		var xCenter = this.chartProp.chartGutter._left + trueWidth/2;
 		var yCenter = this.chartProp.chartGutter._top + trueHeight/2;
 		
+		var numCache;
 		for(var n = 0; n < this.chartProp.series.length; n++)
 		{
 			this.tempAngle = Math.PI/2;
-			sumData = this.cChartDrawer._getSumArray(this.chartProp.series[n].val.numRef.numCache.pts, true);
+			numCache = this.chartProp.series[n].val.numRef ? this.chartProp.series[n].val.numRef.numCache : this.chartProp.series[n].val.numLit;
+			sumData = this.cChartDrawer._getSumArray(numCache.pts, true);
 			
 			//рисуем против часовой стрелки, поэтому цикл с конца
-			for (var k = this.chartProp.series[n].val.numRef.numCache.pts.length - 1; k >= 0; k--) {
+			for (var k = numCache.pts.length - 1; k >= 0; k--) {
 				
-				var angle = Math.abs((parseFloat(this.chartProp.series[n].val.numRef.numCache.pts[k].val / sumData)) * (Math.PI * 2));
+				var angle = Math.abs((parseFloat(numCache.pts[k].val / sumData)) * (Math.PI * 2));
 				if(!this.paths.series)
 					this.paths.series = [];
 				if(!this.paths.series[n])
@@ -4205,7 +4231,7 @@ drawDoughnutChart.prototype =
 		var centerX = xCenter + newRadius * Math.cos(-1 * stAng - swAng / 2); 
 		var centerY = yCenter - newRadius * Math.sin(-1 * stAng - swAng / 2); 
 		
-		var point = this.chartProp.series[ser].val.numRef.numCache.pts[val];
+		var point = this.chartProp.series[ser].val.numRef ? this.chartProp.series[ser].val.numRef.numCache.pts[val] : this.chartProp.series[ser].val.numLit.pts[val];
 		
 		var width = point.compiledDlb.extX;
 		var height = point.compiledDlb.extY;
@@ -4356,7 +4382,7 @@ drawScatterChart.prototype =
 	
 	_drawScatter: function ()
     {
-		var seria, brush, pen, markerBrush, markerPen;
+		var seria, brush, pen, markerBrush, markerPen, yNumCache;
 		for(var i = 0; i < this.chartProp.series.length; i++)
 		{
 			seria = this.chartProp.series[i];
@@ -4370,11 +4396,12 @@ drawScatterChart.prototype =
 				{
 					brush = this.chartProp.series[i].brush;
 					pen = this.chartProp.series[i].pen;
+					yNumCache = this.chartProp.series[i].yVal.numRef ? this.chartProp.series[i].yVal.numRef.numCache : this.chartProp.series[i].yVal.numLit;
 					
-					if(this.chartProp.series[i].yVal.numRef.numCache.pts[k].pen)
-						pen = this.chartProp.series[i].yVal.numRef.numCache.pts[k].pen;
-					if(this.chartProp.series[i].yVal.numRef.numCache.pts[k].brush)
-						brush = this.chartProp.series[i].yVal.numRef.numCache.pts[k].brush;
+					if(yNumCache.pts[k].pen)
+						pen = yNumCache.pts[k].pen;
+					if(yNumCache.pts[k].brush)
+						brush = yNumCache.pts[k].brush;
 						
 					//draw line
 					this._drawPath(this.paths.series[i][k], brush, pen, true);
@@ -4387,8 +4414,9 @@ drawScatterChart.prototype =
 			{
 				for(var k = 0; k < this.paths.points[i].length; k++)
 				{	
-					markerBrush = this.chartProp.series[i].yVal.numRef.numCache.pts[k].compiledMarker.brush;
-					markerPen = this.chartProp.series[i].yVal.numRef.numCache.pts[k].compiledMarker.pen;
+					yNumCache = this.chartProp.series[i].yVal.numRef ? this.chartProp.series[i].yVal.numRef.numCache : this.chartProp.series[i].yVal.numLit;
+					markerBrush = yNumCache.pts[k].compiledMarker.brush;
+					markerPen = yNumCache.pts[k].compiledMarker.pen;
 					
 					//frame of point
 					if(this.paths.points[i][0].framePaths)
@@ -4585,9 +4613,9 @@ drawScatterChart.prototype =
 	{
 		var point;
 		if(this.chartProp.series[ser - 1])
-			point = this.chartProp.series[ser - 1].yVal.numRef.numCache.pts[val];
+			point = this.chartProp.series[ser - 1].yVal.numRef ? this.chartProp.series[ser - 1].yVal.numRef.numCache.pts[val] : this.chartProp.series[ser - 1].yVal.numLit.pts[val];
 		else
-			point = this.chartProp.series[ser].yVal.numRef.numCache.pts[val];
+			point = this.chartProp.series[ser].yVal.numRef ? this.chartProp.series[ser].yVal.numRef.numCache.pts[val] : this.chartProp.series[ser].yVal.numLit.pts[val];
 		
 		var path;
 		
@@ -4717,28 +4745,30 @@ drawStockChart.prototype =
 		
 		var trueWidth = this.chartProp.trueWidth;
 
-		var koffX = trueWidth / this.chartProp.series[0].val.numRef.numCache.pts.length;
+		var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
+		var koffX = trueWidth / numCache.pts.length;
 		var widthBar = koffX / (1 + this.cChartSpace.chart.plotArea.chart.upDownBars.gapWidth / 100);
 		
-		var val1, val2, val3, val4, xVal, yVal1, yVal2, yVal3, yVal4;
-		for (var i = 0; i < this.chartProp.series[0].val.numRef.numCache.pts.length; i++) {
+		var val1, val2, val3, val4, xVal, yVal1, yVal2, yVal3, yVal4, curNumCache;
+		for (var i = 0; i < numCache.pts.length; i++) {
 			
-			val1 = this.chartProp.series[0].val.numRef.numCache.pts[i].val;
-			val4 = this.chartProp.series[this.chartProp.series.length - 1].val.numRef.numCache.pts[i].val;
+			val1 = numCache.pts[i].val;
+			val4 = this.chartProp.series[this.chartProp.series.length - 1].val.numRef ? this.chartProp.series[this.chartProp.series.length - 1].val.numRef.numCache.pts[i].val : this.chartProp.series[this.chartProp.series.length - 1].val.numLit.pts[i].val;
 			
 			for(var k = 1; k < this.chartProp.series.length - 1; k++)
 			{
+				curNumCache = this.chartProp.series[k].val.numRef ? this.chartProp.series[k].val.numRef.numCache : this.chartProp.series[k].val.numLit;
 				if(k == 1)
 				{
-					val2 = this.chartProp.series[k].val.numRef.numCache.pts[i].val;
-					val3 = this.chartProp.series[k].val.numRef.numCache.pts[i].val;
+					val2 = curNumCache.pts[i].val;
+					val3 = curNumCache.pts[i].val;
 				}
 				else
 				{
-					if(parseFloat(val2) > parseFloat(this.chartProp.series[k].val.numRef.numCache.pts[i].val))	
-						val2 = this.chartProp.series[k].val.numRef.numCache.pts[i].val;
-					if(parseFloat(val3) < parseFloat(this.chartProp.series[k].val.numRef.numCache.pts[i].val))	
-						val3 = this.chartProp.series[k].val.numRef.numCache.pts[i].val;
+					if(parseFloat(val2) > parseFloat(curNumCache.pts[i].val))	
+						val2 = curNumCache.pts[i].val;
+					if(parseFloat(val3) < parseFloat(curNumCache.pts[i].val))	
+						val3 = curNumCache.pts[i].val;
 				}
 			}
 			
@@ -4812,7 +4842,9 @@ drawStockChart.prototype =
 		var pen;
 		var dataSeries;
 		var seria;
-		for (var i = 0; i < this.chartProp.series[0].val.numRef.numCache.pts.length; i++) {
+		var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
+		
+		for (var i = 0; i < numCache.pts.length; i++) {
 
 			pen = this.cChartSpace.chart.plotArea.chart.calculatedHiLowLines;
 				
@@ -4867,10 +4899,11 @@ drawStockChart.prototype =
 		if(this.chartProp.min < 0 && this.chartProp.max <= 0)
 			min = -1*max;
 
-		var koffX = this.chartProp.trueWidth / this.chartProp.series[0].val.numRef.numCache.pts.length;
+		var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
+		var koffX = this.chartProp.trueWidth / numCache.pts.length;
 		var koffY = this.chartProp.trueHeight / digHeight;
 		
-		var point = this.chartProp.series[ser].val.numRef.numCache.pts[val];
+		var point = this.chartProp.series[ser].val.numRef ? this.chartProp.series[ser].val.numRef.numCache.pts[val] : this.chartProp.series[ser].val.numLit.pts[val];
 		
 		var x = this.chartProp.chartGutter._left + (val)*koffX + koffX/2;
 		var y = this.chartProp.trueHeight - (point.val - min)*koffY + this.chartProp.chartGutter._top;
@@ -5843,7 +5876,7 @@ drawLine3DChart.prototype =
 		
 			var seria = this.chartProp.series[i];
 			
-			var dataSeries = seria.val.numRef.numCache.pts;
+			var dataSeries = seria.val.numRef.numCache ? seria.val.numRef.numCache.pts : seria.val.numLit.pts;
 			
 			var y, y1, x, x1, val, prevVal, tempVal;
 			
@@ -5927,13 +5960,13 @@ drawLine3DChart.prototype =
 			brush = seria.brush;
 			pen = seria.pen;
 			
-			dataSeries = seria.val.numRef.numCache.pts;
+			dataSeries = seria.val.numRef.numCache ? seria.val.numRef.numCache.pts : seria.val.numLit.pts;
 			for(var n = 1; n < dataSeries.length; n++)
 			{
-				if(seria.val.numRef.numCache.pts[n].pen)
-					pen = seria.val.numRef.numCache.pts[n].pen;
-				if(seria.val.numRef.numCache.pts[n].brush)
-					brush = seria.val.numRef.numCache.pts[n].brush;
+				if(dataSeries[n].pen)
+					pen = dataSeries[n].pen;
+				if(dataSeries[n].brush)
+					brush = dataSeries[n].brush;
 					
 				this._drawPath(this.paths.series[i][n], brush, pen);
 			}
@@ -5944,11 +5977,13 @@ drawLine3DChart.prototype =
 	{
 		var tempVal;
 		var val = 0;
+		var numCache;
 		if(this.chartProp.subType == "stacked")
 		{
 			for(var k = 0; k <= i; k++)
 			{
-				tempVal = parseFloat(this.chartProp.series[k].val.numRef.numCache.pts[n].val);
+				numCache = this.chartProp.series[k].val.numRef ? this.chartProp.series[k].val.numRef.numCache : this.chartProp.series[k].val.numLit;
+				tempVal = parseFloat(numCache.pts[n].val);
 				if(tempVal)
 					val += tempVal;
 			}
@@ -5958,7 +5993,8 @@ drawLine3DChart.prototype =
 			var summVal = 0;
 			for(var k = 0; k < this.chartProp.series.length; k++)
 			{
-				tempVal = parseFloat(this.chartProp.series[k].val.numRef.numCache.pts[n].val);
+				numCache = this.chartProp.series[k].val.numRef ? this.chartProp.series[k].val.numRef.numCache : this.chartProp.series[k].val.numLit;
+				tempVal = parseFloat(numCache.pts[n].val);
 				if(tempVal)
 				{
 					if(k <= i)
@@ -5970,7 +6006,8 @@ drawLine3DChart.prototype =
 		}
 		else
 		{
-			val = parseFloat(this.chartProp.series[i].val.numRef.numCache.pts[n].val);
+			numCache = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache : this.chartProp.series[i].val.numLit;
+			val = parseFloat(numCache.pts[n].val);
 		}
 		return val;
 	},
