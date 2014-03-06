@@ -97,7 +97,7 @@
 
 		// ToDo стоит перенести в common-ы
 		var kCurFormatPainter = "";
-		if (true || AscBrowser.isIE)
+		if (AscBrowser.isIE)
 			kCurFormatPainter = "url(../Common/Images/copy_format.cur), pointer";
 		else if (AscBrowser.isOpera)
 			kCurFormatPainter = "pointer";
