@@ -912,7 +912,7 @@ function CDrawingDocument()
     this.cursorPaintFormat = "";
     if (bIsIE)
     {
-        this.cursorPaintFormat = "url(Images/copy_format.cur), pointer";
+        this.cursorPaintFormat = "url(../Common/Images/copy_format.cur), pointer";
     }
     else if (window.opera)
         this.cursorPaintFormat = "pointer";
