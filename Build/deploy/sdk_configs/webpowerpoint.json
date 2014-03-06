@@ -189,7 +189,7 @@
             "sample": {
                 "files": {
                     "<%= pkg.menu_path %>/PowerPoint/": [
-                        "../../PowerPoint/Images/**",
+                        "../../PowerPoint/Images/*.cur"
                         "../../PowerPoint/menu/**",
                         "../../PowerPoint/MenuIcons/**"
                     ],
