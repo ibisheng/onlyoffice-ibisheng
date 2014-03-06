@@ -95,6 +95,7 @@
 		var kCurSEResize	= "se-resize";
 		var kCurNEResize	= "ne-resize";
 
+		// ToDo стоит перенести в common-ы
 		var kCurFormatPainter = "";
 		if (true || AscBrowser.isIE)
 			kCurFormatPainter = "url(../Common/Images/copy_format.cur), pointer";
