@@ -188,10 +188,6 @@
             },
             "sample": {
                 "files": {
-                    "<%= pkg.menu_path %>/PowerPoint/": [
-                        "../../PowerPoint/menu/**",
-                        "../../PowerPoint/MenuIcons/**"
-                    ],
                     "<%= pkg.menu_path %>/PowerPoint/index.html": "../../PowerPoint/index.html.deploy"
                 }
             }
