@@ -4287,15 +4287,18 @@ drawScatterChart.prototype =
 		var koffX = trueWidth/digHeightOx;
 		var koffY = trueHeight/digHeightOy;	
 		
-		var seria, yVal, xVal, points, x, x1, y, y1;
+		var seria, yVal, xVal, points, x, x1, y, y1, yNumCache, xNumCache;
 		for(var i = 0; i < this.chartProp.series.length; i++)
 		{
 			seria = this.chartProp.series[i];
 			points = [];
-			for(var n = 0; n < seria.yVal.numRef.numCache.pts.length; n++)
+			yNumCache = seria.yVal.numRef.numCache ? seria.yVal.numRef.numCache : seria.yVal.numRef.numLit;
+			for(var n = 0; n < yNumCache.pts.length; n++)
 			{
-				yVal = parseFloat(seria.yVal.numRef.numCache.pts[n].val);
-				if(seria.xVal && seria.xVal.numRef.numCache.pts[n] && seria.xVal.numRef.numCache.pts[n].val)
+				yVal = parseFloat(yNumCache.pts[n].val);
+				
+				xNumCache = seria.xVal && seria.xVal.numRef.numCache ? seria.xVal.numRef.numCache : seria.xVal && seria.xVal.numRef.numLit ? seria.xVal.numRef.numLit : null;
+				if(xNumCache && xNumCache.pts[n] && xNumCache.pts[n].val)
 				{
 					if(!isNaN(parseFloat(seria.xVal.numRef.numCache.pts[n].val)))
 						xVal = parseFloat(seria.xVal.numRef.numCache.pts[n].val);
@@ -4337,7 +4340,7 @@ drawScatterChart.prototype =
 				if(!this.paths.points[i])
 					this.paths.points[i] = [];
 				
-				this.paths.points[i][k] = this._calculatePoint(x, y, seria.yVal.numRef.numCache.pts[k].compiledMarker.size, seria.yVal.numRef.numCache.pts[k].compiledMarker.symbol);
+				this.paths.points[i][k] = this._calculatePoint(x, y, yNumCache.pts[k].compiledMarker.size, yNumCache.pts[k].compiledMarker.symbol);
 			}
 		}
     },
