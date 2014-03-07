@@ -320,7 +320,11 @@ CHistory.prototype =
 
         this.Points.splice( this.Points.length - 2, 2, NewPoint );
         if ( this.Index >= this.Points.length )
-            this.Index = this.Points.length - 1;
+        {
+            var DiffIndex = -this.Index + (this.Points.length - 1);
+            this.Index    += DiffIndex;
+            this.RecIndex += DiffIndex;
+        }
     },
 
     TurnOff : function()
