@@ -85,6 +85,8 @@
                 "../../Word/Editor/DrawingObjects.js",
                 "../../Word/Editor/FlowObjects.js",
                 "../../Word/Editor/ParagraphContent.js",
+                "../../Word/Editor/Hyperlink.js",
+                "../../Word/Editor/Run.js",
                 "../../Word/Editor/Paragraph.js",
                 "../../Word/Editor/Sections.js",
                 "../../Word/Editor/Numbering.js",
