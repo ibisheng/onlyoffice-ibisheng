@@ -1475,7 +1475,39 @@ DrawingObjectsController.prototype =
             var need_groupping, need_num_fmt, need_bar_dir;
             var val_axis, new_chart_type, object_type, axis_obj ;
             var axis_by_types;
+            var val_ax, cat_ax;
             object_type = chart_type.getObjectType();
+
+            var checkSwapAxis = function(plotArea, chartType, newChartType)
+            {
+                if(chartType.getAxisByTypes )
+                {
+                    var axis_by_types = chartType.getAxisByTypes(), cat_ax, val_ax;
+                    if(axis_by_types.catAx.length > 0 && axis_by_types.valAx.length > 0)
+                    {
+                        cat_ax = axis_by_types.catAx[0];
+                        val_ax = axis_by_types.valAx[0];
+                    }
+                }
+                if(!val_ax || !cat_ax)
+                {
+                    var axis_obj = CreateDefaultAxises(need_num_fmt);
+                    cat_ax = axis_obj.catAx;
+                    val_ax = axis_obj.valAx;
+                }
+                newChartType.addAxId(cat_ax);
+                newChartType.addAxId(val_ax);
+                plotArea.addAxis(cat_ax);
+                plotArea.addAxis(val_ax);
+            };
+
+            var replaceChart = function(plotArea, chartType, newChartType)
+            {
+                plotArea.addChart(newChartType, 0);
+                plotArea.removeCharts(1, plotArea.charts.length - 1);
+                newChartType.setFromOtherChart(chartType);
+            };
+
             switch(type)
             {
                 case c_oAscChartTypeSettings.barNormal     :
@@ -1535,35 +1567,12 @@ DrawingObjectsController.prototype =
                     else
                     {
                         new_chart_type = new CBarChart();
-                        new_chart_type.setGapWidth(150);
-                        plot_area.addChart(new_chart_type, 0);
-                        plot_area.removeCharts(1, plot_area.charts.length - 1);
-                        var series = chart_type.series;
-                        var new_ser, ser;
-                        switch (object_type)
-                        {
-                            case historyitem_type_PieChart:
-                            case historyitem_type_AreaChart:
-                            case historyitem_type_LineChart:
-                            {
-                                new_chart_type.setFromOtherChart(chart_type);
-                                if(object_type === historyitem_type_PieChart)
-                                {
-                                    axis_obj = CreateDefaultAxises(need_num_fmt);
-                                    plot_area.addAxis(axis_obj.valAx);
-                                    plot_area.addAxis(axis_obj.catAx);
-                                    new_chart_type.addAxId(axis_obj.valAx);
-                                    new_chart_type.addAxId(axis_obj.catAx);
-                                }
-                                break;
-                            }
-                            case historyitem_type_ScatterChart:
-                            {
-                                break;
-                            }
-                        }
+                        replaceChart(plot_area, chart_type, new_chart_type);
+                        checkSwapAxis(plot_area, chart_type, new_chart_type);
                         new_chart_type.setGrouping(need_groupping);
                         new_chart_type.setBarDir(need_bar_dir);
+                        new_chart_type.setGapWidth(150);
+
                         axis_by_types = new_chart_type.getAxisByTypes();
                         val_axis = axis_by_types.valAx;
                         for(i = 0; i < val_axis.length; ++i)
@@ -1573,7 +1582,6 @@ DrawingObjectsController.prototype =
                             if(need_bar_dir = BAR_DIR_BAR)
                                 val_axis[i].setAxPos(AX_POS_B);
                         }
-
                         if(need_bar_dir = BAR_DIR_BAR)
                         {
                             for(i = 0; i < axis_by_types.catAx.length; ++i)
@@ -1589,7 +1597,6 @@ DrawingObjectsController.prototype =
                 case c_oAscChartTypeSettings.lineStackedMarker   :
                 case c_oAscChartTypeSettings.lineStackedPerMarker:
                 {
-
                     if(type === c_oAscChartTypeSettings.lineNormal || type === c_oAscChartTypeSettings.lineNormalMarker)
                         need_groupping = GROUPING_STANDARD;
                     else if(type === c_oAscChartTypeSettings.lineStacked || type === c_oAscChartTypeSettings.lineStackedMarker)
@@ -1604,7 +1611,6 @@ DrawingObjectsController.prototype =
                         need_num_fmt = "0%";
 
                     var b_marker = type ===  c_oAscChartTypeSettings.lineNormalMarker|| type === c_oAscChartTypeSettings.lineStackedMarker || type === c_oAscChartTypeSettings.lineStackedPerMarker;
-
 
                     if(chart_type.getObjectType() === historyitem_type_LineChart)
                     {
@@ -1623,40 +1629,14 @@ DrawingObjectsController.prototype =
                     else
                     {
                         new_chart_type = new CLineChart();
-                        plot_area.addChart(new_chart_type, 0);
-                        plot_area.removeCharts(1, plot_area.charts.length - 1);
-                        switch (object_type)
-                        {
-                            case historyitem_type_PieChart:
-                            case historyitem_type_AreaChart:
-                            case historyitem_type_BarChart:
-                            {
-                                new_chart_type.setFromOtherChart(chart_type);
-                                if(object_type === historyitem_type_PieChart)
-                                {
-                                    axis_obj = CreateDefaultAxises(need_num_fmt);
-                                    new_chart_type.addAxId(axis_obj.valAx);
-                                    new_chart_type.addAxId(axis_obj.catAx);
-                                }
-                                break;
-                            }
-                            /*case historyitem_type_AreaChart:
-                             case historyitem_type_LineChart:
-                             case historyitem_type_OfPieChart:
-                             case historyitem_type_RadarChart:
-                             case historyitem_type_StockChart:
-                             case historyitem_type_BubbleChart:
-                             case historyitem_type_ScatterChart:
-                             case historyitem_type_SurfaceChart:
-                             case historyitem_type_DoughnutChart:*/
-                        }
+                        replaceChart(plot_area, chart_type, new_chart_type);
+                        checkSwapAxis(plot_area, chart_type, new_chart_type);
                         val_axis = new_chart_type.getAxisByTypes().valAx;
                         for(i = 0; i < val_axis.length; ++i)
                         {
                             if(val_axis[i].numFmt.formatCode !== need_num_fmt)
                                 val_axis[i].numFmt.setFormatCode(need_num_fmt);
                         }
-
                         new_chart_type.setMarker(b_marker);
                         new_chart_type.setGrouping(need_groupping);
                     }
@@ -1667,29 +1647,19 @@ DrawingObjectsController.prototype =
                     if(chart_type.getObjectType() !== historyitem_type_PieChart)
                     {
                         new_chart_type = new CPieChart();
-                        plot_area.addChart(new_chart_type, 0);
-                        plot_area.removeCharts(1, plot_area.charts.length - 1);
-                        switch (object_type)
-                        {
-                            case historyitem_type_BarChart:
-                            case historyitem_type_AreaChart:
-                            case historyitem_type_LineChart:
-                            case historyitem_type_BarChart:
-                            {
-                                new_chart_type.setFromOtherChart(chart_type);
-                                break;
-                            }
-                            /*case historyitem_type_AreaChart:
-                             case historyitem_type_LineChart:
-                             case historyitem_type_OfPieChart:
-                             case historyitem_type_RadarChart:
-                             case historyitem_type_StockChart:
-                             case historyitem_type_BubbleChart:
-                             case historyitem_type_ScatterChart:
-                             case historyitem_type_SurfaceChart:
-                             case historyitem_type_DoughnutChart:*/
-                        }
+                        replaceChart(plot_area, chart_type, new_chart_type)
                         new_chart_type.setVaryColors(true);
+                    }
+                    break;
+                }
+                case c_oAscChartTypeSettings.doughnut:
+                {
+                    if(chart_type.getObjectType() !== historyitem_type_DoughnutChart)
+                    {
+                        new_chart_type = new CDoughnutChart();
+                        replaceChart(plot_area, chart_type, new_chart_type)
+                        new_chart_type.setVaryColors(true);
+                        new_chart_type.setHoleSize(50);
                     }
                     break;
                 }
@@ -1724,24 +1694,9 @@ DrawingObjectsController.prototype =
                     else
                     {
                         new_chart_type = new CAreaChart();
-                        plot_area.addChart(new_chart_type, 0);
-                        plot_area.removeCharts(1, plot_area.charts.length - 1);
-                        switch (object_type)
-                        {
-                            case historyitem_type_PieChart:
-                            case historyitem_type_LineChart:
-                            case historyitem_type_BarChart:
-                            {
-                                new_chart_type.setFromOtherChart(chart_type);
-                                if(object_type === historyitem_type_PieChart)
-                                {
-                                    axis_obj = CreateDefaultAxises(need_num_fmt);
-                                    new_chart_type.addAxId(axis_obj.valAx);
-                                    new_chart_type.addAxId(axis_obj.catAx);
-                                }
-                                break;
-                            }
-                        }
+                        replaceChart(plot_area, chart_type, new_chart_type);
+                        checkSwapAxis(plot_area, chart_type, new_chart_type);
+
                         val_axis = new_chart_type.getAxisByTypes().valAx;
                         for(i = 0; i < val_axis.length; ++i)
                         {
@@ -1757,7 +1712,8 @@ DrawingObjectsController.prototype =
                 case c_oAscChartTypeSettings.scatterSmooth:
                 {
                     if(chart_type.getObjectType() === historyitem_type_ScatterChart)
-                    {}
+                    {
+                    }
                     else
                     {
                         new_chart_type = new CScatterChart();
@@ -1767,17 +1723,35 @@ DrawingObjectsController.prototype =
                         axis_obj = CreateScatterAxis(); //cat - 0, val - 1
                         new_chart_type.addAxId(axis_obj.catAx);
                         new_chart_type.addAxId(axis_obj.valAx);
-                        /*val_axis = new_chart_type.getAxisByTypes().valAx;
-                        for(i = 0; i < val_axis.length; ++i)
-                        {
-                            if(val_axis[i].numFmt.formatCode !== need_num_fmt)
-                                val_axis[i].numFmt.setFormatCode(need_num_fmt);
-                        }
-                        new_chart_type.setGrouping(need_groupping);      */
                     }
                     break;
                 }
             }
+
+            chart_type = plot_area.charts[0];
+            //подписи данных
+            if(typeof chart_type.setDLbls === "function")
+            {
+
+                var data_lbls;
+                var checkDataLabels = function(chartType)
+                {
+                    chartType.removeDataLabels();
+                    if(!chartType.dLbls)
+                        chartType.setDLbls(new CDLbls());
+                    return chartType.dLbls;
+                }
+                if(isRealBool(chartSettings.showCatName))
+                    checkDataLabels(chart_type).setShowCatName(chartSettings.showCatName);
+                if(isRealBool(chartSettings.showSerName))
+                    checkDataLabels(chart_type).setShowSerName(chartSettings.showSerName);
+                if(isRealBool(chartSettings.showVal))
+                    checkDataLabels(chart_type).setShowVal(chartSettings.showVal);
+
+                if(typeof chartSettings.separator === "string" && chartSettings.separator.length > 0)
+                    checkDataLabels(chart_type).setSeparator(chartSettings.separator);
+            }
+
             chart_space.addToRecalculate();  //TODO
             chart_space.setRecalculateInfo();//TODO: обязательно переделать
             this.startRecalculate();

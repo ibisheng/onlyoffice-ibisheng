@@ -658,7 +658,7 @@ CChartSpace.prototype.recalculateMarkers = function()
             default_marker.spPr.ln.merge(parent_objects.theme.themeElements.fmtScheme.lnStyleLst[0]);
         }
         var RGBA = {R:0, G:0, B:0, A: 255};
-        if(this.chart.plotArea.chart.varyColors && this.chart.plotArea.chart.series.length === 1)
+        if(this.chart.plotArea.chart.varyColors && (this.chart.plotArea.chart.series.length === 1 || this.chart.plotArea.chart.getObjectType() === historyitem_type_PieChart || this.chart.plotArea.chart.getObjectType() === historyitem_type_DoughnutChart))
         {
             var ser = this.chart.plotArea.chart.series[0], pts;
             if(ser.val)
@@ -2574,7 +2574,7 @@ CChartSpace.prototype.recalculateLegend = function()
         var max_width = 0, cur_width, max_font_size = 0, cur_font_size, ser, b_line_series;
         var max_word_width = 0;
         this.chart.legend.chart = this;
-        if( !this.chart.plotArea.chart.varyColors || (this.chart.plotArea.chart.getObjectType() !== historyitem_type_PieChart || this.chart.plotArea.chart.getObjectType() !== historyitem_type_DoughnutChart) && series.length !== 1)
+        if( !this.chart.plotArea.chart.varyColors || (this.chart.plotArea.chart.getObjectType() !== historyitem_type_PieChart && this.chart.plotArea.chart.getObjectType() !== historyitem_type_DoughnutChart) && series.length !== 1)
         {
             for(i = 0; i < series.length; ++i)
             {

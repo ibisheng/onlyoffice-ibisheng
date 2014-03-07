@@ -51,6 +51,14 @@ CPlotArea.prototype =
 
     addAxis: function(axis)
     {
+        //сначала проверим не лежит ли ось уже в plotArea
+        var i;
+        for(i = 0; i < this.axId.length; ++i)
+        {
+            if(this.axId[i] === axis)
+                return;
+        }
+        //если такой оси нет, можно добавлять.
         History.Add(this, {Type: historyitem_PlotArea_AddAxis, newPr:axis});
         this.axId.push(axis);
 
@@ -81,26 +89,29 @@ CPlotArea.prototype =
             var chart  = this.charts.splice(pos, 1)[0];
 
             //удалим все оси этой диаграммы, проверив прежде нет ли ссылок на данные оси в других диаграммах
-            var chart_axis = chart.axId;
-            for(var i = 0; i < chart_axis.length; ++i)
+            if(Array.isArray(chart.axId))
             {
-                var axis = chart_axis[i];
-                for(var j = 0; j  < this.charts.length; ++j)
+                var chart_axis = chart.axId;
+                for(var i = 0; i < chart_axis.length; ++i)
                 {
-                    var other_chart = this.charts[j];
-                    if(Array.isArray(other_chart.axId))
+                    var axis = chart_axis[i];
+                    for(var j = 0; j  < this.charts.length; ++j)
                     {
-                        for(var k = 0;  k  < other_chart.axId.length; ++k)
+                        var other_chart = this.charts[j];
+                        if(Array.isArray(other_chart.axId))
                         {
-                            if(other_chart.axId[k] === axis)
+                            for(var k = 0;  k  < other_chart.axId.length; ++k)
+                            {
+                                if(other_chart.axId[k] === axis)
+                                    break;
+                            }
+                            if(k < other_chart.axId.length)
                                 break;
                         }
-                        if(k < other_chart.axId.length)
-                            break;
                     }
+                    if(j === this.charts.length)
+                        this.removeAxis(axis);
                 }
-                if(j === this.charts.length)
-                    this.removeAxis(axis);
             }
         }
     },
@@ -471,18 +482,20 @@ CAreaChart.prototype =
         return  historyitem_type_AreaChart;
     },
 
+
+    removeDataLabels: CBarChart.prototype.removeDataLabels,
     getAxisByTypes: CPlotArea.prototype.getAxisByTypes,
 
     setFromOtherChart: function(c)
     {
         var i;
-        if(Array.isArray(c.axId))
-        {
-            for(i = 0; i < c.axId.length; ++i)
-            {
-                this.addAxId(c.axId[i]);
-            }
-        }
+      //if(Array.isArray(c.axId))
+      //{
+      //    for(i = 0; i < c.axId.length; ++i)
+      //    {
+      //        this.addAxId(c.axId[i]);
+      //    }
+      //}
         if(c.dLbls)
             this.setDLbls(c.dLbls);
         if(c.dropLines)
@@ -742,6 +755,17 @@ CAreaSeries.prototype =
             this.setTx(o.tx);
         if(o.val)
             this.setVal(o.val);
+
+        if(o.xVal)
+        {
+            this.setCat(new CCat());
+            this.cat.setFromOtherObject(o.xVal);
+        }
+        if(o.yVal)
+        {
+            this.setVal(new CYVal());
+            this.val.setFromOtherObject(o.yVal);
+        }
     },
 
     getSeriesName: function()
@@ -2625,6 +2649,16 @@ CBarChart.prototype =
         return this.Id;
     },
 
+    removeDataLabels: function()
+    {
+        var i;
+        for(i = 0; i < this.series.length; ++i)
+        {
+            if(typeof this.series[i].setDLbls === "function")
+                this.series[i].setDLbls(null);
+        }
+    },
+
     getObjectType: function()
     {
         return historyitem_type_BarChart;
@@ -2647,13 +2681,13 @@ CBarChart.prototype =
     setFromOtherChart: function(c)
     {
         var i;
-        if(Array.isArray(c.axId))
-        {
-            for(i = 0; i < c.axId.length; ++i)
-            {
-                this.addAxId(c.axId[i]);
-            }
-        }
+        //if(Array.isArray(c.axId))
+        //{
+        //    for(i = 0; i < c.axId.length; ++i)
+        //    {
+        //        this.addAxId(c.axId[i]);
+        //    }
+        //}
         if(isRealNumber(c.barDir))
             this.setBarDir(c.barDir);
 
@@ -3013,7 +3047,7 @@ CBarSeries.prototype =
         if(o.yVal)
         {
             this.setVal(new CYVal());
-            this.val.setFromOtherObject(o.val);
+            this.val.setFromOtherObject(o.yVal);
         }
     },
 
@@ -4926,7 +4960,7 @@ CDLbl.prototype =
     getDefaultTextForTxBody: function()
     {
         var compiled_string = "";
-        var separator = typeof this.separator === "string" ? this.separator : ", ";
+        var separator = typeof this.separator === "string" ? this.separator +" " : ", ";
         if(this.showSerName)
         {
             compiled_string += this.series.getSeriesName();
@@ -5129,6 +5163,9 @@ CDLbl.prototype =
 
         if(dLbl.numFmt != null)
             this.setNumFmt(dLbl.numFmt);
+
+        if(dLbl.separator != null)
+            this.setSeparator(dLbl.separator);
 
         if(dLbl.showBubbleSize != null)
             this.setShowBubbleSize(dLbl.showBubbleSize);
@@ -6936,21 +6973,19 @@ CDoughnutChart.prototype =
         return historyitem_type_DoughnutChart;
     },
 
-
+    removeDataLabels: CBarChart.prototype.removeDataLabels,
 
     setFromOtherChart: function(c)
     {
-        var i;
-
         if(c.dLbls)
             this.setDLbls(c.dLbls);
-
         if(isRealNumber(c.firstSliceAng))
             this.setFirstSliceAng(c.firstSliceAng);
         if(isRealNumber(c.holeSize))
             this.setHoleSize(c.holeSize);
         if(Array.isArray(c.series))
         {
+            var i;
             for(i = 0; i < c.series.length; ++i)
             {
                 var ser = new CPieSeries();
@@ -8476,6 +8511,8 @@ CLineChart.prototype =
         return  historyitem_type_LineChart;
     },
 
+    removeDataLabels: CBarChart.prototype.removeDataLabels,
+
     getAxisByTypes: CPlotArea.prototype.getAxisByTypes,
 
     Write_ToBinary2: function(w)
@@ -8493,13 +8530,13 @@ CLineChart.prototype =
     setFromOtherChart: function(c)
     {
         var i;
-        if(Array.isArray(c.axId))
-        {
-            for(i = 0; i < c.axId.length; ++i)
-            {
-                this.addAxId(c.axId[i]);
-            }
-        }
+        //if(Array.isArray(c.axId))
+        //{
+        //    for(i = 0; i < c.axId.length; ++i)
+        //    {
+        //        this.addAxId(c.axId[i]);
+        //    }
+        //}
         if(c.dLbls)
             this.setDLbls(c.dLbls);
 
@@ -8884,7 +8921,7 @@ CLineSeries.prototype =
         if(other.spPr)
             this.setSpPr(other.spPr);
         if(other.trendline)
-            this.setTrendline(ther.trendline);
+            this.setTrendline(other.trendline);
         if(other.tx)
             this.setTx(other.tx);
         if(other.val)
@@ -8893,12 +8930,12 @@ CLineSeries.prototype =
         if(other.xVal)
         {
             this.setCat(new CCat());
-            this.cat.setFromOtherObject(o.xVal);
+            this.cat.setFromOtherObject(other.xVal);
         }
         if(other.yVal)
         {
-            this.setVal(new CYVal())
-            this.val.setFromOtherObject(o.val);
+            this.setVal(new CYVal());
+            this.val.setFromOtherObject(other.yVal);
         }
     },
 
@@ -10414,7 +10451,8 @@ COfPieChart.prototype =
     },
 
 
-    getAxisByTypes: CPlotArea.prototype.getAxisByTypes,
+    removeDataLabels: CBarChart.prototype.removeDataLabels,
+
 
     addCustSplit: function(pr)
     {
@@ -11010,6 +11048,8 @@ CPieChart.prototype =
         this.Id = r.GetString2();
     },
 
+    removeDataLabels: CBarChart.prototype.removeDataLabels,
+
     setFromOtherChart: function(c)
     {
         var i;
@@ -11268,8 +11308,8 @@ CPieSeries.prototype =
         }
         if(o.yVal)
         {
-            this.setVal(new CYVal())
-            this.val.setFromOtherObject(o.val);
+            this.setVal(new CYVal());
+            this.val.setFromOtherObject(o.yVal);
         }
     },
 
@@ -11757,6 +11797,9 @@ CRadarChart.prototype =
         return historyitem_type_RadarChart;
     },
 
+
+    removeDataLabels: CBarChart.prototype.removeDataLabels,
+
     getAxisByTypes: CPlotArea.prototype.getAxisByTypes,
 
     setAxId: function(pr)
@@ -12046,8 +12089,8 @@ CRadarSeries.prototype =
         }
         if(o.yVal)
         {
-            this.setVal(new CYVal())
-            this.val.setFromOtherObject(o.val);
+            this.setVal(new CYVal());
+            this.val.setFromOtherObject(o.yVal);
         }
     },
 
@@ -12472,6 +12515,8 @@ CScatterChart.prototype =
         return historyitem_type_ScatterChart;
     },
 
+
+    removeDataLabels: CBarChart.prototype.removeDataLabels,
 
     setFromOtherChart: function(o)
     {
@@ -13327,6 +13372,7 @@ CStockChart.prototype =
         return  historyitem_type_StockChart;
     },
 
+    removeDataLabels: CBarChart.prototype.removeDataLabels,
 
     getAxisByTypes: CPlotArea.prototype.getAxisByTypes,
 
@@ -14023,6 +14069,7 @@ CSurfaceChart.prototype =
         return historyitem_type_SurfaceChart;
     },
 
+    removeDataLabels: CBarChart.prototype.removeDataLabels,
 
     getAxisByTypes: CPlotArea.prototype.getAxisByTypes,
 
@@ -14264,6 +14311,16 @@ CSurfaceSeries.prototype =
             this.setTx(o.tx);
         if(o.val)
             this.setVal(o.val);
+        if(o.xVal)
+        {
+            this.setCat(new CCat());
+            this.cat.setFromOtherObject(o.xVal);
+        }
+        if(o.yVal)
+        {
+            this.setVal(new CYVal());
+            this.val.setFromOtherObject(o.yVal);
+        }
     },
 
     getSeriesName: CAreaSeries.prototype.getSeriesName,

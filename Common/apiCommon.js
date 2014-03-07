@@ -203,6 +203,10 @@
             this.horGridLines  = null;
             this.vertGridLines = null;
             this.type = null;
+            this.showSerName = null;
+            this.showCatName = null;
+            this.showVal    = null;
+            this.separator = null;
         }
         asc_ChartSettings.prototype =
         {
@@ -314,7 +318,45 @@
             putType: function(v)
             {
                 return this.type = v;
+            },
+
+            putShowSerName: function(v)
+            {
+                return this.showSerName = v;
+            },
+            putShowCatName: function(v)
+            {
+                return this.showCatName = v;
+            },
+            putShowVal: function(v)
+            {
+                return this.showVal = v;
+            },
+
+
+            getShowSerName: function()
+            {
+                return this.showSerName;
+            },
+            getShowCatName: function()
+            {
+                return this.showCatName;
+            },
+            getShowVal: function()
+            {
+                return this.showVal;
+            },
+
+            putSeparator: function(v)
+            {
+                this.separator = v;
+            },
+
+            getSeparator: function()
+            {
+                return this.separator;
             }
+
         };
 
         prot = asc_ChartSettings.prototype;
@@ -336,12 +378,21 @@
         prot["getDataLabelsPos"] = prot.getDataLabelsPos;
         prot["getHorAx"]         = prot.getHorAx;
         prot["getVertAx"]        = prot.getVertAx;
-        prot["getHorGridLines"]         = prot.getHorGridLines;
-        prot["putHorGridLines"]        = prot.putHorGridLines;
-        prot["getVertGridLines"]         = prot.getVertGridLines;
-        prot["putVertGridLines"]        = prot.putVertGridLines;
-        prot["getType"]         = prot.getType;
-        prot["putType"]         = prot.putType;
+        prot["getHorGridLines"]  = prot.getHorGridLines;
+        prot["putHorGridLines"]  = prot.putHorGridLines;
+        prot["getVertGridLines"] = prot.getVertGridLines;
+        prot["putVertGridLines"] = prot.putVertGridLines;
+        prot["getType"]          = prot.getType;
+        prot["putType"]          = prot.putType;
+        prot["putShowSerName"]   = prot.putShowSerName;
+        prot["getShowSerName"]   = prot.getShowSerName;
+        prot["putShowCatName"]   = prot.putShowCatName;
+        prot["getShowCatName"]   = prot.getShowCatName;
+        prot["putShowVal"]       = prot.putShowVal;
+        prot["getShowVal"]       = prot.getShowVal;
+        prot["putSeparator"]       = prot.putSeparator;
+        prot["getSeparator"]       = prot.getSeparator;
+
 
         window["asc_ChartSettings"] = asc_ChartSettings;
         function asc_AxisSettings()

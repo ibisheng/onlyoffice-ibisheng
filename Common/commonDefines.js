@@ -188,5 +188,6 @@ var c_oAscChartTypeSettings =
     areaStackedPer      : 15,
     scatter             : 16,
     scatterLine         : 17,
-    scatterSmooth       : 18
+    scatterSmooth       : 18,
+    doughnut            : 19
 };

@@ -2313,6 +2313,7 @@ Format
             <option value="lineStackedPerMarker">Line Stacked Per Marker</option>
 
             <option value="pie" style="background: #7F9DB9">Pie</option>
+            <option value="doughnut" style="background: #7F9DB9">Doughnut</option>
 
             <option value="hBarNormal" style="background: #7F9DB9">HBar Normal</option>
             <option value="hBarStacked">HBar Stacked</option>
@@ -2365,15 +2366,23 @@ Format
         </select>
         <br>
         <label style="font-size: 11pt">Data Labels</label>
-        <select id="chartDataLabels">
-            <option value="none">None</option>
-            <option value="center">Center</option>
-            <option value="inner_top">Inner Top</option>
-            <option value="in_base">In Base</option>
-            <option value="out_end">Out End</option>
-            <option value="right_overlay">Right Overlay</option>
-            <option value="left_overlay">Left Overlay</option>
-        </select>
+        <br>
+            <select id="chartDataLabels">
+                <option value="none">None</option>
+                <option value="center">Center</option>
+                <option value="inner_top">Inner Top</option>
+                <option value="in_base">In Base</option>
+                <option value="out_end">Out End</option>
+                <option value="right_overlay">Right Overlay</option>
+                <option value="left_overlay">Left Overlay</option>
+            </select>
+            <div id="labelsOptionsDiv">
+                <input type="checkbox"  class="dataLabelsCheckBox" value="serName"><label style="font-size: 10pt">Series Name</label>
+                <br><input type="checkbox" class="dataLabelsCheckBox" value="catName"><label style="font-size: 10pt">Cat Name</label>
+                <br><input type="checkbox" class="dataLabelsCheckBox" value="val"><label style="font-size: 10pt">Value</label>
+            </div>
+            <label style="font-size: 10pt">Data Labels Separator</label><input type="text" id="dataLabelsSeparatorInput">
+            <br><button id="dataLblsPrApplyButton">Apply</button>
         <br>
         <label style="font-size: 11pt">Hor Axis</label>
         <select id="chartHorAxis">

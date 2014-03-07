@@ -2854,17 +2854,7 @@
     $("#chartDataLabels").change(
         function()
         {
-            var val = $("#chartDataLabels").attr("value");
-            var map = {
-                "none"           : c_oAscChartDataLabelsPos.none,
-                "center"         : c_oAscChartDataLabelsPos.ctr,
-                "inner_top"      : c_oAscChartDataLabelsPos.inEnd,
-                "in_base"        : c_oAscChartDataLabelsPos.inBase,
-                "out_end"        : c_oAscChartDataLabelsPos.outEnd
-            };
-            var settings = new asc_ChartSettings();
-            settings.putDataLabelsPos(map[val]);
-            api.asc_editChartDrawingObject(settings);
+
         }
     );
 
@@ -2921,7 +2911,8 @@
             "areaNormal"          : c_oAscChartTypeSettings.areaNormal          ,
             "areaStacked"         : c_oAscChartTypeSettings.areaStacked         ,
             "areaStackedPer"      : c_oAscChartTypeSettings.areaStackedPer      ,
-            "scatter"             : c_oAscChartTypeSettings.scatter
+            "scatter"             : c_oAscChartTypeSettings.scatter,
+            "doughnut"            : c_oAscChartTypeSettings.doughnut
         };
 
         var settings = new asc_ChartSettings();
@@ -2929,6 +2920,49 @@
         api.asc_editChartDrawingObject(settings);
     });
 
-
+    $(".dataLabelsCheckBox").change(function()
+    {
+       // var value = $(this).attr("value");
+       // var settings = new asc_ChartSettings();
+       // if(value === "catName")
+       //     settings.putShowCatName(this.checked);
+       // else if(value === "serName")
+       //     settings.putShowSerName(this.checked);
+       // else
+       //     settings.putShowVal(this.checked);
+       //
+       // api.asc_editChartDrawingObject(settings);
+    });
+    $("#dataLblsPrApplyButton").click(
+        function()
+        {
+            var val = $("#chartDataLabels").attr("value");
+            var map = {
+                "none"           : c_oAscChartDataLabelsPos.none,
+                "center"         : c_oAscChartDataLabelsPos.ctr,
+                "inner_top"      : c_oAscChartDataLabelsPos.inEnd,
+                "in_base"        : c_oAscChartDataLabelsPos.inBase,
+                "out_end"        : c_oAscChartDataLabelsPos.outEnd
+            };
+            var settings = new asc_ChartSettings();
+            settings.putDataLabelsPos(map[val]);
+            var check_boxes = $(".dataLabelsCheckBox");
+            var i;
+            for(i = 0; i < check_boxes.length; ++i)
+            {
+                var value = check_boxes[i].value;
+                if(value === "catName")
+                    settings.putShowCatName(check_boxes[i].checked);
+                else if(value === "serName")
+                    settings.putShowSerName(check_boxes[i].checked);
+                else
+                    settings.putShowVal(check_boxes[i].checked);
+            }
+            var separator = $("#dataLabelsSeparatorInput").attr("value");
+            if(separator.length > 0)
+                settings.putSeparator(separator);
+            api.asc_editChartDrawingObject(settings);
+        }
+    );
 });
 
