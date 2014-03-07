@@ -9661,14 +9661,7 @@ window["asc_docs_api"].prototype["asc_nativeCalculateFile"] = function()
 
 window["asc_docs_api"].prototype["asc_nativeApplyChanges"] = function(changes)
 {
-    var _len = changes.length;
-	for (var i = 0; i < _len; i++)
-	{
-	    var Changes = new CCollaborativeChanges();
-        Changes.Set_Id( changes[i]["id"] );
-        Changes.Set_Data( changes[i]["data"] );
-	    CollaborativeEditing.Add_Changes( Changes );
-	}
+    this.CoAuthoringApi.onSaveChanges(changes, false);
 	CollaborativeEditing.Apply_OtherChanges();
 }
 
