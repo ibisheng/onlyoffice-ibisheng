@@ -632,7 +632,11 @@ function CCollaborativeEditing()
                 var Item = Point.Items[Index];
                 var oChanges = new CCollaborativeChanges();
                 oChanges.Set_FromUndoRedo( Item.Class, Item.Data, Item.Binary );
-                aChanges.push( oChanges );
+
+                var oChanges2 = new Object();
+                oChanges2["Id"]   = oChanges.m_sId;
+                oChanges2["Data"] = oChanges.m_pData;
+                aChanges.push( oChanges2 );
             }
         }
 

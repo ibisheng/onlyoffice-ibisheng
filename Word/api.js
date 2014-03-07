@@ -1555,8 +1555,8 @@ asc_docs_api.prototype._coAuthoringInit = function()
         for ( var Index = 0; Index < Count; Index++ )
         {
             var Changes = new CCollaborativeChanges();
-            Changes.Set_Id( e[Index].m_sId );
-            Changes.Set_Data( e[Index].m_pData );
+            Changes.Set_Id( e[Index]["Id"] );
+            Changes.Set_Data( e[Index]["Data"] );
             CollaborativeEditing.Add_Changes( Changes );
         }
 
