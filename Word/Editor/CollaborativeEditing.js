@@ -611,7 +611,7 @@ function CCollaborativeEditing()
 
         // Генерируем свои изменения
         var PointsCount = 0;
-        if ( true === m_bUse )
+        if ( true === this.m_bUse )
         {
             // (ненужные точки предварительно удаляем)
             History.Clear_Redo();
@@ -656,7 +656,7 @@ function CCollaborativeEditing()
         editor.CoAuthoringApi.saveChanges(aChanges);
 
         // Чистим Undo/Redo только во время совместного редактирования
-        if ( true === m_bUse )
+        if ( true === this.m_bUse )
             History.Clear();
 
         editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
