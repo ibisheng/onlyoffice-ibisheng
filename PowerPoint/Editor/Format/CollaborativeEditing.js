@@ -623,17 +623,28 @@ function CCollaborativeEditing()
 
     this.Send_Changes = function()
     {
-        // Пока не началось совместное редактирование, мы ничего не делаем
-        if ( true != this.m_bUse )
-            return;
 
         // Пересчитываем позиции
        this.Refresh_DCChanges();
        this.RefreshPosExtChanges();
-        // Генерируем свои изменения (ненужные точки предварительно удаляем)
-        History.Clear_Redo();
+
+
+        // Генерируем свои изменения
+        var PointsCount = 0;
+        if ( true === m_bUse )
+        {
+            // (ненужные точки предварительно удаляем)
+            History.Clear_Redo();
+            PointsCount = History.Points.length;
+        }
+        else
+        {
+            PointsCount = History.Index + 1;
+        }
+
+
+
         var aChanges = new Array();
-        var PointsCount = History.Points.length;
         for ( var PointIndex = 0; PointIndex < PointsCount; PointIndex++ )
         {
             var Point = History.Points[PointIndex];
@@ -643,7 +654,10 @@ function CCollaborativeEditing()
                 var Item = Point.Items[Index];
                 var oChanges = new CCollaborativeChanges();
                 oChanges.Set_FromUndoRedo( Item.Class, Item.Data, Item.Binary );
-                aChanges.push( oChanges );
+                var oChanges2 = new Object();
+                oChanges2["Id"]   = oChanges.m_sId;
+                oChanges2["Data"] = oChanges.m_pData;
+                aChanges.push( oChanges2 );
             }
         }
 
@@ -690,7 +704,8 @@ function CCollaborativeEditing()
         editor.CoAuthoringApi.saveChanges(aChanges);
 
         // Чистим Undo/Redo
-        History.Clear();
+        if(this.m_bUse)
+            History.Clear();
         editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
         editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
 
