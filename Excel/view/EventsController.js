@@ -965,14 +965,16 @@
 
 			var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
 			if ( !t.isMousePressed && graphicObjects.length && t.enableKeyEvents ) {
-				if (!( (event.ctrlKey || event.metaKey) && (event.which == 99 || event.which == 118 || event.which == 120) )) {		// Mozilla Firefox Fix #20080 (Ctrl+C, Ctrl+V, Ctrl+X)
-					if (t.isCellEditMode) {
-						t.handlers.trigger("stopCellEditing");
-						t.isCellEditMode = false;
-					}
-					if (t.handlers.trigger("graphicObjectWindowKeyPress", event))
-						return true;
+				if (t.skipKeyPress || event.which < 32) {		// Mozilla Firefox Fix #20080 (Ctrl+C, Ctrl+V, Ctrl+X)
+					t.skipKeyPress = true;
+					return true;
 				}
+				if (t.isCellEditMode) {
+					t.handlers.trigger("stopCellEditing");
+					t.isCellEditMode = false;
+				}
+				if (t.handlers.trigger("graphicObjectWindowKeyPress", event))
+					return true;
 			}
 
 			// Для таких браузеров, которые не присылают отжатие левой кнопки мыши для двойного клика, при выходе из
@@ -1029,6 +1031,12 @@
             else if( this.vsbApiLockMouse )
                 this.vsbApi.mouseDown ? this.vsbApi.evt_mousemove.call(this.vsbApi,event) : false;
 				
+			// Режим установки закреплённых областей
+			if (t.isFrozenAnchorMode) {
+				t._moveFrozenAnchorHandle(event, { target: t.isFrozenAnchorMode });
+				return true;
+			}
+				
 			event.isLocked = t.isMousePressed;
 			if (t.isShapeAction && t.isMouseDownMode)
 				t.handlers.trigger("graphicObjectMouseMove", event, coord.x, coord.y);
@@ -1082,6 +1090,11 @@
 				this.isMoveResizeRange = false;
 				this.isMoveResizeChartsRange = false;
 				this.handlers.trigger("moveResizeRangeHandleDone", this.targetInfo);
+			}
+			// Режим установки закреплённых областей
+			if (this.isFrozenAnchorMode) {
+				this._moveFrozenAnchorHandleDone(event, { target: this.isFrozenAnchorMode });
+				this.isFrozenAnchorMode = false;
 			}
 
 			// Мы можем dblClick и не отработать, если вышли из области и отпустили кнопку мыши, нужно отработать
@@ -1259,7 +1272,7 @@
 					}
 					else if ( t.targetInfo && ((t.targetInfo.target === "frozenAnchorV") || (t.targetInfo.target === "frozenAnchorH")) ) {
 						// Режим установки закреплённых областей
-						this.isFrozenAnchorMode = true;
+						this.isFrozenAnchorMode = t.targetInfo.target;
 						t._moveFrozenAnchorHandle(event, t.targetInfo);
 						return;
 					}
