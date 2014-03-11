@@ -5176,7 +5176,9 @@ CMathContent.prototype =
     },
     getGapsInside: function() // учитываем gaps внутренних объектов
     {
-        var bFirstComp = this.content[1].value.typeObj == MATH_COMP,
+        var typeFirst = this.content.length > 1 ?  this.content[1].value.typeObj : null;
+
+        var bFirstComp = typeFirst == MATH_COMP,
             bLastComp = false;
 
         var posLComp = -1;
@@ -7903,6 +7905,14 @@ CMathComposition.prototype =
     // position вычислить естественно до того, как придет Draw, чтобы не пришлось пересчитывать при изменении в тексте документа
     Draw: function(x, y, pGraphics)
     {
+
+
+
+
+        //// test
+        this.RecalculateComposition(g_oTextMeasurer);
+        ////
+
         this.absPos = {x: x, y: y - this.Root.size.ascent};
 
         if(this.Root.content.length > 1)
@@ -8091,6 +8101,15 @@ CMathComposition.prototype =
     },
     RecalculateComposition:  function(oMeasure, TextPr) // textPrp в тестовом режиме, просто отрисуем с ними формулу
     {
+        /*console.log("SIGN_GAP: " + SIGN_GAP);
+        console.log("RADICAL_GAP: " + RADICAL_GAP);
+        console.log("RADICAL_H0: " + RADICAL_H0);
+        console.log("RADICAL_H1: " + RADICAL_H1);
+        console.log("RADICAL_H2: " + RADICAL_H2);
+        console.log("RADICAL_H3: " + RADICAL_H3);
+        console.log("RADICAL_H4: " + RADICAL_H4);
+        console.log("RADICAL_H5: " + RADICAL_H5);*/
+
         this.Resize(oMeasure); // пересчитываем всю формулу
 
         var width = this.Root.size.width,
