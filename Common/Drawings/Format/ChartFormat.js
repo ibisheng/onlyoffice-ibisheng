@@ -457,6 +457,350 @@ CPlotArea.prototype =
 };
 
 
+function CBarChart()
+{
+    this.axId        = [];
+    this.barDir      = null;
+    this.dLbls       = null;
+    this.gapWidth    = null;
+    this.grouping    = null;
+    this.overlap     = null;
+    this.series      = [];
+    this.serLines    = null;
+    this.varyColors  = null;
+
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
+}
+
+CBarChart.prototype =
+{
+    Grt_Id: function()
+    {
+        return this.Id;
+    },
+
+    removeDataLabels: function()
+    {
+        var i;
+        for(i = 0; i < this.series.length; ++i)
+        {
+            if(typeof this.series[i].setDLbls === "function")
+                this.series[i].setDLbls(null);
+        }
+    },
+
+    getObjectType: function()
+    {
+        return historyitem_type_BarChart;
+    },
+
+
+    getAxisByTypes: CPlotArea.prototype.getAxisByTypes,
+
+    Write_ToBinary2: function(w)
+    {
+        w.WriteLong(this.getObjectType());
+        w.WriteString2(this.Get_Id());
+    },
+
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.GetString2();
+    },
+
+    setFromOtherChart: function(c)
+    {
+        var i;
+        //if(Array.isArray(c.axId))
+        //{
+        //    for(i = 0; i < c.axId.length; ++i)
+        //    {
+        //        this.addAxId(c.axId[i]);
+        //    }
+        //}
+        if(isRealNumber(c.barDir))
+            this.setBarDir(c.barDir);
+
+        if(c.dLbls)
+            this.setDLbls(c.dLbls);
+
+        if(isRealNumber(c.gapWidth))
+            this.setGapWidth(c.gapWidth);
+        if(isRealNumber(c.grouping))
+            this.setGrouping(c.grouping);
+        if(isRealNumber(c.overlap))
+            this.setOverlap(c.overlap);
+        if(Array.isArray(c.series))
+        {
+            for(i = 0; i < c.series.length; ++i)
+            {
+                var ser = new CBarSeries();
+                ser.setFromOtherSeries(c.series[i]);
+                this.addSer(ser);
+            }
+        }
+        if(isRealBool(c.varyColors))
+            this.setVaryColors(c.varyColors);
+    },
+
+    addAxId: function(pr)
+    {
+        History.Add(this, {Type: historyitem_BarChart_AddAxId, pr: pr});
+        this.axId.push(pr);
+    },
+
+    setBarDir: function(pr)
+    {
+        History.Add(this, {Type: historyitem_BarChart_SetBarDir, oldPr: this.barDir, newPr:pr});
+        this.barDir = pr;
+    },
+
+    setDLbls     : function(pr)
+    {
+        History.Add(this, {Type: historyitem_BarChart_SetDLbls, oldPr: this.dLbls, newPr:pr});
+        this.dLbls = pr;
+    },
+    setGapWidth: function(pr)
+    {
+        History.Add(this, {Type: historyitem_BarChart_SetGapWidth, oldPr: this.gapWidth, newPr:pr});
+        this.gapWidth = pr;
+    },
+    setGrouping: function(pr)
+    {
+        History.Add(this, {Type: historyitem_BarChart_SetGrouping, oldPr: this.grouping, newPr:pr});
+        this.grouping = pr;
+    },
+    setOverlap: function(pr)
+    {
+        History.Add(this, {Type: historyitem_BarChart_SetOverlap, oldPr: this.overlap, newPr:pr});
+        this.overlap = pr;
+    },
+    addSer: function(pr)
+    {
+        History.Add(this, {Type: historyitem_BarChart_AddSer, pr: pr});
+        this.series.push(pr);
+    },
+    setSerLines: function(pr)
+    {
+        History.Add(this, {Type: historyitem_BarChart_SetSerLines, oldPr: this.serLines, newPr:pr});
+        this.serLines = pr;
+    },
+    setVaryColors: function(pr)
+    {
+        History.Add(this, {Type: historyitem_BarChart_SetVaryColors, oldPr: this.varyColors, newPr:pr});
+        this.varyColors = pr;
+    },
+
+    Undo: function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_BarChart_AddAxId:
+            {
+                for(var i = this.axId.length; i > -1; --i)
+                {
+                    if(this.axId[i] === data.pr)
+                    {
+                        this.axId.splice(i, 1);
+                        break;
+                    }
+                }
+                break;
+            }
+            case historyitem_BarChart_SetBarDir:
+            {
+                this.barDir = data.oldPr;
+                break;
+            }
+            case historyitem_BarChart_SetDLbls:
+            {
+                this.dLbls = data.oldPr;
+                break;
+            }
+            case historyitem_BarChart_SetGapWidth:
+            {
+                this.gapWidth = data.oldPr;
+                break;
+            }
+            case historyitem_BarChart_SetGrouping:
+            {
+                this.grouping = data.oldPr;
+                break;
+            }
+            case historyitem_BarChart_SetOverlap:
+            {
+                this.overlap = data.oldPr;
+                break;
+            }
+            case historyitem_BarChart_AddSer:
+            {
+                for(var i = this.series.length; i > -1; --i)
+                {
+                    if(this.series[i] === data.pr)
+                    {
+                        this.series.splice(i, 1);
+                        break;
+                    }
+                }
+                break;
+            }
+            case historyitem_BarChart_SetSerLines:
+            {
+                this.serLines = data.oldPr;
+                break;
+            }
+            case historyitem_BarChart_SetVaryColors:
+            {
+                this.varyColors = data.oldPr;
+                break;
+            }
+        }
+    },
+
+    Redo: function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_BarChart_AddAxId:
+            {
+                this.axId.push(data.pr);
+                break;
+            }
+            case historyitem_BarChart_SetBarDir:
+            {
+                this.barDir = data.newPr;
+                break;
+            }
+            case historyitem_BarChart_SetDLbls:
+            {
+                this.dLbls = data.newPr;
+                break;
+            }
+            case historyitem_BarChart_SetGapWidth:
+            {
+                this.gapWidth = data.newPr;
+                break;
+            }
+            case historyitem_BarChart_SetGrouping:
+            {
+                this.grouping = data.newPr;
+                break;
+            }
+            case historyitem_BarChart_SetOverlap:
+            {
+                this.overlap = data.newPr;
+                break;
+            }
+            case historyitem_BarChart_AddSer:
+            {
+                this.series.push(data.pr);
+                break;
+            }
+            case historyitem_BarChart_SetSerLines:
+            {
+                this.serLines = data.newPr;
+                break;
+            }
+            case historyitem_BarChart_SetVaryColors:
+            {
+                this.varyColors = data.newPr;
+                break;
+            }
+        }
+    },
+
+    Save_Changes: function(data, w)
+    {
+        w.WriteLong(data.Type);
+
+        switch(data.Type)
+        {
+            case historyitem_BarChart_AddAxId:
+            case historyitem_BarChart_AddSer:
+            {
+                writeObject(w, data.pr);
+                break;
+            }
+            case historyitem_BarChart_SetBarDir:
+            case historyitem_BarChart_SetGapWidth:
+            case historyitem_BarChart_SetGrouping:
+            case historyitem_BarChart_SetOverlap:
+            {
+                writeLong(w, data.newPr);
+                break;
+            }
+            case historyitem_BarChart_SetDLbls:
+            case historyitem_BarChart_SetSerLines:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_BarChart_SetVaryColors:
+            {
+                writeBool(w, data.newPr);
+                break;
+            }
+        }
+    },
+
+    Load_Changes: function(r)
+    {
+        var type = r.GetLong();
+        switch (type)
+        {
+            case historyitem_BarChart_AddAxId:
+            {
+                var ax = readObject(r);
+                if(isRealObject(ax))
+                    this.axId.push(ax);
+                break;
+            }
+            case historyitem_BarChart_SetBarDir:
+            {
+                this.barDir = readLong(r);
+                break;
+            }
+            case historyitem_BarChart_SetDLbls:
+            {
+                this.dLbls = readLong(r);
+                break;
+            }
+            case historyitem_BarChart_SetGapWidth:
+            {
+                this.gapWidth = readLong(r);
+                break;
+            }
+            case historyitem_BarChart_SetGrouping:
+            {
+                this.grouping = readLong(r);
+                break;
+            }
+            case historyitem_BarChart_SetOverlap:
+            {
+                this.overlap = readLong(r);
+                break;
+            }
+            case historyitem_BarChart_AddSer:
+            {
+                var ser = readObject(r);
+                if(isRealObject(ser))
+                    this.series.push(ser);
+                break;
+            }
+            case historyitem_BarChart_SetSerLines:
+            {
+                this.serLines = readObject(r);
+                break;
+            }
+            case historyitem_BarChart_SetVaryColors:
+            {
+                this.varyColors = readBool(r);
+                break;
+            }
+        }
+    }
+};
 
 function CAreaChart()
 {
@@ -2626,350 +2970,7 @@ var BAR_GROUPING_PERCENT_STACKED = 1;
 var BAR_GROUPING_STACKED = 2;
 var BAR_GROUPING_STANDARD = 3;
 
-function CBarChart()
-{
-    this.axId        = [];
-    this.barDir      = null;
-    this.dLbls       = null;
-    this.gapWidth    = null;
-    this.grouping    = null;
-    this.overlap     = null;
-    this.series      = [];
-    this.serLines    = null;
-    this.varyColors  = null;
 
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
-}
-
-CBarChart.prototype =
-{
-    Grt_Id: function()
-    {
-        return this.Id;
-    },
-
-    removeDataLabels: function()
-    {
-        var i;
-        for(i = 0; i < this.series.length; ++i)
-        {
-            if(typeof this.series[i].setDLbls === "function")
-                this.series[i].setDLbls(null);
-        }
-    },
-
-    getObjectType: function()
-    {
-        return historyitem_type_BarChart;
-    },
-
-
-    getAxisByTypes: CPlotArea.prototype.getAxisByTypes,
-
-    Write_ToBinary2: function(w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteString2(this.Get_Id());
-    },
-
-    Read_FromBinary2: function(r)
-    {
-        this.Id = r.GetString2();
-    },
-
-    setFromOtherChart: function(c)
-    {
-        var i;
-        //if(Array.isArray(c.axId))
-        //{
-        //    for(i = 0; i < c.axId.length; ++i)
-        //    {
-        //        this.addAxId(c.axId[i]);
-        //    }
-        //}
-        if(isRealNumber(c.barDir))
-            this.setBarDir(c.barDir);
-
-        if(c.dLbls)
-            this.setDLbls(c.dLbls);
-
-        if(isRealNumber(c.gapWidth))
-            this.setGapWidth(c.gapWidth);
-        if(isRealNumber(c.grouping))
-            this.setGrouping(c.grouping);
-        if(isRealNumber(c.overlap))
-            this.setOverlap(c.overlap);
-        if(Array.isArray(c.series))
-        {
-            for(i = 0; i < c.series.length; ++i)
-            {
-                var ser = new CBarSeries();
-                ser.setFromOtherSeries(c.series[i]);
-                this.addSer(ser);
-            }
-        }
-        if(isRealBool(c.varyColors))
-            this.setVaryColors(c.varyColors);
-    },
-
-    addAxId: function(pr)
-    {
-        History.Add(this, {Type: historyitem_BarChart_AddAxId, pr: pr});
-        this.axId.push(pr);
-    },
-
-    setBarDir: function(pr)
-    {
-        History.Add(this, {Type: historyitem_BarChart_SetBarDir, oldPr: this.barDir, newPr:pr});
-        this.barDir = pr;
-    },
-
-    setDLbls     : function(pr)
-    {
-        History.Add(this, {Type: historyitem_BarChart_SetDLbls, oldPr: this.dLbls, newPr:pr});
-        this.dLbls = pr;
-    },
-    setGapWidth: function(pr)
-    {
-        History.Add(this, {Type: historyitem_BarChart_SetGapWidth, oldPr: this.gapWidth, newPr:pr});
-        this.gapWidth = pr;
-    },
-    setGrouping: function(pr)
-    {
-        History.Add(this, {Type: historyitem_BarChart_SetGrouping, oldPr: this.grouping, newPr:pr});
-        this.grouping = pr;
-    },
-    setOverlap: function(pr)
-    {
-        History.Add(this, {Type: historyitem_BarChart_SetOverlap, oldPr: this.overlap, newPr:pr});
-        this.overlap = pr;
-    },
-    addSer: function(pr)
-    {
-        History.Add(this, {Type: historyitem_BarChart_AddSer, pr: pr});
-        this.series.push(pr);
-    },
-    setSerLines: function(pr)
-    {
-        History.Add(this, {Type: historyitem_BarChart_SetSerLines, oldPr: this.serLines, newPr:pr});
-        this.serLines = pr;
-    },
-    setVaryColors: function(pr)
-    {
-        History.Add(this, {Type: historyitem_BarChart_SetVaryColors, oldPr: this.varyColors, newPr:pr});
-        this.varyColors = pr;
-    },
-
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_BarChart_AddAxId:
-            {
-                for(var i = this.axId.length; i > -1; --i)
-                {
-                    if(this.axId[i] === data.pr)
-                    {
-                        this.axId.splice(i, 1);
-                        break;
-                    }
-                }
-                break;
-            }
-            case historyitem_BarChart_SetBarDir:
-            {
-                this.barDir = data.oldPr;
-                break;
-            }
-            case historyitem_BarChart_SetDLbls:
-            {
-                this.dLbls = data.oldPr;
-                break;
-            }
-            case historyitem_BarChart_SetGapWidth:
-            {
-                this.gapWidth = data.oldPr;
-                break;
-            }
-            case historyitem_BarChart_SetGrouping:
-            {
-                this.grouping = data.oldPr;
-                break;
-            }
-            case historyitem_BarChart_SetOverlap:
-            {
-                this.overlap = data.oldPr;
-                break;
-            }
-            case historyitem_BarChart_AddSer:
-            {
-                for(var i = this.series.length; i > -1; --i)
-                {
-                    if(this.series[i] === data.pr)
-                    {
-                        this.series.splice(i, 1);
-                        break;
-                    }
-                }
-                break;
-            }
-            case historyitem_BarChart_SetSerLines:
-            {
-                this.serLines = data.oldPr;
-                break;
-            }
-            case historyitem_BarChart_SetVaryColors:
-            {
-                this.varyColors = data.oldPr;
-                break;
-            }
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_BarChart_AddAxId:
-            {
-                this.axId.push(data.pr);
-                break;
-            }
-            case historyitem_BarChart_SetBarDir:
-            {
-                this.barDir = data.newPr;
-                break;
-            }
-            case historyitem_BarChart_SetDLbls:
-            {
-                this.dLbls = data.newPr;
-                break;
-            }
-            case historyitem_BarChart_SetGapWidth:
-            {
-                this.gapWidth = data.newPr;
-                break;
-            }
-            case historyitem_BarChart_SetGrouping:
-            {
-                this.grouping = data.newPr;
-                break;
-            }
-            case historyitem_BarChart_SetOverlap:
-            {
-                this.overlap = data.newPr;
-                break;
-            }
-            case historyitem_BarChart_AddSer:
-            {
-                this.series.push(data.pr);
-                break;
-            }
-            case historyitem_BarChart_SetSerLines:
-            {
-                this.serLines = data.newPr;
-                break;
-            }
-            case historyitem_BarChart_SetVaryColors:
-            {
-                this.varyColors = data.newPr;
-                break;
-            }
-        }
-    },
-
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(data.Type);
-
-        switch(data.Type)
-        {
-            case historyitem_BarChart_AddAxId:
-            case historyitem_BarChart_AddSer:
-            {
-                writeObject(w, data.pr);
-                break;
-            }
-            case historyitem_BarChart_SetBarDir:
-            case historyitem_BarChart_SetGapWidth:
-            case historyitem_BarChart_SetGrouping:
-            case historyitem_BarChart_SetOverlap:
-            {
-                writeLong(w, data.newPr);
-                break;
-            }
-            case historyitem_BarChart_SetDLbls:
-            case historyitem_BarChart_SetSerLines:
-            {
-                writeObject(w, data.newPr);
-                break;
-            }
-            case historyitem_BarChart_SetVaryColors:
-            {
-                writeBool(w, data.newPr);
-                break;
-            }
-        }
-    },
-
-    Load_Changes: function(r)
-    {
-        var type = r.GetLong();
-        switch (type)
-        {
-            case historyitem_BarChart_AddAxId:
-            {
-                var ax = readObject(r);
-                if(isRealObject(ax))
-                    this.axId.push(ax);
-                break;
-            }
-            case historyitem_BarChart_SetBarDir:
-            {
-                this.barDir = readLong(r);
-                break;
-            }
-            case historyitem_BarChart_SetDLbls:
-            {
-                this.dLbls = readLong(r);
-                break;
-            }
-            case historyitem_BarChart_SetGapWidth:
-            {
-                this.gapWidth = readLong(r);
-                break;
-            }
-            case historyitem_BarChart_SetGrouping:
-            {
-                this.grouping = readLong(r);
-                break;
-            }
-            case historyitem_BarChart_SetOverlap:
-            {
-                this.overlap = readLong(r);
-                break;
-            }
-            case historyitem_BarChart_AddSer:
-            {
-                var ser = readObject(r);
-                if(isRealObject(ser))
-                    this.series.push(ser);
-                break;
-            }
-            case historyitem_BarChart_SetSerLines:
-            {
-                this.serLines = readObject(r);
-                break;
-            }
-            case historyitem_BarChart_SetVaryColors:
-            {
-                this.varyColors = readBool(r);
-                break;
-            }
-        }
-    }
-};
 
 
 function CBarSeries()
