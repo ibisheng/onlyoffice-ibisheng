@@ -423,13 +423,16 @@ function CBinaryFileWriter()
         this.WriteULong(0);
 
         // App
-        this.WriteApp(presentation.App);
+		if (presentation.App)
+			this.WriteApp(presentation.App);
 
         // Core
-        this.WriteCore(presentation.Core);
+		if (presentation.Core)
+			this.WriteCore(presentation.Core);
 
         // ViewProps
-        this.WriteViewProps(presentation.ViewProps);
+		if (presentation.ViewProps)
+			this.WriteViewProps(presentation.ViewProps);
 
         // presentation
         this.WritePresentation(presentation);
