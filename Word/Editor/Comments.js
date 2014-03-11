@@ -1093,6 +1093,15 @@ ParaComment.prototype =
     {
     },
 
+    Get_PosByElement : function(Class, ContentPos, Depth, UseRange, Range, Line)
+    {
+        if ( this === Class )
+            return true;
+
+        return false;
+    },
+
+
     Get_RunElementByPos : function(ContentPos, Depth)
     {
         return null;
@@ -1122,6 +1131,10 @@ ParaComment.prototype =
     Get_StartRangePos : function(_CurLine, _CurRange, SearchPos, Depth)
     {
         return false;
+    },
+
+    Get_StartRangePos2 : function(_CurLine, _CurRange, ContentPos, Depth)
+    {
     },
 
     Get_StartPos : function(ContentPos, Depth)

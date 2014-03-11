@@ -2011,7 +2011,9 @@ CDocument.prototype =
             // Сначала удаляем заселекченую часть
             if ( true === this.Selection.Use )
             {
+                this.TurnOffRecalc = true;
                 this.Remove( 1, true );
+                this.TurnOffRecalc = false;
             }
 
             // Добавляем новый параграф

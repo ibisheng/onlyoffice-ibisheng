@@ -38,8 +38,9 @@ function ParaRun(Paragraph)
 
     this.CollaborativeMarks = new Array(); // Массив CParaRunCollaborativeMark
 
-    this.NearPosArray = new Array();
-    this.SearchMarks  = new Array();
+    this.NearPosArray  = new Array();
+    this.SearchMarks   = new Array();
+    this.SpellingMarks = new Array();
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -322,20 +323,6 @@ ParaRun.prototype =
                     this.Lines[CurLine].Ranges[RangesCount - 1].EndPos++;
                 }
             }
-
-            // TODO: Поиск, SpellCheck
-
-//            for ( var CurSearch in this.SearchResults )
-//            {
-//                if ( this.SearchResults[CurSearch].StartPos >= Pos )
-//                    this.SearchResults[CurSearch].StartPos++;
-//
-//                if ( this.SearchResults[CurSearch].EndPos >= Pos )
-//                    this.SearchResults[CurSearch].EndPos++;
-//            }
-//
-//
-//            this.SpellChecker.Update_OnAdd( this, Pos, Item );
         }
 
         // Обновляем позиции в NearestPos
@@ -361,6 +348,20 @@ ParaRun.prototype =
             if ( ContentPos.Data[Depth] >= Pos )
                 ContentPos.Data[Depth]++;
         }
+
+        // Обновляем позиции для орфографии
+        var SpellingMarksCount = this.SpellingMarks.length;
+        for ( var Index = 0; Index < SpellingMarksCount; Index++ )
+        {
+            var Mark       = this.SpellingMarks[Index];
+            var ContentPos = ( true === Mark.Start ? Mark.Element.StartPos : Mark.Element.EndPos );
+            var Depth      = Mark.Depth;
+
+            if ( ContentPos.Data[Depth] >= Pos )
+                ContentPos.Data[Depth]++;
+        }
+
+        this.Paragraph.SpellChecker.Update_OnAdd( this, Pos, Item );
 
         // Отмечаем, что надо перемерить элементы в данном ране
         this.RecalcInfo.Measure = true;
@@ -432,11 +433,6 @@ ParaRun.prototype =
                         Range.EndPos = Math.max( 0 , Pos );
                 }
             }
-
-            // TODO: Поиск, Spelling
-//
-//            // Передвинем все метки слов для проверки орфографии
-//            this.SpellChecker.Update_OnRemove( this, Pos, Count );
         }
 
         // Обновляем позиции в NearestPos
@@ -466,6 +462,22 @@ ParaRun.prototype =
             else if ( ContentPos.Data[Depth] > Pos )
                 ContentPos.Data[Depth] = Math.max( 0 , Pos );
         }
+
+        // Обновляем позиции для орфографии
+        var SpellingMarksCount = this.SpellingMarks.length;
+        for ( var Index = 0; Index < SpellingMarksCount; Index++ )
+        {
+            var Mark       = this.SpellingMarks[Index];
+            var ContentPos = ( true === Mark.Start ? Mark.Element.StartPos : Mark.Element.EndPos );
+            var Depth      = Mark.Depth;
+
+            if ( ContentPos.Data[Depth] > Pos + Count )
+                ContentPos.Data[Depth] -= Count;
+            else if ( ContentPos.Data[Depth] > Pos )
+                ContentPos.Data[Depth] = Math.max( 0 , Pos );
+        }
+
+        this.Paragraph.SpellChecker.Update_OnRemove( this, Pos, Count );
 
         // Отмечаем, что надо перемерить элементы в данном ране
         this.RecalcInfo.Measure = true;
@@ -742,6 +754,35 @@ ParaRun.prototype =
         // Разделяем содержимое по ранам
         NewRun.Concat_ToContent( this.Content.slice(CurPos) );
         this.Remove_FromContent( CurPos, this.Content.length - CurPos, true );
+
+        // Если были точки орфографии, тогда переместим их в новый ран
+        var SpellingMarksCount = this.SpellingMarks.length;
+        for ( var Index = 0; Index < SpellingMarksCount; Index++ )
+        {
+            var Mark    = this.SpellingMarks[Index];
+            var MarkPos = ( true === Mark.Start ? Mark.Element.StartPos.Get(Mark.Depth) : Mark.Element.EndPos.Get(Mark.Depth) );
+
+            if ( MarkPos >= ContentPos )
+            {
+                var MarkElement = Mark.Element;
+                if ( true === Mark.Start )
+                {
+                    MarkElement.ClassesS[Mark.Depth]       = NewRun;
+                    MarkElement.StartPos.Data[Mark.Depth] -= ContentPos;
+                }
+                else
+                {
+                    MarkElement.ClassesE[Mark.Depth]     = NewRun;
+                    MarkElement.EndPos.Data[Mark.Depth] -= ContentPos;
+                }
+
+                NewRun.SpellingMarks.push( Mark );
+
+                this.SpellingMarks.splice( Index, 1 );
+                SpellingMarksCount--;
+                Index--;
+            }
+        }
 
         return NewRun;
     },
@@ -2535,9 +2576,41 @@ ParaRun.prototype =
         else
             CurColor.Set( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
 
+        var SpellingMarksArray = new Object();
+        var SpellingMarksCount = this.SpellingMarks.length;
+        for ( var SPos = 0; SPos < SpellingMarksCount; SPos++)
+        {
+            var Mark = this.SpellingMarks[SPos];
+
+            if ( false === Mark.Element.Checked )
+            {
+                if ( true === Mark.Start )
+                {
+                    var MarkPos = Mark.Element.StartPos.Get(Mark.Depth);
+
+                    if ( undefined === SpellingMarksArray[MarkPos] )
+                        SpellingMarksArray[MarkPos] = 1;
+                    else
+                        SpellingMarksArray[MarkPos] += 1;
+                }
+                else
+                {
+                    var MarkPos = Mark.Element.EndPos.Get(Mark.Depth);
+
+                    if ( undefined === SpellingMarksArray[MarkPos] )
+                        SpellingMarksArray[MarkPos] = 2;
+                    else
+                        SpellingMarksArray[MarkPos] += 2;
+                }
+            }
+        }
+
         for ( var Pos = StartPos; Pos < EndPos; Pos++ )
         {
             var Item = this.Content[Pos];
+
+            if ( 1 === SpellingMarksArray[Pos] || 3 === SpellingMarksArray[Pos] )
+                PDSL.SpellingCounter++;
 
             switch( Item.Type )
             {
@@ -2565,9 +2638,8 @@ ParaRun.prototype =
                         if ( true === CurTextPr.Underline )
                             aUnderline.Add( UnderlineY, UnderlineY, X, X + Item.WidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
 
-                        // TODO: Переделать орфографию
-                        //if ( true === CheckSpelling[Pos] )
-                        //    aSpelling.Add( UnderlineY, UnderlineY, X, X + Item.WidthVisible, LineW, 0, 0, 0 );
+                        if ( PDSL.SpellingCounter > 0 )
+                            aSpelling.Add( UnderlineY, UnderlineY, X, X + Item.WidthVisible, LineW, 0, 0, 0 );
 
                         X += Item.WidthVisible;
                     }
@@ -2595,6 +2667,9 @@ ParaRun.prototype =
                     break;
                 }
             }
+
+            if ( 2 === SpellingMarksArray[Pos + 1] || 3 === SpellingMarksArray[Pos + 1] )
+                PDSL.SpellingCounter--;
         }
 
         // Обновляем позицию
@@ -2775,6 +2850,14 @@ ParaRun.prototype =
     {
         var Pos = ContentPos.Get(Depth);
         this.State.ContentPos = Pos;
+    },
+
+    Get_PosByElement : function(Class, ContentPos, Depth, UseRange, Range, Line)
+    {
+        if ( this === Class )
+            return true;
+
+        return false;
     },
 
     Get_RunElementByPos : function(ContentPos, Depth)
@@ -3095,6 +3178,15 @@ ParaRun.prototype =
             return false;
     },
 
+    Get_StartRangePos2 : function(_CurLine, _CurRange, ContentPos, Depth)
+    {
+        var CurLine  = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+        var Pos = this.Lines[CurLine].Ranges[CurRange].StartPos;
+        ContentPos.Update( Pos, Depth );
+    },
+
     Get_StartPos : function(ContentPos, Depth)
     {
         ContentPos.Update( 0, Depth );
@@ -3307,7 +3399,7 @@ ParaRun.prototype =
         return this.Pr.Copy();
     },
 
-    Get_CompiledTextPr : function()
+    Get_CompiledTextPr : function(Copy)
     {
         if ( true === this.State.Selection.Use && true === this.Selection_CheckParaEnd() )
         {
@@ -3322,7 +3414,7 @@ ParaRun.prototype =
             return ThisTextPr;
         }
         else
-            return this.Get_CompiledPr(true);
+            return this.Get_CompiledPr(Copy);
     },
 
     Recalc_CompiledPr : function(RecalcMeasure)
@@ -3388,6 +3480,9 @@ ParaRun.prototype =
 
         History.Add( this, { Type : historyitem_ParaRun_TextPr, New : TextPr, Old : OldValue } );
         this.Recalc_CompiledPr(true);
+
+        // TODO: Орфография: пока сделаем так, в будущем надо будет переделать
+        this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
     },
 
     Apply_TextPr : function(TextPr, IncFontSize, ApplyToAll)
@@ -3578,6 +3673,36 @@ ParaRun.prototype =
         {
             NewRun.State.Selection.EndPos = 0;
         }
+
+        // Если были точки орфографии, тогда переместим их в новый ран
+        var SpellingMarksCount = this.SpellingMarks.length;
+        for ( var Index = 0; Index < SpellingMarksCount; Index++ )
+        {
+            var Mark    = this.SpellingMarks[Index];
+            var MarkPos = ( true === Mark.Start ? Mark.Element.StartPos.Get(Mark.Depth) : Mark.Element.EndPos.Get(Mark.Depth) );
+
+            if ( MarkPos >= Pos )
+            {
+                var MarkElement = Mark.Element;
+                if ( true === Mark.Start )
+                {
+                    MarkElement.ClassesS[Mark.Depth]       = NewRun;
+                    MarkElement.StartPos.Data[Mark.Depth] -= Pos;
+                }
+                else
+                {
+                    MarkElement.ClassesE[Mark.Depth]     = NewRun;
+                    MarkElement.EndPos.Data[Mark.Depth] -= Pos;
+                }
+
+                NewRun.SpellingMarks.push( Mark );
+
+                this.SpellingMarks.splice( Index, 1 );
+                SpellingMarksCount--;
+                Index--;
+            }
+        }
+
 
         return NewRun;
     },
@@ -3999,6 +4124,9 @@ ParaRun.prototype =
 
             if ( undefined != Lang.Val )
                 this.Set_Lang_Val( Lang.Val );
+
+            // TODO: Орфография: пока сделаем так, в будущем надо будет переделать
+            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
         }
     },
 
@@ -4214,7 +4342,6 @@ function CParaRunCollaborativeMark(Pos, Type)
     this.Pos  = Pos;
     this.Type = Type;
 }
-
 
 function FontSize_IncreaseDecreaseValue(bIncrease, Value)
 {

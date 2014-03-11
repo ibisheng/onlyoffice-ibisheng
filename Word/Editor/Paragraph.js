@@ -130,7 +130,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
 
     this.SearchResults = new Object();
 
-    this.SpellChecker  = new CParaSpellChecker();
+    this.SpellChecker  = new CParaSpellChecker(this);
 
     this.NearPosArray  = new Array();
 
@@ -488,6 +488,25 @@ Paragraph.prototype =
                     ContentPos.Data[0]++;
             }
 
+            // Передвинем все метки слов для проверки орфографии
+            // Обновляем позиции в SearchResults
+            var SpellingsCount  = this.SpellChecker.Elements.length;
+            for ( var Pos = 0; Pos < SpellingsCount; Pos++ )
+            {
+                var Element = this.SpellChecker.Elements[Pos];
+                var ContentPos = Element.StartPos;
+
+                if ( ContentPos.Data[0] >= Pos )
+                    ContentPos.Data[0]++;
+
+                ContentPos = Element.EndPos;
+
+                if ( ContentPos.Data[0] >= Pos )
+                    ContentPos.Data[0]++;
+            }
+
+            this.SpellChecker.Update_OnAdd( this, Pos, Item );
+
             Item.Set_Paragraph( this );
         }
     },
@@ -569,7 +588,7 @@ Paragraph.prototype =
 
             // Обновлять позиции в NearestPos не надо, потому что мы добавляем новые элементы в конец массива
 
-            // TODO: Разобраться с орфографией
+            this.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
         }
     },
 
@@ -707,6 +726,24 @@ Paragraph.prototype =
             // Удаляем комментарий, если это необходимо
             if ( true === this.DeleteCommentOnRemove && para_Comment === Item.Type )
                 this.LogicDocument.Remove_Comment( Item.Id, true );
+
+            var SpellingsCount  = this.SpellChecker.Elements.length;
+            for ( var Pos = 0; Pos < SpellingsCount; Pos++ )
+            {
+                var Element = this.SpellChecker.Elements[Pos];
+                var ContentPos = Element.StartPos;
+
+                if ( ContentPos.Data[0] > Pos )
+                    ContentPos.Data[0]--;
+
+                ContentPos = Element.EndPos;
+
+                if ( ContentPos.Data[0] > Pos )
+                    ContentPos.Data[0]--;
+            }
+
+            // Передвинем все метки слов для проверки орфографии
+            this.SpellChecker.Update_OnRemove( this, Pos, 1 );
         }
     },
 
@@ -5313,7 +5350,10 @@ Paragraph.prototype =
         }
 
         // Во время пересчета сбрасываем привязку курсора к строке.
-        this.CurPos.Line = -1;
+        this.CurPos.Line  = -1;
+        this.CurPos.Range = -1;
+
+        this.Internal_CheckSpelling();
 
         return Result;
     },
@@ -5554,7 +5594,12 @@ Paragraph.prototype =
             this.Clear_NearestPosArray();
 
             // Во время пересчета сбрасываем привязку курсора к строке.
-            this.CurPos.Line = -1;
+            this.CurPos.Line  = -1;
+            this.CurPos.Range = -1;
+
+            this.FontMap.NeedRecalc = true;
+
+            this.Internal_CheckSpelling();
 
             var CurPage = _PageIndex - this.PageNum;
             var RecalcResult = this.Recalculate_Page__( CurPage );
@@ -7326,7 +7371,7 @@ Paragraph.prototype =
             var StartLine = Page.StartLine;
             var EndLine   = Page.EndLine;
 
-            var CheckSpelling = this.SpellChecker.Get_DrawingInfo();
+            PDSL.SpellingCounter = this.SpellChecker.Get_DrawingInfo( this.Get_PageStartPos(CurPage) );
 
             for ( var CurLine = StartLine; CurLine <= EndLine; CurLine++ )
             {
@@ -9796,6 +9841,43 @@ Paragraph.prototype =
         }
     },
 
+    // Находим позицию заданного элемента. (Данной функцией лучше пользоваться, когда параграф рассчитан)
+    Get_PosByElement : function(Class)
+    {
+        var ContentPos = new CParagraphContentPos();
+
+        // Сначала попробуем определить местоположение по данным рассчета
+        var CurRange = Class.StartRange;
+        var CurLine  = Class.StartLine;
+
+        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
+        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
+
+        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+        {
+            var Element = this.Content[CurPos];
+
+            ContentPos.Update( CurPos, 0 );
+
+            if ( true === Element.Get_PosByElement(Class, ContentPos, 1, true, CurRange, CurLine) )
+                return ContentPos;
+        }
+
+        // Если мы дошли до сюда, значит мы так и не нашли заданный класс. Попробуем его найти с помощью
+        // поиска по всему параграфу, а не по заданному отрезку
+
+        var ContentLen = this.Content.length;
+        for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
+        {
+            var Element = this.Content[CurPos];
+
+            ContentPos.Update( CurPos, 0 );
+
+            if ( true === Element.Get_PosByElement(Class, ContentPos, 1, false, -1, -1) )
+                return ContentPos;
+        }
+    },
+
     // Получаем по заданной позиции элемент текста
     Get_RunElementByPos : function(ContentPos)
     {
@@ -9817,6 +9899,14 @@ Paragraph.prototype =
         }
 
         return Element;
+    },
+
+    Get_PageStartPos : function(CurPage)
+    {
+        var CurLine  = this.Pages[CurPage].StartLine;
+        var CurRange = 0;
+
+        return this.Get_StartRangePos2( CurLine, CurRange );
     },
 
     Get_LeftPos : function(SearchPos, ContentPos)
@@ -9992,6 +10082,18 @@ Paragraph.prototype =
             if ( true === Item.Get_StartRangePos( CurLine, CurRange, SearchPos, 1 ) )
                 SearchPos.Pos.Update( CurPos, 0 );
         }
+    },
+
+    Get_StartRangePos2 : function(CurLine, CurRange)
+    {
+        var ContentPos = new CParagraphContentPos();
+        var Depth = 0;
+
+        var Pos = this.Lines[CurLine].Ranges[CurRange].StartPos;
+        ContentPos.Update( Pos, Depth );
+
+        this.Content[Pos].Get_StartRangePos2( CurLine, CurRange, ContentPos, Depth + 1 );
+        return ContentPos;
     },
 
     Get_StartPos : function()
@@ -14355,18 +14457,18 @@ Paragraph.prototype =
             while ( true === this.Content[StartPos].Selection_IsEmpty() && StartPos < EndPos )
                 StartPos++;
 
-            TextPr = this.Content[StartPos].Get_CompiledTextPr();
+            TextPr = this.Content[StartPos].Get_CompiledTextPr(true);
 
             for ( var CurPos = StartPos + 1; CurPos <= EndPos; CurPos++ )
             {
-                var TempTextPr = this.Content[CurPos].Get_CompiledTextPr();
+                var TempTextPr = this.Content[CurPos].Get_CompiledTextPr(false);
                 if ( null !== TempTextPr && undefined !== TempTextPr && true !== this.Content[CurPos].Selection_IsEmpty() )
                     TextPr = TextPr.Compare( TempTextPr );
             }
         }
         else
         {
-            TextPr = this.Content[this.CurPos.ContentPos].Get_CompiledTextPr();
+            TextPr = this.Content[this.CurPos.ContentPos].Get_CompiledTextPr(true);
         }
 
         return TextPr;
@@ -16899,7 +17001,20 @@ Paragraph.prototype =
         }
         else
         {
-            // TODO: Разобраться с орфографией
+            var StartPos, EndPos;
+            if ( true === this.Selection.Use )
+            {
+                StartPos = this.Get_ParaContentPos( true, true );
+                EndPos = this.Get_ParaContentPos( true, false );
+            }
+            else
+            {
+                var CurPos = this.Get_ParaContentPos( false, false );
+                StartPos = CurPos;
+                EndPos   = CurPos;
+            }
+
+            this.SpellChecker.Document_UpdateInterfaceState( StartPos, EndPos );
 
             var HyperPos = -1;
 
@@ -20296,30 +20411,66 @@ Paragraph.prototype =
 
     Replace_MisspelledWord : function(Word, WordId)
     {
-        var Element = this.SpellChecker.Elements[WordId];
-        var StartPos = Element.StartPos;
-        var EndPos   = Element.EndPos;
-
-        for ( var Pos = EndPos; Pos >= StartPos; Pos-- )
+        if ( true !== Debug_ParaRunMode )
         {
-            var ItemType = this.Content[Pos].Type;
-            if ( para_TextPr != ItemType )
-                this.Internal_Content_Remove(Pos);
-        }
+            var Element = this.SpellChecker.Elements[WordId];
+            var StartPos = Element.StartPos;
+            var EndPos   = Element.EndPos;
 
-        var Len = Word.length;
-        for ( var Pos = 0; Pos < Len; Pos++ )
+            for ( var Pos = EndPos; Pos >= StartPos; Pos-- )
+            {
+                var ItemType = this.Content[Pos].Type;
+                if ( para_TextPr != ItemType )
+                    this.Internal_Content_Remove(Pos);
+            }
+
+            var Len = Word.length;
+            for ( var Pos = 0; Pos < Len; Pos++ )
+            {
+                this.Internal_Content_Add( StartPos + Pos, new ParaText( Word[Pos] ) );
+            }
+
+            this.RecalcInfo.Set_Type_0( pararecalc_0_All );
+
+            this.Selection.Use      = false;
+            this.Selection.Start    = false;
+            this.Selection.StartPos = EndPos;
+            this.Selection.EndPos   = EndPos;
+            this.Set_ContentPos( EndPos );
+        }
+        else
         {
-            this.Internal_Content_Add( StartPos + Pos, new ParaText( Word[Pos] ) );
+            var Element = this.SpellChecker.Elements[WordId];
+
+            // Сначала вставим новое слово
+            var Class = Element.ClassesS[Element.ClassesS.length - 1];
+            if ( para_Run !== Class.Type )
+                return;
+
+            var RunPos = Element.StartPos.Data[Element.ClassesS.length - 1];
+            var Len = Word.length;
+            for ( var Pos = 0; Pos < Len; Pos++ )
+            {
+                Class.Add_ToContent( RunPos + Pos, new ParaText(Word[Pos]) );
+            }
+
+            // Удалим старое слово
+            var StartPos = Element.StartPos;
+            var EndPos   = Element.EndPos;
+
+            this.Set_SelectionContentPos( StartPos, EndPos );
+            this.Selection.Use  = true;
+            this.Selection.Flag = selectionflag_Common;
+
+            this.Remove();
+
+            this.Selection_Remove();
+            this.Set_ParaContentPos( StartPos, true, -1, -1 );
+
+            this.RecalcInfo.Set_Type_0( pararecalc_0_All );
+
+            Element.Checked = null;
         }
-
-        this.RecalcInfo.Set_Type_0( pararecalc_0_All );
-
-        this.Selection.Use      = false;
-        this.Selection.Start    = false;
-        this.Selection.StartPos = EndPos;
-        this.Selection.EndPos   = EndPos;
-        this.Set_ContentPos( EndPos );
     },
 
     Ignore_MisspelledWord : function(WordId)
@@ -21574,6 +21725,8 @@ function CParagraphDrawStateLines()
     this.Underline  = new CParaDrawingRangeLines();
     this.Spelling   = new CParaDrawingRangeLines();
 
+    this.SpellingCounter = 0;
+
     this.Page  = 0;
     this.Line  = 0;
     this.Range = 0;
@@ -21595,6 +21748,8 @@ CParagraphDrawStateLines.prototype =
         this.VisitedHyperlink = false;
 
         this.CurPos = new CParagraphContentPos();
+
+        this.SpellingCounter = 0;
     },
 
     Reset_Line : function(Page, Line, Baseline, UnderlineOffset)

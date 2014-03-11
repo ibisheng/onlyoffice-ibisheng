@@ -25,8 +25,9 @@ function ParaHyperlink()
 
     this.Range = this.Lines[0].Ranges[0];
 
-    this.NearPosArray = new Array();
-    this.SearchMarks  = new Array();
+    this.NearPosArray  = new Array();
+    this.SearchMarks   = new Array();
+    this.SpellingMarks = new Array();
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -113,7 +114,7 @@ ParaHyperlink.prototype =
             return this.Content[_ContentPos.Get(Depth)].Get_TextPr( _ContentPos, Depth + 1 );
     },
 
-    Get_CompiledTextPr : function()
+    Get_CompiledTextPr : function(Copy)
     {
         var TextPr = null;
 
@@ -128,17 +129,17 @@ ParaHyperlink.prototype =
                 EndPos   = this.State.Selection.StartPos;
             }
 
-            TextPr = this.Content[StartPos].Get_CompiledTextPr();
+            TextPr = this.Content[StartPos].Get_CompiledTextPr(Copy);
 
             while ( null === TextPr && StartPos < EndPos )
             {
                 StartPos++;
-                TextPr = this.Content[StartPos].Get_CompiledTextPr();
+                TextPr = this.Content[StartPos].Get_CompiledTextPr(Copy);
             }
 
             for ( var CurPos = StartPos + 1; CurPos <= EndPos; CurPos++ )
             {
-                var CurTextPr = this.Content[CurPos].Get_CompiledPr();
+                var CurTextPr = this.Content[CurPos].Get_CompiledPr(false);
 
                 if ( null !== CurTextPr )
                     TextPr = TextPr.Compare( CurTextPr );
@@ -149,7 +150,7 @@ ParaHyperlink.prototype =
             var CurPos = this.State.ContentPos;
 
             if ( CurPos >= 0 && CurPos < this.Content.length )
-                TextPr = this.Content[CurPos].Get_CompiledTextPr();
+                TextPr = this.Content[CurPos].Get_CompiledTextPr(Copy);
         }
 
         return TextPr;
@@ -1070,6 +1071,41 @@ ParaHyperlink.prototype =
         this.Content[Pos].Set_ParaContentPos( ContentPos, Depth + 1 );
     },
 
+    Get_PosByElement : function(Class, ContentPos, Depth, UseRange, Range, Line)
+    {
+        if ( this === Class )
+            return true;
+
+        var ContentPos = new CParagraphContentPos();
+
+        var StartPos = 0;
+        var EndPos   = this.Content.length - 1;
+
+        if ( true === UseRange )
+        {
+            var CurLine  = Line - this.StartLine;
+            var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
+
+            if ( CurLine >= 0 && CurLine < this.Lines.length && CurRange >= 0 && CurRange < this.Lines[CurLine].Ranges.length )
+            {
+                StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
+                EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
+            }
+        }
+
+        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+        {
+            var Element = this.Content[CurPos];
+
+            ContentPos.Update( CurPos, Depth );
+
+            if ( true === Element.Get_PosByElement(Class, ContentPos, 1, true, CurRange, CurLine) )
+                return true;
+        }
+
+        return false;
+    },
+
     Get_RunElementByPos : function(ContentPos, Depth)
     {
         var Pos = ContentPos.Get(Depth);
@@ -1223,6 +1259,17 @@ ParaHyperlink.prototype =
             SearchPos.Pos.Update( StartPos, Depth );
 
         return Result;
+    },
+
+    Get_StartRangePos2 : function(_CurLine, _CurRange, ContentPos, Depth)
+    {
+        var CurLine  = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+        var Pos = this.Lines[CurLine].Ranges[CurRange].StartPos;
+        ContentPos.Update( Pos, Depth );
+
+        this.Content[Pos].Get_StartRangePos2( _CurLine, _CurRange, ContentPos, Depth + 1 );
     },
 
     Get_StartPos : function(ContentPos, Depth)
