@@ -436,6 +436,8 @@ CDrawingDocument.prototype =
             this.IsUpdateOverlayOnEndCheck = true;
             return false;
         }
+        
+        this.Native["DD_Overlay_UpdateStart"]();
 
         this.Native["DD_Overlay_Clear"]();
 
@@ -480,6 +482,8 @@ CDrawingDocument.prototype =
         this.Native["DD_Overlay_DrawFrameTrack"]();
         this.Native["DD_Overlay_DrawInlineTextTrackEnabled"]();
         this.Native["DD_Overlay_DrawHorVerAnchor"]();
+        
+        this.Native["DD_Overlay_UpdateEnd"]();
 
         return true;
     },
