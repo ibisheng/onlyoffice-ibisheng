@@ -2384,7 +2384,7 @@ CChartsDrawer.prototype =
 		if(undefined != varMin.toString().split('.')[1])
 			lengthNum = varMin.toString().split('.')[1].length;
 
-		if('Line' == mainObj.type && max > 0 && min < 0)
+		if(('Radar' == mainObj.type || 'Line' == mainObj.type) && max > 0 && min < 0)
 		{
 			varMin = varMin/degreeNum;
 			stepOY = stepOY/degreeNum;
@@ -2538,6 +2538,125 @@ CChartsDrawer.prototype =
 		newZ = newZ;
 		
 		return {x: newX,y: newY,z: newZ};
+	},
+	
+	calculatePoint: function(x, y, size, symbol)
+	{
+		size = size / 2.69;
+		var halfSize = size / 2;
+		var path  = new Path();
+		var pathH = this.calcProp.pathH;
+		var pathW = this.calcProp.pathW;
+		var gdLst = [];
+
+		path.pathH = pathH;
+		path.pathW = pathW;
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
+		
+		var framePaths = null;
+		
+		var result;
+
+		/*
+		var SYMBOL_PICTURE = 5;*/
+
+		switch ( symbol )
+		{
+			case SYMBOL_DASH:
+			{
+				path.moveTo((x - halfSize) * pathW, y * pathW);
+				path.lnTo((x + halfSize) * pathW, y * pathW);
+				break;
+			}
+			case SYMBOL_DOT:
+			{
+				path.moveTo((x - halfSize / 2) * pathW, y * pathW);
+				path.lnTo((x + halfSize / 2) * pathW, y * pathW);
+				break;
+			}
+			
+			case SYMBOL_PLUS:
+			{
+				path.moveTo(x * pathW, (y  + halfSize) * pathW);
+				path.lnTo(x * pathW, (y  - halfSize) * pathW);
+				path.moveTo((x - halfSize) * pathW, y * pathW);
+				path.lnTo((x  + halfSize) * pathW, y * pathW);
+				break;
+			}
+			
+			case SYMBOL_CIRCLE:
+			{
+				path.moveTo((x + halfSize) * pathW, y * pathW);
+				path.arcTo(halfSize * pathW, halfSize * pathW, 0, Math.PI * 2 * cToDeg);
+				break;
+			}
+			
+			case SYMBOL_STAR:
+			{
+				path.moveTo((x - halfSize) * pathW, (y  + halfSize) * pathW);
+				path.lnTo((x + halfSize) * pathW, (y  - halfSize) * pathW);
+				path.moveTo((x + halfSize) * pathW, (y  + halfSize) * pathW);
+				path.lnTo((x  - halfSize) * pathW, (y  - halfSize) * pathW);
+				path.moveTo(x * pathW, (y  + halfSize) * pathW);
+				path.lnTo(x * pathW, (y  - halfSize) * pathW);
+				break;
+			}
+			
+			case SYMBOL_X:
+			{
+				path.moveTo((x - halfSize) * pathW, (y  + halfSize) * pathW);
+				path.lnTo((x + halfSize) * pathW, (y  - halfSize) * pathW);
+				path.moveTo((x + halfSize) * pathW, (y  + halfSize) * pathW);
+				path.lnTo((x  - halfSize) * pathW, (y  - halfSize) * pathW);
+				break;
+			}
+			
+			case SYMBOL_TRIANGLE:
+			{
+				path.moveTo((x - size/Math.sqrt(3)) * pathW, (y  + size/3) * pathW);
+				path.lnTo(x * pathW, (y  - (2/3)*size) * pathW);
+				path.lnTo((x + size/Math.sqrt(3)) * pathW, (y  + size/3) * pathW)
+				path.lnTo((x - size/Math.sqrt(3)) * pathW, (y  + size/3) * pathW);
+				break;
+			}
+			
+			case SYMBOL_SQUARE:
+			{
+				path.moveTo((x - halfSize) * pathW, (y + halfSize) * pathW);
+				path.lnTo((x - halfSize) * pathW, (y - halfSize) * pathW);
+				path.lnTo((x + halfSize) * pathW, (y - halfSize) * pathW);
+				path.lnTo((x + halfSize) * pathW, (y + halfSize) * pathW);
+				path.lnTo((x - halfSize) * pathW, (y + halfSize) * pathW);
+			}
+			
+			case SYMBOL_DIAMOND:
+			{
+				path.moveTo((x - halfSize) * pathW, y * pathW);
+				path.lnTo(x * pathW, (y  - halfSize) * pathW);
+				path.lnTo((x + halfSize) * pathW, y * pathW);
+				path.lnTo(x * pathW, (y  + halfSize) * pathW);
+				path.lnTo((x - halfSize) * pathW, y  * pathW);
+				break;
+			}
+		}
+		
+		if(symbol == "Plus" || symbol == "Star" || symbol == "X")
+		{
+			framePaths = new Path();
+			framePaths.moveTo((x - halfSize) * pathW, (y + halfSize) * pathW);
+			framePaths.lnTo((x - halfSize) * pathW, (y - halfSize) * pathW);
+			framePaths.lnTo((x + halfSize) * pathW, (y - halfSize) * pathW);
+			framePaths.lnTo((x + halfSize) * pathW, (y + halfSize) * pathW);
+			framePaths.lnTo((x - halfSize) * pathW, (y + halfSize) * pathW);
+		}
+		
+		path.recalculate(gdLst);
+		if(framePaths)
+			framePaths.recalculate(gdLst);
+		result = {framePaths: framePaths, path: path};
+		
+		return result;
 	}
 }
 
@@ -2887,7 +3006,7 @@ drawLineChart.prototype =
 					this.paths.points = [];
 				if(!this.paths.points[i])
 					this.paths.points[i] = [];
-				this.paths.points[i][n] = this._calculatePoint(x, y, dataSeries[n].compiledMarker.size, dataSeries[n].compiledMarker.symbol);
+				this.paths.points[i][n] = this.cChartDrawer.calculatePoint(x, y, dataSeries[n].compiledMarker.size, dataSeries[n].compiledMarker.symbol);
 			}
 			else
 			{
@@ -2919,133 +3038,14 @@ drawLineChart.prototype =
 					
 					if(n == 0)
 					{
-						this.paths.points[i][n] = this._calculatePoint(x, y, dataSeries[n].compiledMarker.size, dataSeries[n].compiledMarker.symbol);
-						this.paths.points[i][n + 1] = this._calculatePoint(x1, y1, dataSeries[n + 1].compiledMarker.size, dataSeries[n + 1].compiledMarker.symbol);
+						this.paths.points[i][n] = this.cChartDrawer.calculatePoint(x, y, dataSeries[n].compiledMarker.size, dataSeries[n].compiledMarker.symbol);
+						this.paths.points[i][n + 1] = this.cChartDrawer.calculatePoint(x1, y1, dataSeries[n + 1].compiledMarker.size, dataSeries[n + 1].compiledMarker.symbol);
 					}
 					else
-						this.paths.points[i][n + 1] = this._calculatePoint(x1, y1, dataSeries[n + 1].compiledMarker.size, dataSeries[n + 1].compiledMarker.symbol);
+						this.paths.points[i][n + 1] = this.cChartDrawer.calculatePoint(x1, y1, dataSeries[n + 1].compiledMarker.size, dataSeries[n + 1].compiledMarker.symbol);
 				}
 			}
 		}
-	},
-	
-	_calculatePoint: function(x, y, size, symbol)
-	{
-		size = size / 2.69;
-		var halfSize = size / 2;
-		var path  = new Path();
-		var pathH = this.chartProp.pathH;
-		var pathW = this.chartProp.pathW;
-		var gdLst = [];
-
-		path.pathH = pathH;
-		path.pathW = pathW;
-		gdLst["w"] = 1;
-		gdLst["h"] = 1;
-		
-		var framePaths = null;
-		
-		var result;
-
-		/*
-		var SYMBOL_PICTURE = 5;*/
-
-		switch ( symbol )
-		{
-			case SYMBOL_DASH:
-			{
-				path.moveTo((x - halfSize) * pathW, y * pathW);
-				path.lnTo((x + halfSize) * pathW, y * pathW);
-				break;
-			}
-			case SYMBOL_DOT:
-			{
-				path.moveTo((x - halfSize / 2) * pathW, y * pathW);
-				path.lnTo((x + halfSize / 2) * pathW, y * pathW);
-				break;
-			}
-			
-			case SYMBOL_PLUS:
-			{
-				path.moveTo(x * pathW, (y  + halfSize) * pathW);
-				path.lnTo(x * pathW, (y  - halfSize) * pathW);
-				path.moveTo((x - halfSize) * pathW, y * pathW);
-				path.lnTo((x  + halfSize) * pathW, y * pathW);
-				break;
-			}
-			
-			case SYMBOL_CIRCLE:
-			{
-				path.moveTo((x + halfSize) * pathW, y * pathW);
-				path.arcTo(halfSize * pathW, halfSize * pathW, 0, Math.PI * 2 * cToDeg);
-				break;
-			}
-			
-			case SYMBOL_STAR:
-			{
-				path.moveTo((x - halfSize) * pathW, (y  + halfSize) * pathW);
-				path.lnTo((x + halfSize) * pathW, (y  - halfSize) * pathW);
-				path.moveTo((x + halfSize) * pathW, (y  + halfSize) * pathW);
-				path.lnTo((x  - halfSize) * pathW, (y  - halfSize) * pathW);
-				path.moveTo(x * pathW, (y  + halfSize) * pathW);
-				path.lnTo(x * pathW, (y  - halfSize) * pathW);
-				break;
-			}
-			
-			case SYMBOL_X:
-			{
-				path.moveTo((x - halfSize) * pathW, (y  + halfSize) * pathW);
-				path.lnTo((x + halfSize) * pathW, (y  - halfSize) * pathW);
-				path.moveTo((x + halfSize) * pathW, (y  + halfSize) * pathW);
-				path.lnTo((x  - halfSize) * pathW, (y  - halfSize) * pathW);
-				break;
-			}
-			
-			case SYMBOL_TRIANGLE:
-			{
-				path.moveTo((x - size/Math.sqrt(3)) * pathW, (y  + size/3) * pathW);
-				path.lnTo(x * pathW, (y  - (2/3)*size) * pathW);
-				path.lnTo((x + size/Math.sqrt(3)) * pathW, (y  + size/3) * pathW)
-				path.lnTo((x - size/Math.sqrt(3)) * pathW, (y  + size/3) * pathW);
-				break;
-			}
-			
-			case SYMBOL_SQUARE:
-			{
-				path.moveTo((x - halfSize) * pathW, (y + halfSize) * pathW);
-				path.lnTo((x - halfSize) * pathW, (y - halfSize) * pathW);
-				path.lnTo((x + halfSize) * pathW, (y - halfSize) * pathW);
-				path.lnTo((x + halfSize) * pathW, (y + halfSize) * pathW);
-				path.lnTo((x - halfSize) * pathW, (y + halfSize) * pathW);
-			}
-			
-			case SYMBOL_DIAMOND:
-			{
-				path.moveTo((x - halfSize) * pathW, y * pathW);
-				path.lnTo(x * pathW, (y  - halfSize) * pathW);
-				path.lnTo((x + halfSize) * pathW, y * pathW);
-				path.lnTo(x * pathW, (y  + halfSize) * pathW);
-				path.lnTo((x - halfSize) * pathW, y  * pathW);
-				break;
-			}
-		}
-		
-		if(symbol == "Plus" || symbol == "Star" || symbol == "X")
-		{
-			framePaths = new Path();
-			framePaths.moveTo((x - halfSize) * pathW, (y + halfSize) * pathW);
-			framePaths.lnTo((x - halfSize) * pathW, (y - halfSize) * pathW);
-			framePaths.lnTo((x + halfSize) * pathW, (y - halfSize) * pathW);
-			framePaths.lnTo((x + halfSize) * pathW, (y + halfSize) * pathW);
-			framePaths.lnTo((x - halfSize) * pathW, (y + halfSize) * pathW);
-		}
-		
-		path.recalculate(gdLst);
-		if(framePaths)
-			framePaths.recalculate(gdLst);
-		result = {framePaths: framePaths, path: path};
-		
-		return result;
 	},
 	
 	_getYPosition: function(val, yPoints)
@@ -4355,7 +4355,7 @@ drawRadarChart.prototype =
 				if(!this.paths.points[i])
 					this.paths.points[i] = [];
 
-				this.paths.points[i][n] = this._calculatePoint(x, y, dataSeries[n].compiledMarker.size, dataSeries[n].compiledMarker.symbol);
+				this.paths.points[i][n] = this.cChartDrawer.calculatePoint(x, y, dataSeries[n].compiledMarker.size, dataSeries[n].compiledMarker.symbol);
 			}
 			else
 			{
@@ -4397,133 +4397,14 @@ drawRadarChart.prototype =
 					
 					if(n == 0)
 					{
-						this.paths.points[i][n] = this._calculatePoint(x, y, dataSeries[n].compiledMarker.size, dataSeries[n].compiledMarker.symbol);
-						this.paths.points[i][n + 1] = this._calculatePoint(x1, y1, dataSeries[n + 1].compiledMarker.size, dataSeries[n + 1].compiledMarker.symbol);
+						this.paths.points[i][n] = this.cChartDrawer.calculatePoint(x, y, dataSeries[n].compiledMarker.size, dataSeries[n].compiledMarker.symbol);
+						this.paths.points[i][n + 1] = this.cChartDrawer.calculatePoint(x1, y1, dataSeries[n + 1].compiledMarker.size, dataSeries[n + 1].compiledMarker.symbol);
 					}
 					else
-						this.paths.points[i][n + 1] = this._calculatePoint(x1, y1, dataSeries[n + 1].compiledMarker.size, dataSeries[n + 1].compiledMarker.symbol);
+						this.paths.points[i][n + 1] = this.cChartDrawer.calculatePoint(x1, y1, dataSeries[n + 1].compiledMarker.size, dataSeries[n + 1].compiledMarker.symbol);
 				}
 			}
 		}
-	},
-	
-	_calculatePoint: function(x, y, size, symbol)
-	{
-		size = size / 2.69;
-		var halfSize = size / 2;
-		var path  = new Path();
-		var pathH = this.chartProp.pathH;
-		var pathW = this.chartProp.pathW;
-		var gdLst = [];
-
-		path.pathH = pathH;
-		path.pathW = pathW;
-		gdLst["w"] = 1;
-		gdLst["h"] = 1;
-		
-		var framePaths = null;
-		
-		var result;
-
-		/*
-		var SYMBOL_PICTURE = 5;*/
-
-		switch ( symbol )
-		{
-			case SYMBOL_DASH:
-			{
-				path.moveTo((x - halfSize) * pathW, y * pathW);
-				path.lnTo((x + halfSize) * pathW, y * pathW);
-				break;
-			}
-			case SYMBOL_DOT:
-			{
-				path.moveTo((x - halfSize / 2) * pathW, y * pathW);
-				path.lnTo((x + halfSize / 2) * pathW, y * pathW);
-				break;
-			}
-			
-			case SYMBOL_PLUS:
-			{
-				path.moveTo(x * pathW, (y  + halfSize) * pathW);
-				path.lnTo(x * pathW, (y  - halfSize) * pathW);
-				path.moveTo((x - halfSize) * pathW, y * pathW);
-				path.lnTo((x  + halfSize) * pathW, y * pathW);
-				break;
-			}
-			
-			case SYMBOL_CIRCLE:
-			{
-				path.moveTo((x + halfSize) * pathW, y * pathW);
-				path.arcTo(halfSize * pathW, halfSize * pathW, 0, Math.PI * 2 * cToDeg);
-				break;
-			}
-			
-			case SYMBOL_STAR:
-			{
-				path.moveTo((x - halfSize) * pathW, (y  + halfSize) * pathW);
-				path.lnTo((x + halfSize) * pathW, (y  - halfSize) * pathW);
-				path.moveTo((x + halfSize) * pathW, (y  + halfSize) * pathW);
-				path.lnTo((x  - halfSize) * pathW, (y  - halfSize) * pathW);
-				path.moveTo(x * pathW, (y  + halfSize) * pathW);
-				path.lnTo(x * pathW, (y  - halfSize) * pathW);
-				break;
-			}
-			
-			case SYMBOL_X:
-			{
-				path.moveTo((x - halfSize) * pathW, (y  + halfSize) * pathW);
-				path.lnTo((x + halfSize) * pathW, (y  - halfSize) * pathW);
-				path.moveTo((x + halfSize) * pathW, (y  + halfSize) * pathW);
-				path.lnTo((x  - halfSize) * pathW, (y  - halfSize) * pathW);
-				break;
-			}
-			
-			case SYMBOL_TRIANGLE:
-			{
-				path.moveTo((x - size/Math.sqrt(3)) * pathW, (y  + size/3) * pathW);
-				path.lnTo(x * pathW, (y  - (2/3)*size) * pathW);
-				path.lnTo((x + size/Math.sqrt(3)) * pathW, (y  + size/3) * pathW)
-				path.lnTo((x - size/Math.sqrt(3)) * pathW, (y  + size/3) * pathW);
-				break;
-			}
-			
-			case SYMBOL_SQUARE:
-			{
-				path.moveTo((x - halfSize) * pathW, (y + halfSize) * pathW);
-				path.lnTo((x - halfSize) * pathW, (y - halfSize) * pathW);
-				path.lnTo((x + halfSize) * pathW, (y - halfSize) * pathW);
-				path.lnTo((x + halfSize) * pathW, (y + halfSize) * pathW);
-				path.lnTo((x - halfSize) * pathW, (y + halfSize) * pathW);
-			}
-			
-			case SYMBOL_DIAMOND:
-			{
-				path.moveTo((x - halfSize) * pathW, y * pathW);
-				path.lnTo(x * pathW, (y  - halfSize) * pathW);
-				path.lnTo((x + halfSize) * pathW, y * pathW);
-				path.lnTo(x * pathW, (y  + halfSize) * pathW);
-				path.lnTo((x - halfSize) * pathW, y  * pathW);
-				break;
-			}
-		}
-		
-		if(symbol == "Plus" || symbol == "Star" || symbol == "X")
-		{
-			framePaths = new Path();
-			framePaths.moveTo((x - halfSize) * pathW, (y + halfSize) * pathW);
-			framePaths.lnTo((x - halfSize) * pathW, (y - halfSize) * pathW);
-			framePaths.lnTo((x + halfSize) * pathW, (y - halfSize) * pathW);
-			framePaths.lnTo((x + halfSize) * pathW, (y + halfSize) * pathW);
-			framePaths.lnTo((x - halfSize) * pathW, (y + halfSize) * pathW);
-		}
-		
-		path.recalculate(gdLst);
-		if(framePaths)
-			framePaths.recalculate(gdLst);
-		result = {framePaths: framePaths, path: path};
-		
-		return result;
 	},
 	
 	_getYPosition: function(val, yPoints)
@@ -4859,7 +4740,7 @@ drawScatterChart.prototype =
 				if(!this.paths.points[i])
 					this.paths.points[i] = [];
 				
-				this.paths.points[i][k] = this._calculatePoint(x, y, yNumCache.pts[k].compiledMarker.size, yNumCache.pts[k].compiledMarker.symbol);
+				this.paths.points[i][k] = this.cChartDrawer.calculatePoint(x, y, yNumCache.pts[k].compiledMarker.size, yNumCache.pts[k].compiledMarker.symbol);
 			}
 		}
     },
@@ -4972,125 +4853,6 @@ drawScatterChart.prototype =
 		path.recalculate(gdLst);
 		
 		return path;
-	},
-	
-	_calculatePoint: function(x, y, size, symbol)
-	{
-		size = size / 2.69;
-		var halfSize = size / 2;
-		var path  = new Path();
-		var pathH = this.chartProp.pathH;
-		var pathW = this.chartProp.pathW;
-		var gdLst = [];
-
-		path.pathH = pathH;
-		path.pathW = pathW;
-		gdLst["w"] = 1;
-		gdLst["h"] = 1;
-		
-		var framePaths = null;
-		
-		var result;
-
-		/*
-		var SYMBOL_PICTURE = 5;*/
-
-		switch ( symbol )
-		{
-			case SYMBOL_DASH:
-			{
-				path.moveTo((x - halfSize) * pathW, y * pathW);
-				path.lnTo((x + halfSize) * pathW, y * pathW);
-				break;
-			}
-			case SYMBOL_DOT:
-			{
-				path.moveTo((x - halfSize / 2) * pathW, y * pathW);
-				path.lnTo((x + halfSize / 2) * pathW, y * pathW);
-				break;
-			}
-			
-			case SYMBOL_PLUS:
-			{
-				path.moveTo(x * pathW, (y  + halfSize) * pathW);
-				path.lnTo(x * pathW, (y  - halfSize) * pathW);
-				path.moveTo((x - halfSize) * pathW, y * pathW);
-				path.lnTo((x  + halfSize) * pathW, y * pathW);
-				break;
-			}
-			
-			case SYMBOL_CIRCLE:
-			{
-				path.moveTo((x + halfSize) * pathW, y * pathW);
-				path.arcTo(halfSize * pathW, halfSize * pathW, 0, Math.PI * 2 * cToDeg);
-				break;
-			}
-			
-			case SYMBOL_STAR:
-			{
-				path.moveTo((x - halfSize) * pathW, (y  + halfSize) * pathW);
-				path.lnTo((x + halfSize) * pathW, (y  - halfSize) * pathW);
-				path.moveTo((x + halfSize) * pathW, (y  + halfSize) * pathW);
-				path.lnTo((x  - halfSize) * pathW, (y  - halfSize) * pathW);
-				path.moveTo(x * pathW, (y  + halfSize) * pathW);
-				path.lnTo(x * pathW, (y  - halfSize) * pathW);
-				break;
-			}
-			
-			case SYMBOL_X:
-			{
-				path.moveTo((x - halfSize) * pathW, (y  + halfSize) * pathW);
-				path.lnTo((x + halfSize) * pathW, (y  - halfSize) * pathW);
-				path.moveTo((x + halfSize) * pathW, (y  + halfSize) * pathW);
-				path.lnTo((x  - halfSize) * pathW, (y  - halfSize) * pathW);
-				break;
-			}
-			
-			case SYMBOL_TRIANGLE:
-			{
-				path.moveTo((x - size/Math.sqrt(3)) * pathW, (y  + size/3) * pathW);
-				path.lnTo(x * pathW, (y  - (2/3)*size) * pathW);
-				path.lnTo((x + size/Math.sqrt(3)) * pathW, (y  + size/3) * pathW)
-				path.lnTo((x - size/Math.sqrt(3)) * pathW, (y  + size/3) * pathW);
-				break;
-			}
-			
-			case SYMBOL_SQUARE:
-			{
-				path.moveTo((x - halfSize) * pathW, (y + halfSize) * pathW);
-				path.lnTo((x - halfSize) * pathW, (y - halfSize) * pathW);
-				path.lnTo((x + halfSize) * pathW, (y - halfSize) * pathW);
-				path.lnTo((x + halfSize) * pathW, (y + halfSize) * pathW);
-				path.lnTo((x - halfSize) * pathW, (y + halfSize) * pathW);
-			}
-			
-			case SYMBOL_DIAMOND:
-			{
-				path.moveTo((x - halfSize) * pathW, y * pathW);
-				path.lnTo(x * pathW, (y  - halfSize) * pathW);
-				path.lnTo((x + halfSize) * pathW, y * pathW);
-				path.lnTo(x * pathW, (y  + halfSize) * pathW);
-				path.lnTo((x - halfSize) * pathW, y  * pathW);
-				break;
-			}
-		}
-		
-		if(symbol == "Plus" || symbol == "Star" || symbol == "X")
-		{
-			framePaths = new Path();
-			framePaths.moveTo((x - halfSize) * pathW, (y + halfSize) * pathW);
-			framePaths.lnTo((x - halfSize) * pathW, (y - halfSize) * pathW);
-			framePaths.lnTo((x + halfSize) * pathW, (y - halfSize) * pathW);
-			framePaths.lnTo((x + halfSize) * pathW, (y + halfSize) * pathW);
-			framePaths.lnTo((x - halfSize) * pathW, (y + halfSize) * pathW);
-		}
-		
-		path.recalculate(gdLst);
-		if(framePaths)
-			framePaths.recalculate(gdLst);
-		result = {framePaths: framePaths, path: path};
-		
-		return result;
 	},
 	
 	_calculateDLbl: function(chartSpace, ser, val)
@@ -5514,30 +5276,91 @@ gridChart.prototype =
 	},
 	
 	_calculateHorisontalLines : function()
-	{
+	{	
 		var stepY = (this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom - this.chartProp.chartGutter._top)/(this.chartProp.numhlines);
-		var minorStep = stepY/this.chartProp.numhMinorlines;
+		var minorStep = stepY / this.chartProp.numhMinorlines;
 		var widthLine = this.chartProp.widthCanvas - (this.chartProp.chartGutter._left + this.chartProp.chartGutter._right);
 		var posX = this.chartProp.chartGutter._left;
 		var posY;
 		var posMinorY;
+					
+		var trueWidth = this.chartProp.trueWidth;
+		var trueHeight = this.chartProp.trueHeight;
+		
+		var xCenter = (this.chartProp.chartGutter._left + trueWidth/2) / this.chartProp.pxToMM;
+		var yCenter = (this.chartProp.chartGutter._top + trueHeight/2) / this.chartProp.pxToMM;
+		
+		if(this.chartProp.type == "Radar")
+		{
+			var y, x, path;
+			
+			//соответствует подписям оси категорий(OX)
+			if(this.chartSpace.chart.plotArea.valAx)
+				var yPoints = this.chartSpace.chart.plotArea.valAx.yPoints;
+			
+			var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache.pts : this.chartProp.series[0].val.numLit.pts;
+			var tempAngle = 2 * Math.PI / numCache.length;
+			var xDiff = ((trueHeight / 2) / yPoints.length) / this.chartProp.pxToMM;
+			var radius;
+		}
+		
 		for(var i = 0; i <= this.chartProp.numhlines; i++)
 		{
-			posY = i*stepY + this.chartProp.chartGutter._top;
-			if(!this.paths.horisontalLines)
-				this.paths.horisontalLines = [];
-			this.paths.horisontalLines[i] = this._calculateLine(posX, posY, posX + widthLine, posY);
-			
-			//промежуточные линии
-			for(var n = 0; n < this.chartProp.numhMinorlines; n++)
+			if(this.chartProp.type == "Radar")
 			{
-				posMinorY = posY + n*minorStep;
-				if(!this.paths.horisontalMinorLines)
-					this.paths.horisontalMinorLines = [];
-				if(!this.paths.horisontalMinorLines[i])
-					this.paths.horisontalMinorLines[i] = [];
+				path  = new Path();
+				for(var k = 0; k < numCache.length; k++)
+				{
+					y  = i * xDiff; 
+					x  = xCenter; 
+					
+					radius = y;
+					
+					y = yCenter - radius * Math.cos(k * tempAngle);
+					x = x + radius * Math.sin(k * tempAngle);
+					
+
+					var pathH = this.chartProp.pathH;
+					var pathW = this.chartProp.pathW;
+					var gdLst = [];
+					
+					path.pathH = pathH;
+					path.pathW = pathW;
+					gdLst["w"] = 1;
+					gdLst["h"] = 1;
+					
+					path.stroke = true;
+					var pxToMm = this.chartProp.pxToMM;
+					if(k == 0)
+						path.moveTo(x / pxToMm * pathW, y / pxToMm * pathH);
+					else
+						path.lnTo(x / pxToMm * pathW, y / pxToMm * pathH);
+				}
 				
-				this.paths.horisontalMinorLines[i][n] = this._calculateLine(posX, posMinorY, posX + widthLine, posMinorY);
+				path.recalculate(gdLst);
+				if(!this.paths.horisontalLines)
+					this.paths.horisontalLines = [];
+				this.paths.horisontalLines[i] = path;
+				
+			}
+			else
+			{
+				posY = i*stepY + this.chartProp.chartGutter._top;
+				if(!this.paths.horisontalLines)
+					this.paths.horisontalLines = [];
+				this.paths.horisontalLines[i] = this._calculateLine(posX, posY, posX + widthLine, posY);
+				
+				//промежуточные линии
+				for(var n = 0; n < this.chartProp.numhMinorlines; n++)
+				{
+					posMinorY = posY + n*minorStep;
+					if(!this.paths.horisontalMinorLines)
+						this.paths.horisontalMinorLines = [];
+					if(!this.paths.horisontalMinorLines[i])
+						this.paths.horisontalMinorLines[i] = [];
+					
+					this.paths.horisontalMinorLines[i][n] = this._calculateLine(posX, posMinorY, posX + widthLine, posMinorY);
+				}
 			}
 		}
 	},
