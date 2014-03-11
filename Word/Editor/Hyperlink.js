@@ -643,6 +643,27 @@ ParaHyperlink.prototype =
             CurPos--;
         }
     },
+
+    Collect_DocumentStatistics : function(ParaStats)
+    {
+        var Count = this.Content.length;
+        for (var Index = 0; Index < Count; Index++)
+            this.Content[Index].Collect_DocumentStatistics( ParaStats );
+    },
+
+    Create_FontMap : function(Map)
+    {
+        var Count = this.Content.length;
+        for (var Index = 0; Index < Count; Index++)
+            this.Content[Index].Create_FontMap( Map );
+    },
+
+    Get_AllFontNames : function(AllFonts)
+    {
+        var Count = this.Content.length;
+        for (var Index = 0; Index < Count; Index++)
+            this.Content[Index].Get_AllFontNames( AllFonts );
+    },
 //-----------------------------------------------------------------------------------
 // Функции пересчета
 //-----------------------------------------------------------------------------------

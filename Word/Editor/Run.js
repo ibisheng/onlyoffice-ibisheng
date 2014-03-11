@@ -968,6 +968,64 @@ ParaRun.prototype =
             }
         }
     },
+
+    Collect_DocumentStatistics : function(ParaStats)
+    {
+        var Count = this.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var Item = this.Content[Index];
+
+            var bSymbol  = false;
+            var bSpace   = false;
+            var bNewWord = false;
+
+            if ( (para_Text === Item.Type && false === Item.Is_NBSP()) || (para_PageNum === Item.Type) )
+            {
+                if ( false === ParaStats.Word )
+                    bNewWord = true;
+
+                bSymbol = true;
+                bSpace  = false;
+
+                ParaStats.Word           = true;
+                ParaStats.EmptyParagraph = false;
+            }
+            else if ( ( para_Text === Item.Type && true === Item.Is_NBSP() ) || para_Space === Item.Type || para_Tab === Item.Type )
+            {
+                bSymbol = true;
+                bSpace  = true;
+
+                ParaStats.Word = false;
+            }
+
+            if ( true === bSymbol )
+                ParaStats.Stats.Add_Symbol( bSpace );
+
+            if ( true === bNewWord )
+                ParaStats.Stats.Add_Word();
+        }
+    },
+
+    Create_FontMap : function(Map)
+    {
+        var TextPr = this.Get_CompiledPr(false);
+        TextPr.Document_CreateFontMap( Map );
+    },
+
+    Get_AllFontNames : function(AllFonts)
+    {
+        this.Pr.Document_Get_AllFontNames( AllFonts );
+
+        var Count = this.Content.length;
+        for (var Index = 0; Index < Count; Index++)
+        {
+            var Item = this.Content[Index];
+
+            if ( para_Drawing === Item.Type )
+                Item.documentGetAllFontNames( AllFonts );
+        }
+    },
 //-----------------------------------------------------------------------------------
 // Функции пересчета
 //-----------------------------------------------------------------------------------
@@ -4132,7 +4190,7 @@ ParaRun.prototype =
 
     Set_Lang_Bidi : function(Value)
     {
-        if ( Value !== this.Pr.Land.Bidi )
+        if ( Value !== this.Pr.Lang.Bidi )
         {
             var OldValue = this.Pr.Lang.Bidi;
             this.Pr.Lang.Bidi = Value;

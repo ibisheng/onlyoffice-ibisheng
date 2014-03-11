@@ -16597,49 +16597,73 @@ Paragraph.prototype =
 
     DocumentStatistics : function(Stats)
     {
-        var bEmptyParagraph = true;
-        var bWord = false;
-        for ( var Index = 0; Index < this.Content.length; Index++ )
+        if ( true !== Debug_ParaRunMode )
         {
-            var Item = this.Content[Index];
-
-            var bSymbol  = false;
-            var bSpace   = false;
-            var bNewWord = false;
-
-            if ( (para_Text === Item.Type && false === Item.Is_NBSP()) || (para_PageNum === Item.Type) )
+            var bEmptyParagraph = true;
+            var bWord = false;
+            for ( var Index = 0; Index < this.Content.length; Index++ )
             {
-                if ( false === bWord )
-                    bNewWord = true;
+                var Item = this.Content[Index];
 
-                bWord   = true;
-                bSymbol = true;
-                bSpace  = false;
+                var bSymbol  = false;
+                var bSpace   = false;
+                var bNewWord = false;
+
+                if ( (para_Text === Item.Type && false === Item.Is_NBSP()) || (para_PageNum === Item.Type) )
+                {
+                    if ( false === bWord )
+                        bNewWord = true;
+
+                    bWord   = true;
+                    bSymbol = true;
+                    bSpace  = false;
+                    bEmptyParagraph = false;
+                }
+                else if ( ( para_Text === Item.Type && true === Item.Is_NBSP() ) || para_Space === Item.Type || para_Tab === Item.Type )
+                {
+                    bWord   = false;
+                    bSymbol = true;
+                    bSpace  = true;
+                }
+
+                if ( true === bSymbol )
+                    Stats.Add_Symbol( bSpace );
+
+                if ( true === bNewWord )
+                    Stats.Add_Word();
+            }
+
+            var NumPr = this.Numbering_Get();
+            if ( undefined != NumPr )
+            {
                 bEmptyParagraph = false;
-            }
-            else if ( ( para_Text === Item.Type && true === Item.Is_NBSP() ) || para_Space === Item.Type || para_Tab === Item.Type )
-            {
-                bWord   = false;
-                bSymbol = true;
-                bSpace  = true;
+                this.Parent.Get_Numbering().Get_AbstractNum( NumPr.NumId).DocumentStatistics( NumPr.Lvl, Stats );
             }
 
-            if ( true === bSymbol )
-                Stats.Add_Symbol( bSpace );
-
-            if ( true === bNewWord )
-                Stats.Add_Word();
+            if ( false === bEmptyParagraph )
+                Stats.Add_Paragraph();
         }
-
-        var NumPr = this.Numbering_Get();
-        if ( undefined != NumPr )
+        else
         {
-            bEmptyParagraph = false;
-            this.Parent.Get_Numbering().Get_AbstractNum( NumPr.NumId).DocumentStatistics( NumPr.Lvl, Stats );
-        }
+            var ParaStats = new CParagraphStatistics(Stats);
+            var Count = this.Content.length;
 
-        if ( false === bEmptyParagraph )
-            Stats.Add_Paragraph();
+            for ( var Index = 0; Index < Count; Index++ )
+            {
+                var Item = this.Content[Index];
+                Item.Collect_DocumentStatistics( ParaStats );
+            }
+
+            var NumPr = this.Numbering_Get();
+            if ( undefined != NumPr )
+            {
+                bEmptyParagraph = false;
+                this.Parent.Get_Numbering().Get_AbstractNum( NumPr.NumId).DocumentStatistics( NumPr.Lvl, Stats );
+            }
+
+            if ( false === ParaStats.EmptyParagraph )
+                Stats.Add_Paragraph();
+        }
     },
 
     TurnOff_RecalcEvent : function()
@@ -16739,30 +16763,43 @@ Paragraph.prototype =
             CurTextPr.Merge( this.TextPr.Value );
             CurTextPr.Document_CreateFontMap( this.FontMap.Map );
 
-            for ( var Index = 0; Index < this.Content.length; Index++ )
+            if ( true !== Debug_ParaRunMode )
             {
-                var Item = this.Content[Index];
-
-                if ( para_TextPr === Item.Type )
+                for ( var Index = 0; Index < this.Content.length; Index++ )
                 {
-                    // Выствляем начальные настройки текста у данного параграфа
-                    CurTextPr = this.CompiledPr.Pr.TextPr.Copy();
+                    var Item = this.Content[Index];
 
-                    var _CurTextPr = Item.Value;
-
-                    // Копируем настройки из символьного стиля
-                    if ( undefined != _CurTextPr.RStyle )
+                    if ( para_TextPr === Item.Type )
                     {
-                        var Styles = this.Parent.Get_Styles();
-                        var StyleTextPr = Styles.Get_Pr( _CurTextPr.RStyle, styletype_Character).TextPr;
-                        CurTextPr.Merge( StyleTextPr );
-                    }
+                        // Выствляем начальные настройки текста у данного параграфа
+                        CurTextPr = this.CompiledPr.Pr.TextPr.Copy();
 
-                    // Копируем прямые настройки
-                    CurTextPr.Merge( _CurTextPr );
-                    CurTextPr.Document_CreateFontMap( this.FontMap.Map );
+                        var _CurTextPr = Item.Value;
+
+                        // Копируем настройки из символьного стиля
+                        if ( undefined != _CurTextPr.RStyle )
+                        {
+                            var Styles = this.Parent.Get_Styles();
+                            var StyleTextPr = Styles.Get_Pr( _CurTextPr.RStyle, styletype_Character).TextPr;
+                            CurTextPr.Merge( StyleTextPr );
+                        }
+
+                        // Копируем прямые настройки
+                        CurTextPr.Merge( _CurTextPr );
+                        CurTextPr.Document_CreateFontMap( this.FontMap.Map );
+                    }
                 }
             }
+            else
+            {
+                var Count = this.Content.length;
+                for ( var Index = 0; Index < Count; Index++ )
+                {
+                    this.Content[Index].Create_FontMap( this.FontMap.Map );
+                }
+            }
+
+
             this.FontMap.NeedRecalc = false;
         }
 
@@ -16844,17 +16881,28 @@ Paragraph.prototype =
         // Смотрим на знак конца параграфа
         this.TextPr.Value.Document_Get_AllFontNames( AllFonts );
 
-        var Count = this.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
+        if ( true !== Debug_ParaRunMode )
         {
-            var Item = this.Content[Index];
-            if ( para_TextPr === Item.Type )
+            var Count = this.Content.length;
+            for ( var Index = 0; Index < Count; Index++ )
             {
-                Item.Value.Document_Get_AllFontNames( AllFonts );
+                var Item = this.Content[Index];
+                if ( para_TextPr === Item.Type )
+                {
+                    Item.Value.Document_Get_AllFontNames( AllFonts );
+                }
+                else if ( para_Drawing === Item.Type )
+                {
+                    Item.documentGetAllFontNames( AllFonts );
+                }
             }
-            else if ( para_Drawing === Item.Type )
+        }
+        else
+        {
+            var Count = this.Content.length;
+            for ( var Index = 0; Index < Count; Index++ )
             {
-                Item.documentGetAllFontNames( AllFonts );
+                this.Content[Index].Get_AllFontNames( AllFonts );
             }
         }
     },
@@ -17080,7 +17128,7 @@ Paragraph.prototype =
         for ( var Index = 0; Index < this.Content.length; Index++ )
         {
             var Item = this.Content[Index];
-            if ( para_CommentEnd === Item.Type || para_CommentStart === Item.Type )
+            if ( para_CommentEnd === Item.Type || para_CommentStart === Item.Type || para_Comment === Item.Type )
             {
                 editor.WordControl.m_oLogicDocument.Remove_Comment( Item.Id, true );
             }
@@ -21930,4 +21978,15 @@ function CParagraphRunElements(ContentPos, Count)
     this.ContentPos = ContentPos;
     this.Elements   = new Array();
     this.Count      = Count;
+}
+
+function CParagraphStatistics(Stats)
+{
+    this.Stats          = Stats;
+    this.EmptyParagraph = true;
+    this.Word           = false;
+
+    this.Symbol  = false;
+    this.Space   = false;
+    this.NewWord = false;
 }

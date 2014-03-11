@@ -956,6 +956,18 @@ ParaComment.prototype =
     Get_PrevRunElements : function(RunElements, UseContentPos, Depth)
     {
     },
+
+    Collect_DocumentStatistics : function(ParaStats)
+    {
+    },
+
+    Create_FontMap : function(Map)
+    {
+    },
+
+    Get_AllFontNames : function(AllFonts)
+    {
+    },
 //-----------------------------------------------------------------------------------
 // Функции пересчета
 //-----------------------------------------------------------------------------------
