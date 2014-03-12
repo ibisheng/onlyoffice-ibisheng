@@ -2054,7 +2054,8 @@ CChartsDrawer.prototype =
 		var max1;
 		var arr = [];
 		//находим минимальное значение
-		var min, max, greaterNullNum;
+		var min, max, greaterNullNum, lengthNum;
+		
 		if('Bar' == mainObj.type)
 		{
 			if(mainObj.subType == 'stacked')
@@ -5301,7 +5302,7 @@ gridChart.prototype =
 			var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache.pts : this.chartProp.series[0].val.numLit.pts;
 			var tempAngle = 2 * Math.PI / numCache.length;
 			var xDiff = ((trueHeight / 2) / yPoints.length) / this.chartProp.pxToMM;
-			var radius;
+			var radius, xFirst, yFirst;
 		}
 		
 		for(var i = 0; i <= this.chartProp.numhlines; i++)
@@ -5332,9 +5333,22 @@ gridChart.prototype =
 					path.stroke = true;
 					var pxToMm = this.chartProp.pxToMM;
 					if(k == 0)
-						path.moveTo(x / pxToMm * pathW, y / pxToMm * pathH);
+					{
+						xFirst = x;
+						yFirst = y;
+						path.moveTo(x * pathW, y * pathH);
+					}	
 					else
-						path.lnTo(x / pxToMm * pathW, y / pxToMm * pathH);
+					{
+						if(k == numCache.length - 1)
+						{
+							path.lnTo(x * pathW, y * pathH);
+							path.lnTo(xFirst * pathW, yFirst * pathH);
+						}
+						else
+							path.lnTo(x * pathW, y * pathH);
+					}
+						
 				}
 				
 				path.recalculate(gdLst);
