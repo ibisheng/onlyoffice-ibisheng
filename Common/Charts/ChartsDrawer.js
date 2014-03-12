@@ -5259,6 +5259,303 @@ drawStockChart.prototype =
 	}
 };
 
+
+function drawBubbleChart()
+{
+	this.chartProp = null;
+	this.cChartDrawer = null;
+	this.cShapeDrawer = null;
+	this.paths = {};
+}
+
+drawBubbleChart.prototype =
+{
+    reCalculate : function(chartProp, cShapeDrawer)
+	{
+		this.chartProp = chartProp.calcProp;
+		this.cChartDrawer = chartProp;
+		this.cShapeDrawer = cShapeDrawer;
+		this.paths = {};
+		
+		this._recalculateScatter();
+	},
+	
+	draw : function(chartProp, cShapeDrawer)
+    {
+		this.chartProp = chartProp.calcProp;
+		this.cChartDrawer = chartProp;
+		this.cShapeDrawer = cShapeDrawer;
+		
+		this._drawScatter();
+	},
+	
+	_recalculateScatter: function ()
+    {
+		//соответствует подписям оси категорий(OX)
+		var xPoints = this.cShapeDrawer.chart.plotArea.catAx.xPoints;
+		//соответствует подписям оси значений(OY)
+		var yPoints = this.cShapeDrawer.chart.plotArea.valAx.yPoints;
+		
+		var trueHeight = this.chartProp.trueHeight;
+		var trueWidth  = this.chartProp.trueWidth;
+		
+		var minOy = this.chartProp.ymin;
+		var maxOy = this.chartProp.ymax;
+		var maxOx = this.chartProp.xScale[this.chartProp.xScale.length - 1];
+		var minOx = this.chartProp.xScale[0];
+		
+		var digHeightOy = Math.abs(maxOy - minOy);
+		var digHeightOx = Math.abs(maxOx - minOx);
+
+		var koffX = trueWidth/digHeightOx;
+		var koffY = trueHeight/digHeightOy;	
+		
+		var seria, yVal, xVal, points, x, x1, y, y1, yNumCache, xNumCache;
+		for(var i = 0; i < this.chartProp.series.length; i++)
+		{
+			seria = this.chartProp.series[i];
+			points = [];
+			yNumCache = seria.yVal.numRef.numCache ? seria.yVal.numRef.numCache : seria.yVal.numRef.numLit;
+			for(var n = 0; n < yNumCache.pts.length; n++)
+			{
+				yVal = parseFloat(yNumCache.pts[n].val);
+				
+				xNumCache = seria.xVal && seria.xVal.numRef ? seria.xVal.numRef.numCache : seria.xVal && seria.xVal.numLit ? seria.xVal.numLit : null;
+				if(xNumCache && xNumCache.pts[n] && xNumCache.pts[n].val)
+				{
+					if(!isNaN(parseFloat(xNumCache.pts[n].val)))
+						xVal = parseFloat(xNumCache.pts[n].val);
+					else
+						xVal = n + 1;
+				}
+				else
+					xVal = n + 1;
+				
+				points[n] = {x: xVal, y: yVal}
+			}
+			
+			for(var k = 0; k < points.length; k++)
+			{
+				y = this._getYPosition(points[k].y, yPoints);
+				x = this._getYPosition(points[k].x, xPoints, true);
+			
+				
+				if(!this.paths.points)
+					this.paths.points = [];
+				if(!this.paths.points[i])
+					this.paths.points[i] = [];
+				
+				this.paths.points[i][k] = this._calculateBubble(x, y, yNumCache.pts[k].compiledMarker.size, yNumCache.pts[k].compiledMarker.symbol);
+			}
+		}
+    },
+	
+	_drawScatter: function ()
+    {
+		var seria, brush, pen, markerBrush, markerPen, yNumCache;
+		for(var i = 0; i < this.chartProp.series.length; i++)
+		{
+			seria = this.chartProp.series[i];
+			brush = seria.brush;
+			pen = seria.pen;
+			
+			//draw bubble
+			if(this.paths.points && this.paths.points[i])
+			{
+				for(var k = 0; k < this.paths.points[i].length; k++)
+				{	
+					yNumCache = this.chartProp.series[i].yVal.numRef ? this.chartProp.series[i].yVal.numRef.numCache : this.chartProp.series[i].yVal.numLit;
+					markerBrush = yNumCache.pts[k].compiledMarker.brush;
+					markerPen = yNumCache.pts[k].compiledMarker.pen;
+					
+					//point		
+					this._drawPath(this.paths.points[i][k], markerBrush, markerPen, true);
+				}
+			}
+		}
+    },
+	
+	_getYPosition: function(val, yPoints, isOx)
+	{
+		//позиция в заисимости от положения точек на оси OY
+		var result;
+		var resPos;
+		var resVal;
+		var diffVal;
+		if(val < yPoints[0].val)
+		{
+			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
+			resVal = yPoints[1].val - yPoints[0].val;
+			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
+			result = yPoints[0].pos - (diffVal / resVal) * resPos;
+		}
+		else if(val > yPoints[yPoints.length - 1].val)
+		{	
+			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
+			resVal = yPoints[1].val - yPoints[0].val;
+			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
+			result = yPoints[0].pos + (diffVal / resVal) * resPos;
+		}
+		else
+		{
+			for(var s = 0; s < yPoints.length; s++)
+			{
+				if(val >= yPoints[s].val && val <= yPoints[s + 1].val)
+				{
+					resPos = Math.abs(yPoints[s + 1].pos - yPoints[s].pos);
+					resVal = yPoints[s + 1].val - yPoints[s].val;
+					if(!isOx)
+						result =  - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+					else	
+						result = (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+						
+					break;
+				}
+			}
+		}
+		
+		return result;
+	},
+	
+	_calculateLine: function(x, y, x1, y1)
+	{
+		var path  = new Path();
+		
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+		var gdLst = [];
+		
+		path.pathH = pathH;
+		path.pathW = pathW;
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
+		
+		path.moveTo(x * pathH, y * pathW);
+		path.lnTo(x1 * pathH, y1 * pathW);
+		path.recalculate(gdLst);
+		
+		return path;
+	},
+	
+	_calculateDLbl: function(chartSpace, ser, val)
+	{
+		var point;
+		if(this.chartProp.series[ser - 1])
+			point = this.chartProp.series[ser - 1].yVal.numRef ? this.chartProp.series[ser - 1].yVal.numRef.numCache.pts[val] : this.chartProp.series[ser - 1].yVal.numLit.pts[val];
+		else
+			point = this.chartProp.series[ser].yVal.numRef ? this.chartProp.series[ser].yVal.numRef.numCache.pts[val] : this.chartProp.series[ser].yVal.numLit.pts[val];
+		
+		var path;
+		
+		/*if(this.paths.series && this.paths.series[ser - 1])
+		{
+			if(val == this.chartProp.series[ser - 1].yVal.numRef.numCache.pts.length - 1)
+				path = this.paths.series[ser - 1][val - 1].ArrPathCommand[1];
+			else
+				path = this.paths.series[ser - 1][val].ArrPathCommand[0];
+		}
+		else*/ if(this.paths.points)
+		{
+			if(this.paths.points[ser] && this.paths.points[ser][val])
+				path = this.paths.points[ser][val].path.ArrPathCommand[0];	
+		}
+	
+		if(!path)
+			return;
+			
+		var x = path.X;
+		var y = path.Y;
+		
+		var pxToMm = this.chartProp.pxToMM;
+		var constMargin = 5 / pxToMm;
+		
+		var width = point.compiledDlb.extX;
+		var height = point.compiledDlb.extY;
+		
+		var centerX = x - width/2;
+		var centerY = y - height/2;
+		
+		switch ( point.compiledDlb.dLblPos )
+		{
+			case DLBL_POS_B:
+			{
+				centerY = centerY + height/2 + constMargin;
+				break;
+			}
+			case DLBL_POS_BEST_FIT:
+			{
+				break;
+			}
+			case DLBL_POS_CTR:
+			{
+				break;
+			}
+			case DLBL_POS_L:
+			{
+				centerX = centerX - width/2 - constMargin;
+				break;
+			}
+			case DLBL_POS_R:
+			{
+				centerX = centerX + width/2 + constMargin;
+				break;
+			}
+			case DLBL_POS_T:
+			{
+				centerY = centerY - height/2 - constMargin;
+				break;
+			}
+		}
+		
+		if(centerX < 0)
+			centerX = 0;
+		if(centerX + width > this.chartProp.widthCanvas / pxToMm)
+			centerX = this.chartProp.widthCanvas / pxToMm - width;
+			
+		if(centerY < 0)
+			centerY = 0;
+		if(centerY + height > this.chartProp.heightCanvas / pxToMm)
+			centerY = this.chartProp.heightCanvas / pxToMm - height;
+		
+		return {x: centerX, y: centerY};
+	},
+	
+	_drawPath: function(path, brush, pen, stroke)
+	{
+		path.stroke = stroke;
+		
+		var cGeometry = new CGeometry2();
+		this.cShapeDrawer.Clear();
+		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
+		
+		cGeometry.AddPath(path);
+		this.cShapeDrawer.draw(cGeometry);
+	},
+	
+	_calculateBubble: function(x, y, size)
+	{
+		var defaultSize = 4;
+		var path  = new Path();
+		
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+		var gdLst = [];
+		
+		path.pathH = pathH;
+		path.pathW = pathW;
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
+		
+		path.moveTo((x + defaultSize) * pathW, y * pathH);
+		path.arcTo(defaultSize * pathW, defaultSize * pathW, 0, Math.PI * 2 * cToDeg);
+
+		path.recalculate(gdLst);
+		return path;	
+	}
+};
+
+
+
 //*****GRID*****
 function gridChart()
 {
