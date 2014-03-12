@@ -173,6 +173,8 @@
 <script src="../Word/Editor/Styles.js"></script>
 <script src="../Word/Editor/Numbering.js"></script>
 <script src="../Word/Editor/ParagraphContent.js"></script>
+<script src="../Word/Editor/Run.js"></script>
+<script src="../Word/Editor/Hyperlink.js"></script>
 
 <script src="../Word/Editor/Comments.js"></script>
 <script src="../Word/Editor/FlowObjects.js"></script>
@@ -487,6 +489,17 @@
 {
     background: #303030;
 }
+
+.left_panel_chart_props_no_select
+{
+    background-color: #ffffff;
+}
+
+.left_panel_chart_props_select
+{
+    background-color: #8bb9f0;
+}
+
 .right_panel_drawing_props
 {
     position: absolute;
@@ -2230,6 +2243,7 @@ Format
                 <option value='Scatter'>Scatter</option>
                 <option value='Stock'>Stock</option>
                 <option value='Doughnut'>Doughnut</option>
+                <option value='Radar'>Radar</option>
             </select>
             <select id='chartSubType' style='width: 320px; margin: 10px;'>
                 <option value='Normal' selected>Normal</option>
@@ -2290,17 +2304,17 @@ Format
 
 <div id="chartPropsMenuDiv"  style="background: #ece9d8; z-index:500; width: 619px; height: 515px; position: absolute; left:100px; top:100px; font-family: Tahoma; display: none">
     <div id="leftPanelChartPropsDiv" style="position:absolute;  left: 7px; top: 7px; height: 470px; width: 150px; background: #ffffff;border: 1px solid rgb(127,157,185)">
-        <div class="leftPanelCharPropsItemDiv" id="designChartLeft">
+        <div class="leftPanelCharPropsItemDiv left_panel_chart_props_select" id="designChartLeft">
             <p>Design</p>
         </div>
-        <div class="leftPanelCharPropsItemDiv" id="valAxisProps">
+        <div class="leftPanelCharPropsItemDiv left_panel_chart_props_no_select" id="valAxisProps">
             <p>Value Axis Props</p>
         </div>
-        <div class="leftPanelCharPropsItemDiv" id="catAxisProps">
+        <div class="leftPanelCharPropsItemDiv left_panel_chart_props_no_select" id="catAxisProps">
             <p>Cat Axis Props</p>
         </div>
     </div>
-    <div id="rightPanelChartPropsDiv" class="right_panel_drawing_props" >
+    <div id="rightPanelChartPropsDiv" class="right_panel_drawing_props">
         <div><p style="font-size: 14pt">Design</p></div>
         <!--<button id="chageChartTypeButton">Change Type</button> -->
         <select id="changeChartTypeSelect">
@@ -2370,22 +2384,22 @@ Format
         <br>
         <label style="font-size: 11pt">Data Labels</label>
         <br>
-            <select id="chartDataLabels">
-                <option value="none">None</option>
-                <option value="center">Center</option>
-                <option value="inner_top">Inner Top</option>
-                <option value="in_base">In Base</option>
-                <option value="out_end">Out End</option>
-                <option value="right_overlay">Right Overlay</option>
-                <option value="left_overlay">Left Overlay</option>
-            </select>
-            <div id="labelsOptionsDiv">
-                <input type="checkbox"  class="dataLabelsCheckBox" value="serName"><label style="font-size: 10pt">Series Name</label>
-                <br><input type="checkbox" class="dataLabelsCheckBox" value="catName"><label style="font-size: 10pt">Cat Name</label>
-                <br><input type="checkbox" class="dataLabelsCheckBox" value="val"><label style="font-size: 10pt">Value</label>
-            </div>
-            <label style="font-size: 10pt">Data Labels Separator</label><input type="text" id="dataLabelsSeparatorInput">
-            <br><button id="dataLblsPrApplyButton">Apply</button>
+        <select id="chartDataLabels">
+            <option value="none">None</option>
+            <option value="center">Center</option>
+            <option value="inner_top">Inner Top</option>
+            <option value="in_base">In Base</option>
+            <option value="out_end">Out End</option>
+            <option value="right_overlay">Right Overlay</option>
+            <option value="left_overlay">Left Overlay</option>
+        </select>
+        <div id="labelsOptionsDiv">
+            <input type="checkbox"  class="dataLabelsCheckBox" value="serName"><label style="font-size: 10pt">Series Name</label>
+            <br><input type="checkbox" class="dataLabelsCheckBox" value="catName"><label style="font-size: 10pt">Cat Name</label>
+            <br><input type="checkbox" class="dataLabelsCheckBox" value="val"><label style="font-size: 10pt">Value</label>
+        </div>
+        <label style="font-size: 10pt">Data Labels Separator</label><input type="text" id="dataLabelsSeparatorInput">
+        <br><button id="dataLblsPrApplyButton">Apply</button>
         <br>
         <label style="font-size: 11pt">Hor Axis</label>
         <select id="chartHorAxis">
@@ -2401,9 +2415,6 @@ Format
             <option value="byDefault">By Default</option>
             <option value="log">Log</option>
         </select>
-
-
-
         <br>
         <label style="font-size: 11pt">Hor Grid Lines</label>
         <select id="chartHorGridLines">
@@ -2422,15 +2433,15 @@ Format
             <option value="minor_major">Major&Minor</option>
         </select>
     </div>
-    <div id="rightPanelValAxisProps" class="right_panel_drawing_props" style="display: none">
+    <div id="rightPanelValAxisProps" class="right_panel_drawing_props" style="display: none" >
         <label style="font-weight: bold">min value</label><br>
-        <label>auto</label><input type="radio" name="min_value" value="auto" checked="checked">
-        <label>fixed</label><input type="radio" name="min_value" value="fixed">
+        <label>auto</label><input type="radio" name="min_value" value="auto" checked="checked" id="autoMinValValAxisCheckBox">
+        <label>fixed</label><input type="radio" name="min_value" value="fixed" id="fixedMinValValAxisCheckBox">
         <input id="minValueAxisInput" type="text" disabled="disabled">
         <br>
         <label style="font-weight: bold">max value</label><br>
-        <label>auto</label><input type="radio" name="max_value" value="auto" checked="checked">
-        <label>fixed</label><input type="radio" name="max_value" value="fixed">
+        <label>auto</label><input type="radio" name="max_value" value="auto" checked="checked" id="autoMaxValValAxisCheckBox">
+        <label>fixed</label><input type="radio" name="max_value" value="fixed" id="fixedMaxValValAxisCheckBox">
         <input id="maxValueAxisInput" type="text" disabled="disabled">
         <br>
         <label>invert val order</label> <input type="checkbox" id="invertValOrderValAxisInput">
@@ -2441,8 +2452,7 @@ Format
         <select id="unitsSelect">
             <option value="none">None</option>
             <option value="BILLIONS">BILLIONS</option>
-            <option value="BILLIONS">BILLIONS</option>
-            <option value="HUNDRED_MILLIONS ">HUNDRED_MILLIONS</option>
+            <option value="HUNDRED_MILLIONS">HUNDRED_MILLIONS</option>
             <option value="HUNDREDS">HUNDREDS</option>
             <option value="HUNDRED_THOUSANDS">HUNDRED_THOUSANDS</option>
             <option value="MILLIONS">MILLIONS</option>
@@ -2478,136 +2488,91 @@ Format
             <option value="TICK_LABEL_POSITION_NEXT_TO">TICK_LABEL_POSITION_NEXT_TO</option>
             <option value="TICK_LABEL_POSITION_NONE">TICK_LABEL_POSITION_NONE</option>
         </select>
+        <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
+        <label>Crosses</label>
+        <br>
+        <label>auto</label><input type="radio" name="crosses" value="auto" checked="checked" id="crossesAutoValAxInput"><br>
+        <label>value</label><input type="radio" name="crosses" value="value" id="crossesValAxValInput"><input type="text" id="crossesValInput" disabled="disabled"><br>
+        <label>max value</label><input type="radio" name="crosses" value="maxValue" id="crossesMaxAxValInput">
+        <br>
         <br>
         <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
         <br>
-        <label>Crosses</label>
-        <br>
-        <label>auto</label><input type="radio" name="crosses" value="auto" checked="checked"><br>
-        <label>value</label><input type="radio" name="crosses" value="value"><input type="text" id="crossesValInput" disabled="disabled"><br>
-        <label>max value</label><input type="radio" name="crosses" value="maxValue">
-        <br>
         <button id="valApplyValAxisProps">
-            Apply
+            Apply Props
         </button>
     </div>
-
-    <div id="rigthPanelCatAxProps" class="right_panel_drawing_props" style="display: none">
-        <label>interval between tick</label> <input type="text" id="intervalBetweenTickInput">
+    <div id="rightPanelCatAxProps" class="right_panel_drawing_props" style="display: none">
+        <label style="font-weight: bold">Axis Settings</label><br>
+        <label>interval between tick</label> <input type="text" id="intervalBetweenTickInput" value="1">
         <br>
         <label>interval between labels:</label>
         <br>
-        <input type="radio" name="intervalBetweenLabels" value="auto"><label>auto</label>
+        <input type="radio" name="intervalBetweenLabels" value="auto" class="intervalBetweenLabelsCatAxInput" checked="checked"><label>auto</label>
         <br>
-        <input type="radio" name="intervalBetweenLabels" value="manual"><label>manual</label>
+        <input type="radio" name="intervalBetweenLabels" value="manual" class="intervalBetweenLabelsCatAxInput"><label>manual</label>
+        <input type="text" id="intervalBetweenLabelsInputCatAxManual" disabled="disabled">
         <br>
-        <input type="checkbox" id="invertCatOrderChaeckBox"><label>Invert Cat Order</label>
+        <input type="checkbox" id="invertCatOrderCheckBox"><label>Invert Cat Order</label>
+        <br>
+        <label>Labels Axis Distance: </label><input id="labelsAxisInputDistanceInput" type="text" value="100">
         <br>
         <label>Axis Type:</label>
         <br>
-        <input type="radio" name="horAxisTypeInput" value="auto"><label>auto</label>
-        <br>
+        <input type="radio" name="horAxisTypeInput" value="auto" checked="checked"><label>auto</label>
         <input type="radio" name="horAxisTypeInput" value="text"><label>text</label>
-        <br>
         <input type="radio" name="horAxisTypeInput" value="date"><label>date</label>
         <br>
         <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
+        <label>major tick mark</label>
+        <select id="majorTickMarkSelectCatAx">
+            <option value="TICK_MARK_CROSS">TICK_MARK_CROSS</option>
+            <option value="TICK_MARK_IN">TICK_MARK_IN</option>
+            <option value="TICK_MARK_NONE">TICK_MARK_NONE</option>
+            <option value="TICK_MARK_OUT">TICK_MARK_OUT</option>
+        </select>
         <br>
-
+        <label>minor tick mark</label>
+        <select id="minorTickMarkSelectCatAx">
+            <option value="TICK_MARK_CROSS">TICK_MARK_CROSS</option>
+            <option value="TICK_MARK_IN">TICK_MARK_IN</option>
+            <option value="TICK_MARK_NONE">TICK_MARK_NONE</option>
+            <option value="TICK_MARK_OUT">TICK_MARK_OUT</option>
+        </select>
+        <br>
+        <label>tick labels</label>
+        <select id="tickLabelsSelectCatAx">
+            <option value="TICK_LABEL_POSITION_HIGH">TICK_LABEL_POSITION_HIGH</option>
+            <option value="TICK_LABEL_POSITION_LOW">TICK_LABEL_POSITION_LOW</option>
+            <option value="TICK_LABEL_POSITION_NEXT_TO">TICK_LABEL_POSITION_NEXT_TO</option>
+            <option value="TICK_LABEL_POSITION_NONE">TICK_LABEL_POSITION_NONE</option>
+        </select>
+        <br>
+        <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
+        <label>Crosses</label>
+        <br>
+        <label>auto</label><input type="radio" name="crosses" value="auto" checked="checked" id="crossesAutoCatAxInput"><br>
+        <label>value</label><input type="radio" name="crosses" value="value" id="crossesCatAxValInput"><input type="text" id="crossesCatInput" disabled="disabled"><br>
+        <label>max value</label><input type="radio" name="crosses" value="maxValue" id="crossesMaxAxCatInput">
+        <br>
+        <label>Axis Position</label><br>
+        <label>by divisions:</label><input type="checkbox" id="checkBoxByDivisionsInput">
+        <br>
+        <label>between divisions:</label><input type="checkbox" id="checkBoxBetweenDivisionsInput">
+        <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
+        <button id="valApplyCatAxisProps">
+            Apply Props
+        </button>
     </div>
 
     <div id="rightPanelNumFmt" class="right_panel_drawing_props" style="display: none">
-
-
         <button id="numFmtApplyButton">
             Apply
         </button>
     </div>
-
-
-
 </div>
 
 
-<div id="changeChartTypeDiv" style="background: #ece9d8; z-index:500; width: 619px; height: 515px; position: absolute; left:100px; top:100px; font-family: Tahoma; display: none">
-    <div id="leftPanelChartType" style="position:absolute;  left: 7px; top: 7px; height: 470px; width: 150px; background: #ffffff;border: 1px solid rgb(127,157,185)">
-        <div class="leftPanelCharPropsItemDiv" id="barTypeLeftPanel">
-            <p>Bar</p>
-        </div>
-        <div class="leftPanelCharPropsItemDiv" id="lineTypeLeftPanel">
-            <p>Line</p>
-        </div>
-        <div class="leftPanelCharPropsItemDiv" id="pieTypeLeftPanel">
-            <p>Pie</p>
-        </div>
-        <div class="leftPanelCharPropsItemDiv" id="hBarTypeLeftPanel">
-            <p>HBar</p>
-        </div>
-        <div class="leftPanelCharPropsItemDiv" id="areaTypeLeftPanel">
-            <p>Area</p>
-        </div>
-        <div class="leftPanelCharPropsItemDiv" id="scatterTypeLeftPanel">
-            <p>Scatter</p>
-        </div>
-        <div class="leftPanelCharPropsItemDiv" id="stockTypeLeftPanel">
-            <p>Stock</p>
-        </div>
-    </div>
-    <div class="right_panel_drawing_props" id="barTypeRightPanel" style="display: none">
-
-    </div>
-    <div class="right_panel_drawing_props" id="lineTypeRightPanel" style="display: none">
-        <p>Line</p>
-    </div>
-    <div class="right_panel_drawing_props" id="pieTypeRightPanel" style="display: none">
-        <p>Pie</p>
-    </div>
-    <div class="right_panel_drawing_props" id="hBarTypeRightPanel" style="display: none">
-        <p>HBar</p>
-    </div>
-    <div class="right_panel_drawing_props" id="areaTypeRightPanel" style="display: none">
-        <p>Area</p>
-    </div>
-    <div class="right_panel_drawing_props" id="scatterTypeRightPanel" style="display: none">
-        <p>Scatter</p>
-    </div>
-    <div class="right_panel_drawing_props" id="stockTypeRightPanel" style="display: none">
-        <p>Stock</p>
-    </div>
-
-</div>
-
-<div id="vertAxisMenuDiv" style="display: none;background: #ece9d8; z-index: 8000; width: 619px; height: 515px; position: absolute; left: 0px; top:0px">
- <div id="leftPanelDiv">
-     <div class="leftPanelItem" id="vertAxisOptionsDiv">
-         <p>Axis Options</p>
-     </div>
-     <div class="leftPanelItem" id="vertAxisNumberDiv">
-         <p>Number</p>
-     </div>
-     <div class="leftPanelItem" id="vertAxisFillDiv">
-         <p>Fill</p>
-     </div>
-     <div class="leftPanelItem" id="vertAxisLineColorDiv">
-         <p>Line Color</p>
-     </div>
-     <div class="leftPanelItem" id="vertAxisLineTypeDiv">
-         <p>Line Type</p>
-     </div>
-     <div class="leftPanelItem" id="vertAxisShadowDiv">
-         <p>Shadow</p>
-     </div>
-     <div class="leftPanelItem" id="vertAxisGlowDiv">
-         <p>Glow</p>
-     </div>
-     <div class="leftPanelItem" id="vertAxis3DFormatDiv">
-         <p>3D Format</p>
-     </div>
-     <div class="leftPanelItem" id="vertAxisTextAlignmentDiv">
-         <p>Text Alignment</p>
-     </div>
- </div>
-</div>
 
 <div id="shapeBox" class="options hidden">
 <table>

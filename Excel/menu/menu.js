@@ -2964,5 +2964,108 @@
             api.asc_editChartDrawingObject(settings);
         }
     );
+    $("#fixedMinValValAxisCheckBox").change(function(){this.checked && $("#minValueAxisInput").removeAttr("disabled");});
+    $("#autoMinValValAxisCheckBox").change(function(){this.checked && $("#minValueAxisInput").attr("disabled", "disabled");});
+    $("#fixedMaxValValAxisCheckBox").change(function(){this.checked && $("#maxValueAxisInput").removeAttr("disabled");});
+    $("#autoMaxValValAxisCheckBox").change(function(){this.checked && $("#maxValueAxisInput").attr("disabled", "disabled");});
+    $("#logScaleInput").change(function(){this.checked ? $("#logBaseInput").removeAttr("disabled") : $("#logBaseInput").attr("disabled", "disabled")});
+    $("#crossesValAxValInput").change(function(){this.checked && $("#crossesValInput").removeAttr("disabled");});
+    $("#crossesAutoValAxInput").change(function(){this.checked && $("#crossesValInput").attr("disabled", "disabled");});
+    $("#crossesMaxAxValInput").change(function(){this.checked && $("#crossesValInput").attr("disabled", "disabled");});
+
+
+    $(".leftPanelCharPropsItemDiv").mousedown(function()
+    {
+        $(".leftPanelCharPropsItemDiv").removeClass("left_panel_chart_props_select");
+        $(".leftPanelCharPropsItemDiv").addClass("left_panel_chart_props_no_select");
+        $(this).removeClass("left_panel_chart_props_no_select");
+        $(this).addClass("left_panel_chart_props_select");
+
+        $(".right_panel_drawing_props").css("display", "none");
+
+        var id = this.id;
+        switch(id)
+        {
+            case "designChartLeft":
+            {
+                $("#rightPanelChartPropsDiv").css("display","");
+                break;
+            }
+
+            case "valAxisProps":
+            {
+                $("#rightPanelValAxisProps").css("display","");
+                break;
+            }
+
+            case "catAxisProps":
+            {
+                $("#rightPanelCatAxProps").css("display","");
+                break;
+            }
+        }
+    });
+
+    $("#valApplyValAxisProps").click(
+        function()
+        {
+            var settings = new asc_ChartSettings()
+            var axis_settings = new asc_ValAxisSettings();
+            settings.putVertAxisProps(axis_settings);
+            if($("#autoMinValValAxisCheckBox").attr("checked"))
+            {
+                axis_settings.putMinValRule(c_oAscValAxisRule.auto)
+            }
+            else
+            {
+                axis_settings.putMinValRule(c_oAscValAxisRule.fixed);
+                axis_settings.putMinVal(parseInt($("#minValueAxisInput").attr("value")));
+            }
+            if($("#autoMaxValValAxisCheckBox").attr("checked"))
+            {
+                axis_settings.putMaxValRule(c_oAscValAxisRule.auto)
+            }
+            else
+            {
+                axis_settings.putMaxValRule(c_oAscValAxisRule.fixed);
+                axis_settings.putMaxVal(parseInt($("#maxValueAxisInput").attr("value")));
+            }
+            $("#invertValOrderValAxisInput").attr("checked") ? axis_settings.putInvertValOrder(true) : axis_settings.putInvertValOrder(false);
+            if($("#logScaleInput").attr("checked"))
+            {
+                axis_settings.putLogScale(true);
+                axis_settings.putLogBase(parseFloat($("#logBaseInput").attr("value")));
+            }
+            else
+            {
+                axis_settings.putLogScale(false);
+            }
+            axis_settings.putUnits(c_oAscValAxUnits[$("#unitsSelect").attr("value")]);
+            if($("#showUnitsLabels").attr("checked"))
+                axis_settings.putShowUnitsOnChart(true);
+            else
+                axis_settings.putShowUnitsOnChart(false);
+
+            axis_settings.putMajorTickMark(c_oAscTickMark[$("#majorTickMarkSelectValAx").attr("value")]);
+            axis_settings.putMinorTickMark(c_oAscTickMark[$("#minorTickMarkSelectValAx").attr("value")]);
+            axis_settings.putTickLabelsPos(c_oAscTickLabelsPos[$("#tickLabelsSelectValAx").attr("value")]);
+
+            if($("#crossesAutoValAxInput").attr("checked"))
+            {
+                axis_settings.putCrossesRule(c_oAscCrossesRule.auto);
+            }
+            else if($("#crossesMaxAxValInput").attr("checked"))
+            {
+                axis_settings.putCrossesRule(c_oAscCrossesRule.maxValue);
+            }
+            else
+            {
+                axis_settings.putCrossesRule(c_oAscCrossesRule.value);
+                axis_settings.putCrosses(parseFloat($("#crossesValInput").attr("value")));
+            }
+            api.asc_editChartDrawingObject(settings);
+        }
+    );
+
 });
 
