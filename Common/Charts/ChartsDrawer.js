@@ -4328,7 +4328,7 @@ drawRadarChart.prototype =
 		var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache.pts : this.chartProp.series[0].val.numLit.pts;
 		var tempAngle = 2 * Math.PI / numCache.length;
 		var xDiff = ((trueHeight / 2) / yPoints.length) / this.chartProp.pxToMM;
-		var radius, radius1;
+		var radius, radius1, xFirst, yFirst;
 		
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 		
@@ -4391,18 +4391,31 @@ drawRadarChart.prototype =
 					
 					this.paths.series[i][n] = this._calculateLine(x, y, x1, y1);
 					
+					if(n == 0)
+					{
+						xFirst = x;
+						yFirst = y;
+					}
+						
+					
+					if(n == dataSeries.length - 2)
+						this.paths.series[i][n + 1] = this._calculateLine(x1, y1, xFirst, yFirst);
+					
 					if(!this.paths.points)
 						this.paths.points = [];
 					if(!this.paths.points[i])
 						this.paths.points[i] = [];
 					
-					if(n == 0)
+					if(dataSeries[n].compiledMarker)
 					{
-						this.paths.points[i][n] = this.cChartDrawer.calculatePoint(x, y, dataSeries[n].compiledMarker.size, dataSeries[n].compiledMarker.symbol);
-						this.paths.points[i][n + 1] = this.cChartDrawer.calculatePoint(x1, y1, dataSeries[n + 1].compiledMarker.size, dataSeries[n + 1].compiledMarker.symbol);
+						if(n == 0)
+						{
+							this.paths.points[i][n] = this.cChartDrawer.calculatePoint(x, y, dataSeries[n].compiledMarker.size, dataSeries[n].compiledMarker.symbol);
+							this.paths.points[i][n + 1] = this.cChartDrawer.calculatePoint(x1, y1, dataSeries[n + 1].compiledMarker.size, dataSeries[n + 1].compiledMarker.symbol);
+						}
+						else
+							this.paths.points[i][n + 1] = this.cChartDrawer.calculatePoint(x1, y1, dataSeries[n + 1].compiledMarker.size, dataSeries[n + 1].compiledMarker.symbol);
 					}
-					else
-						this.paths.points[i][n + 1] = this.cChartDrawer.calculatePoint(x1, y1, dataSeries[n + 1].compiledMarker.size, dataSeries[n + 1].compiledMarker.symbol);
 				}
 			}
 		}
@@ -4545,6 +4558,8 @@ drawRadarChart.prototype =
 					brush = numCache.pts[n].brush;
 					
 				this._drawPath(this.paths.series[i][n], brush, pen);
+				if(n == dataSeries.length - 2 && this.paths.series[i][n + 1])
+					this._drawPath(this.paths.series[i][n + 1], brush, pen);
 			}
 			
 			//draw point
