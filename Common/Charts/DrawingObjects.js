@@ -5339,10 +5339,12 @@ function ObjectLocker(ws) {
 	var asc_applyFunction = asc.applyFunction;
 
 	var _t = this;
+	_t.bLock = true;
 	var aObjectId = [];
 	var worksheet = ws;
 	
 	_t.reset = function() {
+		_t.bLock = true;
 		aObjectId = [];
 	};
 	
@@ -5354,7 +5356,8 @@ function ObjectLocker(ws) {
 	_t.checkObjects = function(callback) {
 		
 		function callbackEx(result) {
-			worksheet._drawCollaborativeElements(true);
+			//if ( worksheet )
+			//	worksheet._drawCollaborativeElements(true);
 			if ( callback )
 				callback(result);
 		}
@@ -5385,10 +5388,13 @@ function ObjectLocker(ws) {
 				asc_applyFunction(callbackEx, false);
 				return;
 			}
-			worksheet.collaborativeEditing.addCheckLock(lockInfo);
+			if ( _t.bLock )
+				worksheet.collaborativeEditing.addCheckLock(lockInfo);
 		}
-		
-		worksheet.collaborativeEditing.onEndCheckLock(callbackEx);
+		if ( _t.bLock )
+			worksheet.collaborativeEditing.onEndCheckLock(callbackEx);
+		else
+			asc_applyFunction(callbackEx, true);
 	}
 }
 

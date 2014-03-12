@@ -3004,7 +3004,7 @@
 			}
 		};
 		
-		WorksheetView.prototype._drawFrozenAnchor = function(canvas) {
+		WorksheetView.prototype._drawFrozenAnchor = function() {
 			if (false === this.model.sheetViews[0].asc_getShowRowColHeaders())
 				return;
 			
@@ -3014,10 +3014,22 @@
 			var frozenCell = this.topLeftFrozenCell ? this.topLeftFrozenCell : new CellAddress(0, 0, 0);
 			
 			function drawAnchor(x, y, w, h) {
-				_this.drawingCtx.beginPath()
-								.rect(_x, _y, w, h)
-								.setFillStyle(_this.settings.activeCellBorderColor)
-								.fill();
+			
+				var callback = function(result) {
+					var color = _this.settings.activeCellBorderColor;
+					if ( !result )
+						color = c_oAscCoAuthoringOtherBorderColor;
+						
+					_this.drawingCtx.beginPath()
+									.rect(_x, _y, w, h)
+									.setFillStyle(color)
+									.fill();
+				}
+			
+				_this.objectRender.objectLocker.reset();
+				_this.objectRender.objectLocker.bLock = false;
+				_this.objectRender.objectLocker.addObjectId(_this.getFrozenCellId());
+				_this.objectRender.objectLocker.checkObjects(callback);
 			}
 
 			// vertical
@@ -3104,9 +3116,9 @@
 						}
 						else {
 							if ( _this.topLeftFrozenCell )
-								_this.setFrozenCell(col, _this.topLeftFrozenCell.getRow0(), true);
+								_this.setFrozenCell(col, _this.topLeftFrozenCell.getRow0(), false, true);
 							else
-								_this.setFrozenCell(col, 0, true);
+								_this.setFrozenCell(col, 0, true, true);
 						}
 					}
 					break;
@@ -3121,23 +3133,58 @@
 						}
 						else {
 							if ( _this.topLeftFrozenCell )
-								_this.setFrozenCell(_this.topLeftFrozenCell.getCol0(), row, true);
+								_this.setFrozenCell(_this.topLeftFrozenCell.getCol0(), row, false, true);
 							else
-								_this.setFrozenCell(0, row, true);
+								_this.setFrozenCell(0, row, true, true);
 						}
 					}
 					break;
 			}
 		};
 		
-		WorksheetView.prototype.setFrozenCell = function(col, row, bRedraw) {
-			this.topLeftFrozenCell = new CellAddress(row, col, 0);
-			this.visibleRange.c1 = col;
-			this.visibleRange.r1 = row;
-			this.objectRender.drawingArea.init();
-			if ( bRedraw )
-				this.draw();
+		WorksheetView.prototype.setFrozenCell = function(col, row, bNew, bRedraw) {
+			var _this = this;
+			var callback = function(result) {
+				if ( result ) {
+					if ( bNew ) {
+						History.Create_NewPoint();
+						History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_AddFrozenCell, _this.model.getId(), null, new UndoRedoData_FrozenCell(row, col));
+						
+						_this.topLeftFrozenCell = new CellAddress(row, col, 0);
+						_this.visibleRange.c1 = col;
+						_this.visibleRange.r1 = row;
+					}
+					else {
+						var compositeFroze = new UndoRedoData_CompositeFrozenCell(new UndoRedoData_FrozenCell(_this.topLeftFrozenCell.getRow0(), _this.topLeftFrozenCell.getCol0()), new UndoRedoData_FrozenCell(row, col));
+						
+						History.Create_NewPoint();
+						History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ChangeFrozenCell, _this.model.getId(), null, compositeFroze);
+						
+						_this.topLeftFrozenCell = new CellAddress(row, col, 0);
+						_this.visibleRange.c1 = col;
+						_this.visibleRange.r1 = row;
+					}
+					
+					_this.objectRender.drawingArea.init();
+					if ( bRedraw )
+						_this.draw();
+				}
+				else {
+					_this.overlayCtx.clear();
+					_this._drawSelection();
+				}
+			}
+		
+			_this.objectRender.objectLocker.reset();
+			_this.objectRender.objectLocker.addObjectId(_this.getFrozenCellId());
+			_this.objectRender.objectLocker.checkObjects(callback);
 		}
+		
+		WorksheetView.prototype.getFrozenCellId = function() {
+			return "frozenCell_" + this.model.Id;
+		}
+		
+		/** Для api закрепленных областей */
 		
 		WorksheetView.prototype.clearFrozenCell = function() {
 			this.topLeftFrozenCell = null;
@@ -3148,17 +3195,19 @@
 		}
 		
 		WorksheetView.prototype.setSelectedFrozenCell = function() {
-			this.setFrozenCell(this.getSelectedColumnIndex(), this.getSelectedRowIndex(), true);
+			this.setFrozenCell(this.getSelectedColumnIndex(), this.getSelectedRowIndex(), true, true);
 		}
 		
 		WorksheetView.prototype.setFirstFrozenCol = function() {
-			this.setFrozenCell(1, 0, true);
+			this.setFrozenCell(1, 0, true, true);
 		}
 		
 		WorksheetView.prototype.setFirstFrozenRow = function() {
-			this.setFrozenCell(0, 1, true);
+			this.setFrozenCell(0, 1, true, true);
 		}
 
+		/** */
+		
 		WorksheetView.prototype._drawSelectionElement = function (visibleRange, offsetX, offsetY, args) {
 			var range = args[0], isDashLine = args[1], lineWidth = args[2], strokeColor = args[3],
 				fillColor = args[4], isAllRange = args[5];
@@ -3604,9 +3653,10 @@
 
 		WorksheetView.prototype._drawCollaborativeElements = function (bIsDrawObjects) {
 			if (this.collaborativeEditing.getCollaborativeEditing()) {
-				this._drawCollaborativeElementsMeOther (c_oAscLockTypes.kLockTypeMine, bIsDrawObjects);
-				this._drawCollaborativeElementsMeOther (c_oAscLockTypes.kLockTypeOther, bIsDrawObjects);
-				this._drawCollaborativeElementsAllLock ();
+				this._drawCollaborativeElementsMeOther(c_oAscLockTypes.kLockTypeMine, bIsDrawObjects);
+				this._drawCollaborativeElementsMeOther(c_oAscLockTypes.kLockTypeOther, bIsDrawObjects);
+				this._drawCollaborativeElementsAllLock();
+				this._drawFrozenAnchor();
 			}
 		};
 

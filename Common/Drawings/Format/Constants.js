@@ -960,8 +960,8 @@ var historyitem_Comments_Add    = 1; // Добавили новый коммен
 var historyitem_Comments_Remove = 2; // Удалили комментарий
 
 // Типы изменений в классе СComment
-var historyitem_Comment_Change   = 1; // Изменили комментарий
-var historyitem_Comment_TypeInfo = 2; // Изменили информацию о типе комментария
+var historyitem_Comment_Change   = 3; // Изменили комментарий
+var historyitem_Comment_TypeInfo = 4; // Изменили информацию о типе комментария
 
 // Типы изменений в классе CParaHyperlinkStart
 var historyitem_Hyperlink_Value      = 1; // Изменяем значение гиперссылки

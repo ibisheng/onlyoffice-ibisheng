@@ -358,7 +358,8 @@ var UndoRedoDataTypes = new function() {
     this.DocContentParaItemId = 66;
     this.ParagraphAddParaItem = 67;
     this.ParagraphParaItemAdd = 68;
-
+	this.FrozenCell = 69;
+	this.CompositeFrozenCell = 70;
 
     this.Create = function(nType)
 	{
@@ -429,10 +430,77 @@ var UndoRedoDataTypes = new function() {
             case this.GOSetAdjustmentValue: return new UndoRedoDataSetAdjustmentValue();
             case this.ParagraphAddParaItem: return new UndoRedoDataAddParaItem();
             case this.ParagraphParaItemAdd: return new UndoRedoData_historyitem_Paragraph_AddItem();
+			
+			case this.FrozenCell: return new UndoRedoData_FrozenCell();
+            case this.CompositeFrozenCell: return new UndoRedoData_CompositeFrozenCell();
         }
 		return null;
 	};
 };
+
+//
+function UndoRedoData_FrozenCell(nRow, nCol) {
+	this.Properties = {
+		Row: 0,
+		Col: 1
+	};
+	this.nRow = nRow;
+	this.nCol = nCol;
+}
+UndoRedoData_FrozenCell.prototype = {
+	getType : function() {
+		return UndoRedoDataTypes.FrozenCell;
+	},
+	getProperties : function() {
+		return this.Properties;
+	},
+	getProperty : function(nType) {
+		switch(nType) {
+			case this.Properties.Row: return this.nRow; break;
+			case this.Properties.Col: return this.nCol; break;
+		}
+		return null;
+	},
+	setProperty : function(nType, value) {
+		switch(nType) {
+			case this.Properties.Row: this.nRow = value; break;
+			case this.Properties.Col: this.nCol = value; break;
+		}
+	}
+};
+
+function UndoRedoData_CompositeFrozenCell(frozenBefore, frozenAfter) {
+	
+	this.frozenBefore = frozenBefore;
+	this.frozenAfter = frozenAfter;
+
+	this.Properties = {
+		frozenBefore: 0,
+		frozenAfter: 1
+	};
+}
+
+UndoRedoData_CompositeFrozenCell.prototype = {
+	getType: function() {
+		return UndoRedoDataTypes.CompositeFrozenCell;
+	},
+	getProperties: function() {
+		return this.Properties;
+	},
+	getProperty: function(nType) {
+		switch (nType) {
+			case this.Properties.frozenBefore: return this.frozenBefore; break;
+			case this.Properties.frozenAfter: return this.frozenAfter; break;
+		}
+	},
+	setProperty: function(nType, value) {
+		switch (nType) {
+			case this.Properties.frozenBefore: this.frozenBefore = value; break;
+			case this.Properties.frozenAfter: this.frozenAfter = value; break;
+		}
+	}
+}
+//
 
 function UndoRedoData_CellSimpleData(nRow, nCol, oOldVal, oNewVal, sFormula){
 	this.Properties = {
@@ -2942,6 +3010,7 @@ UndoRedoWoorksheet.prototype = {
 	},
 	UndoRedo : function(Type, Data, nSheetId, bUndo)
 	{
+		var api = window["Asc"]["editor"];
 		var ws = this.wb.getWorksheetById(nSheetId);
 		if(null == ws)
 			return;
@@ -3368,6 +3437,54 @@ UndoRedoWoorksheet.prototype = {
 				data.Ref = ws.getRange3(to.r1, to.c1, to.r2, to.c2);
 				ws.hyperlinkManager.add(to, data);
 			}
+		}
+		// Frozen anchor
+		else if (historyitem_Worksheet_AddFrozenCell === Type) {
+			if ( !api.wb )
+				return;
+			var wsView = api.wb.getWorksheetById(nSheetId);
+			
+			if ( bUndo ) {
+				wsView.topLeftFrozenCell = null;
+				wsView.visibleRange.c1 = 0;
+				wsView.visibleRange.r1 = 0;
+			}
+			else {
+				wsView.topLeftFrozenCell = new CellAddress(Data.nRow, Data.nCol, 0);
+				wsView.visibleRange.c1 = Data.nCol;
+				wsView.visibleRange.r1 = Data.nRow;
+			}
+			wsView.objectRender.drawingArea.init();
+		}
+		else if (historyitem_Worksheet_ChangeFrozenCell === Type) {
+			if ( !api.wb )
+				return;
+			var wsView = api.wb.getWorksheetById(nSheetId);
+			
+			if ( bUndo ) {
+				wsView.topLeftFrozenCell = new CellAddress(Data.frozenBefore.nRow, Data.frozenBefore.nCol, 0);
+				wsView.visibleRange.c1 = Data.frozenBefore.nCol;
+				wsView.visibleRange.r1 = Data.frozenBefore.nRow;
+			}
+			else {
+				wsView.topLeftFrozenCell = new CellAddress(Data.frozenAfter.nRow, Data.frozenAfter.nCol, 0);
+				wsView.visibleRange.c1 = Data.frozenAfter.nCol;
+				wsView.visibleRange.r1 = Data.frozenAfter.nRow;
+			}
+			wsView.objectRender.drawingArea.init();
+		}
+		else if (historyitem_Worksheet_RemoveFrozenCell === Type) {
+			if ( bUndo ) {
+				wsView.topLeftFrozenCell = new CellAddress(Data.nRow, Data.nCol, 0);
+				wsView.visibleRange.c1 = Data.nCol;
+				wsView.visibleRange.r1 = Data.nRow;
+			}
+			else {
+				wsView.topLeftFrozenCell = null;
+				wsView.visibleRange.c1 = 0;
+				wsView.visibleRange.r1 = 0;
+			}
+			wsView.objectRender.drawingArea.init();
 		}
 	}
 };

@@ -36,6 +36,10 @@ var historyitem_Worksheet_SetViewSettings = 23;
 var historyitem_Worksheet_RemoveCellFormula = 24;
 var historyitem_Worksheet_ChangeMerge = 25;
 var historyitem_Worksheet_ChangeHyperlink = 26;
+// Frozen cell
+var historyitem_Worksheet_AddFrozenCell = 30;
+var historyitem_Worksheet_ChangeFrozenCell = 31;
+var historyitem_Worksheet_RemoveFrozenCell = 32;
 
 var historyitem_RowCol_Fontname = 1;
 var historyitem_RowCol_Fontsize = 2;
