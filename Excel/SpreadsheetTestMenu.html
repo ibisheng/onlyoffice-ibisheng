@@ -2491,7 +2491,7 @@ Format
         <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
         <label>Crosses</label>
         <br>
-        <label>auto</label><input type="radio" name="crosses" value="auto" checked="checked" id="crossesAutoValAxInput"><br>
+        <label>auto</label><input type="radio" name="crosses" value="auto" checked="checked" id="crossesAutoValAxInput" ><br>
         <label>value</label><input type="radio" name="crosses" value="value" id="crossesValAxValInput"><input type="text" id="crossesValInput" disabled="disabled"><br>
         <label>max value</label><input type="radio" name="crosses" value="maxValue" id="crossesMaxAxValInput">
         <br>
@@ -2508,7 +2508,7 @@ Format
         <br>
         <label>interval between labels:</label>
         <br>
-        <input type="radio" name="intervalBetweenLabels" value="auto" class="intervalBetweenLabelsCatAxInput" checked="checked"><label>auto</label>
+        <input type="radio" name="intervalBetweenLabels" value="auto" class="intervalBetweenLabelsCatAxInput" checked="checked" id="autoIntervalBetweenLabelsInputCat"><label>auto</label>
         <br>
         <input type="radio" name="intervalBetweenLabels" value="manual" class="intervalBetweenLabelsCatAxInput"><label>manual</label>
         <input type="text" id="intervalBetweenLabelsInputCatAxManual" disabled="disabled">
@@ -2519,9 +2519,9 @@ Format
         <br>
         <label>Axis Type:</label>
         <br>
-        <input type="radio" name="horAxisTypeInput" value="auto" checked="checked"><label>auto</label>
-        <input type="radio" name="horAxisTypeInput" value="text"><label>text</label>
-        <input type="radio" name="horAxisTypeInput" value="date"><label>date</label>
+        <input type="radio"  class = "catAxisTypeInputAuto" name="horAxisTypeInput" value="auto" checked="checked"><label>auto</label>
+        <input type="radio"  class = "catAxisTypeInputText" name="horAxisTypeInput" value="text"><label>text</label>
+        <input type="radio"  class = "catAxisTypeInputDate" name="horAxisTypeInput" value="date"><label>date</label>
         <br>
         <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
         <label>major tick mark</label>
@@ -2551,14 +2551,14 @@ Format
         <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
         <label>Crosses</label>
         <br>
-        <label>auto</label><input type="radio" name="crosses" value="auto" checked="checked" id="crossesAutoCatAxInput"><br>
-        <label>value</label><input type="radio" name="crosses" value="value" id="crossesCatAxValInput"><input type="text" id="crossesCatInput" disabled="disabled"><br>
-        <label>max value</label><input type="radio" name="crosses" value="maxValue" id="crossesMaxAxCatInput">
+        <label>auto</label><input type="radio" name="crossesCat" value="auto" checked="checked" id="crossesAutoCatAxInput"><br>
+        <label>value</label><input type="radio" name="crossesCat" value="value" id="crossesCatAxValInput"><input type="text" id="crossesCatInput" disabled="disabled"><br>
+        <label>max value</label><input type="radio" name="crossesCat" value="maxValue" id="crossesMaxAxCatInput">
         <br>
         <label>Axis Position</label><br>
-        <label>by divisions:</label><input type="checkbox" id="checkBoxByDivisionsInput">
+        <label>by divisions:</label><input type="radio" id="checkBoxByDivisionsInput" checked="checked">
         <br>
-        <label>between divisions:</label><input type="checkbox" id="checkBoxBetweenDivisionsInput">
+        <label>between divisions:</label><input type="radio" id="checkBoxBetweenDivisionsInput">
         <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
         <button id="valApplyCatAxisProps">
             Apply Props

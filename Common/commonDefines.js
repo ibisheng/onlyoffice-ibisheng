@@ -246,3 +246,9 @@ var c_oAscBetweenLabelsRule =
     auto: 0,
     manual: 1
 };
+
+var c_oAscLabelsPosition =
+{
+    byDivisions: 0,
+    betweenDivisions: 1
+};

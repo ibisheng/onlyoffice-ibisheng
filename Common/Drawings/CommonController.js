@@ -1749,6 +1749,195 @@ DrawingObjectsController.prototype =
                     checkDataLabels(chart_type).setSeparator(chartSettings.separator);
             }
 
+
+
+            if(chart_type.getAxisByTypes )
+            {
+                axis_by_types = chart_type.getAxisByTypes();
+                if(axis_by_types.catAx.length > 0 && axis_by_types.valAx.length > 0)
+                {
+                    cat_ax = axis_by_types.catAx[0];
+                    val_ax = axis_by_types.valAx[0];
+                }
+
+                var scaling;
+                var vert_axis_props = chartSettings.getVertAxisProps();
+                if(vert_axis_props)
+                {
+                    if(!val_ax.scaling)
+                        val_ax.setScaling(new CScaling());
+
+                    scaling = val_ax.scaling;
+                    if(isRealNumber(vert_axis_props.minValRule))
+                    {
+                        if(vert_axis_props.minValRule === c_oAscValAxisRule.auto)
+                        {
+                            if(isRealNumber(scaling.min))
+                                scaling.setMin(null);
+                        }
+                        else
+                        {
+                            if(isRealNumber(vert_axis_props.minVal))
+                                scaling.setMin(vert_axis_props.minVal);
+                        }
+                    }
+
+                    if(isRealNumber(vert_axis_props.maxValRule))
+                    {
+                        if(vert_axis_props.maxValRule === c_oAscValAxisRule.auto)
+                        {
+                            if(isRealNumber(scaling.max))
+                                scaling.setMax(null);
+                        }
+                        else
+                        {
+                            if(isRealNumber(vert_axis_props.maxVal))
+                                scaling.setMax(vert_axis_props.maxVal);
+                        }
+                    }
+
+                    if(isRealBool(vert_axis_props.invertValOrder))
+                        scaling.setOrientation(vert_axis_props.invertValOrder ? ORIENTATION_MAX_MIN : ORIENTATION_MIN_MAX);
+
+
+                    if(isRealBool(vert_axis_props.logScale) && isRealNumber(vert_axis_props.logBase) && vert_axis_props.logBase > 0)
+                        scaling.setLogBase(vert_axis_props.logBase);
+
+                    if(isRealNumber(vert_axis_props.units))
+                    {
+                        if(vert_axis_props.units === c_oAscValAxUnits.none)
+                        {
+                            if(val_ax.dispUnits)
+                                val_ax.setDispUnits(null);
+                        }
+                        else if(isRealNumber(MENU_SETTINGS_MAP[vert_axis_props.units]))
+                        {
+                            if(!val_ax.dispUnits)
+                                val_ax.setDispUnits(new CDispUnits());
+                            val_ax.dispUnits.setBuiltInUnit(MENU_SETTINGS_MAP[vert_axis_props.units]);
+                            if(isRealBool(val_ax.showUnitsOnChart))
+                                val_ax.dispUnits.setDispUnitsLbl(new CDLbl());
+                        }
+                    }
+
+                    if(isRealNumber(vert_axis_props.majorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[vert_axis_props.majorTickMark]))
+                        val_ax.setMajorTickMark(MENU_SETTINGS_TICK_MARK[vert_axis_props.majorTickMark]);
+
+                    if(isRealNumber(vert_axis_props.minorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[vert_axis_props.minorTickMark]))
+                        val_ax.setMinorTickMark(MENU_SETTINGS_TICK_MARK[vert_axis_props.minorTickMark]);
+
+                    if(isRealNumber(vert_axis_props.tickLabelsPos) && isRealNumber(MENU_SETTINGS_LABELS_POS[vert_axis_props.tickLabelsPos]))
+                        val_ax.setTickLblPos(MENU_SETTINGS_LABELS_POS[vert_axis_props.tickLabelsPos]);
+
+                    if(isRealNumber(vert_axis_props.crossesRule) && isRealObject(val_ax.crossAx))
+                    {
+                        if(vert_axis_props.crossesRule === c_oAscCrossesRule.auto)
+                        {
+                            val_ax.crossAx.setCrossesAt(null)
+                            val_ax.crossAx.setCrosses(CROSSES_AUTO_ZERO);
+                        }
+                        else if(vert_axis_props.crossesRule === c_oAscCrossesRule.value)
+                        {
+                            if(isRealNumber(vert_axis_props.crosses))
+                            {
+                                val_ax.crossAx.setCrossesAt(vert_axis_props.crosses)
+                                val_ax.crossAx.setCrosses(null);
+                            }
+                        }
+                        else if(vert_axis_props.crossesRule === c_oAscCrossesRule.maxValue)
+                        {
+                            val_ax.crossAx.setCrossesAt(null)
+                            val_ax.crossAx.setCrosses(CROSSES_MAX);
+                        }
+                    }
+
+                    var hor_axis_props = chartSettings.getHorAxisProps();
+                    if(hor_axis_props)
+                    {
+                        var  intervalBetweenTick       = hor_axis_props.getIntervalBetweenTick();
+                        var  intervalBetweenLabelsRule = hor_axis_props.getIntervalBetweenLabelsRule();
+                        var  intervalBetweenLabels     = hor_axis_props.getIntervalBetweenLabels();
+                        var  invertCatOrder            = hor_axis_props.getInvertCatOrder();
+                        var  labelsAxisDistance        = hor_axis_props.getLabelsAxisDistance();
+                        var  axisType                  = hor_axis_props.getAxisType();
+                        var  majorTickMark             = hor_axis_props.getMajorTickMark();
+                        var  minorTickMark             = hor_axis_props.getMinorTickMark();
+                        var  tickLabelsPos             = hor_axis_props.getTickLabelsPos();
+                        var  crossesRule               = hor_axis_props.getCrossesRule();
+                        var  crosses                   = hor_axis_props.getCrosses();
+                        var  labelsPosition            = hor_axis_props.getLabelsPosition();
+
+
+                        if(isRealNumber(intervalBetweenTick))
+                            cat_ax.setTickMarkSkip(intervalBetweenTick);
+
+                        if(isRealNumber(intervalBetweenLabelsRule))
+                        {
+                            if(intervalBetweenLabelsRule === c_oAscBetweenLabelsRule.auto)
+                            {
+                                if(isRealNumber(cat_ax.tickLblSkip))
+                                {
+                                    cat_ax.setTickLblSkip(null);
+                                }
+                            }
+                            else if(intervalBetweenLabelsRule === c_oAscBetweenLabelsRule.manual && isRealNumber(intervalBetweenLabels))
+                            {
+                                cat_ax.setTickLblSkip(intervalBetweenLabels);
+                            }
+                        }
+
+                        if(!cat_ax.scaling)
+                            cat_ax.setScaling(new CScaling());
+                        scaling = cat_ax.scaling;
+                        if(isRealBool(invertCatOrder))
+                            scaling.setOrientation(invertCatOrder ? ORIENTATION_MAX_MIN : ORIENTATION_MIN_MAX);
+                        if(isRealNumber(labelsAxisDistance))
+                            cat_ax.setLblOffset(labelsAxisDistance);
+
+                        if(isRealNumber(axisType))
+                        {
+                            //TODO
+                        }
+
+
+                        if(isRealNumber(majorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[majorTickMark]))
+                            cat_ax.setMajorTickMark(MENU_SETTINGS_TICK_MARK[majorTickMark]);
+
+                        if(isRealNumber(minorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[minorTickMark]))
+                            cat_ax.setMinorTickMark(MENU_SETTINGS_TICK_MARK[minorTickMark]);
+
+                        if(isRealNumber(tickLabelsPos) && isRealNumber(MENU_SETTINGS_LABELS_POS[tickLabelsPos]))
+                            cat_ax.setTickLblPos(MENU_SETTINGS_LABELS_POS[tickLabelsPos]);
+
+
+                        if(isRealNumber(crossesRule) && isRealObject(cat_ax.crossAx))
+                        {
+                            if(crossesRule === c_oAscCrossesRule.auto)
+                            {
+                                cat_ax.crossAx.setCrossesAt(null)
+                                cat_ax.crossAx.setCrosses(CROSSES_AUTO_ZERO);
+                            }
+                            else if(crossesRule === c_oAscCrossesRule.value)
+                            {
+                                if(isRealNumber(crosses))
+                                {
+                                    cat_ax.crossAx.setCrossesAt(crosses)
+                                    cat_ax.crossAx.setCrosses(null);
+                                }
+                            }
+                            else if(crossesRule === c_oAscCrossesRule.maxValue)
+                            {
+                                cat_ax.crossAx.setCrossesAt(null)
+                                cat_ax.crossAx.setCrosses(CROSSES_MAX);
+                            }
+                        }
+
+                        if(isRealNumber(labelsPosition) && isRealObject(cat_ax.crossAx))
+                            cat_ax.crossAx(labelsPosition === c_oAscLabelsPosition.byDivisions ? CROSS_BETWEEN_MID_CAT : CROSS_BETWEEN_BETWEEN)
+                    }
+                }
+            }
+
             chart_space.addToRecalculate();  //TODO
             chart_space.setRecalculateInfo();//TODO: обязательно переделать
             this.startRecalculate();

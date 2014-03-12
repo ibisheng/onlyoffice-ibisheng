@@ -588,23 +588,31 @@
         prot["getCrossesRule"]      = prot.getCrossesRule      ;
         prot["getCrosses"]          = prot.getCrosses          ;
 
+    window["asc_ValAxisSettings"] = asc_ValAxisSettings;
 
 
     function asc_CatAxisSettings()
     {
+        this.intervalBetweenTick       = null;
         this.intervalBetweenLabelsRule = null;
         this.intervalBetweenLabels     = null;
         this.invertCatOrder            = null;
         this.labelsAxisDistance        = null;
+        this.axisType                  = null;
         this.majorTickMark             = null;
         this.minorTickMark             = null;
         this.tickLabelsPos             = null;
         this.crossesRule               = null;
         this.crosses                   = null;
+        this.labelsPosition            = null;
     }
 
     asc_CatAxisSettings.prototype =
     {
+        putIntervalBetweenTick: function(v)
+        {
+            this.intervalBetweenTick = v;
+        },
         putIntervalBetweenLabelsRule: function(v)
         {
             this.intervalBetweenLabelsRule = v;
@@ -642,6 +650,21 @@
             this.crosses = v;
         },
 
+        putAxisType: function(v)
+        {
+            this.axisType = v;
+        },
+
+        putLabelsPosition: function(v)
+        {
+            this.labelsPosition = v;
+        },
+
+        getIntervalBetweenTick: function(v)
+        {
+            return this.intervalBetweenTick;
+        },
+
         getIntervalBetweenLabelsRule: function()
         {
             return this.intervalBetweenLabelsRule ;
@@ -677,10 +700,21 @@
         getCrosses: function()
         {
             return this.crosses;
+        },
+
+        getAxisType: function()
+        {
+            return this.axisType;
+        },
+
+        getLabelsPosition: function()
+        {
+            return this.labelsPosition;
         }
     };
 
     prot = asc_CatAxisSettings.prototype;
+    prot["putIntervalBetweenTick"] = prot.putIntervalBetweenTick;
     prot["putIntervalBetweenLabelsRule"] = prot.putIntervalBetweenLabelsRule;
     prot["putIntervalBetweenLabels"] = prot.putIntervalBetweenLabels        ;
     prot["putInvertCatOrder"] = prot.putInvertCatOrder                      ;
@@ -690,9 +724,11 @@
     prot["putTickLabelsPos"] = prot.putTickLabelsPos;
     prot["putCrossesRule"] = prot.putCrossesRule;
     prot["putCrosses"] = prot.putCrosses;
+    prot["putAxisType"] = prot.putAxisType;
+    prot["putLabelsPosition"] = prot.putLabelsPosition;
 
 
-
+    prot["getIntervalBetweenTick"] = prot.getIntervalBetweenTick;
     prot["getIntervalBetweenLabelsRule"] = prot.getIntervalBetweenLabelsRule;
     prot["getIntervalBetweenLabels"] = prot.getIntervalBetweenLabels        ;
     prot["getInvertCatOrder"] = prot.getInvertCatOrder                      ;
@@ -702,9 +738,11 @@
     prot["getTickLabelsPos"] = prot.getTickLabelsPos                        ;
     prot["getCrossesRule"] = prot.getCrossesRule                            ;
     prot["getCrosses"]     = prot.getCrosses                   ;
+    prot["getAxisType"]     = prot.getAxisType                   ;
+    prot["getLabelsPosition"] = prot.getLabelsPosition;
 
 
-
+    window["asc_CatAxisSettings"] = asc_CatAxisSettings;
 }
 )(window);
 
