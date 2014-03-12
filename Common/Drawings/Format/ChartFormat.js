@@ -11777,7 +11777,7 @@ CPivotFmt.prototype =
 
 function CRadarChart()
 {
-    this.axId        = null;
+    this.axId        = [];
     this.dLbls       = null;
     this.radarStyle  = null;
     this.series      = [];
@@ -11798,15 +11798,14 @@ CRadarChart.prototype =
         return historyitem_type_RadarChart;
     },
 
-
     removeDataLabels: CBarChart.prototype.removeDataLabels,
 
     getAxisByTypes: CPlotArea.prototype.getAxisByTypes,
 
-    setAxId: function(pr)
+    addAxId: function(pr)
     {
-        History.Add(this, {Type: historyitem_RadarChart_SetAxId, oldPr: this.axId, newPr:pr});
-        this.axId = pr;
+        History.Add(this, {Type: historyitem_RadarChart_AddAxId, newPr:pr});
+        this.axId.push(pr);
     },
 
     setDLbls: function(pr)
@@ -11837,9 +11836,16 @@ CRadarChart.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_RadarChart_SetAxId:
+            case historyitem_RadarChart_AddAxId:
             {
-                this.axId = data.oldPr;
+                for(var i = this.axId.length - 1; i > -1; --i)
+                {
+                    if(this.axId[i] === data.newPr)
+                    {
+                        this.axId.splice(i, 1);
+                        break;
+                    }
+                }
                 break;
             }
             case historyitem_RadarChart_SetDLbls:
@@ -11870,15 +11876,15 @@ CRadarChart.prototype =
                 break;
             }
         }
-    } ,
+    },
 
     Redo: function(data)
     {
         switch(data.Type)
         {
-            case historyitem_RadarChart_SetAxId:
+            case historyitem_RadarChart_AddAxId:
             {
-                this.axId = data.newPr;
+                this.axId.push(data.newPr);
                 break;
             }
             case historyitem_RadarChart_SetDLbls:
@@ -11909,13 +11915,9 @@ CRadarChart.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_RadarChart_SetAxId:
+            case historyitem_RadarChart_AddAxId:
             {
-                w.WriteBool(isRealNumber(data.newPr));
-                if(isRealNumber(data.newPr))
-                {
-                    w.WriteLong(data.newPr);
-                }
+                writeObject(w, data.newPr);
                 break;
             }
             case historyitem_RadarChart_SetDLbls:
@@ -11952,18 +11954,14 @@ CRadarChart.prototype =
 
     Load_Changes: function(r)
     {
-        switch(data.Type)
+        var type = r.GetLong();
+        switch(type)
         {
-            case historyitem_RadarChart_SetAxId:
+            case historyitem_RadarChart_AddAxId:
             {
-                if(r.GetBool())
-                {
-                    this.axId = r.GetLong();
-                }
-                else
-                {
-                    this.axId = null;
-                }
+                var axis = readObject(r);
+                if(axis)
+                    this.axId.push(axis);
                 break;
             }
             case historyitem_RadarChart_SetDLbls:
@@ -12016,7 +12014,6 @@ CRadarChart.prototype =
             }
         }
     }
-
 };
 
 

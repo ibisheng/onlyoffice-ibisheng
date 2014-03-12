@@ -207,6 +207,8 @@
             this.showCatName = null;
             this.showVal    = null;
             this.separator = null;
+            this.horAxisProps = null;
+            this.vertAxisProps = null;
         }
         asc_ChartSettings.prototype =
         {
@@ -355,8 +357,28 @@
             getSeparator: function()
             {
                 return this.separator;
-            }
+            },
 
+            putHorAxisProps: function(v)
+            {
+                this.horAxisProps = v;
+            },
+
+            getHorAxisProps: function()
+            {
+                return this.horAxisProps;
+            },
+
+
+            putVertAxisProps: function(v)
+            {
+                this.vertAxisProps = v;
+            },
+
+            getVertAxisProps: function()
+            {
+                return this.vertAxisProps;
+            }
         };
 
         prot = asc_ChartSettings.prototype;
@@ -392,46 +414,300 @@
         prot["getShowVal"]       = prot.getShowVal;
         prot["putSeparator"]       = prot.putSeparator;
         prot["getSeparator"]       = prot.getSeparator;
+        prot["putHorAxisProps"]       = prot.putHorAxisProps;
+        prot["getHorAxisProps"]       = prot.getHorAxisProps;
+        prot["putVertAxisProps"]       = prot.putVertAxisProps;
+        prot["getVertAxisProps"]       = prot.getVertAxisProps;
 
 
         window["asc_ChartSettings"] = asc_ChartSettings;
-        function asc_AxisSettings()
+
+        function asc_ValAxisSettings()
         {
-            this.type = null;
-            this.settings = null;
+            this.minValRule       = null;
+            this.minVal            = null;
+            this.maxValRule       = null;
+            this.maxVal            = null;
+            this.invertValOrder   = null;
+            this.logScale          = null;
+            this.logBase          = null;
+            this.units               = null;
+            this.showUnitsOnChart = null;
+            this.majorTickMark      = null;
+            this.minorTickMark      = null;
+            this.tickLabelsPos      = null;
+            this.crossesRule        = null;
+            this.crosses            = null;
         }
-        asc_AxisSettings.prototype =
+        asc_ValAxisSettings.prototype =
         {
-            putType: function(val)
+            putMinValRule: function(v)
             {
-                this.type = val;
+                this.minValRule = v;
+            },
+            putMinVal: function(v)
+            {
+                this.minVal = v;
+            },
+            putMaxValRule: function(v)
+            {
+                this.maxValRule = v;
+            },
+            putMaxVal: function(v)
+            {
+                this.maxVal = v;
+            },
+            putInvertValOrder: function(v)
+            {
+                this.invertValOrder =  v;
+            },
+            putLogScale: function(v)
+            {
+                this.logScale =  v;
+            },
+            putLogBase: function(v)
+            {
+                this.logBase =  v;
+            },
+            putUnits: function(v)
+            {
+                this.units = v;
+            },
+            putShowUnitsOnChart: function(v)
+            {
+                this.showUnitsOnChart =  v;
+            },
+            putMajorTickMark: function(v)
+            {
+                this.majorTickMark =  v;
+            },
+            putMinorTickMark: function(v)
+            {
+                this.minorTickMark =  v;
+            },
+            putTickLabelsPos: function(v)
+            {
+                this.tickLabelsPos =  v;
+            },
+            putCrossesRule: function(v)
+            {
+                this.crossesRule =  v;
+            },
+            putCrosses: function(v)
+            {
+                this.crosses =  v;
             },
 
-            putSettings: function(val)
-            {
-                this.settings = val;
-            },
 
-            getType: function()
+            getMinValRule: function()
             {
-                return this.type;
+                return this.minValRule;
             },
-
-            getSettings: function()
+            getMinVal: function()
             {
-                return this.settings;
+                return this.minVal;
+            },
+            getMaxValRule: function()
+            {
+                return this.maxValRule;
+            },
+            getMaxVal: function()
+            {
+                return this.maxVal;
+            },
+            getInvertValOrder: function()
+            {
+                return this.invertValOrder;
+            },
+            getLogScale: function()
+            {
+                return this.logScale;
+            },
+            getLogBase: function()
+            {
+                return this.logBase;
+            },
+            getUnits: function()
+            {
+                return this.units;
+            },
+            getShowUnitsOnChart: function()
+            {
+                return this.showUnitsOnChart;
+            },
+            getMajorTickMark: function()
+            {
+                return this.majorTickMark;
+            },
+            getMinorTickMark: function()
+            {
+                return this.minorTickMark;
+            },
+            getTickLabelsPos: function()
+            {
+                return this.tickLabelPos;
+            },
+            getCrossesRule: function()
+            {
+                return this.crossesRule;
+            },
+            getCrosses: function()
+            {
+                return this.crosses;
             }
         };
-        prot = asc_AxisSettings.prototype;
-        prot["putType"] = prot.putType;
-        prot["putSettings"] = prot.putSettings;
-        prot["getType"] = prot.getType;
-        prot["getSettings"] = prot.getSettings;
 
-        window["asc_AxisSettings"] = asc_AxisSettings;
+        prot = asc_ValAxisSettings.prototype;
+        prot["putMinValRule"]       = prot.putMinValRule       ;
+        prot["putMinVal"]           = prot.putMinVal           ;
+        prot["putMaxValRule"]       = prot.putMaxValRule       ;
+        prot["putMaxVal"]           = prot.putMaxVal           ;
+        prot["putInvertValOrder"]   = prot.putInvertValOrder   ;
+        prot["putLogScale"]         = prot.putLogScale         ;
+        prot["putLogBase"]          = prot.putLogBase          ;
+        prot["putUnits"]            = prot.putUnits            ;
+        prot["putShowUnitsOnChart"] = prot.putShowUnitsOnChart ;
+        prot["putMajorTickMark"]    = prot.putMajorTickMark    ;
+        prot["putMinorTickMark"]    = prot.putMinorTickMark    ;
+        prot["putTickLabelsPos"]    = prot.putTickLabelsPos    ;
+        prot["putCrossesRule"]      = prot.putCrossesRule      ;
+        prot["putCrosses"]          = prot.putCrosses          ;
+
+        prot["getMinValRule"]       = prot.getMinValRule       ;
+        prot["getMinVal"]           = prot.getMinVal           ;
+        prot["getMaxValRule"]       = prot.getMaxValRule       ;
+        prot["getMaxVal"]           = prot.getMaxVal           ;
+        prot["getInvertValOrder"]   = prot.getInvertValOrder   ;
+        prot["getLogScale"]         = prot.getLogScale         ;
+        prot["getLogBase"]          = prot.getLogBase          ;
+        prot["getUnits"]            = prot.getUnits            ;
+        prot["getShowUnitsOnChart"] = prot.getShowUnitsOnChart ;
+        prot["getMajorTickMark"]    = prot.getMajorTickMark    ;
+        prot["getMinorTickMark"]    = prot.getMinorTickMark    ;
+        prot["getTickLabelsPos"]    = prot.getTickLabelsPos    ;
+        prot["getCrossesRule"]      = prot.getCrossesRule      ;
+        prot["getCrosses"]          = prot.getCrosses          ;
+
+
+
+    function asc_CatAxisSettings()
+    {
+        this.intervalBetweenLabelsRule = null;
+        this.intervalBetweenLabels     = null;
+        this.invertCatOrder            = null;
+        this.labelsAxisDistance        = null;
+        this.majorTickMark             = null;
+        this.minorTickMark             = null;
+        this.tickLabelsPos             = null;
+        this.crossesRule               = null;
+        this.crosses                   = null;
+    }
+
+    asc_CatAxisSettings.prototype =
+    {
+        putIntervalBetweenLabelsRule: function(v)
+        {
+            this.intervalBetweenLabelsRule = v;
+        },
+        putIntervalBetweenLabels: function(v)
+        {
+            this.intervalBetweenLabels = v;
+        },
+        putInvertCatOrder: function(v)
+        {
+            this.invertCatOrder = v;
+        },
+        putLabelsAxisDistance: function(v)
+        {
+            this.labelsAxisDistance = v;
+        },
+        putMajorTickMark: function(v)
+        {
+            this.majorTickMark = v;
+        },
+        putMinorTickMark: function(v)
+        {
+            this.minorTickMark = v;
+        },
+        putTickLabelsPos: function(v)
+        {
+            this.tickLabelsPos = v;
+        },
+        putCrossesRule: function(v)
+        {
+            this.crossesRule = v;
+        },
+        putCrosses: function(v)
+        {
+            this.crosses = v;
+        },
+
+        getIntervalBetweenLabelsRule: function()
+        {
+            return this.intervalBetweenLabelsRule ;
+        },
+        getIntervalBetweenLabels: function()
+        {
+            return this.intervalBetweenLabels ;
+        },
+        getInvertCatOrder: function()
+        {
+            return this.invertCatOrder ;
+        },
+        getLabelsAxisDistance: function()
+        {
+            return this.labelsAxisDistance ;
+        },
+        getMajorTickMark: function()
+        {
+            return this.majorTickMark ;
+        },
+        getMinorTickMark: function()
+        {
+            return this.minorTickMark ;
+        },
+        getTickLabelsPos: function()
+        {
+            return this.tickLabelsPos;
+        },
+        getCrossesRule: function()
+        {
+            return this.crossesRule ;
+        },
+        getCrosses: function()
+        {
+            return this.crosses;
+        }
+    };
+
+    prot = asc_CatAxisSettings.prototype;
+    prot["putIntervalBetweenLabelsRule"] = prot.putIntervalBetweenLabelsRule;
+    prot["putIntervalBetweenLabels"] = prot.putIntervalBetweenLabels        ;
+    prot["putInvertCatOrder"] = prot.putInvertCatOrder                      ;
+    prot["putLabelsAxisDistance"] = prot.putLabelsAxisDistance              ;
+    prot["putMajorTickMark"] = prot.putMajorTickMark                        ;
+    prot["putMinorTickMark"] = prot.putMinorTickMark                        ;
+    prot["putTickLabelsPos"] = prot.putTickLablesPos                        ;
+    prot["putCrossesRule"] = prot.putCrossesRule                            ;
+    prot["putCrosses"]                  = prot.putCrosses                   ;
+
+
+
+    prot["getIntervalBetweenLabelsRule"] = prot.getIntervalBetweenLabelsRule;
+    prot["getIntervalBetweenLabels"] = prot.getIntervalBetweenLabels        ;
+    prot["getInvertCatOrder"] = prot.getInvertCatOrder                      ;
+    prot["getLabelsAxisDistance"] = prot.getLabelsAxisDistance              ;
+    prot["getMajorTickMark"] = prot.getMajorTickMark                        ;
+    prot["getMinorTickMark"] = prot.getMinorTickMark                        ;
+    prot["getTickLabelsPos"] = prot.getTickLablesPos                        ;
+    prot["getCrossesRule"] = prot.getCrossesRule                            ;
+    prot["getCrosses"]                  = prot.getCrosses                   ;
+
+
 }
 )(window);
 
 var CColor = window["CColor"];
 var asc_ChartSettings = window["asc_ChartSettings"];
 var asc_AxisSettings = window["asc_AxisSettings"];
+var asc_ValAxisSettings = window["asc_ValAxisSettings"];

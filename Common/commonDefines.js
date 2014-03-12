@@ -191,3 +191,58 @@ var c_oAscChartTypeSettings =
     scatterSmooth       : 18,
     doughnut            : 19
 };
+
+var c_oAscValAxisRule =
+{
+    auto:0,
+    fixed:1
+};
+
+var c_oAscValAxUnits =
+{
+    none:0,
+    BILLIONS: 1,
+    HUNDRED_MILLIONS: 2,
+    HUNDREDS: 3,
+    HUNDRED_THOUSANDS: 4,
+    MILLIONS: 5,
+    TEN_MILLIONS: 6,
+    TEN_THOUSANDS: 7,
+    TRILLIONS: 8
+};
+
+var c_oAscTickMark =
+{
+    TICK_MARK_CROSS: 0,
+    TICK_MARK_IN: 1,
+    TICK_MARK_NONE: 2,
+    TICK_MARK_OUT: 3
+};
+
+var c_oAscTickLabelsPos =
+{
+    TICK_LABEL_POSITION_HIGH:0,
+    TICK_LABEL_POSITION_LOW:    1,
+    TICK_LABEL_POSITION_NEXT_TO:  2,
+    TICK_LABEL_POSITION_NONE    :  3
+};
+
+var c_oAscCrossesRule =
+{
+    auto:0,
+    maxValue: 1,
+    value: 2
+};
+
+var c_oAscHorAxisType =
+{
+    auto: 0,
+    date: 1,
+    text: 2
+};
+
+var c_oAscBetweenLabelsRule =
+{
+    auto: 0,
+    manual: 1
+};

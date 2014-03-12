@@ -1453,7 +1453,6 @@ DrawingObjectsController.prototype =
                 {
                     if(isRealNumber(DLBL_POS_DEFINES_MAP[data_labels_pos_setting]))
                     {
-
                         if(!chart_type.dLbls)
                         {
                             var d_lbls = new CDLbls();
@@ -1471,7 +1470,6 @@ DrawingObjectsController.prototype =
             //TODO
             var i;
             var type = chartSettings.getType();
-
             var need_groupping, need_num_fmt, need_bar_dir;
             var val_axis, new_chart_type, object_type, axis_obj ;
             var axis_by_types;
@@ -1732,7 +1730,6 @@ DrawingObjectsController.prototype =
             //подписи данных
             if(typeof chart_type.setDLbls === "function")
             {
-
                 var data_lbls;
                 var checkDataLabels = function(chartType)
                 {
@@ -1851,6 +1848,10 @@ DrawingObjectsController.prototype =
             case "Stock":
             {
                 return CreateStockChart(chart);
+            }
+            case "Radar":
+            {
+                return CreateRadarChart(chart);
             }
         }
         return null;
