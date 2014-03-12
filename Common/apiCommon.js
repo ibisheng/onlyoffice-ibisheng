@@ -687,9 +687,9 @@
     prot["putLabelsAxisDistance"] = prot.putLabelsAxisDistance              ;
     prot["putMajorTickMark"] = prot.putMajorTickMark                        ;
     prot["putMinorTickMark"] = prot.putMinorTickMark                        ;
-    prot["putTickLabelsPos"] = prot.putTickLablesPos                        ;
-    prot["putCrossesRule"] = prot.putCrossesRule                            ;
-    prot["putCrosses"]                  = prot.putCrosses                   ;
+    prot["putTickLabelsPos"] = prot.putTickLabelsPos;
+    prot["putCrossesRule"] = prot.putCrossesRule;
+    prot["putCrosses"] = prot.putCrosses;
 
 
 
@@ -699,9 +699,10 @@
     prot["getLabelsAxisDistance"] = prot.getLabelsAxisDistance              ;
     prot["getMajorTickMark"] = prot.getMajorTickMark                        ;
     prot["getMinorTickMark"] = prot.getMinorTickMark                        ;
-    prot["getTickLabelsPos"] = prot.getTickLablesPos                        ;
+    prot["getTickLabelsPos"] = prot.getTickLabelsPos                        ;
     prot["getCrossesRule"] = prot.getCrossesRule                            ;
-    prot["getCrosses"]                  = prot.getCrosses                   ;
+    prot["getCrosses"]     = prot.getCrosses                   ;
+
 
 
 }
@@ -711,3 +712,4 @@ var CColor = window["CColor"];
 var asc_ChartSettings = window["asc_ChartSettings"];
 var asc_AxisSettings = window["asc_AxisSettings"];
 var asc_ValAxisSettings = window["asc_ValAxisSettings"];
+var asc_CatAxisSettings = window["asc_CatAxisSettings"];

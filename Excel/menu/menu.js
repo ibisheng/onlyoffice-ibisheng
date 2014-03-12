@@ -3067,5 +3067,34 @@
         }
     );
 
+
+    $(".intervalBetweenLabelsCatAxInput").change(
+        function()
+        {
+            this.value === "auto" ? $("#intervalBetweenLabelsInputCatAxManual").attr("disabled", "disabled") : $("#intervalBetweenLabelsInputCatAxManual").removeAttr("disabled");
+        }
+    );
+
+    $("#crossesAutoCatAxInput").change(
+        function()
+        {
+          $("#crossesCatInput").attr("disabled", "disabled");
+        }
+    );
+
+    $("#crossesMaxAxCatInput").change(
+        function()
+        {
+            $("#crossesCatInput").attr("disabled", "disabled");
+        }
+    );
+
+    $("#crossesCatAxValInput").change(
+        function()
+        {
+            $("#crossesCatInput").removeAttr("disabled");
+        }
+    );
+
 });
 

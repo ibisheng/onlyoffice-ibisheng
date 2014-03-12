@@ -638,7 +638,7 @@ CChartSpace.prototype.recalculateMarkers = function()
        || this.chart.plotArea.chart instanceof CScatterChart
        || this.chart.plotArea.chart instanceof CStockChart)
        && this.chart.plotArea.chart.series*/
-       this.chart.plotArea.chart.getObjectType() !== historyitem_type_LineChart || this.chart.plotArea.chart.marker)
+       this.chart.plotArea.chart.getObjectType() !== historyitem_type_LineChart && this.chart.plotArea.chart.getObjectType() !== historyitem_type_RadarChart  || this.chart.plotArea.chart.marker)
     {
         var chart_style = CHART_STYLE_MANAGER.getStyleByIndex(this.style);
         var effect_fill = chart_style.fill1;
@@ -920,7 +920,7 @@ CChartSpace.prototype.recalculateSeriesColors = function()
         }
         else
         {
-            if(!(this.chart.plotArea.chart instanceof CLineChart || this.chart.plotArea.chart instanceof  CScatterChart))
+            if(!(this.chart.plotArea.chart instanceof CLineChart || this.chart.plotArea.chart instanceof  CScatterChart || this.chart.plotArea.chart instanceof CRadarChart))
             {
                 var base_fills = getArrayFillsFromBase(style.fill2, series.length);
                 var base_line_fills = null;
@@ -942,7 +942,6 @@ CChartSpace.prototype.recalculateSeriesColors = function()
                     {
                         pts = [];
                     }
-
                     for(var j = 0; j < pts.length; ++j)
                     {
                         var compiled_brush = new CUniFill();
