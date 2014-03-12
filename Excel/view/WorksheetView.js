@@ -3656,7 +3656,6 @@
 				this._drawCollaborativeElementsMeOther(c_oAscLockTypes.kLockTypeMine, bIsDrawObjects);
 				this._drawCollaborativeElementsMeOther(c_oAscLockTypes.kLockTypeOther, bIsDrawObjects);
 				this._drawCollaborativeElementsAllLock();
-				this._drawFrozenAnchor();
 			}
 		};
 
