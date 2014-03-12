@@ -121,22 +121,25 @@ CParaSpellChecker.prototype =
 {
     Clear : function()
     {
-        var Count = this.Elements.length;
-
-        for (var Index = 0; Index < Count; Index++)
+        if ( true === Debug_ParaRunMode )
         {
-            var Element = this.Elements[Index];
+            var Count = this.Elements.length;
 
-            var Count2 = Element.ClassesS.length;
-            for ( var Index2 = 1; Index2 < Count2; Index2++ )
+            for (var Index = 0; Index < Count; Index++)
             {
-                Element.ClassesS[Index2].Clear_SpellingMarks();
-            }
+                var Element = this.Elements[Index];
 
-            Count2 = Element.ClassesE.length;
-            for ( var Index2 = 1; Index2 < Count2; Index2++ )
-            {
-                Element.ClassesE[Index2].Clear_SpellingMarks();
+                var Count2 = Element.ClassesS.length;
+                for ( var Index2 = 1; Index2 < Count2; Index2++ )
+                {
+                    Element.ClassesS[Index2].Clear_SpellingMarks();
+                }
+
+                Count2 = Element.ClassesE.length;
+                for ( var Index2 = 1; Index2 < Count2; Index2++ )
+                {
+                    Element.ClassesE[Index2].Clear_SpellingMarks();
+                }
             }
         }
 
@@ -1081,8 +1084,8 @@ Paragraph.prototype.Continue_CheckSpelling = function()
         else
         {
             var OldElements = this.SpellChecker.Elements;
-            this.SpellChecker.Clear();
 
+            this.SpellChecker.Elements = new Array();
             var SpellCheckerEngine = new CParagraphSpellCheckerEngine( this.SpellChecker );
 
             var ContentLen = this.Content.length;
@@ -1175,6 +1178,8 @@ Paragraph.prototype.Add_SpellCheckerElement = function(Element)
 //----------------------------------------------------------------------------------------------------------------------
 ParaRun.prototype.Check_Spelling = function(SpellCheckerEngine, Depth)
 {
+    this.SpellingMarks = new Array();
+
     // Пропускаем пустые раны
     if ( true === this.Is_Empty() )
         return;
@@ -1268,6 +1273,8 @@ ParaRun.prototype.Clear_SpellingMarks = function()
 //----------------------------------------------------------------------------------------------------------------------
 ParaHyperlink.prototype.Check_Spelling = function(SpellCheckerEngine, Depth)
 {
+    this.SpellingMarks = new Array();
+
     var ContentLen = this.Content.length;
     for ( var Pos = 0; Pos < ContentLen; Pos++ )
     {

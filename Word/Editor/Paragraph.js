@@ -587,7 +587,6 @@ Paragraph.prototype =
             }
 
             // Обновлять позиции в NearestPos не надо, потому что мы добавляем новые элементы в конец массива
-
             this.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
         }
     },
@@ -5172,7 +5171,7 @@ Paragraph.prototype =
             return Pos - Counter;
         }
         else
-            return 0;
+            return Pos;
     },
 
     Internal_Get_RealPos : function(Pos)
@@ -5193,7 +5192,7 @@ Paragraph.prototype =
             return Counter;
         }
         else
-            return 0;
+            return Pos;
     },
 
     Internal_Get_ClearContentLength : function()
@@ -9095,9 +9094,6 @@ Paragraph.prototype =
         }
         else
         {
-            // Удалим все лишние пустые раны из параграфа
-            this.Remove_EmptyRuns();
-
             if ( true === this.ApplyToAll )
             {
                 // Применяем настройки ко всем элементам параграфа
@@ -18720,63 +18716,118 @@ Paragraph.prototype =
 
     Get_SelectionState : function()
     {
-        var ParaState = new Object();
-        ParaState.CurPos  =
+        if ( true !== Debug_ParaRunMode )
         {
-            X          : this.CurPos.X,
-            Y          : this.CurPos.Y,
-            Line       : this.CurPos.Line,
-            ContentPos : this.Internal_Get_ClearPos(this.CurPos.ContentPos),
-            RealX      : this.CurPos.RealX,
-            RealY      : this.CurPos.RealY,
-            PagesPos   : this.CurPos.PagesPos
-        };
+            var ParaState = new Object();
+            ParaState.CurPos  =
+            {
+                X          : this.CurPos.X,
+                Y          : this.CurPos.Y,
+                Line       : this.CurPos.Line,
+                ContentPos : this.Internal_Get_ClearPos(this.CurPos.ContentPos),
+                RealX      : this.CurPos.RealX,
+                RealY      : this.CurPos.RealY,
+                PagesPos   : this.CurPos.PagesPos
+            };
 
-        ParaState.Selection =
+            ParaState.Selection =
+            {
+                Start    : this.Selection.Start,
+                Use      : this.Selection.Use,
+                StartPos : this.Internal_Get_ClearPos(this.Selection.StartPos),
+                EndPos   : this.Internal_Get_ClearPos(this.Selection.EndPos),
+                StartPos : this.Internal_Get_ClearPos(this.Selection.StartPos2),
+                EndPos   : this.Internal_Get_ClearPos(this.Selection.EndPos2),
+                Flag     : this.Selection.Flag
+            };
+
+            return [ ParaState ];
+        }
+        else
         {
-            Start    : this.Selection.Start,
-            Use      : this.Selection.Use,
-            StartPos : this.Internal_Get_ClearPos(this.Selection.StartPos),
-            EndPos   : this.Internal_Get_ClearPos(this.Selection.EndPos),
-            StartPos : this.Internal_Get_ClearPos(this.Selection.StartPos2),
-            EndPos   : this.Internal_Get_ClearPos(this.Selection.EndPos2),
-            Flag     : this.Selection.Flag
-        };
+            var ParaState = new Object();
+            ParaState.CurPos  =
+            {
+                X          : this.CurPos.X,
+                Y          : this.CurPos.Y,
+                Line       : this.CurPos.Line,
+                ContentPos : this.Get_ParaContentPos( false, false ),
+                RealX      : this.CurPos.RealX,
+                RealY      : this.CurPos.RealY,
+                PagesPos   : this.CurPos.PagesPos
+            };
 
-        return [ ParaState ];
+            ParaState.Selection =
+            {
+                Start    : this.Selection.Start,
+                Use      : this.Selection.Use,
+                StartPos : this.Get_ParaContentPos( true, true ),
+                EndPos   : this.Get_ParaContentPos( true, false ),
+                Flag     : this.Selection.Flag
+            };
+
+            return [ ParaState ];
+        }
     },
 
     Set_SelectionState : function(State, StateIndex)
     {
-        if ( State.length <= 0 )
-            return;
-
-        var ParaState = State[StateIndex];
-
-        this.CurPos  =
+        if ( true !== Debug_ParaRunMode )
         {
-            X          : ParaState.CurPos.X,
-            Y          : ParaState.CurPos.Y,
-            Line       : ParaState.CurPos.Line,
-            ContentPos : this.Internal_Get_RealPos(ParaState.CurPos.ContentPos),
-            RealX      : ParaState.CurPos.RealX,
-            RealY      : ParaState.CurPos.RealY,
-            PagesPos   : ParaState.CurPos.PagesPos
-        };
+            if ( State.length <= 0 )
+                return;
 
-        this.Selection.Start     = ParaState.Selection.Start;
-        this.Selection.Use       = ParaState.Selection.Use;
-        this.Selection.StartPos  = this.Internal_Get_RealPos(ParaState.Selection.StartPos);
-        this.Selection.EndPos    = this.Internal_Get_RealPos(ParaState.Selection.EndPos);
-        this.Selection.StartPos2 = this.Internal_Get_RealPos(ParaState.Selection.StartPos2);
-        this.Selection.EndPos2   = this.Internal_Get_RealPos(ParaState.Selection.EndPos2);
+            var ParaState = State[StateIndex];
 
-        var CursorPos_max = this.Internal_GetEndPos();
-        var CursorPos_min = this.Internal_GetStartPos();
+            this.CurPos  =
+            {
+                X          : ParaState.CurPos.X,
+                Y          : ParaState.CurPos.Y,
+                Line       : ParaState.CurPos.Line,
+                ContentPos : this.Internal_Get_RealPos(ParaState.CurPos.ContentPos),
+                RealX      : ParaState.CurPos.RealX,
+                RealY      : ParaState.CurPos.RealY,
+                PagesPos   : ParaState.CurPos.PagesPos
+            };
 
-        this.Set_ContentPos( Math.max( CursorPos_min, Math.min( CursorPos_max, this.CurPos.ContentPos  ) ) );
-        this.Selection.StartPos = Math.max( CursorPos_min, Math.min( CursorPos_max, this.Selection.StartPos ) );
-        this.Selection.EndPos   = Math.max( CursorPos_min, Math.min( CursorPos_max, this.Selection.EndPos   ) );
+            this.Selection.Start     = ParaState.Selection.Start;
+            this.Selection.Use       = ParaState.Selection.Use;
+            this.Selection.StartPos  = this.Internal_Get_RealPos(ParaState.Selection.StartPos);
+            this.Selection.EndPos    = this.Internal_Get_RealPos(ParaState.Selection.EndPos);
+            this.Selection.StartPos2 = this.Internal_Get_RealPos(ParaState.Selection.StartPos2);
+            this.Selection.EndPos2   = this.Internal_Get_RealPos(ParaState.Selection.EndPos2);
+
+            var CursorPos_max = this.Internal_GetEndPos();
+            var CursorPos_min = this.Internal_GetStartPos();
+
+            this.Set_ContentPos( Math.max( CursorPos_min, Math.min( CursorPos_max, this.CurPos.ContentPos  ) ) );
+            this.Selection.StartPos = Math.max( CursorPos_min, Math.min( CursorPos_max, this.Selection.StartPos ) );
+        }
+        else
+        {
+            if ( State.length <= 0 )
+                return;
+
+            var ParaState = State[StateIndex];
+
+            this.CurPos.X          = ParaState.CurPos.X;
+            this.CurPos.Y          = ParaState.CurPos.Y;
+            this.CurPos.Line       = ParaState.CurPos.Line;
+            this.CurPos.RealX      = ParaState.CurPos.RealX;
+            this.CurPos.RealY      = ParaState.CurPos.RealY;
+            this.CurPos.PagesPos   = ParaState.CurPos.PagesPos;
+
+            this.Set_ParaContentPos(ParaState.CurPos.ContentPos, true, -1, -1);
+
+            this.Selection_Remove();
+
+            this.Selection.Start = ParaState.Selection.Start;
+            this.Selection.Use   = ParaState.Selection.Use;
+            this.Selection.Flag  = ParaState.Selection.Flag;
+
+            if ( true === this.Selection.Use )
+                this.Set_SelectionContentPos( ParaState.Selection.StartPos, ParaState.Selection.EndPos )
+        }
     },
 
     Get_ParentObject_or_DocumentPos : function()

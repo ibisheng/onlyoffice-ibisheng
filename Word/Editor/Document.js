@@ -1089,7 +1089,8 @@ CDocument.prototype =
         // Увеличиваем номер пересчета
         this.RecalcId++;
 
-        if ( true === Debug_ParaRunMode )
+        // Если задан параметр _RecalcData, тогда мы не можем ориентироваться на историю
+        if ( true === Debug_ParaRunMode && undefined === _RecalcData )
         {
             // Проверяем можно ли сделать быстрый пересчет
             var SimpleChanges = History.Is_SimpleChanges();
@@ -2011,9 +2012,7 @@ CDocument.prototype =
             // Сначала удаляем заселекченую часть
             if ( true === this.Selection.Use )
             {
-                this.TurnOffRecalc = true;
                 this.Remove( 1, true );
-                this.TurnOffRecalc = false;
             }
 
             // Добавляем новый параграф

@@ -4233,6 +4233,331 @@ ParaRun.prototype =
 
         switch ( Type )
         {
+            case historyitem_ParaRun_AddItem :
+            {
+                this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
+
+                this.RecalcInfo.Measure = true;
+                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+                break;
+            }
+
+            case historyitem_ParaRun_RemoveItem :
+            {
+                var Pos = Data.Pos;
+
+                var Array_start = this.Content.slice( 0, Pos );
+                var Array_end   = this.Content.slice( Pos );
+
+                this.Content = Array_start.concat( Data.Items, Array_end );
+
+                this.RecalcInfo.Measure = true;
+                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+                break;
+            }
+
+            case historyitem_ParaRun_TextPr:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr = Data.Old;
+                else
+                    this.Pr = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Bold:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.Bold = Data.Old;
+                else
+                    this.Pr.Bold = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Italic:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.Italic = Data.Old;
+                else
+                    this.Pr.Italic = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Strikeout:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.Strikeout = Data.Old;
+                else
+                    this.Pr.Strikeout = undefined;
+
+                this.Recalc_CompiledPr(false);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Underline:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.Underline = Data.Old;
+                else
+                    this.Pr.Underline = undefined;
+
+                this.Recalc_CompiledPr(false);
+
+                break;
+            }
+
+            case historyitem_ParaRun_FontSize:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.FontSize = Data.Old;
+                else
+                    this.Pr.FontSize = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Color:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.Color = Data.Old;
+                else
+                    this.Pr.Color = undefined;
+
+                this.Recalc_CompiledPr(false);
+
+                break;
+            }
+
+            case historyitem_ParaRun_VertAlign:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.VertAlign = Data.Old;
+                else
+                    this.Pr.VertAlign = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_HighLight:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.HighLight = Data.Old;
+                else
+                    this.Pr.HighLight = undefined;
+
+                this.Recalc_CompiledPr(false);
+
+                break;
+            }
+
+            case historyitem_ParaRun_RStyle:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.RStyle = Data.Old;
+                else
+                    this.Pr.RStyle = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Spacing:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.Spacing = Data.Old;
+                else
+                    this.Pr.Spacing = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+            case historyitem_ParaRun_DStrikeout:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.DStrikeout = Data.Old;
+                else
+                    this.Pr.DStrikeout = undefined;
+
+                this.Recalc_CompiledPr(false);
+
+                break;
+            }
+            case historyitem_ParaRun_Caps:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.Caps = Data.Old;
+                else
+                    this.Pr.Caps = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+            case historyitem_ParaRun_SmallCaps:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.SmallCaps = Data.Old;
+                else
+                    this.Pr.SmallCaps = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Position:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.Position = Data.Old;
+                else
+                    this.Pr.Position = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_RFonts:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.RFonts = Data.Old;
+                else
+                    this.Pr.RFonts = new CRFonts();
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_RFonts_Ascii:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.RFonts.Ascii = Data.Old;
+                else
+                    this.Pr.RFonts.Ascii = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_RFonts_HAnsi:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.RFonts.Ascii = Data.Old;
+                else
+                    this.Pr.RFonts.Ascii = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_RFonts_CS:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.RFonts.Ascii = Data.Old;
+                else
+                    this.Pr.RFonts.Ascii = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_RFonts_EastAsia:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.RFonts.Ascii = Data.Old;
+                else
+                    this.Pr.RFonts.Ascii = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_RFonts_Hint:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.RFonts.Ascii = Data.Old;
+                else
+                    this.Pr.RFonts.Ascii = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Lang:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.Lang = Data.Old;
+                else
+                    this.Pr.Lang = new CLang();
+
+                this.Recalc_CompiledPr(false);
+                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+                break;
+            }
+
+            case historyitem_ParaRun_Lang_Bidi:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.Lang.Bidi = Data.Old;
+                else
+                    this.Pr.Lang.Bidi = undefined;
+
+                this.Recalc_CompiledPr(false);
+                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+                break;
+            }
+
+            case historyitem_ParaRun_Lang_EastAsia:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.Lang.EastAsia = Data.Old;
+                else
+                    this.Pr.Lang.EastAsia = undefined;
+
+                this.Recalc_CompiledPr(false);
+                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+                break;
+            }
+
+            case historyitem_ParaRun_Lang_Val:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.Lang.Val = Data.Old;
+                else
+                    this.Pr.Lang.Val = undefined;
+
+                this.Recalc_CompiledPr(false);
+                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+                break;
+            }
         }
     },
 
@@ -4242,6 +4567,332 @@ ParaRun.prototype =
 
         switch ( Type )
         {
+            case  historyitem_ParaRun_AddItem:
+            {
+                var Pos = Data.Pos;
+
+                var Array_start = this.Content.slice( 0, Pos );
+                var Array_end   = this.Content.slice( Pos );
+
+                this.Content = Array_start.concat( Data.Items, Array_end );
+
+                this.RecalcInfo.Measure = true;
+                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+                break;
+
+            }
+
+            case historyitem_ParaRun_RemoveItem:
+            {
+                this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
+
+                this.RecalcInfo.Measure = true;
+                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+                break;
+            }
+
+            case historyitem_ParaRun_TextPr:
+            {
+                if ( undefined != Data.New )
+                    this.Pr = Data.New;
+                else
+                    this.Pr = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Bold:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.Bold = Data.New;
+                else
+                    this.Pr.Bold = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Italic:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.Italic = Data.New;
+                else
+                    this.Pr.Italic = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Strikeout:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.Strikeout = Data.New;
+                else
+                    this.Pr.Strikeout = undefined;
+
+                this.Recalc_CompiledPr(false);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Underline:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.Underline = Data.New;
+                else
+                    this.Pr.Underline = undefined;
+
+                this.Recalc_CompiledPr(false);
+
+                break;
+            }
+
+            case historyitem_ParaRun_FontSize:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.FontSize = Data.New;
+                else
+                    this.Pr.FontSize = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Color:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.Color = Data.New;
+                else
+                    this.Pr.Color = undefined;
+
+                this.Recalc_CompiledPr(false);
+
+                break;
+            }
+
+            case historyitem_ParaRun_VertAlign:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.VertAlign = Data.New;
+                else
+                    this.Pr.VertAlign = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_HighLight:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.HighLight = Data.New;
+                else
+                    this.Pr.HighLight = undefined;
+
+                this.Recalc_CompiledPr(false);
+
+                break;
+            }
+
+            case historyitem_ParaRun_RStyle:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.RStyle = Data.New;
+                else
+                    this.Pr.RStyle = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Spacing:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.Spacing = Data.New;
+                else
+                    this.Pr.Spacing = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+            case historyitem_ParaRun_DStrikeout:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.DStrikeout = Data.New;
+                else
+                    this.Pr.DStrikeout = undefined;
+
+                this.Recalc_CompiledPr(false);
+
+                break;
+            }
+            case historyitem_ParaRun_Caps:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.Caps = Data.New;
+                else
+                    this.Pr.Caps = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+            case historyitem_ParaRun_SmallCaps:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.SmallCaps = Data.New;
+                else
+                    this.Pr.SmallCaps = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Position:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.Position = Data.New;
+                else
+                    this.Pr.Position = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_RFonts:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.RFonts = Data.New;
+                else
+                    this.Pr.RFonts = new CRFonts();
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_RFonts_Ascii:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.RFonts.Ascii = Data.New;
+                else
+                    this.Pr.RFonts.Ascii = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_RFonts_HAnsi:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.RFonts.Ascii = Data.New;
+                else
+                    this.Pr.RFonts.Ascii = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_RFonts_CS:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.RFonts.Ascii = Data.New;
+                else
+                    this.Pr.RFonts.Ascii = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_RFonts_EastAsia:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.RFonts.Ascii = Data.New;
+                else
+                    this.Pr.RFonts.Ascii = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_RFonts_Hint:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.RFonts.Ascii = Data.New;
+                else
+                    this.Pr.RFonts.Ascii = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Lang:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.Lang = Data.New;
+                else
+                    this.Pr.Lang = new CLang();
+
+                this.Recalc_CompiledPr(false);
+                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+                break;
+            }
+
+            case historyitem_ParaRun_Lang_Bidi:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.Lang.Bidi = Data.New;
+                else
+                    this.Pr.Lang.Bidi = undefined;
+
+                this.Recalc_CompiledPr(false);
+                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+                break;
+            }
+
+            case historyitem_ParaRun_Lang_EastAsia:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.Lang.EastAsia = Data.New;
+                else
+                    this.Pr.Lang.EastAsia = undefined;
+
+                this.Recalc_CompiledPr(false);
+                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+                break;
+            }
+
+            case historyitem_ParaRun_Lang_Val:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.Lang.Val = Data.New;
+                else
+                    this.Pr.Lang.Val = undefined;
+
+                this.Recalc_CompiledPr(false);
+                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+                break;
+            }
         }
     },
 

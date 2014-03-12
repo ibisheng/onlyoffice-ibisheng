@@ -1558,6 +1558,29 @@ ParaHyperlink.prototype =
         var Type = Data.Type;
         switch(Type)
         {
+            case historyitem_Hyperlink_AddItem :
+            {
+                this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
+
+                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+                break;
+            }
+
+            case historyitem_Hyperlink_RemoveItem :
+            {
+                var Pos = Data.Pos;
+
+                var Array_start = this.Content.slice( 0, Pos );
+                var Array_end   = this.Content.slice( Pos );
+
+                this.Content = Array_start.concat( Data.Items, Array_end );
+
+                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+                break;
+            }
+
             case historyitem_Hyperlink_Value :
             {
                 this.Value = Data.Old;
@@ -1577,6 +1600,29 @@ ParaHyperlink.prototype =
         var Type = Data.Type;
         switch(Type)
         {
+            case historyitem_Hyperlink_AddItem :
+            {
+                var Pos = Data.Pos;
+
+                var Array_start = this.Content.slice( 0, Pos );
+                var Array_end   = this.Content.slice( Pos );
+
+                this.Content = Array_start.concat( Data.Items, Array_end );
+
+                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+                break;
+            }
+
+            case historyitem_Hyperlink_RemoveItem :
+            {
+                this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
+
+                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+                break;
+            }
+
             case historyitem_Hyperlink_Value :
             {
                 this.Value = Data.New;

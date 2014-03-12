@@ -159,6 +159,11 @@ CHistory.prototype =
         if ( this.Index < 0 )
             return;
 
+        // Заглушка на случай, если у нас во время создания одной точки в истории, после нескольких изменений идет
+        // пересчет, потом снова добавляются изменения и снова запускается пересчет и т.д.
+        if ( this.RecIndex >= this.Index )
+            this.RecIndex = this.Index - 1;
+
         var Binary_Pos = this.BinaryWriter.GetCurPosition();
 
         Class.Save_Changes( Data, this.BinaryWriter );
@@ -359,8 +364,6 @@ CHistory.prototype =
     {
         if ( this.Index >= 0 )
         {
-            var LastPoint = this.RecIndex;
-
             this.Internal_RecalcData_Clear();
 
             for ( var Pos = this.RecIndex + 1; Pos <= this.Index; Pos++ )
