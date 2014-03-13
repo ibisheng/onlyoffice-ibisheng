@@ -2263,7 +2263,9 @@ function CBinaryFileWriter()
         }
         tPr.lvl = paragraph.PresentationPr.Level;
         tPr.pPr = paragraph.Pr;
-        tPr.rPr = null;
+        //tPr.rPr = null;
+        if (tPr.rPr == null)
+            tPr.rPr = new CTextPr();
 
         oThis.WriteRecord1(0, tPr, oThis.WriteTextParagraphPr);
         oThis.WriteRecord2(1, paragraph.TextPr.Value, oThis.WriteRunProperties);
