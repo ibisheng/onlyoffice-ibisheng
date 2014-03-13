@@ -2263,7 +2263,7 @@ function CBinaryFileWriter()
         }
         tPr.lvl = paragraph.PresentationPr.Level;
         tPr.pPr = paragraph.Pr;
-        //tPr.rPr = null;
+		tPr.rPr = null; // TODO: !!!
         if (tPr.rPr == null)
             tPr.rPr = new CTextPr();
 
