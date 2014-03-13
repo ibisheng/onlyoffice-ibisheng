@@ -14,7 +14,9 @@ function(window, undefined)
 		TT_USER_COUNT: 0,          // by user count
         TT_ACTIVE_CONNECTION: 1,   // by active connections
         TT_TIME_USAGE: 2,          // by time of editing
-        TT_DOCUMENT_SESSION: 3     // by document editing session count
+        TT_DOCUMENT_SESSION: 3,     // by document editing session count
+        TT_NONE: 4,					// no tracking
+		TT_USER_COUNT_2: 5			// by user count, without active/inactive detection
     };
 	
 	function CTrackFile(obj)
@@ -40,12 +42,28 @@ function(window, undefined)
 				this.trackingUrl = obj["trackingUrl"];
 		}
 		
-		if(c_TrackingType.TT_ACTIVE_CONNECTION == this.trackingType)
-			this.isPeriodicalyTracking = true;
-			
-		if(c_TrackingType.TT_DOCUMENT_SESSION == this.trackingType)
-			this.isAliveTrackingOnly = true;
+		switch (this.trackingType)
+		{
+			case c_TrackingType.TT_ACTIVE_CONNECTION:
+				this.isPeriodicalyTracking = true;
+				this.isAliveTrackingOnly = false;
+				break;
 		
+			case c_TrackingType.TT_DOCUMENT_SESSION:
+			case c_TrackingType.TT_USER_COUNT_2:			
+				this.isPeriodicalyTracking = false;
+				this.isAliveTrackingOnly = true;
+				break;
+
+			case c_TrackingType.TT_NONE:
+				this.isTrackDone = true;
+				this.isPeriodicalyTracking = false;
+				break;
+
+			default:
+				break;
+		}
+
 		this.sendTrackFunc = null;
 		this.isDocumentModifiedFunc = null;
 		this.trackingInterval = 300 * 1000;
