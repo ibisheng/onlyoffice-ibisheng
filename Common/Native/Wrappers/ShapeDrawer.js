@@ -386,6 +386,7 @@ CShapeDrawer.prototype =
             }
             case FILL_TYPE_GRAD:
             {
+                this.Graphics["PD_put_BrushBounds"](this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y));
                 var points = null;
                 if (_fill.lin)
                 {
