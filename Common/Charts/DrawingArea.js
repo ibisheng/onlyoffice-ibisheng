@@ -681,7 +681,6 @@ function DrawingArea(ws) {
 			// Restore
 			_this.frozenPlaces[i].restore(shapeOverlayCtx);
 		}
-		_this.worksheet._drawFrozenPaneLines(_this.worksheet.drawingGraphicCtx);
 	}
 	
 	_this.getOffsets = function(x, y) {

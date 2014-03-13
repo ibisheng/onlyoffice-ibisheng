@@ -386,7 +386,6 @@
 			this.highlightedCol = -1;
 			this.highlightedRow = -1;
 			this.topLeftFrozenCell = null;	// Верхняя ячейка для закрепления диапазона
-			this.frozenAnchorWidth = 1;		// Ширина элемента управления закреплёнными областями
 			this.visibleRange = asc_Range(0, 0, 0, 0);
 			this.activeRange = new asc_ActiveRange(0, 0, 0, 0);
 			this.isChanged = false;
@@ -1869,7 +1868,6 @@
 			this._drawCellsBorders(/*drawingCtx*/undefined);
 			this._drawFrozenPane();
 			this._drawFrozenPaneLines();
-			this._drawFrozenAnchor();
 			this._fixSelectionOfMergedCells();
 			this._fixSelectionOfHiddenCells();
 			this._drawAutoF();
@@ -2169,7 +2167,7 @@
 			}
 		};
 
-		WorksheetView.prototype._cleanColumnHeaders = function (colStart, colEnd) {
+		WorksheetView.prototype._cleanColumnHeaders = function (colStart, colEnd) {	
 			var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
 			var i, cFrozen = 0;
 			if (this.topLeftFrozenCell) {
@@ -2989,62 +2987,60 @@
 
 		/** Рисует закрепление областей */
 		WorksheetView.prototype._drawFrozenPaneLines = function (canvas) {
-			if (this.topLeftFrozenCell) {
-				var ctx = canvas ? canvas : this.drawingCtx;
-				var row = this.topLeftFrozenCell.getRow0();
-				var col = this.topLeftFrozenCell.getCol0();
-				ctx.setLineWidth(1).setStrokeStyle(/*this.settings.frozenColor*/this.settings.activeCellBorderColor).beginPath();
-				if (0 < row) {
-					ctx.lineHor(0, this.rows[row].top - this.height_1px, ctx.getWidth());
-				}
-				if (0 < col) {
-					ctx.lineVer(this.cols[col].left - this.width_1px, 0, ctx.getHeight());
-				}
-				ctx.stroke();
-			}
-		};
-		
-		WorksheetView.prototype._drawFrozenAnchor = function() {
-			if (false === this.model.sheetViews[0].asc_getShowRowColHeaders())
-				return;
 			
-			// Ширина элемента управления закреплёнными областями
-			var _this = this;
-			var anchorWidth = _this.frozenAnchorWidth * asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
-			var frozenCell = this.topLeftFrozenCell ? this.topLeftFrozenCell : new CellAddress(0, 0, 0);
-			
-			function drawAnchor(x, y, w, h) {
-			
+				var _this = this;
 				var callback = function(result) {
 					var color = _this.settings.activeCellBorderColor;
 					if ( !result )
 						color = c_oAscCoAuthoringOtherBorderColor;
 						
-					_this.drawingCtx.beginPath()
-									.rect(_x, _y, w, h)
-									.setFillStyle(color)
-									.fill();
+					function drawAnchor(x, y, w, h, bVertical) {
+						_this.drawingCtx.beginPath().setStrokeStyle(color);
+						if ( bVertical )
+							_this.drawingCtx.dashLineCleverVer(x, y, y + h);
+						else
+							_this.drawingCtx.dashLineCleverHor(x, y, x + w);
+						_this.drawingCtx.stroke();
+					}
+					
+					// Anchor
+					if ( _this.model.sheetViews[0].asc_getShowRowColHeaders() ) {
+						var frozenCell = _this.topLeftFrozenCell ? _this.topLeftFrozenCell : new CellAddress(0, 0, 0);
+						
+						// vertical
+						var _x = _this.getCellLeft(frozenCell.getCol0(), 1) - 0.5;
+						var _y = _this.headersTop;
+						var w = 0;
+						var h = _this.headersHeight;
+						drawAnchor(_x, _y, w, h, true);
+						
+						// horizontal
+						_x = _this.headersLeft;
+						_y = _this.getCellTop(frozenCell.getRow0(), 1) - 0.5;
+						w = _this.headersWidth - 0.5;
+						h = 0;
+						drawAnchor(_x, _y, w, h, false);
+					}
+				
+					// Lines
+					if (_this.topLeftFrozenCell) {
+						var ctx = canvas ? canvas : _this.drawingCtx;
+						var row = _this.topLeftFrozenCell.getRow0();
+						var col = _this.topLeftFrozenCell.getCol0();
+						ctx.setLineWidth(1).setStrokeStyle(color).beginPath();
+						if (0 < row) {
+							ctx.dashLineCleverHor(0, _this.rows[row].top - _this.height_1px, ctx.getWidth());
+						}
+						if (0 < col) {
+							ctx.dashLineCleverVer(_this.cols[col].left - _this.width_1px, 0, ctx.getHeight());
+						}
+						ctx.stroke();
+					}
 				}
-			
 				_this.objectRender.objectLocker.reset();
 				_this.objectRender.objectLocker.bLock = false;
 				_this.objectRender.objectLocker.addObjectId(_this.getFrozenCellId());
 				_this.objectRender.objectLocker.checkObjects(callback);
-			}
-
-			// vertical
-			var _x = this.getCellLeft(frozenCell.getCol0(), 1) - anchorWidth/2 - 0.5;
-			var _y = _this.headersTop;
-			var w = anchorWidth;
-			var h = _this.headersHeight;
-			drawAnchor(_x, _y, w, h);
-			
-			// horizontal
-			_x = _this.headersLeft;
-			_y = this.getCellTop(frozenCell.getRow0(), 1) - anchorWidth/2 - 0.5;
-			w = _this.headersWidth;
-			h = anchorWidth;
-			drawAnchor(_x, _y, w, h);
 		};
 		
 		WorksheetView.prototype._isFrozenAnchor = function(x, y) {
@@ -3054,7 +3050,6 @@
 				return result;
 				
 			var _this = this;
-			var anchorWidth = _this.frozenAnchorWidth * asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
 			var frozenCell = this.topLeftFrozenCell ? this.topLeftFrozenCell : new CellAddress(0, 0, 0);
 			
 			x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
@@ -3069,9 +3064,9 @@
 			}
 			
 			// vertical
-			var _x = this.getCellLeft(frozenCell.getCol0(), 1) - anchorWidth/2 - 0.5;
+			var _x = this.getCellLeft(frozenCell.getCol0(), 1) - 0.5;
 			var _y = _this.headersTop;
-			var w = anchorWidth;
+			var w = 0;
 			var h = _this.headersHeight;
 			if ( isPointInAnchor(x, y, _x, _y, w, h) ) {
 				result.result = true;
@@ -3080,9 +3075,9 @@
 			
 			// horizontal
 			_x = _this.headersLeft;
-			_y = this.getCellTop(frozenCell.getRow0(), 1) - anchorWidth/2 - 0.5;
-			w = _this.headersWidth;
-			h = anchorWidth;
+			_y = this.getCellTop(frozenCell.getRow0(), 1) - 0.5;
+			w = _this.headersWidth - 0.5;
+			h = 0;
 			if ( isPointInAnchor(x, y, _x, _y, w, h) ) {
 				result.result = true;
 				result.name = "frozenAnchorH";
@@ -3111,7 +3106,7 @@
 						col = _col.col;
 						if ( bMove ) {
 							ctx.setLineWidth(1).setStrokeStyle(_this.settings.activeCellBorderColor).beginPath();
-							ctx.lineVer(_this.cols[col].left - _this.width_1px, 0, ctx.getHeight());
+							ctx.dashLineCleverVer(_this.cols[col].left - _this.width_1px, 0, ctx.getHeight());
 							ctx.stroke();
 						}
 						else {
@@ -3128,7 +3123,7 @@
 						row = _row.row;
 						if ( bMove ) {
 							ctx.setLineWidth(1).setStrokeStyle(_this.settings.activeCellBorderColor).beginPath();
-							ctx.lineHor(0, _this.rows[row].top - _this.height_1px, ctx.getWidth());
+							ctx.dashLineCleverHor(0, _this.rows[row].top - _this.height_1px, ctx.getWidth());
 							ctx.stroke();
 						}
 						else {

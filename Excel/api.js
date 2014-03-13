@@ -1470,6 +1470,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					"applyChanges":						function () {t._onApplyChanges.apply(t, arguments);},
 					"updateAfterApplyChanges":			function () {t._onUpdateAfterApplyChanges.apply(t, arguments);},
 					"drawSelection":					function () {t._onDrawSelection.apply(t, arguments);},
+					"drawFrozenPaneLines":				function () {t._onDrawFrozenPaneLines.apply(t, arguments);},
 					"updateAllSheetsLock":				function () {t._onUpdateAllSheetsLock.apply(t, arguments);},
 					"showDrawingObjects":				function () {t._onShowDrawingObjects.apply(t, arguments);},
 					"resetLockedGraphicObjects":		function () {t._onResetLockedGraphicObjects.apply(t, arguments);},
@@ -1519,6 +1520,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 							var ws = t.wb.getWorksheet();
 							ws.cleanSelection();
 							ws._drawSelection();
+							ws._drawFrozenPaneLines();
 						}
 					}
 				};
@@ -1700,6 +1702,13 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			_onDrawSelection: function () {
 				if (this.wb)
 					this.wb.getWorksheet()._drawSelection();
+			},
+			
+			_onDrawFrozenPaneLines: function () {
+				if (this.wb) {
+					var ws = this.wb.getWorksheet();
+					ws._drawFrozenPaneLines();
+				}
 			},
 
 			_onUpdateAllSheetsLock: function () {

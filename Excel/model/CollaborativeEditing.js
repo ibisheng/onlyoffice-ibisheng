@@ -262,6 +262,7 @@
 					// Перерисовываем
 					if (bCheckRedraw) {
 						this.handlers.trigger("drawSelection");
+						this.handlers.trigger("drawFrozenPaneLines");
 						this.handlers.trigger("updateAllSheetsLock");
 						this.handlers.trigger("unlockComments");
 						this.handlers.trigger("showComments");
