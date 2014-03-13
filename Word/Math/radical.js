@@ -24,7 +24,7 @@ var RADICAL_H5 = 0;*/
 
 //var GAP_TOP = 0.01822;
 var GAP_TOP = 0.094492;
-var SIGN_GAP = 0.15338;
+var SIGN_GAP = 0.077108;
 
 /*var RADICAL_H0 =  0;
 var RADICAL_H1 = 0.1589;
@@ -49,8 +49,8 @@ function CSignRadical()
     this.pos = null;
 
     this.size = null;
-    this.gapTop = 0;
-    this.gapSign = 0;
+    this.gapArg = 0;
+    this.gapSign = 0;   /// расстояние до значка радикала
 
     this.measure =
     {
@@ -162,12 +162,14 @@ CSignRadical.prototype.draw = function(x, y, pGraphics)
     //var txtPrp = this.Parent.getTxtPrp();
     var penW = txtPrp.FontSize*g_dKoef_pt_to_mm*0.042;
 
-    y += this.gapTop + penW/2; // смещаем, для отрисовки верхней линии радикала
+    y += penW/2 + this.gapSign; // смещаем, для отрисовки верхней линии радикала
 
+
+    //// Tick for degree ////
     var x1 = this.pos.x + x,
         x2 = x1 + 0.048*txtPrp.FontSize;
 
-    var Height = this.size.height - this.gapTop;
+    var Height = this.size.height - this.gapSign;
 
     var y2 = this.pos.y + y + Height - this.measure.heightTick,
         y1 = y2 + 0.0242*txtPrp.FontSize;
@@ -178,35 +180,44 @@ CSignRadical.prototype.draw = function(x, y, pGraphics)
 
     var x3 = x2,
         y3 = y2 - tY;
+    //////////////////////
 
-    //var plH = 9.877777777777776 * txtPrp.FontSize /36;
+    //// Tick lower ////
 
     var sin = 0.876,
         cos = 0.474;
 
     var y4 = this.pos.y + y + Height - penW;
-    var y5 = y4 + penW/2*cos;
+    var y7 = y4 + penW/2*cos;
 
-    // 0.048*txtPrp.FontSize + (- penW + this.measure.heightTick  + 0.92*penW / tg )/ tg
 
-    var x4, x5;
+    var x4, x7;
 
     if( !this.measure.bHigh )
     {
         x4 = x3 + (y4-y3)/tg;
-        x5 = x4 + penW/2*sin;
+        x7 = x4 + penW/2*sin;
     }
     else
     {
         x4 = x1 + this.measure.widthSlash - penW/3*sin;
-        x5 = x1 + this.measure.widthSlash;
+        x7 = x1 + this.measure.widthSlash;
     }
 
-    var x6 = x1 + this.measure.widthSlash,
-        x7 = this.pos.x + x + this.size.width;
+    var x5 = x4 - penW*0.6*sin, y5 = y4 - penW/5,
+        x6 = x7 + penW/3*sin,   y6 = y5;
 
-    var y6 = this.pos.y + y,
-        y7 = this.pos.y + y;
+    /////////////////////
+
+    /// Line for argument
+
+    var x8 = x1 + this.measure.widthSlash,
+        x9 = this.pos.x + x + this.size.width;
+
+    var y8 = this.pos.y + y,
+        y9 = this.pos.y + y;
+
+    /////////////////////
 
 
     pGraphics.p_width(penW*0.8*1000);
@@ -228,24 +239,19 @@ CSignRadical.prototype.draw = function(x, y, pGraphics)
 
     pGraphics.p_width(penW*1000);
 
-
-    pGraphics.p_color(0,0,0, 255);
-    pGraphics.b_color1(0,0,0, 255);
-
-    pGraphics.p_width(penW*1000);
     pGraphics._s();
     pGraphics._m(x5, y5);
     pGraphics._l(x6, y6);
-    pGraphics._l(x7, y7);
     pGraphics.ds();
 
-    pGraphics.p_color(0,0,0, 255);
-    pGraphics.b_color1(0,0,0, 255);
 
+    pGraphics.p_width(penW*1000);
     pGraphics._s();
-    pGraphics._m(x4 - penW*0.6*sin, y4 - penW/5);
-    pGraphics._l(x5 + penW/3*sin, y4 - penW/5);
+    pGraphics._m(x7, y7);
+    pGraphics._l(x8, y8);
+    pGraphics._l(x9, y9);
     pGraphics.ds();
+
 
 }
 CSignRadical.prototype.recalculateSize = function()
@@ -256,16 +262,14 @@ CSignRadical.prototype.recalculateSize = function()
     var height, width;
     var plH = 9.877777777777776 * txtPrp.FontSize/36;
 
-    var gapSign = txtPrp.FontSize*g_dKoef_pt_to_mm*0.077108, /// SIGN_GAP
-        heightArg = sizeArg.height + gapSign,
+    this.gapArg = txtPrp.FontSize*g_dKoef_pt_to_mm*0.077108; /// расстояние до аргумента
+    this.gapSign = txtPrp.FontSize*g_dKoef_pt_to_mm*0.094492; /// расстояние до значка радикала
+
+    var heightArg = sizeArg.height + this.gapArg,
         widthArg  = sizeArg.width;
 
 
-    this.gapTop = txtPrp.FontSize*g_dKoef_pt_to_mm*0.094492; /// GAP_TOP
-    this.gapSign = gapSign;
-
-
-    /////  height  //////
+    //////////  Height  ///////////
 
     /*var H0 = plH*1.2,
      H1 = plH*1.50732421875,
@@ -274,31 +278,35 @@ CSignRadical.prototype.recalculateSize = function()
      H4 = plH*5.52197265625,
      H5 = plH*7.029296875;*/
 
-
-    /*var RADICAL_H0 = 1.2;
-    var RADICAL_H1 = 1.50732421875;
-    var RADICAL_H2 = 2.8;
-    var RADICAL_H3 = 4.08;
-    var RADICAL_H4 = 5.7;
-    var RADICAL_H5 = 7.15;*/
-
-    //var RADICAL_H1 = 1.50732421875;
-
-    var H0 = plH*1.037,
-        H1 = plH*1.50732421875,
+    var H0 = plH*1.07,
+    //H1 = plH*1.50732421875,
+        H1 = plH*1.6234788833214036,
         H2 = plH*2.8,
         H3 = plH*4.08,
         H4 = plH*5.7,
         H5 = plH*7.15;
 
 
+    /*console.log("heightArg :" + heightArg);
+     console.log("plH :" + plH);
+     console.log("ShiftCenter: " + shCenter);
+
+     var k1 = heightArg/plH,
+     k2 = heightArg/shCenter;
+
+     console.log("heightArg/plH :" + k1);
+     console.log("heightArg/shCenter :" + k2);*/
+
     this.measure.bHigh = false;
 
-    if( heightArg < H0 )
-        height = H0*1.082;
-        //height = H0*1.058;
-    else if( heightArg < H1 )
-        height = H1;
+    var bDescentArg = sizeArg.height - sizeArg.ascent > 0.4*txtPrp.FontSize/11; // т.к. у нас почему-то для строчных букв "а" и тп descent не нулевой, см метрики в mathText.js
+
+    if(heightArg < H0 && !bDescentArg)
+        height = H0*1.12;
+    //height = H0*1.058;
+    else if( heightArg < H1)
+        height = H1*0.9284532335069441;
+    //height = H1;
     else if( heightArg < H2 )
         height = H2;
     else if( heightArg < H3 )
@@ -313,10 +321,11 @@ CSignRadical.prototype.recalculateSize = function()
         this.measure.bHigh = true;
     }
 
-    //////
+    ////////////////////////////////////
 
 
-    ///// Size of tick //////
+    //////////  Size of tick  //////////
+
     var minHgtRad = plH * 1.130493164,
         maxHgtRad = plH * 7.029296875;
 
@@ -360,11 +369,12 @@ CSignRadical.prototype.recalculateSize = function()
     this.measure.heightTick = heightTick;
     this.measure.widthTick = 0.1196002747872799*txtPrp.FontSize;
 
-    ////// width, height //////
-    width = widthSlash + gapLeft + widthArg;
-    height += this.gapTop;
-    //////
+    //////////////////////////////
 
+    //////////   WidthБ Height  //////////
+    width = widthSlash + gapLeft + widthArg;
+    height += this.gapSign;
+    //////////////////////////////
 
     this.size = {height: height, width: width};
 }
@@ -878,6 +888,9 @@ function CRadical()
     this.type = SQUARE_RADICAL; // default
     this.degHide = false;
     this.signRadical = null;
+
+    this.gapDegree = 0;
+
     CMathBase.call(this);
 }
 extend(CRadical, CMathBase);
@@ -912,7 +925,8 @@ CRadical.prototype.init = function(props)
         this.setDimension(1, 2);
         var oBase = new CMathContent();
         var oDegree = new CMathContent();
-        oDegree.decreaseArgSize();
+        //oDegree.decreaseArgSize();
+        oDegree.setArgSize(-2);
 
         this.addMCToContent(oDegree, oBase);
     }
@@ -923,21 +937,23 @@ CRadical.prototype.recalculateSize = function(oMeasure)
 
     var txtPrp = this.getCtrPrp();
     var sign = this.signRadical.size,
-        gTop = this.signRadical.gapTop,
-        gSign = this.signRadical.gapSign > 3*g_dKoef_pt_to_mm ? this.signRadical.gapSign : 3*g_dKoef_pt_to_mm ;// делаем смещение, т.к. для fontSize 11, 14 и меньше высота плейсхолдера не совпадает
-                                                                                                               // с высотой отрисовки плейсхолдера и происходит
-                                                                                                               // наложение черты значка радикала и плейсхолдера
-    var gapTop = gTop + gSign;
+        gSign = this.signRadical.gapSign,
+    // в случае смещения бейзлайн контента тоже смещается, и по высоте артгумент может выйти чуть за пределы (т.о. значок интеграла будет расположен чуть выше, чем следовало бы, и размер аргумента выйде за аграницы)
+        gArg = this.signRadical.gapArg > 2*g_dKoef_pt_to_mm ? this.signRadical.gapArg : 2*g_dKoef_pt_to_mm; // делаем смещение, т.к. для fontSize 11, 14 и меньше высота плейсхолдера не совпадает
+                                                                                                        // с высотой отрисовки плейсхолдера и происходит наложение черты значка радикала и плейсхолдера
 
+
+    var gapBase = gSign + gArg;
 
     if(this.type == SQUARE_RADICAL)
     {
         var base = this.elements[0][0].size;
         var shTop = (sign.height - gSign - base.height)/2;
+        shTop = shTop > 0 ? shTop : 0;
 
         var height = sign.height,
             width  = sign.width,
-            ascent = gapTop + shTop + base.ascent;
+            ascent = gapBase + shTop + base.ascent;
             //ascent = height - (base.height - base.ascent);
 
         this.size = {width: width, height: height, ascent: ascent};
@@ -955,14 +971,18 @@ CRadical.prototype.recalculateSize = function(oMeasure)
         //var width = degr.width - wTick + sign.width;
 
         var plH = 9.877777777777776 * txtPrp.FontSize /36;
+        var gapDegree;
+        var shTop = 0.011*txtPrp.FontSize;
 
-        if( sign.height < plH )
-            this.gap = 1.3*txtPrp.FontSize/36;
+        if( base.height < plH )
+            gapDegree = 1.5*txtPrp.FontSize/36;
         else
-            this.gap = 3.5*txtPrp.FontSize/36;
+            gapDegree = 3*txtPrp.FontSize/36;
 
-        var h1 = degr.height + this.gap + hTick,
+
+        var h1 = degr.height + gapDegree + hTick + shTop,
             h2 = sign.height;
+
 
         var height, ascent;
         var shTop = (sign.height - gSign - base.height)/2;
@@ -970,13 +990,15 @@ CRadical.prototype.recalculateSize = function(oMeasure)
         if(h1 > h2)
         {
             height =  h1;
-            ascent = height - sign.height + gapTop + shTop + base.ascent;
+            ascent = height - sign.height + gapBase + shTop + base.ascent;
         }
         else
         {
             height =  h2;
-            ascent = gapTop + shTop + base.ascent;
+            ascent = gapBase + shTop + base.ascent;
         }
+
+        this.gapDegree = height - gapDegree - hTick - degr.height;
 
         this.size = {width: width, height: height, ascent: ascent};
     }
@@ -988,11 +1010,11 @@ CRadical.prototype.setPosition = function(pos)
     if(this.type == SQUARE_RADICAL)
     {
 
-        this.gapLeft = this.size.width - this.elements[0][0].size.width;
-        this.gapTop = this.size.ascent - this.elements[0][0].size.ascent;
+        var gapLeft = this.size.width - this.elements[0][0].size.width;
+        var gapTop = this.size.ascent - this.elements[0][0].size.ascent;
 
-        var x = this.pos.x + this.gapLeft,
-            y = this.pos.y + this.gapTop;
+        var x = this.pos.x + gapLeft,
+            y = this.pos.y + gapTop;
 
         this.signRadical.setPosition(this.pos);
         this.elements[0][0].setPosition({x: x, y: y });
@@ -1003,14 +1025,15 @@ CRadical.prototype.setPosition = function(pos)
             base = this.elements[0][1].size,
             sign = this.signRadical.size;
 
-        var wTick = this.signRadical.measure.widthTick,
-            hTick = this.signRadical.measure.heightTick;
+        var wTick = this.signRadical.measure.widthTick;
+
+        /*var hTick = this.signRadical.measure.heightTick;
 
         var hDg = degr.height + this.gap + hTick;
-        this.topDegr = this.size.height - hDg;
+        this.topDegr = this.size.height - hDg;*/
 
         var x1 = this.pos.x,
-            y1 = this.pos.y + this.topDegr;
+            y1 = this.pos.y + this.gapDegree;
 
         this.elements[0][0].setPosition({x: x1, y: y1});
 
@@ -1036,31 +1059,34 @@ CRadical.prototype.findDisposition = function(mCoord)
         var X, Y;
         var inside_flag = -1;
 
-        if(mCoord.x < this.gapLeft)
+        var gapLeft = this.size.width - this.elements[0][0].size.width;
+        var gapTop = this.size.ascent - this.elements[0][0].size.ascent;
+
+        if(mCoord.x < gapLeft)
         {
             X = 0;
             inside_flag = 0;
         }
-        else if(mCoord.x > this.gapLeft + sizeBase.width)
+        else if(mCoord.x > gapLeft + sizeBase.width)
         {
             X = sizeBase.width;
             inside_flag = 1;
         }
         else
-            X = mCoord.x - this.gapLeft;
+            X = mCoord.x - gapLeft;
 
-        if(mCoord.y < this.gapTop)
+        if(mCoord.y < gapTop)
         {
             Y = 0;
             inside_flag = 2;
         }
-        else if(mCoord.y > this.gapTop + sizeBase.height)
+        else if(mCoord.y > gapTop + sizeBase.height)
         {
             Y = sizeBase.height;
             inside_flag = 2;
         }
         else
-            Y = mCoord.y - this.gapTop;
+            Y = mCoord.y - gapTop;
 
         disposition = {pos: {x:0, y:0}, mCoord: {x: X, y: Y}, inside_flag: inside_flag};
     }
@@ -1090,19 +1116,19 @@ CRadical.prototype.findDisposition = function(mCoord)
 
             mouseCoord.x = mCoord.x;
 
-            if(mCoord.y < this.topDegr)
+            if(mCoord.y < this.gapDegree)
             {
                 mouseCoord.y = 0;
                 inside_flag = 2;
             }
-            else if(mCoord.y > degr.height + this.topDegr)
+            else if(mCoord.y > degr.height + this.gapDegree)
             {
                 mouseCoord.y = degr.height;
                 inside_flag = 2;
             }
             else
             {
-                mouseCoord.y = mCoord.y - this.topDegr;
+                mouseCoord.y = mCoord.y - this.gapDegree;
             }
         }
         else
@@ -1133,15 +1159,14 @@ CRadical.prototype.findDisposition = function(mCoord)
 }
 CRadical.prototype.draw = function(x, y, pGraphics)
 {
-
     //////  test   //////
 
-    var xx = x + this.pos.x,
+    /*var xx = x + this.pos.x,
         yy = y + this.pos.y,
         w = this.size.width,
         h = this.size.height;
 
-    /*pGraphics.p_width(1000);
+    pGraphics.p_width(1000);
     pGraphics.b_color1(0,0,250, 255);
 
     pGraphics._s();

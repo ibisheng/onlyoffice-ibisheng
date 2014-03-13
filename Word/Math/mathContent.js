@@ -7363,17 +7363,17 @@ CMathComposition.prototype =
     GetShiftCenter: function(oMeasure, font)
     {
         oMeasure.SetFont(font);
-        var metrics = oMeasure.Measure2Code(8727); // "+"
+        var metrics = oMeasure.Measure2Code(0x2217); // "+"
 
         return 0.6*metrics.Height;
     },
-    GetGapSign: function(oMeasure, font)
+    /*GetGapSign: function(oMeasure, font)
     {
         oMeasure.SetFont(font);
         var metrics = oMeasure.Measure2Code(0x2217); // "+"
 
         return metrics.Height;
-    },
+    },*/
     CheckTarget: function()
     {
         var bSelect = this.SelectContent.selectUse(),
@@ -7906,11 +7906,8 @@ CMathComposition.prototype =
     Draw: function(x, y, pGraphics)
     {
 
-
-
-
         //// test
-        this.RecalculateComposition(g_oTextMeasurer);
+        //this.RecalculateComposition(g_oTextMeasurer);
         ////
 
         this.absPos = {x: x, y: y - this.Root.size.ascent};

@@ -99,14 +99,15 @@ CMathText.prototype =
 
         if(this.type == TXT_ROMAN )
         {
-            if(code == 0x0068) // h
-                code = 0x210E;
+
 
             var bDigit = (code > 0x002F && code < 0x003A),
                 bCapGreek = (code > 0x0390 && code < 0x03AA ),
                 bSmallGreek = (code > 0x03B0 && code < 0x03CA);
 
-            if(bCapitale)
+            if(code == 0x0068) // h
+                code = 0x210E;
+            else if(bCapitale)
                 code  = code + 0x1D3F3;
             else if(bSmall)
                 code  = code + 0x1D3ED;
