@@ -5481,7 +5481,16 @@
 				
 			var frozenCursor = this._isFrozenAnchor(x, y);
 			if (frozenCursor.result) {
-				return {cursor: frozenCursor.cursor, target: frozenCursor.name, col: -1, row: -1};
+				lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId, this.getFrozenCellId());
+				isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, false);
+				if (false !== isLocked) {
+					// Кто-то сделал lock
+					var frozenCell = this.topLeftFrozenCell ? this.topLeftFrozenCell : new CellAddress(0, 0, 0);
+					userId = isLocked.UserId;
+					lockRangePosLeft = this.getCellLeft(frozenCell.getCol0(), 0);
+					lockRangePosTop = this.getCellTop(frozenCell.getRow0(), 0);
+				}
+				return {cursor: frozenCursor.cursor, target: frozenCursor.name, col: -1, row: -1, userId: userId, lockRangePosLeft: lockRangePosLeft, lockRangePosTop: lockRangePosTop};
 			}
 
 			var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
