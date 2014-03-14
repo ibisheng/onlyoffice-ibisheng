@@ -1590,6 +1590,54 @@
 					this.handlers.trigger("applyCloseEvent", event);
 			},
 
+			_getAutoString: function(str) {
+				var _this = this;
+				var api = asc["editor"];
+				if ( api.wb ) {
+					var ws = api.wb.getWorksheet();
+					if ( ws ) {
+						var editedCol = ws.getSelectedColumnIndex();
+						var editedRow = ws.getSelectedRowIndex();
+						
+						var isNumber = function(n) {
+							return !isNaN(parseFloat(n)) && isFinite(n);
+						}
+						
+						var findAutoString = function (col, row) {
+							var oString = null;
+							var cellText = _this.input.value + str;
+							if ( !isNumber(cellText) ) {
+								var cellAddress = new CellAddress(row, col, 0);
+								var topCellText = ws.model.getCell(cellAddress).getValueWithFormat();
+								var start = topCellText.indexOf(cellText);
+								if ( topCellText && (start == 0) ) {
+									oString = {};
+									oString.text = topCellText.substring(_this.input.value.length, topCellText.length);
+									oString.selectionBegin = _this.input.value.length + 1;
+									oString.selectionEnd = topCellText.length;
+								}
+							}
+							return oString;
+						}
+						
+						var oAutoStringTop = null;
+						var oAutoStringBottom = null;
+						
+						// Check top cell
+						if ( editedRow - 1 >= 0 )
+							oAutoStringTop = findAutoString(editedCol, editedRow - 1);
+						// Check bottom cell
+						if ( ws.rows[editedRow + 1] && (editedRow + 1 >= 0) )
+							oAutoStringBottom = findAutoString(editedCol, editedRow + 1);
+						
+						if ( oAutoStringTop && !oAutoStringBottom )
+							return oAutoStringTop;
+						if ( !oAutoStringTop && oAutoStringBottom )
+							return oAutoStringBottom;
+					}
+				}
+				return null;
+			},
 
 			// Event handlers
 
@@ -1850,7 +1898,16 @@
 
 				//t.setFocus(true);
 				t.isUpdateValue = false;
-				t._addChars(String.fromCharCode(event.which));
+				var oAutoString = t._getAutoString(String.fromCharCode(event.which));
+				if ( oAutoString ) {
+					t._addChars(oAutoString.text);
+					t.selectionBegin = oAutoString.selectionBegin;
+					t.selectionEnd = oAutoString.selectionEnd;
+					t._drawSelection();
+				}
+				else
+					t._addChars(String.fromCharCode(event.which));
+					
 				return t.isTopLineActive ? true : false; // prevent event bubbling
 			},
 
