@@ -2699,43 +2699,71 @@ CChartsDrawer.prototype =
 		chartProp.chart.plotArea.valAx && chartProp.chart.plotArea.valAx.scaling ? chartProp.chart.plotArea.valAx.scaling.max : null;
 		//максимальное и минимальное значение(по документации excel)
 		var trueMinMax = this._getTrueMinMax(isOx, yMin, yMax);
-		axisMin = chartProp.chart.plotArea.valAx && chartProp.chart.plotArea.valAx.scaling && chartProp.chart.plotArea.valAx.scaling.min !== null ? chartProp.chart.plotArea.valAx.scaling.min : trueMinMax.min;
-		axisMax = chartProp.chart.plotArea.valAx && chartProp.chart.plotArea.valAx.scaling && chartProp.chart.plotArea.valAx.scaling.max !== null ? chartProp.chart.plotArea.valAx.scaling.max : trueMinMax.max;
 		
-		if(this.calcProp.subType == 'stackedPer' && axisMax > 100)
-			axisMax = 100;
+		var manualMin = chartProp.chart.plotArea.valAx && chartProp.chart.plotArea.valAx.scaling && chartProp.chart.plotArea.valAx.scaling.min !== null ? chartProp.chart.plotArea.valAx.scaling.min : null;
+		var manualMax = chartProp.chart.plotArea.valAx && chartProp.chart.plotArea.valAx.scaling && chartProp.chart.plotArea.valAx.scaling.max !== null ? chartProp.chart.plotArea.valAx.scaling.max : null;
+		axisMin =  manualMin ? manualMin : trueMinMax.min;
+		axisMax =  manualMax ? manualMax : trueMinMax.max;
+		
+		var percentChartMax = 100;
+		if(this.calcProp.subType == 'stackedPer' && axisMax > percentChartMax)
+			axisMax = percentChartMax;
+		if(this.calcProp.subType == 'stackedPer' && axisMin < - percentChartMax)
+			axisMin = - percentChartMax;
 		
 		//приводим к первому порядку
 		firstDegree = this._getFirstDegree((Math.abs(axisMax - axisMin)) / 10);
 		
 		//находим шаг
-		step = this._getStep(firstDegree.val);
+		if(isOx || 'HBar' == this.calcProp.type)
+			step = this._getStep(firstDegree.val + 1.5);
+		else
+			step = this._getStep(firstDegree.val);
+			
 		step = step * firstDegree.numPow;
 		
+		//минимальное значение оси
 		var minUnit = 0;
-		if(axisMin < 0)
+		if(manualMin != null)
+			minUnit = manualMin;
+		else
 		{
-			while(minUnit > axisMin)
+			if(axisMin < 0)
 			{
-				minUnit -= step;
+				while(minUnit > axisMin)
+				{
+					minUnit -= step;
+				}
+			}
+			else if(axisMin > 0)
+			{
+				while(minUnit < axisMin && minUnit > (axisMin - step))
+				{
+					minUnit += step;
+				}	
 			}
 		}
-		else if(axisMin > 0)
-		{
-			while(minUnit < axisMin && minUnit > (axisMin - step))
-			{
-				minUnit += step;
-			}	
-		}
 		
-		arrayValues = [];
+		//массив подписей
+		arrayValues = this._getArrayAxisValues(minUnit, axisMin, axisMax, step, manualMin, manualMax);
+		
+		return arrayValues;
+	},
+	
+	_getArrayAxisValues: function(minUnit, axisMin, axisMax, step, manualMin, manualMax)
+	{
+		var arrayValues = [];
 		for(var i = 0; i < 20; i++)
 		{
 			if(this.calcProp.subType == 'stackedPer' && (minUnit + step * i) > 100)
 				break;
 			
 			arrayValues[i] = minUnit + step * i;
-			if(arrayValues[i] > axisMax)
+			if(axisMax == 0 && axisMin < 0 && arrayValues[i] == axisMax)
+			{
+				break;
+			}
+			else if((manualMax != null && arrayValues[i] >= axisMax) || (manualMax == null && arrayValues[i] > axisMax))
 			{
 				if(this.calcProp.subType == 'stackedPer')
 					arrayValues[i] = arrayValues[i] / 100;
@@ -2747,7 +2775,7 @@ CChartsDrawer.prototype =
 		}
 		if(!arrayValues.length)
 			arrayValues = [0.2, 0.4, 0.6, 0.8, 1, 1.2];
-		
+			
 		return arrayValues;
 	},
 	
@@ -2768,10 +2796,7 @@ CChartsDrawer.prototype =
 		var axisMax, axisMin, diffPerMaxMin;
 		if(yMin >= 0 && yMax >= 0)
 		{
-			if(isOx)
-				axisMax = yMax;
-			else
-				axisMax = yMax + 0.05 * ( yMax - yMin );
+			axisMax = yMax + 0.05 * ( yMax - yMin );
 			
 			diffPerMaxMin = ((yMax - yMin) / yMax)*100;
 			if(16.667 > diffPerMaxMin)
@@ -2785,16 +2810,16 @@ CChartsDrawer.prototype =
 		}
 		else if(yMin <= 0 && yMax <= 0)
 		{
-			diffPerMaxMin = ((yMax - yMin) / yMax) * 100;
-			axisMax =  yMax + 0.05 * (yMax - yMin);
+			diffPerMaxMin = ((yMin - yMax) / yMin) * 100;
+			axisMin =  yMin + 0.05 * (yMin - yMax);
 			
-			if(16.667 > diffPerMaxMin)
+			if(16.667 < diffPerMaxMin)
 			{
-				axisMin = yMin - ((yMax - yMin) / 2);
+				axisMax = 0;
 			}
 			else
 			{
-				axisMin = 0;
+				axisMax = yMax - ((yMin - yMax) / 2)
 			}
 		}
 		else if(yMax > 0 && yMin < 0)
@@ -3059,6 +3084,52 @@ CChartsDrawer.prototype =
 		result = {framePaths: framePaths, path: path};
 		
 		return result;
+	},
+	
+	getYPosition: function(val, yPoints, isOx)
+	{
+		//позиция в заисимости от положения точек на оси OY
+		var result;
+		var resPos;
+		var resVal;
+		var diffVal;
+		if(val < yPoints[0].val)
+		{
+			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
+			resVal = yPoints[1].val - yPoints[0].val;
+			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
+			result = yPoints[0].pos + Math.abs((diffVal / resVal) * resPos);
+		}
+		else if(val > yPoints[yPoints.length - 1].val)
+		{	
+			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
+			resVal = yPoints[1].val - yPoints[0].val;
+			diffVal = Math.abs(yPoints[0].val - val);
+			if(isOx)
+				result = yPoints[0].pos + (diffVal / resVal) * resPos;
+			else
+				result = yPoints[0].pos - (diffVal / resVal) * resPos;
+		}
+		else
+		{
+			for(var s = 0; s < yPoints.length; s++)
+			{
+				if(val >= yPoints[s].val && val <= yPoints[s + 1].val)
+				{
+					resPos = Math.abs(yPoints[s + 1].pos - yPoints[s].pos);
+					resVal = yPoints[s + 1].val - yPoints[s].val;
+					
+					if(!isOx)
+						result =  - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+					else	
+						result = (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+					
+					break;
+				}
+			}
+		}
+		
+		return result;
 	}
 }
 
@@ -3098,6 +3169,8 @@ drawBarChart.prototype =
 	
 	_DrawBars: function()
 	{
+		this.cShapeDrawer.Graphics.SaveGrState();
+		this.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, this.chartProp.chartGutter._top / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
 		var brush, pen, seria, numCache;
 		for (var i = 0; i < this.paths.series.length; i++) {
 			seria = this.chartProp.series[i];
@@ -3114,6 +3187,7 @@ drawBarChart.prototype =
 				this._drawPaths(this.paths.series[i][j], brush, pen);
 			}
 		}
+		this.cShapeDrawer.Graphics.RestoreGrState();
 	},
 	
 	_reCalculateBars: function (/*isSkip*/)
@@ -3165,8 +3239,8 @@ drawBarChart.prototype =
 				else
 					startX = startXPosition * this.chartProp.pxToMM + hmargin + (i * individualBarWidth - i * widthOverLap);
 				
-				if(height != 0)
-				{
+				//if(height != 0)
+				//{
 					paths = this._calculateRect(startX, startY, individualBarWidth, height);
 					
 					if(!this.paths.series)
@@ -3174,7 +3248,7 @@ drawBarChart.prototype =
 					if(!this.paths.series[i])
 						this.paths.series[i] = [];
 					this.paths.series[i][j] = paths;
-				}
+				//}
 			}
         }
     },
@@ -3193,7 +3267,7 @@ drawBarChart.prototype =
 					diffYVal += seriesHeight[k][j];
 			}
 			startY = nullPositionOX - diffYVal;
-			height = nullPositionOX - this._getYPosition(val, yPoints) * this.chartProp.pxToMM;
+			height = nullPositionOX - this.cChartDrawer.getYPosition(val, yPoints) * this.chartProp.pxToMM;
 		}
 		else if(this.chartProp.subType == "stackedPer")
 		{
@@ -3218,12 +3292,12 @@ drawBarChart.prototype =
 				this.summBarVal[j] = temp;
 			}
 			
-			height = nullPositionOX - this._getYPosition((val / this.summBarVal[j]), yPoints) * this.chartProp.pxToMM;
+			height = nullPositionOX - this.cChartDrawer.getYPosition((val / this.summBarVal[j]), yPoints) * this.chartProp.pxToMM;
 			startY = nullPositionOX - diffYVal;
 		}
 		else
 		{
-			height = nullPositionOX - this._getYPosition(val, yPoints) * this.chartProp.pxToMM;
+			height = nullPositionOX - this.cChartDrawer.getYPosition(val, yPoints) * this.chartProp.pxToMM;
 			startY = nullPositionOX;
 		}	
 		
@@ -3236,22 +3310,45 @@ drawBarChart.prototype =
 		var result;
 		var resPos;
 		var resVal;
-		for(var s = 0; s < yPoints.length; s++)
+		var diffVal;
+		if(val < yPoints[0].val)
 		{
-			if(val >= yPoints[s].val && val <= yPoints[s + 1].val)
+			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
+			resVal = yPoints[1].val - yPoints[0].val;
+			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
+			result = yPoints[0].pos + Math.abs((diffVal / resVal) * resPos);
+		}
+		else if(val > yPoints[yPoints.length - 1].val)
+		{	
+			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
+			resVal = yPoints[1].val - yPoints[0].val;
+			diffVal = Math.abs(yPoints[0].val - val);
+			result = yPoints[0].pos - (diffVal / resVal) * resPos;
+		}
+		else
+		{
+			for(var s = 0; s < yPoints.length; s++)
 			{
-				resPos = Math.abs(yPoints[s + 1].pos - yPoints[s].pos);
-				resVal = yPoints[s + 1].val - yPoints[s].val;
-				result =  - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
-				break;
+				if(val >= yPoints[s].val && val <= yPoints[s + 1].val)
+				{
+					resPos = Math.abs(yPoints[s + 1].pos - yPoints[s].pos);
+					resVal = yPoints[s + 1].val - yPoints[s].val;
+					result =  - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+					break;
+				}
 			}
 		}
+		
 		return result;
 	},
+	
 	
 	_calculateDLbl: function(chartSpace, ser, val)
 	{
 		var point = this.chartProp.series[ser].val.numRef ? this.chartProp.series[ser].val.numRef.numCache.pts[val] : this.chartProp.series[ser].val.numLit.pts[val];
+		if(!this.paths.series[ser][val])
+			return;
+		
 		var path = this.paths.series[ser][val].ArrPathCommand;
 			
 		var x = path[0].X;
@@ -3402,7 +3499,7 @@ drawLineChart.prototype =
 				var n = 0;
 				//рассчитываем значения				
 				val = this._getYVal(n, i);
-				y  = this._getYPosition(val, yPoints);
+				y  = this.cChartDrawer.getYPosition(val, yPoints);
 				x  = xPoints[n].pos;
 				if(!this.paths.points)
 					this.paths.points = [];
@@ -3420,8 +3517,8 @@ drawLineChart.prototype =
 					
 					//точки находятся внутри диапазона
 
-					y  = this._getYPosition(val, yPoints);
-					y1 = this._getYPosition(nextVal, yPoints);
+					y  = this.cChartDrawer.getYPosition(val, yPoints);
+					y1 = this.cChartDrawer.getYPosition(nextVal, yPoints);
 					
 					x  = xPoints[n].pos; 
 					x1 = xPoints[n + 1].pos;
@@ -3462,7 +3559,7 @@ drawLineChart.prototype =
 			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
 			resVal = yPoints[1].val - yPoints[0].val;
 			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
-			result = yPoints[0].pos - (diffVal / resVal) * resPos;
+			result = yPoints[0].pos + Math.abs((diffVal / resVal) * resPos);
 		}
 		else if(val > yPoints[yPoints.length - 1].val)
 		{	
@@ -3729,15 +3826,15 @@ drawAreaChart.prototype =
 				nextVal = this._getYVal(n + 1, i);
 				
 				//точки находятся внутри диапазона
-				if(val >= yPoints[0].val && val <= yPoints[yPoints.length - 1].val && nextVal >= yPoints[0].val && nextVal <= yPoints[yPoints.length - 1].val)
-				{
-					y  = this._getYPosition(val, yPoints);
-					y1 = this._getYPosition(nextVal, yPoints);
+				//if(val >= yPoints[0].val && val <= yPoints[yPoints.length - 1].val && nextVal >= yPoints[0].val && nextVal <= yPoints[yPoints.length - 1].val)
+				//{
+					y  = this.cChartDrawer.getYPosition(val, yPoints);
+					y1 = this.cChartDrawer.getYPosition(nextVal, yPoints);
 					
 					x  = xPoints[n].pos; 
 					x1 = xPoints[n + 1].pos;
-				}
-				//первая точка выходит за пределы диапазона || вторая точка выходит за пределы диапазона
+				//}
+				/*//первая точка выходит за пределы диапазона || вторая точка выходит за пределы диапазона
 				else if(( nextVal >= yPoints[0].val && nextVal <= yPoints[yPoints.length - 1].val ) || ( val >= yPoints[0].val && val <= yPoints[yPoints.length - 1].val ))
 				{
 					y  = this._getYPosition(val, yPoints);
@@ -3762,7 +3859,7 @@ drawAreaChart.prototype =
 						x1 = (yk * (x - x1) + x1 * y + x1 * y1) / (y - y1);
 						y1 = yk;
 					}
-				}
+				}*/
 				
 				
 				if(!this.paths.series)
@@ -3787,14 +3884,14 @@ drawAreaChart.prototype =
 			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
 			resVal = yPoints[1].val - yPoints[0].val;
 			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
-			result = yPoints[0].pos - (diffVal / resVal) * resPos;
+			result = yPoints[0].pos - Math.abs((diffVal / resVal) * resPos);
 		}
 		else if(val > yPoints[yPoints.length - 1].val)
 		{	
 			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
 			resVal = yPoints[1].val - yPoints[0].val;
-			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
-			result = yPoints[0].pos + (diffVal / resVal) * resPos;
+			diffVal = Math.abs(yPoints[0].val - val);
+			result = yPoints[0].pos - (diffVal / resVal) * resPos;
 		}
 		else
 		{
@@ -3891,6 +3988,9 @@ drawAreaChart.prototype =
 		var FillUniColor;
 		var pen;
 		var seria, dataSeries;
+		
+		this.cShapeDrawer.Graphics.SaveGrState();
+		this.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, this.chartProp.chartGutter._top / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 			
 			//в случае накопительных дигарамм, рисуем в обратном порядке
@@ -3913,6 +4013,7 @@ drawAreaChart.prototype =
 				this._drawPath(this.paths.series[i][n], brush, pen);
 			}
         }
+		this.cShapeDrawer.Graphics.RestoreGrState();
     },
 	
 	_getYVal: function(n, i)
@@ -4102,7 +4203,7 @@ drawHBarChart.prototype =
 					diffYVal += seriesHeight[k][j];
 			}
 			startY = nullPositionOX + diffYVal;
-			width = this._getYPosition(val, xPoints, true) * this.chartProp.pxToMM - nullPositionOX;
+			width = this.cChartDrawer.getYPosition(val, xPoints, true) * this.chartProp.pxToMM - nullPositionOX;
 		}
 		else if(this.chartProp.subType == "stackedPer")
 		{
@@ -4127,12 +4228,12 @@ drawHBarChart.prototype =
 				this.summBarVal[j] = temp;
 			}
 			
-			width = this._getYPosition((val / this.summBarVal[j]), xPoints, true) * this.chartProp.pxToMM - nullPositionOX;
+			width = this.cChartDrawer.getYPosition((val / this.summBarVal[j]), xPoints, true) * this.chartProp.pxToMM - nullPositionOX;
 			startY = nullPositionOX + diffYVal;
 		}
 		else
 		{
-			width = this._getYPosition(val, xPoints, true) * this.chartProp.pxToMM - nullPositionOX;
+			width = this.cChartDrawer.getYPosition(val, xPoints, true) * this.chartProp.pxToMM - nullPositionOX;
 			startY = nullPositionOX;
 		}	
 		
@@ -4151,13 +4252,13 @@ drawHBarChart.prototype =
 			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
 			resVal = yPoints[1].val - yPoints[0].val;
 			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
-			result = yPoints[0].pos - (diffVal / resVal) * resPos;
+			result = yPoints[0].pos - Math.abs((diffVal / resVal) * resPos);
 		}
 		else if(val > yPoints[yPoints.length - 1].val)
 		{	
 			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
 			resVal = yPoints[1].val - yPoints[0].val;
-			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
+			diffVal = Math.abs(yPoints[0].val - val);
 			result = yPoints[0].pos + (diffVal / resVal) * resPos;
 		}
 		else
@@ -4187,6 +4288,9 @@ drawHBarChart.prototype =
 		var lineWidth;
 		var dataSeries;
 		var seria;
+		
+		this.cShapeDrawer.Graphics.SaveGrState();
+		this.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, this.chartProp.chartGutter._top / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 			seria = this.chartProp.series[i];
 			brush = seria.brush;
@@ -4202,6 +4306,7 @@ drawHBarChart.prototype =
 				this._drawPath(this.paths.series[i][j], brush, pen);
 			}
 		}
+		this.cShapeDrawer.Graphics.RestoreGrState();
     },
 	
 	_calculateDLbl: function(chartSpace, ser, val)
@@ -4834,7 +4939,7 @@ drawRadarChart.prototype =
 			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
 			resVal = yPoints[1].val - yPoints[0].val;
 			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
-			result = yPoints[0].pos - (diffVal / resVal) * resPos;
+			result = yPoints[0].pos - Math.abs((diffVal / resVal) * resPos);
 		}
 		else if(val > yPoints[yPoints.length - 1].val)
 		{	
@@ -5133,16 +5238,16 @@ drawScatterChart.prototype =
 				
 				if(k == points.length - 1)
 				{
-					y = this._getYPosition(points[k].y, yPoints);
-					x = this._getYPosition(points[k].x, xPoints, true);
+					y = this.cChartDrawer.getYPosition(points[k].y, yPoints);
+					x = this.cChartDrawer.getYPosition(points[k].x, xPoints, true);
 				}
 				else
 				{
-					y  = this._getYPosition(points[k].y, yPoints);
-					y1 = this._getYPosition(points[k + 1].y, yPoints);
+					y  = this.cChartDrawer.getYPosition(points[k].y, yPoints);
+					y1 = this.cChartDrawer.getYPosition(points[k + 1].y, yPoints);
 					
-					x  = this._getYPosition(points[k].x, xPoints, true);
-					x1 = this._getYPosition(points[k + 1].x, xPoints, true);
+					x  = this.cChartDrawer.getYPosition(points[k].x, xPoints, true);
+					x1 = this.cChartDrawer.getYPosition(points[k + 1].x, xPoints, true);
 					
 					if(!this.paths.series)
 						this.paths.series = [];
@@ -5222,7 +5327,7 @@ drawScatterChart.prototype =
 			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
 			resVal = yPoints[1].val - yPoints[0].val;
 			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
-			result = yPoints[0].pos - (diffVal / resVal) * resPos;
+			result = yPoints[0].pos - Math.abs((diffVal / resVal) * resPos);
 		}
 		else if(val > yPoints[yPoints.length - 1].val)
 		{	
@@ -5440,11 +5545,11 @@ drawStockChart.prototype =
 			if(!this.paths.values[i])
 				this.paths.values[i] = {};
 			
-			xVal = this._getYPosition(i, xPoints, true);
-			yVal1 = this._getYPosition(val1, yPoints);
-			yVal2 = this._getYPosition(val2, yPoints);
-			yVal3 = this._getYPosition(val3, yPoints);
-			yVal4 = this._getYPosition(val4, yPoints);
+			xVal = this.cChartDrawer.getYPosition(i, xPoints, true);
+			yVal1 = this.cChartDrawer.getYPosition(val1, yPoints);
+			yVal2 = this.cChartDrawer.getYPosition(val2, yPoints);
+			yVal3 = this.cChartDrawer.getYPosition(val3, yPoints);
+			yVal4 = this.cChartDrawer.getYPosition(val4, yPoints);
 			
 			this.paths.values[i].lowLines = this._calculateLine(xVal, yVal2, xVal, yVal1);
 			this.paths.values[i].highLines = this._calculateLine(xVal, yVal4, xVal, yVal3);
@@ -5468,7 +5573,7 @@ drawStockChart.prototype =
 			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
 			resVal = yPoints[1].val - yPoints[0].val;
 			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
-			result = yPoints[0].pos - (diffVal / resVal) * resPos;
+			result = yPoints[0].pos - Math.abs((diffVal / resVal) * resPos);
 		}
 		else if(val > yPoints[yPoints.length - 1].val)
 		{	
@@ -5737,8 +5842,8 @@ drawBubbleChart.prototype =
 			
 			for(var k = 0; k < points.length; k++)
 			{
-				y = this._getYPosition(points[k].y, yPoints);
-				x = this._getYPosition(points[k].x, xPoints, true);
+				y = this.cChartDrawer.getYPosition(points[k].y, yPoints);
+				x = this.cChartDrawer.getYPosition(points[k].x, xPoints, true);
 			
 				
 				if(!this.paths.points)
@@ -5788,7 +5893,7 @@ drawBubbleChart.prototype =
 			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
 			resVal = yPoints[1].val - yPoints[0].val;
 			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
-			result = yPoints[0].pos - (diffVal / resVal) * resPos;
+			result = yPoints[0].pos - Math.abs((diffVal / resVal) * resPos);
 		}
 		else if(val > yPoints[yPoints.length - 1].val)
 		{	
@@ -7450,7 +7555,7 @@ drawBar3DChart.prototype =
 			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
 			resVal = yPoints[1].val - yPoints[0].val;
 			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
-			result = yPoints[0].pos - (diffVal / resVal) * resPos;
+			result = yPoints[0].pos - Math.abs((diffVal / resVal) * resPos);
 		}
 		else if(val > yPoints[yPoints.length - 1].val)
 		{	
