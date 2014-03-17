@@ -3098,7 +3098,10 @@ CChartsDrawer.prototype =
 			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
 			resVal = yPoints[1].val - yPoints[0].val;
 			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
-			result = yPoints[0].pos + Math.abs((diffVal / resVal) * resPos);
+			if(isOx)
+				result = yPoints[0].pos - Math.abs((diffVal / resVal) * resPos);
+			else
+				result = yPoints[0].pos + Math.abs((diffVal / resVal) * resPos);
 		}
 		else if(val > yPoints[yPoints.length - 1].val)
 		{	
