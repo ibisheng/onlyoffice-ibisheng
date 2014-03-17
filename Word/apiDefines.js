@@ -396,3 +396,5 @@ var c_oAscDropCap =
     Drop   : 1,
     Margin : 2
 };
+
+window["flat_desine"] = true;

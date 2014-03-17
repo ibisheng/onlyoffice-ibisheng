@@ -5732,6 +5732,12 @@ function CStylesPainter()
     this.STYLE_THUMBNAIL_WIDTH  = 80;
     this.STYLE_THUMBNAIL_HEIGHT = 40;
 
+    if (window["flat_desine"] === true)
+    {
+        this.STYLE_THUMBNAIL_WIDTH  = 109;
+        this.STYLE_THUMBNAIL_HEIGHT = 45;
+    }
+
     this.CurrentTranslate = null;
     this.IsRetinaEnabled = false;
 
@@ -5883,8 +5889,11 @@ function CStylesPainter()
         _canvas.height = _count * this.STYLE_THUMBNAIL_HEIGHT;
         var ctx = _canvas.getContext('2d');
 
-        ctx.fillStyle = "#FFFFFF";
-        ctx.fillRect(0, 0, _canvas.width, _canvas.height);
+        if (window["flat_desine"] !== true)
+        {
+            ctx.fillStyle = "#FFFFFF";
+            ctx.fillRect(0, 0, _canvas.width, _canvas.height);
+        }
 
         var graphics = new CGraphics();
         if (!this.IsRetinaEnabled)
@@ -5905,7 +5914,10 @@ function CStylesPainter()
 				var res = formalStyle.match(/^heading([1-9][0-9]*)$/);
 				var index = (res) ? res[1] - 1 : -1;
 
-				this.drawStyle(graphics, __Styles.Get_Pr(i, styletype_Paragraph), cur_index);
+                var _dr_style = __Styles.Get_Pr(i, styletype_Paragraph);
+                _dr_style.Name = style.Name;
+
+				this.drawStyle(graphics, _dr_style, cur_index);
 				this.docStyles[cur_index] = new CStyleImage(style.Name, cur_index, c_oAscStyleImage.Document, style.uiPriority);
 
 				// алгоритм смены имени
@@ -5968,45 +5980,68 @@ function CStylesPainter()
         if (this.IsRetinaEnabled)
             dKoefToMM /= 2;
 
-        var y = index * dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
-        var b = (index + 1) * dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
-        var w = dKoefToMM * this.STYLE_THUMBNAIL_WIDTH;
+        if (window["flat_desine"] !== true)
+        {
+            var y = index * dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
+            var b = (index + 1) * dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
+            var w = dKoefToMM * this.STYLE_THUMBNAIL_WIDTH;
 
-        graphics.transform(1,0,0,1,0,0);
-        graphics.save();
-        graphics._s();
-        graphics._m(-0.5, y);
-        graphics._l(w, y);
-        graphics._l(w, b);
-        graphics._l(0, b);
-        graphics._z();
-        graphics.clip();
+            graphics.transform(1,0,0,1,0,0);
+            graphics.save();
+            graphics._s();
+            graphics._m(-0.5, y);
+            graphics._l(w, y);
+            graphics._l(w, b);
+            graphics._l(0, b);
+            graphics._z();
+            graphics.clip();
 
-        graphics.t(this.CurrentTranslate.StylesText, 0.5, (y + b) / 2);
+            graphics.t(this.CurrentTranslate.StylesText, 0.5, (y + b) / 2);
 
-        var ctx = graphics.m_oContext;
-        ctx.setTransform(1,0,0,1,0,0);
-        ctx.fillStyle = "#E8E8E8";
+            var ctx = graphics.m_oContext;
+            ctx.setTransform(1,0,0,1,0,0);
+            ctx.fillStyle = "#E8E8E8";
 
-        var _b = (index + 1) * this.STYLE_THUMBNAIL_HEIGHT - 1.5;
-        var _x = 2;
-        var _w = this.STYLE_THUMBNAIL_WIDTH - 4;
-        var _h = (this.STYLE_THUMBNAIL_HEIGHT / 3) >> 0;
-        ctx.beginPath();
-        ctx.moveTo(_x, _b - _h);
-        ctx.lineTo(_x + _w, _b - _h);
-        ctx.lineTo(_x + _w, _b);
-        ctx.lineTo(_x, _b);
-        ctx.closePath();
-        ctx.fill();
+            var _b = (index + 1) * this.STYLE_THUMBNAIL_HEIGHT - 1.5;
+            var _x = 2;
+            var _w = this.STYLE_THUMBNAIL_WIDTH - 4;
+            var _h = (this.STYLE_THUMBNAIL_HEIGHT / 3) >> 0;
+            ctx.beginPath();
+            ctx.moveTo(_x, _b - _h);
+            ctx.lineTo(_x + _w, _b - _h);
+            ctx.lineTo(_x + _w, _b);
+            ctx.lineTo(_x, _b);
+            ctx.closePath();
+            ctx.fill();
 
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = "#D8D8D8";
-        ctx.beginPath();
-        ctx.rect(0.5, index * this.STYLE_THUMBNAIL_HEIGHT + 0.5, this.STYLE_THUMBNAIL_WIDTH - 1, this.STYLE_THUMBNAIL_HEIGHT - 1);
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = "#D8D8D8";
+            ctx.beginPath();
+            ctx.rect(0.5, index * this.STYLE_THUMBNAIL_HEIGHT + 0.5, this.STYLE_THUMBNAIL_WIDTH - 1, this.STYLE_THUMBNAIL_HEIGHT - 1);
 
-        ctx.stroke();
+            ctx.stroke();
 
-        graphics.restore();
+            graphics.restore();
+        }
+        else
+        {
+            var y = index * dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
+            var b = (index + 1) * dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
+            var w = dKoefToMM * this.STYLE_THUMBNAIL_WIDTH;
+
+            graphics.transform(1,0,0,1,0,0);
+            graphics.save();
+            graphics._s();
+            graphics._m(0, y);
+            graphics._l(w, y);
+            graphics._l(w, b);
+            graphics._l(0, b);
+            graphics._z();
+            graphics.clip();
+
+            graphics.t(style.Name, 0.5, y + 0.75 * (b - y));
+
+            graphics.restore();
+        }
     }
 }

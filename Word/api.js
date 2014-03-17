@@ -1087,6 +1087,11 @@ asc_docs_api.prototype.DecreaseReaderFontSize = function()
 
 asc_docs_api.prototype.CreateCSS = function()
 {
+    if (window["flat_desine"] === true)
+    {
+        global_style_color = "#CBCBCB";
+    }
+
     var _head = document.getElementsByTagName('head')[0];
 
     var style0 = document.createElement('style');
@@ -1097,7 +1102,7 @@ asc_docs_api.prototype.CreateCSS = function()
     var style1 = document.createElement('style');
     style1.type = 'text/css';
     style1.innerHTML = ".buttonTabs {\
-background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAA5CAYAAADUZxCcAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAUVJREFUWEftlr9OhEAQhwex4i0srXwWXsCERhsTKwoaCLWViY2WvgC8ipXlvQOE/wHMbGa5nHe77J57ykW+ZLLshPyyswlfsNI0HcEQF7QawWjYNObH54Y1juHm+oqtO2EPd7esqcPL2/sUttw7O9OwMAwhiiLazSMNK4qClSrSsLIsWakye7Kqqmg3zyWtB2maBmzbBs/zwHGcqeI4pjd2kZ6sbVvo+x6GYZhqHMWSWe7ndBprmMDomGdwZ6tplfm7MDRvEAS020crrOs6qOuadvtohWGQzLxaYWhdmXmlpsU7QkGicXnQ0WPiHWEQjsaDsCdiNa0+RsdcbtjptO0/3rOmDk/Pr6u2f4BSmO/7rOb4/ZPNSZGjFJbnOWRZRjsxQm27rktPW7BnWRb7r02ShLpbhCfjzv9eXOGHWO7n9C+0DfAFUOr1fzFrfLcAAAAASUVORK5CYII=);\
+background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAA5CAYAAADUZxCcAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwwAADsMBx2+oZAAAABp0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjUuMTAw9HKhAAABP0lEQVRYR+2Wu6qFMBBFz5fZKCgoVr4q8YE2+hOnOuX9FX/M1jaXCRyJZOOdDOJtLBaGnWRhJjj4WpblMmAoBYZS9sH786OkQNm6rs48MrzhDLZsmiY1z7OVm7BlTdOotm2t3IQtK4pClWVp5SZsWRzHKk1TKzdhy4IgUGEYamFVVarrOquGbJnneVqYJIk+MtWQLsVcw5ZxuEcmxZJdAQylwFDKPkC14AJl6Lb+4pHhDWeIZfSRj+N4yMQyEtV1fcjEMhJlWXbIxLI8z3X3NTO2jGo0DIN+IxJRk/R9/7CGLfvWiI5GIuq61H3NNWwZh3tkUizZFcBQCgylwFDKPkCF5QJl27Y588jwhjOcZdSKCDT3vzL6/ez7Hs45y6jLEmiOJaMfY0QURfrpJKP2fIaTjMs9MimW7ApgKGN5/QLYSxIfSlbxIQAAAABJRU5ErkJggg==);\
 background-position: 0px 0px;\
 background-repeat: no-repeat;\
 }";
@@ -1137,7 +1142,7 @@ asc_docs_api.prototype.CreateComponents = function()
 
 	var element = document.getElementById(this.HtmlElementName);
 	if (element != null)
-		element.innerHTML = "<div id=\"id_main\" class=\"block_elem\" style=\"-moz-user-select:none;-khtml-user-select:none;user-select:none;background-color:#B0B0B0;overflow:hidden;\" UNSELECTABLE=\"on\">\
+		element.innerHTML = "<div id=\"id_main\" class=\"block_elem\" style=\"-moz-user-select:none;-khtml-user-select:none;user-select:none;background-color:" + global_style_color + ";overflow:hidden;\" UNSELECTABLE=\"on\">\
 								<div id=\"id_panel_left\" class=\"block_elem\">\
 									<div id=\"id_buttonTabs\" class=\"block_elem buttonTabs\"></div>\
 									<canvas id=\"id_vert_ruler\" class=\"block_elem\"></canvas>\
@@ -1146,12 +1151,12 @@ asc_docs_api.prototype.CreateComponents = function()
 									<canvas id=\"id_hor_ruler\" class=\"block_elem\"></canvas>\
 									</div>\
                                     <div id=\"id_main_view\" class=\"block_elem\" style=\"overflow:hidden\">\
-                                        <canvas id=\"id_viewer\" class=\"block_elem\" style=\"background-color:#B0B0B0;z-index:1\"></canvas>\
+                                        <canvas id=\"id_viewer\" class=\"block_elem\" style=\"background-color:" + global_style_color + ";z-index:1\"></canvas>\
 									    <canvas id=\"id_viewer_overlay\" class=\"block_elem\" style=\"z-index:2\"></canvas>\
 									    <canvas id=\"id_target_cursor\" class=\"block_elem\" width=\"1\" height=\"1\" style=\"width:2px;height:13px;display:none;z-index:3;\"></canvas>\
                                     </div>\
 								</div>\
-									<div id=\"id_panel_right\" class=\"block_elem\" style=\"margin-right:1px;background-color:#B0B0B0;\">\
+									<div id=\"id_panel_right\" class=\"block_elem\" style=\"margin-right:1px;background-color:" + global_style_color + ";\">\
 									<div id=\"id_buttonRulers\" class=\"block_elem buttonRuler\"></div>\
 									<div id=\"id_vertical_scroll\" style=\"left:0;top:0;width:16px;overflow:hidden;position:absolute;\">\
 									<div id=\"panel_right_scroll\" class=\"block_elem\" style=\"left:0;top:0;width:16px;height:6000px;\"></div>\
@@ -1159,7 +1164,7 @@ asc_docs_api.prototype.CreateComponents = function()
 									<div id=\"id_buttonPrevPage\" class=\"block_elem buttonPrevPage\"></div>\
 									<div id=\"id_buttonNextPage\" class=\"block_elem buttonNextPage\"></div>\
 								</div>\
-									<div id=\"id_horscrollpanel\" class=\"block_elem\" style=\"margin-bottom:1px;background-color:#B0B0B0;\">\
+									<div id=\"id_horscrollpanel\" class=\"block_elem\" style=\"margin-bottom:1px;background-color:" + global_style_color + ";\">\
 									<div id=\"id_horizontal_scroll\" style=\"left:0;top:0;height:16px;overflow:hidden;position:absolute;width:100%;\">\
 										<div id=\"panel_hor_scroll\" class=\"block_elem\" style=\"left:0;top:0;width:6000px;height:16px;\"></div>\
 									</div>\
@@ -9700,7 +9705,7 @@ window["asc_docs_api"].prototype["asc_nativeCheckPdfRenderer"] = function(_memor
 	_printer.Memory				    = _memory1;
 	_printer.VectorMemoryForPrint	= _memory2;
 	return _printer;
-},
+}
 
 window["asc_docs_api"].prototype["asc_nativeCalculate"] = function()
 {

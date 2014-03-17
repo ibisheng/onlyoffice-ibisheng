@@ -416,7 +416,7 @@ function CHorRuler()
         else
             context.setTransform(2, 0, 0, 2, 10, 0);
 
-        context.fillStyle = "#B0B0B0";
+        context.fillStyle = global_style_color;
         context.fillRect(0, 0, this.m_oCanvas.width, this.m_oCanvas.height);
 
         // ���������� ����� ���������
@@ -599,7 +599,7 @@ function CHorRuler()
             var _count = markup.Cols.length;
             if (0 != _count)
             {
-                context.fillStyle = "#B0B0B0";
+                context.fillStyle = global_style_color;
                 context.strokeStyle = "#929292";
 
                 var _offset = markup.X;
@@ -1948,7 +1948,7 @@ function CVerRuler()
         else
             context.setTransform(2, 0, 0, 2, 0, 10);
 
-        context.fillStyle = "#B0B0B0";
+        context.fillStyle = global_style_color;
         context.fillRect(0, 0, this.m_oCanvas.width, this.m_oCanvas.height);
 
         var top_margin = 0;
@@ -2150,7 +2150,7 @@ function CVerRuler()
             var start_dark = (((markup.Rows[0].Y + markup.Rows[0].H) * dKoef_mm_to_pix) >> 0) + 0.5;
             var end_dark = 0;
 
-            context.fillStyle = "#B0B0B0";
+            context.fillStyle = global_style_color;
             context.strokeStyle = "#929292";
 
             var _x = this.m_nLeft + 0.5;

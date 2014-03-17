@@ -44,6 +44,8 @@ if (AscBrowser.isIE || window.opera)
     }
 }
 
+var global_style_color = "#B0B0B0";
+
 function CEditorPage(api)
 {
     this.Name = "";
@@ -3031,7 +3033,7 @@ function CEditorPage(api)
             return;
 
         var context = canvas.getContext("2d");
-        context.fillStyle = "#B0B0B0";
+        context.fillStyle = global_style_color;
 
         //this.m_oBoundsController.Clear(context);
         // сначала посморим, изменились ли ректы страниц
