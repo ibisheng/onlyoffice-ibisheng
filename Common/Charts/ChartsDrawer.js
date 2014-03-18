@@ -11,12 +11,15 @@ function CChartsDrawer()
 	this.allAreaChart = null;
 	this.gridChart = null;
 	this.chart = null;
+	this.cChartSpace = null;
 }
 
 CChartsDrawer.prototype =
 {
     reCalculate : function(chartSpace)
     {
+		this.cChartSpace = chartSpace;
+		
 		this.calcProp = {};
 		this._calculateProperties(chartSpace);
 
@@ -112,6 +115,8 @@ CChartsDrawer.prototype =
 	
 	draw : function(chartSpace, graphics)
     {
+		this.cChartSpace = chartSpace;
+		
 		var cShapeDrawer = new CShapeDrawer();
 		cShapeDrawer.Graphics = graphics;
 		this.calcProp.series = chartSpace.chart.plotArea.chart.series;
@@ -1292,9 +1297,9 @@ CChartsDrawer.prototype =
 		{
 			right += standartMargin / 2;
 			if(chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.title != null && !isHBar)
-				right += chartSpace.chart.plotArea.valAx.title.extX;
+				left += chartSpace.chart.plotArea.valAx.title.extX;
 			else if(isHBar && chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.title != null)
-				right += chartSpace.chart.plotArea.catAx.title.extX;
+				left += chartSpace.chart.plotArea.catAx.title.extX;
 		}
 		else
 			right += standartMargin;
@@ -1317,11 +1322,11 @@ CChartsDrawer.prototype =
 		//****top*****
 		if(top)
 		{
-			top += standartMargin / 2;
+			top += standartMargin + standartMargin / 2;
 			if(chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.title != null && !isHBar)
-				top += chartSpace.chart.plotArea.catAx.title.extY;
+				bottom += chartSpace.chart.plotArea.catAx.title.extY;
 			else if(isHBar && chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.title != null)
-				top += chartSpace.chart.plotArea.valAx.title.extY;
+				bottom += chartSpace.chart.plotArea.valAx.title.extY;
 				
 			if(chartSpace.chart.title !== null && !chartSpace.chart.title.overlay)
 				top += chartSpace.chart.title.extY;
@@ -1505,7 +1510,10 @@ CChartsDrawer.prototype =
 				rightUpPointX = catAx.labels.x;
 
 			
-			rightUpPointY = valAx.yPoints[valAx.yPoints.length - 1].pos;
+			if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
+				rightUpPointY = valAx.yPoints[valAx.yPoints.length - 1].pos;
+			else
+				rightUpPointY = valAx.yPoints[0].pos;
 			
 			
 			
@@ -1518,7 +1526,7 @@ CChartsDrawer.prototype =
 				}
 				else if((valAx.labels.x + valAx.labels.extX) >= rightUpPointY)//правее крайней правой точки
 				{
-					right = valAx.labels.x + valAx.labels.extX - rightUpPointY;
+					right = valAx.labels.extX;
 				}
 			}
 			
@@ -1547,16 +1555,29 @@ CChartsDrawer.prototype =
 			
 		var min = this.calcProp.min;
 		var max = this.calcProp.max;
+		var orientation = this.cChartSpace ? this.cChartSpace.chart.plotArea.valAx.scaling.orientation : ORIENTATION_MIN_MAX;
 		
 		if(min >= 0 && max >= 0)
 		{
-			numNull = 0;
+			if(orientation == ORIENTATION_MIN_MAX)
+				numNull = 0;
+			else
+			{
+				numNull = this.calcProp.numhlines;
+				if(this.calcProp.type == "HBar")
+					numNull = this.calcProp.numvlines;
+			}
 		}
 		else if(min <= 0 && max <= 0)
 		{
-			numNull = this.calcProp.numhlines;
-			if(this.calcProp.type == "HBar")
-				numNull = this.calcProp.numvlines;
+			if(orientation == ORIENTATION_MIN_MAX)
+			{
+				numNull = this.calcProp.numhlines;
+				if(this.calcProp.type == "HBar")
+					numNull = this.calcProp.numvlines;
+			}
+			else
+				numNull = 0;
 		}
 		else
 		{
@@ -2716,7 +2737,7 @@ CChartsDrawer.prototype =
 		
 		//находим шаг
 		if(isOx || 'HBar' == this.calcProp.type)
-			step = this._getStep(firstDegree.val + 1.5);
+			step = this._getStep(firstDegree.val + (firstDegree.val / 10) * 3);
 		else
 			step = this._getStep(firstDegree.val);
 			
@@ -2787,6 +2808,8 @@ CChartsDrawer.prototype =
 			step = 5;
 		else if(step > 5 && step <= 10)
 			step = 10;
+		else if(step > 10 && step <= 20)
+			step = 20;
 			
 		return step;
 	},
@@ -3093,6 +3116,8 @@ CChartsDrawer.prototype =
 		var resPos;
 		var resVal;
 		var diffVal;
+		var plotArea = this.cChartSpace.chart.plotArea;
+		
 		if(val < yPoints[0].val)
 		{
 			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
@@ -3123,7 +3148,12 @@ CChartsDrawer.prototype =
 					resVal = yPoints[s + 1].val - yPoints[s].val;
 					
 					if(!isOx)
-						result =  - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+					{
+						if(plotArea.valAx.scaling.orientation == ORIENTATION_MIN_MAX)
+							result =  - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+						else
+							result =  (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+					}	
 					else	
 						result = (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
 					
@@ -6467,7 +6497,7 @@ catAxisChart.prototype =
 				var stepX = xPoints[1] ? Math.abs(xPoints[1].pos - xPoints[0].pos) : Math.abs(xPoints[0].pos - this.chartProp.chartGutter._bottom / this.chartProp.pxToMM);
 				var minorStep = stepX / this.chartProp.numvMinorlines;
 				
-				var posY = this.chartSpace.chart.plotArea.catAx.posY;
+				var posY = this.chartProp.nullPositionOX / this.chartProp.pxToMM;
 				var posX;
 				var posMinorX;
 				for(var i = 0; i < xPoints.length; i++)
