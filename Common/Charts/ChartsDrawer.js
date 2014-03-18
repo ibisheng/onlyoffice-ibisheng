@@ -16,7 +16,8 @@ function CChartsDrawer()
 
 CChartsDrawer.prototype =
 {
-    reCalculate : function(chartSpace)
+    //****draw and recalculate functions****
+	reCalculate : function(chartSpace)
     {
 		this.cChartSpace = chartSpace;
 		
@@ -135,6 +136,9 @@ CChartsDrawer.prototype =
 		this.chart.draw(this, cShapeDrawer, chartSpace);
 	},
 	
+	
+	
+	//****positions text labels****
 	reCalculatePositionText : function(type, chartSpace, ser, val)
 	{
 		var pos;
@@ -288,6 +292,298 @@ CChartsDrawer.prototype =
 		return {x: x, y: y}
 	},
 	
+	
+	
+	//****calculate margins****
+	_calculateMarginsChart: function(chartSpace) {
+		this.calcProp.chartGutter = {};
+		
+		if(!this.calcProp.pxToMM)
+			this.calcProp.pxToMM = 1 / chartSpace.convertPixToMM(1);
+		
+		var pxToMM = this.calcProp.pxToMM;
+		var standartMargin = 13 / pxToMM;
+		var isHBar = (chartSpace.chart.plotArea.chart.getObjectType() == historyitem_type_BarChart && chartSpace.chart.plotArea.chart.barDir != 1) ? true : false;
+		
+		//высчитываем выходящие за пределы подписи осей
+		var labelsMargin = this._calculateMarginLabels(chartSpace);
+		
+		var left = labelsMargin.left, right = labelsMargin.right, top = labelsMargin.top, bottom = labelsMargin.bottom;
+		
+		//****left*****
+		if(left || !right)
+		{
+			if(chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.title != null && !isHBar)
+				left += chartSpace.chart.plotArea.valAx.title.extX + standartMargin;
+			else if(isHBar && chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.title != null)
+				left += chartSpace.chart.plotArea.catAx.title.extX + standartMargin;
+			else
+				left += standartMargin / 2;
+		}
+		else
+			left += standartMargin;
+		
+		
+		//****right*****
+		if(right)
+		{
+			right += standartMargin / 2;
+			if(chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.title != null && !isHBar)
+				left += chartSpace.chart.plotArea.valAx.title.extX;
+			else if(isHBar && chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.title != null)
+				left += chartSpace.chart.plotArea.catAx.title.extX;
+		}
+		else
+			right += standartMargin;
+		
+		
+		//****bottom*****
+		if(bottom || !top)
+		{
+			if(chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.title != null && !isHBar)
+				bottom += chartSpace.chart.plotArea.catAx.title.extY + standartMargin;
+			else if(isHBar && chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.title != null)
+				bottom += chartSpace.chart.plotArea.valAx.title.extY + standartMargin;
+			else
+				bottom += standartMargin / 2;
+		}
+		else
+			bottom += standartMargin;
+		
+		
+		//****top*****
+		if(top)
+		{
+			top += standartMargin + standartMargin / 2;
+			if(chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.title != null && !isHBar)
+				bottom += chartSpace.chart.plotArea.catAx.title.extY;
+			else if(isHBar && chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.title != null)
+				bottom += chartSpace.chart.plotArea.valAx.title.extY;
+				
+			if(chartSpace.chart.title !== null && !chartSpace.chart.title.overlay)
+				top += chartSpace.chart.title.extY;
+		}
+		else
+		{
+			top += standartMargin;
+			if(chartSpace.chart.title !== null && !chartSpace.chart.title.overlay)
+				top += chartSpace.chart.title.extY + standartMargin / 2;
+		}
+			
+		
+		//KEY
+		if(chartSpace.chart.legend && !chartSpace.chart.legend.overlay)
+		{
+			switch ( chartSpace.chart.legend.legendPos )
+			{
+				case LEGEND_POS_L:
+				{
+					left += chartSpace.chart.legend.extX + standartMargin / 2;
+					break;
+				}
+				case LEGEND_POS_T:
+				{
+					top += chartSpace.chart.legend.extY + standartMargin / 2;
+					break;
+				}
+				case LEGEND_POS_R:
+				{
+					right += chartSpace.chart.legend.extX + standartMargin / 2;
+					break;
+				}
+				case LEGEND_POS_B:
+				{
+					bottom += chartSpace.chart.legend.extY + standartMargin / 2;
+					break;
+				}
+				case LEGEND_POS_TR:
+				{
+					right += chartSpace.chart.legend.extX + standartMargin / 2;
+					break;
+				}
+			}
+		}
+		
+		this.calcProp.chartGutter._left = left * pxToMM;
+		this.calcProp.chartGutter._right = right * pxToMM;
+		this.calcProp.chartGutter._top = top * pxToMM;
+		this.calcProp.chartGutter._bottom = bottom * pxToMM;
+	
+	},
+	
+	_calculateMarginLabels: function(chartSpace)
+	{
+		var isHBar = this.calcProp.type;
+		var left = 0, right = 0, bottom = 0, top = 0;
+		
+		var leftDownPointX, leftDownPointY, rightUpPointX, rightUpPointY;
+		
+		var valAx = chartSpace.chart.plotArea.valAx;
+		var catAx = chartSpace.chart.plotArea.catAx;
+		
+
+		if(isHBar === 'HBar' && catAx && valAx && catAx.yPoints && valAx.xPoints)
+		{
+			if(catAx.yPoints.length > 1)
+			{
+				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+					leftDownPointY = catAx.yPoints[0].pos - (catAx.yPoints[1].pos - catAx.yPoints[0].pos) / 2;
+				else
+					leftDownPointY = catAx.yPoints[0].pos;
+			}
+			else
+				leftDownPointY = valAx.labels.y;
+
+			
+			leftDownPointX = valAx.xPoints[0].pos;
+			
+			
+			if(catAx.yPoints.length > 1)
+			{
+				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+					rightUpPointY = catAx.yPoints[0].pos - Math.abs((catAx.yPoints[1].pos - catAx.yPoints[0].pos) / 2);
+				else
+					rightUpPointY = catAx.yPoints[catAx.yPoints.length - 1].pos;
+			}
+			else
+				rightUpPointY = catAx.labels.x;
+
+			
+			rightUpPointX = valAx.xPoints[valAx.xPoints.length - 1].pos;
+			
+			
+			
+			if(catAx.labels && !catAx.bDelete)
+			{
+				//подпись оси OY находится левее крайней левой точки
+				if(leftDownPointX >= catAx.labels.x)
+				{
+					left = leftDownPointX - catAx.labels.x;
+				}
+				else if((catAx.labels.x + catAx.labels.extX) >= rightUpPointX)//правее крайней правой точки
+				{
+					right = catAx.labels.x + catAx.labels.extX - rightUpPointX;
+				}
+			}
+			
+			
+			if(valAx.labels && !valAx.bDelete)
+			{
+				//подпись оси OX находится ниже крайней нижней точки
+				if((valAx.labels.y + valAx.labels.extY) >= leftDownPointY)
+				{
+					bottom = (valAx.labels.y + valAx.labels.extY) - leftDownPointY;
+				}
+				else if(valAx.labels.y <= rightUpPointY)//выше верхней
+				{
+					top = rightUpPointY - valAx.labels.y;
+				}
+			}
+		}
+		else if(isHBar === 'Scatter' && catAx && valAx && catAx.xPoints && valAx.yPoints)
+		{
+			leftDownPointX = catAx.xPoints[0].pos;
+			leftDownPointY = valAx.yPoints[0].pos;
+
+			rightUpPointX = catAx.xPoints[catAx.xPoints.length - 1].pos;
+			rightUpPointY = valAx.yPoints[valAx.yPoints.length - 1].pos;
+			
+			if(valAx.labels && !valAx.bDelete)
+			{
+				//подпись оси OY находится левее крайней левой точки
+				if(leftDownPointX >= valAx.labels.x)
+				{
+					left = leftDownPointX - valAx.labels.x;
+				}
+				else if((valAx.labels.x + valAx.labels.extX) >= rightUpPointY)//правее крайней правой точки
+				{
+					right = valAx.labels.x + valAx.labels.extX - rightUpPointY;
+				}
+			}
+			
+			
+			if(catAx.labels && !catAx.bDelete)
+			{
+				//подпись оси OX находится ниже крайней нижней точки
+				if((catAx.labels.y + catAx.labels.extY) >= leftDownPointY)
+				{
+					bottom = (catAx.labels.y + catAx.labels.extY) - leftDownPointY;
+				}
+				else if(catAx.labels.y <= rightUpPointY)//выше верхней
+				{
+					top = rightUpPointY - catAx.labels.y;
+				}
+			}
+		}
+		else if(isHBar !== undefined && valAx && catAx && catAx.xPoints && valAx.yPoints)
+		{
+			if(catAx.xPoints.length > 1)
+			{
+				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+					leftDownPointX = catAx.xPoints[0].pos - (catAx.xPoints[1].pos - catAx.xPoints[0].pos) / 2;
+				else
+					leftDownPointX = catAx.xPoints[0].pos;
+			}
+			else
+				leftDownPointX = catAx.labels.x;
+
+			
+			leftDownPointY = valAx.yPoints[0].pos;
+			
+			
+			if(catAx.xPoints.length > 1)
+			{
+				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+					rightUpPointX = catAx.xPoints[catAx.xPoints.length - 1].pos + (catAx.xPoints[1].pos - catAx.xPoints[0].pos) / 2;
+				else
+					rightUpPointX = catAx.xPoints[catAx.xPoints.length - 1].pos;
+			}
+			else
+				rightUpPointX = catAx.labels.x;
+
+			
+			if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
+				rightUpPointY = valAx.yPoints[valAx.yPoints.length - 1].pos;
+			else
+				rightUpPointY = valAx.yPoints[0].pos;
+			
+			
+			
+			if(valAx.labels && !valAx.bDelete)
+			{
+				//подпись оси OY находится левее крайней левой точки
+				if(leftDownPointX >= valAx.labels.x)
+				{
+					left = leftDownPointX - valAx.labels.x;
+				}
+				else if((valAx.labels.x + valAx.labels.extX) >= rightUpPointY)//правее крайней правой точки
+				{
+					right = valAx.labels.extX;
+				}
+			}
+			
+			
+			if(catAx.labels && !catAx.bDelete)
+			{
+				//подпись оси OX находится ниже крайней нижней точки
+				if((catAx.labels.y + catAx.labels.extY) >= leftDownPointY)
+				{
+					bottom = (catAx.labels.y + catAx.labels.extY) - leftDownPointY;
+				}
+				else if(catAx.labels.y <= rightUpPointY)//выше верхней
+				{
+					top = rightUpPointY - catAx.labels.y;
+				}
+			}
+		}
+		
+		
+		return {left: left, right: right, top: top, bottom: bottom};
+	},
+	
+	
+	
+	//****calculate properties****
 	_calculateProperties: function(chartProp)
 	{
 		if(!this.calcProp.scale)
@@ -298,9 +594,6 @@ CChartsDrawer.prototype =
 		
 		this.calcProp.trueWidth = this.calcProp.widthCanvas - this.calcProp.chartGutter._left - this.calcProp.chartGutter._right;
 		this.calcProp.trueHeight = this.calcProp.heightCanvas - this.calcProp.chartGutter._top - this.calcProp.chartGutter._bottom;
-		
-		this._calculateWidthChart();
-		
 		
 		//count line of chart grid
 		if((chartProp.chart.plotArea.valAx && chartProp.chart.plotArea.catAx && chartProp.chart.plotArea.valAx.yPoints && chartProp.chart.plotArea.catAx.xPoints) || (chartProp.chart.plotArea.catAx && chartProp.chart.plotArea.valAx && chartProp.chart.plotArea.catAx.yPoints && chartProp.chart.plotArea.valAx.xPoints))
@@ -362,106 +655,9 @@ CChartsDrawer.prototype =
 		}
 	},
 	
-	preCalculateData: function(chartProp)
-	{
-		this.calcProp.pxToMM = 1 / chartProp.convertPixToMM(1);
-		
-		this.calcProp.pathH = 1000000000;
-		this.calcProp.pathW = 1000000000;
-		
-		var typeChart = chartProp.chart.plotArea.chart.getObjectType();
-		
-		switch ( typeChart )
-		{
-			case historyitem_type_LineChart:
-			{
-				this.calcProp.type = "Line";
-				break;
-			}
-			case historyitem_type_BarChart:
-			{
-				if(chartProp.chart.plotArea.chart.barDir == 1)
-					this.calcProp.type = "Bar";
-				else 
-					this.calcProp.type = "HBar";
-				break;
-			}
-			case historyitem_type_PieChart:
-			{
-				this.calcProp.type = "Pie";
-				break;
-			}
-			case historyitem_type_AreaChart:
-			{
-				this.calcProp.type = "Area";
-				break;
-			}
-			case historyitem_type_ScatterChart:
-			{
-				this.calcProp.type = "Scatter";
-				break;
-			}
-			case historyitem_type_StockChart:
-			{
-				this.calcProp.type = "Stock";
-				break;
-			}
-			case historyitem_type_DoughnutChart:
-			{
-				this.calcProp.type = "DoughnutChart";
-				break;
-			}
-			case historyitem_type_RadarChart:
-			{
-				this.calcProp.type = "Radar";
-				break;
-			}
-			case historyitem_type_BubbleChart:
-			{
-				this.calcProp.type = "BubbleChart";
-				break;
-			}
-		};
-		
-		var grouping = chartProp.chart.plotArea.chart.grouping;
-		if(this.calcProp.type == "Line" || this.calcProp.type == "Area")
-			this.calcProp.subType = (grouping === GROUPING_PERCENT_STACKED) ? "stackedPer" : (grouping === GROUPING_STACKED) ? "stacked" : "normal"
-		else
-			this.calcProp.subType = (grouping === BAR_GROUPING_PERCENT_STACKED) ? "stackedPer" : (grouping === BAR_GROUPING_STACKED) ? "stacked" : "normal"
-		
-		
-		this.calcProp.xaxispos = null;
-		this.calcProp.yaxispos = null;
-		
-		//рассчёт данных и ещё некоторых параметров(this.calcProp./min/max/ymax/ymin/data)
-		this._calculateData2(chartProp);
-		
-		//пересчёт данных для накопительных диаграмм
-		if(this.calcProp.subType == 'stackedPer' || this.calcProp.subType == 'stacked')
-			this._calculateStackedData2();
-		
-		//***series***
-		this.calcProp.series = chartProp.chart.plotArea.chart.series;
-		
-		//находим значния для осей
-		/*this.calcProp.scale = this._getAxisData(false, this.calcProp, this.calcProp.min, this.calcProp.max, this.calcProp.ymin, this.calcProp.ymax, chartProp);	
-		if(this.calcProp.type == "Scatter")
-			this.calcProp.xScale = this._getAxisData(true, this.calcProp, this.calcProp.min, this.calcProp.max, this.calcProp.ymin, this.calcProp.ymax, chartProp);*/
-			
-		
-		if(this.calcProp.type == "Scatter")
-		{
-			this.calcProp.scale = this._getAxisData2(false, this.calcProp.ymin, this.calcProp.ymax, chartProp);	
-			this.calcProp.xScale = this._getAxisData2(true, this.calcProp.min, this.calcProp.max, chartProp);
-		}
-		else
-			this.calcProp.scale = this._getAxisData2(false, this.calcProp.min, this.calcProp.max, chartProp);	
-		
-		
-		this.calcProp.widthCanvas = chartProp.extX*this.calcProp.pxToMM;
-		this.calcProp.heightCanvas = chartProp.extY*this.calcProp.pxToMM;
-	},
 	
+	
+	//****calculate data****
 	_calculateStackedData: function()
 	{	
 		if(this.calcProp.type == "Bar")
@@ -570,303 +766,6 @@ CChartsDrawer.prototype =
 			}
 		};
 	},
-	
-	_calculateStackedData2: function()
-	{	
-		if(this.calcProp.type == "Bar" || this.calcProp.type == "HBar")
-		{
-			if (this.calcProp.subType == 'stacked') {
-				var originalData = $.extend(true, [], this.calcProp.data);
-				for (var j = 0; j < this.calcProp.data.length; j++) {
-					for (var i = 0; i < this.calcProp.data[j].length; i++) {
-						this.calcProp.data[j][i] = this._findPrevValue(originalData, j, i)
-					}
-				}
-				this.calcProp.max = this._getMaxValueArray(this.calcProp.data);
-				this.calcProp.min = this._getMinValueArray(this.calcProp.data);
-			}
-			else if(this.calcProp.subType == 'stackedPer') {
-				var summ;
-				var originalData = $.extend(true, [], this.calcProp.data);
-				for (var j = 0; j < (this.calcProp.data.length); j++) {
-					summ = 0;
-					for (var i = 0; i < this.calcProp.data[j].length; i++) {
-						summ += Math.abs(this.calcProp.data[j][i]);
-					}
-					for (var i = 0; i < this.calcProp.data[j].length; i++) {
-						this.calcProp.data[j][i] = (this._findPrevValue(originalData, j, i) * 100) / summ;
-					}
-				}
-				this.calcProp.max = this._getMaxValueArray(this.calcProp.data);
-				this.calcProp.min = this._getMinValueArray(this.calcProp.data);
-			}
-		};
-		
-		
-		if(this.calcProp.type == "Line" || this.calcProp.type == "Area")
-		{
-			if (this.calcProp.subType == 'stacked') {
-				for (var j = 0; j < (this.calcProp.data.length - 1); j++) {
-					for (var i = 0; i < this.calcProp.data[j].length; i++) {
-						if(!this.calcProp.data[j + 1])
-							this.calcProp.data[j + 1] = [];
-						this.calcProp.data[j + 1][i] = this.calcProp.data[j + 1][i] + this.calcProp.data[j][i];
-					}
-				}
-				this.calcProp.max = this._getMaxValueArray(this.calcProp.data);
-				this.calcProp.min = this._getMinValueArray(this.calcProp.data);
-			}
-			else if (this.calcProp.subType == 'stackedPer') {
-				var firstData = this.calcProp.data;
-				
-				var summValue = [];
-				for (var j = 0; j < (firstData[0].length); j++) {
-					summValue[j] = 0;
-					for (var i = 0; i < firstData.length; i++) {
-						summValue[j] += Math.abs(firstData[i][j])
-					}
-				}
-				
-				for (var j = 0; j < (this.calcProp.data.length - 1); j++) {
-					for (var i = 0; i < this.calcProp.data[j].length; i++) {
-						this.calcProp.data[j + 1][i] = this.calcProp.data[j + 1][i] + this.calcProp.data[j][i]
-					}
-				}
-				
-				var tempData = this.calcProp.data;
-
-				for (var j = 0; j < (tempData[0].length); j++) {
-					for (var i = 0; i < tempData.length; i++) {
-						if(summValue[j] == 0)
-							tempData[i][j] = 0;
-						else
-							tempData[i][j] = (100 * tempData[i][j]) / (summValue[j]);
-					}
-				}
-				this.calcProp.max = this._getMaxValueArray(tempData);
-				this.calcProp.min = this._getMinValueArray(tempData);
-				this.calcProp.data = tempData;
-			}
-		};
-	},
-	
-	_getSumArray: function (arr, isAbs)
-    {
-        if (typeof(arr) == 'number') {
-            return arr;
-        }
-		else if(typeof(arr) == 'string'){
-			return parseFloat(arr);
-		}
-
-        var i, sum;
-        for(i = 0,sum = 0; i < arr.length; i++)
-		{
-			if(typeof(arr[i]) == 'object' && arr[i].val)
-				sum += parseFloat(isAbs ? Math.abs(arr[i].val) : arr[i].val);
-			else
-				sum += isAbs ? Math.abs(arr[i]) : arr[i];
-		}
-        return sum;
-    },
-	
-	_getMaxValueArray: function(array)
-	{
-		var max = 0;
-		for(var i = 0; i < array.length; i++)
-		{
-			for(var j = 0; j < array[i].length; j++)
-			{
-				if(i == 0 && j == 0)
-					max =  array[i][j];
-				if(array[i][j] > max)
-					max = array[i][j];
-			}
-		}
-		return max;
-	},
-	
-	_getMinValueArray: function(array)
-	{
-		var min = 0;
-		for(var i = 0; i < array.length; i++)
-		{
-			for(var j = 0; j < array[i].length; j++)
-			{
-				if(i == 0 && j == 0)
-					min =  array[i][j];
-				if(array[i][j] < min)
-					min = array[i][j];
-			}
-		}
-		return min;
-	},
-	
-	_findPrevValue: function(originalData, num, max) {
-		var summ = 0;
-		for (var i = 0; i <= max; i++) {
-			if (originalData[num][max] >= 0) {
-				if (originalData[num][i] >= 0)
-					summ += originalData[num][i];
-			}
-
-			else {
-				if (originalData[num][i] < 0)
-					summ += originalData[num][i];
-			}
-		}
-		return summ;
-	},
-	
-	
-	_calculateData2: function(chart) {	
-		var max = 0;
-		var min = 0; 
-		var minY = 0;
-		var maxY = 0;
-		var xNumCache, yNumCache, newArr;
-		
-		var series = chart.chart.plotArea.chart.series;
-		if(this.calcProp.type != 'Scatter')//берём данные из NumCache
-		{
-			var arrValues = [];
-			var isSkip = [];
-			var skipSeries = [];
-			
-			var isEn = false;
-			var isEnY = false;
-			var numSeries = 0;
-			var curSeria;
-			var isNumberVal = true;
-			
-			
-			for(var l = 0; l < series.length; ++l)
-			{
-				var firstCol = 0;
-				var firstRow = 0;
-				
-				curSeria = series[l].val.numRef.numCache.pts;
-				
-				skipSeries[l] = true;
-			
-				if(series[l].isHidden == true)
-					continue;
-				if(!curSeria.length)
-					continue;
-				
-				skipSeries[l] = false;
-				arrValues[numSeries] = [];
-				isSkip[numSeries] = true;
-		
-				var row = firstRow;
-				var n = 0;
-				for(var col = firstCol; col < curSeria.length; ++col)
-				{
-					if(!curSeria[col])
-					{
-						curSeria[col] = {val:0};
-					}
-					else if(curSeria[col].isHidden == true)
-					{
-						continue;
-					}
-					
-					var cell = curSeria[col];
-					
-					var orValue = cell.val;
-
-					if('' != orValue)
-						isSkip[numSeries] = false;
-					var value =  parseFloat(orValue)
-					if(!isEn && !isNaN(value))
-					{
-						min = value;
-						max = value;
-						isEn = true;
-					}
-					if(!isNaN(value) && value > max)
-						max = value
-					if(!isNaN(value) && value < min)
-						min = value
-					if(isNaN(value) && orValue == '' && (((this.calcProp.type == 'Line' ) && this.calcProp.type == 'normal')))
-					{
-						value = '';
-					}
-					else if (isNaN(value))
-					{
-						value = 0;
-					}
-					
-					if(this.calcProp.type == 'Pie' || this.calcProp.type == "DoughnutChart")
-						arrValues[numSeries][n] = Math.abs(value);
-					else
-						arrValues[numSeries][n] = value;
-
-					n++;
-				}
-				numSeries++;
-			}
-		}
-		else
-		{
-			var yVal;
-			var xVal;
-			newArr = [];
-			for(var l = 0; l < series.length; ++l)
-			{
-				newArr[l] = [];
-				yNumCache = series[l].yVal.numRef.numCache ? series[l].yVal.numRef.numCache : series[l].yVal.numLit;
-				for(var j = 0; j < yNumCache.pts.length; ++j)
-				{
-					yVal = parseFloat(yNumCache.pts[j].val);
-					
-					xNumCache = series[l].xVal && series[l].xVal.numRef ? series[l].xVal.numRef.numCache : series[l].xVal && series[l].xVal.numLit ? series[l].xVal.numLit : null;
-					if(xNumCache && xNumCache.pts[j] && xNumCache.pts[j].val)
-					{
-						if(!isNaN(parseFloat(xNumCache.pts[j].val)))
-							xVal = parseFloat(xNumCache.pts[j].val);
-						else
-							xVal = j + 1;
-					}
-					else
-						xVal = j + 1;
-					
-					newArr[l][j] = [xVal, yVal];
-					
-					if(l == 0 && j == 0)
-					{
-						min = xVal;
-						max = xVal;
-						minY = yVal;
-						maxY = yVal;
-					};
-					
-					if(xVal < min)
-						min = xVal;
-					if(xVal > max)
-						max = xVal;
-					if(yVal < minY)
-						minY = yVal;
-					if(yVal > maxY)
-						maxY = yVal;
-				}
-			}
-			this.calcProp.ymin = minY;
-			this.calcProp.ymax = maxY;
-		}
-
-		this.calcProp.min = min;
-		this.calcProp.max = max;
-		
-		if(newArr)
-			arrValues = newArr;
-			
-		if(this.calcProp.type == 'Bar' || this.calcProp.type == 'HBar')
-			this.calcProp.data = arrReverse(arrValues);
-		else
-			this.calcProp.data = arrValues
-	},
-	
 	
 	_calculateData: function(chart) {
 		var isSeries = false;
@@ -1230,411 +1129,6 @@ CChartsDrawer.prototype =
 		}
 	},
 	
-	_calculateWidthChart: function() {
-		var trueWidth = this.calcProp.trueWidth;
-		var trueHeight = this.calcProp.trueHeight;
-		
-		if('Line' == this.calcProp.type)
-		{
-			var lengthOfData = this.calcProp.data[0].length;
-			var widthChart = (trueWidth/lengthOfData)*(lengthOfData - 1) + 5;
-			
-			this.calcProp.hmargin = (trueWidth - widthChart) / 2;
-		}
-		else {
-			var pointKoff = 1 - 1 / (this.calcProp.data[0].length)
-			this.calcProp.hmargin = (trueWidth - trueWidth * pointKoff) / 2;
-		}
-		if('Area' == this.calcProp.type)
-			this.calcProp.hmargin = 0;
-	},
-	
-	calculateSizePlotArea : function(chartSpace)
-	{
-		this._calculateMarginsChart(chartSpace);
-		
-		var widthCanvas = chartSpace.extX;
-		var heightCanvas = chartSpace.extY;
-		
-		var w = widthCanvas - (this.calcProp.chartGutter._left + this.calcProp.chartGutter._right) / this.calcProp.pxToMM;
-		var h = heightCanvas - (this.calcProp.chartGutter._top + this.calcProp.chartGutter._bottom) / this.calcProp.pxToMM;
-		
-
-        return {w: w , h: h , startX: this.calcProp.chartGutter._left / this.calcProp.pxToMM, startY: this.calcProp.chartGutter._top / this.calcProp.pxToMM};
-	},
-	
-	_calculateMarginsChart: function(chartSpace) {
-		this.calcProp.chartGutter = {};
-		
-		if(!this.calcProp.pxToMM)
-			this.calcProp.pxToMM = 1 / chartSpace.convertPixToMM(1);
-		
-		var pxToMM = this.calcProp.pxToMM;
-		var standartMargin = 13 / pxToMM;
-		var isHBar = (chartSpace.chart.plotArea.chart.getObjectType() == historyitem_type_BarChart && chartSpace.chart.plotArea.chart.barDir != 1) ? true : false;
-		
-		//высчитываем выходящие за пределы подписи осей
-		var labelsMargin = this._calculateMarginLabels(chartSpace);
-		
-		var left = labelsMargin.left, right = labelsMargin.right, top = labelsMargin.top, bottom = labelsMargin.bottom;
-		
-		//****left*****
-		if(left || !right)
-		{
-			if(chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.title != null && !isHBar)
-				left += chartSpace.chart.plotArea.valAx.title.extX + standartMargin;
-			else if(isHBar && chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.title != null)
-				left += chartSpace.chart.plotArea.catAx.title.extX + standartMargin;
-			else
-				left += standartMargin / 2;
-		}
-		else
-			left += standartMargin;
-		
-		
-		//****right*****
-		if(right)
-		{
-			right += standartMargin / 2;
-			if(chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.title != null && !isHBar)
-				left += chartSpace.chart.plotArea.valAx.title.extX;
-			else if(isHBar && chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.title != null)
-				left += chartSpace.chart.plotArea.catAx.title.extX;
-		}
-		else
-			right += standartMargin;
-		
-		
-		//****bottom*****
-		if(bottom || !top)
-		{
-			if(chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.title != null && !isHBar)
-				bottom += chartSpace.chart.plotArea.catAx.title.extY + standartMargin;
-			else if(isHBar && chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.title != null)
-				bottom += chartSpace.chart.plotArea.valAx.title.extY + standartMargin;
-			else
-				bottom += standartMargin / 2;
-		}
-		else
-			bottom += standartMargin;
-		
-		
-		//****top*****
-		if(top)
-		{
-			top += standartMargin + standartMargin / 2;
-			if(chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.title != null && !isHBar)
-				bottom += chartSpace.chart.plotArea.catAx.title.extY;
-			else if(isHBar && chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.title != null)
-				bottom += chartSpace.chart.plotArea.valAx.title.extY;
-				
-			if(chartSpace.chart.title !== null && !chartSpace.chart.title.overlay)
-				top += chartSpace.chart.title.extY;
-		}
-		else
-		{
-			top += standartMargin;
-			if(chartSpace.chart.title !== null && !chartSpace.chart.title.overlay)
-				top += chartSpace.chart.title.extY + standartMargin / 2;
-		}
-			
-		
-		//KEY
-		if(chartSpace.chart.legend && !chartSpace.chart.legend.overlay)
-		{
-			switch ( chartSpace.chart.legend.legendPos )
-			{
-				case LEGEND_POS_L:
-				{
-					left += chartSpace.chart.legend.extX + standartMargin / 2;
-					break;
-				}
-				case LEGEND_POS_T:
-				{
-					top += chartSpace.chart.legend.extY + standartMargin / 2;
-					break;
-				}
-				case LEGEND_POS_R:
-				{
-					right += chartSpace.chart.legend.extX + standartMargin / 2;
-					break;
-				}
-				case LEGEND_POS_B:
-				{
-					bottom += chartSpace.chart.legend.extY + standartMargin / 2;
-					break;
-				}
-				case LEGEND_POS_TR:
-				{
-					right += chartSpace.chart.legend.extX + standartMargin / 2;
-					break;
-				}
-			}
-		}
-		
-		this.calcProp.chartGutter._left = left * pxToMM;
-		this.calcProp.chartGutter._right = right * pxToMM;
-		this.calcProp.chartGutter._top = top * pxToMM;
-		this.calcProp.chartGutter._bottom = bottom * pxToMM;
-	
-	},
-	
-	_calculateMarginLabels: function(chartSpace)
-	{
-		var isHBar = this.calcProp.type;
-		var left = 0, right = 0, bottom = 0, top = 0;
-		
-		var leftDownPointX, leftDownPointY, rightUpPointX, rightUpPointY;
-		
-		var valAx = chartSpace.chart.plotArea.valAx;
-		var catAx = chartSpace.chart.plotArea.catAx;
-		
-
-		if(isHBar === 'HBar' && catAx && valAx && catAx.yPoints && valAx.xPoints)
-		{
-			if(catAx.yPoints.length > 1)
-			{
-				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
-					leftDownPointY = catAx.yPoints[0].pos - (catAx.yPoints[1].pos - catAx.yPoints[0].pos) / 2;
-				else
-					leftDownPointY = catAx.yPoints[0].pos;
-			}
-			else
-				leftDownPointY = valAx.labels.y;
-
-			
-			leftDownPointX = valAx.xPoints[0].pos;
-			
-			
-			if(catAx.yPoints.length > 1)
-			{
-				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
-					rightUpPointY = catAx.yPoints[0].pos - Math.abs((catAx.yPoints[1].pos - catAx.yPoints[0].pos) / 2);
-				else
-					rightUpPointY = catAx.yPoints[catAx.yPoints.length - 1].pos;
-			}
-			else
-				rightUpPointY = catAx.labels.x;
-
-			
-			rightUpPointX = valAx.xPoints[valAx.xPoints.length - 1].pos;
-			
-			
-			
-			if(catAx.labels && !catAx.bDelete)
-			{
-				//подпись оси OY находится левее крайней левой точки
-				if(leftDownPointX >= catAx.labels.x)
-				{
-					left = leftDownPointX - catAx.labels.x;
-				}
-				else if((catAx.labels.x + catAx.labels.extX) >= rightUpPointX)//правее крайней правой точки
-				{
-					right = catAx.labels.x + catAx.labels.extX - rightUpPointX;
-				}
-			}
-			
-			
-			if(valAx.labels && !valAx.bDelete)
-			{
-				//подпись оси OX находится ниже крайней нижней точки
-				if((valAx.labels.y + valAx.labels.extY) >= leftDownPointY)
-				{
-					bottom = (valAx.labels.y + valAx.labels.extY) - leftDownPointY;
-				}
-				else if(valAx.labels.y <= rightUpPointY)//выше верхней
-				{
-					top = rightUpPointY - valAx.labels.y;
-				}
-			}
-		}
-		else if(isHBar === 'Scatter' && catAx && valAx && catAx.xPoints && valAx.yPoints)
-		{
-			leftDownPointX = catAx.xPoints[0].pos;
-			leftDownPointY = valAx.yPoints[0].pos;
-
-			rightUpPointX = catAx.xPoints[catAx.xPoints.length - 1].pos;
-			rightUpPointY = valAx.yPoints[valAx.yPoints.length - 1].pos;
-			
-			if(valAx.labels && !valAx.bDelete)
-			{
-				//подпись оси OY находится левее крайней левой точки
-				if(leftDownPointX >= valAx.labels.x)
-				{
-					left = leftDownPointX - valAx.labels.x;
-				}
-				else if((valAx.labels.x + valAx.labels.extX) >= rightUpPointY)//правее крайней правой точки
-				{
-					right = valAx.labels.x + valAx.labels.extX - rightUpPointY;
-				}
-			}
-			
-			
-			if(catAx.labels && !catAx.bDelete)
-			{
-				//подпись оси OX находится ниже крайней нижней точки
-				if((catAx.labels.y + catAx.labels.extY) >= leftDownPointY)
-				{
-					bottom = (catAx.labels.y + catAx.labels.extY) - leftDownPointY;
-				}
-				else if(catAx.labels.y <= rightUpPointY)//выше верхней
-				{
-					top = rightUpPointY - catAx.labels.y;
-				}
-			}
-		}
-		else if(isHBar !== undefined && valAx && catAx && catAx.xPoints && valAx.yPoints)
-		{
-			if(catAx.xPoints.length > 1)
-			{
-				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
-					leftDownPointX = catAx.xPoints[0].pos - (catAx.xPoints[1].pos - catAx.xPoints[0].pos) / 2;
-				else
-					leftDownPointX = catAx.xPoints[0].pos;
-			}
-			else
-				leftDownPointX = catAx.labels.x;
-
-			
-			leftDownPointY = valAx.yPoints[0].pos;
-			
-			
-			if(catAx.xPoints.length > 1)
-			{
-				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
-					rightUpPointX = catAx.xPoints[catAx.xPoints.length - 1].pos + (catAx.xPoints[1].pos - catAx.xPoints[0].pos) / 2;
-				else
-					rightUpPointX = catAx.xPoints[catAx.xPoints.length - 1].pos;
-			}
-			else
-				rightUpPointX = catAx.labels.x;
-
-			
-			if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
-				rightUpPointY = valAx.yPoints[valAx.yPoints.length - 1].pos;
-			else
-				rightUpPointY = valAx.yPoints[0].pos;
-			
-			
-			
-			if(valAx.labels && !valAx.bDelete)
-			{
-				//подпись оси OY находится левее крайней левой точки
-				if(leftDownPointX >= valAx.labels.x)
-				{
-					left = leftDownPointX - valAx.labels.x;
-				}
-				else if((valAx.labels.x + valAx.labels.extX) >= rightUpPointY)//правее крайней правой точки
-				{
-					right = valAx.labels.extX;
-				}
-			}
-			
-			
-			if(catAx.labels && !catAx.bDelete)
-			{
-				//подпись оси OX находится ниже крайней нижней точки
-				if((catAx.labels.y + catAx.labels.extY) >= leftDownPointY)
-				{
-					bottom = (catAx.labels.y + catAx.labels.extY) - leftDownPointY;
-				}
-				else if(catAx.labels.y <= rightUpPointY)//выше верхней
-				{
-					top = rightUpPointY - catAx.labels.y;
-				}
-			}
-		}
-		
-		
-		return {left: left, right: right, top: top, bottom: bottom};
-	},
-	
-	_getNullPosition: function()
-	{
-		var numNull = this.calcProp.numhlines;
-			
-		var min = this.calcProp.min;
-		var max = this.calcProp.max;
-		var orientation = this.cChartSpace ? this.cChartSpace.chart.plotArea.valAx.scaling.orientation : ORIENTATION_MIN_MAX;
-		
-		if(min >= 0 && max >= 0)
-		{
-			if(orientation == ORIENTATION_MIN_MAX)
-				numNull = 0;
-			else
-			{
-				numNull = this.calcProp.numhlines;
-				if(this.calcProp.type == "HBar")
-					numNull = this.calcProp.numvlines;
-			}
-		}
-		else if(min <= 0 && max <= 0)
-		{
-			if(orientation == ORIENTATION_MIN_MAX)
-			{
-				numNull = this.calcProp.numhlines;
-				if(this.calcProp.type == "HBar")
-					numNull = this.calcProp.numvlines;
-			}
-			else
-				numNull = 0;
-		}
-		else
-		{
-			for (var i=0; i < this.calcProp.scale.length; i++)
-			{
-				if(this.calcProp.scale[i] == 0)
-				{
-					if(this.calcProp.type == "HBar")
-						numNull = i;
-					else
-						numNull = i;
-					break;
-				}
-			}
-		}
-		
-		var nullPosition;
-		if(0 == numNull)
-			nullPosition = 0;
-		else if(this.calcProp.type == "HBar")
-			nullPosition = (this.calcProp.widthCanvas - this.calcProp.chartGutter._left - this.calcProp.chartGutter._right)/(this.calcProp.numvlines)*numNull;
-		else
-			nullPosition = (this.calcProp.heightCanvas - this.calcProp.chartGutter._bottom - this.calcProp.chartGutter._top)/(this.calcProp.numhlines)*numNull;
-		
-		var result;
-		if(this.calcProp.type == "HBar")
-			result = nullPosition + this.calcProp.chartGutter._left;
-		else
-			result = this.calcProp.heightCanvas - this.calcProp.chartGutter._bottom - nullPosition;
-			
-		return result;
-	},
-	
-	_getScatterNullPosition: function()
-	{
-		var x, y;
-		//OY
-		for(var i = 0; i < this.calcProp.xScale.length; i++)
-		{
-			if(this.calcProp.xScale[i] == 0)
-			{
-				y = this.calcProp.chartGutter._left + i * (this.calcProp.trueWidth / (this.calcProp.xScale.length - 1));
-				break;
-			}
-		}
-		//OX
-		for(var i = 0; i < this.calcProp.scale.length; i++)
-		{
-			if(this.calcProp.scale[i] == 0)
-			{
-				x = this.calcProp.heightCanvas - (this.calcProp.chartGutter._bottom + i * (this.calcProp.trueHeight / (this.calcProp.scale.length - 1)));
-				break;
-			}
-		}
-		return {x: x, y: y};
-	},
-	
 	_getAxisData: function (max, mainObj, minVal, maxVal, yminVal, ymaxVal)
     {
         var greaterNullNum;
@@ -1645,11 +1139,6 @@ CChartsDrawer.prototype =
 			return this._getScatterHbarAxisData(max, mainObj, minVal, maxVal, yminVal, ymaxVal);
 		else
 			return this._getAnotherChartAxisData(max, mainObj, minVal, maxVal, yminVal, ymaxVal);
-	},
-	
-	_getAxisData2: function (isOx, minVal, maxVal, chartProp)
-    {
-		return this._getAxisValues(isOx, minVal, maxVal, chartProp);
 	},
 	
 	_getLineAreaBarPercentAxisData : function(max, mainObj, minVal, maxVal, yminVal, ymaxVal)
@@ -2713,6 +2202,240 @@ CChartsDrawer.prototype =
 	},
 	
 	
+	
+	//****new calculate data****
+	_calculateStackedData2: function()
+	{	
+		if(this.calcProp.type == "Bar" || this.calcProp.type == "HBar")
+		{
+			if (this.calcProp.subType == 'stacked') {
+				var originalData = $.extend(true, [], this.calcProp.data);
+				for (var j = 0; j < this.calcProp.data.length; j++) {
+					for (var i = 0; i < this.calcProp.data[j].length; i++) {
+						this.calcProp.data[j][i] = this._findPrevValue(originalData, j, i)
+					}
+				}
+				this.calcProp.max = this._getMaxValueArray(this.calcProp.data);
+				this.calcProp.min = this._getMinValueArray(this.calcProp.data);
+			}
+			else if(this.calcProp.subType == 'stackedPer') {
+				var summ;
+				var originalData = $.extend(true, [], this.calcProp.data);
+				for (var j = 0; j < (this.calcProp.data.length); j++) {
+					summ = 0;
+					for (var i = 0; i < this.calcProp.data[j].length; i++) {
+						summ += Math.abs(this.calcProp.data[j][i]);
+					}
+					for (var i = 0; i < this.calcProp.data[j].length; i++) {
+						this.calcProp.data[j][i] = (this._findPrevValue(originalData, j, i) * 100) / summ;
+					}
+				}
+				this.calcProp.max = this._getMaxValueArray(this.calcProp.data);
+				this.calcProp.min = this._getMinValueArray(this.calcProp.data);
+			}
+		};
+		
+		
+		if(this.calcProp.type == "Line" || this.calcProp.type == "Area")
+		{
+			if (this.calcProp.subType == 'stacked') {
+				for (var j = 0; j < (this.calcProp.data.length - 1); j++) {
+					for (var i = 0; i < this.calcProp.data[j].length; i++) {
+						if(!this.calcProp.data[j + 1])
+							this.calcProp.data[j + 1] = [];
+						this.calcProp.data[j + 1][i] = this.calcProp.data[j + 1][i] + this.calcProp.data[j][i];
+					}
+				}
+				this.calcProp.max = this._getMaxValueArray(this.calcProp.data);
+				this.calcProp.min = this._getMinValueArray(this.calcProp.data);
+			}
+			else if (this.calcProp.subType == 'stackedPer') {
+				var firstData = this.calcProp.data;
+				
+				var summValue = [];
+				for (var j = 0; j < (firstData[0].length); j++) {
+					summValue[j] = 0;
+					for (var i = 0; i < firstData.length; i++) {
+						summValue[j] += Math.abs(firstData[i][j])
+					}
+				}
+				
+				for (var j = 0; j < (this.calcProp.data.length - 1); j++) {
+					for (var i = 0; i < this.calcProp.data[j].length; i++) {
+						this.calcProp.data[j + 1][i] = this.calcProp.data[j + 1][i] + this.calcProp.data[j][i]
+					}
+				}
+				
+				var tempData = this.calcProp.data;
+
+				for (var j = 0; j < (tempData[0].length); j++) {
+					for (var i = 0; i < tempData.length; i++) {
+						if(summValue[j] == 0)
+							tempData[i][j] = 0;
+						else
+							tempData[i][j] = (100 * tempData[i][j]) / (summValue[j]);
+					}
+				}
+				this.calcProp.max = this._getMaxValueArray(tempData);
+				this.calcProp.min = this._getMinValueArray(tempData);
+				this.calcProp.data = tempData;
+			}
+		};
+	},
+	
+	_calculateData2: function(chart) {	
+		var max = 0;
+		var min = 0; 
+		var minY = 0;
+		var maxY = 0;
+		var xNumCache, yNumCache, newArr;
+		
+		var series = chart.chart.plotArea.chart.series;
+		if(this.calcProp.type != 'Scatter')//берём данные из NumCache
+		{
+			var arrValues = [];
+			var isSkip = [];
+			var skipSeries = [];
+			
+			var isEn = false;
+			var isEnY = false;
+			var numSeries = 0;
+			var curSeria;
+			var isNumberVal = true;
+			
+			
+			for(var l = 0; l < series.length; ++l)
+			{
+				var firstCol = 0;
+				var firstRow = 0;
+				
+				curSeria = series[l].val.numRef.numCache.pts;
+				
+				skipSeries[l] = true;
+			
+				if(series[l].isHidden == true)
+					continue;
+				if(!curSeria.length)
+					continue;
+				
+				skipSeries[l] = false;
+				arrValues[numSeries] = [];
+				isSkip[numSeries] = true;
+		
+				var row = firstRow;
+				var n = 0;
+				for(var col = firstCol; col < curSeria.length; ++col)
+				{
+					if(!curSeria[col])
+					{
+						curSeria[col] = {val:0};
+					}
+					else if(curSeria[col].isHidden == true)
+					{
+						continue;
+					}
+					
+					var cell = curSeria[col];
+					
+					var orValue = cell.val;
+
+					if('' != orValue)
+						isSkip[numSeries] = false;
+					var value =  parseFloat(orValue)
+					if(!isEn && !isNaN(value))
+					{
+						min = value;
+						max = value;
+						isEn = true;
+					}
+					if(!isNaN(value) && value > max)
+						max = value
+					if(!isNaN(value) && value < min)
+						min = value
+					if(isNaN(value) && orValue == '' && (((this.calcProp.type == 'Line' ) && this.calcProp.type == 'normal')))
+					{
+						value = '';
+					}
+					else if (isNaN(value))
+					{
+						value = 0;
+					}
+					
+					if(this.calcProp.type == 'Pie' || this.calcProp.type == "DoughnutChart")
+						arrValues[numSeries][n] = Math.abs(value);
+					else
+						arrValues[numSeries][n] = value;
+
+					n++;
+				}
+				numSeries++;
+			}
+		}
+		else
+		{
+			var yVal;
+			var xVal;
+			newArr = [];
+			for(var l = 0; l < series.length; ++l)
+			{
+				newArr[l] = [];
+				yNumCache = series[l].yVal.numRef.numCache ? series[l].yVal.numRef.numCache : series[l].yVal.numLit;
+				for(var j = 0; j < yNumCache.pts.length; ++j)
+				{
+					yVal = parseFloat(yNumCache.pts[j].val);
+					
+					xNumCache = series[l].xVal && series[l].xVal.numRef ? series[l].xVal.numRef.numCache : series[l].xVal && series[l].xVal.numLit ? series[l].xVal.numLit : null;
+					if(xNumCache && xNumCache.pts[j] && xNumCache.pts[j].val)
+					{
+						if(!isNaN(parseFloat(xNumCache.pts[j].val)))
+							xVal = parseFloat(xNumCache.pts[j].val);
+						else
+							xVal = j + 1;
+					}
+					else
+						xVal = j + 1;
+					
+					newArr[l][j] = [xVal, yVal];
+					
+					if(l == 0 && j == 0)
+					{
+						min = xVal;
+						max = xVal;
+						minY = yVal;
+						maxY = yVal;
+					};
+					
+					if(xVal < min)
+						min = xVal;
+					if(xVal > max)
+						max = xVal;
+					if(yVal < minY)
+						minY = yVal;
+					if(yVal > maxY)
+						maxY = yVal;
+				}
+			}
+			this.calcProp.ymin = minY;
+			this.calcProp.ymax = maxY;
+		}
+
+		this.calcProp.min = min;
+		this.calcProp.max = max;
+		
+		if(newArr)
+			arrValues = newArr;
+			
+		if(this.calcProp.type == 'Bar' || this.calcProp.type == 'HBar')
+			this.calcProp.data = arrReverse(arrValues);
+		else
+			this.calcProp.data = arrValues
+	},
+	
+	_getAxisData2: function (isOx, minVal, maxVal, chartProp)
+    {
+		return this._getAxisValues(isOx, minVal, maxVal, chartProp);
+	},
+	
 	_getAxisValues : function(isOx, yMin, yMax, chartProp)
 	{
 		var axisMin, axisMax, firstDegree, step, arrayValues;
@@ -2854,142 +2577,215 @@ CChartsDrawer.prototype =
 		return {min: axisMin, max: axisMax};
 	},
 	
-	_getFirstDegree: function(val)
-	{
-		var secPart = val.toString().split('.');
-		var numPow = 1,tempMax;
-		
-		if(secPart[1] && secPart[1].toString().search('e+') != -1 && secPart[0] && secPart[0].toString().length == 1)
-		{
-			var expNum = secPart[1].toString().split('e+');
-			numPow = Math.pow(10, expNum[1]);
-		}
-		else if(0 != secPart[0])
-			numPow = Math.pow(10, secPart[0].toString().length - 1)
-		else if(0 == secPart[0])
-		{
-			var tempMax = val;
-			var num = -1;
-			while(0 == tempMax.toString().split('.')[0])
-			{
-				tempMax = val;
-				numPow = Math.pow(10, num);
-				tempMax = tempMax / numPow;
-				num--;
-			}
-			val = tempMax;
-		}
-		
-		if(tempMax == undefined)	
-			val = val / numPow;
-		
-		return {val: val, numPow: numPow};
-	},
 	
-	_round_val: function (num)
-	{
-		if(num.toString() && num.toString().indexOf('e+') == -1 && isNaN(parseFloat(num)))
-			return num;
-		var floatKoff = 100000000000;
-		if(num.toString() && num.toString().indexOf('e+') > -1)
-		{
-			var parseVal = num.toString().split("e+");
-			var roundVal = Math.round(parseFloat(parseVal[0])*floatKoff)/floatKoff;
-			var changeSymbol = roundVal.toString() + "e+" + parseVal[1];
-			num = parseFloat(changeSymbol);
-		}
-		num =  Math.round(num*floatKoff)/floatKoff ;
-		return num;
-	},
 	
-	_array_exp: function (arr)
-    {
-		var maxDig = 1000000000;
-		var minDig = 0.000000001;
-		var floatKoff = 100000000000;
+	//****get null position****
+	_getNullPosition: function()
+	{
+		var numNull = this.calcProp.numhlines;
+			
+		var min = this.calcProp.min;
+		var max = this.calcProp.max;
+		var orientation = this.cChartSpace ? this.cChartSpace.chart.plotArea.valAx.scaling.orientation : ORIENTATION_MIN_MAX;
 		
-		if(typeof(arr) == 'number')
+		if(min >= 0 && max >= 0)
 		{
-			if(arr < 0)
-				maxDig = 100000000;
-			if(Math.abs(arr) > maxDig)
+			if(orientation == ORIENTATION_MIN_MAX)
+				numNull = 0;
+			else
 			{
-				var tmp = Math.abs(arr);
-				var exp = 0;
-				while (tmp > 9) {
-					exp += 1;
-					tmp /= 10;
-				}
-				if(arr < 0)
-					tmp *= -1; 
-				arr = tmp + "E+" + exp;
+				numNull = this.calcProp.numhlines;
+				if(this.calcProp.type == "HBar")
+					numNull = this.calcProp.numvlines;
 			}
+		}
+		else if(min <= 0 && max <= 0)
+		{
+			if(orientation == ORIENTATION_MIN_MAX)
+			{
+				numNull = this.calcProp.numhlines;
+				if(this.calcProp.type == "HBar")
+					numNull = this.calcProp.numvlines;
+			}
+			else
+				numNull = 0;
 		}
 		else
 		{
-			for (var i=0; i<arr.length; ++i) {
-			maxDig = 1000000000
-			if(arr[i] < 0)
-				maxDig = 100000000;
-				if(Math.abs(arr[i]) > maxDig)
+			for (var i=0; i < this.calcProp.scale.length; i++)
+			{
+				if(this.calcProp.scale[i] == 0)
 				{
-					var tmp = Math.abs(arr[i]);
-					var exp = 0;
-					while (tmp > 9) {
-						exp += 1;
-						tmp /= 10;
-					}
-					tmp = Math.round(tmp*floatKoff)/floatKoff
-					if(arr[i] < 0)
-						tmp *= -1; 
-					arr[i] = tmp + "E+" + exp;
+					if(this.calcProp.type == "HBar")
+						numNull = i;
+					else
+						numNull = i;
+					break;
 				}
 			}
 		}
-		return arr;
+		
+		var nullPosition;
+		if(0 == numNull)
+			nullPosition = 0;
+		else if(this.calcProp.type == "HBar")
+			nullPosition = (this.calcProp.widthCanvas - this.calcProp.chartGutter._left - this.calcProp.chartGutter._right)/(this.calcProp.numvlines)*numNull;
+		else
+			nullPosition = (this.calcProp.heightCanvas - this.calcProp.chartGutter._bottom - this.calcProp.chartGutter._top)/(this.calcProp.numhlines)*numNull;
+		
+		var result;
+		if(this.calcProp.type == "HBar")
+			result = nullPosition + this.calcProp.chartGutter._left;
+		else
+			result = this.calcProp.heightCanvas - this.calcProp.chartGutter._bottom - nullPosition;
+			
+		return result;
 	},
 	
-	_array_reverse: function (arr)
-    {
-        var newarr = [];
-        for (var i = arr.length - 1; i >= 0; i--) {
-            newarr.push(arr[i]);
-        }
-        return newarr;
-    },
-	
-	_convert3DTo2D: function(x, y, z, p, q, r)
+	_getScatterNullPosition: function()
 	{
-		var convertMatrix = [[1, 0, 0, p], [0, 1, 0, q], [0, 0, 0, r], [0, 0, 0, 1]];
-		
-		var qC = x * convertMatrix[0][3] + y * convertMatrix[1][3] + z * convertMatrix[2][3] + 1;
-		var newX = (x * convertMatrix[0][0] + y * convertMatrix[1][0] + z * convertMatrix[2][0] - 0)/(qC);
-		var newY = (x * convertMatrix[0][1] + y * convertMatrix[1][1] + z * convertMatrix[2][1] - 0)/(qC);
-		return {x: newX, y: newY};
+		var x, y;
+		//OY
+		for(var i = 0; i < this.calcProp.xScale.length; i++)
+		{
+			if(this.calcProp.xScale[i] == 0)
+			{
+				y = this.calcProp.chartGutter._left + i * (this.calcProp.trueWidth / (this.calcProp.xScale.length - 1));
+				break;
+			}
+		}
+		//OX
+		for(var i = 0; i < this.calcProp.scale.length; i++)
+		{
+			if(this.calcProp.scale[i] == 0)
+			{
+				x = this.calcProp.heightCanvas - (this.calcProp.chartGutter._bottom + i * (this.calcProp.trueHeight / (this.calcProp.scale.length - 1)));
+				break;
+			}
+		}
+		return {x: x, y: y};
 	},
 	
-	_turnCoords: function(x, y, z, angleOX, angleOY, angleOZ)
+	
+	
+	//****functions for UP Functions****
+	preCalculateData: function(chartProp)
 	{
-		var newX, newY, newZ;
+		this.calcProp.pxToMM = 1 / chartProp.convertPixToMM(1);
 		
-		//around OY
-		newX = x * Math.cos(angleOY) - z * Math.sin(angleOY);
-		newY = y;
-		newZ = x * Math.sin(angleOY) + z * Math.cos(angleOY);
+		this.calcProp.pathH = 1000000000;
+		this.calcProp.pathW = 1000000000;
 		
-		//around OX
-		newX = newX;
-		newY = newY * Math.cos(angleOX) + newZ * Math.sin(angleOX);
-		newZ = newZ * Math.cos(angleOX) - newY * Math.sin(angleOX);
+		var typeChart = chartProp.chart.plotArea.chart.getObjectType();
 		
-		//around OZ
-		newX = newX * Math.cos(angleOZ) + newY * Math.sin(angleOZ);
-		newY = newY * Math.cos(angleOZ) - newX * Math.sin(angleOZ);
-		newZ = newZ;
+		switch ( typeChart )
+		{
+			case historyitem_type_LineChart:
+			{
+				this.calcProp.type = "Line";
+				break;
+			}
+			case historyitem_type_BarChart:
+			{
+				if(chartProp.chart.plotArea.chart.barDir == 1)
+					this.calcProp.type = "Bar";
+				else 
+					this.calcProp.type = "HBar";
+				break;
+			}
+			case historyitem_type_PieChart:
+			{
+				this.calcProp.type = "Pie";
+				break;
+			}
+			case historyitem_type_AreaChart:
+			{
+				this.calcProp.type = "Area";
+				break;
+			}
+			case historyitem_type_ScatterChart:
+			{
+				this.calcProp.type = "Scatter";
+				break;
+			}
+			case historyitem_type_StockChart:
+			{
+				this.calcProp.type = "Stock";
+				break;
+			}
+			case historyitem_type_DoughnutChart:
+			{
+				this.calcProp.type = "DoughnutChart";
+				break;
+			}
+			case historyitem_type_RadarChart:
+			{
+				this.calcProp.type = "Radar";
+				break;
+			}
+			case historyitem_type_BubbleChart:
+			{
+				this.calcProp.type = "BubbleChart";
+				break;
+			}
+		};
 		
-		return {x: newX,y: newY,z: newZ};
+		var grouping = chartProp.chart.plotArea.chart.grouping;
+		if(this.calcProp.type == "Line" || this.calcProp.type == "Area")
+			this.calcProp.subType = (grouping === GROUPING_PERCENT_STACKED) ? "stackedPer" : (grouping === GROUPING_STACKED) ? "stacked" : "normal"
+		else
+			this.calcProp.subType = (grouping === BAR_GROUPING_PERCENT_STACKED) ? "stackedPer" : (grouping === BAR_GROUPING_STACKED) ? "stacked" : "normal"
+		
+		
+		this.calcProp.xaxispos = null;
+		this.calcProp.yaxispos = null;
+		
+		//рассчёт данных и ещё некоторых параметров(this.calcProp./min/max/ymax/ymin/data)
+		this._calculateData2(chartProp);
+		
+		//пересчёт данных для накопительных диаграмм
+		if(this.calcProp.subType == 'stackedPer' || this.calcProp.subType == 'stacked')
+			this._calculateStackedData2();
+		
+		//***series***
+		this.calcProp.series = chartProp.chart.plotArea.chart.series;
+		
+		//находим значния для осей
+		/*this.calcProp.scale = this._getAxisData(false, this.calcProp, this.calcProp.min, this.calcProp.max, this.calcProp.ymin, this.calcProp.ymax, chartProp);	
+		if(this.calcProp.type == "Scatter")
+			this.calcProp.xScale = this._getAxisData(true, this.calcProp, this.calcProp.min, this.calcProp.max, this.calcProp.ymin, this.calcProp.ymax, chartProp);*/
+			
+		
+		if(this.calcProp.type == "Scatter")
+		{
+			this.calcProp.scale = this._getAxisData2(false, this.calcProp.ymin, this.calcProp.ymax, chartProp);	
+			this.calcProp.xScale = this._getAxisData2(true, this.calcProp.min, this.calcProp.max, chartProp);
+		}
+		else
+			this.calcProp.scale = this._getAxisData2(false, this.calcProp.min, this.calcProp.max, chartProp);	
+		
+		
+		this.calcProp.widthCanvas = chartProp.extX*this.calcProp.pxToMM;
+		this.calcProp.heightCanvas = chartProp.extY*this.calcProp.pxToMM;
 	},
 	
+	calculateSizePlotArea : function(chartSpace)
+	{
+		this._calculateMarginsChart(chartSpace);
+		
+		var widthCanvas = chartSpace.extX;
+		var heightCanvas = chartSpace.extY;
+		
+		var w = widthCanvas - (this.calcProp.chartGutter._left + this.calcProp.chartGutter._right) / this.calcProp.pxToMM;
+		var h = heightCanvas - (this.calcProp.chartGutter._top + this.calcProp.chartGutter._bottom) / this.calcProp.pxToMM;
+		
+
+        return {w: w , h: h , startX: this.calcProp.chartGutter._left / this.calcProp.pxToMM, startY: this.calcProp.chartGutter._top / this.calcProp.pxToMM};
+	},
+	
+	
+	
+	//****functions for chart classes****
 	calculatePoint: function(x, y, size, symbol)
 	{
 		size = size / 2.69;
@@ -3163,6 +2959,216 @@ CChartsDrawer.prototype =
 		}
 		
 		return result;
+	},
+	
+	
+	
+	//****for 3D****
+	_convert3DTo2D: function(x, y, z, p, q, r)
+	{
+		var convertMatrix = [[1, 0, 0, p], [0, 1, 0, q], [0, 0, 0, r], [0, 0, 0, 1]];
+		
+		var qC = x * convertMatrix[0][3] + y * convertMatrix[1][3] + z * convertMatrix[2][3] + 1;
+		var newX = (x * convertMatrix[0][0] + y * convertMatrix[1][0] + z * convertMatrix[2][0] - 0)/(qC);
+		var newY = (x * convertMatrix[0][1] + y * convertMatrix[1][1] + z * convertMatrix[2][1] - 0)/(qC);
+		return {x: newX, y: newY};
+	},
+	
+	_turnCoords: function(x, y, z, angleOX, angleOY, angleOZ)
+	{
+		var newX, newY, newZ;
+		
+		//around OY
+		newX = x * Math.cos(angleOY) - z * Math.sin(angleOY);
+		newY = y;
+		newZ = x * Math.sin(angleOY) + z * Math.cos(angleOY);
+		
+		//around OX
+		newX = newX;
+		newY = newY * Math.cos(angleOX) + newZ * Math.sin(angleOX);
+		newZ = newZ * Math.cos(angleOX) - newY * Math.sin(angleOX);
+		
+		//around OZ
+		newX = newX * Math.cos(angleOZ) + newY * Math.sin(angleOZ);
+		newY = newY * Math.cos(angleOZ) - newX * Math.sin(angleOZ);
+		newZ = newZ;
+		
+		return {x: newX,y: newY,z: newZ};
+	},
+	
+	
+	
+	//****accessory functions****
+	_getSumArray: function (arr, isAbs)
+    {
+        if (typeof(arr) == 'number') {
+            return arr;
+        }
+		else if(typeof(arr) == 'string'){
+			return parseFloat(arr);
+		}
+
+        var i, sum;
+        for(i = 0,sum = 0; i < arr.length; i++)
+		{
+			if(typeof(arr[i]) == 'object' && arr[i].val)
+				sum += parseFloat(isAbs ? Math.abs(arr[i].val) : arr[i].val);
+			else
+				sum += isAbs ? Math.abs(arr[i]) : arr[i];
+		}
+        return sum;
+    },
+	
+	_getMaxValueArray: function(array)
+	{
+		var max = 0;
+		for(var i = 0; i < array.length; i++)
+		{
+			for(var j = 0; j < array[i].length; j++)
+			{
+				if(i == 0 && j == 0)
+					max =  array[i][j];
+				if(array[i][j] > max)
+					max = array[i][j];
+			}
+		}
+		return max;
+	},
+	
+	_getMinValueArray: function(array)
+	{
+		var min = 0;
+		for(var i = 0; i < array.length; i++)
+		{
+			for(var j = 0; j < array[i].length; j++)
+			{
+				if(i == 0 && j == 0)
+					min =  array[i][j];
+				if(array[i][j] < min)
+					min = array[i][j];
+			}
+		}
+		return min;
+	},
+	
+	_findPrevValue: function(originalData, num, max) {
+		var summ = 0;
+		for (var i = 0; i <= max; i++) {
+			if (originalData[num][max] >= 0) {
+				if (originalData[num][i] >= 0)
+					summ += originalData[num][i];
+			}
+
+			else {
+				if (originalData[num][i] < 0)
+					summ += originalData[num][i];
+			}
+		}
+		return summ;
+	},
+	
+	_round_val: function (num)
+	{
+		if(num.toString() && num.toString().indexOf('e+') == -1 && isNaN(parseFloat(num)))
+			return num;
+		var floatKoff = 100000000000;
+		if(num.toString() && num.toString().indexOf('e+') > -1)
+		{
+			var parseVal = num.toString().split("e+");
+			var roundVal = Math.round(parseFloat(parseVal[0])*floatKoff)/floatKoff;
+			var changeSymbol = roundVal.toString() + "e+" + parseVal[1];
+			num = parseFloat(changeSymbol);
+		}
+		num =  Math.round(num*floatKoff)/floatKoff ;
+		return num;
+	},
+	
+	_array_exp: function (arr)
+    {
+		var maxDig = 1000000000;
+		var minDig = 0.000000001;
+		var floatKoff = 100000000000;
+		
+		if(typeof(arr) == 'number')
+		{
+			if(arr < 0)
+				maxDig = 100000000;
+			if(Math.abs(arr) > maxDig)
+			{
+				var tmp = Math.abs(arr);
+				var exp = 0;
+				while (tmp > 9) {
+					exp += 1;
+					tmp /= 10;
+				}
+				if(arr < 0)
+					tmp *= -1; 
+				arr = tmp + "E+" + exp;
+			}
+		}
+		else
+		{
+			for (var i=0; i<arr.length; ++i) {
+			maxDig = 1000000000
+			if(arr[i] < 0)
+				maxDig = 100000000;
+				if(Math.abs(arr[i]) > maxDig)
+				{
+					var tmp = Math.abs(arr[i]);
+					var exp = 0;
+					while (tmp > 9) {
+						exp += 1;
+						tmp /= 10;
+					}
+					tmp = Math.round(tmp*floatKoff)/floatKoff
+					if(arr[i] < 0)
+						tmp *= -1; 
+					arr[i] = tmp + "E+" + exp;
+				}
+			}
+		}
+		return arr;
+	},
+	
+	_array_reverse: function (arr)
+    {
+        var newarr = [];
+        for (var i = arr.length - 1; i >= 0; i--) {
+            newarr.push(arr[i]);
+        }
+        return newarr;
+    },
+	
+	_getFirstDegree: function(val)
+	{
+		var secPart = val.toString().split('.');
+		var numPow = 1,tempMax;
+		
+		if(secPart[1] && secPart[1].toString().search('e+') != -1 && secPart[0] && secPart[0].toString().length == 1)
+		{
+			var expNum = secPart[1].toString().split('e+');
+			numPow = Math.pow(10, expNum[1]);
+		}
+		else if(0 != secPart[0])
+			numPow = Math.pow(10, secPart[0].toString().length - 1)
+		else if(0 == secPart[0])
+		{
+			var tempMax = val;
+			var num = -1;
+			while(0 == tempMax.toString().split('.')[0])
+			{
+				tempMax = val;
+				numPow = Math.pow(10, num);
+				tempMax = tempMax / numPow;
+				num--;
+			}
+			val = tempMax;
+		}
+		
+		if(tempMax == undefined)	
+			val = val / numPow;
+		
+		return {val: val, numPow: numPow};
 	}
 }
 
