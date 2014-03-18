@@ -226,7 +226,73 @@ CGlyphOperator.prototype.getCoordinateGlyph = function()
 
     // A*x + B*y + C = 0
 
-    if(this.loc == LOCATION_TOP)
+    var bLine = this.Parent.typeOper == DELIMITER_LINE || this.Parent.typeOper == DELIMITER_DOUBLE_LINE, // если оператор линия, то размещаем оператор по середине
+        bArrow = this.Parent.typeOper == ARROW_LEFT || this.Parent.typeOper == ARROW_RIGHT || this.Parent.typeOper == ARROW_LR,
+        bDoubleArrow = this.Parent.typeOper == DOUBLE_LEFT_ARROW || this.Parent.typeOper == DOUBLE_RIGHT_ARROW || this.Parent.typeOper == DOUBLE_ARROW_LR;
+
+
+    if(bLine)
+    {
+        if(this.loc == LOCATION_TOP)
+        {
+            a1 = 1; b1 = 0; c1 = 0;
+            a2 = 0; b2 = 1; c2 = (H - glH)/2;
+        }
+        else if(this.loc == LOCATION_BOT)
+        {
+            a1 = 1; b1 = 0; c1 = 0;
+            a2 = 0; b2 = 1; c2 = (H - glH)/2;
+
+        }
+        else if(this.loc == LOCATION_LEFT)
+        {
+            a1 = 0; b1 = 1; c1 = (W - glW)/2;
+            a2 = 1; b2 = 0; c2 = 0;
+        }
+        else if(this.loc == LOCATION_RIGHT)
+        {
+
+            a1 = 0; b1 = 1; c1 = (W - glW)/2;
+            a2 = 1; b2 = 0; c2 = 0;
+        }
+        else if(this.loc == LOCATION_SEP)
+        {
+            a1 = 0; b1 = 1; c1 = (W - glW)/2;
+            a2 = 1; b2 = 0; c2 = 0;
+        }
+    }
+    else
+    {
+        if(this.loc == LOCATION_TOP)
+        {
+            a1 = 1; b1 = 0; c1 = 0;
+            a2 = 0; b2 = 1; c2 = 0;
+        }
+        else if(this.loc == LOCATION_BOT)
+        {
+            a1 = 1; b1 = 0; c1 = 0;
+            a2 = 0; b2 = 1; c2 = H - glH;
+
+        }
+        else if(this.loc == LOCATION_LEFT)
+        {
+            a1 = 0; b1 = 1; c1 = 0;
+            a2 = 1; b2 = 0; c2 = 0;
+        }
+        else if(this.loc == LOCATION_RIGHT)
+        {
+
+            a1 = 0; b1 = 1; c1 = W - glW;
+            a2 = 1; b2 = 0; c2 = 0;
+        }
+        else if(this.loc == LOCATION_SEP)
+        {
+            a1 = 0; b1 = 1; c1 = 0;
+            a2 = 1; b2 = 0; c2 = 0;
+        }
+    }
+
+    /*if(this.loc == LOCATION_TOP)
     {
         a1 = 1; b1 = 0; c1 = 0;
         a2 = 0; b2 = 1; c2 = 0;
@@ -234,7 +300,15 @@ CGlyphOperator.prototype.getCoordinateGlyph = function()
     else if(this.loc == LOCATION_BOT)
     {
         a1 = 1; b1 = 0; c1 = 0;
-        a2 = 0; b2 = 1; c2 = H - glH;
+
+        if(bLine)
+        {
+            a2 = 0; b2 = 1; c2 = (H - glH)/2;
+        }
+        else
+        {
+            a2 = 0; b2 = 1; c2 = H - glH;
+        }
     }
     else if(this.loc == LOCATION_LEFT)
     {
@@ -243,14 +317,23 @@ CGlyphOperator.prototype.getCoordinateGlyph = function()
     }
     else if(this.loc == LOCATION_RIGHT)
     {
-        a1 = 0; b1 = 1; c1 = W - glW;
+        if(bLine)
+        {
+            a1 = 0; b1 = 1; c1 = (W - glW)/2;
+        }
+        else
+        {
+            a1 = 0; b1 = 1; c1 = W - glW;
+        }
+
         a2 = 1; b2 = 0; c2 = 0;
     }
     else if(this.loc == LOCATION_SEP)
     {
         a1 = 0; b1 = 1; c1 = 0;
         a2 = 1; b2 = 0; c2 = 0;
-    }
+    }*/
+
 
 
     /*var shW = 0,
@@ -1258,7 +1341,8 @@ COperatorLine.prototype.calcCoord = function(stretch)
     var XX = new Array(),
         YY = new Array();
 
-    var shY = 2*Y[1]*alpha;
+    //var shY = 2*Y[1]*alpha;
+    var shY = 0;
 
     for(var i = 0; i < X.length; i++)
     {
@@ -1428,7 +1512,8 @@ COperatorDoubleLine.prototype.calcCoord = function(stretch)
     var XX = new Array(),
         YY = new Array();
 
-    var shY = 1.5*Y[1]*alpha;
+    //var shY = 1.5*Y[1]*alpha;
+    var shY = 0;
 
     for(var i = 0; i < X.length; i++)
     {
@@ -1849,7 +1934,7 @@ CCombiningArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
 
-    var height = 3.88*betta;
+    var height = 3.9*betta;
     var width = 4.938*betta;
 
     return {width: width, height: height};
@@ -2978,7 +3063,11 @@ COperator.prototype.fixSize = function(oMeasure, stretch)
 
         var mgCtrPrp = this.Parent.mergeCtrTPrp();
         var shCenter = this.Parent.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
-        ascent = height/2 + shCenter;
+
+        if(this.operator.loc == 0 || this.operator.loc  == 1) // horizontal
+            ascent = dims.Height/2;
+        else // vertical
+            ascent = height/2 + shCenter;
 
         this.size = { width: width, height: height, ascent: ascent};
     }
@@ -3323,10 +3412,14 @@ CDelimiter.prototype.Resize = function(oMeasure)
     var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
     var maxAD = ascentG - shCenter  > descentG + shCenter ? ascentG - shCenter: descentG + shCenter;
 
+    var plH = 9.877777777777776 * mgCtrPrp.FontSize/36;
+    var bTextContent = ascentG < plH || descentG < plH; // для текста операторы в случае центрирования не увеличиваем
+
     var bCentered = this.shape == DELIMITER_SHAPE_CENTERED,
         b2Max = bCentered && (2*maxAD - heightG > 0.001);
 
-    var heightStretch = b2Max ? 2*maxAD : ascentG + descentG;
+
+    var heightStretch = b2Max && !bTextContent ? 2*maxAD : ascentG + descentG;
 
     this.begOper.fixSize(oMeasure, heightStretch);
     this.endOper.fixSize(oMeasure, heightStretch);
@@ -3350,7 +3443,6 @@ CDelimiter.prototype.Resize = function(oMeasure)
 
     if(this.shape == DELIMITER_SHAPE_CENTERED)
     {
-
         var deltaHeight = heightG - maxDimOper.height;
         if(deltaHeight < 0)
             deltaHeight = -deltaHeight;
@@ -3364,11 +3456,12 @@ CDelimiter.prototype.Resize = function(oMeasure)
             var bLHeight = deltaHeight < 0.001,
                 bLMaxAD = deltaMaxAD > 0.001,
                 bLMinAD = deltaMinAD > 0.001,
-                bTextContent = deltaMinAD  < -0.001;
+                bLText = deltaMinAD < - 0.001;
 
             var bEqualOper = bLHeight,
                 bMiddleOper = bLMaxAD && !bLMinAD,
-                bLittleOper = bLMinAD;
+                bLittleOper = bLMinAD,
+                bText = bLText;
 
             if(bEqualOper)
             {
@@ -3380,9 +3473,10 @@ CDelimiter.prototype.Resize = function(oMeasure)
                 height = maxDimOper.height/2 + maxAD;
                 ascent = ascentG > maxDimOper.ascent? ascentG : maxDimOper.ascent;
             }
-            else if(bTextContent)
+            else if(bText)
             {
-                ascent = maxDimOper.ascent;
+                //ascent = maxDimOper.ascent;
+                ascent = ascentG > maxDimOper.ascent ? ascentG : maxDimOper.ascent;
                 height = maxDimOper.height;
             }
             else
@@ -3716,7 +3810,6 @@ CDelimiter.prototype.align = function(element)
     else
         align = (this.size.height - element.size.height)/2;
 
-    //align = (this.size.height - element.size.height)/2;
 
     return align;
 }
@@ -3773,7 +3866,7 @@ CCharacter.prototype.Resize = function(oMeasure)
 
     var width  = base.size.width > this.operator.size.width ? base.size.width : this.operator.size.width,
         height = base.size.height + this.operator.size.height,
-        ascent = this.getAscent();
+        ascent = this.getAscent(oMeasure);
 
     this.size = {height: height, width: width, ascent: ascent};
 }
@@ -3921,20 +4014,23 @@ CGroupCharacter.prototype.init = function(props)
     /*if(this.operator.IsArrow())
         this.setReduct(DEGR_REDUCT);*/
 }
-CGroupCharacter.prototype.getAscent = function()
+CGroupCharacter.prototype.getAscent = function(oMeasure)
 {
     var ascent;
 
-    var shCent = DIV_CENT*this.getCtrPrp().FontSize;
+    //var shCent = DIV_CENT*this.getCtrPrp().FontSize;
+    var ctrPrp = this.getCtrPrp();
+    var shCent = this.Composition.GetShiftCenter(oMeasure, ctrPrp);
 
     if(this.vertJust === VJUST_TOP && this.loc === LOCATION_TOP)
-        ascent =  this.operator.size.height/2 + shCent;
+        ascent =  this.operator.size.ascent + shCent;
     else if(this.vertJust === VJUST_BOT && this.loc === LOCATION_TOP )
         ascent = this.operator.size.height + this.elements[0][0].size.ascent;
     else if(this.vertJust === VJUST_TOP && this.loc === LOCATION_BOT )
         ascent = this.elements[0][0].size.ascent;
     else if(this.vertJust === VJUST_BOT && this.loc === LOCATION_BOT )
-        ascent = this.operator.size.height/2 + shCent + this.elements[0][0].size.height;
+        ascent = this.elements[0][0].size.height + shCent + this.operator.size.height - this.operator.size.ascent;
+        //ascent = this.operator.size.height/2 + shCent + this.elements[0][0].size.height;
 
     return ascent;
 }

@@ -5281,6 +5281,28 @@ CMathContent.prototype =
     {
         var bHidePlh = this.plhHide && this.IsPlaceholder();
 
+        /////  test   //////
+        /*if(!this.bRoot)
+        {
+            var xx = x + this.pos.x,
+                yy = y + this.pos.y,
+                w = this.size.width,
+                h = this.size.height;
+
+            pGraphics.p_width(1000);
+            pGraphics.b_color1(0,0,250, 255);
+
+            pGraphics._s();
+            pGraphics._m(xx, yy);
+            pGraphics._l(xx + w, yy);
+            pGraphics._l(xx + w, yy + h);
+            pGraphics._l(xx, yy + h);
+            pGraphics._l(xx, yy);
+            pGraphics.df();
+        }*/
+
+        //////////////////////
+
         if( !bHidePlh )
         {
             for(var i=1; i < this.content.length;i++)
