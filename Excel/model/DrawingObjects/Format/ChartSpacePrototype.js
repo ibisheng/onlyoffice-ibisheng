@@ -2734,17 +2734,17 @@ CChartSpace.prototype.recalculateAxis = function()
                                 {
                                     if(val_ax.labels)//скорректируем позицию подписей вертикальной оси, если они есть
                                     {
-                                        val_ax.labels.x = rect.x + (val_ax.labels.x - left_gap_point)/(rect.x + rect.w - left_gap_point);
+                                        val_ax.labels.x = rect.x + (val_ax.labels.x - left_gap_point)*(rect.w/(rect.x + rect.w - left_gap_point));
                                     }
                                     //скорректируем point_interval
-                                    point_interval *= (rect.x + rect.w - left_gap_point)/(rect.x + rect.w - left_gap_point);
+                                    point_interval *= (rect.w/(rect.x + rect.w - left_gap_point));
                                     //скорректируем arr_cat_labels_points
                                     for(i = 0; i < arr_cat_labels_points.length; ++i)
                                     {
-                                        arr_cat_labels_points[i] = rect.x + (arr_cat_labels_points[i] - left_gap_point)/(rect.x + rect.w - left_gap_point);
+                                        arr_cat_labels_points[i] = rect.x + (arr_cat_labels_points[i] - left_gap_point)*(rect.w/(rect.x + rect.w - left_gap_point));
                                     }
                                     //скорректируем позицию вертикальной оси
-                                    val_ax.posX =  rect.x + (val_ax.posX - left_gap_point)/(rect.x + rect.w - left_gap_point);
+                                    val_ax.posX =  rect.x + (val_ax.posX - left_gap_point)*(rect.w/(rect.x + rect.w - left_gap_point));
                                 }
 
                                 //смотри выходит ли подпись последней категории за пределы области построения
@@ -2753,16 +2753,16 @@ CChartSpace.prototype.recalculateAxis = function()
                                 {
                                     if(val_ax.labels)//скорректируем позицию подписей вертикальной оси
                                     {
-                                        val_ax.labels.x = rect.x + (val_ax.labels.x - rect.x)/(right_gap_point - rect.x);
+                                        val_ax.labels.x = rect.x + (val_ax.labels.x - rect.x)*(rect.w/(right_gap_point - rect.x));
                                     }
                                     //скорректируем point_interval
-                                    point_interval *= (right_gap_point - rect.x)/(rect.x + rect.w - rect.x);
+                                    point_interval *= (rect.w/(right_gap_point - rect.x));
                                     for(i = 0; i < arr_cat_labels_points.length; ++i)
                                     {
-                                        arr_cat_labels_points[i] = rect.x + (arr_cat_labels_points[i] - rect.x)/(right_gap_point - rect.x);
+                                        arr_cat_labels_points[i] = rect.x + (arr_cat_labels_points[i] - rect.x)*(rect.w/(right_gap_point - rect.x));
                                     }
                                     //скорректируем позицию вертикальной оси
-                                    val_ax.posX = rect.x + (val_ax.posX - rect.x)/(right_gap_point - rect.x);
+                                    val_ax.posX = rect.x + (val_ax.posX - rect.x)*(rect.w/(right_gap_point - rect.x));
 
                                 }
                             }
@@ -2776,33 +2776,33 @@ CChartSpace.prototype.recalculateAxis = function()
                                 {
                                     if(val_ax.labels)//скорректируем позицию подписей вертикальной оси, если они есть
                                     {
-                                        val_ax.labels.x = rect.x + (val_ax.labels.x - left_gap_point)/(rect.x + rect.w - left_gap_point);
+                                        val_ax.labels.x = rect.x + (val_ax.labels.x - left_gap_point)*(rect.w/(rect.x + rect.w - left_gap_point));
                                     }
                                     //скорректируем point_interval
-                                    point_interval *= (rect.x + rect.w - left_gap_point)/(rect.x + rect.w - left_gap_point);
+                                    point_interval *= (rect.w/(rect.x + rect.w - left_gap_point));
                                     //скорректируем arr_cat_labels_points
                                     for(i = 0; i < arr_cat_labels_points.length; ++i)
                                     {
-                                        arr_cat_labels_points[i] = rect.x + (arr_cat_labels_points[i] - left_gap_point)/(rect.x + rect.w - left_gap_point);
+                                        arr_cat_labels_points[i] = rect.x + (arr_cat_labels_points[i] - left_gap_point)*(rect.w/(rect.x + rect.w - left_gap_point));
                                     }
 
                                     //скорректируем позицию вертикальной оси
-                                    val_ax.posX = rect.x + rect.x + (val_ax.posX - left_gap_point)/(rect.x + rect.w - left_gap_point);
+                                    val_ax.posX = rect.x + rect.x + (val_ax.posX - left_gap_point)*(rect.w/(rect.x + rect.w - left_gap_point));
                                 }
                                 if(right_gap_point > rect.x + rect.w)
                                 {
                                     if(val_ax.labels)//скорректируем позицию подписей вертикальной оси
                                     {
-                                        val_ax.labels.x = rect.x + (val_ax.labels.x - rect.x)/(right_gap_point - rect.x);
+                                        val_ax.labels.x = rect.x + (val_ax.labels.x - rect.x)*(rect.w/(right_gap_point - rect.x));
                                     }
                                     //скорректируем point_interval
-                                    point_interval *= (right_gap_point - rect.x)/(rect.x + rect.w - rect.x);
+                                    point_interval *= (rect.w/(right_gap_point - rect.x));
                                     for(i = 0; i < arr_cat_labels_points.length; ++i)
                                     {
-                                        arr_cat_labels_points[i] = rect.x + (arr_cat_labels_points[i] - rect.x)/(right_gap_point - rect.x);
+                                        arr_cat_labels_points[i] = rect.x + (arr_cat_labels_points[i] - rect.x)*(rect.w/(right_gap_point - rect.x));
                                     }
                                     //скорректируем позицию вертикальной оси
-                                    val_ax.posX = rect.x + (val_ax.posX - rect.x)/(right_gap_point - rect.x);
+                                    val_ax.posX = rect.x + (val_ax.posX - rect.x)*(rect.w/(right_gap_point - rect.x));
                                 }
                             }
                         }
