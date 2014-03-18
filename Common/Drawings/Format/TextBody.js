@@ -1008,6 +1008,14 @@ CTextBody.prototype =
     {
 		this.parent && this.parent.Refresh_RecalcData2(pageIndex);
 	},
+
+    getContentOneStringSizes: function()
+    {
+        //TODO: потом переделать
+        this.content.Reset(0, 0, 20000, 20000);//выставляем большую ширину чтобы текст расчитался в одну строку.
+        this.content.Recalculate_Page(0, true);
+        return {w: this.content.Content[0].Lines[0].Ranges[0].W+0.1, h: this.content.Get_SummaryHeight()+0.1};
+    },
 	
     getRectWidth: function(maxWidth)
     {

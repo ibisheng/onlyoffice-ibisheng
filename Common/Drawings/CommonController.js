@@ -1833,108 +1833,108 @@ DrawingObjectsController.prototype =
                     {
                         if(vert_axis_props.crossesRule === c_oAscCrossesRule.auto)
                         {
-                            val_ax.crossAx.setCrossesAt(null)
+                            val_ax.crossAx.setCrossesAt(null);
                             val_ax.crossAx.setCrosses(CROSSES_AUTO_ZERO);
                         }
                         else if(vert_axis_props.crossesRule === c_oAscCrossesRule.value)
                         {
                             if(isRealNumber(vert_axis_props.crosses))
                             {
-                                val_ax.crossAx.setCrossesAt(vert_axis_props.crosses)
+                                val_ax.crossAx.setCrossesAt(vert_axis_props.crosses);
                                 val_ax.crossAx.setCrosses(null);
                             }
                         }
                         else if(vert_axis_props.crossesRule === c_oAscCrossesRule.maxValue)
                         {
-                            val_ax.crossAx.setCrossesAt(null)
+                            val_ax.crossAx.setCrossesAt(null);
                             val_ax.crossAx.setCrosses(CROSSES_MAX);
                         }
                     }
+                }
 
-                    var hor_axis_props = chartSettings.getHorAxisProps();
-                    if(hor_axis_props)
+                var hor_axis_props = chartSettings.getHorAxisProps();
+                if(hor_axis_props)
+                {
+                    var  intervalBetweenTick       = hor_axis_props.getIntervalBetweenTick();
+                    var  intervalBetweenLabelsRule = hor_axis_props.getIntervalBetweenLabelsRule();
+                    var  intervalBetweenLabels     = hor_axis_props.getIntervalBetweenLabels();
+                    var  invertCatOrder            = hor_axis_props.getInvertCatOrder();
+                    var  labelsAxisDistance        = hor_axis_props.getLabelsAxisDistance();
+                    var  axisType                  = hor_axis_props.getAxisType();
+                    var  majorTickMark             = hor_axis_props.getMajorTickMark();
+                    var  minorTickMark             = hor_axis_props.getMinorTickMark();
+                    var  tickLabelsPos             = hor_axis_props.getTickLabelsPos();
+                    var  crossesRule               = hor_axis_props.getCrossesRule();
+                    var  crosses                   = hor_axis_props.getCrosses();
+                    var  labelsPosition            = hor_axis_props.getLabelsPosition();
+
+
+                    if(isRealNumber(intervalBetweenTick))
+                        cat_ax.setTickMarkSkip(intervalBetweenTick);
+
+                    if(isRealNumber(intervalBetweenLabelsRule))
                     {
-                        var  intervalBetweenTick       = hor_axis_props.getIntervalBetweenTick();
-                        var  intervalBetweenLabelsRule = hor_axis_props.getIntervalBetweenLabelsRule();
-                        var  intervalBetweenLabels     = hor_axis_props.getIntervalBetweenLabels();
-                        var  invertCatOrder            = hor_axis_props.getInvertCatOrder();
-                        var  labelsAxisDistance        = hor_axis_props.getLabelsAxisDistance();
-                        var  axisType                  = hor_axis_props.getAxisType();
-                        var  majorTickMark             = hor_axis_props.getMajorTickMark();
-                        var  minorTickMark             = hor_axis_props.getMinorTickMark();
-                        var  tickLabelsPos             = hor_axis_props.getTickLabelsPos();
-                        var  crossesRule               = hor_axis_props.getCrossesRule();
-                        var  crosses                   = hor_axis_props.getCrosses();
-                        var  labelsPosition            = hor_axis_props.getLabelsPosition();
-
-
-                        if(isRealNumber(intervalBetweenTick))
-                            cat_ax.setTickMarkSkip(intervalBetweenTick);
-
-                        if(isRealNumber(intervalBetweenLabelsRule))
+                        if(intervalBetweenLabelsRule === c_oAscBetweenLabelsRule.auto)
                         {
-                            if(intervalBetweenLabelsRule === c_oAscBetweenLabelsRule.auto)
+                            if(isRealNumber(cat_ax.tickLblSkip))
                             {
-                                if(isRealNumber(cat_ax.tickLblSkip))
-                                {
-                                    cat_ax.setTickLblSkip(null);
-                                }
-                            }
-                            else if(intervalBetweenLabelsRule === c_oAscBetweenLabelsRule.manual && isRealNumber(intervalBetweenLabels))
-                            {
-                                cat_ax.setTickLblSkip(intervalBetweenLabels);
+                                cat_ax.setTickLblSkip(null);
                             }
                         }
-
-                        if(!cat_ax.scaling)
-                            cat_ax.setScaling(new CScaling());
-                        scaling = cat_ax.scaling;
-                        if(isRealBool(invertCatOrder))
-                            scaling.setOrientation(invertCatOrder ? ORIENTATION_MAX_MIN : ORIENTATION_MIN_MAX);
-                        if(isRealNumber(labelsAxisDistance))
-                            cat_ax.setLblOffset(labelsAxisDistance);
-
-                        if(isRealNumber(axisType))
+                        else if(intervalBetweenLabelsRule === c_oAscBetweenLabelsRule.manual && isRealNumber(intervalBetweenLabels))
                         {
-                            //TODO
+                            cat_ax.setTickLblSkip(intervalBetweenLabels);
                         }
-
-
-                        if(isRealNumber(majorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[majorTickMark]))
-                            cat_ax.setMajorTickMark(MENU_SETTINGS_TICK_MARK[majorTickMark]);
-
-                        if(isRealNumber(minorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[minorTickMark]))
-                            cat_ax.setMinorTickMark(MENU_SETTINGS_TICK_MARK[minorTickMark]);
-
-                        if(isRealNumber(tickLabelsPos) && isRealNumber(MENU_SETTINGS_LABELS_POS[tickLabelsPos]))
-                            cat_ax.setTickLblPos(MENU_SETTINGS_LABELS_POS[tickLabelsPos]);
-
-
-                        if(isRealNumber(crossesRule) && isRealObject(cat_ax.crossAx))
-                        {
-                            if(crossesRule === c_oAscCrossesRule.auto)
-                            {
-                                cat_ax.crossAx.setCrossesAt(null)
-                                cat_ax.crossAx.setCrosses(CROSSES_AUTO_ZERO);
-                            }
-                            else if(crossesRule === c_oAscCrossesRule.value)
-                            {
-                                if(isRealNumber(crosses))
-                                {
-                                    cat_ax.crossAx.setCrossesAt(crosses)
-                                    cat_ax.crossAx.setCrosses(null);
-                                }
-                            }
-                            else if(crossesRule === c_oAscCrossesRule.maxValue)
-                            {
-                                cat_ax.crossAx.setCrossesAt(null)
-                                cat_ax.crossAx.setCrosses(CROSSES_MAX);
-                            }
-                        }
-
-                        if(isRealNumber(labelsPosition) && isRealObject(cat_ax.crossAx))
-                            cat_ax.crossAx(labelsPosition === c_oAscLabelsPosition.byDivisions ? CROSS_BETWEEN_MID_CAT : CROSS_BETWEEN_BETWEEN)
                     }
+
+                    if(!cat_ax.scaling)
+                        cat_ax.setScaling(new CScaling());
+                    scaling = cat_ax.scaling;
+                    if(isRealBool(invertCatOrder))
+                        scaling.setOrientation(invertCatOrder ? ORIENTATION_MAX_MIN : ORIENTATION_MIN_MAX);
+                    if(isRealNumber(labelsAxisDistance))
+                        cat_ax.setLblOffset(labelsAxisDistance);
+
+                    if(isRealNumber(axisType))
+                    {
+                        //TODO
+                    }
+
+
+                    if(isRealNumber(majorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[majorTickMark]))
+                        cat_ax.setMajorTickMark(MENU_SETTINGS_TICK_MARK[majorTickMark]);
+
+                    if(isRealNumber(minorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[minorTickMark]))
+                        cat_ax.setMinorTickMark(MENU_SETTINGS_TICK_MARK[minorTickMark]);
+
+                    if(isRealNumber(tickLabelsPos) && isRealNumber(MENU_SETTINGS_LABELS_POS[tickLabelsPos]))
+                        cat_ax.setTickLblPos(MENU_SETTINGS_LABELS_POS[tickLabelsPos]);
+
+
+                    if(isRealNumber(crossesRule) && isRealObject(cat_ax.crossAx))
+                    {
+                        if(crossesRule === c_oAscCrossesRule.auto)
+                        {
+                            cat_ax.crossAx.setCrossesAt(null);
+                            cat_ax.crossAx.setCrosses(CROSSES_AUTO_ZERO);
+                        }
+                        else if(crossesRule === c_oAscCrossesRule.value)
+                        {
+                            if(isRealNumber(crosses))
+                            {
+                                cat_ax.crossAx.setCrossesAt(crosses);
+                                cat_ax.crossAx.setCrosses(null);
+                            }
+                        }
+                        else if(crossesRule === c_oAscCrossesRule.maxValue)
+                        {
+                            cat_ax.crossAx.setCrossesAt(null);
+                            cat_ax.crossAx.setCrosses(CROSSES_MAX);
+                        }
+                    }
+
+                    if(isRealNumber(labelsPosition) && isRealObject(cat_ax.crossAx))
+                        cat_ax.crossAx.setCrossBetween(labelsPosition === c_oAscLabelsPosition.byDivisions ? CROSS_BETWEEN_MID_CAT : CROSS_BETWEEN_BETWEEN);
                 }
             }
 

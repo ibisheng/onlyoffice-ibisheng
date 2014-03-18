@@ -2741,7 +2741,7 @@ function CreateScatterChart(asc_chart)
             pt.setVal(asc_series[i].Val.NumCache[j].val);
             num_cache.addPt(pt);
         }
-       //if(parsedHeaders.bTop)
+        //if(parsedHeaders.bTop)
        //{
        //    series.setCat(new CCat());
        //    var cat = series.cat;
@@ -2986,7 +2986,6 @@ function CreateStockChart(asc_chart)
     page_margins.setFooter(0.3);
     return chart_space;
 }
-
 
 function CreateDefaultAxises(valFormatCode)
 {

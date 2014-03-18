@@ -3132,7 +3132,7 @@
             else if($("#crossesCatAxValInput").attr("checked"))
             {
                 axis_settings.putCrossesRule(c_oAscCrossesRule.value);
-                axis_settings.putCrosses($("#crossesCatInput").attr("value"));
+                axis_settings.putCrosses(parseFloat($("#crossesCatInput").attr("value")));
             }
             else
             {
