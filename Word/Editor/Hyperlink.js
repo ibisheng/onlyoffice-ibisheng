@@ -16,6 +16,8 @@ function ParaHyperlink()
 
     this.Content = new Array();
 
+    this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
+
     this.StartLine  = 0;
     this.StartRange = 0;
 
@@ -38,6 +40,21 @@ ParaHyperlink.prototype =
     Get_Id : function()
     {
         return this.Id;
+    },
+
+    Clear_ContentChanges : function()
+    {
+        this.m_oContentChanges.Clear();
+    },
+
+    Add_ContentChanges : function(Changes)
+    {
+        this.m_oContentChanges.Add( Changes );
+    },
+
+    Refresh_ContentChanges : function()
+    {
+        this.m_oContentChanges.Refresh();
     },
 
     Copy : function(Selected)
@@ -678,6 +695,12 @@ ParaHyperlink.prototype =
     Recalculate_Range : function(ParaPr, Depth)
     {
         var PRS = g_oPRSW;
+
+        if ( this.Paragraph !== PRS.Paragraph )
+        {
+            this.Paragraph = PRS.Paragraph;
+            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+        }
 
         var CurLine  = PRS.Line - this.StartLine;
         var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
@@ -1639,33 +1662,224 @@ ParaHyperlink.prototype =
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
 //----------------------------------------------------------------------------------------------------------------------
-    Write_ToBinary : function(Writer)
-    {
-
-    },
-
-    Read_FromBinary : function(Reader)
-    {
-
-    },
-
-    Write_ToBinary2 : function(Writer)
-    {
-
-    },
-
-    Read_FromBinary2 : function(Reader)
-    {
-
-    },
-
     Save_Changes : function(Data, Writer)
     {
+        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
+        // Long : тип класса
+        // Long : тип изменений
 
+        Writer.WriteLong( historyitem_type_Hyperlink );
+
+        var Type = Data.Type;
+
+        // Пишем тип
+        Writer.WriteLong( Type );
+
+        switch(Type)
+        {
+            case historyitem_Hyperlink_AddItem :
+            {
+                // Long     : Количество элементов
+                // Array of :
+                //  {
+                //    Long     : Позиция
+                //    Variable : Id элемента
+                //  }
+
+                var bArray = Data.UseArray;
+                var Count  = Data.Items.length;
+
+                Writer.WriteLong( Count );
+
+                for ( var Index = 0; Index < Count; Index++ )
+                {
+                    if ( true === bArray )
+                        Writer.WriteLong( Data.PosArray[Index] );
+                    else
+                        Writer.WriteLong( Data.Pos + Index );
+
+                    Writer.WriteString2( Data.Items[Index].Get_Id() );
+                }
+
+                break;
+            }
+
+            case historyitem_Hyperlink_RemoveItem :
+            {
+                // Long          : Количество удаляемых элементов
+                // Array of Long : позиции удаляемых элементов
+
+                var bArray = Data.UseArray;
+                var Count  = Data.Items.length;
+
+                var StartPos = Writer.GetCurPosition();
+                Writer.Skip(4);
+                var RealCount = Count;
+
+                for ( var Index = 0; Index < Count; Index++ )
+                {
+                    if ( true === bArray )
+                    {
+                        if ( false === Data.PosArray[Index] )
+                            RealCount--;
+                        else
+                            Writer.WriteLong( Data.PosArray[Index] );
+                    }
+                    else
+                        Writer.WriteLong( Data.Pos );
+                }
+
+                var EndPos = Writer.GetCurPosition();
+                Writer.Seek( StartPos );
+                Writer.WriteLong( RealCount );
+                Writer.Seek( EndPos );
+
+                break;
+            }
+
+            case historyitem_Hyperlink_Value :
+            {
+                // String : Value
+                Writer.WriteString2( Data.New );
+                break;
+            }
+
+            case historyitem_Hyperlink_ToolTip :
+            {
+                // String : ToolTip
+                Writer.WriteString2( Data.New );
+
+                break;
+            }
+        }
     },
 
     Load_Changes : function(Reader)
     {
+        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
+        // Long : тип класса
+        // Long : тип изменений
 
+        var ClassType = Reader.GetLong();
+        if ( historyitem_type_Hyperlink != ClassType )
+            return;
+
+        var Type = Reader.GetLong();
+
+        switch ( Type )
+        {
+            case historyitem_Hyperlink_AddItem :
+            {
+                // Long     : Количество элементов
+                // Array of :
+                //  {
+                //    Long     : Позиция
+                //    Variable : Id Элемента
+                //  }
+
+                var Count = Reader.GetLong();
+
+                for ( var Index = 0; Index < Count; Index++ )
+                {
+                    var Pos     = this.m_oContentChanges.Check( contentchanges_Add, Reader.GetLong() );
+                    var Element = g_oTableId.Get_ById( Reader.GetString2() );
+
+                    if ( null != Element )
+                    {
+                        this.Content.splice( Pos, 0, Element );
+                    }
+                }
+
+                if ( null !== this.Paragraph && undefined !== this.Paragraph )
+                    this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+                break;
+            }
+
+            case historyitem_Hyperlink_RemoveItem:
+            {
+                // Long          : Количество удаляемых элементов
+                // Array of Long : позиции удаляемых элементов
+
+                var Count = Reader.GetLong();
+
+                for ( var Index = 0; Index < Count; Index++ )
+                {
+                    var ChangesPos = this.m_oContentChanges.Check( contentchanges_Remove, Reader.GetLong() );
+
+                    // действие совпало, не делаем его
+                    if ( false === ChangesPos )
+                        continue;
+
+                    this.Content.splice( ChangesPos, 1 );
+                }
+
+                if ( null !== this.Paragraph && undefined !== this.Paragraph )
+                    this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+                break;
+            }
+
+            case historyitem_Hyperlink_Value:
+            {
+                // String : Value
+                this.Value = Reader.GetString2();
+                break;
+            }
+
+            case historyitem_Hyperlink_ToolTip :
+            {
+                // String : ToolTip
+                this.ToolTip = Reader.GetString2();
+
+                break;
+            }
+        }
+    },
+
+    Write_ToBinary2 : function(Writer)
+    {
+        Writer.WriteLong( historyitem_type_Hyperlink );
+
+        // String : Id
+        // String : Value
+        // String : ToolTip
+        // Long   : Количество элементов
+        // Array of Strings : массив с Id элементов
+
+        Writer.WriteString2( this.Id );
+        Writer.WriteString2( this.Value );
+        Writer.WriteString2( this.ToolTip );
+
+        var Count = this.Content.length;
+        Writer.WriteLong( Count );
+
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            Writer.WriteString2( this.Content[Index].Get_Id() );
+        }
+    },
+
+    Read_FromBinary2 : function(Reader)
+    {
+        // String : Id
+        // String : Value
+        // String : ToolTip
+        // Long   : Количество элементов
+        // Array of Strings : массив с Id элементов
+
+        this.Id      = Reader.GetString2();
+        this.Value   = Reader.GetString2();
+        this.ToolTip = Reader.GetString2();
+
+        var Count = Reader.GetLong();
+        this.Content = new Array();
+
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var Element = g_oTableId.Get_ById( Reader.GetString2() );
+            if ( null !== Element )
+                this.Content.push( Element );
+        }
     }
 };

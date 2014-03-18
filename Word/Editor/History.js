@@ -187,18 +187,22 @@ CHistory.prototype =
             ( Class instanceof CDocumentContent && ( historyitem_DocumentContent_AddItem === Data.Type || historyitem_DocumentContent_RemoveItem === Data.Type ) ) ||
             ( Class instanceof CTable           && ( historyitem_Table_AddRow            === Data.Type || historyitem_Table_RemoveRow            === Data.Type ) ) ||
             ( Class instanceof CTableRow        && ( historyitem_TableRow_AddCell        === Data.Type || historyitem_TableRow_RemoveCell        === Data.Type ) ) ||
-            ( Class instanceof Paragraph        && ( historyitem_Paragraph_AddItem       === Data.Type || historyitem_Paragraph_RemoveItem       === Data.Type ) ) )
+            ( Class instanceof Paragraph        && ( historyitem_Paragraph_AddItem       === Data.Type || historyitem_Paragraph_RemoveItem       === Data.Type ) ) ||
+            ( Class instanceof ParaHyperlink    && ( historyitem_Hyperlink_AddItem       === Data.Type || historyitem_Hyperlink_RemoveItem       === Data.Type ) ) ||
+            ( Class instanceof ParaRun          && ( historyitem_ParaRun_AddItem         === Data.Type || historyitem_ParaRun_RemoveItem         === Data.Type ) ) )
         {
             var bAdd = ( ( Class instanceof CDocument        && historyitem_Document_AddItem        === Data.Type ) ||
                 ( Class instanceof CDocumentContent && historyitem_DocumentContent_AddItem === Data.Type ) ||
                 ( Class instanceof CTable           && historyitem_Table_AddRow            === Data.Type ) ||
                 ( Class instanceof CTableRow        && historyitem_TableRow_AddCell        === Data.Type ) ||
-                ( Class instanceof Paragraph        && historyitem_Paragraph_AddItem       === Data.Type )
+                ( Class instanceof Paragraph        && historyitem_Paragraph_AddItem       === Data.Type ) ||
+                ( Class instanceof ParaHyperlink    && historyitem_Hyperlink_AddItem       === Data.Type ) ||
+                ( Class instanceof ParaRun          && historyitem_ParaRun_AddItem         === Data.Type )
                 ) ? true : false;
 
             var Count = 1;
 
-            if ( ( Class instanceof Paragraph )                                                                ||
+            if ( ( Class instanceof Paragraph ) ||  ( Class instanceof ParaHyperlink) || ( Class instanceof ParaRun ) ||
                 ( Class instanceof CDocument        && historyitem_Document_RemoveItem        === Data.Type ) ||
                 ( Class instanceof CDocumentContent && historyitem_DocumentContent_RemoveItem === Data.Type ) )
                 Count = Data.Items.length;

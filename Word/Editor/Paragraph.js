@@ -5,6 +5,10 @@
 // Internal_MoveCursorForward, Internal_AddTextPr, Internal_GetContentPosByXY,
 // Selection_SetEnd, Selection_CalculateTextPr, IsEmpty, Selection_IsEmpty,
 // Cursor_IsStart, Cursor_IsEnd, Is_ContentOnFirstPage
+
+// TODO: Надо избавиться от ParaEnd внутри ParaRun, а сам ParaEnd держать также как и ParaNumbering, как параметр
+//       внутри самого класса Paragraph
+
 var type_Paragraph = 0x0001;
 
 var UnknownValue  = null;
@@ -19072,26 +19076,53 @@ Paragraph.prototype =
         {
             case  historyitem_Paragraph_AddItem:
             {
-                // Long     : Количество элементов
-                // Array of :
-                //  {
-                //    Long     : Позиция
-                //    Variable : Элемент
-                //  }
-
-                var bArray = Data.UseArray;
-                var Count  = Data.Items.length;
-
-                Writer.WriteLong( Count );
-
-                for ( var Index = 0; Index < Count; Index++ )
+                if ( true !== Debug_ParaRunMode )
                 {
-                    if ( true === bArray )
-                        Writer.WriteLong( Data.PosArray[Index] );
-                    else
-                        Writer.WriteLong( Data.Pos + Index );
+                    // Long     : Количество элементов
+                    // Array of :
+                    //  {
+                    //    Long     : Позиция
+                    //    Variable : Элемент
+                    //  }
 
-                    Data.Items[Index].Write_ToBinary(Writer);
+                    var bArray = Data.UseArray;
+                    var Count  = Data.Items.length;
+
+                    Writer.WriteLong( Count );
+
+                    for ( var Index = 0; Index < Count; Index++ )
+                    {
+                        if ( true === bArray )
+                            Writer.WriteLong( Data.PosArray[Index] );
+                        else
+                            Writer.WriteLong( Data.Pos + Index );
+
+                        Data.Items[Index].Write_ToBinary(Writer);
+                    }
+                }
+                else
+                {
+                    // Long     : Количество элементов
+                    // Array of :
+                    //  {
+                    //    Long     : Позиция
+                    //    Variable : Id элемента
+                    //  }
+
+                    var bArray = Data.UseArray;
+                    var Count  = Data.Items.length;
+
+                    Writer.WriteLong( Count );
+
+                    for ( var Index = 0; Index < Count; Index++ )
+                    {
+                        if ( true === bArray )
+                            Writer.WriteLong( Data.PosArray[Index] );
+                        else
+                            Writer.WriteLong( Data.Pos + Index );
+
+                        Writer.WriteString2( Data.Items[Index].Get_Id() );
+                    }
                 }
 
                 break;
@@ -19414,45 +19445,91 @@ Paragraph.prototype =
         {
             case  historyitem_Paragraph_AddItem:
             {
-                // Long     : Количество элементов
-                // Array of :
-                //  {
-                //    Long     : Позиция
-                //    Variable : Элемент
-                //  }
-
-                var Count = Reader.GetLong();
-
-                for ( var Index = 0; Index < Count; Index++ )
+                if ( true !== Debug_ParaRunMode )
                 {
-                    var Pos     = this.Internal_Get_RealPos( this.m_oContentChanges.Check( contentchanges_Add, Reader.GetLong() ) );
-                    var Element = ParagraphContent_Read_FromBinary(Reader);
+                    // Long     : Количество элементов
+                    // Array of :
+                    //  {
+                    //    Long     : Позиция
+                    //    Variable : Элемент
+                    //  }
 
-                    if ( null != Element )
+                    var Count = Reader.GetLong();
+
+                    for ( var Index = 0; Index < Count; Index++ )
                     {
-                        if ( Element instanceof ParaCommentStart )
-                        {
-                            var Comment = g_oTableId.Get_ById( Element.Id );
-                            if ( null != Comment )
-                                Comment.Set_StartInfo( 0, 0, 0, 0, this.Get_Id() );
-                        }
-                        else if ( Element instanceof ParaCommentEnd )
-                        {
-                            var Comment = g_oTableId.Get_ById( Element.Id );
-                            if ( null != Comment )
-                                Comment.Set_EndInfo( 0, 0, 0, 0, this.Get_Id() );
-                        }
+                        var Pos     = this.Internal_Get_RealPos( this.m_oContentChanges.Check( contentchanges_Add, Reader.GetLong() ) );
+                        var Element = ParagraphContent_Read_FromBinary(Reader);
 
-                        // TODO: Подумать над тем как по минимуму вставлять отметки совместного редактирования
-                        this.Content.splice( Pos, 0, new ParaCollaborativeChangesEnd() );
-                        this.Content.splice( Pos, 0, Element );
-                        this.Content.splice( Pos, 0, new ParaCollaborativeChangesStart() );
+                        if ( null != Element )
+                        {
+                            if ( Element instanceof ParaCommentStart )
+                            {
+                                var Comment = g_oTableId.Get_ById( Element.Id );
+                                if ( null != Comment )
+                                    Comment.Set_StartInfo( 0, 0, 0, 0, this.Get_Id() );
+                            }
+                            else if ( Element instanceof ParaCommentEnd )
+                            {
+                                var Comment = g_oTableId.Get_ById( Element.Id );
+                                if ( null != Comment )
+                                    Comment.Set_EndInfo( 0, 0, 0, 0, this.Get_Id() );
+                            }
 
-                        CollaborativeEditing.Add_ChangedClass(this);
+                            // TODO: Подумать над тем как по минимуму вставлять отметки совместного редактирования
+                            this.Content.splice( Pos, 0, new ParaCollaborativeChangesEnd() );
+                            this.Content.splice( Pos, 0, Element );
+                            this.Content.splice( Pos, 0, new ParaCollaborativeChangesStart() );
+
+                            CollaborativeEditing.Add_ChangedClass(this);
+                        }
                     }
-                }
 
-                this.DeleteCollaborativeMarks = false;
+                    this.DeleteCollaborativeMarks = false;
+                }
+                else
+                {
+                    // Long     : Количество элементов
+                    // Array of :
+                    //  {
+                    //    Long     : Позиция
+                    //    Variable : Id Элемента
+                    //  }
+
+                    var Count = Reader.GetLong();
+
+                    for ( var Index = 0; Index < Count; Index++ )
+                    {
+                        var Pos     = this.m_oContentChanges.Check( contentchanges_Add, Reader.GetLong() );
+                        var Element = g_oTableId.Get_ById( Reader.GetString2() );
+
+                        if ( null != Element )
+                        {
+                            if ( para_Comment === Element.Type )
+                            {
+                                var Comment = g_oTableId.Get_ById( Element.CommentId );
+
+                                if ( null != Comment )
+                                {
+                                    if ( true === Element.Start )
+                                        Comment.Set_StartInfo( 0, 0, 0, 0, this.Get_Id() );
+                                    else
+                                        Comment.Set_EndInfo( 0, 0, 0, 0, this.Get_Id() );
+                                }
+                            }
+
+                            // TODO: Нужно пометить, что это новый элемент, добавленный в совместном редактировании
+//                            this.Content.splice( Pos, 0, new ParaCollaborativeChangesEnd() );
+//                            this.Content.splice( Pos, 0, Element );
+//                            this.Content.splice( Pos, 0, new ParaCollaborativeChangesStart() );
+//                            CollaborativeEditing.Add_ChangedClass(this);
+
+                            this.Content.splice( Pos, 0, Element );
+                        }
+                    }
+
+                    //this.DeleteCollaborativeMarks = false;
+                }
 
                 break;
             }
@@ -19472,7 +19549,7 @@ Paragraph.prototype =
                     if ( false === ChangesPos )
                         continue;
 
-                    var Pos = this.Internal_Get_RealPos( ChangesPos );
+                    var Pos = ( true !== Debug_ParaRunMode ? this.Internal_Get_RealPos( ChangesPos ) : ChangesPos );
                     this.Content.splice( Pos, 1 );
                 }
 
@@ -20064,74 +20141,131 @@ Paragraph.prototype =
     {
         Writer.WriteLong( historyitem_type_Paragraph );
 
-        // String   : Id
-        // String   : Id родительского класса
-        // Variable : ParaPr
-        // String   : Id TextPr
-        // Long     : количество элементов, у которых Is_RealContent = true
-
-        Writer.WriteString2( "" + this.Id );
-        Writer.WriteString2( this.Parent.Get_Id() );
-       // Writer.WriteString2( this.Parent.Get_Id() );
-
-        this.Pr.Write_ToBinary( Writer );
-
-        Writer.WriteString2( this.TextPr.Get_Id() );
-
-        var StartPos = Writer.GetCurPosition();
-        Writer.Skip( 4 );
-
-        var Len = this.Content.length;
-        var Count  = 0;
-        for ( var Index = 0; Index < Len; Index++ )
+        if ( true !== Debug_ParaRunMode )
         {
-            var Item = this.Content[Index];
-            if ( true === Item.Is_RealContent() )
+            // String   : Id
+            // String   : Id родительского класса
+            // Variable : ParaPr
+            // String   : Id TextPr
+            // Long     : количество элементов, у которых Is_RealContent = true
+
+            Writer.WriteString2( "" + this.Id );
+            Writer.WriteString2( this.Parent.Get_Id() );
+            // Writer.WriteString2( this.Parent.Get_Id() );
+
+            this.Pr.Write_ToBinary( Writer );
+
+            Writer.WriteString2( this.TextPr.Get_Id() );
+
+            var StartPos = Writer.GetCurPosition();
+            Writer.Skip( 4 );
+
+            var Len = this.Content.length;
+            var Count  = 0;
+            for ( var Index = 0; Index < Len; Index++ )
             {
-                Item.Write_ToBinary( Writer );
-                Count++;
+                var Item = this.Content[Index];
+                if ( true === Item.Is_RealContent() )
+                {
+                    Item.Write_ToBinary( Writer );
+                    Count++;
+                }
+            }
+
+            var EndPos = Writer.GetCurPosition();
+            Writer.Seek( StartPos );
+            Writer.WriteLong( Count );
+            Writer.Seek( EndPos );
+        }
+        else
+        {
+            // String2   : Id
+            // String2   : Id родительского класса
+            // Variable  : ParaPr
+            // String2   : Id TextPr
+            // Long      : количество элементов
+            // Array of String2 : массив с Id элементами
+
+            Writer.WriteString2( "" + this.Id );
+            Writer.WriteString2( "" + this.Parent.Get_Id() );
+            this.Pr.Write_ToBinary( Writer );
+            Writer.WriteString2( "" + this.TextPr.Get_Id() );
+
+            var Count = this.Content.length;
+            Writer.WriteLong( Count );
+
+            for ( var Index = 0; Index < Count; Index++ )
+            {
+                Writer.WriteString2( "" + this.Content[Index].Get_Id() );
             }
         }
-
-        var EndPos = Writer.GetCurPosition();
-        Writer.Seek( StartPos );
-        Writer.WriteLong( Count );
-        Writer.Seek( EndPos );
     },
 
     Read_FromBinary2 : function(Reader)
     {
-        // String   : Id
-        // String   : Id родительского класса
-        // Variable : ParaPr
-        // String   : Id TextPr
-        // Long     : количество элементов, у которых Is_RealContent = true
-
-        this.Id = Reader.GetString2();
-        this.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
-
-        var LinkData = new Object();
-        LinkData.Parent = Reader.GetString2();
-
-        this.Pr = new CParaPr();
-        this.Pr.Read_FromBinary( Reader );
-
-       // this.TextPr = g_oTableId.Get_ById( Reader.GetString2() );
-        LinkData.TextPr = Reader.GetString2();
-        CollaborativeEditing.Add_LinkData(this, LinkData);
-
-
-        this.Content = new Array();
-        var Count = Reader.GetLong();
-        for ( var Index = 0; Index < Count; Index++ )
+        if ( true !== Debug_ParaRunMode )
         {
-            var Element = ParagraphContent_Read_FromBinary(Reader);
+            // String   : Id
+            // String   : Id родительского класса
+            // Variable : ParaPr
+            // String   : Id TextPr
+            // Long     : количество элементов, у которых Is_RealContent = true
 
-            if ( null != Element )
-                this.Content.push( Element );
+            this.Id = Reader.GetString2();
+            this.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
+
+            var LinkData = new Object();
+            LinkData.Parent = Reader.GetString2();
+
+            this.Pr = new CParaPr();
+            this.Pr.Read_FromBinary( Reader );
+
+            // this.TextPr = g_oTableId.Get_ById( Reader.GetString2() );
+            LinkData.TextPr = Reader.GetString2();
+            CollaborativeEditing.Add_LinkData(this, LinkData);
+
+
+            this.Content = new Array();
+            var Count = Reader.GetLong();
+            for ( var Index = 0; Index < Count; Index++ )
+            {
+                var Element = ParagraphContent_Read_FromBinary(Reader);
+
+                if ( null != Element )
+                    this.Content.push( Element );
+            }
+
+            CollaborativeEditing.Add_NewObject( this );
         }
+        else
+        {
+            // String2   : Id
+            // String2   : Id родительского класса
+            // Variable  : ParaPr
+            // String2   : Id TextPr
+            // Long      : количество элементов
+            // Array of String2 : массив с Id элементами
 
-        CollaborativeEditing.Add_NewObject( this );
+            this.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
+
+            this.Id     = Reader.GetString2();
+            this.Parent = g_oTableId.Get_ById( Reader.GetString2() );
+
+            this.Pr = new CParaPr();
+            this.Pr.Read_FromBinary( Reader );
+
+            this.TextPr = g_oTableId.Get_ById( Reader.GetString2() );
+
+            this.Content = new Array();
+            var Count = Reader.GetLong();
+            for ( var Index = 0; Index < Count; Index++ )
+            {
+                var Element = g_oTableId.Get_ById( Reader.GetString2() );
+
+                if ( null != Element )
+                    this.Content.push( Element );
+            }
+        }
     },
 
     Load_LinkData : function(LinkData)
@@ -20498,7 +20632,7 @@ Paragraph.prototype =
             for ( var Pos = 0; Pos < Count; Pos++ )
             {
                 var Item = this.Content[Pos];
-                if ( para_Comment === Item.Type && Id === Item.Id )
+                if ( para_Comment === Item.Type && Id === Item.CommentId )
                 {
                     this.Internal_Content_Remove( Pos );
                     Pos--;

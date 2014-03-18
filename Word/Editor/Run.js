@@ -36,7 +36,8 @@ function ParaRun(Paragraph)
     this.StartLine   = 0; // Строка, с которой начинается данный ран
     this.StartRange  = 0;
 
-    this.CollaborativeMarks = new Array(); // Массив CParaRunCollaborativeMark
+    this.CollaborativeMarks = new CRunCollaborativeMarks();
+    this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
 
     this.NearPosArray  = new Array();
     this.SearchMarks   = new Array();
@@ -105,6 +106,21 @@ ParaRun.prototype =
         }
 
         return NewRun;
+    },
+
+    Clear_ContentChanges : function()
+    {
+        this.m_oContentChanges.Clear();
+    },
+
+    Add_ContentChanges : function(Changes)
+    {
+        this.m_oContentChanges.Add( Changes );
+    },
+
+    Refresh_ContentChanges : function()
+    {
+        this.m_oContentChanges.Refresh();
     },
 
     Get_Text : function(Text)
@@ -363,6 +379,9 @@ ParaRun.prototype =
 
         this.Paragraph.SpellChecker.Update_OnAdd( this, Pos, Item );
 
+        // Обновляем позиции меток совместного редактирования
+        this.CollaborativeMarks.Update_OnAdd( Pos );
+
         // Отмечаем, что надо перемерить элементы в данном ране
         this.RecalcInfo.Measure = true;
     },
@@ -478,6 +497,9 @@ ParaRun.prototype =
         }
 
         this.Paragraph.SpellChecker.Update_OnRemove( this, Pos, Count );
+
+        // Обновляем позиции меток совместного редактирования
+        this.CollaborativeMarks.Update_OnRemove( Pos, Count );
 
         // Отмечаем, что надо перемерить элементы в данном ране
         this.RecalcInfo.Measure = true;
@@ -1077,10 +1099,18 @@ ParaRun.prototype =
 
     Recalculate_Range : function(ParaPr, Depth)
     {
+        var PRS = g_oPRSW;
+
+        if ( this.Paragraph !== g_oPRSW.Paragraph )
+        {
+            this.Paragraph = g_oPRSW.Paragraph;
+            this.RecalcInfo.TextPr = true;
+
+            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+        }
+
         // Сначала измеряем элементы (можно вызывать каждый раз, внутри разруливается, чтобы измерялось 1 раз)
         this.Recalculate_MeasureContent();
-
-        var PRS = g_oPRSW;
 
         var CurLine  = PRS.Line - this.StartLine;
         var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
@@ -2351,6 +2381,8 @@ ParaRun.prototype =
 
         var SearchMarksCount = this.SearchMarks.length;
 
+        this.CollaborativeMarks.Init_Drawing();
+
         for ( var Pos = StartPos; Pos < EndPos; Pos++ )
         {
             var Item = this.Content[Pos];
@@ -2369,19 +2401,7 @@ ParaRun.prototype =
 
             var DrawSearch = ( PDSH.SearchCounter > 0 ? true : false );
 
-            var nCollaborativeChanges = 0;
-            if ( true === bDrawColl )
-            {
-                var CollCount = this.CollaborativeMarks.length;
-                for ( var TempIndex = 0; TempIndex < CollCount; TempIndex++ )
-                {
-                    var CollMark = this.CollaborativeMarks[TempIndex];
-                    if ( CollMark.Pos <= Pos && pararun_CollaborativeMark_Start === CollMark.Type  )
-                        nCollaborativeChanges++;
-                    else if ( CollMark.Pos <= Pos && pararun_CollaborativeMark_End === CollMark.Type )
-                        nCollaborativeChanges--;
-                }
-            }
+            var DrawColl = this.CollaborativeMarks.Check( Pos );
 
             switch( Item.Type )
             {
@@ -2401,7 +2421,7 @@ ParaRun.prototype =
 
                     if ( true === DrawSearch )
                         aFind.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0  );
-                    else if ( nCollaborativeChanges > 0 )
+                    else if ( true === DrawColl )
                         aColl.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0  );
 
                     if ( para_Drawing != Item.Type || drawing_Anchor != Item.DrawingType )
@@ -2424,7 +2444,7 @@ ParaRun.prototype =
 
                     if ( true === DrawSearch )
                         aFind.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0  );
-                    else if ( nCollaborativeChanges > 0 )
+                    else if ( true === DrawColl )
                         aColl.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0  );
 
                     X += Item.WidthVisible;
@@ -2433,7 +2453,7 @@ ParaRun.prototype =
                 }
                 case para_End:
                 {
-                    if ( nCollaborativeChanges > 0 )
+                    if ( true === DrawColl )
                         aColl.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0  );
 
                     X += Item.Width;
@@ -4901,39 +4921,859 @@ ParaRun.prototype =
 //-----------------------------------------------------------------------------------
     Save_Changes : function(Data, Writer)
     {
+        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
+        // Long : тип класса
+        // Long : тип изменений
 
+        Writer.WriteLong( historyitem_type_ParaRun );
+
+        var Type = Data.Type;
+
+        // Пишем тип
+        Writer.WriteLong( Type );
+
+        switch ( Type )
+        {
+            case historyitem_ParaRun_AddItem:
+            {
+                // Long     : Количество элементов
+                // Array of :
+                //  {
+                //    Long     : Позиция
+                //    Variable : Элемент
+                //  }
+
+                var bArray = Data.UseArray;
+                var Count  = Data.Items.length;
+
+                Writer.WriteLong( Count );
+
+                for ( var Index = 0; Index < Count; Index++ )
+                {
+                    if ( true === bArray )
+                        Writer.WriteLong( Data.PosArray[Index] );
+                    else
+                        Writer.WriteLong( Data.Pos + Index );
+
+                    Data.Items[Index].Write_ToBinary(Writer);
+                }
+
+                break;
+            }
+
+            case historyitem_ParaRun_RemoveItem:
+            {
+                // Long          : Количество удаляемых элементов
+                // Array of Long : позиции удаляемых элементов
+
+                var bArray = Data.UseArray;
+                var Count  = Data.Items.length;
+
+                var StartPos = Writer.GetCurPosition();
+                Writer.Skip(4);
+                var RealCount = Count;
+
+                for ( var Index = 0; Index < Count; Index++ )
+                {
+                    if ( true === bArray )
+                    {
+                        if ( false === Data.PosArray[Index] )
+                            RealCount--;
+                        else
+                            Writer.WriteLong( Data.PosArray[Index] );
+                    }
+                    else
+                        Writer.WriteLong( Data.Pos );
+                }
+
+                var EndPos = Writer.GetCurPosition();
+                Writer.Seek( StartPos );
+                Writer.WriteLong( RealCount );
+                Writer.Seek( EndPos );
+
+                break;
+            }
+
+            case historyitem_ParaRun_TextPr:
+            {
+                // CTextPr
+                this.Pr.Write_ToBinary( Writer );
+
+                break;
+            }
+
+            case historyitem_ParaRun_Bold:
+            case historyitem_ParaRun_Italic:
+            case historyitem_ParaRun_Strikeout:
+            case historyitem_ParaRun_Underline:
+            {
+                // Bool : IsUndefined
+                // Bool : Value
+
+                if ( undefined != Data.New )
+                {
+                    Writer.WriteBool( false );
+                    Writer.WriteBool( Data.New );
+                }
+                else
+                    Writer.WriteBool( true );
+
+                break;
+            }
+
+            case historyitem_ParaRun_FontSize:
+            {
+                // Bool   : IsUndefined
+                // Double : FontSize
+
+                if ( undefined != Data.New )
+                {
+                    Writer.WriteBool(false);
+                    Writer.WriteDouble( Data.New );
+                }
+                else
+                    Writer.WriteBool(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Color:
+            {
+                // Bool     : IsUndefined
+                // Variable : Color (CDocumentColor)
+
+                if ( undefined != Data.New )
+                {
+                    Writer.WriteBool(false);
+                    Data.New.Write_ToBinary( Writer );
+                }
+                else
+                    Writer.WriteBool(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_VertAlign:
+            {
+                // Bool  : IsUndefined
+                // Long  : VertAlign
+
+                if ( undefined != Data.New )
+                {
+                    Writer.WriteBool(false);
+                    Writer.WriteLong(Data.New);
+                }
+                else
+                    Writer.WriteBool(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_HighLight:
+            {
+                // Bool  : IsUndefined
+                // Если false
+                //   Bool  : IsNone
+                //   Если false
+                //     Variable : Color (CDocumentColor)
+
+                if ( undefined != Data.New )
+                {
+                    Writer.WriteBool(false);
+                    if ( highlight_None != Data.New )
+                    {
+                        Writer.WriteBool( false );
+                        Data.New.Write_ToBinary( Writer );
+                    }
+                    else
+                        Writer.WriteBool( true );
+                }
+                else
+                    Writer.WriteBool(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_RStyle:
+            {
+                // Bool : IsUndefined
+                // Если false
+                //   String : RStyle
+
+                if ( undefined != Data.New )
+                {
+                    Writer.WriteBool( false );
+                    Writer.WriteString2( Data.New );
+                }
+                else
+                    Writer.WriteBool( true );
+
+                break;
+            }
+
+            case historyitem_ParaRun_Spacing:
+            case historyitem_ParaRun_Position:
+            {
+                // Bool : IsUndefined
+                // Если false
+                //   Double : Spacing
+
+                if ( undefined != Data.New )
+                {
+                    Writer.WriteBool( false );
+                    Writer.WriteDouble( Data.New );
+                }
+                else
+                    Writer.WriteBool( true );
+
+                break;
+            }
+
+            case historyitem_ParaRun_DStrikeout:
+            case historyitem_ParaRun_Caps:
+            case historyitem_ParaRun_SmallCaps:
+            {
+                // Bool : IsUndefined
+                // Если false
+                //   Bool : value
+
+                if ( undefined != Data.New )
+                {
+                    Writer.WriteBool( false );
+                    Writer.WriteBool( Data.New );
+                }
+                else
+                    Writer.WriteBool( true );
+
+                break;
+            }
+
+            case historyitem_ParaRun_RFonts:
+            {
+                // Bool : undefined ?
+                // false -> CRFonts
+                if ( undefined != Data.New )
+                {
+                    Writer.WriteBool( false );
+                    Data.New.Write_ToBinary( Writer );
+                }
+                else
+                    Writer.WriteBool( true );
+
+                break;
+            }
+
+            case historyitem_ParaRun_RFonts_Ascii:
+            case historyitem_ParaRun_RFonts_HAnsi:
+            case historyitem_ParaRun_RFonts_CS:
+            case historyitem_ParaRun_RFonts_EastAsia:
+            {
+                // Bool : undefined?
+                // false -> String
+
+                if ( undefined != Data.New )
+                {
+                    Writer.WriteBool( false );
+                    Writer.WriteString2( Data.New.Name );
+                }
+                else
+                    Writer.WriteBool( true );
+
+                break;
+            }
+
+            case historyitem_ParaRun_RFonts_Hint:
+            {
+                // Bool : undefined?
+                // false -> Long
+
+                if ( undefined != Data.New )
+                {
+                    Writer.WriteBool( false );
+                    Writer.WriteLong( Data.New );
+                }
+                else
+                    Writer.WriteBool( true );
+
+                break;
+            }
+
+            case historyitem_ParaRun_Lang:
+            {
+                // Bool : undefined ?
+                // false -> CLang
+                if ( undefined != Data.New )
+                {
+                    Writer.WriteBool( false );
+                    Data.New.Write_ToBinary( Writer );
+                }
+                else
+                    Writer.WriteBool( true );
+
+                break;
+            }
+
+            case historyitem_ParaRun_Lang_Bidi:
+            case historyitem_ParaRun_Lang_EastAsia:
+            case historyitem_ParaRun_Lang_Val:
+            {
+                // Bool : undefined ?
+                // false -> Long
+                if ( undefined != Data.New )
+                {
+                    Writer.WriteBool( false );
+                    Writer.WriteLong( Data.New );
+                }
+                else
+                    Writer.WriteBool( true );
+
+                break;
+            }
+        }
+
+        return Writer;
     },
 
     Load_Changes : function(Reader)
     {
+        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
+        // Long : тип класса
+        // Long : тип изменений
 
+        var ClassType = Reader.GetLong();
+        if ( historyitem_type_ParaRun != ClassType )
+            return;
+
+        var Type = Reader.GetLong();
+
+        switch ( Type )
+        {
+            case historyitem_ParaRun_AddItem :
+            {
+                // Long     : Количество элементов
+                // Array of :
+                //  {
+                //    Long     : Позиция
+                //    Variable : Id Элемента
+                //  }
+
+                var Count = Reader.GetLong();
+
+                for ( var Index = 0; Index < Count; Index++ )
+                {
+                    var Pos     = this.m_oContentChanges.Check( contentchanges_Add, Reader.GetLong() );
+                    var Element = ParagraphContent_Read_FromBinary(Reader);
+
+                    if ( null != Element )
+                    {
+                        this.CollaborativeMarks.Update_OnAdd( Pos );
+                        this.CollaborativeMarks.Add( Pos, Pos + 1 );
+                        this.Content.splice( Pos, 0, Element );
+
+                        CollaborativeEditing.Add_ChangedClass(this);
+                    }
+                }
+
+                this.RecalcInfo.Measure = true;
+
+                if ( undefined !== this.Paragraph && null !== this.Paragraph )
+                    this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+                break;
+            }
+
+            case historyitem_ParaRun_RemoveItem:
+            {
+                // Long          : Количество удаляемых элементов
+                // Array of Long : позиции удаляемых элементов
+
+                var Count = Reader.GetLong();
+
+                for ( var Index = 0; Index < Count; Index++ )
+                {
+                    var ChangesPos = this.m_oContentChanges.Check( contentchanges_Remove, Reader.GetLong() );
+
+                    // действие совпало, не делаем его
+                    if ( false === ChangesPos )
+                        continue;
+
+                    this.CollaborativeMarks.Update_OnRemove( ChangesPos, 1 );
+                    this.Content.splice( ChangesPos, 1 );
+                }
+
+                this.RecalcInfo.Measure = true;
+
+                if ( undefined !== this.Paragraph && null !== this.Paragraph )
+                    this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+                break;
+            }
+
+            case historyitem_ParaRun_TextPr:
+            {
+                // CTextPr
+                this.Pr = new CTextPr();
+                this.Pr.Read_FromBinary( Reader );
+
+                break;
+            }
+
+            case historyitem_ParaRun_Bold:
+            {
+                // Bool : IsUndefined
+                // Bool : Bold
+
+                if ( true === Reader.GetBool() )
+                    this.Pr.Bold = undefined;
+                else
+                    this.Pr.Bold = Reader.GetBool();
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Italic:
+            {
+                // Bool : IsUndefined
+                // Bool : Italic
+
+                if ( true === Reader.GetBool() )
+                    this.Pr.Italic = undefined;
+                else
+                    this.Pr.Italic = Reader.GetBool();
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Strikeout:
+            {
+                // Bool : IsUndefined
+                // Bool : Strikeout
+
+                if ( true === Reader.GetBool() )
+                    this.Pr.Strikeout = undefined;
+                else
+                    this.Pr.Strikeout = Reader.GetBool();
+
+                this.Recalc_CompiledPr(false);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Underline:
+            {
+                // Bool   : IsUndefined?
+                // Bool   : Underline
+
+                if ( true != Reader.GetBool() )
+                    this.Pr.Underline = Reader.GetBool();
+                else
+                    this.Pr.Underline = undefined;
+
+                this.Recalc_CompiledPr(false);
+
+                break;
+            }
+
+            case historyitem_ParaRun_FontSize:
+            {
+                // Bool   : IsUndefined
+                // Double : FontSize
+
+                if ( true != Reader.GetBool() )
+                    this.Pr.FontSize = Reader.GetDouble();
+                else
+                    this.Pr.FontSize = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Color:
+            {
+                // Bool     : IsUndefined
+                // Variable : Color (CDocumentColor)
+
+                if ( true != Reader.GetBool() )
+                {
+                    var r = Reader.GetByte();
+                    var g = Reader.GetByte();
+                    var b = Reader.GetByte();
+                    this.Pr.Color = new CDocumentColor( r, g, b );
+                }
+                else
+                    this.Pr.Color = undefined;
+
+                this.Recalc_CompiledPr(false);
+
+                break;
+            }
+
+            case historyitem_ParaRun_VertAlign:
+            {
+                // Bool  : IsUndefined
+                // Long  : VertAlign
+
+                if ( true != Reader.GetBool() )
+                    this.Pr.VertAlign = Reader.GetLong();
+                else
+                    this.Pr.VertAlign = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_HighLight:
+            {
+                // Bool  : IsUndefined
+                // Если false
+                //   Bool  : IsNull
+                //   Если false
+                //     Variable : Color (CDocumentColor)
+
+                if ( true != Reader.GetBool() )
+                {
+                    if ( true != Reader.GetBool() )
+                    {
+                        this.Pr.HighLight = new CDocumentColor(0,0,0);
+                        this.Pr.HighLight.Read_FromBinary(Reader);
+                    }
+                    else
+                        this.Pr.HighLight = highlight_None;
+                }
+                else
+                    this.Pr.HighLight = undefined;
+
+                this.Recalc_CompiledPr(false);
+
+                break;
+            }
+
+            case historyitem_ParaRun_RStyle:
+            {
+                // Bool : IsUndefined
+                // Если false
+                //   String : RStyle
+
+                if ( true != Reader.GetBool() )
+                    this.Pr.RStyle = Reader.GetString2();
+                else
+                    this.Pr.RStyle = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Spacing:
+            {
+                // Bool : IsUndefined
+                // Если false
+                //   Double : Spacing
+
+                if ( true != Reader.GetBool() )
+                    this.Pr.Spacing = Reader.GetDouble();
+                else
+                    this.Pr.Spacing = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_DStrikeout:
+            {
+                // Bool : IsUndefined
+                // Если false
+                //   Bool : DStrikeout
+
+                if ( true != Reader.GetBool() )
+                    this.Pr.DStrikeout = Reader.GetBool();
+                else
+                    this.Pr.DStrikeout = undefined;
+
+                this.Recalc_CompiledPr(false);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Caps:
+            {
+                // Bool : IsUndefined
+                // Если false
+                //   Bool : Caps
+
+                if ( true != Reader.GetBool() )
+                    this.Value.Caps = Reader.GetBool();
+                else
+                    this.Value.Caps = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_SmallCaps:
+            {
+                // Bool : IsUndefined
+                // Если false
+                //   Bool : SmallCaps
+
+                if ( true != Reader.GetBool() )
+                    this.Pr.SmallCaps = Reader.GetBool();
+                else
+                    this.Pr.SmallCaps = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Position:
+            {
+                // Bool : IsUndefined
+                // Если false
+                //   Double : Position
+
+                if ( true != Reader.GetBool() )
+                    this.Pr.Position = Reader.GetDouble();
+                else
+                    this.Pr.Position = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_RFonts:
+            {
+                // Bool : undefined ?
+                // false -> CRFonts
+                if ( false === Reader.GetBool() )
+                {
+                    this.Pr.RFonts = new CRFonts();
+                    this.Pr.RFonts.Read_FromBinary( Reader );
+                }
+                else
+                    this.Pr.RFonts = new CRFonts();
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_RFonts_Ascii:
+            {
+                // Bool : undefined ?
+                // false -> String
+                if ( false === Reader.GetBool() )
+                {
+                    this.Pr.RFonts.Ascii =
+                    {
+                        Name  : Reader.GetString2(),
+                        Index : -1
+                    };
+                }
+                else
+                    this.Pr.RFonts.Ascii = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_RFonts_HAnsi:
+            {
+                // Bool : undefined ?
+                // false -> String
+                if ( false === Reader.GetBool() )
+                {
+                    this.Pr.RFonts.HAnsi =
+                    {
+                        Name  : Reader.GetString2(),
+                        Index : -1
+                    };
+                }
+                else
+                    this.Pr.RFonts.HAnsi = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_RFonts_CS:
+            {
+                // Bool : undefined ?
+                // false -> String
+                if ( false === Reader.GetBool() )
+                {
+                    this.Pr.RFonts.CS =
+                    {
+                        Name  : Reader.GetString2(),
+                        Index : -1
+                    };
+                }
+                else
+                    this.Pr.RFonts.CS = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_RFonts_EastAsia:
+            {
+                // Bool : undefined ?
+                // false -> String
+                if ( false === Reader.GetBool() )
+                {
+                    this.Pr.RFonts.EastAsia =
+                    {
+                        Name  : Reader.GetString2(),
+                        Index : -1
+                    };
+                }
+                else
+                    this.Pr.RFonts.Ascii = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_RFonts_Hint:
+            {
+                // Bool : undefined ?
+                // false -> Long
+                if ( false === Reader.GetBool() )
+                    this.Pr.RFonts.Hint = Reader.GetLong();
+                else
+                    this.Pr.RFonts.Hint = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Lang:
+            {
+                // Bool : undefined ?
+                // false -> Lang
+                if ( false === Reader.GetBool() )
+                {
+                    this.Pr.Lang = new CLang();
+                    this.Pr.Lang.Read_FromBinary( Reader );
+                }
+                else
+                    this.Pr.Lang = new CLang();
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Lang_Bidi:
+            {
+                // Bool : undefined ?
+                // false -> Long
+
+                if ( false === Reader.GetBool() )
+                    this.Pr.Lang.Bidi = Reader.GetLong();
+                else
+                    this.Pr.Lang.Bidi = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Lang_EastAsia:
+            {
+                // Bool : undefined ?
+                // false -> Long
+
+                if ( false === Reader.GetBool() )
+                    this.Pr.Lang.EastAsia = Reader.GetLong();
+                else
+                    this.Pr.Lang.EastAsia = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Lang_Val:
+            {
+                // Bool : undefined ?
+                // false -> Long
+
+                if ( false === Reader.GetBool() )
+                    this.Pr.Lang.Val = Reader.GetLong();
+                else
+                    this.Pr.Lang.Val = undefined;
+
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+        }
     },
 
     Write_ToBinary2 : function(Writer)
     {
+        Writer.WriteLong( historyitem_type_ParaRun );
 
+        // String   : Id
+        // String   : Paragraph Id
+        // Variable : CTextPr
+        // Long     : Количество элементов
+        // Array of variable : массив с элементами
+
+        Writer.WriteString2( this.Id );
+        Writer.WriteString2( null !== this.Paragraph && undefined !== this.Paragraph ? this.Paragraph.Get_Id() : "" );
+        this.Pr.Write_ToBinary( Writer );
+
+        var Count = this.Content.length;
+        Writer.WriteLong( Count );
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var Item = this.Content[Index];
+            Item.Write_ToBinary( Writer );
+        }
     },
 
     Read_FromBinary2 : function(Reader)
     {
+        // String   : Id
+        // String   : Paragraph Id
+        // Variable : CTextPr
+        // Long     : Количество элементов
+        // Array of variable : массив с элементами
 
+        this.Id     = Reader.GetString2();
+        this.Parent = g_oTableId.Get_ById( Reader.GetString2() );
+        this.Pr     = new CTextPr();
+        this.Pr.Read_FromBinary( Reader );
+
+        var Count = Reader.GetLong();
+        this.Content = new Array();
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var Element = ParagraphContent_Read_FromBinary( Reader );
+            if ( null !== Element )
+                this.Content.push( Element );
+        }
     },
 
-
-    Write_ToBinary : function(Writer)
+    Clear_CollaborativeMarks : function()
     {
-        // TODO: Скорее всего надо будет убрать эти функции
-    },
-
-    Read_FromBinary : function(Reader)
-    {
-        // TODO: Скорее всего надо будет убрать эти функции
-    },
-
-    Is_RealContent : function()
-    {
-        // TODO: Скорее всего надо будет убрать эти функции
-        return true;
+        this.CollaborativeMarks.Clear();
     }
 };
 
@@ -5114,4 +5954,151 @@ function FontSize_IncreaseDecreaseValue(bIncrease, Value)
     }
 
     return NewValue;
+}
+
+
+function CRunCollaborativeMarks()
+{
+    this.Ranges = new Array();
+    this.DrawingObj = new Object();
+}
+
+CRunCollaborativeMarks.prototype =
+{
+    Add : function(PosS, PosE)
+    {
+        var Count = this.Ranges.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var Range = this.Ranges[Index];
+
+            if ( PosE < Range.PosS )
+                continue;
+            else if ( PosS >= Range.PosS && PosS <= Range.PosE && PosE >= Range.PosS && PosE <= Range.PosE )
+            {
+                return;
+            }
+            else if ( PosS > Range.PosE )
+            {
+                this.Ranges.splice( Index + 1, 0, new CRunCollaborativeRange(PosS, PosE) );
+                return;
+            }
+            else if ( PosS < Range.PosS && PosE > Range.PosE )
+            {
+                Range.PosS = PosS;
+                Range.PosE = PosE;
+                return;
+            }
+            else if ( PosS < Range.PosS ) // && PosE <= Range.PosE )
+            {
+                Range.PosS = PosS;
+                return;
+            }
+            else //if ( PosS >= Range.PosS && PosE > Range.Pos.E )
+            {
+                Range.PosE = PosE;
+                return;
+            }
+        }
+
+        this.Ranges.push( new CRunCollaborativeRange(PosS, PosE) );
+    },
+
+    Update_OnAdd : function(Pos)
+    {
+        var Count = this.Ranges.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var Range = this.Ranges[Index];
+
+            if ( Pos <= Range.PosS )
+            {
+                Range.PosS++;
+                Range.PosE++;
+            }
+            else if ( Pos > Range.PosS && Pos < Range.PosE )
+            {
+                var NewRange = new CRunCollaborativeRange( Pos + 1, Range.PosE + 1 );
+                this.Ranges.splice( Index + 1, 0, NewRange );
+                Range.PosE = Pos;
+                Count++;
+                Index++;
+            }
+            //else if ( Pos < Range.PosE )
+            //    Range.PosE++;
+        }
+    },
+
+    Update_OnRemove : function(Pos, Count)
+    {
+        var Len = this.Ranges.length;
+        for ( var Index = 0; Index < Len; Index++ )
+        {
+            var Range = this.Ranges[Index];
+
+            var PosE = Pos + Count;
+            if ( Pos < Range.PosS )
+            {
+                if ( PosE <= Range.PosS )
+                {
+                    Range.PosS -= Count;
+                    Range.PosE -= Count;
+                }
+                else if ( PosE >= Range.PosE )
+                {
+                    this.Ranges.splice( Index, 1 );
+                    Len--;
+                    Index--;
+                    continue;
+                }
+                else
+                {
+                    Range.PosS = Pos;
+                    Range.PosE -= Count;
+                }
+            }
+            else if ( Pos >= Range.PosS && Pos < Range.PosE )
+            {
+                if ( PosE >= Range.PosE )
+                    Range.PosE = Pos;
+                else
+                    Range.PosE -= Count;
+            }
+            else
+                continue;
+        }
+    },
+
+    Clear : function()
+    {
+        this.Ranges = new Array();
+    },
+
+    Init_Drawing  : function()
+    {
+        this.DrawingObj = new Object();
+
+        var Count = this.Ranges.length;
+        for ( var CurPos = 0; CurPos < Count; CurPos++ )
+        {
+            var Range = this.Ranges[CurPos];
+
+            for ( var Pos = Range.PosS; Pos < Range.PosE; Pos++ )
+                this.DrawingObj[Pos] = true;
+        }
+    },
+
+    Check : function(Pos)
+    {
+        if ( true === this.DrawingObj[Pos] )
+            return true;
+
+        return false;
+    }
+};
+
+function CRunCollaborativeRange(PosS, PosE)
+{
+    this.PosS = PosS;
+    this.PosE = PosE;
 }

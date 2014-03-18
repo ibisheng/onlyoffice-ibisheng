@@ -901,8 +901,10 @@ function CComments()
 
 function ParaComment(Start, Id)
 {
-    this.Start = Start;
-    this.Id    = Id;
+    this.Id = g_oIdCounter.Get_NewId();
+
+    this.Start     = Start;
+    this.CommentId = Id;
 
     this.Type  = para_Comment;
 
@@ -911,10 +913,17 @@ function ParaComment(Start, Id)
 
     this.Lines = new Array();
     this.LinesLength = 0;
+
+    // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
+    g_oTableId.Add( this, this.Id );
 }
 
 ParaComment.prototype =
 {
+    Get_Id : function()
+    {
+        return this.Id;
+    },
 
     Set_Paragraph : function()
     {
@@ -1001,17 +1010,17 @@ ParaComment.prototype =
         var Page = Para.Get_StartPage_Absolute() + CurPage;
 
         if ( true === this.Start )
-            DocumentComments.Set_StartInfo( this.Id, Page, X, Y, H, Para.Get_Id() );
+            DocumentComments.Set_StartInfo( this.CommentId, Page, X, Y, H, Para.Get_Id() );
         else
-            DocumentComments.Set_EndInfo( this.Id, Page, X, Y, H, Para.Get_Id() );
+            DocumentComments.Set_EndInfo( this.CommentId, Page, X, Y, H, Para.Get_Id() );
     },
 
     Recalculate_PageEndInfo : function(PRSI, _CurLine, _CurRange)
     {
         if ( true === this.Start )
-            PRSI.Add_Comment( this.Id );
+            PRSI.Add_Comment( this.CommentId );
         else
-            PRSI.Remove_Comment( this.Id );
+            PRSI.Remove_Comment( this.CommentId );
     },
 
     Save_Lines : function()
@@ -1049,9 +1058,9 @@ ParaComment.prototype =
     Draw_HighLights : function(PDSH)
     {
         if ( true === this.Start )
-            PDSH.Add_Comment( this.Id );
+            PDSH.Add_Comment( this.CommentId );
         else
-            PDSH.Remove_Comment( this.Id );
+            PDSH.Remove_Comment( this.CommentId );
     },
 
     Draw_Elements : function(PDSE)
@@ -1191,14 +1200,24 @@ ParaComment.prototype =
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
 //----------------------------------------------------------------------------------------------------------------------
-    Write_ToBinary : function(Writer)
+    Write_ToBinary2 : function(Writer)
     {
+        Writer.WriteLong( historyitem_type_CommentMark );
 
+        // String   : Id
+        // String   : Id комментария
+        // Bool     : Start
+
+        Writer.WriteString2( "" + this.Id );
+        Writer.WriteString2( "" + this.CommentId );
+        Writer.WriteBool( this.Start );
     },
 
-    Read_FromBinary : function(Reader)
+    Read_FromBinary2 : function(Reader)
     {
-
+        this.Id        = Reader.GetString2();
+        this.CommentId = Reader.GetString2();
+        this.Start     = Reader.GetBool();
     }
 };
 
