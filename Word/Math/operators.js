@@ -3595,7 +3595,7 @@ CDelimiter.prototype.alignOperator = function(operator) // в качестве �
             // k/(k + 1)
             // 0.2/(0.2 + 1) = 1/6
 
-            k = k > 1/4 ? k : 1/4w;
+            k = k > 1/4 ? k : 1/4;
             align = this.size.ascent - shCenter - k*(dimOper.ascent - shCenter);
         }
     }
