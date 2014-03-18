@@ -890,6 +890,8 @@ function CRadical()
     this.signRadical = null;
 
     this.gapDegree = 0;
+    this.gapWidth = 0; //  в случае со степенью, если ширина степени не нулевая, добавляется расстояние для ширины
+
 
     CMathBase.call(this);
 }
@@ -938,10 +940,9 @@ CRadical.prototype.recalculateSize = function(oMeasure)
     var txtPrp = this.getCtrPrp();
     var sign = this.signRadical.size,
         gSign = this.signRadical.gapSign,
-    // в случае смещения бейзлайн контента тоже смещается, и по высоте артгумент может выйти чуть за пределы (т.о. значок интеграла будет расположен чуть выше, чем следовало бы, и размер аргумента выйде за аграницы)
+    // в случае смещения baseline контента тоже смещается, и по высоте артгумент может выйти чуть за пределы (т.о. значок интеграла будет расположен чуть выше, чем следовало бы, и размер аргумента выйде за аграницы)
         gArg = this.signRadical.gapArg > 2*g_dKoef_pt_to_mm ? this.signRadical.gapArg : 2*g_dKoef_pt_to_mm; // делаем смещение, т.к. для fontSize 11, 14 и меньше высота плейсхолдера не совпадает
                                                                                                         // с высотой отрисовки плейсхолдера и происходит наложение черты значка радикала и плейсхолдера
-
 
     var gapBase = gSign + gArg;
 
@@ -966,21 +967,22 @@ CRadical.prototype.recalculateSize = function(oMeasure)
         var wTick = this.signRadical.measure.widthTick,
             hTick = this.signRadical.measure.heightTick;
 
-        var wDegree = degr.width > wTick ? degr.width - wTick : 0;
-        var width = wDegree + sign.width;
-        //var width = degr.width - wTick + sign.width;
-
         var plH = 9.877777777777776 * txtPrp.FontSize /36;
-        var gapDegree;
-        var shTop = 0.011*txtPrp.FontSize;
 
+        // общие gaps
+        var gapHeight = 0.011*txtPrp.FontSize; // добавляем это расстояние к общей высоте радикала, также как и gapWidth
+        this.gapWidth = 0.011*txtPrp.FontSize;
+
+        var wDegree = degr.width > wTick ? degr.width - wTick : 0;
+        var width = wDegree + sign.width + this.gapWidth;
+
+        var gapDegree;
         if( base.height < plH )
             gapDegree = 1.5*txtPrp.FontSize/36;
         else
             gapDegree = 3*txtPrp.FontSize/36;
 
-
-        var h1 = degr.height + gapDegree + hTick + shTop,
+        var h1 = gapHeight + degr.height + gapDegree + hTick,
             h2 = sign.height;
 
 
@@ -998,7 +1000,7 @@ CRadical.prototype.recalculateSize = function(oMeasure)
             ascent = gapBase + shTop + base.ascent;
         }
 
-        this.gapDegree = height - gapDegree - hTick - degr.height;
+        this.gapDegree = height - h1 + gapHeight;
 
         this.size = {width: width, height: height, ascent: ascent};
     }
@@ -1009,7 +1011,6 @@ CRadical.prototype.setPosition = function(pos)
 
     if(this.type == SQUARE_RADICAL)
     {
-
         var gapLeft = this.size.width - this.elements[0][0].size.width;
         var gapTop = this.size.ascent - this.elements[0][0].size.ascent;
 
@@ -1027,12 +1028,7 @@ CRadical.prototype.setPosition = function(pos)
 
         var wTick = this.signRadical.measure.widthTick;
 
-        /*var hTick = this.signRadical.measure.heightTick;
-
-        var hDg = degr.height + this.gap + hTick;
-        this.topDegr = this.size.height - hDg;*/
-
-        var x1 = this.pos.x,
+        var x1 = this.pos.x + this.gapWidth,
             y1 = this.pos.y + this.gapDegree;
 
         this.elements[0][0].setPosition({x: x1, y: y1});
@@ -1109,9 +1105,14 @@ CRadical.prototype.findDisposition = function(mCoord)
                 mouseCoord.x = degr.width;
                 inside_flag = 1;
             }
+            else if(mCoord.x < this.gapWidth)
+            {
+                mouseCoord.x = 0;
+                inside_flag = 0;
+            }
             else
             {
-                mouseCoord.x = mCoord.x;
+                mouseCoord.x = mCoord.x - this.gapWidth;
             }
 
             mouseCoord.x = mCoord.x;

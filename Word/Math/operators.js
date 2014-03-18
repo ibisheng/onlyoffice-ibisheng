@@ -49,7 +49,7 @@ CGlyphOperator.prototype.fixSize = function(stretch)
         width = sizeGlyph.width;
         height = sizeGlyph.height;
 
-        center = height/2;
+        ascent = height/2;
         this.stretch = stretch > width ? stretch : width;
     }
     else
@@ -60,11 +60,11 @@ CGlyphOperator.prototype.fixSize = function(stretch)
         // baseLine смещен чуть вверх, чтобы текст при вставке в скобки располагался по центру, относительно высоты скобок
         // плейсхолдер из-за этого располагается чуть выше, как в Ворде
         //center = height/2 - 1.234722222222222*betta;
-        center = height/2;
+        ascent = height/2;
         this.stretch = stretch > height ? stretch : height;
     }
 
-    this.size = {width: width, height: height, center: center};
+    this.size = {width: width, height: height, ascent: ascent};
 }
 CGlyphOperator.prototype.draw_other = function() //  с выравниванием к краю (относительно аргумента)
 {
@@ -2271,29 +2271,27 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
         };
         operator.init(props);
     }
-    else if(code === 0x3C || type === BRACKET_ANGLE_LEFT)
+    else if(code === 0x27E8 || type === BRACKET_ANGLE_LEFT) // 0x3C => 0x27E8
     {
-        codeChr = 0x3C;
+        codeChr = 0x27E8;
         typeOper = BRACKET_ANGLE_LEFT;
 
         operator = new COperatorAngleBracket();
         var props =
         {
             location:   location,
-            //location:   DELIMITER_LOCATION_LEFT,
             turn:       TURN_0
         };
         operator.init(props);
     }
-    else if(code === 0x3E || type === BRACKET_ANGLE_RIGHT)
+    else if(code === 0x27E9 || type === BRACKET_ANGLE_RIGHT) // 0x3E => 0x27E9
     {
-        codeChr = 0x3E;
+        codeChr = 0x27E9;
         typeOper = BRACKET_ANGLE_RIGHT;
 
         operator = new COperatorAngleBracket();
         var props =
         {
-            //location:   DELIMITER_LOCATION_RIGHT,
             location:   location,
             turn:       TURN_180
         };
@@ -2861,7 +2859,7 @@ COperator.prototype.drawSeparator = function(absX, absY, pGraphics)
         }
     }
 }
-COperator.prototype.fixSize = function(oMeasure, stretch)
+COperator.prototype.old_fixSize = function(oMeasure, stretch)
 {
     if(this.operator !== -1)
     {
@@ -2890,8 +2888,9 @@ COperator.prototype.fixSize = function(oMeasure, stretch)
             else
             {
                 width = this.operator.size.width;
-                height = stretch > this.operator.size.height ? stretch : this.operator.size.height;
-                ascent = this.operator.size.height/2;
+                //height = stretch > this.operator.size.height ? stretch : this.operator.size.height;
+                height = this.operator.size.height;
+                ascent = height/2;
             }
         }
         else
@@ -2921,6 +2920,69 @@ COperator.prototype.fixSize = function(oMeasure, stretch)
         this.size = { width: width, height: height, ascent: ascent};
     }
 }
+COperator.prototype.fixSize = function(oMeasure, stretch)
+{
+    if(this.operator !== -1)
+    {
+        var width, height, ascent;
+
+        if(this.typeOper == OPERATOR_TEXT) // отдельный случай для текста в качестве оператора
+        {
+            var ctrPrp = this.getCtrPrp();
+
+            var rPrp = new CMathTextPrp();
+            var defaultRPrp = this.Parent.Composition.DEFAULT_RUN_PRP;
+            rPrp.Merge(defaultRPrp);
+            rPrp.Merge(ctrPrp);
+            rPrp.Italic = false;
+
+            oMeasure.SetFont(rPrp);
+
+            this.operator.Resize(oMeasure);
+
+            if(this.operator.loc == 0 || this.operator.loc == 1)
+            {
+                height = this.operator.size.height;
+                width  = this.operator.size.width;
+            }
+            else
+            {
+                width = this.operator.size.width;
+                height = this.operator.size.height;
+            }
+        }
+        else
+        {
+            this.operator.fixSize(stretch);
+            var dims = this.operator.getCoordinateGlyph();
+            this.coordGlyph = {XX: dims.XX, YY: dims.YY};
+
+            if(this.operator.loc == 0 || this.operator.loc == 1)
+            {
+                width = dims.Width;
+                //width = this.operator.size.width;
+                height = this.operator.size.height;
+            }
+            else
+            {
+                width = this.operator.size.width;
+                height = dims.Height;
+                //height = this.operator.size.height;
+            }
+
+            //var betta = this.getCtrPrp().FontSize;
+            //ascent = height/2 + 0.2*betta;
+
+
+        }
+
+        var mgCtrPrp = this.Parent.mergeCtrTPrp();
+        var shCenter = this.Parent.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
+        ascent = height/2 + shCenter;
+
+        this.size = { width: width, height: height, ascent: ascent};
+    }
+}
 COperator.prototype.setPosition = function(pos)
 {
     this.pos = pos; // для оператора, это будет просто позиция
@@ -2928,13 +2990,18 @@ COperator.prototype.setPosition = function(pos)
 
     if(this.typeOper == OPERATOR_TEXT)
     {
-        this.operator.setPosition({x: pos.x, y: pos.y});
-        //this.operator.setPosition(pos);
-    }
-        //this.operator.setPosition({x: pos.x, y: pos.y + this.size.center});
+        /*var ascent = this.size.ascent,
+            height = this.size.height;
 
-    /*if(this.typeOper == OPERATOR_TEXT)
-        this.operator.setPosition(pos);*/
+        var k = ascent/height > 0.1 ? ascent/height : 0.1;
+
+        var x = pos.x,
+            y = pos.y + ascent - k*this.operator.size.height;
+
+        this.operator.setPosition({x: x, y: y});*/
+        this.operator.setPosition(pos);
+    }
+
 }
 COperator.prototype.IsJustDraw = function()
 {
@@ -3073,6 +3140,9 @@ CDelimiter.prototype.init = function(props)
     {
         type:  DELIMITER_LINE
     };
+
+    if(props.column == 1 )
+        sepPrp.type = OPERATOR_EMPTY;
 
     this.sepOper.init(sepPrp, sepDefaultPrp);
     this.sepOper.relate(this);
@@ -3230,6 +3300,109 @@ CDelimiter.prototype.old_recalculateSize = function()
 }
 CDelimiter.prototype.Resize = function(oMeasure)
 {
+    // размеры аргумента
+    var heightG = 0, widthG = 0,
+        ascentG = 0, descentG = 0;
+
+
+    // Аргумент
+
+    for(var j = 0; j < this.nCol; j++)
+    {
+        this.elements[0][j].Resize(oMeasure);
+        var content = this.elements[0][j].size;
+        widthG += content.width;
+        ascentG = content.ascent > ascentG ? content.ascent : ascentG;
+        descentG = content.height - content.ascent > descentG ? content.height - content.ascent: descentG;
+    }
+
+    heightG = ascentG + descentG;
+
+
+    var mgCtrPrp = this.mergeCtrTPrp();
+    var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
+    var maxAD = ascentG - shCenter  > descentG + shCenter ? ascentG - shCenter: descentG + shCenter;
+
+    var bCentered = this.shape == DELIMITER_SHAPE_CENTERED,
+        b2Max = bCentered && (2*maxAD - heightG > 0.001);
+
+    var heightStretch = b2Max ? 2*maxAD : ascentG + descentG;
+
+    this.begOper.fixSize(oMeasure, heightStretch);
+    this.endOper.fixSize(oMeasure, heightStretch);
+    this.sepOper.fixSize(oMeasure, heightStretch);
+
+    // Общая ширина
+    var width = widthG + this.begOper.size.width + this.endOper.size.width + (this.nCol - 1)*this.sepOper.size.width;
+
+
+    var maxDimOper;
+    if(this.begOper.size.height > this.endOper.size.height && this.begOper.size.height > this.sepOper.size.height)
+        maxDimOper = this.begOper.size;
+    else if(this.endOper.size.height > this.sepOper.size.height)
+        maxDimOper = this.endOper.size;
+    else
+        maxDimOper = this.sepOper.size;
+
+    // Общие высота и ascent
+    var height, ascent, descent;
+
+
+    if(this.shape == DELIMITER_SHAPE_CENTERED)
+    {
+
+        var deltaHeight = heightG - maxDimOper.height;
+        if(deltaHeight < 0)
+            deltaHeight = -deltaHeight;
+
+        var deltaMaxAD = maxAD - maxDimOper.height/ 2;
+        if(deltaMaxAD < 0)
+            deltaMaxAD = -deltaMaxAD;
+
+        var deltaMinAD = (heightG - maxAD)  - maxDimOper.height/2;
+
+            var bLHeight = deltaHeight < 0.001,
+                bLMaxAD = deltaMaxAD > 0.001,
+                bLMinAD = deltaMinAD > 0.001,
+                bTextContent = deltaMinAD  < -0.001;
+
+            var bEqualOper = bLHeight,
+                bMiddleOper = bLMaxAD && !bLMinAD,
+                bLittleOper = bLMinAD;
+
+            if(bEqualOper)
+            {
+                height = 2*maxAD;
+                ascent = maxAD + shCenter;
+            }
+            else if(bMiddleOper)
+            {
+                height = maxDimOper.height/2 + maxAD;
+                ascent = ascentG > maxDimOper.ascent? ascentG : maxDimOper.ascent;
+            }
+            else if(bTextContent)
+            {
+                ascent = maxDimOper.ascent;
+                height = maxDimOper.height;
+            }
+            else
+            {
+                ascent = ascentG;
+                height = ascentG + descentG;
+            }
+
+    }
+    else
+    {
+        ascent = ascentG;
+        height = ascentG + descentG;
+    }
+
+    this.size = {width: width, height: height, ascent: ascent};
+
+}
+CDelimiter.prototype.old_Resize = function(oMeasure)
+{
     var height = 0,
         width = 0;
 
@@ -3246,7 +3419,7 @@ CDelimiter.prototype.Resize = function(oMeasure)
     var Height = 0.4*FontSize; //  g_oTextMeasurer.GetHeight()
 
     var plH = 0.275*FontSize, // плейсхолдер
-        H2 = 0.08*FontSize; // временно baseLine
+        H2 = 0.05*FontSize; // временно baseLine
 
 
     if(this.shape == DELIMITER_SHAPE_CENTERED)
@@ -3262,12 +3435,12 @@ CDelimiter.prototype.Resize = function(oMeasure)
         _ascent  = ascent - DIV_CENT*FontSize;
         _descent = descent + DIV_CENT*FontSize;
 
-        maxH = _ascent > _descent ? _ascent : _descent;
+        var maxDim = _ascent > _descent ? _ascent : _descent;
 
         // для случая, когда в контенте степень и пр. элементы где нужно учитовать baseLine
         if(_descent < plH || _ascent < plH)
         {
-            if(maxH < plH)
+            if(maxDim < plH)
             {
                 height = _ascent + _descent;
             }
@@ -3279,7 +3452,7 @@ CDelimiter.prototype.Resize = function(oMeasure)
         }
         else
         {
-            height = 2*maxH;
+            height = 2*maxDim;
             ascent = height/2 + DIV_CENT*FontSize;
         }
     }
@@ -3370,7 +3543,7 @@ CDelimiter.prototype.Resize = function(oMeasure)
     this.size = {width: width, height: height, ascent: ascent};
 
 }
-CDelimiter.prototype.alignOperator = function(height)
+CDelimiter.prototype.old_alignOperator = function(height)
 {
     var align = 0;
 
@@ -3396,6 +3569,39 @@ CDelimiter.prototype.alignOperator = function(height)
 
     return align;
 }
+CDelimiter.prototype.alignOperator = function(operator) // в качестве аргумента передаем высоту оператора
+{
+    var align = 0;
+    var dimOper = operator.size;
+
+    var bAlign = this.size.height - dimOper.height > 0.001;
+
+    // ascent идет по бейзлайну, соответствено и сравнивать надо относительно бейзлайна (или центра)
+
+    if(bAlign)
+    {
+        if(this.shape == DELIMITER_SHAPE_CENTERED)
+        {
+            align = this.size.ascent > dimOper.ascent ? this.size.ascent - dimOper.ascent : 0;
+
+        }
+        else if(this.shape === DELIMITER_SHAPE_MATH)
+        {
+            var shCenter = dimOper.ascent - dimOper.height/2; // так получаем shCenter, иначе соотношение м/ду ascent и descent будет неверное
+
+
+            var k = 2*(this.size.ascent - shCenter)/this.size.height ;
+
+            // k/(k + 1)
+            // 0.2/(0.2 + 1) = 1/6
+
+            k = k > 1/4 ? k : 1/4w;
+            align = this.size.ascent - shCenter - k*(dimOper.ascent - shCenter);
+        }
+    }
+
+    return align;
+}
 CDelimiter.prototype.setPosition = function(position)
 {
     this.pos = {x: position.x, y: position.y - this.size.ascent};
@@ -3403,7 +3609,7 @@ CDelimiter.prototype.setPosition = function(position)
     var x = this.pos.x,
         y = this.pos.y;
 
-    var pos = {x: x, y: y + this.align(this.begOper)};
+    var pos = {x: x, y: y + this.alignOperator(this.begOper)};
     this.begOper.setPosition(pos);
     x += this.begOper.size.width;
 
@@ -3416,7 +3622,7 @@ CDelimiter.prototype.setPosition = function(position)
     var Positions = new Array();
     for(var j = 1 ; j < this.nCol; j++)
     {
-        pos = {x: x, y: y + this.align(this.sepOper)};
+        pos = {x: x, y: y + this.alignOperator(this.sepOper)};
         Positions.push(pos);
         x += this.sepOper.size.width;
 
@@ -3428,7 +3634,7 @@ CDelimiter.prototype.setPosition = function(position)
 
     this.sepOper.setPosition(Positions);
 
-    pos = {x: x, y: y + this.align(this.endOper)};
+    pos = {x: x, y: y + this.alignOperator(this.endOper)};
     this.endOper.setPosition(pos);
 }
 CDelimiter.prototype.findDisposition = function(pos)
