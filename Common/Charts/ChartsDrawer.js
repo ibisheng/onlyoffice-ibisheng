@@ -415,7 +415,7 @@ CChartsDrawer.prototype =
 		else if(labelsMargin == 0 && keyMargin != 0  && topMainTitleMargin != 0)
 			result = 2 * standartMargin;
 		else if(labelsMargin != 0 && keyMargin == 0  && topMainTitleMargin != 0)
-			result = 2 * standartMargin;
+			result = standartMargin;
 		else if(labelsMargin != 0 && keyMargin != 0  && topMainTitleMargin != 0)
 			result = 2 * standartMargin;
 		
