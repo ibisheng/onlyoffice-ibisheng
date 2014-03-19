@@ -825,7 +825,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						else{
 							var incomeObject = JSON.parse(msg);
 							switch( incomeObject["type"] ){
-								case "open":
+								case "updateversion":
+							    case "open":
+							        if ("updateversion" == incomeObject["type"])
+									    oThis.asc_setViewerMode(true);
 									var sJsonUrl = g_sResourceServiceLocalUrl + incomeObject["data"];
 									asc_ajax({
 										url: sJsonUrl,
@@ -949,9 +952,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 									oThis.handlers.trigger("asc_onError", oThis.asc_mapAscServerErrorToAscError(parseInt(incomeObject["data"])), nErrorLevel);
 									if(callback)
 										callback(result);
-									break;
-								case "updateversion":
-									alert("need updateversion");
 									break;
 								default:
 									if(callback)

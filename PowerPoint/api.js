@@ -4970,7 +4970,10 @@ function sendCommand(editor, fCallback, rdata){
         success: function(msg){
 			var incomeObject = JSON.parse(msg);
 			switch(incomeObject["type"]){
+				case "updateversion":
                 case "open":
+					if ("updateversion" == incomeObject["type"])
+			            editor.SetViewMode(true);
                     var sJsonUrl = g_sResourceServiceLocalUrl + incomeObject["data"];
 					asc_ajax({
 						url: sJsonUrl,
@@ -5055,9 +5058,6 @@ function sendCommand(editor, fCallback, rdata){
 					if(fCallback)
 						fCallback(incomeObject);
                 break;
-				case "updateversion":
-					alert("need updateversion");
-				break;
 				default:
 					if(fCallback)
 						fCallback(incomeObject);
