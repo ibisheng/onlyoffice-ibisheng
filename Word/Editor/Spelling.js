@@ -1320,6 +1320,26 @@ ParaComment.prototype.Add_SpellCheckerElement = function(Element, Start, Depth)
 ParaComment.prototype.Clear_SpellingMarks = function()
 {
 };
+//----------------------------------------------------------------------------------------------------------------------
+// ParaMath
+//----------------------------------------------------------------------------------------------------------------------
+ParaMath2.prototype.Check_Spelling = function(SpellCheckerEngine, Depth)
+{
+    if ( true === SpellCheckerEngine.bWord )
+    {
+        SpellCheckerEngine.bWord = false;
+        SpellCheckerEngine.SpellChecker.Add( SpellCheckerEngine.StartPos, SpellCheckerEngine.EndPos, SpellCheckerEngine.sWord, SpellCheckerEngine.CurLcid );
+    }
+};
+
+ParaMath2.prototype.Add_SpellCheckerElement = function(Element, Start, Depth)
+{
+};
+
+ParaMath2.prototype.Clear_SpellingMarks = function()
+{
+};
+
 
 
 function CParagraphSpellCheckerEngine(SpellChecker)

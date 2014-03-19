@@ -1588,7 +1588,31 @@ ParaComment.prototype.Search_GetId = function(bNext, bUseContentPos, ContentPos,
 {
     return null;
 };
+//----------------------------------------------------------------------------------------------------------------------
+// ParaMath
+//----------------------------------------------------------------------------------------------------------------------
+ParaMath2.prototype.Search = function(ParaSearch, Depth)
+{
+    // Обнуляем поиск
+    ParaSearch.Reset();
+};
 
+ParaMath2.prototype.Add_SearchResult = function(SearchResult, Start, ContentPos, Depth)
+{
+};
+
+ParaMath2.prototype.Clear_SearchResults = function()
+{
+};
+
+ParaMath2.prototype.Remove_SearchResult = function(SearchResult)
+{
+};
+
+ParaMath2.prototype.Search_GetId = function(bNext, bUseContentPos, ContentPos, Depth)
+{
+    return null;
+};
 
 //----------------------------------------------------------------------------------------------------------------------
 // Вспомогательные классы для поиска внутри параграфа
