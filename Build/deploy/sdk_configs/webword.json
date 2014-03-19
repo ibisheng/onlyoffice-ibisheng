@@ -87,6 +87,7 @@
                 "../../Word/Editor/ParagraphContent.js",
                 "../../Word/Editor/Hyperlink.js",
                 "../../Word/Editor/Run.js",
+                "../../Word/Editor/Math.js",
                 "../../Word/Editor/Paragraph.js",
                 "../../Word/Editor/Sections.js",
                 "../../Word/Editor/Numbering.js",
