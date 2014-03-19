@@ -307,70 +307,39 @@ CChartsDrawer.prototype =
 		
 		//высчитываем выходящие за пределы подписи осей
 		var labelsMargin = this._calculateMarginLabels(chartSpace);
-		
 		var left = labelsMargin.left, right = labelsMargin.right, top = labelsMargin.top, bottom = labelsMargin.bottom;
 		
-		//****left*****
-		if(left || !right)
-		{
-			if(chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.title != null && !isHBar)
-				left += chartSpace.chart.plotArea.valAx.title.extX + standartMargin;
-			else if(isHBar && chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.title != null)
-				left += chartSpace.chart.plotArea.catAx.title.extX + standartMargin;
-			else
-				left += standartMargin / 2;
-		}
-		else
-			left += standartMargin;
 		
 		
-		//****right*****
-		if(right)
-		{
-			right += standartMargin / 2;
-			if(chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.title != null && !isHBar)
-				left += chartSpace.chart.plotArea.valAx.title.extX;
-			else if(isHBar && chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.title != null)
-				left += chartSpace.chart.plotArea.catAx.title.extX;
-		}
-		else
-			right += standartMargin;
+		var leftTextLabels = 0;
+		var rightTextLabels = 0;
+		var topTextLabels = 0;
+		var bottomTextLabels = 0;
+		
+		//добавляем размеры подписей осей + размеры названия
+		//***left***
+		if(chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.title != null && !isHBar)
+			leftTextLabels += chartSpace.chart.plotArea.valAx.title.extX;
+		else if(isHBar && chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.title != null)
+			leftTextLabels += chartSpace.chart.plotArea.catAx.title.extX;
+
 		
 		
-		//****bottom*****
-		if(bottom || !top)
-		{
-			if(chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.title != null && !isHBar)
-				bottom += chartSpace.chart.plotArea.catAx.title.extY + standartMargin;
-			else if(isHBar && chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.title != null)
-				bottom += chartSpace.chart.plotArea.valAx.title.extY + standartMargin;
-			else
-				bottom += standartMargin / 2;
-		}
-		else
-			bottom += standartMargin;
+		//***bottom***
+		if(chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.title != null && !isHBar)
+			bottomTextLabels += chartSpace.chart.plotArea.catAx.title.extY;
+		else if(isHBar && chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.title != null)
+			bottomTextLabels += chartSpace.chart.plotArea.valAx.title.extY;
+
 		
 		
-		//****top*****
-		if(top)
-		{
-			top += standartMargin + standartMargin / 2;
-			if(chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.title != null && !isHBar)
-				bottom += chartSpace.chart.plotArea.catAx.title.extY;
-			else if(isHBar && chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.title != null)
-				bottom += chartSpace.chart.plotArea.valAx.title.extY;
-				
-			if(chartSpace.chart.title !== null && !chartSpace.chart.title.overlay)
-				top += chartSpace.chart.title.extY;
-		}
-		else
-		{
-			top += standartMargin;
-			if(chartSpace.chart.title !== null && !chartSpace.chart.title.overlay)
-				top += chartSpace.chart.title.extY + standartMargin / 2;
-		}
-			
+		//***top***
+		var topMainTitle = 0;
+		if(chartSpace.chart.title !== null && !chartSpace.chart.title.overlay)
+			topMainTitle += chartSpace.chart.title.extY;
 		
+
+		var leftKey = 0, rightKey = 0, topKey = 0, bottomKey = 0;
 		//KEY
 		if(chartSpace.chart.legend && !chartSpace.chart.legend.overlay)
 		{
@@ -378,37 +347,79 @@ CChartsDrawer.prototype =
 			{
 				case LEGEND_POS_L:
 				{
-					left += chartSpace.chart.legend.extX + standartMargin / 2;
+					leftKey += chartSpace.chart.legend.extX;
 					break;
 				}
 				case LEGEND_POS_T:
 				{
-					top += chartSpace.chart.legend.extY + standartMargin / 2;
+					topKey += chartSpace.chart.legend.extY;
 					break;
 				}
 				case LEGEND_POS_R:
 				{
-					right += chartSpace.chart.legend.extX + standartMargin / 2;
+					rightKey += chartSpace.chart.legend.extX;
 					break;
 				}
 				case LEGEND_POS_B:
 				{
-					bottom += chartSpace.chart.legend.extY + standartMargin / 2;
+					bottomKey += chartSpace.chart.legend.extY;
 					break;
 				}
 				case LEGEND_POS_TR:
 				{
-					right += chartSpace.chart.legend.extX + standartMargin / 2;
+					rightKey += chartSpace.chart.legend.extX;
 					break;
 				}
 			}
 		}
+		
+		
+		left   += this._getStandartMargin(left, leftKey, leftTextLabels, 0) + leftKey + leftTextLabels;
+		bottom += this._getStandartMargin(bottom, bottomKey, bottomTextLabels, 0) + bottomKey + bottomTextLabels;
+		top    += this._getStandartMargin(top, topKey, topTextLabels, topMainTitle) + topKey + topTextLabels + topMainTitle;
+		right  += this._getStandartMargin(right, rightKey, rightTextLabels, 0) + rightKey + rightTextLabels;
+		
 		
 		this.calcProp.chartGutter._left = left * pxToMM;
 		this.calcProp.chartGutter._right = right * pxToMM;
 		this.calcProp.chartGutter._top = top * pxToMM;
 		this.calcProp.chartGutter._bottom = bottom * pxToMM;
 	
+	},
+	
+	_getStandartMargin: function(labelsMargin, keyMargin, textMargin, topMainTitleMargin)
+	{
+		var standartMargin = 13 / this.calcProp.pxToMM;
+		var result;
+		
+		if(labelsMargin == 0 && keyMargin == 0 && textMargin == 0 && topMainTitleMargin == 0)
+			result = standartMargin;
+		else if(labelsMargin != 0 && keyMargin == 0 && textMargin == 0 && topMainTitleMargin == 0)
+			result = standartMargin / 2;
+		else if(labelsMargin != 0 && keyMargin == 0 && textMargin != 0 && topMainTitleMargin == 0)
+			result = standartMargin;
+		else if(labelsMargin != 0 && keyMargin != 0 && textMargin != 0 && topMainTitleMargin == 0)
+			result = standartMargin + standartMargin / 2;
+		else if(labelsMargin == 0 && keyMargin != 0 && textMargin == 0 && topMainTitleMargin == 0)
+			result = standartMargin;
+		else if(labelsMargin == 0 && keyMargin == 0 && textMargin != 0 && topMainTitleMargin == 0)
+			result = standartMargin;
+		else if(labelsMargin == 0 && keyMargin != 0 && textMargin != 0 && topMainTitleMargin == 0)
+			result = standartMargin + standartMargin / 2;
+		else if(labelsMargin != 0 && keyMargin != 0 && textMargin == 0 && topMainTitleMargin == 0)
+			result = standartMargin;
+		else if(labelsMargin == 0 && keyMargin != 0 && textMargin != 0 && topMainTitleMargin == 0)
+			result = standartMargin + standartMargin / 2;
+		else if(labelsMargin == 0 && keyMargin == 0 && topMainTitleMargin != 0)
+			result = standartMargin + standartMargin / 2;
+		else if(labelsMargin == 0 && keyMargin != 0  && topMainTitleMargin != 0)
+			result = 2 * standartMargin;
+		else if(labelsMargin != 0 && keyMargin == 0  && topMainTitleMargin != 0)
+			result = 2 * standartMargin;
+		else if(labelsMargin != 0 && keyMargin != 0  && topMainTitleMargin != 0)
+			result = 2 * standartMargin;
+		
+		return result;
 	},
 	
 	_calculateMarginLabels: function(chartSpace)
