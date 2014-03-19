@@ -1089,7 +1089,7 @@ asc_docs_api.prototype.CreateCSS = function()
 {
     if (window["flat_desine"] === true)
     {
-        global_style_color = "#CBCBCB";
+        GlobalSkin = GlobalSkinFlat;
     }
 
     var _head = document.getElementsByTagName('head')[0];
@@ -1120,7 +1120,7 @@ background-repeat: no-repeat;\
     var style3 = document.createElement('style');
     style3.type = 'text/css';
     style3.innerHTML = ".buttonPrevPage {\
-background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAABgCAYAAAAU0fKgAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOxAAADsQBlSsOGwAAABh0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjMxN4N3hgAAAUlJREFUWEftWEEKwjAQTMVX9Su9ivgDEaGUgojXnES89iv9QB+kNLIgcXa3sqIlxlOQnTGz2UwGi2EYbs7wWRiwAZo6Qd20aovYHhBYI4EEMUgiKaQ5GIFtU4syZi5BPYI/mMQpPSi89yY/CARVVU35sZearuuS94PVeqP2hr1MBNZIIEEMkkiWaI/Xyzl8PQJpzWn5vYQ8ic6Zr7P5dQ47KMtSnXlU0Pd98n5wOJ7U3rCnQGCNBBLEIIkE+sF+tw1bH4G0ftsPviYhT+IH/EDMieoc55AVWgSbiNI5F7rhdY6LpcTOGgqBtLifqoQpI0w15rcxAQJzwMgpzTn4uKJ0zoVuOEhxsZTY2UkkkBb3VQkkZ74SxNuo6U/knyzzdTZbWk5pjB+gdM6FbngKcbGU2NljJJAW96EfPEug9XwliKOs6c9+8EhJd/Clu/4I7OgqAAAAAElFTkSuQmCC);\
+background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAABgCAYAAAAU0fKgAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwwAADsMBx2+oZAAAABp0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjUuMTAw9HKhAAABU0lEQVRYR+XWQW6DQBBEUV8xinwxzsWOc3AGoorUUgv9qZ4Gr/DiZVFQxSwg8mvbtlsw7MCwA8MODDswDD+/74PyDENROdD1gGEuVyMYBlcMGMrM0wXDXK5GMOzAsAPDDgw7MOx4Lcty3PE/sO/7Jd8woFeY8mAH8ndA12U4kMtuxJ5ARsVgB6qny3Agl92IPcGMJw3c8ZmBdV0v+YYBvcKUBzuQvwO6LsOBXHYj9gQyKgY7UD1dhgO57EbsCWY8aeAO/NHQgWEHhh0YdmDYgSG9ynSfYCgzZcEwVGXBMD890H2CocyUBcNQlQXDDgw7MOzAsAPDjvv/UPSHfr7MePJA/g7C+R6xJ6jKYgfElWU4kJ8ezveIPUFVFjsgrizlQOVJA3d8ZoB+vsx48kD+DsL5HrEnqMpiB8SVZTiQnx7O94g9QVUWOyCuLOVA5UkD1y3HHxBw7VBakRjXAAAAAElFTkSuQmCC);\
 background-position: 0px 0px;\
 background-repeat: no-repeat;\
 }";
@@ -1129,7 +1129,7 @@ background-repeat: no-repeat;\
     var style4 = document.createElement('style');
     style4.type = 'text/css';
     style4.innerHTML = ".buttonNextPage {\
-background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAABgCAYAAAAU0fKgAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOxAAADsQBlSsOGwAAABh0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjMxN4N3hgAAAUlJREFUWEftWEEKwjAQTMVX9Su9ivgDEaGUgojXnES89iv9QB+kNLIgcXa3sqIlxlOQnTGz2UwGi2EYbs7wWRiwAZo6Qd20aovYHhBYI4EEMUgiKaQ5GIFtU4syZi5BPYI/mMQpPSi89yY/CARVVU35sZearuuS94PVeqP2hr1MBNZIIEEMkkiWaI/Xyzl8PQJpzWn5vYQ8ic6Zr7P5dQ47KMtSnXlU0Pd98n5wOJ7U3rCnQGCNBBLEIIkE+sF+tw1bH4G0ftsPviYhT+IH/EDMieoc55AVWgSbiNI5F7rhdY6LpcTOGgqBtLifqoQpI0w15rcxAQJzwMgpzTn4uKJ0zoVuOEhxsZTY2UkkkBb3VQkkZ74SxNuo6U/knyzzdTZbWk5pjB+gdM6FbngKcbGU2NljJJAW96EfPEug9XwliKOs6c9+8EhJd/Clu/4I7OgqAAAAAElFTkSuQmCC);\
+background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAABgCAYAAAAU0fKgAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwwAADsMBx2+oZAAAABp0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjUuMTAw9HKhAAABU0lEQVRYR+XWQW6DQBBEUV8xinwxzsWOc3AGoorUUgv9qZ4Gr/DiZVFQxSwg8mvbtlsw7MCwA8MODDswDD+/74PyDENROdD1gGEuVyMYBlcMGMrM0wXDXK5GMOzAsAPDDgw7MOx4Lcty3PE/sO/7Jd8woFeY8mAH8ndA12U4kMtuxJ5ARsVgB6qny3Agl92IPcGMJw3c8ZmBdV0v+YYBvcKUBzuQvwO6LsOBXHYj9gQyKgY7UD1dhgO57EbsCWY8aeAO/NHQgWEHhh0YdmDYgSG9ynSfYCgzZcEwVGXBMD890H2CocyUBcNQlQXDDgw7MOzAsAPDjvv/UPSHfr7MePJA/g7C+R6xJ6jKYgfElWU4kJ8ezveIPUFVFjsgrizlQOVJA3d8ZoB+vsx48kD+DsL5HrEnqMpiB8SVZTiQnx7O94g9QVUWOyCuLOVA5UkD1y3HHxBw7VBakRjXAAAAAElFTkSuQmCC);\
 background-position: 0px -48px;\
 background-repeat: no-repeat;\
 }";
@@ -1142,7 +1142,7 @@ asc_docs_api.prototype.CreateComponents = function()
 
 	var element = document.getElementById(this.HtmlElementName);
 	if (element != null)
-		element.innerHTML = "<div id=\"id_main\" class=\"block_elem\" style=\"-moz-user-select:none;-khtml-user-select:none;user-select:none;background-color:" + global_style_color + ";overflow:hidden;\" UNSELECTABLE=\"on\">\
+		element.innerHTML = "<div id=\"id_main\" class=\"block_elem\" style=\"-moz-user-select:none;-khtml-user-select:none;user-select:none;background-color:" + GlobalSkin.BackgroundColor + ";overflow:hidden;\" UNSELECTABLE=\"on\">\
 								<div id=\"id_panel_left\" class=\"block_elem\">\
 									<div id=\"id_buttonTabs\" class=\"block_elem buttonTabs\"></div>\
 									<canvas id=\"id_vert_ruler\" class=\"block_elem\"></canvas>\
@@ -1151,12 +1151,12 @@ asc_docs_api.prototype.CreateComponents = function()
 									<canvas id=\"id_hor_ruler\" class=\"block_elem\"></canvas>\
 									</div>\
                                     <div id=\"id_main_view\" class=\"block_elem\" style=\"overflow:hidden\">\
-                                        <canvas id=\"id_viewer\" class=\"block_elem\" style=\"background-color:" + global_style_color + ";z-index:1\"></canvas>\
+                                        <canvas id=\"id_viewer\" class=\"block_elem\" style=\"background-color:" + GlobalSkin.BackgroundColor + ";z-index:1\"></canvas>\
 									    <canvas id=\"id_viewer_overlay\" class=\"block_elem\" style=\"z-index:2\"></canvas>\
 									    <canvas id=\"id_target_cursor\" class=\"block_elem\" width=\"1\" height=\"1\" style=\"width:2px;height:13px;display:none;z-index:3;\"></canvas>\
                                     </div>\
 								</div>\
-									<div id=\"id_panel_right\" class=\"block_elem\" style=\"margin-right:1px;background-color:" + global_style_color + ";\">\
+									<div id=\"id_panel_right\" class=\"block_elem\" style=\"margin-right:1px;background-color:" + GlobalSkin.BackgroundScroll + ";\">\
 									<div id=\"id_buttonRulers\" class=\"block_elem buttonRuler\"></div>\
 									<div id=\"id_vertical_scroll\" style=\"left:0;top:0;width:16px;overflow:hidden;position:absolute;\">\
 									<div id=\"panel_right_scroll\" class=\"block_elem\" style=\"left:0;top:0;width:16px;height:6000px;\"></div>\
@@ -1164,7 +1164,7 @@ asc_docs_api.prototype.CreateComponents = function()
 									<div id=\"id_buttonPrevPage\" class=\"block_elem buttonPrevPage\"></div>\
 									<div id=\"id_buttonNextPage\" class=\"block_elem buttonNextPage\"></div>\
 								</div>\
-									<div id=\"id_horscrollpanel\" class=\"block_elem\" style=\"margin-bottom:1px;background-color:" + global_style_color + ";\">\
+									<div id=\"id_horscrollpanel\" class=\"block_elem\" style=\"margin-bottom:1px;background-color:" + GlobalSkin.BackgroundScroll + ";\">\
 									<div id=\"id_horizontal_scroll\" style=\"left:0;top:0;height:16px;overflow:hidden;position:absolute;width:100%;\">\
 										<div id=\"panel_hor_scroll\" class=\"block_elem\" style=\"left:0;top:0;width:6000px;height:16px;\"></div>\
 									</div>\

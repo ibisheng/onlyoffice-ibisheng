@@ -416,7 +416,7 @@ function CHorRuler()
         else
             context.setTransform(2, 0, 0, 2, 10, 0);
 
-        context.fillStyle = global_style_color;
+        context.fillStyle = GlobalSkin.BackgroundColor;
         context.fillRect(0, 0, this.m_oCanvas.width, this.m_oCanvas.height);
 
         // ���������� ����� ���������
@@ -468,10 +468,20 @@ function CHorRuler()
             }
         }
 
-        context.fillStyle = "#EDEDED";
+        context.fillStyle = GlobalSkin.RulerLight;
         context.fillRect(left_margin + 0.5, this.m_nTop + 0.5, right_margin - left_margin, this.m_nBottom - this.m_nTop);
 
         var intW = width >> 0;
+
+        if (window["flat_desine"] === true)
+        {
+            context.beginPath();
+            context.fillStyle = GlobalSkin.RulerDark;
+
+            context.fillRect(0.5, this.m_nTop + 0.5, left_margin, this.m_nBottom - this.m_nTop);
+            context.fillRect(right_margin + 0.5, this.m_nTop + 0.5, Math.max(intW - right_margin, 1), this.m_nBottom - this.m_nTop);
+            context.beginPath();
+        }
 
         // �����
         //context.shadowBlur = 0;
@@ -599,7 +609,7 @@ function CHorRuler()
             var _count = markup.Cols.length;
             if (0 != _count)
             {
-                context.fillStyle = global_style_color;
+                context.fillStyle = GlobalSkin.RulerDark;
                 context.strokeStyle = "#929292";
 
                 var _offset = markup.X;
@@ -1948,7 +1958,7 @@ function CVerRuler()
         else
             context.setTransform(2, 0, 0, 2, 0, 10);
 
-        context.fillStyle = global_style_color;
+        context.fillStyle = GlobalSkin.BackgroundColor;
         context.fillRect(0, 0, this.m_oCanvas.width, this.m_oCanvas.height);
 
         var top_margin = 0;
@@ -1998,11 +2008,21 @@ function CVerRuler()
 
         if (bottom_margin > top_margin)
         {
-            context.fillStyle = "#EDEDED";
+            context.fillStyle = GlobalSkin.RulerLight;
             context.fillRect(this.m_nLeft + 0.5, top_margin + 0.5, this.m_nRight - this.m_nLeft, bottom_margin - top_margin);
         }
 
         var intH = height >> 0;
+
+        if (window["flat_desine"] === true)
+        {
+            context.beginPath();
+            context.fillStyle = GlobalSkin.RulerDark;
+
+            context.fillRect(this.m_nLeft + 0.5, 0.5, this.m_nRight - this.m_nLeft, top_margin);
+            context.fillRect(this.m_nLeft + 0.5, bottom_margin + 0.5, this.m_nRight - this.m_nLeft, Math.max(intH - bottom_margin, 1));
+            context.beginPath();
+        }
 
         // �����
         context.strokeStyle = "#929292";

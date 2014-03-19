@@ -5729,14 +5729,8 @@ function CStylesPainter()
 
     this.mergedStyles = null;
 
-    this.STYLE_THUMBNAIL_WIDTH  = 80;
-    this.STYLE_THUMBNAIL_HEIGHT = 40;
-
-    if (window["flat_desine"] === true)
-    {
-        this.STYLE_THUMBNAIL_WIDTH  = 109;
-        this.STYLE_THUMBNAIL_HEIGHT = 45;
-    }
+    this.STYLE_THUMBNAIL_WIDTH  = GlobalSkin.STYLE_THUMBNAIL_WIDTH;
+    this.STYLE_THUMBNAIL_HEIGHT = GlobalSkin.STYLE_THUMBNAIL_HEIGHT;
 
     this.CurrentTranslate = null;
     this.IsRetinaEnabled = false;
@@ -6028,18 +6022,19 @@ function CStylesPainter()
             var y = index * dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
             var b = (index + 1) * dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
             var w = dKoefToMM * this.STYLE_THUMBNAIL_WIDTH;
+            var off = 10 * dKoefToMM;
 
             graphics.transform(1,0,0,1,0,0);
             graphics.save();
             graphics._s();
-            graphics._m(0, y);
-            graphics._l(w, y);
-            graphics._l(w, b);
-            graphics._l(0, b);
+            graphics._m(off, y);
+            graphics._l(w - off, y);
+            graphics._l(w - off, b);
+            graphics._l(off, b);
             graphics._z();
             graphics.clip();
 
-            graphics.t(style.Name, 0.5, y + 0.75 * (b - y));
+            graphics.t(style.Name, off + 0.5, y + 0.75 * (b - y));
 
             graphics.restore();
         }

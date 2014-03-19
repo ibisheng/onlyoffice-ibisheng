@@ -44,7 +44,24 @@ if (AscBrowser.isIE || window.opera)
     }
 }
 
-var global_style_color = "#B0B0B0";
+var GlobalSkinTeamlab = {
+    BackgroundColor : "#B0B0B0",
+    RulerDark : "#B0B0B0",
+    RulerLight : "EDEDED",
+    BackgroundScroll : "#D3D3D3",
+    STYLE_THUMBNAIL_WIDTH : 80,
+    STYLE_THUMBNAIL_HEIGHT : 40
+};
+var GlobalSkinFlat = {
+    BackgroundColor : "#F4F4F4",
+    RulerDark : "#E5E5E5",
+    RulerLight : "#F4F4F4",
+    BackgroundScroll : "#E5E5E5",
+    STYLE_THUMBNAIL_WIDTH : 109,
+    STYLE_THUMBNAIL_HEIGHT : 45
+};
+
+var GlobalSkin = GlobalSkinTeamlab;
 
 function CEditorPage(api)
 {
@@ -2455,7 +2472,7 @@ function CEditorPage(api)
             var settings = {
                 showArrows: true,
                 animateScroll: false,
-                scrollBackgroundColor:"#D3D3D3",
+                scrollBackgroundColor: GlobalSkin.BackgroundScroll,
                 scrollerColor:"#EDEDED",
                 screenW: this.m_oEditor.HtmlElement.width,
                 screenH: this.m_oEditor.HtmlElement.height,
@@ -3033,7 +3050,7 @@ function CEditorPage(api)
             return;
 
         var context = canvas.getContext("2d");
-        context.fillStyle = global_style_color;
+        context.fillStyle = GlobalSkin.BackgroundColor;
 
         //this.m_oBoundsController.Clear(context);
         // сначала посморим, изменились ли ректы страниц
