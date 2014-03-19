@@ -7215,14 +7215,15 @@ Range.prototype._promoteFromTo=function(from, to, bIsPromote, oCanPromote, bCtrl
 	
 	var toRange = this.worksheet.getRange3(to.r1, to.c1, to.r2, to.c2);
 	var fromRange = this.worksheet.getRange3(from.r1, from.c1, from.r2, from.c2);
+	var bChangeRowColProp = false;
 	var nLastCol = from.c2;
-	if(0 == from.c1 && gc_nMaxCol0 == from.c2)
+	if (0 == from.c1 && gc_nMaxCol0 == from.c2)
 	{
 		var aRowProperties = [];
 		nLastCol = 0;
 		fromRange._foreachRowNoEmpty(function(row){
 			if(!row.isEmptyProp())
-				aRowProperties.push({index: from.r1 - this.index, prop: row.getHeightProp(), style: row.getStyle()});
+				aRowProperties.push({index: row.index - from.r1, prop: row.getHeightProp(), style: row.getStyle()});
 		}, function(cell){
 			var nCurCol0 = cell.oId.getCol0();
 			if(nCurCol0 > nLastCol)
@@ -7230,69 +7231,81 @@ Range.prototype._promoteFromTo=function(from, to, bIsPromote, oCanPromote, bCtrl
 		});
 		if(aRowProperties.length > 0)
 		{
-			var nCurCount = 0;
-			for(var i = 0, length = aRowProperties.length; i < length; ++i)
-			{
-				var propElem = aRowProperties[i];
-				var nCurIndex = to.r1 + nCurCount * propElem.index;
-				if(nCurIndex <= to.r2)
-				{
-					var row = this.worksheet._getRow(nCurIndex);
-					if(null != propElem.style)
-						row.setStyle(propElem.style);
-					if(null != propElem.prop)
-					{
-						var oNewProps = propElem.prop;
-						var oOldProps = row.getHeightProp();
-						if(false == Asc.isEqual(oOldProps, oNewProps))
-						{
-							row.setHeightProp(oNewProps);
-							History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowProp, this.worksheet.getId(), new Asc.Range(0, nCurIndex, gc_nMaxCol0, nCurIndex), new UndoRedoData_IndexSimpleProp(nCurIndex, true, oOldProps, oNewProps));
-						}
-					}
-				}
-			}
+		    bChangeRowColProp = true;
+		    var nCurCount = 0;
+		    var nCurIndex = 0;
+		    while (true) {
+		        for (var i = 0, length = aRowProperties.length; i < length; ++i) {
+		            var propElem = aRowProperties[i];
+		            nCurIndex = to.r1 + nCurCount * (from.r2 - from.r1 + 1) + propElem.index;
+		            if (nCurIndex > to.r2)
+		                break;
+                    else{
+		                var row = this.worksheet._getRow(nCurIndex);
+		                if (null != propElem.style)
+		                    row.setStyle(propElem.style);
+		                if (null != propElem.prop) {
+		                    var oNewProps = propElem.prop;
+		                    var oOldProps = row.getHeightProp();
+		                    if (false == Asc.isEqual(oOldProps, oNewProps)) {
+		                        row.setHeightProp(oNewProps);
+		                        History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowProp, this.worksheet.getId(), new Asc.Range(0, nCurIndex, gc_nMaxCol0, nCurIndex), new UndoRedoData_IndexSimpleProp(nCurIndex, true, oOldProps, oNewProps));
+		                    }
+		                }
+		            }
+		        }
+		        nCurCount++;
+		        if (nCurIndex > to.r2)
+		            break;
+		    }
 		}
 	}
 	var nLastRow = from.r2;
-	if(0 == from.r1 && gc_nMaxRow0 == from.r2)
+	if (0 == from.r1 && gc_nMaxRow0 == from.r2)
 	{
 		var aColProperties = [];
 		nLastRow = 0;
 		fromRange._foreachColNoEmpty(function(col){
 			if(!col.isEmpty())
-				aRowProperties.push({index: from.c1 - this.index, prop: row.getWidthProp(), style: row.getStyle()});
+			    aColProperties.push({ index: col.index - from.c1, prop: col.getWidthProp(), style: col.getStyle() });
 		}, function(cell){
 			var nCurRow0 = cell.oId.getRow0();
 			if(nCurRow0 > nLastRow)
 				nLastRow = nCurRow0;
 		});
-		if(aColProperties.length > 0)
+		if (aColProperties.length > 0)
 		{
-			var nCurCount = 0;
-			for(var i = 0, length = aColProperties.length; i < length; ++i)
-			{
-				var propElem = aColProperties[i];
-				var nCurIndex = to.c1 + nCurCount * propElem.index;
-				if(nCurIndex <= to.c2)
-				{
-					var col = this.worksheet._getCol(nCurIndex);
-					if(null != propElem.style)
-						col.setStyle(propElem.style);
-					if(null != propElem.prop)
-					{
-						var oNewProps = propElem.prop;
-						var oOldProps = col.getWidthProp();
-						if(false == oOldProps.isEqual(oNewProps))
-						{
-							col.setWidthProp(oNewProps);
-							History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, this.worksheet.getId(), new Asc.Range(nCurIndex, 0, nCurIndex, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(nCurIndex, false, oOldProps, oNewProps));
-						}
-					}
-				}
-			}
+		    bChangeRowColProp = true;
+		    var nCurCount = 0;
+		    var nCurIndex = 0;
+		    while (true) {
+		        for (var i = 0, length = aColProperties.length; i < length; ++i) {
+		            var propElem = aColProperties[i];
+		            nCurIndex = to.c1 + nCurCount * (from.c2 - from.c1 + 1) + propElem.index;
+		            if (nCurIndex > to.c2)
+		                break;
+                    else{
+		                var col = this.worksheet._getCol(nCurIndex);
+		                if (null != propElem.style)
+		                    col.setStyle(propElem.style);
+		                if (null != propElem.prop) {
+		                    var oNewProps = propElem.prop;
+		                    var oOldProps = col.getWidthProp();
+		                    if (false == oOldProps.isEqual(oNewProps)) {
+		                        col.setWidthProp(oNewProps);
+		                        History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, this.worksheet.getId(), new Asc.Range(nCurIndex, 0, nCurIndex, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(nCurIndex, false, oOldProps, oNewProps));
+		                    }
+		                }
+		            }
+		        }
+		        nCurCount++;
+		        if (nCurIndex > to.c2)
+		            break;
+		    }
 		}
 	}
+	if (bChangeRowColProp)
+	    this.worksheet.workbook.handlers.trigger("changeWorksheetUpdate", this.worksheet.getId());
 	if(nLastCol != from.c2 || nLastRow != from.r2)
 	{
 		var offset = {offsetCol:nLastCol - from.c2, offsetRow:nLastRow - from.r2};
