@@ -13,7 +13,7 @@ var type_Paragraph = 0x0001;
 
 var UnknownValue  = null;
 
-var Debug_ParaRunMode = false;
+var Debug_ParaRunMode = true;
 
 // Класс Paragraph
 function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFromPresentation)
