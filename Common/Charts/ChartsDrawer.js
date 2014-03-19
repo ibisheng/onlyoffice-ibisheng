@@ -384,7 +384,6 @@ CChartsDrawer.prototype =
 		this.calcProp.chartGutter._right = right * pxToMM;
 		this.calcProp.chartGutter._top = top * pxToMM;
 		this.calcProp.chartGutter._bottom = bottom * pxToMM;
-	
 	},
 	
 	_getStandartMargin: function(labelsMargin, keyMargin, textMargin, topMainTitleMargin)
@@ -530,10 +529,18 @@ CChartsDrawer.prototype =
 		{
 			if(catAx.xPoints.length > 1)
 			{
-				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
-					leftDownPointX = catAx.xPoints[0].pos - (catAx.xPoints[1].pos - catAx.xPoints[0].pos) / 2;
+				if(catAx.scaling.orientation != ORIENTATION_MIN_MAX)
+				{
+					leftDownPointX = catAx.xPoints[catAx.xPoints.length - 1].pos;
+				}
 				else
-					leftDownPointX = catAx.xPoints[0].pos;
+				{
+					if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+						leftDownPointX = catAx.xPoints[0].pos - (catAx.xPoints[1].pos - catAx.xPoints[0].pos) / 2;
+					else
+						leftDownPointX = catAx.xPoints[0].pos;
+				}
+				
 			}
 			else
 				leftDownPointX = catAx.labels.x;
@@ -544,10 +551,18 @@ CChartsDrawer.prototype =
 			
 			if(catAx.xPoints.length > 1)
 			{
-				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
-					rightUpPointX = catAx.xPoints[catAx.xPoints.length - 1].pos + (catAx.xPoints[1].pos - catAx.xPoints[0].pos) / 2;
+				if(catAx.scaling.orientation != ORIENTATION_MIN_MAX)
+				{
+					rightUpPointX = catAx.xPoints[0].pos;
+				}
 				else
-					rightUpPointX = catAx.xPoints[catAx.xPoints.length - 1].pos;
+				{
+					if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+						rightUpPointX = catAx.xPoints[catAx.xPoints.length - 1].pos + (catAx.xPoints[1].pos - catAx.xPoints[0].pos) / 2;
+					else
+						rightUpPointX = catAx.xPoints[catAx.xPoints.length - 1].pos;
+				}
+				
 			}
 			else
 				rightUpPointX = catAx.labels.x;
@@ -2449,6 +2464,7 @@ CChartsDrawer.prototype =
 	
 	_getAxisValues : function(isOx, yMin, yMax, chartProp)
 	{
+		//chartProp.chart.plotArea.valAx.scaling.logBase
 		var axisMin, axisMax, firstDegree, step, arrayValues;
 		
 		chartProp.chart.plotArea.valAx && chartProp.chart.plotArea.valAx.scaling ? chartProp.chart.plotArea.valAx.scaling.max : null;
@@ -3261,10 +3277,12 @@ drawBarChart.prototype =
 		var widthOverLap = individualBarWidth * (overlap / 100);
 		var hmargin = (this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100 * individualBarWidth) / 2;
 		
-		var height, startX, startY, diffYVal, val, paths, seriesHeight = [], seria, startYColumnPosition, startXPosition;
+		var height, startX, startY, diffYVal, val, paths, seriesHeight = [], seria, startYColumnPosition, startXPosition, tempI;
 		
+		
+	
 		for (var i = 0; i < this.chartProp.series.length; i++) {
-		
+	
 			numCache = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache : this.chartProp.series[i].val.numLit;
 			seria = numCache.pts;
 			seriesHeight[i] = [];
@@ -3280,14 +3298,29 @@ drawBarChart.prototype =
 				seriesHeight[i][j] = height;
 				
 				//стартовая позиция колонки X
-				if(j != 0)
-					startXPosition = xPoints[j].pos - (xPoints[j].pos - xPoints[j - 1].pos) / 2;
+				//if(j != 0)
+				
+				if(this.cShapeDrawer.chart.plotArea.catAx.scaling.orientation == ORIENTATION_MIN_MAX)
+					startXPosition = xPoints[j].pos - Math.abs(xPoints[0].pos - this.cShapeDrawer.chart.plotArea.valAx.posX);
 				else
-					startXPosition = this.cShapeDrawer.chart.plotArea.valAx.posX;
-				if(i == 0)
-					startX = startXPosition * this.chartProp.pxToMM + hmargin + i * (individualBarWidth);
+					startXPosition = xPoints[j].pos + Math.abs(xPoints[0].pos - this.cShapeDrawer.chart.plotArea.valAx.posX);
+					
+				
+				if(this.cShapeDrawer.chart.plotArea.catAx.scaling.orientation == ORIENTATION_MIN_MAX)
+				{
+					if(i == 0)
+						startX = startXPosition * this.chartProp.pxToMM + hmargin + i * (individualBarWidth);
+					else
+						startX = startXPosition * this.chartProp.pxToMM + hmargin + (i * individualBarWidth - i * widthOverLap);
+				}
 				else
-					startX = startXPosition * this.chartProp.pxToMM + hmargin + (i * individualBarWidth - i * widthOverLap);
+				{
+					if(i == 0)
+						startX = startXPosition * this.chartProp.pxToMM - hmargin - (i + 1) * (individualBarWidth);
+					else
+						startX = startXPosition * this.chartProp.pxToMM - hmargin - ((i + 1) * individualBarWidth - (i + 1) * widthOverLap);
+				}
+				
 				
 				//if(height != 0)
 				//{
@@ -3300,7 +3333,7 @@ drawBarChart.prototype =
 					this.paths.series[i][j] = paths;
 				//}
 			}
-        }
+		}
     },
 	
 	
