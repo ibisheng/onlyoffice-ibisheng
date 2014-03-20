@@ -9530,6 +9530,7 @@ Paragraph.prototype =
 
         SearchPos.CurX = Range.XVisible;
         SearchPos.X    = X;
+        SearchPos.Y    = Y;
 
         // Проверим попадание в нумерацию
         if ( true === this.Numbering.Check_Range(CurRange, CurLine) )
@@ -22108,6 +22109,7 @@ function CParagraphSearchPosXY()
 
     this.CurX           = 0;
     this.X              = 0;
+    this.Y              = 0;
     this.DiffX          = 1000000; // километра для ограничения должно хватить
     this.NumberingDiffX = 1000000; // километра для ограничения должно хватить
 
