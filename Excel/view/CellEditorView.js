@@ -135,7 +135,7 @@
 			//-----------------
 			
 			// Автоподстановка формул
-			this.formulaSelectorColor = "#C7C7C7";
+			this.formulaSelectorColor = "rgba(105, 119, 62, 0.2)";
 
 			this._init();
 
@@ -1672,7 +1672,6 @@
 									}
 								}
 							}
-							
 							return oFormulaList.list.length ? oFormulaList : null;
 						}
 					}
@@ -1684,40 +1683,42 @@
 				if ( formulaList ) {
 					var _this = this;
 					var api = asc["editor"];
-					var canvasWidget = $("#" + api.HtmlElementName);
+					var canvasWidget = document.getElementById(api.HtmlElementName);
 					
-					var selector = $("<div id='formulaSelector'></div>");
-					selector[0].style["zIndex"] = "3000";
-					selector[0].style["width"] = "100px";
-					selector[0].style["height"] = "auto";
-					selector[0].style["backgroundColor"] = "#FFFFFF";
-					selector[0].style["border"] = "1px solid Grey";
-					selector[0].style["top"] = (formulaList.y + canvasWidget.offset().top) + "px";
-					selector[0].style["left"] = (formulaList.x + canvasWidget.offset().left) + "px";
-					selector[0].style["position"] = "absolute";
-					selector[0].style["cursor"] = "default";
-					selector[0].style["font-size"] = "12px";
-					selector[0].style["padding"] = "4px";
-					$("body").append(selector);
+					var selector = document.createElement("div");
+					selector.id = "formulaSelector";
+					selector.style["zIndex"] = "3000";
+					selector.style["width"] = "100px";
+					selector.style["height"] = "auto";
+					selector.style["backgroundColor"] = "#FFFFFF";
+					selector.style["border"] = "1px solid Grey";
+					selector.style["top"] = (formulaList.y + canvasWidget.offsetTop) + "px";
+					selector.style["left"] = (formulaList.x + canvasWidget.offsetLeft) + "px";
+					selector.style["position"] = "absolute";
+					selector.style["cursor"] = "default";
+					selector.style["font-size"] = "12px";
+					selector.style["padding"] = "4px";
+					document.body.appendChild(selector);
 					
-					var combo = $("<ul></ul>").attr("id", "formulaList");
-					combo[0].style["margin"] = 0;
-					combo[0].style["padding"] = 0;
-					selector.append(combo);
+					var combo = document.createElement("ul");
+					combo.id = "formulaList";
+					combo.style["margin"] = 0;
+					combo.style["padding"] = 0;
+					selector.appendChild(combo);
 					
 					for ( var i = 0; i < formulaList.list.length; i++ ) {
-						var item = $("<li></li>");
-						item[0].style["list-style-type"] = "none";
-						item[0].innerText = formulaList.list[i].name;
-						item.attr("title", formulaList.list[i].arg);
+						var item = document.createElement("li");
+						item.style["list-style-type"] = "none";
+						item.innerText = formulaList.list[i].name;
+						item.setAttribute("title", formulaList.list[i].arg);
 						
-						item[0].onmouseover = function(e) {
+						item.onmouseover = function(e) {
 							this.style["backgroundColor"] = _this.formulaSelectorColor;
 						}
-						item[0].onmouseout = function(e) {
+						item.onmouseout = function(e) {
 							this.style["backgroundColor"] = "";
 						}
-						item[0].ondblclick = function(e) {
+						item.ondblclick = function(e) {
 							if ( e && (e.button === 0) ) {
 								var formulaName = this.innerText;
 								var insertText = formulaName.substring(_this.input.value.length - 1) + "(";
@@ -1725,20 +1726,20 @@
 								_this._removeFormulaSelector();
 							}
 						}
-						combo.append(item);
+						combo.appendChild(item);
 					}
 				}
 			},
 			
 			_removeFormulaSelector: function() {
-				var selector = $("#formulaSelector");
-				if ( selector.length > 0 )
+				var selector = document.getElementById("formulaSelector");
+				if ( selector )
 					selector.remove();
 			},
 			
 			_updateFormulaSelectorPosition: function() {
-				var selector = $("#formulaSelector");
-				if ( selector.length > 0 ) {
+				var selector = document.getElementById("formulaSelector");
+				if ( selector ) {
 					var api = asc["editor"];
 					if ( api.wb ) {
 						var ws = api.wb.getWorksheet();
@@ -1753,18 +1754,20 @@
 									
 								var fv = frozenPlace.getFirstVisible();
 								if ( (editedCol < fv.col) || (editedRow < fv.row) ) {
-									selector[0].style["display"] = "none";
+									selector.style["display"] = "none";
 									return;
 								}
 								else
-									selector[0].style["display"] = "";
+									selector.style["display"] = "";
 								
 								var y = ws.getCellTop(editedRow, 0) + frozenPlace.getVerticalScroll() - ws.getCellTop(0, 0);
 								var x = ws.getCellLeft(editedCol, 0) + frozenPlace.getHorizontalScroll() - ws.getCellLeft(0, 0);
 								
-								var canvasWidget = $("#" + api.HtmlElementName);
-								selector[0].style["top"] = (y + canvasWidget.offset().top) + "px";
-								selector[0].style["left"] = (x + canvasWidget.offset().left) + "px";
+								var canvasWidget = document.getElementById(api.HtmlElementName);
+								if ( canvasWidget ) {
+									selector.style["top"] = (y + canvasWidget.offsetTop) + "px";
+									selector.style["left"] = (x + canvasWidget.offsetLeft) + "px";
+								}
 								return;
 							}
 						}
@@ -1774,9 +1777,9 @@
 			
 			_keyDownFormulaSelector: function (event) {
 				var _this = this;
-				var combo = $("#formulaList");
-				if ( combo.length > 0 ) {
-					var nodes = combo[0].childNodes;
+				var combo = document.getElementById("formulaList");
+				if ( combo ) {
+					var nodes = combo.childNodes;
 					
 					switch (event.which) {
 						case 38: // Up
@@ -1796,9 +1799,8 @@
 							}
 							break;
 						case 40: // Down
-							{							
+							{
 								var selectedIndex = -1;
-								var nodes = combo[0].childNodes;
 								for ( var i = 0; i < nodes.length; i++ ) {
 									if ( nodes[i].style["backgroundColor"] != "" ) {
 										selectedIndex = i;
@@ -1813,7 +1815,7 @@
 							}
 							break;
 						case 9: // Tab
-							{							
+							{
 								for ( var i = 0; i < nodes.length; i++ ) {
 									if ( nodes[i].style["backgroundColor"] != "" ) {
 										var formulaName = nodes[i].innerText;
