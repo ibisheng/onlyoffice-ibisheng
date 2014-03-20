@@ -8055,8 +8055,11 @@ Paragraph.prototype =
                 if ( Direction < 0 && false === Result )
                 {
                     // Мы стоим в начале параграфа и пытаемся удалить элемент влево. Действуем следующим образом:
-                    // 1. Если у нас параграф с нумерацией, тогда удаляем нумерацию, но при этом сохраняем
-                    //    значения отступов так как это делается в Word. (аналогично работаем с нумерацией в презентациях)
+                    // 1. Если у нас параграф с нумерацией.
+                    //    1.1 Если нумерация нулевого уровня, тогда удаляем нумерацию, но при этом сохраняем
+                    //        значения отступов так как это делается в Word. (аналогично работаем с нумерацией в
+                    //        презентациях)
+                    //    1.2 Если нумерация не нулевого уровня, тогда уменьшаем уровень.
                     // 2. Если у нас отступ первой строки ненулевой, тогда:
                     //    2.1 Если он положительный делаем его нулевым.
                     //    2.2 Если он отрицательный сдвигаем левый отступ на значение отступа первой строки,
@@ -8070,8 +8073,17 @@ Paragraph.prototype =
                     var Pr = this.Get_CompiledPr2(false).ParaPr;
                     if ( undefined != this.Numbering_Get() )
                     {
-                        this.Numbering_Remove();
-                        this.Set_Ind( { FirstLine : 0, Left : Math.max( Pr.Ind.Left, Pr.Ind.Left + Pr.Ind.FirstLine ) }, false );
+                        var NumPr = this.Numbering_Get();
+
+                        if ( 0 === NumPr.Lvl )
+                        {
+                            this.Numbering_Remove();
+                            this.Set_Ind( { FirstLine : 0, Left : Math.max( Pr.Ind.Left, Pr.Ind.Left + Pr.Ind.FirstLine ) }, false );
+                        }
+                        else
+                        {
+                            this.Numbering_IndDec_Level( false );
+                        }
                     }
                     else if ( numbering_presentationnumfrmt_None != this.PresentationPr.Bullet.Get_Type() )
                     {
