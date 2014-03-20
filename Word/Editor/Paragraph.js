@@ -14177,7 +14177,7 @@ Paragraph.prototype =
                 if ( PageIndex < 0 || PageIndex >= this.Pages.length || true != this.Selection.Use )
                     return false;
 
-                var SearchPosXY = this.Get_ParaContentPosByXY( X, Y, PageIndex, false, false );
+                var SearchPosXY = this.Get_ParaContentPosByXY( X, Y, PageIndex + this.PageNum, false, false );
 
                 if ( SearchPosXY.Pos.Compare( SelSP ) >= 0 && SearchPosXY.Pos.Compare( SelEP ) <= 0 )
                     return true;
