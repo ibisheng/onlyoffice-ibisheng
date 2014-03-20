@@ -612,6 +612,16 @@ ParaMath.prototype =
 //-----------------------------------------------------------------------------------
     Draw_HighLights : function(PDSH)
     {
+        var CurLine  = PDSH.Line - this.StartLine;
+        var CurRange = ( 0 === CurLine ? PDSH.Range - this.StartRange : PDSH.Range );
+
+        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
+        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
+
+        if ( EndPos >= 1 )
+        {
+            PDSH.X += this.Width;
+        }
     },
 
     Draw_Elements : function(PDSE)
@@ -631,6 +641,16 @@ ParaMath.prototype =
 
     Draw_Lines : function(PDSL)
     {
+        var CurLine  = PDSL.Line - this.StartLine;
+        var CurRange = ( 0 === CurLine ? PDSL.Range - this.StartRange : PDSL.Range );
+
+        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
+        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
+
+        if ( EndPos >= 1 )
+        {
+            PDSL.X += this.Width;
+        }
     },
 //-----------------------------------------------------------------------------------
 // Функции для работы с курсором
