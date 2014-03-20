@@ -365,7 +365,10 @@ function CMathContent()
     this.bRoot      =   false;
 
     this.content = new Array(); // array of mathElem
+    //this.length = 0;
+
     this.CurPos = 0;
+
     this.pos = {x:0,    y:0};   // относительная позиция
 
     this.Composition = null; // ссылка на общую формулу
@@ -572,7 +575,7 @@ CMathContent.prototype =
 
         return [item];
     },
-    addMComponent: function(ind)
+    _addMComponent: function(ind)
     {
         //var l_gap =  0, r_gap = 0;
         var mathElem = null;    //положение этого элемента будет this.CurPos + 1
@@ -693,8 +696,11 @@ CMathContent.prototype =
         if(obj.typeObj == MATH_COMP)
             obj.setArgSize(this.argSize);
 
+
+        //this.length = this.content.length;
+
     },
-    addToContent: function(obj, shift)   // for "edit"
+    addToContent: function(obj, shift)   // for "edit", letters
     {
         var elem = new mathElem(obj);
 
@@ -4660,6 +4666,32 @@ CMathContent.prototype =
                 this.setLogicalPosition(0);
         }
     },
+    cursor_Is_Start: function()
+    {
+        var result = false;
+
+        if( !this.IsEmpty() )
+        {
+            if(this.CurPos == 0)
+                result = true;
+            else if(this.CurPos == 1 && this.content[1].value.typeObj === MATH_RUN_PRP)
+                result = true;
+        }
+
+        return result;
+    },
+    cursor_Is_End: function()
+    {
+        var result = false;
+
+        if(!this.IsEmpty())
+        {
+            if(this.CurPos == this.content.length - 1)
+                result = true;
+        }
+
+        return result;
+    },
     //////////////////////////////////////
 
     // не вызываем из mouseDown эту ф-ию, тк иначе не установим селект для внутреннего объекта (setStart_Selection)
@@ -5389,7 +5421,7 @@ CMathContent.prototype =
             this.content[i].widthToEl = this.content[i-1].widthToEl + this.content[i].value.size.width + this.content[i].gaps.left + this.content[i].gaps.right;
         }
     },
-    update_Cursor: function()
+    old_update_Cursor: function()
     {
         //var sizeCursor = this.getRunPrp(this.CurPos).FontSize*g_dKoef_pt_to_mm;
 
@@ -5410,6 +5442,22 @@ CMathContent.prototype =
         editor.WordControl.m_oDrawingDocument.UpdateTargetFromPaint = true;
         editor.WordControl.m_oLogicDocument.DrawingDocument.UpdateTarget( position.x, position.y, 0 );
         editor.WordControl.m_oDrawingDocument.UpdateTargetFromPaint = false;
+
+    },
+    update_Cursor: function()
+    {
+        var runPrp = this.getRunPrp(this.CurPos);
+        var oWPrp = runPrp.getMergedWPrp();
+        this.applyArgSize(oWPrp);
+
+        var absPos = this.Composition.absPos;
+
+        var sizeCursor = oWPrp.FontSize*g_dKoef_pt_to_mm;
+
+        var X = this.pos.x + absPos.x + this.content[this.CurPos].widthToEl,
+            Y = this.pos.y + absPos.y + this.size.ascent - sizeCursor*0.8;
+
+        return {X: X, Y: Y, Height: sizeCursor};
 
     },
     old_coordWOGaps: function( msCoord )
@@ -7093,6 +7141,40 @@ CMathContent.prototype =
         return flag;
     },
 
+
+    /// Position for Paragraph
+
+    get_ParaContentPos: function(bStart, ContentPos)
+    {
+        var bSelect = this.selectUse();
+
+        if(bSelect)
+        {
+            var pos = bStart ? this.RealSelect.startPos : this.RealSelect.endPos;
+            ContentPos.Add(pos);
+        }
+        else
+        {
+            ContentPos.Add(this.CurPos);
+
+            if(this.content[this.CurPos].value.typeObj == MATH_COMP)
+                this.content[this.CurPos].value.get_ParaContentPos(bStart, ContentPos);
+        }
+    },
+    set_ParaContentPos: function(ContentPos, Depth)
+    {
+        this.CurPos = ContentPos.Get(Depth);
+
+        Depth++;
+
+        if(this.content[this.CurPos].value.typeObj == MATH_COMP)
+            this.content[this.CurPos].value.set_ParaContentPos(ContentPos, Depth);
+
+    },
+
+    //////////////////////////
+
+
     ////////////////  Test function for test_math  //////////////////
 
     mouseUp: function()
@@ -7224,7 +7306,6 @@ CMathContent.prototype =
     }
     /////////////////////////////////////////////////////////////////
 
-
     ////  test function for me  ////
 
     /*RecalculateReverse: function(oMeasure)
@@ -7262,6 +7343,15 @@ function CMathComposition()
         wrapIndent: 0,
         smallFrac:  false,
         wrapRight:  false
+    };
+
+    this.Size =
+    {
+        Width:          0,
+        WidthVisible:   0,
+        Height:         0,
+        Ascent:         0,
+        Descent:        0
     };
 
     this.CurrentContent    = null;
@@ -7858,6 +7948,16 @@ CMathComposition.prototype =
     {
         this.Root.Resize(oMeasure);
         this.Root.setPosition({x: 0, y: 0});
+
+        this.Size =
+        {
+            Width:          this.Root.size.width,
+            WidthVisible:   this.Root.size.width,
+            Height:         this.Root.size.height,
+            Ascent:         this.Root.size.ascent,
+            Descent:        this.Root.size.height - this.Root.size.ascent
+        };
+
     },
     test_for_edit: function()
     {
@@ -8017,7 +8117,15 @@ CMathComposition.prototype =
         this.Root.cursor_MoveToEndPos();
         this.CurrentContent = this.SelectContent = this.Root;
     },
-    getSize: function()
+    Cursor_Is_Start: function()
+    {
+        return this.Root.cursor_Is_Start();
+    },
+    Cursor_Is_End: function()
+    {
+        return this.Root.cursor_Is_End();
+    },
+    old_getSize: function()
     {
         /*return this.Root.size;*/
 
@@ -8112,7 +8220,7 @@ CMathComposition.prototype =
     },
     UpdateCursor: function()
     {
-        this.SelectContent.update_Cursor();
+        return this.SelectContent.update_Cursor();
     },
     Refresh_RecalcData2: function()
     {

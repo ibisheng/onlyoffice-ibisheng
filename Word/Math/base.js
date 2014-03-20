@@ -10,8 +10,10 @@ function CMathBase()
     this.size = null;
     this.argSize = 0;
 
-    this.CurPos_X = 0;
-    this.CurPos_Y = 0;
+    //this.CurPos_X = 0;
+    //this.CurPos_Y = 0;
+
+
     this.selectPos =
     {
         startX:    0,
@@ -1174,5 +1176,27 @@ CMathBase.prototype =
         }
 
         return gaps;
+    },
+
+
+    /// Position for Paragraph
+
+    get_ParaContentPos: function(bStart, ContentPos)
+    {
+        ContentPos.Add(this.CurPos_X);
+        ContentPos.Add(this.CurPos_Y);
+
+        this.elements[this.CurPos_X][this.CurPos_Y].get_ParaContentPos(bStart, ContentPos);
+    },
+    set_ParaContentPos: function(ContentPos, Depth)
+    {
+        this.CurPos_X = ContentPos.Get(Depth);
+        this.CurPos_Y = ContentPos.Get(Depth + 1);
+
+        Depth += 2;
+
+        this.elements[this.CurPos_X][this.CurPos_Y].set_ParaContentPos(ContentPos, Depth);
     }
+
+    //////////////////////////
 }

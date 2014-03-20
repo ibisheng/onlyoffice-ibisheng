@@ -11,7 +11,8 @@ function ParaMath()
     this.Jc   = undefined;
     this.Math = new CMathComposition();
     this.Math.Parent = this;
-
+    this.Content = this.Math.Root.content; // Root.content
+    this.State      = new CParaRunState();       // Положение курсора и селекта для данного run
     this.Paragraph  = null;
 
     this.StartLine  = 0;
@@ -201,10 +202,10 @@ ParaMath.prototype =
 
     Get_CurrentParaPos : function()
     {
-        var CurPos = this.State.ContentPos;
+        //var CurPos = this.State.ContentPos;
 
-        if ( CurPos >= 0 && CurPos < this.Content.length )
-            return this.Content[CurPos].Get_CurrentParaPos();
+        /*if ( CurPos >= 0 && CurPos < this.Content.length )
+            return this.Content[CurPos].Get_CurrentParaPos();*/
 
         return new CParaPos( this.StartRange, this.StartLine, 0, 0 );
     },
@@ -293,7 +294,7 @@ ParaMath.prototype =
         var TextPr = new CTextPr();
         TextPr.Init_Default();
         this.Math.RecalculateComposition(g_oTextMeasurer, TextPr);
-        var Size = this.Math.getSize();
+        var Size = this.Math.Size;
 
         this.Width        = Size.Width;
         this.Height       = Size.Height;
@@ -371,7 +372,7 @@ ParaMath.prototype =
                     {
                         // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                         PRS.MoveToLBP = true;
-                        PRS.NewRange  = true;
+                        PRS.NewRange  = true; // перенос на новую строку
                     }
                     else
                     {
@@ -380,7 +381,7 @@ ParaMath.prototype =
 
                         // Слово не убирается в отрезке, но, поскольку, слово 1 на строке и отрезок тоже 1,
                         // делим слово в данном месте
-                        PRS.NewRange = true;
+                        PRS.NewRange = true; // перенос на новую строку
                     }
                 }
                 else
@@ -403,7 +404,7 @@ ParaMath.prototype =
 
         if ( true !== PRS.NewRange )
         {
-            RangeEndPos = 1;
+            RangeEndPos = this.Content.length; // RangeEndPos = 1;    to    RangeEndPos = this.Content.length;
 
             // Удаляем лишние строки, оставшиеся после предыдущего пересчета в самом конце
             if ( this.Lines.length > this.LinesLength )
@@ -421,6 +422,10 @@ ParaMath.prototype =
         {
             this.Range.StartPos = RangeStartPos;
             this.Range.EndPos   = RangeEndPos;
+
+            /*this.Lines[0].RangesLength = 1;
+            this.Lines[0].Ranges.length = this.Content.length - 1;*/
+
             this.Lines[0].RangesLength = 1;
 
             if ( this.Lines[0].Ranges.length > 1 )
@@ -582,7 +587,7 @@ ParaMath.prototype =
             return this.Math.UpdateCursor();
         }
 
-        return { X : X };
+        return {X : X };
     },
 
     Refresh_RecalcData : function(Data)
@@ -668,7 +673,8 @@ ParaMath.prototype =
     Cursor_Is_Start : function()
     {
         // TODO: ParaMath.Cursor_Is_Start
-        return true;
+
+        return this.Math.Cursor_Is_Start();
     },
 
     Cursor_Is_NeededCorrectPos : function()
@@ -679,33 +685,121 @@ ParaMath.prototype =
     Cursor_Is_End : function()
     {
         // TODO: ParaMath.Cursor_Is_End
-        return true;
+
+        return this.Math.Cursor_Is_End();
     },
 
     Cursor_MoveToStartPos : function()
     {
         // TODO: ParaMath.Cursor_MoveToStartPos
+
+        this.Math.Cursor_MoveToStartPos();
     },
 
     Cursor_MoveToEndPos : function(SelectFromEnd)
     {
         // TODO: ParaMath.Cursor_MoveToEndPos
+
+        this.Math.Cursor_MoveToEndPos();
     },
 
     Get_ParaContentPosByXY : function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
     {
         // TODO: ParaMath.Get_ParaContentPosByXY
-        return false;
+
+        var Result = false;
+
+        var CurLine  = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange ); // если находимся в нулевой строке (для текущей позиции), то CurRange мб ненулевой
+
+        var Range = this.Lines[CurLine].Ranges[CurRange];
+        var StartPos = Range.StartPos;  //  0
+        var EndPos   = Range.EndPos;    //  this.content.length
+
+        // TODO: реализовать поиск по Y (для случая, когда формула занимает больше одной строки)
+
+        // Проверяем, попали ли мы в формулу
+
+        var Dx = this.Math.Size.WidthVisible;
+        var D = SearchPos.X - SearchPos.CurX;
+        //var Diff = Math.abs(D) < Math.abs(D -  Dx) ? Math.abs(D) : Math.abs(D -  Dx);
+        var Diff = SearchPos.X - SearchPos.CurX;
+
+        if(Math.abs(Diff) < SearchPos.DiffX + 0.001 )
+        {
+            SearchPos.DiffX = Math.abs(Diff);
+            this.Math.Selection_SetStart(SearchPos.X, SearchPos.Y);
+            this.Math.Selection_SetEnd(SearchPos.X, SearchPos.Y);
+            this.Math.Root.get_ParaContentPos(false, SearchPos.Pos);
+
+            Result = true;
+            if ( Diff >= - 0.001 && Diff <= Dx + 0.001 )
+            {
+                SearchPos.InText = true;
+            }
+        }
+
+        SearchPos.CurX += Dx;
+
+        /*for(var CurPos = StartPos; CurPos < EndPos; CurPos++)
+        {
+            var Dx = this.Content[CurPos].value.size.width;
+
+            // Проверяем, попали ли мы в данный элемент
+            var Diff = SearchPos.X - SearchPos.CurX;
+            if ( Math.abs( Diff ) < SearchPos.DiffX + 0.001 )
+            {
+                SearchPos.DiffX = Math.abs( Diff );
+                SearchPos.Pos.Update( CurPos, Depth );
+                //this.Math.Root.get_ParaContentPos(false, SearchPos.Pos);
+
+                Result = true;
+
+                if ( Diff >= - 0.001 && Diff <= Dx + 0.001 )
+                {
+                    SearchPos.InText = true;
+                }
+            }
+
+            SearchPos.CurX += Dx;
+        }*/
+
+
+        /*var Diff = SearchPos.X - SearchPos.CurX;
+        if ( Math.abs( Diff ) < SearchPos.DiffX + 0.001 )
+        {
+            SearchPos.DiffX = Math.abs( Diff );
+            SearchPos.Pos.Update( StartPos, Depth );
+            Result = true;
+
+            if ( Diff >= - 0.001 && Diff <= this.Math.size.WidthVisible + 0.001 )
+            {
+                SearchPos.InText = true;
+            }
+        }
+
+        SearchPos.CurX += this.Math.size.WidthVisible;*/
+
+
+        return Result;
     },
 
-    Get_ParaContentPos : function(bSelection, bStart, ContentPos)
+    Get_ParaContentPos : function(bSelection, bStart, ContentPos) // получение позиции контентов
     {
         // TODO: ParaMath.Get_ParaContentPos
+
+        this.Math.Root.get_ParaContentPos(bStart, ContentPos);
+
     },
 
-    Set_ParaContentPos : function(ContentPos, Depth)
+    Set_ParaContentPos : function(ContentPos, Depth) // выставить позицию в конетенте
     {
         // TODO: ParaMath.Set_ParaContentPos
+
+        var Pos = ContentPos.Get(Depth);
+        this.State.ContentPos = Pos;
+
+        this.Math.Root.set_ParaContentPos(ContentPos, Depth);
     },
 
     Get_PosByElement : function(Class, ContentPos, Depth, UseRange, Range, Line)
