@@ -5182,6 +5182,7 @@
 				this._drawCells(/*drawingCtx*/undefined, range);
 				this._drawCellsBorders(/*drawingCtx*/undefined, range);
 				this._drawAutoF(range, offsetX, offsetY);
+				editor._updateFormulaSelectorPosition();
 				if (0 < cFrozen) {
 					range.c1 = 0;
 					range.c2 = cFrozen - 1;
@@ -5276,6 +5277,7 @@
 				this._drawCells(/*drawingCtx*/undefined, range);
 				this._drawCellsBorders(/*drawingCtx*/undefined, range);
 				this._drawAutoF(range, offsetX, offsetY);
+				editor._updateFormulaSelectorPosition();
 				if (rFrozen) {
 					range.r1 = 0;
 					range.r2 = rFrozen - 1;

@@ -209,6 +209,7 @@
 				    "moveResizeRangeHandleDone":function () {self._onMoveResizeRangeHandleDone.apply(self, arguments);},
 				    "editCell":          		function () {self._onEditCell.apply(self, arguments);},
 				    "stopCellEditing":   		function () {return self._onStopCellEditing.apply(self, arguments);},
+					"removeFormulaSelector":   	function () {return self._onRemoveFormulaSelector.apply(self, arguments);},
 				    "empty":					function () {self._onEmpty.apply(self, arguments);},
 				    "canEnterCellRange":		function () {
 															    self.cellEditor.setFocus(false);
@@ -950,6 +951,10 @@
 
 		WorkbookView.prototype._onStopCellEditing = function () {
 			return this.cellEditor.close(true);
+		};
+		
+		WorkbookView.prototype._onRemoveFormulaSelector = function () {
+			return this.cellEditor._removeFormulaSelector();
 		};
 
 		WorkbookView.prototype._onCloseCellEditor = function () {

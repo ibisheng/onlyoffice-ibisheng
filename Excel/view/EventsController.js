@@ -1295,6 +1295,7 @@
 							}
 							// для определения рэнджа под курсором и активизации его для WorksheetView
 							else if (false === t.handlers.trigger("canEnterCellRange")) {
+								t.handlers.trigger("removeFormulaSelector");
 								if (!t.handlers.trigger("stopCellEditing")) {return;}
 							}
 						}

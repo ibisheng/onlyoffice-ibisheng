@@ -133,6 +133,9 @@
 			this.fKeyMouseUp	= null;
 			this.fKeyMouseMove	= null;
 			//-----------------
+			
+			// Автоподстановка формул
+			this.formulaSelectorColor = "#C7C7C7";
 
 			this._init();
 
@@ -221,7 +224,10 @@
 					t.input.addEventListener("drop"		, function (e) {e.preventDefault(); return false;}									, false);
 				}
 
-				this.fKeyDown		= function () {return t._onWindowKeyDown.apply(t, arguments);};
+				this.fKeyDown		= function () {
+					t._keyDownFormulaSelector.apply(t, arguments);
+					return t._onWindowKeyDown.apply(t, arguments);
+				};
 				this.fKeyPress		= function () {return t._onWindowKeyPress.apply(t, arguments);};
 				this.fKeyUp			= function () {return t._onWindowKeyUp.apply(t, arguments);};
 				this.fKeyMouseUp	= function () {return t._onWindowMouseUp.apply(t, arguments);};
@@ -1605,15 +1611,17 @@
 						
 						var findAutoString = function (col, row) {
 							var oString = null;
-							var cellText = _this.input.value + str;
+							var _start = (_this.selectionBegin >= 0) ? _this.selectionBegin : _this.input.value.length;
+							var fixedText = _this.input.value.substring(0, _start);
+							var cellText = fixedText + str;
 							if ( !isNumber(cellText) ) {
 								var cellAddress = new CellAddress(row, col, 0);
 								var topCellText = ws.model.getCell(cellAddress).getValueWithFormat();
 								var start = topCellText.indexOf(cellText);
 								if ( topCellText && (start == 0) ) {
 									oString = {};
-									oString.text = topCellText.substring(_this.input.value.length, topCellText.length);
-									oString.selectionBegin = _this.input.value.length + 1;
+									oString.text = topCellText.substring(fixedText.length, topCellText.length);
+									oString.selectionBegin = fixedText.length + 1;
 									oString.selectionEnd = topCellText.length;
 								}
 							}
@@ -1639,6 +1647,188 @@
 				return null;
 			},
 
+			_getFormulaList: function(str) {
+				var _this = this;
+				var text = _this.input.value + str;
+				if ( text.indexOf("=") == 0 ) {
+					var pattern = text.substring(1);
+					var api = asc["editor"];
+					if ( api.wb && pattern.length ) {
+						var ws = api.wb.getWorksheet();
+						if ( ws ) {
+							var oFormulaList = {};
+							var editedCol = ws.getSelectedColumnIndex();
+							var editedRow = ws.getSelectedRowIndex() + 1;
+							oFormulaList.y = ws.getCellTop(editedRow, 0);
+							oFormulaList.x = ws.getCellLeft(editedCol, 0);
+							oFormulaList.list = [];
+							
+							var fullFormulaList = api.asc_getFormulasInfo();
+							for ( var i = 0; i < fullFormulaList.length; i++ ) {
+								var group = fullFormulaList[i];
+								for ( var j = 0; j < group.formulasArray.length; j++ ) {
+									if ( group.formulasArray[j].name.indexOf(pattern/*.toUpperCase()*/) == 0 ) {
+										oFormulaList.list.push(group.formulasArray[j]);
+									}
+								}
+							}
+							
+							return oFormulaList.list.length ? oFormulaList : null;
+						}
+					}
+				}
+				return null;
+			},
+			
+			_showFormulaSelector: function(formulaList) {
+				if ( formulaList ) {
+					var _this = this;
+					var api = asc["editor"];
+					var canvasWidget = $("#" + api.HtmlElementName);
+					
+					var selector = $("<div id='formulaSelector'></div>");
+					selector[0].style["zIndex"] = "3000";
+					selector[0].style["width"] = "100px";
+					selector[0].style["height"] = "auto";
+					selector[0].style["backgroundColor"] = "#FFFFFF";
+					selector[0].style["border"] = "1px solid Grey";
+					selector[0].style["top"] = (formulaList.y + canvasWidget.offset().top) + "px";
+					selector[0].style["left"] = (formulaList.x + canvasWidget.offset().left) + "px";
+					selector[0].style["position"] = "absolute";
+					selector[0].style["cursor"] = "default";
+					selector[0].style["font-size"] = "12px";
+					selector[0].style["padding"] = "4px";
+					$("body").append(selector);
+					
+					var combo = $("<ul></ul>").attr("id", "formulaList");
+					combo[0].style["margin"] = 0;
+					combo[0].style["padding"] = 0;
+					selector.append(combo);
+					
+					for ( var i = 0; i < formulaList.list.length; i++ ) {
+						var item = $("<li></li>");
+						item[0].style["list-style-type"] = "none";
+						item[0].innerText = formulaList.list[i].name;
+						item.attr("title", formulaList.list[i].arg);
+						
+						item[0].onmouseover = function(e) {
+							this.style["backgroundColor"] = _this.formulaSelectorColor;
+						}
+						item[0].onmouseout = function(e) {
+							this.style["backgroundColor"] = "";
+						}
+						item[0].ondblclick = function(e) {
+							if ( e && (e.button === 0) ) {
+								var formulaName = this.innerText;
+								var insertText = formulaName.substring(_this.input.value.length - 1) + "(";
+								_this._addChars(insertText);
+								_this._removeFormulaSelector();
+							}
+						}
+						combo.append(item);
+					}
+				}
+			},
+			
+			_removeFormulaSelector: function() {
+				var selector = $("#formulaSelector");
+				if ( selector.length > 0 )
+					selector.remove();
+			},
+			
+			_updateFormulaSelectorPosition: function() {
+				var selector = $("#formulaSelector");
+				if ( selector.length > 0 ) {
+					var api = asc["editor"];
+					if ( api.wb ) {
+						var ws = api.wb.getWorksheet();
+						if ( ws ) {
+							var editedCol = ws.getSelectedColumnIndex();
+							var editedRow = ws.getSelectedRowIndex() + 1;
+							
+							for (var n = 0; n < ws.drawingArea.frozenPlaces.length; n++) {
+								var frozenPlace = ws.drawingArea.frozenPlaces[n];
+								if ( !frozenPlace.isCellInside({ col: editedCol, row: editedRow }) )
+									continue;
+									
+								var fv = frozenPlace.getFirstVisible();
+								if ( (editedCol < fv.col) || (editedRow < fv.row) ) {
+									selector[0].style["display"] = "none";
+									return;
+								}
+								else
+									selector[0].style["display"] = "";
+								
+								var y = ws.getCellTop(editedRow, 0) + frozenPlace.getVerticalScroll() - ws.getCellTop(0, 0);
+								var x = ws.getCellLeft(editedCol, 0) + frozenPlace.getHorizontalScroll() - ws.getCellLeft(0, 0);
+								
+								var canvasWidget = $("#" + api.HtmlElementName);
+								selector[0].style["top"] = (y + canvasWidget.offset().top) + "px";
+								selector[0].style["left"] = (x + canvasWidget.offset().left) + "px";
+								return;
+							}
+						}
+					}
+				}
+			},
+			
+			_keyDownFormulaSelector: function (event) {
+				var _this = this;
+				var combo = $("#formulaList");
+				if ( combo.length > 0 ) {
+					var nodes = combo[0].childNodes;
+					
+					switch (event.which) {
+						case 38: // Up
+							{
+								var selectedIndex = nodes.length;
+								for ( var i = 0; i < nodes.length; i++ ) {
+									if ( nodes[i].style["backgroundColor"] != "" ) {
+										selectedIndex = i;
+										nodes[i].style["backgroundColor"] = "";
+										break;
+									}
+								}
+								selectedIndex--;
+								if ( selectedIndex < 0 )
+									selectedIndex = 0;
+								nodes[selectedIndex].style["backgroundColor"] = _this.formulaSelectorColor;							
+							}
+							break;
+						case 40: // Down
+							{							
+								var selectedIndex = -1;
+								var nodes = combo[0].childNodes;
+								for ( var i = 0; i < nodes.length; i++ ) {
+									if ( nodes[i].style["backgroundColor"] != "" ) {
+										selectedIndex = i;
+										nodes[i].style["backgroundColor"] = "";
+										break;
+									}
+								}
+								selectedIndex++;
+								if ( selectedIndex >= nodes.length )
+									selectedIndex = nodes.length - 1;
+								nodes[selectedIndex].style["backgroundColor"] = _this.formulaSelectorColor;							
+							}
+							break;
+						case 9: // Tab
+							{							
+								for ( var i = 0; i < nodes.length; i++ ) {
+									if ( nodes[i].style["backgroundColor"] != "" ) {
+										var formulaName = nodes[i].innerText;
+										var insertText = formulaName.substring(_this.input.value.length - 1) + "(";
+										_this._addChars(insertText);
+										_this._removeFormulaSelector();
+										break;
+									}
+								}
+							}
+							break;
+					}
+				}
+			},
+			
 			// Event handlers
 
 			/** @param event {jQuery.Event} */
@@ -1667,6 +1857,7 @@
 							return false;
 						t.undoAll();
 						t.close();
+						t._removeFormulaSelector();
 						return false;
 
 					case 13:  // "enter"
@@ -1898,7 +2089,13 @@
 
 				//t.setFocus(true);
 				t.isUpdateValue = false;
+				t._removeFormulaSelector();
 				var oAutoString = t._getAutoString(String.fromCharCode(event.which));
+				var oFormulaList = t._getFormulaList(String.fromCharCode(event.which));
+				
+				if (oFormulaList) {
+					t._showFormulaSelector(oFormulaList);
+				}
 				if ( oAutoString ) {
 					t._addChars(oAutoString.text);
 					t.selectionBegin = oAutoString.selectionBegin;
