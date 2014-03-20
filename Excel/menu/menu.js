@@ -477,7 +477,7 @@
 
 	api.asc_registerCallback("asc_onActiveSheetChanged", onActiveSheetChanged);
 
-//	api.asc_registerCallback("asc_onCellTextChanged", function(){console.log(arguments)});
+	//api.asc_registerCallback("asc_onCellTextChanged", function(){console.log(arguments)});
 
 	api.asc_registerCallback("asc_onConfirmAction", function(){
 		var arg = arguments;
@@ -717,7 +717,7 @@
 		#td_print, #td_copy, #td_paste,#td_cut, #td_ta_center, #td_ta_right, #td_ta_left, #td_ta_justify, \
 		#td_mergeCells, #td_recalc, #td_insert_chart, #td_insert_image_url, #td_insert_image_file, #td_drawing_object_layer, \
 		#td_add_cell_comment, #td_add_document_comment, #td_add_hyperlink, #td_auto_filter, #td_auto_filter_local, \
-		#td_set_fixed_area, #td_clean_fixed_area").click(function(){
+		#td_set_fixed_area, #td_clean_fixed_area, #td_set_fixed_col, #td_set_fixed_row").click(function(){
 		switch (this.id){
 			case "td_bold":{
 				if ($(this).hasClass("iconPressed")){
@@ -922,9 +922,19 @@
 				break;
 			}
 			case "td_set_fixed_area":{
+				api.asc_setSelectedFrozenCell();
 				break;
 			}
 			case "td_clean_fixed_area":{
+				api.asc_clearFrozenCell();
+				break;
+			}
+			case "td_set_fixed_col":{
+				api.asc_setFirstFrozenCol();
+				break;
+			}
+			case "td_set_fixed_row":{
+				api.asc_setFirstFrozenRow();
 				break;
 			}
 		}
