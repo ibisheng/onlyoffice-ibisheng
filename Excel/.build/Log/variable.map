@@ -250,7 +250,7 @@ ImageLoadStatus$Complete:Tf
 T1_Get_Private_Dict:et
 c_oSer_SheetPr$SyncVertical:sN
 c_oSerSheetFormatPrTypes$DefaultColWidth:dJ
-c_oMainTables$ViewProps:cX
+c_oMainTables$ViewProps:bX
 _iup_worker_interpolate:yp
 JSCompiler_StaticMethods__getRowNoEmpty:Rx
 c_oSer_SheetPr$Published:pN
@@ -603,7 +603,7 @@ cGreaterOperator:gz
 cff_cmap_unicode_class_rec:bs
 JSCompiler_StaticMethods__arrowUpMouseDown:NW
 T1_Driver_Done:pt
-c_oMainTables$Presentation:bX
+c_oMainTables$Presentation:aX
 c_oSer_Pane$State:eN
 c_oSerWorkbookTypes$DefinedNames:jI
 T1_BuilderRec:Xk
@@ -729,7 +729,7 @@ cSEARCH:UB
 CAscColorScheme:YX
 TT_NameTableRec:gi
 cODDFYIELD:kE
-cErrorType$wrong_value_type:N
+cErrorType$wrong_value_type:M
 JSCompiler_StaticMethods_ReadExternal:XW
 JSCompiler_StaticMethods__FormatNumber:Fc
 BinaryWorksheetsTableWriter:sP
@@ -995,7 +995,7 @@ JSCompiler_StaticMethods_default_tt:xo
 g_sUploadServiceLocalUrl:Ya
 cAVERAGE:dC
 AFM_FontInfoRec:Kj
-c_oMainTables$TableStyles:dX
+c_oMainTables$TableStyles:cX
 Ins_NROUND:Lp
 historyitem_Worksheet_RemoveCellFormula:bU
 NumFormat:yc
@@ -2226,7 +2226,7 @@ tt_cmap13_char_index:Jm
 JSCompiler_StaticMethods__removeTileZeros:Sc
 t1_service_multi_masters:At
 cff_index_read_offset:zr
-UndoRedoDataAddParaItem:ZV
+UndoRedoDataAddParaItem:YV
 c_oSerFontTypes$Sz:XH
 matching:bC
 historyitem_Chart_Type:Yd
@@ -2321,12 +2321,12 @@ UndoRedoWoorksheet:fW
 c_oSerWorkbookTypes$DefinedName:kI
 sfnt_load_face:wn
 cTAN:QF
-L 21:K
+L 21:N
 L 20:G
 L 23:O
 AscBrowser$isGecko:ka
-L 22:L
-L 25:M
+L 22:K
+L 25:L
 L 24:U
 c_oSerFillTypes$PatternFill:QH
 tt_find_sbit_image:$l
@@ -2526,7 +2526,7 @@ CPoint2:wu
 cEVEN:XE
 CPoint1:vu
 Ins_DELTAP:Mp
-UndoRedoDataSetAdjustmentValue:YV
+UndoRedoDataSetAdjustmentValue:XV
 ft_var_load_gvar:lq
 ECellTypeType$celltypeSharedString:iO
 c_oSerWorksheetColTypes$Min:WI
@@ -2540,7 +2540,7 @@ arrRecalc:nS
 c_oSerStylesTypes$CellXfs:YG
 TT_Round_Down_To_Grid:no
 SafariIntervalFocus:kx
-UndoRedoData_historyitem_Paragraph_AddItem:$V
+UndoRedoData_historyitem_Paragraph_AddItem:ZV
 cRECEIVED:uE
 FT_Module:Xi
 cNPER:hE
@@ -2566,7 +2566,7 @@ JSCompiler_StaticMethods__moveCellVer:TT
 L 73:vw
 L 74:DO
 Int64:Tg
-L 75:Gr
+L 75:Fr
 tt_face_load_bdf_props:ql
 L 76:Hr
 JSCompiler_StaticMethods_rebuildSeries:de
