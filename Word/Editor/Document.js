@@ -1667,7 +1667,7 @@ CDocument.prototype =
             // До перерисовки селекта должны выставить
             this.Pages[PageIndex].EndPos = Count - 1;
 
-            console.log("LastRecalc: " + ((new Date().getTime() - StartTime) / 1000) );
+            //console.log("LastRecalc: " + ((new Date().getTime() - StartTime) / 1000) );
 
             RunRangesCount = 0;
             RunRangesElementsCount = 0;

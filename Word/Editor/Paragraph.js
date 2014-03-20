@@ -8615,7 +8615,7 @@ Paragraph.prototype =
 
                         for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
                         {
-                            this.Content[CurPos].Apply_TextPr( TextPr, undefined, false );
+                            this.Content[CurPos].Apply_TextPr( TextPr, undefined, true );
                         }
 
                         // Выставляем настройки для символа параграфа

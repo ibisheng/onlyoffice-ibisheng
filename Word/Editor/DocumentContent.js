@@ -6145,31 +6145,49 @@ CDocumentContent.prototype =
         {
             var VisTextPr;
 
-            this.Content[0].Set_ApplyToAll(true);
-
-            if ( type_Paragraph == this.Content[0].GetType() )
-                VisTextPr = this.Content[0].Selection_CalculateTextPr();
-            else if ( type_Table == this.Content[0].GetType() )
-                VisTextPr = this.Content[0].Get_Paragraph_TextPr();
-
-            this.Content[0].Set_ApplyToAll(false);
-
-            for ( var Index = 1; Index < this.Content.length; Index++ )
+            if ( true !== Debug_ParaRunMode )
             {
-                var Item = this.Content[Index];
+                this.Content[0].Set_ApplyToAll(true);
 
-                var CurPr;
+                if ( type_Paragraph == this.Content[0].GetType() )
+                    VisTextPr = this.Content[0].Selection_CalculateTextPr();
+                else if ( type_Table == this.Content[0].GetType() )
+                    VisTextPr = this.Content[0].Get_Paragraph_TextPr();
 
-                Item.Set_ApplyToAll(true);
+                this.Content[0].Set_ApplyToAll(false);
 
-                if ( type_Paragraph == Item.GetType() )
-                    CurPr = Item.Selection_CalculateTextPr();
-                else if ( type_Table == Item.GetType() )
-                    CurPr = Item.Get_Paragraph_TextPr();
+                for ( var Index = 1; Index < this.Content.length; Index++ )
+                {
+                    var Item = this.Content[Index];
 
-                Item.Set_ApplyToAll(false);
+                    var CurPr;
 
-                VisTextPr = VisTextPr.Compare(CurPr);
+                    Item.Set_ApplyToAll(true);
+
+                    if ( type_Paragraph == Item.GetType() )
+                        CurPr = Item.Selection_CalculateTextPr();
+                    else if ( type_Table == Item.GetType() )
+                        CurPr = Item.Get_Paragraph_TextPr();
+
+                    Item.Set_ApplyToAll(false);
+
+                    VisTextPr = VisTextPr.Compare(CurPr);
+                }
+            }
+            else
+            {
+                this.Content[0].Set_ApplyToAll(true);
+                VisTextPr = this.Content[0].Get_Paragraph_TextPr();
+                this.Content[0].Set_ApplyToAll(false);
+
+                var Count = this.Content.length;
+                for ( var Index = 1; Index < Count; Index++ )
+                {
+                    this.Content[Index].Set_ApplyToAll(true);
+                    var CurPr = this.Content[Index].Get_Paragraph_TextPr();
+                    VisTextPr = VisTextPr.Compare( CurPr );
+                    this.Content[Index].Set_ApplyToAll(false);
+                }
             }
 
             Result_TextPr = VisTextPr;
@@ -6197,22 +6215,35 @@ CDocumentContent.prototype =
                             EndPos   = Temp;
                         }
 
-                        if ( type_Paragraph == this.Content[StartPos].GetType() )
-                            VisTextPr = this.Content[StartPos].Selection_CalculateTextPr();
-                        else if ( type_Table == this.Content[StartPos].GetType() )
+                        if ( true !== Debug_ParaRunMode )
+                        {
+                            if ( type_Paragraph == this.Content[StartPos].GetType() )
+                                VisTextPr = this.Content[StartPos].Selection_CalculateTextPr();
+                            else if ( type_Table == this.Content[StartPos].GetType() )
+                                VisTextPr = this.Content[StartPos].Get_Paragraph_TextPr();
+
+                            for ( var Index = StartPos + 1; Index <= EndPos; Index++ )
+                            {
+                                var Item = this.Content[Index];
+
+                                var CurPr;
+                                if ( type_Paragraph == Item.GetType() )
+                                    CurPr = Item.Selection_CalculateTextPr();
+                                else if ( type_Table == Item.GetType() )
+                                    CurPr = Item.Get_Paragraph_TextPr();
+
+                                VisTextPr = VisTextPr.Compare(CurPr);
+                            }
+                        }
+                        else
+                        {
                             VisTextPr = this.Content[StartPos].Get_Paragraph_TextPr();
 
-                        for ( var Index = StartPos + 1; Index <= EndPos; Index++ )
-                        {
-                            var Item = this.Content[Index];
-
-                            var CurPr;
-                            if ( type_Paragraph == Item.GetType() )
-                                CurPr = Item.Selection_CalculateTextPr();
-                            else if ( type_Table == Item.GetType() )
-                                CurPr = Item.Get_Paragraph_TextPr();
-
-                            VisTextPr = VisTextPr.Compare(CurPr);
+                            for ( var Index = StartPos + 1; Index <= EndPos; Index++ )
+                            {
+                                var CurPr = this.Content[Index].Get_Paragraph_TextPr();
+                                VisTextPr = VisTextPr.Compare( CurPr );
+                            }
                         }
 
                         break;
@@ -6240,12 +6271,22 @@ CDocumentContent.prototype =
             }
             else
             {
-                var Item = this.Content[this.CurPos.ContentPos];
-
-                if ( type_Paragraph == Item.GetType() )
-                    Result_TextPr = Item.Internal_CalculateTextPr( Item.CurPos.ContentPos - 1 );
-                else if ( type_Table == Item.GetType() )
-                    Result_TextPr = Item.Get_Paragraph_TextPr();
+                if ( true !== Debug_ParaRunMode )
+                {
+                    var Item = this.Content[this.CurPos.ContentPos];
+                    if ( type_Paragraph == Item.GetType() )
+                    {
+                        Result_TextPr = Item.Internal_CalculateTextPr( Item.CurPos.ContentPos - 1 );
+                    }
+                    else if ( type_Table == Item.GetType() )
+                    {
+                        Result_TextPr = Item.Get_Paragraph_TextPr();
+                    }
+                }
+                else
+                {
+                    Result_TextPr = this.Content[this.CurPos.ContentPos].Get_Paragraph_TextPr();
+                }
             }
 
             return Result_TextPr;
