@@ -3213,7 +3213,7 @@ Paragraph.prototype =
 
         PRS.XStart = XStart;
         PRS.YStart = YStart;
-        PRS.XLimit = XLimit;
+        PRS.XLimit = XLimit - ParaPr.Ind.Right;
         PRS.YLimit = YLimit;
 
         PRS.Y = YStart;
@@ -5387,6 +5387,8 @@ Paragraph.prototype =
         if ( -1 === CurPage )
             return -1;
 
+        var ParaPr = this.Get_CompiledPr2( false).ParaPr;
+
         if ( 0 === CurPage )//|| ( undefined != this.Get_FramePr() && this.Parent instanceof CDocument ) )
         {
             XStart = this.X;
@@ -5406,7 +5408,7 @@ Paragraph.prototype =
 
         PRS.XStart = XStart;
         PRS.YStart = YStart;
-        PRS.XLimit = XLimit;
+        PRS.XLimit = XLimit - ParaPr.Ind.Right;
         PRS.YLimit = YLimit;
 
         // Обнуляем параметры PRS для строки и отрезка
@@ -5433,7 +5435,6 @@ Paragraph.prototype =
 
         var ContentLen = this.Content.length;
 
-        var ParaPr = this.Get_CompiledPr2( false).ParaPr;
         for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
         {
             var Item = this.Content[Pos];
