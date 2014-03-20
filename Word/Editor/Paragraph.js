@@ -361,7 +361,8 @@ Paragraph.prototype =
         OtherParagraph.Pr = this.Pr.Copy();
         History.Add( OtherParagraph, { Type : historyitem_Paragraph_Pr, Old : oOldPr, New : OtherParagraph.Pr } );
 
-        OtherParagraph.Style_Add( this.Style_Get(), true );
+		if(this.bFromDocument)
+			OtherParagraph.Style_Add( this.Style_Get(), true );
     },
 
     Split_Element_ByPos : function(SplitType, ContentPos)
@@ -7448,13 +7449,16 @@ Paragraph.prototype =
                 }
 
                 // Рисуем подчеркивание орфографии
-                pGraphics.p_color( 255, 0, 0, 255 );
-                var SpellingW = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
-                Element = aSpelling.Get_Next();
-                while ( null != Element )
+                if(this.bFromDocument)
                 {
-                    pGraphics.DrawSpellingLine(Element.y0, Element.x0, Element.x1, SpellingW);
+                    pGraphics.p_color( 255, 0, 0, 255 );
+                    var SpellingW = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
                     Element = aSpelling.Get_Next();
+                    while ( null != Element )
+                    {
+                        pGraphics.DrawSpellingLine(Element.y0, Element.x0, Element.x1, SpellingW);
+                        Element = aSpelling.Get_Next();
+                    }
                 }
             }
         }
@@ -14801,7 +14805,8 @@ Paragraph.prototype =
         // стиль для параграфа с нумерацией.
         if ( undefined === this.Style_Get() )
         {
-            this.Style_Add( this.Parent.Get_Styles().Get_Default_ParaList() );
+			if(this.bFromDocument)
+				this.Style_Add( this.Parent.Get_Styles().Get_Default_ParaList() );
         }
 
         // Надо пересчитать конечный стиль
@@ -15323,21 +15328,25 @@ Paragraph.prototype =
             if ( undefined != ParaPr.Shd )
                 this.Set_Shd( ParaPr.Shd, false );
 
-            // NumPr
-            if ( undefined != ParaPr.NumPr )
-                this.Numbering_Set( ParaPr.NumPr.NumId, ParaPr.NumPr.Lvl );
-            else
-                this.Numbering_Remove();
+			if(this.bFromDocument)
+			{
+				// NumPr
+				if ( undefined != ParaPr.NumPr )
+					this.Numbering_Set( ParaPr.NumPr.NumId, ParaPr.NumPr.Lvl );
+				else
+					this.Numbering_Remove();
 
-            // StyleId
-            if ( undefined != ParaPr.PStyle )
-                this.Style_Add( ParaPr.PStyle, true );
-            else
-                this.Style_Remove();
+				// StyleId
+				if ( undefined != ParaPr.PStyle )
+					this.Style_Add( ParaPr.PStyle, true );
+				else
+					this.Style_Remove();
+					
+				// Brd
+				if ( undefined != ParaPr.Brd )
+					this.Set_Borders( ParaPr.Brd );
+			}
 
-            // Brd
-            if ( undefined != ParaPr.Brd )
-                this.Set_Borders( ParaPr.Brd );
         }
     },
 
