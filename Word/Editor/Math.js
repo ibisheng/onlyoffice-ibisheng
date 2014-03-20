@@ -2,7 +2,7 @@
  * Created by Ilja.Kirillov on 18.03.14.
  */
 
-function ParaMath2()
+function ParaMath()
 {
     this.Id = g_oIdCounter.Get_NewId();
 
@@ -33,7 +33,7 @@ function ParaMath2()
     g_oTableId.Add( this, this.Id );
 }
 
-ParaMath2.prototype =
+ParaMath.prototype =
 {
     Get_Id : function()
     {

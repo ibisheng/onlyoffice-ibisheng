@@ -8688,10 +8688,6 @@ Paragraph.prototype =
 
                     if ( para_Math !== this.Content[CurPos].Type )
                     {
-                        // TODO: ParaMath Как избавимся от старого варианта переделать здесь
-                        var ParaMath = new ParaMath2();
-                        ParaMath.Math = Item.Math;
-
                         // Разделяем текущий элемент (возвращается правая часть)
                         var NewElement = this.Content[CurPos].Split( ContentPos, 1 );
 
@@ -8699,7 +8695,7 @@ Paragraph.prototype =
                             this.Internal_Content_Add( CurPos + 1, NewElement );
 
                         // Добавляем гиперссылку в содержимое параграфа
-                        this.Internal_Content_Add( CurPos + 1, ParaMath );
+                        this.Internal_Content_Add( CurPos + 1, Item );
 
                         // TODO: ParaMath Сделать перемещение курсора в формулу
 
