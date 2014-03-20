@@ -1701,18 +1701,23 @@
 					selector.style["cursor"] = "default";
 					selector.style["font-size"] = "12px";
 					selector.style["padding"] = "4px";
+					selector.style["fontSize"] = "12px";
 					document.body.appendChild(selector);
 					
 					var combo = document.createElement("ul");
 					combo.id = "formulaList";
 					combo.style["margin"] = 0;
 					combo.style["padding"] = 0;
+					combo.style["listStyle"] = "none";
+					combo.style["listImage"] = "none";
 					selector.appendChild(combo);
 					
 					for ( var i = 0; i < formulaList.list.length; i++ ) {
 						var item = document.createElement("li");
-						item.style["list-style-type"] = "none";
-						item.innerText = formulaList.list[i].name;
+						if ( item.textContent != undefined )
+							item.textContent = formulaList.list[i].name;
+						else
+							item.innerText = formulaList.list[i].name;
 						item.setAttribute("title", formulaList.list[i].arg);
 						
 						item.onmouseover = function(e) {
@@ -1743,7 +1748,7 @@
 			_removeFormulaSelector: function() {
 				var selector = document.getElementById("formulaSelector");
 				if ( selector )
-					selector.remove();
+					selector.parentNode.removeChild(selector);
 			},
 			
 			_updateFormulaSelectorPosition: function() {
@@ -1830,7 +1835,7 @@
 							{
 								for ( var i = 0; i < nodes.length; i++ ) {
 									if ( nodes[i].style["backgroundColor"] != "" ) {
-										var formulaName = nodes[i].innerText;
+										var formulaName = nodes[i].innerText || nodes[i].textContent;
 										var insertText = formulaName.substring(_this.input.value.length - 1) + "(";
 										_this._addChars(insertText);
 										_this._removeFormulaSelector();
