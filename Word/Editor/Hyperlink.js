@@ -958,6 +958,15 @@ ParaHyperlink.prototype =
     {
         this.Paragraph.Refresh_RecalcData2(0);
     },
+
+    Recalculate_MinMaxContentWidth : function(MinMax)
+    {
+        var Count = this.Content.length;
+        for ( var Pos = 0; Pos < Count; Pos++ )
+        {
+            this.Content[Pos].Recalculate_MinMaxContentWidth(MinMax);
+        }
+    },
 //-----------------------------------------------------------------------------------
 // Функции отрисовки
 //-----------------------------------------------------------------------------------

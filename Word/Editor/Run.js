@@ -2346,6 +2346,185 @@ ParaRun.prototype =
 
         return true;
     },
+
+    Recalculate_MinMaxContentWidth : function(MinMax)
+    {
+        this.Recalculate_MeasureContent();
+
+        var bWord        = MinMax.bWord;
+        var nWordLen     = MinMax.nWordLen;
+        var nSpaceLen    = MinMax.nSpaceLen;
+        var nMinWidth    = MinMax.nMinWidth;
+        var nMaxWidth    = MinMax.nMaxWidth;
+        var nCurMaxWidth = MinMax.nCurMaxWidth;
+
+        var Count = this.Content.length;
+        for ( var Pos = 0; Pos < Count; Pos++ )
+        {
+            var Item = this.Content[Pos];
+
+            switch( Item.Type )
+            {
+                case para_Text:
+                {
+                    if ( false === bWord )
+                    {
+                        bWord    = true;
+                        nWordLen = Item.Width;
+                    }
+                    else
+                    {
+                        nWordLen += Item.Width;
+
+                        if ( true === Item.SpaceAfter )
+                        {
+                            if ( nMinWidth < nWordLen )
+                                nMinWidth = nWordLen;
+
+                            bWord    = false;
+                            nWordLen = 0;
+                        }
+                    }
+
+                    if ( nSpaceLen > 0 )
+                    {
+                        nCurMaxWidth += nSpaceLen;
+                        nSpaceLen     = 0;
+                    }
+
+                    nCurMaxWidth += Item.Width;
+
+                    break;
+                }
+
+                case para_Space:
+                {
+                    if ( true === bWord )
+                    {
+                        if ( nMinWidth < nWordLen )
+                            nMinWidth = nWordLen;
+
+                        bWord    = false;
+                        nWordLen = 0;
+                    }
+
+                    // Мы сразу не добавляем ширину пробелов к максимальной ширине, потому что
+                    // пробелы, идущие в конце параграфа или перед переносом строки(явным), не
+                    // должны учитываться.
+                    nSpaceLen += Item.Width;
+
+                    break;
+                }
+
+                case para_Drawing:
+                {
+                    if ( true === bWord )
+                    {
+                        if ( nMinWidth < nWordLen )
+                            nMinWidth = nWordLen;
+
+                        bWord    = false;
+                        nWordLen = 0;
+                    }
+
+                    if ( ( true === Item.Is_Inline() || true === this.Parent.Is_DrawingShape() ) && Item.Width > nMinWidth )
+                        nMinWidth = Item.Width;
+
+                    if ( nSpaceLen > 0 )
+                    {
+                        nCurMaxWidth += nSpaceLen;
+                        nSpaceLen     = 0;
+                    }
+
+                    nCurMaxWidth += Item.Width;
+
+                    break;
+                }
+
+                case para_PageNum:
+                {
+                    if ( true === bWord )
+                    {
+                        if ( nMinWidth < nWordLen )
+                            nMinWidth = nWordLen;
+
+                        bWord    = false;
+                        nWordLen = 0;
+                    }
+
+                    if ( Item.Width > nMinWidth )
+                        nMinWidth = Item.Width;
+
+                    if ( nSpaceLen > 0 )
+                    {
+                        nCurMaxWidth += nSpaceLen;
+                        nSpaceLen     = 0;
+                    }
+
+                    nCurMaxWidth += Item.Width;
+
+                    break;
+                }
+
+                case para_Tab:
+                {
+                    nWordLen += Item.Width;
+
+                    if ( nMinWidth < nWordLen )
+                        nMinWidth = nWordLen;
+
+                    bWord    = false;
+                    nWordLen = 0;
+
+                    if ( nSpaceLen > 0 )
+                    {
+                        nCurMaxWidth += nSpaceLen;
+                        nSpaceLen     = 0;
+                    }
+
+                    nCurMaxWidth += Item.Width;
+
+                    break;
+                }
+
+                case para_NewLine:
+                {
+                    if ( nMinWidth < nWordLen )
+                        nMinWidth = nWordLen;
+
+                    bWord    = false;
+                    nWordLen = 0;
+
+                    nSpaceLen = 0;
+
+                    if ( nCurMaxWidth > nMaxWidth )
+                        nMaxWidth = nCurMaxWidth;
+
+                    nCurMaxWidth = 0;
+
+                    break;
+                }
+
+                case para_End:
+                {
+                    if ( nMinWidth < nWordLen )
+                        nMinWidth = nWordLen;
+
+                    if ( nCurMaxWidth > nMaxWidth )
+                        nMaxWidth = nCurMaxWidth;
+
+                    break;
+                }
+            }
+        }
+
+        MinMax.bWord        = bWord;
+        MinMax.nWordLen     = nWordLen;
+        MinMax.nSpaceLen    = nSpaceLen;
+        MinMax.nMinWidth    = nMinWidth;
+        MinMax.nMaxWidth    = nMaxWidth;
+        MinMax.nCurMaxWidth = nCurMaxWidth;
+    },
 //-----------------------------------------------------------------------------------
 // Функции отрисовки
 //-----------------------------------------------------------------------------------

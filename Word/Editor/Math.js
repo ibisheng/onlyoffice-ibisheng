@@ -584,6 +584,29 @@ ParaMath2.prototype =
     {
         this.Paragraph.Refresh_RecalcData2(0);
     },
+
+    Recalculate_MinMaxContentWidth : function(MinMax)
+    {
+        // TODO: Если формула не измерена, тогда здесь её надо измерить
+
+        if ( false === MinMax.bWord )
+        {
+            MinMax.bWord    = true;
+            MinMax.nWordLen = this.Width;
+        }
+        else
+        {
+            MinMax.nWordLen += this.Width;
+        }
+
+        if ( MinMax.nSpaceLen > 0 )
+        {
+            MinMax.nCurMaxWidth += MinMax.nSpaceLen;
+            MinMax.nSpaceLen     = 0;
+        }
+
+        MinMax.nCurMaxWidth += this.Width;
+    },
 //-----------------------------------------------------------------------------------
 // Функции отрисовки
 //-----------------------------------------------------------------------------------
