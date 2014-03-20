@@ -9358,8 +9358,8 @@ Paragraph.prototype =
     {
         var Depth = 0;
 
-        var OldStartPos = this.Selection.StartPos;
-        var OldEndPos   = this.Selection.EndPos;
+        var OldStartPos = Math.min( this.Selection.StartPos, this.Content.length - 1 );
+        var OldEndPos   = Math.min( this.Selection.EndPos, this.Content.length - 1 );
 
         if ( OldStartPos > OldEndPos )
         {
@@ -18800,10 +18800,16 @@ Paragraph.prototype =
             {
                 Start    : this.Selection.Start,
                 Use      : this.Selection.Use,
-                StartPos : this.Get_ParaContentPos( true, true ),
-                EndPos   : this.Get_ParaContentPos( true, false ),
+                StartPos : 0,
+                EndPos   : 0,
                 Flag     : this.Selection.Flag
             };
+
+            if ( true === this.Selection.Use )
+            {
+                ParaState.Selection.StartPos = this.Get_ParaContentPos( true, true );
+                ParaState.Selection.EndPos   = this.Get_ParaContentPos( true, false );
+            }
 
             return [ ParaState ];
         }
