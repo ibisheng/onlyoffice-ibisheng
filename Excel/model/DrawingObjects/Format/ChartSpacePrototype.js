@@ -3053,7 +3053,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             }
                             else
                             {
-                                cat_ax.labels.y = rect.y + unit_height*crosses_val_ax;
+                                cat_ax.labels.y = rect.y + unit_height*(crosses_val_ax - arr_val[0]) - cat_ax.labels.extY;
 
                                 for(i = 0; i < arr_val.length; ++i)
                                     arr_val_labels_points[i] = rect.y + (arr_val[i] - arr_val[0])*unit_height;
@@ -3252,13 +3252,63 @@ CChartSpace.prototype.recalculateAxis = function()
             val_ax = axis_by_types.valAx[0];
             if(cat_ax && val_ax)
             {
-                cat_ax.labels = null;
-                val_ax.labels = null;
+                /*---------------------new version---------------------------------------*/
+                val_ax.labels  = null;
+                cat_ax.labels  = null;
                 var sizes = this.getChartSizes();
                 var rect = {x: sizes.startX, y:sizes.startY, w:sizes.w, h: sizes.h};
-                //расчитаем подписи для вертикальной оси
-                var hor_gap = 4;//пока 4mm
-                var gap_hor_axis = 4;//пока 4 mm
+                var arr_val =  this.getValAxisValues();
+                //Получим строки для оси значений с учетом формата и единиц
+                var arr_strings = [];
+                var multiplier;
+                if(val_ax.dispUnits)
+                    multiplier = val_ax.dispUnits.getMultiplier();
+                else
+                    multiplier = 1;
+                var num_fmt = val_ax.numFmt;
+                if(num_fmt && typeof num_fmt.formatCode === "string" /*&& !(num_fmt.formatCode === "General")*/)
+                {
+                    var num_format = oNumFormatCache.get(num_fmt.formatCode);
+                    for(i = 0; i < arr_val.length; ++i)
+                    {
+                        var calc_value = arr_val[i]*multiplier;
+                        var rich_value = num_format.format(calc_value, CellValueType.number, 15);
+                        arr_strings.push(rich_value[0].text);
+                    }
+                }
+                else
+                {
+                    for(i = 0; i < arr_val.length; ++i)
+                    {
+                        var calc_value = arr_val[i]*multiplier;
+                        arr_strings.push(calc_value + "");
+                    }
+                }
+                //расчитаем подписи горизонтальной оси значений
+                val_ax.labels = new CValAxisLabels(this);
+                var max_height = 0;
+                val_ax.xPoints = [];
+                for(i = 0; i < arr_strings.length; ++i)
+                {
+                    var dlbl = new CDLbl();
+                    dlbl.parent = val_ax;
+                    dlbl.chart = this;
+                    dlbl.spPr = val_ax.spPr;
+                    dlbl.txPr = val_ax.txPr;
+                    dlbl.tx = new CChartText();
+                    dlbl.tx.rich = CreateTextBodyFromString(arr_strings[i], this.getDrawingDocument(), dlbl);
+                    dlbl.recalculate();
+                    var h = dlbl.tx.rich.content.Get_SummaryHeight();
+                    if(h > max_height)
+                        max_height = h;
+                    val_ax.labels.arrLabels.push(dlbl);
+                    val_ax.xPoints.push({val: arr_val[i], pos: null});
+                }
+
+                var val_axis_labels_gap = val_ax.labels.arrLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*25.4/72;
+                val_ax.labels.extY = max_height + val_axis_labels_gap;
+
+                //расчитаем подписи для горизонтальной оси
                 var ser = chart_object.series[0];
                 var string_pts = [], pts_len = 0;
                 if(ser && ser.cat)
@@ -3288,210 +3338,541 @@ CChartSpace.prototype.recalculateAxis = function()
                         string_pts.push({val:i+1 + ""});
                     }
                 }
-                cat_ax.labels = new CValAxisLabels(this);
-                val_ax.labels = new CValAxisLabels(this);
-                var tick_lbl_skip = isRealNumber(cat_ax.tickLblSkip) ? cat_ax.tickLblSkip : 1;
-                //расчитаем вертикальную ось без учета горизонтальной
-                max_max_width = 0;
-                max_min_width = 0;
-                for(i = 0; i < pts_len; ++i)
+                /*---------------------расчет позиции блока с подписями вертикальной оси-----------------------------------------------------------------------------*/
+                //расчитаем ширину интервала без учета горизонтальной оси;
+                var crosses;//номер категории в которой вертикалная ось пересекает горизонтальную;
+                if(val_ax.crosses === CROSSES_AUTO_ZERO || val_ax.crosses === CROSSES_MIN)
+                    crosses = 1;
+                else if(val_ax.crosses === CROSSES_MAX)
+                    crosses = string_pts.length;
+                else if(isRealNumber(val_ax.crossesAt))
                 {
-                    var dlbl = null;
-                    if(i%tick_lbl_skip === 0)
+                    if(val_ax.crossesAt <= string_pts.length + 1 && val_ax.crossesAt > 0)
+                        crosses = val_ax.crossesAt;
+                    else if(val_ax.crossesAt <= 0)
+                        crosses = 1;
+                    else
+                        crosses = string_pts.length;
+                }
+                else
+                    crosses = 1;
+
+                var cat_ax_orientation = cat_ax.scaling && isRealNumber(cat_ax.scaling.orientation) ?  cat_ax.scaling.orientation : ORIENTATION_MIN_MAX;
+                var labels_pos = val_ax.tickLblPos;
+                var cross_between = isRealNumber(val_ax.crossBetween) ? val_ax.crossBetween : CROSS_BETWEEN_MID_CAT;
+
+                var bottom_val_ax_labels_align = true;//приленгание подписей оси значений к левому краю.
+
+                var intervals_count = cross_between === CROSS_BETWEEN_MID_CAT ? string_pts.length - 1 : string_pts.length;
+                var point_interval  = rect.h/intervals_count;//интервал между точками. Зависит от crossBetween, а также будет потом корректироваться в зависимости от подписей вертикальной и горизонтальной оси.
+
+
+                var bottom_points_height, top_point_height;
+                var arr_cat_labels_points = [];//массив середин подписей горизонтальной оси; i-й элемент - x-координата центра подписи категории с номером i;
+                if(cat_ax_orientation === ORIENTATION_MIN_MAX)
+                {
+                    if(labels_pos === TICK_LABEL_POSITION_NEXT_TO || !isRealNumber(labels_pos)) //подписи рядом с осью
                     {
-                        dlbl = new CDLbl();
-                        dlbl.parent = cat_ax;
-                        dlbl.chart = this;
-                        dlbl.spPr = cat_ax.spPr;
-                        dlbl.txPr = cat_ax.txPr;
-                        dlbl.tx = new CChartText();
-                        dlbl.tx.rich = CreateTextBodyFromString(string_pts[i].val, this.getDrawingDocument(), dlbl);
-                        dlbl.recalculate();
-                        var min_max =  dlbl.tx.rich.content.Recalculate_MinMaxContentWidth();
-                        var max_min_content_width = min_max.Min;
-                        if(max_min_content_width > max_min_width)
-                            max_min_width = max_min_content_width;
-                        if(min_max.Max > max_max_width)
-                            max_max_width = min_max.Max;
-                    }
-                    cat_ax.labels.arrLabels.push(dlbl);
-                }
-                var content_width;
-                if(max_max_width + hor_gap < rect.w/2 || !(max_min_content_width  + hor_gap < rect.w))//вроде бы у MS ширина вертикальной оси не может быть больше чем в 2 раз ширины рабочей области
-                {
-                    content_width = max_max_width;
-                }
-                else if(max_min_content_width  + hor_gap < rect.w)
-                {
-                    content_width = max_min_content_width;
-                }
-                for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
-                {
-                    cat_ax.labels.arrLabels[i].tx.rich.content.Reset(0, 0, content_width, 20000);
-                    cat_ax.labels.arrLabels[i].tx.rich.content.Recalculate_Page(0, true);
-                }
-                cat_ax.labels.extX = hor_gap + content_width;
-                cat_ax.labels.y = rect.y;
-                var crosses;
-                var arr_val =  this.getValAxisValues();
-                if(isRealNumber(cat_ax.crosses))
-                {
-                    switch(cat_ax.crosses)
-                    {
-                        case CROSSES_AUTO_ZERO:
+                        if(val_ax.crosses === CROSSES_MAX)
                         {
-                            if(arr_val[0] <= 0 && arr_val[arr_val.length-1] >= 0)
+                            bottom_val_ax_labels_align = false;
+                            val_ax.labels.y = rect.y;
+                            point_interval = (rect.h - val_ax.labels.extY)/intervals_count;
+                            val_ax.posY = val_ax.labels.y + val_ax.labels.extY;
+                            if(cross_between === CROSS_BETWEEN_MID_CAT)
                             {
-                                crosses = 0;
-                            }
-                            else if(arr_val[0] > 0)
-                            {
-                                crosses = arr_val[0];
+                                for(i = 0; i < string_pts.length; ++i)
+                                    arr_cat_labels_points[i] = rect.y + rect.h - point_interval*i;
                             }
                             else
                             {
-                                crosses = arr_val[arr_val.length-1];
+                                for(i = 0; i < string_pts.length; ++i)
+                                    arr_cat_labels_points[i] = point_interval/2 + rect.y + rect.h - point_interval*i;
                             }
-                            break;
                         }
-                        case CROSSES_MIN:
+                        else
                         {
-                            crosses = arr_val[0];//ось пересекает категорию с индексом 0
-                            break;
+                            bottom_points_height = point_interval*(crosses-1);//общая ширина левых точек если считать что точки занимают все пространство
+                            if(bottom_points_height < val_ax.labels.extY)//подписи верт. оси выходят за пределы области построения
+                            {
+                                var top_intervals_count = intervals_count - (crosses - 1);//количесво интервалов выше горизонтальной оси
+                                //скорректируем point_interval, поделив расстояние, которое осталось справа от подписей осей на количество интервалов справа
+                                point_interval = (rect.h - val_ax.labels.extY)/top_intervals_count;
+                                val_ax.labels.y = rect.y + rect.h - val_ax.labels.extY;
+                                var start_point = val_ax.labels.y + (crosses-1)*point_interval;//y-координата точки низа области постоения
+
+                                if(cross_between === CROSS_BETWEEN_MID_CAT)
+                                {
+                                    for(i = 0; i < string_pts.length; ++i)
+                                        arr_cat_labels_points[i] = start_point - point_interval*i;
+                                }
+                                else
+                                {
+                                    for(i = 0; i < string_pts.length; ++i)
+                                        arr_cat_labels_points[i] = start_point - point_interval/2 - point_interval*i;
+                                }
+                            }
+                            else
+                            {
+                                val_ax.labels.y = rect.y + rect.h - bottom_points_height;
+                                if(cross_between === CROSS_BETWEEN_MID_CAT)
+                                {
+                                    for(i = 0; i < string_pts.length; ++i)
+                                        arr_cat_labels_points[i] = rect.y + rect.h - point_interval*i;
+                                }
+                                else
+                                {
+                                    for(i = 0; i < string_pts.length; ++i)
+                                        arr_cat_labels_points[i] = rect.y + rect.h - (point_interval/2 + point_interval*i);
+                                }
+                            }
+                            val_ax.posY = val_ax.labels.y;
                         }
-                        case CROSSES_MAX:
+                    }
+                    else if(labels_pos === TICK_LABEL_POSITION_LOW)//подписи снизу от области построения
+                    {
+                        point_interval = (rect.h -  val_ax.labels.extY)/intervals_count;
+                        val_ax.labels.y = rect.y + rect.h - val_ax.labels.extY;
+                        if(cross_between === CROSS_BETWEEN_MID_CAT)
                         {
-                            crosses = arr_val[arr_val.length-1];
-                            break;
+                            for(i = 0; i < string_pts.length; ++i)
+                                arr_cat_labels_points[i] = val_ax.labels.y - point_interval*i;
+                        }
+                        else
+                        {
+                            for(i = 0; i < string_pts.length; ++i)
+                                arr_cat_labels_points[i] = rect.y + rect.h  - val_ax.labels.extY - point_interval/2 - point_interval*i;
+                        }
+                        val_ax.posY = val_ax.labels.y - point_interval*(crosses-1);
+                    }
+                    else if(labels_pos === TICK_LABEL_POSITION_HIGH)//подписи сверху от области построения
+                    {
+                        point_interval = (rect.h - val_ax.labels.extY)/intervals_count;
+                        val_ax.labels.y = rect.y;
+                        bottom_val_ax_labels_align = false;
+                        if(cross_between === CROSS_BETWEEN_MID_CAT)
+                        {
+                            for(i = 0; i < string_pts.length; ++i)
+                                arr_cat_labels_points[i] = rect.y + rect.h - point_interval*i;
+                        }
+                        else
+                        {
+                            for(i = 0; i < string_pts.length; ++i)
+                                arr_cat_labels_points[i] =rect.y + rect.h - (point_interval/2 + point_interval*i);
+                        }
+                        val_ax.posY = rect.y + rect.h - point_interval*(crosses-1);
+                    }
+                    else
+                    {
+                        val_ax.labels = null;
+                        if(cross_between === CROSS_BETWEEN_MID_CAT)
+                        {
+                            for(i = 0; i < string_pts.length; ++i)
+                                arr_cat_labels_points[i] = rect.y + rect.h - point_interval*i;
+                        }
+                        else
+                        {
+                            for(i = 0; i < string_pts.length; ++i)
+                                arr_cat_labels_points[i] = rect.y + rect.h - (point_interval/2 + point_interval*i);
+                        }
+                        val_ax.posY = rect.y + rect.h - point_interval*(crosses-1);
+                    }
+                }
+                else
+                {//то же самое, только зеркально отраженное
+                    if(labels_pos === TICK_LABEL_POSITION_NEXT_TO || !isRealNumber(labels_pos)) //подписи рядом с осью
+                    {
+                        if(val_ax.crosses === CROSSES_MAX)
+                        {
+                            val_ax.labels.y = rect.y + rect.h - val_ax.labels.extY;
+                            point_interval = (rect.h - val_ax.labels.extY)/intervals_count;
+                            if(cross_between === CROSS_BETWEEN_MID_CAT)
+                            {
+                                for(i = 0; i < string_pts.length; ++i)
+                                    arr_cat_labels_points[i] = rect.y + point_interval*i;
+                            }
+                            else
+                            {
+                                for(i = 0; i < string_pts.length; ++i)
+                                    arr_cat_labels_points[i] = rect.y + point_interval/2 + point_interval*i;
+                            }
+                            val_ax.posY = val_ax.labels.y;
+                        }
+                        else
+                        {
+                            bottom_val_ax_labels_align = false;
+                            top_point_height = point_interval*(crosses-1);
+                            if(top_point_height < val_ax.labels.extY)
+                            {
+                                val_ax.labels.y = rect.y;
+                                var bottom_points_interval_count = intervals_count - (crosses - 1);
+                                point_interval = (rect.h - val_ax.labels.extY)/bottom_points_interval_count;
+                                var start_point_bottom = rect.y + rect.h - point_interval*intervals_count;
+                                if(cross_between === CROSS_BETWEEN_MID_CAT)
+                                {
+                                    for(i = 0; i < string_pts.length; ++i)
+                                        arr_cat_labels_points[i] = start_point_bottom + point_interval*i;
+                                }
+                                else
+                                {
+                                    for(i = 0; i < string_pts.length; ++i)
+                                        arr_cat_labels_points[i] = start_point_bottom + point_interval/2 + point_interval*i;
+                                }
+                            }
+                            else
+                            {
+                                val_ax.labels.y = rect.y +  point_interval*(crosses-1) - val_ax.labels.extY;
+                                if(cross_between === CROSS_BETWEEN_MID_CAT)
+                                {
+                                    for(i = 0; i < string_pts.length; ++i)
+                                        arr_cat_labels_points[i] = rect.y + point_interval*i;
+                                }
+                                else
+                                {
+                                    for(i = 0; i < string_pts.length; ++i)
+                                        arr_cat_labels_points[i] = rect.y + point_interval/2 + point_interval*i;
+                                }
+                            }
+                            val_ax.posY = val_ax.labels.y + val_ax.labels.extY;
+                        }
+                    }
+                    else if(labels_pos === TICK_LABEL_POSITION_LOW)//подписи сверху от области построения
+                    {
+                        bottom_val_ax_labels_align = false;
+                        point_interval = (rect.h - val_ax.labels.extY)/intervals_count;
+                        val_ax.labels.y = rect.y;
+
+                        if(cross_between === CROSS_BETWEEN_MID_CAT)
+                        {
+                            for(i = 0; i < string_pts.length; ++i)
+                                arr_cat_labels_points[i] = val_ax.labels.y + val_ax.labels.extY + point_interval*i;
+                        }
+                        else
+                        {
+                            for(i = 0; i < string_pts.length; ++i)
+                                arr_cat_labels_points[i] = val_ax.labels.y + val_ax.labels.extY + point_interval/2 + point_interval*i;
+                        }
+                        val_ax.posY = rect.y + val_ax.labels.extY + point_interval*(crosses-1);
+                    }
+                    else if(labels_pos === TICK_LABEL_POSITION_HIGH)//подписи снизу от области построения
+                    {
+                        point_interval = (rect.h - val_ax.labels.extY)/intervals_count;
+                        val_ax.labels.y = rect.y + rect.h - val_ax.labels.extY;
+                        if(cross_between === CROSS_BETWEEN_MID_CAT)
+                        {
+                            for(i = 0; i < string_pts.length; ++i)
+                                arr_cat_labels_points[i] = rect.y + point_interval*i;
+                        }
+                        else
+                        {
+                            for(i = 0; i < string_pts.length; ++i)
+                                arr_cat_labels_points[i] = rect.y + point_interval/2 + point_interval*i;
+                        }
+                        val_ax.posY = rect.y + point_interval*(crosses-1);
+                    }
+                    else
+                    {
+                        val_ax.labels = null;
+                        if(cross_between === CROSS_BETWEEN_MID_CAT)
+                        {
+                            for(i = 0; i < string_pts.length; ++i)
+                                arr_cat_labels_points[i] = rect.y + point_interval*i;
+                        }
+                        else
+                        {
+                            for(i = 0; i < string_pts.length; ++i)
+                                arr_cat_labels_points[i] = rect.y + point_interval/2 + point_interval*i;
+                        }
+                        val_ax.posY = rect.y + point_interval*(crosses-1);
+                    }
+                }
+
+                var diagram_height = point_interval*intervals_count;//размер области с самой диаграммой позже будет корректироватся;
+                var max_cat_label_height = diagram_height / string_pts.length; // максимальная высота подписи горизонтальной оси;
+
+                cat_ax.labels = null;
+                var max_cat_labels_block_width = rect.w/2;
+                if(TICK_LABEL_POSITION_NONE !== cat_ax.tickLblPos) //будем корректировать вертикальные подписи только если есть горизонтальные
+                {
+                    cat_ax.labels = new CValAxisLabels(this);
+                    var tick_lbl_skip = isRealNumber(cat_ax.tickLblSkip) ? cat_ax.tickLblSkip : 1;
+                    var max_min_width = 0;
+                    var max_max_width = 0;
+                    var max_content_width = 0;
+                    for(i = 0; i < string_pts.length; ++i)
+                    {
+                        var dlbl = null;
+                        if(i%tick_lbl_skip === 0)
+                        {
+                            dlbl = new CDLbl();
+                            dlbl.parent = cat_ax;
+                            dlbl.chart = this;
+                            dlbl.spPr = cat_ax.spPr;
+                            dlbl.txPr = cat_ax.txPr;
+                            dlbl.tx = new CChartText();
+                            dlbl.tx.rich = CreateTextBodyFromString(string_pts[i].val, this.getDrawingDocument(), dlbl);
+                            dlbl.recalculate();
+                            var min_max =  dlbl.tx.rich.content.Recalculate_MinMaxContentWidth();
+                            var max_min_content_width = min_max.Min;
+                            if(min_max.Max > max_max_width)
+                                max_max_width = min_max.Max;
+
+                            if(dlbl.tx.rich.content.XLimit > max_content_width)
+                                max_content_width = dlbl.tx.rich.content.XLimit;
+                        }
+                        cat_ax.labels.arrLabels.push(dlbl);
+                    }
+                    var stake_offset = isRealNumber(cat_ax.lblOffset) ? cat_ax.lblOffset/100 : 1;
+                    var labels_offset = cat_ax.labels.arrLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*(25.4/72)*stake_offset;
+                    //сначала посмотрим убираются ли в максимальную допустимую ширину подписей подписи расчитанные в одну строку
+                    if(max_content_width + labels_offset < max_cat_labels_block_width)
+                    {
+                        cat_ax.labels.extX = max_content_width + labels_offset;
+                    }
+                    else if(max_max_width + labels_offset < max_cat_labels_block_width)//ситуация, когда возможно разместить подписи без переноса слов
+                    {
+                        cat_ax.labels.extX = max_max_width + labels_offset;
+                    }
+                    else //выставляем максимально возможную ширину
+                    {
+                        cat_ax.labels.extX = max_cat_labels_block_width;
+                    }
+                }
+                var cat_labels_align_left = true;//выравнивание подписей в блоке сподписями по левому краю(т. е. зазор находится справа)
+                /*-----------------------------------------------------------------------*/
+                var crosses_val_ax;//значение на горизонтальной оси значений в котором её пересекает горизонтальная
+                if(cat_ax.crosses === CROSSES_AUTO_ZERO)
+                {
+                    if(arr_val[0] <=0 && arr_val[arr_val.length-1] >= 0)
+                        crosses_val_ax = 0;
+                    else if(arr_val[arr_val.length-1] < 0)
+                        crosses_val_ax = arr_val[arr_val.length-1];
+                    else
+                        crosses_val_ax = arr_val[0];
+                }
+                else if(cat_ax.crosses === CROSSES_MIN)
+                {
+                    crosses_val_ax = arr_val[0];
+                }
+                else if(cat_ax.crosses === CROSSES_MAX)
+                {
+                    crosses_val_ax = arr_val[arr_val.length - 1];
+                }
+                else if(isRealNumber(cat_ax.crossesAt) && cat_ax.crossesAt >= arr_val[0] && cat_ax.crossesAt <= arr_val[arr_val.length - 1])
+                {
+                    //сделаем провеку на попадание в интервал
+                    if(cat_ax.crossesAt >= arr_val[0] && cat_ax.crossesAt <= arr_val[arr_val.length - 1])
+                        crosses_val_ax = cat_ax.crossesAt;
+                }
+                else
+                { //ведем себя как в случае (cat_ax.crosses === CROSSES_AUTO_ZERO)
+                    if(arr_val[0] <=0 && arr_val[arr_val.length-1] >= 0)
+                        crosses_val_ax = 0;
+                    else if(arr_val[arr_val.length-1] < 0)
+                        crosses_val_ax = arr_val[arr_val.length-1];
+                    else
+                        crosses_val_ax = arr_val[0];
+                }
+                var val_ax_orientation = val_ax.scaling && isRealNumber(val_ax.scaling.orientation) ? val_ax.scaling.orientation : ORIENTATION_MIN_MAX;
+                var hor_labels_pos = cat_ax.tickLblPos;
+
+                var arr_val_labels_points = [];//массив середин подписей вертикальной оси; i-й элемент - x-координата центра подписи i-огто значения;
+                var unit_width = rect.w/(arr_val[arr_val.length - 1] - arr_val[0]);//ширина единицы измерения на вертикальной оси
+                if(val_ax_orientation === ORIENTATION_MIN_MAX)
+                {
+                    if(hor_labels_pos === TICK_LABEL_POSITION_NEXT_TO || !isRealNumber(hor_labels_pos))
+                    {
+                        if(cat_ax.crosses === CROSSES_MAX)
+                        {
+                            cat_labels_align_left = false;//в данном случае подписи будут выравниваться по верхнему краю блока с подписями
+                            cat_ax.labels.x = rect.x + rect.w - cat_ax.labels.extX;
+                            unit_width = (rect.w - cat_ax.labels.extX)/(arr_val[arr_val.length - 1] - arr_val[0]);
+                            for(i = 0; i < arr_val.length; ++i)
+                                arr_val_labels_points[i] = rect.x + (arr_val[i] - arr_val[0])*unit_width;
+                            cat_ax.posX = cat_ax.labels.x;
+                        }
+                        else
+                        {
+                            var left_points_width = (crosses_val_ax - arr_val[0])*unit_width;//высота области под горизонтальной осью
+                            if(left_points_width < cat_ax.labels.extX)
+                            {
+                                var right_points_width = rect.w - cat_ax.labels.extX;
+                                cat_ax.labels.x = rect.x;
+                                unit_width = (rect.w - cat_ax.labels.extX)/(arr_val[arr_val.length-1]-crosses_val_ax);
+
+                                var left_point = rect.x + rect.w - unit_width*(arr_val[arr_val.length - 1] - arr_val[0]);
+                                for(i = 0; i < arr_val.length; ++i)
+                                    arr_val_labels_points[i] = left_point + (arr_val[i] - arr_val[0])*unit_width;
+                            }
+                            else
+                            {
+                                cat_ax.labels.x = rect.x + left_points_width - cat_ax.labels.extX;
+                                for(i = 0; i < arr_val.length; ++i)
+                                    arr_val_labels_points[i] = rect.x + (arr_val[i] - arr_val[0])*unit_width;
+                            }
+                            cat_ax.posX = cat_ax.labels.x + cat_ax.labels.extX;
+                        }
+                    }
+                    else if(hor_labels_pos === TICK_LABEL_POSITION_LOW)
+                    {
+                        cat_ax.labels.x = rect.x;
+                        unit_width = (rect.w - cat_ax.labels.extX)/(arr_val[arr_val.length - 1] - arr_val[0]);
+
+                        var left_point = rect.x + cat_ax.labels.extX;
+                        for(i = 0; i < arr_val.length; ++i)
+                            arr_val_labels_points[i] = left_point + (arr_val[i] - arr_val[0])*unit_width;
+
+                        cat_ax.posX = cat_ax.labels.x + cat_ax.labels.extX + (crosses_val_ax - arr_val[0])*unit_width;
+                    }
+                    else if(hor_labels_pos === TICK_LABEL_POSITION_HIGH)
+                    {
+                        cat_labels_align_left = false;
+                        cat_ax.labels.x = rect.x + rect.w - cat_ax.labels.extX;
+                        unit_width = (rect.w - cat_ax.labels.extX)/(arr_val[arr_val.length - 1] - arr_val[0]);
+                        for(i = 0; i < arr_val.length; ++i)
+                            arr_val_labels_points[i] = rect.x + (arr_val[i] - arr_val[0])*unit_width;
+                        cat_ax.posX = rect.x + (crosses_val_ax - arr_val[0])*unit_width;
+                    }
+                    else
+                    {
+                        //подписей осей нет
+                        cat_ax.labels = null;
+                        for(i = 0; i < arr_val.length; ++i)
+                            arr_val_labels_points[i] = rect.x + (arr_val[i] - arr_val[0])*unit_width;
+                        cat_ax.posX = rect.x + (crosses_val_ax - arr_val[0])*unit_width;
+                    }
+                }
+                else
+                {//зеркально отражаем
+                    if(hor_labels_pos === TICK_LABEL_POSITION_NEXT_TO || !isRealNumber(hor_labels_pos))
+                    {
+                        if(cat_ax.crosses === CROSSES_MAX)
+                        {
+                            cat_ax.labels.x = rect.x;
+                            unit_width = (rect.w - cat_ax.labels.extX)/(arr_val[arr_val.length - 1] - arr_val[0]);
+
+                            for(i = 0; i < arr_val.length; ++i)
+                                arr_val_labels_points[i] = rect.x + rect.w - (arr_val[i] - arr_val[0])*unit_width;
+                        }
+                        else
+                        {
+                            cat_labels_align_left = false;
+                            var right_points_width = (crosses_val_ax - arr_val[0])*unit_width;
+                            if(right_points_width < cat_ax.labels.extX)
+                            {
+                                cat_ax.labels.x = rect.x + rect.w - cat_ax.labels.extX;
+
+                                var left_points_width = rect.w - cat_ax.labels.extX;
+                                unit_width = left_points_width/(arr_val[arr_val.length - 1] - crosses_val_ax);
+
+                                var right_point = rect.x + unit_width*(arr_val[arr_val.length-1] - arr_val[0]);
+                                for(i = 0; i < arr_val.length; ++i)
+                                    arr_val_labels_points[i] = right_point - (arr_val[i] - arr_val[0])*unit_width;
+                            }
+                            else
+                            {
+                                cat_ax.labels.x = rect.x + rect.w - unit_width*(crosses_val_ax - arr_val[0]);
+                                for(i = 0; i < arr_val.length; ++i)
+                                    arr_val_labels_points[i] = rect.x + rect.w - (arr_val[i] - arr_val[0])*unit_width;
+                            }
+                        }
+                    }
+                    else if(hor_labels_pos === TICK_LABEL_POSITION_LOW)
+                    {
+                        cat_labels_align_left = false;
+                        cat_ax.labels.x = rect.x + rect.w - cat_ax.labels.extX;
+                        unit_width = (rect.w - cat_ax.labels.extX)/(arr_val[arr_val.length-1] - arr_val[0]);
+                        for(i = 0; i < arr_val.length; ++i)
+                            arr_val_labels_points[i] = cat_ax.labels.x - (arr_val[i] - arr_val[0])*unit_width;
+
+                    }
+                    else if(hor_labels_pos === TICK_LABEL_POSITION_HIGH)
+                    {
+                        cat_ax.labels.x = rect.x;
+                        unit_width = (rect.w - cat_ax.labels.extX)/(arr_val[arr_val.length-1] - arr_val[0]);
+                        for(i = 0; i < arr_val.length; ++i)
+                            arr_val_labels_points[i] = rect.x + rect.w - (arr_val[i] - arr_val[0])*unit_width;
+                    }
+                    else
+                    {//подписей осей нет
+                        cat_ax.labels = null;
+                        for(i = 0; i < arr_val.length; ++i)
+                            arr_val_labels_points[i] = rect.x + rect.w - (arr_val[i] - arr_val[0])*unit_width;
+                    }
+                }
+                //запишем в оси необходимую информацию для отрисовщика plotArea  и выставим окончательные позиции для подписей
+                if(val_ax.labels)
+                {
+                    val_ax.labels.x = Math.min.apply(Math, arr_val_labels_points);
+                    val_ax.labels.extX = Math.max.apply(Math, arr_val_labels_points) - Math.min.apply(Math, arr_val_labels_points);
+
+                    //val_axis_labels_gap - вертикальный зазор
+                    if(bottom_val_ax_labels_align)
+                    {
+                        var y_pos = val_ax.labels.y + val_axis_labels_gap;
+                        for(i = 0;  i < val_ax.labels.arrLabels.length; ++i)
+                        {
+                            val_ax.labels.arrLabels[i].setPosition(arr_val_labels_points[i] - val_ax.labels.arrLabels[i].tx.rich.content.XLimit, y_pos);
+                        }
+                    }
+                    else
+                    {
+                        for(i = 0;  i < val_ax.labels.arrLabels.length; ++i)
+                        {
+                            val_ax.labels.arrLabels[i].setPosition(arr_val_labels_points[i] - val_ax.labels.arrLabels[i].tx.rich.content.XLimit,
+                                val_ax.labels.y + val_ax.labels.extY - val_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight() - val_axis_labels_gap);
                         }
                     }
                 }
-                else
-                {
-                    crosses = isRealNumber(cat_ax.crossesAt) ? cat_ax.crossesAt : arr_val[0];
-                }
-
-                var plot_area_width;
-                var crosses_width = rect.w*(crosses - arr_val[0])/(arr_val[arr_val.length - 1] - arr_val[0]);
-                if(crosses_width > cat_ax.labels.extX)
-                {
-                    cat_ax.labels.x = rect.x + crosses_width - cat_ax.labels.extX;
-                    plot_area_width = rect.w;
-                }
-                else
-                {
-                    cat_ax.labels.x = rect.x;
-                    plot_area_width = ((rect.w - cat_ax.labels.extX)*(arr_val[arr_val.length-1]-arr_val[0]))/(arr_val[arr_val.length-1] - crosses);
-                }
-
-                val_ax.labels.x = rect.x + rect.w - plot_area_width;
-
-                //Получим строки для оси значений с учетом формата и единиц
-                var arr_strings = [];
-                var multiplier;
-                if(val_ax.dispUnits)
-                    multiplier = val_ax.dispUnits.getMultiplier();
-                else
-                    multiplier = 1;
-                var num_fmt = val_ax.numFmt;
-                if(num_fmt && typeof num_fmt.formatCode === "string" /*&& !(num_fmt.formatCode === "General")*/)
-                {
-                    var num_format = oNumFormatCache.get(num_fmt.formatCode);
-                    for(i = 0; i < arr_val.length; ++i)
-                    {
-                        var calc_value = arr_val[i]*multiplier;
-                        var rich_value = num_format.format(calc_value, CellValueType.number, 15);
-                        arr_strings.push(rich_value[0].text);
-                    }
-                }
-                else
-                {
-                    for(i = 0; i < arr_val.length; ++i)
-                    {
-                        var calc_value = arr_val[i]*multiplier;
-                        arr_strings.push(calc_value + "");
-                    }
-                }
-                var max_width = 0;
                 val_ax.xPoints = [];
-                var max_height = 0;
-                for(i = 0; i < arr_strings.length; ++i)
+                for(i = 0; i < arr_val_labels_points.length; ++i)
                 {
-                    var dlbl = new CDLbl();
-                    dlbl.parent = val_ax;
-                    dlbl.chart = this;
-                    dlbl.spPr = val_ax.spPr;
-                    dlbl.txPr = val_ax.txPr;
-                    dlbl.tx = new CChartText();
-                    dlbl.tx.rich = CreateTextBodyFromString(arr_strings[i], this.getDrawingDocument(), dlbl);
-                    dlbl.recalculate();
-                    val_ax.labels.arrLabels.push(dlbl);
-                    var cur_height = dlbl.tx.rich.content.Get_SummaryHeight();
-                    if(cur_height > max_height)
-                    {
-                        max_height = cur_height;
-                    }
+                    val_ax.xPoints[i] = {val:arr_val[i], pos: arr_val_labels_points[i]};
                 }
-                val_ax.labels.extY = max_height + gap_hor_axis;
-                var point_width = rect.h / string_pts.length;  //Ширина точки без учета высоты оси значений
-                var crosses;
-                if(isRealNumber(val_ax.crosses))
-                {
-                    switch (val_ax.crosses)
-                    {
-                        case CROSSES_AUTO_ZERO:
-                        case CROSSES_MIN:
-                        {
-                            crosses = 0;//ось пересекает категорию с индексом 0
-                            break;
-                        }
-                        case CROSSES_MAX:
-                        {
-                            crosses = string_pts.length - 1;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    crosses = isRealNumber(val_ax.crossesAt) ? val_ax.crossesAt - 1 : 0;
-                }
-                var plot_area_height;
-                var crosses_height = crosses*rect.h/string_pts.length;
-                if(crosses_height > val_ax.labels.extY)
-                {
-                    plot_area_height = rect.h;
-                    val_ax.labels.y = rect.y + rect.h - crosses_height;
-                }
-                else
-                {
-                    plot_area_height = ((rect.h - val_ax.labels.extY)*(string_pts.length))/(string_pts.length - crosses);
-                    val_ax.labels.y =  rect.y + rect.h -  val_ax.labels.extY;
-                }
-                cat_ax.labels.extY = plot_area_height;
-                var point_height = plot_area_height/cat_ax.labels.arrLabels.length;
+
                 cat_ax.yPoints = [];
-                for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
+                for(i = 0; i <arr_cat_labels_points.length; ++i)
                 {
-                    if(cat_ax.labels.arrLabels[i])
+                    cat_ax.yPoints[i] = {val: i, pos: arr_cat_labels_points[i]};
+                }
+                if(cat_ax.labels)
+                {
+                    cat_ax.labels.y = rect.y;
+                    cat_ax.labels.extY = point_interval*intervals_count;
+                    if(cat_labels_align_left)
                     {
-                        cat_ax.labels.arrLabels[i].setPosition(cat_ax.labels.x, cat_ax.labels.y + (cat_ax.labels.arrLabels.length- i - 0.5)*point_height - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
+                        for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
+                        {
+                            if(cat_ax.labels.arrLabels[i])
+                            {
+                                cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(true);
+                                cat_ax.labels.arrLabels[i].tx.rich.content.Set_ParagraphAlign(align_Center);
+                                cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(false);
+                                cat_ax.labels.arrLabels[i].tx.rich.content.Reset(0, 0, cat_ax.labels.extX - labels_offset, 2000);
+                                cat_ax.labels.arrLabels[i].tx.rich.content.Recalculate_Page(0, true);
+                                cat_ax.labels.arrLabels[i].setPosition(cat_ax.labels.x, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
+                            }
+                        }
                     }
-                    cat_ax.yPoints.push({val: i, pos: cat_ax.labels.y + (cat_ax.labels.arrLabels.length- i - 0.5)*point_height});
+                    else
+                    {
+                        for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
+                        {
+                            if(cat_ax.labels.arrLabels[i])
+                            {
+                                cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(true);
+                                cat_ax.labels.arrLabels[i].tx.rich.content.Set_ParagraphAlign(align_Center);
+                                cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(false);
+                                cat_ax.labels.arrLabels[i].tx.rich.content.Reset(0, 0, cat_ax.labels.extX - labels_offset, 2000);
+                                cat_ax.labels.arrLabels[i].tx.rich.content.Recalculate_Page(0, true);
+                                cat_ax.labels.arrLabels[i].setPosition(cat_ax.labels.x + labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
+                            }
+                        }
+                    }
                 }
 
-                val_ax.labels.extX = plot_area_width;
-                val_ax.xPoints = [];
-                var hor_interval = val_ax.labels.extX/(arr_val.length-1);
-                for(i = 0;  i < val_ax.labels.arrLabels.length; ++i)
-                {
-                    val_ax.labels.arrLabels[i].setPosition(val_ax.labels.x + hor_interval*i - val_ax.labels.arrLabels[i].tx.rich.content.XLimit/2, val_ax.labels.y + gap_hor_axis);
-                    val_ax.xPoints.push({pos: val_ax.labels.x + hor_interval*i, val: arr_val[i]});
-                }
-                val_ax.posY = val_ax.labels.y;
-                cat_ax.posX = cat_ax.labels.x + cat_ax.labels.extX;
-                val_ax.xPoints.sort(function(a, b){return a.val - b.val});
                 cat_ax.yPoints.sort(function(a, b){return a.val - b.val});
+                val_ax.xPoints.sort(function(a, b){return a.val - b.val});
             }
         }
     }

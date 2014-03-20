@@ -1066,6 +1066,11 @@ CTextBody.prototype =
             }
         }
         return max_width + 0.01;
+    }, 
+	
+	Get_PrevElementEndInfo : function(CurElement)
+    {
+       return null;
     }
 };
 
