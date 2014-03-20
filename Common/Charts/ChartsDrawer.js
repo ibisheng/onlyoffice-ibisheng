@@ -531,7 +531,7 @@ CChartsDrawer.prototype =
 			{
 				if(catAx.scaling.orientation != ORIENTATION_MIN_MAX)
 				{
-					leftDownPointX = catAx.xPoints[catAx.xPoints.length - 1].pos;
+					leftDownPointX = catAx.xPoints[catAx.xPoints.length - 1].pos - Math.abs((catAx.xPoints[1].pos - catAx.xPoints[0].pos) / 2);
 				}
 				else
 				{
@@ -546,7 +546,10 @@ CChartsDrawer.prototype =
 				leftDownPointX = catAx.labels.x;
 
 			
-			leftDownPointY = valAx.yPoints[0].pos;
+			if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
+				leftDownPointY = valAx.yPoints[0].pos;
+			else
+				leftDownPointY = valAx.yPoints[valAx.yPoints.length - 1].pos;
 			
 			
 			if(catAx.xPoints.length > 1)
@@ -2639,17 +2642,23 @@ CChartsDrawer.prototype =
 		}
 		else
 		{
-			for (var i=0; i < this.calcProp.scale.length; i++)
+			var valPoints;
+			if(this.calcProp.type == "HBar")
+				valPoints = this.cChartSpace.chart.plotArea.valAx.xPoints;
+			else
+				valPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
+			
+				
+			for (var i = 0; i < valPoints.length; i++)
 			{
-				if(this.calcProp.scale[i] == 0)
+				if(valPoints[i].val == 0)
 				{
-					if(this.calcProp.type == "HBar")
-						numNull = i;
-					else
-						numNull = i;
+					result =  valPoints[i].pos * this.calcProp.pxToMM;
 					break;
 				}
 			}
+			
+			return result;
 		}
 		
 		var nullPosition;
@@ -3277,7 +3286,7 @@ drawBarChart.prototype =
 		var widthOverLap = individualBarWidth * (overlap / 100);
 		var hmargin = (this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100 * individualBarWidth) / 2;
 		
-		var height, startX, startY, diffYVal, val, paths, seriesHeight = [], seria, startYColumnPosition, startXPosition, tempI;
+		var height, startX, startY, diffYVal, val, paths, seriesHeight = [], seria, startYColumnPosition, startXPosition, newStartX, newStartY;
 		
 		
 	
@@ -3316,15 +3325,24 @@ drawBarChart.prototype =
 				else
 				{
 					if(i == 0)
-						startX = startXPosition * this.chartProp.pxToMM - hmargin - (i + 1) * (individualBarWidth);
+						startX = startXPosition * this.chartProp.pxToMM - hmargin - i * (individualBarWidth);
 					else
-						startX = startXPosition * this.chartProp.pxToMM - hmargin - ((i + 1) * individualBarWidth - (i + 1) * widthOverLap);
+						startX = startXPosition * this.chartProp.pxToMM - hmargin - (i * individualBarWidth - i * widthOverLap);
 				}
 				
 				
 				//if(height != 0)
 				//{
-					paths = this._calculateRect(startX, startY, individualBarWidth, height);
+					newStartX = startX;
+					if(this.cShapeDrawer.chart.plotArea.catAx.scaling.orientation != ORIENTATION_MIN_MAX)
+						newStartX = startX - individualBarWidth;
+					
+					newStartY = startY;
+					if(this.cShapeDrawer.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX && (this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked"))
+						newStartY = startY + height;
+					
+					paths = this._calculateRect(newStartX, newStartY, individualBarWidth, height);
+					
 					
 					if(!this.paths.series)
 						this.paths.series = [];
@@ -3349,8 +3367,15 @@ drawBarChart.prototype =
 				if(seriesHeight[k][j] && ((val > 0 && seriesHeight[k][j] > 0) || (val < 0 && seriesHeight[k][j] < 0)))
 					diffYVal += seriesHeight[k][j];
 			}
-			startY = nullPositionOX - diffYVal;
+			if(this.cShapeDrawer.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX)
+				startY = nullPositionOX + diffYVal;
+			else
+				startY = nullPositionOX - diffYVal;
+				
 			height = nullPositionOX - this.cChartDrawer.getYPosition(val, yPoints) * this.chartProp.pxToMM;
+			
+			if(this.cShapeDrawer.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX)
+				height = - height;
 		}
 		else if(this.chartProp.subType == "stackedPer")
 		{
@@ -3376,7 +3401,13 @@ drawBarChart.prototype =
 			}
 			
 			height = nullPositionOX - this.cChartDrawer.getYPosition((val / this.summBarVal[j]), yPoints) * this.chartProp.pxToMM;
-			startY = nullPositionOX - diffYVal;
+			if(this.cShapeDrawer.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX)
+				height = - height;
+			
+			if(this.cShapeDrawer.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX)
+				startY = nullPositionOX + diffYVal;
+			else
+				startY = nullPositionOX - diffYVal;
 		}
 		else
 		{
