@@ -2470,6 +2470,12 @@ CChartsDrawer.prototype =
 		//chartProp.chart.plotArea.valAx.scaling.logBase
 		var axisMin, axisMax, firstDegree, step, arrayValues;
 		
+		if(chartProp.chart.plotArea.valAx.scaling.logBase)
+		{
+			arrayValues = this._getLogArray(yMin, yMax, chartProp.chart.plotArea.valAx.scaling.logBase);
+			return arrayValues;
+		}
+		
 		chartProp.chart.plotArea.valAx && chartProp.chart.plotArea.valAx.scaling ? chartProp.chart.plotArea.valAx.scaling.max : null;
 		//максимальное и минимальное значение(по документации excel)
 		var trueMinMax = this._getTrueMinMax(isOx, yMin, yMax);
@@ -2522,6 +2528,25 @@ CChartsDrawer.prototype =
 		arrayValues = this._getArrayAxisValues(minUnit, axisMin, axisMax, step, manualMin, manualMax);
 		
 		return arrayValues;
+	},
+	
+	_getLogArray: function(yMin, yMax, logBase)
+	{	
+		var result = [];
+		var temp;
+		var pow = 0;
+		
+		if(logBase < 1)
+			logBase = 2;
+		
+		while(temp <= yMax)
+		{
+			temp = Math.pow(logBase, pow);
+			result[pow] = temp;
+			pow ++;
+		};
+		
+		return result;
 	},
 	
 	_getArrayAxisValues: function(minUnit, axisMin, axisMax, step, manualMin, manualMax)
