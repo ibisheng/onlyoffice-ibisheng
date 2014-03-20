@@ -14185,7 +14185,6 @@ Paragraph.prototype =
                 return false;
             }
 
-            // TODO: реализовать Selection_Check
             return false;
         }
     },

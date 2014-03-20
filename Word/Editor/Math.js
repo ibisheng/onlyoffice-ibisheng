@@ -302,15 +302,23 @@ ParaMath2.prototype =
         // переделать с разбиванием на строки.
         //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
+        // Если это первый отрезок в данной строке, тогда нам надо добавить строку (первую строку не добавляем,
+        // т.к. она всегда есть)
+        if ( 0 === CurRange )
+        {
+            if ( 0 !== CurLine )
+            {
+                this.Lines[CurLine] = new CParaRunLine();
+                this.LinesLength    = CurLine + 1;
+            }
+            else
+            {
+                this.LinesLength  = CurLine + 1;
+            }
+        }
+
         // Отмечаем, что началось слово
         PRS.StartWord = true;
-
-        // Обновляем метрику строки
-        if ( PRS.LineAscent < this.Ascent )
-            PRS.LineAscent = this.Ascent;
-
-        if ( PRS.LineDescent < this.Descent )
-            PRS.LineDescent = this.Descent;
 
         // При проверке, убирается ли слово, мы должны учитывать ширину предшествующих пробелов.
         var LetterLen = Size.Width;
@@ -389,7 +397,20 @@ ParaMath2.prototype =
         var RangeEndPos   = 0;
 
         if ( true !== PRS.NewRange )
+        {
             RangeEndPos = 1;
+
+            // Удаляем лишние строки, оставшиеся после предыдущего пересчета в самом конце
+            if ( this.Lines.length > this.LinesLength )
+                this.Lines.length = this.LinesLength;
+
+            // Обновляем метрику строки
+            if ( PRS.LineAscent < this.Ascent )
+                PRS.LineAscent = this.Ascent;
+
+            if ( PRS.LineDescent < this.Descent )
+                PRS.LineDescent = this.Descent;
+        }
 
         if ( 0 === CurLine && 0 === CurRange )
         {
@@ -486,13 +507,6 @@ ParaMath2.prototype =
 
         HyperLines.LinesLength = this.LinesLength;
 
-        var ContentLen = this.Content.length;
-        for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
-        {
-            var ContentLines = this.Content[CurPos].Save_Lines();
-            HyperLines.Content.push( ContentLines );
-        }
-
         return HyperLines;
     },
 
@@ -501,12 +515,6 @@ ParaMath2.prototype =
         this.Lines       = HyperLines.Lines;
         this.LinesLength = HyperLines.LinesLength;
         this.Range       = this.Lines[0].Ranges[0];
-
-        var ContentLen = this.Content.length;
-        for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
-        {
-            this.Content[CurPos].Restore_Lines( HyperLines.Content[CurPos] );
-        }
     },
 
     Is_EmptyRange : function(_CurLine, _CurRange)
