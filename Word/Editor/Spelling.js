@@ -613,15 +613,24 @@ CParaSpellChecker.prototype =
 
             if ( false === OldElement.Checked )
             {
+                var bFound = false;
                 for ( var Index2 = 0; Index2 < ElementsCount; Index2++ )
                 {
                     var Element = this.Elements[Index2];
 
-                    if ( Word === Element.Word && false !== Element.Checked )
+                    if ( Word === Element.Word )
                     {
-                        return true;
+                        bFound = true;
+
+                        if ( false !== Element.Checked )
+                            return true;
+
+                        break;
                     }
                 }
+
+                if ( false === bFound )
+                    return true;
             }
         }
 
