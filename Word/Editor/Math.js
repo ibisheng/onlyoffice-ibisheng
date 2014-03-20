@@ -214,6 +214,11 @@ ParaMath.prototype =
         // TODO: ParaMath.Apply_TextPr
     },
 
+    Clear_TextPr : function()
+    {
+
+    },
+
     Check_NearestPos : function(ParaNearPos, Depth)
     {
     },

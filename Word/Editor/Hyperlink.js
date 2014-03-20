@@ -551,6 +551,15 @@ ParaHyperlink.prototype =
         return CenterRunPos;
     },
 
+    Clear_TextPr : function()
+    {
+        var Count = this.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            this.Content[Index].Clear_TextPr();
+        }
+    },
+
     Check_NearestPos : function(ParaNearPos, Depth)
     {
         var HyperNearPos = new CParagraphElementNearPos();

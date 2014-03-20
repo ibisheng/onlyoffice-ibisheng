@@ -15436,13 +15436,24 @@ Paragraph.prototype =
             // При изменении стиля убираются только те текстовые настроки внутри параграфа,
             // которые присутствуют в стиле. Пока мы удалим вообще все настроки.
             // TODO : переделать
-            for ( var Index = 0; Index < this.Content.length; Index++ )
-            {
-                var Item = this.Content[Index];
 
-                if ( para_TextPr === Item.Type )
+            if ( true !== Debug_ParaRunMode )
+            {
+                for ( var Index = 0; Index < this.Content.length; Index++ )
                 {
-                    Item.Clear_Style();
+                    var Item = this.Content[Index];
+
+                    if ( para_TextPr === Item.Type )
+                    {
+                        Item.Clear_Style();
+                    }
+                }
+            }
+            else
+            {
+                for ( var Index = 0; Index < this.Content.length; Index++ )
+                {
+                    this.Content[Index].Clear_TextPr();
                 }
             }
         }

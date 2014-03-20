@@ -3964,6 +3964,11 @@ ParaRun.prototype =
         return NewRun;
     },
 
+    Clear_TextPr : function()
+    {
+        this.Set_Pr( new CTextPr() );
+    },
+
     // В данной функции мы применяем приходящие настройки поверх старых, т.е. старые не удаляем
     Apply_Pr : function(TextPr)
     {

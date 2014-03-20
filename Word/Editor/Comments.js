@@ -939,6 +939,11 @@ ParaComment.prototype =
         return null;
     },
 
+    Clear_TextPr : function()
+    {
+
+    },
+
     Remove : function()
     {
         return false;
