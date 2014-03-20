@@ -593,7 +593,7 @@ CParaSpellChecker.prototype =
             {
                 var OldElement = OldElements[Index2];
 
-                if ( Word === OldElement.Word && Lang === OldElement.Lang )
+                if ( Word === OldElement.Word && Lang === OldElement.Lang && true !== OldElement.CurPos )
                 {
                     Element.Checked  = OldElement.Checked;
                     Element.Variants = OldElement.Variants;
@@ -602,6 +602,30 @@ CParaSpellChecker.prototype =
                 }
             }
         }
+
+        // Далее мы проверяем нужно ли перерисовывать параграф. Его нужно перерисовать если у нас какой-то слово было
+        // подчеркнуто как неправильное, а в новом массиве либо его нет, либо оно отмечено как правильное или
+        // неопределенное. Тогда, чтобы избавиться от подчеркивания мы перерисовываем параграф.
+        for ( var Index = 0; Index < OldElementsCount; Index++ )
+        {
+            var OldElement = OldElements[Index];
+            var Word = OldElement.Word;
+
+            if ( false === OldElement.Checked )
+            {
+                for ( var Index2 = 0; Index2 < ElementsCount; Index2++ )
+                {
+                    var Element = this.Elements[Index2];
+
+                    if ( Word === Element.Word && false !== Element.Checked )
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 };
 
@@ -1078,6 +1102,7 @@ Paragraph.prototype.Continue_CheckSpelling = function()
     }
     else
     {
+        var ParaForceRedraw = undefined;
         var CheckLang = false;
         if ( pararecalc_0_Spell_None === this.RecalcInfo.Recalc_0_Spell.Type )
             return;
@@ -1097,13 +1122,13 @@ Paragraph.prototype.Continue_CheckSpelling = function()
                 Item.Check_Spelling( SpellCheckerEngine, 1 );
             }
 
-            this.SpellChecker.Compare_WithPrevious( OldElements );
+            if ( true === this.SpellChecker.Compare_WithPrevious( OldElements ) )
+                ParaForceRedraw = this;
 
             // Не надо проверять отдельно языки
             CheckLang = false;
         }
 
-        var ParaForceRedraw = undefined;
         var PrevPara = this.Get_DocumentPrev();
         if ( null != PrevPara && type_Paragraph === PrevPara.GetType() && undefined != PrevPara.Get_FramePr() && undefined != PrevPara.Get_FramePr().DropCap )
         {
@@ -1323,7 +1348,7 @@ ParaComment.prototype.Clear_SpellingMarks = function()
 //----------------------------------------------------------------------------------------------------------------------
 // ParaMath
 //----------------------------------------------------------------------------------------------------------------------
-ParaMath2.prototype.Check_Spelling = function(SpellCheckerEngine, Depth)
+ParaMath.prototype.Check_Spelling = function(SpellCheckerEngine, Depth)
 {
     if ( true === SpellCheckerEngine.bWord )
     {
@@ -1332,11 +1357,11 @@ ParaMath2.prototype.Check_Spelling = function(SpellCheckerEngine, Depth)
     }
 };
 
-ParaMath2.prototype.Add_SpellCheckerElement = function(Element, Start, Depth)
+ParaMath.prototype.Add_SpellCheckerElement = function(Element, Start, Depth)
 {
 };
 
-ParaMath2.prototype.Clear_SpellingMarks = function()
+ParaMath.prototype.Clear_SpellingMarks = function()
 {
 };
 
