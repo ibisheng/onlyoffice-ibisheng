@@ -2170,7 +2170,7 @@ function CVerRuler()
             var start_dark = (((markup.Rows[0].Y + markup.Rows[0].H) * dKoef_mm_to_pix) >> 0) + 0.5;
             var end_dark = 0;
 
-            context.fillStyle = global_style_color;
+            context.fillStyle = GlobalSkin.RulerDark;
             context.strokeStyle = "#929292";
 
             var _x = this.m_nLeft + 0.5;
