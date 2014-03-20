@@ -134,7 +134,7 @@
 			this.fKeyMouseMove	= null;
 			//-----------------
 			
-			// Автоподстановка формул
+			// Автоподстановка формул. Цвет селекта
 			this.formulaSelectorColor = "rgba(105, 119, 62, 0.2)";
 
 			this._init();
@@ -1683,7 +1683,8 @@
 				if ( formulaList ) {
 					var _this = this;
 					var api = asc["editor"];
-					var canvasWidget = document.getElementById(api.HtmlElementName);
+					//var canvasWidget = document.getElementById(api.HtmlElementName);
+					var canvasWidget = $("#" + api.HtmlElementName);
 					
 					var selector = document.createElement("div");
 					selector.id = "formulaSelector";
@@ -1692,8 +1693,10 @@
 					selector.style["height"] = "auto";
 					selector.style["backgroundColor"] = "#FFFFFF";
 					selector.style["border"] = "1px solid Grey";
-					selector.style["top"] = (formulaList.y + canvasWidget.offsetTop) + "px";
-					selector.style["left"] = (formulaList.x + canvasWidget.offsetLeft) + "px";
+					//selector.style["top"] = (formulaList.y + canvasWidget.offsetTop) + "px";
+					//selector.style["left"] = (formulaList.x + canvasWidget.offsetLeft) + "px";
+					selector.style["top"] = (formulaList.y + canvasWidget.offset().top) + "px";
+					selector.style["left"] = (formulaList.x + canvasWidget.offset().left) + "px";
 					selector.style["position"] = "absolute";
 					selector.style["cursor"] = "default";
 					selector.style["font-size"] = "12px";
@@ -1713,6 +1716,12 @@
 						item.setAttribute("title", formulaList.list[i].arg);
 						
 						item.onmouseover = function(e) {
+							var nodes = combo.childNodes;
+							for ( var i = 0; i < nodes.length; i++ ) {
+								if ( nodes[i].style["backgroundColor"] != "" ) {
+									nodes[i].style["backgroundColor"] = "";
+								}
+							}
 							this.style["backgroundColor"] = _this.formulaSelectorColor;
 						}
 						item.onmouseout = function(e) {
@@ -1763,10 +1772,13 @@
 								var y = ws.getCellTop(editedRow, 0) + frozenPlace.getVerticalScroll() - ws.getCellTop(0, 0);
 								var x = ws.getCellLeft(editedCol, 0) + frozenPlace.getHorizontalScroll() - ws.getCellLeft(0, 0);
 								
-								var canvasWidget = document.getElementById(api.HtmlElementName);
+								//var canvasWidget = document.getElementById(api.HtmlElementName);
+								var canvasWidget = $("#" + api.HtmlElementName);
 								if ( canvasWidget ) {
-									selector.style["top"] = (y + canvasWidget.offsetTop) + "px";
-									selector.style["left"] = (x + canvasWidget.offsetLeft) + "px";
+									//selector.style["top"] = (y + canvasWidget.offsetTop) + "px";
+									//selector.style["left"] = (x + canvasWidget.offsetLeft) + "px";
+									selector.style["top"] = (y + canvasWidget.offset().top) + "px";
+									selector.style["left"] = (x + canvasWidget.offset().left) + "px";
 								}
 								return;
 							}
