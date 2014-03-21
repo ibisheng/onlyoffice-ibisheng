@@ -11852,6 +11852,13 @@ CTable.prototype =
                     var NextCell = ( Add_info[CurRow] >= Row.Get_CellsCount() - 1 ? Row.Get_Cell( Add_info[CurRow] - 1 ) : Row.Get_Cell( Add_info[CurRow] + 1 ) );
                     NewCell.Copy_Pr(NextCell.Pr, true);
 
+                    // Скопируем текстовые настройки
+                    var FirstPara = NextCell.Content.Get_FirstParagraph();
+                    var TextPr = FirstPara.Get_FirstRunPr();
+                    NewCell.Content.Set_ApplyToAll( true );
+                    NewCell.Content.Paragraph_Add( new ParaTextPr( TextPr ) );
+                    NewCell.Content.Set_ApplyToAll( false );
+
                     if ( false === bBefore2 )
                         Rows_info[CurRow].splice( Add_info[CurRow], 0, { W : Width, Type : 0, GridSpan : 1 } );
                     else
@@ -11917,6 +11924,14 @@ CTable.prototype =
                     // Скопируем свойства следующуй ячейки в данной строке, а если мы добавляем в конец, то предыдущей
                     var NextCell = ( Add_info[CurRow] + 1 >= Row.Get_CellsCount() - 1 ? Row.Get_Cell( Add_info[CurRow] ) : Row.Get_Cell( Add_info[CurRow] + 2 ) );
                     NewCell.Copy_Pr(NextCell.Pr, true);
+
+                    // Скопируем текстовые настройки
+                    var FirstPara = NextCell.Content.Get_FirstParagraph();
+                    var TextPr = FirstPara.Get_FirstRunPr();
+                    NewCell.Content.Set_ApplyToAll( true );
+                    NewCell.Content.Paragraph_Add( new ParaTextPr( TextPr ) );
+                    NewCell.Content.Set_ApplyToAll( false );
+
 
                     if ( false === bBefore2 )
                         Rows_info[CurRow].splice( Add_info[CurRow] + 1, 0, { W : Width, Type : 0, GridSpan : 1 } );

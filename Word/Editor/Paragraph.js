@@ -221,6 +221,14 @@ Paragraph.prototype =
         return Para;
     },
 
+    Get_FirstRunPr : function()
+    {
+        if ( this.Content.length <= 0 || para_Run !== this.Content[0].Type )
+            return this.TextPr.Value.Copy();
+
+        return this.Content[0].Pr.Copy();
+    },
+
     Get_AllDrawingObjects : function(DrawingObjs)
     {
         if ( undefined === DrawingObjs )
@@ -13798,6 +13806,8 @@ Paragraph.prototype =
                     StartPos = this.Selection.EndPos;
                     EndPos   = this.Selection.StartPos;
                 }
+
+                var EndPos = Math.min( this.Content.length - 1, EndPos );
 
                 for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
                 {
