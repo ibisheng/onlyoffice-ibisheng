@@ -4000,7 +4000,8 @@ CTable.prototype =
                     var CellBordersInfo = Cell.Get_BorderInfo();
 
                     // Левая граница
-                    var BorderInfo_Left = CellBordersInfo.Left;
+                    var BorderInfo_Left  = CellBordersInfo.Left;
+
                     // Это значение может не совпадать с CurRow
                     var TempCurRow = Cell.Row.Index;
 
@@ -4034,6 +4035,7 @@ CTable.prototype =
                             // Для остальных ячеек невидимые границы мы рисуем как правые
                         }
                     }
+
 
                     // Правая граница
                     var BorderInfo_Right = CellBordersInfo.Right;
@@ -4072,9 +4074,10 @@ CTable.prototype =
                         }
                     }
 
+
                     // Верхняя граница
+                    var BorderInfo_Top   = CellBordersInfo.Top;
                     var LastBorderTop_prev = { W : LastBorderTop.W, H : LastBorderTop.H };
-                    var BorderInfo_Top = CellBordersInfo.Top;
                     for ( var Index = 0; Index < BorderInfo_Top.length; Index++ )
                     {
                         var CurBorderInfo = BorderInfo_Top[Index];
@@ -4153,6 +4156,9 @@ CTable.prototype =
                                 RightMW = Max_r;//X1 += Max_r;
                             else
                                 RightMW = -Max_r;//X1 -= Max_r;
+
+                            if ( border_Single === CurBorderInfo.Value && CurBorderInfo.Size <= BorderInfo_Right[0].Size )
+                                RightMW = -BorderInfo_Right[0].Size / 2;
                         }
 
                         if ( 0 === Index )
@@ -4217,6 +4223,9 @@ CTable.prototype =
 
                             //X0 -= Max_l;
                             LeftMW = -Max_l;
+
+                            if ( border_Single === CurBorderInfo.Value && CurBorderInfo.Size <= BorderInfo_Left[0].Size )
+                                LeftMW = BorderInfo_Left[0].Size / 2;
 
                             LastBorderTop.L = Max_l;
                             LastBorderTop.W = 0;
