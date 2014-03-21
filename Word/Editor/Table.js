@@ -11346,6 +11346,13 @@ CTable.prototype =
 
                 New_Cell.Copy_Pr( Old_Cell.Pr );
 
+                // Копируем также текстовые настройки и настройки параграфа
+                var FirstPara = Old_Cell.Content.Get_FirstParagraph();
+                var TextPr = FirstPara.Get_FirstRunPr();
+                New_Cell.Content.Set_ApplyToAll( true );
+                New_Cell.Content.Paragraph_Add( new ParaTextPr( TextPr ) );
+                New_Cell.Content.Set_ApplyToAll( false );
+
                 if ( true === bBefore )
                 {
                     if ( Cells_info[CurCell].VMerge_count_before > 1 )
