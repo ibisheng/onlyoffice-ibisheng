@@ -2,14 +2,14 @@
  * Created by Ilja.Kirillov on 18.03.14.
  */
 
-function ParaMath()
+function ParaMath(bAddMenu, bCollaborative)
 {
     this.Id = g_oIdCounter.Get_NewId();
 
     this.Type  = para_Math;
 
     this.Jc   = undefined;
-    this.Math = new CMathComposition();
+    this.Math = new CMathComposition(bCollaborative);
     this.Math.Parent = this;
     this.Content = this.Math.Root.content; // Root.content
     this.State      = new CParaRunState();       // Положение курсора и селекта для данного run
@@ -916,13 +916,37 @@ ParaMath.prototype =
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
 //----------------------------------------------------------------------------------------------------------------------
-    Write_ToBinary2 : function(Writer)
+    Write_ToBinary : function(Writer)
     {
-        // TODO: ParaMath.Write_ToBinary2
+        // Long   : Type
+        // String : Id
+
+        Writer.WriteLong( this.Type );
+        Writer.WriteString2( this.Id );
+    },
+	Write_ToBinary2 : function(Writer)
+    {
+		Writer.WriteLong( historyitem_type_Math );
+		
+		var oThis = this;
+		this.bs = new BinaryCommonWriter(Writer);
+		this.boMaths = new Binary_oMathWriter(Writer);
+
+		this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteOMathParaCollaborative(oThis.Math);});//WriteOMathParaCollaborative
     },
 
     Read_FromBinary2 : function(Reader)
     {
-        // TODO: ParaMath.Read_FromBinary2
-    }
+		var oThis = this;
+		this.boMathr = new Binary_oMathReader(Reader);
+		this.bcr = new Binary_CommonReader(Reader);
+		
+		var length = Reader.GetUChar();
+		
+		var res = false;
+		Reader.cur += 3;
+		res = this.bcr.Read1(length, function(t, l){
+			return oThis.boMathr.ReadMathOMathParaCollaborative(t,l,oThis.Math);
+		});
+	},
 };

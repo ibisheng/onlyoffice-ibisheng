@@ -7,7 +7,7 @@ function CFraction()
     CMathBase.call(this);
 }
 extend(CFraction, CMathBase);
-CFraction.prototype.init = function(props)
+CFraction.prototype.init = function(props, bColl)
 {
     var bValid = typeof(props.type) !== "undefined" && props.type !== null;
 
@@ -24,10 +24,10 @@ CFraction.prototype.init = function(props)
     if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
     {
         var num = new CNumerator();
-        num.init();
+        num.init(bColl);
 
         var den = new CDenominator();
-        den.init();
+        den.init(bColl);
 
         this.setDimension(2, 1);
 
@@ -440,10 +440,10 @@ function CNumerator()
     CMathBase.call(this);
 }
 extend(CNumerator, CMathBase);
-CNumerator.prototype.init = function()
+CNumerator.prototype.init = function(bColl)
 {
     this.setDimension(1, 1);
-    this.setContent();
+    this.setContent(bColl);
 }
 CNumerator.prototype.recalculateSize = function()
 {
@@ -505,10 +505,10 @@ function CDenominator()
     CMathBase.call(this);
 }
 extend(CDenominator, CMathBase);
-CDenominator.prototype.init = function()
+CDenominator.prototype.init = function(bColl)
 {
     this.setDimension(1, 1);
-    this.setContent();
+    this.setContent(bColl);
 }
 CDenominator.prototype.recalculateSize = function()
 {

@@ -7750,14 +7750,14 @@ ParaPresentationNumbering.prototype =
 };
 
 // Класс ParaMath
-function ParaMath(bAddMenu)
+function ParaMath(bAddMenu, bCollaborative)
 {
     this.Id = g_oIdCounter.Get_NewId();
 
     this.Type  = para_Math;
 
     this.Jc   = undefined;
-	this.Math = new CMathComposition();
+	this.Math = new CMathComposition(bCollaborative);
     this.Math.Parent = this;
 
     this.Inline = false; // внутристроковая формула или нет (проверяемся внутри Internal_Recalculate_0)
@@ -7800,9 +7800,9 @@ ParaMath.prototype =
         this.Id = newId;
     },
 
-    Draw : function( X, Y, Context )
+    Draw : function( X, Y, Context)
     {
-        this.Math.Draw( X, Y, Context );
+		this.Math.Draw( X, Y, Context );
     },
 
     Measure : function( Context, TextPr )
@@ -8072,9 +8072,8 @@ ParaMath.prototype =
 		var oThis = this;
 		this.bs = new BinaryCommonWriter(Writer);
 		this.boMaths = new Binary_oMathWriter(Writer);
-		
-		//this.bs.WriteItem(c_oSerParType.OMathPara, function(){oThis.boMaths.WriteOMathPara(oThis.Math);});
-		this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteOMathPara(oThis.Math);});
+
+		this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteOMathParaCollaborative(oThis.Math);});//WriteOMathParaCollaborative
     },
 
 	/*Write_ElemToBinary2 : function(Writer, elem)
@@ -8087,14 +8086,7 @@ ParaMath.prototype =
     },*/
 	
 	//добавление формулы в формулу
-	Write_MathElemToBinary : function(Writer, elem)
-	{
-		var oThis = this;
-		this.bs = new BinaryCommonWriter(Writer);
-		this.boMaths = new Binary_oMathWriter(Writer);
-		
-		this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteMathElem(elem);});
-	},
+	
 	
     Read_FromBinary2 : function(Reader)
     {
@@ -8107,7 +8099,7 @@ ParaMath.prototype =
 		var res = false;
 		Reader.cur += 3;
 		res = this.bcr.Read1(length, function(t, l){
-			return oThis.boMathr.ReadMathOMathPara(t,l,oThis.Math);
+			return oThis.boMathr.ReadMathOMathParaCollaborative(t,l,oThis.Math);
 		});
 	},
 	
@@ -8126,23 +8118,7 @@ ParaMath.prototype =
 		});
 	},*/
 	
-	Read_MathElemFromBinary : function(Reader)
-    {
-		var oThis = this;
-		this.boMathr = new Binary_oMathReader(Reader);
-		this.bcr = new Binary_CommonReader(Reader);
-		
-		var length = Reader.GetUChar();		
-		var res = false;
-		Reader.cur += 3;
-		
-		var obj = null;
-		var elem = null;
-		res = this.bcr.Read1(length, function(t, l){
-			elem = oThis.boMathr.ReadMathArg(t,l,obj);
-		});
-		return elem;
-	},
+	
 
     Save_Changes : function(Data, Writer)
     {

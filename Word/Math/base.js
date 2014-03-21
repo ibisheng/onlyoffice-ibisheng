@@ -52,7 +52,7 @@ function CMathBase()
 }
 CMathBase.prototype =
 {
-    setContent: function()
+    setContent: function(bColl)
     {
         this.elements = new Array();
 
@@ -61,7 +61,7 @@ CMathBase.prototype =
             this.elements[i] = new Array();
             for(var j = 0; j < this.nCol; j++)
             {
-                this.elements[i][j] = new CMathContent();
+                this.elements[i][j] = new CMathContent(bColl);
                 this.elements[i][j].relate(this);
                 this.elements[i][j].setComposition(this.Composition);
                 /*if( !this.elements[i][j].IsJustDraw())
