@@ -3297,19 +3297,20 @@ drawBarChart.prototype =
 		//соответствует подписям оси значений(OY)
 		var yPoints = this.cShapeDrawer.chart.plotArea.valAx.yPoints;
 		
-		var xaxispos      = this.chartProp.xaxispos;
 		var widthGraph    = this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right;
 		
 		//TODO - передавать overlap из меню!
 		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 100 : 0;
 		var overlap        = this.cShapeDrawer.chart.plotArea.chart.overlap ? this.cShapeDrawer.chart.plotArea.chart.overlap : defaultOverlap;
-		var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
-        var width          = widthGraph / numCache.pts.length;
+		var numCache       = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
+		var width          = widthGraph / numCache.pts.length;
+		if(this.cShapeDrawer.chart.plotArea.catAx.crossAx.crossBetween)
+			width = widthGraph / (numCache.pts.length - 1);
 		
 		
 		var individualBarWidth = width / (this.chartProp.series.length - (this.chartProp.series.length - 1) * (overlap / 100) + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
-		var widthOverLap = individualBarWidth * (overlap / 100);
-		var hmargin = (this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100 * individualBarWidth) / 2;
+		var widthOverLap       = individualBarWidth * (overlap / 100);
+		var hmargin            = (this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100 * individualBarWidth) / 2;
 		
 		var height, startX, startY, diffYVal, val, paths, seriesHeight = [], seria, startYColumnPosition, startXPosition, newStartX, newStartY;
 		
@@ -3332,12 +3333,20 @@ drawBarChart.prototype =
 				seriesHeight[i][j] = height;
 				
 				//стартовая позиция колонки X
-				//if(j != 0)
-				
 				if(this.cShapeDrawer.chart.plotArea.catAx.scaling.orientation == ORIENTATION_MIN_MAX)
-					startXPosition = xPoints[j].pos - Math.abs(xPoints[0].pos - this.cShapeDrawer.chart.plotArea.valAx.posX);
+				{
+					if(xPoints[1] && xPoints[1].pos)
+						startXPosition = xPoints[j].pos - Math.abs((xPoints[1].pos - xPoints[0].pos) / 2);
+					else
+						startXPosition = xPoints[j].pos - Math.abs(xPoints[0].pos - this.cShapeDrawer.chart.plotArea.valAx.posX);
+				}	
 				else
-					startXPosition = xPoints[j].pos + Math.abs(xPoints[0].pos - this.cShapeDrawer.chart.plotArea.valAx.posX);
+				{
+					if(xPoints[1] && xPoints[1].pos)
+						startXPosition = xPoints[j].pos + Math.abs((xPoints[1].pos - xPoints[0].pos) / 2);
+					else
+						startXPosition = xPoints[j].pos + Math.abs(xPoints[0].pos - this.cShapeDrawer.chart.plotArea.valAx.posX);
+				}
 					
 				
 				if(this.cShapeDrawer.chart.plotArea.catAx.scaling.orientation == ORIENTATION_MIN_MAX)
