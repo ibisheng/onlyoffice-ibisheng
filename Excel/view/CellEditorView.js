@@ -1659,8 +1659,13 @@
 							var oFormulaList = {};
 							var editedCol = ws.getSelectedColumnIndex();
 							var editedRow = ws.getSelectedRowIndex() + 1;
-							oFormulaList.y = ws.getCellTop(editedRow, 0);
-							oFormulaList.x = ws.getCellLeft(editedCol, 0);
+							var fvr = ws.getFirstVisibleRow();
+							var fvc = ws.getFirstVisibleCol();
+							
+							oFormulaList.col = editedCol;
+							oFormulaList.row = editedRow;
+							oFormulaList.y = ws.getCellTop(editedRow, 0) - (fvr ? ws.getCellTop(fvr, 0) - ws.getCellTop(0, 0) : 0);
+							oFormulaList.x = ws.getCellLeft(editedCol, 0) - (fvc ? ws.getCellLeft(fvc, 0) - ws.getCellLeft(0, 0) : 0);
 							oFormulaList.list = [];
 							
 							var fullFormulaList = api.asc_getFormulasInfo();
@@ -1683,7 +1688,7 @@
 				if ( formulaList ) {
 					var _this = this;
 					var api = asc["editor"];
-					//var canvasWidget = document.getElementById(api.HtmlElementName);
+					var ws = api.wb.getWorksheet();	
 					var canvasWidget = $("#" + api.HtmlElementName);
 					
 					var selector = document.createElement("div");
@@ -1693,8 +1698,6 @@
 					selector.style["height"] = "auto";
 					selector.style["backgroundColor"] = "#FFFFFF";
 					selector.style["border"] = "1px solid Grey";
-					//selector.style["top"] = (formulaList.y + canvasWidget.offsetTop) + "px";
-					//selector.style["left"] = (formulaList.x + canvasWidget.offsetLeft) + "px";
 					selector.style["top"] = (formulaList.y + canvasWidget.offset().top) + "px";
 					selector.style["left"] = (formulaList.x + canvasWidget.offset().left) + "px";
 					selector.style["position"] = "absolute";
@@ -1742,6 +1745,37 @@
 						}
 						combo.appendChild(item);
 					}
+					// Calculate scroll
+					var lvr = ws.getLastVisibleRow();
+					var lvc = ws.getLastVisibleCol();
+					var getBottomPoint = function() {
+						var pointPx = formulaList.y + selector.offsetHeight;
+						return pointPx * asc.getCvtRatio( 0, 1, ws.drawingCtx.getPPIY() );
+					}
+					var getRightPoint = function() {
+						var pointPx = formulaList.x + selector.offsetWidth;
+						return pointPx * asc.getCvtRatio( 0, 1, ws.drawingCtx.getPPIX() );
+					}
+					// Height
+					var row = ws._findRowUnderCursor(getBottomPoint(), true);
+					while ( !row ) {
+						ws.expandRowsOnScroll(true);
+						row = ws._findRowUnderCursor(getBottomPoint(), true);
+					}
+					if ( row.row - lvr > 0 ) {
+						ws.scrollVertical(row.row - lvr + 1, _this);
+						//ws.handlers.trigger("reinitializeScrollY");
+					}
+					// Width
+					var col = ws._findColUnderCursor(getRightPoint(), true);
+					while ( !col ) {
+						ws.expandColsOnScroll(true);
+						col = ws._findColUnderCursor(getRightPoint(), true);
+					}
+					if ( col.col - lvc > 0 ) {
+						ws.scrollHorizontal(col.col - lvc + 1, _this);
+						//ws.handlers.trigger("reinitializeScrollX");
+					}
 				}
 			},
 			
@@ -1777,11 +1811,8 @@
 								var y = ws.getCellTop(editedRow, 0) + frozenPlace.getVerticalScroll() - ws.getCellTop(0, 0);
 								var x = ws.getCellLeft(editedCol, 0) + frozenPlace.getHorizontalScroll() - ws.getCellLeft(0, 0);
 								
-								//var canvasWidget = document.getElementById(api.HtmlElementName);
 								var canvasWidget = $("#" + api.HtmlElementName);
 								if ( canvasWidget ) {
-									//selector.style["top"] = (y + canvasWidget.offsetTop) + "px";
-									//selector.style["left"] = (x + canvasWidget.offsetLeft) + "px";
 									selector.style["top"] = (y + canvasWidget.offset().top) + "px";
 									selector.style["left"] = (x + canvasWidget.offset().left) + "px";
 								}
