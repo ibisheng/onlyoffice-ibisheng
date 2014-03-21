@@ -1707,6 +1707,19 @@
 					selector.style["fontSize"] = "12px";
 					document.body.appendChild(selector);
 					
+					// Selection hack
+					var clearSelection = function() {
+						if (document.selection && document.selection.empty) {
+							document.selection.empty();
+						}
+						else if (window.getSelection) {
+							var sel = window.getSelection();
+							sel.removeAllRanges();
+						}
+					}
+					
+					// TODO: В Mozilla избавиться от селекта текста при dblclick
+					
 					var combo = document.createElement("ul");
 					combo.id = "formulaList";
 					combo.style["margin"] = 0;
@@ -1737,7 +1750,7 @@
 						}
 						item.ondblclick = function(e) {
 							if ( e && (e.button === 0) ) {
-								var formulaName = this.innerText;
+								var formulaName = this.innerText || this.textContent;
 								var insertText = formulaName.substring(_this.input.value.length - 1) + "(";
 								_this._addChars(insertText);
 								_this._removeFormulaSelector();
