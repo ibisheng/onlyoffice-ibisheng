@@ -3502,6 +3502,77 @@ ParaRun.prototype =
         return this.State.Selection.Use;
     },
 
+    Is_SelectedAll : function(Props)
+    {
+        var Selection = this.State.Selection;
+        if ( false === Selection.Use && true !== this.Is_Empty( Props ) )
+            return false;
+
+        var SkipAnchor = Props.SkipAnchor;
+        var SkipEnd    = Props.SkipEnd;
+
+        var StartPos = Selection.StartPos;
+        var EndPos   = Selection.EndPos;
+
+        if ( EndPos < StartPos )
+        {
+            StartPos = Selection.EndPos;
+            EndPos   = Selection.StartPos;
+        }
+
+        for ( var Pos = 0; Pos < StartPos; Pos++ )
+        {
+            var Item = this.Content[Pos];
+
+            if ( !( ( true === SkipAnchor && ( para_Drawing === Item.Type && true !== Item.Is_Inline() ) ) || ( true === SkipEnd && para_End === Item.Type ) ) )
+                return false;
+        }
+
+        var Count = this.Content.length;
+        for ( var Pos = EndPos; Pos < Count; Pos++ )
+        {
+            var Item = this.Content[Pos];
+
+            if ( !( ( true === SkipAnchor && ( para_Drawing === Item.Type && true !== Item.Is_Inline() ) ) || ( true === SkipEnd && para_End === Item.Type ) ) )
+                return false;
+        }
+
+        return true;
+    },
+
+    Selection_CorrectLeftPos : function(Direction)
+    {
+        if ( false === this.Selection.Use || true === this.Is_Empty( { SkipAnchor : true } ) )
+            return true;
+
+        var Selection = this.State.Selection;
+        var StartPos = Math.min( Selection.StartPos, Selection.EndPos );
+        var EndPos   = Math.max( Selection.StartPos, Selection.EndPos );
+
+        for ( var Pos = 0; Pos < StartPos; Pos++ )
+        {
+            var Item = this.Content[Pos];
+            if ( para_Drawing !== Item.Type || true === Item.Is_Inline() )
+                return false;
+        }
+
+        for ( var Pos = StartPos; Pos < EndPos; Pos++ )
+        {
+            var Item = this.Content[Pos];
+            if ( para_Drawing ===  Item.Type && true !== Item.Is_Inline() )
+            {
+                if ( 1 === Direction )
+                    Selection.StartPos = Pos + 1;
+                else
+                    Selection.EndPos   = Pos + 1;
+            }
+            else
+                return false;
+        }
+
+        return true;
+    },
+
     Selection_Stop : function()
     {
     },

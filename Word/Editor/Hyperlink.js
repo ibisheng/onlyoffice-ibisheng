@@ -1539,6 +1539,70 @@ ParaHyperlink.prototype =
         return false;
     },
 
+    Is_SelectedAll : function(Props)
+    {
+        var Selection = this.State.Selection;
+
+        if ( false === Selection.Use && true !== this.Is_Empty( Props ) )
+            return false;
+
+        var StartPos = Selection.StartPos;
+        var EndPos   = Selection.EndPos;
+
+        if ( EndPos < StartPos )
+        {
+            StartPos = Selection.EndPos;
+            EndPos   = Selection.StartPos;
+        }
+
+        for ( var Pos = 0; Pos <= StartPos; Pos++ )
+        {
+            if ( false === this.Content[Pos].Is_SelectedAll( Props ) )
+                return false;
+        }
+
+        var Count = this.Content.length;
+        for ( var Pos = EndPos; Pos < Count; Pos++ )
+        {
+            if ( false === this.Content[Pos].Is_SelectedAll( Props ) )
+                return false;
+        }
+
+        return true;
+    },
+
+    Selection_CorrectLeftPos : function(Direction)
+    {
+        if ( false === this.Selection.Use || true === this.Is_Empty( { SkipAnchor : true } ) )
+            return true;
+
+        var Selection = this.State.Selection;
+        var StartPos = Math.min( Selection.StartPos, Selection.EndPos );
+        var EndPos   = Math.max( Selection.StartPos, Selection.EndPos );
+
+        for ( var Pos = 0; Pos < StartPos; Pos++ )
+        {
+            if ( true !== this.Content[Pos].Is_Empty( { SkipAnchor : true } ) )
+                return false;
+        }
+
+        for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
+        {
+            if ( true === this.Content[Pos].Selection_CorrectLeftPos(Direction) )
+            {
+                if ( 1 === Direction )
+                    this.Selection.StartPos = Pos + 1;
+                else
+                    this.Selection.EndPos   = Pos + 1;
+
+                this.Content[Pos].Selection_Remove();
+            }
+            else
+                return false;
+        }
+
+        return true;
+    },
 //-----------------------------------------------------------------------------------
 // Работаем со значениями
 //-----------------------------------------------------------------------------------
