@@ -2533,7 +2533,7 @@ CChartsDrawer.prototype =
 	_getLogArray: function(yMin, yMax, logBase)
 	{	
 		var result = [];
-		var temp;
+		var temp = Math.pow(logBase, 0);
 		var pow = 0;
 		
 		if(logBase < 1)
