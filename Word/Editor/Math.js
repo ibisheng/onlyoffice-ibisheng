@@ -259,6 +259,7 @@ ParaMath.prototype =
     Get_AllFontNames : function(AllFonts)
     {
         // TODO: ParaMath.Get_AllFontNames
+        AllFonts["Cambria Math"] = true;
     },
 //-----------------------------------------------------------------------------------
 // Функции пересчета
