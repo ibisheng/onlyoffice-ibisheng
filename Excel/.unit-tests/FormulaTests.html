@@ -20,16 +20,18 @@
         </script>
 
         <script type="text/javascript" src="../../Common/browser.js"></script>
-        <script type="text/javascript" src="../../Common/editorscommon.js"></script>
-        <script type="text/javascript" src="../../Common/downloaderfiles.js"></script>
+
+        <script src="../../Common/downloaderfiles.js"></script>
         <script type="text/javascript" src="../../Common/3rdparty/Underscore/underscore-min.js"></script>
         <script type="text/javascript" src="../../Common/3rdparty/Sockjs/sockjs-0.3.min.js"></script>
         <script type="text/javascript" src="../../Common/docscoapicommon.js"></script>
         <script type="text/javascript" src="../../Common/docscoapi.js"></script>
+        <script type="text/javascript" src="../../Common/Charts/DrawingArea.js"></script>
         <script type="text/javascript" src="../../Common/Charts/DrawingObjects.js"></script>
         <script type="text/javascript" src="../../Common/Charts/charts.js"></script>
+        <script type="text/javascript" src="../../Common/Charts/ChartsDrawer.js"></script>
         <script type="text/javascript" src="../../Common/commonDefines.js"></script>
-
+        <script type="text/javascript" src="../../Common/editorscommon.js"></script>
         <script type="text/javascript" src="../../Common/apiCommon.js"></script>
 
         <script type="text/javascript" src="../../Common/FontsFreeType/font_engine.js"></script>
@@ -52,7 +54,6 @@
         <script type="text/javascript" src="../graphics/DrawingContext.js"></script>
         <script type="text/javascript" src="../graphics/pdfprinter.js"></script>
 
-        <!--<script type="text/javascript" src="../../OfflineDocuments/Excel/test-workbook9/Editor.js"></script>-->
         <script type="text/javascript" src="../../OfflineDocuments/Excel/test-workbook2/editor.js"></script>
 
         <script type="text/javascript" src="../model/CollaborativeEditing.js"></script>
@@ -81,6 +82,8 @@
 
 
         <script type="text/javascript" src="../../Common/scroll.js"></script>
+        <script type="text/javascript" src="../view/mobileTouch.js"></script>
+        <script type="text/javascript" src="../view/iscroll.js"></script>
         <script type="text/javascript" src="../view/StringRender.js"></script>
         <script type="text/javascript" src="../view/CellTextRender.js"></script>
         <script type="text/javascript" src="../view/CellEditorView.js"></script>
@@ -103,64 +106,76 @@
 
         <!--for chart-->
         <script type="text/javascript" src="../../Common/SerializeCommonWordExcel.js"></script>
-        <script type="text/javascript" src="../../Common/Charts/libraries/OfficeExcel.common.core.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.common.core.js"></script>
 
-        <script type="text/javascript" src="../../Common/Charts/libraries/OfficeExcel.common.key.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.common.key.js"></script>
 
-        <script type="text/javascript" src="../../Common/Charts/libraries/OfficeExcel.bar.js"></script>
-        <script type="text/javascript" src="../../Common/Charts/libraries/OfficeExcel.hbar.js"></script>
-        <script type="text/javascript" src="../../Common/Charts/libraries/OfficeExcel.line.js"></script>
-        <script type="text/javascript" src="../../Common/Charts/libraries/OfficeExcel.pie.js"></script>
-        <script type="text/javascript" src="../../Common/Charts/libraries/OfficeExcel.scatter.js"></script>
-        <script type="text/javascript" src="../../Common/Charts/libraries/OfficeExcel.chartProperties.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.bar.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.hbar.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.line.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.pie.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.scatter.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.chartProperties.js"></script>
 
         <!--for shapes-->
-        <script type="text/javascript" src="../../Common/Drawings/Hit.js"></script>
-        <script type="text/javascript" src="../../Common/Drawings/States.js"></script>
-        <script type="text/javascript" src="../../Common/Drawings/TrackObjects/AdjustmentTracks.js"></script>
-        <script type="text/javascript" src="../../Common/Drawings/TrackObjects/ResizeTracks.js"></script>
-        <script type="text/javascript" src="../../Common/Drawings/TrackObjects/RotateTracks.js"></script>
-        <script type="text/javascript" src="../../Common/Drawings/TrackObjects/NewShapeTracks.js"></script>
-        <script type="text/javascript" src="../../Common/Drawings/TrackObjects/PolyLine.js"></script>
-        <script type="text/javascript" src="../../Common/Drawings/TrackObjects/Spline.js"></script>
-        <script type="text/javascript" src="../../Common/Drawings/TrackObjects/MoveTracks.js"></script>
-
-        <script type="text/javascript" src="../../Common/Drawings/Format/ChartFormat.js"></script>
-        <script type="text/javascript" src="../../Common/Drawings/Format/ChartSpace.js"></script>
-        <script type="text/javascript" src="../../Common/Drawings/Format/Constants.js"></script>
-        <script type="text/javascript" src="../../Common/Drawings/Format/CreateGeometry.js"></script>
-        <script type="text/javascript" src="../../Common/Drawings/Format/Format.js"></script>
-        <script type="text/javascript" src="../../Common/Drawings/Format/Geometry.js"></script>
-        <script type="text/javascript" src="../../Common/Drawings/Format/Path.js"></script>
-        <script type="text/javascript" src="../../Common/Drawings/Format/GroupShape.js"></script>
-        <script type="text/javascript" src="../../Common/Drawings/Format/Image.js"></script>
-        <script type="text/javascript" src="../../Common/Drawings/Format/Shape.js"></script>
-        <script type="text/javascript" src="../../Common/Drawings/Format/TextBody.js"></script>
-        <script type="text/javascript" src="../../Common/Drawings/CommonController.js"></script>
-        <script type="text/javascript" src="../view/DrawingObjectsController.js"></script>
-
-        <script type="text/javascript" src="../../Excel/model/DrawingObjects/Graphics.js"></script>
-        <script type="text/javascript" src="../model/DrawingObjects/Overlay.js"></script>
-        <script type="text/javascript" src="../../Word/Drawing/Controls.js"></script>
-        <script type="text/javascript" src="../../Word/Drawing/ShapeDrawer.js"></script>
-        <script type="text/javascript" src="../../Word/Editor/CollaborativeEditing.js"></script>
+        <script src="../../Common/Drawings/Hit.js"></script>
+        <script src="../../Common/Drawings/States.js"></script>
+        <script src="../../Common/Drawings/TrackObjects/AdjustmentTracks.js"></script>
+        <script src="../../Common/Drawings/TrackObjects/ResizeTracks.js"></script>
+        <script src="../../Common/Drawings/TrackObjects/RotateTracks.js"></script>
+        <script src="../../Common/Drawings/TrackObjects/NewShapeTracks.js"></script>
+        <script src="../../Common/Drawings/TrackObjects/PolyLine.js"></script>
+        <script src="../../Common/Drawings/TrackObjects/Spline.js"></script>
+        <script src="../../Common/Drawings/TrackObjects/MoveTracks.js"></script>
 
 
+        <script src="../../Common/Drawings/Format/Constants.js"></script>
+        <script src="../../Common/Drawings/Format/Format.js"></script>
+        <script src="../../Common/Drawings/Format/CreateGeometry.js"></script>
+        <script src="../../Common/Drawings/Format/Geometry.js"></script>
+        <script src="../../Common/Drawings/Format/Path.js"></script>
+        <script src="../../Common/Drawings/Format/GroupShape.js"></script>
+        <script src="../../Common/Drawings/Format/Image.js"></script>
+        <script src="../../Common/Drawings/Format/Shape.js"></script>
+        <script src="../../Common/Drawings/Format/ChartSpace.js"></script>
+        <script src="../../Common/Drawings/Format/ChartFormat.js"></script>
+        <script src="../../Common/Drawings/Format/TextBody.js"></script>
+        <script src="../../Common/Drawings/CommonController.js"></script>
+        <script src="../view/DrawingObjectsController.js"></script>
 
-        <script type="text/javascript" src="../model/DrawingObjects/DrawingDocument.js"></script>
-        <script type="text/javascript" src="../model/DrawingObjects/GlobalLoaders.js"></script>
+        <script src="../model/DrawingObjects/Graphics.js"></script>
+        <script src="../model/DrawingObjects/Overlay.js"></script>
+        <script src="../../Word/Drawing/Controls.js"></script>
+        <script src="../model/DrawingObjects/ShapeDrawer.js"></script>
+
+        <script src="../../Word/Editor/CollaborativeEditing.js"></script>
 
 
-        <script type="text/javascript" src="../model/DrawingObjects/Format/ShapePrototype.js"></script>
-        <script type="text/javascript" src="../model/DrawingObjects/Format/GroupPrototype.js"></script>
-        <script type="text/javascript" src="../model/DrawingObjects/Format/ChartSpacePrototype.js"></script>
-        <script type="text/javascript" src="../model/DrawingObjects/Format/Styles.js"></script>
-        <script type="text/javascript" src="../model/DrawingObjects/Format/Numbering.js"></script>
-        <script type="text/javascript" src="../model/DrawingObjects/Format/ParagraphContent.js"></script>
-        <script type="text/javascript" src="../model/DrawingObjects/Format/Paragraph.js"></script>
-        <script type="text/javascript" src="../model/DrawingObjects/Format/DocumentContent.js"></script>
-        <script type="text/javascript" src="../model/DrawingObjects/Format/FontClassification.js"></script>
-		
+
+        <script src="../model/DrawingObjects/DrawingDocument.js"></script>
+        <script src="../model/DrawingObjects/GlobalLoaders.js"></script>
+
+
+        <script src="../model/DrawingObjects/Format/ShapePrototype.js"></script>
+        <script src="../model/DrawingObjects/Format/ImagePrototype.js"></script>
+        <script src="../model/DrawingObjects/Format/GroupPrototype.js"></script>
+        <script src="../model/DrawingObjects/Format/ChartSpacePrototype.js"></script>
+        <script src="../../Word/Editor/Styles.js"></script>
+        <script src="../../Word/Editor/Numbering.js"></script>
+        <script src="../../Word/Editor/ParagraphContent.js"></script>
+        <script src="../../Word/Editor/Run.js"></script>
+        <script src="../../Word/Editor/Hyperlink.js"></script>
+
+        <script src="../../Word/Editor/Comments.js"></script>
+        <script src="../../Word/Editor/FlowObjects.js"></script>
+        <script src="../../Word/Editor/Paragraph.js"></script>
+        <script src="../../Word/Editor/Document.js"></script>
+        <script src="../../Word/Editor/DocumentContent.js"></script>
+        <script src="../../Word/Editor/HeaderFooter.js"></script>
+        <script src="../../Word/Editor/Table.js"></script>
+        <!-- <script src="../../Word/Editor/Spelling.js"></script> -->
+        <script src="../../Word/Editor/FontClassification.js"></script>
+
 		<script type="text/javascript" src="FormulaTests.js"></script>
 	</head>
 	<body>

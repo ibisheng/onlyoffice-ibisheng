@@ -426,7 +426,7 @@
 
     test( "Test: rename sheet #1", function () {
         oParser = new parserFormula( "Лист2!A2", "A1", ws );
-        ok( oParser.parse() === true );
+        ok( oParser.parse() );
         // strictEqual( oParser.parse(), true)
         strictEqual( oParser.changeSheet( "Лист2", "Лист3" ).assemble(), "Лист3!A2" );
     } )
@@ -459,7 +459,7 @@
     test( "Test: wrong ref", function () {
         oParser = new parserFormula( "1+XXX1", "A1", ws );
         ok( oParser.parse() );
-        notStrictEqual( oParser.calculate().getValue(), "1" );
+        notStrictEqual( oParser.calculate().getValue(), "#NAME?" );
     } )
 
     test( "Test: \"CODE\"", function () {
@@ -763,36 +763,6 @@
 
     } )
 
-    test( "Test: \"PV\"", function () {
-
-        function pv( rate, nper, pmt, fv, type ) {
-            if ( rate != 0 ) {
-                return -1 * ( fv + pmt * (1 + rate * type) * ( (Math.pow( (1 + rate), nper ) - 1) / rate ) ) / Math.pow( 1 + rate, nper )
-            }
-            else {
-                return -1 * ( fv + pmt * nper );
-            }
-
-        }
-
-        oParser = new parserFormula( "PV(0.08/12,12*20,500,,0)", "A2", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), pv( 0.08 / 12, 12 * 20, 500, 0, 0 ) );
-
-        oParser = new parserFormula( "PV(0,12*20,500,,0)", "A2", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), pv( 0, 12 * 20, 500, 0, 0 ) );
-
-    } )
-
-    test( "Test: \"NPV\"", function () {
-
-        oParser = new parserFormula( "NPV(0.1,-10000,3000,4200,6800)", "A2", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 1188.4434123352216 );
-
-    } )
-
     test( "Test: \"SUMIF\"", function () {
 
         ws.getRange2( "A2" ).setValue( "100000" );
@@ -896,113 +866,6 @@
         oParser = new parserFormula( "WORKDAY(DATE(2006,1,1),20,{\"1-2-2006\",\"1-16-2006\"})", "A2", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 38748 );
-
-    } )
-
-    test( "Test: \"FV\"", function () {
-
-        function fv( rate, nper, pmt, pv, type ) {
-            var res;
-            if ( type === undefined || type === null )
-                type = 0;
-
-            if ( pv === undefined || pv === null )
-                pv = 0;
-
-            if ( rate != 0 ) {
-                res = -1 * ( pv * Math.pow( 1 + rate, nper ) + pmt * ( 1 + rate * type ) * ( Math.pow( 1 + rate, nper ) - 1) / rate );
-            }
-            else {
-                res = -1 * ( pv + pmt * nper );
-            }
-            return res;
-        }
-
-        oParser = new parserFormula( "FV(0.06/12,10,-200,-500,1)", "A2", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), fv( 0.06 / 12, 10, -200, -500, 1 ) );
-
-        oParser = new parserFormula( "FV(0.12/12,12,-1000)", "A2", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), fv( 0.12 / 12, 12, -1000 ) );
-
-        oParser = new parserFormula( "FV(0.11/12,35,-2000,,1)", "A2", ws );
-        ok( oParser.parse() );
-        ok( Math.abs( oParser.calculate().getValue() - fv( 0.11 / 12, 35, -2000, null, 1 ) ) < dif );
-
-        oParser = new parserFormula( "FV(0.06/12,12,-100,-1000,1)", "A2", ws );
-        ok( oParser.parse() );
-        ok( Math.abs( oParser.calculate().getValue() - fv( 0.06 / 12, 12, -100, -1000, 1 ) ) < dif );
-
-    } )
-
-    test( "Test: \"PMT\"", function () {
-
-        function pmt( rate, nper, pv, fv, type ) {
-            var res;
-            if ( type === undefined || type === null )
-                type = 0;
-
-            if ( fv === undefined || fv === null )
-                fv = 0;
-
-            if ( rate != 0 ) {
-                res = -1 * ( pv * Math.pow( 1 + rate, nper ) + fv ) /
-                    ( ( 1 + rate * type ) * ( Math.pow( 1 + rate, nper ) - 1 ) / rate );
-            }
-            else {
-                res = -1 * ( pv + fv ) / nper;
-            }
-            return res;
-        }
-
-        oParser = new parserFormula( "PMT(0.08/12,10,10000)", "A2", ws );
-        ok( oParser.parse() );
-        ok( Math.abs( oParser.calculate().getValue() - pmt( 0.08 / 12, 10, 10000 ) ) < dif );
-
-        oParser = new parserFormula( "PMT(0.08/12,10,10000,0,1)", "A2", ws );
-        ok( oParser.parse() );
-        ok( Math.abs( oParser.calculate().getValue() - pmt( 0.08 / 12, 10, 10000, 0, 1 ) ) < dif );
-
-    } )
-
-    test( "Test: \"NPER\"", function () {
-
-        function nper(rate,pmt,pv,fv,type){
-
-            if ( rate === undefined || rate === null )
-                rate = 0;
-
-            if ( pmt === undefined || pmt === null )
-                pmt = 0;
-
-            if ( pv === undefined || pv === null )
-                pv = 0;
-
-            if ( type === undefined || type === null )
-                type = 0;
-
-            if ( fv === undefined || fv === null )
-                fv = 0;
-
-            var res;
-            if ( rate != 0 ) {
-                res = (-fv * rate + pmt * (1 + rate * type)) / (rate * pv + pmt * (1 + rate * type))
-                res = Math.log( res ) / Math.log( 1+rate )
-            }
-            else {
-                res = (- pv - fv )/ pmt ;
-            }
-            return res;
-        }
-
-        oParser = new parserFormula( "NPER(0.12/12,-100,-1000,10000,1)", "A2", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), nper(0.12/12,-100,-1000,10000,1) );
-
-        oParser = new parserFormula( "NPER(0.12/12,-100,-1000)", "A2", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), nper(0.12/12,-100,-1000) );
 
     } )
 
@@ -2953,6 +2816,515 @@
         oParser = new parserFormula( "VLOOKUP(2,A502:C510,2,TRUE)", "A2", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 1.71 );
+
+    } )
+
+    test( "Test: \"MATCH\"", function () {
+
+        ws.getRange2( "A551" ).setValue( "28" );
+        ws.getRange2( "A552" ).setValue( "29" );
+        ws.getRange2( "A553" ).setValue( "31" );
+        ws.getRange2( "A554" ).setValue( "45" );
+        ws.getRange2( "A555" ).setValue( "89" );
+
+        ws.getRange2( "B551" ).setValue( "89" );
+        ws.getRange2( "B552" ).setValue( "45" );
+        ws.getRange2( "B553" ).setValue( "31" );
+        ws.getRange2( "B554" ).setValue( "29" );
+        ws.getRange2( "B555" ).setValue( "28" );
+
+        ws.getRange2( "C551" ).setValue( "89" );
+        ws.getRange2( "C552" ).setValue( "45" );
+        ws.getRange2( "C553" ).setValue( "31" );
+        ws.getRange2( "C554" ).setValue( "29" );
+        ws.getRange2( "C555" ).setValue( "28" );
+
+        oParser = new parserFormula( "MATCH(30;A551:A555;-1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#N/A" );
+
+        oParser = new parserFormula( "MATCH(30;A551:A555;1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 2 );
+
+        oParser = new parserFormula( "MATCH(30;A551:A555;0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#N/A" );
+
+        oParser = new parserFormula( "MATCH(30;B551:B555)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#N/A" );
+
+        oParser = new parserFormula( "MATCH(30;B551:B555;-1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 3 );
+
+        oParser = new parserFormula( "MATCH(30;B551:B555;0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#N/A" );
+
+        oParser = new parserFormula( "MATCH(31;C551:C555;0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 3 );
+
+        oParser = new parserFormula( "MATCH(\"b\",{\"a\";\"b\";\"c\"},0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 2 );
+
+    } )
+
+    test( "Test: \"INDEX\"", function () {
+
+        ws.getRange2( "A651" ).setValue( "1" );
+        ws.getRange2( "A652" ).setValue( "2" );
+        ws.getRange2( "A653" ).setValue( "3" );
+        ws.getRange2( "A654" ).setValue( "4" );
+        ws.getRange2( "A655" ).setValue( "5" );
+
+        ws.getRange2( "B651" ).setValue( "6" );
+        ws.getRange2( "B652" ).setValue( "7" );
+        ws.getRange2( "B653" ).setValue( "8" );
+        ws.getRange2( "B654" ).setValue( "9" );
+        ws.getRange2( "B655" ).setValue( "10" );
+
+        ws.getRange2( "C651" ).setValue( "11" );
+        ws.getRange2( "C652" ).setValue( "12" );
+        ws.getRange2( "C653" ).setValue( "13" );
+        ws.getRange2( "C654" ).setValue( "14" );
+        ws.getRange2( "C655" ).setValue( "15" );
+
+        oParser = new parserFormula( "INDEX({\"Apples\",\"Lemons\";\"Bananas\",\"Pears\"},2,2)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "Pears" );
+
+        oParser = new parserFormula( "INDEX({\"Apples\",\"Lemons\";\"Bananas\",\"Pears\"},1,2)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "Lemons" );
+
+        oParser = new parserFormula( "INDEX(\"Apples\",2,2)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#REF!" );
+
+        oParser = new parserFormula( "INDEX({\"Apples\",\"Lemons\"},,2)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "Lemons" );
+
+        oParser = new parserFormula( "INDEX(A651:C655,,2)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 6 );
+
+        oParser = new parserFormula( "INDEX(A651:C655,3,2)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 8 );
+
+        oParser = new parserFormula( "INDEX(A651:C655,10,2)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#REF!" );
+
+    } )
+
+    /*
+    * Financial
+    */
+
+    test( "Test: \"FV\"", function () {
+
+        function fv( rate, nper, pmt, pv, type ) {
+            var res;
+            if ( type === undefined || type === null )
+                type = 0;
+
+            if ( pv === undefined || pv === null )
+                pv = 0;
+
+            if ( rate != 0 ) {
+                res = -1 * ( pv * Math.pow( 1 + rate, nper ) + pmt * ( 1 + rate * type ) * ( Math.pow( 1 + rate, nper ) - 1) / rate );
+            }
+            else {
+                res = -1 * ( pv + pmt * nper );
+            }
+            return res;
+        }
+
+        oParser = new parserFormula( "FV(0.06/12,10,-200,-500,1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), fv( 0.06 / 12, 10, -200, -500, 1 ) );
+
+        oParser = new parserFormula( "FV(0.12/12,12,-1000)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), fv( 0.12 / 12, 12, -1000 ) );
+
+        oParser = new parserFormula( "FV(0.11/12,35,-2000,,1)", "A2", ws );
+        ok( oParser.parse() );
+        ok( Math.abs( oParser.calculate().getValue() - fv( 0.11 / 12, 35, -2000, null, 1 ) ) < dif );
+
+        oParser = new parserFormula( "FV(0.06/12,12,-100,-1000,1)", "A2", ws );
+        ok( oParser.parse() );
+        ok( Math.abs( oParser.calculate().getValue() - fv( 0.06 / 12, 12, -100, -1000, 1 ) ) < dif );
+
+    } )
+
+    test( "Test: \"PMT\"", function () {
+
+        function pmt( rate, nper, pv, fv, type ) {
+            var res;
+            if ( type === undefined || type === null )
+                type = 0;
+
+            if ( fv === undefined || fv === null )
+                fv = 0;
+
+            if ( rate != 0 ) {
+                res = -1 * ( pv * Math.pow( 1 + rate, nper ) + fv ) /
+                    ( ( 1 + rate * type ) * ( Math.pow( 1 + rate, nper ) - 1 ) / rate );
+            }
+            else {
+                res = -1 * ( pv + fv ) / nper;
+            }
+            return res;
+        }
+
+        oParser = new parserFormula( "PMT(0.08/12,10,10000)", "A2", ws );
+        ok( oParser.parse() );
+        ok( Math.abs( oParser.calculate().getValue() - pmt( 0.08 / 12, 10, 10000 ) ) < dif );
+
+        oParser = new parserFormula( "PMT(0.08/12,10,10000,0,1)", "A2", ws );
+        ok( oParser.parse() );
+        ok( Math.abs( oParser.calculate().getValue() - pmt( 0.08 / 12, 10, 10000, 0, 1 ) ) < dif );
+
+    } )
+
+    test( "Test: \"NPER\"", function () {
+
+        function nper(rate,pmt,pv,fv,type){
+
+            if ( rate === undefined || rate === null )
+                rate = 0;
+
+            if ( pmt === undefined || pmt === null )
+                pmt = 0;
+
+            if ( pv === undefined || pv === null )
+                pv = 0;
+
+            if ( type === undefined || type === null )
+                type = 0;
+
+            if ( fv === undefined || fv === null )
+                fv = 0;
+
+            var res;
+            if ( rate != 0 ) {
+                res = (-fv * rate + pmt * (1 + rate * type)) / (rate * pv + pmt * (1 + rate * type))
+                res = Math.log( res ) / Math.log( 1+rate )
+            }
+            else {
+                res = (- pv - fv )/ pmt ;
+            }
+            return res;
+        }
+
+        oParser = new parserFormula( "NPER(0.12/12,-100,-1000,10000,1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), nper(0.12/12,-100,-1000,10000,1) );
+
+        oParser = new parserFormula( "NPER(0.12/12,-100,-1000)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), nper(0.12/12,-100,-1000) );
+
+    } )
+
+    test( "Test: \"PV\"", function () {
+
+        function pv( rate, nper, pmt, fv, type ) {
+            if ( rate != 0 ) {
+                return -1 * ( fv + pmt * (1 + rate * type) * ( (Math.pow( (1 + rate), nper ) - 1) / rate ) ) / Math.pow( 1 + rate, nper )
+            }
+            else {
+                return -1 * ( fv + pmt * nper );
+            }
+
+        }
+
+        oParser = new parserFormula( "PV(0.08/12,12*20,500,,0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), pv( 0.08 / 12, 12 * 20, 500, 0, 0 ) );
+
+        oParser = new parserFormula( "PV(0,12*20,500,,0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), pv( 0, 12 * 20, 500, 0, 0 ) );
+
+    } )
+
+    test( "Test: \"NPV\"", function () {
+
+        oParser = new parserFormula( "NPV(0.1,-10000,3000,4200,6800)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 1188.4434123352216 );
+
+    } )
+
+    test( "Test: \"EFFECT\"", function () {
+
+        function effect(nr,np){
+
+            if( nr <= 0 || np < 1 ) return "#NUM!"
+
+            return Math.pow( ( 1 + nr/np ), np ) - 1;
+
+        }
+
+        oParser = new parserFormula( "EFFECT(0.0525,4)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), effect(0.0525,4) );
+
+        oParser = new parserFormula( "EFFECT(0.0525,-4)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), effect(0.0525,-4) );
+
+        oParser = new parserFormula( "EFFECT(0.0525,1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), effect(0.0525,1) );
+
+        oParser = new parserFormula( "EFFECT(-1,54)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), effect(-1,54) );
+
+    } )
+
+    test( "Test: \"ISPMT\"", function () {
+
+        function ISPMT( rate, per, nper, pv ){
+
+            return pv * rate * (per / nper - 1.0)
+
+        }
+
+        oParser = new parserFormula( "ISPMT(0.1/12,1,3*12,8000000)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), ISPMT(0.1/12,1,3*12,8000000) );
+
+        oParser = new parserFormula( "ISPMT(0.1,1,3,8000000)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), ISPMT(0.1,1,3,8000000) );
+
+    } )
+
+    test( "Test: \"XNPV\"", function () {
+
+        function xnpv( rate, valueArray, dateArray ){
+            var res = 0, r = rate;
+
+            d1 = dateArray[0];
+
+            for( var i = 0; i < dateArray.length; i++ ){
+
+                res += valueArray[i] / ( Math.pow( ( 1 + r ), ( dateArray[i] - d1 ) / 365 ) )
+            }
+
+            return res;
+        }
+
+        ws.getRange2( "A701" ).setValue( "39448" );
+        ws.getRange2( "A702" ).setValue( "39508" );
+        ws.getRange2( "A703" ).setValue( "39751" );
+        ws.getRange2( "A704" ).setValue( "39859" );
+        ws.getRange2( "A705" ).setValue( "39904" );
+
+        oParser = new parserFormula( "XNPV(0.09,{-10000,2750,4250,3250,2750},A701:A705)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), xnpv( 0.09, [-10000,2750,4250,3250,2750], [39448,39508,39751,39859,39904] ) );
+
+        ws.getRange2( "A705" ).setValue( "43191" );
+
+        oParser = new parserFormula( "XNPV(0.09,{-10000,2750,4250,3250,2750},A701:A705)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), xnpv( 0.09, [-10000,2750,4250,3250,2750], [39448,39508,39751,39859,43191] ) );
+
+    } )
+
+    test( "Test: \"IRR\"", function () {
+
+        function irr( costArr, x ){
+
+            if (!x) x = 0.1
+
+            var nC = 0, g_Eps = 1e-7, fEps = 1.0, fZ = 0, fN = 0, xN = 0, nIM = 100, nMC = 0,arr0 = costArr[0], arrI, wasNegative = false, wasPositive = false;
+
+            if( arr0 < 0 )
+                wasNegative = true;
+            else if( arr0 > 0 )
+                wasPositive = true;
+
+            while(fEps > g_Eps && nMC < nIM ){
+                nC = 0; fZ = 0; fN = 0;
+                fZ += costArr[0]/Math.pow( 1.0 + x, nC );
+                fN += -nC * costArr[0]/Math.pow( 1 + x, nC + 1 );
+                nC++;
+                for(var i = 1; i < costArr.length; i++){
+                    arrI = costArr[i];
+                    fZ += arrI/Math.pow( 1.0 + x, nC );
+                    fN += -nC * arrI/Math.pow( 1 + x, nC + 1 );
+                    if( arrI < 0 )
+                        wasNegative = true;
+                    else if( arrI > 0 )
+                        wasPositive = true
+                    nC++
+                }
+                xN = x - fZ / fN;
+                nMC ++;
+                fEps = Math.abs( xN - x );
+                x = xN;
+            }
+
+
+            if( !(wasNegative && wasPositive)  )
+                return "#NUM!";
+
+            if (fEps < g_Eps)
+                return x;
+            else
+                return "#NUM!";
+
+        }
+
+        oParser = new parserFormula( "IRR({-70000,12000,15000,18000,21000})", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), irr( [-70000,12000,15000,18000,21000] ) );
+
+        ws.getRange2( "A705" ).setValue( "43191" );
+
+        oParser = new parserFormula( "IRR({-70000,12000,15000,18000,21000,26000})", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), irr([-70000,12000,15000,18000,21000,26000] ) );
+
+        oParser = new parserFormula( "IRR({-70000,12000,15000},-0.1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), irr([-70000,12000,15000],-0.1 ) );
+
+        oParser = new parserFormula( "IRR({-70000},-0.1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), irr([-70000],-0.1 ) );
+
+    } )
+
+    test( "Test: \"ACCRINT\"", function () {
+
+        oParser = new parserFormula( "ACCRINT(DATE(2006,3,1),DATE(2006,9,1),DATE(2006,5,1),0.1,1100,2,0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 18.333333333333332 );
+
+        oParser = new parserFormula( "ACCRINT(DATE(2006,3,1),DATE(2006,9,1),DATE(2006,5,1),0.1,,2,0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 16.666666666666668 );
+
+    } )
+
+    test( "Test: \"ACCRINTM\"", function () {
+
+        oParser = new parserFormula( "ACCRINTM(DATE(2006,3,1),DATE(2006,5,1),0.1,1100,0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 18.333333333333332 );
+
+        oParser = new parserFormula( "ACCRINTM(DATE(2006,3,1),DATE(2006,5,1),0.1,,0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 16.666666666666668 )
+
+        oParser = new parserFormula( "ACCRINTM(DATE(2006,3,1),DATE(2006,5,1),0.1,)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 16.666666666666668 );
+
+    } )
+
+    test( "Test: \"AMORDEGRC\"", function () {
+
+        oParser = new parserFormula( "AMORDEGRC(2400,DATE(2008,8,19),DATE(2008,12,31),300,1,0.15,1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 776 );
+
+    } )
+
+    test( "Test: \"AMORLINC\"", function () {
+
+        oParser = new parserFormula( "AMORLINC(2400,DATE(2008,8,19),DATE(2008,12,31),300,1,0.15,1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 360 );
+
+    } )
+
+    test( "Test: \"CUMIPMT\"", function () {
+
+        function cumipmt(fRate, nNumPeriods, fVal, nStartPer, nEndPer, nPayType){
+
+            var fRmz, fZinsZ;
+
+            if( nStartPer < 1 || nEndPer < nStartPer || fRate <= 0.0 || nEndPer > nNumPeriods  || nNumPeriods <= 0 ||
+                fVal <= 0.0 || ( nPayType != 0 && nPayType != 1 ) )
+                return "#NUM!"
+
+            function GetRmz( fZins, fZzr, fBw, fZw, nF ){
+                var fRmz;
+                if( fZins == 0.0 )
+                    fRmz = ( fBw + fZw ) / fZzr;
+                else{
+                    var	fTerm = Math.pow( 1.0 + fZins, fZzr );
+                    if( nF > 0 )
+                        fRmz = ( fZw * fZins / ( fTerm - 1.0 ) + fBw * fZins / ( 1.0 - 1.0 / fTerm ) ) / ( 1.0 + fZins );
+                    else
+                        fRmz = fZw * fZins / ( fTerm - 1.0 ) + fBw * fZins / ( 1.0 - 1.0 / fTerm );
+                }
+
+                return -fRmz;
+            }
+
+            function GetZw( fZins, fZzr, fRmz, fBw, nF ){
+                var fZw;
+                if( fZins == 0.0 )
+                    fZw = fBw + fRmz * fZzr;
+                else{
+                    var fTerm = Math.pow( 1.0 + fZins, fZzr );
+                    if( nF > 0 )
+                        fZw = fBw * fTerm + fRmz * ( 1.0 + fZins ) * ( fTerm - 1.0 ) / fZins;
+                    else
+                        fZw = fBw * fTerm + fRmz * ( fTerm - 1.0 ) / fZins;
+                }
+
+                return -fZw;
+            }
+
+            fRmz = GetRmz( fRate, nNumPeriods, fVal, 0.0, nPayType );
+
+            fZinsZ = 0.0;
+
+            if( nStartPer == 1 )
+            {
+                if( nPayType <= 0 )
+                    fZinsZ = -fVal;
+
+                nStartPer++;
+            }
+
+            for( var i = nStartPer ; i <= nEndPer ; i++ )
+            {
+                if( nPayType > 0 )
+                    fZinsZ += GetZw( fRate, i - 2, fRmz, fVal, 1 ) - fRmz;
+                else
+                    fZinsZ += GetZw( fRate, i - 1, fRmz, fVal, 0 );
+            }
+
+            fZinsZ *= fRate;
+
+            return fZinsZ;
+
+        }
+
+        oParser = new parserFormula( "CUMIPMT(0.09/12,30*12,125000,1,1,0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), cumipmt(0.09/12,30*12,125000,1,1,0) );
+
+        oParser = new parserFormula( "CUMIPMT(0.09/12,30*12,125000,13,24,0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), cumipmt(0.09/12,30*12,125000,13,24,0) );
 
     } )
 

@@ -4041,6 +4041,69 @@ function parseNum( str ) {
     return !isNaN( str );
 }
 
+function matching( x, y, oper ) {
+    var res = false, rS;
+    if ( y instanceof cString ) {
+        rS = searchRegExp2( x.value, y.toString() )
+        switch ( oper ) {
+            case "<>":
+                res = !rS;
+                break;
+            case "=":
+            default:
+                res = rS;
+                break;
+        }
+    }
+    else if ( typeof x === typeof y ) {
+        switch ( oper ) {
+            case "<>":
+                res = (x.value != y.value);
+                break;
+            case ">":
+                res = (x.value > y.value);
+                break;
+            case "<":
+                res = (x.value < y.value);
+                break;
+            case ">=":
+                res = (x.value >= y.value);
+                break;
+            case "<=":
+                res = (x.value <= y.value);
+                break;
+            case "=":
+            default:
+                res = (x.value == y.value);
+                break;
+        }
+    }
+    return res;
+}
+
+function GetDiffDate360( nDay1, nMonth1, nYear1, bLeapYear1, nDay2, nMonth2, nYear2, bUSAMethod ) {
+    if ( nDay1 == 31 )
+        nDay1--;
+    else if ( bUSAMethod && ( nMonth1 == 2 && ( nDay1 == 29 || ( nDay1 == 28 && !bLeapYear1 ) ) ) )
+        nDay1 = 30;
+
+    if ( nDay2 == 31 ) {
+        if ( bUSAMethod && nDay1 != 30 ) {
+            nDay2 = 1;
+            if ( nMonth2 == 12 ) {
+                nYear2++;
+                nMonth2 = 1;
+            }
+            else
+                nMonth2++;
+        }
+        else
+            nDay2 = 30;
+    }
+
+    return ( nDay2 - nDay1 ) + ( nMonth2 - nMonth1 ) * 30 + ( nYear2 - nYear1 ) * 360;
+}
+
 function searchRegExp( str, flags ) {
     var vFS = str
         .replace( /(\\)/g, "\\" )

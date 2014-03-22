@@ -446,9 +446,71 @@ function cHYPERLINK() {
 cHYPERLINK.prototype = Object.create( cBaseFunction.prototype )
 
 function cINDEX() {
-    cBaseFunction.call( this, "INDEX" );
+//    cBaseFunction.call( this, "INDEX" );
+
+    this.name = "INDEX";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 4;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cINDEX.prototype = Object.create( cBaseFunction.prototype )
+cINDEX.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0],
+        arg1 = arg[1] && !(arg[1] instanceof cEmpty) ? arg[1] : new cNumber(1),
+        arg2 = arg[2] && !(arg[2] instanceof cEmpty) ? arg[2] : new cNumber(1),
+        arg3 = arg[3] && !(arg[3] instanceof cEmpty) ? arg[3] : new cNumber(1),
+        isArrayForm = false, res;
+
+    if( arg0 instanceof cArea3D ){
+        return this.value = new cError( cErrorType.not_available );
+    }
+    else if( arg0 instanceof cError ){
+        return this.value = arg0;
+    }
+
+    arg1 = arg1.tocNumber();
+    arg2 = arg2.tocNumber();
+    arg3 = arg3.tocNumber();
+
+    if( arg1 instanceof cError || arg2 instanceof cError || arg3 instanceof cError ){
+        return this.value = new cError( cErrorType.wrong_value_type );
+    }
+
+    if( arg1.getValue() < 0 || arg2.getValue() < 0 ){
+        return this.value = new cError( cErrorType.wrong_value_type );
+    }
+
+    if( arg0 instanceof cArray ){
+        arg0 = arg0.getMatrix();
+    }
+    else if( arg0 instanceof cArea ){
+        arg0 = arg0.getMatrix();
+    }
+    else{
+        arg0 = [[arg0.tryConvert()]]
+    }
+
+    res = arg0[arg1.getValue()-1];
+    if( res )
+        res = res[arg2.getValue()-1];
+
+    return this.value = res ? res : new cError( cErrorType.bad_reference );
+
+}
+cINDEX.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( array , [ row-number ] [ , [ column-number ] ] ) "+this.name+"( reference , [ row-number ] [ , [ column-number ] [ , [ area-number ] ] ] )"
+    };
+}
 
 function cINDIRECT() {
 //    cBaseFunction.call( this, "INDIRECT" );
@@ -548,7 +610,6 @@ cINDIRECT.prototype.Calculate = function ( arg ) {
 
         return this.value = found_operand;
     }
-
 
     return this.value = new cError( cErrorType.bad_reference );
 
@@ -710,14 +771,160 @@ cLOOKUP.prototype.getInfo = function () {
 }
 
 function cMATCH() {
-    cBaseFunction.call( this, "MATCH" );
+
+//    cBaseFunction.call( this, "MATCH" );
+
+    this.name = "MATCH";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 2;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 3;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
 }
 cMATCH.prototype = Object.create( cBaseFunction.prototype )
+cMATCH.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber(1);
+
+    function findMatch(a0,a1,a2){
+        var a1RowCount = a1.length, a1ColumnCount = a1[0].length,
+            a0Value = a0.getValue(), a2Value = a2.getValue(),
+            arr = [], res = new cError( cErrorType.not_available ),
+            index = -1;
+
+        if( a1RowCount > 1 && a1ColumnCount > 1 ){
+            return new cError( cErrorType.not_available );
+        }
+        else if( a1RowCount == 1 && a1ColumnCount > 1 ){
+            for(var i = 0; i < a1ColumnCount; i++){
+                arr[i] = a1[0][i].getValue();
+            }
+        }
+        else if( a1RowCount > 1 && a1ColumnCount == 1 ){
+            for(var i = 0; i < a1RowCount; i++){
+                arr[i] = a1[i][0].getValue();
+            }
+        }
+        else {
+            arr[0]=a1[0][0];
+        }
+
+        if( !(a2Value == 1 || a2Value == 0 || a2Value == -1) ){
+            return new cError( cErrorType.not_numeric );
+        }
+
+        if( a2Value == -1 ){
+            for(var i = 0; i<arr.length; i++){
+                if( arr[i] >= a0Value ){
+                    index = i;
+                }
+                else
+                    break;
+            }
+        }
+        else if( a2Value == 0 ){
+            if( a0 instanceof cString ){
+                for(var i = 0; i<arr.length; i++){
+                    if( searchRegExp2(arr[i].toString(),a0Value) ){
+                        index = i;
+                    }
+                }
+            }
+            else{
+                for(var i = 0; i<arr.length; i++){
+                    if( arr[i] == a0Value ){
+                        index = i;
+                    }
+                }
+            }
+        }
+        else if( a2Value == 1 ){
+            for(var i = 0; i<arr.length; i++){
+                if( arr[i] <= a0Value ){
+                    index = i;
+                }
+                else
+                    break;
+            }
+        }
+
+        if( index > -1 )
+            res = new cNumber(index+1);
+
+        return res;
+
+    }
+
+    if( arg0 instanceof cArea3D || arg0 instanceof cArray || arg0 instanceof cArea ){
+        return this.value = new cError( cErrorType.not_available );
+    }
+    else if( arg0 instanceof cError ){
+        return this.value = arg0;
+    }
+/*    else{
+
+    }*/
+
+    if( !(arg1 instanceof cArray || arg1 instanceof cArea) ){
+        return this.value = new cError( cErrorType.not_available );
+    }
+    else {
+        arg1 = arg1.getMatrix();
+    }
+
+    if( arg2 instanceof cNumber || arg2 instanceof cBool ){
+
+    }
+    else if( arg2 instanceof cError ){
+        return this.value = arg2;
+    }
+    else{
+        return this.value = new cError( cErrorType.not_available );
+    }
+
+    return this.value = findMatch(arg0,arg1,arg2)
+
+}
+cMATCH.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"(  lookup-value  ,  lookup-array [ , [ match-type ]] )"
+    };
+}
 
 function cOFFSET() {
-    cBaseFunction.call( this, "OFFSET" );
+//    cBaseFunction.call( this, "OFFSET" );
+
+    this.name = "OFFSET";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 5;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
 }
 cOFFSET.prototype = Object.create( cBaseFunction.prototype )
+cOFFSET.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3] ? arg[3] : new cNumber(0 ), arg4 = arg[4] ? arg[4] : new cNumber(0);
+
+    if(1){}
+
+}
+cOFFSET.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( reference , rows , cols [ , [ height ] [ , [ width ] ] ] )"
+    };
+}
 
 function cROW() {
 //    cBaseFunction.call( this, "ROW" );
@@ -822,9 +1029,62 @@ function cRTD() {
 cRTD.prototype = Object.create( cBaseFunction.prototype )
 
 function cTRANSPOSE() {
-    cBaseFunction.call( this, "TRANSPOSE" );
+//    cBaseFunction.call( this, "TRANSPOSE" );
+
+    this.name = "TRANSPOSE";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 1;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cTRANSPOSE.prototype = Object.create( cBaseFunction.prototype )
+cTRANSPOSE.prototype.Calculate = function ( arg ) {
+
+    function TransposeMatrix( A ) {
+
+        var tMatrix = [], res = new cArray();
+
+        for ( var i = 0; i < A.length; i++ ) {
+            for ( var j = 0; j < A[i].length; j++ ) {
+                if(!tMatrix[j]) tMatrix[j] = [];
+                tMatrix[j][i] = A[i][j];
+            }
+        }
+
+        res.fillFromArray( tMatrix );
+
+        return res;
+    }
+
+    var arg0 = arg[0];
+    if ( arg0 instanceof cArea || arg0 instanceof cArray ) {
+        arg0 = arg0.getMatrix();
+    }
+    else if( arg0 instanceof cNumber || arg0 instanceof cString || arg0 instanceof cBool || arg0 instanceof cRef || arg0 instanceof cRef3D ){
+        return this.value = arg0.getValue();
+    }
+    else if( arg0 instanceof cError ){
+        return this.value = arg0;
+    }
+    else
+        return this.value = new cError( cErrorType.not_available );
+
+
+    return this.value = TransposeMatrix( arg0 );
+}
+cTRANSPOSE.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( array )"
+    };
+}
 
 function VHLOOKUPCache(bHor){
     this.cacheId = {};

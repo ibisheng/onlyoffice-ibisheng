@@ -7,28 +7,44 @@
  * Time: 13:24
  * To change this template use File | Settings | File Templates.
  */
-function GetDiffDate360( nDay1, nMonth1, nYear1, bLeapYear1, nDay2, nMonth2, nYear2, bUSAMethod ) {
-    if ( nDay1 == 31 )
-        nDay1--;
-    else if ( bUSAMethod && ( nMonth1 == 2 && ( nDay1 == 29 || ( nDay1 == 28 && !bLeapYear1 ) ) ) )
-        nDay1 = 30;
 
-    if ( nDay2 == 31 ) {
-        if ( bUSAMethod && nDay1 != 30 ) {
-            nDay2 = 1;
-            if ( nMonth2 == 12 ) {
-                nYear2++;
-                nMonth2 = 1;
+function yearFrac(d1, d2, mode) {
+    var date1 = d1.getDate(),
+        month1 = d1.getMonth(),
+        year1 = d1.getFullYear(),
+        date2 = d2.getDate(),
+        month2 = d2.getMonth(),
+        year2 = d2.getFullYear();
+
+    switch ( mode ) {
+        case 0:
+            return new cNumber( Math.abs( GetDiffDate360( date1, month1, year1, d2.isLeapYear(), date2, month2, year2, false ) ) / 360 );
+        case 1:
+            var yc = Math.abs( year2 - year1 ),
+                sd = year1 > year2 ? d2 : d1,
+                yearAverage = sd.isLeapYear() ? 366 : 365, dayDiff = Math.abs( d2 - d1 );
+            for ( var i = 0; i < yc; i++ ) {
+                sd.addYears( 1 );
+                yearAverage += sd.isLeapYear() ? 366 : 365;
             }
-            else
-                nMonth2++;
-        }
-        else
-            nDay2 = 30;
+            yearAverage /= (yc + 1);
+            dayDiff /= (yearAverage * c_msPerDay);
+            return new cNumber( dayDiff );
+        case 2:
+            var dayDiff = Math.abs( d2 - d1 );
+            dayDiff /= (360 * c_msPerDay);
+            return new cNumber( dayDiff );
+        case 3:
+            var dayDiff = Math.abs( d2 - d1 );
+            dayDiff /= (365 * c_msPerDay);
+            return new cNumber( dayDiff );
+        case 4:
+            return new cNumber( Math.abs( GetDiffDate360( date1, month1, year1, d2.isLeapYear(), date2, month2, year2, true ) ) / 360 );
+        default:
+            return new cError( cErrorType.not_numeric );
     }
-
-    return nDay2 + nMonth2 * 30 + nYear2 * 360 - nDay1 - nMonth1 * 30 - nYear1 * 360;
 }
+
 cFormulaFunction.DateAndTime = {
     'groupName':"DateAndTime",
     'DATE':cDATE,
@@ -1681,39 +1697,8 @@ cYEARFRAC.prototype.Calculate = function ( arg ) {
 
     val0 = Date.prototype.getDateFromExcel( val0 );
     val1 = Date.prototype.getDateFromExcel( val1 );
-    var date1 = val0.getDate(), date2 = val1.getDate(), month1 = val0.getMonth(), month2 = val1.getMonth(), year1 = val0.getFullYear(), year2 = val1.getFullYear();
-    switch ( arg2.getValue() ) {
-        case 0:
-            return this.value = new cNumber( Math.abs( GetDiffDate360( date1, month1, year1, val1.isLeapYear(), date2, month2, year2, false ) ) / 360 );
-            break;
-        case 1:
-            var yc = Math.abs( year2 - year1 ),
-                sd = year1 > year2 ? val1 : val0,
-                yearAverage = sd.isLeapYear() ? 366 : 365, dayDiff = Math.abs( val1 - val0 );
-            for ( var i = 0; i < yc; i++ ) {
-                sd.addYears( 1 );
-                yearAverage += sd.isLeapYear() ? 366 : 365;
-            }
-            yearAverage /= (yc + 1);
-            dayDiff /= (yearAverage * c_msPerDay);
-            return this.value = new cNumber( dayDiff );
-            break;
-        case 2:
-            var dayDiff = Math.abs( val1 - val0 );
-            dayDiff /= (360 * c_msPerDay);
-            return this.value = new cNumber( dayDiff );
-            break;
-        case 3:
-            var dayDiff = Math.abs( val1 - val0 );
-            dayDiff /= (365 * c_msPerDay);
-            return this.value = new cNumber( dayDiff );
-            break;
-        case 4:
-            return this.value = new cNumber( Math.abs( GetDiffDate360( date1, month1, year1, val1.isLeapYear(), date2, month2, year2, true ) ) / 360 );
-            break;
-        default:
-            return this.value = new cError( cErrorType.not_numeric )
-    }
+
+    return this.value = yearFrac( val0, val1, arg2.getValue() );
 
 }
 cYEARFRAC.prototype.getInfo = function () {
