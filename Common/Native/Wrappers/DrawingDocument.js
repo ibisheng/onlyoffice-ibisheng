@@ -296,7 +296,7 @@ CDrawingDocument.prototype =
             _array_params_rows.push(markup.Rows[i].H);
         }
 
-        this.Native["DD_Set_RulerState_Table"](_array_params1, _array_params_margins, _array_params_rows;
+        this.Native["DD_Set_RulerState_Table"](_array_params1, markup.Cols, _array_params_margins, _array_params_rows);
     },
 
     Set_RulerState_Paragraph : function(margins)
