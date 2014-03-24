@@ -432,6 +432,8 @@ CColorMod.prototype =
     {
         return this.Id;
     },
+    Refresh_RecalcData: function()
+    {},
 
     setName: function(name)
     {
@@ -561,6 +563,8 @@ CColorModifiers.prototype =
     {
         return this.Id;
     },
+    Refresh_RecalcData: function()
+    {},
 
     Write_ToBinary2: function (w) {
         w.WriteLong(this.getObjectType());
@@ -950,6 +954,8 @@ CSysColor.prototype =
         return this.Id;
     },
 
+    Refresh_RecalcData: function()
+    {},
     getObjectType: function()
     {
         return historyitem_type_SysColor;
@@ -1063,6 +1069,9 @@ CPrstColor.prototype =
         return this.Id;
     },
 
+    Refresh_RecalcData: function()
+    {},
+
     getObjectType: function()
     {
         return historyitem_type_PrstColor;
@@ -1148,6 +1157,9 @@ CRGBColor.prototype =
     {
         return this.Id;
     },
+
+    Refresh_RecalcData: function()
+    {},
 
     getObjectType: function()
     {
@@ -1282,6 +1294,9 @@ CSchemeColor.prototype =
     {
         return this.Id;
     },
+
+    Refresh_RecalcData: function()
+    {},
 
     getObjectType: function()
     {
@@ -1423,6 +1438,9 @@ CUniColor.prototype =
     {
         return this.Id;
     },
+
+    Refresh_RecalcData: function()
+    {},
 
     getObjectType: function()
     {
@@ -1751,6 +1769,9 @@ CSrcRect.prototype =
         return this.Id;
     },
 
+    Refresh_RecalcData: function()
+    {},
+
     getObjectType: function()
     {
         return historyitem_type_SrcRect;
@@ -1890,6 +1911,10 @@ CBlipFill.prototype =
     {
         return this.Id;
     },
+
+
+    Refresh_RecalcData: function()
+    {},
 
     getObjectType: function()
     {
@@ -2276,6 +2301,9 @@ CSolidFill.prototype =
         return this.Id;
     },
 
+    Refresh_RecalcData: function()
+    {},
+
     getObjectType: function()
     {
         return historyitem_type_SolidFill;
@@ -2410,6 +2438,9 @@ CGs.prototype =
     {
         return this.Id;
     },
+
+    Refresh_RecalcData: function()
+    {},
     Write_ToBinary2: function (w)
     {
         w.WriteLong(this.getObjectType());
@@ -2572,6 +2603,9 @@ GradLin.prototype =
         return this.Id;
     },
 
+
+    Refresh_RecalcData: function()
+    {},
     getObjectType: function()
     {
         return historyitem_type_GradLin;
@@ -2732,6 +2766,8 @@ GradPath.prototype =
         return this.Id;
     },
 
+    Refresh_RecalcData: function()
+    {},
     getObjectType: function()
     {
         return historyitem_type_GradPath;
@@ -2892,6 +2928,8 @@ CGradFill.prototype =
     {
         return this.Id;
     },
+    Refresh_RecalcData: function()
+    {},
 
     getObjectType: function()
     {
@@ -3265,6 +3303,9 @@ CPattFill.prototype =
     {
         return this.Id;
     },
+
+    Refresh_RecalcData: function()
+    {},
     Write_ToBinary2: function (w)
     {
         w.WriteLong(this.getObjectType());
@@ -3331,6 +3372,8 @@ CNoFill.prototype =
         return this.Id;
     },
 
+    Refresh_RecalcData: function()
+    {},
     getObjectType: function()
     {
         return historyitem_type_NoFill;
@@ -3409,6 +3452,8 @@ CUniFill.prototype =
     {
         return this.Id;
     },
+    Refresh_RecalcData: function()
+    {},
 
     getObjectType: function()
     {
@@ -3875,6 +3920,8 @@ EndArrow.prototype =
     {
         return this.Id;
     },
+    Refresh_RecalcData: function()
+    {},
     Write_ToBinary2: function (w)
     {
         w.WriteLong(this.getObjectType());
@@ -4074,6 +4121,8 @@ LineJoin.prototype =
     {
         return this.Id;
     },
+    Refresh_RecalcData: function()
+    {},
 
     getObjectType: function()
     {
@@ -4733,6 +4782,8 @@ CLn.prototype =
     {
         return this.Id;
     },
+    Refresh_RecalcData: function()
+    {},
     Write_ToBinary2: function (w)
     {
         w.WriteLong(this.getObjectType());
@@ -4766,6 +4817,8 @@ DefaultShapeDefinition.prototype=
         return this.Id;
     },
 
+    Refresh_RecalcData: function()
+    {},
     getObjectType: function()
     {
         return historyitem_type_DefaultShapeDefinition;
@@ -4979,6 +5032,9 @@ CNvPr.prototype =
     {
         return this.Id;
     },
+
+    Refresh_RecalcData: function()
+    {},
     
     getObjectType: function()
     {
@@ -5187,7 +5243,9 @@ NvPr.prototype =
     {
         return this.Id;
     },
-    
+
+    Refresh_RecalcData: function()
+    {},
     getObjectType: function()
     {
     	return historyitem_type_NvPr;
@@ -5405,6 +5463,8 @@ Ph.prototype =
     {
         return this.Id;
     },
+    Refresh_RecalcData: function()
+    {},
     
     getObjectType: function()
     {
@@ -5684,6 +5744,8 @@ UniNvPr.prototype =
     {
         return this.Id;
     },
+    Refresh_RecalcData: function()
+    {},
     
     getObjectType: function()
     {
@@ -5892,7 +5954,7 @@ StyleRef.prototype =
     {
         return this.Id;
     },
-    
+
     getObjectType: function()
     {
     	return  historyitem_type_StyleRef;
@@ -5909,6 +5971,9 @@ StyleRef.prototype =
     	History.Add(this, {Type: historyitem_StyleRef_SetColor, oldColor:this.Color, newColor: color});
     	this.Color = color;
     },
+
+    Refresh_RecalcData: function()
+    {},
     
     Undo: function(data)
     {
@@ -5961,7 +6026,7 @@ StyleRef.prototype =
     		}
     		case historyitem_StyleRef_SetColor:
     		{
-    			w.WriteBool(isRealobject(data.newColor));
+    			w.WriteBool(isRealObject(data.newColor));
     			if(isRealObject(data.newColor))
     			{
     				w.WriteString2(data.newColor.Get_Id());
@@ -6046,6 +6111,8 @@ FontRef.prototype =
     {
         return this.Id;
     },
+    Refresh_RecalcData: function()
+    {},
     
     getObjectType: function()
     {
@@ -6115,7 +6182,7 @@ FontRef.prototype =
     		}
     		case historyitem_FontRef_SetColor:
     		{
-    			w.WriteBool(isRealobject(data.newColor));
+    			w.WriteBool(isRealObject(data.newColor));
     			if(isRealObject(data.newColor))
     			{
     				w.WriteString2(data.newColor.Get_Id());
@@ -6241,6 +6308,9 @@ CShapeStyle.prototype =
     {
         return this.Id;
     },
+
+    Refresh_RecalcData: function()
+    {},
 
     Write_ToBinary2: function (w)
     {
@@ -6544,6 +6614,9 @@ CXfrm.prototype =
     {
         return this.Id;
     },
+
+    Refresh_RecalcData: function()
+    {},
 
     getObjectType: function()
     {
@@ -6985,6 +7058,9 @@ CSpPr.prototype =
         return this.Id;
     },
 
+
+    Refresh_RecalcData: function()
+    {},
     getObjectType: function()
     {
         return historyitem_type_SpPr;
@@ -7341,6 +7417,8 @@ ClrScheme.prototype =
         return this.Id;
     },
 
+    Refresh_RecalcData: function()
+    {},
     getObjectType: function()
     {
         return historyitem_type_ClrScheme;
@@ -7476,6 +7554,9 @@ ClrMap.prototype =
         return this.Id;
     },
 
+    Refresh_RecalcData: function()
+    {},
+
     getObjectType: function()
     {
         return historyitem_type_ClrMap;
@@ -7569,6 +7650,9 @@ ExtraClrScheme.prototype =
     {
         return this.Id;
     },
+
+    Refresh_RecalcData: function()
+    {},
 
     getObjectType: function()
     {
@@ -7685,6 +7769,9 @@ FontCollection.prototype =
     {
         return this.Id;
     },
+
+    Refresh_RecalcData: function()
+    {},
 
     getObjectType: function()
     {
@@ -7817,6 +7904,9 @@ FontScheme.prototype =
     {
         return this.Id;
     },
+
+    Refresh_RecalcData: function()
+    {},
     Write_ToBinary2: function (w)
     {
         w.WriteLong(this.getObjectType());
@@ -7976,6 +8066,8 @@ FmtScheme.prototype =
     },
 
 
+    Refresh_RecalcData: function()
+    {},
     getObjectType: function()
     {
         return historyitem_type_FormatScheme;
@@ -8196,6 +8288,9 @@ ThemeElements.prototype =
     {
         return this.Id;
     },
+
+    Refresh_RecalcData: function()
+    {},
 
     getObjectType: function()
     {
@@ -8583,6 +8678,9 @@ CTheme.prototype =
     {
         return this.Id;
     },
+
+    Refresh_RecalcData: function()
+    {},
     Write_ToBinary2: function (w)
     {
         w.WriteLong(this.getObjectType());
@@ -8616,6 +8714,9 @@ HF.prototype =
         return this.Id;
     },
 
+
+    Refresh_RecalcData: function()
+    {},
     getObjectType: function()
     {
         return historyitem_type_HF;
@@ -8794,6 +8895,9 @@ CBgPr.prototype =
         return this.Id;
     },
 
+
+    Refresh_RecalcData: function()
+    {},
     getObjectType: function()
     {
         return historyitem_type_BgPr;
@@ -8952,6 +9056,9 @@ CBg.prototype =
         return this.Id;
     },
 
+    Refresh_RecalcData: function()
+    {},
+
     setBwMode: function(pr)
     {
         History.Add(this, {Type: historyitem_BgSetBwMode, oldPr: this.bwMode, newPr: pr});
@@ -9077,7 +9184,12 @@ CSld.prototype =
     Get_Id: function()
     {
         return this.Id;
-    }
+    },
+
+    Refresh_RecalcData: function()
+    {}
+
+
 };
 // ----------------------------------
 
@@ -9102,7 +9214,10 @@ CTextStyle.prototype =
     Get_Id: function()
     {
         return this.Id;
-    }
+    },
+
+    Refresh_RecalcData: function()
+    {}
 };
 
 function CTextStyles()
@@ -9176,7 +9291,10 @@ CTextStyles.prototype =
     Get_Id: function()
     {
         return this.Id;
-    }
+    },
+
+    Refresh_RecalcData: function()
+    {}
 };
 
 //---------------------------
@@ -9815,7 +9933,10 @@ NoteMaster.prototype =
     Get_Id: function()
     {
         return this.Id;
-    }
+    } ,
+
+    Refresh_RecalcData: function()
+    {}
 };
 
 // ----------------------------------
@@ -9845,7 +9966,10 @@ NoteSlide.prototype =
     Get_Id: function()
     {
         return this.Id;
-    }
+    },
+
+    Refresh_RecalcData: function()
+    {}
 };
 
 // ----------------------------------
@@ -10143,7 +10267,9 @@ CTextFit.prototype =
     Get_Id: function()
     {
         return this.Id;
-    }
+    }  ,
+    Refresh_RecalcData: function()
+    {}
 };
 
 
@@ -10686,7 +10812,10 @@ CBodyPr.prototype =
     Get_Id: function()
     {
         return this.Id;
-    }
+    } ,
+
+    Refresh_RecalcData: function()
+    {}
 };
 
 
@@ -10701,7 +10830,10 @@ CHyperlink.prototype =
     Get_Id: function()
     {
         return this.Id;
-    }
+    },
+
+    Refresh_RecalcData: function()
+    {}
 };
 
 function CTextParagraphPr()
@@ -10787,7 +10919,10 @@ CTextParagraphPr.prototype =
     Get_Id: function()
     {
         return this.Id;
-    }
+    },
+
+    Refresh_RecalcData: function()
+    {}
 };
 
 function CompareBullets(bullet1, bullet2)
@@ -10903,6 +11038,8 @@ CBullet.prototype =
     {
         return this.Id;
     },
+    Refresh_RecalcData: function()
+    {},
 	
 	Set_FromObject: function(obj)
 	{
@@ -10997,7 +11134,9 @@ CBulletColor.prototype =
     {
         return this.Id;
     },
-	
+
+    Refresh_RecalcData: function()
+    {},
 	Set_FromObject: function(o)
 	{
 		this.type = o.type;
@@ -11059,7 +11198,10 @@ CBulletSize.prototype =
     Get_Id: function()
     {
         return this.Id;
-    }
+    },
+
+    Refresh_RecalcData: function()
+    {}
 };
 
 var BULLET_TYPE_TYPEFACE_NONE	= 0;
@@ -11113,7 +11255,10 @@ CBulletTypeface.prototype =
     Get_Id: function()
     {
         return this.Id;
-    }
+    },
+
+    Refresh_RecalcData: function()
+    {}
 };
 
 var BULLET_TYPE_BULLET_NONE		= 0;
@@ -11195,7 +11340,10 @@ CBulletType.prototype =
     Get_Id: function()
     {
         return this.Id;
-    }
+    } ,
+
+    Refresh_RecalcData: function()
+    {}
 };
 
 function TextListStyle()
@@ -11256,7 +11404,10 @@ TextListStyle.prototype =
     Get_Id: function()
     {
         return this.Id;
-    }
+    },
+
+    Refresh_RecalcData: function()
+    {}
 };
 
 function CPresParagraph()
@@ -11280,7 +11431,10 @@ CPresParagraph.prototype =
     Get_Id: function()
     {
         return this.Id;
-    }
+    },
+
+    Refresh_RecalcData: function()
+    {}
 };
 
 

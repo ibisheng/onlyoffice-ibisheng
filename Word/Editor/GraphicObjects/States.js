@@ -4131,6 +4131,7 @@ function StartTrackNewShape(graphicObjects, beginArrow, endArrow)
         var pen = new CLn();
         pen.Fill = new CUniFill();
         pen.Fill.fill = new CSolidFill();
+        pen.Fill.fill.color = new CUniColor();
         pen.Fill.fill.color.color  = new CSchemeColor();
         pen.Fill.calculate(this.graphicObjects.document.theme, this.graphicObjects.document.clrSchemeMap, {R: 0, G: 0, B: 0, A:255});
         if(this.beginArrow)
@@ -4151,6 +4152,7 @@ function StartTrackNewShape(graphicObjects, beginArrow, endArrow)
 
         var brush = new CUniFill();
         brush.fill = new CSolidFill();
+        brush.fill.color = new CUniColor();
         brush.fill.color.color  = new CSchemeColor();
         brush.calculate(this.graphicObjects.document.theme, this.graphicObjects.document.clrSchemeMap, {R: 0, G: 0, B: 0, A:255});
 
@@ -4279,7 +4281,7 @@ function TrackNewShape(graphicObjects, beginArrow, endArrow)
         if(false === editor.isViewMode && near_pos!= null && false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_None, {Type : changestype_2_Element_and_Type , Element : near_pos.Paragraph, CheckType : changestype_Paragraph_Content} ))
         {
             History.Create_NewPoint();
-            var Drawing = new ParaDrawing(track_obj.extX, track_obj.extY, null, this.graphicObjects.drawingDocument, this.graphicObjects.document, this.graphicObjects.document);
+            var Drawing = new ParaDrawing(track_obj.extX, track_obj.extY, null, this.graphicObjects.drawingDocument, this.graphicObjects.document, near_pos.Paragraph);
             Drawing.Set_DrawingType(drawing_Anchor);
             var shape = new WordShape(Drawing, this.graphicObjects.document, this.graphicObjects.drawingDocument, null);
             Drawing.Set_GraphicObject(shape);
@@ -4370,6 +4372,7 @@ function StartTrackTextRect(graphicObjects)
 
         var brush = new CUniFill();
         brush.fill = new CSolidFill();
+        brush.fill.color = new CUniColor();
         brush.fill.color.color  = new CSchemeColor();
         brush.fill.color.color.id = 12;
         brush.calculate(this.graphicObjects.document.theme, this.graphicObjects.document.clrSchemeMap, {R: 0, G: 0, B: 0, A:255});
@@ -4431,7 +4434,7 @@ function TrackTextRect(graphicObjects)
             History.Create_NewPoint();
             this.graphicObjects.arrTrackObjects[0].endTrack();
             track_obj = this.graphicObjects.arrTrackObjects[0];
-            var Drawing = new ParaDrawing(track_obj.extX, track_obj.extY, null, this.graphicObjects.drawingDocument, this.graphicObjects.document, this.graphicObjects.document);
+            var Drawing = new ParaDrawing(track_obj.extX, track_obj.extY, null, this.graphicObjects.drawingDocument, this.graphicObjects.document, near_pos.Paragraph);
             Drawing.Set_DrawingType(drawing_Anchor);
             var shape = new WordShape(Drawing, this.graphicObjects.document, this.graphicObjects.drawingDocument, null);
             Drawing.Set_GraphicObject(shape);

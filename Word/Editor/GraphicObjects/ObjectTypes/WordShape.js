@@ -853,7 +853,7 @@ WordShape.prototype =
         if (theme && this.style != null && this.style.fillRef!=null)
         {
             brush = theme.getFillStyle(this.style.fillRef.idx);
-            this.style.fillRef.Color.Calculate(theme, colorMap, {R:0, G:0, B:0, A:255});
+            this.style.fillRef.Color.Calculate(theme, null, null, null, {R:0, G:0, B:0, A:255});
             RGBA = this.style.fillRef.Color.RGBA;
 
             if (this.style.fillRef.Color.color != null)
@@ -870,9 +870,10 @@ WordShape.prototype =
         }
 
 
+
         brush.merge(this.spPr.Fill);
         this.brush = brush;
-        this.brush.calculate(theme, colorMap, RGBA);
+        this.brush.calculate(theme, null, null, null, RGBA);
     },
 
     calculateLine: function()
@@ -889,7 +890,7 @@ WordShape.prototype =
             && this.style.lnRef.Color !== null && typeof  this.style.lnRef.Color.Calculate === "function")
         {
             _calculated_line = _theme.getLnStyle(this.style.lnRef.idx);
-            this.style.lnRef.Color.Calculate(_theme, colorMap, {R: 0 , G: 0, B: 0, A: 255});
+            this.style.lnRef.Color.Calculate(_theme, null, null, null, {R: 0 , G: 0, B: 0, A: 255});
             RGBA = this.style.lnRef.Color.RGBA;
         }
         else
@@ -901,10 +902,17 @@ WordShape.prototype =
 
         if(_calculated_line.Fill!=null)
         {
-            _calculated_line.Fill.calculate(_theme, colorMap, RGBA) ;
+            _calculated_line.Fill.calculate(_theme, null, null, null, RGBA) ;
         }
 
         this.pen = _calculated_line;
+    },
+
+    Get_PrevElementEndInfo: function()
+    {
+        if(isRealObject(this.parent) && isRealObject(this.parent.Parent) && (this.parent.Parent.Get_PrevElementEndInfo) )
+            return this.parent.Parent.Get_PrevElementEndInfo();
+        return null;
     },
 
     calculateText: function()
