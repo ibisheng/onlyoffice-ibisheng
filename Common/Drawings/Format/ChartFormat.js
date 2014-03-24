@@ -2344,8 +2344,8 @@ CCatAx.prototype =
     setMenuProps: function(props)
     {
         if(!(isRealObject(props)
-            && typeof props.getType === "function"
-            &&(props.getType() === c_oAscAxisType.cat || props.getType() === c_oAscAxisType.date)))
+            && typeof props.getAxisType === "function"
+            &&(props.getAxisType() === c_oAscAxisType.cat || props.getAxisType() === c_oAscAxisType.date)))
             return;
 
 
@@ -3095,7 +3095,7 @@ CValAx.prototype =
 
     setMenuProps: function(props)
     {
-        if(!(isRealObject(props) && typeof props.getType === "function" && props.getType() === c_oAscAxisType.val))
+        if(!(isRealObject(props) && typeof props.getAxisType === "function" && props.getAxisType() === c_oAscAxisType.val))
             return;
         if(!this.scaling)
             this.setScaling(new CScaling());
@@ -3133,7 +3133,7 @@ CValAx.prototype =
             scaling.setOrientation(props.invertValOrder ? ORIENTATION_MAX_MIN : ORIENTATION_MIN_MAX);
 
 
-        if(isRealBool(vert_axis_props.logScale) && isRealNumber(props.logBase) && props.logBase > 0)
+        if(isRealBool(props.logScale) && isRealNumber(props.logBase) && props.logBase > 0)
             scaling.setLogBase(props.logBase);
 
         if(isRealNumber(props.units))

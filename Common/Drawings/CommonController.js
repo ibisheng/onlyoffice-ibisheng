@@ -1297,9 +1297,9 @@ DrawingObjectsController.prototype =
 
             var hor_axis = plot_area.getHorizontalAxis();
             var hor_axis_label_setting = chartSettings.getHorAxisLabel();
-            if(hor_axis_label_setting !== null)
-            {  //TODO: запрашивать у chart_type
-                if(hor_axis)
+            if(hor_axis)
+            {
+                if(hor_axis_label_setting !== null)
                 {
                     switch (hor_axis_label_setting)
                     {
@@ -1319,8 +1319,8 @@ DrawingObjectsController.prototype =
                             break;
                         }
                     }
-                    hor_axis.setMenuProps(chartSettings.getHorAxisProps());
                 }
+                hor_axis.setMenuProps(chartSettings.getHorAxisProps());
             }
 
 
@@ -1328,9 +1328,9 @@ DrawingObjectsController.prototype =
             //vertAxis
             var vert_axis = plot_area.getVerticalAxis(); //TODO: запрашивать у chart_type
             var vert_axis_labels_settings = chartSettings.getVertAxisLabel();
-            if(vert_axis_labels_settings !== null)
+            if(vert_axis)
             {
-                if(vert_axis)
+                if(vert_axis_labels_settings !== null)
                 {
                     switch (vert_axis_labels_settings)
                     {
@@ -1370,8 +1370,8 @@ DrawingObjectsController.prototype =
                             }
                         }
                     }
-                    vert_axis.setMenuProps(chartSettings.getVertAxisProps())
                 }
+                vert_axis.setMenuProps(chartSettings.getVertAxisProps())
             }
             //legend
             var legend_pos_settings =  chartSettings.getLegendPos();
