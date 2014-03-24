@@ -293,6 +293,30 @@ CDrawingDocument.prototype =
         this.Native["DD_Set_RulerState_HdrFtr"](bHeader, Y0, Y1);
     },
 
+    Update_ParaInd : function( Ind )
+    {
+        var FirstLine = 0,
+            Left = 0,
+            Right = 0;
+        if ( "undefined" != typeof(Ind) )
+        {
+            if("undefined" != typeof(Ind.FirstLine))
+            {
+                FirstLine = Ind.FirstLine;
+            }
+            if("undefined" != typeof(Ind.Left))
+            {
+                Left = Ind.Left;
+            }
+            if("undefined" != typeof(Ind.Right))
+            {
+                Right = Ind.Right;
+            }
+        }
+
+        this.Native["DD_Update_ParaInd"](FirstLine, Left, Right);
+    },
+
     Update_ParaTab : function(Default_Tab, ParaTabs)
     {
         var _arr_pos = [];
