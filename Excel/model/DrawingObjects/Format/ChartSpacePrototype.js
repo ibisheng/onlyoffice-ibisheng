@@ -2027,7 +2027,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 }
                                 else
                                 {
-                                    y_ax.labels.x = rect.x + hor_interval_width*(crosses-arr_x_val[0]);
+                                    y_ax.labels.x = rect.x + hor_interval_width*(crosses-arr_x_val[0]) - y_ax.labels.extX;
                                 }
                                 y_ax.xPos = y_ax.labels.x + y_ax.labels.extX;
                                 for(i = 0; i < arr_x_val.length; ++i)
