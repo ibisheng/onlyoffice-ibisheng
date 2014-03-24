@@ -2717,6 +2717,7 @@ CChartSpace.prototype.recalculateAxis = function()
                 val_ax.labels = new CValAxisLabels(this);
                 var max_width = 0;
                 val_ax.yPoints = [];
+
                 for(i = 0; i < arr_strings.length; ++i)
                 {
                     var dlbl = new CDLbl();
@@ -2726,20 +2727,12 @@ CChartSpace.prototype.recalculateAxis = function()
                     dlbl.txPr = val_ax.txPr;
                     dlbl.tx = new CChartText();
                     dlbl.tx.rich = CreateTextBodyFromString(arr_strings[i], this.getDrawingDocument(), dlbl);
-                    dlbl.recalculate();
-                    if(dlbl.tx.rich.content.XLimit > max_width)
-                        max_width = dlbl.tx.rich.content.XLimit;
+                    var cur_width = dlbl.tx.rich.recalculateByMaxWord().w;
+                    if(cur_width > max_width)
+                        max_width = cur_width;
                     val_ax.labels.arrLabels.push(dlbl);
                     val_ax.yPoints.push({val: arr_val[i], pos: null});
 
-                }
-                for(i = 0; i < arr_strings.length; ++i)
-                {
-                    val_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(true);
-                    val_ax.labels.arrLabels[i].tx.rich.content.Set_ParagraphAlign(align_Right);
-                    val_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(false);
-                    val_ax.labels.arrLabels[i].tx.rich.content.Reset(0,0, max_width, 20000);
-                    val_ax.labels.arrLabels[i].tx.rich.content.Recalculate_Page(0, true);
                 }
                 var val_axis_labels_gap = val_ax.labels.arrLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*25.4/72;
                 val_ax.labels.extX = max_width + val_axis_labels_gap;
@@ -3045,6 +3038,7 @@ CChartSpace.prototype.recalculateAxis = function()
                     var tick_lbl_skip = isRealNumber(cat_ax.tickLblSkip) ? cat_ax.tickLblSkip : 1;
                     var max_min_width = 0;
                     var max_max_width = 0;
+                    var arr_max_contents = [];
                     for(i = 0; i < string_pts.length; ++i)
                     {
                         var dlbl = null;
@@ -3057,7 +3051,14 @@ CChartSpace.prototype.recalculateAxis = function()
                             dlbl.txPr = cat_ax.txPr;
                             dlbl.tx = new CChartText();
                             dlbl.tx.rich = CreateTextBodyFromString(string_pts[i].val, this.getDrawingDocument(), dlbl);
-                            dlbl.recalculate();
+                            //dlbl.recalculate();
+
+                            var content = dlbl.tx.rich.content;
+                            content.Set_ApplyToAll(true);
+                            content.Set_ParagraphAlign(align_Center);
+                            content.Set_ApplyToAll(false);
+                            dlbl.txBody = dlbl.tx.rich;
+
                             var min_max =  dlbl.tx.rich.content.Recalculate_MinMaxContentWidth();
                             var max_min_content_width = min_max.Min;
                             if(max_min_content_width > max_min_width)
@@ -3077,9 +3078,6 @@ CChartSpace.prototype.recalculateAxis = function()
                             if(cat_ax.labels.arrLabels[i])
                             {
                                 var content = cat_ax.labels.arrLabels[i].tx.rich.content;
-                                content.Set_ApplyToAll(true);
-                                content.Set_ParagraphAlign(align_Center);
-                                content.Set_ApplyToAll(false);
                                 content.Reset(0, 0, max_cat_label_width, 20000);
                                 content.Recalculate_Page(0, true);
                                 var cur_height = content.Get_SummaryHeight();
@@ -3454,21 +3452,34 @@ CChartSpace.prototype.recalculateAxis = function()
                     }
                 }
                 //запишем в оси необходимую информацию для отрисовщика plotArea  и выставим окончательные позиции для подписей
+                var arr_labels, transform_text;
                 if(val_ax.labels)
                 {
                     val_ax.labels.y = Math.min.apply(Math, arr_val_labels_points);
                     val_ax.labels.extY = Math.max.apply(Math, arr_val_labels_points) - Math.min.apply(Math, arr_val_labels_points);
-
-                    var text_align = left_val_ax_labels_align ? align_Right : align_Left;//на самом деле получилось, что наоборот
-                    var vert_axis_labels_gap = val_ax.labels.extX - max_width;
-                    var labels_x_pos = left_val_ax_labels_align ?  val_ax.labels.x : val_ax.labels.x + vert_axis_labels_gap;
-                    for(i = 0;  i < val_ax.labels.arrLabels.length; ++i)
+                    arr_labels = val_ax.labels.arrLabels;
+                    if(left_val_ax_labels_align)
                     {
-                        val_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(true);
-                        val_ax.labels.arrLabels[i].tx.rich.content.Set_ParagraphAlign(text_align);
-                        val_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(false);
-                        val_ax.labels.arrLabels[i].tx.rich.content.Reset(0, 0, max_width, 2000);
-                        val_ax.labels.arrLabels[i].setPosition(labels_x_pos, arr_val_labels_points[i] - val_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
+                        for(i = 0; i < arr_labels.length; ++i)
+                        {
+                            arr_labels[i].txBody = arr_labels[i].tx.rich;
+                            transform_text = arr_labels[i].transformText;
+                            transform_text.Reset();
+                            global_MatrixTransformer.TranslateAppend(transform_text, val_ax.labels.x + val_ax.labels.extX - val_axis_labels_gap - arr_labels[i].tx.rich.content.XLimit, arr_val_labels_points[i] - val_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
+                            global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
+                        }
+                    }
+                    else
+                    {
+                        var left_line = val_ax.labels.x + val_axis_labels_gap;
+                        for(i = 0; i < arr_labels.length; ++i)
+                        {
+                            arr_labels[i].txBody = arr_labels[i].tx.rich;
+                            transform_text = arr_labels[i].transformText;
+                            transform_text.Reset();
+                            global_MatrixTransformer.TranslateAppend(transform_text, left_line, arr_val_labels_points[i] - val_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
+                            global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
+                        }
                     }
                 }
                 val_ax.yPoints = [];
@@ -3502,12 +3513,10 @@ CChartSpace.prototype.recalculateAxis = function()
                             {
                                 if(cat_ax.labels.arrLabels[i])
                                 {
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(true);
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Set_ParagraphAlign(align_Center);
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(false);
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Reset(0, 0, max_cat_label_width, 2000);
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Recalculate_Page(0, true);
-                                    cat_ax.labels.arrLabels[i].setPosition(arr_cat_labels_points[i] - max_cat_label_width/2, cat_ax.labels.y + labels_offset);
+                                    var label_text_transform = cat_ax.labels.arrLabels[i].transformText;
+                                    label_text_transform.Reset();
+                                    global_MatrixTransformer.TranslateAppend(label_text_transform, arr_cat_labels_points[i] - max_cat_label_width/2, cat_ax.labels.y + labels_offset);
+                                    global_MatrixTransformer.MultiplyAppend(label_text_transform, this.getTransformMatrix());
                                 }
                             }
                         }
@@ -3517,12 +3526,10 @@ CChartSpace.prototype.recalculateAxis = function()
                             {
                                 if(cat_ax.labels.arrLabels[i])
                                 {
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(true);
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Set_ParagraphAlign(align_Center);
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(false);
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Reset(0, 0, max_cat_label_width, 2000);
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Recalculate_Page(0, true);
-                                    cat_ax.labels.arrLabels[i].setPosition(arr_cat_labels_points[i] - max_cat_label_width/2, cat_ax.labels.y + cat_ax.labels.extY - labels_offset - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight());
+                                    var label_text_transform = cat_ax.labels.arrLabels[i].transformText;
+                                    label_text_transform.Reset();
+                                    global_MatrixTransformer.TranslateAppend(label_text_transform, arr_cat_labels_points[i] - max_cat_label_width/2, cat_ax.labels.y + cat_ax.labels.extY - labels_offset - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight());
+                                    global_MatrixTransformer.MultiplyAppend(label_text_transform, this.getTransformMatrix());
                                 }
                             }
                         }
@@ -3538,6 +3545,9 @@ CChartSpace.prototype.recalculateAxis = function()
                                 if(cat_ax.labels.arrLabels[i])
                                 {
                                     var label_text_transform = cat_ax.labels.arrLabels[i].transformText;
+                                    cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(true);
+                                    cat_ax.labels.arrLabels[i].tx.rich.content.Set_ParagraphAlign(align_Left);
+                                    cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(false);
                                     var wh = cat_ax.labels.arrLabels[i].tx.rich.getContentOneStringSizes();//Todo: не расчитывать больше контент
                                     w2 = wh.w*Math.cos(Math.PI/4) + wh.h*Math.sin(Math.PI/4);
                                     h2 = wh.w*Math.sin(Math.PI/4) + wh.h*Math.cos(Math.PI/4);
@@ -3574,6 +3584,9 @@ CChartSpace.prototype.recalculateAxis = function()
                                 if(cat_ax.labels.arrLabels[i])
                                 {
                                     var label_text_transform = cat_ax.labels.arrLabels[i].transformText;
+                                    cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(true);
+                                    cat_ax.labels.arrLabels[i].tx.rich.content.Set_ParagraphAlign(align_Left);
+                                    cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(false);
                                     var wh = cat_ax.labels.arrLabels[i].tx.rich.getContentOneStringSizes();//Todo: не расчитывать больше контент
                                     w2 = wh.w*Math.cos(Math.PI/4) + wh.h*Math.sin(Math.PI/4);
                                     h2 = wh.w*Math.sin(Math.PI/4) + wh.h*Math.cos(Math.PI/4);
@@ -4506,6 +4519,7 @@ CChartSpace.prototype.recalculateLegend = function()
                     legend.extX = legend_width;
                     legend.extY = legend_height;
                     var summ_h = 0;
+                    calc_entryes.splice(cut_index, calc_entryes.length - cut_index);
                     for(i = 0; i <  cut_index; ++i)
                     {
                         calc_entry = calc_entryes[i];
@@ -4576,6 +4590,7 @@ CChartSpace.prototype.recalculateLegend = function()
                     legend.extX = legend_width;
                     legend.extY = legend_height;
                     var summ_h = 0;
+                    calc_entryes.splice(cut_index, calc_entryes.length - cut_index);
                     for(i = 0; i <  cut_index; ++i)
                     {
                         calc_entry = calc_entryes[i];
@@ -4679,6 +4694,7 @@ CChartSpace.prototype.recalculateLegend = function()
                         }
                         legend.extX = legend_width;
                         legend.extY = legend_height;
+                        calc_entryes.splice(cut_index, calc_entryes.length - cut_index);
                         for(i = 0; i <cut_index; ++i)
                         {
                             calc_entry = calc_entryes[i];
@@ -4749,6 +4765,8 @@ CChartSpace.prototype.recalculateLegend = function()
                         legend.extX = legend_width;
                         legend.extY = legend_height;
                         var summ_h = 0;
+
+                        calc_entryes.splice(cut_index, calc_entryes.length - cut_index);
                         for(i = 0; i <  cut_index; ++i)
                         {
                             calc_entry = calc_entryes[i];
@@ -4841,6 +4859,8 @@ CChartSpace.prototype.recalculateLegend = function()
                         }
                         legend.extX = legend_width;
                         legend.extY = legend_height;
+
+                        calc_entryes.splice(cut_index, calc_entryes.length - cut_index);
                         for(i = 0; i <cut_index; ++i)
                         {
                             calc_entry = calc_entryes[i];
@@ -4906,6 +4926,8 @@ CChartSpace.prototype.recalculateLegend = function()
                         legend.extX = legend_width;
                         legend.extY = legend_height;
                         var summ_h = 0;
+
+                        calc_entryes.splice(cut_index, calc_entryes.length - cut_index);
                         for(i = 0; i <  cut_index; ++i)
                         {
                             calc_entry = calc_entryes[i];
