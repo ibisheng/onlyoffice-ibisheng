@@ -9380,6 +9380,12 @@ Paragraph.prototype =
     {
         var Pos = ContentPos.Get(0);
 
+        if ( Pos >= this.Content.length )
+            Pos = this.Content.length - 1;
+
+        if ( Pos < 0 )
+            Pos = 0;
+
         this.CurPos.ContentPos = Pos;
         this.Content[Pos].Set_ParaContentPos( ContentPos, 1 );
         this.Correct_ContentPos(CorrectEndLinePos);
@@ -16241,6 +16247,13 @@ Paragraph.prototype =
         {
             var ParaNearPos = new CParagraphNearPos();
             ParaNearPos.NearPos = NearPos;
+
+            var Count = this.NearPosArray.length;
+            for ( var Index = 0; Index < Count; Index++ )
+            {
+                if ( this.NearPosArray[Index].NearPos === NearPos )
+                    return;
+            }
 
             this.NearPosArray.push( ParaNearPos );
             ParaNearPos.Classes.push( this );

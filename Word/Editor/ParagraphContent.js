@@ -4752,6 +4752,8 @@ ParaDrawing.prototype =
         }
         else
         {
+            NearPos.Paragraph.Check_NearestPos( NearPos );
+
             var LogicDocument = this.DrawingDocument.m_oLogicDocument;
 
             var Para = new Paragraph(this.DrawingDocument, LogicDocument);
