@@ -118,7 +118,8 @@ var c_oAscChartLegendShowSettings =
     right: 3,
     bottom: 4,
     leftOverlay: 5,
-    rightOverlay: 6
+    rightOverlay: 6,
+    layout: 7
 };
 
 var c_oAscChartDataLabelsPos =
@@ -186,11 +187,18 @@ var c_oAscChartTypeSettings =
     areaNormal          : 13,
     areaStacked         : 14,
     areaStackedPer      : 15,
-    scatter             : 16,
-    scatterLine         : 17,
-    scatterSmooth       : 18,
-    doughnut            : 19
+    doughnut            : 16,
+    stock               : 17,
+    scatter             : 18,
+    scatterLine         : 19,
+    scatterLineMarker   : 20,
+    scatterMarker       : 21,
+    scatterNone         : 22,
+    scatterSmooth       : 23,
+    scatterSmoothMarker : 24,
+    unknown: 25
 };
+
 
 var c_oAscValAxisRule =
 {
@@ -208,7 +216,8 @@ var c_oAscValAxUnits =
     MILLIONS: 5,
     TEN_MILLIONS: 6,
     TEN_THOUSANDS: 7,
-    TRILLIONS: 8
+    TRILLIONS: 8,
+    CUSTOM: 9
 };
 
 var c_oAscTickMark =
@@ -231,7 +240,8 @@ var c_oAscCrossesRule =
 {
     auto:0,
     maxValue: 1,
-    value: 2
+    value: 2,
+    minValue: 3
 };
 
 var c_oAscHorAxisType =
@@ -251,4 +261,14 @@ var c_oAscLabelsPosition =
 {
     byDivisions: 0,
     betweenDivisions: 1
+};
+
+
+var c_oAscAxisType =
+{
+    auto: 0,
+    date: 1,
+    text: 2,
+    cat : 3,
+    val : 4
 };

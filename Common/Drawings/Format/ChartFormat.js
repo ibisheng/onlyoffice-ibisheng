@@ -2277,6 +2277,161 @@ function CCatAx()
 
 CCatAx.prototype =
 {
+    getMenuProps: function()
+    {
+        var ret = new asc_CatAxisSettings();
+
+        if(isRealNumber(this.tickMarkSkip))
+            ret.putIntervalBetweenTick(this.tickMarkSkip);
+        else
+            ret.putIntervalBetweenTick(1);
+
+
+        if(!isRealNumber(this.tickLblSkip))
+            ret.putIntervalBetweenLabelsRule(c_oAscBetweenLabelsRule.auto);
+        else
+        {
+            ret.putIntervalBetweenLabelsRule(c_oAscBetweenLabelsRule.manual);
+            ret.putIntervalBetweenLabels(this.tickLblSkip);
+        }
+
+        var scaling = this.scaling;
+        if(!scaling || scaling.orientation !== ORIENTATION_MAX_MIN)
+            ret.putInvertCatOrder(false);
+        else
+            ret.putInvertCatOrder(true);
+
+        //настройки пересечения с другой осью
+        if(isRealNumber(this.crossesAt))
+        {
+            ret.putCrossesRule(c_oAscCrossesRule.value);
+            ret.putCrosses(this.crossesAt);
+        }
+        else if(this.crosses === CROSSES_MAX)
+        {
+            ret.putCrossesRule(c_oAscCrossesRule.maxValue);
+        }
+        else if(this.crosses === CROSSES_MIN)
+        {
+            ret.putCrossesRule(c_oAscCrossesRule.minValue);
+        }
+        else
+        {
+            ret.putCrossesRule(c_oAscCrossesRule.auto);
+        }
+
+        if(isRealNumber(this.lblOffset))
+            ret.putLabelsAxisDistance(this.lblOffset);
+        else
+            ret.putLabelsAxisDistance(100);
+
+        if(this.crossAx)
+        {
+            ret.putLabelsPosition(this.crossAx.crossBetween === CROSS_BETWEEN_MID_CAT ? c_oAscLabelsPosition.byDivisions : c_oAscLabelsPosition.betweenDivisions);
+        }
+        else
+        {
+            ret.putLabelsPosition(CROSS_BETWEEN_BETWEEN);
+        }
+        if(isRealNumber(this.tickLblPos) && isRealNumber(REV_MENU_SETTINGS_LABELS_POS[this.tickLblPos]))
+            ret.putTickLabelsPos(REV_MENU_SETTINGS_LABELS_POS[this.tickLblPos]);
+        else
+            ret.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
+        return ret;
+     },
+
+
+    setMenuProps: function(props)
+    {
+        if(!(isRealObject(props)
+            && typeof props.getType === "function"
+            &&(props.getType() === c_oAscAxisType.cat || props.getType() === c_oAscAxisType.date)))
+            return;
+
+
+
+        var  intervalBetweenTick       = props.getIntervalBetweenTick();
+        var  intervalBetweenLabelsRule = props.getIntervalBetweenLabelsRule();
+        var  intervalBetweenLabels     = props.getIntervalBetweenLabels();
+        var  invertCatOrder            = props.getInvertCatOrder();
+        var  labelsAxisDistance        = props.getLabelsAxisDistance();
+        var  axisType                  = props.getAxisType();
+        var  majorTickMark             = props.getMajorTickMark();
+        var  minorTickMark             = props.getMinorTickMark();
+        var  tickLabelsPos             = props.getTickLabelsPos();
+        var  crossesRule               = props.getCrossesRule();
+        var  crosses                   = props.getCrosses();
+        var  labelsPosition            = props.getLabelsPosition();
+
+
+        if(isRealNumber(intervalBetweenTick))
+            this.setTickMarkSkip(intervalBetweenTick);
+
+        if(isRealNumber(intervalBetweenLabelsRule))
+        {
+            if(intervalBetweenLabelsRule === c_oAscBetweenLabelsRule.auto)
+            {
+                if(isRealNumber(this.tickLblSkip))
+                {
+                    this.setTickLblSkip(null);
+                }
+            }
+            else if(intervalBetweenLabelsRule === c_oAscBetweenLabelsRule.manual && isRealNumber(intervalBetweenLabels))
+            {
+                this.setTickLblSkip(intervalBetweenLabels);
+            }
+        }
+
+        if(!this.scaling)
+            this.setScaling(new CScaling());
+        var scaling = this.scaling;
+        if(isRealBool(invertCatOrder))
+            scaling.setOrientation(invertCatOrder ? ORIENTATION_MAX_MIN : ORIENTATION_MIN_MAX);
+        if(isRealNumber(labelsAxisDistance))
+            this.setLblOffset(labelsAxisDistance);
+
+        if(isRealNumber(axisType))
+        {
+            //TODO
+        }
+
+
+        if(isRealNumber(majorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[majorTickMark]))
+            this.setMajorTickMark(MENU_SETTINGS_TICK_MARK[majorTickMark]);
+
+        if(isRealNumber(minorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[minorTickMark]))
+            this.setMinorTickMark(MENU_SETTINGS_TICK_MARK[minorTickMark]);
+
+        if(isRealNumber(tickLabelsPos) && isRealNumber(MENU_SETTINGS_LABELS_POS[tickLabelsPos]))
+            this.setTickLblPos(MENU_SETTINGS_LABELS_POS[tickLabelsPos]);
+
+
+        if(isRealNumber(crossesRule) && isRealObject(this.crossAx))
+        {
+            if(crossesRule === c_oAscCrossesRule.auto)
+            {
+                this.crossAx.setCrossesAt(null);
+                this.crossAx.setCrosses(CROSSES_AUTO_ZERO);
+            }
+            else if(crossesRule === c_oAscCrossesRule.value)
+            {
+                if(isRealNumber(crosses))
+                {
+                    this.crossAx.setCrossesAt(crosses);
+                    this.crossAx.setCrosses(null);
+                }
+            }
+            else if(crossesRule === c_oAscCrossesRule.maxValue)
+            {
+                this.crossAx.setCrossesAt(null);
+                this.crossAx.setCrosses(CROSSES_MAX);
+            }
+        }
+
+        if(isRealNumber(labelsPosition) && isRealObject(this.crossAx))
+            this.crossAx.setCrossBetween(labelsPosition === c_oAscLabelsPosition.byDivisions ? CROSS_BETWEEN_MID_CAT : CROSS_BETWEEN_BETWEEN);
+    },
+
     getObjectType: function()
     {
         return historyitem_type_CatAx;
@@ -2830,7 +2985,205 @@ CValAx.prototype =
     {},
 
     Load_Changes: function()
-    {}
+    {},
+
+
+    getMenuProps: function()
+    {
+        var ret = new asc_ValAxisSettings();
+        var scaling = this.scaling;
+
+        //настройки логарифмической шкалы
+        if(scaling && isRealNumber(scaling.logBase))
+        {
+            ret.putLogScale(true);
+            ret.putLogBase(scaling.logBase);
+        }
+        else
+        {
+            ret.putLogScale(false);
+        }
+
+        //настроки максимального значения по оси
+        if(scaling && isRealNumber(scaling.max))
+        {
+            ret.putMaxValRule(c_oAscValAxisRule.fixed);
+            ret.putMaxVal(scaling.max);
+        }
+        else
+        {
+            ret.putMaxValRule(c_oAscValAxisRule.auto);
+        }
+
+        //настройки минимального значения по оси
+        if(scaling && isRealNumber(scaling.min))
+        {
+            ret.putMinValRule(c_oAscValAxisRule.fixed);
+            ret.putMinVal(scaling.min);
+        }
+        else
+        {
+            ret.putMinValRule(c_oAscValAxisRule.auto);
+        }
+
+        //настройка ориентации оси
+        ret.putInvertValOrder(scaling && scaling.orientation === ORIENTATION_MAX_MIN);
+
+        //настройка множителя единиц на оси
+        if(isRealObject(this.dispUnits))
+        {
+            var disp_units = this.dispUnits;
+            if(isRealNumber(disp_units.builtInUnit) && isRealNumber(REV_MENU_SETTINGS_MAP[disp_units.builtInUnit]))
+            {
+                ret.putDispUnitsRule(REV_MENU_SETTINGS_MAP[disp_units.builtInUnit]);
+                ret.putShowUnitsOnChart(isRealObject(disp_units.dispUnitsLbl));
+            }
+            else if(isRealNumber(disp_units.custUnit))
+            {
+                ret.putDispUnitsRule(c_oAscValAxUnits.CUSTOM);
+                ret.putUnits(disp_units.custUnit);
+                ret.putShowUnitsOnChart(isRealObject(disp_units.dispUnitsLbl));
+            }
+            else
+            {
+                ret.putDispUnitsRule(c_oAscValAxUnits.none);
+                ret.putShowUnitsOnChart(false);
+            }
+        }
+        else
+        {
+            ret.putDispUnitsRule(c_oAscValAxUnits.none);
+            ret.putShowUnitsOnChart(false);
+        }
+
+        //настройки засечек на оси
+        if(isRealNumber(this.majorTickMark) && isRealNumber(REV_MENU_SETTINGS_TICK_MARK[this.majorTickMark]))
+            ret.putMajorTickMark(REV_MENU_SETTINGS_TICK_MARK[this.majorTickMark]);
+        else
+            ret.putMajorTickMark( c_oAscTickMark.TICK_MARK_NONE);
+
+        if(isRealNumber(this.minorTickMark) && isRealNumber(REV_MENU_SETTINGS_TICK_MARK[this.minorTickMark]))
+            ret.putMinorTickMark(REV_MENU_SETTINGS_TICK_MARK[this.minorTickMark]);
+        else
+            ret.putMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
+
+        if(isRealNumber(this.tickLblPos) && isRealNumber(REV_MENU_SETTINGS_LABELS_POS[this.tickLblPos]))
+            ret.putTickLabelsPos(REV_MENU_SETTINGS_LABELS_POS[this.tickLblPos]);
+        else
+            ret.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
+
+        //настройки пересечения с другой осью
+        if(isRealNumber(this.crossesAt))
+        {
+            ret.putCrossesRule(c_oAscCrossesRule.value);
+            ret.putCrosses(this.crossesAt);
+        }
+        else if(this.crosses === CROSSES_MAX)
+        {
+            ret.putCrossesRule(c_oAscCrossesRule.maxValue);
+        }
+        else if(this.crosses === CROSSES_MIN)
+        {
+            ret.putCrossesRule(c_oAscCrossesRule.minValue);
+        }
+        else
+        {
+            ret.putCrossesRule(c_oAscCrossesRule.auto);
+        }
+        return ret;
+    },
+
+    setMenuProps: function(props)
+    {
+        if(!(isRealObject(props) && typeof props.getType === "function" && props.getType() === c_oAscAxisType.val))
+            return;
+        if(!this.scaling)
+            this.setScaling(new CScaling());
+
+        var scaling = this.scaling;
+        if(isRealNumber(props.minValRule))
+        {
+            if(props.minValRule === c_oAscValAxisRule.auto)
+            {
+                if(isRealNumber(scaling.min))
+                    scaling.setMin(null);
+            }
+            else
+            {
+                if(isRealNumber(props.minVal))
+                    scaling.setMin(props.minVal);
+            }
+        }
+
+        if(isRealNumber(props.maxValRule))
+        {
+            if(props.maxValRule === c_oAscValAxisRule.auto)
+            {
+                if(isRealNumber(scaling.max))
+                    scaling.setMax(null);
+            }
+            else
+            {
+                if(isRealNumber(props.maxVal))
+                    scaling.setMax(props.maxVal);
+            }
+        }
+
+        if(isRealBool(props.invertValOrder))
+            scaling.setOrientation(props.invertValOrder ? ORIENTATION_MAX_MIN : ORIENTATION_MIN_MAX);
+
+
+        if(isRealBool(vert_axis_props.logScale) && isRealNumber(props.logBase) && props.logBase > 0)
+            scaling.setLogBase(props.logBase);
+
+        if(isRealNumber(props.units))
+        {
+            if(props.units === c_oAscValAxUnits.none)
+            {
+                if(this.dispUnits)
+                    this.setDispUnits(null);
+            }
+            else if(isRealNumber(MENU_SETTINGS_MAP[props.dispUnitsRule]))
+            {
+                if(!this.dispUnits)
+                    this.setDispUnits(new CDispUnits());
+                this.dispUnits.setBuiltInUnit(MENU_SETTINGS_MAP[props.dispUnitsRule]);
+                if(isRealBool(this.showUnitsOnChart))
+                    this.dispUnits.setDispUnitsLbl(new CDLbl());
+            }
+        }
+
+        if(isRealNumber(props.majorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[props.majorTickMark]))
+            this.setMajorTickMark(MENU_SETTINGS_TICK_MARK[props.majorTickMark]);
+
+        if(isRealNumber(props.minorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[props.minorTickMark]))
+            this.setMinorTickMark(MENU_SETTINGS_TICK_MARK[props.minorTickMark]);
+
+        if(isRealNumber(props.tickLabelsPos) && isRealNumber(MENU_SETTINGS_LABELS_POS[props.tickLabelsPos]))
+            this.setTickLblPos(MENU_SETTINGS_LABELS_POS[props.tickLabelsPos]);
+
+        if(isRealNumber(props.crossesRule) && isRealObject(this.crossAx))
+        {
+            if(props.crossesRule === c_oAscCrossesRule.auto)
+            {
+                this.crossAx.setCrossesAt(null);
+                this.crossAx.setCrosses(CROSSES_AUTO_ZERO);
+            }
+            else if(props.crossesRule === c_oAscCrossesRule.value)
+            {
+                if(isRealNumber(props.crosses))
+                {
+                    this.crossAx.setCrossesAt(props.crosses);
+                    this.crossAx.setCrosses(null);
+                }
+            }
+            else if(props.crossesRule === c_oAscCrossesRule.maxValue)
+            {
+                this.crossAx.setCrossesAt(null);
+                this.crossAx.setCrosses(CROSSES_MAX);
+            }
+        }
+    }
 };
 
 
@@ -4369,6 +4722,18 @@ DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.outEnd]  =   DLBL_POS_OUT_END;
 DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.r]       =   DLBL_POS_R;
 DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.t]       =   DLBL_POS_T;
 
+
+
+var REV_DLBL_POS_DEFINES_MAP = [];
+REV_DLBL_POS_DEFINES_MAP[DLBL_POS_B       ] =   c_oAscChartDataLabelsPos.b      ;
+REV_DLBL_POS_DEFINES_MAP[DLBL_POS_BEST_FIT] =   c_oAscChartDataLabelsPos.bestFit;
+REV_DLBL_POS_DEFINES_MAP[DLBL_POS_CTR     ] =   c_oAscChartDataLabelsPos.ctr    ;
+REV_DLBL_POS_DEFINES_MAP[DLBL_POS_IN_BASE ] =   c_oAscChartDataLabelsPos.inBase ;
+REV_DLBL_POS_DEFINES_MAP[DLBL_POS_IN_END  ] =   c_oAscChartDataLabelsPos.inEnd  ;
+REV_DLBL_POS_DEFINES_MAP[DLBL_POS_L       ] =   c_oAscChartDataLabelsPos.l      ;
+REV_DLBL_POS_DEFINES_MAP[DLBL_POS_OUT_END ] =   c_oAscChartDataLabelsPos.outEnd ;
+REV_DLBL_POS_DEFINES_MAP[DLBL_POS_R       ] =   c_oAscChartDataLabelsPos.r      ;
+REV_DLBL_POS_DEFINES_MAP[DLBL_POS_T       ] =   c_oAscChartDataLabelsPos.t      ;
 
 function CDLbl()
 {
@@ -6820,19 +7185,42 @@ MENU_SETTINGS_MAP[c_oAscValAxUnits.TEN_MILLIONS]       = BUILT_IN_UNIT_TEN_MILLI
 MENU_SETTINGS_MAP[c_oAscValAxUnits.TEN_THOUSANDS]      = BUILT_IN_UNIT_TEN_THOUSANDS;
 MENU_SETTINGS_MAP[c_oAscValAxUnits.TRILLIONS]          = BUILT_IN_UNIT_TRILLIONS;
 
+var REV_MENU_SETTINGS_MAP = [];
+
+REV_MENU_SETTINGS_MAP[BUILT_IN_UNIT_BILLIONS        ]  = c_oAscValAxUnits.BILLIONS         ;
+REV_MENU_SETTINGS_MAP[BUILT_IN_UNIT_HUNDRED_MILLIONS]  = c_oAscValAxUnits.HUNDRED_MILLIONS ;
+REV_MENU_SETTINGS_MAP[BUILT_IN_UNIT_HUNDREDS        ]  = c_oAscValAxUnits.HUNDREDS         ;
+REV_MENU_SETTINGS_MAP[BUILT_IN_UNIT_HUNDRED_THOUSANDS] = c_oAscValAxUnits.HUNDRED_THOUSANDS;
+REV_MENU_SETTINGS_MAP[BUILT_IN_UNIT_MILLIONS        ]  = c_oAscValAxUnits.MILLIONS         ;
+REV_MENU_SETTINGS_MAP[BUILT_IN_UNIT_TEN_MILLIONS    ]  = c_oAscValAxUnits.TEN_MILLIONS     ;
+REV_MENU_SETTINGS_MAP[BUILT_IN_UNIT_TEN_THOUSANDS   ]  = c_oAscValAxUnits.TEN_THOUSANDS    ;
+REV_MENU_SETTINGS_MAP[BUILT_IN_UNIT_TRILLIONS       ]  = c_oAscValAxUnits.TRILLIONS        ;
 
 
-var MENU_SETTINGS_TICK_MARK = []
+
+var MENU_SETTINGS_TICK_MARK = [];
 MENU_SETTINGS_TICK_MARK[c_oAscTickMark.TICK_MARK_CROSS] = TICK_MARK_CROSS;
 MENU_SETTINGS_TICK_MARK[c_oAscTickMark.TICK_MARK_IN   ] = TICK_MARK_IN   ;
 MENU_SETTINGS_TICK_MARK[c_oAscTickMark.TICK_MARK_NONE ] = TICK_MARK_NONE ;
 MENU_SETTINGS_TICK_MARK[c_oAscTickMark.TICK_MARK_OUT  ] = TICK_MARK_OUT  ;
+
+var REV_MENU_SETTINGS_TICK_MARK = [];
+REV_MENU_SETTINGS_TICK_MARK[ TICK_MARK_CROSS] =  c_oAscTickMark.TICK_MARK_CROSS;
+REV_MENU_SETTINGS_TICK_MARK[ TICK_MARK_IN   ] =  c_oAscTickMark.TICK_MARK_IN   ;
+REV_MENU_SETTINGS_TICK_MARK[ TICK_MARK_NONE ] =  c_oAscTickMark.TICK_MARK_NONE ;
+REV_MENU_SETTINGS_TICK_MARK[ TICK_MARK_OUT  ] =  c_oAscTickMark.TICK_MARK_OUT  ;
+
 
 var MENU_SETTINGS_LABELS_POS = [];
 MENU_SETTINGS_LABELS_POS[c_oAscTickLabelsPos.TICK_LABEL_POSITION_HIGH   ] = TICK_LABEL_POSITION_HIGH   ;
 MENU_SETTINGS_LABELS_POS[c_oAscTickLabelsPos.TICK_LABEL_POSITION_LOW    ] = TICK_LABEL_POSITION_LOW    ;
 MENU_SETTINGS_LABELS_POS[c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO] = TICK_LABEL_POSITION_NEXT_TO;
 MENU_SETTINGS_LABELS_POS[c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE   ] = TICK_LABEL_POSITION_NONE   ;
+var REV_MENU_SETTINGS_LABELS_POS = [];
+REV_MENU_SETTINGS_LABELS_POS[TICK_LABEL_POSITION_HIGH    ] = c_oAscTickLabelsPos.TICK_LABEL_POSITION_HIGH   ;
+REV_MENU_SETTINGS_LABELS_POS[TICK_LABEL_POSITION_LOW     ] = c_oAscTickLabelsPos.TICK_LABEL_POSITION_LOW    ;
+REV_MENU_SETTINGS_LABELS_POS[TICK_LABEL_POSITION_NEXT_TO ] = c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO;
+REV_MENU_SETTINGS_LABELS_POS[TICK_LABEL_POSITION_NONE    ] = c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE   ;
 
 function CDispUnits()
 {
@@ -7966,6 +8354,15 @@ LEGEND_POS_MAP[c_oAscChartLegendShowSettings.right] = LEGEND_POS_R;
 LEGEND_POS_MAP[c_oAscChartLegendShowSettings.bottom] = LEGEND_POS_B;
 LEGEND_POS_MAP[c_oAscChartLegendShowSettings.leftOverlay] = LEGEND_POS_L;
 LEGEND_POS_MAP[c_oAscChartLegendShowSettings.rightOverlay] = LEGEND_POS_R;
+
+
+var REV_LEGEND_POS_MAP = [];
+REV_LEGEND_POS_MAP[LEGEND_POS_L] =  c_oAscChartLegendShowSettings.left        ;
+REV_LEGEND_POS_MAP[LEGEND_POS_T] =  c_oAscChartLegendShowSettings.top         ;
+REV_LEGEND_POS_MAP[LEGEND_POS_R] =  c_oAscChartLegendShowSettings.right       ;
+REV_LEGEND_POS_MAP[LEGEND_POS_B] =  c_oAscChartLegendShowSettings.bottom      ;
+REV_LEGEND_POS_MAP[LEGEND_POS_L] =  c_oAscChartLegendShowSettings.leftOverlay ;
+REV_LEGEND_POS_MAP[LEGEND_POS_R] =  c_oAscChartLegendShowSettings.rightOverlay;
 
 
 function CLegend()

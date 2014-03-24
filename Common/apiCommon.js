@@ -431,16 +431,28 @@
             this.invertValOrder   = null;
             this.logScale          = null;
             this.logBase          = null;
-            this.units               = null;
+
+            this.dispUnitsRule    = null;
+            this.units            = null;
+
+
+
             this.showUnitsOnChart = null;
             this.majorTickMark      = null;
             this.minorTickMark      = null;
             this.tickLabelsPos      = null;
             this.crossesRule        = null;
             this.crosses            = null;
+            this.axisType           = c_oAscAxisType.val;
         }
         asc_ValAxisSettings.prototype =
         {
+
+            putAxisType: function(v)
+            {
+                this.axisType = v;
+            },
+
             putMinValRule: function(v)
             {
                 this.minValRule = v;
@@ -499,6 +511,22 @@
             },
 
 
+
+            putDispUnitsRule: function(v)
+            {
+                this.dispUnitsRule = v;
+            },
+
+            getAxisType: function()
+            {
+                return this.axisType;
+            },
+
+            getDispUnitsRule: function()
+            {
+                return this.dispUnitsRule;
+            },
+
             getMinValRule: function()
             {
                 return this.minValRule;
@@ -545,7 +573,7 @@
             },
             getTickLabelsPos: function()
             {
-                return this.tickLabelPos;
+                return this.tickLabelsPos;
             },
             getCrossesRule: function()
             {
@@ -573,6 +601,11 @@
         prot["putCrossesRule"]      = prot.putCrossesRule      ;
         prot["putCrosses"]          = prot.putCrosses          ;
 
+         prot["putDispUnitsRule"]          = prot.putDispUnitsRule;
+         prot["getDispUnitsRule"]          = prot.getDispUnitsRule;
+
+        prot["putAxisType"]         = prot.putAxisType;
+        prot["getAxisType"]         = prot.getAxisType;
         prot["getMinValRule"]       = prot.getMinValRule       ;
         prot["getMinVal"]           = prot.getMinVal           ;
         prot["getMaxValRule"]       = prot.getMaxValRule       ;
@@ -598,17 +631,18 @@
         this.intervalBetweenLabels     = null;
         this.invertCatOrder            = null;
         this.labelsAxisDistance        = null;
-        this.axisType                  = null;
         this.majorTickMark             = null;
         this.minorTickMark             = null;
         this.tickLabelsPos             = null;
         this.crossesRule               = null;
         this.crosses                   = null;
         this.labelsPosition            = null;
+        this.axisType                  = c_oAscAxisType.cat;
     }
 
     asc_CatAxisSettings.prototype =
     {
+
         putIntervalBetweenTick: function(v)
         {
             this.intervalBetweenTick = v;

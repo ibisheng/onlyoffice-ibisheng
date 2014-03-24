@@ -1016,6 +1016,17 @@ CTextBody.prototype =
         this.content.Recalculate_Page(0, true);
         return {w: this.content.Content[0].Lines[0].Ranges[0].W+0.1, h: this.content.Get_SummaryHeight()+0.1};
     },
+
+    recalculateByMaxWord: function()
+    {
+        var max_content = this.content.Recalculate_MinMaxContentWidth().Max;
+        this.content.Set_ApplyToAll(true);
+        this.content.Set_ParagraphAlign(align_Center);
+        this.content.Set_ApplyToAll(false);
+        this.content.Reset(0, 0,max_content, 20000);
+        this.content.Recalculate_Page(0, true);
+        return {w: max_content, h: this.content.Get_SummaryHeight()};
+    },
 	
     getRectWidth: function(maxWidth)
     {
