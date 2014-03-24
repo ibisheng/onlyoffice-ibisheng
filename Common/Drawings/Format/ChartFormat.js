@@ -3133,8 +3133,14 @@ CValAx.prototype =
             scaling.setOrientation(props.invertValOrder ? ORIENTATION_MAX_MIN : ORIENTATION_MIN_MAX);
 
 
-        if(isRealBool(props.logScale) && isRealNumber(props.logBase) && props.logBase > 0)
-            scaling.setLogBase(props.logBase);
+        if(isRealBool(props.logScale))
+        {
+
+            if(props.logScale && isRealNumber(props.logBase) && props.logBase >= 2 && props.logBase <=1000)
+                scaling.setLogBase(props.logBase);
+            else if(!props.logBase)
+                scaling.setLogBase(null);
+        }
 
         if(isRealNumber(props.units))
         {

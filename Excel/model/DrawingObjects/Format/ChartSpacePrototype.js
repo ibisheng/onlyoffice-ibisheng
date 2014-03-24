@@ -1883,6 +1883,16 @@ CChartSpace.prototype.recalculateAxis = function()
                         max_width = cur_width;
                     y_ax.labels.arrLabels.push(dlbl);
                 }
+
+                if(isRealObject(y_ax.scaling) && isRealNumber(y_ax.scaling.logBase) && y_ax.scaling.logBase >= 2 && y_ax.scaling.logBase <= 1000)
+                {
+                    for(i = 0; i < arr_val.length; ++i)
+                    {
+                        arr_val[i] = Math.log(arr_val[i])/Math.log(y_ax.scaling.logBase);
+                    }
+                }
+
+
                 //пока расстояние между подписями и краем блока с подписями берем размер шрифта.
                 var hor_gap = y_ax.labels.arrLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*(25.4/72);
                 y_ax.labels.extX = max_width + hor_gap;
@@ -1907,6 +1917,14 @@ CChartSpace.prototype.recalculateAxis = function()
                     {
                         var calc_value = arr_x_val[i]*multiplier;
                         string_pts.push({val:calc_value + ""});
+                    }
+                }
+
+                if(isRealObject(x_ax.scaling) && isRealNumber(x_ax.scaling.logBase) && x_ax.scaling.logBase >= 2 && x_ax.scaling.logBase <= 1000)
+                {
+                    for(i = 0; i < arr_x_val.length; ++i)
+                    {
+                        arr_x_val[i] = Math.log(arr_x_val[i])/Math.log(x_ax.scaling.logBase);
                     }
                 }
 
@@ -2291,10 +2309,30 @@ CChartSpace.prototype.recalculateAxis = function()
                     }
                 }
 
+
+                if(isRealObject(y_ax.scaling) && isRealNumber(y_ax.scaling.logBase) && y_ax.scaling.logBase >= 2 && y_ax.scaling.logBase <= 1000)
+                {
+                    for(i = 0; i < arr_val.length; ++i)
+                    {
+                        arr_val[i] = Math.pow(y_ax.scaling.logBase, arr_val[i]);
+                    }
+                }
+
+
                 y_ax.yPoints = [];
                 for(i = 0; i < arr_val.length; ++i)
                 {
                     y_ax.yPoints.push({pos: arr_y_points[i], val: arr_val[i]});
+                }
+
+
+
+                if(isRealObject(x_ax.scaling) && isRealNumber(x_ax.scaling.logBase) && x_ax.scaling.logBase >= 2 && x_ax.scaling.logBase <= 1000)
+                {
+                    for(i = 0; i < arr_val.length; ++i)
+                    {
+                        arr_x_val[i] = Math.pow(x_ax.scaling.logBase, arr_x_val[i]);
+                    }
                 }
 
                 x_ax.xPoints = [];
@@ -2714,9 +2752,23 @@ CChartSpace.prototype.recalculateAxis = function()
                     }
                 }
                 //расчитаем подписи для вертикальной оси найдем ширину максимальной и возьмем её удвоенную за ширину подписей верт оси
+
+
+                /*если у нас шкала логарифмическая то будем вместо полученных значений использовать логарифм*/
+                if(isRealObject(val_ax.scaling) && isRealNumber(val_ax.scaling.logBase) && val_ax.scaling.logBase >= 2 && val_ax.scaling.logBase <= 1000)
+                {
+                    for(i = 0; i < arr_val.length; ++i)
+                    {
+                        arr_val[i] = Math.log(arr_val[i])/Math.log(val_ax.scaling.logBase);
+                    }
+                }
+
+
+
                 val_ax.labels = new CValAxisLabels(this);
                 var max_width = 0;
                 val_ax.yPoints = [];
+
 
                 for(i = 0; i < arr_strings.length; ++i)
                 {
@@ -3483,6 +3535,13 @@ CChartSpace.prototype.recalculateAxis = function()
                     }
                 }
                 val_ax.yPoints = [];
+                if(isRealObject(val_ax.scaling) && isRealNumber(val_ax.scaling.logBase) && val_ax.scaling.logBase >= 2 && val_ax.scaling.logBase <= 1000)
+                {
+                    for(i = 0; i < arr_val.length; ++i)
+                    {
+                        arr_val[i] = Math.pow(val_ax.scaling.logBase, arr_val[i]);
+                    }
+                }
                 for(i = 0; i < arr_val_labels_points.length; ++i)
                 {
                     val_ax.yPoints[i] = {val:arr_val[i], pos: arr_val_labels_points[i]};
@@ -3666,6 +3725,16 @@ CChartSpace.prototype.recalculateAxis = function()
                         arr_strings.push(calc_value + "");
                     }
                 }
+
+                /*если у нас шкала логарифмическая то будем вместо полученных значений использовать логарифм*/
+                if(isRealObject(val_ax.scaling) && isRealNumber(val_ax.scaling.logBase) && val_ax.scaling.logBase >= 2 && val_ax.scaling.logBase <= 1000)
+                {
+                    for(i = 0; i < arr_val.length; ++i)
+                    {
+                        arr_val[i] = Math.log(arr_val[i])/Math.log(val_ax.scaling.logBase);
+                    }
+                }
+
                 //расчитаем подписи горизонтальной оси значений
                 val_ax.labels = new CValAxisLabels(this);
                 var max_height = 0;
@@ -4207,6 +4276,14 @@ CChartSpace.prototype.recalculateAxis = function()
                     }
                 }
                 val_ax.xPoints = [];
+
+                if(isRealObject(val_ax.scaling) && isRealNumber(val_ax.scaling.logBase) && val_ax.scaling.logBase >= 2 && val_ax.scaling.logBase <= 1000)
+                {
+                    for(i = 0; i < arr_val.length; ++i)
+                    {
+                        arr_val[i] = Math.pow(val_ax.scaling.logBase, arr_val[i]);
+                    }
+                }
                 for(i = 0; i < arr_val_labels_points.length; ++i)
                 {
                     val_ax.xPoints[i] = {val:arr_val[i], pos: arr_val_labels_points[i]};
