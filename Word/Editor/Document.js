@@ -9603,6 +9603,7 @@ CDocument.prototype =
             this.Create_NewHistoryPoint();
         }
 
+        var OldCurPage = this.CurPage;
         this.CurPage = PageIndex;
 
         if ( true === editor.isStartAddShape && docpostype_HdrFtr != this.CurPos.Type )
@@ -9618,6 +9619,52 @@ CDocument.prototype =
         }
         else
         {
+            if ( true === e.ShiftKey )
+            {
+                if ( true === this.Is_SelectionUse() )
+                {
+                    this.Selection.Start = false;
+                    this.Selection_SetEnd( X, Y, e );
+                    this.Document_UpdateSelectionState();
+
+                    return;
+                }
+                else
+                {
+                    var CurPara = this.Get_CurrentParagraph();
+
+                    if ( null !== CurPara )
+                    {
+                        var MouseEvent = new CMouseEventHandler();
+
+                        MouseEvent.ClickCount = 1;
+                        MouseEvent.Type = g_mouse_event_type_down;
+
+                        var OldX = CurPara.CurPos.RealX;
+                        var OldY = CurPara.CurPos.RealY;
+
+                        if ( true === CurPara.Parent.Is_DrawingShape() )
+                        {
+                            var DrawMatrix = CurPara.Parent.Parent.parent.GraphicObj.transformText;
+
+                            var _OldX = DrawMatrix.TransformPointX(OldX, OldY);
+                            var _OldY = DrawMatrix.TransformPointY(OldX, OldY);
+
+                            OldX = _OldX;
+                            OldY = _OldY;
+                        }
+
+                        this.CurPage = CurPara.Get_StartPage_Absolute() + CurPara.CurPos.PagesPos;
+                        this.Selection_SetStart( OldX, OldY, MouseEvent );
+
+                        this.CurPage = PageIndex;
+                        this.Selection_SetEnd( X, Y, e );
+
+                        return;
+                    }
+                }
+            }
+
             this.Selection_SetStart( X, Y, e );
 
             if ( e.ClickCount <= 1 )
@@ -12245,21 +12292,24 @@ CDocument.prototype =
         {
             State.Type = docpostype_Content;
 
+            var Para = null;
+
             if ( true === this.Selection.Use )
             {
                 if ( selectionflag_Numbering === this.Selection.Flag )
                 {
-                    var FirstPara = this.Content[this.Selection.Data[0]];
-                    State.Id = FirstPara.Get_Id();
+                    Para = this.Content[this.Selection.Data[0]];
                 }
                 else // if ( selectionflag_Common === this.Selection.Flag )
                 {
-                    var LastPara = this.Content[this.Selection.EndPos];
-                    State.Id = LastPara.Get_Id();
+                    Para = this.Content[this.Selection.EndPos];
                 }
             }
             else
-                State.Id = this.Content[this.CurPos.ContentPos].Get_Id();
+                Para = this.Content[this.CurPos.ContentPos];
+
+            State.Id     = Para.Get_Id();
+            State.CurPos = Para.Get_ParaContentPos(false, false);
         }
 
         return State;
@@ -12326,7 +12376,13 @@ CDocument.prototype =
 
             this.CurPos.Type       = docpostype_Content;
             this.CurPos.ContentPos = Pos;
-            this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos();
+
+            if ( true !== bFlag )
+                this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos();
+            else
+            {
+                this.Content[this.CurPos.ContentPos].Set_ParaContentPos( State.CurPos );
+            }
         }
     },
 //-----------------------------------------------------------------------------------

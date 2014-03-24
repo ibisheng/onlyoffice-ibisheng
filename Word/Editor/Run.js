@@ -3106,6 +3106,13 @@ ParaRun.prototype =
     Set_ParaContentPos : function(ContentPos, Depth)
     {
         var Pos = ContentPos.Get(Depth);
+
+        if ( Pos > this.Content.length )
+            Pos = this.Content.length;
+
+        if ( Pos < 0 )
+            Pos = 0;
+
         this.State.ContentPos = Pos;
     },
 
@@ -6035,8 +6042,8 @@ ParaRun.prototype =
 function CParaRunSelection()
 {
     this.Use      = false;
-    this.StartPos = false;
-    this.EndPos   = false;
+    this.StartPos = 0;
+    this.EndPos   = 0;
 }
 
 function CParaRunState()
