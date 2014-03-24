@@ -418,3 +418,8 @@ window.native.Call_TurnOnRecalculate = function()
     _api.WordControl.m_oLogicDocument.TurnOffRecalc = false;
     _api.WordControl.m_oLogicDocument.Recalculate();
 };
+
+window.native.Call_CheckTargetUpdate = function()
+{
+    _api.WordControl.m_oLogicDocument.CheckTargetUpdate();
+};
