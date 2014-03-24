@@ -445,22 +445,38 @@ CChartsDrawer.prototype =
 				leftDownPointY = valAx.labels.y;
 
 			
-			leftDownPointX = valAx.xPoints[0].pos;
+			if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
+				leftDownPointX = valAx.xPoints[0].pos;
+			else
+				leftDownPointX = valAx.xPoints[valAx.xPoints.length - 1].pos;
 			
 			
 			if(catAx.yPoints.length > 1)
 			{
-				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
-					rightUpPointY = catAx.yPoints[0].pos - Math.abs((catAx.yPoints[1].pos - catAx.yPoints[0].pos) / 2);
+				if(catAx.scaling.orientation == ORIENTATION_MIN_MAX)
+				{
+					if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+						rightUpPointY = catAx.yPoints[catAx.yPoints.length - 1].pos - Math.abs((catAx.yPoints[1].pos - catAx.yPoints[0].pos) / 2);
+					else
+						rightUpPointY = catAx.yPoints[catAx.yPoints.length - 1].pos;
+				}
 				else
-					rightUpPointY = catAx.yPoints[catAx.yPoints.length - 1].pos;
+				{
+					if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+						rightUpPointY = catAx.yPoints[0].pos - Math.abs((catAx.yPoints[1].pos - catAx.yPoints[0].pos) / 2);
+					else
+						rightUpPointY = catAx.yPoints[0].pos;
+				}
+			
 			}
 			else
 				rightUpPointY = catAx.labels.x;
 
 			
-			rightUpPointX = valAx.xPoints[valAx.xPoints.length - 1].pos;
-			
+			if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
+				rightUpPointX = valAx.xPoints[valAx.xPoints.length - 1].pos;
+			else
+				rightUpPointX = valAx.xPoints[0].pos
 			
 			
 			if(catAx.labels && !catAx.bDelete)
@@ -3012,8 +3028,13 @@ CChartsDrawer.prototype =
 							result =  (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
 					}	
 					else	
-						result = (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
-					
+					{
+						if(plotArea.valAx.scaling.orientation == ORIENTATION_MIN_MAX)
+							result = (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+						else
+							result = - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+					}
+						
 					break;
 				}
 			}
@@ -4296,7 +4317,7 @@ drawHBarChart.prototype =
 		var widthOverLap = individualBarHeight * (overlap / 100);
 		var hmargin = (this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100 * individualBarHeight) / 2;
 		
-		var width, startX, startY, diffYVal, val, paths, seriesHeight = [], seria, startXColumnPosition, startYPosition;
+		var width, startX, startY, diffYVal, val, paths, seriesHeight = [], seria, startXColumnPosition, startYPosition, newStartX, newStartY;
 		
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 		
@@ -4314,19 +4335,68 @@ drawHBarChart.prototype =
 
 				seriesHeight[i][j] = startXColumnPosition.width;
 				
+				
+
+				
 				//стартовая позиция колонки Y
+				if(this.cShapeDrawer.chart.plotArea.catAx.scaling.orientation == ORIENTATION_MIN_MAX)
+				{
+					if(yPoints[1] && yPoints[1].pos)
+						startYPosition = yPoints[j].pos + Math.abs((yPoints[1].pos - yPoints[0].pos) / 2);
+					else
+						startYPosition = yPoints[j].pos + Math.abs(yPoints[0].pos - this.cShapeDrawer.chart.plotArea.valAx.posY);
+				}	
+				else
+				{
+					if(yPoints[1] && yPoints[1].pos)
+						startYPosition = yPoints[j].pos - Math.abs((yPoints[1].pos - yPoints[0].pos) / 2);
+					else
+						startYPosition = yPoints[j].pos - Math.abs(yPoints[0].pos - this.cShapeDrawer.chart.plotArea.valAx.posY);
+				}
+					
+				
+				if(this.cShapeDrawer.chart.plotArea.catAx.scaling.orientation == ORIENTATION_MIN_MAX)
+				{
+					if(i == 0)
+						startY = startYPosition * this.chartProp.pxToMM - hmargin - i * (individualBarHeight);
+					else
+						startY = startYPosition * this.chartProp.pxToMM - hmargin - (i * individualBarHeight - i * widthOverLap);
+				}
+				else
+				{
+					if(i == 0)
+						startY = startYPosition * this.chartProp.pxToMM + hmargin + i * (individualBarHeight);
+					else
+						startY = startYPosition * this.chartProp.pxToMM + hmargin + (i * individualBarHeight - i * widthOverLap);
+				}
+				
+				
+
+				newStartY = startY;
+				if(this.cShapeDrawer.chart.plotArea.catAx.scaling.orientation != ORIENTATION_MIN_MAX)
+						newStartY = startY + individualBarHeight;
+				
+				
+				
+				
+				/*//стартовая позиция колонки Y
 				if(j != 0)
 					startYPosition = yPoints[j].pos - (yPoints[j].pos - yPoints[j - 1].pos) / 2;
 				else
 					startYPosition = this.cShapeDrawer.chart.plotArea.valAx.posY;
+				
 				if(i == 0)
 					startY = startYPosition * this.chartProp.pxToMM - hmargin - i * (individualBarHeight);
 				else
-					startY = startYPosition * this.chartProp.pxToMM - hmargin - (i * individualBarHeight - i * widthOverLap);
+					startY = startYPosition * this.chartProp.pxToMM - hmargin - (i * individualBarHeight - i * widthOverLap);*/
+				
+				newStartX = startX;
+				if(this.cShapeDrawer.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX && (this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked"))
+					newStartX = startX - width;
 				
 				if(height != 0)
 				{
-					paths = this._calculateRect(startX, startY / this.chartProp.pxToMM, width, individualBarHeight / this.chartProp.pxToMM);
+					paths = this._calculateRect(newStartX, newStartY / this.chartProp.pxToMM, width, individualBarHeight / this.chartProp.pxToMM);
 					
 					if(!this.paths.series)
 						this.paths.series = [];
@@ -4350,8 +4420,16 @@ drawHBarChart.prototype =
 				if(seriesHeight[k][j] && ((val > 0 && seriesHeight[k][j] > 0) || (val < 0 && seriesHeight[k][j] < 0)))
 					diffYVal += seriesHeight[k][j];
 			}
-			startY = nullPositionOX + diffYVal;
+			
+			if(this.cShapeDrawer.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX)
+				startY = nullPositionOX - diffYVal;
+			else
+				startY = nullPositionOX + diffYVal;
+				
 			width = this.cChartDrawer.getYPosition(val, xPoints, true) * this.chartProp.pxToMM - nullPositionOX;
+			
+			if(this.cShapeDrawer.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX)
+				width = - width;
 		}
 		else if(this.chartProp.subType == "stackedPer")
 		{
@@ -4375,9 +4453,16 @@ drawHBarChart.prototype =
 				}
 				this.summBarVal[j] = temp;
 			}
-			
+		
+			if(this.cShapeDrawer.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX)
+				startY = nullPositionOX - diffYVal;
+			else
+				startY = nullPositionOX + diffYVal;
+				
 			width = this.cChartDrawer.getYPosition((val / this.summBarVal[j]), xPoints, true) * this.chartProp.pxToMM - nullPositionOX;
-			startY = nullPositionOX + diffYVal;
+			
+			if(this.cShapeDrawer.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX)
+				width = - width;
 		}
 		else
 		{
@@ -6871,7 +6956,7 @@ valAxisChart.prototype =
 					{
 						for(var n = 0; n < this.chartProp.numhMinorlines; n++)
 						{
-							posMinorY = posY + n * minorStep;
+							posMinorY = posY - n * minorStep;
 							if(!this.paths.minorTickMarks)
 								this.paths.minorTickMarks = [];
 							if(!this.paths.minorTickMarks[i])
@@ -6918,6 +7003,9 @@ valAxisChart.prototype =
 	_drawTickMark: function()
 	{
 		var pen, path;
+		if(!this.paths.tickMarks)
+			return;
+		
 		for(var i = 0; i < this.paths.tickMarks.length; i++)
 		{
 			pen = this.chartSpace.chart.plotArea.valAx.compiledTickMarkLn;
@@ -6926,7 +7014,7 @@ valAxisChart.prototype =
 			this._drawPath(path, pen);
 			
 			//промежуточные линии
-			if(i != this.chartProp.numvlines && this.paths.minorTickMarks)
+			if(i != (this.paths.tickMarks.length - 1) && this.paths.minorTickMarks)
 			{
 				for(var n = 0; n < this.paths.minorTickMarks[i].length ; n++)
 				{
