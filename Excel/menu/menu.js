@@ -3679,6 +3679,17 @@
     $("#crossesMaxAxValInput").change(function(){this.checked && $("#crossesValInput").attr("disabled", "disabled");});
 
 
+
+    $("#fixedMinValValAxisCheckBoxX").change(function(){this.checked && $("#minValueAxisInputX").removeAttr("disabled");});
+    $("#autoMinValValAxisCheckBoxX").change(function(){this.checked && $("#minValueAxisInputX").attr("disabled", "disabled");});
+    $("#fixedMaxValValAxisCheckBoxX").change(function(){this.checked && $("#maxValueAxisInputX").removeAttr("disabled");});
+    $("#autoMaxValValAxisCheckBoxX").change(function(){this.checked && $("#maxValueAxisInputX").attr("disabled", "disabled");});
+    $("#logScaleInputX").change(function(){this.checked ? $("#logBaseInputX").removeAttr("disabled") : $("#logBaseInputX").attr("disabled", "disabled")});
+    $("#crossesValAxValInputX").change(function(){this.checked && $("#crossesValInputX").removeAttr("disabled");});
+    $("#crossesAutoValAxInputX").change(function(){this.checked && $("#crossesValInputX").attr("disabled", "disabled");});
+    $("#crossesMaxAxValInputX").change(function(){this.checked && $("#crossesValInputX").attr("disabled", "disabled");});
+
+
     $(".leftPanelCharPropsItemDiv").mousedown(function()
     {
         $(".leftPanelCharPropsItemDiv").removeClass("left_panel_chart_props_select");
@@ -3775,6 +3786,68 @@
             {
                 axis_settings.putCrossesRule(c_oAscCrossesRule.value);
                 axis_settings.putCrosses(parseFloat($("#crossesValInput").attr("value")));
+            }
+            api.asc_editChartDrawingObject(settings);
+        }
+    );
+
+
+    $("#valApplyValAxisPropsX").click(
+        function()
+        {
+            var settings = new asc_ChartSettings();
+            var axis_settings = new asc_ValAxisSettings();
+            settings.putHorAxisProps(axis_settings);
+            if($("#autoMinValValAxisCheckBoxX").attr("checked"))
+            {
+                axis_settings.putMinValRule(c_oAscValAxisRule.auto)
+            }
+            else
+            {
+                axis_settings.putMinValRule(c_oAscValAxisRule.fixed);
+                axis_settings.putMinVal(parseInt($("#minValueAxisInputX").attr("value")));
+            }
+            if($("#autoMaxValValAxisCheckBoxX").attr("checked"))
+            {
+                axis_settings.putMaxValRule(c_oAscValAxisRule.auto)
+            }
+            else
+            {
+                axis_settings.putMaxValRule(c_oAscValAxisRule.fixed);
+                axis_settings.putMaxVal(parseInt($("#maxValueAxisInputX").attr("value")));
+            }
+            $("#invertValOrderValAxisInputX").attr("checked") ? axis_settings.putInvertValOrder(true) : axis_settings.putInvertValOrder(false);
+            if($("#logScaleInputX").attr("checked"))
+            {
+                axis_settings.putLogScale(true);
+                axis_settings.putLogBase(parseFloat($("#logBaseInputX").attr("value")));
+            }
+            else
+            {
+                axis_settings.putLogScale(false);
+            }
+            axis_settings.putDispUnitsRule(c_oAscValAxUnits[$("#unitsSelectX").attr("value")]);
+            if($("#showUnitsLabelsX").attr("checked"))
+                axis_settings.putShowUnitsOnChart(true);
+            else
+                axis_settings.putShowUnitsOnChart(false);
+
+            axis_settings.putMajorTickMark(c_oAscTickMark[$("#majorTickMarkSelectValAxX").attr("value")]);
+            axis_settings.putMinorTickMark(c_oAscTickMark[$("#minorTickMarkSelectValAxX").attr("value")]);
+            axis_settings.putTickLabelsPos(c_oAscTickLabelsPos[$("#tickLabelsSelectValAxX").attr("value")]);
+
+            if($("#crossesAutoValAxInputX").attr("checked"))
+            {
+                axis_settings.putCrossesRule(c_oAscCrossesRule.auto);
+            }
+            else if($("#crossesMaxAxValInputX").attr("checked"))
+            {
+                axis_settings.putCrossesRule(c_oAscCrossesRule.maxValue);
+            }
+            else
+            {
+                axis_settings.putCrossesRule(c_oAscCrossesRule.value);
+                axis_settings.putCrosses(parseFloat($("#crossesValInputX").attr("value")));
             }
             api.asc_editChartDrawingObject(settings);
         }
