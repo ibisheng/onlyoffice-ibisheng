@@ -2763,6 +2763,704 @@
         $("#chartVertAxisSelect").attr("value", value);
     });
 
+
+    api.asc_registerCallback("asc_onChangeSelectDrawingObjects", function(drawingProps)
+    {
+        var chart_props = drawingProps.chartProps;
+        if(!chart_props)
+        {
+            $("#chartPropsMenuDiv").css("display", "none");
+        }
+        else
+        {
+            $("#chartPropsMenuDiv").css("display", "");
+            var val = $("#changeChartTypeSelect").attr("value");
+            var map = {};
+             map[c_oAscChartTypeSettings.barNormal           ] =  "barNormal"           ;
+             map[c_oAscChartTypeSettings.barStacked          ] =  "barStacked"          ;
+             map[c_oAscChartTypeSettings.barStackedPer       ] =  "barStackedPer"       ;
+             map[c_oAscChartTypeSettings.lineNormal          ] =  "lineNormal"          ;
+             map[c_oAscChartTypeSettings.lineStacked         ] =  "lineStacked"         ;
+             map[c_oAscChartTypeSettings.lineStackedPer      ] =  "lineStackedPer"      ;
+             map[c_oAscChartTypeSettings.lineNormalMarker    ] =  "lineNormalMarker"    ;
+             map[c_oAscChartTypeSettings.lineStackedMarker   ] =  "lineStackedMarker"   ;
+             map[c_oAscChartTypeSettings.lineStackedPerMarker] =  "lineStackedPerMarker";
+             map[c_oAscChartTypeSettings.pie                 ] =  "pie"                 ;
+             map[c_oAscChartTypeSettings.hBarNormal          ] =  "hBarNormal"          ;
+             map[c_oAscChartTypeSettings.hBarStacked         ] =  "hBarStacked"         ;
+             map[c_oAscChartTypeSettings.hBarStackedPer      ] =  "hBarStackedPer"      ;
+             map[c_oAscChartTypeSettings.areaNormal          ] =  "areaNormal"          ;
+             map[c_oAscChartTypeSettings.areaStacked         ] =  "areaStacked"         ;
+             map[c_oAscChartTypeSettings.areaStackedPer      ] =  "areaStackedPer"      ;
+             map[c_oAscChartTypeSettings.scatter             ] =  "scatter"             ;
+             map[c_oAscChartTypeSettings.doughnut            ] =  "doughnut"            ;
+
+
+            /*Тип диаграммы*/
+            var chart_type = map[chart_props.getType()];
+            if(typeof chart_type === "string")
+            {
+                $("#changeChartTypeSelect").attr("value", chart_type);
+            }
+            else
+            {
+                $("#changeChartTypeSelect").attr("value", "lineNormal");
+            }
+
+            /*стиль диаграммы*/
+            $("#styleIndexInput").attr("value", chart_props.getStyle()+"");
+
+            /*заголовок диаграммы*/
+            map = {};
+            map[c_oAscChartTitleShowSettings.none]      = "none";
+            map[c_oAscChartTitleShowSettings.overlay]   = "overlay";
+            map[c_oAscChartTitleShowSettings.noOverlay] = "no_overlay";
+
+            $("#chartTitleSelect").attr("value", map[chart_props.getTitle()]);
+
+            /*TODO: здесь должны быть настройки для вертикальной и горизонтальной оси*/
+
+           /*Легенда*/
+            map = {};
+            map[c_oAscChartLegendShowSettings.none        ] = "none"         ;
+            map[c_oAscChartLegendShowSettings.left        ] = "left"         ;
+            map[c_oAscChartLegendShowSettings.top         ] = "top"          ;
+            map[c_oAscChartLegendShowSettings.right       ] = "right"        ;
+            map[c_oAscChartLegendShowSettings.bottom      ] = "bottom"       ;
+            map[c_oAscChartLegendShowSettings.leftOverlay ] = "left_overlay";
+            map[c_oAscChartLegendShowSettings.rightOverlay] = "right_overlay" ;
+            map[c_oAscChartLegendShowSettings.layout      ] = "layout"       ;
+            $("#chartLegendSelect").attr("value", map[chart_props.getLegendPos()]);
+
+            /*Подписи данных*/
+            map = {};
+            map[c_oAscChartDataLabelsPos.none  ] =  "none"     ;
+            map[c_oAscChartDataLabelsPos.ctr   ] =  "center"   ;
+            map[c_oAscChartDataLabelsPos.inEnd ] =  "inner_top";
+            map[c_oAscChartDataLabelsPos.inBase] =  "in_base"  ;
+            map[c_oAscChartDataLabelsPos.outEnd] =  "out_end"  ;
+            map[c_oAscChartDataLabelsPos.b]      =  "bottom"  ;
+            map[c_oAscChartDataLabelsPos.bestFit] = "best_fit"  ;
+            map[c_oAscChartDataLabelsPos.l]      = "left"  ;
+            map[c_oAscChartDataLabelsPos.r]      = "right"  ;
+            map[c_oAscChartDataLabelsPos.t]      = "top"  ;
+            $("#chartDataLabels").attr("value", map[chart_props.getDataLabelsPos()]);
+
+            /*Содержание подписей данных*/
+            if(chart_props.getShowVal())
+                $("#dataLabelsCheckBoxVal").attr("checked", "checked");
+            else
+                $("#dataLabelsCheckBoxVal").removeAttr("checked");
+            if(chart_props.getShowSerName())
+                $("#dataLabelsCheckBoxSerName").attr("checked", "checked");
+            else
+                $("#dataLabelsCheckBoxSerName").removeAttr("checked");
+            if(chart_props.getShowCatName())
+                $("#dataLabelsCheckBoxCatName").attr("checked", "checked");
+            else
+                $("#dataLabelsCheckBoxCatName").removeAttr("checked");
+            /*раздеоитель подписей данных*/
+            var separator_str = chart_props.getSeparator();
+            if(!(typeof  separator_str === "string" && separator_str.length > 0))
+                separator_str = ",";
+            $("#dataLabelsSeparatorInput").attr("value", separator_str);
+
+
+            //горизонтальные линии сетки
+            var hor_grid_lines = chart_props.getHorGridLines();
+            if(hor_grid_lines === c_oAscGridLinesSettings.none)
+            {
+                $("#chartHorGridLines").attr("value", "none");
+            }
+            else if(hor_grid_lines === c_oAscGridLinesSettings.minor)
+            {
+                $("#chartHorGridLines").attr("value", "minor");
+            }
+            else if(hor_grid_lines === c_oAscGridLinesSettings.major)
+            {
+                $("#chartHorGridLines").attr("value", "major");
+            }
+            else if(hor_grid_lines === c_oAscGridLinesSettings.majorMinor)
+            {
+                $("#chartHorGridLines").attr("value", "minor_major");
+            }
+
+            //вертикальные линии сетки
+            var vert_grid_lines = chart_props.getHorGridLines();
+            if(vert_grid_lines === c_oAscGridLinesSettings.none)
+            {
+                $("#chartVertGridLines").attr("value", "none");
+            }
+            else if(vert_grid_lines === c_oAscGridLinesSettings.minor)
+            {
+                $("#chartVertGridLines").attr("value", "minor");
+            }
+            else if(vert_grid_lines === c_oAscGridLinesSettings.major)
+            {
+                $("#chartVertGridLines").attr("value", "major");
+            }
+            else if(vert_grid_lines === c_oAscGridLinesSettings.majorMinor)
+            {
+                $("#chartVertGridLines").attr("value", "minor_major");
+            }
+
+            $(".right_panel_drawing_props").removeClass("horAxisPropsRightPanelActive");
+            $(".right_panel_drawing_props").removeClass("vertAxisPropsRightPanelActive");
+            //горизонтальная ось
+            var hor_axis_props = chart_props.getHorAxisProps();
+            if(hor_axis_props)
+            {
+                if(hor_axis_props.getAxisType() === c_oAscAxisType.cat || hor_axis_props.getAxisType() === c_oAscAxisType.date)
+                {
+                    $("#rightPanelCatAxProps").addClass("horAxisPropsRightPanelActive");
+                    $("#intervalBetweenTickInput").attr("value", hor_axis_props.getIntervalBetweenTick()+"");
+                    if(hor_axis_props.getIntervalBetweenLabelsRule() === c_oAscBetweenLabelsRule.auto)
+                    {
+                        $("#autoIntervalBetweenLabelsInputCat").attr("checked", "checked");
+                        $("#intervalBetweenLabelsInputCatAxManual").attr("disabled", "disabled");
+                        $("#intervalBetweenLabelsInputCatAxManual").attr("value", "");
+                    }
+                    else
+                    {
+                        $("#manualIntervalBetweenLabelsInputCat").attr("checked", "checked");
+                        $("#intervalBetweenLabelsInputCatAxManual").removeAttr("disabled");
+                        $("#intervalBetweenLabelsInputCatAxManual").attr("value", hor_axis_props.getIntervalBetweenLabels() + "");
+                    }
+                    if(hor_axis_props.getInvertCatOrder())
+                    {
+                        $("#invertCatOrderCheckBox").attr("checked", "checked");
+                    }
+                    else
+                    {
+                        $("#invertCatOrderCheckBox").removeAttr("checked");
+                    }
+                    $("#labelsAxisInputDistanceInput").attr("value", hor_axis_props.getLabelsAxisDistance());
+                    //TODO: сделать возможность выбора типа оси
+                    var major_tick_mark = hor_axis_props.getMajorTickMark();
+                    if(major_tick_mark === c_oAscTickMark.TICK_MARK_CROSS)
+                        $("#majorTickMarkSelectCatAx").attr("value", "TICK_MARK_CROSS");
+                    else if(major_tick_mark === c_oAscTickMark.TICK_MARK_IN)
+                        $("#majorTickMarkSelectCatAx").attr("value", "TICK_MARK_IN");
+                    else if(major_tick_mark === c_oAscTickMark.TICK_MARK_NONE)
+                        $("#majorTickMarkSelectCatAx").attr("value", "TICK_MARK_NONE");
+                    else if(major_tick_mark === c_oAscTickMark.TICK_MARK_OUT)
+                        $("#majorTickMarkSelectCatAx").attr("value", "TICK_MARK_OUT");
+
+                    var minor_tick_mark = hor_axis_props.getMinorTickMark();
+                    if(minor_tick_mark === c_oAscTickMark.TICK_MARK_CROSS)
+                        $("#minorTickMarkSelectCatAx").attr("value", "TICK_MARK_CROSS");
+                    else if(minor_tick_mark === c_oAscTickMark.TICK_MARK_IN)
+                        $("#minorTickMarkSelectCatAx").attr("value", "TICK_MARK_IN");
+                    else if(minor_tick_mark === c_oAscTickMark.TICK_MARK_NONE)
+                        $("#minorTickMarkSelectCatAx").attr("value", "TICK_MARK_NONE");
+                    else if(minor_tick_mark === c_oAscTickMark.TICK_MARK_OUT)
+                        $("#minorTickMarkSelectCatAx").attr("value", "TICK_MARK_OUT");
+
+                    var tick_labels_pos = hor_axis_props.getTickLabelsPos();
+                    if(tick_labels_pos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_HIGH)
+                        $("#tickLabelsSelectCatAx").attr("value", "TICK_LABEL_POSITION_HIGH");
+                    else if(tick_labels_pos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_LOW)
+                        $("#tickLabelsSelectCatAx").attr("value", "TICK_LABEL_POSITION_LOW");
+                    else if(tick_labels_pos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO)
+                        $("#tickLabelsSelectCatAx").attr("value", "TICK_LABEL_POSITION_NEXT_TO");
+                    else if(tick_labels_pos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE)
+                        $("#tickLabelsSelectCatAx").attr("value", "TICK_LABEL_POSITION_NONE");
+
+                    var crosses_rule = hor_axis_props.getCrossesRule();
+                    if(crosses_rule === c_oAscCrossesRule.auto)
+                    {
+                        $("#crossesAutoCatAxInput").attr("checked", "checked");
+                        $("crossesCatInput").attr("value", "");
+                        $("crossesCatInput").attr("disabled", "disabled");
+                    }
+                    else if(crosses_rule === c_oAscCrossesRule.maxValue)
+                    {
+                        $("#crossesMaxAxCatInput").attr("checked", "checked");
+                        $("crossesCatInput").attr("value", "");
+                        $("crossesCatInput").attr("disabled", "disabled");
+                    }
+                    else if(crosses_rule === c_oAscCrossesRule.value)
+                    {
+                        $("#crossesCatAxValInput").attr("checked", "checked");
+                        $("crossesCatInput").attr("value", "");
+                        $("crossesCatInput").attr("disabled", hor_axis_props.getCrosses() + "");
+                    }
+                    else if(crosses_rule === c_oAscCrossesRule.minValue)
+                    {
+                        $("#crossesMinAxCatInput").attr("checked", "checked");
+                        $("crossesCatInput").attr("value", "");
+                        $("crossesCatInput").attr("disabled", "disabled");
+                    }
+
+                    if(hor_axis_props.getLabelsPosition() === c_oAscLabelsPosition.byDivisions)
+                    {
+                        $("#checkBoxByDivisionsInput").attr("checked", "checked");
+                    }
+                    else
+                    {
+                        $("#checkBoxBetweenDivisionsInput").attr("checked", "checked");
+                    }
+                }
+                else if(hor_axis_props.getAxisType() === c_oAscAxisType.val)
+                {
+                    $("#rightPanelValAxisPropsX").addClass("horAxisPropsRightPanelActive");
+                    //минимальное значение на оси
+                    if(hor_axis_props.getMinValRule() === c_oAscValAxisRule.auto)
+                    {
+                        $("#autoMinValValAxisCheckBoxX").attr("checked", "checked");
+                        $("#minValueAxisInputX").attr("disabled", "disabled");
+                        $("#minValueAxisInputX").attr("value", "");
+                    }
+                    else
+                    {
+                        $("#minValueAxisInputX").attr("disabled", "");
+                        $("#minValueAxisInputX").attr("value", hor_axis_props.getMinVal() + "");
+                    }
+                    //максимальное значение на оси
+                    if(hor_axis_props.getMaxValRule() === c_oAscValAxisRule.auto)
+                    {
+                        $("#autoMaxValValAxisCheckBoxX").attr("checked", "checked");
+                        $("#maxValueAxisInputX").attr("disabled", "disabled");
+                        $("#maxValueAxisInputX").attr("value", "");
+                    }
+                    else
+                    {
+                        $("#maxValueAxisInputX").removeAttr("disabled");
+                        $("#maxValueAxisInputX").attr("value", hor_axis_props.getMaxVal() + "");
+                    }
+
+                    //обратный порядок значений
+                    if(hor_axis_props.getInvertValOrder())
+                    {
+                        $("#invertValOrderValAxisInputX").attr("checked", "checked");
+                    }
+                    else
+                    {
+                        $("#invertValOrderValAxisInputX").removeAttr("checked");
+                    }
+
+                    //использовать ли логарифмическую шкалу
+                    if(hor_axis_props.getLogScale())
+                    {
+                        $("logScaleInputX").attr("checked", "checked");
+                        $("logBaseInputX").attr("value", hor_axis_props.getLogBase() + "");
+                        $("logBaseInputX").removeAttr("disabled");
+                    }
+                    else
+                    {
+                        $("logScaleInputX").removeAttr("checked");
+                        $("logBaseInputX").attr("value", "");
+                        $("logBaseInputX").attr("disabled", "disabled");
+                    }
+
+                    //множитель оси значений на оси
+                    var disp_units_rule = hor_axis_props.getDispUnitsRule();
+                    if(disp_units_rule === c_oAscValAxUnits.none)
+                    {
+                        $("#unitsSelectX").attr("value", "none");
+                        $("#unitCustomInputX").attr("disabled", "disabled");
+                        $("#unitCustomInputX").attr("value", "");
+                    }
+                    else if(disp_units_rule === c_oAscValAxUnits.BILLIONS)
+                    {
+                        $("#unitsSelectX").attr("value", "BILLIONS");
+                        $("#unitCustomInputX").attr("disabled", "disabled");
+                        $("#unitCustomInputX").attr("value", "");
+                    }
+                    else if(disp_units_rule === c_oAscValAxUnits.HUNDRED_MILLIONS)
+                    {
+                        $("#unitsSelectX").attr("value", "HUNDRED_MILLIONS");
+                        $("#unitCustomInputX").attr("disabled", "disabled");
+                        $("#unitCustomInputX").attr("value", "");
+                    }
+                    else if(disp_units_rule === c_oAscValAxUnits.HUNDREDS)
+                    {
+                        $("#unitsSelectX").attr("value", "HUNDREDS");
+                        $("#unitCustomInputX").attr("disabled", "disabled");
+                        $("#unitCustomInputX").attr("value", "");
+                    }
+                    else if(disp_units_rule === c_oAscValAxUnits.HUNDRED_THOUSANDS)
+                    {
+                        $("#unitsSelectX").attr("value", "HUNDRED_THOUSANDS");
+                        $("#unitCustomInputX").attr("disabled", "disabled");
+                        $("#unitCustomInputX").attr("value", "");
+                    }
+                    else if(disp_units_rule === c_oAscValAxUnits.MILLIONS)
+                    {
+                        $("#unitsSelectX").attr("value", "MILLIONS");
+                        $("#unitCustomInputX").attr("disabled", "disabled");
+                        $("#unitCustomInputX").attr("value", "");
+                    }
+                    else if(disp_units_rule === c_oAscValAxUnits.TEN_MILLIONS)
+                    {
+                        $("#unitsSelectX").attr("value", "TEN_MILLIONS");
+                        $("#unitCustomInputX").attr("disabled", "disabled");
+                        $("#unitCustomInputX").attr("value", "");
+                    }
+                    else if(disp_units_rule === c_oAscValAxUnits.TEN_THOUSANDS)
+                    {
+                        $("#unitsSelectX").attr("value", "TEN_THOUSANDS");
+                        $("#unitCustomInputX").attr("disabled", "disabled");
+                        $("#unitCustomInputX").attr("value", "");
+                    }
+                    else if(disp_units_rule === c_oAscValAxUnits.TRILLIONS)
+                    {
+                        $("#unitsSelectX").attr("value", "TRILLIONS");
+                        $("#unitCustomInputX").attr("disabled", "disabled");
+                        $("#unitCustomInputX").attr("value", "");
+                    }
+                    else if(disp_units_rule === c_oAscValAxUnits.CUSTOM)
+                    {
+                        $("#unitsSelectX").attr("value", "CUSTOM");
+                        $("#unitCustomInputX").removeAttr("disabled", "");
+                        $("#unitCustomInputX").attr("value", hor_axis_props.getUnits() + "");
+                    }
+                    //TODO: флаг показа заголовка единиц оси
+                    var major_tick_mark = hor_axis_props.getMajorTickMark();
+                    if(major_tick_mark === c_oAscTickMark.TICK_MARK_CROSS)
+                        $("#majorTickMarkSelectValAxX").attr("value", "TICK_MARK_CROSS");
+                    else if(major_tick_mark === c_oAscTickMark.TICK_MARK_IN)
+                        $("#majorTickMarkSelectValAxX").attr("value", "TICK_MARK_IN");
+                    else if(major_tick_mark === c_oAscTickMark.TICK_MARK_NONE)
+                        $("#majorTickMarkSelectValAxX").attr("value", "TICK_MARK_NONE");
+                    else if(major_tick_mark === c_oAscTickMark.TICK_MARK_OUT)
+                        $("#majorTickMarkSelectValAxX").attr("value", "TICK_MARK_OUT");
+
+
+                    var minor_tick_mark = hor_axis_props.getMinorTickMark();
+                    if(minor_tick_mark === c_oAscTickMark.TICK_MARK_CROSS)
+                        $("#minorTickMarkSelectValAxX").attr("value", "TICK_MARK_CROSS");
+                    else if(minor_tick_mark === c_oAscTickMark.TICK_MARK_IN)
+                        $("#minorTickMarkSelectValAxX").attr("value", "TICK_MARK_IN");
+                    else if(minor_tick_mark === c_oAscTickMark.TICK_MARK_NONE)
+                        $("#minorTickMarkSelectValAxX").attr("value", "TICK_MARK_NONE");
+                    else if(minor_tick_mark === c_oAscTickMark.TICK_MARK_OUT)
+                        $("#minorTickMarkSelectValAxX").attr("value", "TICK_MARK_OUT");
+
+                    var tick_labels_pos = hor_axis_props.getTickLabelsPos();
+                    if(tick_labels_pos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_HIGH)
+                        $("#tickLabelsSelectValAxX").attr("value", "TICK_LABEL_POSITION_HIGH");
+                    else if(tick_labels_pos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_LOW)
+                        $("#tickLabelsSelectValAxX").attr("value", "TICK_LABEL_POSITION_LOW");
+                    else if(tick_labels_pos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO)
+                        $("#tickLabelsSelectValAxX").attr("value", "TICK_LABEL_POSITION_NEXT_TO");
+                    else if(tick_labels_pos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE)
+                        $("#tickLabelsSelectValAxX").attr("value", "TICK_LABEL_POSITION_NONE");
+
+                    var crosses_rule = hor_axis_props.getCrossesRule();
+                    if(crosses_rule === c_oAscCrossesRule.auto)
+                    {
+                        $("#crossesAutoValAxInputX").attr("checked", "checked");
+                        $("#crossesValInputX").attr("value", "");
+                        $("#crossesValInputX").attr("disabled", "disabled");
+                    }
+                    else if(crosses_rule === c_oAscCrossesRule.maxValue)
+                    {
+                        $("#crossesMaxAxValInputX").attr("checked", "checked");
+                        $("#crossesValInputX").attr("value", "");
+                        $("#crossesValInputX").attr("disabled", "disabled");
+                    }
+                    else if(crosses_rule === c_oAscCrossesRule.minValue)
+                    {
+                        $("#crossesMinAxValInputX").attr("checked", "checked");
+                        $("#crossesValInputX").attr("value", "");
+                        $("#crossesValInputX").attr("disabled", "disabled");
+                    }
+                    else if(crosses_rule === c_oAscCrossesRule.value)
+                    {
+                        $("#crossesValAxValInputX").attr("checked", "checked");
+                        $("#crossesValInputX").attr("disabled", "");
+                        $("#crossesValInputX").attr("value", hor_axis_props.getCrosses() + "");
+                    }
+                }
+            }
+
+            var vert_axis_props = chart_props.getVertAxisProps();
+            if(vert_axis_props)
+            {
+                if(vert_axis_props.getAxisType() === c_oAscAxisType.cat || vert_axis_props.getAxisType() === c_oAscAxisType.date)
+                {
+                    $("#rightPanelCatAxProps").addClass("vertAxisPropsRightPanelActive");
+                    $("#intervalBetweenTickInput").attr("value", vert_axis_props.getIntervalBetweenTick()+"");
+                    if(vert_axis_props.getIntervalBetweenLabelsRule() === c_oAscBetweenLabelsRule.auto)
+                    {
+                        $("#autoIntervalBetweenLabelsInputCat").attr("checked", "checked");
+                        $("#intervalBetweenLabelsInputCatAxManual").attr("disabled", "disabled");
+                        $("#intervalBetweenLabelsInputCatAxManual").attr("value", "");
+                    }
+                    else
+                    {
+                        $("#manualIntervalBetweenLabelsInputCat").attr("checked", "checked");
+                        $("#intervalBetweenLabelsInputCatAxManual").attr("disabled", "");
+                        $("#intervalBetweenLabelsInputCatAxManual").attr("value", vert_axis_props.getIntervalBetweenLabels() + "");
+                    }
+                    if(vert_axis_props.getInvertCatOrder())
+                    {
+                        $("#invertCatOrderCheckBox").attr("checked", "checked");
+                    }
+                    else
+                    {
+                        $("#invertCatOrderCheckBox").attr("checked", "");
+                    }
+                    $("#labelsAxisInputDistanceInput").attr("value", vert_axis_props.getLabelsAxisDistance());
+                    //TODO: сделать возможность выбора типа оси
+                    var major_tick_mark = vert_axis_props.getMajorTickMark();
+                    if(major_tick_mark === c_oAscTickMark.TICK_MARK_CROSS)
+                        $("#majorTickMarkSelectCatAx").attr("value", "TICK_MARK_CROSS");
+                    else if(major_tick_mark === c_oAscTickMark.TICK_MARK_IN)
+                        $("#majorTickMarkSelectCatAx").attr("value", "TICK_MARK_IN");
+                    else if(major_tick_mark === c_oAscTickMark.TICK_MARK_NONE)
+                        $("#majorTickMarkSelectCatAx").attr("value", "TICK_MARK_NONE");
+                    else if(major_tick_mark === c_oAscTickMark.TICK_MARK_OUT)
+                        $("#majorTickMarkSelectCatAx").attr("value", "TICK_MARK_OUT");
+
+                    var minor_tick_mark = vert_axis_props.getMinorTickMark();
+                    if(minor_tick_mark === c_oAscTickMark.TICK_MARK_CROSS)
+                        $("#minorTickMarkSelectCatAx").attr("value", "TICK_MARK_CROSS");
+                    else if(minor_tick_mark === c_oAscTickMark.TICK_MARK_IN)
+                        $("#minorTickMarkSelectCatAx").attr("value", "TICK_MARK_IN");
+                    else if(minor_tick_mark === c_oAscTickMark.TICK_MARK_NONE)
+                        $("#minorTickMarkSelectCatAx").attr("value", "TICK_MARK_NONE");
+                    else if(minor_tick_mark === c_oAscTickMark.TICK_MARK_OUT)
+                        $("#minorTickMarkSelectCatAx").attr("value", "TICK_MARK_OUT");
+
+                    var tick_labels_pos = vert_axis_props.getTickLabelsPos();
+                    if(tick_labels_pos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_HIGH)
+                        $("#tickLabelsSelectCatAx").attr("value", "TICK_LABEL_POSITION_HIGH");
+                    else if(tick_labels_pos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_LOW)
+                        $("#tickLabelsSelectCatAx").attr("value", "TICK_LABEL_POSITION_LOW");
+                    else if(tick_labels_pos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO)
+                        $("#tickLabelsSelectCatAx").attr("value", "TICK_LABEL_POSITION_NEXT_TO");
+                    else if(tick_labels_pos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE)
+                        $("#tickLabelsSelectCatAx").attr("value", "TICK_LABEL_POSITION_NONE");
+
+                    var crosses_rule = vert_axis_props.getCrossesRule();
+                    if(crosses_rule === c_oAscCrossesRule.auto)
+                    {
+                        $("#crossesAutoCatAxInput").attr("checked", "checked");
+                        $("crossesCatInput").attr("value", "");
+                        $("crossesCatInput").attr("disabled", "disabled");
+                    }
+                    else if(crosses_rule === c_oAscCrossesRule.maxValue)
+                    {
+                        $("#crossesMaxAxCatInput").attr("checked", "checked");
+                        $("crossesCatInput").attr("value", "");
+                        $("crossesCatInput").attr("disabled", "disabled");
+                    }
+                    else if(crosses_rule === c_oAscCrossesRule.value)
+                    {
+                        $("#crossesCatAxValInput").attr("checked", "checked");
+                        $("crossesCatInput").attr("value", "");
+                        $("crossesCatInput").attr("disabled", vert_axis_props.getCrosses() + "");
+                    }
+                    else if(crosses_rule === c_oAscCrossesRule.minValue)
+                    {
+                        $("#crossesMinAxCatInput").attr("checked", "checked");
+                        $("crossesCatInput").attr("value", "");
+                        $("crossesCatInput").attr("disabled", "disabled");
+                    }
+
+                    if(vert_axis_props.getLabelsPosition() === c_oAscLabelsPosition.byDivisions)
+                    {
+                        $("#checkBoxByDivisionsInput").attr("checked", "checked");
+                    }
+                    else
+                    {
+                        $("#checkBoxBetweenDivisionsInput").attr("checked", "checked");
+                    }
+                }
+                else if(vert_axis_props.getAxisType() === c_oAscAxisType.val)
+                {
+                    $("#rightPanelValAxisProps").addClass("vertAxisPropsRightPanelActive");
+                    //минимальное значение на оси
+                    if(vert_axis_props.getMinValRule() === c_oAscValAxisRule.auto)
+                    {
+                        $("#autoMinValValAxisCheckBox").attr("checked", "checked");
+                        $("#minValueAxisInput").attr("disabled", "disabled");
+                        $("#minValueAxisInput").attr("value", "");
+                    }
+                    else
+                    {
+                        $("#minValueAxisInput").attr("disabled", "");
+                        $("#minValueAxisInput").attr("value", vert_axis_props.getMinVal() + "");
+                    }
+                    //максимальное значение на оси
+                    if(vert_axis_props.getMaxValRule() === c_oAscValAxisRule.auto)
+                    {
+                        $("#autoMaxValValAxisCheckBox").attr("checked", "checked");
+                        $("#maxValueAxisInput").attr("disabled", "disabled");
+                        $("#maxValueAxisInput").attr("value", "");
+                    }
+                    else
+                    {
+                        $("#maxValueAxisInput").attr("disabled", "");
+                        $("#maxValueAxisInput").attr("value", vert_axis_props.getMinVal() + "");
+                    }
+
+                    //обратный порядок значений
+                    if(vert_axis_props.getInvertValOrder())
+                    {
+                        $("#invertValOrderValAxisInput").attr("checked", "checked");
+                    }
+                    else
+                    {
+                        $("#invertValOrderValAxisInput").removeAttr("checked");
+                    }
+
+                    //использовать ли логарифмическую шкалу
+                    if(vert_axis_props.getLogScale())
+                    {
+                        $("logScaleInput").attr("checked", "checked");
+                        $("logBaseInput").attr("value", vert_axis_props.getLogBase() + "");
+                    }
+                    else
+                    {
+                        $("logScaleInput").removeAttr("checked", "");
+                        $("logBaseInput").attr("value", "");
+                        $("logBaseInput").attr("disabled", "disabled");
+                    }
+
+                    //множитель оси значений на оси
+                    var disp_units_rule = vert_axis_props.getDispUnitsRule();
+                    if(disp_units_rule === c_oAscValAxUnits.none)
+                    {
+                        $("#unitsSelect").attr("value", "none");
+                        $("#unitCustomInput").attr("disabled", "disabled");
+                        $("#unitCustomInput").attr("value", "");
+                    }
+                    else if(disp_units_rule === c_oAscValAxUnits.BILLIONS)
+                    {
+                        $("#unitsSelect").attr("value", "BILLIONS");
+                        $("#unitCustomInput").attr("disabled", "disabled");
+                        $("#unitCustomInput").attr("value", "");
+                    }
+                    else if(disp_units_rule === c_oAscValAxUnits.HUNDRED_MILLIONS)
+                    {
+                        $("#unitsSelect").attr("value", "HUNDRED_MILLIONS");
+                        $("#unitCustomInput").attr("disabled", "disabled");
+                        $("#unitCustomInput").attr("value", "");
+                    }
+                    else if(disp_units_rule === c_oAscValAxUnits.HUNDREDS)
+                    {
+                        $("#unitsSelect").attr("value", "HUNDREDS");
+                        $("#unitCustomInput").attr("disabled", "disabled");
+                        $("#unitCustomInput").attr("value", "");
+                    }
+                    else if(disp_units_rule === c_oAscValAxUnits.HUNDRED_THOUSANDS)
+                    {
+                        $("#unitsSelect").attr("value", "HUNDRED_THOUSANDS");
+                        $("#unitCustomInput").attr("disabled", "disabled");
+                        $("#unitCustomInput").attr("value", "");
+                    }
+                    else if(disp_units_rule === c_oAscValAxUnits.MILLIONS)
+                    {
+                        $("#unitsSelect").attr("value", "MILLIONS");
+                        $("#unitCustomInput").attr("disabled", "disabled");
+                        $("#unitCustomInput").attr("value", "");
+                    }
+                    else if(disp_units_rule === c_oAscValAxUnits.TEN_MILLIONS)
+                    {
+                        $("#unitsSelect").attr("value", "TEN_MILLIONS");
+                        $("#unitCustomInput").attr("disabled", "disabled");
+                        $("#unitCustomInput").attr("value", "");
+                    }
+                    else if(disp_units_rule === c_oAscValAxUnits.TEN_THOUSANDS)
+                    {
+                        $("#unitsSelect").attr("value", "TEN_THOUSANDS");
+                        $("#unitCustomInput").attr("disabled", "disabled");
+                        $("#unitCustomInput").attr("value", "");
+                    }
+                    else if(disp_units_rule === c_oAscValAxUnits.TRILLIONS)
+                    {
+                        $("#unitsSelect").attr("value", "TRILLIONS");
+                        $("#unitCustomInput").attr("disabled", "disabled");
+                        $("#unitCustomInput").attr("value", "");
+                    }
+                    else if(disp_units_rule === c_oAscValAxUnits.CUSTOM)
+                    {
+                        $("#unitsSelect").attr("value", "CUSTOM");
+                        $("#unitCustomInput").removeAttr("disabled");
+                        $("#unitCustomInput").attr("value", vert_axis_props.getUnits() + "");
+                    }
+                    //TODO: флаг показа заголовка единиц оси
+                    var major_tick_mark = vert_axis_props.getMajorTickMark();
+                    if(major_tick_mark === c_oAscTickMark.TICK_MARK_CROSS)
+                        $("#majorTickMarkSelectValAx").attr("value", "TICK_MARK_CROSS");
+                    else if(major_tick_mark === c_oAscTickMark.TICK_MARK_IN)
+                        $("#majorTickMarkSelectValAx").attr("value", "TICK_MARK_IN");
+                    else if(major_tick_mark === c_oAscTickMark.TICK_MARK_NONE)
+                        $("#majorTickMarkSelectValAx").attr("value", "TICK_MARK_NONE");
+                    else if(major_tick_mark === c_oAscTickMark.TICK_MARK_OUT)
+                        $("#majorTickMarkSelectValAx").attr("value", "TICK_MARK_OUT");
+
+
+                    var minor_tick_mark = vert_axis_props.getMinorTickMark();
+                    if(minor_tick_mark === c_oAscTickMark.TICK_MARK_CROSS)
+                        $("#minorTickMarkSelectValAx").attr("value", "TICK_MARK_CROSS");
+                    else if(minor_tick_mark === c_oAscTickMark.TICK_MARK_IN)
+                        $("#minorTickMarkSelectValAx").attr("value", "TICK_MARK_IN");
+                    else if(minor_tick_mark === c_oAscTickMark.TICK_MARK_NONE)
+                        $("#minorTickMarkSelectValAx").attr("value", "TICK_MARK_NONE");
+                    else if(minor_tick_mark === c_oAscTickMark.TICK_MARK_OUT)
+                        $("#minorTickMarkSelectValAx").attr("value", "TICK_MARK_OUT");
+
+                    var tick_labels_pos = vert_axis_props.getTickLabelsPos();
+                    if(tick_labels_pos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_HIGH)
+                        $("#tickLabelsSelectValAx").attr("value", "TICK_LABEL_POSITION_HIGH");
+                    else if(tick_labels_pos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_LOW)
+                        $("#tickLabelsSelectValAx").attr("value", "TICK_LABEL_POSITION_LOW");
+                    else if(tick_labels_pos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO)
+                        $("#tickLabelsSelectValAx").attr("value", "TICK_LABEL_POSITION_NEXT_TO");
+                    else if(tick_labels_pos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE)
+                        $("#tickLabelsSelectValAx").attr("value", "TICK_LABEL_POSITION_NONE");
+
+                    var crosses_rule = vert_axis_props.getCrossesRule();
+                    if(crosses_rule === c_oAscCrossesRule.auto)
+                    {
+                        $("#crossesAutoValAxInput").attr("checked", "checked");
+                        $("#crossesValInput").attr("value", "");
+                        $("#crossesValInput").attr("disabled", "disabled");
+                    }
+                    else if(crosses_rule === c_oAscCrossesRule.maxValue)
+                    {
+                        $("#crossesMaxAxValInput").attr("checked", "checked");
+                        $("#crossesValInput").attr("value", "");
+                        $("#crossesValInput").attr("disabled", "disabled");
+                    }
+                    else if(crosses_rule === c_oAscCrossesRule.minValue)
+                    {
+                        $("#crossesMinAxValInput").attr("checked", "checked");
+                        $("#crossesValInput").attr("value", "");
+                        $("#crossesValInput").attr("disabled", "disabled");
+                    }
+                    else if(crosses_rule === c_oAscCrossesRule.value)
+                    {
+                        $("#crossesValAxValInput").attr("checked", "checked");
+                        $("#crossesValInput").removeAttr("disabled");
+                        $("#crossesValInput").attr("value", vert_axis_props.getCrosses() + "");
+                    }
+                }
+            }
+
+            $(".leftPanelCharPropsItemDiv").removeClass("left_panel_chart_props_select");
+            $(".leftPanelCharPropsItemDiv").addClass("left_panel_chart_props_no_select");
+            $("#designChartLeft").addClass("left_panel_chart_props_select");
+            $(".right_panel_drawing_props").css("display", "none");
+            $("#rightPanelChartPropsDiv").css("display","");
+
+            if(hor_axis_props)
+                $("#catAxisProps").css("display", "");
+            else
+                $("#catAxisProps").css("display", "none");
+
+            if(vert_axis_props)
+                $("#valAxisProps").css("display", "");
+            else
+                $("#valAxisProps").css("display", "none");
+
+        }
+    });
+
     $("#applyStyleButton").on("click",
     function()
     {
@@ -3001,13 +3699,21 @@
 
             case "valAxisProps":
             {
-                $("#rightPanelValAxisProps").css("display","");
+                var vert_axis_panel = $(".vertAxisPropsRightPanelActive")[0];
+                if(vert_axis_panel)
+                {
+                    $(vert_axis_panel).css("display","");
+                }
                 break;
             }
 
             case "catAxisProps":
             {
-                $("#rightPanelCatAxProps").css("display","");
+                var hor_axis_panel = $(".horAxisPropsRightPanelActive")[0];
+                if(hor_axis_panel)
+                {
+                    $(hor_axis_panel).css("display","");
+                }
                 break;
             }
         }
@@ -3016,7 +3722,7 @@
     $("#valApplyValAxisProps").click(
         function()
         {
-            var settings = new asc_ChartSettings()
+            var settings = new asc_ChartSettings();
             var axis_settings = new asc_ValAxisSettings();
             settings.putVertAxisProps(axis_settings);
             if($("#autoMinValValAxisCheckBox").attr("checked"))
@@ -3047,7 +3753,7 @@
             {
                 axis_settings.putLogScale(false);
             }
-            axis_settings.putUnits(c_oAscValAxUnits[$("#unitsSelect").attr("value")]);
+            axis_settings.putDispUnitsRule(c_oAscValAxUnits[$("#unitsSelect").attr("value")]);
             if($("#showUnitsLabels").attr("checked"))
                 axis_settings.putShowUnitsOnChart(true);
             else
