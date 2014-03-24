@@ -262,8 +262,41 @@ CDrawingDocument.prototype =
         this.Frame = null;
         this.Table = markup.Table;
 
-        // TODO:
-        this.Native["DD_Set_RulerState_Table"](markup, transform);
+        var _array_params1 = [];
+        _array_params1.push(markup.Internal.RowIndex);
+        _array_params1.push(markup.Internal.CellIndex);
+        _array_params1.push(markup.Internal.PageNum);
+
+        _array_params1.push(markup.X);
+
+        _array_params1.push(markup.CurCol);
+        _array_params1.push(markup.CurRow);
+
+        if (transform)
+        {
+            _array_params1.push(transform.sx);
+            _array_params1.push(transform.shy);
+            _array_params1.push(transform.shx);
+            _array_params1.push(transform.sy);
+            _array_params1.push(transform.tx);
+            _array_params1.push(transform.ty);
+        }
+
+        var _array_params_margins = [];
+        for (var i = 0; i < markup.Margins.length; i++)
+        {
+            _array_params_margins.push(markup.Margins[i].Left);
+            _array_params_margins.push(markup.Margins[i].Right);
+        }
+
+        var _array_params_rows = [];
+        for (var i = 0; i < markup.Rows.length; i++)
+        {
+            _array_params_rows.push(markup.Rows[i].Y);
+            _array_params_rows.push(markup.Rows[i].H);
+        }
+
+        this.Native["DD_Set_RulerState_Table"](_array_params1, _array_params_margins, _array_params_rows;
     },
 
     Set_RulerState_Paragraph : function(margins)
