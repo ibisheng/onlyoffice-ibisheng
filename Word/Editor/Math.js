@@ -5,13 +5,17 @@
 function ParaMath(bAddMenu, bCollaborative)
 {
     this.Id = g_oIdCounter.Get_NewId();
-
     this.Type  = para_Math;
 
     this.Jc   = undefined;
     this.Math = new CMathComposition(bCollaborative);
     this.Math.Parent = this;
-    this.Content = this.Math.Root.content; // Root.content
+    this.RootComposition = this.Math.Root;
+    this.CurrentContent    = this.RootComposition;
+    this.SelectContent     = this.RootComposition;
+    this.bSelectionUse     = false;
+
+
     this.State      = new CParaRunState();       // Положение курсора и селекта для данного run
     this.Paragraph  = null;
 
@@ -405,7 +409,7 @@ ParaMath.prototype =
 
         if ( true !== PRS.NewRange )
         {
-            RangeEndPos = this.Content.length; // RangeEndPos = 1;    to    RangeEndPos = this.Content.length;
+            RangeEndPos = this.RootComposition.content.length; // RangeEndPos = 1;    to    RangeEndPos = this.Content.length;
 
             // Удаляем лишние строки, оставшиеся после предыдущего пересчета в самом конце
             if ( this.Lines.length > this.LinesLength )
@@ -583,9 +587,9 @@ ParaMath.prototype =
         var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
         var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
 
-        if ( EndPos >= 1 )
+        if ( EndPos >= 1)
         {
-            return this.Math.UpdateCursor();
+            return this.CurrentContent.update_Cursor(_CurPage, UpdateTarget);
         }
 
         return {X : X };
@@ -704,7 +708,7 @@ ParaMath.prototype =
         this.Math.Cursor_MoveToEndPos();
     },
 
-    Get_ParaContentPosByXY : function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
+    Get_ParaContentPosByXY : function(SearchPos, Depth, _CurLine, _CurRange, StepEnd) // получить логическую позицию по XY
     {
         // TODO: ParaMath.Get_ParaContentPosByXY
 
@@ -723,22 +727,37 @@ ParaMath.prototype =
 
         var Dx = this.Math.Size.WidthVisible;
         var D = SearchPos.X - SearchPos.CurX;
-        //var Diff = Math.abs(D) < Math.abs(D -  Dx) ? Math.abs(D) : Math.abs(D -  Dx);
-        var Diff = SearchPos.X - SearchPos.CurX;
+        var Diff = Math.abs(D) < Math.abs(D + Dx) ? Math.abs(D) : Math.abs(D + Dx);
+        //var Diff = SearchPos.X - SearchPos.CurX;
 
         if(Math.abs(Diff) < SearchPos.DiffX + 0.001 )
         {
-            SearchPos.DiffX = Math.abs(Diff);
-            this.Math.Selection_SetStart(SearchPos.X, SearchPos.Y);
-            this.Math.Selection_SetEnd(SearchPos.X, SearchPos.Y);
-            this.Math.Root.get_ParaContentPos(false, SearchPos.Pos);
+            var X = SearchPos.X - this.Math.absPos.x,
+                Y = SearchPos.Y - this.Math.absPos.y;
+
+            SearchPos.DiffX = Diff;
+            this.RootComposition.get_ParaContentPosByXY(SearchPos.Pos, X, Y);
+
+            //this.Math.Selection_SetStart(SearchPos.X, SearchPos.Y);
+            //this.Math.Selection_SetEnd(SearchPos.X, SearchPos.Y);
+            //this.Math.Root.get_ParaContentPos(false, SearchPos.Pos);
 
             Result = true;
-            if ( Diff >= - 0.001 && Diff <= Dx + 0.001 )
+            if ( D >= - 0.001 && D <= Dx + 0.001 )
             {
                 SearchPos.InText = true;
+                SearchPos.DiffX =  0.001; // сравниваем расстояние до ближайшего элемента
             }
         }
+
+//        var str = "";
+//        for(var i = 0; i < SearchPos.Pos.Data.length; i++)
+//        {
+//            str += SearchPos.Pos.Data[i] + ", ";
+//
+//        }
+//        console.log(str);
+        //console.log("Pos [" + i + "] = " + SearchPos.Pos[i]);
 
         SearchPos.CurX += Dx;
 
@@ -785,24 +804,22 @@ ParaMath.prototype =
         return Result;
     },
 
-    Get_ParaContentPos : function(bSelection, bStart, ContentPos) // получение позиции контентов
+    Get_ParaContentPos : function(bSelection, bStart, ContentPos) // получить текущую логическую позицию
     {
         // TODO: ParaMath.Get_ParaContentPos
 
-        this.Math.Root.get_ParaContentPos(bStart, ContentPos);
+        this.RootComposition.get_ParaContentPos(bSelection, bStart, ContentPos);
 
     },
-
-    Set_ParaContentPos : function(ContentPos, Depth) // выставить позицию в конетенте
+    Set_ParaContentPos : function(ContentPos, Depth) // выставить логическую позицию в контенте
     {
         // TODO: ParaMath.Set_ParaContentPos
 
         var Pos = ContentPos.Get(Depth);
         this.State.ContentPos = Pos;
 
-        this.Math.Root.set_ParaContentPos(ContentPos, Depth);
+        this.RootComposition.set_ParaContentPos(ContentPos, Depth);
     },
-
     Get_PosByElement : function(Class, ContentPos, Depth, UseRange, Range, Line)
     {
         if ( this === Class )
@@ -868,23 +885,58 @@ ParaMath.prototype =
     Set_SelectionContentPos : function(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag)
     {
         // TODO: ParaMath.Set_SelectionContentPos
+
+        this.SelectContent = this.RootComposition;
+
+
+
+        switch (StartFlag)
+        {
+            case  1:
+                this.RootComposition.setLogicalPosition(1);
+                break;
+            case -1:
+                this.RootComposition.setLogicalPosition(this.RootComposition.length - 1);
+                break;
+            case  0:
+                this.RootComposition.set_StartSelectContent(StartContentPos, Depth);
+                break;
+        }
+
+        switch (EndFlag)
+        {
+            case  1:
+                this.RootComposition.set_SelectEndExtreme(false);
+                break;
+            case -1:
+                this.RootComposition.set_SelectEndExtreme(true);
+                break;
+            case  0:
+                var result = this.RootComposition.set_EndSelectContent(EndContentPos, Depth);
+                this.SelectContent  = result.SelectContent;
+                break;
+        }
+
+        this.bSelectionUse = true;
     },
 
     Selection_IsUse : function()
     {
         // TODO: ParaMath.Selection_IsUse
-        return false;
+        return this.bSelectionUse;
     },
 
     Selection_Stop : function()
     {
-    },
 
+    },
     Selection_Remove : function()
     {
         // TODO: ParaMath.Selection_Remove
-    },
 
+        this.bSelectionUse = false;
+
+    },
     Select_All : function(Direction)
     {
         // TODO: ParaMath.Select_All
@@ -898,16 +950,42 @@ ParaMath.prototype =
         var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
         var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
 
+
+
         if ( EndPos >= 1 )
         {
+            if ( true === this.bSelectionUse )
+            {
             // TODO: ParaMath.Selection_Draw_Range
+
+            if(SelectionDraw.FindStart == true)
+            {
+                if(this.SelectContent.selectUse())
+                {
+                    SelectionDraw.FindStart = false;
+                    this.SelectContent.drawSelect(SelectionDraw);
+                }
+            }
+            else
+            {
+                if(this.RootComposition.selectUse())
+                    SelectionDraw.W += this.RootComposition.size.width;
+            }
+            }
+            else
+            {
+                if ( true === SelectionDraw.FindStart )
+                    SelectionDraw.StartX += this.Width;
+            }
+
         }
     },
 
     Selection_IsEmpty : function(CheckEnd)
     {
         // TODO: ParaMath.Selection_IsEmpty
-        return true;
+
+        return !this.SelectContent.selectUse();
     },
 
     Selection_CheckParaEnd : function()

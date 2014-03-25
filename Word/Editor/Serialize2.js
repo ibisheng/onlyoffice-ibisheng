@@ -10608,7 +10608,7 @@ function Binary_oMathReader(stream)
 				props.init = true;
 			}
 			var oDeg = oRad.getDegree();
-			if (oDeg && length == 0)
+			if (oDeg && length == 0 && props.degHide !== true)
 				oDeg.fillPlaceholders();			
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oDeg);

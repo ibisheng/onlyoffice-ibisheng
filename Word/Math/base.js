@@ -851,6 +851,58 @@ CMathBase.prototype =
 
          return {pos: posCurs, mCoord: mouseCoord, inside_flag: inside_flag};
     },
+    excludeJDElement: function(Cur_X, Cur_Y)
+    {
+        var pos_X = Cur_X,
+            pos_Y = Cur_Y;
+
+        if( this.elements[Cur_X][Cur_Y].IsJustDraw() )
+        {
+            if(this.nRow > 1)
+            {
+                if(Cur_X == 0)
+                    pos_X = 1;
+                else if(Cur_X == this.nRow - 1)
+                    pos_X = this.nRow - 2;
+                else
+                {
+                    // пока так
+                    pos_X = Cur_X + 1;
+                   /* if( mCoord.y < (_h - Heights[posCurs.x]/2) )
+                        posCurs.x--;
+                    else
+                        posCurs.x++;*/
+                }
+                pos_Y = Cur_Y;
+            }
+            else if(this.nCol > 1)
+            {
+                if(Cur_Y == 0)
+                    pos_Y = 1;
+                else if(Cur_Y == this.nCol - 1)
+                    pos_Y = this.nCol - 2;
+                else
+                {
+                    // пока так
+                    pos_Y = Cur_Y + 1;
+
+                    /*if( mCoord.x < (_w - Widths[u]/2) )
+                        posCurs.y = u - 1;
+                    else
+                        posCurs.y = u + 1;*/
+                }
+
+            }
+            else
+                return; // не самое лучшее решение, в идеале если у нас если такая ситуация получилась
+            // (что сомнительно, в контенте один элемент с которым ничего нельзя сделать),
+            // то вставать  после этого элемента  в контенте на уровень выше
+            // лучше следить за подобными ситуациями, чтобы такого не было
+        }
+
+        return  {x: pos_X, y: pos_Y};
+
+    },
     setPosition: function(pos)
     {
         if(this.bMObjs === true)
@@ -1180,22 +1232,83 @@ CMathBase.prototype =
 
 
     /// Position for Paragraph
+    get_ParaContentPosByXY: function(ContentPos, X, Y)
+    {
+        /// элементов just-draw не должно прийти
+        var disp = this.findDisposition({x: X, y: Y});
 
-    get_ParaContentPos: function(bStart, ContentPos)
+        ContentPos.Add(disp.pos.x);
+        ContentPos.Add(disp.pos.y);
+
+
+        this.elements[disp.pos.x][disp.pos.y].get_ParaContentPosByXY(ContentPos, disp.mCoord.x, disp.mCoord.y);
+    },
+    get_ParaContentPos: function(bSelection, bStart, ContentPos)
     {
         ContentPos.Add(this.CurPos_X);
         ContentPos.Add(this.CurPos_Y);
 
-        this.elements[this.CurPos_X][this.CurPos_Y].get_ParaContentPos(bStart, ContentPos);
+        this.elements[this.CurPos_X][this.CurPos_Y].get_ParaContentPos(bSelection, bStart, ContentPos);
     },
     set_ParaContentPos: function(ContentPos, Depth)
     {
-        this.CurPos_X = ContentPos.Get(Depth);
-        this.CurPos_Y = ContentPos.Get(Depth + 1);
+        var CurPos_X = ContentPos.Get(Depth);
+        var CurPos_Y = ContentPos.Get(Depth + 1);
+
+        if(!this.elements[CurPos_X][CurPos_Y].IsJustDraw())
+        {
+            var disp = this.excludeJDElement(CurPos_X, CurPos_Y);
+            CurPos_X = disp.x;
+            CurPos_Y = disp.y;
+        }
+
+        this.CurPos_X = CurPos_X;
+        this.CurPos_Y = CurPos_Y;
 
         Depth += 2;
 
-        this.elements[this.CurPos_X][this.CurPos_Y].set_ParaContentPos(ContentPos, Depth);
+        return this.elements[this.CurPos_X][this.CurPos_Y].set_ParaContentPos(ContentPos, Depth);
+    },
+    set_StartSelectContent: function(ContentPos, Depth)
+    {
+        var Pos_X = ContentPos.Get(Depth),
+            Pos_Y = ContentPos.Get(Depth+1);
+
+        Depth += 2;
+
+        this.selectPos.startX = Pos_X;
+        this.selectPos.startY = Pos_Y;
+
+        if(!this.elements[Pos_X][Pos_Y].IsJustDraw())
+            this.elements[Pos_X][Pos_Y].set_StartSelectContent(ContentPos, Depth);
+
+    },
+    set_EndSelectContent: function(ContentPos, Depth)
+    {
+        var state = true, SelectContent = null;
+
+        var endX   = ContentPos.Get(Depth),
+            endY   = ContentPos.Get(Depth+1),
+            startX = this.selectPos.startX,
+            startY = this.selectPos.startY;
+
+        Depth += 2;
+
+        var bJustDraw = this.elements[endX][endY].IsJustDraw();
+
+        // пока так
+        if(startX == endX && startY == endY && !bJustDraw)
+        {
+            //this.CurPos_X = startX;
+            //this.CurPos_Y = startY;
+            var movement = this.elements[endX][endY].set_EndSelectContent(ContentPos, Depth);
+            SelectContent = movement.SelectContent;
+            state = movement.state;
+        }
+        else
+            state = false;
+
+        return {state: state, SelectContent: SelectContent};
     }
 
     //////////////////////////

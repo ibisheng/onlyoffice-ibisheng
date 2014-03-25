@@ -398,6 +398,7 @@ function CMathContent(bCollaborative)
     };
     ///////////////////////////////
 
+
     this.size =
     {
         width: 0,
@@ -5450,7 +5451,7 @@ CMathContent.prototype =
         editor.WordControl.m_oDrawingDocument.UpdateTargetFromPaint = false;
 
     },
-    update_Cursor: function()
+    update_Cursor: function(CurPage, UpdateTarget)
     {
         var runPrp = this.getRunPrp(this.CurPos);
         var oWPrp = runPrp.getMergedWPrp();
@@ -5463,8 +5464,19 @@ CMathContent.prototype =
         var X = this.pos.x + absPos.x + this.content[this.CurPos].widthToEl,
             Y = this.pos.y + absPos.y + this.size.ascent - sizeCursor*0.8;
 
-        return {X: X, Y: Y, Height: sizeCursor};
+        var Para = this.Composition.Parent.Paragraph;
+        if ( null !== Para && undefined !== Para && UpdateTarget == true)
+        {
+            Para.DrawingDocument.SetTargetSize( sizeCursor );
+            //Para.DrawingDocument.UpdateTargetFromPaint = true;
+            Para.DrawingDocument.UpdateTarget( X, Y, Para.Get_StartPage_Absolute() + CurPage );
+            console.log("CurPos: " + this.CurPos);
+            console.log("x " + X + " Y " + Y);
+            //Para.DrawingDocument.UpdateTargetFromPaint = false;
+        }
 
+
+        return {X: X, Y: Y, Height: sizeCursor};
     },
     old_coordWOGaps: function( msCoord )
     {
@@ -6095,6 +6107,10 @@ CMathContent.prototype =
     selectUse: function()
     {
         //return (this.selection.startPos !== this.selection.endPos);
+
+        //console.log("start pos "+ this.RealSelect.startPos);
+        //console.log("end pos " + this.RealSelect.endPos);
+
         return this.RealSelect.startPos !== this.RealSelect.endPos;
     },
     setCtrPrp: function()
@@ -6177,7 +6193,7 @@ CMathContent.prototype =
             this.content[i].value.setPosition(t);
         }
     },
-    drawSelect: function()
+    old_drawSelect: function()
     {
         var start   = this.RealSelect.startPos,
             end     = this.RealSelect.endPos;
@@ -6207,7 +6223,10 @@ CMathContent.prototype =
             Y = this.pos.y + this.Composition.absPos.y;
 
         if( widthSelect != 0)
+        {
             editor.WordControl.m_oLogicDocument.DrawingDocument.AddPageSelection(0, X, Y, widthSelect, heightSelect );
+
+        }
     },
     ///// properties /////
     SetDot: function(flag)
@@ -7062,7 +7081,6 @@ CMathContent.prototype =
 
         this.RealSelect.startPos = pos;
         this.RealSelect.endPos = pos;
-
     },
     setSelect_Beginning: function(bStart)
     {
@@ -7095,7 +7113,6 @@ CMathContent.prototype =
                     this.RealSelect.startPos++;
                 }
             }
-
 
 
            /* if(this.content[this.RealSelect.startPos].value.typeObj == MATH_COMP)
@@ -7163,15 +7180,21 @@ CMathContent.prototype =
 
         return flag;
     },
-
-
     /// Position for Paragraph
-
-    get_ParaContentPos: function(bStart, ContentPos)
+    get_ParaContentPosByXY: function(ContentPos, X, Y)
     {
-        var bSelect = this.selectUse();
+        var pos = this.findPosition( {x: X, y: Y} );
+        ContentPos.Add(pos);
 
-        if(bSelect)
+        if(this.content[pos].value.typeObj == MATH_COMP)
+        {
+            var coord = this.getCoordElem(pos, {x: X, y: Y} );
+            this.content[pos].value.get_ParaContentPosByXY(ContentPos, coord.x, coord.y);
+        }
+    },
+    get_ParaContentPos: function(bSelection, bStart, ContentPos)
+    {
+        if( bSelection && this.RealSelect.startPos !== this.RealSelect.endPos )
         {
             var pos = bStart ? this.RealSelect.startPos : this.RealSelect.endPos;
             ContentPos.Add(pos);
@@ -7181,20 +7204,183 @@ CMathContent.prototype =
             ContentPos.Add(this.CurPos);
 
             if(this.content[this.CurPos].value.typeObj == MATH_COMP)
-                this.content[this.CurPos].value.get_ParaContentPos(bStart, ContentPos);
+                this.content[this.CurPos].value.get_ParaContentPos(bSelection, bStart, ContentPos);
         }
     },
     set_ParaContentPos: function(ContentPos, Depth)
     {
+        var Content = this;
         this.CurPos = ContentPos.Get(Depth);
 
         Depth++;
 
         if(this.content[this.CurPos].value.typeObj == MATH_COMP)
-            this.content[this.CurPos].value.set_ParaContentPos(ContentPos, Depth);
+            Content = this.content[this.CurPos].value.set_ParaContentPos(ContentPos, Depth);
+
+        return Content;
+    },
+    set_SelectEndExtreme: function(bEnd)
+    {
+        if(bEnd === false)
+        {
+            this.LogicalSelect.end   = 1;
+            this.RealSelect.endPos    = 1;
+
+            // проверка на то, чтобы CEmpty был включен !!! когда идем из мат объекта(например из числителя) и идем наверх, выходим за пределы формулы
+            // если стоим в конце, то this.RealSelect.endPos равен this.content.length и соответственно, нужно сделать проверку на то, что запрашиваем у существующего объекта typeObj (!)
+            var start = this.RealSelect.startPos; // проверяем именно тот, который идет на отрисовку, т.к. логический мб выставлен на мат. объект
+            if(start < this.content.length)
+            {
+                var current   = this.content[this.CurPos].value.typeObj;
+                var selectStart = this.content[start].value.typeObj;    // only for draw select
+
+                if(current == MATH_COMP && selectStart == MATH_COMP)
+                {
+                    this.RealSelect.startPos++;
+                }
+            }
+        }
+        else
+        {
+            this.LogicalSelect.end   = this.content.length - 1;
+            this.RealSelect.endPos   = this.content.length;
+
+            var start = this.RealSelect.startPos - 2,
+                current   = this.content[this.CurPos].value.typeObj,
+                selectStart = start > 0 ? this.content[start].value.typeObj : null;
+
+            if(current == MATH_COMP && selectStart == MATH_COMP)
+            {
+                this.RealSelect.startPos -= 2;
+            }
+        }
+    },
+    set_StartSelectContent: function(ContentPos, Depth)
+    {
+        if(this.IsPlaceholder())
+        {
+            this.LogicalSelect.start = 1;
+            this.LogicalSelect.end = 2;
+        }
+        else
+        {
+            var pos = ContentPos.Get(Depth);
+            Depth++;
+            this.LogicalSelect.start = this.LogicalSelect.end = pos;
+
+            if(this.RealSelect.startPos === this.RealSelect.endPos && this.content[pos].value.typeObj === MATH_COMP)
+                this.content[pos].value.set_StartSelectContent(ContentPos, Depth);
+        }
+    },
+    set_EndSelectContent: function(ContentPos, Depth)
+    {
+        /*var msCoord = {x: x, y: y};
+        var posEnd = this.findPosition(msCoord),
+            posStart = this.LogicalSelect.start;
+
+        this.CurPos = posStart;
+        this.LogicalSelect.end = posEnd;*/
+
+        var state = true; // вышли / не вышли за переделы контента
+                          // актуально для мат. объекта
+        var SelectContent = null;
+
+        var posEnd = ContentPos.Get(Depth),
+            posStart = this.LogicalSelect.start;
+
+        this.LogicalSelect.end = posEnd;
+        Depth++;
+
+
+        //селект внутри мат. объекта
+        if(posStart === posEnd && this.content[posEnd].value.typeObj === MATH_COMP)
+        {
+            var result = this.content[posEnd].value.set_EndSelectContent(ContentPos, Depth);
+            this.setStartPos_Selection(posStart-1);
+
+            if( !result.state )
+            {
+                this.setEndPos_Selection(posEnd + 1);
+                SelectContent = this;
+            }
+            else
+                SelectContent = result.SelectContent;
+        }
+        //селект элементов контента
+        else
+        {
+            SelectContent = this;
+            var direction = (posStart < posEnd) ? 1 : -1;
+
+
+            if( this.content[posStart].value.typeObj === MATH_COMP )
+            {
+                if( direction == 1 )
+                    this.setStartPos_Selection( posStart - 1);
+                else if( direction == -1 )
+                    this.setStartPos_Selection( posStart + 1);
+            }
+            else
+                this.setStartPos_Selection(posStart);
+
+
+            if( this.content[posEnd].value.typeObj === MATH_COMP )
+            {
+                if( direction == 1 )
+                    this.setEndPos_Selection(posEnd + 1);
+                else if( direction == -1 )
+                    this.setEndPos_Selection(posEnd - 1);
+            }
+            else
+                this.setEndPos_Selection(posEnd);
+        }
+
+        return {state: state, SelectContent:  SelectContent};
+    },
+    drawSelect: function(SelectionDraw)
+    {
+        var start   = this.RealSelect.startPos,
+            end     = this.RealSelect.endPos;
+
+        if( start > end)
+        {
+            var tmp = start;
+            start = end;
+            end = tmp;
+        }
+
+        if(this.IsPlaceholder())
+        {
+            start = 1;
+            end = 2;
+        }
+
+        //var heightSelect = this.size.ascent + this.size.descent;
+        var heightSelect = this.size.height;
+        var widthSelect = 0;
+
+        for(var j= start; j < end ; j++)
+            widthSelect += this.content[j].widthToEl - this.content[j-1].widthToEl;
+
+        var startPos = start > 0 ? start-1 : start;
+        var X = this.pos.x + this.Composition.absPos.x + this.content[startPos].widthToEl,
+            Y = this.pos.y + this.Composition.absPos.y;
+
+        SelectionDraw.StartX = X;
+        SelectionDraw.StartY = Y;
+
+        SelectionDraw.W = widthSelect;
+        SelectionDraw.H = heightSelect;
 
     },
-
+    Get_Id : function()
+    {
+        return this.GetId();
+    },
+    GetId : function()
+    {
+        return this.Id;
+    },
     //////////////////////////
 
 
@@ -7318,15 +7504,8 @@ CMathContent.prototype =
         this.setEndPos_Selection(1);
         //this.setEnd_Selection(1);
         //this.selection.active = false;
-    },
-	Get_Id : function()
-    {
-        return this.GetId();
-    },
-	GetId : function()
-    {
-        return this.Id;
     }
+
     /////////////////////////////////////////////////////////////////
 
     ////  test function for me  ////
@@ -7914,6 +8093,8 @@ CMathComposition.prototype =
          //this.SelectContent.selection.active = false;
          this.UpdateCursor();
          }*/
+
+
     },
     ClearSelect: function()
     {
@@ -8235,9 +8416,9 @@ CMathComposition.prototype =
         History.Add(this.CurrentContent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: EndPos});
 
     },
-    UpdateCursor: function()
+    UpdateCursor: function(CurPage, UpdateTarget)
     {
-        return this.SelectContent.update_Cursor();
+        return this.SelectContent.update_Cursor(CurPage, UpdateTarget);
     },
     Refresh_RecalcData2: function()
     {

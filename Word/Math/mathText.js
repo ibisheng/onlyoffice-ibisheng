@@ -232,6 +232,12 @@ CMathText.prototype =
     },
     Resize: function(oMeasure)
     {
+
+        //  смещения
+        //  rasterOffsetX
+        //  rasterOffsetY
+
+
         var letter = this.getCode();
 
         var metricsTxt = oMeasure.Measure2Code(letter);
