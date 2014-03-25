@@ -182,15 +182,18 @@ CPlotArea.prototype =
     getHorizontalAxis: function()
     {
         var axis_by_types  = this.getAxisByTypes();
-        if(axis_by_types.valAx.length === 1 && axis_by_types.catAx.length === 1)
+        for(var i = 0; i < axis_by_types.valAx.length; ++i)
         {
-           if(axis_by_types.valAx[0].axPos === AX_POS_B || axis_by_types.valAx[0].axPos === AX_POS_T)
-                return axis_by_types.valAx[0]
-           else
-                return axis_by_types.catAx[0];
+            if(axis_by_types.valAx[i].axPos === AX_POS_B || axis_by_types.valAx[i].axPos === AX_POS_T)
+                return axis_by_types.valAx[i];
         }
-        else
-            return null;
+
+        for(var i = 0; i < axis_by_types.valAx.length; ++i)
+        {
+            if(axis_by_types.valAx[i].catAx === AX_POS_B || axis_by_types.catAx[i].axPos === AX_POS_T)
+                return axis_by_types.catAx[i];
+        }
+        return null;
 
 
     },
@@ -199,15 +202,18 @@ CPlotArea.prototype =
     getVerticalAxis: function()
     {
         var axis_by_types  = this.getAxisByTypes();
-        if(axis_by_types.valAx.length === 1 && axis_by_types.catAx.length === 1)
+        for(var i = 0; i < axis_by_types.valAx.length; ++i)
         {
-            if(axis_by_types.valAx[0].axPos === AX_POS_L || axis_by_types.valAx[0].axPos === AX_POS_R)
-                return axis_by_types.valAx[0];
-            else
-                return axis_by_types.catAx[0];
+            if(axis_by_types.valAx[i].axPos === AX_POS_L || axis_by_types.valAx[i].axPos === AX_POS_R)
+                return axis_by_types.valAx[i];
         }
-        else
-            return null;
+
+        for(var i = 0; i < axis_by_types.valAx.length; ++i)
+        {
+            if(axis_by_types.valAx[i].catAx === AX_POS_L || axis_by_types.catAx[i].axPos === AX_POS_R)
+                return axis_by_types.catAx[i];
+        }
+        return null;
     },
 
     getAxisByTypes: function()
