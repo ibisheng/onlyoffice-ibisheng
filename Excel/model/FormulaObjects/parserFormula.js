@@ -4240,7 +4240,7 @@ function lcl_Erfc0600( x ) {
         pn = pn22;
         qn = qn22;
     }
-    else /* if ( x < 6.0 )  this is true, but the compiler does not know */
+    else
     {
         var pn60 = [
                 9.99921140009714409E-1,

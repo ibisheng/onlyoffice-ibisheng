@@ -8,6 +8,38 @@
         return Math.abs( a - b ) < dif
     }
 
+
+    function GetRmz( fZins, fZzr, fBw, fZw, nF ){
+        var fRmz;
+        if( fZins == 0.0 )
+            fRmz = ( fBw + fZw ) / fZzr;
+        else{
+            var	fTerm = Math.pow( 1.0 + fZins, fZzr );
+            if( nF > 0 )
+                fRmz = ( fZw * fZins / ( fTerm - 1.0 ) + fBw * fZins / ( 1.0 - 1.0 / fTerm ) ) / ( 1.0 + fZins );
+            else
+                fRmz = fZw * fZins / ( fTerm - 1.0 ) + fBw * fZins / ( 1.0 - 1.0 / fTerm );
+        }
+
+        return -fRmz;
+    }
+
+    function GetZw( fZins, fZzr, fRmz, fBw, nF ){
+        var fZw;
+        if( fZins == 0.0 )
+            fZw = fBw + fRmz * fZzr;
+        else{
+            var fTerm = Math.pow( 1.0 + fZins, fZzr );
+            if( nF > 0 )
+                fZw = fBw * fTerm + fRmz * ( 1.0 + fZins ) * ( fTerm - 1.0 ) / fZins;
+            else
+                fZw = fBw * fTerm + fRmz * ( fTerm - 1.0 ) / fZins;
+        }
+
+        return -fZw;
+    }
+
+
     var ver = 2;
 
     var oParser, wb, ws, date1, date2, dif = 1e-9,
@@ -3325,6 +3357,383 @@
         oParser = new parserFormula( "CUMIPMT(0.09/12,30*12,125000,13,24,0)", "A2", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), cumipmt(0.09/12,30*12,125000,13,24,0) );
+
+    } )
+
+    test( "Test: \"CUMPRINC\"", function () {
+
+        function cumpring(fRate, nNumPeriods, fVal, nStartPer, nEndPer, nPayType){
+
+            var fRmz, fKapZ;
+
+            if( nStartPer < 1 || nEndPer < nStartPer || nEndPer < 1  || fRate <= 0 || nNumPeriods <= 0 || fVal <= 0 || ( nPayType != 0 && nPayType != 1 ) )
+                return "#NUM!"
+
+            fRmz = GetRmz( fRate, nNumPeriods, fVal, 0.0, nPayType );
+
+            fKapZ = 0.0;
+
+            var nStart = nStartPer;
+            var nEnd = nEndPer;
+
+            if( nStart == 1 )
+            {
+                if( nPayType <= 0 )
+                    fKapZ = fRmz + fVal * fRate;
+                else
+                    fKapZ = fRmz;
+
+                nStart++;
+            }
+
+            for( var i = nStart ; i <= nEnd ; i++ )
+            {
+                if( nPayType > 0 )
+                    fKapZ += fRmz - ( GetZw( fRate, i - 2, fRmz, fVal, 1 ) - fRmz ) * fRate;
+                else
+                    fKapZ += fRmz - GetZw( fRate, i - 1, fRmz, fVal, 0 ) * fRate;
+            }
+
+            return fKapZ
+
+        }
+
+        oParser = new parserFormula( "CUMPRINC(0.09/12,30*12,125000,1,1,0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), cumpring(0.09/12,30*12,125000,1,1,0) );
+
+        oParser = new parserFormula( "CUMPRINC(0.09/12,30*12,-125000,1,1,0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), cumpring(0.09/12,30*12,-125000,1,1,0) );
+
+        oParser = new parserFormula( "CUMPRINC(0.09/12,30*12,125000,13,24,0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), cumpring(0.09/12,30*12,125000,13,24,0) );
+
+    } )
+
+    test( "Test: \"NOMINAL\"", function () {
+
+        function nominal(rate,np){
+
+            if( rate <= 0 || np < 1 )
+                return "#NUM!"
+
+            return ( Math.pow( rate + 1, 1 / np ) - 1 ) * np;
+
+        }
+
+        oParser = new parserFormula( "NOMINAL(0.053543,4)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), nominal(0.053543,4) );
+
+        oParser = new parserFormula( "NOMINAL(0.053543,-4)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), nominal(0.053543,-4) );
+
+    } )
+
+    test( "Test: \"FVSCHEDULE\"", function () {
+
+        function fvschedule(rate,shedList){
+
+            for( var i = 0; i < shedList.length; i++){
+                rate *= 1 + shedList[i]
+            }
+
+            return rate;
+
+        }
+
+        oParser = new parserFormula( "FVSCHEDULE(1,{0.09,0.11,0.1})", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), fvschedule(1,[0.09,0.11,0.1]) );
+
+    } )
+
+    test( "Test: \"DISC\"", function () {
+
+        function disc( settlement, maturity, pr, redemption, basis ){
+
+            if( settlement >= maturity || pr <= 0 || redemption <= 0 || basis < 0 || basis > 4 )
+                return "#NUM!"
+
+            return ( 1.0 - pr / redemption ) / yearFrac( settlement, maturity, basis );
+
+        }
+
+        oParser = new parserFormula( "DISC(DATE(2007,1,25),DATE(2007,6,15),97.975,100,1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), disc( new Date(2007,0,25),new Date(2007,5,15),97.975,100,1 ) );
+
+    } )
+
+    test( "Test: \"DOLLARDE\"", function () {
+
+        function dollarde( fractionalDollar, fraction ){
+
+            if( fraction < 0 )
+                return "#NUM!";
+            else if( fraction == 0 )
+                return "#DIV/0!";
+
+            var fInt = Math.floor( fractionalDollar ), res  = fractionalDollar - fInt;
+
+            res /= fraction;
+
+            res *= Math.pow( 10, Math.ceil( Math.log( fraction ) / Math.log( 10 ) ) );
+
+            res += fInt;
+
+            return res;
+
+        }
+
+        oParser = new parserFormula( "DOLLARDE(1.02,16)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), dollarde( 1.02,16 ) );
+
+        oParser = new parserFormula( "DOLLARDE(1.1,32)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), dollarde( 1.1,32 ) );
+
+    } )
+
+    test( "Test: \"DOLLARFR\"", function () {
+
+        function dollarde( fractionalDollar, fraction ){
+
+            if( fraction < 0 )
+                return "#NUM!";
+            else if( fraction == 0 )
+                return "#DIV/0!";
+
+            var fInt = Math.floor( fractionalDollar ), res  = fractionalDollar - fInt;
+
+            res *= fraction;
+
+            res *= Math.pow( 10.0, -Math.ceil( Math.log( fraction ) / Math.log( 10 ) ) );
+
+            res += fInt;
+
+            return res;
+
+        }
+
+        oParser = new parserFormula( "DOLLARFR(1.125,16)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), dollarde( 1.125,16 ) );
+
+        oParser = new parserFormula( "DOLLARFR(1.125,32)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), dollarde( 1.125,32 ) );
+
+    } )
+
+    test( "Test: \"RECEIVED\"", function () {
+
+        function received( settlement, maturity, investment, discount, basis ){
+
+            if( settlement >= maturity || investment <= 0 || discount <= 0 || basis < 0 || basis > 4 )
+                return "#NUM!"
+
+            return investment / ( 1 - ( discount * yearFrac( settlement, maturity, basis) ) )
+
+        }
+
+        oParser = new parserFormula( "RECEIVED(DATE(2008,2,15),DATE(2008,5,15),1000000,0.0575,2)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), received( new Date(2008,1,15),new Date(2008,4,15),1000000,0.0575,2 ) );
+
+    } )
+
+    test( "Test: \"RATE\"", function () {
+
+        function RateIteration( fNper, fPayment, fPv, fFv, fPayType, fGuess ) {
+            function approxEqual( a, b ) {
+                if ( a == b )
+                    return true;
+                var x = a - b;
+                return (x < 0.0 ? -x : x)
+                    < ((a < 0.0 ? -a : a) * (1.0 / (16777216.0 * 16777216.0)));
+            }
+
+            var bValid = true, bFound = false, fX, fXnew, fTerm, fTermDerivation, fGeoSeries, fGeoSeriesDerivation;
+            var nIterationsMax = 150, nCount = 0, fEpsilonSmall = 1.0E-14, SCdEpsilon = 1.0E-7;
+            fFv = fFv - fPayment * fPayType;
+            fPv = fPv + fPayment * fPayType;
+            if ( fNper == Math.round( fNper ) ) {
+                fX = fGuess.fGuess;
+                var fPowN, fPowNminus1;
+                while ( !bFound && nCount < nIterationsMax ) {
+                    fPowNminus1 = Math.pow( 1.0 + fX, fNper - 1.0 );
+                    fPowN = fPowNminus1 * (1.0 + fX);
+                    if ( approxEqual( Math.abs( fX ), 0.0 ) ) {
+                        fGeoSeries = fNper;
+                        fGeoSeriesDerivation = fNper * (fNper - 1.0) / 2.0;
+                    }
+                    else {
+                        fGeoSeries = (fPowN - 1.0) / fX;
+                        fGeoSeriesDerivation = fNper * fPowNminus1 / fX - fGeoSeries / fX;
+                    }
+                    fTerm = fFv + fPv * fPowN + fPayment * fGeoSeries;
+                    fTermDerivation = fPv * fNper * fPowNminus1 + fPayment * fGeoSeriesDerivation;
+                    if ( Math.abs( fTerm ) < fEpsilonSmall )
+                        bFound = true;
+                    else {
+                        if ( approxEqual( Math.abs( fTermDerivation ), 0.0 ) )
+                            fXnew = fX + 1.1 * SCdEpsilon;
+                        else
+                            fXnew = fX - fTerm / fTermDerivation;
+                        nCount++;
+                        bFound = (Math.abs( fXnew - fX ) < SCdEpsilon);
+                        fX = fXnew;
+                    }
+                }
+                bValid =(fX >=-1.0);
+            }
+            else {
+                fX = (fGuess.fGuest < -1.0) ? -1.0 : fGuess.fGuest;
+                while ( bValid && !bFound && nCount < nIterationsMax ) {
+                    if ( approxEqual( Math.abs( fX ), 0.0 ) ) {
+                        fGeoSeries = fNper;
+                        fGeoSeriesDerivation = fNper * (fNper - 1.0) / 2.0;
+                    }
+                    else {
+                        fGeoSeries = (Math.pow( 1.0 + fX, fNper ) - 1.0) / fX;
+                        fGeoSeriesDerivation = fNper * Math.pow( 1.0 + fX, fNper - 1.0 ) / fX - fGeoSeries / fX;
+                    }
+                    fTerm = fFv + fPv * pow( 1.0 + fX, fNper ) + fPayment * fGeoSeries;
+                    fTermDerivation = fPv * fNper * Math.pow( 1.0 + fX, fNper - 1.0 ) + fPayment * fGeoSeriesDerivation;
+                    if ( Math.abs( fTerm ) < fEpsilonSmall )
+                        bFound = true;
+                    else {
+                        if ( approxEqual( Math.abs( fTermDerivation ), 0.0 ) )
+                            fXnew = fX + 1.1 * SCdEpsilon;
+                        else
+                            fXnew = fX - fTerm / fTermDerivation;
+                        nCount++;
+                        bFound = (Math.abs( fXnew - fX ) < SCdEpsilon);
+                        fX = fXnew;
+                        bValid = (fX >= -1.0);
+                    }
+                }
+            }
+            fGuess.fGuess = fX;
+            return bValid && bFound;
+        }
+
+        function rate(nper, pmt, pv, fv, type, quess){
+
+            if ( fv === undefined ) fv = 0;
+            if ( type === undefined ) type = 0;
+            if ( quess === undefined ) quess = 0.1;
+
+            var res = {fGuess:0};
+
+            if( RateIteration(nper, pmt, pv, fv, type, res) )
+                return res.fGuess;
+
+            return "#VALUE!"
+        }
+
+        oParser = new parserFormula( "RATE(4*12,-200,8000)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( difBetween( oParser.calculate().getValue(), rate(4*12,-200,8000) ), true );
+
+        oParser = new parserFormula( "RATE(4*12,-200,8000)*12", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( difBetween( oParser.calculate().getValue(), rate(4*12,-200,8000)*12 ), true );
+
+    } )
+
+    test( "Test: \"INTRATE\"", function () {
+
+        function intrate( settlement, maturity, investment, redemption, basis ){
+
+            if( settlement >= maturity || investment <= 0 || redemption <= 0 || basis < 0 || basis > 4 )
+                return "#NUM!"
+
+            return ( ( redemption / investment ) - 1 ) / yearFrac( settlement, maturity, basis )
+
+        }
+
+        oParser = new parserFormula( "INTRATE(DATE(2008,2,15),DATE(2008,5,15),1000000,1014420,2)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), intrate( new Date(2008,1,15),new Date(2008,4,15),1000000,1014420,2 ) );
+
+    } )
+
+    test( "Test: \"TBILLEQ\"", function () {
+
+        function tbilleq( settlement, maturity, discount ){
+
+            maturity = Date.prototype.getDateFromExcel(maturity.getExcelDate() + 1)
+
+            var d1 = settlement, d2 = maturity;
+            var date1 = d1.getDate(), month1 = d1.getMonth(), year1 = d1.getFullYear(),
+                date2 = d2.getDate(), month2 = d2.getMonth(), year2 = d2.getFullYear();
+
+            var nDiff = GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, true )
+
+            if( settlement >= maturity || discount <= 0 || nDiff > 360 )
+                return "#NUM!"
+
+            return ( 365 * discount ) / ( 360 - discount * nDiff );
+
+        }
+
+        oParser = new parserFormula( "TBILLEQ(DATE(2008,3,31),DATE(2008,6,1),0.0914)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), tbilleq( new Date(2008,2,31), new Date(2008,5,1), 0.0914 ) );
+
+    } )
+
+    test( "Test: \"TBILLPRICE\"", function () {
+
+        function tbillprice( settlement, maturity, discount ){
+
+            maturity = Date.prototype.getDateFromExcel(maturity.getExcelDate() + 1)
+
+            var d1 = settlement
+            var d2 = maturity
+
+            var fFraction = yearFrac(d1, d2, 0);
+
+            if( fFraction - Math.floor( fFraction ) == 0 )
+                return "#NUM!"
+
+            return 100 * ( 1 - discount * fFraction );
+
+        }
+
+        oParser = new parserFormula( "TBILLPRICE(DATE(2008,3,31),DATE(2008,6,1),0.09)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), tbillprice( new Date(2008,2,31), new Date(2008,5,1), 0.09 ) );
+
+    } )
+
+    test( "Test: \"TBILLYIELD\"", function () {
+
+        function tbillyield( settlement, maturity, pr ){
+
+            var d1 = settlement
+            var d2 = maturity
+            var date1 = d1.getDate(), month1 = d1.getMonth(), year1 = d1.getFullYear(),
+                date2 = d2.getDate(), month2 = d2.getMonth(), year2 = d2.getFullYear();
+
+            var nDiff = GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, true )
+            nDiff++;
+            if( settlement >= maturity || pr <= 0 || nDiff > 360 )
+                return "#NUM!"
+
+            return ( ( 100 - pr ) / pr) * (360 / nDiff);
+
+        }
+
+        oParser = new parserFormula( "TBILLYIELD(DATE(2008,3,31),DATE(2008,6,1),98.45)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), tbillyield( new Date(2008,2,31), new Date(2008,5,1), 98.45 ) );
 
     } )
 
