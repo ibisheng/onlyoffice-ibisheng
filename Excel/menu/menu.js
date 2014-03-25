@@ -3200,7 +3200,7 @@
                     }
                     else
                     {
-                        $("#invertCatOrderCheckBox").attr("checked", "");
+                        $("#invertCatOrderCheckBox").removeAttr("checked");
                     }
                     $("#labelsAxisInputDistanceInput").attr("value", vert_axis_props.getLabelsAxisDistance());
                     //TODO: сделать возможность выбора типа оси
@@ -3887,7 +3887,12 @@
         {
             var settings = new asc_ChartSettings();
             var axis_settings = new asc_CatAxisSettings();
-            settings.putHorAxisProps(axis_settings);
+
+
+            if(!$("#rightPanelValAxisPropsX").hasClass("horAxisPropsRightPanelActive"))
+                settings.putHorAxisProps(axis_settings);
+            else
+                settings.putVertAxisProps(axis_settings);
             axis_settings.putIntervalBetweenLabels(parseInt($("intervalBetweenTickInput").attr("value")));
             if($("#autoIntervalBetweenLabelsInputCat").attr("checked"))
             {

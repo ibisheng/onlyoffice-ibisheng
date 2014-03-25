@@ -1725,34 +1725,34 @@ CChartSpace.prototype.recalculateUpDownBars = function()
             else if(this.style === 33 || this.style === 34)
                 default_bar_line.setFill(CreateUnifillSolidFillSchemeColor(8, 0));
             else if(this.style >= 35 && this.style <= 40)
-                default_bar_line.setFill(CreateUnifillSolidFillSchemeColor(this.style - 35, -25000));
+                default_bar_line.setFill(CreateUnifillSolidFillSchemeColor(this.style - 35, -0.25000));
         }
         if(up_bars)
         {
             var default_up_bars_fill;
             if(this.style === 1 || this.style === 9 || this.style === 17 || this.style === 25 || this.style === 41)
             {
-                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(8, 25000);
+                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(8, 0.25000);
             }
             else if(this.style === 2 || this.style === 10 || this.style === 18 || this.style === 26)
             {
-                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(8, 5000);
+                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(8, 0.05000);
             }
             else if(this.style >= 3 && this.style <= 8)
             {
-                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 3, 25000);
+                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 3, 0.25000);
             }
             else if(this.style >= 11 && this.style <= 16)
             {
-                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 11, 25000);
+                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 11, 0.25000);
             }
             else if(this.style >=19 && this.style <= 24)
             {
-                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 19, 25000);
+                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 19, 0.25000);
             }
             else if(this.style >= 27 && this.style <= 32 )
             {
-                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 27, 25000);
+                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 27, 0.25000);
             }
             else if(this.style >= 33 && this.style <= 40 || this.style === 42)
             {
@@ -1760,7 +1760,7 @@ CChartSpace.prototype.recalculateUpDownBars = function()
             }
             else
             {
-                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 43, 25000);
+                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 43, 0.25000);
             }
             if(up_bars.Fill)
             {
@@ -1780,31 +1780,31 @@ CChartSpace.prototype.recalculateUpDownBars = function()
             var default_down_bars_fill;
             if(this.style === 1 || this.style === 9 || this.style === 17 || this.style === 25 || this.style === 41 || this.style === 33)
             {
-                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(8, 85000);
+                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(8, 0.85000);
             }
             else if(this.style === 2 || this.style === 10 || this.style === 18 || this.style === 26 || this.style === 34)
             {
-                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(8, 95000);
+                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(8, 0.95000);
             }
             else if(this.style >= 3 && this.style <= 8)
             {
-                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 3, -25000);
+                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 3, -0.25000);
             }
             else if(this.style >= 11 && this.style <= 16)
             {
-                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 11, -25000);
+                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 11, -0.25000);
             }
             else if(this.style >=19 && this.style <= 24)
             {
-                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 19, -25000);
+                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 19, -0.25000);
             }
             else if(this.style >= 27 && this.style <= 32 )
             {
-                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 27, -25000);
+                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 27, -0.25000);
             }
             else if(this.style >= 35 && this.style <= 40)
             {
-                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 35, -25000);
+                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 35, -0.25000);
             }
             else if(this.style === 42)
             {
@@ -1812,7 +1812,7 @@ CChartSpace.prototype.recalculateUpDownBars = function()
             }
             else
             {
-                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 43, -25000);
+                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 43, -0.25000);
             }
             if(down_bars.Fill)
             {
@@ -2445,6 +2445,37 @@ CChartSpace.prototype.recalculateAxis = function()
                     }
                 }
 
+                if(y_ax.labels)
+                {
+                    if(y_ax_orientation === ORIENTATION_MIN_MAX)
+                    {
+                        var t = y_ax.labels.arrLabels[0].tx.rich.content.Get_SummaryHeight()/2;
+                        y_ax.labels.y = arr_y_points[0] - t;
+                        y_ax.labels.extY = arr_y_points[arr_y_points.length-1] - arr_y_points[0] + t + y_ax.labels.arrLabels[y_ax.labels.arrLabels.length-1].tx.rich.content.Get_SummaryHeight()/2;
+                    }
+                    else
+                    {
+                        var t = y_ax.labels.arrLabels[y_ax.labels.arrLabels.length-1].tx.rich.content.Get_SummaryHeight()/2;
+                        y_ax.labels.y = arr_y_points[arr_y_points.length-1] - t;
+                        y_ax.labels.extY = arr_y_points[0] - arr_y_points[arr_y_points.length-1] + t + y_ax.labels.arrLabels[0].tx.rich.content.Get_SummaryHeight()/2;
+                    }
+                }
+
+                if(x_ax.labels.extX)
+                {
+                    if(x_ax_orientation === ORIENTATION_MIN_MAX)
+                    {
+                        var t = x_ax.labels.arrLabels[0].tx.rich.content.XLimit/2;
+                        x_ax.labels.x = arr_x_points[0] - t;
+                        x_ax.labels.extX = arr_x_points[arr_x_points.length-1] + x_ax.labels.arrLabels[x_ax.labels.arrLabels.length-1].tx.rich.content.XLimit/2 - x_ax.labels.x;
+                    }
+                    else
+                    {
+                        var t = x_ax.labels.arrLabels[x_ax.labels.arrLabels.length-1].tx.rich.content.XLimit/2;
+                        x_ax.labels.x = arr_x_points[arr_x_points.length-1] - t;
+                        x_ax.labels.extX = arr_x_points[0] + x_ax.labels.arrLabels[0].tx.rich.content.XLimit/2 - x_ax.labels.x;
+                    }
+                }
                 /*new recalc*/
 
 
@@ -2801,7 +2832,7 @@ CChartSpace.prototype.recalculateAxis = function()
                 var max_width = 0;
                 val_ax.yPoints = [];
 
-
+                var max_val_labels_text_height = 0;
                 for(i = 0; i < arr_strings.length; ++i)
                 {
                     var dlbl = new CDLbl();
@@ -2811,9 +2842,12 @@ CChartSpace.prototype.recalculateAxis = function()
                     dlbl.txPr = val_ax.txPr;
                     dlbl.tx = new CChartText();
                     dlbl.tx.rich = CreateTextBodyFromString(arr_strings[i], this.getDrawingDocument(), dlbl);
-                    var cur_width = dlbl.tx.rich.recalculateByMaxWord().w;
+                    var t = dlbl.tx.rich.recalculateByMaxWord();
+                    var cur_width = t.w;
                     if(cur_width > max_width)
                         max_width = cur_width;
+                    if(t.h > max_val_labels_text_height)
+                        max_val_labels_text_height = t.h;
                     val_ax.labels.arrLabels.push(dlbl);
                     val_ax.yPoints.push({val: arr_val[i], pos: null});
 
@@ -3539,8 +3573,8 @@ CChartSpace.prototype.recalculateAxis = function()
                 var arr_labels, transform_text;
                 if(val_ax.labels)
                 {
-                    val_ax.labels.y = Math.min.apply(Math, arr_val_labels_points);
-                    val_ax.labels.extY = Math.max.apply(Math, arr_val_labels_points) - Math.min.apply(Math, arr_val_labels_points);
+                    val_ax.labels.y = Math.min.apply(Math, arr_val_labels_points) - max_val_labels_text_height/2;
+                    val_ax.labels.extY = Math.max.apply(Math, arr_val_labels_points) - Math.min.apply(Math, arr_val_labels_points) + max_val_labels_text_height;
                     arr_labels = val_ax.labels.arrLabels;
                     if(left_val_ax_labels_align)
                     {
@@ -3596,7 +3630,7 @@ CChartSpace.prototype.recalculateAxis = function()
                         {
                             cat_ax.labels.x = arr_cat_labels_points[arr_cat_labels_points.length-1] - max_cat_label_width/2;
                         }
-                        cat_ax.labels.extX = max_cat_label_width*string_pts.length;
+                        cat_ax.labels.extX = arr_cat_labels_points[arr_cat_labels_points.length-1] + max_cat_label_width/2 - cat_ax.labels.x;
 
                         if(cat_labels_align_bottom)
                         {
@@ -3655,15 +3689,15 @@ CChartSpace.prototype.recalculateAxis = function()
                                     global_MatrixTransformer.MultiplyAppend(label_text_transform,this.transform);
                                     if(!isRealNumber(left_x))
                                     {
-                                        left_x = xc - w2;
-                                        right_x = xc + w2;
+                                        left_x = xc - w2/2;
+                                        right_x = xc + w2/2;
                                     }
                                     else
                                     {
-                                        if(xc - w2 < left_x)
-                                            left_x = xc - w2;
-                                        if(xc + w2 > right_x)
-                                            right_x = xc + w2;
+                                        if(xc - w2/2 < left_x)
+                                            left_x = xc - w2/2;
+                                        if(xc + w2/2 > right_x)
+                                            right_x = xc + w2/2;
                                     }
                                 }
                             }
@@ -3695,15 +3729,15 @@ CChartSpace.prototype.recalculateAxis = function()
 
                                     if(!isRealNumber(left_x))
                                     {
-                                        left_x = xc - w2;
-                                        right_x = xc + w2;
+                                        left_x = xc - w2/2;
+                                        right_x = xc + w2/2;
                                     }
                                     else
                                     {
-                                        if(xc - w2 < left_x)
-                                            left_x = xc - w2;
-                                        if(xc + w2 > right_x)
-                                            right_x = xc + w2;
+                                        if(xc - w2/2 < left_x)
+                                            left_x = xc - w2/2;
+                                        if(xc + w2/2 > right_x)
+                                            right_x = xc + w2/2;
                                     }
                                 }
                             }
@@ -3712,7 +3746,6 @@ CChartSpace.prototype.recalculateAxis = function()
                         cat_ax.labels.extX = right_x - left_x;
                     }
                 }
-
                 cat_ax.xPoints.sort(function(a, b){return a.val - b.val});
                 val_ax.yPoints.sort(function(a, b){return a.val - b.val});
             }
@@ -3771,6 +3804,7 @@ CChartSpace.prototype.recalculateAxis = function()
                 val_ax.labels = new CValAxisLabels(this);
                 var max_height = 0;
                 val_ax.xPoints = [];
+                var max_val_ax_label_width = 0;
                 for(i = 0; i < arr_strings.length; ++i)
                 {
                     var dlbl = new CDLbl();
@@ -3781,7 +3815,10 @@ CChartSpace.prototype.recalculateAxis = function()
                     dlbl.tx = new CChartText();
                     dlbl.tx.rich = CreateTextBodyFromString(arr_strings[i], this.getDrawingDocument(), dlbl);
                     dlbl.txBody = dlbl.tx.rich;
-                    var h = dlbl.tx.rich.recalculateByMaxWord().h;
+                    var t = dlbl.tx.rich.recalculateByMaxWord();
+                    var h = t.h;
+                    if(t.w > max_val_ax_label_width)
+                        max_val_ax_label_width = t.w;
                     if(h > max_height)
                         max_height = h;
                     val_ax.labels.arrLabels.push(dlbl);
@@ -4108,9 +4145,11 @@ CChartSpace.prototype.recalculateAxis = function()
 
                             arr_min_max_min[i] = min_max.Min;
 
+                            dlbl.getMaxWidth = function(){return 20000};
+                            dlbl.recalculate();
+                            delete dlbl.getMaxWidth;
                             if(dlbl.tx.rich.content.XLimit > max_content_width)
                                 max_content_width = dlbl.tx.rich.content.XLimit;
-                            dlbl.recalculate();
                         }
                         cat_ax.labels.arrLabels.push(dlbl);
                     }
@@ -4300,8 +4339,8 @@ CChartSpace.prototype.recalculateAxis = function()
                 //запишем в оси необходимую информацию для отрисовщика plotArea  и выставим окончательные позиции для подписей
                 if(val_ax.labels)
                 {
-                    val_ax.labels.x = Math.min.apply(Math, arr_val_labels_points);
-                    val_ax.labels.extX = Math.max.apply(Math, arr_val_labels_points) - Math.min.apply(Math, arr_val_labels_points);
+                    val_ax.labels.x = Math.min.apply(Math, arr_val_labels_points) - max_val_ax_label_width/2;
+                    val_ax.labels.extX = Math.max.apply(Math, arr_val_labels_points) - Math.min.apply(Math, arr_val_labels_points) + max_val_ax_label_width;
                     //val_axis_labels_gap - вертикальный зазор
                     if(bottom_val_ax_labels_align)
                     {
@@ -4359,7 +4398,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 {
                                     var transform_text = cat_ax.labels.arrLabels[i].transformText;
                                     transform_text.Reset();
-                                    global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + cat_ax.labels.extX - cat_ax.labels.arrLabels[i].tx.rich.content.XLimit - labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2)
+                                    global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + cat_ax.labels.extX - cat_ax.labels.arrLabels[i].tx.rich.content.XLimit - labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
                                     global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
                                 }
                             }
@@ -4375,7 +4414,7 @@ CChartSpace.prototype.recalculateAxis = function()
 
                                     var transform_text = cat_ax.labels.arrLabels[i].transformText;
                                     transform_text.Reset();
-                                    global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + cat_ax.labels.extX - cat_ax.labels.arrLabels[i].tx.rich.content.XLimit - labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2)
+                                    global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + cat_ax.labels.extX - cat_ax.labels.arrLabels[i].tx.rich.content.XLimit - labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
                                     global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
                                 }
                             }
@@ -4391,7 +4430,7 @@ CChartSpace.prototype.recalculateAxis = function()
 
                                     var transform_text = cat_ax.labels.arrLabels[i].transformText;
                                     transform_text.Reset();
-                                    global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + cat_ax.labels.extX - cat_ax.labels.arrLabels[i].tx.rich.content.XLimit - labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2)
+                                    global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + cat_ax.labels.extX - cat_ax.labels.arrLabels[i].tx.rich.content.XLimit - labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
                                     global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
                                 }
                             }
@@ -4414,7 +4453,52 @@ CChartSpace.prototype.recalculateAxis = function()
                     }
                     else
                     {
-                        for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
+                        if(width_flag === 0)
+                        {
+                            for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
+                            {
+                                if(cat_ax.labels.arrLabels[i])
+                                {
+                                    var transform_text = cat_ax.labels.arrLabels[i].transformText;
+                                    transform_text.Reset();
+                                    global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
+                                    global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
+                                }
+                            }
+                        }
+                        else if(width_flag === 1)
+                        {
+                            for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
+                            {
+                                if(cat_ax.labels.arrLabels[i])
+                                {
+                                    cat_ax.labels.arrLabels[i].tx.rich.content.Reset(0, 0, arr_min_max_min[i], 20000);
+                                    cat_ax.labels.arrLabels[i].tx.rich.content.Recalculate_Page(0, true);
+
+                                    var transform_text = cat_ax.labels.arrLabels[i].transformText;
+                                    transform_text.Reset();
+                                    global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
+                                    global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
+                                }
+                            }
+                        }
+                        else
+                        {
+                            for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
+                            {
+                                if(cat_ax.labels.arrLabels[i])
+                                {
+                                    cat_ax.labels.arrLabels[i].tx.rich.content.Reset(0, 0, cat_ax.labels.extX - labels_offset, 20000);
+                                    cat_ax.labels.arrLabels[i].tx.rich.content.Recalculate_Page(0, true);
+                                    var transform_text = cat_ax.labels.arrLabels[i].transformText;
+                                    transform_text.Reset();
+                                    global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
+                                    global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
+                                }
+                            }
+                        }
+
+                        /*for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
                         {
                             if(cat_ax.labels.arrLabels[i])
                             {
@@ -4425,7 +4509,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 cat_ax.labels.arrLabels[i].tx.rich.content.Recalculate_Page(0, true);
                                 cat_ax.labels.arrLabels[i].setPosition(cat_ax.labels.x + labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
                             }
-                        }
+                        }*/
                     }
                 }
 
@@ -4498,7 +4582,8 @@ CChartSpace.prototype.recalculateLegend = function()
                         if(ser.compiledSeriesMarker)
                         {
                             union_marker.marker = CreateMarkerGeometryByType(ser.compiledSeriesMarker.symbol, null);
-                            union_marker.marker.brush = ser.compiledSeriesPen.Fill;
+                            if(ser.compiledSeriesPen)
+                                union_marker.marker.brush = ser.compiledSeriesPen.Fill;
                         }
                         if(ser.compiledSeriesPen)
                         {
@@ -4704,10 +4789,16 @@ CChartSpace.prototype.recalculateLegend = function()
                             calc_entry.calcMarkerUnion.marker.localX = distance_to_text + line_marker_width/2 - calc_entry.calcMarkerUnion.marker.extX/2;
                             calc_entry.calcMarkerUnion.marker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2 - marker_size/2;
                         }
-                        calc_entry.calcMarkerUnion.lineMarker.localX = distance_to_text;
-                        calc_entry.calcMarkerUnion.lineMarker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2;// - calc_entry.calcMarkerUnion.lineMarker.penWidth/2;
-                        calc_entry.localX = calc_entry.calcMarkerUnion.lineMarker.localX + line_marker_width + distance_to_text;
-                        calc_entry.localY = summ_h;
+
+                        if(calc_entry.calcMarkerUnion.lineMarker)
+                        {
+                            calc_entry.calcMarkerUnion.lineMarker.localX = distance_to_text;
+                            calc_entry.calcMarkerUnion.lineMarker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2;// - calc_entry.calcMarkerUnion.lineMarker.penWidth/2;
+                            calc_entry.localX = calc_entry.calcMarkerUnion.lineMarker.localX + line_marker_width + distance_to_text;
+                            calc_entry.localY = summ_h;
+                        }
+
+
                         summ_h+=arr_heights[i];
                     }
                     legend.setPosition(0, 0);

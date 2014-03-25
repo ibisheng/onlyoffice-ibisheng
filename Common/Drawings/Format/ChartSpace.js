@@ -2045,10 +2045,6 @@ function CreateLineChart(asc_chart, type)
     var d_lbls = line_chart.dLbls;
     d_lbls.setShowLegendKey(false);
     d_lbls.setShowVal(true);
-    d_lbls.setShowCatName(true);
-    d_lbls.setShowSerName(true);
-    d_lbls.setShowPercent(false);
-    d_lbls.setShowBubbleSize(false);
     var cat_ax = plot_area.catAx;
     cat_ax.setScaling(new CScaling());
     cat_ax.setDelete(false);
@@ -2198,10 +2194,6 @@ function CreateBarChart(asc_chart, type)
     var d_lbls = bar_chart.dLbls;
     d_lbls.setShowLegendKey(false);
     d_lbls.setShowVal(true);
-    d_lbls.setShowCatName(true);
-    d_lbls.setShowSerName(true);
-    d_lbls.setShowPercent(false);
-    d_lbls.setShowBubbleSize(false);
     var cat_ax = plot_area.catAx;
     cat_ax.setScaling(new CScaling());
     cat_ax.setDelete(false);
@@ -2349,10 +2341,6 @@ function CreateHBarChart(asc_chart, type)
     var d_lbls = bar_chart.dLbls;
     d_lbls.setShowLegendKey(false);
     d_lbls.setShowVal(true);
-    d_lbls.setShowCatName(true);
-    d_lbls.setShowSerName(true);
-    d_lbls.setShowPercent(false);
-    d_lbls.setShowBubbleSize(false);
     bar_chart.setGapWidth(150);
     bar_chart.addAxId(plot_area.catAx);
     bar_chart.addAxId(plot_area.valAx);
@@ -2504,10 +2492,6 @@ function CreateAreaChart(asc_chart, type)
     var d_lbls = area_chart.dLbls;
     d_lbls.setShowLegendKey(false);
     d_lbls.setShowVal(true);
-    d_lbls.setShowCatName(true);
-    d_lbls.setShowSerName(true);
-    d_lbls.setShowPercent(false);
-    d_lbls.setShowBubbleSize(false);
     var cat_ax = plot_area.catAx;
     cat_ax.setScaling(new CScaling());
     cat_ax.setDelete(false);
@@ -2645,11 +2629,6 @@ function CreatePieChart(asc_chart, bDoughnut)
     pie_chart.setDLbls(new CDLbls());
     pie_chart.dLbls.setShowLegendKey(false);
     pie_chart.dLbls.setShowVal(true);
-    pie_chart.dLbls.setShowCatName(true);
-    pie_chart.dLbls.setShowSerName(true);
-    pie_chart.dLbls.setShowPercent(false);
-    pie_chart.dLbls.setShowBubbleSize(false);
-    pie_chart.dLbls.setShowLeaderLines(true);
     pie_chart.setFirstSliceAng(0);
     if(bDoughnut)
         pie_chart.setHoleSize(50);
@@ -2782,10 +2761,6 @@ function CreateScatterChart(asc_chart)
     var d_lbls = scatter_chart.dLbls;
     d_lbls.setShowLegendKey(false);
     d_lbls.setShowVal(true);
-    d_lbls.setShowCatName(true);
-    d_lbls.setShowSerName(true);
-    d_lbls.setShowPercent(false);
-    d_lbls.setShowBubbleSize(false);
     var cat_ax = plot_area.catAx;
     cat_ax.setScaling(new CScaling());
     cat_ax.setDelete(false);
@@ -2931,10 +2906,6 @@ function CreateStockChart(asc_chart)
     var d_lbls = line_chart.dLbls;
     d_lbls.setShowLegendKey(false);
     d_lbls.setShowVal(true);
-    d_lbls.setShowCatName(true);
-    d_lbls.setShowSerName(true);
-    d_lbls.setShowPercent(false);
-    d_lbls.setShowBubbleSize(false);
     var cat_ax = plot_area.catAx;
     cat_ax.setScaling(new CScaling());
     cat_ax.setDelete(false);
@@ -3149,10 +3120,6 @@ function CreateRadarChart(asc_chart)
     var d_lbls = bar_chart.dLbls;
     d_lbls.setShowLegendKey(false);
     d_lbls.setShowVal(true);
-    d_lbls.setShowCatName(true);
-    d_lbls.setShowSerName(true);
-    d_lbls.setShowPercent(false);
-    d_lbls.setShowBubbleSize(false);
     var cat_ax = plot_area.catAx;
     cat_ax.setScaling(new CScaling());
     cat_ax.setDelete(false);
