@@ -349,15 +349,22 @@ CChartSpace.prototype.recalculate = function()
             var pos = this.chartObj.reCalculatePositionText("title", this, this.chart.title);
             this.chart.title.setPosition(pos.x, pos.y);
         }
-        if(this.chart && this.chart.plotArea && this.chart.plotArea.valAx && this.chart.plotArea.valAx.title)
+
+        if(this.chart && this.chart.plotArea && this.chart.plotArea)
         {
-            var pos = this.chartObj.reCalculatePositionText("valAx", this, this.chart.plotArea.valAx.title);
-            this.chart.plotArea.valAx.title.setPosition(pos.x, pos.y);
-        }
-        if(this.chart && this.chart.plotArea && this.chart.plotArea.catAx && this.chart.plotArea.catAx.title)
-        {
-            var pos = this.chartObj.reCalculatePositionText("catAx", this, this.chart.plotArea.catAx.title);
-            this.chart.plotArea.catAx.title.setPosition(pos.x, pos.y);
+            var hor_axis = this.chart.plotArea.getHorizontalAxis();
+            if(hor_axis.title)
+            {
+
+                var pos = this.chartObj.reCalculatePositionText("catAx", this, hor_axis.title);
+                hor_axis.title.setPosition(pos.x, pos.y);
+            }
+            var vert_axis = this.chart.plotArea.getVerticalAxis();
+            if(vert_axis.title)
+            {
+                var pos = this.chartObj.reCalculatePositionText("valAx", this, vert_axis.title);
+                vert_axis.title.setPosition(pos.x, pos.y);
+            }
         }
         if(this.chart && this.chart.legend)
         {
