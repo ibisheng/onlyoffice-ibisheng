@@ -3666,7 +3666,7 @@ drawLineChart.prototype =
 		//соответствует подписям оси значений(OY)
 		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
 		
-		var y, y1, x, x1, val, nextVal, tempVal, seria, dataSeries;
+		var y, y1, x, x1, val, nextVal, tempVal, seria, dataSeries, compiledMarkerSize, compiledMarkerSymbol;
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 		
 			seria = this.chartProp.series[i];
@@ -3684,7 +3684,11 @@ drawLineChart.prototype =
 					this.paths.points = [];
 				if(!this.paths.points[i])
 					this.paths.points[i] = [];
-				this.paths.points[i][n] = this.cChartDrawer.calculatePoint(x, y, dataSeries[n].compiledMarker.size, dataSeries[n].compiledMarker.symbol);
+				
+				compiledMarkerSize = dataSeries[n].compiledMarker && dataSeries[n].compiledMarker.size ? dataSeries[n].compiledMarker.size : null;
+				compiledMarkerSymbol = dataSeries[n].compiledMarker && dataSeries[n].compiledMarker.symbol ? dataSeries[n].compiledMarker.symbol : null;
+				
+				this.paths.points[i][n] = this.cChartDrawer.calculatePoint(x, y, compiledMarkerSize, compiledMarkerSymbol);
 			}
 			else
 			{
@@ -3716,11 +3720,23 @@ drawLineChart.prototype =
 					
 					if(n == 0)
 					{
-						this.paths.points[i][n] = this.cChartDrawer.calculatePoint(x, y, dataSeries[n].compiledMarker.size, dataSeries[n].compiledMarker.symbol);
-						this.paths.points[i][n + 1] = this.cChartDrawer.calculatePoint(x1, y1, dataSeries[n + 1].compiledMarker.size, dataSeries[n + 1].compiledMarker.symbol);
+						compiledMarkerSize = dataSeries[n].compiledMarker && dataSeries[n].compiledMarker.size ? dataSeries[n].compiledMarker.size : null;
+						compiledMarkerSymbol = dataSeries[n].compiledMarker && dataSeries[n].compiledMarker.symbol ? dataSeries[n].compiledMarker.symbol : null;
+						
+						this.paths.points[i][n] = this.cChartDrawer.calculatePoint(x, y, compiledMarkerSize, compiledMarkerSymbol);
+						
+						compiledMarkerSize = dataSeries[n + 1].compiledMarker && dataSeries[n + 1].compiledMarker.size ? dataSeries[n + 1].compiledMarker.size : null;
+						compiledMarkerSymbol = dataSeries[n + 1].compiledMarker && dataSeries[n + 1].compiledMarker.symbol ? dataSeries[n + 1].compiledMarker.symbol : null;
+						
+						this.paths.points[i][n + 1] = this.cChartDrawer.calculatePoint(x1, y1, compiledMarkerSize, compiledMarkerSymbol);
 					}
 					else
-						this.paths.points[i][n + 1] = this.cChartDrawer.calculatePoint(x1, y1, dataSeries[n + 1].compiledMarker.size, dataSeries[n + 1].compiledMarker.symbol);
+					{
+						compiledMarkerSize = dataSeries[n + 1].compiledMarker && dataSeries[n + 1].compiledMarker.size ? dataSeries[n + 1].compiledMarker.size : null;
+						compiledMarkerSymbol = dataSeries[n + 1].compiledMarker && dataSeries[n + 1].compiledMarker.symbol ? dataSeries[n + 1].compiledMarker.symbol : null;
+						
+						this.paths.points[i][n + 1] = this.cChartDrawer.calculatePoint(x1, y1, compiledMarkerSize, compiledMarkerSymbol);
+					}	
 				}
 			}
 		}
@@ -3868,8 +3884,8 @@ drawLineChart.prototype =
 			//draw point
 			for(var k = 0; k < this.paths.points[i].length; k++)
 			{	
-				markerBrush = numCache.pts[k].compiledMarker.brush;
-				markerPen = numCache.pts[k].compiledMarker.pen;
+				markerBrush = numCache.pts[k].compiledMarker ? numCache.pts[k].compiledMarker.brush : null;
+				markerPen = numCache.pts[k].compiledMarker ? numCache.pts[k].compiledMarker.pen : null;
 				
 				//frame of point
 				if(this.paths.points[i][0].framePaths)
@@ -5452,7 +5468,7 @@ drawScatterChart.prototype =
 		var koffX = trueWidth/digHeightOx;
 		var koffY = trueHeight/digHeightOy;	
 		
-		var seria, yVal, xVal, points, x, x1, y, y1, yNumCache, xNumCache;
+		var seria, yVal, xVal, points, x, x1, y, y1, yNumCache, xNumCache, compiledMarkerSize, compiledMarkerSymbol;
 		for(var i = 0; i < this.chartProp.series.length; i++)
 		{
 			seria = this.chartProp.series[i];
@@ -5505,7 +5521,10 @@ drawScatterChart.prototype =
 				if(!this.paths.points[i])
 					this.paths.points[i] = [];
 				
-				this.paths.points[i][k] = this.cChartDrawer.calculatePoint(x, y, yNumCache.pts[k].compiledMarker.size, yNumCache.pts[k].compiledMarker.symbol);
+				compiledMarkerSize = yNumCache.pts[k].compiledMarker ? yNumCache.pts[k].compiledMarker.size : null;
+				compiledMarkerSymbol = yNumCache.pts[k].compiledMarker ? yNumCache.pts[k].compiledMarker.symbol : null;
+				
+				this.paths.points[i][k] = this.cChartDrawer.calculatePoint(x, y, compiledMarkerSize, compiledMarkerSymbol);
 			}
 		}
     },
@@ -5545,8 +5564,8 @@ drawScatterChart.prototype =
 				for(var k = 0; k < this.paths.points[i].length; k++)
 				{	
 					yNumCache = this.chartProp.series[i].yVal.numRef ? this.chartProp.series[i].yVal.numRef.numCache : this.chartProp.series[i].yVal.numLit;
-					markerBrush = yNumCache.pts[k].compiledMarker.brush;
-					markerPen = yNumCache.pts[k].compiledMarker.pen;
+					markerBrush = yNumCache.pts[k].compiledMarker ? yNumCache.pts[k].compiledMarker.brush : null;
+					markerPen = yNumCache.pts[k].compiledMarker ? yNumCache.pts[k].compiledMarker.pen : null;
 					
 					//frame of point
 					if(this.paths.points[i][0].framePaths)
