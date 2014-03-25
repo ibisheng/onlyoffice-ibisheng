@@ -521,9 +521,9 @@ CChartsDrawer.prototype =
 				{
 					left = leftDownPointX - valAx.labels.x;
 				}
-				else if((valAx.labels.x + valAx.labels.extX) >= rightUpPointY)//правее крайней правой точки
+				else if((valAx.labels.x + valAx.labels.extX) >= rightUpPointX)//правее крайней правой точки
 				{
-					right = valAx.labels.x + valAx.labels.extX - rightUpPointY;
+					right = valAx.labels.x + valAx.labels.extX - rightUpPointX;
 				}
 			}
 			
@@ -5535,6 +5535,10 @@ drawScatterChart.prototype =
 	_drawScatter: function ()
     {
 		var seria, brush, pen, markerBrush, markerPen, yNumCache;
+		
+		this.cShapeDrawer.Graphics.SaveGrState();
+		this.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, this.chartProp.chartGutter._top / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
+		
 		for(var i = 0; i < this.chartProp.series.length; i++)
 		{
 			seria = this.chartProp.series[i];
@@ -5578,6 +5582,8 @@ drawScatterChart.prototype =
 				}
 			}
 		}
+		
+		this.cShapeDrawer.Graphics.RestoreGrState();
     },
 	
 	_getYPosition: function(val, yPoints, isOx)
@@ -6861,7 +6867,7 @@ valAxisChart.prototype =
 	
 	_calculateAxis : function()
 	{
-		var nullPoisition = this.chartSpace.chart.plotArea.valAx.posX;
+		var nullPoisition = this.chartSpace.chart.plotArea.valAx.posX != undefined ? this.chartSpace.chart.plotArea.valAx.posX : this.chartSpace.chart.plotArea.valAx.xPos;
 		if(this.chartProp.type == "HBar")
 		{	
 			nullPoisition = this.chartSpace.chart.plotArea.valAx.posY;
