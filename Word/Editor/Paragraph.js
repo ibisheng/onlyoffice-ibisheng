@@ -14136,8 +14136,8 @@ Paragraph.prototype =
                         var RangesCount = Line.Ranges.length;
 
                         // Определяем позицию и высоту строки
-                        var StartY = this.Pages[CurPage].Y      + this.Lines[CurLine].Top;
-                        var H      = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
+                        DrawSelection.StartY = this.Pages[CurPage].Y      + this.Lines[CurLine].Top;
+                        DrawSelection.H      = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
 
                         for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
                         {
@@ -14165,6 +14165,9 @@ Paragraph.prototype =
 
                             var StartX = DrawSelection.StartX;
                             var W      = DrawSelection.W;
+
+                            var StartY = DrawSelection.StartY;
+                            var H      = DrawSelection.H;
 
                             // Отрисовываем селект
                             if ( W > 0.001 )
@@ -22235,6 +22238,9 @@ function CParagraphDrawSelectionRange()
 {
     this.StartX    = 0;
     this.W         = 0;
+
+    this.StartY    = 0;
+    this.H         = 0;
 
     this.FindStart = true;
 }
