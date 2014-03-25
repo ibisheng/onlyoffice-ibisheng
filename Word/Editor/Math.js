@@ -818,7 +818,7 @@ ParaMath.prototype =
         var Pos = ContentPos.Get(Depth);
         this.State.ContentPos = Pos;
 
-        this.RootComposition.set_ParaContentPos(ContentPos, Depth);
+        this.CurrentContent = this.SelectContent = this.RootComposition.set_ParaContentPos(ContentPos, Depth);
     },
     Get_PosByElement : function(Class, ContentPos, Depth, UseRange, Range, Line)
     {
