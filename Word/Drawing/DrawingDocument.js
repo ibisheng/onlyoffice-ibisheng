@@ -314,7 +314,10 @@ function CTextMeasurer()
         Width  = Temp.fAdvanceX * 25.4 / 72;
 
         return { Width : Width, Ascent : (Temp.oBBox.fMaxY * 25.4 / 72), Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
-            WidthG: ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72)};
+            WidthG: ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72),
+            rasterOffsetX: Temp.oBBox.fMinX * 25.4 / 72,
+            rasterOffsetY: Temp.oBBox.fMinY * 25.4 / 72
+        };
     }
 
     this.MeasureCode = function(lUnicode)
@@ -338,7 +341,10 @@ function CTextMeasurer()
         Width  = Temp.fAdvanceX * 25.4 / 72;
 
         return { Width : Width, Ascent : (Temp.oBBox.fMaxY * 25.4 / 72), Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
-            WidthG: ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72)};
+            WidthG: ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72),
+            rasterOffsetX: Temp.oBBox.fMinX * 25.4 / 72,
+            rasterOffsetY: Temp.oBBox.fMinY * 25.4 / 72
+        };
     }
 
     this.GetAscender = function()
