@@ -509,10 +509,10 @@ CChartsDrawer.prototype =
 		else if(isHBar === 'Scatter' && catAx && valAx && catAx.xPoints && valAx.yPoints)
 		{
 			leftDownPointX = catAx.xPoints[0].pos;
-			leftDownPointY = valAx.yPoints[0].pos;
+			leftDownPointY = valAx.scaling.orientation == ORIENTATION_MIN_MAX ? valAx.yPoints[0].pos : valAx.yPoints[valAx.yPoints.length - 1].pos;
 
 			rightUpPointX = catAx.xPoints[catAx.xPoints.length - 1].pos;
-			rightUpPointY = valAx.yPoints[valAx.yPoints.length - 1].pos;
+			rightUpPointY = valAx.scaling.orientation == ORIENTATION_MIN_MAX ? valAx.yPoints[valAx.yPoints.length - 1].pos : valAx.yPoints[0].pos;
 			
 			if(valAx.labels && !valAx.bDelete)
 			{
@@ -3029,10 +3029,20 @@ CChartsDrawer.prototype =
 					}	
 					else	
 					{
-						if(plotArea.valAx.scaling.orientation == ORIENTATION_MIN_MAX)
-							result = (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+						if(this.calcProp.type == "Scatter")
+						{
+							if(plotArea.catAx.scaling.orientation != ORIENTATION_MIN_MAX)
+								result = - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+							else
+								result = (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+						}
 						else
-							result = - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+						{
+							if(plotArea.valAx.scaling.orientation == ORIENTATION_MIN_MAX)
+								result = (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+							else
+								result = - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+						}
 					}
 						
 					break;
