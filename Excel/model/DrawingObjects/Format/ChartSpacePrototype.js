@@ -355,15 +355,21 @@ CChartSpace.prototype.recalculate = function()
             var hor_axis = this.chart.plotArea.getHorizontalAxis();
             if(hor_axis.title)
             {
-
+                var old_cat_ax = this.chart.plotArea.catAx;
+                this.chart.plotArea.catAx = hor_axis;
                 var pos = this.chartObj.reCalculatePositionText("catAx", this, hor_axis.title);
                 hor_axis.title.setPosition(pos.x, pos.y);
+
+                this.chart.plotArea.catAx = old_cat_ax;
             }
             var vert_axis = this.chart.plotArea.getVerticalAxis();
             if(vert_axis.title)
             {
+                var old_val_ax = this.chart.plotArea.valAx;
+                this.chart.plotArea.valAx = vert_axis;
                 var pos = this.chartObj.reCalculatePositionText("valAx", this, vert_axis.title);
                 vert_axis.title.setPosition(pos.x, pos.y);
+                this.chart.plotArea.valAx = old_val_ax;
             }
         }
         if(this.chart && this.chart.legend)
