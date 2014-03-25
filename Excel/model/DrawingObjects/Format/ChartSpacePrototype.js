@@ -635,12 +635,7 @@ CChartSpace.prototype.recalculateGridLines = function()
 
 CChartSpace.prototype.recalculateMarkers = function()
 {
-    if(/*this.chart && this.chart.plotArea && this.chart.plotArea.chart
-     && ((this.chart.plotArea.chart instanceof CLineChart && this.chart.plotArea.chart.marker)
-     || this.chart.plotArea.chart instanceof CScatterChart
-     || this.chart.plotArea.chart instanceof CStockChart)
-     && this.chart.plotArea.chart.series*/
-        this.chart.plotArea.chart.getObjectType() !== historyitem_type_LineChart && this.chart.plotArea.chart.getObjectType() !== historyitem_type_RadarChart  || this.chart.plotArea.chart.marker)
+    if(this.chart.plotArea.chart.getObjectType() !== historyitem_type_LineChart && this.chart.plotArea.chart.getObjectType() !== historyitem_type_RadarChart  || this.chart.plotArea.chart.marker)
     {
         var chart_style = CHART_STYLE_MANAGER.getStyleByIndex(this.style);
         var effect_fill = chart_style.fill1;
@@ -768,6 +763,32 @@ CChartSpace.prototype.recalculateMarkers = function()
             }
         }
     }
+    else
+    {
+        var series = this.chart.plotArea.chart.series;
+        for(var i = 0; i < series.length; ++i)
+        {
+            var ser = series[i];
+            ser.compiledSeriesMarker = null;
+            if(ser.val)
+            {
+                pts = ser.val.numRef.numCache.pts;
+            }
+            else if(ser.yVal)
+            {
+                pts = ser.yVal.numRef.numCache.pts;
+            }
+            else
+            {
+                pts = [];
+            }
+            for(var j = 0; j < pts.length; ++j)
+            {
+                pts[j].compiledMarker = null;
+            }
+        }
+    }
+
 };
 
 CChartSpace.prototype.recalculateSeriesColors = function()
@@ -2763,8 +2784,6 @@ CChartSpace.prototype.recalculateAxis = function()
                     }
                 }
 
-
-
                 val_ax.labels = new CValAxisLabels(this);
                 var max_width = 0;
                 val_ax.yPoints = [];
@@ -3206,7 +3225,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                     }
 
                                     //скорректируем позицию вертикальной оси
-                                    val_ax.posX = rect.x + rect.x + (val_ax.posX - left_gap_point)*(rect.w/(rect.x + rect.w - left_gap_point));
+                                    val_ax.posX = rect.x + (val_ax.posX - left_gap_point)*(rect.w/(rect.x + rect.w - left_gap_point));
                                 }
                                 if(right_gap_point > rect.x + rect.w)
                                 {
@@ -3748,8 +3767,8 @@ CChartSpace.prototype.recalculateAxis = function()
                     dlbl.txPr = val_ax.txPr;
                     dlbl.tx = new CChartText();
                     dlbl.tx.rich = CreateTextBodyFromString(arr_strings[i], this.getDrawingDocument(), dlbl);
-                    dlbl.recalculate();
-                    var h = dlbl.tx.rich.content.Get_SummaryHeight();
+                    dlbl.txBody = dlbl.tx.rich;
+                    var h = dlbl.tx.rich.recalculateByMaxWord().h;
                     if(h > max_height)
                         max_height = h;
                     val_ax.labels.arrLabels.push(dlbl);
@@ -4263,6 +4282,10 @@ CChartSpace.prototype.recalculateAxis = function()
                         var y_pos = val_ax.labels.y + val_axis_labels_gap;
                         for(i = 0;  i < val_ax.labels.arrLabels.length; ++i)
                         {
+
+                            //var text_transform = val_ax.labels.arrLabels[i].transformText;
+                            //text_transform.Reset();
+                            //global_MatrixTransformer.TranslateAppend(text_transform, )
                             val_ax.labels.arrLabels[i].setPosition(arr_val_labels_points[i] - val_ax.labels.arrLabels[i].tx.rich.content.XLimit, y_pos);
                         }
                     }

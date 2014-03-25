@@ -181,13 +181,33 @@ CPlotArea.prototype =
 
     getHorizontalAxis: function()
     {
-        return this.catAx; //TODO
+        var axis_by_types  = this.getAxisByTypes();
+        if(axis_by_types.valAx.length === 1 && axis_by_types.catAx.length === 1)
+        {
+           if(axis_by_types.valAx[0].axPos === AX_POS_B || axis_by_types.valAx[0].axPos === AX_POS_T)
+                return axis_by_types.valAx[0]
+           else
+                return axis_by_types.catAx[0];
+        }
+        else
+            return null;
+
+
     },
 
 
     getVerticalAxis: function()
     {
-        return this.valAx;  //TODO
+        var axis_by_types  = this.getAxisByTypes();
+        if(axis_by_types.valAx.length === 1 && axis_by_types.catAx.length === 1)
+        {
+            if(axis_by_types.valAx[0].axPos === AX_POS_L || axis_by_types.valAx[0].axPos === AX_POS_R)
+                return axis_by_types.valAx[0];
+            else
+                return axis_by_types.catAx[0];
+        }
+        else
+            return null;
     },
 
     getAxisByTypes: function()

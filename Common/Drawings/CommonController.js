@@ -1365,8 +1365,8 @@ DrawingObjectsController.prototype =
                                     vert_axis.title.txPr.setBodyPr(new CBodyPr());
                                 }
                                 vert_axis.title.txPr.bodyPr.reset();
-                                vert_axis.title.txPr.bodyPr.setRot(vert_axis_labels_settings === c_oAscChartVertAxisLabelShowSettings.rotated ? Math.PI/2 : 0);
-                                vert_axis.title.txPr.bodyPr.setVert(nVertTThorz);
+                                if(vert_axis_labels_settings === c_oAscChartVertAxisLabelShowSettings.rotated)
+                                    vert_axis.title.txPr.bodyPr.setVert(nVertTTvert);
                             }
                         }
                     }
