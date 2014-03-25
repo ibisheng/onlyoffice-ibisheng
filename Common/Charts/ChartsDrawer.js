@@ -2657,6 +2657,15 @@ CChartsDrawer.prototype =
 			
 		var min = this.calcProp.min;
 		var max = this.calcProp.max;
+		
+		if(this.cChartSpace.chart.plotArea.valAx && this.cChartSpace.chart.plotArea.valAx.scaling.logBase)
+		{
+			if(min < 0)
+				min = 0;
+			if(max < 0)
+				max = 0;
+		}
+
 		var orientation = this.cChartSpace && this.cChartSpace.chart.plotArea.valAx ? this.cChartSpace.chart.plotArea.valAx.scaling.orientation : ORIENTATION_MIN_MAX;
 		
 		if(min >= 0 && max >= 0)
@@ -3056,7 +3065,24 @@ CChartsDrawer.prototype =
 		return result;
 	},
 	
-	
+	getLogarithmicValue: function(val, logBase, yPoints, stackedValues)
+	{
+		if(val < 0)
+			return 0;
+		
+		
+		var logVal = Math.log(val) / Math.log(logBase);
+		var parseLogVal = logVal.toString().split(".");
+		
+		if(!parseLogVal[1])
+			return val;
+		
+		var multiplier = yPoints[parseFloat(parseLogVal[0]) + 1].val;
+		var result = multiplier * (parseFloat("0." + parseLogVal[1]));
+		
+		
+		return result;
+	},
 	
 	//****for 3D****
 	_convert3DTo2D: function(x, y, z, p, q, r)
@@ -3360,6 +3386,10 @@ drawBarChart.prototype =
 				
 				//стартовая позиция колонки Y(+ высота с учётом поправок на накопительные диаграммы)
 				val = parseFloat(seria[j].val);
+				
+				if(this.cShapeDrawer.chart.plotArea.valAx && this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase)
+					val = this.cChartDrawer.getLogarithmicValue(val, this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase, yPoints, tempValues);
+				
 				startYColumnPosition = this._getStartYColumnPosition(seriesHeight, j, val, yPoints);
 				startY = startYColumnPosition.startY;
 				height = startYColumnPosition.height;
@@ -3681,6 +3711,10 @@ drawLineChart.prototype =
 				var n = 0;
 				//рассчитываем значения				
 				val = this._getYVal(n, i);
+				
+				if(this.cChartSpace.chart.plotArea.valAx && this.cChartSpace.chart.plotArea.valAx.scaling.logBase)
+					val = this.cChartDrawer.getLogarithmicValue(val, this.cChartSpace.chart.plotArea.valAx.scaling.logBase, yPoints);
+				
 				y  = this.cChartDrawer.getYPosition(val, yPoints);
 				x  = xPoints[n].pos;
 				if(!this.paths.points)
@@ -3699,7 +3733,12 @@ drawLineChart.prototype =
 				{
 					//рассчитываем значения				
 					val = this._getYVal(n, i);
+					if(this.cChartSpace.chart.plotArea.valAx && this.cChartSpace.chart.plotArea.valAx.scaling.logBase)
+						val = this.cChartDrawer.getLogarithmicValue(val, this.cChartSpace.chart.plotArea.valAx.scaling.logBase, yPoints);
+					
 					nextVal = this._getYVal(n + 1, i);
+					if(this.cChartSpace.chart.plotArea.valAx && this.cChartSpace.chart.plotArea.valAx.scaling.logBase)
+						nextVal = this.cChartDrawer.getLogarithmicValue(nextVal, this.cChartSpace.chart.plotArea.valAx.scaling.logBase, yPoints);
 					
 					//точки находятся внутри диапазона
 
@@ -4021,44 +4060,20 @@ drawAreaChart.prototype =
 			{
 				//рассчитываем значения				
 				val = this._getYVal(n, i);
+				if(this.cShapeDrawer.chart.plotArea.valAx && this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase)
+					val = this.cChartDrawer.getLogarithmicValue(val, this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase, yPoints);
+				
 				nextVal = this._getYVal(n + 1, i);
+				if(this.cShapeDrawer.chart.plotArea.valAx && this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase)
+					nextVal = this.cChartDrawer.getLogarithmicValue(nextVal, this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase, yPoints);
 				
-				//точки находятся внутри диапазона
-				//if(val >= yPoints[0].val && val <= yPoints[yPoints.length - 1].val && nextVal >= yPoints[0].val && nextVal <= yPoints[yPoints.length - 1].val)
-				//{
-					y  = this.cChartDrawer.getYPosition(val, yPoints);
-					y1 = this.cChartDrawer.getYPosition(nextVal, yPoints);
-					
-					x  = xPoints[n].pos; 
-					x1 = xPoints[n + 1].pos;
-				//}
-				/*//первая точка выходит за пределы диапазона || вторая точка выходит за пределы диапазона
-				else if(( nextVal >= yPoints[0].val && nextVal <= yPoints[yPoints.length - 1].val ) || ( val >= yPoints[0].val && val <= yPoints[yPoints.length - 1].val ))
-				{
-					y  = this._getYPosition(val, yPoints);
-					y1 = this._getYPosition(nextVal, yPoints);
-					
-					if(val < yPoints[0].val)
-						yk = this._getYPosition(yPoints[0].val, yPoints);
-					else
-						yk = this._getYPosition(yPoints[yPoints.length - 1].val, yPoints);
-					
-					x  = xPoints[n].pos; 
-					x1 = xPoints[n + 1].pos; 
-					
-					//находим из двух точек уравнение, из третьей координаты y находим x
-					if(nextVal >= yPoints[0].val && nextVal <= yPoints[yPoints.length - 1].val)
-					{
-						x = (yk * (x - x1) + x1 * y + x1 * y1) / (y - y1);
-						y = yk;
-					}
-					else
-					{
-						x1 = (yk * (x - x1) + x1 * y + x1 * y1) / (y - y1);
-						y1 = yk;
-					}
-				}*/
+
+				y  = this.cChartDrawer.getYPosition(val, yPoints);
+				y1 = this.cChartDrawer.getYPosition(nextVal, yPoints);
 				
+				x  = xPoints[n].pos; 
+				x1 = xPoints[n + 1].pos;
+
 				
 				if(!this.paths.series)
 					this.paths.series = [];
@@ -4358,6 +4373,9 @@ drawHBarChart.prototype =
 				
 				//стартовая позиция колонки Y(+ высота с учётом поправок на накопительные диаграммы)
 				val = parseFloat(seria[j].val);
+				if(this.cShapeDrawer.chart.plotArea.valAx && this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase)
+					val = this.cChartDrawer.getLogarithmicValue(val, this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase, xPoints);
+				
 				startXColumnPosition = this._getStartYColumnPosition(seriesHeight, j, val, xPoints);
 				startX = startXColumnPosition.startY / this.chartProp.pxToMM;
 				width = startXColumnPosition.width / this.chartProp.pxToMM;
@@ -5492,6 +5510,11 @@ drawScatterChart.prototype =
 				else
 					xVal = n + 1;
 				
+				if(this.cShapeDrawer.chart.plotArea.catAx && this.cShapeDrawer.chart.plotArea.catAx.scaling.logBase)
+					yVal = this.cChartDrawer.getLogarithmicValue(yVal, this.cShapeDrawer.chart.plotArea.catAx.scaling.logBase, yPoints);
+				if(this.cShapeDrawer.chart.plotArea.valAx && this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase)
+					xVal = this.cChartDrawer.getLogarithmicValue(xVal, this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase, xPoints);	
+					
 				points[n] = {x: xVal, y: yVal}
 			}
 			
