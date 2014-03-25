@@ -4096,7 +4096,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             dlbl.tx = new CChartText();
                             dlbl.tx.rich = CreateTextBodyFromString(string_pts[i].val, this.getDrawingDocument(), dlbl);
                             dlbl.tx.rich.content.Set_ApplyToAll(true);
-                            dlbl.tx.rich.Set_ParagraphAlign(align_Center);
+                            dlbl.tx.rich.content.Set_ParagraphAlign(align_Center);
                             dlbl.tx.rich.content.Set_ApplyToAll(false);
                             var min_max =  dlbl.tx.rich.content.Recalculate_MinMaxContentWidth();
                             var max_min_content_width = min_max.Min;

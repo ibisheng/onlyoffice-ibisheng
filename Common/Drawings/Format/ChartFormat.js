@@ -190,7 +190,7 @@ CPlotArea.prototype =
 
         for(var i = 0; i < axis_by_types.valAx.length; ++i)
         {
-            if(axis_by_types.valAx[i].catAx === AX_POS_B || axis_by_types.catAx[i].axPos === AX_POS_T)
+            if(axis_by_types.catAx[i].axPos === AX_POS_B || axis_by_types.catAx[i].axPos === AX_POS_T)
                 return axis_by_types.catAx[i];
         }
         return null;
@@ -210,7 +210,7 @@ CPlotArea.prototype =
 
         for(var i = 0; i < axis_by_types.valAx.length; ++i)
         {
-            if(axis_by_types.valAx[i].catAx === AX_POS_L || axis_by_types.catAx[i].axPos === AX_POS_R)
+            if(axis_by_types.catAx[i].axPos === AX_POS_L || axis_by_types.catAx[i].axPos === AX_POS_R)
                 return axis_by_types.catAx[i];
         }
         return null;
