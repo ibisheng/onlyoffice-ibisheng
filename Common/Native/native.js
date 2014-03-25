@@ -423,3 +423,71 @@ window.native.Call_CheckTargetUpdate = function()
 {
     _api.WordControl.m_oLogicDocument.CheckTargetUpdate();
 };
+
+window.native.Call_HR_Tabs = function(arrT, arrP)
+{
+    var _arr = new CParaTabs();
+    var _c = arrT.length;
+    for (var i = 0; i < _c; i++)
+    {
+        if (arrT[i] == 1)
+            _arr.Add( new CParaTab( tab_Left, arrP[i] ) );
+        if (arrT[i] == 2)
+            _arr.Add( new CParaTab( tab_Right, arrP[i] ) );
+        if (arrT[i] == 3)
+            _arr.Add( new CParaTab( tab_Center, arrP[i] ) );
+    }
+    
+    var _logic = _api.WordControl.m_oLogicDocument;
+    if ( false === _logic.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+    {
+        _logic.Create_NewHistoryPoint();
+        _logic.Set_ParagraphTabs(_arr);
+    }
+};
+window.native.Call_HR_Pr = function(_indent_left, _indent_right, _indent_first)
+{
+    var _logic = _api.WordControl.m_oLogicDocument;
+    if ( false === _logic.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+    {
+        _logic.Create_NewHistoryPoint();
+        _logic.Set_ParagraphIndent( { Left : _indent_left, Right : _indent_right, FirstLine: _indent_first } );
+        _logic.Document_UpdateInterfaceState();
+    }
+};
+window.native.Call_HR_Margins = function(_margin_left, _margin_right)
+{
+    var _logic = _api.WordControl.m_oLogicDocument;
+    if ( false === _logic.Document_Is_SelectionLocked(changestype_Document_SectPr) )
+    {
+        _logic.Create_NewHistoryPoint();
+        _logic.Set_DocumentMargin( { Left : _margin_left, Right : _margin_right });
+    }
+};
+window.native.Call_HR_Table = function()
+{
+    // TODO:
+};
+
+window.native.Call_VR_Margins = function(_top, _bottom)
+{
+    var _logic = _api.WordControl.m_oLogicDocument;
+    if ( false === _logic.Document_Is_SelectionLocked(changestype_Document_SectPr) )
+    {
+        _logic.Create_NewHistoryPoint();
+        _logic.Set_DocumentMargin( { Top : _top, Bottom : _bottom });
+    }
+};
+window.native.Call_VR_Header = function(_header_top, _header_bottom)
+{
+    var _logic = _api.WordControl.m_oLogicDocument;
+    if ( false === _logic.Document_Is_SelectionLocked(changestype_HdrFtr) )
+    {
+        _logic.Create_NewHistoryPoint();
+        _logic.Document_SetHdrFtrBounds(_header_top, _header_bottom);
+    }
+};
+window.native.Call_VR_Table = function()
+{
+    // TODO:
+};
