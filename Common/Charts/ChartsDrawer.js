@@ -2684,18 +2684,21 @@ CChartsDrawer.prototype =
 		else
 		{
 			var valPoints;
-			if(this.calcProp.type == "HBar")
-				valPoints = this.cChartSpace.chart.plotArea.valAx.xPoints;
-			else
-				valPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
-			
-				
-			for (var i = 0; i < valPoints.length; i++)
+			if(this.cChartSpace.chart.plotArea.valAx)
 			{
-				if(valPoints[i].val == 0)
+				if(this.calcProp.type == "HBar")
+					valPoints = this.cChartSpace.chart.plotArea.valAx.xPoints;
+				else
+					valPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
+				
+					
+				for (var i = 0; i < valPoints.length; i++)
 				{
-					result =  valPoints[i].pos * this.calcProp.pxToMM;
-					break;
+					if(valPoints[i].val == 0)
+					{
+						result =  valPoints[i].pos * this.calcProp.pxToMM;
+						break;
+					}
 				}
 			}
 			
