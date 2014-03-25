@@ -5470,8 +5470,8 @@ CMathContent.prototype =
             Para.DrawingDocument.SetTargetSize( sizeCursor );
             //Para.DrawingDocument.UpdateTargetFromPaint = true;
             Para.DrawingDocument.UpdateTarget( X, Y, Para.Get_StartPage_Absolute() + CurPage );
-            console.log("CurPos: " + this.CurPos);
-            console.log("x " + X + " Y " + Y);
+            //console.log("CurPos: " + this.CurPos);
+            //console.log("x " + X + " Y " + Y);
             //Para.DrawingDocument.UpdateTargetFromPaint = false;
         }
 
