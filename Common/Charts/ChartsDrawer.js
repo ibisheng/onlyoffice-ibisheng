@@ -2486,7 +2486,7 @@ CChartsDrawer.prototype =
 		//chartProp.chart.plotArea.valAx.scaling.logBase
 		var axisMin, axisMax, firstDegree, step, arrayValues;
 		
-		if(chartProp.chart.plotArea.valAx.scaling.logBase)
+		if(chartProp.chart.plotArea.valAx && chartProp.chart.plotArea.valAx.scaling.logBase)
 		{
 			arrayValues = this._getLogArray(yMin, yMax, chartProp.chart.plotArea.valAx.scaling.logBase);
 			return arrayValues;
@@ -2657,7 +2657,7 @@ CChartsDrawer.prototype =
 			
 		var min = this.calcProp.min;
 		var max = this.calcProp.max;
-		var orientation = this.cChartSpace ? this.cChartSpace.chart.plotArea.valAx.scaling.orientation : ORIENTATION_MIN_MAX;
+		var orientation = this.cChartSpace && this.cChartSpace.chart.plotArea.valAx ? this.cChartSpace.chart.plotArea.valAx.scaling.orientation : ORIENTATION_MIN_MAX;
 		
 		if(min >= 0 && max >= 0)
 		{
