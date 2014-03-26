@@ -30,6 +30,11 @@
     this.m_sLockedCursorType    = "";
     
     this.AutoShapesTrackLockPageNum = -1;
+
+    // inline text track
+    this.InlineTextTrackEnabled = false;
+    this.InlineTextTrack        = null;
+    this.InlineTextTrackPage    = -1;
 }
 
 CDrawingDocument.prototype =
@@ -463,10 +468,18 @@ CDrawingDocument.prototype =
     // track text (inline)
     StartTrackText : function()
     {
+        this.InlineTextTrackEnabled = true;
+        this.InlineTextTrack        = null;
+        this.InlineTextTrackPage    = -1;
         this.Native["DD_StartTrackText"]();
     },
     EndTrackText : function()
     {
+        this.InlineTextTrackEnabled = false;
+
+        this.LogicDocument.On_DragTextEnd(this.InlineTextTrack, global_keyboardEvent.CtrlKey);
+        this.InlineTextTrack        = null;
+        this.InlineTextTrackPage    = -1;
         this.Native["DD_EndTrackText"]();
     },
 
@@ -537,7 +550,23 @@ CDrawingDocument.prototype =
 
         this.Native["DD_Overlay_DrawTableTrack"]();
         this.Native["DD_Overlay_DrawFrameTrack"]();
-        this.Native["DD_Overlay_DrawInlineTextTrackEnabled"]();
+
+        if (this.InlineTextTrackEnabled && null != this.InlineTextTrack)
+        {
+            var m = this.InlineTextTrack.transform;
+            if (!m)
+            {
+                this.Native["DD_Overlay_DrawInlineTextTrackEnabled"](this.InlineTextTrackPage,
+                    this.InlineTextTrack.X, this.InlineTextTrack.Y, this.InlineTextTrack.Height);
+            }
+            else
+            {
+                this.Native["DD_Overlay_DrawInlineTextTrackEnabled"](this.InlineTextTrackPage,
+                    this.InlineTextTrack.X, this.InlineTextTrack.Y, this.InlineTextTrack.Height,
+                    m.sx, m.shy, m.shx, m.sy, m.tx, m.ty);
+            }
+        }
+
         this.Native["DD_Overlay_DrawHorVerAnchor"]();
         
         this.Native["DD_Overlay_UpdateEnd"]();
