@@ -6849,6 +6849,70 @@ CTable.prototype =
                 this.CurCell = this.Content[0].Get_Cell(0);
         }
     },
+
+    Get_SelectionState2 : function()
+    {
+        var TableState = new Object();
+
+        TableState.Id = this.Get_Id();
+
+        TableState.CellId = ( null !== this.CurCell ? this.CurCell.Get_Id() : null );
+        TableState.Data   = ( null !== this.CurCell ? this.CurCell.Content.Get_SelectionState2() : null );
+
+        return TableState;
+    },
+
+    Set_SelectionState2 : function(TableState)
+    {
+        var CellId = TableState.CellId;
+
+        var CurCell = null;
+        var Pos = { Cell : 0, Row : 0 };
+
+        var RowsCount = this.Content.length;
+        for ( var RowIndex = 0; RowIndex < RowsCount; RowIndex++ )
+        {
+            var Row = this.Content[RowIndex];
+            var CellsCount = Row.Get_CellsCount();
+            for ( var CellIndex = 0; CellIndex < CellsCount; CellIndex++ )
+            {
+                var Cell = Row.Get_Cell( CellIndex );
+
+                if ( Cell.Get_Id() === CellId )
+                {
+                    CurCell = Cell;
+
+                    Pos.Cell = CellIndex;
+                    Pos.Row  = RowIndex;
+
+                    break;
+                }
+            }
+
+            if ( null !== CurCell )
+                break;
+        }
+
+        if ( null == CurCell )
+        {
+            this.Cursor_MoveToStartPos( false );
+        }
+        else
+        {
+            this.CurCell = CurCell;
+
+            this.Selection.Start    = false;
+            this.Selection.Use      = false;
+            this.Selection.StartPos.Pos = { Row : Pos.Row, Cell : Pos.Cell };
+            this.Selection.EndPos.Pos   = { Row : Pos.Row, Cell : Pos.Cell };
+            this.Selection.Type     = table_Selection_Common;
+            this.Selection.Type2    = table_Selection_Common;
+            this.Selection.Data     = null;
+            this.Selection.Data2    = null;
+
+            this.CurCell.Content.Set_SelectionState2( TableState.Data );
+        }
+    },
 //-----------------------------------------------------------------------------------
 // Функции для работы с гиперссылками
 //-----------------------------------------------------------------------------------

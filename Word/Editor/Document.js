@@ -12266,7 +12266,7 @@ CDocument.prototype =
 
         // Сохраняем Id ближайшего элемента в текущем классе
 
-        var State = new Object();
+        var State = new CDocumentSelectionState();
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
             State.Type = docpostype_HdrFtr;
@@ -12290,26 +12290,11 @@ CDocument.prototype =
         }
         else // if ( docpostype_Content === this.CurPos.Type )
         {
+            State.Id   = this.Get_Id();
             State.Type = docpostype_Content;
 
-            var Para = null;
-
-            if ( true === this.Selection.Use )
-            {
-                if ( selectionflag_Numbering === this.Selection.Flag )
-                {
-                    Para = this.Content[this.Selection.Data[0]];
-                }
-                else // if ( selectionflag_Common === this.Selection.Flag )
-                {
-                    Para = this.Content[this.Selection.EndPos];
-                }
-            }
-            else
-                Para = this.Content[this.CurPos.ContentPos];
-
-            State.Id     = Para.Get_Id();
-            State.CurPos = Para.Get_ParaContentPos(false, false);
+            var Element = this.Content[this.CurPos.ContentPos]
+            State.Data = Element.Get_SelectionState2();
         }
 
         return State;
@@ -12334,38 +12319,29 @@ CDocument.prototype =
         }
         else // if ( docpostype_Content === State.Type )
         {
-            var CurId = Id;
+            var ElementId = State.Data.Id;
+
+            var CurId = ElementId;
 
             var bFlag = false;
 
             var Pos = 0;
-            while ( !bFlag )
+
+            // Найдем элемент с Id = CurId
+            var Count = this.Content.length;
+            for ( Pos = 0; Pos < Count; Pos++ )
             {
-                // Найдем элемент с Id = CurId
-                var Count = this.Content.length;
-                Pos = 0;
-                for ( Pos = 0; Pos < Count; Pos++ )
+                if ( this.Content[Pos].Get_Id() == CurId )
                 {
-                    if ( this.Content[Pos].Get_Id() == CurId )
-                    {
-                        bFlag = true;
-                        break;
-                    }
+                    bFlag = true;
+                    break;
                 }
+            }
 
-                if ( !bFlag )
-                {
-                    var TempElement = g_oTableId.Get_ById(CurId);
-
-                    if ( null === TempElement || null === TempElement.Prev || "undefined" === typeof(TempElement.Prev) )
-                    {
-                        Pos   = 0;
-                        bFlag = true;
-                        break;
-                    }
-                    else
-                        CurId = TempElement.Prev.Get_Id();
-                }
+            if ( true !== bFlag )
+            {
+                var TempElement = g_oTableId.Get_ById(CurId);
+                Pos = ( null != TempElement ? Math.min( this.Content.length - 1, TempElement.Index ) : 0 );
             }
 
             this.Selection.Start    = false;
@@ -12381,7 +12357,7 @@ CDocument.prototype =
                 this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos();
             else
             {
-                this.Content[this.CurPos.ContentPos].Set_ParaContentPos( State.CurPos );
+                this.Content[this.CurPos.ContentPos].Set_SelectionState2( State.Data );
             }
         }
     },
@@ -12649,3 +12625,13 @@ CDocument.prototype =
         }
     }
 };
+
+//-----------------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------------
+function CDocumentSelectionState()
+{
+    this.Id        = null;
+    this.Type      = docpostype_Content;
+    this.Data      = new Object(); // Объект с текущей позицией
+}

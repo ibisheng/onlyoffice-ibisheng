@@ -8391,6 +8391,64 @@ CDocumentContent.prototype =
         if ( "undefined" != typeof(LinkData.Parent) )
             this.Parent = g_oTableId.Get_ById( LinkData.Parent );
     },
+
+    Get_SelectionState2 : function()
+    {
+        // Сохраняем Id ближайшего элемента в текущем классе
+        var State = new CDocumentSelectionState();
+
+        State.Id   = this.Get_Id();
+        State.Type = docpostype_Content;
+
+        var Element = this.Content[this.CurPos.ContentPos]
+        State.Data = Element.Get_SelectionState2();
+
+        return State;
+    },
+
+    Set_SelectionState2 : function(State)
+    {
+        var ElementId = State.Data.Id;
+
+        var CurId = ElementId;
+
+        var bFlag = false;
+
+        var Pos = 0;
+        
+        // Найдем элемент с Id = CurId
+        var Count = this.Content.length;
+        for ( Pos = 0; Pos < Count; Pos++ )
+        {
+            if ( this.Content[Pos].Get_Id() == CurId )
+            {
+                bFlag = true;
+                break;
+            }
+        }
+
+        if ( true !== bFlag )
+        {
+            var TempElement = g_oTableId.Get_ById(CurId);
+            Pos = ( null != TempElement ? Math.min( this.Content.length - 1, TempElement.Index ) : 0 );
+        }
+
+        this.Selection.Start    = false;
+        this.Selection.Use      = false;
+        this.Selection.StartPos = Pos;
+        this.Selection.EndPos   = Pos;
+        this.Selection.Flag     = selectionflag_Common;
+
+        this.CurPos.Type       = docpostype_Content;
+        this.CurPos.ContentPos = Pos;
+
+        if ( true !== bFlag )
+            this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos();
+        else
+        {
+            this.Content[this.CurPos.ContentPos].Set_SelectionState2( State.Data );
+        }
+    },
 //-----------------------------------------------------------------------------------
 // Функции для работы с комментариями
 //-----------------------------------------------------------------------------------

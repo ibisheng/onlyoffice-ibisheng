@@ -18086,7 +18086,7 @@ Paragraph.prototype =
 
             // В старый параграф добавим ран с концом параграфа
             var EndRun = new ParaRun( this );
-            EndRun.Content[0] = new ParaEnd();
+            EndRun.Add_ToContent( 0, new ParaEnd() );
 
             this.Internal_Content_Add( this.Content.length, EndRun );
 
