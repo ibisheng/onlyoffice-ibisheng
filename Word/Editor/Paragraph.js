@@ -65,22 +65,6 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
     this.Pages = new Array(); // Массив страниц (CParaPage)
     this.Lines = new Array(); // Массив строк (CParaLine)
 
-    // Добавляем в контент элемент "конец параграфа"
-    this.Content = new Array();
-
-    if ( true !== Debug_ParaRunMode )
-    {
-        this.Content[0] = new ParaEnd();
-        this.Content[1] = new ParaEmpty();
-    }
-    else
-    {
-        var EndRun = new ParaRun(this);
-        EndRun.Content[0] = new ParaEnd();
-
-        this.Content[0] = EndRun;
-    }
-
     this.Numbering = new ParaNumbering();
 
     this.CurPos  =
@@ -137,6 +121,22 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
     this.SpellChecker  = new CParaSpellChecker(this);
 
     this.NearPosArray  = new Array();
+
+    // Добавляем в контент элемент "конец параграфа"
+    this.Content = new Array();
+
+    if ( true !== Debug_ParaRunMode )
+    {
+        this.Content[0] = new ParaEnd();
+        this.Content[1] = new ParaEmpty();
+    }
+    else
+    {
+        var EndRun = new ParaRun(this);
+        EndRun.Add_ToContent( 0, new ParaEnd() );
+
+        this.Content[0] = EndRun;
+    }
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -5835,6 +5835,7 @@ Paragraph.prototype =
             {
                 var Item = this.Content[Pos];
 
+                Item.Set_Paragraph( this );
                 Item.Recalculate_MinMaxContentWidth( MinMax );
             }
 
@@ -20400,7 +20401,7 @@ Paragraph.prototype =
             LinkData.Parent = Reader.GetString2();
 
             this.Pr = new CParaPr();
-            this.Pr.Read_FromBinary( Reader );
+            //this.Pr.Read_FromBinary( Reader );
 
             // this.TextPr = g_oTableId.Get_ById( Reader.GetString2() );
             LinkData.TextPr = Reader.GetString2();
@@ -20431,12 +20432,17 @@ Paragraph.prototype =
             this.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
 
             this.Id     = Reader.GetString2();
-            this.Parent = g_oTableId.Get_ById( Reader.GetString2() );
+            //this.Parent = g_oTableId.Get_ById( Reader.GetString2() );
+
+            var LinkData = new Object();
+            LinkData.Parent = Reader.GetString2();
 
             this.Pr = new CParaPr();
             this.Pr.Read_FromBinary( Reader );
 
-            this.TextPr = g_oTableId.Get_ById( Reader.GetString2() );
+            //this.TextPr = g_oTableId.Get_ById( Reader.GetString2() );
+            LinkData.TextPr = Reader.GetString2();
+            CollaborativeEditing.Add_LinkData(this, LinkData);
 
             this.Content = new Array();
             var Count = Reader.GetLong();
@@ -20447,6 +20453,8 @@ Paragraph.prototype =
                 if ( null != Element )
                     this.Content.push( Element );
             }
+
+            CollaborativeEditing.Add_NewObject( this );
         }
     },
 
@@ -20470,6 +20478,61 @@ Paragraph.prototype =
                 Pos--;
             }
         }
+    },
+
+    Get_SelectionState2 : function()
+    {
+        var ParaState = new Object();
+
+        ParaState.Id      = this.Get_Id();
+        ParaState.CurPos  =
+        {
+            X          : this.CurPos.X,
+            Y          : this.CurPos.Y,
+            Line       : this.CurPos.Line,
+            ContentPos : this.Get_ParaContentPos( false, false ),
+            RealX      : this.CurPos.RealX,
+            RealY      : this.CurPos.RealY,
+            PagesPos   : this.CurPos.PagesPos
+        };
+
+        ParaState.Selection =
+        {
+            Start    : this.Selection.Start,
+            Use      : this.Selection.Use,
+            StartPos : 0,
+            EndPos   : 0,
+            Flag     : this.Selection.Flag
+        };
+
+        if ( true === this.Selection.Use )
+        {
+            ParaState.Selection.StartPos = this.Get_ParaContentPos( true, true );
+            ParaState.Selection.EndPos   = this.Get_ParaContentPos( true, false );
+        }
+
+        return ParaState;
+    },
+
+    Set_SelectionState2 : function(ParaState)
+    {
+        this.CurPos.X          = ParaState.CurPos.X;
+        this.CurPos.Y          = ParaState.CurPos.Y;
+        this.CurPos.Line       = ParaState.CurPos.Line;
+        this.CurPos.RealX      = ParaState.CurPos.RealX;
+        this.CurPos.RealY      = ParaState.CurPos.RealY;
+        this.CurPos.PagesPos   = ParaState.CurPos.PagesPos;
+
+        this.Set_ParaContentPos(ParaState.CurPos.ContentPos, true, -1, -1);
+
+        this.Selection_Remove();
+
+        this.Selection.Start = ParaState.Selection.Start;
+        this.Selection.Use   = ParaState.Selection.Use;
+        this.Selection.Flag  = ParaState.Selection.Flag;
+
+        if ( true === this.Selection.Use )
+            this.Set_SelectionContentPos( ParaState.Selection.StartPos, ParaState.Selection.EndPos )
     },
 //-----------------------------------------------------------------------------------
 // Функции для работы с комментариями

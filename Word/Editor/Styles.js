@@ -8344,28 +8344,22 @@ CParaPr.prototype =
             Flags |= 131072;
         }
 
-		if ( undefined != this.FramePr )
-        {
-            this.FramePr.Write_ToBinary( Writer );
-            Flags |= 131072;
-        }
-		
 		if(undefined != this.DefaultRunPr)
 		{
 			this.DefaultRunPr.Write_ToBinary( Writer );
-			Flags |= 232144;
+			Flags |= 262144;
 		}
 		
 		if(undefined != this.Bullet)
 		{
 			this.Bullet.Write_ToBinary( Writer );
-			Flags |= 464288;
+			Flags |= 524288;
 		}
 		
 		if(undefined != this.Lvl)
 		{
 			Writer.WriteByte(this.Lvl);
-			Flags |= 928576;
+			Flags |= 1048576;
 		}
 		
         var EndPos = Writer.GetCurPosition();
@@ -8465,19 +8459,19 @@ CParaPr.prototype =
             this.FramePr.Read_FromBinary( Reader );
         }
 		
-		if(Flags & 232144)
+		if(Flags & 262144)
 		{
 			this.DefaultRunPr = new CTextPr();
 			this.DefaultRunPr.Read_FromBinary(Reader);
 		}
 		
-		if(Flags & 464288)
+		if(Flags & 524288)
 		{
 			this.Bullet = new CBullet();
 			this.Bullet.Read_FromBinary(Reader);
 		}
 		
-		if(Flags & 928576)
+		if(Flags & 1048576)
 		{
 			this.Lvl = Reader.GetByte();
 		}
