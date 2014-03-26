@@ -150,6 +150,7 @@ var MATH_RUN_PRP                =  1;
 var MATH_COMP                   =  2;
 var MATH_EMPTY                  =  3;
 var MATH_PLACEHOLDER            =  4;
+var MATH_PARA_RUN               =  5;
 
 
 ////////////////////////////////////////

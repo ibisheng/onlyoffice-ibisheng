@@ -237,7 +237,6 @@ CMathText.prototype =
         //  rasterOffsetX
         //  rasterOffsetY
 
-
         var letter = this.getCode();
 
         var metricsTxt = oMeasure.Measure2Code(letter);
@@ -424,6 +423,8 @@ CMathText.prototype =
     setComposition: function() // заглушка
     {},
     setReferenceComposition: function() // заглушка
+    {},
+    Write_ToBinary: function()
     {}
 
     /*draw2: function()

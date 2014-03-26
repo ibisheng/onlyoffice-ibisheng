@@ -6364,3 +6364,69 @@ function CRunCollaborativeRange(PosS, PosE)
     this.PosS = PosS;
     this.PosE = PosE;
 }
+
+
+
+ParaRun.prototype.Math_SetPosition = function(pos)
+{
+    for(var i = 0; i < this.Content.length; i++)
+    {
+        this.Content[i].setPosition(pos);
+    }
+}
+
+ParaRun.prototype.Math_Draw = function(x, y, pGraphics)
+{
+    if(this.bMathRun)
+    {
+        var X = x;
+        var Y = y + this.size.ascent;
+
+        pGraphics.b_color1(0,0,0,255);
+
+        for(var i=1; i < this.Content.length;i++)
+        {
+            var oWPrp = this.Get_CompiledPr(false);
+            g_oTextMeasurer.SetFont(oWPrp);
+
+            X += this.Content[i].size.width;
+
+            this.Content[i].draw(X, Y, pGraphics);
+        }
+
+    }
+}
+ParaRun.prototype.Math_Recalculate = function()
+{
+    var RangeStartPos = 0;
+    var RangeEndPos = this.Content.length;
+
+    this.Lines[0].Add_Range( 0, RangeStartPos, RangeEndPos );
+
+
+    var width = 0,
+        ascent = 0, descent = 0;
+    for (var Pos = 0 ; Pos < this.Content.length; Pos++ )
+    {
+        // var oWPrp = new CTextPr();
+        // oWPrp.Merge(this.Parent.Composition.DEFAULT_RUN_PRP);
+        var oWPrp = this.Get_CompiledPr(false);
+        oWPrp.Merge(this.Parent.Composition.DEFAULT_RUN_PRP.getTxtPrp());
+        g_oTextMeasurer.SetFont(oWPrp);
+
+        this.Content[Pos].Resize(g_oTextMeasurer);
+
+        var oSize = this.Content[Pos].size;
+        //var gps = this.Content[Pos].gaps;
+
+        //width += oSize.width + gps.left + gps.right;
+        width += oSize.width;
+
+        ascent = ascent > oSize.ascent ? ascent : oSize.ascent;
+        var oDescent = oSize.height - oSize.ascent;
+        descent =  descent < oDescent ? oDescent : descent;
+    }
+
+    this.size = {width: width, height: ascent + descent, ascent: ascent};
+
+}

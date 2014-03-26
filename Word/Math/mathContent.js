@@ -687,7 +687,8 @@ CMathContent.prototype =
     addElementToContent: function(obj)   //for "read"
     {
         var element = new mathElem(obj);
-        obj.relate(this);
+        //obj.relate(this);
+        obj.Parent = this;
 		
 		if(obj.typeObj === MATH_COMP)
 			obj.setComposition(this.Composition);
@@ -702,9 +703,6 @@ CMathContent.prototype =
 
         if(obj.typeObj == MATH_COMP)
             obj.setArgSize(this.argSize);
-
-
-        //this.length = this.content.length;
 
     },
     addToContent: function(obj, shift)   // for "edit", letters
@@ -4836,6 +4834,10 @@ CMathContent.prototype =
                     this.content[i].value.Resize(oMeasure);
                 }
             }
+            else if(type == MATH_PARA_RUN)
+            {
+                this.content[i].value.Math_Recalculate();
+            }
         }
 
         this.recalculateSize();
@@ -5374,6 +5376,11 @@ CMathContent.prototype =
                     pGraphics.SetFont(oWPrp);
 
                     this.content[i].value.draw(x, y, pGraphics);
+                }
+                else if(this.content[i].value.typeObj == MATH_PARA_RUN)
+                {
+                    var PSDE = {X: x, Y: y, Graphics: pGraphics};
+                    this.content[i].value.Math_Draw(x, y, pGraphics);
                 }
                 else
                     this.content[i].value.draw(x, y, pGraphics);
@@ -6190,7 +6197,10 @@ CMathContent.prototype =
                 y: this.pos.y + this.size.ascent    //baseline
             };
 
-            this.content[i].value.setPosition(t);
+            if(this.content[i].value.typeObj == MATH_PARA_RUN)
+                this.content[i].value.Math_SetPosition(pos);
+            else
+                this.content[i].value.setPosition(t);
         }
     },
     old_drawSelect: function()
@@ -6774,7 +6784,7 @@ CMathContent.prototype =
             }
         }
     },
-   Save_Changes: function(Data, Writer)
+    Save_Changes: function(Data, Writer)
     {
         Writer.WriteLong( historyitem_type_Math );
 
@@ -7194,10 +7204,20 @@ CMathContent.prototype =
     },
     get_ParaContentPos: function(bSelection, bStart, ContentPos)
     {
-        if( bSelection && this.RealSelect.startPos !== this.RealSelect.endPos )
+        if( bSelection )
         {
             var pos = bStart ? this.RealSelect.startPos : this.RealSelect.endPos;
             ContentPos.Add(pos);
+
+
+            if(this.RealSelect.startPos == this.RealSelect.endPos)
+            {
+                var blen = this.RealSelect.startPos < this.content.length;
+                var bComp = blen ? this.content[this.RealSelect.startPos].value.typeObj == MATH_COMP : false;
+
+                if(bComp)
+                    this.content[this.RealSelect.startPos].value.get_ParaContentPos(bSelection, bStart, ContentPos);
+            }
         }
         else
         {
@@ -7266,9 +7286,9 @@ CMathContent.prototype =
         {
             var pos = ContentPos.Get(Depth);
             Depth++;
-            this.LogicalSelect.start = this.LogicalSelect.end = pos;
+            this.LogicalSelect.start = pos;
 
-            if(this.RealSelect.startPos === this.RealSelect.endPos && this.content[pos].value.typeObj === MATH_COMP)
+            if(pos < this.content.length && this.RealSelect.startPos === this.RealSelect.endPos && this.content[pos].value.typeObj === MATH_COMP)
                 this.content[pos].value.set_StartSelectContent(ContentPos, Depth);
         }
     },
@@ -7291,9 +7311,11 @@ CMathContent.prototype =
         this.LogicalSelect.end = posEnd;
         Depth++;
 
+        //var blen = this.RealSelect.startPos < this.content.length;
+
 
         //селект внутри мат. объекта
-        if(posStart === posEnd && this.content[posEnd].value.typeObj === MATH_COMP)
+        if(posStart < this.content.length && posStart === posEnd && this.content[posEnd].value.typeObj === MATH_COMP)
         {
             var result = this.content[posEnd].value.set_EndSelectContent(ContentPos, Depth);
             this.setStartPos_Selection(posStart-1);
@@ -7312,27 +7334,34 @@ CMathContent.prototype =
             SelectContent = this;
             var direction = (posStart < posEnd) ? 1 : -1;
 
-
-            if( this.content[posStart].value.typeObj === MATH_COMP )
+            if(posStart < this.content.length)
             {
-                if( direction == 1 )
-                    this.setStartPos_Selection( posStart - 1);
-                else if( direction == -1 )
-                    this.setStartPos_Selection( posStart + 1);
+                if(this.content[posStart].value.typeObj === MATH_COMP )
+                {
+                    if( direction == 1 )
+                        this.setStartPos_Selection( posStart - 1);
+                    else if( direction == -1 )
+                        this.setStartPos_Selection( posStart + 1);
+                }
+                else
+                    this.setStartPos_Selection(posStart);
             }
-            else
-                this.setStartPos_Selection(posStart);
 
-
-            if( this.content[posEnd].value.typeObj === MATH_COMP )
+            if(posEnd < this.content.length)
             {
-                if( direction == 1 )
-                    this.setEndPos_Selection(posEnd + 1);
-                else if( direction == -1 )
-                    this.setEndPos_Selection(posEnd - 1);
+                if(this.content[posEnd].value.typeObj === MATH_COMP )
+                {
+                    if( direction == 1 )
+                        this.setEndPos_Selection(posEnd + 1);
+                    else if( direction == -1 )
+                        this.setEndPos_Selection(posEnd - 1);
+                }
+                else
+                    this.setEndPos_Selection(posEnd);
             }
-            else
-                this.setEndPos_Selection(posEnd);
+
+
+
         }
 
         return {state: state, SelectContent:  SelectContent};
