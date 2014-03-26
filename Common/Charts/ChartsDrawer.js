@@ -6402,6 +6402,12 @@ gridChart.prototype =
 		
 		var xCenter = (this.chartProp.chartGutter._left + trueWidth/2) / this.chartProp.pxToMM;
 		var yCenter = (this.chartProp.chartGutter._top + trueHeight/2) / this.chartProp.pxToMM;
+		var yPoints = this.chartSpace.chart.plotArea.valAx.yPoints ? this.chartSpace.chart.plotArea.valAx.yPoints : this.chartSpace.chart.plotArea.catAx.yPoints;
+		
+		var crossBetween = this.chartSpace.chart.plotArea.valAx.crossBetween;
+		var crossDiff;
+		if(crossBetween == CROSS_BETWEEN_BETWEEN && this.chartSpace.chart.plotArea.valAx.posY)
+			crossDiff = yPoints[1] ? Math.abs((yPoints[1].pos - yPoints[0].pos) / 2) : Math.abs(yPoints[0].pos - this.chartSpace.chart.plotArea.valAx.posY);
 		
 		if(this.chartProp.type == "Radar")
 		{
@@ -6417,7 +6423,7 @@ gridChart.prototype =
 			var radius, xFirst, yFirst;
 		}
 		
-		for(var i = 0; i <= this.chartProp.numhlines; i++)
+		for(var i = 0; i < yPoints.length; i++)
 		{
 			if(this.chartProp.type == "Radar")
 			{
@@ -6471,7 +6477,12 @@ gridChart.prototype =
 			}
 			else
 			{
-				posY = i*stepY + this.chartProp.chartGutter._top;
+				if(crossDiff)
+					posY = (yPoints[i].pos - crossDiff) * this.chartProp.pxToMM;
+				else
+					posY = yPoints[i].pos * this.chartProp.pxToMM;
+				
+				
 				if(!this.paths.horisontalLines)
 					this.paths.horisontalLines = [];
 				this.paths.horisontalLines[i] = this._calculateLine(posX, posY, posX + widthLine, posY);
@@ -6487,6 +6498,18 @@ gridChart.prototype =
 					
 					this.paths.horisontalMinorLines[i][n] = this._calculateLine(posX, posMinorY, posX + widthLine, posMinorY);
 				}
+				
+				if(crossDiff && i == yPoints.length - 1)
+				{
+					if(crossDiff)
+						posY = (yPoints[i].pos + crossDiff) * this.chartProp.pxToMM;
+					
+					i++;
+					if(!this.paths.horisontalLines)
+						this.paths.horisontalLines = [];
+					this.paths.horisontalLines[i] = this._calculateLine(posX, posY, posX + widthLine, posY);
+				}
+				
 			}
 		}
 	},
@@ -6494,14 +6517,25 @@ gridChart.prototype =
 	_calculateVerticalLines: function()
 	{
 		var stepX = (this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right)/(this.chartProp.numvlines);
-		var minorStep = stepX/this.chartProp.numvMinorlines;
+		var minorStep = stepX / this.chartProp.numvMinorlines;
 		var heightLine = this.chartProp.heightCanvas - (this.chartProp.chartGutter._bottom +this.chartProp.chartGutter._top);
 		var posY = this.chartProp.chartGutter._top;
 		var posX;
 		var posMinorX;
-		for(var i = 0; i <= this.chartProp.numvlines; i++)
+		var xPoints = this.chartSpace.chart.plotArea.valAx.xPoints ? this.chartSpace.chart.plotArea.valAx.xPoints : this.chartSpace.chart.plotArea.catAx.xPoints;
+		
+		var crossBetween = this.chartSpace.chart.plotArea.valAx.crossBetween;
+		var crossDiff;
+		if(crossBetween == CROSS_BETWEEN_BETWEEN && this.chartSpace.chart.plotArea.valAx.posX && this.chartProp.type != "HBar")
+			crossDiff = xPoints[1] ? Math.abs((xPoints[1].pos - xPoints[0].pos) / 2) : Math.abs(xPoints[0].pos - this.chartSpace.chart.plotArea.valAx.posX);
+			
+		for(var i = 0; i < xPoints.length; i++)
 		{
-			posX = i*stepX + this.chartProp.chartGutter._left;
+			if(crossDiff)
+				posX = (xPoints[i].pos - crossDiff) * this.chartProp.pxToMM;
+			else
+				posX = xPoints[i].pos * this.chartProp.pxToMM;
+			
 			if(!this.paths.verticalLines)
 				this.paths.verticalLines = [];
 			this.paths.verticalLines[i] = this._calculateLine(posX, posY, posX, posY + heightLine);
@@ -6516,6 +6550,17 @@ gridChart.prototype =
 					this.paths.verticalMinorLines[i] = [];
 				
 				this.paths.verticalMinorLines[i][n] = this._calculateLine(posMinorX, posY, posMinorX, posY + heightLine);
+			}
+			
+			if(crossDiff && i == xPoints.length - 1)
+			{
+				if(crossDiff)
+					posX = (xPoints[i].pos + crossDiff) * this.chartProp.pxToMM;
+				
+				i++;
+				if(!this.paths.verticalLines)
+					this.paths.verticalLines = [];
+				this.paths.verticalLines[i] = this._calculateLine(posX, posY, posX, posY + heightLine);
 			}
 		}
 	},
@@ -6546,7 +6591,9 @@ gridChart.prototype =
 	{
 		var pen;
 		var path;
-		for(var i = 0; i <= this.chartProp.numhlines; i++)
+		var yPoints = this.chartSpace.chart.plotArea.valAx.yPoints ? this.chartSpace.chart.plotArea.valAx.yPoints : this.chartSpace.chart.plotArea.catAx.yPoints;
+		
+		for(var i = 0; i < this.paths.horisontalLines.length; i++)
 		{
 			if(this.chartProp.type == "HBar")
 				pen = this.chartSpace.chart.plotArea.catAx.compiledMajorGridLines;
@@ -6557,7 +6604,7 @@ gridChart.prototype =
 			this._drawPath(path, pen);
 			
 			//промежуточные линии
-			if(i != this.chartProp.numhlines && this.paths.horisontalMinorLines)
+			if(this.paths.horisontalMinorLines[i])
 			{
 				for(var n = 0; n < this.paths.horisontalMinorLines[i].length ; n++)
 				{
@@ -6575,7 +6622,9 @@ gridChart.prototype =
 	_drawVerticalLines: function()
 	{
 		var pen, path;
-		for(var i = 0; i <= this.chartProp.numvlines; i++)
+		var xPoints = this.chartSpace.chart.plotArea.valAx.xPoints ? this.chartSpace.chart.plotArea.valAx.xPoints : this.chartSpace.chart.plotArea.catAx.xPoints;
+		
+		for(var i = 0; i < this.paths.verticalLines.length; i++)
 		{
 			if(this.chartProp.type == "HBar")
 				pen = this.chartSpace.chart.plotArea.valAx.compiledMajorGridLines;
@@ -6586,7 +6635,7 @@ gridChart.prototype =
 			this._drawPath(path, pen);
 			
 			//промежуточные линии
-			if(i != this.chartProp.numvlines)
+			if(this.paths.verticalMinorLines[i])
 			{
 				for(var n = 0; n < this.paths.verticalMinorLines[i].length ; n++)
 				{
