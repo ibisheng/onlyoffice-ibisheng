@@ -12867,6 +12867,13 @@ Paragraph.prototype =
                 var StartPos = StartContentPos.Get(0);
                 var EndPos   = EndContentPos.Get(0);
 
+                // TODO: Как только избавимся от ParaEnd, здесь надо будет переделать.
+                if ( this.Content.length - 1 === EndPos && true === this.Selection_CheckParaEnd() )
+                {
+                    EndContentPos = this.Get_EndPos( false );
+                    EndPos        = EndContentPos.Get(0);
+                }
+
                 var NewElementE = this.Content[EndPos].Split( EndContentPos, 1 );
                 var NewElementS = this.Content[StartPos].Split( StartContentPos, 1 );
 
@@ -13382,7 +13389,7 @@ Paragraph.prototype =
                     for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
                     {
                         var Element = this.Content[CurPos];
-                        if ( para_Hyperlink === Element.Type || true === Element.Selection_CheckParaEnd() )
+                        if ( para_Hyperlink === Element.Type /*|| true === Element.Selection_CheckParaEnd()*/ )
                             return false;
                     }
 
@@ -13417,7 +13424,7 @@ Paragraph.prototype =
                     for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
                     {
                         var Element = this.Content[CurPos];
-                        if ( (true === bHyper && para_Hyperlink === Element.Type) || true === Element.Selection_CheckParaEnd() )
+                        if ( (true === bHyper && para_Hyperlink === Element.Type) /*|| true === Element.Selection_CheckParaEnd()*/ )
                             return false;
                         else if ( true !== bHyper && para_Hyperlink === Element.Type )
                             bHyper = true;

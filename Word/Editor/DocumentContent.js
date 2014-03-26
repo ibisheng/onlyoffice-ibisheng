@@ -8415,7 +8415,7 @@ CDocumentContent.prototype =
         var bFlag = false;
 
         var Pos = 0;
-        
+
         // Найдем элемент с Id = CurId
         var Count = this.Content.length;
         for ( Pos = 0; Pos < Count; Pos++ )
