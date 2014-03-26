@@ -180,7 +180,7 @@
     {
         this.bIsTracked = false;
 
-        if (null == this.TableOutline || (true === this.IsChangeSmall) || word_control.m_oApi.isViewMode)
+        if (null == this.TableOutline || (true === this.IsChangeSmall) || drDoc.Api.isViewMode)
             return false;
 
         var _dKoef_mm_to_pix = this.Native["DD_GetDotsPerMM"]();
@@ -464,6 +464,7 @@ CDrawingDocument.prototype =
     AfterLoad : function()
     {
         this.m_oWordControl = this;
+		this.Api = window.editor;
         this.LogicDocument  = window.editor.WordControl.m_oLogicDocument;
         this.LogicDocument.DrawingDocument = this;        
     },
@@ -1290,7 +1291,7 @@ CDrawingDocument.prototype =
     // drawings mouse events
     checkMouseDown_Drawing : function(pos)
     {
-        var _ret = this.TableOutlineDr.checkMouseDown(pos, oWordControl);
+        var _ret = this.TableOutlineDr.checkMouseDown(pos, this);
         if (_ret === true)
         {
             this.LogicDocument.Selection_Remove();
@@ -1472,7 +1473,7 @@ CDrawingDocument.prototype =
     {
         if (this.TableOutlineDr.bIsTracked)
         {
-            this.TableOutlineDr.checkMouseUp(global_mouseEvent.X, global_mouseEvent.Y, oWordControl);
+            this.TableOutlineDr.checkMouseUp(global_mouseEvent.X, global_mouseEvent.Y, this);
             this.LogicDocument.Document_UpdateInterfaceState();
             this.LogicDocument.Document_UpdateRulersState();
 
