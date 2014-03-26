@@ -93,14 +93,16 @@ CAutoshapeTrack.prototype =
         this.Native["DD_DrawEditWrapPointsTrackLines"](points);
     },
 
-    DrawInlineMoveCursor : function(x, y, h, matrix)
+    DrawInlineMoveCursor : function(page, x, y, h, m)
     {
-        if (!matrix)
-            this.Native["DD_DrawTrackTransform"]();
+        if (!m)
+        {
+            this.Native["DD_DrawInlineMoveCursor"](page, x, y, h);
+        }
         else
-            this.Native["DD_DrawTrackTransform"](matrix.sx, matrix.shy, matrix.shx, matrix.sy, matrix.tx, matrix.ty);
-
-        this.Native["DD_DrawInlineMoveCursor"](x, y, h);
+        {
+            this.Native["DD_DrawInlineMoveCursor"](page, x, y, h, m.sx, m.shy, m.shx, m.sy, m.tx, m.ty);
+        }
     },
 
     drawFlowAnchor : function(x, y)

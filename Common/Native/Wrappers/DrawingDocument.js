@@ -553,18 +553,9 @@ CDrawingDocument.prototype =
 
         if (this.InlineTextTrackEnabled && null != this.InlineTextTrack)
         {
-            var m = this.InlineTextTrack.transform;
-            if (!m)
-            {
-                this.Native["DD_Overlay_DrawInlineTextTrackEnabled"](this.InlineTextTrackPage,
-                    this.InlineTextTrack.X, this.InlineTextTrack.Y, this.InlineTextTrack.Height);
-            }
-            else
-            {
-                this.Native["DD_Overlay_DrawInlineTextTrackEnabled"](this.InlineTextTrackPage,
-                    this.InlineTextTrack.X, this.InlineTextTrack.Y, this.InlineTextTrack.Height,
-                    m.sx, m.shy, m.shx, m.sy, m.tx, m.ty);
-            }
+            this.AutoShapesTrack.DrawInlineMoveCursor(this.InlineTextTrackPage,
+                this.InlineTextTrack.X, this.InlineTextTrack.Y, this.InlineTextTrack.Height,
+                this.InlineTextTrack.transform);
         }
 
         this.Native["DD_Overlay_DrawHorVerAnchor"]();
