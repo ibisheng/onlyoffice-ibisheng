@@ -35,6 +35,10 @@
     this.InlineTextTrackEnabled = false;
     this.InlineTextTrack        = null;
     this.InlineTextTrackPage    = -1;
+
+    // frame rect
+    this.FrameRect = { IsActive : false, Rect : { X : 0, Y : 0, R : 0, B : 0 }, Frame : null,
+        Track : { X : 0, Y : 0, L : 0, T : 0, R : 0, B : 0, PageIndex : 0, Type : -1 }, IsTracked : false, PageIndex : 0 };
 }
 
 CDrawingDocument.prototype =
@@ -264,7 +268,7 @@ CDrawingDocument.prototype =
     // ruler states
     Set_RulerState_Table : function(markup, transform)
     {
-        this.Frame = null;
+        this.FrameRect.IsActive = false;
         this.Table = markup.Table;
 
         var _array_params1 = [];
@@ -306,11 +310,53 @@ CDrawingDocument.prototype =
 
     Set_RulerState_Paragraph : function(margins)
     {
+        if (margins && margins.Frame !== undefined)
+        {
+            var bIsUpdate = false;
+
+            if (!this.FrameRect.IsActive)
+                bIsUpdate = true;
+
+            if (!bIsUpdate)
+            {
+                if (this.FrameRect.Rect.X != margins.L ||
+                    this.FrameRect.Rect.Y != margins.T ||
+                    this.FrameRect.Rect.R != margins.R ||
+                    this.FrameRect.Rect.B != margins.B ||
+                    this.FrameRect.PageIndex != margins.PageIndex)
+                {
+                    bIsUpdate = true;
+                }
+            }
+
+            this.FrameRect.IsActive = true;
+            this.FrameRect.Rect.X = margins.L;
+            this.FrameRect.Rect.Y = margins.T;
+            this.FrameRect.Rect.R = margins.R;
+            this.FrameRect.Rect.B = margins.B;
+            this.FrameRect.PageIndex = margins.PageIndex;
+            this.FrameRect.Frame = margins.Frame;
+
+            if (bIsUpdate)
+            {
+                this.OnUpdateOverlay();
+            }
+        }
+        else
+        {
+            if (this.FrameRect.IsActive)
+            {
+                this.FrameRect.IsActive = false;
+                this.OnUpdateOverlay();
+            }
+            else
+                this.FrameRect.IsActive = false;
+        }
+
         this.Table = null;
         if (margins && margins.Frame)
         {
             this.Native["DD_Set_RulerState_Paragraph"](margins.L, margins.T, margins.R, margins.B, true, margins.PageIndex);
-            this.Frame = margins.Frame;
         }
         else if (margins)
         {
@@ -549,7 +595,8 @@ CDrawingDocument.prototype =
         }
 
         this.Native["DD_Overlay_DrawTableTrack"]();
-        this.Native["DD_Overlay_DrawFrameTrack"]();
+
+        this.DrawFrameTrack();
 
         if (this.InlineTextTrackEnabled && null != this.InlineTextTrack)
         {
@@ -779,10 +826,11 @@ CDrawingDocument.prototype =
             oWordControl.EndUpdateOverlay();
             return true;
         }
+        */
 
         if (this.FrameRect.IsActive)
         {
-            var eps = 10 * g_dKoef_pix_to_mm * 100 / oWordControl.m_nZoomValue;
+            var eps = 10 / this.Native["DD_GetDotsPerMM"]();
             var _check = this.checkCursorOnTrackRect(pos.X, pos.Y, eps, this.FrameRect.Rect);
 
             if (-1 != _check)
@@ -841,15 +889,10 @@ CDrawingDocument.prototype =
                     }
                 }
 
-                if (-1 == oWordControl.m_oTimerScrollSelect)
-                {
-                    oWordControl.m_oTimerScrollSelect = setInterval(oWordControl.SelectWheel, 20);
-                }
-                oWordControl.EndUpdateOverlay();
+                this.EndUpdateOverlay();
                 return true;
             }
         }
-        */
 
         return false;
     },
@@ -878,12 +921,11 @@ CDrawingDocument.prototype =
             return true;
         }
 
-        /*
         if (this.FrameRect.IsActive)
         {
             if (!this.FrameRect.IsTracked && this.FrameRect.PageIndex == pos.Page)
             {
-                var eps = 10 * g_dKoef_pix_to_mm * 100 / oWordControl.m_nZoomValue;
+                var eps = 10 / this.Native["DD_GetDotsPerMM"]();
                 var _check = this.checkCursorOnTrackRect(pos.X, pos.Y, eps, this.FrameRect.Rect);
 
                 if (_check != -1)
@@ -937,7 +979,7 @@ CDrawingDocument.prototype =
                         }
                     }
                     // оверлей не нужно перерисовывать
-                    oWordControl.EndUpdateOverlay();
+                    this.EndUpdateOverlay();
                     return true;
                 }
             }
@@ -945,13 +987,11 @@ CDrawingDocument.prototype =
             {
                 this.checkTrackRect(pos);
 
-                oWordControl.ShowOverlay();
-                oWordControl.OnUpdateOverlay();
-                oWordControl.EndUpdateOverlay();
+                this.OnUpdateOverlay();
+                this.EndUpdateOverlay();
                 return true;
             }
         }
-        */
 
         return false;
     },
@@ -989,7 +1029,6 @@ CDrawingDocument.prototype =
             return true;
         }
 
-        /*
         if (this.FrameRect.IsActive && this.FrameRect.IsTracked)
         {
             this.FrameRect.IsTracked = false;
@@ -998,18 +1037,238 @@ CDrawingDocument.prototype =
             var _track = this.FrameRect.Track;
             this.FrameRect.Frame.Change_Frame(_track.L, _track.T, _track.R - _track.L, _track.B - _track.T, _track.PageIndex);
 
-            if (-1 != oWordControl.m_oTimerScrollSelect)
-            {
-                clearInterval(oWordControl.m_oTimerScrollSelect);
-                oWordControl.m_oTimerScrollSelect = -1;
-            }
-            oWordControl.OnUpdateOverlay();
-
-            oWordControl.EndUpdateOverlay();
+            this.OnUpdateOverlay();
+            this.EndUpdateOverlay();
             return true;
         }
-        */
+
         return false;
+    },
+
+    checkCursorOnTrackRect : function(X, Y, eps, rect)
+    {
+        // 0-1-...-7 - точки по часовой стрелке, начиная с left-top,
+        // 8-..-11 - стороны по часовой стрелке, начиная с top
+
+        var __x_dist1 = Math.abs(X - rect.X);
+        var __x_dist2 = Math.abs(X - ((rect.X + rect.R) / 2));
+        var __x_dist3 = Math.abs(X - rect.R);
+
+        var __y_dist1 = Math.abs(Y - rect.Y);
+        var __y_dist2 = Math.abs(Y - ((rect.Y + rect.B) / 2));
+        var __y_dist3 = Math.abs(Y - rect.B);
+
+        if (__y_dist1 < eps)
+        {
+            if ((X < (rect.X - eps)) || (X > (rect.R + eps)))
+                return -1;
+
+            if (__x_dist1 <= __x_dist2 && __x_dist1 <= __x_dist3)
+                return (__x_dist1 < eps) ? 0 : 8;
+
+            if (__x_dist2 <= __x_dist1 && __x_dist2 <= __x_dist3)
+                return (__x_dist2 < eps) ? 1 : 8;
+
+            if (__x_dist3 <= __x_dist1 && __x_dist3 <= __x_dist2)
+                return (__x_dist3 < eps) ? 2 : 8;
+
+            return 8;
+        }
+
+        if (__y_dist3 < eps)
+        {
+            if ((X < (rect.X - eps)) || (X > (rect.R + eps)))
+                return -1;
+
+            if (__x_dist1 <= __x_dist2 && __x_dist1 <= __x_dist3)
+                return (__x_dist1 < eps) ? 6 : 10;
+
+            if (__x_dist2 <= __x_dist1 && __x_dist2 <= __x_dist3)
+                return (__x_dist2 < eps) ? 5 : 10;
+
+            if (__x_dist3 <= __x_dist1 && __x_dist3 <= __x_dist2)
+                return (__x_dist3 < eps) ? 4 : 10;
+
+            return 8;
+        }
+
+        if (__x_dist1 < eps)
+        {
+            if ((Y < (rect.Y - eps)) || (Y > (rect.B + eps)))
+                return -1;
+
+            if (__y_dist1 <= __y_dist2 && __y_dist1 <= __y_dist3)
+                return (__y_dist1 < eps) ? 0 : 11;
+
+            if (__y_dist2 <= __y_dist1 && __y_dist2 <= __y_dist3)
+                return (__y_dist2 < eps) ? 7 : 11;
+
+            if (__y_dist3 <= __y_dist1 && __y_dist3 <= __y_dist2)
+                return (__y_dist3 < eps) ? 6 : 11;
+
+            return 11;
+        }
+
+        if (__x_dist3 < eps)
+        {
+            if ((Y < (rect.Y - eps)) || (Y > (rect.B + eps)))
+                return -1;
+
+            if (__y_dist1 <= __y_dist2 && __y_dist1 <= __y_dist3)
+                return (__y_dist1 < eps) ? 2 : 9;
+
+            if (__y_dist2 <= __y_dist1 && __y_dist2 <= __y_dist3)
+                return (__y_dist2 < eps) ? 3 : 9;
+
+            if (__y_dist3 <= __y_dist1 && __y_dist3 <= __y_dist2)
+                return (__y_dist3 < eps) ? 4 : 9;
+
+            return 9;
+        }
+
+        return -1;
+    },
+
+    checkTrackRect : function(pos)
+    {
+        var _min_dist = 3; // mm;
+
+        var _track = this.FrameRect.Track;
+        var _rect = this.FrameRect.Rect;
+        _track.PageIndex = this.FrameRect.PageIndex;
+        switch (_track.Type)
+        {
+            case 0:
+            {
+                _track.L = _rect.X + (pos.X - _track.X);
+                _track.T = _rect.Y + (pos.Y - _track.Y);
+                _track.R = _rect.R;
+                _track.B = _rect.B;
+
+                if (_track.L > (_track.R - _min_dist))
+                    _track.L = _track.R - _min_dist;
+                if (_track.T > (_track.B - _min_dist))
+                    _track.T = _track.B - _min_dist;
+
+                break;
+            }
+            case 1:
+            {
+                _track.L = _rect.X;
+                _track.T = _rect.Y + (pos.Y - _track.Y);
+                _track.R = _rect.R;
+                _track.B = _rect.B;
+
+                if (_track.T > (_track.B - _min_dist))
+                    _track.T = _track.B - _min_dist;
+
+                break;
+            }
+            case 2:
+            {
+                _track.L = _rect.X;
+                _track.T = _rect.Y + (pos.Y - _track.Y);
+                _track.R = _rect.R + (pos.X - _track.X);
+                _track.B = _rect.B;
+
+                if (_track.R < (_track.L + _min_dist))
+                    _track.R = _track.L + _min_dist;
+                if (_track.T > (_track.B - _min_dist))
+                    _track.T = _track.B - _min_dist;
+
+                break;
+            }
+            case 3:
+            {
+                _track.L = _rect.X;
+                _track.T = _rect.Y;
+                _track.R = _rect.R + (pos.X - _track.X);
+                _track.B = _rect.B;
+
+                if (_track.R < (_track.L + _min_dist))
+                    _track.R = _track.L + _min_dist;
+
+                break;
+            }
+            case 4:
+            {
+                _track.L = _rect.X;
+                _track.T = _rect.Y;
+                _track.R = _rect.R + (pos.X - _track.X);
+                _track.B = _rect.B + (pos.Y - _track.Y);
+
+                if (_track.R < (_track.L + _min_dist))
+                    _track.R = _track.L + _min_dist;
+                if (_track.B < (_track.T + _min_dist))
+                    _track.B = _track.T + _min_dist;
+
+                break;
+            }
+            case 5:
+            {
+                _track.L = _rect.X;
+                _track.T = _rect.Y;
+                _track.R = _rect.R;
+                _track.B = _rect.B + (pos.Y - _track.Y);
+
+                if (_track.B < (_track.T + _min_dist))
+                    _track.B = _track.T + _min_dist;
+
+                break;
+            }
+            case 6:
+            {
+                _track.L = _rect.X + (pos.X - _track.X);
+                _track.T = _rect.Y;
+                _track.R = _rect.R;
+                _track.B = _rect.B + (pos.Y - _track.Y);
+
+                if (_track.L > (_track.R - _min_dist))
+                    _track.L = _track.R - _min_dist;
+                if (_track.B < (_track.T + _min_dist))
+                    _track.B = _track.T + _min_dist;
+
+                break;
+            }
+            case 7:
+            {
+                _track.L = _rect.X + (pos.X - _track.X);
+                _track.T = _rect.Y;
+                _track.R = _rect.R;
+                _track.B = _rect.B;
+
+                if (_track.L > (_track.R - _min_dist))
+                    _track.L = _track.R - _min_dist;
+
+                break;
+            }
+            default:
+            {
+                _track.L = pos.X - (_track.X - _rect.X);
+                _track.T = pos.Y - (_track.Y - _rect.Y);
+                _track.R = _track.L + _rect.R - _rect.X;
+                _track.B = _track.T + _rect.B - _rect.Y;
+
+                _track.PageIndex = pos.Page;
+                break;
+            }
+        }
+    },
+
+    DrawFrameTrack : function()
+    {
+        if (!this.FrameRect.IsActive)
+            return;
+
+        this.Native["DD_Overlay_DrawFrameTrack1"](this.FrameRect.PageIndex,
+            this.FrameRect.Rect.X, this.FrameRect.Rect.Y, this.FrameRect.Rect.R, this.FrameRect.Rect.B);
+
+        // move
+        if (this.FrameRect.IsTracked)
+        {
+            this.Native["DD_Overlay_DrawFrameTrack2"](this.FrameRect.Track.PageIndex,
+                this.FrameRect.Track.L, this.FrameRect.Track.T, this.FrameRect.Track.R, this.FrameRect.Track.B);
+        }
     }
 };
 
