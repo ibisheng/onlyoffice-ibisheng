@@ -126,7 +126,6 @@ UndoRedoItemSerializable.prototype = {
 				sTypeOf = "array";
 			else
 				sTypeOf = typeof(oItem);
-			var bUnknown = false;
 			switch(sTypeOf)
 			{
 				case "object":
@@ -492,6 +491,7 @@ UndoRedoData_CompositeFrozenCell.prototype = {
 			case this.Properties.frozenBefore: return this.frozenBefore; break;
 			case this.Properties.frozenAfter: return this.frozenAfter; break;
 		}
+		return null;
 	},
 	setProperty: function(nType, value) {
 		switch (nType) {
@@ -499,7 +499,7 @@ UndoRedoData_CompositeFrozenCell.prototype = {
 			case this.Properties.frozenAfter: this.frozenAfter = value; break;
 		}
 	}
-}
+};
 //
 
 function UndoRedoData_CellSimpleData(nRow, nCol, oOldVal, oNewVal, sFormula){
@@ -573,6 +573,7 @@ UndoRedoData_CellData.prototype = {
 			case this.Properties.value: return this.value;break;
 			case this.Properties.style: return this.style;break;
 		}
+		return null;
 	},
 	setProperty : function(nType, value)
 	{
@@ -618,6 +619,7 @@ UndoRedoData_CellValueData.prototype = {
 			case this.Properties.formula: return this.formula;break;
 			case this.Properties.value: return this.value;break;
 		}
+		return null;
 	},
 	setProperty : function(nType, value)
 	{
@@ -654,6 +656,7 @@ UndoRedoData_FromToRowCol.prototype = {
 			case this.Properties.from: return this.from;break;
 			case this.Properties.to: return this.to;break;
 		}
+		return null;
 	},
 	setProperty : function(nType, value)
 	{
@@ -705,6 +708,7 @@ UndoRedoData_FromTo.prototype = {
 			case this.Properties.to: return this.to;break;
 			case this.Properties.copyRange: return this.copyRange;break;
 		}
+		return null;
 	},
 	setProperty : function(nType, value)
 	{
@@ -744,6 +748,7 @@ UndoRedoData_FromToHyperlink.prototype = {
 			case this.Properties.to: return this.to;break;
 			case this.Properties.hyperlink: return this.hyperlink;break;
 		}
+		return null;
 	},
 	setProperty : function(nType, value)
 	{
@@ -794,6 +799,7 @@ UndoRedoData_IndexSimpleProp.prototype = {
 			case this.Properties.index: return this.index;break;
 			case this.Properties.oNewVal: return this.oNewVal;break;
 		}
+		return null;
 	},
 	setProperty : function(nType, value)
 	{
@@ -858,6 +864,7 @@ UndoRedoData_ColProp.prototype = {
 			case this.Properties.CustomWidth: return this.CustomWidth;break;
 			case this.Properties.BestFit: return this.BestFit;break;
 		}
+		return null;
 	},
 	setProperty : function(nType, value)
 	{
@@ -913,6 +920,7 @@ UndoRedoData_RowProp.prototype = {
 			case this.Properties.hd: return this.hd;break;
 			case this.Properties.CustomHeight: return this.CustomHeight;break;
 		}
+		return null;
 	},
 	setProperty : function(nType, value)
 	{
@@ -965,6 +973,7 @@ UndoRedoData_BBox.prototype = {
 			case this.Properties.c2: return this.c2;break;
 			case this.Properties.r2: return this.r2;break;
 		}
+		return null;
 	},
 	setProperty : function(nType, value)
 	{
@@ -1009,6 +1018,7 @@ UndoRedoData_SortData.prototype = {
 			case this.Properties.bbox: return this.bbox;break;
 			case this.Properties.places: return this.places;break;
 		}
+		return null;
 	},
 	setProperty : function(nType, value)
 	{
@@ -1062,15 +1072,10 @@ UndoRedoData_GTableIdAdd.prototype =
     {
         switch(nType)
         {
-            case this.Properties.objectType:
-            {
-                return this.objectType;
-            }
-            case this.Properties.id:
-            {
-                return this.id;
-            }
+            case this.Properties.objectType: return this.objectType;
+            case this.Properties.id: return this.id;
         }
+		return null;
     },
 
     setProperty: function(nType, value)
@@ -1121,19 +1126,11 @@ UndoRedoData_historyitem_Paragraph_AddItem.prototype =
     {
         switch (nType)
         {
-            case this.Properties.startPos:
-            {
-                return this.startPos;
-            }
-            case this.Properties.endPos:
-            {
-                return this.endPos;
-            }
-            case this.Properties.itemsIds:
-            {
-                return this.itemsIds;
-            }
+            case this.Properties.startPos: return this.startPos;
+            case this.Properties.endPos: return this.endPos;
+            case this.Properties.itemsIds: return this.itemsIds;
         }
+		return null;
     },
 
     setProperty: function(nType, value)
@@ -1185,15 +1182,10 @@ UndoRedoDataDocContentAddItem.prototype =
     {
         switch(nType)
         {
-            case this.Properties.pos:
-            {
-                return this.pos;
-            }
-            case this.Properties.objectId:
-            {
-                return this.objectId;
-            }
+            case this.Properties.pos: return this.pos;
+            case this.Properties.objectId: return this.objectId;
         }
+		return null;
     },
 
     setProperty: function(nType, value)
@@ -1240,12 +1232,9 @@ UndoRedoDataTypeParaItemId.prototype =
     {
         switch(nType)
         {
-            case this.Properties.itemId:
-            {
-                return this.itemId;
-            }
-
+            case this.Properties.itemId: return this.itemId;
         }
+		return null;
     },
 
     setProperty: function(nType, value)
@@ -1289,15 +1278,10 @@ UndoRedoDataAddParaItem.prototype =
     {
         switch(nType)
         {
-            case this.Properties.type:
-            {
-                return this.type;
-            }
-            case this.Properties.value:
-            {
-                return this.value;
-            }
+            case this.Properties.type: return this.type;
+            case this.Properties.value: return this.value;
         }
+		return null;
     },
 
     setProperty: function(nType, value)
@@ -1345,15 +1329,10 @@ UndoRedoDataDocContentRemoveItems.prototype =
     {
         switch(nType)
         {
-            case this.Properties.pos:
-            {
-                return this.pos;
-            }
-            case this.Properties.aItems:
-            {
-                return this.aItems;
-            }
+            case this.Properties.pos: return this.pos;
+            case this.Properties.aItems: return this.aItems;
         }
+		return null;
     },
 
     setProperty: function(nType, value)
@@ -1475,6 +1454,7 @@ UndoRedoDataParaPr.prototype = {
                case this.Properties.NumPr                   : return   this.NumPr                   ;
                case this.Properties.PStyle                  : return   this.PStyle                  ;
         }
+		return null;
     },
     setProperty : function(nType, value)
     {
@@ -1542,6 +1522,7 @@ UndoRedoData_SheetAdd.prototype = {
 			case this.Properties.sheetidfrom: return this.sheetidfrom;break;
 			case this.Properties.sheetid: return this.sheetid;break;
 		}
+		return null;
 	},
 	setProperty : function(nType, value)
 	{
@@ -1580,6 +1561,7 @@ UndoRedoData_SheetRemove.prototype = {
 			case this.Properties.sheetId: return this.sheetId;break;
 			case this.Properties.sheet: return this.sheet;break;
 		}
+		return null;
 	},
 	setProperty : function(nType, value)
 	{
@@ -1612,6 +1594,7 @@ UndoRedoData_SheetPositions.prototype = {
 		{
 			case this.Properties.positions: return this.positions;break;
 		}
+		return null;
 	},
 	setProperty : function(nType, value)
 	{
@@ -1703,6 +1686,7 @@ UndoRedoData_AutoFilter.prototype = {
 			case this.Properties.moveFrom: this.moveFrom = value;break;
 			case this.Properties.moveTo: this.moveTo = value;break;
 		}
+		return null;
 	},
 	applyCollaborative : function (nSheetId, collaborativeEditing) {
 		this.activeCells.c1 = collaborativeEditing.getLockMeColumn2(nSheetId, this.activeCells.c1);
@@ -1760,7 +1744,6 @@ var UndoRedoClassTypes = new function(){
 		return null;
 	};
 };
-
 
 
 function UndoRedoDataGraphicObjects(objectId, drawingData)
@@ -2583,7 +2566,6 @@ UndoRedoDataClosePath.prototype =
     },
     getProperty : function (nType)
     {
-
         return null;
     },
     setProperty : function (nType, value)
@@ -3048,7 +3030,6 @@ UndoRedoWoorksheet.prototype = {
             var nCol = Data.nCol;
             if(bUndo)
             {
-                var sFormula = Data.sFormula
                 var cell = ws._getCellNoEmpty(nRow, nCol);
 				if(cell)
 				{
@@ -3177,7 +3158,6 @@ UndoRedoWoorksheet.prototype = {
 		}
 		else if(historyitem_Worksheet_ShiftCellsTop == Type || historyitem_Worksheet_ShiftCellsBottom == Type)
 		{
-			var bbox = Data;
 			var r1 = Data.r1;
 			var c1 = Data.c1;
 			var r2 = Data.r2;
@@ -3242,9 +3222,7 @@ UndoRedoWoorksheet.prototype = {
 			}
 			if(false != this.wb.bCollaborativeChanges)
 			{
-				var collaborativeEditing = this.wb.oApi.collaborativeEditing,
-					nSheetId = ws.getId(),
-					coBBoxTo 	= Asc.Range(0, 0, 0, 0),
+				var coBBoxTo 	= Asc.Range(0, 0, 0, 0),
 					coBBoxFrom 	= Asc.Range(0, 0, 0, 0);
 
 				coBBoxTo.r1 = collaborativeEditing.getLockOtherRow2(	nSheetId, to.r1);
@@ -3493,7 +3471,7 @@ var g_oUndoRedoRow = null;
 var g_oUndoRedoCol = null;
 function UndoRedoRowCol(wb, bRow){
 	this.wb = wb;
-	this.bRow = bRow
+	this.bRow = bRow;
 	this.nTypeRow = UndoRedoClassTypes.Add(function(){return g_oUndoRedoRow;});
 	this.nTypeCol = UndoRedoClassTypes.Add(function(){return g_oUndoRedoCol;});
 }
@@ -3591,7 +3569,7 @@ UndoRedoRowCol.prototype = {
 		else if (historyitem_RowCol_SetCellStyle == Type)
 			row.setCellStyle(Val);
 	}
-}
+};
 
 var g_oUndoRedoComment = null;
 function UndoRedoComment(wb){

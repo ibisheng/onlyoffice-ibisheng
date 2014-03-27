@@ -1212,17 +1212,9 @@
 
 		WorksheetView.prototype._initPane = function () {
 			var pane = this.model.sheetViews[0].pane;
-			if (null !== pane) {
-				// ToDo Обрабатываем пока только frozen и frozenSplit
-				if (kPaneStateFrozen === pane.state || kPaneStateFrozenSplit === pane.state) {
-					this.topLeftFrozenCell = new CellAddress(pane.topLeftCell);
-					if (!this.topLeftFrozenCell.isValid())
-						this.topLeftFrozenCell = null;
-					else {
-						this.visibleRange.r1 = this.topLeftFrozenCell.getRow0();
-						this.visibleRange.c1 = this.topLeftFrozenCell.getCol0();
-					}
-				}
+			if (null !== pane && null !== (this.topLeftFrozenCell = pane.topLeftFrozenCell)) {
+				this.visibleRange.r1 = this.topLeftFrozenCell.getRow0();
+				this.visibleRange.c1 = this.topLeftFrozenCell.getCol0();
 			}
 		};
 
@@ -3173,11 +3165,11 @@
 			_this.objectRender.objectLocker.reset();
 			_this.objectRender.objectLocker.addObjectId(_this.getFrozenCellId());
 			_this.objectRender.objectLocker.checkObjects(callback);
-		}
+		};
 		
 		WorksheetView.prototype.getFrozenCellId = function() {
 			return "frozenCell_" + this.model.Id;
-		}
+		};
 		
 		/** Для api закрепленных областей */
 		
@@ -3187,19 +3179,19 @@
 			this.visibleRange.r1 = 0;
 			this.objectRender.drawingArea.init();
 			this.draw();
-		}
+		};
 		
 		WorksheetView.prototype.setSelectedFrozenCell = function() {
 			this.setFrozenCell(this.getSelectedColumnIndex(), this.getSelectedRowIndex(), true, true);
-		}
+		};
 		
 		WorksheetView.prototype.setFirstFrozenCol = function() {
 			this.setFrozenCell(1, 0, true, true);
-		}
+		};
 		
 		WorksheetView.prototype.setFirstFrozenRow = function() {
 			this.setFrozenCell(0, 1, true, true);
-		}
+		};
 
 		/** */
 		

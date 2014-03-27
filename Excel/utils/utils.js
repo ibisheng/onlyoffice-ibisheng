@@ -1011,6 +1011,8 @@
 
 			this.state = null;
 			this.topLeftCell = null;
+			// CellAddress для удобства
+			this.topLeftFrozenCell = null;
 
 			return this;
 		}
@@ -1018,7 +1020,16 @@
 			var res = new asc_CPane();
 			res.state = this.state;
 			res.topLeftCell = this.topLeftCell;
+			res.topLeftFrozenCell = this.topLeftFrozenCell ? new CellAddress(this.topLeftFrozenCell.id) : null;
 			return res;
+		};
+		asc_CPane.prototype.init = function() {
+			// ToDo Обрабатываем пока только frozen и frozenSplit
+			if (c_oAscPaneState.Frozen === this.state || c_oAscPaneState.FrozenSplit === this.state) {
+				this.topLeftFrozenCell = new CellAddress(this.topLeftCell);
+				if (!this.topLeftFrozenCell.isValid())
+					this.topLeftFrozenCell = null;
+			}
 		};
 
 		function RedoObjectParam () {

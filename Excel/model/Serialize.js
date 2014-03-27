@@ -6073,6 +6073,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 			res = this.bcr.Read1(length, function (t, l) {
 				return oThis.ReadPane(t, l, oSheetView.pane);
 			});
+			oSheetView.pane.init();
 		} else
 			res = c_oSerConstants.ReadUnknown;
 		return res;

@@ -418,15 +418,15 @@ var c_oAscTypeSelectElement = {
 };
 
 var c_oAscLineBeginSize = {
-    small_small : 0,
-    small_mid : 1,
-    small_large : 2,
-    mid_small : 3,
-    mid_mid : 4,
-    mid_large : 5,
-    large_small : 6,
-    large_mid : 7,
-    large_large : 8
+    small_small	: 0,
+    small_mid	: 1,
+    small_large	: 2,
+    mid_small	: 3,
+    mid_mid		: 4,
+    mid_large	: 5,
+    large_small	: 6,
+    large_mid 	: 7,
+    large_large	: 8
 };
 
 
@@ -436,40 +436,45 @@ var c_oAscFillGradType  = {
 };
 
 var c_oAscVerticalTextAlign = {
-    TEXT_ALIGN_BOTTOM : 0,// (Text Anchor Enum ( Bottom ))
-    TEXT_ALIGN_CTR : 1,// (Text Anchor Enum ( Center ))
-    TEXT_ALIGN_DIST : 2,// (Text Anchor Enum ( Distributed ))
-    TEXT_ALIGN_JUST : 3,// (Text Anchor Enum ( Justified ))
-    TEXT_ALIGN_TOP : 4// Top
+    TEXT_ALIGN_BOTTOM	: 0, // (Text Anchor Enum ( Bottom ))
+    TEXT_ALIGN_CTR		: 1, // (Text Anchor Enum ( Center ))
+    TEXT_ALIGN_DIST		: 2, // (Text Anchor Enum ( Distributed ))
+    TEXT_ALIGN_JUST		: 3, // (Text Anchor Enum ( Justified ))
+    TEXT_ALIGN_TOP		: 4  // Top
 };
 
 
 // Chart defines
 var c_oAscChartType = {
-    line: "Line",
-    bar: "Bar",
-    hbar: "HBar",
-    area: "Area",
-    pie: "Pie",
-    scatter: "Scatter",
-    stock: "Stock"
+    line	: "Line",
+    bar		: "Bar",
+    hbar	: "HBar",
+    area	: "Area",
+    pie		: "Pie",
+    scatter	: "Scatter",
+    stock	: "Stock"
 };
 
 var c_oAscChartSubType = {
-    normal: "normal",
-    stacked: "stacked",
-    stackedPer: "stackedPer"
+    normal		: "normal",
+    stacked		: "stacked",
+    stackedPer	: "stackedPer"
 };
 
 var c_oAscChartStyle = {
-    Dark: 1,
-    Standart: 2,
-    Accent1: 3,
-    Accent2: 4,
-    Accent3: 5,
-    Accent4: 6,
-    Accent5: 7,
-    Accent6: 8
+    Dark		: 1,
+    Standart	: 2,
+    Accent1		: 3,
+    Accent2		: 4,
+    Accent3		: 5,
+    Accent4		: 6,
+    Accent5		: 7,
+    Accent6		: 8
+};
+
+var c_oAscPaneState = {
+	Frozen		: "frozen",
+	FrozenSplit	: "frozenSplit"
 };
  
 var c_oAscCoAuthoringMeBorderColor					= new window.CColor(22, 156, 0);
