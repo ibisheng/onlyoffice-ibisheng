@@ -114,7 +114,7 @@ ParaMath.prototype =
             if (oElem)
             {
                 oElem.addElementToContent(oMRun);
-                for (var i=0;i<sText.length;i++)
+                for (var i=0; i < sText.lengt ;i++)
                 {
                     /*text[i].replace("&",	"&amp;");
                      text[i].Replace("'",	"&apos;");

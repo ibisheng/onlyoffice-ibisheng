@@ -6367,14 +6367,16 @@ function CRunCollaborativeRange(PosS, PosE)
 
 
 
-ParaRun.prototype.Math_SetPosition = function(pos)
+ParaRun.prototype.Math_SetPosition = function(_pos)
 {
+    var pos = {x: _pos.x, y: _pos.y - this.size.ascent};
+
     for(var i = 0; i < this.Content.length; i++)
     {
         this.Content[i].setPosition(pos);
+        pos.x += this.Content[i].size.width;
     }
 }
-
 ParaRun.prototype.Math_Draw = function(x, y, pGraphics)
 {
     if(this.bMathRun)
@@ -6384,16 +6386,13 @@ ParaRun.prototype.Math_Draw = function(x, y, pGraphics)
 
         pGraphics.b_color1(0,0,0,255);
 
-        for(var i=1; i < this.Content.length;i++)
+        for(var i=0; i < this.Content.length;i++)
         {
             var oWPrp = this.Get_CompiledPr(false);
             g_oTextMeasurer.SetFont(oWPrp);
 
-            X += this.Content[i].size.width;
-
             this.Content[i].draw(X, Y, pGraphics);
         }
-
     }
 }
 ParaRun.prototype.Math_Recalculate = function()
@@ -6403,17 +6402,15 @@ ParaRun.prototype.Math_Recalculate = function()
 
     this.Lines[0].Add_Range( 0, RangeStartPos, RangeEndPos );
 
-
     var width = 0,
         ascent = 0, descent = 0;
+
+    var oWPrp = this.Get_CompiledPr(false);
+    oWPrp.Merge(this.Parent.Composition.DEFAULT_RUN_PRP.getTxtPrp());
+    g_oTextMeasurer.SetFont(oWPrp);
+
     for (var Pos = 0 ; Pos < this.Content.length; Pos++ )
     {
-        // var oWPrp = new CTextPr();
-        // oWPrp.Merge(this.Parent.Composition.DEFAULT_RUN_PRP);
-        var oWPrp = this.Get_CompiledPr(false);
-        oWPrp.Merge(this.Parent.Composition.DEFAULT_RUN_PRP.getTxtPrp());
-        g_oTextMeasurer.SetFont(oWPrp);
-
         this.Content[Pos].Resize(g_oTextMeasurer);
 
         var oSize = this.Content[Pos].size;
