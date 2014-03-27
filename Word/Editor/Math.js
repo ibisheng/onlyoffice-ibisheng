@@ -1250,5 +1250,5 @@ ParaMath.prototype =
 		res = this.bcr.Read1(length, function(t, l){
 			return oThis.boMathr.ReadMathOMathParaCollaborative(t,l,oThis.Math);
 		});
-	},
+	}
 };
