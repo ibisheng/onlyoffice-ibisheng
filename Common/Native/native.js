@@ -466,7 +466,18 @@ window.native.Call_HR_Margins = function(_margin_left, _margin_right)
 };
 window.native.Call_HR_Table = function()
 {
-    // TODO:
+    var _logic = _api.WordControl.m_oLogicDocument;
+    if ( false === _logic.Document_Is_SelectionLocked(changestype_Table_Properties) )
+    {
+        _logic.Create_NewHistoryPoint();
+
+        var _table_murkup = Deserialize_Table_Markup(_params, _cols, _margins, _rows);
+        _table_murkup.Table = _api.WordControl.m_oDrawingDocument.Table;
+
+        _table_murkup.CorrectTo();
+        _table_murkup.Table.Update_TableMarkupFromRuler(_table_murkup, true, _params[6]);
+        _table_murkup.CorrectFrom();
+    }
 };
 
 window.native.Call_VR_Margins = function(_top, _bottom)
@@ -487,7 +498,48 @@ window.native.Call_VR_Header = function(_header_top, _header_bottom)
         _logic.Document_SetHdrFtrBounds(_header_top, _header_bottom);
     }
 };
-window.native.Call_VR_Table = function()
+window.native.Call_VR_Table = function(_params, _cols, _margins, _rows)
 {
-    // TODO:
+    var _logic = _api.WordControl.m_oLogicDocument;
+    if ( false === _logic.Document_Is_SelectionLocked(changestype_Table_Properties) )
+    {
+        _logic.Create_NewHistoryPoint();
+
+        var _table_murkup = Deserialize_Table_Markup(_params, _cols, _margins, _rows);
+        _table_murkup.Table = _api.WordControl.m_oDrawingDocument.Table;
+
+        _table_murkup.CorrectTo();
+        _table_murkup.Table.Update_TableMarkupFromRuler(_table_murkup, false, _params[6]);
+        _table_murkup.CorrectFrom();
+    }
 };
+
+function Deserialize_Table_Markup(_params, _cols, _margins, _rows)
+{
+    var _markup = new CTableMarkup(null);
+    _markup.Internal.RowIndex   = _params[0];
+    _markup.Internal.CellIndex  = _params[1];
+    _markup.Internal.PageNum    = _params[2];
+    _markup.X                   = _params[3];
+    _markup.CurCol              = _params[4];
+    _markup.CurRow              = _params[5];
+    // 6 - DragPos
+    _markup.TransformX          = _params[7];
+    _markup.TransformY          = _params[8];
+
+    _markup.Cols    = _cols;
+
+    var _len = _margins.length;
+    for (var i = 0; i < _len; i += 2)
+    {
+        _markup.Margins.push({ Left : _margins[i], Right : _margins[i + 1] });
+    }
+
+    _len = _rows.length;
+    for (var i = 0; i < _len; i += 2)
+    {
+        _markup.Rows.push({ Y : _rows[i], H : _rows[i + 1] });
+    }
+
+    return _markup;
+}
