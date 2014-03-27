@@ -810,6 +810,12 @@ ParaMath.prototype =
         this.Paragraph.Refresh_RecalcData2(0);
     },
 
+    Refresh_RecalcData2 : function(Data)
+    {
+        this.Paragraph.Refresh_RecalcData2(0);
+    },
+
+
     Recalculate_MinMaxContentWidth : function(MinMax)
     {
         // TODO: Если формула не измерена, тогда здесь её надо измерить
