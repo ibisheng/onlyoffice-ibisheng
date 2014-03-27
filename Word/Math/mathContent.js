@@ -358,14 +358,8 @@ CMPrp.prototype =
 // 1. (!!) повтор IsIncline, IsHighElement
 
 
-function CMathContent(bCollaborative)
+function CMathContent()
 {
-	if (!bCollaborative)
-	{
-		this.Id = g_oIdCounter.Get_NewId();
-		g_oTableId.m_aPairs[this.Id] = this;
-	}
-	
     this.bDot       =   false;
     this.plhHide    =   false;
     this.bRoot      =   false;
@@ -689,9 +683,9 @@ CMathContent.prototype =
         var element = new mathElem(obj);
         //obj.relate(this);
         obj.Parent = this;
-		
-		if(obj.typeObj === MATH_COMP)
-			obj.setComposition(this.Composition);
+
+        if(obj.typeObj === MATH_COMP)
+            obj.setComposition(this.Composition);
 
         this.content.push(element);
         this.CurPos++;
@@ -728,6 +722,7 @@ CMathContent.prototype =
 
         this.CurPos++;
         this.setLogicalPosition(this.CurPos);
+
         //this.setStart_Selection(this.CurPos);
         //this.selection.active = false;
     },
@@ -5346,7 +5341,7 @@ CMathContent.prototype =
 
         if( !bHidePlh )
         {
-            for(var i=1; i < this.content.length;i++)
+            for(var i=0; i < this.content.length;i++)
             {
                 if(this.content[i].value.typeObj == MATH_RUN_PRP)
                 {
@@ -7557,7 +7552,7 @@ CMathContent.prototype =
 
 }
 
-function CMathComposition(bCollaborative)
+function CMathComposition()
 {
     this.Parent = undefined;
 
@@ -7590,7 +7585,7 @@ function CMathComposition(bCollaborative)
 
     this.DEFAULT_RUN_PRP = new CMathRunPrp();
 
-    this.Init(bCollaborative);
+    this.Init();
 }
 CMathComposition.prototype =
 {
@@ -8211,9 +8206,9 @@ CMathComposition.prototype =
      },*/
     //////////////*    end  of  test  functions   *//////////////////
 
-    Init: function(bCollaborative)
+    Init: function()
     {	
-        this.Root = new CMathContent(bCollaborative);
+        this.Root = new CMathContent();
         //this.Root.gaps = gps;
         this.Root.setComposition(this);
         //this.SetTestRunPrp();
