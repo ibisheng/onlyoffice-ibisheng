@@ -8,7 +8,7 @@ function ParaMath(bAddMenu)
     this.Type  = para_Math;
 
     this.Jc   = undefined;
-    this.Math = new CMathComposition(bCollaborative);
+    this.Math = new CMathComposition();
     this.Math.Parent = this;
     this.RootComposition = this.Math.Root;
     this.CurrentContent    = this.RootComposition;
