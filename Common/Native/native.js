@@ -464,7 +464,7 @@ window.native.Call_HR_Margins = function(_margin_left, _margin_right)
         _logic.Set_DocumentMargin( { Left : _margin_left, Right : _margin_right });
     }
 };
-window.native.Call_HR_Table = function()
+window.native.Call_HR_Table = function(_params, _cols, _margins, _rows)
 {
     var _logic = _api.WordControl.m_oLogicDocument;
     if ( false === _logic.Document_Is_SelectionLocked(changestype_Table_Properties) )
