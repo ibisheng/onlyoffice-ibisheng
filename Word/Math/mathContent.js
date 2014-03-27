@@ -6184,18 +6184,18 @@ CMathContent.prototype =
     {
         this.pos = {x: pos.x, y: pos.y};
 
-        for(var i=1; i < this.content.length;i++)
+        var _pos = {x: pos.x, y: pos.y + this.size.ascent };   // y по baseline;
+
+        for(var i=0; i < this.content.length; i++)
         {
-            var t =
-            {
-                x: this.pos.x + this.content[i-1].widthToEl + this.content[i].gaps.left,
-                y: this.pos.y + this.size.ascent    //baseline
-            };
+            _pos.x += this.content[i].gaps.left;
 
             if(this.content[i].value.typeObj == MATH_PARA_RUN)
-                this.content[i].value.Math_SetPosition(pos);
+                this.content[i].value.Math_SetPosition(_pos);
             else
-                this.content[i].value.setPosition(t);
+                this.content[i].value.setPosition(_pos);
+
+            _pos.x += this.content[i].value.size.width;
         }
     },
     old_drawSelect: function()
