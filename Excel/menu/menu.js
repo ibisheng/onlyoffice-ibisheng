@@ -922,19 +922,19 @@
 				break;
 			}
 			case "td_set_fixed_area":{
-				api.asc_setSelectedFrozenCell();
+				api.asc_freezePane(c_oAscFreezePane.FreezeSheetPanes);
 				break;
 			}
 			case "td_clean_fixed_area":{
-				api.asc_clearFrozenCell();
+				api.asc_freezePane(c_oAscFreezePane.FreezeClean);
 				break;
 			}
 			case "td_set_fixed_col":{
-				api.asc_setFirstFrozenCol();
+				api.asc_freezePane(c_oAscFreezePane.FreezeFirstColumn);
 				break;
 			}
 			case "td_set_fixed_row":{
-				api.asc_setFirstFrozenRow();
+				api.asc_freezePane(c_oAscFreezePane.FreezeTopRow);
 				break;
 			}
 		}

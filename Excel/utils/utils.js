@@ -1020,7 +1020,8 @@
 			var res = new asc_CPane();
 			res.state = this.state;
 			res.topLeftCell = this.topLeftCell;
-			res.topLeftFrozenCell = this.topLeftFrozenCell ? new CellAddress(this.topLeftFrozenCell.id) : null;
+			res.topLeftFrozenCell = this.topLeftFrozenCell ?
+				new CellAddress(this.topLeftFrozenCell.row, this.topLeftFrozenCell.col) : null;
 			return res;
 		};
 		asc_CPane.prototype.init = function() {

@@ -714,9 +714,9 @@
 			if (isResizeModeMove) {
 				ws.objectRender.saveSizeDrawingObjects();
 				if (target.target === "colresize") {
-						ws.changeColumnWidth(target.col, x, target.mouseX);
+					ws.changeColumnWidth(target.col, x, target.mouseX);
 				} else if (target.target === "rowresize") {
-						ws.changeRowHeight(target.row, y, target.mouseY);
+					ws.changeRowHeight(target.row, y, target.mouseY);
 				}
 				ws.objectRender.updateSizeDrawingObjects();
 				ws.cellCommentator.updateCommentPosition();
@@ -768,15 +768,13 @@
 		// Frozen anchor
 		WorkbookView.prototype._onMoveFrozenAnchorHandle = function (x, y, targetInfo) {
 			var ws = this.getWorksheet();
-			if ( ws )
-				ws._applyFrozenAnchor(x, y, targetInfo, true);
+			ws.drawFrozenGuides(x, y, targetInfo);
 		};
 		
 		WorkbookView.prototype._onMoveFrozenAnchorHandleDone = function (x, y, targetInfo) {
 			// Закрепляем область
 			var ws = this.getWorksheet();
-			if ( ws )
-				ws._applyFrozenAnchor(x, y, targetInfo, false);
+			ws.applyFrozenAnchor(x, y, targetInfo);
 		};
 
 		WorkbookView.prototype._onAutoFiltersClick = function (idFilter) {

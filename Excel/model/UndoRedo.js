@@ -357,8 +357,6 @@ var UndoRedoDataTypes = new function() {
     this.DocContentParaItemId = 66;
     this.ParagraphAddParaItem = 67;
     this.ParagraphParaItemAdd = 68;
-	this.FrozenCell = 69;
-	this.CompositeFrozenCell = 70;
 
     this.Create = function(nType)
 	{
@@ -429,78 +427,10 @@ var UndoRedoDataTypes = new function() {
             case this.GOSetAdjustmentValue: return new UndoRedoDataSetAdjustmentValue();
             case this.ParagraphAddParaItem: return new UndoRedoDataAddParaItem();
             case this.ParagraphParaItemAdd: return new UndoRedoData_historyitem_Paragraph_AddItem();
-			
-			case this.FrozenCell: return new UndoRedoData_FrozenCell();
-            case this.CompositeFrozenCell: return new UndoRedoData_CompositeFrozenCell();
         }
 		return null;
 	};
 };
-
-//
-function UndoRedoData_FrozenCell(nRow, nCol) {
-	this.Properties = {
-		Row: 0,
-		Col: 1
-	};
-	this.nRow = nRow;
-	this.nCol = nCol;
-}
-UndoRedoData_FrozenCell.prototype = {
-	getType : function() {
-		return UndoRedoDataTypes.FrozenCell;
-	},
-	getProperties : function() {
-		return this.Properties;
-	},
-	getProperty : function(nType) {
-		switch(nType) {
-			case this.Properties.Row: return this.nRow; break;
-			case this.Properties.Col: return this.nCol; break;
-		}
-		return null;
-	},
-	setProperty : function(nType, value) {
-		switch(nType) {
-			case this.Properties.Row: this.nRow = value; break;
-			case this.Properties.Col: this.nCol = value; break;
-		}
-	}
-};
-
-function UndoRedoData_CompositeFrozenCell(frozenBefore, frozenAfter) {
-	
-	this.frozenBefore = frozenBefore;
-	this.frozenAfter = frozenAfter;
-
-	this.Properties = {
-		frozenBefore: 0,
-		frozenAfter: 1
-	};
-}
-
-UndoRedoData_CompositeFrozenCell.prototype = {
-	getType: function() {
-		return UndoRedoDataTypes.CompositeFrozenCell;
-	},
-	getProperties: function() {
-		return this.Properties;
-	},
-	getProperty: function(nType) {
-		switch (nType) {
-			case this.Properties.frozenBefore: return this.frozenBefore; break;
-			case this.Properties.frozenAfter: return this.frozenAfter; break;
-		}
-		return null;
-	},
-	setProperty: function(nType, value) {
-		switch (nType) {
-			case this.Properties.frozenBefore: this.frozenBefore = value; break;
-			case this.Properties.frozenAfter: this.frozenAfter = value; break;
-		}
-	}
-};
-//
 
 function UndoRedoData_CellSimpleData(nRow, nCol, oOldVal, oNewVal, sFormula){
 	this.Properties = {
@@ -2992,20 +2922,20 @@ UndoRedoWoorksheet.prototype = {
 	},
 	UndoRedo : function(Type, Data, nSheetId, bUndo)
 	{
-		var api = window["Asc"]["editor"];
+		var worksheetView, nRow, nCol, oLockInfo, cell, index, from, to, range, r1, c1, r2, c2, temp, i, length, data;
 		var ws = this.wb.getWorksheetById(nSheetId);
 		if(null == ws)
 			return;
 		var collaborativeEditing = this.wb.oApi.collaborativeEditing;
 		if(historyitem_Worksheet_RemoveCell == Type)
 		{
-			var nRow = Data.nRow;
-			var nCol = Data.nCol;
+			nRow = Data.nRow;
+			nCol = Data.nCol;
 			if(false != this.wb.bCollaborativeChanges)
 			{
 				nRow = collaborativeEditing.getLockOtherRow2(nSheetId, nRow);
 				nCol = collaborativeEditing.getLockOtherColumn2(nSheetId, nCol);
-				var oLockInfo = new Asc.asc_CLockInfo();
+				oLockInfo = new Asc.asc_CLockInfo();
 				oLockInfo["sheetId"] = nSheetId;
 				oLockInfo["type"] = c_oAscLockTypeElem.Range;
 				oLockInfo["rangeOrObjectId"] = new Asc.Range(nCol, nRow, nCol, nRow);
@@ -3015,7 +2945,7 @@ UndoRedoWoorksheet.prototype = {
 			{
 				var oValue = Data.oOldVal.value;
 				var oStyle = Data.oOldVal.style;
-				var cell = ws._getCell(nRow, nCol);
+				cell = ws._getCell(nRow, nCol);
 				cell.setValueData(oValue);
 				if(null != oStyle)
 					cell.setStyle(oStyle);
@@ -3026,11 +2956,11 @@ UndoRedoWoorksheet.prototype = {
 				ws._removeCell(nRow, nCol);
 		}
         else if(historyitem_Worksheet_RemoveCellFormula == Type){
-            var nRow = Data.nRow;
-            var nCol = Data.nCol;
+            nRow = Data.nRow;
+            nCol = Data.nCol;
             if(bUndo)
             {
-                var cell = ws._getCellNoEmpty(nRow, nCol);
+                cell = ws._getCellNoEmpty(nRow, nCol);
 				if(cell)
 				{
 					var node = ws.workbook.dependencyFormulas.getNode(ws.getId(), cell.getName());
@@ -3041,11 +2971,11 @@ UndoRedoWoorksheet.prototype = {
         }
 		else if(historyitem_Worksheet_ColProp == Type)
 		{
-			var index = Data.index;
+			index = Data.index;
 			if(false != this.wb.bCollaborativeChanges)
 			{
 				index = collaborativeEditing.getLockOtherColumn2(nSheetId, index);
-				var oLockInfo = new Asc.asc_CLockInfo();
+				oLockInfo = new Asc.asc_CLockInfo();
 				oLockInfo["sheetId"] = nSheetId;
 				oLockInfo["type"] = c_oAscLockTypeElem.Range;
 				oLockInfo["rangeOrObjectId"] = new Asc.Range(index, 0, index, gc_nMaxRow0);
@@ -3059,11 +2989,11 @@ UndoRedoWoorksheet.prototype = {
 		}
 		else if(historyitem_Worksheet_RowProp == Type)
 		{
-			var index = Data.index;
+			index = Data.index;
 			if(false != this.wb.bCollaborativeChanges)
 			{
 				index = collaborativeEditing.getLockOtherRow2(nSheetId, index);
-				var oLockInfo = new Asc.asc_CLockInfo();
+				oLockInfo = new Asc.asc_CLockInfo();
 				oLockInfo["sheetId"] = nSheetId;
 				oLockInfo["type"] = c_oAscLockTypeElem.Range;
 				oLockInfo["rangeOrObjectId"] = new Asc.Range(0, index, gc_nMaxCol0, index);
@@ -3077,22 +3007,22 @@ UndoRedoWoorksheet.prototype = {
 		}
 		else if(historyitem_Worksheet_AddRows == Type || historyitem_Worksheet_RemoveRows == Type)
 		{
-			var from = Data.from;
-			var to = Data.to;
+			from = Data.from;
+			to = Data.to;
 			if(false != this.wb.bCollaborativeChanges)
 			{
 				from = collaborativeEditing.getLockOtherRow2(nSheetId, from);
 				to = collaborativeEditing.getLockOtherRow2(nSheetId, to);
 				if(false == ((true == bUndo && historyitem_Worksheet_AddRows == Type) || (false == bUndo && historyitem_Worksheet_RemoveRows == Type)))
 				{
-					var oLockInfo = new Asc.asc_CLockInfo();
+					oLockInfo = new Asc.asc_CLockInfo();
 					oLockInfo["sheetId"] = nSheetId;
 					oLockInfo["type"] = c_oAscLockTypeElem.Range;
 					oLockInfo["rangeOrObjectId"] = new Asc.Range(0, from, gc_nMaxCol0, to);
 					this.wb.aCollaborativeChangeElements.push(oLockInfo);
 				}
 			}
-			var range = Asc.Range(0, from, gc_nMaxCol0, to);
+			range = Asc.Range(0, from, gc_nMaxCol0, to);
 			if((true == bUndo && historyitem_Worksheet_AddRows == Type) || (false == bUndo && historyitem_Worksheet_RemoveRows == Type))
 				ws.workbook.handlers.trigger("deleteCell", nSheetId, c_oAscDeleteOptions.DeleteRows, range);
 			else
@@ -3104,15 +3034,15 @@ UndoRedoWoorksheet.prototype = {
 		}
 		else if(historyitem_Worksheet_AddCols == Type || historyitem_Worksheet_RemoveCols == Type)
 		{
-			var from = Data.from;
-			var to = Data.to;
+			from = Data.from;
+			to = Data.to;
 			if(false != this.wb.bCollaborativeChanges)
 			{
 				from = collaborativeEditing.getLockOtherColumn2(nSheetId, from);
 				to = collaborativeEditing.getLockOtherColumn2(nSheetId, to);
 				if(false == ((true == bUndo && historyitem_Worksheet_AddCols == Type) || (false == bUndo && historyitem_Worksheet_RemoveCols == Type)))
 				{
-					var oLockInfo = new Asc.asc_CLockInfo();
+					oLockInfo = new Asc.asc_CLockInfo();
 					oLockInfo["sheetId"] = nSheetId;
 					oLockInfo["type"] = c_oAscLockTypeElem.Range;
 					oLockInfo["rangeOrObjectId"] = new Asc.Range(from, 0, to, gc_nMaxRow0);
@@ -3120,7 +3050,7 @@ UndoRedoWoorksheet.prototype = {
 				}
 			}
 
-			var range = Asc.Range(from, 0, to, gc_nMaxRow0);
+			range = Asc.Range(from, 0, to, gc_nMaxRow0);
 			if((true == bUndo && historyitem_Worksheet_AddCols == Type) || (false == bUndo && historyitem_Worksheet_RemoveCols == Type))
 				ws.workbook.handlers.trigger("deleteCell", nSheetId, c_oAscDeleteOptions.DeleteColumns, range);
 			else
@@ -3132,10 +3062,10 @@ UndoRedoWoorksheet.prototype = {
 		}
 		else if(historyitem_Worksheet_ShiftCellsLeft == Type || historyitem_Worksheet_ShiftCellsRight == Type)
 		{
-			var r1 = Data.r1;
-			var c1 = Data.c1;
-			var r2 = Data.r2;
-			var c2 = Data.c2;
+			r1 = Data.r1;
+			c1 = Data.c1;
+			r2 = Data.r2;
+			c2 = Data.c2;
 			if(false != this.wb.bCollaborativeChanges)
 			{
 				r1 = collaborativeEditing.getLockOtherRow2(nSheetId, r1);
@@ -3144,7 +3074,7 @@ UndoRedoWoorksheet.prototype = {
 				c2 = collaborativeEditing.getLockOtherColumn2(nSheetId, c2);
 				if(false == ((true == bUndo && historyitem_Worksheet_ShiftCellsLeft == Type) || (false == bUndo && historyitem_Worksheet_ShiftCellsRight == Type)))
 				{
-					var oLockInfo = new Asc.asc_CLockInfo();
+					oLockInfo = new Asc.asc_CLockInfo();
 					oLockInfo["sheetId"] = nSheetId;
 					oLockInfo["type"] = c_oAscLockTypeElem.Range;
 					oLockInfo["rangeOrObjectId"] = new Asc.Range(c1, r1, c2, r2);
@@ -3158,10 +3088,10 @@ UndoRedoWoorksheet.prototype = {
 		}
 		else if(historyitem_Worksheet_ShiftCellsTop == Type || historyitem_Worksheet_ShiftCellsBottom == Type)
 		{
-			var r1 = Data.r1;
-			var c1 = Data.c1;
-			var r2 = Data.r2;
-			var c2 = Data.c2;
+			r1 = Data.r1;
+			c1 = Data.c1;
+			r2 = Data.r2;
+			c2 = Data.c2;
 			if(false != this.wb.bCollaborativeChanges)
 			{
 				r1 = collaborativeEditing.getLockOtherRow2(nSheetId, r1);
@@ -3170,7 +3100,7 @@ UndoRedoWoorksheet.prototype = {
 				c2 = collaborativeEditing.getLockOtherColumn2(nSheetId, c2);
 				if(false == ((true == bUndo && historyitem_Worksheet_ShiftCellsTop == Type) || (false == bUndo && historyitem_Worksheet_ShiftCellsBottom == Type)))
 				{
-					var oLockInfo = new Asc.asc_CLockInfo();
+					oLockInfo = new Asc.asc_CLockInfo();
 					oLockInfo["sheetId"] = nSheetId;
 					oLockInfo["type"] = c_oAscLockTypeElem.Range;
 					oLockInfo["rangeOrObjectId"] = new Asc.Range(c1, r1, c2, r2);
@@ -3192,31 +3122,31 @@ UndoRedoWoorksheet.prototype = {
 				bbox.c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, bbox.c1);
 				bbox.r2 = collaborativeEditing.getLockOtherRow2(nSheetId, bbox.r2);
 				bbox.c2 = collaborativeEditing.getLockOtherColumn2(nSheetId, bbox.c2);
-				for(var i = 0, length = Data.places.length; i < length; ++i)
+				for(i = 0, length = Data.places.length; i < length; ++i)
 				{
 					var place = Data.places[i];
 					place.from = collaborativeEditing.getLockOtherRow2(nSheetId, place.from);
 					place.to = collaborativeEditing.getLockOtherRow2(nSheetId, place.to);
-					var oLockInfo = new Asc.asc_CLockInfo();
+					oLockInfo = new Asc.asc_CLockInfo();
 					oLockInfo["sheetId"] = nSheetId;
 					oLockInfo["type"] = c_oAscLockTypeElem.Range;
 					oLockInfo["rangeOrObjectId"] = new Asc.Range(bbox.c1, place.from, bbox.c2, place.from);
 					this.wb.aCollaborativeChangeElements.push(oLockInfo);
 				}
 			}
-			var range = ws.getRange(new CellAddress(bbox.r1, bbox.c1, 0), new CellAddress(bbox.r2, bbox.c2, 0));
+			range = ws.getRange(new CellAddress(bbox.r1, bbox.c1, 0), new CellAddress(bbox.r2, bbox.c2, 0));
 			range._sortByArray(bbox, places);
 		}
 		else if(historyitem_Worksheet_MoveRange == Type)
 		{
 			//todo worksheetView.autoFilters._moveAutoFilters(worksheetView ,null, null, g_oUndoRedoAutoFiltersMoveData);
-			var from = Asc.Range(Data.from.c1, Data.from.r1, Data.from.c2, Data.from.r2);
-			var to = Asc.Range(Data.to.c1, Data.to.r1, Data.to.c2, Data.to.r2);
+			from = Asc.Range(Data.from.c1, Data.from.r1, Data.from.c2, Data.from.r2);
+			to = Asc.Range(Data.to.c1, Data.to.r1, Data.to.c2, Data.to.r2);
             var copyRange = Data.copyRange;
 
 			if(bUndo)
 			{
-				var temp = from;
+				temp = from;
 				from = to;
 				to = temp;
 			}
@@ -3240,7 +3170,7 @@ UndoRedoWoorksheet.prototype = {
 			else{
 				ws._moveRange(from, to, copyRange);
 			}
-			var worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
+			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
 			if(bUndo)//если на Undo перемещается диапазон из форматированной таблицы - стиль форматированной таблицы не должен цепляться
 			{
 				worksheetView.autoFilters._clearFormatTableStyle(to);
@@ -3260,10 +3190,10 @@ UndoRedoWoorksheet.prototype = {
 		{
 			if(historyitem_Worksheet_Unmerge == Type)
 				bUndo = !bUndo;
-			var r1 = Data.r1;
-			var c1 = Data.c1;
-			var r2 = Data.r2;
-			var c2 = Data.c2;
+			r1 = Data.r1;
+			c1 = Data.c1;
+			r2 = Data.r2;
+			c2 = Data.c2;
 			if(false != this.wb.bCollaborativeChanges)
 			{
 				r1 = collaborativeEditing.getLockOtherRow2(nSheetId, r1);
@@ -3271,7 +3201,7 @@ UndoRedoWoorksheet.prototype = {
 				r2 = collaborativeEditing.getLockOtherRow2(nSheetId, r2);
 				c2 = collaborativeEditing.getLockOtherColumn2(nSheetId, c2);
 			}
-			var range = ws.getRange(new CellAddress(r1, c1, 0), new CellAddress(r2, c2, 0));
+			range = ws.getRange(new CellAddress(r1, c1, 0), new CellAddress(r2, c2, 0));
 			if(bUndo)
 				range.unmerge();
 			else
@@ -3285,10 +3215,10 @@ UndoRedoWoorksheet.prototype = {
 			if(false != this.wb.bCollaborativeChanges)
 			{
 				var bboxRef = Data.Ref.getBBox0();
-				var r1 = collaborativeEditing.getLockOtherRow2(nSheetId, bboxRef.r1);
-				var c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, bboxRef.c1);
-				var r2 = collaborativeEditing.getLockOtherRow2(nSheetId, bboxRef.r2);
-				var c2 = collaborativeEditing.getLockOtherColumn2(nSheetId, bboxRef.c2);
+				r1 = collaborativeEditing.getLockOtherRow2(nSheetId, bboxRef.r1);
+				c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, bboxRef.c1);
+				r2 = collaborativeEditing.getLockOtherRow2(nSheetId, bboxRef.r2);
+				c2 = collaborativeEditing.getLockOtherColumn2(nSheetId, bboxRef.c2);
 				Ref.setOffsetFirst({offsetCol: c1 - bboxRef.c1, offsetRow: r1 - bboxRef.r1});
 				Ref.setOffsetLast({offsetCol: c2 - bboxRef.c2, offsetRow: r2 - bboxRef.r2});
 			}
@@ -3350,22 +3280,22 @@ UndoRedoWoorksheet.prototype = {
 			ws.setSheetViewSettings(bUndo ? Data.from : Data.to);
 		}
 		else if(historyitem_Worksheet_ChangeMerge === Type){
-			var from = null;
+			from = null;
 			if(null != Data.from)
 				from = new Asc.Range(Data.from.c1, Data.from.r1, Data.from.c2, Data.from.r2);
-			var to = null;
+			to = null;
 			if(null != Data.to)
 				to = new Asc.Range(Data.to.c1, Data.to.r1, Data.to.c2, Data.to.r2);
 			if(bUndo)
 			{
-				var temp = from;
+				temp = from;
 				from = to;
 				to = temp;
 			}
 			if(null != from && null != from.r1 && null != from.c1 && null != from.r2 && null != from.c2)
 			{
 				var aMerged = ws.mergeManager.get(from);
-				for(var i in aMerged.inner)
+				for(i in aMerged.inner)
 				{
 					var merged = aMerged.inner[i];
 					if(merged.bbox.isEqual(from))
@@ -3375,29 +3305,29 @@ UndoRedoWoorksheet.prototype = {
 					}
 				}
 			}
-			var data = 1;
+			data = 1;
 			if(null != to && null != to.r1 && null != to.c1 && null != to.r2 && null != to.c2)
 				ws.mergeManager.add(to, data);
 		}
 		else if(historyitem_Worksheet_ChangeHyperlink === Type){
-			var from = null;
+			from = null;
 			if(null != Data.from)
 				from = new Asc.Range(Data.from.c1, Data.from.r1, Data.from.c2, Data.from.r2);
-			var to = null;
+			to = null;
 			if(null != Data.to)
 				to = new Asc.Range(Data.to.c1, Data.to.r1, Data.to.c2, Data.to.r2);
 			if(bUndo)
 			{
-				var temp = from;
+				temp = from;
 				from = to;
 				to = temp;
 			}
 			//не делаем clone потому что предполагаем, что здесь могут быть только операции изменения рзмеров, перемещение или удаления одной ссылки
-			var data = null;
+			data = null;
 			if(null != from && null != from.r1 && null != from.c1 && null != from.r2 && null != from.c2)
 			{
 				var aHyperlinks = ws.hyperlinkManager.get(from);
-				for(var i in aHyperlinks.inner)
+				for(i in aHyperlinks.inner)
 				{
 					var hyp = aHyperlinks.inner[i];
 					if(hyp.bbox.isEqual(from))
@@ -3415,54 +3345,10 @@ UndoRedoWoorksheet.prototype = {
 				data.Ref = ws.getRange3(to.r1, to.c1, to.r2, to.c2);
 				ws.hyperlinkManager.add(to, data);
 			}
-		}
-		// Frozen anchor
-		else if (historyitem_Worksheet_AddFrozenCell === Type) {
-			if ( !api.wb )
-				return;
-			var wsView = api.wb.getWorksheetById(nSheetId);
-			
-			if ( bUndo ) {
-				wsView.topLeftFrozenCell = null;
-				wsView.visibleRange.c1 = 0;
-				wsView.visibleRange.r1 = 0;
-			}
-			else {
-				wsView.topLeftFrozenCell = new CellAddress(Data.nRow, Data.nCol, 0);
-				wsView.visibleRange.c1 = Data.nCol;
-				wsView.visibleRange.r1 = Data.nRow;
-			}
-			wsView.objectRender.drawingArea.init();
-		}
-		else if (historyitem_Worksheet_ChangeFrozenCell === Type) {
-			if ( !api.wb )
-				return;
-			var wsView = api.wb.getWorksheetById(nSheetId);
-			
-			if ( bUndo ) {
-				wsView.topLeftFrozenCell = new CellAddress(Data.frozenBefore.nRow, Data.frozenBefore.nCol, 0);
-				wsView.visibleRange.c1 = Data.frozenBefore.nCol;
-				wsView.visibleRange.r1 = Data.frozenBefore.nRow;
-			}
-			else {
-				wsView.topLeftFrozenCell = new CellAddress(Data.frozenAfter.nRow, Data.frozenAfter.nCol, 0);
-				wsView.visibleRange.c1 = Data.frozenAfter.nCol;
-				wsView.visibleRange.r1 = Data.frozenAfter.nRow;
-			}
-			wsView.objectRender.drawingArea.init();
-		}
-		else if (historyitem_Worksheet_RemoveFrozenCell === Type) {
-			if ( bUndo ) {
-				wsView.topLeftFrozenCell = new CellAddress(Data.nRow, Data.nCol, 0);
-				wsView.visibleRange.c1 = Data.nCol;
-				wsView.visibleRange.r1 = Data.nRow;
-			}
-			else {
-				wsView.topLeftFrozenCell = null;
-				wsView.visibleRange.c1 = 0;
-				wsView.visibleRange.r1 = 0;
-			}
-			wsView.objectRender.drawingArea.init();
+		} else if (historyitem_Worksheet_ChangeFrozenCell === Type) {
+			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
+			var updateData = bUndo ? Data.from : Data.to;
+			worksheetView._updateFreezePane(updateData.c1, updateData.r1, /*lockDraw*/true);
 		}
 	}
 };

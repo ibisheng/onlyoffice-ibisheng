@@ -476,6 +476,13 @@ var c_oAscPaneState = {
 	Frozen		: "frozen",
 	FrozenSplit	: "frozenSplit"
 };
+
+var c_oAscFreezePane = {
+	FreezeSheetPanes	: 1,
+	FreezeTopRow		: 2,
+	FreezeFirstColumn	: 3,
+	FreezeClean			: 4
+};
  
 var c_oAscCoAuthoringMeBorderColor					= new window.CColor(22, 156, 0);
 var c_oAscCoAuthoringOtherBorderColor				= new window.CColor(238, 53, 37);

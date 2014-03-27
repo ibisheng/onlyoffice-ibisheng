@@ -159,8 +159,7 @@
 
 		var kNewLine = "\n";
 
-		var kPaneStateFrozen = "frozen";
-		var kPaneStateFrozenSplit = "frozenSplit";
+		var klockNameFrozenPane = "frozenPane";
 
 		function calcDecades(num) {
 			return Math.abs(num) < 10 ? 1 : 1 + calcDecades( asc_floor(num * 0.1) );
@@ -228,7 +227,7 @@
 			this.fillHandleBorderColorSelect	= new CColor(255, 255, 255, 1);
 
 			// Цвет закрепленных областей
-			this.frozenColor					= new CColor(0, 0, 0, 1);
+			this.frozenColor					= new CColor(105, 119, 62, 1);
 			return this;
 		}
 
@@ -2979,60 +2978,58 @@
 
 		/** Рисует закрепление областей */
 		WorksheetView.prototype._drawFrozenPaneLines = function (canvas) {
-			
-				var _this = this;
-				var callback = function(result) {
-					var color = _this.settings.activeCellBorderColor;
-					if ( !result )
-						color = c_oAscCoAuthoringOtherBorderColor;
-						
-					function drawAnchor(x, y, w, h, bVertical) {
-						_this.drawingCtx.beginPath().setStrokeStyle(color);
-						if ( bVertical )
-							_this.drawingCtx.dashLineCleverVer(x, y, y + h);
-						else
-							_this.drawingCtx.dashLineCleverHor(x, y, x + w);
-						_this.drawingCtx.stroke();
-					}
-					
-					// Anchor
-					if ( _this.model.sheetViews[0].asc_getShowRowColHeaders() ) {
-						var frozenCell = _this.topLeftFrozenCell ? _this.topLeftFrozenCell : new CellAddress(0, 0, 0);
-						
-						// vertical
-						var _x = _this.getCellLeft(frozenCell.getCol0(), 1) - 0.5;
-						var _y = _this.headersTop;
-						var w = 0;
-						var h = _this.headersHeight;
-						drawAnchor(_x, _y, w, h, true);
-						
-						// horizontal
-						_x = _this.headersLeft;
-						_y = _this.getCellTop(frozenCell.getRow0(), 1) - 0.5;
-						w = _this.headersWidth - 0.5;
-						h = 0;
-						drawAnchor(_x, _y, w, h, false);
-					}
-				
-					// Lines
-					if (_this.topLeftFrozenCell) {
-						var ctx = canvas ? canvas : _this.drawingCtx;
-						var row = _this.topLeftFrozenCell.getRow0();
-						var col = _this.topLeftFrozenCell.getCol0();
-						ctx.setLineWidth(1).setStrokeStyle(color).beginPath();
-						if (0 < row) {
-							ctx.dashLineCleverHor(0, _this.rows[row].top - _this.height_1px, ctx.getWidth());
-						}
-						if (0 < col) {
-							ctx.dashLineCleverVer(_this.cols[col].left - _this.width_1px, 0, ctx.getHeight());
-						}
-						ctx.stroke();
-					}
+			// ToDo заделать отрисовку lock области
+			if (this.topLeftFrozenCell) {
+				var ctx = canvas ? canvas : this.drawingCtx;
+				var row = this.topLeftFrozenCell.getRow0();
+				var col = this.topLeftFrozenCell.getCol0();
+				ctx.setLineWidth(1).setStrokeStyle(this.settings.frozenColor).beginPath();
+				if (0 < row) {
+					ctx.lineHor(0, this.rows[row].top - this.height_1px, ctx.getWidth());
 				}
-				_this.objectRender.objectLocker.reset();
-				_this.objectRender.objectLocker.bLock = false;
-				_this.objectRender.objectLocker.addObjectId(_this.getFrozenCellId());
-				_this.objectRender.objectLocker.checkObjects(callback);
+				if (0 < col) {
+					ctx.lineVer(this.cols[col].left - this.width_1px, 0, ctx.getHeight());
+				}
+				ctx.stroke();
+			}
+		};
+
+		WorksheetView.prototype.drawFrozenGuides = function (x, y, targetInfo) {
+			if (!targetInfo)
+				return;
+
+			var data, offsetFrozen;
+			var ctx = this.overlayCtx;
+
+			ctx.clear();
+			this._drawSelection();
+
+			switch (targetInfo.target) {
+				case "frozenAnchorV":
+					x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
+					data = this._findColUnderCursor(x, true);
+					if (data && 0 <= data.col) {
+						var h = ctx.getHeight();
+						var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
+						offsetFrozen = this.getFrozenPaneOffset(false, true);
+						offsetX -= offsetFrozen.offsetX;
+						ctx.setFillPattern(this.ptrnLineDotted1)
+							.fillRect(this.cols[data.col].left - offsetX - this.width_1px, 0, this.width_1px, h);
+					}
+					break;
+				case "frozenAnchorH":
+					y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
+					data = this._findRowUnderCursor(y, true);
+					if (data && 0 <= data.row) {
+						var w = ctx.getWidth();
+						var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
+						offsetFrozen = this.getFrozenPaneOffset(true, false);
+						offsetY -= offsetFrozen.offsetY;
+						ctx.setFillPattern(this.ptrnLineDotted1)
+							.fillRect(0, this.rows[data.row].top - offsetY - this.height_1px, w, this.height_1px);
+					}
+					break;
+			}
 		};
 		
 		WorksheetView.prototype._isFrozenAnchor = function(x, y) {
@@ -3078,119 +3075,99 @@
 			return result;
 		};
 		
-		WorksheetView.prototype._applyFrozenAnchor = function(x, y, targetInfo, bMove) {
-			if ( !targetInfo )
+		WorksheetView.prototype.applyFrozenAnchor = function(x, y, targetInfo) {
+			if (!targetInfo)
 				return;
-		
-			var _this = this;
-			var col = 0, row = 0;
-			var ctx = _this.overlayCtx;
-			if ( bMove )
-				ctx.clear();
-				
-			x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
-			y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
-			
-			switch (targetInfo.target) {
-				case "frozenAnchorV":
-					var _col = _this._findColUnderCursor(x, true);
-					if ( _col && (_col.col >= 0) ) {
-						col = _col.col;
-						if ( bMove ) {
-							ctx.setLineWidth(1).setStrokeStyle(_this.settings.activeCellBorderColor).beginPath();
-							ctx.dashLineCleverVer(_this.cols[col].left - _this.width_1px, 0, ctx.getHeight());
-							ctx.stroke();
-						}
-						else {
-							if ( _this.topLeftFrozenCell )
-								_this.setFrozenCell(col, _this.topLeftFrozenCell.getRow0(), false, true);
-							else
-								_this.setFrozenCell(col, 0, true, true);
-						}
-					}
-					break;
-				case "frozenAnchorH":
-					var _row = _this._findRowUnderCursor(y, true);
-					if ( _row && (_row.row >= 0) ) {
-						row = _row.row;
-						if ( bMove ) {
-							ctx.setLineWidth(1).setStrokeStyle(_this.settings.activeCellBorderColor).beginPath();
-							ctx.dashLineCleverHor(0, _this.rows[row].top - _this.height_1px, ctx.getWidth());
-							ctx.stroke();
-						}
-						else {
-							if ( _this.topLeftFrozenCell )
-								_this.setFrozenCell(_this.topLeftFrozenCell.getCol0(), row, false, true);
-							else
-								_this.setFrozenCell(0, row, true, true);
-						}
-					}
-					break;
-			}
-		};
-		
-		WorksheetView.prototype.setFrozenCell = function(col, row, bNew, bRedraw) {
-			var _this = this;
-			var callback = function(result) {
-				if ( result ) {
-					if ( bNew ) {
-						History.Create_NewPoint();
-						History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_AddFrozenCell, _this.model.getId(), null, new UndoRedoData_FrozenCell(row, col));
-						
-						_this.topLeftFrozenCell = new CellAddress(row, col, 0);
-						_this.visibleRange.c1 = col;
-						_this.visibleRange.r1 = row;
-					}
-					else {
-						var compositeFroze = new UndoRedoData_CompositeFrozenCell(new UndoRedoData_FrozenCell(_this.topLeftFrozenCell.getRow0(), _this.topLeftFrozenCell.getCol0()), new UndoRedoData_FrozenCell(row, col));
-						
-						History.Create_NewPoint();
-						History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ChangeFrozenCell, _this.model.getId(), null, compositeFroze);
-						
-						_this.topLeftFrozenCell = new CellAddress(row, col, 0);
-						_this.visibleRange.c1 = col;
-						_this.visibleRange.r1 = row;
-					}
-					
-					_this.objectRender.drawingArea.init();
-					if ( bRedraw )
-						_this.draw();
+
+			var t = this;
+			var onChangeFrozenCallback = function (isSuccess) {
+				if (false === isSuccess) {
+					t.overlayCtx.clear();
+					t._drawSelection();
+					return;
 				}
-				else {
-					_this.overlayCtx.clear();
-					_this._drawSelection();
+				var lastCol = 0, lastRow = 0, data;
+				if (t.topLeftFrozenCell) {
+					lastCol = t.topLeftFrozenCell.getCol0();
+					lastRow = t.topLeftFrozenCell.getRow0();
 				}
-			}
-		
-			_this.objectRender.objectLocker.reset();
-			_this.objectRender.objectLocker.addObjectId(_this.getFrozenCellId());
-			_this.objectRender.objectLocker.checkObjects(callback);
-		};
-		
-		WorksheetView.prototype.getFrozenCellId = function() {
-			return "frozenCell_" + this.model.Id;
+				switch (targetInfo.target) {
+					case "frozenAnchorV":
+						x *= asc_getcvt(0/*px*/, 1/*pt*/, t._getPPIX());
+						data = t._findColUnderCursor(x, true);
+						if (data && 0 <= data.col)
+							lastCol = data.col;
+						break;
+					case "frozenAnchorH":
+						y *= asc_getcvt(0/*px*/, 1/*pt*/, t._getPPIY());
+						data = t._findRowUnderCursor(y, true);
+						if (data && 0 <= data.row)
+							lastRow = data.row;
+						break;
+				}
+				t._updateFreezePane(lastCol, lastRow);
+			};
+
+			this._isLockedFrozenPane (onChangeFrozenCallback);
 		};
 		
 		/** Для api закрепленных областей */
-		
-		WorksheetView.prototype.clearFrozenCell = function() {
-			this.topLeftFrozenCell = null;
-			this.visibleRange.c1 = 0;
-			this.visibleRange.r1 = 0;
+
+		WorksheetView.prototype.freezePane = function (type) {
+			var t = this;
+			var onChangeFreezePane = function (isSuccess) {
+				if (false === isSuccess)
+					return;
+				var col, row;
+				switch(type) {
+					case c_oAscFreezePane.FreezeSheetPanes:
+						col = t.getSelectedColumnIndex();
+						row = t.getSelectedRowIndex();
+						break;
+					case c_oAscFreezePane.FreezeFirstColumn:
+						col = 1;
+						row = 0;
+						break;
+					case c_oAscFreezePane.FreezeTopRow:
+						col = 0;
+						row = 1;
+						break;
+					case c_oAscFreezePane.FreezeClean:
+						col = 0;
+						row = 0;
+						break;
+				}
+				t._updateFreezePane(col, row);
+			};
+
+			return this._isLockedFrozenPane(onChangeFreezePane);
+		};
+
+		WorksheetView.prototype._updateFreezePane = function(col, row, lockDraw) {
+			var lastCol = 0, lastRow = 0;
+			if (this.topLeftFrozenCell) {
+				lastCol = this.topLeftFrozenCell.getCol0();
+				lastRow = this.topLeftFrozenCell.getRow0();
+			}
+			History.Create_NewPoint();
+			var oData = new UndoRedoData_FromTo(new UndoRedoData_BBox(new asc_Range(lastCol, lastRow, lastCol, lastRow)),
+				new UndoRedoData_BBox(new asc_Range(col, row, col, row)), null);
+			History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ChangeFrozenCell, this.model.getId(), null, oData);
+
+			if (0 === col && 0 === row) {
+				// Очистка
+				this.topLeftFrozenCell = this.model.sheetViews[0].pane = null;
+			} else {
+				// Создание
+				var pane = this.model.sheetViews[0].pane = new asc.asc_CPane();
+				this.topLeftFrozenCell = pane.topLeftFrozenCell = new CellAddress(row, col, 0);
+			}
+			this.visibleRange.c1 = col;
+			this.visibleRange.r1 = row;
+
 			this.objectRender.drawingArea.init();
-			this.draw();
-		};
-		
-		WorksheetView.prototype.setSelectedFrozenCell = function() {
-			this.setFrozenCell(this.getSelectedColumnIndex(), this.getSelectedRowIndex(), true, true);
-		};
-		
-		WorksheetView.prototype.setFirstFrozenCol = function() {
-			this.setFrozenCell(1, 0, true, true);
-		};
-		
-		WorksheetView.prototype.setFirstFrozenRow = function() {
-			this.setFrozenCell(0, 1, true, true);
+			if (!lockDraw)
+				this.draw();
 		};
 
 		/** */
@@ -5477,7 +5454,7 @@
 				
 			var frozenCursor = this._isFrozenAnchor(x, y);
 			if (frozenCursor.result) {
-				lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId, this.getFrozenCellId());
+				lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId, klockNameFrozenPane);
 				isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, false);
 				if (false !== isLocked) {
 					// Кто-то сделал lock
@@ -8771,6 +8748,38 @@
 			arnFor[0] = arn;
 			arnFor[1] = arrFormula;
 			return arnFor;
+		};
+
+		// Залочена ли панель для закрепления
+		WorksheetView.prototype._isLockedFrozenPane = function (callback) {
+			if (false === this.collaborativeEditing.isCoAuthoringExcellEnable()) {
+				// Запрещено совместное редактирование
+				asc_applyFunction(callback, true);
+				return;
+			}
+			var sheetId = this.model.getId();
+			var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId, klockNameFrozenPane);
+
+			if (false === this.collaborativeEditing.getCollaborativeEditing()) {
+				// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
+				asc_applyFunction(callback, true);
+				callback = undefined;
+			}
+			if (false !== this.collaborativeEditing.getLockIntersection(lockInfo,
+				c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
+				// Редактируем сами
+				asc_applyFunction(callback, true);
+				return;
+			} else if (false !== this.collaborativeEditing.getLockIntersection(lockInfo,
+				c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
+				// Уже ячейку кто-то редактирует
+				asc_applyFunction(callback, false);
+				return;
+			}
+
+			this.collaborativeEditing.onStartCheckLock();
+			this.collaborativeEditing.addCheckLock(lockInfo);
+			this.collaborativeEditing.onEndCheckLock(callback);
 		};
 
 		// Залочен ли весь лист

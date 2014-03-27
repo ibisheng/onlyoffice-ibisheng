@@ -2674,33 +2674,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			asyncImageEndLoadedBackground: function() {
 			},
-			
+
 			// Frozen pane
-			asc_clearFrozenCell: function() {
-				if ( this.wb ) {
-					var ws = this.wb.getWorksheet();
-					ws.clearFrozenCell();
-				}
-			},
-			
-			asc_setSelectedFrozenCell: function() {
-				if ( this.wb ) {
-					var ws = this.wb.getWorksheet();
-					ws.setSelectedFrozenCell();
-				}
-			},
-			
-			asc_setFirstFrozenCol: function() {
-				if ( this.wb ) {
-					var ws = this.wb.getWorksheet();
-					ws.setFirstFrozenCol();
-				}
-			},
-			
-			asc_setFirstFrozenRow: function() {
-				if ( this.wb ) {
-					var ws = this.wb.getWorksheet();
-					ws.setFirstFrozenRow();
+			asc_freezePane: function (type) {
+				if (this.wb) {
+					this.wb.getWorksheet().freezePane(type);
 				}
 			},
 			
@@ -3717,10 +3695,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_changeShapeImageFromFile"] = prot.asc_changeShapeImageFromFile;
 		
 		// Frozen pane
-		prot["asc_clearFrozenCell"] = prot.asc_clearFrozenCell;
-		prot["asc_setSelectedFrozenCell"] = prot.asc_setSelectedFrozenCell;
-		prot["asc_setFirstFrozenCol"] = prot.asc_setFirstFrozenCol;
-		prot["asc_setFirstFrozenRow"] = prot.asc_setFirstFrozenRow;
+		prot["asc_freezePane"] = prot.asc_freezePane;
 		
 		// Cell interface
 		prot["asc_getCellInfo"] = prot.asc_getCellInfo;
