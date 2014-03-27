@@ -1143,6 +1143,7 @@ var historyitem_type_ChartTitle       = 32;
 var historyitem_type_Math			  = 33;
 var historyitem_type_CommentMark      = 34;
 var historyitem_type_ParaRun          = 35;
+var historyitem_type_MathContent	  = 36;
 
 //Типы изменений в классе CChartAsGroup
 var historyitem_SetCahrtLayout = 1000;

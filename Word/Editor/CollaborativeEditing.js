@@ -155,7 +155,8 @@ function CTableId()
             case historyitem_type_Style            : Element = new CStyle(); break;
             case historyitem_type_TextBody         : Element = new CTextBody(); break;
             case historyitem_type_ChartTitle       : Element = new CChartTitle(); break;
-			case historyitem_type_Math		       : Element = new ParaMath(false, true); break;
+			case historyitem_type_Math		       : Element = new ParaMath(false); break;
+			case historyitem_type_MathContent      : Element = new CMathContent(); break;
             case historyitem_type_CommentMark      : Element = new ParaComment(); break;
             case historyitem_type_ParaRun          : Element = new ParaRun(); break;
         }

@@ -2,7 +2,7 @@
  * Created by Ilja.Kirillov on 18.03.14.
  */
 
-function ParaMath(bAddMenu, bCollaborative)
+function ParaMath(bAddMenu)
 {
     this.Id = g_oIdCounter.Get_NewId();
     this.Type  = para_Math;
@@ -35,7 +35,8 @@ function ParaMath(bAddMenu, bCollaborative)
     this.Descent      = 0;
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
-    g_oTableId.Add( this, this.Id );
+    if (!bAddMenu)		
+		g_oTableId.Add( this, this.Id );
 }
 
 ParaMath.prototype =
@@ -129,24 +130,31 @@ ParaMath.prototype =
         }
     },
     AddText : function(oElem, sText, props)
-    {
-
+    {		
         if(sText)
-        {
+        {			
             var MathRun = new ParaRun();
+			
+			var Pos = oElem.CurPos,
+				PosEnd = Pos + 1;
+			var items = new Array();
 
             for (var Pos=0; Pos < sText.length; Pos++)
             {
                 var oText = new CMathText();
-                oText.addTxt(sText[Pos]);
+                oText.addTxt(sText[Pos]);				
                 MathRun.Content.splice( Pos, 0, oText );
+				
+				var element = new mathElem(oText);
+				items.push(element);
             }
 
             MathRun.bMathRun = true;
             MathRun.typeObj = MATH_PARA_RUN;
             oElem.addElementToContent(MathRun);
-
-        }
+			
+			History.Add(oElem, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
+        }        
 
         /*if(sText)
         {
@@ -809,7 +817,7 @@ ParaMath.prototype =
     {
         this.Paragraph.Refresh_RecalcData2(0);
     },
-
+	
     Refresh_RecalcData2 : function(Data)
     {
         this.Paragraph.Refresh_RecalcData2(0);
@@ -1224,7 +1232,16 @@ ParaMath.prototype =
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
 //----------------------------------------------------------------------------------------------------------------------
-    Write_ToBinary : function(Writer)
+    /*Save_Changes : function(Data, Writer)
+    {
+
+    },
+
+    Load_Changes : function(Reader)
+    {
+		this.Math.CurrentContent.Load_Changes(Reader);
+    }*/
+	Write_ToBinary : function(Writer)
     {
         // Long   : Type
         // String : Id
@@ -1236,16 +1253,17 @@ ParaMath.prototype =
     {
 		Writer.WriteLong( historyitem_type_Math );
 		
-		var oThis = this;
+		/*var oThis = this;
 		this.bs = new BinaryCommonWriter(Writer);
 		this.boMaths = new Binary_oMathWriter(Writer);
 
 		this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteOMathParaCollaborative(oThis.Math);});//WriteOMathParaCollaborative
-    },
+		*/
+	},
 
     Read_FromBinary2 : function(Reader)
     {
-		var oThis = this;
+		/*var oThis = this;
 		this.boMathr = new Binary_oMathReader(Reader);
 		this.bcr = new Binary_CommonReader(Reader);
 		
@@ -1256,5 +1274,6 @@ ParaMath.prototype =
 		res = this.bcr.Read1(length, function(t, l){
 			return oThis.boMathr.ReadMathOMathParaCollaborative(t,l,oThis.Math);
 		});
+		*/
 	}
 };

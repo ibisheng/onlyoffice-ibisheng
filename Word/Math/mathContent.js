@@ -360,6 +360,7 @@ CMPrp.prototype =
 
 function CMathContent()
 {
+	this.Id = g_oIdCounter.Get_NewId();		
     this.bDot       =   false;
     this.plhHide    =   false;
     this.bRoot      =   false;
@@ -401,7 +402,9 @@ function CMathContent()
     };
 
     this.init();
-
+	
+	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
+	g_oTableId.Add( this, this.Id );
 }
 CMathContent.prototype =
 {
@@ -6781,7 +6784,7 @@ CMathContent.prototype =
     },
     Save_Changes: function(Data, Writer)
     {
-        Writer.WriteLong( historyitem_type_Math );
+        Writer.WriteLong( historyitem_type_MathContent );
 
         var Type = Data.Type;
         // Пишем тип
@@ -6809,7 +6812,7 @@ CMathContent.prototype =
 			}
 			case historyitem_Math_RemoveItem:
 			{
-				/*var bArray = Data.UseArray;
+				var bArray = Data.UseArray;
                 var Count  = Data.Items.length;
 
                 var StartPos = Writer.GetCurPosition();
@@ -6835,7 +6838,7 @@ CMathContent.prototype =
                 Writer.WriteLong( RealCount );
                 Writer.Seek( EndPos );
 
-                break;*/
+                break;
 			}			
 		}
 		
@@ -6853,7 +6856,7 @@ CMathContent.prototype =
         // Long : тип изменений
 
         var ClassType = Reader.GetLong();
-        if ( historyitem_type_Math != ClassType )
+        if ( historyitem_type_MathContent != ClassType )
             return;
 
         var Type = Reader.GetLong();
@@ -6880,7 +6883,7 @@ CMathContent.prototype =
                 break;
 			}
 		}
-		this.Composition.Resize(g_oTextMeasurer);
+		//this.Composition.Resize(g_oTextMeasurer);
 	},
 	Write_MathElemToBinary : function(Writer, elem)
 	{
@@ -6888,7 +6891,7 @@ CMathContent.prototype =
 		this.bs = new BinaryCommonWriter(Writer);
 		this.boMaths = new Binary_oMathWriter(Writer);
 		
-		this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteMathElemCollaborative(elem);});
+		this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteMathElem(elem);});
 	},
 	Read_MathElemFromBinary : function(Reader)
     {
@@ -6902,14 +6905,41 @@ CMathContent.prototype =
 		
 		//var obj = null;
 		var bCollaborative = true;
-		var obj = new CMathContent(bCollaborative);
+		var obj = new CMathContent();
 		obj.setReferenceComposition(this.Composition);
 		var elem = null;
 		res = this.bcr.Read1(length, function(t, l){
-			oThis.boMathr.ReadMathArgCollaborative(t,l,obj);
+			oThis.boMathr.ReadMathArg(t,l,obj);
 		});
 		elem = obj.content[1];
 		return elem;
+	},
+	//добавление cmathcontent в формулу
+	Write_ToBinary2 : function(Writer)
+    {
+		Writer.WriteLong( historyitem_type_MathContent );
+		
+		/*var oThis = this;
+		this.bs = new BinaryCommonWriter(Writer);
+		this.boMaths = new Binary_oMathWriter(Writer);
+		
+		this.bs.WriteItem(c_oSerParType.OMathPara, function(){oThis.boMaths.WriteOMathPara(oThis.Math);});
+		this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteOMathPara(oThis);});*/
+    },
+	Read_FromBinary2 : function(Reader)
+    {
+		var i=1;
+		/*var oThis = this;
+		this.boMathr = new Binary_oMathReader(Reader);
+		this.bcr = new Binary_CommonReader(Reader);
+		
+		var length = Reader.GetUChar();
+		
+		var res = false;
+		Reader.cur += 3;
+		res = this.bcr.Read1(length, function(t, l){
+			return oThis.boMathr.ReadMathOMathPara(t,l,oThis);
+		});*/
 	},
     Refresh_RecalcData: function()
     {
@@ -8575,40 +8605,7 @@ CMathComposition.prototype =
     GetCurrentRunPrp: function()
     {
         return this.CurrentContent.getRunPrp(this.CurrentContent.CurPos);
-    },
-	
-	//совместное редактирование
-	Write_ToBinary2 : function(Writer)
-    {
-		Writer.WriteLong( historyitem_type_Math );
-		
-		var oThis = this;
-		this.bs = new BinaryCommonWriter(Writer);
-		this.boMaths = new Binary_oMathWriter(Writer);
-		
-		//this.bs.WriteItem(c_oSerParType.OMathPara, function(){oThis.boMaths.WriteOMathPara(oThis.Math);});
-		this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteOMathPara(oThis);});
-    },
-	Read_FromBinary2 : function(Reader)
-    {
-		var oThis = this;
-		this.boMathr = new Binary_oMathReader(Reader);
-		this.bcr = new Binary_CommonReader(Reader);
-		
-		var length = Reader.GetUChar();
-		
-		var res = false;
-		Reader.cur += 3;
-		res = this.bcr.Read1(length, function(t, l){
-			return oThis.boMathr.ReadMathOMathPara(t,l,oThis);
-		});
-	},
-	Load_Changes : function( Reader )
-	{
-		this.CurrentContent.Load_Changes(Reader)
-	}
-
-    //////////////////////////////
+    }
 }
 
 
