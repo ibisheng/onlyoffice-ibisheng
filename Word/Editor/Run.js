@@ -1208,7 +1208,7 @@ ParaRun.prototype =
         var ContentLen = this.Content.length;
         for ( ; Pos < ContentLen; Pos++ )
         {
-            if ( false === StartWord && true === FirstItemOnLine && Math.abs( XEnd - X ) < 0.001 && RangesCount > 0 )
+            if ( false === StartWord && true === FirstItemOnLine && XEnd - X < 0.001 && RangesCount > 0 )
             {
                 NewRange    = true;
                 RangeEndPos = Pos;
