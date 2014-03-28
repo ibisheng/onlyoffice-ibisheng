@@ -2469,6 +2469,21 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 			this.bs.WriteItem(c_oSer_SheetView.ShowGridLines, function(){oThis.memory.WriteBool(oSheetView.showGridLines);});
 		if (null !== oSheetView.showRowColHeaders)
 			this.bs.WriteItem(c_oSer_SheetView.ShowRowColHeaders, function(){oThis.memory.WriteBool(oSheetView.showRowColHeaders);});
+		if (null !== oSheetView.pane)
+			this.bs.WriteItem(c_oSer_SheetView.Pane, function(){oThis.WriteSheetViewPane(oSheetView.pane);});
+	};
+	this.WriteSheetViewPane = function (oPane) {
+		var oThis = this;
+		// Всегда пишем Frozen
+		this.bs.WriteItem(c_oSer_Pane.State, function(){oThis.memory.WriteString3(c_oAscPaneState.Frozen);});
+		this.bs.WriteItem(c_oSer_Pane.TopLeftCell, function(){oThis.memory.WriteString3(oPane.topLeftFrozenCell.getID());});
+
+		var col = oPane.topLeftFrozenCell.getCol0();
+		var row = oPane.topLeftFrozenCell.getRow0();
+		if (0 < col)
+			this.bs.WriteItem(c_oSer_Pane.XSplit, function(){oThis.memory.WriteDouble2(col);});
+		if (0 < row)
+			this.bs.WriteItem(c_oSer_Pane.YSplit, function(){oThis.memory.WriteDouble2(row);});
 	};
 	this.WriteSheetPr = function (sheetPr) {
 		var oThis = this;
