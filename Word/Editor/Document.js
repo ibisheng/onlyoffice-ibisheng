@@ -1723,9 +1723,9 @@ CDocument.prototype =
             {
                 if (window["native"]["WC_CheckSuspendRecalculate"])
                 {
-                    if (window["native"]["WC_CheckSuspendRecalculate"]())
+                    if ( _PageIndex > this.FullRecalc.StartPage + 2 )
                     {
-                        if ( _PageIndex > this.FullRecalc.StartPage + 2 )
+                        if (window["native"]["WC_CheckSuspendRecalculate"]())
                             return;
                     }
                 }
