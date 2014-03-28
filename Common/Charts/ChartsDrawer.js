@@ -685,7 +685,11 @@ CChartsDrawer.prototype =
 		
 		
 		if(this.calcProp.type != "Scatter")
+		{
 			this.calcProp.nullPositionOX = this._getNullPosition();
+			this.calcProp.nullPositionOXLog = this._getNullPositionLog();
+		}
+			
 		else
 		{
 			var scatterNullPos = this._getScatterNullPosition();
@@ -2549,18 +2553,53 @@ CChartsDrawer.prototype =
 	_getLogArray: function(yMin, yMax, logBase)
 	{	
 		var result = [];
-		var temp = Math.pow(logBase, 0);
-		var pow = 0;
 		
+		var temp;
+		var pow = 0;
+		var tempPow = yMin;
+		
+		if(yMin < 1 && yMin > 0)
+		{	
+			temp = this._getFirstDegree(yMin).numPow;
+			
+			tempPow = temp;
+			while(tempPow < 1)
+			{
+				pow --;
+				tempPow = tempPow * 10;
+			};
+		}
+		else	
+			temp = Math.pow(logBase, 0);
+			
 		if(logBase < 1)
 			logBase = 2;
 		
-		while(temp <= yMax)
+		var step = 0;
+		var lMax = 1;
+		if(yMin < 1 && yMin > 0)
 		{
-			temp = Math.pow(logBase, pow);
-			result[pow] = temp;
-			pow ++;
-		};
+			if(lMax < yMax)
+				lMax = yMax;
+			
+			while(temp < lMax)
+			{
+				temp = Math.pow(logBase, pow);
+				result[step] = temp;
+				pow++;
+				step++;
+			};
+		}
+		else
+		{
+			while(temp <= yMax)
+			{
+				temp = Math.pow(logBase, pow);
+				result[step] = temp;
+				pow++;
+				step++;
+			};
+		}
 		
 		return result;
 	},
@@ -2728,6 +2767,30 @@ CChartsDrawer.prototype =
 		else
 			result = this.calcProp.heightCanvas - this.calcProp.chartGutter._bottom - nullPosition;
 			
+		return result;
+	},
+	
+	//****get null position****
+	_getNullPositionLog: function()
+	{
+		var valPoints, result;
+		if(this.cChartSpace.chart.plotArea.valAx)
+		{
+			if(this.calcProp.type == "HBar")
+				valPoints = this.cChartSpace.chart.plotArea.valAx.xPoints;
+			else
+				valPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
+			
+				
+			for (var i = 0; i < valPoints.length; i++)
+			{
+				if(valPoints[i].val == 1)
+				{
+					result =  valPoints[i].pos * this.calcProp.pxToMM;
+					break;
+				}
+			}
+		}		
 		return result;
 	},
 	
@@ -2994,8 +3057,13 @@ CChartsDrawer.prototype =
 		return result;
 	},
 	
-	getYPosition: function(val, yPoints, isOx)
+	getYPosition: function(val, yPoints, isOx, logBase)
 	{
+		if(logBase)
+		{	
+			return this._getYPositionLogBase(val, yPoints, isOx, logBase);
+		};
+		
 		//позиция в заисимости от положения точек на оси OY
 		var result;
 		var resPos;
@@ -3065,23 +3133,85 @@ CChartsDrawer.prototype =
 		return result;
 	},
 	
-	getLogarithmicValue: function(val, logBase, yPoints, stackedValues)
+	_getYPositionLogBase: function(val, yPoints, isOx, logBase)
 	{
 		if(val < 0)
 			return 0;
-		
-		
+
 		var logVal = Math.log(val) / Math.log(logBase);
-		var parseLogVal = logVal.toString().split(".");
+		var result;
 		
-		if(!parseLogVal[1])
-			return val;
-		
-		var multiplier = yPoints[parseFloat(parseLogVal[0]) + 1].val;
-		var result = multiplier * (parseFloat("0." + parseLogVal[1]));
-		
+		if(logVal < 0)
+		{
+			var parseVal = logVal.toString().split(".");
+			var maxVal = Math.pow(logBase, parseVal[0]);
+			var minVal = Math.pow(logBase, parseFloat(parseVal[0]) - 1);
+			var startPos = 0;
+			var diffPos;
+			for(var i = 0; i < yPoints.length; i++)
+			{
+				if(yPoints[i].val < maxVal && yPoints[i].val > minVal)
+				{
+					startPos = yPoints[i + 1].pos;
+					diffPos = yPoints[i].pos - yPoints[i + 1].pos
+					break;
+				}
+			}
+			result = startPos + parseFloat("0." + parseVal[1]) * diffPos;
+		}
+		else
+		{
+			var parseVal = logVal.toString().split(".");
+			var minVal = Math.pow(logBase, parseVal[0]);
+			var maxVal = Math.pow(logBase, parseFloat(parseVal[0]) + 1);
+			var startPos = 0;
+			var diffPos;
+			for(var i = 0; i < yPoints.length; i++)
+			{
+				if(yPoints[i].val < maxVal && yPoints[i].val >= minVal)
+				{
+					startPos = yPoints[i].pos;
+					diffPos = yPoints[i].pos - yPoints[i + 1].pos
+					break;
+				}
+			}
+			result = startPos - parseFloat("0." + parseVal[1]) * diffPos;
+		};
 		
 		return result;
+	},
+	
+	getLogarithmicValue: function(val, logBase, yPoints)
+	{
+		if(val < 0)
+			return 0;
+			
+		var logVal = Math.log(val) / Math.log(logBase);
+		
+		var temp = 0;
+		if(logVal > 0)
+		{
+			for(var l = 0; l < logVal; l++)
+			{
+				if(l != 0)
+					temp += Math.pow(logBase, l);
+				if(l + 1 > logVal)
+				{
+					temp += (logVal - l) * Math.pow(logBase, l + 1);
+					break;
+				}	
+			}
+		}
+		else
+		{
+			var parseTemp = logVal.toString().split(".");
+			var nextTemp = Math.pow(logBase, parseFloat(parseTemp[0]) - 1);
+			temp = Math.pow(logBase, parseFloat(parseTemp[0]));
+			
+			temp =  temp - temp * parseFloat("0." + parseTemp[1]);
+		}
+		
+		return temp;
 	},
 	
 	//****for 3D****
@@ -3353,11 +3483,11 @@ drawBarChart.prototype =
 	_reCalculateBars: function (/*isSkip*/)
     {
         //соответствует подписям оси категорий(OX)
-		var xPoints = this.cShapeDrawer.chart.plotArea.catAx.xPoints;
+		var xPoints     = this.cShapeDrawer.chart.plotArea.catAx.xPoints;
 		//соответствует подписям оси значений(OY)
-		var yPoints = this.cShapeDrawer.chart.plotArea.valAx.yPoints;
+		var yPoints     = this.cShapeDrawer.chart.plotArea.valAx.yPoints;
 		
-		var widthGraph    = this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right;
+		var widthGraph  = this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right;
 		
 		//TODO - передавать overlap из меню!
 		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 100 : 0;
@@ -3372,25 +3502,36 @@ drawBarChart.prototype =
 		var widthOverLap       = individualBarWidth * (overlap / 100);
 		var hmargin            = (this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100 * individualBarWidth) / 2;
 		
-		var height, startX, startY, diffYVal, val, paths, seriesHeight = [], seria, startYColumnPosition, startXPosition, newStartX, newStartY;
+		var height, startX, startY, diffYVal, val, paths, seriesHeight = [], tempValues = [], seria, startYColumnPosition, startXPosition, newStartX, newStartY, prevVal;
 		
 		
 	
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 	
-			numCache = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache : this.chartProp.series[i].val.numLit;
-			seria = numCache.pts;
+			numCache        = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache : this.chartProp.series[i].val.numLit;
+			seria           = numCache.pts;
 			seriesHeight[i] = [];
+			tempValues[i]   = [];
 			
 			for (var j = 0; j < seria.length; j++) {
 				
 				//стартовая позиция колонки Y(+ высота с учётом поправок на накопительные диаграммы)
 				val = parseFloat(seria[j].val);
 				
-				if(this.cShapeDrawer.chart.plotArea.valAx && this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase)
-					val = this.cChartDrawer.getLogarithmicValue(val, this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase, yPoints, tempValues);
+				prevVal = 0;
+				if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
+				{	
+					for(var k = 0; k < tempValues.length; k++)
+					{
+						if(tempValues[k][j] && tempValues[k][j] > 0)
+							prevVal += tempValues[k][j];
+					}
+				};
 				
-				startYColumnPosition = this._getStartYColumnPosition(seriesHeight, j, val, yPoints);
+				
+				tempValues[i][j]   = val;
+				
+				startYColumnPosition = this._getStartYColumnPosition(seriesHeight, j, val, yPoints, prevVal);
 				startY = startYColumnPosition.startY;
 				height = startYColumnPosition.height;
 
@@ -3453,10 +3594,11 @@ drawBarChart.prototype =
     },
 	
 	
-	_getStartYColumnPosition: function (seriesHeight, j, val, yPoints, summBarVal)
+	_getStartYColumnPosition: function (seriesHeight, j, val, yPoints, prevVal)
 	{
-		var startY, diffYVal, height, numCache;
-		var nullPositionOX = this.chartProp.nullPositionOX/*this.cShapeDrawer.chart.plotArea.catAx.posY * this.chartProp.pxToMM*/;
+		var startY, diffYVal, height, numCache, tempLogVal, tempPrevLogVal;
+		var nullPositionOX = this.cShapeDrawer.chart.plotArea.valAx && this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase ?  this.chartProp.nullPositionOXLog : this.chartProp.nullPositionOX/*this.cShapeDrawer.chart.plotArea.catAx.posY * this.chartProp.pxToMM*/;
+		
 		if(this.chartProp.subType == "stacked")
 		{
 			diffYVal = 0;
@@ -3470,7 +3612,19 @@ drawBarChart.prototype =
 			else
 				startY = nullPositionOX - diffYVal;
 				
-			height = nullPositionOX - this.cChartDrawer.getYPosition(val, yPoints) * this.chartProp.pxToMM;
+			//исключение для логарифмической шкалы
+			if(prevVal && this.cShapeDrawer.chart.plotArea.valAx && this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase)
+			{
+				tempLogVal = this.cChartDrawer.getYPosition(val + prevVal, yPoints, null,this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase);
+				tempPrevLogVal = this.cChartDrawer.getYPosition(prevVal, yPoints, null,this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase);
+				
+				height = (tempPrevLogVal - tempLogVal) * this.chartProp.pxToMM;
+			}
+			else if(this.cShapeDrawer.chart.plotArea.valAx && this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase)
+				height = nullPositionOX - this.cChartDrawer.getYPosition(val, yPoints, null,this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase) * this.chartProp.pxToMM;
+			else
+				height = nullPositionOX - this.cChartDrawer.getYPosition(val, yPoints) * this.chartProp.pxToMM;
+			
 			
 			if(this.cShapeDrawer.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX)
 				height = - height;
@@ -3498,7 +3652,21 @@ drawBarChart.prototype =
 				this.summBarVal[j] = temp;
 			}
 			
-			height = nullPositionOX - this.cChartDrawer.getYPosition((val / this.summBarVal[j]), yPoints) * this.chartProp.pxToMM;
+			
+			//исключение для логарифмической шкалы
+			if(prevVal && this.cShapeDrawer.chart.plotArea.valAx && this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase)
+			{
+				tempLogVal = this.cChartDrawer.getYPosition(val / this.summBarVal[j] + prevVal / this.summBarVal[j], yPoints, null,this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase);
+				tempPrevLogVal = this.cChartDrawer.getYPosition(prevVal / this.summBarVal[j], yPoints, null,this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase);
+				
+				height = (tempPrevLogVal - tempLogVal) * this.chartProp.pxToMM;
+			}
+			else if(this.cShapeDrawer.chart.plotArea.valAx && this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase)
+				height = nullPositionOX - this.cChartDrawer.getYPosition(val / this.summBarVal[j], yPoints, null,this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase) * this.chartProp.pxToMM;
+			else
+				height = nullPositionOX - this.cChartDrawer.getYPosition((val / this.summBarVal[j]), yPoints) * this.chartProp.pxToMM;
+			
+			
 			if(this.cShapeDrawer.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX)
 				height = - height;
 			
@@ -3509,8 +3677,15 @@ drawBarChart.prototype =
 		}
 		else
 		{
-			height = nullPositionOX - this.cChartDrawer.getYPosition(val, yPoints) * this.chartProp.pxToMM;
 			startY = nullPositionOX;
+			if(this.cShapeDrawer.chart.plotArea.valAx && this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase)//исключение для логарифмической шкалы
+			{
+				height = nullPositionOX - this.cChartDrawer.getYPosition(val, yPoints, null,this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase) * this.chartProp.pxToMM;
+			}
+			else
+			{
+				height = nullPositionOX - this.cChartDrawer.getYPosition(val, yPoints) * this.chartProp.pxToMM;
+			}
 		}	
 		
 		return {startY : startY, height: height};
@@ -4060,12 +4235,12 @@ drawAreaChart.prototype =
 			{
 				//рассчитываем значения				
 				val = this._getYVal(n, i);
-				if(this.cShapeDrawer.chart.plotArea.valAx && this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase)
-					val = this.cChartDrawer.getLogarithmicValue(val, this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase, yPoints);
+				if(this.cChartSpace.chart.plotArea.valAx && this.cChartSpace.chart.plotArea.valAx.scaling.logBase)
+					val = this.cChartDrawer.getLogarithmicValue(val, this.cChartSpace.chart.plotArea.valAx.scaling.logBase, yPoints);
 				
 				nextVal = this._getYVal(n + 1, i);
-				if(this.cShapeDrawer.chart.plotArea.valAx && this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase)
-					nextVal = this.cChartDrawer.getLogarithmicValue(nextVal, this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase, yPoints);
+				if(this.cChartSpace.chart.plotArea.valAx && this.cChartSpace.chart.plotArea.valAx.scaling.logBase)
+					nextVal = this.cChartDrawer.getLogarithmicValue(nextVal, this.cChartSpace.chart.plotArea.valAx.scaling.logBase, yPoints);
 				
 
 				y  = this.cChartDrawer.getYPosition(val, yPoints);
