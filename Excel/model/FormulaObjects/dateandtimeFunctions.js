@@ -10,19 +10,19 @@
 
 function yearFrac(d1, d2, mode) {
     var date1 = d1.getDate(),
-        month1 = d1.getMonth(),
+        month1 = d1.getMonth()+1,
         year1 = d1.getFullYear(),
         date2 = d2.getDate(),
-        month2 = d2.getMonth(),
+        month2 = d2.getMonth()+1,
         year2 = d2.getFullYear();
 
     switch ( mode ) {
         case 0:
-            return new cNumber( Math.abs( GetDiffDate360( date1, month1, year1, d2.isLeapYear(), date2, month2, year2, false ) ) / 360 );
+            return new cNumber( Math.abs( GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, true ) ) / 360 );
         case 1:
-            var yc = Math.abs( year2 - year1 ),
-                sd = year1 > year2 ? d2 : d1,
-                yearAverage = sd.isLeapYear() ? 366 : 365, dayDiff = Math.abs( d2 - d1 );
+            var yc = /*Math.abs*/( year2 - year1 ),
+                sd = year1 > year2 ? new Date(d2) : new Date(d1),
+                yearAverage = sd.isLeapYear() ? 366 : 365, dayDiff = /*Math.abs*/( d2 - d1 );
             for ( var i = 0; i < yc; i++ ) {
                 sd.addYears( 1 );
                 yearAverage += sd.isLeapYear() ? 366 : 365;
@@ -39,11 +39,164 @@ function yearFrac(d1, d2, mode) {
             dayDiff /= (365 * c_msPerDay);
             return new cNumber( dayDiff );
         case 4:
-            return new cNumber( Math.abs( GetDiffDate360( date1, month1, year1, d2.isLeapYear(), date2, month2, year2, true ) ) / 360 );
+            return new cNumber( Math.abs( GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, false ) ) / 360 );
         default:
             return new cError( cErrorType.not_numeric );
     }
 }
+
+function diffDate(d1, d2, mode){
+    var date1 = d1.getDate(),
+        month1 = d1.getMonth()+1,
+        year1 = d1.getFullYear(),
+        date2 = d2.getDate(),
+        month2 = d2.getMonth()+1,
+        year2 = d2.getFullYear();
+
+    switch ( mode ) {
+        case 0:
+            return new cNumber( Math.abs( GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, true ) ) );
+        case 1:
+            var yc = Math.abs( year2 - year1 ),
+                sd = year1 > year2 ? d2 : d1,
+                yearAverage = sd.isLeapYear() ? 366 : 365, dayDiff = Math.abs( d2 - d1 );
+            for ( var i = 0; i < yc; i++ ) {
+                sd.addYears( 1 );
+                yearAverage += sd.isLeapYear() ? 366 : 365;
+            }
+            yearAverage /= (yc + 1);
+            dayDiff /= c_msPerDay;
+            return new cNumber( dayDiff );
+        case 2:
+            var dayDiff = Math.abs( d2 - d1 );
+            dayDiff /= c_msPerDay;
+            return new cNumber( dayDiff );
+        case 3:
+            var dayDiff = Math.abs( d2 - d1 );
+            dayDiff /= c_msPerDay;
+            return new cNumber( dayDiff );
+        case 4:
+            return new cNumber( Math.abs( GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, false ) ) );
+        default:
+            return new cError( cErrorType.not_numeric );
+    }
+}
+
+function diffDate2(d1, d2, mode){
+    var date1 = d1.getDate(),
+        month1 = d1.getMonth(),
+        year1 = d1.getFullYear(),
+        date2 = d2.getDate(),
+        month2 = d2.getMonth(),
+        year2 = d2.getFullYear();
+
+    var nDaysInYear, nYears, nDayDiff;
+
+    switch ( mode ) {
+        case 0:
+            nDaysInYear = 360;
+            nYears = year1 - year2;
+            nDayDiff = Math.abs( GetDiffDate360( date1, month1+1, year1, d1.isLeapYear(), date2, month2+1, year2, true ) ) - nYears * nDaysInYear;
+            return new cNumber( nYears + nDayDiff / nDaysInYear );
+        case 1:
+            nYears = year2 - year1;
+            nDaysInYear = d1.isLeapYear() ? 366 : 365;
+
+            var dayDiff;
+
+            if( nYears && ( month1 > month2 || ( month1 == month2 && date1 > date2 ) ) )
+                nYears--;
+
+            if( nYears )
+                dayDiff = parseInt((d2 - new Date( year2, month1, date1 ))/c_msPerDay);
+            else
+                dayDiff = parseInt(( d2 - d1 )/c_msPerDay);
+
+            if( dayDiff < 0 )
+                dayDiff += nDaysInYear;
+
+            return new cNumber( nYears + dayDiff / nDaysInYear );
+        case 2:
+            nDaysInYear = 360;
+            nYears = parseInt( ( d2 - d1 )/c_msPerDay / nDaysInYear );
+            nDayDiff = (d2 - d1)/c_msPerDay;
+            nDayDiff %= nDaysInYear;
+
+            return new cNumber( nYears + nDayDiff / nDaysInYear );
+        case 3:
+            nDaysInYear = 365;
+            nYears = parseInt( ( d2 - d1 )/c_msPerDay / nDaysInYear );
+            nDayDiff = (d2 - d1)/c_msPerDay;
+            nDayDiff %= nDaysInYear;
+
+            return new cNumber( nYears + nDayDiff / nDaysInYear );
+        case 4:
+            nDaysInYear = 360;
+            nYears = year1 - year2;
+            nDayDiff = Math.abs( GetDiffDate360( date1, month1+1, year1, d1.isLeapYear(), date2, month2+1, year2, false ) ) - nYears * nDaysInYear;
+            return new cNumber( nYears + nDayDiff / nDaysInYear );
+//            return new cNumber( Math.abs( GetDiffDate360( date1, month1, year1, d2.isLeapYear(), date2, month2, year2, true ) ) );
+        default:
+            return new cError( cErrorType.not_numeric );
+    }
+}
+
+function GetDiffDate( d1,d2, nMode ){
+    var bNeg = d1 > d2;
+
+    if( bNeg )
+    {
+        var n = d2;
+        d2 = d1;
+        d1 = n;
+    }
+
+    var nRet,pOptDaysIn1stYear
+
+    var nD1 = d1.getDate(),
+        nM1 = d1.getMonth(),
+        nY1  = d1.getFullYear(),
+        nD2 = d2.getDate(),
+        nM2 = d2.getMonth(),
+        nY2 = d2.getFullYear();
+
+    switch( nMode )
+    {
+        case 0:			// 0=USA (NASD) 30/360
+        case 4:			// 4=Europe 30/360
+        {
+            var bLeap = d1.isLeapYear()
+            var nDays, nMonths/*, nYears*/;
+
+            nMonths = nM2 - nM1;
+            nDays = nD2 - nD1;
+
+            nMonths += ( nY2 - nY1 ) * 12;
+
+            nRet = nMonths * 30 + nDays;
+            if( nMode == 0 && nM1 == 2 && nM2 != 2 && nY1 == nY2 )
+                nRet -= bLeap? 1 : 2;
+
+                pOptDaysIn1stYear = 360;
+        }
+            break;
+        case 1:			// 1=exact/exact
+            pOptDaysIn1stYear = d1.isLeapYear() ? 366 : 365;
+            nRet = d2 - d1;
+            break;
+        case 2:			// 2=exact/360
+            nRet = d2 - d1;
+            pOptDaysIn1stYear = 360;
+            break;
+        case 3:			//3=exact/365
+            nRet = d2 - d1;
+                pOptDaysIn1stYear = 365;
+            break;
+    }
+
+    return (bNeg ? -nRet : nRet) / c_msPerDay / pOptDaysIn1stYear;
+}
+
 
 cFormulaFunction.DateAndTime = {
     'groupName':"DateAndTime",
@@ -1699,6 +1852,7 @@ cYEARFRAC.prototype.Calculate = function ( arg ) {
     val1 = Date.prototype.getDateFromExcel( val1 );
 
     return this.value = yearFrac( val0, val1, arg2.getValue() );
+//    return this.value = diffDate2( val0, val1, arg2.getValue() );
 
 }
 cYEARFRAC.prototype.getInfo = function () {

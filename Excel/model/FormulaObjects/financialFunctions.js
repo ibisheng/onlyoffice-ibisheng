@@ -1,12 +1,12 @@
 "use strict";
 
-function GetRmz( fZins, fZzr, fBw, fZw, nF ){
+function GetRmz( fZins, fZzr, fBw, fZw, nF ) {
     var fRmz;
-    if( fZins == 0.0 )
+    if ( fZins == 0.0 )
         fRmz = ( fBw + fZw ) / fZzr;
-    else{
-        var	fTerm = Math.pow( 1.0 + fZins, fZzr );
-        if( nF > 0 )
+    else {
+        var fTerm = Math.pow( 1.0 + fZins, fZzr );
+        if ( nF > 0 )
             fRmz = ( fZw * fZins / ( fTerm - 1.0 ) + fBw * fZins / ( 1.0 - 1.0 / fTerm ) ) / ( 1.0 + fZins );
         else
             fRmz = fZw * fZins / ( fTerm - 1.0 ) + fBw * fZins / ( 1.0 - 1.0 / fTerm );
@@ -15,13 +15,13 @@ function GetRmz( fZins, fZzr, fBw, fZw, nF ){
     return -fRmz;
 }
 
-function GetZw( fZins, fZzr, fRmz, fBw, nF ){
+function GetZw( fZins, fZzr, fRmz, fBw, nF ) {
     var fZw;
-    if( fZins == 0.0 )
+    if ( fZins == 0.0 )
         fZw = fBw + fRmz * fZzr;
-    else{
+    else {
         var fTerm = Math.pow( 1.0 + fZins, fZzr );
-        if( nF > 0 )
+        if ( nF > 0 )
             fZw = fBw * fTerm + fRmz * ( 1.0 + fZins ) * ( fTerm - 1.0 ) / fZins;
         else
             fZw = fBw * fTerm + fRmz * ( fTerm - 1.0 ) / fZins;
@@ -71,7 +71,7 @@ function RateIteration( fNper, fPayment, fPv, fFv, fPayType, fGuess ) {
                 fX = fXnew;
             }
         }
-        bValid =(fX >=-1.0);
+        bValid = (fX >= -1.0);
     }
     else {
         fX = (fGuess.fGuest < -1.0) ? -1.0 : fGuess.fGuest;
@@ -102,6 +102,130 @@ function RateIteration( fNper, fPayment, fPv, fFv, fPayType, fGuess ) {
     }
     fGuess.fGuess = fX;
     return bValid && bFound;
+}
+
+function lcl_GetCouppcd( settl, matur, freq ) {
+    matur.setFullYear( settl.getFullYear() );
+    if ( matur < settl )
+        matur.addYears( 1 );
+    while ( matur > settl ) {
+        matur.addMonths( -12 / freq );
+    }
+}
+
+function lcl_GetCoupncd( settl, matur, freq ) {
+    matur.setFullYear( settl.getFullYear() );
+    if ( matur > settl )
+        matur.addYears( -1 );
+    while ( matur <= settl ) {
+        matur.addMonths( 12 / freq );
+    }
+}
+
+function getcoupdaybs( settl, matur, frequency, basis ) {
+    lcl_GetCouppcd( settl, matur, frequency );
+    return diffDate( settl, matur, basis );
+}
+
+function getcoupdays( settl, matur, frequency, basis ) {
+    lcl_GetCouppcd( settl, matur, frequency );
+    var n = new Date( matur )
+    n.addMonths( 12 / frequency );
+    return diffDate( matur, n, basis );
+}
+
+function getcoupnum( settl, matur, frequency ) {
+    var n = new Date( matur );
+    lcl_GetCouppcd( settl, n, frequency );
+    var nMonths = (matur.getFullYear() - n.getFullYear()) * 12 + matur.getMonth() - n.getMonth();
+    return Math.ceil( nMonths * frequency / 12 );
+}
+
+function getcoupdaysnc( settl, matur, frequency, basis ) {
+
+    if ( (basis != 0) && (basis != 4) ) {
+
+        lcl_GetCoupncd( settl, matur, frequency );
+        return diffDate( settl, matur, basis );
+
+    }
+
+    return getcoupdays( new Date( settl ), new Date( matur ), frequency, basis ) - getcoupdaybs( new Date( settl ), new Date( matur ), frequency, basis );
+}
+
+function getprice( nSettle, nMat, fRate, fYield, fRedemp, nFreq, nBase ) {
+
+    var fE = getcoupdays( new Date( nSettle ), new Date( nMat ), nFreq, nBase );
+    var fDSC_E = getcoupdaysnc( new Date( nSettle ), new Date( nMat ), nFreq, nBase ) / fE;
+    var fN = getcoupnum( new Date( nSettle ), (nMat), nFreq, nBase );
+    var fA = getcoupdaybs( new Date( nSettle ), new Date( nMat ), nFreq, nBase );
+
+    var fRet = fRedemp / ( Math.pow( 1.0 + fYield / nFreq, fN - 1.0 + fDSC_E ) );
+    fRet -= 100.0 * fRate / nFreq * fA / fE;
+
+    var fT1 = 100.0 * fRate / nFreq;
+    var fT2 = 1.0 + fYield / nFreq;
+
+    for ( var fK = 0.0; fK < fN; fK++ ) {
+        fRet += fT1 / Math.pow( fT2, fK + fDSC_E );
+    }
+
+    return fRet;
+}
+
+function getYield( nSettle, nMat, fCoup, fPrice, fRedemp, nFreq, nBase ) {
+    var fRate = fCoup, fPriceN = 0.0, fYield1 = 0.0, fYield2 = 1.0;
+    var fPrice1 = getprice( nSettle, nMat, fRate, fYield1, fRedemp, nFreq, nBase );
+    var fPrice2 = getprice( nSettle, nMat, fRate, fYield2, fRedemp, nFreq, nBase );
+    var fYieldN = ( fYield2 - fYield1 ) * 0.5;
+
+    for ( var nIter = 0; nIter < 100 && fPriceN != fPrice; nIter++ ) {
+        fPriceN = getprice( nSettle, nMat, fRate, fYieldN, fRedemp, nFreq, nBase );
+
+        if ( fPrice == fPrice1 )
+            return fYield1;
+        else if ( fPrice == fPrice2 )
+            return fYield2;
+        else if ( fPrice == fPriceN )
+            return fYieldN;
+        else if ( fPrice < fPrice2 ) {
+            fYield2 *= 2.0;
+            fPrice2 = getprice( nSettle, nMat, fRate, fYield2, fRedemp, nFreq, nBase );
+
+            fYieldN = ( fYield2 - fYield1 ) * 0.5;
+        }
+        else {
+            if ( fPrice < fPriceN ) {
+                fYield1 = fYieldN;
+                fPrice1 = fPriceN;
+            }
+            else {
+                fYield2 = fYieldN;
+                fPrice2 = fPriceN;
+            }
+
+            fYieldN = fYield2 - ( fYield2 - fYield1 ) * ( ( fPrice - fPrice2 ) / ( fPrice1 - fPrice2 ) );
+        }
+    }
+
+    if ( Math.abs( fPrice - fPriceN ) > fPrice / 100.0 )
+        return new cError( cErrorType.not_numeric );		// result not precise enough
+
+    return new cNumber( fYieldN );
+}
+
+function getyieldmat( nSettle, nMat, nIssue, fRate, fPrice, nBase ){
+
+    var fIssMat = yearFrac( nIssue, nMat, nBase );
+    var fIssSet = yearFrac( nIssue, nSettle, nBase );
+    var fSetMat = yearFrac( nSettle, nMat, nBase );
+
+    var y = 1.0 + fIssMat * fRate;
+    y /= fPrice / 100.0 + fIssSet * fRate;
+    y--;
+    y /= fSetMat;
+
+    return y;
 }
 
 /**
@@ -188,14 +312,14 @@ cACCRINT.prototype = Object.create( cBaseFunction.prototype )
 cACCRINT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1],
         arg2 = arg[2], arg3 = arg[3],
-        arg4 = arg[4] && !(arg[4] instanceof cEmpty) ? arg[4] : new cNumber(1000 ),
+        arg4 = arg[4] && !(arg[4] instanceof cEmpty) ? arg[4] : new cNumber( 1000 ),
         arg5 = arg[5],
         arg6 = arg[6] && !(arg[6] instanceof cEmpty) ? arg[6] : new cNumber( 0 );
 
-    function GetYearDiff( nNullDate, nStartDate, nEndDate, nMode ){
-        var nDays1stYear ;
+    function GetYearDiff( nNullDate, nStartDate, nEndDate, nMode ) {
+        var nDays1stYear;
 
-        switch(nMode){
+        switch ( nMode ) {
             case 0:
             case 4:
                 nDays1stYear = 360;
@@ -283,16 +407,16 @@ cACCRINT.prototype.Calculate = function ( arg ) {
 
     var _arg5 = arg5.getValue()
 
-    if( arg0.getValue() >= arg2.getValue() || arg3.getValue() <= 0 || arg4.getValue() <= 0 || arg6.getValue() < 0 || arg6.getValue() > 4 || (_arg5 != 1 && _arg5 != 2 && _arg5 != 4) ){
+    if ( arg0.getValue() >= arg2.getValue() || arg3.getValue() <= 0 || arg4.getValue() <= 0 || arg6.getValue() < 0 || arg6.getValue() > 4 || (_arg5 != 1 && _arg5 != 2 && _arg5 != 4) ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
-    var res = GetYearDiff( Date.prototype.getDateFromExcel(arg0.getValue()), Date.prototype.getDateFromExcel(arg0.getValue()),
-                           Date.prototype.getDateFromExcel(arg2.getValue()), arg6.getValue() )
+    var res = GetYearDiff( Date.prototype.getDateFromExcel( arg0.getValue() ), Date.prototype.getDateFromExcel( arg0.getValue() ),
+        Date.prototype.getDateFromExcel( arg2.getValue() ), arg6.getValue() )
 
     res = res * arg4.getValue() * arg3.getValue();
 
-    return this.value = new cNumber(res)
+    return this.value = new cNumber( res )
 }
 cACCRINT.prototype.getInfo = function () {
     return {
@@ -322,13 +446,13 @@ cACCRINTM.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0],
         arg1 = arg[1],
         arg2 = arg[2],
-        arg3 = arg[3] && !(arg[3] instanceof cEmpty) ? arg[3] : new cNumber(1000),
-        arg4 = arg[4] && !(arg[4] instanceof cEmpty) ? arg[4] : new cNumber(0);
+        arg3 = arg[3] && !(arg[3] instanceof cEmpty) ? arg[3] : new cNumber( 1000 ),
+        arg4 = arg[4] && !(arg[4] instanceof cEmpty) ? arg[4] : new cNumber( 0 );
 
-    function GetYearDiff( nStartDate, nEndDate, nMode ){
-        var nDays1stYear ;
+    function GetYearDiff( nStartDate, nEndDate, nMode ) {
+        var nDays1stYear;
 
-        switch(nMode){
+        switch ( nMode ) {
             case 0:
             case 4:
                 nDays1stYear = 360;
@@ -396,16 +520,16 @@ cACCRINTM.prototype.Calculate = function ( arg ) {
     if ( arg3 instanceof cError ) return this.value = arg3;
     if ( arg4 instanceof cError ) return this.value = arg4;
 
-    if( arg0.getValue() >= arg1.getValue() || arg3.getValue() <= 0 || arg4.getValue() < 0 || arg4.getValue() > 4 ){
+    if ( arg0.getValue() >= arg1.getValue() || arg3.getValue() <= 0 || arg4.getValue() < 0 || arg4.getValue() > 4 ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
-    var res = GetYearDiff( Date.prototype.getDateFromExcel(arg0.getValue()),
-        Date.prototype.getDateFromExcel(arg1.getValue()), arg4.getValue() )
+    var res = GetYearDiff( Date.prototype.getDateFromExcel( arg0.getValue() ),
+        Date.prototype.getDateFromExcel( arg1.getValue() ), arg4.getValue() )
 
     res = res * arg2.getValue() * arg3.getValue();
 
-    return this.value = new cNumber(res)
+    return this.value = new cNumber( res )
 }
 cACCRINTM.prototype.getInfo = function () {
     return {
@@ -438,7 +562,7 @@ cAMORDEGRC.prototype.Calculate = function ( arg ) {
         salvage = arg[3],
         period = arg[4],
         rate = arg[5],
-        basis = arg[6] && !(arg[6] instanceof cEmpty) ? arg[6] : new cNumber(0);
+        basis = arg[6] && !(arg[6] instanceof cEmpty) ? arg[6] : new cNumber( 0 );
 
     if ( cost instanceof cArea || cost instanceof cArea3D ) {
         cost = cost.cross( arguments[1].first );
@@ -510,14 +634,14 @@ cAMORDEGRC.prototype.Calculate = function ( arg ) {
         fRestVal = salvage.getValue(),
         nPer = period.getValue()
 
-    var	fUsePer = 1.0 / fRate,
+    var fUsePer = 1.0 / fRate,
         fAmorCoeff;
 
-    if( fUsePer < 3.0 )
+    if ( fUsePer < 3.0 )
         fAmorCoeff = 1.0;
-    else if( fUsePer < 5.0 )
+    else if ( fUsePer < 5.0 )
         fAmorCoeff = 1.5;
-    else if( fUsePer <= 6.0 )
+    else if ( fUsePer <= 6.0 )
         fAmorCoeff = 2.0;
     else
         fAmorCoeff = 2.5;
@@ -551,7 +675,7 @@ cAMORDEGRC.prototype.Calculate = function ( arg ) {
 
     return this.value = new cNumber( fNRate )
 
-  }
+}
 cAMORDEGRC.prototype.getInfo = function () {
     return {
         name:this.name,
@@ -583,7 +707,7 @@ cAMORLINC.prototype.Calculate = function ( arg ) {
         salvage = arg[3],
         period = arg[4],
         rate = arg[5],
-        basis = arg[6] && !(arg[6] instanceof cEmpty) ? arg[6] : new cNumber(0);
+        basis = arg[6] && !(arg[6] instanceof cEmpty) ? arg[6] : new cNumber( 0 );
 
     if ( cost instanceof cArea || cost instanceof cArea3D ) {
         cost = cost.cross( arguments[1].first );
@@ -665,11 +789,11 @@ cAMORLINC.prototype.Calculate = function ( arg ) {
 
     var nNumOfFullPeriods = ( fCost - fRestVal - f0Rate) / fOneRate;
 
-    if( nPer == 0 )
+    if ( nPer == 0 )
         return this.value = new cNumber( f0Rate );
-    else if( nPer <= nNumOfFullPeriods )
+    else if ( nPer <= nNumOfFullPeriods )
         return this.value = new cNumber( fOneRate );
-    else if( nPer == nNumOfFullPeriods + 1 )
+    else if ( nPer == nNumOfFullPeriods + 1 )
         return this.value = new cNumber( fCostDelta - fOneRate * nNumOfFullPeriods - f0Rate );
     else
         return this.value = new cNumber( 0.0 );
@@ -683,34 +807,486 @@ cAMORLINC.prototype.getInfo = function () {
 }
 
 function cCOUPDAYBS() {
-    cBaseFunction.call( this, "COUPDAYBS" );
+//    cBaseFunction.call( this, "COUPDAYBS" );
+
+    this.name = "COUPDAYBS";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 4;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cCOUPDAYBS.prototype = Object.create( cBaseFunction.prototype )
+cCOUPDAYBS.prototype.Calculate = function ( arg ) {
+    var settlement = arg[0],
+        maturity = arg[1],
+        frequency = arg[2],
+        basis = arg[3] && !(arg[3] instanceof cEmpty) ? arg[3] : new cNumber( 0 );
+
+    if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
+        settlement = settlement.cross( arguments[1].first );
+    }
+    else if ( settlement instanceof cArray ) {
+        settlement = settlement.getElementRowCol( 0, 0 );
+    }
+
+    if ( maturity instanceof cArea || maturity instanceof cArea3D ) {
+        maturity = maturity.cross( arguments[1].first );
+    }
+    else if ( maturity instanceof cArray ) {
+        maturity = maturity.getElementRowCol( 0, 0 );
+    }
+
+    if ( frequency instanceof cArea || frequency instanceof cArea3D ) {
+        frequency = frequency.cross( arguments[1].first );
+    }
+    else if ( frequency instanceof cArray ) {
+        frequency = frequency.getElementRowCol( 0, 0 );
+    }
+
+    if ( basis instanceof cArea || basis instanceof cArea3D ) {
+        basis = basis.cross( arguments[1].first );
+    }
+    else if ( basis instanceof cArray ) {
+        basis = basis.getElementRowCol( 0, 0 );
+    }
+
+    settlement = settlement.tocNumber();
+    maturity = maturity.tocNumber();
+    frequency = frequency.tocNumber();
+    basis = basis.tocNumber();
+
+    if ( settlement instanceof cError ) return this.value = settlement;
+    if ( maturity instanceof cError ) return this.value = maturity;
+    if ( frequency instanceof cError ) return this.value = frequency;
+    if ( basis instanceof cError ) return this.value = basis;
+
+    if ( settlement.getValue() >= maturity.getValue() || basis.getValue() < 0 || basis.getValue() > 4 || ( frequency.getValue() != 1 && frequency.getValue() != 2 && frequency.getValue() != 4 ) )
+        return this.value = new cError( cErrorType.not_numeric );
+
+    var settl = Date.prototype.getDateFromExcel( settlement.getValue() ),
+        matur = Date.prototype.getDateFromExcel( maturity.getValue() );
+
+    return this.value = new cNumber( getcoupdaybs( settl, matur, frequency.getValue(), basis.getValue() ) );
+
+}
+cCOUPDAYBS.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( settlement , maturity , frequency [ , [ basis ] ] )"
+    };
+}
 
 function cCOUPDAYS() {
-    cBaseFunction.call( this, "COUPDAYS" );
+//    cBaseFunction.call( this, "COUPDAYS" );
+
+    this.name = "COUPDAYS";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 4;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cCOUPDAYS.prototype = Object.create( cBaseFunction.prototype )
+cCOUPDAYS.prototype.Calculate = function ( arg ) {
+    var settlement = arg[0],
+        maturity = arg[1],
+        frequency = arg[2],
+        basis = arg[3] && !(arg[3] instanceof cEmpty) ? arg[3] : new cNumber( 0 );
+
+    if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
+        settlement = settlement.cross( arguments[1].first );
+    }
+    else if ( settlement instanceof cArray ) {
+        settlement = settlement.getElementRowCol( 0, 0 );
+    }
+
+    if ( maturity instanceof cArea || maturity instanceof cArea3D ) {
+        maturity = maturity.cross( arguments[1].first );
+    }
+    else if ( maturity instanceof cArray ) {
+        maturity = maturity.getElementRowCol( 0, 0 );
+    }
+
+    if ( frequency instanceof cArea || frequency instanceof cArea3D ) {
+        frequency = frequency.cross( arguments[1].first );
+    }
+    else if ( frequency instanceof cArray ) {
+        frequency = frequency.getElementRowCol( 0, 0 );
+    }
+
+    if ( basis instanceof cArea || basis instanceof cArea3D ) {
+        basis = basis.cross( arguments[1].first );
+    }
+    else if ( basis instanceof cArray ) {
+        basis = basis.getElementRowCol( 0, 0 );
+    }
+
+    settlement = settlement.tocNumber();
+    maturity = maturity.tocNumber();
+    frequency = frequency.tocNumber();
+    basis = basis.tocNumber();
+
+    if ( settlement instanceof cError ) return this.value = settlement;
+    if ( maturity instanceof cError ) return this.value = maturity;
+    if ( frequency instanceof cError ) return this.value = frequency;
+    if ( basis instanceof cError ) return this.value = basis;
+
+    if ( settlement.getValue() >= maturity.getValue() || basis.getValue() < 0 || basis.getValue() > 4 || ( frequency.getValue() != 1 && frequency.getValue() != 2 && frequency.getValue() != 4 ) )
+        return this.value = new cError( cErrorType.not_numeric );
+
+    var settl = Date.prototype.getDateFromExcel( settlement.getValue() ),
+        matur = Date.prototype.getDateFromExcel( maturity.getValue() );
+
+    return this.value = new cNumber( getcoupdays( settl, matur, frequency.getValue(), basis.getValue() ) );
+
+}
+cCOUPDAYS.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( settlement , maturity , frequency [ , [ basis ] ] )"
+    };
+}
 
 function cCOUPDAYSNC() {
-    cBaseFunction.call( this, "COUPDAYSNC" );
+//    cBaseFunction.call( this, "COUPDAYSNC" );
+
+    this.name = "COUPDAYSNC";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 4;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cCOUPDAYSNC.prototype = Object.create( cBaseFunction.prototype )
+cCOUPDAYSNC.prototype.Calculate = function ( arg ) {
+    var settlement = arg[0],
+        maturity = arg[1],
+        frequency = arg[2],
+        basis = arg[3] && !(arg[3] instanceof cEmpty) ? arg[3] : new cNumber( 0 );
+
+    if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
+        settlement = settlement.cross( arguments[1].first );
+    }
+    else if ( settlement instanceof cArray ) {
+        settlement = settlement.getElementRowCol( 0, 0 );
+    }
+
+    if ( maturity instanceof cArea || maturity instanceof cArea3D ) {
+        maturity = maturity.cross( arguments[1].first );
+    }
+    else if ( maturity instanceof cArray ) {
+        maturity = maturity.getElementRowCol( 0, 0 );
+    }
+
+    if ( frequency instanceof cArea || frequency instanceof cArea3D ) {
+        frequency = frequency.cross( arguments[1].first );
+    }
+    else if ( frequency instanceof cArray ) {
+        frequency = frequency.getElementRowCol( 0, 0 );
+    }
+
+    if ( basis instanceof cArea || basis instanceof cArea3D ) {
+        basis = basis.cross( arguments[1].first );
+    }
+    else if ( basis instanceof cArray ) {
+        basis = basis.getElementRowCol( 0, 0 );
+    }
+
+    settlement = settlement.tocNumber();
+    maturity = maturity.tocNumber();
+    frequency = frequency.tocNumber();
+    basis = basis.tocNumber();
+
+    if ( settlement instanceof cError ) return this.value = settlement;
+    if ( maturity instanceof cError ) return this.value = maturity;
+    if ( frequency instanceof cError ) return this.value = frequency;
+    if ( basis instanceof cError ) return this.value = basis;
+
+    if ( settlement.getValue() >= maturity.getValue() || basis.getValue() < 0 || basis.getValue() > 4 || ( frequency.getValue() != 1 && frequency.getValue() != 2 && frequency.getValue() != 4 ) )
+        return this.value = new cError( cErrorType.not_numeric );
+
+    var settl = Date.prototype.getDateFromExcel( settlement.getValue() ),
+        matur = Date.prototype.getDateFromExcel( maturity.getValue() );
+
+    frequency = frequency.getValue();
+    basis = basis.getValue();
+
+    return this.value = new cNumber( getcoupdaysnc( new Date( settl ), new Date( matur ), frequency, basis ) );
+
+}
+cCOUPDAYSNC.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( settlement , maturity , frequency [ , [ basis ] ] )"
+    };
+}
 
 function cCOUPNCD() {
-    cBaseFunction.call( this, "COUPNCD" );
+//    cBaseFunction.call( this, "COUPNCD" );
+
+    this.name = "COUPNCD";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 4;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cCOUPNCD.prototype = Object.create( cBaseFunction.prototype )
+cCOUPNCD.prototype.Calculate = function ( arg ) {
+    var settlement = arg[0],
+        maturity = arg[1],
+        frequency = arg[2],
+        basis = arg[3] && !(arg[3] instanceof cEmpty) ? arg[3] : new cNumber( 0 );
+
+    if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
+        settlement = settlement.cross( arguments[1].first );
+    }
+    else if ( settlement instanceof cArray ) {
+        settlement = settlement.getElementRowCol( 0, 0 );
+    }
+
+    if ( maturity instanceof cArea || maturity instanceof cArea3D ) {
+        maturity = maturity.cross( arguments[1].first );
+    }
+    else if ( maturity instanceof cArray ) {
+        maturity = maturity.getElementRowCol( 0, 0 );
+    }
+
+    if ( frequency instanceof cArea || frequency instanceof cArea3D ) {
+        frequency = frequency.cross( arguments[1].first );
+    }
+    else if ( frequency instanceof cArray ) {
+        frequency = frequency.getElementRowCol( 0, 0 );
+    }
+
+    if ( basis instanceof cArea || basis instanceof cArea3D ) {
+        basis = basis.cross( arguments[1].first );
+    }
+    else if ( basis instanceof cArray ) {
+        basis = basis.getElementRowCol( 0, 0 );
+    }
+
+    settlement = settlement.tocNumber();
+    maturity = maturity.tocNumber();
+    frequency = frequency.tocNumber();
+    basis = basis.tocNumber();
+
+    if ( settlement instanceof cError ) return this.value = settlement;
+    if ( maturity instanceof cError ) return this.value = maturity;
+    if ( frequency instanceof cError ) return this.value = frequency;
+    if ( basis instanceof cError ) return this.value = basis;
+
+    if ( settlement.getValue() >= maturity.getValue() || basis.getValue() < 0 || basis.getValue() > 4 || ( frequency.getValue() != 1 && frequency.getValue() != 2 && frequency.getValue() != 4 ) )
+        return this.value = new cError( cErrorType.not_numeric );
+
+    var settl = Date.prototype.getDateFromExcel( settlement.getValue() ),
+        matur = Date.prototype.getDateFromExcel( maturity.getValue() );
+
+    frequency = frequency.getValue();
+    basis = basis.getValue();
+
+    lcl_GetCoupncd( settl, matur, frequency );
+    this.value = new cNumber( matur.getExcelDate() );
+    this.value.numFormat = 14;
+    return this.value;
+
+}
+cCOUPNCD.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( settlement , maturity , frequency [ , [ basis ] ] )"
+    };
+}
 
 function cCOUPNUM() {
-    cBaseFunction.call( this, "COUPNUM" );
+//    cBaseFunction.call( this, "COUPNUM" );
+
+    this.name = "COUPNUM";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 4;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cCOUPNUM.prototype = Object.create( cBaseFunction.prototype )
+cCOUPNUM.prototype.Calculate = function ( arg ) {
+    var settlement = arg[0],
+        maturity = arg[1],
+        frequency = arg[2],
+        basis = arg[3] && !(arg[3] instanceof cEmpty) ? arg[3] : new cNumber( 0 );
+
+    if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
+        settlement = settlement.cross( arguments[1].first );
+    }
+    else if ( settlement instanceof cArray ) {
+        settlement = settlement.getElementRowCol( 0, 0 );
+    }
+
+    if ( maturity instanceof cArea || maturity instanceof cArea3D ) {
+        maturity = maturity.cross( arguments[1].first );
+    }
+    else if ( maturity instanceof cArray ) {
+        maturity = maturity.getElementRowCol( 0, 0 );
+    }
+
+    if ( frequency instanceof cArea || frequency instanceof cArea3D ) {
+        frequency = frequency.cross( arguments[1].first );
+    }
+    else if ( frequency instanceof cArray ) {
+        frequency = frequency.getElementRowCol( 0, 0 );
+    }
+
+    if ( basis instanceof cArea || basis instanceof cArea3D ) {
+        basis = basis.cross( arguments[1].first );
+    }
+    else if ( basis instanceof cArray ) {
+        basis = basis.getElementRowCol( 0, 0 );
+    }
+
+    settlement = settlement.tocNumber();
+    maturity = maturity.tocNumber();
+    frequency = frequency.tocNumber();
+    basis = basis.tocNumber();
+
+    if ( settlement instanceof cError ) return this.value = settlement;
+    if ( maturity instanceof cError ) return this.value = maturity;
+    if ( frequency instanceof cError ) return this.value = frequency;
+    if ( basis instanceof cError ) return this.value = basis;
+
+    if ( settlement.getValue() >= maturity.getValue() || basis.getValue() < 0 || basis.getValue() > 4 || ( frequency.getValue() != 1 && frequency.getValue() != 2 && frequency.getValue() != 4 ) )
+        return this.value = new cError( cErrorType.not_numeric );
+
+    var settl = Date.prototype.getDateFromExcel( settlement.getValue() ),
+        matur = Date.prototype.getDateFromExcel( maturity.getValue() );
+
+    frequency = frequency.getValue();
+    basis = basis.getValue();
+
+    var res = getcoupnum( settl, matur, frequency );
+
+    return this.value = new cNumber( res );
+
+}
+cCOUPNUM.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( settlement , maturity , frequency [ , [ basis ] ] )"
+    };
+}
 
 function cCOUPPCD() {
-    cBaseFunction.call( this, "COUPPCD" );
+//    cBaseFunction.call( this, "COUPPCD" );
+
+    this.name = "COUPPCD";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 4;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
 }
 cCOUPPCD.prototype = Object.create( cBaseFunction.prototype )
+cCOUPPCD.prototype.Calculate = function ( arg ) {
+    var settlement = arg[0],
+        maturity = arg[1],
+        frequency = arg[2],
+        basis = arg[3] && !(arg[3] instanceof cEmpty) ? arg[3] : new cNumber( 0 );
+
+    if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
+        settlement = settlement.cross( arguments[1].first );
+    }
+    else if ( settlement instanceof cArray ) {
+        settlement = settlement.getElementRowCol( 0, 0 );
+    }
+
+    if ( maturity instanceof cArea || maturity instanceof cArea3D ) {
+        maturity = maturity.cross( arguments[1].first );
+    }
+    else if ( maturity instanceof cArray ) {
+        maturity = maturity.getElementRowCol( 0, 0 );
+    }
+
+    if ( frequency instanceof cArea || frequency instanceof cArea3D ) {
+        frequency = frequency.cross( arguments[1].first );
+    }
+    else if ( frequency instanceof cArray ) {
+        frequency = frequency.getElementRowCol( 0, 0 );
+    }
+
+    if ( basis instanceof cArea || basis instanceof cArea3D ) {
+        basis = basis.cross( arguments[1].first );
+    }
+    else if ( basis instanceof cArray ) {
+        basis = basis.getElementRowCol( 0, 0 );
+    }
+
+    settlement = settlement.tocNumber();
+    maturity = maturity.tocNumber();
+    frequency = frequency.tocNumber();
+    basis = basis.tocNumber();
+
+    if ( settlement instanceof cError ) return this.value = settlement;
+    if ( maturity instanceof cError ) return this.value = maturity;
+    if ( frequency instanceof cError ) return this.value = frequency;
+    if ( basis instanceof cError ) return this.value = basis;
+
+    if ( settlement.getValue() >= maturity.getValue() || basis.getValue() < 0 || basis.getValue() > 4 || ( frequency.getValue() != 1 && frequency.getValue() != 2 && frequency.getValue() != 4 ) )
+        return this.value = new cError( cErrorType.not_numeric );
+
+    var settl = Date.prototype.getDateFromExcel( settlement.getValue() ),
+        matur = Date.prototype.getDateFromExcel( maturity.getValue() );
+
+    frequency = frequency.getValue();
+    basis = basis.getValue();
+
+    lcl_GetCouppcd( settl, matur, frequency );
+
+    this.value = new cNumber( matur.getExcelDate() );
+    this.value.numFormat = 14;
+    return this.value;
+
+}
+cCOUPPCD.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( settlement , maturity , frequency [ , [ basis ] ] )"
+    };
+}
 
 function cCUMIPMT() {
 //    cBaseFunction.call( this, "CUMIPMT" );
@@ -801,22 +1377,20 @@ cCUMIPMT.prototype.Calculate = function ( arg ) {
         nPayType = type.getValue(),
         fRmz, fZinsZ = 0;
 
-    if( nStartPer < 1 || nEndPer < nStartPer || fRate <= 0 || nEndPer > nNumPeriods  || nNumPeriods <= 0 || fVal <= 0 || ( nPayType != 0 && nPayType != 1 ) )
+    if ( nStartPer < 1 || nEndPer < nStartPer || fRate <= 0 || nEndPer > nNumPeriods || nNumPeriods <= 0 || fVal <= 0 || ( nPayType != 0 && nPayType != 1 ) )
         return this.value = new cError( cErrorType.not_numeric );
 
     fRmz = GetRmz( fRate, nNumPeriods, fVal, 0, nPayType );
 
-    if( nStartPer == 1 )
-    {
-        if( nPayType <= 0 )
+    if ( nStartPer == 1 ) {
+        if ( nPayType <= 0 )
             fZinsZ = -fVal;
 
         nStartPer++;
     }
 
-    for( var i = nStartPer ; i <= nEndPer ; i++ )
-    {
-        if( nPayType > 0 )
+    for ( var i = nStartPer; i <= nEndPer; i++ ) {
+        if ( nPayType > 0 )
             fZinsZ += GetZw( fRate, i - 2, fRmz, fVal, 1 ) - fRmz;
         else
             fZinsZ += GetZw( fRate, i - 1, fRmz, fVal, 0 );
@@ -856,8 +1430,8 @@ cCUMPRINC.prototype.Calculate = function ( arg ) {
         nper = arg[1],
         pv = arg[2],
         startPeriod = arg[3],
-        endPeriod = arg[4] && !(arg[4] instanceof cEmpty) ? arg[4] : new cNumber(0 ),
-        type = arg[5] && !(arg[5] instanceof cEmpty) ? arg[5] : new cNumber(0);
+        endPeriod = arg[4] && !(arg[4] instanceof cEmpty) ? arg[4] : new cNumber( 0 ),
+        type = arg[5] && !(arg[5] instanceof cEmpty) ? arg[5] : new cNumber( 0 );
 
     if ( rate instanceof cArea || rate instanceof cArea3D ) {
         rate = rate.cross( arguments[1].first );
@@ -923,7 +1497,7 @@ cCUMPRINC.prototype.Calculate = function ( arg ) {
         nPayType = type.getValue(),
         fRmz, fKapZ;
 
-    if( nStartPer < 1 || nEndPer < nStartPer || nEndPer < 1  || fRate <= 0 || nNumPeriods <= 0 || fVal <= 0 || ( nPayType != 0 && nPayType != 1 ) )
+    if ( nStartPer < 1 || nEndPer < nStartPer || nEndPer < 1 || fRate <= 0 || nNumPeriods <= 0 || fVal <= 0 || ( nPayType != 0 && nPayType != 1 ) )
         return this.value = new cError( cErrorType.not_numeric );
 
     fRmz = GetRmz( fRate, nNumPeriods, fVal, 0.0, nPayType );
@@ -933,9 +1507,8 @@ cCUMPRINC.prototype.Calculate = function ( arg ) {
     var nStart = nStartPer;
     var nEnd = nEndPer;
 
-    if( nStart == 1 )
-    {
-        if( nPayType <= 0 )
+    if ( nStart == 1 ) {
+        if ( nPayType <= 0 )
             fKapZ = fRmz + fVal * fRate;
         else
             fKapZ = fRmz;
@@ -943,9 +1516,8 @@ cCUMPRINC.prototype.Calculate = function ( arg ) {
         nStart++;
     }
 
-    for( var i = nStart ; i <= nEnd ; i++ )
-    {
-        if( nPayType > 0 )
+    for ( var i = nStart; i <= nEnd; i++ ) {
+        if ( nPayType > 0 )
             fKapZ += fRmz - ( GetZw( fRate, i - 2, fRmz, fVal, 1 ) - fRmz ) * fRate;
         else
             fKapZ += fRmz - GetZw( fRate, i - 1, fRmz, fVal, 0 ) * fRate;
@@ -993,7 +1565,7 @@ cDISC.prototype.Calculate = function ( arg ) {
         maturity = arg[1],
         pr = arg[2],
         redemption = arg[3],
-        basis = arg[4] && !(arg[4] instanceof cEmpty) ? arg[4] : new cNumber(0 );
+        basis = arg[4] && !(arg[4] instanceof cEmpty) ? arg[4] : new cNumber( 0 );
 
     if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
         settlement = settlement.cross( arguments[1].first );
@@ -1042,10 +1614,10 @@ cDISC.prototype.Calculate = function ( arg ) {
     if ( redemption instanceof cError ) return this.value = redemption;
     if ( basis instanceof cError ) return this.value = basis;
 
-    if( settlement.getValue() >= maturity.getValue() || pr.getValue() <= 0 || redemption.getValue() <= 0 || basis.getValue() < 0 || basis.getValue() > 4 )
+    if ( settlement.getValue() >= maturity.getValue() || pr.getValue() <= 0 || redemption.getValue() <= 0 || basis.getValue() < 0 || basis.getValue() > 4 )
         return this.value = new cError( cErrorType.not_numeric );
 
-    var res = ( 1.0 - pr.getValue() / redemption.getValue() ) / yearFrac( Date.prototype.getDateFromExcel(settlement.getValue()), Date.prototype.getDateFromExcel(maturity.getValue()), basis.getValue() )
+    var res = ( 1.0 - pr.getValue() / redemption.getValue() ) / yearFrac( Date.prototype.getDateFromExcel( settlement.getValue() ), Date.prototype.getDateFromExcel( maturity.getValue() ), basis.getValue() )
 
     this.value = new cNumber( res );
     this.value.numFormat = 9;
@@ -1077,7 +1649,7 @@ function cDOLLARDE() {
 }
 cDOLLARDE.prototype = Object.create( cBaseFunction.prototype )
 cDOLLARDE.prototype.Calculate = function ( arg ) {
-    var  fractionalDollar = arg[0],
+    var fractionalDollar = arg[0],
         fraction = arg[1];
 
     if ( fractionalDollar instanceof cArea || fractionalDollar instanceof cArea3D ) {
@@ -1103,12 +1675,12 @@ cDOLLARDE.prototype.Calculate = function ( arg ) {
     fractionalDollar = fractionalDollar.getValue();
     fraction = fraction.getValue();
 
-    if( fraction < 0 )
+    if ( fraction < 0 )
         return this.value = new cError( cErrorType.not_numeric );
-    else if( fraction == 0 )
+    else if ( fraction == 0 )
         return this.value = new cError( cErrorType.division_by_zero );
 
-    var fInt = Math.floor( fractionalDollar ), res  = fractionalDollar - fInt;
+    var fInt = Math.floor( fractionalDollar ), res = fractionalDollar - fInt;
 
     res /= fraction;
 
@@ -1125,7 +1697,6 @@ cDOLLARDE.prototype.getInfo = function () {
         args:"( fractional-dollar , fraction )"
     };
 }
-
 
 function cDOLLARFR() {
 //    cBaseFunction.call( this, "DOLLARFR" );
@@ -1145,7 +1716,7 @@ function cDOLLARFR() {
 }
 cDOLLARFR.prototype = Object.create( cBaseFunction.prototype )
 cDOLLARFR.prototype.Calculate = function ( arg ) {
-    var  decimalDollar = arg[0],
+    var decimalDollar = arg[0],
         fraction = arg[1];
 
     if ( decimalDollar instanceof cArea || decimalDollar instanceof cArea3D ) {
@@ -1171,16 +1742,16 @@ cDOLLARFR.prototype.Calculate = function ( arg ) {
     decimalDollar = decimalDollar.getValue();
     fraction = fraction.getValue();
 
-    if( fraction < 0 )
+    if ( fraction < 0 )
         return this.value = new cError( cErrorType.not_numeric );
-    else if( fraction == 0 )
+    else if ( fraction == 0 )
         return this.value = new cError( cErrorType.division_by_zero );
 
-    var fInt = Math.floor( decimalDollar ), res  = decimalDollar - fInt;
+    var fInt = Math.floor( decimalDollar ), res = decimalDollar - fInt;
 
     res *= fraction;
 
-    res *= Math.pow( 10.0, - Math.ceil( Math.log( fraction ) / Math.log( 10 ) ) );
+    res *= Math.pow( 10.0, -Math.ceil( Math.log( fraction ) / Math.log( 10 ) ) );
 
     res += fInt;
 
@@ -1195,9 +1766,133 @@ cDOLLARFR.prototype.getInfo = function () {
 }
 
 function cDURATION() {
-    cBaseFunction.call( this, "DURATION" );
+//    cBaseFunction.call( this, "DURATION" );
+
+    this.name = "DURATION";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 5;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 6;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cDURATION.prototype = Object.create( cBaseFunction.prototype )
+/*cDURATION.prototype.Calculate = function ( arg ) {
+ var settlement = arg[0],
+ maturity = arg[1],
+ coupon = arg[2],
+ yld = arg[3],
+ frequency = arg[4],
+ basis = arg[5] && !(arg[5] instanceof cEmpty) ? arg[5] : new cNumber(0 );
+
+ if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
+ settlement = settlement.cross( arguments[1].first );
+ }
+ else if ( settlement instanceof cArray ) {
+ settlement = settlement.getElementRowCol( 0, 0 );
+ }
+
+ if ( maturity instanceof cArea || maturity instanceof cArea3D ) {
+ maturity = maturity.cross( arguments[1].first );
+ }
+ else if ( maturity instanceof cArray ) {
+ maturity = maturity.getElementRowCol( 0, 0 );
+ }
+
+ if ( coupon instanceof cArea || coupon instanceof cArea3D ) {
+ coupon = coupon.cross( arguments[1].first );
+ }
+ else if ( coupon instanceof cArray ) {
+ coupon = coupon.getElementRowCol( 0, 0 );
+ }
+
+ if ( yld instanceof cArea || yld instanceof cArea3D ) {
+ yld = yld.cross( arguments[1].first );
+ }
+ else if ( yld instanceof cArray ) {
+ yld = yld.getElementRowCol( 0, 0 );
+ }
+
+ if ( frequency instanceof cArea || frequency instanceof cArea3D ) {
+ frequency = frequency.cross( arguments[1].first );
+ }
+ else if ( frequency instanceof cArray ) {
+ frequency = frequency.getElementRowCol( 0, 0 );
+ }
+
+ if ( basis instanceof cArea || basis instanceof cArea3D ) {
+ basis = basis.cross( arguments[1].first );
+ }
+ else if ( basis instanceof cArray ) {
+ basis = basis.getElementRowCol( 0, 0 );
+ }
+
+ settlement = settlement.tocNumber();
+ maturity = maturity.tocNumber();
+ coupon = coupon.tocNumber();
+ yld = yld.tocNumber();
+ frequency = frequency.tocNumber();
+ basis = basis.tocNumber();
+
+ if ( settlement instanceof cError ) return this.value = settlement;
+ if ( maturity instanceof cError ) return this.value = maturity;
+ if ( coupon instanceof cError ) return this.value = coupon;
+ if ( yld instanceof cError ) return this.value = yld;
+ if ( frequency instanceof cError ) return this.value = frequency;
+ if ( basis instanceof cError ) return this.value = basis;
+
+ if( settlement.getValue() >= maturity.getValue() ||
+ basis.getValue() < 0 || basis.getValue() > 4 ||
+ ( frequency.getValue() != 1 && frequency.getValue() != 2 && frequency.getValue() != 4 ) ||
+ yld.getValue() < 0 || coupon.getValue < 0 )
+ return this.value = new cError( cErrorType.not_numeric );
+
+ settlement = settlement.getValue();
+ maturity = maturity.getValue();
+ coupon = coupon.getValue();
+ yld = yld.getValue();
+ frequency = frequency.getValue();
+ basis = basis.getValue();
+
+ var settl = Date.prototype.getDateFromExcel( settlement ),
+ matur = Date.prototype.getDateFromExcel( maturity );
+
+ var fYearfrac = yearFrac( settl, matur, basis ).getValue();
+ //    var fYearfrac = diffDate2( settl, matur, basis ).getValue();
+ var fNumOfCoups = getcoupnum( settl, matur, frequency, basis );
+ var fDur = 0,	f100 = 100;
+ coupon = coupon * f100 / frequency;	// fCoup is used as cash flow
+ yld = yld / frequency + 1;
+
+ var nDiff = Math.round(fYearfrac * frequency - fNumOfCoups);
+
+ var t,p = 0;
+
+ for( t = 1 ; t < fNumOfCoups ; t++ ){
+ fDur += ( t + nDiff ) * ( coupon ) / Math.pow( yld, t + nDiff );
+ p += coupon / Math.pow( yld, t + nDiff );
+ }
+
+ fDur += ( fNumOfCoups + nDiff ) * ( coupon + f100 ) / Math.pow( yld, fNumOfCoups + nDiff );
+ p += ( coupon + f100 ) / Math.pow( yld, fNumOfCoups + nDiff );
+
+ fDur /= p;
+ fDur /= frequency;
+
+ return this.value = new cNumber( fDur );
+
+ }
+ cDURATION.prototype.getInfo = function () {
+ return {
+ name:this.name,
+ args:"( settlement , maturity , coupon , yld , frequency [ , [ basis ] ] )"
+ };
+ }*/
 
 function cEFFECT() {
 //    cBaseFunction.call( this, "EFFECT" );
@@ -1240,11 +1935,11 @@ cEFFECT.prototype.Calculate = function ( arg ) {
     if ( npery instanceof cError ) return this.value = npery;
 
     var nr = nominalRate.getValue(), np = npery.getValue();
-    if( nominalRate.getValue() <= 0 || npery.getValue() < 1 ){
+    if ( nominalRate.getValue() <= 0 || npery.getValue() < 1 ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
-    return this.value = new cNumber( Math.pow( (1 + nr/np), np ) - 1 );
+    return this.value = new cNumber( Math.pow( (1 + nr / np), np ) - 1 );
 }
 cEFFECT.prototype.getInfo = function () {
     return {
@@ -1372,16 +2067,16 @@ cFVSCHEDULE.prototype.Calculate = function ( arg ) {
     }
 
     if ( schedule instanceof cArea || schedule instanceof cArea3D ) {
-        schedule.foreach2( function(v){
+        schedule.foreach2( function ( v ) {
             shedList.push( v.tocNumber() );
         } )
     }
     else if ( schedule instanceof cArray ) {
-        schedule.foreach(function(v){
+        schedule.foreach( function ( v ) {
             shedList.push( v.tocNumber() );
-        })
+        } )
     }
-    else{
+    else {
         shedList.push( schedule.tocNumber() )
     }
 
@@ -1391,11 +2086,11 @@ cFVSCHEDULE.prototype.Calculate = function ( arg ) {
 
     var princ = principal.getValue();
 
-    for( var i = 0; i < shedList.length; i++){
-        if( shedList[i] instanceof cError ){
+    for ( var i = 0; i < shedList.length; i++ ) {
+        if ( shedList[i] instanceof cError ) {
             return this.value = new cError( cErrorType.wrong_value_type );
         }
-        else{
+        else {
             princ *= 1 + shedList[i].getValue();
         }
     }
@@ -1433,7 +2128,7 @@ cINTRATE.prototype.Calculate = function ( arg ) {
         maturity = arg[1],
         investment = arg[2],
         redemption = arg[3],
-        basis = arg[4] && !(arg[4] instanceof cEmpty) ? arg[4] : new cNumber(0 );
+        basis = arg[4] && !(arg[4] instanceof cEmpty) ? arg[4] : new cNumber( 0 );
 
     if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
         settlement = settlement.cross( arguments[1].first );
@@ -1482,11 +2177,11 @@ cINTRATE.prototype.Calculate = function ( arg ) {
     if ( redemption instanceof cError ) return this.value = redemption;
     if ( basis instanceof cError ) return this.value = basis;
 
-    if( settlement.getValue() >= maturity.getValue() || investment.getValue() <= 0 || redemption.getValue() <= 0 || basis.getValue() < 0 || basis.getValue() > 4 )
+    if ( settlement.getValue() >= maturity.getValue() || investment.getValue() <= 0 || redemption.getValue() <= 0 || basis.getValue() < 0 || basis.getValue() > 4 )
         return this.value = new cError( cErrorType.not_numeric );
 
 
-    var res = ( ( redemption.getValue() / investment.getValue() ) - 1 ) / yearFrac( Date.prototype.getDateFromExcel(settlement.getValue()), Date.prototype.getDateFromExcel(maturity.getValue()), basis.getValue() )
+    var res = ( ( redemption.getValue() / investment.getValue() ) - 1 ) / yearFrac( Date.prototype.getDateFromExcel( settlement.getValue() ), Date.prototype.getDateFromExcel( maturity.getValue() ), basis.getValue() )
 
     this.value = new cNumber( res );
     this.value.numFormat = 9;
@@ -1523,22 +2218,22 @@ function cIRR() {
 }
 cIRR.prototype = Object.create( cBaseFunction.prototype )
 cIRR.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cNumber(0.1);
+    var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cNumber( 0.1 );
 
-    function irr(arr,x) {
+    function irr( arr, x ) {
         x = x.getValue();
 
         var nC = 0, g_Eps = 1e-7, fEps = 1.0, fZ = 0, fN = 0, xN = 0, nIM = 100, nMC = 0, arr0 = arr[0], arrI, wasNegative = false, wasPositive = false;
 
-        if( arr0 instanceof cError ){
+        if ( arr0 instanceof cError ) {
             return new cError( cErrorType.not_available );
         }
 
-        if( arr0.getValue() < 0 )
+        if ( arr0.getValue() < 0 )
             wasNegative = true;
-        else if( arr0.getValue() > 0 )
+        else if ( arr0.getValue() > 0 )
             wasPositive = true;
-        if( arr.length < 2 )
+        if ( arr.length < 2 )
             return new cError( cErrorType.not_numeric );
 
         while ( fEps > g_Eps && nMC < nIM ) {
@@ -1549,16 +2244,16 @@ cIRR.prototype.Calculate = function ( arg ) {
             fN += -nC * arr0.getValue() / Math.pow( 1 + x, nC + 1 );
             nC++;
             for ( var i = 1; i < arr.length; i++ ) {
-                if(arr[i] instanceof cError){
+                if ( arr[i] instanceof cError ) {
                     return new cError( cErrorType.not_available );
                 }
                 arrI = arr[i].getValue()
-                fZ += arrI  / Math.pow( 1.0 + x, nC );
-                fN += -nC * arrI  / Math.pow( 1 + x, nC + 1 );
-                if( arrI < 0 )
+                fZ += arrI / Math.pow( 1.0 + x, nC );
+                fN += -nC * arrI / Math.pow( 1 + x, nC + 1 );
+                if ( arrI < 0 )
                     wasNegative = true;
-                else if( arrI > 0 )
-                    wasPositive = true ;
+                else if ( arrI > 0 )
+                    wasPositive = true;
                 nC++
             }
             xN = x - fZ / fN;
@@ -1567,32 +2262,33 @@ cIRR.prototype.Calculate = function ( arg ) {
             x = xN;
         }
 
-        if( !(wasNegative && wasPositive)  )
+        if ( !(wasNegative && wasPositive) )
             return new cError( cErrorType.not_numeric );
 
-        if (fEps < g_Eps)
+        if ( fEps < g_Eps )
             return new cNumber( x );
         else
             return new cError( cErrorType.not_numeric );
     }
+
     var arr = []
-    if( arg0 instanceof cArray ){
-        arg0.foreach(function(v){
-            arr.push(v.tocNumber())
-        })
+    if ( arg0 instanceof cArray ) {
+        arg0.foreach( function ( v ) {
+            arr.push( v.tocNumber() )
+        } )
     }
-    else if( arg0 instanceof cArea ){
-        arg0.foreach2(function(v){
-            arr.push(v.tocNumber())
-        })
+    else if ( arg0 instanceof cArea ) {
+        arg0.foreach2( function ( v ) {
+            arr.push( v.tocNumber() )
+        } )
     }
 
     arg1 = arg1.tocNumber();
 
-    if( arg1 instanceof cError ){
+    if ( arg1 instanceof cError ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
-    this.value = irr(arr,arg1);
+    this.value = irr( arr, arg1 );
     this.value.numFormat = 9;
     return this.value;
 
@@ -1725,7 +2421,7 @@ cNOMINAL.prototype.Calculate = function ( arg ) {
     var eR = effectRate.getValue(),
         np = npery.getValue(), res;
 
-    if( eR <= 0 || npery < 1 )
+    if ( eR <= 0 || npery < 1 )
         return this.value = new cError( cErrorType.not_numeric );
     this.value = new cNumber( ( Math.pow( eR + 1, 1 / np ) - 1 ) * np );
 //    this.value.numFormat = 9;
@@ -2037,19 +2733,337 @@ function cPPMT() {
 cPPMT.prototype = Object.create( cBaseFunction.prototype )
 
 function cPRICE() {
-    cBaseFunction.call( this, "PRICE" );
+//    cBaseFunction.call( this, "PRICE" );
+
+    this.name = "PRICE";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 6;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 7;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cPRICE.prototype = Object.create( cBaseFunction.prototype )
+cPRICE.prototype.Calculate = function ( arg ) {
+    var settlement = arg[0],
+        maturity = arg[1],
+        rate = arg[2],
+        yld = arg[3],
+        redemption = arg[4],
+        frequency = arg[5],
+        basis = arg[6] && !(arg[6] instanceof cEmpty) ? arg[6] : new cNumber( 0 );
+
+    if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
+        settlement = settlement.cross( arguments[1].first );
+    }
+    else if ( settlement instanceof cArray ) {
+        settlement = settlement.getElementRowCol( 0, 0 );
+    }
+
+    if ( maturity instanceof cArea || maturity instanceof cArea3D ) {
+        maturity = maturity.cross( arguments[1].first );
+    }
+    else if ( maturity instanceof cArray ) {
+        maturity = maturity.getElementRowCol( 0, 0 );
+    }
+
+    if ( rate instanceof cArea || rate instanceof cArea3D ) {
+        rate = rate.cross( arguments[1].first );
+    }
+    else if ( rate instanceof cArray ) {
+        rate = rate.getElementRowCol( 0, 0 );
+    }
+
+    if ( yld instanceof cArea || yld instanceof cArea3D ) {
+        yld = yld.cross( arguments[1].first );
+    }
+    else if ( yld instanceof cArray ) {
+        yld = yld.getElementRowCol( 0, 0 );
+    }
+
+    if ( redemption instanceof cArea || redemption instanceof cArea3D ) {
+        redemption = redemption.cross( arguments[1].first );
+    }
+    else if ( redemption instanceof cArray ) {
+        redemption = redemption.getElementRowCol( 0, 0 );
+    }
+
+    if ( frequency instanceof cArea || frequency instanceof cArea3D ) {
+        frequency = frequency.cross( arguments[1].first );
+    }
+    else if ( frequency instanceof cArray ) {
+        frequency = frequency.getElementRowCol( 0, 0 );
+    }
+
+    if ( basis instanceof cArea || basis instanceof cArea3D ) {
+        basis = basis.cross( arguments[1].first );
+    }
+    else if ( basis instanceof cArray ) {
+        basis = basis.getElementRowCol( 0, 0 );
+    }
+
+    settlement = settlement.tocNumber();
+    maturity = maturity.tocNumber();
+    rate = rate.tocNumber();
+    yld = yld.tocNumber();
+    redemption = redemption.tocNumber();
+    frequency = frequency.tocNumber();
+    basis = basis.tocNumber();
+
+    if ( settlement instanceof cError ) return this.value = settlement;
+    if ( maturity instanceof cError ) return this.value = maturity;
+    if ( rate instanceof cError ) return this.value = rate;
+    if ( yld instanceof cError ) return this.value = yld;
+    if ( redemption instanceof cError ) return this.value = redemption;
+    if ( frequency instanceof cError ) return this.value = frequency;
+    if ( basis instanceof cError ) return this.value = basis;
+
+    settlement = settlement.getValue();
+    maturity = maturity.getValue();
+    rate = rate.getValue();
+    yld = yld.getValue();
+    redemption = redemption.getValue();
+    frequency = frequency.getValue();
+    basis = basis.getValue();
+
+    if ( settlement >= maturity ||
+        basis < 0 || basis > 4 ||
+        ( frequency != 1 && frequency != 2 && frequency != 4 ) ||
+        rate < 0 || yld < 0 ||
+        redemption <= 0 )
+        return this.value = new cError( cErrorType.not_numeric );
+
+    var settl = Date.prototype.getDateFromExcel( settlement ),
+        matur = Date.prototype.getDateFromExcel( maturity );
+
+    return this.value = new cNumber( getprice( settl, matur, rate, yld, redemption, frequency, basis ) );
+
+}
+cPRICE.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( settlement , maturity , rate , yld , redemption , frequency [ , [ basis ] ] )"
+    };
+}
 
 function cPRICEDISC() {
-    cBaseFunction.call( this, "PRICEDISC" );
+//    cBaseFunction.call( this, "PRICEDISC" );
+
+    this.name = "PRICEDISC";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 4;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 5;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cPRICEDISC.prototype = Object.create( cBaseFunction.prototype )
+cPRICEDISC.prototype.Calculate = function ( arg ) {
+    var settlement = arg[0],
+        maturity = arg[1],
+        discount = arg[2],
+        redemption = arg[3],
+        basis = arg[4] && !(arg[4] instanceof cEmpty) ? arg[4] : new cNumber( 0 );
+
+    if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
+        settlement = settlement.cross( arguments[1].first );
+    }
+    else if ( settlement instanceof cArray ) {
+        settlement = settlement.getElementRowCol( 0, 0 );
+    }
+
+    if ( maturity instanceof cArea || maturity instanceof cArea3D ) {
+        maturity = maturity.cross( arguments[1].first );
+    }
+    else if ( maturity instanceof cArray ) {
+        maturity = maturity.getElementRowCol( 0, 0 );
+    }
+
+    if ( discount instanceof cArea || discount instanceof cArea3D ) {
+        discount = discount.cross( arguments[1].first );
+    }
+    else if ( discount instanceof cArray ) {
+        discount = discount.getElementRowCol( 0, 0 );
+    }
+
+    if ( redemption instanceof cArea || redemption instanceof cArea3D ) {
+        redemption = redemption.cross( arguments[1].first );
+    }
+    else if ( redemption instanceof cArray ) {
+        redemption = redemption.getElementRowCol( 0, 0 );
+    }
+
+    if ( basis instanceof cArea || basis instanceof cArea3D ) {
+        basis = basis.cross( arguments[1].first );
+    }
+    else if ( basis instanceof cArray ) {
+        basis = basis.getElementRowCol( 0, 0 );
+    }
+
+    settlement = settlement.tocNumber();
+    maturity = maturity.tocNumber();
+    discount = discount.tocNumber();
+    redemption = redemption.tocNumber();
+    basis = basis.tocNumber();
+
+    if ( settlement instanceof cError ) return this.value = settlement;
+    if ( maturity instanceof cError ) return this.value = maturity;
+    if ( discount instanceof cError ) return this.value = discount;
+    if ( redemption instanceof cError ) return this.value = redemption;
+    if ( basis instanceof cError ) return this.value = basis;
+
+    settlement = settlement.getValue();
+    maturity = maturity.getValue();
+    discount = discount.getValue();
+    redemption = redemption.getValue();
+    basis = basis.getValue();
+
+    if ( settlement >= maturity ||
+        basis < 0 || basis > 4 ||
+        discount <= 0 || redemption <= 0 )
+        return this.value = new cError( cErrorType.not_numeric );
+
+    var settl = Date.prototype.getDateFromExcel( settlement ),
+        matur = Date.prototype.getDateFromExcel( maturity );
+
+//    var res = redemption * ( 1.0 - discount * diffDate( settl, matur, basis ) );
+    var res = redemption * ( 1.0 - discount * GetDiffDate( settl, matur, basis ) );
+
+    return this.value = new cNumber( res );
+
+}
+cPRICEDISC.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( settlement , maturity , discount , redemption [ , [ basis ] ] )"
+    };
+}
 
 function cPRICEMAT() {
-    cBaseFunction.call( this, "PRICEMAT" );
+//    cBaseFunction.call( this, "PRICEMAT" );
+
+    this.name = "PRICEMAT";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 5;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 6;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cPRICEMAT.prototype = Object.create( cBaseFunction.prototype )
+cPRICEMAT.prototype.Calculate = function ( arg ) {
+    var settlement = arg[0],
+        maturity = arg[1],
+        issue = arg[2],
+        rate = arg[3],
+        yld = arg[4],
+        basis = arg[5] && !(arg[5] instanceof cEmpty) ? arg[5] : new cNumber( 0 );
+
+    if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
+        settlement = settlement.cross( arguments[1].first );
+    }
+    else if ( settlement instanceof cArray ) {
+        settlement = settlement.getElementRowCol( 0, 0 );
+    }
+
+    if ( maturity instanceof cArea || maturity instanceof cArea3D ) {
+        maturity = maturity.cross( arguments[1].first );
+    }
+    else if ( maturity instanceof cArray ) {
+        maturity = maturity.getElementRowCol( 0, 0 );
+    }
+
+    if ( issue instanceof cArea || issue instanceof cArea3D ) {
+        issue = issue.cross( arguments[1].first );
+    }
+    else if ( issue instanceof cArray ) {
+        issue = issue.getElementRowCol( 0, 0 );
+    }
+
+    if ( rate instanceof cArea || rate instanceof cArea3D ) {
+        rate = rate.cross( arguments[1].first );
+    }
+    else if ( rate instanceof cArray ) {
+        rate = rate.getElementRowCol( 0, 0 );
+    }
+
+    if ( yld instanceof cArea || yld instanceof cArea3D ) {
+        yld = yld.cross( arguments[1].first );
+    }
+    else if ( yld instanceof cArray ) {
+        yld = yld.getElementRowCol( 0, 0 );
+    }
+
+    if ( basis instanceof cArea || basis instanceof cArea3D ) {
+        basis = basis.cross( arguments[1].first );
+    }
+    else if ( basis instanceof cArray ) {
+        basis = basis.getElementRowCol( 0, 0 );
+    }
+
+    settlement = settlement.tocNumber();
+    maturity = maturity.tocNumber();
+    issue = issue.tocNumber();
+    rate = rate.tocNumber();
+    yld = yld.tocNumber();
+    basis = basis.tocNumber();
+
+    if ( settlement instanceof cError ) return this.value = settlement;
+    if ( maturity instanceof cError ) return this.value = maturity;
+    if ( issue instanceof cError ) return this.value = issue;
+    if ( rate instanceof cError ) return this.value = rate;
+    if ( yld instanceof cError ) return this.value = yld;
+    if ( basis instanceof cError ) return this.value = basis;
+
+    settlement = settlement.getValue();
+    maturity = maturity.getValue();
+    issue = issue.getValue();
+    rate = rate.getValue();
+    yld = yld.getValue();
+    basis = basis.getValue();
+
+    if ( settlement >= maturity ||
+        basis < 0 || basis > 4 ||
+        rate <= 0 || yld <= 0 )
+        return this.value = new cError( cErrorType.not_numeric );
+
+    var settl = Date.prototype.getDateFromExcel( settlement ),
+        matur = Date.prototype.getDateFromExcel( maturity ),
+        iss = Date.prototype.getDateFromExcel( issue );
+
+    var fIssMat = yearFrac( new Date( iss ), new Date( matur ), basis );
+    var fIssSet = yearFrac( new Date( iss ), new Date( settl ), basis );
+    var fSetMat = yearFrac( new Date( settl ), new Date( matur ), basis );
+
+    var res = 1.0 + fIssMat * rate;
+    res /= 1.0 + fSetMat * yld;
+    res -= fIssSet * rate;
+    res *= 100.0;
+
+    return this.value = new cNumber( res );
+
+}
+cPRICEMAT.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( settlement , maturity , discount , redemption [ , [ basis ] ] )"
+    };
+}
 
 function cPV() {
 //    cBaseFunction.call( this, "PV" );
@@ -2221,8 +3235,8 @@ cRATE.prototype.Calculate = function ( arg ) {
 
     var guess = {fGuess:quess.getValue()};
 
-    var bValid = RateIteration(nper.getValue(), pmt.getValue(), pv.getValue(), fv.getValue(), type.getValue(), guess);
-    if (!bValid)
+    var bValid = RateIteration( nper.getValue(), pmt.getValue(), pv.getValue(), fv.getValue(), type.getValue(), guess );
+    if ( !bValid )
         return this.value = new cError( cErrorType.wrong_value_type );
 
     this.value = new cNumber( guess.fGuess );
@@ -2258,7 +3272,7 @@ cRECEIVED.prototype.Calculate = function ( arg ) {
         maturity = arg[1],
         investment = arg[2],
         discount = arg[3],
-        basis = arg[4] && !(arg[4] instanceof cEmpty) ? arg[4] : new cNumber(0 );
+        basis = arg[4] && !(arg[4] instanceof cEmpty) ? arg[4] : new cNumber( 0 );
 
     if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
         settlement = settlement.cross( arguments[1].first );
@@ -2307,10 +3321,10 @@ cRECEIVED.prototype.Calculate = function ( arg ) {
     if ( discount instanceof cError ) return this.value = discount;
     if ( basis instanceof cError ) return this.value = basis;
 
-    if( settlement.getValue() >= maturity.getValue() || investment.getValue() <= 0 || discount.getValue() <= 0 || basis.getValue() < 0 || basis.getValue() > 4 )
+    if ( settlement.getValue() >= maturity.getValue() || investment.getValue() <= 0 || discount.getValue() <= 0 || basis.getValue() < 0 || basis.getValue() > 4 )
         return this.value = new cError( cErrorType.not_numeric );
 
-    var res = investment.getValue() / ( 1 - ( discount.getValue() * yearFrac( Date.prototype.getDateFromExcel(settlement.getValue()), Date.prototype.getDateFromExcel(maturity.getValue()), basis.getValue() ) ) )
+    var res = investment.getValue() / ( 1 - ( discount.getValue() * yearFrac( Date.prototype.getDateFromExcel( settlement.getValue() ), Date.prototype.getDateFromExcel( maturity.getValue() ), basis.getValue() ) ) )
 
     this.value = new cNumber( res );
 //    this.value.numFormat = 9;
@@ -2388,14 +3402,14 @@ cTBILLEQ.prototype.Calculate = function ( arg ) {
     var nMat = maturity.getValue();
     nMat++;
 
-    var d1 = Date.prototype.getDateFromExcel(settlement.getValue())
-    var d2 = Date.prototype.getDateFromExcel(nMat)
+    var d1 = Date.prototype.getDateFromExcel( settlement.getValue() )
+    var d2 = Date.prototype.getDateFromExcel( nMat )
     var date1 = d1.getDate(), month1 = d1.getMonth(), year1 = d1.getFullYear(),
         date2 = d2.getDate(), month2 = d2.getMonth(), year2 = d2.getFullYear();
 
     var nDiff = GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, true )
 
-    if( settlement.getValue() >= maturity.getValue() || discount.getValue() <= 0 || nDiff > 360 )
+    if ( settlement.getValue() >= maturity.getValue() || discount.getValue() <= 0 || nDiff > 360 )
         return this.value = new cError( cErrorType.not_numeric );
 
     var res = ( 365 * discount.getValue() ) / ( 360 - ( discount.getValue() * nDiff ) );
@@ -2466,17 +3480,17 @@ cTBILLPRICE.prototype.Calculate = function ( arg ) {
     var nMat = maturity.getValue();
     nMat++;
 
-    var d1 = Date.prototype.getDateFromExcel(settlement.getValue())
-    var d2 = Date.prototype.getDateFromExcel(nMat)
+    var d1 = Date.prototype.getDateFromExcel( settlement.getValue() )
+    var d2 = Date.prototype.getDateFromExcel( nMat )
 
-    var fFraction = yearFrac(d1, d2, 0);
+    var fFraction = yearFrac( d1, d2, 0 );
 
-    if( fFraction - Math.floor( fFraction ) == 0 )
+    if ( fFraction - Math.floor( fFraction ) == 0 )
         return this.value = new cError( cErrorType.not_numeric )
 
     var res = 100 * ( 1 - discount.getValue() * fFraction );
 
-    if( settlement.getValue() >= maturity.getValue() || discount.getValue() <= 0 )
+    if ( settlement.getValue() >= maturity.getValue() || discount.getValue() <= 0 )
         return this.value = new cError( cErrorType.not_numeric );
 
     this.value = new cNumber( res );
@@ -2542,19 +3556,19 @@ cTBILLYIELD.prototype.Calculate = function ( arg ) {
     if ( maturity instanceof cError ) return this.value = maturity;
     if ( pr instanceof cError ) return this.value = pr;
 
-    var d1 = Date.prototype.getDateFromExcel(settlement.getValue())
-    var d2 = Date.prototype.getDateFromExcel(maturity.getValue())
+    var d1 = Date.prototype.getDateFromExcel( settlement.getValue() )
+    var d2 = Date.prototype.getDateFromExcel( maturity.getValue() )
     var date1 = d1.getDate(), month1 = d1.getMonth(), year1 = d1.getFullYear(),
         date2 = d2.getDate(), month2 = d2.getMonth(), year2 = d2.getFullYear();
 
     var nDiff = GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, true )
     nDiff++;
-    if( settlement.getValue() >= maturity.getValue() || pr.getValue() <= 0 || nDiff > 360 )
+    if ( settlement.getValue() >= maturity.getValue() || pr.getValue() <= 0 || nDiff > 360 )
         return this.value = new cError( cErrorType.not_numeric );
 
     pr = pr.getValue();
 
-    var res =( ( 100 - pr ) / pr) * (360 / nDiff);
+    var res = ( ( 100 - pr ) / pr) * (360 / nDiff);
 
     this.value = new cNumber( res );
     this.value.numFormat = 9;
@@ -2593,7 +3607,7 @@ cXIRR.prototype = Object.create( cBaseFunction.prototype )
 cXIRR.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber( 0.1 );
 
-    function lcl_sca_XirrResult( rValues, rDates, fRate ){
+    function lcl_sca_XirrResult( rValues, rDates, fRate ) {
         /*  V_0 ... V_n = input values.
          D_0 ... D_n = input dates.
          R           = input interest rate.
@@ -2608,12 +3622,12 @@ cXIRR.prototype.Calculate = function ( arg ) {
         var D_0 = rDates[0];
         var r = fRate + 1.0;
         var fResult = rValues[0];
-        for( var i = 1, nCount = rValues.length; i < nCount; ++i )
+        for ( var i = 1, nCount = rValues.length; i < nCount; ++i )
             fResult += rValues[i] / Math.pow( r, (rDates[i] - D_0) / 365.0 );
         return fResult;
     }
 
-    function lcl_sca_XirrResult_Deriv1( rValues, rDates, fRate ){
+    function lcl_sca_XirrResult_Deriv1( rValues, rDates, fRate ) {
         /*  V_0 ... V_n = input values.
          D_0 ... D_n = input dates.
          R           = input interest rate.
@@ -2632,41 +3646,40 @@ cXIRR.prototype.Calculate = function ( arg ) {
         var D_0 = rDates[0];
         var r = fRate + 1.0;
         var fResult = 0.0;
-        for( var i = 1, nCount = rValues.length; i < nCount; ++i )
-        {
+        for ( var i = 1, nCount = rValues.length; i < nCount; ++i ) {
             var E_i = (rDates[i] - D_0) / 365.0;
             fResult -= E_i * rValues[i] / Math.pow( r, E_i + 1.0 );
         }
         return fResult;
     }
 
-    function xirr( valueArray, dateArray, rate ){
+    function xirr( valueArray, dateArray, rate ) {
         var res = 0, vaTmp, daTmp;
 
         var nC = 0, g_Eps = 1e-7, fEps = 1.0, fZ = 0, fN = 0, xN = 0, nIM = 100, nMC = 0, arr0 = valueArray[0], arr1 = dateArray[0], arrI, wasNegative = false, wasPositive = false;
 
-        if( arr0 instanceof cError ){
+        if ( arr0 instanceof cError ) {
             return new cError( cErrorType.not_available );
         }
 
-        if( arr1 instanceof cError ){
+        if ( arr1 instanceof cError ) {
             return new cError( cErrorType.not_available );
         }
 
-        if( valueArray.length < 2 || (dateArray.length != valueArray.length) )
+        if ( valueArray.length < 2 || (dateArray.length != valueArray.length) )
             return new cError( cErrorType.not_numeric );
 
 
         var fResultRate = rate.getValue()
-        if( fResultRate <= -1 )
+        if ( fResultRate <= -1 )
             return new cError( cErrorType.not_numeric );
 
         var fMaxEps = 1e-10, nMaxIter = 50;
 
-        for( var i = 0; i < dateArray.length; i++ ){
+        for ( var i = 0; i < dateArray.length; i++ ) {
             dateArray[i] = dateArray[i].tocNumber();
             valueArray[i] = valueArray[i].tocNumber();
-            if( dateArray[i] instanceof cError || valueArray[i] instanceof cError )
+            if ( dateArray[i] instanceof cError || valueArray[i] instanceof cError )
                 return new cError( cErrorType.not_numeric );
             dateArray[i] = dateArray[i].getValue();
             valueArray[i] = valueArray[i].getValue();
@@ -2682,9 +3695,9 @@ cXIRR.prototype.Calculate = function ( arg ) {
             fResultRate = fNewRate;
             bContLoop = (fRateEps > fMaxEps) && (Math.abs( fResultValue ) > fMaxEps);
         }
-        while( bContLoop && (++nIter < nMaxIter) );
+        while ( bContLoop && (++nIter < nMaxIter) );
 
-        if( bContLoop )
+        if ( bContLoop )
             return new cError( cErrorType.not_numeric );
 
         return new cNumber( fResultRate );
@@ -2693,52 +3706,52 @@ cXIRR.prototype.Calculate = function ( arg ) {
 
     var dateArray = [], valueArray = [];
 
-    if( arg0 instanceof cArea ){
-        arg0.foreach2(function(c){
+    if ( arg0 instanceof cArea ) {
+        arg0.foreach2( function ( c ) {
             valueArray.push( c.tocNumber() );
-        })
+        } )
     }
-    else if( arg0 instanceof cArray ){
-        arg0.foreach(function(c){
+    else if ( arg0 instanceof cArray ) {
+        arg0.foreach( function ( c ) {
             valueArray.push( c.tocNumber() );
-        })
+        } )
     }
-    else if( arg0 instanceof cArea3D ){
-        if( arg0.wsFrom == arg0.wsTo ){
+    else if ( arg0 instanceof cArea3D ) {
+        if ( arg0.wsFrom == arg0.wsTo ) {
             valueArray = arg0.getMatrix()[0];
         }
         else
             return this.value = new cError( cErrorType.wrong_value_type );
     }
-    else{
+    else {
         arg0 = arg0.tocNumber();
-        if( arg1 instanceof cError ){
+        if ( arg1 instanceof cError ) {
             return this.value = new cError( cErrorType.not_numeric )
         }
         else
             valueArray[0] = arg0;
     }
 
-    if( arg1 instanceof cArea ){
-        arg1.foreach2(function(c){
+    if ( arg1 instanceof cArea ) {
+        arg1.foreach2( function ( c ) {
             dateArray.push( c.tocNumber() );
-        })
+        } )
     }
-    else if( arg1 instanceof cArray ){
-        arg1.foreach(function(c){
+    else if ( arg1 instanceof cArray ) {
+        arg1.foreach( function ( c ) {
             dateArray.push( c.tocNumber() );
-        })
+        } )
     }
-    else if( arg1 instanceof cArea3D ){
-        if( arg1.wsFrom == arg1.wsTo ){
+    else if ( arg1 instanceof cArea3D ) {
+        if ( arg1.wsFrom == arg1.wsTo ) {
             dateArray = arg1.getMatrix()[0];
         }
         else
             return this.value = new cError( cErrorType.wrong_value_type );
     }
-    else{
+    else {
         arg1 = arg1.tocNumber();
-        if( arg1 instanceof cError ){
+        if ( arg1 instanceof cError ) {
             return this.value = new cError( cErrorType.not_numeric )
         }
         else
@@ -2752,10 +3765,10 @@ cXIRR.prototype.Calculate = function ( arg ) {
     arg2 = arg2.tocNumber();
 
     if ( arg2 instanceof cArray ) {
-        arg2 = arg2.getElement(0);
+        arg2 = arg2.getElement( 0 );
     }
 
-    if ( arg2 instanceof cError ){
+    if ( arg2 instanceof cError ) {
         return this.value = arg2;
     }
 
@@ -2791,24 +3804,24 @@ cXNPV.prototype = Object.create( cBaseFunction.prototype )
 cXNPV.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
 
-    function xnpv( rate, valueArray, dateArray ){
+    function xnpv( rate, valueArray, dateArray ) {
         var res = 0, vaTmp, daTmp, r = rate.getValue()
 
-        if( dateArray.length != valueArray.length )
+        if ( dateArray.length != valueArray.length )
             return new cError( cErrorType.not_numeric );
 
         d1 = dateArray[0].tocNumber();
 
-        for( var i = 0; i < dateArray.length; i++ ){
+        for ( var i = 0; i < dateArray.length; i++ ) {
             vaTmp = valueArray[i].tocNumber();
             daTmp = dateArray[i].tocNumber();
-            if( vaTmp instanceof  cError || daTmp instanceof cError )
+            if ( vaTmp instanceof  cError || daTmp instanceof cError )
                 return new cError( cErrorType.not_numeric );
 
-            res += valueArray[i].getValue() / ( Math.pow( ( 1 + r ), ( dateArray[i].getValue()-d1.getValue() ) / 365 ) )
+            res += valueArray[i].getValue() / ( Math.pow( ( 1 + r ), ( dateArray[i].getValue() - d1.getValue() ) / 365 ) )
         }
 
-        return new cNumber(res);
+        return new cNumber( res );
     }
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
@@ -2818,62 +3831,70 @@ cXNPV.prototype.Calculate = function ( arg ) {
     arg0 = arg0.tocNumber();
 
     if ( arg0 instanceof cArray ) {
-        arg0 = arg0.getElement(0);
+        arg0 = arg0.getElement( 0 );
     }
-    if ( arg0 instanceof cError ){
+    if ( arg0 instanceof cError ) {
         return this.value = arg0;
     }
 
     var dateArray = [], valueArray = [];
 
-    if( arg1 instanceof cArea ){
-        arg1.foreach2(function(c){valueArray.push(c)})
+    if ( arg1 instanceof cArea ) {
+        arg1.foreach2( function ( c ) {
+            valueArray.push( c )
+        } )
 //        valueArray = arg1.getMatrix();
     }
-    else if( arg1 instanceof cArray ){
-        arg1.foreach(function(c){valueArray.push(c)})
+    else if ( arg1 instanceof cArray ) {
+        arg1.foreach( function ( c ) {
+            valueArray.push( c )
+        } )
     }
-    else if( arg1 instanceof cArea3D ){
-        if( arg1.wsFrom == arg1.wsTo ){
+    else if ( arg1 instanceof cArea3D ) {
+        if ( arg1.wsFrom == arg1.wsTo ) {
             valueArray = arg1.getMatrix()[0];
         }
         else
             return this.value = new cError( cErrorType.wrong_value_type );
     }
-    else{
+    else {
         arg1 = arg1.tocNumber();
-        if( arg1 instanceof cError ){
+        if ( arg1 instanceof cError ) {
             return this.value = new cError( cErrorType.not_numeric )
         }
         else
             valueArray[0] = arg1;
     }
 
-    if( arg2 instanceof cArea ){
-        arg2.foreach2(function(c){dateArray.push(c)})
+    if ( arg2 instanceof cArea ) {
+        arg2.foreach2( function ( c ) {
+            dateArray.push( c )
+        } )
 //        dateArray = arg2.getMatrix();
     }
-    else if( arg2 instanceof cArray ){
+    else if ( arg2 instanceof cArray ) {
 //        dateArray = arg2.getMatrix();
-        arg2.foreach(function(c){dateArray.push(c)})
+        arg2.foreach( function ( c ) {
+            dateArray.push( c )
+        } )
     }
-    else if( arg2 instanceof cArea3D ){
-        if( arg2.wsFrom == arg2.wsTo ){
+    else if ( arg2 instanceof cArea3D ) {
+        if ( arg2.wsFrom == arg2.wsTo ) {
             dateArray = arg2.getMatrix()[0];
         }
         else
             return this.value = new cError( cErrorType.wrong_value_type );
     }
-    else{
+    else {
         arg2 = arg2.tocNumber();
-        if( arg2 instanceof cError ){
+        if ( arg2 instanceof cError ) {
             return this.value = new cError( cErrorType.not_numeric )
         }
         else
             dateArray[0] = arg2;
     }
 
-    return this.value = xnpv(arg0, valueArray, dateArray);
+    return this.value = xnpv( arg0, valueArray, dateArray );
 
 }
 cXNPV.prototype.getInfo = function () {
@@ -2884,16 +3905,333 @@ cXNPV.prototype.getInfo = function () {
 }
 
 function cYIELD() {
-    cBaseFunction.call( this, "YIELD" );
+//    cBaseFunction.call( this, "YIELD" );
+
+    this.name = "YIELD";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 6;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 7;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cYIELD.prototype = Object.create( cBaseFunction.prototype )
+cYIELD.prototype.Calculate = function ( arg ) {
+    var settlement = arg[0],
+        maturity = arg[1],
+        rate = arg[2],
+        pr = arg[3],
+        redemption = arg[4],
+        frequency = arg[5],
+        basis = arg[6] && !(arg[6] instanceof cEmpty) ? arg[6] : new cNumber( 0 );
+
+    if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
+        settlement = settlement.cross( arguments[1].first );
+    }
+    else if ( settlement instanceof cArray ) {
+        settlement = settlement.getElementRowCol( 0, 0 );
+    }
+
+    if ( maturity instanceof cArea || maturity instanceof cArea3D ) {
+        maturity = maturity.cross( arguments[1].first );
+    }
+    else if ( maturity instanceof cArray ) {
+        maturity = maturity.getElementRowCol( 0, 0 );
+    }
+
+    if ( rate instanceof cArea || rate instanceof cArea3D ) {
+        rate = rate.cross( arguments[1].first );
+    }
+    else if ( rate instanceof cArray ) {
+        rate = rate.getElementRowCol( 0, 0 );
+    }
+
+    if ( pr instanceof cArea || pr instanceof cArea3D ) {
+        pr = pr.cross( arguments[1].first );
+    }
+    else if ( pr instanceof cArray ) {
+        pr = pr.getElementRowCol( 0, 0 );
+    }
+
+    if ( redemption instanceof cArea || redemption instanceof cArea3D ) {
+        redemption = redemption.cross( arguments[1].first );
+    }
+    else if ( redemption instanceof cArray ) {
+        redemption = redemption.getElementRowCol( 0, 0 );
+    }
+
+    if ( frequency instanceof cArea || frequency instanceof cArea3D ) {
+        frequency = frequency.cross( arguments[1].first );
+    }
+    else if ( frequency instanceof cArray ) {
+        frequency = frequency.getElementRowCol( 0, 0 );
+    }
+
+    if ( basis instanceof cArea || basis instanceof cArea3D ) {
+        basis = basis.cross( arguments[1].first );
+    }
+    else if ( basis instanceof cArray ) {
+        basis = basis.getElementRowCol( 0, 0 );
+    }
+
+    settlement = settlement.tocNumber();
+    maturity = maturity.tocNumber();
+    rate = rate.tocNumber();
+    pr = pr.tocNumber();
+    redemption = redemption.tocNumber();
+    frequency = frequency.tocNumber();
+    basis = basis.tocNumber();
+
+    if ( settlement instanceof cError ) return this.value = settlement;
+    if ( maturity instanceof cError ) return this.value = maturity;
+    if ( rate instanceof cError ) return this.value = rate;
+    if ( pr instanceof cError ) return this.value = pr;
+    if ( redemption instanceof cError ) return this.value = redemption;
+    if ( frequency instanceof cError ) return this.value = frequency;
+    if ( basis instanceof cError ) return this.value = basis;
+
+    settlement = settlement.getValue();
+    maturity = maturity.getValue();
+    rate = rate.getValue();
+    pr = pr.getValue();
+    redemption = redemption.getValue();
+    frequency = frequency.getValue();
+    basis = basis.getValue();
+
+    if ( settlement >= maturity ||
+        basis < 0 || basis > 4 ||
+        ( frequency != 1 && frequency != 2 && frequency != 4 ) ||
+        rate < 0 ||
+        pr <= 0 || redemption <= 0 )
+        return this.value = new cError( cErrorType.not_numeric );
+
+    var settl = Date.prototype.getDateFromExcel( settlement ),
+        matur = Date.prototype.getDateFromExcel( maturity );
+
+    this.value = new cNumber( getYield( settl, matur, rate, pr, redemption, frequency, basis ) );
+//    this.value.numFormat = 9;
+    return this.value;
+
+}
+cYIELD.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( settlement , maturity , rate , pr , redemption , frequency [ , [ basis ] ] )"
+    };
+}
 
 function cYIELDDISC() {
-    cBaseFunction.call( this, "YIELDDISC" );
+//    cBaseFunction.call( this, "YIELDDISC" );
+
+    this.name = "YIELDDISC";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 4;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 5;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cYIELDDISC.prototype = Object.create( cBaseFunction.prototype )
+cYIELDDISC.prototype.Calculate = function ( arg ) {
+    var settlement = arg[0],
+        maturity = arg[1],
+        pr = arg[2],
+        redemption = arg[3],
+        basis = arg[4] && !(arg[4] instanceof cEmpty) ? arg[4] : new cNumber( 0 );
+
+    if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
+        settlement = settlement.cross( arguments[1].first );
+    }
+    else if ( settlement instanceof cArray ) {
+        settlement = settlement.getElementRowCol( 0, 0 );
+    }
+
+    if ( maturity instanceof cArea || maturity instanceof cArea3D ) {
+        maturity = maturity.cross( arguments[1].first );
+    }
+    else if ( maturity instanceof cArray ) {
+        maturity = maturity.getElementRowCol( 0, 0 );
+    }
+
+    if ( pr instanceof cArea || pr instanceof cArea3D ) {
+        pr = pr.cross( arguments[1].first );
+    }
+    else if ( pr instanceof cArray ) {
+        pr = pr.getElementRowCol( 0, 0 );
+    }
+
+    if ( redemption instanceof cArea || redemption instanceof cArea3D ) {
+        redemption = redemption.cross( arguments[1].first );
+    }
+    else if ( redemption instanceof cArray ) {
+        redemption = redemption.getElementRowCol( 0, 0 );
+    }
+
+    if ( basis instanceof cArea || basis instanceof cArea3D ) {
+        basis = basis.cross( arguments[1].first );
+    }
+    else if ( basis instanceof cArray ) {
+        basis = basis.getElementRowCol( 0, 0 );
+    }
+
+    settlement = settlement.tocNumber();
+    maturity = maturity.tocNumber();
+    pr = pr.tocNumber();
+    redemption = redemption.tocNumber();
+    basis = basis.tocNumber();
+
+    if ( settlement instanceof cError ) return this.value = settlement;
+    if ( maturity instanceof cError ) return this.value = maturity;
+    if ( pr instanceof cError ) return this.value = pr;
+    if ( redemption instanceof cError ) return this.value = redemption;
+    if ( basis instanceof cError ) return this.value = basis;
+
+    settlement = settlement.getValue();
+    maturity = maturity.getValue();
+    pr = pr.getValue();
+    redemption = redemption.getValue();
+    basis = basis.getValue();
+
+    if ( settlement >= maturity ||
+        basis < 0 || basis > 4 ||
+        pr <= 0 || redemption <= 0 )
+        return this.value = new cError( cErrorType.not_numeric );
+
+    var settl = Date.prototype.getDateFromExcel( settlement ),
+        matur = Date.prototype.getDateFromExcel( maturity );
+
+    var fRet = ( redemption / pr ) - 1.0;
+    fRet /= yearFrac( settl, matur, basis );
+
+    this.value = new cNumber( fRet );
+    this.value.numFormat = 10;
+    return this.value;
+
+}
+cYIELDDISC.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( settlement , maturity , pr , redemption , [ , [ basis ] ] )"
+    };
+}
 
 function cYIELDMAT() {
-    cBaseFunction.call( this, "YIELDMAT" );
+//    cBaseFunction.call( this, "YIELDMAT" );
+
+    this.name = "YIELDMAT";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 5;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 6;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cYIELDMAT.prototype = Object.create( cBaseFunction.prototype )
+cYIELDMAT.prototype.Calculate = function ( arg ) {
+    var settlement = arg[0],
+        maturity = arg[1],
+        issue = arg[2],
+        rate = arg[3],
+        pr = arg[4],
+        basis = arg[5] && !(arg[5] instanceof cEmpty) ? arg[5] : new cNumber( 0 );
+
+    if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
+        settlement = settlement.cross( arguments[1].first );
+    }
+    else if ( settlement instanceof cArray ) {
+        settlement = settlement.getElementRowCol( 0, 0 );
+    }
+
+    if ( maturity instanceof cArea || maturity instanceof cArea3D ) {
+        maturity = maturity.cross( arguments[1].first );
+    }
+    else if ( maturity instanceof cArray ) {
+        maturity = maturity.getElementRowCol( 0, 0 );
+    }
+
+    if ( issue instanceof cArea || issue instanceof cArea3D ) {
+        issue = issue.cross( arguments[1].first );
+    }
+    else if ( issue instanceof cArray ) {
+        issue = issue.getElementRowCol( 0, 0 );
+    }
+
+    if ( rate instanceof cArea || rate instanceof cArea3D ) {
+        rate = rate.cross( arguments[1].first );
+    }
+    else if ( rate instanceof cArray ) {
+        rate = rate.getElementRowCol( 0, 0 );
+    }
+
+    if ( pr instanceof cArea || pr instanceof cArea3D ) {
+        pr = pr.cross( arguments[1].first );
+    }
+    else if ( pr instanceof cArray ) {
+        pr = pr.getElementRowCol( 0, 0 );
+    }
+
+    if ( basis instanceof cArea || basis instanceof cArea3D ) {
+        basis = basis.cross( arguments[1].first );
+    }
+    else if ( basis instanceof cArray ) {
+        basis = basis.getElementRowCol( 0, 0 );
+    }
+
+    settlement = settlement.tocNumber();
+    maturity = maturity.tocNumber();
+    issue = issue.tocNumber();
+    rate = rate.tocNumber();
+    pr = pr.tocNumber();
+    basis = basis.tocNumber();
+
+    if ( settlement instanceof cError ) return this.value = settlement;
+    if ( maturity instanceof cError ) return this.value = maturity;
+    if ( issue instanceof cError ) return this.value = issue;
+    if ( rate instanceof cError ) return this.value = rate;
+    if ( pr instanceof cError ) return this.value = pr;
+    if ( basis instanceof cError ) return this.value = basis;
+
+    settlement = settlement.getValue();
+    maturity = maturity.getValue();
+    issue = issue.getValue();
+    rate = rate.getValue();
+    pr = pr.getValue();
+    basis = basis.getValue();
+
+    if ( settlement >= maturity ||
+        basis < 0 || basis > 4 ||
+        pr <= 0 || rate <= 0 )
+        return this.value = new cError( cErrorType.not_numeric );
+
+    var settl = Date.prototype.getDateFromExcel( settlement ),
+        matur = Date.prototype.getDateFromExcel( maturity ),
+        iss = Date.prototype.getDateFromExcel( issue );
+
+    var fRet = getyieldmat( settl, matur, iss, rate, pr, basis )
+
+    this.value = new cNumber( fRet );
+    this.value.numFormat = 10;
+    return this.value;
+
+}
+cYIELDMAT.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( settlement , maturity , issue , rate , pr [ , [ basis ] ] )"
+    };
+}

@@ -8,8 +8,7 @@
         return Math.abs( a - b ) < dif
     }
 
-
-    function GetRmz( fZins, fZzr, fBw, fZw, nF ){
+    function _GetRmz( fZins, fZzr, fBw, fZw, nF ){
         var fRmz;
         if( fZins == 0.0 )
             fRmz = ( fBw + fZw ) / fZzr;
@@ -24,7 +23,7 @@
         return -fRmz;
     }
 
-    function GetZw( fZins, fZzr, fRmz, fBw, nF ){
+    function _GetZw( fZins, fZzr, fRmz, fBw, nF ){
         var fZw;
         if( fZins == 0.0 )
             fZw = fBw + fRmz * fZzr;
@@ -39,6 +38,246 @@
         return -fZw;
     }
 
+    function _diffDate(d1, d2, mode){
+        var date1 = d1.getDate(),
+            month1 = d1.getMonth(),
+            year1 = d1.getFullYear(),
+            date2 = d2.getDate(),
+            month2 = d2.getMonth(),
+            year2 = d2.getFullYear();
+
+        switch ( mode ) {
+            case 0:
+                return Math.abs( GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, true ) );
+            case 1:
+                var yc = Math.abs( year2 - year1 ),
+                    sd = year1 > year2 ? d2 : d1,
+                    yearAverage = sd.isLeapYear() ? 366 : 365, dayDiff = Math.abs( d2 - d1 );
+                for ( var i = 0; i < yc; i++ ) {
+                    sd.addYears( 1 );
+                    yearAverage += sd.isLeapYear() ? 366 : 365;
+                }
+                yearAverage /= (yc + 1);
+                dayDiff /= c_msPerDay;
+                return dayDiff;
+            case 2:
+                var dayDiff = Math.abs( d2 - d1 );
+                dayDiff /= c_msPerDay;
+                return dayDiff;
+            case 3:
+                var dayDiff = Math.abs( d2 - d1 );
+                dayDiff /= c_msPerDay;
+                return dayDiff;
+            case 4:
+                return Math.abs( GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, false ) );
+            default:
+                return "#NUM!";
+        }
+    }
+
+    function _yearFrac(d1, d2, mode) {
+        var date1 = d1.getDate(),
+            month1 = d1.getMonth()+1,
+            year1 = d1.getFullYear(),
+            date2 = d2.getDate(),
+            month2 = d2.getMonth()+1,
+            year2 = d2.getFullYear();
+
+        switch ( mode ) {
+            case 0:
+                return Math.abs( GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, true ) ) / 360;
+            case 1:
+                var yc = /*Math.abs*/( year2 - year1 ),
+                    sd = year1 > year2 ? new Date(d2) : new Date(d1),
+                    yearAverage = sd.isLeapYear() ? 366 : 365, dayDiff = /*Math.abs*/( d2 - d1 );
+                for ( var i = 0; i < yc; i++ ) {
+                    sd.addYears( 1 );
+                    yearAverage += sd.isLeapYear() ? 366 : 365;
+                }
+                yearAverage /= (yc + 1);
+                dayDiff /= (yearAverage * c_msPerDay);
+                return dayDiff;
+            case 2:
+                var dayDiff = Math.abs( d2 - d1 );
+                dayDiff /= (360 * c_msPerDay);
+                return dayDiff;
+            case 3:
+                var dayDiff = Math.abs( d2 - d1 );
+                dayDiff /= (365 * c_msPerDay);
+                return dayDiff;
+            case 4:
+                return Math.abs( GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, false ) ) / 360;
+            default:
+                return "#NUM!";
+        }
+    }
+
+    function _lcl_GetCouppcd(settl, matur, freq){
+        matur.setFullYear( settl.getFullYear() );
+        if( matur < settl )
+            matur.addYears( 1 );
+        while( matur > settl ){
+            matur.addMonths( -12 / freq );
+        }
+    }
+
+    function _lcl_GetCoupncd( settl, matur, freq ){
+        matur.setFullYear( settl.getFullYear() );
+        if( matur > settl )
+            matur.addYears( -1 );
+        while( matur <= settl ){
+            matur.addMonths( 12 / freq );
+        }
+    }
+
+    function _getcoupdaybs( settl, matur, frequency, basis ) {
+        _lcl_GetCouppcd( settl, matur, frequency );
+        return _diffDate( settl, matur, basis );
+    }
+
+    function _getcoupdays( settl, matur, frequency, basis ) {
+        _lcl_GetCouppcd( settl, matur, frequency );
+        var n = new Date( matur )
+        n.addMonths( 12 / frequency );
+        return _diffDate( matur, n, basis );
+    }
+
+    function _getdiffdate( d1,d2, nMode ){
+        var bNeg = d1 > d2;
+
+        if( bNeg )
+        {
+            var n = d2;
+            d2 = d1;
+            d1 = n;
+        }
+
+        var nRet,pOptDaysIn1stYear
+
+        var nD1 = d1.getDate(),
+            nM1 = d1.getMonth(),
+            nY1  = d1.getFullYear(),
+            nD2 = d2.getDate(),
+            nM2 = d2.getMonth(),
+            nY2 = d2.getFullYear();
+
+        switch( nMode )
+        {
+            case 0:			// 0=USA (NASD) 30/360
+            case 4:			// 4=Europe 30/360
+            {
+                var bLeap = d1.isLeapYear()
+                var nDays, nMonths/*, nYears*/;
+
+                nMonths = nM2 - nM1;
+                nDays = nD2 - nD1;
+
+                nMonths += ( nY2 - nY1 ) * 12;
+
+                nRet = nMonths * 30 + nDays;
+                if( nMode == 0 && nM1 == 2 && nM2 != 2 && nY1 == nY2 )
+                    nRet -= bLeap? 1 : 2;
+
+                pOptDaysIn1stYear = 360;
+            }
+                break;
+            case 1:			// 1=exact/exact
+                pOptDaysIn1stYear = d1.isLeapYear() ? 366 : 365;
+                nRet = d2 - d1;
+                break;
+            case 2:			// 2=exact/360
+                nRet = d2 - d1;
+                pOptDaysIn1stYear = 360;
+                break;
+            case 3:			//3=exact/365
+                nRet = d2 - d1;
+                pOptDaysIn1stYear = 365;
+                break;
+        }
+
+        return (bNeg ? -nRet : nRet) / c_msPerDay / pOptDaysIn1stYear;
+    }
+
+    function _getprice( nSettle, nMat, fRate, fYield, fRedemp, nFreq, nBase ){
+
+        var fE = getcoupdays( new Date(nSettle), new Date(nMat), nFreq, nBase );
+        var fDSC_E = getcoupdaysnc( new Date(nSettle), new Date(nMat), nFreq, nBase ) / fE;
+        var fN = getcoupnum( new Date(nSettle), (nMat), nFreq, nBase );
+        var fA = getcoupdaybs( new Date(nSettle), new Date(nMat), nFreq, nBase );
+
+        var fRet = fRedemp / ( Math.pow( 1.0 + fYield / nFreq, fN - 1.0 + fDSC_E ) );
+        fRet -= 100.0 * fRate / nFreq * fA / fE;
+
+        var fT1 = 100.0 * fRate / nFreq;
+        var fT2 = 1.0 + fYield / nFreq;
+
+        for( var fK = 0.0 ; fK < fN ; fK++ ){
+            fRet += fT1 / Math.pow( fT2, fK + fDSC_E );
+        }
+
+        return fRet;
+    }
+
+    function _getYield( nSettle, nMat, fCoup, fPrice, fRedemp, nFreq, nBase ){
+        var fRate = fCoup, fPriceN = 0.0, fYield1 = 0.0, fYield2 = 1.0;
+        var fPrice1 = _getprice( nSettle, nMat, fRate, fYield1, fRedemp, nFreq, nBase );
+        var fPrice2 = _getprice( nSettle, nMat, fRate, fYield2, fRedemp, nFreq, nBase );
+        var fYieldN = ( fYield2 - fYield1 ) * 0.5;
+
+        for( var nIter = 0 ; nIter < 100 && fPriceN != fPrice ; nIter++ )
+        {
+            fPriceN = _getprice( nSettle, nMat, fRate, fYieldN, fRedemp, nFreq, nBase );
+
+            if( fPrice == fPrice1 )
+                return fYield1;
+            else if( fPrice == fPrice2 )
+                return fYield2;
+            else if( fPrice == fPriceN )
+                return fYieldN;
+            else if( fPrice < fPrice2 )
+            {
+                fYield2 *= 2.0;
+                fPrice2 = _getprice( nSettle, nMat, fRate, fYield2, fRedemp, nFreq, nBase );
+
+                fYieldN = ( fYield2 - fYield1 ) * 0.5;
+            }
+            else
+            {
+                if( fPrice < fPriceN )
+                {
+                    fYield1 = fYieldN;
+                    fPrice1 = fPriceN;
+                }
+                else
+                {
+                    fYield2 = fYieldN;
+                    fPrice2 = fPriceN;
+                }
+
+                fYieldN = fYield2 - ( fYield2 - fYield1 ) * ( ( fPrice - fPrice2 ) / ( fPrice1 - fPrice2 ) );
+            }
+        }
+
+        if( Math.abs( fPrice - fPriceN ) > fPrice / 100.0 )
+            return "#NUM!";		// result not precise enough
+
+        return fYieldN;
+    }
+
+    function _getyieldmat( nSettle, nMat, nIssue, fRate, fPrice, nBase ){
+
+        var fIssMat = _yearFrac( nIssue, nMat, nBase );
+        var fIssSet = _yearFrac( nIssue, nSettle, nBase );
+        var fSetMat = _yearFrac( nSettle, nMat, nBase );
+
+        var y = 1.0 + fIssMat * fRate;
+        y /= fPrice / 100.0 + fIssSet * fRate;
+        y--;
+        y /= fSetMat;
+
+        return y;
+
+    }
 
     var ver = 2;
 
@@ -3294,37 +3533,7 @@
                 fVal <= 0.0 || ( nPayType != 0 && nPayType != 1 ) )
                 return "#NUM!"
 
-            function GetRmz( fZins, fZzr, fBw, fZw, nF ){
-                var fRmz;
-                if( fZins == 0.0 )
-                    fRmz = ( fBw + fZw ) / fZzr;
-                else{
-                    var	fTerm = Math.pow( 1.0 + fZins, fZzr );
-                    if( nF > 0 )
-                        fRmz = ( fZw * fZins / ( fTerm - 1.0 ) + fBw * fZins / ( 1.0 - 1.0 / fTerm ) ) / ( 1.0 + fZins );
-                    else
-                        fRmz = fZw * fZins / ( fTerm - 1.0 ) + fBw * fZins / ( 1.0 - 1.0 / fTerm );
-                }
-
-                return -fRmz;
-            }
-
-            function GetZw( fZins, fZzr, fRmz, fBw, nF ){
-                var fZw;
-                if( fZins == 0.0 )
-                    fZw = fBw + fRmz * fZzr;
-                else{
-                    var fTerm = Math.pow( 1.0 + fZins, fZzr );
-                    if( nF > 0 )
-                        fZw = fBw * fTerm + fRmz * ( 1.0 + fZins ) * ( fTerm - 1.0 ) / fZins;
-                    else
-                        fZw = fBw * fTerm + fRmz * ( fTerm - 1.0 ) / fZins;
-                }
-
-                return -fZw;
-            }
-
-            fRmz = GetRmz( fRate, nNumPeriods, fVal, 0.0, nPayType );
+            fRmz = _GetRmz( fRate, nNumPeriods, fVal, 0.0, nPayType );
 
             fZinsZ = 0.0;
 
@@ -3339,9 +3548,9 @@
             for( var i = nStartPer ; i <= nEndPer ; i++ )
             {
                 if( nPayType > 0 )
-                    fZinsZ += GetZw( fRate, i - 2, fRmz, fVal, 1 ) - fRmz;
+                    fZinsZ += _GetZw( fRate, i - 2, fRmz, fVal, 1 ) - fRmz;
                 else
-                    fZinsZ += GetZw( fRate, i - 1, fRmz, fVal, 0 );
+                    fZinsZ += _GetZw( fRate, i - 1, fRmz, fVal, 0 );
             }
 
             fZinsZ *= fRate;
@@ -3369,7 +3578,7 @@
             if( nStartPer < 1 || nEndPer < nStartPer || nEndPer < 1  || fRate <= 0 || nNumPeriods <= 0 || fVal <= 0 || ( nPayType != 0 && nPayType != 1 ) )
                 return "#NUM!"
 
-            fRmz = GetRmz( fRate, nNumPeriods, fVal, 0.0, nPayType );
+            fRmz = _GetRmz( fRate, nNumPeriods, fVal, 0.0, nPayType );
 
             fKapZ = 0.0;
 
@@ -3389,9 +3598,9 @@
             for( var i = nStart ; i <= nEnd ; i++ )
             {
                 if( nPayType > 0 )
-                    fKapZ += fRmz - ( GetZw( fRate, i - 2, fRmz, fVal, 1 ) - fRmz ) * fRate;
+                    fKapZ += fRmz - ( _GetZw( fRate, i - 2, fRmz, fVal, 1 ) - fRmz ) * fRate;
                 else
-                    fKapZ += fRmz - GetZw( fRate, i - 1, fRmz, fVal, 0 ) * fRate;
+                    fKapZ += fRmz - _GetZw( fRate, i - 1, fRmz, fVal, 0 ) * fRate;
             }
 
             return fKapZ
@@ -3736,5 +3945,201 @@
         strictEqual( oParser.calculate().getValue(), tbillyield( new Date(2008,2,31), new Date(2008,5,1), 98.45 ) );
 
     } )
+
+    test( "Test: \"COUPDAYBS\"", function () {
+
+        function coupdaybs( settlement, maturity, frequency, basis ){
+
+            basis = ( basis !== undefined ? basis : 0 );
+
+            return _getcoupdaybs(settlement, maturity, frequency, basis)
+
+        }
+
+        oParser = new parserFormula( "COUPDAYBS(DATE(2007,1,25),DATE(2008,11,15),2,1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), coupdaybs( new Date(2007,0,25), new Date(2008,10,15), 2, 1 ) );
+
+        oParser = new parserFormula( "COUPDAYBS(DATE(2007,1,25),DATE(2008,11,15),2)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), coupdaybs( new Date(2007,0,25), new Date(2008,10,15), 2 ) );
+
+    } )
+
+    test( "Test: \"COUPDAYS\"", function () {
+
+        function coupdays( settlement, maturity, frequency, basis ){
+
+            basis = ( basis !== undefined ? basis : 0 );
+
+            return _getcoupdays(settlement, maturity, frequency, basis)
+
+        }
+
+        oParser = new parserFormula( "COUPDAYS(DATE(2007,1,25),DATE(2008,11,15),2,1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), coupdays( new Date(2007,0,25), new Date(2008,10,15), 2, 1 ) );
+
+        oParser = new parserFormula( "COUPDAYS(DATE(2007,1,25),DATE(2008,11,15),2)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), coupdays( new Date(2007,0,25), new Date(2008,10,15), 2 ) );
+
+    } )
+
+    test( "Test: \"COUPDAYSNC\"", function () {
+
+        function coupdaysnc( settlement, maturity, frequency, basis ) {
+
+            basis = ( basis !== undefined ? basis : 0 );
+
+            if ( (basis != 0) && (basis != 4) ) {
+
+                _lcl_GetCoupncd( settlement, maturity, frequency );
+                return _diffDate( settlement, maturity, basis );
+            }
+
+            return _getcoupdays( new Date( settlement ), new Date( maturity ), frequency, basis ) - _getcoupdaybs( new Date( settlement ), new Date( maturity ), frequency, basis );
+
+        }
+
+        oParser = new parserFormula( "COUPDAYSNC(DATE(2007,1,25),DATE(2008,11,15),2,1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), coupdaysnc( new Date(2007,0,25), new Date(2008,10,15), 2, 1 ) );
+
+        oParser = new parserFormula( "COUPDAYSNC(DATE(2007,1,25),DATE(2008,11,15),2)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), coupdaysnc( new Date(2007,0,25), new Date(2008,10,15), 2 ) );
+
+    } )
+
+    test( "Test: \"COUPNCD\"", function () {
+
+        function coupncd( settlement, maturity, frequency, basis ) {
+
+            basis = ( basis !== undefined ? basis : 0 );
+
+            _lcl_GetCoupncd( settlement, maturity, frequency );
+
+            return maturity.getExcelDate();
+
+        }
+
+        oParser = new parserFormula( "COUPNCD(DATE(2007,1,25),DATE(2008,11,15),2,1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), coupncd( new Date(2007,0,25), new Date(2008,10,15), 2, 1 ) );
+
+    } )
+
+    test( "Test: \"COUPNUM\"", function () {
+
+        function coupnum( settlement, maturity, frequency, basis ) {
+
+            basis = ( basis !== undefined ? basis : 0 );
+
+            var n = new Date(maturity);
+            _lcl_GetCouppcd( settlement, n, frequency );
+            var nMonths = (maturity.getFullYear() - n.getFullYear()) * 12 + maturity.getMonth() - n.getMonth();
+            return nMonths * frequency / 12 ;
+
+        }
+
+        oParser = new parserFormula( "COUPNUM(DATE(2007,1,25),DATE(2008,11,15),2,1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), coupnum( new Date(2007,0,25), new Date(2008,10,15), 2, 1 ) );
+
+    } )
+
+    test( "Test: \"COUPPCD\"", function () {
+
+        function couppcd( settlement, maturity, frequency, basis ) {
+
+            basis = ( basis !== undefined ? basis : 0 );
+
+            _lcl_GetCouppcd( settlement, maturity, frequency );
+            return maturity.getExcelDate();
+
+        }
+
+        oParser = new parserFormula( "COUPPCD(DATE(2007,1,25),DATE(2008,11,15),2,1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), couppcd( new Date(2007,0,25), new Date(2008,10,15), 2, 1 ) );
+
+    } )
+
+    test( "Test: \"PRICE\"", function () {
+
+        oParser = new parserFormula( "PRICE(DATE(2008,2,15),DATE(2017,11,15),0.0575,0.065,100,2,0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), _getprice( new Date( 2008, 1, 15 ), new Date( 2017, 10, 15 ), 0.0575, 0.065, 100, 2, 0 ) );
+
+    } )
+
+    test( "Test: \"PRICEDISC\"", function () {
+
+        function pricedisc(settl, matur, discount, redemption, basis){
+            return redemption * ( 1.0 - discount * _getdiffdate( settl, matur, basis ) );
+        }
+
+        oParser = new parserFormula( "PRICEDISC(DATE(2008,2,16),DATE(2008,3,1),0.0525,100,2)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), pricedisc( new Date(2008,1,16), new Date(2008,2,1),0.0525,100,2 ) );
+
+    } )
+
+    test( "Test: \"PRICEMAT\"", function () {
+
+        function pricemat( settl, matur, iss, rate, yld, basis ) {
+
+            var fIssMat = yearFrac( new Date(iss), new Date(matur), basis );
+            var fIssSet = yearFrac( new Date(iss), new Date(settl), basis );
+            var fSetMat = yearFrac( new Date(settl), new Date(matur), basis );
+
+            var res = 1.0 + fIssMat * rate;
+            res /= 1.0 + fSetMat * yld;
+            res -= fIssSet * rate;
+            res *= 100.0;
+
+            return res;
+        }
+
+        oParser = new parserFormula( "PRICEMAT(DATE(2008,2,15),DATE(2008,4,13),DATE(2007,11,11),0.061,0.061,0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), pricemat( new Date(2008,1,15),new Date(2008,3,13),new Date(2007,10,11),0.061,0.061,0 ) );
+
+    } )
+
+    test( "Test: \"YIELD\"", function () {
+
+        oParser = new parserFormula( "YIELD(DATE(2008,2,15),DATE(2016,11,15),0.0575,95.04287,100,2,0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), _getYield( new Date(2008,1,15), new Date(2016,10,15),0.0575,95.04287,100,2,0 ) );
+
+    } )
+
+    test( "Test: \"YIELDDISC\"", function () {
+
+        function yielddisc( settlement, maturity, pr, redemption, basis ){
+
+            var fRet = ( redemption / pr ) - 1.0;
+            fRet /= _yearFrac( settlement, maturity, basis );
+            return fRet;
+
+        }
+
+        oParser = new parserFormula( "YIELDDISC(DATE(2008,2,16),DATE(2008,3,1),99.795,100,2)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), yielddisc( new Date( 2008, 1, 16 ), new Date( 2008, 2, 1 ), 99.795, 100, 2 ) );
+
+    } )
+
+
+    test( "Test: \"YIELDMAT\"", function () {
+
+        oParser = new parserFormula( "YIELDMAT(DATE(2008,3,15),DATE(2008,11,3),DATE(2007,11,8),0.0625,100.0123,0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), _getyieldmat( new Date( 2008, 2, 15 ), new Date( 2008, 10, 3 ), new Date( 2007, 10, 8 ), 0.0625, 100.0123, 0 ) );
+
+    } )
+
 
 } );
