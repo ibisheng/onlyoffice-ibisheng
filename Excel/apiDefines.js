@@ -143,17 +143,18 @@ var c_oAscDeleteOptions = {
 };
 
 var c_oAscFormatOptions = {
-	General:    'General',
-	Number:     '0.00',
-	Currency:   '$#,##0.00',
-	Accounting: '_($* #,##0.00_);_($* (#,##0.00);_($* "-"??_);_(@_)',
-	DateShort:  'm/d/yyyy',
-	DateLong:   '[$-F800]dddd, mmmm dd, yyyy',
-	Time:       '[$-F400]h:mm:ss AM/PM',
-	Percentage: '0%',
-	Fraction:   '# ?/?',
-	Scientific: '0.00E+00',
-	Text:       '@'
+	General		: 'General',
+	Number		: '0.00',
+	Currency	: '$#,##0.00',
+	Accounting	: '_($* #,##0.00_);_($* (#,##0.00);_($* "-"??_);_(@_)',
+	DateShort	: 'm/d/yyyy',
+	DateLong	: '[$-F800]dddd, mmmm dd, yyyy',
+	Time		: '[$-F400]h:mm:ss AM/PM',
+	Percentage	: '0%',
+	PercentageF	: '0.00%',
+	Fraction	: '# ?/?',
+	Scientific	: '0.00E+00',
+	Text		: '@'
 };
 
 var c_oAscBorderOptions = {
