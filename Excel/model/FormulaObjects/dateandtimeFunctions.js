@@ -9,6 +9,9 @@
  */
 
 function yearFrac(d1, d2, mode) {
+    d1.truncate();
+    d2.truncate();
+
     var date1 = d1.getDate(),
         month1 = d1.getMonth()+1,
         year1 = d1.getFullYear(),

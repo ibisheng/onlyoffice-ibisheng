@@ -63,6 +63,10 @@ Date.prototype.getDaysInMonth.R = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 3
 // durations of months for the leap year
 Date.prototype.getDaysInMonth.L = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
+Date.prototype.truncate = function() {
+    this.setHours(0,0,0,0);
+}
+
 Date.prototype.getExcelDate = function () {
     return Math.floor( ( this.getTime() / 1000 - this.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (g_bDate1904 ? 0 : 1) ) )
 }
@@ -127,9 +131,15 @@ Math.fact = function ( n ) {
     return res;
 }
 
-Math.ln = function ( x ) {
-    return Math.log( x ) / Math.log( Math.E );
+Math.ln = Math.log;
+
+Math.log10 = function( x ){
+    return Math.log( x ) / Math.log( 10 );
 }
+
+Math.fmod = function (a,b) {
+    return Number( (a - (Math.floor( a / b ) * b)).toPrecision( cExcelSignificantDigits ) );
+};
 
 Math.binomCoeff = function ( n, k ) {
     return this.fact( n ) / (this.fact( k ) * this.fact( n - k ));

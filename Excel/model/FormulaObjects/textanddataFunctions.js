@@ -308,7 +308,7 @@ cDOLLAR.prototype.Calculate = function ( arg ) {
         if ( quotient == 0 ) {
             return 0;
         }
-        var nolpiat = 5 * sign( quotient ) * Math.pow( 10, Math.floor( Math.log( Math.abs( quotient ) ) / Math.log( 10 ) ) - cExcelSignificantDigits );
+        var nolpiat = 5 * sign( quotient ) * Math.pow( 10, Math.floor( Math.log10( Math.abs( quotient ) ) ) - cExcelSignificantDigits );
         return truncate( quotient + nolpiat ) * significance;
     }
 
@@ -652,7 +652,7 @@ cFIXED.prototype.Calculate = function ( arg ) {
         if ( quotient == 0 ) {
             return 0;
         }
-        var nolpiat = 5 * sign( quotient ) * Math.pow( 10, Math.floor( Math.log( Math.abs( quotient ) ) / Math.log( 10 ) ) - cExcelSignificantDigits );
+        var nolpiat = 5 * sign( quotient ) * Math.pow( 10, Math.floor( Math.log10( Math.abs( quotient ) ) ) - cExcelSignificantDigits );
         return truncate( quotient + nolpiat ) * significance;
     }
 

@@ -228,6 +228,33 @@ function getyieldmat( nSettle, nMat, nIssue, fRate, fPrice, nBase ){
     return y;
 }
 
+function getduration( settlement, maturity, coupon, yld, frequency, basis ){
+
+    var yearfrac = yearFrac( new Date( settlement ), new Date( maturity ), basis ).getValue();
+    var numOfCoups = getcoupnum( new Date( settlement ), new Date( maturity ), frequency );
+    var duration = 0, f100 = 100;
+    coupon *= f100 / frequency;	// fCoup is used as cash flow
+    yld /= frequency;
+    yld += 1;
+
+    var nDiff = yearfrac * frequency - numOfCoups;
+
+    var t, p = 0;
+
+    for ( t = 1; t < numOfCoups; t++ ) {
+        duration += ( t + nDiff ) * ( coupon ) / Math.pow( yld, t + nDiff );
+        p += coupon / Math.pow( yld, t + nDiff );
+    }
+
+    duration += ( numOfCoups + nDiff ) * ( coupon + f100 ) / Math.pow( yld, numOfCoups + nDiff );
+    p += ( coupon + f100 ) / Math.pow( yld, numOfCoups + nDiff );
+
+    duration /= p;
+    duration /= frequency;
+
+    return duration;
+}
+
 /**
  * Created with JetBrains WebStorm.
  * User: Dmitry.Shahtanov
@@ -1684,7 +1711,7 @@ cDOLLARDE.prototype.Calculate = function ( arg ) {
 
     res /= fraction;
 
-    res *= Math.pow( 10, Math.ceil( Math.log( fraction ) / Math.log( 10 ) ) );
+    res *= Math.pow( 10, Math.ceil( Math.log10( fraction ) ) );
 
     res += fInt;
 
@@ -1751,7 +1778,7 @@ cDOLLARFR.prototype.Calculate = function ( arg ) {
 
     res *= fraction;
 
-    res *= Math.pow( 10.0, -Math.ceil( Math.log( fraction ) / Math.log( 10 ) ) );
+    res *= Math.pow( 10, -Math.ceil( Math.log10( fraction ) ) );
 
     res += fInt;
 
@@ -1782,117 +1809,95 @@ function cDURATION() {
 
 }
 cDURATION.prototype = Object.create( cBaseFunction.prototype )
-/*cDURATION.prototype.Calculate = function ( arg ) {
- var settlement = arg[0],
- maturity = arg[1],
- coupon = arg[2],
- yld = arg[3],
- frequency = arg[4],
- basis = arg[5] && !(arg[5] instanceof cEmpty) ? arg[5] : new cNumber(0 );
+cDURATION.prototype.Calculate = function ( arg ) {
+    var settlement = arg[0],
+        maturity = arg[1],
+        coupon = arg[2],
+        yld = arg[3],
+        frequency = arg[4],
+        basis = arg[5] && !(arg[5] instanceof cEmpty) ? arg[5] : new cNumber( 0 );
 
- if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
- settlement = settlement.cross( arguments[1].first );
- }
- else if ( settlement instanceof cArray ) {
- settlement = settlement.getElementRowCol( 0, 0 );
- }
+    if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
+        settlement = settlement.cross( arguments[1].first );
+    }
+    else if ( settlement instanceof cArray ) {
+        settlement = settlement.getElementRowCol( 0, 0 );
+    }
 
- if ( maturity instanceof cArea || maturity instanceof cArea3D ) {
- maturity = maturity.cross( arguments[1].first );
- }
- else if ( maturity instanceof cArray ) {
- maturity = maturity.getElementRowCol( 0, 0 );
- }
+    if ( maturity instanceof cArea || maturity instanceof cArea3D ) {
+        maturity = maturity.cross( arguments[1].first );
+    }
+    else if ( maturity instanceof cArray ) {
+        maturity = maturity.getElementRowCol( 0, 0 );
+    }
 
- if ( coupon instanceof cArea || coupon instanceof cArea3D ) {
- coupon = coupon.cross( arguments[1].first );
- }
- else if ( coupon instanceof cArray ) {
- coupon = coupon.getElementRowCol( 0, 0 );
- }
+    if ( coupon instanceof cArea || coupon instanceof cArea3D ) {
+        coupon = coupon.cross( arguments[1].first );
+    }
+    else if ( coupon instanceof cArray ) {
+        coupon = coupon.getElementRowCol( 0, 0 );
+    }
 
- if ( yld instanceof cArea || yld instanceof cArea3D ) {
- yld = yld.cross( arguments[1].first );
- }
- else if ( yld instanceof cArray ) {
- yld = yld.getElementRowCol( 0, 0 );
- }
+    if ( yld instanceof cArea || yld instanceof cArea3D ) {
+        yld = yld.cross( arguments[1].first );
+    }
+    else if ( yld instanceof cArray ) {
+        yld = yld.getElementRowCol( 0, 0 );
+    }
 
- if ( frequency instanceof cArea || frequency instanceof cArea3D ) {
- frequency = frequency.cross( arguments[1].first );
- }
- else if ( frequency instanceof cArray ) {
- frequency = frequency.getElementRowCol( 0, 0 );
- }
+    if ( frequency instanceof cArea || frequency instanceof cArea3D ) {
+        frequency = frequency.cross( arguments[1].first );
+    }
+    else if ( frequency instanceof cArray ) {
+        frequency = frequency.getElementRowCol( 0, 0 );
+    }
 
- if ( basis instanceof cArea || basis instanceof cArea3D ) {
- basis = basis.cross( arguments[1].first );
- }
- else if ( basis instanceof cArray ) {
- basis = basis.getElementRowCol( 0, 0 );
- }
+    if ( basis instanceof cArea || basis instanceof cArea3D ) {
+        basis = basis.cross( arguments[1].first );
+    }
+    else if ( basis instanceof cArray ) {
+        basis = basis.getElementRowCol( 0, 0 );
+    }
 
- settlement = settlement.tocNumber();
- maturity = maturity.tocNumber();
- coupon = coupon.tocNumber();
- yld = yld.tocNumber();
- frequency = frequency.tocNumber();
- basis = basis.tocNumber();
+    settlement = settlement.tocNumber();
+    maturity = maturity.tocNumber();
+    coupon = coupon.tocNumber();
+    yld = yld.tocNumber();
+    frequency = frequency.tocNumber();
+    basis = basis.tocNumber();
 
- if ( settlement instanceof cError ) return this.value = settlement;
- if ( maturity instanceof cError ) return this.value = maturity;
- if ( coupon instanceof cError ) return this.value = coupon;
- if ( yld instanceof cError ) return this.value = yld;
- if ( frequency instanceof cError ) return this.value = frequency;
- if ( basis instanceof cError ) return this.value = basis;
+    if ( settlement instanceof cError ) return this.value = settlement;
+    if ( maturity instanceof cError ) return this.value = maturity;
+    if ( coupon instanceof cError ) return this.value = coupon;
+    if ( yld instanceof cError ) return this.value = yld;
+    if ( frequency instanceof cError ) return this.value = frequency;
+    if ( basis instanceof cError ) return this.value = basis;
 
- if( settlement.getValue() >= maturity.getValue() ||
- basis.getValue() < 0 || basis.getValue() > 4 ||
- ( frequency.getValue() != 1 && frequency.getValue() != 2 && frequency.getValue() != 4 ) ||
- yld.getValue() < 0 || coupon.getValue < 0 )
- return this.value = new cError( cErrorType.not_numeric );
+    if ( settlement.getValue() >= maturity.getValue() ||
+        basis.getValue() < 0 || basis.getValue() > 4 ||
+        ( frequency.getValue() != 1 && frequency.getValue() != 2 && frequency.getValue() != 4 ) ||
+        yld.getValue() < 0 || coupon.getValue < 0 )
+        return this.value = new cError( cErrorType.not_numeric );
 
- settlement = settlement.getValue();
- maturity = maturity.getValue();
- coupon = coupon.getValue();
- yld = yld.getValue();
- frequency = frequency.getValue();
- basis = basis.getValue();
+    settlement = settlement.getValue();
+    maturity = maturity.getValue();
+    coupon = coupon.getValue();
+    yld = yld.getValue();
+    frequency = frequency.getValue();
+    basis = basis.getValue();
 
- var settl = Date.prototype.getDateFromExcel( settlement ),
- matur = Date.prototype.getDateFromExcel( maturity );
+    var settl = Date.prototype.getDateFromExcel( settlement ),
+        matur = Date.prototype.getDateFromExcel( maturity );
 
- var fYearfrac = yearFrac( settl, matur, basis ).getValue();
- //    var fYearfrac = diffDate2( settl, matur, basis ).getValue();
- var fNumOfCoups = getcoupnum( settl, matur, frequency, basis );
- var fDur = 0,	f100 = 100;
- coupon = coupon * f100 / frequency;	// fCoup is used as cash flow
- yld = yld / frequency + 1;
+    return this.value = new cNumber( getduration( settl, matur, coupon, yld, frequency, basis ) );
 
- var nDiff = Math.round(fYearfrac * frequency - fNumOfCoups);
-
- var t,p = 0;
-
- for( t = 1 ; t < fNumOfCoups ; t++ ){
- fDur += ( t + nDiff ) * ( coupon ) / Math.pow( yld, t + nDiff );
- p += coupon / Math.pow( yld, t + nDiff );
- }
-
- fDur += ( fNumOfCoups + nDiff ) * ( coupon + f100 ) / Math.pow( yld, fNumOfCoups + nDiff );
- p += ( coupon + f100 ) / Math.pow( yld, fNumOfCoups + nDiff );
-
- fDur /= p;
- fDur /= frequency;
-
- return this.value = new cNumber( fDur );
-
- }
- cDURATION.prototype.getInfo = function () {
- return {
- name:this.name,
- args:"( settlement , maturity , coupon , yld , frequency [ , [ basis ] ] )"
- };
- }*/
+}
+cDURATION.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( settlement , maturity , coupon , yld , frequency [ , [ basis ] ] )"
+    };
+}
 
 function cEFFECT() {
 //    cBaseFunction.call( this, "EFFECT" );
@@ -2368,9 +2373,115 @@ cISPMT.prototype.getInfo = function () {
 }
 
 function cMDURATION() {
-    cBaseFunction.call( this, "MDURATION" );
+//    cBaseFunction.call( this, "MDURATION" );
+
+    this.name = "MDURATION";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 5;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 6;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cMDURATION.prototype = Object.create( cBaseFunction.prototype )
+cMDURATION.prototype.Calculate = function ( arg ) {
+    var settlement = arg[0],
+        maturity = arg[1],
+        coupon = arg[2],
+        yld = arg[3],
+        frequency = arg[4],
+        basis = arg[5] && !(arg[5] instanceof cEmpty) ? arg[5] : new cNumber( 0 );
+
+    if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
+        settlement = settlement.cross( arguments[1].first );
+    }
+    else if ( settlement instanceof cArray ) {
+        settlement = settlement.getElementRowCol( 0, 0 );
+    }
+
+    if ( maturity instanceof cArea || maturity instanceof cArea3D ) {
+        maturity = maturity.cross( arguments[1].first );
+    }
+    else if ( maturity instanceof cArray ) {
+        maturity = maturity.getElementRowCol( 0, 0 );
+    }
+
+    if ( coupon instanceof cArea || coupon instanceof cArea3D ) {
+        coupon = coupon.cross( arguments[1].first );
+    }
+    else if ( coupon instanceof cArray ) {
+        coupon = coupon.getElementRowCol( 0, 0 );
+    }
+
+    if ( yld instanceof cArea || yld instanceof cArea3D ) {
+        yld = yld.cross( arguments[1].first );
+    }
+    else if ( yld instanceof cArray ) {
+        yld = yld.getElementRowCol( 0, 0 );
+    }
+
+    if ( frequency instanceof cArea || frequency instanceof cArea3D ) {
+        frequency = frequency.cross( arguments[1].first );
+    }
+    else if ( frequency instanceof cArray ) {
+        frequency = frequency.getElementRowCol( 0, 0 );
+    }
+
+    if ( basis instanceof cArea || basis instanceof cArea3D ) {
+        basis = basis.cross( arguments[1].first );
+    }
+    else if ( basis instanceof cArray ) {
+        basis = basis.getElementRowCol( 0, 0 );
+    }
+
+    settlement = settlement.tocNumber();
+    maturity = maturity.tocNumber();
+    coupon = coupon.tocNumber();
+    yld = yld.tocNumber();
+    frequency = frequency.tocNumber();
+    basis = basis.tocNumber();
+
+    if ( settlement instanceof cError ) return this.value = settlement;
+    if ( maturity instanceof cError ) return this.value = maturity;
+    if ( coupon instanceof cError ) return this.value = coupon;
+    if ( yld instanceof cError ) return this.value = yld;
+    if ( frequency instanceof cError ) return this.value = frequency;
+    if ( basis instanceof cError ) return this.value = basis;
+
+    if ( settlement.getValue() >= maturity.getValue() ||
+        basis.getValue() < 0 || basis.getValue() > 4 ||
+        ( frequency.getValue() != 1 && frequency.getValue() != 2 && frequency.getValue() != 4 ) ||
+        yld.getValue() < 0 || coupon.getValue < 0 )
+        return this.value = new cError( cErrorType.not_numeric );
+
+    settlement = settlement.getValue();
+    maturity = maturity.getValue();
+    coupon = coupon.getValue();
+    yld = yld.getValue();
+    frequency = frequency.getValue();
+    basis = basis.getValue();
+
+    var settl = Date.prototype.getDateFromExcel( settlement ),
+        matur = Date.prototype.getDateFromExcel( maturity );
+
+    var duration = getduration( settl, matur, coupon, yld, frequency, basis );
+
+    duration /= 1 + yld/frequency;
+
+    return this.value = new cNumber( duration );
+
+}
+cMDURATION.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( settlement , maturity , coupon , yld , frequency [ , [ basis ] ] )"
+    };
+}
 
 function cMIRR() {
     cBaseFunction.call( this, "MIRR" );
@@ -2625,14 +2736,283 @@ function cODDFYIELD() {
 cODDFYIELD.prototype = Object.create( cBaseFunction.prototype )
 
 function cODDLPRICE() {
-    cBaseFunction.call( this, "ODDLPRICE" );
+//    cBaseFunction.call( this, "ODDLPRICE" );
+
+    this.name = "ODDLPRICE";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 7;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 8;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cODDLPRICE.prototype = Object.create( cBaseFunction.prototype )
+cODDLPRICE.prototype.Calculate = function ( arg ) {
+    var settlement = arg[0],
+        maturity = arg[1],
+        last_interest = arg[2],
+        rate = arg[3],
+        yld = arg[4],
+        redemption = arg[5],
+        frequency = arg[6],
+        basis = arg[7] && !(arg[7] instanceof cEmpty) ? arg[7] : new cNumber( 0 );
+
+    if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
+        settlement = settlement.cross( arguments[1].first );
+    }
+    else if ( settlement instanceof cArray ) {
+        settlement = settlement.getElementRowCol( 0, 0 );
+    }
+
+    if ( maturity instanceof cArea || maturity instanceof cArea3D ) {
+        maturity = maturity.cross( arguments[1].first );
+    }
+    else if ( maturity instanceof cArray ) {
+        maturity = maturity.getElementRowCol( 0, 0 );
+    }
+
+    if ( last_interest instanceof cArea || last_interest instanceof cArea3D ) {
+        last_interest = last_interest.cross( arguments[1].first );
+    }
+    else if ( last_interest instanceof cArray ) {
+        last_interest = last_interest.getElementRowCol( 0, 0 );
+    }
+
+    if ( rate instanceof cArea || rate instanceof cArea3D ) {
+        rate = rate.cross( arguments[1].first );
+    }
+    else if ( rate instanceof cArray ) {
+        rate = rate.getElementRowCol( 0, 0 );
+    }
+
+    if ( yld instanceof cArea || yld instanceof cArea3D ) {
+        yld = yld.cross( arguments[1].first );
+    }
+    else if ( yld instanceof cArray ) {
+        yld = yld.getElementRowCol( 0, 0 );
+    }
+
+    if ( redemption instanceof cArea || redemption instanceof cArea3D ) {
+        redemption = redemption.cross( arguments[1].first );
+    }
+    else if ( redemption instanceof cArray ) {
+        redemption = redemption.getElementRowCol( 0, 0 );
+    }
+
+    if ( frequency instanceof cArea || frequency instanceof cArea3D ) {
+        frequency = frequency.cross( arguments[1].first );
+    }
+    else if ( frequency instanceof cArray ) {
+        frequency = frequency.getElementRowCol( 0, 0 );
+    }
+
+    if ( basis instanceof cArea || basis instanceof cArea3D ) {
+        basis = basis.cross( arguments[1].first );
+    }
+    else if ( basis instanceof cArray ) {
+        basis = basis.getElementRowCol( 0, 0 );
+    }
+
+    settlement = settlement.tocNumber();
+    maturity = maturity.tocNumber();
+    last_interest = last_interest.tocNumber();
+    rate = rate.tocNumber();
+    yld = yld.tocNumber();
+    redemption = redemption.tocNumber();
+    frequency = frequency.tocNumber();
+    basis = basis.tocNumber();
+
+    if ( settlement instanceof cError ) return this.value = settlement;
+    if ( maturity instanceof cError ) return this.value = maturity;
+    if ( last_interest instanceof cError ) return this.value = last_interest;
+    if ( rate instanceof cError ) return this.value = rate;
+    if ( yld instanceof cError ) return this.value = yld;
+    if ( redemption instanceof cError ) return this.value = redemption;
+    if ( frequency instanceof cError ) return this.value = frequency;
+    if ( basis instanceof cError ) return this.value = basis;
+
+    settlement = settlement.getValue();
+    maturity = maturity.getValue();
+    last_interest = last_interest.getValue();
+    rate = rate.getValue();
+    yld = yld.getValue();
+    redemption = redemption.getValue();
+    frequency = frequency.getValue();
+    basis = basis.getValue();
+
+    if ( settlement >= maturity || maturity <= last_interest ||
+        basis < 0 || basis > 4 ||
+        yld < 0 || rate < 0 ||
+        frequency != 1 && frequency != 2 && frequency != 4 )
+        return this.value = new cError( cErrorType.not_numeric );
+
+    var settl = Date.prototype.getDateFromExcel( settlement ),
+        matur = Date.prototype.getDateFromExcel( maturity ),
+        lastInt = Date.prototype.getDateFromExcel( last_interest );
+
+    var fDCi = yearFrac( lastInt, matur, basis ) * frequency;
+    var fDSCi = yearFrac( settl, matur, basis ) * frequency;
+    var fAi = yearFrac( lastInt, settl, basis ) * frequency;
+
+    var res = redemption + fDCi * 100.0 * rate / frequency;
+    res /= fDSCi * yld / frequency + 1.0;
+    res -= fAi * 100.0 * rate / frequency;
+
+    this.value = new cNumber( res );
+    return this.value;
+
+}
+cODDLPRICE.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( settlement , maturity , last-interest , rate , yld , redemption , frequency [ , [ basis ] ] )"
+    };
+}
 
 function cODDLYIELD() {
-    cBaseFunction.call( this, "ODDLYIELD" );
+//    cBaseFunction.call( this, "ODDLYIELD" );
+
+    this.name = "ODDLYIELD";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 7;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 8;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cODDLYIELD.prototype = Object.create( cBaseFunction.prototype )
+cODDLYIELD.prototype.Calculate = function ( arg ) {
+    var settlement = arg[0],
+        maturity = arg[1],
+        last_interest = arg[2],
+        rate = arg[3],
+        pr = arg[4],
+        redemption = arg[5],
+        frequency = arg[6],
+        basis = arg[7] && !(arg[7] instanceof cEmpty) ? arg[7] : new cNumber( 0 );
+
+    if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
+        settlement = settlement.cross( arguments[1].first );
+    }
+    else if ( settlement instanceof cArray ) {
+        settlement = settlement.getElementRowCol( 0, 0 );
+    }
+
+    if ( maturity instanceof cArea || maturity instanceof cArea3D ) {
+        maturity = maturity.cross( arguments[1].first );
+    }
+    else if ( maturity instanceof cArray ) {
+        maturity = maturity.getElementRowCol( 0, 0 );
+    }
+
+    if ( last_interest instanceof cArea || last_interest instanceof cArea3D ) {
+        last_interest = last_interest.cross( arguments[1].first );
+    }
+    else if ( last_interest instanceof cArray ) {
+        last_interest = last_interest.getElementRowCol( 0, 0 );
+    }
+
+    if ( rate instanceof cArea || rate instanceof cArea3D ) {
+        rate = rate.cross( arguments[1].first );
+    }
+    else if ( rate instanceof cArray ) {
+        rate = rate.getElementRowCol( 0, 0 );
+    }
+
+    if ( pr instanceof cArea || pr instanceof cArea3D ) {
+        pr = pr.cross( arguments[1].first );
+    }
+    else if ( pr instanceof cArray ) {
+        pr = pr.getElementRowCol( 0, 0 );
+    }
+
+    if ( redemption instanceof cArea || redemption instanceof cArea3D ) {
+        redemption = redemption.cross( arguments[1].first );
+    }
+    else if ( redemption instanceof cArray ) {
+        redemption = redemption.getElementRowCol( 0, 0 );
+    }
+
+    if ( frequency instanceof cArea || frequency instanceof cArea3D ) {
+        frequency = frequency.cross( arguments[1].first );
+    }
+    else if ( frequency instanceof cArray ) {
+        frequency = frequency.getElementRowCol( 0, 0 );
+    }
+
+    if ( basis instanceof cArea || basis instanceof cArea3D ) {
+        basis = basis.cross( arguments[1].first );
+    }
+    else if ( basis instanceof cArray ) {
+        basis = basis.getElementRowCol( 0, 0 );
+    }
+
+    settlement = settlement.tocNumber();
+    maturity = maturity.tocNumber();
+    last_interest = last_interest.tocNumber();
+    rate = rate.tocNumber();
+    pr = pr.tocNumber();
+    redemption = redemption.tocNumber();
+    frequency = frequency.tocNumber();
+    basis = basis.tocNumber();
+
+    if ( settlement instanceof cError ) return this.value = settlement;
+    if ( maturity instanceof cError ) return this.value = maturity;
+    if ( last_interest instanceof cError ) return this.value = last_interest;
+    if ( rate instanceof cError ) return this.value = rate;
+    if ( pr instanceof cError ) return this.value = pr;
+    if ( redemption instanceof cError ) return this.value = redemption;
+    if ( frequency instanceof cError ) return this.value = frequency;
+    if ( basis instanceof cError ) return this.value = basis;
+
+    settlement = settlement.getValue();
+    maturity = maturity.getValue();
+    last_interest = last_interest.getValue();
+    rate = rate.getValue();
+    pr = pr.getValue();
+    redemption = redemption.getValue();
+    frequency = frequency.getValue();
+    basis = basis.getValue();
+
+    if ( settlement >= maturity || maturity <= last_interest ||
+        basis < 0 || basis > 4 ||
+        pr < 0 || rate < 0 ||
+        frequency != 1 && frequency != 2 && frequency != 4 )
+        return this.value = new cError( cErrorType.not_numeric );
+
+    var settl = Date.prototype.getDateFromExcel( settlement ),
+        matur = Date.prototype.getDateFromExcel( maturity ),
+        lastInt = Date.prototype.getDateFromExcel( last_interest );
+
+    var fDCi = yearFrac( lastInt, matur, basis ) * frequency;
+    var fDSCi = yearFrac( settl, matur, basis ) * frequency;
+    var fAi = yearFrac( lastInt, settl, basis ) * frequency;
+
+    var res = redemption + fDCi * 100.0 * rate / frequency;
+    res /= pr + fAi * 100.0 * rate / frequency;
+    res--;
+    res *= frequency / fDSCi;
+
+    this.value = new cNumber( res );
+    return this.value;
+
+}
+cODDLYIELD.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( settlement , maturity , last-interest , rate , pr , redemption , frequency [ , [ basis ] ] )"
+    };
+}
 
 function cPMT() {
 //    cBaseFunction.call( this, "PMT" );

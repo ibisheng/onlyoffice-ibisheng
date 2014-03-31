@@ -568,7 +568,7 @@ cCEILING.prototype.Calculate = function ( arg ) {
             }
             var quotientTr = Math.floor( quotient );
 
-            var nolpiat = 5 * ( quotient < 0 ? -1.0 : quotient > 0 ? 1.0 : 0.0 ) * Math.pow( 10, Math.floor( Math.log( Math.abs( quotient ) ) / Math.log( 10 ) ) - cExcelSignificantDigits );
+            var nolpiat = 5 * ( quotient < 0 ? -1.0 : quotient > 0 ? 1.0 : 0.0 ) * Math.pow( 10, Math.floor( Math.log10( Math.abs( quotient ) ) ) - cExcelSignificantDigits );
 
             if ( Math.abs( quotient - quotientTr ) > nolpiat ) {
                 ++quotientTr;
@@ -1182,7 +1182,7 @@ cFLOOR.prototype.Calculate = function ( arg ) {
                 return new cNumber( 0.0 );
             }
 
-            var nolpiat = 5 * ( quotient < 0 ? -1.0 : quotient > 0 ? 1.0 : 0.0 ) * Math.pow( 10, Math.floor( Math.log( Math.abs( quotient ) ) / Math.log( 10 ) ) - cExcelSignificantDigits );
+            var nolpiat = 5 * ( quotient < 0 ? -1.0 : quotient > 0 ? 1.0 : 0.0 ) * Math.pow( 10, Math.floor( Math.log10( Math.abs( quotient ) ) ) - cExcelSignificantDigits );
 
             return new cNumber( Math.floor( quotient + nolpiat ) * significance );
         }
@@ -1698,7 +1698,7 @@ cLOG10.prototype.Calculate = function ( arg ) {
                 if ( elem.getValue() <= 0 )
                     this.array[r][c] = new cError( cErrorType.not_numeric );
                 else
-                    this.array[r][c] = new cNumber( Math.log( elem.getValue() ) / Math.log( 10 ) );
+                    this.array[r][c] = new cNumber( Math.log10( elem.getValue() ) );
             }
             else {
                 this.array[r][c] = new cError( cErrorType.wrong_value_type );
@@ -1709,7 +1709,7 @@ cLOG10.prototype.Calculate = function ( arg ) {
         if ( arg0.getValue() <= 0 )
             return this.value = new cError( cErrorType.not_numeric );
         else
-            return this.value = new cNumber( Math.log( arg0.getValue() ) / Math.log( 10 ) );
+            return this.value = new cNumber( Math.log10( arg0.getValue() ) );
     }
 }
 cLOG10.prototype.getInfo = function () {
@@ -2146,14 +2146,14 @@ cMROUND.prototype.Calculate = function ( arg ) {
     var multiple;
 
     function mroundHelper( num ) {
-        var multiplier = Math.pow( 10, Math.floor( Math.log( Math.abs( num ) ) / Math.log( 10 ) ) - cExcelSignificantDigits + 1 );
+        var multiplier = Math.pow( 10, Math.floor( Math.log10( Math.abs( num ) ) ) - cExcelSignificantDigits + 1 );
         var nolpiat = 0.5 * (num > 0 ? 1 : num < 0 ? -1 : 0) * multiplier;
         var y = (num + nolpiat) / multiplier;
         y = y / Math.abs( y ) * Math.floor( Math.abs( y ) )
         var x = y * multiplier / multiple
 
         // var x = number / multiple;
-        var nolpiat = 5 * (x / Math.abs( x )) * Math.pow( 10, Math.floor( Math.log( Math.abs( x ) ) / Math.log( 10 ) ) - cExcelSignificantDigits );
+        var nolpiat = 5 * (x / Math.abs( x )) * Math.pow( 10, Math.floor( Math.log10( Math.abs( x ) ) ) - cExcelSignificantDigits );
         x = x + nolpiat;
         x = x | x;
 
@@ -3002,7 +3002,7 @@ cROUND.prototype.Calculate = function ( arg ) {
         if ( quotient == 0 ) {
             return 0;
         }
-        var nolpiat = 5 * sign( quotient ) * Math.pow( 10, Math.floor( Math.log( Math.abs( quotient ) ) / Math.log( 10 ) ) - cExcelSignificantDigits );
+        var nolpiat = 5 * sign( quotient ) * Math.pow( 10, Math.floor( Math.log10( Math.abs( quotient ) ) ) - cExcelSignificantDigits );
         return truncate( quotient + nolpiat ) * significance;
     }
 
