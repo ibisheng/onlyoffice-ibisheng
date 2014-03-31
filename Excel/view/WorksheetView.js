@@ -469,8 +469,8 @@
 			return this.visibleRange.r2;
 		};
 
-		WorksheetView.prototype.getHorizontalScrollRange = function () {
-			var ctxW = this.drawingCtx.getWidth() - this.cellsLeft;
+		WorksheetView.prototype.getHorizontalScrollRange = function (scrollWidth) {
+			var ctxW = this.drawingCtx.getWidth() - this.cellsLeft - scrollWidth;
 			for (var w = 0, i = this.cols.length - 1; i >= 0; --i) {
 				w += this.cols[i].width;
 				if (w > ctxW) {break;}
@@ -478,8 +478,8 @@
 			return i; // Диапазон скрола должен быть меньше количества столбцов, чтобы не было прибавления столбцов при перетаскивании бегунка
 		};
 
-		WorksheetView.prototype.getVerticalScrollRange = function () {
-			var ctxH = this.drawingCtx.getHeight() - this.cellsTop;
+		WorksheetView.prototype.getVerticalScrollRange = function (scrollHeight) {
+			var ctxH = this.drawingCtx.getHeight() - this.cellsTop - scrollHeight;
 			for (var h = 0, i = this.rows.length - 1; i >= 0; --i) {
 				h += this.rows[i].height;
 				if (h > ctxH) {break;}
@@ -1174,6 +1174,11 @@
 			var sr = this.stringRender;
 			var tm = this._roundTextMetrics(sr.measureString("A"));
 			this.headersHeightByFont = tm.height;
+
+			// Инициализируем число колонок и строк (при открытии). Причем нужно поставить на 1 больше,
+			// чтобы могли показать последнюю строку/столбец (http://bugzserver/show_bug.cgi?id=23513)
+			this.nColsCount = Math.min(this.model.getColsCount() + 1, gc_nMaxCol);
+			this.nRowsCount = Math.min(this.model.getRowsCount() + 1, gc_nMaxRow);
 		};
 
 		WorksheetView.prototype._initConstValues = function () {
@@ -1353,7 +1358,7 @@
 			var y = this.cellsTop;
 			var visibleH = this.drawingCtx.getHeight();
 			var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
-			var l = Math.max(this.model.getRowsCount() , this.nRowsCount, obr.maxRow);
+			var l = Math.max(this.model.getRowsCount(), this.nRowsCount, obr.maxRow);
 			var defaultH = this.model.getDefaultHeight() || this.defaultRowHeight;
 			var i = 0, h, hR, isCustomHeight, row, hiddenH = 0;
 

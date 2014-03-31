@@ -490,8 +490,10 @@
 
 		WorkbookView.prototype._onScrollReinitialize = function (whichSB, callback) {
 			var ws = this.getWorksheet(),
-			    vsize = !whichSB || whichSB === 1 ? ws.getVerticalScrollRange() : undefined,
-			    hsize = !whichSB || whichSB === 2 ? ws.getHorizontalScrollRange() : undefined;
+			    vsize = !whichSB || whichSB === 1 ?
+					ws.getVerticalScrollRange(this.Api.isMobileVersion ? 0 : this.defaults.scroll.heightPx) : undefined,
+			    hsize = !whichSB || whichSB === 2 ?
+					ws.getHorizontalScrollRange(this.Api.isMobileVersion ? 0 : this.defaults.scroll.widthPx) : undefined;
 
             if( vsize != undefined )
                 this.m_dScrollY_max = Math.max(this.controller.settings.vscrollStep * (vsize + 1), 1);
