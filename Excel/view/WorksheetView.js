@@ -159,8 +159,6 @@
 
 		var kNewLine = "\n";
 
-		var klockNameFrozenPane = "frozenPane";
-
 		function calcDecades(num) {
 			return Math.abs(num) < 10 ? 1 : 1 + calcDecades( asc_floor(num * 0.1) );
 		}
@@ -2978,20 +2976,42 @@
 
 		/** Рисует закрепление областей */
 		WorksheetView.prototype._drawFrozenPaneLines = function (canvas) {
+			// Возможно стоит отрисовывать на overlay, а не на основной канве
+			var ctx = canvas ? canvas : this.drawingCtx;
+			var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null,
+				this.model.getId(), c_oAscLockNameFrozenPane);
+			var isLocked = this.collaborativeEditing.getLockIntersection(lockInfo,
+				c_oAscLockTypes.kLockTypeOther, false);
+			var color = isLocked ? c_oAscCoAuthoringOtherBorderColor : this.settings.frozenColor;
+			ctx.setLineWidth(1).setStrokeStyle(color).beginPath();
+			var fHorLine, fVerLine;
+			if (isLocked) {
+				fHorLine = ctx.dashLineCleverHor;
+				fVerLine = ctx.dashLineCleverVer;
+			} else {
+				fHorLine = ctx.lineHor;
+				fVerLine = ctx.lineVer;
+			}
+
 			// ToDo заделать отрисовку lock области
 			if (this.topLeftFrozenCell) {
-				var ctx = canvas ? canvas : this.drawingCtx;
 				var row = this.topLeftFrozenCell.getRow0();
 				var col = this.topLeftFrozenCell.getCol0();
-				ctx.setLineWidth(1).setStrokeStyle(this.settings.frozenColor).beginPath();
-				if (0 < row) {
-					ctx.lineHor(0, this.rows[row].top - this.height_1px, ctx.getWidth());
-				}
-				if (0 < col) {
-					ctx.lineVer(this.cols[col].left - this.width_1px, 0, ctx.getHeight());
-				}
-				ctx.stroke();
+				if (0 < row)
+					fHorLine.apply(ctx, [0, this.rows[row].top - this.height_1px, ctx.getWidth()]);
+				else
+					fHorLine.apply(ctx, [0, this.headersHeight - this.height_1px, this.headersWidth]);
+
+				if (0 < col)
+					fVerLine.apply(ctx, [this.cols[col].left - this.width_1px, 0, ctx.getHeight()]);
+				else
+					fVerLine.apply(ctx, [this.headersWidth - this.width_1px, 0, this.headersHeight - this.height_1px]);
+			} else if (this.model.sheetViews[0].asc_getShowRowColHeaders()) {
+				fHorLine.apply(ctx, [0, this.headersHeight - this.height_1px, this.headersWidth]);
+				fVerLine.apply(ctx, [this.headersWidth - this.width_1px, 0, this.headersHeight - this.height_1px]);
 			}
+
+			ctx.stroke();
 		};
 
 		WorksheetView.prototype.drawFrozenGuides = function (x, y, targetInfo) {
@@ -3034,7 +3054,7 @@
 		
 		WorksheetView.prototype._isFrozenAnchor = function(x, y) {
 			
-			var result = { result: false, cursor: "move", name: "" };
+			var result = {result: false, cursor: "move", name: ""};
 			if (false === this.model.sheetViews[0].asc_getShowRowColHeaders())
 				return result;
 				
@@ -3046,10 +3066,7 @@
 			
 			function isPointInAnchor(x, y, rectX, rectY, rectW, rectH) {
 				var delta = 2 * asc_getcvt(0/*px*/, 1/*pt*/, _this._getPPIX());
-				if ( (x >= rectX - delta) && (x <= rectX + rectW + delta) && (y >= rectY - delta) && (y <= rectY + rectH + delta) )
-					return true;
-				else
-					return false;
+				return (x >= rectX - delta) && (x <= rectX + rectW + delta) && (y >= rectY - delta) && (y <= rectY + rectH + delta);
 			}
 			
 			// vertical
@@ -3057,7 +3074,7 @@
 			var _y = _this.headersTop;
 			var w = 0;
 			var h = _this.headersHeight;
-			if ( isPointInAnchor(x, y, _x, _y, w, h) ) {
+			if (isPointInAnchor(x, y, _x, _y, w, h)) {
 				result.result = true;
 				result.name = "frozenAnchorV";
 			}
@@ -3067,7 +3084,7 @@
 			_y = this.getCellTop(frozenCell.getRow0(), 1) - 0.5;
 			w = _this.headersWidth - 0.5;
 			h = 0;
-			if ( isPointInAnchor(x, y, _x, _y, w, h) ) {
+			if (isPointInAnchor(x, y, _x, _y, w, h)) {
 				result.result = true;
 				result.name = "frozenAnchorH";
 			}
@@ -5454,7 +5471,7 @@
 				
 			var frozenCursor = this._isFrozenAnchor(x, y);
 			if (frozenCursor.result) {
-				lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId, klockNameFrozenPane);
+				lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId, c_oAscLockNameFrozenPane);
 				isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, false);
 				if (false !== isLocked) {
 					// Кто-то сделал lock
@@ -5463,7 +5480,8 @@
 					lockRangePosLeft = this.getCellLeft(frozenCell.getCol0(), 0);
 					lockRangePosTop = this.getCellTop(frozenCell.getRow0(), 0);
 				}
-				return {cursor: frozenCursor.cursor, target: frozenCursor.name, col: -1, row: -1, userId: userId, lockRangePosLeft: lockRangePosLeft, lockRangePosTop: lockRangePosTop};
+				return {cursor: frozenCursor.cursor, target: frozenCursor.name, col: -1, row: -1, userId: userId,
+					lockRangePosLeft: lockRangePosLeft, lockRangePosTop: lockRangePosTop};
 			}
 
 			var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
@@ -8758,7 +8776,7 @@
 				return;
 			}
 			var sheetId = this.model.getId();
-			var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId, klockNameFrozenPane);
+			var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId, c_oAscLockNameFrozenPane);
 
 			if (false === this.collaborativeEditing.getCollaborativeEditing()) {
 				// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование

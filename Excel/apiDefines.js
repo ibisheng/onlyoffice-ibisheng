@@ -491,4 +491,6 @@ var c_oAscCoAuthoringLockTablePropertiesBorderColor	= new window.CColor(255, 144
 var c_oAscCoAuthoringDottedWidth					= 2;
 var c_oAscCoAuthoringDottedDistance					= 2;
 
+var c_oAscLockNameFrozenPane	= "frozenPane";
+
 var FONT_THUMBNAIL_HEIGHT = parseInt(7 * 96.0 / 25.4);
