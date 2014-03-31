@@ -505,7 +505,7 @@
 			var ws = this.getWorksheet();
 			var delta = asc_round(pos - ws.getFirstVisibleRow(/*allowPane*/true));
 			if (delta !== 0) {
-				ws.scrollVertical(delta, this.cellEditor,this.Api.isMobileVersion);
+				ws.scrollVertical(delta, this.cellEditor);
 			}
 		};
 
@@ -513,7 +513,7 @@
 			var ws = this.getWorksheet();
 			var delta = asc_round(pos - ws.getFirstVisibleCol(/*allowPane*/true));
 			if (delta !== 0) {
-				ws.scrollHorizontal(delta, this.cellEditor, this.Api.isMobileVersion);
+				ws.scrollHorizontal(delta, this.cellEditor);
 			}
 		};
 
