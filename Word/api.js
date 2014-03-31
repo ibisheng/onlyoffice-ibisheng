@@ -1044,7 +1044,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
         this.DocInfo.put_OfflineApp(true);
 
         // For test create unique id
-        documentId = "0123456789";
+        documentId = "test_document_id";
         this.OfflineAppDocumentStartLoad();
         this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, 0);
     }
