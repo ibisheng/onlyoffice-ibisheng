@@ -1430,7 +1430,7 @@ c_oSer_OMathBottomNodesType$HideBot:dQ
 FT_Service_GlyphDictRec:ul
 c_oAscStrokeType$STROKE_NONE:w5
 JSCompiler_StaticMethods__ExecuteParagraphBorder:we
-TYPE_TRACK_EMPTY_PH:e3
+TYPE_TRACK_EMPTY_PH:f3
 CShapeColor:J2
 JSCompiler_StaticMethods_Set_TableBorder_Left:ze
 BULLET_TYPE_BULLET_CHAR:rk
@@ -3043,7 +3043,7 @@ JSCompiler_StaticMethods_Get_CellsCount:mc
 c_oAscServerError$StorageFileNoFound:Rg
 c_oAscSlideTransitionTypes$Clock:pj
 PropLocker:TA
-CTablePositionV:t6
+CTablePositionV:v6
 historyitem_type_Shape:NA
 c_oSerNumTypes$lvl_LvlTextItemText:DK
 RulerCorrectPosition:uV
