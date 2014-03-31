@@ -5244,7 +5244,7 @@ CMathContent.prototype =
         var oSize;
         for(var i = 0; i < this.content.length; i++)
         {
-            if(this.content[i].typeObj === MATH_COMP)
+            if(this.content[i].typeObj === MATH_COMP || this.content[i].typeObj === MATH_PLACEHOLDER)
                 oSize = this.content[i].size;
             else
                 oSize = this.content[i].Math_GetSize();
@@ -5449,7 +5449,6 @@ CMathContent.prototype =
 
         return result;
     },
-
     getGapsInside: function(RecalcInfo) // учитываем gaps внутренних объектов
     {
         var gaps = {left: 0, right: 0};
@@ -5588,6 +5587,8 @@ CMathContent.prototype =
                     this.content[i].draw(x, y, pGraphics);
                 }
                 else if(this.content[i].typeObj == MATH_COMP)
+                    this.content[i].draw(x, y, pGraphics);
+                else if(this.content[i].typeObj == MATH_PLACEHOLDER)
                     this.content[i].draw(x, y, pGraphics);
                 else    // MATH_PARA_RUN
                     this.content[i].Math_Draw(x, y, pGraphics);
@@ -6406,6 +6407,8 @@ CMathContent.prototype =
                 this.content[i].setPosition(_pos);
                 _pos.x += this.content[i].size.width + this.content[i].GapRight;
             }
+            else if(this.content[i].typeObj == MATH_PLACEHOLDER)
+                this.content[i].setPosition(_pos);
             else
             {
                 this.content[i].Math_SetPosition(_pos);
