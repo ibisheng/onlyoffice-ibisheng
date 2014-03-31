@@ -6366,10 +6366,12 @@ function CRunCollaborativeRange(PosS, PosE)
 }
 
 
+// добавлены поля
+// size,  Parent
 
 ParaRun.prototype.Math_SetPosition = function(_pos)
 {
-    var pos = {x: _pos.x, y: _pos.y - this.size.ascent};
+    var pos = {x: _pos.x, y: _pos.y - this.Math_GetSize().ascent};
 
     for(var i = 0; i < this.Content.length; i++)
     {
@@ -6382,35 +6384,49 @@ ParaRun.prototype.Math_Draw = function(x, y, pGraphics)
     if(this.bMathRun)
     {
         var X = x;
-        var Y = y + this.size.ascent;
+        var Y = y + this.Math_GetSize().ascent;
 
         pGraphics.b_color1(0,0,0,255);
 
         for(var i=0; i < this.Content.length;i++)
         {
             var oWPrp = this.Get_CompiledPr(false);
+            oWPrp.Merge(this.Parent.Composition.DEFAULT_RUN_PRP.getTxtPrp());
+
             g_oTextMeasurer.SetFont(oWPrp);
 
             this.Content[i].draw(X, Y, pGraphics);
         }
     }
 }
-ParaRun.prototype.Math_Recalculate = function()
+ParaRun.prototype.Math_Recalculate = function(RecalcInfo)
 {
     var RangeStartPos = 0;
     var RangeEndPos = this.Content.length;
 
-    this.Lines[0].Add_Range( 0, RangeStartPos, RangeEndPos );
+    // ??
+    this.Lines[0].Add_Range(0, RangeStartPos, RangeEndPos);
 
     var width = 0,
         ascent = 0, descent = 0;
 
-    var oWPrp = this.Get_CompiledPr(false);
-    oWPrp.Merge(this.Parent.Composition.DEFAULT_RUN_PRP.getTxtPrp());
+    var oWPrp = this.Get_CompiledPr(true);
+    oWPrp.Merge(RecalcInfo.Composition.DEFAULT_RUN_PRP.getTxtPrp());
+
+    // TODO
+    // смержить еще с math_Run_Prp
+
     g_oTextMeasurer.SetFont(oWPrp);
 
     for (var Pos = 0 ; Pos < this.Content.length; Pos++ )
     {
+        RecalcInfo.leftRunPrp = RecalcInfo.currRunPrp;
+        RecalcInfo.Left = RecalcInfo.Current;
+
+        RecalcInfo.currRunPrp = oWPrp;
+        RecalcInfo.Current = this.Content[Pos];
+        RecalcInfo.setGaps();
+
         this.Content[Pos].Resize(g_oTextMeasurer);
 
         var oSize = this.Content[Pos].size;
@@ -6424,6 +6440,24 @@ ParaRun.prototype.Math_Recalculate = function()
         descent =  descent < oDescent ? oDescent : descent;
     }
 
-    this.size = {width: width, height: ascent + descent, ascent: ascent};
+    //this.size = {width: width, height: ascent + descent, ascent: ascent};
+}
+ParaRun.prototype.Math_GetSize = function()
+{
+    var width = 0,
+        ascent = 0, descent = 0;
 
+    for (var Pos = 0 ; Pos < this.Content.length; Pos++ )
+    {
+        this.Content[Pos].Resize(g_oTextMeasurer);
+        var oSize = this.Content[Pos].size;
+
+        width += oSize.width;
+
+        ascent = ascent > oSize.ascent ? ascent : oSize.ascent;
+        var oDescent = oSize.height - oSize.ascent;
+        descent =  descent < oDescent ? oDescent : descent;
+    }
+
+    return {width: width, height: ascent + descent, ascent: ascent};
 }

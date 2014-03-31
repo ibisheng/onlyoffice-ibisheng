@@ -48,6 +48,9 @@ function CMathBase()
         wdt: null
     };
 
+    this.GapLeft = 0;
+    this.GapRight = 0;
+
     return this;
 }
 CMathBase.prototype =
@@ -939,8 +942,8 @@ CMathBase.prototype =
     },
     recalculateSize: function(oMeasure)
     {
-        var _width = 0;
-        var _height = 0;
+        var width = 0;
+        var height = 0;
 
         var maxWH = this.getWidthsHeights();
 
@@ -950,18 +953,19 @@ CMathBase.prototype =
         var Heights = maxWH.heights;
 
         for( j = 0 ; j < this.nRow; j++ )
-            _height += Heights[j];
+            height += Heights[j];
 
-        _height += this.dH*(this.nRow - 1);
+        height += this.dH*(this.nRow - 1);
 
-        for( i=0; i < this.nCol ; i++)
-            _width += Widths[i];
+        for(var i=0; i < this.nCol ; i++)
+            width += Widths[i];
 
-        _width += this.dW*(this.nCol - 1);
+        width += this.dW*(this.nCol - 1);
+        width += this.GapLeft + this.GapRight;
 
-        var _ascent =  this.getAscent(_height, oMeasure);
+        var ascent =  this.getAscent(height, oMeasure);
 
-        this.size = {width: _width, height: _height, ascent: _ascent};
+        this.size = {width: width, height: height, ascent: ascent};
     },
     /*RecalculateReverse: function(oMeasure)
     {
@@ -1215,7 +1219,7 @@ CMathBase.prototype =
 
         return content;
     },
-    getGapsInside: function()
+    getGapsInside: function(RecalcInfo)
     {
         var kind = this.kind;
         var gaps = {left: 0, right: 0};
@@ -1224,7 +1228,7 @@ CMathBase.prototype =
         if(checkBase)
         {
             var base = this.getBase();
-            gaps = base.getGapsInside();
+            gaps = base.getGapsInside(RecalcInfo);
         }
 
         return gaps;

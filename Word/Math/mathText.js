@@ -58,12 +58,19 @@ function CMathText()
     this.bJDraw = false;
     this.type  = TXT_ROMAN;
 
+    this.GapLeft = 0;
+    this.GapRight = 0;
+
     //this.Parent = null;
 
     /*this.TxtPrp = new CMathTextPrp();
     this.OwnTPrp = new CMathTextPrp();*/
 
     //this.sizeSymbol = null; // размер символа без учета трансформации
+
+
+    // TO DO
+    // убрать
 
     this.transform =
     {
@@ -99,8 +106,6 @@ CMathText.prototype =
 
         if(this.type == TXT_ROMAN )
         {
-
-
             var bDigit = (code > 0x002F && code < 0x003A),
                 bCapGreek = (code > 0x0390 && code < 0x03AA ),
                 bSmallGreek = (code > 0x03B0 && code < 0x03CA);
@@ -247,6 +252,8 @@ CMathText.prototype =
         var height  =  ascent + descent;
 
         var widthG   = metricsTxt.WidthG;
+
+        width += this.GapLeft + this.GapRight;
 
         this.size = {width: width, widthG: widthG, height: height, ascent: ascent};
     },

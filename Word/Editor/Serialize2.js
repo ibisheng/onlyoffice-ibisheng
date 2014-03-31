@@ -1566,7 +1566,7 @@ function Binary_oMathWriter(memory, oMathPara)
 	this.WriteMathElem = function(mathElem)
 	{
 		var oThis = this;
-		var item = mathElem.value;
+		var item = mathElem;
 		switch ( item.typeObj)
 		{
 			case MATH_COMP:
@@ -1626,7 +1626,7 @@ function Binary_oMathWriter(memory, oMathPara)
 	this.WriteMathElemCollaborative = function(mathElem)
 	{
 		var oThis = this;
-		var item = mathElem.value;
+		var item = mathElem;
 		switch ( item.typeObj)
 		{
 			case MATH_COMP:
@@ -1745,7 +1745,7 @@ function Binary_oMathWriter(memory, oMathPara)
 			{
 				var item = oElem.content[i];	
 				
-				if (MATH_RUN_PRP == item.value.typeObj)
+				if (MATH_RUN_PRP == item.typeObj)
 				{
 					var nCurPos = 0;
 					this.memory.WriteByte(c_oSer_OMathContentType.MRun);
