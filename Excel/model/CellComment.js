@@ -1575,7 +1575,6 @@ asc_CCellCommentator.prototype = {
 								}
 
 								comment.oParent.aReplies.splice(i, 1);
-								bResult = true;
 								break;
 							}
 						}
@@ -1590,7 +1589,6 @@ asc_CCellCommentator.prototype = {
 								}
 
 								_this.aComments.splice(i, 1);
-								bResult = true;
 								break;
 							}
 						}
