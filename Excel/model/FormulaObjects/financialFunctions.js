@@ -3724,9 +3724,84 @@ function cSLN() {
 cSLN.prototype = Object.create( cBaseFunction.prototype )
 
 function cSYD() {
-    cBaseFunction.call( this, "SYD" );
+//    cBaseFunction.call( this, "SYD" );
+
+    this.name = "SYD";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 4;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 4;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cSYD.prototype = Object.create( cBaseFunction.prototype )
+cSYD.prototype.Calculate = function ( arg ) {
+    var cost = arg[0], salvage = arg[1], life = arg[2], per = arg[3];
+
+    if ( cost instanceof cArea || cost instanceof cArea3D ) {
+        cost = cost.cross( arguments[1].first );
+    }
+    else if ( cost instanceof cArray ) {
+        cost = cost.getElementRowCol( 0, 0 );
+    }
+
+    if ( salvage instanceof cArea || salvage instanceof cArea3D ) {
+        salvage = salvage.cross( arguments[1].first );
+    }
+    else if ( salvage instanceof cArray ) {
+        salvage = salvage.getElementRowCol( 0, 0 );
+    }
+
+    if ( life instanceof cArea || life instanceof cArea3D ) {
+        life = life.cross( arguments[1].first );
+    }
+    else if ( life instanceof cArray ) {
+        life = life.getElementRowCol( 0, 0 );
+    }
+
+    if ( per instanceof cArea || per instanceof cArea3D ) {
+        per = per.cross( arguments[1].first );
+    }
+    else if ( per instanceof cArray ) {
+        per = per.getElementRowCol( 0, 0 );
+    }
+
+    cost = cost.tocNumber();
+    salvage = salvage.tocNumber();
+    life = life.tocNumber();
+    per = per.tocNumber();
+
+    if ( cost instanceof cError ) return this.value = cost;
+    if ( salvage instanceof cError ) return this.value = salvage;
+    if ( life instanceof cError ) return this.value = life;
+    if ( per instanceof cError ) return this.value = per;
+
+    cost = cost.getValue();
+    salvage = salvage.getValue();
+    life = life.getValue();
+    per = per.getValue();
+
+    if ( life == 1 || life == 0 )
+        return this.value = new cError( cErrorType.not_numeric );
+
+    var res = 2;
+    res *= cost - salvage;
+    res *= life+1-per;
+    res /= (life+1)*life;
+
+    return this.value = new cNumber( res );
+}
+cSYD.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( cost , salvage , life , per )"
+    };
+}
 
 function cTBILLEQ() {
 //    cBaseFunction.call( this, "TBILLEQ" );
