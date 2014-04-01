@@ -3973,7 +3973,9 @@ drawLineChart.prototype =
 		//соответствует подписям оси значений(OY)
 		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
 		
-		var y, y1, x, x1, val, nextVal, tempVal, seria, dataSeries, compiledMarkerSize, compiledMarkerSymbol;
+		var isSplineLine = true;
+		
+		var y, y1, y2, y3, x, x1, x2, x3, val, nextVal, tempVal, seria, dataSeries, compiledMarkerSize, compiledMarkerSymbol;
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 		
 			seria = this.chartProp.series[i];
@@ -4015,19 +4017,43 @@ drawLineChart.prototype =
 						nextVal = this.cChartDrawer.getLogarithmicValue(nextVal, this.cChartSpace.chart.plotArea.valAx.scaling.logBase, yPoints);
 					
 					//точки находятся внутри диапазона
-
-					y  = this.cChartDrawer.getYPosition(val, yPoints);
-					y1 = this.cChartDrawer.getYPosition(nextVal, yPoints);
-					
-					x  = xPoints[n].pos; 
-					x1 = xPoints[n + 1].pos;
-					
 					if(!this.paths.series)
 						this.paths.series = [];
 					if(!this.paths.series[i])
-						this.paths.series[i] = []
+						this.paths.series[i] = [];
+						
+					if(isSplineLine)
+					{
+						x = n - 1 >= 0 ? n - 1 : 0;
+						y = this._getYVal(x, i);
+						
+						x1 = n;
+						y1 = val;
+						
+						x2 = n + 1 <= dataSeries.length - 1 ? n + 1 : dataSeries.length - 1;
+						y2 = this._getYVal(x2, i);
+						
+						x3 = n + 2 <= dataSeries.length - 1 ? n + 2 : dataSeries.length - 1;
+						y3 = this._getYVal(x3, i);
+						
+						this.paths.series[i][n] = this._calculateSplineLine(x, y, x1, y1, x2, y2, x3, y3, xPoints, yPoints);
+					}
+					else
+					{
+						y  = this.cChartDrawer.getYPosition(val, yPoints);
+						y1 = this.cChartDrawer.getYPosition(nextVal, yPoints);
+						
+						x  = xPoints[n].pos; 
+						x1 = xPoints[n + 1].pos;
+						
+						if(!this.paths.series)
+							this.paths.series = [];
+						if(!this.paths.series[i])
+							this.paths.series[i] = []
+						
+						this.paths.series[i][n] = this._calculateLine(x, y, x1, y1);
+					}
 					
-					this.paths.series[i][n] = this._calculateLine(x, y, x1, y1);
 					
 					if(!this.paths.points)
 						this.paths.points = [];
@@ -4267,6 +4293,47 @@ drawLineChart.prototype =
 		
 		path.moveTo(x * pathW, y * pathH);
 		path.lnTo(x1 * pathW, y1 * pathH);
+		path.recalculate(gdLst);
+		
+		return path;
+	},
+	
+	_calculateSplineLine : function(x, y, x1, y1, x2, y2, x3, y3, xPoints, yPoints)
+	{
+		var path  = new Path();
+		var splineCoords;
+		
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+		var gdLst = [];
+		
+		path.pathH = pathH;
+		path.pathW = pathW;
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
+		
+		var startCoords;
+		var endCoords;
+		
+		for(var i = 0; i <= 1;)
+		{
+			splineCoords = this.cChartDrawer.calculate_Bezier(x, y, x1, y1, x2, y2, x3, y3, i);
+			
+			if(i == 0)
+			{
+				startCoords = {x: this.cChartDrawer.getYPosition(splineCoords[0], xPoints, true), y: this.cChartDrawer.getYPosition(splineCoords[1], yPoints)};
+			}
+			
+			endCoords = {x: this.cChartDrawer.getYPosition(splineCoords[0], xPoints, true), y: this.cChartDrawer.getYPosition(splineCoords[1], yPoints)};
+			
+			
+			if(i == 0)
+				path.moveTo(startCoords.x * pathW, startCoords.y * pathH);
+			path.lnTo(endCoords.x * pathW, endCoords.y * pathH);
+			
+			i = i + 0.1;
+		};
+
 		path.recalculate(gdLst);
 		
 		return path;
