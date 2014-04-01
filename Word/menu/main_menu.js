@@ -981,8 +981,8 @@ $("#td_formatmodel,#td_info, #td_redo, #td_undo, #td_orient, #td_bold, #td_itali
             _img.onload = function(){
                 editor.WordControl.m_oLogicDocument.Add_FlowImage( 50, 50, this );
             };
-			//_img.innerHtml = "./Images/Test.jpg";
-            _img.src = "./Images/Test.jpg";
+			//_img.innerHtml = "./menu/img/Test.jpg";
+            _img.src = "./menu/img/Test.jpg";
             */
             editor.AddImageUrl("http://www.google.com/images/srpr/logo4w.png");
 			break;
@@ -996,13 +996,13 @@ $("#td_formatmodel,#td_info, #td_redo, #td_undo, #td_orient, #td_bold, #td_itali
                 editor.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
                 editor.WordControl.m_oLogicDocument.Add_InlineImage( 50, 50, this.src );
             };
-			//_img.innerHtml = "./Images/Test.jpg";
-            _img.src = "./Images/Test.jpg";
+			//_img.innerHtml = "./menu/img/Test.jpg";
+            _img.src = "./menu/img/Test.jpg";
 
             //editor.AddImage(true);
             break;
 		case "td_imageInText2":
-            editor.AddImageUrl("./Images/Test.jpg");
+            editor.AddImageUrl("./menu/img/Test.jpg");
             break;
 			
         case "td_link":
@@ -1021,8 +1021,11 @@ $("#td_formatmodel,#td_info, #td_redo, #td_undo, #td_orient, #td_bold, #td_itali
             //editor.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
             //editor.WordControl.m_oLogicDocument.Paragraph_Add( Math );
 
-            editor.WordControl.m_oLogicDocument.LoadTestDocument();
+            //editor.WordControl.m_oLogicDocument.LoadTestDocument(); // максимальное количество ранов
+            //editor.WordControl.m_oLogicDocument.LoadTestDocument4(); // среднее количество ранов
+            //editor.WordControl.m_oLogicDocument.LoadTestDocument5(); // 1 ран в параграфе
 
+            editor.WordControl.m_oLogicDocument.Add_SectionBreak();
 
 			break;
 		case "td_indent":
@@ -1038,6 +1041,8 @@ $("#td_formatmodel,#td_info, #td_redo, #td_undo, #td_orient, #td_bold, #td_itali
 			//editor.DecreaseIndent();
 
 			editor.WordControl.m_oLogicDocument.LoadTestDocument2();
+			//editor.WordControl.m_oLogicDocument.LoadTestDocument6();
+			//editor.WordControl.m_oLogicDocument.LoadTestDocument7();
 			break;
 		case "bulletedlist":
             if ($("#td_bulletedlist").hasClass("iconPressed")){

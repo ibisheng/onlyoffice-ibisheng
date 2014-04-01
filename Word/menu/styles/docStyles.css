@@ -287,7 +287,7 @@ table {
 .bns a.link{ color: blue;}
 .drawing{padding: 0 !important;border: none !important;}
 .lineSpacing{background-image: url(../../images/lineSpacing.png);	background-repeat: no-repeat;background-position: 0px 50%;height: 20px;margin-left: 3px;margin-top: 2px;width: 30px;}
-.paragraphMarks{background-image: url(../../images/paragraphMarks_whiteBG.png);	background-repeat: no-repeat;background-position: 0px 50%;height: 17px;margin-top: 2px;width: 19px;}
+.paragraphMarks{background-image: url(../img/paragraphMarks_whiteBG.png);	background-repeat: no-repeat;background-position: 0px 50%;height: 17px;margin-top: 2px;width: 19px;}
 #lineSpacing {margin-right: 3px;background-color: #FFFFFF;border-radius: 0 0 0 0;height: 21px;min-width: 35px;width: 50px;}
 #lineSpacing .SubItem {text-align: center;}
 .selectedHT{background-color:#B0B0B0;}
