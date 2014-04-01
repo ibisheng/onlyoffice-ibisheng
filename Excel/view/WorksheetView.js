@@ -7807,7 +7807,9 @@
 			var t = this;
 			//загрузка шрифтов, в случае удачи на callback вставляем текст
 			t._loadFonts(val.fontsNew, function () {
-				t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
+				if(val.onlyImages !== true)
+					t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
+					
 				var a_drawings = [];
 				if (val.addImages && val.addImages.length != 0) {
 					var api = asc["editor"];
