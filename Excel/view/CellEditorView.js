@@ -783,7 +783,7 @@
 			_updateFormulaEditMod: function (bIsOpen) {
 				var isFormula = this.isFormula();
 				if (!bIsOpen)
-					this._updateEditorState(isFormula)
+					this._updateEditorState(isFormula);
 				this.handlers.trigger("updateFormulaEditMod", isFormula);
 				var ret1 = this._parseFormulaRanges();
 				var ret2 = this.canEnterCellRange();
@@ -2258,6 +2258,9 @@
 
 			/** @param event {jQuery.Event} */
 			_onInputTextArea: function (event) {
+				if (this.handlers.trigger("isViewerMode"))
+					return true;
+
 				if (this.isUpdateValue) {
 					// Для языков с иероглифами не приходят эвенты с клавиатуры, поэтому обработаем здесь
 					this.skipTLUpdate = true;

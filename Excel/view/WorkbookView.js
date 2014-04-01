@@ -410,7 +410,8 @@
 							    self.handlers.trigger("asc_onCanUndoChanged", bCanUndo);
 							    self.handlers.trigger("asc_onCanRedoChanged", bCanRedo);
 						    },
-							"applyCloseEvent"			: function () {self.controller._onWindowKeyDown.apply(self.controller, arguments);}
+							"applyCloseEvent"			: function () {self.controller._onWindowKeyDown.apply(self.controller, arguments);},
+							"isViewerMode"				: function () {return self.controller.settings.isViewerMode;}
 					    },
 					    /*settings*/{
 						    font: this.defaultFont
