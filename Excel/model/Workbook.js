@@ -2845,7 +2845,7 @@ Woorksheet.prototype.getRange3=function(r1, c1, r2, c2){
 		nColMin = c2;
 	}
 	return new Range(this, nRowMin, nColMin, nRowMax, nColMax);
-}
+};
 Woorksheet.prototype._getRows=function(){
 	return this.aGCells;
 };
@@ -2916,7 +2916,6 @@ Woorksheet.prototype._getCell2=function(cellId){
 };
 Woorksheet.prototype._getCellNoEmpty=function(row, col){
 	//0-based
-	var oCurCell;
 	var oCurRow = this.aGCells[row];
 	if(oCurRow)
 	{
@@ -5344,6 +5343,14 @@ Range.prototype.getType=function(){
 		return cell.getType();
 	else
 		return null;
+};
+Range.prototype.isEmptyText=function(){
+	var cell = this.worksheet._getCellNoEmpty(this.bbox.r1,this.bbox.c1);
+	return (null != cell) ? cell.isEmptyText() : true;
+};
+Range.prototype.isEmptyTextString=function(){
+	var cell = this.worksheet._getCellNoEmpty(this.bbox.r1,this.bbox.c1);
+	return (null != cell) ? cell.isEmptyTextString() : true;
 };
 Range.prototype.getFormula=function(){
 	var cell = this.worksheet._getCellNoEmpty(this.bbox.r1,this.bbox.c1);

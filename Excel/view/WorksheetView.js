@@ -2656,7 +2656,7 @@
 			ctx.setFillStyle(this.settings.cells.defaultState.background);
 			for (var col = colBeg; col < colEnd; ++col) {
 				var c = this._getCell(col, row);
-				var bg = c !== undefined ? c.getFill() : null;
+				var bg = null !== c ? c.getFill() : null;
 				if (bg !== null) {continue;}
 				ctx.fillRect(
 					this.cols[col].left + this.cols[col].width - offsetX - this.width_1px,
@@ -4166,7 +4166,7 @@
             }
 
             var c = this._getCell(col, row);
-            if (c === undefined) {return col;}
+            if (null === c) {return col;}
 
             var bUpdateScrollX = false;
             var bUpdateScrollY = false;
@@ -4199,7 +4199,7 @@
                     fMergedRows = true;
             }
 
-            if (this._isCellEmpty(c)) {return mc ? mc.c2 : col;}
+            if (this._isCellEmptyTextString(c)) {return mc ? mc.c2 : col;}
 
             var dDigitsCount = 0;
             var colWidth = 0;
@@ -4513,9 +4513,9 @@
 		WorksheetView.prototype._getCell = function (col, row) {
 			this.nRowsCount = Math.max(this.model.getRowsCount() , this.rows.length);
 			this.nColsCount = Math.max(this.model.getColsCount(), this.cols.length);
-			if ( col < 0 || col >= this.nColsCount || row < 0 || row >= this.nRowsCount ) {
-				return undefined;
-			}
+			if (col < 0 || col >= this.nColsCount || row < 0 || row >= this.nRowsCount)
+				return null;
+
 			return this.model.getCell3(row, col);
 		};
 
@@ -4526,7 +4526,7 @@
 		WorksheetView.prototype._getCellFlags = function (col, row) {
 			var c = row !== undefined ? this._getCell(col, row) : col;
 			var fl = new CellFlags();
-			if (c !== undefined) {
+			if (null !== c) {
 				fl.wrapText = c.getWrap();
 				fl.shrinkToFit = c.getShrinkToFit();
 				fl.isMerged = c.hasMerged() !== null;
@@ -4535,35 +4535,39 @@
 			return fl;
 		};
 
-		WorksheetView.prototype._isCellEmpty = function (col, row) {
+		WorksheetView.prototype._isCellEmptyText = function (col, row) {
 			var c = row !== undefined ? this._getCell(col, row) : col;
-			return c === undefined || c.getValue().search(/[^ ]/) < 0;
+			return null === c || c.isEmptyText();
+		};
+		WorksheetView.prototype._isCellEmptyTextString = function (col, row) {
+			var c = row !== undefined ? this._getCell(col, row) : col;
+			return null === c || c.isEmptyTextString();
 		};
 
 		WorksheetView.prototype._isCellEmptyOrMerged = function (col, row) {
 			var c = row !== undefined ? this._getCell(col, row) : col;
-			if (undefined === c)
+			if (null === c)
 				return true;
-			if (null !== c.hasMerged())
+			if (!c.isEmptyText())
 				return false;
-			return c.getValue().search(/[^ ]/) < 0;
+			return (null === c.hasMerged());
 		};
 
 		WorksheetView.prototype._isCellEmptyOrMergedOrBackgroundColorOrBorders = function (col, row) {
 			var c = row !== undefined ? this._getCell(col, row) : col;
-			if (undefined === c)
+			if (null === c)
 				return true;
+			if (!c.isEmptyTextString())
+				return false;
 			if (null !== c.hasMerged())
 				return false;
 			var bg = c.getFill();
 			if (null !== bg)
 				return false;
 			var cb = c.getBorder();
-			if ((cb.l && c_oAscBorderStyles.None !== cb.l.s) || (cb.r && c_oAscBorderStyles.None !== cb.r.s) ||
+			return !((cb.l && c_oAscBorderStyles.None !== cb.l.s) || (cb.r && c_oAscBorderStyles.None !== cb.r.s) ||
 				(cb.t && c_oAscBorderStyles.None !== cb.t.s) || (cb.b && c_oAscBorderStyles.None !== cb.b.s) ||
-				(cb.dd && c_oAscBorderStyles.None !== cb.dd.s)  || (cb.du && c_oAscBorderStyles.None !== cb.du.s))
-				return false;
-			return c.getValue().search(/[^ ]/) < 0;
+				(cb.dd && c_oAscBorderStyles.None !== cb.dd.s)  || (cb.du && c_oAscBorderStyles.None !== cb.du.s));
 		};
 
 		WorksheetView.prototype._getRange = function (c1, r1, c2, r2) {
@@ -4917,11 +4921,11 @@
 			var vr = t.visibleRange;
 
 			function findNextCell(col, row, dx, dy) {
-				var state = t._isCellEmpty(col, row);
+				var state = t._isCellEmptyText(col, row);
 				var i = col + dx;
 				var j = row + dy;
 				while (i >= 0 && i < t.cols.length && j >= 0 && j < t.rows.length) {
-					var newState = t._isCellEmpty(i, j);
+					var newState = t._isCellEmptyText(i, j);
 					if (newState !== state) {
 						var ret = {};
 						ret.col = state ? i : i - dx;
@@ -4957,7 +4961,7 @@
 
 				for (var col = 0; col < maxCols; ++col) {
 					for (var row = 0; row < maxRows; ++row) {
-						if (!t._isCellEmpty(col, row)) {
+						if (!t._isCellEmptyText(col, row)) {
 							lastC = Math.max(lastC, col);
 							lastR = Math.max(lastR, row);
 						}
@@ -6074,7 +6078,7 @@
 				case c_oAscMergeOptions.MergeCenter:
 					for (r = arn.r1; r <= arn.r2; ++r) {
 						for (c = arn.c1; c <= arn.c2; ++c) {
-							if (false === this._isCellEmpty(c, r)) {
+							if (false === this._isCellEmptyText(c, r)) {
 								if (notEmpty)
 									return true;
 								notEmpty = true;
@@ -6086,7 +6090,7 @@
 					for (r = arn.r1; r <= arn.r2; ++r) {
 						notEmpty = false;
 						for (c = arn.c1; c <= arn.c2; ++c) {
-							if (false === this._isCellEmpty(c, r)) {
+							if (false === this._isCellEmptyText(c, r)) {
 								if (notEmpty)
 									return true;
 								notEmpty = true;

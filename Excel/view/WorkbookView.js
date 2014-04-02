@@ -860,9 +860,9 @@
 				ct.target === "colresize" ? ws.optimizeColWidth(ct.col) : ws.optimizeRowHeight(ct.row);
 				asc_applyFunction(callback);
 			} else {
-				if (ct.col >=0 && ct.row >= 0) {
-					this.controller.setStrictClose( !ws._isCellEmpty(ct.col, ct.row) );
-				}
+				if (ct.col >=0 && ct.row >= 0)
+					this.controller.setStrictClose(!ws._isCellEmptyText(ct.col, ct.row));
+
 				// Для нажатия на колонку/строку/all обрабатывать dblClick не нужно
 				if ("colheader" === ct.target || "rowheader" === ct.target || "corner" === ct.target) {
 					asc_applyFunction(callback);
