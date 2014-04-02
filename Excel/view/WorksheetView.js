@@ -5474,11 +5474,31 @@
 			}
 			return null;
 		};
+		WorksheetView.prototype._isCursorOnSelectionBorder = function (ar, vr, x, y) {
+			var arIntersection = ar.intersectionSimple(vr);
+			var left, top, right, bottom;
+			if (arIntersection) {
+				left = ar.c1 === arIntersection.c1 ? this.cols[ar.c1].left : null;
+				right = ar.c2 === arIntersection.c2 ? this.cols[ar.c2].left + this.cols[ar.c2].width : null;
+				top = ar.r1 === arIntersection.r1 ? this.rows[ar.r1].top : null;
+				bottom = ar.r2 === arIntersection.r2 ? this.rows[ar.r2].top + this.rows[ar.r2].height : null;
+				if ((((null !== left && x >= left - this.width_2px && x <= left + this.width_2px) ||
+					(null !== right && x >= right - this.width_2px && x <= right + this.width_2px)) &&
+					null !== top && null !== bottom && y >= top - this.height_2px && y <= bottom + this.height_2px) ||
+					(((null !== top && y >= top - this.height_2px && y <= top + this.height_2px) ||
+						(null !== bottom && y >= bottom - this.height_2px && y <= bottom + this.height_2px)) &&
+						null !== left && null !== right && x >= left - this.width_2px && x <= right + this.width_2px)) {
+					// Мы навели на границу выделения
+					return true;
+				}
+			}
+			return false;
+		};
 
 		WorksheetView.prototype.getCursorTypeFromXY = function (x, y, isViewerMode) {
-			var c, r, f, i, offsetX, offsetY, arIntersection, left, top, right, bottom, cellCursor,
-				sheetId = this.model.getId(), userId, lockRangePosLeft, lockRangePosTop, lockInfo, oHyperlink,
-				widthDiff = 0, heightDiff = 0, isLocked = false, ar = this.activeRange, target = "cells", row = -1, col = -1;
+			var c, r, f, i, offsetX, offsetY, cellCursor, sheetId = this.model.getId(), userId,
+				lockRangePosLeft, lockRangePosTop, lockInfo, oHyperlink, widthDiff = 0, heightDiff = 0,
+				isLocked = false, ar = this.activeRange, target = "cells", row = -1, col = -1, isSelGraphicObject;
 				
 			var frozenCursor = this._isFrozenAnchor(x, y);
 			if (frozenCursor.result) {
@@ -5572,43 +5592,29 @@
 			if (oFormulaOrChartCursor)
 				return oFormulaOrChartCursor;
 
-			var oResDefault = {cursor: kCurDefault, target: "none", col: -1, row: -1};
-			// Эпсилон для fillHandle
-			var fillHandleEpsilon = this.width_1px;
-			if (!isViewerMode && !this.isChartAreaEditMode &&
-				x >= (this.fillHandleL - fillHandleEpsilon) && x <= (this.fillHandleR + fillHandleEpsilon) &&
-				y >= (this.fillHandleT - fillHandleEpsilon) && y <= (this.fillHandleB + fillHandleEpsilon)) {
-				// Мы на "квадрате" для автозаполнения
-				if (!this.objectRender.selectedGraphicObjectsExists())
+			isSelGraphicObject = this.objectRender.selectedGraphicObjectsExists();
+			if (!isViewerMode && !isSelGraphicObject) {
+				// Эпсилон для fillHandle
+				var fillHandleEpsilon = this.width_1px;
+				if (!this.isChartAreaEditMode &&
+					x >= (this.fillHandleL - fillHandleEpsilon) && x <= (this.fillHandleR + fillHandleEpsilon) &&
+					y >= (this.fillHandleT - fillHandleEpsilon) && y <= (this.fillHandleB + fillHandleEpsilon)) {
+					// Мы на "квадрате" для автозаполнения
 					return {cursor: kCurFillHandle, target: "fillhandle", col: -1, row: -1};
-			}
-
-			var xWithOffset = x + offsetX;
-			var yWithOffset = y + offsetY;
-
-			// Навели на выделение
-			arIntersection = ar.intersectionSimple(this.visibleRange);
-			if (!isViewerMode && arIntersection) {
-				left = ar.c1 === arIntersection.c1 ? this.cols[ar.c1].left : null;
-				right = ar.c2 === arIntersection.c2 ? this.cols[ar.c2].left + this.cols[ar.c2].width : null;
-				top = ar.r1 === arIntersection.r1 ? this.rows[ar.r1].top : null;
-				bottom = ar.r2 === arIntersection.r2 ? this.rows[ar.r2].top + this.rows[ar.r2].height : null;
-				if ((((null !== left && xWithOffset >= left - this.width_2px && xWithOffset <= left + this.width_2px) ||
-					(null !== right && xWithOffset >= right - this.width_2px && xWithOffset <= right + this.width_2px)) &&
-					null !== top && null !== bottom && yWithOffset >= top - this.height_2px && yWithOffset <= bottom + this.height_2px) ||
-					(((null !== top && yWithOffset >= top - this.height_2px && yWithOffset <= top + this.height_2px) ||
-					(null !== bottom && yWithOffset >= bottom - this.height_2px && yWithOffset <= bottom + this.height_2px)) &&
-					null !== left && null !== right && xWithOffset >= left - this.width_2px && xWithOffset <= right + this.width_2px)) {
-					// Мы навели на границу выделения
-					if ( !this.objectRender.selectedGraphicObjectsExists() )
-						return {cursor: kCurMove, target: "moveRange", col: -1, row: -1};
 				}
+
+				// Навели на выделение
+				var xWithOffset = x + offsetX;
+				var yWithOffset = y + offsetY;
+				if (this._isCursorOnSelectionBorder(ar, this.visibleRange, xWithOffset, yWithOffset))
+					return {cursor: kCurMove, target: "moveRange", col: -1, row: -1};
 			}
 
 			if (x < this.cellsLeft && y < this.cellsTop) {
 				return {cursor: kCurCorner, target: "corner", col: -1, row: -1};
 			}
 
+			var oResDefault = {cursor: kCurDefault, target: "none", col: -1, row: -1};
 			if (x > this.cellsLeft && y > this.cellsTop) {
 				c = this._findColUnderCursor(x, true);
 				r = this._findRowUnderCursor(y, true);
