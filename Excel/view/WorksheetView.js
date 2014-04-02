@@ -278,16 +278,19 @@
 		function CellFlags() {
 			this.wrapText = false;
 			this.shrinkToFit = false;
-			this.isMerged = false;
+			this.merged = null;
 			this.textAlign = kNone;
 		}
 		CellFlags.prototype.clone = function () {
 			var oRes = new CellFlags();
 			oRes.wrapText = this.wrapText;
 			oRes.shrinkToFit = this.shrinkToFit;
-			oRes.isMerged = this.isMerged;
+			oRes.merged = this.merged ? this.merged.clone() : null;
 			oRes.textAlign = this.textAlign;
 			return oRes;
+		};
+		CellFlags.prototype.isMerged = function () {
+			return null !== this.merged;
 		};
 
 
@@ -1566,8 +1569,7 @@
 								var rightSide = 0;
 								var ct = this._getCellTextCache(c, r);
 								if (ct !== undefined) {
-									var isMerged = ct.flags.isMerged, isWrapped = ct.flags.wrapText;
-									if (!isMerged && !isWrapped)
+									if (!ct.flags.isMerged() && !ct.flags.wrapText)
 										rightSide = ct.sideR;
 								}
 
@@ -2438,11 +2440,11 @@
             if (ct === undefined)
                 return null;
 
-            var isMerged = ct.flags.isMerged, range = undefined, isWrapped = ct.flags.wrapText;
+            var isMerged = ct.flags.isMerged(), range = undefined, isWrapped = ct.flags.wrapText;
             var ctx = (undefined === drawingCtx) ? this.drawingCtx : drawingCtx;
 
             if (isMerged) {
-                range = ct.mc;
+                range = ct.flags.merged;
                 if (!drawMergedCells) {return {c1: range.c1, r1: range.r1, c2: range.c2, r2: range.r2, index: range.r1 + "_" + range.c1};}
                 if (col !== range.c1 || row !== range.r1) {return null;}
             }
@@ -4187,8 +4189,8 @@
             }
 
             // Range для замерженной ячейки
-            var mc = this.model.getMergedByCell(row, col);
             var fl = this._getCellFlags(c);
+			var mc = fl.merged;
             var fMergedColumns = false;	// Замержены ли колонки (если да, то автоподбор ширины не должен работать)
             var fMergedRows = false;	// Замержены ли строки (если да, то автоподбор высоты не должен работать)
             if (null !== mc) {
@@ -4256,13 +4258,14 @@
             }
 
             // ToDo dDigitsCount нужно рассчитывать исходя не из дефалтового шрифта и размера, а исходя из текущего шрифта и размера ячейки
+			var isMerged = fl.isMerged();
             var str  = c.getValue2(dDigitsCount, makeFnIsGoodNumFormat(fl, colWidth));
             var ha   = c.getAlignHorizontalByValue().toLowerCase();
             var va   = c.getAlignVertical().toLowerCase();
-            var maxW = fl.wrapText || fl.shrinkToFit || fl.isMerged || isFixedWidthCell(str) ? this._calcMaxWidth(col, row, mc) : undefined;
+            var maxW = fl.wrapText || fl.shrinkToFit || isMerged || isFixedWidthCell(str) ? this._calcMaxWidth(col, row, mc) : undefined;
             var tm   = this._roundTextMetrics( this.stringRender.measureString(str, fl, maxW) );
 			var angle = c.getAngle();
-            var cto  = (fl.isMerged || fl.wrapText) ?
+            var cto  = (isMerged || fl.wrapText) ?
             {
                 maxWidth:  maxW - this.cols[col].innerWidth + this.cols[col].width,
                 leftSide: 0,
@@ -4270,7 +4273,7 @@
             } : this._calcCellTextOffset(col, row, ha, tm.width);
 
             // check right side of cell text and append columns if it exceeds existing cells borders
-            if (!fl.isMerged) {
+            if (!isMerged) {
                 var rside = this.cols[col - cto.leftSide].left + tm.width;
                 var lc    = this.cols[this.cols.length - 1];
                 if (rside > lc.left + lc.width) {
@@ -4327,8 +4330,7 @@
                 cellType	: cellType,
                 isFormula	: c.isFormula(),
                 angle		: angle,
-                textBound	: textBound,
-                mc			: mc
+                textBound	: textBound
             };
 
             this._fetchCellCacheText(col, row).hasText = true;
@@ -4338,7 +4340,7 @@
 			}
 
             // update row's descender
-            if (va !== kvaTop && va !== kvaCenter && !fl.isMerged) {
+            if (va !== kvaTop && va !== kvaCenter && !isMerged) {
 				rowInfo.descender = Math.max(rowInfo.descender, tm.height - tm.baseline);
             }
 
@@ -4529,7 +4531,7 @@
 			if (null !== c) {
 				fl.wrapText = c.getWrap();
 				fl.shrinkToFit = c.getShrinkToFit();
-				fl.isMerged = c.hasMerged() !== null;
+				fl.merged = c.hasMerged();
 				fl.textAlign = c.getAlignHorizontalByValue().toLowerCase();
 			}
 			return fl;
@@ -9462,7 +9464,7 @@
 					return;
 
 				var width = null;
-				var row, ct, c, fl, str, maxW, tm, mc;
+				var row, ct, c, fl, str, maxW, tm, mc, isMerged;
 				var oldWidth;
 				var lastHeight = null;
 				var filterButton = null;
@@ -9474,25 +9476,26 @@
 					t._addCellTextToCache(col, row, /*canChangeColWidth*/c_oAscCanChangeColWidth.all);
 					ct = t._getCellTextCache(col, row);
 					if (ct === undefined) {continue;}
-					if (ct.flags.isMerged) {
-						mc = ct.mc;
+					fl = ct.flags;
+					isMerged = fl.isMerged();
+					if (isMerged) {
+						mc = fl.merged;
 						// Для замерженных ячеек (с 2-мя или более колонками) оптимизировать не нужно
 						if (mc.c1 !== mc.c2)
 							continue;
 					}
 
 					if (ct.metrics.height > t.maxRowHeight) {
+						if (isMerged) {continue;}
 						// Запоминаем старую ширину (в случае, если у нас по высоте не уберется)
 						oldWidth = ct.metrics.width;
 						lastHeight = null;
 						// вычисление новой ширины столбца, чтобы высота текста была меньше maxRowHeight
 						c = t._getCell(col, row);
-						fl = t._getCellFlags(c);
-						if (fl.isMerged) {continue;}
 						str = c.getValue2();
 						maxW = ct.metrics.width + t.maxDigitWidth;
 						while (1) {
-							tm = t._roundTextMetrics( t.stringRender.measureString(str, fl, maxW) );
+							tm = t._roundTextMetrics(t.stringRender.measureString(str, fl, maxW));
 							if (tm.height <= t.maxRowHeight) {break;}
 							if (lastHeight === tm.height) {
 								// Ситуация, когда у нас текст не уберется по высоте (http://bugzserver/show_bug.cgi?id=19974)
@@ -9522,8 +9525,7 @@
 
 				History.Create_NewPoint();
 				var oSelection = History.GetSelection();
-				if(null != oSelection)
-				{
+				if (null != oSelection) {
 					oSelection = oSelection.clone();
 					oSelection.assign(col, 0, col, gc_nMaxRow0);
 					oSelection.type = c_oAscSelectionType.RangeCol;
@@ -9557,8 +9559,8 @@
 				for (col = 0; col < t.rows.length; ++col) {
 					ct = t._getCellTextCache(col, row);
 					if (ct === undefined) {continue;}
-					if (ct.flags.isMerged) {
-						mc = ct.mc;
+					if (ct.flags.isMerged()) {
+						mc = ct.flags.merged;
 						// Для замерженных ячеек (с 2-мя или более строками) оптимизировать не нужно
 						if (mc.r1 !== mc.r2)
 							continue;
@@ -10015,7 +10017,7 @@
 
 		WorksheetView.prototype.openCellEditor = function (editor, x, y, isCoord, fragments, cursorPos,
 														   isFocus, isClearCell, isHideCursor, activeRange) {
-			var t = this, vr = t.visibleRange.clone(), tc = t.cols, tr = t.rows, col, row, c, fl, mc, bg;
+			var t = this, vr = t.visibleRange.clone(), tc = t.cols, tr = t.rows, col, row, c, fl, mc, bg, isMerged;
 			var offsetX = 0, offsetY = 0;
 			var ar = t.activeRange;
 			if (activeRange)
@@ -10037,7 +10039,7 @@
 				var i, w, res = [], offs = t.cols[vr.c1].left - t.cols[0].left - offsetX;
 
 				// Для замерженных ячеек, можем уйти за границу
-				if (fl.isMerged && col > vr.c2)
+				if (isMerged && col > vr.c2)
 					col = vr.c2;
 
 				for (i = col; i <= vr.c2; ++i) {
@@ -10056,7 +10058,7 @@
 				var i, h, res = [], offs = t.rows[vr.r1].top - t.rows[0].top - offsetY;
 
 				// Для замерженных ячеек, можем уйти за границу
-				if (fl.isMerged && row > vr.r2)
+				if (isMerged && row > vr.r2)
 					row = vr.r2;
 
 				for (i = row; i <= vr.r2; ++i) {
@@ -10089,8 +10091,9 @@
 			if (!c) {throw "Can not get cell data (col=" + col + ", row=" + row + ")";}
 
 			fl = t._getCellFlags(c);
-			if (fl.isMerged) {
-				mc = t.model.getMergedByCell(row, col);
+			isMerged = fl.isMerged();
+			if (isMerged) {
+				mc = fl.merged;
 				c = t._getVisibleCell(mc.c1, mc.r1);
 				if (!c) {throw "Can not get merged cell data (col=" + mc.c1 + ", row=" + mc.r1 + ")";}
 				fl = t._getCellFlags(c);
@@ -10159,11 +10162,11 @@
 			}
 
 			editor.open({
-				cellX: t.cellsLeft + tc[!fl.isMerged ? col : mc.c1].left - tc[vr.c1].left + offsetX,
-				cellY: t.cellsTop + tr[!fl.isMerged ? row : mc.r1].top - tr[vr.r1].top + offsetY,
-				leftSide: getLeftSide(!fl.isMerged ? col : mc.c1),
-				rightSide: getRightSide(!fl.isMerged ? col : mc.c2),
-				bottomSide: getBottomSide(!fl.isMerged ? row : mc.r2),
+				cellX: t.cellsLeft + tc[!isMerged ? col : mc.c1].left - tc[vr.c1].left + offsetX,
+				cellY: t.cellsTop + tr[!isMerged ? row : mc.r1].top - tr[vr.r1].top + offsetY,
+				leftSide: getLeftSide(!isMerged ? col : mc.c1),
+				rightSide: getRightSide(!isMerged ? col : mc.c2),
+				bottomSide: getBottomSide(!isMerged ? row : mc.r2),
 				fragments: fragments,
 				flags: fl,
 				font: new asc_FP(c.getFontname(), c.getFontsize()),
@@ -10175,7 +10178,7 @@
 				isClearCell: isClearCell,
 				isHideCursor: isHideCursor,
 				saveValueCallback: function (val, flags, skipNLCheck) {
-					var oCellEdit = fl.isMerged ? new asc_Range(mc.c1, mc.r1, mc.c1, mc.r1) : new asc_Range(col, row, col, row);
+					var oCellEdit = isMerged ? new asc_Range(mc.c1, mc.r1, mc.c1, mc.r1) : new asc_Range(col, row, col, row);
 					return t._saveCellValueAfterEdit(oCellEdit, c, val, flags, skipNLCheck, /*isNotHistory*/false);
 				}
 			});
@@ -10205,7 +10208,7 @@
 		};
 
 		WorksheetView.prototype._updateCellsRange = function (range, canChangeColWidth, lockDraw) {
-			var t = this, r, c, h, d, ct;
+			var t = this, r, c, h, d, ct, isMerged;
 			var mergedRange, bUpdateRowHeight;
 
 			if (range === undefined) {range = t.activeRange.clone(true);}
@@ -10250,17 +10253,18 @@
 					}
 
 					// Замерженная ячейка (с 2-мя или более строками) не влияет на высоту строк!
-					if (!ct.flags.isMerged) {
+					isMerged = ct.flags.isMerged();
+					if (!isMerged) {
 						bUpdateRowHeight = true;
 					} else {
-						mergedRange = ct.mc;
+						mergedRange = ct.flags.merged;
 						// Для замерженных ячеек (с 2-мя или более строками) оптимизировать не нужно
 						bUpdateRowHeight = mergedRange.r1 === mergedRange.r2;
 					}
 					if (bUpdateRowHeight)
 						h = Math.max(h, ct.metrics.height);
 
-					if (ct.cellVA !== kvaTop && ct.cellVA !== kvaCenter && !ct.flags.isMerged) {
+					if (ct.cellVA !== kvaTop && ct.cellVA !== kvaCenter && !isMerged) {
 						d = Math.max(d, ct.metrics.height - ct.metrics.baseline);
 					}
 				}

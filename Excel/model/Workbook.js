@@ -5997,7 +5997,6 @@ Range.prototype.getVerticalText=function(){
     return g_nVerticalTextAngle == g_oDefaultAlign.angle;
 }
 Range.prototype.hasMerged=function(){
-	var oThis = this;
 	var aMerged = this.worksheet.mergeManager.get(this.bbox);
 	if(aMerged.all.length > 0)
 		return aMerged.all[0].bbox;
