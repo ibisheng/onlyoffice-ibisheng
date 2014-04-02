@@ -3426,7 +3426,7 @@ CChartsDrawer.prototype =
 	
 	
 	//***spline functions***
-	calculate_Bezier: function(x, y, x1, y1, x2, y2, x3, y3, t)
+	calculate_Bezier: function(x, y, x1, y1, x2, y2, x3, y3)
 	{
 		var pts = [], bz = [];   
 
@@ -3441,8 +3441,11 @@ CChartsDrawer.prototype =
 		var d02 = this.XYZDist(pts[0], pts[2]);
 		var d13 = this.XYZDist(pts[1], pts[3]);
 		
+		//start point
 		bz[0] = pts[1];
 		
+		
+		//control points
 		if ((d02 / 6 < d12 / 2) && (d13 / 6 < d12 / 2))
 		{
 			var f;
@@ -3459,8 +3462,7 @@ CChartsDrawer.prototype =
 				f = 1 / 3;
 
 			bz[2] = this.XYZAdd(pts[2], this.XYZMult(this.XYZSub(pts[1], pts[3]), f))
-		}
-		   
+		}  
 		else if ((d02 / 6 >= d12 / 2) && (d13 / 6 >= d12 / 2)) 
 		{
 			bz[1] = this.XYZAdd(pts[1], this.XYZMult(this.XYZSub(pts[2], pts[0]), d12 / 2 / d02))
@@ -3477,28 +3479,10 @@ CChartsDrawer.prototype =
 			bz[2] = this.XYZAdd(pts[2], this.XYZMult(this.XYZSub(pts[1], pts[3]), d12 / 2 / d13))
 		}
 		
+		//end point
 		bz[3] = pts[2];
 		
-		var pt = this._bezier4(bz[0], bz[1], bz[2], bz[3], t);
-		
-		return [pt.x, pt.y];
-	},
-
-	_bezier4: function(p1, p2, p3, p4, t)
-	{
-		var mum1, mum13, t3, mum12, t2;
-		var p = {};
-		
-		mum1 = 1 - t;
-		mum13 = mum1 * mum1 * mum1;
-		mum12 = mum1 * mum1;
-		t2 = t * t
-		t3 = t * t * t;
-
-		p.x = mum13 * p1.x + 3 * t * mum12 * p2.x + 3 * t2 * mum1 * p3.x + t3 * p4.x;
-		p.y = mum13 * p1.y + 3 * t * mum12 * p2.y + 3 * t2 * mum1 * p3.y + t3 * p4.y;
-		
-		return p;
+		return bz;
 	},
 
 	XYZAdd: function(a, b)
@@ -4301,7 +4285,6 @@ drawLineChart.prototype =
 	_calculateSplineLine : function(x, y, x1, y1, x2, y2, x3, y3, xPoints, yPoints)
 	{
 		var path  = new Path();
-		var splineCoords;
 		
 		var pathH = this.chartProp.pathH;
 		var pathW = this.chartProp.pathW;
@@ -4312,28 +4295,24 @@ drawLineChart.prototype =
 		gdLst["w"] = 1;
 		gdLst["h"] = 1;
 		
-		var startCoords;
-		var endCoords;
-		
-		for(var i = 0; i <= 1;)
-		{
-			splineCoords = this.cChartDrawer.calculate_Bezier(x, y, x1, y1, x2, y2, x3, y3, i);
-			
-			if(i == 0)
-			{
-				startCoords = {x: this.cChartDrawer.getYPosition(splineCoords[0], xPoints, true), y: this.cChartDrawer.getYPosition(splineCoords[1], yPoints)};
-			}
-			
-			endCoords = {x: this.cChartDrawer.getYPosition(splineCoords[0], xPoints, true), y: this.cChartDrawer.getYPosition(splineCoords[1], yPoints)};
-			
-			
-			if(i == 0)
-				path.moveTo(startCoords.x * pathW, startCoords.y * pathH);
-			path.lnTo(endCoords.x * pathW, endCoords.y * pathH);
-			
-			i = i + 0.1;
-		};
 
+		var splineCoords = this.cChartDrawer.calculate_Bezier(x, y, x1, y1, x2, y2, x3, y3, i);
+		
+		var x = this.cChartDrawer.getYPosition(splineCoords[0].x, xPoints, true);
+		var y = this.cChartDrawer.getYPosition(splineCoords[0].y, yPoints);
+		
+		var x1 = this.cChartDrawer.getYPosition(splineCoords[1].x, xPoints, true);
+		var y1 = this.cChartDrawer.getYPosition(splineCoords[1].y, yPoints);
+		
+		var x2 = this.cChartDrawer.getYPosition(splineCoords[2].x, xPoints, true);
+		var y2 = this.cChartDrawer.getYPosition(splineCoords[2].y, yPoints);
+		
+		var x3 = this.cChartDrawer.getYPosition(splineCoords[3].x, xPoints, true);
+		var y3 = this.cChartDrawer.getYPosition(splineCoords[3].y, yPoints);
+		
+		path.moveTo(x * pathW, y * pathH);
+		path.cubicBezTo(x1 * pathW, y1 * pathH, x2 * pathW, y2 * pathH, x3 * pathW, y3 * pathH);
+		
 		path.recalculate(gdLst);
 		
 		return path;
@@ -6133,9 +6112,6 @@ drawScatterChart.prototype =
 		gdLst["w"] = 1;
 		gdLst["h"] = 1;
 		
-		var startCoords;
-		var endCoords;
-		
 		var x = points[k - 1] ? points[k - 1].x : points[k].x;
 		var y = points[k - 1] ? points[k - 1].y : points[k].y;
 		
@@ -6148,25 +6124,24 @@ drawScatterChart.prototype =
 		var x3 = points[k + 2] ? points[k + 2].x : points[k].x;
 		var y3 = points[k + 2] ? points[k + 2].y : points[k].y;
 		
-		for(var i = 0; i <= 1;)
-		{
-			splineCoords = this.cChartDrawer.calculate_Bezier(x, y, x1, y1, x2, y2, x3, y3, i);
-			
-			if(i == 0)
-			{
-				startCoords = {x: this.cChartDrawer.getYPosition(splineCoords[0], xPoints, true), y: this.cChartDrawer.getYPosition(splineCoords[1], yPoints)};
-			}
-			
-			endCoords = {x: this.cChartDrawer.getYPosition(splineCoords[0], xPoints, true), y: this.cChartDrawer.getYPosition(splineCoords[1], yPoints)};
-			
-			
-			if(i == 0)
-				path.moveTo(startCoords.x * pathW, startCoords.y * pathH);
-			path.lnTo(endCoords.x * pathW, endCoords.y * pathH);
-			
-			i = i + 0.1;
-		};
-
+		
+		var splineCoords = this.cChartDrawer.calculate_Bezier(x, y, x1, y1, x2, y2, x3, y3, i);
+		
+		x = this.cChartDrawer.getYPosition(splineCoords[0].x, xPoints, true);
+		y = this.cChartDrawer.getYPosition(splineCoords[0].y, yPoints);
+		
+		x1 = this.cChartDrawer.getYPosition(splineCoords[1].x, xPoints, true);
+		y1 = this.cChartDrawer.getYPosition(splineCoords[1].y, yPoints);
+		
+		x2 = this.cChartDrawer.getYPosition(splineCoords[2].x, xPoints, true);
+		y2 = this.cChartDrawer.getYPosition(splineCoords[2].y, yPoints);
+		
+		x3 = this.cChartDrawer.getYPosition(splineCoords[3].x, xPoints, true);
+		y3 = this.cChartDrawer.getYPosition(splineCoords[3].y, yPoints);
+		
+		path.moveTo(x * pathW, y * pathH);
+		path.cubicBezTo(x1 * pathW, y1 * pathH, x2 * pathW, y2 * pathH, x3 * pathW, y3 * pathH);
+		
 		path.recalculate(gdLst);
 		
 		return path;
