@@ -5476,18 +5476,20 @@
 		};
 		WorksheetView.prototype._isCursorOnSelectionBorder = function (ar, vr, x, y) {
 			var arIntersection = ar.intersectionSimple(vr);
-			var left, top, right, bottom;
+			var left, top, right, bottom, wEps = this.width_2px, hEps = this.height_2px;
 			if (arIntersection) {
 				left = ar.c1 === arIntersection.c1 ? this.cols[ar.c1].left : null;
 				right = ar.c2 === arIntersection.c2 ? this.cols[ar.c2].left + this.cols[ar.c2].width : null;
 				top = ar.r1 === arIntersection.r1 ? this.rows[ar.r1].top : null;
 				bottom = ar.r2 === arIntersection.r2 ? this.rows[ar.r2].top + this.rows[ar.r2].height : null;
-				if ((((null !== left && x >= left - this.width_2px && x <= left + this.width_2px) ||
-					(null !== right && x >= right - this.width_2px && x <= right + this.width_2px)) &&
-					null !== top && null !== bottom && y >= top - this.height_2px && y <= bottom + this.height_2px) ||
-					(((null !== top && y >= top - this.height_2px && y <= top + this.height_2px) ||
-						(null !== bottom && y >= bottom - this.height_2px && y <= bottom + this.height_2px)) &&
-						null !== left && null !== right && x >= left - this.width_2px && x <= right + this.width_2px)) {
+				var isLeft = (null !== left && x >= left - wEps && x <= left + wEps),
+					isRight = (null !== right && x >= right - wEps && x <= right + wEps),
+					isTop = (null !== top && y >= top - hEps && y <= top + hEps),
+					isBottom = (null !== bottom && y >= bottom - hEps && y <= bottom + hEps),
+					isHorMiddle = ((null === left || x >= left - wEps) && (null === right || x <= right + wEps)),
+					isVerMiddle = ((null === top || y >= top - hEps) && (null === bottom || y <= bottom + hEps));
+
+				if (((isLeft || isRight) && isVerMiddle) || ((isTop || isBottom) && isHorMiddle)) {
 					// Мы навели на границу выделения
 					return true;
 				}
@@ -5569,6 +5571,39 @@
 				return {cursor: kCurFormatPainter, target: target, col: col, row: row};
 			}
 
+			var oResDefault = {cursor: kCurDefault, target: "none", col: -1, row: -1};
+			if (x < this.cellsLeft && y < this.cellsTop) {
+				return {cursor: kCurCorner, target: "corner", col: -1, row: -1};
+			}
+			if (x <= this.cellsLeft && y >= this.cellsTop) {
+				r = this._findRowUnderCursor(y, true);
+				if (r === null)
+					return oResDefault;
+				f = !isViewerMode && (r.row !== this.visibleRange.r1 && y < r.top + 3 || y >= r.bottom - 3);
+				// ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
+				return {
+					cursor: f ? kCurRowResize : kCurRowSelect,
+					target: f ? "rowresize" : "rowheader",
+					col: -1,
+					row: r.row + (r.row !== this.visibleRange.r1 && f && y < r.top + 3 ? -1 : 0),
+					mouseY: f ? ((y < r.top + 3) ? (r.top - y - this.height_1px): (r.bottom - y - this.height_1px))  : null
+				};
+			}
+			if (y <= this.cellsTop && x >= this.cellsLeft) {
+				c = this._findColUnderCursor(x, true);
+				if (c === null)
+					return oResDefault;
+				f = !isViewerMode && (c.col !== this.visibleRange.c1 && x < c.left + 3 || x >= c.right - 3);
+				// ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
+				return {
+					cursor: f ? kCurColResize : kCurColSelect,
+					target: f ? "colresize" : "colheader",
+					col: c.col + (c.col !== this.visibleRange.c1 && f && x < c.left + 3 ? -1 : 0),
+					row: -1,
+					mouseX: f ? ((x < c.left + 3) ? (c.left - x - this.width_1px): (c.right - x - this.width_1px))  : null
+				};
+			}
+
 			var autoFilterInfo = this.autoFilters.checkCursor(x, y);
 			if (autoFilterInfo)
 				return {cursor: kCurAutoFilter, target: "aFilterObject", col: -1, row: -1, idFilter: autoFilterInfo.id};
@@ -5610,11 +5645,6 @@
 					return {cursor: kCurMove, target: "moveRange", col: -1, row: -1};
 			}
 
-			if (x < this.cellsLeft && y < this.cellsTop) {
-				return {cursor: kCurCorner, target: "corner", col: -1, row: -1};
-			}
-
-			var oResDefault = {cursor: kCurDefault, target: "none", col: -1, row: -1};
 			if (x > this.cellsLeft && y > this.cellsTop) {
 				c = this._findColUnderCursor(x, true);
 				r = this._findRowUnderCursor(y, true);
@@ -5719,36 +5749,6 @@
 						lockAllPosTop: lockAllPosTop, commentIndexes: indexes, commentCoords: coords};
 				}
 				return cellCursor;
-			}
-
-			if (x <= this.cellsLeft && y >= this.cellsTop) {
-				r = this._findRowUnderCursor(y, true);
-				if (r === null)
-					return oResDefault;
-				f = !isViewerMode && (r.row !== this.visibleRange.r1 && y < r.top + 3 || y >= r.bottom - 3);
-				// ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
-				return {
-					cursor: f ? kCurRowResize : kCurRowSelect,
-					target: f ? "rowresize" : "rowheader",
-					col: -1,
-					row: r.row + (r.row !== this.visibleRange.r1 && f && y < r.top + 3 ? -1 : 0),
-					mouseY: f ? ((y < r.top + 3) ? (r.top - y - this.height_1px): (r.bottom - y - this.height_1px))  : null
-				};
-			}
-
-			if (y <= this.cellsTop && x >= this.cellsLeft) {
-				c = this._findColUnderCursor(x, true);
-				if (c === null)
-					return oResDefault;
-				f = !isViewerMode && (c.col !== this.visibleRange.c1 && x < c.left + 3 || x >= c.right - 3);
-				// ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
-				return {
-					cursor: f ? kCurColResize : kCurColSelect,
-					target: f ? "colresize" : "colheader",
-					col: c.col + (c.col !== this.visibleRange.c1 && f && x < c.left + 3 ? -1 : 0),
-					row: -1,
-					mouseX: f ? ((x < c.left + 3) ? (c.left - x - this.width_1px): (c.right - x - this.width_1px))  : null
-				};
 			}
 
 			return oResDefault;
