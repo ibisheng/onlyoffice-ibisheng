@@ -4325,7 +4325,7 @@
                 sideL		: cto.leftSide,
                 sideR		: cto.rightSide,
                 cellType	: cellType,
-                isFormula	: c.getFormula().length > 0,
+                isFormula	: c.isFormula(),
                 angle		: angle,
                 textBound	: textBound,
                 mc			: mc

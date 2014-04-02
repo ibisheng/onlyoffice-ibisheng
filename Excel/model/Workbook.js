@@ -5352,6 +5352,10 @@ Range.prototype.isEmptyTextString=function(){
 	var cell = this.worksheet._getCellNoEmpty(this.bbox.r1,this.bbox.c1);
 	return (null != cell) ? cell.isEmptyTextString() : true;
 };
+Range.prototype.isFormula=function(){
+	var cell = this.worksheet._getCellNoEmpty(this.bbox.r1,this.bbox.c1);
+	return (null != cell) ? cell.isFormula() : false;
+};
 Range.prototype.getFormula=function(){
 	var cell = this.worksheet._getCellNoEmpty(this.bbox.r1,this.bbox.c1);
 	if(null != cell)
