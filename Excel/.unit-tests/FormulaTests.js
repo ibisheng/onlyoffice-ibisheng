@@ -4141,5 +4141,77 @@
 
     } )
 
+    test( "Test: \"ODDLPRICE\"", function () {
+
+        function oddlprice( settlement, maturity, last_interest, rate, yld, redemption, frequency, basis ){
+
+            var fDCi = _yearFrac( last_interest, maturity, basis ) * frequency;
+            var fDSCi = _yearFrac( settlement, maturity, basis ) * frequency;
+            var fAi = _yearFrac( last_interest, settlement, basis ) * frequency;
+
+            var res = redemption + fDCi * 100.0 * rate / frequency;
+            res /= fDSCi * yld / frequency + 1.0;
+            res -= fAi * 100.0 * rate / frequency;
+
+            return res;
+        }
+
+        oParser = new parserFormula( "ODDLPRICE(DATE(2008,11,11),DATE(2021,3,1),DATE(2008,10,15),0.0785,0.0625,100,2,1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), oddlprice( new Date(2008,10,11), new Date(2021,2,1), new Date(2008,9,15), 0.0785, 0.0625, 100, 2, 1 ) );
+
+    } )
+
+    test( "Test: \"ODDLYIELD\"", function () {
+
+        function oddlyield( settlement, maturity, last_interest, rate, pr, redemption, frequency, basis ){
+
+            var fDCi = yearFrac( last_interest, maturity, basis ) * frequency;
+            var fDSCi = yearFrac( settlement, maturity, basis ) * frequency;
+            var fAi = yearFrac( last_interest, settlement, basis ) * frequency;
+
+            var res = redemption + fDCi * 100.0 * rate / frequency;
+            res /= pr + fAi * 100.0 * rate / frequency;
+            res--;
+            res *= frequency / fDSCi;
+
+            return res;
+        }
+
+        oParser = new parserFormula( "ODDLYIELD(DATE(2008,11,11),DATE(2021,3,1),DATE(2008,10,15),0.0575,84.5,100,2,0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), oddlyield( new Date(2008,10,11), new Date(2021,2,1), new Date(2008,9,15), 0.0575, 84.5, 100, 2, 0 ) );
+
+    } )
+
+    test( "Test: \"SYD\"", function () {
+
+        function syd( cost, salvage, life, per ){
+
+            if( life == -1 || life == 0 )
+                return "#NUM!";
+
+            var res = 2;
+            res *= cost - salvage;
+            res *= life+1-per;
+            res /= (life+1)*life;
+
+            return res;
+        }
+
+        oParser = new parserFormula( "SYD(30000,7500,10,1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), syd( 30000,7500,10,1 ) );
+
+        oParser = new parserFormula( "SYD(30000,7500,-1,10)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), syd( 30000,7500,-1,10 ) );
+
+        oParser = new parserFormula( "SYD(30000,7500,-10,10)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), syd( 30000,7500,-10,10 ) );
+
+    } )
+
 
 } );
