@@ -5629,18 +5629,18 @@
 
 			isSelGraphicObject = this.objectRender.selectedGraphicObjectsExists();
 			if (!isViewerMode && !isSelGraphicObject) {
-				// Эпсилон для fillHandle
-				var fillHandleEpsilon = this.width_1px;
+			// Эпсилон для fillHandle
+			var fillHandleEpsilon = this.width_1px;
 				if (!this.isChartAreaEditMode &&
-					x >= (this.fillHandleL - fillHandleEpsilon) && x <= (this.fillHandleR + fillHandleEpsilon) &&
-					y >= (this.fillHandleT - fillHandleEpsilon) && y <= (this.fillHandleB + fillHandleEpsilon)) {
-					// Мы на "квадрате" для автозаполнения
+				x >= (this.fillHandleL - fillHandleEpsilon) && x <= (this.fillHandleR + fillHandleEpsilon) &&
+				y >= (this.fillHandleT - fillHandleEpsilon) && y <= (this.fillHandleB + fillHandleEpsilon)) {
+				// Мы на "квадрате" для автозаполнения
 					return {cursor: kCurFillHandle, target: "fillhandle", col: -1, row: -1};
-				}
+			}
 
 				// Навели на выделение
-				var xWithOffset = x + offsetX;
-				var yWithOffset = y + offsetY;
+			var xWithOffset = x + offsetX;
+			var yWithOffset = y + offsetY;
 				if (this._isCursorOnSelectionBorder(ar, this.visibleRange, xWithOffset, yWithOffset))
 					return {cursor: kCurMove, target: "moveRange", col: -1, row: -1};
 			}
@@ -5751,8 +5751,8 @@
 				return cellCursor;
 			}
 
-			return oResDefault;
-		};
+					return oResDefault;
+				};
 
 		WorksheetView.prototype._fixSelectionOfMergedCells = function (fixedRange) {
 			var t = this;
@@ -7218,6 +7218,17 @@
 			var colByX = this._findColUnderCursor (x, /*canReturnNull*/false, /*dX*/false).col;
 			var rowByY = this._findRowUnderCursor (y, /*canReturnNull*/false, /*dY*/false).row;
 
+            if( ar.type == c_oAscSelectionType.RangeRow ){
+                colByX = 0;
+            }
+            if( ar.type == c_oAscSelectionType.RangeCol ){
+                rowByY = 0;
+            }
+            if( ar.type == c_oAscSelectionType.RangeMax ){
+                colByX = 0;
+                rowByY = 0;
+            }
+
 			// Если мы только первый раз попали сюда, то копируем выделенную область
 			if (null === this.startCellMoveRange) {
 				// Учитываем погрешность (мы должны быть внутри диапазона при старте)
@@ -7284,7 +7295,18 @@
 			while ( this._isRowDrawnPartially( this.activeMoveRange.r2, this.visibleRange.r1 + d.deltaY) ) {++d.deltaY;}
 			
 			this.model.workbook.handlers.trigger("asc_onHideComment");
-			
+
+            if( this.activeMoveRange.type == c_oAscSelectionType.RangeRow ){
+                d.deltaX = 0;
+            }
+            if( this.activeMoveRange.type == c_oAscSelectionType.RangeCol ){
+                d.deltaY = 0;
+            }
+            if( this.activeMoveRange.type == c_oAscSelectionType.RangeMax ){
+                d.deltaX = 0;
+                d.deltaY = 0;
+            }
+
 			return d;
 		};
 
@@ -9502,7 +9524,7 @@
 						str = c.getValue2();
 						maxW = ct.metrics.width + t.maxDigitWidth;
 						while (1) {
-							tm = t._roundTextMetrics(t.stringRender.measureString(str, fl, maxW));
+							tm = t._roundTextMetrics( t.stringRender.measureString(str, fl, maxW) );
 							if (tm.height <= t.maxRowHeight) {break;}
 							if (lastHeight === tm.height) {
 								// Ситуация, когда у нас текст не уберется по высоте (http://bugzserver/show_bug.cgi?id=19974)
