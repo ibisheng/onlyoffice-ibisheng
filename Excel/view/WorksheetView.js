@@ -6694,6 +6694,7 @@
 				this.cleanSelection();
 				this.copyOfActiveRange = null;
 				this._drawSelection();
+				this.handlers.trigger("onStopFormatPainter");
 			}
 		};
 

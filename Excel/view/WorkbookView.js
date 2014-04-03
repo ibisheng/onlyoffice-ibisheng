@@ -450,7 +450,8 @@
 				"setAutoFiltersDialog"  	: function (arrVal) {self.handlers.trigger("asc_onSetAFDialog", arrVal);},
 				"selectionRangeChanged"		: function (val) {self.handlers.trigger("asc_onSelectionRangeChanged", val);},
 				"getDCForCharts"			: function () { return self.drawingCtxCharts; },
-				"onRenameCellTextEnd"		: function (countFind, countReplace) {self.handlers.trigger("asc_onRenameCellTextEnd", countFind, countReplace);}
+				"onRenameCellTextEnd"		: function (countFind, countReplace) {self.handlers.trigger("asc_onRenameCellTextEnd", countFind, countReplace);},
+				"onStopFormatPainter"		: function () {self.handlers.trigger("asc_onStopFormatPainter");}
 			}, this.buffers, this.stringRender, this.maxDigitWidth, this.collaborativeEditing, opt);
 		};
 

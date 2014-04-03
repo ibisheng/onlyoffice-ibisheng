@@ -1186,8 +1186,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			 * asc_onRenameCellTextEnd		(countCellsFind, countCellsReplace)							- эвент об окончании замены текста в ячейках (мы не можем сразу прислать ответ)
 			 * asc_onWorkbookLocked			(result)													- эвент залочена ли работа с листами или нет
 			 * asc_onWorksheetLocked		(index, result)												- эвент залочен ли лист или нет
-			 * asc_onGetEditorPermissions	(permission)												- эвент о правах редактора.
-			 * asc_onGetLicense				(license)													- эвент о лицензии.
+			 * asc_onGetEditorPermissions	(permission)												- эвент о правах редактора
+			 * asc_onGetLicense				(license)													- эвент о лицензии
+			 * asc_onStopFormatPainter		()															- эвент об окончании форматирования по образцу
 			 */
 
 			asc_StartAction: function (type, id) {
