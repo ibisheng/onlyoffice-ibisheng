@@ -117,6 +117,8 @@ function CDocumentPage()
     this.Y      = 0;
     this.XLimit = 0;
     this.YLimit = 0;
+
+    this.EndSectionParas = new Array();
 }
 
 CDocumentPage.prototype =
@@ -137,6 +139,18 @@ CDocumentPage.prototype =
         this.YLimit += Dy;
 
         this.Bounds.Shift( Dx, Dy );
+    },
+
+    Check_EndSectionPara : function(Element)
+    {
+        var Count = this.EndSectionParas.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            if ( Element === this.EndSectionParas[Index] )
+                return true;
+        }
+
+        return false;
     }
 };
 
@@ -368,14 +382,12 @@ function CDocument(DrawingDocument)
     this.StartPage = 0; // Для совместимости с CDocumentContent
     this.CurPage   = 0;
 
-    this.Orientation = orientation_Portrait; // ориентация страницы
     this.StyleCounter = 0;
     this.NumInfoCounter = 0;
 
     // Сначала настраиваем размеры страницы и поля
-    this.SectPr = new SectPr();
-    this.SectPr.Set_PageSize( 793.7, 1122,53 );
-    this.SectPr.Set_PageMargins( { Left : 75.6  }  );
+    this.SectPr = new CSectionPr(this);
+    this.SectionsInfo = new CDocumentSectionsInfo();
 
     this.Content = new Array();
     this.Content[0] = new Paragraph( DrawingDocument, this, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
@@ -555,6 +567,11 @@ CDocument.prototype =
     {
         g_oTableId.Reset_Id( this, newId, this.Id );
         this.Id = newId;
+    },
+
+    On_EndLoad : function()
+    {
+        this.Update_SectionsInfo();
     },
 
     LoadEmptyDocument : function()
@@ -999,10 +1016,32 @@ CDocument.prototype =
         return true;
     },
 
-    Get_PageContentStartPos : function (PageIndex)
+    Get_PageContentStartPos : function (PageIndex, ElementIndex)
     {
         if ( true !== g_TestColumns )
         {
+            var SectPr = this.SectionsInfo.Get_SectPr( ElementIndex).SectPr;
+
+            var X, Y, XLimit, YLimit;
+            if ( orientation_Portrait == SectPr.PageSize.Orient )
+            {
+                Y      = SectPr.PageMargins.Top;
+                YLimit = SectPr.PageSize.H - SectPr.PageMargins.Bottom;
+                X      = SectPr.PageMargins.Left;
+                XLimit = SectPr.PageSize.W - SectPr.PageMargins.Right;
+            }
+            else
+            {
+                Y      = SectPr.PageMargins.Right;
+                YLimit = SectPr.PageSize.W - SectPr.PageMargins.Left;
+                X      = SectPr.PageMargins.Top;
+                XLimit = SectPr.PageSize.H - SectPr.PageMargins.Bottom;
+            }
+
+            return { X : X, Y : Y, XLimit : XLimit, YLimit : YLimit };
+
+
+            /*
             var Y = Y_Top_Field;
             var YHeader = this.HdrFtr.Get_HeaderBottomPos( PageIndex );
             if ( YHeader >= 0 && YHeader > Y )
@@ -1014,6 +1053,7 @@ CDocument.prototype =
                 YLimit = YFooter;
 
             return { X : X_Left_Field, Y : Y, XLimit : X_Right_Field, YLimit : YLimit };
+            */
         }
         else
         {
@@ -1102,6 +1142,24 @@ CDocument.prototype =
                 var Res  = Para.Recalculate_Fast( SimpleChanges );
                 if ( -1 !== Res )
                 {
+                    // Если изменения произошли на последней странице параграфа, и за данным параграфом следовал
+                    // пустой параграф с новой секцией, тогда его тоже надо пересчитать.
+                    if ( Res === Para.Get_StartPage_Absolute() + Para.Pages.length - 1 )
+                    {
+                        var NextElement = Para.Get_DocumentNext();
+                        if (null !== NextElement && true === this.Pages[Res].Check_EndSectionPara(NextElement))
+                        {
+                            var LastVisibleBounds = Para.Get_LastRangeVisibleBounds();
+
+                            var ___X = LastVisibleBounds.X + LastVisibleBounds.W;
+                            var ___Y = LastVisibleBounds.Y;
+
+                            // Делаем предел по X минимум 10 мм, чтобы всегда было видно элемент разрыва секции
+                            NextElement.Reset(___X, ___Y, Math.max(___X + 10, NextElement.XLimit), 10000, Res);
+                            NextElement.Recalculate_Page(Res);
+                        }
+                    }
+
                     // Перерисуем страницу, на которой произошли изменения
                     this.DrawingDocument.OnRecalculatePage( Res, this.Pages[Res] );
                     this.DrawingDocument.OnEndRecalculate( false, true );
@@ -1209,26 +1267,46 @@ CDocument.prototype =
         this.DrawingObjects.updateCharts();
         this.DrawingDocument.OnStartRecalculate( StartPage );
         this.Recalculate_Page(StartPage, true, StartIndex);
-
-        //sendStatus("LastRecalc: " + ((new Date().getTime() - StartTime) / 1000) );
-
     },
 
     // bStart - флаг, который говорит, о том рассчитываем мы эту страницу первый раз или нет (за один общий пересчет)
-    Recalculate_Page : function(PageIndex, bStart, StartIndex)
+    Recalculate_Page : function(PageIndex, bStart, StartIndex, bStartNewSection)
     {
+        var StartPos = this.Get_PageContentStartPos( PageIndex, StartIndex );
+
         if ( true === bStart )
         {
+            var SectPr = this.SectionsInfo.Get_SectPr( StartIndex).SectPr;
+
             this.Pages.length = PageIndex;
             this.Pages[PageIndex] = new CDocumentPage();
             this.Pages[PageIndex].Pos = StartIndex;
+
+            if ( orientation_Portrait === SectPr.PageSize.Orient )
+            {
+                this.Pages[PageIndex].Width          = SectPr.PageSize.W;
+                this.Pages[PageIndex].Height         = SectPr.PageSize.H;
+                this.Pages[PageIndex].Margins.Left   = SectPr.PageMargins.Left;
+                this.Pages[PageIndex].Margins.Top    = SectPr.PageMargins.Top;
+                this.Pages[PageIndex].Margins.Right  = SectPr.PageSize.W - SectPr.PageMargins.Right;
+                this.Pages[PageIndex].Margins.Bottom = SectPr.PageSize.H - SectPr.PageMargins.Bottom;
+            }
+            else
+            {
+                this.Pages[PageIndex].Width          = SectPr.PageSize.H;
+                this.Pages[PageIndex].Height         = SectPr.PageSize.W;
+                this.Pages[PageIndex].Margins.Left   = SectPr.PageMargins.Top;
+                this.Pages[PageIndex].Margins.Top    = SectPr.PageMargins.Right;
+                this.Pages[PageIndex].Margins.Right  = SectPr.PageSize.H - SectPr.PageMargins.Bottom;
+                this.Pages[PageIndex].Margins.Bottom = SectPr.PageSize.W - SectPr.PageMargins.Left;
+            }
+
+
             this.DrawingObjects.createGraphicPage(PageIndex);
             this.DrawingObjects.resetDrawingArrays(PageIndex, this);
         }
 
         var Count = this.Content.length;
-
-        var StartPos = this.Get_PageContentStartPos( PageIndex );
 
         var X      = StartPos.X;
         var StartY = StartPos.Y;
@@ -1241,6 +1319,7 @@ CDocument.prototype =
         var _PageIndex  = PageIndex;
         var _StartIndex = StartIndex;
         var _bStart     = false;
+        var _bStartNewSection = false;
 
         var Index;
         for ( Index = StartIndex; Index < Count; Index++ )
@@ -1603,13 +1682,37 @@ CDocument.prototype =
             }
             else
             {
-                if ( ( 0 === Index && 0 === PageIndex ) || Index != StartIndex )
+                if ( ( 0 === Index && 0 === PageIndex ) || Index != StartIndex || ( Index === StartIndex && true === bStartNewSection ) )
                 {
                     Element.Set_DocumentIndex( Index );
                     Element.Reset( X, Y, XLimit, YLimit, PageIndex );
                 }
 
-                RecalcResult = Element.Recalculate_Page( PageIndex );
+                // Делаем как в Word: Обработаем особый случай, когда на данном параграфе заканчивается секция, и он
+                // пустой. В такой ситуации этот параграф не добавляет смещения по Y, и сам приписывается в конец
+                // предыдущего элемента.
+
+                var SectInfoElement = this.SectionsInfo.Get_SectPr(Index);
+                if ( Index > 0 && ( Index !== StartIndex || true !== bStartNewSection ) && Index === SectInfoElement.Index && true === Element.IsEmpty() )
+                {
+                    RecalcResult = recalcresult_NextElement;
+                    var LastVisibleBounds = this.Content[Index - 1].Get_LastRangeVisibleBounds();
+
+                    var ___X = LastVisibleBounds.X + LastVisibleBounds.W;
+                    var ___Y = LastVisibleBounds.Y;
+
+                    // Делаем предел по X минимум 10 мм, чтобы всегда было видно элемент разрыва секции
+                    Element.Reset( ___X, ___Y, Math.max( ___X + 10, XLimit ), 10000, PageIndex );
+                    Element.Recalculate_Page( PageIndex );
+
+                    // Добавим в список особых параграфов
+                    this.Pages[PageIndex].EndSectionParas.push( Element );
+
+                    // Выставляем этот флаг, чтобы у нас не менялось значение по Y
+                    bFlow = true;
+                }
+                else
+                    RecalcResult = Element.Recalculate_Page( PageIndex );
             }
 
             Element.TurnOn_RecalcEvent();
@@ -1626,6 +1729,35 @@ CDocument.prototype =
             else if ( recalcresult_NextElement === RecalcResult )
             {
                 // Ничего не делаем
+
+                var CurSectInfo  = this.SectionsInfo.Get_SectPr( Index );
+                var NextSectInfo = this.SectionsInfo.Get_SectPr( Index + 1 );
+                if ( CurSectInfo !== NextSectInfo )
+                {
+                    if ( section_type_Continuous === NextSectInfo.SectPr.Get_Type() && true === CurSectInfo.SectPr.Compare_PageSize( NextSectInfo.SectPr ) )
+                    {
+                        // Новая секция начинается на данной странице. Нам надо получить новые поля данной секции, но
+                        // на данной странице мы будет использовать только новые горизонтальные поля, а поля по вертикали
+                        // используем от предыдущей секции.
+
+                        var NewStartPos = this.Get_PageContentStartPos( PageIndex, Index + 1 );
+
+                        Y = Y + 0.001; // на всякий случай
+                        X      = NewStartPos.X;
+                        XLimit = NewStartPos.XLimit;
+                    }
+                    else
+                    {
+                        this.Pages[PageIndex].EndPos = Index;
+
+                        bContinue         = true;
+                        _PageIndex        = PageIndex + 1;
+                        _StartIndex       = Index + 1;
+                        _bStart           = true;
+                        _bStartNewSection = true;
+                        break;
+                    }
+                }
             }
             else if ( recalcresult_NextPage === RecalcResult )
             {
@@ -1730,7 +1862,7 @@ CDocument.prototype =
                     }
                 }
 
-                this.Recalculate_Page( _PageIndex, _bStart, _StartIndex );
+                this.Recalculate_Page( _PageIndex, _bStart, _StartIndex, _bStartNewSection );
                 return;
             }
 
@@ -1747,7 +1879,7 @@ CDocument.prototype =
                 */
             }
             else
-                this.Recalculate_Page( _PageIndex, _bStart, _StartIndex );
+                this.Recalculate_Page( _PageIndex, _bStart, _StartIndex, _bStartNewSection );
 
         }
     },
@@ -1935,7 +2067,7 @@ CDocument.prototype =
         // Рисуем колонтитулы
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
-            var PageMetrics = this.Get_PageContentStartPos( nPageIndex );
+            var PageMetrics = this.Get_PageContentStartPos( nPageIndex, this.Pages[nPageIndex].Pos );
             pGraphics.DrawHeaderEdit( PageMetrics.Y,     this.HdrFtr.Lock.Get_Type() );
             pGraphics.DrawFooterEdit( PageMetrics.YLimit,this.HdrFtr.Lock.Get_Type() );
         }
@@ -2067,6 +2199,13 @@ CDocument.prototype =
                                 NewParagraph.Style_Remove();
                             else
                                 NewParagraph.Style_Add_Open( NextId );
+                        }
+
+                        var SectPr = Item.Get_SectionPr();
+                        if ( undefined !== SectPr )
+                        {
+                            Item.Set_SectionPr( undefined );
+                            NewParagraph.Set_SectionPr( SectPr );
                         }
                     }
                     else
@@ -7148,34 +7287,34 @@ CDocument.prototype =
 
     Set_DocumentMargin : function(MarPr)
     {
-        this.History.Add( this, { Type : historyitem_Document_Margin, Fields_old : { Left : X_Left_Field, Right : X_Right_Field, Top : Y_Top_Field, Bottom : Y_Bottom_Field }, Fields_new : MarPr, Recalc_Margins : true } );
+        // TODO: Document.Set_DocumentOrientation Сделать в зависимости от выделения
 
-        if( "undefined" !== typeof( MarPr.Left ) )
+        var CurPos = this.CurPos.ContentPos;
+        var SectPr = this.SectionsInfo.Get_SectPr( CurPos).SectPr;
+
+        var L, T, R, B;
+
+        if ( orientation_Portrait === SectPr.Get_Orientation() )
         {
-            X_Left_Field = MarPr.Left;
+            L = MarPr.Left;
+            T = MarPr.Top;
+            R = ( undefined === MarPr.Right ? undefined : SectPr.Get_PageWidth() - MarPr.Right );
+            B = ( undefined === MarPr.Bottom ? undefined : SectPr.Get_PageHeight() - MarPr.Bottom );
         }
-        
-        if( "undefined" !== typeof( MarPr.Right ) )
+        else
         {
-            X_Right_Field = MarPr.Right;
-        }
-        
-        if( "undefined" !== typeof( MarPr.Top ) )
-        {
-            Y_Top_Field = MarPr.Top;
-        }
-        
-        if( "undefined" !== typeof( MarPr.Bottom ) )
-        {
-            Y_Bottom_Field = MarPr.Bottom;
+            L = ( undefined === MarPr.Bottom ? undefined : SectPr.Get_PageWidth() - MarPr.Bottom );
+            T = MarPr.Left;
+            R = MarPr.Top;
+            B = ( undefined === MarPr.Right ? undefined : SectPr.Get_PageHeight() - MarPr.Right );
         }
 
-        X_Left_Margin   = X_Left_Field;
-        X_Right_Margin  = Page_Width - X_Right_Field;
-        Y_Bottom_Margin = Page_Height - Y_Bottom_Field;
-        Y_Top_Margin    = Y_Top_Field;
 
-        this.HdrFtr.UpdateMargins( 0 );
+
+        SectPr.Set_PageMargins( L, T, R, B );
+
+        // TODO: Добавить обработку колонтитулов
+        // this.HdrFtr.UpdateMargins( 0 );
 
         this.ContentLastChangePos = 0;
         this.Recalculate();
@@ -7186,62 +7325,73 @@ CDocument.prototype =
 
     Set_DocumentPageSize : function(W, H, bNoRecalc)
     {
-        this.History.Add( this, { Type : historyitem_Document_PageSize, Width_new : W, Height_new : H, Width_old : Page_Width, Height_old : Page_Height } );
+        // TODO: Document.Set_DocumentOrientation Сделать в зависимости от выделения
 
-        Page_Width  = W;
-        Page_Height = H;
+        var CurPos = this.CurPos.ContentPos;
+        var SectPr = this.SectionsInfo.Get_SectPr( CurPos).SectPr;
 
-        editor.sync_DocSizeCallback( W, H );
+        SectPr.Set_PageSize( W, H );
 
-        X_Left_Field   = X_Left_Margin;
-        X_Right_Field  = Page_Width  - X_Right_Margin;
-        Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
-        Y_Top_Field    = Y_Top_Margin;
+        // TODO: Добавить обработку колонтитулов
+        // this.HdrFtr.UpdateMargins( 0, bNoRecalc );
 
-        this.HdrFtr.UpdateMargins( 0, bNoRecalc );
-		
-		if( true != bNoRecalc )
-		{
-			this.ContentLastChangePos = 0;
-			this.Recalculate();
+        if( true != bNoRecalc )
+        {
+            this.ContentLastChangePos = 0;
+            this.Recalculate();
 
             this.Document_UpdateSelectionState();
             this.Document_UpdateInterfaceState();
-		}
+        }
+    },
+
+    Get_DocumentPageSize : function()
+    {
+        // TODO: Document.Get_DocumentOrientation Сделать в зависимости от выделения
+
+        var CurPos = this.CurPos.ContentPos;
+        var SectionInfoElement = this.SectionsInfo.Get_SectPr(CurPos);
+
+        if ( undefined === SectionInfoElement )
+            return true;
+
+        var SectPr = SectionInfoElement.SectPr;
+
+        return { W : SectPr.Get_PageWidth(), H : SectPr.Get_PageHeight() };
     },
 
     Set_DocumentOrientation : function(Orientation, bNoRecalc)
     {
-        if ( this.Orientation === Orientation )
-            return;
+        // TODO: Document.Set_DocumentOrientation Сделать в зависимости от выделения
 
-        var old_Orientation = this.Orientation;
-        this.Orientation = Orientation;
+        var CurPos = this.CurPos.ContentPos;
+        var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
 
-        var old_X_Left_Margin   = X_Left_Margin;
-        var old_X_Right_Margin  = X_Right_Margin;
-        var old_Y_Bottom_Margin = Y_Bottom_Margin;
-        var old_Y_Top_Margin    = Y_Top_Margin;
+        SectPr.Set_Orientation( Orientation );
+        // TODO: Добавить обработку колонтитулов
 
-        if ( orientation_Landscape === Orientation )
+        if( true != bNoRecalc )
         {
-            // меняем с книжной на альбомную
-            Y_Top_Margin    = old_X_Right_Margin;
-            X_Right_Margin  = old_Y_Bottom_Margin;
-            Y_Bottom_Margin = old_X_Left_Margin;
-            X_Left_Margin   = old_Y_Top_Margin;
-        }
-        else
-        {
-            // меняем с альбомной най книжную
-            Y_Top_Margin    = old_X_Left_Margin;
-            X_Right_Margin  = old_Y_Top_Margin;
-            Y_Bottom_Margin = old_X_Right_Margin;
-            X_Left_Margin   = old_Y_Bottom_Margin;
-        }
+            this.Recalculate();
 
-        this.History.Add( this, { Type : historyitem_Document_Orientation, Orientation_new : this.Orientation, Orientation_old : old_Orientation, Margins_old : { Left : old_X_Left_Margin, Right : old_X_Right_Margin, Top : old_Y_Top_Margin, Bottom : old_Y_Bottom_Margin }, Margins_new : { Left : X_Left_Margin, Right : X_Right_Margin, Top : Y_Top_Margin, Bottom : Y_Bottom_Margin } } );
-        this.Set_DocumentPageSize( Page_Height, Page_Width, bNoRecalc );
+            this.Document_UpdateSelectionState();
+            this.Document_UpdateInterfaceState();
+        }
+    },
+
+    Get_DocumentOrientation : function()
+    {
+        // TODO: Document.Get_DocumentOrientation Сделать в зависимости от выделения
+
+        var CurPos = this.CurPos.ContentPos;
+        var SectionInfoElement = this.SectionsInfo.Get_SectPr(CurPos);
+
+        if ( undefined === SectionInfoElement )
+            return true;
+
+        var SectPr = SectionInfoElement.SectPr;
+
+        return ( SectPr.Get_Orientation() === orientation_Portrait ? true : false );
     },
 
     Set_DocumentDefaultTab : function(DTab)
@@ -7282,6 +7432,8 @@ CDocument.prototype =
                 editor.Update_ParaTab( Default_Tab_Stop, ParaPr.Tabs );
 
             editor.UpdateParagraphProp( ParaPr );
+
+            //editor.
         }
     },
 
@@ -7372,18 +7524,26 @@ CDocument.prototype =
             }
         }
 
-        var StartPos = this.Pages[PageNum].Pos;
-        var EndPos   = this.Content.length - 1;
+        // Теперь проверим пустые параграфы с окончанием секций
+        var SectCount = this.Pages[PageNum].EndSectionParas.length;
+        for ( var Index = 0; Index < SectCount; Index++ )
+        {
+            var Item = this.Pages[PageNum].EndSectionParas[Index];
+            var Bounds = Item.Pages[0].Bounds;
 
-        if ( PageNum < this.Pages.length - 1 )
-            EndPos = Math.min( this.Pages[PageNum + 1].Pos, EndPos );
+            if ( Y < Bounds.Bottom && Y > Bounds.Top && X > Bounds.Left && X < Bounds.Right )
+                return Item.Index;
+        }
+
+        var StartPos = this.Pages[PageNum].Pos;
+        var EndPos   = Math.min( this.Pages[PageNum].EndPos, this.Content.length - 1 );
 
         // Сохраним позиции всех Inline элементов на данной странице
         var InlineElements = new Array();
         for ( var Index = StartPos; Index <= EndPos; Index++ )
         {
             var Item = this.Content[Index];
-            if ( false != Item.Is_Inline() )
+            if ( false != Item.Is_Inline() && ( type_Table === Item.GetType() || undefined === Item.Get_SectionPr() || true !== Item.IsEmpty() ) )
                 InlineElements.push( Index );
         }
 
@@ -7675,7 +7835,7 @@ CDocument.prototype =
             this.DrawingDocument.EndTrackTable( null, true );
         }
 
-        var PageMetrics = this.Get_PageContentStartPos( this.CurPage );
+        var PageMetrics = this.Get_PageContentStartPos( this.CurPage, this.Pages[this.CurPage].Pos );
 
         // Проверяем, не попали ли мы в колонтитул (если мы попадаем в Flow-объект, то попадание в колонтитул не проверяем)
         if ( true != bFlowTable && nInDrawing < 0 && true === bCheckHdrFtr && MouseEvent.ClickCount >= 2 && ( Y <= PageMetrics.Y || Y > PageMetrics.YLimit ) )
@@ -9708,7 +9868,7 @@ CDocument.prototype =
 
             if ( docpostype_HdrFtr != this.CurPos.Type && -1 === nInDrawing && null === pFlowTable )
             {
-                var PageMetrics = this.Get_PageContentStartPos( this.CurPage );
+                var PageMetrics = this.Get_PageContentStartPos( this.CurPage, this.Pages[this.CurPage].Pos );
                 // Проверяем, не попали ли мы в колонтитул
                 if ( Y <= PageMetrics.Y )
                 {
@@ -10022,6 +10182,9 @@ CDocument.prototype =
         // Проверим, что последний элемент не таблица
         if ( type_Table == this.Content[this.Content.length - 1].GetType() )
             this.Internal_Content_Add(this.Content.length, new Paragraph( this.DrawingDocument, this, 0, 50, 50, X_Right_Field, Y_Bottom_Field ) );
+
+        // Обновим информацию о секциях
+        this.SectionsInfo.Update_OnAdd( Position, [ NewObject ] );
     },
 
     Internal_Content_Remove : function(Position, Count)
@@ -10057,6 +10220,9 @@ CDocument.prototype =
         // Проверим, что последний элемент не таблица
         if ( type_Table == this.Content[this.Content.length - 1].GetType() )
             this.Internal_Content_Add(this.Content.length, new Paragraph( this.DrawingDocument, this, 0, 50, 50, X_Right_Field, Y_Bottom_Field ) );
+
+        // Обновим информацию о секциях
+        this.SectionsInfo.Update_OnRemove( Position, Count );
 
         return ChangePos;
     },
@@ -10947,6 +11113,7 @@ CDocument.prototype =
 
         this.Document_UpdateUndoRedoState();
         this.Document_UpdateCanAddHyperlinkState();
+        this.Document_UpdateSectionPr();
     },
 
     // Обновляем линейки
@@ -11111,6 +11278,16 @@ CDocument.prototype =
     {
         // Проверяем можно ли добавить гиперссылку
         editor.sync_CanAddHyperlinkCallback( this.Hyperlink_CanAdd(false) );
+    },
+
+    Document_UpdateSectionPr : function()
+    {
+        // Обновляем ориентацию страницы
+        editor.sync_PageOrientCallback( this.Get_DocumentOrientation() );
+
+        // Обновляем размер страницы
+        var PageSize = this.Get_DocumentPageSize();
+        editor.sync_DocSizeCallback( PageSize.W, PageSize.H );
     },
 //-----------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
@@ -11339,6 +11516,10 @@ CDocument.prototype =
             case  historyitem_Document_AddItem:
             {
                 this.Content.splice( Data.Pos, 1 );
+
+                // Обновим информацию о секциях
+                this.SectionsInfo.Update_OnRemove( Data.Pos, 1 );
+
                 break;
             }
 
@@ -11350,57 +11531,9 @@ CDocument.prototype =
                 var Array_end   = this.Content.slice( Pos );
 
                 this.Content = Array_start.concat( Data.Items, Array_end );
-                break;
-            }
 
-            case historyitem_Document_Margin:
-            {
-                X_Left_Field   = Data.Fields_old.Left;
-                X_Right_Field  = Data.Fields_old.Right;
-                Y_Top_Field    = Data.Fields_old.Top;
-                Y_Bottom_Field = Data.Fields_old.Bottom;
-
-                if ( true === Data.Recalc_Margins )
-                {
-                    X_Left_Margin   = X_Left_Field;
-                    X_Right_Margin  = Page_Width - X_Right_Field;
-                    Y_Bottom_Margin = Page_Height - Y_Bottom_Field;
-                    Y_Top_Margin    = Y_Top_Field;
-                }
-
-                this.HdrFtr.UpdateMargins( 0, true, true );
-                break;
-            }
-
-            case historyitem_Document_PageSize:
-            {
-                Page_Width  = Data.Width_old;
-                Page_Height = Data.Height_old;
-
-                editor.sync_DocSizeCallback( Page_Width, Page_Height );
-
-                X_Left_Field   = X_Left_Margin;
-                X_Right_Field  = Page_Width  - X_Right_Margin;
-                Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
-                Y_Top_Field    = Y_Top_Margin;
-
-                this.HdrFtr.UpdateMargins( 0, true, true );
-                break;
-            }
-
-            case historyitem_Document_Orientation:
-            {
-                this.Orientation = Data.Orientation_old;
-
-                Y_Top_Margin    = Data.Margins_old.Top;
-                X_Right_Margin  = Data.Margins_old.Right;
-                Y_Bottom_Margin = Data.Margins_old.Bottom;
-                X_Left_Margin   = Data.Margins_old.Left;
-
-                this.HdrFtr.UpdateMargins( 0, true, true );
-
-                editor.DocumentOrientation = this.Orientation === orientation_Portrait ? true : false;
-                editor.sync_PageOrientCallback(editor.get_DocumentOrientation());
+                // Обновим информацию о секциях
+                this.SectionsInfo.Update_OnAdd( Data.Pos, Data.Items );
 
                 break;
             }
@@ -11424,70 +11557,19 @@ CDocument.prototype =
             {
                 var Pos = Data.Pos;
                 this.Content.splice( Pos, 0, Data.Item );
+
+                // Обновим информацию о секциях
+                this.SectionsInfo.Update_OnAdd( Data.Pos, [ Data.Item ] );
+
                 break;
             }
 
             case historyitem_Document_RemoveItem:
             {
                 this.Content.splice( Data.Pos, Data.Items.length );
-                break;
-            }
 
-            case historyitem_Document_Margin:
-            {
-                if( "undefined" !== typeof( Data.Fields_new.Left ) )
-                    X_Left_Field = Data.Fields_new.Left;
-
-                if( "undefined" !== typeof( Data.Fields_new.Right ) )
-                    X_Right_Field = Data.Fields_new.Right;
-
-                if( "undefined" !== typeof( Data.Fields_new.Top ) )
-                    Y_Top_Field = Data.Fields_new.Top;
-
-                if( "undefined" !== typeof( Data.Fields_new.Bottom ) )
-                    Y_Bottom_Field = Data.Fields_new.Bottom;
-
-                if ( true === Data.Recalc_Margins )
-                {
-                    X_Left_Margin   = X_Left_Field;
-                    X_Right_Margin  = Page_Width - X_Right_Field;
-                    Y_Bottom_Margin = Page_Height - Y_Bottom_Field;
-                    Y_Top_Margin    = Y_Top_Field;
-                }
-
-                this.HdrFtr.UpdateMargins( 0, true, true );
-                break;
-            }
-
-            case historyitem_Document_PageSize:
-            {
-                Page_Width  = Data.Width_new;
-                Page_Height = Data.Height_new;
-
-                editor.sync_DocSizeCallback( Page_Width, Page_Height );
-
-                X_Left_Field   = X_Left_Margin;
-                X_Right_Field  = Page_Width  - X_Right_Margin;
-                Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
-                Y_Top_Field    = Y_Top_Margin;
-
-                this.HdrFtr.UpdateMargins( 0, true, true );
-                break;
-            }
-
-            case historyitem_Document_Orientation:
-            {
-                this.Orientation = Data.Orientation_new;
-
-                Y_Top_Margin    = Data.Margins_new.Top;
-                X_Right_Margin  = Data.Margins_new.Right;
-                Y_Bottom_Margin = Data.Margins_new.Bottom;
-                X_Left_Margin   = Data.Margins_new.Left;
-
-                this.HdrFtr.UpdateMargins( 0, true, true );
-
-                editor.DocumentOrientation = this.Orientation === orientation_Portrait ? true : false;
-                editor.sync_PageOrientCallback(editor.get_DocumentOrientation());
+                // Обновим информацию о секциях
+                this.SectionsInfo.Update_OnRemove( Data.Pos, Data.Items.length );
 
                 break;
             }
@@ -11522,9 +11604,6 @@ CDocument.prototype =
                 break;
             }
 
-            case historyitem_Document_Margin:
-            case historyitem_Document_PageSize:
-            case historyitem_Document_Orientation:
             case historyitem_Document_DefaultTab:
             {
                 bNeedRecalcHdrFtr = true;
@@ -11947,85 +12026,6 @@ CDocument.prototype =
                 break;
             }
 
-            case historyitem_Document_Margin:
-            {
-                // Long : Flags
-                // Если Flags & 1  Double : Left
-                // Если Flags & 2  Double : Right
-                // Если Flags & 4  Double : Top
-                // Если Flags & 8  Double : Bottom
-                // Bool : RecalcMargins
-
-                var StartPos = Writer.GetCurPosition();
-                Writer.Skip(4);
-                var Flags = 0;
-
-                var bLeft = ( ( "undefined" != typeof( Data.Fields_new.Left ) ) ? true : false );
-                if ( bLeft )
-                {
-                    Writer.WriteDouble( Data.Fields_new.Left );
-                    Flags |= 1;
-                }
-
-                var bRight = ( ( "undefined" != typeof( Data.Fields_new.Right ) ) ? true : false );
-                if ( bRight )
-                {
-                    Writer.WriteDouble( Data.Fields_new.Right );
-                    Flags |= 2;
-                }
-
-                var bTop = ( ( "undefined" != typeof( Data.Fields_new.Top ) ) ? true : false );
-                if ( bTop )
-                {
-                    Writer.WriteDouble( Data.Fields_new.Top );
-                    Flags |= 4;
-                }
-
-                var bBottom = ( ( "undefined" != typeof( Data.Fields_new.Bottom ) ) ? true : false );
-                if ( bBottom )
-                {
-                    Writer.WriteDouble( Data.Fields_new.Bottom );
-                    Flags |= 8;
-                }
-
-                Writer.WriteBool( Data.Recalc_Margins );
-
-                var EndPos = Writer.GetCurPosition();
-                Writer.Seek( StartPos );
-                Writer.WriteLong( Flags );
-                Writer.Seek( EndPos );
-
-                break;
-            }
-
-            case historyitem_Document_PageSize:
-            {
-                // Double : Width
-                // Double : Height
-
-                Writer.WriteDouble( Data.Width_new );
-                Writer.WriteDouble( Data.Height_new );
-
-                break;
-            }
-
-            case historyitem_Document_Orientation:
-            {
-                // Byte : тип ориентации
-                // Double : Margin.Top
-                // Double : Margin.Right
-                // Double : Margin.Bottom
-                // Double : Margin.Left
-
-                Writer.WriteByte( Data.Orientation_new );
-                Writer.WriteDouble( Data.Margins_new.Top );
-                Writer.WriteDouble( Data.Margins_new.Right );
-                Writer.WriteDouble( Data.Margins_new.Bottom );
-                Writer.WriteDouble( Data.Margins_new.Left );
-
-                break;
-            }
-
             case historyitem_Document_DefaultTab:
             {
                 // Double : Default Tab
@@ -12051,21 +12051,6 @@ CDocument.prototype =
             }
 
             case historyitem_Document_RemoveItem:
-            {
-                break;
-            }
-
-            case historyitem_Document_Margin:
-            {
-                break;
-            }
-
-            case historyitem_Document_PageSize:
-            {
-                break;
-            }
-
-            case historyitem_Document_Orientation:
             {
                 break;
             }
@@ -12123,6 +12108,9 @@ CDocument.prototype =
                             Element.Next = null;
 
                         this.Content.splice( Pos, 0, Element );
+
+                        // Обновим информацию о секциях
+                        this.SectionsInfo.Update_OnAdd( Pos, [ Element ] );
                     }
                 }
 
@@ -12162,87 +12150,10 @@ CDocument.prototype =
                     {
                         this.Content[Pos].Prev = null;
                     }
+
+                    // Обновим информацию о секциях
+                    this.SectionsInfo.Update_OnRemove( Pos, 1 );
                 }
-
-                break;
-            }
-
-            case historyitem_Document_Margin:
-            {
-                // Long : Flags
-                // Если Flags & 1  Double : Left
-                // Если Flags & 2  Double : Right
-                // Если Flags & 4  Double : Top
-                // Если Flags & 8  Double : Bottom
-                // Bool : RecalcMargins
-
-                var Flags = Reader.GetLong();
-
-                if( 1 & Flags )
-                    X_Left_Field = Reader.GetDouble();
-
-                if( 2 & Flags )
-                    X_Right_Field = Reader.GetDouble();
-
-                if( 4 & Flags )
-                    Y_Top_Field = Reader.GetDouble();
-
-                if( 8 & Flags )
-                    Y_Bottom_Field = Reader.GetDouble();
-
-                var bRecalcMargins = Reader.GetBool();
-                if ( true === bRecalcMargins )
-                {
-                    X_Left_Margin   = X_Left_Field;
-                    X_Right_Margin  = Page_Width - X_Right_Field;
-                    Y_Bottom_Margin = Page_Height - Y_Bottom_Field;
-                    Y_Top_Margin    = Y_Top_Field;
-                }
-
-                this.HdrFtr.UpdateMargins( 0, true, true );
-
-                break;
-            }
-
-            case historyitem_Document_PageSize:
-            {
-                // Double : Width
-                // Double : Height
-
-                Page_Width  = Reader.GetDouble();
-                Page_Height = Reader.GetDouble();
-
-                editor.sync_DocSizeCallback( Page_Width, Page_Height );
-
-                X_Left_Field   = X_Left_Margin;
-                X_Right_Field  = Page_Width  - X_Right_Margin;
-                Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
-                Y_Top_Field    = Y_Top_Margin;
-
-                this.HdrFtr.UpdateMargins( 0, true, true );
-
-                break;
-            }
-
-            case historyitem_Document_Orientation:
-            {
-                // Byte : тип ориентации
-                // Double : Margin.Top
-                // Double : Margin.Right
-                // Double : Margin.Bottom
-                // Double : Margin.Left
-
-                this.Orientation = Reader.GetByte();
-
-                Y_Top_Margin    = Reader.GetDouble();
-                X_Right_Margin  = Reader.GetDouble();
-                Y_Bottom_Margin = Reader.GetDouble();
-                X_Left_Margin   = Reader.GetDouble();
-
-                this.HdrFtr.UpdateMargins( 0, true, true );
-
-                editor.DocumentOrientation = this.Orientation === orientation_Portrait ? true : false;
-                editor.sync_PageOrientCallback(editor.get_DocumentOrientation());
 
                 break;
             }
@@ -12623,6 +12534,76 @@ CDocument.prototype =
             var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( Comment_X, Comment_Y, Comment_PageNum );
             editor.sync_UpdateCommentPosition( Comment.Get_Id(), Coords.X, Coords.Y );
         }
+    },
+//----------------------------------------------------------------------------------------------------------------------
+// Функции для работы с секциями
+//----------------------------------------------------------------------------------------------------------------------
+    Update_SectionsInfo : function()
+    {
+        this.SectionsInfo.Clear();
+
+        var Count = this.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var Element = this.Content[Index];
+            if ( type_Paragraph === Element.GetType() && undefined !== Element.Get_SectionPr() )
+                this.SectionsInfo.Add( Element.Get_SectionPr(), Index );
+        }
+
+        this.SectionsInfo.Add( this.SectPr, Count );
+    },
+
+    Add_SectionBreak : function(SectionBreakType)
+    {
+        var Element = null;
+        if ( docpostype_HdrFtr === this.CurPos.Type )
+        {
+            // В колонтитуле нельзя добавить разрыв страницы
+            return false;
+        }
+        else if ( docpostype_DrawingObjects === this.CurPos.Type )
+        {
+            // В автофигуре нельзя добавить разрыв страницы
+            return false;
+        }
+        else
+        {
+            if ( true === this.Selection.Use )
+            {
+                // Если у нас есть селект, тогда ставим курсор в начало селекта
+                this.Cursor_MoveLeft(false, false);
+            }
+
+            var Element = this.Content[this.CurPos.ContentPos];
+
+            var CurSectPr = this.SectionsInfo.Get_SectPr( this.CurPos.ContentPos).SectPr;
+
+            if ( type_Paragraph !== Element.GetType() )
+                return;
+
+            if ( undefined === Element.Get_SectionPr() )
+            {
+                // TODO: Надо получить текущие настройки секции
+
+                var SectPr = new CSectionPr(this);
+
+                // Поскольку данной секцией мы разбиваем предыдущую, поэтому заданный тип выставляем старой секции,
+                // которая теперь идет после новой, а новой секции выставляем тип старой, чтобы до места разбиения все шло как и раньше.
+                SectPr.Set_Type( CurSectPr.Get_Type() );
+                CurSectPr.Set_Type( SectionBreakType );
+
+                Element.Set_SectionPr(SectPr);
+                Element.Refresh_RecalcData2(0, 0);
+            }
+            else
+            {
+                // TODO: Надо добавить новый параграф в текущей позиции и к этому параграфу уже добавить разрыв секции
+            }
+
+            this.Recalculate();
+
+            return true;
+        }
     }
 };
 
@@ -12634,4 +12615,107 @@ function CDocumentSelectionState()
     this.Id        = null;
     this.Type      = docpostype_Content;
     this.Data      = new Object(); // Объект с текущей позицией
+}
+
+function CDocumentSectionsInfo()
+{
+    this.Elements = new Array();
+}
+
+CDocumentSectionsInfo.prototype =
+{
+    Add : function( SectPr, Index )
+    {
+        this.Elements.push( new CDocumentSectionsInfoElement( SectPr, Index ) );
+    },
+
+    Clear : function()
+    {
+        this.Elements.length = 0;
+    },
+
+    Get_SectPr : function(Index)
+    {
+        var Count = this.Elements.length;
+
+        for ( var Pos = 0; Pos < Count; Pos++ )
+        {
+            if ( Index <= this.Elements[Pos].Index )
+                return this.Elements[Pos];
+        }
+
+        // Последний элемент здесь это всегда конечная секция документа
+        return this.Elements[Count - 1];
+    },
+
+    Find : function(SectPr)
+    {
+        var Count = this.Elements.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var Element = this.Elements[Index];
+            if ( Element.SectPr === SectPr )
+                return Index;
+        }
+
+        return -1;
+    },
+
+    Update_OnAdd : function(Pos, Items)
+    {
+        var Count = Items.length;
+        var Len = this.Elements.length;
+
+        // Сначала обновим старые метки
+        for (var Index = 0; Index < Len; Index++)
+        {
+            if ( this.Elements[Index].Index >= Pos )
+                this.Elements[Index].Index += Count;
+        }
+
+        // Если среди новых элементов были параграфы с настройками секции, тогда добавим их здесь
+        for (var Index = 0; Index < Count; Index++ )
+        {
+            var Item = Items[Index];
+            var SectPr = ( type_Paragraph === Item.GetType() ? Item.Get_SectionPr() : undefined );
+
+            if ( undefined !== SectPr )
+            {
+                var TempPos = 0;
+                for ( ; TempPos < Len; TempPos++ )
+                {
+                    if ( Pos + Index <= this.Elements[TempPos].Index )
+                        break;
+                }
+
+                this.Elements.splice( TempPos, 0, new CDocumentSectionsInfoElement( SectPr, Pos + Index ) );
+                Len++;
+            }
+        }
+    },
+
+    Update_OnRemove : function(Pos, Count)
+    {
+        var Len = this.Elements.length;
+
+        for (var Index = 0; Index < Len; Index++)
+        {
+            var CurPos = this.Elements[Index].Index;
+
+            if ( CurPos === Pos && CurPos < Pos + Count )
+            {
+                this.Elements.splice( Index, 1 );
+                Len--;
+                Index--;
+            }
+            else if ( CurPos >= Pos + Count )
+                this.Elements[Index].Index -= Count;
+        }
+    }
+};
+
+function CDocumentSectionsInfoElement(SectPr, Index)
+{
+    this.SectPr = SectPr;
+    this.Index  = Index;
 }

@@ -5207,6 +5207,8 @@ function BinaryFileReader(doc, openParams)
         }
 		// for(var i = 0, length = this.oReadResult.aPostOpenStyleNumCallbacks.length; i < length; ++i)
 			// this.oReadResult.aPostOpenStyleNumCallbacks[i].call();
+
+        this.Document.On_EndLoad();
     };
 };
 function BinaryStyleTableReader(doc, oReadResult, stream)

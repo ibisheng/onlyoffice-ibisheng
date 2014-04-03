@@ -1575,10 +1575,22 @@ ParaRun.prototype =
                 }
                 case para_NewLine:
                 {
+                    X += WordLen;
+
+                    if ( true === Word )
+                    {
+                        EmptyLine   = false;
+                        Word        = false;
+                        X          += SpaceLen;
+                        SpaceLen    = 0;
+                    }
+
                     if ( break_Page === Item.BreakType )
                     {
                         if ( true === PRS.SkipPageBreak && Item === PRS.PageBreak )
                             continue;
+
+                        Item.Flags.NewLine = true;
 
                         // PageBreak вне самого верхнего документа не надо учитывать
                         if ( !(Para.Parent instanceof CDocument) )
@@ -1602,16 +1614,6 @@ ParaRun.prototype =
                     }
 
                     RangeEndPos = Pos + 1;
-
-                    X += WordLen;
-
-                    if ( true === Word )
-                    {
-                        EmptyLine   = false;
-                        Word        = false;
-                        X          += SpaceLen;
-                        SpaceLen    = 0;
-                    }
 
                     break;
                 }
@@ -2061,12 +2063,27 @@ ParaRun.prototype =
                 }
                 case para_End:
                 {
+                    var SectPr = PRSA.Paragraph.Get_SectionPr();
+                    if ( undefined !== SectPr )
+                    {
+                        // Нас интересует следующая секция
+                        var LogicDocument = PRSA.Paragraph.LogicDocument;
+                        var NextSectPr = LogicDocument.SectionsInfo.Get_SectPr(PRSA.Paragraph.Index + 1).SectPr;
+
+                        Item.Update_SectionPr(NextSectPr, PRSA.XEnd - PRSA.X);
+                    }
+                    else
+                        Item.Clear_SectionPr();
+
                     PRSA.X += Item.Width;
 
                     break;
                 }
                 case para_NewLine:
                 {
+                    if ( break_Page === Item.BreakType )
+                        Item.Update_String( PRSA.XEnd - PRSA.X );
+
                     PRSA.X += Item.WidthVisible;
 
                     break;
@@ -2333,7 +2350,10 @@ ParaRun.prototype =
             if ( true === PBChecker.FindPB )
             {
                 if ( Element === PBChecker.PageBreak )
+                {
                     PBChecker.FindPB = false;
+                    PBChecker.PageBreak.Flags.NewLine = true;
+                }
             }
             else
             {
@@ -2524,6 +2544,60 @@ ParaRun.prototype =
         MinMax.nMinWidth    = nMinWidth;
         MinMax.nMaxWidth    = nMaxWidth;
         MinMax.nCurMaxWidth = nCurMaxWidth;
+    },
+
+    Get_Range_VisibleWidth : function(RangeW, _CurLine, _CurRange)
+    {
+        var CurLine  = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+        var Range    = this.Lines[CurLine].Ranges[CurRange];
+        var StartPos = Range.StartPos;
+        var EndPos   = Range.EndPos;
+
+        for ( var Pos = StartPos; Pos < EndPos; Pos++ )
+        {
+            var Item = this.Content[Pos];
+
+            switch( Item.Type )
+            {
+                case para_Sym:
+                case para_Text:
+                case para_Space:
+                {
+                    RangeW.W += Item.WidthVisible;
+
+                    break;
+                }
+
+                case para_Drawing:
+                {
+                    if ( true === Item.Is_Inline() )
+                        RangeW.W += Item.Width;
+
+                    break;
+                }
+                case para_PageNum:
+                case para_Tab:
+                {
+                    RangeW.W += Item.Width;
+                    break;
+                }
+                case para_NewLine:
+                {
+                    RangeW.W += Item.WidthVisible;
+
+                    break;
+                }
+                case para_End:
+                {
+                    RangeW.W += Item.WidthVisible;
+                    RangeW.End = true;
+
+                    break;
+                }
+            }
+        }
     },
 //-----------------------------------------------------------------------------------
 // Функции отрисовки
@@ -2759,24 +2833,34 @@ ParaRun.prototype =
                 }
                 case para_End:
                 {
-                    // Выставляем настройки для символа параграфа
-                    var EndTextPr = Para.Get_CompiledPr2( false).TextPr.Copy();
-                    EndTextPr.Merge( Para.TextPr.Value );
+                    var SectPr = Para.Get_SectionPr();
 
-                    pGraphics.SetTextPr( EndTextPr );
+                    if ( undefined === SectPr )
+                    {
+                        // Выставляем настройки для символа параграфа
+                        var EndTextPr = Para.Get_CompiledPr2(false).TextPr.Copy();
+                        EndTextPr.Merge(Para.TextPr.Value);
 
-                    if ( true === EndTextPr.Color.Auto )
-                        pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+                        pGraphics.SetTextPr(EndTextPr);
+
+                        if (true === EndTextPr.Color.Auto)
+                            pGraphics.b_color1(AutoColor.r, AutoColor.g, AutoColor.b, 255);
+                        else
+                            pGraphics.b_color1(EndTextPr.Color.r, EndTextPr.Color.g, EndTextPr.Color.b, 255);
+
+                        bEnd = true;
+                        var bEndCell = false;
+                        if (null === Para.Get_DocumentNext() && true === Para.Parent.Is_TableCellContent())
+                            bEndCell = true;
+
+                        Item.Draw(X, Y - this.YOffset, pGraphics, bEndCell);
+                        X += Item.Width;
+                    }
                     else
-                        pGraphics.b_color1( EndTextPr.Color.r, EndTextPr.Color.g, EndTextPr.Color.b, 255);
-
-                    bEnd = true;
-                    var bEndCell = false;
-                    if ( null === Para.Get_DocumentNext() && true === Para.Parent.Is_TableCellContent() )
-                        bEndCell = true;
-
-                    Item.Draw( X, Y - this.YOffset, pGraphics, bEndCell );
-                    X += Item.Width;
+                    {
+                        Item.Draw(X, Y - this.YOffset, pGraphics, false);
+                        X += Item.Width;
+                    }
 
                     break;
                 }

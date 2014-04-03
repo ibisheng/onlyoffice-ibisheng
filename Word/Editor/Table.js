@@ -4431,6 +4431,45 @@ CTable.prototype =
         }
     },
 
+    Get_LastRangeVisibleBounds : function()
+    {
+        var CurPage = this.Pages.length - 1;
+        var Page_abs = this.Get_StartPage_Absolute() + CurPage;
+
+        var CurRow = this.Content.length - 1;
+        var Row = this.Content[CurRow];
+
+        var CurCell = Row.Get_CellsCount() - 1;
+
+        var Cell     = Row.Get_Cell( CurCell );
+        var CellInfo = Row.Get_CellInfo( CurCell );
+        var CellMar  = Cell.Get_Margins();
+
+        var X_start = CellInfo.X_cell_start;
+        var X_end   = CellInfo.X_cell_end;
+
+        var Cell_PageRel = Page_abs - Cell.Content.Get_StartPage_Absolute();
+
+        var Bounds = Cell.Content_Get_PageBounds( Cell_PageRel );
+        var Y_offset = Cell.Temp.Y_VAlign_offset[Cell_PageRel];
+
+        var Y = 0;
+        if ( 0 != Cell_PageRel )
+        {
+            // мы должны определить ряд, на котором случился перенос на новую страницу
+            var TempRowIndex = this.Pages[CurPage].FirstRow;
+
+            Y = this.RowsInfo[TempRowIndex].Y[CurPage] + this.RowsInfo[TempRowIndex].TopDy[CurPage] + CellMar.Top.W + Y_offset;
+        }
+        else
+        {
+            Y = this.RowsInfo[CurRow].Y[CurPage] + this.RowsInfo[CurRow].TopDy[CurPage] + CellMar.Top.W + Y_offset;
+        }
+
+        return { X : X_start, Y : Y, W : X_end - X_start, H : 10 };
+    },
+
+
     Get_NearestPos : function( PageNum, X, Y, bAnchor, Drawing )
     {
         var PNum = PageNum - this.PageNum;

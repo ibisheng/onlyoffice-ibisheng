@@ -976,6 +976,20 @@ ParaHyperlink.prototype =
             this.Content[Pos].Recalculate_MinMaxContentWidth(MinMax);
         }
     },
+
+    Get_Range_VisibleWidth : function(RangeW, _CurLine, _CurRange)
+    {
+        var CurLine = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
+        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
+
+        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+        {
+            this.Content[CurPos].Get_Range_VisibleWidth(RangeW, CurLine, CurRange);
+        }
+    },
 //-----------------------------------------------------------------------------------
 // Функции отрисовки
 //-----------------------------------------------------------------------------------

@@ -1025,7 +1025,7 @@ $("#td_formatmodel,#td_info, #td_redo, #td_undo, #td_orient, #td_bold, #td_itali
             //editor.WordControl.m_oLogicDocument.LoadTestDocument4(); // среднее количество ранов
             //editor.WordControl.m_oLogicDocument.LoadTestDocument5(); // 1 ран в параграфе
 
-            editor.WordControl.m_oLogicDocument.Add_SectionBreak();
+            editor.WordControl.m_oLogicDocument.Add_SectionBreak(section_type_Continuous);
 
 			break;
 		case "td_indent":

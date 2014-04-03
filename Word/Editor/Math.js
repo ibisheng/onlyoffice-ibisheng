@@ -846,6 +846,20 @@ ParaMath.prototype =
 
         MinMax.nCurMaxWidth += this.Width;
     },
+
+    Get_Range_VisibleWidth : function(RangeW, _CurLine, _CurRange)
+    {
+        var CurLine = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
+        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
+
+        if ( EndPos >= 1 )
+        {
+            RangeW.W += this.Width;
+        }
+    },
 //-----------------------------------------------------------------------------------
 // Функции отрисовки
 //-----------------------------------------------------------------------------------

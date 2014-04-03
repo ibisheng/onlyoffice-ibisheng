@@ -2256,13 +2256,8 @@ function ParaEnd()
 {
     this.Type = para_End;
 
-    this.TextPr = null; // Рассчитанные настройки текста для символа конца параграфа
-
-//    this.TextAscent  = 0;
-//    this.TextDescent = 0;
-//    this.TextHeight  = 0;
-//    this.TextAscent2 = 0;
-//    this.YOffset     = 0;
+    this.TextPr    = null; // Рассчитанные настройки текста для символа конца параграфа
+    this.SectionPr = null;
 
     this.Width = 0;
 }
@@ -2275,7 +2270,21 @@ ParaEnd.prototype =
         
         if ( typeof (editor) !== "undefined" && editor.ShowParaMarks )
         {
-            if ( true === bEndCell )
+            if ( null !== this.SectionPr )
+            {
+                Context.SetFont( {FontFamily: { Name : "Courier New", Index : -1 }, FontSize: 8, Italic: false, Bold : false} );
+                var Widths          = this.SectionPr.Widths;
+                var strSectionBreak = this.SectionPr.Str;
+
+                var Len = strSectionBreak.length;
+
+                for ( var Index = 0; Index < Len; Index++ )
+                {
+                    Context.FillText( X, Y, strSectionBreak[Index] );
+                    X += Widths[Index];
+                }
+            }
+            else if ( true === bEndCell )
                 Context.FillText( X, Y, String.fromCharCode( 0x00A4 ) );
             else
                 Context.FillText( X, Y, String.fromCharCode( 0x00B6 ) );
@@ -2293,6 +2302,91 @@ ParaEnd.prototype =
             this.WidthVisible = Context.Measure( String.fromCharCode( 0x00A4 ) ).Width;
         else
             this.WidthVisible = Context.Measure( String.fromCharCode( 0x00B6 ) ).Width;
+    },
+
+    Update_SectionPr : function(SectionPr, W)
+    {
+        var Type = SectionPr.Type;
+
+        var strSectionBreak = "";
+        switch ( Type )
+        {
+            case section_type_Column     : strSectionBreak = " Section Break (Column) "; break;
+            case section_type_Continuous : strSectionBreak = " Section Break (Continuous) "; break;
+            case section_type_EvenPage   : strSectionBreak = " Section Break (Even Page) "; break;
+            case section_type_NextPage   : strSectionBreak = " Section Break (Next Page) "; break;
+            case section_type_OddPage    : strSectionBreak = " Section Break (Odd Page) "; break;
+        }
+
+        g_oTextMeasurer.SetFont( {FontFamily: { Name : "Courier New", Index : -1 }, FontSize: 8, Italic: false, Bold : false} );
+
+        var Widths = [];
+
+        var nStrWidth = 0;
+        var Len = strSectionBreak.length;
+        for ( var Index = 0; Index < Len; Index++ )
+        {
+            var Val = g_oTextMeasurer.Measure( strSectionBreak[Index] ).Width;
+            nStrWidth += Val;
+            Widths[Index] = Val;
+        }
+
+        var strSymbol = ":";
+        var nSymWidth = g_oTextMeasurer.Measure( strSymbol ).Width * 2/3;
+
+        var strResult = "";
+        if ( W - 6 * nSymWidth >= nStrWidth )
+        {
+            var Count = parseInt( (W - nStrWidth) / ( 2 * nSymWidth ) );
+            var strResult = strSectionBreak;
+            for ( var Index = 0; Index < Count; Index++ )
+            {
+                strResult = strSymbol + strResult + strSymbol;
+                Widths.splice( 0, 0, nSymWidth );
+                Widths.splice( Widths.length, 0, nSymWidth );
+            }
+        }
+        else
+        {
+            var Count = parseInt( W / nSymWidth );
+            MesureArray = [];
+            for ( var Index = 0; Index < Count; Index++ )
+            {
+                strResult += strSymbol;
+                Widths[Index] = nSymWidth;
+            }
+        }
+
+        var ResultW = 0;
+        var Count = Widths.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            ResultW += Widths[Index];
+        }
+
+        var AddW = 0;
+        if ( ResultW < W && Count > 1 )
+        {
+            AddW = (W - ResultW) / (Count - 1);
+        }
+
+        for ( var Index = 0; Index < Count - 1; Index++ )
+        {
+            Widths[Index] += AddW;
+        }
+
+        this.SectionPr = new Object();
+        this.SectionPr.OldWidth = this.Width;
+        this.SectionPr.Str      = strResult;
+        this.SectionPr.Widths   = Widths;
+
+        this.Width        = W;
+        this.WidthVisible = W;
+    },
+
+    Clear_SectionPr : function()
+    {
+        this.SectionPr = null;
     },
 
     Is_RealContent : function()
@@ -2351,27 +2445,24 @@ ParaNewLine.prototype =
                 }
                 case break_Page:
                 {
-                    var PageBreak_String = "";
-                    for ( var Index = 0; Index < 41; Index++ )
-                    {
-                        if ( 20 != Index )
-                            PageBreak_String += String.fromCharCode("0x00B7");
-                        else
-                            PageBreak_String += "PageBreak";
-                    }
+                    var strPageBreak = this.Flags.BreakPageInfo.Str;
+                    var Widths       = this.Flags.BreakPageInfo.Widths;
 
                     var OldColor = Common_CopyObj( Context.m_oBrush.Color1 );
+                    var OldFont  = Context.GetFont();
                     Context.b_color1( 0, 0 , 0, 255);
+                    Context.SetFont( {FontFamily: { Name : "Courier New", Index : -1 }, FontSize: 8, Italic: false, Bold : false} );
 
-                    g_oTextMeasurer.SetFont( {FontFamily: { Name : "Arial", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
-                    Context.SetFont( {FontFamily: { Name : "Arial", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
-                    for ( var Index = 0; Index < PageBreak_String.length; Index++ )
+                    var Len = strPageBreak.length;
+                    for ( var Index = 0; Index < Len; Index++ )
                     {
-                        Context.FillText( X, Y, PageBreak_String[Index] );
-                        X += g_oTextMeasurer.Measure( PageBreak_String[Index] ).Width;
+                        Context.FillText( X, Y, strPageBreak[Index] );
+                        X += Widths[Index];
                     }
 
                     Context.b_color1( OldColor.R, OldColor.G, OldColor.B, OldColor.A);
+                    Context.SetFont( OldFont );
+
                     break;
                 }
             }
@@ -2397,29 +2488,84 @@ ParaNewLine.prototype =
             }
             case break_Page:
             {
-                this.Width        = 0;
-                this.Height       = 0;
-
-                var PageBreak_String = "";
-                for ( var Index = 0; Index < 41; Index++ )
-                {
-                    if ( 20 != Index )
-                        PageBreak_String += String.fromCharCode("0x00B7");
-                    else
-                        PageBreak_String += "PageBreak";
-                }
-
-                var oldFont = g_oTextMeasurer.GetFont();
-                g_oTextMeasurer.SetFont( {FontFamily: { Name : "Arial", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
-                var W = 0;
-                for ( var Index = 0; Index < PageBreak_String.length; Index++ )
-                    W += g_oTextMeasurer.Measure( PageBreak_String[Index] ).Width;
-                g_oTextMeasurer.SetFont( oldFont );
-
-                this.WidthVisible = W;
+                this.Width  = 0;
+                this.Height = 0;
 
                 break;
             }
+        }
+    },
+
+    Update_String : function(_W)
+    {
+        if ( break_Page === this.BreakType )
+        {
+            var W = ( false === this.Flags.NewLine ? 50 : _W );
+
+            g_oTextMeasurer.SetFont({FontFamily: { Name: "Courier New", Index: -1 }, FontSize: 8, Italic: false, Bold: false});
+
+            var Widths = [];
+
+            var nStrWidth = 0;
+            var strBreakPage = " Page Break ";
+            var Len = strBreakPage.length;
+            for (var Index = 0; Index < Len; Index++)
+            {
+                var Val = g_oTextMeasurer.Measure(strBreakPage[Index]).Width;
+                nStrWidth += Val;
+                Widths[Index] = Val;
+            }
+
+            var strSymbol = String.fromCharCode("0x00B7");
+            var nSymWidth = g_oTextMeasurer.Measure(strSymbol).Width * 2 / 3;
+
+            var strResult = "";
+            if (W - 6 * nSymWidth >= nStrWidth)
+            {
+                var Count = parseInt((W - nStrWidth) / ( 2 * nSymWidth ));
+                var strResult = strBreakPage;
+                for (var Index = 0; Index < Count; Index++)
+                {
+                    strResult = strSymbol + strResult + strSymbol;
+                    Widths.splice(0, 0, nSymWidth);
+                    Widths.splice(Widths.length, 0, nSymWidth);
+                }
+            }
+            else
+            {
+                var Count = parseInt(W / nSymWidth);
+                MesureArray = [];
+                for (var Index = 0; Index < Count; Index++)
+                {
+                    strResult += strSymbol;
+                    Widths[Index] = nSymWidth;
+                }
+            }
+
+            var ResultW = 0;
+            var Count = Widths.length;
+            for ( var Index = 0; Index < Count; Index++ )
+            {
+                ResultW += Widths[Index];
+            }
+
+            var AddW = 0;
+            if ( ResultW < W && Count > 1 )
+            {
+                AddW = (W - ResultW) / (Count - 1);
+            }
+
+            for ( var Index = 0; Index < Count - 1; Index++ )
+            {
+                Widths[Index] += AddW;
+            }
+
+            this.Flags.BreakPageInfo = new Object();
+            this.Flags.BreakPageInfo.Str = strResult;
+            this.Flags.BreakPageInfo.Widths = Widths;
+
+            this.Width        = W;
+            this.WidthVisible = W;
         }
     },
 

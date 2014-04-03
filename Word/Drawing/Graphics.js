@@ -2567,7 +2567,7 @@ CGraphics.prototype =
 
     drawCollaborativeChanges : function(x, y, w, h)
     {
-        this.b_color1( 0, 255, 0, 64 );
+        this.b_color1( 191, 255, 191, 255 );
         this.rect( x, y, w, h );
         this.df();
     },

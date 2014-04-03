@@ -159,6 +159,7 @@ function CTableId()
 			case historyitem_type_MathContent      : Element = new CMathContent(); break;
             case historyitem_type_CommentMark      : Element = new ParaComment(); break;
             case historyitem_type_ParaRun          : Element = new ParaRun(); break;
+            case historyitem_type_Section          : Element = new CSectionPr(); break;
         }
 
         Element.Read_FromBinary2(Reader);
