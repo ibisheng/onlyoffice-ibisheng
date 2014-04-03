@@ -1032,10 +1032,10 @@ CDocument.prototype =
             }
             else
             {
-                Y      = SectPr.PageMargins.Right;
-                YLimit = SectPr.PageSize.W - SectPr.PageMargins.Left;
-                X      = SectPr.PageMargins.Top;
-                XLimit = SectPr.PageSize.H - SectPr.PageMargins.Bottom;
+                Y      = SectPr.PageMargins.Left;
+                YLimit = SectPr.PageSize.W - SectPr.PageMargins.Right;
+                X      = SectPr.PageMargins.Bottom;
+                XLimit = SectPr.PageSize.H - SectPr.PageMargins.Top;
             }
 
             return { X : X, Y : Y, XLimit : XLimit, YLimit : YLimit };
@@ -1295,10 +1295,10 @@ CDocument.prototype =
             {
                 this.Pages[PageIndex].Width          = SectPr.PageSize.H;
                 this.Pages[PageIndex].Height         = SectPr.PageSize.W;
-                this.Pages[PageIndex].Margins.Left   = SectPr.PageMargins.Top;
-                this.Pages[PageIndex].Margins.Top    = SectPr.PageMargins.Right;
-                this.Pages[PageIndex].Margins.Right  = SectPr.PageSize.H - SectPr.PageMargins.Bottom;
-                this.Pages[PageIndex].Margins.Bottom = SectPr.PageSize.W - SectPr.PageMargins.Left;
+                this.Pages[PageIndex].Margins.Left   = SectPr.PageMargins.Bottom;
+                this.Pages[PageIndex].Margins.Top    = SectPr.PageMargins.Left;
+                this.Pages[PageIndex].Margins.Right  = SectPr.PageSize.H - SectPr.PageMargins.Top;
+                this.Pages[PageIndex].Margins.Bottom = SectPr.PageSize.W - SectPr.PageMargins.Right;
             }
 
 
@@ -7303,10 +7303,10 @@ CDocument.prototype =
         }
         else
         {
-            L = ( undefined === MarPr.Bottom ? undefined : SectPr.Get_PageWidth() - MarPr.Bottom );
-            T = MarPr.Left;
-            R = MarPr.Top;
-            B = ( undefined === MarPr.Right ? undefined : SectPr.Get_PageHeight() - MarPr.Right );
+            L = MarPr.Top;
+            T = ( undefined === MarPr.Right ? undefined : SectPr.Get_PageHeight() - MarPr.Right );
+            R = ( undefined === MarPr.Bottom ? undefined : SectPr.Get_PageWidth() - MarPr.Bottom );
+            B = MarPr.Left;
         }
 
 
