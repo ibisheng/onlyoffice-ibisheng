@@ -957,6 +957,8 @@ CRadical.prototype.recalculateSize = function(oMeasure)
             ascent = gapBase + shTop + base.ascent;
             //ascent = height - (base.height - base.ascent);
 
+        width += this.GapLeft + this.GapRight;
+
         this.size = {width: width, height: height, ascent: ascent};
     }
     else if(this.type == DEGREE_RADICAL)
@@ -975,6 +977,8 @@ CRadical.prototype.recalculateSize = function(oMeasure)
 
         var wDegree = degr.width > wTick ? degr.width - wTick : 0;
         var width = wDegree + sign.width + this.gapWidth;
+
+        width += this.GapLeft + this.GapRight;
 
         var gapDegree;
         if( base.height < plH )
@@ -1014,11 +1018,14 @@ CRadical.prototype.setPosition = function(pos)
         var gapLeft = this.size.width - this.elements[0][0].size.width;
         var gapTop = this.size.ascent - this.elements[0][0].size.ascent;
 
-        var x = this.pos.x + gapLeft,
-            y = this.pos.y + gapTop;
+        var x1 = this.pos.x + this.GapLeft,
+            y1 = this.pos.y;
 
-        this.signRadical.setPosition(this.pos);
-        this.elements[0][0].setPosition({x: x, y: y });
+        var x2 = this.pos.x + this.GapLeft + gapLeft,
+            y2 = this.pos.y + gapTop;
+
+        this.signRadical.setPosition({x: x1, y: y1});
+        this.elements[0][0].setPosition({x: x2, y: y2});
     }
     else if(this.type == DEGREE_RADICAL)
     {
@@ -1028,18 +1035,18 @@ CRadical.prototype.setPosition = function(pos)
 
         var wTick = this.signRadical.measure.widthTick;
 
-        var x1 = this.pos.x + this.gapWidth,
+        var x1 = this.pos.x + this.GapLeft + this.gapWidth,
             y1 = this.pos.y + this.gapDegree;
 
         this.elements[0][0].setPosition({x: x1, y: y1});
 
         var wDegree = degr.width > wTick ? degr.width - wTick : 0;
-        var x2 = this.pos.x + wDegree,
+        var x2 = this.pos.x + this.GapLeft + wDegree,
             y2 = this.pos.y + this.size.height - sign.height;
 
         this.signRadical.setPosition({x: x2, y: y2});
 
-        var x3 = this.pos.x + this.size.width - base.width,
+        var x3 = this.pos.x + this.GapLeft + this.size.width - base.width,
             y3 = this.pos.y + this.size.ascent - base.ascent;
 
         this.elements[0][1].setPosition({x: x3, y: y3});

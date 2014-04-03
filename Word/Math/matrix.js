@@ -223,8 +223,9 @@ CMathMatrix.prototype.recalculateSize = function(oMeasure)
         ascent = this.getAscent(height, oMeasure);
         //center = height/2;
 
-    this.size = {width: width, height: height, ascent: ascent};
+    width += this.GapLeft + this.GapRight;
 
+    this.size = {width: width, height: height, ascent: ascent};
 }
 CMathMatrix.prototype.setPosition = function(pos)
 {
@@ -245,7 +246,10 @@ CMathMatrix.prototype.setPosition = function(pos)
         for(var j = 0; j < this.nCol; j++)
         {
             var al = this.align(i, j);
-            this.elements[i][j].setPosition( {x: this.pos.x + al.x + this.gaps.column[j] + w , y: this.pos.y + al.y + this.gaps.row[i] + h  } );
+            var X = this.pos.x + this.GapLeft + al.x + this.gaps.column[j] + w;
+            var Y = this.pos.y + al.y + this.gaps.row[i] + h;
+
+            this.elements[i][j].setPosition( {x: X, y: Y} );
             w += Widths[j] + this.gaps.column[j];
         }
         h += Heights[i] + this.gaps.row[i];

@@ -467,7 +467,10 @@ CRecalculateInfo.prototype =
                     }
                     else
                     {
-                        rightCoeff -= currCoeff;
+                        var leftCode = this.Left.getCodeChr();
+                        rightCoeff = COEFF_GAPS.getCoeff(leftCode, -1, 1);
+                        if(rightCoeff > currCoeff)
+                            rightCoeff -= currCoeff;
                     }
                 }
                 else
@@ -839,6 +842,8 @@ function CMathContent()
     this.content = new Array(); // array of mathElem
     //this.length = 0;
 
+    this.WidthToElement = [];
+
     this.CurPos = 0;
 
     this.pos = {x:0,    y:0};   // относительная позиция
@@ -863,6 +868,11 @@ function CMathContent()
                         //  особенно важна стартовая позиция
     };
     ///////////////////////////////
+
+    ///////////////////////////////
+
+    this.SelectStartPos = 0;
+    this.SelectEndPos   = 0;
 
 
     this.size =
@@ -1184,20 +1194,23 @@ CMathContent.prototype =
 
             if(this.content.length == 0)
             {
-                this.content.push(new ParaRun());
-                this.CurPos++;
+                this.content.push(new ParaRun(this.Composition.Parent.Paragraph, true, this));
+                //this.CurPos++;
             }
 
             this.content.push(obj);
-            this.content.push(new ParaRun());
+            this.content.push(new ParaRun(this.Composition.Parent.Paragraph, true, this));
 
-            this.CurPos += 2;
+            //this.CurPos += 2;
+
         }
         else
         {
             this.content.push(obj);
-            this.CurPos++;
+            //this.CurPos++;
         }
+
+        this.CurPos = this.content.length-1;
 
         this.setLogicalPosition(this.CurPos);
     },
@@ -5168,28 +5181,30 @@ CMathContent.prototype =
                 this.setLogicalPosition(0);
         }
     },
-    cursor_Is_Start: function()
+    Cursor_Is_Start: function()
     {
         var result = false;
 
         if( !this.IsEmpty() )
         {
             if(this.CurPos == 0)
-                result = true;
-            else if(this.CurPos == 1 && this.content[1].value.typeObj === MATH_RUN_PRP)
-                result = true;
+                result = this.content[0].Cursor_Is_Start();
+
         }
 
         return result;
     },
-    cursor_Is_End: function()
+    Cursor_Is_End: function()
     {
         var result = false;
 
         if(!this.IsEmpty())
         {
-            if(this.CurPos == this.content.length - 1)
-                result = true;
+            var len = this.content.length - 1;
+            if(this.CurPos == len  && this.content[len].typeObj == MATH_RUN_PRP)
+            {
+                result = this.content[len].Cursor_Is_End();
+            }
         }
 
         return result;
@@ -5242,12 +5257,13 @@ CMathContent.prototype =
         var descent    =   0 ;
 
         var oSize;
+
+        this.WidthToElement.length = 0;
+
         for(var i = 0; i < this.content.length; i++)
         {
-            if(this.content[i].typeObj === MATH_COMP || this.content[i].typeObj === MATH_PLACEHOLDER)
-                oSize = this.content[i].size;
-            else
-                oSize = this.content[i].Math_GetSize();
+            this.WidthToElement[i] = width;
+            oSize = this.content[i].size;
 
             width += oSize.width;
 
@@ -5365,6 +5381,7 @@ CMathContent.prototype =
 
         var RecalcInfo = new CRecalculateInfo(oMeasure, this.argSize, this.Composition);
 
+
         /*if(this.content.length > 1)
         {
             if(this.IsEmptyRun(0))
@@ -5382,8 +5399,6 @@ CMathContent.prototype =
         {
             if(this.content[pos].typeObj == MATH_COMP)
             {
-                this.content[pos].Resize(oMeasure);
-
                 RecalcInfo.Left = RecalcInfo.Current;
                 RecalcInfo.leftRunPrp = RecalcInfo.currRunPrp;
 
@@ -5391,14 +5406,15 @@ CMathContent.prototype =
 
                 //var currRPrp = this.content[pos].getRunPrp();
 
-                var runPrp =this.content[pos].getRunPrp();
+                var runPrp = this.content[pos].getRunPrp();
                 var currRPrp = runPrp.getMergedWPrp();
                 this.applyArgSize(currRPrp);
-
 
                 RecalcInfo.currRunPrp = currRPrp;
 
                 RecalcInfo.setGaps();
+
+                this.content[pos].Resize(oMeasure);
             }
             else if(this.content[pos].typeObj == MATH_PLACEHOLDER)
             {
@@ -5414,8 +5430,10 @@ CMathContent.prototype =
                     this.content[pos].Resize(oMeasure);
                 }
             }
-            else if(this.content[pos].typeObj == MATH_PARA_RUN)
+            else
             {
+                // to do убрать
+                this.content[pos].Set_Paragraph(this.Composition.Parent.Paragraph);
                 this.content[pos].Math_Recalculate(RecalcInfo);
             }
 
@@ -5643,7 +5661,7 @@ CMathContent.prototype =
             this.content[i].widthToEl = this.content[i-1].widthToEl + this.content[i].value.size.width + this.content[i].GapLeft + this.content[i].GapRight;
         }
     },
-    old_update_Cursor: function()
+    _old_update_Cursor: function()
     {
         //var sizeCursor = this.getRunPrp(this.CurPos).FontSize*g_dKoef_pt_to_mm;
 
@@ -5666,7 +5684,7 @@ CMathContent.prototype =
         editor.WordControl.m_oDrawingDocument.UpdateTargetFromPaint = false;
 
     },
-    update_Cursor: function(CurPage, UpdateTarget)
+    old_update_Cursor: function(CurPage, UpdateTarget)
     {
         var runPrp = this.getRunPrp(this.CurPos);
         var oWPrp = runPrp.getMergedWPrp();
@@ -5690,8 +5708,26 @@ CMathContent.prototype =
             //Para.DrawingDocument.UpdateTargetFromPaint = false;
         }
 
-
         return {X: X, Y: Y, Height: sizeCursor};
+    },
+    update_Cursor: function(CurPage, UpdateTarget)
+    {
+        var result;
+        if(this.content[this.CurPos].typeObj == MATH_COMP)
+        {
+            result = this.content[this.CurPos].update_Cursor(CurPage, UpdateTarget);
+        }
+        else if(this.content[this.CurPos].typeObj == MATH_PARA_RUN)
+        {
+            var absPos = this.Composition.absPos;
+            var X = this.pos.x + absPos.x + this.WidthToElement[this.CurPos],
+                Y = this.pos.y + absPos.y + this.size.ascent;
+
+            result = this.content[this.CurPos].Math_Update_Cursor(X, Y, CurPage, UpdateTarget);
+            //this.content[this.CurPos].Recalculate_CurPos(X, Y, true, 0, 0, true, true, true);
+        }
+
+        return result;
     },
     old_coordWOGaps: function( msCoord )
     {
@@ -5713,37 +5749,35 @@ CMathContent.prototype =
 
         return {x: x, y: y};
     },
-    findPosition: function(mCoord)
+    findPosition: function(X, Y)
     {
-        var mouseX = mCoord.x;
-        //var mouseY = mCoord.y;
-
+        var W = 0, width = 0;
         var pos = 0;
-        while( pos < (this.content.length - 1) &&  this.content[pos].widthToEl < mouseX )
-            pos++;
-
-        var gps = this.content[pos].gaps;
-        var width = this.content[pos].value.size.width;
-        var widthToEl = this.content[pos].widthToEl;
-
-        if(pos !== 0)
+        for(var i = 0; i < this.content.length && X > W; i++)
         {
-            if( this.content[pos].value.typeObj === MATH_COMP )
-            {
-                if(mouseX < widthToEl - width - gps.right)
-                    pos--;
-                else if(mouseX >= widthToEl - gps.right)
-                    pos++;
-            }
-            else
-            {
-                if( !(widthToEl - width/2 <  mouseX) )
-                    pos--;
-            }
+            W += this.content[i].size.width;
+            width = this.content[i].size.width;
+
+            pos = i;
         }
 
+
+        if( this.content[pos].typeObj === MATH_COMP )
+        {
+            if(X < W - width + this.GapLeft)
+                pos--;
+            else if(X >= W - this.GapRight)
+                pos++;
+        }
+
+        /*else
+        {
+            if( !(W - width/2 <  mouseX) )
+                pos--;
+        }*/
+
         // проверка на RunPrp, смещенная позиция
-        pos = this.verifyCurPos(pos);
+        //pos = this.verifyCurPos(pos);
 
         return pos;
     },
@@ -6319,7 +6353,7 @@ CMathContent.prototype =
         if(this.content.length == 1 && ! this.bRoot )//только CEmpty
             this.fillPlaceholders();
     },
-    selectUse: function()
+    old_selectUse: function()
     {
         //return (this.selection.startPos !== this.selection.endPos);
 
@@ -6327,6 +6361,11 @@ CMathContent.prototype =
         //console.log("end pos " + this.RealSelect.endPos);
 
         return this.RealSelect.startPos !== this.RealSelect.endPos;
+    },
+    selectUse: function()
+    {
+        return this.SelectStartPos !== this.SelectEndPos;
+        //return this.SelectStartPos !== this.SelectEndPos;
     },
     setCtrPrp: function()
     {
@@ -6397,25 +6436,22 @@ CMathContent.prototype =
     {
         this.pos = {x: pos.x, y: pos.y};
 
-        var _pos = {x: pos.x, y: pos.y + this.size.ascent };   // y по baseline;
+        var _pos = {x: pos.x, y: pos.y + this.size.ascent};   // y по baseline;
 
         for(var i=0; i < this.content.length; i++)
         {
             if(this.content[i].typeObj == MATH_COMP)
             {
-                _pos.x += this.content[i].GapLeft;
                 this.content[i].setPosition(_pos);
-                _pos.x += this.content[i].size.width + this.content[i].GapRight;
+                _pos.x += this.content[i].size.width;
+            }
+            else if(this.content[i].typeObj == MATH_PARA_RUN)
+            {
+                this.content[i].Math_SetPosition(_pos);
+                _pos.x += this.content[i].size.width;
             }
             else if(this.content[i].typeObj == MATH_PLACEHOLDER)
                 this.content[i].setPosition(_pos);
-            else
-            {
-                this.content[i].Math_SetPosition(_pos);
-                _pos.x += this.content[i].Math_GetSize().width;
-            }
-
-
         }
     },
     old_drawSelect: function()
@@ -7433,53 +7469,67 @@ CMathContent.prototype =
         return flag;
     },
     /// Position for Paragraph
-    get_ParaContentPosByXY: function(ContentPos, X, Y)
+    Get_ParaContentPosByXY: function(SearchPos, Depth)
     {
-        var pos = this.findPosition( {x: X, y: Y} );
-        ContentPos.Add(pos);
-
-        if(this.content[pos].value.typeObj == MATH_COMP)
+        if(this.content.length > 0) // случай , если у нас контент не заполнен, не предусмотрен
         {
-            var coord = this.getCoordElem(pos, {x: X, y: Y} );
-            this.content[pos].value.get_ParaContentPosByXY(ContentPos, coord.x, coord.y);
+            var pos = this.findPosition(SearchPos.X, SearchPos.Y);
+            SearchPos.Pos.Update( pos, Depth );
+            Depth++;
+            //ContentPos.Add(pos);
+
+            SearchPos.X -= this.WidthToElement[pos];
+            SearchPos.CurX += this.WidthToElement[pos];
+
+            if(this.content[pos].typeObj == MATH_COMP)
+            {
+                this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth);
+            }
+            else if(this.content[pos].typeObj == MATH_PARA_RUN)      // проверка на gaps в findDisposition
+            {
+                SearchPos.X += this.pos.x + this.Composition.absPos.x;
+                this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth, 0, 0);
+            }
         }
     },
-    get_ParaContentPos: function(bSelection, bStart, ContentPos)
+    Get_ParaContentPos: function(bSelection, bStart, ContentPos)
     {
         if( bSelection )
         {
-            var pos = bStart ? this.RealSelect.startPos : this.RealSelect.endPos;
+            var pos = bStart ? this.SelectStartPos : this.SelectEndPos;
             ContentPos.Add(pos);
 
+            this.content[pos].Get_ParaContentPos(bSelection, bStart, ContentPos);
 
-            if(this.RealSelect.startPos == this.RealSelect.endPos)
+            /*if(this.RealSelect.startPos == this.RealSelect.endPos)
             {
-                var blen = this.RealSelect.startPos < this.content.length;
-                var bComp = blen ? this.content[this.RealSelect.startPos].value.typeObj == MATH_COMP : false;
+                var blen = pos < this.content.length;
+                var bComp = blen ? this.content[pos].typeObj == MATH_COMP : false;
 
                 if(bComp)
-                    this.content[this.RealSelect.startPos].value.get_ParaContentPos(bSelection, bStart, ContentPos);
-            }
+                    this.content[pos].Get_ParaContentPos(bSelection, bStart, ContentPos);
+
+            }*/
         }
         else
         {
             ContentPos.Add(this.CurPos);
 
-            if(this.content[this.CurPos].value.typeObj == MATH_COMP)
-                this.content[this.CurPos].value.get_ParaContentPos(bSelection, bStart, ContentPos);
+            if(this.content[this.CurPos].typeObj == MATH_COMP || this.content[this.CurPos].typeObj == MATH_PARA_RUN)
+                this.content[this.CurPos].Get_ParaContentPos(bSelection, bStart, ContentPos);
         }
     },
-    set_ParaContentPos: function(ContentPos, Depth)
+    Set_ParaContentPos: function(ContentPos, Depth)
     {
-        var Content = this;
         this.CurPos = ContentPos.Get(Depth);
 
         Depth++;
 
-        if(this.content[this.CurPos].value.typeObj == MATH_COMP)
-            Content = this.content[this.CurPos].value.set_ParaContentPos(ContentPos, Depth);
+        var curr = this.content[this.CurPos];
 
-        return Content;
+        if(curr.typeObj == MATH_COMP || curr.typeObj == MATH_PARA_RUN)
+            curr.Set_ParaContentPos(ContentPos, Depth);
+
     },
     set_SelectEndExtreme: function(bEnd)
     {
@@ -7530,11 +7580,13 @@ CMathContent.prototype =
             Depth++;
             this.LogicalSelect.start = pos;
 
-            if(pos < this.content.length && this.RealSelect.startPos === this.RealSelect.endPos && this.content[pos].value.typeObj === MATH_COMP)
-                this.content[pos].value.set_StartSelectContent(ContentPos, Depth);
+            if(pos < this.content.length && this.RealSelect.startPos === this.RealSelect.endPos && this.content[pos].typeObj === MATH_COMP)
+            {
+                this.content[pos].set_StartSelectContent(ContentPos, Depth);
+            }
         }
     },
-    set_EndSelectContent: function(ContentPos, Depth)
+    old_set_EndSelectContent: function(ContentPos, Depth)
     {
         /*var msCoord = {x: x, y: y};
         var posEnd = this.findPosition(msCoord),
@@ -7601,12 +7653,258 @@ CMathContent.prototype =
                 else
                     this.setEndPos_Selection(posEnd);
             }
+        }
+
+        return {state: state, SelectContent:  SelectContent};
+    },
+    set_EndSelectContent: function(ContentPos, Depth)
+    {
+        /*var msCoord = {x: x, y: y};
+         var posEnd = this.findPosition(msCoord),
+         posStart = this.LogicalSelect.start;
+
+         this.CurPos = posStart;
+         this.LogicalSelect.end = posEnd;*/
+
+        var state = true; // вышли / не вышли за переделы контента
+                          // актуально для мат. объектов !!
+        var SelectContent = null;
+
+        var posEnd = ContentPos.Get(Depth),
+            posStart = this.LogicalSelect.start;
+
+        this.LogicalSelect.end = posEnd;
+        Depth++;
+
+        //var blen = this.RealSelect.startPos < this.content.length;
+
+
+        //селект внутри мат. объекта
+
+        // возможны две ситуации:
+        // 1. мы нашли нужный контенте posStart !== posEnd  или  posStart ===  posEnd и находимся в одном Para_Run
+        // 2. posStart === posEnd и это мат объект и ищем дальше
+
+        if(posStart < this.content.length && posStart === posEnd && this.content[posEnd].typeObj === MATH_COMP)
+        {
+            var result = this.content[posEnd].value.set_EndSelectContent(ContentPos, Depth);
+            this.setStartPos_Selection(posStart-1);
+
+            if( !result.state )
+            {
+                this.setEndPos_Selection(posEnd + 1);
+                SelectContent = this;
+            }
+            else
+                SelectContent = result.SelectContent;
+        }
+        //селект элементов контента
+        else
+        {
+            SelectContent = this;
+            /*var direction = (posStart < posEnd) ? 1 : -1;
+
+            if(posStart < this.content.length)
+            {
+                if(this.content[posStart].value.typeObj === MATH_COMP )
+                {
+                    if( direction == 1 )
+                        this.setStartPos_Selection( posStart - 1);
+                    else if( direction == -1 )
+                        this.setStartPos_Selection( posStart + 1);
+                }
+                else
+                    this.setStartPos_Selection(posStart);
+            }
+
+            if(posEnd < this.content.length)
+            {
+                if(this.content[posEnd].value.typeObj === MATH_COMP )
+                {
+                    if( direction == 1 )
+                        this.setEndPos_Selection(posEnd + 1);
+                    else if( direction == -1 )
+                        this.setEndPos_Selection(posEnd - 1);
+                }
+                else
+                    this.setEndPos_Selection(posEnd);
+            }*/
+        }
+
+        return {state: state, SelectContent:  SelectContent};
+    },
+    Set_SelectionContentPos: function(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag)
+    {
+        /*
+         else
+         {
+             SelectContent = this;
+             var direction = (posStart < posEnd) ? 1 : -1;
+
+             if(posStart < this.content.length)
+             {
+                 if(this.content[posStart].value.typeObj === MATH_COMP )
+                 {
+                     if( direction == 1 )
+                        this.setStartPos_Selection( posStart - 1);
+                     else if( direction == -1 )
+                        this.setStartPos_Selection( posStart + 1);
+                 }
+                 else
+                     this.setStartPos_Selection(posStart);
+             }
+
+             if(posEnd < this.content.length)
+             {
+                 if(this.content[posEnd].value.typeObj === MATH_COMP )
+                 {
+                     if( direction == 1 )
+                        this.setEndPos_Selection(posEnd + 1);
+                     else if( direction == -1 )
+                        this.setEndPos_Selection(posEnd - 1);
+                 }
+                 else
+                    this.setEndPos_Selection(posEnd);
+             }
+         }
+        */
+
+        var posStart, posEnd;
+
+        switch(StartFlag)
+        {
+            case 0:
+                posStart = StartContentPos.Get(Depth);
+                break;
+            case 1:
+                posStart = 0;
+                break;
+            case -1:
+                posStart = this.content.length - 1;
+        }
+
+        switch(EndFlag)
+        {
+            case 0:
+                posEnd = EndContentPos.Get(Depth);
+                break;
+            case 1:
+                posEnd = 0;
+                break;
+            case -1:
+                posEnd = this.content.length - 1;
+        }
+
+        this.SelectStartPos = posStart;
+        this.SelectEndPos = posEnd;
+        Depth++;
+
+
+        if(this.IsPlaceholder())
+        {
+            this.SelectStartPos = 0;
+            this.SelectEndPos = 1;
+        }
+        else if(posStart < this.content.length)
+        {
+            if(posStart == posEnd)
+            {
+                this.content[posStart].Set_SelectionContentPos(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag);
+            }
+            else
+            {
+                this.content[posStart].Set_SelectionContentPos(StartContentPos, null, Depth, StartFlag, -1);
+                //this.content[posEnd].Set_SelectionContentPos(null, EndContentPos, Depth)
+
+                //случай с плейсхолдером рассмотрели выше
+                if(this.content[posEnd].typeObj !== MATH_COMP) // Para_Run
+                    this.content[posEnd].Set_SelectionContentPos(null, EndContentPos, Depth, 1, EndFlag);
+
+
+                /*if(this.content[posEnd].typeObj == MATH_COMP)
+                {
+                    var direction = (posStart < posEnd) ? 1 : -1;
+
+                    if( direction == 1 )
+                        this.SelectEndPos = posEnd + 1;
+                        //this.setEndPos_Selection(posEnd + 1);
+                    else if( direction == -1 )
+                        this.SelectEndPos = posEnd - 1;
+                        //this.setEndPos_Selection(posEnd - 1);
+                }
+                else // Para_Run
+                {
+                    this.content[posEnd].Set_SelectionContentPos(null, EndContentPos, Depth, 1, 0);
+                }*/
+
+            }
+        }
+
+    },
+    Selection_DrawRange: function(SelectionDraw)
+    {
+        if(this.SelectStartPos !== this.SelectEndPos)
+        {
+            SelectionDraw.FindStart = false;
+
+            var startPos = this.SelectStartPos,
+                endPos = this.SelectEndPos;
+
+            if(startPos > endPos)
+            {
+                var temp = startPos;
+                startPos = endPos;
+                endPos = temp;
+            }
+
+            SelectionDraw.StartX += this.WidthToElement[startPos];
+
+            if(this.content[startPos].typeObj === MATH_PARA_RUN)
+                this.content[startPos].Selection_DrawRange(0, 0, SelectionDraw);
+            else
+            {
+                SelectionDraw.W += this.WidthToElement[startPos];
+                SelectionDraw.StartX = this.pos.x + this.Composition.absPos.x + this.WidthToElement[startPos];
+                SelectionDraw.StartY = this.pos.y + this.Composition.absPos.y;
+            }
+
+
+            SelectionDraw.W += this.WidthToElement[endPos] - this.WidthToElement[startPos + 1]; // startPos < endPos
+            SelectionDraw.H = this.size.height;
+
+            if(this.content[endPos].typeObj === MATH_PARA_RUN)
+                this.content[endPos].Selection_DrawRange(0, 0, SelectionDraw);
+            else
+                SelectionDraw.W += this.WidthToElement[endPos];
+
+
+        }
+        else
+        {
+            var pos = this.SelectStartPos;
+            SelectionDraw.StartX += this.WidthToElement[pos];
+
+            if(this.content[pos].typeObj === MATH_COMP)
+            {
+                if(this.content[pos].IsSelectEmpty())
+                    this.content[pos].Selection_DrawRange(SelectionDraw);
+                else
+                {
+                    SelectionDraw.FindStart = false;
+                    SelectionDraw.W = this.content[pos].size.width;
+                    SelectionDraw.H = this.size.height;
+
+                    SelectionDraw.StartX = this.pos.x + this.Composition.absPos.x + this.WidthToElement[pos];
+                    SelectionDraw.StartY = this.pos.y + this.Composition.absPos.y;
+
+                }
+            }
+            else if(this.content[pos].typeObj === MATH_PARA_RUN)
+                this.content[pos].Selection_DrawRange(0, 0, SelectionDraw);
 
 
 
         }
-
-        return {state: state, SelectContent:  SelectContent};
     },
     drawSelect: function(SelectionDraw)
     {

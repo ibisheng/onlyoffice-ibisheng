@@ -303,6 +303,7 @@ CNaryOvr.prototype.recalculateSize = function()
 
     var ascent = nOper.ascent;
     var width = nOper.width > iter.width ? nOper.width : iter.width;
+    width += this.GapLeft + this.GapRight;
 
     var height = nOper.height + this.dH + iter.height;
 
@@ -358,6 +359,7 @@ CNaryUndOvr.prototype.recalculateSize = function()
         height += this.elements[i][0].size.height;
     }
 
+    width += this.GapLeft + this.GapRight;
     height += this.gapTop + this.gapBottom;
 
     this.size = {width: width, height: height, ascent: ascent};
@@ -365,11 +367,13 @@ CNaryUndOvr.prototype.recalculateSize = function()
 CNaryUndOvr.prototype.setPosition = function(pos)
 {
     this.pos = {x: pos.x, y : pos.y - this.size.ascent};
-    var x1 = pos.x + this.align(0, 0).x,
+    var xx = pos.x + this.GapLeft;
+
+    var x1 = xx + this.align(0, 0).x,
         y1 = pos.y,
-        x2 = pos.x + this.align(1,0).x,
+        x2 = xx + this.align(1,0).x,
         y2 = y1 + this.elements[0][0].size.height + this.gapTop,
-        x3 = pos.x + this.align(2,0).x,
+        x3 = xx + this.align(2,0).x,
         y3 = y2 + this.elements[1][0].size.height + this.gapBottom;
 
     this.elements[0][0].setPosition({x: x1, y :y1});
@@ -526,6 +530,8 @@ CNaryOperator.prototype.recalculateSize = function()
     var height = this.sizeGlyph.height,
         width =  this.sizeGlyph.width,
         ascent = this.sizeGlyph.height/2 + DIV_CENT*this.getCtrPrp().FontSize;
+
+    width += this.GapLeft + this.GapRight;
 
     this.size = {height: height, width: width, ascent: ascent};
 }

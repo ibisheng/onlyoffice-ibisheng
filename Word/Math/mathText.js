@@ -60,6 +60,7 @@ function CMathText()
 
     this.GapLeft = 0;
     this.GapRight = 0;
+    this.WidthVisible = 0;
 
     //this.Parent = null;
 
@@ -255,6 +256,8 @@ CMathText.prototype =
 
         width += this.GapLeft + this.GapRight;
 
+        this.WidthVisible = width;
+
         this.size = {width: width, widthG: widthG, height: height, ascent: ascent};
     },
     old_draw: function()
@@ -358,9 +361,9 @@ CMathText.prototype =
     setPosition: function(pos)
     {
         if( ! this.bJDraw)                      // for text
-            this.pos = {x : pos.x, y: pos.y };
+            this.pos = {x : pos.x + this.GapLeft, y: pos.y };
         else                                    // for symbol only drawing
-            this.pos = {x:  pos.x , y: pos.y + this.size.ascent};
+            this.pos = {x:  pos.x + this.GapLeft, y: pos.y + this.size.ascent};
     },
     new_setPosition: function(pos)
     {

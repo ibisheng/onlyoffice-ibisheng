@@ -82,6 +82,8 @@ CBorderBox.prototype.recalculateSize = function()
     if(this.bRight)
         width += this.gapBrd;
 
+    width += this.GapLeft + this.GapRight;
+
     this.size = {width : width, height: height, ascent: ascent};
 }
 CBorderBox.prototype.draw = function(x, y, pGraphics)
@@ -213,7 +215,7 @@ CBorderBox.prototype.setPosition = function(pos)
 {
     this.pos = {x: pos.x, y: pos.y - this.size.ascent};
 
-    var x = this.pos.x, y = this.pos.y;
+    var x = this.pos.x + this.GapLeft, y = this.pos.y;
 
     if(this.bLeft)
         x += this.gapBrd;

@@ -3700,7 +3700,7 @@ CDelimiter.prototype.setPosition = function(position)
 {
     this.pos = {x: position.x, y: position.y - this.size.ascent};
 
-    var x = this.pos.x,
+    var x = this.pos.x + this.GapLeft,
         y = this.pos.y;
 
     var pos = {x: x, y: y + this.alignOperator(this.begOper)};
@@ -3879,19 +3879,27 @@ CCharacter.prototype.setPosition = function(pos)
 
     if(this.loc === LOCATION_TOP)
     {
-        var pos = {x: this.pos.x + alignOp, y: this.pos.y};
-        this.operator.setPosition(pos);
+        var x1 = this.pos.x + this.GapLeft + alignOp,
+            y1 = this.pos.y;
 
-        pos = {x: this.pos.x + alignCnt, y: this.pos.y + this.operator.size.height};
-        this.elements[0][0].setPosition(pos);
+        this.operator.setPosition({x: x1, y: y1});
+
+        var x2 = this.pos.x + this.GapLeft + alignCnt,
+            y2 = this.pos.y + this.operator.size.height;
+
+        this.elements[0][0].setPosition({x: x2, y: y2});
     }
     else if(this.loc === LOCATION_BOT)
     {
-        var pos = {x: this.pos.x + alignCnt, y: this.pos.y};
-        this.elements[0][0].setPosition(pos);
+        var x1 = this.pos.x + this.GapLeft + alignCnt,
+            y1 = this.pos.y;
 
-        pos = {x: this.pos.x + alignOp, y: this.pos.y + this.elements[0][0].size.height};
-        this.operator.setPosition(pos);
+        this.elements[0][0].setPosition({x: x1, y: y1});
+
+        var x2 = this.pos.x + this.GapLeft + alignOp,
+            y2 = this.pos.y + this.elements[0][0].size.height;
+
+        this.operator.setPosition({x: x2, y: y2});
     }
 }
 CCharacter.prototype.align = function(element)

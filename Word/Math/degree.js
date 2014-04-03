@@ -160,6 +160,7 @@ CDegree.prototype.recalculateSup = function(oMeasure)
         this.dW = 0.01*mgCtrPrp.FontSize;
 
     var width = base.width + iter.width + this.dW;
+    width += this.GapLeft + this.GapRight;
 
     this.size = {width: width, height: height, ascent: ascent};
 }
@@ -172,6 +173,7 @@ CDegree.prototype.recalculateSubScript = function(oMeasure)
     var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
 
     var width = base.width + iter.width + this.dW;
+    width += this.GapLeft + this.GapRight;
 
     var bBaseOnlyText = this.elements[0][0].IsOnlyText();
 
@@ -236,8 +238,14 @@ CDegree.prototype.setPosition = function(pos)
     else
         this.pos = {x: pos.x, y: pos.y - this.size.ascent};
 
-    this.elements[0][0].setPosition({x: this.pos.x, y: this.pos.y + this.upBase});
-    this.elements[0][1].setPosition({x: this.pos.x + this.elements[0][0].size.width + this.dW, y: this.pos.y + this.upIter});
+    var x1 = this.pos.x + this.GapLeft,
+        y1 = this.pos.y + this.upBase;
+
+    var x2 = this.pos.x + this.GapLeft + this.elements[0][0].size.width + this.dW,
+        y2 = this.pos.y + this.upIter;
+
+    this.elements[0][0].setPosition({x: x1, y: y1});
+    this.elements[0][1].setPosition({x: x2, y: y2});
 }
 CDegree.prototype.old_findDisposition = function(mCoord)
 {

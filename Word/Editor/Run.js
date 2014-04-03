@@ -4,7 +4,7 @@
  * Time: 18:28
  */
 
-function ParaRun(Paragraph)
+function ParaRun(Paragraph, bMathRun, Parent)
 {
     this.Id         = g_oIdCounter.Get_NewId();  // Id данного элемента
     this.Type       = para_Run;                  // тип данного элемента
@@ -45,6 +45,18 @@ function ParaRun(Paragraph)
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
+
+    if(bMathRun)
+    {
+        this.typeObj = MATH_PARA_RUN;
+        this.Parent = Parent;
+        this.size =
+        {
+            ascent: 0,
+            height: 0,
+            width: 0
+        };
+    }
 }
 
 ParaRun.prototype =
@@ -3184,7 +3196,7 @@ ParaRun.prototype =
     Get_ParaContentPos : function(bSelection, bStart, ContentPos)
     {
         var Pos = ( true !== bSelection ? this.State.ContentPos : ( false !== bStart ? this.State.Selection.StartPos : this.State.Selection.EndPos ) );
-        ContentPos.Add( Pos );
+        ContentPos.Add(Pos);
     },
 
     Set_ParaContentPos : function(ContentPos, Depth)
@@ -6450,12 +6462,10 @@ function CRunCollaborativeRange(PosS, PosE)
 }
 
 
-// добавлены поля
-// size,  Parent
 
 ParaRun.prototype.Math_SetPosition = function(_pos)
 {
-    var pos = {x: _pos.x, y: _pos.y - this.Math_GetSize().ascent};
+    var pos = {x: _pos.x, y: _pos.y - this.size.ascent};
 
     for(var i = 0; i < this.Content.length; i++)
     {
@@ -6465,37 +6475,41 @@ ParaRun.prototype.Math_SetPosition = function(_pos)
 }
 ParaRun.prototype.Math_Draw = function(x, y, pGraphics)
 {
-    if(this.bMathRun)
+    var X = x;
+    var Y = y + this.size.ascent;
+
+    // var oWPrp = this.Get_CompiledPr(true);
+    var oWPrp = this.Pr.Copy();
+    this.Math_applyArgSize(oWPrp);
+
+    oWPrp.Italic = false;
+
+    pGraphics.SetFont(oWPrp);
+    pGraphics.b_color1(0,0,0,255);
+
+    for(var i=0; i < this.Content.length;i++)
     {
-        var X = x;
-        var Y = y + this.Math_GetSize().ascent;
-
-        pGraphics.b_color1(0,0,0,255);
-
-        for(var i=0; i < this.Content.length;i++)
-        {
-            var oWPrp = this.Get_CompiledPr(false);
-            oWPrp.Merge(this.Parent.Composition.DEFAULT_RUN_PRP.getTxtPrp());
-
-            g_oTextMeasurer.SetFont(oWPrp);
-
-            this.Content[i].draw(X, Y, pGraphics);
-        }
+        this.Content[i].draw(X, Y, pGraphics);
     }
+
 }
 ParaRun.prototype.Math_Recalculate = function(RecalcInfo)
 {
     var RangeStartPos = 0;
     var RangeEndPos = this.Content.length;
 
-    // ??
+    // обновляем позиции start и end для Range
     this.Lines[0].Add_Range(0, RangeStartPos, RangeEndPos);
 
     var width = 0,
         ascent = 0, descent = 0;
 
-    var oWPrp = this.Get_CompiledPr(true);
-    oWPrp.Merge(RecalcInfo.Composition.DEFAULT_RUN_PRP.getTxtPrp());
+    //var oWPrp = this.Get_CompiledPr(true);
+    var oWPrp = this.Pr.Copy();
+    this.Math_applyArgSize(oWPrp);
+    //oWPrp.Merge(RecalcInfo.Composition.DEFAULT_RUN_PRP.getTxtPrp());
+
+    oWPrp.Italic = false;
 
     // TODO
     // смержить еще с math_Run_Prp
@@ -6524,24 +6538,71 @@ ParaRun.prototype.Math_Recalculate = function(RecalcInfo)
         descent =  descent < oDescent ? oDescent : descent;
     }
 
-    //this.size = {width: width, height: ascent + descent, ascent: ascent};
+    this.size = {width: width, height: ascent + descent, ascent: ascent};
 }
-ParaRun.prototype.Math_GetSize = function()
+ParaRun.prototype.Math_Update_Cursor = function(X, Y, CurPage, UpdateTarget)
 {
-    var width = 0,
-        ascent = 0, descent = 0;
+    var runPrp = this.Get_CompiledPr(true);
+    this.Math_applyArgSize(runPrp);
 
-    for (var Pos = 0 ; Pos < this.Content.length; Pos++ )
+
+    var sizeCursor = runPrp.FontSize*g_dKoef_pt_to_mm;
+
+    Y -= sizeCursor*0.8;
+
+    for(var i = 0; i < this.State.ContentPos; i++)
+        X += this.Content[i].size.width;
+
+
+    if ( null !== this.Paragraph && undefined !== this.Paragraph && UpdateTarget == true)
     {
-        this.Content[Pos].Resize(g_oTextMeasurer);
-        var oSize = this.Content[Pos].size;
-
-        width += oSize.width;
-
-        ascent = ascent > oSize.ascent ? ascent : oSize.ascent;
-        var oDescent = oSize.height - oSize.ascent;
-        descent =  descent < oDescent ? oDescent : descent;
+        this.Paragraph.DrawingDocument.SetTargetSize(sizeCursor);
+        //Para.DrawingDocument.UpdateTargetFromPaint = true;
+        this.Paragraph.DrawingDocument.UpdateTarget( X, Y, this.Paragraph.Get_StartPage_Absolute() + CurPage );
+        //Para.DrawingDocument.UpdateTargetFromPaint = false;
     }
 
-    return {width: width, height: ascent + descent, ascent: ascent};
+    return {X: X, Y: Y, Height: sizeCursor};
+}
+ParaRun.prototype.Math_applyArgSize = function(oWPrp)
+{
+    var tPrp = new CTextPr();
+    var defaultRPrp = this.Parent.Composition.GetDefaultRunPrp();
+    var gWPrp = defaultRPrp.getMergedWPrp();
+    tPrp.Merge(gWPrp);
+    tPrp.Merge(oWPrp);
+
+    var FSize = tPrp.FontSize;
+
+    if(this.argSize == -1)
+    {
+        //aa: 0.0013  bb: 0.66  cc: 0.5
+        //aa: 0.0009  bb: 0.68  cc: 0.26
+        FSize = 0.0009*FSize*FSize + 0.68*FSize + 0.26;
+        //FSize = 0.001*FSize*FSize + 0.723*FSize - 1.318;
+        //FSize = 0.0006*FSize*FSize + 0.743*FSize - 1.53;
+    }
+    else if(this.argSize == -2)
+    {
+        // aa: -0.0004  bb: 0.66  cc: 0.87
+        // aa: -0.0014  bb: 0.71  cc: 0.39
+        // aa: 0  bb: 0.63  cc: 1.11
+        //FSize = 0.63*FSize + 1.11;
+        FSize = -0.0004*FSize*FSize + 0.66*FSize + 0.87;
+        //tPrp.FontSize *= 0.473;
+    }
+
+    tPrp.FontSize = FSize;
+
+    oWPrp.Merge(tPrp);
+
+    /*
+     if(this.argSize == -1)
+     //tPrp.FontSize *= 0.8;
+     tPrp.FontSize *= 0.728;
+     //tPrp.FontSize *= 0.65;
+     else if(this.argSize == -2)
+     //tPrp.FontSize *= 0.65;
+     tPrp.FontSize *= 0.53;
+     //tPrp.FontSize *= 0.473;*/
 }

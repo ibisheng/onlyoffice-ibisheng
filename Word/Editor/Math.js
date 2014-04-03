@@ -10,9 +10,9 @@ function ParaMath(bAddMenu)
     this.Jc   = undefined;
     this.Math = new CMathComposition();
     this.Math.Parent = this;
-    this.RootComposition = this.Math.Root;
-    this.CurrentContent    = this.RootComposition;
-    this.SelectContent     = this.RootComposition;
+    this.Root = this.Math.Root;
+    //this.CurrentContent    = this.RootComposition;
+    //this.SelectContent     = this.RootComposition;
     this.bSelectionUse     = false;
 
 
@@ -133,7 +133,7 @@ ParaMath.prototype =
     {		
         if(sText)
         {			
-            var MathRun = new ParaRun();
+            var MathRun = new ParaRun(this.Paragraph, true, this.Root);
 			
 			var Pos = oElem.CurPos,
 				PosEnd = Pos + 1;
@@ -145,12 +145,10 @@ ParaMath.prototype =
                 oText.addTxt(sText[Pos]);				
                 MathRun.Content.splice( Pos, 0, oText );
 				
-				var element = new mathElem(oText);
-				items.push(element);
+				//var element = new mathElem(oText);
+				items.push(oText);
             }
 
-            MathRun.bMathRun = true;
-            MathRun.typeObj = MATH_PARA_RUN;
             oElem.addElementToContent(MathRun);
 			
 			History.Add(oElem, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
@@ -461,7 +459,7 @@ ParaMath.prototype =
 
         if ( true !== PRS.NewRange )
         {
-            RangeEndPos = this.RootComposition.content.length; // RangeEndPos = 1;    to    RangeEndPos = this.Content.length;
+            RangeEndPos = this.Root.content.length; // RangeEndPos = 1;    to    RangeEndPos = this.Content.length;
 
             // Удаляем лишние строки, оставшиеся после предыдущего пересчета в самом конце
             if ( this.Lines.length > this.LinesLength )
@@ -627,7 +625,7 @@ ParaMath.prototype =
 
         if ( true !== PRS.NewRange )
         {
-            RangeEndPos = this.RootComposition.content.length; // RangeEndPos = 1;    to    RangeEndPos = this.Content.length;
+            RangeEndPos = this.Root.content.length; // RangeEndPos = 1;    to    RangeEndPos = this.Content.length;
 
             // Удаляем лишние строки, оставшиеся после предыдущего пересчета в самом конце
             if ( this.Lines.length > this.LinesLength )
@@ -800,17 +798,16 @@ ParaMath.prototype =
     {
         var CurLine  = _CurLine - this.StartLine;
         var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-        var X = _X;
 
-        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
+        //var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
         var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
 
-        if ( EndPos >= 1)
+        if ( EndPos >= 1 )
         {
-            return this.CurrentContent.update_Cursor(_CurPage, UpdateTarget);
+            return this.Root.update_Cursor(_CurPage, UpdateTarget);
         }
 
-        return {X : X };
+        return {X : _X };
     },
 
     Refresh_RecalcData : function(Data)
@@ -917,7 +914,7 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Cursor_Is_Start
 
-        return this.Math.Cursor_Is_Start();
+        return this.Root.Cursor_Is_Start();
     },
 
     Cursor_Is_NeededCorrectPos : function()
@@ -929,7 +926,7 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Cursor_Is_End
 
-        return this.Math.Cursor_Is_End();
+        return this.Root.Cursor_Is_End();
     },
 
     Cursor_MoveToStartPos : function()
@@ -945,8 +942,7 @@ ParaMath.prototype =
 
         this.Math.Cursor_MoveToEndPos();
     },
-
-    Get_ParaContentPosByXY : function(SearchPos, Depth, _CurLine, _CurRange, StepEnd) // получить логическую позицию по XY
+    old_Get_ParaContentPosByXY : function(SearchPos, Depth, _CurLine, _CurRange, StepEnd) // получить логическую позицию по XY
     {
         // TODO: ParaMath.Get_ParaContentPosByXY
 
@@ -966,7 +962,7 @@ ParaMath.prototype =
         var Dx = this.Math.Size.WidthVisible;
         var D = SearchPos.X - SearchPos.CurX;
         var Diff = Math.abs(D) < Math.abs(D + Dx) ? Math.abs(D) : Math.abs(D + Dx);
-        //var Diff = SearchPos.X - SearchPos.CurX;
+        //var Diff = SearchPos.X - SearchCommonPos.CurX;
 
         if(Math.abs(Diff) < SearchPos.DiffX + 0.001 )
         {
@@ -988,6 +984,7 @@ ParaMath.prototype =
             }
         }
 
+
 //        var str = "";
 //        for(var i = 0; i < SearchPos.Pos.Data.length; i++)
 //        {
@@ -1000,43 +997,114 @@ ParaMath.prototype =
         SearchPos.CurX += Dx;
 
         /*for(var CurPos = StartPos; CurPos < EndPos; CurPos++)
-        {
-            var Dx = this.Content[CurPos].value.size.width;
+         {
+         var Dx = this.Content[CurPos].value.size.width;
 
-            // Проверяем, попали ли мы в данный элемент
-            var Diff = SearchPos.X - SearchPos.CurX;
-            if ( Math.abs( Diff ) < SearchPos.DiffX + 0.001 )
-            {
-                SearchPos.DiffX = Math.abs( Diff );
-                SearchPos.Pos.Update( CurPos, Depth );
-                //this.Math.Root.get_ParaContentPos(false, SearchPos.Pos);
+         // Проверяем, попали ли мы в данный элемент
+         var Diff = SearchPos.X - SearchPos.CurX;
+         if ( Math.abs( Diff ) < SearchPos.DiffX + 0.001 )
+         {
+         SearchPos.DiffX = Math.abs( Diff );
+         SearchPos.Pos.Update( CurPos, Depth );
+         //this.Math.Root.get_ParaContentPos(false, SearchPos.Pos);
 
-                Result = true;
+         Result = true;
 
-                if ( Diff >= - 0.001 && Diff <= Dx + 0.001 )
-                {
-                    SearchPos.InText = true;
-                }
-            }
+         if ( Diff >= - 0.001 && Diff <= Dx + 0.001 )
+         {
+         SearchPos.InText = true;
+         }
+         }
 
-            SearchPos.CurX += Dx;
-        }*/
+         SearchPos.CurX += Dx;
+         }*/
 
 
         /*var Diff = SearchPos.X - SearchPos.CurX;
-        if ( Math.abs( Diff ) < SearchPos.DiffX + 0.001 )
-        {
-            SearchPos.DiffX = Math.abs( Diff );
-            SearchPos.Pos.Update( StartPos, Depth );
-            Result = true;
+         if ( Math.abs( Diff ) < SearchPos.DiffX + 0.001 )
+         {
+         SearchPos.DiffX = Math.abs( Diff );
+         SearchPos.Pos.Update( StartPos, Depth );
+         Result = true;
 
-            if ( Diff >= - 0.001 && Diff <= this.Math.size.WidthVisible + 0.001 )
+         if ( Diff >= - 0.001 && Diff <= this.Math.size.WidthVisible + 0.001 )
+         {
+         SearchPos.InText = true;
+         }
+         }
+
+         SearchPos.CurX += this.Math.size.WidthVisible;*/
+
+
+        return Result;
+    },
+    Get_ParaContentPosByXY : function(SearchPos, Depth, _CurLine, _CurRange, StepEnd) // получить логическую позицию по XY
+    {
+        // TODO: ParaMath.Get_ParaContentPosByXY
+
+        var Result = false;
+
+        var CurLine  = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange ); // если находимся в нулевой строке (для текущей позиции), то CurRange мб ненулевой
+
+        var Range = this.Lines[CurLine].Ranges[CurRange];
+        var StartPos = Range.StartPos;  //  0
+        var EndPos   = Range.EndPos;    //  this.content.length
+
+        // TODO: реализовать поиск по Y (для случая, когда формула занимает больше одной строки)
+
+        // Проверяем, попали ли мы в формулу
+
+        //var Dx = this.Math.Size.WidthVisible;
+        var Dx = this.Root.size.width;
+        var D = SearchPos.X - SearchPos.CurX;
+        var Diff = Math.abs(D) < Math.abs(D + Dx) ? Math.abs(D) : Math.abs(D + Dx);
+        //var Diff = SearchPos.X - SearchPos.CurX;
+
+        var CurX = SearchPos.CurX;
+        if(Math.abs(Diff) < SearchPos.DiffX + 0.001 )
+        {
+
+            //console.log(SearchPos.X);
+            var X = SearchPos.X,
+                Y = SearchPos.Y;
+
+            SearchPos.X -= this.Math.absPos.x;
+            SearchPos.Y -= this.Math.absPos.y;
+
+            SearchPos.DiffX = Diff;
+
+            this.Root.Get_ParaContentPosByXY(SearchPos, Depth);
+
+            //console.log(SearchPos.X);
+
+            /*var str = "";
+
+            for(var i = 0; i < SearchPos.Pos.length; i++)
+            {
+                str += SearchPos.Pos[i] + " ;";
+            }
+            console.log(str);*/
+
+            SearchPos.X = X;
+            SearchPos.Y = Y;
+
+
+            //this.Math.Selection_SetStart(SearchPos.X, SearchPos.Y);
+            //this.Math.Selection_SetEnd(SearchPos.X, SearchPos.Y);
+            //this.Math.Root.get_ParaContentPos(false, SearchPos.Pos);
+
+            Result = true;
+            if ( D >= - 0.001 && D <= Dx + 0.001 )
             {
                 SearchPos.InText = true;
+                SearchPos.DiffX =  0.001; // сравниваем расстояние до ближайшего элемента
             }
+
         }
 
-        SearchPos.CurX += this.Math.size.WidthVisible;*/
+        SearchPos.CurX = CurX + Dx;
+
 
 
         return Result;
@@ -1046,17 +1114,26 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Get_ParaContentPos
 
-        this.RootComposition.get_ParaContentPos(bSelection, bStart, ContentPos);
+        this.Root.Get_ParaContentPos(bSelection, bStart, ContentPos);
 
+        return ContentPos;
     },
     Set_ParaContentPos : function(ContentPos, Depth) // выставить логическую позицию в контенте
     {
         // TODO: ParaMath.Set_ParaContentPos
 
+        /*var str = "";
+
+        for(var i = 0; i < ContentPos.length; i++)
+        {
+            str += ContentPos[i] + " ;";
+        }
+        console.log(str);*/
+
         var Pos = ContentPos.Get(Depth);
         this.State.ContentPos = Pos;
 
-        this.RootComposition.set_ParaContentPos(ContentPos, Depth);
+        this.Root.Set_ParaContentPos(ContentPos, Depth);
     },
     Get_PosByElement : function(Class, ContentPos, Depth, UseRange, Range, Line)
     {
@@ -1124,8 +1201,9 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Set_SelectionContentPos
 
-        this.SelectContent = this.RootComposition;
+        this.Root.Set_SelectionContentPos(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag);
 
+        /*this.SelectContent = this.RootComposition;
 
         switch (StartFlag)
         {
@@ -1152,10 +1230,10 @@ ParaMath.prototype =
                 var result = this.RootComposition.set_EndSelectContent(EndContentPos, Depth);
                 this.SelectContent  = result.SelectContent;
                 break;
-        }
+        }*/
 
-        if(!this.SelectContent.selectUse())
-            this.CurrentContent = this.SelectContent;
+        /*if(!this.SelectContent.selectUse())
+            this.CurrentContent = this.SelectContent;*/
 
         this.bSelectionUse = true;
     },
@@ -1191,26 +1269,27 @@ ParaMath.prototype =
         var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
 
 
-
         if ( EndPos >= 1 )
         {
             if ( true === this.bSelectionUse )
             {
             // TODO: ParaMath.Selection_Draw_Range
 
-            if(SelectionDraw.FindStart == true)
-            {
-                if(this.SelectContent.selectUse())
+                if(SelectionDraw.FindStart == true)
                 {
-                    SelectionDraw.FindStart = false;
-                    this.SelectContent.drawSelect(SelectionDraw);
+                    /*if(this.SelectContent.selectUse())
+                    {
+                        SelectionDraw.FindStart = false;
+                        this.SelectContent.drawSelect(SelectionDraw);
+                    }*/
+
+                    this.Root.Selection_DrawRange(SelectionDraw);
                 }
-            }
-            else
-            {
-                if(this.RootComposition.selectUse())
-                    SelectionDraw.W += this.RootComposition.size.width;
-            }
+                else
+                {
+                    if(this.Root.selectUse())
+                        SelectionDraw.W += this.Root.size.width;
+                }
             }
             else
             {
@@ -1225,7 +1304,8 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Selection_IsEmpty
 
-        return !this.SelectContent.selectUse();
+        return false;
+        //return !this.SelectContent.selectUse();
     },
 
     Selection_CheckParaEnd : function()

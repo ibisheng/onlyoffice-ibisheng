@@ -10,8 +10,8 @@ function CMathBase()
     this.size = null;
     this.argSize = 0;
 
-    //this.CurPos_X = 0;
-    //this.CurPos_Y = 0;
+    this.CurPos_X = 0;
+    this.CurPos_Y = 0;
 
 
     this.selectPos =
@@ -19,6 +19,13 @@ function CMathBase()
         startX:    0,
         startY:    0
     };
+
+    this.SelectStart_X = 0;
+    this.SelectStart_Y = 0;
+
+    this.SelectEnd_X = 0;
+    this.SelectEnd_Y = 0;
+
 
     this.nRow = 0;
     this.nCol = 0;
@@ -924,7 +931,9 @@ CMathBase.prototype =
             for(var j = 0; j < this.nCol; j++)
             {
                 var al = this.align(i, j);
-                this.elements[i][j].setPosition( {x: this.pos.x + al.x + this.dW*j + w , y: this.pos.y + al.y + this.dH*i + h  } );
+                var X = this.pos.x + this.GapLeft + al.x + this.dW*j + w;
+                var Y = this.pos.y + al.y + this.dH*i + h;
+                this.elements[i][j].setPosition( {x: X, y: Y} );
                 w += Widths[j];
             }
             h += Heights[i];
@@ -963,7 +972,7 @@ CMathBase.prototype =
         width += this.dW*(this.nCol - 1);
         width += this.GapLeft + this.GapRight;
 
-        var ascent =  this.getAscent(height, oMeasure);
+        var ascent = this.getAscent(height, oMeasure);
 
         this.size = {width: width, height: height, ascent: ascent};
     },
@@ -1236,42 +1245,63 @@ CMathBase.prototype =
 
 
     /// Position for Paragraph
-    get_ParaContentPosByXY: function(ContentPos, X, Y)
+    Get_ParaContentPosByXY: function(SearchPos, Depth)
     {
         /// элементов just-draw не должно прийти
-        var disp = this.findDisposition({x: X, y: Y});
+        //var disp = this.findDisposition({x: X, y: Y});
+        var disp = this.findDisposition({ x: SearchPos.X, y: SearchPos.Y});
 
-        ContentPos.Add(disp.pos.x);
-        ContentPos.Add(disp.pos.y);
+        // TO DO
+        // Рассмотреть дурацкий случай, если контент не заполнен, то тогда перейти в другой элемент
+        //
+        // Word
+        // в случае, если в xml отсутствуют элементы в контенте, то выставляются плейсхолдеры
+
+        var pos = disp.pos;
+
+        SearchPos.Pos.Update(pos.x, Depth);
+        SearchPos.Pos.Update(pos.y, Depth+1);
+
+        Depth +=2;
+
+        SearchPos.X = disp.mCoord.x;
+        SearchPos.Y = disp.mCoord.y;
 
 
-        this.elements[disp.pos.x][disp.pos.y].get_ParaContentPosByXY(ContentPos, disp.mCoord.x, disp.mCoord.y);
+        //ContentPos.Add(disp.pos.x);
+        //ContentPos.Add(disp.pos.y);
+
+
+        this.elements[disp.pos.x][disp.pos.y].Get_ParaContentPosByXY(SearchPos, Depth);
     },
-    get_ParaContentPos: function(bSelection, bStart, ContentPos)
+    Get_ParaContentPos: function(bSelection, bStart, ContentPos)
     {
         ContentPos.Add(this.CurPos_X);
         ContentPos.Add(this.CurPos_Y);
 
-        this.elements[this.CurPos_X][this.CurPos_Y].get_ParaContentPos(bSelection, bStart, ContentPos);
+        this.elements[this.CurPos_X][this.CurPos_Y].Get_ParaContentPos(bSelection, bStart, ContentPos);
     },
-    set_ParaContentPos: function(ContentPos, Depth)
+    Set_ParaContentPos: function(ContentPos, Depth)
     {
         var CurPos_X = ContentPos.Get(Depth);
         var CurPos_Y = ContentPos.Get(Depth + 1);
 
-        if(!this.elements[CurPos_X][CurPos_Y].IsJustDraw())
+        if(this.elements[CurPos_X][CurPos_Y].IsJustDraw())
         {
             var disp = this.excludeJDElement(CurPos_X, CurPos_Y);
-            CurPos_X = disp.x;
-            CurPos_Y = disp.y;
+            this.CurPos_X = disp.x;
+            this.CurPos_Y = disp.y;
+        }
+        else
+        {
+            this.CurPos_X = CurPos_X;
+            this.CurPos_Y = CurPos_Y;
         }
 
-        this.CurPos_X = CurPos_X;
-        this.CurPos_Y = CurPos_Y;
 
         Depth += 2;
 
-        return this.elements[this.CurPos_X][this.CurPos_Y].set_ParaContentPos(ContentPos, Depth);
+        return this.elements[this.CurPos_X][this.CurPos_Y].Set_ParaContentPos(ContentPos, Depth);
     },
     set_StartSelectContent: function(ContentPos, Depth)
     {
@@ -1313,6 +1343,52 @@ CMathBase.prototype =
             state = false;
 
         return {state: state, SelectContent: SelectContent};
+    },
+    Set_SelectionContentPos: function(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag)
+    {
+        var startX = StartContentPos.Get(Depth),
+            startY = StartContentPos.Get(Depth + 1);
+
+        this.SelectStart_X = startX;
+        this.SelectStart_Y = startY;
+
+        var endX, endY;
+
+        if(EndFlag !== -1)
+        {
+            endX = EndContentPos.Get(Depth);
+            endY = EndContentPos.Get(Depth + 1);
+        }
+        else /// в случае, если закончили селект на уровень выше, а нужно выставить начало селекта во внутреннем элементе мат объекта
+        {
+            endX = -1;
+            endY = -1;
+        }
+
+        this.SelectEnd_X = endX;
+        this.SelectEnd_Y = endY;
+
+        Depth += 2;
+
+        var bJustDraw = this.elements[startX][startY].IsJustDraw();
+
+        if(startX == endX && startY == endY && !bJustDraw)
+        {
+            this.elements[startX][startY].Set_SelectionContentPos(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag);
+        }
+        else
+        {
+            this.elements[startX][startY].Set_SelectionContentPos(StartContentPos, null, Depth, StartFlag, -1);
+        }
+
+    },
+    IsSelectEmpty: function()
+    {
+        return (this.SelectStart_X == this.SelectEnd_X) && (this.SelectStart_Y == this.SelectEnd_Y);
+    },
+    update_Cursor: function(CurPage, UpdateTarget)
+    {
+        return this.elements[this.CurPos_X][this.CurPos_Y].update_Cursor(CurPage, UpdateTarget);
     }
 
     //////////////////////////

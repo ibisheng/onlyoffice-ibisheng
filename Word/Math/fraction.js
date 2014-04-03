@@ -282,7 +282,8 @@ CFraction.prototype.recalculateBarFraction = function(oMeasure)
     var width  = num.width > den.width ? num.width : den.width;
     var height = num.height + den.height;
     var ascent = num.height + this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
-    //var ascent = num.height;
+
+    width += this.GapLeft + this.GapRight;
 
     this.size =  {width: width, height: height, ascent: ascent};
 }
@@ -292,11 +293,13 @@ CFraction.prototype.recalculateSkewed = function(oMeasure)
     var mgCtrPrp = this.mergeCtrTPrp();
 
     this.gapSlash = 5.011235894097222 * mgCtrPrp.FontSize/36;
-    var _width = this.elements[0][0].size.width + this.gapSlash + this.elements[0][1].size.width;
-    var _height = this.elements[0][0].size.height + this.elements[0][1].size.height;
-    var _ascent = this.elements[0][0].size.height + this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
+    var width = this.elements[0][0].size.width + this.gapSlash + this.elements[0][1].size.width;
+    var height = this.elements[0][0].size.height + this.elements[0][1].size.height;
+    var ascent = this.elements[0][0].size.height + this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
 
-    this.size =  {width: _width, height: _height, ascent: _ascent};
+    width += this.GapLeft + this.GapRight;
+
+    this.size =  {width: width, height: height, ascent: ascent};
 }
 CFraction.prototype.recalculateLinear = function()
 {
@@ -331,6 +334,8 @@ CFraction.prototype.recalculateLinear = function()
 
     var width = this.elements[0][0].size.width + this.dW + this.elements[0][1].size.width;
 
+    width += this.GapLeft + this.GapRight;
+
     this.size = {height: height, width: width, ascent: ascent};
 }
 CFraction.prototype.setPosition = function(pos)
@@ -338,12 +343,16 @@ CFraction.prototype.setPosition = function(pos)
     if(this.type == SKEWED_FRACTION)
     {
         this.pos = {x: pos.x, y: pos.y - this.size.ascent};
-        this.elements[0][0].setPosition(this.pos);
 
-        var x = this.pos.x + this.elements[0][0].size.width + this.gapSlash,
-            y = this.pos.y + this.elements[0][0].size.height;
+        var x1 = this.pos.x + this.GapLeft,
+            y1 = this.pos.y;
 
-        this.elements[0][1].setPosition({x: x, y: y});
+        var x2 = this.pos.x + this.GapLeft + this.elements[0][0].size.width + this.gapSlash,
+            y2 = this.pos.y + this.elements[0][0].size.height;
+
+        this.elements[0][0].setPosition({x: x1, y: y1});
+
+        this.elements[0][1].setPosition({x: x2, y: y2});
     }
     else
         CFraction.superclass.setPosition.call(this, pos);
