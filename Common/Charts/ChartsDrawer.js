@@ -2515,13 +2515,36 @@ CChartsDrawer.prototype =
 		firstDegree = this._getFirstDegree((Math.abs(axisMax - axisMin)) / 10);
 		
 		//находим шаг
+		var firstStep;
 		if(isOx || 'HBar' == this.calcProp.type)
 			step = this._getStep(firstDegree.val + (firstDegree.val / 10) * 3);
 		else
 			step = this._getStep(firstDegree.val);
 			
+		firstStep = step;
 		step = step * firstDegree.numPow;
 		
+		arrayValues = this._getArrayDataValues(step, axisMin, axisMax, manualMin, manualMax);
+		
+		//проверка на переход в другой диапазон из-за ограничения по высоте
+		/*if(!isOx)
+		{
+			var trueHeight = this.calcProp.heightCanvas - this.calcProp.chartGutter._top - this.calcProp.chartGutter._bottom;
+			var newStep;
+			
+			while(Math.round(trueHeight / arrayValues.length) < 16)
+			{
+				newStep = this._getNextStep(firstStep);
+				arrayValues = this._getArrayDataValues(newStep, axisMin, axisMax, manualMin, manualMax);
+			};	
+		};*/
+		
+		return arrayValues;
+	},
+	
+	_getArrayDataValues: function(step, axisMin, axisMax, manualMin, manualMax)
+	{
+		var arrayValues;
 		//минимальное значение оси
 		var minUnit = 0;
 		if(manualMin != null)
@@ -2769,6 +2792,8 @@ CChartsDrawer.prototype =
 			
 		return result;
 	},
+	
+	
 	
 	//****get null position****
 	_getNullPositionLog: function()
@@ -3213,6 +3238,8 @@ CChartsDrawer.prototype =
 		
 		return temp;
 	},
+	
+	
 	
 	//****for 3D****
 	_convert3DTo2D: function(x, y, z, p, q, r)
