@@ -254,8 +254,11 @@
 				    "updateSelectionShape":			function () {return self._onUpdateSelectionShape.apply(self, arguments);},
 					
 					// Frozen anchor
-					"moveFrozenAnchorHandle":			function () {self._onMoveFrozenAnchorHandle.apply(self, arguments);},
-					"moveFrozenAnchorHandleDone":		function () {self._onMoveFrozenAnchorHandleDone.apply(self, arguments);}
+					"moveFrozenAnchorHandle":		function () {self._onMoveFrozenAnchorHandle.apply(self, arguments);},
+					"moveFrozenAnchorHandleDone":	function () {self._onMoveFrozenAnchorHandleDone.apply(self, arguments);},
+
+					// AutoComplete
+					"showAutoComplete":				function () {self._onShowAutoComplete.apply(self, arguments);}
 			    });
 
 			    this.model.handlers.add("cleanCellCache", function (wsId, range, canChangeColWidth, bLockDraw) {
@@ -779,6 +782,18 @@
 			// Закрепляем область
 			var ws = this.getWorksheet();
 			ws.applyFrozenAnchor(x, y, targetInfo);
+		};
+
+		WorkbookView.prototype._onShowAutoComplete = function () {
+			var ws = this.getWorksheet();
+			var arrValues = [], objValues = {};
+			var range = ws.findCellAutoComplete(ws.activeRange.startCol, ws.activeRange.startRow, 1);
+			ws.getColValues(range, ws.activeRange.startCol, arrValues, objValues);
+			range = ws.findCellAutoComplete(ws.activeRange.startCol, ws.activeRange.startRow, -1);
+			ws.getColValues(range, ws.activeRange.startCol, arrValues, objValues);
+
+			arrValues.sort();
+			console.log(arrValues);
 		};
 
 		WorkbookView.prototype._onAutoFiltersClick = function (idFilter) {

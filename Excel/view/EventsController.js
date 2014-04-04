@@ -813,6 +813,11 @@
 
 				case 40: // down
 					stop();                          // Отключим стандартную обработку браузера нажатия down
+					// Обработка Alt + down
+					if (!isViewerMode && !t.isCellEditMode && !t.isSelectionDialogMode && event.altKey) {
+						t.handlers.trigger("showAutoComplete");
+						return t.__retval;
+					}
 					dr = event.ctrlKey ? +1.5 : +1;  // Движение стрелками (влево-вправо, вверх-вниз)
 					break;
 

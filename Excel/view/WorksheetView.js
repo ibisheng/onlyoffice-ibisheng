@@ -5629,18 +5629,18 @@
 
 			isSelGraphicObject = this.objectRender.selectedGraphicObjectsExists();
 			if (!isViewerMode && !isSelGraphicObject) {
-			// Эпсилон для fillHandle
-			var fillHandleEpsilon = this.width_1px;
+				// Эпсилон для fillHandle
+				var fillHandleEpsilon = this.width_1px;
 				if (!this.isChartAreaEditMode &&
-				x >= (this.fillHandleL - fillHandleEpsilon) && x <= (this.fillHandleR + fillHandleEpsilon) &&
-				y >= (this.fillHandleT - fillHandleEpsilon) && y <= (this.fillHandleB + fillHandleEpsilon)) {
-				// Мы на "квадрате" для автозаполнения
+					x >= (this.fillHandleL - fillHandleEpsilon) && x <= (this.fillHandleR + fillHandleEpsilon) &&
+					y >= (this.fillHandleT - fillHandleEpsilon) && y <= (this.fillHandleB + fillHandleEpsilon)) {
+					// Мы на "квадрате" для автозаполнения
 					return {cursor: kCurFillHandle, target: "fillhandle", col: -1, row: -1};
-			}
+				}
 
 				// Навели на выделение
-			var xWithOffset = x + offsetX;
-			var yWithOffset = y + offsetY;
+				var xWithOffset = x + offsetX;
+				var yWithOffset = y + offsetY;
 				if (this._isCursorOnSelectionBorder(ar, this.visibleRange, xWithOffset, yWithOffset))
 					return {cursor: kCurMove, target: "moveRange", col: -1, row: -1};
 			}
@@ -5751,8 +5751,8 @@
 				return cellCursor;
 			}
 
-					return oResDefault;
-				};
+			return oResDefault;
+		};
 
 		WorksheetView.prototype._fixSelectionOfMergedCells = function (fixedRange) {
 			var t = this;
@@ -9524,7 +9524,7 @@
 						str = c.getValue2();
 						maxW = ct.metrics.width + t.maxDigitWidth;
 						while (1) {
-							tm = t._roundTextMetrics( t.stringRender.measureString(str, fl, maxW) );
+							tm = t._roundTextMetrics(t.stringRender.measureString(str, fl, maxW));
 							if (tm.height <= t.maxRowHeight) {break;}
 							if (lastHeight === tm.height) {
 								// Ситуация, когда у нас текст не уберется по высоте (http://bugzserver/show_bug.cgi?id=19974)
@@ -9914,6 +9914,74 @@
 				/*isCoord*/false, /*isSelectMode*/false);
 		};
 
+		/**
+		 * Ищет дополнение для ячейки (снизу или сверху)
+		 * @param col
+		 * @param row
+		 * @param step
+		 * @returns {asc_Range}
+		 */
+		WorksheetView.prototype.findCellAutoComplete = function (col, row, step) {
+			row += step;
+			var cell, end = 0 < step ? this.model.getRowsCount() - 1: 0, isEnd = true,
+				colsCount = this.model.getColsCount(), range = new asc_Range(col, row, col, row);
+			for (; row * step <= end; row += step, isEnd = true) {
+				for (col = range.c1; col <= range.c2; ++col) {
+					cell = this.model._getCellNoEmpty(row, col);
+					if (cell && false === cell.isEmptyText()) {
+						isEnd = false;
+						break;
+					}
+				}
+				// Идем влево по колонкам
+				for (col = range.c1 - 1; col >= 0; --col) {
+					cell = this.model._getCellNoEmpty(row, col);
+					if (null === cell || cell.isEmptyText())
+						break;
+					isEnd = false;
+				}
+				range.c1 = col + 1;
+				// Идем вправо по колонкам
+				for (col = range.c2 + 1; col < colsCount; ++col) {
+					cell = this.model._getCellNoEmpty(row, col);
+					if (null === cell || cell.isEmptyText())
+						break;
+					isEnd = false;
+				}
+				range.c2 = col - 1;
+
+				if (isEnd)
+					break;
+			}
+			if (0 < step)
+				range.r2 = row - 1;
+			else
+				range.r1 = row + 1;
+			return range.r1 <= range.r2 ? range : null;
+		};
+
+		/**
+		 * Формирует уникальный массив
+		 * @param range
+		 * @param col
+		 * @param arrValues
+		 * @param objValues
+		 */
+		WorksheetView.prototype.getColValues = function (range, col, arrValues, objValues) {
+			if (null === range)
+				return;
+			var row, cell, value;
+			for (row = range.r1; row <= range.r2; ++row) {
+				cell = this.model._getCellNoEmpty(row, col);
+				if (cell) {
+					value = cell.getValue();
+					if (!objValues.hasOwnProperty(value)) {
+						arrValues.push(value);
+						objValues[value] = 1;
+					}
+				}
+			}
+		};
 
 		// ----- Cell Editor -----
 

@@ -4305,7 +4305,7 @@ Range.prototype.clone=function(oNewWs){
 	if(!oNewWs)
 		oNewWs = this.worksheet;
 	return new Range(oNewWs, this.bbox.r1, this.bbox.c1, this.bbox.r2, this.bbox.c2);
-}
+};
 Range.prototype.getFirst=function(){
 	return this.first;
 }
