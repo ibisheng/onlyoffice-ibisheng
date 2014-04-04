@@ -2064,6 +2064,10 @@ CDocument.prototype =
          pGraphics.Stroke();
          */
 
+        // Определим секцию
+        var Page_StartPos = this.Pages[nPageIndex].Pos;
+        var SectPr = this.SectionsInfo.Get_SectPr( Page_StartPos).SectPr;
+
         // Рисуем колонтитулы
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
@@ -2073,6 +2077,10 @@ CDocument.prototype =
         }
         else
             pGraphics.Start_GlobalAlpha();
+
+        // Рисуем границы вокруг страницы (если границы надо рисовать под текстом)
+        if ( section_borders_ZOrderBack === SectPr.Get_Borders_ZOrder() )
+            this.Draw_Borders(pGraphics, SectPr);
 
         this.DrawingObjects.drawBehindDocHdrFtr( nPageIndex, pGraphics );
         this.DrawingObjects.drawWrappingObjectsHdrFtr( nPageIndex, pGraphics );
@@ -2121,8 +2129,158 @@ CDocument.prototype =
 
         this.DrawingObjects.drawBeforeObjects( nPageIndex, pGraphics );
 
+        // Рисуем границы вокруг страницы (если границы надо рисовать перед текстом)
+        if ( section_borders_ZOrderFront === SectPr.Get_Borders_ZOrder() )
+            this.Draw_Borders(pGraphics, SectPr);
+
         if ( docpostype_HdrFtr === this.CurPos.Type )
             pGraphics.put_GlobalAlpha(false, 1.0);
+    },
+
+    Draw_Borders : function(Graphics, SectPr)
+    {
+        var Orient  = SectPr.Get_Orientation();
+        var Offset  = SectPr.Get_Borders_OffsetFrom();
+
+        var LBorder = SectPr.Get_Borders_Left();
+        var TBorder = SectPr.Get_Borders_Top();
+        var RBorder = SectPr.Get_Borders_Right();
+        var BBorder = SectPr.Get_Borders_Bottom();
+
+        var W = SectPr.Get_PageWidth();
+        var H = SectPr.Get_PageHeight();
+
+        // Порядок отрисовки границ всегда одинаковый вне зависимости от цветы и толщины: сначала вертикальные,
+        // потом горизонтальные поверх вертикальных
+
+        if (section_borders_OffsetFromPage === Offset)
+        {
+            if ( orientation_Portrait !== Orient )
+            {
+                // В случае альбомной ориентации мы не переворачиваем границы вместе со страницей, т.е. левая граница так
+                // и рисуется слева, верхняя - сверху и т.д.
+
+                var Temp = W;
+                W = H;
+                H = Temp;
+            }
+
+            // Рисуем левую границу
+            if (border_None !== LBorder.Value)
+            {
+                var X  = LBorder.Space + LBorder.Size / 2;
+                var Y0 = ( border_None !== TBorder.Value ? TBorder.Space + TBorder.Size / 2 : 0 );
+                var Y1 = ( border_None !== BBorder.Value ? H - BBorder.Space - BBorder.Size / 2 : H );
+
+                Graphics.p_color(LBorder.Color.r, LBorder.Color.g, LBorder.Color.b, 255);
+                Graphics.drawVerLine(c_oAscLineDrawingRule.Center, X, Y0, Y1, LBorder.Size);
+            }
+
+            // Рисуем правую границу
+            if (border_None !== RBorder.Value)
+            {
+                var X  = W - RBorder.Space - RBorder.Size / 2;
+                var Y0 = ( border_None !== TBorder.Value ? TBorder.Space + TBorder.Size / 2 : 0 );
+                var Y1 = ( border_None !== BBorder.Value ? H - BBorder.Space - BBorder.Size / 2 : H );
+
+                Graphics.p_color(RBorder.Color.r, RBorder.Color.g, RBorder.Color.b, 255);
+                Graphics.drawVerLine(c_oAscLineDrawingRule.Center, X, Y0, Y1, RBorder.Size);
+            }
+
+            // Рисуем верхнюю границу
+            if (border_None !== TBorder.Value)
+            {
+                var Y  = TBorder.Space;
+                var X0 = ( border_None !== LBorder.Value ? LBorder.Space + LBorder.Size / 2 : 0 );
+                var X1 = ( border_None !== RBorder.Value ? W - RBorder.Space - RBorder.Size / 2 : W );
+
+                Graphics.p_color(TBorder.Color.r, TBorder.Color.g, TBorder.Color.b, 255);
+                Graphics.drawHorLineExt(c_oAscLineDrawingRule.Top, Y, X0, X1, TBorder.Size, ( border_None !== LBorder.Value ? -LBorder.Size / 2 : 0 ), ( border_None !== RBorder.Value ? RBorder.Size / 2 : 0 ));
+            }
+
+            // Рисуем нижнюю границу
+            if (border_None !== BBorder.Value)
+            {
+                var Y  = H - BBorder.Space;
+                var X0 = ( border_None !== LBorder.Value ? LBorder.Space + LBorder.Size / 2 : 0 );
+                var X1 = ( border_None !== RBorder.Value ? W - RBorder.Space - RBorder.Size / 2 : W );
+
+                Graphics.p_color(BBorder.Color.r, BBorder.Color.g, BBorder.Color.b, 255);
+                Graphics.drawHorLineExt(c_oAscLineDrawingRule.Bottom, Y, X0, X1, BBorder.Size, ( border_None !== LBorder.Value ? -LBorder.Size / 2 : 0 ), ( border_None !== RBorder.Value ? RBorder.Size / 2 : 0 ));
+            }
+        }
+        else
+        {
+            var _X0, _X1, _Y0, _Y1;
+
+            if ( orientation_Portrait === Orient )
+            {
+                _X0 = SectPr.Get_PageMargin_Left();
+                _X1 = W - SectPr.Get_PageMargin_Right();
+                _Y0 = SectPr.Get_PageMargin_Top();
+                _Y1 = H - SectPr.Get_PageMargin_Bottom();
+            }
+            else
+            {
+                // В случае альбомной ориентации мы не переворачиваем границы вместе со страницей, т.е. левая граница так
+                // и рисуется слева, верхняя - сверху и т.д.
+
+                _X0 = SectPr.Get_PageMargin_Bottom();
+                _X1 = H - SectPr.Get_PageMargin_Top();
+                _Y0 = SectPr.Get_PageMargin_Left();
+                _Y1 = W - SectPr.Get_PageMargin_Right();
+            }
+
+            // Рисуем левую границу
+            if (border_None !== LBorder.Value)
+            {
+                var X  = _X0 - LBorder.Space;
+                var Y0 = ( border_None !== TBorder.Value ? _Y0 - TBorder.Space - TBorder.Size / 2 : _Y0 );
+                var Y1 = ( border_None !== BBorder.Value ? _Y1 + BBorder.Space + BBorder.Size / 2 : _Y1 );
+
+                Graphics.p_color(LBorder.Color.r, LBorder.Color.g, LBorder.Color.b, 255);
+                Graphics.drawVerLine(c_oAscLineDrawingRule.Right, X, Y0, Y1, LBorder.Size);
+            }
+
+            // Рисуем правую границу
+            if (border_None !== RBorder.Value)
+            {
+                var X  = _X1 + RBorder.Space;
+                var Y0 = ( border_None !== TBorder.Value ? _Y0 - TBorder.Space - TBorder.Size / 2 : _Y0 );
+                var Y1 = ( border_None !== BBorder.Value ? _Y1 + BBorder.Space + BBorder.Size / 2 : _Y1 );
+
+                Graphics.p_color(RBorder.Color.r, RBorder.Color.g, RBorder.Color.b, 255);
+                Graphics.drawVerLine(c_oAscLineDrawingRule.Left, X, Y0, Y1, RBorder.Size);
+            }
+
+            // Рисуем верхнюю границу
+            if (border_None !== TBorder.Value)
+            {
+                var Y  = _Y0 - TBorder.Space;
+                var X0 = ( border_None !== LBorder.Value ? _X0 - LBorder.Space : _X0 );
+                var X1 = ( border_None !== RBorder.Value ? _X1 + RBorder.Space : _X1 );
+
+                Graphics.p_color(TBorder.Color.r, TBorder.Color.g, TBorder.Color.b, 255);
+                Graphics.drawHorLineExt(c_oAscLineDrawingRule.Bottom, Y, X0, X1, TBorder.Size, ( border_None !== LBorder.Value ? -LBorder.Size : 0 ), ( border_None !== RBorder.Value ? RBorder.Size : 0 ));
+            }
+
+            // Рисуем нижнюю границу
+            if (border_None !== BBorder.Value)
+            {
+                var Y  = _Y1 + BBorder.Space;
+                var X0 = ( border_None !== LBorder.Value ? _X0 - LBorder.Space : _X0 );
+                var X1 = ( border_None !== RBorder.Value ? _X1 + RBorder.Space : _X1 );
+
+                Graphics.p_color(BBorder.Color.r, BBorder.Color.g, BBorder.Color.b, 255);
+                Graphics.drawHorLineExt(c_oAscLineDrawingRule.Top, Y, X0, X1, BBorder.Size, ( border_None !== LBorder.Value ? -LBorder.Size : 0 ), ( border_None !== RBorder.Value ? RBorder.Size : 0 ));
+            }
+        }
+
+        // TODO: Реализовать:
+        //       1. ArtBorders
+        //       2. Различные типы обычных границ. Причем, если пересакающиеся границы имеют одинаковый тип и размер,
+        //          тогда надо специально отрисовывать места соединения данных линий.
+
     },
 
     Add_NewParagraph : function(bRecalculate)
@@ -3312,12 +3470,14 @@ CDocument.prototype =
                                         // Соединяем текущий и предыдущий параграфы
                                         var Prev = this.Content[this.CurPos.ContentPos - 1];
 
+                                        // Смещаемся в конец до объединения параграфов, чтобы курсор стоял в месте 
+                                        // соединения.
+                                        Prev.Cursor_MoveToEndPos();
+
                                         // Запоминаем новую позицию курсора, после совмещения параграфов
-                                        var NewPos = Prev.Content.length - 2;
                                         Prev.Concat( this.Content[this.CurPos.ContentPos] );
                                         this.Internal_Content_Remove( this.CurPos.ContentPos, 1 );
                                         this.CurPos.ContentPos--;
-                                        this.Content[this.CurPos.ContentPos].CurPos.ContentPos = NewPos;
                                     }
                                 }
                             }
@@ -11170,7 +11330,7 @@ CDocument.prototype =
                     }
 
                     if ( undefined === FramePr )
-                        this.DrawingDocument.Set_RulerState_Paragraph( null );
+                        this.Document_UpdateRulersStateBySection();
                     else
                         this.Content[StartPos].Document_UpdateRulersState();
                 }
@@ -11186,6 +11346,33 @@ CDocument.prototype =
                     Item.Document_UpdateRulersState();
             }
         }
+    },
+
+    Document_UpdateRulersStateBySection : function()
+    {
+        // В данной функции мы уже точно знаем, что нам секцию нужно выбирать исходя из текущего параграфа
+        var CurPos = ( this.Selection.Use === true ? this.Selection.EndPos : this.CurPos.ContentPos );
+
+        var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
+
+        var L, T, R, B;
+
+        if ( orientation_Portrait === SectPr.Get_Orientation() )
+        {
+            L = SectPr.Get_PageMargin_Left();
+            T = SectPr.Get_PageMargin_Top();
+            R = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
+            B = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Bottom();
+        }
+        else
+        {
+            L = SectPr.Get_PageMargin_Bottom();
+            T = SectPr.Get_PageMargin_Left();
+            R = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Top();
+            B = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
+        }
+
+        this.DrawingDocument.Set_RulerState_Paragraph( { L : L, T : T, R : R, B : B } );
     },
 
     // Обновляем линейки
@@ -12574,36 +12761,76 @@ CDocument.prototype =
                 this.Cursor_MoveLeft(false, false);
             }
 
-            var Element = this.Content[this.CurPos.ContentPos];
-
-            var CurSectPr = this.SectionsInfo.Get_SectPr( this.CurPos.ContentPos).SectPr;
-
-            if ( type_Paragraph !== Element.GetType() )
-                return;
-
-            if ( undefined === Element.Get_SectionPr() )
+            if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
             {
-                // TODO: Надо получить текущие настройки секции
+                History.Create_NewPoint();
+
+                var Element = this.Content[this.CurPos.ContentPos];
+
+                var CurSectPr = this.SectionsInfo.Get_SectPr(this.CurPos.ContentPos).SectPr;
+
+                if ( type_Paragraph === Element.GetType() )
+                {
+                    // Если мы стоим в параграфе, тогда делим данный параграф на 2 в текущей точке(даже если мы стоим в начале
+                    // или в конце параграфа) и к первому параграфу приписываем конец секкции.
+
+                    var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, X_Left_Field, Y_Bottom_Field );
+
+                    Element.Split( NewParagraph );
+
+                    this.CurPos.ContentPos++;
+                    NewParagraph.Cursor_MoveToStartPos(false);
+
+                    this.Internal_Content_Add( this.CurPos.ContentPos, NewParagraph );
+
+                    // Заметим, что после функции Split, у параграфа Element не может быть окончания секции, т.к. если она 
+                    // была в нем изначально, тогда после функции Split, окончание секции перенеслось в новый параграф. 
+                }
+                else
+                {
+                    // Если мы стоим в таблице, тогда делим данную таблицу на 2 по текущему ряду(текущий ряд попадает во
+                    // вторую таблицу). Вставляем между таблицами параграф, и к этому параграфу приписываем окончание
+                    // секции. Если мы стоим в первой строке таблицы, таблицу делить не надо, достаточно добавить новый 
+                    // параграф перед ней.
+
+                    var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, X_Left_Field, Y_Bottom_Field );
+                    var NewTable = Element.Split_Table();
+
+                    if ( null === NewTable )
+                    {
+                        this.Internal_Content_Add( this.CurPos.ContentPos, NewParagraph );
+                        this.CurPos.ContentPos++;
+                    }
+                    else
+                    {
+                        this.Internal_Content_Add( this.CurPos.ContentPos + 1, NewParagraph );
+                        this.Internal_Content_Add( this.CurPos.ContentPos + 2, NewTable );
+                        this.CurPos.ContentPos += 2;
+                    }
+
+                    this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos( false );
+
+                    Element = NewParagraph;
+                }
 
                 var SectPr = new CSectionPr(this);
 
-                // Поскольку данной секцией мы разбиваем предыдущую, поэтому заданный тип выставляем старой секции,
-                // которая теперь идет после новой, а новой секции выставляем тип старой, чтобы до места разбиения все шло как и раньше.
-                SectPr.Set_Type( CurSectPr.Get_Type() );
+                // В данном месте мы ставим разрыв секции. Чтобы до текущего места ничего не изменилось, мы у новой
+                // для новой секции копируем все настройки из старой, а в старую секцию выставляем приходящий тип
+                // разрыва секций.
+                SectPr.Copy( CurSectPr );
                 CurSectPr.Set_Type( SectionBreakType );
 
                 Element.Set_SectionPr(SectPr);
                 Element.Refresh_RecalcData2(0, 0);
-            }
-            else
-            {
-                // TODO: Надо добавить новый параграф в текущей позиции и к этому параграфу уже добавить разрыв секции
-            }
 
-            this.Recalculate();
+                this.Recalculate();
 
-            return true;
+                return true;
+            }
         }
+        
+        return false;
     }
 };
 

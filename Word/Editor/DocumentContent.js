@@ -2441,12 +2441,13 @@ CDocumentContent.prototype =
                                     // Соединяем текущий и предыдущий параграфы
                                     var Prev = this.Content[this.CurPos.ContentPos - 1];
 
-                                    // Запоминаем новую позицию курсора, после совмещения параграфов
-                                    var NewPos = Prev.Content.length - 2;
+                                    // Смещаемся в конец до объединения параграфов, чтобы курсор стоял в месте 
+                                    // соединения.
+                                    Prev.Cursor_MoveToEndPos();
+
                                     Prev.Concat( this.Content[this.CurPos.ContentPos] );
                                     this.Internal_Content_Remove( this.CurPos.ContentPos, 1 );
                                     this.CurPos.ContentPos--;
-                                    this.Content[this.CurPos.ContentPos].CurPos.ContentPos = NewPos;
                                 }
                             }
                         }

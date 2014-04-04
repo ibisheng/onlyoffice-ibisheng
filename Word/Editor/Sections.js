@@ -11,6 +11,16 @@ var section_type_EvenPage   = 0x02;
 var section_type_Continuous = 0x03;
 var section_type_Column     = 0x04;
 
+var section_borders_DisplayAllPages     = 0x00;
+var section_borders_DisplayFirstPage    = 0x01;
+var section_borders_DisplayNotFirstPage = 0x02;
+
+var section_borders_OffsetFromPage = 0x00;
+var section_borders_OffsetFromText = 0x01;
+
+var section_borders_ZOrderBack  = 0x00;
+var section_borders_ZOrderFront = 0x01;
+
 function CSectionPr(LogicDocument)
 {
     this.Id = g_oIdCounter.Get_NewId();
@@ -21,6 +31,8 @@ function CSectionPr(LogicDocument)
 
     this.LogicDocument = LogicDocument;
 
+    this.Borders       = new CSectionBorders();
+
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
 }
@@ -30,6 +42,28 @@ CSectionPr.prototype =
     Get_Id : function()
     {
         return this.Id;
+    },
+
+    Copy : function(Other)
+    {
+        // Тип
+        this.Set_Type( Other.Type );
+
+        // Настройки страницы
+        this.Set_PageSize( Other.PageSize.W, Other.PageSize.H );
+        this.Set_Orientation( Other.PageSize.Orient );
+
+        // Настройки отступов
+        this.Set_PageMargins( Other.PageMargins.L, Other.PageMargins.T, Other.PageMargins.R, Other.PageMargins.B );
+
+        // Настройки границ
+        this.Set_Borders_Left( Other.Borders.Left );
+        this.Set_Borders_Top( Other.Borders.Top );
+        this.Set_Borders_Right( Other.Borders.Right );
+        this.Set_Borders_Bottom( Other.Borders.Bottom );
+        this.Set_Borders_Display( Other.Borders.Display );
+        this.Set_Borders_OffsetFrom( Other.Borders.OffsetFrom );
+        this.Set_Borders_ZOrder( Other.Borders.ZOrder );
     },
 
     Compare_PageSize : function(OtherSectionPr)
@@ -99,22 +133,22 @@ CSectionPr.prototype =
 
     Get_PageMargin_Left : function()
     {
-        return this.Set_PageMargins.Left;
+        return this.PageMargins.Left;
     },
 
     Get_PageMargin_Right : function()
     {
-        return this.Set_PageMargins.Right;
+        return this.PageMargins.Right;
     },
 
     Get_PageMargin_Top : function()
     {
-        return this.Set_PageMargins.Top;
+        return this.PageMargins.Top;
     },
 
     Get_PageMargin_Bottom : function()
     {
-        return this.Set_PageMargins.Bottom;
+        return this.PageMargins.Bottom;
     },
 
     Set_Orientation : function(Orient)
@@ -131,6 +165,103 @@ CSectionPr.prototype =
         return this.PageSize.Orient;
     },
 
+    Set_Borders_Left : function(Border)
+    {
+        if ( true !== this.Borders.Left.Compare( Border ) )
+        {
+            History.Add( this, { Type : historyitem_Section_Borders_Left, Old : this.Borders.Left, New : Border } );
+            this.Borders.Left = Border;
+        }
+    },
+
+    Get_Borders_Left : function()
+    {
+        return this.Borders.Left;
+    },
+
+    Set_Borders_Top : function(Border)
+    {
+        if ( true !== this.Borders.Top.Compare( Border ) )
+        {
+            History.Add( this, { Type : historyitem_Section_Borders_Top, Old : this.Borders.Top, New : Border } );
+            this.Borders.Top = Border;
+        }
+    },
+
+    Get_Borders_Top : function()
+    {
+        return this.Borders.Top;
+    },
+
+    Set_Borders_Right : function(Border)
+    {
+        if ( true !== this.Borders.Right.Compare( Border ) )
+        {
+            History.Add( this, { Type : historyitem_Section_Borders_Right, Old : this.Borders.Right, New : Border } );
+            this.Borders.Right = Border;
+        }
+    },
+
+    Get_Borders_Right : function()
+    {
+        return this.Borders.Right;
+    },
+
+    Set_Borders_Bottom : function(Border)
+    {
+        if ( true !== this.Borders.Bottom.Compare( Border ) )
+        {
+            History.Add( this, { Type : historyitem_Section_Borders_Bottom, Old : this.Borders.Bottom, New : Border } );
+            this.Borders.Bottom = Border;
+        }
+    },
+
+    Get_Borders_Bottom : function()
+    {
+        return this.Borders.Bottom;
+    },
+
+    Set_Borders_Display : function(Display)
+    {
+        if ( Display !== this.Borders.Display )
+        {
+            History.Add( this, { Type : historyitem_Section_Borders_Display, Old : this.Borders.Display, New : Display } );
+            this.Borders.Display = Display;
+        }
+    },
+
+    Get_Borders_Display : function()
+    {
+        return this.Borders.Display;
+    },
+
+    Set_Borders_OffsetFrom : function(OffsetFrom)
+    {
+        if ( OffsetFrom !== this.Borders.OffsetFrom )
+        {
+            History.Add( this, { Type : historyitem_Section_Borders_OffsetFrom, Old : this.Borders.OffsetFrom, New : OffsetFrom } );
+            this.Borders.OffsetFrom = OffsetFrom;
+        }
+    },
+
+    Get_Borders_OffsetFrom : function()
+    {
+        return this.Borders.OffsetFrom;
+    },
+
+    Set_Borders_ZOrder : function(ZOrder)
+    {
+        if ( ZOrder !== this.Borders.ZOrder )
+        {
+            History.Add( this, { Type : historyitem_Section_Borders_ZOrder, Old : this.Borders.ZOrder, New : ZOrder } );
+            this.Borders.ZOrder = ZOrder;
+        }
+    },
+
+    Get_Borders_ZOrder : function()
+    {
+        return this.Borders.ZOrder;
+    },
 //----------------------------------------------------------------------------------------------------------------------
 // Undo/Redo функции
 //----------------------------------------------------------------------------------------------------------------------
@@ -169,6 +300,48 @@ CSectionPr.prototype =
             {
                 this.Type = Data.Old;
 
+                break;
+            }
+
+            case historyitem_Section_Borders_Left:
+            {
+                this.Borders.Left = Data.Old;
+                break;
+            }
+
+            case historyitem_Section_Borders_Top:
+            {
+                this.Borders.Top = Data.Old;
+                break;
+            }
+
+            case historyitem_Section_Borders_Right:
+            {
+                this.Borders.Right = Data.Old;
+                break;
+            }
+
+            case historyitem_Section_Borders_Bottom:
+            {
+                this.Borders.Bottom = Data.Old;
+                break;
+            }
+
+            case historyitem_Section_Borders_Display:
+            {
+                this.Borders.Display = Data.Old;
+                break;
+            }
+
+            case historyitem_Section_Borders_OffsetFrom:
+            {
+                this.Borders.OffsetFrom = Data.Old;
+                break;
+            }
+
+            case historyitem_Section_Borders_ZOrder:
+            {
+                this.Borders.ZOrder = Data.Old;
                 break;
             }
         }
@@ -211,6 +384,49 @@ CSectionPr.prototype =
 
                 break;
             }
+
+            case historyitem_Section_Borders_Left:
+            {
+                this.Borders.Left = Data.New;
+                break;
+            }
+
+            case historyitem_Section_Borders_Top:
+            {
+                this.Borders.Top = Data.New;
+                break;
+            }
+
+            case historyitem_Section_Borders_Right:
+            {
+                this.Borders.Right = Data.New;
+                break;
+            }
+
+            case historyitem_Section_Borders_Bottom:
+            {
+                this.Borders.Bottom = Data.New;
+                break;
+            }
+
+            case historyitem_Section_Borders_Display:
+            {
+                this.Borders.Display = Data.New;
+                break;
+            }
+
+            case historyitem_Section_Borders_OffsetFrom:
+            {
+                this.Borders.OffsetFrom = Data.New;
+                break;
+            }
+
+            case historyitem_Section_Borders_ZOrder:
+            {
+                this.Borders.ZOrder = Data.New;
+                break;
+            }
+
         }
     },
 
@@ -293,6 +509,25 @@ CSectionPr.prototype =
 
                 break;
             }
+
+            case historyitem_Section_Borders_Left:
+            case historyitem_Section_Borders_Top:
+            case historyitem_Section_Borders_Right:
+            case historyitem_Section_Borders_Bottom:
+            {
+                // Variable : CDocumentBorder
+                Data.New.Write_ToBinary( Writer );
+                break;
+            }
+
+            case historyitem_Section_Borders_Display:
+            case historyitem_Section_Borders_OffsetFrom:
+            case historyitem_Section_Borders_ZOrder:
+            {
+                // Byte : Value
+                Writer.WriteByte( Data.New );
+                break;
+            }
         }
 
     },
@@ -351,6 +586,55 @@ CSectionPr.prototype =
 
                 break;
             }
+
+            case historyitem_Section_Borders_Left:
+            {
+                // Variable : CDocumentBorder
+                this.Borders.Left.Read_FromBinary(Reader);
+                break;
+            }
+
+            case historyitem_Section_Borders_Top:
+            {
+                // Variable : CDocumentBorder
+                this.Borders.Top.Read_FromBinary(Reader);
+                break;
+            }
+
+            case historyitem_Section_Borders_Right:
+            {
+                // Variable : CDocumentBorder
+                this.Borders.Right.Read_FromBinary(Reader);
+                break;
+            }
+
+            case historyitem_Section_Borders_Bottom:
+            {
+                // Variable : CDocumentBorder
+                this.Borders.Bottom.Read_FromBinary(Reader);
+                break;
+            }
+
+            case historyitem_Section_Borders_Display:
+            {
+                // Byte : Value
+                this.Borders.Display = Reader.GetByte();
+                break;
+            }
+
+            case historyitem_Section_Borders_OffsetFrom:
+            {
+                // Byte : Value
+                this.Borders.OffsetFrom = Reader.GetByte();
+                break;
+            }
+
+            case historyitem_Section_Borders_ZOrder:
+            {
+                // Byte : Value
+                this.Borders.ZOrder = Reader.GetByte();
+                break;
+            }
         }
     },
 
@@ -363,12 +647,14 @@ CSectionPr.prototype =
         // Variable : PageSize
         // Variable : PageMargins
         // Byte     : Type
+        // Variable : Borders
 
         Writer.WriteString2( "" + this.Id );
         Writer.WriteString2( "" + this.LogicDocument.Get_Id() );
         this.PageSize.Write_ToBinary( Writer );
         this.PageMargins.Write_ToBinary( Writer );
         Writer.WriteByte( this.Type );
+        this.Borders.Write_ToBinary( Writer );
     },
 
     Read_FromBinary2 : function(Reader)
@@ -378,12 +664,14 @@ CSectionPr.prototype =
         // Variable : PageSize
         // Variable : PageMargins
         // Byte     : Type
+        // Variable : Borders
 
         this.Id = Reader.GetString2();
         this.LogicDocument = g_oTable.Id.Get_ById( Reader.GetString2() );
         this.PageSize.Read_FromBinary( Reader );
         this.PageMargins.Read_FromBinary( Reader );
         this.Type = Reader.GetByte();
+        this.Borders.Read_FromBinary( Reader );
     }
 }
 
@@ -453,5 +741,59 @@ CSectionPageMargins.prototype =
         this.Top    = Reader.GetDouble();
         this.Right  = Reader.GetDouble();
         this.Bottom = Reader.GetDouble();
+    }
+}
+
+function CSectionBorders()
+{
+    this.Top        = new CDocumentBorder();
+    this.Bottom     = new CDocumentBorder();
+    this.Left       = new CDocumentBorder();
+    this.Right      = new CDocumentBorder();
+
+    this.Display    = section_borders_DisplayAllPages;
+    this.OffsetFrom = section_borders_OffsetFromPage;
+    this.ZOrder     = section_borders_ZOrderFront;
+}
+
+CSectionBorders.prototype =
+{
+    Write_ToBinary : function(Writer)
+    {
+        // Variable : Left
+        // Variable : Top
+        // Variable : Right
+        // Variable : Bottom
+        // Byte     : Display
+        // Byte     : OffsetFrom
+        // Byte     : ZOrder
+
+        this.Left.Write_ToBinary(Writer);
+        this.Top.Write_ToBinary(Writer);
+        this.Right.Write_ToBinary(Writer);
+        this.Bottom.Write_ToBinary(Writer);
+        Writer.WriteByte(this.Display);
+        Writer.WriteByte(this.OffsetFrom);
+        Writer.WriteByte(this.ZOrder);
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        // Variable : Left
+        // Variable : Top
+        // Variable : Right
+        // Variable : Bottom
+        // Byte     : Display
+        // Byte     : OffsetFrom
+        // Byte     : ZOrder
+
+        this.Left.Read_FromBinary(Reader);
+        this.Top.Read_FromBinary(Reader);
+        this.Right.Read_FromBinary(Reader);
+        this.Bottom.Read_FromBinary(Reader);
+
+        this.Display    = Reader.GetByte();
+        this.OffsetFrom = Reader.GetByte();
+        this.ZOrder     = Reader.GetByte();
     }
 }

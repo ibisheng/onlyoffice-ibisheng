@@ -17103,7 +17103,9 @@ Paragraph.prototype =
     {
         var FramePr = this.Get_FramePr();
         if ( undefined === FramePr )
-            this.Parent.DrawingDocument.Set_RulerState_Paragraph( null );
+        {
+            this.LogicDocument.Document_UpdateRulersStateBySection();
+        }
         else
         {
             var Frame = this.CalculatedFrame;

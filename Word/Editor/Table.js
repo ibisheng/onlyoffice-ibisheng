@@ -10569,7 +10569,33 @@ CTable.prototype =
 //-----------------------------------------------------------------------------------
 // Работаем с сеткой таблицы
 //-----------------------------------------------------------------------------------
-
+    
+    Split_Table : function()
+    {
+        // Пока данная функция используется только при добавлении секции. В этом случае мы делим таблицу на 2 части по
+        // текущей строке. Если текущая строка первая, тогда не делим таблицу.
+        
+        var CurRow = this.CurCell.Row.Index;
+        
+        if ( 0 === CurRow )
+            return null;
+        
+        var NewTable = new CTable(this.DrawingDocument, this.Parent, this.Inline, 0, 0, 0, 0, 0, 0, 0, this.Internal_Copy_Grid(this.TableGrid) );
+        
+        var Len = this.Content.length;
+        for ( var RowIndex = CurRow; RowIndex < Len; RowIndex++ )
+        {
+            NewTable.Internal_Add_Row( RowIndex - CurRow, 0, true, this.Content[CurRow] );
+            this.Internal_Remove_Row( CurRow );            
+        }
+        
+        NewTable.Set_Pr( this.Pr.Copy() );
+        NewTable.Set_TableStyle2( this.TableStyle );
+        NewTable.Set_TableLook( this.TableLook.Copy() );
+        
+        return NewTable;
+    },
+    
     Internal_CheckMerge : function()
     {
         var bCanMerge = true;
@@ -17489,7 +17515,7 @@ CTable.prototype =
         this.Internal_ReIndexing(Index);
     },
 
-    Internal_Add_Row : function( Index, CellsCount, bReIndexing )
+    Internal_Add_Row : function( Index, CellsCount, bReIndexing, _NewRow )
     {
         if ( Index < 0 )
             Index = 0;
@@ -17499,7 +17525,7 @@ CTable.prototype =
 
         this.Rows++;
 
-        var NewRow = new CTableRow( this, CellsCount );
+        var NewRow = ( undefined === _NewRow ? new CTableRow( this, CellsCount ) : _NewRow );
 
         History.Add( this, { Type : historyitem_Table_AddRow, Pos : Index, Item : { Row : NewRow, TableRowsBottom : {}, RowsInfo : {} } } );
 
