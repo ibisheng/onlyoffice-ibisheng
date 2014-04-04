@@ -778,6 +778,7 @@ var historyitem_Paragraph_PresentationPr_Bullet     = 32; // Изменяем с
 var historyitem_Paragraph_PresentationPr_Level      = 33; // Изменяем уровень параграфа в презентациях
 var historyitem_Paragraph_FramePr                   = 34; // Изменяем настройки рамки
 var historyitem_Paragraph_Shd                       = 35; // Изменяем настройки заливки целиком
+var historyitem_Paragraph_SectionPr                 = 36; // Изменяем настройки секции
 
 // Типы изменений в классе ParaRun
 var historyitem_ParaRun_AddItem         =  1;
@@ -1094,6 +1095,19 @@ var historyitem_Style_UnhideWhenUsed  = 109; // Изменяем UnhideWhenUsed
 var historyitem_Styles_Add    = 1; // Добавляем стиль
 var historyitem_Styles_Remove = 2; // Удаляем стиль
 
+// Тип изменений в классе CSectionPr
+var historyitem_Section_PageSize_Orient    = 1; // Меняем ориентацию страницы
+var historyitem_Section_PageSize_Size      = 2; // Меняем размер страницы
+var historyitem_Section_PageMargins        = 3; // Меняем отступы страницы
+var historyitem_Section_Type               = 4; // Меняем тип секции
+var historyitem_Section_Borders_Left       = 5; // Меняем левую границу
+var historyitem_Section_Borders_Top        = 6; // Меняем верхнюю границу
+var historyitem_Section_Borders_Right      = 7; // Меняем правую границу
+var historyitem_Section_Borders_Bottom     = 8; // Меняем нижнюю границу
+var historyitem_Section_Borders_Display    = 9; // Меняем тип страниц, на которых рисуются границы
+var historyitem_Section_Borders_OffsetFrom = 10; // Меняем тип отступа границ
+var historyitem_Section_Borders_ZOrder     = 11; // Меняем Z-index границ
+
 // Тип класса, к которому относится данный элемент истории
 var historyitem_State_Unknown         = 0;
 var historyitem_State_Document        = 1;
@@ -1144,6 +1158,7 @@ var historyitem_type_Math			  = 33;
 var historyitem_type_CommentMark      = 34;
 var historyitem_type_ParaRun          = 35;
 var historyitem_type_MathContent	  = 36;
+var historyitem_type_Section          = 37;
 
 //Типы изменений в классе CChartAsGroup
 var historyitem_SetCahrtLayout = 1000;
