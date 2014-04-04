@@ -4048,6 +4048,12 @@ drawLineChart.prototype =
 						y3 = this._getYVal(x3, i);
 						
 						this.paths.series[i][n] = this._calculateSplineLine(x, y, x1, y1, x2, y2, x3, y3, xPoints, yPoints);
+						
+						y  = this.cChartDrawer.getYPosition(val, yPoints);
+						y1 = this.cChartDrawer.getYPosition(nextVal, yPoints);
+						
+						x  = xPoints[n].pos; 
+						x1 = xPoints[n + 1].pos;
 					}
 					else
 					{
@@ -4138,6 +4144,7 @@ drawLineChart.prototype =
 		var numCache = this.chartProp.series[ser].val.numRef ? this.chartProp.series[ser].val.numRef.numCache : this.chartProp.series[ser].val.numLit;
 		var point = numCache.pts[val];
 		var path;
+		var isSplineLine = true;
 		
 		if(this.paths.series)
 		{
@@ -4156,6 +4163,11 @@ drawLineChart.prototype =
 				
 		var x = path.X;
 		var y = path.Y;
+		if(val == numCache.pts.length - 1 && isSplineLine == true)
+		{
+			x = path.X2;
+			y = path.Y2;
+		}
 		
 		var pxToMm = this.chartProp.pxToMM;
 		var constMargin = 5 / pxToMm;
@@ -5877,6 +5889,18 @@ drawScatterChart.prototype =
 				if(isSplineLine)
 				{
 					this.paths.series[i][k] = this._calculateSplineLine(points, k, xPoints, yPoints);
+					
+					
+					if(k == points.length - 1)
+					{
+						y = this.cChartDrawer.getYPosition(points[k].y, yPoints);
+						x = this.cChartDrawer.getYPosition(points[k].x, xPoints, true);
+					}
+					else
+					{
+						y  = this.cChartDrawer.getYPosition(points[k].y, yPoints);
+						x  = this.cChartDrawer.getYPosition(points[k].x, xPoints, true);	
+					}
 				}
 				else
 				{
