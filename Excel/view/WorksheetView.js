@@ -5955,7 +5955,7 @@
 				}
 				if (!done) { continue; }
 
-				// Обработка движения через срытые столбцы/строки
+				// Обработка движения через скрытые столбцы/строки
 				while (ar.startCol >= arn.c1 && ar.startCol <= arn.c2 && this.cols[ar.startCol].width < 0.000001) {
 					ar.startCol += dc || (dr > 0 ? +1 : -1);
 					done = false;
@@ -7285,15 +7285,28 @@
 
 			// Перерисовываем
 			this._drawSelection();
-			var d = {
+            var d = {}
+			/*var d = {
 				deltaX : this.activeMoveRange.c1 < this.visibleRange.c1 ? this.activeMoveRange.c1-this.visibleRange.c1 :
 					this.activeMoveRange.c2>this.visibleRange.c2 ? this.activeMoveRange.c2-this.visibleRange.c2 : 0,
 				deltaY : this.activeMoveRange.r1 < this.visibleRange.r1 ? this.activeMoveRange.r1-this.visibleRange.r1 :
 					this.activeMoveRange.r2>this.visibleRange.r2 ? this.activeMoveRange.r2-this.visibleRange.r2 : 0
 			};
 			while ( this._isColDrawnPartially( this.activeMoveRange.c2, this.visibleRange.c1 + d.deltaX) ) {++d.deltaX;}
-			while ( this._isRowDrawnPartially( this.activeMoveRange.r2, this.visibleRange.r1 + d.deltaY) ) {++d.deltaY;}
-			
+			while ( this._isRowDrawnPartially( this.activeMoveRange.r2, this.visibleRange.r1 + d.deltaY) ) {++d.deltaY;}*/
+
+            if ( y <= this.cellsTop + this.height_2px ){
+                d.deltaY = -1;
+            }else if ( y >= this.drawingCtx.getHeight() - this.height_2px ){
+                d.deltaY = 1;
+            }
+
+            if ( x <= this.cellsLeft + this.width_2px ){
+                d.deltaX = -1;
+            }else if ( x >= this.drawingCtx.getWidth() - this.width_2px ){
+                d.deltaX = 1;
+            }
+
 			this.model.workbook.handlers.trigger("asc_onHideComment");
 
             if( this.activeMoveRange.type == c_oAscSelectionType.RangeRow ){
