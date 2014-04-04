@@ -4,7 +4,7 @@
  * Time: 18:28
  */
 
-function ParaRun(Paragraph, bMathRun, Parent)
+function ParaRun(Paragraph, bMathRun)
 {
     this.Id         = g_oIdCounter.Get_NewId();  // Id данного элемента
     this.Type       = para_Run;                  // тип данного элемента
@@ -49,7 +49,7 @@ function ParaRun(Paragraph, bMathRun, Parent)
     if(bMathRun)
     {
         this.typeObj = MATH_PARA_RUN;
-        this.Parent = Parent;
+        this.Parent = null;
         this.size =
         {
             ascent: 0,
@@ -608,6 +608,11 @@ ParaRun.prototype =
                     if ( drawing_Inline != Item.DrawingType )
                         break;
 
+                    X += Item.WidthVisible;
+                    break;
+                }
+                case para_Math_Text:
+                {
                     X += Item.WidthVisible;
                     break;
                 }
@@ -6492,7 +6497,7 @@ ParaRun.prototype.Math_Draw = function(x, y, pGraphics)
 
     // var oWPrp = this.Get_CompiledPr(true);
     var oWPrp = this.Pr.Copy();
-    this.Math_applyArgSize(oWPrp);
+    this.Parent.applyArgSize(oWPrp);
 
     oWPrp.Italic = false;
 
@@ -6510,6 +6515,8 @@ ParaRun.prototype.Math_Recalculate = function(RecalcInfo)
     var RangeStartPos = 0;
     var RangeEndPos = this.Content.length;
 
+    this.Parent = RecalcInfo.Parent;
+
     // обновляем позиции start и end для Range
     this.Lines[0].Add_Range(0, RangeStartPos, RangeEndPos);
 
@@ -6518,7 +6525,7 @@ ParaRun.prototype.Math_Recalculate = function(RecalcInfo)
 
     //var oWPrp = this.Get_CompiledPr(true);
     var oWPrp = this.Pr.Copy();
-    this.Math_applyArgSize(oWPrp);
+    this.Parent.applyArgSize(oWPrp);
     //oWPrp.Merge(RecalcInfo.Composition.DEFAULT_RUN_PRP.getTxtPrp());
 
     oWPrp.Italic = false;
@@ -6555,7 +6562,7 @@ ParaRun.prototype.Math_Recalculate = function(RecalcInfo)
 ParaRun.prototype.Math_Update_Cursor = function(X, Y, CurPage, UpdateTarget)
 {
     var runPrp = this.Get_CompiledPr(true);
-    this.Math_applyArgSize(runPrp);
+    this.Parent.applyArgSize(runPrp);
 
 
     var sizeCursor = runPrp.FontSize*g_dKoef_pt_to_mm;

@@ -103,32 +103,6 @@ ParaMath.prototype =
         }
     },
 
-    old_AddText : function(oElem, sText, props)
-    {
-        if(sText)
-        {
-            var rPr = new CTextPr();
-            var oMRun = new CMathRunPrp();
-            if (props)
-                oMRun.setMathRunPrp(props);
-            oMRun.setTxtPrp(rPr);
-            if (oElem)
-            {
-                oElem.addElementToContent(oMRun);
-                for (var i=0; i < sText.lengt ;i++)
-                {
-                    /*text[i].replace("&",	"&amp;");
-                     text[i].Replace("'",	"&apos;");
-                     text[i].Replace("<",	"&lt;");
-                     text[i].Replace(">",	"&gt;");
-                     text[i].Replace("\"",	"&quot;");*/
-                    oText = new CMathText();
-                    oText.addTxt(sText[i]);
-                    oElem.addElementToContent(oText);
-                }
-            }
-        }
-    },
     AddText : function(oElem, sText, props)
     {		
         if(sText)
@@ -324,172 +298,6 @@ ParaMath.prototype =
         this.StartLine   = StartLine;
         this.StartRange  = StartRange;
         this.LinesLength = 0;
-    },
-
-    old_Recalculate_Range : function(ParaPr, Depth)
-    {
-        // TODO: Пока у нас контент здесь состоит из 1 элемента (всего элемента Math). Поэтому у нас в данном
-        //       контенте есть 2 позиции 0 и 1, т.е. до или после Math.
-
-        var PRS = g_oPRSW;
-
-        if ( this.Paragraph !== PRS.Paragraph )
-        {
-            this.Paragraph = PRS.Paragraph;
-            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
-        }
-
-        var CurLine  = PRS.Line - this.StartLine;
-        var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
-
-        var Para      = PRS.Paragraph;
-        var ParaLine  = PRS.Line;
-        var ParaRange = PRS.Range;
-
-        var TextPr = new CTextPr();
-        TextPr.Init_Default();
-        this.Math.RecalculateComposition(g_oTextMeasurer, TextPr);
-        var Size = this.Math.Size;
-
-        this.Width        = Size.Width;
-        this.Height       = Size.Height;
-        this.WidthVisible = Size.WidthVisible;
-        this.Ascent       = Size.Ascent;
-        this.Descent      = Size.Descent;
-
-        //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        // TODO: ParaMath.Recalculate_Range
-        // Пока логика пересчета здесь аналогична логике пересчета отдельного символа в ParaRun. В будущем надо будет
-        // переделать с разбиванием на строки.
-        //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-        // Если это первый отрезок в данной строке, тогда нам надо добавить строку (первую строку не добавляем,
-        // т.к. она всегда есть)
-        if ( 0 === CurRange )
-        {
-            if ( 0 !== CurLine )
-            {
-                this.Lines[CurLine] = new CParaRunLine();
-                this.LinesLength    = CurLine + 1;
-            }
-            else
-            {
-                this.LinesLength  = CurLine + 1;
-            }
-        }
-
-        // Отмечаем, что началось слово
-        PRS.StartWord = true;
-
-        // При проверке, убирается ли слово, мы должны учитывать ширину предшествующих пробелов.
-        var LetterLen = Size.Width;
-        if ( true !== PRS.Word )
-        {
-            // Слово только началось. Делаем следующее:
-            // 1) Если до него на строке ничего не было и данная строка не
-            //    имеет разрывов, тогда не надо проверять убирается ли слово в строке.
-            // 2) В противном случае, проверяем убирается ли слово в промежутке.
-
-            // Если слово только началось, и до него на строке ничего не было, и в строке нет разрывов, тогда не надо проверять убирается ли оно на строке.
-            if ( true !== PRS.FirstItemOnLine || false === Para.Internal_Check_Ranges(ParaLine, ParaRange) )
-            {
-                if ( PRS.X + PRS.SpaceLen + LetterLen > PRS.XEnd )
-                {
-                    PRS.NewRange  = true;
-                }
-            }
-
-            if ( true !== PRS.NewRange )
-            {
-                // Отмечаем начало нового слова
-                PRS.Set_LineBreakPos( 0 );
-                PRS.WordLen = this.Width;
-                PRS.Word    = true;
-            }
-        }
-        else
-        {
-            if ( PRS.X + PRS.SpaceLen + PRS.WordLen + LetterLen > PRS.XEnd )
-            {
-                if ( true === PRS.FirstItemOnLine )
-                {
-                    // Слово оказалось единственным элементом в промежутке, и, все равно,
-                    // не умещается целиком. Делаем следующее:
-                    //
-                    // 1) Если у нас строка без вырезов, тогда ставим перенос строки на
-                    //    текущей позиции.
-                    // 2) Если у нас строка с вырезом, и данный вырез не последний, тогда
-                    //    ставим перенос внутри строки в начале слова.
-                    // 3) Если у нас строка с вырезом и вырез последний, тогда ставим перенос
-                    //    строки в начале слова.
-
-                    if ( false === Para.Internal_Check_Ranges(ParaLine, ParaRange)  )
-                    {
-                        // Слово не убирается в отрезке. Переносим слово в следующий отрезок
-                        PRS.MoveToLBP = true;
-                        PRS.NewRange  = true; // перенос на новую строку
-                    }
-                    else
-                    {
-                        PRS.EmptyLine   = false;
-                        PRS.X          += WordLen;
-
-                        // Слово не убирается в отрезке, но, поскольку, слово 1 на строке и отрезок тоже 1,
-                        // делим слово в данном месте
-                        PRS.NewRange = true; // перенос на новую строку
-                    }
-                }
-                else
-                {
-                    // Слово не убирается в отрезке. Переносим слово в следующий отрезок
-                    PRS.MoveToLBP = true;
-                    PRS.NewRange  = true;
-                }
-            }
-
-            if ( true !== PRS.NewRange )
-            {
-                // Мы убираемся в пределах данной строки. Прибавляем ширину буквы к ширине слова
-                PRS.WordLen += LetterLen;
-            }
-        }
-
-        var RangeStartPos = 0;
-        var RangeEndPos   = 0;
-
-        if ( true !== PRS.NewRange )
-        {
-            RangeEndPos = this.Root.content.length; // RangeEndPos = 1;    to    RangeEndPos = this.Content.length;
-
-            // Удаляем лишние строки, оставшиеся после предыдущего пересчета в самом конце
-            if ( this.Lines.length > this.LinesLength )
-                this.Lines.length = this.LinesLength;
-
-            // Обновляем метрику строки
-            if ( PRS.LineAscent < this.Ascent )
-                PRS.LineAscent = this.Ascent;
-
-            if ( PRS.LineDescent < this.Descent )
-                PRS.LineDescent = this.Descent;
-        }
-
-        if ( 0 === CurLine && 0 === CurRange )
-        {
-            this.Range.StartPos = RangeStartPos;
-            this.Range.EndPos   = RangeEndPos;
-
-            /*this.Lines[0].RangesLength = 1;
-            this.Lines[0].Ranges.length = this.Content.length - 1;*/
-
-            this.Lines[0].RangesLength = 1;
-
-            if ( this.Lines[0].Ranges.length > 1 )
-                this.Lines[0].Ranges.length = 1;
-        }
-        else
-            this.Lines[CurLine].Add_Range( CurRange, RangeStartPos, RangeEndPos );
-
-        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     },
 
     Recalculate_Range : function(ParaPr, Depth)
@@ -802,12 +610,19 @@ ParaMath.prototype =
         //var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
         var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
 
-        if ( EndPos >= 1 )
+
+        var result = {X: _X + this.Root.size.width};
+
+
+        if ( EndPos >= 1 && CurrentRun == true)
         {
-            return this.Root.update_Cursor(_CurPage, UpdateTarget);
+            //result =  this.Root.update_Cursor(_CurPage, UpdateCurPos, UpdateTarget);
+            result = this.Root.Recalculate_CurPos(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
         }
 
-        return {X : _X };
+
+
+        return result;
     },
 
     Refresh_RecalcData : function(Data)
@@ -942,103 +757,8 @@ ParaMath.prototype =
 
         this.Math.Cursor_MoveToEndPos();
     },
-    old_Get_ParaContentPosByXY : function(SearchPos, Depth, _CurLine, _CurRange, StepEnd) // получить логическую позицию по XY
-    {
-        // TODO: ParaMath.Get_ParaContentPosByXY
 
-        var Result = false;
-
-        var CurLine  = _CurLine - this.StartLine;
-        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange ); // если находимся в нулевой строке (для текущей позиции), то CurRange мб ненулевой
-
-        var Range = this.Lines[CurLine].Ranges[CurRange];
-        var StartPos = Range.StartPos;  //  0
-        var EndPos   = Range.EndPos;    //  this.content.length
-
-        // TODO: реализовать поиск по Y (для случая, когда формула занимает больше одной строки)
-
-        // Проверяем, попали ли мы в формулу
-
-        var Dx = this.Math.Size.WidthVisible;
-        var D = SearchPos.X - SearchPos.CurX;
-        var Diff = Math.abs(D) < Math.abs(D + Dx) ? Math.abs(D) : Math.abs(D + Dx);
-        //var Diff = SearchPos.X - SearchCommonPos.CurX;
-
-        if(Math.abs(Diff) < SearchPos.DiffX + 0.001 )
-        {
-            var X = SearchPos.X - this.Math.absPos.x,
-                Y = SearchPos.Y - this.Math.absPos.y;
-
-            SearchPos.DiffX = Diff;
-            this.RootComposition.get_ParaContentPosByXY(SearchPos.Pos, X, Y);
-
-            //this.Math.Selection_SetStart(SearchPos.X, SearchPos.Y);
-            //this.Math.Selection_SetEnd(SearchPos.X, SearchPos.Y);
-            //this.Math.Root.get_ParaContentPos(false, SearchPos.Pos);
-
-            Result = true;
-            if ( D >= - 0.001 && D <= Dx + 0.001 )
-            {
-                SearchPos.InText = true;
-                SearchPos.DiffX =  0.001; // сравниваем расстояние до ближайшего элемента
-            }
-        }
-
-
-//        var str = "";
-//        for(var i = 0; i < SearchPos.Pos.Data.length; i++)
-//        {
-//            str += SearchPos.Pos.Data[i] + ", ";
-//
-//        }
-//        console.log(str);
-        //console.log("Pos [" + i + "] = " + SearchPos.Pos[i]);
-
-        SearchPos.CurX += Dx;
-
-        /*for(var CurPos = StartPos; CurPos < EndPos; CurPos++)
-         {
-         var Dx = this.Content[CurPos].value.size.width;
-
-         // Проверяем, попали ли мы в данный элемент
-         var Diff = SearchPos.X - SearchPos.CurX;
-         if ( Math.abs( Diff ) < SearchPos.DiffX + 0.001 )
-         {
-         SearchPos.DiffX = Math.abs( Diff );
-         SearchPos.Pos.Update( CurPos, Depth );
-         //this.Math.Root.get_ParaContentPos(false, SearchPos.Pos);
-
-         Result = true;
-
-         if ( Diff >= - 0.001 && Diff <= Dx + 0.001 )
-         {
-         SearchPos.InText = true;
-         }
-         }
-
-         SearchPos.CurX += Dx;
-         }*/
-
-
-        /*var Diff = SearchPos.X - SearchPos.CurX;
-         if ( Math.abs( Diff ) < SearchPos.DiffX + 0.001 )
-         {
-         SearchPos.DiffX = Math.abs( Diff );
-         SearchPos.Pos.Update( StartPos, Depth );
-         Result = true;
-
-         if ( Diff >= - 0.001 && Diff <= this.Math.size.WidthVisible + 0.001 )
-         {
-         SearchPos.InText = true;
-         }
-         }
-
-         SearchPos.CurX += this.Math.size.WidthVisible;*/
-
-
-        return Result;
-    },
-    Get_ParaContentPosByXY : function(SearchPos, Depth, _CurLine, _CurRange, StepEnd) // получить логическую позицию по XY
+    Get_ParaContentPosByXY : function(SearchPos, Depth, _CurLine, _CurRange, StepEnd, Flag) // получить логическую позицию по XY
     {
         // TODO: ParaMath.Get_ParaContentPosByXY
 
@@ -1062,12 +782,18 @@ ParaMath.prototype =
         //var Diff = SearchPos.X - SearchPos.CurX;
 
         var CurX = SearchPos.CurX;
+        //console.log("CurX :"+ SearchPos.CurX );
+
         if(Math.abs(Diff) < SearchPos.DiffX + 0.001 )
         {
 
             //console.log(SearchPos.X);
             var X = SearchPos.X,
                 Y = SearchPos.Y;
+
+            var str = "X: "+ SearchPos.X + "; " + "Y: " + SearchPos.Y;
+            //console.log(str);
+
 
             SearchPos.X -= this.Math.absPos.x;
             SearchPos.Y -= this.Math.absPos.y;
@@ -1089,6 +815,12 @@ ParaMath.prototype =
             SearchPos.X = X;
             SearchPos.Y = Y;
 
+            str = "X: "+ SearchPos.X + "; " + "Y: " + SearchPos.Y;
+
+            //console.log(str);
+            /*console.log("X; " + SearchPos.X);
+            console.log("Y: " + SearchPos.Y);*/
+
 
             //this.Math.Selection_SetStart(SearchPos.X, SearchPos.Y);
             //this.Math.Selection_SetEnd(SearchPos.X, SearchPos.Y);
@@ -1105,6 +837,11 @@ ParaMath.prototype =
 
         SearchPos.CurX = CurX + Dx;
 
+
+        var CX = SearchPos.CurX - Dx;
+
+       /* if ( 1 === Flag )
+            console.log("CurX :"+ SearchPos.CurX );*/
 
 
         return Result;
@@ -1304,8 +1041,8 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Selection_IsEmpty
 
-        return false;
-        //return !this.SelectContent.selectUse();
+        //return false;
+        return this.Root.Selection_IsEmpty();
     },
 
     Selection_CheckParaEnd : function()

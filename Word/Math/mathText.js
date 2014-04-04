@@ -62,6 +62,9 @@ function CMathText()
     this.GapRight = 0;
     this.WidthVisible = 0;
 
+    // для Para_Run
+    this.Type = para_Math_Text;
+
     //this.Parent = null;
 
     /*this.TxtPrp = new CMathTextPrp();

@@ -161,12 +161,13 @@ CCoeffGaps.prototype =
 
 var COEFF_GAPS = new CCoeffGaps();
 
-function CRecalculateInfo(oMeasure, argSize, Composition)
+function CRecalculateInfo(oMeasure, Parent)
 {
     this.measure = oMeasure;
+    this.Parent = Parent;
 
-    this.Composition = Composition; // для Para_Run
-    this.argSize = argSize;  // argSize выставляем один раз для всего контента
+    this.Composition = this.Parent.Composition; // для Para_Run
+    this.argSize = this.Parent.argSize;  // argSize выставляем один раз для всего контента
     this.leftRunPrp = null; // Run_Prp левого элемента
     this.currRunPrp = null;
 
@@ -1194,12 +1195,12 @@ CMathContent.prototype =
 
             if(this.content.length == 0)
             {
-                this.content.push(new ParaRun(this.Composition.Parent.Paragraph, true, this));
+                this.content.push(new ParaRun(this.Composition.Parent.Paragraph, true));
                 //this.CurPos++;
             }
 
             this.content.push(obj);
-            this.content.push(new ParaRun(this.Composition.Parent.Paragraph, true, this));
+            this.content.push(new ParaRun(this.Composition.Parent.Paragraph, true));
 
             //this.CurPos += 2;
 
@@ -5379,7 +5380,7 @@ CMathContent.prototype =
             lit:    false
         };*/
 
-        var RecalcInfo = new CRecalculateInfo(oMeasure, this.argSize, this.Composition);
+        var RecalcInfo = new CRecalculateInfo(oMeasure, this, this.argSize, this.Composition);
 
 
         /*if(this.content.length > 1)
@@ -5604,12 +5605,10 @@ CMathContent.prototype =
 
                     this.content[i].draw(x, y, pGraphics);
                 }
-                else if(this.content[i].typeObj == MATH_COMP)
-                    this.content[i].draw(x, y, pGraphics);
-                else if(this.content[i].typeObj == MATH_PLACEHOLDER)
-                    this.content[i].draw(x, y, pGraphics);
-                else    // MATH_PARA_RUN
+                else  if(this.content[i].typeObj == MATH_PARA_RUN)
                     this.content[i].Math_Draw(x, y, pGraphics);
+                else
+                    this.content[i].draw(x, y, pGraphics);
 
                 /*if(this.content[i].value.typeObj == MATH_COMP)
                 {
@@ -5725,6 +5724,32 @@ CMathContent.prototype =
 
             result = this.content[this.CurPos].Math_Update_Cursor(X, Y, CurPage, UpdateTarget);
             //this.content[this.CurPos].Recalculate_CurPos(X, Y, true, 0, 0, true, true, true);
+        }
+
+        return result;
+    },
+    Recalculate_CurPos : function(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
+    {
+        var result;
+
+        if(this.content[this.CurPos].typeObj == MATH_COMP)
+        {
+            _X += this.WidthToElement[this.CurPos];
+            result = this.content[this.CurPos].Recalculate_CurPos(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
+        }
+        else if(this.content[this.CurPos].typeObj == MATH_PARA_RUN)
+        {
+            var absPos = this.Composition.absPos;
+            //var X = this.pos.x + absPos.x + this.WidthToElement[this.CurPos],
+            //    Y = this.pos.y + absPos.y + this.size.ascent;
+            //_X += this.WidthToElement[this.CurPos];
+
+            Y = this.pos.y + absPos.y + this.size.ascent;
+
+            _X = this.pos.x + absPos.x + this.WidthToElement[this.CurPos];
+
+
+            result = this.content[this.CurPos].Recalculate_CurPos(_X, Y, CurrentRun, 0, 0, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
         }
 
         return result;
@@ -6366,6 +6391,27 @@ CMathContent.prototype =
     {
         return this.SelectStartPos !== this.SelectEndPos;
         //return this.SelectStartPos !== this.SelectEndPos;
+    },
+    Selection_IsEmpty: function()
+    {
+        var startPos = this.SelectStartPos,
+            endPos = this.SelectEndPos;
+
+        var result = false;
+
+        if(startPos == endPos)
+        {
+            var bRunPrp = this.content[startPos].typeObj == MATH_RUN_PRP,
+                bComp = this.content[startPos].typeObj == MATH_COMP,
+                bSelectComp = bComp ? this.content[startPos].IsSelectEmpty() : false;
+
+            if(bRunPrp || bSelectComp)
+                result = this.content[startPos].Selection_IsEmpty();
+            else
+                result = false;
+        }
+
+        return result;
     },
     setCtrPrp: function()
     {
@@ -7479,7 +7525,7 @@ CMathContent.prototype =
             //ContentPos.Add(pos);
 
             SearchPos.X -= this.WidthToElement[pos];
-            SearchPos.CurX += this.WidthToElement[pos];
+            //SearchPos.CurX += this.WidthToElement[pos];
 
             if(this.content[pos].typeObj == MATH_COMP)
             {
@@ -7487,9 +7533,11 @@ CMathContent.prototype =
             }
             else if(this.content[pos].typeObj == MATH_PARA_RUN)      // проверка на gaps в findDisposition
             {
-                SearchPos.X += this.pos.x + this.Composition.absPos.x;
+                SearchPos.X += this.pos.x + this.Composition.absPos.x + this.WidthToElement[pos];
+                SearchPos.CurX += this.pos.x + this.WidthToElement[pos];
                 this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth, 0, 0);
             }
+
         }
     },
     Get_ParaContentPos: function(bSelection, bStart, ContentPos)
@@ -7527,8 +7575,11 @@ CMathContent.prototype =
 
         var curr = this.content[this.CurPos];
 
-        if(curr.typeObj == MATH_COMP || curr.typeObj == MATH_PARA_RUN)
-            curr.Set_ParaContentPos(ContentPos, Depth);
+        if(this.content.length > 0)
+        {
+            if(curr.typeObj == MATH_COMP || curr.typeObj == MATH_PARA_RUN)
+                curr.Set_ParaContentPos(ContentPos, Depth);
+        }
 
     },
     set_SelectEndExtreme: function(bEnd)

@@ -1242,8 +1242,6 @@ CMathBase.prototype =
 
         return gaps;
     },
-
-
     /// Position for Paragraph
     Get_ParaContentPosByXY: function(SearchPos, Depth)
     {
@@ -1263,6 +1261,9 @@ CMathBase.prototype =
         SearchPos.Pos.Update(pos.y, Depth+1);
 
         Depth +=2;
+
+        //SearchPos.CurX += SearchPos.X - disp.mCoord.x;
+        //SearchPos.CurX += this.align(pos.x, pos.y).x;
 
         SearchPos.X = disp.mCoord.x;
         SearchPos.Y = disp.mCoord.y;
@@ -1382,13 +1383,23 @@ CMathBase.prototype =
         }
 
     },
+    Selection_DrawRange: function(SelectionDraw)
+    {
+        if(this.IsSelectEmpty())
+            this.elements[this.SelectStart_X][this.SelectStart_Y].Selection_DrawRange(SelectionDraw);
+    },
+    Selection_IsEmpty: function()
+    {
+        if(this.IsSelectEmpty())
+            this.elements[this.SelectStart_X][this.SelectStart_Y].Selection_IsEmpty();
+    },
     IsSelectEmpty: function()
     {
         return (this.SelectStart_X == this.SelectEnd_X) && (this.SelectStart_Y == this.SelectEnd_Y);
     },
-    update_Cursor: function(CurPage, UpdateTarget)
+    Recalculate_CurPos: function(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
     {
-        return this.elements[this.CurPos_X][this.CurPos_Y].update_Cursor(CurPage, UpdateTarget);
+        return this.elements[this.CurPos_X][this.CurPos_Y].Recalculate_CurPos(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
     }
 
     //////////////////////////
