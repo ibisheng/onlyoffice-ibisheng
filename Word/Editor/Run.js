@@ -3189,6 +3189,17 @@ ParaRun.prototype =
             SearchPos.Pos.Update( StartPos, Depth );
             Result = true;
         }
+        
+        if ( MATH_PARA_RUN === this.typeObj )
+        {
+            var Diff = SearchPos.X - SearchPos.CurX;
+            if ( Math.abs( Diff ) < SearchPos.DiffX + 0.001 )
+            {
+                SearchPos.DiffX = Math.abs( Diff );
+                SearchPos.Pos.Update( CurPos, Depth );
+                Result = true;
+            }
+        }
 
         return Result;
     },
