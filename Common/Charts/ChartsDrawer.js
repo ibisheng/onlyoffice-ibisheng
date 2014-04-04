@@ -102,7 +102,10 @@ CChartsDrawer.prototype =
 		
 		//делаем полный пресчёт
 		this.areaChart.reCalculate(this.calcProp, null, this);
-		this.gridChart.reCalculate(this.calcProp, this, chartSpace);
+		
+		if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart")
+			this.gridChart.reCalculate(this.calcProp, this, chartSpace);
+		
 		this.allAreaChart.reCalculate(this.calcProp);
 		
 		if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart")
@@ -130,9 +133,9 @@ CChartsDrawer.prototype =
 		{
 			this.catAxisChart.draw(this.calcProp, cShapeDrawer, chartSpace);
 			this.valAxisChart.draw(this.calcProp, cShapeDrawer, chartSpace);
+			this.gridChart.draw(this.calcProp, cShapeDrawer, chartSpace);
 		}
 		
-		this.gridChart.draw(this.calcProp, cShapeDrawer, chartSpace);
 		this.chart.draw(this, cShapeDrawer, chartSpace);
 	},
 	
