@@ -3137,7 +3137,8 @@ ParaRun.prototype =
         var StartPos = Range.StartPos;
         var EndPos   = Range.EndPos;
 
-        for ( var CurPos = StartPos; CurPos < EndPos; CurPos++ )
+        var CurPos = StartPos;
+        for (; CurPos < EndPos; CurPos++ )
         {
             var Item = this.Content[CurPos];
 
