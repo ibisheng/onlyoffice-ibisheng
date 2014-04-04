@@ -1848,6 +1848,9 @@ var gUndoInsDelCellsFlag = true;
 					{
 						if(aWs.AutoFilter && aWs.AutoFilter.Ref == cloneData.Ref)
 						{
+							if(aWs.AutoFilter.result)
+								this._addButtonAF({result: aWs.AutoFilter.result, isVis: false});
+								
 							delete aWs.AutoFilter;
 						}
 						else if(aWs.TableParts)
@@ -1857,6 +1860,10 @@ var gUndoInsDelCellsFlag = true;
 								if(cloneData.Ref == aWs.TableParts[l].Ref)
 								{
 									this._cleanStyleTable(aWs, cloneData.Ref);
+									
+									if(aWs.TableParts[l].result)
+										this._addButtonAF({result: aWs.TableParts[l].result, isVis: false});
+										
 									aWs.TableParts.splice(l,1);
 								}	
 							}
