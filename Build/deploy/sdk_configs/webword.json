@@ -216,6 +216,11 @@
         }
     },
     "tasks": {
-        "build": "increment_build concat_js_api extract_js_api compile_sdk"
+        "build": [
+            "increment_build",
+            "concat_js_api",
+            "extract_js_api",
+            "compile_sdk"
+        ]
     }
 }

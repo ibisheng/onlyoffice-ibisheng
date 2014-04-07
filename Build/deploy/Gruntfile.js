@@ -24,7 +24,7 @@ module.exports = function(grunt) {
 		});
     });	
 	
-	grunt.registerTask('cleanup_deploy_folder',  'cleanup_deploy_folder_init clean');
+	grunt.registerTask('cleanup_deploy_folder',  ['cleanup_deploy_folder_init', 'clean']);
 	
 	grunt.registerTask('build_webword_init', 'Initialize build WebWord SDK.', function(){
         defaultConfig = './sdk_configs/webword.json';
@@ -77,16 +77,16 @@ module.exports = function(grunt) {
         }
     });
 	
-	grunt.registerTask('build_webword',     'setup_tools build_webword_init build_sdk');
-	grunt.registerTask('build_webword_server', 'setup_tools build_webword_server_init build_sdk');
-    grunt.registerTask('build_webexcel',  'setup_tools build_webexcel_init build_sdk');
-    grunt.registerTask('build_webpowerpoint', 'setup_tools build_webpowerpoint_init build_sdk');
+	grunt.registerTask('build_webword',     ['setup_tools', 'build_webword_init', 'build_sdk']);
+	grunt.registerTask('build_webword_server', ['setup_tools', 'build_webword_server_init', 'build_sdk']);
+    grunt.registerTask('build_webexcel',  ['setup_tools', 'build_webexcel_init', 'build_sdk']);
+    grunt.registerTask('build_webpowerpoint', ['setup_tools', 'build_webpowerpoint_init', 'build_sdk']);
 	
-	grunt.registerTask('deploy_sdk_all', 'setup_tools build_webword_init deploy_sdk build_webexcel_init deploy_sdk build_webpowerpoint_init deploy_sdk');
+	grunt.registerTask('deploy_sdk_all', ['setup_tools', 'build_webword_init', 'deploy_sdk', 'build_webexcel_init', 'deploy_sdk', 'build_webpowerpoint_init', 'deploy_sdk']);
 	
-	grunt.registerTask('build_all_without_deploy', 'setup_tools build_webword_init build_sdk build_webexcel_init build_sdk build_webpowerpoint_init build_sdk');
-	grunt.registerTask('build_all', 'build_all_without_deploy deploy_sdk_all');
-	grunt.registerTask('cleanup_and_build_all', 'setup_tools cleanup_deploy_folder build_all');
+	grunt.registerTask('build_all_without_deploy', ['setup_tools', 'build_webword_init', 'build_sdk', 'build_webexcel_init', 'build_sdk', 'build_webpowerpoint_init', 'build_sdk']);
+	grunt.registerTask('build_all', ['build_all_without_deploy', 'deploy_sdk_all']);
+	grunt.registerTask('cleanup_and_build_all', ['setup_tools', 'cleanup_deploy_folder', 'build_all']);
 
 	grunt.registerTask('up_sdk_src_init', 'Update SDK source', function() {
 		grunt.initConfig({
@@ -103,11 +103,11 @@ module.exports = function(grunt) {
 		});
     });
 	
-	grunt.registerTask('update_sources_webword', 'build_webword_init up_sdk_src_init exec');
-	grunt.registerTask('update_sources_webexcel', 'build_webexcel_init up_sdk_src_init exec');
-	grunt.registerTask('update_sources_webpowerpoint', 'build_webpowerpoint_init up_sdk_src_init exec');
+	grunt.registerTask('update_sources_webword', ['build_webword_init', 'up_sdk_src_init', 'exec']);
+	grunt.registerTask('update_sources_webexcel', ['build_webexcel_init', 'up_sdk_src_init', 'exec']);
+	grunt.registerTask('update_sources_webpowerpoint', ['build_webpowerpoint_init', 'up_sdk_src_init', 'exec']);
 
-	grunt.registerTask('update_sources', 'update_sources_webword update_sources_webexcel update_sources_webpowerpoint');
+	grunt.registerTask('update_sources', ['update_sources_webword', 'update_sources_webexcel', 'update_sources_webpowerpoint']);
 
 	grunt.registerTask('commit_logs_init', function() {
 		var build_num = packageFile['info']['build'];
@@ -132,11 +132,11 @@ module.exports = function(grunt) {
         });
     });	
 	
-	grunt.registerTask('commit_logs_webword', 'build_webword_init commit_logs_init exec');
-	grunt.registerTask('commit_logs_webexcel', 'build_webexcel_init commit_logs_init exec');
-	grunt.registerTask('commit_logs_webpowerpoint', 'build_webpowerpoint_init commit_logs_init exec');
+	grunt.registerTask('commit_logs_webword', ['build_webword_init', 'commit_logs_init', 'exec']);
+	grunt.registerTask('commit_logs_webexcel', ['build_webexcel_init', 'commit_logs_init', 'exec']);
+	grunt.registerTask('commit_logs_webpowerpoint', ['build_webpowerpoint_init', 'commit_logs_init', 'exec']);
 	
-	grunt.registerTask('commit_logs', 'commit_logs_webword commit_logs_webexcel commit_logs_webpowerpoint');
+	grunt.registerTask('commit_logs', ['commit_logs_webword', 'commit_logs_webexcel', 'commit_logs_webpowerpoint']);
 	
     grunt.registerTask('increment_build', function() {
 		var pkg = grunt.file.readJSON(defaultConfig);
@@ -156,7 +156,7 @@ module.exports = function(grunt) {
             concat:  packageFile['concat_api']
         });
     });
-	grunt.registerTask('concat_js_api', 'concat_js_api_init concat');
+	grunt.registerTask('concat_js_api', ['concat_js_api_init', 'concat']);
 	
 	grunt.registerTask('extract_js_api_init', 'Extract JS API', function(){
 		grunt.initConfig({
@@ -168,7 +168,7 @@ module.exports = function(grunt) {
 			}
 		});
 	});
-	grunt.registerTask('extract_js_api', 'extract_js_api_init exec');
+	grunt.registerTask('extract_js_api', ['extract_js_api_init', 'exec']);
 	
 	grunt.registerTask('create_map_file', function() {
 		//Не нашел как передать параметры в таску, поэтому  продублировал код.	
@@ -189,30 +189,31 @@ module.exports = function(grunt) {
 					map_record_file_path ];
 		grunt.initConfig({
 			closureCompiler: {
-			  sdk: {
-				closureCompiler: toolsFile['closure_compiler'],
-				js: packageFile['compile']['sdk']['src'],
-				output_file: packageFile['compile']['sdk']['dst'],
 				options: {
-					compilation_level: 'ADVANCED_OPTIMIZATIONS',
-					externs: packageFile['compile']['sdk']['externs'],
-					define: packageFile['compile']['sdk']['define'],
-					warning_level: 'QUIET',
-					variable_map_output_file: packageFile['compile']['sdk']['log'] + '/variable.map',
-					property_map_output_file: packageFile['compile']['sdk']['log'] + '/property.map',
-					create_source_map: map_file_path,
-					source_map_format: "V3"
+					compilerFile: toolsFile['closure_compiler']
+				},
+				sdk: {
+					TEMPcompilerOpts: {
+						compilation_level: 'ADVANCED_OPTIMIZATIONS',
+						externs: packageFile['compile']['sdk']['externs'],
+						define: packageFile['compile']['sdk']['define'],
+						warning_level: 'QUIET',
+						variable_map_output_file: packageFile['compile']['sdk']['log'] + '/variable.map',
+						property_map_output_file: packageFile['compile']['sdk']['log'] + '/property.map',
+						create_source_map: map_file_path,
+						source_map_format: "V3"
+					},
+					src: packageFile['compile']['sdk']['src'],
+					dest: packageFile['compile']['sdk']['dst']
+				},
+				defines: {
+					TEMPcompilerOpts: {
+						compilation_level: 'SIMPLE_OPTIMIZATIONS',
+						warning_level: 'QUIET'
+					},
+					src: packageFile['compile']['defines']['src'],
+					dest: packageFile['compile']['defines']['dst']
 				}
-			  },
-			  defines: {
-				closureCompiler: toolsFile['closure_compiler'],
-				js: packageFile['compile']['defines']['src'],
-				output_file: packageFile['compile']['defines']['dst'],
-				options: {
-					compilation_level: 'SIMPLE_OPTIMIZATIONS',
-					warning_level: 'QUIET'
-				}
-			  }
 			},
 			create_map_file: {},
 			concat: concat_res,
@@ -237,7 +238,7 @@ module.exports = function(grunt) {
 		});
 	});
 	
-	grunt.registerTask('compile_sdk', 'compile_sdk_init closureCompiler concat replace clean');
+	grunt.registerTask('compile_sdk', ['compile_sdk_init', 'closureCompiler', 'concat', 'replace', 'clean']);
 	
 	grunt.registerTask('deploy_sdk_init', function() {
         grunt.initConfig({
@@ -246,7 +247,7 @@ module.exports = function(grunt) {
         });
     });
 	
-	grunt.registerTask('deploy_sdk', 'deploy_sdk_init copy');
+	grunt.registerTask('deploy_sdk', ['deploy_sdk_init', 'copy']);
 	 
 	grunt.registerTask('default', 'build_all_without_deploy');
 };
