@@ -2127,14 +2127,16 @@
 				t._addChars(String.fromCharCode(event.which));
 				if (t.textRender.getEndOfText() === t.cursorPos && !t.isFormula()) {
 					var s = t._getFragmentsText(t.options.fragments);
-					var arrAutoComplete = t._getAutoComplete(s.toLowerCase());
-					var lengthInput = s.length;
-					if (1 === arrAutoComplete.length) {
-						var newValue = arrAutoComplete[0];
-						var tmpCursorPos = t.cursorPos;
-						t._addChars(newValue.substring(lengthInput));
-						t.selectionBegin = tmpCursorPos;
-						t._selectChars(kEndOfText);
+					if (!isNumber(s)) {
+						var arrAutoComplete = t._getAutoComplete(s.toLowerCase());
+						var lengthInput = s.length;
+						if (1 === arrAutoComplete.length) {
+							var newValue = arrAutoComplete[0];
+							var tmpCursorPos = t.cursorPos;
+							t._addChars(newValue.substring(lengthInput));
+							t.selectionBegin = tmpCursorPos;
+							t._selectChars(kEndOfText);
+						}
 					}
 				}
 
