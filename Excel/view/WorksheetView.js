@@ -9992,7 +9992,7 @@
 				cell = this.model._getCellNoEmpty(row, col);
 				if (cell) {
 					value = cell.getValue();
-					if (!objValues.hasOwnProperty(value)) {
+					if (!isNumber(value) && !objValues.hasOwnProperty(value)) {
 						arrValues.push(value);
 						objValues[value] = 1;
 					}
