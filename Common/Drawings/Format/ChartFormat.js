@@ -3822,7 +3822,7 @@ CBubbleChart.prototype =
         History.Add(this, {Type:historyitem_BubbleChart_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
     },
-    AddSer: function(ser)
+    addSer: function(ser)
     {
         History.Add(this, {Type:historyitem_BubbleChart_AddSerie, newPr: ser});
         this.series.push(ser);
@@ -7196,6 +7196,7 @@ var BUILT_IN_UNIT_MILLIONS = 4;
 var BUILT_IN_UNIT_TEN_MILLIONS = 5;
 var BUILT_IN_UNIT_TEN_THOUSANDS = 6;
 var BUILT_IN_UNIT_TRILLIONS = 7;
+var BUILT_IN_UNIT_THOUSANDS = 8;
 
 var UNIT_MULTIPLIERS = [];
 UNIT_MULTIPLIERS[BUILT_IN_UNIT_BILLIONS]           = 1.0/1000000000.0;
