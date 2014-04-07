@@ -786,13 +786,7 @@
 
 		WorkbookView.prototype._onShowAutoComplete = function () {
 			var ws = this.getWorksheet();
-			var arrValues = [], objValues = {};
-			var range = ws.findCellAutoComplete(ws.activeRange.startCol, ws.activeRange.startRow, 1);
-			ws.getColValues(range, ws.activeRange.startCol, arrValues, objValues);
-			range = ws.findCellAutoComplete(ws.activeRange.startCol, ws.activeRange.startRow, -1);
-			ws.getColValues(range, ws.activeRange.startCol, arrValues, objValues);
-
-			arrValues.sort();
+			var arrValues = ws.getCellAutoCompleteValues(ws.activeRange.startCol, ws.activeRange.startRow);
 			console.log(arrValues);
 		};
 

@@ -86,6 +86,7 @@
 			this.input = input;
 			this.handlers = new asc_HL(handlers);
 			this.settings = $.extend(true, {}, this.defaults, settings);
+			this.options = {};
 
 			//---declaration---
 			this.canvasOuter = undefined;
@@ -136,6 +137,8 @@
 			
 			// Автоподстановка формул. Цвет селекта
 			this.formulaSelectorColor = "rgba(105, 119, 62, 0.2)";
+
+			this.objAutoComplete = {};
 
 			this._init();
 
@@ -305,6 +308,9 @@
 				t._hideCursor();
 				// hide
 				t.canvasOuterStyle.display = "none";
+
+				// delete autoComplete
+				this.objAutoComplete = {};
 
 				t.handlers.trigger("closed");
 				return true;
@@ -1596,55 +1602,20 @@
 					this.handlers.trigger("applyCloseEvent", event);
 			},
 
-			_getAutoString: function(str) {
-				var _this = this;
-				var api = asc["editor"];
-				if ( api.wb ) {
-					var ws = api.wb.getWorksheet();
-					if ( ws ) {
-						var editedCol = ws.getSelectedColumnIndex();
-						var editedRow = ws.getSelectedRowIndex();
-						
-						var isNumber = function(n) {
-							return !isNaN(parseFloat(n)) && isFinite(n);
-						}
-						
-						var findAutoString = function (col, row) {
-							var oString = null;
-							var _start = (_this.selectionBegin >= 0) ? _this.selectionBegin : _this.input.value.length;
-							var fixedText = _this.input.value.substring(0, _start);
-							var cellText = fixedText + str;
-							if ( !isNumber(cellText) ) {
-								var cellAddress = new CellAddress(row, col, 0);
-								var topCellText = ws.model.getCell(cellAddress).getValueWithFormat();
-								var start = topCellText.indexOf(cellText);
-								if ( topCellText && (start == 0) ) {
-									oString = {};
-									oString.text = topCellText.substring(fixedText.length, topCellText.length);
-									oString.selectionBegin = fixedText.length + 1;
-									oString.selectionEnd = topCellText.length;
-								}
-							}
-							return oString;
-						}
-						
-						var oAutoStringTop = null;
-						var oAutoStringBottom = null;
-						
-						// Check top cell
-						if ( editedRow - 1 >= 0 )
-							oAutoStringTop = findAutoString(editedCol, editedRow - 1);
-						// Check bottom cell
-						if ( ws.rows[editedRow + 1] && (editedRow + 1 >= 0) )
-							oAutoStringBottom = findAutoString(editedCol, editedRow + 1);
-						
-						if ( oAutoStringTop && !oAutoStringBottom )
-							return oAutoStringTop;
-						if ( !oAutoStringTop && oAutoStringBottom )
-							return oAutoStringBottom;
-					}
+			_getAutoComplete: function(str) {
+				// ToDo можно ускорить делая поиск каждый раз не в большом массиве, а в уменбшенном (по предыдущим символам)
+				var oLastResult = this.objAutoComplete[str];
+				if (oLastResult)
+					return oLastResult;
+
+				var arrAutoComplete = this.options.autoComplete;
+				var arrAutoCompleteLC = this.options.autoCompleteLC;
+				var i, length, arrResult = [];
+				for (i = 0, length = arrAutoCompleteLC.length; i < length; ++i) {
+					if (0 === arrAutoCompleteLC[i].indexOf(str))
+						arrResult.push(arrAutoComplete[i]);
 				}
-				return null;
+				return this.objAutoComplete[str] = arrResult;
 			},
 
 			_getFormulaList: function(str) {
@@ -2152,21 +2123,35 @@
 
 				//t.setFocus(true);
 				t.isUpdateValue = false;
-				t._removeFormulaSelector();
-				var oAutoString = t._getAutoString(String.fromCharCode(event.which));
-				var oFormulaList = t._getFormulaList(String.fromCharCode(event.which));
-				
-				if (oFormulaList) {
-					t._showFormulaSelector(oFormulaList);
+
+				t._addChars(String.fromCharCode(event.which));
+				if (t.textRender.getEndOfText() === t.cursorPos && !t.isFormula()) {
+					var s = t._getFragmentsText(t.options.fragments);
+					var arrAutoComplete = t._getAutoComplete(s.toLowerCase());
+					var lengthInput = s.length;
+					if (1 === arrAutoComplete.length) {
+						var newValue = arrAutoComplete[0];
+						var tmpCursorPos = t.cursorPos;
+						t._addChars(newValue.substring(lengthInput));
+						t.selectionBegin = tmpCursorPos;
+						t._selectChars(kEndOfText);
+					}
 				}
-				if ( oAutoString ) {
+
+				//t._removeFormulaSelector();
+				//var oFormulaList = t._getFormulaList(oNewChar);
+				
+				//if (oFormulaList) {
+				//	t._showFormulaSelector(oFormulaList);
+				//}
+				/*if ( oAutoString ) {
 					t._addChars(oAutoString.text);
 					t.selectionBegin = oAutoString.selectionBegin;
 					t.selectionEnd = oAutoString.selectionEnd;
 					t._drawSelection();
 				}
 				else
-					t._addChars(String.fromCharCode(event.which));
+					t._addChars(String.fromCharCode(event.which));*/
 					
 				return t.isTopLineActive ? true : false; // prevent event bubbling
 			},

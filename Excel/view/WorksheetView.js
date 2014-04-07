@@ -159,6 +159,8 @@
 
 		var kNewLine = "\n";
 
+		var kMaxAutoCompleteCellEdit = 20000;
+
 		function calcDecades(num) {
 			return Math.abs(num) < 10 ? 1 : 1 + calcDecades( asc_floor(num * 0.1) );
 		}
@@ -9927,18 +9929,26 @@
 				/*isCoord*/false, /*isSelectMode*/false);
 		};
 
-		/**
-		 * Ищет дополнение для ячейки (снизу или сверху)
-		 * @param col
-		 * @param row
-		 * @param step
-		 * @returns {asc_Range}
-		 */
-		WorksheetView.prototype.findCellAutoComplete = function (col, row, step) {
+		/* Ищет дополнение для ячейки */
+		WorksheetView.prototype.getCellAutoCompleteValues = function (col, row, maxCount) {
+			var arrValues = [], objValues = {};
+			var range = this.findCellAutoComplete(col, row, 1, maxCount);
+			this.getColValues(range, col, arrValues, objValues);
+			range = this.findCellAutoComplete(col, row, -1, maxCount);
+			this.getColValues(range, col, arrValues, objValues);
+
+			arrValues.sort();
+			return arrValues;
+		};
+
+		/* Ищет дополнение для ячейки (снизу или сверху) */
+		WorksheetView.prototype.findCellAutoComplete = function (col, row, step, maxCount) {
 			row += step;
-			var cell, end = 0 < step ? this.model.getRowsCount() - 1: 0, isEnd = true,
+			if (!maxCount)
+				maxCount = Number.MAX_VALUE;
+			var count = 0, cell, end = 0 < step ? this.model.getRowsCount() - 1: 0, isEnd = true,
 				colsCount = this.model.getColsCount(), range = new asc_Range(col, row, col, row);
-			for (; row * step <= end; row += step, isEnd = true) {
+			for (; row * step <= end && count < maxCount; row += step, isEnd = true, ++count) {
 				for (col = range.c1; col <= range.c2; ++col) {
 					cell = this.model._getCellNoEmpty(row, col);
 					if (cell && false === cell.isEmptyText()) {
@@ -9973,13 +9983,7 @@
 			return range.r1 <= range.r2 ? range : null;
 		};
 
-		/**
-		 * Формирует уникальный массив
-		 * @param range
-		 * @param col
-		 * @param arrValues
-		 * @param objValues
-		 */
+		/* Формирует уникальный массив */
 		WorksheetView.prototype.getColValues = function (range, col, arrValues, objValues) {
 			if (null === range)
 				return;
@@ -10271,6 +10275,9 @@
 					fragments.push(_fragmentsTmp[i].clone());
 			}
 
+			var arrAutoComplete = this.getCellAutoCompleteValues(col, row, kMaxAutoCompleteCellEdit);
+			var arrAutoCompleteLC = asc.arrayToLowerCase(arrAutoComplete);
+
 			editor.open({
 				cellX: t.cellsLeft + tc[!isMerged ? col : mc.c1].left - tc[vr.c1].left + offsetX,
 				cellY: t.cellsTop + tr[!isMerged ? row : mc.r1].top - tr[vr.r1].top + offsetY,
@@ -10287,6 +10294,8 @@
 				focus: isFocus,
 				isClearCell: isClearCell,
 				isHideCursor: isHideCursor,
+				autoComplete: arrAutoComplete,
+				autoCompleteLC: arrAutoCompleteLC,
 				saveValueCallback: function (val, flags, skipNLCheck) {
 					var oCellEdit = isMerged ? new asc_Range(mc.c1, mc.r1, mc.c1, mc.r1) : new asc_Range(col, row, col, row);
 					return t._saveCellValueAfterEdit(oCellEdit, c, val, flags, skipNLCheck, /*isNotHistory*/false);
