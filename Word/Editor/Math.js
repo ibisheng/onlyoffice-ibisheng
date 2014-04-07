@@ -160,8 +160,18 @@ ParaMath.prototype =
         oElem.relate(oParent);
         oElem.init(props);
 
+		var Pos = oParent.CurPos,
+				PosEnd = Pos + 1;
+		var items = new Array();
+		
         if (oParent)
+		{
             oParent.addElementToContent(oElem);
+
+			var element = new mathElem(oElem);
+			items.push(element);
+			History.Add(oParent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
+		}
 
     },
 
@@ -169,7 +179,7 @@ ParaMath.prototype =
     {
         this.CreateElem(oFraction, oParentElem, props);
 
-        var oElemDen = oFraction.getDenominator();
+        var oElemDen = oFraction.getDenominator();		
         this.AddText(oElemDen, sDenText);
 
         var oElemNum = oFraction.getNumerator();

@@ -8193,6 +8193,7 @@ function Binary_oMathReader(stream)
 		else if (c_oSer_OMathContentType.MRun === type)
         {
 			var oMRun = new ParaRun();
+			oMRun.bMathRun = true;
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathMRun(t,l,oMRun,props,oElem);
             });
