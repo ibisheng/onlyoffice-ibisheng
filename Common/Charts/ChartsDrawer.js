@@ -3146,7 +3146,7 @@ CChartsDrawer.prototype =
 						}
 						else
 						{
-							if(plotArea.valAx.scaling.orientation == ORIENTATION_MIN_MAX)
+							if((plotArea.valAx.scaling.orientation == ORIENTATION_MIN_MAX && this.calcProp.type != "Line") || (plotArea.catAx.scaling.orientation == ORIENTATION_MIN_MAX && this.calcProp.type == "Line"))
 								result = (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
 							else
 								result = - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
