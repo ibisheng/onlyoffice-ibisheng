@@ -11378,6 +11378,8 @@ CDocument.prototype =
     // Обновляем линейки
     Document_UpdateSelectionState : function()
     {
+        this.DrawingDocument.UpdateTargetTransform(null);
+        
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
