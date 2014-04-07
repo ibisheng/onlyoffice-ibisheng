@@ -4500,10 +4500,6 @@ CMathContent.prototype =
 
         if(bShiftKey)
         {
-            console.log("Start of select " + this.RealSelect.startPos);
-            console.log("End of select " + this.RealSelect.endPos);
-
-
             var pos = this.RealSelect.endPos - 1;
             var endSelect = this.changePosForMove(pos, -1);
 
@@ -4532,9 +4528,6 @@ CMathContent.prototype =
 
 
                 this.setEndPos_Selection(endSelect);
-
-                console.log("After move: start of select " + this.RealSelect.startPos);
-                console.log("After move: end of select " + this.RealSelect.endPos);
             }
 
         }
@@ -5264,6 +5257,7 @@ CMathContent.prototype =
         for(var i = 0; i < this.content.length; i++)
         {
             this.WidthToElement[i] = width;
+
             oSize = this.content[i].size;
 
             width += oSize.width;
@@ -7786,40 +7780,6 @@ CMathContent.prototype =
     },
     Set_SelectionContentPos: function(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag)
     {
-        /*
-         else
-         {
-             SelectContent = this;
-             var direction = (posStart < posEnd) ? 1 : -1;
-
-             if(posStart < this.content.length)
-             {
-                 if(this.content[posStart].value.typeObj === MATH_COMP )
-                 {
-                     if( direction == 1 )
-                        this.setStartPos_Selection( posStart - 1);
-                     else if( direction == -1 )
-                        this.setStartPos_Selection( posStart + 1);
-                 }
-                 else
-                     this.setStartPos_Selection(posStart);
-             }
-
-             if(posEnd < this.content.length)
-             {
-                 if(this.content[posEnd].value.typeObj === MATH_COMP )
-                 {
-                     if( direction == 1 )
-                        this.setEndPos_Selection(posEnd + 1);
-                     else if( direction == -1 )
-                        this.setEndPos_Selection(posEnd - 1);
-                 }
-                 else
-                    this.setEndPos_Selection(posEnd);
-             }
-         }
-        */
-
         var posStart, posEnd;
 
         switch(StartFlag)
@@ -7850,7 +7810,6 @@ CMathContent.prototype =
         this.SelectEndPos = posEnd;
         Depth++;
 
-
         if(this.IsPlaceholder())
         {
             this.SelectStartPos = 0;
@@ -7864,40 +7823,31 @@ CMathContent.prototype =
             }
             else
             {
-                this.content[posStart].Set_SelectionContentPos(StartContentPos, null, Depth, StartFlag, -1);
-                //this.content[posEnd].Set_SelectionContentPos(null, EndContentPos, Depth)
-
-                //случай с плейсхолдером рассмотрели выше
-                if(this.content[posEnd].typeObj !== MATH_COMP) // Para_Run
-                    this.content[posEnd].Set_SelectionContentPos(null, EndContentPos, Depth, 1, EndFlag);
-
-
-                /*if(this.content[posEnd].typeObj == MATH_COMP)
+                if(posStart > posEnd)
                 {
-                    var direction = (posStart < posEnd) ? 1 : -1;
+                    this.content[posStart].Set_SelectionContentPos(StartContentPos, null, Depth, StartFlag, 1);
 
-                    if( direction == 1 )
-                        this.SelectEndPos = posEnd + 1;
-                        //this.setEndPos_Selection(posEnd + 1);
-                    else if( direction == -1 )
-                        this.SelectEndPos = posEnd - 1;
-                        //this.setEndPos_Selection(posEnd - 1);
+                    //случай с плейсхолдером рассмотрели выше
+                    if(this.content[posEnd].typeObj == MATH_PARA_RUN)
+                        this.content[posEnd].Set_SelectionContentPos(null, EndContentPos, Depth, -1, EndFlag);
                 }
-                else // Para_Run
+                else
                 {
-                    this.content[posEnd].Set_SelectionContentPos(null, EndContentPos, Depth, 1, 0);
-                }*/
+                    this.content[posStart].Set_SelectionContentPos(StartContentPos, null, Depth, StartFlag, -1);
 
+                    //случай с плейсхолдером рассмотрели выше
+                    if(this.content[posEnd].typeObj == MATH_PARA_RUN)
+                        this.content[posEnd].Set_SelectionContentPos(null, EndContentPos, Depth, 1, EndFlag);
+                }
             }
         }
 
     },
     Selection_DrawRange: function(SelectionDraw)
     {
+
         if(this.SelectStartPos !== this.SelectEndPos)
         {
-            SelectionDraw.FindStart = false;
-
             var startPos = this.SelectStartPos,
                 endPos = this.SelectEndPos;
 
@@ -7908,52 +7858,62 @@ CMathContent.prototype =
                 endPos = temp;
             }
 
-            SelectionDraw.StartX += this.WidthToElement[startPos];
 
             if(this.content[startPos].typeObj === MATH_PARA_RUN)
+            {
+                SelectionDraw.StartX += this.pos.x + this.WidthToElement[startPos];
                 this.content[startPos].Selection_DrawRange(0, 0, SelectionDraw);
+                SelectionDraw.StartY = this.pos.y + this.Composition.absPos.y;
+            }
             else
             {
-                SelectionDraw.W += this.WidthToElement[startPos];
+                SelectionDraw.W += this.content[startPos].size.width;
                 SelectionDraw.StartX = this.pos.x + this.Composition.absPos.x + this.WidthToElement[startPos];
                 SelectionDraw.StartY = this.pos.y + this.Composition.absPos.y;
             }
 
-
             SelectionDraw.W += this.WidthToElement[endPos] - this.WidthToElement[startPos + 1]; // startPos < endPos
-            SelectionDraw.H = this.size.height;
+
 
             if(this.content[endPos].typeObj === MATH_PARA_RUN)
                 this.content[endPos].Selection_DrawRange(0, 0, SelectionDraw);
             else
-                SelectionDraw.W += this.WidthToElement[endPos];
+                SelectionDraw.W += this.content[endPos].size.width;
 
+            SelectionDraw.H = this.size.height;
 
+            SelectionDraw.FindStart = false;
         }
         else
         {
             var pos = this.SelectStartPos;
-            SelectionDraw.StartX += this.WidthToElement[pos];
+
 
             if(this.content[pos].typeObj === MATH_COMP)
             {
                 if(this.content[pos].IsSelectEmpty())
+                {
                     this.content[pos].Selection_DrawRange(SelectionDraw);
+                }
                 else
                 {
                     SelectionDraw.FindStart = false;
                     SelectionDraw.W = this.content[pos].size.width;
                     SelectionDraw.H = this.size.height;
 
-                    SelectionDraw.StartX = this.pos.x + this.Composition.absPos.x + this.WidthToElement[pos];
+                    SelectionDraw.StartX += this.pos.x + this.WidthToElement[pos];
                     SelectionDraw.StartY = this.pos.y + this.Composition.absPos.y;
 
                 }
             }
             else if(this.content[pos].typeObj === MATH_PARA_RUN)
+            {
+                SelectionDraw.StartX += this.pos.x + this.WidthToElement[pos];
+
                 this.content[pos].Selection_DrawRange(0, 0, SelectionDraw);
-
-
+                SelectionDraw.H = this.size.height;
+                SelectionDraw.StartY = this.pos.y + this.Composition.absPos.y;
+            }
 
         }
     },
@@ -9046,15 +9006,6 @@ CMathComposition.prototype =
     },
     RecalculateComposition:  function(oMeasure, TextPr) // textPrp в тестовом режиме, просто отрисуем с ними формулу
     {
-        /*console.log("SIGN_GAP: " + SIGN_GAP);
-        console.log("RADICAL_GAP: " + RADICAL_GAP);
-        console.log("RADICAL_H0: " + RADICAL_H0);
-        console.log("RADICAL_H1: " + RADICAL_H1);
-        console.log("RADICAL_H2: " + RADICAL_H2);
-        console.log("RADICAL_H3: " + RADICAL_H3);
-        console.log("RADICAL_H4: " + RADICAL_H4);
-        console.log("RADICAL_H5: " + RADICAL_H5);*/
-
         this.Resize(oMeasure); // пересчитываем всю формулу
 
         var width = this.Root.size.width,
@@ -9068,8 +9019,6 @@ CMathComposition.prototype =
             y = Y - this.absPos.y;
 
         this.Root.selection_Start(x, y);
-
-        //console.log("X: " + X, "Y: " + Y);
     },
     Selection_SetEnd: function(X, Y, PageNum, MouseEvent)
     {

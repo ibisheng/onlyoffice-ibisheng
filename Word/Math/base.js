@@ -1355,7 +1355,7 @@ CMathBase.prototype =
 
         var endX, endY;
 
-        if(EndFlag !== -1)
+        if(EndFlag === 0)
         {
             endX = EndContentPos.Get(Depth);
             endY = EndContentPos.Get(Depth + 1);

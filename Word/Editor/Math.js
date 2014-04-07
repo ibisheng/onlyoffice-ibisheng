@@ -626,7 +626,6 @@ ParaMath.prototype =
 
         if ( EndPos >= 1 && CurrentRun == true)
         {
-            //result =  this.Root.update_Cursor(_CurPage, UpdateCurPos, UpdateTarget);
             result = this.Root.Recalculate_CurPos(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
         }
 
@@ -785,24 +784,16 @@ ParaMath.prototype =
 
         // Проверяем, попали ли мы в формулу
 
-        //var Dx = this.Math.Size.WidthVisible;
         var Dx = this.Root.size.width;
         var D = SearchPos.X - SearchPos.CurX;
         var Diff = Math.abs(D) < Math.abs(D + Dx) ? Math.abs(D) : Math.abs(D + Dx);
-        //var Diff = SearchPos.X - SearchPos.CurX;
 
         var CurX = SearchPos.CurX;
-        //console.log("CurX :"+ SearchPos.CurX );
 
         if(Math.abs(Diff) < SearchPos.DiffX + 0.001 )
         {
-
-            //console.log(SearchPos.X);
             var X = SearchPos.X,
                 Y = SearchPos.Y;
-
-            var str = "X: "+ SearchPos.X + "; " + "Y: " + SearchPos.Y;
-            //console.log(str);
 
 
             SearchPos.X -= this.Math.absPos.x;
@@ -812,29 +803,9 @@ ParaMath.prototype =
 
             this.Root.Get_ParaContentPosByXY(SearchPos, Depth);
 
-            //console.log(SearchPos.X);
-
-            /*var str = "";
-
-            for(var i = 0; i < SearchPos.Pos.length; i++)
-            {
-                str += SearchPos.Pos[i] + " ;";
-            }
-            console.log(str);*/
-
             SearchPos.X = X;
             SearchPos.Y = Y;
 
-            str = "X: "+ SearchPos.X + "; " + "Y: " + SearchPos.Y;
-
-            //console.log(str);
-            /*console.log("X; " + SearchPos.X);
-            console.log("Y: " + SearchPos.Y);*/
-
-
-            //this.Math.Selection_SetStart(SearchPos.X, SearchPos.Y);
-            //this.Math.Selection_SetEnd(SearchPos.X, SearchPos.Y);
-            //this.Math.Root.get_ParaContentPos(false, SearchPos.Pos);
 
             Result = true;
             if ( D >= - 0.001 && D <= Dx + 0.001 )
@@ -846,12 +817,6 @@ ParaMath.prototype =
         }
 
         SearchPos.CurX = CurX + Dx;
-
-
-        var CX = SearchPos.CurX - Dx;
-
-       /* if ( 1 === Flag )
-            console.log("CurX :"+ SearchPos.CurX );*/
 
 
         return Result;
@@ -868,14 +833,6 @@ ParaMath.prototype =
     Set_ParaContentPos : function(ContentPos, Depth) // выставить логическую позицию в контенте
     {
         // TODO: ParaMath.Set_ParaContentPos
-
-        /*var str = "";
-
-        for(var i = 0; i < ContentPos.length; i++)
-        {
-            str += ContentPos[i] + " ;";
-        }
-        console.log(str);*/
 
         var Pos = ContentPos.Get(Depth);
         this.State.ContentPos = Pos;
@@ -950,38 +907,6 @@ ParaMath.prototype =
 
         this.Root.Set_SelectionContentPos(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag);
 
-        /*this.SelectContent = this.RootComposition;
-
-        switch (StartFlag)
-        {
-            case  1:
-                this.RootComposition.setLogicalPosition(1);
-                break;
-            case -1:
-                this.RootComposition.setLogicalPosition(this.RootComposition.length - 1);
-                break;
-            case  0:
-                this.RootComposition.set_StartSelectContent(StartContentPos, Depth);
-                break;
-        }
-
-        switch (EndFlag)
-        {
-            case  1:
-                this.RootComposition.set_SelectEndExtreme(false);
-                break;
-            case -1:
-                this.RootComposition.set_SelectEndExtreme(true);
-                break;
-            case  0:
-                var result = this.RootComposition.set_EndSelectContent(EndContentPos, Depth);
-                this.SelectContent  = result.SelectContent;
-                break;
-        }*/
-
-        /*if(!this.SelectContent.selectUse())
-            this.CurrentContent = this.SelectContent;*/
-
         this.bSelectionUse = true;
     },
 
@@ -1022,26 +947,18 @@ ParaMath.prototype =
             {
             // TODO: ParaMath.Selection_Draw_Range
 
-                if(SelectionDraw.FindStart == true)
-                {
-                    /*if(this.SelectContent.selectUse())
-                    {
-                        SelectionDraw.FindStart = false;
-                        this.SelectContent.drawSelect(SelectionDraw);
-                    }*/
 
-                    this.Root.Selection_DrawRange(SelectionDraw);
-                }
-                else
-                {
-                    if(this.Root.selectUse())
-                        SelectionDraw.W += this.Root.size.width;
-                }
+                this.Root.Selection_DrawRange(SelectionDraw);
+
             }
             else
             {
+                console.log(SelectionDraw.FindStart);
+
                 if ( true === SelectionDraw.FindStart )
+                {
                     SelectionDraw.StartX += this.Width;
+                }
             }
 
         }
