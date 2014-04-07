@@ -6951,7 +6951,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         var oCurContainer = oParStruct.cur.elem;
         if (c_oSerParType.Run === type)
         {
-            var oNewRun = new ParaRun(oParStruct.paragraph);
+            var oNewRun = new ParaRun(oParStruct.paragraph, true);
             var oRes = { bRes: true };
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadRun(t, l, oNewRun, oParStruct, oRes);
@@ -8192,8 +8192,7 @@ function Binary_oMathReader(stream)
         }
 		else if (c_oSer_OMathContentType.MRun === type)
         {
-			var oMRun = new ParaRun();
-			oMRun.bMathRun = true;
+			var oMRun = new ParaRun(null, true);
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathMRun(t,l,oMRun,props,oElem);
             });
