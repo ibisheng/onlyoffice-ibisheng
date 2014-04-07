@@ -55,9 +55,9 @@ CNary.prototype.init = function(props)
         var bIntegral = signCode > 0x222A && signCode < 0x2231;
 
         if(bIntegral)
-            this.limLoc =  this.Composition.props.intLim;
+            this.limLoc =  this.Parent.Composition.props.intLim;
         else
-            this.limLoc = this.Composition.props.naryLim;
+            this.limLoc = this.Parent.Composition.props.naryLim;
     }
 
 
@@ -530,8 +530,6 @@ CNaryOperator.prototype.recalculateSize = function()
     var height = this.sizeGlyph.height,
         width =  this.sizeGlyph.width,
         ascent = this.sizeGlyph.height/2 + DIV_CENT*this.getCtrPrp().FontSize;
-
-    width += this.GapLeft + this.GapRight;
 
     this.size = {height: height, width: width, ascent: ascent};
 }
