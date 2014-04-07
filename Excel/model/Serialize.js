@@ -5607,7 +5607,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
     };
     this.ReadDrawings = function(type, length, aDrawings, wsId)
     {
-        var res = c_oSerConstants.ReadOk;
+        /*var res = c_oSerConstants.ReadOk;
         var oThis = this;
         if ( c_oSerWorksheetsTypes.Drawing == type )
         {
@@ -5628,8 +5628,8 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 				aDrawings.push(oNewDrawing);
 			}
         }
-        else
-            res = c_oSerConstants.ReadUnknown;
+        else*/
+            var res = c_oSerConstants.ReadUnknown;
         return res;
     };
     this.ReadDrawing = function(type, length, oDrawing, oFlags)
