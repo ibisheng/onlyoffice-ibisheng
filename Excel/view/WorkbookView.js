@@ -386,8 +386,7 @@
 			    this.cellEditor = new asc_CE(this.element, this.input, this.fmgrGraphics, this.m_oFont,
 					    /*handlers*/{
 						    "closed"   : function () {self._onCloseCellEditor.apply(self, arguments);},
-						    "updated"  : function () {self.handlers.trigger.apply(self.handlers,
-							    ["asc_onCellTextChanged"].concat(Array.prototype.slice.call(arguments)));},
+						    "updated"  : function () {self._onUpdateCellEditor.apply(self, arguments);},
 						    "gotFocus" : function (hasFocus) {self.controller.setFocus(!hasFocus);},
 						    "copy"     : function () {self.copyToClipboard.apply(self, arguments);},
 						    "paste"    : function () {self.pasteFromClipboard.apply(self, arguments);},
@@ -1323,6 +1322,11 @@
 			if (this.cellEditor.hasFocus) {
 				this.cellEditor.restoreFocus();
 			}
+		};
+
+		WorkbookView.prototype._onUpdateCellEditor = function (text, cursorPosition, isFormula, formulaPos, formulaName) {
+			// ToDo добавить вывод окна для формулы (список формул должен всегда лежать в переменной, сделанной на инициализации)
+			// Еще для ускорения можно завести объект, куда класть результаты поиска по формулам и второй раз не искать.
 		};
 
 		// Вставка формулы в редактор

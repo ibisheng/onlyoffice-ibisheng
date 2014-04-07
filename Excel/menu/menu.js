@@ -477,8 +477,6 @@
 
 	api.asc_registerCallback("asc_onActiveSheetChanged", onActiveSheetChanged);
 
-	//api.asc_registerCallback("asc_onCellTextChanged", function(){console.log(arguments)});
-
 	api.asc_registerCallback("asc_onConfirmAction", function(){
 		var arg = arguments;
 		$("#ConfirmMess")
