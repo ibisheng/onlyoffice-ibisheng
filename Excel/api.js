@@ -2959,7 +2959,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			asc_getFormulasInfo: function () {
-				return getFormulasInfo();
+				return this.wb.getFormulasInfo();
 			},
 
 			asc_recalc : function(isRecalcWB){

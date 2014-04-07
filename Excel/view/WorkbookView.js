@@ -84,6 +84,8 @@
 			this.cellEditor = undefined;
 			this.fontRenderingMode = null;
 
+			this.formulasList = null;	// Список всех формул
+
 			this._lockDraw = false;
 
 			// Фонт, который выставлен в DrawingContext, он должен быть один на все DrawingContext-ы
@@ -422,6 +424,8 @@
 
 			this.clipboard.Api = this.Api;
 			this.clipboard.init();
+
+			this.formulasList = getFormulasInfo();
 
             if (this.Api.isMobileVersion){
                 this.MobileTouchManager = new CMobileTouchManager();
@@ -1248,6 +1252,10 @@
 				// ToDo не должно происходить ничего, но нам приходит resize сверху
 				this.showWorksheet(undefined, true);
 			}
+		};
+
+		WorkbookView.prototype.getFormulasInfo = function () {
+			return this.formulasList;
 		};
 
 		// Получаем свойство: редактируем мы сейчас или нет
