@@ -1253,7 +1253,7 @@
 			$("#td_Formulas").removeClass("iconPressed");
 			$("#formulaList1").hide();
 			$("#formulaList2").hide();
-				$("#formulaMore").dialog("open");
+			$("#formulaMore").dialog("open");
 			return;
 		}
 		$("#formulaMore").dialog("close");
