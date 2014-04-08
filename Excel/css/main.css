@@ -157,3 +157,6 @@
     overflow: hidden;
     white-space: nowrap;
 }
+#apiPopUpList li:hover {
+    background-color: rgba(105, 119, 62, 0.2);
+}

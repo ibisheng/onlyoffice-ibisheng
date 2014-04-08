@@ -50,18 +50,7 @@
 				} else
 					item.innerHTML = arrItems[i];
 
-				/*item.onmouseover = function(e) {
-					var nodes = combo.childNodes;
-					for ( var i = 0; i < nodes.length; i++ ) {
-						if ( nodes[i].style["backgroundColor"] != "" ) {
-							nodes[i].style["backgroundColor"] = "";
-						}
-					}
-					this.style["backgroundColor"] = _this.formulaSelectorColor;
-				}
-				item.onmouseout = function(e) {
-					this.style["backgroundColor"] = "";
-				}
+				/*
 				item.ondblclick = function(e) {
 					if ( e && (e.button === 0) ) {
 						var formulaName = this.innerText || this.textContent;
