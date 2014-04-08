@@ -575,6 +575,20 @@ var c_oSer_SheetView = {
 
 	Pane						: 19
 };
+var c_oSer_DrawingType =
+{
+    Type: 0,
+    From: 1,
+    To: 2,
+    Pos: 3,
+    Pic: 4,
+    PicSrc: 5,
+    GraphicFrame: 6,
+    Chart: 7,
+    Ext: 8,
+    pptxDrawing: 9,
+    Chart2: 10
+};
 /** @enum */
 var c_oSer_Pane = {
 	ActivePane	: 0,
@@ -2725,14 +2739,17 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
             // this.bs.WriteItem(c_oSer_DrawingType.Pos, function(){oThis.WritePos(oDrawing.Pos);});
 		if (oDrawing.isChart())
 		{
-			var oBinaryChartWriter = new BinaryChartWriter(this.memory);
-			this.bs.WriteItem(c_oSer_DrawingType.GraphicFrame, function(){oBinaryChartWriter.Write(oDrawing.graphicObject);});
+			this.bs.WriteItem(c_oSer_DrawingType.GraphicFrame, function () { oThis.WriteGraphicFrame(oDrawing); });
 		}
 		else if(curDrawing)
 			this.bs.WriteItem(c_oSer_DrawingType.pptxDrawing, function(){window.global_pptx_content_writer.WriteDrawing(oThis.memory, curDrawing, null, null, null);});
 		else
 			this.bs.WriteItem(c_oSer_DrawingType.pptxDrawing, function(){window.global_pptx_content_writer.WriteDrawing(oThis.memory, oDrawing.graphicObject, null, null, null);});
     };
+    this.WriteGraphicFrame = function (oDrawing) {
+        var oBinaryChartWriter = new BinaryChartWriter(this.memory);
+        this.bs.WriteItem(c_oSer_DrawingType.Chart2, function () { oBinaryChartWriter.WriteCT_ChartSpace(oDrawing.graphicObject); });
+    }
     this.WriteFromTo = function(oFromTo)
     {
         if(null != oFromTo.col)
@@ -5679,12 +5696,9 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 		/** proprietary begin **/
 		else if ( c_oSer_DrawingType.GraphicFrame == type )
         {
-			var oNewGraphicObject = new CChartAsGroup();
-            oNewGraphicObject.setAscChart(new asc_CChart());
-			var oBinary_ChartReader = new Binary_ChartReader(this.stream,  oNewGraphicObject.chart,  oNewGraphicObject);
-			res = oBinary_ChartReader.Read(length);
-			if(null != oNewGraphicObject.chart.range.interval && oNewGraphicObject.chart.range.interval.length > 0)
-				oDrawing.graphicObject = oNewGraphicObject;
+		    res = this.bcr.Read1(length, function (t, l) {
+		        return oThis.ReadGraphicFrame(t, l, oDrawing);
+		    });
         }
 		/** proprietary end **/
 		else if ( c_oSer_DrawingType.pptxDrawing == type )
@@ -5696,6 +5710,19 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 				oGraphicObject.setDrawingBase(oDrawing);
 			}
 		}
+        else
+            res = c_oSerConstants.ReadUnknown;
+        return res;
+    };
+    this.ReadGraphicFrame = function (type, length, oDrawing) {
+        var res = c_oSerConstants.ReadOk;
+        var oThis = this;
+        if (c_oSer_DrawingType.Chart2 == type) {
+            var oNewChartSpace = new CChartSpace();
+            var oBinaryChartReader = new BinaryChartReader(this.stream);
+            res = oBinaryChartReader.ExternalReadCT_ChartSpace(length, oNewChartSpace);
+            oDrawing.graphicObject = oNewChartSpace;
+        }
         else
             res = c_oSerConstants.ReadUnknown;
         return res;

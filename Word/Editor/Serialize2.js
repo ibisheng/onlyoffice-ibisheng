@@ -316,7 +316,8 @@ var c_oSerImageType2 = {
 	WrapTight: 21,
 	WrapTopAndBottom: 22,
 	Chart: 23,
-	ChartImg: 24
+	ChartImg: 24,
+	Chart2: 25
 };
 var c_oSerEffectExtent = {
 	Left: 0,
@@ -7589,22 +7590,13 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			var grObject = window.global_pptx_content_loader.ReadDrawing(this, this.stream, this.Document, oParaDrawing);
             oParaDrawing.Set_GraphicObject(grObject);
 		}
-		else if( c_oSerImageType2.Chart === type )
+		else if( c_oSerImageType2.Chart2 === type )
         {
-			var oNewGraphicObj = new CChartAsGroup();
-            if(g_oTableId)
-                g_oTableId.m_bTurnOff = true;
-			var chart = new asc_CChart();
-            if(g_oTableId)
-                g_oTableId.m_bTurnOff = false;
-			var oBinary_ChartReader = new Binary_ChartReader(this.stream, chart, oNewGraphicObj);
-			oBinary_ChartReader.ReadExternal(length);
-			if(null != chart.range.interval && chart.range.interval.length > 0)
-			{
-				oNewGraphicObj.setAscChart(chart);
-				//oNewGraphicObj.setChart(chart, true);
-				oParaDrawing.Set_GraphicObject(oNewGraphicObj);
-			}
+			res = c_oSerConstants.ReadUnknown;
+			// var oNewChartSpace = new CChartSpace();
+            // var oBinaryChartReader = new BinaryChartReader(this.stream);
+            // res = oBinaryChartReader.ExternalReadCT_ChartSpace(length, oNewChartSpace);
+			// oParaDrawing.Set_GraphicObject(oNewChartSpace);
 		}
 		else if( c_oSerImageType2.AllowOverlap === type )
 			var AllowOverlap = this.stream.GetBool();

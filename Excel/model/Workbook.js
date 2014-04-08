@@ -1987,31 +1987,6 @@ Woorksheet.prototype.init=function(){
 	}
 };
 Woorksheet.prototype.initPostOpen = function(){
-	//chart
-	if(null != this.Drawings)
-	{
-		var oThis = this;
-		for(var i = this.Drawings.length - 1; i >= 0; --i)
-		{
-			var obj = this.Drawings[i];
-			if(obj.graphicObject && obj.graphicObject.chart)
-			{
-				var chart = obj.graphicObject.chart;
-				if(chart.range.interval)
-				{
-					var oRefParsed = parserHelp.parse3DRef(chart.range.interval);
-					if (null !== oRefParsed) {
-						// Получаем sheet по имени
-						var ws = oThis.workbook.getWorksheetByName (oRefParsed.sheet);
-						if (ws)
-							chart.range.intervalObject = ws.getRange2(oRefParsed.range);
-					}
-				}
-				if(null == chart.range.intervalObject)
-					this.Drawings.splice(i, 1);
-			}
-		}
-	}
 	if (!this.PagePrintOptions) {
 		// Даже если не было, создадим
 		this.PagePrintOptions = new Asc.asc_CPageOptions();

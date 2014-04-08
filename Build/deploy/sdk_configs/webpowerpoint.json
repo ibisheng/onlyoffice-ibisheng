@@ -48,6 +48,7 @@
                 "../../Common/Charts/DrawingObjects.js",
                 "../../Common/commonDefines.js",
                 "../../Common/SerializeCommonWordExcel.js",
+				"../../Common/SerializeChart.js",
                 "../../Word/Editor/Serialize2.js",
                 "../../Common/Charts/charts.js",
                 "../../Excel/graphics/DrawingContextWord.js",

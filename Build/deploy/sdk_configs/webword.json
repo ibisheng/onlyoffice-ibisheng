@@ -38,6 +38,7 @@
                 "../../Common/Shapes/Serialize.js",
                 "../../Common/Shapes/SerializeWriter.js",
                 "../../Common/SerializeCommonWordExcel.js",
+				"../../Common/SerializeChart.js",
                 "../../Common/Drawings/Format/Constants.js",
                 "../../Common/Drawings/Format/Format.js",
                 "../../Common/trackFile.js",

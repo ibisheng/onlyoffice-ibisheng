@@ -79,6 +79,7 @@
                 "../../Common/Shapes/Serialize.js",
                 "../../Common/Shapes/SerializeWriter.js",
                 "../../Common/SerializeCommonWordExcel.js",
+				"../../Common/SerializeChart.js",
                 "../../Common/Charts/libraries/OfficeExcel.common.core.js",
                 "../../Common/Charts/libraries/OfficeExcel.common.key.js",
                 "../../Common/Charts/libraries/OfficeExcel.bar.js",
