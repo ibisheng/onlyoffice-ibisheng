@@ -76,12 +76,12 @@ function RateIteration( nper, payment, pv, fv, payType, guess ) {
         if ( a == b )
             return true;
         var x = a - b;
-//        return (x < 0 ? -x : x) < ( (a < 0 ? -a : a) * (1.0 / (16777216.0 * 16777216.0)));
+//        return (x < 0 ? -x : x) < ( (a < 0 ? -a : a) * (1 / (16777216 * 16777216)));
         return Math.abs(x) < ( Math.abs(a) * (1 / (16777216 * 16777216) ) ) ;
     }
 
     var bValid = true, bFound = false, fX, fXnew, fTerm, fTermDerivation, fGeoSeries, fGeoSeriesDerivation;
-    var iterationMax = 150, nCount = 0, minEps = 1.0E-14, eps = 1.0E-7;
+    var iterationMax = 150, nCount = 0, minEps = 1E-14, eps = 1E-7;
     fv = fv - payment * payType;
     pv = pv + payment * payType;
     if ( nper == Math.round( nper ) ) {
@@ -230,7 +230,7 @@ function getYield( settle, mat, coup, price, redemp, freq, base ) {
         else if ( price == priceN )
             return yieldN;
         else if ( price < price2 ) {
-            yield2 *= 2.0;
+            yield2 *= 2;
             price2 = getprice( settle, mat, rate, yield2, redemp, freq, base );
 
             yieldN = ( yield2 - yield1 ) * 0.5;
@@ -699,15 +699,15 @@ cAMORDEGRC.prototype.Calculate = function ( arg ) {
         fRestVal = salvage.getValue(),
         nPer = period.getValue()
 
-    var fUsePer = 1.0 / fRate,
+    var fUsePer = 1 / fRate,
         fAmorCoeff;
 
-    if ( fUsePer < 3.0 )
-        fAmorCoeff = 1.0;
-    else if ( fUsePer < 5.0 )
+    if ( fUsePer < 3 )
+        fAmorCoeff = 1;
+    else if ( fUsePer < 5 )
         fAmorCoeff = 1.5;
-    else if ( fUsePer <= 6.0 )
-        fAmorCoeff = 2.0;
+    else if ( fUsePer <= 6 )
+        fAmorCoeff = 2;
     else
         fAmorCoeff = 2.5;
 
@@ -725,7 +725,7 @@ cAMORDEGRC.prototype.Calculate = function ( arg ) {
         fNRate = Math.round( fRate * fCost );
         fRest -= fNRate;
 
-        if ( fRest < 0.0 ) {
+        if ( fRest < 0 ) {
             switch ( nPer - n ) {
                 case 0:
                 case 1:
@@ -861,7 +861,7 @@ cAMORLINC.prototype.Calculate = function ( arg ) {
     else if ( nPer == nNumOfFullPeriods + 1 )
         return this.value = new cNumber( fCostDelta - fOneRate * nNumOfFullPeriods - f0Rate );
     else
-        return this.value = new cNumber( 0.0 );
+        return this.value = new cNumber( 0 );
 
 }
 cAMORLINC.prototype.getInfo = function () {
@@ -1565,9 +1565,9 @@ cCUMPRINC.prototype.Calculate = function ( arg ) {
     if ( nStartPer < 1 || nEndPer < nStartPer || nEndPer < 1 || fRate <= 0 || nNumPeriods <= 0 || fVal <= 0 || ( nPayType != 0 && nPayType != 1 ) )
         return this.value = new cError( cErrorType.not_numeric );
 
-    fRmz = getPMT( fRate, nNumPeriods, fVal, 0.0, nPayType );
+    fRmz = getPMT( fRate, nNumPeriods, fVal, 0, nPayType );
 
-    fKapZ = 0.0;
+    fKapZ = 0;
 
     var nStart = nStartPer;
     var nEnd = nEndPer;
@@ -1616,17 +1616,17 @@ function cDB() {
 }
 cDB.prototype = Object.create( cBaseFunction.prototype )
 cDB.prototype.Calculate = function ( arg ) {
-    var cast = arg[0],
+    var cost = arg[0],
         salvage = arg[1],
         life = arg[2],
         period = arg[3],
         month = arg[4] && !(arg[4] instanceof cEmpty) ? arg[4] : new cNumber( 12 );
 
-    if ( cast instanceof cArea || cast instanceof cArea3D ) {
-        cast = cast.cross( arguments[1].first );
+    if ( cost instanceof cArea || cost instanceof cArea3D ) {
+        cost = cost.cross( arguments[1].first );
     }
-    else if ( cast instanceof cArray ) {
-        cast = cast.getElementRowCol( 0, 0 );
+    else if ( cost instanceof cArray ) {
+        cost = cost.getElementRowCol( 0, 0 );
     }
 
     if ( salvage instanceof cArea || salvage instanceof cArea3D ) {
@@ -1657,31 +1657,30 @@ cDB.prototype.Calculate = function ( arg ) {
         month = month.getElementRowCol( 0, 0 );
     }
 
-    cast = cast.tocNumber();
+    cost = cost.tocNumber();
     salvage = salvage.tocNumber();
     life = life.tocNumber();
     period = period.tocNumber();
     month = month.tocNumber();
 
-    if ( cast instanceof cError ) return this.value = cast;
+    if ( cost instanceof cError ) return this.value = cost;
     if ( salvage instanceof cError ) return this.value = salvage;
     if ( life instanceof cError ) return this.value = life;
     if ( period instanceof cError ) return this.value = period;
     if ( month instanceof cError ) return this.value = month;
 
-    cast = cast.getValue();
+    cost = cost.getValue();
     salvage = salvage.getValue();
     life = life.getValue();
     period = period.getValue();
     month = month.getValue();
 
-    if ( month < 1 || month > 12 || life > 1200 || salvage < 0 ||
-        period > (life + 1) || salvage > cast || cast < 0 ) {
+    if ( month < 1 || month > 12 || salvage <= 0 || life < 0 || period < 0 || cost < 0 ) {
         return this.value = new cError( cErrorType.wrong_value_type );
     }
-    var nAbRate = 1 - Math.pow( salvage / cast, 1 / life );
+    var nAbRate = 1 - Math.pow( salvage / cost, 1 / life );
     nAbRate = Math.floor( (nAbRate * 1000) + 0.5 ) / 1000;
-    var nErsteAbRate = cast * nAbRate * month / 12;
+    var nErsteAbRate = cost * nAbRate * month / 12;
 
     var res = 0;
     if ( Math.floor( period ) == 1 )
@@ -1691,11 +1690,11 @@ cDB.prototype.Calculate = function ( arg ) {
         if ( nMin > period ) nMin = period;
         var iMax = Math.floor( nMin );
         for ( var i = 2; i <= iMax; i++ ) {
-            res = (cast - nSummAbRate) * nAbRate;
+            res = (cost - nSummAbRate) * nAbRate;
             nSummAbRate += res;
         }
         if ( period > life )
-            res = ((cast - nSummAbRate) * nAbRate * (12 - month)) / 12;
+            res = ((cost - nSummAbRate) * nAbRate * (12 - month)) / 12;
     }
 
     this.value = new cNumber( res );
@@ -1786,13 +1785,11 @@ cDDB.prototype.Calculate = function ( arg ) {
     period = period.getValue();
     factor = factor.getValue();
 
-    if (cost < 0.0 || salvage < 0.0 || factor <= 0.0 || salvage > cost || period < 1.0 || period > life) {
+    if ( cost <= 0 || salvage < 0 || factor <= 0 || life<=0 || period <= 0 ) {
         return this.value = new cError( cErrorType.wrong_value_type );
     }
 
-    var res = getDDB(cost, salvage, life, period, factor);
-
-    this.value = new cNumber( res );
+    this.value = new cNumber( getDDB(cost, salvage, life, period, factor) );
     return this.value;
 
 }
@@ -1877,7 +1874,7 @@ cDISC.prototype.Calculate = function ( arg ) {
     if ( settlement.getValue() >= maturity.getValue() || pr.getValue() <= 0 || redemption.getValue() <= 0 || basis.getValue() < 0 || basis.getValue() > 4 )
         return this.value = new cError( cErrorType.not_numeric );
 
-    var res = ( 1.0 - pr.getValue() / redemption.getValue() ) / yearFrac( Date.prototype.getDateFromExcel( settlement.getValue() ), Date.prototype.getDateFromExcel( maturity.getValue() ), basis.getValue() )
+    var res = ( 1 - pr.getValue() / redemption.getValue() ) / yearFrac( Date.prototype.getDateFromExcel( settlement.getValue() ), Date.prototype.getDateFromExcel( maturity.getValue() ), basis.getValue() )
 
     this.value = new cNumber( res );
     this.value.numFormat = 9;
@@ -2518,14 +2515,13 @@ cIPMT.prototype.Calculate = function ( arg ) {
 
     var res;
 
-    if ( per < 1 || per > nper ){
+    if ( per < 1 || per > nper || type != 0 && type != 1 ){
         return this.value = new cError( cErrorType.wrong_value_type );
     }
 
     res = getPMT(rate, nper, pv, fv, type);
-    res = getIPMT(rate, per, pv, type, res);
 
-    this.value = new cNumber( res );
+    this.value = new cNumber( getIPMT(rate, per, pv, type, res) );
 //    this.value.numFormat = 9;
     return this.value;
 }
@@ -2559,7 +2555,7 @@ cIRR.prototype.Calculate = function ( arg ) {
     function irr( arr, x ) {
         x = x.getValue();
 
-        var nC = 0, g_Eps = 1e-7, fEps = 1.0, fZ = 0, fN = 0, xN = 0, nIM = 100, nMC = 0, arr0 = arr[0], arrI, wasNegative = false, wasPositive = false;
+        var nC = 0, g_Eps = 1e-7, fEps = 1, fZ = 0, fN = 0, xN = 0, nIM = 100, nMC = 0, arr0 = arr[0], arrI, wasNegative = false, wasPositive = false;
 
         if ( arr0 instanceof cError ) {
             return new cError( cErrorType.not_available );
@@ -2576,7 +2572,7 @@ cIRR.prototype.Calculate = function ( arg ) {
             nC = 0;
             fZ = 0;
             fN = 0;
-            fZ += arr0.getValue() / Math.pow( 1.0 + x, nC );
+            fZ += arr0.getValue() / Math.pow( 1 + x, nC );
             fN += -nC * arr0.getValue() / Math.pow( 1 + x, nC + 1 );
             nC++;
             for ( var i = 1; i < arr.length; i++ ) {
@@ -2584,7 +2580,7 @@ cIRR.prototype.Calculate = function ( arg ) {
                     return new cError( cErrorType.not_available );
                 }
                 arrI = arr[i].getValue()
-                fZ += arrI / Math.pow( 1.0 + x, nC );
+                fZ += arrI / Math.pow( 1 + x, nC );
                 fN += -nC * arrI / Math.pow( 1 + x, nC + 1 );
                 if ( arrI < 0 )
                     wasNegative = true;
@@ -2694,7 +2690,7 @@ cISPMT.prototype.Calculate = function ( arg ) {
     if ( nper instanceof cError ) return this.value = nper;
     if ( pv instanceof cError ) return this.value = pv;
 
-    return this.value = new cNumber( pv.getValue() * rate.getValue() * (per.getValue() / nper.getValue() - 1.0) );
+    return this.value = new cNumber( pv.getValue() * rate.getValue() * (per.getValue() / nper.getValue() - 1) );
 }
 cISPMT.prototype.getInfo = function () {
     return {
@@ -2832,7 +2828,7 @@ function cMIRR() {
 }
 cMIRR.prototype = Object.create( cBaseFunction.prototype )
 cMIRR.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
+    var arg0 = arg[0], fRate1_invest = arg[1], fRate1_reinvest = arg[2];
 
     var valueArray = [];
 
@@ -2862,20 +2858,21 @@ cMIRR.prototype.Calculate = function ( arg ) {
             valueArray.push( arg0 );
     }
 
-    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
+    if ( fRate1_invest instanceof cArea || fRate1_invest instanceof cArea3D ) {
+        fRate1_invest = fRate1_invest.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof cArray ) {
-        arg1 = arg1.getElementRowCol( 0, 0 );
+    else if ( fRate1_invest instanceof cArray ) {
+        fRate1_invest = fRate1_invest.getElementRowCol( 0, 0 );
     }
 
-    if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
-        arg2 = arg2.cross( arguments[1].first );
+    if ( fRate1_reinvest instanceof cArea || fRate1_reinvest instanceof cArea3D ) {
+        fRate1_reinvest = fRate1_reinvest.cross( arguments[1].first );
     }
-    else if ( arg2 instanceof cArray ) {
-        arg2 = arg2.getElementRowCol( 0, 0 );
+    else if ( fRate1_reinvest instanceof cArray ) {
+        fRate1_reinvest = fRate1_reinvest.getElementRowCol( 0, 0 );
     }
-    var fRate1_invest = arg1.tocNumber(), fRate1_reinvest = arg2.tocNumber();
+
+    fRate1_invest = fRate1_invest.tocNumber(), fRate1_reinvest = fRate1_reinvest.tocNumber();
 
     if( fRate1_invest instanceof cError ) return this.value = fRate1_invest;
     if( fRate1_reinvest instanceof cError ) return this.value = fRate1_reinvest;
@@ -2968,7 +2965,7 @@ cNOMINAL.prototype.Calculate = function ( arg ) {
     if ( npery instanceof cError ) return this.value = npery;
 
     var eR = effectRate.getValue(),
-        np = npery.getValue(), res;
+        np = npery.getValue();
 
     if ( eR <= 0 || npery < 1 )
         return this.value = new cError( cErrorType.not_numeric );
@@ -3297,9 +3294,9 @@ cODDLPRICE.prototype.Calculate = function ( arg ) {
     var fDSCi = yearFrac( settl, matur, basis ) * frequency;
     var fAi = yearFrac( lastInt, settl, basis ) * frequency;
 
-    var res = redemption + fDCi * 100.0 * rate / frequency;
-    res /= fDSCi * yld / frequency + 1.0;
-    res -= fAi * 100.0 * rate / frequency;
+    var res = redemption + fDCi * 100 * rate / frequency;
+    res /= fDSCi * yld / frequency + 1;
+    res -= fAi * 100 * rate / frequency;
 
     this.value = new cNumber( res );
     return this.value;
@@ -3436,8 +3433,8 @@ cODDLYIELD.prototype.Calculate = function ( arg ) {
     var fDSCi = yearFrac( settl, matur, basis ) * frequency;
     var fAi = yearFrac( lastInt, settl, basis ) * frequency;
 
-    var res = redemption + fDCi * 100.0 * rate / frequency;
-    res /= pr + fAi * 100.0 * rate / frequency;
+    var res = redemption + fDCi * 100 * rate / frequency;
+    res /= pr + fAi * 100 * rate / frequency;
     res--;
     res *= frequency / fDSCi;
 
@@ -3630,7 +3627,7 @@ cPPMT.prototype.Calculate = function ( arg ) {
 
     var res;
 
-    if ( per < 1 || per > nper ){
+    if ( per < 1 || per > nper || type != 0 && type != 1 ){
         return this.value = new cError( cErrorType.wrong_value_type );
     }
 
@@ -3853,8 +3850,7 @@ cPRICEDISC.prototype.Calculate = function ( arg ) {
     var settl = Date.prototype.getDateFromExcel( settlement ),
         matur = Date.prototype.getDateFromExcel( maturity );
 
-//    var res = redemption * ( 1.0 - discount * diffDate( settl, matur, basis ) );
-    var res = redemption * ( 1.0 - discount * GetDiffDate( settl, matur, basis ) );
+    var res = redemption * ( 1 - discount * GetDiffDate( settl, matur, basis ) );
 
     return this.value = new cNumber( res );
 
@@ -3967,10 +3963,10 @@ cPRICEMAT.prototype.Calculate = function ( arg ) {
     var fIssSet = yearFrac( new Date( iss ), new Date( settl ), basis );
     var fSetMat = yearFrac( new Date( settl ), new Date( matur ), basis );
 
-    var res = 1.0 + fIssMat * rate;
-    res /= 1.0 + fSetMat * yld;
+    var res = 1 + fIssMat * rate;
+    res /= 1 + fSetMat * yld;
     res -= fIssSet * rate;
-    res *= 100.0;
+    res *= 100;
 
     return this.value = new cNumber( res );
 
@@ -4313,9 +4309,7 @@ cSLN.prototype.Calculate = function ( arg ) {
     if( life == 0 )
         return this.value = new cError( cErrorType.not_numeric );
 
-    var res = ( cost - salvage ) / life;
-
-    this.value = new cNumber( res );
+    this.value = new cNumber( ( cost - salvage ) / life );
     return this.value;
 
 }
@@ -4678,10 +4672,10 @@ cXIRR.prototype.Calculate = function ( arg ) {
          i=0  r^E_i              i=1  r^E_i
          */
         var D_0 = rDates[0];
-        var r = fRate + 1.0;
+        var r = fRate + 1;
         var fResult = rValues[0];
         for ( var i = 1, nCount = rValues.length; i < nCount; ++i )
-            fResult += rValues[i] / Math.pow( r, (rDates[i] - D_0) / 365.0 );
+            fResult += rValues[i] / Math.pow( r, (rDates[i] - D_0) / 365 );
         return fResult;
     }
 
@@ -4702,19 +4696,18 @@ cXIRR.prototype.Calculate = function ( arg ) {
          i=1       r^(E_i+1)             i=1  r^(E_i+1)
          */
         var D_0 = rDates[0];
-        var r = fRate + 1.0;
-        var fResult = 0.0;
+        var r = fRate + 1;
+        var fResult = 0;
         for ( var i = 1, nCount = rValues.length; i < nCount; ++i ) {
-            var E_i = (rDates[i] - D_0) / 365.0;
-            fResult -= E_i * rValues[i] / Math.pow( r, E_i + 1.0 );
+            var E_i = (rDates[i] - D_0) / 365;
+            fResult -= E_i * rValues[i] / Math.pow( r, E_i + 1 );
         }
         return fResult;
     }
 
     function xirr( valueArray, dateArray, rate ) {
-        var res = 0, vaTmp, daTmp;
 
-        var nC = 0, g_Eps = 1e-7, fEps = 1.0, fZ = 0, fN = 0, xN = 0, nIM = 100, nMC = 0, arr0 = valueArray[0], arr1 = dateArray[0], arrI, wasNegative = false, wasPositive = false;
+        var arr0 = valueArray[0], arr1 = dateArray[0];
 
         if ( arr0 instanceof cError ) {
             return new cError( cErrorType.not_available );
@@ -4728,11 +4721,11 @@ cXIRR.prototype.Calculate = function ( arg ) {
             return new cError( cErrorType.not_numeric );
 
 
-        var fResultRate = rate.getValue()
-        if ( fResultRate <= -1 )
+        var res = rate.getValue()
+        if ( res <= -1 )
             return new cError( cErrorType.not_numeric );
 
-        var fMaxEps = 1e-10, nMaxIter = 50;
+        var fMaxEps = 1e-10, maxIter = 50;
 
         for ( var i = 0; i < dateArray.length; i++ ) {
             dateArray[i] = dateArray[i].tocNumber();
@@ -4743,22 +4736,28 @@ cXIRR.prototype.Calculate = function ( arg ) {
             valueArray[i] = valueArray[i].getValue();
         }
 
-        // Newton's method - try to find a fResultRate, so that lcl_sca_XirrResult() returns 0.
-        var fNewRate, fRateEps, fResultValue, nIter = 0, bContLoop;
-        do
-        {
-            fResultValue = lcl_sca_XirrResult( valueArray, dateArray, fResultRate );
-            fNewRate = fResultRate - fResultValue / lcl_sca_XirrResult_Deriv1( valueArray, dateArray, fResultRate );
-            fRateEps = Math.abs( fNewRate - fResultRate );
-            fResultRate = fNewRate;
-            bContLoop = (fRateEps > fMaxEps) && (Math.abs( fResultValue ) > fMaxEps);
+        var newRate, eps, xirrRes, bContLoop = true;
+        for( var i = 0; i < maxIter && bContLoop; i++){
+            xirrRes = lcl_sca_XirrResult( valueArray, dateArray, res );
+            newRate = res - xirrRes / lcl_sca_XirrResult_Deriv1( valueArray, dateArray, res );
+            eps = Math.abs( newRate - res );
+            res = newRate;
+            bContLoop = (eps > fMaxEps) && (Math.abs( xirrRes ) > fMaxEps);
         }
-        while ( bContLoop && (++nIter < nMaxIter) );
+/*        do
+        {
+            xirrRes = lcl_sca_XirrResult( valueArray, dateArray, res );
+            fNewRate = res - xirrRes / lcl_sca_XirrResult_Deriv1( valueArray, dateArray, res );
+            eps = Math.abs( fNewRate - res );
+            res = fNewRate;
+            bContLoop = (eps > fMaxEps) && (Math.abs( xirrRes ) > fMaxEps);
+        }
+        while ( bContLoop && (++nIter < nMaxIter) );*/
 
         if ( bContLoop )
             return new cError( cErrorType.not_numeric );
 
-        return new cNumber( fResultRate );
+        return new cNumber( res );
 
     }
 
@@ -5168,7 +5167,7 @@ cYIELDDISC.prototype.Calculate = function ( arg ) {
     var settl = Date.prototype.getDateFromExcel( settlement ),
         matur = Date.prototype.getDateFromExcel( maturity );
 
-    var fRet = ( redemption / pr ) - 1.0;
+    var fRet = ( redemption / pr ) - 1;
     fRet /= yearFrac( settl, matur, basis );
 
     this.value = new cNumber( fRet );

@@ -8,7 +8,7 @@
         return Math.abs( a - b ) < dif
     }
 
-    function _GetRmz( fZins, fZzr, fBw, fZw, nF ){
+    function _getPMT( fZins, fZzr, fBw, fZw, nF ){
         var fRmz;
         if( fZins == 0.0 )
             fRmz = ( fBw + fZw ) / fZzr;
@@ -23,7 +23,7 @@
         return -fRmz;
     }
 
-    function _GetZw( fZins, fZzr, fRmz, fBw, nF ){
+    function _getFV( fZins, fZzr, fRmz, fBw, nF ){
         var fZw;
         if( fZins == 0.0 )
             fZw = fBw + fRmz * fZzr;
@@ -36,6 +36,47 @@
         }
 
         return -fZw;
+    }
+
+    function _getDDB( cost, salvage, life, period, factor ) {
+        var ddb, ipmt, oldCost, newCost;
+        ipmt = factor / life;
+        if ( ipmt >= 1 ) {
+            ipmt = 1;
+            if ( period == 1 )
+                oldCost = cost;
+            else
+                oldCost = 0;
+        }
+        else
+            oldCost = cost * Math.pow( 1 - ipmt, period - 1 );
+        newCost = cost * Math.pow( 1 - ipmt, period );
+
+        if ( newCost < salvage )
+            ddb = oldCost - salvage;
+        else
+            ddb = oldCost - newCost;
+        if ( ddb < 0 )
+            ddb = 0;
+        return ddb;
+    }
+
+    function _getIPMT(rate, per, pv, type, pmt) {
+        var ipmt;
+
+        if ( per == 1 ) {
+            if ( type > 0 )
+                ipmt = 0;
+            else
+                ipmt = -pv;
+        }
+        else {
+            if ( type > 0 )
+                ipmt = _getFV( rate, per - 2, pmt, pv, 1 ) - pmt;
+            else
+                ipmt = _getFV( rate, per - 1, pmt, pv, 0 );
+        }
+        return ipmt * rate
     }
 
     function _diffDate(d1, d2, mode){
@@ -3570,7 +3611,7 @@
                 fVal <= 0.0 || ( nPayType != 0 && nPayType != 1 ) )
                 return "#NUM!"
 
-            fRmz = _GetRmz( fRate, nNumPeriods, fVal, 0.0, nPayType );
+            fRmz = _getPMT( fRate, nNumPeriods, fVal, 0.0, nPayType );
 
             fZinsZ = 0.0;
 
@@ -3585,9 +3626,9 @@
             for( var i = nStartPer ; i <= nEndPer ; i++ )
             {
                 if( nPayType > 0 )
-                    fZinsZ += _GetZw( fRate, i - 2, fRmz, fVal, 1 ) - fRmz;
+                    fZinsZ += _getFV( fRate, i - 2, fRmz, fVal, 1 ) - fRmz;
                 else
-                    fZinsZ += _GetZw( fRate, i - 1, fRmz, fVal, 0 );
+                    fZinsZ += _getFV( fRate, i - 1, fRmz, fVal, 0 );
             }
 
             fZinsZ *= fRate;
@@ -3615,7 +3656,7 @@
             if( nStartPer < 1 || nEndPer < nStartPer || nEndPer < 1  || fRate <= 0 || nNumPeriods <= 0 || fVal <= 0 || ( nPayType != 0 && nPayType != 1 ) )
                 return "#NUM!"
 
-            fRmz = _GetRmz( fRate, nNumPeriods, fVal, 0.0, nPayType );
+            fRmz = _getPMT( fRate, nNumPeriods, fVal, 0.0, nPayType );
 
             fKapZ = 0.0;
 
@@ -3635,9 +3676,9 @@
             for( var i = nStart ; i <= nEnd ; i++ )
             {
                 if( nPayType > 0 )
-                    fKapZ += fRmz - ( _GetZw( fRate, i - 2, fRmz, fVal, 1 ) - fRmz ) * fRate;
+                    fKapZ += fRmz - ( _getFV( fRate, i - 2, fRmz, fVal, 1 ) - fRmz ) * fRate;
                 else
-                    fKapZ += fRmz - _GetZw( fRate, i - 1, fRmz, fVal, 0 ) * fRate;
+                    fKapZ += fRmz - _getFV( fRate, i - 1, fRmz, fVal, 0 ) * fRate;
             }
 
             return fKapZ
@@ -4259,5 +4300,273 @@
         strictEqual( oParser.calculate().getValue(), syd( 30000,7500,-10,10 ) );
 
     } )
+
+    test( "Test: \"PPMT\"", function () {
+
+        function ppmt( rate, per, nper, pv, fv, type ){
+
+            if( fv == undefined ) fv = 0;
+            if( type == undefined ) type = 0;
+
+            var fRmz = _getPMT(rate, nper, pv, fv, type);
+
+            return fRmz - _getIPMT(rate, per, pv, type, fRmz);
+
+        }
+
+        oParser = new parserFormula( "PPMT(0.1/12,1,2*12,2000)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), ppmt( 0.1/12,1,2*12,2000 ) );
+
+        oParser = new parserFormula( "PPMT(0.08,10,10,200000)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), ppmt( 0.08,10,10,200000 ) );
+
+    } )
+
+    test( "Test: \"MIRR\"", function () {
+
+        function mirr( valueArray, fRate1_invest, fRate1_reinvest ){
+
+            fRate1_invest = fRate1_invest + 1;
+            fRate1_reinvest = fRate1_reinvest + 1;
+
+            var fNPV_reinvest = 0, fPow_reinvest = 1, fNPV_invest = 0, fPow_invest = 1, fCellValue,
+                wasNegative = false, wasPositive = false;
+
+            for(var i = 0; i < valueArray.length; i++){
+                fCellValue = valueArray[i];
+
+                if( fCellValue > 0 ){
+                    wasPositive = true;
+                    fNPV_reinvest += fCellValue * fPow_reinvest;
+                }
+                else if( fCellValue < 0 ){
+                    wasNegative = true;
+                    fNPV_invest += fCellValue * fPow_invest;
+                }
+                fPow_reinvest /= fRate1_reinvest;
+                fPow_invest /= fRate1_invest;
+
+            }
+
+            if( !( wasNegative && wasPositive ) )
+                return "#DIV/0!";
+
+            var fResult = -fNPV_reinvest / fNPV_invest;
+            fResult *= Math.pow( fRate1_reinvest, valueArray.length - 1 );
+            fResult = Math.pow( fResult, 1 / (valueArray.length - 1) );
+
+            return fResult - 1;
+
+        }
+
+        oParser = new parserFormula( "MIRR({-120000,39000,30000,21000,37000,46000},0.1,0.12)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), mirr( [-120000,39000,30000,21000,37000,46000],0.1,0.12 ) );
+
+        oParser = new parserFormula( "MIRR({-120000,39000,30000,21000},0.1,0.12)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), mirr( [-120000,39000,30000,21000],0.1,0.12 ) );
+
+        oParser = new parserFormula( "MIRR({-120000,39000,30000,21000,37000,46000},0.1,0.14)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), mirr( [-120000,39000,30000,21000,37000,46000],0.1,0.14 ) );
+
+    } )
+
+    test( "Test: \"IPMT\"", function () {
+
+        function ipmt( rate, per, nper, pv, fv, type ){
+
+            if( fv == undefined ) fv = 0;
+            if( type == undefined ) type = 0;
+
+            var res = getPMT(rate, nper, pv, fv, type);
+            res = getIPMT(rate, per, pv, type, res);
+
+            return res;
+
+        }
+
+        oParser = new parserFormula( "IPMT(0.1/12,1*3,3,8000)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), ipmt( 0.1/12,1*3,3,8000 ) );
+
+        oParser = new parserFormula( "IPMT(0.1,3,3,8000)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), ipmt( 0.1,3,3,8000 ) );
+
+
+    } )
+
+    test( "Test: \"DB\"", function () {
+
+        function db( cost, salvage, life, period, month ){
+
+            var nAbRate = 1 - Math.pow( salvage / cost, 1 / life );
+            nAbRate = Math.floor( (nAbRate * 1000) + 0.5 ) / 1000;
+            var nErsteAbRate = cost * nAbRate * month / 12;
+
+            var res = 0;
+            if ( Math.floor( period ) == 1 )
+                res = nErsteAbRate;
+            else {
+                var nSummAbRate = nErsteAbRate, nMin = life;
+                if ( nMin > period ) nMin = period;
+                var iMax = Math.floor( nMin );
+                for ( var i = 2; i <= iMax; i++ ) {
+                    res = (cost - nSummAbRate) * nAbRate;
+                    nSummAbRate += res;
+                }
+                if ( period > life )
+                    res = ((cost - nSummAbRate) * nAbRate * (12 - month)) / 12;
+            }
+
+            return res
+
+        }
+
+        oParser = new parserFormula( "DB(1000000,100000,6,1,7)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), db(1000000,100000,6,1,7) );
+
+        oParser = new parserFormula( "DB(1000000,100000,6,2,7)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), db(1000000,100000,6,2,7) );
+
+        oParser = new parserFormula( "DB(1000000,100000,6,3,7)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), db(1000000,100000,6,3,7) );
+
+        oParser = new parserFormula( "DB(1000000,100000,6,4,7)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), db(1000000,100000,6,4,7) );
+
+        oParser = new parserFormula( "DB(1000000,100000,6,5,7)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), db(1000000,100000,6,5,7) );
+
+        oParser = new parserFormula( "DB(1000000,100000,6,6,7)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), db(1000000,100000,6,6,7) );
+
+        oParser = new parserFormula( "DB(1000000,100000,6,7,7)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), db(1000000,100000,6,7,7) );
+
+    } )
+
+    test( "Test: \"DDB\"", function () {
+
+        function ddb( cost, salvage, life, period, factor ){
+
+            if( factor === undefined || factor === null ) factor = 2;
+            return _getDDB(cost, salvage, life, period, factor);
+        }
+
+        oParser = new parserFormula( "DDB(2400,300,10*365,1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), ddb(2400,300,10*365,1) );
+
+        oParser = new parserFormula( "DDB(2400,300,10*12,1,2)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), ddb(2400,300,10*12,1,2) );
+
+        oParser = new parserFormula( "DDB(2400,300,10,1,2)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), ddb(2400,300,10,1,2) );
+
+        oParser = new parserFormula( "DDB(2400,300,10,2,1.5)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), ddb(2400,300,10,2,1.5) );
+
+        oParser = new parserFormula( "DDB(2400,300,10,10)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), ddb(2400,300,10,10) );
+
+    } )
+
+    test( "Test: \"SLN\"", function () {
+
+        function sln( cost, salvage, life ){
+
+            if ( life == 0 ) return "#NUM!";
+
+            return ( cost - salvage ) / life;
+        }
+
+        oParser = new parserFormula( "SLN(30000,7500,10)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), sln(30000,7500,10) );
+
+
+    } )
+
+    test( "Test: \"XIRR\"", function () {
+        function lcl_sca_XirrResult( rValues, rDates, fRate ) {
+            var D_0 = rDates[0];
+            var r = fRate + 1;
+            var fResult = rValues[0];
+            for ( var i = 1, nCount = rValues.length; i < nCount; ++i )
+                fResult += rValues[i] / Math.pow( r, (rDates[i] - D_0) / 365 );
+            return fResult;
+        }
+
+        function lcl_sca_XirrResult_Deriv1( rValues, rDates, fRate ) {
+            var D_0 = rDates[0];
+            var r = fRate + 1;
+            var fResult = 0;
+            for ( var i = 1, nCount = rValues.length; i < nCount; ++i ) {
+                var E_i = (rDates[i] - D_0) / 365;
+                fResult -= E_i * rValues[i] / Math.pow( r, E_i + 1 );
+            }
+            return fResult;
+        }
+
+        function xirr( valueArray, dateArray, rate ) {
+
+            var res = rate
+            if ( res <= -1 )
+                return "#NUM!"
+
+            var fMaxEps = 1e-10, maxIter = 50;
+
+            var newRate, eps, xirrRes, bContLoop, nIter = 0;
+            do
+             {
+                 xirrRes = lcl_sca_XirrResult( valueArray, dateArray, res );
+                 newRate = res - xirrRes / lcl_sca_XirrResult_Deriv1( valueArray, dateArray, res );
+                 eps = Math.abs( newRate - res );
+                 res = newRate;
+                 bContLoop = (eps > fMaxEps) && (Math.abs( xirrRes ) > fMaxEps);
+             }
+             while ( bContLoop && (++nIter < maxIter) );
+
+            if ( bContLoop )
+                return "#NUM!";
+
+            return res;
+
+        }
+
+        ws.getRange2( "F100" ).setValue( "1/1/2008" );
+        ws.getRange2( "G100" ).setValue( "3/1/2008" );
+        ws.getRange2( "H100" ).setValue( "10/30/2008" );
+        ws.getRange2( "I100" ).setValue( "2/15/2009" );
+        ws.getRange2( "J100" ).setValue( "4/1/2009" );
+
+        oParser = new parserFormula( "XIRR({-10000,2750,4250,3250,2750},F100:J100,0.1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), xirr([-10000,2750,4250,3250,2750],[new Date(2008,0,1 ).getExcelDate(),
+                                                                                        new Date(2008,2,1 ).getExcelDate(),
+                                                                                        new Date(2008,9,30).getExcelDate(),
+                                                                                        new Date(2009,1,15).getExcelDate(),
+                                                                                        new Date(2009,3,1 ).getExcelDate()],0.1) );
+
+
+    } )
+
+
 
 } );
