@@ -114,6 +114,8 @@ CGroupShape.prototype =
 
     addToSpTree: function(pos, item)
     {
+        if(!isRealNumber(pos))
+            pos = this.spTree.length;
         History.Add(this, {Type: historyitem_GroupShapeAddToSpTree, pos: pos, item: item});
         this.spTree.splice(pos, 0, item);
     },
@@ -132,15 +134,24 @@ CGroupShape.prototype =
 
     removeFromSpTree: function(id)
     {
-        for(var i = 0; i < this.spTree.length; ++i)
+        for(var i = this.spTree.length-1; i > -1 ; --i)
         {
             if(this.spTree[i].Get_Id() === id)
             {
                 History.Add(this,{Type:historyitem_GroupShapeRemoveFromSpTree, pos: i, item:this.spTree[i]});
-                this.spTree.splice(i, 1);
+                return this.spTree.splice(i, 1)[0];
             }
         }
+        return null;
     },
+
+
+    removeFromSpTreeByPos: function(pos)
+    {
+        History.Add(this,{Type:historyitem_GroupShapeRemoveFromSpTree, pos: pos, item:this.spTree[pos]});
+        return this.spTree.splice(pos, 1)[0];
+    },
+
 
     handleUpdateSpTree: function()
     {
@@ -1627,26 +1638,76 @@ CGroupShape.prototype =
     bringToFront : function()//перемещаем заселекченые объекты наверх
     {
         var i;
+        var arrDrawings = [];
         for(i = this.spTree.length - 1;  i > -1; --i)
         {
             if(this.spTree[i].getObjectType() === historyitem_type_GroupShape)
             {
                 this.spTree[i].bringToFront();
             }
-
+            else if(this.spTree[i].selected)
+            {
+                arrDrawings.push(this.removeFromSpTreeByPos(i));
+            }
+        }
+        for(i = arrDrawings.length-1; i > -1 ; --i)
+        {
+            this.addToSpTree(null, arrDrawings[i]);
         }
     },
 
     bringForward : function()
     {
+        var i;
+        for(i = this.spTree.length-1; i > -1; --i)
+        {
+            if(this.spTree[i].getObjectType() === historyitem_type_GroupShape)
+            {
+                this.spTree[i].bringForward();
+            }
+            else if(i < this.spTree.length-1 && this.spTree[i].selected && !this.spTree[i+1].selected)
+            {
+                var item = this.removeFromSpTreeByPos(i);
+                this.addToSpTree(i+1, item);
+            }
+        }
     },
 
     sendToBack : function()
     {
+        var i, arrDrawings = [];
+        for(i = this.spTree.length-1; i > -1; --i)
+        {
+            if(this.spTree[i].getObjectType() === historyitem_type_GroupShape)
+            {
+                this.spTree[i].sendToBack();
+            }
+            else if(this.spTree[i].selected)
+            {
+                arrDrawings.push(this.removeFromSpTreeByPos(i));
+            }
+        }
+        arrDrawings.reverse();
+        for(i = 0; i < arrDrawings.length; ++i)
+        {
+            this.addToSpTree(i, arrDrawings[i]);
+        }
     },
 
     bringBackward : function()
     {
+        var i;
+        for(i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].getObjectType() === historyitem_type_GroupShape)
+            {
+                this.spTree[i].bringBackward();
+            }
+            else if(i > 0 && this.spTree[i].selected && !this.spTree[i-1].selected)
+            {
+                this.addToSpTree(i-1, this.removeFromSpTreeByPos(i));
+            }
+        }
     },
 
 
