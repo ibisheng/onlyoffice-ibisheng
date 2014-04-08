@@ -852,29 +852,46 @@ asc_docs_api.prototype.Init = function()
 }
 asc_docs_api.prototype.asc_getEditorPermissions = function()
 {
-	if (this.DocInfo && this.DocInfo.get_Id()) {
-		var rData = {
-			"c"			: "getsettings",
-			"id"		: this.DocInfo.get_Id(),
-			"userid"	: this.DocInfo.get_UserId(),
-			"format"	: this.DocInfo.get_Format(),
-			"vkey"		: this.DocInfo.get_VKey(),
-			"editorid"	: c_oEditorId.Word
-		};
-		
-		sendCommand( this, this.asc_getEditorPermissionsCallback, rData );
-	} else {
-		var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
-		editor.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());	
+	if (undefined != window['qtDocBridge'])
+	{
+		// set permissions
+		//var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
+		//editor.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());	
+	}
+	else
+	{
+		if (this.DocInfo && this.DocInfo.get_Id()) {
+			var rData = {
+				"c"			: "getsettings",
+				"id"		: this.DocInfo.get_Id(),
+				"userid"	: this.DocInfo.get_UserId(),
+				"format"	: this.DocInfo.get_Format(),
+				"vkey"		: this.DocInfo.get_VKey(),
+				"editorid"	: c_oEditorId.Word
+			};
+			
+			sendCommand( this, this.asc_getEditorPermissionsCallback, rData );
+		} else {
+			var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
+			editor.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());	
+		}
 	}
 };
 
-asc_docs_api.prototype.asc_getLicense = function () {
-	var t = this;
-	var rdata = {
-		"c" 		: "getlicense"
-	};
-	sendCommand(this, function (response) {t._onGetLicense(response);}, rdata);
+asc_docs_api.prototype.asc_getLicense = function () 
+{
+	if (undefined != window['qtDocBridge'])
+	{
+		editor._onGetLicense(null);
+	}
+	else
+	{
+		var t = this;
+		var rdata = {
+			"c" 		: "getlicense"
+		};
+		sendCommand(this, function (response) {t._onGetLicense(response);}, rdata);
+	}
 };
 
 asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(incomeObject)
