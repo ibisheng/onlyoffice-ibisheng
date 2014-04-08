@@ -5537,7 +5537,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 		if ( c_oSerCellTypes.Ref == type )
             oCell.oId = g_oCellAddressUtils.getCellAddress(this.stream.GetString2LE(length));
 		else if ( c_oSerCellTypes.RefRowCol == type )
-			oCell.oId = new CellAddress(this.stream.GetULongLE(), this.stream.GetULongLE()); //  Ускорение открытия
+			oCell.oId = new CellAddress(this.stream.GetULongLE(), this.stream.GetULongLE(), 0); //  Ускорение открытия
         else if( c_oSerCellTypes.Style == type )
         {
             var nStyleIndex = this.stream.GetULongLE();
