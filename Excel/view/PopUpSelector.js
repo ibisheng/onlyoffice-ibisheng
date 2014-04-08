@@ -17,6 +17,8 @@
 			this.selectorStyle	= null;
 			this.selectorList	= null;
 
+			this.isVisible		= false;
+
 			this._init();
 			return this;
 		}
@@ -34,7 +36,10 @@
 		PopUpSelector.prototype.show = function (isFormula, arrItems, cellRect) {
 			this._clearList();
 			this.setPosition(cellRect);
-			this.selectorStyle.display = "block";
+			if (!this.isVisible) {
+				this.selectorStyle.display = "block";
+				this.isVisible = true;
+			}
 
 			var item;
 			for (var i = 0; i < arrItems.length; ++i) {
@@ -82,12 +87,18 @@
 			// TODO: В Mozilla избавиться от селекта текста при dblclick
 		};
 		PopUpSelector.prototype.hide = function () {
-			this.selectorStyle.display = "none";
+			if (this.isVisible) {
+				this.selectorStyle.display = "none";
+				this.isVisible = false;
+			}
 			this._clearList();
 		};
 		PopUpSelector.prototype.setPosition = function (cellRect) {
 			this.selectorStyle["left"] = (cellRect.asc_getX() + 10) + "px";
 			this.selectorStyle["top"] = (cellRect.asc_getY() + cellRect.asc_getHeight()) + "px";
+		};
+		PopUpSelector.prototype.getVisible = function () {
+			return this.isVisible;
 		};
 		PopUpSelector.prototype._clearList = function () {
 			this.selectorList.innerHTML = "";
