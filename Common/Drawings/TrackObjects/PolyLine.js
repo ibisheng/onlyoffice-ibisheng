@@ -48,6 +48,10 @@ function PolyLine (drawingObjects)
     };
     this.draw = function(g)
     {
+        if(isRealNumber(this.pageIndex))
+        {
+            g.SetCurrentPage(this.pageIndex);
+        }
         this.polylineForDrawer.Draw(g);
         return;
         if(this.arrPoint.length < 2)

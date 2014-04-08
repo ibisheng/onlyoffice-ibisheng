@@ -119,120 +119,7 @@ function resetChartSelection(state)
     }
 }
 
-function handleSelectedObjects(drawingObjectsController, e, x, y, group)
-{
-    var selected_objects = group ? group.selectedObjects : drawingObjectsController.getSelectedObjects();
-    if(selected_objects.length === 1)
-    {
-        var hit_to_adj = selected_objects[0].hitToAdjustment(x, y);
-        if(hit_to_adj.hit)
-        {
-            return drawingObjectsController.handleAdjustmentHit(hit_to_adj, selected_objects[0], group);
-        }
-    }
 
-    for(var i = selected_objects.length - 1; i > -1; --i)
-    {
-        var hit_to_handles = selected_objects[i].hitToHandles(x, y);
-        if(hit_to_handles > -1)
-        {
-            return drawingObjectsController.handleHandleHit(hit_to_handles, selected_objects[i], group);
-        }
-    }
-
-    for(i = selected_objects.length - 1; i > -1; --i)
-    {
-        if(selected_objects[i].hitInBoundingRect(x, y))
-        {
-            return drawingObjectsController.handleMoveHit(selected_objects[i], e, x, y, group);
-        }
-    }
-    return false;
-}
-
-function handleShapeImage(drawing, drawingObjectsController, e, x, y, group)
-{
-    var hit_in_inner_area = drawing.hitInInnerArea(x, y);
-    var hit_in_path = drawing.hitInPath(x, y);
-    var hit_in_text_rect = drawing.hitInTextRect(x, y);
-    if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
-    {
-        return drawingObjectsController.handleMoveHit(drawing, e, x, y, group);
-    }
-    else if(hit_in_text_rect)
-    {
-        return drawingObjectsController.handleTextHit(drawing, e, x, y, group);
-    }
-    return false;
-}
-
-
-function handleGroup(drawing, drawingObjectsController, e, x, y)
-{
-    var grouped_objects = drawing.getArrGraphicObjects();
-    var selected_objects = drawingObjectsController.selectedObjects;
-    for(var j = grouped_objects.length - 1; j > -1; --j)
-    {
-        var cur_grouped_object = grouped_objects[j];
-        if(cur_grouped_object instanceof CShape || cur_grouped_object instanceof CImageShape)
-        {
-            var hit_in_inner_area = cur_grouped_object.hitInInnerArea(x, y);
-            var hit_in_path = cur_grouped_object.hitInPath(x, y);
-            var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
-            if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
-            {
-                return drawingObjectsController.handleMoveHit(drawing, e, x, y);
-            }
-            else if(hit_in_text_rect)
-            {
-               return drawingObjectsController.handleTextHitGroup(cur_grouped_object, drawing, e);
-            }
-        }
-    }
-    return false;
-}
-
-function handleTable(drawing, drawingObjects, drawingObjectsController, e, x, y, handleState)
-{
-    var hit_in_inner_area = drawing.hitInInnerArea(x, y);
-    var hit_in_bounding_rect = drawing.hitInBoundingRect(x, y);
-    if(hit_in_bounding_rect || hit_in_inner_area)
-    {
-        resetGroupChartSelection(drawingObjectsController.State);
-        if(e.CtrlKey && drawingObjectsController.selectedObjects.length > 0)
-        {
-            var b_selected = drawing.selected;
-            drawing.select(drawingObjectsController);
-            for(var j = 0; j < drawingObjectsController.selectedObjects.length; ++j)
-            {
-                drawingObjectsController.addPreTrackObject(drawingObjectsController.selectedObjects[j].createMoveTrack());
-            }
-            drawingObjectsController.changeCurrentState(new PreMoveState(drawingObjectsController, drawingObjects, x, y, e.ShiftKey, e.CtrlKey, drawing, b_selected, true));
-            drawingObjects.OnUpdateOverlay();
-            return true;
-        }
-        else
-        {
-            drawingObjectsController.resetSelection();
-            drawing.select(drawingObjectsController);
-            if(!(e.Button === g_mouse_button_right)&&(!drawing.isTableBorder(x, y)
-                || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false))
-            {
-                drawing.selectionSetStart(e, x, y);
-                drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, drawingObjects, drawing));
-            }
-            else if(e.Button === g_mouse_button_right && drawingObjectsController.State.textObject && drawingObjectsController.State.textObject === drawing && !(drawing.pointInSelectedText(x, y)))
-            {
-                drawing.selectionSetStart(e, x, y);
-                drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, drawingObjects, drawing));
-            }
-            drawingObjects.presentation.Document_UpdateSelectionState();
-            drawingObjects.OnUpdateOverlay();
-            return true;
-        }
-    }
-    return false;
-}
 
 function NullState(drawingObjectsController)
 {
@@ -246,7 +133,7 @@ function NullState(drawingObjectsController)
         if(result)
             return result;
         var arr_drawing_objects = this.drawingObjectsController.getDrawingObjects();
-        for(i = arr_drawing_objects.length-1; i > -1; --i)
+        for(var i = arr_drawing_objects.length-1; i > -1; --i)
         {
             var cur_drawing_base = arr_drawing_objects[i];
             var cur_drawing = cur_drawing_base;
@@ -263,11 +150,11 @@ function NullState(drawingObjectsController)
                     return result;
             }
             /*else if(cur_drawing.isChart())
-            {
-                result = handleChart(cur_drawing,  this.drawingObjectsController, e, x, y);
-                if(result)
-                    return result;
-            }*/
+             {
+             result = handleChart(cur_drawing,  this.drawingObjectsController, e, x, y);
+             if(result)
+             return result;
+             }*/
             else if(cur_drawing.isTable && cur_drawing.isTable())
             {
                 result = handleTable(cur_drawing,  this.drawingObjectsController, e, x, y);
@@ -2004,9 +1891,9 @@ function TextAddState(drawingObjectsController, textObject)
         {
             this.textObject.addTextFlag = false;
             /*if(this.textObject instanceof CGraphicFrame)
-            {
-               // this.textObject.graphicObject.Selection_Remove();
-            }*/
+             {
+             // this.textObject.graphicObject.Selection_Remove();
+             }*/
             this.drawingObjectsController.updateSelectionState();
 
         }
@@ -2737,22 +2624,22 @@ function PreMoveState(drawingObjectsController, startX, startY, shift, ctrl, maj
 
         if(!(this.ctrl || this.shift) && e.ClickCount > 1 && this.majorObject.isChart())
         {
-			return this.drawingObjectsController.handleDoubleClickOnChart();
-		}	
-		if(!(this.majorObject.isGroup() && this.bInside))
-		{
-			if((this.shift || this.ctrl) && this.majorObjectIsSelected)
-			{
-				return this.drawingObjectsController.handleMouseUpCtrlShiftOnSelectedObject(this.majorObject);
-			}
-		}
-		else
-		{
-			if(this.majorObjectIsSelected && !CheckRightButtonEvent(e) && !(this.ctrl || this.shift))
-			{
-				return this.drawingObjectsController.handleClickOnSelectedGroup(this.majorObject, e, x, y);
-			}
-		}
+            return this.drawingObjectsController.handleDoubleClickOnChart();
+        }
+        if(!(this.majorObject.isGroup() && this.bInside))
+        {
+            if((this.shift || this.ctrl) && this.majorObjectIsSelected)
+            {
+                return this.drawingObjectsController.handleMouseUpCtrlShiftOnSelectedObject(this.majorObject);
+            }
+        }
+        else
+        {
+            if(this.majorObjectIsSelected && !CheckRightButtonEvent(e) && !(this.ctrl || this.shift))
+            {
+                return this.drawingObjectsController.handleClickOnSelectedGroup(this.majorObject, e, x, y);
+            }
+        }
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
     };
 
@@ -2932,11 +2819,11 @@ function GetSnapObject(trackSnapArr, dist, snapArr)
                 }
                 else
                 {
-                   if(Math.abs(d) < Math.abs(min_d))
-                   {
-                       min_d  = d;
-                       point = snapArr[j];
-                   }
+                    if(Math.abs(d) < Math.abs(min_d))
+                    {
+                        min_d  = d;
+                        point = snapArr[j];
+                    }
                 }
 
             }
@@ -3044,10 +2931,10 @@ function GroupState(drawingObjectsController, group)
         result = handleSelectedObjects(this.drawingObjectsController, e, x, y, this.group);
         if(result)
             return result;
-			
-		result = handleSelectedObjects(this.drawingObjectsController, e, x, y, null);
-		if(result)
-			return result;
+
+        result = handleSelectedObjects(this.drawingObjectsController, e, x, y, null);
+        if(result)
+            return result;
 
         var drawing_objects = this.drawingObjectsController.getDrawingObjects();
         for(i = drawing_objects.length - 1; i > -1; --i)
@@ -3073,9 +2960,9 @@ function GroupState(drawingObjectsController, group)
                     for(var s = arr_graphic_objects.length - 1; s > -1; --s)
                     {
                         var cur_grouped_object = arr_graphic_objects[s];
-						result = handleShapeImage(cur_grouped_object, this.drawingObjectsController, e, x, y, this.group);
-						if(result)
-							return result;
+                        result = handleShapeImage(cur_grouped_object, this.drawingObjectsController, e, x, y, this.group);
+                        if(result)
+                            return result;
                     }
                 }
                 else
@@ -3622,12 +3509,12 @@ function MoveInGroupState(drawingObjectsController, group, startX, startY, rectX
             }
         }
         this.drawingObjectsController.trackMoveObjects(result_dx, result_dy);
-		this.drawingObjectsController.updateOverlay();
+        this.drawingObjectsController.updateOverlay();
     };
 
     this.onMouseUp = function(e, x, y)
-	{
-		this.drawingObjectsController.handleEndMoveTrack(e);
+    {
+        this.drawingObjectsController.handleEndMoveTrack(e);
     };
 
     this.onKeyDown = function(e)
@@ -3664,7 +3551,7 @@ function PreChangeAdjInGroupState(drawingObjectsController, group)
     {
         this.drawingObjectsController.swapTrackObjects();
         this.drawingObjectsController.changeCurrentState(new ChangeAdjInGroupState(this.drawingObjectsController, this.group))
-		this.drawingObjectsController.onMouseMove(e, x, y);
+        this.drawingObjectsController.onMouseMove(e, x, y);
     };
 
     this.onMouseUp = function(e, x, y)
@@ -3708,7 +3595,7 @@ function ChangeAdjInGroupState(drawingObjectsController, group)
 
     this.onMouseUp = function(e, x, y)
     {
-		this.drawingObjectsController.handleEndTrackAdj();
+        this.drawingObjectsController.handleEndTrackAdj();
     };
 
     this.onKeyDown = function(e)
@@ -3948,10 +3835,7 @@ function SplineBezierState(drawingObjectsController, drawingObjects)
 
     this.onMouseUp = function(e, X, Y, pageIndex)
     {
-
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-       
-
     };
 
     this.onKeyDown = function(e)
@@ -4167,7 +4051,7 @@ function SplineBezierState3(drawingObjectsController, drawingObjects, startX, st
         /* if(e.ClickCount >= 2)
          {
          this.spline.createShape(this.drawingObjects);
-        
+
          this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
          }  */
     };
@@ -4407,7 +4291,7 @@ function SplineBezierState5(drawingObjectsController, drawingObjects, startX, st
         /*  if(e.ClickCount >= 2)
          {
          this.spline.createShape(this.drawingObjects);
-        
+
          this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
          }  */
     };
@@ -4458,7 +4342,7 @@ function PolyLineAddState(drawingObjectsController, drawingObjects)
     this.onMouseUp = function(e, x, y)
     {
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-       
+
 
     };
 
@@ -4617,7 +4501,7 @@ function AddPolyLine2State2(drawingObjectsController, drawingObjects, x, y, poly
         if(e.ClickCount > 1)
         {
             this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-           
+
 
         }
     };
@@ -4760,10 +4644,7 @@ function AddPolyLine2State3(drawingObjectsController, drawingObjects, polyline)
     };
 }
 
-function CheckObjectLine(obj)
-{
-    return (obj instanceof CShape && obj.spPr.geometry && obj.spPr.geometry.preset === "line");
-}
+
 
 function DrawDefaultSelection(drawingObjectsController, drawingDocument)
 {
@@ -4817,6 +4698,5 @@ function CompareGroups(a, b)
     }
     return count1 - count2;
 }
-
 
 

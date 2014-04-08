@@ -89,6 +89,10 @@ function Spline(drawingObjects)
     };
     this.draw = function(g)
     {
+        if(isRealNumber(this.pageIndex))
+        {
+            g.SetCurrentPage(this.pageIndex);
+        }
         this.splineForDraw.Draw(g);
         return;
         for(var i = 0; i < this.path.length; ++i)

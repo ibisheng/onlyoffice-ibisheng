@@ -18,6 +18,7 @@ function CGroupShape(parent)
     this.flipH = null;
     this.flipV = null;
     this.transform = new CMatrix();
+    this.localTransform = new CMatrix();
     this.invertTransform = null;
     this.brush  = null;
     this.pen = null;
@@ -26,6 +27,14 @@ function CGroupShape(parent)
     this.selected = false;
     this.arrGraphicObjects = [];
     this.selectedObjects = [];
+
+    this.selection =
+    {
+        groupSelection: null,
+        chartSelection: null,
+        textSelection: null
+    };
+
 
     this.setRecalculateInfo();
     this.Lock = new CLock();
@@ -47,6 +56,38 @@ CGroupShape.prototype =
         return this.Id;
     },
 
+    documentUpdateSelectionState: function()
+    {
+        if(this.selection.textSelection)
+        {
+            this.selection.textSelection.updateSelectionState();
+        }
+        else if(this.selection.groupSelection)
+        {
+            this.selection.groupSelection.documentUpdateSelectionState();
+        }
+        else if(this.selection.chartSelection)
+        {
+            this.selection.chartSelection.documentUpdateSelectionState();
+        }
+        else
+        {
+            this.getDrawingDocument().SelectClear();
+            this.getDrawingDocument().TargetEnd();
+        }
+    },
+
+
+    drawSelectionPage: function(pageIndex)
+    {
+        if(this.selection.textSelection)
+        {
+            this.getDrawingDocument().UpdateTargetTransform(this.selection.textSelection.transformText);
+            this.selection.textSelection.getDocContent().Selection_Draw_Page(pageIndex);
+        }
+        else if(this.selection.chartSelection)
+        {}
+    },
     Write_ToBinary2: function(w)
     {
         w.WriteLong(historyitem_type_GroupShape);
@@ -347,6 +388,16 @@ CGroupShape.prototype =
         }
     },
 
+    getLocalTransform: function()
+    {
+        if(this.recalcInfo.recalculateTransform)
+        {
+            this.recalculateTransform();
+            this.recalcInfo.recalculateTransform = false;
+        }
+        return this.localTransform;
+    },
+
     getArrGraphicObjects: function()
     {
         if(this.recalcInfo.recalculateArrGraphicObjects)
@@ -433,19 +484,10 @@ CGroupShape.prototype =
     {
         return null;
     },
-	
-	selectObject: function(object)
+
+    selectObject: function(object, pageIndex)
     {
-        object.selected = true;
-        for(var i = 0; i < this.selectedObjects.length; ++i)
-        {
-            if(this.selectedObjects[i] === object)
-            {
-                break;
-            }
-        }
-        if(i === this.selectedObjects.length)
-            this.selectedObjects.push(object);
+        object.select(this, pageIndex);
     },
 
 
@@ -463,11 +505,11 @@ CGroupShape.prototype =
             this.recalculatePen();
             recalcInfo.recalculatePen = false;
         }
-		if(recalcInfo.recalculateScaleCoefficients)
-		{
-			this.getResultScaleCoefficients();
-			recalcInfo.recalculateScaleCoefficients = false;
-		}
+        if(recalcInfo.recalculateScaleCoefficients)
+        {
+            this.getResultScaleCoefficients();
+            recalcInfo.recalculateScaleCoefficients = false;
+        }
 
         if(recalcInfo.recalculateTransform)
         {
@@ -504,18 +546,18 @@ CGroupShape.prototype =
 
     canRotate: function()
     {
-		//TODO: сделать еще проверку SpLock
+        //TODO: сделать еще проверку SpLock
         for(var i = 0; i < this.spTree.length; ++i)
         {
             if(!this.spTree[i].canRotate || !this.spTree[i].canRotate())
-				return false;
+                return false;
         }
         return true;
     },
 
     canResize: function()
     {
-		//TODO: сделать еще проверку SpLock
+        //TODO: сделать еще проверку SpLock
         for(var i = 0; i < this.spTree.length; ++i)
         {
             if(!this.spTree[i].canResize || !this.spTree[i].canResize())
@@ -526,13 +568,13 @@ CGroupShape.prototype =
 
     canMove: function()
     {
-		//TODO: сделать еще проверку SpLock
+        //TODO: сделать еще проверку SpLock
         return true;//TODO
     },
 
     canGroup: function()
     {
-		//TODO: сделать еще проверку SpLock
+        //TODO: сделать еще проверку SpLock
         return true;//TODO
     },
 
@@ -567,6 +609,42 @@ CGroupShape.prototype =
                 var arr_graphic_objects = this.spTree[i].getArrGraphicObjects();
                 for(var j = 0; j < arr_graphic_objects.length; ++j)
                     this.arrGraphicObjects.push(arr_graphic_objects[j]);
+            }
+        }
+    },
+
+
+    paragraphAdd: function(paraItem, bRecalculate)
+    {
+        if(this.selection.textSelection)
+        {
+            this.selection.textSelection.paragraphAdd(paraItem, bRecalculate);
+        }
+        else if(this.selection.chartSelection)
+        {
+            this.selection.chartSelection.paragraphAdd(paraItem, bRecalculate);
+        }
+        else
+        {
+            var i;
+            if(paraItem.Type === para_TextPr)
+            {
+                for(i = 0; i < this.selectedObjects.length; ++i)
+                {
+                    this.selectedObjects[i].applyTextPr(paraItem, bRecalculate);
+                }
+            }
+            else if(this.selectedObjects.length === 1
+                && this.selectedObjects[0].getObjectType() === historyitem_type_Shape
+                &&  !CheckLinePreset(this.selectedObjects[0].getPresetGeom()))
+            {
+                this.selection.textSelection = this.selectedObjects[0];
+                this.selection.textSelection.paragraphAdd(paraItem, bRecalculate);
+            }
+            else if(this.selectedObjects.length > 0)
+            {
+                this.parent.GoTo_Text();
+                this.resetSelection();
             }
         }
     },
@@ -1239,15 +1317,15 @@ CGroupShape.prototype =
             new_ext_x = scale_scale_coefficients.cx*xfrm.extX;
             new_ext_y = scale_scale_coefficients.cy*xfrm.extY;
         }
-		var xfrm = this.spPr.xfrm;
-		xfrm.setOffX(new_off_x);
-		xfrm.setOffY(new_off_y);
-		xfrm.setExtX(new_ext_x);
-		xfrm.setExtY(new_ext_y);
-		xfrm.setChExtX(new_ext_x);
-		xfrm.setChExtY(new_ext_y);
-		xfrm.setChOffX(0);
-		xfrm.setChOffY(0);
+        var xfrm = this.spPr.xfrm;
+        xfrm.setOffX(new_off_x);
+        xfrm.setOffY(new_off_y);
+        xfrm.setExtX(new_ext_x);
+        xfrm.setExtY(new_ext_y);
+        xfrm.setChExtX(new_ext_x);
+        xfrm.setChExtY(new_ext_y);
+        xfrm.setChOffX(0);
+        xfrm.setChOffY(0);
     },
 
     updateCoordinatesAfterInternalResize: function()
@@ -1353,37 +1431,22 @@ CGroupShape.prototype =
         pos_x = new_xc - new_hc;
         pos_y = new_yc - new_vc;
 
-		var xfrm = this.spPr.xfrm;
-		xfrm.setOffX(pos_x);
-		xfrm.setOffY(pos_y);
-		xfrm.setExtX(Math.abs(max_x - min_x));
-		xfrm.setExtY(Math.abs(max_y - min_y));
-		xfrm.setChExtX(Math.abs(max_x - min_x));
-		xfrm.setChExtY(Math.abs(max_y - min_y));
+        var xfrm = this.spPr.xfrm;
+        xfrm.setOffX(pos_x);
+        xfrm.setOffY(pos_y);
+        xfrm.setExtX(Math.abs(max_x - min_x));
+        xfrm.setExtY(Math.abs(max_y - min_y));
+        xfrm.setChExtX(Math.abs(max_x - min_x));
+        xfrm.setChExtY(Math.abs(max_y - min_y));
         for(i = 0; i < sp_tree.length; ++i)
         {
-			sp_tree[i].spPr.xfrm.setOffX(sp_tree[i].spPr.xfrm.offX - x_min_clear);
-			sp_tree[i].spPr.xfrm.setOffY(sp_tree[i].spPr.xfrm.offY - y_min_clear);
+            sp_tree[i].spPr.xfrm.setOffX(sp_tree[i].spPr.xfrm.offX - x_min_clear);
+            sp_tree[i].spPr.xfrm.setOffY(sp_tree[i].spPr.xfrm.offY - y_min_clear);
         }
     },
 
 
-    select: function(drawingObjectsController)
-    {
-        this.selected = true;
-        var selected_objects;
-        if(!isRealObject(this.group))
-            selected_objects = drawingObjectsController.selectedObjects;
-        else
-            selected_objects = this.group.getMainGroup().selectedObjects;
-        for(var i = 0; i < selected_objects.length; ++i)
-        {
-            if(selected_objects[i] === this)
-                break;
-        }
-        if(i === selected_objects.length)
-            selected_objects.push(this);
-    },
+    select: CShape.prototype.select,
 
     deselect: function(drawingObjectsController)
     {
@@ -1516,11 +1579,16 @@ CGroupShape.prototype =
 
     resetSelection: function(graphicObjects)
     {
+        this.selection.textSelection = null;
+        this.selection.chartSelection = null;
         for(var i = this.selectedObjects.length - 1; i > -1; --i)
         {
             this.selectedObjects[i].deselect(graphicObjects);
         }
     },
+
+    resetInternalSelection: DrawingObjectsController.prototype.resetInternalSelection,
+    recalculateCurPos: DrawingObjectsController.prototype.recalculateCurPos,
 
     hitToAdj: function(x, y)
     {
@@ -1555,6 +1623,33 @@ CGroupShape.prototype =
             }
         }
     },
+
+    bringToFront : function()//перемещаем заселекченые объекты наверх
+    {
+        var i;
+        for(i = this.spTree.length - 1;  i > -1; --i)
+        {
+            if(this.spTree[i].getObjectType() === historyitem_type_GroupShape)
+            {
+                this.spTree[i].bringToFront();
+            }
+
+        }
+    },
+
+    bringForward : function()
+    {
+    },
+
+    sendToBack : function()
+    {
+    },
+
+    bringBackward : function()
+    {
+    },
+
+
 
     Undo: function(data)
     {
@@ -1637,6 +1732,8 @@ CGroupShape.prototype =
             }
         }
     },
+
+
 
 
 

@@ -277,4 +277,4 @@ CShape.prototype.recalculateContent = function()
 		content.Reset(0, 0, w, h);
 		content.Recalculate_Page(content.StartPage, true);
 	}
-}
+};

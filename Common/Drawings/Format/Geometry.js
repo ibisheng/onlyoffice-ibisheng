@@ -375,8 +375,11 @@ Geometry.prototype=
 
     Read_FromBinary2: function(r)
     {
-       this.Id = r.GetString2();
+        this.Id = r.GetString2();
     },
+
+    Refresh_RecalcData: function(data)
+    {},
 
     createDuplicate: function()
     {
@@ -1141,7 +1144,7 @@ Geometry.prototype=
     {
         if(isRealNumber(this.gdLst[gdRef]))
         {
-          this.gdLst[gdRef] = gdValue;
+            this.gdLst[gdRef] = gdValue;
         }
     },
 
@@ -1328,9 +1331,9 @@ Geometry.prototype=
             if(cur_polygon.length >= 2)
             {
                 /*if(first_point_x !== null && first_point_y !== null)
-                {
-                    cur_polygon.push({x: first_point_x, y: first_point_y});
-                }             */
+                 {
+                 cur_polygon.push({x: first_point_x, y: first_point_y});
+                 }             */
                 arr_polygons.push(cur_polygon);
             }
         }

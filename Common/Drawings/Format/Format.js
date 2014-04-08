@@ -160,15 +160,15 @@ function readObject(r)
 
 function ExecuteNoHistory(f, oThis, args)
 {
-	var is_on = (History instanceof CHistory) ? History.Is_On() : false;
-	if(!(History instanceof CHistory))
-	{
-		History = {Add: function(){}};
-	}
-	if(is_on)
-	{
-		History.TurnOff();
-	}
+    var is_on = (History instanceof CHistory) ? History.Is_On() : false;
+    if(!(History instanceof CHistory))
+    {
+        History = {Add: function(){}};
+    }
+    if(is_on)
+    {
+        History.TurnOff();
+    }
 
     var b_table_id = false;
     if(g_oTableId && !g_oTableId.m_bTurnOff)
@@ -179,16 +179,16 @@ function ExecuteNoHistory(f, oThis, args)
 
 
 
-	var ret = f.apply(oThis, args);	
-	if(is_on)
-	{
-		History.TurnOn();
-	}
+    var ret = f.apply(oThis, args);
+    if(is_on)
+    {
+        History.TurnOn();
+    }
     if(b_table_id)
     {
         g_oTableId.m_bTurnOff = false;
     }
-	return ret;
+    return ret;
 }
 
 
@@ -940,7 +940,13 @@ function CSysColor()
 {
     this.type = COLOR_TYPE_SYS;
     this.id = "";
-    this.RGBA = {R:0, G:0, B:0, A:255};
+    this.RGBA = {
+        R: 0,
+        G: 0,
+        B: 0,
+        A: 255,
+        needRecalc: true
+    };
 
 
     this.Id = g_oIdCounter.Get_NewId();
@@ -956,6 +962,15 @@ CSysColor.prototype =
 
     Refresh_RecalcData: function()
     {},
+
+
+    check: function()
+    {
+        var ret = this.RGBA.needRecalc;
+        this.RGBA.needRecalc = false;
+        return ret;
+    },
+
     getObjectType: function()
     {
         return historyitem_type_SysColor;
@@ -1057,7 +1072,9 @@ function CPrstColor()
 {
     this.type = COLOR_TYPE_PRST;
     this.id = "";
-    this.RGBA = {R:0, G:0, B:0, A:255};
+    this.RGBA = {
+        R:0, G:0, B:0, A:255, needRecalc: true
+    };
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -1140,12 +1157,43 @@ CPrstColor.prototype =
         this.RGBA.R = (RGB >> 16) & 0xFF;
         this.RGBA.G = (RGB >> 8) & 0xFF;
         this.RGBA.B = RGB & 0xFF;
+    },
+
+    check: function()
+    {
+        var r, g, b , rgb;
+        rgb = map_prst_color[this.id];
+        r = (rgb >> 16) & 0xFF;
+        g = (rgb >> 8) & 0xFF;
+        b = rgb & 0xFF;
+
+        var RGBA = this.RGBA;
+        if(RGBA.needRecalc)
+        {
+            RGBA.R = r;
+            RGBA.G = g;
+            RGBA.B = b;
+            RGBA.needRecalc = false;
+            return true;
+        }
+        else
+        {
+            if(RGBA.R === r && RGBA.G === g && RGBA.B === b)
+                return false;
+            else
+            {
+                RGBA.R = r;
+                RGBA.G = g;
+                RGBA.B = b;
+                return true;
+            }
+        }
     }
 };
 function CRGBColor()
 {
     this.type = COLOR_TYPE_SRGB;
-    this.RGBA = {R:0, G:0, B:0, A:255};
+    this.RGBA = {R:0, G:0, B:0, A:255, needRecalc: true};
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -1160,6 +1208,13 @@ CRGBColor.prototype =
 
     Refresh_RecalcData: function()
     {},
+
+    check: function()
+    {
+        var ret = this.RGBA.needRecalc;
+        this.RGBA.needRecalc = false;
+        return ret;
+    },
 
     getObjectType: function()
     {
@@ -1283,7 +1338,13 @@ function CSchemeColor()
 {
     this.type = COLOR_TYPE_SCHEME;
     this.id = 0;
-    this.RGBA = {R:0, G:0, B:0, A:255};
+    this.RGBA = {
+        R:0,
+        G:0,
+        B:0,
+        A:255,
+        needRecalc: true
+    };
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -1297,6 +1358,40 @@ CSchemeColor.prototype =
 
     Refresh_RecalcData: function()
     {},
+
+    check: function(theme, colorMap)
+    {
+        var RGBA, colors = theme.themeElements.clrScheme.colors;
+        if (colorMap[this.id]!=null && colors[colorMap[this.id]] != null)
+            RGBA =  colors[colorMap[this.id]].color.RGBA;
+        else if ( colors[this.id] != null)
+            RGBA = colors[this.id].color.RGBA;
+        var _RGBA = this.RGBA;
+        if(this.RGBA.needRecalc)
+        {
+            _RGBA.R = RGBA.R;
+            _RGBA.G = RGBA.G;
+            _RGBA.B = RGBA.B;
+            _RGBA.A = RGBA.A;
+            this.RGBA.needRecalc = false;
+            return true;
+        }
+        else
+        {
+            if(_RGBA.R === RGBA.R && _RGBA.G === RGBA.G && _RGBA.B === RGBA.B && _RGBA.A === RGBA.A)
+            {
+                return false;
+            }
+            else
+            {
+                _RGBA.R = RGBA.R;
+                _RGBA.G = RGBA.G;
+                _RGBA.B = RGBA.B;
+                _RGBA.A = RGBA.A;
+                return true;
+            }
+        }
+    },
 
     getObjectType: function()
     {
@@ -1423,11 +1518,16 @@ CSchemeColor.prototype =
     }
 };
 
-    function CUniColor()
+function CUniColor()
 {
     this.color = null;
     this.Mods = null;//new CColorModifiers();
-    this.RGBA = {R:0, G:0, B:0, A: 255};
+    this.RGBA = {
+        R: 0,
+        G: 0,
+        B: 0,
+        A: 255
+    };
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -1441,6 +1541,19 @@ CUniColor.prototype =
 
     Refresh_RecalcData: function()
     {},
+
+
+    check: function(theme, colorMap)
+    {
+        if(this.color && this.color.check(theme, colorMap)/*возвращает был ли изменен RGBA*/)
+        {
+            this.RGBA.R = this.color.RGBA.R;
+            this.RGBA.G = this.color.RGBA.G;
+            this.RGBA.B = this.color.RGBA.B;
+            if(this.Mods)
+                this.Mods.Apply(this.RGBA);
+        }
+    },
 
     getObjectType: function()
     {
@@ -1534,7 +1647,7 @@ CUniColor.prototype =
 
     Load_Changes: function(r)
     {
-        if(r.GetLong() !== this.getObjectsType())
+        if(r.GetLong() !== this.getObjectType())
         {
             return;
         }
@@ -1916,6 +2029,10 @@ CBlipFill.prototype =
     Refresh_RecalcData: function()
     {},
 
+
+    check: function()
+    {},
+
     getObjectType: function()
     {
         return historyitem_type_BlipFill;
@@ -2042,7 +2159,7 @@ CBlipFill.prototype =
 
     Save_Changes: function(data, w)
     {
-        w.WriteLong(this.getObjectsType());
+        w.WriteLong(this.getObjectType());
         w.WriteLong(data.Type);
         switch(data.Type)
         {
@@ -2292,6 +2409,7 @@ function CSolidFill()
 {
     this.type = FILL_TYPE_SOLID;
     this.color = null;
+    this.Id = g_oIdCounter.Get_NewId();
 }
 
 CSolidFill.prototype =
@@ -2303,6 +2421,15 @@ CSolidFill.prototype =
 
     Refresh_RecalcData: function()
     {},
+
+
+    check: function(theme, colorMap)
+    {
+        if(this.color)
+        {
+            this.color.check(theme, colorMap);
+        }
+    },
 
     getObjectType: function()
     {
@@ -2500,7 +2627,7 @@ CGs.prototype =
 
     Save_Changes: function(data, w)
     {
-        w.WriteLong(this.getObjectsType());
+        w.WriteLong(this.getObjectType());
         w.WriteLong(data.Type);
         switch(data.Type)
         {
@@ -2931,6 +3058,17 @@ CGradFill.prototype =
     Refresh_RecalcData: function()
     {},
 
+    check: function(theme, colorMap)
+    {
+        for(var i = 0; i < this.colors.length; ++i)
+        {
+            if(this.colors[i].color)
+            {
+                this.colors[i].color.check(theme, colorMap);
+            }
+        }
+    },
+
     getObjectType: function()
     {
         return historyitem_type_GradFill;
@@ -3157,6 +3295,14 @@ CPattFill.prototype =
         return historyitem_type_PathFill;
     },
 
+    check: function(theme, colorMap)
+    {
+        if(this.fgClr)
+            this.fgClr.check(theme, colorMap);
+        if(this.bgClr)
+            this.bgClr.check(theme, colorMap);
+    },
+
     setFType: function(fType)
     {
         History.Add(this, {Type: historyitem_PathFill_SetFType, oldFType: this.ftype, newFType: fType});
@@ -3374,6 +3520,10 @@ CNoFill.prototype =
 
     Refresh_RecalcData: function()
     {},
+
+    check: function()
+    {},
+
     getObjectType: function()
     {
         return historyitem_type_NoFill;
@@ -3432,18 +3582,19 @@ CNoFill.prototype =
 
 function CreateBlackRGBUnifill()
 {
-	var ret = new CUniFill();
-	ret.setFill(new CSolidFill());
-	ret.fill.setColor(new CUniColor());
-	ret.fill.color.setColor(new CRGBColor());
-	ret.fill.color.color.setColor(0, 0, 0);
-	return ret;
+    var ret = new CUniFill();
+    ret.setFill(new CSolidFill());
+    ret.fill.setColor(new CUniColor());
+    ret.fill.color.setColor(new CRGBColor());
+    ret.fill.color.color.setColor(0, 0, 0);
+    return ret;
 }
 
 function CUniFill()
 {
     this.fill = null;
     this.transparent = null;
+    this.Id = g_oIdCounter.Get_NewId();
 }
 
 CUniFill.prototype =
@@ -3454,6 +3605,20 @@ CUniFill.prototype =
     },
     Refresh_RecalcData: function()
     {},
+
+    check: function(theme, colorMap)
+    {
+        if(this.fill)
+        {
+            this.fill.check(theme, colorMap);
+        }
+    },
+
+    getCalcFill: function()
+    {
+
+        return this;
+    },
 
     getObjectType: function()
     {
@@ -3472,11 +3637,11 @@ CUniFill.prototype =
         this.transparent = transparent;
     },
 
-	Set_FromObject: function(o)
-	{
-		//TODO:
-	},
-	
+    Set_FromObject: function(o)
+    {
+        //TODO:
+    },
+
     Undo: function(data)
     {
         switch (data.Type)
@@ -3583,12 +3748,12 @@ CUniFill.prototype =
     {
         this.Id = r.GetString2();
     },
-	
-	Write_ToBinary: function(w)
-	{},
-	
-	Read_FromBinary: function()
-	{},
+
+    Write_ToBinary: function(w)
+    {},
+
+    Read_FromBinary: function()
+    {},
 
 
 
@@ -4852,156 +5017,156 @@ DefaultShapeDefinition.prototype=
     {
         switch(data.Type)
         {
-        	case historyitem_DefaultShapeDefinition_SetSpPr:
-        	{
-        		this.spPr = data.oldSpPr;
-        		break;
-        	}
-			case historyitem_DefaultShapeDefinition_SetBodyPr:
-			{
-				this.bodyPr = data.oldBodyPr;
-				break;
-			}
-			case historyitem_DefaultShapeDefinition_SetLstStyle:
-			{
-				this.lstStyle = data.oldLstStyle;
-				break;
-			}
-			case historyitem_DefaultShapeDefinition_SetStyle:
-			{
-				this.style = data.oldStyle;
-				break;
-			}
+            case historyitem_DefaultShapeDefinition_SetSpPr:
+            {
+                this.spPr = data.oldSpPr;
+                break;
+            }
+            case historyitem_DefaultShapeDefinition_SetBodyPr:
+            {
+                this.bodyPr = data.oldBodyPr;
+                break;
+            }
+            case historyitem_DefaultShapeDefinition_SetLstStyle:
+            {
+                this.lstStyle = data.oldLstStyle;
+                break;
+            }
+            case historyitem_DefaultShapeDefinition_SetStyle:
+            {
+                this.style = data.oldStyle;
+                break;
+            }
         }
     },
 
     Redo: function(data)
     {
-    	switch(data.Type)
+        switch(data.Type)
         {
-        	case historyitem_DefaultShapeDefinition_SetSpPr:
-        	{
-        		this.spPr = data.newSpPr;
-        		break;
-        	}
-			case historyitem_DefaultShapeDefinition_SetBodyPr:
-			{
-				this.bodyPr = data.newBodyPr;
-				break;
-			}
-			case historyitem_DefaultShapeDefinition_SetLstStyle:
-			{
-				this.lstStyle = data.newLstStyle;
-				break;
-			}
-			case historyitem_DefaultShapeDefinition_SetStyle:
-			{
-				this.style = data.newStyle;
-				break;
-			}
+            case historyitem_DefaultShapeDefinition_SetSpPr:
+            {
+                this.spPr = data.newSpPr;
+                break;
+            }
+            case historyitem_DefaultShapeDefinition_SetBodyPr:
+            {
+                this.bodyPr = data.newBodyPr;
+                break;
+            }
+            case historyitem_DefaultShapeDefinition_SetLstStyle:
+            {
+                this.lstStyle = data.newLstStyle;
+                break;
+            }
+            case historyitem_DefaultShapeDefinition_SetStyle:
+            {
+                this.style = data.newStyle;
+                break;
+            }
         }
     },
-    
+
     Save_Changes: function(data, w)
     {
-    	w.WriteLong(this.getObjectType());
-    	w.WriteLong(data.Type);
-    	switch(data.Type)
+        w.WriteLong(this.getObjectType());
+        w.WriteLong(data.Type);
+        switch(data.Type)
         {
-        	case historyitem_DefaultShapeDefinition_SetSpPr:
-        	{
-        		w.WriteBool(isRealObject(data.newSpPr));
-        		if(isRealObject(data.newSpPr))
-				{
-					w.WriteString2(data.newSpPr.Get_Id());
-				}
-        		break;
-        	}
-			case historyitem_DefaultShapeDefinition_SetBodyPr:
-			{
-        		w.WriteBool(isRealObject(data.newBodyPr));
-        		if(isRealObject(data.newBodyPr))
-				{
-					w.WriteString2(data.newBodyPr.Get_Id());
-				}
-				break;
-			}
-			case historyitem_DefaultShapeDefinition_SetLstStyle:
-			{
-				w.WriteBool(isRealObject(data.newLstStyle));
-        		if(isRealObject(data.newLstStyle))
-				{
-					w.WriteString2(data.newLstStyle.Get_Id());
-				}
-				break;
-			}
-			case historyitem_DefaultShapeDefinition_SetStyle:
-			{
-				w.WriteBool(isRealObject(data.newStyle));
-        		if(isRealObject(data.newStyle))
-				{
-					w.WriteString2(data.newStyle.Get_Id());
-				}
-				break;
-			}
+            case historyitem_DefaultShapeDefinition_SetSpPr:
+            {
+                w.WriteBool(isRealObject(data.newSpPr));
+                if(isRealObject(data.newSpPr))
+                {
+                    w.WriteString2(data.newSpPr.Get_Id());
+                }
+                break;
+            }
+            case historyitem_DefaultShapeDefinition_SetBodyPr:
+            {
+                w.WriteBool(isRealObject(data.newBodyPr));
+                if(isRealObject(data.newBodyPr))
+                {
+                    w.WriteString2(data.newBodyPr.Get_Id());
+                }
+                break;
+            }
+            case historyitem_DefaultShapeDefinition_SetLstStyle:
+            {
+                w.WriteBool(isRealObject(data.newLstStyle));
+                if(isRealObject(data.newLstStyle))
+                {
+                    w.WriteString2(data.newLstStyle.Get_Id());
+                }
+                break;
+            }
+            case historyitem_DefaultShapeDefinition_SetStyle:
+            {
+                w.WriteBool(isRealObject(data.newStyle));
+                if(isRealObject(data.newStyle))
+                {
+                    w.WriteString2(data.newStyle.Get_Id());
+                }
+                break;
+            }
         }
     },
-    
+
     Load_Changes: function(r)
     {
-    	if(this.getObjectType() !== r.GetBool())
-			return;
-		var type = r.GetLong();
-    	switch(type)
+        if(this.getObjectType() !== r.GetBool())
+            return;
+        var type = r.GetLong();
+        switch(type)
         {
-        	case historyitem_DefaultShapeDefinition_SetSpPr:
-        	{
-        		if(r.GetBool())
-				{
-					this.spPr = g_oTableId.Get_ById(r.GetString2());
-				}
-				else
-				{
-					this.spPr = null;
-				}
-        		break;
-        	}
-			case historyitem_DefaultShapeDefinition_SetBodyPr:
-			{
-        		if(r.GetBool())
-				{
-					this.bodyPr = g_oTableId.Get_ById(r.GetString2());
-				}
-				else
-				{
-					this.bodyPr = null;
-				}
-				break;
-			}
-			case historyitem_DefaultShapeDefinition_SetLstStyle:
-			{
-				if(r.GetBool())
-				{
-					this.lstStyle = g_oTableId.Get_ById(r.GetString2());
-				}
-				else
-				{
-					this.lstStyle = null;
-				}
-				break;
-			}
-			case historyitem_DefaultShapeDefinition_SetStyle:
-			{
-				if(r.GetBool())
-				{
-					this.style = g_oTableId.Get_ById(r.GetString2());
-				}
-				else
-				{
-					this.style = null;
-				}
-				break;
-			}
+            case historyitem_DefaultShapeDefinition_SetSpPr:
+            {
+                if(r.GetBool())
+                {
+                    this.spPr = g_oTableId.Get_ById(r.GetString2());
+                }
+                else
+                {
+                    this.spPr = null;
+                }
+                break;
+            }
+            case historyitem_DefaultShapeDefinition_SetBodyPr:
+            {
+                if(r.GetBool())
+                {
+                    this.bodyPr = g_oTableId.Get_ById(r.GetString2());
+                }
+                else
+                {
+                    this.bodyPr = null;
+                }
+                break;
+            }
+            case historyitem_DefaultShapeDefinition_SetLstStyle:
+            {
+                if(r.GetBool())
+                {
+                    this.lstStyle = g_oTableId.Get_ById(r.GetString2());
+                }
+                else
+                {
+                    this.lstStyle = null;
+                }
+                break;
+            }
+            case historyitem_DefaultShapeDefinition_SetStyle:
+            {
+                if(r.GetBool())
+                {
+                    this.style = g_oTableId.Get_ById(r.GetString2());
+                }
+                else
+                {
+                    this.style = null;
+                }
+                break;
+            }
         }
     }
 };
@@ -5021,8 +5186,8 @@ function CNvPr()
         return duplicate;
     };
 
-	this.Id = g_oIdCounter.Get_NewId();
-	g_oTableId.Add(this, this.Id)
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id)
 }
 
 
@@ -5035,151 +5200,151 @@ CNvPr.prototype =
 
     Refresh_RecalcData: function()
     {},
-    
+
     getObjectType: function()
     {
-    	return historyitem_type_CNvPr;
+        return historyitem_type_CNvPr;
     },
-    
+
     setId: function(id)
     {
-    	History.Add(this, {Type: historyitem_CNvPr_SetId, oldId: this.id, newId: id});
-    	this.id = id;
+        History.Add(this, {Type: historyitem_CNvPr_SetId, oldId: this.id, newId: id});
+        this.id = id;
     },
-    
+
     setName: function(name)
     {
-    	History.Add(this, {Type: historyitem_CNvPr_SetName, oldName: this.name, newName: name});
-    	this.name = name;
+        History.Add(this, {Type: historyitem_CNvPr_SetName, oldName: this.name, newName: name});
+        this.name = name;
     },
-     
+
     setIsHidden: function(isHidden)
     {
-    	History.Add(this, {Type: historyitem_CNvPr_SetIsHidden, oldIsHidden: this.isHidden, newIsHidden: isHidden});
-    	this.isHidden = isHidden;
+        History.Add(this, {Type: historyitem_CNvPr_SetIsHidden, oldIsHidden: this.isHidden, newIsHidden: isHidden});
+        this.isHidden = isHidden;
     },
-    
+
     Undo: function(data)
     {
-    	switch(data.Type)
-    	{
-    		case historyitem_CNvPr_SetId:
-    		{
-    			this.id = data.oldId;
-    			break;
-    		}
-    		case historyitem_CNvPr_SetName:
-    		{
-    			this.name = data.oldName;
-    			break;
-    		}
-    		case historyitem_CNvPr_SetIsHidden:
-    		{
-    			this.isHidden = data.oldIsHidden;
-    			break;
-    		}
-    	}
+        switch(data.Type)
+        {
+            case historyitem_CNvPr_SetId:
+            {
+                this.id = data.oldId;
+                break;
+            }
+            case historyitem_CNvPr_SetName:
+            {
+                this.name = data.oldName;
+                break;
+            }
+            case historyitem_CNvPr_SetIsHidden:
+            {
+                this.isHidden = data.oldIsHidden;
+                break;
+            }
+        }
     },
-    
+
     Redo: function(data)
     {
-    	switch(data.Type)
-    	{
-    		case historyitem_CNvPr_SetId:
-    		{
-    			this.id = data.newId;
-    			break;
-    		}
-    		case historyitem_CNvPr_SetName:
-    		{
-    			this.name = data.newName;
-    			break;
-    		}
-    		case historyitem_CNvPr_SetIsHidden:
-    		{
-    			this.isHidden = data.newIsHidden;
-    			break;
-    		}
-    	}
+        switch(data.Type)
+        {
+            case historyitem_CNvPr_SetId:
+            {
+                this.id = data.newId;
+                break;
+            }
+            case historyitem_CNvPr_SetName:
+            {
+                this.name = data.newName;
+                break;
+            }
+            case historyitem_CNvPr_SetIsHidden:
+            {
+                this.isHidden = data.newIsHidden;
+                break;
+            }
+        }
     },
-    
+
     Save_Changes: function(data, w)
     {
-    	w.WriteLong(this.getObjectType());
-    	w.WriteLong(data.Type);
-    	switch(data.Type)
-    	{
-    		case historyitem_CNvPr_SetId:
-    		{
-    			w.WriteBool(isRealNumber(data.newId));
-    			if(isRealNumber(data.newId))
-    			{
-    				w.WriteLong(data.newId);
-    			}
-    			break;
-    		}
-    		case historyitem_CNvPr_SetName:
-    		{
-    			w.WriteBool(typeof data.newName === "string");
-    			if(typeof data.newName === "string")
-    			{
-    				w.WriteString2(data.newName);
-    			}
-    			break;
-    		}
-    		case historyitem_CNvPr_SetIsHidden:
-    		{
-    			w.WriteBool(isRealBool(data.newIsHidden));
-    			if(isRealBool(data.newIsHidden))
-    			{
-    				w.WriteBool(data.newIsHidden);
-    			}
-    			break;
-    		}
-    	}
-	},
-	
-	
-	Load_Changes: function(r)
-	{
-		if(this.getObjectType() !== r.GetLong())
-			return;
-		var type = r.GetLong();
-		switch(type)
-    	{
-    		case historyitem_CNvPr_SetId:
-    		{
-    			if(r.GetBool())
-    			{
-    				this.id = r.GetLong();
-    			}
-    			else 
-    			{
-    				this.id = null;
-				}
-    			break;
-    		}
-    		case historyitem_CNvPr_SetName:
-    		{
-    			w.WriteBool(typeof data.newName === "string");
-    			if(typeof data.newName === "string")
-    			{
-    				w.WriteString2(data.newName);
-    			}
-    			if(r.GetBool())
-    			break;
-    		}
-    		case historyitem_CNvPr_SetIsHidden:
-    		{
-    			w.WriteBool(isRealBool(data.newIsHidden));
-    			if(isRealBool(data.newIsHidden))
-    			{
-    				w.WriteBool(data.newIsHidden);
-    			}
-    			break;
-    		}
-    	}
-	},
+        w.WriteLong(this.getObjectType());
+        w.WriteLong(data.Type);
+        switch(data.Type)
+        {
+            case historyitem_CNvPr_SetId:
+            {
+                w.WriteBool(isRealNumber(data.newId));
+                if(isRealNumber(data.newId))
+                {
+                    w.WriteLong(data.newId);
+                }
+                break;
+            }
+            case historyitem_CNvPr_SetName:
+            {
+                w.WriteBool(typeof data.newName === "string");
+                if(typeof data.newName === "string")
+                {
+                    w.WriteString2(data.newName);
+                }
+                break;
+            }
+            case historyitem_CNvPr_SetIsHidden:
+            {
+                w.WriteBool(isRealBool(data.newIsHidden));
+                if(isRealBool(data.newIsHidden))
+                {
+                    w.WriteBool(data.newIsHidden);
+                }
+                break;
+            }
+        }
+    },
+
+
+    Load_Changes: function(r)
+    {
+        if(this.getObjectType() !== r.GetLong())
+            return;
+        var type = r.GetLong();
+        switch(type)
+        {
+            case historyitem_CNvPr_SetId:
+            {
+                if(r.GetBool())
+                {
+                    this.id = r.GetLong();
+                }
+                else
+                {
+                    this.id = null;
+                }
+                break;
+            }
+            case historyitem_CNvPr_SetName:
+            {
+                w.WriteBool(typeof data.newName === "string");
+                if(typeof data.newName === "string")
+                {
+                    w.WriteString2(data.newName);
+                }
+                if(r.GetBool())
+                    break;
+            }
+            case historyitem_CNvPr_SetIsHidden:
+            {
+                w.WriteBool(isRealBool(data.newIsHidden));
+                if(isRealBool(data.newIsHidden))
+                {
+                    w.WriteBool(data.newIsHidden);
+                }
+                break;
+            }
+        }
+    },
 
     Write_ToBinary2: function (w)
     {
@@ -5232,7 +5397,7 @@ function NvPr()
             this.ph.Read_FromBinary2(r);
         }
     };
-    
+
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -5248,157 +5413,157 @@ NvPr.prototype =
     {},
     getObjectType: function()
     {
-    	return historyitem_type_NvPr;
+        return historyitem_type_NvPr;
     },
-    
+
     setIsPhoto: function(isPhoto)
     {
-    	History.Add(this, {Type:historyitem_NvPr_SetIsPhoto, oldIsPhoto: this.isPhoto, newIsPhoto: isPhoto});
-    	this.isPhoto = isPhoto; 
+        History.Add(this, {Type:historyitem_NvPr_SetIsPhoto, oldIsPhoto: this.isPhoto, newIsPhoto: isPhoto});
+        this.isPhoto = isPhoto;
     },
-    
+
     setUserDrawn: function(userDrawn)
     {
-    	History.Add(this, {Type:historyitem_NvPr_SetUserDrawn, oldUserDrawn: this.userDrawn, newUserDrawn: userDrawn});
-    	this.userDrawn = userDrawn;
+        History.Add(this, {Type:historyitem_NvPr_SetUserDrawn, oldUserDrawn: this.userDrawn, newUserDrawn: userDrawn});
+        this.userDrawn = userDrawn;
     },
-    
+
     setPh: function(ph)
     {
-    	History.Add(this, {Type: historyitem_NvPr_SetPh, oldPh: this.ph, newPh: ph});
-    	this.ph = ph;
+        History.Add(this, {Type: historyitem_NvPr_SetPh, oldPh: this.ph, newPh: ph});
+        this.ph = ph;
     },
-    
-    
+
+
     Undo: function(data)
     {
-    	switch(data.Type)
-    	{
-    		case historyitem_NvPr_SetIsPhoto:
-    		{
-    			this.isPhoto = data.oldIsPhoto;
-     			break;
-    		}
-    		case historyitem_NvPr_SetUserDrawn:
-    		{
-    			this.userDrawn = data.oldUserDrawn;
-    			break;
-    		}
-    		case historyitem_NvPr_SetPh:
-    		{
-    			this.ph = data.oldPh;
-    			break;
-    		}
-    	}
+        switch(data.Type)
+        {
+            case historyitem_NvPr_SetIsPhoto:
+            {
+                this.isPhoto = data.oldIsPhoto;
+                break;
+            }
+            case historyitem_NvPr_SetUserDrawn:
+            {
+                this.userDrawn = data.oldUserDrawn;
+                break;
+            }
+            case historyitem_NvPr_SetPh:
+            {
+                this.ph = data.oldPh;
+                break;
+            }
+        }
     },
-    
-    
+
+
     Redo: function(data)
     {
-    	switch(data.Type)
-    	{
-    		case historyitem_NvPr_SetIsPhoto:
-    		{
-    			this.isPhoto = data.newIsPhoto;
-     			break;
-    		}
-    		case historyitem_NvPr_SetUserDrawn:
-    		{
-    			this.userDrawn = data.newUserDrawn;
-    			break;
-    		}
-    		case historyitem_NvPr_SetPh:
-    		{
-    			this.ph = data.newPh;
-    			break;
-    		}
-    	}
+        switch(data.Type)
+        {
+            case historyitem_NvPr_SetIsPhoto:
+            {
+                this.isPhoto = data.newIsPhoto;
+                break;
+            }
+            case historyitem_NvPr_SetUserDrawn:
+            {
+                this.userDrawn = data.newUserDrawn;
+                break;
+            }
+            case historyitem_NvPr_SetPh:
+            {
+                this.ph = data.newPh;
+                break;
+            }
+        }
     },
-    
-    
+
+
     Save_Changes: function(data, w)
     {
-    	w.WriteLong(this.getObjectType());
-    	w.WriteLong(data.Type);
-    	switch(data.Type)
-    	{
-			case historyitem_NvPr_SetIsPhoto:
-    		{
-    			w.WriteBool(isRealBool(data.newIsPhoto));
-    			if(isRealBool(data.newIsPhoto))
-    			{
-    				w.WriteBool(data.newIsPhoto);
-    			}
-     			break;
-    		}
-    		case historyitem_NvPr_SetUserDrawn:
-    		{
-    			w.WriteBool(isRealBool(data.newUserDrawn));
-    			if(isRealBool(data.newUserDrawn))
-    			{
-    				w.WriteBool(data.newUserDrawn);
-    			}
-    			break;
-    		}
-    		case historyitem_NvPr_SetPh:
-    		{
-    			w.WriteBool(isRealObject(data.newPh));
-    			if(isRealObject(data.newPh))
-    			{
-    				w.WriteString2(data.newPh.Get_Id());
-    			}
-    			break;
-    		}
-    	}
-    	
+        w.WriteLong(this.getObjectType());
+        w.WriteLong(data.Type);
+        switch(data.Type)
+        {
+            case historyitem_NvPr_SetIsPhoto:
+            {
+                w.WriteBool(isRealBool(data.newIsPhoto));
+                if(isRealBool(data.newIsPhoto))
+                {
+                    w.WriteBool(data.newIsPhoto);
+                }
+                break;
+            }
+            case historyitem_NvPr_SetUserDrawn:
+            {
+                w.WriteBool(isRealBool(data.newUserDrawn));
+                if(isRealBool(data.newUserDrawn))
+                {
+                    w.WriteBool(data.newUserDrawn);
+                }
+                break;
+            }
+            case historyitem_NvPr_SetPh:
+            {
+                w.WriteBool(isRealObject(data.newPh));
+                if(isRealObject(data.newPh))
+                {
+                    w.WriteString2(data.newPh.Get_Id());
+                }
+                break;
+            }
+        }
+
     },
 
     Load_Change: function(r)
     {
-   		if(this.getObjectType() !== r.GetLong())
-   			return;
-		var type = r.GetLong();
-		switch(type)
-		{
-			case historyitem_NvPr_SetIsPhoto:
-    		{
-    			if(r.GetBool())
-    			{
-    				this.isPhoto = r.GetBool();
-    			}
-    			else
-    			{
-    				this.isPhoto = null;
-    			}
-     			break;
-    		}
-    		case historyitem_NvPr_SetUserDrawn:
-    		{	
-    			if(r.GetBool())
-    			{
-    				this.userDrawn = r.GetBool();
-    			}
-    			else
-    			{
-    				this.userDrawn = null;
-    			}
-    			break;
-    		}
-    		case historyitem_NvPr_SetPh:
-    		{
-    			if(r.GetBool())
-    			{
-    				this.ph = g_oTableId.Get_ById(r.GetString2());
-    			}
-    			else
-    			{
-    				this.ph = null;
-    			}
-    			break;
-    		} 
-		}
+        if(this.getObjectType() !== r.GetLong())
+            return;
+        var type = r.GetLong();
+        switch(type)
+        {
+            case historyitem_NvPr_SetIsPhoto:
+            {
+                if(r.GetBool())
+                {
+                    this.isPhoto = r.GetBool();
+                }
+                else
+                {
+                    this.isPhoto = null;
+                }
+                break;
+            }
+            case historyitem_NvPr_SetUserDrawn:
+            {
+                if(r.GetBool())
+                {
+                    this.userDrawn = r.GetBool();
+                }
+                else
+                {
+                    this.userDrawn = null;
+                }
+                break;
+            }
+            case historyitem_NvPr_SetPh:
+            {
+                if(r.GetBool())
+                {
+                    this.ph = g_oTableId.Get_ById(r.GetString2());
+                }
+                else
+                {
+                    this.ph = null;
+                }
+                break;
+            }
+        }
     },
-    
+
     Write_ToBinary2: function (w)
     {
         w.WriteLong(this.getObjectType());
@@ -5465,247 +5630,247 @@ Ph.prototype =
     },
     Refresh_RecalcData: function()
     {},
-    
+
     getObjectType: function()
     {
-    	return historyitem_type_Ph;
+        return historyitem_type_Ph;
     },
-    
+
     setHasCustomPrompt: function(hasCustomPrompt)
     {
-    	History.Add(this, {Type: historyitem_Ph_SetHasCustomPrompt, oldHasCutomPrompt: this.hasCustomPrompt, newHasCustomPrompt:hasCustomPrompt});
-    	this.hasCustomPrompt = hasCustomPrompt;
+        History.Add(this, {Type: historyitem_Ph_SetHasCustomPrompt, oldHasCutomPrompt: this.hasCustomPrompt, newHasCustomPrompt:hasCustomPrompt});
+        this.hasCustomPrompt = hasCustomPrompt;
     },
-    
+
     setIdx: function(idx)
     {
-    	History.Add(this, {Type: historyitem_Ph_SetIdx, oldIdx: this.idx, newIdx:idx});
-    	this.idx = idx;
+        History.Add(this, {Type: historyitem_Ph_SetIdx, oldIdx: this.idx, newIdx:idx});
+        this.idx = idx;
     },
-    
+
     setOrient: function(orient)
     {
-    	History.Add(this, {Type: historyitem_Ph_SetOrient, oldOrient: this.orient, newIdx:orient});
-    	this.orient = orient;
+        History.Add(this, {Type: historyitem_Ph_SetOrient, oldOrient: this.orient, newIdx:orient});
+        this.orient = orient;
     },
-    
+
     setSz: function(sz)
     {
-    	History.Add(this, {Type: historyitem_Ph_SetSz, oldSz: this.sz, newSz:sz});
-    	this.sz = sz;
+        History.Add(this, {Type: historyitem_Ph_SetSz, oldSz: this.sz, newSz:sz});
+        this.sz = sz;
     },
-    
+
     setType: function(type)
     {
-    	History.Add(this, {Type: historyitem_Ph_SetType, oldType: this.type, newType:type});
-    	this.type = type;	
+        History.Add(this, {Type: historyitem_Ph_SetType, oldType: this.type, newType:type});
+        this.type = type;
     },
-    
+
     Undo: function(data)
     {
-    	switch(data.Type)
-    	{
-    		case historyitem_Ph_SetHasCustomPrompt:
-    		{
-    			this.hasCustomPrompt = data.oldHasCustomPrompt;
-    			break;
-    		}    		
-    		case historyitem_Ph_SetIdx:
-    		{
-    			this.idx = data.oldIdx;
-    			break;
-    		}
-    		case historyitem_Ph_SetOrient:
-    		{
-    			this.orient = data.oldOrient;
-    			break;
-    		}
-    		case historyitem_Ph_SetSz:
-    		{
-    			this.sz = data.oldSz;
-    			break;
-    		}
-    		case historyitem_Ph_SetType:
-    		{
-    			this.type = data.oldType;
-    			break;
-    		}
-    	}
+        switch(data.Type)
+        {
+            case historyitem_Ph_SetHasCustomPrompt:
+            {
+                this.hasCustomPrompt = data.oldHasCustomPrompt;
+                break;
+            }
+            case historyitem_Ph_SetIdx:
+            {
+                this.idx = data.oldIdx;
+                break;
+            }
+            case historyitem_Ph_SetOrient:
+            {
+                this.orient = data.oldOrient;
+                break;
+            }
+            case historyitem_Ph_SetSz:
+            {
+                this.sz = data.oldSz;
+                break;
+            }
+            case historyitem_Ph_SetType:
+            {
+                this.type = data.oldType;
+                break;
+            }
+        }
     },
 
     Redo: function(data)
     {
-    	switch(data.Type)
-    	{
-    		case historyitem_Ph_SetHasCustomPrompt:
-    		{
-    			this.hasCustomPrompt = data.newHasCustomPrompt;
-    			break;
-    		}    		
-    		case historyitem_Ph_SetIdx:
-    		{
-    			this.idx = data.newIdx;
-    			break;
-    		}
-    		case historyitem_Ph_SetOrient:
-    		{
-    			this.orient = data.newOrient;
-    			break;
-    		}
-    		case historyitem_Ph_SetSz:
-    		{
-    			this.sz = data.newSz;
-    			break;
-    		}
-    		case historyitem_Ph_SetType:
-    		{
-    			this.type = data.newType;
-    			break;
-    		}
-    	}
+        switch(data.Type)
+        {
+            case historyitem_Ph_SetHasCustomPrompt:
+            {
+                this.hasCustomPrompt = data.newHasCustomPrompt;
+                break;
+            }
+            case historyitem_Ph_SetIdx:
+            {
+                this.idx = data.newIdx;
+                break;
+            }
+            case historyitem_Ph_SetOrient:
+            {
+                this.orient = data.newOrient;
+                break;
+            }
+            case historyitem_Ph_SetSz:
+            {
+                this.sz = data.newSz;
+                break;
+            }
+            case historyitem_Ph_SetType:
+            {
+                this.type = data.newType;
+                break;
+            }
+        }
     },
-    
-    
+
+
     Save_Changes: function(data, w)
     {
-    	w.WriteLong(this.getObjectType());
-    	w.WriteLong(data.Type);
-    	switch(data.Type)
-    	{
-    		case historyitem_Ph_SetHasCustomPrompt:
-    		{
-    			w.WriteBool(isRealBool(data.newHasCustomPrompt));
-    			if(isRealBool(data.newHasCustomPrompt))
-    			{
-    				w.WriteBool(data.newHasCustomPrompt);
-    			}
-    			break;
-    		}    		
-    		case historyitem_Ph_SetIdx:
-    		{
-    			w.WriteBool(typeof data.newIdx === "string" || isRealNumber(data.newIdx));
-    			if(typeof data.newIdx === "string" || isRealNumber(data.newIdx))
-    			{
-    				w.WriteBool(typeof data.newIdx === "string");
-    				if(typeof data.newIdx === "string")
-    				{
-    					w.WriteString2(data.newIdx);
-    				}
-    				else
-    				{
-    					w.WriteLong(data.newIdx);	
-    				}
-    			}
-    			break;
-    		}
-    		case historyitem_Ph_SetOrient:
-    		{
-    			w.WriteBool(isRealNumber(data.newOrient));
-    			if(isRealNumber(data.newOrient))
-    			{
-    				w.WriteLong(data.newOrient);
-    			}
-    			break;
-    		}
-    		case historyitem_Ph_SetSz:
-    		{
-    			w.WriteBool(isRealNumber(data.newSz));
-    			if(isRealNumber(data.newSz))
-    			{
-    				w.WriteLong(data.newSz);
-    			}
-    			break;
-    		}
-    		case historyitem_Ph_SetType:
-    		{
-    			w.WriteBool(isRealNumber(data.newType));
-    			if(isRealNumber(data.newType))
-    			{
-    				w.WriteLong(data.newType);
-    			}
-    			break;
-    		}
-		}
+        w.WriteLong(this.getObjectType());
+        w.WriteLong(data.Type);
+        switch(data.Type)
+        {
+            case historyitem_Ph_SetHasCustomPrompt:
+            {
+                w.WriteBool(isRealBool(data.newHasCustomPrompt));
+                if(isRealBool(data.newHasCustomPrompt))
+                {
+                    w.WriteBool(data.newHasCustomPrompt);
+                }
+                break;
+            }
+            case historyitem_Ph_SetIdx:
+            {
+                w.WriteBool(typeof data.newIdx === "string" || isRealNumber(data.newIdx));
+                if(typeof data.newIdx === "string" || isRealNumber(data.newIdx))
+                {
+                    w.WriteBool(typeof data.newIdx === "string");
+                    if(typeof data.newIdx === "string")
+                    {
+                        w.WriteString2(data.newIdx);
+                    }
+                    else
+                    {
+                        w.WriteLong(data.newIdx);
+                    }
+                }
+                break;
+            }
+            case historyitem_Ph_SetOrient:
+            {
+                w.WriteBool(isRealNumber(data.newOrient));
+                if(isRealNumber(data.newOrient))
+                {
+                    w.WriteLong(data.newOrient);
+                }
+                break;
+            }
+            case historyitem_Ph_SetSz:
+            {
+                w.WriteBool(isRealNumber(data.newSz));
+                if(isRealNumber(data.newSz))
+                {
+                    w.WriteLong(data.newSz);
+                }
+                break;
+            }
+            case historyitem_Ph_SetType:
+            {
+                w.WriteBool(isRealNumber(data.newType));
+                if(isRealNumber(data.newType))
+                {
+                    w.WriteLong(data.newType);
+                }
+                break;
+            }
+        }
     },
-    
+
     Load_Changes: function(r)
     {
-    	if(this.getObjectType() !== r.GetLong())
-    		return;
-    	var type = r.GetLong();	
-    	switch(type)
-    	{
-    		case historyitem_Ph_SetHasCustomPrompt:
-    		{
-    			if(r.GetBool())
-    			{
-    				this.hasCustomPrompt = r.GetBool();
-    			}
-    			else
-    			{
-    				this.hasCustomPrompt = null;
-    			}
-    			break;
-    		}    		
-    		case historyitem_Ph_SetIdx:
-    		{
-    			if(r.GetBool())
-    			{
-    				if(r.GetBool())
-    				{
-    					this.idx = r.GetString2();
-    				}
-    				else
-    				{
-    					this.idx = r.GetLong();
-    				}
-    			}
-    			else
-    			{
-    				this.idx = null;
-    			}
-    			break;
-    		}
-    		case historyitem_Ph_SetOrient:
-    		{
-    			if(r.GetBool())
-    			{
-    				this.orient = r.GetLong();
-    			}
-    			else
-    			{
-    				this.orient = null;
-    			}
-    			break;
-    		}
-    		case historyitem_Ph_SetSz:
-    		{
-    			if(r.GetBool())
-    			{
-    				this.sz = r.GetLong();
-    			}
-    			else
-    			{
-    				this.sz = null;
-    			}
-    			break;
-    		}
-    		case historyitem_Ph_SetType:
-    		{
-    			if(r.GetBool())
-    			{
-    				this.type = r.GetLong();
-    			}
-    			else
-    			{
-    				this.type = null;
-    			}
-    			break;
-    		}	
-    	}
-		
+        if(this.getObjectType() !== r.GetLong())
+            return;
+        var type = r.GetLong();
+        switch(type)
+        {
+            case historyitem_Ph_SetHasCustomPrompt:
+            {
+                if(r.GetBool())
+                {
+                    this.hasCustomPrompt = r.GetBool();
+                }
+                else
+                {
+                    this.hasCustomPrompt = null;
+                }
+                break;
+            }
+            case historyitem_Ph_SetIdx:
+            {
+                if(r.GetBool())
+                {
+                    if(r.GetBool())
+                    {
+                        this.idx = r.GetString2();
+                    }
+                    else
+                    {
+                        this.idx = r.GetLong();
+                    }
+                }
+                else
+                {
+                    this.idx = null;
+                }
+                break;
+            }
+            case historyitem_Ph_SetOrient:
+            {
+                if(r.GetBool())
+                {
+                    this.orient = r.GetLong();
+                }
+                else
+                {
+                    this.orient = null;
+                }
+                break;
+            }
+            case historyitem_Ph_SetSz:
+            {
+                if(r.GetBool())
+                {
+                    this.sz = r.GetLong();
+                }
+                else
+                {
+                    this.sz = null;
+                }
+                break;
+            }
+            case historyitem_Ph_SetType:
+            {
+                if(r.GetBool())
+                {
+                    this.type = r.GetLong();
+                }
+                else
+                {
+                    this.type = null;
+                }
+                break;
+            }
+        }
+
     },
-    
+
     Write_ToBinary2: function (w)
     {
         w.WriteLong(this.getObjectType());
@@ -5732,7 +5897,7 @@ function UniNvPr()
         duplicate.nvPr = this.nvPr.createDuplicate();
         return duplicate;
     };
-    
+
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 
@@ -5746,156 +5911,156 @@ UniNvPr.prototype =
     },
     Refresh_RecalcData: function()
     {},
-    
+
     getObjectType: function()
     {
-    	return historyitem_type_UniNvPr;
+        return historyitem_type_UniNvPr;
     },
-    
+
     setCNvPr: function(cNvPr)
     {
-    	History.Add(this, {Type: historyitem_UniNvPr_SetCNvPr, oldCNvPr: this.cNvPr, newCNvPr: cNvPr});
-    	this.cNvPr = cNvPr;
-	},
-	
-	setUniPr: function(uniPr)
-	{
-    	History.Add(this, {Type: historyitem_UniNvPr_SetUniPr, oldUniPr: this.UniPr, newUniPr: uniPr});
-    	this.UniPr = uniPr;
-	},
-	
-	setNvPr: function(nvPr)
-	{
-    	History.Add(this, {Type: historyitem_UniNvPr_SetNvPr, oldNvPr: this.nvPr, newNvPr: nvPr});
-    	this.nvPr = nvPr;
-	},
-	
-	Undo: function(data)
-	{
-		switch(data.Type)
-		{
-			case historyitem_UniNvPr_SetCNvPr:
-			{
-				this.cNvPr = data.oldCNvPr;
-				break;
-			}
-			case historyitem_UniNvPr_SetUniPr:
-			{
-				this.UniPr = data.oldUniPr;
-				break;
-			}
-			case historyitem_UniNvPr_SetNvPr:
-			{
-				this.nvPr = data.oldNvPr;
-				break;
-			}
-		}
-	},
-	
-	Redo: function(data)
-	{
-		switch(data.Type)
-		{
-			case historyitem_UniNvPr_SetCNvPr:
-			{
-				this.cNvPr = data.newCNvPr;
-				break;
-			}
-			case historyitem_UniNvPr_SetUniPr:
-			{
-				this.UniPr = data.newUniPr;
-				break;
-			}
-			case historyitem_UniNvPr_SetNvPr:
-			{
-				this.nvPr = data.newNvPr;
-				break;
-			}
-		}
-	},
-	
-	Save_Changes: function(data, w)
-	{
-		w.WriteLong(this.getObjectType());
-		w.WriteLong(data.Type);
-		switch(data.Type)
-		{
-			case historyitem_UniNvPr_SetCNvPr:
-			{
-				w.WriteBool(isRealObject(data.newCNvPr));
-				if(isRealObject(data.newCNvPr))
-				{
-					w.WriteString2(data.newCNvPr.Get_Id());
-				}
-				break;
-			}
-			case historyitem_UniNvPr_SetUniPr:
-			{
-				w.WriteBool(isRealObject(data.newUniPr));
-				if(isRealObject(data.newUniPr))
-				{
-					w.WriteString2(data.newUniPr.Get_Id());
-				}
-				break;
-			}
-			case historyitem_UniNvPr_SetNvPr:
-			{
-				w.WriteBool(isRealObject(data.newNvPr));
-				if(isRealObject(data.newNvPr))
-				{
-					w.WriteString2(data.newNvPr.Get_Id());
-				}
-				break;
-			}
-		}
-	},
-	
-	
-	Load_Changes: function(r)
-	{
-		if(this.getObjectType() !== r.GetLong())
-			return;
-		var type = r.GetLong();
-		switch(type)
-		{
-			case historyitem_UniNvPr_SetCNvPr:
-			{
-				if(r.GetBool())
-				{
-					this.cNvPr = g_oTableId.Get_ById(r.GetString2());
-				}
-				else
-				{
-					this.cNvPr = null;
-				}
-				break;
-			}
-			case historyitem_UniNvPr_SetUniPr:
-			{
-				if(r.GetBool())
-				{
-					this.UniPr = g_oTableId.Get_ById(r.GetString2());
-				}
-				else
-				{
-					this.UniPr = null;
-				}
-				break;
-			}
-			case historyitem_UniNvPr_SetNvPr:
-			{
-				if(r.GetBool())
-				{
-					this.nvPr = g_oTableId.Get_ById(r.GetString2());
-				}
-				else
-				{
-					this.nvPr = null;
-				}
-				break;
-			} 
-		}
-	},
+        History.Add(this, {Type: historyitem_UniNvPr_SetCNvPr, oldCNvPr: this.cNvPr, newCNvPr: cNvPr});
+        this.cNvPr = cNvPr;
+    },
+
+    setUniPr: function(uniPr)
+    {
+        History.Add(this, {Type: historyitem_UniNvPr_SetUniPr, oldUniPr: this.UniPr, newUniPr: uniPr});
+        this.UniPr = uniPr;
+    },
+
+    setNvPr: function(nvPr)
+    {
+        History.Add(this, {Type: historyitem_UniNvPr_SetNvPr, oldNvPr: this.nvPr, newNvPr: nvPr});
+        this.nvPr = nvPr;
+    },
+
+    Undo: function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_UniNvPr_SetCNvPr:
+            {
+                this.cNvPr = data.oldCNvPr;
+                break;
+            }
+            case historyitem_UniNvPr_SetUniPr:
+            {
+                this.UniPr = data.oldUniPr;
+                break;
+            }
+            case historyitem_UniNvPr_SetNvPr:
+            {
+                this.nvPr = data.oldNvPr;
+                break;
+            }
+        }
+    },
+
+    Redo: function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_UniNvPr_SetCNvPr:
+            {
+                this.cNvPr = data.newCNvPr;
+                break;
+            }
+            case historyitem_UniNvPr_SetUniPr:
+            {
+                this.UniPr = data.newUniPr;
+                break;
+            }
+            case historyitem_UniNvPr_SetNvPr:
+            {
+                this.nvPr = data.newNvPr;
+                break;
+            }
+        }
+    },
+
+    Save_Changes: function(data, w)
+    {
+        w.WriteLong(this.getObjectType());
+        w.WriteLong(data.Type);
+        switch(data.Type)
+        {
+            case historyitem_UniNvPr_SetCNvPr:
+            {
+                w.WriteBool(isRealObject(data.newCNvPr));
+                if(isRealObject(data.newCNvPr))
+                {
+                    w.WriteString2(data.newCNvPr.Get_Id());
+                }
+                break;
+            }
+            case historyitem_UniNvPr_SetUniPr:
+            {
+                w.WriteBool(isRealObject(data.newUniPr));
+                if(isRealObject(data.newUniPr))
+                {
+                    w.WriteString2(data.newUniPr.Get_Id());
+                }
+                break;
+            }
+            case historyitem_UniNvPr_SetNvPr:
+            {
+                w.WriteBool(isRealObject(data.newNvPr));
+                if(isRealObject(data.newNvPr))
+                {
+                    w.WriteString2(data.newNvPr.Get_Id());
+                }
+                break;
+            }
+        }
+    },
+
+
+    Load_Changes: function(r)
+    {
+        if(this.getObjectType() !== r.GetLong())
+            return;
+        var type = r.GetLong();
+        switch(type)
+        {
+            case historyitem_UniNvPr_SetCNvPr:
+            {
+                if(r.GetBool())
+                {
+                    this.cNvPr = g_oTableId.Get_ById(r.GetString2());
+                }
+                else
+                {
+                    this.cNvPr = null;
+                }
+                break;
+            }
+            case historyitem_UniNvPr_SetUniPr:
+            {
+                if(r.GetBool())
+                {
+                    this.UniPr = g_oTableId.Get_ById(r.GetString2());
+                }
+                else
+                {
+                    this.UniPr = null;
+                }
+                break;
+            }
+            case historyitem_UniNvPr_SetNvPr:
+            {
+                if(r.GetBool())
+                {
+                    this.nvPr = g_oTableId.Get_ById(r.GetString2());
+                }
+                else
+                {
+                    this.nvPr = null;
+                }
+                break;
+            }
+        }
+    },
 
     Write_ToBinary2: function (w)
     {
@@ -5943,7 +6108,7 @@ function StyleRef()
         return true;
 
     }
-    
+
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -5957,118 +6122,118 @@ StyleRef.prototype =
 
     getObjectType: function()
     {
-    	return  historyitem_type_StyleRef;
+        return  historyitem_type_StyleRef;
     },
-    
+
     setIdx: function(idx)
     {
-    	History.Add(this, {Type: historyitem_StyleRef_SetIdx, oldIdx:this.idx, newIdx: idx});
-    	this.idx= idx;
+        History.Add(this, {Type: historyitem_StyleRef_SetIdx, oldIdx:this.idx, newIdx: idx});
+        this.idx= idx;
     },
-    
+
     setColor: function(color)
     {
-    	History.Add(this, {Type: historyitem_StyleRef_SetColor, oldColor:this.Color, newColor: color});
-    	this.Color = color;
+        History.Add(this, {Type: historyitem_StyleRef_SetColor, oldColor:this.Color, newColor: color});
+        this.Color = color;
     },
 
     Refresh_RecalcData: function()
     {},
-    
+
     Undo: function(data)
     {
-    	switch(data.Type)
-    	{
-    		case historyitem_StyleRef_SetIdx:
-    		{
-    			this.idx = data.oldIdx;
-    			break;
-    		}
-    		case historyitem_StyleRef_SetColor:
-    		{
-    			this.Color = data.oldColor;
-    			break;
-    		}
-    	}
+        switch(data.Type)
+        {
+            case historyitem_StyleRef_SetIdx:
+            {
+                this.idx = data.oldIdx;
+                break;
+            }
+            case historyitem_StyleRef_SetColor:
+            {
+                this.Color = data.oldColor;
+                break;
+            }
+        }
     },
-    
+
     Redo: function(data)
     {
-    	switch(data.Type)
-    	{
-    		case historyitem_StyleRef_SetIdx:
-    		{
-    			this.idx = data.newIdx;
-    			break;
-    		}
-    		case historyitem_StyleRef_SetColor:
-    		{
-    			this.Color = data.newColor;
-    			break;
-    		}
-    	}
+        switch(data.Type)
+        {
+            case historyitem_StyleRef_SetIdx:
+            {
+                this.idx = data.newIdx;
+                break;
+            }
+            case historyitem_StyleRef_SetColor:
+            {
+                this.Color = data.newColor;
+                break;
+            }
+        }
     },
-    
+
     Save_Changes: function(data, w)
     {
-    	w.WriteLong(this.getObjectType());
-    	w.WriteLong(data.Type);
-    	switch(data.Type)
-    	{
-    		case historyitem_StyleRef_SetIdx:
-    		{
-    			w.WriteBool(isRealNumber(data.newIdx));
-    			if(isRealNumber(data.newIdx))
-    			{
-    				w.WriteLong(data.newIdx);
-    			}
-    			break;
-    		}
-    		case historyitem_StyleRef_SetColor:
-    		{
-    			w.WriteBool(isRealObject(data.newColor));
-    			if(isRealObject(data.newColor))
-    			{
-    				w.WriteString2(data.newColor.Get_Id());
-    			}
-    			break;
-    		}	
-    	}
+        w.WriteLong(this.getObjectType());
+        w.WriteLong(data.Type);
+        switch(data.Type)
+        {
+            case historyitem_StyleRef_SetIdx:
+            {
+                w.WriteBool(isRealNumber(data.newIdx));
+                if(isRealNumber(data.newIdx))
+                {
+                    w.WriteLong(data.newIdx);
+                }
+                break;
+            }
+            case historyitem_StyleRef_SetColor:
+            {
+                w.WriteBool(isRealObject(data.newColor));
+                if(isRealObject(data.newColor))
+                {
+                    w.WriteString2(data.newColor.Get_Id());
+                }
+                break;
+            }
+        }
     },
-    
+
     Load_Changes: function(r)
     {
-    	if(this.getObjectType() !== r.GetLong())
-    		return;
-    	var type = r.GetLong();
-    	switch(type)
-    	{
-    		case historyitem_StyleRef_SetIdx:
-    		{
-    			if(r.GetBool())
-    			{
-    				this.idx = r.GetLong();
-    			}
-    			else
-    			{
-    				this.idx = null;
-    			}
-    			break;
-    		}
-    		case historyitem_StyleRef_SetColor:
-    		{
-    			if(r.GetBool())
-    			{
-    				this.Color = g_oTableId.Get_ById(r.GetString2());
-    			}
-    			else
-    			{
-    				this.Color = null;
-    			}
-    			break;
-    		}	
-    	}
-		
+        if(this.getObjectType() !== r.GetLong())
+            return;
+        var type = r.GetLong();
+        switch(type)
+        {
+            case historyitem_StyleRef_SetIdx:
+            {
+                if(r.GetBool())
+                {
+                    this.idx = r.GetLong();
+                }
+                else
+                {
+                    this.idx = null;
+                }
+                break;
+            }
+            case historyitem_StyleRef_SetColor:
+            {
+                if(r.GetBool())
+                {
+                    this.Color = g_oTableId.Get_ById(r.GetString2());
+                }
+                else
+                {
+                    this.Color = null;
+                }
+                break;
+            }
+        }
+
     },
 
     Write_ToBinary2: function (w)
@@ -6100,7 +6265,7 @@ function FontRef()
             duplicate.Color = this.Color.createDuplicate();
         return duplicate;
     }
-	
+
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -6113,118 +6278,118 @@ FontRef.prototype =
     },
     Refresh_RecalcData: function()
     {},
-    
+
     getObjectType: function()
     {
-    	return historyitem_type_FontRef;
-	},
-    
+        return historyitem_type_FontRef;
+    },
+
     setIdx: function(idx)
     {
-    	History.Add(this, {Type: historyitem_FontRef_SetIdx, oldIdx:this.idx, newIdx: idx});
-    	this.idx= idx;
+        History.Add(this, {Type: historyitem_FontRef_SetIdx, oldIdx:this.idx, newIdx: idx});
+        this.idx= idx;
     },
-    
+
     setColor: function(color)
     {
-    	History.Add(this, {Type: historyitem_FontRef_SetColor, oldColor:this.Color, newColor: color});
-    	this.Color = color;
+        History.Add(this, {Type: historyitem_FontRef_SetColor, oldColor:this.Color, newColor: color});
+        this.Color = color;
     },
-    
+
     Undo: function(data)
     {
-    	switch(data.Type)
-    	{
-    		case historyitem_FontRef_SetIdx:
-    		{
-    			this.idx = data.oldIdx;
-    			break;
-    		}
-    		case historyitem_FontRef_SetColor:
-    		{
-    			this.Color = data.oldColor;
-    			break;
-    		}
-    	}
+        switch(data.Type)
+        {
+            case historyitem_FontRef_SetIdx:
+            {
+                this.idx = data.oldIdx;
+                break;
+            }
+            case historyitem_FontRef_SetColor:
+            {
+                this.Color = data.oldColor;
+                break;
+            }
+        }
     },
-    
+
     Redo: function(data)
     {
-    	switch(data.Type)
-    	{
-    		case historyitem_FontRef_SetIdx:
-    		{
-    			this.idx = data.newIdx;
-    			break;
-    		}
-    		case historyitem_FontRef_SetColor:
-    		{
-    			this.Color = data.newColor;
-    			break;
-    		}
-    	}
+        switch(data.Type)
+        {
+            case historyitem_FontRef_SetIdx:
+            {
+                this.idx = data.newIdx;
+                break;
+            }
+            case historyitem_FontRef_SetColor:
+            {
+                this.Color = data.newColor;
+                break;
+            }
+        }
     },
-    
+
     Save_Changes: function(data, w)
     {
-    	w.WriteLong(this.getObjectType());
-    	w.WriteLong(data.Type);
-    	switch(data.Type)
-    	{
-    		case historyitem_FontRef_SetIdx:
-    		{
-    			w.WriteBool(isRealNumber(data.newIdx));
-    			if(isRealNumber(data.newIdx))
-    			{
-    				w.WriteLong(data.newIdx);
-    			}
-    			break;
-    		}
-    		case historyitem_FontRef_SetColor:
-    		{
-    			w.WriteBool(isRealObject(data.newColor));
-    			if(isRealObject(data.newColor))
-    			{
-    				w.WriteString2(data.newColor.Get_Id());
-    			}
-    			break;
-    		}	
-    	}
+        w.WriteLong(this.getObjectType());
+        w.WriteLong(data.Type);
+        switch(data.Type)
+        {
+            case historyitem_FontRef_SetIdx:
+            {
+                w.WriteBool(isRealNumber(data.newIdx));
+                if(isRealNumber(data.newIdx))
+                {
+                    w.WriteLong(data.newIdx);
+                }
+                break;
+            }
+            case historyitem_FontRef_SetColor:
+            {
+                w.WriteBool(isRealObject(data.newColor));
+                if(isRealObject(data.newColor))
+                {
+                    w.WriteString2(data.newColor.Get_Id());
+                }
+                break;
+            }
+        }
     },
-    
+
     Load_Changes: function(r)
     {
-    	if(this.getObjectType() !== r.GetLong())
-    		return;
-    	var type = r.GetLong();
-    	switch(type)
-    	{
-    		case historyitem_FontRef_SetIdx:
-    		{
-    			if(r.GetBool())
-    			{
-    				this.idx = r.GetLong();
-    			}
-    			else
-    			{
-    				this.idx = null;
-    			}
-    			break;
-    		}
-    		case historyitem_FontRef_SetColor:
-    		{
-    			if(r.GetBool())
-    			{
-    				this.Color = g_oTableId.Get_ById(r.GetString2());
-    			}
-    			else
-    			{
-    				this.Color = null;
-    			}
-    			break;
-    		}	
-    	}
-		
+        if(this.getObjectType() !== r.GetLong())
+            return;
+        var type = r.GetLong();
+        switch(type)
+        {
+            case historyitem_FontRef_SetIdx:
+            {
+                if(r.GetBool())
+                {
+                    this.idx = r.GetLong();
+                }
+                else
+                {
+                    this.idx = null;
+                }
+                break;
+            }
+            case historyitem_FontRef_SetColor:
+            {
+                if(r.GetBool())
+                {
+                    this.Color = g_oTableId.Get_ById(r.GetString2());
+                }
+                else
+                {
+                    this.Color = null;
+                }
+                break;
+            }
+        }
+
     },
 
 
@@ -6615,9 +6780,6 @@ CXfrm.prototype =
         return this.Id;
     },
 
-    Refresh_RecalcData: function()
-    {},
-
     getObjectType: function()
     {
         return historyitem_type_Xfrm;
@@ -6752,6 +6914,69 @@ CXfrm.prototype =
         if(this.parent && this.parent.handleUpdateRot)
         {
             this.parent.handleUpdateRot();
+        }
+    },
+
+
+    Refresh_RecalcData: function(data)
+    {
+        switch (data.Type)
+        {
+            case historyitem_Xfrm_SetOffX:
+            {
+                this.handleUpdatePosition();
+                break;
+            }
+            case historyitem_Xfrm_SetOffY:
+            {
+                this.handleUpdatePosition();
+                break;
+            }
+            case historyitem_Xfrm_SetExtX:
+            {
+                this.handleUpdateExtents();
+                break;
+            }
+            case historyitem_Xfrm_SetExtY:
+            {
+                this.handleUpdateExtents();
+                break;
+            }
+            case historyitem_Xfrm_SetChOffX:
+            {
+                this.handleUpdateChildOffset();
+                break;
+            }
+            case historyitem_Xfrm_SetChOffY:
+            {
+                this.handleUpdateChildOffset();
+                break;
+            }
+            case historyitem_Xfrm_SetChExtX:
+            {
+                this.handleUpdateChildExtents();
+                break;
+            }
+            case historyitem_Xfrm_SetChExtY:
+            {
+                this.handleUpdateChildExtents();
+                break;
+            }
+            case historyitem_Xfrm_SetFlipH:
+            {
+                this.handleUpdateFlip();
+                break;
+            }
+            case historyitem_Xfrm_SetFlipV:
+            {
+                this.handleUpdateFlip();
+                break;
+            }
+            case historyitem_Xfrm_SetRot:
+            {
+                this.handleUpdateRot();
+                break;
+            }
         }
     },
 
@@ -7058,9 +7283,44 @@ CSpPr.prototype =
         return this.Id;
     },
 
+    Refresh_RecalcData: function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_SpPr_SetParent:
+            {
+                break;
+            }
+            case historyitem_SpPr_SetBwMode:
+            {
+                break;
+            }
+            case historyitem_SpPr_SetXfrm:
+            {
+                break;
+            }
+            case historyitem_SpPr_SetGeometry:
+            {
+                this.handleUpdateGeometry();
+                break;
+            }
+            case historyitem_SpPr_SetFill:
+            {
+                this.handleUpdateFill();
+                break;
+            }
+            case historyitem_SpPr_SetLn:
+            {
+                this.handleUpdateLn();
+                break;
+            }
+        }
+    },
 
-    Refresh_RecalcData: function()
-    {},
+    Refresh_RecalcData2: function(data)
+    {
+    },
+
     getObjectType: function()
     {
         return historyitem_type_SpPr;
@@ -8498,7 +8758,7 @@ function CTheme()
         var _slide_count = _slides.length;
         for(var _slide_index = 0; _slide_index < _slide_count; ++_slide_index)
         {
-			var _cur_slide =_slides[_slide_index];
+            var _cur_slide =_slides[_slide_index];
             var _cur_theme = _cur_slide.Layout.Master.Theme;
             if(_cur_theme === this)
             {
@@ -8538,8 +8798,8 @@ function CTheme()
         var _slide_count = _slides.length;
         for(var _slide_index = 0; _slide_index < _slide_count; ++_slide_index)
         {
-			var _cur_slide =_slides[_slide_index];
-			var _cur_theme = _cur_slide.Layout.Master.Theme;
+            var _cur_slide =_slides[_slide_index];
+            var _cur_theme = _cur_slide.Layout.Master.Theme;
             if(_cur_theme === this)
             {
                 _cur_slide.recalcAllColors();
@@ -8557,11 +8817,11 @@ function CTheme()
         return historyitem_type_Theme;
     },
 
-    this.Write_ToBinary2 = function(w)
-    {
-        w.WriteLong(historyitem_type_Theme);
-        w.WriteString2(this.Id);
-    };
+        this.Write_ToBinary2 = function(w)
+        {
+            w.WriteLong(historyitem_type_Theme);
+            w.WriteString2(this.Id);
+        };
 
     this.Read_FromBinary2 = function(r)
     {
@@ -8588,8 +8848,8 @@ function CTheme()
     {
         if(r.GetLong() === historyitem_type_Theme)
         {
-			var _cur_slide, _cur_theme;
-			var type = r.GetLong();
+            var _cur_slide, _cur_theme;
+            var type = r.GetLong();
             switch(type)
             {
                 case historyitem_ChangeColorScheme:
@@ -10337,7 +10597,7 @@ function CBodyPr()
     this.textFit          = null;
 
 
-	
+
     this.setVert = function(val)
     {
         this.vert = val;
@@ -10373,7 +10633,7 @@ function CBodyPr()
         this.textFit          = null;
     };
 
-	
+
     this.Write_ToBinary2 = function(w)
     {
         var flag = this.flatTx != null;
@@ -10717,6 +10977,8 @@ function CBodyPr()
 
     this.merge = function(bodyPr)
     {
+        if(!bodyPr)
+            return;
         if(bodyPr.flatTx!=null)
         {
             this.flatTx = bodyPr.flatTx;
@@ -10801,6 +11063,7 @@ function CBodyPr()
         {
             this.wrap = bodyPr.wrap;
         }
+        return this;
     }
 
     this.Id = g_oIdCounter.Get_NewId();
@@ -10927,9 +11190,9 @@ CTextParagraphPr.prototype =
 
 function CompareBullets(bullet1, bullet2)
 {
-	var ret = new CBullet();
-	//TODO: сделать сравнивание
-	return ret;
+    var ret = new CBullet();
+    //TODO: сделать сравнивание
+    return ret;
 }
 
 function CBullet()
@@ -11040,42 +11303,42 @@ CBullet.prototype =
     },
     Refresh_RecalcData: function()
     {},
-	
-	Set_FromObject: function(obj)
-	{
-		if(obj)
-		{
-			if(obj.bulletColor)
-			{
-				this.bulletColor = new CBulletColor();
-				this.bulletColor.Set_FromObject(obj.bulletColor);
-			}
-			else
-				this.bulletColor = null;
-			
-			if(obj.bulletSize)
-			{
-				this.bulletSize = new CBulletSize();
-				this.bulletSize.Set_FromObject(obj.bulletSize);
-			}
-			else
-				this.bulletSize = null;
-				
-			if(obj.bulletTypeface)
-			{
-				this.bulletTypeface = new CBulletTypeface();
-				this.bulletTypeface.Set_FromObject(obj.bulletTypeface);
-			}
-			else
-				this.bulletTypeface = null;
-		}
-	},
-	
-	Write_ToBinary: function(w)
-	{},
-	
-	Read_FromBinary: function(r)
-	{}
+
+    Set_FromObject: function(obj)
+    {
+        if(obj)
+        {
+            if(obj.bulletColor)
+            {
+                this.bulletColor = new CBulletColor();
+                this.bulletColor.Set_FromObject(obj.bulletColor);
+            }
+            else
+                this.bulletColor = null;
+
+            if(obj.bulletSize)
+            {
+                this.bulletSize = new CBulletSize();
+                this.bulletSize.Set_FromObject(obj.bulletSize);
+            }
+            else
+                this.bulletSize = null;
+
+            if(obj.bulletTypeface)
+            {
+                this.bulletTypeface = new CBulletTypeface();
+                this.bulletTypeface.Set_FromObject(obj.bulletTypeface);
+            }
+            else
+                this.bulletTypeface = null;
+        }
+    },
+
+    Write_ToBinary: function(w)
+    {},
+
+    Read_FromBinary: function(r)
+    {}
 
 };
 
@@ -11137,14 +11400,14 @@ CBulletColor.prototype =
 
     Refresh_RecalcData: function()
     {},
-	Set_FromObject: function(o)
-	{
-		this.type = o.type;
-		if(o.UniColor)
-		{
-			
-		}
-	}
+    Set_FromObject: function(o)
+    {
+        this.type = o.type;
+        if(o.UniColor)
+        {
+
+        }
+    }
 };
 
 var BULLET_TYPE_SIZE_NONE	= 0;
@@ -11463,110 +11726,110 @@ var PARRUN_TYPE_BR		= 3;
 // DEFAULT OBJECTS
 function GenerateDefaultTheme(presentation)
 {
-	return ExecuteNoHistory(function()
-	{
-		var theme = new CTheme();
-		theme.presentation = presentation;
-		theme.themeElements.fontScheme.majorFont.latin = "Arial";
-		theme.themeElements.fontScheme.minorFont.latin = "Arial";
+    return ExecuteNoHistory(function()
+    {
+        var theme = new CTheme();
+        theme.presentation = presentation;
+        theme.themeElements.fontScheme.majorFont.latin = "Arial";
+        theme.themeElements.fontScheme.minorFont.latin = "Arial";
 
-		var scheme = theme.themeElements.clrScheme;
+        var scheme = theme.themeElements.clrScheme;
 
-		scheme.colors[8] = CreateUniColorRGB(0,0,0);
-		scheme.colors[12] = CreateUniColorRGB(255,255,255);
-		scheme.colors[9] = CreateUniColorRGB(0x1F,0x49, 0x7D);
-		scheme.colors[13] = CreateUniColorRGB(0xEE,0xEC,0xE1);
-		scheme.colors[0] = CreateUniColorRGB(0x4F, 0x81, 0xBD); //CreateUniColorRGB(0xFF, 0x81, 0xBD);//
-		scheme.colors[1] = CreateUniColorRGB(0xC0,0x50,0x4D);
-		scheme.colors[2] = CreateUniColorRGB(0x9B,0xBB,0x59);
-		scheme.colors[3] = CreateUniColorRGB(0x80,0x64,0xA2);
-		scheme.colors[4] = CreateUniColorRGB(0x4B,0xAC,0xC6);
-		scheme.colors[5] = CreateUniColorRGB(0xF7,0x96,0x46);
-		scheme.colors[11] = CreateUniColorRGB(0x00,0x00,0xFF);
-		scheme.colors[10] = CreateUniColorRGB(0x80, 0x00, 0x80);
+        scheme.colors[8] = CreateUniColorRGB(0,0,0);
+        scheme.colors[12] = CreateUniColorRGB(255,255,255);
+        scheme.colors[9] = CreateUniColorRGB(0x1F,0x49, 0x7D);
+        scheme.colors[13] = CreateUniColorRGB(0xEE,0xEC,0xE1);
+        scheme.colors[0] = CreateUniColorRGB(0x4F, 0x81, 0xBD); //CreateUniColorRGB(0xFF, 0x81, 0xBD);//
+        scheme.colors[1] = CreateUniColorRGB(0xC0,0x50,0x4D);
+        scheme.colors[2] = CreateUniColorRGB(0x9B,0xBB,0x59);
+        scheme.colors[3] = CreateUniColorRGB(0x80,0x64,0xA2);
+        scheme.colors[4] = CreateUniColorRGB(0x4B,0xAC,0xC6);
+        scheme.colors[5] = CreateUniColorRGB(0xF7,0x96,0x46);
+        scheme.colors[11] = CreateUniColorRGB(0x00,0x00,0xFF);
+        scheme.colors[10] = CreateUniColorRGB(0x80, 0x00, 0x80);
 
-		// -------------- fill styles -------------------------
-		var brush = new CUniFill();
-		brush.setFill(new CSolidFill());
-		brush.fill.setColor(new CUniColor());
-		brush.fill.color.setColor(new CSchemeColor());
-		brush.fill.color.color.setId(phClr);
-		theme.themeElements.fmtScheme.fillStyleLst.push(brush);
+        // -------------- fill styles -------------------------
+        var brush = new CUniFill();
+        brush.setFill(new CSolidFill());
+        brush.fill.setColor(new CUniColor());
+        brush.fill.color.setColor(new CSchemeColor());
+        brush.fill.color.color.setId(phClr);
+        theme.themeElements.fmtScheme.fillStyleLst.push(brush);
 
-		brush = new CUniFill();
-		brush.setFill(new CSolidFill());
-		brush.fill.setColor(new CUniColor());
-		brush.fill.color.setColor(CreateUniColorRGB(0,0,0));
-		theme.themeElements.fmtScheme.fillStyleLst.push(brush);
+        brush = new CUniFill();
+        brush.setFill(new CSolidFill());
+        brush.fill.setColor(new CUniColor());
+        brush.fill.color.setColor(CreateUniColorRGB(0,0,0));
+        theme.themeElements.fmtScheme.fillStyleLst.push(brush);
 
-		brush = new CUniFill();
-		brush.setFill(new CSolidFill());
-		brush.fill.setColor(new CUniColor());
-		brush.fill.color.setColor(CreateUniColorRGB(0,0,0));
-		theme.themeElements.fmtScheme.fillStyleLst.push(brush);
-		// ----------------------------------------------------
+        brush = new CUniFill();
+        brush.setFill(new CSolidFill());
+        brush.fill.setColor(new CUniColor());
+        brush.fill.color.setColor(CreateUniColorRGB(0,0,0));
+        theme.themeElements.fmtScheme.fillStyleLst.push(brush);
+        // ----------------------------------------------------
 
-		// -------------- back styles -------------------------
-		brush = new CUniFill();
-		brush.setFill(new CSolidFill());
-		brush.fill.setColor(new CUniColor());
-		brush.fill.color.setColor(new CSchemeColor());
-		brush.fill.color.color.setId(phClr);
-		theme.themeElements.fmtScheme.bgFillStyleLst.push(brush);
+        // -------------- back styles -------------------------
+        brush = new CUniFill();
+        brush.setFill(new CSolidFill());
+        brush.fill.setColor(new CUniColor());
+        brush.fill.color.setColor(new CSchemeColor());
+        brush.fill.color.color.setId(phClr);
+        theme.themeElements.fmtScheme.bgFillStyleLst.push(brush);
 
-		brush = new CUniFill();
-		brush.setFill(new CSolidFill());
-		brush.fill.setColor(new CUniColor());
-		brush.fill.color.setColor(CreateUniColorRGB(0,0,0));
-		theme.themeElements.fmtScheme.bgFillStyleLst.push(brush);
+        brush = new CUniFill();
+        brush.setFill(new CSolidFill());
+        brush.fill.setColor(new CUniColor());
+        brush.fill.color.setColor(CreateUniColorRGB(0,0,0));
+        theme.themeElements.fmtScheme.bgFillStyleLst.push(brush);
 
-		brush = new CUniFill();
-		brush.setFill(new CSolidFill());
-		brush.fill.setColor(new CUniColor());
-		brush.fill.color.setColor(CreateUniColorRGB(0,0,0));
-		theme.themeElements.fmtScheme.bgFillStyleLst.push(brush);
-		// ----------------------------------------------------
+        brush = new CUniFill();
+        brush.setFill(new CSolidFill());
+        brush.fill.setColor(new CUniColor());
+        brush.fill.color.setColor(CreateUniColorRGB(0,0,0));
+        theme.themeElements.fmtScheme.bgFillStyleLst.push(brush);
+        // ----------------------------------------------------
 
-		var pen = new CLn();
-		pen.setW(9525);
-		pen.setFill(new CUniFill());
-		pen.Fill.setFill(new CSolidFill());
-		pen.Fill.fill.setColor(new CUniColor());
-		pen.Fill.fill.color.setColor(new CSchemeColor());
-		pen.Fill.fill.color.color.setId(phClr);
-		pen.Fill.fill.color.setMods(new CColorModifiers());
-		
-		var mod = new CColorMod();
-		mod.setName("shade");
-		mod.setVal(95000);
-		pen.Fill.fill.color.Mods.addMod(mod);
-		mod = new CColorMod();
-		mod.setName("satMod");
-		mod.setVal(105000);
-		pen.Fill.fill.color.Mods.addMod(mod);
-		theme.themeElements.fmtScheme.lnStyleLst.push(pen);
+        var pen = new CLn();
+        pen.setW(9525);
+        pen.setFill(new CUniFill());
+        pen.Fill.setFill(new CSolidFill());
+        pen.Fill.fill.setColor(new CUniColor());
+        pen.Fill.fill.color.setColor(new CSchemeColor());
+        pen.Fill.fill.color.color.setId(phClr);
+        pen.Fill.fill.color.setMods(new CColorModifiers());
 
-		pen = new CLn();
-		pen.setW(25400);
-		pen.setFill(new CUniFill());
-		pen.Fill.setFill(new CSolidFill());
+        var mod = new CColorMod();
+        mod.setName("shade");
+        mod.setVal(95000);
+        pen.Fill.fill.color.Mods.addMod(mod);
+        mod = new CColorMod();
+        mod.setName("satMod");
+        mod.setVal(105000);
+        pen.Fill.fill.color.Mods.addMod(mod);
+        theme.themeElements.fmtScheme.lnStyleLst.push(pen);
 
-		pen.Fill.fill.setColor(new CUniColor());
-		pen.Fill.fill.color.setColor(new CSchemeColor());
-		pen.Fill.fill.color.color.setId(phClr);
-		theme.themeElements.fmtScheme.lnStyleLst.push(pen);
+        pen = new CLn();
+        pen.setW(25400);
+        pen.setFill(new CUniFill());
+        pen.Fill.setFill(new CSolidFill());
 
-		pen = new CLn();
-		pen.setW(38100);
-		pen.setFill(new CUniFill());
-		pen.Fill.setFill(new CSolidFill());
-		pen.Fill.fill.setColor(new CUniColor());
-		pen.Fill.fill.color.setColor(new CSchemeColor());
-		pen.Fill.fill.color.color.setId(phClr);
-		theme.themeElements.fmtScheme.lnStyleLst.push(pen);
-		theme.extraClrSchemeLst = [];
-		return theme;
-	}, this, []);
+        pen.Fill.fill.setColor(new CUniColor());
+        pen.Fill.fill.color.setColor(new CSchemeColor());
+        pen.Fill.fill.color.color.setId(phClr);
+        theme.themeElements.fmtScheme.lnStyleLst.push(pen);
+
+        pen = new CLn();
+        pen.setW(38100);
+        pen.setFill(new CUniFill());
+        pen.Fill.setFill(new CSolidFill());
+        pen.Fill.fill.setColor(new CUniColor());
+        pen.Fill.fill.color.setColor(new CSchemeColor());
+        pen.Fill.fill.color.color.setId(phClr);
+        theme.themeElements.fmtScheme.lnStyleLst.push(pen);
+        theme.extraClrSchemeLst = [];
+        return theme;
+    }, this, []);
 }
 
 function GenerateDefaultMasterSlide(theme)

@@ -98,12 +98,16 @@ function RotateTrackShapeImage(originalObject)
     this.overlayObject = new OverlayObject(originalObject.spPr.geometry, originalObject.extX, originalObject.extY, originalObject.brush, originalObject.pen, this.transform);
 
     this.angle = originalObject.rot;
-	var full_flip_h = this.originalObject.getFullFlipH();
-	var full_flip_v = this.originalObject.getFullFlipV();
+    var full_flip_h = this.originalObject.getFullFlipH();
+    var full_flip_v = this.originalObject.getFullFlipV();
     this.signum = !full_flip_h && !full_flip_v || full_flip_h && full_flip_v ? 1 : -1;
     this.draw = function(overlay)
     {
-        this.overlayObject.draw(overlay);	
+        if(isRealNumber(this.originalObject.selectStartPage))
+        {
+            overlay.SetCurrentPage(this.originalObject.selectStartPage);
+        }
+        this.overlayObject.draw(overlay);
     };
 
     this.track = function(angle, e)
@@ -141,15 +145,22 @@ function RotateTrackShapeImage(originalObject)
             global_MatrixTransformer.ScaleAppend(this.transform, 1, -1);
         global_MatrixTransformer.RotateRadAppend(this.transform, -this.angle);
         global_MatrixTransformer.TranslateAppend(this.transform, this.originalObject.x + hc, this.originalObject.y + vc);
-		if(this.originalObject.group)
-		{
-			global_MatrixTransformer.MultiplyAppend(this.transform, this.originalObject.group.transform);
-		}
+        if(this.originalObject.group)
+        {
+            global_MatrixTransformer.MultiplyAppend(this.transform, this.originalObject.group.transform);
+        }
     };
 
     this.trackEnd = function()
     {
         this.originalObject.spPr.xfrm.setRot(this.angle);
+    };
+
+    this.getBounds = function()
+    {
+        var bounds_checker = new CSlideBoundsChecker();
+        this.overlayObject.draw(bounds_checker);
+        return bounds_checker.Bounds;
     }
 }
 
@@ -179,11 +190,24 @@ function RotateTrackGroup(originalObject)
 
     this.draw = function(overlay)
     {
+        if(isRealNumber(this.originalObject.selectStartPage))
+        {
+            overlay.SetCurrentPage(this.originalObject.selectStartPage);
+        }
         for(var i = 0; i < this.overlayObjects.length; ++i)
         {
             this.overlayObjects[i].draw(overlay);
         }
     };
+
+    this.getBounds = function()
+    {
+        var bounds_checker = new  CSlideBoundsChecker();
+        bounds_checker.init(Page_Width, Page_Height, Page_Width, Page_Height);
+        this.draw(bounds_checker);
+        return bounds_checker.Bounds;
+    };
+
 
     this.track = function(angle, e)
     {
@@ -230,6 +254,6 @@ function RotateTrackGroup(originalObject)
 
     this.trackEnd = function()
     {
-         this.originalObject.spPr.xfrm.setRot(this.angle);
+        this.originalObject.spPr.xfrm.setRot(this.angle);
     }
 }

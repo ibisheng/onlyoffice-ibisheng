@@ -540,6 +540,7 @@ var historyitem_ShapeSetTextBoxContent        = 2523;
 var historyitem_ShapeSetParent                = 2524;
 var historyitem_ShapeSetGroup                 = 2525;
 var historyitem_ShapeSetBodyPr                = 2526;
+var historyitem_ShapeSetWordShape             = 2527;
 var historyitem_DispUnitsSetBuiltInUnit       = 2526;
 var historyitem_DispUnitsSetCustUnit          = 2527;
 var historyitem_DispUnitsSetDispUnitsLbl      = 2528;
@@ -618,6 +619,11 @@ var historyitem_ValAxSetSpPr              = 2600;
 var historyitem_ValAxSetTickLblPos        = 2601;
 var historyitem_ValAxSetTitle             = 2602;
 var historyitem_ValAxSetTxPr              = 2603;
+
+var historyitem_ZIndexManagerRemoveItem   = 2604;
+var historyitem_ZIndexManagerAddItem      = 2605;
+var historyitem_GraphicObjectsAddHeaderOrFooter  = 2606;
+var historyitem_GraphicObjectsRemoveHeaderOrFooter  = 2606;
 
 var historyitem_type_ColorMod = 1001;
 var historyitem_type_ColorModifiers = 1002;
@@ -1116,9 +1122,10 @@ var historyitem_State_Paragraph       = 3;
 var historyitem_State_Table           = 4;
 
 // Типы произошедших изменений
-var historyrecalctype_Inline = 0; // Изменения произошли в обычном тексте (с верхним классом CDocument)
-var historyrecalctype_Flow   = 1; // Изменения произошли в "плавающем" объекте
-var historyrecalctype_HdrFtr = 2; // Изменения произошли в колонтитуле
+var historyrecalctype_Inline  = 0; // Изменения произошли в обычном тексте (с верхним классом CDocument)
+var historyrecalctype_Flow    = 1; // Изменения произошли в "плавающем" объекте
+var historyrecalctype_HdrFtr  = 2; // Изменения произошли в колонтитуле
+var historyrecalctype_Drawing = 3; // Изменения произошли в drawing'е
 
 // Типы классов, в которых происходили изменения (типы нужны для совместного редактирования)
 var historyitem_type_Unknown          =  0;

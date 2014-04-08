@@ -6,6 +6,10 @@ var contentchanges_Add    = 1;
 var contentchanges_Remove = 2;
 
 
+var HANDLE_EVENT_MODE_HANDLE = 0;
+var HANDLE_EVENT_MODE_CURSOR = 1;
+
+
 function CContentChangesElement(Type, Pos, Count, Data)
 {
     this.m_nType  = Type;  // Тип изменений (удаление или добавление)
@@ -136,13 +140,27 @@ function CContentChanges()
     };
 }
 
+function CheckLinePreset(preset)
+{
+    return preset === "line";
+}
+
 
 function DrawingObjectsController(drawingObjects)
 {
     this.drawingObjects = drawingObjects;
 
     this.curState = new NullState(this);
+
     this.selectedObjects = [];
+
+    this.selection =
+    {
+        selectedObjects: [],
+        groupSelection: null,
+        chartSelection: null,
+        textSelection: null
+    };
     this.arrPreTrackObjects = [];
     this.arrTrackObjects = [];
 
@@ -151,12 +169,11 @@ function DrawingObjectsController(drawingObjects)
     this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
 }
 
-var HANDLE_EVENT_MODE_HANDLE = 0;
-var HANDLE_EVENT_MODE_CURSOR = 1;
+
 
 DrawingObjectsController.prototype =
 {
-    handleAdjustmentHit: function(hit, selectedObject, group)
+    handleAdjustmentHit: function(hit, selectedObject, group, pageIndex, bWord)
     {
         if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
@@ -169,28 +186,44 @@ DrawingObjectsController.prototype =
             {
                 this.arrPreTrackObjects.push(new PolarAdjustmentTrack(selectedObject, hit.adjNum));
             }
-			if(!isRealObject(group))
-				this.changeCurrentState(new PreChangeAdjState(this, selectedObject));
-			else
-			{
-				this.changeCurrentState(new PreChangeAdjInGroupState(this, group));
-			}
+            if(!isRealObject(group))
+            {
+                this.changeCurrentState(new PreChangeAdjState(this, selectedObject));
+            }
+            else
+            {
+                this.changeCurrentState(new PreChangeAdjInGroupState(this, group));
+            }
             return true;
         }
         else
         {
-			if(!isRealObject(group))
-				return {objectId: selectedObject.Get_Id(), cursorType: "crosshair"};
-			else
-				return {objectId: group.Get_Id(), cursorType: "crosshair"};
+            if(!isRealObject(group))
+                return {objectId: selectedObject.Get_Id(), cursorType: "crosshair", bMarker: true};
+            else
+                return {objectId: selectedObject.Get_Id(), cursorType: "crosshair", bMarker: true};
         }
     },
 
-    handleHandleHit: function(hit, selectedObject, group)
+    resetInternalSelection: function()
+    {
+        if(this.selection.groupSelection)
+        {
+            this.selection.groupSelection.resetSelection();
+            this.selection.groupSelection = null;
+        }
+        if(this.selection.textSelection)
+        {
+            this.selection.textSelection.getDocContent().Selection_Remove();
+            this.selection.textSelection = null;
+        }
+    },
+
+    handleHandleHit: function(hit, selectedObject, group, pageIndex, bWord)
     {
         if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
-			var selected_objects = group ? group.selectedObjects : this.selectedObjects; 
+            var selected_objects = group ? group.selectedObjects : this.selectedObjects;
             this.arrPreTrackObjects.length = 0;
             if(hit === 8)
             {
@@ -203,16 +236,13 @@ DrawingObjectsController.prototype =
                             this.arrPreTrackObjects.push(selected_objects[i].createRotateTrack());
                         }
                     }
-					if(!isRealObject(group))
-					{
-						if(this.curState.group)
-						{
-							this.curState.group.resetSelection();
-						}
-						this.changeCurrentState(new PreRotateState(this, selectedObject));
-					}
-					else
-						this.changeCurrentState(new PreRotateInGroupState(this, group, selectedObject));
+                    if(!isRealObject(group))
+                    {
+                        this.resetInternalSelection();
+                        this.changeCurrentState(new PreRotateState(this, selectedObject));
+                    }
+                    else
+                        this.changeCurrentState(new PreRotateInGroupState(this, group, selectedObject));
                 }
             }
             else
@@ -225,58 +255,74 @@ DrawingObjectsController.prototype =
                         if(selected_objects[j].canResize())
                             this.arrPreTrackObjects.push(selected_objects[j].createResizeTrack(card_direction));
                     }
-					if(!isRealObject(group))
-					{
-						if(this.curState.group)
-						{
-							this.curState.group.resetSelection();
-						}
-						this.changeCurrentState(new PreResizeState(this, selectedObject, card_direction));
-					}
-					else
-						this.changeCurrentState(new PreResizeInGroupState(this, group, selectedObject, card_direction));
-				}
+                    if(!isRealObject(group))
+                    {
+                        this.resetInternalSelection();
+                        this.changeCurrentState(new PreResizeState(this, selectedObject, card_direction));
+                    }
+                    else
+                        this.changeCurrentState(new PreResizeInGroupState(this, group, selectedObject, card_direction));
+                }
             }
             return true;
         }
         else
         {
             var card_direction = selectedObject.getCardDirectionByNum(hit);
-            return {objectId: group ? group.Get_Id() : selectedObject.Get_Id(), cursorType: hit === 8 ? "crosshair" : CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]};
+            return {objectId: selectedObject.Get_Id(), cursorType: hit === 8 ? "crosshair" : CURSOR_TYPES_BY_CARD_DIRECTION[card_direction], bMarker: true};
         }
     },
 
-    handleMoveHit: function(object, e, x, y, group)
+    handleMoveHit: function(object, e, x, y, group, bInSelect, pageIndex, bWord)
     {
         if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
-			var selector = group ? group : this;
+            var selector = group ? group : this;
             if(object.canMove())
             {
                 this.arrPreTrackObjects.length = 0;
                 var is_selected =  object.selected;
                 if(!(e.CtrlKey || e.ShiftKey) && !is_selected)
                     selector.resetSelection();
-                selector.selectObject(object);
-				if(!is_selected)
-					this.updateOverlay();
+                selector.selectObject(object, pageIndex);
+                if(!is_selected)
+                    this.updateOverlay();
                 this.checkSelectedObjectsForMove(group);
-				if(!isRealObject(group))
-				{
-					if(this.curState.group)
-					{
-						this.curState.group.resetSelection();
-					}
-					this.changeCurrentState(new PreMoveState(this, x, y, e.ShiftKey, e.CtrlKey,  object, is_selected, true));
-				}
-				else
-					this.changeCurrentState(new PreMoveInGroupState(this, group, x, y, e.ShiftKey, e.CtrlKey, object,  is_selected));
+                if(!isRealObject(group))
+                {
+                    this.resetInternalSelection();
+                    this.changeCurrentState(new PreMoveState(this, x, y, e.ShiftKey, e.CtrlKey,  object, is_selected, true));
+                }
+                else
+                {
+                    group.resetInternalSelection();
+                    this.changeCurrentState(new PreMoveInGroupState(this, group, x, y, e.ShiftKey, e.CtrlKey, object,  is_selected));
+                }
             }
             return true;
         }
         else
         {
-            return {objectId: group ? group.Get_Id() : object.Get_Id(), cursorType: "move"};
+            return {objectId: object.Get_Id(), cursorType: "move", bMarker: bInSelect};
+        }
+    },
+    recalculateCurPos: function()
+    {
+        if(this.selection.textSelection)
+        {
+            var content = this.selection.textSelection.getDocContent();
+            if(content)
+            {
+                content.RecalculateCurPos();
+            }
+        }
+        else if(this.selection.groupSelection)
+        {
+            this.selection.groupSelection.recalculateCurPos();
+        }
+        else if(this.selection.chartSelection)
+        {
+            this.selection.chartSelection.recalculateCurPos();
         }
     },
 
@@ -305,13 +351,26 @@ DrawingObjectsController.prototype =
         }
     },
 
-	handleClickOnSelectedGroup: function(group, e, x, y)
-	{
-		this.changeCurrentState(new GroupState(this, group));
-		this.onMouseDown(e, x, y);
-		this.onMouseUp(e, x, y);
-	},
-	
+    handleClickOnSelectedGroup: function(group, e, x, y)
+    {
+        this.changeCurrentState(new GroupState(this, group));
+        this.onMouseDown(e, x, y);
+        this.onMouseUp(e, x, y);
+    },
+
+
+    checkSelectedObjectsForMove: function(group)
+    {
+        var selected_object = group ? group.selectedObjects : this.selectedObjects;
+        for(var i = 0; i < selected_object.length; ++i)
+        {
+            if(selected_object[i].canMove())
+            {
+                this.arrPreTrackObjects.push(selected_object[i].createMoveTrack());
+            }
+        }
+    },
+
     getSnapArraysTrackObjects: function()
     {
         var snapX = [], snapY = [];
@@ -325,13 +384,23 @@ DrawingObjectsController.prototype =
         return {snapX: snapX, snapY: snapY};
     },
 
-    handleTextHit: function(object, e, x, y)
+    handleTextHit: function(object, e, x, y, group, pageIndex, bWord)
     {
         if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
             this.resetSelection();
-            this.selectObject(object);
-            object.selectionSetStart(e, x, y);
+            (group ? group : this).selectObject(object,pageIndex);
+            object.selectionSetStart(e, x, y, pageIndex);
+            if(!group)
+            {
+                this.selection.textSelection = object;
+            }
+            else
+            {
+                this.selectObject(group, pageIndex);
+                this.selection.groupSelection = group;
+                group.selection.textSelection = object;
+            }
             this.changeCurrentState(new TextAddState(this, object));
             if(e.ClickCount < 2)
                 this.updateSelectionState();
@@ -343,13 +412,13 @@ DrawingObjectsController.prototype =
         }
     },
 
-    handleTextHitGroup: function(object, group, e)
+    handleTextHitGroup: function(object, group, e, pageIndex)
     {
         if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
             this.resetSelection();
-            this.selectObject(group);
-            group.selectObject(object);
+            this.selectObject(group, pageIndex);
+            group.selectObject(object, pageIndex);
             object.selectionSetStart(e, x, y);
             this.changeCurrentState(new TextAddInGroup(this, group, object));
             if(e.ClickCount < 2)
@@ -358,7 +427,7 @@ DrawingObjectsController.prototype =
         }
         else
         {
-            return {objectId: group.Get_Id(), cursorType: "text"};
+            return {objectId: object.Get_Id(), cursorType: "text"};
         }
     },
 
@@ -380,7 +449,7 @@ DrawingObjectsController.prototype =
     {
         var track_object = this.arrTrackObjects[0];
         var _this = this;
-		var group = this.curState.group;
+        var group = this.curState.group;
         function callback()
         {
             History.Create_NewPoint();
@@ -389,10 +458,10 @@ DrawingObjectsController.prototype =
         }
         this.checkSelectedObjectsAndFireCallback(callback, []);
         this.arrTrackObjects.length = 0;
-		if(group)
-			this.changeCurrentState(new GroupState(this, group));
-		else
-			this.changeCurrentState(new NullState(this));
+        if(group)
+            this.changeCurrentState(new GroupState(this, group));
+        else
+            this.changeCurrentState(new NullState(this));
     },
 
     handleStartRotateTrack: function(e, x, y)
@@ -447,7 +516,7 @@ DrawingObjectsController.prototype =
     {
         var tracks = this.getCopyTrackArray();
         var _this = this;
-		var group = this.curState.group;
+        var group = this.curState.group;
         function callback()
         {
             History.Create_NewPoint();
@@ -455,19 +524,19 @@ DrawingObjectsController.prototype =
             {
                 tracks[i].trackEnd();
             }
-			if(isRealObject(group))
-			{
-				group.updateCoordinatesAfterInternalResize();
-			}
+            if(isRealObject(group))
+            {
+                group.updateCoordinatesAfterInternalResize();
+            }
             _this.startRecalculate();
         }
         this.checkSelectedObjectsAndFireCallback(callback, []);
         this.arrTrackObjects.length = 0;
-		if(!isRealObject(this.curState.group))
-			this.changeCurrentState(new NullState(this));
-		else
-			this.changeCurrentState(new GroupState(this, this.curState.group));
-	},
+        if(!isRealObject(this.curState.group))
+            this.changeCurrentState(new NullState(this));
+        else
+            this.changeCurrentState(new GroupState(this, this.curState.group));
+    },
 
 
     handleMoveMouseDown: function()
@@ -478,7 +547,7 @@ DrawingObjectsController.prototype =
         }
         else
         {
-            return {cursorType: "move", objectId: this.curState.group ? this.curState.group.Get_Id() : this.curState.majorObject.Get_Id()};
+            return {cursorType: "move", objectId: this.curState.majorObject.Get_Id()};
         }
     },
 
@@ -491,7 +560,7 @@ DrawingObjectsController.prototype =
         }
         else
         {
-            return {cursorType: "crosshair", objectId: this.curState.group ? this.curState.group.Get_Id() : this.curState.majorObject.Get_Id()};
+            return {cursorType: "crosshair", objectId: this.curState.majorObject.Get_Id()};
         }
     },
 
@@ -574,7 +643,7 @@ DrawingObjectsController.prototype =
     {
         var tracks = this.getCopyTrackArray();
         var _this = this;
-		var group = this.curState.group;
+        var group = this.curState.group;
         function callback()
         {
             History.Create_NewPoint();
@@ -582,38 +651,29 @@ DrawingObjectsController.prototype =
             {
                 tracks[i].trackEnd();
             }
-			if(isRealObject(group))
-			{
-				group.updateCoordinatesAfterInternalResize();
-			}
+            if(isRealObject(group))
+            {
+                group.updateCoordinatesAfterInternalResize();
+            }
             _this.startRecalculate();
         }
         this.checkSelectedObjectsAndCallback(callback, []);
         this.arrTrackObjects.length = 0;
-		if(!group)
-			this.changeCurrentState(new NullState(this));
-		else
-			this.changeCurrentState(new GroupState(this, group));
+        if(!group)
+            this.changeCurrentState(new NullState(this));
+        else
+            this.changeCurrentState(new GroupState(this, group));
     },
-	
-	handleMouseUpCtrlShiftOnSelectedObject: function(object)
-	{
-		object.deselect(this);
-		this.changeCurrentState(new NullState(this));
-	},
 
-    selectObject: function(object)
+    handleMouseUpCtrlShiftOnSelectedObject: function(object)
     {
-        object.selected = true;
-        for(var i = 0; i < this.selectedObjects.length; ++i)
-        {
-            if(this.selectedObjects[i] === object)
-            {
-                break;
-            }
-        }
-        if(i === this.selectedObjects.length)
-            this.selectedObjects.push(object);
+        object.deselect(this);
+        this.changeCurrentState(new NullState(this));
+    },
+
+    selectObject: function(object, pageIndex)
+    {
+        object.select(this, pageIndex)
     },
 
     deselectObject: function(object)
@@ -633,7 +693,7 @@ DrawingObjectsController.prototype =
 
     addContentChanges: function(changes)
     {
-       // this.contentChanges.Add(changes);
+        // this.contentChanges.Add(changes);
     },
 
     refreshContentChanges: function()
@@ -2031,7 +2091,8 @@ DrawingObjectsController.prototype =
 
     getChartSpace: function(chart, options)
     {
-        switch (chart.type)
+        var _type = typeof chart.type === "string" ? chart.type : "Bar";
+        switch (_type)
         {
             case "Line":
             {
@@ -2146,11 +2207,6 @@ DrawingObjectsController.prototype =
         window["asc"]["editor"].handlers.trigger("asc_onChangeSelectDrawingObjects", ret);
     },
 
-    recalculateCurPos: function()
-    {
-        if(this.curState.textObject && this.curState.textObject.recalculateCurPos)
-            this.curState.textObject.recalculateCurPos();
-    },
 
     updateSelectionState: function()
     {
@@ -2175,7 +2231,7 @@ DrawingObjectsController.prototype =
 
     removeCallback: function(dir)
     {
-		return;
+        return;
         var state = this.curState;
         var drawingObjectsController = this;
         switch(state.id)
@@ -2365,10 +2421,10 @@ DrawingObjectsController.prototype =
     },
 
     /*onKeyPress: function(e)
-    {
-        this.curState.onKeyPress(e);
-        return true;
-    },*/
+     {
+     this.curState.onKeyPress(e);
+     return true;
+     },*/
 
     resetSelectionState: function()
     {
@@ -2404,11 +2460,11 @@ DrawingObjectsController.prototype =
         var count = this.selectedObjects.length;
         while(count > 0)
         {
-			var selected_object = this.selectedObjects[0];
-			var old_group = selected_object.group;
-			selected_object.group = null;
+            var selected_object = this.selectedObjects[0];
+            var old_group = selected_object.group;
+            selected_object.group = null;
             this.selectedObjects[0].deselect(this);
-			selected_object.group = old_group;
+            selected_object.group = old_group;
             --count;
         }
     },
@@ -2498,20 +2554,16 @@ DrawingObjectsController.prototype =
     },
 
 
-    getGroup: function()
+    getBoundsForGroup: function(arrDrawings)
     {
-        var grouped_objects = this.getArrayForGrouping();
-        if(grouped_objects.length < 2)
-            return null;
-        var max_x, min_x, max_y, min_y;
-        var bounds = grouped_objects[0].getBoundsInGroup();
-        max_x = bounds.maxX;
-        max_y = bounds.maxY;
-        min_x = bounds.minX;
-        min_y = bounds.minY;
-        for(var i = 1; i < grouped_objects.length; ++i)
+        var bounds = arrDrawings[0].getBoundsInGroup();
+        var max_x = bounds.maxX;
+        var max_y = bounds.maxY;
+        var min_x = bounds.minX;
+        var min_y = bounds.minY;
+        for(var i = 1; i < arrDrawings.length; ++i)
         {
-            bounds = grouped_objects[i].getBoundsInGroup();
+            bounds = arrDrawings[i].getBoundsInGroup();
             if(max_x < bounds.maxX)
                 max_x = bounds.maxX;
             if(max_y < bounds.maxY)
@@ -2521,6 +2573,21 @@ DrawingObjectsController.prototype =
             if(min_y > bounds.minY)
                 min_y = bounds.minY;
         }
+        return {minX: min_x, maxX: max_x, minY: min_y, maxY: max_y};
+    },
+
+
+    getGroup: function(arrDrawings)
+    {
+        if(!Array.isArray(arrDrawings))
+            arrDrawings = this.getArrayForGrouping();
+        if(arrDrawings.length < 2)
+            return null;
+        var bounds = this.getBoundsForGroup(arrDrawings);
+        var max_x = bounds.maxX;
+        var max_y = bounds.maxY;
+        var min_x = bounds.minX;
+        var min_y = bounds.minY;
         var group = new CGroupShape();
         group.setSpPr(new CSpPr());
         group.spPr.setParent(group);
@@ -2535,12 +2602,12 @@ DrawingObjectsController.prototype =
         xfrm.setChExtY(max_y-min_y);
         xfrm.setChOffX(0);
         xfrm.setChOffY(0);
-        for(i = 0; i < grouped_objects.length; ++i)
+        for(var i = 0; i < arrDrawings.length; ++i)
         {
-            grouped_objects[i].spPr.xfrm.setOffX(grouped_objects[i].x - min_x);
-            grouped_objects[i].spPr.xfrm.setOffY(grouped_objects[i].y - min_y);
-            grouped_objects[i].setGroup(group);
-            group.addToSpTree(group.spTree.length, grouped_objects[i]);
+            arrDrawings[i].spPr.xfrm.setOffX(arrDrawings[i].x - min_x);
+            arrDrawings[i].spPr.xfrm.setOffY(arrDrawings[i].y - min_y);
+            arrDrawings[i].setGroup(group);
+            group.addToSpTree(group.spTree.length, arrDrawings[i]);
         }
         return group;
     },
@@ -3275,25 +3342,25 @@ DrawingObjectsController.prototype =
     },
 
     createImage: function(rasterImageId, x, y, extX, extY)
-	{
-		var image = new CImageShape();
-		image.setSpPr(new CSpPr());
-		image.spPr.setParent(image);
-		image.spPr.setGeometry(CreateGeometry("rect"));
-		image.spPr.setXfrm(new CXfrm());
-		image.spPr.xfrm.setParent(image.spPr);
-		image.spPr.xfrm.setOffX(x);
-		image.spPr.xfrm.setOffY(y);
-		image.spPr.xfrm.setExtX(extX);
-		image.spPr.xfrm.setExtY(extY);
-		image.setBlipFill(new CBlipFill());
-		image.blipFill.setRasterImageId(rasterImageId);
-		image.blipFill.setStretch(true);
-		image.setNvPicPr(new UniNvPr());
-		return image;
-	},
-	
-	Get_SelectedText: function()
+    {
+        var image = new CImageShape();
+        image.setSpPr(new CSpPr());
+        image.spPr.setParent(image);
+        image.spPr.setGeometry(CreateGeometry("rect"));
+        image.spPr.setXfrm(new CXfrm());
+        image.spPr.xfrm.setParent(image.spPr);
+        image.spPr.xfrm.setOffX(x);
+        image.spPr.xfrm.setOffY(y);
+        image.spPr.xfrm.setExtX(extX);
+        image.spPr.xfrm.setExtY(extY);
+        image.setBlipFill(new CBlipFill());
+        image.blipFill.setRasterImageId(rasterImageId);
+        image.blipFill.setStretch(true);
+        image.setNvPicPr(new UniNvPr());
+        return image;
+    },
+
+    Get_SelectedText: function()
     {
         if(this.curState.textObject && this.curState.textObject.Get_SelectedText)
         {
@@ -3651,21 +3718,21 @@ DrawingObjectsController.prototype =
                         selected_array[sel_index].applyTextPr(paraItem, bRecalculate);
                     }
                 }
-				else
-				{
-					if(this.selectedObjects.length === 1 && this.selectedObjects[0].isShape())
-					{
-						var shape = this.selectedObjects[0];
-						if(!shape.textBody)
-						{
-							shape.createTextBody();
-						}
-						shape.paragraphAdd(paraItem, bRecalculate);
-						this.changeCurrentState(new TextAddState(this, shape));
-						this.updateSelectionState();
-						return;
-					}
-				}
+                else
+                {
+                    if(this.selectedObjects.length === 1 && this.selectedObjects[0].isShape())
+                    {
+                        var shape = this.selectedObjects[0];
+                        if(!shape.textBody)
+                        {
+                            shape.createTextBody();
+                        }
+                        shape.paragraphAdd(paraItem, bRecalculate);
+                        this.changeCurrentState(new TextAddState(this, shape));
+                        this.updateSelectionState();
+                        return;
+                    }
+                }
             }
             else if(cur_state.id === STATES_ID_GROUP)
             {

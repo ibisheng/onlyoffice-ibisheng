@@ -86,6 +86,10 @@ function XYAdjustmentTrack(originalShape, adjIndex)
 
     this.draw = function(overlay)
     {
+        if(isRealNumber(this.originalShape.selectStartPage))
+        {
+            overlay.SetCurrentPage(this.originalShape.selectStartPage);
+        }
         this.overlayObject.draw(overlay);
     };
 
@@ -94,7 +98,7 @@ function XYAdjustmentTrack(originalShape, adjIndex)
         var bounds_checker = new  CSlideBoundsChecker();
         bounds_checker.init(Page_Width, Page_Height, Page_Width, Page_Height);
         this.draw(bounds_checker);
-        return {l: bounds_checker.Bounds.min_x, t: bounds_checker.Bounds.min_y, r: bounds_checker.Bounds.max_x , b: bounds_checker.Bounds.max_y};
+        return bounds_checker.Bounds;
     };
 
     this.track = function(posX, posY)
@@ -242,15 +246,18 @@ function PolarAdjustmentTrack(originalShape, adjIndex)
 
     this.draw = function(overlay)
     {
-        this.overlayObject.draw(overlay)
+        if(this.originalShape.parent && isRealNumber(this.originalShape.selectStartPage))
+        {
+            overlay.SetCurrentPage(this.originalShape.selectStartPage);
+        }
+        this.overlayObject.draw(overlay);
     };
-
     this.getBounds = function()
     {
         var bounds_checker = new  CSlideBoundsChecker();
         bounds_checker.init(Page_Width, Page_Height, Page_Width, Page_Height);
         this.draw(bounds_checker);
-        return {l: bounds_checker.Bounds.min_x, t: bounds_checker.Bounds.min_y, r: bounds_checker.Bounds.max_x , b: bounds_checker.Bounds.max_y};
+        return bounds_checker.Bounds;
     };
 
     this.track = function(posX, posY)

@@ -24,7 +24,7 @@ function CImageShape()
 
     this.selected = false;
 
-	
+
     this.setRecalculateInfo();
     this.Lock = new CLock();
 
@@ -486,6 +486,10 @@ CImageShape.prototype =
         return false;
     },
 
+    hitToTextRect: function()
+    {
+        return false;
+    },
     hitToBoundsRect: function(x, y)
     {
         return false;
@@ -504,13 +508,13 @@ CImageShape.prototype =
 
     recalculateBrush: function()
     {
-		var is_on = History.Is_On();
-		if(is_on)
-			History.TurnOff();
-		this.brush = new CUniFill();
-		this.brush.setFill(this.blipFill);
-		if(is_on)
-			History.TurnOn();
+        var is_on = History.Is_On();
+        if(is_on)
+            History.TurnOff();
+        this.brush = new CUniFill();
+        this.brush.setFill(this.blipFill);
+        if(is_on)
+            History.TurnOn();
     },
 
     recalculatePen: function()
@@ -884,10 +888,11 @@ CImageShape.prototype =
         return {x: this.x, y: this.y, extX: this.extX, extY: this.extY, rot: this.rot, flipH: this.flipH, flipV: this.flipV};
     },
 
-    draw: function(graphics)
+    draw: function(graphics, transform)
     {
+        var _transform = transform ? transform :this.transform;
         graphics.SetIntegerGrid(false);
-        graphics.transform3(this.transform, false);
+        graphics.transform3(_transform, false);
         var shape_drawer = new CShapeDrawer();
         shape_drawer.fromShape2(this, graphics, this.spPr.geometry);
         shape_drawer.draw(this.spPr.geometry);
@@ -900,22 +905,7 @@ CImageShape.prototype =
         graphics.SetIntegerGrid(true);
     },
 
-    select: function(drawingObjectsController)
-    {
-        this.selected = true;
-        var selected_objects;
-        if(!isRealObject(this.group))
-            selected_objects = drawingObjectsController.selectedObjects;
-        else
-            selected_objects = this.group.getMainGroup().selectedObjects;
-        for(var i = 0; i < selected_objects.length; ++i)
-        {
-            if(selected_objects[i] === this)
-                break;
-        }
-        if(i === selected_objects.length)
-            selected_objects.push(this);
-    },
+    select: CShape.prototype.select,
 
     deselect: function(drawingObjectsController)
     {
@@ -952,7 +942,7 @@ CImageShape.prototype =
     {
     },
 
-   
+
 
 
     hitToAdjustment: function()
@@ -982,7 +972,7 @@ CImageShape.prototype =
 
 
 
-   
+
     setNvSpPr: function(pr)
     {
         History.Add(this, {Type: historyitem_SetSetNvSpPr, oldPr: this.nvPicPr, newPr: pr});

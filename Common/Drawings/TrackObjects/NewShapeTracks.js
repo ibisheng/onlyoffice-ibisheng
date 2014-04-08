@@ -1,6 +1,6 @@
 "use strict";
 
-function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide)
+function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide, pageIndex)
 {
     this.presetGeom = presetGeom;
     this.startX = startX;
@@ -12,7 +12,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide)
     this.extY = null;
     this.arrowsCount = 0;
     this.transform = new CMatrix();
-
+    this.pageIndex = pageIndex;
     var style;
     if(presetGeom !== "textRect")
         style = CreateDefaultShapeStyle();
@@ -294,19 +294,38 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide)
 
     this.draw = function(overlay)
     {
+        if(isRealNumber(this.pageIndex))
+        {
+            overlay.SetCurrentPage(this.pageIndex);
+        }
         this.overlayObject.draw(overlay);
     };
 
-    this.getShape = function()
+    this.getShape = function(bFromWord)
     {
         var shape = new CShape();
         shape.setSpPr(new CSpPr());
         shape.spPr.setParent(shape);
         shape.spPr.setXfrm(new CXfrm());
+        if(bFromWord)
+        {
+            shape.setWordShape(true);
+        }
         var xfrm = shape.spPr.xfrm;
         xfrm.setParent(shape.spPr);
-        xfrm.setOffX(this.x);
-        xfrm.setOffY(this.y);
+        var x, y;
+        if(bFromWord)
+        {
+            x = 0;
+            y = 0;
+        }
+        else
+        {
+            x = this.x;
+            y = this.y;
+        }
+        xfrm.setOffX(x);
+        xfrm.setOffY(y);
         xfrm.setExtX(this.extX);
         xfrm.setExtY(this.extY);
         xfrm.setFlipH(this.flipH);
@@ -356,4 +375,12 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide)
         }
         return shape;
     };
+
+
+    this.getBounds = function()
+    {
+        var bounds_checker = new CSlideBoundsChecker();
+        this.overlayObject.draw(bounds_checker);
+        return bounds_checker.Bounds;
+    }
 }

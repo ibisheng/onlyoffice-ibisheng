@@ -372,42 +372,51 @@ asc_CChart.prototype = {
 			seria.xVal = Cat;
 		this.series.push(seria);
 	},
-	
-	parseSeriesHeaders: function() {
-		
-		var cntLeft = 0, cntTop = 0;
-		var headers = { bLeft: false, bTop: false };
-		
-		var _t = this;
-		var bbox = _t.range.intervalObject.getBBox0();
-		
-		if ( bbox.c2 - bbox.c1 > 0 ) {
-			for (var i = bbox.r1 + 1; i <= bbox.r2; i++) {
-				
-				var cell = _t.range.intervalObject.worksheet.getCell( new CellAddress(i, bbox.c1, 0) );
-				var value = cell.getValue();
-				if ( !isNumber(value) && (value != "") )
-					cntLeft++;
-			}
-			if ( (cntLeft > 0) && (cntLeft >= bbox.r2 - bbox.r1) )
-				headers.bLeft = true;
-		}
-		
-		if ( bbox.r2 - bbox.r1 > 0 ) {
-			for (var i = bbox.c1 + 1; i <= bbox.c2; i++) {
-				
-				var cell = _t.range.intervalObject.worksheet.getCell( new CellAddress(bbox.r1, i, 0) );
-				var value = cell.getValue();
-				if ( !isNumber(value) && (value != "") )
-					cntTop++;
-			}
-			if ( (cntTop > 0) && (cntTop >= bbox.c2 - bbox.c1) )
-				headers.bTop = true;
-		}
-		
-		return headers;
-	},
-	
+
+
+    parseSeriesHeaders: function() {
+
+        var cntLeft = 0, cntTop = 0;
+        var headers = { bLeft: false, bTop: false };
+
+        var _t = this;
+        if(_t.range.intervalObject)
+        {
+            var bbox = _t.range.intervalObject.getBBox0();
+
+            if ( bbox.c2 - bbox.c1 > 0 ) {
+                for (var i = bbox.r1 + 1; i <= bbox.r2; i++) {
+
+                    var cell = _t.range.intervalObject.worksheet.getCell( new CellAddress(i, bbox.c1, 0) );
+                    var value = cell.getValue();
+                    if ( !isNumber(value) && (value != "") )
+                        cntLeft++;
+                }
+                if ( (cntLeft > 0) && (cntLeft >= bbox.r2 - bbox.r1) )
+                    headers.bLeft = true;
+            }
+
+            if ( bbox.r2 - bbox.r1 > 0 ) {
+                for (var i = bbox.c1 + 1; i <= bbox.c2; i++) {
+
+                    var cell = _t.range.intervalObject.worksheet.getCell( new CellAddress(bbox.r1, i, 0) );
+                    var value = cell.getValue();
+                    if ( !isNumber(value) && (value != "") )
+                        cntTop++;
+                }
+                if ( (cntTop > 0) && (cntTop >= bbox.c2 - bbox.c1) )
+                    headers.bTop = true;
+            }
+        }
+        else
+        {
+            var headers = { bLeft: true, bTop: true };
+
+        }
+
+        return headers;
+    },
+
 	rebuildSeries: function(isIgnoreColors) {
 		var _t = this;
 		var bbox = _t.range.intervalObject.getBBox0();
@@ -688,7 +697,7 @@ asc_CChart.prototype = {
 	
 	Write_ToBinary2: function(Writer) {
 		var i, j;
-		Writer.WriteLong(CLASS_TYPE_CHART_DATA);
+		//Writer.WriteLong(CLASS_TYPE_CHART_DATA);
 		Writer.WriteString2( this.Id );
 		
 		Writer.WriteString2( this.type );

@@ -24,7 +24,7 @@
 <script type="text/javascript">
     //<![CDATA[
     window.g_debug_mode = false;
-	window.g_offline_doc = "../Excel/document/";
+    window.g_offline_doc = "../Excel/document/";
     //window.g_debug_mode = true;
     //window.g_isMobileVersion = true;
     //]]>
@@ -130,6 +130,7 @@
 <!--for shapes-->
 <script src="../Common/Drawings/Hit.js"></script>
 <script src="../Common/Drawings/States.js"></script>
+<script src="../Common/Drawings/DrawingObjectsHandlers.js"></script>
 <script src="../Common/Drawings/TrackObjects/AdjustmentTracks.js"></script>
 <script src="../Common/Drawings/TrackObjects/ResizeTracks.js"></script>
 <script src="../Common/Drawings/TrackObjects/RotateTracks.js"></script>
@@ -1726,7 +1727,7 @@ Format
                 <img class="ToolbarIcon FixedArea" src="menu/img/spacer.gif"/>
             </div>
         </li>
-		<li class="ToolbarIconOut selectableIcon" title="Set fixed first col">
+        <li class="ToolbarIconOut selectableIcon" title="Set fixed first col">
             <div id="td_set_fixed_col" class="iconToolbar">
                 <img class="ToolbarIcon FixedArea" src="menu/img/spacer.gif"/>
             </div>
@@ -1738,7 +1739,7 @@ Format
                 <img class="ToolbarIcon FixedAreaClean" src="menu/img/spacer.gif"/>
             </div>
         </li>
-		<li class="ToolbarIconOut selectableIcon" title="Set fixed first row">
+        <li class="ToolbarIconOut selectableIcon" title="Set fixed first row">
             <div id="td_set_fixed_row" class="iconToolbar">
                 <img class="ToolbarIcon FixedArea" src="menu/img/spacer.gif"/>
             </div>
@@ -2313,352 +2314,352 @@ Format
 </div>
 
 <div id="chartPropsMenuDiv"  style="background: #ece9d8; z-index:500; width: 619px; height: 515px; position: absolute; left:100px; top:100px; font-family: Tahoma; display: none">
-    <div id="leftPanelChartPropsDiv" style="position:absolute;  left: 7px; top: 7px; height: 470px; width: 150px; background: #ffffff;border: 1px solid rgb(127,157,185)">
-        <div class="leftPanelCharPropsItemDiv left_panel_chart_props_select" id="designChartLeft">
-            <p>Design</p>
-        </div>
-        <div class="leftPanelCharPropsItemDiv left_panel_chart_props_no_select" id="valAxisProps">
-            <p>Vertical Axis Props</p>
-        </div>
-        <div class="leftPanelCharPropsItemDiv left_panel_chart_props_no_select" id="catAxisProps">
-            <p>Horizontal Axis Props</p>
-        </div>
+<div id="leftPanelChartPropsDiv" style="position:absolute;  left: 7px; top: 7px; height: 470px; width: 150px; background: #ffffff;border: 1px solid rgb(127,157,185)">
+    <div class="leftPanelCharPropsItemDiv left_panel_chart_props_select" id="designChartLeft">
+        <p>Design</p>
     </div>
-    <div id="rightPanelChartPropsDiv" class="right_panel_drawing_props">
-        <div><p style="font-size: 14pt">Design</p></div>
-        <!--<button id="chageChartTypeButton">Change Type</button> -->
-        <select id="changeChartTypeSelect">
-            <option value="barNormal" style="background: #7F9DB9">Bar Normal</option>
-            <option value="barStacked">Bar Stacked</option>
-            <option value="barStackedPer">Bar Stacked Per</option>
-
-            <option value="lineNormal" style="background: #7F9DB9">Line Normal</option>
-            <option value="lineStacked">Line Stacked</option>
-            <option value="lineStackedPer">Line Stacked Per</option>
-            <option value="lineNormalMarker">Line Normal Marker</option>
-            <option value="lineStackedMarker">Line Stacked Marker</option>
-            <option value="lineStackedPerMarker">Line Stacked Per Marker</option>
-
-            <option value="pie" style="background: #7F9DB9">Pie</option>
-            <option value="doughnut" style="background: #7F9DB9">Doughnut</option>
-
-            <option value="hBarNormal" style="background: #7F9DB9">HBar Normal</option>
-            <option value="hBarStacked">HBar Stacked</option>
-            <option value="hBarStackedPer">HBar Stacked Per</option>
-
-            <option value="areaNormal" style="background: #7F9DB9">Area Normal</option>
-            <option value="areaStacked">Area Stacked</option>
-            <option value="areaStackedPer">Area Stacked Per</option>
-
-            <option value="scatter" style="background: #7F9DB9">Scatter</option>
-            <option value="scatter">Scatter Line</option>
-        </select>
-        <button id="rowColsButton">Rows/Cols</button>
-        <button id="selectDataButton">Select Data</button>
-        <br>
-        <label style="font-size: 11pt">Style Index</label>
-        <input type="text" id="styleIndexInput">
-        <button id="applyStyleButton">Apply Style</button>
-        <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
-        <div><p style="font-size: 14pt">Layout</p></div>
-        <label style="font-size: 11pt">Chart Title</label>
-        <select id="chartTitleSelect">
-            <option value="none">None</option>
-            <option value="overlay">Overlay</option>
-            <option value="no_overlay">No Overlay</option>
-        </select>
-        <br>
-        <label style="font-size: 11pt">Hor Axis Title</label>
-        <select id="chartHorAxisSelect">
-            <option value="none">None</option>
-            <option value="no_overlay">No Overlay</option>
-        </select>
-        <br>
-        <label style="font-size: 11pt">Vert Axis Title</label>
-        <select id="chartVertAxisSelect">
-            <option value="none">None</option>
-            <option value="rotated">Rotated</option>
-            <option value="horizontal">Horizontal</option>
-        </select>
-        <br>
-        <label style="font-size: 11pt">Legend</label>
-        <select id="chartLegendSelect">
-            <option value="none">None</option>
-            <option value="left">Left</option>
-            <option value="top">Top</option>
-            <option value="right">Right</option>
-            <option value="bottom">Bottom</option>
-            <option value="right_overlay">Right Overlay</option>
-            <option value="left_overlay">Left Overlay</option>
-        </select>
-        <br>
-        <label style="font-size: 11pt">Data Labels</label>
-        <br>
-        <select id="chartDataLabels">
-            <option value="none">     None</option>
-            <option value="center">   Center</option>
-            <option value="inner_top">Inner Top</option>
-            <option value="in_base">In Base</option>
-            <option value="out_end">Out End</option>
-            <option value="right_overlay">Right Overlay</option>
-            <option value="left_overlay">Left Overlay</option>
-        </select>
-        <div id="labelsOptionsDiv">
-            <input type="checkbox"     id="dataLabelsCheckBoxSerName" class="dataLabelsCheckBox" value="serName"><label style="font-size: 10pt">Series Name</label>
-            <br><input type="checkbox" id="dataLabelsCheckBoxCatName" class="dataLabelsCheckBox" value="catName"><label style="font-size: 10pt">Cat Name</label>
-            <br><input type="checkbox" id="dataLabelsCheckBoxVal" class="dataLabelsCheckBox" value="val"><label style="font-size: 10pt">Value</label>
-        </div>
-        <label style="font-size: 10pt">Data Labels Separator</label><input type="text" id="dataLabelsSeparatorInput">
-        <br><button id="dataLblsPrApplyButton">Apply</button>
-        <br>
-        <label style="font-size: 11pt">Hor Axis</label>
-        <select id="chartHorAxis">
-            <option value="none">None</option>
-            <option value="leftToRight">Left To Right</option>
-            <option value="noLabels">No Labels</option>
-            <option value="rightToLeft">Right To Left</option>
-        </select>
-        <br>
-        <label style="font-size: 11pt">Vert Axis</label>
-        <select id="chartVertAxis">
-            <option value="none">None</option>
-            <option value="byDefault">By Default</option>
-            <option value="log">Log</option>
-        </select>
-        <br>
-        <label style="font-size: 11pt">Hor Grid Lines</label>
-        <select id="chartHorGridLines">
-            <option value="none">None</option>
-            <option value="major">Major</option>
-            <option value="minor">Minor</option>
-            <option value="minor_major">Major&Minor</option>
-        </select>
-
-        <br>
-        <label style="font-size: 11pt">Vert Grid Lines</label>
-        <select id="chartVertGridLines">
-            <option value="none">None</option>
-            <option value="major">Major</option>
-            <option value="minor">Minor</option>
-            <option value="minor_major">Major&Minor</option>
-        </select>
+    <div class="leftPanelCharPropsItemDiv left_panel_chart_props_no_select" id="valAxisProps">
+        <p>Vertical Axis Props</p>
     </div>
-    <div id="rightPanelValAxisProps" class="right_panel_drawing_props" style="display: none" >
-        <label style="font-weight: bold">min value</label><br>
-        <label>auto</label><input type="radio" name="min_value" value="auto" checked="checked" id="autoMinValValAxisCheckBox">
-        <label>fixed</label><input type="radio" name="min_value" value="fixed" id="fixedMinValValAxisCheckBox">
-        <input id="minValueAxisInput" type="text" disabled="disabled">
-        <br>
-        <label style="font-weight: bold">max value</label><br>
-        <label>auto</label><input type="radio" name="max_value" value="auto" checked="checked" id="autoMaxValValAxisCheckBox">
-        <label>fixed</label><input type="radio" name="max_value" value="fixed" id="fixedMaxValValAxisCheckBox">
-        <input id="maxValueAxisInput" type="text" disabled="disabled">
-        <br>
-        <label>invert val order</label> <input type="checkbox" id="invertValOrderValAxisInput">
-        <br>
-        <label>log scale</label> <input type="checkbox" id="logScaleInput">
-        <label>log base</label> <input id="logBaseInput" type="text" disabled="disabled">
-        <br><label>value of division</label>
-        <select id="unitsSelect">
-            <option value="none">None</option>
-            <option value="BILLIONS">BILLIONS</option>
-            <option value="HUNDRED_MILLIONS">HUNDRED_MILLIONS</option>
-            <option value="HUNDREDS">HUNDREDS</option>
-            <option value="HUNDRED_THOUSANDS">HUNDRED_THOUSANDS</option>
-            <option value="MILLIONS">MILLIONS</option>
-            <option value="TEN_MILLIONS">TEN_MILLIONS</option>
-            <option value="TEN_THOUSANDS">TEN_THOUSANDS</option>
-            <option value="TRILLIONS">TRILLIONS</option>
-            <option value="CUSTOM">CUSTOM</option>
-        </select>
-        <input type="text" disabled= "disabled" id="unitCustomInput">
-        <br>
-        <label>show on chart</label> <input type="checkbox" id="showUnitsLabels" disabled="disabled">
-        <br>
-        <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
-        <br>
-        <label>major tick mark</label>
-        <select id="majorTickMarkSelectValAx">
-            <option value="TICK_MARK_CROSS">TICK_MARK_CROSS</option>
-            <option value="TICK_MARK_IN">TICK_MARK_IN</option>
-            <option value="TICK_MARK_NONE">TICK_MARK_NONE</option>
-            <option value="TICK_MARK_OUT">TICK_MARK_OUT</option>
-        </select>
-        <br>
-        <label>minor tick mark</label>
-        <select id="minorTickMarkSelectValAx">
-            <option value="TICK_MARK_CROSS">TICK_MARK_CROSS</option>
-            <option value="TICK_MARK_IN">TICK_MARK_IN</option>
-            <option value="TICK_MARK_NONE">TICK_MARK_NONE</option>
-            <option value="TICK_MARK_OUT">TICK_MARK_OUT</option>
-        </select>
-        <br>
-        <label>tick labels</label>
-        <select id="tickLabelsSelectValAx">
-            <option value="TICK_LABEL_POSITION_HIGH">TICK_LABEL_POSITION_HIGH</option>
-            <option value="TICK_LABEL_POSITION_LOW">TICK_LABEL_POSITION_LOW</option>
-            <option value="TICK_LABEL_POSITION_NEXT_TO">TICK_LABEL_POSITION_NEXT_TO</option>
-            <option value="TICK_LABEL_POSITION_NONE">TICK_LABEL_POSITION_NONE</option>
-        </select>
-        <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
-        <label>Crosses</label>
-        <br>
-        <label>auto</label><input type="radio" name="crosses" value="auto" checked="checked" id="crossesAutoValAxInput" ><br>
-        <label>value</label><input type="radio" name="crosses" value="value" id="crossesValAxValInput"><input type="text" id="crossesValInput" disabled="disabled"><br>
-        <label>max value</label><input type="radio" name="crosses" value="maxValue" id="crossesMaxAxValInput">
-        <label>min value</label><input type="radio" name="crosses" value="maxValue" id="crossesMinAxValInput">
-        <br>
-        <br>
-        <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
-        <br>
-        <button id="valApplyValAxisProps">
-            Apply Props
-        </button>
+    <div class="leftPanelCharPropsItemDiv left_panel_chart_props_no_select" id="catAxisProps">
+        <p>Horizontal Axis Props</p>
     </div>
-    <div id="rightPanelCatAxProps" class="right_panel_drawing_props" style="display: none">
-        <label style="font-weight: bold">Axis Settings</label><br>
-        <label>interval between tick</label> <input type="text" id="intervalBetweenTickInput" value="1">
-        <br>
-        <label>interval between labels:</label>
-        <br>
-        <input type="radio" name="intervalBetweenLabels" value="auto" class="intervalBetweenLabelsCatAxInput" checked="checked" id="autoIntervalBetweenLabelsInputCat"><label>auto</label>
-        <br>
-        <input type="radio" name="intervalBetweenLabels" value="manual" class="intervalBetweenLabelsCatAxInput" id="manualIntervalBetweenLabelsInputCat"><label>manual</label>
-        <input type="text" id="intervalBetweenLabelsInputCatAxManual" disabled="disabled">
-        <br>
-        <input type="checkbox" id="invertCatOrderCheckBox"><label>Invert Cat Order</label>
-        <br>
-        <label>Labels Axis Distance: </label><input id="labelsAxisInputDistanceInput" type="text" value="100">
-        <br>
-        <label>Axis Type:</label>
-        <br>
-        <input type="radio"  class = "catAxisTypeInputAuto" name="horAxisTypeInput" value="auto" checked="checked"><label>auto</label>
-        <input type="radio"  class = "catAxisTypeInputText" name="horAxisTypeInput" value="text"><label>text</label>
-        <input type="radio"  class = "catAxisTypeInputDate" name="horAxisTypeInput" value="date"><label>date</label>
-        <br>
-        <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
-        <label>major tick mark</label>
-        <select id="majorTickMarkSelectCatAx">
-            <option value="TICK_MARK_CROSS">TICK_MARK_CROSS</option>
-            <option value="TICK_MARK_IN">TICK_MARK_IN</option>
-            <option value="TICK_MARK_NONE">TICK_MARK_NONE</option>
-            <option value="TICK_MARK_OUT">TICK_MARK_OUT</option>
-        </select>
-        <br>
-        <label>minor tick mark</label>
-        <select id="minorTickMarkSelectCatAx">
-            <option value="TICK_MARK_CROSS">TICK_MARK_CROSS</option>
-            <option value="TICK_MARK_IN">TICK_MARK_IN</option>
-            <option value="TICK_MARK_NONE">TICK_MARK_NONE</option>
-            <option value="TICK_MARK_OUT">TICK_MARK_OUT</option>
-        </select>
-        <br>
-        <label>tick labels</label>
-        <select id="tickLabelsSelectCatAx">
-            <option value="TICK_LABEL_POSITION_HIGH">TICK_LABEL_POSITION_HIGH</option>
-            <option value="TICK_LABEL_POSITION_LOW">TICK_LABEL_POSITION_LOW</option>
-            <option value="TICK_LABEL_POSITION_NEXT_TO">TICK_LABEL_POSITION_NEXT_TO</option>
-            <option value="TICK_LABEL_POSITION_NONE">TICK_LABEL_POSITION_NONE</option>
-        </select>
-        <br>
-        <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
-        <label>Crosses</label>
-        <br>
-        <label>auto</label><input type="radio" name="crossesCat" value="auto" checked="checked" id="crossesAutoCatAxInput"><br>
-        <label>value</label><input type="radio" name="crossesCat" value="value" id="crossesCatAxValInput"><input type="text" id="crossesCatInput" disabled="disabled"><br>
-        <label>max value</label><input type="radio" name="crossesCat" value="maxValue" id="crossesMaxAxCatInput">
-        <label>min value</label><input type="radio" name="crossesCat" value="maxValue" id="crossesMinAxCatInput">
-        <br>
-        <label>Axis Position</label><br>
-        <label>by divisions:</label><input type="radio" id="checkBoxByDivisionsInput"  name="axis_pos_cat">
-        <br>
-        <label>between divisions:</label><input type="radio" id="checkBoxBetweenDivisionsInput" checked="checked" name="axis_pos_cat">
-        <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
-        <button id="valApplyCatAxisProps">
-            Apply Props
-        </button>
+</div>
+<div id="rightPanelChartPropsDiv" class="right_panel_drawing_props">
+    <div><p style="font-size: 14pt">Design</p></div>
+    <!--<button id="chageChartTypeButton">Change Type</button> -->
+    <select id="changeChartTypeSelect">
+        <option value="barNormal" style="background: #7F9DB9">Bar Normal</option>
+        <option value="barStacked">Bar Stacked</option>
+        <option value="barStackedPer">Bar Stacked Per</option>
+
+        <option value="lineNormal" style="background: #7F9DB9">Line Normal</option>
+        <option value="lineStacked">Line Stacked</option>
+        <option value="lineStackedPer">Line Stacked Per</option>
+        <option value="lineNormalMarker">Line Normal Marker</option>
+        <option value="lineStackedMarker">Line Stacked Marker</option>
+        <option value="lineStackedPerMarker">Line Stacked Per Marker</option>
+
+        <option value="pie" style="background: #7F9DB9">Pie</option>
+        <option value="doughnut" style="background: #7F9DB9">Doughnut</option>
+
+        <option value="hBarNormal" style="background: #7F9DB9">HBar Normal</option>
+        <option value="hBarStacked">HBar Stacked</option>
+        <option value="hBarStackedPer">HBar Stacked Per</option>
+
+        <option value="areaNormal" style="background: #7F9DB9">Area Normal</option>
+        <option value="areaStacked">Area Stacked</option>
+        <option value="areaStackedPer">Area Stacked Per</option>
+
+        <option value="scatter" style="background: #7F9DB9">Scatter</option>
+        <option value="scatter">Scatter Line</option>
+    </select>
+    <button id="rowColsButton">Rows/Cols</button>
+    <button id="selectDataButton">Select Data</button>
+    <br>
+    <label style="font-size: 11pt">Style Index</label>
+    <input type="text" id="styleIndexInput">
+    <button id="applyStyleButton">Apply Style</button>
+    <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
+    <div><p style="font-size: 14pt">Layout</p></div>
+    <label style="font-size: 11pt">Chart Title</label>
+    <select id="chartTitleSelect">
+        <option value="none">None</option>
+        <option value="overlay">Overlay</option>
+        <option value="no_overlay">No Overlay</option>
+    </select>
+    <br>
+    <label style="font-size: 11pt">Hor Axis Title</label>
+    <select id="chartHorAxisSelect">
+        <option value="none">None</option>
+        <option value="no_overlay">No Overlay</option>
+    </select>
+    <br>
+    <label style="font-size: 11pt">Vert Axis Title</label>
+    <select id="chartVertAxisSelect">
+        <option value="none">None</option>
+        <option value="rotated">Rotated</option>
+        <option value="horizontal">Horizontal</option>
+    </select>
+    <br>
+    <label style="font-size: 11pt">Legend</label>
+    <select id="chartLegendSelect">
+        <option value="none">None</option>
+        <option value="left">Left</option>
+        <option value="top">Top</option>
+        <option value="right">Right</option>
+        <option value="bottom">Bottom</option>
+        <option value="right_overlay">Right Overlay</option>
+        <option value="left_overlay">Left Overlay</option>
+    </select>
+    <br>
+    <label style="font-size: 11pt">Data Labels</label>
+    <br>
+    <select id="chartDataLabels">
+        <option value="none">     None</option>
+        <option value="center">   Center</option>
+        <option value="inner_top">Inner Top</option>
+        <option value="in_base">In Base</option>
+        <option value="out_end">Out End</option>
+        <option value="right_overlay">Right Overlay</option>
+        <option value="left_overlay">Left Overlay</option>
+    </select>
+    <div id="labelsOptionsDiv">
+        <input type="checkbox"     id="dataLabelsCheckBoxSerName" class="dataLabelsCheckBox" value="serName"><label style="font-size: 10pt">Series Name</label>
+        <br><input type="checkbox" id="dataLabelsCheckBoxCatName" class="dataLabelsCheckBox" value="catName"><label style="font-size: 10pt">Cat Name</label>
+        <br><input type="checkbox" id="dataLabelsCheckBoxVal" class="dataLabelsCheckBox" value="val"><label style="font-size: 10pt">Value</label>
     </div>
+    <label style="font-size: 10pt">Data Labels Separator</label><input type="text" id="dataLabelsSeparatorInput">
+    <br><button id="dataLblsPrApplyButton">Apply</button>
+    <br>
+    <label style="font-size: 11pt">Hor Axis</label>
+    <select id="chartHorAxis">
+        <option value="none">None</option>
+        <option value="leftToRight">Left To Right</option>
+        <option value="noLabels">No Labels</option>
+        <option value="rightToLeft">Right To Left</option>
+    </select>
+    <br>
+    <label style="font-size: 11pt">Vert Axis</label>
+    <select id="chartVertAxis">
+        <option value="none">None</option>
+        <option value="byDefault">By Default</option>
+        <option value="log">Log</option>
+    </select>
+    <br>
+    <label style="font-size: 11pt">Hor Grid Lines</label>
+    <select id="chartHorGridLines">
+        <option value="none">None</option>
+        <option value="major">Major</option>
+        <option value="minor">Minor</option>
+        <option value="minor_major">Major&Minor</option>
+    </select>
+
+    <br>
+    <label style="font-size: 11pt">Vert Grid Lines</label>
+    <select id="chartVertGridLines">
+        <option value="none">None</option>
+        <option value="major">Major</option>
+        <option value="minor">Minor</option>
+        <option value="minor_major">Major&Minor</option>
+    </select>
+</div>
+<div id="rightPanelValAxisProps" class="right_panel_drawing_props" style="display: none" >
+    <label style="font-weight: bold">min value</label><br>
+    <label>auto</label><input type="radio" name="min_value" value="auto" checked="checked" id="autoMinValValAxisCheckBox">
+    <label>fixed</label><input type="radio" name="min_value" value="fixed" id="fixedMinValValAxisCheckBox">
+    <input id="minValueAxisInput" type="text" disabled="disabled">
+    <br>
+    <label style="font-weight: bold">max value</label><br>
+    <label>auto</label><input type="radio" name="max_value" value="auto" checked="checked" id="autoMaxValValAxisCheckBox">
+    <label>fixed</label><input type="radio" name="max_value" value="fixed" id="fixedMaxValValAxisCheckBox">
+    <input id="maxValueAxisInput" type="text" disabled="disabled">
+    <br>
+    <label>invert val order</label> <input type="checkbox" id="invertValOrderValAxisInput">
+    <br>
+    <label>log scale</label> <input type="checkbox" id="logScaleInput">
+    <label>log base</label> <input id="logBaseInput" type="text" disabled="disabled">
+    <br><label>value of division</label>
+    <select id="unitsSelect">
+        <option value="none">None</option>
+        <option value="BILLIONS">BILLIONS</option>
+        <option value="HUNDRED_MILLIONS">HUNDRED_MILLIONS</option>
+        <option value="HUNDREDS">HUNDREDS</option>
+        <option value="HUNDRED_THOUSANDS">HUNDRED_THOUSANDS</option>
+        <option value="MILLIONS">MILLIONS</option>
+        <option value="TEN_MILLIONS">TEN_MILLIONS</option>
+        <option value="TEN_THOUSANDS">TEN_THOUSANDS</option>
+        <option value="TRILLIONS">TRILLIONS</option>
+        <option value="CUSTOM">CUSTOM</option>
+    </select>
+    <input type="text" disabled= "disabled" id="unitCustomInput">
+    <br>
+    <label>show on chart</label> <input type="checkbox" id="showUnitsLabels" disabled="disabled">
+    <br>
+    <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
+    <br>
+    <label>major tick mark</label>
+    <select id="majorTickMarkSelectValAx">
+        <option value="TICK_MARK_CROSS">TICK_MARK_CROSS</option>
+        <option value="TICK_MARK_IN">TICK_MARK_IN</option>
+        <option value="TICK_MARK_NONE">TICK_MARK_NONE</option>
+        <option value="TICK_MARK_OUT">TICK_MARK_OUT</option>
+    </select>
+    <br>
+    <label>minor tick mark</label>
+    <select id="minorTickMarkSelectValAx">
+        <option value="TICK_MARK_CROSS">TICK_MARK_CROSS</option>
+        <option value="TICK_MARK_IN">TICK_MARK_IN</option>
+        <option value="TICK_MARK_NONE">TICK_MARK_NONE</option>
+        <option value="TICK_MARK_OUT">TICK_MARK_OUT</option>
+    </select>
+    <br>
+    <label>tick labels</label>
+    <select id="tickLabelsSelectValAx">
+        <option value="TICK_LABEL_POSITION_HIGH">TICK_LABEL_POSITION_HIGH</option>
+        <option value="TICK_LABEL_POSITION_LOW">TICK_LABEL_POSITION_LOW</option>
+        <option value="TICK_LABEL_POSITION_NEXT_TO">TICK_LABEL_POSITION_NEXT_TO</option>
+        <option value="TICK_LABEL_POSITION_NONE">TICK_LABEL_POSITION_NONE</option>
+    </select>
+    <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
+    <label>Crosses</label>
+    <br>
+    <label>auto</label><input type="radio" name="crosses" value="auto" checked="checked" id="crossesAutoValAxInput" ><br>
+    <label>value</label><input type="radio" name="crosses" value="value" id="crossesValAxValInput"><input type="text" id="crossesValInput" disabled="disabled"><br>
+    <label>max value</label><input type="radio" name="crosses" value="maxValue" id="crossesMaxAxValInput">
+    <label>min value</label><input type="radio" name="crosses" value="maxValue" id="crossesMinAxValInput">
+    <br>
+    <br>
+    <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
+    <br>
+    <button id="valApplyValAxisProps">
+        Apply Props
+    </button>
+</div>
+<div id="rightPanelCatAxProps" class="right_panel_drawing_props" style="display: none">
+    <label style="font-weight: bold">Axis Settings</label><br>
+    <label>interval between tick</label> <input type="text" id="intervalBetweenTickInput" value="1">
+    <br>
+    <label>interval between labels:</label>
+    <br>
+    <input type="radio" name="intervalBetweenLabels" value="auto" class="intervalBetweenLabelsCatAxInput" checked="checked" id="autoIntervalBetweenLabelsInputCat"><label>auto</label>
+    <br>
+    <input type="radio" name="intervalBetweenLabels" value="manual" class="intervalBetweenLabelsCatAxInput" id="manualIntervalBetweenLabelsInputCat"><label>manual</label>
+    <input type="text" id="intervalBetweenLabelsInputCatAxManual" disabled="disabled">
+    <br>
+    <input type="checkbox" id="invertCatOrderCheckBox"><label>Invert Cat Order</label>
+    <br>
+    <label>Labels Axis Distance: </label><input id="labelsAxisInputDistanceInput" type="text" value="100">
+    <br>
+    <label>Axis Type:</label>
+    <br>
+    <input type="radio"  class = "catAxisTypeInputAuto" name="horAxisTypeInput" value="auto" checked="checked"><label>auto</label>
+    <input type="radio"  class = "catAxisTypeInputText" name="horAxisTypeInput" value="text"><label>text</label>
+    <input type="radio"  class = "catAxisTypeInputDate" name="horAxisTypeInput" value="date"><label>date</label>
+    <br>
+    <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
+    <label>major tick mark</label>
+    <select id="majorTickMarkSelectCatAx">
+        <option value="TICK_MARK_CROSS">TICK_MARK_CROSS</option>
+        <option value="TICK_MARK_IN">TICK_MARK_IN</option>
+        <option value="TICK_MARK_NONE">TICK_MARK_NONE</option>
+        <option value="TICK_MARK_OUT">TICK_MARK_OUT</option>
+    </select>
+    <br>
+    <label>minor tick mark</label>
+    <select id="minorTickMarkSelectCatAx">
+        <option value="TICK_MARK_CROSS">TICK_MARK_CROSS</option>
+        <option value="TICK_MARK_IN">TICK_MARK_IN</option>
+        <option value="TICK_MARK_NONE">TICK_MARK_NONE</option>
+        <option value="TICK_MARK_OUT">TICK_MARK_OUT</option>
+    </select>
+    <br>
+    <label>tick labels</label>
+    <select id="tickLabelsSelectCatAx">
+        <option value="TICK_LABEL_POSITION_HIGH">TICK_LABEL_POSITION_HIGH</option>
+        <option value="TICK_LABEL_POSITION_LOW">TICK_LABEL_POSITION_LOW</option>
+        <option value="TICK_LABEL_POSITION_NEXT_TO">TICK_LABEL_POSITION_NEXT_TO</option>
+        <option value="TICK_LABEL_POSITION_NONE">TICK_LABEL_POSITION_NONE</option>
+    </select>
+    <br>
+    <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
+    <label>Crosses</label>
+    <br>
+    <label>auto</label><input type="radio" name="crossesCat" value="auto" checked="checked" id="crossesAutoCatAxInput"><br>
+    <label>value</label><input type="radio" name="crossesCat" value="value" id="crossesCatAxValInput"><input type="text" id="crossesCatInput" disabled="disabled"><br>
+    <label>max value</label><input type="radio" name="crossesCat" value="maxValue" id="crossesMaxAxCatInput">
+    <label>min value</label><input type="radio" name="crossesCat" value="maxValue" id="crossesMinAxCatInput">
+    <br>
+    <label>Axis Position</label><br>
+    <label>by divisions:</label><input type="radio" id="checkBoxByDivisionsInput"  name="axis_pos_cat">
+    <br>
+    <label>between divisions:</label><input type="radio" id="checkBoxBetweenDivisionsInput" checked="checked" name="axis_pos_cat">
+    <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
+    <button id="valApplyCatAxisProps">
+        Apply Props
+    </button>
+</div>
 
 
-    <div id="rightPanelValAxisPropsX" class="right_panel_drawing_props" style="display: none" >
-        <label style="font-weight: bold">min value</label><br>
-        <label>auto</label><input type="radio" name="min_valueX" value="auto" checked="checked" id="autoMinValValAxisCheckBoxX">
-        <label>fixed</label><input type="radio" name="min_valueX" value="fixed" id="fixedMinValValAxisCheckBoxX">
-        <input id="minValueAxisInputX" type="text" disabled="disabled">
-        <br>
-        <label style="font-weight: bold">max value</label><br>
-        <label>auto</label><input type="radio" name="max_valueX" value="auto" checked="checked" id="autoMaxValValAxisCheckBoxX">
-        <label>fixed</label><input type="radio" name="max_valueX" value="fixed" id="fixedMaxValValAxisCheckBoxX">
-        <input id="maxValueAxisInputX" type="text" disabled="disabled">
-        <br>
-        <label>invert val order</label> <input type="checkbox" id="invertValOrderValAxisInputX">
-        <br>
-        <label>log scale</label> <input type="checkbox" id="logScaleInputX">
-        <label>log base</label> <input id="logBaseInputX" type="text" disabled="disabled">
-        <br><label>value of division</label>
-        <select id="unitsSelectX">
-            <option value="none">None</option>
-            <option value="BILLIONS">BILLIONS</option>
-            <option value="HUNDRED_MILLIONS">HUNDRED_MILLIONS</option>
-            <option value="HUNDREDS">HUNDREDS</option>
-            <option value="HUNDRED_THOUSANDS">HUNDRED_THOUSANDS</option>
-            <option value="MILLIONS">MILLIONS</option>
-            <option value="TEN_MILLIONS">TEN_MILLIONS</option>
-            <option value="TEN_THOUSANDS">TEN_THOUSANDS</option>
-            <option value="TRILLIONS">TRILLIONS</option>
-            <option value="CUSTOM">CUSTOM</option>
-        </select>
-        <input type="text" disabled= "disabled" id="unitCustomInputX">
-        <br>
-        <label>show on chart</label> <input type="checkbox" id="showUnitsLabelsX" disabled="disabled">
-        <br>
-        <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
-        <br>
-        <label>major tick mark</label>
-        <select id="majorTickMarkSelectValAxX">
-            <option value="TICK_MARK_CROSS">TICK_MARK_CROSS</option>
-            <option value="TICK_MARK_IN">TICK_MARK_IN</option>
-            <option value="TICK_MARK_NONE">TICK_MARK_NONE</option>
-            <option value="TICK_MARK_OUT">TICK_MARK_OUT</option>
-        </select>
-        <br>
-        <label>minor tick mark</label>
-        <select id="minorTickMarkSelectValAxX">
-            <option value="TICK_MARK_CROSS">TICK_MARK_CROSS</option>
-            <option value="TICK_MARK_IN">TICK_MARK_IN</option>
-            <option value="TICK_MARK_NONE">TICK_MARK_NONE</option>
-            <option value="TICK_MARK_OUT">TICK_MARK_OUT</option>
-        </select>
-        <br>
-        <label>tick labels</label>
-        <select id="tickLabelsSelectValAxX">
-            <option value="TICK_LABEL_POSITION_HIGH">TICK_LABEL_POSITION_HIGH</option>
-            <option value="TICK_LABEL_POSITION_LOW">TICK_LABEL_POSITION_LOW</option>
-            <option value="TICK_LABEL_POSITION_NEXT_TO">TICK_LABEL_POSITION_NEXT_TO</option>
-            <option value="TICK_LABEL_POSITION_NONE">TICK_LABEL_POSITION_NONE</option>
-        </select>
-        <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
-        <label>Crosses</label>
-        <br>
-        <label>auto</label><input type="radio" name="crossesX" value="auto" checked="checked" id="crossesAutoValAxInputX" ><br>
-        <label>value</label><input type="radio" name="crossesX" value="value" id="crossesValAxValInputX"><input type="text" id="crossesValInputX" disabled="disabled"><br>
-        <label>max value</label><input type="radio" name="crossesX" value="maxValue" id="crossesMaxAxValInputX">
-        <label>min value</label><input type="radio" name="crossesX" value="maxValue" id="crossesMinAxValInputX">
-        <br>
-        <br>
-        <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
-        <br>
-        <button id="valApplyValAxisPropsX">
-            Apply Props
-        </button>
-    </div>
+<div id="rightPanelValAxisPropsX" class="right_panel_drawing_props" style="display: none" >
+    <label style="font-weight: bold">min value</label><br>
+    <label>auto</label><input type="radio" name="min_valueX" value="auto" checked="checked" id="autoMinValValAxisCheckBoxX">
+    <label>fixed</label><input type="radio" name="min_valueX" value="fixed" id="fixedMinValValAxisCheckBoxX">
+    <input id="minValueAxisInputX" type="text" disabled="disabled">
+    <br>
+    <label style="font-weight: bold">max value</label><br>
+    <label>auto</label><input type="radio" name="max_valueX" value="auto" checked="checked" id="autoMaxValValAxisCheckBoxX">
+    <label>fixed</label><input type="radio" name="max_valueX" value="fixed" id="fixedMaxValValAxisCheckBoxX">
+    <input id="maxValueAxisInputX" type="text" disabled="disabled">
+    <br>
+    <label>invert val order</label> <input type="checkbox" id="invertValOrderValAxisInputX">
+    <br>
+    <label>log scale</label> <input type="checkbox" id="logScaleInputX">
+    <label>log base</label> <input id="logBaseInputX" type="text" disabled="disabled">
+    <br><label>value of division</label>
+    <select id="unitsSelectX">
+        <option value="none">None</option>
+        <option value="BILLIONS">BILLIONS</option>
+        <option value="HUNDRED_MILLIONS">HUNDRED_MILLIONS</option>
+        <option value="HUNDREDS">HUNDREDS</option>
+        <option value="HUNDRED_THOUSANDS">HUNDRED_THOUSANDS</option>
+        <option value="MILLIONS">MILLIONS</option>
+        <option value="TEN_MILLIONS">TEN_MILLIONS</option>
+        <option value="TEN_THOUSANDS">TEN_THOUSANDS</option>
+        <option value="TRILLIONS">TRILLIONS</option>
+        <option value="CUSTOM">CUSTOM</option>
+    </select>
+    <input type="text" disabled= "disabled" id="unitCustomInputX">
+    <br>
+    <label>show on chart</label> <input type="checkbox" id="showUnitsLabelsX" disabled="disabled">
+    <br>
+    <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
+    <br>
+    <label>major tick mark</label>
+    <select id="majorTickMarkSelectValAxX">
+        <option value="TICK_MARK_CROSS">TICK_MARK_CROSS</option>
+        <option value="TICK_MARK_IN">TICK_MARK_IN</option>
+        <option value="TICK_MARK_NONE">TICK_MARK_NONE</option>
+        <option value="TICK_MARK_OUT">TICK_MARK_OUT</option>
+    </select>
+    <br>
+    <label>minor tick mark</label>
+    <select id="minorTickMarkSelectValAxX">
+        <option value="TICK_MARK_CROSS">TICK_MARK_CROSS</option>
+        <option value="TICK_MARK_IN">TICK_MARK_IN</option>
+        <option value="TICK_MARK_NONE">TICK_MARK_NONE</option>
+        <option value="TICK_MARK_OUT">TICK_MARK_OUT</option>
+    </select>
+    <br>
+    <label>tick labels</label>
+    <select id="tickLabelsSelectValAxX">
+        <option value="TICK_LABEL_POSITION_HIGH">TICK_LABEL_POSITION_HIGH</option>
+        <option value="TICK_LABEL_POSITION_LOW">TICK_LABEL_POSITION_LOW</option>
+        <option value="TICK_LABEL_POSITION_NEXT_TO">TICK_LABEL_POSITION_NEXT_TO</option>
+        <option value="TICK_LABEL_POSITION_NONE">TICK_LABEL_POSITION_NONE</option>
+    </select>
+    <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
+    <label>Crosses</label>
+    <br>
+    <label>auto</label><input type="radio" name="crossesX" value="auto" checked="checked" id="crossesAutoValAxInputX" ><br>
+    <label>value</label><input type="radio" name="crossesX" value="value" id="crossesValAxValInputX"><input type="text" id="crossesValInputX" disabled="disabled"><br>
+    <label>max value</label><input type="radio" name="crossesX" value="maxValue" id="crossesMaxAxValInputX">
+    <label>min value</label><input type="radio" name="crossesX" value="maxValue" id="crossesMinAxValInputX">
+    <br>
+    <br>
+    <div style="width: inherit; height: 1px; background: rgb(127,157,185)"></div>
+    <br>
+    <button id="valApplyValAxisPropsX">
+        Apply Props
+    </button>
+</div>
 
 
-    <div id="rightPanelNumFmt" class="right_panel_drawing_props" style="display: none">
-        <button id="numFmtApplyButton">
-            Apply
-        </button>
-    </div>
+<div id="rightPanelNumFmt" class="right_panel_drawing_props" style="display: none">
+    <button id="numFmtApplyButton">
+        Apply
+    </button>
+</div>
 </div>
 
 

@@ -50,6 +50,9 @@ Path.prototype = {
         this.Id = r.GetString2();
     },
 
+    Refresh_RecalcData: function()
+    {},
+
     createDuplicate: function()
     {
         var p = new Path();
@@ -979,7 +982,6 @@ function partition_bezier4(x0, y0, x1, y1, x2, y2, x3, y3, epsilon)
 
     return partition_bezier4(x0, y0, x01, y01, x012, y012, x0123, y0123, epsilon).concat(partition_bezier4(x0123, y0123, x123, y123, x23, y23, x3, y3, epsilon));
 }
-
 
 
 
