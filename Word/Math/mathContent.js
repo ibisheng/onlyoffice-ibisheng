@@ -5780,23 +5780,13 @@ CMathContent.prototype =
             pos = i;
         }
 
-
         if( this.content[pos].typeObj === MATH_COMP )
         {
-            if(X < W - width + this.GapLeft)
+            if(X < W - width + this.content[pos].GapLeft)
                 pos--;
-            else if(X >= W - this.GapRight)
+            else if(X >= W - this.content[pos].GapRight)
                 pos++;
         }
-
-        /*else
-        {
-            if( !(W - width/2 <  mouseX) )
-                pos--;
-        }*/
-
-        // проверка на RunPrp, смещенная позиция
-        //pos = this.verifyCurPos(pos);
 
         return pos;
     },
@@ -6374,36 +6364,25 @@ CMathContent.prototype =
     },
     old_selectUse: function()
     {
-        //return (this.selection.startPos !== this.selection.endPos);
-
-        //console.log("start pos "+ this.RealSelect.startPos);
-        //console.log("end pos " + this.RealSelect.endPos);
-
         return this.RealSelect.startPos !== this.RealSelect.endPos;
     },
     selectUse: function()
     {
-        return this.SelectStartPos !== this.SelectEndPos;
-        //return this.SelectStartPos !== this.SelectEndPos;
-    },
-    Selection_IsEmpty: function()
-    {
-        var startPos = this.SelectStartPos,
-            endPos = this.SelectEndPos;
+        var result;
 
-        var result = false;
-
-        if(startPos == endPos)
+        if(this.SelectStartPos == this.SelectEndPos)
         {
-            var bRunPrp = this.content[startPos].typeObj == MATH_RUN_PRP,
-                bComp = this.content[startPos].typeObj == MATH_COMP,
-                bSelectComp = bComp ? this.content[startPos].IsSelectEmpty() : false;
-
-            if(bRunPrp || bSelectComp)
-                result = this.content[startPos].Selection_IsEmpty();
-            else
-                result = false;
+            if(this.content[this.SelectStartPos].typeObj == MATH_PARA_RUN)
+            {
+                result = this.content[this.SelectStartPos].Selection_IsUse();
+            }
+            else if(this.content[this.SelectStartPos].typeObj == MATH_COMP)
+            {
+                result = ! this.content[this.SelectStartPos].IsSelectEmpty();
+            }
         }
+        else
+            result = true;
 
         return result;
     },
@@ -7519,7 +7498,6 @@ CMathContent.prototype =
             //ContentPos.Add(pos);
 
             SearchPos.X -= this.WidthToElement[pos];
-            //SearchPos.CurX += this.WidthToElement[pos];
 
             if(this.content[pos].typeObj == MATH_COMP)
             {
@@ -7542,16 +7520,6 @@ CMathContent.prototype =
             ContentPos.Add(pos);
 
             this.content[pos].Get_ParaContentPos(bSelection, bStart, ContentPos);
-
-            /*if(this.RealSelect.startPos == this.RealSelect.endPos)
-            {
-                var blen = pos < this.content.length;
-                var bComp = blen ? this.content[pos].typeObj == MATH_COMP : false;
-
-                if(bComp)
-                    this.content[pos].Get_ParaContentPos(bSelection, bStart, ContentPos);
-
-            }*/
         }
         else
         {
@@ -7575,208 +7543,6 @@ CMathContent.prototype =
                 curr.Set_ParaContentPos(ContentPos, Depth);
         }
 
-    },
-    set_SelectEndExtreme: function(bEnd)
-    {
-        if(bEnd === false)
-        {
-            this.LogicalSelect.end   = 1;
-            this.RealSelect.endPos    = 1;
-
-            // проверка на то, чтобы CEmpty был включен !!! когда идем из мат объекта(например из числителя) и идем наверх, выходим за пределы формулы
-            // если стоим в конце, то this.RealSelect.endPos равен this.content.length и соответственно, нужно сделать проверку на то, что запрашиваем у существующего объекта typeObj (!)
-            var start = this.RealSelect.startPos; // проверяем именно тот, который идет на отрисовку, т.к. логический мб выставлен на мат. объект
-            if(start < this.content.length)
-            {
-                var current   = this.content[this.CurPos].value.typeObj;
-                var selectStart = this.content[start].value.typeObj;    // only for draw select
-
-                if(current == MATH_COMP && selectStart == MATH_COMP)
-                {
-                    this.RealSelect.startPos++;
-                }
-            }
-        }
-        else
-        {
-            this.LogicalSelect.end   = this.content.length - 1;
-            this.RealSelect.endPos   = this.content.length;
-
-            var start = this.RealSelect.startPos - 2,
-                current   = this.content[this.CurPos].value.typeObj,
-                selectStart = start > 0 ? this.content[start].value.typeObj : null;
-
-            if(current == MATH_COMP && selectStart == MATH_COMP)
-            {
-                this.RealSelect.startPos -= 2;
-            }
-        }
-    },
-    set_StartSelectContent: function(ContentPos, Depth)
-    {
-        if(this.IsPlaceholder())
-        {
-            this.LogicalSelect.start = 1;
-            this.LogicalSelect.end = 2;
-        }
-        else
-        {
-            var pos = ContentPos.Get(Depth);
-            Depth++;
-            this.LogicalSelect.start = pos;
-
-            if(pos < this.content.length && this.RealSelect.startPos === this.RealSelect.endPos && this.content[pos].typeObj === MATH_COMP)
-            {
-                this.content[pos].set_StartSelectContent(ContentPos, Depth);
-            }
-        }
-    },
-    old_set_EndSelectContent: function(ContentPos, Depth)
-    {
-        /*var msCoord = {x: x, y: y};
-        var posEnd = this.findPosition(msCoord),
-            posStart = this.LogicalSelect.start;
-
-        this.CurPos = posStart;
-        this.LogicalSelect.end = posEnd;*/
-
-        var state = true; // вышли / не вышли за переделы контента
-                          // актуально для мат. объекта
-        var SelectContent = null;
-
-        var posEnd = ContentPos.Get(Depth),
-            posStart = this.LogicalSelect.start;
-
-        this.LogicalSelect.end = posEnd;
-        Depth++;
-
-        //var blen = this.RealSelect.startPos < this.content.length;
-
-
-        //селект внутри мат. объекта
-        if(posStart < this.content.length && posStart === posEnd && this.content[posEnd].value.typeObj === MATH_COMP)
-        {
-            var result = this.content[posEnd].value.set_EndSelectContent(ContentPos, Depth);
-            this.setStartPos_Selection(posStart-1);
-
-            if( !result.state )
-            {
-                this.setEndPos_Selection(posEnd + 1);
-                SelectContent = this;
-            }
-            else
-                SelectContent = result.SelectContent;
-        }
-        //селект элементов контента
-        else
-        {
-            SelectContent = this;
-            var direction = (posStart < posEnd) ? 1 : -1;
-
-            if(posStart < this.content.length)
-            {
-                if(this.content[posStart].value.typeObj === MATH_COMP )
-                {
-                    if( direction == 1 )
-                        this.setStartPos_Selection( posStart - 1);
-                    else if( direction == -1 )
-                        this.setStartPos_Selection( posStart + 1);
-                }
-                else
-                    this.setStartPos_Selection(posStart);
-            }
-
-            if(posEnd < this.content.length)
-            {
-                if(this.content[posEnd].value.typeObj === MATH_COMP )
-                {
-                    if( direction == 1 )
-                        this.setEndPos_Selection(posEnd + 1);
-                    else if( direction == -1 )
-                        this.setEndPos_Selection(posEnd - 1);
-                }
-                else
-                    this.setEndPos_Selection(posEnd);
-            }
-        }
-
-        return {state: state, SelectContent:  SelectContent};
-    },
-    set_EndSelectContent: function(ContentPos, Depth)
-    {
-        /*var msCoord = {x: x, y: y};
-         var posEnd = this.findPosition(msCoord),
-         posStart = this.LogicalSelect.start;
-
-         this.CurPos = posStart;
-         this.LogicalSelect.end = posEnd;*/
-
-        var state = true; // вышли / не вышли за переделы контента
-                          // актуально для мат. объектов !!
-        var SelectContent = null;
-
-        var posEnd = ContentPos.Get(Depth),
-            posStart = this.LogicalSelect.start;
-
-        this.LogicalSelect.end = posEnd;
-        Depth++;
-
-        //var blen = this.RealSelect.startPos < this.content.length;
-
-
-        //селект внутри мат. объекта
-
-        // возможны две ситуации:
-        // 1. мы нашли нужный контенте posStart !== posEnd  или  posStart ===  posEnd и находимся в одном Para_Run
-        // 2. posStart === posEnd и это мат объект и ищем дальше
-
-        if(posStart < this.content.length && posStart === posEnd && this.content[posEnd].typeObj === MATH_COMP)
-        {
-            var result = this.content[posEnd].value.set_EndSelectContent(ContentPos, Depth);
-            this.setStartPos_Selection(posStart-1);
-
-            if( !result.state )
-            {
-                this.setEndPos_Selection(posEnd + 1);
-                SelectContent = this;
-            }
-            else
-                SelectContent = result.SelectContent;
-        }
-        //селект элементов контента
-        else
-        {
-            SelectContent = this;
-            /*var direction = (posStart < posEnd) ? 1 : -1;
-
-            if(posStart < this.content.length)
-            {
-                if(this.content[posStart].value.typeObj === MATH_COMP )
-                {
-                    if( direction == 1 )
-                        this.setStartPos_Selection( posStart - 1);
-                    else if( direction == -1 )
-                        this.setStartPos_Selection( posStart + 1);
-                }
-                else
-                    this.setStartPos_Selection(posStart);
-            }
-
-            if(posEnd < this.content.length)
-            {
-                if(this.content[posEnd].value.typeObj === MATH_COMP )
-                {
-                    if( direction == 1 )
-                        this.setEndPos_Selection(posEnd + 1);
-                    else if( direction == -1 )
-                        this.setEndPos_Selection(posEnd - 1);
-                }
-                else
-                    this.setEndPos_Selection(posEnd);
-            }*/
-        }
-
-        return {state: state, SelectContent:  SelectContent};
     },
     Set_SelectionContentPos: function(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag)
     {
@@ -7845,7 +7611,6 @@ CMathContent.prototype =
     },
     Selection_DrawRange: function(SelectionDraw)
     {
-
         if(this.SelectStartPos !== this.SelectEndPos)
         {
             var startPos = this.SelectStartPos,
@@ -7857,7 +7622,6 @@ CMathContent.prototype =
                 startPos = endPos;
                 endPos = temp;
             }
-
 
             if(this.content[startPos].typeObj === MATH_PARA_RUN)
             {
@@ -7876,7 +7640,11 @@ CMathContent.prototype =
 
 
             if(this.content[endPos].typeObj === MATH_PARA_RUN)
+            {
+                var StartX = SelectionDraw.StartX;
                 this.content[endPos].Selection_DrawRange(0, 0, SelectionDraw);
+                SelectionDraw.StartX = StartX;
+            }
             else
                 SelectionDraw.W += this.content[endPos].size.width;
 
@@ -7887,7 +7655,6 @@ CMathContent.prototype =
         else
         {
             var pos = this.SelectStartPos;
-
 
             if(this.content[pos].typeObj === MATH_COMP)
             {
@@ -7901,7 +7668,7 @@ CMathContent.prototype =
                     SelectionDraw.W = this.content[pos].size.width;
                     SelectionDraw.H = this.size.height;
 
-                    SelectionDraw.StartX += this.pos.x + this.WidthToElement[pos];
+                    SelectionDraw.StartX = this.pos.x + this.Composition.absPos.x + this.WidthToElement[pos];
                     SelectionDraw.StartY = this.pos.y + this.Composition.absPos.y;
 
                 }
@@ -7917,41 +7684,56 @@ CMathContent.prototype =
 
         }
     },
-    drawSelect: function(SelectionDraw)
+    Select_All: function()
     {
-        var start   = this.RealSelect.startPos,
-            end     = this.RealSelect.endPos;
+        this.SelectStartPos = 0;
+        this.SelectEndPos = this.content.length - 1;
 
-        if( start > end)
+        if(this.content[this.SelectStartPos].typeObj == MATH_PARA_RUN)
+            this.content[this.SelectStartPos].Select_All();
+
+        if(this.content[this.SelectEndPos].typeObj == MATH_PARA_RUN)
+            this.content[this.SelectEndPos].Select_All();
+
+    },
+    Is_SelectedAll: function(Props)
+    {
+        var bFirst = false, bEnd = false;
+
+        if(this.SelectStartPos == 0 && this.SelectEndPos == this.content.length - 1)
         {
-            var tmp = start;
-            start = end;
-            end = tmp;
+            if(this.content[this.SelectStartPos].typeObj == MATH_PARA_RUN)
+                bFirst = this.content[this.SelectStartPos].Is_SelectedAll(Props);
+            else
+                bFirst = true;
+
+            if(this.content[this.SelectEndPos].typeObj == MATH_PARA_RUN)
+                bEnd = this.content[this.SelectEndPos].Is_SelectedAll(Props);
+            else
+                bEnd = true;
         }
 
-        if(this.IsPlaceholder())
+        return bFirst && bEnd;
+    },
+    Selection_IsEmpty: function()
+    {
+        var startPos = this.SelectStartPos,
+            endPos = this.SelectEndPos;
+
+        var result = false;
+
+        if(startPos == endPos)
         {
-            start = 1;
-            end = 2;
+            var bRunPrp = this.content[startPos].typeObj == MATH_RUN_PRP,
+                bComp = this.content[startPos].typeObj == MATH_COMP;
+
+            if(bRunPrp || bComp)
+                result = this.content[startPos].Selection_IsEmpty();
+            else
+                result = false; // placeholder
         }
 
-        //var heightSelect = this.size.ascent + this.size.descent;
-        var heightSelect = this.size.height;
-        var widthSelect = 0;
-
-        for(var j= start; j < end ; j++)
-            widthSelect += this.content[j].widthToEl - this.content[j-1].widthToEl;
-
-        var startPos = start > 0 ? start-1 : start;
-        var X = this.pos.x + this.Composition.absPos.x + this.content[startPos].widthToEl,
-            Y = this.pos.y + this.Composition.absPos.y;
-
-        SelectionDraw.StartX = X;
-        SelectionDraw.StartY = Y;
-
-        SelectionDraw.W = widthSelect;
-        SelectionDraw.H = heightSelect;
-
+        return result;
     },
     Get_Id : function()
     {

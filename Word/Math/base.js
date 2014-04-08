@@ -1246,8 +1246,8 @@ CMathBase.prototype =
     Get_ParaContentPosByXY: function(SearchPos, Depth)
     {
         /// элементов just-draw не должно прийти
-        //var disp = this.findDisposition({x: X, y: Y});
-        var disp = this.findDisposition({ x: SearchPos.X, y: SearchPos.Y});
+
+        var disp = this.findDisposition({ x: SearchPos.X - this.GapLeft, y: SearchPos.Y});
 
         // TO DO
         // Рассмотреть дурацкий случай, если контент не заполнен, то тогда перейти в другой элемент
@@ -1262,25 +1262,44 @@ CMathBase.prototype =
 
         Depth +=2;
 
-        //SearchPos.CurX += SearchPos.X - disp.mCoord.x;
-        //SearchPos.CurX += this.align(pos.x, pos.y).x;
 
         SearchPos.X = disp.mCoord.x;
         SearchPos.Y = disp.mCoord.y;
-
-
-        //ContentPos.Add(disp.pos.x);
-        //ContentPos.Add(disp.pos.y);
 
 
         this.elements[disp.pos.x][disp.pos.y].Get_ParaContentPosByXY(SearchPos, Depth);
     },
     Get_ParaContentPos: function(bSelection, bStart, ContentPos)
     {
-        ContentPos.Add(this.CurPos_X);
-        ContentPos.Add(this.CurPos_Y);
+        if( bSelection )
+        {
+            var SelectX, SelectY;
 
-        this.elements[this.CurPos_X][this.CurPos_Y].Get_ParaContentPos(bSelection, bStart, ContentPos);
+            if(bStart)
+            {
+                SelectX = this.SelectStart_X;
+                SelectY = this.SelectStart_Y;
+            }
+            else
+            {
+                SelectX = this.SelectEnd_X;
+                SelectY = this.SelectEnd_Y;
+            }
+
+            ContentPos.Add(SelectX);
+            ContentPos.Add(SelectY);
+
+            if(SelectX !== -1 && SelectY !== -1)
+                this.elements[SelectX][SelectY].Get_ParaContentPos(bSelection, bStart, ContentPos);
+
+        }
+        else
+        {
+            ContentPos.Add(this.CurPos_X);
+            ContentPos.Add(this.CurPos_Y);
+
+            this.elements[this.CurPos_X][this.CurPos_Y].Get_ParaContentPos(bSelection, bStart, ContentPos);
+        }
     },
     Set_ParaContentPos: function(ContentPos, Depth)
     {
@@ -1303,47 +1322,6 @@ CMathBase.prototype =
         Depth += 2;
 
         return this.elements[this.CurPos_X][this.CurPos_Y].Set_ParaContentPos(ContentPos, Depth);
-    },
-    set_StartSelectContent: function(ContentPos, Depth)
-    {
-        var Pos_X = ContentPos.Get(Depth),
-            Pos_Y = ContentPos.Get(Depth+1);
-
-        Depth += 2;
-
-        this.selectPos.startX = Pos_X;
-        this.selectPos.startY = Pos_Y;
-
-        if(!this.elements[Pos_X][Pos_Y].IsJustDraw())
-            this.elements[Pos_X][Pos_Y].set_StartSelectContent(ContentPos, Depth);
-
-    },
-    set_EndSelectContent: function(ContentPos, Depth)
-    {
-        var state = true, SelectContent = null;
-
-        var endX   = ContentPos.Get(Depth),
-            endY   = ContentPos.Get(Depth+1),
-            startX = this.selectPos.startX,
-            startY = this.selectPos.startY;
-
-        Depth += 2;
-
-        var bJustDraw = this.elements[endX][endY].IsJustDraw();
-
-        // пока так
-        if(startX == endX && startY == endY && !bJustDraw)
-        {
-            //this.CurPos_X = startX;
-            //this.CurPos_Y = startY;
-            var movement = this.elements[endX][endY].set_EndSelectContent(ContentPos, Depth);
-            SelectContent = movement.SelectContent;
-            state = movement.state;
-        }
-        else
-            state = false;
-
-        return {state: state, SelectContent: SelectContent};
     },
     Set_SelectionContentPos: function(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag)
     {
@@ -1369,6 +1347,25 @@ CMathBase.prototype =
         this.SelectEnd_X = endX;
         this.SelectEnd_Y = endY;
 
+
+        var str = "";
+
+        if(this.constructor.name == "CFraction")
+        {
+            if(startX == 0 && startY == 0)
+                str += "StartContentPos = Numerator;  ";
+            else
+                str += "StartContentPos = Denominator;  ";
+
+            if(endX == 0 && endY == 0)
+                str += "EndContentPos = Numerator ";
+            else
+                str += "EndContentPos = Denominator ";
+
+            console.log(str);
+        }
+
+
         Depth += 2;
 
         var bJustDraw = this.elements[startX][startY].IsJustDraw();
@@ -1390,8 +1387,12 @@ CMathBase.prototype =
     },
     Selection_IsEmpty: function()
     {
+        var result = false;
+
         if(this.IsSelectEmpty())
-            this.elements[this.SelectStart_X][this.SelectStart_Y].Selection_IsEmpty();
+            result = this.elements[this.SelectStart_X][this.SelectStart_Y].Selection_IsEmpty();
+
+        return result;
     },
     IsSelectEmpty: function()
     {

@@ -62,7 +62,7 @@ ParaMath.prototype =
 
     Is_Empty : function()
     {
-        return this.Math.Is_Empty();
+        return this.Root.content.length == 0;
     },
 
     Is_StartFromNewLine : function()
@@ -792,24 +792,32 @@ ParaMath.prototype =
 
         if(Math.abs(Diff) < SearchPos.DiffX + 0.001 )
         {
-            var X = SearchPos.X,
-                Y = SearchPos.Y;
 
-
-            SearchPos.X -= this.Math.absPos.x;
-            SearchPos.Y -= this.Math.absPos.y;
-
-            SearchPos.DiffX = Diff;
-
-            this.Root.Get_ParaContentPosByXY(SearchPos, Depth);
-
-            SearchPos.X = X;
-            SearchPos.Y = Y;
-
-
-            Result = true;
             if ( D >= - 0.001 && D <= Dx + 0.001 )
             {
+                var X = SearchPos.X,
+                    Y = SearchPos.Y;
+
+
+                SearchPos.X -= this.Math.absPos.x;
+                SearchPos.Y -= this.Math.absPos.y;
+
+                SearchPos.DiffX = Diff;
+
+                //console.log("SearchPos.X : " + SearchPos.X);
+                //console.log("SearchPos.Y : " + SearchPos.Y);
+                this.Root.Get_ParaContentPosByXY(SearchPos, Depth);
+
+                SearchPos.X = X;
+                SearchPos.Y = Y;
+
+
+
+                Result = true;
+
+                //////////
+
+
                 SearchPos.InText = true;
                 SearchPos.DiffX =  0.001; // сравниваем расстояние до ближайшего элемента
             }
@@ -930,6 +938,8 @@ ParaMath.prototype =
     Select_All : function(Direction)
     {
         // TODO: ParaMath.Select_All
+        this.bSelectionUse = true;
+        this.Root.Select_All();
     },
 
     Selection_DrawRange : function(_CurLine, _CurRange, SelectionDraw)
@@ -947,14 +957,20 @@ ParaMath.prototype =
             {
             // TODO: ParaMath.Selection_Draw_Range
 
+                var SelectH = SelectionDraw.H,
+                    SelectStartY = SelectionDraw.StartY;
 
                 this.Root.Selection_DrawRange(SelectionDraw);
+
+                if(this.Root.selectUse())
+                {
+                    SelectionDraw.H = SelectH;
+                    SelectionDraw.StartY = SelectStartY;
+                }
 
             }
             else
             {
-                console.log(SelectionDraw.FindStart);
-
                 if ( true === SelectionDraw.FindStart )
                 {
                     SelectionDraw.StartX += this.Width;
@@ -980,7 +996,7 @@ ParaMath.prototype =
     Is_SelectedAll : function(Props)
     {
         // TODO: ParaMath.Is_SelectedAll
-        return false;
+        return this.Root.Is_SelectedAll(Props);
     },
 
     Selection_CorrectLeftPos : function(Direction)
