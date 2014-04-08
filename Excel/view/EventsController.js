@@ -1297,10 +1297,8 @@
 								this.isMoveResizeRange = true;
 								t._moveResizeRangeHandle(event, t.targetInfo);
 								return;
-							}
-							// для определения рэнджа под курсором и активизации его для WorksheetView
-							else if (false === t.handlers.trigger("canEnterCellRange")) {
-								t.handlers.trigger("removeFormulaSelector");
+							} else if (false === t.handlers.trigger("canEnterCellRange")) {
+								// для определения рэнджа под курсором и активизации его для WorksheetView
 								if (!t.handlers.trigger("stopCellEditing")) {return;}
 							}
 						}

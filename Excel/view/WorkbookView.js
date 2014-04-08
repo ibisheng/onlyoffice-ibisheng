@@ -23,6 +23,7 @@
 		var asc_typeof			= asc.typeOf;
 		var asc_FP				= asc.FontProperties;
 		var asc_CE				= asc.CellEditor;
+		var asc_PS				= asc.PopUpSelector;
 		var asc_WSV				= asc.WorksheetView;
 		var asc_CB				= asc.Clipboard;
 		var asc_CMM				= asc.asc_CMouseMoveData;
@@ -84,6 +85,7 @@
 			this.cellEditor = undefined;
 			this.fontRenderingMode = null;
 
+			this.popUpSelector = null;
 			this.formulasList = null;	// Список всех формул
 
 			this._lockDraw = false;
@@ -211,7 +213,6 @@
 				    "moveResizeRangeHandleDone":function () {self._onMoveResizeRangeHandleDone.apply(self, arguments);},
 				    "editCell":          		function () {self._onEditCell.apply(self, arguments);},
 				    "stopCellEditing":   		function () {return self._onStopCellEditing.apply(self, arguments);},
-					"removeFormulaSelector":   	function () {return self._onRemoveFormulaSelector.apply(self, arguments);},
 				    "empty":					function () {self._onEmpty.apply(self, arguments);},
 				    "canEnterCellRange":		function () {
 															    self.cellEditor.setFocus(false);
@@ -420,6 +421,8 @@
 					    /*settings*/{
 						    font: this.defaultFont
 					    });
+
+				this.popUpSelector = new asc_PS(this.element);
 			}
 
 			this.clipboard.Api = this.Api;
@@ -790,7 +793,8 @@
 		WorkbookView.prototype._onShowAutoComplete = function () {
 			var ws = this.getWorksheet();
 			var arrValues = ws.getCellAutoCompleteValues(ws.activeRange.startCol, ws.activeRange.startRow);
-			console.log(arrValues);
+			this.popUpSelector.show(false, arrValues, this.getWorksheet().getActiveCellCoord());
+			// ToDo нужно не забыть скрывать этот список
 		};
 
 		WorkbookView.prototype._onAutoFiltersClick = function (idFilter) {
@@ -965,10 +969,6 @@
 
 		WorkbookView.prototype._onStopCellEditing = function () {
 			return this.cellEditor.close(true);
-		};
-		
-		WorkbookView.prototype._onRemoveFormulaSelector = function () {
-			return this.cellEditor._removeFormulaSelector();
 		};
 
 		WorkbookView.prototype._onCloseCellEditor = function () {
@@ -1335,6 +1335,22 @@
 		WorkbookView.prototype._onUpdateCellEditor = function (text, cursorPosition, isFormula, formulaPos, formulaName) {
 			// ToDo добавить вывод окна для формулы (список формул должен всегда лежать в переменной, сделанной на инициализации)
 			// Еще для ускорения можно завести объект, куда класть результаты поиска по формулам и второй раз не искать.
+			var arrResult = [];
+			if (isFormula && formulaName) {
+				formulaName = formulaName.toUpperCase();
+				for (var i = 0; i < this.formulasList.length; ++i) {
+					var group = this.formulasList[i].formulasArray;
+					for (var j = 0; j < group.length; ++j) {
+						if (0 === group[j].name.indexOf(formulaName)) {
+							arrResult.push(group[j]);
+						}
+					}
+				}
+			}
+			if (0 < arrResult.length)
+				this.popUpSelector.show(true, arrResult, this.getWorksheet().getActiveCellCoord());
+			else
+				this.popUpSelector.hide();
 		};
 
 		// Вставка формулы в редактор

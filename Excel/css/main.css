@@ -134,3 +134,26 @@
 	width: 1px;
 	height: 11pt;
 }
+
+#apiPopUpSelector {
+    z-index: 3000;
+    height: auto;
+    background-color: #FFF;
+    border: 1px solid Grey;
+    position: absolute;
+    cursor: default;
+    font-size: 12px;
+    padding: 4px;
+    display: none;
+}
+#apiPopUpList {
+    margin: 0 10px 0 0;
+    padding: 0;
+    list-style: none;
+}
+#apiPopUpList li {
+    max-width: 500px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
