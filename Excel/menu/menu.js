@@ -420,6 +420,7 @@
 	var aDialogNames = [];
 	var bIsUpdateChartProperties = false;
 	var bIsReopenDialog = false;
+	var bIsInitFormulasList = false;
 
 	// Comment events	
 	api.asc_registerCallback("asc_onMouseMove", eventMouseMoveComment);
@@ -1245,11 +1246,37 @@
 	});
 
 	$("#td_function").click(function(){
+		updateFormulaList();
 		$("#formulaMore").dialog("open");
 	});
 
+	function updateFormulaList() {
+		if (bIsInitFormulasList)
+			return;
+		var flist = api.asc_getFormulasInfo(), a;
+		for(var i = 0; i < flist.length; i++){
+			a = flist[i].asc_getFormulasArray();
+			for(var n=0;n<a.length;n++){
+				$("#fListMore").append("<div class ='formulaItem selectable' group='" + flist[i].asc_getGroupName() + "' name='" + a[n].asc_getName() + "' args='" +a[n].asc_getName()+ a[n].asc_getArguments() + "'>" + a[n].asc_getName()+ a[n].asc_getArguments() + "</div>");
+				if ($("#formulaSelect option[value='" + flist[i].asc_getGroupName() + "']").length == 0) {
+					$("#formulaSelect").append("<option value='" + flist[i].asc_getGroupName() + "'>" + flist[i].asc_getGroupName() + "</option>");
+				}
+			}
+		}
+		$("#formulaSelect").change(function() {
+			if ($(this).val() == "All") $("#fListMore .formulaItem").show();
+			else {
+				$("#fListMore .formulaItem").hide();
+				$("#fListMore .formulaItem[group='" + $(this).val() + "']").show();
+			}
+		});
+		bIsInitFormulasList = true;
+	}
+
 	function formulaItemClick( oHandler ){
 		if($(oHandler).attr("id")=="moreFunc"){
+			updateFormulaList();
+
 			$("#td_Formulas").removeClass("iconPressed");
 			$("#formulaList1").hide();
 			$("#formulaList2").hide();
@@ -1527,25 +1554,8 @@
 		if (h*3<2) { return P+(Q-P)*(2/3-h)*6; }
 		return P;
 	}
-	// consolelog( api.asc_getFormulasInfo() )
-	var flist = api.asc_getFormulasInfo(), a;
-	for(var i = 0; i < flist.length; i++){
-		a = flist[i].asc_getFormulasArray();
-		for(var n=0;n<a.length;n++){
-			$("#fListMore").append("<div class ='formulaItem selectable' group='" + flist[i].asc_getGroupName() + "' name='" + a[n].asc_getName() + "' args='" +a[n].asc_getName()+ a[n].asc_getArguments() + "'>" + a[n].asc_getName()+ a[n].asc_getArguments() + "</div>");
-			if ($("#formulaSelect option[value='" + flist[i].asc_getGroupName() + "']").length == 0) {
-				$("#formulaSelect").append("<option value='" + flist[i].asc_getGroupName() + "'>" + flist[i].asc_getGroupName() + "</option>");
-			}
-		}
-	}
+
 	$(".formulaItem").bind("click", function() { formulaItemClick(this); });
-	$("#formulaSelect").change(function() {
-		if ($(this).val() == "All") $("#fListMore .formulaItem").show();
-		else {
-			$("#fListMore .formulaItem").hide();
-			$("#fListMore .formulaItem[group='" + $(this).val() + "']").show();
-		}
-	});
 	$("#mnuAddHyperlink").bind("click", function() {
 		$("#td_add_hyperlink").click();
 	});
