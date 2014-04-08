@@ -199,9 +199,9 @@ module.exports = function(grunt) {
 						define: packageFile['compile']['sdk']['define'],
 						warning_level: 'QUIET',
 						variable_map_output_file: packageFile['compile']['sdk']['log'] + '/variable.map',
-						property_map_output_file: packageFile['compile']['sdk']['log'] + '/property.map',
+						property_map_output_file: packageFile['compile']['sdk']['log'] + '/property.map'/*,
 						create_source_map: map_file_path,
-						source_map_format: "V3"
+						source_map_format: "V3"*/
 					},
 					src: packageFile['compile']['sdk']['src'],
 					dest: packageFile['compile']['sdk']['dst']
