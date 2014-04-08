@@ -1244,6 +1244,10 @@
 		api.asc_setCellFormat(this.getAttribute("fmt"))
 	});
 
+	$("#td_function").click(function(){
+		$("#formulaMore").dialog("open");
+	});
+
 	function formulaItemClick( oHandler ){
 		if($(oHandler).attr("id")=="moreFunc"){
 			$("#td_Formulas").removeClass("iconPressed");
