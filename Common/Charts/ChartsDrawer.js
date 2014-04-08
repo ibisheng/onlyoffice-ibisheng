@@ -6580,7 +6580,7 @@ drawBubbleChart.prototype =
 				if(!this.paths.points[i])
 					this.paths.points[i] = [];
 				
-				this.paths.points[i][k] = this._calculateBubble(x, y, yNumCache.pts[k].compiledMarker.size, yNumCache.pts[k].compiledMarker.symbol);
+				this.paths.points[i][k] = this._calculateBubble(x, y, seria.bubbleSize, k);
 			}
 		}
     },
@@ -6650,26 +6650,6 @@ drawBubbleChart.prototype =
 		}
 		
 		return result;
-	},
-	
-	_calculateLine: function(x, y, x1, y1)
-	{
-		var path  = new Path();
-		
-		var pathH = this.chartProp.pathH;
-		var pathW = this.chartProp.pathW;
-		var gdLst = [];
-		
-		path.pathH = pathH;
-		path.pathW = pathW;
-		gdLst["w"] = 1;
-		gdLst["h"] = 1;
-		
-		path.moveTo(x * pathH, y * pathW);
-		path.lnTo(x1 * pathH, y1 * pathW);
-		path.recalculate(gdLst);
-		
-		return path;
 	},
 	
 	_calculateDLbl: function(chartSpace, ser, val)
@@ -6767,9 +6747,36 @@ drawBubbleChart.prototype =
 		this.cShapeDrawer.draw(cGeometry);
 	},
 	
-	_calculateBubble: function(x, y, size)
+	_calculateBubble: function(x, y, bubbleSize, k)
 	{
 		var defaultSize = 4;
+		
+		if(bubbleSize)
+		{
+			var maxSize, curSize, yPoints, maxDiamBubble, diffSize, maxArea;
+			
+			
+			maxSize = this.cChartDrawer._getMaxValueArray(bubbleSize);
+			curSize = bubbleSize[k].val;
+			
+			yPoints = this.chartSpace.chart.plotArea.valAx.yPoints ? this.chartSpace.chart.plotArea.valAx.yPoints : this.chartSpace.chart.plotArea.catAx.yPoints;
+			maxDiamBubble = Math.abs(yPoints[1].pos - yPoints[0].pos) * 2;
+			
+			diffSize = maxSize / curSize;
+			
+			var isDiam = false;
+			
+			if(isDiam)
+			{
+				defaultSize = (maxDiamBubble / diffSize) / 2;
+			}
+			else
+			{
+				maxArea = 1 / 4 * (Math.PI * (maxDiamBubble * maxDiamBubble));
+				defaultSize = Math.sqrt((maxArea / diffSize) / Math.PI);
+			};
+		};
+		
 		var path  = new Path();
 		
 		var pathH = this.chartProp.pathH;
