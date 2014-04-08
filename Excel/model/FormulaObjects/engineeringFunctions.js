@@ -1,5 +1,58 @@
 "use strict";
 
+function ConvertToDec( aStrSource, nBase, nCharLim ){
+    if ( nBase < 2 || nBase > 36 )
+        return "Error #1";
+
+    var nStrLen = aStrSource.length;
+    if( nStrLen > nCharLim )
+        return "Error #2";
+    else if( !nStrLen )
+        return 0;
+
+    var fVal = 0;
+
+    var p = aStrSource;
+
+    var nFirstDig = 0;
+    var bFirstDig = true;
+    var fBase = nBase;
+
+    for(var i=0; i < p.length; i++)
+    {
+        var n;
+
+        if( '0' <= p[i] && p[i] <= '9' )
+            n = p[i].charCodeAt() - '0'.charCodeAt();
+        else if( 'A' <= p[i] && p[i] <= 'Z' )
+            n = 10 + ( p[i].charCodeAt() - 'A'.charCodeAt() );
+        else if ( 'a' <= p[i] && p[i] <= 'z' )
+            n = 10 + ( p[i].charCodeAt() - 'a'.charCodeAt() );
+        else
+            n = nBase;
+
+        if( n < nBase )
+        {
+            if( bFirstDig )
+            {
+                bFirstDig = false;
+                nFirstDig = n;
+            }
+            fVal = fVal * fBase + n;
+        }
+        else
+            return "Error #3"
+    }
+
+    if( nStrLen == nCharLim && !bFirstDig && (nFirstDig >= nBase / 2) )
+    {   // handling negativ values
+        fVal = ( Math.pow( nBase, nCharLim ) - fVal );   // complement
+        fVal *= -1.0;
+    }
+
+    return fVal;
+}
+
 /**
  * Created with JetBrains WebStorm.
  * User: Dmitry.Shahtanov

@@ -4101,9 +4101,7 @@ RangeDataManager.prototype = {
 	},
 	move : function(from, to)
 	{
-		//убираем fChange, чтобы потом послать его только на одну операцию, а не 2
-		var fOldChange = this.fChange;
-		this.fChange = null;
+        var fOldChange = this.fChange;
 		var nOffsetRow = to.r1 - from.r1;
 		var nOffsetCol = to.c1 - from.c1;
 		var oGetRes = this.get(from);
@@ -4113,10 +4111,13 @@ RangeDataManager.prototype = {
 			var oNewBBox = new Asc.Range(elem.bbox.c1 + nOffsetCol, elem.bbox.r1 + nOffsetRow, elem.bbox.c2 + nOffsetCol, elem.bbox.r2 + nOffsetRow);
 			if(null != fOldChange)
 				fOldChange.call(this, elem.data, elem.bbox, oNewBBox);
+            //убираем fChange, чтобы потом послать его только на одну операцию, а не 2
+            this.fChange = null;
 			this.removeElement(elem);
 			this.add(oNewBBox, elem.data);
+            this.fChange = fOldChange;
 		}
-		this.fChange = fOldChange;
+
 	},
 	getAll : function()
 	{
@@ -4312,9 +4313,7 @@ CellArea.prototype = {
 	},
 	move : function(from, to)
 	{
-		//убираем fChange, чтобы потом послать его только на одну операцию, а не 2
-		var fOldChange = this.fChange;
-		this.fChange = null;
+        var fOldChange = this.fChange;
 		var nOffsetRow = to.r1 - from.r1;
 		var nOffsetCol = to.c1 - from.c1;
 		var oGetRes = this.get(from);
@@ -4324,10 +4323,12 @@ CellArea.prototype = {
 			var oNewBBox = new Asc.Range(elem.bbox.c1 + nOffsetCol, elem.bbox.r1 + nOffsetRow, elem.bbox.c2 + nOffsetCol, elem.bbox.r2 + nOffsetRow);
 			if(null != fOldChange)
 				fOldChange.call(this, elem.data, elem.bbox, oNewBBox);
+            //убираем fChange, чтобы потом послать его только на одну операцию, а не 2
+            this.fChange = null;
 			this.removeElement(elem);
 			this.add(oNewBBox.r1, oNewBBox.c1, elem.data);
+            this.fChange = fOldChange;
 		}
-		this.fChange = fOldChange;
 	},
 	getAll : function(){
 		var aRes = [];

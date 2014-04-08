@@ -1,106 +1,147 @@
 "use strict";
 
-function GetRmz( fZins, fZzr, fBw, fZw, nF ) {
-    var fRmz;
-    if ( fZins == 0.0 )
-        fRmz = ( fBw + fZw ) / fZzr;
+function getPMT( rate, nper, pv, fv, flag ) {
+    var res;
+    if ( rate == 0 )
+        res = ( pv + fv ) / nper;
     else {
-        var fTerm = Math.pow( 1.0 + fZins, fZzr );
-        if ( nF > 0 )
-            fRmz = ( fZw * fZins / ( fTerm - 1.0 ) + fBw * fZins / ( 1.0 - 1.0 / fTerm ) ) / ( 1.0 + fZins );
+        var part = Math.pow( 1 + rate, nper );
+        if ( flag > 0 )
+            res = ( fv * rate / ( part - 1 ) + pv * rate / ( 1 - 1 / part ) ) / ( 1 + rate );
         else
-            fRmz = fZw * fZins / ( fTerm - 1.0 ) + fBw * fZins / ( 1.0 - 1.0 / fTerm );
+            res = fv * rate / ( part - 1 ) + pv * rate / ( 1 - 1 / part );
     }
 
-    return -fRmz;
+    return -res;
 }
 
-function GetZw( fZins, fZzr, fRmz, fBw, nF ) {
-    var fZw;
-    if ( fZins == 0.0 )
-        fZw = fBw + fRmz * fZzr;
+function getFV( rate, nper, pmt, pv, type ) {
+    var res;
+    if ( rate == 0 )
+        res = pv + pmt * nper;
     else {
-        var fTerm = Math.pow( 1.0 + fZins, fZzr );
-        if ( nF > 0 )
-            fZw = fBw * fTerm + fRmz * ( 1.0 + fZins ) * ( fTerm - 1.0 ) / fZins;
+        var part = Math.pow( 1 + rate, nper );
+        if ( type > 0 )
+            res = pv * part + pmt * ( 1 + rate ) * ( part - 1 ) / rate;
         else
-            fZw = fBw * fTerm + fRmz * ( fTerm - 1.0 ) / fZins;
+            res = pv * part + pmt * ( part - 1 ) / rate;
     }
 
-    return -fZw;
+    return -res;
 }
 
-function RateIteration( fNper, fPayment, fPv, fFv, fPayType, fGuess ) {
+function getDDB( cost, salvage, life, period, factor ) {
+    var ddb, ipmt, oldCost, newCost;
+    ipmt = factor / life;
+    if ( ipmt >= 1 ) {
+        ipmt = 1;
+        if ( period == 1 )
+            oldCost = cost;
+        else
+            oldCost = 0;
+    }
+    else
+        oldCost = cost * Math.pow( 1 - ipmt, period - 1 );
+    newCost = cost * Math.pow( 1 - ipmt, period );
+
+    if ( newCost < salvage )
+        ddb = oldCost - salvage;
+    else
+        ddb = oldCost - newCost;
+    if ( ddb < 0 )
+        ddb = 0;
+    return ddb;
+}
+
+function getIPMT(rate, per, pv, type, pmt) {
+    var ipmt;
+
+    if ( per == 1 ) {
+        if ( type > 0 )
+            ipmt = 0;
+        else
+            ipmt = -pv;
+    }
+    else {
+        if ( type > 0 )
+            ipmt = getFV( rate, per - 2, pmt, pv, 1 ) - pmt;
+        else
+            ipmt = getFV( rate, per - 1, pmt, pv, 0 );
+    }
+    return ipmt * rate
+}
+
+function RateIteration( nper, payment, pv, fv, payType, guess ) {
     function approxEqual( a, b ) {
         if ( a == b )
             return true;
         var x = a - b;
-        return (x < 0.0 ? -x : x)
-            < ((a < 0.0 ? -a : a) * (1.0 / (16777216.0 * 16777216.0)));
+//        return (x < 0 ? -x : x) < ( (a < 0 ? -a : a) * (1.0 / (16777216.0 * 16777216.0)));
+        return Math.abs(x) < ( Math.abs(a) * (1 / (16777216 * 16777216) ) ) ;
     }
 
     var bValid = true, bFound = false, fX, fXnew, fTerm, fTermDerivation, fGeoSeries, fGeoSeriesDerivation;
-    var nIterationsMax = 150, nCount = 0, fEpsilonSmall = 1.0E-14, SCdEpsilon = 1.0E-7;
-    fFv = fFv - fPayment * fPayType;
-    fPv = fPv + fPayment * fPayType;
-    if ( fNper == Math.round( fNper ) ) {
-        fX = fGuess.fGuess;
+    var iterationMax = 150, nCount = 0, minEps = 1.0E-14, eps = 1.0E-7;
+    fv = fv - payment * payType;
+    pv = pv + payment * payType;
+    if ( nper == Math.round( nper ) ) {
+        fX = guess.fGuess;
         var fPowN, fPowNminus1;
-        while ( !bFound && nCount < nIterationsMax ) {
-            fPowNminus1 = Math.pow( 1.0 + fX, fNper - 1.0 );
-            fPowN = fPowNminus1 * (1.0 + fX);
-            if ( approxEqual( Math.abs( fX ), 0.0 ) ) {
-                fGeoSeries = fNper;
-                fGeoSeriesDerivation = fNper * (fNper - 1.0) / 2.0;
+        while ( !bFound && nCount < iterationMax ) {
+            fPowNminus1 = Math.pow( 1 + fX, nper - 1 );
+            fPowN = fPowNminus1 * (1 + fX);
+            if ( approxEqual( Math.abs( fX ), 0 ) ) {
+                fGeoSeries = nper;
+                fGeoSeriesDerivation = nper * (nper - 1) / 2;
             }
             else {
-                fGeoSeries = (fPowN - 1.0) / fX;
-                fGeoSeriesDerivation = fNper * fPowNminus1 / fX - fGeoSeries / fX;
+                fGeoSeries = (fPowN - 1) / fX;
+                fGeoSeriesDerivation = nper * fPowNminus1 / fX - fGeoSeries / fX;
             }
-            fTerm = fFv + fPv * fPowN + fPayment * fGeoSeries;
-            fTermDerivation = fPv * fNper * fPowNminus1 + fPayment * fGeoSeriesDerivation;
-            if ( Math.abs( fTerm ) < fEpsilonSmall )
+            fTerm = fv + pv * fPowN + payment * fGeoSeries;
+            fTermDerivation = pv * nper * fPowNminus1 + payment * fGeoSeriesDerivation;
+            if ( Math.abs( fTerm ) < minEps )
                 bFound = true;
             else {
-                if ( approxEqual( Math.abs( fTermDerivation ), 0.0 ) )
-                    fXnew = fX + 1.1 * SCdEpsilon;
+                if ( approxEqual( Math.abs( fTermDerivation ), 0 ) )
+                    fXnew = fX + 1.1 * eps;
                 else
                     fXnew = fX - fTerm / fTermDerivation;
                 nCount++;
-                bFound = (Math.abs( fXnew - fX ) < SCdEpsilon);
+                bFound = (Math.abs( fXnew - fX ) < eps);
                 fX = fXnew;
             }
         }
-        bValid = (fX >= -1.0);
+        bValid = (fX >= -1);
     }
     else {
-        fX = (fGuess.fGuest < -1.0) ? -1.0 : fGuess.fGuest;
-        while ( bValid && !bFound && nCount < nIterationsMax ) {
-            if ( approxEqual( Math.abs( fX ), 0.0 ) ) {
-                fGeoSeries = fNper;
-                fGeoSeriesDerivation = fNper * (fNper - 1.0) / 2.0;
+        fX = (guess.fGuest < -1) ? -1 : guess.fGuest;
+        while ( bValid && !bFound && nCount < iterationMax ) {
+            if ( approxEqual( Math.abs( fX ), 0 ) ) {
+                fGeoSeries = nper;
+                fGeoSeriesDerivation = nper * (nper - 1) / 2;
             }
             else {
-                fGeoSeries = (Math.pow( 1.0 + fX, fNper ) - 1.0) / fX;
-                fGeoSeriesDerivation = fNper * Math.pow( 1.0 + fX, fNper - 1.0 ) / fX - fGeoSeries / fX;
+                fGeoSeries = (Math.pow( 1 + fX, nper ) - 1) / fX;
+                fGeoSeriesDerivation = nper * Math.pow( 1 + fX, nper - 1 ) / fX - fGeoSeries / fX;
             }
-            fTerm = fFv + fPv * pow( 1.0 + fX, fNper ) + fPayment * fGeoSeries;
-            fTermDerivation = fPv * fNper * Math.pow( 1.0 + fX, fNper - 1.0 ) + fPayment * fGeoSeriesDerivation;
-            if ( Math.abs( fTerm ) < fEpsilonSmall )
+            fTerm = fv + pv * pow( 1 + fX, nper ) + payment * fGeoSeries;
+            fTermDerivation = pv * nper * Math.pow( 1 + fX, nper - 1 ) + payment * fGeoSeriesDerivation;
+            if ( Math.abs( fTerm ) < minEps )
                 bFound = true;
             else {
-                if ( approxEqual( Math.abs( fTermDerivation ), 0.0 ) )
-                    fXnew = fX + 1.1 * SCdEpsilon;
+                if ( approxEqual( Math.abs( fTermDerivation ), 0 ) )
+                    fXnew = fX + 1.1 * eps;
                 else
                     fXnew = fX - fTerm / fTermDerivation;
                 nCount++;
-                bFound = (Math.abs( fXnew - fX ) < SCdEpsilon);
+                bFound = (Math.abs( fXnew - fX ) < eps);
                 fX = fXnew;
-                bValid = (fX >= -1.0);
+                bValid = (fX >= -1);
             }
         }
     }
-    fGuess.fGuess = fX;
+    guess.fGuess = fX;
     return bValid && bFound;
 }
 
@@ -137,8 +178,8 @@ function getcoupdays( settl, matur, frequency, basis ) {
 function getcoupnum( settl, matur, frequency ) {
     var n = new Date( matur );
     lcl_GetCouppcd( settl, n, frequency );
-    var nMonths = (matur.getFullYear() - n.getFullYear()) * 12 + matur.getMonth() - n.getMonth();
-    return Math.ceil( nMonths * frequency / 12 );
+    var months = (matur.getFullYear() - n.getFullYear()) * 12 + matur.getMonth() - n.getMonth();
+    return Math.ceil( months * frequency / 12 );
 }
 
 function getcoupdaysnc( settl, matur, frequency, basis ) {
@@ -153,77 +194,75 @@ function getcoupdaysnc( settl, matur, frequency, basis ) {
     return getcoupdays( new Date( settl ), new Date( matur ), frequency, basis ) - getcoupdaybs( new Date( settl ), new Date( matur ), frequency, basis );
 }
 
-function getprice( nSettle, nMat, fRate, fYield, fRedemp, nFreq, nBase ) {
+function getprice( settle, mat, rate, _yield, redemp, freq, base ) {
 
-    var fE = getcoupdays( new Date( nSettle ), new Date( nMat ), nFreq, nBase );
-    var fDSC_E = getcoupdaysnc( new Date( nSettle ), new Date( nMat ), nFreq, nBase ) / fE;
-    var fN = getcoupnum( new Date( nSettle ), (nMat), nFreq, nBase );
-    var fA = getcoupdaybs( new Date( nSettle ), new Date( nMat ), nFreq, nBase );
+    var _coupdays = getcoupdays( new Date( settle ), new Date( mat ), freq, base );
+    var _coupdaysnc = getcoupdaysnc( new Date( settle ), new Date( mat ), freq, base ) / _coupdays;
+    var _coupnum = getcoupnum( new Date( settle ), (mat), freq, base );
+    var _coupdaybs = getcoupdaybs( new Date( settle ), new Date( mat ), freq, base );
 
-    var fRet = fRedemp / ( Math.pow( 1.0 + fYield / nFreq, fN - 1.0 + fDSC_E ) );
-    fRet -= 100.0 * fRate / nFreq * fA / fE;
+    var res = redemp / ( Math.pow( 1 + _yield / freq, _coupnum - 1 + _coupdaysnc ) );
+    res -= 100 * rate / freq * _coupdaybs / _coupdays;
 
-    var fT1 = 100.0 * fRate / nFreq;
-    var fT2 = 1.0 + fYield / nFreq;
+    var fT1 = 100 * rate / freq;
+    var fT2 = 1 + _yield / freq;
 
-    for ( var fK = 0.0; fK < fN; fK++ ) {
-        fRet += fT1 / Math.pow( fT2, fK + fDSC_E );
+    for ( var i = 0; i < _coupnum; i++ ) {
+        res += fT1 / Math.pow( fT2, i + _coupdaysnc );
     }
 
-    return fRet;
+    return res;
 }
 
-function getYield( nSettle, nMat, fCoup, fPrice, fRedemp, nFreq, nBase ) {
-    var fRate = fCoup, fPriceN = 0.0, fYield1 = 0.0, fYield2 = 1.0;
-    var fPrice1 = getprice( nSettle, nMat, fRate, fYield1, fRedemp, nFreq, nBase );
-    var fPrice2 = getprice( nSettle, nMat, fRate, fYield2, fRedemp, nFreq, nBase );
-    var fYieldN = ( fYield2 - fYield1 ) * 0.5;
+function getYield( settle, mat, coup, price, redemp, freq, base ) {
+    var rate = coup, priceN = 0, yield1 = 0, yield2 = 1;
+    var price1 = getprice( settle, mat, rate, yield1, redemp, freq, base );
+    var price2 = getprice( settle, mat, rate, yield2, redemp, freq, base );
+    var yieldN = ( yield2 - yield1 ) * 0.5;
 
-    for ( var nIter = 0; nIter < 100 && fPriceN != fPrice; nIter++ ) {
-        fPriceN = getprice( nSettle, nMat, fRate, fYieldN, fRedemp, nFreq, nBase );
+    for ( var i = 0; i < 100 && priceN != price; i++ ) {
+        priceN = getprice( settle, mat, rate, yieldN, redemp, freq, base );
 
-        if ( fPrice == fPrice1 )
-            return fYield1;
-        else if ( fPrice == fPrice2 )
-            return fYield2;
-        else if ( fPrice == fPriceN )
-            return fYieldN;
-        else if ( fPrice < fPrice2 ) {
-            fYield2 *= 2.0;
-            fPrice2 = getprice( nSettle, nMat, fRate, fYield2, fRedemp, nFreq, nBase );
+        if ( price == price1 )
+            return yield1;
+        else if ( price == price2 )
+            return yield2;
+        else if ( price == priceN )
+            return yieldN;
+        else if ( price < price2 ) {
+            yield2 *= 2.0;
+            price2 = getprice( settle, mat, rate, yield2, redemp, freq, base );
 
-            fYieldN = ( fYield2 - fYield1 ) * 0.5;
+            yieldN = ( yield2 - yield1 ) * 0.5;
         }
         else {
-            if ( fPrice < fPriceN ) {
-                fYield1 = fYieldN;
-                fPrice1 = fPriceN;
+            if ( price < priceN ) {
+                yield1 = yieldN;
+                price1 = priceN;
             }
             else {
-                fYield2 = fYieldN;
-                fPrice2 = fPriceN;
+                yield2 = yieldN;
+                price2 = priceN;
             }
 
-            fYieldN = fYield2 - ( fYield2 - fYield1 ) * ( ( fPrice - fPrice2 ) / ( fPrice1 - fPrice2 ) );
+            yieldN = yield2 - ( yield2 - yield1 ) * ( ( price - price2 ) / ( price1 - price2 ) );
         }
     }
 
-    if ( Math.abs( fPrice - fPriceN ) > fPrice / 100.0 )
+    if ( Math.abs( price - priceN ) > price / 100 )
         return new cError( cErrorType.not_numeric );		// result not precise enough
 
-    return new cNumber( fYieldN );
+    return new cNumber( yieldN );
 }
 
-function getyieldmat( nSettle, nMat, nIssue, fRate, fPrice, nBase ){
+function getyieldmat( settle, mat, issue, rate, price, base ){
 
-    var fIssMat = yearFrac( nIssue, nMat, nBase );
-    var fIssSet = yearFrac( nIssue, nSettle, nBase );
-    var fSetMat = yearFrac( nSettle, nMat, nBase );
+    var issMat = yearFrac( issue, mat, base );
+    var issSet = yearFrac( issue, settle, base );
+    var setMat = yearFrac( settle, mat, base );
 
-    var y = 1.0 + fIssMat * fRate;
-    y /= fPrice / 100.0 + fIssSet * fRate;
-    y--;
-    y /= fSetMat;
+    var y = (1 + issMat * rate) / (price / 100 + issSet * rate) - 1;
+    y /= setMat;
 
     return y;
 }
@@ -233,24 +272,23 @@ function getduration( settlement, maturity, coupon, yld, frequency, basis ){
     var yearfrac = yearFrac( new Date( settlement ), new Date( maturity ), basis ).getValue();
     var numOfCoups = getcoupnum( new Date( settlement ), new Date( maturity ), frequency );
     var duration = 0, f100 = 100;
-    coupon *= f100 / frequency;	// fCoup is used as cash flow
+    coupon *= f100 / frequency;
     yld /= frequency;
     yld += 1;
 
     var nDiff = yearfrac * frequency - numOfCoups;
 
-    var t, p = 0;
+    var p = 0;
 
-    for ( t = 1; t < numOfCoups; t++ ) {
-        duration += ( t + nDiff ) * ( coupon ) / Math.pow( yld, t + nDiff );
-        p += coupon / Math.pow( yld, t + nDiff );
+    for ( var i = 1; i < numOfCoups; i++ ) {
+        duration += ( i + nDiff ) * ( coupon ) / Math.pow( yld, i + nDiff );
+        p += coupon / Math.pow( yld, i + nDiff );
     }
 
     duration += ( numOfCoups + nDiff ) * ( coupon + f100 ) / Math.pow( yld, numOfCoups + nDiff );
     p += ( coupon + f100 ) / Math.pow( yld, numOfCoups + nDiff );
 
-    duration /= p;
-    duration /= frequency;
+    duration = duration / p / frequency;
 
     return duration;
 }
@@ -1407,7 +1445,7 @@ cCUMIPMT.prototype.Calculate = function ( arg ) {
     if ( nStartPer < 1 || nEndPer < nStartPer || fRate <= 0 || nEndPer > nNumPeriods || nNumPeriods <= 0 || fVal <= 0 || ( nPayType != 0 && nPayType != 1 ) )
         return this.value = new cError( cErrorType.not_numeric );
 
-    fRmz = GetRmz( fRate, nNumPeriods, fVal, 0, nPayType );
+    fRmz = getPMT( fRate, nNumPeriods, fVal, 0, nPayType );
 
     if ( nStartPer == 1 ) {
         if ( nPayType <= 0 )
@@ -1418,9 +1456,9 @@ cCUMIPMT.prototype.Calculate = function ( arg ) {
 
     for ( var i = nStartPer; i <= nEndPer; i++ ) {
         if ( nPayType > 0 )
-            fZinsZ += GetZw( fRate, i - 2, fRmz, fVal, 1 ) - fRmz;
+            fZinsZ += getFV( fRate, i - 2, fRmz, fVal, 1 ) - fRmz;
         else
-            fZinsZ += GetZw( fRate, i - 1, fRmz, fVal, 0 );
+            fZinsZ += getFV( fRate, i - 1, fRmz, fVal, 0 );
     }
 
     fZinsZ *= fRate;
@@ -1527,7 +1565,7 @@ cCUMPRINC.prototype.Calculate = function ( arg ) {
     if ( nStartPer < 1 || nEndPer < nStartPer || nEndPer < 1 || fRate <= 0 || nNumPeriods <= 0 || fVal <= 0 || ( nPayType != 0 && nPayType != 1 ) )
         return this.value = new cError( cErrorType.not_numeric );
 
-    fRmz = GetRmz( fRate, nNumPeriods, fVal, 0.0, nPayType );
+    fRmz = getPMT( fRate, nNumPeriods, fVal, 0.0, nPayType );
 
     fKapZ = 0.0;
 
@@ -1545,9 +1583,9 @@ cCUMPRINC.prototype.Calculate = function ( arg ) {
 
     for ( var i = nStart; i <= nEnd; i++ ) {
         if ( nPayType > 0 )
-            fKapZ += fRmz - ( GetZw( fRate, i - 2, fRmz, fVal, 1 ) - fRmz ) * fRate;
+            fKapZ += fRmz - ( getFV( fRate, i - 2, fRmz, fVal, 1 ) - fRmz ) * fRate;
         else
-            fKapZ += fRmz - GetZw( fRate, i - 1, fRmz, fVal, 0 ) * fRate;
+            fKapZ += fRmz - getFV( fRate, i - 1, fRmz, fVal, 0 ) * fRate;
     }
 
     return this.value = new cNumber( fKapZ );
@@ -1561,14 +1599,209 @@ cCUMPRINC.prototype.getInfo = function () {
 }
 
 function cDB() {
-    cBaseFunction.call( this, "DB" );
+//    cBaseFunction.call( this, "DB" );
+
+    this.name = "DB";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 4;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 5;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cDB.prototype = Object.create( cBaseFunction.prototype )
+cDB.prototype.Calculate = function ( arg ) {
+    var cast = arg[0],
+        salvage = arg[1],
+        life = arg[2],
+        period = arg[3],
+        month = arg[4] && !(arg[4] instanceof cEmpty) ? arg[4] : new cNumber( 12 );
+
+    if ( cast instanceof cArea || cast instanceof cArea3D ) {
+        cast = cast.cross( arguments[1].first );
+    }
+    else if ( cast instanceof cArray ) {
+        cast = cast.getElementRowCol( 0, 0 );
+    }
+
+    if ( salvage instanceof cArea || salvage instanceof cArea3D ) {
+        salvage = salvage.cross( arguments[1].first );
+    }
+    else if ( salvage instanceof cArray ) {
+        salvage = salvage.getElementRowCol( 0, 0 );
+    }
+
+    if ( life instanceof cArea || life instanceof cArea3D ) {
+        life = life.cross( arguments[1].first );
+    }
+    else if ( life instanceof cArray ) {
+        life = life.getElementRowCol( 0, 0 );
+    }
+
+    if ( period instanceof cArea || period instanceof cArea3D ) {
+        period = period.cross( arguments[1].first );
+    }
+    else if ( period instanceof cArray ) {
+        period = period.getElementRowCol( 0, 0 );
+    }
+
+    if ( month instanceof cArea || month instanceof cArea3D ) {
+        month = month.cross( arguments[1].first );
+    }
+    else if ( month instanceof cArray ) {
+        month = month.getElementRowCol( 0, 0 );
+    }
+
+    cast = cast.tocNumber();
+    salvage = salvage.tocNumber();
+    life = life.tocNumber();
+    period = period.tocNumber();
+    month = month.tocNumber();
+
+    if ( cast instanceof cError ) return this.value = cast;
+    if ( salvage instanceof cError ) return this.value = salvage;
+    if ( life instanceof cError ) return this.value = life;
+    if ( period instanceof cError ) return this.value = period;
+    if ( month instanceof cError ) return this.value = month;
+
+    cast = cast.getValue();
+    salvage = salvage.getValue();
+    life = life.getValue();
+    period = period.getValue();
+    month = month.getValue();
+
+    if ( month < 1 || month > 12 || life > 1200 || salvage < 0 ||
+        period > (life + 1) || salvage > cast || cast < 0 ) {
+        return this.value = new cError( cErrorType.wrong_value_type );
+    }
+    var nAbRate = 1 - Math.pow( salvage / cast, 1 / life );
+    nAbRate = Math.floor( (nAbRate * 1000) + 0.5 ) / 1000;
+    var nErsteAbRate = cast * nAbRate * month / 12;
+
+    var res = 0;
+    if ( Math.floor( period ) == 1 )
+        res = nErsteAbRate;
+    else {
+        var nSummAbRate = nErsteAbRate, nMin = life;
+        if ( nMin > period ) nMin = period;
+        var iMax = Math.floor( nMin );
+        for ( var i = 2; i <= iMax; i++ ) {
+            res = (cast - nSummAbRate) * nAbRate;
+            nSummAbRate += res;
+        }
+        if ( period > life )
+            res = ((cast - nSummAbRate) * nAbRate * (12 - month)) / 12;
+    }
+
+    this.value = new cNumber( res );
+    return this.value;
+
+}
+cDB.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( cost , salvage , life , period [ , [ month ] ] )"
+    };
+}
 
 function cDDB() {
-    cBaseFunction.call( this, "DDB" );
+//    cBaseFunction.call( this, "DDB" );
+
+    this.name = "DDB";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 4;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 5;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cDDB.prototype = Object.create( cBaseFunction.prototype )
+cDDB.prototype.Calculate = function ( arg ) {
+    var cost = arg[0],
+        salvage = arg[1],
+        life = arg[2],
+        period = arg[3],
+        factor = arg[4] && !(arg[4] instanceof cEmpty) ? arg[4] : new cNumber( 2 );
+
+    if ( cost instanceof cArea || cost instanceof cArea3D ) {
+        cost = cost.cross( arguments[1].first );
+    }
+    else if ( cost instanceof cArray ) {
+        cost = cost.getElementRowCol( 0, 0 );
+    }
+
+    if ( salvage instanceof cArea || salvage instanceof cArea3D ) {
+        salvage = salvage.cross( arguments[1].first );
+    }
+    else if ( salvage instanceof cArray ) {
+        salvage = salvage.getElementRowCol( 0, 0 );
+    }
+
+    if ( life instanceof cArea || life instanceof cArea3D ) {
+        life = life.cross( arguments[1].first );
+    }
+    else if ( life instanceof cArray ) {
+        life = life.getElementRowCol( 0, 0 );
+    }
+
+    if ( period instanceof cArea || period instanceof cArea3D ) {
+        period = period.cross( arguments[1].first );
+    }
+    else if ( period instanceof cArray ) {
+        period = period.getElementRowCol( 0, 0 );
+    }
+
+    if ( factor instanceof cArea || factor instanceof cArea3D ) {
+        factor = factor.cross( arguments[1].first );
+    }
+    else if ( factor instanceof cArray ) {
+        factor = factor.getElementRowCol( 0, 0 );
+    }
+
+    cost = cost.tocNumber();
+    salvage = salvage.tocNumber();
+    life = life.tocNumber();
+    period = period.tocNumber();
+    factor = factor.tocNumber();
+
+    if ( cost instanceof cError ) return this.value = cost;
+    if ( salvage instanceof cError ) return this.value = salvage;
+    if ( life instanceof cError ) return this.value = life;
+    if ( period instanceof cError ) return this.value = period;
+    if ( factor instanceof cError ) return this.value = factor;
+
+    cost = cost.getValue();
+    salvage = salvage.getValue();
+    life = life.getValue();
+    period = period.getValue();
+    factor = factor.getValue();
+
+    if (cost < 0.0 || salvage < 0.0 || factor <= 0.0 || salvage > cost || period < 1.0 || period > life) {
+        return this.value = new cError( cErrorType.wrong_value_type );
+    }
+
+    var res = getDDB(cost, salvage, life, period, factor);
+
+    this.value = new cNumber( res );
+    return this.value;
+
+}
+cDDB.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( cost , salvage , life , period [ , factor ] )"
+    };
+}
 
 function cDISC() {
 //    cBaseFunction.call( this, "DISC" );
@@ -2201,9 +2434,107 @@ cINTRATE.prototype.getInfo = function () {
 }
 
 function cIPMT() {
-    cBaseFunction.call( this, "IPMT" );
+//    cBaseFunction.call( this, "IPMT" );
+
+    this.name = "IPMT";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 4;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 6;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cIPMT.prototype = Object.create( cBaseFunction.prototype )
+cIPMT.prototype.Calculate = function ( arg ) {
+    var rate = arg[0], per = arg[1], nper = arg[2], pv = arg[3], fv = arg[4] ? arg[4] : new cNumber( 0 ), type = arg[5] ? arg[5] : new cNumber( 0 );
+
+    if ( rate instanceof cArea || rate instanceof cArea3D ) {
+        rate = rate.cross( arguments[1].first );
+    }
+    else if ( rate instanceof cArray ) {
+        rate = rate.getElementRowCol( 0, 0 );
+    }
+
+    if ( per instanceof cArea || per instanceof cArea3D ) {
+        per = per.cross( arguments[1].first );
+    }
+    else if ( per instanceof cArray ) {
+        per = per.getElementRowCol( 0, 0 );
+    }
+
+    if ( nper instanceof cArea || nper instanceof cArea3D ) {
+        nper = nper.cross( arguments[1].first );
+    }
+    else if ( nper instanceof cArray ) {
+        nper = nper.getElementRowCol( 0, 0 );
+    }
+
+    if ( pv instanceof cArea || pv instanceof cArea3D ) {
+        pv = pv.cross( arguments[1].first );
+    }
+    else if ( pv instanceof cArray ) {
+        pv = pv.getElementRowCol( 0, 0 );
+    }
+
+    if ( fv instanceof cArea || fv instanceof cArea3D ) {
+        fv = fv.cross( arguments[1].first );
+    }
+    else if ( fv instanceof cArray ) {
+        fv = fv.getElementRowCol( 0, 0 );
+    }
+
+    if ( type instanceof cArea || type instanceof cArea3D ) {
+        type = type.cross( arguments[1].first );
+    }
+    else if ( type instanceof cArray ) {
+        type = type.getElementRowCol( 0, 0 );
+    }
+
+    rate = rate.tocNumber();
+    per = per.tocNumber();
+    nper = nper.tocNumber();
+    pv = pv.tocNumber();
+    fv = fv.tocNumber();
+    type = type.tocNumber();
+
+    if ( rate instanceof cError ) return this.value = rate;
+    if ( per instanceof cError ) return this.value = per;
+    if ( nper instanceof cError ) return this.value = nper;
+    if ( pv instanceof cError ) return this.value = pv;
+    if ( fv instanceof cError ) return this.value = fv;
+    if ( type instanceof cError ) return this.value = type;
+
+    rate = rate.getValue();
+    per = per.getValue();
+    nper = nper.getValue();
+    pv = pv.getValue();
+    fv = fv.getValue();
+    type = type.getValue();
+
+    var res;
+
+    if ( per < 1 || per > nper ){
+        return this.value = new cError( cErrorType.wrong_value_type );
+    }
+
+    res = getPMT(rate, nper, pv, fv, type);
+    res = getIPMT(rate, per, pv, type, res);
+
+    this.value = new cNumber( res );
+//    this.value.numFormat = 9;
+    return this.value;
+}
+cIPMT.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( rate , per , nper , pv [ , [ fv ] [ , [ type ] ] ] )"
+    };
+}
 
 function cIRR() {
 //    cBaseFunction.call( this, "IRR" );
@@ -2484,9 +2815,116 @@ cMDURATION.prototype.getInfo = function () {
 }
 
 function cMIRR() {
-    cBaseFunction.call( this, "MIRR" );
+//    cBaseFunction.call( this, "MIRR" );
+
+    this.name = "MIRR";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 3;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cMIRR.prototype = Object.create( cBaseFunction.prototype )
+cMIRR.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
+
+    var valueArray = [];
+
+    if ( arg0 instanceof cArea ) {
+        arg0.foreach2( function ( c ) {
+            valueArray.push( c.tocNumber() );
+        } )
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0.foreach( function ( c ) {
+            valueArray.push( c.tocNumber() );
+        } )
+    }
+    else if ( arg0 instanceof cArea3D ) {
+        if ( arg0.wsFrom == arg0.wsTo ) {
+            valueArray = arg0.getMatrix()[0];
+        }
+        else
+            return this.value = new cError( cErrorType.wrong_value_type );
+    }
+    else {
+        arg0 = arg0.tocNumber();
+        if ( arg1 instanceof cError ) {
+            return this.value = new cError( cErrorType.not_numeric )
+        }
+        else
+            valueArray.push( arg0 );
+    }
+
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    else if ( arg1 instanceof cArray ) {
+        arg1 = arg1.getElementRowCol( 0, 0 );
+    }
+
+    if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
+        arg2 = arg2.cross( arguments[1].first );
+    }
+    else if ( arg2 instanceof cArray ) {
+        arg2 = arg2.getElementRowCol( 0, 0 );
+    }
+    var fRate1_invest = arg1.tocNumber(), fRate1_reinvest = arg2.tocNumber();
+
+    if( fRate1_invest instanceof cError ) return this.value = fRate1_invest;
+    if( fRate1_reinvest instanceof cError ) return this.value = fRate1_reinvest;
+
+    fRate1_invest = fRate1_invest.getValue() + 1;
+    fRate1_reinvest = fRate1_reinvest.getValue() + 1;
+
+    var fNPV_reinvest = 0, fPow_reinvest = 1, fNPV_invest = 0, fPow_invest = 1, fCellValue,
+        wasNegative = false, wasPositive = false;
+
+    for(var i = 0; i < valueArray.length; i++){
+        fCellValue = valueArray[i];
+
+        if( fCellValue instanceof cError )
+            return this.value = fCellValue;
+
+        fCellValue = valueArray[i].getValue();
+
+        if( fCellValue > 0 ){          // reinvestments
+            wasPositive = true;
+            fNPV_reinvest += fCellValue * fPow_reinvest;
+        }
+        else if( fCellValue < 0 ){     // investments
+            wasNegative = true;
+            fNPV_invest += fCellValue * fPow_invest;
+        }
+        fPow_reinvest /= fRate1_reinvest;
+        fPow_invest /= fRate1_invest;
+
+    }
+
+    if( !( wasNegative && wasPositive ) )
+        return this.value = new cError( cErrorType.division_by_zero );
+
+    var fResult = -fNPV_reinvest / fNPV_invest;
+        fResult *= Math.pow( fRate1_reinvest, valueArray.length - 1 );
+        fResult = Math.pow( fResult, 1 / (valueArray.length - 1) );
+
+    this.value = new cNumber( fResult - 1 );
+    this.value.numFormat = 9;
+    return this.value;
+
+}
+cMIRR.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( values , finance-rate , reinvest-rate )"
+    };
+}
 
 function cNOMINAL() {
 //    cBaseFunction.call( this, "NOMINAL" );
@@ -3108,9 +3546,108 @@ cPMT.prototype.getInfo = function () {
 }
 
 function cPPMT() {
-    cBaseFunction.call( this, "PPMT" );
+//    cBaseFunction.call( this, "PPMT" );
+
+    this.name = "PPMT";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 4;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 6;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cPPMT.prototype = Object.create( cBaseFunction.prototype )
+cPPMT.prototype.Calculate = function ( arg ) {
+    var rate = arg[0], per = arg[1], nper = arg[2], pv = arg[3], fv = arg[4] ? arg[4] : new cNumber( 0 ), type = arg[5] ? arg[5] : new cNumber( 0 );
+
+    if ( rate instanceof cArea || rate instanceof cArea3D ) {
+        rate = rate.cross( arguments[1].first );
+    }
+    else if ( rate instanceof cArray ) {
+        rate = rate.getElementRowCol( 0, 0 );
+    }
+
+    if ( per instanceof cArea || per instanceof cArea3D ) {
+        per = per.cross( arguments[1].first );
+    }
+    else if ( per instanceof cArray ) {
+        per = per.getElementRowCol( 0, 0 );
+    }
+
+    if ( nper instanceof cArea || nper instanceof cArea3D ) {
+        nper = nper.cross( arguments[1].first );
+    }
+    else if ( nper instanceof cArray ) {
+        nper = nper.getElementRowCol( 0, 0 );
+    }
+
+    if ( pv instanceof cArea || pv instanceof cArea3D ) {
+        pv = pv.cross( arguments[1].first );
+    }
+    else if ( pv instanceof cArray ) {
+        pv = pv.getElementRowCol( 0, 0 );
+    }
+
+    if ( fv instanceof cArea || fv instanceof cArea3D ) {
+        fv = fv.cross( arguments[1].first );
+    }
+    else if ( fv instanceof cArray ) {
+        fv = fv.getElementRowCol( 0, 0 );
+    }
+
+    if ( type instanceof cArea || type instanceof cArea3D ) {
+        type = type.cross( arguments[1].first );
+    }
+    else if ( type instanceof cArray ) {
+        type = type.getElementRowCol( 0, 0 );
+    }
+
+    rate = rate.tocNumber();
+    per = per.tocNumber();
+    nper = nper.tocNumber();
+    pv = pv.tocNumber();
+    fv = fv.tocNumber();
+    type = type.tocNumber();
+
+    if ( rate instanceof cError ) return this.value = rate;
+    if ( per instanceof cError ) return this.value = per;
+    if ( nper instanceof cError ) return this.value = nper;
+    if ( pv instanceof cError ) return this.value = pv;
+    if ( fv instanceof cError ) return this.value = fv;
+    if ( type instanceof cError ) return this.value = type;
+
+    rate = rate.getValue();
+    per = per.getValue();
+    nper = nper.getValue();
+    pv = pv.getValue();
+    fv = fv.getValue();
+    type = type.getValue();
+
+    var res;
+
+    if ( per < 1 || per > nper ){
+        return this.value = new cError( cErrorType.wrong_value_type );
+    }
+
+    var fRmz = getPMT(rate, nper, pv, fv, type);
+
+    res = fRmz - getIPMT(rate, per, pv, type, fRmz);
+
+    this.value = new cNumber( res );
+//    this.value.numFormat = 9;
+    return this.value;
+}
+cPPMT.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( rate , per , nper , pv [ , [ fv ] [ , [ type ] ] ] )"
+    };
+}
 
 function cPRICE() {
 //    cBaseFunction.call( this, "PRICE" );
@@ -3719,9 +4256,75 @@ cRECEIVED.prototype.getInfo = function () {
 }
 
 function cSLN() {
-    cBaseFunction.call( this, "SLN" );
+//    cBaseFunction.call( this, "SLN" );
+
+    this.name = "SLN";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 3;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 3;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cSLN.prototype = Object.create( cBaseFunction.prototype )
+cSLN.prototype.Calculate = function ( arg ) {
+    var cost = arg[0],
+        salvage = arg[1],
+        life = arg[2];
+
+    if ( cost instanceof cArea || cost instanceof cArea3D ) {
+        cost = cost.cross( arguments[1].first );
+    }
+    else if ( cost instanceof cArray ) {
+        cost = cost.getElementRowCol( 0, 0 );
+    }
+
+    if ( salvage instanceof cArea || salvage instanceof cArea3D ) {
+        salvage = salvage.cross( arguments[1].first );
+    }
+    else if ( salvage instanceof cArray ) {
+        salvage = salvage.getElementRowCol( 0, 0 );
+    }
+
+    if ( life instanceof cArea || life instanceof cArea3D ) {
+        life = life.cross( arguments[1].first );
+    }
+    else if ( life instanceof cArray ) {
+        life = life.getElementRowCol( 0, 0 );
+    }
+
+    cost = cost.tocNumber();
+    salvage = salvage.tocNumber();
+    life = life.tocNumber();
+
+    if ( cost instanceof cError ) return this.value = cost;
+    if ( salvage instanceof cError ) return this.value = salvage;
+    if ( life instanceof cError ) return this.value = life;
+
+    cost = cost.getValue();
+    salvage = salvage.getValue();
+    life = life.getValue();
+
+    if( life == 0 )
+        return this.value = new cError( cErrorType.not_numeric );
+
+    var res = ( cost - salvage ) / life;
+
+    this.value = new cNumber( res );
+    return this.value;
+
+}
+cSLN.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( cost , salvage , life )"
+    };
+}
 
 function cSYD() {
 //    cBaseFunction.call( this, "SYD" );
@@ -4184,7 +4787,7 @@ cXIRR.prototype.Calculate = function ( arg ) {
             return this.value = new cError( cErrorType.not_numeric )
         }
         else
-            valueArray[0] = arg0;
+            valueArray.push( arg0 );
     }
 
     if ( arg1 instanceof cArea ) {

@@ -279,6 +279,43 @@
 
     }
 
+    function _coupnum( settlement, maturity, frequency, basis ) {
+
+        basis = ( basis !== undefined ? basis : 0 );
+
+        var n = new Date(maturity);
+        _lcl_GetCouppcd( settlement, n, frequency );
+        var nMonths = (maturity.getFullYear() - n.getFullYear()) * 12 + maturity.getMonth() - n.getMonth();
+        return nMonths * frequency / 12 ;
+
+    }
+
+    function _duration( settlement, maturity, coupon, yld, frequency, basis ){
+
+        var yearfrac = _yearFrac( new Date( settlement ), new Date( maturity ), basis );
+        var numOfCoups = _coupnum( new Date( settlement ), new Date( maturity ), frequency );
+        var duration = 0, f100 = 100;
+        coupon *= f100 / frequency;
+        yld /= frequency;
+        yld += 1;
+
+        var nDiff = yearfrac * frequency - numOfCoups;
+
+        var p = 0;
+
+        for ( var i = 1; i < numOfCoups; i++ ) {
+            duration += ( i + nDiff ) * ( coupon ) / Math.pow( yld, i + nDiff );
+            p += coupon / Math.pow( yld, i + nDiff );
+        }
+
+        duration += ( numOfCoups + nDiff ) * ( coupon + f100 ) / Math.pow( yld, numOfCoups + nDiff );
+        p += ( coupon + f100 ) / Math.pow( yld, numOfCoups + nDiff );
+
+        duration = duration / p / frequency;
+
+        return duration;
+    }
+
     var ver = 2;
 
     var oParser, wb, ws, date1, date2, dif = 1e-9,
@@ -4032,20 +4069,9 @@
 
     test( "Test: \"COUPNUM\"", function () {
 
-        function coupnum( settlement, maturity, frequency, basis ) {
-
-            basis = ( basis !== undefined ? basis : 0 );
-
-            var n = new Date(maturity);
-            _lcl_GetCouppcd( settlement, n, frequency );
-            var nMonths = (maturity.getFullYear() - n.getFullYear()) * 12 + maturity.getMonth() - n.getMonth();
-            return nMonths * frequency / 12 ;
-
-        }
-
         oParser = new parserFormula( "COUPNUM(DATE(2007,1,25),DATE(2008,11,15),2,1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), coupnum( new Date(2007,0,25), new Date(2008,10,15), 2, 1 ) );
+        strictEqual( oParser.calculate().getValue(), _coupnum( new Date(2007,0,25), new Date(2008,10,15), 2, 1 ) );
 
     } )
 
@@ -4090,9 +4116,9 @@
 
         function pricemat( settl, matur, iss, rate, yld, basis ) {
 
-            var fIssMat = yearFrac( new Date(iss), new Date(matur), basis );
-            var fIssSet = yearFrac( new Date(iss), new Date(settl), basis );
-            var fSetMat = yearFrac( new Date(settl), new Date(matur), basis );
+            var fIssMat = _yearFrac( new Date(iss), new Date(matur), basis );
+            var fIssSet = _yearFrac( new Date(iss), new Date(settl), basis );
+            var fSetMat = _yearFrac( new Date(settl), new Date(matur), basis );
 
             var res = 1.0 + fIssMat * rate;
             res /= 1.0 + fSetMat * yld;
@@ -4132,7 +4158,6 @@
 
     } )
 
-
     test( "Test: \"YIELDMAT\"", function () {
 
         oParser = new parserFormula( "YIELDMAT(DATE(2008,3,15),DATE(2008,11,3),DATE(2007,11,8),0.0625,100.0123,0)", "A2", ws );
@@ -4166,9 +4191,9 @@
 
         function oddlyield( settlement, maturity, last_interest, rate, pr, redemption, frequency, basis ){
 
-            var fDCi = yearFrac( last_interest, maturity, basis ) * frequency;
-            var fDSCi = yearFrac( settlement, maturity, basis ) * frequency;
-            var fAi = yearFrac( last_interest, settlement, basis ) * frequency;
+            var fDCi = _yearFrac( last_interest, maturity, basis ) * frequency;
+            var fDSCi = _yearFrac( settlement, maturity, basis ) * frequency;
+            var fAi = _yearFrac( last_interest, settlement, basis ) * frequency;
 
             var res = redemption + fDCi * 100.0 * rate / frequency;
             res /= pr + fAi * 100.0 * rate / frequency;
@@ -4181,6 +4206,28 @@
         oParser = new parserFormula( "ODDLYIELD(DATE(2008,11,11),DATE(2021,3,1),DATE(2008,10,15),0.0575,84.5,100,2,0)", "A2", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), oddlyield( new Date(2008,10,11), new Date(2021,2,1), new Date(2008,9,15), 0.0575, 84.5, 100, 2, 0 ) );
+
+    } )
+
+    test( "Test: \"DURATION\"", function () {
+
+        oParser = new parserFormula( "DURATION(DATE(2008,1,1),DATE(2016,1,1),0.08,0.09,2,1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), _duration( new Date(2008,0,1), new Date(2016,0,1), 0.08, 0.09, 2, 1 ) );
+
+    } )
+
+    test( "Test: \"MDURATION\"", function () {
+
+        function mduration(settl, matur, coupon, yld, frequency, basis){
+
+            return _duration( settl, matur, coupon, yld, frequency, basis ) / (1 + yld/frequency);
+
+        }
+
+        oParser = new parserFormula( "MDURATION(DATE(2008,1,1),DATE(2016,1,1),0.08,0.09,2,1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), mduration( new Date(2008,0,1), new Date(2016,0,1), 0.08, 0.09, 2, 1 ) );
 
     } )
 
@@ -4212,6 +4259,5 @@
         strictEqual( oParser.calculate().getValue(), syd( 30000,7500,-10,10 ) );
 
     } )
-
 
 } );
