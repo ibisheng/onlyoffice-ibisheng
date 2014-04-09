@@ -1010,6 +1010,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			_asc_open: function (fCallback) { //fCallback({returnCode:"", val:obj, ...})
 				if (this.chartEditor) {
 				} else if (!this.documentId || !this.documentUrl) {
+					// Назначим id-сами, если он не пришел (для открытия тестового документа)
+					if (!this.documentId)
+						this.documentId = "9876543210";
                     this._OfflineAppDocumentStartLoad(fCallback);
 				} else {
                     var v = {
