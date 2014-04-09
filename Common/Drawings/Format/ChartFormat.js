@@ -11065,7 +11065,7 @@ function COfPieChart()
     this.gapWidth      = null;
     this.ofPieType     = null;
     this.secondPieSize = null;
-    this.series        = null;
+    this.series        = [];
     this.serLines      = null;
     this.splitPos      = null;
     this.splitType     = null;
