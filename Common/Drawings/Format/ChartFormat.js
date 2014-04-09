@@ -1,5 +1,16 @@
 "use strict";
 
+function findPrAndRemove(arr, pr)
+{
+    for(var i = arr.length-1; i > -1; --i)
+    {
+        if(arr[i] === pr)
+        {
+            arr.splice(i, 1);
+            return;
+        }
+    }
+}
 
 var SCALE_INSET_COEFF = 1.016;//Возможно придется уточнять
 
@@ -1079,7 +1090,7 @@ function CAreaSeries()
 {
     this.cat            = null;
     this.dLbls          = null;
-    this.dPt            = null;
+    this.dPt            = [];
     this.errBars        = null;
     this.idx            = null;
     this.order          = null;
@@ -1122,7 +1133,12 @@ CAreaSeries.prototype =
         if(o.dLbls)
             this.setDLbls(o.dLbls);
         if(o.dPt)
-            this.setDPt(o.dPt);
+        {
+            for(var i = 0; i < o.dPt.length; ++i)
+            {
+                this.addDPt(o.dPt[i]);
+            }
+        }
         if(o.errBars)
             this.setErrBars(o.errBars);
         if(isRealNumber(o.idx))
@@ -1256,10 +1272,10 @@ CAreaSeries.prototype =
         History.Add(this, {Type: historyitem_AreaSeries_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
     },
-    setDPt: function(pr)
+    addDPt: function(pr)
     {
-        History.Add(this, {Type: historyitem_AreaSeries_SetDPt, oldPr: this.dPt, newPr: pr});
-        this.dPt = pr;
+        History.Add(this, {Type: historyitem_AreaSeries_SetDPt, newPr: pr});
+        this.dPt.push(pr);
     },
     setErrBars: function(pr)
     {
@@ -1318,7 +1334,7 @@ CAreaSeries.prototype =
             }
             case historyitem_AreaSeries_SetDPt:
             {
-                this.dPt = data.oldPr;
+                findPrAndRemove(this.dPt, data.newPr);
                 break;
             }
             case historyitem_AreaSeries_SetErrBars:
@@ -1370,7 +1386,7 @@ CAreaSeries.prototype =
             }
             case historyitem_AreaSeries_SetDPt:
             {
-                this.dPt = data.newPr;
+                this.dPt.push(data.newPr);
                 break;
             }
             case historyitem_AreaSeries_SetErrBars:
@@ -1448,7 +1464,7 @@ CAreaSeries.prototype =
             }
             case historyitem_AreaSeries_SetDPt:
             {
-                this.dPt = readObject(r);
+                this.dPt.push(readObject(r));
                 break;
             }
             case historyitem_AreaSeries_SetErrBars:
@@ -3404,7 +3420,7 @@ function CBarSeries()
 {
     this.cat               = null;
     this.dLbls            = null;
-    this.dPt               = null;
+    this.dPt               = [];
     this.errBars           = null;
     this.idx              = null;
     this.invertIfNegative  = null;
@@ -3448,7 +3464,12 @@ CBarSeries.prototype =
         if(o.dLbls)
             this.setDLbls(o.dLbls);
         if(o.dPt)
-            this.setDPt(o.dPt);
+        {
+            for(var i = 0;  i< o.dPt.length; ++i)
+            {
+                this.addDPt(o.dPt[i]);
+            }
+        }
         if(o.errBars)
             this.setErrBars(o.errBars);
         if(isRealNumber(o.idx))
@@ -3495,10 +3516,10 @@ CBarSeries.prototype =
         History.Add(this, {Type: historyitem_BarSeries_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
     },
-    setDPt: function(pr)
+    addDPt: function(pr)
     {
-        History.Add(this, {Type: historyitem_BarSeries_SetDPt, oldPr: this.dPt, newPr: pr});
-        this.dPt = pr;
+        History.Add(this, {Type: historyitem_BarSeries_SetDPt, newPr: pr});
+        this.dPt.push(pr);
     },
     setErrBars: function(pr)
     {
@@ -3567,7 +3588,7 @@ CBarSeries.prototype =
             }
             case historyitem_BarSeries_SetDPt:
             {
-                this.dPt = data.oldPr;
+                findPrAndRemove(this.dPt, data.newPr);
                 break;
             }
             case historyitem_BarSeries_SetErrBars:
@@ -3639,7 +3660,7 @@ CBarSeries.prototype =
             }
             case historyitem_BarSeries_SetDPt:
             {
-                this.dPt = data.newPr;
+                this.dPt.push(data.newPr);
                 break;
             }
             case historyitem_BarSeries_SetErrBars:
@@ -3746,7 +3767,7 @@ CBarSeries.prototype =
             }
             case historyitem_BarSeries_SetDPt:
             {
-                this.dPt = readObject(r);
+                this.dPt.push(readObject(r));
                 break;
             }
             case historyitem_BarSeries_SetErrBars:
@@ -4096,7 +4117,7 @@ function CBubbleSeries()
     this.bubble3D         = null;
     this.bubbleSize       = null;
     this.dLbls            = null;
-    this.dPt              = null;
+    this.dPt              = [];
     this.errBars          = null;
     this.idx              = null;
     this.invertIfNegative = null;
@@ -4167,7 +4188,7 @@ CBubbleSeries.prototype =
             }
             case historyitem_BubbleSeries_SetDPt:
             {
-                this.dPt = data.oldPr;
+                findPrAndRemove(this.dPt, data.newPr);
                 break;
             }
             case historyitem_BubbleSeries_SetErrBars:
@@ -4239,7 +4260,7 @@ CBubbleSeries.prototype =
             }
             case historyitem_BubbleSeries_SetDPt:
             {
-                this.dPt = data.newPr;
+                this.dPt.push(data.newPr);
                 break;
             }
             case historyitem_BubbleSeries_SetErrBars:
@@ -4345,7 +4366,7 @@ CBubbleSeries.prototype =
             }
             case historyitem_BubbleSeries_SetDPt:
             {
-                this.dPt = readObject(r);
+                this.dPt.push(readObject(r));
                 break;
             }
             case historyitem_BubbleSeries_SetErrBars:
@@ -4411,10 +4432,10 @@ CBubbleSeries.prototype =
         History.Add(this, {Type: historyitem_BubbleSeries_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
     },
-    setDPt: function(pr)
+    addDPt: function(pr)
     {
         History.Add(this, {Type: historyitem_BubbleSeries_SetDPt, oldPr: this.dPt, newPr: pr});
-        this.dPt = pr;
+        this.dPt.push(pr);
     },
     setErrBars: function(pr)
     {
@@ -9471,7 +9492,7 @@ function CLineSeries()
 {
     this.cat           = null;
     this.dLbls         = null;
-    this.dPt           = null;
+    this.dPt           = [];
     this.errBars       = null;
     this.idx           = null;
     this.marker        = null;
@@ -9513,7 +9534,7 @@ CLineSeries.prototype =
         if(other.dLbls)
             this.setDLbls(other.dLbls);
         if(other.dPt)
-            this.setDPt(other.dPt);
+            copyDpt(this, other.dPt);
         if(other.errBars)
             this.setErrBars(other.errBars);
         if(isRealNumber(other.idx))
@@ -9572,10 +9593,10 @@ CLineSeries.prototype =
         History.Add(this, {Type: historyitem_LineSeries_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
     },
-    setDPt: function(pr)
+    addDPt: function(pr)
     {
         History.Add(this, {Type: historyitem_LineSeries_SetDPt, oldPr: this.dPt, newPr: pr});
-        this.dPt = pr;
+        this.dPt.push(pr);
     },
     setErrBars: function(pr)
     {
@@ -9639,7 +9660,7 @@ CLineSeries.prototype =
             }
             case historyitem_LineSeries_SetDPt:
             {
-                this.dPt = data.oldPr;
+                findPrAndRemove(this.dPt, data.newPr);
                 break;
             }
             case historyitem_LineSeries_SetErrBars:
@@ -9706,7 +9727,7 @@ CLineSeries.prototype =
             }
             case historyitem_LineSeries_SetDPt:
             {
-                this.dPt = data.newPr;
+                this.dPt.push(data.newPr);
                 break;
             }
             case historyitem_LineSeries_SetErrBars:
@@ -9807,7 +9828,7 @@ CLineSeries.prototype =
             }
             case historyitem_LineSeries_SetDPt:
             {
-                this.dPt = readObject(r);
+                this.dPt.push(readObject(r));
                 break;
             }
             case historyitem_LineSeries_SetErrBars:
@@ -11905,7 +11926,7 @@ function CPieSeries()
 {
     this.cat       = null;
     this.dLbls     = null;
-    this.dPt       = null;
+    this.dPt       = [];
     this.explosion = null;
     this.idx       = null;
     this.order     = null;
@@ -11940,7 +11961,12 @@ CPieSeries.prototype =
         if(o.dLbls)
             this.setDLbls(o.dLbls);
         if(o.dPt)
-            this.setDPt(o.dPt);
+        {
+            for(var i = 0; i < o.dPt.length; ++i)
+            {
+                this.addDPt(o.dPt[i]);
+            }
+        }
         if(o.explosion)
             this.setExplosion(o.explosion);
         if(isRealNumber(o.idx))
@@ -11991,10 +12017,10 @@ CPieSeries.prototype =
         History.Add(this, {Type: historyitem_PieSeries_SetDLbls, oldPr: this.dLbls, newPr:pr});
         this.dLbls = pr;
     },
-    setDPt: function(pr)
+    addDPt: function(pr)
     {
         History.Add(this, {Type: historyitem_PieSeries_SetDPt, oldPr: this.dPt, newPr:pr});
-        this.dPt = pr;
+        this.dPt.push(pr);
     },
     setExplosion: function(pr)
     {
@@ -12043,7 +12069,7 @@ CPieSeries.prototype =
             }
             case historyitem_PieSeries_SetDPt:
             {
-                this.dPt = data.oldPr;
+                findPrAndRemove(this.dPt, data.newPr);
                 break;
             }
             case historyitem_PieSeries_SetExplosion:
@@ -12095,7 +12121,7 @@ CPieSeries.prototype =
             }
             case historyitem_PieSeries_SetDPt:
             {
-                this.dPt = data.newPr;
+                this.dPt.push(data.newPr);
                 break;
             }
             case historyitem_PieSeries_SetExplosion:
@@ -12173,7 +12199,7 @@ CPieSeries.prototype =
             }
             case historyitem_PieSeries_SetDPt:
             {
-                this.dPt = readObject(r);
+                this.dPt.push(readObject(r));
                 break;
             }
             case historyitem_PieSeries_SetExplosion:
@@ -12680,11 +12706,19 @@ CRadarChart.prototype =
 };
 
 
+function copyDPt(oThis, pt)
+{
+    for(var i = 0; i < pt.length; ++i)
+    {
+        oThis.addDPt(pt[i]);
+    }
+}
+
 function CRadarSeries()
 {
     this.cat     = null;
     this.dLbls   = null;
-    this.dPt     = null;
+    this.dPt     = [];
     this.idx     = null;
     this.marker  = null;
     this.order   = null;
@@ -12734,7 +12768,9 @@ CRadarSeries.prototype =
         if(o.dLbls)
             this.setDLbls(o.dLbls);
         if(o.dPt)
-            this.setDPt(o.dPt);
+        {
+            copyDPt(this, o.dPt)
+        }
         if(o.marker)
             this.setMarker(o.marker);
         if(isRealNumber(o.idx))
@@ -12764,10 +12800,10 @@ CRadarSeries.prototype =
         History.Add(this, {Type: historyitem_RadarSeries_SetCat, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
     },
-    setDPt: function(pr)
+    addDPt: function(pr)
     {
         History.Add(this, {Type: historyitem_RadarSeries_SetCat, oldPr: this.dPt, newPr: pr});
-        this.dPt = pr;
+        this.dPt.push(pr);
     },
     setIdx: function(pr)
     {
@@ -12816,7 +12852,7 @@ CRadarSeries.prototype =
             }
             case historyitem_RadarSeries_SetDPt:
             {
-                this.dPt = data.oldPr;
+                findPrAndRemove(this.dPt, data.newPr);
                 break;
             }
             case historyitem_RadarSeries_SetIdx:
@@ -12868,7 +12904,7 @@ CRadarSeries.prototype =
             }
             case historyitem_RadarSeries_SetDPt:
             {
-                this.dPt = data.newPr;
+                this.addDPt(data.newPr);
                 break;
             }
             case historyitem_RadarSeries_SetIdx:
@@ -12946,7 +12982,7 @@ CRadarSeries.prototype =
             }
             case historyitem_RadarSeries_SetDPt:
             {
-                this.dPt = readObject(r);
+                this.dPt.push(readObject(r));
                 break;
             }
             case historyitem_RadarSeries_SetIdx:
@@ -13464,7 +13500,7 @@ CScatterSeries.prototype =
         if(o.dLbls)
             this.setDLbls(o.dLbls);
         if(o.dPt)
-            this.setDPt(o.dPt);
+            copyDPt(this, o.dPt);
         if(o.errBars)
             this.setErrBars(o.errBars);
         if(isRealNumber(o.idx))
@@ -13521,10 +13557,10 @@ CScatterSeries.prototype =
         History.Add(this, {Type: historyitem_ScatterSer_SetDLbls, oldPr: this.dLbls, newPr:pr});
         this.dLbls = pr;
     },
-    setDPt: function(pr)
+    addDPt: function(pr)
     {
         History.Add(this, {Type: historyitem_ScatterSer_SetDPt, oldPr: this.dPt, newPr:pr});
-        this.dPt = pr;
+        this.dPt.push(pr);
     },
     setErrBars: function(pr)
     {
@@ -13588,7 +13624,7 @@ CScatterSeries.prototype =
             }
             case historyitem_ScatterSer_SetDPt:
             {
-                this.dPt = data.oldPr;
+                findPrAndRemove(this.dPt, data.newPr);
                 break;
             }
             case historyitem_ScatterSer_SetErrBars:
@@ -13655,7 +13691,7 @@ CScatterSeries.prototype =
             }
             case historyitem_ScatterSer_SetDPt:
             {
-                this.dPt = data.newPr;
+                this.dPt.push(data.newPr);
                 break;
             }
             case historyitem_ScatterSer_SetErrBars:
@@ -13774,14 +13810,7 @@ CScatterSeries.prototype =
             }
             case historyitem_ScatterSer_SetDPt:
             {
-                if(r.GetBool())
-                {
-                    this.dPt = g_oTableId.Get_ById(r.GetString2());
-                }
-                else
-                {
-                    this.dPt = null;
-                }
+                this.dPt.push(readObject(r));
                 break;
             }
             case historyitem_ScatterSer_SetErrBars:

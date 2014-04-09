@@ -673,7 +673,7 @@ DrawingObjectsController.prototype =
 
     selectObject: function(object, pageIndex)
     {
-        object.select(this, pageIndex)
+        object.select(this, pageIndex);
     },
 
     deselectObject: function(object)

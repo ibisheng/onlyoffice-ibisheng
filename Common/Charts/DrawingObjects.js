@@ -3003,94 +3003,22 @@ function DrawingObjects() {
 			}
 			
 			// Object types
-            if (typeof CChartAsGroup !== "undefined" && drawingObject.graphicObject instanceof  CChartAsGroup) {
-				
-				_this.calcChartInterval(drawingObject.graphicObject.chart);
+            if (drawingObject.graphicObject instanceof  CChartSpace)
+            {
 				drawingObject.graphicObject.drawingBase = drawingObject;
-                drawingObject.graphicObject.setDrawingObjects(_this);
-                
-				if (drawingObject.graphicObject.chartTitle)
-                    drawingObject.graphicObject.chartTitle.drawingObjects = _this;
-					
-                drawingObject.graphicObject.chart.worksheet = worksheet;
-				drawingObject.graphicObject.chart.rebuildSeries();
-				
-                drawingObject.graphicObject.init(theme);
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterInit2Chart, null, null, new UndoRedoDataGraphicObjects(drawingObject.graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+				drawingObject.graphicObject.drawingObjects = this;
+                var metrics = drawingObject.graphicObject.drawingBase.getGraphicObjectMetrics();
+
+                drawingObject.graphicObject.setSpPr(new CSpPr());
+                drawingObject.graphicObject.spPr.setParent(drawingObject.graphicObject);
+                drawingObject.graphicObject.spPr.setXfrm(new CXfrm());
+                drawingObject.graphicObject.spPr.xfrm.setParent(drawingObject.graphicObject.spPr);
+                drawingObject.graphicObject.spPr.xfrm.setOffX(metrics.x);
+                drawingObject.graphicObject.spPr.xfrm.setOffY(metrics.y);
+                drawingObject.graphicObject.spPr.xfrm.setExtX(metrics.extX);
+                drawingObject.graphicObject.spPr.xfrm.setExtY(metrics.extY);
+                drawingObject.graphicObject.recalculate();
                 drawingObject.graphicObject.addToDrawingObjects();
-
-
-                var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
-				aBoundsCheckers.push(boundsChecker);
-            }
-			if (drawingObject.graphicObject instanceof  CShape) {
-				
-				drawingObject.graphicObject.drawingBase = drawingObject;
-				drawingObject.graphicObject.setDrawingObjects(_this);
-                drawingObject.graphicObject.setDrawingDocument(_this.drawingDocument);
-                var xfrm = drawingObject.graphicObject.spPr.xfrm;
-                drawingObject.graphicObject.checkThemeFonts(theme);
-                if (!xfrm)
-                {
-                    drawingObject.graphicObject.setXfrmObject(new CXfrm());
-                }
-                if (isRealObject(drawingObject.graphicObject.drawingBase))
-                {
-                    var metrics = drawingObject.graphicObject.drawingBase.getGraphicObjectMetrics();
-                    drawingObject.graphicObject.spPr.xfrm.setPosition(metrics.x, metrics.y);
-                    drawingObject.graphicObject.spPr.xfrm.setExtents(metrics.extX, metrics.extY);
-                }
-				drawingObject.graphicObject.recalculate(aImagesSync);
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterInit, null, null, new UndoRedoDataGraphicObjects(drawingObject.graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
-				drawingObject.graphicObject.addToDrawingObjects();
-				
-				var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
-				aBoundsCheckers.push(boundsChecker);
-			}
-            if (drawingObject.graphicObject instanceof  CImageShape) {
-
-				aObjectsSync[aObjectsSync.length] = drawingObject;
-                drawingObject.graphicObject.drawingBase = drawingObject;
-				drawingObject.graphicObject.setDrawingDocument(_this.drawingDocument);
-                drawingObject.graphicObject.setDrawingObjects(_this);
-                var xfrm = drawingObject.graphicObject.spPr.xfrm;
-
-                if (!xfrm)
-                {
-                    drawingObject.graphicObject.setXfrmObject(new CXfrm());
-                }
-                if (isRealObject(drawingObject.graphicObject.drawingBase))
-                {
-                    var metrics = drawingObject.graphicObject.drawingBase.getGraphicObjectMetrics();
-                    drawingObject.graphicObject.spPr.xfrm.setPosition(metrics.x, metrics.y);
-                    drawingObject.graphicObject.spPr.xfrm.setExtents(metrics.extX, metrics.extY);
-                }
-                drawingObject.graphicObject.recalculate(aImagesSync);
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateAfterLoad, null, null, new UndoRedoDataGraphicObjects(drawingObject.graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
-                drawingObject.graphicObject.addToDrawingObjects();
-
-            }
-            if (drawingObject.graphicObject instanceof  CGroupShape) {
-
-                drawingObject.graphicObject.drawingBase = drawingObject;
-                drawingObject.graphicObject.setDrawingObjects(_this);
-                var xfrm = drawingObject.graphicObject.spPr.xfrm;
-
-                drawingObject.graphicObject.checkThemeFonts(theme);
-                if (!xfrm)
-                {
-                    drawingObject.graphicObject.setXfrmObject(new CXfrm());
-                }
-                
-                drawingObject.graphicObject.setDrawingDocument(this.drawingDocument);
-                var old_len = aImagesSync.length;
-                drawingObject.graphicObject.initCharts();
-                drawingObject.graphicObject.recalculate(aImagesSync);
-                if (aImagesSync.length > old_len)
-                    aObjectsSync[aObjectsSync.length] = drawingObject;
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateAfterLoad, null, null, new UndoRedoDataGraphicObjects(drawingObject.graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
-                drawingObject.graphicObject.addToDrawingObjects();
-
                 var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
 				aBoundsCheckers.push(boundsChecker);
             }
