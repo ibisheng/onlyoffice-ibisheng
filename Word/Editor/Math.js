@@ -974,7 +974,7 @@ ParaMath.prototype =
                 {
                     oCont.content[Start].Selection_DrawRange(0, 0, SelectionDraw);
 
-
+                    SelectionDraw.FindStart = false;
                     SelectionDraw.W += oCont.WidthToElement[End] - oCont.WidthToElement[Start + 1]; // startPos < endPos !
 
                     oCont.content[End].Selection_DrawRange(0,0, SelectionDraw);
@@ -985,7 +985,6 @@ ParaMath.prototype =
                     SelectionDraw.StartY += oCont.pos.y;
                     SelectionDraw.H = oCont.size.height;
                 }
-
 
             }
             else
