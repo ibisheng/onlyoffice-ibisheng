@@ -308,6 +308,39 @@ CChartsDrawer.prototype =
 		var standartMargin = 13 / pxToMM;
 		var isHBar = (chartSpace.chart.plotArea.chart.getObjectType() == historyitem_type_BarChart && chartSpace.chart.plotArea.chart.barDir != 1) ? true : false;
 		
+		var calculateLeft = 0, calculateRight = 0, calculateTop = 0, calculateBottom = 0;
+		if(chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.xPoints && chartSpace.chart.plotArea.valAx.labels)
+		{
+			var valAx = chartSpace.chart.plotArea.valAx;
+			if(isHBar)
+			{
+				if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
+				{
+					calculateLeft  = valAx.xPoints[0].pos;
+					calculateRight = this.calcProp.widthCanvas / pxToMM - valAx.xPoints[valAx.xPoints.length - 1].pos;
+				}
+				else
+				{
+					calculateLeft  = valAx.xPoints[valAx.xPoints.length - 1].pos;
+					calculateRight = this.calcProp.widthCanvas / pxToMM - valAx.xPoints[0].pos;
+				}
+			}
+			else
+			{
+				if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
+				{
+					calculateTop  = valAx.xPoints[valAx.xPoints.length - 1].pos;
+					calculateBottom = this.calcProp.heightCanvas / pxToMM - valAx.xPoints[valAx.xPoints.length - 1].pos;
+				}
+				else
+				{
+					calculateTop  = valAx.xPoints[0].pos;
+					calculateBottom = this.calcProp.heightCanvas / pxToMM - valAx.xPoints[0].pos;
+				}
+			};
+		};
+
+		
 		//высчитываем выходящие за пределы подписи осей
 		var labelsMargin = this._calculateMarginLabels(chartSpace);
 		var left = labelsMargin.left, right = labelsMargin.right, top = labelsMargin.top, bottom = labelsMargin.bottom;
@@ -383,10 +416,10 @@ CChartsDrawer.prototype =
 		right  += this._getStandartMargin(right, rightKey, rightTextLabels, 0) + rightKey + rightTextLabels;
 		
 		
-		this.calcProp.chartGutter._left = left * pxToMM;
-		this.calcProp.chartGutter._right = right * pxToMM;
-		this.calcProp.chartGutter._top = top * pxToMM;
-		this.calcProp.chartGutter._bottom = bottom * pxToMM;
+		this.calcProp.chartGutter._left = calculateLeft ? calculateLeft * pxToMM : left * pxToMM;
+		this.calcProp.chartGutter._right = calculateRight ? calculateRight * pxToMM : right * pxToMM;
+		this.calcProp.chartGutter._top = calculateTop ? calculateTop * pxToMM : top * pxToMM;
+		this.calcProp.chartGutter._bottom = calculateBottom ? calculateBottom * pxToMM : bottom * pxToMM;
 	},
 	
 	_getStandartMargin: function(labelsMargin, keyMargin, textMargin, topMainTitleMargin)
