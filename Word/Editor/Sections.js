@@ -32,6 +32,16 @@ function CSectionPr(LogicDocument)
     this.LogicDocument = LogicDocument;
 
     this.Borders       = new CSectionBorders();
+    
+    this.FooterFirst   = null;
+    this.FooterEven    = null;
+    this.FooterDefault = null;
+    
+    this.HeaderFirst   = null;
+    this.HeaderEven    = null;
+    this.HeaderDefault = null;
+    
+    this.TitlePage     = false;
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -262,6 +272,104 @@ CSectionPr.prototype =
     {
         return this.Borders.ZOrder;
     },
+    
+    Set_Footer_First : function(Footer)
+    {
+        if ( Footer !== this.FooterFirst )
+        {
+            History.Add( this, { Type : historyitem_Section_Footer_First, Old : this.FooterFirst, New : Footer } );
+            this.FooterFirst = Footer;
+        }
+    },
+    
+    Get_Footer_First : function()
+    {
+        return this.FooterFirst;
+    },
+
+    Set_Footer_Even : function(Footer)
+    {
+        if ( Footer !== this.FooterEven )
+        {
+            History.Add( this, { Type : historyitem_Section_Footer_Even, Old : this.FooterEven, New : Footer } );
+            this.FooterEven = Footer;
+        }
+    },
+
+    Get_Footer_Even : function()
+    {
+        return this.FooterEven;
+    },
+
+    Set_Footer_Default : function(Footer)
+    {
+        if ( Footer !== this.FooterDefault )
+        {
+            History.Add( this, { Type : historyitem_Section_Footer_Default, Old : this.FooterDefault, New : Footer } );
+            this.FooterDefault = Footer;
+        }
+    },
+
+    Get_Footer_Default : function()
+    {
+        return this.FooterDefault;
+    },
+
+    Set_Header_First : function(Header)
+    {
+        if ( Header !== this.HeaderFirst )
+        {
+            History.Add( this, { Type : historyitem_Section_Header_First, Old : this.HeaderFirst, New : Header } );
+            this.HeaderFirst = Header;
+        }
+    },
+
+    Get_Header_First : function()
+    {
+        return this.HeaderFirst;
+    },
+
+    Set_Header_Even : function(Header)
+    {
+        if ( Header !== this.HeaderEven )
+        {
+            History.Add( this, { Type : historyitem_Section_Header_Even, Old : this.HeaderEven, New : Header } );
+            this.HeaderEven = Header;
+        }
+    },
+
+    Get_Header_Even : function()
+    {
+        return this.HeaderEven;
+    },
+
+    Set_Header_Default : function(Header)
+    {
+        if ( Header !== this.HeaderDefault )
+        {
+            History.Add( this, { Type : historyitem_Section_Header_Default, Old : this.HeaderDefault, New : Header } );
+            this.HeaderDefault = Header;
+        }
+    },
+
+    Get_Header_Default : function()
+    {
+        return this.HeaderDefault;
+    },
+    
+    Set_TitlePage : function(Value)
+    {
+        if ( Value !== this.TitlePage )
+        {
+            History.Add( this, { Type : historyitem_Section_TitlePage, Old : this.TitlePage, New : Value } );
+            this.TitlePage = Value;
+        }
+    },
+    
+    Get_TitlePage : function()
+    {
+        return this.TitlePage;
+    },
 //----------------------------------------------------------------------------------------------------------------------
 // Undo/Redo функции
 //----------------------------------------------------------------------------------------------------------------------
@@ -342,6 +450,48 @@ CSectionPr.prototype =
             case historyitem_Section_Borders_ZOrder:
             {
                 this.Borders.ZOrder = Data.Old;
+                break;
+            }
+                
+            case historyitem_Section_Header_First:
+            {
+                this.HeaderFirst = Data.Old;
+                break;
+            }
+
+            case historyitem_Section_Header_Even:
+            {
+                this.HeaderEven = Data.Old;
+                break;
+            }
+
+            case historyitem_Section_Header_Default:
+            {
+                this.HeaderDefault = Data.Old;
+                break;
+            }
+
+            case historyitem_Section_Footer_First:
+            {
+                this.FooterFirst = Data.Old;
+                break;
+            }
+
+            case historyitem_Section_Footer_Even:
+            {
+                this.FooterEven = Data.Old;
+                break;
+            }
+
+            case historyitem_Section_Footer_Default:
+            {
+                this.FooterDefault = Data.Old;
+                break;
+            }
+
+            case historyitem_Section_TitlePage:
+            {
+                this.TitlePage = Data.Old;
                 break;
             }
         }
@@ -426,7 +576,48 @@ CSectionPr.prototype =
                 this.Borders.ZOrder = Data.New;
                 break;
             }
+                
+            case historyitem_Section_Header_First:
+            {
+                this.HeaderFirst = Data.New;
+                break;
+            }
 
+            case historyitem_Section_Header_Even:
+            {
+                this.HeaderEven = Data.New;
+                break;
+            }
+
+            case historyitem_Section_Header_Default:
+            {
+                this.HeaderDefault = Data.New;
+                break;
+            }
+
+            case historyitem_Section_Footer_First:
+            {
+                this.FooterFirst = Data.New;
+                break;
+            }
+
+            case historyitem_Section_Footer_Even:
+            {
+                this.FooterEven = Data.New;
+                break;
+            }
+
+            case historyitem_Section_Footer_Default:
+            {
+                this.FooterDefault = Data.New;
+                break;
+            }
+
+            case historyitem_Section_TitlePage:
+            {
+                this.TitlePage = Data.New;
+                break;
+            }
         }
     },
 
@@ -526,6 +717,37 @@ CSectionPr.prototype =
             {
                 // Byte : Value
                 Writer.WriteByte( Data.New );
+                break;
+            }
+
+            case historyitem_Section_Header_First:            
+            case historyitem_Section_Header_Even:            
+            case historyitem_Section_Header_Default:            
+            case historyitem_Section_Footer_First:            
+            case historyitem_Section_Footer_Even:            
+            case historyitem_Section_Footer_Default:
+            {
+                // Bool : Is null
+                // false ->
+                //      String : Id колонтитула
+                
+                if ( null === Data.New )
+                    Writer.WriteBool( true );
+                else
+                {
+                    Writer.WriteBool( false );
+                    Writer.WriteString2( Data.New.Get_Id() );
+                }
+                
+                break;
+            }
+                
+            case historyitem_Section_TitlePage:
+            {
+                // Bool : TitlePage
+                
+                Writer.WriteBool( Data.New );
+
                 break;
             }
         }
@@ -635,6 +857,99 @@ CSectionPr.prototype =
                 this.Borders.ZOrder = Reader.GetByte();
                 break;
             }
+
+            case historyitem_Section_Header_First:
+            {
+                // Bool : Is null
+                // false ->
+                //      String : Id колонтитула
+
+                if ( true === Reader.GetBool() )
+                    this.HeaderFirst = null;
+                else
+                    this.HeaderFirst = g_oTableId.Get_ById( Reader.GetString2() );
+
+                break;
+            }
+
+            case historyitem_Section_Header_Even:
+            {
+                // Bool : Is null
+                // false ->
+                //      String : Id колонтитула
+
+                if ( true === Reader.GetBool() )
+                    this.HeaderEven = null;
+                else
+                    this.HeaderEven = g_oTableId.Get_ById( Reader.GetString2() );
+
+                break;
+            }
+
+            case historyitem_Section_Header_Default:
+            {
+                // Bool : Is null
+                // false ->
+                //      String : Id колонтитула
+
+                if ( true === Reader.GetBool() )
+                    this.HeaderDefault = null;
+                else
+                    this.HeaderDefault = g_oTableId.Get_ById( Reader.GetString2() );
+
+                break;
+            }
+
+            case historyitem_Section_Footer_First:
+            {
+                // Bool : Is null
+                // false ->
+                //      String : Id колонтитула
+
+                if ( true === Reader.GetBool() )
+                    this.FooterFirst = null;
+                else
+                    this.FooterFirst = g_oTableId.Get_ById( Reader.GetString2() );
+
+                break;
+            }
+
+            case historyitem_Section_Footer_Even:
+            {
+                // Bool : Is null
+                // false ->
+                //      String : Id колонтитула
+
+                if ( true === Reader.GetBool() )
+                    this.FooterEven = null;
+                else
+                    this.FooterEven = g_oTableId.Get_ById( Reader.GetString2() );
+
+                break;
+            }
+
+            case historyitem_Section_Footer_Default:
+            {
+                // Bool : Is null
+                // false ->
+                //      String : Id колонтитула
+
+                if ( true === Reader.GetBool() )
+                    this.FooterDefault = null;
+                else
+                    this.FooterDefault = g_oTableId.Get_ById( Reader.GetString2() );
+
+                break;
+            }
+
+            case historyitem_Section_TitlePage:
+            {
+                // Bool : TitlePage
+
+                this.TitlePage = Reader.GetBool();
+
+                break;
+            }
         }
     },
 
@@ -647,7 +962,8 @@ CSectionPr.prototype =
         // Variable : PageSize
         // Variable : PageMargins
         // Byte     : Type
-        // Variable : Borders
+        // Variable : Borders        
+        // Колонтитулы не пишем в бинарник, при созданиии класса они всегда null, а TitlePage = false
 
         Writer.WriteString2( "" + this.Id );
         Writer.WriteString2( "" + this.LogicDocument.Get_Id() );
@@ -665,6 +981,7 @@ CSectionPr.prototype =
         // Variable : PageMargins
         // Byte     : Type
         // Variable : Borders
+        // Колонтитулы не пишем в бинарник, при созданиии класса они всегда null, а TitlePage = false
 
         this.Id = Reader.GetString2();
         this.LogicDocument = g_oTable.Id.Get_ById( Reader.GetString2() );
