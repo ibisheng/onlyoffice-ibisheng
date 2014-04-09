@@ -1706,7 +1706,6 @@ function Woorksheet(wb, _index, bAddUserId, sId){
 	this.TableParts = [];
 	this.AutoFilter = null;
 	this.oAllCol = null;
-	this.objForRebuldFormula = {};
 	this.aComments = [];
 	this.aCommentsCoords = [];
 	var oThis = this;

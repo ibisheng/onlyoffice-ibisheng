@@ -345,6 +345,10 @@ asc_CCommentData.prototype = {
 		return oReply;
 	},
 
+	asc_getWorksheetId: function () {
+		return this.wsId;
+	},
+
 	//	For collaborative editing
 	getType: function() {
 		return UndoRedoDataTypes.CommentData;
@@ -398,7 +402,7 @@ asc_CCommentData.prototype = {
 			this.nRow = collaborativeEditing.getLockMeRow2(nSheetId, this.nRow);
 		}
 	}
-}
+};
 
 window["Asc"]["asc_CCommentData"] = window["Asc"].asc_CCommentData = asc_CCommentData;
 prot = asc_CCommentData.prototype;
@@ -446,6 +450,8 @@ prot["asc_getRepliesCount"] = prot.asc_getRepliesCount;
 prot["asc_getReply"] = prot.asc_getReply;
 
 prot["asc_addReply"] = prot.asc_addReply;
+
+prot["asc_getWorksheetId"] = prot.asc_getWorksheetId;
 
 //}
 

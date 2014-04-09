@@ -5828,7 +5828,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
-    }
+    };
     this.ReadComment = function(type, length, oCommentCoords, aCommentData)
     {
         var res = c_oSerConstants.ReadOk;
