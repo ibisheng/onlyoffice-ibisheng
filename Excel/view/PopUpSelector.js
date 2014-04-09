@@ -27,6 +27,8 @@
 			this.isFormula		= false;
 			this.isVisible		= false;
 
+			this.skipClose		= false;
+
 			this.fMouseDown		= null;
 			this.fMouseDblClick	= null;
 			this.fMouseOver		= null;
@@ -48,6 +50,16 @@
 				this.fMouseDown = function (event) {t._onMouseDown(event);};
 				this.fMouseDblClick = function (event) {t._onMouseDblClick(event);};
 				this.fMouseOver = function (event) {t._onMouseOver(event);};
+
+				if (window.addEventListener) {
+					window.addEventListener("mousedown", function () {
+						if (t.skipClose) {
+							t.skipClose = false;
+							return;
+						}
+						t.hide();
+					}, false);
+				}
 			}
 		};
 		PopUpSelector.prototype.show = function (isFormula, arrItems, cellRect) {
@@ -158,6 +170,7 @@
 		};
 
 		PopUpSelector.prototype._onMouseDown = function (event) {
+			this.skipClose = true;
 			var element = (event.target || event.srcElement);
 			if (this.isFormula) {
 				this._onChangeSelection(element);
