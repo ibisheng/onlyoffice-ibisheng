@@ -309,7 +309,7 @@ CChartsDrawer.prototype =
 		var isHBar = (chartSpace.chart.plotArea.chart.getObjectType() == historyitem_type_BarChart && chartSpace.chart.plotArea.chart.barDir != 1) ? true : false;
 		
 		var calculateLeft = 0, calculateRight = 0, calculateTop = 0, calculateBottom = 0;
-		if(chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.xPoints && chartSpace.chart.plotArea.valAx.labels)
+		if(chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.labels)
 		{
 			var valAx = chartSpace.chart.plotArea.valAx;
 			if(isHBar)
@@ -329,13 +329,13 @@ CChartsDrawer.prototype =
 			{
 				if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
 				{
-					calculateTop  = valAx.xPoints[valAx.xPoints.length - 1].pos;
-					calculateBottom = this.calcProp.heightCanvas / pxToMM - valAx.xPoints[valAx.xPoints.length - 1].pos;
+					calculateTop  = valAx.yPoints[valAx.yPoints.length - 1].pos;
+					calculateBottom = this.calcProp.heightCanvas / pxToMM - valAx.yPoints[0].pos;
 				}
 				else
 				{
-					calculateTop  = valAx.xPoints[0].pos;
-					calculateBottom = this.calcProp.heightCanvas / pxToMM - valAx.xPoints[0].pos;
+					calculateTop  = valAx.yPoints[valAx.yPoints.length - 1].pos;
+					calculateBottom = this.calcProp.heightCanvas / pxToMM - valAx.yPoints[0].pos;
 				}
 			};
 		};
@@ -604,7 +604,7 @@ CChartsDrawer.prototype =
 				}
 				
 			}
-			else
+			else if(catAx.labels)
 				leftDownPointX = catAx.labels.x;
 
 			
@@ -629,7 +629,7 @@ CChartsDrawer.prototype =
 				}
 				
 			}
-			else
+			else if(catAx.labels)
 				rightUpPointX = catAx.labels.x;
 
 			
@@ -3653,7 +3653,7 @@ drawBarChart.prototype =
 		var widthGraph  = this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right;
 		
 		//TODO - передавать overlap из меню!
-		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 100 : 0;
+		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 1 : 0;
 		var overlap        = this.cShapeDrawer.chart.plotArea.chart.overlap ? this.cShapeDrawer.chart.plotArea.chart.overlap : defaultOverlap;
 		var numCache       = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
 		var width          = widthGraph / numCache.pts.length;
@@ -3661,8 +3661,8 @@ drawBarChart.prototype =
 			width = widthGraph / (numCache.pts.length - 1);
 		
 		
-		var individualBarWidth = width / (this.chartProp.series.length - (this.chartProp.series.length - 1) * (overlap / 100) + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
-		var widthOverLap       = individualBarWidth * (overlap / 100);
+		var individualBarWidth = width / (this.chartProp.series.length - (this.chartProp.series.length - 1) * (overlap) + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
+		var widthOverLap       = individualBarWidth * (overlap);
 		var hmargin            = (this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100 * individualBarWidth) / 2;
 		
 		var height, startX, startY, diffYVal, val, paths, seriesHeight = [], tempValues = [], seria, startYColumnPosition, startXPosition, newStartX, newStartY, prevVal;
@@ -3760,7 +3760,7 @@ drawBarChart.prototype =
 	_getStartYColumnPosition: function (seriesHeight, j, val, yPoints, prevVal)
 	{
 		var startY, diffYVal, height, numCache, tempLogVal, tempPrevLogVal;
-		var nullPositionOX = this.cShapeDrawer.chart.plotArea.valAx && this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase ?  this.chartProp.nullPositionOXLog : this.chartProp.nullPositionOX/*this.cShapeDrawer.chart.plotArea.catAx.posY * this.chartProp.pxToMM*/;
+		var nullPositionOX = this.cShapeDrawer.chart.plotArea.valAx && this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase ?  this.chartProp.nullPositionOXLog : this.cShapeDrawer.chart.plotArea.catAx.posY * this.chartProp.pxToMM;
 		
 		if(this.chartProp.subType == "stacked")
 		{
@@ -7204,7 +7204,7 @@ catAxisChart.prototype =
 		else
 		{
 			//TODO сделать по аналогии с HBAR
-			this.paths.axisLine = this._calculateLine( this.chartProp.chartGutter._left / this.chartProp.pxToMM, nullPoisition / this.chartProp.pxToMM, (this.chartProp.widthCanvas - this.chartProp.chartGutter._right) / this.chartProp.pxToMM, nullPoisition / this.chartProp.pxToMM );
+			this.paths.axisLine = this._calculateLine( this.chartProp.chartGutter._left / this.chartProp.pxToMM, this.chartSpace.chart.plotArea.catAx.posY, (this.chartProp.widthCanvas - this.chartProp.chartGutter._right) / this.chartProp.pxToMM, this.chartSpace.chart.plotArea.catAx.posY );
 		}
 	},
 	
