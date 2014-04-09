@@ -1348,24 +1348,6 @@ CMathBase.prototype =
         this.SelectEnd_Y = endY;
 
 
-        var str = "";
-
-        if(this.constructor.name == "CFraction")
-        {
-            if(startX == 0 && startY == 0)
-                str += "StartContentPos = Numerator;  ";
-            else
-                str += "StartContentPos = Denominator;  ";
-
-            if(endX == 0 && endY == 0)
-                str += "EndContentPos = Numerator ";
-            else
-                str += "EndContentPos = Denominator ";
-
-            console.log(str);
-        }
-
-
         Depth += 2;
 
         var bJustDraw = this.elements[startX][startY].IsJustDraw();
@@ -1380,11 +1362,11 @@ CMathBase.prototype =
         }
 
     },
-    Selection_DrawRange: function(SelectionDraw)
+    /*Selection_DrawRange: function(SelectionDraw)
     {
         if(this.IsSelectEmpty())
             this.elements[this.SelectStart_X][this.SelectStart_Y].Selection_DrawRange(SelectionDraw);
-    },
+    },*/
     Selection_IsEmpty: function()
     {
         var result = false;
@@ -1401,7 +1383,17 @@ CMathBase.prototype =
     Recalculate_CurPos: function(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
     {
         return this.elements[this.CurPos_X][this.CurPos_Y].Recalculate_CurPos(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
+    },
+    GetSelectContent: function()
+    {
+        return this.elements[this.SelectStart_X][this.SelectStart_Y].GetSelectContent();
+    },
+    Selection_DrawRange: function(CurLine, CurPage, SelectionDraw) // первые два параметра нужны только для аналогичной функции в ParaRun
+    {
+        SelectionDraw.W += this.size.width;
+        SelectionDraw.FindStart = false;
     }
+
 
     //////////////////////////
 }

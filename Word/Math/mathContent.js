@@ -7593,7 +7593,6 @@ CMathContent.prototype =
                 {
                     this.content[posStart].Set_SelectionContentPos(StartContentPos, null, Depth, StartFlag, 1);
 
-                    //случай с плейсхолдером рассмотрели выше
                     if(this.content[posEnd].typeObj == MATH_PARA_RUN)
                         this.content[posEnd].Set_SelectionContentPos(null, EndContentPos, Depth, -1, EndFlag);
                 }
@@ -7601,7 +7600,6 @@ CMathContent.prototype =
                 {
                     this.content[posStart].Set_SelectionContentPos(StartContentPos, null, Depth, StartFlag, -1);
 
-                    //случай с плейсхолдером рассмотрели выше
                     if(this.content[posEnd].typeObj == MATH_PARA_RUN)
                         this.content[posEnd].Set_SelectionContentPos(null, EndContentPos, Depth, 1, EndFlag);
                 }
@@ -7609,7 +7607,37 @@ CMathContent.prototype =
         }
 
     },
-    Selection_DrawRange: function(SelectionDraw)
+    GetSelectContent: function()
+    {
+        var startPos = this.SelectStartPos,
+            endPos = this.SelectEndPos;
+
+        if(startPos > endPos)
+        {
+            var temp = startPos;
+            startPos = endPos;
+            endPos = temp;
+        }
+
+        var bEqual = startPos == endPos,
+            bNotSelectComp = bEqual ? this.content[startPos].typeObj === MATH_COMP && this.content[startPos].IsSelectEmpty() : false;
+
+        var result;
+
+        if(bNotSelectComp)
+        {
+            result = this.content[startPos].GetSelectContent(); // startPos == endPos
+        }
+        else
+        {
+            result = {Content: this, Start: startPos, End: endPos};
+        }
+
+        return result;
+
+    },
+    //Selection_DrawRange: function(CurLine, CurPage, SelectionDraw)
+    OLD_Selection_DrawRange: function(SelectionDraw)
     {
         if(this.SelectStartPos !== this.SelectEndPos)
         {
@@ -7638,12 +7666,12 @@ CMathContent.prototype =
 
             SelectionDraw.W += this.WidthToElement[endPos] - this.WidthToElement[startPos + 1]; // startPos < endPos
 
+            SelectionDraw.FindStart = false;
+
 
             if(this.content[endPos].typeObj === MATH_PARA_RUN)
             {
-                var StartX = SelectionDraw.StartX;
                 this.content[endPos].Selection_DrawRange(0, 0, SelectionDraw);
-                SelectionDraw.StartX = StartX;
             }
             else
                 SelectionDraw.W += this.content[endPos].size.width;

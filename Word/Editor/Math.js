@@ -238,6 +238,11 @@ ParaMath.prototype =
         return this.Math.Remove(Direction, bOnAddText);
     },
 
+    GetSelectContent: function()
+    {
+        return this.Root.GetSelectContent();
+    },
+
     Get_CurrentParaPos : function()
     {
         //var CurPos = this.State.ContentPos;
@@ -804,8 +809,6 @@ ParaMath.prototype =
 
                 SearchPos.DiffX = Diff;
 
-                //console.log("SearchPos.X : " + SearchPos.X);
-                //console.log("SearchPos.Y : " + SearchPos.Y);
                 this.Root.Get_ParaContentPosByXY(SearchPos, Depth);
 
                 SearchPos.X = X;
@@ -960,13 +963,38 @@ ParaMath.prototype =
                 var SelectH = SelectionDraw.H,
                     SelectStartY = SelectionDraw.StartY;
 
-                this.Root.Selection_DrawRange(SelectionDraw);
+                //this.Root.Selection_DrawRange(SelectionDraw);
 
-                if(this.Root.selectUse())
+                var result = this.GetSelectContent();
+
+                var Start = result.Start,
+                    End = result.End,
+                    oCont = result.Content;
+
+                SelectionDraw.StartX += oCont.pos.x + oCont.WidthToElement[Start];
+                //SelectionDraw.StartY = oCont.pos.y + oCont.Composition.absPos.y;
+                SelectionDraw.StartY += oCont.pos.y;
+
+                if(Start == End)
+                    oCont.content[Start].Selection_DrawRange(0, 0, SelectionDraw);
+                else
+                {
+                    oCont.content[Start].Selection_DrawRange(0, 0, SelectionDraw);
+                    //SelectionDraw.FindStart = false;
+
+                    SelectionDraw.W += oCont.WidthToElement[End] - oCont.WidthToElement[Start + 1]; // startPos < endPos !
+
+                    oCont.content[End].Selection_DrawRange(0,0, SelectionDraw);
+                }
+
+                SelectionDraw.H = oCont.size.height;
+
+
+                /*if(this.Root.selectUse())
                 {
                     SelectionDraw.H = SelectH;
                     SelectionDraw.StartY = SelectStartY;
-                }
+                }*/
 
             }
             else
