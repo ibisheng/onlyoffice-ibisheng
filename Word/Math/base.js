@@ -1362,11 +1362,6 @@ CMathBase.prototype =
         }
 
     },
-    /*Selection_DrawRange: function(SelectionDraw)
-    {
-        if(this.IsSelectEmpty())
-            this.elements[this.SelectStart_X][this.SelectStart_Y].Selection_DrawRange(SelectionDraw);
-    },*/
     Selection_IsEmpty: function()
     {
         var result = false;
