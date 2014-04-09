@@ -115,8 +115,9 @@
 			if (this.isVisible) {
 				this.selectorStyle.display = "none";
 				this.isVisible = false;
+
+				this._clearList();
 			}
-			this._clearList();
 		};
 		PopUpSelector.prototype.setPosition = function (cellRect) {
 			this.selectorStyle["left"] = (cellRect.asc_getX() + 10) + "px";
@@ -161,6 +162,8 @@
 				default:
 					retVal = true;
 			}
+			if (retVal)
+				this.hide();
 			return retVal;
 		};
 
