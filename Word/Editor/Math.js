@@ -960,11 +960,6 @@ ParaMath.prototype =
             {
             // TODO: ParaMath.Selection_Draw_Range
 
-                var SelectH = SelectionDraw.H,
-                    SelectStartY = SelectionDraw.StartY;
-
-                //this.Root.Selection_DrawRange(SelectionDraw);
-
                 var result = this.GetSelectContent();
 
                 var Start = result.Start,
@@ -972,29 +967,25 @@ ParaMath.prototype =
                     oCont = result.Content;
 
                 SelectionDraw.StartX += oCont.pos.x + oCont.WidthToElement[Start];
-                //SelectionDraw.StartY = oCont.pos.y + oCont.Composition.absPos.y;
-                SelectionDraw.StartY += oCont.pos.y;
 
                 if(Start == End)
                     oCont.content[Start].Selection_DrawRange(0, 0, SelectionDraw);
                 else
                 {
                     oCont.content[Start].Selection_DrawRange(0, 0, SelectionDraw);
-                    //SelectionDraw.FindStart = false;
+
 
                     SelectionDraw.W += oCont.WidthToElement[End] - oCont.WidthToElement[Start + 1]; // startPos < endPos !
 
                     oCont.content[End].Selection_DrawRange(0,0, SelectionDraw);
                 }
 
-                SelectionDraw.H = oCont.size.height;
-
-
-                /*if(this.Root.selectUse())
+                if(!oCont.bRoot)
                 {
-                    SelectionDraw.H = SelectH;
-                    SelectionDraw.StartY = SelectStartY;
-                }*/
+                    SelectionDraw.StartY += oCont.pos.y;
+                    SelectionDraw.H = oCont.size.height;
+                }
+
 
             }
             else
