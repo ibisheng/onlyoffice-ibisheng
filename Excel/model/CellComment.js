@@ -11,7 +11,7 @@
 //-----------------------------------------------------------------------------------
 
 //{ ASC Classes
-
+/** @constructor */
 function asc_CCommentCoords(obj) {
 
 	var _this = this;
@@ -205,7 +205,7 @@ prot["asc_getSizeWithCells"] = prot.asc_getSizeWithCells;
 //-----------------------------------------------------------------------------------
 // CommentData
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CCommentData(obj) {
 
 	var _this = this;
@@ -499,7 +499,7 @@ CompositeCommentData.prototype = {
 //-----------------------------------------------------------------------------------
 // CellCommentator
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CCellCommentator(currentSheet) {
 
 	var _this = this;
