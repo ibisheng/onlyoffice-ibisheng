@@ -4,6 +4,8 @@
  * Time: 14:46
 */
 
+var EvenAndOddHeaders = false;
+
 var Default_Tab_Stop = 12.5;
 
 var Default_Heading_Font = "Arial";
