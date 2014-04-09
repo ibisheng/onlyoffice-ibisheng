@@ -684,6 +684,13 @@
 
 			t.skipKeyPress = true;
 
+			if (!t.isCellEditMode) {
+				if (!t.handlers.trigger("popUpSelectorKeyDown", event)) {
+					stop();
+					return t.__retval;
+				}
+			}
+
 			switch (event.which) {
 
 				case 113: // F2
@@ -803,9 +810,6 @@
 
 				case 38: // up
 					stop();                          // Отключим стандартную обработку браузера нажатия up
-
-					if (!t.handlers.trigger("popUpSelectorKeyDown", event))
-						return t.__retval;
 					dr = event.ctrlKey ? -1.5 : -1;  // Движение стрелками (влево-вправо, вверх-вниз)
 					break;
 
@@ -821,8 +825,6 @@
 						t.handlers.trigger("showAutoComplete");
 						return t.__retval;
 					}
-					if (!t.handlers.trigger("popUpSelectorKeyDown", event))
-						return t.__retval;
 					dr = event.ctrlKey ? +1.5 : +1;  // Движение стрелками (влево-вправо, вверх-вниз)
 					break;
 

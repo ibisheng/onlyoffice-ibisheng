@@ -113,8 +113,16 @@
 			var retVal = false;
 			switch (event.which) {
 				case 9: // Tab
+					if (this.isFormula)
+						this._onMouseDblClick();
+					else
+						retVal = true;
 					break;
 				case 13:  // "enter"
+					if (!this.isFormula && null !== this.selectElement)
+						this._onInsert(this.selectElement.innerHTML);
+					else
+						retVal = true;
 					break;
 				case 27: // Esc
 					this.hide();
@@ -133,13 +141,17 @@
 			return retVal;
 		};
 
+		PopUpSelector.prototype._onInsert = function (value) {
+			this.hide();
+			this.handlers.trigger("insert", value);
+		};
+
 		PopUpSelector.prototype._onMouseDown = function (event) {
 			var element = (event.target || event.srcElement);
 			if (this.isFormula) {
 				this._onChangeSelection(element);
 			} else {
-				this.hide();
-				this.handlers.trigger("insert", element.innerHTML);
+				this._onInsert(element.innerHTML);
 			}
 		};
 		PopUpSelector.prototype._onMouseDblClick = function (event) {
@@ -150,9 +162,8 @@
 				this._onMouseDown(event);
 				return;
 			}
-			var elementVal = (event.target || event.srcElement).innerHTML + "(";
-			this.hide();
-			this.handlers.trigger("insert", elementVal);
+			var elementVal = (event ? (event.target || event.srcElement) : this.selectElement).innerHTML + "(";
+			this._onInsert(elementVal);
 		};
 		PopUpSelector.prototype._onChangeSelection = function (newElement) {
 			if (null === newElement)
