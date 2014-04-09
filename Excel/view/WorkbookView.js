@@ -264,7 +264,8 @@
 
 					// AutoComplete
 					"showAutoComplete":				function () {self._onShowAutoComplete.apply(self, arguments);},
-					"popUpSelectorKeyDown":			function (event) {return self._onPopUpSelectorKeyDown(event);}
+					"popUpSelectorKeyDown":			function (event) {return self._onPopUpSelectorKeyDown(event);},
+					"isPopUpSelectorOpen":			function () {return self.popUpSelector.getVisible();}
 			    });
 
 			    this.model.handlers.add("cleanCellCache", function (wsId, range, canChangeColWidth, bLockDraw) {

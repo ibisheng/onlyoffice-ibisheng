@@ -810,6 +810,9 @@
 
 				case 38: // up
 					stop();                          // Отключим стандартную обработку браузера нажатия up
+					// Если у нас открыто меню для подстановки формулы, то мы не обрабатываем верх/вниз
+					if (t.isCellEditMode && t.handlers.trigger("isPopUpSelectorOpen"))
+						return t.__retval;
 					dr = event.ctrlKey ? -1.5 : -1;  // Движение стрелками (влево-вправо, вверх-вниз)
 					break;
 
@@ -820,6 +823,9 @@
 
 				case 40: // down
 					stop();                          // Отключим стандартную обработку браузера нажатия down
+					// Если у нас открыто меню для подстановки формулы, то мы не обрабатываем верх/вниз
+					if (t.isCellEditMode && t.handlers.trigger("isPopUpSelectorOpen"))
+						return t.__retval;
 					// Обработка Alt + down
 					if (!isViewerMode && !t.isCellEditMode && !t.isSelectionDialogMode && event.altKey) {
 						t.handlers.trigger("showAutoComplete");
