@@ -22,12 +22,14 @@
 			this.selectorStyle	= null;
 			this.selectorList	= null;
 			this.selectElement	= null;
+			this.firstElement	= null;
 
 			this.isFormula		= false;
 			this.isVisible		= false;
 
 			this.fMouseDown		= null;
 			this.fMouseDblClick	= null;
+			this.fMouseOver		= null;
 
 			this._init();
 			return this;
@@ -45,6 +47,7 @@
 
 				this.fMouseDown = function (event) {t._onMouseDown(event);};
 				this.fMouseDblClick = function (event) {t._onMouseDblClick(event);};
+				this.fMouseOver = function (event) {t._onMouseOver(event);};
 			}
 		};
 		PopUpSelector.prototype.show = function (isFormula, arrItems, cellRect) {
@@ -56,11 +59,15 @@
 			}
 			this.isFormula = isFormula;
 
-			var item;
+			var item, isFirst;
 			for (var i = 0; i < arrItems.length; ++i) {
 				item = document.createElement("li");
+				isFirst = (0 === i);
+				if (isFirst)
+					this.firstElement = item;
+
 				if (this.isFormula) {
-					if (0 === i) {
+					if (isFirst) {
 						this.selectElement = item;
 						item.className = "selected";
 					}
@@ -72,6 +79,9 @@
 				if (item.addEventListener) {
 					item.addEventListener("mousedown"	, this.fMouseDown		, false);
 					item.addEventListener("dblclick"	, this.fMouseDblClick	, false);
+					if (!this.isFormula) {
+						item.addEventListener("mouseover", this.fMouseOver, false);
+					}
 				}
 
 				this.selectorList.appendChild(item);
@@ -106,6 +116,7 @@
 		PopUpSelector.prototype._clearList = function () {
 			this.selectorList.innerHTML = "";
 			this.selectElement = null;
+			this.firstElement = null;
 			this.isFormula = false;
 		};
 
@@ -128,12 +139,12 @@
 					this.hide();
 					break;
 				case 38: // Up
-					if (this.isFormula)
-						this._onChangeSelection(this.selectElement.previousSibling);
+					this._onChangeSelection(null !== this.selectElement ?
+						this.selectElement.previousSibling : this.firstElement);
 					break;
 				case 40: // Down
-					if (this.isFormula)
-						this._onChangeSelection(this.selectElement.nextSibling);
+					this._onChangeSelection(null !== this.selectElement ?
+						this.selectElement.nextSibling : this.firstElement);
 					break;
 				default:
 					retVal = true;
@@ -164,6 +175,13 @@
 			}
 			var elementVal = (event ? (event.target || event.srcElement) : this.selectElement).innerHTML + "(";
 			this._onInsert(elementVal);
+		};
+		PopUpSelector.prototype._onMouseOver = function (event) {
+			if (this.isFormula)
+				return;
+
+			var element = (event.target || event.srcElement);
+			this._onChangeSelection(element);
 		};
 		PopUpSelector.prototype._onChangeSelection = function (newElement) {
 			if (null === newElement)
