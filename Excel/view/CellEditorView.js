@@ -227,9 +227,10 @@
 					t.input.addEventListener("drop"		, function (e) {e.preventDefault(); return false;}									, false);
 				}
 
-				this.fKeyDown		= function () {
-					t._keyDownFormulaSelector.apply(t, arguments);
-					return t._onWindowKeyDown.apply(t, arguments);
+				this.fKeyDown		= function (event) {
+					if (t.handlers.trigger("popUpSelectorKeyDown", event))
+						return t._onWindowKeyDown(event);
+					return false;
 				};
 				this.fKeyPress		= function () {return t._onWindowKeyPress.apply(t, arguments);};
 				this.fKeyUp			= function () {return t._onWindowKeyUp.apply(t, arguments);};

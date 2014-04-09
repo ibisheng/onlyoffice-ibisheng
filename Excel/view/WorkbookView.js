@@ -87,6 +87,8 @@
 
 			this.popUpSelector = null;
 			this.formulasList = null;	// Список всех формул
+			this.lastFormulaPos = -1; 	// Последняя позиция формулы
+			this.lastFormulaName = "";	// Последний кусок формулы
 
 			this._lockDraw = false;
 
@@ -261,7 +263,8 @@
 					"moveFrozenAnchorHandleDone":	function () {self._onMoveFrozenAnchorHandleDone.apply(self, arguments);},
 
 					// AutoComplete
-					"showAutoComplete":				function () {self._onShowAutoComplete.apply(self, arguments);}
+					"showAutoComplete":				function () {self._onShowAutoComplete.apply(self, arguments);},
+					"popUpSelectorKeyDown":			function (event) {return self._onPopUpSelectorKeyDown(event);}
 			    });
 
 			    this.model.handlers.add("cleanCellCache", function (wsId, range, canChangeColWidth, bLockDraw) {
@@ -416,13 +419,16 @@
 							    self.handlers.trigger("asc_onCanRedoChanged", bCanRedo);
 						    },
 							"applyCloseEvent"			: function () {self.controller._onWindowKeyDown.apply(self.controller, arguments);},
-							"isViewerMode"				: function () {return self.controller.settings.isViewerMode;}
+							"isViewerMode"				: function () {return self.controller.settings.isViewerMode;},
+							"popUpSelectorKeyDown"	: function (event) {return self._onPopUpSelectorKeyDown(event);}
 					    },
 					    /*settings*/{
 						    font: this.defaultFont
 					    });
 
-				this.popUpSelector = new asc_PS(this.element);
+				this.popUpSelector = new asc_PS(this.element, /*handlers*/{
+					"insert"	: function () {self._onPopUpSelectorInsert.apply(self, arguments);}
+				});
 			}
 
 			this.clipboard.Api = this.Api;
@@ -1347,14 +1353,31 @@
 					}
 				}
 			}
-			if (0 < arrResult.length)
+			if (0 < arrResult.length) {
 				this.popUpSelector.show(true, arrResult, this.getWorksheet().getActiveCellCoord());
-			else
+				this.lastFormulaPos = formulaPos;
+				this.lastFormulaName = formulaName;
+			}
+			else {
 				this.popUpSelector.hide();
+				this.lastFormulaPos = -1;
+				this.lastFormulaName = "";
+			}
+		};
+		WorkbookView.prototype._onPopUpSelectorKeyDown = function (event) {
+			if (!this.popUpSelector.getVisible())
+				return true;
+			return this.popUpSelector.onKeyDown(event);
+		};
+		WorkbookView.prototype._onPopUpSelectorInsert = function (value) {
+			if (this.controller.isCellEditMode)
+				this.cellEditor.replaceText(this.lastFormulaPos, this.lastFormulaName.length, value);
+			else
+				this.getWorksheet().setSelectionInfo("value", value, /*onlyActive*/true);
 		};
 
 		// Вставка формулы в редактор
-		WorkbookView.prototype.insertFormulaInEditor = function (functionName, autoComplet) {
+		WorkbookView.prototype.insertFormulaInEditor = function (functionName, autoComplete) {
 			var t = this;
 			var ws = this.getWorksheet();
 
@@ -1368,8 +1391,8 @@
 				// Он закрыт
 				var cellRange = null;
 				// Если нужно сделать автозаполнение формулы, то ищем ячейки)
-				if (autoComplet) {
-					cellRange = ws.autoCompletFormula(functionName);
+				if (autoComplete) {
+					cellRange = ws.autoCompleteFormula(functionName);
 				}
 				if (cellRange) {
 					if (cellRange.notEditCell) {
@@ -1645,15 +1668,6 @@
 
 			return printPagesData;
 		};
-
-//		не используется
-//		WorkbookView.prototype.setCellValue = function (v, pos, len) {
-//			if (!this.controller.isCellEditMode) {
-//				this.getWorksheet().setSelectionInfo("value", v, /*onlyActive*/true);
-//			} else {
-//				this.cellEditor.replaceText(pos, len, v);
-//			}
-//		};
 
 		WorkbookView.prototype._initCommentsToSave  = function () {
 			for (var wsKey in this.wsViews)

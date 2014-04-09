@@ -158,5 +158,8 @@
     white-space: nowrap;
 }
 #apiPopUpList li:hover {
-    background-color: rgba(105, 119, 62, 0.2);
+    background-color: #D8DADC;
+}
+#apiPopUpList li.selected {
+    background-color: #7d858c;
 }

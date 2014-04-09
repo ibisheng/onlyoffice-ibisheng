@@ -11,18 +11,29 @@
  	 * @param {undefined} undefined
  	 */
 	function($, window, undefined) {
-		function PopUpSelector(element) {
+		var asc		= window["Asc"];
+		var asc_HL	= asc.HandlersList;
+
+		function PopUpSelector(element, handlers) {
+			this.handlers		= new asc_HL(handlers);
+
 			this.element		= element;
 			this.selector		= null;
 			this.selectorStyle	= null;
 			this.selectorList	= null;
+			this.selectElement	= null;
 
+			this.isFormula		= false;
 			this.isVisible		= false;
+
+			this.fMouseDown		= null;
+			this.fMouseDblClick	= null;
 
 			this._init();
 			return this;
 		}
 		PopUpSelector.prototype._init = function () {
+			var t = this;
 			if (null != this.element) {
 				this.selector = document.createElement("div");
 				this.selectorStyle = this.selector.style;
@@ -31,6 +42,9 @@
 
 				this.element.appendChild(this.selector);
 				this.selectorList = document.getElementById("apiPopUpList");
+
+				this.fMouseDown = function (event) {t._onMouseDown(event);};
+				this.fMouseDblClick = function (event) {t._onMouseDblClick(event);};
 			}
 		};
 		PopUpSelector.prototype.show = function (isFormula, arrItems, cellRect) {
@@ -40,25 +54,25 @@
 				this.selectorStyle.display = "block";
 				this.isVisible = true;
 			}
+			this.isFormula = isFormula;
 
 			var item;
 			for (var i = 0; i < arrItems.length; ++i) {
 				item = document.createElement("li");
-				if (isFormula) {
+				if (this.isFormula) {
+					if (0 === i) {
+						this.selectElement = item;
+						item.className = "selected";
+					}
 					item.innerHTML = arrItems[i].name;
 					item.setAttribute("title", arrItems[i].arg);
 				} else
 					item.innerHTML = arrItems[i];
 
-				/*
-				item.ondblclick = function(e) {
-					if ( e && (e.button === 0) ) {
-						var formulaName = this.innerText || this.textContent;
-						var insertText = formulaName.substring(_this.input.value.length - 1) + "(";
-						_this._addChars(insertText);
-						_this._removeFormulaSelector();
-					}
-				}*/
+				if (item.addEventListener) {
+					item.addEventListener("mousedown"	, this.fMouseDown		, false);
+					item.addEventListener("dblclick"	, this.fMouseDblClick	, false);
+				}
 
 				this.selectorList.appendChild(item);
 			}
@@ -91,6 +105,64 @@
 		};
 		PopUpSelector.prototype._clearList = function () {
 			this.selectorList.innerHTML = "";
+			this.selectElement = null;
+			this.isFormula = false;
+		};
+
+		PopUpSelector.prototype.onKeyDown = function (event) {
+			var retVal = false;
+			switch (event.which) {
+				case 9: // Tab
+					break;
+				case 13:  // "enter"
+					break;
+				case 27: // Esc
+					this.hide();
+					break;
+				case 38: // Up
+					if (this.isFormula)
+						this._onChangeSelection(this.selectElement.previousSibling);
+					break;
+				case 40: // Down
+					if (this.isFormula)
+						this._onChangeSelection(this.selectElement.nextSibling);
+					break;
+				default:
+					retVal = true;
+			}
+			return retVal;
+		};
+
+		PopUpSelector.prototype._onMouseDown = function (event) {
+			var element = (event.target || event.srcElement);
+			if (this.isFormula) {
+				this._onChangeSelection(element);
+			} else {
+				this.hide();
+				this.handlers.trigger("insert", element.innerHTML);
+			}
+		};
+		PopUpSelector.prototype._onMouseDblClick = function (event) {
+			if (!this.isVisible)
+				return;
+
+			if (!this.isFormula) {
+				this._onMouseDown(event);
+				return;
+			}
+			var elementVal = (event.target || event.srcElement).innerHTML + "(";
+			this.hide();
+			this.handlers.trigger("insert", elementVal);
+		};
+		PopUpSelector.prototype._onChangeSelection = function (newElement) {
+			if (null === newElement)
+				return;
+
+			if (null !== this.selectElement)
+				this.selectElement.className = "";
+
+			this.selectElement = newElement;
+			this.selectElement.className = "selected";
 		};
 
 		/*

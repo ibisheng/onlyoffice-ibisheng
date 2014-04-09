@@ -752,7 +752,7 @@
 		};
 
 		// Автодополняет формулу диапазоном, если это возможно
-		WorksheetView.prototype.autoCompletFormula = function (functionName) {
+		WorksheetView.prototype.autoCompleteFormula = function (functionName) {
 			var t = this;
 			this.activeRange.normalize();
 			var ar = this.activeRange;
@@ -906,7 +906,7 @@
 					}
 				}
 
-				var onAutoCompletFormula = function (isSuccess) {
+				var onAutoCompleteFormula = function (isSuccess) {
 					if (false === isSuccess)
 						return;
 
@@ -921,7 +921,7 @@
 				};
 
 				// Можно ли применять автоформулу
-				this._isLockedCells (changedRange, /*subType*/null, onAutoCompletFormula);
+				this._isLockedCells (changedRange, /*subType*/null, onAutoCompleteFormula);
 
 				result.notEditCell = true;
 				return result;

@@ -2865,16 +2865,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.wb.restoreFocus();
 			},
 
-//			/**
-//			 * Устанавливает текст в ячейке или в редакторе ячейки
-//			 * @param {String} v    новый текст
-//			 * @param {Number} pos  позиция текста в редакторе (для редактора ячейки)
-//			 * @param {Number} len  длина замещаемого текста (для редактора ячейки)
-//			 */
-//			asc_setCellValue: function (v, pos, len) {
-//				this.wb.setCellValue(v, pos, len);
-//			}, - не используется (и не стоит так делать)
-
 			asc_setCellFormat: function (format) {
 				this.wb.getWorksheet().setSelectionInfo("format", format);
 				this.wb.restoreFocus();
@@ -3723,7 +3713,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_setCellTextColor"] = prot.asc_setCellTextColor;
 		prot["asc_setCellBackgroundColor"] = prot.asc_setCellBackgroundColor;
 		prot["asc_setCellBorders"] = prot.asc_setCellBorders;
-		//prot["asc_setCellValue"] = prot.asc_setCellValue; - не используется (и не стоит так делать)
 		prot["asc_setCellFormat"] = prot.asc_setCellFormat;
         prot["asc_setCellAngle"] = prot.asc_setCellAngle;
 		prot["asc_setCellStyle"] = prot.asc_setCellStyle;
