@@ -4169,6 +4169,19 @@ ParaDrawing.prototype =
         this.Height       = this.H;
         this.WidthVisible = this.W;
     },
+    
+    Save_RecalculateObject : function()
+    {
+        return null;
+    },
+    
+    Load_RecalculateObject : function(RecalcObj)
+    {
+    },
+    
+    Prepeare_RecalculateObject : function()
+    {
+    },
 
     Is_RealContent : function()
     {
@@ -7185,55 +7198,35 @@ function ParaPageNum()
     this.Type = para_PageNum;
 
     this.FontKoef = 1;
+    
+    this.NumWidths = [];
+    
+    this.Widths = [];
+    this.String = [];
+    
+    this.Width        = 0;
+    this.Height       = 0;
+    this.WidthVisible = 0;
 }
 
 ParaPageNum.prototype =
 {
-    Draw : function(X,Y,Context, Value, Align)
+    Draw : function(X, Y, Context)
     {
         // Value - реальное значение, которое должно быть отрисовано.
         // Align - прилегание параграфа, в котором лежит данный номер страницы.
 
-        var sValue = "" + (Value + 1);
-
-        g_oTextMeasurer.SetTextPr( Context.GetTextPr() );
-        g_oTextMeasurer.SetFontSlot( fontslot_ASCII, this.FontKoef );
-
-        var RealWidth = 0;
-        for ( var Index = 0; Index < sValue.length; Index++ )
-        {
-            var Char = sValue.charAt(Index);
-            RealWidth += g_oTextMeasurer.Measure( Char ).Width;
-        }
+        var Len = this.String.length;
 
         var _X = X;
         var _Y = Y;
 
-        switch(Align)
-        {
-            case align_Left:
-            {
-                _X = X;
-                break;
-            }
-            case align_Right:
-            {
-                _X = X + this.Width - RealWidth;
-                break;
-            }
-            case align_Center:
-            {
-                _X = X + (this.Width - RealWidth) / 2;
-                break;
-            }
-        }
-
         Context.SetFontSlot( fontslot_ASCII, this.FontKoef );
-        for ( var Index = 0; Index < sValue.length; Index++ )
+        for ( var Index = 0; Index < Len; Index++ )
         {
-            var Char = sValue.charAt(Index);
+            var Char = this.String.charAt(Index);
             Context.FillText( _X, _Y, Char );
-            _X += g_oTextMeasurer.Measure( Char ).Width;
+            _X += this.Widths[Index];
         }
     },
 
@@ -7242,20 +7235,52 @@ ParaPageNum.prototype =
         this.FontKoef = TextPr.Get_FontKoef();
         Context.SetFontSlot( fontslot_ASCII, this.FontKoef );
 
-        var Width = 0;
         for ( var Index = 0; Index < 10; Index++ )
         {
-            var TempW = Context.Measure( "" + Index ).Width;
-            if ( Width < TempW )
-                Width = TempW;
+            this.NumWidths[Index] = Context.Measure( "" + Index ).Width;
         }
 
-        // Выделяем место под 4 знака
-        Width *= 4;
-
-        this.Width        = Width;
+        this.Width        = 0;
         this.Height       = 0;
-        this.WidthVisible = Width;
+        this.WidthVisible = 0;
+    },
+    
+    Set_Page : function(PageNum)
+    {
+        this.String = "" + (PageNum + 1);
+        var Len = this.String.length;
+
+        var RealWidth = 0;
+        for ( var Index = 0; Index < Len; Index++ )
+        {
+            var Char = parseInt(this.String.charAt(Index));
+            
+            this.Widths[Index] = this.NumWidths[Char];
+            RealWidth         += this.NumWidths[Char];
+        }
+        
+        this.Width        = RealWidth;
+        this.WidthVisible = RealWidth;
+    },
+
+    Save_RecalculateObject : function()
+    {
+        return new CPageNumRecalculateObject(this.Widths, this.String, this.Width);
+    },
+
+    Load_RecalculateObject : function(RecalcObj)
+    {
+        this.Widths = RecalcObj.Widths;
+        this.String = RecalcObj.String;
+        
+        this.Width  = RecalcObj.Width;
+        this.WidthVisible = this.Width;
+    },
+
+    Prepare_RecalculateObject : function()
+    {
+        this.Widths = [];
+        this.String = "";
     },
 
     Document_CreateFontCharMap : function(FontCharMap)
@@ -7293,6 +7318,13 @@ ParaPageNum.prototype =
     {
     }
 };
+
+function CPageNumRecalculateObject(Widths, String, Width)
+{
+    this.Widths = Widths;
+    this.String = String;
+    this.Width  = Width;
+}
 
 
 // Класс ParaFlowObjectAnchor
