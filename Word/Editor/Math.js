@@ -115,7 +115,7 @@ ParaMath.prototype =
     {		
         if(sText)
         {			
-            var MathRun = new ParaRun(this.Paragraph, true, this.Root);
+            var MathRun = new ParaRun(this.Paragraph, true);
 			
 			var Pos = oElem.CurPos,
 				PosEnd = Pos + 1;
@@ -982,7 +982,7 @@ ParaMath.prototype =
                 {
                     oCont.content[Start].Selection_DrawRange(0, 0, SelectionDraw);
 
-                    SelectionDraw.FindStart = false;
+                    SelectionDraw.FindStart = false; // выставляем здесь флаг, для того чтобы правильно отрисовался селект для случая пустой ран мат. объект пустой ран
                     SelectionDraw.W += oCont.WidthToElement[End] - oCont.WidthToElement[Start + 1]; // startPos < endPos !
 
                     oCont.content[End].Selection_DrawRange(0,0, SelectionDraw);

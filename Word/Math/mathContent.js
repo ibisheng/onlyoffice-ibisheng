@@ -1193,14 +1193,15 @@ CMathContent.prototype =
             obj.setComposition(this.Composition);
             obj.setArgSize(this.argSize);
 
-            if(this.content.length == 0)
+            this.content.push(obj);
+
+            /*if(this.content.length == 0)
             {
                 this.content.push(new ParaRun(this.Composition.Parent.Paragraph, true));
                 //this.CurPos++;
             }
+            this.content.push(new ParaRun(this.Composition.Parent.Paragraph, true));*/
 
-            this.content.push(obj);
-            this.content.push(new ParaRun(this.Composition.Parent.Paragraph, true));
 
             //this.CurPos += 2;
 
@@ -7487,6 +7488,7 @@ CMathContent.prototype =
 
         return flag;
     },
+
     /// Position for Paragraph
     Get_ParaContentPosByXY: function(SearchPos, Depth)
     {
@@ -7694,6 +7696,53 @@ CMathContent.prototype =
     GetId : function()
     {
         return this.Id;
+    },
+    SetRunEmptyToContent: function(bAll)
+    {
+        var current = null, left = null;
+
+        var NewContent = [];
+
+        // После чтения из файла формулы, выставить курсор в конец !
+        var len = this.content.length;
+
+        for(var i = 0; i < len; i++)
+        {
+            current = this.content[i];
+
+            var bLeftRun  = left !== null ? left.typeObj == MATH_PARA_RUN : false,
+                bRightRun = i < len - 1 ? this.content[i + 1].typeObj === MATH_PARA_RUN : false;
+
+            var bCurrComp = current.typeObj == MATH_COMP,
+                bCurrEmptyRun = current.typeObj == MATH_PARA_RUN && current.Is_Empty();
+
+            var bDeleteEmptyRun = bCurrEmptyRun && (bLeftRun || bRightRun);
+
+            if(bCurrComp && !bLeftRun) // добавление пустого Run перед мат объектом
+            {
+                NewContent.push( new ParaRun(this.Composition.Parent.Paragraph, true) );
+                NewContent.push( this.content[i] ); // Math Object
+
+                this.content[i].SetRunEmptyToContent(bAll);
+
+                left = current;
+
+            }
+            else if(! bDeleteEmptyRun )
+            {
+                NewContent.push(this.content[i]);
+                left = current;
+            }
+        }
+
+        if(this.content[len - 1].typeObj == MATH_COMP)
+        {
+            NewContent.push( new ParaRun(this.Composition.Parent.Paragraph, true) );
+        }
+
+        this.content = NewContent;
+
+
     },
     //////////////////////////
 

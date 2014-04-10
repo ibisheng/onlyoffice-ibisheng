@@ -1387,8 +1387,13 @@ CMathBase.prototype =
     {
         SelectionDraw.W += this.size.width;
         SelectionDraw.FindStart = false;
+    },
+    SetRunEmptyToContent: function(bAll)
+    {
+        for(var i=0; i < this.nRow; i++)
+            for(var j = 0; j < this.nCol; j++)
+                this.elements[i][j].SetRunEmptyToContent(bAll);
     }
-
 
     //////////////////////////
 }
