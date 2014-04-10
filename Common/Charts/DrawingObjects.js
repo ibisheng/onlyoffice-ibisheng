@@ -46,7 +46,7 @@ function getFullImageSrc(src) {
     }
 	else
 		return src;
-};
+}
 
 function getCurrentTime() {
 	var currDate = new Date();

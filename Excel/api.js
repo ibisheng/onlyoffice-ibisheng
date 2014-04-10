@@ -2703,6 +2703,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				return this.wb.getWorksheet().getActiveCellCoord();
 			},
 
+			// Получить координаты для каких-либо действий (для общей схемы)
+			asc_getAnchorPosition: function () {
+				return this.asc_getActiveCellCoord();
+			},
+
 			// Получаем свойство: редактируем мы сейчас или нет
 			asc_getCellEditMode: function () {
 				return this.wb.getCellEditMode();
@@ -3701,6 +3706,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		// Cell interface
 		prot["asc_getCellInfo"] = prot.asc_getCellInfo;
 		prot["asc_getActiveCellCoord"] = prot.asc_getActiveCellCoord;
+		prot["asc_getAnchorPosition"] = prot.asc_getAnchorPosition;
 		prot["asc_setCellFontName"] = prot.asc_setCellFontName;
 		prot["asc_setCellFontSize"] = prot.asc_setCellFontSize;
 		prot["asc_setCellBold"] = prot.asc_setCellBold;

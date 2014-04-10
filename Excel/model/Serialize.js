@@ -2300,15 +2300,16 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 			
 		if(ws.aComments.length > 0 && ws.aCommentsCoords.length > 0)
 			this.bs.WriteItem(c_oSerWorksheetsTypes.Comments, function(){oThis.WriteComments(ws.aComments, ws.aCommentsCoords);});
-		
+
+		var oBinaryTableWriter;
 		if(null != ws.AutoFilter && !this.isCopyPaste)
 		{
-			var oBinaryTableWriter = new BinaryTableWriter(this.memory, this.aDxfs);
+			oBinaryTableWriter = new BinaryTableWriter(this.memory, this.aDxfs);
 			this.bs.WriteItem(c_oSerWorksheetsTypes.Autofilter, function(){oBinaryTableWriter.WriteAutoFilter(ws.AutoFilter);});
 		}
 		if(null != ws.TableParts && ws.TableParts.length > 0)
 		{
-			var oBinaryTableWriter = new BinaryTableWriter(this.memory, this.aDxfs, this.isCopyPaste);
+			oBinaryTableWriter = new BinaryTableWriter(this.memory, this.aDxfs, this.isCopyPaste);
 			this.bs.WriteItem(c_oSerWorksheetsTypes.TableParts, function(){oBinaryTableWriter.Write(ws.TableParts);});
 		}
     };
@@ -3194,27 +3195,27 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 	this.WriteComments = function(aComments, aCommentsCoords)
 	{
 		var oThis = this;
-		var oNewComments = {};
-		for(var i = 0, length = aComments.length; i < length; ++i)
+		var oNewComments = {}, i, length, elem, nRow, nCol, row, comment;
+		for(i = 0, length = aComments.length; i < length; ++i)
 		{
 			//write only active comments, if copy/paste
 			if(this.isCopyPaste && !this.isCopyPaste.contains(aComments[i].nCol, aComments[i].nRow))
 				 continue;
 				
-			var elem = aComments[i];
-			var nRow = elem.asc_getRow();
+			elem = aComments[i];
+			nRow = elem.asc_getRow();
 			if(null == nRow)
 				nRow = 0;
-			var nCol = elem.asc_getCol();
+			nCol = elem.asc_getCol();
 			if(null == nCol)
 				nCol = 0;
-			var row = oNewComments[nRow];
+			row = oNewComments[nRow];
 			if(null == row)
 			{
 				row = {};
 				oNewComments[nRow] = row;
 			}
-			var comment = row[nCol];
+			comment = row[nCol];
 			if(null == comment)
 			{
 				comment = {data: [], coord: null};
@@ -3222,25 +3223,25 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 			}
 			comment.data.push(elem);
 		}
-		for(var i = 0, length = aCommentsCoords.length; i < length; ++i)
+		for(i = 0, length = aCommentsCoords.length; i < length; ++i)
 		{
 			//write only active comments, if copy/paste
 			if(this.isCopyPaste && !this.isCopyPaste.contains(aCommentsCoords[i].nCol, aCommentsCoords[i].nRow))
 				continue;
-			var elem = aCommentsCoords[i];
-			var nRow = elem.asc_getRow();
+			elem = aCommentsCoords[i];
+			nRow = elem.asc_getRow();
 			if(null == nRow)
 				nRow = 0;
-			var nCol = elem.asc_getCol();
+			nCol = elem.asc_getCol();
 			if(null == nCol)
 				nCol = 0;
-			var row = oNewComments[nRow];
+			row = oNewComments[nRow];
 			if(null == row)
 			{
 				row = {};
 				oNewComments[nRow] = row;
 			}
-			var comment = row[nCol];
+			comment = row[nCol];
 			if(null == comment)
 			{
 				comment = {data: [], coord: null};
@@ -3248,12 +3249,12 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 			}
 			comment.coord = elem;
 		}
-		for(var i in oNewComments)
+		for(i in oNewComments)
 		{
-			var row = oNewComments[i];
+			row = oNewComments[i];
 			for(var j in row)
 			{
-				var comment = row[j];
+				comment = row[j];
 				if(null == comment.coord || 0 == comment.data.length)
 					continue;
 				var coord = comment.coord;
@@ -5082,17 +5083,18 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 			this.aHyperlinks = [];
             var oNewWorksheet = new Woorksheet(this.wb, wb.aWorksheets.length, false);
             res = this.bcr.Read1(length, function(t,l){
-                    return oThis.ReadWorksheet(t,l, oNewWorksheet);
-                });
+				return oThis.ReadWorksheet(t,l, oNewWorksheet);
+			});
 			//merged
-			for(var i = 0, length = this.aMerged.length; i < length; ++i)
+			var i;
+			for(i = 0, length = this.aMerged.length; i < length; ++i)
 			{
 				var range = oNewWorksheet.getRange2(this.aMerged[i]);
 				if(null != range)
 					range.mergeOpen();
 			}
 			//hyperlinks
-			for(var i = 0, length = this.aHyperlinks.length; i < length; ++i)
+			for(i = 0, length = this.aHyperlinks.length; i < length; ++i)
 			{
 				var hyperlink = this.aHyperlinks[i];
 				if (null !== hyperlink.Ref)
@@ -5150,7 +5152,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 					oTo.CustomWidth = oFrom.CustomWidth;
 				if(oTo.index + 1 > oWorksheet.nColsCount)
                     oWorksheet.nColsCount = oTo.index + 1;
-			}
+			};
 			//если есть стиль последней колонки, назначаем его стилем всей таблицы и убираем из колонок
 			var oAllCol = null;
 			if(aTempCols.length > 0)
@@ -5250,12 +5252,10 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
         {
 			oBinary_TableReader = new Binary_TableReader(this.stream, oWorksheet, this.Dxfs);
 			oBinary_TableReader.Read(length, oWorksheet.TableParts);
-        }
-        else if ( c_oSerWorksheetsTypes.Comments == type )
-        {
+        } else if ( c_oSerWorksheetsTypes.Comments == type ) {
 			res = this.bcr.Read1(length, function(t,l){
-					return oThis.ReadComments(t,l, oWorksheet);
-				});
+				return oThis.ReadComments(t,l, oWorksheet);
+			});
         } else if (c_oSerWorksheetsTypes.ConditionalFormatting === type) {
 			oConditionalFormatting = new Asc.CConditionalFormatting();
 			res = this.bcr.Read1(length, function (t, l) {
@@ -5806,10 +5806,11 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 			var oCommentCoords = new Asc.asc_CCommentCoords();
 			var aCommentData = [];
             res = this.bcr.Read2Spreadsheet(length, function(t,l){
-					return oThis.ReadComment(t,l, oCommentCoords, aCommentData);
-				});
+				return oThis.ReadComment(t,l, oCommentCoords, aCommentData);
+			});
 			//todo проверка
-			for(var i = 0, length = aCommentData.length; i < length; ++i)
+			var i;
+			for(i = 0, length = aCommentData.length; i < length; ++i)
 			{
 				var elem = aCommentData[i];
 				elem.asc_putRow(oCommentCoords.asc_getRow());

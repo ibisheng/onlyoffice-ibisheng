@@ -137,7 +137,7 @@ asc_CCommentCoords.prototype = {
 
 	asc_setSizeWithCells: function(val) { this.bSizeWithCells = val; },
 	asc_getSizeWithCells: function() { return this.bSizeWithCells; }
-}
+};
 
 window["Asc"]["asc_CCommentCoords"] = window["Asc"].asc_CCommentCoords = asc_CCommentCoords;
 var prot = asc_CCommentCoords.prototype;
@@ -276,7 +276,7 @@ function asc_CCommentData(obj) {
 			_this.nId = "doc_" + guid();
 		else
 			_this.nId = "sheet" + _this.wsId + "_" + guid();
-	}
+	};
 
 	function guid() {
 		function S4() {
@@ -345,7 +345,7 @@ asc_CCommentData.prototype = {
 		return oReply;
 	},
 
-	asc_getWorksheetId: function () {
+	asc_getMasterCommentId: function () {
 		return this.wsId;
 	},
 
@@ -375,6 +375,7 @@ asc_CCommentData.prototype = {
 			case this.Properties.aReplies: return this.aReplies; break;
 			case this.Properties.bHidden: return this.bHidden; break;
 		}
+		return null;
 	},
 
 	setProperty: function(nType, value) {
@@ -451,7 +452,7 @@ prot["asc_getReply"] = prot.asc_getReply;
 
 prot["asc_addReply"] = prot.asc_addReply;
 
-prot["asc_getWorksheetId"] = prot.asc_getWorksheetId;
+prot["asc_getMasterCommentId"] = prot.asc_getMasterCommentId;
 
 //}
 
@@ -486,6 +487,7 @@ CompositeCommentData.prototype = {
 			case this.Properties.commentBefore: return this.commentBefore; break;
 			case this.Properties.commentAfter: return this.commentAfter; break;
 		}
+		return null;
 	},
 
 	setProperty: function(nType, value) {
@@ -494,7 +496,7 @@ CompositeCommentData.prototype = {
 			case this.Properties.commentAfter: this.commentAfter = value; break;
 		}
 	}
-}
+};
 
 //-----------------------------------------------------------------------------------
 // CellCommentator
@@ -605,13 +607,13 @@ function asc_CCellCommentator(currentSheet) {
 					_this.worksheet.model.workbook.handlers.trigger("asc_onLockComment", comment.asc_getId(), comment.asc_getUserId());
 			}
 		}
-	}
+	};
 	
 	_this.unlockComments = function() {
 		for (var i = 0; i < _this.aComments.length; i++) {
 			_this.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", _this.aComments[i].asc_getId());
 		}
-	}
+	};
 	
 	_this.tryUnlockComment = function(id) {
 		for (var i = 0; i < _this.aComments.length; i++) {
@@ -620,7 +622,7 @@ function asc_CCellCommentator(currentSheet) {
 				break;
 			}
 		}
-	}
+	};
 
 	_this.moveRangeComments = function(rangeFrom, rangeTo) {
 		if ( rangeFrom && rangeTo ) {
@@ -653,24 +655,24 @@ function asc_CCellCommentator(currentSheet) {
 				}
 			}
 		}
-	}
+	};
 	
 	_this.deleteCommentsRange = function(range) {
 		if ( range ) {
-			var aCommentId = [];
-			for (var i = 0; i < _this.aComments.length; ++i) {
+			var aCommentId = [], i;
+			for (i = 0; i < _this.aComments.length; ++i) {
 				var comment = _this.aComments[i];
 				if ( (comment.nCol >= range.c1) && (comment.nCol <= range.c2) && (comment.nRow >= range.r1) && (comment.nRow <= range.r2) ) {
 					aCommentId.push(comment.asc_getId());
 				}
 			}
 			History.StartTransaction();
-			for (var i = 0; i < aCommentId.length; i++) {
+			for (i = 0; i < aCommentId.length; i++) {
 				_this.asc_removeComment(aCommentId[i]);
 			}
 			History.EndTransaction();
 		}
-	}
+	};
 	
 	_this.addCommentSerialize = function(oComment) {
 
@@ -683,7 +685,7 @@ function asc_CCellCommentator(currentSheet) {
 			}
 			_this.aComments.push(oComment);
 		}
-	}
+	};
 
 	_this.getCommentsXY = function(x, y) {
 
@@ -693,7 +695,7 @@ function asc_CCellCommentator(currentSheet) {
 		var findRow = _this.worksheet._findRowUnderCursor(_this.pxToPt(y), true);
 
 		return (findCol && findRow) ? _this.asc_getComments(findCol.col, findRow.row) : [];
-	}
+	};
 
 	_this.drawCommentCells = function() {
 	
@@ -701,7 +703,7 @@ function asc_CCellCommentator(currentSheet) {
 			return;
 
 		var drawCells = []; 	// Associative array
-		function getCellId(col, row) { return (col + "_" + row) };
+		function getCellId(col, row) { return (col + "_" + row); }
 
 		for (var n = 0; n < _this.worksheet.drawingArea.frozenPlaces.length; n++) {
 			var frozenPlace = _this.worksheet.drawingArea.frozenPlaces[n];
@@ -745,7 +747,7 @@ function asc_CCellCommentator(currentSheet) {
 		}
 		//if (_this.lastSelectedId)
 		//	_this.asc_selectComment(_this.lastSelectedId, false);
-	}
+	};
 
 	_this.getTextMetrics = function(text, units) {
 
@@ -758,7 +760,7 @@ function asc_CCellCommentator(currentSheet) {
 			metrics.height = textOptions.lineHeight;
 		}
 		return metrics;
-	}
+	};
 
 	_this.getCellMetrics = function(col, row) {
 
@@ -780,10 +782,11 @@ function asc_CCellCommentator(currentSheet) {
 				metrics.top = _this.worksheet.getCellTop(startRow, 1) /*- _this.worksheet.getCellTop(fv.row, 1) + _this.worksheet.getCellTop(0, 1)*/ + _this.pxToPt(frozenPlace.getVerticalScroll()) - _this.worksheet.getCellTop(0, 1);
 				metrics.left = _this.worksheet.getCellLeft(startCol, 1) /*- _this.worksheet.getCellLeft(fv.col, 1) + _this.worksheet.getCellLeft(0, 1)*/ + _this.pxToPt(frozenPlace.getHorizontalScroll()) - _this.worksheet.getCellLeft(0, 1);
 
-				for (var i = startCol; i <= mergedRange.c2; i++) {
+				var i;
+				for (i = startCol; i <= mergedRange.c2; i++) {
 					metrics.width += _this.worksheet.getColumnWidth(i, 1)
 				}
-				for (var i = startRow; i <= mergedRange.r2; i++) {
+				for (i = startRow; i <= mergedRange.r2; i++) {
 					metrics.height += _this.worksheet.getRowHeight(i, 1)
 				}
 				metrics.result = true;
@@ -799,7 +802,7 @@ function asc_CCellCommentator(currentSheet) {
 		}
 
 		return metrics;
-	}
+	};
 
 	_this.updateCommentPosition = function() {
 		var _this = this;
@@ -827,14 +830,14 @@ function asc_CCellCommentator(currentSheet) {
 				}
 			}
 		}
-	}
+	};
 	
 	_this.updateCommentsDependencies = function(bInsert, operType, updateRange) {
 		
 		var UpdatePair = function(comment, bChange) {
 			this.comment = comment;
 			this.bChange = bChange;
-		}
+		};
 		var aChangedComments = [];		// Array of UpdatePair
 		
 		function updateCommentsList(aComments) {
@@ -864,13 +867,14 @@ function asc_CCellCommentator(currentSheet) {
 				_this.drawCommentCells();
 			}
 		}	
-		
+
+		var i, comment;
 		if ( bInsert ) {
 			switch (operType) {
 			
 				case c_oAscInsertOptions.InsertCellsAndShiftDown: {
-					for (var i = 0; i < _this.aComments.length; i++) {
-						var comment = new asc_CCommentData(_this.aComments[i]);
+					for (i = 0; i < _this.aComments.length; i++) {
+						comment = new asc_CCommentData(_this.aComments[i]);
 						if ( (comment.nRow >= updateRange.r1) && (comment.nCol >= updateRange.c1) && (comment.nCol <= updateRange.c2) ) {
 							comment.nRow += updateRange.r2 - updateRange.r1 + 1;
 							aChangedComments.push( new UpdatePair(comment, true) );
@@ -881,8 +885,8 @@ function asc_CCellCommentator(currentSheet) {
 				break;
 				
 				case c_oAscInsertOptions.InsertCellsAndShiftRight: {
-					for (var i = 0; i < _this.aComments.length; i++) {
-						var comment = new asc_CCommentData(_this.aComments[i]);
+					for (i = 0; i < _this.aComments.length; i++) {
+						comment = new asc_CCommentData(_this.aComments[i]);
 						if ( (comment.nCol >= updateRange.c1) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2) ) {
 							comment.nCol += updateRange.c2 - updateRange.c1 + 1;
 							aChangedComments.push( new UpdatePair(comment, true) );
@@ -893,8 +897,8 @@ function asc_CCellCommentator(currentSheet) {
 				break;
 				
 				case c_oAscInsertOptions.InsertColumns: {
-					for (var i = 0; i < _this.aComments.length; i++) {
-						var comment = new asc_CCommentData(_this.aComments[i]);
+					for (i = 0; i < _this.aComments.length; i++) {
+						comment = new asc_CCommentData(_this.aComments[i]);
 						if (comment.nCol >= updateRange.c1) {
 							comment.nCol += updateRange.c2 - updateRange.c1 + 1;
 							aChangedComments.push( new UpdatePair(comment, true) );
@@ -905,8 +909,8 @@ function asc_CCellCommentator(currentSheet) {
 				break;
 				
 				case c_oAscInsertOptions.InsertRows: {
-					for (var i = 0; i < _this.aComments.length; i++) {
-						var comment = new asc_CCommentData(_this.aComments[i]);
+					for (i = 0; i < _this.aComments.length; i++) {
+						comment = new asc_CCommentData(_this.aComments[i]);
 						if (comment.nRow >= updateRange.r1) {
 							comment.nRow += updateRange.r2 - updateRange.r1 + 1;
 							aChangedComments.push( new UpdatePair(comment, true) );
@@ -921,8 +925,8 @@ function asc_CCellCommentator(currentSheet) {
 			switch (operType) {
 				
 				case "deleteAllComments": {
-					for (var i = 0; i < _this.aComments.length; i++) {
-						var comment = new asc_CCommentData(_this.aComments[i]);
+					for (i = 0; i < _this.aComments.length; i++) {
+						comment = new asc_CCommentData(_this.aComments[i]);
 						if ( (updateRange.c1 <= comment.nCol) && (updateRange.c2 >= comment.nCol) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2) ) {
 							aChangedComments.push( new UpdatePair(comment, false) );
 						}
@@ -932,8 +936,8 @@ function asc_CCellCommentator(currentSheet) {
 				break;
 				
 				case c_oAscDeleteOptions.DeleteCellsAndShiftTop: {
-					for (var i = 0; i < _this.aComments.length; i++) {
-						var comment = new asc_CCommentData(_this.aComments[i]);
+					for (i = 0; i < _this.aComments.length; i++) {
+						comment = new asc_CCommentData(_this.aComments[i]);
 						if ( (comment.nRow > updateRange.r1) && (comment.nCol >= updateRange.c1) && (comment.nCol <= updateRange.c2) ) {
 							comment.nRow -= updateRange.r2 - updateRange.r1 + 1;
 							aChangedComments.push( new UpdatePair(comment, true) );
@@ -947,8 +951,8 @@ function asc_CCellCommentator(currentSheet) {
 				break;
 				
 				case c_oAscDeleteOptions.DeleteCellsAndShiftLeft: {
-					for (var i = 0; i < _this.aComments.length; i++) {
-						var comment = new asc_CCommentData(_this.aComments[i]);
+					for (i = 0; i < _this.aComments.length; i++) {
+						comment = new asc_CCommentData(_this.aComments[i]);
 						if ( (comment.nCol > updateRange.c2) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2) ) {
 							comment.nCol -= updateRange.c2 - updateRange.c1 + 1;
 							aChangedComments.push( new UpdatePair(comment, true) );
@@ -962,8 +966,8 @@ function asc_CCellCommentator(currentSheet) {
 				break;
 				
 				case c_oAscDeleteOptions.DeleteColumns: {
-					for (var i = 0; i < _this.aComments.length; i++) {
-						var comment = new asc_CCommentData(_this.aComments[i]);
+					for (i = 0; i < _this.aComments.length; i++) {
+						comment = new asc_CCommentData(_this.aComments[i]);
 						if (comment.nCol > updateRange.c2) {
 							comment.nCol -= updateRange.c2 - updateRange.c1 + 1;
 							aChangedComments.push( new UpdatePair(comment, true) );
@@ -977,8 +981,8 @@ function asc_CCellCommentator(currentSheet) {
 				break;
 				
 				case c_oAscDeleteOptions.DeleteRows: {
-					for (var i = 0; i < _this.aComments.length; i++) {
-						var comment = new asc_CCommentData(_this.aComments[i]);
+					for (i = 0; i < _this.aComments.length; i++) {
+						comment = new asc_CCommentData(_this.aComments[i]);
 						if (comment.nRow > updateRange.r2) {
 							comment.nRow -= updateRange.r2 - updateRange.r1 + 1;
 							aChangedComments.push( new UpdatePair(comment, true) );
@@ -992,7 +996,7 @@ function asc_CCellCommentator(currentSheet) {
 				break;
 			}
 		}		
-	}
+	};
 
 	_this.showHideComments = function(bHide, bColumn, start, stop) {
 		
@@ -1028,7 +1032,7 @@ function asc_CCellCommentator(currentSheet) {
 			}
 		}
 		updateCommentsList(aChangedComments);
-	}
+	};
 	
 	_this.sortComments = function(activeRange, changes) {
 		
@@ -1059,12 +1063,12 @@ function asc_CCellCommentator(currentSheet) {
 			}			
 			updateCommentsList(aChangedComments);
 		}
-	}
+	};
 	
 	_this.resetLastSelectedId = function() {
 		_this.cleanLastSelection();
 		_this.lastSelectedId = null;
-	}
+	};
 	
 	_this.cleanLastSelection = function() {
 		if ( _this.lastSelectedId ) {
@@ -1077,7 +1081,7 @@ function asc_CCellCommentator(currentSheet) {
 				}
 			}
 		}
-	}
+	};
 
 	_this.calcCommentsCoords = function(bSave) {
 
@@ -1102,7 +1106,7 @@ function asc_CCellCommentator(currentSheet) {
 					_this.aCommentCoords.push(_this.getCommentsCoords(commentList));
 			}
 		}
-	}
+	};
 
 	_this.getCommentsCoords = function(comments) {
 
@@ -1147,8 +1151,8 @@ function asc_CCellCommentator(currentSheet) {
 			_this.overlayCtx.setFont(outputFont);
 
 			// Comment text
-			var commentSpl = comment.sText.split('\n');
-			for (var i = 0; i < commentSpl.length; i++) {
+			var commentSpl = comment.sText.split('\n'), i;
+			for (i = 0; i < commentSpl.length; i++) {
 			
 				txtMetrics = _this.getTextMetrics(commentSpl[i], 1);
 				coords.dHeightPX += _this.ptToPx(txtMetrics.height);
@@ -1157,7 +1161,7 @@ function asc_CCellCommentator(currentSheet) {
 					coords.dWidthPX = lineWidth;
 			}
 
-			for (var i = 0; i < comment.aReplies.length; i++) {
+			for (i = 0; i < comment.aReplies.length; i++) {
 				calcCommentArea(comment.aReplies[i], coords);
 			}
 
@@ -1240,7 +1244,7 @@ function asc_CCellCommentator(currentSheet) {
 		}
 
 		return coords;
-	}
+	};
 
 	_this.commentCoordsExist = function(col, row) {
 
@@ -1250,7 +1254,7 @@ function asc_CCellCommentator(currentSheet) {
 				return true;
 		}
 		return result;
-	}
+	};
 
 	_this.prepareCommentsToSave = function() {
 
@@ -1261,7 +1265,7 @@ function asc_CCellCommentator(currentSheet) {
 		*/
 
 		_this.calcCommentsCoords(true);
-	}
+	};
 
 	_this.cleanSelectedComment = function() {
 		if ( _this.lastSelectedId ) {
@@ -1272,7 +1276,7 @@ function asc_CCellCommentator(currentSheet) {
 					_this.overlayCtx.clearRect(metrics.left, metrics.top, metrics.width, metrics.height);
 			}
 		}
-	}
+	};
 	
 	_this.getFrozenOffset = function() {
 		
@@ -1287,31 +1291,27 @@ function asc_CCellCommentator(currentSheet) {
 			offsetY = _this.worksheet.rows[_this.worksheet.visibleRange.r1].top - _this.worksheet.cellsTop - diffHeight;
 		}
 		return { offsetX: offsetX, offsetY: offsetY };
-	}
+	};
 	
 	//-----------------------------------------------------------------------------------
 	// Misc methods
 	//-----------------------------------------------------------------------------------
 
 	_this.pxToPt = function(val) {
-		var tmp = val * _this.ascCvtRatio(0, 1);
-		return tmp;
-	}
+		return val * _this.ascCvtRatio(0, 1);
+	};
 
 	_this.ptToPx = function(val) {
-		var tmp = val * _this.ascCvtRatio(1, 0);
-		return tmp;
-	}
+		return val * _this.ascCvtRatio(1, 0);
+	};
 
 	_this.mmToPx = function(val) {
-		var tmp = val * _this.ascCvtRatio(3, 0);
-		return tmp;
-	}
+		return val * _this.ascCvtRatio(3, 0);
+	};
 
 	_this.pxToMm = function(val) {
-		var tmp = val * _this.ascCvtRatio(0, 3);
-		return tmp;
-	}
+		return val * _this.ascCvtRatio(0, 3);
+	};
 
 	_this.ascCvtRatio = function(fromUnits, toUnits) {
 		return Asc.getCvtRatio(fromUnits, toUnits, _this.overlayCtx.getPPIX());
@@ -1394,20 +1394,20 @@ asc_CCellCommentator.prototype = {
 			
 			var col = comment.asc_getCol();
 			var row = comment.asc_getRow();
-			var vr = _this.worksheet.visibleRange;
 			var fvc = _this.worksheet.getFirstVisibleCol(true);
 			var fvr = _this.worksheet.getFirstVisibleRow(true);
 			var lvc = _this.worksheet.getLastVisibleCol();
 			var lvr = _this.worksheet.getLastVisibleRow();
-			
+
+			var offset;
 			if ( bMove ) {
 				if ( (row < fvr) || (row > lvr) ) {
-					var offset = row - fvr - Math.round(( lvr - fvr ) / 2);
+					offset = row - fvr - Math.round(( lvr - fvr ) / 2);
 					_this.worksheet.scrollVertical(offset);
 					_this.worksheet.handlers.trigger("reinitializeScrollY");
 				}
 				if ( (col < fvc) || (col > lvc) ) {
-					var offset = col - fvc - Math.round(( lvc - fvc ) / 2);
+					offset = col - fvc - Math.round(( lvc - fvc ) / 2);
 					_this.worksheet.scrollHorizontal(offset);
 					_this.worksheet.handlers.trigger("reinitializeScrollX");
 				}
@@ -1440,6 +1440,7 @@ asc_CCellCommentator.prototype = {
 				if (comment)
 					return comment;
 			}
+			return null;
 		}
 
 		for (var i = 0; i < _this.aComments.length; i++) {
@@ -1506,9 +1507,7 @@ asc_CCellCommentator.prototype = {
 		function callbackFunc(result) {
 			if ( !result ) {
 				_this.worksheet.model.workbook.handlers.trigger("asc_onLockComment", comment.asc_getId(), comment.asc_getUserId());
-				return;
-			}
-			else {
+			} else {
 				_this.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", comment.asc_getId());
 				
 				var commentBefore = new asc_CCommentData(comment);
@@ -1565,14 +1564,13 @@ asc_CCellCommentator.prototype = {
 		function callbackFunc(result) {
 			if ( !result ) {
 				_this.worksheet.model.workbook.handlers.trigger("asc_onLockComment", comment.asc_getId(), oComment.asc_getUserId());
-				return;
-			}
-			else {
+			} else {
 				_this.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", comment.asc_getId());
 				
 				if (comment) {
+					var i;
 					if (comment.oParent) {
-						for (var i = 0; i < comment.oParent.aReplies.length; i++) {
+						for (i = 0; i < comment.oParent.aReplies.length; i++) {
 							if (comment.asc_getId() == comment.oParent.aReplies[i].asc_getId()) {
 
 								if ( _this.bSaveHistory ) {
@@ -1584,9 +1582,8 @@ asc_CCellCommentator.prototype = {
 								break;
 							}
 						}
-					}
-					else {
-						for (var i = 0; i < _this.aComments.length; i++) {
+					} else {
+						for (i = 0; i < _this.aComments.length; i++) {
 							if (comment.asc_getId() == _this.aComments[i].asc_getId()) {
 
 								if ( _this.bSaveHistory ) {
@@ -1667,21 +1664,20 @@ asc_CCellCommentator.prototype = {
 
 	Undo: function(type, data) {
 
-		var _this = this;
+		var _this = this, i, parentComment;
 		switch (type) {
 
 			case historyitem_Comment_Add:
 				if (data.oParent) {
-					var parentComment = _this.asc_findComment(data.oParent.asc_getId());
-					for (var i = 0; i < parentComment.aReplies.length; i++) {
+					parentComment = _this.asc_findComment(data.oParent.asc_getId());
+					for (i = 0; i < parentComment.aReplies.length; i++) {
 						if (parentComment.aReplies[i].asc_getId() == data.asc_getId()) {
 							parentComment.aReplies.splice(i, 1);
 							break;
 						}
 					}
-				}
-				else {
-					for (var i = 0; i < _this.aComments.length; i++) {
+				} else {
+					for (i = 0; i < _this.aComments.length; i++) {
 						if (_this.aComments[i].asc_getId() == data.asc_getId()) {
 							_this.aComments.splice(i, 1);
 							_this.worksheet.model.workbook.handlers.trigger("asc_onRemoveComment", data.asc_getId());
@@ -1693,10 +1689,9 @@ asc_CCellCommentator.prototype = {
 
 			case historyitem_Comment_Remove:
 				if (data.oParent) {
-					var parentComment = _this.asc_findComment(data.oParent.asc_getId());
+					parentComment = _this.asc_findComment(data.oParent.asc_getId());
 					parentComment.aReplies.push(data);
-				}
-				else {
+				} else {
 					_this.aComments.push(data);
 					_this.worksheet.model.workbook.handlers.trigger("asc_onAddComment", data.asc_getId(), data);
 				}
@@ -1704,17 +1699,16 @@ asc_CCellCommentator.prototype = {
 
 			case historyitem_Comment_Change:
 				if (data.commentAfter.oParent) {
-					var parentComment = _this.asc_findComment(data.commentAfter.oParent.asc_getId());
-					for (var i = 0; i < parentComment.aReplies.length; i++) {
+					parentComment = _this.asc_findComment(data.commentAfter.oParent.asc_getId());
+					for (i = 0; i < parentComment.aReplies.length; i++) {
 						if (parentComment.aReplies[i].asc_getId() == data.asc_getId()) {
 							parentComment.aReplies.splice(i, 1);
 							parentComment.aReplies.push(data.commentBefore);
 							break;
 						}
 					}
-				}
-				else {
-					for (var i = 0; i < _this.aComments.length; i++) {
+				} else {
+					for (i = 0; i < _this.aComments.length; i++) {
 						if (_this.aComments[i].asc_getId() == data.commentAfter.asc_getId()) {
 							_this.aComments.splice(i, 1);
 							_this.aComments.push(data.commentBefore);
@@ -1729,15 +1723,14 @@ asc_CCellCommentator.prototype = {
 
 	Redo: function(type, data) {
 
-		var _this = this;
+		var _this = this, parentComment, i;
 		switch (type) {
 
 			case historyitem_Comment_Add:
 				if (data.oParent) {
-					var parentComment = _this.asc_findComment(data.oParent.asc_getId());
+					parentComment = _this.asc_findComment(data.oParent.asc_getId());
 					parentComment.aReplies.push(data);
-				}
-				else {
+				} else {
 					_this.aComments.push(data);
 					_this.worksheet.model.workbook.handlers.trigger("asc_onAddComment", data.asc_getId(), data);
 				}
@@ -1745,16 +1738,15 @@ asc_CCellCommentator.prototype = {
 
 			case historyitem_Comment_Remove:
 				if (data.oParent) {
-					var parentComment = _this.asc_findComment(data.oParent.asc_getId());
-					for (var i = 0; i < parentComment.aReplies.length; i++) {
+					parentComment = _this.asc_findComment(data.oParent.asc_getId());
+					for (i = 0; i < parentComment.aReplies.length; i++) {
 						if (parentComment.aReplies[i].asc_getId() == data.asc_getId()) {
 							parentComment.aReplies.splice(i, 1);
 							break;
 						}
 					}
-				}
-				else {
-					for (var i = 0; i < _this.aComments.length; i++) {
+				} else {
+					for (i = 0; i < _this.aComments.length; i++) {
 						if (_this.aComments[i].asc_getId() == data.asc_getId()) {
 							_this.aComments.splice(i, 1);
 							_this.worksheet.model.workbook.handlers.trigger("asc_onRemoveComment", data.asc_getId());
@@ -1766,17 +1758,16 @@ asc_CCellCommentator.prototype = {
 
 			case historyitem_Comment_Change:
 				if (data.commentBefore.oParent) {
-					var parentComment = _this.asc_findComment(data.commentBefore.oParent.asc_getId());
-					for (var i = 0; i < parentComment.aReplies.length; i++) {
+					parentComment = _this.asc_findComment(data.commentBefore.oParent.asc_getId());
+					for (i = 0; i < parentComment.aReplies.length; i++) {
 						if (parentComment.aReplies[i].asc_getId() == data.asc_getId()) {
 							parentComment.aReplies.splice(i, 1);
 							parentComment.aReplies.push(data.commentAfter);
 							break;
 						}
 					}
-				}
-				else {
-					for (var i = 0; i < _this.aComments.length; i++) {
+				} else {
+					for (i = 0; i < _this.aComments.length; i++) {
 						if (_this.aComments[i].asc_getId() == data.commentBefore.asc_getId()) {
 							_this.aComments.splice(i, 1);
 							_this.aComments.push(data.commentAfter);
@@ -1788,7 +1779,7 @@ asc_CCellCommentator.prototype = {
 				break;
 		}
 	}
-}
+};
 
 window["Asc"]["asc_CCellCommentator"] = window["Asc"].asc_CCellCommentator = asc_CCellCommentator;
 prot = asc_CCellCommentator.prototype;
