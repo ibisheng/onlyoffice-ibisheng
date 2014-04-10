@@ -51,6 +51,11 @@
 				this.fMouseDblClick = function (event) {t._onMouseDblClick(event);};
 				this.fMouseOver = function (event) {t._onMouseOver(event);};
 
+				if (this.selector.addEventListener) {
+					this.selector.addEventListener("mousedown", function () {
+						t.skipClose = true;
+					}, false);
+				}
 				if (window.addEventListener) {
 					window.addEventListener("mousedown", function () {
 						if (t.skipClose) {

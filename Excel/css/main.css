@@ -162,4 +162,5 @@
 }
 #apiPopUpList li.selected {
     background-color: #7d858c;
+    color: #fff;
 }
