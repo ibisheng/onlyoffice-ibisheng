@@ -673,6 +673,16 @@ function asc_CCellCommentator(currentSheet) {
 			History.EndTransaction();
 		}
 	};
+
+	_this.prepareComments = function(arrComments) {
+		var commentList = [];
+		for (var i = 0; i < arrComments.length; ++i) {
+			var comment = {"Id": arrComments[i].asc_getId(), "Comment": arrComments[i]};
+			_this.addCommentSerialize(comment["Comment"]);
+			commentList.push(comment);
+		}
+		return commentList;
+	};
 	
 	_this.addCommentSerialize = function(oComment) {
 
@@ -1090,7 +1100,7 @@ function asc_CCellCommentator(currentSheet) {
 		for (var i = 0; i < _this.aComments.length; i++) {
 
 			var commentCell = _this.aComments[i];
-			if (!_this.commentCoordsExist(commentCell.asc_getCol(), commentCell.asc_getRow())) {
+			if (commentCell.asc_getDocumentFlag() || !_this.commentCoordsExist(commentCell.asc_getCol(), commentCell.asc_getRow())) {
 
 				var commentList = _this.asc_getComments(commentCell.asc_getCol(), commentCell.asc_getRow());
 
@@ -1560,6 +1570,8 @@ asc_CCellCommentator.prototype = {
 
 		var _this = this;
 		var comment = _this.asc_findComment(id);
+		if (null === comment)
+			return;
 		
 		function callbackFunc(result) {
 			if ( !result ) {
