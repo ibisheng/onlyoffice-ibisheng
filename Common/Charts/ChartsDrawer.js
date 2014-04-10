@@ -3502,6 +3502,15 @@ CChartsDrawer.prototype =
 		return {val: val, numPow: numPow};
 	},
 	
+	getIdxPoint: function(seria, val)
+	{
+		var pts = seria.val.numRef ? seria.val.numRef.numCache.pts : seria.val.numLit.pts;
+		for(var p = 0; p < pts.length; p++)
+		{
+			if(pts[p].idx == val)
+				return pts[p];
+		}
+	},
 	
 	
 	
@@ -3632,12 +3641,13 @@ drawBarChart.prototype =
 
 			for (var j = 0; j < this.paths.series[i].length; j++) {
 				numCache = seria.val.numRef ? seria.val.numRef.numCache : seria.val.numLit;
-				if(numCache.pts[j].pen)
+				if(numCache.pts[j] && numCache.pts[j].pen)
 					pen = numCache.pts[j].pen;
-				if(numCache.pts[j].brush)
+				if(numCache.pts[j] && numCache.pts[j].brush)
 					brush = numCache.pts[j].brush;
 					
-				this._drawPaths(this.paths.series[i][j], brush, pen);
+				if(this.paths.series[i][j])
+					this._drawPaths(this.paths.series[i][j], brush, pen);
 			}
 		}
 		this.cShapeDrawer.Graphics.RestoreGrState();
@@ -3656,16 +3666,16 @@ drawBarChart.prototype =
 		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 1 : 0;
 		var overlap        = this.cShapeDrawer.chart.plotArea.chart.overlap ? this.cShapeDrawer.chart.plotArea.chart.overlap : defaultOverlap;
 		var numCache       = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
-		var width          = widthGraph / numCache.pts.length;
+		var width          = widthGraph / numCache.ptCount;
 		if(this.cShapeDrawer.chart.plotArea.catAx.crossAx.crossBetween)
-			width = widthGraph / (numCache.pts.length - 1);
+			width = widthGraph / (numCache.ptCount - 1);
 		
 		
 		var individualBarWidth = width / (this.chartProp.series.length - (this.chartProp.series.length - 1) * (overlap) + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
 		var widthOverLap       = individualBarWidth * (overlap);
 		var hmargin            = (this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100 * individualBarWidth) / 2;
 		
-		var height, startX, startY, diffYVal, val, paths, seriesHeight = [], tempValues = [], seria, startYColumnPosition, startXPosition, newStartX, newStartY, prevVal;
+		var height, startX, startY, diffYVal, val, paths, seriesHeight = [], tempValues = [], seria, startYColumnPosition, startXPosition, newStartX, newStartY, prevVal, idx;
 		
 		
 	
@@ -3680,40 +3690,41 @@ drawBarChart.prototype =
 				
 				//стартовая позиция колонки Y(+ высота с учётом поправок на накопительные диаграммы)
 				val = parseFloat(seria[j].val);
+				idx = seria[j].idx != null ? seria[j].idx : j;
 				
 				prevVal = 0;
 				if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
 				{	
 					for(var k = 0; k < tempValues.length; k++)
 					{
-						if(tempValues[k][j] && tempValues[k][j] > 0)
-							prevVal += tempValues[k][j];
+						if(tempValues[k][idx] && tempValues[k][idx] > 0)
+							prevVal += tempValues[k][idx];
 					}
 				};
 				
 				
-				tempValues[i][j]   = val;
+				tempValues[i][idx]   = val;
 				
-				startYColumnPosition = this._getStartYColumnPosition(seriesHeight, j, val, yPoints, prevVal);
+				startYColumnPosition = this._getStartYColumnPosition(seriesHeight, idx, val, yPoints, prevVal);
 				startY = startYColumnPosition.startY;
 				height = startYColumnPosition.height;
 
-				seriesHeight[i][j] = height;
+				seriesHeight[i][idx] = height;
 				
 				//стартовая позиция колонки X
 				if(this.cShapeDrawer.chart.plotArea.catAx.scaling.orientation == ORIENTATION_MIN_MAX)
 				{
 					if(xPoints[1] && xPoints[1].pos)
-						startXPosition = xPoints[j].pos - Math.abs((xPoints[1].pos - xPoints[0].pos) / 2);
+						startXPosition = xPoints[idx].pos - Math.abs((xPoints[1].pos - xPoints[0].pos) / 2);
 					else
-						startXPosition = xPoints[j].pos - Math.abs(xPoints[0].pos - this.cShapeDrawer.chart.plotArea.valAx.posX);
+						startXPosition = xPoints[idx].pos - Math.abs(xPoints[0].pos - this.cShapeDrawer.chart.plotArea.valAx.posX);
 				}	
 				else
 				{
 					if(xPoints[1] && xPoints[1].pos)
-						startXPosition = xPoints[j].pos + Math.abs((xPoints[1].pos - xPoints[0].pos) / 2);
+						startXPosition = xPoints[idx].pos + Math.abs((xPoints[1].pos - xPoints[0].pos) / 2);
 					else
-						startXPosition = xPoints[j].pos + Math.abs(xPoints[0].pos - this.cShapeDrawer.chart.plotArea.valAx.posX);
+						startXPosition = xPoints[idx].pos + Math.abs(xPoints[0].pos - this.cShapeDrawer.chart.plotArea.valAx.posX);
 				}
 					
 				
@@ -3750,7 +3761,7 @@ drawBarChart.prototype =
 						this.paths.series = [];
 					if(!this.paths.series[i])
 						this.paths.series[i] = [];
-					this.paths.series[i][j] = paths;
+					this.paths.series[i][idx] = paths;
 				//}
 			}
 		}
@@ -3895,7 +3906,7 @@ drawBarChart.prototype =
 	
 	_calculateDLbl: function(chartSpace, ser, val)
 	{
-		var point = this.chartProp.series[ser].val.numRef ? this.chartProp.series[ser].val.numRef.numCache.pts[val] : this.chartProp.series[ser].val.numLit.pts[val];
+		var point = this.cChartDrawer.getIdxPoint(this.chartProp.series[ser], val);
 		if(!this.paths.series[ser][val])
 			return;
 		
