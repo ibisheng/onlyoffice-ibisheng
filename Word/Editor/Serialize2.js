@@ -10158,6 +10158,8 @@ function Binary_oMathReader(stream)
 						oMRun.Content.splice( i, 0, oText );						
 					}
 				}
+				else if (text[i] == ' ')
+					oMRun.Content.splice(oMRun.Content.length, 0, new ParaSpace(1));
             }
 			oParent.addElementToContent(oMRun);
         }

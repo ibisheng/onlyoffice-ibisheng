@@ -89,19 +89,27 @@ ParaMath.prototype =
 
     Add : function(Item)
     {
-        var Type = Item.Type;
+		var Type = Item.Type;
+		var oPos = this.GetSelectContent();
 
-        if ( para_Text === Type )
-            this.Math.AddLetter( Item.Value.charCodeAt(0) );
-        else if ( para_Space === Type )
-            this.Math.AddLetter( 0x0020 );
-        else if ( para_Math === Type )
-        {
-            var rPr = this.Math.GetCurrentRunPrp();
-            Item.Math.Root.setRPrp(rPr);
-            this.Math.AddToComposition(Item.Math.Root);
-        }
-    },
+		if ( para_Text === Type)
+		{
+			var oText = new CMathText();
+			oText.addTxt(Item.Value);
+			oPos.Content.content[oPos.Start].Add(oText);
+		}
+		else if ( para_Space === Type )
+		{
+			var oSpace = new ParaSpace(1);
+			oPos.Content.content[oPos.Start].Add(oSpace);
+		}
+		else if ( para_Math === Type )
+		{
+			var rPr = this.Math.GetCurrentRunPrp();
+			Item.Math.Root.setRPrp(rPr);
+			this.Math.AddToComposition(Item.Math.Root);
+		}
+	},
 
     AddText : function(oElem, sText, props)
     {		
