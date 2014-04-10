@@ -7197,11 +7197,11 @@ catAxisChart.prototype =
 	_calculateAxis : function()
 	{
 		var nullPoisition = this.chartProp.nullPositionOX;
-		if(this.chartProp.type == "HBar")
+		if(this.chartProp.type == "HBar" && this.chartSpace.chart.plotArea.catAx.bDelete != true)
 		{	
 			this.paths.axisLine = this._calculateLine( this.chartSpace.chart.plotArea.catAx.posX, this.chartProp.chartGutter._top / this.chartProp.pxToMM, this.chartSpace.chart.plotArea.catAx.posX, (this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom) / this.chartProp.pxToMM);
 		}
-		else
+		else if(this.chartSpace.chart.plotArea.catAx.bDelete != true)
 		{
 			//TODO сделать по аналогии с HBAR
 			this.paths.axisLine = this._calculateLine( this.chartProp.chartGutter._left / this.chartProp.pxToMM, this.chartSpace.chart.plotArea.catAx.posY, (this.chartProp.widthCanvas - this.chartProp.chartGutter._right) / this.chartProp.pxToMM, this.chartSpace.chart.plotArea.catAx.posY );
@@ -7395,6 +7395,9 @@ catAxisChart.prototype =
 	
 	_drawPath: function(path, pen)
 	{	
+		if(!path)
+			return;
+		
 		path.stroke = true;
 		var cGeometry = new CGeometry2();
 		this.cShapeDrawer.Clear();
@@ -7441,12 +7444,13 @@ valAxisChart.prototype =
 	_calculateAxis : function()
 	{
 		var nullPoisition = this.chartSpace.chart.plotArea.valAx.posX != undefined ? this.chartSpace.chart.plotArea.valAx.posX : this.chartSpace.chart.plotArea.valAx.xPos;
-		if(this.chartProp.type == "HBar")
+
+		if(this.chartProp.type == "HBar" && this.chartSpace.chart.plotArea.valAx.bDelete != true)
 		{	
 			nullPoisition = this.chartSpace.chart.plotArea.valAx.posY;
 			this.paths.axisLine = this._calculateLine( this.chartProp.chartGutter._left / this.chartProp.pxToMM, nullPoisition, (this.chartProp.widthCanvas - this.chartProp.chartGutter._right) / this.chartProp.pxToMM, nullPoisition );
 		}
-		else
+		else if(this.chartSpace.chart.plotArea.valAx.bDelete != true)
 		{
 			this.paths.axisLine = this._calculateLine( nullPoisition, this.chartProp.chartGutter._top / this.chartProp.pxToMM, nullPoisition, (this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom) / this.chartProp.pxToMM );
 		}
@@ -7638,6 +7642,9 @@ valAxisChart.prototype =
 	
 	_drawPath: function(path, pen)
 	{	
+		if(!path)
+			return;
+		
 		path.stroke = true;
 		var cGeometry = new CGeometry2();
 		this.cShapeDrawer.Clear();
