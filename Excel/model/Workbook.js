@@ -1037,8 +1037,10 @@ function Workbook(sUrlPath, eventsHandlers, oApi){
 	this.oNameGenerator = new NameGenerator(this);
 	this.CellStyles = new CCellStyles();
 	this.TableStyles = new CTableStyles();
-	this.oStyleManager = new StyleManager(this);
+	this.oStyleManager = new StyleManager();
 	this.calcChain = [];
+	this.aComments = [];	// Комментарии к документу
+	this.aCommentsCoords = [];
 	this.aWorksheets = [];
 	this.aWorksheetsById = {};
 	this.cwf = {};
@@ -1049,7 +1051,7 @@ function Workbook(sUrlPath, eventsHandlers, oApi){
 	this.bUndoChanges = false;
 	this.bRedoChanges = false;
 	this.aCollaborativeChangeElements = [];
-};
+}
 Workbook.prototype.init=function(){
 	if(this.nActive < 0)
 		this.nActive = 0;
@@ -1074,7 +1076,7 @@ Workbook.prototype.rebuildColors=function(){
 	g_oColorManager.rebuildColors();
 	for(var i = 0 , length = this.aWorksheets.length; i < length; ++i)
 		this.aWorksheets[i].rebuildColors();;
-}
+};
 Workbook.prototype.getDefaultFont=function(){
 	return g_oDefaultFont.fn;
 };
@@ -1378,10 +1380,10 @@ Workbook.prototype.checkUniqueSheetName=function(name){
 			return i;
 	}
 	return -1;
-}
+};
 Workbook.prototype.checkValidSheetName=function(name){
 	return name.length < g_nSheetNameMaxLength;
-}
+};
 Workbook.prototype.getUniqueSheetNameFrom=function(name, bCopy){
 	var nIndex = 1;
 	var sNewName = "";
@@ -1474,7 +1476,7 @@ Workbook.prototype.recalcWB = function(isRecalcWB){
         }
         sortDependency( this );
     }
-}
+};
 Workbook.prototype.isDefinedNamesExists = function(name, sheetId){
 	if(null != sheetId)
 	{
@@ -1492,7 +1494,7 @@ Workbook.prototype.isDefinedNamesExists = function(name, sheetId){
 		return !!this.DefinedNames[name];
 	}
 	return false;
-}
+};
 Workbook.prototype.getDefinesNames = function(name, sheetId){
 	if(null != sheetId)
 	{
@@ -1513,7 +1515,7 @@ Workbook.prototype.getDefinesNames = function(name, sheetId){
 			return oDefName;
 	}
 	return false;
-}
+};
 Workbook.prototype.buildDependency = function(){
 	this.dependencyFormulas.clear();
 	this.dependencyFormulas = null;
@@ -1521,7 +1523,7 @@ Workbook.prototype.buildDependency = function(){
 	for(var i in this.cwf){
 		this.getWorksheetById(i)._BuildDependencies(this.cwf[i].cells);
 	}
-}
+};
 Workbook.prototype.recalcDependency = function(f,bad,notRecalc){
     if(f.length > 0){
 
@@ -1558,7 +1560,7 @@ Workbook.prototype.recalcDependency = function(f,bad,notRecalc){
 
         return sr;
     }
-}
+};
 Workbook.prototype.SerializeHistory = function(){
 	var aRes = [];
 	//соединяем изменения, которые были до приема данных с теми, что получились после.
@@ -1593,9 +1595,8 @@ Workbook.prototype.SerializeHistory = function(){
 		this.aCollaborativeActions = [];
 	}
 	return aRes;
-}
+};
 Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
-	var bRes = false;
 	var oThis = this;
 	//сохраняем те изменения, которые были до приема данных, потому что дальше undo/redo будет очищено
 	this.aCollaborativeActions = this.aCollaborativeActions.concat(History.GetSerializeArray());

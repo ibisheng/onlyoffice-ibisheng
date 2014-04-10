@@ -3477,37 +3477,35 @@ UndoRedoComment.prototype = {
 	},
 	UndoRedo : function (Type, Data, nSheetId, bUndo)
 	{
-		var wsModel = this.wb.getWorksheetById(nSheetId);
-		if ( !wsModel.aComments )
-			wsModel.aComments = [];
+		var oModel = ("workbook" === nSheetId) ? this.wb : this.wb.getWorksheetById(nSheetId);
+		if (!oModel.aComments)
+			oModel.aComments = [];
 
 		var api = window["Asc"]["editor"];
-		if ( !api.wb )
+		if (!api.wb)
 			return;
-		var ws = api.wb.getWorksheetById(nSheetId);
+		var ws = ("workbook" === nSheetId) ? api.wb : api.wb.getWorksheetById(nSheetId);
 		Data.worksheet = ws;
 
 		var cellCommentator = ws.cellCommentator;
 		if ( bUndo == true )
 			cellCommentator.Undo(Type, Data);
-
 		else {
+			var collaborativeEditing;
 			// CCommentData
 			if ( (Data.commentBefore == undefined) && (Data.commentAfter == undefined) ) {
 				if ( !Data.bDocument ) {
 					if ( false != this.wb.bCollaborativeChanges ) {
-						var collaborativeEditing = this.wb.oApi.collaborativeEditing;
+						collaborativeEditing = this.wb.oApi.collaborativeEditing;
 						Data.nRow = collaborativeEditing.getLockOtherRow2(nSheetId, Data.nRow);
 						Data.nCol = collaborativeEditing.getLockOtherColumn2(nSheetId, Data.nCol);
 					}
 				}
-			}
-			// CompositeCommentData
-			else {
+			} else {
+				// CompositeCommentData
 				if ( !Data.commentAfter.bDocument ) {
 					if ( false != this.wb.bCollaborativeChanges ) {
-						var collaborativeEditing = this.wb.oApi.collaborativeEditing;
-
+						collaborativeEditing = this.wb.oApi.collaborativeEditing;
 						Data.commentAfter.nRow = collaborativeEditing.getLockOtherRow2(nSheetId, Data.commentAfter.nRow);
 						Data.commentAfter.nCol = collaborativeEditing.getLockOtherColumn2(nSheetId, Data.commentAfter.nCol);
 					}
@@ -3517,7 +3515,7 @@ UndoRedoComment.prototype = {
 			cellCommentator.Redo(Type, Data);
 		}
 	}
-}
+};
 
 var g_oUndoRedoAutoFilters = null;
 var g_oUndoRedoAutoFiltersMoveData = null;

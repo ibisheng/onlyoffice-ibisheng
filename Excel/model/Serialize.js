@@ -5214,7 +5214,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 				oWorksheet.PagePrintOptions = new Asc.asc_CPageOptions();
             res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadPrintOptions(t,l, oWorksheet.PagePrintOptions);
-                });			
+                });
         }
         else if ( c_oSerWorksheetsTypes.Hyperlinks == type )
         {
@@ -5815,16 +5815,16 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 				var elem = aCommentData[i];
 				elem.asc_putRow(oCommentCoords.asc_getRow());
 				elem.asc_putCol(oCommentCoords.asc_getCol());
-				
-				elem.wsId = oWorksheet.Id;
-				if (elem.asc_getDocumentFlag())
-					elem.nId = "doc_" + (oWorksheet.aComments.length + 1);
-				else
+
+				if (elem.asc_getDocumentFlag()) {
+					elem.nId = "doc_" + (this.wb.aComments.length + 1);
+					this.wb.aComments.push(elem);
+				} else {
+					elem.wsId = oWorksheet.Id;
 					elem.nId = "sheet" + elem.wsId + "_" + (oWorksheet.aComments.length + 1);
-				
-				oWorksheet.aComments.push(elem);
+					oWorksheet.aComments.push(elem);
+				}
 			}
-            oWorksheet.aCommentsCoords.push(oCommentCoords);
         }
         else
             res = c_oSerConstants.ReadUnknown;

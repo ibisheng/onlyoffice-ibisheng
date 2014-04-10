@@ -2507,13 +2507,21 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			// Cell comment interface
 			asc_addComment: function(oComment) {
-				var ws = this.wb.getWorksheet();
-				ws.cellCommentator.asc_addComment(oComment);					
+				if (oComment.bDocument)
+					this.wb.cellCommentator.asc_addComment(oComment);
+				else {
+					var ws = this.wb.getWorksheet();
+					ws.cellCommentator.asc_addComment(oComment);
+				}
 			},
 			
 			asc_changeComment: function(id, oComment) {
-				var ws = this.wb.getWorksheet();
-				ws.cellCommentator.asc_changeComment(id, oComment);
+				if (oComment.bDocument)
+					this.wb.cellCommentator.asc_changeComment(id, oComment);
+				else {
+					var ws = this.wb.getWorksheet();
+					ws.cellCommentator.asc_changeComment(id, oComment);
+				}
 			},
 			
 			asc_selectComment: function(id) {
@@ -2534,6 +2542,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_removeComment: function(id) {
 				var ws = this.wb.getWorksheet();
 				ws.cellCommentator.asc_removeComment(id);
+				this.wb.cellCommentator.asc_removeComment(id);
 			},
 			
 			asc_getComments: function(col, row) {
@@ -2542,8 +2551,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 			
 			asc_getDocumentComments: function() {
-				var ws = this.wb.getWorksheet();
-				return ws.cellCommentator.asc_getDocumentComments();
+				return this.wb.cellCommentator.asc_getDocumentComments();
 			},
 			
 			asc_showComments: function() {

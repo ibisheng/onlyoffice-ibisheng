@@ -32,6 +32,17 @@
 		var asc_SR				= asc.StringRender;
 		var asc_getcvt			= asc.getCvtRatio;
 		var asc_CSP				= asc.asc_CStylesPainter;
+		var asc_CCellComments	= asc.asc_CCellCommentator;
+
+		function WorkbookCommentsModel (handlers) {
+			this.workbook = {handlers: handlers};
+		}
+		WorkbookCommentsModel.prototype.getId = function () {
+			return "workbook";
+		};
+		WorkbookCommentsModel.prototype.getMergedByCell = function () {
+			return null;
+		};
 
 
 		/**
@@ -112,6 +123,9 @@
 			this.overlayGraphicCtx = undefined;
 			this.stringRender = undefined;
 			this.drawingCtxCharts = undefined;
+
+			// Комментарии для всего документа
+			this.cellCommentator = null;
 
 			// Максимальная ширина числа из 0,1,2...,9, померенная в нормальном шрифте(дефалтовый для книги) в px(целое)
 			// Ecma-376 Office Open XML Part 1, пункт 18.3.1.13
@@ -431,6 +445,16 @@
 					"insert"	: function () {self._onPopUpSelectorInsert.apply(self, arguments);}
 				});
 			}
+
+			this.cellCommentator = new asc_CCellComments({
+				model: new WorkbookCommentsModel(this.handlers),
+				collaborativeEditing: this.collaborativeEditing,
+				draw: function() {},
+				handlers: {trigger: function (){return true;}}
+			});
+			var commentList = this.cellCommentator.prepareComments(this.model.aComments);
+			if (0 < commentList.length)
+				this.handlers.trigger("asc_onAddComments", commentList);
 
 			this.clipboard.Api = this.Api;
 			this.clipboard.init();
@@ -1671,6 +1695,7 @@
 		};
 
 		WorkbookView.prototype._initCommentsToSave  = function () {
+			var isFirst = true;
 			for (var wsKey in this.wsViews)
 			{
 				var wsView = this.wsViews[wsKey];
@@ -1678,6 +1703,16 @@
 				wsView.cellCommentator.prepareCommentsToSave();
 				wsModel.aComments = wsView.cellCommentator.aComments;
 				wsModel.aCommentsCoords = wsView.cellCommentator.aCommentCoords;
+
+				if (isFirst) {
+					isFirst = false;
+					this.cellCommentator.worksheet = wsView;
+					this.cellCommentator.overlayCtx = wsView.overlayCtx;
+					this.cellCommentator.drawingCtx = wsView.drawingCtx;
+					this.cellCommentator.prepareCommentsToSave();
+					wsModel.aComments = wsModel.aComments.concat(this.cellCommentator.aComments);
+					wsModel.aCommentsCoords = wsModel.aCommentsCoords.concat(this.cellCommentator.aCommentCoords);
+				}
 			}
 		};
 
