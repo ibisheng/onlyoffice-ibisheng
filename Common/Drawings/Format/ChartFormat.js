@@ -4546,17 +4546,17 @@ CCat.prototype =
     setNumLit: function(pr)
     {
         History.Add(this, {Type: historyitem_Cat_SetMultiLvlStrRef, oldPr: this.multiLvlStrRef, newPr: pr});
-        this.multiLvlStrRef = pr;
+        this.numLit = pr;
     },
     setNumRef: function(pr)
     {
         History.Add(this, {Type: historyitem_Cat_SetMultiLvlStrRef, oldPr: this.multiLvlStrRef, newPr: pr});
-        this.multiLvlStrRef = pr;
+        this.numRef = pr;
     },
     setStrLit: function(pr)
     {
         History.Add(this, {Type: historyitem_Cat_SetMultiLvlStrRef, oldPr: this.multiLvlStrRef, newPr: pr});
-        this.multiLvlStrRef = pr;
+        this.strLit = pr;
     },
     setStrRef: function(pr)
     {
@@ -7869,7 +7869,7 @@ CErrBars.prototype =
     setErrValType: function(pr)
     {
         History.Add(this, {Type: historyitem_ErrBars_SetErrValType, oldPr: this.errDir, newPr: pr});
-        this.errDir = pr;
+        this.errValType = pr;
     },
     setMinus: function(pr)
     {
@@ -12726,7 +12726,7 @@ function CRadarSeries()
     this.tx      = null;
     this.val     = null;
 
-    this.Id = g_oIdCouner.Get_NewId();
+    this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
 
@@ -14779,7 +14779,7 @@ function CSurfaceChart()
     this.series = [];
     this.wireframe = null;
 
-    this.Id = g_oTableId.Get_NewId();
+    this.Id = g_oIdCounter.Get_NewId();
 }
 
 CSurfaceChart.prototype =
