@@ -1141,13 +1141,8 @@
 
 		WorksheetView.prototype._prepareComments = function () {
 			// Теперь получение всех комментариев через asc_getWorkbookComments
-			var commentList = [];
-			for (var i = 0; i < this.model.aComments.length; i++) {
-				var comment = { "Id": this.model.aComments[i].asc_getId(), "Comment": this.model.aComments[i] };
-				this.cellCommentator.addCommentSerialize(comment["Comment"]);
-				commentList.push(comment);
-			}
-			if ( commentList.length )
+			var commentList = this.cellCommentator.prepareComments(this.model.aComments);
+			if (0 < commentList.length)
 				this.model.workbook.handlers.trigger("asc_onAddComments", commentList);
 		};
 
