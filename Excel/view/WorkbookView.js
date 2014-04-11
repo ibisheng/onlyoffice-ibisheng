@@ -825,7 +825,7 @@
 			var ws = this.getWorksheet();
 			var arrValues = ws.getCellAutoCompleteValues(ws.activeRange.startCol, ws.activeRange.startRow);
 			this.popUpSelector.show(false, arrValues, this.getWorksheet().getActiveCellCoord());
-			// ToDo нужно не забыть скрывать этот список
+			this.handlers.trigger("asc_onShowAutoComplete", false, arrValues);
 		};
 
 		WorkbookView.prototype._onAutoFiltersClick = function (idFilter) {
@@ -1380,10 +1380,10 @@
 			}
 			if (0 < arrResult.length) {
 				this.popUpSelector.show(true, arrResult, this.getWorksheet().getActiveCellCoord());
+				this.handlers.trigger("asc_onShowAutoComplete", true, arrResult);
 				this.lastFormulaPos = formulaPos;
 				this.lastFormulaName = formulaName;
-			}
-			else {
+			} else {
 				this.popUpSelector.hide();
 				this.lastFormulaPos = -1;
 				this.lastFormulaName = "";
