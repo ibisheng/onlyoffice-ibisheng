@@ -8047,16 +8047,18 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			oCellContentReader.oCurComments = this.oCurComments;
 			oCellContentReader.Read(length, oCellContent);
 			this.nCurCommentsCount = oCellContentReader.nCurCommentsCount;
-			
-			for(var i = 0; i < oCellContent.length; ++i)
+			if(oCellContent.length > 0)
 			{
-				if(i == length - 1)
-					cell.Content.Internal_Content_Add(i + 1, oCellContent[i], true);
-				else
-					cell.Content.Internal_Content_Add(i + 1, oCellContent[i], false);
+				for(var i = 0; i < oCellContent.length; ++i)
+				{
+					if(i == length - 1)
+						cell.Content.Internal_Content_Add(i + 1, oCellContent[i], true);
+					else
+						cell.Content.Internal_Content_Add(i + 1, oCellContent[i], false);
+				}
+				cell.Content.Internal_Content_Remove(0, 1);
 			}
-				
-			cell.Content.Internal_Content_Remove(0, 1);
+			//если 0 == oCellContent.length в ячейке остается параграф который был там при создании.
         }
         else
             res = c_oSerConstants.ReadUnknown;
