@@ -275,7 +275,7 @@ asc_CCommentData.prototype = {
 	},
 	setId: function () {
 		if (this.bDocument)
-			this.nId = "doc_" + guid();
+			this.nId = "doc_" + this.guid();
 		else
 			this.nId = "sheet" + this.wsId + "_" + this.guid();
 	},
