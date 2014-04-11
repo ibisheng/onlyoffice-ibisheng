@@ -23,8 +23,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		var asc_CTrackFile = asc.CTrackFile;
 		var prot;
 
-
-		function spreadsheet_api(name, inputName, eventsController, eventsHandlers, options) {
+		/** @constructor */
+		function spreadsheet_api(name, inputName, eventsHandlers, options) {
 			/************ private!!! **************/
 			this.HtmlElementName = name;
 			this.topLineEditorName = inputName;
