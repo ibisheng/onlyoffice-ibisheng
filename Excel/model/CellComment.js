@@ -1513,6 +1513,8 @@ asc_CCellCommentator.prototype = {
 
 		var _this = this;
 		var comment = _this.asc_findComment(id);
+		if (null === comment)
+			return;
 		
 		function callbackFunc(result) {
 			if ( !result ) {
