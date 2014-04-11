@@ -37,7 +37,6 @@
 		var asc_CFont			= asc.asc_CFont;
 		var asc_CFill			= asc.asc_CFill;
 		var asc_CCellInfo		= asc.asc_CCellInfo;
-		var asc_CRect			= asc.asc_CRect;
 		var asc_CHyperlink		= asc.asc_CHyperlink;
 		var asc_CPageOptions	= asc.asc_CPageOptions;
 		var asc_CPageSetup		= asc.asc_CPageSetup;

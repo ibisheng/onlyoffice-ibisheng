@@ -794,7 +794,7 @@
 		asc_getHeight:	function () { return this._height; }
 	};
 
-	window["Asc"].asc_CRect = asc_CRect;
+	window["asc_CRect"] = asc_CRect;
 	prot = asc_CRect.prototype;
 
 	prot["asc_getX"]			= prot.asc_getX;
