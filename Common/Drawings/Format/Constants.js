@@ -1121,6 +1121,8 @@ var historyitem_Section_Footer_First       = 15; // Меняем нижний к
 var historyitem_Section_Footer_Even        = 16; // Меняем нижний колонтитул четных страниц
 var historyitem_Section_Footer_Default     = 17; // Меняем нижний колонтитул по умолчанию
 var historyitem_Section_TitlePage          = 18; // Меняем настройку наличия специального колонтитула для первой страницы
+var historyitem_Section_PageMargins_Header = 19; // Меняем расстояние от верха страницы до верхнего колонтитула
+var historyitem_Section_PageMargins_Footer = 20; // Меняем расстояние от низа страницы до нижнего колонтитула
 
 // Тип класса, к которому относится данный элемент истории
 var historyitem_State_Unknown         = 0;
