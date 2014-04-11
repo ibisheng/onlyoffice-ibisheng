@@ -5644,11 +5644,11 @@ function Binary_pPrReader(doc, oReadResult, stream)
 						});
 					if(null != oAdditional.HeaderMargin){
 						if(null != oNewSectionPr.HeaderFirst)
-							oNewSectionPr.HeaderFirst.Set_BoundY2(oAdditional.HeaderMargin);
+							oNewSectionPr.HeaderFirst.Set_BoundY2(oAdditional.HeaderMargin, false);
 						if(null != oNewSectionPr.HeaderEven)
-							oNewSectionPr.HeaderEven.Set_BoundY2(oAdditional.HeaderMargin);
+							oNewSectionPr.HeaderEven.Set_BoundY2(oAdditional.HeaderMargin, false);
 						if(null != oNewSectionPr.HeaderDefault)
-							oNewSectionPr.HeaderDefault.Set_BoundY2(oAdditional.HeaderMargin);
+							oNewSectionPr.HeaderDefault.Set_BoundY2(oAdditional.HeaderMargin, false);
 					}
 					if(null != oAdditional.FooterMargin){
 						var nH = oNewSectionPr.Get_PageHeight();
@@ -5656,11 +5656,11 @@ function Binary_pPrReader(doc, oReadResult, stream)
 							nH = Page_Height;
 						var nMargin = nH - oAdditional.FooterMargin;
 						if(null != oNewSectionPr.FooterFirst)
-							oNewSectionPr.FooterFirst.Set_BoundY2(nMargin);
+							oNewSectionPr.FooterFirst.Set_BoundY2(nMargin, false);
 						if(null != oNewSectionPr.FooterEven)
-							oNewSectionPr.FooterEven.Set_BoundY2(nMargin);
+							oNewSectionPr.FooterEven.Set_BoundY2(nMargin, false);
 						if(null != oNewSectionPr.FooterDefault)
-							oNewSectionPr.FooterDefault.Set_BoundY2(nMargin);
+							oNewSectionPr.FooterDefault.Set_BoundY2(nMargin, false);
 					}
 					this.paragraph.Set_SectionPr(oNewSectionPr);
 				}
@@ -7072,9 +7072,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.bpPrr.Read_SecPr(t, l, oSectPr, oAdditional);
             });
-			//todo функция
 			if(null != oAdditional.EvenAndOddHeaders)
-				EvenAndOddHeaders = oAdditional.EvenAndOddHeaders;
+				this.Document.Set_DocumentEvenAndOddHeaders(oAdditional.EvenAndOddHeaders);
 			if(g_nCurFileVersion < 5)
 			{
 				for(var i = 0; i < this.oReadResult.headers.length; ++i)
@@ -7100,11 +7099,11 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			}
 			if(null != oAdditional.HeaderMargin){
 				if(null != oSectPr.HeaderFirst)
-					oSectPr.HeaderFirst.Set_BoundY2(oAdditional.HeaderMargin);
+					oSectPr.HeaderFirst.Set_BoundY2(oAdditional.HeaderMargin, false);
 				if(null != oSectPr.HeaderEven)
-					oSectPr.HeaderEven.Set_BoundY2(oAdditional.HeaderMargin);
+					oSectPr.HeaderEven.Set_BoundY2(oAdditional.HeaderMargin, false);
 				if(null != oSectPr.HeaderDefault)
-					oSectPr.HeaderDefault.Set_BoundY2(oAdditional.HeaderMargin);
+					oSectPr.HeaderDefault.Set_BoundY2(oAdditional.HeaderMargin, false);
 			}
 			if(null != oAdditional.FooterMargin){
 				var nH = oSectPr.Get_PageHeight();
@@ -7112,11 +7111,11 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 					nH = Page_Height;
 				var nMargin = nH - oAdditional.FooterMargin;
 				if(null != oSectPr.FooterFirst)
-					oSectPr.FooterFirst.Set_BoundY2(nMargin);
+					oSectPr.FooterFirst.Set_BoundY2(nMargin, false);
 				if(null != oSectPr.FooterEven)
-					oSectPr.FooterEven.Set_BoundY2(nMargin);
+					oSectPr.FooterEven.Set_BoundY2(nMargin, false);
 				if(null != oSectPr.FooterDefault)
-					oSectPr.FooterDefault.Set_BoundY2(nMargin);
+					oSectPr.FooterDefault.Set_BoundY2(nMargin, false);
 			}
         }
         else
