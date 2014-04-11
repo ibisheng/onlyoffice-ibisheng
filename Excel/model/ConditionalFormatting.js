@@ -220,32 +220,27 @@
 		return this;
 	}
 
-	CGradient.prototype = {
-		/** @type CGradient */
-		constructor: CGradient,
+	CGradient.prototype.init = function (min, max) {
+		var distance = max - min;
 
-		init: function (min, max) {
-			var distance = max - min;
+		this.min = min;
+		this.max = max;
+		this.koef = this.MaxColorIndex / (2.0 * distance);
+		this.r1 = this.c1.getR();
+		this.g1 = this.c1.getG();
+		this.b1 = this.c1.getB();
+		this.r2 = this.c2.getR();
+		this.g2 = this.c2.getG();
+		this.b2 = this.c2.getB();
+	};
+	CGradient.prototype.calculateColor = function (indexColor) {
+		indexColor = parseInt((indexColor - this.min) * this.koef);
 
-			this.min = min;
-			this.max = max;
-			this.koef = this.MaxColorIndex / (2.0 * distance);
-			this.r1 = this.c1.getR();
-			this.g1 = this.c1.getG();
-			this.b1 = this.c1.getB();
-			this.r2 = this.c2.getR();
-			this.g2 = this.c2.getG();
-			this.b2 = this.c2.getB();
-		},
-		calculateColor: function (indexColor) {
-			indexColor = parseInt((indexColor - this.min) * this.koef);
-
-			var r = (this.r1 + ((FT_Common.IntToUInt(this.r2 - this.r1) * indexColor) >> this.base_shift)) & 0xFF;
-			var g = (this.g1 + ((FT_Common.IntToUInt(this.g2 - this.g1) * indexColor) >> this.base_shift)) & 0xFF;
-			var b = (this.b1 + ((FT_Common.IntToUInt(this.b2 - this.b1) * indexColor) >> this.base_shift)) & 0xFF;
-			//console.log("index=" + indexColor + ": r=" + r + " g=" + g + " b=" + b);
-			return new RgbColor((r << 16) + (g << 8) + b);
-		}
+		var r = (this.r1 + ((FT_Common.IntToUInt(this.r2 - this.r1) * indexColor) >> this.base_shift)) & 0xFF;
+		var g = (this.g1 + ((FT_Common.IntToUInt(this.g2 - this.g1) * indexColor) >> this.base_shift)) & 0xFF;
+		var b = (this.b1 + ((FT_Common.IntToUInt(this.b2 - this.b1) * indexColor) >> this.base_shift)) & 0xFF;
+		//console.log("index=" + indexColor + ": r=" + r + " g=" + g + " b=" + b);
+		return new RgbColor((r << 16) + (g << 8) + b);
 	};
 
 	/*
