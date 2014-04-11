@@ -388,6 +388,34 @@ CSectionPr.prototype =
     {
         return this.TitlePage;
     },
+    
+    Set_PageMargins_Header : function(Header)
+    {
+        if ( Header !== this.PageMargins.Header )
+        {
+            History.Add( this, { Type : historyitem_Section_PageMargins_Header, Old : this.PageMargins.Header, New : Header } );
+            this.PageMargins.Header = Header;
+        }
+    },
+    
+    Get_PageMargins_Header : function()
+    {
+        return this.PageMargins.Header;
+    },
+
+    Set_PageMargins_Footer : function(Footer)
+    {
+        if ( Footer !== this.PageMargins.Footer )
+        {
+            History.Add( this, { Type : historyitem_Section_PageMargins_Footer, Old : this.PageMargins.Footer, New : Footer } );
+            this.PageMargins.Footer = Footer;
+        }
+    },
+
+    Get_PageMargins_Footer : function()
+    {
+        return this.PageMargins.Footer;
+    },
 //----------------------------------------------------------------------------------------------------------------------
 // Undo/Redo функции
 //----------------------------------------------------------------------------------------------------------------------
@@ -510,6 +538,18 @@ CSectionPr.prototype =
             case historyitem_Section_TitlePage:
             {
                 this.TitlePage = Data.Old;
+                break;
+            }
+                
+            case historyitem_Section_PageMargins_Header:
+            {
+                this.PageMargins.Header = Data.Old;
+                break;
+            }
+                
+            case historyitem_Section_PageMargins_Footer:
+            {
+                this.PageMargins.Footer = Data.Old;
                 break;
             }
         }
@@ -636,6 +676,18 @@ CSectionPr.prototype =
                 this.TitlePage = Data.New;
                 break;
             }
+
+            case historyitem_Section_PageMargins_Header:
+            {
+                this.PageMargins.Header = Data.New;
+                break;
+            }
+
+            case historyitem_Section_PageMargins_Footer:
+            {
+                this.PageMargins.Footer = Data.New;
+                break;
+            }                
         }
     },
 
@@ -766,6 +818,16 @@ CSectionPr.prototype =
                 
                 Writer.WriteBool( Data.New );
 
+                break;
+            }
+
+            case historyitem_Section_PageMargins_Header:
+            case historyitem_Section_PageMargins_Footer:                
+            {
+                // Double : Header/Footer distance
+                
+                Writer.WriteDouble( Data.New );
+                
                 break;
             }
         }
@@ -968,6 +1030,24 @@ CSectionPr.prototype =
 
                 break;
             }
+
+            case historyitem_Section_PageMargins_Header:
+            {
+                // Double : Header distance
+
+                this.PageMargins.Header = Reader.GetDouble();
+
+                break;
+            }
+
+            case historyitem_Section_PageMargins_Footer:
+            {
+                // Double : Footer distance
+
+                this.PageMargins.Footer = Reader.GetDouble();
+
+                break;
+            }                
         }
     },
 
@@ -1048,6 +1128,9 @@ function CSectionPageMargins()
     this.Top    = 20; // 2 cm
     this.Right  = 15; // 1.5 cm
     this.Bottom = 20; // 2 cm
+    
+    this.Header = 12.7; // 1.27 cm
+    this.Footer = 12.7; // 1.27 cm
 }
 
 CSectionPageMargins.prototype =
@@ -1058,11 +1141,15 @@ CSectionPageMargins.prototype =
         // Double : Top
         // Double : Right
         // Double : Bottom
+        // Double : Header
+        // Double : Footer        
 
         Writer.WriteDouble( this.Left );
         Writer.WriteDouble( this.Top );
         Writer.WriteDouble( this.Right );
         Writer.WriteDouble( this.Bottom );
+        Writer.WriteDouble( this.Header );
+        Writer.WriteDouble( this.Footer );
     },
 
     Read_FromBinary : function(Reader)
@@ -1071,11 +1158,15 @@ CSectionPageMargins.prototype =
         // Double : Top
         // Double : Right
         // Double : Bottom
+        // Double : Header
+        // Double : Footer        
 
         this.Left   = Reader.GetDouble();
         this.Top    = Reader.GetDouble();
         this.Right  = Reader.GetDouble();
         this.Bottom = Reader.GetDouble();
+        this.Header = Reader.GetDouble();
+        this.Footer = Reader.GetDouble();
     }
 }
 

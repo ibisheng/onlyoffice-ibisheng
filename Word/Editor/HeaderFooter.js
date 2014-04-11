@@ -111,6 +111,17 @@ CHeaderFooter.prototype =
             this.Content.Load_RecalculateObject( RecalcObj );
         }
     },
+    
+    Recalculate2 : function(Page_abs)
+    {
+        this.Content.Set_StartPage( Page_abs );
+        this.Content.Prepare_RecalculateObject();
+
+        var CurPage = 0;
+        var RecalcResult = recalcresult2_NextPage;
+        while ( recalcresult2_End != RecalcResult  )
+            RecalcResult = this.Content.Recalculate_Page( CurPage++, true );
+    },
 
     Recalculate_ : function()
     {
@@ -461,6 +472,22 @@ CHeaderFooter.prototype =
     Get_Bounds : function()
     {
         return this.Content.Get_PageBounds(0);
+    },
+    
+    Get_DividingLine : function(PageIndex)
+    {
+        var OldPage = this.RecalcInfo.CurPage;
+        
+        this.Set_Page( PageIndex );
+        var Bounds = this.Get_Bounds();
+        
+        if ( -1 !== OldPage )
+            this.Set_Page( OldPage );
+        
+        if ( hdrftr_Footer === this.Type )
+            return Bounds.Top;
+        else
+            return Bounds.Bottom;
     },
 
     UpdateMargins : function(bNoRecalc, bNoSaveHistory)
@@ -1946,7 +1973,7 @@ CHeaderFooterController.prototype =
         // Рассчитываем верхний колонтитул
         if ( null !== Header )
         {
-            var Y      = Header.BoundY2;
+            var Y      = SectPr.Get_PageMargins_Header();
             var YLimit = (orientation_Portrait === Orient ? SectPr.Get_PageHeight() / 2 : SectPr.Get_PageWidth() / 2); 
             
             Header.Reset( X, Y, XLimit, YLimit );
@@ -1956,9 +1983,18 @@ CHeaderFooterController.prototype =
         // Рассчитываем нижний колонтитул
         if ( null !== Footer )
         {
-            var Y      = Header.BoundY2 - 20; // Временно
+            // Нижний колонтитул рассчитываем 2 раза. Сначала, с 0 позиции, чтобы рассчитать суммарную высоту колонитула.
+            // Исходя из уже известной высоты располагаем и рассчитываем колонтитул.
+            
+            var Y      = 0;
             var YLimit = (orientation_Portrait === Orient ? SectPr.Get_PageHeight() : SectPr.Get_PageWidht() );
 
+            Footer.Reset( X, Y, XLimit, YLimit );
+            Footer.Recalculate2(PageIndex);
+
+            var SummaryHeight = Footer.Content.Get_SummaryHeight();
+            Y = Math.max( 2 * YLimit / 3, YLimit - SectPr.Get_PageMargins_Footer() - SummaryHeight );
+            
             Footer.Reset( X, Y, XLimit, YLimit );
             Footer.Recalculate(PageIndex);
         }
@@ -2048,13 +2084,26 @@ CHeaderFooterController.prototype =
     },
 
     // Запрашиваем низ у верхнего колонтитула для данной страницы
-    Get_HeaderBottomPos : function(PageIndex)
+    Get_HdrFtrLines : function(PageIndex)
     {
-        var HdrFtr = this.Internal_GetContentByXY( 0, 0, PageIndex );
-        if ( null != HdrFtr && hdrftr_Header === HdrFtr.Type )
-            return HdrFtr.Get_Bounds().Bottom;
-
-        return null;
+        var Header = null;
+        var Footer = null;
+        
+        if ( undefined !== this.Pages[PageIndex] )
+        {
+            Header = this.Pages[PageIndex].Header;
+            Footer = this.Pages[PageIndex].Footer;
+        }
+        
+        var Top = null; 
+        if ( null !== Header )
+            Top = Header.Get_DividingLine(PageIndex);
+        
+        var Bottom = null;
+        if ( null !== Footer )
+            Bottom = Footer.Get_DividingLine(PageIndex);
+        
+        return { Top : Top, Bottom : Bottom };
     },
 
     // Запрашиваем верх у нижнего колонтитула для данной страницы
