@@ -1548,7 +1548,6 @@
             this.view.MobileTouchManager.onTouchStart(event);
         };
         asc_CEventsController.prototype._onTouchMove = function (event){
-            var n = new Date().getTime();
             this.view.MobileTouchManager.onTouchMove(event);
         };
         asc_CEventsController.prototype._onTouchEnd = function (event){

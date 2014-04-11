@@ -49,12 +49,12 @@
 		 * Widget for displaying and editing Workbook object
 		 * -----------------------------------------------------------------------------
 		 * @param {Workbook} model               					Workbook
-		 * @param {EventsController} controller  					Events controller
+		 * @param {asc.asc_CEventsController} controller  			Events controller
 		 * @param {HandlersList} handlers        					Events handlers for WorkbookView events
 		 * @param {Element} elem                 					Container element
 		 * @param {Element} inputElem            					Input element for top line editor
 		 * @param {Object} Api
-		 * @param {asc_CCollaborativeEditing} collaborativeEditing
+		 * @param {CCollaborativeEditing} collaborativeEditing
 		 * @param {c_oAscFontRenderingModeType} fontRenderingMode
 		 * @param {Object} settings              					Settings
 		 *

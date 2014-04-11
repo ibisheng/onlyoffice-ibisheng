@@ -964,7 +964,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 			
 			_asc_sendTrack: function (callback, url, rdata) {
-				var oThis = this;
 				asc_ajax({
 					type: 'POST',
 					url: url,
@@ -1049,7 +1048,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				var oAdditionalData = {};
 				oAdditionalData["c"] = "save";
 				oAdditionalData["id"] = this.documentId;
-				oAdditionalData["userid"] = this.documentUserId,
+				oAdditionalData["userid"] = this.documentUserId;
 				oAdditionalData["vkey"] = this.documentVKey;
 				oAdditionalData["outputformat"] = this.documentFormatSave;
 				if(c_oAscFileType.CSV == this.documentFormatSave)
@@ -1071,7 +1070,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				var oAdditionalData = {};
 				oAdditionalData["c"] = "save";
 				oAdditionalData["id"] = this.documentId;
-				oAdditionalData["userid"] = this.documentUserId,
+				oAdditionalData["userid"] = this.documentUserId;
 				oAdditionalData["vkey"] = this.documentVKey;
 				oAdditionalData["outputformat"] = sFormat;
 				if(null != sSaveKey)
