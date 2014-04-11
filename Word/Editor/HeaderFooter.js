@@ -47,6 +47,10 @@ function CHeaderFooter(Parent, LogicDocument, DrawingDocument, Type, BoundY2)
 
     this.RecalcInfo =
     {
+        CurPage       : -1, // Текущий выставленный номер страницы
+        RecalcObj     : {}, // Постраничные объекты пересчета данного колонтитула
+        RecalcObjPrev : {}, // Постраничные объекты пересчета данного колонтитула (для предыдущего пересчета) 
+        
         NeedRecalc : true, // флаг для первого пересчета колонтитула (при загрузке или добавлении)
         OldBounds  : null, // границы колонтитула после предыдущего пересчета
         OldFlowPos : null  // позиции всех flow-объектов, после предыдущего пересчета
@@ -68,8 +72,47 @@ CHeaderFooter.prototype =
     {
         return this.Id;
     },
+    
+    Set_Page : function(Page_abs)
+    {
+        if ( Page_abs !== this.RecalcInfo.CurPage )
+        {
+            var RecalcObj = this.RecalcInfo.RecalcObj[Page_abs];
+            if ( undefined !== RecalcObj )
+            {
+                this.RecalcInfo.CurPage = Page_abs;
+                this.Content.Load_RecalculateObject( RecalcObj );                
+            }            
+        }        
+    },
+    
+    Recalculate : function(Page_abs)
+    {
+        var RecalcObj = this.RecalcInfo.RecalcObj[Page_abs];
+        
+        if ( undefined === RecalcObj )
+        {
+            this.Content.Set_StartPage( Page_abs );
+            this.Content.Prepare_RecalculateObject();
+            
+            var CurPage = 0;
+            var RecalcResult = recalcresult2_NextPage;
+            while ( recalcresult2_End != RecalcResult  )
+                RecalcResult = this.Content.Recalculate_Page( CurPage++, true );
 
-    Recalculate : function()
+            this.RecalcInfo.RecalcObj[Page_abs] = this.Content.Save_RecalculateObject();
+        }
+        
+        if ( -1 === this.RecalcInfo.CurPage )
+            this.RecalcInfo.CurPage = Page_abs;
+        else            
+        {
+            var RecalcObj = this.RecalcInfo.RecalcObj[this.RecalcInfo.CurPage];
+            this.Content.Load_RecalculateObject( RecalcObj );
+        }
+    },
+
+    Recalculate_ : function()
     {
         // Выясним, произошли ли какие-нибудь кардинальные изменения в колонтитуле
         // Изменения могут быть 2 типов: изменение границы колонтитула и изменение
@@ -292,10 +335,13 @@ CHeaderFooter.prototype =
 
     Draw : function(nPageIndex, pGraphics)
     {
-        var OldStartPage = this.Content.Get_StartPage_Relative();
-        this.Content.Set_StartPage( nPageIndex );
+        var OldPage = this.RecalcInfo.CurPage;
+        
+        this.Set_Page( nPageIndex );
         this.Content.Draw( nPageIndex, pGraphics );
-        this.Content.Set_StartPage( OldStartPage );
+        
+        if ( -1 !== OldPage )
+            this.Set_Page( OldPage );
     },
 
     // Пришло сообщение о том, что контент изменился и пересчитался
@@ -606,19 +652,22 @@ CHeaderFooter.prototype =
 
     Is_TableBorder : function(X, Y, PageNum_Abs)
     {
-        this.Content.Set_StartPage( PageNum_Abs );
+        this.Set_Page( PageNum_Abs );
+        //this.Content.Set_StartPage( PageNum_Abs );
         return this.Content.Is_TableBorder( X, Y, PageNum_Abs );
     },
 
     Is_InText : function(X, Y, PageNum_Abs)
     {
-        this.Content.Set_StartPage( PageNum_Abs );
+        this.Set_Page( PageNum_Abs );
+        //this.Content.Set_StartPage( PageNum_Abs );
         return this.Content.Is_InText( X, Y, PageNum_Abs );
     },
 
     Is_InDrawing : function(X, Y, PageNum_Abs)
     {
-        this.Content.Set_StartPage( PageNum_Abs );
+        this.Set_Page( PageNum_Abs );
+        //this.Content.Set_StartPage( PageNum_Abs );
         return this.Content.Is_InDrawing( X, Y, PageNum_Abs );
     },
 
@@ -832,7 +881,8 @@ CHeaderFooter.prototype =
 
     Cursor_MoveAt : function( X, Y, PageIndex, AddToSelect, bRemoveOldSelection )
     {
-        this.Content.Set_StartPage( PageIndex );
+        this.Set_Page( PageIndex );
+        //this.Content.Set_StartPage( PageIndex );
         return this.Content.Cursor_MoveAt( X, Y, AddToSelect, bRemoveOldSelection );
     },
 
@@ -975,7 +1025,8 @@ CHeaderFooter.prototype =
 
     Selection_SetStart : function(X,Y, PageIndex, MouseEvent)
     {
-        this.Content.Set_StartPage( PageIndex );
+        this.Set_Page( PageIndex );
+        //this.Content.Set_StartPage( PageIndex );
 
         if ( true === editor.isStartAddShape )
         {
@@ -994,7 +1045,8 @@ CHeaderFooter.prototype =
 
     Selection_SetEnd : function(X, Y, PageIndex, MouseEvent)
     {
-        this.Content.Set_StartPage( PageIndex );
+        this.Set_Page( PageIndex );
+        //this.Content.Set_StartPage( PageIndex );
         return this.Content.Selection_SetEnd(X, Y, PageIndex, MouseEvent);
     },
 
@@ -1171,6 +1223,11 @@ CHeaderFooter.prototype =
 
     Refresh_RecalcData2 : function()
     {
+        // Сохраняем пересчитаные страницы в старый пересчет, а текущий обнуляем
+        this.RecalcInfo.RecalcObjPrev = this.RecalcInfo.RecalcObj;
+        this.RecalcInfo.RecalcObj = {};
+        this.RecalcInfo.CurPage   = -1;
+        
         History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : this } );
     },
 //-----------------------------------------------------------------------------------
@@ -1397,13 +1454,13 @@ function CHeaderFooterController(LogicDocument, DrawingDocument)
     // Текущий колонтитул
     this.CurHdrFtr = null;
 
-    this.Pages   = new Array();
+    this.Pages   = {};
     this.CurPage = 0;
     this.ChangeCurPageOnEnd = true;
 
     this.WaitMouseDown = true;
 
-    this.Lock = new CLock();
+    this.Lock = new CLock();   
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -1852,36 +1909,58 @@ CHeaderFooterController.prototype =
             return this.CurHdrFtr.RecalculateCurPos();
     },
 
-    Recalculate : function()
+    Recalculate : function(PageIndex)    
     {
-        if ( null != this.Content[0].Header.First )
-        {
-            this.Content[0].Header.First.Recalculate();
-        }
+        // Определим четность страницы и является ли она первой в данной секции. Заметим, что четность страницы 
+        // отсчитывается от начала текущей секции и не зависит от настроек нумерации страниц для данной секции.
+        var FirstPage = this.LogicDocument.Get_SectionFirstPage( PageIndex );
+        
+        var bFirst = ( FirstPage === PageIndex ? true : false );
+        var bEven  = ( 0 === ( ( PageIndex - FirstPage ) % 2 ) ? false : true ); // потому что у нас страницы с 0 нумеруются
+        
+        // Запросим нужный нам колонтитул 
+        var HdrFtr = this.LogicDocument.Get_SectionHdrFtr( PageIndex, bFirst, bEven );
+        
+        var Header = HdrFtr.Header;
+        var Footer = HdrFtr.Footer;
+        var SectPr = HdrFtr.SectPr;
 
-        if ( null != this.Content[0].Header.Odd && this.Content[0].Header.Odd !== this.Content[0].Header.First )
-        {
-            this.Content[0].Header.Odd.Recalculate();
+        this.Pages[PageIndex] = new CHdrFtrPage();
+        this.Pages[PageIndex].Header = Header;
+        this.Pages[PageIndex].Footer = Footer;
+        
+        var X, XLimit;
+        
+        var Orient = SectPr.Get_Orientation();
+        if ( orientation_Portrait === Orient )
+        {        
+            X      = SectPr.Get_PageMargin_Left();
+            XLimit = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
         }
-
-        if ( null != this.Content[0].Header.Even && this.Content[0].Header.Even !== this.Content[0].Header.Odd && this.Content[0].Header.Even != this.Content[0].Header.First )
+        else
         {
-            this.Content[0].Header.Even.Recalculate();
+            X      = SectPr.Get_PageMargin_Bottom();
+            XLimit = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Top();
         }
-
-        if ( null != this.Content[0].Footer.First )
+        
+        // Рассчитываем верхний колонтитул
+        if ( null !== Header )
         {
-            this.Content[0].Footer.First.Recalculate();
+            var Y      = Header.BoundY2;
+            var YLimit = (orientation_Portrait === Orient ? SectPr.Get_PageHeight() / 2 : SectPr.Get_PageWidth() / 2); 
+            
+            Header.Reset( X, Y, XLimit, YLimit );
+            Header.Recalculate(PageIndex);
         }
-
-        if ( null != this.Content[0].Footer.Odd && this.Content[0].Footer.Odd !== this.Content[0].Footer.First )
+        
+        // Рассчитываем нижний колонтитул
+        if ( null !== Footer )
         {
-            this.Content[0].Footer.Odd.Recalculate();
-        }
+            var Y      = Header.BoundY2 - 20; // Временно
+            var YLimit = (orientation_Portrait === Orient ? SectPr.Get_PageHeight() : SectPr.Get_PageWidht() );
 
-        if ( null != this.Content[0].Footer.Even && this.Content[0].Footer.Even !== this.Content[0].Footer.Odd && this.Content[0].Footer.Even != this.Content[0].Footer.First )
-        {
-            this.Content[0].Footer.Even.Recalculate();
+            Footer.Reset( X, Y, XLimit, YLimit );
+            Footer.Recalculate(PageIndex);
         }
     },
 
@@ -1921,45 +2000,14 @@ CHeaderFooterController.prototype =
     // Отрисовка колонтитулов на данной странице
     Draw : function(nPageIndex, pGraphics)
     {
-        var bHeader = true;
-        var bFirst = (0 === nPageIndex ? true : false);
-        var bEven  = (nPageIndex  % 2 === 1 ? true : false); // 0, потому что нумерация начинается с 0, а не 1
+        var Header = this.Pages[nPageIndex].Header;
+        var Footer = this.Pages[nPageIndex].Footer;
+        
+        if ( null !== Header )
+            Header.Draw( nPageIndex, pGraphics );
 
-
-        // В зависимости от страницы и позиции на странице мы активируем(делаем текущим)
-        // соответствующий колонтитул
-
-        var Ptr = null;
-        if ( true === bHeader )
-            Ptr = this.Content[0].Header;
-        else
-            Ptr = this.Content[0].Footer;
-
-        if ( true === bFirst )
-        {
-            if ( null != this.Content[0].Header.First )
-                this.Content[0].Header.First.Draw( nPageIndex, pGraphics );
-
-            if ( null != this.Content[0].Footer.First )
-                this.Content[0].Footer.First.Draw( nPageIndex, pGraphics );
-        }
-        else if ( true === bEven )
-        {
-            if ( null != this.Content[0].Header.Even )
-                this.Content[0].Header.Even.Draw( nPageIndex, pGraphics );
-
-            if ( null != this.Content[0].Footer.Even )
-                this.Content[0].Footer.Even.Draw( nPageIndex, pGraphics );
-        }
-        else
-        {
-            if ( null != this.Content[0].Header.Odd )
-                this.Content[0].Header.Odd.Draw( nPageIndex, pGraphics );
-
-            if ( null != this.Content[0].Footer.Odd )
-                this.Content[0].Footer.Odd.Draw( nPageIndex, pGraphics );
-
-        }
+        if ( null !== Footer )
+            Footer.Draw( nPageIndex, pGraphics );
     },
 
     CheckRange : function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageIndex)
@@ -2006,7 +2054,7 @@ CHeaderFooterController.prototype =
         if ( null != HdrFtr && hdrftr_Header === HdrFtr.Type )
             return HdrFtr.Get_Bounds().Bottom;
 
-        return -1;
+        return null;
     },
 
     // Запрашиваем верх у нижнего колонтитула для данной страницы
@@ -2016,7 +2064,7 @@ CHeaderFooterController.prototype =
         if ( null != HdrFtr && hdrftr_Footer === HdrFtr.Type  )
             return HdrFtr.Get_Bounds().Top;
 
-        return -1;
+        return null;
     },
 
     UpdateMargins : function(Index, bNoRecalc, bNoSaveHistory)
@@ -2546,16 +2594,16 @@ CHeaderFooterController.prototype =
         this.ChangeCurPageOnEnd = true;
 
         var OldPage = this.CurPage;
+
         // Сначала проверяем, не попали ли мы в контент документа. Если да, тогда надо
         // активировать работу с самим документом (просто вернуть false здесь)
 
-        var bFirst = (0 === PageIndex ? true : false);
-        var bEven  = (PageIndex  % 2 === 1 ? true : false); // 0, потому что нумерация начинается с 0, а не 1
         var TempHdrFtr = null;
         var PageMetrics = this.LogicDocument.Get_PageContentStartPos( PageIndex );
+        
         if ( MouseEvent.ClickCount >= 2 && true != editor.isStartAddShape &&
-            !( Y <= PageMetrics.Y      || ( ( ( true === bFirst && null != ( TempHdrFtr = this.Content[0].Header.First ) ) || ( true === bEven && null != ( TempHdrFtr = this.Content[0].Header.Even ) ) || ( false === bEven && null != ( TempHdrFtr = this.Content[0].Header.Odd ) ) ) && true === TempHdrFtr.Is_PointInDrawingObjects( X, Y ) ) ) &&
-            !( Y >= PageMetrics.YLimit || ( ( ( true === bFirst && null != ( TempHdrFtr = this.Content[0].Footer.First ) ) || ( true === bEven && null != ( TempHdrFtr = this.Content[0].Footer.Even ) ) || ( false === bEven && null != ( TempHdrFtr = this.Content[0].Footer.Odd ) ) ) && true === TempHdrFtr.Is_PointInDrawingObjects( X, Y ) ) ) )
+            !( Y <= PageMetrics.Y      || ( null !== ( TempHdrFtr = this.Pages[PageIndex].Header ) && true === TempHdrFtr.Is_PointInDrawingObjects( X, Y ) ) ) &&
+            !( Y >= PageMetrics.YLimit || ( null !== ( TempHdrFtr = this.Pages[PageIndex].Footer ) && true === TempHdrFtr.Is_PointInDrawingObjects( X, Y ) ) ) )
         {
             // Убираем селект, если он был
             if ( null != this.CurHdrFtr )
@@ -2569,48 +2617,50 @@ CHeaderFooterController.prototype =
 
         this.CurPage = PageIndex;
 
-        var bHeader = null;
+        var HdrFtr = null;
 
         // Проверяем попали ли мы в колонтитул, если он есть. Если мы попали в
         // область колонтитула, а его там нет, тогда добавим новый колонтитул.
-        if ( Y <= PageMetrics.Y || ( ( ( true === bFirst && null != ( TempHdrFtr = this.Content[0].Header.First ) ) || ( true === bEven && null != ( TempHdrFtr = this.Content[0].Header.Even ) ) || ( false === bEven && null != ( TempHdrFtr = this.Content[0].Header.Odd ) ) ) && true === TempHdrFtr.Is_PointInDrawingObjects( X, Y ) ) || true === editor.isStartAddShape )
+        if ( Y <= PageMetrics.Y || ( null !== ( TempHdrFtr = this.Pages[PageIndex].Header ) && true === TempHdrFtr.Is_PointInDrawingObjects( X, Y ) ) || true === editor.isStartAddShape )
         {
-            bHeader = true;
-            if ( ( null === this.Content[0].Header.First && true === bFirst ) || ( null === this.Content[0].Header.Even && true === bEven ) || ( null === this.Content[0].Header.Odd && false === bEven ) )
+            if ( null === this.Pages[PageIndex].Header )
             {
                 if ( false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_HdrFtr) )
                 {
-                    // Меняем тип на старый, чтобы при Undo/Redo возвращаться в режим редактирования документа
+                    // Меняем старый режим редактирования, чтобы при Undo/Redo возвращаться в режим редактирования документа
                     this.LogicDocument.CurPos.Type = docpostype_Content;
                     History.Create_NewPoint();
                     this.LogicDocument.CurPos.Type = docpostype_HdrFtr;
-
-                    this.AddHeaderOrFooter( hdrftr_Header, hdrftr_Default );
+                    HdrFtr = this.LogicDocument.Create_SectionHdrFtr( hdrftr_Header, PageIndex );
+                    this.LogicDocument.Recalculate();
                 }
                 else
                     return false;
             }
+            else
+                HdrFtr = this.Pages[PageIndex].Header;
         }
-        else if ( Y >= PageMetrics.YLimit || ( ( ( true === bFirst && null != ( TempHdrFtr = this.Content[0].Footer.First ) ) || ( true === bEven && null != ( TempHdrFtr = this.Content[0].Footer.Even ) ) || ( false === bEven && null != ( TempHdrFtr = this.Content[0].Footer.Odd ) ) ) && true === TempHdrFtr.Is_PointInDrawingObjects( X, Y ) ) )
+        else if ( Y >= PageMetrics.YLimit || ( null !== ( TempHdrFtr = this.Pages[PageIndex].Footer ) && true === TempHdrFtr.Is_PointInDrawingObjects( X, Y ) ) )
         {
-            bHeader = false;
-            if ( ( null === this.Content[0].Footer.First && true === bFirst ) || ( null === this.Content[0].Footer.Even && true === bEven ) || ( null === this.Content[0].Footer.Odd && false === bEven ) )
+            if ( null === this.Pages[PageIndex].Footer )
             {
                 if ( false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_HdrFtr) )
                 {
-                    // Меняем тип на старый, чтобы при Undo/Redo возвращаться в режим редактирования документа
+                    // Меняем старый режим редактирования, чтобы при Undo/Redo возвращаться в режим редактирования документа
                     this.LogicDocument.CurPos.Type = docpostype_Content;
                     History.Create_NewPoint();
                     this.LogicDocument.CurPos.Type = docpostype_HdrFtr;
-
-                    this.AddHeaderOrFooter( hdrftr_Footer, hdrftr_Default );
+                    HdrFtr = this.LogicDocument.Create_SectionHdrFtr( hdrftr_Footer, PageIndex );
+                    this.LogicDocument.Recalculate();
                 }
                 else
                     return false;
             }
+            else
+                HdrFtr = this.Pages[PageIndex].Footer;
         }
 
-        if ( null === bHeader )
+        if ( null === HdrFtr )
         {
             // Ничего не делаем и отключаем дальнейшую обработку MouseUp и MouseMove
             this.WaitMouseDown = true;
@@ -2625,20 +2675,8 @@ CHeaderFooterController.prototype =
         // В зависимости от страницы и позиции на странице мы активируем(делаем текущим)
         // соответствующий колонтитул
 
-        var Ptr = null;
-        if ( true === bHeader )
-            Ptr = this.Content[0].Header;
-        else
-            Ptr = this.Content[0].Footer;
-
         var OldHdrFtr = this.CurHdrFtr;
-
-        if ( true === bFirst )
-            this.CurHdrFtr = Ptr.First;
-        else if ( true === bEven )
-            this.CurHdrFtr = Ptr.Even;
-        else
-            this.CurHdrFtr = Ptr.Odd;
+        this.CurHdrFtr = HdrFtr;
 
         if ( null != OldHdrFtr && (OldHdrFtr != this.CurHdrFtr || OldPage != this.CurPage) )
         {
@@ -2649,9 +2687,9 @@ CHeaderFooterController.prototype =
         if ( null != this.CurHdrFtr )
         {
             // активируем линейку для колонтитула
-            if ( null != bHeader && (OldHdrFtr != this.CurHdrFtr || true === bActivate) )
+            if ( null != HdrFtr && (OldHdrFtr != this.CurHdrFtr || true === bActivate) )
             {
-                if ( true === bHeader )
+                if ( hdrftr_Header === HdrFtr.Type )
                     this.DrawingDocument.Set_RulerState_HdrFtr( true, this.CurHdrFtr.BoundY2, Math.max( this.CurHdrFtr.BoundY, Y_Top_Field ) );
                 else
                 {
@@ -2698,7 +2736,10 @@ CHeaderFooterController.prototype =
             this.CurHdrFtr.Selection_SetEnd(X, ResY, PageIndex, MouseEvent);
 
             if ( false === this.ChangeCurPageOnEnd )
-                this.CurHdrFtr.Content.Set_StartPage( this.CurPage );
+            {
+                this.CurHdrFtr.Set_Page( this.CurPage );
+                //this.CurHdrFtr.Content.Set_StartPage( this.CurPage );
+            }
         }
     },
 
@@ -2743,26 +2784,13 @@ CHeaderFooterController.prototype =
     // Возвращаем колонтитул по данной позиции
     Internal_GetContentByXY : function( X, Y, PageIndex )
     {
-        var bFirst = (0 === PageIndex ? true : false);
-        var bEven  = (PageIndex  % 2 === 1 ? true : false); // 0, потому что нумерация начинается с 0, а не 1
-
         var Header = null;
         var Footer = null;
 
-        if ( true === bFirst )
+        if ( undefined !== this.Pages[PageIndex] )
         {
-            Header = this.Content[0].Header.First;
-            Footer = this.Content[0].Footer.First;
-        }
-        else if ( true === bEven )
-        {
-            Header = this.Content[0].Header.Even;
-            Footer = this.Content[0].Footer.Even;
-        }
-        else
-        {
-            Header = this.Content[0].Header.Odd;
-            Footer = this.Content[0].Footer.Odd;
+            Header = this.Pages[PageIndex].Header;
+            Footer = this.Pages[PageIndex].Footer;
         }
 
         if ( Y <= Page_Height / 2 && null != Header )
@@ -3543,4 +3571,10 @@ CHeaderFooterController.prototype =
 
         return false;
     }
+}
+
+function CHdrFtrPage()
+{
+    this.Header = null;
+    this.Footer = null;
 }

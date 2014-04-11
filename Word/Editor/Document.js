@@ -151,6 +151,34 @@ CDocumentPage.prototype =
         }
 
         return false;
+    },
+    
+    Copy : function()
+    {
+        var NewPage = new CDocumentPage();
+
+        NewPage.Width  = this.Width;
+        NewPage.Height = this.Height;
+
+        NewPage.Margins.Left   = this.Margins.Left;
+        NewPage.Margins.Right  = this.Margins.Right;
+        NewPage.Margins.Top    = this.Margins.Top;
+        NewPage.Margins.Bottom = this.Margins.Bottom;
+
+        NewPage.Bounds.Left   = this.Bounds.Left;
+        NewPage.Bounds.Right  = this.Bounds.Right;
+        NewPage.Bounds.Top    = this.Bounds.Top;
+        NewPage.Bounds.Bottom = this.Bounds.Bottom;        
+        
+        NewPage.Pos    = this.Pos;
+        NewPage.EndPos = this.EndPos;
+
+        NewPage.X      = this.X;
+        NewPage.Y      = this.Y;
+        NewPage.XLimit = this.XLimit;
+        NewPage.YLimit = this.YLimit;
+        
+        return NewPage;
     }
 };
 
@@ -1020,7 +1048,7 @@ CDocument.prototype =
     {
         if ( true !== g_TestColumns )
         {
-            var SectPr = this.SectionsInfo.Get_SectPr( ElementIndex).SectPr;
+            var SectPr = this.SectionsInfo.Get_SectPr(ElementIndex).SectPr;
 
             var X, Y, XLimit, YLimit;
             if ( orientation_Portrait == SectPr.PageSize.Orient )
@@ -1038,22 +1066,15 @@ CDocument.prototype =
                 XLimit = SectPr.PageSize.H - SectPr.PageMargins.Top;
             }
 
-            return { X : X, Y : Y, XLimit : XLimit, YLimit : YLimit };
-
-
-            /*
-            var Y = Y_Top_Field;
             var YHeader = this.HdrFtr.Get_HeaderBottomPos( PageIndex );
-            if ( YHeader >= 0 && YHeader > Y )
+            if ( null !== YHeader && YHeader > Y )
                 Y = YHeader;
 
-            var YLimit = Y_Bottom_Field;
             var YFooter = this.HdrFtr.Get_FooterTopPos( PageIndex );
-            if ( YFooter >= 0 &&  YFooter < YLimit )
+            if ( null !== YFooter && YFooter < YLimit )
                 YLimit = YFooter;
 
-            return { X : X_Left_Field, Y : Y, XLimit : X_Right_Field, YLimit : YLimit };
-            */
+            return { X : X, Y : Y, XLimit : XLimit, YLimit : YLimit };
         }
         else
         {
@@ -1187,12 +1208,13 @@ CDocument.prototype =
 
         // 2. Пересчитываем все колонтитулы, которые надо пересчитать. Если граница хоть одного колонтитула изменилась, тогда
         //    надо будет пересчитать документ от начала и до конца.
-        var bFullRecalc = false;
-        for ( var HdrFtrIndex = 0; HdrFtrIndex < RecalcData.HdrFtr.length; HdrFtrIndex++ )
-        {
-            if ( true === RecalcData.HdrFtr[HdrFtrIndex].Recalculate() )
-                bFullRecalc = true;
-        }
+        var bFullRecalc = true;
+        
+        //for ( var HdrFtrIndex = 0; HdrFtrIndex < RecalcData.HdrFtr.length; HdrFtrIndex++ )
+        //{
+        //    if ( true === RecalcData.HdrFtr[HdrFtrIndex].Recalculate() )
+        //        bFullRecalc = true;
+        //}
 
         if ( true === bFullRecalc )
         {
@@ -1272,15 +1294,17 @@ CDocument.prototype =
     // bStart - флаг, который говорит, о том рассчитываем мы эту страницу первый раз или нет (за один общий пересчет)
     Recalculate_Page : function(PageIndex, bStart, StartIndex, bStartNewSection)
     {
-        var StartPos = this.Get_PageContentStartPos( PageIndex, StartIndex );
-
+        var SectElement = this.SectionsInfo.Get_SectPr( StartIndex );
+        
         if ( true === bStart )
         {
-            var SectPr = this.SectionsInfo.Get_SectPr( StartIndex).SectPr;
-
             this.Pages.length = PageIndex;
             this.Pages[PageIndex] = new CDocumentPage();
             this.Pages[PageIndex].Pos = StartIndex;
+
+            this.HdrFtr.Recalculate(PageIndex);
+
+            var SectPr = this.SectionsInfo.Get_SectPr(StartIndex).SectPr;
 
             if ( orientation_Portrait === SectPr.PageSize.Orient )
             {
@@ -1301,11 +1325,12 @@ CDocument.prototype =
                 this.Pages[PageIndex].Margins.Bottom = SectPr.PageSize.W - SectPr.PageMargins.Right;
             }
 
-
             this.DrawingObjects.createGraphicPage(PageIndex);
             this.DrawingObjects.resetDrawingArrays(PageIndex, this);
         }
-
+        
+        var StartPos = this.Get_PageContentStartPos(PageIndex, StartIndex);
+        
         var Count = this.Content.length;
 
         var X      = StartPos.X;
@@ -1313,6 +1338,11 @@ CDocument.prototype =
         var Y      = StartY;
         var YLimit = StartPos.YLimit;
         var XLimit = StartPos.XLimit;
+
+        this.Pages[PageIndex].X      = X;
+        this.Pages[PageIndex].XLimit = XLimit;
+        this.Pages[PageIndex].Y      = Y;
+        this.Pages[PageIndex].YLimit = YLimit;
 
         var bReDraw     = true;
         var bContinue   = false;
@@ -2045,24 +2075,7 @@ CDocument.prototype =
     // Отрисовка содержимого Документа
     Draw : function(nPageIndex, pGraphics)
     {
-        if ( "undefined" == typeof(pGraphics) )
-            pGraphics = Canvas;
-
-        if ( "undefined" == typeof(nPageIndex) )
-            nPageIndex = this.CurPage;
-
         this.Comments.Reset_CurrentDraw( nPageIndex );
-
-        /*
-
-         pGraphics.BeginPath();
-         pGraphics.MoveTo( X_Left_Field, Y_Top_Field );
-         pGraphics.LineTo( X_Left_Field, Y_Bottom_Field );
-         pGraphics.LineTo( X_Right_Field, Y_Bottom_Field );
-         pGraphics.LineTo( X_Right_Field, Y_Top_Field );
-         pGraphics.LineTo( X_Left_Field, Y_Top_Field );
-         pGraphics.Stroke();
-         */
 
         // Определим секцию
         var Page_StartPos = this.Pages[nPageIndex].Pos;
@@ -2071,9 +2084,8 @@ CDocument.prototype =
         // Рисуем колонтитулы
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
-            var PageMetrics = this.Get_PageContentStartPos( nPageIndex, this.Pages[nPageIndex].Pos );
-            pGraphics.DrawHeaderEdit( PageMetrics.Y,     this.HdrFtr.Lock.Get_Type() );
-            pGraphics.DrawFooterEdit( PageMetrics.YLimit,this.HdrFtr.Lock.Get_Type() );
+            pGraphics.DrawHeaderEdit( this.Pages[nPageIndex].Y,      this.HdrFtr.Lock.Get_Type() );
+            pGraphics.DrawFooterEdit( this.Pages[nPageIndex].YLimit, this.HdrFtr.Lock.Get_Type() );
         }
         else
             pGraphics.Start_GlobalAlpha();
@@ -7559,6 +7571,15 @@ CDocument.prototype =
         this.History.Add( this, { Type : historyitem_Document_DefaultTab, Old : Default_Tab_Stop, New : DTab } );
         Default_Tab_Stop = DTab;
     },
+    
+    Set_DocumentEvenAndOddHeaders : function(Value)
+    {
+        if ( Value !== EvenAndOddHeaders )
+        {
+            this.History.Add( this, { Type : historyitem_Document_EvenAndOddHeaders, Old : EvenAndOddHeaders, New : Value } );
+            EvenAndOddHeaders = Value;
+        }
+    },
 
     // Обновляем данные в интерфейсе о свойствах параграфа
     Interface_Update_ParaPr : function()
@@ -11733,6 +11754,12 @@ CDocument.prototype =
 
                 break;
             }
+                
+            case historyitem_Document_EvenAndOddHeaders:
+            {
+                EvenAndOddHeaders = Data.Old;
+                break;
+            }
         }
     },
 
@@ -11769,6 +11796,12 @@ CDocument.prototype =
 
                 break;
             }
+
+            case historyitem_Document_EvenAndOddHeaders:
+            {
+                EvenAndOddHeaders = Data.New;
+                break;
+            }
         }
     },
 
@@ -11794,6 +11827,7 @@ CDocument.prototype =
             }
 
             case historyitem_Document_DefaultTab:
+            case historyitem_Document_EvenAndOddHeaders:
             {
                 bNeedRecalcHdrFtr = true;
                 break;
@@ -12223,6 +12257,13 @@ CDocument.prototype =
 
                 break;
             }
+
+            case historyitem_Document_EvenAndOddHeaders:
+            {
+                // Boold : EvenAndOddHeaders
+                Writer.WriteBool( Data.New );
+                break;
+            }
         }
 
         return Writer;
@@ -12352,6 +12393,15 @@ CDocument.prototype =
                 // Double : Default Tab
 
                 Default_Tab_Stop = Reader.GetDouble();
+
+                break;
+            }
+
+            case historyitem_Document_EvenAndOddHeaders:
+            {
+                // Bool : EvenAndOddHeaders
+                
+                EvenAndOddHeaders = Reader.GetBool();
 
                 break;
             }
@@ -12822,6 +12872,7 @@ CDocument.prototype =
                 // разрыва секций.
                 SectPr.Copy( CurSectPr );
                 CurSectPr.Set_Type( SectionBreakType );
+                CurSectPr.Clear_AllHdrFtr();
 
                 Element.Set_SectionPr(SectPr);
                 Element.Refresh_RecalcData2(0, 0);
@@ -12833,6 +12884,121 @@ CDocument.prototype =
         }
         
         return false;
+    },
+    
+    Get_SectionFirstPage : function(Page_abs)
+    {
+        var StartIndex = this.Pages[Page_abs].Pos;
+        var SectIndex  = this.SectionsInfo.Get_Index( StartIndex );
+        
+        if ( 0 === SectIndex )
+            return 0;
+        
+        StartIndex = this.SectionsInfo.Get_SectPr2( SectIndex - 1).Index;
+        
+        // Ищем номер страницы, на которой закончилась предыдущая секция
+        var CurPage = Page_abs;
+        for (; CurPage > 0; CurPage--)
+        {
+            if ( this.Pages[CurPage].EndPos >= StartIndex && this.Pages[CurPage].Pos <= StartIndex )
+                break;
+        }
+        
+        return CurPage + 1;
+    },
+    
+    Get_SectionHdrFtr : function(Page_abs, _bFirst, _bEven)
+    {       
+        var StartIndex = this.Pages[Page_abs].Pos;
+        var SectIndex  = this.SectionsInfo.Get_Index(StartIndex);
+        var CurSectPr  = this.SectionsInfo.Get_SectPr2(SectIndex).SectPr;
+
+        var bEven  = ( true === _bEven  && true === EvenAndOddHeaders   ? true : false );
+        var bFirst = ( true === _bFirst && true === CurSectPr.TitlePage ? true : false );
+
+        var CurSectIndex = SectIndex;
+        
+        // Ищем верхний и нижний колонтитулы. Если они не находятся в текущей секции, тогда ищем в предыдущей.        
+        var Header = null, Footer = null;
+        while ( CurSectIndex >= 0 )
+        {
+            var SectPr = this.SectionsInfo.Get_SectPr2(CurSectIndex).SectPr;
+            
+            if ( null === Header )
+            {
+                if ( true === bFirst )
+                    Header = SectPr.Get_Header_First();
+                else if ( true === bEven )
+                    Header = SectPr.Get_Header_Even();
+                else
+                    Header = SectPr.Get_Header_Default();
+            }
+
+            if ( null === Footer )
+            {
+                if ( true === bFirst )
+                    Footer = SectPr.Get_Footer_First();
+                else if ( true === bEven )
+                    Footer = SectPr.Get_Footer_Even();
+                else
+                    Footer = SectPr.Get_Footer_Default();
+            }
+
+            if ( null !== Header && null !== Footer )
+                break;     
+            
+            CurSectIndex--;
+        }
+                
+        return { Header : Header, Footer : Footer, SectPr : CurSectPr };
+    },
+    
+    Create_SectionHdrFtr : function(Type, PageIndex)
+    {
+        // Данная функция используется, когда у нас нет колонтитула вообще. Это значит, что его нет ни в 1 секции. Следовательно,
+        // создаем колонтитул в первой секции, а в остальных он будет повторяться. По текущей секции нам надо будет
+        // определить какой конкретно колонтитул мы собираемся создать.
+        
+        var FirstPage = this.Get_SectionFirstPage( PageIndex );
+
+        var _bFirst = ( FirstPage === PageIndex ? true : false );
+        var _bEven  = ( 0 === ( ( PageIndex - FirstPage ) % 2 ) ? false : true ); // потому что у нас страницы с 0 нумеруются
+
+        var StartIndex = this.Pages[PageIndex].Pos;
+        var SectIndex  = this.SectionsInfo.Get_Index(StartIndex);
+        var CurSectPr  = this.SectionsInfo.Get_SectPr2(SectIndex).SectPr;
+                
+        var bEven  = ( true === _bEven  && true === EvenAndOddHeaders   ? true : false );
+        var bFirst = ( true === _bFirst && true === CurSectPr.TitlePage ? true : false );
+        
+        var SectPr = this.SectionsInfo.Get_SectPr2(0).SectPr;
+
+        var BoundY2 = Y_Default_Header;
+        if ( Type === hdrftr_Footer )
+            BoundY2 = Page_Height - Y_Default_Footer;
+        
+        var HdrFtr = new CHeaderFooter( this.HdrFtr, this, this.DrawingDocument, Type, BoundY2 );
+
+        if ( hdrftr_Header === Type )
+        {
+            if ( true === bFirst )
+                SectPr.Set_Header_First( HdrFtr );
+            else if ( true === bEven )
+                SectPr.Set_Header_Even( HdrFtr );
+            else
+                SectPr.Set_Header_Default( HdrFtr );
+        }
+        else
+        {
+            if ( true === bFirst )
+                SectPr.Set_Footer_First( HdrFtr );
+            else if ( true === bEven )
+                SectPr.Set_Footer_Even( HdrFtr );
+            else
+                SectPr.Set_Footer_Default( HdrFtr );
+        } 
+        
+        return HdrFtr;
     }
 };
 
@@ -12862,6 +13028,20 @@ CDocumentSectionsInfo.prototype =
     {
         this.Elements.length = 0;
     },
+    
+    Get_Index : function(Index)
+    {
+        var Count = this.Elements.length;
+
+        for ( var Pos = 0; Pos < Count; Pos++ )
+        {
+            if ( Index <= this.Elements[Pos].Index )
+                return Pos;
+        }
+
+        // Последний элемент здесь это всегда конечная секция документа
+        return (Count - 1);
+    },
 
     Get_SectPr : function(Index)
     {
@@ -12875,6 +13055,11 @@ CDocumentSectionsInfo.prototype =
 
         // Последний элемент здесь это всегда конечная секция документа
         return this.Elements[Count - 1];
+    },
+    
+    Get_SectPr2 : function(Index)
+    {
+        return this.Elements[Index];
     },
 
     Find : function(SectPr)

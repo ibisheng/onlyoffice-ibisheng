@@ -236,13 +236,13 @@ Paragraph.prototype =
     {
         if ( undefined === DrawingObjs )
             DrawingObjs = new Array();
-
+        
         var Count = this.Content.length;
         for ( var Pos = 0; Pos < Count; Pos++ )
         {
             var Item = this.Content[Pos];
-            if ( para_Drawing === Item.Type )
-                DrawingObjs.push( Item );
+            if ( para_Hyperlink === Item.Type || para_Run === Item.Type )
+                Item.Get_AllDrawingObjects( DrawingObjs );
         }
 
         return DrawingObjs;
@@ -5245,6 +5245,9 @@ Paragraph.prototype =
 
     Recalculate_Fast : function(SimpleChanges)
     {
+        if ( true === this.Parent.Is_HdrFtr(false) )
+            return -1;
+        
         var Run = SimpleChanges[0].Class;
 
         var StartLine  = Run.StartLine;
@@ -5453,7 +5456,7 @@ Paragraph.prototype =
 
             PRS.Update_CurPos( Pos, 0 );
 
-            var SavedLines = Item.Save_Lines();
+            var SavedLines = Item.Save_RecalculateObject(true);
 
             Item.Recalculate_Range( ParaPr, 1 );
 
@@ -5468,7 +5471,7 @@ Paragraph.prototype =
             if ( false === SavedLines.Compare( _Line, _Range, Item ) )
                 return -1;
 
-            Item.Restore_Lines( SavedLines );
+            Item.Load_RecalculateObject( SavedLines );
         }
 
         // Recalculate_Lines_Width
@@ -9181,9 +9184,6 @@ Paragraph.prototype =
                 {
                     this.Content[CurPos].Apply_TextPr( undefined, bIncrease, false );
                 }
-
-                // Выставляем настройки для символа параграфа
-                this.TextPr.Apply_TextPr( TextPr );
             }
             else
             {
@@ -21098,6 +21098,31 @@ Paragraph.prototype =
         var W = RangeW.W;
 
         return { X : X, Y : Y, W : W, H : H };
+    },
+
+
+    Save_RecalculateObject : function()
+    {        
+        var RecalcObj = new CParagraphRecalculateObject();
+        RecalcObj.Save( this );
+        return RecalcObj;
+    },
+    
+    Load_RecalculateObject : function(RecalcObj)
+    {
+        RecalcObj.Load( this );
+    },
+
+    Prepare_RecalculateObject : function()
+    {
+        this.Pages = [];        
+        this.Lines = [];
+        
+        var Count = this.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            this.Content[Index].Prepare_RecalculateObject();
+        }        
     }
 };
 
@@ -21225,6 +21250,32 @@ CParaLineRange.prototype =
         this.Letters     = 0;
         this.SpacesSkip  = 0;
         this.LettersSkip = 0;
+    },
+    
+    Copy : function()
+    {
+        var NewRange = new CParaLineRange();
+
+        NewRange.X           = this.X;
+        NewRange.XVisible    = this.XVisible;
+        NewRange.XEnd        = this.XEnd;
+
+        NewRange.W           = this.W;
+        NewRange.Words       = this.Words;
+        NewRange.Spaces      = this.Spaces;
+        NewRange.Letters     = this.Letters;
+
+        NewRange.SpacesSkip  = this.SpacesSkip;
+        NewRange.LettersSkip = this.LettersSkip;
+
+        NewRange.StartPos    = this.StartPos;
+        NewRange.EndPos      = this.EndPos;
+
+        NewRange.SpacePos    = this.SpacePos;
+        NewRange.StartPos2   = this.StartPos2;
+        NewRange.EndPos2     = this.EndPos2;
+        
+        return NewRange;
     }
 };
 
@@ -21397,6 +21448,38 @@ CParaLine.prototype =
 
         if ( CurRange === this.Ranges.length - 1 )
             this.Set_EndPos( EndPos );
+    },
+    
+    Copy : function()
+    {
+        var NewLine = new CParaLine();
+
+        NewLine.Y      = this.Y;
+        NewLine.W      = this.W;
+        NewLine.Top    = this.Top;
+        NewLine.Bottom = this.Bottom;
+        NewLine.Words  = this.Words;
+        NewLine.Spaces = this.Spaces;
+
+
+        NewLine.Metrics.Ascent      = this.Ascent;
+        NewLine.Metrics.Descent     = this.Descent;
+        NewLine.Metrics.TextAscent  = this.TextAscent;
+        NewLine.Metrics.TextAscent2 = this.TextAscent2;
+        NewLine.Metrics.TextDescent = this.TextDescent;
+        NewLine.Metrics.LineGap     = this.LineGap;
+        
+        var Count = this.Ranges.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {  
+            NewLine.Ranges[Index] = this.Ranges[Index].Copy();
+        }
+        
+        NewLine.RangeY   = this.RangeY;
+        NewLine.StartPos = this.StartPos;
+        NewLine.EndPos   = this.EndPos;
+        
+        return NewLine;
     },
 
     Reset : function(StartPos)
@@ -21690,6 +21773,35 @@ CParaPage.prototype =
     Add_Drawing : function(Item)
     {
         this.Drawings.push(Item);
+    },
+    
+    Copy : function()
+    {
+        var NewPage = new CParaPage();
+
+        NewPage.X             = this.X;
+        NewPage.Y             = this.Y;
+        NewPage.XLimit        = this.XLimit;
+        NewPage.YLimit        = this.YLimit;
+        NewPage.FirstLine     = this.FirstLine;
+        
+        NewPage.Bounds.Left   = this.Bounds.Left;
+        NewPage.Bounds.Right  = this.Bounds.Right;
+        NewPage.Bounds.Top    = this.Bounds.Top;
+        NewPage.Bounds.Bottom = this.Bounds.Bottom;
+        
+        NewPage.StartLine     = this.StartLine;
+        NewPage.EndLine       = this.EndLine;
+
+        var Count = this.Drawings.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            NewPage.Drawings.push( this.Drawings[Index] );
+        }
+
+        NewPage.EndInfo = this.EndInfo.Copy();
+        
+        return NewPage;
     }
 };
 
@@ -22495,7 +22607,7 @@ function CParagraphDrawingLayout(Drawing, Paragraph, X, Y, Line, Range, Page)
 //
 //----------------------------------------------------------------------------------------------------------------------
 
-function CParagraphLinesInfo(StartLine, StartRange)
+function CRunRecalculateObject(StartLine, StartRange)
 {
     this.StartLine   = StartLine;
     this.StartRange  = StartRange
@@ -22507,8 +22619,83 @@ function CParagraphLinesInfo(StartLine, StartRange)
 }
 
 
-CParagraphLinesInfo.prototype =
+CRunRecalculateObject.prototype =
 {
+    Save_Lines : function(Obj, Copy)
+    {
+        if ( true === Copy )
+        {
+            var Lines = Obj.Lines;
+            var Count = Obj.Lines.length;
+            for ( var Index = 0; Index < Count; Index++ )
+                this.Lines[Index] = Lines[Index].Copy();
+            
+            this.LinesLength = Obj.LinesLength;
+        }
+        else
+        {
+            this.Lines       = Obj.Lines;
+            this.LinesLength = Obj.LinesLength;
+        }
+    },
+    
+    Save_Content : function(Obj, Copy)
+    {
+        var Content = Obj.Content;
+        var ContentLen = Content.length;
+        for ( var Index = 0; Index < ContentLen; Index++ )
+        {
+            this.Content[Index] = Content[Index].Save_RecalculateObject(Copy);
+        }
+    },
+
+    Load_Lines : function(Obj)
+    {
+        Obj.StartLine  = this.StartLine;
+        Obj.StartRange = this.StartRange;
+
+        Obj.Lines       = this.Lines;
+        Obj.LinesLength = this.LinesLength;
+    },
+    
+    Load_ZeroRange : function(Obj)
+    {
+        Obj.Range = this.Lines[0].Ranges[0];
+    },
+    
+    Load_Content : function(Obj)
+    {
+        var Count = Obj.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            Obj.Content[Index].Load_RecalculateObject( this.Content[Index] );
+        }
+    },
+    
+    Save_RunContent : function(Run, Copy)
+    {
+        var ContentLen = Run.Content.length;
+        for ( var Index = 0, Index2 = 0; Index < ContentLen; Index++ )
+        {
+            var Item = Run.Content[Index];
+            
+            if ( para_PageNum === Item.Type || para_Drawing === Item.Type )
+                this.Content[Index2++] = Item.Save_RecalculateObject(Copy);
+        }
+    },
+    
+    Load_RunContent : function(Run)
+    {
+        var Count = Run.Content.length;
+        for ( var Index = 0, Index2 = 0; Index < Count; Index++ )
+        {
+            var Item = Run.Content[Index];
+            
+            if ( para_PageNum === Item.Type || para_Drawing === Item.Type )
+                Item.Load_RecalculateObject( this.Content[Index2++] );
+        }
+    },
+    
     Compare : function(_CurLine, _CurRange, OtherLinesInfo)
     {
         var OLI = OtherLinesInfo;
@@ -22582,3 +22769,53 @@ function CParagraphRangeVisibleWidth()
     this.End = false;
     this.W   = 0;
 }
+
+function CParagraphRecalculateObject()
+{
+    this.X      = 0;
+    this.Y      = 0;
+    this.XLimit = 0;
+    this.YLimit = 0;
+    
+    this.Pages   = [];
+    this.Lines   = [];    
+    this.Content = [];
+}
+
+CParagraphRecalculateObject.prototype = 
+{
+    Save : function(Para)
+    {
+        this.X      = Para.X;
+        this.Y      = Para.Y;
+        this.XLimit = Para.XLimit;
+        this.YLimit = Para.YLimit;
+        
+        this.Pages  = Para.Pages;
+        this.Lines  = Para.Lines;
+    
+        var Content = Para.Content;
+        var Count = Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            this.Content[Index] = Content[Index].Save_RecalculateObject();
+        }
+    },
+    
+    Load : function(Para)
+    {
+        Para.X      = this.X;
+        Para.Y      = this.Y;
+        Para.XLimit = this.XLimit;
+        Para.YLimit = this.YLimit;
+
+        Para.Pages = this.Pages;
+        Para.Lines = this.Lines;
+                
+        var Count = Para.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            Para.Content[Index].Load_RecalculateObject(this.Content[Index]);
+        }
+    }
+};

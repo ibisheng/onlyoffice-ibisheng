@@ -91,6 +91,18 @@ ParaHyperlink.prototype =
 
         return NewHyperlink;
     },
+    
+    Get_AllDrawingObjects : function(DrawingObjs)
+    {
+        var Count = this.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var Item = this.Content[Index];
+            
+            if ( para_Run === Item.Type || para_Hyperlink === Item.Type )
+                Item.Get_AllDrawingObjects(DrawingObjs);
+        }
+    },
 
     Set_Paragraph : function(Paragraph)
     {
@@ -851,37 +863,32 @@ ParaHyperlink.prototype =
         }
     },
 
-    Save_Lines : function()
+    Save_RecalculateObject : function(Copy)
     {
-        var HyperLines = new CParagraphLinesInfo(this.StartLine, this.StartRange);
-
-        for ( var CurLine = 0; CurLine < this.LinesLength; CurLine++ )
-        {
-            HyperLines.Lines.push( this.Lines[CurLine].Copy() );
-        }
-
-        HyperLines.LinesLength = this.LinesLength;
-
-        var ContentLen = this.Content.length;
-        for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
-        {
-            var ContentLines = this.Content[CurPos].Save_Lines();
-            HyperLines.Content.push( ContentLines );
-        }
-
-        return HyperLines;
+        var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
+        RecalcObj.Save_Lines( this, Copy );
+        RecalcObj.Save_Content( this, Copy );
+        return RecalcObj;
     },
 
-    Restore_Lines : function(HyperLines)
+    Load_RecalculateObject : function(RecalcObj)
     {
-        this.Lines       = HyperLines.Lines;
-        this.LinesLength = HyperLines.LinesLength;
-        this.Range       = this.Lines[0].Ranges[0];
+        RecalcObj.Load_Lines( this );
+        RecalcObj.Load_Content( this );
+    },
 
-        var ContentLen = this.Content.length;
-        for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
+    Prepare_RecalculateObject : function()
+    {
+        this.Lines       = [];
+        this.Lines[0]    = new CParaRunLine();
+        this.LinesLength = 0;
+
+        this.Range = this.Lines[0].Ranges[0];
+        
+        var Count = this.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
         {
-            this.Content[CurPos].Restore_Lines( HyperLines.Content[CurPos] );
+            this.Content[Index].Prepare_RecalculateObject();
         }
     },
 

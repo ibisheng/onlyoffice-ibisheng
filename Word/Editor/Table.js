@@ -4430,6 +4430,22 @@ CTable.prototype =
             }
         }
     },
+    
+    Save_RecalculateObject : function()
+    {
+        var RecalcObj = new CTableRecalculateObject();
+        RecalObj.Save( this );
+        return RecalcObj;
+    }, 
+    
+    Load_RecalculateObject : function(RecalcObj)
+    {
+        RecalcObj.Load(this);
+    },
+    
+    Prepare_RecalculateObject : function()
+    {
+    },
 
     Get_LastRangeVisibleBounds : function()
     {
@@ -21826,5 +21842,21 @@ CTableCell.prototype =
     {
         if ( "undefined" != typeof(LinkData.Row) )
             this.Row = g_oTableId.Get_ById( LinkData.Row );
+    }
+};
+
+
+function CTableRecalculateObject()
+{
+}
+
+CTableRecalculateObject.prototype = 
+{
+    Save : function()
+    {
+    },
+    
+    Load : function()
+    {
     }
 };

@@ -837,6 +837,28 @@ CDocumentContent.prototype =
         }
     },
 
+    Save_RecalculateObject : function()
+    {
+        var RecalcObj = new CDocumentRecalculateObject();        
+        RecalcObj.Save( this );
+        return RecalcObj;  
+    },
+    
+    Load_RecalculateObject : function(RecalcObj)
+    {
+        RecalcObj.Load( this );
+    },
+    
+    Prepare_RecalculateObject : function()
+    {
+        this.Pages = [];
+        var Count = this.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            this.Content[Index].Prepare_RecalculateObject();
+        }
+    },
+
     ReDraw : function(StartPage, EndPage)
     {
         if ( "undefined" === typeof(StartPage) )
@@ -8588,4 +8610,40 @@ CDocumentContent.prototype =
         }
     }
 
+};
+
+function CDocumentRecalculateObject()
+{
+    this.StartPage = 0;
+    
+    this.Pages   = [];    
+    this.Content = [];    
+}
+
+CDocumentRecalculateObject.prototype = 
+{
+    Save : function(Doc)
+    {
+        this.StartPage = Doc.StartPage;        
+        this.Pages     = Doc.Pages;
+        
+        var Content = Doc.Content;
+        var Count = Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            this.Content[Index] = Content[Index].Save_RecalculateObject();
+        }
+    },
+        
+    Load : function(Doc)
+    {
+        Doc.StartPage = this.StartPage;
+        Doc.Pages     = this.Pages;
+        
+        var Count = Doc.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            Doc.Content[Index].Load_RecalculateObject( this.Content[Index] );
+        }
+    }
 };

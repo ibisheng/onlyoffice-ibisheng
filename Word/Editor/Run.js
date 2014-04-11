@@ -120,6 +120,18 @@ ParaRun.prototype =
         return NewRun;
     },
 
+    Get_AllDrawingObjects : function(DrawingObjs)
+    {
+        var Count = this.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var Item = this.Content[Index];
+
+            if ( para_Drawing === Item.Type )
+                DrawingObjs.push(Item);
+        }
+    },
+
     Clear_ContentChanges : function()
     {
         this.m_oContentChanges.Clear();
@@ -1484,6 +1496,9 @@ ParaRun.prototype =
                 }
                 case para_PageNum:
                 {
+                    // Выставляем номер страницы
+                    Item.Set_Page(PRS.Page + Para.Get_StartPage_Absolute());
+                    
                     // Если до этого было слово, тогда не надо проверять убирается ли оно, но если стояли пробелы,
                     // тогда мы их учитываем при проверке убирается ли данный элемент, и добавляем только если
                     // данный элемент убирается
@@ -1521,7 +1536,7 @@ ParaRun.prototype =
                     }
 
                     SpaceLen    = 0;
-
+                    
                     break;
                 }
                 case para_Tab:
@@ -2302,25 +2317,40 @@ ParaRun.prototype =
         this.Paragraph.Refresh_RecalcData2(0);
     },
 
-    Save_Lines : function()
+    Save_RecalculateObject : function(Copy)
     {
-        var RunLines = new CParagraphLinesInfo(this.StartLine, this.StartRange);
-
-        for ( var CurLine = 0; CurLine < this.LinesLength; CurLine++ )
-        {
-            RunLines.Lines.push( this.Lines[CurLine].Copy() );
-        }
-
-        RunLines.LinesLength = this.LinesLength;
-
-        return RunLines;
+        var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
+        RecalcObj.Save_Lines( this );
+        RecalcObj.Save_RunContent( this );
+        
+        // TODO: Разобраться с картинками
+        
+        return RecalcObj;
     },
 
-    Restore_Lines : function(RunLines)
+    Load_RecalculateObject : function(RecalcObj)
     {
-        this.Lines       = RunLines.Lines;
-        this.LinesLength = RunLines.LinesLength;
-        this.Range       = this.Lines[0].Ranges[0];
+        RecalcObj.Load_Lines(this);
+        RecalcObj.Load_ZeroRange(this);
+        RecalcObj.Load_RunContent( this );
+    },
+
+    Prepare_RecalculateObject : function()
+    {
+        this.Lines       = [];
+        this.Lines[0]    = new CParaRunLine();
+        this.LinesLength = 0;
+
+        this.Range = this.Lines[0].Ranges[0];
+        
+        var Count = this.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var Item = this.Content[Index];
+            
+            if ( para_PageNum === Item.Type || para_Drawing === Item.Type )
+                Item.Prepare_RecalculateObject();
+        }
     },
 
     Is_EmptyRange : function(_CurLine, _CurRange)
@@ -2615,7 +2645,7 @@ ParaRun.prototype =
                 }
             }
         }
-    },
+    },   
 //-----------------------------------------------------------------------------------
 // Функции отрисовки
 //-----------------------------------------------------------------------------------
@@ -2810,13 +2840,7 @@ ParaRun.prototype =
                     {
                         bFirstLineItem = false;
 
-                        if ( para_PageNum != Item.Type )
-                            Item.Draw( X, Y - this.YOffset, pGraphics );
-                        else
-                        {
-                            var ParaJc = Para.Get_CompiledPr2(false).ParaPr.Jc;
-                            Item.Draw( X, Y - this.YOffset, pGraphics, Para.Get_StartPage_Absolute() + CurPage, ParaJc );
-                        }
+                        Item.Draw( X, Y - this.YOffset, pGraphics );
 
                         X += Item.WidthVisible;
                     }
@@ -6477,7 +6501,6 @@ function CRunCollaborativeRange(PosS, PosE)
     this.PosS = PosS;
     this.PosE = PosE;
 }
-
 
 
 ParaRun.prototype.Math_SetPosition = function(_pos)

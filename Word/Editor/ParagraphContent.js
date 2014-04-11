@@ -4170,7 +4170,7 @@ ParaDrawing.prototype =
         this.WidthVisible = this.W;
     },
     
-    Save_RecalculateObject : function()
+    Save_RecalculateObject : function(Copy)
     {
         return null;
     },
@@ -7263,9 +7263,9 @@ ParaPageNum.prototype =
         this.WidthVisible = RealWidth;
     },
 
-    Save_RecalculateObject : function()
+    Save_RecalculateObject : function(Copy)
     {
-        return new CPageNumRecalculateObject(this.Widths, this.String, this.Width);
+        return new CPageNumRecalculateObject(this.Widths, this.String, this.Width, Copy);
     },
 
     Load_RecalculateObject : function(RecalcObj)
@@ -7319,11 +7319,20 @@ ParaPageNum.prototype =
     }
 };
 
-function CPageNumRecalculateObject(Widths, String, Width)
+function CPageNumRecalculateObject(Widths, String, Width, Copy)
 {
     this.Widths = Widths;
     this.String = String;
     this.Width  = Width;
+    
+    if ( true === Copy )
+    {
+        this.Widths = [];
+        var Len = Widths.length;
+        for ( var Index = 0; Index < Count; Index++ )
+            this.Widths[Index] = Widths[Index];
+    }
+       
 }
 
 

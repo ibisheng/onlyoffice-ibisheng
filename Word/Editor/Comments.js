@@ -1028,13 +1028,19 @@ ParaComment.prototype =
             PRSI.Remove_Comment( this.CommentId );
     },
 
-    Save_Lines : function()
+    Save_RecalculateObject : function(Copy)
     {
-        var CommentLines = new CParagraphLinesInfo(this.StartLine, this.StartRange);
-        return CommentLines;
+        var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
+        return RecalcObj;
     },
 
-    Restore_Lines : function(CommentLines)
+    Load_RecalculateObject : function(RecalcObj)
+    {
+        this.StartLine  = RecalcObj.StartLine;
+        this.StartRange = RecalcObj.StartRange;
+    },
+
+    Prepare_RecalculateObject : function()
     {
     },
 

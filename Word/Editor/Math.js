@@ -558,25 +558,29 @@ ParaMath.prototype =
     {
     },
 
-    Save_Lines : function()
+    Save_RecalculateObject : function(Copy)
     {
-        var HyperLines = new CParagraphLinesInfo(this.StartLine, this.StartRange);
-
-        for ( var CurLine = 0; CurLine < this.LinesLength; CurLine++ )
-        {
-            HyperLines.Lines.push( this.Lines[CurLine].Copy() );
-        }
-
-        HyperLines.LinesLength = this.LinesLength;
-
-        return HyperLines;
+        var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
+        RecalcObj.Save_Lines( this, Copy );
+        
+        // TODO: Сделать сохранение пересчета у формулы
+        
+        return RecalcObj;
     },
 
-    Restore_Lines : function(HyperLines)
+    Load_RecalculateObject : function(RecalcObj)
     {
-        this.Lines       = HyperLines.Lines;
-        this.LinesLength = HyperLines.LinesLength;
-        this.Range       = this.Lines[0].Ranges[0];
+        RecalcObj.Load_Lines(this);
+        RecalcObj.Load_ZeroRange(this);
+    },
+
+    Prepare_RecalculateObject : function()
+    {
+        this.Lines       = [];
+        this.Lines[0]    = new CParaRunLine();
+        this.LinesLength = 0;
+
+        this.Range = this.Lines[0].Ranges[0];
     },
 
     Is_EmptyRange : function(_CurLine, _CurRange)
@@ -836,7 +840,6 @@ ParaMath.prototype =
         }
 
         SearchPos.CurX = CurX + Dx;
-
 
         return Result;
     },

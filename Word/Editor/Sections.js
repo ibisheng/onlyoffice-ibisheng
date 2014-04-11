@@ -74,6 +74,24 @@ CSectionPr.prototype =
         this.Set_Borders_Display( Other.Borders.Display );
         this.Set_Borders_OffsetFrom( Other.Borders.OffsetFrom );
         this.Set_Borders_ZOrder( Other.Borders.ZOrder );
+        
+        // Колонтитулы
+        this.Set_Header_First( Other.HeaderFirst );
+        this.Set_Header_Even( Other.HeaderEven );
+        this.Set_Header_Default( Other.HeaderDefault );
+        this.Set_Footer_First( Other.FooterFirst );
+        this.Set_Footer_Even( Other.FooterEven );
+        this.Set_Footer_Default( Other.FooterDefault );
+    },
+    
+    Clear_AllHdrFtr : function()
+    {
+        this.Set_Header_First( null );
+        this.Set_Header_Even( null );
+        this.Set_Header_Default( null );
+        this.Set_Footer_First( null );
+        this.Set_Footer_Even( null );
+        this.Set_Footer_Default( null );
     },
 
     Compare_PageSize : function(OtherSectionPr)
