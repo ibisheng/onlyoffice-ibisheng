@@ -741,12 +741,13 @@ var historyitem_type_ValAx = 1111;
 
 
 // Типы изменений в классе CDocument
-var historyitem_Document_AddItem     = 1; // Добавляем элемент в документ
-var historyitem_Document_RemoveItem  = 2; // Удаляем элемент из документа
-var historyitem_Document_Margin      = 3; // Меняем маргины(поля) документа
-var historyitem_Document_PageSize    = 4; // Меняем размер страницы у документа
-var historyitem_Document_Orientation = 5; // Меняем ориентацию страниц у документа
-var historyitem_Document_DefaultTab  = 6; // Меняем таб по умолчанию
+var historyitem_Document_AddItem           = 1; // Добавляем элемент в документ
+var historyitem_Document_RemoveItem        = 2; // Удаляем элемент из документа
+var historyitem_Document_Margin            = 3; // Меняем маргины(поля) документа
+var historyitem_Document_PageSize          = 4; // Меняем размер страницы у документа
+var historyitem_Document_Orientation       = 5; // Меняем ориентацию страниц у документа
+var historyitem_Document_DefaultTab        = 6; // Меняем таб по умолчанию
+var historyitem_Document_EvenAndOddHeaders = 7; // Меняем настройку различия четных/нечетных колонтитулов
 
 // Типы изменений в классе Paragraph
 var historyitem_Paragraph_AddItem                   =  1; // Добавляем элемент в параграф
@@ -1113,6 +1114,13 @@ var historyitem_Section_Borders_Bottom     = 8; // Меняем нижнюю г�
 var historyitem_Section_Borders_Display    = 9; // Меняем тип страниц, на которых рисуются границы
 var historyitem_Section_Borders_OffsetFrom = 10; // Меняем тип отступа границ
 var historyitem_Section_Borders_ZOrder     = 11; // Меняем Z-index границ
+var historyitem_Section_Header_First       = 12; // Меняем верхний колонтитул первой страницы
+var historyitem_Section_Header_Even        = 13; // Меняем верхний колонтитул четных страниц
+var historyitem_Section_Header_Default     = 14; // Меняем верхний колонтитул по умолчанию
+var historyitem_Section_Footer_First       = 15; // Меняем нижний колонтитул первой страницы
+var historyitem_Section_Footer_Even        = 16; // Меняем нижний колонтитул четных страниц
+var historyitem_Section_Footer_Default     = 17; // Меняем нижний колонтитул по умолчанию
+var historyitem_Section_TitlePage          = 18; // Меняем настройку наличия специального колонтитула для первой страницы
 
 // Тип класса, к которому относится данный элемент истории
 var historyitem_State_Unknown         = 0;
