@@ -2561,7 +2561,7 @@ CChartsDrawer.prototype =
 		firstDegree = this._getFirstDegree((Math.abs(axisMax - axisMin)) / 10);
 		
 		//находим шаг
-		if(chartProp.chart.plotArea.valAx.majorUnit !== null)
+		if(chartProp.chart.plotArea.valAx && chartProp.chart.plotArea.valAx.majorUnit !== null)
 		{
 			step = chartProp.chart.plotArea.valAx.majorUnit;
 		}
