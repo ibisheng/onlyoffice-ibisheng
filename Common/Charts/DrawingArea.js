@@ -40,46 +40,46 @@ function FrozenPlace(ws, type) {
 	// Methods	
 	_this.initRange = function() {
 		
-		checkCol(_this.worksheet.getLastVisibleCol() + 1);
-		checkRow(_this.worksheet.getLastVisibleRow() + 1);
+		checkCol(_this.worksheet.getLastVisibleCol());
+		checkRow(_this.worksheet.getLastVisibleRow());
 		
 		switch (_this.type) {
 		
 			case FrozenAreaType.Top: {
-				if ( !_this.frozenCell.col && _this.frozenCell.row )
-					_this.range = new asc_Range(0, 0, _this.worksheet.getLastVisibleCol() + 1, _this.frozenCell.row);
+				if (!_this.frozenCell.col && _this.frozenCell.row)
+					_this.range = new asc_Range(0, 0, _this.worksheet.getLastVisibleCol(), _this.frozenCell.row - 1);
 				else
 					_this.isValid = false;
 			}
 			break;
 			
 			case FrozenAreaType.Bottom: {
-				if ( !_this.frozenCell.col && _this.frozenCell.row )
-					_this.range = new asc_Range(0, _this.frozenCell.row, _this.worksheet.getLastVisibleCol() + 1, _this.worksheet.getLastVisibleRow() + 1);
+				if (!_this.frozenCell.col && _this.frozenCell.row)
+					_this.range = new asc_Range(0, _this.frozenCell.row, _this.worksheet.getLastVisibleCol(), _this.worksheet.getLastVisibleRow());
 				else
 					_this.isValid = false;
 			}
 			break;
 			
 			case FrozenAreaType.Left: {
-				if ( _this.frozenCell.col && !_this.frozenCell.row )
-					_this.range = new asc_Range(0, 0, _this.frozenCell.col, _this.worksheet.getLastVisibleRow() + 1);
+				if (_this.frozenCell.col && !_this.frozenCell.row)
+					_this.range = new asc_Range(0, 0, _this.frozenCell.col - 1, _this.worksheet.getLastVisibleRow());
 				else
 					_this.isValid = false;
 			}
 			break;
 			
 			case FrozenAreaType.Right: {
-				if ( _this.frozenCell.col && !_this.frozenCell.row )
-					_this.range = new asc_Range(_this.frozenCell.col, 0, _this.worksheet.getLastVisibleCol() + 1, _this.worksheet.getLastVisibleRow() + 1);
+				if (_this.frozenCell.col && !_this.frozenCell.row)
+					_this.range = new asc_Range(_this.frozenCell.col, 0, _this.worksheet.getLastVisibleCol(), _this.worksheet.getLastVisibleRow());
 				else
 					_this.isValid = false;
 			}
 			break;
 			
 			case FrozenAreaType.Center: {
-				if ( !_this.frozenCell.col && !_this.frozenCell.row )
-					_this.range = new asc_Range(_this.worksheet.getFirstVisibleCol(true), _this.worksheet.getFirstVisibleRow(true), _this.worksheet.getLastVisibleCol() + 1, _this.worksheet.getLastVisibleRow() + 1);
+				if (!_this.frozenCell.col && !_this.frozenCell.row)
+					_this.range = new asc_Range(_this.worksheet.getFirstVisibleCol(true), _this.worksheet.getFirstVisibleRow(true), _this.worksheet.getLastVisibleCol(), _this.worksheet.getLastVisibleRow());
 				else
 					_this.isValid = false;
 			}
@@ -87,38 +87,38 @@ function FrozenPlace(ws, type) {
 			
 			// Other
 			case FrozenAreaType.LeftTop: {
-				if ( _this.frozenCell.col && _this.frozenCell.row )
-					_this.range = new asc_Range(0, 0, _this.frozenCell.col, _this.frozenCell.row);
+				if (_this.frozenCell.col && _this.frozenCell.row)
+					_this.range = new asc_Range(0, 0, _this.frozenCell.col - 1, _this.frozenCell.row - 1);
 				else
 					_this.isValid = false;
 			}
 			break;
 			
 			case FrozenAreaType.RightTop: {
-				if ( _this.frozenCell.col && _this.frozenCell.row )
-					_this.range = new asc_Range(_this.frozenCell.col, 0, _this.worksheet.getLastVisibleCol() + 1, _this.frozenCell.row);
+				if (_this.frozenCell.col && _this.frozenCell.row)
+					_this.range = new asc_Range(_this.frozenCell.col, 0, _this.worksheet.getLastVisibleCol(), _this.frozenCell.row - 1);
 				else
 					_this.isValid = false;
 			}
 			break;
 			
 			case FrozenAreaType.LeftBottom: {
-				if ( _this.frozenCell.col && _this.frozenCell.row )
-					_this.range = new asc_Range(0, _this.frozenCell.row, _this.frozenCell.col, _this.worksheet.getLastVisibleRow() + 1);
+				if (_this.frozenCell.col && _this.frozenCell.row)
+					_this.range = new asc_Range(0, _this.frozenCell.row, _this.frozenCell.col - 1, _this.worksheet.getLastVisibleRow());
 				else
 					_this.isValid = false;
 			}
 			break;
 			
 			case FrozenAreaType.RightBottom: {
-				if ( _this.frozenCell.col && _this.frozenCell.row )
-					_this.range = new asc_Range(_this.frozenCell.col, _this.frozenCell.row, _this.worksheet.getLastVisibleCol() + 1, _this.worksheet.getLastVisibleRow() + 1);
+				if (_this.frozenCell.col && _this.frozenCell.row)
+					_this.range = new asc_Range(_this.frozenCell.col, _this.frozenCell.row, _this.worksheet.getLastVisibleCol(), _this.worksheet.getLastVisibleRow());
 				else
 					_this.isValid = false;
 			}
 			break;
 		}
-	}
+	};
 	
 	_this.getVisibleRange = function() {
 		var vr = _this.range.clone();
@@ -179,16 +179,16 @@ function FrozenPlace(ws, type) {
 			break;
 		}
 		return vr;
-	}
+	};
 	
 	_this.getRect = function() {
 		var rect = { x: 0, y: 0, w: 0, h: 0 };
 		rect.x = _this.worksheet.getCellLeft(_this.range.c1, 0);
 		rect.y = _this.worksheet.getCellTop(_this.range.r1, 0);
-		rect.w = _this.worksheet.getCellLeft(_this.range.c2, 0) - rect.x;
-		rect.h = _this.worksheet.getCellTop(_this.range.r2, 0) - rect.y;
+		rect.w = _this.worksheet.getCellLeft(_this.range.c2, 0) + _this.worksheet.getColumnWidth(_this.range.c2, 0) - rect.x;
+		rect.h = _this.worksheet.getCellTop(_this.range.r2, 0) + _this.worksheet.getRowHeight(_this.range.r2, 0) - rect.y;
 		return rect;
-	}
+	};
 	
 	_this.getFirstVisible = function() {
 		var fv = { col: 0, row: 0 };
@@ -559,30 +559,31 @@ function DrawingArea(ws) {
 	_this.init = function() {
 		_this.frozenPlaces = [];
 		if ( _this.worksheet ) {
+			var place;
 			if ( _this.worksheet.topLeftFrozenCell ) {
-				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.Top);
+				place = new FrozenPlace(_this.worksheet, FrozenAreaType.Top);
 				if ( place.isValid )
 					_this.frozenPlaces.push(place);
-				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.Bottom);
+				place = new FrozenPlace(_this.worksheet, FrozenAreaType.Bottom);
 				if ( place.isValid )
 					_this.frozenPlaces.push(place);
-				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.Left);
+				place = new FrozenPlace(_this.worksheet, FrozenAreaType.Left);
 				if ( place.isValid )
 					_this.frozenPlaces.push(place);
-				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.Right);
+				place = new FrozenPlace(_this.worksheet, FrozenAreaType.Right);
 				if ( place.isValid )
 					_this.frozenPlaces.push(place);
 					
-				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.LeftTop);
+				place = new FrozenPlace(_this.worksheet, FrozenAreaType.LeftTop);
 				if ( place.isValid )
 					_this.frozenPlaces.push(place);
-				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.RightTop);
+				place = new FrozenPlace(_this.worksheet, FrozenAreaType.RightTop);
 				if ( place.isValid )
 					_this.frozenPlaces.push(place);
-				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.LeftBottom);
+				place = new FrozenPlace(_this.worksheet, FrozenAreaType.LeftBottom);
 				if ( place.isValid )
 					_this.frozenPlaces.push(place);
-				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.RightBottom);
+				place = new FrozenPlace(_this.worksheet, FrozenAreaType.RightBottom);
 				if ( place.isValid )
 					_this.frozenPlaces.push(place);
 			}

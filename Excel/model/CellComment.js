@@ -14,61 +14,58 @@
 /** @constructor */
 function asc_CCommentCoords(obj) {
 
-	var _this = this;
+	this.nRow = null;
+	this.nCol = null;
+
+	this.nLeft = null;
+	this.nLeftOffset = null;
+	this.nTop = null;
+	this.nTopOffset = null;
+	this.nRight = null;
+	this.nRightOffset = null;
+	this.nBottom = null;
+	this.nBottomOffset = null;
+
+	this.dLeftMM = null;
+	this.dTopMM = null;
+	this.dLeftPX = null;
+	this.dReverseLeftPX = null;
+	this.dTopPX = null;
+
+	this.dWidthMM = null;
+	this.dHeightMM = null;
+	this.dWidthPX = null;
+	this.dHeightPX = null;
+
+	this.bMoveWithCells = false;
+	this.bSizeWithCells = false;
 
 	if (obj) {
-		_this.nRow = obj.nRow;
-		_this.nCol = obj.nCol;
+		this.nRow = obj.nRow;
+		this.nCol = obj.nCol;
 
-		_this.nLeft = obj.nLeft;
-		_this.nLeftOffset = obj.nLeftOffset;
-		_this.nTop = obj.nTop;
-		_this.nTopOffset = obj.nTopOffset;
-		_this.nRight = obj.nRight;
-		_this.nRightOffset = obj.nRightOffset;
-		_this.nBottom = obj.nBottom;
-		_this.nBottomOffset = obj.nBottomOffset;
+		this.nLeft = obj.nLeft;
+		this.nLeftOffset = obj.nLeftOffset;
+		this.nTop = obj.nTop;
+		this.nTopOffset = obj.nTopOffset;
+		this.nRight = obj.nRight;
+		this.nRightOffset = obj.nRightOffset;
+		this.nBottom = obj.nBottom;
+		this.nBottomOffset = obj.nBottomOffset;
 
-		_this.dLeftMM = obj.dLeftMM;
-		_this.dTopMM = obj.dTopMM;
-		_this.dLeftPX = obj.dLeftPX;
-		_this.dReverseLeftPX = obj.dReverseLeftPX;
-		_this.dTopPX = obj.dTopPX;
+		this.dLeftMM = obj.dLeftMM;
+		this.dTopMM = obj.dTopMM;
+		this.dLeftPX = obj.dLeftPX;
+		this.dReverseLeftPX = obj.dReverseLeftPX;
+		this.dTopPX = obj.dTopPX;
 
-		_this.dWidthMM = obj.dWidthMM;
-		_this.dHeightMM = obj.dHeightMM;
-		_this.dWidthPX = obj.dWidthPX;
-		_this.dHeightPX = obj.dHeightPX;
+		this.dWidthMM = obj.dWidthMM;
+		this.dHeightMM = obj.dHeightMM;
+		this.dWidthPX = obj.dWidthPX;
+		this.dHeightPX = obj.dHeightPX;
 
-		_this.bMoveWithCells = obj.bMoveWithCells;
-		_this.bSizeWithCells = obj.bSizeWithCells;
-	}
-	else {
-		_this.nRow = null;
-		_this.nCol = null;
-
-		_this.nLeft = null;
-		_this.nLeftOffset = null;
-		_this.nTop = null;
-		_this.nTopOffset = null;
-		_this.nRight = null;
-		_this.nRightOffset = null;
-		_this.nBottom = null;
-		_this.nBottomOffset = null;
-
-		_this.dLeftMM = null;
-		_this.dTopMM = null;
-		_this.dLeftPX = null;
-		_this.dReverseLeftPX = null;
-		_this.dTopPX = null;
-
-		_this.dWidthMM = null;
-		_this.dHeightMM = null;
-		_this.dWidthPX = null;
-		_this.dHeightPX = null;
-
-		_this.bMoveWithCells = false;
-		_this.bSizeWithCells = false;
+		this.bMoveWithCells = obj.bMoveWithCells;
+		this.bSizeWithCells = obj.bSizeWithCells;
 	}
 }
 
@@ -207,10 +204,7 @@ prot["asc_getSizeWithCells"] = prot.asc_getSizeWithCells;
 //-----------------------------------------------------------------------------------
 /** @constructor */
 function asc_CCommentData(obj) {
-
-	var _this = this;
-
-	_this.Properties = {
+	this.Properties = {
 		wsId: 0,
 		nCol: 1,
 		nRow: 2,
@@ -227,67 +221,64 @@ function asc_CCommentData(obj) {
 		bHidden: 14
 	};
 
+	this.bHidden = false;
+	this.wsId = null;
+	this.nCol = 0;
+	this.nRow = 0;
+	this.nId = null;
+	this.oParent = null;
+	this.nLevel = 0;
+
+	// Common
+	this.sText = "";
+	this.sQuoteText = "";
+	this.sTime = "";
+	this.sUserId = "";
+	this.sUserName = "";
+	this.bDocument = true; 	// For compatibility with 'Word Comment Control'
+	this.bSolved = false;
+	this.aReplies = [];
+
 	if (obj) {
-		_this.bHidden = obj.bHidden;
-		_this.wsId = obj.wsId;
-		_this.nCol = obj.nCol;
-		_this.nRow = obj.nRow;
-		_this.nId = obj.nId;
-		_this.oParent = obj.oParent;
-		_this.nLevel = (_this.oParent == null) ? 0 : _this.oParent.asc_getLevel() + 1;
+		this.bHidden = obj.bHidden;
+		this.wsId = obj.wsId;
+		this.nCol = obj.nCol;
+		this.nRow = obj.nRow;
+		this.nId = obj.nId;
+		this.oParent = obj.oParent;
+		this.nLevel = (null === this.oParent) ? 0 : this.oParent.asc_getLevel() + 1;
 
 		// Common
-		_this.sText = obj.sText;
-		_this.sQuoteText = obj.sQuoteText;
-		_this.sTime = obj.sTime;
-		_this.sUserId = obj.sUserId;
-		_this.sUserName = obj.sUserName;
-		_this.bDocument = obj.bDocument;
-		_this.bSolved = obj.bSolved;
-		_this.aReplies = [];
+		this.sText = obj.sText;
+		this.sQuoteText = obj.sQuoteText;
+		this.sTime = obj.sTime;
+		this.sUserId = obj.sUserId;
+		this.sUserName = obj.sUserName;
+		this.bDocument = obj.bDocument;
+		this.bSolved = obj.bSolved;
+		this.aReplies = [];
 
 		for (var i = 0; i < obj.aReplies.length; i++) {
 			var item = new asc_CCommentData(obj.aReplies[i]);
-			_this.aReplies.push(item);
+			this.aReplies.push(item);
 		}
-	}
-	else {
-		_this.bHidden = false;
-		_this.wsId = null;
-		_this.nCol = 0;
-		_this.nRow = 0;
-		_this.nId = null;
-		_this.oParent = null;
-		_this.nLevel = 0;
-
-		// Common
-		_this.sText = "";
-		_this.sQuoteText = "";
-		_this.sTime = "";
-		_this.sUserId = "";
-		_this.sUserName = "";
-		_this.bDocument = true; 	// For compatibility with 'Word Comment Control'
-		_this.bSolved = false;
-		_this.aReplies = [];
-	}
-
-	_this.setId = function() {
-		if (_this.bDocument)
-			_this.nId = "doc_" + guid();
-		else
-			_this.nId = "sheet" + _this.wsId + "_" + guid();
-	};
-
-	function guid() {
-		function S4() {
-			return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-		}
-		return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
 	}
 }
 
 // Prototype
 asc_CCommentData.prototype = {
+	guid: function () {
+		function S4() {
+			return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+		}
+		return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+	},
+	setId: function () {
+		if (this.bDocument)
+			this.nId = "doc_" + guid();
+		else
+			this.nId = "sheet" + this.wsId + "_" + this.guid();
+	},
 
 	asc_putQuoteText: function(val) { this.sQuoteText = val; },
 	asc_getQuoteText: function() { return this.sQuoteText; },
@@ -461,12 +452,10 @@ prot["asc_getMasterCommentId"] = prot.asc_getMasterCommentId;
 //-----------------------------------------------------------------------------------
 
 function CompositeCommentData() {
-	var _this = this;
+	this.commentBefore = null;
+	this.commentAfter = null;
 
-	_this.commentBefore = null;
-	_this.commentAfter = null;
-
-	_this.Properties = {
+	this.Properties = {
 		commentBefore: 0,
 		commentAfter: 1
 	};
@@ -722,17 +711,18 @@ function asc_CCellCommentator(currentSheet) {
 			var lvc = _this.worksheet.getLastVisibleCol();
 			
 			for (var i = 0; i < _this.aComments.length; i++) {
-
 				// Get cell metrics
 				var commentCell = _this.aComments[i];
+				if (commentCell.asc_getDocumentFlag() || commentCell.asc_getHiddenFlag() || commentCell.asc_getSolved())
+					continue;
 				
 				var mergedRange = _this.worksheet.model.getMergedByCell(commentCell.nRow, commentCell.nCol);
 				var drawCol = mergedRange ? mergedRange.c2 : commentCell.nCol;
 				var drawRow = mergedRange ? mergedRange.r1 : commentCell.nRow;
+				if (drawCol < fv.col || drawRow < fv.row || drawCol > lvc || drawRow > lvr)
+					continue;
 
 				if ( !frozenPlace.isCellInside({ col: drawCol, row: drawRow }) )
-					continue;
-				if ( commentCell.asc_getDocumentFlag() || commentCell.asc_getHiddenFlag() || commentCell.asc_getSolved() || (drawCol < fv.col) || (drawRow < fv.row) || (drawCol > lvc) || (drawRow > lvr) )
 					continue;
 
 				var cellId = getCellId(commentCell.nCol, commentCell.nRow);
