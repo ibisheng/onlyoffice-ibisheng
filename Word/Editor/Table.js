@@ -7111,6 +7111,30 @@ CTable.prototype =
                 return this.CurCell.Content.CanAdd_Comment();
         }
     },
+
+    Get_SelectionAnchorPos : function()
+    {
+        if ( true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ) )
+        {
+            var Cells_array = this.Internal_Get_SelectionArray();
+            
+            var Pos = Cells_array[0];
+            var Row = this.Content[Pos.Row];
+            var Cell = Row.Get_Cell( Pos.Cell );
+            
+            var X0 = Cell.Metrics.X_cell_start;
+            var X1 = Cell.Metrics.X_cell_end;
+
+            var Y = this.RowsInfo[Pos.Row].Y[this.RowsInfo[Pos.Row].StartPage];
+            var Page = this.RowsInfo[Pos.Row].StartPage + this.Get_StartPage_Absolute();
+            
+            return { X0 : X0, X1 : X1, Y : Y, Page : Page };
+        }
+        else
+        {
+            return this.CurCell.Content.Get_SelectionAnchorPos();
+        }    
+    },
 //-----------------------------------------------------------------------------------
 // Работаем с текущей позицией и селектом таблицы
 //-----------------------------------------------------------------------------------

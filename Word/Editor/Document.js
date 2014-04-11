@@ -12729,6 +12729,33 @@ CDocument.prototype =
         else
             return null;
     },
+    
+    Get_SelectionAnchorPos : function()
+    {
+        var Result;
+        if ( docpostype_HdrFtr === this.CurPos.Type )
+        {
+            Result = this.HdrFtr.Get_SelectionAnchorPos();
+        }
+        else if ( docpostype_DrawingObjects === this.CurPos.Type )
+        {
+            var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
+            Result.X0    = ParaDrawing.GraphicObj.x;
+            Result.Y     = ParaDrawing.GraphicObj.y;
+            Result.X1    = ParaDrawing.GraphicObj.x + ParaDrawing.GraphicObj.extX;
+            Result.Page  = ParaDrawing.PageNum;
+        }
+        else
+        {
+            var Pos = ( true === this.Selection.Use ? ( this.Selection.StartPos < this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos )  : this.CurPos.ContentPos );
+            Result = this.Content[Pos].Get_SelectionAnchorPos();
+        }
+
+        var Coords0 = this.DrawingDocument.ConvertCoordsToCursorWR( Result.X0, Result.Y, Result.Page );
+        var Coords1 = this.DrawingDocument.ConvertCoordsToCursorWR( Result.X1, Result.Y, Result.Page );
+
+        return { X0 : Coords0.X, X1 : Coords1.X, Y : Coords0.Y };
+    },
 //-----------------------------------------------------------------------------------
 // Функции для работы с textbox
 //-----------------------------------------------------------------------------------

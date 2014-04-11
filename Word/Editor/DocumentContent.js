@@ -8587,6 +8587,12 @@ CDocumentContent.prototype =
         return false;
     },
 
+    Get_SelectionAnchorPos : function()
+    {
+        var Pos = ( true === this.Selection.Use ? ( this.Selection.StartPos < this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos )  : this.CurPos.ContentPos );
+        return this.Content[Pos].Get_SelectionAnchorPos();
+    },
+
     Get_EndInfo : function()
     {
         var ContentLen = this.Content.length;

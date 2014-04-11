@@ -5686,6 +5686,8 @@ asc_docs_api.prototype.asc_addComment = function(AscCommentData)
     var Comment = this.WordControl.m_oLogicDocument.Add_Comment( CommentData );
     if ( null != Comment )
         this.sync_AddComment( Comment.Get_Id(), CommentData );
+    
+    return Comment.Get_Id();
 }
 
 asc_docs_api.prototype.asc_removeComment = function(Id)
@@ -6933,6 +6935,28 @@ asc_docs_api.prototype.SetDrawImagePlaceParagraph = function(element_id, props)
 asc_docs_api.prototype.asc_setCoAuthoringEnable = function (isCoAuthoringEnable)
 {
 	this.isCoAuthoringEnable = !!isCoAuthoringEnable;
+}
+
+asc_docs_api.prototype.asc_getMasterCommentId = function()
+{
+    return -1;
+}
+
+function CApiAnchorPosition(Obj)
+{
+    this.X0 = Obj.X0;
+    this.X1 = Obj.X1;
+    this.Y  = Obj.Y;
+}
+
+CApiAnchorPosition.prototype.Get_X0 = function() { return this.X0; }
+CApiAnchorPosition.prototype.Get_X1 = function() { return this.X1; }
+CApiAnchorPosition.prototype.Get_Y = function() { return this.Y; }
+
+asc_docs_api.prototype.asc_getAnchorPosition = function()
+{
+    var AnchorPos = this.WordControl.m_oLogicDocument.Get_SelectionAnchorPos();
+    return new CApiAnchorPosition(AnchorPos);    
 }
 
 var cCharDelimiter = String.fromCharCode(5);

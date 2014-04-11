@@ -3570,7 +3570,16 @@ CHeaderFooterController.prototype =
             return this.CurHdrFtr.CanAdd_Comment();
 
         return false;
+    },
+    
+    Get_SelectionAnchorPos : function()
+    {
+        if ( null != this.CurHdrFtr )
+            return this.CurHdrFtr.Content.Get_SelectionAnchorPos();
+        
+        return { X : 0, Y : 0, Page : 0 };
     }
+    
 }
 
 function CHdrFtrPage()
