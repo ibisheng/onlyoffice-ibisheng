@@ -12,6 +12,7 @@ function CChartsDrawer()
 	this.gridChart = null;
 	this.chart = null;
 	this.cChartSpace = null;
+	this.cShapeDrawer = null;
 }
 
 CChartsDrawer.prototype =
@@ -125,15 +126,17 @@ CChartsDrawer.prototype =
 		cShapeDrawer.Graphics = graphics;
 		this.calcProp.series = chartSpace.chart.plotArea.chart.series;
 		
+		this.cShapeDrawer = cShapeDrawer;
+		
 		//отрисовываем без пересчёта
-		this.allAreaChart.draw(this.calcProp, cShapeDrawer, chartSpace);
-		this.areaChart.draw(this.calcProp, cShapeDrawer, chartSpace);
+		this.allAreaChart.draw(this, cShapeDrawer, chartSpace);
+		this.areaChart.draw(this, cShapeDrawer, chartSpace);
 		
 		if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart")
 		{
-			this.catAxisChart.draw(this.calcProp, cShapeDrawer, chartSpace);
-			this.valAxisChart.draw(this.calcProp, cShapeDrawer, chartSpace);
-			this.gridChart.draw(this.calcProp, cShapeDrawer, chartSpace);
+			this.catAxisChart.draw(this, cShapeDrawer, chartSpace);
+			this.valAxisChart.draw(this, cShapeDrawer, chartSpace);
+			this.gridChart.draw(this, cShapeDrawer, chartSpace);
 		}
 		
 		this.chart.draw(this, cShapeDrawer, chartSpace);
@@ -3013,7 +3016,21 @@ CChartsDrawer.prototype =
         return {w: w , h: h , startX: this.calcProp.chartGutter._left / this.calcProp.pxToMM, startY: this.calcProp.chartGutter._top / this.calcProp.pxToMM};
 	},
 	
-	
+	drawPath: function(path, pen, brush)
+	{	
+		if(!path)
+			return;
+		
+		if(pen)
+			path.stroke = true;
+
+		var cGeometry = new CGeometry2();
+		this.cShapeDrawer.Clear();
+		this.cShapeDrawer.fromShape2(new CColorObj(pen, brush, cGeometry) ,this.cShapeDrawer.Graphics, cGeometry);
+		
+		cGeometry.AddPath(path);
+		this.cShapeDrawer.draw(cGeometry);
+	},
 	
 	//****functions for chart classes****
 	calculatePoint: function(x, y, size, symbol)
@@ -3647,7 +3664,7 @@ drawBarChart.prototype =
 					brush = numCache.pts[j].brush;
 					
 				if(this.paths.series[i][j])
-					this._drawPaths(this.paths.series[i][j], brush, pen);
+					this.cChartDrawer.drawPath(this.paths.series[i][j], pen, brush);
 			}
 		}
 		this.cShapeDrawer.Graphics.RestoreGrState();
@@ -3998,15 +4015,6 @@ drawBarChart.prototype =
 		path.recalculate(gdLst);
 		
 		return path;
-	}, 
-	
-	_drawPaths: function(paths, brush, pen)
-	{
-		var cGeometry = new CGeometry2();
-		this.cShapeDrawer.Clear();
-		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
-		cGeometry.AddPath(paths);
-		this.cShapeDrawer.draw(cGeometry);
 	}
 }
 
@@ -4307,7 +4315,7 @@ drawLineChart.prototype =
 				if(numCache.pts[n].brush)
 					brush = numCache.pts[n].brush;
 					
-				this._drawPath(this.paths.series[i][n], brush, pen);
+				this.cChartDrawer.drawPath(this.paths.series[i][n], pen, brush);
 			}
 			
 			//draw point
@@ -4318,9 +4326,9 @@ drawLineChart.prototype =
 				
 				//frame of point
 				if(this.paths.points[i][0].framePaths)
-					this._drawPath(this.paths.points[i][k].framePaths, markerBrush, markerPen, false);
+					this.cChartDrawer.drawPath(this.paths.points[i][k].framePaths, markerPen, markerBrush, false);
 				//point		
-				this._drawPath(this.paths.points[i][k].path, markerBrush, markerPen, true);
+				this.cChartDrawer.drawPath(this.paths.points[i][k].path, markerPen, markerBrush, true);
 			}
         }
 		this.cShapeDrawer.Graphics.RestoreGrState();
@@ -4419,18 +4427,6 @@ drawLineChart.prototype =
 		path.recalculate(gdLst);
 		
 		return path;
-	},
-	
-	_drawPath : function(path, brush, pen)
-	{
-		path.stroke = true;
-		
-		var cGeometry = new CGeometry2();
-		this.cShapeDrawer.Clear();
-		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
-		
-		cGeometry.AddPath(path);
-		this.cShapeDrawer.draw(cGeometry);
 	}
 }
 
@@ -4646,7 +4642,7 @@ drawAreaChart.prototype =
 				if(dataSeries[n].brush)
 					brush = dataSeries[n].brush;
 				
-				this._drawPath(this.paths.series[i][n], brush, pen);
+				this.cChartDrawer.drawPath(this.paths.series[i][n], pen, brush);
 			}
         }
 		this.cShapeDrawer.Graphics.RestoreGrState();
@@ -4715,18 +4711,6 @@ drawAreaChart.prototype =
 		path.recalculate(gdLst);
 		
 		return path;
-	},
-	
-	_drawPath : function(path, brush, pen)
-	{
-		//path.stroke = true;
-		
-		var cGeometry = new CGeometry2();
-		this.cShapeDrawer.Clear();
-		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
-		
-		cGeometry.AddPath(path);
-		this.cShapeDrawer.draw(cGeometry);
 	}
 }
 
@@ -5003,7 +4987,7 @@ drawHBarChart.prototype =
 				if(dataSeries[j].brush)
 					brush = dataSeries[j].brush;
 			
-				this._drawPath(this.paths.series[i][j], brush, pen);
+				this.cChartDrawer.drawPath(this.paths.series[i][j], pen, brush);
 			}
 		}
 		this.cShapeDrawer.Graphics.RestoreGrState();
@@ -5101,15 +5085,6 @@ drawHBarChart.prototype =
 		path.recalculate(gdLst);
 		
 		return path;
-	},
-	
-	_drawPath : function(path, brush, pen)
-	{
-		var cGeometry = new CGeometry2();
-		this.cShapeDrawer.Clear();
-		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
-		cGeometry.AddPath(path);
-		this.cShapeDrawer.draw(cGeometry);
 	}
 }
 
@@ -5152,9 +5127,9 @@ drawPieChart.prototype =
 			brush = val.brush;
 			pen = val.pen;
 			path = this.paths.series[i];
-            this._drawPath(path, brush, pen);
+			
+            this.cChartDrawer.drawPath(path, pen, brush);
         }
-		
     },
 	
 	_reCalculatePie: function ()
@@ -5273,16 +5248,6 @@ drawPieChart.prototype =
 			centerX = 0;
 		
 		return {x: centerX, y: centerY};
-	},
-	
-	_drawPath : function(path, brush, pen)
-	{
-		var cGeometry = new CGeometry2();
-		this.cShapeDrawer.Clear();
-		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
-		
-		cGeometry.AddPath(path);
-		this.cShapeDrawer.draw(cGeometry);
 	}
 };
 
@@ -5329,7 +5294,8 @@ drawDoughnutChart.prototype =
 				brush = val.brush;
 				pen = val.pen;
 				path = this.paths.series[n][k];
-				this._drawPath(path, brush, pen);
+				
+				 this.cChartDrawer.drawPath(path, pen, brush);
 			}
 		}
     },
@@ -5474,16 +5440,6 @@ drawDoughnutChart.prototype =
 			centerY = 0;
 		
 		return {x: centerX, y: centerY};
-	},
-	
-	_drawPath : function(path, brush, pen)
-	{
-		var cGeometry = new CGeometry2();
-		this.cShapeDrawer.Clear();
-		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
-		
-		cGeometry.AddPath(path);
-		this.cShapeDrawer.draw(cGeometry);
 	}
 };
 
@@ -5763,9 +5719,9 @@ drawRadarChart.prototype =
 				if(numCache.pts[n].brush)
 					brush = numCache.pts[n].brush;
 					
-				this._drawPath(this.paths.series[i][n], brush, pen);
+				this.cChartDrawer.drawPath(this.paths.series[i][n], pen, brush);
 				if(n == dataSeries.length - 2 && this.paths.series[i][n + 1])
-					this._drawPath(this.paths.series[i][n + 1], brush, pen);
+					this.cChartDrawer.drawPath(this.paths.series[i][n + 1], pen, brush);
 			}
 			
 			//draw point
@@ -5776,9 +5732,9 @@ drawRadarChart.prototype =
 				
 				//frame of point
 				if(this.paths.points[i][0].framePaths)
-					this._drawPath(this.paths.points[i][k].framePaths, markerBrush, markerPen, false);
+					this.cChartDrawer.drawPath(this.paths.points[i][k].framePaths, markerPen, markerBrush, false);
 				//point		
-				this._drawPath(this.paths.points[i][k].path, markerBrush, markerPen, true);
+				this.cChartDrawer.drawPath(this.paths.points[i][k].path, markerPen, markerBrush, true);
 			}
         }
 		//this.cShapeDrawer.Graphics.RestoreGrState();
@@ -5841,18 +5797,6 @@ drawRadarChart.prototype =
 		path.recalculate(gdLst);
 		
 		return path;
-	},
-	
-	_drawPath : function(path, brush, pen)
-	{
-		path.stroke = true;
-		
-		var cGeometry = new CGeometry2();
-		this.cShapeDrawer.Clear();
-		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
-		
-		cGeometry.AddPath(path);
-		this.cShapeDrawer.draw(cGeometry);
 	}
 }
 
@@ -6024,7 +5968,7 @@ drawScatterChart.prototype =
 						brush = yNumCache.pts[k].brush;
 						
 					//draw line
-					this._drawPath(this.paths.series[i][k], brush, pen, true);
+					this.cChartDrawer.drawPath(this.paths.series[i][k], pen, brush, true);
 				}
 			}
 		
@@ -6040,9 +5984,9 @@ drawScatterChart.prototype =
 					
 					//frame of point
 					if(this.paths.points[i][0].framePaths)
-						this._drawPath(this.paths.points[i][k].framePaths, markerBrush, markerPen, false);
+						this.cChartDrawer.drawPath(this.paths.points[i][k].framePaths, markerPen, markerBrush, false);
 					//point		
-					this._drawPath(this.paths.points[i][k].path, markerBrush, markerPen, true);
+					this.cChartDrawer.drawPath(this.paths.points[i][k].path, markerPen, markerBrush, true);
 				}
 			}
 		}
@@ -6194,20 +6138,6 @@ drawScatterChart.prototype =
 		
 		return {x: centerX, y: centerY};
 	},
-	
-	_drawPath: function(path, brush, pen, stroke)
-	{
-		path.stroke = stroke;
-		
-		var cGeometry = new CGeometry2();
-		this.cShapeDrawer.Clear();
-		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
-		
-		cGeometry.AddPath(path);
-		this.cShapeDrawer.draw(cGeometry);
-	},
-	
-	
 	
 	
 	_calculateSplineLine : function(points, k, xPoints, yPoints)
@@ -6403,21 +6333,21 @@ drawStockChart.prototype =
 
 			pen = this.cChartSpace.chart.plotArea.chart.calculatedHiLowLines;
 				
-			this._drawPath(this.paths.values[i].lowLines, brush, pen);
+			this.cChartDrawer.drawPath(this.paths.values[i].lowLines, pen, brush);
 			
-			this._drawPath(this.paths.values[i].highLines, brush, pen);
+			this.cChartDrawer.drawPath(this.paths.values[i].highLines, pen, brush);
 			
 			if(this.paths.values[i].downBars)
 			{
 				brush = this.cChartSpace.chart.plotArea.chart.upDownBars.downBarsBrush;
 				pen = this.cChartSpace.chart.plotArea.chart.upDownBars.downBarsPen;
-				this._drawPath(this.paths.values[i].downBars, brush, pen);
+				this.cChartDrawer.drawPath(this.paths.values[i].downBars, pen, brush);
 			}
 			else
 			{
 				brush = this.cChartSpace.chart.plotArea.chart.upDownBars.upBarsBrush;
 				pen = this.cChartSpace.chart.plotArea.chart.upDownBars.upBarsPen;
-				this._drawPath(this.paths.values[i].upBars, brush, pen);
+				this.cChartDrawer.drawPath(this.paths.values[i].upBars, pen, brush);
 			}
         }
     },
@@ -6537,18 +6467,6 @@ drawStockChart.prototype =
 		path.recalculate(gdLst);
 		
 		return path;
-	},
-	
-	_drawPath : function(path, brush, pen)
-	{
-		path.stroke = true;
-		
-		var cGeometry = new CGeometry2();
-		this.cShapeDrawer.Clear();
-		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
-		
-		cGeometry.AddPath(path);
-		this.cShapeDrawer.draw(cGeometry);
 	}
 };
 
@@ -6662,7 +6580,7 @@ drawBubbleChart.prototype =
 					markerPen = yNumCache.pts[k].compiledMarker.pen;
 					
 					//point		
-					this._drawPath(this.paths.points[i][k], markerBrush, markerPen, true);
+					this.cChartDrawer.drawPath(this.paths.points[i][k], markerPen, markerBrush, true);
 				}
 			}
 		}
@@ -6793,18 +6711,6 @@ drawBubbleChart.prototype =
 		return {x: centerX, y: centerY};
 	},
 	
-	_drawPath: function(path, brush, pen, stroke)
-	{
-		path.stroke = stroke;
-		
-		var cGeometry = new CGeometry2();
-		this.cShapeDrawer.Clear();
-		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
-		
-		cGeometry.AddPath(path);
-		this.cShapeDrawer.draw(cGeometry);
-	},
-	
 	_calculateBubble: function(x, y, bubbleSize, k)
 	{
 		var defaultSize = 4;
@@ -6862,6 +6768,8 @@ function gridChart()
 	this.chartProp = null;
 	this.cShapeDrawer = null;
 	this.chartSpace = null;
+	this.cChartDrawer = null;
+	
 	this.paths = {};
 }
 
@@ -6869,9 +6777,10 @@ gridChart.prototype =
 {
     draw : function(chartProp, cShapeDrawer, chartSpace)
     {
-		this.chartProp = chartProp;
+		this.chartProp = chartProp.calcProp;
 		this.cShapeDrawer = cShapeDrawer;
 		this.chartSpace = chartSpace;
+		this.cChartDrawer = chartProp;
 		
 		this._drawHorisontalLines();
 		this._drawVerticalLines();
@@ -6882,6 +6791,7 @@ gridChart.prototype =
 		this.chartProp = chartProp;
 		this.cShapeDrawer = cShapeDrawer;
 		this.chartSpace = chartSpace;
+		this.cChartDrawer = chartProp;
 		
 		this.paths = {};
 		this._calculateHorisontalLines();
@@ -7024,6 +6934,9 @@ gridChart.prototype =
 		var posMinorX;
 		var xPoints = this.chartSpace.chart.plotArea.valAx.xPoints ? this.chartSpace.chart.plotArea.valAx.xPoints : this.chartSpace.chart.plotArea.catAx.xPoints;
 		
+		if(!xPoints)
+			return;
+		
 		var crossBetween = this.chartSpace.chart.plotArea.valAx.crossBetween;
 		var crossDiff;
 		if(crossBetween == CROSS_BETWEEN_BETWEEN && this.chartSpace.chart.plotArea.valAx.posX && this.chartProp.type != "HBar")
@@ -7101,7 +7014,7 @@ gridChart.prototype =
 				pen = this.chartSpace.chart.plotArea.valAx.compiledMajorGridLines;
 				
 			path = this.paths.horisontalLines[i];
-			this._drawPath(path, pen);
+			this.cChartDrawer.drawPath(path, pen);
 			
 			//промежуточные линии
 			if(this.paths.horisontalMinorLines[i])
@@ -7113,7 +7026,7 @@ gridChart.prototype =
 						pen = this.chartSpace.chart.plotArea.catAx.compiledMinorGridLines;
 					else
 						pen = this.chartSpace.chart.plotArea.valAx.compiledMinorGridLines;
-					this._drawPath(path, pen);
+					this.cChartDrawer.drawPath(path, pen);
 				}
 			}
 		}
@@ -7132,7 +7045,7 @@ gridChart.prototype =
 				pen = this.chartSpace.chart.plotArea.catAx.compiledMajorGridLines;
 				
 			path = this.paths.verticalLines[i];
-			this._drawPath(path, pen);
+			this.cChartDrawer.drawPath(path, pen);
 			
 			//промежуточные линии
 			if(this.paths.verticalMinorLines[i])
@@ -7144,20 +7057,10 @@ gridChart.prototype =
 						pen = this.chartSpace.chart.plotArea.valAx.compiledMinorGridLines;
 					else
 						pen = this.chartSpace.chart.plotArea.catAx.compiledMinorGridLines;
-					this._drawPath(path, pen);
+					this.cChartDrawer.drawPath(path, pen);
 				}
 			}
 		}	
-	},
-	
-	_drawPath: function(path, pen)
-	{	
-		var cGeometry = new CGeometry2();
-		this.cShapeDrawer.Clear();
-		this.cShapeDrawer.fromShape2({pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
-		
-		cGeometry.AddPath(path);
-		this.cShapeDrawer.draw(cGeometry);
 	}
 }	
 	
@@ -7168,6 +7071,8 @@ function catAxisChart()
 	this.chartProp = null;
 	this.cShapeDrawer = null;
 	this.chartSpace = null;
+	this.cChartDrawer = null;
+	
 	this.paths = {};
 }
 
@@ -7175,9 +7080,10 @@ catAxisChart.prototype =
 {
     draw : function(chartProp, cShapeDrawer, chartSpace)
     {
-		this.chartProp = chartProp;
+		this.chartProp = chartProp.calcProp;
 		this.cShapeDrawer = cShapeDrawer;
 		this.chartSpace = chartSpace;
+		this.cChartDrawer = chartProp;
 		
 		this._drawAxis();
 		this._drawTickMark();
@@ -7188,6 +7094,7 @@ catAxisChart.prototype =
 		this.chartProp = chartProp;
 		this.cShapeDrawer = cShapeDrawer;
 		this.chartSpace = chartSpace;
+		this.cChartDrawer = chartProp;
 		
 		this.paths = {};
 		this._calculateAxis();
@@ -7367,7 +7274,8 @@ catAxisChart.prototype =
 	
 		pen = this.chartSpace.chart.plotArea.catAx.compiledLn;	
 		path = this.paths.axisLine;
-		this._drawPath(path, pen);
+		
+		this.cChartDrawer.drawPath(path, pen);
 	},
 	
 	_drawTickMark: function()
@@ -7380,7 +7288,7 @@ catAxisChart.prototype =
 				pen = this.chartSpace.chart.plotArea.catAx.compiledTickMarkLn;
 					
 				path = this.paths.tickMarks[i];
-				this._drawPath(path, pen);
+				this.cChartDrawer.drawPath(path, pen);
 				
 				//промежуточные линии
 				if(i != this.chartProp.numvlines && this.paths.minorTickMarks)
@@ -7388,25 +7296,11 @@ catAxisChart.prototype =
 					for(var n = 0; n < this.paths.minorTickMarks[i].length ; n++)
 					{
 						path = this.paths.minorTickMarks[i][n];
-						this._drawPath(path, pen);
+						this.cChartDrawer.drawPath(path, pen);
 					}
 				}
 			}	
 		}
-	},
-	
-	_drawPath: function(path, pen)
-	{	
-		if(!path)
-			return;
-		
-		path.stroke = true;
-		var cGeometry = new CGeometry2();
-		this.cShapeDrawer.Clear();
-		this.cShapeDrawer.fromShape2({pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
-		
-		cGeometry.AddPath(path);
-		this.cShapeDrawer.draw(cGeometry);
 	}
 }	
 
@@ -7417,6 +7311,8 @@ function valAxisChart()
 	this.chartProp = null;
 	this.cShapeDrawer = null;
 	this.chartSpace = null;
+	this.cChartDrawer = null;
+	
 	this.paths = {};
 }
 
@@ -7424,9 +7320,10 @@ valAxisChart.prototype =
 {
     draw : function(chartProp, cShapeDrawer, chartSpace)
     {
-		this.chartProp = chartProp;
+		this.chartProp = chartProp.calcProp;
 		this.cShapeDrawer = cShapeDrawer;
 		this.chartSpace = chartSpace;
+		this.cChartDrawer = chartProp;
 		
 		this._drawAxis();
 		this._drawTickMark();
@@ -7437,6 +7334,7 @@ valAxisChart.prototype =
 		this.chartProp = chartProp;
 		this.cShapeDrawer = cShapeDrawer;
 		this.chartSpace = chartSpace;
+		this.cChartDrawer = chartProp;
 		
 		this.paths = {};
 		this._calculateAxis();
@@ -7614,7 +7512,7 @@ valAxisChart.prototype =
 	
 		pen = this.chartSpace.chart.plotArea.catAx.compiledLn;	
 		path = this.paths.axisLine;
-		this._drawPath(path, pen);
+		this.cChartDrawer.drawPath(path, pen);
 	},
 	
 	_drawTickMark: function()
@@ -7628,7 +7526,7 @@ valAxisChart.prototype =
 			pen = this.chartSpace.chart.plotArea.valAx.compiledTickMarkLn;
 				
 			path = this.paths.tickMarks[i];
-			this._drawPath(path, pen);
+			this.cChartDrawer.drawPath(path, pen);
 			
 			//промежуточные линии
 			if(i != (this.paths.tickMarks.length - 1) && this.paths.minorTickMarks)
@@ -7636,24 +7534,10 @@ valAxisChart.prototype =
 				for(var n = 0; n < this.paths.minorTickMarks[i].length ; n++)
 				{
 					path = this.paths.minorTickMarks[i][n];
-					this._drawPath(path, pen);
+					this.cChartDrawer.drawPath(path, pen);
 				}
 			}
 		}	
-	},
-	
-	_drawPath: function(path, pen)
-	{	
-		if(!path)
-			return;
-		
-		path.stroke = true;
-		var cGeometry = new CGeometry2();
-		this.cShapeDrawer.Clear();
-		this.cShapeDrawer.fromShape2({pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
-		
-		cGeometry.AddPath(path);
-		this.cShapeDrawer.draw(cGeometry);
 	}
 }	
 
@@ -7664,6 +7548,7 @@ function allAreaChart()
 	this.chartProp = null;
 	this.cShapeDrawer = null;
 	this.chartSpace = null;
+	this.cChartDrawer = null;
 	
 	this.paths = null;
 }
@@ -7672,9 +7557,10 @@ allAreaChart.prototype =
 {
     draw : function(chartProp, cShapeDrawer, chartSpace)
     {
-		this.chartProp = chartProp;
+		this.chartProp = chartProp.calcProp;
 		this.cShapeDrawer = cShapeDrawer;
 		this.chartSpace = chartSpace;
+		this.cChartDrawer = chartProp;
 		
 		this._drawArea();
 	},
@@ -7683,6 +7569,7 @@ allAreaChart.prototype =
 	{
 		this.chartProp = chartProp;
 		this.cShapeDrawer = cShapeDrawer;
+		this.cChartDrawer = chartProp;
 		
 		this.paths = null;
 		this._calculateArea();
@@ -7717,17 +7604,7 @@ allAreaChart.prototype =
 	{
 		var pen = this.chartSpace.pen;
 		var brush = this.chartSpace.brush;
-		this._drawPaths(this.paths, brush, pen);
-	},
-	
-	_drawPaths: function(paths, brush, pen)
-	{
-		paths.stroke = true;
-		var cGeometry = new CGeometry2();
-		this.cShapeDrawer.Clear();
-		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
-		cGeometry.AddPath(paths);
-		this.cShapeDrawer.draw(cGeometry);
+		this.cChartDrawer.drawPath(this.paths, pen, brush);
 	}
 }	
 	
@@ -7737,6 +7614,7 @@ function areaChart()
 	this.chartProp = null;
 	this.cShapeDrawer = null;
 	this.chartSpace = null;
+	this.cChartDrawer = null;
 	
 	this.paths = null;
 }
@@ -7745,9 +7623,10 @@ areaChart.prototype =
 {
     draw : function(chartProp, cShapeDrawer, chartSpace)
     {
-		this.chartProp = chartProp;
+		this.chartProp = chartProp.calcProp;
 		this.cShapeDrawer = cShapeDrawer;
 		this.chartSpace = chartSpace;
+		this.cChartDrawer = chartProp;
 		
 		this._drawArea();
 	},
@@ -7756,6 +7635,7 @@ areaChart.prototype =
 	{
 		this.chartProp = chartProp;
 		this.cShapeDrawer = cShapeDrawer;
+		this.cChartDrawer = chartProp;
 		
 		this.paths = null;
 		this._calculateArea();
@@ -7798,17 +7678,7 @@ areaChart.prototype =
 	{
 		var pen = this.chartSpace.chart.plotArea.pen;
 		var brush = this.chartSpace.chart.plotArea.brush;
-		this._drawPaths(this.paths, brush, pen);
-	},
-	
-	_drawPaths: function(paths, brush, pen)
-	{
-		paths.stroke = true;
-		var cGeometry = new CGeometry2();
-		this.cShapeDrawer.Clear();
-		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
-		cGeometry.AddPath(paths);
-		this.cShapeDrawer.draw(cGeometry);
+		this.cChartDrawer.drawPath(this.paths, pen, brush);
 	}
 }	
 	
@@ -7963,7 +7833,7 @@ drawLine3DChart.prototype =
 				if(dataSeries[n].brush)
 					brush = dataSeries[n].brush;
 					
-				this._drawPath(this.paths.series[i][n], brush, pen);
+				this.cChartDrawer.drawPath(this.paths.series[i][n], pen, brush);
 			}
         }
     },
@@ -8034,18 +7904,6 @@ drawLine3DChart.prototype =
 	_calculateDLbl: function()
 	{
 		return {x: 0, y: 0};
-	},
-	
-	_drawPath : function(path, brush, pen)
-	{
-		path.stroke = true;
-		
-		var cGeometry = new CGeometry2();
-		this.cShapeDrawer.Clear();
-		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
-		
-		cGeometry.AddPath(path);
-		this.cShapeDrawer.draw(cGeometry);
 	}
 }
 
@@ -8114,10 +7972,10 @@ drawBar3DChart.prototype =
 						cColorMod.name = "shade";
 						duplicateBrush.fill.color.Mods.addMod(cColorMod);
 						duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new CUniColor().RGBA);
-						this._drawPaths(this.paths.series[i][j][k], duplicateBrush, pen);
+						this.cChartDrawer.drawPath(this.paths.series[i][j][k], pen, duplicateBrush);
 					}
 					else
-						this._drawPaths(this.paths.series[i][j][k], brush, pen);
+						this.cChartDrawer.drawPath(this.paths.series[i][j][k], pen, brush);
 					
 				}
 			}
@@ -8148,10 +8006,10 @@ drawBar3DChart.prototype =
 						cColorMod.name = "shade";
 						duplicateBrush.fill.color.Mods.addMod(cColorMod);
 						duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new CUniColor().RGBA);
-						this._drawPaths(this.paths.series[i][j][k], duplicateBrush, pen);
+						this.cChartDrawer.drawPath(this.paths.series[i][j][k], pen, duplicateBrush);
 					}
 					else
-						this._drawPaths(this.paths.series[i][j][k], brush, pen);
+						this.cChartDrawer.drawPath(this.paths.series[i][j][k], pen, brush);
 					
 				}
 			}
@@ -8489,15 +8347,6 @@ drawBar3DChart.prototype =
 	_calculateDLbl: function()
 	{
 		return {x: 0, y: 0};
-	},
-	
-	_drawPaths: function(paths, brush, pen)
-	{	
-		var cGeometry = new CGeometry2();
-		this.cShapeDrawer.Clear();
-		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
-		cGeometry.AddPath(paths);
-		this.cShapeDrawer.draw(cGeometry);
 	}
 }
 
@@ -8734,7 +8583,7 @@ grid3DChart.prototype =
 				pen = this.chartSpace.chart.plotArea.valAx.compiledMajorGridLines;
 				
 			path = this.paths.horisontalLines[i];
-			this._drawPath(path, pen);
+			this.cChartDrawer.drawPath(path, pen);
 		}
 	},
 	
@@ -8753,18 +8602,8 @@ grid3DChart.prototype =
 				pen = this.chartSpace.chart.plotArea.catAx.compiledMajorGridLines;
 				
 			path = this.paths.verticalLines[i];
-			this._drawPath(path, pen);
+			this.cChartDrawer.drawPath(path, pen);
 		}
-	},
-	
-	_drawPath: function(path, pen)
-	{	
-		var cGeometry = new CGeometry2();
-		this.cShapeDrawer.Clear();
-		this.cShapeDrawer.fromShape2({pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
-		
-		cGeometry.AddPath(path);
-		this.cShapeDrawer.draw(cGeometry);
 	}
 }		
 	
@@ -8815,5 +8654,51 @@ CGeometry2.prototype =
     {
         for (var i=0, n=this.pathLst.length; i<n;++i)
             this.pathLst[i].draw(shape_drawer);
+    },
+	
+	check_bounds: function(checker)
+    {
+
+        for(var i=0, n=this.pathLst.length; i<n;++i)
+
+            this.pathLst.check_bounds(checker);
+
     }
+};
+
+
+function CColorObj(pen, brush, geometry)
+{
+    this.pen = pen;
+	this.brush = brush;
+	this.geometry = geometry;
+}
+
+CColorObj.prototype =
+{
+	check_bounds: function (checker) {
+		if (this.spPr.geometry) {
+
+			this.spPr.geometry.check_bounds(checker);
+
+		}
+
+		else {
+
+			checker._s();
+
+			checker._m(0, 0);
+
+			checker._l(this.extX, 0);
+
+			checker._l(this.extX, this.extY);
+
+			checker._l(0, this.extY);
+
+			checker._z();
+
+			checker._e();
+
+		}
+	}
 };
