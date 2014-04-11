@@ -826,15 +826,13 @@ ParaMath.prototype =
                 SearchPos.X = X;
                 SearchPos.Y = Y;
 
-
-
                 Result = true;
 
                 //////////
 
-
                 SearchPos.InText = true;
                 SearchPos.DiffX =  0.001; // сравниваем расстояние до ближайшего элемента
+
             }
 
         }
@@ -927,6 +925,25 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Set_SelectionContentPos
 
+        if(StartFlag == 0)
+        {
+            var str = "";
+            for(var i = 0; i < StartContentPos.Data.length; i++)
+                str += StartContentPos.Data[i] + " ";
+
+            //console.log("StartContentPos " + str);
+        }
+
+        if(EndFlag == 0)
+        {
+            var str = "";
+            for(var i = 0; i < EndContentPos.Data.length; i++)
+                str += EndContentPos.Data [i]+ " ";
+
+            //console.log("EndContentPos " + str);
+        }
+
+
         this.Root.Set_SelectionContentPos(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag);
 
         this.bSelectionUse = true;
@@ -1013,7 +1030,6 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Selection_IsEmpty
 
-        //return false;
         return this.Root.Selection_IsEmpty();
     },
 

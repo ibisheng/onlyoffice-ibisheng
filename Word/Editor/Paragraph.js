@@ -14326,7 +14326,7 @@ Paragraph.prototype =
 
                 var SearchPosXY = this.Get_ParaContentPosByXY( X, Y, PageIndex + this.PageNum, false, false );
 
-                if ( SearchPosXY.Pos.Compare( SelSP ) >= 0 && SearchPosXY.Pos.Compare( SelEP ) <= 0 )
+                if ( SearchPosXY.Pos.Compare( SelSP ) >= 0 && SearchPosXY.Pos.Compare( SelEP ) <= 0 && true !== SearchPosXY.Pos.bPlaceholder )
                     return true;
 
                 return false;
@@ -22079,6 +22079,7 @@ function CParagraphContentPos()
 {
     this.Data  = [0, 0, 0];
     this.Depth = 0;
+    this.bPlaceholder = false;
 }
 
 CParagraphContentPos.prototype =

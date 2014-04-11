@@ -1325,8 +1325,21 @@ CMathBase.prototype =
     },
     Set_SelectionContentPos: function(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag)
     {
-        var startX = StartContentPos.Get(Depth),
+        var startX, startY;
+        var bJustDraw = false;
+
+        if(StartFlag === 0)
+        {
+            startX = StartContentPos.Get(Depth);
             startY = StartContentPos.Get(Depth + 1);
+
+            bJustDraw = this.elements[startX][startY].IsJustDraw();
+        }
+        else
+        {
+            startX = -2;
+            startY = -2;
+        }
 
         this.SelectStart_X = startX;
         this.SelectStart_Y = startY;
@@ -1347,16 +1360,13 @@ CMathBase.prototype =
         this.SelectEnd_X = endX;
         this.SelectEnd_Y = endY;
 
-
         Depth += 2;
-
-        var bJustDraw = this.elements[startX][startY].IsJustDraw();
 
         if(startX == endX && startY == endY && !bJustDraw)
         {
             this.elements[startX][startY].Set_SelectionContentPos(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag);
         }
-        else
+        else if(startX !== -2 && startY !== -2)
         {
             this.elements[startX][startY].Set_SelectionContentPos(StartContentPos, null, Depth, StartFlag, -1);
         }

@@ -6546,10 +6546,8 @@ ParaRun.prototype.Math_Recalculate = function(RecalcInfo)
     var width = 0,
         ascent = 0, descent = 0;
 
-    //var oWPrp = this.Get_CompiledPr(true);
     var oWPrp = this.Pr.Copy();
     this.Parent.applyArgSize(oWPrp);
-    //oWPrp.Merge(RecalcInfo.Composition.DEFAULT_RUN_PRP.getTxtPrp());
 
     oWPrp.Italic = false;
 
@@ -6570,9 +6568,6 @@ ParaRun.prototype.Math_Recalculate = function(RecalcInfo)
         this.Content[Pos].Resize(g_oTextMeasurer);
 
         var oSize = this.Content[Pos].size;
-        //var gps = this.Content[Pos].gaps;
-
-        //width += oSize.width + gps.left + gps.right;
         width += oSize.width;
 
         ascent = ascent > oSize.ascent ? ascent : oSize.ascent;

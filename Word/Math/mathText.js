@@ -13,6 +13,8 @@
 // /var DIV_CENT = 0.1;
 var DIV_CENT = 0.1386;
 
+var StartTextElement = 0x2B1A; // Cambria Math
+
 function CMathTextPrp()
 {
     this.FontFamily = undefined;
@@ -51,6 +53,7 @@ CMathTextPrp.prototype =
 function CMathText()
 {
     this.typeObj = MATH_TEXT;
+
     this.pos = null;
     this.size = null;
     this.value = null;
@@ -64,14 +67,6 @@ function CMathText()
 
     // для Para_Run
     this.Type = para_Math_Text;
-
-    //this.Parent = null;
-
-    /*this.TxtPrp = new CMathTextPrp();
-    this.OwnTPrp = new CMathTextPrp();*/
-
-    //this.sizeSymbol = null; // размер символа без учета трансформации
-
 
     // TO DO
     // убрать
@@ -432,6 +427,43 @@ CMathText.prototype =
     {
         this.type = type;
     },
+
+    // for Para Math
+    // for placeholder
+    Set_SelectionContentPos: function(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag)
+    {
+        if(StartFlag == 0)
+            StartContentPos.Update2(0, Depth);
+
+
+        if(EndFlag == 0)
+            EndContentPos.Update2(1, Depth);
+    },
+    Selection_DrawRange : function(_CurLine, _CurRange, SelectionDraw)
+    {
+        SelectionDraw.W += this.size.width;
+        SelectionDraw.FindStart = false;
+    },
+    Get_ParaContentPos: function(bSelection, bStart, ContentPos)
+    {
+        if(bSelection)
+        {
+            var pos = bStart ? 0 : 1;
+            ContentPos.Add(pos);
+        }
+        else
+            ContentPos.Add(0);
+
+
+    },
+    Get_ParaContentPosByXY: function(SearchPos, Depth)
+    {
+        SearchPos.Pos.Update(0, Depth);
+        SearchPos.Pos.bPlaceholder = true;
+
+    },
+
+
     // заглушка для текста (для n-арных операторов, когда выставляется текст вместо оператора)
     setComposition: function() // заглушка
     {},
