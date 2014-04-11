@@ -1065,12 +1065,14 @@ CDocument.prototype =
                 X      = SectPr.PageMargins.Bottom;
                 XLimit = SectPr.PageSize.H - SectPr.PageMargins.Top;
             }
+            
+            var HdrFtrLine = this.HdrFtr.Get_HdrFtrLines( PageIndex );
 
-            var YHeader = this.HdrFtr.Get_HeaderBottomPos( PageIndex );
+            var YHeader = HdrFtrLine.Top;
             if ( null !== YHeader && YHeader > Y )
                 Y = YHeader;
 
-            var YFooter = this.HdrFtr.Get_FooterTopPos( PageIndex );
+            var YFooter = HdrFtrLine.Bottom;
             if ( null !== YFooter && YFooter < YLimit )
                 YLimit = YFooter;
 
@@ -8786,6 +8788,7 @@ CDocument.prototype =
             // Нам надо разделить наш параграф в заданной позиции, если позиция в
             // начале или конце параграфа, тогда делить не надо
             Para.Cursor_MoveToNearPos( NearPos );
+            Para.Selection_Remove();
 
             if ( true === Para.Cursor_IsEnd() )
             {
@@ -10464,7 +10467,20 @@ CDocument.prototype =
 
     Document_SetHdrFtrDistance : function(Value)
     {
-        this.HdrFtr.Set_Distance( Value, Page_Height );
+        var CurHdrFtr = this.HdrFtr.CurHdrFtr;
+        
+        if ( null === CurHdrFtr )
+            return;
+
+        var CurPage = CurHdrFtr.RecalcInfo.CurPage;
+        if ( -1 === CurPage )
+            return;
+        
+        var Index = this.Pages[CurPage].Pos;
+        var SectPr = this.Get_SectPr( Index).SectPr;
+        
+        //SectPr.
+        
         this.Document_UpdateRulersState();
         this.Document_UpdateInterfaceState();
     },

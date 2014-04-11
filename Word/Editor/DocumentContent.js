@@ -3699,6 +3699,7 @@ CDocumentContent.prototype =
             // Нам надо разделить наш параграф в заданной позиции, если позиция в
             // начале или конце параграфа, тогда делить не надо
             Para.Cursor_MoveToNearPos( NearPos );
+            Para.Selection_Remove();
 
             if ( true === Para.Cursor_IsEnd() )
             {

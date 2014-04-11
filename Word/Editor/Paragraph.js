@@ -11280,8 +11280,16 @@ Paragraph.prototype =
         }
         else
         {
-            this.Selection.Use = false;
             this.Set_ParaContentPos( NearPos.ContentPos, true, -1, -1 );
+
+            this.Selection.Use = true;            
+            this.Set_SelectionContentPos( NearPos.ContentPos, NearPos.ContentPos );
+
+            var SelectionStartPos = this.Get_ParaContentPos( true, true );
+            var SelectionEndPos   = this.Get_ParaContentPos( true, false );
+
+            if ( 0 === SelectionStartPos.Compare( SelectionEndPos ) )
+                this.Selection_Remove();
         }
     },
 
