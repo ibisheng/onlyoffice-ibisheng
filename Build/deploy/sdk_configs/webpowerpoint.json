@@ -153,44 +153,47 @@
     "deploy": {
         "copy": {
             "api": {
-                "files": {
-                    "<%= pkg.menu_path %>/PowerPoint/": [
-                        "../../PowerPoint/api.js",
-                        "../../PowerPoint/apiCommon.js",
-                        "../../PowerPoint/apiDefines.js"
-                    ]
-                }
+                "expand": true,
+                "cwd": "../../PowerPoint/",
+                "src": [
+                    "api.js",
+                    "apiCommon.js",
+                    "apiDefines.js"
+                ],
+                "dest": "<%= pkg.menu_path %>/PowerPoint/"
             },
             "sdk": {
-                "files": {
-                    "<%= pkg.menu_path %>/PowerPoint/": [
-                        "../../PowerPoint/sdk-all.js",
-                        "../../PowerPoint/themes/theme*/**"
-                    ]
-                }
+                "expand": true,
+                "cwd": "../../PowerPoint/",
+                "src": [
+                    "sdk-all.js",
+                    "themes/theme*/**"
+                ],
+                "dest": "<%= pkg.menu_path %>/PowerPoint/"
             },
             "doc": {
-                "files": {
-                    "<%= pkg.menu_path %>/PowerPoint/document/": "../../PowerPoint/document/**"
-                }
+                "expand": true,
+                "cwd": "../../PowerPoint/",
+                "src": "document/**",
+                "dest": "<%= pkg.menu_path %>/PowerPoint/"
             },
             "log": {
-                "files": {
-                    "<%= pkg.menu_path %>/PowerPoint/": [
-                        "../../PowerPoint/sdk-all.js.map",
-                        "../../PowerPoint/Build/Log/property.map",
-                        "../../PowerPoint/Build/Log/variable.map",
-                        "../../PowerPoint/Build/Log/apiExport.js"
-                    ]
-                },
-                "options": {
-                    "flatten": true
-                }
+                "expand": true,
+                "cwd": "../../PowerPoint/",
+                "flatten": true,
+                "src": [
+                    "sdk-all.js.map",
+                    "Build/Log/property.map",
+                    "Build/Log/variable.map",
+                    "Build/Log/apiExport.js"
+                ],
+                "dest": "<%= pkg.menu_path %>/PowerPoint/"
             },
             "sample": {
-                "files": {
-                    "<%= pkg.menu_path %>/PowerPoint/index.html": "../../PowerPoint/index.html.deploy"
-                }
+                "expand": true,
+                "cwd": "../../PowerPoint/",
+                "src": "index.html.deploy",
+                "dest": "<%= pkg.menu_path %>/PowerPoint/"
             }
         },
         "store_log": {

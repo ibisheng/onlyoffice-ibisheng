@@ -175,55 +175,60 @@
     "deploy": {
         "copy": {
             "common": {
-                "files": {
-                    "<%= pkg.menu_path %>/Excel/model/": [
-                        "../../Common/Charts/DrawingObjects.js"
-                    ]
-                }
+                "expand": true,
+                "cwd": "../../Common/Charts/",
+                "src": "DrawingObjects.js",
+                "dest": "<%= pkg.menu_path %>/Excel/model/"
             },
             "api": {
-                "files": {
-                    "<%= pkg.menu_path %>/Excel/": [
-                        "../../Excel/api.js",
-                        "../../Excel/apiDefines.js",
-                        "../../Excel/view/EventsController.js",
-                        "../../Excel/view/HandlerList.js",
-                        "../../Excel/model/AdvancedOptions.js",
-                        "../../Excel/model/CellInfo.js",
-                        "../../Excel/model/CellComment.js",
-                        "../../Excel/utils/utils.js",
-                        "../../Excel/css/*.css"
-                    ]
-                }
+                "expand": true,
+                "cwd": "../../Excel/",
+                "src": [
+                    "api.js",
+                    "apiDefines.js",
+                    "view/EventsController.js",
+                    "view/HandlerList.js",
+                    "model/AdvancedOptions.js",
+                    "model/CellInfo.js",
+                    "model/CellComment.js",
+                    "utils/utils.js",
+                    "css/*.css"
+                ],
+                "dest": "<%= pkg.menu_path %>/Excel/"
             },
             "sdk": {
-                "files": {
-                    "<%= pkg.menu_path %>/Excel/": "../../Excel/sdk-all.js"
-                }
+                "expand": true,
+                "cwd": "../../Excel/",
+                "src": "sdk-all.js",
+                "dest": "<%= pkg.menu_path %>/Excel/"
             },
             "doc": {
-                "files": {
-                    "<%= pkg.menu_path %>/Excel/document/": "../../Excel/document/**"
-                }
+                "expand": true,
+                "cwd": "../../Excel/",
+                "src": "document/**",
+                "dest": "<%= pkg.menu_path %>/Excel/"
             },
             "log": {
-                "files": {
-                    "<%= pkg.menu_path %>/Excel/": "../../Excel/sdk-all.js.map"
-                }
+                "expand": true,
+                "cwd": "../../Excel/",
+                "src": "sdk-all.js.map",
+                "dest": "<%= pkg.menu_path %>/Excel/"
             },
             "samlpe": {
-                "files": {
-                    "<%= pkg.menu_path %>/Excel/Spreadsheet.html": "../../Excel/Spreadsheet.html.deploy"
-                }
+                "expand": true,
+                "cwd": "../../Excel/",
+                "src": "Spreadsheet.html.deploy",
+                "dest": "<%= pkg.menu_path %>/Excel/"
             },
             "samlpe_files": {
-                "files": {
-                    "<%= pkg.menu_path %>/Excel/": [
-                        "../../Excel/jquery/jquery-1.7.1.js",
-                        "../../Excel/css/nav-buttons.png",
-                        "../../Excel/css/gradient.png"
-                    ]
-                }
+                "expand": true,
+                "cwd": "../../Excel/",
+                "src": [
+                    "jquery/jquery-1.7.1.js",
+                    "css/nav-buttons.png",
+                    "css/gradient.png"
+                ],
+                "dest": "<%= pkg.menu_path %>/Excel/"
             }
         },
         "store_log": {

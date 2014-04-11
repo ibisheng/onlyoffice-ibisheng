@@ -155,61 +155,65 @@
     "deploy": {
         "copy": {
             "api": {
-                "files": {
-                    "<%= pkg.menu_path %>/Word/": [
-                        "../../Word/api.js",
-                        "../../Word/apiCommon.js",
-                        "../../Word/apiDefines.js"
-                    ]
-                }
+                "expand": true,
+                "cwd": "../../Word/",
+                "src": [
+                    "api.js",
+                    "apiCommon.js",
+                    "apiDefines.js"
+                ],
+                "dest": "<%= pkg.menu_path %>/Word/"
             },
             "sdk": {
-                "files": {
-                    "<%= pkg.menu_path %>/Word/": [
-                        "../../Word/sdk-all.js"
-                    ]
-                }
+                "expand": true,
+                "cwd": "../../Word/",
+                "src": "sdk-all.js",
+                "dest": "<%= pkg.menu_path %>/Word/"
             },
             "fonts": {
-                "files": {
-                    "<%= pkg.menu_path %>/Fonts/": [
-                        "../../Fonts/js/*.js",
-                        "../../Fonts/native/*.ttf",
-                        "../../Fonts/native/*.ttc",
-                        "../../Fonts/native/*.otf",
-                        "../../Fonts/native/*.TTF",
-                        "../../Fonts/native/*.TTC",
-                        "../../Fonts/native/*.OTF",
-                        "../../Fonts/native/*.bin",
-                        "../../Fonts/native/*.BIN"
-                    ]
-                }
+                "expand": true,
+                "cwd": "../../Fonts/",
+                "src": [
+                    "js/*.js",
+                    "native/*.ttf",
+                    "native/*.ttc",
+                    "native/*.otf",
+                    "native/*.TTF",
+                    "native/*.TTC",
+                    "native/*.OTF",
+                    "native/*.bin",
+                    "native/*.BIN"
+                ],
+                "dest": "<%= pkg.menu_path %>/Fonts/"
             },
             "doc": {
-                "files": {
-                    "<%= pkg.menu_path %>/Word/document/": "../../Word/document/**"
-                }
+                "expand": true,
+                "cwd": "../../Word/",
+                "src": "document/**",
+                "dest": "<%= pkg.menu_path %>/Word/"
             },
             "docscoapisettings": {
-                "files": {
-                    "<%= pkg.menu_path %>/Common/": [
-                        "../../Common/AllFonts.js",
-                        "../../Common/docscoapisettings.js",
-                        "../../Common/commonDefines.js",
-                        "../../Common/apiCommon.js",
-                        "../../Common/downloaderfiles.js",
-						"../../Common/Images/*.cur"
-                    ]
-                }
+                "expand": true,
+                "cwd": "../../Common/",
+                "src": [
+                    "AllFonts.js",
+                    "docscoapisettings.js",
+                    "commonDefines.js",
+                    "apiCommon.js",
+                    "downloaderfiles.js",
+                    "Images/*.cur"
+                ],
+                "dest": "<%= pkg.menu_path %>/Common/"
             },
             "log": {
-                "files": {
-                    "<%= pkg.menu_path %>/Word/": [
-                        "../../Word/Build/Log/property.map",
-                        "../../Word/Build/Log/variable.map",
-                        "../../Word/Build/Log/apiExport.js"
-                    ]
-                }
+                "expand": true,
+                "cwd": "../../Word/",
+                "src": [
+                    "Build/Log/property.map",
+                    "Build/Log/variable.map",
+                    "Build/Log/apiExport.js"
+                ],
+                "dest": "<%= pkg.menu_path %>/Word/"
             }
         },
         "store_log": {
