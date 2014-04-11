@@ -221,7 +221,7 @@ module.exports = function(grunt) {
 				packageFile['compile']['defines']['dst'],
 				map_record_file_path
 			],
-			pkg: '<json:' + defaultConfig + '>',
+			pkg: grunt.file.readJSON(defaultConfig),
 			replace: {
 				version: {
 					options: {
@@ -242,7 +242,7 @@ module.exports = function(grunt) {
 	
 	grunt.registerTask('deploy_sdk_init', function() {
         grunt.initConfig({
-		    pkg: '<json:' + toolsConfig + '>',
+		    pkg: grunt.file.readJSON(toolsConfig),
             copy:  packageFile['deploy']['copy']
         });
     });
