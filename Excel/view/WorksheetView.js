@@ -2667,8 +2667,14 @@
 		/** Рисует рамки для ячеек */
 		WorksheetView.prototype._drawCellsBorders = function (drawingCtx, range, leftFieldInPt, topFieldInPt) {
 			//TODO: использовать стили линий при рисовании границ
+			var drawRange;
 			if (range === undefined) {
-				range = this.visibleRange;
+				drawRange = this.visibleRange;
+			} else {
+				// Если пришел диапазон не всего экрана, то нужно учитывать merge для бордеров
+				// ToDo возможно стоит оптимизировать, если будет тормозить
+				drawRange = range.clone(true);
+				this._fixSelectionOfMergedCells(drawRange);
 			}
 			var t = this;
 			var ctx = (drawingCtx) ? drawingCtx : this.drawingCtx;
@@ -2774,12 +2780,12 @@
 			var arrCurrRow = [];
 			var arrNextRow = [];
 			var bCur, bPrev, bNext, bTopCur, bTopPrev, bTopNext, bBotCur, bBotPrev, bBotNext;
-			bCur = bPrev = bNext = bTopCur = bTopPrev = bTopNext = bBotCur = bBotPrev = bBotNext = undefined;
-			var row = range.r1 - 1, col, prevCol = range.c1 - 1;
+			bCur = bPrev = bNext = bTopCur = bTopNext = bBotCur = bBotNext = undefined;
+			var row = drawRange.r1 - 1, col, prevCol = drawRange.c1 - 1;
 			// Сначала пройдемся по верхней строке (над отрисовываемым диапазоном)
 			while (0 <= row) {
 				if (r[row].height >= t.height_1px) {
-					for (col = prevCol; col <= range.c2 && col < t.nColsCount; ++col) {
+					for (col = prevCol; col <= drawRange.c2 && col < t.nColsCount; ++col) {
 						if (0 > col || c[col].width < t.width_1px) {continue;}
 						arrPrevRow[col] = t._getVisibleCell(col, row).getBorder();
 					}
@@ -2793,10 +2799,10 @@
 
 			var mc = undefined, isMerged;
 			var isPrevColExist = (0 <= prevCol);
-			for (row = range.r1; row <= range.r2 && row < t.nRowsCount; ++row) {
+			for (row = drawRange.r1; row <= drawRange.r2 && row < t.nRowsCount; ++row) {
 				if (r[row].height < t.height_1px) {continue;}
-				var isFirstRow = row === range.r1;
-				var isLastRow  = row === range.r2;
+				var isFirstRow = row === drawRange.r1;
+				var isLastRow  = row === drawRange.r2;
 				var nextRow = row + 1;
 
 				var rowCache = t._fetchRowCache(row);
@@ -2804,12 +2810,12 @@
 				var y2 = y1 + r[row].height - this.height_1px;
 
 				var nextCol;
-				for (col = range.c1, isMerged = false; col <= range.c2 && col < t.nColsCount; col = nextCol, isMerged = false) {
+				for (col = drawRange.c1, isMerged = false; col <= drawRange.c2 && col < t.nColsCount; col = nextCol, isMerged = false) {
 					if (c[col].width < this.width_1px) {continue;}
-					var isFirstCol = col === range.c1;
-					var isLastCol = col === range.c2;
+					var isFirstCol = col === drawRange.c1;
+					var isLastCol = col === drawRange.c2;
 					// Нужно отсеять пустые справа
-					for (nextCol = col + 1; nextCol <= range.c2 && nextCol < t.nColsCount; ++nextCol)
+					for (nextCol = col + 1; nextCol <= drawRange.c2 && nextCol < t.nColsCount; ++nextCol)
 						if (c[nextCol].width >= this.width_1px) {break;}
 
 					if (mc && mc.c2 >= col) {
@@ -2908,7 +2914,7 @@
 //						}
 					}
 					// draw right border
-					if ((!isMerged || isLastCol) && !t._isRightBorderErased1(col, rowCache)) {
+					if ((!isMerged || col === mc.c2 || isLastCol) && !t._isRightBorderErased1(col, rowCache)) {
 						drawVerticalBorder(bCur, bNext, x2, y1, y2);
 					}
 					// draw top border
@@ -2920,7 +2926,7 @@
 //							drawHorizontalBorder.call(this, tb, lb, lbPrev, rb, rbPrev, x1, y1, x2);
 //						}
 					}
-					if (!isMerged || isLastRow) {
+					if (!isMerged || row === mc.r2 || isLastRow) {
 						// draw bottom border
 						drawHorizontalBorder(bCur, bBotCur, x1, y2, x2);
 					}
