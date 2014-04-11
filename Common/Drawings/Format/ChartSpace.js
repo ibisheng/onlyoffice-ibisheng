@@ -230,6 +230,11 @@ CChartSpace.prototype =
         return historyitem_type_ChartSpace;
     },
 
+    getAllRasterImages: function(images)
+    {
+        //todo
+    },
+
     setParent: CShape.prototype.setParent,
 
     setChart: function(chart)
@@ -4406,9 +4411,9 @@ CChartSpace.prototype =
                                     var compiled_line = new CLn();
                                     compiled_line.merge(default_line);
                                     compiled_line.Fill.merge(style.line2[0]);
-                                    if(ser.spPr && spPr.ln)
+                                    if(ser.spPr && ser.spPr.ln)
                                     {
-                                        compiled_line.merge(spPr.ln);
+                                        compiled_line.merge(ser.spPr.ln);
                                     }
                                     if(j === 0)
                                         ser.compiledSeriesPen = compiled_line.createDuplicate();

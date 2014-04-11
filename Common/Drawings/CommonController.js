@@ -214,8 +214,13 @@ DrawingObjectsController.prototype =
         }
         if(this.selection.textSelection)
         {
-            this.selection.textSelection.getDocContent().Selection_Remove();
+            var content = this.selection.textSelection.getDocContent();
+            content && content.Selection_Remove();
             this.selection.textSelection = null;
+        }
+        if(this.selection.wrapPolygonSelection)
+        {
+            this.selection.wrapPolygonSelection = null;
         }
     },
 
@@ -1862,12 +1867,16 @@ DrawingObjectsController.prototype =
             //TODO: переделать ret.putHorAxisLabel(hor_axis ? (isRealObject(hor_axis.title) ? (hor_axis.title.overlay ? c_oAscChartTitleShowSettings.overlay : c_oAscChartTitleShowSettings.noOverlay) : c_oAscChartTitleShowSettings.none): null);
             //TODO: переделать ret.putVertAxisLabel(vert_axis ? (isRealObject(vert_axis.title) ? (vert_axis.title.overlay ? c_oAscChartTitleShowSettings.overlay : c_oAscChartTitleShowSettings.noOverlay) : c_oAscChartTitleShowSettings.none): null);
 
+
             var data_labels = plot_area.chart.dLbls;
-            ret.putShowSerName(data_labels.showSerName === true);
-            ret.putShowCatName(data_labels.showCatName === true);
-            ret.putShowVal(data_labels.showVal === true);
-            ret.putSeparator(data_labels.separator);
-            ret.putDataLabelsPos(REV_DLBL_POS_DEFINES_MAP[data_labels.dLblPos]);
+            if(data_labels)
+            {
+                ret.putShowSerName(data_labels.showSerName === true);
+                ret.putShowCatName(data_labels.showCatName === true);
+                ret.putShowVal(data_labels.showVal === true);
+                ret.putSeparator(data_labels.separator);
+                ret.putDataLabelsPos(REV_DLBL_POS_DEFINES_MAP[data_labels.dLblPos]);
+            }
 
 
             if(chart.legend)

@@ -4946,6 +4946,8 @@ CDLbl.prototype =
 
     },
 
+
+
     getTextHeight: function()
     {
 
@@ -5001,6 +5003,7 @@ CDLbl.prototype =
 
     recalculateBrush: CShape.prototype.recalculateBrush,
     recalculatePen: CShape.prototype.recalculatePen,
+    check_bounds: CShape.prototype.check_bounds,
 
     getCompiledStyle: function()
     {
@@ -5009,7 +5012,7 @@ CDLbl.prototype =
 
     getParentObjects: function()
     {
-        return this.chart.getParentObjects;
+        return this.chart.getParentObjects();
     },
 
     recalculateTransform: function()
