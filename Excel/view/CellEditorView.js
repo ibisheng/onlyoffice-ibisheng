@@ -1604,7 +1604,7 @@
 			},
 
 			_getAutoComplete: function(str) {
-				// ToDo можно ускорить делая поиск каждый раз не в большом массиве, а в уменбшенном (по предыдущим символам)
+				// ToDo можно ускорить делая поиск каждый раз не в большом массиве, а в уменьшенном (по предыдущим символам)
 				var oLastResult = this.objAutoComplete[str];
 				if (oLastResult)
 					return oLastResult;
@@ -1617,12 +1617,6 @@
 						arrResult.push(arrAutoComplete[i]);
 				}
 				return this.objAutoComplete[str] = arrResult;
-			},
-			
-			_removeFormulaSelector: function() {
-				var selector = document.getElementById("formulaSelector");
-				if ( selector )
-					selector.parentNode.removeChild(selector);
 			},
 			
 			_updateFormulaSelectorPosition: function() {
@@ -1662,63 +1656,7 @@
 					}
 				}
 			},
-			
-			_keyDownFormulaSelector: function (event) {
-				var _this = this;
-				var combo = document.getElementById("formulaList");
-				if ( combo ) {
-					var nodes = combo.childNodes;
-					
-					switch (event.which) {
-						case 38: // Up
-							{
-								var selectedIndex = nodes.length;
-								for ( var i = 0; i < nodes.length; i++ ) {
-									if ( nodes[i].style["backgroundColor"] != "" ) {
-										selectedIndex = i;
-										nodes[i].style["backgroundColor"] = "";
-										break;
-									}
-								}
-								selectedIndex--;
-								if ( selectedIndex < 0 )
-									selectedIndex = 0;
-								nodes[selectedIndex].style["backgroundColor"] = _this.formulaSelectorColor;							
-							}
-							break;
-						case 40: // Down
-							{
-								var selectedIndex = -1;
-								for ( var i = 0; i < nodes.length; i++ ) {
-									if ( nodes[i].style["backgroundColor"] != "" ) {
-										selectedIndex = i;
-										nodes[i].style["backgroundColor"] = "";
-										break;
-									}
-								}
-								selectedIndex++;
-								if ( selectedIndex >= nodes.length )
-									selectedIndex = nodes.length - 1;
-								nodes[selectedIndex].style["backgroundColor"] = _this.formulaSelectorColor;							
-							}
-							break;
-						case 9: // Tab
-							{
-								for ( var i = 0; i < nodes.length; i++ ) {
-									if ( nodes[i].style["backgroundColor"] != "" ) {
-										var formulaName = nodes[i].innerText || nodes[i].textContent;
-										var insertText = formulaName.substring(_this.input.value.length - 1) + "(";
-										_this._addChars(insertText);
-										_this._removeFormulaSelector();
-										break;
-									}
-								}
-							}
-							break;
-					}
-				}
-			},
-			
+
 			// Event handlers
 
 			/** @param event {jQuery.Event} */
@@ -1747,7 +1685,6 @@
 							return false;
 						t.undoAll();
 						t.close();
-						t._removeFormulaSelector();
 						return false;
 
 					case 13:  // "enter"
