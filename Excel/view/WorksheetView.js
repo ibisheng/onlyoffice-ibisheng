@@ -2775,6 +2775,7 @@
 			var arrCurrRow = [];
 			var arrNextRow = [];
 			var bCur, bPrev, bNext, bTopCur, bTopPrev, bTopNext, bBotCur, bBotPrev, bBotNext;
+			bCur = bPrev = bNext = bTopCur = bTopPrev = bTopNext = bBotCur = bBotPrev = bBotNext = undefined;
 			var row = range.r1 - 1, col, prevCol = range.c1 - 1;
 			// Сначала пройдемся по верхней строке (над отрисовываемым диапазоном)
 			while (0 <= row) {
@@ -2791,7 +2792,7 @@
 			while (0 <= prevCol && c[prevCol].width < t.width_1px)
 				--prevCol;
 
-			var mc, isMerged;
+			var mc = undefined, isMerged;
 			var isPrevColExist = (0 <= prevCol);
 			for (row = range.r1; row <= range.r2 && row < t.nRowsCount; ++row) {
 				if (r[row].height < t.height_1px) {continue;}
@@ -2803,11 +2804,14 @@
 				var y1 = r[row].top - offsetY;
 				var y2 = y1 + r[row].height - this.height_1px;
 
-				for (col = range.c1, isMerged = false; col <= range.c2 && col < t.nColsCount; ++col, isMerged = false) {
+				var nextCol;
+				for (col = range.c1, isMerged = false; col <= range.c2 && col < t.nColsCount; col = nextCol, isMerged = false) {
 					if (c[col].width < this.width_1px) {continue;}
 					var isFirstCol = col === range.c1;
 					var isLastCol = col === range.c2;
-					var nextCol = col + 1;
+					// Нужно отсеять пустые справа
+					for (nextCol = col + 1; nextCol <= range.c2 && nextCol < t.nColsCount; ++nextCol)
+						if (c[nextCol].width >= this.width_1px) {break;}
 
 					if (mc && mc.c2 >= col) {
 						isMerged = true;
