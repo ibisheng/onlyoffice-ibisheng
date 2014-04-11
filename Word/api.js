@@ -6942,21 +6942,10 @@ asc_docs_api.prototype.asc_getMasterCommentId = function()
     return -1;
 }
 
-function CApiAnchorPosition(Obj)
-{
-    this.X0 = Obj.X0;
-    this.X1 = Obj.X1;
-    this.Y  = Obj.Y;
-}
-
-CApiAnchorPosition.prototype.Get_X0 = function() { return this.X0; }
-CApiAnchorPosition.prototype.Get_X1 = function() { return this.X1; }
-CApiAnchorPosition.prototype.Get_Y = function() { return this.Y; }
-
 asc_docs_api.prototype.asc_getAnchorPosition = function()
 {
-    var AnchorPos = this.WordControl.m_oLogicDocument.Get_SelectionAnchorPos();
-    return new CApiAnchorPosition(AnchorPos);    
+    var AnchorPos = this.WordControl.m_oLogicDocument.Get_SelectionAnchorPos();    
+    return new asc_CRect(AnchorPos.X0, AnchorPos.Y, AnchorPos.X1 - AnchorPos.X0, 0);
 }
 
 var cCharDelimiter = String.fromCharCode(5);
