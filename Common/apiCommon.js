@@ -777,6 +777,30 @@
 
 
     window["asc_CatAxisSettings"] = asc_CatAxisSettings;
+
+	/** @constructor */
+	function asc_CRect (x, y, width, height) {
+		// private members
+		this._x = x;
+		this._y = y;
+		this._width = width;
+		this._height = height;
+	}
+
+	asc_CRect.prototype = {
+		asc_getX:		function () { return this._x; },
+		asc_getY:		function () { return this._y; },
+		asc_getWidth:	function () { return this._width; },
+		asc_getHeight:	function () { return this._height; }
+	};
+
+	window["Asc"].asc_CRect = asc_CRect;
+	prot = asc_CRect.prototype;
+
+	prot["asc_getX"]			= prot.asc_getX;
+	prot["asc_getY"]			= prot.asc_getY;
+	prot["asc_getWidth"]		= prot.asc_getWidth;
+	prot["asc_getHeight"]		= prot.asc_getHeight;
 }
 )(window);
 

@@ -37,7 +37,7 @@
 		var asc_CFont			= asc.asc_CFont;
 		var asc_CFill			= asc.asc_CFill;
 		var asc_CCellInfo		= asc.asc_CCellInfo;
-		var asc_CCellRect		= asc.asc_CCellRect;
+		var asc_CRect			= asc.asc_CRect;
 		var asc_CHyperlink		= asc.asc_CHyperlink;
 		var asc_CPageOptions	= asc.asc_CPageOptions;
 		var asc_CPageSetup		= asc.asc_CPageSetup;
@@ -6354,7 +6354,7 @@
 			yL *= asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIY() );
 			var width = this.getColumnWidth (this.activeRange.startCol, /*px*/0);
 			var height = this.getRowHeight(this.activeRange.startRow, /*px*/0);
-			return new asc_CCellRect (xL, yL, width, height);
+			return new asc_CRect (xL, yL, width, height);
 		};
 
 		WorksheetView.prototype._checkSelectionShape = function () {

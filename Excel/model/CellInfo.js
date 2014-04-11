@@ -203,30 +203,5 @@
 		prot["asc_getStyleName"]		= prot.asc_getStyleName;
 		prot["asc_getNumFormatType"]	= prot.asc_getNumFormatType;
 		prot["asc_getAngle"]			= prot.asc_getAngle;
-
-		// Класс точки
-		function asc_CCellRect (x, y, width, height) {
-			// private members
-			this._x = x;
-			this._y = y;
-			this._width = width;
-			this._height = height;
-		}
-
-		asc_CCellRect.prototype = {
-			asc_getX:		function () { return this._x; },
-			asc_getY:		function () { return this._y; },
-			asc_getWidth:	function () { return this._width; },
-			asc_getHeight:	function () { return this._height; }
-		};
-
-		window["Asc"].asc_CCellRect = asc_CCellRect;
-		prot = asc_CCellRect.prototype;
-
-		prot["asc_getX"]			= prot.asc_getX;
-		prot["asc_getY"]			= prot.asc_getY;
-		prot["asc_getWidth"]		= prot.asc_getWidth;
-		prot["asc_getHeight"]		= prot.asc_getHeight;
-
 	}
 )(window);
