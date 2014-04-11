@@ -11,6 +11,7 @@
 		if (!window["Asc"]) {window["Asc"] = {};}
 		var prot;
 
+		/** @constructor */
 		function asc_CCellFlag(m, s, w, t, l) {
 			this.merge = !!m;
 			this.shrinkToFit = !!s;
@@ -36,6 +37,7 @@
 		prot["asc_getSelectionType"] = prot.asc_getSelectionType;
 		prot["asc_getLockText"] = prot.asc_getLockText;
 
+		/** @constructor */
 		function asc_CFont(name, size, color, b, i, u, s, sub, sup) {
 			this.name = name !== undefined ? name : "Arial";
 			this.size = size !== undefined ? size : 10;
@@ -73,6 +75,7 @@
 		prot["asc_getSuperscript"]	= prot.asc_getSuperscript;
 		prot["asc_getColor"]		= prot.asc_getColor;
 
+		/** @constructor */
 		function asc_CFill(color) {
 			this.color = color !== undefined ? color : null;
 		}
@@ -86,6 +89,7 @@
 
 		prot["asc_getColor"] = prot.asc_getColor;
 
+		/** @constructor */
 		function asc_CBorder(style, color) {
 			// ToDo заглушка для создания border-а
 			if (typeof style === "string") {
@@ -112,6 +116,7 @@
 		prot["asc_getStyle"] = prot.asc_getStyle;
 		prot["asc_getColor"] = prot.asc_getColor;
 
+		/** @constructor */
 		function asc_CBorders() {
 			this.left = null;
 			this.top = null;
@@ -140,6 +145,7 @@
 		prot["asc_getDiagDown"]	= prot.asc_getDiagDown;
 		prot["asc_getDiagUp"]	= prot.asc_getDiagUp;
 
+		/** @constructor */
 		function asc_CCellInfo() {
 			this.name = null;
 			this.formula = "";
