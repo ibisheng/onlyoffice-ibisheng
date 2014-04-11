@@ -3663,7 +3663,7 @@ drawBarChart.prototype =
 		var widthGraph  = this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right;
 		
 		//TODO - передавать overlap из меню!
-		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 1 : 0;
+		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 100 : 0;
 		var overlap        = this.cShapeDrawer.chart.plotArea.chart.overlap ? this.cShapeDrawer.chart.plotArea.chart.overlap : defaultOverlap;
 		var numCache       = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
 		var width          = widthGraph / numCache.ptCount;
@@ -3671,8 +3671,8 @@ drawBarChart.prototype =
 			width = widthGraph / (numCache.ptCount - 1);
 		
 		
-		var individualBarWidth = width / (this.chartProp.series.length - (this.chartProp.series.length - 1) * (overlap) + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
-		var widthOverLap       = individualBarWidth * (overlap);
+		var individualBarWidth = width / (this.chartProp.series.length - (this.chartProp.series.length - 1) * (overlap / 100) + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
+		var widthOverLap       = individualBarWidth * (overlap / 100);
 		var hmargin            = (this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100 * individualBarWidth) / 2;
 		
 		var height, startX, startY, diffYVal, val, paths, seriesHeight = [], tempValues = [], seria, startYColumnPosition, startXPosition, newStartX, newStartY, prevVal, idx;
@@ -4048,7 +4048,7 @@ drawLineChart.prototype =
 		//соответствует подписям оси значений(OY)
 		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
 		
-		var isSplineLine = true;
+		var isSplineLine = false;
 		
 		var y, y1, y2, y3, x, x1, x2, x3, val, nextVal, tempVal, seria, dataSeries, compiledMarkerSize, compiledMarkerSymbol;
 		for (var i = 0; i < this.chartProp.series.length; i++) {
@@ -4208,7 +4208,7 @@ drawLineChart.prototype =
 		var numCache = this.chartProp.series[ser].val.numRef ? this.chartProp.series[ser].val.numRef.numCache : this.chartProp.series[ser].val.numLit;
 		var point = numCache.pts[val];
 		var path;
-		var isSplineLine = true;
+		var isSplineLine = false;
 		
 		if(this.paths.series)
 		{
@@ -4774,14 +4774,14 @@ drawHBarChart.prototype =
 		var heightGraph    = this.chartProp.heightCanvas - this.chartProp.chartGutter._top - this.chartProp.chartGutter._bottom;
 		
 		//TODO - передавать overlap из меню!
-		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 1 : 0;
+		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 100 : 0;
 		var overlap        = this.cShapeDrawer.chart.plotArea.chart.overlap ? this.cShapeDrawer.chart.plotArea.chart.overlap : defaultOverlap;
 		var numCache       = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
         var height         = heightGraph / numCache.ptCount;
 		
 		
-		var individualBarHeight = height / (this.chartProp.series.length - (this.chartProp.series.length - 1) * (overlap) + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
-		var widthOverLap = individualBarHeight * (overlap);
+		var individualBarHeight = height / (this.chartProp.series.length - (this.chartProp.series.length - 1) * (overlap / 100) + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
+		var widthOverLap = individualBarHeight * (overlap / 100);
 		var hmargin = (this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100 * individualBarHeight) / 2;
 		
 		var width, startX, startY, diffYVal, val, paths, seriesHeight = [], seria, startXColumnPosition, startYPosition, newStartX, newStartY, idx;
@@ -5894,7 +5894,7 @@ drawScatterChart.prototype =
 		var xPoints = this.cShapeDrawer.chart.plotArea.catAx.xPoints;
 		//соответствует подписям оси значений(OY)
 		var yPoints = this.cShapeDrawer.chart.plotArea.valAx.yPoints;
-		var isSplineLine = true;
+		var isSplineLine = false;
 		
 		var trueHeight = this.chartProp.trueHeight;
 		var trueWidth  = this.chartProp.trueWidth;
@@ -7215,11 +7215,12 @@ catAxisChart.prototype =
 		{
 			case TICK_MARK_CROSS:
 			{
+				widthLine = 5;
 				break;
 			}
 			case TICK_MARK_IN:
 			{
-				widthLine = -3;
+				widthLine = -5;
 				break;
 			}
 			case TICK_MARK_NONE:
@@ -7229,7 +7230,7 @@ catAxisChart.prototype =
 			}
 			case TICK_MARK_OUT:
 			{
-				widthLine = 3;
+				widthLine = 5;
 				break;
 			}
 		};
@@ -7238,6 +7239,7 @@ catAxisChart.prototype =
 		{
 			case TICK_MARK_CROSS:
 			{
+				widthMinorLine = 3;
 				break;
 			}
 			case TICK_MARK_IN:
