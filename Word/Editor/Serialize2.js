@@ -731,17 +731,16 @@ function BinaryFileWriter(doc)
 		//Write Comments
 		var oMapCommentId = new Object();
 		this.WriteTable(c_oSerTableTypes.Comments, new BinaryCommentsTableWriter(this.memory, this.Document, oMapCommentId));
-		var oNumIdMap = new Object();
-		
         //Write Numbering
+		var oNumIdMap = new Object();
         this.WriteTable(c_oSerTableTypes.Numbering, new BinaryNumberingTableWriter(this.memory, this.Document, oNumIdMap));		
         //Write StyleTable
         this.WriteTable(c_oSerTableTypes.Style, new BinaryStyleTableWriter(this.memory, this.Document, oNumIdMap));
-        //Write HeaderFooter
-        this.WriteTable(c_oSerTableTypes.HdrFtr, new BinaryHeaderFooterTableWriter(this.memory, this.Document, oNumIdMap));
         //Write DocumentTable
-        //DocumentTable всегда пишем последней, чтобы сначала заполнить все вспомогательные структуры, а при заполении документа, вызывать методы типа Style_Add...
-        this.WriteTable(c_oSerTableTypes.Document, new BinaryDocumentTableWriter(this.memory, this.Document, oMapCommentId, oNumIdMap, null));
+		var oBinaryHeaderFooterTableWriter = new BinaryHeaderFooterTableWriter(this.memory, this.Document, oNumIdMap);
+        this.WriteTable(c_oSerTableTypes.Document, new BinaryDocumentTableWriter(this.memory, this.Document, oMapCommentId, oNumIdMap, null, oBinaryHeaderFooterTableWriter));
+        //Write HeaderFooter
+        this.WriteTable(c_oSerTableTypes.HdrFtr, oBinaryHeaderFooterTableWriter);
         //Write OtherTable
 		var oBinaryOtherTableWriter = new BinaryOtherTableWriter(this.memory, this.Document)
         this.WriteTable(c_oSerTableTypes.Other, oBinaryOtherTableWriter);
@@ -766,7 +765,7 @@ function BinaryFileWriter(doc)
 		this.copyParams.oUsedNumIdMap = new Object();
 		this.copyParams.nNumIdIndex = 1;
 		this.copyParams.oUsedStyleMap = new Object();		
-		this.copyParams.bdtw = new BinaryDocumentTableWriter(this.memory, this.Document, null, this.copyParams.oUsedNumIdMap, this.copyParams);
+		this.copyParams.bdtw = new BinaryDocumentTableWriter(this.memory, this.Document, null, this.copyParams.oUsedNumIdMap, this.copyParams, null);
 		this.copyParams.nDocumentWriterTablePos = 0;
 		this.copyParams.nDocumentWriterPos = 0;
 		
@@ -854,7 +853,7 @@ function BinaryStyleTableWriter(memory, doc, oNumIdMap, oUsedStyleMap)
 	this.oUsedStyleMap = oUsedStyleMap;
     this.bs = new BinaryCommonWriter(this.memory);
 	this.btblPrs = new Binary_tblPrWriter(this.memory, oNumIdMap);
-    this.bpPrs = new Binary_pPrWriter(this.memory, oNumIdMap);
+    this.bpPrs = new Binary_pPrWriter(this.memory, oNumIdMap, null);
     this.brPrs = new Binary_rPrWriter(this.memory);
     this.Write = function()
     {
@@ -1022,10 +1021,11 @@ function BinaryStyleTableWriter(memory, doc, oNumIdMap, oUsedStyleMap)
 			this.bs.WriteItem(c_oSerProp_tblStylePrType.TcPr, function(){oThis.btblPrs.WriteCellPr(val.TableCellPr);});
 	};
 };
-function Binary_pPrWriter(memory, oNumIdMap)
+function Binary_pPrWriter(memory, oNumIdMap, oBinaryHeaderFooterTableWriter)
 {
     this.memory = memory;
 	this.oNumIdMap = oNumIdMap;
+	this.oBinaryHeaderFooterTableWriter = oBinaryHeaderFooterTableWriter;
     this.bs = new BinaryCommonWriter(this.memory);
     this.brPrs = new Binary_rPrWriter(this.memory);
     this.Write_pPr = function(pPr, pPr_rPr, SectPr, oDocument)
@@ -1366,14 +1366,12 @@ function Binary_pPrWriter(memory, oNumIdMap)
         this.bs.WriteItem(c_oSerProp_secPrType.pgMar, function(){oThis.WritePageMargin(sectPr, oDocument);});
 		//setting
         this.bs.WriteItem(c_oSerProp_secPrType.setting, function(){oThis.WritePageSetting(sectPr, oDocument);});
-		var header = oDocument.HdrFtr.Content[0].Header;
-		var footer = oDocument.HdrFtr.Content[0].Footer;
 		//header
-		if(null != header.First || null != header.Even || null != header.Odd)
-			this.bs.WriteItem(c_oSerProp_secPrType.headers, function(){oThis.WriteHdrFtr(header);});
+		if(null != sectPr.HeaderFirst || null != sectPr.HeaderEven || null != sectPr.HeaderDefault)
+			this.bs.WriteItem(c_oSerProp_secPrType.headers, function(){oThis.WriteHdr(sectPr);});
 		//footer
-		if(null != footer.First || null != footer.Even || null != footer.Odd)
-			this.bs.WriteItem(c_oSerProp_secPrType.footers, function(){oThis.WriteHdrFtr(footer);});
+		if(null != sectPr.FooterFirst || null != sectPr.FooterEven || null != sectPr.FooterDefault)
+			this.bs.WriteItem(c_oSerProp_secPrType.footers, function(){oThis.WriteFtr(sectPr);});
     };
     this.WritePageSize = function(sectPr, oDocument)
     {
@@ -1410,49 +1408,41 @@ function Binary_pPrWriter(memory, oNumIdMap)
         this.memory.WriteByte(c_oSerPropLenType.Double);
         this.memory.WriteDouble(sectPr.Get_PageMargin_Bottom());
         
-        var header = oDocument.HdrFtr.Content[0].Header;
-        var footer = oDocument.HdrFtr.Content[0].Footer;
         //Header
-        if(header)
+        var item = null;
+        if(null != sectPr.HeaderDefault)
+            item = sectPr.HeaderDefault;
+        else if(null != sectPr.HeaderEven)
+            item = sectPr.HeaderEven;
+        else if(null != sectPr.HeaderFirst)
+            item = sectPr.HeaderFirst;
+        if(null != item)
         {
-            var item = null;
-            if(null != header.Odd)
-                item = header.Odd;
-            else if(null != header.Even)
-                item = header.Even;
-            else if(null != header.First)
-                item = header.First;
-            if(null != item)
-            {
-                this.memory.WriteByte(c_oSer_pgMarType.Header);
-                this.memory.WriteByte(c_oSerPropLenType.Double);
-                this.memory.WriteDouble(item.BoundY2);
-            }
+            this.memory.WriteByte(c_oSer_pgMarType.Header);
+            this.memory.WriteByte(c_oSerPropLenType.Double);
+            this.memory.WriteDouble(item.BoundY2);
         }
         //Footer
-        if(footer)
+        var item = null;
+        if(null != sectPr.FooterDefault)
+            item = sectPr.FooterDefault;
+        else if(null != sectPr.FooterEven)
+            item = sectPr.FooterEven;
+        else if(null != sectPr.FooterFirst)
+            item = sectPr.FooterFirst;
+        if(null != item)
         {
-            var item = null;
-            if(null != footer.Odd)
-                item = footer.Odd;
-            else if(null != footer.Even)
-                item = footer.Even;
-            else if(null != footer.First)
-                item = footer.First;
-            if(null != item)
-            {
-                this.memory.WriteByte(c_oSer_pgMarType.Footer);
-                this.memory.WriteByte(c_oSerPropLenType.Double);
-                this.memory.WriteDouble(Page_Height - item.BoundY2);
-            }
+			var nH = sectPr.Get_PageHeight();
+			if(null == nH)
+				nH = Page_Height;
+            this.memory.WriteByte(c_oSer_pgMarType.Footer);
+            this.memory.WriteByte(c_oSerPropLenType.Double);
+            this.memory.WriteDouble(nH - item.BoundY2);
         }
     };
 	this.WritePageSetting = function(sectPr, oDocument)
     {
-		var header = oDocument.HdrFtr.Content[0].Header;
-		var titlePg = false;
-		if(header.First != header.Odd && header.First != header.Even)
-			titlePg = true;
+		var titlePg = sectPr.Get_TitlePage();
         //titlePg
 		if(titlePg)
 		{
@@ -1460,9 +1450,6 @@ function Binary_pPrWriter(memory, oNumIdMap)
 			this.memory.WriteByte(c_oSerPropLenType.Byte);
 			this.memory.WriteBool(titlePg);
 		}
-		var EvenAndOddHeaders = false;
-		if(header.Odd != header.Even)
-			EvenAndOddHeaders = true;
         //EvenAndOddHeaders
 		if(EvenAndOddHeaders)
 		{
@@ -1471,15 +1458,49 @@ function Binary_pPrWriter(memory, oNumIdMap)
 			this.memory.WriteBool(EvenAndOddHeaders);
 		}
     };
-	this.WriteHdrFtr = function(oHdrFtr)
+	this.WriteHdr = function(sectPr)
 	{
 		var oThis = this;
-		if(null != oHdrFtr.Odd)
-			this.bs.WriteItem(c_oSerProp_secPrType.hdrftrelem, function(){oThis.memory.WriteLong(0);});
-		if(null != oHdrFtr.Even && oHdrFtr.Odd !== oHdrFtr.Even)
-			this.bs.WriteItem(c_oSerProp_secPrType.hdrftrelem, function(){oThis.memory.WriteLong(1);});
-		if(null != oHdrFtr.First && oHdrFtr.Odd != oHdrFtr.First && oHdrFtr.Even != oHdrFtr.First)
-			this.bs.WriteItem(c_oSerProp_secPrType.hdrftrelem, function(){oThis.memory.WriteLong(2);});
+		var nIndex;
+		if(null != this.oBinaryHeaderFooterTableWriter){
+			if(null != sectPr.HeaderDefault){
+				nIndex = this.oBinaryHeaderFooterTableWriter.aHeaders.length;
+				this.bs.WriteItem(c_oSerProp_secPrType.hdrftrelem, function(){oThis.memory.WriteLong(nIndex);});
+				this.oBinaryHeaderFooterTableWriter.aHeaders.push({type: c_oSerHdrFtrTypes.HdrFtr_Odd, elem: sectPr.HeaderDefault});
+			}
+			if(null != sectPr.HeaderEven){
+				nIndex = this.oBinaryHeaderFooterTableWriter.aHeaders.length;
+				this.bs.WriteItem(c_oSerProp_secPrType.hdrftrelem, function(){oThis.memory.WriteLong(nIndex);});
+				this.oBinaryHeaderFooterTableWriter.aHeaders.push({type: c_oSerHdrFtrTypes.HdrFtr_Even, elem: sectPr.HeaderEven});
+			}
+			if(null != sectPr.HeaderFirst){
+				nIndex = this.oBinaryHeaderFooterTableWriter.aHeaders.length;
+				this.bs.WriteItem(c_oSerProp_secPrType.hdrftrelem, function(){oThis.memory.WriteLong(nIndex);});
+				this.oBinaryHeaderFooterTableWriter.aHeaders.push({type: c_oSerHdrFtrTypes.HdrFtr_First, elem: sectPr.HeaderFirst});
+			}
+		}
+	}
+	this.WriteFtr = function(sectPr)
+	{
+		var oThis = this;
+		var nIndex;
+		if(null != this.oBinaryHeaderFooterTableWriter){
+			if(null != sectPr.FooterDefault){
+				nIndex = this.oBinaryHeaderFooterTableWriter.aFooters.length;
+				this.bs.WriteItem(c_oSerProp_secPrType.hdrftrelem, function(){oThis.memory.WriteLong(nIndex);});
+				this.oBinaryHeaderFooterTableWriter.aFooters.push({type: c_oSerHdrFtrTypes.HdrFtr_Odd, elem: sectPr.FooterDefault});
+			}
+			if(null != sectPr.FooterEven){
+				nIndex = this.oBinaryHeaderFooterTableWriter.aFooters.length;
+				this.bs.WriteItem(c_oSerProp_secPrType.hdrftrelem, function(){oThis.memory.WriteLong(nIndex);});
+				this.oBinaryHeaderFooterTableWriter.aFooters.push({type: c_oSerHdrFtrTypes.HdrFtr_Even, elem: sectPr.FooterEven});
+			}
+			if(null != sectPr.FooterFirst){
+				nIndex = this.oBinaryHeaderFooterTableWriter.aFooters.length;
+				this.bs.WriteItem(c_oSerProp_secPrType.hdrftrelem, function(){oThis.memory.WriteLong(nIndex);});
+				this.oBinaryHeaderFooterTableWriter.aFooters.push({type: c_oSerHdrFtrTypes.HdrFtr_First, elem: sectPr.FooterFirst});
+			}
+		}
 	}
 };
 function Binary_rPrWriter(memory)
@@ -2997,7 +3018,7 @@ function Binary_tblPrWriter(memory, oNumIdMap)
 {
     this.memory = memory;
     this.bs = new BinaryCommonWriter(this.memory);
-    this.bpPrs = new Binary_pPrWriter(this.memory, oNumIdMap);
+    this.bpPrs = new Binary_pPrWriter(this.memory, oNumIdMap, null);
 }
 Binary_tblPrWriter.prototype = 
 {
@@ -3352,6 +3373,8 @@ function BinaryHeaderFooterTableWriter(memory, doc, oNumIdMap)
     this.memory = memory;
     this.Document = doc;
 	this.oNumIdMap = oNumIdMap;
+	this.aHeaders = [];
+	this.aFooters = [];
     this.bs = new BinaryCommonWriter(this.memory);
     this.Write = function()
     {
@@ -3361,46 +3384,27 @@ function BinaryHeaderFooterTableWriter(memory, doc, oNumIdMap)
     this.WriteHeaderFooterContent = function()
     {
         var oThis = this;
-        var oHeader = null;
-        var oFooter = null;
-        if(this.Document.HdrFtr && this.Document.HdrFtr.Content && this.Document.HdrFtr.Content.length > 0 && this.Document.HdrFtr.Content[0].Header)
-        {
-            oHeader = this.Document.HdrFtr.Content[0].Header;
-        }
-        if(this.Document.HdrFtr && this.Document.HdrFtr.Content && this.Document.HdrFtr.Content.length > 0 && this.Document.HdrFtr.Content[0].Footer)
-        {
-            oFooter = this.Document.HdrFtr.Content[0].Footer;
-        }
         //Header
-        if(null != oHeader)
-            this.bs.WriteItem(c_oSerHdrFtrTypes.Header,function(){oThis.WriteHdrFtrContent(oHeader);});
+        if(this.aHeaders.length > 0)
+            this.bs.WriteItem(c_oSerHdrFtrTypes.Header,function(){oThis.WriteHdrFtrContent(oThis.aHeaders);});
         //Footer
-        if(null != oFooter)
-            this.bs.WriteItem(c_oSerHdrFtrTypes.Footer,function(){oThis.WriteHdrFtrContent(oFooter);});
+        if(this.aFooters.length > 0)
+            this.bs.WriteItem(c_oSerHdrFtrTypes.Footer,function(){oThis.WriteHdrFtrContent(oThis.aFooters);});
     };
-    this.WriteHdrFtrContent = function(oHdrFtr)
+    this.WriteHdrFtrContent = function(aHdrFtr)
     {
         var oThis = this;
-        //Odd
-        if(null != oHdrFtr.Odd)
-            this.bs.WriteItem(c_oSerHdrFtrTypes.HdrFtr_Odd, function(){oThis.WriteHdrFtrItem(oHdrFtr.Odd);});
-        //Even
-        if(null != oHdrFtr.Even && oHdrFtr.Odd !== oHdrFtr.Even)
-            this.bs.WriteItem(c_oSerHdrFtrTypes.HdrFtr_Even, function(){oThis.WriteHdrFtrItem(oHdrFtr.Even);});
-        //First
-        if(null != oHdrFtr.First && oHdrFtr.Odd != oHdrFtr.First && oHdrFtr.Even != oHdrFtr.First)
-            this.bs.WriteItem(c_oSerHdrFtrTypes.HdrFtr_First, function(){oThis.WriteHdrFtrItem(oHdrFtr.First);});
+		for(var i = 0, length = aHdrFtr.length; i < length; ++i)
+		{
+			var item = aHdrFtr[i];
+			this.bs.WriteItem(item.type, function(){oThis.WriteHdrFtrItem(item.elem);});
+		}
     };
     this.WriteHdrFtrItem = function(item)
     {
         var oThis = this;
-        //BoundY, BoundY2 при сохранении не используются. вместо них используются pageMarings
-        //BoundY
-        this.bs.WriteItem(c_oSerHdrFtrTypes.HdrFtr_Y, function(){oThis.memory.WriteDouble(item.BoundY);});
-        //BoundY2
-        this.bs.WriteItem(c_oSerHdrFtrTypes.HdrFtr_Y2, function(){oThis.memory.WriteDouble(item.BoundY2);});
         //Content
-        var dtw = new BinaryDocumentTableWriter(this.memory, this.Document, null, this.oNumIdMap, null);
+        var dtw = new BinaryDocumentTableWriter(this.memory, this.Document, null, this.oNumIdMap, null, null);
         this.bs.WriteItem(c_oSerHdrFtrTypes.HdrFtr_Content, function(){dtw.WriteDocumentContent(item.Content);});
     };
 };
@@ -3411,7 +3415,7 @@ function BinaryNumberingTableWriter(memory, doc, oNumIdMap, oUsedNumIdMap)
 	this.oNumIdMap = oNumIdMap;
 	this.oUsedNumIdMap = oUsedNumIdMap;
     this.bs = new BinaryCommonWriter(this.memory);
-    this.bpPrs = new Binary_pPrWriter(this.memory, null != this.oUsedNumIdMap ? this.oUsedNumIdMap : this.oNumIdMap);
+    this.bpPrs = new Binary_pPrWriter(this.memory, null != this.oUsedNumIdMap ? this.oUsedNumIdMap : this.oNumIdMap, null);
     this.brPrs = new Binary_rPrWriter(this.memory);
     this.Write = function()
     {
@@ -3604,14 +3608,14 @@ function BinaryNumberingTableWriter(memory, doc, oNumIdMap, oUsedNumIdMap)
         }
     };
 };
-function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyParams)
+function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyParams, oBinaryHeaderFooterTableWriter)
 {
     this.memory = memory;
     this.Document = doc;
 	this.oNumIdMap = oNumIdMap;
     this.bs = new BinaryCommonWriter(this.memory);
 	this.btblPrs = new Binary_tblPrWriter(this.memory, oNumIdMap);
-    this.bpPrs = new Binary_pPrWriter(this.memory, oNumIdMap);
+    this.bpPrs = new Binary_pPrWriter(this.memory, oNumIdMap, oBinaryHeaderFooterTableWriter);
     this.brPrs = new Binary_rPrWriter(this.memory);
 	this.boMaths = new Binary_oMathWriter(this.memory);
 	this.oMapCommentId = oMapCommentId;
@@ -4371,7 +4375,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
         //Content
         if(null != cell.Content)
         {
-            var oInnerDocument = new BinaryDocumentTableWriter(this.memory, this.Document, this.oMapCommentId, this.oNumIdMap, this.copyParams);
+            var oInnerDocument = new BinaryDocumentTableWriter(this.memory, this.Document, this.oMapCommentId, this.oNumIdMap, this.copyParams, this.oBinaryHeaderFooterTableWriter);
             this.bs.WriteItem(c_oSerDocTableType.Cell_Content, function(){oInnerDocument.WriteDocumentContent(cell.Content);});
         }
     };
@@ -5634,10 +5638,30 @@ function Binary_pPrReader(doc, oReadResult, stream)
 				if(null != this.paragraph)
 				{
 					var oNewSectionPr = new CSectionPr(this.Document);
-					var oAdditional = {headers: [], footers: []};
+					var oAdditional = {EvenAndOddHeaders: null, HeaderMargin: null, FooterMargin: null};
 					res = this.bcr.Read1(length, function(t, l){
 							return oThis.Read_SecPr(t, l, oNewSectionPr, oAdditional);
 						});
+					if(null != oAdditional.HeaderMargin){
+						if(null != oNewSectionPr.HeaderFirst)
+							oNewSectionPr.HeaderFirst.Set_BoundY2(oAdditional.HeaderMargin);
+						if(null != oNewSectionPr.HeaderEven)
+							oNewSectionPr.HeaderEven.Set_BoundY2(oAdditional.HeaderMargin);
+						if(null != oNewSectionPr.HeaderDefault)
+							oNewSectionPr.HeaderDefault.Set_BoundY2(oAdditional.HeaderMargin);
+					}
+					if(null != oAdditional.FooterMargin){
+						var nH = oNewSectionPr.Get_PageHeight();
+						if(null == nH)
+							nH = Page_Height;
+						var nMargin = nH - oAdditional.FooterMargin;
+						if(null != oNewSectionPr.FooterFirst)
+							oNewSectionPr.FooterFirst.Set_BoundY2(nMargin);
+						if(null != oNewSectionPr.FooterEven)
+							oNewSectionPr.FooterEven.Set_BoundY2(nMargin);
+						if(null != oNewSectionPr.FooterDefault)
+							oNewSectionPr.FooterDefault.Set_BoundY2(nMargin);
+					}
 					this.paragraph.Set_SectionPr(oNewSectionPr);
 				}
 				else
@@ -5889,7 +5913,7 @@ function Binary_pPrReader(doc, oReadResult, stream)
         {
 			var oMar = {L: null, T: null, R: null, B: null};
             res = this.bcr.Read2(length, function(t, l){
-                return oThis.Read_pgMar(t, l, oMar);
+                return oThis.Read_pgMar(t, l, oMar, oAdditional);
             });
 			if(null != oMar.L && null != oMar.T && null != oMar.R && null != oMar.B)
 				oSectPr.Set_PageMargins(oMar.L, oMar.T, oMar.R, oMar.B);
@@ -5897,36 +5921,36 @@ function Binary_pPrReader(doc, oReadResult, stream)
         else if( c_oSerProp_secPrType.setting === type )
         {
             res = this.bcr.Read2(length, function(t, l){
-                return oThis.Read_setting(t, l);
+                return oThis.Read_setting(t, l, oSectPr, oAdditional);
             });
         }
 		else if( c_oSerProp_secPrType.headers === type )
         {
 			res = this.bcr.Read1(length, function(t, l){
-                return oThis.Read_pgHdrFtr(t, l, oAdditional.headers);
+                return oThis.Read_pgHdrFtr(t, l, oSectPr, oThis.oReadResult.headers, true);
             });
         }
 		else if( c_oSerProp_secPrType.footers === type )
         {
 			res = this.bcr.Read1(length, function(t, l){
-                return oThis.Read_pgHdrFtr(t, l, oAdditional.footers);
+                return oThis.Read_pgHdrFtr(t, l, oSectPr, oThis.oReadResult.footers, false);
             });
         }
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
     }
-    this.Read_setting = function(type, length)
+    this.Read_setting = function(type, length, oSectPr, oAdditional)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
         if( c_oSerProp_secPrSettingsType.titlePg === type )
         {
-            this.oReadResult.setting.titlePg = this.stream.GetUChar();
+            oSectPr.Set_TitlePage(this.stream.GetBool());
         }
         else if( c_oSerProp_secPrSettingsType.EvenAndOddHeaders === type )
         {
-            this.oReadResult.setting.EvenAndOddHeaders = this.stream.GetUChar();
+            oAdditional.EvenAndOddHeaders = this.stream.GetUChar();
         }
         else
             res = c_oSerConstants.ReadUnknown;
@@ -5952,7 +5976,7 @@ function Binary_pPrReader(doc, oReadResult, stream)
             res = c_oSerConstants.ReadUnknown;
         return res;
     }
-    this.Read_pgMar = function(type, length, oMar)
+    this.Read_pgMar = function(type, length, oMar, oAdditional)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -5972,17 +5996,45 @@ function Binary_pPrReader(doc, oReadResult, stream)
         {
             oMar.B = this.bcr.ReadDouble();
         }
+		else if( c_oSer_pgMarType.Header === type )
+        {
+            oAdditional.HeaderMargin = this.bcr.ReadDouble();
+        }
+		else if( c_oSer_pgMarType.Footer === type )
+        {
+            oAdditional.FooterMargin = this.bcr.ReadDouble();
+        }
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
     }
-	this.Read_pgHdrFtr = function(type, length, aHdrFtr)
+	this.Read_pgHdrFtr = function(type, length, oSectPr, aHdrFtr, bHeader)
     {
 		var res = c_oSerConstants.ReadOk;
         var oThis = this;
         if( c_oSerProp_secPrType.hdrftrelem === type )
         {
-            aHdrFtr.push(this.stream.GetULongLE());
+			var nIndex = this.stream.GetULongLE();
+			if(nIndex >= 0 && nIndex < aHdrFtr.length)
+			{
+				var item = aHdrFtr[nIndex];
+				if(bHeader){
+					switch(item.type)
+					{
+						case c_oSerHdrFtrTypes.HdrFtr_First: oSectPr.HeaderFirst = item.elem;break;
+						case c_oSerHdrFtrTypes.HdrFtr_Even: oSectPr.HeaderEven = item.elem;break;
+						case c_oSerHdrFtrTypes.HdrFtr_Odd: oSectPr.HeaderDefault = item.elem;break;
+					}
+				}
+				else{
+					switch(item.type)
+					{
+						case c_oSerHdrFtrTypes.HdrFtr_First: oSectPr.FooterFirst = item.elem;break;
+						case c_oSerHdrFtrTypes.HdrFtr_Even: oSectPr.FooterEven = item.elem;break;
+						case c_oSerHdrFtrTypes.HdrFtr_Odd: oSectPr.FooterDefault = item.elem;break;
+					}
+				}
+			}
         }
         else
             res = c_oSerConstants.ReadUnknown;
@@ -6897,13 +6949,12 @@ function Binary_HdrFtrTableReader(doc, oReadResult, openParams, stream)
         {
             var hdrftr = new CHeaderFooter(this.Document.HdrFtr, this.Document, this.Document.DrawingDocument, nHdrFtrType, 0);
             this.bdtr.Document = hdrftr.Content;
-            var oNewItem = {Content: null, BoundY: null, BoundY2: null};
+            var oNewItem = {Content: null};
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadHdrFtrItem(t, l, oNewItem);
             });
-            if(null != oNewItem.Content && oNewItem.Content.length > 0 && null != oNewItem.BoundY2)
+            if(null != oNewItem.Content)
             {
-                hdrftr.Set_BoundY2(oNewItem.BoundY2, false);
                 hdrftr.Content.Content = oNewItem.Content;
 				oHdrFtrContainer.push({type: type, elem: hdrftr});
             }
@@ -6916,15 +6967,7 @@ function Binary_HdrFtrTableReader(doc, oReadResult, openParams, stream)
     {
         var oThis = this;
         var res = c_oSerConstants.ReadOk;
-        if ( c_oSerHdrFtrTypes.HdrFtr_Y2 === type )
-        {
-            oNewItem.BoundY2 = this.bcr.ReadDouble();
-        }
-        else if ( c_oSerHdrFtrTypes.HdrFtr_Y === type )
-        {
-            oNewItem.BoundY = this.bcr.ReadDouble();
-        }
-        else if ( c_oSerHdrFtrTypes.HdrFtr_Content === type )
+        if ( c_oSerHdrFtrTypes.HdrFtr_Content === type )
         {
 			oNewItem.Content = new Array();
 			oThis.bdtr.Read(length, oNewItem.Content);
@@ -7024,12 +7067,14 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         }
         else if ( c_oSerParType.sectPr === type )
 		{
-			var oAdditional = {headers: [], footers: []};
+			var oSectPr = oThis.Document.SectPr;
+			var oAdditional = {EvenAndOddHeaders: null, HeaderMargin: null, FooterMargin: null};
             res = this.bcr.Read1(length, function(t, l){
-                return oThis.bpPrr.Read_SecPr(t, l, oThis.Document.SectPr, oAdditional);
+                return oThis.bpPrr.Read_SecPr(t, l, oSectPr, oAdditional);
             });
-			var oDocHeader = this.Document.HdrFtr.Content[0].Header;
-			var oDocFooter = this.Document.HdrFtr.Content[0].Footer;
+			//todo функция
+			if(null != oAdditional.EvenAndOddHeaders)
+				EvenAndOddHeaders = oAdditional.EvenAndOddHeaders;
 			if(g_nCurFileVersion < 5)
 			{
 				for(var i = 0; i < this.oReadResult.headers.length; ++i)
@@ -7037,9 +7082,9 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 					var item = this.oReadResult.headers[i];
 					switch(item.type)
 					{
-						case c_oSerHdrFtrTypes.HdrFtr_First: oDocHeader.First = item.elem;break;
-						case c_oSerHdrFtrTypes.HdrFtr_Even: oDocHeader.Even = item.elem;break;
-						case c_oSerHdrFtrTypes.HdrFtr_Odd: oDocHeader.Odd = item.elem;break;
+						case c_oSerHdrFtrTypes.HdrFtr_First: oSectPr.HeaderFirst = item.elem;break;
+						case c_oSerHdrFtrTypes.HdrFtr_Even: oSectPr.HeaderEven = item.elem;break;
+						case c_oSerHdrFtrTypes.HdrFtr_Odd: oSectPr.HeaderDefault = item.elem;break;
 					}
 				}
 				for(var i = 0; i < this.oReadResult.footers.length; ++i)
@@ -7047,42 +7092,31 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 					var item = this.oReadResult.footers[i];
 					switch(item.type)
 					{
-						case c_oSerHdrFtrTypes.HdrFtr_First: oDocFooter.First = item.elem;break;
-						case c_oSerHdrFtrTypes.HdrFtr_Even: oDocFooter.Even = item.elem;break;
-						case c_oSerHdrFtrTypes.HdrFtr_Odd: oDocFooter.Odd = item.elem;break;
+						case c_oSerHdrFtrTypes.HdrFtr_First: oSectPr.FooterFirst = item.elem;break;
+						case c_oSerHdrFtrTypes.HdrFtr_Even: oSectPr.FooterEven = item.elem;break;
+						case c_oSerHdrFtrTypes.HdrFtr_Odd: oSectPr.FooterDefault = item.elem;break;
 					}
 				}
 			}
-			else
-			{
-				for(var i = 0; i < oAdditional.headers.length; ++i)
-				{
-					var nIndex = oAdditional.headers[i];
-					if(nIndex >= 0 && nIndex < this.oReadResult.headers.length)
-					{
-						var item = this.oReadResult.headers[nIndex];
-						switch(item.type)
-						{
-							case c_oSerHdrFtrTypes.HdrFtr_First: oDocHeader.First = item.elem;break;
-							case c_oSerHdrFtrTypes.HdrFtr_Even: oDocHeader.Even = item.elem;break;
-							case c_oSerHdrFtrTypes.HdrFtr_Odd: oDocHeader.Odd = item.elem;break;
-						}
-					}
-				}
-				for(var i = 0; i < oAdditional.footers.length; ++i)
-				{
-					var nIndex = oAdditional.footers[i];
-					if(nIndex >= 0 && nIndex < this.oReadResult.footers.length)
-					{
-						var item = this.oReadResult.footers[nIndex];
-						switch(item.type)
-						{
-							case c_oSerHdrFtrTypes.HdrFtr_First: oDocFooter.First = item.elem;break;
-							case c_oSerHdrFtrTypes.HdrFtr_Even: oDocFooter.Even = item.elem;break;
-							case c_oSerHdrFtrTypes.HdrFtr_Odd: oDocFooter.Odd = item.elem;break;
-						}
-					}
-				}
+			if(null != oAdditional.HeaderMargin){
+				if(null != oSectPr.HeaderFirst)
+					oSectPr.HeaderFirst.Set_BoundY2(oAdditional.HeaderMargin);
+				if(null != oSectPr.HeaderEven)
+					oSectPr.HeaderEven.Set_BoundY2(oAdditional.HeaderMargin);
+				if(null != oSectPr.HeaderDefault)
+					oSectPr.HeaderDefault.Set_BoundY2(oAdditional.HeaderMargin);
+			}
+			if(null != oAdditional.FooterMargin){
+				var nH = oSectPr.Get_PageHeight();
+				if(null == nH)
+					nH = Page_Height;
+				var nMargin = nH - oAdditional.FooterMargin;
+				if(null != oSectPr.FooterFirst)
+					oSectPr.FooterFirst.Set_BoundY2(nMargin);
+				if(null != oSectPr.FooterEven)
+					oSectPr.FooterEven.Set_BoundY2(nMargin);
+				if(null != oSectPr.FooterDefault)
+					oSectPr.FooterDefault.Set_BoundY2(nMargin);
 			}
         }
         else
