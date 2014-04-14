@@ -18,9 +18,14 @@ module.exports = function(grunt) {
 	
 	grunt.registerTask('cleanup_deploy_folder_init', 'Initialize tools.', function(){
 		grunt.initConfig({
-			clean: [
-				toolsFile['menu_path']
-			]
+			clean: {
+				options: {
+					force: true
+				},
+				menu:[
+					toolsFile['menu_path']
+				]
+			}
 		});
     });	
 	
