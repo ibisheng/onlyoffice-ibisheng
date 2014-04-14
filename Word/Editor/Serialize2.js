@@ -10278,6 +10278,7 @@ function Binary_oMathReader(stream)
         {
 			if (!props.init)
 			{
+                oNary.relate(oParent);
 				oNary.init(props);
 				oParent.addElementToContent(oNary);
 				props.init = true;

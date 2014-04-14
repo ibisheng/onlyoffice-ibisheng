@@ -774,14 +774,14 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Cursor_MoveToStartPos
 
-        this.Math.Cursor_MoveToStartPos();
+        this.Root.Cursor_MoveToStartPos();
     },
 
     Cursor_MoveToEndPos : function(SelectFromEnd)
     {
         // TODO: ParaMath.Cursor_MoveToEndPos
 
-        this.Math.Cursor_MoveToEndPos();
+        this.Root.Cursor_MoveToEndPos();
     },
 
     Get_ParaContentPosByXY : function(SearchPos, Depth, _CurLine, _CurRange, StepEnd, Flag) // получить логическую позицию по XY
@@ -866,7 +866,6 @@ ParaMath.prototype =
 
         // TODO: ParaMath.Get_PosByElement
     },
-
     Get_RunElementByPos : function(ContentPos, Depth)
     {
         return null;
@@ -875,12 +874,14 @@ ParaMath.prototype =
     Get_LeftPos : function(SearchPos, ContentPos, Depth, UseContentPos)
     {
         // TODO: ParaMath.Get_LeftPos
+        this.Root.Get_LeftPos(SearchPos, ContentPos, Depth, UseContentPos);
         return false;
     },
 
     Get_RightPos : function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
     {
         // TODO: ParaMath.Get_RightPos
+        this.Root.Get_RightPos(SearchPos, ContentPos, Depth, UseContentPos, StepEnd);
         return false;
     },
 
@@ -912,11 +913,13 @@ ParaMath.prototype =
     Get_StartPos : function(ContentPos, Depth)
     {
         // TODO: ParaMath.Get_StartPos
+        this.Root.Get_StartPos(ContentPos, Depth);
     },
 
     Get_EndPos : function(BehindEnd, ContentPos, Depth)
     {
         // TODO: ParaMath.Get_EndPos
+        this.Root.Get_EndPos(BehindEnd, ContentPos, Depth);
     },
 //-----------------------------------------------------------------------------------
 // Функции для работы с селектом
@@ -924,25 +927,6 @@ ParaMath.prototype =
     Set_SelectionContentPos : function(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag)
     {
         // TODO: ParaMath.Set_SelectionContentPos
-
-        if(StartFlag == 0)
-        {
-            var str = "";
-            for(var i = 0; i < StartContentPos.Data.length; i++)
-                str += StartContentPos.Data[i] + " ";
-
-            //console.log("StartContentPos " + str);
-        }
-
-        if(EndFlag == 0)
-        {
-            var str = "";
-            for(var i = 0; i < EndContentPos.Data.length; i++)
-                str += EndContentPos.Data [i]+ " ";
-
-            //console.log("EndContentPos " + str);
-        }
-
 
         this.Root.Set_SelectionContentPos(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag);
 
@@ -1042,8 +1026,7 @@ ParaMath.prototype =
 
         if(start == end)
         {
-            if(SelectContent.content[start].typeObj == MATH_PLACEHOLDER)
-                bPlaceholder = true;
+            bPlaceholder = SelectContent.IsPlaceholder();
         }
 
         return bPlaceholder;
