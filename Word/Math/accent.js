@@ -1170,7 +1170,6 @@ CAccent.prototype.init = function(properties)
     this.setDimension(1, 1);
     this.setContent();
 
-
     //this.setOperator(accent);
     this.elements[0][0].SetDot(true);
 }

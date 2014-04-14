@@ -1402,7 +1402,8 @@ CMathBase.prototype =
     {
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
-                this.elements[i][j].SetRunEmptyToContent(bAll);
+                if(!this.elements[i][j].IsJustDraw())
+                    this.elements[i][j].SetRunEmptyToContent(bAll);
     }
 
     //////////////////////////

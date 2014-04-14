@@ -5149,7 +5149,7 @@ CMathContent.prototype =
         return posChange;
     },
     // выставить курсор в начало конента
-    cursor_MoveToStartPos: function()  //  home => cursor_MoveToStartPos
+    old_cursor_MoveToStartPos: function()  //  home => cursor_MoveToStartPos
     {
         if( !this.IsEmpty() )
         {
@@ -5166,7 +5166,7 @@ CMathContent.prototype =
         }
     },
     // выставить курсор в конец конента
-    cursor_MoveToEndPos: function()  //  end => cursor_MoveToEndPos
+    old_cursor_MoveToEndPos: function()  //  end => cursor_MoveToEndPos
     {
         if( !this.IsEmpty() )
         {
@@ -5176,34 +5176,7 @@ CMathContent.prototype =
                 this.setLogicalPosition(0);
         }
     },
-    Cursor_Is_Start: function()
-    {
-        var result = false;
 
-        if( !this.IsEmpty() )
-        {
-            if(this.CurPos == 0)
-                result = this.content[0].Cursor_Is_Start();
-
-        }
-
-        return result;
-    },
-    Cursor_Is_End: function()
-    {
-        var result = false;
-
-        if(!this.IsEmpty())
-        {
-            var len = this.content.length - 1;
-            if(this.CurPos == len  && this.content[len].typeObj == MATH_RUN_PRP)
-            {
-                result = this.content[len].Cursor_Is_End();
-            }
-        }
-
-        return result;
-    },
     //////////////////////////////////////
 
     // не вызываем из mouseDown эту ф-ию, тк иначе не установим селект для внутреннего объекта (setStart_Selection)
@@ -6491,7 +6464,6 @@ CMathContent.prototype =
     {
         this.plhHide = flag;
     },
-
     ///////// RunPrp, CtrPrp
     addRunPrp: function(rPrp)
     {
@@ -7695,6 +7667,21 @@ CMathContent.prototype =
 
         return result;
     },
+    Get_StartPos: function(ContentPos, Depth)
+    {
+        ContentPos.Update( 0, Depth );
+        Depth++;
+
+        this.content[0].Get_StartPos(ContentPos, Depth);
+    },
+    Get_EndPos: function(BehindEnd, ContentPos, Depth)
+    {
+        var len = this.content.length - 1;
+        ContentPos.Update(len, Depth);
+        Depth++;
+
+        this.content[len].Get_EndPos(BehindEnd, ContentPos, Depth);
+    },
     Get_Id : function()
     {
         return this.GetId();
@@ -7729,8 +7716,6 @@ CMathContent.prototype =
                 NewContent.push( new ParaRun(this.Composition.Parent.Paragraph, true) );
                 NewContent.push( this.content[i] ); // Math Object
 
-                this.content[i].SetRunEmptyToContent(bAll);
-
                 left = current;
 
             }
@@ -7739,6 +7724,10 @@ CMathContent.prototype =
                 NewContent.push(this.content[i]);
                 left = current;
             }
+
+
+            if(bCurrComp && bAll == true)
+                this.content[i].SetRunEmptyToContent(bAll);
         }
 
         if(this.content[len - 1].typeObj == MATH_COMP)
@@ -7748,10 +7737,50 @@ CMathContent.prototype =
 
         this.content = NewContent;
 
+    },
+    Cursor_MoveToStartPos: function()
+    {
+        if(!this.IsEmpty())
+        {
+            this.content[0].Cursor_MoveToStartPos();
+        }
+    },
+    Cursor_MoveToEndPos: function()
+    {
+        if(!this.IsEmpty())
+        {
+            var len = this.content.length - 1;
+            this.content[len].Cursor_MoveToEndPos();
+        }
+    },
+    Cursor_Is_Start: function()
+    {
+        var result = false;
 
+        if( !this.IsEmpty() )
+        {
+            if(this.CurPos == 0)
+                result = this.content[0].Cursor_Is_Start();
+        }
+
+        return result;
+    },
+    Cursor_Is_End: function()
+    {
+        var result = false;
+
+        if(!this.IsEmpty())
+        {
+            var len = this.content.length - 1;
+            if(this.CurPos == len)
+            {
+                result = this.content[len].Cursor_Is_End();
+            }
+        }
+
+        return result;
     },
     //////////////////////////
-
 
     ////////////////  Test function for test_math  //////////////////
 
@@ -8561,7 +8590,7 @@ CMathComposition.prototype =
         //this.RecalculateComposition(g_oTextMeasurer);
         ////
 
-        this.absPos = {x: x, y: y - this.Root.size.ascent};
+        //this.absPos = {x: x, y: y - this.Root.size.ascent};
 
         this.Root.draw(this.absPos.x, this.absPos.y , pGraphics);
     },

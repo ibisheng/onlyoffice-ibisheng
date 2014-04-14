@@ -373,6 +373,9 @@ ParaMath.prototype =
         var TextPr = new CTextPr();
         TextPr.Init_Default();
         this.Math.RecalculateComposition(g_oTextMeasurer, TextPr);
+
+        this.Math.absPos = {x: PRS.X, y: PRS.Y};
+
         var Size = this.Math.Size;
 
         this.Width        = Size.Width;
