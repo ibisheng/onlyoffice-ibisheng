@@ -7490,7 +7490,7 @@ asc_docs_api.prototype.asc_setDrawCollaborationMarks = function (bDraw)
 asc_docs_api.prototype.asc_AddMath = function(Type)
 {
     var loader = window.g_font_loader;
-    var nIndex = loader.map_font_index[name];
+    var nIndex = loader.map_font_index["Cambria Math"];
     var fontinfo = loader.fontInfos[nIndex];
     var isasync = loader.LoadFont(fontinfo);
     if (false === isasync)
