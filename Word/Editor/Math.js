@@ -1035,18 +1035,18 @@ ParaMath.prototype =
     Selection_IsPlaceholder : function()
     {
         var bPlaceholder = false;
-        var content = this.GetSelectContent();
-        var start = content.SelectStartPos,
-            end = content.SelectEndPos;
+        var result = this.GetSelectContent(),
+            SelectContent = result.Content;
+        var start = result.Start,
+            end = result.End;
 
         if(start == end)
         {
-            if(this.content[start].typeObj == MATH_PLACEHOLDER)
+            if(SelectContent.content[start].typeObj == MATH_PLACEHOLDER)
                 bPlaceholder = true;
         }
 
         return bPlaceholder;
-
     },
     Selection_CheckParaEnd : function()
     {
