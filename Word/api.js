@@ -580,6 +580,9 @@ function asc_docs_api(name)
 
     this.isImageChangeUrl = false;
     this.isShapeImageChangeUrl = false;
+
+    this.FontAsyncLoadType = 0;
+    this.FontAsyncLoadParam = null;
 	
     this.isPasteFonts_Images = false;
     this.isLoadNoCutFonts = false;
@@ -6426,6 +6429,15 @@ asc_docs_api.prototype.asyncFontStartLoaded = function()
 asc_docs_api.prototype.asyncFontEndLoaded = function(fontinfo)
 {
     this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
+
+    if (this.FontAsyncLoadType == 1)
+    {
+        this.FontAsyncLoadType = 0;
+        this.asc_AddMath2(this.FontAsyncLoadParam);
+        this.FontAsyncLoadParam = null;
+        return;
+    }
+
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
@@ -7476,6 +7488,23 @@ asc_docs_api.prototype.asc_setDrawCollaborationMarks = function (bDraw)
 }
 
 asc_docs_api.prototype.asc_AddMath = function(Type)
+{
+    var loader = window.g_font_loader;
+    var nIndex = loader.map_font_index[name];
+    var fontinfo = loader.fontInfos[nIndex];
+    var isasync = loader.LoadFont(fontinfo);
+    if (false === isasync)
+    {
+        return this.asc_AddMath2(Type);
+    }
+    else
+    {
+        this.FontAsyncLoadType = 1;
+        this.FontAsyncLoadParam = Type;
+    }
+}
+
+asc_docs_api.prototype.asc_AddMath2 = function(Type)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
     {
