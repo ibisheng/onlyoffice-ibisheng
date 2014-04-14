@@ -14325,8 +14325,9 @@ Paragraph.prototype =
                     return false;
 
                 var SearchPosXY = this.Get_ParaContentPosByXY( X, Y, PageIndex + this.PageNum, false, false );
+                var CurPos = SearchPosXY.Pos.Get(0);
 
-                if ( SearchPosXY.Pos.Compare( SelSP ) >= 0 && SearchPosXY.Pos.Compare( SelEP ) <= 0 && true !== SearchPosXY.Pos.bPlaceholder )
+                if ( SearchPosXY.Pos.Compare( SelSP ) >= 0 && SearchPosXY.Pos.Compare( SelEP ) <= 0 && ( para_Math !== this.Content[CurPos].Type || true !== this.Content[CurPos].Selection_IsPlaceholder() ) )
                     return true;
 
                 return false;
