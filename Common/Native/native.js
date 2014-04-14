@@ -15,6 +15,15 @@ window.NATIVE_EDITOR_ENJINE_SYNC_RECALC = true;
 var document = new Object();
 window.document = document;
 
+function ConvertJSC_Array(_array)
+{
+    var _len = _array.length;
+    var ret = new Uint8Array(_len);
+    for (var i = 0; i < _len; i++)
+        ret[i] = _array.getAt(i);
+    return ret;
+}
+
 function Image()
 {
     this.src = "";

@@ -1045,7 +1045,6 @@ CDrawingDocument.prototype =
                 }
             }
         }
-        this.Native["DD_Overlay_DrawTableOutline"]();
 
         // drawShapes (+ track)
         if (this.LogicDocument.DrawingObjects)
