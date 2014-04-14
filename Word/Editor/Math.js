@@ -1032,7 +1032,22 @@ ParaMath.prototype =
 
         return this.Root.Selection_IsEmpty();
     },
+    Selection_IsPlaceholder : function()
+    {
+        var bPlaceholder = false;
+        var content = this.GetSelectContent();
+        var start = content.SelectStartPos,
+            end = content.SelectEndPos;
 
+        if(start == end)
+        {
+            if(this.content[start].typeObj == MATH_PLACEHOLDER)
+                bPlaceholder = true;
+        }
+
+        return bPlaceholder;
+
+    },
     Selection_CheckParaEnd : function()
     {
         return false;
