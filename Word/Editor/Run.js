@@ -741,7 +741,7 @@ ParaRun.prototype =
                 return { X : X, Y : Y, PageNum : CurPage + Para.Get_StartPage_Absolute(), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
         }
 
-        return { X : X };
+        return { X : X, Y: Y,  Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
     },
 
     // Проверяем, произошло ли простейшее изменение (набор или удаление текста)
