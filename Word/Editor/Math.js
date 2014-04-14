@@ -90,25 +90,52 @@ ParaMath.prototype =
     Add : function(Item)
     {
 		var Type = Item.Type;
-		var oPos = this.GetSelectContent();
+		var oContent = this.GetSelectContent();
+		var oStartContent = oContent.Content.content[oContent.Start];
+		var oEndContent = oContent.Content.content[oContent.End];
 
 		if ( para_Text === Type)
 		{
 			var oText = new CMathText();
 			oText.addTxt(Item.Value);
-			oPos.Content.content[oPos.Start].Add(oText);
+			oStartContent.Add(oText);
 		}
 		else if ( para_Space === Type )
 		{
-			var oSpace = new ParaSpace(1);
-			oPos.Content.content[oPos.Start].Add(oSpace);
+			//var oSpace = new ParaSpace(1);
+			var oText = new CMathText();
+			oText.addTxt(" ");
+			oStartContent.Add(oText);
 		}
-		else if ( para_Math === Type )
+		/*else if ( para_Math === Type )
 		{
-			var rPr = this.Math.GetCurrentRunPrp();
-			Item.Math.Root.setRPrp(rPr);
-			this.Math.AddToComposition(Item.Math.Root);
-		}
+			nPosStart = oStartContent.State.ContentPos;
+			nLenStart = oStartContent.Content.length;
+			nPosEnd = oEndContent.State.ContentPos;
+			
+			History.Create_NewPoint();
+			
+			var oMRun = new ParaRun(null, true);
+			oMRun.Pr = oStartContent.Pr;
+			for (i=nPosStart; i<nLenStart; i++)
+			{
+				var Pos = oMRun.Content.length;
+				var EndPos = Pos + 1;
+				var oItem = oStartContent.Content[i];
+				History.Add( oMRun, { Type : historyitem_ParaRun_AddItem, Pos : Pos, EndPos : EndPos, Items : [ oItem ] } );
+				oMRun.Content.push(Item);
+				oStartContent.Remove_FromContent(i, 1, false);
+			}
+			
+			//Item.Math.AddToComposition(Item.Math.Root);
+			var oNewContent = Item.Math.Root.content;
+			for(var i = 0; i < oNewContent.length; i++)
+				oContent.Content.content.push(oNewContent[i]);
+
+			oContent.Content.content.push(oMRun);
+
+			oContent.Content.SetRunEmptyToContent(false);
+		}*/
 	},
 
     AddText : function(oElem, sText, props)

@@ -8896,7 +8896,7 @@ function Binary_oMathReader(stream)
         }
 		else if (c_oSer_OMathBottomNodesValType.AlnAt === type)
         {
-			props.alnAt = this.stream.GetBool(length);
+			props.alnAt = this.stream.GetULongLE();
         }
 		else
             res = c_oSerConstants.ReadUnknown;
@@ -10187,18 +10187,17 @@ function Binary_oMathReader(stream)
 			var str = "";
 			for (var i = 0; i < text.length; ++i)
             {
-                if (text[i] != ' ')
+				//управляющие символы 
+				if (0x001F < text[i].charCodeAt(0))
 				{
-					//управляющие символы 
-					if (0x001F < text[i].charCodeAt(0))
-					{
-						var oText = new CMathText();
-						oText.addTxt(text[i]);
-						oMRun.Content.splice( i, 0, oText );						
-					}
+					var oText = new CMathText();
+					oText.addTxt(text[i]);
+					oMRun.Content.splice( i, 0, oText );						
 				}
+				/*в будущем переделка под para_space
 				else if (text[i] == ' ')
-					oMRun.Content.splice(oMRun.Content.length, 0, new ParaSpace(1));
+					oMRun.Content.splice(oMRun.Content.length, 0, new ParaSpace(1));				
+				*/				
             }
 			oParent.addElementToContent(oMRun);
         }
@@ -10505,6 +10504,7 @@ function Binary_oMathReader(stream)
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oOMathPara.Root);
             });
+			oOMathPara.Root.SetRunEmptyToContent(true);
         }
 		else if (c_oSer_OMathContentType.OMathParaPr === type)
 		{
@@ -10748,7 +10748,7 @@ function Binary_oMathReader(stream)
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadMathRad = function(type, length, oRad, props, oParent)
+	this.ReadMathRadCollaborative = function(type, length, oRad, props, oParent)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
