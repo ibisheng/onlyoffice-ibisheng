@@ -1885,19 +1885,16 @@ CDocument.prototype =
             
             if (window["NATIVE_EDITOR_ENJINE_SYNC_RECALC"] === true)
             {
-                if (window["native"]["WC_CheckSuspendRecalculate"])
+                if ( _PageIndex > this.FullRecalc.StartPage + 2 )
                 {
-                    if ( _PageIndex > this.FullRecalc.StartPage + 2 )
-                    {
-                        if (window["native"]["WC_CheckSuspendRecalculate"]())
-                            return;
-                    }
+					if (window["native"]["WC_CheckSuspendRecalculate"]())
+						return;                    
                 }
 
                 this.Recalculate_Page( _PageIndex, _bStart, _StartIndex, _bStartNewSection );
                 return;
             }
-
+			
             if ( _PageIndex > this.FullRecalc.StartPage + 2 )
             {
                 this.FullRecalc.Id = setTimeout( Document_Recalculate_Page, 20 );
