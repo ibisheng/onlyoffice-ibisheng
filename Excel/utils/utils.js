@@ -1252,7 +1252,7 @@
 			this.scanForward = true;					// поиск вперед/назад
 			this.isMatchCase = false;					// учитывать регистр
 			this.isWholeCell = false;					// ячейка целиком
-			this.scanOnOnlySheet = false;				// искать только на листе/в книге
+			this.scanOnOnlySheet = true;				// искать только на листе/в книге
 			this.lookIn = c_oAscFindLookIn.Formulas;	// искать в формулах/значениях/примечаниях
 
 			this.replaceWith = "";						// текст, на который заменяем (если у нас замена)
