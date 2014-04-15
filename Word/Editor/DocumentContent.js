@@ -1442,9 +1442,6 @@ CDocumentContent.prototype =
                 }
 
                 this.Content[StartPos].Cursor_MoveToStartPos(true);
-
-                if ( this.Content[StartPos].GetType() === type_Paragraph  )
-                    this.Content[StartPos].Selection_Internal_Update();
             }
         }
         else
@@ -1512,9 +1509,6 @@ CDocumentContent.prototype =
                 }
 
                 this.Content[StartPos].Cursor_MoveToEndPos(true);
-
-                if ( this.Content[StartPos].GetType() === type_Paragraph  )
-                    this.Content[StartPos].Selection_Internal_Update();
             }
         }
         else

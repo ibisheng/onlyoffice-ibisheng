@@ -1129,8 +1129,8 @@ function CSectionPageMargins()
     this.Right  = 15; // 1.5 cm
     this.Bottom = 20; // 2 cm
     
-    this.Header = 12.7; // 1.27 cm
-    this.Footer = 12.7; // 1.27 cm
+    this.Header = 12.5; // 1.25 cm
+    this.Footer = 12.5; // 1.25 cm
 }
 
 CSectionPageMargins.prototype =

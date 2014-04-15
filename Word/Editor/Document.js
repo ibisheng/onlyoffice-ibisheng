@@ -3652,9 +3652,6 @@ CDocument.prototype =
                 }
 
                 this.Content[StartPos].Cursor_MoveToStartPos(true);
-
-                if ( this.Content[StartPos].GetType() === type_Paragraph  )
-                    this.Content[StartPos].Selection_Internal_Update();
             }
         }
         else
@@ -3740,9 +3737,6 @@ CDocument.prototype =
                 }
 
                 this.Content[StartPos].Cursor_MoveToEndPos(true, false);
-
-                if ( this.Content[StartPos].GetType() === type_Paragraph  )
-                    this.Content[StartPos].Selection_Internal_Update();
             }
         }
         else
@@ -7480,12 +7474,7 @@ CDocument.prototype =
             B = MarPr.Left;
         }
 
-
-
         SectPr.Set_PageMargins( L, T, R, B );
-
-        // TODO: Добавить обработку колонтитулов
-        // this.HdrFtr.UpdateMargins( 0 );
 
         this.ContentLastChangePos = 0;
         this.Recalculate();
@@ -7502,9 +7491,6 @@ CDocument.prototype =
         var SectPr = this.SectionsInfo.Get_SectPr( CurPos).SectPr;
 
         SectPr.Set_PageSize( W, H );
-
-        // TODO: Добавить обработку колонтитулов
-        // this.HdrFtr.UpdateMargins( 0, bNoRecalc );
 
         if( true != bNoRecalc )
         {
@@ -8418,9 +8404,6 @@ CDocument.prototype =
 
                     break;
             }
-
-            if ( ItemType === type_Paragraph && Index === this.Selection.StartPos && Direction != 0 )
-                Item.Selection_Internal_Update();
         }
 
         this.Content[ContentPos].Selection_SetEnd( X, Y, this.CurPage, MouseEvent );
@@ -10461,6 +10444,80 @@ CDocument.prototype =
         this.Document_UpdateSelectionState();
         this.Document_UpdateInterfaceState();
     },
+    
+    Document_SetHdrFtrFirstPage : function(Value)
+    {
+        var CurHdrFtr = this.HdrFtr.CurHdrFtr;
+        
+        if ( null === CurHdrFtr || -1 === CurHdrFtr.RecalcInfo.CurPage )
+            return;
+        
+        var CurPage = CurHdrFtr.RecalcInfo.CurPage;
+        var Index = this.Pages[CurPage].Pos;
+        var SectPr = this.SectionsInfo.Get_SectPr(Index).SectPr;
+        
+        SectPr.Set_TitlePage(Value);
+        
+        if ( true === Value )
+        {
+            // Если мы добавляем разные колонтитулы для первой страницы, а этих колонтитулов нет, тогда создаем их
+            var FirstSectPr = this.SectionsInfo.Get_SectPr2( 0).SectPr;
+
+            if ( null === FirstSectPr.Get_Header_First() )
+            {
+                var Header = new CHeaderFooter( this.HdrFtr, this, this.DrawingDocument, hdrftr_Header );
+                FirstSectPr.Set_Header_First( Header );
+                
+                this.HdrFtr.CurHdrFtr = Header;
+            }
+
+            if ( null === FirstSectPr.Get_Footer_First() )
+            {
+                var Footer = new CHeaderFooter( this.HdrFtr, this, this.DrawingDocument, hdrftr_Footer );
+                FirstSectPr.Set_Footer_First( Footer );
+            }                       
+        }
+       
+        CurHdrFtr.Content.Cursor_MoveToStartPos();
+        
+        this.Recalculate();
+
+        this.Document_UpdateSelectionState();
+        this.Document_UpdateInterfaceState();
+    },
+    
+    Document_SetHdrFtrEvenAndOddHeaders : function(Value)
+    {
+        this.Set_DocumentEvenAndOddHeaders( Value );
+        
+        if ( true === Value )
+        {
+            // Если мы добавляем разные колонтитулы для четных и нечетных страниц, а этих колонтитулов нет, тогда
+            // создаем их в самой первой секции            
+            var FirstSectPr = this.SectionsInfo.Get_SectPr2( 0).SectPr;
+            if ( null === FirstSectPr.Get_Header_Even() )
+            {
+                var Header = new CHeaderFooter( this.HdrFtr, this, this.DrawingDocument, hdrftr_Header );
+                FirstSectPr.Set_Header_Even( Header );
+                
+                this.HdrFtr.CurHdrFtr = Header;
+            }
+            
+            if ( null === FirstSectPr.Get_Footer_Even() )
+            {
+                var Footer = new CHeaderFooter( this.HdrFtr, this, this.DrawingDocument, hdrftr_Footer );
+                FirstSectPr.Set_Footer_Even( Footer );
+            }            
+        }
+        
+        if ( null !== this.HdrFtr.CurHdrFtr )
+            this.HdrFtr.CurHdrFtr.Content.Cursor_MoveToStartPos();
+        
+        this.Recalculate();
+        
+        this.Document_UpdateSelectionState();
+        this.Document_UpdateInterfaceState();        
+    },
 
     Document_SetHdrFtrDistance : function(Value)
     {
@@ -10473,10 +10530,15 @@ CDocument.prototype =
         if ( -1 === CurPage )
             return;
         
-        var Index = this.Pages[CurPage].Pos;
-        var SectPr = this.Get_SectPr( Index).SectPr;
+        var Index = this.Pages[CurPage].Pos;        
+        var SectPr = this.SectionsInfo.Get_SectPr(Index).SectPr;
         
-        //SectPr.
+        if ( hdrftr_Header === CurHdrFtr.Type )
+            SectPr.Set_PageMargins_Header( Value );
+        else
+            SectPr.Set_PageMargins_Footer( Value );
+                
+        this.Recalculate();
         
         this.Document_UpdateRulersState();
         this.Document_UpdateInterfaceState();
@@ -10484,7 +10546,46 @@ CDocument.prototype =
 
     Document_SetHdrFtrBounds : function(Y0, Y1)
     {
-        this.HdrFtr.Set_Bounds( Y0, Y1 );
+        var CurHdrFtr = this.HdrFtr.CurHdrFtr;
+
+        if ( null === CurHdrFtr )
+            return;
+        
+        var CurPage = CurHdrFtr.RecalcInfo.CurPage;
+        if ( -1 === CurPage )
+            return;
+        
+        var Index = this.Pages[CurPage].Pos;
+        var SectPr = this.SectionsInfo.Get_SectPr(Index).SectPr;
+        var Bounds = CurHdrFtr.Get_Bounds();
+        
+        if ( hdrftr_Header === CurHdrFtr.Type )
+        {
+            if ( null !== Y0 )
+                SectPr.Set_PageMargins_Header( Y0 );
+            
+            if ( null !== Y1 )
+            {
+                if ( orientation_Portrait === SectPr.Get_Orientation() )
+                    SectPr.Set_PageMargins( undefined, Y1, undefined, undefined );
+                else
+                    SectPr.Set_PageMargins( Y1, undefined, undefined, undefined );
+            }
+        }
+        else
+        {
+            if ( null !== Y0 )
+            {
+                var H = Bounds.Bottom - Bounds.Top;
+                var _Y1 = Y0 + H;
+
+                SectPr.Set_PageMargins_Footer( orientation_Portrait === SectPr.Get_Orientation() ? SectPr.Get_PageHeight() - _Y1 : SectPr.Get_PageWidth() - _Y1 );
+            }
+        }
+        
+        CurHdrFtr.Refresh_RecalcData();
+        this.Recalculate();
+                
         this.Document_UpdateRulersState();
         this.Document_UpdateInterfaceState();
     },

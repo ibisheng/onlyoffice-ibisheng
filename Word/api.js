@@ -4229,17 +4229,7 @@ asc_docs_api.prototype.HeadersAndFooters_DifferentFirstPage = function(isOn)
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_HdrFtr) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-
-        if ( isOn )
-        {
-            this.WordControl.m_oLogicDocument.Document_AddHdrFtr( hdrftr_Footer, hdrftr_First );
-            this.WordControl.m_oLogicDocument.Document_AddHdrFtr( hdrftr_Header, hdrftr_First );
-        }
-        else
-        {
-            this.WordControl.m_oLogicDocument.Document_RemoveHdrFtr( hdrftr_Footer, hdrftr_First );
-            this.WordControl.m_oLogicDocument.Document_RemoveHdrFtr( hdrftr_Header, hdrftr_First );
-        }
+        this.WordControl.m_oLogicDocument.Document_SetHdrFtrFirstPage( isOn );
     }
 }
 asc_docs_api.prototype.HeadersAndFooters_DifferentOddandEvenPage = function(isOn)
@@ -4247,17 +4237,7 @@ asc_docs_api.prototype.HeadersAndFooters_DifferentOddandEvenPage = function(isOn
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_HdrFtr) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-
-        if ( isOn )
-        {
-            this.WordControl.m_oLogicDocument.Document_AddHdrFtr( hdrftr_Footer, hdrftr_Even );
-            this.WordControl.m_oLogicDocument.Document_AddHdrFtr( hdrftr_Header, hdrftr_Even );
-        }
-        else
-        {
-            this.WordControl.m_oLogicDocument.Document_RemoveHdrFtr( hdrftr_Footer, hdrftr_Even );
-            this.WordControl.m_oLogicDocument.Document_RemoveHdrFtr( hdrftr_Header, hdrftr_Even );
-        }
+        this.WordControl.m_oLogicDocument.Document_SetHdrFtrEvenAndOddHeaders( isOn );
     }
 }
 
