@@ -5219,7 +5219,7 @@ drawPieChart.prototype =
 		var tempCenterX, tempCenterY;
 		
 		//TODO высчитать позиции, как в екселе +  ограничения
-		switch ( DLBL_POS_IN_END )
+		switch ( point.compiledDlb.dLblPos )
 		{
 			case DLBL_POS_BEST_FIT:
 			{
