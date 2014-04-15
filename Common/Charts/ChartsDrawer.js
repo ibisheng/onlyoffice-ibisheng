@@ -5315,6 +5315,10 @@ drawDoughnutChart.prototype =
 		var defaultSize = 50;
 		var holeSize = this.cShapeDrawer.chart.plotArea.chart.holeSize ? this.cShapeDrawer.chart.plotArea.chart.holeSize : defaultSize;
 		
+		//first ang  
+		var firstSliceAng = this.cShapeDrawer.chart.plotArea.chart.firstSliceAng ? this.cShapeDrawer.chart.plotArea.chart.firstSliceAng : 0;
+		firstSliceAng = (firstSliceAng / 360) * (Math.PI * 2);
+		
 		//inner radius
 		var radius = outRadius * (holeSize / 100);
 		var step = (outRadius - radius) / this.chartProp.series.length;
@@ -5337,14 +5341,14 @@ drawDoughnutChart.prototype =
 					this.paths.series = [];
 				if(!this.paths.series[n])
 					this.paths.series[n] = [];
-				this.paths.series[n][k] = this._calculateSegment(angle, radius, xCenter, yCenter, radius + step * (n + 1), radius + step * n);
+				this.paths.series[n][k] = this._calculateSegment(angle, radius, xCenter, yCenter, radius + step * (n + 1), radius + step * n, firstSliceAng);
 			}
 		}
     },
 	
-	_calculateSegment: function (angle, radius, xCenter, yCenter, radius1, radius2)
+	_calculateSegment: function (angle, radius, xCenter, yCenter, radius1, radius2, firstSliceAng)
     {
-		var startAngle = (this.tempAngle);
+		var startAngle = this.tempAngle - firstSliceAng;
 		var endAngle   = angle;
 		
 		if(radius < 0)
