@@ -4073,6 +4073,8 @@ drawLineChart.prototype =
 		
 			seria = this.chartProp.series[i];
 			
+			isSplineLine = seria.smooth;
+			
 			dataSeries = seria.val.numRef ? seria.val.numRef.numCache.pts : seria.val.numLit.pts;
 			
 			if(dataSeries.length == 1)
@@ -5930,6 +5932,9 @@ drawScatterChart.prototype =
 			seria = this.chartProp.series[i];
 			points = [];
 			yNumCache = seria.yVal.numRef.numCache ? seria.yVal.numRef.numCache : seria.yVal.numRef.numLit;
+			
+			isSplineLine = seria.smooth;
+			
 			for(var n = 0; n < yNumCache.pts.length; n++)
 			{
 				yVal = parseFloat(yNumCache.pts[n].val);
