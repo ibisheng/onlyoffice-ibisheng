@@ -7244,7 +7244,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			
 			res = this.bcr.Read1(length, function(t, l){
                 return oThis.boMathr.ReadMathArg(t,l,oMathPara.Math.Root);
-			});
+			});			
+			oMathPara.Math.Root.SetRunEmptyToContent(true);
 		}
 		else if (c_oSerParType.Hyperlink == type) {
 		    var oHyperlinkObj = {Link: null, Anchor: null, Tooltip: null, History: null, DocLocation: null, TgtFrame: null};
