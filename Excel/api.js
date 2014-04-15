@@ -2276,8 +2276,15 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
             },
 
 			asc_findText: function (text, scanByRows, scanForward, isMatchCase, isWholeCell) {
-				var d = this.wb.findCellText({text: text, scanByRows: scanByRows, scanForward: scanForward,
-					isMatchCase: isMatchCase, isWholeCell: isWholeCell, isNotSelect: false});
+				var temp = new asc.asc_CFindOptions();
+				temp.findWhat = text;
+				temp.scanByRows = scanByRows;
+				temp.scanForward = scanForward;
+				temp.isMatchCase = isMatchCase;
+				temp.isWholeCell = isWholeCell;
+				temp.isNotSelect = false;
+
+				var d = this.wb.findCellText(temp);
 				if (d) {
 					if (d.deltaX) {this.controller.scrollHorizontal(d.deltaX);}
 					if (d.deltaY) {this.controller.scrollVertical(d.deltaY);}
@@ -2286,8 +2293,16 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			asc_replaceText: function (findWhat, replaceWith, isReplaceAll, isMatchCase, isWholeCell) {
-				this.wb.replaceCellText({findWhat: findWhat, replaceWith: replaceWith, isReplaceAll: isReplaceAll,
-					isMatchCase: isMatchCase, isWholeCell: isWholeCell});
+				var temp = new asc.asc_CFindOptions();
+				temp.findWhat = findWhat;
+				temp.isMatchCase = isMatchCase;
+				temp.isWholeCell = isWholeCell;
+				temp.lookIn = c_oAscFindLookIn.Formulas; // При замене поиск только в формулах
+
+				temp.replaceWith = replaceWith;
+				temp.isReplaceAll = isReplaceAll;
+
+				this.wb.replaceCellText(temp);
 			},
 
 			/**

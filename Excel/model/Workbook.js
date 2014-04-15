@@ -4204,7 +4204,7 @@ Cell.prototype.getValue=function(numFormat, dDigitsCount){
 };
 Cell.prototype.getValue2=function(dDigitsCount, fIsFitMeasurer){
 	if(null == fIsFitMeasurer)
-		fIsFitMeasurer = function(aText){return true;}
+		fIsFitMeasurer = function(aText){return true;};
 	if(null == dDigitsCount)
 		dDigitsCount = gc_nMaxDigCountView;
 	return this.oValue.getValue2(dDigitsCount, fIsFitMeasurer);
@@ -4213,7 +4213,7 @@ Cell.prototype.getNumFormatStr=function(){
 	if(null != this.xfs && null != this.xfs.num)
             return this.xfs.num.f;
 	return g_oDefaultNum.f;
-}
+};
 Cell.prototype.moveHor=function(val){
 	//копируем потому что изначально обьект ыбл получен из g_oCellAddressUtils
 	this.oId = new CellAddress(this.oId.getRow0(), this.oId.getCol0(), 0);

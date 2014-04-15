@@ -9669,7 +9669,7 @@
 		WorksheetView.prototype.findCellText = function (options) {
 			var self = this;
 			if (true !== options.isMatchCase)
-				options.text = options.text.toLowerCase();
+				options.findWhat = options.findWhat.toLowerCase();
 			var ar = options.activeRange ? options.activeRange : this.activeRange;
 			var c = ar.startCol;
 			var r = ar.startRow;
@@ -9715,11 +9715,11 @@
 					_tmpCell = this.model.getCell (new CellAddress(mc.r1, mc.c1, 0));
 				else
 					_tmpCell = this.model.getCell (new CellAddress(r, c, 0));
-				cellText = _tmpCell.getValueForEdit();
+				cellText = (options.lookIn === c_oAscFindLookIn.Formulas) ? _tmpCell.getValueForEdit() : _tmpCell.getValue();
 				if (true !== options.isMatchCase)
 					cellText = cellText.toLowerCase();
-				if (cellText.indexOf(options.text) >= 0) {
-					if (true !== options.isWholeCell || options.text.length === cellText.length)
+				if (cellText.indexOf(options.findWhat) >= 0) {
+					if (true !== options.isWholeCell || options.findWhat.length === cellText.length)
 						return (options.isNotSelect) ? (mc ? new asc_Range(mc.c1, mc.r1, mc.c1, mc.r1) : new asc_Range(c, r, c, r)) : this._setActiveCell(c, r);
 				}
 			}
@@ -9767,11 +9767,11 @@
 					_tmpCell = this.model.getCell (new CellAddress(mc.r1, mc.c1, 0));
 				else
 					_tmpCell = this.model.getCell (new CellAddress(r, c, 0));
-				cellText = _tmpCell.getValueForEdit();
+				cellText = (options.lookIn === c_oAscFindLookIn.Formulas) ? _tmpCell.getValueForEdit() : _tmpCell.getValue();
 				if (true !== options.isMatchCase)
 					cellText = cellText.toLowerCase();
-				if (cellText.indexOf(options.text) >= 0) {
-					if (true !== options.isWholeCell || options.text.length === cellText.length)
+				if (cellText.indexOf(options.findWhat) >= 0) {
+					if (true !== options.isWholeCell || options.findWhat.length === cellText.length)
 						return (options.isNotSelect) ? (mc ? new asc_Range(mc.c1, mc.r1, mc.c1, mc.r1) : new asc_Range(c, r, c, r)) : this._setActiveCell(c, r);
 				}
 			}
@@ -9800,8 +9800,9 @@
 				// На ReplaceAll ставим медленную операцию
 				t.handlers.trigger("slowOperation", true);
 				var aReplaceCellsIndex = {};
-				var optionsFind = {text: options.findWhat, scanByRows: true, scanForward: true,
-					isMatchCase: options.isMatchCase, isWholeCell: options.isWholeCell, isNotSelect: true, activeRange: ar};
+				var optionsFind = options.clone();
+				optionsFind.isNotSelect = true;
+				optionsFind.activeRange = ar;
 				var findResult, index;
 				while (true) {
 					findResult = t.findCellText(optionsFind);
@@ -9827,7 +9828,7 @@
 					return;
 				}
 
-				var cellValue = c.getValueForEdit();
+				var cellValue = (options.lookIn === c_oAscFindLookIn.Formulas) ? c.getValueForEdit() : c.getValue();
 
 				// Попробуем сначала найти
 				if ((true === options.isWholeCell && cellValue.length !== options.findWhat.length) ||

@@ -1245,6 +1245,47 @@
 			asc_getAverage: function () { return this.average; }
 		};
 
+		/** @constructor */
+		function asc_CFindOptions() {
+			this.findWhat = "";							// текст, который ищем
+			this.scanByRows = true;						// просмотр по строкам/столбцам
+			this.scanForward = true;					// поиск вперед/назад
+			this.isMatchCase = false;					// учитывать регистр
+			this.isWholeCell = false;					// ячейка целиком
+			this.scanOnOnlySheet = true;				// искать только на листе/в книге
+			this.lookIn = c_oAscFindLookIn.Formulas;	// искать в формулах/значениях/примечаниях
+
+			this.replaceWith = "";						// текст, на который заменяем (если у нас замена)
+			this.isReplaceAll = false;					// заменить все (если у нас замена)
+
+			// внутренние переменные
+			this.activeRange = null;
+			this.isNotSelect = false;
+			this.indexInArray = 0;
+			this.countFind = 0;
+			this.countReplace = 0;
+		}
+		asc_CFindOptions.prototype.clone = function () {
+			var result = new asc_CFindOptions();
+			result.findWhat = this.findWhat;
+			result.scanByRows = this.scanByRows;
+			result.scanForward = this.scanForward;
+			result.isMatchCase = this.isMatchCase;
+			result.isWholeCell = this.isWholeCell;
+			result.scanOnOnlySheet = this.scanOnOnlySheet;
+			result.lookIn = this.lookIn;
+
+			result.replaceWith = this.replaceWith;
+			result.isReplaceAll = this.isReplaceAll;
+
+			result.activeRange = this.activeRange ? this.activeRange.clone() : null;
+			result.isNotSelect = this.isNotSelect;
+			result.indexInArray = this.indexInArray;
+			result.countFind = this.countFind;
+			result.countReplace = this.countReplace;
+			return result;
+		};
+
 		/*
 		 * Export
 		 * -----------------------------------------------------------------------------
@@ -1379,6 +1420,8 @@
 		prot["asc_getCount"] = prot.asc_getCount;
 		prot["asc_getSum"] = prot.asc_getSum;
 		prot["asc_getAverage"] = prot.asc_getAverage;
+
+		window["Asc"]["asc_CFindOptions"] = window["Asc"].asc_CFindOptions = asc_CFindOptions;
 
 }
 )(jQuery, window);

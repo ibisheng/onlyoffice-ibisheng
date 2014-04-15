@@ -469,6 +469,12 @@ var c_oAscFreezePane = {
 	FreezeFirstColumn	: 3,
 	FreezeClean			: 4
 };
+
+var c_oAscFindLookIn = {
+	Formulas	: 1,
+	Value		: 2,
+	Annotations	: 3
+};
  
 var c_oAscCoAuthoringMeBorderColor					= new window.CColor(22, 156, 0);
 var c_oAscCoAuthoringOtherBorderColor				= new window.CColor(238, 53, 37);
