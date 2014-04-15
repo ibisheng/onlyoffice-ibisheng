@@ -1260,7 +1260,6 @@
 
 			// внутренние переменные
 			this.activeRange = null;
-			this.isNotSelect = false;
 			this.indexInArray = 0;
 			this.countFind = 0;
 			this.countReplace = 0;
@@ -1279,7 +1278,6 @@
 			result.isReplaceAll = this.isReplaceAll;
 
 			result.activeRange = this.activeRange ? this.activeRange.clone() : null;
-			result.isNotSelect = this.isNotSelect;
 			result.indexInArray = this.indexInArray;
 			result.countFind = this.countFind;
 			result.countReplace = this.countReplace;

@@ -9670,17 +9670,14 @@
 			var cell, cellText;
 			// Не пользуемся RegExp, чтобы не возиться со спец.символами
 			var mc = this.model.getMergedByCell(r, c);
-			if (mc)
-				cell = this._getVisibleCell(mc.r1, mc.c1);
-			else
-				cell = this._getVisibleCell(r, c);
+			cell = mc ? this._getVisibleCell(mc.r1, mc.c1) : this._getVisibleCell(r, c);
 			cellText = (options.lookIn === c_oAscFindLookIn.Formulas) ? cell.getValueForEdit() : cell.getValue();
 			if (true !== options.isMatchCase)
 				cellText = cellText.toLowerCase();
 			if ((cellText.indexOf(options.findWhat) >= 0) &&
 				(true !== options.isWholeCell || options.findWhat.length === cellText.length))
-				return (options.isNotSelect) ? (mc ? new asc_Range(mc.c1, mc.r1, mc.c1, mc.r1) : new asc_Range(c, r, c, r)) : true;
-			return false;
+				return (mc ? new asc_Range(mc.c1, mc.r1, mc.c1, mc.r1) : new asc_Range(c, r, c, r));
+			return null;
 		};
 		WorksheetView.prototype.findCellText = function (options) {
 			var self = this;
@@ -9725,8 +9722,8 @@
 
 			for (ct = findNextCell(); ct; ct = findNextCell()) {
 				isEqual = this._isCellEqual(c, r, options);
-				if (false !== isEqual)
-					return (options.isNotSelect) ? isEqual : this._setActiveCell(c, r);
+				if (null !== isEqual)
+					return isEqual;
 			}
 
 			// Сбрасываем замерженные
@@ -9742,8 +9739,7 @@
 
 					maxC = this.cols.length - 1;
 					maxR = ar.startRow;
-				}
-				else {
+				} else {
 					c = 0;
 					r = -1;
 
@@ -9757,8 +9753,7 @@
 				if (options.scanByRows) {
 					minC = 0;
 					minR = ar.startRow;
-				}
-				else {
+				} else {
 					minC = ar.startCol;
 					minR = 0;
 				}
@@ -9767,10 +9762,10 @@
 			}
 			for (ct = findNextCell(); ct; ct = findNextCell()) {
 				isEqual = this._isCellEqual(c, r, options);
-				if (false !== isEqual)
-					return (options.isNotSelect) ? isEqual : this._setActiveCell(c, r);
+				if (null !== isEqual)
+					return isEqual;
 			}
-			return undefined;
+			return null;
 		};
 
 		WorksheetView.prototype.replaceCellText = function (options) {
@@ -9786,7 +9781,7 @@
 				var findResult, index;
 				while (true) {
 					findResult = t.findCellText(optionsFind);
-					if (undefined === findResult)
+					if (null === findResult)
 						break;
 					index = findResult.c1 + '-' + findResult.r1;
 					if (aReplaceCellsIndex[index])

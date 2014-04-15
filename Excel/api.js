@@ -2282,7 +2282,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				temp.scanForward = scanForward;
 				temp.isMatchCase = isMatchCase;
 				temp.isWholeCell = isWholeCell;
-				temp.isNotSelect = false;
 
 				var d = this.wb.findCellText(temp);
 				if (d) {
@@ -2301,7 +2300,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 				temp.replaceWith = replaceWith;
 				temp.isReplaceAll = isReplaceAll;
-				temp.isNotSelect = true;
 
 				this.wb.replaceCellText(temp);
 			},

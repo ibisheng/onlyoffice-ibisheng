@@ -1612,7 +1612,8 @@
 			// Останавливаем ввод данных в редакторе ввода
 			if (ws.getCellEditMode())
 				this._onStopCellEditing();
-			return ws.findCellText(options);
+			var result = ws.findCellText(options);
+			return result ? ws._setActiveCell(result.c1, result.r1) : null;
 		};
 
 		// Замена текста в листе
