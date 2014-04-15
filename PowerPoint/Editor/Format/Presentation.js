@@ -255,9 +255,6 @@ function CPresentation(DrawingDocument)
     this.NumInfoCounter = 0;
 
     // Сначала настраиваем размеры страницы и поля
-    this.SectPr = new SectPr();
-    this.SectPr.Set_PageSize( 793.7, 1122,53 );
-    this.SectPr.Set_PageMargins( { Left : 75.6  }  );
     this.slidesToUnlock = [];
 
     this.ContentLastChangePos = 0;
@@ -1293,6 +1290,7 @@ CPresentation.prototype =
             this.Slides[i].graphicObjects.redrawCharts();
         }
     },
+
 
     Add_InlineImage : function(W, H, Img, Chart, bFlow)
     {
@@ -6126,7 +6124,6 @@ CPresentation.prototype =
         this.Slides.splice(pos, 0, slide);
         slide.setSlideSize(this.Width, this.Height);
         editor.WordControl.m_oLogicDocument.recalcMap[slide.Id] = slide;
-
     },
 	
 	moveSlides: function(slidesIndexes, pos)
