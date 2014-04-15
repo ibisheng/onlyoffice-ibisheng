@@ -3418,6 +3418,7 @@ Woorksheet.prototype._BuildDependencies=function(cellRange){
 					var elem = oNewFormula.outStack[pos.index];
 					if(elem)
 					{
+						//todo случай ,если ref число или именованный диапазон
 						var ref = aRefs[k];
 						var range = Asc.g_oRangeCache.getAscRange(ref);
 						if(null != range)
@@ -3468,7 +3469,9 @@ Woorksheet.prototype._BuildDependencies=function(cellRange){
 				c.formulaParsed = new parserFormula( c.sFormula, c.oId.getID(), this );
 				c.formulaParsed.parse();
 				c.formulaParsed.buildDependencies();
-				aCache.push(c);
+				//error не добавляем в кеш у них не распознались RefPos, их бессмысленно сравнивать.Это только добавит торозов
+				if(0 == c.formulaParsed.error.length)
+					aCache.push(c);
 			}
 		}
 	}
@@ -3480,11 +3483,13 @@ function inCache(aCache, sFormula, aRefs)
 	{
 		var cache = aCache[i];
 		var sCurFormula = cache.sFormula;
-		var RefPos = cache.formulaParsed.RefPos;
-		if(inCacheStrcmp(sCurFormula, sFormula, RefPos, aRefs))
-		{
-			oRes = cache;
-			break;
+		if(null != cache.formulaParsed){
+			var RefPos = cache.formulaParsed.RefPos;
+			//todo свое сравнение для error
+			if(0 == cache.formulaParsed.error.length && inCacheStrcmp(sCurFormula, sFormula, RefPos, aRefs)){
+				oRes = cache;
+				break;
+			}
 		}
 	}
 	return oRes;
