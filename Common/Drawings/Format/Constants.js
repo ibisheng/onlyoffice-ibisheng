@@ -92,6 +92,7 @@ var historyitem_ChartSpace_SetSpPr = 2091;
 var historyitem_ChartSpace_SetStyle = 2092;
 var historyitem_ChartSpace_SetTxPr = 2093;
 var historyitem_ChartSpace_SetUserShapes = 2094;
+var historyitem_ChartSpace_SetThemeOverride = 2095;
 var historyitem_Legend_SetLayout = 2095;
 var historyitem_Legend_AddLegendEntry = 2096;
 var historyitem_Legend_SetLegendPos = 2097;
@@ -625,6 +626,9 @@ var historyitem_ZIndexManagerAddItem      = 2605;
 var historyitem_GraphicObjectsAddHeaderOrFooter  = 2606;
 var historyitem_GraphicObjectsRemoveHeaderOrFooter  = 2606;
 
+var historyitem_WrapPolygonSetEdited     = 2607;
+var historyitem_WrapPolygonSetRelPoints  = 2608;
+
 var historyitem_type_ColorMod = 1001;
 var historyitem_type_ColorModifiers = 1002;
 var historyitem_type_SysColor = 1003;
@@ -737,6 +741,7 @@ var historyitem_type_Path = 1108;
 var historyitem_type_TextBody = 1109;
 var historyitem_type_CatAx = 1110;
 var historyitem_type_ValAx = 1111;
+var historyitem_type_WrapPolygon = 1112;
 
 
 

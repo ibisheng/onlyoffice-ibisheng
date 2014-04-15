@@ -3032,9 +3032,10 @@ CChartsDrawer.prototype =
 
 		var cGeometry = new CGeometry2();
 		this.cShapeDrawer.Clear();
+
+        cGeometry.AddPath(path);
 		this.cShapeDrawer.fromShape2(new CColorObj(pen, brush, cGeometry) ,this.cShapeDrawer.Graphics, cGeometry);
-		
-		cGeometry.AddPath(path);
+
 		this.cShapeDrawer.draw(cGeometry);
 	},
 	
@@ -5142,7 +5143,7 @@ drawPieChart.prototype =
 
 		var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache.pts : this.chartProp.series[0].val.numLit.pts;
 		var sumData = this.cChartDrawer._getSumArray(numCache, true);
-		var radius = trueHeight/2;
+        var radius = Math.min(trueHeight, trueWidth)/2;
 		var xCenter = this.chartProp.chartGutter._left + trueWidth/2;
 		var yCenter = this.chartProp.chartGutter._top + trueHeight/2;
 		
@@ -5309,7 +5310,7 @@ drawDoughnutChart.prototype =
 		var trueHeight = this.chartProp.trueHeight;
 
 		var sumData;
-		var outRadius = trueHeight/2;
+        var outRadius = Math.min(trueHeight,trueWidth)/2;
 		
 		//% from out radius  
 		var defaultSize = 50;
@@ -8668,7 +8669,7 @@ CGeometry2.prototype =
 
         for(var i=0, n=this.pathLst.length; i<n;++i)
 
-            this.pathLst.check_bounds(checker);
+            this.pathLst[i].check_bounds(checker);
 
     }
 };
@@ -8684,10 +8685,8 @@ function CColorObj(pen, brush, geometry)
 CColorObj.prototype =
 {
 	check_bounds: function (checker) {
-		if (this.spPr && this.spPr.geometry) {
-
-			this.spPr.geometry.check_bounds(checker);
-
+		if (this.geometry) {
+			this.geometry.check_bounds(checker);
 		}
 
 		else {

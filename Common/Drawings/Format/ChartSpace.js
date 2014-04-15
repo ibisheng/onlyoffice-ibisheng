@@ -86,13 +86,13 @@ function CChartStyleManager()
             }
             this.styles[32] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, s[0], EFFECT_SUBTLE, EFFECT_SUBTLE,  [f(8, -0.5)], 5, s[0], 9);
             this.styles[33] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, s[1], EFFECT_SUBTLE, EFFECT_SUBTLE,  s[2], 5, s[1], 9);
-            for(i = 34; i < 41; ++i)
+            for(i = 34; i < 40; ++i)
             {
                 this.styles[i] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, [f(i - 34, 0)], EFFECT_SUBTLE, EFFECT_SUBTLE, [f(i-34, -0.5)], 5, [f(i-34, 0)], 9);
             }
-            this.styles[41] = new CChartStyle(EFFECT_INTENSE, EFFECT_INTENSE, s[3], EFFECT_SUBTLE, EFFECT_NONE, [], 5, s[3], 9);
-            this.styles[42] = new CChartStyle(EFFECT_INTENSE, EFFECT_INTENSE, s[1], EFFECT_INTENSE, EFFECT_NONE, [], 5, s[1], 9);
-            for(i = 43; i < 48; ++i)
+            this.styles[40] = new CChartStyle(EFFECT_INTENSE, EFFECT_INTENSE, s[3], EFFECT_SUBTLE, EFFECT_NONE, [], 5, s[3], 9);
+            this.styles[41] = new CChartStyle(EFFECT_INTENSE, EFFECT_INTENSE, s[1], EFFECT_INTENSE, EFFECT_NONE, [], 5, s[1], 9);
+            for(i = 42; i < 48; ++i)
             {
                 this.styles[i] = new CChartStyle(EFFECT_INTENSE, EFFECT_INTENSE, [f(i-43, 0)], EFFECT_SUBTLE, EFFECT_NONE, [], 5, [f(i-43, 0)], 9);
             }
@@ -187,9 +187,10 @@ function CChartSpace()
     this.protection = null;
     this.roundedCorners = null;
     this.spPr = null;
-    this.style = null;
+    this.style = 2;
     this.txPr = null;
     this.userShapes = null;
+    this.themeOverride = null;
 
     this.calculatedChart = null;
     this.transform = new CMatrix();
@@ -233,6 +234,12 @@ CChartSpace.prototype =
     getAllRasterImages: function(images)
     {
         //todo
+    },
+
+    setThemeOverride: function(pr)
+    {
+        History.Add(this, {Type:historyitem_ChartSpace_SetThemeOverride, oldPr: this.themeOverride, newPr: pr});
+        this.themeOverride = pr;
     },
 
     setParent: CShape.prototype.setParent,
@@ -356,19 +363,8 @@ CChartSpace.prototype =
                 var gap_hor_axis = 4;
                 var axis = chart_object.axId;
                 var x_ax, y_ax;
-                for(i = 0; i < axis.length; ++i)
-                {
-                    if(!x_ax && axis[i].axPos === AX_POS_B)
-                    {
-                        x_ax = axis[i];
-                    }
-                    if(!y_ax && axis[i].axPos === AX_POS_L)
-                    {
-                        y_ax = axis[i];
-                    }
-                    if(x_ax && y_ax)
-                        break;
-                }
+                y_ax = this.chart.plotArea.valAx;
+                x_ax = this.chart.plotArea.catAx;
                 if(x_ax && y_ax)
                 {
                     /*new recalc*/
@@ -1043,15 +1039,8 @@ CChartSpace.prototype =
                 var gap_hor_axis = 4;
                 var axis = chart_object.axId;
                 var cat_ax, val_ax;
-                for(i = 0; i < axis.length; ++i)
-                {
-                    if(!cat_ax && axis[i].getObjectType() === historyitem_type_CatAx)
-                        cat_ax = axis[i];
-                    if(!val_ax && axis[i].getObjectType() === historyitem_type_ValAx)
-                        val_ax = axis[i];
-                    if(cat_ax && val_ax)
-                        break;
-                }
+                val_ax = this.chart.plotArea.valAx;
+                cat_ax = this.chart.plotArea.catAx;
                 if(val_ax && cat_ax)
                 {
                     val_ax.labels  = null;
@@ -2588,7 +2577,7 @@ CChartSpace.prototype =
                                 unit_width = (rect.w - left_gap - first_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]);
                                 cat_ax.xPos = rect.x + rect.w - first_val_lbl_half_width - (crosses_val_ax - arr_val[0])*unit_width;
                                 if(cat_ax.labels)
-                                cat_ax.labels.x = cat_ax.xPos - cat_ax_ext_x;
+                                    cat_ax.labels.x = cat_ax.xPos - cat_ax_ext_x;
                             }
                             else
                             {
@@ -3423,7 +3412,7 @@ CChartSpace.prototype =
                             else
                                 vert_count = t;
                             //посмотрим убираются ли все эти строки в максимальную высоту. те которые не убираются обрежем, кроме первой.
-                            legend_width = hor_count*(max_legend_width + left_width);
+                            legend_width = hor_count*(max_entry_width + left_width);
                             if(legend_width + distance_to_text <= max_legend_width)
                                 legend_width += distance_to_text;
                             else
@@ -3537,6 +3526,9 @@ CChartSpace.prototype =
             {
                 //TODO
             }
+            legend.recalcInfo = {recalculateLine: true, recalculateFill: true, recalculateTransparent: true};
+            legend.recalculatePen();
+            legend.recalculateBrush();
         }
     },
 
@@ -3715,15 +3707,15 @@ CChartSpace.prototype =
             if(this.style >=1 && this.style <=32)
                 default_brush = CreateUnifillSolidFillSchemeColor(6, 0);
             else if(this.style >=33 && this.style <= 34)
-                default_brush = CreateUnifillSolidFillSchemeColor(8, 20000);
+                default_brush = CreateUnifillSolidFillSchemeColor(8, 0.20000);
             else if(this.style >=35 && this.style <=40)
                 default_brush = CreateUnifillSolidFillSchemeColor(this.style - 35, 0);
             else
-                default_brush = CreateUnifillSolidFillSchemeColor(8, 95000);
+                default_brush = CreateUnifillSolidFillSchemeColor(8, 0.95000);
 
             if(plot_area.spPr && plot_area.spPr.Fill)
             {
-                default_brush.merge(this.spPr.Fill);
+                default_brush.merge(plot_area.spPr.Fill);
             }
             var parents = this.getParentObjects();
             default_brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
@@ -3744,9 +3736,9 @@ CChartSpace.prototype =
 
         var fill;
         if(this.style >= 1 && this.style <= 32)
-            fill = CreateUnifillSolidFillSchemeColor(15, 75000);
+            fill = CreateUnifillSolidFillSchemeColor(15, 0.75000);
         else if(this.style >= 33 && this.style <= 40)
-            fill = CreateUnifillSolidFillSchemeColor(8, 75000);
+            fill = CreateUnifillSolidFillSchemeColor(8, 0.75000);
         else
             fill = CreateUnifillSolidFillSchemeColor(12, 0);
         default_line.setFill(fill);
@@ -4252,65 +4244,57 @@ CChartSpace.prototype =
                         pts[i].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
                     }
 
-                    if(style.line1 === EFFECT_SUBTLE)
+                    default_line =  new CLn();
+                    if(style.line1 === EFFECT_NONE)
                     {
-                        var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
-                        var base_line_fills = [];
+                        default_line.w = 0;
+                    }
+                    else if(style.line1 === EFFECT_SUBTLE)
+                    {
+                        default_line.merge(parents.theme.themeElements.fmtScheme.lnStyleLst[0]);
+                    }
+                    else if(style.line1 === EFFECT_MODERATE)
+                    {
+                        default_line.merge(parents.theme.themeElements.fmtScheme.lnStyleLst[1]);
+                    }
+                    else if(style.line1 === EFFECT_INTENSE)
+                    {
+                        default_line.merge(parents.theme.themeElements.fmtScheme.lnStyleLst[2]);
+                    }
+                    var base_line_fills;
+                    if(this.style === 34)
+                        base_line_fills = getArrayFillsFromBase(style.line2, pts.length);
+                    for(i = 0; i < pts.length; ++i)
+                    {
+                        var compiled_line = new CLn();
+                        compiled_line.merge(default_line);
+                        compiled_line.Fill = new CUniFill();
                         if(this.style !== 34)
                         {
-                            for(i = 0; i < pts.length; ++i)
-                            {
-                                var compiled_line = new CLn();
-                                compiled_line.merge(default_line);
-                                compiled_line.Fill.merge(style.line2[0]);
-                                if(ser.spPr && ser.spPr.ln)
-                                    compiled_line.merge(ser.spPr.ln);
-                                if(Array.isArray(ser.dPt))
-                                {
-                                    for(var j = 0; j < ser.dPt.length; ++j)
-                                    {
-                                        if(ser.dPt[j].idx === pts[i].idx)
-                                        {
-                                            if(ser.dPt[j].spPr)
-                                            {
-                                                compiled_line.merge(ser.dPt[j].spPr.ln);
-                                            }
-                                            break;
-                                        }
-                                    }
-                                }
-                                pts[i].pen = compiled_line;
-                                pts[i].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-                            }
+                            compiled_line.Fill.merge(style.line2[0]);
                         }
                         else
                         {
-                            var base_line_fills = getArrayFillsFromBase(style.line2, pts.length);
-                            for(i = 0; i < pts.length; ++i)
+                            compiled_line.Fill.merge(base_line_fills[i]);
+                        }
+                        if(ser.spPr && ser.spPr.ln)
+                            compiled_line.merge(ser.spPr.ln);
+                        if(Array.isArray(ser.dPt))
+                        {
+                            for(var j = 0; j < ser.dPt.length; ++j)
                             {
-                                var compiled_line = new CLn();
-                                compiled_line.merge(default_line);
-                                compiled_line.Fill.merge(base_line_fills[i]);
-                                if(ser.spPr && ser.spPr.ln)
-                                    compiled_line.merge(ser.spPr.ln);
-                                if(Array.isArray(ser.dPt))
+                                if(ser.dPt[j].idx === pts[i].idx)
                                 {
-                                    for(var j = 0; j < ser.dPt.length; ++j)
+                                    if(ser.dPt[j].spPr)
                                     {
-                                        if(ser.dPt[j].idx === pts[i].idx)
-                                        {
-                                            if(ser.dPt[j].spPr)
-                                            {
-                                                compiled_line.merge(ser.dPt[j].spPr.ln);
-                                            }
-                                            break;
-                                        }
+                                        compiled_line.merge(ser.dPt[j].spPr.ln);
                                     }
+                                    break;
                                 }
-                                pts[i].pen = compiled_line;
-                                pts[i].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
                             }
                         }
+                        pts[i].pen = compiled_line;
+                        pts[i].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
                     }
                 }
                 else
@@ -4400,71 +4384,60 @@ CChartSpace.prototype =
                         }
 
 
-                        if(style.line1 === EFFECT_SUBTLE)
+                        //
                         {
-                            var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
-
-                            if(this.style !== 34)
+                            default_line =  new CLn();
+                            if(style.line1 === EFFECT_NONE)
                             {
-                                for(var j = 0; j < pts.length; ++j)
-                                {
-                                    var compiled_line = new CLn();
-                                    compiled_line.merge(default_line);
-                                    compiled_line.Fill.merge(style.line2[0]);
-                                    if(ser.spPr && ser.spPr.ln)
-                                    {
-                                        compiled_line.merge(ser.spPr.ln);
-                                    }
-                                    if(j === 0)
-                                        ser.compiledSeriesPen = compiled_line.createDuplicate();
-                                    if(Array.isArray(ser.dPt))
-                                    {
-                                        for(var k = 0; k < ser.dPt.length; ++k)
-                                        {
-                                            if(ser.dPt[k].idx === pts[j].idx)
-                                            {
-                                                if(ser.dPt[k].spPr)
-                                                {
-                                                    compiled_line.merge(ser.dPt[k].spPr.ln);
-                                                }
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    pts[j].pen = compiled_line;
-                                    pts[j].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-                                }
+                                default_line.w = 0;
                             }
-                            else
+                            else if(style.line1 === EFFECT_SUBTLE)
                             {
-                                for(var j = 0; j < pts.length; ++j)
-                                {
-                                    var compiled_line = new CLn();
-                                    compiled_line.merge(default_line);
+                                default_line.merge(parents.theme.themeElements.fmtScheme.lnStyleLst[0]);
+                            }
+                            else if(style.line1 === EFFECT_MODERATE)
+                            {
+                                default_line.merge(parents.theme.themeElements.fmtScheme.lnStyleLst[1]);
+                            }
+                            else if(style.line1 === EFFECT_INTENSE)
+                            {
+                                default_line.merge(parents.theme.themeElements.fmtScheme.lnStyleLst[2]);
+                            }
+                            var base_line_fills;
+                            if(this.style === 34)
+                                base_line_fills = getArrayFillsFromBase(style.line2, pts.length);
+
+                            for(var j = 0; j < pts.length; ++j)
+                            {
+                                var compiled_line = new CLn();
+                                compiled_line.merge(default_line);
+                                compiled_line.Fill = new CUniFill();
+                                if(this.style !== 34)
+                                    compiled_line.Fill.merge(style.line2[0]);
+                                else
                                     compiled_line.Fill.merge(base_line_fills[i]);
-                                    if(ser.spPr && ser.spPr.ln)
+                                if(ser.spPr && ser.spPr.ln)
+                                {
+                                    compiled_line.merge(ser.spPr.ln);
+                                }
+                                if(j === 0)
+                                    ser.compiledSeriesPen = compiled_line.createDuplicate();
+                                if(Array.isArray(ser.dPt))
+                                {
+                                    for(var k = 0; k < ser.dPt.length; ++k)
                                     {
-                                        compiled_line.merge(ser.spPr.ln);
-                                    }
-                                    if(j === 0)
-                                        ser.compiledSeriesPen = compiled_line.createDuplicate();
-                                    if(Array.isArray(ser.dPt))
-                                    {
-                                        for(var j = 0; j < ser.dPt.length; ++j)
+                                        if(ser.dPt[k].idx === pts[j].idx)
                                         {
-                                            if(ser.dPt[j].idx === pts[j].idx)
+                                            if(ser.dPt[k].spPr)
                                             {
-                                                if(ser.dPt[j].spPr)
-                                                {
-                                                    compiled_line.merge(ser.dPt[j].spPr.ln);
-                                                }
-                                                break;
+                                                compiled_line.merge(ser.dPt[k].spPr.ln);
                                             }
+                                            break;
                                         }
                                     }
-                                    pts[j].pen = compiled_line;
-                                    pts[j].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
                                 }
+                                pts[j].pen = compiled_line;
+                                pts[j].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
                             }
                         }
                     }
@@ -4573,9 +4546,10 @@ CChartSpace.prototype =
                         compiled_marker.setSpPr(new CSpPr());
                     }
                     compiled_marker.spPr.setFill(brushes[i]);
+                    compiled_marker.spPr.Fill.merge(pts[i].brush);
                     if(!compiled_marker.spPr.ln)
                         compiled_marker.spPr.setLn(new CLn());
-                    compiled_marker.spPr.ln.setFill(pens_fills[i]);
+                    compiled_marker.spPr.ln.merge(pts[i].pen);
                     compiled_marker.merge(ser.marker);
                     compiled_marker.setSymbol(GetTypeMarkerByIndex(j));
 
@@ -4585,6 +4559,28 @@ CChartSpace.prototype =
                         {
                             if(ser.dPt[j].idx === pts[i].idx)
                             {
+
+                                var d_pt = ser.dPt[j];
+                                if(d_pt.spPr && (d_pt.spPr.Fill || d_pt.spPr.ln))
+                                {
+                                    if(!compiled_marker.spPr)
+                                    {
+                                        compiled_marker.setSpPr(new CSpPr());
+                                    }
+                                    if(d_pt.spPr.Fill)
+                                    {
+                                        compiled_marker.spPr.setFill(d_pt.spPr.Fill.createDuplicate());
+                                    }
+                                    if(d_pt.spPr.ln)
+                                    {
+                                        if(!compiled_marker.spPr.ln)
+                                        {
+                                            compiled_marker.spPr.setLn(new CLn());
+                                        }
+                                        compiled_marker.spPr.ln.merge(d_pt.spPr.ln);
+                                    }
+                                }
+
                                 compiled_marker.merge(ser.dPt[j].marker);
                                 break;
                             }
@@ -4626,7 +4622,7 @@ CChartSpace.prototype =
                             compiled_marker.setSpPr(new CSpPr());
                         }
                         compiled_marker.spPr.setFill(brushes[i]);
-                        if(!compiled_marker.spPr)
+                        if(!compiled_marker.spPr.ln)
                             compiled_marker.spPr.setLn(new CLn());
                         compiled_marker.spPr.ln.setFill(pens_fills[i]);
                         compiled_marker.merge(ser.marker);
@@ -4982,6 +4978,11 @@ CChartSpace.prototype =
                 this.userShapes = data.oldUserShapes;
                 break;
             }
+            case historyitem_ChartSpace_SetThemeOverride:
+            {
+                this.themeOverride = data.oldPr;
+                break;
+            }
         }
     },
 
@@ -5052,6 +5053,11 @@ CChartSpace.prototype =
             case historyitem_ChartSpace_SetUserShapes:
             {
                 this.userShapes = data.newUserShapes;
+                break;
+            }
+            case historyitem_ChartSpace_SetThemeOverride:
+            {
+                this.themeOverride = data.newPr;
                 break;
             }
         }
@@ -5127,6 +5133,12 @@ CChartSpace.prototype =
                 writeString(w, data.newUserShapes);
                 break;
             }
+
+            case historyitem_ChartSpace_SetThemeOverride:
+            {
+                writeObject(w, data.oldPr);
+                break;
+            }
         }
     },
 
@@ -5198,6 +5210,11 @@ CChartSpace.prototype =
             case historyitem_ChartSpace_SetUserShapes:
             {
                 this.userShapes = readString(r);
+                break;
+            }
+            case historyitem_ChartSpace_SetThemeOverride:
+            {
+                this.themeOverride = readObject(r);
                 break;
             }
         }
@@ -5317,7 +5334,8 @@ function CreateUniFillSolidFillWidthTintOrShade(unifill, effectVal)
     if(effectVal !== 0)
     {
         effectVal*=100000.0;
-        unicolor.setMods(new CColorModifiers());
+        if(!unicolor.Mods)
+            unicolor.setMods(new CColorModifiers());
         var mod = new CColorMod();
         if(effectVal > 0)
         {

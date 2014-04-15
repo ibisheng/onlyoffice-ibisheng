@@ -296,6 +296,82 @@ CShape.prototype =
         }, this, []);
     },
 
+
+    documentSearch: function(String, search_Common)
+    {
+        if(this.textBoxContent)
+        {
+            var dd = this.getDrawingDocument();
+            dd.StartSearchTransform(this.transformText);
+            this.textBoxContent.DocumentSearch(String, search_Common);
+            dd.EndSearchTransform();
+        }
+    },
+
+    documentUpdateRulersState: function()
+    {
+        var content = this.getDocContent();
+        if(!content)
+            return;
+        var xc, yc;
+        var l, t, r, b;
+        var body_pr = this.getBodyPr();
+        var l_ins, t_ins, r_ins, b_ins;
+        if(typeof body_pr.lIns === "number")
+            l_ins = body_pr.lIns;
+        else
+            l_ins = 2.54;
+
+        if(typeof body_pr.tIns === "number")
+            t_ins = body_pr.tIns;
+        else
+            t_ins = 1.27;
+
+        if(typeof body_pr.rIns === "number")
+            r_ins = body_pr.rIns;
+        else
+            r_ins = 2.54;
+
+        if(typeof body_pr.bIns === "number")
+            b_ins = body_pr.bIns;
+        else
+            b_ins = 1.27;
+
+        if(isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect))
+        {
+            l = this.spPr.geometry.rect.l+l_ins;
+            t = this.spPr.geometry.rect.t+t_ins;
+            r = this.spPr.geometry.rect.r-r_ins;
+            b = this.spPr.geometry.rect.b-b_ins;
+
+        }
+        else
+        {
+            l = l_ins;
+            t = t_ins;
+            r = this.extX-r_ins;
+            b = this.extY-b_ins;
+        }
+
+        var x_lt, y_lt, x_rt, y_rt, x_rb, y_rb, x_lb, y_lb;
+        var tr = this.transform;
+        x_lt = tr.TransformPointX(l, t);
+        y_lt = tr.TransformPointY(l, t);
+
+        x_rb = tr.TransformPointX(r, b);
+        y_rb = tr.TransformPointY(r, b);
+
+
+        xc = (x_lt + x_rb)*0.5;
+        yc = (y_lt + y_rb)*0.5;
+
+        var hc = (r - l)*0.5;
+        var vc = (b - t)*0.5;
+
+        this.getDrawingDocument().Set_RulerState_Paragraph({L: xc - hc, T: yc - vc, R: xc + hc, B: yc + vc});
+        content.Document_UpdateRulersState(isRealNumber(this.selectStartPage) ? this.selectStartPage : 0);
+    },
+
     setParent: function (parent)
     {
         History.Add(this, { Type: historyitem_ShapeSetParent, oldPr: this.parent, newPr: parent });
@@ -3161,6 +3237,12 @@ CShape.prototype =
         return null;
     },
 
+    getAllRasterImages: function(images)
+    {
+        if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && typeof this.spPr.Fill.fill.RasterImageId === "string" && this.spPr.Fill.fill.RasterImageId.length > 0)
+            images.push(this.spPr.Fill.fill.RasterImageId);
+    },
+
     setVerticalAlign: function (align) {
 
         if (this.txBody) {
@@ -3767,6 +3849,23 @@ CShape.prototype =
 
     Load_LinkData: function (linkData)
     {
+    },
+
+    Get_PageContentStartPos: function(pageNum)
+    {
+        if(this.textBoxContent)
+        {
+            if(this.spPr.geometry && this.spPr.geometry.rect)
+            {
+                var rect = this.spPr.geometry.rect;
+                return {X: 0, Y: 0, XLimit: rect.r - rect.l, YLimit: 20000};
+            }
+            else
+            {
+                return {X: 0, Y: 0, XLimit: this.extX, YLimit: 20000};
+            }
+        }
+        return null;
     },
 
     recalculateBounds: function()

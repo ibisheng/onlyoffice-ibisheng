@@ -3009,7 +3009,9 @@ function DrawingObjects() {
 				drawingObject.graphicObject.drawingObjects = this;
                 var metrics = drawingObject.graphicObject.drawingBase.getGraphicObjectMetrics();
 
-                drawingObject.graphicObject.setSpPr(new CSpPr());
+
+                if(!drawingObject.graphicObject.spPr)
+                    drawingObject.graphicObject.setSpPr(new CSpPr());
                 drawingObject.graphicObject.spPr.setParent(drawingObject.graphicObject);
                 drawingObject.graphicObject.spPr.setXfrm(new CXfrm());
                 drawingObject.graphicObject.spPr.xfrm.setParent(drawingObject.graphicObject.spPr);
@@ -3018,7 +3020,8 @@ function DrawingObjects() {
                 drawingObject.graphicObject.spPr.xfrm.setExtX(metrics.extX);
                 drawingObject.graphicObject.spPr.xfrm.setExtY(metrics.extY);
                 drawingObject.graphicObject.recalculate();
-                drawingObject.graphicObject.addToDrawingObjects();
+                aObjects.push(drawingObject)
+                //drawingObject.graphicObject.addToDrawingObjects();
                 var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
 				aBoundsCheckers.push(boundsChecker);
             }

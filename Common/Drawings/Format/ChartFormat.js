@@ -1225,7 +1225,7 @@ CAreaSeries.prototype =
         return idx + "";
     },
 
-    getValByIndex: function(idx)
+    getValByIndex: function(idx, bPercent)
     {
         var pts;
         var val;
@@ -1250,12 +1250,33 @@ CAreaSeries.prototype =
             }
             if(Array.isArray(pts))
             {
-                for(var i = 0; i < pts.length; ++i)
+                var i;
+                if(!(bPercent === true))
                 {
-                    if(pts[i].idx === idx)
+                    for(i = 0; i < pts.length; ++i)
                     {
-                        return pts[i].val + "";
+                        if(pts[i].idx === idx)
+                        {
+                            return pts[i].val + "";
+                        }
                     }
+                }
+                else
+                {
+                    var summ = 0, value;
+                    for(i = 0; i < pts.length; ++i)
+                    {
+                        if(isRealNumber(pts[i].val))
+                            summ += pts[i].val;
+
+                        if(pts[i].idx === idx)
+                        {
+                            value = pts[i].val;
+                        }
+                    }
+
+                    if(summ > 0 && isRealNumber(value))
+                        return Math.round(100*(value/summ)) + "%";
                 }
             }
         }
@@ -5435,7 +5456,7 @@ CDLbl.prototype =
             return false;
         else
         {
-            return !(this.showSerName || this.showCatName || this.showVal);
+            return !(this.showSerName || this.showCatName || this.showVal || this.showPercent);
         }
     },
 
@@ -5465,6 +5486,12 @@ CDLbl.prototype =
             if(compiled_string.length > 0)
                 compiled_string += separator;
             compiled_string += this.series.getValByIndex(this.pt.idx);
+        }
+        if(this.showPercent)
+        {
+            if(compiled_string.length > 0)
+                compiled_string += separator;
+            compiled_string += this.series.getValByIndex(this.pt.idx, true);
         }
         return compiled_string;
     },
@@ -5547,6 +5574,10 @@ CDLbl.prototype =
 
             var content = this.txBody.content;
             content.Reset(0, 0, max_content_width, 20000);
+
+            content.Set_ApplyToAll(true);
+            content.Set_ParagraphAlign(align_Center);
+            content.Set_ApplyToAll(false);
             content.Recalculate_Page(0, true);
             var pargs = content.Content;
             var max_width = 0;
@@ -8575,22 +8606,55 @@ CLegend.prototype =
     },
 
 
+    recalculatePen:CShape.prototype.recalculatePen,
+    recalculateBrush:CShape.prototype.recalculateBrush,
+    getCompiledStyle: function()
+    {
+        return null;
+    },
+
+    getParentObjects: function()
+    {
+        if(this.chart)
+        {
+            return this.chart.getParentObjects();
+        }
+        else
+        {
+            return {};
+        }
+    },
+
+    getCompiledLine: CShape.prototype.getCompiledLine,
+    getCompiledFill: CShape.prototype.getCompiledFill,
+    getCompiledTransparent: CShape.prototype.getCompiledTransparent,
+    check_bounds: CShape.prototype.check_bounds,
+    getHierarchy: function(){return this.chart ? this.chart.getHierarchy() : []},
+    isEmptyPlaceholder: function()
+    {
+        return false;
+    },
+    isPlaceholder: function()
+    {
+        return false;
+    },
     draw: function(g)
     {
         if(this.chart)
         {
-            g.SetIntegerGrid(false);
-            g.p_width(70);
-            g.transform3(this.chart.transform, false);
-            g.p_color(0, 0, 0, 255);
-            g._s();
-            g._m(this.x, this.y);
-            g._l(this.x + this.extX, this.y + 0);
-            g._l(this.x + this.extX, this.y + this.extY);
-            g._l(this.x + 0, this.y + this.extY);
-            g._z();
-            g.ds();
-            g.SetIntegerGrid(true);
+            CShape.prototype.draw.call(this, g);/*
+         g.SetIntegerGrid(false);
+         g.p_width(70);
+         g.transform3(this.chart.transform, false);
+         g.p_color(0, 0, 0, 255);
+         g._s();
+         g._m(this.x, this.y);
+         g._l(this.x + this.extX, this.y + 0);
+         g._l(this.x + this.extX, this.y + this.extY);
+         g._l(this.x + 0, this.y + this.extY);
+         g._z();
+         g.ds();
+         g.SetIntegerGrid(true);    */
         }
         for(var i = 0; i < this.calcEntryes.length; ++i)
         {
@@ -9537,7 +9601,7 @@ CLineSeries.prototype =
         if(other.dLbls)
             this.setDLbls(other.dLbls);
         if(other.dPt)
-            copyDpt(this, other.dPt);
+            copyDPt(this, other.dPt);
         if(other.errBars)
             this.setErrBars(other.errBars);
         if(isRealNumber(other.idx))
@@ -17348,12 +17412,15 @@ function CompiledMarker()
 CompiledMarker.prototype =
 {
     draw: CShape.prototype.draw,
+    check_bounds: CShape.prototype.check_bounds,
 
 
     isEmptyPlaceholder: function()
     {
         return false;
     }
+
+
 };
 
 function CUnionMarker()

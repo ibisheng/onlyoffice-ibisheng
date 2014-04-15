@@ -5300,12 +5300,9 @@ BinaryChartReader.prototype.ReadCT_ChartSpace = function (type, length, val) {
         if (null != oNewVal.m_val)
             val.setStyle(oNewVal.m_val);
     }
-        //else if (c_oserct_chartspaceCLRMAPOVR === type) {
-        //    //todo
-        //    var oNewVal;
-        //    oNewVal = this.stream.GetString2LE(length);
-        //    val.m_clrMapOvr = oNewVal;
-        //}
+    else if (c_oserct_chartspaceCLRMAPOVR === type) {
+        val.setClrMapOvr(this.ReadClrOverride(length));
+    }
     else if (c_oserct_chartspacePIVOTSOURCE === type) {
         var oNewVal = new CPivotSource();
         res = this.bcr.Read1(length, function (t, l) {
@@ -5373,6 +5370,30 @@ BinaryChartReader.prototype.ReadSpPr = function (length) {
     var oPPTXContentLoader = new CPPTXContentLoader();
     return oPPTXContentLoader.ReadShapeProperty(this.stream);
 }
+
+BinaryChartReader.prototype.ReadClrOverride = function(lenght)
+{
+    var loader = new BinaryPPTYLoader();
+
+    loader.stream = new FileStream();
+    loader.stream.obj    = this.stream.obj;
+    loader.stream.data   = this.stream.data;
+    loader.stream.size   = this.stream.size;
+
+    loader.stream.pos    = this.stream.pos;
+    loader.stream.cur    = this.stream.cur;
+    var s = loader.stream;
+    var _main_type = s.GetUChar(); // 0!!!
+
+    var clr_map =  new ClrMap();
+    loader.ReadClrMap(clr_map);
+
+    this.stream.pos = s.pos;
+    this.stream.cur = s.cur;
+    return clr_map;
+
+};
+
 BinaryChartReader.prototype.ReadTxPr = function (length) {
     // var oPPTXContentLoader = new CPPTXContentLoader();
     // oPPTXContentLoader.ReadTextBody(null, this.stream,  chartTitlePptx);

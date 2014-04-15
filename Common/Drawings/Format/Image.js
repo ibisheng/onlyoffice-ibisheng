@@ -135,28 +135,7 @@ CImageShape.prototype =
         return getBoundsInGroup(this);
     },
 
-    normalize: function()
-    {
-        var new_off_x, new_off_y, new_ext_x, new_ext_y;
-        var xfrm = this.spPr.xfrm;
-        if(!isRealObject(this.group))
-        {
-            new_off_x = xfrm.offX;
-            new_off_y = xfrm.offY;
-            new_ext_x = xfrm.extX;
-            new_ext_y = xfrm.extY;
-        }
-        else
-        {
-            var scale_scale_coefficients = this.group.getResultScaleCoefficients();
-            new_off_x = scale_scale_coefficients.cx*(xfrm.offX - this.group.spPr.xfrm.chOffX);
-            new_off_y = scale_scale_coefficients.cy*(xfrm.offY - this.group.spPr.xfrm.chOffY);
-            new_ext_x = scale_scale_coefficients.cx*xfrm.extX;
-            new_ext_y = scale_scale_coefficients.cy*xfrm.extY;
-        }
-        this.setOffset(new_off_x, new_off_y);
-        this.setExtents(new_ext_x, new_ext_y);
-    },
+    normalize: CShape.prototype.normalize,
 
     sendMouseData: function()
     {
@@ -228,39 +207,6 @@ CImageShape.prototype =
         return false;
     },
 
-    getParentObjects: function()
-    {
-        var parents = {slide: null, layout: null, master: null, theme: null};
-        switch (this.parent.kind)
-        {
-            case SLIDE_KIND:
-            {
-                parents.slide = this.parent;
-                parents.layout = this.parent.Layout;
-                parents.master = this.parent.Layout.Master;
-                parents.theme = this.parent.Layout.Master.Theme;
-                parents.presentation = this.parent.Layout.Master.presentation;
-                break;
-            }
-            case LAYOUT_KIND:
-            {
-                parents.layout = this.parent;
-                parents.master = this.parent.Master;
-                parents.theme = this.parent.Master.Theme;
-                parents.presentation = this.parent.Master.presentation;
-                break;
-            }
-            case MASTER_KIND:
-            {
-                parents.master = this.parent;
-                parents.theme = this.parent.Theme;
-                parents.presentation = this.parent.presentation;
-                break;
-            }
-        }
-        return parents;
-    },
-
     hitToAdj: function(x, y)
     {
         return {hit: false, num: -1, polar: false};
@@ -268,36 +214,12 @@ CImageShape.prototype =
 
 
 
-    hitToPath: function(x, y)
-    {
-        if(isRealObject(this.spPr.geometry))
-        {
-            var px = this.invertTransform.TransformPointX(x, y);
-            var py = this.invertTransform.TransformPointY(x, y);
-            return this.spPr.geometry.hitInPath(this.getParentObjects().presentation.DrawingDocument.CanvasHitContext, px, py);
-        }
-        return false;
-    },
+    hitToPath: CShape.prototype.hitToPath,
+    getParentObjects: CShape.prototype.getParentObjects,
 
-    hitInPath: function(x, y)
-    {
-        var invert_transform = this.getInvertTransform();
-        var x_t = invert_transform.TransformPointX(x, y);
-        var y_t = invert_transform.TransformPointY(x, y);
-        if(isRealObject(this.spPr.geometry))
-            return this.spPr.geometry.hitInPath(this.getParentObjects().presentation.DrawingDocument.CanvasHitContext, x_t, y_t);
-        return false;
-    },
-
-    hitInInnerArea: function(x, y)
-    {
-        var invert_transform = this.getInvertTransform();
-        var x_t = invert_transform.TransformPointX(x, y);
-        var y_t = invert_transform.TransformPointY(x, y);
-        if(isRealObject(this.spPr.geometry))
-            return this.spPr.geometry.hitInInnerArea(this.getParentObjects().presentation.DrawingDocument.CanvasHitContext, x_t, y_t);
-        return x_t > 0 && x_t < this.extX && y_t > 0 && y_t < this.extY;
-    },
+    hitInPath: CShape.prototype.hitInPath,
+    hitInInnerArea: CShape.prototype.hitInInnerArea,
+    getRotateAngle: CShape.prototype.getRotateAngle,
 
     changeSize: function(kw, kh)
     {
@@ -309,34 +231,6 @@ CImageShape.prototype =
         }
     },
 
-
-    getRotateAngle: function(x, y)
-    {
-        var transform = this.getTransformMatrix();
-        var rotate_distance =  this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE);
-        var hc = this.extX*0.5;
-        var vc = this.extY*0.5;
-        var xc_t = transform.TransformPointX(hc, vc);
-        var yc_t = transform.TransformPointY(hc, vc);
-        var rot_x_t = transform.TransformPointX(hc, - rotate_distance);
-        var rot_y_t = transform.TransformPointY(hc, - rotate_distance);
-
-        var invert_transform = this.getInvertTransform();
-        var rel_x = invert_transform.TransformPointX(x, y);
-
-        var v1_x, v1_y, v2_x, v2_y;
-        v1_x = x - xc_t;
-        v1_y = y - yc_t;
-
-        v2_x = rot_x_t - xc_t;
-        v2_y = rot_y_t - yc_t;
-
-        var flip_h = this.getFullFlipH();
-        var flip_v = this.getFullFlipV();
-        var same_flip = flip_h && flip_v || !flip_h && !flip_v;
-        var angle =  rel_x > this.extX*0.5 ? Math.atan2( Math.abs(v1_x*v2_y - v1_y*v2_x), v1_x*v2_x + v1_y*v2_y) : -Math.atan2( Math.abs(v1_x*v2_y - v1_y*v2_x), v1_x*v2_x + v1_y*v2_y);
-        return same_flip ? angle : -angle;
-    },
 
 
     getFullFlipH: function()
@@ -520,6 +414,11 @@ CImageShape.prototype =
     recalculatePen: function()
     {
 
+    },
+
+    getAllRasterImages: function(images)
+    {
+        this.blipFill && typeof this.blipFill.RasterImageId === "string" && this.blipFill.RasterImageId.length > 0 && images.push(this.blipFill.RasterImageId);
     },
 
     getIsSingleBody: function()

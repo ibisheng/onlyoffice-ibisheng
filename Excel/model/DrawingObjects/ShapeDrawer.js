@@ -446,7 +446,7 @@ CShapeDrawer.prototype =
 {
     Clear : function()
     {
-		//this.Shape = null;
+        //this.Shape = null;
         //this.Graphics = null;
         this.UniFill = null;
         this.Ln = null;
@@ -472,7 +472,7 @@ CShapeDrawer.prototype =
 
         this.IsRectShape = false;
     },
-    
+
     CheckPoint : function(_x,_y)
     {
         // TODO: !!!
@@ -527,31 +527,31 @@ CShapeDrawer.prototype =
         var bIsCheckBounds = false;
 
         /*
-        // чуть подольше, но зато с полной поддержкой прозрачности
-        if (graphics.ClearMode === true)
-        {
-            if (this.UniFill == null || this.UniFill.fill == null)
-                this.bIsNoFillAttack = true;
-            else
-            {
-                this.FillUniColor = { R : 0, G : 0, B : 0, A : 255 };
-            }
+         // чуть подольше, но зато с полной поддержкой прозрачности
+         if (graphics.ClearMode === true)
+         {
+         if (this.UniFill == null || this.UniFill.fill == null)
+         this.bIsNoFillAttack = true;
+         else
+         {
+         this.FillUniColor = { R : 0, G : 0, B : 0, A : 255 };
+         }
 
-            if (this.Ln == null || this.Ln.Fill == null || this.Ln.Fill.fill == null)
-                this.bIsNoStrokeAttack = true;
-            else
-            {
-                this.StrokeUniColor = { R : 0, G : 0, B : 0, A : 255 };
+         if (this.Ln == null || this.Ln.Fill == null || this.Ln.Fill.fill == null)
+         this.bIsNoStrokeAttack = true;
+         else
+         {
+         this.StrokeUniColor = { R : 0, G : 0, B : 0, A : 255 };
 
-                this.StrokeWidth = (this.Ln.w == null) ? 12700 : parseInt(this.Ln.w);
-                this.StrokeWidth /= 36000.0;
+         this.StrokeWidth = (this.Ln.w == null) ? 12700 : parseInt(this.Ln.w);
+         this.StrokeWidth /= 36000.0;
 
-                this.p_width(1000 * this.StrokeWidth);
-            }
+         this.p_width(1000 * this.StrokeWidth);
+         }
 
-            return;
-        }
-        */
+         return;
+         }
+         */
 
         if (this.UniFill == null || this.UniFill.fill == null)
             this.bIsNoFillAttack = true;
@@ -870,7 +870,7 @@ CShapeDrawer.prototype =
             }
             else
             {
-				var editor = window["Asc"]["editor"];
+                var editor = window["Asc"]["editor"];
                 var _img = editor.ImageLoader.map_image_index[getFullImageSrc(this.UniFill.fill.RasterImageId)];
                 var _img_native = this.UniFill.fill.canvas;
                 if ((!_img_native) && (_img == undefined || _img.Image == null || _img.Status == ImageLoadStatus.Loading))
@@ -1431,7 +1431,7 @@ CShapeDrawer.prototype =
                         {
                             if (this.UniFill != null && this.UniFill.transparent != null && this.Graphics.ClearMode !== true)
                                 rgba.A = this.UniFill.transparent;
-                            
+
                             this.Graphics.b_color1(rgba.R, rgba.G, rgba.B, rgba.A);
                         }
                     }
@@ -1575,6 +1575,11 @@ CShapeDrawer.prototype =
         // перпендикуляра к первой прямой, проведенной из точки (x1, y1)
         var ex1 = Math.cos(angle);
         var ey1 = Math.sin(angle);
+
+        if(ex1 === 0)
+        {
+            return { X : x0, Y : y1 };
+        }
 
         var ex2 = -ey1;
         var ey2 = ex1;
@@ -1801,18 +1806,18 @@ function ShapeToImageConverter(shape, pageIndex)
         return null;
 
     /*
-    if (shape.pen)
-    {
-        var _w_pen = (shape.pen.w == null) ? 12700 : parseInt(shape.pen.w);
-        _w_pen /= 36000.0;
-        _w_pen *= g_dKoef_mm_to_pix;
+     if (shape.pen)
+     {
+     var _w_pen = (shape.pen.w == null) ? 12700 : parseInt(shape.pen.w);
+     _w_pen /= 36000.0;
+     _w_pen *= g_dKoef_mm_to_pix;
 
-        _need_pix_width += (2 * _w_pen);
-        _need_pix_height += (2 * _w_pen);
+     _need_pix_width += (2 * _w_pen);
+     _need_pix_height += (2 * _w_pen);
 
-        _bounds_cheker.Bounds.min_x -= _w_pen;
-        _bounds_cheker.Bounds.min_y -= _w_pen;
-    }*/
+     _bounds_cheker.Bounds.min_x -= _w_pen;
+     _bounds_cheker.Bounds.min_y -= _w_pen;
+     }*/
 
     var _canvas = document.createElement('canvas');
     _canvas.width = _need_pix_width;

@@ -117,6 +117,8 @@ CGroupShape.prototype =
         if(!isRealNumber(pos))
             pos = this.spTree.length;
         History.Add(this, {Type: historyitem_GroupShapeAddToSpTree, pos: pos, item: item});
+        if(this.recalcBounds)
+            this.recalcBounds();
         this.spTree.splice(pos, 0, item);
     },
 
@@ -138,6 +140,8 @@ CGroupShape.prototype =
         {
             if(this.spTree[i].Get_Id() === id)
             {
+                if(this.recalcBounds)
+                    this.recalcBounds();
                 History.Add(this,{Type:historyitem_GroupShapeRemoveFromSpTree, pos: i, item:this.spTree[i]});
                 return this.spTree.splice(i, 1)[0];
             }
@@ -158,11 +162,13 @@ CGroupShape.prototype =
         if(!this.group)
         {
             this.recalcInfo.recalculateArrGraphicObjects = true;
+            this.recalcBounds();
             this.addToRecalculate();
         }
         else
         {
             this.group.handleUpdateSpTree();
+            this.recalcBounds();
         }
     },
 
@@ -377,6 +383,15 @@ CGroupShape.prototype =
     isPlaceholder : function()
     {
         return this.nvGrpSpPr != null && this.nvGrpSpPr.nvPr != undefined && this.nvGrpSpPr.nvPr.ph != undefined;
+    },
+
+    getAllRasterImages: function(images)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].getAllRasterImages)
+                this.spTree[i].getAllRasterImages(images);
+        }
     },
 
     draw: function(graphics)
@@ -885,6 +900,91 @@ CGroupShape.prototype =
         return true;
     },
 
+
+    getSelectionState: function()
+    {
+        var selection_state = {};
+        if(this.selection.textSelection)
+        {
+            selection_state.textObject = this.selection.textSelection;
+            selection_state.selectStartPage = this.selection.textSelection.selectStartPage;
+            selection_state.textSelection = this.selection.textSelection.getDocContent().Get_SelectionState();
+        }
+        else if(this.selection.chartSelection)
+        {
+            selection_state.chartObject = this.selection.chartSelection;
+            selection_state.selectStartPage = this.selection.chartSelection.selectStartPage;
+            selection_state.chartSelection = this.selection.chartSelection.getSelectionState();
+        }
+        else
+        {
+            selection_state.selection = [];
+            for(var i = 0; i < this.selectedObjects.length; ++i)
+            {
+                selection_state.selection.push({object: this.selectedObjects[i], pageIndex: this.selectedObjects[i].selectStartPage});
+            }
+        }
+        return selection_state;
+    },
+
+    setSelectionState: function(selection_state)
+    {
+        this.resetSelection();
+        if(selection_state.textObject)
+        {
+            this.selectObject(selection_state.textObject, selection_state.selectStartPage);
+            this.selection.textSelection = selection_state.textObject;
+            selection_state.textObject.getDocContent().Set_SelectionState(selection_state.textSelection, selection_state.textSelection.length-1);
+        }
+        else if(selection_state.chartSelection)
+        {
+            this.selectObject(selection_state.chartSelection, selection_state.selectStartPage);
+            this.selection.chartSelection = selection_state.chartObject;
+            selection_state.chartObject.setSelectionState(selection_state.chartSelection);
+        }
+        else
+        {
+            for(var i = 0; i < selection_state.selection.length; ++i)
+            {
+                this.selectObject(selection_state.selection[i].object, selection_state.selection[i].pageIndex);
+            }
+        }
+    },
+
+    documentUpdateRulersState: function()
+    {
+        if(this.selectedObjects.length === 1 && this.selectedObjects[0].documentUpdateRulersState)
+            this.selectedObjects[0].documentUpdateRulersState();
+    },
+
+    documentUpdateInterfaceState: function()
+    {
+        if(this.selection.textSelection)
+        {
+            this.selection.textSelection.getDocContent().Document_UpdateInterfaceState();
+        }
+        else
+        {
+            ///var para_pr = this.getParagraphParaPr();
+            ///if(!(this.selectedObjects.length === 1 && this.selectedObjects[0].getObjectType() === historyitem_type_Shape && this.selectedObjects[0].getDocContent()))
+            ///{
+            ///    para_pr = this.parent.Get_ParentParagraph().Get_CompiledPr2(true).ParaPr;
+            ///}
+            ///editor.UpdateParagraphProp(para_pr);
+            ///editor.UpdateTextPr(this.getParagraphTextPr());
+        }
+    },
+
+    documentSearch: function(String, search_Common)
+    {
+        for(var i = 0;  i< this.spTree.length; ++i)
+        {
+            if(this.spTree[i].documentSearch)
+            {
+                this.spTree[i].documentSearch(String, search_Common);
+            }
+        }
+    },
 
     checkNotNullTransform: function()
     {
@@ -1877,9 +1977,9 @@ function normalizeRotate(rot)
     if(isRealNumber(new_rot))
     {
         while(new_rot >= 2*Math.PI)
-            new_rot -= Math.PI;
+            new_rot -= 2*Math.PI;
         while(new_rot < 0)
-            new_rot += Math.PI;
+            new_rot += 2*Math.PI;
         return new_rot;
     }
     return new_rot;
