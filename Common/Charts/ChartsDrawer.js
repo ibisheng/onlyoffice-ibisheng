@@ -8684,7 +8684,7 @@ function CColorObj(pen, brush, geometry)
 CColorObj.prototype =
 {
 	check_bounds: function (checker) {
-		if (this.spPr.geometry) {
+		if (this.spPr && this.spPr.geometry) {
 
 			this.spPr.geometry.check_bounds(checker);
 
