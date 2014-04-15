@@ -101,6 +101,9 @@
 			this.lastFormulaPos = -1; 	// Последняя позиция формулы
 			this.lastFormulaName = "";	// Последний кусок формулы
 
+			this.lastFindOptions = null;	// Последний поиск (параметры)
+			this.lastFindResults = {};		// Результаты поиска (для поиска по всей книге, чтобы перейти на другой лист)
+
 			this._lockDraw = false;
 
 			// Фонт, который выставлен в DrawingContext, он должен быть один на все DrawingContext-ы
@@ -623,6 +626,9 @@
 				this._onWSSelectionChanged(ws.getSelectionInfo());
 				this._onSelectionMathInfoChanged(ws.getSelectionMathInfo());
 			}
+
+			// Нужно очистить поиск
+			this._cleanFindResults();
 
 			var ct = ws.getCursorTypeFromXY(x, y, this.controller.settings.isViewerMode);
 
@@ -1178,6 +1184,9 @@
             if(this.Api.isMobileVersion)
                 this.MobileTouchManager.Resize();
 			// Zoom теперь на каждом листе одинаковый, не отправляем смену
+
+			// Нужно очистить поиск
+			this._cleanFindResults();
 			return this;
 		};
 
@@ -1606,6 +1615,11 @@
 			this.getWorksheet().setSelectionDialogMode(isSelectionDialogMode, selectRange);
 		};
 
+		WorkbookView.prototype._cleanFindResults = function () {
+			this.lastFindOptions = null;
+			this.lastFindResults = {};
+		};
+
 		// Поиск текста в листе
 		WorkbookView.prototype.findCellText = function (options) {
 			var ws = this.getWorksheet();
@@ -1613,7 +1627,57 @@
 			if (ws.getCellEditMode())
 				this._onStopCellEditing();
 			var result = ws.findCellText(options);
-			return result ? ws._setActiveCell(result.c1, result.r1) : null;
+			if (result) {
+				if (false === options.scanOnOnlySheet) {
+					// Поиск по всей книге
+					var key = result.c1 + "-" + result.r1;
+					if (options.isEqual(this.lastFindOptions)) {
+						if (this.lastFindResults[key]) {
+							// Мы уже находили данную ячейку, попробуем на другом листе
+							var i, active = this.model.getActive(), start = 0, end = this.model.getWorksheetCount();
+							var inc = options.scanForward ? +1 : -1;
+							var tmpWs, tmpResult = null;
+							for (i = active + inc; i < end && i >= start; i += inc) {
+								tmpWs = this.getWorksheet(i);
+								tmpResult = tmpWs.findCellText(options);
+								if (tmpResult)
+									break;
+							}
+							if (!tmpResult) {
+								// Мы дошли до конца или начала (в зависимости от направления, теперь пойдем до активного)
+								if (options.scanForward) {
+									i = 0; end = active;
+								} else {
+									i = end - 1;
+									start = active + 1;
+								}
+								inc *= -1;
+								for (; i < end && i >= start; i += inc) {
+									tmpWs = this.getWorksheet(i);
+									tmpResult = tmpWs.findCellText(options);
+									if (tmpResult)
+										break;
+								}
+							}
+
+							if (tmpResult) {
+								ws = tmpWs;
+								result = tmpResult;
+								this.showWorksheet(i);
+								key = result.c1 + "-" + result.r1;
+							}
+
+							this.lastFindResults = {};
+						}
+					}
+					this.lastFindOptions = options.clone();
+					this.lastFindResults[key] = true;
+				} else
+					this._cleanFindResults();
+				return ws._setActiveCell(result.c1, result.r1);
+			} else
+				this._cleanFindResults();
+			return null;
 		};
 
 		// Замена текста в листе

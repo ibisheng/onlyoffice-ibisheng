@@ -1252,7 +1252,7 @@
 			this.scanForward = true;					// поиск вперед/назад
 			this.isMatchCase = false;					// учитывать регистр
 			this.isWholeCell = false;					// ячейка целиком
-			this.scanOnOnlySheet = true;				// искать только на листе/в книге
+			this.scanOnOnlySheet = false;				// искать только на листе/в книге
 			this.lookIn = c_oAscFindLookIn.Formulas;	// искать в формулах/значениях/примечаниях
 
 			this.replaceWith = "";						// текст, на который заменяем (если у нас замена)
@@ -1282,6 +1282,12 @@
 			result.countFind = this.countFind;
 			result.countReplace = this.countReplace;
 			return result;
+		};
+		asc_CFindOptions.prototype.isEqual = function (obj) {
+			return null != obj && this.findWhat === obj.findWhat && this.scanByRows === obj.scanByRows &&
+				this.scanForward === obj.scanForward && this.isMatchCase === obj.isMatchCase &&
+				this.isWholeCell === obj.isWholeCell && this.scanOnOnlySheet === obj.scanOnOnlySheet &&
+				this.lookIn === obj.lookIn;
 		};
 
 		/*

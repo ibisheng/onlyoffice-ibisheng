@@ -9670,7 +9670,7 @@
 			var cell, cellText;
 			// Не пользуемся RegExp, чтобы не возиться со спец.символами
 			var mc = this.model.getMergedByCell(r, c);
-			cell = mc ? this._getVisibleCell(mc.r1, mc.c1) : this._getVisibleCell(r, c);
+			cell = mc ? this._getVisibleCell(mc.c1, mc.r1) : this._getVisibleCell(c, r);
 			cellText = (options.lookIn === c_oAscFindLookIn.Formulas) ? cell.getValueForEdit() : cell.getValue();
 			if (true !== options.isMatchCase)
 				cellText = cellText.toLowerCase();
