@@ -5216,8 +5216,10 @@ drawPieChart.prototype =
 		var width = point.compiledDlb.extX;
 		var height = point.compiledDlb.extY;
 		
+		var tempCenterX, tempCenterY;
+		
 		//TODO высчитать позиции, как в екселе +  ограничения
-		switch ( point.compiledDlb.dLblPos )
+		switch ( DLBL_POS_IN_END )
 		{
 			case DLBL_POS_BEST_FIT:
 			{
@@ -5233,23 +5235,72 @@ drawPieChart.prototype =
 			{
 				centerX = centerX + (radius / 2) * Math.cos(-1 * stAng - swAng / 2) - width / 2;
 				centerY = centerY - (radius / 2) * Math.sin(-1 * stAng - swAng / 2) - height / 2;
-				/*centerX = centerX + radius * Math.cos(-1 * stAng - swAng / 2) - width / 2;
-				centerY = centerY - radius * Math.sin(-1 * stAng - swAng / 2) - height / 2;*/
 				break;
 			}
 			case DLBL_POS_IN_END:
 			{
-				//centerY = centerY + 27 / pxToMm;
+				tempCenterX = centerX + (radius) * Math.cos(-1 * stAng - swAng / 2);
+				tempCenterY = centerY - (radius) * Math.sin(-1 * stAng - swAng / 2);
+				
+				if(tempCenterX < centerX && tempCenterY < centerY)
+				{
+					centerX = tempCenterX;	
+					centerY = tempCenterY;
+				}
+				else if(tempCenterX > centerX && tempCenterY < centerY)
+				{
+					centerX = tempCenterX - width;
+					centerY = tempCenterY;
+				}
+				else if(tempCenterX < centerX && tempCenterY > centerY)
+				{
+					centerX = tempCenterX;
+					centerY = tempCenterY - height;
+				}
+				else
+				{
+					centerX = tempCenterX - width;	
+					centerY = tempCenterY - height;
+				}
 				break;
 			}
 			case DLBL_POS_OUT_END:
 			{
-				//centerY = centerY + 27 / pxToMm;
+				tempCenterX = centerX + (radius) * Math.cos(-1 * stAng - swAng / 2);
+				tempCenterY = centerY - (radius) * Math.sin(-1 * stAng - swAng / 2);
+				
+				if(tempCenterX < centerX && tempCenterY < centerY)
+				{
+					centerX = tempCenterX - width;
+					centerY = tempCenterY - height;
+				}
+				else if(tempCenterX > centerX && tempCenterY < centerY)
+				{
+					centerX = tempCenterX;
+					centerY = tempCenterY - height;
+				}
+				else if(tempCenterX < centerX && tempCenterY > centerY)
+				{
+					centerX = tempCenterX - width;
+					centerY = tempCenterY;
+				}
+				else
+				{
+					centerX = tempCenterX;	
+					centerY = tempCenterY;
+				}	
 				break;
 			}
 		}
 		if(centerX < 0)
 			centerX = 0;
+		if(centerX + width > this.chartProp.widthCanvas / pxToMm)
+			centerX = this.chartProp.widthCanvas / pxToMm - width;
+			
+		if(centerY < 0)
+			centerY = 0;
+		if(centerY + height > this.chartProp.heightCanvas / pxToMm)
+			centerY = this.chartProp.heightCanvas / pxToMm - height;
 		
 		return {x: centerX, y: centerY};
 	}
