@@ -9666,6 +9666,22 @@
 			return offs;
 		};
 
+		WorksheetView.prototype._isCellEqual = function (c, r, options) {
+			var cell, cellText;
+			// Не пользуемся RegExp, чтобы не возиться со спец.символами
+			var mc = this.model.getMergedByCell(r, c);
+			if (mc)
+				cell = this._getVisibleCell(mc.r1, mc.c1);
+			else
+				cell = this._getVisibleCell(r, c);
+			cellText = (options.lookIn === c_oAscFindLookIn.Formulas) ? cell.getValueForEdit() : cell.getValue();
+			if (true !== options.isMatchCase)
+				cellText = cellText.toLowerCase();
+			if ((cellText.indexOf(options.findWhat) >= 0) &&
+				(true !== options.isWholeCell || options.findWhat.length === cellText.length))
+				return (options.isNotSelect) ? (mc ? new asc_Range(mc.c1, mc.r1, mc.c1, mc.r1) : new asc_Range(c, r, c, r)) : true;
+			return false;
+		};
 		WorksheetView.prototype.findCellText = function (options) {
 			var self = this;
 			if (true !== options.isMatchCase)
@@ -9678,8 +9694,7 @@
 			var maxC = this.cols.length - 1;
 			var maxR = this.rows.length - 1;
 			var inc = options.scanForward ? +1 : -1;
-			var ct, mc, excluded = [];
-			var _tmpCell, cellText;
+			var ct, mc, excluded = [], isEqual;
 
 			function isExcluded(col, row) {
 				for (var i = 0; i < excluded.length; ++i) {
@@ -9709,19 +9724,9 @@
 			}
 
 			for (ct = findNextCell(); ct; ct = findNextCell()) {
-				// Не пользуемся RegExp, чтобы не возиться со спец.символами
-				mc = this.model.getMergedByCell(r, c);
-				if (mc)
-					_tmpCell = this.model.getCell (new CellAddress(mc.r1, mc.c1, 0));
-				else
-					_tmpCell = this.model.getCell (new CellAddress(r, c, 0));
-				cellText = (options.lookIn === c_oAscFindLookIn.Formulas) ? _tmpCell.getValueForEdit() : _tmpCell.getValue();
-				if (true !== options.isMatchCase)
-					cellText = cellText.toLowerCase();
-				if (cellText.indexOf(options.findWhat) >= 0) {
-					if (true !== options.isWholeCell || options.findWhat.length === cellText.length)
-						return (options.isNotSelect) ? (mc ? new asc_Range(mc.c1, mc.r1, mc.c1, mc.r1) : new asc_Range(c, r, c, r)) : this._setActiveCell(c, r);
-				}
+				isEqual = this._isCellEqual(c, r, options);
+				if (false !== isEqual)
+					return (options.isNotSelect) ? isEqual : this._setActiveCell(c, r);
 			}
 
 			// Сбрасываем замерженные
@@ -9761,38 +9766,14 @@
 				maxR = this.rows.length - 1;
 			}
 			for (ct = findNextCell(); ct; ct = findNextCell()) {
-				// Не пользуемся RegExp, чтобы не возиться со спец.символами
-				mc = this.model.getMergedByCell(r, c);
-				if (mc)
-					_tmpCell = this.model.getCell (new CellAddress(mc.r1, mc.c1, 0));
-				else
-					_tmpCell = this.model.getCell (new CellAddress(r, c, 0));
-				cellText = (options.lookIn === c_oAscFindLookIn.Formulas) ? _tmpCell.getValueForEdit() : _tmpCell.getValue();
-				if (true !== options.isMatchCase)
-					cellText = cellText.toLowerCase();
-				if (cellText.indexOf(options.findWhat) >= 0) {
-					if (true !== options.isWholeCell || options.findWhat.length === cellText.length)
-						return (options.isNotSelect) ? (mc ? new asc_Range(mc.c1, mc.r1, mc.c1, mc.r1) : new asc_Range(c, r, c, r)) : this._setActiveCell(c, r);
-				}
+				isEqual = this._isCellEqual(c, r, options);
+				if (false !== isEqual)
+					return (options.isNotSelect) ? isEqual : this._setActiveCell(c, r);
 			}
 			return undefined;
 		};
 
 		WorksheetView.prototype.replaceCellText = function (options) {
-			var findFlags = "g"; // Заменяем все вхождения
-			if (true !== options.isMatchCase)
-				findFlags += "i"; // Не чувствителен к регистру
-
-			var valueForSearching = options.findWhat
-                .replace( /(\\)/g, "\\\\" ).replace( /(\^)/g, "\\^" )
-                .replace( /(\()/g, "\\(" ).replace( /(\))/g, "\\)" )
-                .replace( /(\+)/g, "\\+" ).replace( /(\[)/g, "\\[" )
-                .replace( /(\])/g, "\\]" ).replace( /(\{)/g, "\\{" )
-                .replace( /(\})/g, "\\}" ).replace( /(\$)/g, "\\$" )
-                .replace( /(~)?\*/g, function ( $0, $1 ) { return $1 ? $0 : '(.*)'; } )
-                .replace( /(~)?\?/g, function ( $0, $1 ) { return $1 ? $0 : '.'; } )
-                .replace( /(~\*)/g, "\\*" ).replace( /(~\?)/g, "\\?" );
-			valueForSearching = new RegExp(valueForSearching, findFlags);
 			var t = this;
 			var ar = this.activeRange.clone();
 			var aReplaceCells = [];
@@ -9801,7 +9782,6 @@
 				t.handlers.trigger("slowOperation", true);
 				var aReplaceCellsIndex = {};
 				var optionsFind = options.clone();
-				optionsFind.isNotSelect = true;
 				optionsFind.activeRange = ar;
 				var findResult, index;
 				while (true) {
@@ -9817,37 +9797,39 @@
 					ar.startRow = findResult.r1;
 				}
 			} else {
-				var mc = t.model.getMergedByCell(ar.startRow, ar.startCol);
-				var c1 = mc ? mc.c1 : ar.startCol;
-				var r1 = mc ? mc.r1 : ar.startRow;
-				var c = t._getVisibleCell(c1, r1);
-
-				if (c === undefined) {
-					asc_debug("log", "Unknown cell's info: col = " + c1 + ", row = " + r1);
-					t.handlers.trigger("onRenameCellTextEnd", 0, 0);
-					return;
-				}
-
-				var cellValue = (options.lookIn === c_oAscFindLookIn.Formulas) ? c.getValueForEdit() : c.getValue();
-
 				// Попробуем сначала найти
-				if ((true === options.isWholeCell && cellValue.length !== options.findWhat.length) ||
-					0 > cellValue.search(valueForSearching)) {
+				var isEqual = this._isCellEqual(ar.startCol, ar.startRow, options);
+				if (false !== isEqual) {
 					t.handlers.trigger("onRenameCellTextEnd", 0, 0);
 					return;
 				}
 
-				aReplaceCells.push(new asc_Range(c1, r1, c1, r1));
+				aReplaceCells.push(isEqual);
 			}
 
 			if (0 > aReplaceCells.length) {
 				t.handlers.trigger("onRenameCellTextEnd", 0, 0);
 				return;
 			}
-			this._replaceCellsText(aReplaceCells, valueForSearching, options);
+			this._replaceCellsText(aReplaceCells, options);
 		};
 
-		WorksheetView.prototype._replaceCellsText = function (aReplaceCells, valueForSearching, options) {
+		WorksheetView.prototype._replaceCellsText = function (aReplaceCells, options) {
+			var findFlags = "g"; // Заменяем все вхождения
+			if (true !== options.isMatchCase)
+				findFlags += "i"; // Не чувствителен к регистру
+
+			var valueForSearching = options.findWhat
+				.replace( /(\\)/g, "\\\\" ).replace( /(\^)/g, "\\^" )
+				.replace( /(\()/g, "\\(" ).replace( /(\))/g, "\\)" )
+				.replace( /(\+)/g, "\\+" ).replace( /(\[)/g, "\\[" )
+				.replace( /(\])/g, "\\]" ).replace( /(\{)/g, "\\{" )
+				.replace( /(\})/g, "\\}" ).replace( /(\$)/g, "\\$" )
+				.replace( /(~)?\*/g, function ( $0, $1 ) { return $1 ? $0 : '(.*)'; } )
+				.replace( /(~)?\?/g, function ( $0, $1 ) { return $1 ? $0 : '.'; } )
+				.replace( /(~\*)/g, "\\*" ).replace( /(~\?)/g, "\\?" );
+			valueForSearching = new RegExp(valueForSearching, findFlags);
+
 			History.Create_NewPoint();
 			History.StartTransaction();
 

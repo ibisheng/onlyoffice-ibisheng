@@ -2301,6 +2301,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 				temp.replaceWith = replaceWith;
 				temp.isReplaceAll = isReplaceAll;
+				temp.isNotSelect = true;
 
 				this.wb.replaceCellText(temp);
 			},

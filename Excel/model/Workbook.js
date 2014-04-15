@@ -4283,10 +4283,10 @@ Range.prototype.clone=function(oNewWs){
 };
 Range.prototype.getFirst=function(){
 	return this.first;
-}
+};
 Range.prototype.getLast=function(){
 	return this.last;
-}
+};
 Range.prototype._foreach=function(action){
 	if(null != action)
 	{
