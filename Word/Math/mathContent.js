@@ -54,6 +54,7 @@ var SELECT_PARENT = 0;
 var SELECT_CHILD  = 1;
 
 
+
 /*var  DEFAULT_RUN_PRP =
 {
     FontFamily:     {Name  : "Cambria Math", Index : -1 },
@@ -7470,6 +7471,7 @@ CMathContent.prototype =
         if(this.content.length > 0) // случай , если у нас контент не заполнен, не предусмотрен
         {
             var pos = this.findPosition(SearchPos.X, SearchPos.Y);
+
             SearchPos.Pos.Update( pos, Depth );
             Depth++;
             //ContentPos.Add(pos);
@@ -7478,6 +7480,7 @@ CMathContent.prototype =
 
             if(this.content[pos].typeObj == MATH_COMP)
             {
+                SearchPos.Y -= this.size.ascent - this.content[pos].size.ascent;
                 this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth);
             }
             else if(this.content[pos].typeObj == MATH_PARA_RUN)      // проверка на gaps в findDisposition
@@ -7697,6 +7700,7 @@ CMathContent.prototype =
         var NewContent = [];
 
         // После чтения из файла формулы, выставить курсор в конец !
+
         var len = this.content.length;
 
         for(var i = 0; i < len; i++)
@@ -8585,13 +8589,6 @@ CMathComposition.prototype =
     // position вычислить естественно до того, как придет Draw, чтобы не пришлось пересчитывать при изменении в тексте документа
     Draw: function(x, y, pGraphics)
     {
-
-        //// test
-        //this.RecalculateComposition(g_oTextMeasurer);
-        ////
-
-        //this.absPos = {x: x, y: y - this.Root.size.ascent};
-
         this.Root.draw(this.absPos.x, this.absPos.y , pGraphics);
     },
     GetFirstRPrp: function()
