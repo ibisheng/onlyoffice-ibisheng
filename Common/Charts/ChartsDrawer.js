@@ -3187,11 +3187,22 @@ CChartsDrawer.prototype =
 		{	
 			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
 			resVal = yPoints[1].val - yPoints[0].val;
-			diffVal = Math.abs(yPoints[0].val - val);
-			if(isOx)
-				result = yPoints[0].pos + (diffVal / resVal) * resPos;
+			diffVal = Math.abs(yPoints[yPoints.length - 1].val - val);
+			
+			if(plotArea.valAx.scaling.orientation == ORIENTATION_MIN_MAX)
+			{
+				if(isOx)
+					result = yPoints[yPoints.length - 1].pos + (diffVal / resVal) * resPos;
+				else
+					result = yPoints[yPoints.length - 1].pos - (diffVal / resVal) * resPos;
+			}
 			else
-				result = yPoints[0].pos - (diffVal / resVal) * resPos;
+			{
+				if(isOx)
+					result = yPoints[yPoints.length - 1].pos - (diffVal / resVal) * resPos;
+				else
+					result = yPoints[yPoints.length - 1].pos + (diffVal / resVal) * resPos;
+			}
 		}
 		else
 		{
@@ -4853,7 +4864,7 @@ drawHBarChart.prototype =
 	_getStartYColumnPosition: function (seriesHeight, j, i, val, xPoints, summBarVal)
 	{
 		var startY, diffYVal, width, numCache, dVal, curVal, prevVal, endBlockPosition, startBlockPosition;
-		var nullPositionOX = this.cShapeDrawer.chart.plotArea.catAx.posX * this.chartProp.pxToMM;
+		var nullPositionOX = this.cShapeDrawer.chart.plotArea.catAx.posX ? this.cShapeDrawer.chart.plotArea.catAx.posX * this.chartProp.pxToMM : this.cShapeDrawer.chart.plotArea.catAx.xPos * this.chartProp.pxToMM;
 		if(this.chartProp.subType == "stacked")
 		{
 			curVal = this._getStackedValue(this.chartProp.series, i, j, val);
