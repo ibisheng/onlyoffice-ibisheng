@@ -497,7 +497,9 @@
 				"selectionRangeChanged"		: function (val) {self.handlers.trigger("asc_onSelectionRangeChanged", val);},
 				"getDCForCharts"			: function () { return self.drawingCtxCharts; },
 				"onRenameCellTextEnd"		: function (countFind, countReplace) {self.handlers.trigger("asc_onRenameCellTextEnd", countFind, countReplace);},
-				"onStopFormatPainter"		: function () {self.handlers.trigger("asc_onStopFormatPainter");}
+				"onStopFormatPainter"		: function () {self.handlers.trigger("asc_onStopFormatPainter");},
+				"onChangeColumnWidth"		: function (widthCC, widthPx) {self.handlers.trigger("asc_onChangeColumnWidth");},
+				"onChangeRowHeight"			: function (heightPt, heightPx) {self.handlers.trigger("asc_onChangeRowHeight", heightPt, heightPx);}
 			}, this.buffers, this.stringRender, this.maxDigitWidth, this.collaborativeEditing, opt);
 		};
 

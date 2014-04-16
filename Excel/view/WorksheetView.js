@@ -3948,9 +3948,8 @@
 			var x1 = t.cols[col].left - offsetX - this.width_1px;
 			var h = ctx.getHeight();
 
-			// ToDo для вывода при смене мышкой
-			//var test = t._colWidthToCharCount(x - x1);
-			//console.log("width = " + ((x - x1) * 96 / 72) + "px; widthS = " + test  + "; val = " + (x * 96 / 72) + "px");
+			var widthPt = (x - x1);
+			t.handlers.trigger("onChangeColumnWidth", t._colWidthToCharCount(widthPt), widthPt * 96 / 72);
 
 			ctx.clear();
 			t._drawSelection();
@@ -3975,8 +3974,8 @@
 			var y1 = t.rows[row].top - offsetY - this.height_1px;
 			var w = ctx.getWidth();
 
-			// ToDo для вывода при смене мышкой
-			//console.log("height = " + ((y - y1) * 96 / 72) + "px; heightPt: " + (y - y1) + "; val = " + (y * 96 / 72) + "px");
+			var heightPt = (y - y1);
+			t.handlers.trigger("onChangeRowHeight", heightPt, heightPt * 96 / 72);
 
 			ctx.clear();
 			t._drawSelection();
