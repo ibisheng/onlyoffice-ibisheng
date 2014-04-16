@@ -7270,7 +7270,7 @@ catAxisChart.prototype =
 		var stepY = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[0].pos - this.chartProp.chartGutter._bottom / this.chartProp.pxToMM);
 		var minorStep = stepY / this.chartProp.numhMinorlines;
 		
-		var posX = this.chartSpace.chart.plotArea.catAx.posX;
+		var posX = this.chartSpace.chart.plotArea.catAx.posX ? this.chartSpace.chart.plotArea.catAx.posX : this.chartSpace.chart.plotArea.catAx.xPos;
 
 		var posY;
 		var posMinorY;
@@ -7303,7 +7303,7 @@ catAxisChart.prototype =
 				{
 					for(var n = 0; n < this.chartProp.numhMinorlines; n++)
 					{
-						posMinorY = posY + n * minorStep;
+						posMinorY = posY - n * minorStep;
 						if(!this.paths.minorTickMarks)
 							this.paths.minorTickMarks = [];
 						if(!this.paths.minorTickMarks[i])
@@ -7337,7 +7337,7 @@ catAxisChart.prototype =
 				{
 					for(var n = 0; n < this.chartProp.numhMinorlines; n++)
 					{
-						posMinorY = posY + n * minorStep;
+						posMinorY = posY - n * minorStep;
 						if(!this.paths.minorTickMarks)
 							this.paths.minorTickMarks = [];
 						if(!this.paths.minorTickMarks[i])
