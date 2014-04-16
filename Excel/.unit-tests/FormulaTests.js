@@ -793,15 +793,16 @@
     } )
 
     test( "Test: rename sheet #4", function () {
-        ws = wb.getWorksheetById( 1 );
+        ws = wb.getWorksheet( 0 );
         ws.getRange2( "S95" ).setValue( "2" );
-        ws = wb.getWorksheetById( 2 );
-        ws.getRange2( "S100" ).setValue( "=" + wb.getWorksheetById( 1 ).getName() + "!S95" );
+        ws = wb.getWorksheet( 1 );
+        ws.getRange2( "S100" ).setValue( "=" + wb.getWorksheet( 0 ).getName() + "!S95" );
         strictEqual( ws.getCell2( "S100" ).getCells()[0].getValue(), "2" );
 
-        wb.getWorksheetById( 1 ).setName( "ЛистTEMP" );
+        wb.getWorksheet( 0 ).setName( "ЛистTEMP" );
 
-        strictEqual( ws.getCell2( "S100" ).getCells()[0].getFormula(), wb.getWorksheetById( 1 ).getName() + "!S95", ws.getCell2( "S100" ).getCells()[0].getFormula() + " " + wb.getWorksheetById( 1 ).getName() + "!S95" );
+        strictEqual( ws.getCell2( "S100" ).getCells()[0].getFormula(), wb.getWorksheet( 0 ).getName() + "!S95",
+					 ws.getCell2( "S100" ).getCells()[0].getFormula() + " " + wb.getWorksheet( 0 ).getName() + "!S95" );
 
     } )
 
@@ -4567,6 +4568,100 @@
 
     } )
 
+    test( "Test: \"VDB\"", function () {
 
+
+        function _getVDB( cost, salvage, life, life1, startperiod, factor){
+            var fVdb=0, nLoopEnd = end = Math.ceil(startperiod),
+                fTerm, fLia = 0, fRestwert = cost - salvage, bNowLia = false, fGda;
+
+            for ( var i = 1; i <= nLoopEnd; i++){
+                if(!bNowLia){
+
+                    fGda = _getDDB(cost, salvage, life, i, factor);
+                    fLia = fRestwert/ (life1 - (i-1));
+
+                    if (fLia > fGda){
+                        fTerm = fLia;
+                        bNowLia = true;
+                    }
+                    else{
+                        fTerm = fGda;
+                        fRestwert -= fGda;
+                    }
+
+                }
+                else{
+                    fTerm = fLia;
+                }
+
+                if ( i == nLoopEnd)
+                    fTerm *= ( startperiod + 1.0 - end );
+
+                fVdb += fTerm;
+            }
+            return fVdb;
+        }
+
+        function vdb( cost, salvage, life, startPeriod, endPeriod, factor, flag ) {
+
+            if( factor === undefined || factor === null ) factor = 2;
+            if( flag === undefined || flag === null ) flag = false;
+
+            var start = Math.floor(startPeriod),
+                end   = Math.ceil(endPeriod),
+                loopStart = start,
+                loopEnd   = end;
+
+            var res = 0;
+            if ( flag ) {
+                for ( var i = loopStart + 1; i <= loopEnd; i++ ) {
+                    var ddb = _getDDB( cost, salvage, life, i, factor );
+
+                    if ( i == loopStart + 1 )
+                        ddb *= ( Math.min( endPeriod, start + 1 ) - startPeriod );
+                    else if ( i == loopEnd )
+                        ddb *= ( endPeriod + 1 - end );
+
+                    res += ddb;
+                }
+            }
+            else {
+
+                var life1 = life;
+
+                if ( !Math.approxEqual( startPeriod, Math.floor( startPeriod ) ) ) {
+                    if ( factor > 1 ) {
+                        if ( startPeriod > life / 2 || Math.approxEqual( startPeriod, life / 2 ) ) {
+                            var fPart = startPeriod - life / 2;
+                            startPeriod = life / 2;
+                            endPeriod -= fPart;
+                            life1 += 1;
+                        }
+                    }
+                }
+
+                cost -= _getVDB( cost, salvage, life, life1, startPeriod, factor );
+                res = _getVDB( cost, salvage, life, life - startPeriod, endPeriod - startPeriod, factor );
+            }
+
+            return res;
+
+        }
+
+        oParser = new parserFormula( "VDB(2400,300,10*365,0,1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), vdb(2400,300,10*365,0,1) );
+
+        oParser = new parserFormula( "VDB(2400,300,10*12,0,1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), vdb(2400,300,10*12,0,1) );
+
+        oParser = new parserFormula( "VDB(2400,300,10*12,6,18)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), vdb(2400,300,10*12,6,18) );
+
+
+    } )
 
 } );
