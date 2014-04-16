@@ -293,8 +293,7 @@
 					this.r2 = 0;
 			},
 			
-			getName : function()
-			{
+			getName : function() {
 				var sRes;
 				if(0 == this.c1 && gc_nMaxCol0 == this.c2)
 					sRes = (this.r1 + 1) + ":" + (this.r2 + 1);
@@ -308,8 +307,21 @@
 						sRes = g_oCellAddressUtils.colnumToColstr(this.c1 + 1) + (this.r1 + 1) + ":" + g_oCellAddressUtils.colnumToColstr(this.c2 + 1) + (this.r2 + 1);
 				}
 				return sRes;
-			}
+			},
 
+			getAllRange: function () {
+				var result;
+				if (c_oAscSelectionType.RangeMax === this.type)
+					result = new Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
+				else if (c_oAscSelectionType.RangeCol === this.type)
+					result = new Range(this.c1, 0, this.c2, gc_nMaxRow0);
+				else if (c_oAscSelectionType.RangeRow === this.type)
+					result = new Range(0, this.r1, gc_nMaxCol0, this.r2);
+				else
+					result = this.clone();
+
+				return result;
+			}
 		};
 		
 		function ActiveRange(){

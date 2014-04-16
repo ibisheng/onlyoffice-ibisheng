@@ -6675,12 +6675,14 @@
 
 		WorksheetView.prototype.applyFormatPainter = function () {
 			var t = this;
-			var onApplyMoveRangeHandleCallback = function (isSuccess) {
+			var from = t.copyOfActiveRange.getAllRange(), to = t.activeRange.getAllRange();
+
+			var onApplyFormatPainterCallback = function (isSuccess) {
 				// Очищаем выделение
 				t.cleanSelection();
 
 				if (true === isSuccess)
-					t._getRange(0, 0, 0, 0).promoteFromTo(t.copyOfActiveRange, t.activeRange);
+					t._getRange(0, 0, 0, 0).promoteFromTo(from, to);
 
 				// Сбрасываем параметры
 				t._updateCellsRange(t.activeRange, /*canChangeColWidth*/c_oAscCanChangeColWidth.none, /*lockDraw*/true);
@@ -6689,7 +6691,7 @@
 				t.draw();
 			};
 
-			this._isLockedCells (this.activeRange, null, onApplyMoveRangeHandleCallback);
+			this._isLockedCells (to, null, onApplyFormatPainterCallback);
 		};
 		WorksheetView.prototype.formatPainter = function () {
 			this.isFormatPainter = !this.isFormatPainter;
@@ -7548,15 +7550,7 @@
 			if (onlyActive) {
 				checkRange = new asc_Range(arn.startCol, arn.startRow, arn.startCol, arn.startRow);
 			} else {
-				if (c_oAscSelectionType.RangeMax === arn.type) {
-					checkRange = new asc_Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
-				} else if (c_oAscSelectionType.RangeCol === arn.type) {
-					checkRange = new asc_Range(arn.c1, 0, arn.c2, gc_nMaxRow0);
-				} else if (c_oAscSelectionType.RangeRow === arn.type) {
-					checkRange = new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r2);
-				} else {
-					checkRange = arn;
-				}
+				checkRange = arn.getAllRange();
 			}
 
 			var onSelectionCallback = function (isSuccess) {
@@ -9040,17 +9034,8 @@
 				return;
 
 			var t = this;
-			var checkRange = null;
 			var arn = t.activeRange.clone(true);
-			if (c_oAscSelectionType.RangeMax === arn.type) {
-				checkRange = new asc_Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
-			} else if (c_oAscSelectionType.RangeCol === arn.type) {
-				checkRange = new asc_Range(arn.c1, 0, arn.c2, gc_nMaxRow0);
-			} else if (c_oAscSelectionType.RangeRow === arn.type) {
-				checkRange = new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r2);
-			} else {
-				checkRange = arn;
-			}
+			var checkRange = arn.getAllRange();
 
 			var range;
 			var fullRecalc = undefined;
