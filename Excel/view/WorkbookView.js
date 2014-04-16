@@ -1376,8 +1376,7 @@
 		};
 
 		WorkbookView.prototype._onUpdateCellEditor = function (text, cursorPosition, isFormula, formulaPos, formulaName) {
-			// ToDo добавить вывод окна для формулы (список формул должен всегда лежать в переменной, сделанной на инициализации)
-			// Еще для ускорения можно завести объект, куда класть результаты поиска по формулам и второй раз не искать.
+			// ToDo для ускорения можно завести объект, куда класть результаты поиска по формулам и второй раз не искать.
 			var arrResult = [];
 			if (isFormula && formulaName) {
 				formulaName = formulaName.toUpperCase();

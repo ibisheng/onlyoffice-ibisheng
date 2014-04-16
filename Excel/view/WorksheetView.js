@@ -9842,7 +9842,6 @@
 						newValue = [];
 						newValue[0] = new Fragment({text: cellValue, format: v[0].format.clone()});
 
-						// ToDo для неактивных листов не делать отрисовку
 						t._saveCellValueAfterEdit(oCellEdit, c, newValue, /*flags*/undefined, /*skipNLCheck*/false,
 							/*isNotHistory*/true, lockDraw);
 					}
