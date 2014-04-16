@@ -9768,19 +9768,20 @@
 			return null;
 		};
 
-		WorksheetView.prototype.replaceCellText = function (options) {
+		WorksheetView.prototype.replaceCellText = function (options, lockDraw, callback) {
+			// Очищаем результаты
+			options.countFind = 0;
+			options.countReplace = 0;
+
 			var t = this;
 			var ar = this.activeRange.clone();
 			var aReplaceCells = [];
 			if (options.isReplaceAll) {
-				// На ReplaceAll ставим медленную операцию
-				t.handlers.trigger("slowOperation", true);
 				var aReplaceCellsIndex = {};
-				var optionsFind = options.clone();
-				optionsFind.activeRange = ar;
+				options.activeRange = ar;
 				var findResult, index;
 				while (true) {
-					findResult = t.findCellText(optionsFind);
+					findResult = t.findCellText(options);
 					if (null === findResult)
 						break;
 					index = findResult.c1 + '-' + findResult.r1;
@@ -9794,22 +9795,19 @@
 			} else {
 				// Попробуем сначала найти
 				var isEqual = this._isCellEqual(ar.startCol, ar.startRow, options);
-				if (false !== isEqual) {
-					t.handlers.trigger("onRenameCellTextEnd", 0, 0);
-					return;
-				}
+				if (null === isEqual)
+					return callback(options);
 
 				aReplaceCells.push(isEqual);
 			}
 
-			if (0 > aReplaceCells.length) {
-				t.handlers.trigger("onRenameCellTextEnd", 0, 0);
-				return;
-			}
-			this._replaceCellsText(aReplaceCells, options);
+			if (0 > aReplaceCells.length)
+				return callback(options);
+
+			return this._replaceCellsText(aReplaceCells, options, lockDraw, callback);
 		};
 
-		WorksheetView.prototype._replaceCellsText = function (aReplaceCells, options) {
+		WorksheetView.prototype._replaceCellsText = function (aReplaceCells, options, lockDraw, callback) {
 			var findFlags = "g"; // Заменяем все вхождения
 			if (true !== options.isMatchCase)
 				findFlags += "i"; // Не чувствителен к регистру
@@ -9825,27 +9823,17 @@
 				.replace( /(~\*)/g, "\\*" ).replace( /(~\?)/g, "\\?" );
 			valueForSearching = new RegExp(valueForSearching, findFlags);
 
-			History.Create_NewPoint();
-			History.StartTransaction();
-
 			options.indexInArray = 0;
 			options.countFind = aReplaceCells.length;
 			options.countReplace = 0;
-			this._replaceCellText(aReplaceCells, valueForSearching, options);
+			this._replaceCellText(aReplaceCells, valueForSearching, options, lockDraw, callback);
 		};
 
-		WorksheetView.prototype._replaceCellText = function (aReplaceCells, valueForSearching, options) {
+		WorksheetView.prototype._replaceCellText = function (aReplaceCells, valueForSearching, options,
+															 lockDraw, callback) {
 			var t = this;
-			if (options.indexInArray >= aReplaceCells.length) {
-				History.EndTransaction();
-				if (options.isReplaceAll) {
-					// Завершаем медленную операцию
-					t.handlers.trigger("slowOperation", false);
-				}
-
-				t.handlers.trigger("onRenameCellTextEnd", options.countFind, options.countReplace);
-				return;
-			}
+			if (options.indexInArray >= aReplaceCells.length)
+				return callback(options);
 
 			var onReplaceCallback = function (isSuccess) {
 				var cell = aReplaceCells[options.indexInArray];
@@ -9869,15 +9857,18 @@
 						newValue = [];
 						newValue[0] = new Fragment({text: cellValue, format: v[0].format.clone()});
 
+						// ToDo для неактивных листов не делать отрисовку
 						t._saveCellValueAfterEdit(oCellEdit, c, newValue, /*flags*/undefined, /*skipNLCheck*/false,
-							/*isNotHistory*/true);
+							/*isNotHistory*/true, lockDraw);
 					}
 				}
 
-				window.setTimeout(function () {t._replaceCellText(aReplaceCells, valueForSearching, options)}, 1);
+				window.setTimeout(function () {
+					t._replaceCellText(aReplaceCells, valueForSearching, options, lockDraw, callback);
+				}, 1);
 			};
 
-			this._isLockedCells (aReplaceCells[options.indexInArray], /*subType*/null, onReplaceCallback);
+			return this._isLockedCells (aReplaceCells[options.indexInArray], /*subType*/null, onReplaceCallback);
 		};
 
 		WorksheetView.prototype.findCell = function (reference) {
@@ -10056,7 +10047,8 @@
 			return mergedRange ? mergedRange : asc_Range(col, row, col, row);
 		};
 
-		WorksheetView.prototype._saveCellValueAfterEdit = function (oCellEdit, c, val, flags, skipNLCheck, isNotHistory) {
+		WorksheetView.prototype._saveCellValueAfterEdit = function (oCellEdit, c, val, flags, skipNLCheck,
+																	isNotHistory, lockDraw) {
 			var t = this;
 			var oldMode = t.isFormulaEditMode;
 			t.isFormulaEditMode = false;
@@ -10100,7 +10092,7 @@
 					c.setWrap(true);
 
 				// Для формулы обновление будет в коде рассчета формулы
-				t._updateCellsRange(oCellEdit, /*canChangeColWidth*/c_oAscCanChangeColWidth.numbers);
+				t._updateCellsRange(oCellEdit, /*canChangeColWidth*/c_oAscCanChangeColWidth.numbers, lockDraw);
 			}
 
 			if (!isNotHistory) {
@@ -10280,7 +10272,8 @@
 				autoCompleteLC: arrAutoCompleteLC,
 				saveValueCallback: function (val, flags, skipNLCheck) {
 					var oCellEdit = isMerged ? new asc_Range(mc.c1, mc.r1, mc.c1, mc.r1) : new asc_Range(col, row, col, row);
-					return t._saveCellValueAfterEdit(oCellEdit, c, val, flags, skipNLCheck, /*isNotHistory*/false);
+					return t._saveCellValueAfterEdit(oCellEdit, c, val, flags,
+						skipNLCheck, /*isNotHistory*/false, /*lockDraw*/false);
 				}
 			});
 			return true;

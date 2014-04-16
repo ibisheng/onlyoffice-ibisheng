@@ -1263,6 +1263,9 @@
 			this.indexInArray = 0;
 			this.countFind = 0;
 			this.countReplace = 0;
+			this.countFindAll = 0;
+			this.countReplaceAll = 0;
+			this.sheetIndex = -1;
 		}
 		asc_CFindOptions.prototype.clone = function () {
 			var result = new asc_CFindOptions();
@@ -1281,6 +1284,9 @@
 			result.indexInArray = this.indexInArray;
 			result.countFind = this.countFind;
 			result.countReplace = this.countReplace;
+			result.countFindAll = this.countFindAll;
+			result.countReplaceAll = this.countReplaceAll;
+			result.sheetIndex = this.sheetIndex;
 			return result;
 		};
 		asc_CFindOptions.prototype.isEqual = function (obj) {
@@ -1288,6 +1294,10 @@
 				this.scanForward === obj.scanForward && this.isMatchCase === obj.isMatchCase &&
 				this.isWholeCell === obj.isWholeCell && this.scanOnOnlySheet === obj.scanOnOnlySheet &&
 				this.lookIn === obj.lookIn;
+		};
+		asc_CFindOptions.prototype.updateFindAll = function () {
+			this.countFindAll += this.countFind;
+			this.countReplaceAll += this.countReplace;
 		};
 
 		/*

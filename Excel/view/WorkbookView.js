@@ -103,6 +103,7 @@
 
 			this.lastFindOptions = null;	// Последний поиск (параметры)
 			this.lastFindResults = {};		// Результаты поиска (для поиска по всей книге, чтобы перейти на другой лист)
+			this.fReplaceCallback = null;	// Callback для замены текста
 
 			this._lockDraw = false;
 
@@ -463,6 +464,8 @@
 			this.clipboard.init();
 
 			this.formulasList = getFormulasInfo();
+
+			this.fReplaceCallback = function () {self._replaceCellTextCallback.apply(self, arguments);};
 
             if (this.Api.isMobileVersion){
                 this.MobileTouchManager = new CMobileTouchManager();
@@ -1627,56 +1630,59 @@
 			if (ws.getCellEditMode())
 				this._onStopCellEditing();
 			var result = ws.findCellText(options);
-			if (result) {
-				if (false === options.scanOnOnlySheet) {
-					// Поиск по всей книге
-					var key = result.c1 + "-" + result.r1;
-					if (options.isEqual(this.lastFindOptions)) {
-						if (this.lastFindResults[key]) {
-							// Мы уже находили данную ячейку, попробуем на другом листе
-							var i, active = this.model.getActive(), start = 0, end = this.model.getWorksheetCount();
-							var inc = options.scanForward ? +1 : -1;
-							var tmpWs, tmpResult = null;
-							for (i = active + inc; i < end && i >= start; i += inc) {
+			if (false === options.scanOnOnlySheet) {
+				// Поиск по всей книге
+				var key = result ? (result.c1 + "-" + result.r1) : null;
+				if (null === key || options.isEqual(this.lastFindOptions)) {
+					if (null === key || this.lastFindResults[key]) {
+						// Мы уже находили данную ячейку, попробуем на другом листе
+						var i, active = this.model.getActive(), start = 0, end = this.model.getWorksheetCount();
+						var inc = options.scanForward ? +1 : -1;
+						var tmpWs, tmpResult = null;
+						for (i = active + inc; i < end && i >= start; i += inc) {
+							tmpWs = this.getWorksheet(i);
+							tmpResult = tmpWs.findCellText(options);
+							if (tmpResult)
+								break;
+						}
+						if (!tmpResult) {
+							// Мы дошли до конца или начала (в зависимости от направления, теперь пойдем до активного)
+							if (options.scanForward) {
+								i = 0; end = active;
+							} else {
+								i = end - 1;
+								start = active + 1;
+							}
+							inc *= -1;
+							for (; i < end && i >= start; i += inc) {
 								tmpWs = this.getWorksheet(i);
 								tmpResult = tmpWs.findCellText(options);
 								if (tmpResult)
 									break;
 							}
-							if (!tmpResult) {
-								// Мы дошли до конца или начала (в зависимости от направления, теперь пойдем до активного)
-								if (options.scanForward) {
-									i = 0; end = active;
-								} else {
-									i = end - 1;
-									start = active + 1;
-								}
-								inc *= -1;
-								for (; i < end && i >= start; i += inc) {
-									tmpWs = this.getWorksheet(i);
-									tmpResult = tmpWs.findCellText(options);
-									if (tmpResult)
-										break;
-								}
-							}
-
-							if (tmpResult) {
-								ws = tmpWs;
-								result = tmpResult;
-								this.showWorksheet(i);
-								key = result.c1 + "-" + result.r1;
-							}
-
-							this.lastFindResults = {};
 						}
+
+						if (tmpResult) {
+							ws = tmpWs;
+							result = tmpResult;
+							this.showWorksheet(i);
+							// Посылаем эвент о смене активного листа
+							this.handlers.trigger ("asc_onActiveSheetChanged", i);
+							key = result.c1 + "-" + result.r1;
+						}
+
+						this.lastFindResults = {};
 					}
+				}
+				if (null !== key) {
 					this.lastFindOptions = options.clone();
 					this.lastFindResults[key] = true;
-				} else
-					this._cleanFindResults();
+				}
+			}
+
+			if (result)
 				return ws._setActiveCell(result.c1, result.r1);
-			} else
-				this._cleanFindResults();
+			this._cleanFindResults();
 			return null;
 		};
 
@@ -1686,7 +1692,41 @@
 			// Останавливаем ввод данных в редакторе ввода
 			if (ws.getCellEditMode())
 				this._onStopCellEditing();
-			ws.replaceCellText(options);
+
+			History.Create_NewPoint();
+			History.StartTransaction();
+
+			if (options.isReplaceAll) {
+				// На ReplaceAll ставим медленную операцию
+				this.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction,
+					c_oAscAsyncAction.SlowOperation);
+			}
+
+			ws.replaceCellText(options, false, this.fReplaceCallback);
+		};
+		WorkbookView.prototype._replaceCellTextCallback = function (options) {
+			options.updateFindAll();
+			if (!options.scanOnOnlySheet && options.isReplaceAll) {
+				// Замена на всей книге
+				var i = ++options.sheetIndex;
+				if (this.model.getActive() === i)
+					i = ++options.sheetIndex;
+
+				if (i < this.model.getWorksheetCount()) {
+					var ws = this.getWorksheet(i);
+					ws.replaceCellText(options, true, this.fReplaceCallback);
+					return;
+				}
+			}
+
+			this.handlers.trigger("asc_onRenameCellTextEnd", options.countFindAll, options.countReplaceAll);
+
+			History.EndTransaction();
+			if (options.isReplaceAll) {
+				// Заканчиваем медленную операцию
+				this.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction,
+					c_oAscAsyncAction.SlowOperation);
+			}
 		};
 
 		// Поиск ячейки по ссылке
