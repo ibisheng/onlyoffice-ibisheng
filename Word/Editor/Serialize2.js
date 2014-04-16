@@ -367,41 +367,11 @@ var c_oSerPoint2D = {
 	X: 0,
 	Y: 1
 };
-var c_oSerBorderType = {
-    Color:0,
-    Space:1,
-    Size:2,
-    Value:3
-};
-var c_oSerShdType = {
-    Value:0,
-    Color:1
-};
-var c_oSerPaddingType = {
-    left:0,
-    top:1,
-    right:2,
-    bottom:3
-};
 var c_oSerMarginsType = {
     left:0,
     top:1,
     right:2,
     bottom:3
-};
-var c_oSerBordersType = {
-    left:0,
-    top:1,
-    right:2,
-    bottom:3,
-    insideV:4,
-    insideH:5,
-    start:6,
-    end:7,
-    tl2br:8,
-    tr2bl:9,
-    bar:10,
-    between:11
 };
 var c_oSerWidthType = {
     Type:0,
@@ -665,8 +635,6 @@ var ETblLayoutType = {
 	tbllayouttypeAutofit: 1,
 	tbllayouttypeFixed: 2
 };
-var g_nodeAttributeStart = 0xFA;
-var g_nodeAttributeEnd	= 0xFB;
 
 var g_sErrorCharCountMessage = "g_sErrorCharCountMessage";
 var g_nErrorCharCount = 30000;
@@ -5264,6 +5232,123 @@ function BinaryFileReader(doc, openParams)
 
         this.Document.On_EndLoad();
     };
+    this.ReadFromString = function (sBase64) {
+        //надо сбросить то, что остался после открытия документа
+        window.global_pptx_content_loader.Clear();
+        window.global_pptx_content_loader.Start_UseFullUrl();
+        var openParams = { checkFileSize: false, charCount: 0, parCount: 0 };
+        var oBinaryFileReader = new BinaryFileReader(this.Document, openParams);
+        oBinaryFileReader.stream = oBinaryFileReader.getbase64DecodedData(sBase64);
+        oBinaryFileReader.ReadMainTable();
+        var oReadResult = oBinaryFileReader.oReadResult;
+        //обрабатываем списки
+        for (var i in oReadResult.numToNumClass) {
+            var oNumClass = oReadResult.numToNumClass[i];
+            var documentANum = this.Document.Numbering.AbstractNum;
+            //проверка на уже существующий такой же AbstractNum
+            var isAlreadyContains = false;
+            for (var n in documentANum) {
+                var isEqual = documentANum[n].isEqual(oNumClass);
+                if (isEqual == true) {
+                    isAlreadyContains = true;
+                    break;
+                }
+            }
+            if (!isAlreadyContains) {
+                this.Document.Numbering.Add_AbstractNum(oNumClass);
+            }
+            else
+                oReadResult.numToNumClass[i] = documentANum[n];
+
+        }
+        for (var i = 0, length = oReadResult.paraNumPrs.length; i < length; ++i) {
+            var numPr = oReadResult.paraNumPrs[i];
+            var oNumClass = oReadResult.numToNumClass[numPr.NumId];
+            if (null != oNumClass)
+                numPr.NumId = oNumClass.Get_Id();
+            else
+                numPr.NumId = 0;
+        }
+        //обрабатываем стили
+        var isAlreadyContainsStyle;
+        var oStyleTypes = { par: 1, table: 2, lvl: 3 };
+        var addNewStyles = false;
+        var fParseStyle = function (aStyles, oDocumentStyles, oReadResult, nStyleType) {
+            if (aStyles == undefined)
+                return;
+            for (var i = 0, length = aStyles.length; i < length; ++i) {
+                var elem = aStyles[i];
+                var stylePaste = oReadResult.styles[elem.style];
+                var isEqualName = null;
+                if (null != stylePaste && null != stylePaste.style) {
+                    for (var j in oDocumentStyles.Style) {
+                        var styleDoc = oDocumentStyles.Style[j];
+                        isAlreadyContainsStyle = styleDoc.isEqual(stylePaste.style);
+                        if (styleDoc.Name == stylePaste.style.Name)
+                            isEqualName = j;
+                        if (isAlreadyContainsStyle) {
+                            if (oStyleTypes.par == nStyleType)
+                                elem.pPr.PStyle = j;
+                            else if (oStyleTypes.table == nStyleType)
+                                elem.pPr.Set_TableStyle2(j);
+                            else
+                                elem.pPr.PStyle = j;
+                            break;
+                        }
+                    }
+                    if (!isAlreadyContainsStyle && isEqualName != null)//если нашли имя такого же стиля
+                    {
+                        if (nStyleType == oStyleTypes.par || nStyleType == oStyleTypes.lvl)
+                            elem.pPr.PStyle = isEqualName;
+                        else if (nStyleType == oStyleTypes.table)
+                            elem.pPr.Set_TableStyle2(isEqualName);
+                    }
+                    else if (!isAlreadyContainsStyle && isEqualName == null)//нужно добавить новый стиль
+                    {
+                        //todo править и BaseOn
+                        var nStyleId = oDocumentStyles.Add(stylePaste.style);
+                        if (nStyleType == oStyleTypes.par || nStyleType == oStyleTypes.lvl)
+                            elem.pPr.PStyle = nStyleId;
+                        else if (nStyleType == oStyleTypes.table)
+                            elem.pPr.Set_TableStyle2(nStyleId);
+                        addNewStyles = true;
+                    }
+                }
+            }
+        }
+
+        fParseStyle(oBinaryFileReader.oReadResult.paraStyles, this.Document.Styles, oBinaryFileReader.oReadResult, oStyleTypes.par);
+        fParseStyle(oBinaryFileReader.oReadResult.tableStyles, this.Document.Styles, oBinaryFileReader.oReadResult, oStyleTypes.table);
+        fParseStyle(oBinaryFileReader.oReadResult.lvlStyles, this.Document.Styles, oBinaryFileReader.oReadResult, oStyleTypes.lvl);
+        var aContent = oBinaryFileReader.oReadResult.DocumentContent;
+        for (var i = 0, length = oBinaryFileReader.oReadResult.aPostOpenStyleNumCallbacks.length; i < length; ++i)
+            oBinaryFileReader.oReadResult.aPostOpenStyleNumCallbacks[i].call();
+        var bInBlock;
+        if (oReadResult.bLastRun)
+            bInBlock = false;
+        else
+            bInBlock = true;
+        //создаем список используемых шрифтов
+        var AllFonts = {};
+        this.Document.Numbering.Document_Get_AllFontNames(AllFonts);
+        this.Document.Styles.Document_Get_AllFontNames(AllFonts);
+        for (var Index = 0, Count = aContent.length; Index < Count; Index++)
+            aContent[Index].Document_Get_AllFontNames(AllFonts);
+        var aPrepeareFonts = [];
+        for (var i in AllFonts)
+            aPrepeareFonts.push(new CFont(i, 0, "", 0));
+        //создаем список используемых картинок
+        var oPastedImagesUnique = {};
+        var aPastedImages = window.global_pptx_content_loader.End_UseFullUrl();
+        for (var i = 0, length = aPastedImages.length; i < length; ++i) {
+            var elem = aPastedImages[i];
+            oPastedImagesUnique[elem.Url] = 1;
+        }
+        var aPrepeareImages = [];
+        for (var i in oPastedImagesUnique)
+            aPrepeareImages.push(i);
+        return { content: aContent, fonts: aPrepeareFonts, images: aPrepeareImages, bAddNewStyles: addNewStyles, aPastedImages: aPastedImages, bInBlock: bInBlock };
+    }
 };
 function BinaryStyleTableReader(doc, oReadResult, stream)
 {

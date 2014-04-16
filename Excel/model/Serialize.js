@@ -1,4 +1,5 @@
 ﻿"use strict";
+(function($, window, undefined) {
 
 /** @enum */
 var c_oSerFormat = {
@@ -293,19 +294,6 @@ var c_oSer_CalcChainType =
     Ref: 4,
     ChildChain: 5,
     NewThread: 6
-};
-/** @enum */
-var c_oSer_ColorObjectType =
-{
-    Rgb: 0,
-    Type: 1,
-	Theme: 2,
-	Tint: 3
-};
-/** @enum */
-var c_oSer_ColorType =
-{
-    Auto: 0
 };
 /** @enum */
 var  c_oSer_PageMargins =
@@ -956,9 +944,6 @@ var DocumentPageSize = new function() {
         return this.oSizes[8];//A4
     };
 };
-
-var g_nodeAttributeStart = 0xFA;
-var g_nodeAttributeEnd	= 0xFB;
 
 /** @constructor */
 function BinaryTableWriter(memory, aDxfs, isCopyPaste)
@@ -7573,3 +7558,30 @@ function ReadDefCellStyles(wb, oOutput)
 		g_oDefaultXfId = 0;
 	}
 }
+
+window["Asc"].c_oSerFormat = c_oSerFormat;
+window["Asc"].EBorderStyle = EBorderStyle;
+window["Asc"].EUnderline = EUnderline;
+window["Asc"].EVerticalAlignRun = EVerticalAlignRun;
+window["Asc"].ECellAnchorType = ECellAnchorType;
+window["Asc"].EVisibleType = EVisibleType;
+window["Asc"].EHorizontalAlignment = EHorizontalAlignment;
+window["Asc"].EVerticalAlignment = EVerticalAlignment;
+window["Asc"].ECellTypeType = ECellTypeType;
+window["Asc"].ECellFormulaType = ECellFormulaType;
+window["Asc"].EPageOrientation = EPageOrientation;
+window["Asc"].EPageSize = EPageSize;
+window["Asc"].ETotalsRowFunction = ETotalsRowFunction;
+window["Asc"].ESortBy = ESortBy;
+window["Asc"].ECustomFilter = ECustomFilter;
+window["Asc"].EDateTimeGroup = EDateTimeGroup;
+window["Asc"].ETableStyleType = ETableStyleType;
+window["Asc"].EFontScheme = EFontScheme;
+
+window["Asc"].CTableStyles = CTableStyles;
+window["Asc"].CTableStyle = CTableStyle;
+window["Asc"].CTableStyleElement = CTableStyleElement;
+window["Asc"].BinaryFileReader = BinaryFileReader;
+window["Asc"].BinaryFileWriter = BinaryFileWriter;
+}
+)(jQuery, window);

@@ -1035,7 +1035,7 @@ function Workbook(sUrlPath, eventsHandlers, oApi){
 	this.oRealDefinedNames = {};
 	this.oNameGenerator = new NameGenerator(this);
 	this.CellStyles = new CCellStyles();
-	this.TableStyles = new CTableStyles();
+	this.TableStyles = new Asc.CTableStyles();
 	this.oStyleManager = new StyleManager();
 	this.calcChain = [];
 	this.aComments = [];	// Комментарии к документу
@@ -1648,7 +1648,7 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 					var sChange = aChanges[i];
 					if(sFontMapString != sChange.substring(0, sFontMapString.length))
 					{
-						var oBinaryFileReader = new BinaryFileReader();
+					    var oBinaryFileReader = new Asc.BinaryFileReader();
 						nCurOffset = oBinaryFileReader.getbase64DecodedData2(sChange, aIndexes[i], stream, nCurOffset);
 						var item = new UndoRedoItemSerializable();
 						item.Deserialize(stream);
@@ -1922,7 +1922,7 @@ Woorksheet.prototype.init=function(){
 			*/
 			if(null != oCell.oFormulaExt)
 			{
-				if( oCell.oFormulaExt.t == ECellFormulaType.cellformulatypeShared ){
+			    if (oCell.oFormulaExt.t == Asc.ECellFormulaType.cellformulatypeShared) {
 					if(null != oCell.oFormulaExt.si){
 						if(null != oCell.oFormulaExt.ref){
 							formulaShared[oCell.oFormulaExt.si] = 	{
@@ -4664,7 +4664,7 @@ Range.prototype.setValue2=function(array){
 	var oBBox = this.bbox;
 	History.StartTransaction();
 	var wb = this.worksheet.workbook, ws = this.worksheet, ar =[];
-	//[{"text":"qwe","format":{"b":true, "i":false, "u":EUnderline.underlineNone, "s":false, "fn":"Arial", "fs": 12, "c": 0xff00ff, "va": "subscript"  }},{}...]
+    //[{"text":"qwe","format":{"b":true, "i":false, "u":Asc.EUnderline.underlineNone, "s":false, "fn":"Arial", "fs": 12, "c": 0xff00ff, "va": "subscript"  }},{}...]
 	var oThis = this;
 	/*
 		Устанавливаем значение в Range ячеек. В отличае от setValue, сюда мы попадаем только в случае ввода значения отличного от формулы. Таким образом, если в ячейке была формула, то для нее в графе очищается список ячеек от которых зависела. После чего выставляем флаг о необходимости пересчета.
@@ -5386,7 +5386,7 @@ Range.prototype.getValueWithFormat=function(){
 		return "";
 };
 Range.prototype.getValue2=function(dDigitsCount, fIsFitMeasurer){
-	//[{"text":"qwe","format":{"b":true, "i":false, "u":EUnderline.underlineNone, "s":false, "fn":"Arial", "fs": 12, "c": 0xff00ff, "va": "subscript"  }},{}...]
+    //[{"text":"qwe","format":{"b":true, "i":false, "u":Asc.EUnderline.underlineNone, "s":false, "fn":"Arial", "fs": 12, "c": 0xff00ff, "va": "subscript"  }},{}...]
 	var nRow0 = this.bbox.r1;
 	var nCol0 = this.bbox.c1;
 	var cell = this.worksheet._getCellNoEmpty(this.bbox.r1, this.bbox.c1);
@@ -6416,7 +6416,7 @@ Range.prototype.setHyperlink=function(val, bWithoutStyle){
 			var oHyperlinkFont = new Font();
 			oHyperlinkFont.fn = this.worksheet.workbook.getDefaultFont();
 			oHyperlinkFont.fs = this.worksheet.workbook.getDefaultSize();
-			oHyperlinkFont.u = EUnderline.underlineSingle;
+			oHyperlinkFont.u = Asc.EUnderline.underlineSingle;
 			oHyperlinkFont.c = g_oColorManager.getThemeColor(g_nColorHyperlink);
 			this.setFont(oHyperlinkFont);
 		}

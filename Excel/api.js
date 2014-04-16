@@ -483,7 +483,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_LoadEmptyDocument: function () {
 				
 				var emptyWorkbook = getEmptyWorkbook() + "";
-				if	( emptyWorkbook.length && (c_oSerFormat.Signature === emptyWorkbook.substring(0, c_oSerFormat.Signature.length)) ) {
+				if (emptyWorkbook.length && (Asc.c_oSerFormat.Signature === emptyWorkbook.substring(0, Asc.c_oSerFormat.Signature.length))) {
 					this.isChartEditor = true;
 					var wb = this.asc_OpenDocument("", emptyWorkbook);
 					
@@ -496,7 +496,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				var wb = new Workbook(url, this.handlers, this);
 				this.initGlobalObjects(wb);
 				this.wbModel = wb;
-				var oBinaryFileReader = new BinaryFileReader(url);
+				var oBinaryFileReader = new Asc.BinaryFileReader(url);
 				oBinaryFileReader.Read(data, wb);
 				g_oIdCounter.Set_Load(false);
 				return wb;
@@ -841,7 +841,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 												url = sJsonUrl.substring(0, nIndex + 1);
 											else
 												url = sJsonUrl;
-											if( c_oSerFormat.Signature === result.substring(0, c_oSerFormat.Signature.length))
+											if (Asc.c_oSerFormat.Signature === result.substring(0, Asc.c_oSerFormat.Signature.length))
 											{
 												var wb = oThis.asc_OpenDocument(url, result);
 												if (callback)
@@ -1000,7 +1000,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
             _OfflineAppDocumentEndLoad: function (sUrlPath, fCallback) {
                 var data = getTestWorkbook();
                 var sData = data + "";
-                if (c_oSerFormat.Signature === sData.substring(0, c_oSerFormat.Signature.length)) {
+                if (Asc.c_oSerFormat.Signature === sData.substring(0, Asc.c_oSerFormat.Signature.length)) {
                     var wb = this.asc_OpenDocument(sUrlPath, sData);
                     fCallback({returnCode: 0, val:wb});
                 }
@@ -1043,7 +1043,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			_asc_save: function () {
 				var that = this;
 				this.wb._initCommentsToSave();
-				var oBinaryFileWriter = new BinaryFileWriter(this.wbModel);
+				var oBinaryFileWriter = new Asc.BinaryFileWriter(this.wbModel);
 				var data = oBinaryFileWriter.Write();
 				var oAdditionalData = {};
 				oAdditionalData["c"] = "save";
@@ -1119,7 +1119,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					return this._asc_sendCommand (fCallback, v);
 				} else {
 					this.wb._initCommentsToSave();
-					var oBinaryFileWriter = new BinaryFileWriter(this.wbModel);
+					var oBinaryFileWriter = new Asc.BinaryFileWriter(this.wbModel);
 					oAdditionalData["savetype"] = "completeall";
 					if (c_oAscFileType.CSV === sFormat) {
 						if (options instanceof asc.asc_CCSVAdvancedOptions) {
@@ -2513,7 +2513,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			// Для вставки диаграмм в Word
 			asc_getBinaryFileWriter: function() {
 				this.wb._initCommentsToSave();
-				return new BinaryFileWriter(this.wbModel);
+				return new Asc.BinaryFileWriter(this.wbModel);
 			},
 			
 			asc_getWordChartObject: function() {
@@ -2792,7 +2792,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellUnderline )
 					ws.objectRender.controller.setCellUnderline(isUnderline);
 				else {
-					this.wb.setFontAttributes("u", isUnderline ? EUnderline.underlineSingle : EUnderline.underlineNone);
+				    this.wb.setFontAttributes("u", isUnderline ? Asc.EUnderline.underlineSingle : Asc.EUnderline.underlineNone);
 					this.wb.restoreFocus();
 				}
 			},
@@ -3257,7 +3257,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                             oAdditionalData["outputformat"] = sFormat;
 
                             t.wb._initCommentsToSave();
-                            var oBinaryFileWriter = new BinaryFileWriter(t.wbModel);
+                            var oBinaryFileWriter = new Asc.BinaryFileWriter(t.wbModel);
                             oAdditionalData["savetype"] = "completeall";
 
                             var data = oBinaryFileWriter.Write();
@@ -3302,7 +3302,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                 function loadDocument (data) {
 
                     var workbook = data;
-                    if (!data || c_oSerFormat.Signature !== data.substring(0, c_oSerFormat.Signature.length)) {
+                    if (!data || Asc.c_oSerFormat.Signature !== data.substring(0, Asc.c_oSerFormat.Signature.length)) {
                         workbook = "XLSY;v1;1001;BAKAAgAAAwwDAAAEHwMAAADgAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIgAAAAAHgAAAAEZAAAAAAAAAAABAAAAAAIAAAAABAAAAAAFAAAAAAIdAAAAAxgAAAAGBAAAAAAHBAAAAAAIBAAAAAAJBAAAAAAECgAAAAUAAAAABQAAAAAGLwAAAAcqAAAAAQYGAAAAAAQAAAD/BAYOAAAAQwBhAGwAaQBiAHIAaQAGBQAAAAAAACZADwAAAAAAAAAAAQUAAAACAAAAAL0AAAAAOgAAAAEYAAAAAAYMAAAAUwBoAGUAZQB0ADEAAQQBAAAABAQAAABBADEACwoAAAABBQAAAAAAAC5ACQAAAAAAOgAAAAEYAAAAAAYMAAAAUwBoAGUAZQB0ADIAAQQCAAAABAQAAABBADEACwoAAAABBQAAAAAAAC5ACQAAAAAAOgAAAAEYAAAAAAYMAAAAUwBoAGUAZQB0ADMAAQQDAAAABAQAAABBADEACwoAAAABBQAAAAAAAC5ACQAAAAAFAAAAAAAAAAA=";
                     }
 					var wb = t.asc_OpenDocument("", workbook);
@@ -3389,7 +3389,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                 this.wbModel = new Workbook(this.DocumentUrl, this.handlers, this);   
                 this.initGlobalObjects(this.wbModel);
                 
-                var oBinaryFileReader = new BinaryFileReader(this.DocumentUrl);
+                var oBinaryFileReader = new Asc.BinaryFileReader(this.DocumentUrl);
                 oBinaryFileReader.Read(base64File, this.wbModel);
                 g_oIdCounter.Set_Load(false);
 
@@ -3419,7 +3419,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_nativeGetFile : function()
 			{
 			    this.wb._initCommentsToSave();
-		        var oBinaryFileWriter = new BinaryFileWriter(this.wbModel);
+			    var oBinaryFileWriter = new Asc.BinaryFileWriter(this.wbModel);
 		        return oBinaryFileWriter.Write();
 			},
 			

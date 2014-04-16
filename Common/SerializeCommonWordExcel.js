@@ -23,6 +23,47 @@ var c_oSerPropLenType = {
     Double:5,
     Variable:6
 };
+var c_oSer_ColorObjectType =
+{
+    Rgb: 0,
+    Type: 1,
+    Theme: 2,
+    Tint: 3
+};
+var c_oSer_ColorType =
+{
+    Auto: 0
+};
+var c_oSerBorderType = {
+    Color: 0,
+    Space: 1,
+    Size: 2,
+    Value: 3
+};
+var c_oSerBordersType = {
+    left: 0,
+    top: 1,
+    right: 2,
+    bottom: 3,
+    insideV: 4,
+    insideH: 5,
+    start: 6,
+    end: 7,
+    tl2br: 8,
+    tr2bl: 9,
+    bar: 10,
+    between: 11
+};
+var c_oSerPaddingType = {
+    left: 0,
+    top: 1,
+    right: 2,
+    bottom: 3
+};
+var c_oSerShdType = {
+    Value: 0,
+    Color: 1
+};
 
 var g_tabtype_left = 0;
 var g_tabtype_right = 1;

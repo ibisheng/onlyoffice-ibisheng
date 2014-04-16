@@ -289,7 +289,7 @@
 						this.lStorage.htmlInShape = text;
 					else
 					{
-						var oBinaryFileWriter = new BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
+					    var oBinaryFileWriter = new Asc.BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
 						var sBase64 = oBinaryFileWriter.Write();
 						if(this.element.children && this.element.children.length == 1 /*&& window.USER_AGENT_SAFARI_MACOS*/)
 						{
@@ -383,7 +383,7 @@
 					{
 						var  table = t._makeTableNode(range, worksheet, isCut);
 						t.copyText = t._getTextFromTable(table);
-						var oBinaryFileWriter = new BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
+						var oBinaryFileWriter = new Asc.BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
 						var sBase64 = oBinaryFileWriter.Write();
 						t.lStorage = sBase64;
 					}
@@ -1143,7 +1143,7 @@
                 oNewItem.format.b = (jqSpanObject.css('font-weight') == 'bold');
                 oNewItem.format.i = (jqSpanObject.css('font-style') == 'italic');
                 oNewItem.format.u = (jqSpanObject.css('text-decoration') == 'underline') ?
-                    EUnderline.underlineSingle : EUnderline.underlineNone;
+                    Asc.EUnderline.underlineSingle : Asc.EUnderline.underlineNone;
                 oNewItem.format.s = (jqSpanObject.css('text-decoration') == 'line-through');
 				
 				if (jqSpanObject.css('vertical-align') != null)
@@ -1570,7 +1570,7 @@
 					}
 					if(base64 != null)
 					{
-						var oBinaryFileReader = new BinaryFileReader(null, true);
+					    var oBinaryFileReader = new Asc.BinaryFileReader(null, true);
 						var tempWorkbook = new Workbook;
 						oBinaryFileReader.Read(base64, tempWorkbook);
 						this.activeRange = oBinaryFileReader.copyPasteObj.activeRange;
@@ -2281,7 +2281,7 @@
 
 				function getTextDecoration(format) {
 					var res = [];
-					if (EUnderline.underlineNone !== format.u) {res.push("underline");}
+					if (Asc.EUnderline.underlineNone !== format.u) { res.push("underline"); }
 					if (format.s) {res.push("line-through");}
 					return res.length > 0 ? res.join(",") : "";
 				}
@@ -2832,7 +2832,7 @@
 									c: colorText,
 									b: fb.indexOf("bold") >= 0 || parseInt(fb, 10) > 500,
 									i: fi.indexOf("italic") >= 0,
-									u: td.indexOf("underline") >= 0 ? EUnderline.underlineSingle : EUnderline.underlineNone,
+									u: td.indexOf("underline") >= 0 ? Asc.EUnderline.underlineSingle : Asc.EUnderline.underlineNone,
 									s: td.indexOf("line-through") >= 0,
 									va: va.indexOf("sub") >=0 ? "subscript" : va.indexOf("sup") >=0 ? "superscript" : "none"
 								},
@@ -2851,7 +2851,7 @@
 											c: colorText,
 											b: fb.indexOf("bold") >= 0 || parseInt(fb, 10) > 500,
 											i: fi.indexOf("italic") >= 0,
-											u: td.indexOf("underline") >= 0 ? EUnderline.underlineSingle : EUnderline.underlineNone,
+											u: td.indexOf("underline") >= 0 ? Asc.EUnderline.underlineSingle : Asc.EUnderline.underlineNone,
 											s: td.indexOf("line-through") >= 0,
 											va: va.indexOf("sub") >=0 ? "subscript" : va.indexOf("sup") >=0 ? "superscript" : "none"
 										},

@@ -1082,7 +1082,7 @@
 				case "u":
 					// ToDo для двойного подчеркивания нужно будет немного переделать схему
 					val = !(selectionInfo.asc_getFont().asc_getUnderline());
-					val = val ? EUnderline.underlineSingle : EUnderline.underlineNone;
+					val = val ? Asc.EUnderline.underlineSingle : Asc.EUnderline.underlineNone;
 					break;
 				case "s":
 					val = !(selectionInfo.asc_getFont().asc_getStrikeout());

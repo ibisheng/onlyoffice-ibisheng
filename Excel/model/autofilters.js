@@ -3104,22 +3104,22 @@ var gUndoInsDelCellsFlag = true;
 						result[s] = checkComplexSymbols;
 					else
 					{
-						if(arrLog[s] == ECustomFilter.customfilterEqual || arrLog[s] == ECustomFilter.customfilterNotEqual)//общие для числа и текста
+					    if (arrLog[s] == Asc.ECustomFilter.customfilterEqual || arrLog[s] == Asc.ECustomFilter.customfilterNotEqual)//общие для числа и текста
 						{
 							val = val.toString();
 							filterVal = valLog[s].toString();
-							if(arrLog[s] == ECustomFilter.customfilterEqual)//equals
+							if (arrLog[s] == Asc.ECustomFilter.customfilterEqual)//equals
 							{
 								if(val == filterVal || valWithFormat == filterVal)
 									result[s] = true;
 							}
-							else if(arrLog[s] == ECustomFilter.customfilterNotEqual)//doesNotEqual
+							else if (arrLog[s] == Asc.ECustomFilter.customfilterNotEqual)//doesNotEqual
 							{
 								if(val != filterVal || valWithFormat != filterVal)
 									result[s] = true;
 							}
 						}
-						else if(arrLog[s] == ECustomFilter.customfilterGreaterThan || arrLog[s] == ECustomFilter.customfilterGreaterThanOrEqual || arrLog[s] == ECustomFilter.customfilterLessThan || arrLog[s] == ECustomFilter.customfilterLessThanOrEqual)//только для чисел
+					    else if (arrLog[s] == Asc.ECustomFilter.customfilterGreaterThan || arrLog[s] == Asc.ECustomFilter.customfilterGreaterThanOrEqual || arrLog[s] == Asc.ECustomFilter.customfilterLessThan || arrLog[s] == Asc.ECustomFilter.customfilterLessThanOrEqual)//только для чисел
 						{
 							filterVal =  parseFloat(valLog[s]);
 							if(g_oFormatParser && g_oFormatParser.parse && g_oFormatParser.parse(valLog[s]) != null)
@@ -3130,19 +3130,19 @@ var gUndoInsDelCellsFlag = true;
 							{
 								switch (arrLog[s])
 								{
-									case ECustomFilter.customfilterGreaterThan:
+								    case Asc.ECustomFilter.customfilterGreaterThan:
 										if(val > filterVal)//isGreaterThan
 											result[s] = true;
 										break;
-									case ECustomFilter.customfilterGreaterThanOrEqual: 
+								    case Asc.ECustomFilter.customfilterGreaterThanOrEqual:
 										if(val >= filterVal)//isGreaterThanOrEqualTo
 											result[s] = true;
 										break;
-									case ECustomFilter.customfilterLessThan: 
+								    case Asc.ECustomFilter.customfilterLessThan:
 										if(val < valLog[s])//isLessThan
 											result[s] = true;
 										break;
-									case ECustomFilter.customfilterLessThanOrEqual: 
+								    case Asc.ECustomFilter.customfilterLessThanOrEqual:
 										if(val <= filterVal)//isLessThanOrEqualTo
 											result[s] = true;
 										break;

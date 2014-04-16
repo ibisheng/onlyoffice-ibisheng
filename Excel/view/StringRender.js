@@ -976,7 +976,7 @@
 					var dh = prop && prop.lm && prop.lm.bl2 > 0 ? prop.lm.bl2 - prop.lm.bl : 0;
 					var dw = self._calcCharsWidth(strBeg, end - 1);
 					var so = prop.font.Strikeout;
-					var ul = EUnderline.underlineNone !== prop.font.Underline;
+					var ul = Asc.EUnderline.underlineNone !== prop.font.Underline;
 					var isSO = so === true;
 					var fsz, x2, y, lw, dy, i, b, x_, cp, w_1px, h_1px;
 
