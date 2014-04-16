@@ -2304,6 +2304,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.wb.replaceCellText(temp);
 			},
 
+			asc_endFindText: function () {
+				// Нужно очистить поиск
+				this.wb._cleanFindResults();
+			},
+
 			/**
 			 * Делает активной указанную ячейку
 			 * @param {String} reference  Ссылка на ячейку вида A1 или R1C1
@@ -3633,6 +3638,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
         prot["asc_searchEnabled"] = prot.asc_searchEnabled;
 		prot["asc_findText"] = prot.asc_findText;
 		prot["asc_replaceText"] = prot.asc_replaceText;
+		prot["asc_endFindText"] = prot.asc_endFindText;
 		prot["asc_findCell"] = prot.asc_findCell;
 		//prot["asc_openCellEditor"] = prot.asc_openCellEditor; - не используется (и не стоит так делать)
 		prot["asc_closeCellEditor"] = prot.asc_closeCellEditor;
