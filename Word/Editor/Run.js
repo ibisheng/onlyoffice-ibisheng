@@ -2494,7 +2494,7 @@ ParaRun.prototype =
                         nWordLen = 0;
                     }
 
-                    if ( ( true === Item.Is_Inline() || true === this.Parent.Is_DrawingShape() ) && Item.Width > nMinWidth )
+                    if ( ( true === Item.Is_Inline() || true === this.Paragraph.Is_DrawingShape() ) && Item.Width > nMinWidth )
                         nMinWidth = Item.Width;
 
                     if ( nSpaceLen > 0 )
@@ -6155,9 +6155,9 @@ ParaRun.prototype =
         // Long     : Количество элементов
         // Array of variable : массив с элементами
 
-        this.Id     = Reader.GetString2();
-        this.Parent = g_oTableId.Get_ById( Reader.GetString2() );
-        this.Pr     = new CTextPr();
+        this.Id        = Reader.GetString2();
+        this.Paragraph = g_oTableId.Get_ById( Reader.GetString2() );
+        this.Pr        = new CTextPr();
         this.Pr.Read_FromBinary( Reader );
 
         var Count = Reader.GetLong();
