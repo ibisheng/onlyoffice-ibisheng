@@ -3518,6 +3518,18 @@ asc_docs_api.prototype.asc_addComment = function(AscCommentData)
     var Comment = this.WordControl.m_oLogicDocument.Add_Comment( CommentData );
     if ( null != Comment )
         this.sync_AddComment( Comment.Get_Id(), CommentData );
+    return Comment.Get_Id();
+}
+
+asc_docs_api.prototype.asc_getMasterCommentId = function()
+{
+    return -1;
+}
+
+asc_docs_api.prototype.asc_getAnchorPosition = function()
+{
+    var AnchorPos = this.WordControl.m_oLogicDocument.Get_SelectionAnchorPos();
+    return new asc_CRect(AnchorPos.X0, AnchorPos.Y, AnchorPos.X1 - AnchorPos.X0, 0);
 }
 
 asc_docs_api.prototype.asc_removeComment = function(Id)

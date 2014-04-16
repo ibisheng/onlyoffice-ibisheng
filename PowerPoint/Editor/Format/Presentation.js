@@ -4042,6 +4042,20 @@ CPresentation.prototype =
         return this.Content[ContentPos].Get_NearestPos( PageNum, X, Y, bAnchor, Drawing );
     },
 
+    Get_SelectionAnchorPos: function()
+    {
+        var selected_objects = this.Slides[this.CurPage].graphicObjects.selectedObjects;
+        if(selected_objects.length  > 0)
+        {
+            var last_object = selected_objects[selected_objects.length - 1];
+            return  { X0 : last_object.x, X1 : last_object.x + last_object.extX, Y : last_object.y};
+        }
+        else
+        {
+            return  { X0 : this.Slides[this.CurPage].commentX, X1 : this.Slides[this.CurPage].commentX, Y : this.Slides[this.CurPage].commentY};
+        }
+    },
+
     Internal_Content_Add : function(Position, NewObject)
     {
         // Position = this.Content.length  допускается
