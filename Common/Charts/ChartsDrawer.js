@@ -4986,25 +4986,25 @@ drawHBarChart.prototype =
     {
 		var brush;
 		var pen;
-		var lineWidth;
-		var dataSeries;
+		var numCache;
 		var seria;
 		
 		this.cShapeDrawer.Graphics.SaveGrState();
 		this.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, this.chartProp.chartGutter._top / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
-		for (var i = 0; i < this.chartProp.series.length; i++) {
+		for (var i = 0; i < this.paths.series.length; i++) {
 			seria = this.chartProp.series[i];
 			brush = seria.brush;
 			pen = seria.pen;
-			dataSeries = seria.val.numRef ? seria.val.numRef.numCache.pts : seria.val.numLit.pts;
-			
-			for (var j = 0; j < dataSeries.length; j++) {
-				if(dataSeries[j].pen)
-					pen = dataSeries[j].pen;
-				if(dataSeries[j].brush)
-					brush = dataSeries[j].brush;
-			
-				this.cChartDrawer.drawPath(this.paths.series[i][j], pen, brush);
+
+			for (var j = 0; j < this.paths.series[i].length; j++) {
+				numCache = seria.val.numRef ? seria.val.numRef.numCache : seria.val.numLit;
+				if(numCache.pts[j] && numCache.pts[j].pen)
+					pen = numCache.pts[j].pen;
+				if(numCache.pts[j] && numCache.pts[j].brush)
+					brush = numCache.pts[j].brush;
+					
+				if(this.paths.series[i][j])
+					this.cChartDrawer.drawPath(this.paths.series[i][j], pen, brush);
 			}
 		}
 		this.cShapeDrawer.Graphics.RestoreGrState();
