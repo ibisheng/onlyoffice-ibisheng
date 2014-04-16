@@ -39,6 +39,25 @@ document.onselectstart= function() {
     return false;
 }
 
+var GlobalSkinTeamlab = {
+    BackgroundColor : "#B0B0B0",
+    RulerDark : "#B0B0B0",
+    RulerLight : "EDEDED",
+    BackgroundScroll : "#D3D3D3",
+    STYLE_THUMBNAIL_WIDTH : 80,
+    STYLE_THUMBNAIL_HEIGHT : 40
+};
+var GlobalSkinFlat = {
+    BackgroundColor : "#F4F4F4",
+    RulerDark : "#E5E5E5",
+    RulerLight : "#F4F4F4",
+    BackgroundScroll : "#E5E5E5",
+    STYLE_THUMBNAIL_WIDTH : 109,
+    STYLE_THUMBNAIL_HEIGHT : 45
+};
+
+var GlobalSkin = GlobalSkinTeamlab;
+
 function CEditorPage(api)
 {
     // ------------------------------------------------------------------
