@@ -5,7 +5,6 @@ var g_nHSLMaxValue = 240;
 var g_nVerticalTextAngle = 255;
 var gc_dDefaultColWidthCharsAttribute;//определяется в WorksheetView.js
 var gc_dDefaultRowHeightAttribute;//определяется в WorksheetView.js
-var g_nNextWorksheetId = 1;
 var g_sNewSheetNamePattern = "Sheet";
 var g_nSheetNameMaxLength = 31;
 var g_nAllColIndex = -1;
@@ -1123,7 +1122,7 @@ Workbook.prototype.getWorksheetCount=function(){
 Workbook.prototype.createWorksheet=function(indexBefore, sName, sId){
 	History.Create_NewPoint();
 	History.TurnOff();
-    var oNewWorksheet = new Woorksheet(this, this.aWorksheets.length, true, sId);
+    var oNewWorksheet = new Woorksheet(this, this.aWorksheets.length, sId);
 	if(null != sName)
 	{
 		if(true == this.checkValidSheetName(sName))
@@ -1681,7 +1680,7 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 /**
  * @constructor
  */
-function Woorksheet(wb, _index, bAddUserId, sId){
+function Woorksheet(wb, _index, sId){
 	this.workbook = wb;
 	this.DefinedNames = {};
 	this.sName = this.workbook.getUniqueSheetNameFrom(g_sNewSheetNamePattern, false);
@@ -1692,12 +1691,7 @@ function Woorksheet(wb, _index, bAddUserId, sId){
 	if(null != sId)
 		this.Id = sId;
 	else
-	{
-		if(bAddUserId)
-			this.Id = this.workbook.oApi.User.asc_getId() + "_" + g_nNextWorksheetId++;
-		else
-			this.Id = g_nNextWorksheetId++;
-	}
+		this.Id = g_oIdCounter.Get_NewId();
 
 	this.nRowsCount = 0;
 	this.nColsCount = 0;
@@ -1803,9 +1797,9 @@ Woorksheet.prototype.generateFontMap=function(oFontMap){
 Woorksheet.prototype.clone=function(sNewId, bFromRedo){
 	var oNewWs, i, elem, range;
 	if(null != sNewId)
-		oNewWs = new Woorksheet(this.workbook, this.workbook.aWorksheets.length, true, sNewId);
+		oNewWs = new Woorksheet(this.workbook, this.workbook.aWorksheets.length, sNewId);
 	else
-		oNewWs = new Woorksheet(this.workbook, this.workbook.aWorksheets.length, true);
+		oNewWs = new Woorksheet(this.workbook, this.workbook.aWorksheets.length);
 	oNewWs.sName = this.workbook.getUniqueSheetNameFrom(this.sName, true);
 	oNewWs.bHidden = this.bHidden;
 	oNewWs.oSheetFormatPr = this.oSheetFormatPr.clone();

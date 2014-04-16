@@ -498,6 +498,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.wbModel = wb;
 				var oBinaryFileReader = new BinaryFileReader(url);
 				oBinaryFileReader.Read(data, wb);
+				g_oIdCounter.Set_Load(false);
 				return wb;
 			},
 			
@@ -519,7 +520,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				g_oUndoRedoComment = new UndoRedoComment(wbModel);
 				g_oUndoRedoAutoFilters = new UndoRedoAutoFilters(wbModel);
 				g_oUndoRedoGraphicObjects = new UndoRedoGraphicObjects(wbModel);
-				g_oIdCounter.Set_Load(false);
 				CHART_STYLE_MANAGER = new CChartStyleManager();
 			},
 			
@@ -3389,7 +3389,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                 
                 var oBinaryFileReader = new BinaryFileReader(this.DocumentUrl);
                 oBinaryFileReader.Read(base64File, this.wbModel);
-                
+                g_oIdCounter.Set_Load(false);
+
                 this._coAuthoringInit();
                 this.wb = new asc.WorkbookView(
 					        this.wbModel,
