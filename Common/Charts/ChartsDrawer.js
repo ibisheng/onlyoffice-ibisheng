@@ -7247,6 +7247,13 @@ catAxisChart.prototype =
 			widthLine = - widthLine;
 		};
 		
+		var orientation = this.chartSpace && this.chartSpace.chart.plotArea.valAx ? this.chartSpace.chart.plotArea.valAx.scaling.orientation : ORIENTATION_MIN_MAX;
+		if(orientation !== ORIENTATION_MIN_MAX)
+		{
+			widthMinorLine = - widthMinorLine;
+			widthLine = - widthLine;
+		}
+		
 		if(!(widthLine === 0 && widthMinorLine === 0))
 		{	
 			//исчключение для вертикальной оси
