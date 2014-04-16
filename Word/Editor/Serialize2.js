@@ -3726,7 +3726,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 				
             }
         }
-        if (bLastRun && bUseSelection && ParaEnd < Content.length - 1)
+        if (bLastRun && bUseSelection && !par.Selection_CheckParaEnd() )
 		{
             this.WriteRun2( function () {
                 oThis.memory.WriteByte(c_oSerRunType._LastRun);
