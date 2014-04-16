@@ -198,12 +198,24 @@ CNary.prototype.init = function(props)
             var prp = {type: DEGREE_SubSup};
             base.init_2(prp, sign);
         }
+
     }
 
-    /*if(!this.supHide && !this.subHide)
-     base.setCtrPrp(this.CtrPrp);*/      // выставляем аналогично как в CMathContent при добавлении элемента в addMComponent
+    if(!this.supHide || !this.subHide)
+        base.setCtrPrp(this.CtrPrp);    // выставляем аналогично как в CMathContent при добавлении элемента в addMComponent
 
     this.addMCToContent(base, arg);
+
+}
+CNary.prototype.setCtrPrp = function(txtPrp)
+{
+    this.CtrPrp.Merge(txtPrp); // only runPrp for paragraph
+    this.RunPrp.setTxtPrp(txtPrp);
+
+    if(this.elements !== null)
+    {
+        this.elements[0][0].setCtrPrp(this.CtrPrp);
+    }
 }
 CNary.prototype.setDistance = function()
 {

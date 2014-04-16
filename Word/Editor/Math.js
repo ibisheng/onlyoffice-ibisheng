@@ -580,8 +580,6 @@ ParaMath.prototype =
 
             this.Math.absPos = {x: PRSA.X, y: PRSA.Y - this.Root.size.ascent};
 
-            console.log("Id Of Root  " + this.Root.Id + "  Recalculate : " + " X " + PRSA.X + " Y " + PRSA.Y);
-
             PRSA.X    += this.WidthVisible;
             PRSA.LastW = this.WidthVisible;
         }
@@ -757,7 +755,6 @@ ParaMath.prototype =
 
         if ( EndPos >= 1 )
         {
-            console.log("Id Of Root  " + this.Root.Id + "  Draw : " + " X " + PDSE.X + " Y " + PDSE.Y);
             this.Math.Draw( PDSE.X, PDSE.Y - this.Root.size.ascent, PDSE.Graphics );
             PDSE.X += this.Width;
         }
