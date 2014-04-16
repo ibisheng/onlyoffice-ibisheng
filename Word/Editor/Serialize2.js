@@ -10925,7 +10925,7 @@ function Binary_oMathReader(stream)
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadMathSPre = function(type, length, oSPre, props, oParent)
+	this.ReadMathSPreCollaborative = function(type, length, oSPre, props, oParent)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
