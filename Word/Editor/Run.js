@@ -2494,7 +2494,7 @@ ParaRun.prototype =
                         nWordLen = 0;
                     }
 
-                    if ( ( true === Item.Is_Inline() || true === this.Paragraph.Is_DrawingShape() ) && Item.Width > nMinWidth )
+                    if ( ( true === Item.Is_Inline() || true === this.Paragraph.Parent.Is_DrawingShape() ) && Item.Width > nMinWidth )
                         nMinWidth = Item.Width;
 
                     if ( nSpaceLen > 0 )
