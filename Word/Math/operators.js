@@ -3182,9 +3182,9 @@ function CDelimiter()
 	this.column = 0;
     ////
 
-    CSubMathBase.call(this);
+    CMathBase.call(this);
 }
-extend(CDelimiter, CSubMathBase);
+extend(CDelimiter, CMathBase);
 CDelimiter.prototype.init = function(props)
 {
     if(props.grow == true || props.grow == 1)
@@ -3846,9 +3846,9 @@ CDelimiter.prototype.getPropsForWrite = function()
 function CCharacter()
 {
     this.operator = new COperator(OPER_GROUP_CHAR);
-    CSubMathBase.call(this);
+    CMathBase.call(this);
 }
-extend(CCharacter, CSubMathBase);
+extend(CCharacter, CMathBase);
 CCharacter.prototype.setCharacter = function(props, defaultProps)
 {
     this.operator.init(props, defaultProps);

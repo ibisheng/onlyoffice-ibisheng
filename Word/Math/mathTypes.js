@@ -161,3 +161,15 @@ var BREAK_REPEAT              =  2;
 var BREAK_MIN_MIN             =  0;
 var BREAK_PLUS_MIN            =  1;
 var BREAK_MIN_PLUS            =  2;
+
+
+
+var extend = function(Child, Parent)
+{
+    var F = function() { };
+    F.prototype = Parent.prototype;
+    Child.prototype = new F();
+    Child.prototype.constructor = Child;
+    Child.superclass = Parent.prototype;
+
+}

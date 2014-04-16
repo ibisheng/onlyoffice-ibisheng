@@ -601,9 +601,9 @@ function CDegreeSubSup()
     this.gapBase = 0;
     this.type = DEGREE_SubSup;
     this.alnScr = false;    // не выровнены, итераторы идут в соответствии с наклоном буквы/мат. объекта
-    CSubMathBase.call(this);
+    CMathBase.call(this);
 }
-extend(CDegreeSubSup, CSubMathBase);
+extend(CDegreeSubSup, CMathBase);
 CDegreeSubSup.prototype.init = function(props)
 {
     if(props.alnScr === true || props.alnScr === 1)

@@ -20,10 +20,9 @@ function CNary()
     this.grow = false;
     this.supHide = false;
     this.subHide = false;
-    //this.limLoc = NARY_UndOvr;
-    CSubMathBase.call(this);
+    CMathBase.call(this);
 }
-extend(CNary, CSubMathBase);
+extend(CNary, CMathBase);
 CNary.prototype.init = function(props)
 {
     if(props.supHide === true || props.supHide === 1)
