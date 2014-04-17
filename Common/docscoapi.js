@@ -640,10 +640,8 @@
 		if (participants) {
 			var tmpUser, countEditUsers = 0;
 			for (var i = 0; i < participants.length; ++i) {
-				tmpUser = new asc_user ();
-				tmpUser.asc_setId (participants[i]["id"]);
-				tmpUser.asc_setUserName (participants[i]["username"]);
-				this._participants.push (tmpUser);
+				tmpUser = new asc_user(participants[i]);
+				this._participants.push(tmpUser);
 				// Считаем число всех пользователей (и тех кто просматривает тоже)
 				++countEditUsers;
 			}
@@ -666,10 +664,7 @@
 	DocsCoApi.prototype._onConnectionStateChanged = function (data) {
 		var userStateChanged = null;
 		if (undefined !== data["state"] && this.onConnectionStateChanged) {
-			userStateChanged = new asc_user();
-			userStateChanged.asc_setId(data["id"]);
-			userStateChanged.asc_setUserName(data["username"]);
-			userStateChanged.asc_setState(data["state"]);
+			userStateChanged = new asc_user(data);
 			this.onConnectionStateChanged(userStateChanged);
 		}
 	};
