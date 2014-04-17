@@ -149,6 +149,9 @@ CDocumentContent.prototype =
         }
         else
         {
+            if ( null === this.LogicDocument )
+                return { X : 0, Y : 0, XLimit : 0, YLimit : 0 };    
+            
             var Page_abs = this.Get_StartPage_Absolute() + PageIndex;
             var Index = ( undefined !== this.LogicDocument.Pages[Page_abs] ? this.LogicDocument.Pages[Page_abs].Pos : 0 );
             var SectPr = this.LogicDocument.SectionsInfo.Get_SectPr(Index).SectPr;
@@ -176,6 +179,9 @@ CDocumentContent.prototype =
             }
             else
             {
+                if ( null === this.LogicDocument )
+                    return { X : 0, Y : 0, XLimit : 0, YLimit : 0 };
+
                 var Page_abs = this.Get_StartPage_Absolute() + PageIndex;
                 var Index = ( undefined !== this.LogicDocument.Pages[Page_abs] ? this.LogicDocument.Pages[Page_abs].Pos : 0 );
                 var SectPr = this.LogicDocument.SectionsInfo.Get_SectPr(Index).SectPr;
@@ -189,6 +195,9 @@ CDocumentContent.prototype =
         }
         else
         {
+            if ( null === this.LogicDocument )
+                return { X : 0, Y : 0, XLimit : 0, YLimit : 0 };
+            
             var Page_abs = this.Get_StartPage_Absolute() + PageIndex;
             var Index = ( undefined !== this.LogicDocument.Pages[Page_abs] ? this.LogicDocument.Pages[Page_abs].Pos : 0 );
             var SectPr = this.LogicDocument.SectionsInfo.Get_SectPr(Index).SectPr;
