@@ -41,6 +41,7 @@
                 "../../Excel/model/autofilters.js",
                 "../../Excel/graphics/DrawingContext.js",
                 "../../Excel/graphics/pdfprinter.js",
+                "../../Excel/model/CollaborativeEditing.js",
                 "../../Excel/model/ConditionalFormatting.js",
                 "../../Excel/model/FormulaObjects/parserFormula.js",
                 "../../Excel/model/FormulaObjects/dateandtimeFunctions.js",
@@ -117,6 +118,7 @@
                 "../../Excel/model/DrawingObjects/Overlay.js",
                 "../../Excel/model/DrawingObjects/Controls.js",
                 "../../Excel/model/DrawingObjects/ShapeDrawer.js",
+
 
                 "../../Word/Editor/CollaborativeEditing.js",
 
