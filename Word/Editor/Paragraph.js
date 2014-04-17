@@ -9675,7 +9675,7 @@ Paragraph.prototype =
             var Item = this.Content[CurPos];
 
             if ( true === Item.Get_ParaContentPosByXY( SearchPos, 1, CurLine, CurRange, StepEnd ) )
-                SearchPos.Pos.Update( CurPos, 0 );
+                SearchPos.Pos.Update2( CurPos, 0 );
         }
 
         // По Х попали в какой-то элемент, проверяем по Y

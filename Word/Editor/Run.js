@@ -3231,11 +3231,15 @@ ParaRun.prototype =
 
                     // Если мы ищем позицию для селекта, тогда нужно искать и за знаком параграфа
                     if ( true === StepEnd )
+                    {
                         SearchPos.Pos.Update( this.Content.length, Depth );
+                        Result = true;
+                    }
                 }
                 else if ( CurPos === EndPos - 1 && para_NewLine != Item.Type )
                 {
                     SearchPos.Pos.Update( EndPos, Depth );
+                    Result = true;
                 }
             }
         }

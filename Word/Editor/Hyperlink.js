@@ -1130,7 +1130,7 @@ ParaHyperlink.prototype =
 
             if ( true === Item.Get_ParaContentPosByXY( SearchPos, Depth + 1, _CurLine, _CurRange, StepEnd ) )
             {
-                SearchPos.Pos.Update( CurPos, Depth );
+                SearchPos.Pos.Update2( CurPos, Depth );
                 Result = true;
             }
         }
