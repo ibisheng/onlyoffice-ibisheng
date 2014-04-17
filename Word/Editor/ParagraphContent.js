@@ -3687,8 +3687,9 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
     this.Lock = new CLock();
     if ( false === g_oIdCounter.m_bLoad )
     {
-        this.Lock.Set_Type( locktype_Mine, false );
-        CollaborativeEditing.Add_Unlock2( this );
+        this.Lock.Set_Type(locktype_Mine, false);
+        if (typeof CollaborativeEditing !== "undefined")
+            CollaborativeEditing.Add_Unlock2( this );
     }
 
     this.DrawingType = drawing_Inline;

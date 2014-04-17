@@ -220,17 +220,6 @@ var c_oAscCollaborativeMarksShowType = {
     LastChanges : 1
 };
 
-var c_oAscRelativeFromH = {
-    Character     : 0x00,
-    Column        : 0x01,
-    InsideMargin  : 0x02,
-    LeftMargin    : 0x03,
-    Margin        : 0x04,
-    OutsideMargin : 0x05,
-    Page          : 0x06,
-    RightMargin   : 0x07
-};
-
 var c_oAscAlignH = {
     Center  : 0x00,
     Inside  : 0x01,
@@ -244,17 +233,6 @@ var c_oAscChangeLevel = {
     BringForward : 0x01,
     SendToBack   : 0x02,
     BringBackward: 0x03
-};
-
-var c_oAscRelativeFromV = {
-    BottomMargin  : 0x00,
-    InsideMargin  : 0x01,
-    Line          : 0x02,
-    Margin        : 0x03,
-    OutsideMargin : 0x04,
-    Page          : 0x05,
-    Paragraph     : 0x06,
-    TopMargin     : 0x07
 };
 
 var c_oAscAlignV = {
@@ -274,37 +252,6 @@ var c_oAscVertAlignJc = {
 var c_oAscTableLayout = {
     AutoFit : 0x00,
     Fixed   : 0x01
-};
-
-var c_oAscHAnchor = {
-    Margin : 0x00,
-    Page   : 0x01,
-    Text   : 0x02,
-
-    PageInternal : 0xFF // только для внутреннего использования
-};
-
-var c_oAscXAlign = {
-    Center  : 0x00,
-    Inside  : 0x01,
-    Left    : 0x02,
-    Outside : 0x03,
-    Right   : 0x04
-};
-
-var c_oAscYAlign = {
-    Bottom  : 0x00,
-    Center  : 0x01,
-    Inline  : 0x02,
-    Inside  : 0x03,
-    Outside : 0x04,
-    Top     : 0x05
-};
-
-var c_oAscVAnchor = {
-    Margin : 0x00,
-    Page   : 0x01,
-    Text   : 0x02
 };
 
 var c_oAscColor = {

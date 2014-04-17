@@ -575,8 +575,9 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
     this.Lock = new CLock();
     if ( false === g_oIdCounter.m_bLoad )
     {
-        this.Lock.Set_Type( locktype_Mine, false );
-        CollaborativeEditing.Add_Unlock2( this );
+        this.Lock.Set_Type(locktype_Mine, false);
+        if (typeof CollaborativeEditing !== "undefined")
+            CollaborativeEditing.Add_Unlock2( this );
     }
 
     this.LogicDocument   = editor && editor.isDocumentEditor ? editor.WordControl.m_oLogicDocument : null;
@@ -595,7 +596,7 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
 
     this.TableGridNeedRecalc = true;
 
-    this.TableStyle = editor.WordControl.m_oLogicDocument.Styles.Get_Default_TableGrid();
+    this.TableStyle = this.DrawingDocument.m_oLogicDocument.Styles.Get_Default_TableGrid();
     this.TableLook  = new CTableLook(true, true, false, false, true, false);
 
     this.TableSumGrid  = []; // данный массив будет заполнен после Internal_RecalculateGrid
@@ -18642,7 +18643,8 @@ function CTableRow(Table, Cols, TableGrid)
     this.PagesCount = 1;
 
     // Добавляем данный класс в список DocumentContent'ов
-    CollaborativeEditing.Add_NewDC(this);
+    if (typeof CollaborativeEditing !== "undefined")
+        CollaborativeEditing.Add_NewDC(this);
     this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
@@ -19971,7 +19973,7 @@ function CTableCell(Row, ColW)
     this.Prev = null;
     this.Next = null;
 
-    this.Content = new CDocumentContent( this, editor.WordControl.m_oLogicDocument.DrawingDocument, 0, 0, 0, 0, false, false );
+    this.Content = new CDocumentContent(this, this.Row.Table.DrawingDocument, 0, 0, 0, 0, false, false);
     this.Content.Set_StartPage( ( Row ? this.Row.Table.PageNum : 0 ) );
 
     this.CompiledPr =

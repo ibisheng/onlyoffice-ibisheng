@@ -411,8 +411,10 @@ function CDocument(DrawingDocument)
 
     // Создаем глобальные объекты, необходимые для совместного редактирования
     this.IdCounter = g_oIdCounter;
-    this.TableId   = g_oTableId;
-    this.CollaborativeEditing = CollaborativeEditing;
+    this.TableId = g_oTableId;
+    this.CollaborativeEditing = null;
+    if (typeof CollaborativeEditing !== "undefined")
+        this.CollaborativeEditing = CollaborativeEditing;
     //------------------------------------------------------------------------
 
     this.Id = g_oIdCounter.Get_NewId();
@@ -473,7 +475,9 @@ function CDocument(DrawingDocument)
     this.NeedUpdateTarget = false;
 
     // Массив укзателей на все инлайновые графические объекты
-    this.DrawingObjects = new CDrawingObjects();
+    this.DrawingObjects = null;
+    if (typeof CDrawingObjects !== "undefined")
+        this.DrawingObjects = new CDrawingObjects();
 
     // Класс для работы с колонтитулами
     this.HdrFtr = new CHeaderFooterController(this, this.DrawingDocument);
@@ -509,12 +513,15 @@ function CDocument(DrawingDocument)
 
     this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
 
-    this.DrawingObjects = new CGraphicObjects(this, this.DrawingDocument, editor);
+    if (typeof CGraphicObjects !== "undefined")
+        this.DrawingObjects = new CGraphicObjects(this, this.DrawingDocument, editor);
     this.theme          = GenerateDefaultTheme(this);
     this.clrSchemeMap   = GenerateDefaultColorMap();
 
     // Класс для работы с поиском и заменой в документе
-    this.SearchEngine = new CDocumentSearch();
+    this.SearchEngine = null;
+    if (typeof CDocumentSearch !== "undefined")
+        this.SearchEngine = new CDocumentSearch();
 
     // Параграфы, в которых есть ошибки в орфографии (объект с ключом - Id параграфа)
     this.Spelling = new CDocumentSpelling();

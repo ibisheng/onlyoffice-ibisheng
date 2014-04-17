@@ -2043,6 +2043,16 @@
 			
 			ReadFromBinaryWord : function(sBase64)
 			{
+			    var oTempDrawingDocument = new CDrawingDocument();
+			    var newCDocument = new CDocument(oTempDrawingDocument);
+			    oTempDrawingDocument.m_oLogicDocument = newCDocument;
+			    var openParams = { checkFileSize: false, charCount: 0, parCount: 0 };
+			    History.TurnOff();
+			    var oBinaryFileReader = new BinaryFileReader(newCDocument, openParams);
+			    var oRes = oBinaryFileReader.ReadFromString(sBase64);
+			    History.TurnOn();
+			    return oBinaryFileReader.oReadResult;
+
 				//TODO ПРОСМОТРЕТЬ ВСЕ ЗАКОММЕНТИРОВАННЫЕ ОБЛАСТИ!!!!
 				
 				//надо сбросить то, что остался после открытия документа

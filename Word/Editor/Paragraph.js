@@ -87,7 +87,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
 
     this.NeedReDraw = true;
     this.DrawingDocument = DrawingDocument;
-    this.LogicDocument = editor && editor.isDocumentEditor ? editor.WordControl.m_oLogicDocument : null;
+    this.LogicDocument = bFromPresentation ? null : this.DrawingDocument.m_oLogicDocument;
 	this.bFromDocument = bFromPresentation === true ? false : !!this.LogicDocument;
     this.TurnOffRecalcEvent = false;
 

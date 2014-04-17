@@ -5236,11 +5236,9 @@ function BinaryFileReader(doc, openParams)
         //надо сбросить то, что остался после открытия документа
         window.global_pptx_content_loader.Clear();
         window.global_pptx_content_loader.Start_UseFullUrl();
-        var openParams = { checkFileSize: false, charCount: 0, parCount: 0 };
-        var oBinaryFileReader = new BinaryFileReader(this.Document, openParams);
-        oBinaryFileReader.stream = oBinaryFileReader.getbase64DecodedData(sBase64);
-        oBinaryFileReader.ReadMainTable();
-        var oReadResult = oBinaryFileReader.oReadResult;
+        this.stream = this.getbase64DecodedData(sBase64);
+        this.ReadMainTable();
+        var oReadResult = this.oReadResult;
         //обрабатываем списки
         for (var i in oReadResult.numToNumClass) {
             var oNumClass = oReadResult.numToNumClass[i];
@@ -5317,12 +5315,12 @@ function BinaryFileReader(doc, openParams)
             }
         }
 
-        fParseStyle(oBinaryFileReader.oReadResult.paraStyles, this.Document.Styles, oBinaryFileReader.oReadResult, oStyleTypes.par);
-        fParseStyle(oBinaryFileReader.oReadResult.tableStyles, this.Document.Styles, oBinaryFileReader.oReadResult, oStyleTypes.table);
-        fParseStyle(oBinaryFileReader.oReadResult.lvlStyles, this.Document.Styles, oBinaryFileReader.oReadResult, oStyleTypes.lvl);
-        var aContent = oBinaryFileReader.oReadResult.DocumentContent;
-        for (var i = 0, length = oBinaryFileReader.oReadResult.aPostOpenStyleNumCallbacks.length; i < length; ++i)
-            oBinaryFileReader.oReadResult.aPostOpenStyleNumCallbacks[i].call();
+        fParseStyle(this.oReadResult.paraStyles, this.Document.Styles, this.oReadResult, oStyleTypes.par);
+        fParseStyle(this.oReadResult.tableStyles, this.Document.Styles, this.oReadResult, oStyleTypes.table);
+        fParseStyle(this.oReadResult.lvlStyles, this.Document.Styles, this.oReadResult, oStyleTypes.lvl);
+        var aContent = this.oReadResult.DocumentContent;
+        for (var i = 0, length = this.oReadResult.aPostOpenStyleNumCallbacks.length; i < length; ++i)
+            this.oReadResult.aPostOpenStyleNumCallbacks[i].call();
         var bInBlock;
         if (oReadResult.bLastRun)
             bInBlock = false;
