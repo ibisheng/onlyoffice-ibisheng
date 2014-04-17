@@ -61,7 +61,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
     // Настройки секции
     this.SectPr = undefined; // undefined или CSectionPr
 
-    this.Bounds = new CDocumentBounds( X, Y, X_Right_Field, Y );
+    this.Bounds = new CDocumentBounds( X, Y, XLimit, Y );
 
     this.RecalcInfo = new CParaRecalcInfo();
 
@@ -8798,6 +8798,8 @@ Paragraph.prototype =
         else
         {
             var ParaPr = this.Get_CompiledPr2(false).ParaPr;
+            
+            var LD_PageFields = this.LogicDocument.Get_PageFields( this.Get_StartPage_Absolute() );
 
             if ( true != bShift )
             {
@@ -8811,7 +8813,7 @@ Paragraph.prototype =
                     this.Set_Ind( { FirstLine : 12.5 }, false );
                     this.CompiledPr.NeedRecalc = true;
                 }
-                else if ( X_Right_Field - X_Left_Margin > ParaPr.Ind.Left + 25 )
+                else if ( LD_PageFields.XLimit - LD_PageFields.X > ParaPr.Ind.Left + 25 )
                 {
                     this.Set_Ind( { Left : ParaPr.Ind.Left + 12.5 }, false );
                     this.CompiledPr.NeedRecalc = true;
@@ -17769,7 +17771,8 @@ Paragraph.prototype =
             {
                 if ( undefined != FramePr.DropCap && dropcap_None != FramePr.DropCap && 1 === FrameParas.length )
                 {
-                    var _H = Math.min( H, Page_Height );
+                    var PageH = this.LogicDocument.Get_PageLimits( PageIndex).YLimit;
+                    var _H = Math.min( H, PageH );
                     NewFramePr.Lines = this.Update_DropCapByHeight( _H );
                     NewFramePr.HRule = linerule_Auto;
                 }

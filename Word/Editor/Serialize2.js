@@ -5224,7 +5224,7 @@ function BinaryFileReader(doc, openParams)
 		this.Document.Content = this.oReadResult.DocumentContent;
 		if(this.Document.Content.length == 0)
         {
-            var oNewParagraph = new Paragraph(this.Document.DrawingDocument, this.Document, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
+            var oNewParagraph = new Paragraph(this.Document.DrawingDocument, this.Document, 0, 0, 0, 0, 0 );
             this.Document.Content.push(oNewParagraph);
         }
 		// for(var i = 0, length = this.oReadResult.aPostOpenStyleNumCallbacks.length; i < length; ++i)
@@ -7074,7 +7074,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				if(this.openParams.parCount >= g_nErrorParagraphCount)
 					throw new Error(g_sErrorCharCountMessage);
 			}
-            var oNewParagraph = new Paragraph(this.Document.DrawingDocument, this.Document, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
+            var oNewParagraph = new Paragraph(this.Document.DrawingDocument, this.Document, 0, 0, 0, 0, 0 );
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadParagraph(t,l, oNewParagraph, Content);
             });
@@ -7090,7 +7090,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         else if ( c_oSerParType.Table === type )
         {
             var doc = this.Document;
-			var oNewTable = new CTable(doc.DrawingDocument, doc, true, 0, 0, 0, X_Left_Field, Y_Bottom_Field, 0, 0, []);
+			var oNewTable = new CTable(doc.DrawingDocument, doc, true, 0, 0, 0, 0, 0, 0, 0, []);
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadDocTable(t, l, oNewTable);
             });
@@ -7454,7 +7454,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         else if(c_oSerRunType.table === type)
         {
             var doc = this.Document;
-            var oNewTable = new CTable(doc.DrawingDocument, doc, true, 0, 0, 0, X_Left_Field, Y_Bottom_Field, 0, 0, []);
+            var oNewTable = new CTable(doc.DrawingDocument, doc, true, 0, 0, 0, 0, 0, 0, 0, []);
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadDocTable(t, l, oNewTable);
             });

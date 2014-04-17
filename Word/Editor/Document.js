@@ -9763,7 +9763,7 @@ CDocument.prototype =
                 {
                     var Comment_PageNum = Comment.m_oStartInfo.PageNum;
                     var Comment_Y       = Comment.m_oStartInfo.Y;
-                    var Comment_X       = Page_Width;
+                    var Comment_X       = this.Get_PageLimits(PageIndex).XLimit;
 
                     var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( Comment_X, Comment_Y, Comment_PageNum );
                     this.Select_Comment( Comment.Get_Id() );
@@ -12472,7 +12472,7 @@ CDocument.prototype =
         {
             var Comment_PageNum = Comment.m_oStartInfo.PageNum;
             var Comment_Y       = Comment.m_oStartInfo.Y;
-            var Comment_X       = Page_Width;
+            var Comment_X       = this.Get_PageLimits(Comment_PageNum).XLimit;
 
             var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( Comment_X, Comment_Y, Comment_PageNum );
             editor.sync_ShowComment( Comment.Get_Id(), Coords.X, Coords.Y );
@@ -12577,7 +12577,7 @@ CDocument.prototype =
         {
             var Comment_PageNum = Comment.m_oStartInfo.PageNum;
             var Comment_Y       = Comment.m_oStartInfo.Y;
-            var Comment_X       = Page_Width;
+            var Comment_X       = this.Get_PageLimits(Comment_PageNum).XLimit;
             var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( Comment_X, Comment_Y, Comment_PageNum );
             editor.sync_UpdateCommentPosition( Comment.Get_Id(), Coords.X, Coords.Y );
         }

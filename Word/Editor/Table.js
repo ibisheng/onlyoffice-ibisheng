@@ -579,7 +579,7 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
         CollaborativeEditing.Add_Unlock2( this );
     }
 
-
+    this.LogicDocument   = editor && editor.isDocumentEditor ? editor.WordControl.m_oLogicDocument : null;
     this.DrawingDocument = DrawingDocument;
     this.Parent          = Parent;
     this.PageNum         = PageNum;
@@ -1145,8 +1145,10 @@ CTable.prototype =
         }
         else
         {
+            var LD_PageFields = this.LogicDocument.Get_PageFields( this.Get_StartPage_Absolute() );
+            
             Pr.TableAlignment     = 0; // align_Left
-            Pr.TableIndent        = this.X_origin - X_Left_Field;
+            Pr.TableIndent        = this.X_origin - LD_PageFields.X;
             Pr.TableWrappingStyle = c_oAscWrapStyle.Flow;
 
             Pr.PositionH = new Object();
@@ -2750,7 +2752,7 @@ CTable.prototype =
                             // Параграф начинается до заданной страницы и заканчивается после. Нам нужно разделить его на
                             // 2 параграфа в заданной точке.
 
-                            var NewParagraph = new Paragraph( NewDocContent.DrawingDocument, NewDocContent, 0, 0, 0, X_Left_Field, Y_Bottom_Field );
+                            var NewParagraph = new Paragraph( NewDocContent.DrawingDocument, NewDocContent, 0, 0, 0, 0, 0 );
                             NearestPos.Paragraph.Split( NewParagraph, NearestPos.ContentPos );
                             NewDocContent.Internal_Content_Add(NewIndex + 1, NewParagraph);                            
 
@@ -2766,7 +2768,7 @@ CTable.prototype =
                             // в конец добавляем новый пустой параграф
                             NewIndex++;
                             if ( NewIndex >= NewDocContent.Content.length - 1 )
-                                NewDocContent.Internal_Content_Add(NewDocContent.Content.length, new Paragraph( NewDocContent.DrawingDocument, NewDocContent, 0, 50, 50, X_Right_Field, Y_Bottom_Field ) );
+                                NewDocContent.Internal_Content_Add(NewDocContent.Content.length, new Paragraph( NewDocContent.DrawingDocument, NewDocContent, 0, 0, 0, 0, 0 ) );
                         }
 
                     }
@@ -2825,7 +2827,7 @@ CTable.prototype =
                     }
                     else if ( true != TarParagraph.Cursor_IsStart(ParaContentPos) )
                     {
-                        var NewParagraph = new Paragraph( NewDocContent.DrawingDocument, NewDocContent, 0, 0, 0, X_Left_Field, Y_Bottom_Field );
+                        var NewParagraph = new Paragraph( NewDocContent.DrawingDocument, NewDocContent, 0, 0, 0, 0, 0 );
                         NearestPos.Paragraph.Split( NewParagraph, NearestPos.ContentPos );
                         NewDocContent.Internal_Content_Add( NewIndex + 1, NewParagraph );
 
@@ -7220,8 +7222,10 @@ CTable.prototype =
 
             if ( 0 === Result.Border || 2 === Result.Border )
             {
+                var PageH = this.LogicDocument.Get_PageLimits( this.Get_StartPage_Absolute()).YLimit;
+                
                 var Y_min = 0;
-                var Y_max = Page_Height;
+                var Y_max = PageH;
 
                 this.Selection.Data2.bCol = false;
 
@@ -14747,6 +14751,10 @@ CTable.prototype =
     {
         var TablePr = this.Get_CompiledPr(false).TablePr;
         var PageLimits = this.Parent.Get_PageLimits(this.PageNum);
+        
+        var LD_PageLimits = this.LogicDocument.Get_PageLimits( this.Get_StartPage_Absolute() );
+        var LD_PageFields = this.LogicDocument.Get_PageFields( this.Get_StartPage_Absolute() );
+        
         if ( true === this.Is_Inline() )
         {
             switch ( TablePr.Jc )
@@ -14777,7 +14785,7 @@ CTable.prototype =
             }
 
             this.AnchorPosition.CalcX = this.X_origin + TablePr.TableInd;
-            this.AnchorPosition.Set_X( this.TableSumGrid[this.TableSumGrid.length - 1], this.X_origin, X_Left_Field, X_Right_Field, Page_Width, PageLimits.X, PageLimits.XLimit );
+            this.AnchorPosition.Set_X( this.TableSumGrid[this.TableSumGrid.length - 1], this.X_origin, LD_PageFields.X, LD_PageFields.XLimit, LD_PageLimits.XLimit, PageLimits.X, PageLimits.XLimit );
         }
         else
         {
@@ -14795,7 +14803,7 @@ CTable.prototype =
             }
 
             this.X = this.X_origin + this.Get_TableOffsetCorrection();
-            this.AnchorPosition.Set_X( this.TableSumGrid[this.TableSumGrid.length - 1], this.X_origin, X_Left_Field - OffsetCorrection_Left, X_Right_Field + OffsetCorrection_Right, Page_Width, PageLimits.X - OffsetCorrection_Left, PageLimits.XLimit + OffsetCorrection_Right );
+            this.AnchorPosition.Set_X( this.TableSumGrid[this.TableSumGrid.length - 1], this.X_origin, LD_PageFields.X - OffsetCorrection_Left, LD_PageFields.XLimit + OffsetCorrection_Right, LD_PageLimits.XLimit, PageLimits.X - OffsetCorrection_Left, PageLimits.XLimit + OffsetCorrection_Right );
 
             this.X = this.AnchorPosition.Calculate_X(this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
             this.X_origin = this.X - this.Get_TableOffsetCorrection();
@@ -14822,14 +14830,17 @@ CTable.prototype =
     Internal_Recalculate_Position_2 : function(CurPage)
     {
         var PageLimits = this.Parent.Get_PageLimits(this.PageNum);
+        var LD_PageFields = this.LogicDocument.Get_PageFields( this.Get_StartPage_Absolute() );
+        var LD_PageLimits = this.LogicDocument.Get_PageLimits( this.Get_StartPage_Absolute() );
+        
         if ( true === this.Is_Inline() && 0 === CurPage )
         {
             this.AnchorPosition.CalcY = this.Y;
-            this.AnchorPosition.Set_Y( this.Pages[CurPage].Height, this.Y, Y_Top_Field, Y_Bottom_Field, Page_Height, PageLimits.Y, PageLimits.YLimit );
+            this.AnchorPosition.Set_Y( this.Pages[CurPage].Height, this.Y, LD_PageFields.Y, LD_PageFields.YLimit, LD_PageLimits.YLimit, PageLimits.Y, PageLimits.YLimit );
         }
         else if ( true != this.Is_Inline() && ( 0 === CurPage || ( 1 === CurPage && false === this.RowsInfo[0].FirstPage ) ) )
         {
-            this.AnchorPosition.Set_Y( this.Pages[CurPage].Height, this.Pages[CurPage].Y, Y_Top_Field, Y_Bottom_Field, Page_Height, PageLimits.Y, PageLimits.YLimit );
+            this.AnchorPosition.Set_Y( this.Pages[CurPage].Height, this.Pages[CurPage].Y, LD_PageFields.Y, LD_PageFields.YLimit, LD_PageLimits.YLimit, PageLimits.Y, PageLimits.YLimit );
 
             var OtherFlowTables = editor.WordControl.m_oLogicDocument.DrawingObjects.getAllFloatTablesOnPage( this.Get_StartPage_Absolute() );
             this.AnchorPosition.Calculate_Y(this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value);

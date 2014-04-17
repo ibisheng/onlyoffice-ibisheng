@@ -606,7 +606,7 @@ CDocumentContent.prototype =
                         {
                             // Добавляем начало таблицы в конец страницы так, чтобы не убралось ничего
                             Element.Set_DocumentIndex( Index );
-                            Element.Reset( X, Page_Height, XLimit, Page_Height, PageIndex );
+                            Element.Reset( X, YLimit, XLimit, YLimit, PageIndex );
                             Element.Recalculate_Page( PageIndex );
 
                             this.RecalcInfo.FlowObjectPage++;
