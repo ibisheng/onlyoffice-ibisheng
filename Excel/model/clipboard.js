@@ -3296,6 +3296,7 @@
 				var row, colorText, cTextPr, fontFamily = "Arial";
 				var text = null;
 				var oNewItem = [];
+				var paraRunContent;
 
 				var aResult = this.aResult;
 				if(row === undefined)
@@ -3327,7 +3328,7 @@
 				
 				//backgroundColor
 				var backgroundColor = null;
-				if(paragraph.Parent && paragraph.Parent.Parent && paragraph.Parent.Parent instanceof CTableCell2 && paragraph.Parent.Parent.CompiledPr && paragraph.Parent.Parent.CompiledPr.Pr.Shd && paragraph.Parent.Parent.CompiledPr.Pr.Shd.Color)
+				if(paragraph.Parent && paragraph.Parent.Parent && paragraph.Parent.Parent instanceof CTableCell && paragraph.Parent.Parent.CompiledPr && paragraph.Parent.Parent.CompiledPr.Pr.Shd && paragraph.Parent.Parent.CompiledPr.Pr.Shd.Color)
 				{
 					var color = paragraph.Parent.Parent.CompiledPr.Pr.Shd.Color;
 					backgroundColor = new RgbColor(this.clipboard._getBinaryColor("rgb(" + color.r + "," + color.g + "," + color.b + ")"));
@@ -3363,145 +3364,151 @@
 					if(text == null)
 						text = "";
 					
-					
-					if(content[n] instanceof ParaTextPr2)//settings for text	
+					if(content[n] instanceof ParaRun)
 					{
-						if(text !== null && oNewItem[oNewItem.length - 1])//oNewItem - массив, аналогичный value2
-							oNewItem[oNewItem.length - 1].text = text;
-						else if(text !== null && oNewItem.length == 0)
+						paraRunContent = content[n].Content;
+						for(var pR = 0; pR < paraRunContent.length; pR++)
 						{
-							this.fontsNew["Arial"] = 1;
-							colorText = new RgbColor(this.clipboard._getBinaryColor("rgb(0, 0, 0)"));
-							
-							var calcValue = content[n].CalcValue;
-							oNewItem.push({
-								format: {
-									fn: calcValue.FontFamily && calcValue.FontFamily.Name ? calcValue.FontFamily.Name : paragraphFontFamily,
-									fs: calcValue.FontSize ? calcValue.FontSize : paragraphFontSize,
-									c: colorParagraph ? colorParagraph : colorText,
-									b: paragraphBold,
-									i: paragraphItalic,
-									u: paragraphUnderline,
-									s: paragraphStrikeout,
-									va: "none"
-								}
-							});
-							oNewItem[oNewItem.length - 1].text = text;
-						}	
-						
-						text = "";
-						
-						cTextPr = content[n].CalcValue;
-						
-						if(cTextPr.Color)
-							colorText = new RgbColor(this.clipboard._getBinaryColor("rgb(" + cTextPr.Color.r + "," + cTextPr.Color.g + "," + cTextPr.Color.b + ")"));
-						else
-							colorText = null;
-						
-						fontFamily = cTextPr.fontFamily ? fontFamily : cTextPr.RFonts.CS ? cTextPr.RFonts.CS.Name : paragraphFontFamily;
-						this.fontsNew[fontFamily] = 1;
-						
-						var verticalAlign;
-						if(cTextPr.VertAlign == 2)
-							verticalAlign = "subscript";
-						else if(cTextPr.VertAlign == 1)
-							verticalAlign = "superscript";
-							
+							if(paraRunContent[pR] instanceof ParaTextPr)//settings for text	
+							{
+								if(text !== null && oNewItem[oNewItem.length - 1])//oNewItem - массив, аналогичный value2
+									oNewItem[oNewItem.length - 1].text = text;
+								else if(text !== null && oNewItem.length == 0)
+								{
+									this.fontsNew["Arial"] = 1;
+									colorText = new RgbColor(this.clipboard._getBinaryColor("rgb(0, 0, 0)"));
+									
+									var calcValue = paraRunContent[pR].CalcValue;
+									oNewItem.push({
+										format: {
+											fn: calcValue.FontFamily && calcValue.FontFamily.Name ? calcValue.FontFamily.Name : paragraphFontFamily,
+											fs: calcValue.FontSize ? calcValue.FontSize : paragraphFontSize,
+											c: colorParagraph ? colorParagraph : colorText,
+											b: paragraphBold,
+											i: paragraphItalic,
+											u: paragraphUnderline,
+											s: paragraphStrikeout,
+											va: "none"
+										}
+									});
+									oNewItem[oNewItem.length - 1].text = text;
+								}	
+								
+								text = "";
+								
+								cTextPr = paraRunContent[pR].CalcValue;
+								
+								if(cTextPr.Color)
+									colorText = new RgbColor(this.clipboard._getBinaryColor("rgb(" + cTextPr.Color.r + "," + cTextPr.Color.g + "," + cTextPr.Color.b + ")"));
+								else
+									colorText = null;
+								
+								fontFamily = cTextPr.fontFamily ? fontFamily : cTextPr.RFonts.CS ? cTextPr.RFonts.CS.Name : paragraphFontFamily;
+								this.fontsNew[fontFamily] = 1;
+								
+								var verticalAlign;
+								if(cTextPr.VertAlign == 2)
+									verticalAlign = "subscript";
+								else if(cTextPr.VertAlign == 1)
+									verticalAlign = "superscript";
+									
 
-						oNewItem.push({
-							format: {
-								fn: fontFamily,
-								fs: cTextPr.FontSize ? cTextPr.FontSize : paragraphFontSize,
-								c: colorText ? colorText : colorParagraph,
-								b: cTextPr.Bold ? cTextPr.Bold : paragraphBold,
-								i: cTextPr.Italic ? cTextPr.Italic : paragraphItalic,
-								u: cTextPr.Underline ? cTextPr.Underline : paragraphUnderline,
-								s: cTextPr.Strikeout ? cTextPr.Strikeout : paragraphStrikeout,
-								va: verticalAlign ? verticalAlign : paragraphVertAlign
+								oNewItem.push({
+									format: {
+										fn: fontFamily,
+										fs: cTextPr.FontSize ? cTextPr.FontSize : paragraphFontSize,
+										c: colorText ? colorText : colorParagraph,
+										b: cTextPr.Bold ? cTextPr.Bold : paragraphBold,
+										i: cTextPr.Italic ? cTextPr.Italic : paragraphItalic,
+										u: cTextPr.Underline ? cTextPr.Underline : paragraphUnderline,
+										s: cTextPr.Strikeout ? cTextPr.Strikeout : paragraphStrikeout,
+										va: verticalAlign ? verticalAlign : paragraphVertAlign
+									}
+								});
 							}
-						});
-					}
-					else if(content[n] instanceof ParaText2)//text
-					{
-						text += content[n].Value;
-					}
-					else if(content[n] instanceof ParaSpace2)
-					{	
-						text += " ";
-					}
-					else if(content[n] instanceof ParaTab2)//tab
-					{
-						if(!oNewItem.length)
-						{
-							fontFamily = paragraphFontFamily;
-							this.fontsNew[fontFamily] = 1;
-							colorText = colorParagraph ? colorParagraph : new RgbColor(this.clipboard._getBinaryColor("rgb(0, 0, 0)"));
-							
-							oNewItem.push({
-								format: {
-									fn: fontFamily,
-									fs: paragraphFontSize,
-									c: colorText,
-									b: paragraphBold,
-									i: paragraphItalic,
-									u: paragraphUnderline,
-									s: paragraphStrikeout,
-									va: paragraphVertAlign
+							else if(paraRunContent[pR] instanceof ParaText)//text
+							{
+								text += paraRunContent[pR].Value;
+							}
+							else if(paraRunContent[pR] instanceof ParaSpace)
+							{	
+								text += " ";
+							}
+							else if(paraRunContent[pR] instanceof ParaTab)//tab
+							{
+								if(!oNewItem.length)
+								{
+									fontFamily = paragraphFontFamily;
+									this.fontsNew[fontFamily] = 1;
+									colorText = colorParagraph ? colorParagraph : new RgbColor(this.clipboard._getBinaryColor("rgb(0, 0, 0)"));
+									
+									oNewItem.push({
+										format: {
+											fn: fontFamily,
+											fs: paragraphFontSize,
+											c: colorText,
+											b: paragraphBold,
+											i: paragraphItalic,
+											u: paragraphUnderline,
+											s: paragraphStrikeout,
+											va: paragraphVertAlign
+										}
+									});
 								}
-							});
-						}
-						if(text !== null)
-							oNewItem[oNewItem.length - 1].text = text;
-						//переходим в следующую ячейку
-						if(typeof aResult[row][s + c1] == "object")
-							aResult[row][s + c1][aResult[row][s + c1].length] = oNewItem;
-						else
-						{
-							aResult[row][s + c1] = [];
-							aResult[row][s + c1][0] = oNewItem;
-						}
-							
-						text = "";
-						oNewItem = [];
-						s++;
-					}
-					else if(content[n] instanceof ParaEnd2)//end
-					{
-						if(!oNewItem.length)
-						{
-							fontFamily = paragraphFontFamily;
-							this.fontsNew[fontFamily] = 1;
-							colorText = colorParagraph ? colorParagraph : new RgbColor(this.clipboard._getBinaryColor("rgb(0, 0, 0)"));
-							
-							oNewItem.push({
-								format: {
-									fn: fontFamily,
-									fs: paragraphFontSize,
-									c: colorText,
-									b: paragraphBold,
-									i: paragraphItalic,
-									u: paragraphUnderline,
-									s: paragraphStrikeout,
-									va: paragraphVertAlign
+								if(text !== null)
+									oNewItem[oNewItem.length - 1].text = text;
+								//переходим в следующую ячейку
+								if(typeof aResult[row][s + c1] == "object")
+									aResult[row][s + c1][aResult[row][s + c1].length] = oNewItem;
+								else
+								{
+									aResult[row][s + c1] = [];
+									aResult[row][s + c1][0] = oNewItem;
 								}
-							});
-						}
-						if(text !== null)
-							oNewItem[oNewItem.length - 1].text = text;
-						text = "";
-						if(typeof aResult[row][s + c1] == "object")
-							aResult[row][s + c1][aResult[row][s + c1].length] = oNewItem;
-						else
-						{
-							aResult[row][s + c1] = [];
-							aResult[row][s + c1][0] = oNewItem;
-						}
-					}
-					else if(n == content.length - 1)//end of row
-					{
-						text = "";
-						oNewItem = [];
-					}
+									
+								text = "";
+								oNewItem = [];
+								s++;
+							}
+							else if(paraRunContent[pR] instanceof ParaEnd)//end
+							{
+								if(!oNewItem.length)
+								{
+									fontFamily = paragraphFontFamily;
+									this.fontsNew[fontFamily] = 1;
+									colorText = colorParagraph ? colorParagraph : new RgbColor(this.clipboard._getBinaryColor("rgb(0, 0, 0)"));
+									
+									oNewItem.push({
+										format: {
+											fn: fontFamily,
+											fs: paragraphFontSize,
+											c: colorText,
+											b: paragraphBold,
+											i: paragraphItalic,
+											u: paragraphUnderline,
+											s: paragraphStrikeout,
+											va: paragraphVertAlign
+										}
+									});
+								}
+								if(text !== null)
+									oNewItem[oNewItem.length - 1].text = text;
+								text = "";
+								if(typeof aResult[row][s + c1] == "object")
+									aResult[row][s + c1][aResult[row][s + c1].length] = oNewItem;
+								else
+								{
+									aResult[row][s + c1] = [];
+									aResult[row][s + c1][0] = oNewItem;
+								}
+							}
+							else if(n == paraRunContent[pR].length - 1)//end of row
+							{
+								text = "";
+								oNewItem = [];
+							}
+						};
+					}	
 				};
 			}
 		};
