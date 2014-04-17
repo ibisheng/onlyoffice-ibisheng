@@ -61,7 +61,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.documentTitleWithoutExtention = "null";
 			this.documentFormat = "null";
 			this.documentVKey = null;
-			this.documentOrigin = "";
 			this.documentFormatSave = c_oAscFileType.XLSX;
 			this.documentFormatSaveCsvCodepage = 65001;//utf8
 			this.documentFormatSaveCsvDelimiter = c_oAscCsvDelimiter.Comma;
@@ -426,7 +425,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this.documentTitle  		= this.DocInfo["Title"];
 					this.documentFormat 		= this.DocInfo["Format"];
 					this.documentVKey   		= this.DocInfo["VKey"];
-					this.documentOrigin 		= this.DocInfo["Origin"];
 					this.chartEditor			= this.DocInfo["ChartEditor"];
 					this.documentOpenOptions 	= this.DocInfo["Options"];
 					
@@ -455,15 +453,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this.User = new asc_user();
 					this.User.asc_setId(this.DocInfo["UserId"]);
 					this.User.asc_setUserName(this.DocInfo["UserName"]);
-
-					//Взято из редактора документов
-					var sProtocol = window.location.protocol;
-					var sHost = window.location.host;
-					this.documentOrigin = "";
-					if(sProtocol && sProtocol.length > 0)
-						this.documentOrigin = sProtocol + "//" + sHost;
-					else
-						this.documentOrigin = sHost;
 				}
 
                 if (this.DocInfo["OfflineApp"] && (true == this.DocInfo["OfflineApp"])) {
