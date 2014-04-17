@@ -4172,14 +4172,31 @@ ParaDrawing.prototype =
     
     Save_RecalculateObject : function(Copy)
     {
-        return null;
+        var DrawingObj = new Object();
+        
+        DrawingObj.Type         = this.Type;
+        DrawingObj.DrawingType  = this.DrawingType;
+        DrawingObj.WrappingType = this.wrappingType;
+        
+        if ( drawing_Anchor === this.Get_DrawingType() && true === this.Use_TextWrap() )
+        {
+            DrawingObj.FlowPos =
+            {
+                X : this.X - this.Distance.L,
+                Y : this.Y - this.Distance.T,
+                W : this.W + this.Distance.R,
+                H : this.H + this.Distance.B
+            }
+        }
+        
+        return DrawingObj;
     },
     
     Load_RecalculateObject : function(RecalcObj)
     {
     },
-    
-    Prepeare_RecalculateObject : function()
+
+    Prepare_RecalculateObject : function()
     {
     },
 
@@ -7265,7 +7282,7 @@ ParaPageNum.prototype =
 
     Save_RecalculateObject : function(Copy)
     {
-        return new CPageNumRecalculateObject(this.Widths, this.String, this.Width, Copy);
+        return new CPageNumRecalculateObject(this.Type, this.Widths, this.String, this.Width, Copy);
     },
 
     Load_RecalculateObject : function(RecalcObj)
@@ -7319,8 +7336,9 @@ ParaPageNum.prototype =
     }
 };
 
-function CPageNumRecalculateObject(Widths, String, Width, Copy)
+function CPageNumRecalculateObject(Type, Widths, String, Width, Copy)
 {
+    this.Type   = Type;
     this.Widths = Widths;
     this.String = String;
     this.Width  = Width;

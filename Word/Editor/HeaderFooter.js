@@ -50,6 +50,7 @@ function CHeaderFooter(Parent, LogicDocument, DrawingDocument, Type, BoundY2)
         CurPage       : -1, // Текущий выставленный номер страницы
         RecalcObj     : {}, // Постраничные объекты пересчета данного колонтитула
         NeedRecalc    : {}, // Объект с ключом - номером страницы, нужно ли пересчитывать данную страницу
+        SectPr        : {}, // Объект с ключом - номером страницы и полем - ссылкой на секцию
         
         OldBounds  : null, // границы колонтитула после предыдущего пересчета
         OldFlowPos : null  // позиции всех flow-объектов, после предыдущего пересчета
@@ -93,7 +94,7 @@ CHeaderFooter.prototype =
         return true;
     },
     
-    Recalculate : function(Page_abs)
+    Recalculate : function(Page_abs, SectPr)
     {
         // Логика пересчета колонтитулов следующая:
         // 1. При пересчете страницы каждый раз пересчитывается колонтитул (всмысле заходим в функцию Recalculate,т.е. сюда)
@@ -113,31 +114,9 @@ CHeaderFooter.prototype =
             bChanges = true;
         else
         {
-            // Получим данные о предыдущем пересчете
-            this.Content.Load_RecalculateObject( RecalcObj );
-
-            OldSumH   = this.Content.Get_SummaryHeight();
-            OldBounds = this.Content.Get_PageBounds(0);
-            
-            var AllDrawingObjects = this.Content.Get_AllDrawingObjects();
-            var Count = AllDrawingObjects.length;
-
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                var Obj = AllDrawingObjects[Index];
-                if ( drawing_Anchor === Obj.Get_DrawingType() && true === Obj.Use_TextWrap() )
-                {
-                    var FlowPos =
-                    {
-                        X : Obj.X - Obj.Distance.L,
-                        Y : Obj.Y - Obj.Distance.T,
-                        W : Obj.W + Obj.Distance.R,
-                        H : Obj.H + Obj.Distance.B
-                    };
-
-                    OldFlowPos.push( FlowPos );
-                }
-            }
+            OldSumH   = RecalcObj.Get_SummaryHeight();
+            OldBounds = RecalcObj.Get_PageBounds(0);
+            RecalcObj.Get_DrawingFlowPos( OldFlowPos );
         }
         
         // Пересчитаем заново данный колонтитул        
@@ -151,6 +130,7 @@ CHeaderFooter.prototype =
         
         this.RecalcInfo.RecalcObj[Page_abs]  = this.Content.Save_RecalculateObject();
         this.RecalcInfo.NeedRecalc[Page_abs] = false;
+        this.RecalcInfo.SectPr[Page_abs]     = false;
         
         // Если у нас до этого был какой-то пересчет, тогда сравним его с текущим.
         // 1. Сравним границы: у верхнего колонтитула смотрим на изменение нижней границы, а нижнего - верхней
@@ -1047,65 +1027,7 @@ CHeaderFooter.prototype =
     },
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
-//-----------------------------------------------------------------------------------
-    Undo : function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case historyitem_HdrFtr_BoundY2:
-            {
-                this.BoundY2 = Data.Old;
-
-                if ( this.Type === hdrftr_Header )
-                    this.Content.Reset( X_Left_Field, this.BoundY2, X_Right_Field, Page_Height / 2 );
-                else
-                {
-                    var Bounds = this.Get_Bounds();
-                    var SummaryHeight = this.Content.Get_SummaryHeight();
-
-                    var Top    = Bounds.Top;
-                    var Bottom = Top + SummaryHeight;
-
-                    if ( Bottom - Top < Page_Height / 3 )
-                        this.Content.Reset( X_Left_Field, this.BoundY2 - ( Bottom - Top ), X_Right_Field, Page_Height );
-                    else
-                        this.Content.Reset( X_Left_Field, 2 / 3 * Page_Height, X_Right_Field, Page_Height );
-                }
-
-                break;
-            }
-        }
-    },
-
-    Redo : function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case historyitem_HdrFtr_BoundY2:
-            {
-                this.BoundY2 = Data.New;
-
-                if ( this.Type === hdrftr_Header )
-                    this.Content.Reset( X_Left_Field, this.BoundY2, X_Right_Field, Page_Height / 2 );
-                else
-                {
-                    var SummaryHeight = this.Content.Get_SummaryHeight();
-
-                    if ( SummaryHeight < Page_Height / 3 )
-                        this.Content.Reset( X_Left_Field, this.BoundY2 - SummaryHeight, X_Right_Field, Page_Height );
-                    else
-                        this.Content.Reset( X_Left_Field, 2 / 3 * Page_Height, X_Right_Field, Page_Height );
-                }
-
-                break;
-            }
-        }
-    },
-
+//-----------------------------------------------------------------------------------    
     Get_ParentObject_or_DocumentPos : function()
     {
         return { Type : historyrecalctype_HdrFtr, Data : this };
@@ -1120,9 +1042,33 @@ CHeaderFooter.prototype =
     {
         // Сохраняем пересчитаные страницы в старый пересчет, а текущий обнуляем
         this.RecalcInfo.NeedRecalc = {};
-        this.RecalcInfo.CurPage   = -1;
+        this.RecalcInfo.SectPr     = {};
+        this.RecalcInfo.CurPage    = -1;
         
         History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : this } );
+    },
+    
+    Refresh_RecalcData_BySection : function(SectPr)
+    {
+        // Найдем среди пересчитанных страниц те, которые пересчитывались в заданной секции,
+        // и среди них найдем ключ с наименьшим номером. Далее, отметим все страницы с номером большим, чем найденный,
+        // как не пересчитанные.
+        
+        var MinPageIndex = -1;
+        for ( var PageIndex in this.RecalcInfo.NeedRecalc )
+        {
+            if ( SectPr === this.RecalcInfo.SectPr[PageIndex] && ( -1 === MinPageIndex || PageIndex < MinPageIndex ) )
+                MinPageIndex = PageIndex;                
+        }
+        
+        for ( var PageIndex in this.RecalcInfo.NeedRecalc )
+        {
+            if ( PageIndex >= MinPageIndex )
+            {
+                delete this.RecalcInfo.NeedRecalc[PageIndex];
+                delete this.RecalcInfo.SectPr[PageIndex];                    
+            }
+        }
     },
 //-----------------------------------------------------------------------------------
 // Поиск
@@ -1178,76 +1124,6 @@ CHeaderFooter.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с совместным редактирования
 //-----------------------------------------------------------------------------------
-    Save_Changes : function(Data, Writer)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        Writer.WriteLong( historyitem_type_HdrFtrController );
-
-        var Type = Data.Type;
-
-        // Пишем тип
-        Writer.WriteLong( Type );
-
-        switch ( Type )
-        {
-            case historyitem_HdrFtr_BoundY2:
-            {
-                // Double : BoundY2
-
-                Writer.WriteDouble( Data.New );
-
-                break;
-            }
-        }
-
-        return Writer;
-    },
-
-    Save_Changes2 : function(Data, Writer)
-    {
-        return false;
-    },
-
-    Load_Changes : function(Reader, Reader2)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        var ClassType = Reader.GetLong();
-        if ( historyitem_type_HdrFtrController != ClassType )
-            return;
-
-        var Type = Reader.GetLong();
-
-        switch ( Type )
-        {
-            case historyitem_HdrFtr_BoundY2:
-            {
-                // Double : BoundY2
-
-                this.BoundY2 = Reader.GetDouble();
-
-                if ( this.Type === hdrftr_Header )
-                    this.Content.Reset( X_Left_Field, this.BoundY2, X_Right_Field, Page_Height / 2 );
-                else
-                {
-                    var SummaryHeight = this.Content.Get_SummaryHeight();
-
-                    if ( SummaryHeight < Page_Height / 3 )
-                        this.Content.Reset( X_Left_Field, this.BoundY2 - SummaryHeight, X_Right_Field, Page_Height );
-                    else
-                        this.Content.Reset( X_Left_Field, 2 / 3 * Page_Height, X_Right_Field, Page_Height );
-                }
-
-                break;
-            }
-        }
-    },
-
     Write_ToBinary2 : function(Writer)
     {
         Writer.WriteLong( historyitem_type_HdrFtr );
@@ -1725,7 +1601,6 @@ CHeaderFooterController.prototype =
 //-----------------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------------
-
     RecalculateCurPos : function()
     {
         if ( null != this.CurHdrFtr )
@@ -1766,6 +1641,8 @@ CHeaderFooterController.prototype =
             XLimit = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Top();
         }
         
+        var bRecalcHeader = false;
+        
         // Рассчитываем верхний колонтитул
         if ( null !== Header )
         {
@@ -1775,7 +1652,7 @@ CHeaderFooterController.prototype =
                 var YLimit = (orientation_Portrait === Orient ? SectPr.Get_PageHeight() / 2 : SectPr.Get_PageWidth() / 2);
 
                 Header.Reset( X, Y, XLimit, YLimit );
-                Header.Recalculate(PageIndex);
+                bRecalcHeader = Header.Recalculate(PageIndex);
             }
             else 
             {
@@ -1783,6 +1660,8 @@ CHeaderFooterController.prototype =
                     Header.Set_Page(PageIndex);
             }
         }
+        
+        var bRecalcFooter = false;
         
         // Рассчитываем нижний колонтитул
         if ( null !== Footer )
@@ -1802,7 +1681,7 @@ CHeaderFooterController.prototype =
                 Y = Math.max( 2 * YLimit / 3, YLimit - SectPr.Get_PageMargins_Footer() - SummaryHeight );
 
                 Footer.Reset( X, Y, XLimit, YLimit );
-                Footer.Recalculate(PageIndex);
+                bRecalcFooter = Footer.Recalculate(PageIndex);
             }
             else
             {
@@ -1810,6 +1689,11 @@ CHeaderFooterController.prototype =
                     Footer.Set_Page(PageIndex);
             }
         }
+        
+        if ( true === bRecalcHeader || true === bRecalcFooter )
+            return true;
+        
+        return false;
     },
 
     Reset_RecalculateCache : function()

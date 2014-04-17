@@ -6991,9 +6991,9 @@ function Binary_HdrFtrTableReader(doc, oReadResult, openParams, stream)
         {
             var hdrftr;
 			if(hdrftr_Header == nHdrFtrType)
-				hdrftr = new CHeaderFooter(this.Document.HdrFtr, this.Document, this.Document.DrawingDocument, nHdrFtrType, Y_Default_Header);
+				hdrftr = new CHeaderFooter(this.Document.HdrFtr, this.Document, this.Document.DrawingDocument, nHdrFtrType );
 			else
-				hdrftr = new CHeaderFooter(this.Document.HdrFtr, this.Document, this.Document.DrawingDocument, nHdrFtrType, Page_Height - Y_Default_Footer);
+				hdrftr = new CHeaderFooter(this.Document.HdrFtr, this.Document, this.Document.DrawingDocument, nHdrFtrType );
             this.bdtr.Document = hdrftr.Content;
             var oNewItem = {Content: null};
             res = this.bcr.Read1(length, function(t, l){

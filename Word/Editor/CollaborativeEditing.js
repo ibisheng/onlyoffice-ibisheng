@@ -136,13 +136,10 @@ function CTableId()
             case historyitem_type_Hyperlink        : if ( true !== Debug_ParaRunMode ) Element = new ParaHyperlinkStart(); else Element = new ParaHyperlink(); break;
             case historyitem_type_Drawing          : Element = new ParaDrawing(); break;
             case historyitem_type_DrawingObjects   : Element = new CDrawingObjects(); break;
-            case historyitem_type_FlowObjects      : Element = new FlowObjects(); break;
-            case historyitem_type_FlowImage        : Element = new FlowImage(); break;
             case historyitem_type_Table            : Element = new CTable(); break;
             case historyitem_type_TableRow         : Element = new CTableRow(); break;
             case historyitem_type_TableCell        : Element = new CTableCell(); break;
             case historyitem_type_DocumentContent  : Element = new CDocumentContent(); break;
-            case historyitem_type_FlowTable        : Element = new FlowTable(); break;
             case historyitem_type_HdrFtr           : Element = new CHeaderFooter(); break;
             case historyitem_type_AbstractNum      : Element = new CAbstractNum(); break;
             case historyitem_type_Comment          : Element = new CComment(); break;

@@ -21882,5 +21882,9 @@ CTableRecalculateObject.prototype =
     
     Load : function()
     {
+    },
+    
+    Get_DrawingFlowPos : function(FlowPos)
+    {        
     }
 };

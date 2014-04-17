@@ -148,7 +148,17 @@ CDocumentContent.prototype =
             return { X : X, XLimit : XLimit, Y : Y, YLimit : YLimit }
         }
         else
-            return { X : 0, Y : 0, XLimit : Page_Width, YLimit : Page_Height };
+        {
+            var Page_abs = this.Get_StartPage_Absolute() + PageIndex;
+            var Index = ( undefined !== this.LogicDocument.Pages[Page_abs] ? this.LogicDocument.Pages[Page_abs].Pos : 0 );
+            var SectPr = this.LogicDocument.SectionsInfo.Get_SectPr(Index).SectPr;
+            var Orient = SectPr.Get_Orientation();
+
+            var W = ( orientation_Portrait === Orient ? SectPr.Get_PageWidth() : SectPr.Get_PageHeight() );
+            var H = ( orientation_Portrait !== Orient ? SectPr.Get_PageWidth() : SectPr.Get_PageHeight() );
+
+            return { X : 0, Y : 0, XLimit : W, YLimit : H };
+        }
     },
 
     Get_PageFields : function(PageIndex)
@@ -165,10 +175,44 @@ CDocumentContent.prototype =
                 return { X : X, XLimit : XLimit, Y : Y, YLimit : YLimit }
             }
             else
-                return { X : 0, XLimit : Page_Width, Y : 0, YLimit : Page_Height }
+            {
+                var Page_abs = this.Get_StartPage_Absolute() + PageIndex;
+                var Index = ( undefined !== this.LogicDocument.Pages[Page_abs] ? this.LogicDocument.Pages[Page_abs].Pos : 0 );
+                var SectPr = this.LogicDocument.SectionsInfo.Get_SectPr(Index).SectPr;
+                var Orient = SectPr.Get_Orientation();
+
+                var W = ( orientation_Portrait === Orient ? SectPr.Get_PageWidth() : SectPr.Get_PageHeight() );
+                var H = ( orientation_Portrait !== Orient ? SectPr.Get_PageWidth() : SectPr.Get_PageHeight() );
+
+                return { X : 0, Y : 0, XLimit : W, YLimit : H };
+            }
         }
         else
-            return { X : X_Left_Field, Y : Y_Top_Field, XLimit : X_Right_Field, YLimit : Y_Bottom_Field };
+        {
+            var Page_abs = this.Get_StartPage_Absolute() + PageIndex;
+            var Index = ( undefined !== this.LogicDocument.Pages[Page_abs] ? this.LogicDocument.Pages[Page_abs].Pos : 0 );
+            var SectPr = this.LogicDocument.SectionsInfo.Get_SectPr(Index).SectPr;
+            var Orient = SectPr.Get_Orientation();
+
+            var X, Y, XLimit, YLimit;
+            if ( orientation_Portrait == SectPr.PageSize.Orient )
+            {
+                Y      = SectPr.PageMargins.Top;
+                YLimit = SectPr.PageSize.H - SectPr.PageMargins.Bottom;
+                X      = SectPr.PageMargins.Left;
+                XLimit = SectPr.PageSize.W - SectPr.PageMargins.Right;
+            }
+            else
+            {
+                Y      = SectPr.PageMargins.Left;
+                YLimit = SectPr.PageSize.W - SectPr.PageMargins.Right;
+                X      = SectPr.PageMargins.Bottom;
+                XLimit = SectPr.PageSize.H - SectPr.PageMargins.Top;
+            }
+
+            return { X : X, Y : Y, XLimit : XLimit, YLimit : YLimit };            
+        }
+            
     },
 
     Get_EmptyHeight : function()
@@ -477,140 +521,6 @@ CDocumentContent.prototype =
         }
     },
 
-    Recalculate_ : function(bForceRecalc, LastChangeIndex)
-    {
-        if ( true === this.TurnOffRecalc || editor && true === editor.WordControl.m_oLogicDocument.TurnOffRecalc )
-            return;
-
-        if ( "undefined" === typeof(bForceRecalc) )
-            bForceRecalc = false;
-
-        if ( "undefined" === typeof(LastChangeIndex) )
-            LastChangeIndex = 0;
-
-        var OldPages  = this.Pages.length;
-        var OldBottom = new Array();
-        for ( var Index = 0; Index < OldPages; Index++ )
-              OldBottom[Index] = this.Pages[Index].Bounds.Bottom;
-
-        var Old_FlowObjects = new Array();
-        for ( var Index = 0; Index < this.Pages.length; Index++ )
-            Old_FlowObjects[Index] = this.Pages[Index].FlowObjects;
-
-        this.Pages.length = 0;
-        this.Pages[0] =
-        {
-            Pos    : 0,
-            X      : this.X,
-            Y      : this.Y,
-            XLimit : this.XLimit,
-            YLimit : this.YLimit,
-
-            Bounds :
-            {
-                Left   : this.X,
-                Top    : this.Y,
-                Right  : this.XLimit,
-                Bottom : this.Y
-            },
-
-            FlowObjects : Old_FlowObjects[0]
-        };
-
-
-        var Count = this.Content.length;
-
-        var X = this.X;
-        var Y = this.Y;
-
-        var CurPage = 0;
-
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            // Пересчитываем элемент
-            var Element = this.Content[Index];
-            Element.Set_DocumentIndex( Index );
-            
-            if ( Index >= LastChangeIndex )
-            {
-                Element.TurnOff_RecalcEvent();
-                Element.Reset( X, Y, this.Pages[CurPage].XLimit, this.Pages[CurPage].YLimit, CurPage );
-                Element.Recalculate();
-                Element.TurnOn_RecalcEvent();
-            }
-
-            var bNewPage = false;
-            var Temp = CurPage;
-            for ( ; CurPage < Temp + Element.Pages.length - 1; )
-            {
-                // Выставляем нижнюю границу
-                this.Pages[CurPage].Bounds.Bottom = Element.Pages[CurPage - Temp].Bounds.Bottom;
-
-                if ( "undefined" == typeof(this.Pages[++CurPage]) )
-                {
-                    this.Pages[CurPage] = new Object();
-                }
-
-                var StartPos = this.Get_PageContentStartPos( CurPage );
-                this.Pages[CurPage] =
-                {
-                    Pos    : Index,
-                    X      : StartPos.X,
-                    Y      : StartPos.Y,
-                    XLimit : StartPos.XLimit,
-                    YLimit : StartPos.YLimit,
-
-                    Bounds :
-                    {
-                        Left   : StartPos.X,
-                        Top    : StartPos.Y,
-                        Right  : StartPos.XLimit,
-                        Bottom : StartPos.Y
-                    }
-                };
-
-                if ( "undefined" != typeof(Old_FlowObjects[CurPage]) && null != Old_FlowObjects[CurPage] )
-                    this.Pages[CurPage].FlowObjects = Old_FlowObjects[CurPage];
-                else
-                    this.Pages[CurPage].FlowObjects = new FlowObjects(this, CurPage);
-
-                bNewPage = true;
-            }
-
-            // Выставляем нижнюю границу
-            this.Pages[CurPage].Bounds.Bottom = Element.Pages[Element.Pages.length - 1].Bounds.Bottom;
-
-            if ( false === bNewPage )
-                Y += Element.Bounds.Bottom - Element.Bounds.Top;
-            else
-            {
-                Y = this.Get_PageContentStartPos( CurPage ).Y;
-                Y += Element.Bounds.Bottom - Y;
-            }
-        }
-
-        var NewPages  = this.Pages.length;
-        var NewBottom = new Array();
-        for ( var Index = 0; Index < NewPages; Index++ )
-            NewBottom[Index] = this.Pages[Index].Bounds.Bottom;
-
-        var bChange = ( ( OldPages != NewPages )  ? true : false );
-        if ( false === bChange )
-        {
-            for ( var Index = 0; Index < OldPages; Index++ )
-            {
-                if ( Math.abs( OldBottom[Index] - NewBottom[Index] ) > 0.01 )
-                {
-                    bChange = true;
-                    break;
-                }
-            }
-        }
-
-        // Сообщаем родительскому классу, что контент пересчитался
-        this.Parent.OnContentRecalculate( bChange, bForceRecalc );
-    },
-
     // Пересчитываем отдельную страницу DocumentContent
     Recalculate_Page : function(PageIndex, bStart)
     {
@@ -684,7 +594,7 @@ CDocumentContent.prototype =
                     this.RecalcInfo.FlowObject   = Element;
                     this.RecalcInfo.RecalcResult = Element.Recalculate_Page( PageIndex );
 					if(this.DrawingObjects)
-						this.DrawingObjects.addFloatTable( new CFlowTable2( Element, PageIndex ) );
+						this.DrawingObjects.addFloatTable( new CFlowTable( Element, PageIndex ) );
                     RecalcResult = recalcresult_CurPage;
                 }
                 else if ( Element === this.RecalcInfo.FlowObject )
@@ -736,7 +646,7 @@ CDocumentContent.prototype =
                     {
                         RecalcResult = Element.Recalculate_Page( PageIndex );
 						if(this.DrawingObjects)
-							this.DrawingObjects.addFloatTable( new CFlowTable2( Element, PageIndex ) );
+							this.DrawingObjects.addFloatTable( new CFlowTable( Element, PageIndex ) );
 
                         if ( recalcresult_NextElement === RecalcResult )
                         {
@@ -1657,7 +1567,7 @@ CDocumentContent.prototype =
                 else
                 {
                     // Создаем новый параграф
-                    var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, X_Left_Field, Y_Bottom_Field );
+                    var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 );
 
                     // Проверим позицию в текущем параграфе
                     if ( true === Item.Cursor_IsEnd() )
@@ -1708,7 +1618,7 @@ CDocumentContent.prototype =
                 if (  0 === this.CurPos.ContentPos && Item.Cursor_IsStart(true) )
                 {
                     // Создаем новый параграф
-                    var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, X_Left_Field, Y_Bottom_Field );
+                    var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 );
                     this.Internal_Content_Add( 0, NewParagraph );
 
                     this.CurPos.ContentPos = 0;
@@ -1732,7 +1642,7 @@ CDocumentContent.prototype =
 
         while ( true )
         {
-            var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, X_Left_Field, Y_Bottom_Field );
+            var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 );
 
             var StyleId = LastPara.Style_Get();
             var NextId  = undefined;
@@ -1902,7 +1812,7 @@ CDocumentContent.prototype =
                     else
                     {
                         // Создаем новый параграф
-                        var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, X_Left_Field, Y_Bottom_Field );
+                        var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 );
                         Item.Split( NewParagraph );
 
                         // Добавляем новый параграф
@@ -3706,7 +3616,7 @@ CDocumentContent.prototype =
             else
             {
                 // Создаем новый параграф
-                var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, X_Left_Field, Y_Bottom_Field );
+                var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 );
                 Para.Split( NewParagraph );
                 this.Internal_Content_Add( DstIndex + 1, NewParagraph );
 
@@ -8646,5 +8556,41 @@ CDocumentRecalculateObject.prototype =
         {
             Doc.Content[Index].Load_RecalculateObject( this.Content[Index] );
         }
+    },
+    
+    Get_SummaryHeight : function()
+    {
+        var Height = 0;
+        var PagesCount = this.Pages.length;
+        for ( var Page = 0; Page < PagesCount; Page++ )
+        {
+            var Bounds = this.Get_PageBounds( Page );
+            Height += Bounds.Bottom - Bounds.Top;
+        }
+
+        return Height;
+    },
+    
+    Get_PageBounds : function(PageNum)
+    {
+        if ( this.Pages.length <= 0 )
+            return { Top : 0, Left : 0, Right : 0, Bottom : 0 };
+
+        if ( PageNum < 0 || PageNum > this.Pages.length )
+            return this.Pages[0].Bounds;
+
+        var Bounds = this.Pages[PageNum].Bounds;        
+
+        return Bounds;
+    },
+    
+    Get_DrawingFlowPos : function(FlowPos)
+    {
+        var Count = this.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            this.Content[Index].Get_DrawingFlowPos( FlowPos );
+        }
     }
+        
 };

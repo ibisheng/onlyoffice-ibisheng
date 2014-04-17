@@ -22797,6 +22797,18 @@ CRunRecalculateObject.prototype =
         }
     },
     
+    Get_DrawingFlowPos : function(FlowPos)
+    {
+        var Count = this.Content.length;
+        for ( var Index = 0, Index2 = 0; Index < Count; Index++ )
+        {
+            var Item = this.Content[Index];
+
+            if ( para_Drawing === Item.Type && undefined !== Item.FlowPos )
+                FlowPos.push( Item.FlowPos );
+        }
+    },
+    
     Compare : function(_CurLine, _CurRange, OtherLinesInfo)
     {
         var OLI = OtherLinesInfo;
@@ -22917,6 +22929,15 @@ CParagraphRecalculateObject.prototype =
         for ( var Index = 0; Index < Count; Index++ )
         {
             Para.Content[Index].Load_RecalculateObject(this.Content[Index]);
+        }
+    },
+    
+    Get_DrawingFlowPos : function(FlowPos)
+    {
+        var Count = this.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            this.Content[Index].Get_DrawingFlowPos( FlowPos );
         }
     }
 };

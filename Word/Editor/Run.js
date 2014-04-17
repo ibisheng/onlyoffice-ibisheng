@@ -938,6 +938,23 @@ ParaRun.prototype =
 
         if ( CurContentPos === CurPos )
         {
+            var LogicDocument = this.Paragraph.LogicDocument;
+            var LD_PageLimits = LogicDocument.Get_PageLimits( CurPage );
+            var LD_PageFields = LogicDocument.Get_PageFields( CurPage );
+
+            var Page_Width  = LD_PageLimits.XLimit;
+            var Page_Height = LD_PageLimits.YLimit;
+
+            var X_Left_Field   = LD_PageFields.X;
+            var Y_Top_Field    = LD_PageFields.Y;
+            var X_Right_Field  = LD_PageFields.XLimit;
+            var Y_Bottom_Field = LD_PageFields.YLimit;
+
+            var X_Left_Margin   = X_Left_Field;
+            var X_Right_Margin  = Page_Width  - X_Right_Field;
+            var Y_Bottom_Margin = Page_Height - Y_Bottom_Field;
+            var Y_Top_Margin    = Y_Top_Field;
+
             var Para    = DrawingLayout.Paragraph;
             var CurPage = DrawingLayout.Page;
             var Drawing = DrawingLayout.Drawing;
@@ -959,18 +976,11 @@ ParaRun.prototype =
                 Bottom_Margin = 0;
                 Page_H        = 0;
             }
-
+                                    
             if ( undefined != Drawing && true != Drawing.Use_TextWrap() )
             {
-                PageFields.X      = X_Left_Field;
-                PageFields.Y      = Y_Top_Field;
-                PageFields.XLimit = X_Right_Field;
-                PageFields.YLimit = Y_Bottom_Field;
-
-                PageLimits.X = 0;
-                PageLimits.Y = 0;
-                PageLimits.XLimit = Page_Width;
-                PageLimits.YLimit = Page_Height;
+                PageFields = LD_PageFields;
+                PageLimits = LD_PageLimits;
             }
 
             DrawingLayout.Layout = new CParagraphLayout( DrawingLayout.X, DrawingLayout.Y , Para.Get_StartPage_Absolute() + CurPage, DrawingLayout.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y );
@@ -1961,6 +1971,24 @@ ParaRun.prototype =
                 case para_Drawing:
                 {
                     var Para = PRSA.Paragraph;
+
+                    var LogicDocument = this.Paragraph.LogicDocument;
+                    var LD_PageLimits = LogicDocument.Get_PageLimits( CurPage );
+                    var LD_PageFields = LogicDocument.Get_PageFields( CurPage );
+
+                    var Page_Width  = LD_PageLimits.XLimit;
+                    var Page_Height = LD_PageLimits.YLimit;
+
+                    var X_Left_Field   = LD_PageFields.X;
+                    var Y_Top_Field    = LD_PageFields.Y;
+                    var X_Right_Field  = LD_PageFields.XLimit;
+                    var Y_Bottom_Field = LD_PageFields.YLimit;
+
+                    var X_Left_Margin   = X_Left_Field;
+                    var X_Right_Margin  = Page_Width  - X_Right_Field;
+                    var Y_Bottom_Margin = Page_Height - Y_Bottom_Field;
+                    var Y_Top_Margin    = Y_Top_Field;
+                    
                     var DrawingObjects = Para.Parent.DrawingObjects;
                     var PageLimits     = Para.Parent.Get_PageLimits(Para.PageNum + CurPage);
                     var PageFields     = Para.Parent.Get_PageFields(Para.PageNum + CurPage);

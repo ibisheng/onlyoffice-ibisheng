@@ -867,7 +867,7 @@ CStyle.prototype =
 
     Create_Header : function()
     {
-        var RPos = Page_Width - X_Left_Margin - X_Right_Margin;
+        var RPos = 297 - 30 - 15; // Ширина страницы - левое поле - правое поле
         var CPos = RPos / 2;
 
         var ParaPr =
@@ -910,7 +910,7 @@ CStyle.prototype =
 
     Create_Footer : function()
     {
-        var RPos = Page_Width - X_Left_Margin - X_Right_Margin;
+        var RPos = 297 - 30 - 15; // Ширина страницы - левое поле - правое поле
         var CPos = RPos / 2;
 
         var ParaPr =

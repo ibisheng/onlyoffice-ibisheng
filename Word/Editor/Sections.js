@@ -711,6 +711,9 @@ CSectionPr.prototype =
             var DocIndex = this.LogicDocument.SectionsInfo.Elements[Index - 1].Index + 1;
             this.LogicDocument.Refresh_RecalcData2( DocIndex, 0 );
         }
+        
+        // Дополнительно кроме этого мы должны обновить пересчет в колонтитулах, причем только начиная с данной секции
+        this.LogicDocument.On_SectionChange( this );
     },
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
