@@ -4436,7 +4436,7 @@ CTable.prototype =
     Save_RecalculateObject : function()
     {
         var RecalcObj = new CTableRecalculateObject();
-        RecalObj.Save( this );
+        RecalcObj.Save( this );
         return RecalcObj;
     }, 
     
@@ -4447,6 +4447,33 @@ CTable.prototype =
     
     Prepare_RecalculateObject : function()
     {
+        this.TableSumGrid    = [];
+        this.TableGridCalc   = [];
+
+        this.TableRowsBottom = [];
+        this.RowsInfo        = [];
+
+        this.HeaderInfo =
+        {
+            Count     : 0,
+            H         : 0,
+            PageIndex : 0,
+            Pages     : []
+        };
+
+        this.Pages           = [];
+
+        this.MaxTopBorder    = [];
+        this.MaxBotBorder    = [];
+        this.MaxBotMargin    = [];
+        
+        this.RecalcInfo.Reset( true );
+
+        var Count = this.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            this.Content[Index].Prepare_RecalculateObject();
+        }
     },
 
     Get_LastRangeVisibleBounds : function()
@@ -18711,6 +18738,31 @@ CTableRow.prototype =
         else
             return this.Content[CellIndex - 1].Get_EndInfo();
     },
+
+    Save_RecalculateObject : function()
+    {
+        var RecalcObj = new CTableRowRecalculateObject();
+        RecalcObj.Save( this );
+        return RecalcObj;
+    },
+
+    Load_RecalculateObject : function(RecalcObj)
+    {
+        RecalcObj.Load(this);
+    },
+
+    Prepare_RecalculateObject : function()
+    {
+        this.CellsInfo   = [];
+        this.Metrics     = { X_min : 0, X_max : 0 };
+        this.SpacingInfo = { Top : false, Bottom : false };
+
+        var Count = this.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            this.Content[Index].Prepare_RecalculateObject();
+        }
+    },
 //-----------------------------------------------------------------------------------
 // Работаем с стилем строки
 //-----------------------------------------------------------------------------------
@@ -20044,6 +20096,54 @@ CTableCell.prototype =
     Get_PrevElementEndInfo : function(CurElement)
     {
         return this.Row.Get_PrevElementEndInfo( this.Index );
+    },
+
+    Save_RecalculateObject : function()
+    {
+        var RecalcObj = new CTableCellRecalculateObject();
+        RecalcObj.Save( this );
+        return RecalcObj;
+    },
+
+    Load_RecalculateObject : function(RecalcObj)
+    {
+        RecalcObj.Load(this);
+    },
+
+    Prepare_RecalculateObject : function()
+    {
+        this.BorderInfo =
+        {
+            Top    : null,
+            Left   : null,
+            Right  : null,
+            Bottom : null,            // Используется для последней строки таблицы,
+            Bottom_BeforeCount : -1,  // когда Spacing = null(у последней строки) или когда в следущей строке
+            Bottom_AfterCount  : -1,  // GridBefore и/или GridAfter отлично от 0.
+            MaxLeft  : 0,
+            MaxRight : 0
+        };
+
+        // Метрики данной ячейки(они все относительные, а не абсолютные). Абсолютные хранятся в строке
+        this.Metrics =
+        {
+            StartGridCol    : 0,
+            X_grid_start    : 0,
+            X_grid_end      : 0,
+            X_cell_start    : 0,
+            X_cell_end      : 0,
+            X_content_start : 0,
+            X_content_end   : 0
+        };
+
+        this.Temp =
+        {
+            Y       : 0,
+            CurPage : 0,
+            Y_VAlign_offset : new Array() // Сдвиг, который нужно сделать из-за VAlign (массив по страницам)
+        };
+        
+        this.Content.Prepare_RecalculateObject();
     },
 //-----------------------------------------------------------------------------------
 // Работаем с стилем ячейки
@@ -21883,19 +21983,184 @@ CTableCell.prototype =
 
 function CTableRecalculateObject()
 {
+    this.TableSumGrid    = [];
+    this.TableGridCalc   = [];
+
+    this.TableRowsBottom = [];
+    this.HeaderInfo      = {};
+    this.RowsInfo        = [];
+   
+    this.X_origin = 0;
+    this.X        = 0;
+    this.Y        = 0;
+    this.XLimit   = 0;
+    this.YLimit   = 0;
+
+    this.Pages    = [];
+
+    this.MaxTopBorder = [];
+    this.MaxBotBorder = [];
+    this.MaxBotMargin = [];
+
+    this.Content = new Array();
 }
 
 CTableRecalculateObject.prototype = 
 {
-    Save : function()
+    Save : function(Table)
     {
+        this.TableSumGrid    = Table.TableSumGrid;
+        this.TableGridCalc   = Table.TableGridCalc;
+
+        this.TableRowsBottom = Table.TableRowsBottom;
+        this.HeaderInfo      = Table.HeaderInfo;        
+        this.RowsInfo        = Table.RowsInfo;
+        
+        this.X_origin        = Table.X_origin;
+        this.X               = Table.X;
+        this.Y               = Table.Y;
+        this.XLimit          = Table.XLimit;
+        this.YLimit          = Table.YLimit;
+        
+        this.Pages           = Table.Pages;
+        
+        this.MaxTopBorder    = Table.MaxTopBorder;
+        this.MaxBotBorder    = Table.MaxBotBorder;
+        this.MaxBotMargin    = Table.MaxBotBorder;
+        
+        var Count = Table.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            this.Content[Index] = Table.Content[Index].Save_RecalculateObject();
+        }
     },
     
-    Load : function()
+    Load : function(Table)
     {
+        Table.TableSumGrid    = this.TableSumGrid;
+        Table.TableGridCalc   = this.TableGridCalc;
+
+        Table.TableRowsBottom = this.TableRowsBottom;
+        Table.HeaderInfo      = this.HeaderInfo;
+        Table.RowsInfo        = this.RowsInfo;
+
+        Table.X_origin        = this.X_origin;
+        Table.X               = this.X;
+        Table.Y               = this.Y;
+        Table.XLimit          = this.XLimit;
+        Table.YLimit          = this.YLimit;
+
+        Table.Pages           = this.Pages;
+
+        Table.MaxTopBorder    = this.MaxTopBorder;
+        Table.MaxBotBorder    = this.MaxBotBorder;
+        Table.MaxBotMargin    = this.MaxBotBorder;
+
+        var Count = this.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            Table.Content[Index].Load_RecalculateObject( this.Content[Index] );
+        }
     },
     
     Get_DrawingFlowPos : function(FlowPos)
-    {        
+    {
+        var Count = this.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            this.Content[Index].Get_DrawingFlowPos( FlowPos );
+        }
     }
+};
+
+function CTableRowRecalculateObject()
+{
+    this.CellsInfo   = [];
+    this.Metrics     = {};
+    this.SpacingInfo = {};
+
+    this.Height      = 0;
+    this.PagesCount  = 0;
+    
+    this.Content = [];
+}
+
+CTableRowRecalculateObject.prototype = 
+{
+    Save : function(Row)
+    {
+        this.CellsInfo   = Row.CellsInfo;
+        this.Metrics     = Row.Metrics;
+        this.SpacingInfo = Row.SpacingInfo;
+        
+        this.Height      = Row.Height;
+        this.PagesCount  = Row.PagesCount;
+        
+        var Count = Row.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            this.Content[Index] = Row.Content[Index].Save_RecalculateObject();
+        }
+    },
+    
+    Load : function(Row)
+    {
+        Row.CellsInfo   = this.CellsInfo;
+        Row.Metrics     = this.Metrics;
+        Row.SpacingInfo = this.SpacingInfo;
+
+        Row.Height      = this.Height;
+        Row.PagesCount  = this.PagesCount;
+
+        var Count = Row.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            Row.Content[Index].Load_RecalculateObject( this.Content[Index] );
+        }
+    },
+    
+    Get_DrawingFlowPos : function(FlowPos)
+    {
+        var Count = this.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            this.Content[Index].Get_DrawingFlowPos( FlowPos );
+        }
+    }
+};
+
+function CTableCellRecalculateObject()
+{
+    this.BorderInfo = null;
+    this.Metrics    = null;
+    this.Temp       = null;
+    
+    this.Content    = null;
+}
+
+CTableCellRecalculateObject.prototype = 
+{
+    Save : function(Cell)
+    {
+        this.BorderInfo = Cell.BorderInfo;
+        this.Metrics    = Cell.Metrics;
+        this.Temp       = Cell.Temp;
+
+        this.Content = Cell.Content.Save_RecalculateObject();
+    },
+    
+    Load : function(Cell)
+    {
+        Cell.BorderInfo = this.BorderInfo;
+        Cell.Metrics    = this.Metrics;
+        Cell.Temp       = this.Temp;
+
+        Cell.Content.Load_RecalculateObject( this.Content );
+    },
+
+    Get_DrawingFlowPos : function(FlowPos)
+    {
+        this.Content.Get_DrawingFlowPos( FlowPos );
+    }
+        
 };
