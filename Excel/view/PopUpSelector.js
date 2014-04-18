@@ -42,8 +42,7 @@
 				this.selector = document.createElement("div");
 				this.selectorStyle = this.selector.style;
 				this.selector.id = "apiPopUpSelector";
-				this.selector.className = "dropdown-menu";	// Необходимо для меню
-				this.selector.innerHTML = '<div style="max-height:210px;overflow-y:auto"><ul id="apiPopUpList"></ul></div>';
+				this.selector.innerHTML = '<div style="max-height:210px;" class="combobox"><ul id="apiPopUpList" class="dropdown-menu"></ul></div>';
 
 				this.element.appendChild(this.selector);
 				this.selectorList = document.getElementById("apiPopUpList");
