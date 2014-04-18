@@ -132,7 +132,22 @@
                 "../../Excel/model/DrawingObjects/Format/ImagePrototype.js",
                 "../../Excel/model/DrawingObjects/Format/GroupPrototype.js",
                 "../../Excel/model/DrawingObjects/Format/ChartSpacePrototype.js",
-				
+
+
+                "../../Word/Math/mathTypes.js",
+                "../../Word/Math/mathText.js",
+                "../../Word/Math/mathContent.js",
+                "../../Word/Math/base.js",
+                "../../Word/Math/fraction.js",
+                "../../Word/Math/degree.js",
+                "../../Word/Math/matrix.js",
+                "../../Word/Math/limit.js",
+                "../../Word/Math/nary.js",
+                "../../Word/Math/radical.js",
+                "../../Word/Math/operators.js",
+                "../../Word/Math/accent.js",
+                "../../Word/Math/borderBox.js",
+
 				"../../Word/Editor/Comments.js",
 				"../../Word/Editor/Styles.js",
 				"../../Word/Editor/FlowObjects.js",
