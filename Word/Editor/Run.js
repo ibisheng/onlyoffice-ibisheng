@@ -47,6 +47,7 @@ function ParaRun(Paragraph, bMathRun)
     if(bMathRun)
     {
         this.typeObj = MATH_PARA_RUN;
+        this.MathPrp = new CMPrp();
         this.Parent = null;
         this.size =
         {
@@ -6688,4 +6689,8 @@ ParaRun.prototype.Math_applyArgSize = function(oWPrp)
      //tPrp.FontSize *= 0.65;
      tPrp.FontSize *= 0.53;
      //tPrp.FontSize *= 0.473;*/
+}
+ParaRun.prototype.Set_MathPrp = function(props)
+{
+    this.MathPrp.setMathProps(props);
 }
