@@ -32,8 +32,8 @@
 				hscrollStep: 10,
 				scrollTimeout: 20,
 				showArrows: true,//показывать или нет стрелки у скролла
-				scrollBackgroundColor:"#DDDDDD",//цвет фона скролла
-				scrollerColor:"#EDEDED",//цвет ползунка скрола
+				//scrollBackgroundColor:"#DDDDDD",//цвет фона скролла
+				//scrollerColor:"#EDEDED",//цвет ползунка скрола
 				isViewerMode: false,
 				wheelScrollLines: 3
 			};

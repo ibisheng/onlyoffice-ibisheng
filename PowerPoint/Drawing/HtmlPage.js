@@ -2010,8 +2010,8 @@ function CEditorPage(api)
         var settings = {
             showArrows: true,
             animateScroll: false,
-            scrollBackgroundColor:"#D3D3D3",
-            scrollerColor:"#EDEDED",
+//            scrollBackgroundColor:"#D3D3D3",
+//            scrollerColor:"#EDEDED",
             screenW: this.m_oEditor.HtmlElement.width,
             screenH: this.m_oEditor.HtmlElement.height,
             vsscrollStep: 45,

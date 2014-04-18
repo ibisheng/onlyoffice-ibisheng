@@ -2478,8 +2478,8 @@ function CEditorPage(api)
             var settings = {
                 showArrows: true,
                 animateScroll: false,
-                scrollBackgroundColor: GlobalSkin.BackgroundScroll,
-                scrollerColor:"#EDEDED",
+//                scrollBackgroundColor: GlobalSkin.BackgroundScroll,
+//                scrollerColor:"#EDEDED",
                 screenW: this.m_oEditor.HtmlElement.width,
                 screenH: this.m_oEditor.HtmlElement.height,
 				vscrollStep: 45,
