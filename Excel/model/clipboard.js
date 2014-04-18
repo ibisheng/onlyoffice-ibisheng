@@ -3356,57 +3356,70 @@
 						text = "";
 					
 					
-					//*paraRun*
-					if(content[n] instanceof ParaRun)
+					switch(content[n].Type)
 					{
-						paraRunContent = content[n].Content;
-						
-						cTextPr = content[n].Get_CompiledPr();
-						if(cTextPr && !(paraRunContent.length == 1 && paraRunContent[0] instanceof ParaEnd))//settings for text	
-							formatText = this._getPrParaRun(paraPr, cTextPr);
-						else if(!formatText)
-							formatText = this._getPrParaRun(paraPr, cTextPr);
-						
-						
-						for(var pR = 0; pR < paraRunContent.length; pR++)
+						case para_Run://*paraRun*
 						{
-	
-							if(paraRunContent[pR] instanceof ParaText)//text
+							paraRunContent = content[n].Content;
+						
+							cTextPr = content[n].Get_CompiledPr();
+							if(cTextPr && !(paraRunContent.length == 1 && paraRunContent[0] instanceof ParaEnd))//settings for text	
+								formatText = this._getPrParaRun(paraPr, cTextPr);
+							else if(!formatText)
+								formatText = this._getPrParaRun(paraPr, cTextPr);
+							
+							
+							for(var pR = 0; pR < paraRunContent.length; pR++)
 							{
-								text += paraRunContent[pR].Value;
-							}
-							else if(paraRunContent[pR] instanceof ParaSpace)
-							{	
-								text += " ";
-							}
-							else if(paraRunContent[pR] instanceof ParaTab || paraRunContent[pR] instanceof ParaEnd)//tab
-							{
-								if(!oNewItem.length)
+		
+								switch(paraRunContent[pR].Type)
 								{
-									fontFamily = paragraphFontFamily;
-									this.fontsNew[fontFamily] = 1;
+									case para_Text://*paraText*
+									{
+										text += paraRunContent[pR].Value;
+										break;
+									};
 									
-									oNewItem.push(formatText);
-								}
-								
-								if(text !== null)
-									oNewItem[oNewItem.length - 1].text = text;
-								
-								cloneNewItem  = this._getCloneNewItem(oNewItem);
-								
-								//переходим в следующую ячейку
-								if(typeof aResult[row][s + c1] == "object")
-									aResult[row][s + c1][aResult[row][s + c1].length] = cloneNewItem;
-								else
-								{
-									aResult[row][s + c1] = [];
-									aResult[row][s + c1][0] = cloneNewItem;
-								}
+									case para_Space://*paraSpace*
+									{
+										text += " ";
+										break;
+									};
 									
-								text = "";
-								oNewItem = [];
-								s++;
-							}
+									case para_Tab://*paraEnd / paraTab*
+									case para_End:
+									{
+										if(!oNewItem.length)
+										{
+											fontFamily = paragraphFontFamily;
+											this.fontsNew[fontFamily] = 1;
+											
+											oNewItem.push(formatText);
+										}
+										
+										if(text !== null)
+											oNewItem[oNewItem.length - 1].text = text;
+										
+										cloneNewItem  = this._getCloneNewItem(oNewItem);
+										
+										//переходим в следующую ячейку
+										if(typeof aResult[row][s + c1] == "object")
+											aResult[row][s + c1][aResult[row][s + c1].length] = cloneNewItem;
+										else
+										{
+											aResult[row][s + c1] = [];
+											aResult[row][s + c1][0] = cloneNewItem;
+										}
+											
+										text = "";
+										oNewItem = [];
+										s++;
+										break;
+									};
+								}
+							};
+							
+							break;
 						};
 					};
 				};
