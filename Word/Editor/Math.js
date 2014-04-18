@@ -74,6 +74,8 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Get_TextPr
 
+
+
         return new CTextPr();
     },
 
@@ -288,6 +290,25 @@ ParaMath.prototype =
         return new CParaPos( this.StartRange, this.StartLine, 0, 0 );
     },
 
+    Get_Default_TPrp: function()
+    {
+        var TextPrp = new CTextPr();
+
+        var DefaultPrp =
+        {
+            FontFamily:     {Name  : "Cambria Math", Index : -1 },
+            FontSize:       11,
+            FontSizeCS:     11,
+            Italic:         true,
+            Bold:           false
+        };
+
+        TextPrp.Set_FromObject(DefaultPrp);
+
+        return TextPrp;
+
+    },
+
     Apply_TextPr : function(TextPr, IncFontSize, ApplyToAll)
     {
         // TODO: ParaMath.Apply_TextPr
@@ -458,7 +479,7 @@ ParaMath.prototype =
                     else
                     {
                         PRS.EmptyLine   = false;
-                        PRS.X          += WordLen;
+                        //PRS.X          += WordLen;
 
                         // Слово не убирается в отрезке, но, поскольку, слово 1 на строке и отрезок тоже 1,
                         // делим слово в данном месте
@@ -833,30 +854,31 @@ ParaMath.prototype =
 
         var Dx = this.Root.size.width;
         var D = SearchPos.X - SearchPos.CurX;
-        var Diff = Math.abs(D) < Math.abs(D + Dx) ? Math.abs(D) : Math.abs(D + Dx);
+
+        var startDx = Math.abs(D),
+            endDx = Math.abs(D - Dx);
+
+        var Diff = startDx < endDx ? startDx : endDx;
 
         var CurX = SearchPos.CurX;
 
-        if(Math.abs(Diff) < SearchPos.DiffX + 0.001 )
+        if(Math.abs(Diff) < SearchPos.DiffX + 0.001)
         {
-
             if ( D >= - 0.001 && D <= Dx + 0.001 )
             {
                 var X = SearchPos.X,
                     Y = SearchPos.Y;
 
-
                 SearchPos.X -= this.Math.absPos.x;
                 SearchPos.Y -= this.Math.absPos.y;
 
-                SearchPos.DiffX = Diff;
+
 
                 this.Root.Get_ParaContentPosByXY(SearchPos, Depth);
 
                 SearchPos.X = X;
                 SearchPos.Y = Y;
 
-                Result = true;
 
                 //////////
 
@@ -864,6 +886,27 @@ ParaMath.prototype =
                 SearchPos.DiffX =  0.001; // сравниваем расстояние до ближайшего элемента
 
             }
+            else if(startDx < endDx)
+            {
+                this.Get_StartPos(SearchPos.Pos, Depth);
+                SearchPos.DiffX = Diff;
+            }
+            else
+            {
+                this.Get_EndPos(false, SearchPos.Pos, Depth);
+                SearchPos.DiffX = Diff - 0.0015;
+
+                /*var str = "";
+                for(var i = 0; i < SearchPos.Pos.Data.length; i++)
+                {
+                    str += SearchPos.Pos.Data[i] + " ";
+                }
+
+                console.log("Get_EndPos : " + str);*/
+
+            }
+
+            Result = true;
 
         }
 
@@ -956,7 +999,34 @@ ParaMath.prototype =
 //-----------------------------------------------------------------------------------
     Set_SelectionContentPos : function(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag)
     {
+        /*var startStr = "";
+
+         if(StartContentPos !== null)
+         {
+         for(var i = 0; i < StartContentPos.Data.length; i++)
+         {
+         startStr += StartContentPos.Data[i] + " ";
+         }
+
+         console.log("StartContent : " + startStr);
+         }
+
+
+         var endStr = "";
+
+         if(EndContentPos !== null)
+         {
+         for(var i = 0; i < EndContentPos.Data.length; i++)
+         {
+         endStr += EndContentPos.Data[i] + " ";
+         }
+
+         console.log("EndContent : " + endStr);
+         }*/
+
         // TODO: ParaMath.Set_SelectionContentPos
+
+
 
         this.Root.Set_SelectionContentPos(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag);
 

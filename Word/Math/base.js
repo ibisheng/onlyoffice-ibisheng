@@ -1289,7 +1289,7 @@ CMathBase.prototype =
             ContentPos.Add(SelectX);
             ContentPos.Add(SelectY);
 
-            if(SelectX !== -1 && SelectY !== -1)
+            if(SelectX !== -1 && SelectY !== -1 && !this.elements[SelectX][SelectY].IsJustDraw())
                 this.elements[SelectX][SelectY].Get_ParaContentPos(bSelection, bStart, ContentPos);
 
         }
@@ -1337,8 +1337,8 @@ CMathBase.prototype =
         }
         else
         {
-            startX = -2;
-            startY = -2;
+            startX = -1;
+            startY = -1;
         }
 
         this.SelectStart_X = startX;
@@ -1366,7 +1366,7 @@ CMathBase.prototype =
         {
             this.elements[startX][startY].Set_SelectionContentPos(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag);
         }
-        else if(startX !== -2 && startY !== -2)
+        else if(startX !== -1 && startY !== -1)
         {
             this.elements[startX][startY].Set_SelectionContentPos(StartContentPos, null, Depth, StartFlag, -1);
         }

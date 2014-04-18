@@ -3966,8 +3966,18 @@ ParaRun.prototype =
             TextPr.Merge( StyleTextPr );
         }
 
-        // Мержим прямые настройки данного рана
-        TextPr.Merge( this.Pr );
+        if(this.typeObj == MATH_PARA_RUN)
+        {
+            var oWPrp = this.Parent.Get_Default_TPrp();
+            TextPr.Merge(oWPrp);
+            TextPr.Merge( this.Pr );            // Мержим прямые настройки данного рана
+            this.Parent.applyArgSize(TextPr);
+
+        }
+        else
+            TextPr.Merge( this.Pr ); // Мержим прямые настройки данного рана
+
+
 
         // Для совместимости со старыми версиями запишем FontFamily
         TextPr.FontFamily.Name  = TextPr.RFonts.Ascii.Name;
@@ -6588,6 +6598,7 @@ ParaRun.prototype.Math_Recalculate = function(RecalcInfo)
 
     g_oTextMeasurer.SetFont(oWPrp);
 
+
     for (var Pos = 0 ; Pos < this.Content.length; Pos++ )
     {
         RecalcInfo.leftRunPrp = RecalcInfo.currRunPrp;
@@ -6596,6 +6607,8 @@ ParaRun.prototype.Math_Recalculate = function(RecalcInfo)
         RecalcInfo.currRunPrp = oWPrp;
         RecalcInfo.Current = this.Content[Pos];
         RecalcInfo.setGaps();
+
+        var compiledTPrp = this.Get_CompiledPr(true);
 
         this.Content[Pos].Resize(g_oTextMeasurer);
 

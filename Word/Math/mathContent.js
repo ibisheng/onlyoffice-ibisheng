@@ -597,9 +597,9 @@ CMathRunPrp.prototype =
 
         if(!this.mathPrp.nor) // math text, style: plain
         {
-            var mPrp = this.mathPrp.getTxtPrp();
-
             oWPrp.Merge(this.textPrp); // FontFamily, FontSize etc
+
+            var mPrp = this.mathPrp.getTxtPrp();
             oWPrp.Merge(mPrp); // bold, italic
         }
         else
@@ -656,11 +656,16 @@ CMPrp.prototype =
 {
     Merge:  function(mPrp)
     {
+        // выравнивание
         this.aln      = mPrp.aln;
         this.brk      = mPrp.brk;
+
+        // настройки для букв в контенте
         this.lit      = mPrp.lit;
         this.nor      = mPrp.nor;
         this.typeText = mPrp.typeText;
+
+        // настройки bold, italic
         this.italic   = mPrp.italic;
         this.bold     = mPrp.bold;
         this.plain    = mPrp.plain;
@@ -758,8 +763,9 @@ CMPrp.prototype =
         }
         else if(props.sty === "p")
         {
-            // plain text ?!
-            this.plain = true;
+            // plain text ?!    // default
+            this.plain = true;  // italic = true
+                                // bold   = false
         }
 
         if(props.scr === "double-struck")    // U+1D538 - U+1D56B
@@ -5340,28 +5346,7 @@ CMathContent.prototype =
     },
     Resize: function(oMeasure)      // пересчитываем всю формулу
     {
-        // default для случая с плейсхолдером, RunPrp в контенте отсутствуют
-        /*var TxtSettings =
-        {
-            type:   TXT_ROMAN,
-            lit:    false
-        };*/
-
-        var RecalcInfo = new CRecalculateInfo(oMeasure, this, this.argSize, this.Composition);
-
-
-        /*if(this.content.length > 1)
-        {
-            if(this.IsEmptyRun(0))
-            {
-                RecalcInfo.Current = this.content[1];
-
-                if(this.IsEmptyRun(2))
-                    RecalcInfo.Right = this.content[2];
-            }
-            else
-                RecalcInfo.Current = this.content[0]; // right не прописываем
-        }*/
+        var RecalcInfo = new CRecalculateInfo(oMeasure, this);
 
         for(var pos = 0; pos < this.content.length; pos++)
         {
@@ -5400,25 +5385,9 @@ CMathContent.prototype =
             }
             else
             {
-                // to do убрать
                 this.content[pos].Set_Paragraph(this.Composition.Parent.Paragraph);
                 this.content[pos].Math_Recalculate(RecalcInfo);
             }
-
-            /*RecalcInfo.Left = RecalcInfo.Сurrent;
-            RecalcInfo.Сurrent = RecalcInfo.Right;*/
-
-            /*if( pos+1 == this.content.length )
-                RecalcInfo.Right = null;
-            else if(this.IsEmptyRun(pos+1))
-            {
-                if(pos+2 == this.content.length)
-                    RecalcInfo.Right = null;
-                else
-                    RecalcInfo.Right = this.content[pos+2];
-            }
-            else
-                pos++;*/
         }
 
         if(RecalcInfo.Current !== null)
@@ -5517,28 +5486,6 @@ CMathContent.prototype =
     {
         var bHidePlh = this.plhHide && this.IsPlaceholder();
 
-        /////  test   //////
-        /*if(!this.bRoot)
-        {
-            var xx = x + this.pos.x,
-                yy = y + this.pos.y,
-                w = this.size.width,
-                h = this.size.height;
-
-            pGraphics.p_width(1000);
-            pGraphics.b_color1(0,0,250, 255);
-
-            pGraphics._s();
-            pGraphics._m(xx, yy);
-            pGraphics._l(xx + w, yy);
-            pGraphics._l(xx + w, yy + h);
-            pGraphics._l(xx, yy + h);
-            pGraphics._l(xx, yy);
-            pGraphics.df();
-        }*/
-
-        //////////////////////
-
         if( !bHidePlh )
         {
             for(var i=0; i < this.content.length;i++)
@@ -5558,13 +5505,7 @@ CMathContent.prototype =
                 {
                     pGraphics.b_color1(0,0,0,255);
 
-                    var ctrPrp = this.Parent.getCtrPrp();
-                    /*var rPrp = new CMathTextPrp();
-                    rPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
-                    rPrp.Merge(ctrPrp);*/
-
-                    var oWPrp = new CTextPr();
-                    oWPrp.Merge(ctrPrp);
+                    var oWPrp = this.Parent.getCtrPrp();
 
                     this.applyArgSize(oWPrp);
                     oWPrp.Italic = false;
@@ -5577,47 +5518,8 @@ CMathContent.prototype =
                 else
                     this.content[i].draw(x, y, pGraphics);
 
-                /*if(this.content[i].value.typeObj == MATH_COMP)
-                {
-                    var penW = 25.4/96;
-                    var x1 = this.pos.x + x - penW + this.content[i-1].widthToEl,
-                        y1 = this.pos.y + y + penW,
-                        x2 = this.pos.x + x + penW + this.content[i].widthToEl,
-                        y2 = this.pos.y + y + this.size.height - penW;
-
-                    pGraphics.p_color(0,0,255, 255);
-                    pGraphics.drawVerLine(0, x1, y1, y2, penW);
-                    pGraphics.drawVerLine(0, x2, y1, y2, penW);
-                }*/
             }
         }
-
-        /// TEST
-        /*if(!this.IsOnlyText())
-        {
-            var penW = 25.4/96;
-            var x1 = this.pos.x + x - penW,
-                y1 = this.pos.y + y + penW,
-                x2 = this.pos.x + x + this.size.width + penW,
-                y2 = this.pos.y + y + this.size.height - penW;
-
-            pGraphics.p_color(0,0,255, 255);
-            pGraphics.drawVerLine(0, x1, y1, y2, penW);
-            pGraphics.drawVerLine(0, x2, y1, y2, penW);
-        }*/
-
-        /*if(this.bRoot)
-        {
-            var penW = 25.4/96;
-            var x1 = this.pos.x + x - penW,
-                y1 = this.pos.y + y + penW,
-                x2 = this.pos.x + x + this.size.width + penW,
-                y2 = this.pos.y + y + this.size.height - penW;
-
-            pGraphics.p_color(0,0,255, 255);
-            pGraphics.drawVerLine(0, x1, y1, y2, penW);
-            pGraphics.drawVerLine(0, x2, y1, y2, penW);
-        }*/
 
     },
     update_widthContent: function()
@@ -7493,6 +7395,18 @@ CMathContent.prototype =
             }
 
         }
+
+        /*if(this.bRoot)
+        {
+            var str = "";
+
+            for(var i = 0; i < SearchPos.Pos.Data.length; i++)
+            {
+                str += SearchPos.Pos.Data[i] + " ";
+            }
+
+            console.log(str);
+        }*/
     },
     Get_ParaContentPos: function(bSelection, bStart, ContentPos)
     {
@@ -7502,6 +7416,11 @@ CMathContent.prototype =
             ContentPos.Add(pos);
 
             this.content[pos].Get_ParaContentPos(bSelection, bStart, ContentPos);
+
+            /*if(this.bRoot)
+            {
+                console.log("SelectStartPos : " + this.SelectStartPos + " ; SelectEndPos : " + this.SelectEndPos);
+            }*/
         }
         else
         {
@@ -7781,6 +7700,30 @@ CMathContent.prototype =
         }
 
         return result;
+    },
+    Get_TextPr: function(ContentPos, Depth)
+    {
+        var pos = ContentPos.Get(Depth);
+        Depth++;
+
+
+        if(this.content[pos].typeObj == MATH_PLACEHOLDER)
+        {
+
+        }
+        else
+        {
+            this.content[pos].Get_TextPr(ContentPos, Depth);
+        }
+
+
+
+    },
+    Get_Default_TPrp: function()
+    {
+
+        return this.Composition.Parent.Get_Default_TPrp();
+
     },
     //////////////////////////
 

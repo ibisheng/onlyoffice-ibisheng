@@ -7166,7 +7166,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         var oCurContainer = oParStruct.cur.elem;
         if (c_oSerParType.Run === type)
         {
-            var oNewRun = new ParaRun(oParStruct.paragraph, true);
+            var oNewRun = new ParaRun(oParStruct.paragraph);
             var oRes = { bRes: true };
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadRun(t, l, oNewRun, oParStruct, oRes);
