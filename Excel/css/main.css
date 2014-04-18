@@ -135,7 +135,7 @@
 	height: 11pt;
 }
 
-#apiPopUpSelector {
+/*#apiPopUpSelector {
     z-index: 3000;
     height: auto;
     background-color: #FFF;
@@ -150,17 +150,17 @@
     margin: 0 10px 0 0;
     padding: 0;
     list-style: none;
-}
+}*/
 #apiPopUpList li {
     max-width: 500px;
-    text-overflow: ellipsis;
+    /*text-overflow: ellipsis;
     overflow: hidden;
-    white-space: nowrap;
+    white-space: nowrap;*/
 }
-#apiPopUpList li:hover {
+/*#apiPopUpList li:hover {
     background-color: #D8DADC;
 }
 #apiPopUpList li.selected {
     background-color: #7d858c;
     color: #fff;
-}
+}*/

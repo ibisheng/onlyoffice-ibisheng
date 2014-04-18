@@ -42,6 +42,7 @@
 				this.selector = document.createElement("div");
 				this.selectorStyle = this.selector.style;
 				this.selector.id = "apiPopUpSelector";
+				this.selector.className = "dropdown-menu";	// Необходимо для меню
 				this.selector.innerHTML = '<div style="max-height:210px;overflow-y:auto"><ul id="apiPopUpList"></ul></div>';
 
 				this.element.appendChild(this.selector);
@@ -76,7 +77,7 @@
 			}
 			this.isFormula = isFormula;
 
-			var item, isFirst;
+			var item, isFirst, value;
 			for (var i = 0; i < arrItems.length; ++i) {
 				item = document.createElement("li");
 				isFirst = (0 === i);
@@ -88,10 +89,14 @@
 						this.selectElement = item;
 						item.className = "selected";
 					}
-					item.innerHTML = arrItems[i].name;
+
+					value = arrItems[i].name;
 					item.setAttribute("title", arrItems[i].arg);
 				} else
-					item.innerHTML = arrItems[i];
+					value = arrItems[i];
+
+				item.innerHTML = "<a>" + value + "</a>";
+				item.setAttribute("val", value);
 
 				if (item.addEventListener) {
 					item.addEventListener("mousedown"	, this.fMouseDown		, false);
@@ -149,7 +154,7 @@
 					break;
 				case 13:  // "enter"
 					if (!this.isFormula && null !== this.selectElement)
-						this._onInsert(this.selectElement.innerHTML);
+						this._onInsert(this.selectElement.getAttribute("val"));
 					else
 						retVal = true;
 					break;
@@ -183,7 +188,7 @@
 			if (this.isFormula) {
 				this._onChangeSelection(element);
 			} else {
-				this._onInsert(element.innerHTML);
+				this._onInsert(element.getAttribute("val"));
 			}
 		};
 		PopUpSelector.prototype._onMouseDblClick = function (event) {
@@ -194,7 +199,7 @@
 				this._onMouseDown(event);
 				return;
 			}
-			var elementVal = (event ? (event.target || event.srcElement) : this.selectElement).innerHTML + "(";
+			var elementVal = (event ? (event.target || event.srcElement) : this.selectElement).getAttribute("val") + "(";
 			this._onInsert(elementVal);
 		};
 		PopUpSelector.prototype._onMouseOver = function (event) {
