@@ -801,6 +801,12 @@
 	prot["asc_getY"]			= prot.asc_getY;
 	prot["asc_getWidth"]		= prot.asc_getWidth;
 	prot["asc_getHeight"]		= prot.asc_getHeight;
+
+	function generateColor() {
+		return '#' + ('000000' + Math.floor(Math.random()*0xFFFFFF).toString(16)).substr(-6);
+	}
+
+	window["Asc"].generateColor = generateColor;
 }
 )(window);
 

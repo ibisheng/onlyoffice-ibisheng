@@ -3,16 +3,15 @@
 (function (global) {
     'use strict';
 	
-	var asc        = window["Asc"];
-	var asc_user  = asc.asc_CUser;
+	var asc			= window["Asc"];
+	var asc_user	= asc.asc_CUser;
 
 	// Класс надстройка, для online и offline работы
 	var CDocsCoApi = function (options) {
 		this._CoAuthoringApi = new DocsCoApi();
 		this._onlineWork = false;
 
-		if (options)
-		{
+		if (options) {
 			this.onAuthParticipantsChanged = options.onAuthParticipantsChanged;
 			this.onParticipantsChanged = options.onParticipantsChanged;
 			this.onMessage = options.onMessage;
@@ -31,8 +30,8 @@
 	CDocsCoApi.prototype.init = function (user, docid, token, serverHost, serverPath, callback, editorType, documentFormatSave) {
 		if (this._CoAuthoringApi && this._CoAuthoringApi.isRightURL()) {
 			var t = this;
-			this._CoAuthoringApi.onAuthParticipantsChanged = function (e) {t.callback_OnAuthParticipantsChanged(e);};
-			this._CoAuthoringApi.onParticipantsChanged = function (e, Count) {t.callback_OnParticipantsChanged(e, Count);};
+			this._CoAuthoringApi.onAuthParticipantsChanged = function (e, count) {t.callback_OnAuthParticipantsChanged(e, count);};
+			this._CoAuthoringApi.onParticipantsChanged = function (e, count) {t.callback_OnParticipantsChanged(e, count);};
 			this._CoAuthoringApi.onMessage = function (e) {t.callback_OnMessage(e);};
 			this._CoAuthoringApi.onLocksAcquired = function (e) {t.callback_OnLocksAcquired(e);};
 			this._CoAuthoringApi.onLocksReleased = function (e, bChanges) {t.callback_OnLocksReleased(e, bChanges);};
@@ -145,34 +144,34 @@
 		}
 	};
 
-	CDocsCoApi.prototype.callback_OnAuthParticipantsChanged = function (e) {
+	CDocsCoApi.prototype.callback_OnAuthParticipantsChanged = function (e, count) {
 		if (this.onAuthParticipantsChanged)
-			return this.onAuthParticipantsChanged(e);
+			this.onAuthParticipantsChanged(e, count);
 	};
 
-	CDocsCoApi.prototype.callback_OnParticipantsChanged = function (e, Count) {
+	CDocsCoApi.prototype.callback_OnParticipantsChanged = function (e, count) {
 		if (this.onParticipantsChanged)
-			return this.onParticipantsChanged (e, Count);
+			this.onParticipantsChanged (e, count);
 	};
 
 	CDocsCoApi.prototype.callback_OnMessage = function (e) {
 		if (this.onMessage)
-			return this.onMessage (e);
+			this.onMessage (e);
 	};
 
 	CDocsCoApi.prototype.callback_OnLocksAcquired = function (e) {
 		if (this.onLocksAcquired)
-			return this.onLocksAcquired (e);
+			this.onLocksAcquired (e);
 	};
 
 	CDocsCoApi.prototype.callback_OnLocksReleased = function (e, bChanges) {
 		if (this.onLocksReleased)
-			return this.onLocksReleased (e, bChanges);
+			this.onLocksReleased (e, bChanges);
 	};
 
 	CDocsCoApi.prototype.callback_OnLocksReleasedEnd = function () {
 		if (this.onLocksReleasedEnd)
-			return this.onLocksReleasedEnd ();
+			this.onLocksReleasedEnd ();
 	};
 
 	/**
@@ -183,31 +182,31 @@
 	 */
 	CDocsCoApi.prototype.callback_OnDisconnect = function (e, isDisconnectAtAll, isCloseCoAuthoring) {
 		if (this.onDisconnect)
-			return this.onDisconnect (e, isDisconnectAtAll, isCloseCoAuthoring);
+			this.onDisconnect (e, isDisconnectAtAll, isCloseCoAuthoring);
 	};
 
 	CDocsCoApi.prototype.callback_OnFirstLoadChanges = function (e) {
 		if (this.onFirstLoadChanges)
-			return this.onFirstLoadChanges (e);
+			this.onFirstLoadChanges (e);
 	};
 
 	CDocsCoApi.prototype.callback_OnConnectionStateChanged = function (e) {
 		if (this.onConnectionStateChanged)
-			return this.onConnectionStateChanged (e);
+			this.onConnectionStateChanged (e);
 	};
 
 	CDocsCoApi.prototype.callback_OnSetIndexUser = function (e) {
 		if (this.onSetIndexUser)
-			return this.onSetIndexUser (e);
+			this.onSetIndexUser (e);
 	};
 
 	CDocsCoApi.prototype.callback_OnSaveChanges = function (e) {
 		if (this.onSaveChanges)
-			return this.onSaveChanges (e);
+			this.onSaveChanges (e);
 	};
 	CDocsCoApi.prototype.callback_OnStartCoAuthoring = function (e) {
 		if (this.onStartCoAuthoring)
-			return this.onStartCoAuthoring (e);
+			this.onStartCoAuthoring (e);
 	};
 
     /** States
@@ -218,8 +217,7 @@
 	 *  3 - closed
      */
     var DocsCoApi = function (options) {
-		if (options)
-		{
+		if (options) {
 			this.onAuthParticipantsChanged = options.onAuthParticipantsChanged;
 			this.onParticipantsChanged = options.onParticipantsChanged;
 			this.onMessage = options.onMessage;
@@ -233,7 +231,10 @@
 			this.onConnectionStateChanged = options.onConnectionStateChanged;
 		}
         this._state = 0;
-        this._participants = [];
+		// Online-пользователи в документе
+        this._participants = {};
+		this._countEditUsers = 0;
+
         this._user = "Anonymous";
         this._locks = {};
         this._msgBuffer = [];
@@ -276,10 +277,6 @@
 
     DocsCoApi.prototype.getSessionId = function () {
         return this._id;
-    };
-	// ToDo убрать getParticipants
-    DocsCoApi.prototype.getParticipants = function () {
-        return this._participants;
     };
 
     DocsCoApi.prototype.getUser = function () {
@@ -412,7 +409,9 @@
 	};
 
     DocsCoApi.prototype.getUsers = function () {
-        this._send({"type": "getusers"});
+		// Специально для возможности получения после прохождения авторизации (Стоит переделать)
+		if (this.onAuthParticipantsChanged)
+			this.onAuthParticipantsChanged(this._participants, this._countEditUsers);
     };
 
     DocsCoApi.prototype.disconnect = function () {
@@ -635,29 +634,25 @@
         }
     };
 	
-	DocsCoApi.prototype._onParticipantsChanged = function (participants, isStartEvent) {
-		this._participants = [];
+	DocsCoApi.prototype._onAuthParticipantsChanged = function (participants) {
+		this._participants = {};
+		this._countEditUsers = 0;
+
 		if (participants) {
-			var tmpUser, countEditUsers = 0;
+			var tmpUser;
 			for (var i = 0; i < participants.length; ++i) {
 				tmpUser = new asc_user(participants[i]);
-				this._participants.push(tmpUser);
+				this._participants[tmpUser.asc_getId()] = tmpUser;
 				// Считаем число всех пользователей (и тех кто просматривает тоже)
-				++countEditUsers;
+				++this._countEditUsers;
 			}
-			
-			if (isStartEvent) {
-				if (this.onAuthParticipantsChanged)
-					this.onAuthParticipantsChanged (this._participants);
-			} else {
-				if (this.onParticipantsChanged)
-					this.onParticipantsChanged (this._participants, countEditUsers);
-			}
+
+			if (this.onAuthParticipantsChanged)
+				this.onAuthParticipantsChanged(this._participants, this._countEditUsers);
 			
 			// Посылаем эвент о совместном редактировании
-			if (1 < countEditUsers) {
-				this._onStartCoAuthoring(isStartEvent);
-			}
+			if (1 < this._countEditUsers)
+				this._onStartCoAuthoring(/*isStartEvent*/true);
 		}
 	};
 
@@ -665,6 +660,20 @@
 		var userStateChanged = null;
 		if (undefined !== data["state"] && this.onConnectionStateChanged) {
 			userStateChanged = new asc_user(data);
+
+			if (userStateChanged.asc_getState()) {
+				this._participants[userStateChanged.asc_getId()] = userStateChanged;
+				++this._countEditUsers;
+
+				// Посылаем эвент о совместном редактировании
+				if (1 < this._countEditUsers)
+					this._onStartCoAuthoring(/*isStartEvent*/false);
+			} else {
+				delete this._participants[userStateChanged.asc_getId()];
+				--this._countEditUsers;
+			}
+
+			this.onParticipantsChanged(this._participants, this._countEditUsers);
 			this.onConnectionStateChanged(userStateChanged);
 		}
 	};
@@ -683,8 +692,7 @@
             if (docsCoApi.onConnect) {
                 docsCoApi.onConnect();
             }
-            if (docsCoApi._locks)
-            {
+            if (docsCoApi._locks) {
                 docsCoApi.ownedLockBlocks = [];
                 //If we already have locks
                 for (var block in docsCoApi._locks) {
@@ -703,8 +711,11 @@
                     "type":"auth",
                     "docid":docsCoApi._docid,
                     "token":docsCoApi._token,
-                    "user":docsCoApi._user.asc_getId(),
-					"username":docsCoApi._user.asc_getUserName(),
+					"user": {
+						"id":docsCoApi._user.asc_getId(),
+						"name":docsCoApi._user.asc_getUserName(),
+						"color":docsCoApi._user.asc_getColor()
+					},
                     "locks":docsCoApi.ownedLockBlocks,
                     "sessionId":docsCoApi._id,
 					"serverHost": docsCoApi._serverHost,
@@ -788,7 +799,7 @@
                     docsCoApi._state = 2; // Authorized
                     docsCoApi._id = data["sessionId"];
 					
-					docsCoApi._onParticipantsChanged(data["participants"], /*isStartEvent*/ true);
+					docsCoApi._onAuthParticipantsChanged(data["participants"]);
 					
 					if (data["indexuser"]) {
 						docsCoApi._indexuser = data["indexuser"];
@@ -814,14 +825,6 @@
                 if (docsCoApi._initCallback) {
                     docsCoApi._initCallback({result:data["result"]});
                 }
-            },
-			"getusers":function (data) {
-				// Специально для возможности получения после прохождения авторизации
-				docsCoApi._onParticipantsChanged(data["participants"], /*isStartEvent*/ true);
-			},
-            "participants":function (data) {
-                //Pushed participants list from server
-				docsCoApi._onParticipantsChanged(data["participants"], /*isStartEvent*/ false);
             },
             "message":function (data) {
                 docsCoApi._onMessages(data);
@@ -850,12 +853,4 @@
         };
     };
     global["CDocsCoApi"] = CDocsCoApi;
-
-    //Helpers
-    /*Array.prototype.remove = function(from, to) {
-        var rest = this.slice((to || from) + 1 || this.length);
-        this.length = from < 0 ? this.length + from : from;
-        return this.push.apply(this, rest);
-    };*/
-
 })(window);
