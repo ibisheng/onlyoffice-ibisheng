@@ -306,7 +306,6 @@ ParaMath.prototype =
         TextPrp.Set_FromObject(DefaultPrp);
 
         return TextPrp;
-
     },
 
     Apply_TextPr : function(TextPr, IncFontSize, ApplyToAll)
@@ -599,6 +598,7 @@ ParaMath.prototype =
             else
                 this.WidthVisible = this.Width + PRSA.JustifyWord;
 
+            // Позиция в документе для формулы
             this.Math.absPos = {x: PRSA.X, y: PRSA.Y - this.Root.size.ascent};
 
             PRSA.X    += this.WidthVisible;
@@ -1094,7 +1094,8 @@ ParaMath.prototype =
 
                 if(!oCont.bRoot)
                 {
-                    SelectionDraw.StartY += oCont.pos.y;
+                    //SelectionDraw.StartY += oCont.pos.y;
+                    SelectionDraw.StartY = this.Math.absPos.y + oCont.pos.y; // выставляем так, чтобы для формул с различной высотой в одной строке, всё было ok
                     SelectionDraw.H = oCont.size.height;
                 }
 

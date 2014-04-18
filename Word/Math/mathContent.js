@@ -7721,9 +7721,7 @@ CMathContent.prototype =
     },
     Get_Default_TPrp: function()
     {
-
         return this.Composition.Parent.Get_Default_TPrp();
-
     },
     //////////////////////////
 

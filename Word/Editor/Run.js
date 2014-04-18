@@ -43,8 +43,6 @@ function ParaRun(Paragraph, bMathRun)
     this.SearchMarks   = new Array();
     this.SpellingMarks = new Array();
 
-    // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
-    g_oTableId.Add( this, this.Id );
 
     if(bMathRun)
     {
@@ -57,6 +55,9 @@ function ParaRun(Paragraph, bMathRun)
             width: 0
         };
     }
+
+    // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
+    g_oTableId.Add( this, this.Id );
 }
 
 ParaRun.prototype =
