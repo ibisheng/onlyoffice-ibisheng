@@ -1479,10 +1479,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this.asyncServerIdEndLoaded ();
 					return; // Error
 				}
-				this.CoAuthoringApi.onParticipantsChanged   	= function (e) { t.handlers.trigger("asc_onParticipantsChanged", e); };
-				this.CoAuthoringApi.onAuthParticipantsChanged  	= function (e) { t.handlers.trigger("asc_onAuthParticipantsChanged", e ); };
-				this.CoAuthoringApi.onMessage               	= function (e) { t.handlers.trigger("asc_onCoAuthoringChatReceiveMessage", e ); };
-				this.CoAuthoringApi.onConnectionStateChanged	= function (e) { t.handlers.trigger("asc_onConnectionStateChanged", e ); };
+				this.CoAuthoringApi.onParticipantsChanged   	= function (e, count) { t.handlers.trigger("asc_onParticipantsChanged", e, count); };
+				this.CoAuthoringApi.onAuthParticipantsChanged  	= function (e, count) { t.handlers.trigger("asc_onAuthParticipantsChanged", e, count); };
+				this.CoAuthoringApi.onMessage               	= function (e) { t.handlers.trigger("asc_onCoAuthoringChatReceiveMessage", e); };
+				this.CoAuthoringApi.onConnectionStateChanged	= function (e) { t.handlers.trigger("asc_onConnectionStateChanged", e); };
 				this.CoAuthoringApi.onLocksAcquired				= function (e) {
 					if ( 2 != e["state"] )
 					{

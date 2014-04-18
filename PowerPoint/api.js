@@ -255,8 +255,8 @@ asc_docs_api.prototype._coAuthoringInit = function () {
 	}
 
     var t = this;
-    this.CoAuthoringApi.onParticipantsChanged   	= function (e) { t.asc_fireCallback( "asc_onParticipantsChanged", e ); };
-    this.CoAuthoringApi.onAuthParticipantsChanged  	= function (e) { t.asc_fireCallback( "asc_onAuthParticipantsChanged", e ); };
+    this.CoAuthoringApi.onParticipantsChanged   	= function (e, count) { t.asc_fireCallback("asc_onParticipantsChanged", e, count); };
+    this.CoAuthoringApi.onAuthParticipantsChanged  	= function (e, count) { t.asc_fireCallback("asc_onAuthParticipantsChanged", e, count); };
     this.CoAuthoringApi.onMessage               	= function (e) { t.asc_fireCallback( "asc_onCoAuthoringChatReceiveMessage", e ); };
     this.CoAuthoringApi.onConnectionStateChanged	= function (e) { t.asc_fireCallback( "asc_onConnectionStateChanged", e ); };
     this.CoAuthoringApi.onLocksAcquired				= function (e) {
