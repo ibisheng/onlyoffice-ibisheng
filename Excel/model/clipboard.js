@@ -3228,6 +3228,7 @@
 							}
 						}
 					}
+					
 					if(childrens[i].children.length == 0)
 					{
 						//if parent - cell of table
@@ -3293,9 +3294,9 @@
 			_parseParagraph: function(paragraph, activeRange, row, col, rowSpan, colSpan)
 			{
 				var content = paragraph.Content;
-				var row, colorText, cTextPr, fontFamily = "Arial";
+				var row, cTextPr, fontFamily = "Arial";
 				var text = null;
-				var oNewItem = [];
+				var oNewItem = [], cloneNewItem;
 				var paraRunContent;
 
 				var aResult = this.aResult;
@@ -3319,10 +3320,11 @@
 						oNewItem.colSpan = this.aResult[row][col][0].colSpan;
 					}
 					delete this.aResult[row][col];
-				}
+				};
 	
 				if(!aResult[row])
 					aResult[row] = [];
+					
 				var s = 0;
 				var c1 = col !== undefined ? col : activeRange.c1;
 				
@@ -3336,14 +3338,89 @@
 				if(backgroundColor)
 					oNewItem.bc = backgroundColor;
 				
+				//настройки параграфа
 				paragraph.CompiledPr.NeedRecalc = true;
 				var paraPr = paragraph.Get_CompiledPr();
 				var paragraphFontFamily = paraPr.TextPr.FontFamily.Name;
+				
+				
+				var cTextPr, formatText;
+				//проходимся по контенту paragraph
+				for(var n = 0; n < content.length; n++)
+				{
+					//s  - меняется в зависимости от табуляции
+					if(!aResult[row][s + c1])
+						aResult[row][s + c1] = [];
+						
+					if(text == null)
+						text = "";
+					
+					
+					//*paraRun*
+					if(content[n] instanceof ParaRun)
+					{
+						paraRunContent = content[n].Content;
+						
+						cTextPr = content[n].Get_CompiledPr();
+						if(cTextPr && !(paraRunContent.length == 1 && paraRunContent[0] instanceof ParaEnd))//settings for text	
+							formatText = this._getPrParaRun(paraPr, cTextPr);
+						else if(!formatText)
+							formatText = this._getPrParaRun(paraPr, cTextPr);
+						
+						
+						for(var pR = 0; pR < paraRunContent.length; pR++)
+						{
+	
+							if(paraRunContent[pR] instanceof ParaText)//text
+							{
+								text += paraRunContent[pR].Value;
+							}
+							else if(paraRunContent[pR] instanceof ParaSpace)
+							{	
+								text += " ";
+							}
+							else if(paraRunContent[pR] instanceof ParaTab || paraRunContent[pR] instanceof ParaEnd)//tab
+							{
+								if(!oNewItem.length)
+								{
+									fontFamily = paragraphFontFamily;
+									this.fontsNew[fontFamily] = 1;
+									
+									oNewItem.push(formatText);
+								}
+								
+								if(text !== null)
+									oNewItem[oNewItem.length - 1].text = text;
+								
+								cloneNewItem  = this._getCloneNewItem(oNewItem);
+								
+								//переходим в следующую ячейку
+								if(typeof aResult[row][s + c1] == "object")
+									aResult[row][s + c1][aResult[row][s + c1].length] = cloneNewItem;
+								else
+								{
+									aResult[row][s + c1] = [];
+									aResult[row][s + c1][0] = cloneNewItem;
+								}
+									
+								text = "";
+								oNewItem = [];
+								s++;
+							}
+						};
+					};
+				};
+			},
+			
+			_getPrParaRun: function(paraPr, cTextPr)
+			{
+				var formatText, fontFamily, colorText;
+				
 				var paragraphFontSize = paraPr.TextPr.FontSize;
 				var paragraphBold = paraPr.TextPr.Bold;
 				var paragraphItalic = paraPr.TextPr.Italic;
 				var paragraphStrikeout = paraPr.TextPr.Strikeout;
-				var paragraphUnderline = paraPr.TextPr.Underline;
+				var paragraphUnderline = paraPr.TextPr.Underline ? Asc.EUnderline.underlineSingle : Asc.EUnderline.underlineNone;
 				var paragraphVertAlign = "none";
 				if(paraPr.TextPr.VertAlign == 1)
 					paragraphVertAlign = "superscript";
@@ -3352,164 +3429,51 @@
 
 				var colorParagraph = new RgbColor(this.clipboard._getBinaryColor("rgb(" + paraPr.TextPr.Color.r + "," + paraPr.TextPr.Color.g + "," + paraPr.TextPr.Color.b + ")"));
 				
+				if(cTextPr.Color)
+					colorText = new RgbColor(this.clipboard._getBinaryColor("rgb(" + cTextPr.Color.r + "," + cTextPr.Color.g + "," + cTextPr.Color.b + ")"));
+				else
+					colorText = null;
 				
-				//проходимся по контенту paragraph
-				for(var n = 0; n < content.length; n++)
-				{
-					//s  - меняется в зависимости от табуляции
-					if(!aResult[row][s + c1])
-					{
-						aResult[row][s + c1] = [];
-					}
-					if(text == null)
-						text = "";
+				fontFamily = cTextPr.fontFamily ? fontFamily : cTextPr.RFonts.CS ? cTextPr.RFonts.CS.Name : paragraphFontFamily;
+				this.fontsNew[fontFamily] = 1;
+				
+				var verticalAlign;
+				if(cTextPr.VertAlign == 2)
+					verticalAlign = "subscript";
+				else if(cTextPr.VertAlign == 1)
+					verticalAlign = "superscript";
 					
-					if(content[n] instanceof ParaRun)
-					{
-						paraRunContent = content[n].Content;
-						for(var pR = 0; pR < paraRunContent.length; pR++)
-						{
-							if(paraRunContent[pR] instanceof ParaTextPr)//settings for text	
-							{
-								if(text !== null && oNewItem[oNewItem.length - 1])//oNewItem - массив, аналогичный value2
-									oNewItem[oNewItem.length - 1].text = text;
-								else if(text !== null && oNewItem.length == 0)
-								{
-									this.fontsNew["Arial"] = 1;
-									colorText = new RgbColor(this.clipboard._getBinaryColor("rgb(0, 0, 0)"));
-									
-									var calcValue = paraRunContent[pR].CalcValue;
-									oNewItem.push({
-										format: {
-											fn: calcValue.FontFamily && calcValue.FontFamily.Name ? calcValue.FontFamily.Name : paragraphFontFamily,
-											fs: calcValue.FontSize ? calcValue.FontSize : paragraphFontSize,
-											c: colorParagraph ? colorParagraph : colorText,
-											b: paragraphBold,
-											i: paragraphItalic,
-											u: paragraphUnderline,
-											s: paragraphStrikeout,
-											va: "none"
-										}
-									});
-									oNewItem[oNewItem.length - 1].text = text;
-								}	
-								
-								text = "";
-								
-								cTextPr = paraRunContent[pR].CalcValue;
-								
-								if(cTextPr.Color)
-									colorText = new RgbColor(this.clipboard._getBinaryColor("rgb(" + cTextPr.Color.r + "," + cTextPr.Color.g + "," + cTextPr.Color.b + ")"));
-								else
-									colorText = null;
-								
-								fontFamily = cTextPr.fontFamily ? fontFamily : cTextPr.RFonts.CS ? cTextPr.RFonts.CS.Name : paragraphFontFamily;
-								this.fontsNew[fontFamily] = 1;
-								
-								var verticalAlign;
-								if(cTextPr.VertAlign == 2)
-									verticalAlign = "subscript";
-								else if(cTextPr.VertAlign == 1)
-									verticalAlign = "superscript";
-									
-
-								oNewItem.push({
-									format: {
-										fn: fontFamily,
-										fs: cTextPr.FontSize ? cTextPr.FontSize : paragraphFontSize,
-										c: colorText ? colorText : colorParagraph,
-										b: cTextPr.Bold ? cTextPr.Bold : paragraphBold,
-										i: cTextPr.Italic ? cTextPr.Italic : paragraphItalic,
-										u: cTextPr.Underline ? cTextPr.Underline : paragraphUnderline,
-										s: cTextPr.Strikeout ? cTextPr.Strikeout : paragraphStrikeout,
-										va: verticalAlign ? verticalAlign : paragraphVertAlign
-									}
-								});
-							}
-							else if(paraRunContent[pR] instanceof ParaText)//text
-							{
-								text += paraRunContent[pR].Value;
-							}
-							else if(paraRunContent[pR] instanceof ParaSpace)
-							{	
-								text += " ";
-							}
-							else if(paraRunContent[pR] instanceof ParaTab)//tab
-							{
-								if(!oNewItem.length)
-								{
-									fontFamily = paragraphFontFamily;
-									this.fontsNew[fontFamily] = 1;
-									colorText = colorParagraph ? colorParagraph : new RgbColor(this.clipboard._getBinaryColor("rgb(0, 0, 0)"));
-									
-									oNewItem.push({
-										format: {
-											fn: fontFamily,
-											fs: paragraphFontSize,
-											c: colorText,
-											b: paragraphBold,
-											i: paragraphItalic,
-											u: paragraphUnderline,
-											s: paragraphStrikeout,
-											va: paragraphVertAlign
-										}
-									});
-								}
-								if(text !== null)
-									oNewItem[oNewItem.length - 1].text = text;
-								//переходим в следующую ячейку
-								if(typeof aResult[row][s + c1] == "object")
-									aResult[row][s + c1][aResult[row][s + c1].length] = oNewItem;
-								else
-								{
-									aResult[row][s + c1] = [];
-									aResult[row][s + c1][0] = oNewItem;
-								}
-									
-								text = "";
-								oNewItem = [];
-								s++;
-							}
-							else if(paraRunContent[pR] instanceof ParaEnd)//end
-							{
-								if(!oNewItem.length)
-								{
-									fontFamily = paragraphFontFamily;
-									this.fontsNew[fontFamily] = 1;
-									colorText = colorParagraph ? colorParagraph : new RgbColor(this.clipboard._getBinaryColor("rgb(0, 0, 0)"));
-									
-									oNewItem.push({
-										format: {
-											fn: fontFamily,
-											fs: paragraphFontSize,
-											c: colorText,
-											b: paragraphBold,
-											i: paragraphItalic,
-											u: paragraphUnderline,
-											s: paragraphStrikeout,
-											va: paragraphVertAlign
-										}
-									});
-								}
-								if(text !== null)
-									oNewItem[oNewItem.length - 1].text = text;
-								text = "";
-								if(typeof aResult[row][s + c1] == "object")
-									aResult[row][s + c1][aResult[row][s + c1].length] = oNewItem;
-								else
-								{
-									aResult[row][s + c1] = [];
-									aResult[row][s + c1][0] = oNewItem;
-								}
-							}
-							else if(n == paraRunContent[pR].length - 1)//end of row
-							{
-								text = "";
-								oNewItem = [];
-							}
-						};
-					}	
+				formatText = {
+					format: {
+						fn: fontFamily,
+						fs: cTextPr.FontSize ? cTextPr.FontSize : paragraphFontSize,
+						c: colorText ? colorText : colorParagraph,
+						b: cTextPr.Bold ? cTextPr.Bold : paragraphBold,
+						i: cTextPr.Italic ? cTextPr.Italic : paragraphItalic,
+						u: cTextPr.Underline ? Asc.EUnderline.underlineSingle : paragraphUnderline,
+						s: cTextPr.Strikeout ? cTextPr.Strikeout : paragraphStrikeout,
+						va: verticalAlign ? verticalAlign : paragraphVertAlign
+					}
 				};
+				
+				return formatText;
+			},
+			
+			_getCloneNewItem: function(oNewItem)
+			{
+				var result = [];
+				
+				for(var item = 0; item < oNewItem.length; item++)
+				{
+					result[item] = {text: oNewItem[item].text, format: oNewItem[item].format};
+				};
+				
+				result.borders = oNewItem.borders;
+				result.rowSpan = oNewItem.rowSpan;
+				result.colSpan = oNewItem.colSpan;
+				result.bc = oNewItem.bc;
+				
+				return result;
 			}
 		};
 		
