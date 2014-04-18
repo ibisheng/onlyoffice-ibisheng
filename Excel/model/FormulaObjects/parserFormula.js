@@ -122,7 +122,7 @@ Math.atanh = function ( arg ) {
 
 Math.fact = function ( n ) {
     var res = 1;
-    n = Math.floor( n );
+    n = this.floor( n );
     if ( n < 0 ) return Number.NaN;
     else if ( n > 170 ) return Number.Infinity;
     while ( n != 0 ) {
@@ -134,11 +134,11 @@ Math.fact = function ( n ) {
 Math.ln = Math.log;
 
 Math.log10 = function( x ){
-    return Math.log( x ) / Math.log( 10 );
+    return this.log( x ) / this.log( 10 );
 }
 
 Math.fmod = function (a,b) {
-    return Number( (a - (Math.floor( a / b ) * b)).toPrecision( cExcelSignificantDigits ) );
+    return Number( (a - (this.floor( a / b ) * b)).toPrecision( cExcelSignificantDigits ) );
 };
 
 Math.binomCoeff = function ( n, k ) {
@@ -146,7 +146,16 @@ Math.binomCoeff = function ( n, k ) {
 }
 
 Math.permut = function ( n, k ) {
-    return Math.floor( this.fact( n ) / this.fact( n - k ) + .5 );
+    return this.floor( this.fact( n ) / this.fact( n - k ) + .5 );
+}
+
+Math.approxEqual = function( a, b ) {
+    if ( a == b )
+        return true;
+    var x = a - b;
+//        return (x < 0 ? -x : x) < ( (a < 0 ? -a : a) * (1 / (16777216 * 16777216)));
+//    return this.abs(x) < ( this.abs(a) * (1 / (16777216 * 16777216) ) ) ;
+    return this.abs(x) < 1e-15;
 }
 
 var _func = [];//для велосипеда а-ля перегрузка функций.

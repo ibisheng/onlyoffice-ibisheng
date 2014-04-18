@@ -8,6 +8,19 @@
  * To change this template use File | Settings | File Templates.
  */
 
+var DayCountBasis = {
+    // US 30/360
+    UsPsa30_360:0,
+    // Actual/Actual
+    ActualActual:1,
+    // Actual/360
+    Actual360:2,
+    // Actual/365
+    Actual365:3,
+    // European 30/360
+    Europ30_360:4
+}
+
 function yearFrac(d1, d2, mode) {
     d1.truncate();
     d2.truncate();
@@ -20,9 +33,9 @@ function yearFrac(d1, d2, mode) {
         year2 = d2.getFullYear();
 
     switch ( mode ) {
-        case 0:
+        case DayCountBasis.UsPsa30_360:
             return new cNumber( Math.abs( GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, true ) ) / 360 );
-        case 1:
+        case DayCountBasis.ActualActual:
             var yc = /*Math.abs*/( year2 - year1 ),
                 sd = year1 > year2 ? new Date(d2) : new Date(d1),
                 yearAverage = sd.isLeapYear() ? 366 : 365, dayDiff = /*Math.abs*/( d2 - d1 );
@@ -33,15 +46,15 @@ function yearFrac(d1, d2, mode) {
             yearAverage /= (yc + 1);
             dayDiff /= (yearAverage * c_msPerDay);
             return new cNumber( dayDiff );
-        case 2:
+        case DayCountBasis.Actual360:
             var dayDiff = Math.abs( d2 - d1 );
             dayDiff /= (360 * c_msPerDay);
             return new cNumber( dayDiff );
-        case 3:
+        case DayCountBasis.Actual365:
             var dayDiff = Math.abs( d2 - d1 );
             dayDiff /= (365 * c_msPerDay);
             return new cNumber( dayDiff );
-        case 4:
+        case DayCountBasis.Europ30_360:
             return new cNumber( Math.abs( GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, false ) ) / 360 );
         default:
             return new cError( cErrorType.not_numeric );
@@ -57,9 +70,9 @@ function diffDate(d1, d2, mode){
         year2 = d2.getFullYear();
 
     switch ( mode ) {
-        case 0:
+        case DayCountBasis.UsPsa30_360:
             return new cNumber( Math.abs( GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, true ) ) );
-        case 1:
+        case DayCountBasis.ActualActual:
             var yc = Math.abs( year2 - year1 ),
                 sd = year1 > year2 ? d2 : d1,
                 yearAverage = sd.isLeapYear() ? 366 : 365, dayDiff = Math.abs( d2 - d1 );
@@ -70,15 +83,15 @@ function diffDate(d1, d2, mode){
             yearAverage /= (yc + 1);
             dayDiff /= c_msPerDay;
             return new cNumber( dayDiff );
-        case 2:
+        case DayCountBasis.Actual360:
             var dayDiff = Math.abs( d2 - d1 );
             dayDiff /= c_msPerDay;
             return new cNumber( dayDiff );
-        case 3:
+        case DayCountBasis.Actual365:
             var dayDiff = Math.abs( d2 - d1 );
             dayDiff /= c_msPerDay;
             return new cNumber( dayDiff );
-        case 4:
+        case DayCountBasis.Europ30_360:
             return new cNumber( Math.abs( GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, false ) ) );
         default:
             return new cError( cErrorType.not_numeric );
@@ -96,12 +109,12 @@ function diffDate2(d1, d2, mode){
     var nDaysInYear, nYears, nDayDiff;
 
     switch ( mode ) {
-        case 0:
+        case DayCountBasis.UsPsa30_360:
             nDaysInYear = 360;
             nYears = year1 - year2;
             nDayDiff = Math.abs( GetDiffDate360( date1, month1+1, year1, d1.isLeapYear(), date2, month2+1, year2, true ) ) - nYears * nDaysInYear;
             return new cNumber( nYears + nDayDiff / nDaysInYear );
-        case 1:
+        case DayCountBasis.ActualActual:
             nYears = year2 - year1;
             nDaysInYear = d1.isLeapYear() ? 366 : 365;
 
@@ -117,28 +130,24 @@ function diffDate2(d1, d2, mode){
 
             if( dayDiff < 0 )
                 dayDiff += nDaysInYear;
-
             return new cNumber( nYears + dayDiff / nDaysInYear );
-        case 2:
+        case DayCountBasis.Actual360:
             nDaysInYear = 360;
             nYears = parseInt( ( d2 - d1 )/c_msPerDay / nDaysInYear );
             nDayDiff = (d2 - d1)/c_msPerDay;
             nDayDiff %= nDaysInYear;
-
             return new cNumber( nYears + nDayDiff / nDaysInYear );
-        case 3:
+        case DayCountBasis.Actual365:
             nDaysInYear = 365;
             nYears = parseInt( ( d2 - d1 )/c_msPerDay / nDaysInYear );
             nDayDiff = (d2 - d1)/c_msPerDay;
             nDayDiff %= nDaysInYear;
-
             return new cNumber( nYears + nDayDiff / nDaysInYear );
-        case 4:
+        case DayCountBasis.Europ30_360:
             nDaysInYear = 360;
             nYears = year1 - year2;
             nDayDiff = Math.abs( GetDiffDate360( date1, month1+1, year1, d1.isLeapYear(), date2, month2+1, year2, false ) ) - nYears * nDaysInYear;
             return new cNumber( nYears + nDayDiff / nDaysInYear );
-//            return new cNumber( Math.abs( GetDiffDate360( date1, month1, year1, d2.isLeapYear(), date2, month2, year2, true ) ) );
         default:
             return new cError( cErrorType.not_numeric );
     }
@@ -165,8 +174,8 @@ function GetDiffDate( d1,d2, nMode ){
 
     switch( nMode )
     {
-        case 0:			// 0=USA (NASD) 30/360
-        case 4:			// 4=Europe 30/360
+        case DayCountBasis.UsPsa30_360:			// 0=USA (NASD) 30/360
+        case DayCountBasis.Europ30_360:			// 4=Europe 30/360
         {
             var bLeap = d1.isLeapYear()
             var nDays, nMonths/*, nYears*/;
@@ -183,15 +192,15 @@ function GetDiffDate( d1,d2, nMode ){
                 pOptDaysIn1stYear = 360;
         }
             break;
-        case 1:			// 1=exact/exact
+        case DayCountBasis.ActualActual:			// 1=exact/exact
             pOptDaysIn1stYear = d1.isLeapYear() ? 366 : 365;
             nRet = d2 - d1;
             break;
-        case 2:			// 2=exact/360
+        case DayCountBasis.Actual360:			// 2=exact/360
             nRet = d2 - d1;
             pOptDaysIn1stYear = 360;
             break;
-        case 3:			//3=exact/365
+        case DayCountBasis.Actual365:			//3=exact/365
             nRet = d2 - d1;
                 pOptDaysIn1stYear = 365;
             break;
@@ -199,7 +208,6 @@ function GetDiffDate( d1,d2, nMode ){
 
     return (bNeg ? -nRet : nRet) / c_msPerDay / pOptDaysIn1stYear;
 }
-
 
 cFormulaFunction.DateAndTime = {
     'groupName':"DateAndTime",

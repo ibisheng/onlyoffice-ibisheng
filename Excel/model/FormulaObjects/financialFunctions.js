@@ -72,13 +72,6 @@ function getIPMT(rate, per, pv, type, pmt) {
 }
 
 function RateIteration( nper, payment, pv, fv, payType, guess ) {
-    function approxEqual( a, b ) {
-        if ( a == b )
-            return true;
-        var x = a - b;
-//        return (x < 0 ? -x : x) < ( (a < 0 ? -a : a) * (1 / (16777216 * 16777216)));
-        return Math.abs(x) < ( Math.abs(a) * (1 / (16777216 * 16777216) ) ) ;
-    }
 
     var bValid = true, bFound = false, fX, fXnew, fTerm, fTermDerivation, fGeoSeries, fGeoSeriesDerivation;
     var iterationMax = 150, nCount = 0, minEps = 1E-14, eps = 1E-7;
@@ -90,7 +83,7 @@ function RateIteration( nper, payment, pv, fv, payType, guess ) {
         while ( !bFound && nCount < iterationMax ) {
             fPowNminus1 = Math.pow( 1 + fX, nper - 1 );
             fPowN = fPowNminus1 * (1 + fX);
-            if ( approxEqual( Math.abs( fX ), 0 ) ) {
+            if ( Math.approxEqual( Math.abs( fX ), 0 ) ) {
                 fGeoSeries = nper;
                 fGeoSeriesDerivation = nper * (nper - 1) / 2;
             }
@@ -103,7 +96,7 @@ function RateIteration( nper, payment, pv, fv, payType, guess ) {
             if ( Math.abs( fTerm ) < minEps )
                 bFound = true;
             else {
-                if ( approxEqual( Math.abs( fTermDerivation ), 0 ) )
+                if ( Math.approxEqual( Math.abs( fTermDerivation ), 0 ) )
                     fXnew = fX + 1.1 * eps;
                 else
                     fXnew = fX - fTerm / fTermDerivation;
@@ -117,7 +110,7 @@ function RateIteration( nper, payment, pv, fv, payType, guess ) {
     else {
         fX = (guess.fGuest < -1) ? -1 : guess.fGuest;
         while ( bValid && !bFound && nCount < iterationMax ) {
-            if ( approxEqual( Math.abs( fX ), 0 ) ) {
+            if ( Math.approxEqual( Math.abs( fX ), 0 ) ) {
                 fGeoSeries = nper;
                 fGeoSeriesDerivation = nper * (nper - 1) / 2;
             }
@@ -130,7 +123,7 @@ function RateIteration( nper, payment, pv, fv, payType, guess ) {
             if ( Math.abs( fTerm ) < minEps )
                 bFound = true;
             else {
-                if ( approxEqual( Math.abs( fTermDerivation ), 0 ) )
+                if ( Math.approxEqual( Math.abs( fTermDerivation ), 0 ) )
                     fXnew = fX + 1.1 * eps;
                 else
                     fXnew = fX - fTerm / fTermDerivation;
@@ -3161,10 +3154,187 @@ cNPV.prototype.getInfo = function () {
 };
 
 function cODDFPRICE() {
-    cBaseFunction.call( this, "ODDFPRICE" );
+//    cBaseFunction.call( this, "ODDFPRICE" );
+
+    this.name = "NPV";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 8;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 9;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cODDFPRICE.prototype = Object.create( cBaseFunction.prototype )
+/*cODDFPRICE.prototype.Calculate = function ( arg ) {
+    var settlement = arg[0],
+        maturity = arg[1],
+        issue = arg[2],
+        first_coupon = arg[3],
+        rate = arg[4],
+        yld = arg[5],
+        redemption = arg[6],
+        frequency = arg[7],
+        basis = arg[8] && !(arg[8] instanceof cEmpty) ? arg[8] : new cNumber( 0 );
 
+    if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
+        settlement = settlement.cross( arguments[1].first );
+    }
+    else if ( settlement instanceof cArray ) {
+        settlement = settlement.getElementRowCol( 0, 0 );
+    }
+
+    if ( maturity instanceof cArea || maturity instanceof cArea3D ) {
+        maturity = maturity.cross( arguments[1].first );
+    }
+    else if ( maturity instanceof cArray ) {
+        maturity = maturity.getElementRowCol( 0, 0 );
+    }
+
+    if ( issue instanceof cArea || issue instanceof cArea3D ) {
+        issue = issue.cross( arguments[1].first );
+    }
+    else if ( issue instanceof cArray ) {
+        issue = issue.getElementRowCol( 0, 0 );
+    }
+
+    if ( first_coupon instanceof cArea || first_coupon instanceof cArea3D ) {
+        first_coupon = first_coupon.cross( arguments[1].first );
+    }
+    else if ( first_coupon instanceof cArray ) {
+        first_coupon = first_coupon.getElementRowCol( 0, 0 );
+    }
+
+    if ( rate instanceof cArea || rate instanceof cArea3D ) {
+        rate = rate.cross( arguments[1].first );
+    }
+    else if ( rate instanceof cArray ) {
+        rate = rate.getElementRowCol( 0, 0 );
+    }
+
+    if ( yld instanceof cArea || yld instanceof cArea3D ) {
+        yld = yld.cross( arguments[1].first );
+    }
+    else if ( yld instanceof cArray ) {
+        yld = yld.getElementRowCol( 0, 0 );
+    }
+
+    if ( redemption instanceof cArea || redemption instanceof cArea3D ) {
+        redemption = redemption.cross( arguments[1].first );
+    }
+    else if ( redemption instanceof cArray ) {
+        redemption = redemption.getElementRowCol( 0, 0 );
+    }
+
+    if ( frequency instanceof cArea || frequency instanceof cArea3D ) {
+        frequency = frequency.cross( arguments[1].first );
+    }
+    else if ( frequency instanceof cArray ) {
+        frequency = frequency.getElementRowCol( 0, 0 );
+    }
+
+    if ( basis instanceof cArea || basis instanceof cArea3D ) {
+        basis = basis.cross( arguments[1].first );
+    }
+    else if ( basis instanceof cArray ) {
+        basis = basis.getElementRowCol( 0, 0 );
+    }
+
+    settlement = settlement.tocNumber();
+    maturity = maturity.tocNumber();
+    issue = issue.tocNumber();
+    first_coupon = first_coupon.tocNumber();
+    rate = rate.tocNumber();
+    yld = yld.tocNumber();
+    redemption = redemption.tocNumber();
+    frequency = frequency.tocNumber();
+    basis = basis.tocNumber();
+
+    if ( settlement instanceof cError ) return this.value = settlement;
+    if ( maturity instanceof cError ) return this.value = maturity;
+    if ( issue instanceof cError ) return this.value = issue;
+    if ( first_coupon instanceof cError ) return this.value = first_coupon;
+    if ( rate instanceof cError ) return this.value = rate;
+    if ( yld instanceof cError ) return this.value = yld;
+    if ( redemption instanceof cError ) return this.value = redemption;
+    if ( frequency instanceof cError ) return this.value = frequency;
+    if ( basis instanceof cError ) return this.value = basis;
+
+    settlement = settlement.getValue();
+    maturity = maturity.getValue();
+    issue = issue.getValue();
+    first_coupon = first_coupon.getValue();
+    rate = rate.getValue();
+    yld = yld.getValue();
+    redemption = redemption.getValue();
+    frequency = frequency.getValue();
+    basis = basis.getValue();
+
+    if ( settlement >= maturity || maturity <= last_interest ||
+        basis < 0 || basis > 4 ||
+        yld < 0 || rate < 0 ||
+        frequency != 1 && frequency != 2 && frequency != 4 )
+        return this.value = new cError( cErrorType.not_numeric );
+
+    var settl = Date.prototype.getDateFromExcel( settlement ),
+        matur = Date.prototype.getDateFromExcel( maturity ),
+        iss = Date.prototype.getDateFromExcel( issue ),
+        firstCoup = Date.prototype.getDateFromExcel( first_coupon );
+
+    function freq2months(freq){ return 12 / freq; }
+    function lastDayOfMonth(y, m, d){
+        return (new Date(y,m-1)).getDaysInMonth() == d;
+    }
+    function daysBetweenNotNeg(d1, d2, b){
+        var res = diffDate(d1, d2, b);
+        return res > 0 ? res : 0;
+    }
+    var res;
+    var endMonth = lastDayOfMonth(matur.getFullYear(), matur.getMonth()+1, matur.getDate());
+    var numMonths = freq2months(frequency);
+    var numMonthsNeg = - numMonths;
+    var e = getcoupdays( settl, firstCoup, frequency, basis);
+    var n = getcoupnum( settl, matur, frequency);
+    var m = frequency
+    var dfc = daysBetweenNotNeg(iss, firstCoup, basis);
+
+    if (dfc < e){
+        var  dsc = daysBetweenNotNeg( settl, firstCoup, basis);
+        var a = daysBetweenNotNeg (iss, settl, basis);
+        var x = yld / frequency + 1;
+        var y = dsc / e;
+        var term1 = redemption / Math.pow( x, (n - 1 + y) );
+        var term2 = 100 * rate / frequency * dfc / e / Math.pow( x, y)
+        var term3 = 0;//aggrBetween 2 (int n) (function( acc, index ){ acc + 100 * rate / frequency / (Math.pow( x, (index - 1 + y)))}) 0
+
+        for(var i = 2; i<=n; i++){
+            term3 += 1/Math.pow( x, (i - 1 + y));
+        }
+        term3*=100*rate/frequency;
+
+        res = term1 + term2 + term3 -
+                a / e * rate / frequency * 100
+    }
+    else{
+        var nc = getcoupnum( iss, firstCoup, frequency);
+        var lateCoup = new Date(firstCoup);
+
+    }
+    this.value = new cNumber( res );
+    return this.value;
+
+}
+cODDFPRICE.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( settlement , maturity , issue , first-coupon , rate , yld , redemption , frequency [ , [ basis ] ] )"
+    };
+}
+*/
 function cODDFYIELD() {
     cBaseFunction.call( this, "ODDFYIELD" );
 }
@@ -4635,9 +4805,183 @@ cTBILLYIELD.prototype.getInfo = function () {
 }
 
 function cVDB() {
-    cBaseFunction.call( this, "VDB" );
+//    cBaseFunction.call( this, "VDB" );
+
+    this.name = "VDB";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 5;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 7;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
+
 }
 cVDB.prototype = Object.create( cBaseFunction.prototype )
+cVDB.prototype.Calculate = function ( arg ) {
+    var cost = arg[0], salvage = arg[1], life = arg[2],
+        startPeriod = arg[3], endPeriod = arg[4],
+        factor = arg[5] && !(arg[5] instanceof cEmpty) ? arg[5] : new cNumber( 2 ),
+        flag = arg[6] && !(arg[6] instanceof cEmpty) ? arg[6] : new cBool( false );
+
+    function getVDB( cost, fRest, life, life1, startPeriod, factor){
+        var res=0, loopEnd = end = Math.ceil(startPeriod),
+			temp, sln = 0, rest = cost - fRest, sln1 = false, ddb;
+        
+        for ( var i = 1; i <= loopEnd; i++){
+            if(!sln1){
+			
+                ddb = getDDB(cost, fRest, life, i, factor);
+                sln = rest/ (life1 - (i-1));
+
+                if (sln > ddb){
+                    temp = sln;
+                    sln1 = true;
+                }
+                else{
+                    temp = ddb;
+                    rest -= ddb;
+                }
+				
+            }
+            else{
+                temp = sln;
+            }
+
+            if ( i == loopEnd)
+                temp *= ( startPeriod + 1.0 - end );
+
+            res += temp;
+        }
+        return res;
+    }
+
+
+    if ( cost instanceof cArea || cost instanceof cArea3D ) {
+        cost = cost.cross( arguments[1].first );
+    }
+    else if ( cost instanceof cArray ) {
+        cost = cost.getElementRowCol( 0, 0 );
+    }
+
+    if ( salvage instanceof cArea || salvage instanceof cArea3D ) {
+        salvage = salvage.cross( arguments[1].first );
+    }
+    else if ( salvage instanceof cArray ) {
+        salvage = salvage.getElementRowCol( 0, 0 );
+    }
+
+    if ( life instanceof cArea || life instanceof cArea3D ) {
+        life = life.cross( arguments[1].first );
+    }
+    else if ( life instanceof cArray ) {
+        life = life.getElementRowCol( 0, 0 );
+    }
+
+    if ( startPeriod instanceof cArea || startPeriod instanceof cArea3D ) {
+        startPeriod = startPeriod.cross( arguments[1].first );
+    }
+    else if ( startPeriod instanceof cArray ) {
+        startPeriod = startPeriod.getElementRowCol( 0, 0 );
+    }
+
+    if ( endPeriod instanceof cArea || endPeriod instanceof cArea3D ) {
+        endPeriod = endPeriod.cross( arguments[1].first );
+    }
+    else if ( endPeriod instanceof cArray ) {
+        endPeriod = endPeriod.getElementRowCol( 0, 0 );
+    }
+
+    if ( factor instanceof cArea || factor instanceof cArea3D ) {
+        factor = factor.cross( arguments[1].first );
+    }
+    else if ( factor instanceof cArray ) {
+        factor = factor.getElementRowCol( 0, 0 );
+    }
+
+    if ( flag instanceof cArea || flag instanceof cArea3D ) {
+        flag = flag.cross( arguments[1].first );
+    }
+    else if ( flag instanceof cArray ) {
+        flag = flag.getElementRowCol( 0, 0 );
+    }
+
+    cost = cost.tocNumber();
+    salvage = salvage.tocNumber();
+    life = life.tocNumber();
+    startPeriod = startPeriod.tocNumber();
+    endPeriod = endPeriod.tocNumber();
+    factor = factor.tocNumber();
+    flag = flag.tocBool();
+
+    if ( cost instanceof cError ) return this.value = cost;
+    if ( salvage instanceof cError ) return this.value = salvage;
+    if ( life instanceof cError ) return this.value = life;
+    if ( startPeriod instanceof cError ) return this.value = startPeriod;
+    if ( endPeriod instanceof cError ) return this.value = endPeriod;
+    if ( factor instanceof cError ) return this.value = factor;
+    if ( flag instanceof cError ) return this.value = flag;
+
+    cost = cost.getValue();
+    salvage = salvage.getValue();
+    life = life.getValue();
+    startPeriod = startPeriod.getValue();
+    endPeriod = endPeriod.getValue();
+    factor = factor.getValue();
+    flag = flag.getValue();
+
+    if( cost < salvage || life < 0 || startPeriod < 0 || life < startPeriod || startPeriod > endPeriod || life < endPeriod || factor < 0 ){
+        return this.value = new cError( cErrorType.not_numeric );
+    }
+
+    var start = Math.floor(startPeriod),
+        end   = Math.ceil(endPeriod),
+        loopStart = start,
+        loopEnd   = end;
+
+    var res = 0;
+    if ( flag ) {
+        for ( var i = loopStart + 1; i <= loopEnd; i++ ) {
+            var ddb = getDDB( cost, salvage, life, i, factor );
+
+            if ( i == loopStart + 1 )
+                ddb *= ( Math.min( endPeriod, start + 1 ) - startPeriod );
+            else if ( i == loopEnd )
+                ddb *= ( endPeriod + 1 - end );
+
+            res += ddb;
+        }
+    }
+    else {
+
+        var life1 = life;
+
+        if ( !Math.approxEqual( startPeriod, Math.floor( startPeriod ) ) ) {
+            if ( factor > 1 ) {
+                if ( startPeriod > life / 2 || Math.approxEqual( startPeriod, life / 2 ) ) {
+                    var fPart = startPeriod - life / 2;
+                    startPeriod = life / 2;
+                    endPeriod -= fPart;
+                    life1 += 1;
+                }
+            }
+        }
+
+        cost -= getVDB( cost, salvage, life, life1, startPeriod, factor );
+        res = getVDB( cost, salvage, life, life - startPeriod, endPeriod - startPeriod, factor );
+    }
+
+    return this.value = new cNumber( res );
+}
+cVDB.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( cost , salvage , life , start-period , end-period [ , [ [ factor ] [ , [ no-switch-flag ] ] ] ] ] )"
+    };
+}
 
 function cXIRR() {
 //    cBaseFunction.call( this, "XIRR" );
@@ -4660,17 +5004,6 @@ cXIRR.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber( 0.1 );
 
     function lcl_sca_XirrResult( rValues, rDates, fRate ) {
-        /*  V_0 ... V_n = input values.
-         D_0 ... D_n = input dates.
-         R           = input interest rate.
-
-         r   := R+1
-         E_i := (D_i-D_0) / 365
-
-         n    V_i                n    V_i
-         f(R)  =  SUM   -------  =  V_0 + SUM   ------- .
-         i=0  r^E_i              i=1  r^E_i
-         */
         var D_0 = rDates[0];
         var r = fRate + 1;
         var fResult = rValues[0];
@@ -4680,21 +5013,6 @@ cXIRR.prototype.Calculate = function ( arg ) {
     }
 
     function lcl_sca_XirrResult_Deriv1( rValues, rDates, fRate ) {
-        /*  V_0 ... V_n = input values.
-         D_0 ... D_n = input dates.
-         R           = input interest rate.
-
-         r   := R+1
-         E_i := (D_i-D_0) / 365
-
-         n    V_i
-         f'(R)  =  [ V_0 + SUM   ------- ]'
-         i=1  r^E_i
-
-         n           V_i                 n    E_i V_i
-         =  0 + SUM   -E_i ----------- r'  =  - SUM   ----------- .
-         i=1       r^(E_i+1)             i=1  r^(E_i+1)
-         */
         var D_0 = rDates[0];
         var r = fRate + 1;
         var fResult = 0;
