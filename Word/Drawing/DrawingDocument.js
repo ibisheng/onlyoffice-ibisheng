@@ -957,7 +957,7 @@ function CPage()
     {
         if (null != this.drawingPage.cachedImage)
         {
-            context.strokeStyle = "#81878F";
+            context.strokeStyle = GlobalSkin.PageOutline;
             context.strokeRect(xDst, yDst, wDst, hDst);
             // ����� ���������� �� �������� ���������
             context.drawImage(this.drawingPage.cachedImage.image, xDst, yDst, wDst, hDst);
@@ -965,7 +965,7 @@ function CPage()
         else
         {
             context.fillStyle = "#ffffff";
-            context.strokeStyle = "#81878F";
+            context.strokeStyle = GlobalSkin.PageOutline;
             context.strokeRect(xDst, yDst, wDst, hDst);
             context.fillRect(xDst, yDst, wDst, hDst);
         }

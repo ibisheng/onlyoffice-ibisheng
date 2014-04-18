@@ -49,14 +49,20 @@ var GlobalSkinTeamlab = {
     RulerDark : "#B0B0B0",
     RulerLight : "EDEDED",
     BackgroundScroll : "#D3D3D3",
+    RulerOutline : "#929292",
+    RulerMarkersFillColor : "#E7E7E7",
+    PageOutline : "#81878F",
     STYLE_THUMBNAIL_WIDTH : 80,
     STYLE_THUMBNAIL_HEIGHT : 40
 };
 var GlobalSkinFlat = {
     BackgroundColor : "#F4F4F4",
-    RulerDark : "#E5E5E5",
-    RulerLight : "#F4F4F4",
-    BackgroundScroll : "#E5E5E5",
+    RulerDark : "#D8DADC",
+    RulerLight : "#FFFFFF",
+    BackgroundScroll : "#F4F4F4",
+    RulerOutline : "#BBBEC2",
+    RulerMarkersFillColor : "#FFFFFF",
+    PageOutline : "#BBBEC2",
     STYLE_THUMBNAIL_WIDTH : 109,
     STYLE_THUMBNAIL_HEIGHT : 45
 };

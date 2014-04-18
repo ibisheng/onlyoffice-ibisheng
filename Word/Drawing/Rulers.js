@@ -487,7 +487,7 @@ function CHorRuler()
         //context.shadowBlur = 0;
         //context.shadowColor = "#81878F";
 
-        context.strokeStyle = "#929292";
+        context.strokeStyle = GlobalSkin.RulerOutline;
 
         context.lineWidth = 1;
         context.strokeRect(0.5, this.m_nTop + 0.5, Math.max(intW - 1, 1), this.m_nBottom - this.m_nTop);
@@ -610,7 +610,7 @@ function CHorRuler()
             if (0 != _count)
             {
                 context.fillStyle = GlobalSkin.RulerDark;
-                context.strokeStyle = "#929292";
+                context.strokeStyle = GlobalSkin.RulerOutline;
 
                 var _offset = markup.X;
                 for (var i = 0; i <= _count; i++)
@@ -1648,7 +1648,7 @@ function CHorRuler()
 
             if (posL < posR)
             {
-                context.fillStyle = "#E7E7E7";
+                context.fillStyle = GlobalSkin.RulerMarkersFillColor;
 
                 // left indent
                 dCenterX = left + (_margin_left +  this.m_dIndentLeft) * dKoef_mm_to_pix;
@@ -2025,7 +2025,7 @@ function CVerRuler()
         }
 
         // �����
-        context.strokeStyle = "#929292";
+        context.strokeStyle = GlobalSkin.RulerOutline;
 
         context.lineWidth = 1;
         context.strokeRect(this.m_nLeft + 0.5, 0.5, this.m_nRight - this.m_nLeft, Math.max(intH - 1, 1));
@@ -2171,7 +2171,7 @@ function CVerRuler()
             var end_dark = 0;
 
             context.fillStyle = GlobalSkin.RulerDark;
-            context.strokeStyle = "#929292";
+            context.strokeStyle = GlobalSkin.RulerOutline;
 
             var _x = this.m_nLeft + 0.5;
             var _w = this.m_nRight - this.m_nLeft;
