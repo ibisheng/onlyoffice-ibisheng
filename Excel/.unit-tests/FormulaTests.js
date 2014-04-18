@@ -362,7 +362,7 @@
     var oParser, wb, ws, date1, date2, dif = 1e-9,
         data = getTestWorkbook(),
         sData = data + "";
-    if ( c_oSerFormat.Signature === sData.substring( 0, c_oSerFormat.Signature.length ) ) {
+    if ( Asc.c_oSerFormat.Signature === sData.substring( 0, Asc.c_oSerFormat.Signature.length ) ) {
         var sUrlPath = "offlinedocs/";
         var wb = new Workbook( sUrlPath, new Asc.asc_CHandlersList(), {} );
 //        wb.initGlobalObjects();
@@ -384,7 +384,7 @@
         g_oUndoRedoGraphicObjects = new UndoRedoGraphicObjects(wb);
         g_oIdCounter.Set_Load(false);
 
-        var oBinaryFileReader = new BinaryFileReader( sUrlPath );
+        var oBinaryFileReader = new Asc.BinaryFileReader( sUrlPath );
         oBinaryFileReader.Read( sData, wb );
     }
     ws = wb.getWorksheet( wb.getActive() );
