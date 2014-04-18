@@ -1194,16 +1194,6 @@ CDocumentContent.prototype =
         }
     },
 
-    DocumentSearch : function(Str, Type)
-    {
-        var Count = this.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            var Element = this.Content[Index];
-            Element.DocumentSearch( Str, Type );
-        }
-    },
-
     DocumentStatistics : function(Stats)
     {
         var Count = this.Content.length;

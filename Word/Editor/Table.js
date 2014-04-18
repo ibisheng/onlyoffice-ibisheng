@@ -4758,20 +4758,6 @@ CTable.prototype =
         this.DrawingDocument.StartTrackTable( NewOutline , transform);
     },
 
-    DocumentSearch : function(Str, Type)
-    {
-        for ( var CurRow = 0; CurRow < this.Content.length; CurRow++ )
-        {
-            var Row = this.Content[CurRow];
-            var CellsCount = Row.Get_CellsCount();
-
-            for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-            {
-                Row.Get_Cell( CurCell ).Content_DocumentSearch( Str, Type );
-            }
-        }
-    },
-
     DocumentStatistics : function(Stats)
     {
         for ( var CurRow = 0; CurRow < this.Content.length; CurRow++ )
@@ -20488,11 +20474,6 @@ CTableCell.prototype =
     Content_Set_StartPage : function(PageNum)
     {
         this.Content.Set_StartPage(PageNum);
-    },
-
-    Content_DocumentSearch : function( Str, Type )
-    {
-        this.Content.DocumentSearch( Str, Type );
     },
 
     Content_Document_CreateFontMap : function(FontMap)

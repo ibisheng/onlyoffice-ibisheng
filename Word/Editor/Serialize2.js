@@ -5099,30 +5099,7 @@ function BinaryFileReader(doc, openParams)
 		if(null != this.oReadResult.DefrPr)
 			this.Document.Styles.Default.TextPr.Merge( this.oReadResult.DefrPr );
 		
-		var setting = this.oReadResult.setting;
-        var oHdrFtr = this.Document.HdrFtr.Content[0];
-        if(null != oHdrFtr.Header)
-        {
-            var Header = oHdrFtr.Header;
-            if(null != Header.Odd)
-            {
-                if(false == setting.titlePg && null == Header.First)
-                    Header.First = Header.Odd;
-                if(false == setting.EvenAndOddHeaders && null == Header.Even)
-                    Header.Even = Header.Odd;
-            }
-        }
-        if(null != oHdrFtr.Footer)
-        {
-            var Footer = oHdrFtr.Footer;
-            if(null != Footer.Odd)
-            {
-                if(false == setting.titlePg && null == Footer.First)
-                    Footer.First = Footer.Odd;
-                if(false == setting.EvenAndOddHeaders && null == Footer.Even)
-                    Footer.Even = Footer.Odd;
-            }
-        }
+		var setting = this.oReadResult.setting;        
 		var fInitCommentData = function(comment)
 		{
 			var oCommentObj = new CCommentData();

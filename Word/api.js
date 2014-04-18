@@ -4195,26 +4195,6 @@ asc_docs_api.prototype.put_PageNum = function(where,align)
 }
 
 // "where" где нижний или верхний, "options" опции колонтитула
-asc_docs_api.prototype.put_HeadersAndFooters = function(where,options)
-{
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_HdrFtr) )
-    {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-        this.WordControl.m_oLogicDocument.Document_AddHdrFtr( where, options );
-    }
-}
-
-// "where" где нижний или верхний, "options" опции колонтитула
-asc_docs_api.prototype.rem_HeadersAndFooters = function(where,options)
-{
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_HdrFtr) )
-    {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-        this.WordControl.m_oLogicDocument.Document_RemoveHdrFtr( where, options );
-    }
-}
-
-// "where" где нижний или верхний, "options" опции колонтитула
 asc_docs_api.prototype.put_HeadersAndFootersDistance = function(value)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_HdrFtr) )
@@ -6302,56 +6282,35 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                     CollaborativeEditing.Release_Locks();
                 }
 
-                //Recalculate HdrFtr
-                if(Document.HdrFtr && Document.HdrFtr.Content && Document.HdrFtr.Content.length > 0 && Document.HdrFtr.Content[0].Header)
-                {
-                    var Header = Document.HdrFtr.Content[0].Header;
-                    if(null != Header.First)
-                        History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : Header.First } );
-                    if(null != Header.Even)
-                        History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : Header.Even } );
-                    if(null != Header.Odd)
-                        History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : Header.Odd } );
-                }
-                if(Document.HdrFtr && Document.HdrFtr.Content && Document.HdrFtr.Content.length > 0 && Document.HdrFtr.Content[0].Footer)
-                {
-                    var Footer = Document.HdrFtr.Content[0].Footer;
-                    if(null != Footer.First)
-                        History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : Footer.First } );
-                    if(null != Footer.Even)
-                        History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : Footer.Even } );
-                    if(null != Footer.Odd)
-                        History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : Footer.Odd } );
-                }
-
                 History.RecalcData_Add( { Type : historyrecalctype_Inline, Data : { Pos : 0, PageNum : 0 } } );
 
                 //Recalculate для Document
                 Document.CurPos.ContentPos = 0;
 
-                var hdr = Document.HdrFtr.Content[0].Header;
-                var ftr = Document.HdrFtr.Content[0].Footer;
-                var drawing_objects = Document.DrawingObjects;
-                if(hdr.First != null || ftr.First != null)
-                {
-                    drawing_objects.firstPage = new HeaderFooterGraphicObjects();
-                }
-                if(hdr.Even != null || ftr.Even != null)
-                {
-                    if((hdr.Even != null && hdr.Even == hdr.First) || (ftr.Even != null && ftr.Even == ftr.First))
-                        drawing_objects.evenPage = drawing_objects.firstPage;
-                    else
-                        drawing_objects.evenPage = new HeaderFooterGraphicObjects();
-                }
-                if(hdr.Odd != null || ftr.Odd != null)
-                {
-                    if((hdr.Odd != null && hdr.Odd == hdr.First) || (ftr.Odd != null && ftr.Odd == ftr.First))
-                        drawing_objects.oddPage = drawing_objects.firstPage;
-                    else if((hdr.Odd != null && hdr.Odd == hdr.Even)|| (ftr.Odd != null && ftr.Odd == ftr.Even))
-                        drawing_objects.oddPage = drawing_objects.evenPage;
-                    else
-                        drawing_objects.oddPage = new HeaderFooterGraphicObjects();
-                }
+                // TODO: Переделать 
+//                var hdr = Document.HdrFtr.Content[0].Header;
+//                var ftr = Document.HdrFtr.Content[0].Footer;
+//                var drawing_objects = Document.DrawingObjects;
+//                if(hdr.First != null || ftr.First != null)
+//                {
+//                    drawing_objects.firstPage = new HeaderFooterGraphicObjects();
+//                }
+//                if(hdr.Even != null || ftr.Even != null)
+//                {
+//                    if((hdr.Even != null && hdr.Even == hdr.First) || (ftr.Even != null && ftr.Even == ftr.First))
+//                        drawing_objects.evenPage = drawing_objects.firstPage;
+//                    else
+//                        drawing_objects.evenPage = new HeaderFooterGraphicObjects();
+//                }
+//                if(hdr.Odd != null || ftr.Odd != null)
+//                {
+//                    if((hdr.Odd != null && hdr.Odd == hdr.First) || (ftr.Odd != null && ftr.Odd == ftr.First))
+//                        drawing_objects.oddPage = drawing_objects.firstPage;
+//                    else if((hdr.Odd != null && hdr.Odd == hdr.Even)|| (ftr.Odd != null && ftr.Odd == ftr.Even))
+//                        drawing_objects.oddPage = drawing_objects.evenPage;
+//                    else
+//                        drawing_objects.oddPage = new HeaderFooterGraphicObjects();
+//                }
 
 
                 Document.DrawingObjects.calculateAfterOpen();
@@ -6774,13 +6733,15 @@ asc_docs_api.prototype.ClearFormating = function()
 asc_docs_api.prototype.GetSectionInfo = function()
 {
     var obj = new CAscSection();
-    obj.PageWidth = Page_Width;
-    obj.PageHeight = Page_Height;
+        
+    // TODO: Переделать данную функцию, если она вообще нужна
+    obj.PageWidth    = 297;
+    obj.PageHeight   = 210;
 
-    obj.MarginLeft = X_Left_Margin;
-    obj.MarginRight = X_Right_Margin;
-    obj.MarginTop = Y_Top_Margin;
-    obj.MarginBottom = Y_Bottom_Margin;
+    obj.MarginLeft   = 30;
+    obj.MarginRight  = 15;
+    obj.MarginTop    = 20;
+    obj.MarginBottom = 20;
 
     return obj;
 }
@@ -9641,58 +9602,37 @@ window["asc_docs_api"].prototype["asc_nativeCalculateFile"] = function()
             CollaborativeEditing.Release_Locks();
             return;
         }
-    }
-
-    //Recalculate HdrFtr
-    if(Document.HdrFtr && Document.HdrFtr.Content && Document.HdrFtr.Content.length > 0 && Document.HdrFtr.Content[0].Header)
-    {
-        var Header = Document.HdrFtr.Content[0].Header;
-        if(null != Header.First)
-            History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : Header.First } );
-        if(null != Header.Even)
-            History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : Header.Even } );
-        if(null != Header.Odd)
-            History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : Header.Odd } );
-    }
-    if(Document.HdrFtr && Document.HdrFtr.Content && Document.HdrFtr.Content.length > 0 && Document.HdrFtr.Content[0].Footer)
-    {
-        var Footer = Document.HdrFtr.Content[0].Footer;
-        if(null != Footer.First)
-            History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : Footer.First } );
-        if(null != Footer.Even)
-            History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : Footer.Even } );
-        if(null != Footer.Odd)
-            History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : Footer.Odd } );
-    }
+    }    
 
     History.RecalcData_Add( { Type : historyrecalctype_Inline, Data : { Pos : 0, PageNum : 0 } } );
 
     //Recalculate для Document
     Document.CurPos.ContentPos = 0;
 
-    var hdr = Document.HdrFtr.Content[0].Header;
-    var ftr = Document.HdrFtr.Content[0].Footer;
-    var drawing_objects = Document.DrawingObjects;
-    if(hdr.First != null || ftr.First != null)
-    {
-        drawing_objects.firstPage = new HeaderFooterGraphicObjects();
-    }
-    if(hdr.Even != null || ftr.Even != null)
-    {
-        if((hdr.Even != null && hdr.Even == hdr.First) || (ftr.Even != null && ftr.Even == ftr.First))
-            drawing_objects.evenPage = drawing_objects.firstPage;
-        else
-            drawing_objects.evenPage = new HeaderFooterGraphicObjects();
-    }
-    if(hdr.Odd != null || ftr.Odd != null)
-    {
-        if((hdr.Odd != null && hdr.Odd == hdr.First) || (ftr.Odd != null && ftr.Odd == ftr.First))
-            drawing_objects.oddPage = drawing_objects.firstPage;
-        else if((hdr.Odd != null && hdr.Odd == hdr.Even)|| (ftr.Odd != null && ftr.Odd == ftr.Even))
-            drawing_objects.oddPage = drawing_objects.evenPage;
-        else
-            drawing_objects.oddPage = new HeaderFooterGraphicObjects();
-    }
+    // TODO: Переделать
+//    var hdr = Document.HdrFtr.Content[0].Header;
+//    var ftr = Document.HdrFtr.Content[0].Footer;
+//    var drawing_objects = Document.DrawingObjects;
+//    if(hdr.First != null || ftr.First != null)
+//    {
+//        drawing_objects.firstPage = new HeaderFooterGraphicObjects();
+//    }
+//    if(hdr.Even != null || ftr.Even != null)
+//    {
+//        if((hdr.Even != null && hdr.Even == hdr.First) || (ftr.Even != null && ftr.Even == ftr.First))
+//            drawing_objects.evenPage = drawing_objects.firstPage;
+//        else
+//            drawing_objects.evenPage = new HeaderFooterGraphicObjects();
+//    }
+//    if(hdr.Odd != null || ftr.Odd != null)
+//    {
+//        if((hdr.Odd != null && hdr.Odd == hdr.First) || (ftr.Odd != null && ftr.Odd == ftr.First))
+//            drawing_objects.oddPage = drawing_objects.firstPage;
+//        else if((hdr.Odd != null && hdr.Odd == hdr.Even)|| (ftr.Odd != null && ftr.Odd == ftr.Even))
+//            drawing_objects.oddPage = drawing_objects.evenPage;
+//        else
+//            drawing_objects.oddPage = new HeaderFooterGraphicObjects();
+//    }
 
 
     Document.DrawingObjects.calculateAfterOpen();

@@ -625,7 +625,10 @@ CDocument.prototype =
 
     Set_CurrentElement : function(Index, bUpdateStates)
     {
+        var OldDocPosType = this.CurPos.Type;
+
         var ContentPos = Math.max( 0, Math.min( this.Content.length - 1, Index ) );
+
         this.CurPos.Type = docpostype_Content;
         this.Selection_Remove();
         this.CurPos.ContentPos = Math.max( 0, Math.min( this.Content.length - 1, Index ) );
@@ -642,6 +645,12 @@ CDocument.prototype =
             this.Document_UpdateInterfaceState();
             this.Document_UpdateRulersState();
             this.Document_UpdateSelectionState();
+        }
+
+        if ( docpostype_HdrFtr === OldDocPosType )
+        {
+            this.DrawingDocument.ClearCachePages();
+            this.DrawingDocument.FirePaint();
         }
     },
 
@@ -1001,8 +1010,6 @@ CDocument.prototype =
                 this.Pages[PageIndex] = OldPage;
                 this.DrawingDocument.OnRecalculatePage( PageIndex, this.Pages[PageIndex] );
 
-                console.log( "HdrFtr Recalc Page " + PageIndex );
-                
                 this.Internal_CheckCurPage();
                 this.DrawingDocument.OnEndRecalculate( true );
                 this.DrawingObjects.onEndRecalculateDocument( this.Pages.length );
@@ -1024,8 +1031,6 @@ CDocument.prototype =
                 this.Pages[PageIndex] = OldPage;
                 this.DrawingDocument.OnRecalculatePage( PageIndex, this.Pages[PageIndex] );
 
-                console.log( "HdrFtr Recalc Page " + PageIndex );
-                
                 this.FullRecalc.PageIndex  = PageIndex + 1;
                 this.FullRecalc.Start      = true;
                 this.FullRecalc.StartIndex = this.Pages[PageIndex + 1].Pos;
@@ -1064,8 +1069,6 @@ CDocument.prototype =
             if ( true === bStart )
                 this.Pages.length = PageIndex + 1;
         }
-
-        console.log( "Regular Recalc Page " + PageIndex );
 
         var StartPos = this.Get_PageContentStartPos(PageIndex, StartIndex);
         
@@ -1624,7 +1627,7 @@ CDocument.prototype =
 
     Reset_RecalculateCache : function()
     {
-        this.HdrFtr.Reset_RecalculateCache();
+        this.SectionsInfo.Reset_HdrFtrRecalculateCache();
 
         var Count = this.Content.length;
         for ( var Index = 0; Index < Count; Index++ )
@@ -7125,7 +7128,7 @@ CDocument.prototype =
     {
         var ParaArray = new Array();
 
-        this.HdrFtr.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
+        this.SectionsInfo.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
 
         var Count = this.Content.length;
         for ( var Index = 0; Index < Count; Index++ )
@@ -10104,29 +10107,13 @@ CDocument.prototype =
             if ( PageIndex < 0 )
                 PageIndex = this.CurPage;
 
-            this.HdrFtr.AddPageNum( PageIndex, AlignV, AlignH );
+            this.Create_HdrFtrWidthPageNum( PageIndex, AlignV, AlignH );
         }
         else
         {
             this.Paragraph_Add( new ParaPageNum() );
         }
 
-        this.Document_UpdateInterfaceState();
-    },
-
-    // Type    - верхний или нижний колонтитул
-    // Subtype - first, even или default
-    Document_AddHdrFtr : function(Type, Subtype)
-    {
-        this.HdrFtr.AddHeaderOrFooter( Type, Subtype );
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
-    },
-
-    Document_RemoveHdrFtr : function(Type, Subtype)
-    {
-        this.HdrFtr.RemoveHeaderOrFooter( Type, Subtype );
-        this.Document_UpdateSelectionState();
         this.Document_UpdateInterfaceState();
     },
     
@@ -10562,102 +10549,6 @@ CDocument.prototype =
         return Info;
     },
 //-----------------------------------------------------------------------------------
-// Функции для работы с поиском
-//-----------------------------------------------------------------------------------
-    Search_Start : function(Str)
-    {
-        if ( "string" != typeof(Str) || Str.length <= 0 )
-            return;
-
-        this.DrawingDocument.StartSearch();
-
-        this.SearchInfo.String   = Str;
-        this.SearchInfo.CurPage  = 0;
-        this.SearchInfo.StartPos = 0;
-
-        // Начнем поиск с поиска по колонтитулам
-        this.HdrFtr.DocumentSearch( this.SearchInfo.String );
-
-        this.SearchInfo.Id = setTimeout(function() {editor.WordControl.m_oLogicDocument.Search_WaitRecalc()}, 1);
-    },
-
-    Search_WaitRecalc : function()
-    {
-        if ( null === this.SearchInfo.Id )
-            return;
-
-        // Пока рассчет не закончился не начинаем поиск
-        if ( null != this.FullRecalc.Id )
-            this.SearchInfo.Id = setTimeout(function() {editor.WordControl.m_oLogicDocument.Search_WaitRecalc()}, 100);
-        else
-            this.SearchInfo.Id = setTimeout(function() {editor.WordControl.m_oLogicDocument.Search_OnPage()}, 1);
-    },
-
-    Search_OnPage : function()
-    {
-        if ( null === this.SearchInfo.Id )
-            return;
-
-        var Count = this.Content.length;
-        var CurPage = this.SearchInfo.CurPage;
-
-        var bFlowObjChecked = false;
-
-        var Index = 0;
-        for ( Index = this.SearchInfo.StartPos; Index < Count; Index++ )
-        {
-            var Element = this.Content[Index];
-            Element.DocumentSearch( this.SearchInfo.String, search_Common );
-
-            if ( false === bFlowObjChecked )
-            {
-                this.DrawingObjects.documentSearch( CurPage, this.SearchInfo.String, search_Common );
-                bFlowObjChecked = true;
-            }
-
-            var bNewPage = false;
-            if ( Element.Pages.length > 1 )
-            {
-                for ( var TempIndex = 1; TempIndex < Element.Pages.length - 1; TempIndex++ )
-                    this.DrawingObjects.documentSearch( CurPage + TempIndex, this.SearchInfo.String, search_Common );
-
-                CurPage += Element.Pages.length - 1;
-                bNewPage = true;
-            }
-
-            if ( bNewPage )
-            {
-                clearTimeout( this.SearchInfo.Id );
-
-                this.SearchInfo.StartPos = Index + 1;
-                this.SearchInfo.CurPage  = CurPage;
-                this.SearchInfo.Id = setTimeout(function() {editor.WordControl.m_oLogicDocument.Search_OnPage()}, 1);
-
-                break;
-            }
-        }
-
-        if ( Index >= Count )
-        {
-            this.SearchInfo.Id = null;
-            this.Search_Stop( false );
-        }
-    },
-
-    Search_Stop : function(bChange)
-    {
-        if ( "undefined" === typeof(bChange) )
-            bChange = false;
-
-        if ( null != this.SearchInfo.Id )
-        {
-            clearTimeout( this.SearchInfo.Id );
-            this.SearchInfo.Id = null;
-        }
-
-        this.DrawingDocument.EndSearch( bChange );
-    },
-//-----------------------------------------------------------------------------------
 // Функции для работы с таблицами
 //-----------------------------------------------------------------------------------
     Table_AddRow : function(bBefore)
@@ -10981,7 +10872,7 @@ CDocument.prototype =
         var StartTime = new Date().getTime();
         
         var FontMap = new Object();
-        this.HdrFtr.Document_CreateFontMap(FontMap);
+        this.SectionsInfo.Document_CreateFontMap(FontMap);
 
         var CurPage = 0;
         this.DrawingObjects.documentCreateFontMap( CurPage, FontMap );
@@ -10999,14 +10890,12 @@ CDocument.prototype =
             }
         }
 
-        //console.log( "CreateFontMap: " + ((new Date().getTime() - StartTime) / 1000) + " s"  );
-
         return FontMap;
     },
 
     Document_CreateFontCharMap : function(FontCharMap)
     {
-        this.HdrFtr.Document_CreateFontCharMap( FontCharMap );
+        this.SectionsInfo.Document_CreateFontCharMap( FontCharMap );
         this.DrawingObjects.documentCreateFontCharMap( FontCharMap );
 
         var Count = this.Content.length;
@@ -11021,7 +10910,7 @@ CDocument.prototype =
     {
         var AllFonts = new Object();
 
-        this.HdrFtr.Document_Get_AllFontNames( AllFonts );
+        this.SectionsInfo.Document_Get_AllFontNames( AllFonts );
         this.Numbering.Document_Get_AllFontNames( AllFonts );
         this.Styles.Document_Get_AllFontNames( AllFonts );
 
@@ -12862,6 +12751,48 @@ CDocument.prototype =
 
         if ( null !== FooterE )
             FooterE.Refresh_RecalcData_BySection( _SectPr );                
+    },
+    
+    Create_HdrFtrWidthPageNum : function(PageIndex, AlignV, AlignH)
+    {
+        // Определим четность страницы и является ли она первой в данной секции. Заметим, что четность страницы 
+        // отсчитывается от начала текущей секции и не зависит от настроек нумерации страниц для данной секции.
+        var FirstPage = this.Get_SectionFirstPage( PageIndex );
+
+        var bFirst = ( FirstPage === PageIndex ? true : false );
+        var bEven  = ( 0 === ( ( PageIndex - FirstPage ) % 2 ) ? false : true ); // потому что у нас страницы с 0 нумеруются
+
+        // Запросим нужный нам колонтитул 
+        var HdrFtr = this.Get_SectionHdrFtr( PageIndex, bFirst, bEven );   
+        
+        switch ( AlignV )
+        {
+            case hdrftr_Header :
+            {
+                var Header = HdrFtr.Header;
+
+                if ( null === Header)
+                    Header = this.Create_SectionHdrFtr( hdrftr_Header, PageIndex );
+
+                Header.AddPageNum( AlignH );
+                
+                break;
+            }
+                
+            case hdrftr_Footer :
+            {
+                var Footer = HdrFtr.Footer;
+
+                if ( null === Footer)
+                    Footer = this.Create_SectionHdrFtr( hdrftr_Footer, PageIndex );
+
+                Footer.AddPageNum( AlignH );
+
+                break;
+            }
+        }
+        
+        this.Recalculate();
     }
 };
 
@@ -12907,6 +12838,141 @@ CDocumentSectionsInfo.prototype =
         return -1;
     },
     
+    Reset_HdrFtrRecalculateCache : function()
+    {
+        var Count = this.Elements.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var SectPr = this.Elements[Index].SectPr;
+            
+            if ( null != SectPr.HeaderFirst )
+                SectPr.HeaderFirst.Reset_RecalculateCache();
+
+            if ( null != SectPr.HeaderDefault )
+                SectPr.HeaderDefault.Reset_RecalculateCache();
+
+            if ( null != SectPr.HeaderEven )
+                SectPr.HeaderEven.Reset_RecalculateCache();
+            
+            if ( null != SectPr.FooterFirst )
+                SectPr.FooterFirst.Reset_RecalculateCache();
+
+            if ( null != SectPr.FooterDefault )
+                SectPr.FooterDefault.Reset_RecalculateCache();
+
+            if ( null != SectPr.FooterEven )
+                SectPr.FooterEven.Reset_RecalculateCache();
+        }
+    },
+
+    Get_AllParagraphs_ByNumbering : function(NumPr, ParaArray)
+    {
+        var Count = this.Elements.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var SectPr = this.Elements[Index].SectPr;
+
+            if ( null != SectPr.HeaderFirst )
+                SectPr.HeaderFirst.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
+
+            if ( null != SectPr.HeaderDefault )
+                SectPr.HeaderDefault.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
+
+            if ( null != SectPr.HeaderEven )
+                SectPr.HeaderEven.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
+
+            if ( null != SectPr.FooterFirst )
+                SectPr.FooterFirst.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
+
+            if ( null != SectPr.FooterDefault )
+                SectPr.FooterDefault.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
+
+            if ( null != SectPr.FooterEven )
+                SectPr.FooterEven.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
+        }
+    },
+
+    Document_CreateFontMap : function(FontMap)
+    {
+        var Count = this.Elements.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var SectPr = this.Elements[Index].SectPr;
+
+            if ( null != SectPr.HeaderFirst )
+                SectPr.HeaderFirst.Document_CreateFontMap(FontMap);
+
+            if ( null != SectPr.HeaderDefault )
+                SectPr.HeaderDefault.Document_CreateFontMap(FontMap);
+
+            if ( null != SectPr.HeaderEven )
+                SectPr.HeaderEven.Document_CreateFontMap(FontMap);
+
+            if ( null != SectPr.FooterFirst )
+                SectPr.FooterFirst.Document_CreateFontMap(FontMap);
+
+            if ( null != SectPr.FooterDefault )
+                SectPr.FooterDefault.Document_CreateFontMap(FontMap);
+
+            if ( null != SectPr.FooterEven )
+                SectPr.FooterEven.Document_CreateFontMap(FontMap);
+        }
+    },
+
+    Document_CreateFontCharMap : function(FontCharMap)
+    {
+        var Count = this.Elements.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var SectPr = this.Elements[Index].SectPr;
+
+            if ( null != SectPr.HeaderFirst )
+                SectPr.HeaderFirst.Document_CreateFontCharMap(FontCharMap);
+
+            if ( null != SectPr.HeaderDefault )
+                SectPr.HeaderDefault.Document_CreateFontCharMap(FontCharMap);
+
+            if ( null != SectPr.HeaderEven )
+                SectPr.HeaderEven.Document_CreateFontCharMap(FontCharMap);
+
+            if ( null != SectPr.FooterFirst )
+                SectPr.FooterFirst.Document_CreateFontCharMap(FontCharMap);
+
+            if ( null != SectPr.FooterDefault )
+                SectPr.FooterDefault.Document_CreateFontCharMap(FontCharMap);
+
+            if ( null != SectPr.FooterEven )
+                SectPr.FooterEven.Document_CreateFontCharMap(FontCharMap);
+        }
+    },
+
+    Document_Get_AllFontNames : function ( AllFonts )
+    {
+        var Count = this.Elements.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var SectPr = this.Elements[Index].SectPr;
+
+            if ( null != SectPr.HeaderFirst )
+                SectPr.HeaderFirst.Document_Get_AllFontNames(AllFonts);
+
+            if ( null != SectPr.HeaderDefault )
+                SectPr.HeaderDefault.Document_Get_AllFontNames(AllFonts);
+
+            if ( null != SectPr.HeaderEven )
+                SectPr.HeaderEven.Document_Get_AllFontNames(AllFonts);
+
+            if ( null != SectPr.FooterFirst )
+                SectPr.FooterFirst.Document_Get_AllFontNames(AllFonts);
+
+            if ( null != SectPr.FooterDefault )
+                SectPr.FooterDefault.Document_Get_AllFontNames(AllFonts);
+
+            if ( null != SectPr.FooterEven )
+                SectPr.FooterEven.Document_Get_AllFontNames(AllFonts);
+        }
+    },
+
     Get_Index : function(Index)
     {
         var Count = this.Elements.length;

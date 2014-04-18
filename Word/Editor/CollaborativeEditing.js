@@ -721,22 +721,7 @@ function CCollaborativeEditing()
             Inline : { Pos : 0, PageNum : 0 },
             Flow   : new Array(),
             HdrFtr : new Array()
-        };
-
-        var HdrFtr_Content = LogicDocument.HdrFtr.Content[0];
-
-        if ( null != HdrFtr_Content.Header.First )
-            RecalculateData.HdrFtr.push( HdrFtr_Content.Header.First );
-        if ( null != HdrFtr_Content.Footer.First )
-            RecalculateData.HdrFtr.push( HdrFtr_Content.Footer.First );
-        if ( null != HdrFtr_Content.Header.Even )
-            RecalculateData.HdrFtr.push( HdrFtr_Content.Header.Even );
-        if ( null != HdrFtr_Content.Footer.Even )
-            RecalculateData.HdrFtr.push( HdrFtr_Content.Footer.Even );
-        if ( null != HdrFtr_Content.Header.Odd )
-            RecalculateData.HdrFtr.push( HdrFtr_Content.Header.Odd );
-        if ( null != HdrFtr_Content.Footer.Odd )
-            RecalculateData.HdrFtr.push( HdrFtr_Content.Footer.Odd );
+        };        
 
         LogicDocument.Reset_RecalculateCache();
 

@@ -96,17 +96,8 @@ CDocumentSearch.prototype =
                 Paragraph.Selection.Use      = true;
                 Paragraph.Selection.Start    = false;
 
-                if ( true !== Debug_ParaRunMode )
-                {
-                    Paragraph.Selection.StartPos = SearchElement.StartPos;
-                    Paragraph.Selection.EndPos   = SearchElement.EndPos;
-                    Paragraph.CurPos.ContentPos  = SearchElement.StartPos;
-                }
-                else
-                {
-                    Paragraph.Set_SelectionContentPos(SearchElement.StartPos, SearchElement.EndPos);
-                    Paragraph.Set_ParaContentPos(SearchElement.StartPos, false, -1, -1);
-                }
+                Paragraph.Set_SelectionContentPos(SearchElement.StartPos, SearchElement.EndPos);
+                Paragraph.Set_ParaContentPos(SearchElement.StartPos, false, -1, -1);
 
                 Paragraph.Document_SetThisElementCurrent(true);
             }
@@ -128,71 +119,32 @@ CDocumentSearch.prototype =
             var SearchElement = Para.SearchResults[Id];
             if ( undefined != SearchElement )
             {
-                if ( true !== Debug_ParaRunMode )
+                // Сначала в начальную позицию поиска добавляем новый текст
+                var StartContentPos = SearchElement.StartPos;
+                var StartRun = SearchElement.ClassesS[SearchElement.ClassesS.length - 1];
+
+                var RunPos = StartContentPos.Get( SearchElement.ClassesS.length - 1 );
+
+                var Len = NewStr.length;
+                for ( var Pos = 0; Pos < Len; Pos++ )
                 {
-                    var StartPos = SearchElement.StartPos;
-                    var EndPos   = SearchElement.EndPos;
-
-                    for ( var Pos = EndPos - 1; Pos >= StartPos; Pos-- )
-                    {
-                        var ItemType = Para.Content[Pos].Type;
-                        if ( para_TextPr != ItemType && para_CollaborativeChangesStart != ItemType && para_CollaborativeChangesEnd != ItemType && para_CommentStart != ItemType && para_CommentEnd != ItemType && para_HyperlinkStart != ItemType && para_HyperlinkEnd != ItemType )
-                            Para.Internal_Content_Remove(Pos);
-                    }
-
-
-                    var Len = NewStr.length;
-                    for ( var Pos = 0; Pos < Len; Pos++ )
-                    {
-                        Para.Internal_Content_Add2( StartPos + Pos, new ParaText( NewStr[Pos] ) );
-                    }
-
-                    Para.RecalcInfo.Set_Type_0( pararecalc_0_All );
-                    Para.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
-
-                    // Удаляем запись о данном элементе
-                    this.Count--;
-                    delete Para.SearchResults[Id];
-
-                    var ParaCount = 0;
-                    for ( var TempId in Para.SearchResults )
-                    {
-                        ParaCount++;
-                        break;
-                    }
-
-                    if ( ParaCount <= 0 )
-                        delete this.Elements[Id];
+                    StartRun.Add_ToContent( RunPos + Pos, new ParaText( NewStr[Pos] ) );
                 }
-                else
-                {
-                    // Сначала в начальную позицию поиска добавляем новый текст
-                    var StartContentPos = SearchElement.StartPos;
-                    var StartRun = SearchElement.ClassesS[SearchElement.ClassesS.length - 1];
 
-                    var RunPos = StartContentPos.Get( SearchElement.ClassesS.length - 1 );
+                // Выделяем старый объект поиска и удаляем его
+                Para.Selection.Use = true;
+                Para.Set_SelectionContentPos( SearchElement.StartPos, SearchElement.EndPos );
+                Para.Remove();
 
-                    var Len = NewStr.length;
-                    for ( var Pos = 0; Pos < Len; Pos++ )
-                    {
-                        StartRun.Add_ToContent( RunPos + Pos, new ParaText( NewStr[Pos] ) );
-                    }
+                // Перемещаем курсор в конец поиска
+                Para.Selection_Remove();
+                Para.Set_ParaContentPos( SearchElement.StartPos, true, -1, -1 );
 
-                    // Выделяем старый объект поиска и удаляем его
-                    Para.Selection.Use = true;
-                    Para.Set_SelectionContentPos( SearchElement.StartPos, SearchElement.EndPos );
-                    Para.Remove();
+                // Удаляем запись о данном элементе
+                this.Count--;
 
-                    // Перемещаем курсор в конец поиска
-                    Para.Selection_Remove();
-                    Para.Set_ParaContentPos( SearchElement.StartPos, true, -1, -1 );
-
-                    // Удаляем запись о данном элементе
-                    this.Count--;
-
-                    Para.Remove_SearchResult( Id );
-                    delete this.Elements[Id];
-                }
+                Para.Remove_SearchResult( Id );
+                delete this.Elements[Id];
             }
         }
     },
@@ -241,7 +193,7 @@ CDocument.prototype.Search = function(Str, Props)
     }
 
     // Поиск в колонтитулах
-    this.HdrFtr.Search( Str, Props, this.SearchEngine );
+    this.SectionsInfo.Search( Str, Props, this.SearchEngine );
 
     this.DrawingDocument.ClearCachePages();
     this.DrawingDocument.FirePaint();
@@ -410,7 +362,7 @@ CDocument.prototype.Search_GetId = function(bNext)
     }
     else if ( docpostype_HdrFtr === this.CurPos.Type )
     {
-        return this.HdrFtr.Search_GetId( bNext );
+        return this.SectionsInfo.Search_GetId( bNext, this.HdrFtr.CurHdrFtr );
     }
 
     return null;
@@ -551,153 +503,103 @@ CHeaderFooter.prototype.Search_GetId = function(bNext, bCurrent)
 };
 
 //----------------------------------------------------------------------------------------------------------------------
-// CHeaderFooterController
+// CDocumentSectionsInfo
 //----------------------------------------------------------------------------------------------------------------------
-CHeaderFooterController.prototype.Search = function(Str, Props, SearchEngine)
+CDocumentSectionsInfo.prototype.Search = function(Str, Props, SearchEngine)
 {
-    var bHdr_first = false;
-    var bHdr_even  = false;
-
-    if ( this.Content[0].Header.First != this.Content[0].Header.Odd )
-        bHdr_first = true;
-
-    if ( this.Content[0].Header.Even != this.Content[0].Header.Odd )
-        bHdr_even = true;
-
-    if ( true === bHdr_even && true === bHdr_first )
+    var bEvenOdd = EvenAndOddHeaders;
+    var Count = this.Elements.length;
+    for ( var Index = 0; Index < Count; Index++ )
     {
-        if ( null != this.Content[0].Header.First )
-            this.Content[0].Header.First.Search( Str, Props, SearchEngine, search_Header | search_HdrFtr_First  );
+        var SectPr = this.Elements[Index].SectPr;
+        var bFirst = SectPr.Get_TitlePage();
+        
+        if ( null != SectPr.HeaderFirst && true === bFirst )
+            SectPr.HeaderFirst.Search( Str, Props, SearchEngine, search_Header );
 
-        if ( null != this.Content[0].Header.Even )
-            this.Content[0].Header.Even.Search( Str, Props, SearchEngine, search_Header | search_HdrFtr_Even );
+        if ( null != SectPr.HeaderEven && true === bEvenOdd )
+            SectPr.HeaderEven.Search( Str, Props, SearchEngine, search_Header );
 
-        if ( null != this.Content[0].Header.Odd )
-            this.Content[0].Header.Odd.Search( Str, Props, SearchEngine, search_Header | search_HdrFtr_Odd_no_First );
-    }
-    else if ( true === bHdr_even )
-    {
-        if ( null != this.Content[0].Header.Even )
-            this.Content[0].Header.Even.Search( Str, Props, SearchEngine, search_Header | search_HdrFtr_Even );
+        if ( null != SectPr.HeaderDefault )
+            SectPr.HeaderDefault.Search( Str, Props, SearchEngine, search_Header );
 
-        if ( null != this.Content[0].Header.Odd )
-            this.Content[0].Header.Odd.Search( Str, Props, SearchEngine, search_Header | search_HdrFtr_Odd );
-    }
-    else if ( true === bHdr_first )
-    {
-        if ( null != this.Content[0].Header.First )
-            this.Content[0].Header.First.Search( Str, Props, SearchEngine, search_Header | search_HdrFtr_First );
+        if ( null != SectPr.FooterFirst && true === bFirst )
+            SectPr.FooterFirst.Search( Str, Props, SearchEngine, search_Footer );
 
-        if ( null != this.Content[0].Header.Odd )
-            this.Content[0].Header.Odd.Search( Str, Props, SearchEngine, search_Header | search_HdrFtr_All_no_First );
-    }
-    else
-    {
-        if ( null != this.Content[0].Header.Odd )
-            this.Content[0].Header.Odd.Search( Str, Props, SearchEngine, search_Header | search_HdrFtr_All );
-    }
+        if ( null != SectPr.FooterEven && true === bEvenOdd )
+            SectPr.FooterEven.Search( Str, Props, SearchEngine, search_Footer );
 
-    var bFtr_first = false;
-    var bFtr_even  = false;
-
-    if ( this.Content[0].Footer.First != this.Content[0].Footer.Odd )
-        bFtr_first = true;
-
-    if ( this.Content[0].Footer.Even != this.Content[0].Footer.Odd )
-        bFtr_even = true;
-
-    if ( true === bFtr_even && true === bFtr_first )
-    {
-        if ( null != this.Content[0].Footer.First )
-            this.Content[0].Footer.First.Search( Str, Props, SearchEngine, search_Footer | search_HdrFtr_First );
-
-        if ( null != this.Content[0].Footer.Even )
-            this.Content[0].Footer.Even.Search( Str, Props, SearchEngine, search_Footer | search_HdrFtr_Even );
-
-        if ( null != this.Content[0].Footer.Odd )
-            this.Content[0].Footer.Odd.Search( Str, Props, SearchEngine, search_Footer | search_HdrFtr_Odd_no_First );
-    }
-    else if ( true === bFtr_even )
-    {
-        if ( null != this.Content[0].Footer.Even )
-            this.Content[0].Footer.Even.Search( Str, Props, SearchEngine, search_Footer | search_HdrFtr_Even );
-
-        if ( null != this.Content[0].Footer.Odd )
-            this.Content[0].Footer.Odd.Search( Str, Props, SearchEngine, search_Footer | search_HdrFtr_Odd );
-    }
-    else if ( true === bFtr_first )
-    {
-        if ( null != this.Content[0].Footer.First )
-            this.Content[0].Footer.First.Search( Str, Props, SearchEngine, search_Footer | search_HdrFtr_First );
-
-        if ( null != this.Content[0].Footer.Odd )
-            this.Content[0].Footer.Odd.Search( Str, Props, SearchEngine, search_Footer | search_HdrFtr_All_no_First );
-    }
-    else
-    {
-        if ( null != this.Content[0].Footer.Odd )
-            this.Content[0].Footer.Odd.Search( Str, Props, SearchEngine, search_Footer | search_HdrFtr_All );
-    }
+        if ( null != SectPr.FooterDefault )
+            SectPr.FooterDefault.Search( Str, Props, SearchEngine, search_Footer );                
+    }            
 };
 
-CHeaderFooterController.prototype.Search_GetId = function(bNext)
-{
+CDocumentSectionsInfo.prototype.Search_GetId = function(bNext, CurHdrFtr)
+{       
     var HdrFtrs = new Array();
     var CurPos  = -1;
 
-    if ( null != this.Content[0].Header.First )
+    var bEvenOdd = EvenAndOddHeaders;
+    var Count = this.Elements.length;
+    for ( var Index = 0; Index < Count; Index++ )
     {
-        HdrFtrs.push( this.Content[0].Header.First );
+        var SectPr = this.Elements[Index].SectPr;
+        var bFirst = SectPr.Get_TitlePage();
 
-        if ( this.CurHdrFtr === this.Content[0].Header.First )
-            CurPos = HdrFtrs.length - 1;
+        if ( null != SectPr.HeaderFirst && true === bFirst )
+        {
+            HdrFtrs.push( SectPr.HeaderFirst );
+
+            if ( CurHdrFtr === SectPr.HeaderFirst )
+                CurPos = HdrFtrs.length - 1;
+        }
+
+        if ( null != SectPr.HeaderEven && true === bEvenOdd )
+        {
+            HdrFtrs.push( SectPr.HeaderEven );
+
+            if ( CurHdrFtr === SectPr.HeaderEven )
+                CurPos = HdrFtrs.length - 1;
+        }
+
+        if ( null != SectPr.HeaderDefault )
+        {
+            HdrFtrs.push( SectPr.HeaderDefault );
+
+            if ( CurHdrFtr === SectPr.HeaderDefault )
+                CurPos = HdrFtrs.length - 1;
+        }
+
+        if ( null != SectPr.FooterFirst && true === bFirst )
+        {
+            HdrFtrs.push( SectPr.FooterFirst );
+
+            if ( CurHdrFtr === SectPr.FooterFirst )
+                CurPos = HdrFtrs.length - 1;
+        }
+
+        if ( null != SectPr.FooterEven && true === bEvenOdd )
+        {
+            HdrFtrs.push( SectPr.FooterEven );
+
+            if ( CurHdrFtr === SectPr.FooterEven )
+                CurPos = HdrFtrs.length - 1;
+        }
+
+        if ( null != SectPr.FooterDefault )
+        {
+            HdrFtrs.push( SectPr.FooterDefault );
+
+            if ( CurHdrFtr === SectPr.FooterDefault )
+                CurPos = HdrFtrs.length - 1;
+        }
     }
-
-    if ( null != this.Content[0].Footer.First )
-    {
-        HdrFtrs.push( this.Content[0].Footer.First );
-
-        if ( this.CurHdrFtr === this.Content[0].Footer.First )
-            CurPos = HdrFtrs.length - 1;
-    }
-
-    if ( null === Id && null != this.Content[0].Header.Even && this.Content[0].Header.First != this.Content[0].Header.Even )
-    {
-        HdrFtrs.push( this.Content[0].Header.Even );
-
-        if ( this.CurHdrFtr === this.Content[0].Header.Even )
-            CurPos = HdrFtrs.length - 1;
-    }
-
-    if ( null === Id && null != this.Content[0].Footer.Even && this.Content[0].Footer.First != this.Content[0].Footer.Even )
-    {
-        HdrFtrs.push( this.Content[0].Footer.Even );
-
-        if ( this.CurHdrFtr === this.Content[0].Footer.Even )
-            CurPos = HdrFtrs.length - 1;
-    }
-
-    if ( null === Id && null != this.Content[0].Header.Odd && this.Content[0].Header.First != this.Content[0].Header.Odd && this.Content[0].Header.First != this.Content[0].Header.Odd )
-    {
-        HdrFtrs.push( this.Content[0].Header.Odd );
-
-        if ( this.CurHdrFtr === this.Content[0].Header.Odd  )
-            CurPos = HdrFtrs.length - 1;
-    }
-
-    if ( null === Id && null != this.Content[0].Footer.Odd && this.Content[0].Footer.First != this.Content[0].Footer.Odd && this.Content[0].Footer.First != this.Content[0].Footer.Odd )
-    {
-        HdrFtrs.push( this.Content[0].Footer.Odd );
-
-        if ( this.CurHdrFtr === this.Content[0].Footer.Odd )
-            CurPos = HdrFtrs.length - 1;
-    }
-
+    
     var Count = HdrFtrs.length;
 
     if ( -1 != CurPos )
     {
-        var Id = this.CurHdrFtr.Search_GetId( bNext, true );
+        var Id = CurHdrFtr.Search_GetId( bNext, true );
         if ( null != Id )
             return Id;
 

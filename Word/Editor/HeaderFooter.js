@@ -237,9 +237,24 @@ CHeaderFooter.prototype =
 
     Set_CurrentElement : function(bUpdateStates)
     {
+        var PageIndex = -1;
+        
+        for ( var PIndex in this.Parent.Pages )
+        {
+            if ( ( this === this.Parent.Pages[PIndex].Header || this === this.Parent.Pages[PIndex].Footer ) && ( -1 === PageIndex || PageIndex > PIndex ) )
+                PageIndex = PIndex;
+        }
+        
+        if ( -1 === PageIndex )
+            return;
+
+        this.Set_Page( PageIndex );        
+        
         this.Parent.CurHdrFtr     = this;
         this.Parent.WaitMouseDown = true;
+        this.Parent.CurPage       = PageIndex;
 
+        var OldDocPosType = this.LogicDocument.CurPos.Type;
         this.LogicDocument.CurPos.Type = docpostype_HdrFtr;
 
         if ( true === bUpdateStates )
@@ -247,6 +262,12 @@ CHeaderFooter.prototype =
             this.LogicDocument.Document_UpdateInterfaceState();
             this.LogicDocument.Document_UpdateRulersState();
             this.LogicDocument.Document_UpdateSelectionState();
+        }
+
+        if ( docpostype_HdrFtr !== OldDocPosType )
+        {
+            this.DrawingDocument.ClearCachePages();
+            this.DrawingDocument.FirePaint();
         }
     },
 
@@ -981,13 +1002,6 @@ CHeaderFooter.prototype =
         }
     },
 //-----------------------------------------------------------------------------------
-// Поиск
-//-----------------------------------------------------------------------------------
-    DocumentSearch : function(SearchString, Type)
-    {
-        this.Content.DocumentSearch( SearchString, Type );
-    },
-//-----------------------------------------------------------------------------------
 // Функции для работы с гиперссылками
 //-----------------------------------------------------------------------------------
     Hyperlink_Add : function(HyperProps)
@@ -1072,10 +1086,6 @@ CHeaderFooter.prototype =
 
         this.Content = g_oTableId.Get_ById( Reader.GetString2() );        
     },
-
-    Load_LinkData : function(LinkData)
-    {
-    },
 //-----------------------------------------------------------------------------------
 // Функции для работы с комментариями
 //-----------------------------------------------------------------------------------
@@ -1099,25 +1109,6 @@ function CHeaderFooterController(LogicDocument, DrawingDocument)
 
     this.DrawingDocument = DrawingDocument;
     this.LogicDocument   = LogicDocument;
-
-    // В контенте лежат все колонтитулы
-    this.Content = new Array();
-    this.Content[0] =
-    {
-        Header :
-        {
-            First : null,
-            Even  : null,
-            Odd   : null
-        },
-
-        Footer :
-        {
-            First : null,
-            Even  : null,
-            Odd   : null
-        }
-    };
 
     // Текущий колонтитул
     this.CurHdrFtr = null;
@@ -1148,274 +1139,7 @@ CHeaderFooterController.prototype =
     },
 //-----------------------------------------------------------------------------------
 // Функции для работы с колонтитулами
-//-----------------------------------------------------------------------------------
-
-    AddHeaderOrFooter : function(Type, PageType)
-    {
-        this.LogicDocument.DrawingObjects.AddHeaderOrFooter( Type, PageType );
-
-        var BoundY2 = Y_Default_Header;
-        if ( Type === hdrftr_Footer )
-            BoundY2 = Page_Height - Y_Default_Footer;
-
-        var Content_old =
-        {
-            Header :
-            {
-                First : this.Content[0].Header.First,
-                Even  : this.Content[0].Header.Even,
-                Odd   : this.Content[0].Header.Odd
-            },
-
-            Footer :
-            {
-                First : this.Content[0].Footer.First,
-                Even  : this.Content[0].Footer.Even,
-                Odd   : this.Content[0].Footer.Odd
-            }
-        };
-
-        var HdrFtr = new CHeaderFooter( this, this.LogicDocument, this.DrawingDocument, Type, BoundY2 );
-        switch( Type )
-        {
-            case hdrftr_Footer:
-            {
-                switch ( PageType )
-                {
-                    case hdrftr_Default:
-                    {
-                        if ( null === this.Content[0].Footer.First )
-                            this.Content[0].Footer.First = HdrFtr;
-
-                        if ( null === this.Content[0].Footer.Even )
-                            this.Content[0].Footer.Even  = HdrFtr;
-
-                        this.Content[0].Footer.Odd   = HdrFtr;
-                        break;
-                    }
-                    case hdrftr_Even :
-                    {
-                        this.Content[0].Footer.Even  = HdrFtr;
-
-                        break;
-                    }
-                    case hdrftr_First :
-                    {
-                        this.Content[0].Footer.First  = HdrFtr;
-
-                        break;
-                    }
-                }
-
-                break;
-            }
-            case hdrftr_Header:
-            {
-                switch ( PageType )
-                {
-                    case hdrftr_Default:
-                    {
-                        if ( null === this.Content[0].Header.First )
-                            this.Content[0].Header.First = HdrFtr;
-
-                        if ( null === this.Content[0].Header.Even )
-                            this.Content[0].Header.Even  = HdrFtr;
-
-                        this.Content[0].Header.Odd   = HdrFtr;
-                        break;
-                    }
-                    case hdrftr_Even :
-                    {
-                        this.Content[0].Header.Even  = HdrFtr;
-
-                        break;
-                    }
-                    case hdrftr_First :
-                    {
-                        this.Content[0].Header.First  = HdrFtr;
-                        break;
-                    }
-                }
-
-                break;
-            }
-        }
-
-        History.Add( this, { Type : historyitem_HdrFtrController_AddItem, Old : Content_old, New : this.Content[0] } );
-
-        this.LogicDocument.Recalculate();
-
-        this.CurHdrFtr = this.Internal_GetContentByXY( 0, 0, this.CurPage );
-        this.CurHdrFtr.Cursor_MoveAt( 0, 0, this.CurPage, false, false );
-
-        return HdrFtr;
-    },
-
-    RemoveHeaderOrFooter : function(Type, PageType)
-    {
-        this.LogicDocument.DrawingObjects.RemoveHeaderOrFooter( Type, PageType );
-
-        var Content_old =
-        {
-            Header :
-            {
-                First : this.Content[0].Header.First,
-                Even  : this.Content[0].Header.Even,
-                Odd   : this.Content[0].Header.Odd
-            },
-
-            Footer :
-            {
-                First : this.Content[0].Footer.First,
-                Even  : this.Content[0].Footer.Even,
-                Odd   : this.Content[0].Footer.Odd
-            }
-        };
-
-        switch( Type )
-        {
-            case hdrftr_Footer:
-            {
-                switch ( PageType )
-                {
-                    case hdrftr_Default:
-                    {
-                        var HdrFtr = this.Content[0].Footer.Odd;
-
-                        if ( HdrFtr === this.Content[0].Footer.First )
-                            this.Content[0].Footer.First = null;
-
-                        if ( HdrFtr === this.Content[0].Footer.Even )
-                            this.Content[0].Footer.Even = null;
-
-                        this.Content[0].Footer.Odd = null;
-
-                        break;
-                    }
-                    case hdrftr_Even :
-                    {
-                        if ( this.Content[0].Footer.Odd != this.Content[0].Footer.Even )
-                            this.Content[0].Footer.Even = this.Content[0].Footer.Odd;
-
-                        break;
-                    }
-                    case hdrftr_First :
-                    {
-                        if ( this.Content[0].Footer.Odd != this.Content[0].Footer.First )
-                            this.Content[0].Footer.First  = this.Content[0].Footer.Odd;
-
-                        break;
-                    }
-                }
-
-                break;
-            }
-            case hdrftr_Header:
-            {
-                switch ( PageType )
-                {
-                    case hdrftr_Default:
-                    {
-                        var HdrFtr = this.Content[0].Header.Odd;
-
-                        if ( HdrFtr === this.Content[0].Header.First )
-                            this.Content[0].Header.First = null;
-
-                        if ( HdrFtr === this.Content[0].Header.Even )
-                            this.Content[0].Header.Even = null;
-
-                        this.Content[0].Header.Odd = null;
-
-                        break;
-                    }
-                    case hdrftr_Even :
-                    {
-                        if ( this.Content[0].Header.Odd != this.Content[0].Header.Even )
-                        {
-                            if ( this.Content[0].Header.Even === this.Content[0].Header.First )
-                                this.Content[0].Header.First = this.Content[0].Header.Odd;
-
-                            this.Content[0].Header.Even = this.Content[0].Header.Odd;
-                        }
-
-                        break;
-                    }
-                    case hdrftr_First :
-                    {
-                        if ( this.Content[0].Header.Odd != this.Content[0].Header.First )
-                            this.Content[0].Header.First  = this.Content[0].Header.Odd;
-
-                        break;
-                    }
-                }
-
-                break;
-            }
-        }
-
-        History.Add( this, { Type : historyitem_HdrFtrController_AddItem, Old : Content_old, New : this.Content[0] } );
-
-        this.CurHdrFtr = this.Internal_GetContentByXY( 0, 0, this.CurPage );
-        this.CurHdrFtr.Cursor_MoveAt( 0, 0, this.CurPage, false, false );
-
-        this.LogicDocument.ContentLastChangePos = 0;
-        this.LogicDocument.Recalculate();
-    },
-
-    AddPageNum : function(PageIndex, AlignV, AlignH)
-    {
-        // Номер страницы добавляется только в тот колонтитул, который соответствует текущей странице
-        var bFirst = (0 === PageIndex ? true : false);
-        var bEven  = (PageIndex  % 2 === 1 ? true : false); // 0, потому что нумерация начинается с 0, а не 1
-
-        var Header = null;
-        var Footer = null;
-
-        if ( true === bFirst )
-        {
-            Header = this.Content[0].Header.First;
-            Footer = this.Content[0].Footer.First;
-        }
-        else if ( true === bEven )
-        {
-            Header = this.Content[0].Header.Even;
-            Footer = this.Content[0].Footer.Even;
-        }
-        else
-        {
-            Header = this.Content[0].Header.Odd;
-            Footer = this.Content[0].Footer.Odd;
-        }
-
-        switch ( AlignV )
-        {
-            case hdrftr_Header:
-            {
-                if ( null === Header)
-                {
-                    // На странице нет колонтитула, значит колонтитулов вообще никаких пока нет
-                    // Значит мы должны добавить стандартный(Default) колонтитул
-                    Header = this.AddHeaderOrFooter( hdrftr_Header, hdrftr_Default );
-                }
-
-                Header.AddPageNum( AlignH );
-                break;
-            }
-            case hdrftr_Footer:
-            {
-                if ( null === Footer)
-                {
-                    // На странице нет колонтитула, значит колонтитулов вообще никаких пока нет
-                    // Значит мы должны добавить стандартный(Default) колонтитул
-                    Footer = this.AddHeaderOrFooter( hdrftr_Footer, hdrftr_Default );
-                }
-
-                Footer.AddPageNum( AlignH );
-                break;
-            }
-        }
-    },
-
+//-----------------------------------------------------------------------------------        
     Get_CurPage : function()
     {
         if ( null != this.CurHdrFtr )
@@ -1456,46 +1180,15 @@ CHeaderFooterController.prototype =
 
     Set_CurHdrFtr_ById : function(Id)
     {
-        if ( null != this.Content[0].Header.First && Id === this.Content[0].Header.First.Get_Id() )
-        {
-            this.CurHdrFtr = this.Content[0].Header.First;
-            this.CurHdrFtr.Content.Cursor_MoveToStartPos();
-            return true;
-        }
-        else if ( null != this.Content[0].Header.Odd && Id === this.Content[0].Header.Odd.Get_Id() )
-        {
-            this.CurHdrFtr = this.Content[0].Header.Odd;
-            this.CurHdrFtr.Content.Cursor_MoveToStartPos();
-            return true;
-        }
-        else if ( null != this.Content[0].Header.Even && Id === this.Content[0].Header.Even.Get_Id() )
-        {
-            this.CurHdrFtr = this.Content[0].Header.Even;
-            this.CurHdrFtr.Content.Cursor_MoveToStartPos();
-            return true;
-        }
-        else if ( null != this.Content[0].Footer.First && Id === this.Content[0].Footer.First.Get_Id() )
-        {
-            this.CurHdrFtr = this.Content[0].Footer.First;
-            this.CurHdrFtr.Content.Cursor_MoveToStartPos();
-            return true;
-        }
-        else if ( null != this.Content[0].Footer.Odd && Id === this.Content[0].Footer.Odd.Get_Id() )
-        {
-            this.CurHdrFtr = this.Content[0].Footer.Odd;
-            this.CurHdrFtr.Content.Cursor_MoveToStartPos();
-            return true;
-        }
-        else if ( null != this.Content[0].Footer.Even && Id === this.Content[0].Footer.Even.Get_Id() )
-        {
-            this.CurHdrFtr = this.Content[0].Footer.Even;
-            this.CurHdrFtr.Content.Cursor_MoveToStartPos();
-            return true;
-        }
-
-        return false;
+        var HdrFtr = g_oTableId.Get_BydId( Id );
+        if ( -1 === this.LogicDocument.SectionsInfo.Find_ByHdrFtr( HdrFtr ) )
+            return false;
+        
+        this.CurHdrFtr = HdrFtr;
+        HdrFtr.Content.Cursor_MoveToStartPos();
+              
+        return true;
     },
-
 //-----------------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------------
@@ -1592,40 +1285,7 @@ CHeaderFooterController.prototype =
             return true;
         
         return false;
-    },
-
-    Reset_RecalculateCache : function()
-    {
-        if ( null != this.Content[0].Header.First )
-        {
-            this.Content[0].Header.First.Reset_RecalculateCache();
-        }
-
-        if ( null != this.Content[0].Header.Odd && this.Content[0].Header.Odd !== this.Content[0].Header.First )
-        {
-            this.Content[0].Header.Odd.Reset_RecalculateCache();
-        }
-
-        if ( null != this.Content[0].Header.Even && this.Content[0].Header.Even !== this.Content[0].Header.Odd && this.Content[0].Header.Even != this.Content[0].Header.First )
-        {
-            this.Content[0].Header.Even.Reset_RecalculateCache();
-        }
-
-        if ( null != this.Content[0].Footer.First )
-        {
-            this.Content[0].Footer.First.Reset_RecalculateCache();
-        }
-
-        if ( null != this.Content[0].Footer.Odd && this.Content[0].Footer.Odd !== this.Content[0].Footer.First )
-        {
-            this.Content[0].Footer.Odd.Reset_RecalculateCache();
-        }
-
-        if ( null != this.Content[0].Footer.Even && this.Content[0].Footer.Even !== this.Content[0].Footer.Odd && this.Content[0].Footer.Even != this.Content[0].Footer.First )
-        {
-            this.Content[0].Footer.Even.Reset_RecalculateCache();
-        }
-    },
+    },    
 
     // Отрисовка колонтитулов на данной странице
     Draw : function(nPageIndex, pGraphics)
@@ -1642,28 +1302,8 @@ CHeaderFooterController.prototype =
 
     CheckRange : function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageIndex)
     {
-        var bFirst = (0 === PageIndex ? true : false);
-        var bEven  = (PageIndex  % 2 === 1 ? true : false); // 0, потому что нумерация начинается с 0, а не 1
-
-        var Header = null;
-        var Footer = null;
-
-        if ( true === bFirst )
-        {
-            Header = this.Content[0].Header.First;
-            Footer = this.Content[0].Footer.First;
-        }
-        else if ( true === bEven )
-        {
-            Header = this.Content[0].Header.Even;
-            Footer = this.Content[0].Footer.Even;
-
-        }
-        else
-        {
-            Header = this.Content[0].Header.Odd;
-            Footer = this.Content[0].Footer.Odd;
-        }
+        var Header = this.Pages[PageIndex].Header;
+        var Footer = this.Pages[PageIndex].Footer;              
 
         var HeaderRange = [];
         var FooterRange = [];
@@ -1806,48 +1446,20 @@ CHeaderFooterController.prototype =
 
     Is_UseInDocument : function(Id)
     {
-        if ( null != this.Content[0].Header.First && Id === this.Content[0].Header.First.Get_Id() )
-            return true;
+        var HdrFtr = g_oTableId.Get_BydId( Id );
+        if ( -1 === this.LogicDocument.SectionsInfo.Find_ByHdrFtr( HdrFtr ) )
+            return false;        
 
-        if ( null != this.Content[0].Header.Even && Id === this.Content[0].Header.Even.Get_Id() )
-            return true;
-
-        if ( null != this.Content[0].Header.Odd && Id === this.Content[0].Header.Odd.Get_Id() )
-            return true;
-
-        if ( null != this.Content[0].Footer.First && Id === this.Content[0].Footer.First.Get_Id() )
-            return true;
-
-        if ( null != this.Content[0].Footer.Even && Id === this.Content[0].Footer.Even.Get_Id() )
-            return true;
-
-        if ( null != this.Content[0].Footer.Odd && Id === this.Content[0].Footer.Odd.Get_Id() )
-            return true;
-
-        return false;
+        return true;                
     },
 
     Check_Page : function(HdrFtr, PageIndex)
     {
-        var bHeader = (HdrFtr.Type === hdrftr_Header ? true : false);
-        var bFirst  = (0 === PageIndex ? true : false);
-        var bEven   = (PageIndex  % 2 === 1 ? true : false); // 0, потому что нумерация начинается с 0, а не 1
+        var Header = this.Pages[PageIndex].Header;
+        var Footer = this.Pages[PageIndex].Footer;
 
-        if ( true === bFirst )
-        {
-            if ( ( true === bHeader && HdrFtr === this.Content[0].Header.First ) || ( true != bHeader && HdrFtr === this.Content[0].Footer.First ) )
-                return true;
-        }
-        else if ( true === bEven )
-        {
-            if ( ( true === bHeader && HdrFtr === this.Content[0].Header.Even ) || ( true != bHeader && HdrFtr === this.Content[0].Footer.Even ) )
-                return true;
-        }
-        else
-        {
-            if ( ( true === bHeader && HdrFtr === this.Content[0].Header.Odd ) || ( true != bHeader && HdrFtr === this.Content[0].Footer.Odd ) )
-                return true;
-        }
+        if ( true === bHeader && HdrFtr === Header || HdrFtr === Footer )
+            return true;
 
         return false;
     },
@@ -2135,32 +1747,7 @@ CHeaderFooterController.prototype =
             return this.CurHdrFtr.Get_Paragraph_ParaPr_Copy();
 
         return null;
-    },
-
-    Get_AllParagraphs_ByNumbering : function(NumPr, ParaArray)
-    {
-        var SectHdrFtr = this.Content[0];
-        var Headers = SectHdrFtr.Header;
-        var Footers = SectHdrFtr.Footer;
-
-        if ( Headers.First != Headers.Odd && Headers.First != Headers.Even && null != Headers.First )
-            Headers.First.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
-
-        if ( Headers.Even != Headers.Odd && null != Headers.Even )
-            Headers.Even.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
-
-        if ( null != Headers.Odd )
-            Headers.Odd.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
-
-        if ( Footers.First != Footers.Odd && Footers.First != Footers.Even && null != Footers.First )
-            Footers.First.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
-
-        if ( Footers.Even != Footers.Odd && null != Footers.Even )
-            Footers.Even.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
-
-        if ( null != Footers.Odd )
-            Footers.Odd.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
-    },
+    },    
 
     // Убираем селект
     Selection_Remove : function()
@@ -2491,160 +2078,7 @@ CHeaderFooterController.prototype =
 
         if ( null != this.CurHdrFtr )
             this.CurHdrFtr.Content.Set_SelectionState(State, StateIndex - 1);
-    },
-
-    Undo : function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case historyitem_HdrFtrController_AddItem:
-            {
-                this.Content[0] = Data.Old;
-                break;
-            }
-
-            case historyitem_HdrFtrController_RemoveItem:
-            {
-                this.Content[0] = Data.Old;
-                break;
-            }
-        }
-    },
-
-    Redo : function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case historyitem_HdrFtrController_AddItem:
-            {
-                this.Content[0] = Data.New;
-                break;
-            }
-
-            case historyitem_HdrFtrController_RemoveItem:
-            {
-                this.Content[0] = Data.New;
-                break;
-            }
-        }
-    },
-
-    Refresh_RecalcData : function(Data)
-    {
-        // При любых изменениях пересчитываем все колонтитулы
-
-        if ( null != this.Content[0].Header.First )
-            History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : this.Content[0].Header.First } );
-
-        if ( null != this.Content[0].Header.Even )
-            History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : this.Content[0].Header.Even } );
-
-        if ( null != this.Content[0].Header.Odd )
-            History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : this.Content[0].Header.Odd } );
-
-        if ( null != this.Content[0].Footer.First )
-            History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : this.Content[0].Footer.First } );
-
-        if ( null != this.Content[0].Footer.Even )
-            History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : this.Content[0].Footer.Even } );
-
-        if ( null != this.Content[0].Footer.Odd )
-            History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : this.Content[0].Footer.Odd } );
-    },
-//-----------------------------------------------------------------------------------
-// Поиск
-//-----------------------------------------------------------------------------------
-    DocumentSearch : function(SearchString)
-    {
-        var bHdr_first = false;
-        var bHdr_even  = false;
-
-        if ( this.Content[0].Header.First != this.Content[0].Header.Odd )
-            bHdr_first = true;
-
-        if ( this.Content[0].Header.Even != this.Content[0].Header.Odd )
-            bHdr_even = true;
-
-        if ( true === bHdr_even && true === bHdr_first )
-        {
-            if ( null != this.Content[0].Header.First )
-                this.Content[0].Header.First.DocumentSearch( SearchString, search_Header | search_HdrFtr_First  );
-
-            if ( null != this.Content[0].Header.Even )
-                this.Content[0].Header.Even.DocumentSearch( SearchString, search_Header | search_HdrFtr_Even );
-
-            if ( null != this.Content[0].Header.Odd )
-                this.Content[0].Header.Odd.DocumentSearch( SearchString, search_Header | search_HdrFtr_Odd_no_First );
-        }
-        else if ( true === bHdr_even )
-        {
-            if ( null != this.Content[0].Header.Even )
-                this.Content[0].Header.Even.DocumentSearch( SearchString, search_Header | search_HdrFtr_Even );
-
-            if ( null != this.Content[0].Header.Odd )
-                this.Content[0].Header.Odd.DocumentSearch( SearchString, search_Header | search_HdrFtr_Odd );
-        }
-        else if ( true === bHdr_first )
-        {
-            if ( null != this.Content[0].Header.First )
-                this.Content[0].Header.First.DocumentSearch( SearchString, search_Header | search_HdrFtr_First );
-
-            if ( null != this.Content[0].Header.Odd )
-                this.Content[0].Header.Odd.DocumentSearch( SearchString, search_Header | search_HdrFtr_All_no_First );
-        }
-        else
-        {
-            if ( null != this.Content[0].Header.Odd )
-                this.Content[0].Header.Odd.DocumentSearch( SearchString, search_Header | search_HdrFtr_All );
-        }
-
-        var bFtr_first = false;
-        var bFtr_even  = false;
-
-        if ( this.Content[0].Footer.First != this.Content[0].Footer.Odd )
-            bFtr_first = true;
-
-        if ( this.Content[0].Footer.Even != this.Content[0].Footer.Odd )
-            bFtr_even = true;
-
-        if ( true === bFtr_even && true === bFtr_first )
-        {
-            if ( null != this.Content[0].Footer.First )
-                this.Content[0].Footer.First.DocumentSearch( SearchString, search_Footer | search_HdrFtr_First );
-
-            if ( null != this.Content[0].Footer.Even )
-                this.Content[0].Footer.Even.DocumentSearch( SearchString, search_Footer | search_HdrFtr_Even );
-
-            if ( null != this.Content[0].Footer.Odd )
-                this.Content[0].Footer.Odd.DocumentSearch( SearchString, search_Footer | search_HdrFtr_Odd_no_First );
-        }
-        else if ( true === bFtr_even )
-        {
-            if ( null != this.Content[0].Footer.Even )
-                this.Content[0].Footer.Even.DocumentSearch( SearchString, search_Footer | search_HdrFtr_Even );
-
-            if ( null != this.Content[0].Footer.Odd )
-                this.Content[0].Footer.Odd.DocumentSearch( SearchString, search_Footer | search_HdrFtr_Odd );
-        }
-        else if ( true === bFtr_first )
-        {
-            if ( null != this.Content[0].Footer.First )
-                this.Content[0].Footer.First.DocumentSearch( SearchString, search_Footer | search_HdrFtr_First );
-
-            if ( null != this.Content[0].Footer.Odd )
-                this.Content[0].Footer.Odd.DocumentSearch( SearchString, search_Footer | search_HdrFtr_All_no_First );
-        }
-        else
-        {
-            if ( null != this.Content[0].Footer.Odd )
-                this.Content[0].Footer.Odd.DocumentSearch( SearchString, search_Footer | search_HdrFtr_All );
-        }
-
-    },
+    },    
 //-----------------------------------------------------------------------------------
 // Функции для работы с гиперссылками
 //-----------------------------------------------------------------------------------
@@ -2682,469 +2116,12 @@ CHeaderFooterController.prototype =
         return null;
     },
 //-----------------------------------------------------------------------------------
-// Функции для работы с генерацией карты шрифтов
-//-----------------------------------------------------------------------------------
-    Document_CreateFontMap : function(FontMap)
-    {
-        var bHdr_first = false;
-        var bHdr_even  = false;
-
-        if ( this.Content[0].Header.First != this.Content[0].Header.Odd )
-            bHdr_first = true;
-
-        if ( this.Content[0].Header.Even != this.Content[0].Header.Odd )
-            bHdr_even = true;
-
-        if ( true === bHdr_even && true === bHdr_first )
-        {
-            if ( null != this.Content[0].Header.First )
-                this.Content[0].Header.First.Document_CreateFontMap( FontMap );
-
-            if ( null != this.Content[0].Header.Even )
-                this.Content[0].Header.Even.Document_CreateFontMap( FontMap );
-
-            if ( null != this.Content[0].Header.Odd )
-                this.Content[0].Header.Odd.Document_CreateFontMap( FontMap );
-        }
-        else if ( true === bHdr_even )
-        {
-            if ( null != this.Content[0].Header.Even )
-                this.Content[0].Header.Even.Document_CreateFontMap( FontMap );
-
-            if ( null != this.Content[0].Header.Odd )
-                this.Content[0].Header.Odd.Document_CreateFontMap( FontMap );
-        }
-        else if ( true === bHdr_first )
-        {
-            if ( null != this.Content[0].Header.First )
-                this.Content[0].Header.First.Document_CreateFontMap( FontMap );
-
-            if ( null != this.Content[0].Header.Odd )
-                this.Content[0].Header.Odd.Document_CreateFontMap( FontMap );
-        }
-        else
-        {
-            if ( null != this.Content[0].Header.Odd )
-                this.Content[0].Header.Odd.Document_CreateFontMap( FontMap );
-        }
-
-        var bFtr_first = false;
-        var bFtr_even  = false;
-
-        if ( this.Content[0].Footer.First != this.Content[0].Footer.Odd )
-            bFtr_first = true;
-
-        if ( this.Content[0].Footer.Even != this.Content[0].Footer.Odd )
-            bFtr_even = true;
-
-        if ( true === bFtr_even && true === bFtr_first )
-        {
-            if ( null != this.Content[0].Footer.First )
-                this.Content[0].Footer.First.Document_CreateFontMap( FontMap );
-
-            if ( null != this.Content[0].Footer.Even )
-                this.Content[0].Footer.Even.Document_CreateFontMap( FontMap );
-
-            if ( null != this.Content[0].Footer.Odd )
-                this.Content[0].Footer.Odd.Document_CreateFontMap( FontMap );
-        }
-        else if ( true === bFtr_even )
-        {
-            if ( null != this.Content[0].Footer.Even )
-                this.Content[0].Footer.Even.Document_CreateFontMap( FontMap );
-
-            if ( null != this.Content[0].Footer.Odd )
-                this.Content[0].Footer.Odd.Document_CreateFontMap( FontMap );
-        }
-        else if ( true === bFtr_first )
-        {
-            if ( null != this.Content[0].Footer.First )
-                this.Content[0].Footer.First.Document_CreateFontMap( FontMap );
-
-            if ( null != this.Content[0].Footer.Odd )
-                this.Content[0].Footer.Odd.Document_CreateFontMap( FontMap );
-        }
-        else
-        {
-            if ( null != this.Content[0].Footer.Odd )
-                this.Content[0].Footer.Odd.Document_CreateFontMap( FontMap );
-        }
-    },
-
-    Document_CreateFontCharMap : function(FontMap)
-    {
-        var bHdr_first = false;
-        var bHdr_even  = false;
-
-        if ( this.Content[0].Header.First != this.Content[0].Header.Odd )
-            bHdr_first = true;
-
-        if ( this.Content[0].Header.Even != this.Content[0].Header.Odd )
-            bHdr_even = true;
-
-        if ( true === bHdr_even && true === bHdr_first )
-        {
-            if ( null != this.Content[0].Header.First )
-                this.Content[0].Header.First.Document_CreateFontCharMap( FontMap );
-
-            if ( null != this.Content[0].Header.Even )
-                this.Content[0].Header.Even.Document_CreateFontCharMap( FontMap );
-
-            if ( null != this.Content[0].Header.Odd )
-                this.Content[0].Header.Odd.Document_CreateFontCharMap( FontMap );
-        }
-        else if ( true === bHdr_even )
-        {
-            if ( null != this.Content[0].Header.Even )
-                this.Content[0].Header.Even.Document_CreateFontCharMap( FontMap );
-
-            if ( null != this.Content[0].Header.Odd )
-                this.Content[0].Header.Odd.Document_CreateFontCharMap( FontMap );
-        }
-        else if ( true === bHdr_first )
-        {
-            if ( null != this.Content[0].Header.First )
-                this.Content[0].Header.First.Document_CreateFontCharMap( FontMap );
-
-            if ( null != this.Content[0].Header.Odd )
-                this.Content[0].Header.Odd.Document_CreateFontCharMap( FontMap );
-        }
-        else
-        {
-            if ( null != this.Content[0].Header.Odd )
-                this.Content[0].Header.Odd.Document_CreateFontCharMap( FontMap );
-        }
-
-        var bFtr_first = false;
-        var bFtr_even  = false;
-
-        if ( this.Content[0].Footer.First != this.Content[0].Footer.Odd )
-            bFtr_first = true;
-
-        if ( this.Content[0].Footer.Even != this.Content[0].Footer.Odd )
-            bFtr_even = true;
-
-        if ( true === bFtr_even && true === bFtr_first )
-        {
-            if ( null != this.Content[0].Footer.First )
-                this.Content[0].Footer.First.Document_CreateFontCharMap( FontMap );
-
-            if ( null != this.Content[0].Footer.Even )
-                this.Content[0].Footer.Even.Document_CreateFontCharMap( FontMap );
-
-            if ( null != this.Content[0].Footer.Odd )
-                this.Content[0].Footer.Odd.Document_CreateFontCharMap( FontMap );
-        }
-        else if ( true === bFtr_even )
-        {
-            if ( null != this.Content[0].Footer.Even )
-                this.Content[0].Footer.Even.Document_CreateFontCharMap( FontMap );
-
-            if ( null != this.Content[0].Footer.Odd )
-                this.Content[0].Footer.Odd.Document_CreateFontCharMap( FontMap );
-        }
-        else if ( true === bFtr_first )
-        {
-            if ( null != this.Content[0].Footer.First )
-                this.Content[0].Footer.First.Document_CreateFontCharMap( FontMap );
-
-            if ( null != this.Content[0].Footer.Odd )
-                this.Content[0].Footer.Odd.Document_CreateFontCharMap( FontMap );
-        }
-        else
-        {
-            if ( null != this.Content[0].Footer.Odd )
-                this.Content[0].Footer.Odd.Document_CreateFontCharMap( FontMap );
-        }
-    },
-
-    Document_Get_AllFontNames : function(AllFonts)
-    {
-        var bHdr_first = false;
-        var bHdr_even  = false;
-
-        if ( this.Content[0].Header.First != this.Content[0].Header.Odd )
-            bHdr_first = true;
-
-        if ( this.Content[0].Header.Even != this.Content[0].Header.Odd )
-            bHdr_even = true;
-
-        if ( true === bHdr_even && true === bHdr_first )
-        {
-            if ( null != this.Content[0].Header.First )
-                this.Content[0].Header.First.Document_Get_AllFontNames( AllFonts );
-
-            if ( null != this.Content[0].Header.Even )
-                this.Content[0].Header.Even.Document_Get_AllFontNames( AllFonts );
-
-            if ( null != this.Content[0].Header.Odd )
-                this.Content[0].Header.Odd.Document_Get_AllFontNames( AllFonts );
-        }
-        else if ( true === bHdr_even )
-        {
-            if ( null != this.Content[0].Header.Even )
-                this.Content[0].Header.Even.Document_Get_AllFontNames( AllFonts );
-
-            if ( null != this.Content[0].Header.Odd )
-                this.Content[0].Header.Odd.Document_Get_AllFontNames( AllFonts );
-        }
-        else if ( true === bHdr_first )
-        {
-            if ( null != this.Content[0].Header.First )
-                this.Content[0].Header.First.Document_Get_AllFontNames( AllFonts );
-
-            if ( null != this.Content[0].Header.Odd )
-                this.Content[0].Header.Odd.Document_Get_AllFontNames( AllFonts );
-        }
-        else
-        {
-            if ( null != this.Content[0].Header.Odd )
-                this.Content[0].Header.Odd.Document_Get_AllFontNames( AllFonts );
-        }
-
-        var bFtr_first = false;
-        var bFtr_even  = false;
-
-        if ( this.Content[0].Footer.First != this.Content[0].Footer.Odd )
-            bFtr_first = true;
-
-        if ( this.Content[0].Footer.Even != this.Content[0].Footer.Odd )
-            bFtr_even = true;
-
-        if ( true === bFtr_even && true === bFtr_first )
-        {
-            if ( null != this.Content[0].Footer.First )
-                this.Content[0].Footer.First.Document_Get_AllFontNames( AllFonts );
-
-            if ( null != this.Content[0].Footer.Even )
-                this.Content[0].Footer.Even.Document_Get_AllFontNames( AllFonts );
-
-            if ( null != this.Content[0].Footer.Odd )
-                this.Content[0].Footer.Odd.Document_Get_AllFontNames( AllFonts );
-        }
-        else if ( true === bFtr_even )
-        {
-            if ( null != this.Content[0].Footer.Even )
-                this.Content[0].Footer.Even.Document_Get_AllFontNames( AllFonts );
-
-            if ( null != this.Content[0].Footer.Odd )
-                this.Content[0].Footer.Odd.Document_Get_AllFontNames( AllFonts );
-        }
-        else if ( true === bFtr_first )
-        {
-            if ( null != this.Content[0].Footer.First )
-                this.Content[0].Footer.First.Document_Get_AllFontNames( AllFonts );
-
-            if ( null != this.Content[0].Footer.Odd )
-                this.Content[0].Footer.Odd.Document_Get_AllFontNames( AllFonts );
-        }
-        else
-        {
-            if ( null != this.Content[0].Footer.Odd )
-                this.Content[0].Footer.Odd.Document_Get_AllFontNames( AllFonts );
-        }
-    },
-//-----------------------------------------------------------------------------------
 // Функции для работы с совместным редактирования
 //-----------------------------------------------------------------------------------
     Document_Is_SelectionLocked : function(CheckType)
     {
         // Любое действие внутри колонтитула лочит его
         this.Lock.Check( this.Get_Id() );
-    },
-
-    Save_Changes : function(Data, Writer)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        Writer.WriteLong( historyitem_type_HdrFtrController );
-
-        var Type = Data.Type;
-
-        // Пишем тип
-        Writer.WriteLong( Type );
-
-        switch ( Type )
-        {
-            case historyitem_HdrFtrController_AddItem:
-            case historyitem_HdrFtrController_RemoveItem:
-            {
-                // Long   : Флаг (для header), первые три бита - null или нет колонтитулы, следующие три бита - совпадение колонтитулов
-                //  в зависимости от флага
-                //  String : Id Header.First
-                //  String : Id Header.Even
-                //  String : Id Header.Odd
-                // Long   : Флаг (для footer), первые три бита - null или нет колонтитулы, следующие три бита - совпадение колонтитулов
-                //  в зависимости от флага
-                //  String : Id Header.First
-                //  String : Id Header.Even
-                //  String : Id Header.Odd
-
-                var HeaderFlag = 0;
-                if ( null != Data.New.Header.First )
-                    HeaderFlag |= 1;
-
-                if ( null != Data.New.Header.Even )
-                    HeaderFlag |= 2;
-
-                if ( null != Data.New.Header.Odd )
-                    HeaderFlag |= 4;
-
-                if ( Data.New.Header.First === Data.New.Header.Even )
-                    HeaderFlag |= 8;
-
-                if ( Data.New.Header.First === Data.New.Header.Odd )
-                    HeaderFlag |= 16;
-
-                if ( Data.New.Header.Even === Data.New.Header.Odd )
-                    HeaderFlag |= 32;
-
-                Writer.WriteLong( HeaderFlag );
-
-                if ( HeaderFlag & 1 )
-                    Writer.WriteString2( Data.New.Header.First.Get_Id() );
-
-                if ( HeaderFlag & 2 && !(HeaderFlag & 8) )
-                    Writer.WriteString2( Data.New.Header.Even.Get_Id() );
-
-                if ( HeaderFlag & 4 && !(HeaderFlag & 16) && !(HeaderFlag & 32) )
-                    Writer.WriteString2( Data.New.Header.Odd.Get_Id() );
-
-                var FooterFlag = 0;
-                if ( null != Data.New.Footer.First )
-                    FooterFlag |= 1;
-
-                if ( null != Data.New.Footer.Even )
-                    FooterFlag |= 2;
-
-                if ( null != Data.New.Footer.Odd )
-                    FooterFlag |= 4;
-
-                if ( Data.New.Footer.First === Data.New.Footer.Even )
-                    FooterFlag |= 8;
-
-                if ( Data.New.Footer.First === Data.New.Footer.Odd )
-                    FooterFlag |= 16;
-
-                if ( Data.New.Footer.Even === Data.New.Footer.Odd )
-                    FooterFlag |= 32;
-
-                Writer.WriteLong( FooterFlag );
-
-                if ( FooterFlag & 1 )
-                    Writer.WriteString2( Data.New.Footer.First.Get_Id() );
-
-                if ( FooterFlag & 2 && !(FooterFlag & 8) )
-                    Writer.WriteString2( Data.New.Footer.Even.Get_Id() );
-
-                if ( FooterFlag & 4 && !(FooterFlag & 16) && !(FooterFlag & 32) )
-                    Writer.WriteString2( Data.New.Footer.Odd.Get_Id() );
-
-                break;
-            }
-        }
-
-        return Writer;
-    },
-
-    Save_Changes2 : function(Data, Writer)
-    {
-        return false;
-    },
-
-    Load_Changes : function(Reader, Reader2)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        var ClassType = Reader.GetLong();
-        if ( historyitem_type_HdrFtrController != ClassType )
-            return;
-
-        var Type = Reader.GetLong();
-
-        switch ( Type )
-        {
-            case historyitem_HdrFtrController_AddItem:
-            case historyitem_HdrFtrController_RemoveItem:
-            {
-                // Long   : Флаг (для header), первые три бита - null или нет колонтитулы, следующие три бита - совпадение колонтитулов
-                //  в зависимости от флага
-                //  String : Id Header.First
-                //  String : Id Header.Even
-                //  String : Id Header.Odd
-                // Long   : Флаг (для footer), первые три бита - null или нет колонтитулы, следующие три бита - совпадение колонтитулов
-                //  в зависимости от флага
-                //  String : Id Header.First
-                //  String : Id Header.Even
-                //  String : Id Header.Odd
-
-                var HeaderFlag = Reader.GetLong();
-                if ( HeaderFlag & 1 )
-                    this.Content[0].Header.First = g_oTableId.Get_ById( Reader.GetString2() );
-                else
-                    this.Content[0].Header.First = null;
-
-                if ( HeaderFlag & 2 )
-                {
-                    if ( !(HeaderFlag & 8) )
-                        this.Content[0].Header.Even = g_oTableId.Get_ById( Reader.GetString2() );
-                    else
-                        this.Content[0].Header.Even = this.Content[0].Header.First
-                }
-                else
-                    this.Content[0].Header.Even = null;
-
-                if ( HeaderFlag & 4 )
-                {
-                    if ( !(HeaderFlag & 16) && !(HeaderFlag & 32) )
-                        this.Content[0].Header.Odd = g_oTableId.Get_ById( Reader.GetString2() );
-                    else if ( !(HeaderFlag & 16) )
-                        this.Content[0].Header.Odd = this.Content[0].Header.First;
-                    else
-                        this.Content[0].Header.Odd = this.Content[0].Header.Even;
-                }
-                else
-                    this.Content[0].Header.Odd = null;
-
-                var FooterFlag = Reader.GetLong();
-                if ( FooterFlag & 1 )
-                    this.Content[0].Footer.First = g_oTableId.Get_ById( Reader.GetString2() );
-                else
-                    this.Content[0].Footer.First = null;
-
-                if ( FooterFlag & 2 )
-                {
-                    if ( !(FooterFlag & 8) )
-                        this.Content[0].Footer.Even = g_oTableId.Get_ById( Reader.GetString2() );
-                    else
-                        this.Content[0].Footer.Even = this.Content[0].Footer.First
-                }
-                else
-                    this.Content[0].Footer.Even = null;
-
-                if ( FooterFlag & 4 )
-                {
-                    if ( !(FooterFlag & 16) && !(FooterFlag & 32) )
-                        this.Content[0].Footer.Odd = g_oTableId.Get_ById( Reader.GetString2() );
-                    else if ( FooterFlag & 16 )
-                        this.Content[0].Footer.Odd = this.Content[0].Footer.First;
-                    else
-                        this.Content[0].Footer.Odd = this.Content[0].Footer.Even;
-                }
-                else
-                    this.Content[0].Footer.Odd = null;
-
-                break;
-            }
-        }
-    },
-
-    Load_LinkData : function(LinkData)
-    {
     },
 //-----------------------------------------------------------------------------------
 // Функции для работы с комментариями
