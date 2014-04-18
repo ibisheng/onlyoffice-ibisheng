@@ -1572,7 +1572,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						worksheet.cellCommentator.unlockComments();
 					}
 				};
-				this.CoAuthoringApi.onSaveChanges				= function (e, bSendEvent) {
+				this.CoAuthoringApi.onSaveChanges				= function (e, userId, bSendEvent) {
 					// bSendEvent = false - это означает, что мы загружаем имеющиеся изменения при открытии
 					var bAddChanges = false;
 					var nCount = e.length;
@@ -1608,8 +1608,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					if (true === bAddChanges && false !== bSendEvent && t.IsSendDocumentLoadCompleate)
 						t.syncCollaborativeChanges();
 				};
-				this.CoAuthoringApi.onFirstLoadChanges			= function (e) {
-					t.CoAuthoringApi.onSaveChanges(e, false);
+				this.CoAuthoringApi.onFirstLoadChanges			= function (e, userId) {
+					t.CoAuthoringApi.onSaveChanges(e, userId, false);
+				};
+				this.CoAuthoringApi.onFirstLoadChangesEnd			= function () {
 					t.asyncServerIdEndLoaded ();
 				};
 				this.CoAuthoringApi.onSetIndexUser				= function (e) {
@@ -3401,7 +3403,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			asc_nativeApplyChanges : function(changes)
 			{
-			    this.CoAuthoringApi.onSaveChanges(changes, false);
+			    this.CoAuthoringApi.onSaveChanges(changes, null, false);
                 this.collaborativeEditing.applyChanges();
 			},
 			

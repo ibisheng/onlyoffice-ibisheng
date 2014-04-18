@@ -457,7 +457,7 @@ asc_docs_api.prototype._coAuthoringInit = function () {
             }
         }
     };
-    this.CoAuthoringApi.onSaveChanges				= function (e, bSendEvent) {
+    this.CoAuthoringApi.onSaveChanges				= function (e, userId, bSendEvent) {
 		// bSendEvent = false - это означает, что мы загружаем имеющиеся изменения при открытии
 		var Count = e.length;
         for ( var Index = 0; Index < Count; Index++ )
@@ -472,11 +472,13 @@ asc_docs_api.prototype._coAuthoringInit = function () {
         if ( Count > 0 && false != bSendEvent && t.bInit_word_control )
             t.sync_CollaborativeChanges();
     };
-    this.CoAuthoringApi.onFirstLoadChanges			= function (e) {
-        t.CoAuthoringApi.onSaveChanges(e,false);
-		t.asyncServerIdEndLoaded ();
+    this.CoAuthoringApi.onFirstLoadChanges			= function (e, userId) {
+        t.CoAuthoringApi.onSaveChanges(e, userId, false);
         //CollaborativeEditing.Apply_Changes();
     };
+	this.CoAuthoringApi.onFirstLoadChangesEnd		= function () {
+		t.asyncServerIdEndLoaded ();
+	};
     this.CoAuthoringApi.onSetIndexUser			= function (e) {
         g_oIdCounter.Set_UserId("" + e);
     };

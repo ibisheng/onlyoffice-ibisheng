@@ -20,6 +20,7 @@
 			this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
 			this.onDisconnect = options.onDisconnect;
 			this.onFirstLoadChanges = options.onFirstLoadChanges;
+			this.onFirstLoadChangesEnd = options.onFirstLoadChangesEnd;
 			this.onConnectionStateChanged = options.onConnectionStateChanged;
 			this.onSetIndexUser = options.onSetIndexUser;
 			this.onSaveChanges = options.onSaveChanges;
@@ -37,10 +38,11 @@
 			this._CoAuthoringApi.onLocksReleased = function (e, bChanges) {t.callback_OnLocksReleased(e, bChanges);};
 			this._CoAuthoringApi.onLocksReleasedEnd = function () {t.callback_OnLocksReleasedEnd();};
 			this._CoAuthoringApi.onDisconnect = function (e, isDisconnectAtAll, isCloseCoAuthoring) {t.callback_OnDisconnect(e, isDisconnectAtAll, isCloseCoAuthoring);};
-			this._CoAuthoringApi.onFirstLoadChanges = function (e) {t.callback_OnFirstLoadChanges(e);};
+			this._CoAuthoringApi.onFirstLoadChanges = function (e, userId) {t.callback_OnFirstLoadChanges(e, userId);};
+			this._CoAuthoringApi.onFirstLoadChangesEnd = function () {t.callback_OnFirstLoadChangesEnd();};
 			this._CoAuthoringApi.onConnectionStateChanged = function (e) {t.callback_OnConnectionStateChanged(e);};
 			this._CoAuthoringApi.onSetIndexUser = function (e) {t.callback_OnSetIndexUser(e);};
-			this._CoAuthoringApi.onSaveChanges = function (e) {t.callback_OnSaveChanges(e);};
+			this._CoAuthoringApi.onSaveChanges = function (e, userId) {t.callback_OnSaveChanges(e, userId);};
 			// Callback есть пользователей больше 1
 			this._CoAuthoringApi.onStartCoAuthoring = function (e) {t.callback_OnStartCoAuthoring(e);};
 
@@ -132,6 +134,12 @@
 		}
 	};
 
+	CDocsCoApi.prototype.getUser = function (userId) {
+		if (this._CoAuthoringApi && this._onlineWork)
+			return this._CoAuthoringApi.getUser(userId);
+		return null;
+	};
+
 	CDocsCoApi.prototype.releaseLocks = function (blockId) {
 		if (this._CoAuthoringApi && this._onlineWork) {
 			this._CoAuthoringApi.releaseLocks(blockId);
@@ -151,27 +159,27 @@
 
 	CDocsCoApi.prototype.callback_OnParticipantsChanged = function (e, count) {
 		if (this.onParticipantsChanged)
-			this.onParticipantsChanged (e, count);
+			this.onParticipantsChanged(e, count);
 	};
 
 	CDocsCoApi.prototype.callback_OnMessage = function (e) {
 		if (this.onMessage)
-			this.onMessage (e);
+			this.onMessage(e);
 	};
 
 	CDocsCoApi.prototype.callback_OnLocksAcquired = function (e) {
 		if (this.onLocksAcquired)
-			this.onLocksAcquired (e);
+			this.onLocksAcquired(e);
 	};
 
 	CDocsCoApi.prototype.callback_OnLocksReleased = function (e, bChanges) {
 		if (this.onLocksReleased)
-			this.onLocksReleased (e, bChanges);
+			this.onLocksReleased(e, bChanges);
 	};
 
 	CDocsCoApi.prototype.callback_OnLocksReleasedEnd = function () {
 		if (this.onLocksReleasedEnd)
-			this.onLocksReleasedEnd ();
+			this.onLocksReleasedEnd();
 	};
 
 	/**
@@ -182,31 +190,36 @@
 	 */
 	CDocsCoApi.prototype.callback_OnDisconnect = function (e, isDisconnectAtAll, isCloseCoAuthoring) {
 		if (this.onDisconnect)
-			this.onDisconnect (e, isDisconnectAtAll, isCloseCoAuthoring);
+			this.onDisconnect(e, isDisconnectAtAll, isCloseCoAuthoring);
 	};
 
-	CDocsCoApi.prototype.callback_OnFirstLoadChanges = function (e) {
+	CDocsCoApi.prototype.callback_OnFirstLoadChanges = function (e, userId) {
 		if (this.onFirstLoadChanges)
-			this.onFirstLoadChanges (e);
+			this.onFirstLoadChanges(e, userId);
+	};
+
+	CDocsCoApi.prototype.callback_OnFirstLoadChangesEnd = function () {
+		if (this.onFirstLoadChangesEnd)
+			this.onFirstLoadChangesEnd();
 	};
 
 	CDocsCoApi.prototype.callback_OnConnectionStateChanged = function (e) {
 		if (this.onConnectionStateChanged)
-			this.onConnectionStateChanged (e);
+			this.onConnectionStateChanged(e);
 	};
 
 	CDocsCoApi.prototype.callback_OnSetIndexUser = function (e) {
 		if (this.onSetIndexUser)
-			this.onSetIndexUser (e);
+			this.onSetIndexUser(e);
 	};
 
-	CDocsCoApi.prototype.callback_OnSaveChanges = function (e) {
+	CDocsCoApi.prototype.callback_OnSaveChanges = function (e, userId) {
 		if (this.onSaveChanges)
-			this.onSaveChanges (e);
+			this.onSaveChanges(e, userId);
 	};
 	CDocsCoApi.prototype.callback_OnStartCoAuthoring = function (e) {
 		if (this.onStartCoAuthoring)
-			this.onStartCoAuthoring (e);
+			this.onStartCoAuthoring(e);
 	};
 
     /** States
@@ -227,7 +240,9 @@
 			this.onRelockFailed = options.onRelockFailed;
 			this.onDisconnect = options.onDisconnect;
 			this.onConnect = options.onConnect;
+			this.onSaveChanges = options.onSaveChanges;
 			this.onFirstLoadChanges = options.onFirstLoadChanges;
+			this.onFirstLoadChangesEnd = options.onFirstLoadChangesEnd;
 			this.onConnectionStateChanged = options.onConnectionStateChanged;
 		}
         this._state = 0;
@@ -414,6 +429,10 @@
 			this.onAuthParticipantsChanged(this._participants, this._countEditUsers);
     };
 
+	DocsCoApi.prototype.getUser = function (userId) {
+		return this._participants[userId];
+	};
+
     DocsCoApi.prototype.disconnect = function () {
 		// Отключаемся сами
 		this.isCloseCoAuthoring = true;
@@ -540,7 +559,7 @@
         }
 		if (data["changes"]) {
 			if (this.onSaveChanges) {
-				this.onSaveChanges(JSON.parse(data["changes"]));
+				this.onSaveChanges(JSON.parse(data["changes"]), data["user"]);
 			}
 		}
     };
@@ -579,20 +598,19 @@
 		var t = this;
         if (allServerChanges && this.onFirstLoadChanges) {
 			var allChanges = [];
-			for (var changeId in allServerChanges) {
+			for (var changeId in allServerChanges) if (allServerChanges.hasOwnProperty(changeId)){
 				var change = allServerChanges[changeId];
 				if (change["skipChange"])
 					continue;
 				var changesOneUser = change["changes"];
 				if (changesOneUser) {
-					changesOneUser = JSON.parse(changesOneUser);
-					for (var i in changesOneUser)
-						allChanges.push(changesOneUser[i]);
+					t.onFirstLoadChanges(JSON.parse(changesOneUser), change["user"]);
 				}
 			}
 
 			// Посылать нужно всегда, т.к. на это рассчитываем при открытии
-			t.onFirstLoadChanges(allChanges);
+			if (t.onFirstLoadChangesEnd)
+				t.onFirstLoadChangesEnd();
 			// Если были изменения, то мы все еще в совместном редактировании (иначе при сохранениях мы будем затирать изменения на сервере)
 			if (0 < allChanges.length)
 				t._onStartCoAuthoring(/*isStartEvent*/ true);

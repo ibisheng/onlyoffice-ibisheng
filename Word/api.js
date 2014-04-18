@@ -1570,8 +1570,12 @@ asc_docs_api.prototype._coAuthoringInit = function()
             CollaborativeEditing.Remove_NeedLock(Id);
         }
     };
-	this.CoAuthoringApi.onSaveChanges				= function (e, bSendEvent)
+	this.CoAuthoringApi.onSaveChanges				= function (e, userId, bSendEvent)
 	{
+		var oUser = t.CoAuthoringApi.getUser(userId);
+		var oColor = oUser ? oUser.asc_getColor() : null;
+		// ToDo add select changes color
+
         var Count = e.length;
         for ( var Index = 0; Index < Count; Index++ )
         {
@@ -1585,11 +1589,13 @@ asc_docs_api.prototype._coAuthoringInit = function()
         if ( Count > 0 && false != bSendEvent && t.bInit_word_control )
             t.sync_CollaborativeChanges();
 	};
-	this.CoAuthoringApi.onFirstLoadChanges			= function (e)
+	this.CoAuthoringApi.onFirstLoadChanges			= function (e, userId)
 	{
-        t.CoAuthoringApi.onSaveChanges(e,false);
-		t.asyncServerIdEndLoaded ();
+        t.CoAuthoringApi.onSaveChanges(e, userId, false);
         //CollaborativeEditing.Apply_Changes();
+	};
+	this.CoAuthoringApi.onFirstLoadChangesEnd		= function () {
+		t.asyncServerIdEndLoaded ();
 	};
 	this.CoAuthoringApi.onSetIndexUser			= function (e)
 	{
