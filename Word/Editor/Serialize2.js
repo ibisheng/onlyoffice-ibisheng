@@ -5967,7 +5967,7 @@ function Binary_pPrReader(doc, oReadResult, stream)
         }
         else if( c_oSerProp_secPrSettingsType.EvenAndOddHeaders === type )
         {
-            oAdditional.EvenAndOddHeaders = this.stream.GetUChar();
+            oAdditional.EvenAndOddHeaders = this.stream.GetBool();
         }
         else
             res = c_oSerConstants.ReadUnknown;
