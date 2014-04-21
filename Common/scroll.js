@@ -14,6 +14,14 @@ var ScrollOverType = {
     ACTIVE:2
 };
 
+var ArrowStatus = {
+    upLeftArrowHover_downRightArrowNonActive:0,
+    upLeftArrowActive_downRightArrowNonActive:1,
+    upLeftArrowNonActive_downRightArrowHover:2,
+    upLeftArrowNonActive_downRightArrowActive:3,
+    upLeftArrowNonActive_downRightArrowNonActive:4
+}
+
 function GetClientWidth( elem ) {
     var _w = elem.clientWidth;
     if ( 0 != _w )
@@ -912,7 +920,7 @@ ScrollObject.prototype = {
             var h = this.canvasH;
             if ( this.isVerticalScroll ) {
                 switch ( type ) {
-                    case 0://upArrow mouse hover, downArrow stable
+                    case ArrowStatus.upLeftArrowHover_downRightArrowNonActive://upArrow mouse hover, downArrow stable
                         if ( ScrollOverType.OVER != this.ScrollOverType1 ) {
                             this.ArrowDrawer.drawArrow( ScrollArrowType.ARROW_TOP, ScrollOverType.OVER, this.context, w, h );
                             this.ScrollOverType1 = ScrollOverType.OVER;
@@ -922,7 +930,7 @@ ScrollObject.prototype = {
                             this.ScrollOverType2 = ScrollOverType.NONE;
                         }
                         break;
-                    case 1://upArrow mouse down, downArrow stable
+                    case ArrowStatus.upLeftArrowActive_downRightArrowNonActive://upArrow mouse down, downArrow stable
                         if ( ScrollOverType.ACTIVE != this.ScrollOverType1 ) {
                             this.ArrowDrawer.drawArrow( ScrollArrowType.ARROW_TOP, ScrollOverType.ACTIVE, this.context, w, h );
                             this.ScrollOverType1 = ScrollOverType.ACTIVE;
@@ -932,7 +940,7 @@ ScrollObject.prototype = {
                             this.ScrollOverType2 = ScrollOverType.NONE;
                         }
                         break;
-                    case 2://upArrow stable, downArrow mouse hover
+                    case ArrowStatus.upLeftArrowNonActive_downRightArrowHover://upArrow stable, downArrow mouse hover
                         if ( ScrollOverType.NONE != this.ScrollOverType1 ) {
                             this.ArrowDrawer.drawArrow( ScrollArrowType.ARROW_TOP, ScrollOverType.NONE, this.context, w, h );
                             this.ScrollOverType1 = ScrollOverType.NONE;
@@ -942,7 +950,7 @@ ScrollObject.prototype = {
                             this.ScrollOverType2 = ScrollOverType.OVER;
                         }
                         break;
-                    case 3://upArrow stable, downArrow mouse down
+                    case ArrowStatus.upLeftArrowNonActive_downRightArrowActive://upArrow stable, downArrow mouse down
                         if ( ScrollOverType.NONE != this.ScrollOverType1 ) {
                             this.ArrowDrawer.drawArrow( ScrollArrowType.ARROW_TOP, ScrollOverType.NONE, this.context, w, h );
                             this.ScrollOverType1 = ScrollOverType.NONE;
@@ -966,7 +974,7 @@ ScrollObject.prototype = {
             }
             if ( this.isHorizontalScroll ) {
                 switch ( type ) {
-                    case 0://leftArrow mouse hover, rightArrow stable
+                    case ArrowStatus.upLeftArrowHover_downRightArrowNonActive://leftArrow mouse hover, rightArrow stable
                         if ( ScrollOverType.OVER != this.ScrollOverType1 ) {
                             this.ArrowDrawer.drawArrow( ScrollArrowType.ARROW_LEFT, ScrollOverType.OVER, this.context, w, h );
                             this.ScrollOverType1 = ScrollOverType.OVER;
@@ -976,7 +984,7 @@ ScrollObject.prototype = {
                             this.ScrollOverType2 = ScrollOverType.NONE;
                         }
                         break;
-                    case 1://leftArrow mouse down, rightArrow stable
+                    case ArrowStatus.upLeftArrowActive_downRightArrowNonActive://leftArrow mouse down, rightArrow stable
                         if ( ScrollOverType.ACTIVE != this.ScrollOverType1 ) {
                             this.ArrowDrawer.drawArrow( ScrollArrowType.ARROW_LEFT, ScrollOverType.ACTIVE, this.context, w, h );
                             this.ScrollOverType1 = ScrollOverType.ACTIVE;
@@ -986,7 +994,7 @@ ScrollObject.prototype = {
                             this.ScrollOverType2 = ScrollOverType.NONE;
                         }
                         break;
-                    case 2://leftArrow stable, rightArrow mouse hover
+                    case ArrowStatus.upLeftArrowNonActive_downRightArrowHover://leftArrow stable, rightArrow mouse hover
                         if ( ScrollOverType.NONE != this.ScrollOverType1 ) {
                             this.ArrowDrawer.drawArrow( ScrollArrowType.ARROW_LEFT, ScrollOverType.NONE, this.context, w, h );
                             this.ScrollOverType1 = ScrollOverType.NONE;
@@ -996,7 +1004,7 @@ ScrollObject.prototype = {
                             this.ScrollOverType2 = ScrollOverType.OVER;
                         }
                         break;
-                    case 3://leftArrow stable, rightArrow mouse down
+                    case ArrowStatus.upLeftArrowNonActive_downRightArrowActive://leftArrow stable, rightArrow mouse down
                         if ( ScrollOverType.NONE != this.ScrollOverType1 ) {
                             this.ArrowDrawer.drawArrow( ScrollArrowType.ARROW_LEFT, ScrollOverType.NONE, this.context, w, h );
                             this.ScrollOverType1 = ScrollOverType.NONE;
@@ -1082,16 +1090,20 @@ ScrollObject.prototype = {
         if ( scrollerHover ) {
             this.that.scrollerStatus = ScrollOverType.OVER;
             this.that.canvas.style.cursor = "pointer";
+            this.that._drawArrow();
         }
         else if ( this.that.settings.showArrows && (downHover || upHover) ) {
+            this.that.scrollerStatus = ScrollOverType.NONE;
             this.that.canvas.style.cursor = "pointer";
-            if ( upHover && this.that.settings.showArrows && !this.that.mouseDownArrow && !this.that.nonePointer ) {
-                this.that._drawArrow( 0 );
-                this.that.nonePointer = true;
-            }
-            if ( downHover && this.that.settings.showArrows && !this.that.mouseDownArrow && !this.that.nonePointer ) {
-                this.that._drawArrow( 2 );
-                this.that.nonePointer = true;
+            if ( !this.that.mouseDownArrow ) {
+                if ( upHover ) {
+                    this.that._drawArrow( ArrowStatus.upLeftArrowHover_downRightArrowNonActive );
+                    this.that.nonePointer = true;
+                }
+                else if ( downHover ) {
+                    this.that._drawArrow( ArrowStatus.upLeftArrowNonActive_downRightArrowHover );
+                    this.that.nonePointer = true;
+                }
             }
         }
         else {
