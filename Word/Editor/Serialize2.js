@@ -10182,21 +10182,21 @@ function Binary_oMathReader(stream)
 		if (c_oSer_OMathContentType.MText === type)
         {
 			var text = this.stream.GetString2LE(length);
-			var str = "";
 			for (var i = 0; i < text.length; ++i)
             {
-				//управляющие символы 
+				//управляющие символы
 				if (0x001F < text[i].charCodeAt(0))
 				{
 					var oText = new CMathText();
 					oText.addTxt(text[i]);
-					oMRun.Content.splice( i, 0, oText );						
+					oMRun.Content.splice( i, 0, oText );
 				}
 				/*в будущем переделка под para_space
 				else if (text[i] == ' ')
-					oMRun.Content.splice(oMRun.Content.length, 0, new ParaSpace(1));				
-				*/				
+					oMRun.Content.splice(oMRun.Content.length, 0, new ParaSpace(1));
+				*/
             }
+
 			oMRun.Set_MathPrp(props);
 			oParent.addElementToContent(oMRun);
         }

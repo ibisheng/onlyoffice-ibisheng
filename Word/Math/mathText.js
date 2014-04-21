@@ -100,16 +100,22 @@ CMathText.prototype =
     {
         var code = this.value;
 
+        if(this.typeObj === MATH_PLACEHOLDER)
+            return code;
+
         var bCapitale = (code > 0x0040 && code < 0x005B),
             bSmall = (code > 0x0060 && code < 0x007b);
 
-        if(this.type == TXT_ROMAN )
+        var Type = this.Parent.Math_GetTypeText();
+        //var Type = TXT_ROMAN;
+
+        if(Type == TXT_ROMAN )
         {
             var bDigit = (code > 0x002F && code < 0x003A),
                 bCapGreek = (code > 0x0390 && code < 0x03AA ),
                 bSmallGreek = (code > 0x03B0 && code < 0x03CA);
 
-            if(code == 0x0068) // h
+            if(code == 0x68) // h
                 code = 0x210E;
             else if(bCapitale)
                 code  = code + 0x1D3F3;
@@ -125,35 +131,45 @@ CMathText.prototype =
             else if(code == 0x237) // "j" without dot
                 code = 0x1D6A5;
         }
-        else if(this.type == TXT_DOUBLE_STRUCK)
+        else if(Type == TXT_DOUBLE_STRUCK)
         {
             if(bCapitale)
                 code  = code + 0x1D4F8;
             else if(bSmall)
                 code  = code + 0x1D4F2;
         }
-        else if(this.type == TXT_MONOSPACE)
+        else if(Type == TXT_MONOSPACE)
         {
             if(bCapitale)
                 code  = code + 0x1D630;
             else if(bSmall)
                 code  = code + 0x1D62A;
         }
-        else if(this.type == TXT_FRAKTUR)
+        else if(Type == TXT_FRAKTUR)
         {
-            if(bCapitale)
-                code  = code + 0x1D4C4;
+            if(code == 0x43)
+                code = 0x212D;
+            else if(code == 0x48)
+                code = 0x210C;
+            else if(code == 0x49)
+                code = 0x2111;
+            else if(code == 0x52)
+                code = 0x211C;
+            else if(code == 0x5A)
+                code = 0x2128;
+            else if(bCapitale)
+                code  = code + 0x1D4C3;
             else if(bSmall)
-                code  = code + 0x1D4BE;
+                code  = code + 0x1D4BD;
         }
-        else if(this.type == TXT_SANS_SERIF)
+        else if(Type == TXT_SANS_SERIF)
         {
             if(bCapitale)
                 code  = code + 0x1D5CB;
             else if(bSmall)
                 code  = code + 0x1D5C5;
         }
-        else if(this.type == TXT_SCRIPT)
+        else if(Type == TXT_SCRIPT)
         {
             if(bCapitale)
                 code  = code + 0x1D45C;
@@ -423,7 +439,7 @@ CMathText.prototype =
     {
         this.bJDraw = bJustDraw;
     },
-    setMText: function(type)
+    SetTypeText: function(type)
     {
         this.type = type;
     },
@@ -460,7 +476,6 @@ CMathText.prototype =
     {
         SearchPos.Pos.Update(0, Depth);
         SearchPos.Pos.bPlaceholder = true;
-
     },
 
 

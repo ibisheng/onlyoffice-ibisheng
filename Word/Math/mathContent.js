@@ -746,7 +746,7 @@ CMPrp.prototype =
         this.SetBProp(this.aln, props.aln);
         this.SetBProp(this.brk, props.brk);
         this.SetBProp(this.lit, props.lit);
-        //this.SetBProp(this.nor, props.nor);
+
 
         // если приходит несколько параметров style из xml, то запоминается последний
         if(props.sty === "i")
@@ -783,6 +783,20 @@ CMPrp.prototype =
             this.typeText = TXT_NORMAL;
 
     },
+    getTypeText: function()
+    {
+        var type;
+
+        if(this.plain && this.typeText == TXT_ROMAN)
+            type = TXT_NORMAL;
+        else
+            type = this.typeText;
+
+        if(this.nor)
+            type = TXT_NORMAL;
+
+        return type;
+    },
     getTxtSettings: function()
     {
         var type = this.typeText;
@@ -802,8 +816,8 @@ CMPrp.prototype =
     {
         var textPrp = new CTextPr();
 
-        textPrp.italic = this.italic;
-        textPrp.bold = this.bold;
+        textPrp.Italic = this.italic;
+        textPrp.Bold = this.bold;
 
         if(this.typeText == TXT_ROMAN)
             textPrp.Italic = false;

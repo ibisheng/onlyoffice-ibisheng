@@ -3973,8 +3973,14 @@ ParaRun.prototype =
             var oWPrp = this.Parent.Get_Default_TPrp();
             TextPr.Merge(oWPrp);
             TextPr.Merge( this.Pr );            // Мержим прямые настройки данного рана
-            this.Parent.applyArgSize(TextPr);
 
+            if(!this.MathPrp.nor) // math text, style: plain
+            {
+                var MPrp = this.MathPrp.getTxtPrp();
+                TextPr.Merge(MPrp); // bold, italic
+            }
+
+            this.Parent.applyArgSize(TextPr);
         }
         else
             TextPr.Merge( this.Pr ); // Мержим прямые настройки данного рана
@@ -6562,10 +6568,7 @@ ParaRun.prototype.Math_Draw = function(x, y, pGraphics)
     var X = x;
     var Y = y + this.size.ascent;
 
-    // var oWPrp = this.Get_CompiledPr(true);
-    var oWPrp = this.Pr.Copy();
-    this.Parent.applyArgSize(oWPrp);
-
+    var oWPrp = this.Get_CompiledPr(true);
     oWPrp.Italic = false;
 
     pGraphics.SetFont(oWPrp);
@@ -6589,37 +6592,32 @@ ParaRun.prototype.Math_Recalculate = function(RecalcInfo)
 
     var width = 0,
         ascent = 0, descent = 0;
+    var oWPrp = this.Get_CompiledPr(true);
+        oWPrp.Italic = false;
 
-    var oWPrp = this.Pr.Copy();
-    this.Parent.applyArgSize(oWPrp);
-
-    oWPrp.Italic = false;
-
-    // TODO
-    // смержить еще с math_Run_Prp
 
     g_oTextMeasurer.SetFont(oWPrp);
 
-
     for (var Pos = 0 ; Pos < this.Content.length; Pos++ )
     {
-        RecalcInfo.leftRunPrp = RecalcInfo.currRunPrp;
-        RecalcInfo.Left = RecalcInfo.Current;
 
-        RecalcInfo.currRunPrp = oWPrp;
-        RecalcInfo.Current = this.Content[Pos];
-        RecalcInfo.setGaps();
+            RecalcInfo.leftRunPrp = RecalcInfo.currRunPrp;
+            RecalcInfo.Left = RecalcInfo.Current;
 
-        var compiledTPrp = this.Get_CompiledPr(true);
+            RecalcInfo.currRunPrp = oWPrp;
+            RecalcInfo.Current = this.Content[Pos];
+            RecalcInfo.setGaps();
 
-        this.Content[Pos].Resize(g_oTextMeasurer);
+            this.Content[Pos].relate(this);
+            this.Content[Pos].Resize(g_oTextMeasurer);
 
-        var oSize = this.Content[Pos].size;
-        width += oSize.width;
+            var oSize = this.Content[Pos].size;
+            width += oSize.width;
 
-        ascent = ascent > oSize.ascent ? ascent : oSize.ascent;
-        var oDescent = oSize.height - oSize.ascent;
-        descent =  descent < oDescent ? oDescent : descent;
+            ascent = ascent > oSize.ascent ? ascent : oSize.ascent;
+            var oDescent = oSize.height - oSize.ascent;
+            descent =  descent < oDescent ? oDescent : descent;
+
     }
 
     this.size = {width: width, height: ascent + descent, ascent: ascent};
@@ -6693,4 +6691,8 @@ ParaRun.prototype.Math_applyArgSize = function(oWPrp)
 ParaRun.prototype.Set_MathPrp = function(props)
 {
     this.MathPrp.setMathProps(props);
+}
+ParaRun.prototype.Math_GetTypeText = function()
+{
+    return this.MathPrp.getTypeText();
 }
