@@ -3368,7 +3368,7 @@
 							else if(!formatText)
 								formatText = this._getPrParaRun(paraPr, cTextPr);
 							
-							
+							//проходимся по контенту paraRun
 							for(var pR = 0; pR < paraRunContent.length; pR++)
 							{
 		
@@ -3387,7 +3387,6 @@
 									};
 									
 									case para_Tab://*paraEnd / paraTab*
-									case para_End:
 									{
 										if(!oNewItem.length)
 										{
@@ -3416,7 +3415,34 @@
 										s++;
 										break;
 									};
+									
+									case para_End:
+									{	
+										if(typeof aResult[row][s + c1] == "object")
+											aResult[row][s + c1][aResult[row][s + c1].length] = oNewItem;
+										else
+										{
+											aResult[row][s + c1] = [];
+											aResult[row][s + c1][0] = oNewItem;
+										}
+									};
 								}
+							};
+							
+							if(text != "")
+							{	
+								fontFamily = paragraphFontFamily;
+								this.fontsNew[fontFamily] = 1;
+								
+								oNewItem.push(formatText);
+								
+								
+								if(text !== null)
+									oNewItem[oNewItem.length - 1].text = text;
+									
+								cloneNewItem  = this._getCloneNewItem(oNewItem);
+								
+								text = "";
 							};
 							
 							break;
