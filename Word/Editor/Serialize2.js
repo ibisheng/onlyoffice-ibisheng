@@ -10197,6 +10197,7 @@ function Binary_oMathReader(stream)
 					oMRun.Content.splice(oMRun.Content.length, 0, new ParaSpace(1));				
 				*/				
             }
+			oMRun.Set_MathPrp(props);
 			oParent.addElementToContent(oMRun);
         }
 		else if (c_oSer_OMathContentType.MRPr === type)
