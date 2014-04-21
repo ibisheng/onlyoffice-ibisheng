@@ -5,6 +5,32 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-exec');
 	grunt.loadNpmTasks('grunt-closure-tools');
 	grunt.loadNpmTasks('grunt-replace');
+
+	grunt.registerTask('patch_closure_tools_init', 'Initialize tools.', function(){
+		grunt.initConfig({
+			replace: {
+				add_java_parm: {
+					options: {
+						  patterns: [
+							{
+							  match: '\'java \'',
+							  replacement: '\'java -Xms512m \''
+							}
+						  ],
+						  usePrefix: false
+					},
+					files: [
+						{
+							src: 'node_modules/grunt-closure-tools/node_modules/task-closure-tools/lib/libCompiler.js',
+							dest: 'node_modules/grunt-closure-tools/node_modules/task-closure-tools/lib/libCompiler.js'
+						}
+					]
+				}
+			}
+		});
+    });
+	
+	grunt.task.run(['patch_closure_tools_init', 'replace']);	
 	
 	grunt.registerTask('setup_tools', 'Initialize tools.', function(){
         toolsConfig = 'tools.json';
@@ -195,7 +221,8 @@ module.exports = function(grunt) {
 		grunt.initConfig({
 			closureCompiler: {
 				options: {
-					compilerFile: toolsFile['closure_compiler']
+					compilerFile: toolsFile['closure_compiler'],
+					d32: true
 				},
 				sdk: {
 					TEMPcompilerOpts: {
