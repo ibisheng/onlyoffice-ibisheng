@@ -2183,7 +2183,13 @@ function CEditorPage(api)
 
         oWordControl.EndUpdateOverlay();
 
-		if (false == oWordControl.TextboxUsedForSpecials)
+        if (false === oWordControl.bIsUseKeyPress || (true === global_keyboardEvent.AltKey && !AscBrowser.isMacOs))
+        {
+            e.preventDefault();
+        }
+
+        /*
+		if (false === oWordControl.TextboxUsedForSpecials)
 		{
         	if (false === oWordControl.bIsUseKeyPress || true === global_keyboardEvent.AltKey)
         	{
@@ -2198,6 +2204,7 @@ function CEditorPage(api)
 					e.preventDefault();
 			}
 		}
+		*/
     }
 
     this.onKeyDownNoActiveControl = function(e)
