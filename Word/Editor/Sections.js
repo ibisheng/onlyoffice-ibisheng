@@ -32,6 +32,7 @@ function CSectionPr(LogicDocument)
     this.LogicDocument = LogicDocument;
 
     this.Borders       = new CSectionBorders();
+    this.PageNumType   = new CSectionPageNumType();
     
     this.FooterFirst   = null;
     this.FooterEven    = null;
@@ -42,6 +43,7 @@ function CSectionPr(LogicDocument)
     this.HeaderDefault = null;
     
     this.TitlePage     = false;
+       
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -416,6 +418,82 @@ CSectionPr.prototype =
     {
         return this.PageMargins.Footer;
     },
+    
+    Get_HdrFtr : function(bHeader, bFirst, bEven)
+    {
+        if ( true === bHeader )
+        {
+            if ( true === bFirst )
+                return this.HeaderFirst;
+            else if ( true === bEven )
+                return this.HeaderEven;
+            else
+                return this.HeaderDefault;
+        }
+        else
+        {
+            if ( true === bFirst )
+                return this.FooterFirst;
+            else if ( true === bEven )
+                return this.FooterEven;
+            else
+                return this.FooterDefault;
+        }
+    },
+    
+    Set_HdrFtr : function(bHeader, bFirst, bEven, HdrFtr)
+    {
+        if ( true === bHeader )
+        {
+            if ( true === bFirst )
+                return this.Set_Header_First( HdrFtr );
+            else if ( true === bEven )
+                return this.Set_Header_Even( HdrFtr );
+            else
+                return this.Set_Header_Default( HdrFtr );
+        }
+        else
+        {
+            if ( true === bFirst )
+                return this.Set_Footer_First( HdrFtr );
+            else if ( true === bEven )
+                return this.Set_Footer_Even( HdrFtr );
+            else
+                return this.Set_Footer_Default( HdrFtr );
+        }
+    },
+    
+    Get_HdrFtrInfo : function(HdrFtr)
+    {
+        if  ( HdrFtr === this.HeaderFirst )
+            return { Header : true, First : true, Even : false };
+        else if ( HdrFtr === this.HeaderEven )
+            return { Header : true, First : false, Even : true };
+        else if ( HdrFtr === this.HeaderDefault )
+            return { Header : true, First : false, Even : false };
+        else if ( HdrFtr === this.FooterFirst )
+            return { Header : false, First : true, Even : false };
+        else if ( HdrFtr === this.FooterEven )
+            return { Header : false, First : false, Even : true };
+        else if ( HdrFtr === this.FooterDefault )
+            return { Header : false, First : false, Even : false };
+
+        return null;
+    },
+    
+    Set_PageNum_Start : function(Start)
+    {
+        if ( Start !== this.PageNumType.Start )
+        {
+            History.Add( this, { Type : historyitem_Section_PageNumType_Start, Old : this.PageNumType.Start, New : Start } );
+            this.PageNumType.Start = Start;
+        }
+    },
+    
+    Get_PageNum_Start : function()
+    {
+        return this.PageNumType.Start;
+    },
 //----------------------------------------------------------------------------------------------------------------------
 // Undo/Redo функции
 //----------------------------------------------------------------------------------------------------------------------
@@ -550,6 +628,12 @@ CSectionPr.prototype =
             case historyitem_Section_PageMargins_Footer:
             {
                 this.PageMargins.Footer = Data.Old;
+                break;
+            }
+                
+            case historyitem_Section_PageNumType_Start:
+            {
+                this.PageNumType.Start = Data.Old;
                 break;
             }
         }
@@ -687,7 +771,13 @@ CSectionPr.prototype =
             {
                 this.PageMargins.Footer = Data.New;
                 break;
-            }                
+            }
+
+            case historyitem_Section_PageNumType_Start:
+            {
+                this.PageNumType.Start = Data.New;
+                break;
+            }
         }
     },
 
@@ -833,6 +923,14 @@ CSectionPr.prototype =
                 
                 break;
             }
+
+            case historyitem_Section_PageNumType_Start:
+            {
+                // Long : PageNumType.Start
+                
+                Writer.WriteLong( Data.New );
+                break;
+            }                
         }
 
     },
@@ -1050,7 +1148,16 @@ CSectionPr.prototype =
                 this.PageMargins.Footer = Reader.GetDouble();
 
                 break;
-            }                
+            }
+
+            case historyitem_Section_PageNumType_Start:
+            {
+                // Long : PageNumType.Start
+
+                this.PageNumType.Start = Reader.GetLong();
+
+                break;
+            }
         }
     },
 
@@ -1065,6 +1172,7 @@ CSectionPr.prototype =
         // Byte     : Type
         // Variable : Borders        
         // Колонтитулы не пишем в бинарник, при созданиии класса они всегда null, а TitlePage = false
+        // Variable : PageNumType
 
         Writer.WriteString2( "" + this.Id );
         Writer.WriteString2( "" + this.LogicDocument.Get_Id() );
@@ -1072,6 +1180,7 @@ CSectionPr.prototype =
         this.PageMargins.Write_ToBinary( Writer );
         Writer.WriteByte( this.Type );
         this.Borders.Write_ToBinary( Writer );
+        this.PageNumType.Write_ToBinary( Writer );
     },
 
     Read_FromBinary2 : function(Reader)
@@ -1083,6 +1192,7 @@ CSectionPr.prototype =
         // Byte     : Type
         // Variable : Borders
         // Колонтитулы не пишем в бинарник, при созданиии класса они всегда null, а TitlePage = false
+        // Variable : PageNumType
 
         this.Id = Reader.GetString2();
         this.LogicDocument = g_oTable.Id.Get_ById( Reader.GetString2() );
@@ -1090,6 +1200,7 @@ CSectionPr.prototype =
         this.PageMargins.Read_FromBinary( Reader );
         this.Type = Reader.GetByte();
         this.Borders.Read_FromBinary( Reader );
+        this.PageNumType.Read_FromBinary( Reader );
     }
 }
 
@@ -1225,4 +1336,26 @@ CSectionBorders.prototype =
         this.OffsetFrom = Reader.GetByte();
         this.ZOrder     = Reader.GetByte();
     }
+}
+
+function CSectionPageNumType()
+{
+    this.Start = -1;
+}
+
+CSectionPageNumType.prototype = 
+{
+    Write_ToBinary : function(Writer)
+    {
+        // Long : Start
+        
+        Writer.WriteLong( this.Start );
+    },
+    
+    Read_FromBinary : function(Reader)
+    {
+        // Long : Start
+
+        this.Start = Reader.GetLong();
+    }    
 }
