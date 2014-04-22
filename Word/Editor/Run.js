@@ -6696,3 +6696,10 @@ ParaRun.prototype.Math_GetTypeText = function()
 {
     return this.MathPrp.getTypeText();
 }
+ParaRun.prototype.getPropsForWrite = function()
+{
+    var wRPrp = this.Pr.Copy(),
+        mathRPrp = this.MathPrp.getPropsForWrite();
+
+    return {wRPrp: wRPrp, mathRPrp: mathRPrp};
+}
