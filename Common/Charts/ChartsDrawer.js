@@ -309,7 +309,7 @@ CChartsDrawer.prototype =
 		
 		var pxToMM = this.calcProp.pxToMM;
 		var standartMargin = 13 / pxToMM;
-		var isHBar = (chartSpace.chart.plotArea.chart.getObjectType() == historyitem_type_BarChart && chartSpace.chart.plotArea.chart.barDir != 1) ? true : false;
+		var isHBar = (chartSpace.chart.plotArea.chart.getObjectType() == historyitem_type_BarChart && chartSpace.chart.plotArea.chart.barDir === BAR_DIR_BAR) ? true : false;
 		
 		var calculateLeft = 0, calculateRight = 0, calculateTop = 0, calculateBottom = 0;
 		if(chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.labels)
@@ -2926,7 +2926,7 @@ CChartsDrawer.prototype =
 			}
 			case historyitem_type_BarChart:
 			{
-				if(chartProp.chart.plotArea.chart.barDir == 1)
+				if(chartProp.chart.plotArea.chart.barDir !== BAR_DIR_BAR)
 					this.calcProp.type = "Bar";
 				else 
 					this.calcProp.type = "HBar";
