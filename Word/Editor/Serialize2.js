@@ -10896,7 +10896,7 @@ function Binary_oMathReader(stream)
 				case 2:	props.scr = "monospace"; break;
 				case 3:	props.scr = "roman"; break;
 				case 4:	props.scr = "sans-serif"; break;
-				case 4:	props.scr = "script"; break;
+				case 5:	props.scr = "script"; break;
 				default: props.scr = "roman";
 			}
         }
