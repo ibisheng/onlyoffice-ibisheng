@@ -2377,11 +2377,8 @@ ParaRun.prototype =
     Save_RecalculateObject : function(Copy)
     {
         var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
-        RecalcObj.Save_Lines( this );
-        RecalcObj.Save_RunContent( this );
-
-        // TODO: Разобраться с картинками
-
+        RecalcObj.Save_Lines( this, Copy );
+        RecalcObj.Save_RunContent( this, Copy );                
         return RecalcObj;
     },
 

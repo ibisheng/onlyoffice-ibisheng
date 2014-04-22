@@ -782,6 +782,8 @@ CDocument.prototype =
                 var Res  = Para.Recalculate_Fast( SimpleChanges );
                 if ( -1 !== Res )
                 {
+                    //console.log( "Fast Recalc " + Res );
+                    
                     // Если изменения произошли на последней странице параграфа, и за данным параграфом следовал
                     // пустой параграф с новой секцией, тогда его тоже надо пересчитать.
                     if ( Res === Para.Get_StartPage_Absolute() + Para.Pages.length - 1 )
@@ -12735,10 +12737,17 @@ CDocument.prototype =
 
                 // В данном месте мы ставим разрыв секции. Чтобы до текущего места ничего не изменилось, мы у новой
                 // для новой секции копируем все настройки из старой, а в старую секцию выставляем приходящий тип
-                // разрыва секций.
+                // разрыва секций. Заметим, что поскольку мы делаем все так, чтобы до текущей страницы ничего не 
+                // изменилось, надо сохранить эту информацию для пересчета, для этого мы помечаем все следующие изменения
+                // как не влияющие на пересчет.
+                
+                History.MinorChanges = true;
+                
                 SectPr.Copy( CurSectPr );
                 CurSectPr.Set_Type( SectionBreakType );
                 CurSectPr.Clear_AllHdrFtr();
+
+                History.MinorChanges = false;
 
                 Element.Set_SectionPr(SectPr);
                 Element.Refresh_RecalcData2(0, 0);
@@ -13033,6 +13042,11 @@ CDocumentSectionsInfo.prototype =
     Add : function( SectPr, Index )
     {
         this.Elements.push( new CDocumentSectionsInfoElement( SectPr, Index ) );
+    },
+    
+    Get_SectionsCount : function()
+    {
+        return this.Elements.length;
     },
 
     Clear : function()

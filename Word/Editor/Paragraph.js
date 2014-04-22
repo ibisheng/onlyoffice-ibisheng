@@ -5290,7 +5290,8 @@ Paragraph.prototype =
 
         // Если у нас отрезок, в котором произошли изменения является отрезком с нумерацией, тогда надо запустить
         // обычный пересчет.
-        if ( null !== this.Numbering.Item && ( Line < this.Numbering.Line || ( Line === this.Numbering.Line && Range <= this.Numbering.Range ) ) )
+        var NumPr = this.Get_CompiledPr2(false).ParaPr.NumPr;
+        if ( null !== this.Numbering.Item && ( Line < this.Numbering.Line || ( Line === this.Numbering.Line && Range <= this.Numbering.Range ) ) && ( undefined !== NumPr && undefined !== NumPr.NumId && 0 !== NumPr.NumId && "0" !== NumPr.NumId ) )
         {
             // TODO: Сделать проверку на само изменение, переместилась ли нумерация
             return -1;

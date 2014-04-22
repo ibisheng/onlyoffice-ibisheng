@@ -273,8 +273,6 @@ CHeaderFooter.prototype =
         
         if ( -1 === PageIndex )
             return;
-
-        this.Set_Page( PageIndex );        
         
         this.Parent.CurHdrFtr     = this;
         this.Parent.WaitMouseDown = true;
@@ -285,6 +283,8 @@ CHeaderFooter.prototype =
 
         if ( true === bUpdateStates )
         {
+            this.Set_Page( PageIndex );
+            
             this.LogicDocument.Document_UpdateInterfaceState();
             this.LogicDocument.Document_UpdateRulersState();
             this.LogicDocument.Document_UpdateSelectionState();
@@ -890,7 +890,7 @@ CHeaderFooter.prototype =
     Selection_Check : function(X, Y, Page_Abs, NearPos)
     {
         var HdrFtrPage = this.Content.Get_StartPage_Absolute();
-        if ( HdrFtrPage === Page_Abs  )
+        if ( undefined !== NearPos || HdrFtrPage === Page_Abs )
             return this.Content.Selection_Check( X, Y, Page_Abs, NearPos );
 
         return false;

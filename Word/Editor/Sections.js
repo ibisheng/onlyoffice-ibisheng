@@ -789,17 +789,53 @@ CSectionPr.prototype =
         if ( -1 === Index )
             return;
 
-        if ( 0 === Index )
+        // Здесь есть 1 исключение: когда мы добавляем колонтитул для первой страницы, может так получиться, что 
+        // у данной секции флаг TitlePage = False, а значит пересчет надо запускать с места где данный колонтитул
+        // первый раз начнет использоваться, а не с текущей секции.
+
+        if ( (historyitem_Section_Header_First === Data.Type || historyitem_Section_Footer_First === Data.Type) && false === this.TitlePage )
         {
-            // Первая секция, значит мы должны пересчитать начиная с самого начала документа
-            this.LogicDocument.Refresh_RecalcData2(0, 0);
+            var bHeader = historyitem_Section_Header_First === Data.Type ? true : false
+            var SectionsCount = this.LogicDocument.SectionsInfo.Get_SectionsCount();
+            while ( Index < SectionsCount - 1 )
+            {
+                Index++;
+
+                var TempSectPr = this.LogicDocument.SectionsInfo.Get_SectPr2(Index).SectPr;
+
+                // Если в следующей секции свой колонтитул, тогда наш добавленный колонтитул вообще ни на что не влияет
+                if ( (true === bHeader && null !== TempSectPr.Get_Header_First()) || (true !== bHeader && null !== TempSectPr.Get_Footer_First()) )
+                    break;
+
+                // Если в следующей секции есть титульная страница, значит мы нашли нужную секцию
+                if ( true === TempSectPr.Get_TitlePage() )
+                {
+                    if ( 0 === Index )
+                    {
+                        this.LogicDocument.Refresh_RecalcData2(0, 0);
+                    }
+                    else
+                    {
+                        var DocIndex = this.LogicDocument.SectionsInfo.Elements[Index - 1].Index + 1;
+                        this.LogicDocument.Refresh_RecalcData2( DocIndex, 0 );
+                    }
+                }
+            }
         }
         else
         {
-            // Ищем номер элемента, на котором закончилась предыдущая секция, начиная со следующего после него элемента
-            // и пересчитываем документ.
-            var DocIndex = this.LogicDocument.SectionsInfo.Elements[Index - 1].Index + 1;
-            this.LogicDocument.Refresh_RecalcData2( DocIndex, 0 );
+            if ( 0 === Index )
+            {
+                // Первая секция, значит мы должны пересчитать начиная с самого начала документа
+                this.LogicDocument.Refresh_RecalcData2(0, 0);
+            }
+            else
+            {
+                // Ищем номер элемента, на котором закончилась предыдущая секция, начиная со следующего после него элемента
+                // и пересчитываем документ. 
+                var DocIndex = this.LogicDocument.SectionsInfo.Elements[Index - 1].Index + 1;
+                this.LogicDocument.Refresh_RecalcData2( DocIndex, 0 );
+            }
         }
         
         // Дополнительно кроме этого мы должны обновить пересчет в колонтитулах, причем только начиная с данной секции

@@ -27,6 +27,7 @@ function CHistory(Document)
     };
 
     this.TurnOffHistory = false;
+    this.MinorChanges   = false; // Данный параметр нужен, чтобы определить влияют ли добавленные изменения на пересчет
 
     this.BinaryWriter = new CMemory();
 }
@@ -183,7 +184,9 @@ CHistory.prototype =
             {
                 Pos : Binary_Pos,
                 Len : Binary_Len
-            }
+            },
+            
+            NeedRecalc : !this.MinorChanges
         };
 
         this.Points[this.Index].Items.push( Item );
@@ -403,7 +406,9 @@ CHistory.prototype =
                 for ( var Index = 0; Index < Point.Items.length; Index++ )
                 {
                     var Item = Point.Items[Index];
-                    Item.Class.Refresh_RecalcData( Item.Data );
+                    
+                    if ( true === Item.NeedRecalc )
+                        Item.Class.Refresh_RecalcData( Item.Data );
                 }
             }
         }
