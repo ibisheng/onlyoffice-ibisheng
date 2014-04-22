@@ -17651,7 +17651,17 @@ CTable.prototype =
             this.Content[Ind].Next = ( Ind < this.Content.length - 1 ? this.Content[Ind + 1] : null );
         }
     },
+    
+    ReIndexing : function()
+    {
+        this.Internal_ReIndexing(0);
 
+        var Count = this.Content.length;
+        for ( var Ind = StartIndex; Ind < Count; Ind++ )
+        {
+            this.Content[Ind].Internal_ReIndexing(0);
+        }
+    },
 
     // Переделываем сетку таблицы заново, исходя из массива RowsInfo
     // В данном массиве заданы для каждой строки ширины всех ячеек (либо
