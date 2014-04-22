@@ -7859,8 +7859,12 @@ CMathContent.prototype =
         this.setEndPos_Selection(1);
         //this.setEnd_Selection(1);
         //this.selection.active = false;
-    }
-
+    },
+	getElem: function(nNum)
+	{
+		return this.content[nNum];
+	}
+	
     /////////////////////////////////////////////////////////////////
 
     ////  test function for me  ////
@@ -8650,52 +8654,20 @@ CMathComposition.prototype =
 
         return size;
     },
-    Remove: function(order, bOnAdd)
+    Remove: function(oContent, nCount, bOnAdd)
     {
-        //
-        ////*    History    */////
         History.Create_NewPoint();
-
-        var start = this.SelectContent.RealSelect.startPos,
-            end   = this.SelectContent.RealSelect.endPos;
-        var Pos;
-
-        if(start !== end)
-            Pos = start < end ? start: end;
-        else if(order == 1)
-            Pos = this.SelectContent.CurPos;
-        else
-            Pos = this.SelectContent.CurPos + 1;
-
-        ///////////////////////////
-
-        var removeMComp = true;
-
-        if(bOnAdd)
-        {
-            this.SelectContent.removeAreaSelect();
-        }
-        else
-        {
-            var result = this.SelectContent.remove(order);
-
-            var bRoot = this.SelectContent.bRoot === true,
-                bToUpper = result.state.bBegin || result.state.bEnd, // наверх нужно ли прокидовать
-                bAddRPrp = result.state.bAddRPrp;
-
-
-            if( result.state.bDelete )
-                History.Add(this.CurrentContent, {Type: historyitem_Math_RemoveItem, Items: result.items, Pos: Pos, bAddRPrp: bAddRPrp});
-
-
-            this.CurrentContent = result.CurrContent;
-            this.SelectContent  = result.SelectContent;
-            this.CurrentContent.setPlaceholderAfterRemove(); // чтобы не выставлялся тагет при вставке, когда заселекчен весь контент и мы добавляем, например, другой мат элемент
-
-            removeMComp = !(bRoot && bToUpper);  // посылаем false, если в начале + backspace или в конце + delete
-        }
-
-        return removeMComp;
+		
+		var oStartContent = oContent.Content.content[oContent.Start];
+		var oEndContent = oContent.Content.content[oContent.End];		
+		var Items = new Array();
+		for (var i=oContent.Start; i<=oContent.End; i++)
+		{
+			Items.push(oContent.Content.content[i]);
+			oContent.Content.content.splice( i, 1 );
+		}
+		History.Add(oContent.Content, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: oContent.Start});
+		return;
     },
     AddLetter: function(code)
     {

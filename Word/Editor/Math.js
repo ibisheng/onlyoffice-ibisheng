@@ -109,7 +109,7 @@ ParaMath.prototype =
 			oText.addTxt(" ");
 			oStartContent.Add(oText);
 		}
-		/*else if ( para_Math === Type )
+		else if ( para_Math === Type )
 		{
 			nPosStart = oStartContent.State.ContentPos;
 			nLenStart = oStartContent.Content.length;
@@ -137,7 +137,7 @@ ParaMath.prototype =
 			oContent.Content.content.push(oMRun);
 
 			oContent.Content.SetRunEmptyToContent(false);
-		}*/
+		}
 	},
 
     AddText : function(oElem, sText, props)
@@ -149,51 +149,20 @@ ParaMath.prototype =
 			var Pos = oElem.CurPos,
 				PosEnd = Pos + 1;
 			var items = new Array();
-
             for (var Pos=0; Pos < sText.length; Pos++)
             {
                 var oText = new CMathText();
                 oText.addTxt(sText[Pos]);				
                 MathRun.Content.splice( Pos, 0, oText );
-				
-				//var element = new mathElem(oText);
 				items.push(oText);
             }
-
             oElem.addElementToContent(MathRun);
-			
 			History.Add(oElem, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
         }        
-
-        /*if(sText)
-        {
-            var rPr = new CTextPr();
-            var oMRun = new CMathRunPrp();
-            if (props)
-                oMRun.setMathRunPrp(props);
-            oMRun.setTxtPrp(rPr);
-            if (oElem)
-            {
-                oElem.addElementToContent(oMRun);
-                for (var i=0;i<sText.length;i++)
-                {
-                    *//*text[i].replace("&",	"&amp;");
-                     text[i].Replace("'",	"&apos;");
-                     text[i].Replace("<",	"&lt;");
-                     text[i].Replace(">",	"&gt;");
-                     text[i].Replace("\"",	"&quot;");*//*
-                    oText = new CMathText();
-                    oText.addTxt(sText[i]);
-                    oElem.addElementToContent(oText);
-                }
-            }
-        }*/
     },
 
     CreateElem : function (oElem, oParent, props)
     {
-        /*var ctrPrp = new CTextPr();
-         oElem.setCtrPrp(ctrPrp);*/
         oElem.relate(oParent);
         oElem.init(props);
 
@@ -204,9 +173,7 @@ ParaMath.prototype =
         if (oParent)
 		{
             oParent.addElementToContent(oElem);
-
-			var element = new mathElem(oElem);
-			items.push(element);
+			items.push(oElem);
 			History.Add(oParent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
 		}
 
@@ -272,7 +239,17 @@ ParaMath.prototype =
 
     Remove : function(Direction, bOnAddText)
     {
-        return this.Math.Remove(Direction, bOnAddText);
+		var oContent = this.GetSelectContent();
+		if (oContent.Start == oContent.End)
+		{
+			var oElem = oContent.Content.getElem(oContent.Start);
+			if (oElem.typeObj == MATH_COMP)
+				this.Math.Remove(oContent, Direction, bOnAddText);
+			else	//mathrun
+				oElem.Remove(Direction, bOnAddText);
+		}
+		else
+			return this.Math.Remove(oContent, Direction, bOnAddText);
     },
 
     GetSelectContent: function()
