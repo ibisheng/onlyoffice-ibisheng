@@ -40,9 +40,6 @@ function CHeaderFooter(Parent, LogicDocument, DrawingDocument, Type)
 
     this.Type = Type;
 
-    this.BoundY  = -1; // Для верхнего колонтитула это нижняя граница, а для нижнего - верхняя
-    this.BoundY2 = 0;  // Для верхнего колонтитула это верхняя граница, а для нижнего - нижняя
-
     this.RecalcInfo =
     {
         CurPage       : -1, // Текущий выставленный номер страницы
@@ -66,6 +63,13 @@ CHeaderFooter.prototype =
     Get_Id : function()
     {
         return this.Id;
+    },
+    
+    Copy : function()
+    {
+        var NewHdrFtr = new CHeaderFooter(this.Parent, this.LogicDocument, this.DrawingDocument, this.Type);
+        NewHdrFtr.Content = this.Content.Copy( NewHdrFtr );
+        return NewHdrFtr;
     },
     
     Set_Page : function(Page_abs)
@@ -189,7 +193,12 @@ CHeaderFooter.prototype =
         // Ежели текущая страница не задана, тогда выставляем ту, которая оказалась пересчитанной первой. В противном
         // случае, выставляем рассчет страницы, которая была до этого.
         if ( -1 === this.RecalcInfo.CurPage )
+        {
             this.RecalcInfo.CurPage = Page_abs;
+            
+            // Обновляем интерфейс, чтобы обновить настройки колонтитула, т.к. мы могли попасть в новую секцию
+            this.LogicDocument.Document_UpdateInterfaceState();
+        }
         else            
         {
             var RecalcObj = this.RecalcInfo.RecalcObj[this.RecalcInfo.CurPage];
@@ -1054,14 +1063,10 @@ CHeaderFooter.prototype =
 
         // String   : Id
         // Long     : Type
-        // Double   : BoundY
-        // Double   : BoundY2
         // String   : Content Id
 
         Writer.WriteString2( this.Id );
         Writer.WriteLong( this.Type );
-        Writer.WriteDouble( this.BoundY );
-        Writer.WriteDouble( this.BoundY2 );
         Writer.WriteString2( this.Content.Get_Id() );
     },
 
@@ -1069,8 +1074,6 @@ CHeaderFooter.prototype =
     {
         // String   : Id
         // Long     : Type
-        // Double   : BoundY
-        // Double   : BoundY2
         // String   : Content Id
 
         var LogicDocument = editor.WordControl.m_oLogicDocument;
@@ -1081,8 +1084,6 @@ CHeaderFooter.prototype =
 
         this.Id      = Reader.GetString2();
         this.Type    = Reader.GetLong();
-        this.BoundY  = Reader.GetDouble();
-        this.BoundY2 = Reader.GetDouble();
 
         this.Content = g_oTableId.Get_ById( Reader.GetString2() );        
     },
@@ -1160,7 +1161,7 @@ CHeaderFooterController.prototype =
                 return Pr;
             
             var Index  = this.LogicDocument.Pages[this.CurHdrFtr.RecalcInfo.CurPage].Pos;            
-            var SectPr = this.LogicDocument.SectionsInfo.Get_SectPr( Index).SectPr;
+            var SectPr = this.LogicDocument.SectionsInfo.Get_SectPr(Index).SectPr;
 
             if ( hdrftr_Footer === Pr.Type )
                 Pr.Position = SectPr.Get_PageMargins_Footer();
@@ -1169,6 +1170,24 @@ CHeaderFooterController.prototype =
             
             Pr.DifferentFirst   = SectPr.Get_TitlePage();
             Pr.DifferentEvenOdd = EvenAndOddHeaders;
+            
+            if ( SectPr === this.LogicDocument.SectionsInfo.Get_SectPr2(0).SectPr )
+            {
+                // У первой секции не может быть повторяющихся колонтитулов. Посылаем особое значение (null) в меню
+                Pr.LinkToPrevious = null;
+            }
+            else
+            {
+                // Определим тип колонтитула, в котором мы находимся
+                var PageIndex = this.CurHdrFtr.RecalcInfo.CurPage;
+                var SectionPageInfo = this.LogicDocument.Get_SectionPageNumInfo( PageIndex );
+
+                var bFirst  = ( true === SectionPageInfo.bFirst && true === SectPr.Get_TitlePage() ? true : false );
+                var bEven   = ( true === SectionPageInfo.bEven  && true === EvenAndOddHeaders      ? true : false );
+                var bHeader = ( hdrftr_Header === this.CurHdrFtr.Type ? true : false );
+
+                Pr.LinkToPrevious = ( null === SectPr.Get_HdrFtr( bHeader, bFirst, bEven ) ? true : false );
+            }
 
             Pr.Locked = this.Lock.Is_Locked();
 
@@ -1202,10 +1221,10 @@ CHeaderFooterController.prototype =
     {
         // Определим четность страницы и является ли она первой в данной секции. Заметим, что четность страницы 
         // отсчитывается от начала текущей секции и не зависит от настроек нумерации страниц для данной секции.
-        var FirstPage = this.LogicDocument.Get_SectionFirstPage( PageIndex );
+        var SectionPageInfo = this.LogicDocument.Get_SectionPageNumInfo( PageIndex );
         
-        var bFirst = ( FirstPage === PageIndex ? true : false );
-        var bEven  = ( 0 === ( ( PageIndex - FirstPage ) % 2 ) ? false : true ); // потому что у нас страницы с 0 нумеруются
+        var bFirst = SectionPageInfo.bFirst;
+        var bEven  = SectionPageInfo.bEven;
         
         // Запросим нужный нам колонтитул 
         var HdrFtr = this.LogicDocument.Get_SectionHdrFtr( PageIndex, bFirst, bEven );

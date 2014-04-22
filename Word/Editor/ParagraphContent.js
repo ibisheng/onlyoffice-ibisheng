@@ -7265,7 +7265,7 @@ ParaPageNum.prototype =
     
     Set_Page : function(PageNum)
     {
-        this.String = "" + (PageNum + 1);
+        this.String = "" + PageNum;
         var Len = this.String.length;
 
         var RealWidth = 0;

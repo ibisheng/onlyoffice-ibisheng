@@ -1030,20 +1030,14 @@ $("#td_formatmodel,#td_info, #td_redo, #td_undo, #td_orient, #td_bold, #td_itali
 			break;
 		case "td_indent":
 
-            //var Time = History.Get_EditingTime(10000);
-            //alert("Время редактирования " + (Time / 1000) );
-
-			//editor.IncreaseIndent()
-			editor.WordControl.m_oLogicDocument.Run_TestRecalculate();
-
+			editor.IncreaseIndent()
 			break;
+			
 		case "td_outdent":
-			//editor.DecreaseIndent();
-
-			editor.WordControl.m_oLogicDocument.LoadTestDocument2();
-			//editor.WordControl.m_oLogicDocument.LoadTestDocument6();
-			//editor.WordControl.m_oLogicDocument.LoadTestDocument7();
+		
+			editor.DecreaseIndent();
 			break;
+			
 		case "bulletedlist":
             if ($("#td_bulletedlist").hasClass("iconPressed")){
 				bulletlistpressed = false;
@@ -1624,6 +1618,8 @@ $(".colorWatch").mouseover(function(){
 		$("#hafType").html("")
 		document.getElementById("hafFP").checked = false;
 		document.getElementById("hafOE").checked = false;
+		document.getElementById("hafLink").checked  = false;
+		document.getElementById("hafLink").disabled = "disabled";
 	})
      editor.asc_registerCallback("asc_onPageOrient", function()
      {
@@ -1892,6 +1888,12 @@ $(".colorWatch").mouseover(function(){
 	$("#hafOE").click(function(){
 		editor.HeadersAndFooters_DifferentOddandEvenPage(document.getElementById ("hafOE").checked);
 	})
+
+	$("#hafLink").click(function()
+	{
+		editor.HeadersAndFooters_LinkToPrevious(document.getElementById("hafLink").checked);
+	})
+
 	$("#hafHF").keypress(function(evt){
 		evt = evt || window.event;
 		if (evt.keyCode == 13){
@@ -2124,15 +2126,30 @@ $(".colorWatch").mouseover(function(){
          editor.tblApply( { TableLook : TableLook } );
      })
 
-	editor.asc_registerCallback("asc_onHeadersAndFootersProp", function(){
+	editor.asc_registerCallback("asc_onHeadersAndFootersProp", function()
+	{
 		$("#hafProp").show();
 		$("#hafHF").val(arguments[0].Position);
+		
 		document.getElementById("hafFP").checked = arguments[0].DifferentFirst;
 		document.getElementById("hafOE").checked = arguments[0].DifferentEvenOdd;
+		
 		if (arguments[0].get_ObjectType() == hdrftr_Footer)
-			$("#hafType").html("We in Footer")
+			$("#hafType").html("We in Footer");
 		else if (arguments[0].get_ObjectType() == hdrftr_Header)	
-			$("#hafType").html("We in header")
+			$("#hafType").html("We in header");
+			
+		var Link = arguments[0].LinkToPrevious;
+		if ( null === Link )
+		{
+		    document.getElementById("hafLink").disabled = "disabled";
+		    document.getElementById("hafLink").checked  = false;
+		}
+		else
+		{
+		    document.getElementById("hafLink").disabled = 0;
+		    document.getElementById("hafLink").checked  = Link;
+		}			
 	})
     editor.asc_registerCallback("asc_onPaintFormatChanged", function(value){
          // отжать/нажать кнопку
@@ -2753,10 +2770,23 @@ $(".colorWatch").mouseover(function(){
 					$("#hafHF").val(elemVal.Position);
 					document.getElementById("hafFP").checked = elemVal.DifferentFirst;
 					document.getElementById("hafOE").checked = elemVal.DifferentEvenOdd;
+					
 					if (elemVal.get_Type() == hdrftr_Footer)
-						$("#hafType").html("We in Footer")
+						$("#hafType").html("We in Footer");
 					else if (elemVal.get_Type() == hdrftr_Header)	
-						$("#hafType").html("We in header")
+						$("#hafType").html("We in header");
+						
+    				var Link = elemVal.LinkToPrevious;
+                    if ( null === Link )
+                    {
+                        document.getElementById("hafLink").disabled = "disabled";
+                        document.getElementById("hafLink").checked  = false;
+                    }
+                    else
+                    {
+                        document.getElementById("hafLink").disabled = 0;
+                        document.getElementById("hafLink").checked  = Link;
+                    }	
 				}
 				else if ( ObjectType == c_oAscTypeSelectElement.Paragraph)
 				{

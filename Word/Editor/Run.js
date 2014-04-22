@@ -1509,7 +1509,11 @@ ParaRun.prototype =
                 case para_PageNum:
                 {
                     // Выставляем номер страницы
-                    Item.Set_Page(PRS.Page + Para.Get_StartPage_Absolute());
+                    
+                    var LogicDocument = Para.LogicDocument;
+                    var SectionPage   = LogicDocument.Get_SectionPageNumInfo2(PRS.Page + Para.Get_StartPage_Absolute()).CurPage;
+                    
+                    Item.Set_Page(SectionPage);
                     
                     // Если до этого было слово, тогда не надо проверять убирается ли оно, но если стояли пробелы,
                     // тогда мы их учитываем при проверке убирается ли данный элемент, и добавляем только если

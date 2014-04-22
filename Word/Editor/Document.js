@@ -825,8 +825,60 @@ CDocument.prototype =
             var HdrFtr = RecalcData.HdrFtr[HdrFtrIndex];            
             var FindIndex = this.SectionsInfo.Find_ByHdrFtr( HdrFtr );
             
-            if ( -1 !== FindIndex && ( -1 === SectPrIndex || FindIndex < SectPrIndex ) )
-                SectPrIndex = FindIndex;            
+            // Колонтитул может быть записан в данной секции, но в ней не использоваться. Нам нужно начинать пересчет
+            // с места использования данного колонтитула.
+            
+            var SectPr = this.SectionsInfo.Get_SectPr2( FindIndex).SectPr;
+            var HdrFtrInfo = SectPr.Get_HdrFtrInfo( HdrFtr );
+            
+            if ( null !== HdrFtrInfo && -1 !== FindIndex )
+            {
+                var bHeader = HdrFtrInfo.Header;
+                var bFirst  = HdrFtrInfo.First;
+                var bEven   = HdrFtrInfo.Even;
+                
+                var CheckSectIndex = -1;
+
+                if ( true === bFirst )
+                {
+                    var CurSectIndex = FindIndex;
+                    var SectCount = this.SectionsInfo.Elements.length;
+
+                    while ( CurSectIndex < SectCount )
+                    {
+                        var CurSectPr = this.SectionsInfo.Get_SectPr2(CurSectIndex).SectPr;
+
+                        if ( FindIndex === CurSectIndex || null === CurSectPr.Get_HdrFtr( bHeader, bFirst, bEven ) )
+                        {
+                            if ( true === CurSectPr.Get_TitlePage() )
+                            {
+                                CheckSectIndex = CurSectIndex;
+                                break;
+                            }
+
+                        }
+                        else
+                        {
+                            // Если мы попали сюда, значит данный колонтитул нигде не используется
+                            break;
+                        }
+
+                        CurSectIndex++;
+                    }
+                }
+                else if ( true === bEven )
+                {
+                    if ( true === EvenAndOddHeaders )
+                        CheckSectIndex = FindIndex;
+                }
+                else
+                {
+                    CheckSectIndex = FindIndex;
+                }
+                
+                if ( -1 !== CheckSectIndex && ( -1 === SectPrIndex || CheckSectIndex < SectPrIndex ) )
+                    SectPrIndex = CheckSectIndex;
+            }
         }
         
         if ( -1 === RecalcData.Inline.Pos && -1 === SectPrIndex )
@@ -1007,6 +1059,8 @@ CDocument.prototype =
         {
             if ( OldPage.EndPos >= Count - 1 )
             {
+                //console.log( "HdrFtr Recalc " + PageIndex );
+                
                 this.Pages[PageIndex] = OldPage;
                 this.DrawingDocument.OnRecalculatePage( PageIndex, this.Pages[PageIndex] );
 
@@ -1027,6 +1081,8 @@ CDocument.prototype =
             }
             else if ( undefined !== this.Pages[PageIndex + 1] )
             {
+                //console.log( "HdrFtr Recalc " + PageIndex );
+                
                 // Переходим к следующей странице
                 this.Pages[PageIndex] = OldPage;
                 this.DrawingDocument.OnRecalculatePage( PageIndex, this.Pages[PageIndex] );
@@ -1069,6 +1125,8 @@ CDocument.prototype =
             if ( true === bStart )
                 this.Pages.length = PageIndex + 1;
         }
+
+        //console.log( "Regular Recalc " + PageIndex );
 
         var StartPos = this.Get_PageContentStartPos(PageIndex, StartIndex);
         
@@ -10260,6 +10318,80 @@ CDocument.prototype =
         this.Document_UpdateRulersState();
         this.Document_UpdateInterfaceState();
     },
+    
+    Document_SetHdrFtrLink : function(bLinkToPrevious)
+    {
+        var CurHdrFtr = this.HdrFtr.CurHdrFtr;
+        if ( docpostype_HdrFtr !== this.CurPos.Type || null === CurHdrFtr || -1 === CurHdrFtr.RecalcInfo.CurPage )
+            return;
+
+        var PageIndex = CurHdrFtr.RecalcInfo.CurPage;
+        
+        var Index  = this.Pages[PageIndex].Pos;
+        var SectPr = this.SectionsInfo.Get_SectPr(Index).SectPr;
+        
+        // У самой первой секции не может быть повторяющихся колонтитулов, поэтому не делаем ничего
+        if ( SectPr === this.SectionsInfo.Get_SectPr2(0).SectPr )
+            return;
+
+        // Определим тип колонтитула, в котором мы находимся
+        var SectionPageInfo = this.Get_SectionPageNumInfo( PageIndex );
+
+        var bFirst  = ( true === SectionPageInfo.bFirst && true === SectPr.Get_TitlePage() ? true : false );
+        var bEven   = ( true === SectionPageInfo.bEven  && true === EvenAndOddHeaders      ? true : false );
+        var bHeader = ( hdrftr_Header === CurHdrFtr.Type ? true : false );
+
+        var _CurHdrFtr = SectPr.Get_HdrFtr( bHeader, bFirst, bEven );
+        
+        if ( true === bLinkToPrevious )
+        {
+            // Если нам надо повторять колонтитул, а он уже изначально повторяющийся, тогда не делаем ничего
+            if ( null === _CurHdrFtr )
+                return;
+            
+            // Просто удаляем запись о данном колонтитуле в секции
+            SectPr.Set_HdrFtr( bHeader, bFirst, bEven, null );
+            
+            var HdrFtr = this.Get_SectionHdrFtr( PageIndex, bFirst, bEven );
+            
+            // Заглушка. Вообще такого не должно быть, чтобы был колонтитул не в первой секции, и не было в первой,
+            // но, на всякий случай, обработаем такую ситуацию.
+            if ( true === bHeader )
+            {
+                if ( null === HdrFtr.Header )
+                    CurHdrFtr = this.Create_SectionHdrFtr( hdrftr_Header, PageIndex );
+                else
+                    CurHdrFtr = HdrFtr.Header;
+            }
+            else
+            {
+                if ( null === HdrFtr.Footer )
+                    CurHdrFtr = this.Create_SectionHdrFtr( hdrftr_Footer, PageIndex );
+                else
+                    CurHdrFtr = HdrFtr.Footer;
+            }
+
+
+            this.HdrFtr.CurHdrFtr = CurHdrFtr;
+            this.HdrFtr.CurHdrFtr.Cursor_MoveToStartPos(false);
+        }
+        else
+        {
+            // Если данный колонтитул уже не повторяющийся, тогда ничего не делаем
+            if ( null !== _CurHdrFtr )
+                return;
+            
+            var NewHdrFtr = CurHdrFtr.Copy();
+            SectPr.Set_HdrFtr( bHeader, bFirst, bEven, NewHdrFtr );
+            this.HdrFtr.CurHdrFtr = NewHdrFtr;
+            this.HdrFtr.CurHdrFtr.Cursor_MoveToStartPos(false);
+        }
+                
+        this.Recalculate();
+        
+        this.Document_UpdateSelectionState();
+        this.Document_UpdateInterfaceState();
+    },
 
     Document_Format_Copy : function()
     {
@@ -12590,15 +12722,12 @@ CDocument.prototype =
         return false;
     },
     
-    Get_SectionFirstPage : function(Page_abs)
-    {
-        var StartIndex = this.Pages[Page_abs].Pos;
-        var SectIndex  = this.SectionsInfo.Get_Index( StartIndex );
-        
-        if ( 0 === SectIndex )
+    Get_SectionFirstPage : function(SectIndex, Page_abs)
+    {       
+        if ( SectIndex <= 0 )
             return 0;
         
-        StartIndex = this.SectionsInfo.Get_SectPr2( SectIndex - 1).Index;
+        var StartIndex = this.SectionsInfo.Get_SectPr2(SectIndex - 1).Index;
         
         // Ищем номер страницы, на которой закончилась предыдущая секция
         var CurPage = Page_abs;
@@ -12609,6 +12738,64 @@ CDocument.prototype =
         }
         
         return CurPage + 1;
+    },
+
+    
+    Get_SectionPageNumInfo : function(Page_abs)
+    {
+        var PageNumInfo = this.Get_SectionPageNumInfo2( Page_abs );
+        
+        var FP = PageNumInfo.FirstPage;
+        var CP = PageNumInfo.CurPage;
+        
+        var bFirst = ( FP === CP ? true : false );
+        var bEven  = ( 0 === CP % 2 ? true : false ); // Четность/нечетность проверяется по текущему номеру страницы в секции, с учетом нумерации в секциях
+                
+        return { FirstPage : FP, CurPage : CP, bFirst : bFirst, bEven : bEven };
+    },
+    
+    Get_SectionPageNumInfo2 : function(Page_abs)
+    {
+        var StartIndex = this.Pages[Page_abs].Pos;
+        var SectIndex  = this.SectionsInfo.Get_Index(StartIndex);
+
+        if ( 0 === SectIndex )
+        {
+            var PageNumStart = this.SectionsInfo.Get_SectPr2(0).SectPr.Get_PageNum_Start();
+
+            // Нумерация начинается с 1, если начальное значение не задано. Заметим, что в Word нумерация может начинаться и 
+            // со значения 0, а все отрицательные значения воспринимаются как продолжение нумерации с предыдущей секции.
+            if ( PageNumStart < 0 )
+                PageNumStart = 1;
+
+            return { FirstPage : PageNumStart, CurPage : Page_abs + PageNumStart };
+        }
+
+        var SectionFirstPage = this.Get_SectionFirstPage( SectIndex, Page_abs );
+
+        var FirstPage    = SectionFirstPage;
+        var PageNumStart = this.SectionsInfo.Get_SectPr2(SectIndex).SectPr.Get_PageNum_Start();
+
+        while ( PageNumStart < 0 && SectIndex > 0 )
+        {
+            SectIndex--;
+
+            FirstPage    = this.Get_SectionFirstPage( SectIndex, Page_abs );
+            PageNumStart = this.SectionsInfo.Get_SectPr2(SectIndex).SectPr.Get_PageNum_Start();
+        }
+
+        // Нумерация начинается с 1, если начальное значение не задано. Заметим, что в Word нумерация может начинаться и 
+        // со значения 0, а все отрицательные значения воспринимаются как продолжение нумерации с предыдущей секции.
+        if ( PageNumStart < 0 )
+            PageNumStart = 1;
+
+        if ( FirstPage > Page_abs )
+            return { FirstPage : PageNumStart, CurPage : PageNumStart };       
+
+        var FP = PageNumStart + SectionFirstPage - FirstPage;
+        var CP = PageNumStart + Math.max( Page_abs - FirstPage, SectionFirstPage - FirstPage, 0 );
+
+        return { FirstPage : FP, CurPage : CP };
     },
     
     Get_SectionHdrFtr : function(Page_abs, _bFirst, _bEven)
@@ -12662,11 +12849,11 @@ CDocument.prototype =
         // Данная функция используется, когда у нас нет колонтитула вообще. Это значит, что его нет ни в 1 секции. Следовательно,
         // создаем колонтитул в первой секции, а в остальных он будет повторяться. По текущей секции нам надо будет
         // определить какой конкретно колонтитул мы собираемся создать.
-        
-        var FirstPage = this.Get_SectionFirstPage( PageIndex );
 
-        var _bFirst = ( FirstPage === PageIndex ? true : false );
-        var _bEven  = ( 0 === ( ( PageIndex - FirstPage ) % 2 ) ? false : true ); // потому что у нас страницы с 0 нумеруются
+        var SectionPageInfo = this.Get_SectionPageNumInfo( PageIndex );
+
+        var _bFirst = SectionPageInfo.bFirst;
+        var _bEven  = SectionPageInfo.bEven;
 
         var StartIndex = this.Pages[PageIndex].Pos;
         var SectIndex  = this.SectionsInfo.Get_Index(StartIndex);
@@ -12757,10 +12944,10 @@ CDocument.prototype =
     {
         // Определим четность страницы и является ли она первой в данной секции. Заметим, что четность страницы 
         // отсчитывается от начала текущей секции и не зависит от настроек нумерации страниц для данной секции.
-        var FirstPage = this.Get_SectionFirstPage( PageIndex );
+        var SectionPageInfo = this.Get_SectionPageNumInfo( PageIndex );
 
-        var bFirst = ( FirstPage === PageIndex ? true : false );
-        var bEven  = ( 0 === ( ( PageIndex - FirstPage ) % 2 ) ? false : true ); // потому что у нас страницы с 0 нумеруются
+        var bFirst = SectionPageInfo.bFirst;
+        var bEven  = SectionPageInfo.bEven;
 
         // Запросим нужный нам колонтитул 
         var HdrFtr = this.Get_SectionHdrFtr( PageIndex, bFirst, bEven );   

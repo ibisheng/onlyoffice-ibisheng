@@ -413,6 +413,7 @@ function CHeaderProp( obj )
 		this.Position = (undefined != obj.Position) ? obj.Position : null;
 		this.DifferentFirst = (undefined != obj.DifferentFirst) ? obj.DifferentFirst : null;
 		this.DifferentEvenOdd = (undefined != obj.DifferentEvenOdd) ? obj.DifferentEvenOdd : null;
+        this.LinkToPrevious   = (undefined != obj.LinkToPrevious)   ? obj.LinkToPrevious   : null;
         this.Locked = (undefined != obj.Locked) ? obj.Locked : false;
 	}
 	else
@@ -421,6 +422,7 @@ function CHeaderProp( obj )
 		this.Position = 12.5;
 		this.DifferentFirst = false;
 		this.DifferentEvenOdd = false;
+        this.LinkToPrevious   = null;
         this.Locked = false;
 	}
 }
@@ -433,6 +435,7 @@ CHeaderProp.prototype.get_DifferentFirst = function(){ return this.DifferentFirs
 CHeaderProp.prototype.put_DifferentFirst = function(v){ this.DifferentFirst = v; }
 CHeaderProp.prototype.get_DifferentEvenOdd = function(){ return this.DifferentEvenOdd; }
 CHeaderProp.prototype.put_DifferentEvenOdd = function(v){ this.DifferentEvenOdd = v; }
+CHeaderProp.prototype.get_LinkToPrevious = function() { return this.LinkToPrevious; }
 CHeaderProp.prototype.get_Locked = function() { return this.Locked; }
 
 function CSelectedObject( type, val )
@@ -4196,7 +4199,6 @@ asc_docs_api.prototype.put_PageNum = function(where,align)
     }
 }
 
-// "where" где нижний или верхний, "options" опции колонтитула
 asc_docs_api.prototype.put_HeadersAndFootersDistance = function(value)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_HdrFtr) )
@@ -4214,12 +4216,22 @@ asc_docs_api.prototype.HeadersAndFooters_DifferentFirstPage = function(isOn)
         this.WordControl.m_oLogicDocument.Document_SetHdrFtrFirstPage( isOn );
     }
 }
+
 asc_docs_api.prototype.HeadersAndFooters_DifferentOddandEvenPage = function(isOn)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_HdrFtr) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Document_SetHdrFtrEvenAndOddHeaders( isOn );
+    }
+}
+
+asc_docs_api.prototype.HeadersAndFooters_LinkToPrevious = function(isOn)
+{
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_HdrFtr) )
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Document_SetHdrFtrLink( isOn );
     }
 }
 

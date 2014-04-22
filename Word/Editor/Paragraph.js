@@ -217,9 +217,15 @@ Paragraph.prototype =
         for ( var Index = 0; Index < Count; Index++ )
         {
             var Item = this.Content[Index];
-            if ( true === Item.Is_RealContent() )
-                Para.Internal_Content_Add( Para.Content.length, Item.Copy(), false );
+            Para.Internal_Content_Add( Para.Content.length, Item.Copy(false), false );
         }
+        
+        // TODO: Как только переделаем para_End, переделать тут
+        // Поскольку в ране не купируется элемент para_End добавим его здесь отдельно
+
+        var EndRun = new ParaRun(Para);
+        EndRun.Add_ToContent( 0, new ParaEnd() );
+        Para.Internal_Content_Add( Para.Content.length, EndRun, false );
 
         return Para;
     },
