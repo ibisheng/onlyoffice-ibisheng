@@ -107,7 +107,6 @@ CMathText.prototype =
             bSmall = (code > 0x0060 && code < 0x007b);
 
         var Type = this.Parent.Math_GetTypeText();
-        //var Type = TXT_ROMAN;
 
         if(Type == TXT_ROMAN )
         {
@@ -133,17 +132,31 @@ CMathText.prototype =
         }
         else if(Type == TXT_DOUBLE_STRUCK)
         {
-            if(bCapitale)
-                code  = code + 0x1D4F8;
+            if(code == 0x43)
+                code = 0x2102;
+            else if(code == 0x48)
+                code = 0x210D;
+            else if(code == 0x4E)
+                code = 0x2115;
+            else if(code == 0x50)
+                code = 0x2119;
+            else if(code == 0x51)
+                code = 0x211A;
+            else if(code == 0x52)
+                code = 0x211D;
+            else if(code == 0x5A)
+                code = 0x2124;
+            else if(bCapitale)
+                code  = code + 0x1D4F7;
             else if(bSmall)
-                code  = code + 0x1D4F2;
+                code  = code + 0x1D4F1;
         }
         else if(Type == TXT_MONOSPACE)
         {
             if(bCapitale)
-                code  = code + 0x1D630;
+                code  = code + 0x1D62F;
             else if(bSmall)
-                code  = code + 0x1D62A;
+                code  = code + 0x1D629;
         }
         else if(Type == TXT_FRAKTUR)
         {
@@ -165,13 +178,14 @@ CMathText.prototype =
         else if(Type == TXT_SANS_SERIF)
         {
             if(bCapitale)
-                code  = code + 0x1D5CB;
+                code  = code + 0x1D5C7;
             else if(bSmall)
-                code  = code + 0x1D5C5;
+                code  = code + 0x1D5C1;
         }
         else if(Type == TXT_SCRIPT)
         {
             if(bCapitale)
+                //code = code + 0x1D504;
                 code  = code + 0x1D45C;
             else if(bSmall)
                 code  = code + 0x1D456;
