@@ -1,9 +1,14 @@
 ﻿"use strict";
 
+var historyitem_ChartFormatSetChart = 1;
 var historyitem_ColorMod_SetName = 2001;
 var historyitem_ColorMod_SetVal = 2002;
 var historyitem_ColorModifiers_AddColorMod = 2003;
+var historyitem_ColorModifiers_RemoveColorMod = 2004;
 var historyitem_SysColor_SetId = 2004;
+var historyitem_SysColor_SetR = 2005;
+var historyitem_SysColor_SetG = 2006;
+var historyitem_SysColor_SetB = 2007;
 var historyitem_PrstColor_SetId = 2005;
 var historyitem_RGBColor_SetColor = 2006;
 var historyitem_SchemeColor_SetId = 2007;
@@ -479,8 +484,11 @@ var historyitem_SpPr_SetParent        = 2462;
 var historyitem_ClrScheme_AddClr      = 2462;
 var historyitem_ClrScheme_SetName     = 2463;
 var historyitem_ClrMap_SetClr         = 2464;
+
 var historyitem_ExtraClrScheme_SetClrScheme  = 2465;
 var historyitem_ExtraClrScheme_SetClrMap     = 2466;
+
+var historyitem_FontCollection_SetFontScheme = 2467;
 var historyitem_FontCollection_SetLatin      = 2467;
 var historyitem_FontCollection_SetEA         = 2468;
 var historyitem_FontCollection_SetCS         = 2469;
@@ -533,6 +541,8 @@ var historyitem_PageSetupSetPaperSize         = 2515;
 var historyitem_PageSetupSetPaperWidth        = 2516;
 var historyitem_PageSetupSetUseFirstPageNumb  = 2517;
 var historyitem_PageSetupSetVerticalDpi       = 2518;
+
+var historyitem_ShapeSetBDeleted              = 2518;
 var historyitem_ShapeSetNvSpPr                = 2519;
 var historyitem_ShapeSetSpPr                  = 2520;
 var historyitem_ShapeSetStyle                 = 2521;
@@ -1190,7 +1200,6 @@ var historyitem_SetCahrtLayout = 1000;
 var historyitem_SetShape = 0;
 var historyitem_SetDocContent = 1;
 var historyitem_SetLstStyle = 2;
-
 
 
 

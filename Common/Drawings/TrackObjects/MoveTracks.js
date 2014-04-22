@@ -1,13 +1,4 @@
 "use strict";
-
-/**
- * Created with JetBrains WebStorm.
- * User: Sergey.Luzyanin
- * Date: 6/28/13
- * Time: 4:14 PM
- * To change this template use File | Settings | File Templates.
- */
-
 function MoveShapeImageTrack(originalObject)
 {
     this.originalObject = originalObject;
@@ -102,6 +93,11 @@ function MoveShapeImageTrack(originalObject)
                 this.originalObject.selectStartPage = this.pageIndex;
         }
         var scale_coefficients, ch_off_x, ch_off_y;
+        if(!this.originalObject.spPr.xfrm)
+        {
+            this.originalObject.spPr.setXfrm(new CXfrm());
+            this.originalObject.spPr.xfrm.setParent(this.originalObject.spPr);
+        }
         if(this.originalObject.group)
         {
             scale_coefficients = this.originalObject.group.getResultScaleCoefficients();
@@ -196,6 +192,11 @@ function MoveShapeImageTrackInGroup(originalObject)
         var scale_scale_coefficients = this.originalObject.group.getResultScaleCoefficients();
         var xfrm = this.originalObject.group.spPr.xfrm;
 
+        if(!this.originalObject.spPr.xfrm)
+        {
+            this.originalObject.spPr.setXfrm(new CXfrm());
+            this.originalObject.spPr.xfrm.setParent(this.originalObject.spPr);
+        }
         var shape_xfrm = this.originalObject.spPr.xfrm;
         shape_xfrm.setOffX(this.x/scale_scale_coefficients.cx + xfrm.chOffX);
         shape_xfrm.setOffY(this.y/scale_scale_coefficients.cy + xfrm.chOffY);
@@ -284,6 +285,11 @@ function MoveGroupTrack(originalObject)
         {
             this.x = 0;
             this.y = 0;
+        }
+        if(!this.originalObject.spPr.xfrm)
+        {
+            this.originalObject.spPr.setXfrm(new CXfrm());
+            this.originalObject.spPr.xfrm.setParent(this.originalObject.spPr);
         }
         var xfrm = this.originalObject.spPr.xfrm;
         xfrm.setOffX(this.x);

@@ -445,8 +445,8 @@ CShapeDrawer.prototype =
 {
     Clear : function()
     {
-        this.Shape = null;
-        this.Graphics = null;
+        //this.Shape = null;
+        //this.Graphics = null;
         this.UniFill = null;
         this.Ln = null;
         this.Transform = null;
@@ -1208,6 +1208,8 @@ CShapeDrawer.prototype =
 
     drawFillStroke : function(bIsFill, fill_mode, bIsStroke)
     {
+        if(this.Graphics.IsSlideBoundsCheckerType)
+            return;
         if (this.Graphics.RENDERER_PDF_FLAG === undefined)
         {
             if (bIsFill)

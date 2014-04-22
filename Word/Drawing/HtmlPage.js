@@ -1008,10 +1008,6 @@ function CEditorPage(api)
         oWordControl.m_bIsUpdateTargetNoAttack = true;
         oWordControl.m_bIsRePaintOnScroll = true;
 
-        if (oWordControl.m_oLogicDocument)
-        {
-            oWordControl.m_oLogicDocument.DrawingObjects.redrawCharts();
-        }
 
         oWordControl.OnScroll();
     }

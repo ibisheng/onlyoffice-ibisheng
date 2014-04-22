@@ -21,6 +21,7 @@ function CImageShape()
     this.cursorTypes = [];
     this.brush  = null;
     this.pen = null;
+    this.bDeleted = true;
 
     this.selected = false;
 
@@ -54,6 +55,12 @@ CImageShape.prototype =
     Read_FromBinary2: function(r)
     {
         this.Id = r.GetString2();
+    },
+
+    setBDeleted: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ShapeSetBDeleted, oldPr: this.bDeleted, newPr: pr});
+        this.bDeleted = pr;
     },
 
 
@@ -805,6 +812,7 @@ CImageShape.prototype =
     },
 
     select: CShape.prototype.select,
+    recalculateLocalTransform: CShape.prototype.recalculateLocalTransform,
 
     deselect: function(drawingObjectsController)
     {
@@ -874,15 +882,8 @@ CImageShape.prototype =
 
     setNvSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_SetSetNvSpPr, oldPr: this.nvPicPr, newPr: pr});
+        History.Add(this, {Type: historyitem_ImageShapeSetNvPicPr, oldPr: this.nvPicPr, newPr: pr});
         this.nvPicPr = pr;
-        if(this.parent && pr && pr.cNvPr && isRealNumber(pr.cNvPr.id))
-        {
-            if(pr.cNvPr.id > this.parent.maxId)
-            {
-                this.parent.maxId = pr.cNvPr.id+1;
-            }
-        }
     },
 
 
@@ -904,6 +905,11 @@ CImageShape.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_ShapeSetBDeleted:
+            {
+                this.bDeleted = data.oldPr;
+                break;
+            }
             case historyitem_ImageShapeSetNvPicPr:
             {
                 this.nvPicPr = data.oldPr;
@@ -938,6 +944,11 @@ CImageShape.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_ShapeSetBDeleted:
+            {
+                this.bDeleted = data.newPr;
+                break;
+            }
             case historyitem_ImageShapeSetNvPicPr:
             {
                 this.nvPicPr = data.newPr;
@@ -980,14 +991,25 @@ CImageShape.prototype =
                 writeObject(w, data.newPr);
                 break;
             }
+            case historyitem_ShapeSetBDeleted:
+            {
+                writeBool(w, data.oldPr);
+                break;
+            }
         }
     },
 
     Load_Changes: function(r)
     {
         var type = r.GetLong();
-        switch(data.Type)
+        switch(type)
         {
+
+            case historyitem_ShapeSetBDeleted:
+            {
+                this.bDeleted = readBool(r);
+                break;
+            }
             case historyitem_ImageShapeSetNvPicPr:
             {
                 this.nvPicPr = readObject(r);

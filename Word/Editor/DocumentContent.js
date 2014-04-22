@@ -7,7 +7,7 @@
 
 // Класс CDocumentContent. Данный класс используется для работы с контентом ячеек таблицы,
 // колонтитулов, сносок, надписей.
-function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, TurnOffInnerWrap)
+function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, TurnOffInnerWrap, bPresentation)
 {
     this.Id = g_oIdCounter.Get_NewId();
 
@@ -35,7 +35,7 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
     this.Split = Split; // Разделяем ли на страницы
 
     this.Content = new Array();
-    this.Content[0] = new Paragraph( DrawingDocument, this, 0, X, Y, XLimit, YLimit );
+    this.Content[0] = new Paragraph( DrawingDocument, this, 0, X, Y, XLimit, YLimit, bPresentation );
     this.Content[0].Set_DocumentNext( null );
     this.Content[0].Set_DocumentPrev( null );
 
@@ -129,9 +129,22 @@ CDocumentContent.prototype =
 
     // Данную функцию используют внутренние классы, для определения следующей позиции.
     // Данный класс запрашивает следующую позицию у своего родителя.
+
+
+
     Get_PageContentStartPos : function (PageNum)
     {
         return this.Parent.Get_PageContentStartPos(PageNum);
+    },
+
+    Get_Theme : function()
+    {
+        return this.Parent.Get_Theme();
+    },
+
+    Get_ColorMap: function()
+    {
+        return this.Parent.Get_ColorMap();
     },
 
     Get_PageLimits : function(PageIndex)
@@ -244,7 +257,7 @@ CDocumentContent.prototype =
     // что у них врапится текст не колонтитула, а документа.
     CheckRange : function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum_rel, Inner)
     {
-		if(typeof(editor) !== "undefined" && editor.isDocumentEditor)
+		if(this.LogicDocument && typeof(editor) !== "undefined" && editor.isDocumentEditor)
 		{
 			if ( undefined === Inner )
 				Inner = true;
@@ -258,7 +271,7 @@ CDocumentContent.prototype =
 
     Is_PointInDrawingObjects : function(X, Y, Page_Abs)
     {
-        return this.LogicDocument.DrawingObjects.pointInObjInDocContent( this, X, Y, Page_Abs );
+        return this.LogicDocument && this.LogicDocument.DrawingObjects.pointInObjInDocContent( this, X, Y, Page_Abs );
     },
 
     Get_Numbering : function()
@@ -312,7 +325,7 @@ CDocumentContent.prototype =
 
     Get_Styles : function(lvl)
     {
-		if(typeof(editor) !== "undefined" && editor.isDocumentEditor)
+		if(this.Content[0] && this.Content[0].bFromDocument)
 			return this.Styles;
 		else
 			return this.Parent.Get_Styles(lvl);
@@ -321,6 +334,12 @@ CDocumentContent.prototype =
     Get_TableStyleForPara : function()
     {
         return this.Parent.Get_TableStyleForPara();
+    },
+
+
+    Get_ShapeStyleForPara: function()
+    {
+        return this.Parent.Get_ShapeStyleForPara();
     },
 
     Get_TextBackGroundColor : function()
@@ -1726,14 +1745,26 @@ CDocumentContent.prototype =
                 var Drawing;
                 if(!isRealObject(Chart))
                 {
-                    var Drawing = new ParaDrawing( W, H, null, this.DrawingDocument, this );
-                    var Image = new WordImage( Drawing, this, this.DrawingDocument, null );
+                    Drawing = new ParaDrawing( W, H, null, this.DrawingDocument, this, null);
+                    var Image = this.DrawingObjects.createImage(Img, 0, 0, W, H);
+                    Image.setParent(Drawing);
                     Drawing.Set_GraphicObject(Image);
-                    Image.init( Img, W, H, Chart );
                 }
                 else
                 {
-                    Drawing = Chart;
+                    Drawing = new ParaDrawing( W, H, null, this.DrawingDocument, this, null);
+                    var Image = this.DrawingObjects.getChartSpace(Chart,null);
+                    Image.setParent(Drawing);
+                    Image.setStyle(2);
+                    Image.setSpPr(new CSpPr());
+                    Image.spPr.setParent(Image);
+                    Image.spPr.setXfrm(new CXfrm());
+                    Image.spPr.xfrm.setParent(Image.spPr);
+                    Image.spPr.xfrm.setOffX(0);
+                    Image.spPr.xfrm.setOffY(0);
+                    Image.spPr.xfrm.setExtX(152);
+                    Image.spPr.xfrm.setExtY(89);
+                    Drawing.Set_GraphicObject(Image);
                 }
                 if ( true === bFlow )
                 {

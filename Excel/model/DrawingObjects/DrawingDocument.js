@@ -190,9 +190,15 @@ function CTextMeasurer()
         }
     }
 
-    this.SetTextPr = function(textPr)
+    this.SetTextPr = function(textPr, theme)
     {
         this.m_oTextPr = textPr.Copy();
+        this.theme = theme;
+        var FontScheme = theme.themeElements.fontScheme;
+        this.m_oTextPr.RFonts.Ascii    = {Name: FontScheme.checkFont(this.m_oTextPr.RFonts.Ascii.Name), Index: -1};
+        this.m_oTextPr.RFonts.EastAsia = {Name: FontScheme.checkFont(this.m_oTextPr.RFonts.EastAsia.Name), Index: -1};
+        this.m_oTextPr.RFonts.HAnsi    = {Name: FontScheme.checkFont(this.m_oTextPr.RFonts.HAnsi.Name), Index: -1};
+        this.m_oTextPr.RFonts.CS       = {Name: FontScheme.checkFont(this.m_oTextPr.RFonts.CS.Name), Index: -1};
     }
 
     this.SetFontSlot = function(slot, fontSizeKoef)

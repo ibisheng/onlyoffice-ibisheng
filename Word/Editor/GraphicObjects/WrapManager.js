@@ -4,13 +4,14 @@ var WRAP_TEXT_SIDE_LEFT = 0x02;
 var WRAP_TEXT_SIDE_RIGHT = 0x03;
 
 var APPROXIMATE_ANGLE = 0.3;
-
-
 function CWrapPolygon(wordGraphicObject)
 {
-    this.wordGraphicObject = wordGraphicObject;
+    this.calculatedPoints = [];
     this.arrPoints = [];
     this.relativeArrPoints = [];
+
+    this.edited = false;
+
     this.wrapSide = WRAP_TEXT_SIDE_BOTH_SIDES;
 
     this.distL = 2.54;
@@ -18,15 +19,24 @@ function CWrapPolygon(wordGraphicObject)
     this.distT = 2.54;
     this.distB = 2.54;
 
+    this.posX = null;
+    this.posY = null;
+
     this.left = null;
     this.top = null;
     this.right = null;
     this.bottom = null;
 
+    this.localLeft = null;
+    this.localTop = null;
+    this.localRight = null;
+    this.localBottom = null;
+
+    this.wordGraphicObject = wordGraphicObject;
+
     this.rightField = X_Right_Field;
     this.leftField = X_Left_Field;
     this.rect_flag = false;
-    this.edited = false;
     g_oTableId.Add( this, g_oIdCounter.Get_NewId());
 }
 
@@ -35,6 +45,23 @@ CWrapPolygon.prototype =
     Get_Id: function()
     {
         return this.Id;
+    },
+
+    getObjectType: function()
+    {
+        return historyitem_type_WrapPolygon;
+    },
+
+    setEdited: function(pr)
+    {
+        History.Add(this, {Type: historyitem_WrapPolygonSetEdited, oldPr: this.edited, newPr: pr});
+        this.edited = pr;
+    },
+
+    setArrRelPoints: function(pr)
+    {
+        History.Add(this, {Type:historyitem_WrapPolygonSetRelPoints, oldPr: this.relativeArrPoints, newPr: pr});
+        this.relativeArrPoints = pr;
     },
 
     writeToBinaryForCopyPaste: function(w)
@@ -65,26 +92,16 @@ CWrapPolygon.prototype =
     Write_ToBinary2: function(writer)
     {
         writer.WriteLong(historyitem_type_WrapPolygon);
-        writer.WriteString2(this.wordGraphicObject.Get_Id());
         writer.WriteString2(this.Get_Id());
     },
 
     Read_FromBinary2: function(reader)
     {
-        var link_data = {};
-        link_data.wordGraphicObject = reader.GetString2();
         this.Id = reader.GetString2();
-        CollaborativeEditing.Add_NewObject( this );
-        CollaborativeEditing.Add_LinkData(this, link_data);
     },
 
     Load_LinkData: function(data)
     {
-        this.wordGraphicObject = g_oTableId.Get_ById(data.wordGraphicObject);
-        if(this.wordGraphicObject != null)
-        {
-            this.wordGraphicObject.wrappingPolygon = this;
-        }
     },
 
 
@@ -95,11 +112,11 @@ CWrapPolygon.prototype =
 
         var cur_max_x;
         var cur_min_x;
-        var point_count = this.arrPoints.length;
+        var point_count = this.calculatedPoints.length;
         for(var point_index = 1; point_index < point_count; ++point_index)
         {
-            var point0 = this.arrPoints[point_index-1];
-            var point1 = this.arrPoints[point_index];
+            var point0 = this.calculatedPoints[point_index-1];
+            var point1 = this.calculatedPoints[point_index];
             if(!(point0.y > y && point1.y > y || point0.y < y && point1.y < y ))
             {
                 if(point0.y === point1.y)
@@ -134,8 +151,8 @@ CWrapPolygon.prototype =
                 }
             }
         }
-        point0 = this.arrPoints[point_count-1];
-        point1 = this.arrPoints[0];
+        point0 = this.calculatedPoints[point_count-1];
+        point1 = this.calculatedPoints[0];
         if(!(point0.y > y && point1.y > y || point0.y < y && point1.y < y ))
         {
             if(point0.y === point1.y)
@@ -264,7 +281,7 @@ CWrapPolygon.prototype =
                 }
 
 
-                var arr_points = this.arrPoints;
+                var arr_points = this.calculatedPoints;
                 var point_count = arr_points.length;
                 var between_flag = false;
                 for(var point_index = 0; point_index < point_count; ++point_index)
@@ -363,11 +380,11 @@ CWrapPolygon.prototype =
                 && Math.abs(this.arrPoints[1].x - this.arrPoints[2].x) < 0.01
                 && Math.abs(this.arrPoints[2].y - this.arrPoints[3].y) < 0.01
                 && Math.abs(this.arrPoints[3].x - this.arrPoints[0].x) < 0.01
-            || Math.abs(this.arrPoints[0].x - this.arrPoints[1].x) < 0.01
+                || Math.abs(this.arrPoints[0].x - this.arrPoints[1].x) < 0.01
                 && Math.abs(this.arrPoints[1].y - this.arrPoints[2].y) < 0.01
                 && Math.abs(this.arrPoints[2].x - this.arrPoints[3].x) < 0.01
                 && Math.abs(this.arrPoints[3].y - this.arrPoints[0].y) < 0.01
-            )
+                )
             {
                 return true;
             }
@@ -376,10 +393,10 @@ CWrapPolygon.prototype =
     },
 
 
-    calculate: function()
+    calculate: function(drawing)
     {
-        var arrPolygons = this.wordGraphicObject.getArrayWrapPolygons();
-        var transform = this.wordGraphicObject.getTransformMatrix();
+        var arrPolygons = drawing.getArrayWrapPolygons();
+        var transform = drawing.localTransform;
         var arrEdges = [];
         var arrPoints = [];
 
@@ -440,7 +457,6 @@ CWrapPolygon.prototype =
                         break;
                 }
             }
-
         }
         var left_path_arr = [];
         var right_path_arr = [];
@@ -472,19 +488,19 @@ CWrapPolygon.prototype =
                 var inter = cur_edge.getIntersectionPointX(cur_y);
                 if (inter != null)
                 {
-                    if (inter.count == 1)
+                    if (inter.length == 1)
                     {
-                        if(inter.x1 < cur_x_min)
-                            cur_x_min = inter.x1;
-                        if(inter.x1 > cur_x_max)
-                            cur_x_max = inter.x1;
+                        if(inter[0] < cur_x_min)
+                            cur_x_min = inter[0];
+                        if(inter[0] > cur_x_max)
+                            cur_x_max = inter[0];
                     }
                     else
                     {
-                        if(inter.x1 < cur_x_min)
-                            cur_x_min = inter.x1;
-                        if(inter.x2 > cur_x_max)
-                            cur_x_max = inter.x2;
+                        if(inter[0] < cur_x_min)
+                            cur_x_min = inter[0];
+                        if(inter[1] > cur_x_max)
+                            cur_x_max = inter[1];
                     }
                 }
             }
@@ -573,31 +589,33 @@ CWrapPolygon.prototype =
             this.arrPoints.push(left_path_arr[point_index]);
         }
 
-        var bounds = this.wordGraphicObject.getBounds();
+
+
+        var bounds = drawing.parent.getBounds();
         if(bounds.l < x_min)
-            this.left = bounds.l - this.wordGraphicObject.Distance.L;
+            this.localLeft = bounds.l - drawing.parent.Distance.L;
         else
-            this.left  = x_min - this.wordGraphicObject.Distance.L;
+            this.localLeft  = x_min - drawing.parent.Distance.L;
 
         if(bounds.r > x_max)
-            this.right = bounds.r + this.wordGraphicObject.Distance.R;
+            this.localRight = bounds.r + drawing.parent.Distance.R;
         else
-            this.right = x_max + this.wordGraphicObject.Distance.R;
+            this.localRight = x_max + drawing.parent.Distance.R;
 
         if(!isRealObject(left_path_arr[0]) || !(typeof left_path_arr[0].y === "number"))
-            this.top = bounds.t - this.wordGraphicObject.Distance.T;
+            this.localTop = bounds.t - drawing.parent.Distance.T;
         else
-            this.top = left_path_arr[0].y - this.wordGraphicObject.Distance.T;
+            this.localTop = left_path_arr[0].y - drawing.parent.Distance.T;
 
         if(!isRealObject(left_path_arr[left_path_arr.length - 1]) || !(typeof left_path_arr[left_path_arr.length - 1].y === "number"))
-            this.bottom = bounds.b + this.wordGraphicObject.Distance.B;
+            this.localBottom = bounds.b + drawing.parent.Distance.B;
         else
-            this.bottom = left_path_arr[left_path_arr.length - 1].y + this.wordGraphicObject.Distance.B;
-        this.calculateAbsToRel(this.wordGraphicObject.getTransformMatrix());
+            this.localBottom = left_path_arr[left_path_arr.length - 1].y + drawing.parent.Distance.B;
+        this.calculateAbsToRel(drawing.localTransform, drawing);
         this.rect_flag = this.isRect();
     },
 
-    calculateRelToAbs: function(transform)
+    calculateRelToAbs: function(transform, drawing)
     {
         if(this.relativeArrPoints.length === 0)
         {
@@ -610,8 +628,8 @@ CWrapPolygon.prototype =
         for(var point_index = 0; point_index < relArr.length; ++point_index)
         {
             var rel_point = relArr[point_index];
-            var tr_x = transform.TransformPointX(rel_point.x, rel_point.y);
-            var tr_y = transform.TransformPointY(rel_point.x, rel_point.y);
+            var tr_x = (transform.TransformPointX(rel_point.x*drawing.extX/21600, rel_point.y*drawing.extY/21600));
+            var tr_y = (transform.TransformPointY(rel_point.x*drawing.extX/21600, rel_point.y*drawing.extY/21600));
             absArr[point_index] = {x: tr_x, y:tr_y};
         }
 
@@ -623,7 +641,7 @@ CWrapPolygon.prototype =
 
         for(point_index = 0; point_index < absArr.length; ++point_index)
         {
-           var absPoint = absArr[point_index];
+            var absPoint = absArr[point_index];
             if(min_x > absPoint.x)
                 min_x = absPoint.x;
             if(max_x < absPoint.x)
@@ -635,30 +653,35 @@ CWrapPolygon.prototype =
                 max_y = absPoint.y;
         }
 
-        var bounds = this.wordGraphicObject.getBounds();
+        var bounds = {};
+
+        bounds.l = drawing.bounds.l;
+        bounds.t = drawing.bounds.t;
+        bounds.r = drawing.bounds.r;
+        bounds.b = drawing.bounds.b;
         if(bounds.l < min_x)
-            this.left = bounds.l - this.wordGraphicObject.Distance.L;
+            this.localLeft = bounds.l - drawing.parent.Distance.L;
         else
-            this.left  = min_x - this.wordGraphicObject.Distance.L;
+            this.localLeft  = min_x - drawing.parent.Distance.L;
 
         if(bounds.r > max_x)
-            this.right = bounds.r + this.wordGraphicObject.Distance.R;
+            this.localRight = bounds.r + drawing.parent.Distance.R;
         else
-            this.right = max_x + this.wordGraphicObject.Distance.R;
+            this.localRight = max_x + drawing.parent.Distance.R;
 
         if(bounds.t < min_y)
-            this.top = bounds.t - this.wordGraphicObject.Distance.T;
+            this.localTop = bounds.t - drawing.parent.Distance.T;
         else
-            this.top = min_y - this.wordGraphicObject.Distance.T;
+            this.localTop = min_y - drawing.parent.Distance.T;
 
         if(bounds.b > max_y)
-            this.bottom = bounds.b + this.wordGraphicObject.Distance.B;
+            this.localBottom = bounds.b + drawing.parent.Distance.B;
         else
-            this.bottom = max_y + this.wordGraphicObject.Distance.B;
+            this.localBottom = max_y + drawing.parent.Distance.B;
         this.rect_flag = this.isRect();
     },
 
-    calculateAbsToRel: function(transform)
+    calculateAbsToRel: function(transform, drawing)
     {
         if(this.arrPoints.length === 0)
         {
@@ -673,8 +696,8 @@ CWrapPolygon.prototype =
         for(var point_index = 0; point_index < absArr.length; ++point_index)
         {
             var abs_point = absArr[point_index];
-            var tr_x = invert_transform.TransformPointX(abs_point.x, abs_point.y);
-            var tr_y = invert_transform.TransformPointY(abs_point.x, abs_point.y);
+            var tr_x = invert_transform.TransformPointX(abs_point.x, abs_point.y)*(21600/drawing.extX)>>0;
+            var tr_y = invert_transform.TransformPointY(abs_point.x, abs_point.y)*(21600/drawing.extY)>>0;
             relArr[point_index] = {x: tr_x, y:tr_y};
         }
 
@@ -699,28 +722,48 @@ CWrapPolygon.prototype =
         }
 
 
-        var bounds = this.wordGraphicObject.getBounds();
+        var bounds = drawing.parent.getBounds();
         if(bounds.l < min_x)
-            this.left = bounds.l - this.wordGraphicObject.Distance.L;
+            this.left = bounds.l - drawing.parent.Distance.L;
         else
-            this.left  = min_x - this.wordGraphicObject.Distance.L;
+            this.left  = min_x - drawing.parent.Distance.L;
 
         if(bounds.r > max_x)
-            this.right = bounds.r + this.wordGraphicObject.Distance.R;
+            this.right = bounds.r + drawing.parent.Distance.R;
         else
-            this.right = max_x + this.wordGraphicObject.Distance.R;
+            this.right = max_x + drawing.parent.Distance.R;
 
         if(bounds.t < min_y)
-            this.top = bounds.t - this.wordGraphicObject.Distance.T;
+            this.top = bounds.t - drawing.parent.Distance.T;
         else
-            this.top = min_y - this.wordGraphicObject.Distance.T;
+            this.top = min_y - drawing.parent.Distance.T;
 
         if(bounds.b > max_y)
-            this.bottom = bounds.b + this.wordGraphicObject.Distance.B;
+            this.bottom = bounds.b + drawing.parent.Distance.B;
         else
-            this.bottom = max_y + this.wordGraphicObject.Distance.B;
+            this.bottom = max_y + drawing.parent.Distance.B;
 
         this.rect_flag = this.isRect();
+    },
+
+    updatePosition: function(x, y)
+    {
+        this.posX = x;
+        this.posY = y;
+        this.calculatedPoints.length = 0;
+        var p, local_point;
+        for(var i = 0;  i < this.arrPoints.length; ++i)
+        {
+            local_point = this.arrPoints[i];
+            p = new CPolygonPoint();
+            p.x = (local_point.x + x);
+            p.y = (local_point.y + y);
+            this.calculatedPoints.push(p);
+        }
+        this.left   = this.localLeft + x;
+        this.top    = this.localTop + y;
+        this.right  = this.localRight + x;
+        this.bottom = this.localBottom + y;
     },
 
     updateSizes: function(kw, kh)
@@ -744,53 +787,16 @@ CWrapPolygon.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_ChangePolygon:
+            case historyitem_WrapPolygonSetEdited:
             {
-                this.edited = data.oldEdited;
-                this.relativeArrPoints.length = 0;
-                for(var i = 0; i < data.oldRelArr.length; ++i)
-                {
-                    this.relativeArrPoints[i] = {x: data.oldRelArr[i].x, y: data.oldRelArr[i].y}
-                }
-                this.calculateRelToAbs(this.wordGraphicObject.getTransformMatrix());
+                this.edited = data.oldPr;
                 break;
             }
-
-            case historyitem_RemovePoint:
+            case historyitem_WrapPolygonSetRelPoints:
             {
-                this.edited = data.oldValueEdited;
-                this.relativeArrPoints.splice(data.pointNum, 0, {x: data.pointRelX, y: data.pointRelY});
-                this.calculateRelToAbs(this.wordGraphicObject.getTransformMatrix());
+                this.relativeArrPoints = data.oldPr;
                 break;
             }
-            case historyitem_AddNewPoint:
-            {
-                this.edited = data.oldEdited;
-                this.relativeArrPoints.splice(data.num, 1);
-                this.calculateRelToAbs(this.wordGraphicObject.getTransformMatrix());
-                break;
-            }
-            case historyitem_MovePoint:
-            {
-                this.edited = data.oldEdited;
-                this.arrPoints[data.pointIndex] = {x: data.oldX, y: data.oldY};
-                this.calculateAbsToRel(this.wordGraphicObject.getTransformMatrix());
-                break;
-            }
-            case historyitem_UpdateWrapSizes:
-            {
-                var kw = 1/data.kw;
-                var kh = 1/data.kh;
-                for(var i = 0; i < this.relativeArrPoints.length; ++i)
-                {
-                    var p = this.relativeArrPoints[i];
-                    p.x *= kw;
-                    p.y *= kh;
-                }
-                this.calculateRelToAbs(this.wordGraphicObject.getTransformMatrix());
-                break;
-            }
-
         }
     },
 
@@ -798,52 +804,16 @@ CWrapPolygon.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_ChangePolygon:
+            case historyitem_WrapPolygonSetEdited:
             {
-                this.edited = true;
-                this.relativeArrPoints.length = 0;
-                for(var i = 0; i < data.oldRelArr.length; ++i)
-                {
-                    this.relativeArrPoints[i] = {x: data.newRelArr[i].x, y: data.newRelArr[i].y}
-                }
-                this.calculateRelToAbs(this.wordGraphicObject.getTransformMatrix());
+                this.edited = data.newPr;
                 break;
             }
-            case historyitem_RemovePoint:
+            case historyitem_WrapPolygonSetRelPoints:
             {
-                this.edited = true;
-                this.arrPoints.splice(data.pointNum, 1);
-                this.calculateAbsToRel(this.wordGraphicObject.getTransformMatrix());
+                this.relativeArrPoints = data.newPr;
                 break;
             }
-            case historyitem_AddNewPoint:
-            {
-                this.edited = true;
-                this.relativeArrPoints.splice(data.num, 0, {x: data.pointX, y: data.pointY});
-                this.calculateRelToAbs(this.wordGraphicObject.getTransformMatrix());
-                break;
-            }
-            case historyitem_MovePoint:
-            {
-                this.edited = true;
-                this.arrPoints[data.pointIndex] = {x: data.newX, y: data.newY};
-                  this.calculateAbsToRel(this.wordGraphicObject.getTransformMatrix());
-                break;
-            }
-            case historyitem_UpdateWrapSizes:
-            {
-                var kw = data.kw;
-                var kh = data.kh;
-                for(var i = 0; i < this.relativeArrPoints.length; ++i)
-                {
-                    var p = this.relativeArrPoints[i];
-                    p.x *= kw;
-                    p.y *= kh;
-                }
-                this.calculateRelToAbs(this.wordGraphicObject.getTransformMatrix());
-                break;
-            }
-
         }
     },
 
@@ -853,43 +823,21 @@ CWrapPolygon.prototype =
         writer.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_ChangePolygon:
+            case historyitem_WrapPolygonSetEdited:
             {
-                writer.WriteLong(data.newRelArr.length);
-                for(var i = 0; i < data.newRelArr.length; ++i)
+                writeBool(writer, data.newPr);
+                break;
+            }
+            case historyitem_WrapPolygonSetRelPoints:
+            {
+                writer.WriteLong(data.newPr.length);
+                for(var i = 0; i < data.newPr.length; ++i)
                 {
-                    writer.WriteDouble(data.newRelArr[i].x);
-                    writer.WriteDouble(data.newRelArr[i].y);
+                    writer.WriteLong(data.newPr[i].x >> 0);
+                    writer.WriteLong(data.newPr[i].y >> 0);
                 }
                 break;
             }
-            case historyitem_RemovePoint:
-            {
-                writer.WriteLong(data.pointNum);
-                break;
-            }
-            case historyitem_AddNewPoint:
-            {
-                writer.WriteLong(data.num);
-                writer.WriteDouble(data.pointX);
-                writer.WriteDouble(data.pointY);
-                break;
-            }
-            case historyitem_MovePoint:
-            {
-                writer.WriteLong(data.pointIndex);
-                writer.WriteDouble(data.newX);
-                writer.WriteDouble(data.newY);
-                break;
-            }
-
-            case historyitem_UpdateWrapSizes:
-            {
-                writer.WriteDouble(data.kw);
-                writer.WriteDouble(data.kh);
-                break;
-            }
-
         }
     },
 
@@ -899,76 +847,39 @@ CWrapPolygon.prototype =
             return;
         switch (reader.GetLong())
         {
-            case historyitem_ChangePolygon:
+            case historyitem_WrapPolygonSetEdited:
             {
-                this.edited = true;
-                var count = reader.GetLong();
-                this.relativeArrPoints.length = 0;
-                for(var i = 0; i < count; ++i)
+                this.edited = readBool(reader);
+                break;
+            }
+            case historyitem_WrapPolygonSetRelPoints:
+            {
+                var l = reader.GetLong();
+                var rel_arr = [], x, y;
+                for(var i = 0; i < l; ++i)
                 {
-                    var x = reader.GetDouble();
-                    var y = reader.GetDouble();
-                    this.relativeArrPoints[i] = {x: x, y: y};
+                    x = reader.GetLong();
+                    y = reader.GetLong();
+                    rel_arr[i] = {x: x, y: y};
                 }
-             //   this.calculateRelToAbs(this.wordGraphicObject.getTransformMatrix());
+                this.relativeArrPoints = rel_arr;
                 break;
             }
-            case historyitem_RemovePoint:
-            {
-                this.edited = true;
-                this.arrPoints.splice(reader.GetLong(), 1);
-              //  this.calculateAbsToRel(this.wordGraphicObject.getTransformMatrix());
-                break;
-            }
-            case historyitem_AddNewPoint:
-            {
-                this.edited = true;
-                var num = reader.GetLong();
-                var x = reader.GetDouble();
-                var y = reader.GetDouble();
-                this.relativeArrPoints.splice(num, 0, {x: x, y: y});
-                this.calculateRelToAbs(this.wordGraphicObject.getTransformMatrix());
-                break;
-            }
-            case historyitem_MovePoint:
-            {
-                this.edited = true;
-                var pointIndex = reader.GetLong();
-                var x = reader.GetDouble();
-                var y = reader.GetDouble();
-                this.arrPoints[pointIndex] = {x: x, y: y};
-                this.calculateAbsToRel(this.wordGraphicObject.getTransformMatrix());
-                break;
-            }
-            case historyitem_UpdateWrapSizes:
-            {
-                var kw = reader.GetDouble();
-                var kh = reader.GetDouble();
-                for(var i = 0; i < this.relativeArrPoints.length; ++i)
-                {
-                    var p = this.relativeArrPoints[i];
-                    p.x *= kw;
-                    p.y *= kh;
-                }
-               //    this.calculateRelToAbs(this.wordGraphicObject.getTransformMatrix());
-                break;
-            }
-
         }
     },
 
 
     Refresh_RecalcData : function(Data)
     {
-        if(isRealObject(this.wordGraphicObject))
-            this.wordGraphicObject.Refresh_RecalcData();
-
+        if(this.wordGraphicObject && this.wordGraphicObject.GraphicObj && this.wordGraphicObject.GraphicObj.recalcWrapPolygon)
+        {
+            this.wordGraphicObject.GraphicObj.recalcWrapPolygon();
+            this.wordGraphicObject.GraphicObj.addToRecalculate()
+        }
     },
 
     Refresh_RecalcData2 : function()
     {
-        if(isRealObject(this.wordGraphicObject))
-            History.RecalcData_Add( { Type : historyrecalctype_Flow, Data :this.wordGraphicObject});
     }
 };
 
@@ -1037,27 +948,10 @@ CWrapManager.prototype =
             {
                 var pageIndex = this.graphicPage.pageIndex;
                 var graphic_objects = this.graphicPage.graphicObjects;
-                var hdr_footer_objects;
-                var bFirst = (0 === pageIndex ? true : false);
-                var bEven  = (pageIndex  % 2 === 1 ? true : false);
-                if(bFirst)
-                {
-                    hdr_footer_objects = graphic_objects.firstPage;
-                }
-                else
-                {
-                    if(bEven)
-                    {
-                        hdr_footer_objects = graphic_objects.evenPage;
-                    }
-                    else
-                    {
-                        hdr_footer_objects = graphic_objects.oddPage;
-                    }
-                }
+                var hdr_footer_objects = this.graphicPage.graphicObjects.getHdrFtrObjectsByPageIndex(pageIndex);
                 if(hdr_footer_objects != null)
                 {
-                    arrGraphicObjects = hdr_footer_objects.wrappingArray;
+                    arrGraphicObjects = hdr_footer_objects.wrappingObjects;
                     for(index = 0; index < arrGraphicObjects.length; ++index)
                     {
                         if(arrGraphicObjects[index].DocumentContent === docContent)
@@ -1065,7 +959,7 @@ CWrapManager.prototype =
                             arrGraphicObjects[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, arr_intervals);
                         }
                     }
-                    arrFlowTables = hdr_footer_objects.floatTables;
+                    arrFlowTables = hdr_footer_objects.flowTables;
                     for(index = 0; index < arrFlowTables.length; ++index)
                     {
                         cur_float_table = arrFlowTables[index];
@@ -1195,3 +1089,66 @@ function CTrackWrapPolygon(originalWrapPolygon, pointNum)
         History.Add(wrap_polygon, data);
     };
 }
+
+function TrackNewPointWrapPolygon(originalObject, point1)
+{
+    this.originalObject = originalObject;
+    this.point1 = point1;
+    this.pageIndex = originalObject.selectStartPage;
+    this.arrPoints = [];
+    for(var  i = 0; i < originalObject.parent.wrappingPolygon.calculatedPoints.length; ++i)
+    {
+        this.arrPoints[i] = {};
+        this.arrPoints[i].x = originalObject.parent.wrappingPolygon.calculatedPoints[i].x;
+        this.arrPoints[i].y = originalObject.parent.wrappingPolygon.calculatedPoints[i].y;
+    }
+    this.arrPoints.splice(point1+1, 0, {x: null, y: null});
+    this.matrix = new CMatrix();
+    this.point2 = originalObject.parent.wrappingPolygon.calculatedPoints[point1 + 1] ? originalObject.parent.wrappingPolygon.calculatedPoints[point1 + 1] : originalObject.parent.wrappingPolygon.calculatedPoints[0];
+}
+
+
+TrackNewPointWrapPolygon.prototype =
+{
+    track: function(x, y)
+    {
+        this.arrPoints[this.point1+1].x = x;
+        this.arrPoints[this.point1+1].y = y;
+    },
+
+    draw: function(overlay)
+    {
+        overlay.SetCurrentPage(this.pageIndex);
+        overlay.DrawEditWrapPointsTrackLines([this.arrPoints[this.point1], this.arrPoints[this.point1+1], this.point2], this.matrix);
+        overlay.ds();
+    }
+};
+
+function TrackPointWrapPointWrapPolygon(originalObject, point)
+{
+    this.originalObject = originalObject;
+    this.point = point;
+    this.pointCoord = {};
+    this.pointCoord.x = originalObject.parent.wrappingPolygon.calculatedPoints[point].x;
+    this.pointCoord.y = originalObject.parent.wrappingPolygon.calculatedPoints[point].y;
+    this.point1 = originalObject.parent.wrappingPolygon.calculatedPoints[point - 1] ? originalObject.parent.wrappingPolygon.calculatedPoints[point - 1] : originalObject.parent.wrappingPolygon.calculatedPoints[originalObject.parent.wrappingPolygon.calculatedPoints.length-1];
+    this.point2 = originalObject.parent.wrappingPolygon.calculatedPoints[point + 1] ? originalObject.parent.wrappingPolygon.calculatedPoints[point + 1] : originalObject.parent.wrappingPolygon.calculatedPoints[0];
+    this.matrix = new CMatrix();
+    this.pageIndex = originalObject.selectStartPage;
+}
+
+TrackPointWrapPointWrapPolygon.prototype =
+{
+    track: function(x, y)
+    {
+        this.pointCoord.x = x;
+        this.pointCoord.y = y;
+    },
+
+    draw: function(overlay)
+    {
+        overlay.SetCurrentPage(this.pageIndex);
+        overlay.DrawEditWrapPointsTrackLines([this.point1, this.pointCoord, this.point2], this.matrix);
+        overlay.ds();
+    }
+};

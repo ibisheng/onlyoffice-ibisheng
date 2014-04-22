@@ -4,6 +4,9 @@ var DRAWING_ARRAY_TYPE_WRAPPING = 0x02;
 var DRAWING_ARRAY_TYPE_BEFORE = 0x03;
 
 
+
+
+
 function CGraphicPage(pageIndex, graphicObjects)
 {
     this.pageIndex = pageIndex;
@@ -33,21 +36,6 @@ function CGraphicPage(pageIndex, graphicObjects)
 
 CGraphicPage.prototype =
 {
-
-    redrawCharts: function()
-    {
-        var arr = [this.inlineObjects, this.behindDocObjects, this.wrappingObjects, this.beforeTextObjects];
-        for(var i = 0; i < arr.length; ++i)
-        {
-            var cur_arr = arr[i];
-            for(var j  = 0; j < cur_arr.length; ++j)
-            {
-                if(typeof  CChartAsGroup != "undefined" && cur_arr[j].GraphicObj instanceof CChartAsGroup)
-                    cur_arr[j].GraphicObj.recalculate();
-            }
-        }
-    },
-
     addFloatTable: function(table)
     {
         this.flowTables.push(table);
@@ -71,63 +59,16 @@ CGraphicPage.prototype =
 
     documentStatistics: function(Statistics)
     {
-        var cur_array = this.inlineObjects;
+        var cur_array = this.inlineObjects.concat(this.behindDocObjects).concat(this.wrappingObjects).concat(this.beforeTextObjects);
         for(var i = 0; i < cur_array.length; ++i)
         {
-            cur_array[i].documentStatistics(Statistics);
+            if(cur_array[i].documentStatistics)
+                cur_array[i].documentStatistics(Statistics);
         }
 
-
-        cur_array = this.behindDocObjects;
-        for(i = 0; i < cur_array.length; ++i)
-        {
-            cur_array[i].documentStatistics(Statistics);
-        }
-
-
-        cur_array = this.wrappingObjects;
-        for(i = 0; i < cur_array.length; ++i)
-        {
-            cur_array[i].documentStatistics(Statistics);
-        }
-
-        cur_array = this.beforeTextObjects;
-        for(i = 0; i < cur_array.length; ++i)
-        {
-            cur_array[i].documentStatistics(Statistics);
-        }
     },
 
 
-    getObjectByXY: function(x, y)
-    {
-        for(var index = this.flowTables.length - 1; index > -1; -index)
-        {
-            var flow_table = this.flowTables[index];
-            if(x >= flow_table.X && x <= flow_table.X + flow_table.W
-                && y >= flow_table.Y && y <= flow_table.Y + flow_table.H)
-                return flow_table;
-        }
-        for(index = this.beforeTextObjects.length; index > -1; --index)
-        {
-            if(this.beforeTextObjects[index].hit(x, y))
-                return this.beforeTextObjects[index];
-        }
-
-
-        for(index = this.wrappingObjects.length; index > -1; --index)
-        {
-            if(this.wrappingObjects[index].hit(x, y))
-                return this.wrappingObjects[index];
-        }
-
-        for(index = this.inlineObjects.length; index > -1; --index)
-        {
-            if(this.inlineObjects[index].hit(x, y))
-                return this.inlineObjects[index];
-        }
-        return null;
-    },
 
     getTableByXY: function(x, y, documentContent)
     {
@@ -261,149 +202,96 @@ CGraphicPage.prototype =
 
     resetDrawingArrays: function(docContent)
     {
-        if(!isRealObject(docContent) || docContent === editor.WordControl.m_oLogicDocument)
+        function findInArrayAndRemove(drawingArray, docContent, document)
         {
-
+            if(!docContent === document)
+            {
+                drawingArray.length = 0;
+                return;
+            }
+            for(var i = drawingArray.length-1; i > -1; --i)
+            {
+                if(!drawingArray[i].parent || drawingArray[i].parent.DocumentContent === docContent)
+                    drawingArray.splice(i, 1);
+            }
         }
+        function findTableInArrayAndRemove(drawingArray, docContent, document)
+        {
+            if(!docContent === document)
+            {
+                drawingArray.length = 0;
+                return;
+            }
+            for(var i = drawingArray.length-1; i >-1; --i)
+            {
+                if(drawingArray[i].Table.Parent === docContent)
+                    drawingArray.splice(i, 1);
+            }
+        }
+
+        function findInArrayAndRemoveFromDrawingPage(drawingPage, docContent, document)
+        {
+            if(!drawingPage)
+                return;
+            if(Array.isArray(drawingPage.inlineObjects))
+            {
+                findInArrayAndRemove(drawingPage.inlineObjects, docContent, document);
+                findInArrayAndRemove(drawingPage.behindDocObjects, docContent, document);
+                findInArrayAndRemove(drawingPage.wrappingObjects, docContent, document);
+                findInArrayAndRemove(drawingPage.beforeTextObjects, docContent, document);
+                findTableInArrayAndRemove(drawingPage.flowTables, docContent, document);
+            }
+            else if(Array.isArray(drawingPage.inlineArray))
+            {
+                findInArrayAndRemove(drawingPage.inlineArray, docContent, document);
+                findInArrayAndRemove(drawingPage.behindDocArray, docContent, document);
+                findInArrayAndRemove(drawingPage.wrappingArray, docContent, document);
+                findInArrayAndRemove(drawingPage.beforeTextArray, docContent, document);
+                findTableInArrayAndRemove(drawingPage.floatTables, docContent, document);
+            }
+        }
+
+        if(!isRealObject(docContent))
+            docContent = this.graphicObjects.document;
+
+
         if(isRealObject(docContent))
         {
-            if(docContent.Is_TopDocument())
+            if(!docContent.Is_HdrFtr())
             {
-                if(!docContent.Is_HdrFtr())
-                {
-                    this.objectsMap = {};
-                    this.inlineObjects.length = 0;
-                    this.behindDocObjects.length = 0;
-                    this.wrappingObjects.length = 0;
-                    this.beforeTextObjects.length = 0;
-                    this.flowTables.length = 0;
-                }
-                else
-                {
-                    var hdr_ftr;
-                    if(this.pageIndex === 0)
-                    {
-                        if(isRealObject(this.graphicObjects.firstPage))
-                        {
-                            hdr_ftr = this.graphicObjects.firstPage;
-                        }
-                    }
-                    else
-                    {
-                        if(this.pageIndex  % 2 === 1)
-                        {
-                            hdr_ftr = this.graphicObjects.evenPage;
-                        }
-                        else
-                        {
-                            hdr_ftr = this.graphicObjects.oddPage;
-                        }
-                    }
-                    if(isRealObject(hdr_ftr))
-                    {
-                        var arr = [hdr_ftr.behindDocArray, hdr_ftr.inlineArray, hdr_ftr.wrappingArray, hdr_ftr.beforeTextArray];
-
-                        if(isRealObject(arr))
-                        {
-                            for(var i = 0;  i < 4; ++i)
-                            {
-                                var a = arr[i];
-                                for(var j = a.length - 1; j > -1 ; --j)
-                                {
-                                    o = a[j];
-                                    if(isRealObject(o) && isRealObject(o.Parent) && isRealObject(o.Parent.Parent) && o.Parent.Parent === docContent)
-                                    {
-                                        a.splice(j, 1);
-                                    }
-                                }
-                            }
-                            a =  hdr_ftr.floatTables;
-                            for(var j = a.length - 1; j > -1 ; --j)
-                            {
-                                o = a[j];
-                                if(isRealObject(o) && isRealObject(o.Table) && isRealObject(o.Table.Parent) && o.Table.Parent === docContent)
-                                {
-                                    a.splice(j, 1);
-                                }
-                            }
-                        }
-                    }
-                }
+                findInArrayAndRemoveFromDrawingPage(this, docContent, this.graphicObjects.document)
             }
             else
             {
-                for(var key in this.objectsMap)
+                var check_hdr_ftr_arrays = [];
+                if(this.pageIndex === 0)
                 {
-                    var o = this.objectsMap[key];
-                    if(isRealObject(o) && isRealObject(o.Parent) && isRealObject(o.Parent.Parent))
-                    {
-                        if(o.Parent.Parent === docContent)
-                            delete this.objectsMap[key];
-                    }
+                    check_hdr_ftr_arrays.push(this.graphicObjects.headerFooter.header.first);
+                    check_hdr_ftr_arrays.push(this.graphicObjects.headerFooter.footer.first);
                 }
-
-
-                if(!docContent.Is_HdrFtr())
-                    arr =  [this.inlineObjects, this.behindDocObjects, this.wrappingObjects, this.beforeTextObjects];
                 else
                 {
-                    var hdr_ftr = null;
-                    if(this.pageIndex === 0)
+                    if(this.pageIndex  % 2 === 1)
                     {
-                        hdr_ftr = this.graphicObjects.firstPage;
+                        check_hdr_ftr_arrays.push(this.graphicObjects.headerFooter.header.even);
+                        check_hdr_ftr_arrays.push(this.graphicObjects.headerFooter.footer.even);
                     }
                     else
                     {
-                        if(this.pageIndex  % 2 === 1)
-                        {
-                            hdr_ftr = this.graphicObjects.evenPage;
-                        }
-                        else
-                        {
-                            hdr_ftr = this.graphicObjects.oddPage;
-                        }
+                        check_hdr_ftr_arrays.push(this.graphicObjects.headerFooter.header.odd);
+                        check_hdr_ftr_arrays.push(this.graphicObjects.headerFooter.footer.odd);
                     }
-                    if(isRealObject(hdr_ftr))
-                    {
-                        arr = [hdr_ftr.behindDocArray, hdr_ftr.inlineArray, hdr_ftr.wrappingArray, hdr_ftr.beforeTextArray];
-                    }
-
                 }
-                if(isRealObject(arr))
+
+                check_hdr_ftr_arrays.push(this.graphicObjects.headerFooter.commonFirst);
+                check_hdr_ftr_arrays.push(this.graphicObjects.headerFooter.commonEven);
+                check_hdr_ftr_arrays.push(this.graphicObjects.headerFooter.commonOdd);
+
+                for(var i = 0; i < check_hdr_ftr_arrays.length; ++i)
                 {
-                    for(var i = 0;  i < 4; ++i)
-                    {
-                        var a = arr[i];
-                        for(var j = a.length - 1; j > -1 ; --j)
-                        {
-                            o = a[j];
-                            if(isRealObject(o) && isRealObject(o.Parent) && isRealObject(o.Parent.Parent) && o.Parent.Parent === docContent)
-                            {
-                                a.splice(j, 1);
-                            }
-                        }
-                    }
-                    a = [];
-                    if(!docContent.Is_HdrFtr())
-                        a = this.flowTables;
-                    else
-                    {
-                        if(isRealObject(hdr_ftr))
-                            a = hdr_ftr.floatTables;
-                    }
-
-                    for(var j = a.length - 1; j > -1 ; --j)
-                    {
-                        o = a[j];
-                        if(isRealObject(o) && isRealObject(o.Table) && isRealObject(o.Table.Parent) && o.Table.Parent === docContent)
-                        {
-                            a.splice(j, 1);
-                        }
-                    }
+                    findInArrayAndRemoveFromDrawingPage(check_hdr_ftr_arrays[i], docContent);
                 }
-
             }
-
         }
     },
 
@@ -450,30 +338,7 @@ CGraphicPage.prototype =
 
     documentSearch: function(String, search_Common)
     {
-        var hdr_ftr;
-        if(this.pageIndex === 0)
-        {
-            hdr_ftr = this.graphicObjects.firstPage;
-        }
-        else
-        {
-            if(this.pageIndex % 2 === 1)
-            {
-                hdr_ftr = this.graphicObjects.evenPage;
-            }
-            else
-            {
-                hdr_ftr = this.graphicObjects.oddPage;
-            }
-        }
         var search_array = [];
-        if(isRealObject(hdr_ftr))
-        {
-            search_array= search_array.concat(hdr_ftr.behindDocArray);
-            search_array= search_array.concat(hdr_ftr.wrappingArray);
-            search_array= search_array.concat(hdr_ftr.inlineArray);
-            search_array= search_array.concat(hdr_ftr.beforeTextArray);
-        }
         search_array= search_array.concat(this.behindDocObjects);
         search_array= search_array.concat(this.wrappingObjects);
         search_array= search_array.concat(this.inlineObjects);
@@ -481,7 +346,8 @@ CGraphicPage.prototype =
 
         for(var i = 0; i < search_array.length; ++i)
         {
-            search_array[i].documentSearch(String, search_Common);
+            if(search_array[i].documentSearch)
+                search_array[i].documentSearch(String, search_Common);
         }
 
     },
@@ -498,22 +364,29 @@ CGraphicPage.prototype =
             case DRAWING_ARRAY_TYPE_BEHIND:
             {
                 this.behindDocObjects.push(graphicObject);
-                this.behindDocObjects.sort(ComparisonByZIndexSimple);
+                this.behindDocObjects.sort(ComparisonByZIndexSimpleParent);
                 break;
             }
             case DRAWING_ARRAY_TYPE_WRAPPING:
             {
                 this.wrappingObjects.push(graphicObject);
-                this.wrappingObjects.sort(ComparisonByZIndexSimple);
+                this.wrappingObjects.sort(ComparisonByZIndexSimpleParent);
                 break;
             }
             case DRAWING_ARRAY_TYPE_BEFORE:
             {
                 this.beforeTextObjects.push(graphicObject);
-                this.beforeTextObjects.sort(ComparisonByZIndexSimple);
+                this.beforeTextObjects.sort(ComparisonByZIndexSimpleParent);
                 break;
             }
         }
+    },
+
+    sortDrawingArrays: function()
+    {
+        this.behindDocObjects.sort(ComparisonByZIndexSimpleParent);
+        this.wrappingObjects.sort(ComparisonByZIndexSimpleParent);
+        this.beforeTextObjects.sort(ComparisonByZIndexSimpleParent);
     },
 
     drawBehindDoc: function(graphics)

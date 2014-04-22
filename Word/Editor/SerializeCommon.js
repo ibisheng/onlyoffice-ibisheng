@@ -96,12 +96,16 @@ function CPPTXContentLoader()
 
         return GrObject;
     }
-	
-    this.ReadGraphicObject = function(stream)
+
+    this.ReadGraphicObject = function(stream, presentation)
     {
         if (this.Reader == null)
             this.Reader = new BinaryPPTYLoader();
 
+        if(presentation)
+        {
+            this.Reader.presentation = presentation;
+        }
         this.LogicDocument = null;
 
         this.Reader.ImageMapChecker = this.ImageMapChecker;
@@ -116,8 +120,8 @@ function CPPTXContentLoader()
 
         this.stream.pos    = stream.pos;
         this.stream.cur    = stream.cur;
-		
-		this.Reader.stream = this.stream;
+
+        this.Reader.stream = this.stream;
 
         var s = this.stream;
         var _main_type = s.GetUChar(); // 0!!!
@@ -127,19 +131,21 @@ function CPPTXContentLoader()
 
         s.Skip2(5); // 1 + 4 byte - len
 
-		var GrObject = this.Reader.ReadGraphicObject();
-        
+        var GrObject = this.Reader.ReadGraphicObject();
+
         s.Seek2(_end_rec);
         stream.pos = s.pos;
         stream.cur = s.cur;
-		return GrObject;
+        return GrObject;
     }
-	
-    this.ReadTextBody = function(reader, stream, shape)
+
+    this.ReadTextBody = function(reader, stream, shape, presentation)
     {
         this.BaseReader = reader;
         if (this.Reader == null)
             this.Reader = new BinaryPPTYLoader();
+        if(!this.Reader.presentation && presentation)
+            this.Reader.presentation = presentation;
 
         this.LogicDocument = null;
 
@@ -202,8 +208,8 @@ function CPPTXContentLoader()
 
         return txBody;
     }
-	
-	this.ReadShapeProperty = function(stream)
+
+    this.ReadShapeProperty = function(stream)
     {
         if (this.Reader == null)
             this.Reader = new BinaryPPTYLoader();
@@ -228,8 +234,8 @@ function CPPTXContentLoader()
         var s = this.stream;
         var _main_type = s.GetUChar(); // 0!!!
 
-		var oNewSpPr = new CSpPr();
-		
+        var oNewSpPr = new CSpPr();
+
         this.Reader.ReadSpPr(oNewSpPr);
 
         stream.pos = s.pos;
@@ -242,8 +248,10 @@ function CPPTXContentLoader()
     {
         var s = this.stream;
 
-        var shape = new WordShape(this.TempMainObject == null ? this.ParaDrawing : null, this.LogicDocument, this.LogicDocument.DrawingDocument, this.TempMainObject);
+        var shape = new CShape();
 
+        shape.setBDeleted(false);
+        shape.setParent(this.TempMainObject == null ? this.ParaDrawing : null);
         var _rec_start = s.cur;
         var _end_rec = _rec_start + s.GetULong() + 4;
 
@@ -282,6 +290,7 @@ function CPPTXContentLoader()
                     var spPr = new CSpPr();
                     this.ReadSpPr(spPr);
                     shape.setSpPr(spPr);
+                    shape.spPr.setParent(shape);
                     break;
                 }
                 case 2:
@@ -298,7 +307,7 @@ function CPPTXContentLoader()
                 {
                     var oThis = this.BaseReader;
 
-                    shape.addDocContent(new CDocumentContent(shape, this.LogicDocument.DrawingDocument, 0, 0, 0, 0, false, false));
+                    shape.setTextBoxContent(new CDocumentContent(shape, this.LogicDocument.DrawingDocument, 0, 0, 0, 0, false, false));
 
                     var _old_cont = shape.textBoxContent.Content[0];
 
@@ -347,7 +356,7 @@ function CPPTXContentLoader()
     {
         var s = this.stream;
 
-        var shape = new WordShape( null, this.LogicDocument, this.LogicDocument.DrawingDocument, this.TempMainObject);
+        var shape = new CShape( );
         shape.setParent(this.TempMainObject == null ? this.ParaDrawing : null);
         var _rec_start = s.cur;
         var _end_rec = _rec_start + s.GetULong() + 4;
@@ -408,7 +417,8 @@ function CPPTXContentLoader()
     {
         var s = this.stream;
 
-        var pic = new WordImage(null, this.LogicDocument, this.LogicDocument.DrawingDocument, this.TempMainObject);
+        var pic = new CImageShape();
+        pic.setBDeleted(false);
         pic.setParent(this.TempMainObject == null ? this.ParaDrawing : null);
 
         var _rec_start = s.cur;
@@ -429,9 +439,9 @@ function CPPTXContentLoader()
                     var unifill = this.Reader.ReadUniFill();
                     pic.setBlipFill(unifill.fill);//this.Reader.ReadUniFill();
 
-                    pic.spPr.Fill = new CUniFill();
-                    pic.spPr.Fill.fill = pic.blipFill;
-                    pic.brush = pic.spPr.Fill;
+                    //pic.spPr.Fill = new CUniFill();
+                    //pic.spPr.Fill.fill = pic.blipFill;
+                    //pic.brush = pic.spPr.Fill;
 
                     break;
                 }
@@ -440,6 +450,7 @@ function CPPTXContentLoader()
                     var spPr = new CSpPr();
                     this.ReadSpPr(spPr);
                     pic.setSpPr(spPr);
+                    pic.spPr.setParent(pic);
                     break;
                 }
                 case 3:
@@ -461,7 +472,9 @@ function CPPTXContentLoader()
     {
         var s = this.stream;
 
-        var shape = new WordGroupShapes(null, this.LogicDocument, this.LogicDocument.DrawingDocument, this.TempMainObject);
+        var shape = new CGroupShape();
+
+        shape.setBDeleted(false);
         shape.setParent(this.TempMainObject == null ? this.ParaDrawing : null);
         this.TempGroupObject = shape;
 
@@ -485,6 +498,7 @@ function CPPTXContentLoader()
                     var spPr = new CSpPr();
                     this.ReadSpPr(spPr);
                     shape.setSpPr(spPr);
+                    shape.spPr.setParent(shape);
                     break;
                 }
                 case 2:
@@ -500,34 +514,45 @@ function CPPTXContentLoader()
 
                         var _type = s.GetUChar();
 
+                        var sp;
                         switch (_type)
                         {
                             case 1:
                             {
-                                shape.addGraphicObject(this.ReadShape());
+                                sp = this.ReadShape();
+                                sp.setGroup(shape);
+                                shape.addToSpTree(shape.spTree.length, sp);
                                 break;
                             }
                             case 2:
                             {
-                                shape.addGraphicObject(this.ReadPic());
+                                sp = this.ReadPic();
+                                sp.setGroup(shape);
+                                shape.addToSpTree(shape.spTree.length, sp);
                                 break;
                             }
                             case 3:
                             {
-                                shape.addGraphicObject(this.ReadCxn());
+                                sp = this.ReadCxn();
+                                sp.setGroup(shape);
+                                shape.addToSpTree(shape.spTree.length, sp);
                                 break;
                             }
                             case 4:
                             {
-                                shape.addGraphicObject( this.ReadGroupShape());
-                                this.TempGroupObject = shape;
+                                sp = this.ReadGroupShape();
+                                sp.setGroup(shape);
+                                shape.addToSpTree(shape.spTree.length, sp);
                                 break;
                             }
                             case 5:
                             {
                                 var _chart = this.Reader.ReadChartDataInGroup(shape);
                                 if (null != _chart)
-                                    shape.addGraphicObject(_chart);
+                                {
+                                    _chart.setGroup(shape);
+                                    shape.addToSpTree(shape.spTree.length, _chart);
+                                }
                                 break;
                             }
                             default:
@@ -576,23 +601,26 @@ function CPPTXContentLoader()
             {
                 case 0:
                 {
-                    spPr.xfrm = this.Reader.ReadXfrm();
+                    spPr.setXfrm(this.Reader.ReadXfrm());
+                    spPr.xfrm.setParent(spPr);
                     //this.CorrectXfrm(spPr.xfrm);
                     break;
                 }
                 case 1:
                 {
-                    spPr.geometry = this.Reader.ReadGeometry(spPr.xfrm);
+                    spPr.setGeometry(this.Reader.ReadGeometry(spPr.xfrm));
+                    if(spPr.geometry)
+                        spPr.geometry.setParent(spPr);
                     break;
                 }
                 case 2:
                 {
-                    spPr.Fill = this.Reader.ReadUniFill();
+                    spPr.setFill(this.Reader.ReadUniFill());
                     break;
                 }
                 case 3:
                 {
-                    spPr.ln = this.Reader.ReadLn();
+                    spPr.setLn(this.Reader.ReadLn());
                     break;
                 }
                 case 4:
@@ -686,12 +714,12 @@ function CPPTXContentLoader()
             logicDoc.ImageMap[index++] = i;
         }
     }
-	
-	this.Clear = function()
+
+    this.Clear = function()
     {
-		//вызывается пока только перед вставкой
-		this.stream = null;
-		this.ImageMapChecker = new Object();
+        //вызывается пока только перед вставкой
+        this.stream = null;
+        this.ImageMapChecker = new Object();
     }
 }
 
@@ -731,7 +759,7 @@ function CPPTXContentWriter()
     {
         this.ShapeTextBoxContent = null;
     }
-	this.WriteTextBody = function(memory, textBody)
+    this.WriteTextBody = function(memory, textBody)
     {
         if (this.BinaryFileWriter.UseContinueWriter)
         {
@@ -769,7 +797,7 @@ function CPPTXContentWriter()
             this.arrayStackStarts.splice(this.arrayStackStarts.length - 1, 1);
         }
     }
-	this.WriteSpPr = function(memory, spPr)
+    this.WriteSpPr = function(memory, spPr)
     {
         if (this.BinaryFileWriter.UseContinueWriter)
         {
@@ -825,11 +853,11 @@ function CPPTXContentWriter()
         {
             this.WriteShape2(grObject, Document, oMapCommentId, oNumIdMap, copyParams);
         }
-		else if (("undefined" !== typeof(WordImage) && grObject instanceof WordImage) || ("undefined" !== typeof(CImageShape) && grObject instanceof CImageShape))
+        else if (("undefined" !== typeof(WordImage) && grObject instanceof WordImage) || ("undefined" !== typeof(CImageShape) && grObject instanceof CImageShape))
         {
             this.WriteImage(grObject);
         }
-		else if (("undefined" !== typeof(WordGroupShapes) && grObject instanceof WordGroupShapes) || ("undefined" !== typeof(CGroupShape) && grObject instanceof CGroupShape))
+        else if (("undefined" !== typeof(WordGroupShapes) && grObject instanceof WordGroupShapes) || ("undefined" !== typeof(CGroupShape) && grObject instanceof CGroupShape))
         {
             this.WriteGroup(grObject, Document, oMapCommentId, oNumIdMap, copyParams);
         }
@@ -888,20 +916,20 @@ function CPPTXContentWriter()
         if (shape.textBoxContent)
         {
             _writer.StartRecord(4);
-			
-			var memory = this.ShapeTextBoxContent;
+
+            var memory = this.ShapeTextBoxContent;
 
             this.arrayStackStartsTextBoxContent.push(memory.pos);
 
-			var bdtw = new BinaryDocumentTableWriter(memory, Document, oMapCommentId, oNumIdMap, copyParams);
-			var bcw = new BinaryCommonWriter(memory);
-			bcw.WriteItemWithLength(function(){bdtw.WriteDocumentContent(shape.textBoxContent);});
+            var bdtw = new BinaryDocumentTableWriter(memory, Document, oMapCommentId, oNumIdMap, copyParams);
+            var bcw = new BinaryCommonWriter(memory);
+            bcw.WriteItemWithLength(function(){bdtw.WriteDocumentContent(shape.textBoxContent);});
 
             var oldPos = this.arrayStackStartsTextBoxContent[this.arrayStackStartsTextBoxContent.length - 1];
             _writer.WriteBuffer(memory.data, oldPos, memory.pos - oldPos);
             memory.pos = oldPos;
             this.arrayStackStartsTextBoxContent.splice(this.arrayStackStartsTextBoxContent.length - 1, 1);
-			
+
             _writer.EndRecord();
 
             _writer.StartRecord(5);
@@ -1027,24 +1055,24 @@ function CPPTXContentWriter()
             for (var i = 0; i < _len; i++)
             {
                 _writer.StartRecord(0);
-				
-				var elem = spTree[i];
-				if ("undefined" !== typeof(WordShape) && elem instanceof WordShape)
-				{
-					this.WriteShape(elem, Document, oMapCommentId, oNumIdMap, copyParams);
-				}
-				else if ("undefined" !== typeof(CShape) && elem instanceof CShape)
-				{
-					this.WriteShape2(elem, Document, oMapCommentId, oNumIdMap, copyParams);
-				}
-				else if (("undefined" !== typeof(WordImage) && elem instanceof WordImage) || ("undefined" !== typeof(CImageShape) && elem instanceof CImageShape))
-				{
-					this.WriteImage(elem);
-				}
-				else if (("undefined" !== typeof(WordGroupShapes) && elem instanceof WordGroupShapes) || ("undefined" !== typeof(CGroupShape) && elem instanceof CGroupShape))
-				{
-					this.WriteGroup(elem, Document, oMapCommentId, oNumIdMap, copyParams);
-				}
+
+                var elem = spTree[i];
+                if ("undefined" !== typeof(WordShape) && elem instanceof WordShape)
+                {
+                    this.WriteShape(elem, Document, oMapCommentId, oNumIdMap, copyParams);
+                }
+                else if ("undefined" !== typeof(CShape) && elem instanceof CShape)
+                {
+                    this.WriteShape2(elem, Document, oMapCommentId, oNumIdMap, copyParams);
+                }
+                else if (("undefined" !== typeof(WordImage) && elem instanceof WordImage) || ("undefined" !== typeof(CImageShape) && elem instanceof CImageShape))
+                {
+                    this.WriteImage(elem);
+                }
+                else if (("undefined" !== typeof(WordGroupShapes) && elem instanceof WordGroupShapes) || ("undefined" !== typeof(CGroupShape) && elem instanceof CGroupShape))
+                {
+                    this.WriteGroup(elem, Document, oMapCommentId, oNumIdMap, copyParams);
+                }
                 else if ("undefined" !== typeof(CChartAsGroup) && elem instanceof CChartAsGroup)
                 {
                     this.BinaryFileWriter.WriteChart(elem);

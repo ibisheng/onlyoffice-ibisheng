@@ -111,7 +111,7 @@ function CChartStyleManager()
                 this.defaultLineStyles[i] = this.defaultLineStyles[34];
             }
             this.defaultLineStyles[40] = new ChartLineStyle(f(8, 0), f(15, 0.9), f(12, 0), f(12, 0), EFFECT_NONE);
-            for(var i = 41; i < 48; ++i)
+            for(i = 41; i < 48; ++i)
             {
                 this.defaultLineStyles[i] = this.defaultLineStyles[40];
             }
@@ -195,6 +195,9 @@ function CChartSpace()
     this.calculatedChart = null;
     this.transform = new CMatrix();
 
+
+    this.bDeleted = true;
+
     this.setRecalculateInfo();
 
 
@@ -233,7 +236,125 @@ CChartSpace.prototype =
 
     getAllRasterImages: function(images)
     {
-        //todo
+        if(this.spPr)
+        {
+            this.spPr.checkBlipFillRasterImage(images);
+        }
+        var chart = this.chart;
+        if(chart)
+        {
+            chart.backWall && chart.backWall.spPr && chart.backWall.spPr.checkBlipFillRasterImage(images);
+            chart.floor && chart.floor.spPr && chart.floor.spPr.checkBlipFillRasterImage(images);
+            chart.legend && chart.legend.spPr && chart.legend.spPr.checkBlipFillRasterImage(images);
+            chart.sideWall && chart.sideWall.spPr && chart.sideWall.spPr.checkBlipFillRasterImage(images);
+            chart.title && chart.title.spPr && chart.title.spPr.checkBlipFillRasterImage(images);
+            //plotArea
+            var plot_area = this.chart.plotArea;
+            if(plot_area)
+            {
+                plot_area.spPr && plot_area.spPr.checkBlipFillRasterImage(images);
+                var i;
+                for(i = 0; i < plot_area.axId.length; ++i)
+                {
+                    var axis = plot_area.axId[i];
+                    if(axis)
+                    {
+                        axis.spPr && axis.spPr.checkBlipFillRasterImage(images);
+                        axis.title && axis.title && axis.title.spPr.checkBlipFillRasterImage(images);
+                    }
+                }
+                for(i = 0; i < plot_area.charts.length; ++i)
+                {
+                    plot_area.charts[i].getAllRasterImages(images);
+                }
+            }
+        }
+    },
+
+    getAllContents: function()
+    {
+
+    },
+
+    documentGetAllFontNames: function(allFonts)
+    {
+        var parent_objects = this.getParentObjects();
+        checkTxBodyDefFonts(this.txPr);
+        var chart = this.chart, i;
+        if(chart)
+        {
+            for(i = 0; i < chart.pivotFmts.length; ++i)
+            {
+                chart.pivotFmts[i] &&  checkTxBodyDefFonts(allFonts, chart.pivotFmts[i].txPr);
+            }
+            if(chart.legend)
+            {
+                checkTxBodyDefFonts(chart.legend.txPr);
+                for(i = 0;  i < chart.legend.legendEntryes.length; ++i)
+                {
+                    chart.legend.legendEntryes[i] && checkTxBodyDefFonts(allFonts, chart.legend.legendEntryes[i].txPr);
+                }
+            }
+            chart.title && checkTxBodyDefFonts(allFonts, chart.title.txPr);
+            var plot_area = chart.plotArea;
+            if(plot_area)
+            {
+                for(i = 0; i < plot_area.charts.length; ++i)
+                {
+                    plot_area.charts[i] && plot_area.charts[i].documentCreateFontMap(allFonts)
+                }
+            }
+        }
+    },
+
+    documentCreateFontMap: function(allFonts)
+    {
+        if(this.chart)
+        {
+            this.chart.title && this.chart.title.txBody && this.chart.title.txBody.content.Document_CreateFontMap(allFonts);
+            var i, j, k;
+            if(this.chart.legend)
+            {
+                var calc_entryes = this.chart.legend.calcEntryes;
+                for(i = 0; i < calc_entryes.length; ++i)
+                {
+                    calc_entryes[i].txBody.content.Document_CreateFontMap(allFonts);
+                }
+            }
+            var axis = this.chart.plotArea.axId, cur_axis;
+            for(i = axis.length-1; i > -1 ; --i)
+            {
+                cur_axis = axis[i];
+                if(cur_axis)
+                {
+                    cur_axis && cur_axis.title && cur_axis.title.txBody && cur_axis.title.txBody.content.Document_CreateFontMap(allFonts);
+                    if(cur_axis.labels)
+                    {
+                        for(j = cur_axis.labels.arrLabels.length - 1; j > -1; --j)
+                        {
+                            cur_axis.labels.arrLabels[j] && cur_axis.labels.arrLabels[j].txBody && cur_axis.labels.arrLabels[j].txBody.content.Document_CreateFontMap(allFonts);
+                        }
+                    }
+                }
+            }
+
+            var series, pts;
+            for(i = this.chart.plotArea.charts.length-1; i > -1; --i)
+            {
+                series = this.chart.plotArea.charts[i].series;
+                for(j = series.length -1; j > -1; --j)
+                {
+                    pts = getPtsFromSeries(series[i]);
+                    if(Array.isArray(pts))
+                    {
+                        for(k = pts.length - 1; k > -1; --k)
+                        {
+                            pts[k].compiledDlb && pts[k].compiledDlb.txBody && pts[k].compiledDlb.txBody.content.Document_CreateFontMap(allFonts);
+                        }
+                    }
+                }
+            }
+        }
     },
 
     setThemeOverride: function(pr)
@@ -242,6 +363,12 @@ CChartSpace.prototype =
         this.themeOverride = pr;
     },
 
+
+    setBDeleted: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ShapeSetBDeleted, oldPr: this.bDeleted, newPr: pr});
+        this.bDeleted = pr;
+    },
     setParent: CShape.prototype.setParent,
 
     setChart: function(chart)
@@ -386,7 +513,7 @@ CChartSpace.prototype =
                         for(i = 0; i < arr_val.length; ++i)
                         {
                             var calc_value = arr_val[i]*multiplier;
-                            var rich_value = num_format.format(calc_value, CellValueType.number, 15);
+                            var rich_value = num_format.format(calc_value, CellValueType.Number, 15);
                             arr_strings.push(rich_value[0].text);
                         }
                     }
@@ -1062,7 +1189,7 @@ CChartSpace.prototype =
                         for(i = 0; i < arr_val.length; ++i)
                         {
                             var calc_value = arr_val[i]*multiplier;
-                            var rich_value = num_format.format(calc_value, CellValueType.number, 15);
+                            var rich_value = num_format.format(calc_value, CellValueType.Number, 15);
                             arr_strings.push(rich_value[0].text);
                         }
                     }
@@ -1074,7 +1201,6 @@ CChartSpace.prototype =
                             arr_strings.push(calc_value + "");
                         }
                     }
-                    //расчитаем подписи для вертикальной оси найдем ширину максимальной и возьмем её удвоенную за ширину подписей верт оси
 
 
                     /*если у нас шкала логарифмическая то будем вместо полученных значений использовать логарифм*/
@@ -1130,12 +1256,21 @@ CChartSpace.prototype =
                     }
                     if(string_pts.length === 0)
                     {
-                        if(ser.val)
+                        pts_len = 0;
+                        for(i = 0; i < chart_object.series.length; ++i)
                         {
-                            if(ser.val.numRef && ser.val.numRef.numCache)
-                                pts_len = ser.val.numRef.numCache.pts.length;
-                            else if(ser.val.numLit)
-                                pts_len = ser.val.numLit.pts.length;
+                            var cur_pts= null;
+                            if(ser.val)
+                            {
+                                if(ser.val.numRef && ser.val.numRef.numCache)
+                                    cur_pts = ser.val.numRef.numCache.pts;
+                                else if(ser.val.numLit)
+                                    cur_pts = ser.val.numLit.pts;
+                                if(cur_pts)
+                                {
+                                    pts_len = Math.max(pts_len, getMaxIdx(cur_pts));
+                                }
+                            }
                         }
                         for(i = 0; i < pts_len; ++i)
                         {
@@ -3049,7 +3184,7 @@ CChartSpace.prototype =
                         for(i = 0; i < calc_entryes.length; ++i)
                         {
                             calc_entry = calc_entryes[i];
-                            cur_content_width = calc_entry.txBody.getMaxContentWidth(content_width);
+                            cur_content_width = calc_entry.txBody.getMaxContentWidth(content_width, true);
                             if(cur_content_width > max_content_width)
                                 max_content_width = cur_content_width;
                             arr_heights.push(calc_entry.txBody.getSummaryHeight());
@@ -3062,6 +3197,11 @@ CChartSpace.prototype =
                         {
                             legend_width = max_legend_width;
                         }
+
+                        var max_entry_height2 = Math.max.apply(Math, arr_heights);
+                        for(i = 0; i < arr_heights.length; ++i)
+                            arr_heights[i] = max_entry_height2;
+
                         var height_summ = 0;
                         for(i = 0;  i < arr_heights.length; ++i)
                         {
@@ -3126,11 +3266,15 @@ CChartSpace.prototype =
                         for(i = 0; i < calc_entryes.length; ++i)
                         {
                             calc_entry = calc_entryes[i];
-                            cur_content_width = calc_entry.txBody.getMaxContentWidth(content_width);
+                            cur_content_width = calc_entry.txBody.getMaxContentWidth(content_width, true);
                             if(cur_content_width > max_content_width)
                                 max_content_width = cur_content_width;
                             arr_heights.push(calc_entry.txBody.getSummaryHeight());
                         }
+
+                        var max_entry_height2 = Math.max.apply(Math, arr_heights);
+                        for(i = 0; i < arr_heights.length; ++i)
+                            arr_heights[i] = max_entry_height2;
                         if(max_content_width < max_legend_width - left_inset)
                         {
                             legend_width = max_content_width + left_inset;
@@ -3204,7 +3348,7 @@ CChartSpace.prototype =
                         for(i = 0; i < calc_entryes.length; ++i)
                         {
                             calc_entry = calc_entryes[i];
-                            cur_entry_width = calc_entry.txBody.getMaxContentWidth(20000/*ставим большое число чтобы текст расчитался в одну строчку*/);
+                            cur_entry_width = calc_entry.txBody.getMaxContentWidth(20000/*ставим большое число чтобы текст расчитался в одну строчку*/, true);
                             if(cur_entry_width > max_entry_width)
                                 max_entry_width = cur_entry_width;
                             arr_height.push(calc_entry.txBody.getSummaryHeight());
@@ -3301,7 +3445,7 @@ CChartSpace.prototype =
                             for(i = 0; i < calc_entryes.length; ++i)
                             {
                                 calc_entry = calc_entryes[i];
-                                cur_content_width = calc_entry.txBody.getMaxContentWidth(content_width);
+                                cur_content_width = calc_entry.txBody.getMaxContentWidth(content_width, true);
                                 if(cur_content_width > max_content_width)
                                     max_content_width = cur_content_width;
                                 arr_heights.push(calc_entry.txBody.getSummaryHeight());
@@ -3370,7 +3514,7 @@ CChartSpace.prototype =
                         for(i = 0; i < calc_entryes.length; ++i)
                         {
                             calc_entry = calc_entryes[i];
-                            cur_entry_width = calc_entry.txBody.getMaxContentWidth(20000/*ставим большое число чтобы текст расчитался в одну строчку*/);
+                            cur_entry_width = calc_entry.txBody.getMaxContentWidth(20000/*ставим большое число чтобы текст расчитался в одну строчку*/, true);
                             if(cur_entry_width > max_entry_width)
                                 max_entry_width = cur_entry_width;
                             arr_height.push(calc_entry.txBody.getSummaryHeight());
@@ -3462,7 +3606,7 @@ CChartSpace.prototype =
                             for(i = 0; i < calc_entryes.length; ++i)
                             {
                                 calc_entry = calc_entryes[i];
-                                cur_content_width = calc_entry.txBody.getMaxContentWidth(content_width);
+                                cur_content_width = calc_entry.txBody.getMaxContentWidth(content_width, true);
                                 if(cur_content_width > max_content_width)
                                     max_content_width = cur_content_width;
                                 arr_heights.push(calc_entry.txBody.getSummaryHeight());
@@ -4217,11 +4361,11 @@ CChartSpace.prototype =
 
                 if(!(this.chart.plotArea.chart instanceof CLineChart))
                 {
-                    var base_fills = getArrayFillsFromBase(style.fill2, pts.length);
+                    var base_fills = getArrayFillsFromBase(style.fill2, getMaxIdx(pts));
                     for(var i = 0; i < pts.length; ++i)
                     {
                         var compiled_brush = new CUniFill();
-                        compiled_brush.merge(base_fills[i]);
+                        compiled_brush.merge(base_fills[pts[i].idx]);
                         if(ser.spPr && ser.spPr.Fill)
                         {
                             compiled_brush.merge(ser.spPr.Fill);
@@ -4263,7 +4407,7 @@ CChartSpace.prototype =
                     }
                     var base_line_fills;
                     if(this.style === 34)
-                        base_line_fills = getArrayFillsFromBase(style.line2, pts.length);
+                        base_line_fills = getArrayFillsFromBase(style.line2, getMaxIdx(pts));
                     for(i = 0; i < pts.length; ++i)
                     {
                         var compiled_line = new CLn();
@@ -4275,7 +4419,7 @@ CChartSpace.prototype =
                         }
                         else
                         {
-                            compiled_line.Fill.merge(base_line_fills[i]);
+                            compiled_line.Fill.merge(base_line_fills[pts[i].idx]);
                         }
                         if(ser.spPr && ser.spPr.ln)
                             compiled_line.merge(ser.spPr.ln);
@@ -4300,12 +4444,12 @@ CChartSpace.prototype =
                 else
                 {
                     var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
-                    var base_line_fills = getArrayFillsFromBase(style.line4, pts.length);
+                    var base_line_fills = getArrayFillsFromBase(style.line4, getMaxIdx(pts));
                     for(var i = 0; i < pts.length; ++i)
                     {
                         var compiled_line = new CLn();
                         compiled_line.merge(default_line);
-                        compiled_line.Fill.merge(base_line_fills[i]);
+                        compiled_line.Fill.merge(base_line_fills[pts[i].idx]);
                         compiled_line.w *= style.line3;
                         if(ser.spPr && ser.spPr.ln)
                         {
@@ -4335,10 +4479,10 @@ CChartSpace.prototype =
             {
                 if(!(this.chart.plotArea.chart instanceof CLineChart || this.chart.plotArea.chart instanceof  CScatterChart || this.chart.plotArea.chart instanceof CRadarChart))
                 {
-                    var base_fills = getArrayFillsFromBase(style.fill2, series.length);
+                    var base_fills = getArrayFillsFromBase(style.fill2, getMaxIdx(series));
                     var base_line_fills = null;
                     if(style.line1 === EFFECT_SUBTLE && this.style === 34)
-                        base_line_fills	= getArrayFillsFromBase(style.line2, series.length);
+                        base_line_fills	= getArrayFillsFromBase(style.line2, getMaxIdx(series));
                     for(var i = 0; i < series.length; ++i)
                     {
                         var ser = series[i];
@@ -4358,7 +4502,7 @@ CChartSpace.prototype =
                         for(var j = 0; j < pts.length; ++j)
                         {
                             var compiled_brush = new CUniFill();
-                            compiled_brush.merge(base_fills[i]);
+                            compiled_brush.merge(base_fills[ser.idx]);
                             if(ser.spPr && ser.spPr.Fill)
                             {
                                 compiled_brush.merge(ser.spPr.Fill);
@@ -4405,7 +4549,7 @@ CChartSpace.prototype =
                             }
                             var base_line_fills;
                             if(this.style === 34)
-                                base_line_fills = getArrayFillsFromBase(style.line2, pts.length);
+                                base_line_fills = getArrayFillsFromBase(style.line2, getMaxIdx(pts));
 
                             for(var j = 0; j < pts.length; ++j)
                             {
@@ -4415,7 +4559,7 @@ CChartSpace.prototype =
                                 if(this.style !== 34)
                                     compiled_line.Fill.merge(style.line2[0]);
                                 else
-                                    compiled_line.Fill.merge(base_line_fills[i]);
+                                    compiled_line.Fill.merge(base_line_fills[ser.idx]);
                                 if(ser.spPr && ser.spPr.ln)
                                 {
                                     compiled_line.merge(ser.spPr.ln);
@@ -4444,7 +4588,7 @@ CChartSpace.prototype =
                 }
                 else
                 {
-                    var base_line_fills = getArrayFillsFromBase(style.line4, series.length);
+                    var base_line_fills = getArrayFillsFromBase(style.line4, getMaxIdx(series));
                     for(var i = 0; i < series.length; ++i)
                     {
                         var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
@@ -4466,7 +4610,7 @@ CChartSpace.prototype =
                         {
                             var compiled_line = new CLn();
                             compiled_line.merge(default_line);
-                            compiled_line.Fill.merge(base_line_fills[i]);
+                            compiled_line.Fill.merge(base_line_fills[ser.idx]);
                             compiled_line.w *= style.line3;
                             if(ser.spPr && ser.spPr.ln)
                                 compiled_line.merge(ser.spPr.ln);
@@ -4534,8 +4678,8 @@ CChartSpace.prototype =
                     pts = [];
                 }
                 var series_marker = ser.marker;
-                var brushes = getArrayFillsFromBase(fill, pts.length);
-                var pens_fills = getArrayFillsFromBase(line, pts.length);
+                var brushes = getArrayFillsFromBase(fill, getMaxIdx(pts));
+                var pens_fills = getArrayFillsFromBase(line, getMaxIdx(pts));
                 var compiled_markers = [];
                 for(var i = 0;  i < pts.length; ++i)
                 {
@@ -4596,8 +4740,8 @@ CChartSpace.prototype =
             else
             {
                 var series = this.chart.plotArea.chart.series;
-                var brushes = getArrayFillsFromBase(fill, series.length);
-                var pens_fills = getArrayFillsFromBase(line, series.length);
+                var brushes = getArrayFillsFromBase(fill, getMaxIdx(series));
+                var pens_fills = getArrayFillsFromBase(line, getMaxIdx(series));
                 for(var i = 0; i < series.length; ++i)
                 {
                     var ser = series[i];
@@ -4625,8 +4769,8 @@ CChartSpace.prototype =
                         if(!compiled_marker.spPr.ln)
                             compiled_marker.spPr.setLn(new CLn());
                         compiled_marker.spPr.ln.setFill(pens_fills[i]);
-                        compiled_marker.merge(ser.marker);
                         compiled_marker.setSymbol(GetTypeMarkerByIndex(i));
+                        compiled_marker.merge(ser.marker);
                         if(j === 0)
                             ser.compiledSeriesMarker = compiled_marker.createDuplicate();
                         if(Array.isArray(ser.dPt))
@@ -4913,6 +5057,11 @@ CChartSpace.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_ShapeSetBDeleted:
+            {
+                this.bDeleted = data.oldPr;
+                break;
+            }
             case historyitem_ChartSpace_SetChart:
             {
                 this.chart = data.oldChart;
@@ -4990,6 +5139,11 @@ CChartSpace.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_ShapeSetBDeleted:
+            {
+                this.bDeleted = data.newPr;
+                break;
+            }
             case historyitem_ChartSpace_SetChart:
             {
                 this.chart = data.newChart;
@@ -5068,6 +5222,12 @@ CChartSpace.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+
+            case historyitem_ShapeSetBDeleted:
+            {
+                writeBool(w, data.newPr);
+                break;
+            }
             case historyitem_ChartSpace_SetChart:
             {
                 writeObject(w,data.newChart);
@@ -5147,6 +5307,12 @@ CChartSpace.prototype =
         var type = r.GetLong();
         switch (type)
         {
+
+            case historyitem_ShapeSetBDeleted:
+            {
+                this.bDeleted = readBool(r);
+                break;
+            }
             case historyitem_ChartSpace_SetChart:
             {
                 this.chart = readObject(r);
@@ -5255,6 +5421,14 @@ function getCatStringPointsFromSeries(ser)
         }
     }
     return null;
+}
+
+function getMaxIdx(arr)
+{
+    var max_idx = 0;
+    for(var i = 0; i < arr.length;++i)
+        arr[i].idx > max_idx && (max_idx = arr[i].idx);
+    return max_idx+1;
 }
 
 

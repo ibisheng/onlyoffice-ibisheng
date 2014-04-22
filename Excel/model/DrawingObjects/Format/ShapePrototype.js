@@ -1,12 +1,14 @@
 "use strict";
 
+var G_O_DEFAULT_COLOR_MAP = GenerateDefaultColorMap();
+
 CShape.prototype.setDrawingObjects = function(drawingObjects)
 {
     if ( isRealObject(drawingObjects) && drawingObjects.getWorksheet() )
     {
         var newValue = drawingObjects.getWorksheet().model.getId();
         var oldValue = isRealObject(this.drawingObjects) ? this.drawingObjects.getWorksheet().model.getId() : null;
-       // History.Add(this, {Type: historyitem_AutoShapes_SetDrawingObjects, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+        // History.Add(this, {Type: historyitem_AutoShapes_SetDrawingObjects, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
         this.drawingObjects = drawingObjects;
     }
 };
@@ -18,7 +20,7 @@ CShape.prototype.addToDrawingObjects =  function(pos)
 {
     var position = this.drawingObjects.addGraphicObject(this, pos, true);
     var data = new UndoRedoDataGOSingleProp(position, null);
-   // History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_To_Drawing_Objects, null, null, new UndoRedoDataGraphicObjects(this.Id, data), null);
+    // History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_To_Drawing_Objects, null, null, new UndoRedoDataGraphicObjects(this.Id, data), null);
     this.drawingObjects.controller.addContentChanges(new CContentChangesElement(contentchanges_Add, data.oldValue, 1, data));
 };
 CShape.prototype.deleteDrawingBase = function()
@@ -50,7 +52,7 @@ CShape.prototype.setRecalculateInfo = function()
         recalculateTransparent:    true,
         recalculateTextStyles:     [true, true, true, true, true, true, true, true, true]
     };
-	this.compiledStyles = [];
+    this.compiledStyles = [];
     this.textPropsForRecalc = [];
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
 };
@@ -61,7 +63,7 @@ CShape.prototype.recalcContent = function()
 
 CShape.prototype.getDrawingDocument = function()
 {
-	return this.drawingObjects.drawingDocument;
+    return this.drawingObjects.drawingDocument;
 };
 
 CShape.prototype.recalcBrush = function()
@@ -119,7 +121,7 @@ CShape.prototype.addToRecalculate = function()
 CShape.prototype.handleUpdatePosition = function()
 {
     this.recalcTransform();
-	this.recalcBounds();
+    this.recalcBounds();
     this.recalcTransformText();
     this.addToRecalculate();
 };
@@ -127,7 +129,7 @@ CShape.prototype.handleUpdateExtents = function()
 {
     this.recalcContent();
     this.recalcGeometry();
-	this.recalcBounds();
+    this.recalcBounds();
     this.addToRecalculate();
 };
 CShape.prototype.handleUpdateRot = function()
@@ -184,7 +186,7 @@ CShape.prototype.getParentObjects = function ()
     return { slide: null, layout: null, master: null, theme: window["Asc"]["editor"].wbModel.theme};
 };
 
-CShape.prototype.recalculate = function () 
+CShape.prototype.recalculate = function ()
 {
     if (this.recalcInfo.recalculateBrush) {
         this.recalculateBrush();
@@ -242,39 +244,49 @@ CShape.prototype.recalculateBounds = function()
 
 CShape.prototype.recalculateContent = function()
 {
-	var content = this.getDocContent();
-	if(content)
-	{
-		var w, h;
-		var l_ins, t_ins, r_ins, b_ins;
-		var body_pr = this.getBodyPr();
-		if(body_pr)
-		{
-			l_ins = isRealNumber(body_pr.lIns) ? body_pr.lIns : 2.54;
-			r_ins = isRealNumber(body_pr.rIns) ? body_pr.rIns : 2.54;
-			t_ins = isRealNumber(body_pr.tIns) ? body_pr.tIns : 1.27;
-			b_ins = isRealNumber(body_pr.bIns) ? body_pr.bIns : 1.27;
-		}
-		else
-		{
-			l_ins = 2.54;
-			r_ins = 2.54;
-			t_ins = 1.27;
-			b_ins = 1.27;
-		}
-		if(this.spPr.geometry && this.spPr.geometry.rect
-			&& isRealNumber(this.spPr.geometry.rect.l) && isRealNumber(this.spPr.geometry.rect.t)
-			&& isRealNumber(this.spPr.geometry.rect.r) && isRealNumber(this.spPr.geometry.rect.r))
-		{
-			w = this.spPr.geometry.rect.r - this.spPr.geometry.rect.l - (l_ins + r_ins);
-			h = this.spPr.geometry.rect.b - this.spPr.geometry.rect.t - (t_ins + b_ins);
-		}
-		else
-		{
-			w = this.extX - (l_ins + r_ins);
-			h = this.extY - (t_ins + b_ins);
-		}
-		content.Reset(0, 0, w, h);
-		content.Recalculate_Page(content.StartPage, true);
-	}
+    var content = this.getDocContent();
+    if(content)
+    {
+        var w, h;
+        var l_ins, t_ins, r_ins, b_ins;
+        var body_pr = this.getBodyPr();
+        if(body_pr)
+        {
+            l_ins = isRealNumber(body_pr.lIns) ? body_pr.lIns : 2.54;
+            r_ins = isRealNumber(body_pr.rIns) ? body_pr.rIns : 2.54;
+            t_ins = isRealNumber(body_pr.tIns) ? body_pr.tIns : 1.27;
+            b_ins = isRealNumber(body_pr.bIns) ? body_pr.bIns : 1.27;
+        }
+        else
+        {
+            l_ins = 2.54;
+            r_ins = 2.54;
+            t_ins = 1.27;
+            b_ins = 1.27;
+        }
+        if(this.spPr.geometry && this.spPr.geometry.rect
+            && isRealNumber(this.spPr.geometry.rect.l) && isRealNumber(this.spPr.geometry.rect.t)
+            && isRealNumber(this.spPr.geometry.rect.r) && isRealNumber(this.spPr.geometry.rect.r))
+        {
+            w = this.spPr.geometry.rect.r - this.spPr.geometry.rect.l - (l_ins + r_ins);
+            h = this.spPr.geometry.rect.b - this.spPr.geometry.rect.t - (t_ins + b_ins);
+        }
+        else
+        {
+            w = this.extX - (l_ins + r_ins);
+            h = this.extY - (t_ins + b_ins);
+        }
+        content.Reset(0, 0, w, h);
+        content.Recalculate_Page(content.StartPage, true);
+    }
+};
+
+CShape.prototype.Get_ColorMap = function()
+{
+    return G_O_DEFAULT_COLOR_MAP;
+};
+
+CShape.prototype.getStyles = function(index)
+{
+    return this.Get_Styles(index);
 };

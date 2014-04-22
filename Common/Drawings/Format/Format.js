@@ -158,6 +158,48 @@ function readObject(r)
     return ret;
 }
 
+
+function checkThemeFonts(oFontMap, font_scheme)
+{
+    if(oFontMap["+mj-lt"])
+    {
+        if(font_scheme.majorFont && font_scheme.majorFont.latin === "string" && font_scheme.majorFont.latin.length > 0)
+            oFontMap[font_scheme.majorFont.latin] = 1;
+        delete oFontMap["+mj-lt"];
+    }
+    if(oFontMap["+mj-ea"])
+    {
+        if(font_scheme.majorFont && font_scheme.majorFont.ea === "string" && font_scheme.majorFont.ea.length > 0)
+            oFontMap[font_scheme.majorFont.ea] = 1;
+        delete oFontMap["+mj-ea"];
+    }
+    if(oFontMap["+mj-cs"])
+    {
+        if(font_scheme.majorFont && font_scheme.majorFont.cs === "string" && font_scheme.majorFont.cs.length > 0)
+            oFontMap[font_scheme.majorFont.cs] = 1;
+        delete oFontMap["+mj-cs"];
+    }
+
+    if(oFontMap["+mn-lt"])
+    {
+        if(font_scheme.minorFont && font_scheme.minorFont.latin === "string" && font_scheme.minorFont.latin.length > 0)
+            oFontMap[font_scheme.minorFont.latin] = 1;
+        delete oFontMap["+mn-lt"];
+    }
+    if(oFontMap["+mn-ea"])
+    {
+        if(font_scheme.minorFont && font_scheme.minorFont.ea === "string" && font_scheme.minorFont.ea.length > 0)
+            oFontMap[font_scheme.minorFont.ea] = 1;
+        delete oFontMap["+mn-ea"];
+    }
+    if(oFontMap["+mn-cs"])
+    {
+        if(font_scheme.minorFont && font_scheme.minorFont.cs === "string" && font_scheme.minorFont.cs.length > 0)
+            oFontMap[font_scheme.minorFont.cs] = 1;
+        delete oFontMap["+mn-cs"];
+    }
+}
+
 function ExecuteNoHistory(f, oThis, args)
 {
     var is_on = (History instanceof CHistory) ? History.Is_On() : false;
@@ -591,6 +633,11 @@ CColorModifiers.prototype =
                 }
                 break;
             }
+            case historyitem_ColorModifiers_RemoveColorMod:
+            {
+                this.Mods.splice(data.pos, 0, data.pr);
+                break;
+            }
         }
     },
 
@@ -607,6 +654,11 @@ CColorModifiers.prototype =
                 }
                 break;
             }
+            case historyitem_ColorModifiers_RemoveColorMod:
+            {
+                this.Mods.splice(data.pos, 1);
+                break;
+            }
         }
     },
 
@@ -619,6 +671,11 @@ CColorModifiers.prototype =
             case historyitem_ColorModifiers_AddColorMod:
             {
                 w.WriteString2(data.modId);
+                break;
+            }
+            case historyitem_ColorModifiers_RemoveColorMod:
+            {
+                w.WriteLong(data.pos);
                 break;
             }
         }
@@ -642,6 +699,12 @@ CColorModifiers.prototype =
                 }
                 break;
             }
+            case historyitem_ColorModifiers_RemoveColorMod:
+            {
+                var pos = r.GetLong();
+                this.Mods.splice(pos, 1);
+                break;
+            }
         }
     },
 
@@ -650,6 +713,14 @@ CColorModifiers.prototype =
     {
         this.Mods.push(mod);
         History.Add(this, {Type: historyitem_ColorModifiers_AddColorMod, modId: mod.Get_Id()});
+    },
+
+
+    removeMod: function(pos)
+    {
+        var mod = this.Mods.splice(pos, 1)[0];
+        History.Add(this, {Type: historyitem_ColorModifiers_RemoveColorMod, pos: pos, pr: mod});
+
     },
 
 
@@ -964,6 +1035,22 @@ CSysColor.prototype =
     {},
 
 
+    setR: function(pr)
+    {
+        History.Add(this, {Type:historyitem_SysColor_SetR, oldPr: this.RGBA.R, newPr:pr});
+        this.RGBA.R = pr;
+    },
+    setG: function(pr)
+    {
+        History.Add(this, {Type:historyitem_SysColor_SetG, oldPr: this.RGBA.G, newPr:pr});
+        this.RGBA.G = pr;
+    },
+    setB: function(pr)
+    {
+        History.Add(this, {Type:historyitem_SysColor_SetB, oldPr: this.RGBA.B, newPr:pr});
+        this.RGBA.B = pr;
+    },
+
     check: function()
     {
         var ret = this.RGBA.needRecalc;
@@ -996,6 +1083,21 @@ CSysColor.prototype =
                 this.id = data.oldId;
                 break;
             }
+            case historyitem_SysColor_SetR:
+            {
+                this.RGBA.R = data.oldPr;
+                break;
+            }
+            case historyitem_SysColor_SetG:
+            {
+                this.RGBA.G = data.oldPr;
+                break;
+            }
+            case historyitem_SysColor_SetB:
+            {
+                this.RGBA.B = data.oldPr;
+                break;
+            }
         }
     },
 
@@ -1006,6 +1108,21 @@ CSysColor.prototype =
             case historyitem_SysColor_SetId:
             {
                 this.id = data.newId;
+                break;
+            }
+            case historyitem_SysColor_SetR:
+            {
+                this.RGBA.R = data.newPr;
+                break;
+            }
+            case historyitem_SysColor_SetG:
+            {
+                this.RGBA.G = data.newPr;
+                break;
+            }
+            case historyitem_SysColor_SetB:
+            {
+                this.RGBA.B = data.newPr;
                 break;
             }
         }
@@ -1028,6 +1145,13 @@ CSysColor.prototype =
                 w.WriteString2(data.newId);
                 break;
             }
+            case historyitem_SysColor_SetR:
+            case historyitem_SysColor_SetG:
+            case historyitem_SysColor_SetB:
+            {
+                writeLong(w, data.newPr);
+                break;
+            }
         }
     },
 
@@ -1043,6 +1167,21 @@ CSysColor.prototype =
             case historyitem_SysColor_SetId:
             {
                 this.id = r.GetString2();
+                break;
+            }
+            case historyitem_SysColor_SetR:
+            {
+                this.RGBA.R = readLong(r);
+                break;
+            }
+            case historyitem_SysColor_SetG:
+            {
+                this.RGBA.G = readLong(r);
+                break;
+            }
+            case historyitem_SysColor_SetB:
+            {
+                this.RGBA.B = readLong(r);
                 break;
             }
         }
@@ -1545,7 +1684,7 @@ CUniColor.prototype =
 
     check: function(theme, colorMap)
     {
-        if(this.color && this.color.check(theme, colorMap)/*возвращает был ли изменен RGBA*/)
+        if(this.color && this.color.check(theme, colorMap.color_map)/*возвращает был ли изменен RGBA*/)
         {
             this.RGBA.R = this.color.RGBA.R;
             this.RGBA.G = this.color.RGBA.G;
@@ -3590,6 +3729,14 @@ function CreateBlackRGBUnifill()
     return ret;
 }
 
+function FormatRGBAColor()
+{
+    this.R = 0;
+    this.G = 0;
+    this.B = 0;
+    this.A = 255;
+}
+
 function CUniFill()
 {
     this.fill = null;
@@ -3633,7 +3780,7 @@ CUniFill.prototype =
 
     setTransparent: function(transparent)
     {
-        History.Add(this, {Type: historyitem_UniFill_SetTransparent, oldTransparent: this.fill, newTransparent: fill});
+        History.Add(this, {Type: historyitem_UniFill_SetTransparent, oldTransparent: this.transparent, newTransparent: transparent});
         this.transparent = transparent;
     },
 
@@ -3789,7 +3936,7 @@ CUniFill.prototype =
             }
             if (this.fill.type == FILL_TYPE_GRAD)
             {
-                var RGBA = {R:0, G:0, B:0, A:255};
+                var RGBA = new FormatRGBAColor();
                 var _colors = this.fill.colors;
                 var _len = _colors.length;
 
@@ -3813,8 +3960,12 @@ CUniFill.prototype =
             {
                 return this.fill.fgClr.RGBA;
             }
+            if(this.fill.type == FILL_TYPE_NOFILL)
+            {
+                return {R: 0, G: 0}
+            }
         }
-        return {R:0, G:0, B:0, A:255};
+        return new FormatRGBAColor();
     },
 
     createDuplicate : function()
@@ -6648,7 +6799,7 @@ function CreateDefaultShapeStyle()
     style.fontRef.setIdx(fntStyleInd_minor);
     style.fontRef.setColor(new CUniColor());
     style.fontRef.Color.setColor(new CSchemeColor());
-    style.fontRef.Color.color.setId(tx1);
+    style.fontRef.Color.color.setId(12);
     return style;
 }
 
@@ -7223,7 +7374,7 @@ function CSpPr()
 {
     this.bwMode    = 0;
 
-    this.xfrm       = new CXfrm();//TODO: временная заглушка чтоб работало в ворде.
+    this.xfrm       = null;//new CXfrm();//TODO: временная заглушка чтоб работало в ворде.
     this.geometry   = null;//new Geometry();
     this.Fill       = null;
     this.ln         = null;
@@ -7319,6 +7470,26 @@ CSpPr.prototype =
 
     Refresh_RecalcData2: function(data)
     {
+    },
+
+    checkUniFillRasterImageId: function(unifill)
+    {
+        if(unifill && unifill.fill && typeof unifill.fill.RasterImageId === "string" && unifill.fill.RasterImageId.length > 0)
+            return unifill.fill.RasterImageId;
+        return null;
+    },
+
+    checkBlipFillRasterImage: function(images)
+    {
+        var fill_image_id = this.checkUniFillRasterImageId(this.Fill);
+        if(fill_image_id !== null)
+            images.push(fill_image_id);
+        if(this.ln)
+        {
+            var line_image_id = this.checkUniFillRasterImageId(this.ln.Fill);
+            if(line_image_id)
+                images.push(line_image_id);
+        }
     },
 
     getObjectType: function()
@@ -8012,14 +8183,19 @@ ExtraClrScheme.prototype =
     }
 };
 
-function FontCollection()
+function FontCollection(fontScheme)
 {
+
     this.latin = null;
     this.ea   = null;
     this.cs   = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
+    if(fontScheme)
+    {
+        this.setFontScheme(fontScheme);
+    }
 
 }
 
@@ -8033,6 +8209,12 @@ FontCollection.prototype =
     Refresh_RecalcData: function()
     {},
 
+    setFontScheme: function(fontScheme)
+    {
+        History.Add(this, {Type: historyitem_FontCollection_SetFontScheme, oldPr: this.fontScheme, newPr: fontScheme});
+        this.fontScheme = fontScheme;
+    },
+
     getObjectType: function()
     {
         return historyitem_type_FontCollection;
@@ -8042,18 +8224,27 @@ FontCollection.prototype =
     {
         History.Add(this, {Type: historyitem_FontCollection_SetLatin, oldPr: this.latin, newPr: pr});
         this.latin = pr;
+        if(this.fontScheme)
+            this.fontScheme.checkFromFontCollection(pr, this, FONT_REGION_LT);
     },
 
     setEA: function(pr)
     {
         History.Add(this, {Type: historyitem_FontCollection_SetEA, oldPr: this.ea, newPr: pr});
         this.ea = pr;
+
+        if(this.fontScheme)
+            this.fontScheme.checkFromFontCollection(pr, this, FONT_REGION_EA);
     },
 
     setCS: function(pr)
     {
         History.Add(this, {Type: historyitem_FontCollection_SetCS, oldPr: this.cs, newPr: pr});
         this.cs = pr;
+
+
+        if(this.fontScheme)
+            this.fontScheme.checkFromFontCollection(pr, this, FONT_REGION_CS);
     },
 
     Undo: function(data)
@@ -8063,16 +8254,32 @@ FontCollection.prototype =
             case historyitem_FontCollection_SetLatin:
             {
                 this.latin = data.oldPr;
+
+                if(this.fontScheme)
+                    this.fontScheme.checkFromFontCollection(data.oldPr, this, FONT_REGION_LT);
                 break;
             }
             case historyitem_FontCollection_SetEA:
             {
                 this.ea = data.oldPr;
+
+                if(this.fontScheme)
+                    this.fontScheme.checkFromFontCollection(data.oldPr, this, FONT_REGION_EA);
                 break;
             }
             case historyitem_FontCollection_SetCS:
             {
                 this.cs = data.oldPr;
+
+                if(this.fontScheme)
+                    this.fontScheme.checkFromFontCollection(data.oldPr, this, FONT_REGION_CS);
+                break;
+            }
+            case historyitem_FontCollection_SetFontScheme:
+            {
+                this.fontScheme = data.oldPr;
+
+
                 break;
             }
         }
@@ -8085,16 +8292,31 @@ FontCollection.prototype =
             case historyitem_FontCollection_SetLatin:
             {
                 this.latin = data.newPr;
+
+                if(this.fontScheme)
+                    this.fontScheme.checkFromFontCollection(data.newPr, this, FONT_REGION_LT);
                 break;
             }
             case historyitem_FontCollection_SetEA:
             {
                 this.ea = data.newPr;
+
+                if(this.fontScheme)
+                    this.fontScheme.checkFromFontCollection(data.newPr, this, FONT_REGION_EA);
                 break;
             }
             case historyitem_FontCollection_SetCS:
             {
                 this.cs = data.newPr;
+
+
+                if(this.fontScheme)
+                    this.fontScheme.checkFromFontCollection(data.newPr, this, FONT_REGION_CS);
+                break;
+            }
+            case historyitem_FontCollection_SetFontScheme:
+            {
+                this.fontScheme = data.newPr;
                 break;
             }
         }
@@ -8112,6 +8334,11 @@ FontCollection.prototype =
                 writeString(w, data.newPr);
                 break;
             }
+            case historyitem_FontCollection_SetFontScheme:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
         }
     },
 
@@ -8123,16 +8350,30 @@ FontCollection.prototype =
             case historyitem_FontCollection_SetLatin:
             {
                 this.latin = readString(r);
+
+
+                if(this.fontScheme)
+                    this.fontScheme.checkFromFontCollection(this.latin, this, FONT_REGION_LT);
                 break;
             }
             case historyitem_FontCollection_SetEA:
             {
                 this.ea = readString(r);
+                if(this.fontScheme)
+                    this.fontScheme.checkFromFontCollection(this.ea, this, FONT_REGION_EA);
                 break;
             }
             case historyitem_FontCollection_SetCS:
             {
                 this.cs = readString(r);
+                if(this.fontScheme)
+                    this.fontScheme.checkFromFontCollection(this.cs, this, FONT_REGION_CS);
+                break;
+            }
+
+            case historyitem_FontCollection_SetFontScheme:
+            {
+                this.fontScheme = readObject(r);
                 break;
             }
         }
@@ -8154,9 +8395,21 @@ function FontScheme()
 {
     this.name = "";
 
-    this.majorFont = new FontCollection();
-    this.minorFont = new FontCollection();
+    this.majorFont = new FontCollection(this);
+    this.minorFont = new FontCollection(this);
+    this.fontMap = {
+        "+mj-lt": undefined,
+        "+mj-ea": undefined,
+        "+mj-cs": undefined,
+        "+mn-lt": undefined,
+        "+mn-ea": undefined,
+        "+mn-cs": undefined
+    };
 }
+
+var FONT_REGION_LT = 0x00;
+var FONT_REGION_EA = 0x01;
+var FONT_REGION_CS = 0x02;
 
 FontScheme.prototype =
 {
@@ -8176,6 +8429,61 @@ FontScheme.prototype =
     Read_FromBinary2: function (r)
     {
         this.Id = r.GetString2();
+    },
+
+    checkFromFontCollection: function(font, fontCollection, region)
+    {
+        if(fontCollection === this.majorFont)
+        {
+            switch (region)
+            {
+                case FONT_REGION_LT:
+                {
+                    this.fontMap["+mj-lt"] = font;
+                    break;
+                }
+                case FONT_REGION_EA:
+                {
+                    this.fontMap["+mj-ea"] = font;
+                    break;
+                }
+                case FONT_REGION_CS:
+                {
+                    this.fontMap["+mj-cs"] = font;
+                    break;
+                }
+            }
+        }
+        else if(fontCollection === this.minorFont)
+        {
+            switch (region)
+            {
+                case FONT_REGION_LT:
+                {
+                    this.fontMap["+mn-lt"] = font;
+                    break;
+                }
+                case FONT_REGION_EA:
+                {
+                    this.fontMap["+mn-ea"] = font;
+                    break;
+                }
+                case FONT_REGION_CS:
+                {
+                    this.fontMap["+mn-cs"] = font;
+                    break;
+                }
+            }
+        }
+    },
+
+    checkFont: function(font)
+    {
+        if(font)
+        {
+            return this.fontMap[font] ? this.fontMap[font] : font;
+        }
+        return "Arial";
     },
 
     getObjectType: function()
@@ -8950,6 +9258,19 @@ CTheme.prototype =
     Read_FromBinary2: function (r)
     {
         this.Id = r.GetString2();
+    },
+
+    Document_Get_AllFontNames: function(AllFonts)
+    {
+        var font_scheme = this.themeElements.fontScheme;
+        var major_font = font_scheme.majorFont;
+        typeof major_font.latin === "string" && major_font.latin.length > 0 && (AllFonts[major_font.latin] = 1);
+        typeof major_font.ea === "string" && major_font.ea.length > 0 && (AllFonts[major_font.ea] = 1);
+        typeof major_font.cs === "string" && major_font.latin.length > 0 && (AllFonts[major_font.cs] = 1);
+        var minor_font = font_scheme.minorFont;
+        typeof minor_font.latin === "string" && minor_font.latin.length > 0 && (AllFonts[minor_font.latin] = 1);
+        typeof minor_font.ea === "string" && minor_font.ea.length > 0 && (AllFonts[minor_font.ea] = 1);
+        typeof minor_font.cs === "string" && minor_font.latin.length > 0 && (AllFonts[minor_font.cs] = 1);
     }
 };
 // ----------------------------------
@@ -11078,7 +11399,12 @@ CBodyPr.prototype =
     } ,
 
     Refresh_RecalcData: function()
-    {}
+    {},
+
+    setAnchor: function(val)
+    {
+        this.anchor = val;
+    }
 };
 
 

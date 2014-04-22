@@ -7643,10 +7643,12 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		else if( c_oSerImageType2.Chart2 === type )
         {
 			res = c_oSerConstants.ReadUnknown;
-			// var oNewChartSpace = new CChartSpace();
-            // var oBinaryChartReader = new BinaryChartReader(this.stream);
-            // res = oBinaryChartReader.ExternalReadCT_ChartSpace(length, oNewChartSpace);
-			// oParaDrawing.Set_GraphicObject(oNewChartSpace);
+			var oNewChartSpace = new CChartSpace();
+            var oBinaryChartReader = new BinaryChartReader(this.stream);
+            res = oBinaryChartReader.ExternalReadCT_ChartSpace(length, oNewChartSpace, this.Document);
+            oNewChartSpace.setBDeleted(false);
+            oParaDrawing.Set_GraphicObject(oNewChartSpace);
+            oNewChartSpace.setParent(oParaDrawing);
 		}
 		else if( c_oSerImageType2.AllowOverlap === type )
 			var AllowOverlap = this.stream.GetBool();
@@ -7856,12 +7858,15 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			var WrapText = this.stream.GetUChar();
 		else if( c_oSerWrapThroughTight.WrapPolygon === type )
 		{
+            wrappingPolygon.tempArrPoints = [];
 			var oStartRes = {start: null};
 			res = this.bcr.Read2(length, function(t, l){
                     return oThis.ReadWrapPolygon(t, l, wrappingPolygon, oStartRes);
                 });
-			if(null != oStartRes.start)
-				wrappingPolygon.relativeArrPoints.unshift(oStartRes.start);
+            if(null != oStartRes.start)
+                wrappingPolygon.tempArrPoints.unshift(oStartRes.start);
+            wrappingPolygon.setArrRelPoints(wrappingPolygon.tempArrPoints);
+            delete wrappingPolygon.tempArrPoints;
 		}
 		else
             res = c_oSerConstants.ReadUnknown;
@@ -7891,7 +7896,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		var res = c_oSerConstants.ReadOk;
         var oThis = this;
         if( c_oSerWrapPolygon.Edited === type )
-			wrappingPolygon.edited = this.stream.GetBool();
+			wrappingPolygon.setEdited(this.stream.GetBool());
 		else if( c_oSerWrapPolygon.Start === type )
 		{
 			oStartRes.start = new CPolygonPoint();
@@ -7902,7 +7907,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		else if( c_oSerWrapPolygon.ALineTo === type )
 		{
 			res = this.bcr.Read2(length, function(t, l){
-                    return oThis.ReadLineTo(t, l, wrappingPolygon.relativeArrPoints);
+                    return oThis.ReadLineTo(t, l, wrappingPolygon.tempArrPoints);
                 });
 		}
 		else
@@ -7927,13 +7932,13 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 	}
 	this.ReadPolygonPoint = function(type, length, oPoint)
 	{
-		var res = c_oSerConstants.ReadOk;
+        var res = c_oSerConstants.ReadOk;
         var oThis = this;
         if( c_oSerPoint2D.X === type )
-			oPoint.x = this.bcr.ReadDouble();
-		else if( c_oSerPoint2D.Y === type )
-			oPoint.y = this.bcr.ReadDouble();
-		else
+            oPoint.x = (this.bcr.ReadDouble()*36000 >> 0);
+        else if( c_oSerPoint2D.Y === type )
+            oPoint.y = (this.bcr.ReadDouble()*36000 >> 0);
+        else
             res = c_oSerConstants.ReadUnknown;
         return res;
 	}

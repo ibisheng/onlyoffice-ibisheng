@@ -54,16 +54,16 @@ var nbsp_string = String.fromCharCode( 0x00A0 );
 var   sp_string = String.fromCharCode( 0x0032 );
 
 var g_aPunctuation =
-[
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,
-    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,
-    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0
-];
+    [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0
+    ];
 
 g_aPunctuation[0x00AB] = 1; // символ «
 g_aPunctuation[0x00BB] = 1; // символ »
@@ -2269,7 +2269,7 @@ ParaEnd.prototype =
     Draw : function(X,Y,Context, bEndCell)
     {
         Context.SetFontSlot( fontslot_ASCII );
-        
+
         if ( typeof (editor) !== "undefined" && editor.ShowParaMarks )
         {
             if ( null !== this.SectionPr )
@@ -2827,12 +2827,12 @@ function ParaNumbering()
 
 ParaNumbering.prototype =
 {
-    Draw : function(X,Y,Context, Numbering, TextPr, NumPr)
+    Draw : function(X,Y,Context, Numbering, TextPr, NumPr, Theme)
     {
-        Numbering.Draw( NumPr.NumId, NumPr.Lvl, X, Y, Context, this.Internal.NumInfo, TextPr );
+        Numbering.Draw( NumPr.NumId, NumPr.Lvl, X, Y, Context, this.Internal.NumInfo, TextPr, Theme );
     },
 
-    Measure : function (Context, Numbering, NumInfo, TextPr, NumPr)
+    Measure : function (Context, Numbering, NumInfo, TextPr, NumPr, Theme)
     {
         this.Internal.NumInfo = NumInfo;
 
@@ -2845,7 +2845,7 @@ ParaNumbering.prototype =
         if ( undefined === Numbering )
             return { Width : this.Width, Height : this.Height, WidthVisible : this.WidthVisible };
 
-        var Temp = Numbering.Measure( NumPr.NumId, NumPr.Lvl, Context, NumInfo, TextPr );
+        var Temp = Numbering.Measure( NumPr.NumId, NumPr.Lvl, Context, NumInfo, TextPr, Theme );
         this.Width        = Temp.Width;
         this.WidthVisible = Temp.Width;
         this.WidthNum     = Temp.Width;
@@ -3650,6 +3650,9 @@ var WRAPPING_TYPE_THROUGH = 0x02;
 var WRAPPING_TYPE_TIGHT = 0x03;
 var WRAPPING_TYPE_TOP_AND_BOTTOM = 0x04;
 
+var MOVE_DELTA = 0.0000001;
+
+
 //Horizontal Relative Positioning Types
 var HOR_REL_POS_TYPE_CHAR = 0x00;
 var HOR_REL_POS_TYPE_COLUMN = 0x01;
@@ -3912,22 +3915,22 @@ ParaDrawing.prototype =
         var dr_objects = editor.WordControl.m_oLogicDocument.DrawingObjects;
 
         /*if(isRealObject(this.GraphicObj))
-        {
-            if(this.GraphicObj.isShape() || (this.GraphicObj.isGroup() && this.GraphicObj.haveShapes()))
-            {
-                Props.ShapeProperties =
-                {
-                    type: this.GraphicObj.getPresetGeom(),
-                    fill: this.GraphicObj.getFill(),
-                    stroke: this.GraphicObj.getStroke(),
-                    canChangeArrows: this.GraphicObj.canChangeArrows()
-                }
-            }
-            else if(this.GraphicObj.isImage()|| (this.GraphicObj.isGroup() && this.GraphicObj.haveImages()))
-            {
-                Props.ImageUrl = this.GraphicObj.getImageUrl();
-            }
-        }    */
+         {
+         if(this.GraphicObj.isShape() || (this.GraphicObj.isGroup() && this.GraphicObj.haveShapes()))
+         {
+         Props.ShapeProperties =
+         {
+         type: this.GraphicObj.getPresetGeom(),
+         fill: this.GraphicObj.getFill(),
+         stroke: this.GraphicObj.getStroke(),
+         canChangeArrows: this.GraphicObj.canChangeArrows()
+         }
+         }
+         else if(this.GraphicObj.isImage()|| (this.GraphicObj.isGroup() && this.GraphicObj.haveImages()))
+         {
+         Props.ImageUrl = this.GraphicObj.getImageUrl();
+         }
+         }    */
 
 
         if ( undefined != this.Parent && undefined != this.Parent.Parent && true === this.Parent.Parent.Is_DrawingShape() )
@@ -4056,56 +4059,56 @@ ParaDrawing.prototype =
 
     Set_Props : function(Props)
     {
-        if ( undefined != Props.Width || undefined != Props.Height )
-        {
-            var result_width, result_height;
-            var b_is_line = this.GraphicObj.checkLine();
-            if(Props.Width != undefined)
-                if(Props.Width >= MIN_SHAPE_SIZE || b_is_line)
-                    result_width = Props.Width;
-                else
-                    result_width = MIN_SHAPE_SIZE;
-            else
-                result_width = this.GraphicObj.absExtX;
+        /*if ( undefined != Props.Width || undefined != Props.Height )
+         {
+         var result_width, result_height;
+         var b_is_line = this.GraphicObj.checkLine();
+         if(Props.Width != undefined)
+         if(Props.Width >= MIN_SHAPE_SIZE || b_is_line)
+         result_width = Props.Width;
+         else
+         result_width = MIN_SHAPE_SIZE;
+         else
+         result_width = this.GraphicObj.absExtX;
 
-            if(Props.Height != undefined)
-                if(Props.Height >= MIN_SHAPE_SIZE || b_is_line)
-                    result_height = Props.Height;
-                else
-                    result_height = MIN_SHAPE_SIZE;
-            else
-                result_height = this.GraphicObj.absExtY;
+         if(Props.Height != undefined)
+         if(Props.Height >= MIN_SHAPE_SIZE || b_is_line)
+         result_height = Props.Height;
+         else
+         result_height = MIN_SHAPE_SIZE;
+         else
+         result_height = this.GraphicObj.absExtY;
 
-            if(this.GraphicObj.isShape() || this.GraphicObj.isImage() || (typeof  CChartAsGroup != "undefined" && this.GraphicObj instanceof  CChartAsGroup))
-            {
-                this.GraphicObj.setAbsoluteTransform(null, null, result_width, result_height, null, null, null);
-                this.GraphicObj.setXfrm(null, null, result_width, result_height, null, null, null);
-                this.GraphicObj.calculateAfterResize();
-            }
-            else if(this.GraphicObj.isGroup())
-            {
-                //this.GraphicObj.setSizes2(result_width, result_height);
-            }
+         if(this.GraphicObj.isShape() || this.GraphicObj.isImage() || (typeof  CChartAsGroup != "undefined" && this.GraphicObj instanceof  CChartAsGroup))
+         {
+         this.GraphicObj.setAbsoluteTransform(null, null, result_width, result_height, null, null, null);
+         this.GraphicObj.setXfrm(null, null, result_width, result_height, null, null, null);
+         this.GraphicObj.calculateAfterResize();
+         }
+         else if(this.GraphicObj.isGroup())
+         {
+         //this.GraphicObj.setSizes2(result_width, result_height);
+         }
 
-            var bounds = this.getBounds();
-            this.Update_Size(bounds.r - bounds.l, bounds.b - bounds.t);
-        }
+         var bounds = this.getBounds();
+         this.Update_Size(bounds.r - bounds.l, bounds.b - bounds.t);
+         }
 
-        if(isRealObject(Props.ChartProperties))
-        {
-            if(this.GraphicObj.setDiagram)
-            {
-                this.GraphicObj.setDiagram(Props.ChartProperties)
-            }
-            if(this.GraphicObj.isGroup())
-                this.GraphicObj.setDiagram(Props.ChartProperties);
-        }
+         if(isRealObject(Props.ChartProperties))
+         {
+         if(this.GraphicObj.setDiagram)
+         {
+         this.GraphicObj.setDiagram(Props.ChartProperties)
+         }
+         if(this.GraphicObj.isGroup())
+         this.GraphicObj.setDiagram(Props.ChartProperties);
+         }
 
-        if(typeof Props.ImageUrl === "string" && this.GraphicObj.isImage() && !isRealObject(this.GraphicObj.chart))
-        {
-            this.GraphicObj.setRasterImage2(Props.ImageUrl);
-        }
-
+         if(typeof Props.ImageUrl === "string" && this.GraphicObj.isImage() && !isRealObject(this.GraphicObj.chart))
+         {
+         this.GraphicObj.setRasterImage2(Props.ImageUrl);
+         }
+         */
         if ( undefined != Props.WrappingStyle )
         {
             if ( drawing_Inline === this.DrawingType && c_oAscWrapStyle2.Inline != Props.WrappingStyle && undefined === Props.Paddings )
@@ -4147,14 +4150,15 @@ ParaDrawing.prototype =
             this.Set_PositionV( Props.PositionV.RelativeFrom, Props.PositionV.UseAlign, ( true === Props.PositionV.UseAlign ? Props.PositionV.Align : Props.PositionV.Value ) );
     },
 
-    Draw : function(X,Y,Context)
+    Draw : function( X, Y, pGraphics, pageIndex, align)
     {
         if ( drawing_Inline === this.DrawingType )
         {
-            this.draw(Context);
+            pGraphics.shapePageIndex = pageIndex;
+            this.draw(pGraphics, pageIndex);
+            pGraphics.shapePageIndex = null;
         }
     },
-
     Measure : function(Context)
     {
         if(this.bNeedUpdateWH || (!this.W || !this.H))
@@ -4170,15 +4174,15 @@ ParaDrawing.prototype =
         this.Height       = this.H;
         this.WidthVisible = this.W;
     },
-    
+
     Save_RecalculateObject : function(Copy)
     {
         var DrawingObj = new Object();
-        
+
         DrawingObj.Type         = this.Type;
         DrawingObj.DrawingType  = this.DrawingType;
         DrawingObj.WrappingType = this.wrappingType;
-        
+
         if ( drawing_Anchor === this.Get_DrawingType() && true === this.Use_TextWrap() )
         {
             DrawingObj.FlowPos =
@@ -4189,10 +4193,10 @@ ParaDrawing.prototype =
                 H : this.H + this.Distance.B
             }
         }
-        
+
         return DrawingObj;
     },
-    
+
     Load_RecalculateObject : function(RecalcObj)
     {
     },
@@ -4275,11 +4279,7 @@ ParaDrawing.prototype =
             data.newId = null;
         }
         History.Add(this, data);
-        if(isRealObject(this.GraphicObj))
-            this.GraphicObj.setParent(null);
         this.GraphicObj = graphicObject;
-        if(isRealObject(graphicObject))
-            graphicObject.setParent(this);
 
     },
 
@@ -4327,25 +4327,24 @@ ParaDrawing.prototype =
         var W, H;
         if(this.Is_Inline())
         {
-            W = this.W;
-            H = this.H;
+            W = this.GraphicObj.bounds.w;
+            H = this.GraphicObj.bounds.h;
         }
         else
         {
             if(this.PositionH.Align)
-                W = this.W;
+                W = this.GraphicObj.bounds.w;
             else
                 W = this.getXfrmExtX();
 
             if(this.PositionV.Align)
-                H = this.H;
+                H = this.GraphicObj.bounds.h;
             else
                 H = this.getXfrmExtY();
 
             // Добавляем данный элемент в страницы параграфа
             this.Parent.Pages[PageNum - this.Parent.Get_StartPage_Absolute()].Add_Drawing( this );
         }
-
         this.Internal_Position.Set( W, H, this.YOffset, ParaLayout);
         this.Internal_Position.Calculate_X(bInline, this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
         this.Internal_Position.Calculate_Y(bInline, this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value);
@@ -4397,43 +4396,6 @@ ParaDrawing.prototype =
         if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.setParagraphBorders === "function")
             this.GraphicObj.setParagraphBorders(val);
     },
-    Update_Position2: function(pageIndex, x, y)
-    {
-        this.graphicObjects.removeById(this.pageIndex, this.Get_Id());
-        this.calculateOffset();
-        if(!this.Is_Inline())
-        {
-            this.GraphicObj.updatePosition2(x/* + this.boundsOffsetX*/, y/* + this.boundsOffsetY*/, null, null, null, null, null, false);
-        }
-        else
-        {
-            this.calculateOffset();
-            this.GraphicObj.updatePosition2(x + this.boundsOffsetX, y + this.boundsOffsetY, null, null, null, null, null, false);
-        }
-
-        if(typeof this.GraphicObj.setStartPage === "function")
-            this.GraphicObj.setStartPage(pageIndex);
-        this.setPageIndex(pageIndex);
-        this.graphicObjects.addObjectOnPage(pageIndex, this);
-        var b_history_is_on = History.Is_On();
-        if(b_history_is_on)
-        {
-            History.TurnOff();
-        }
-        this.GraphicObj.calculateAfterResize();
-        this.recalculateWrapPolygon();
-        this.calculateSnapArrays();
-        this.updateCursorTypes();
-        var bounds = this.getBounds();
-        this.X = bounds.l;
-        this.Y = bounds.t;
-        this.W = bounds.r - bounds.l;
-        this.H = bounds.b - bounds.t;
-        if(b_history_is_on)
-        {
-            History.TurnOn();
-        }
-    },
 
     deselect: function()
     {
@@ -4448,92 +4410,21 @@ ParaDrawing.prototype =
         this.setPageIndex(pageIndex);
         if(typeof this.GraphicObj.setStartPage === "function")
             this.GraphicObj.setStartPage(pageIndex);
-       /* this.graphicObjects.addObjectOnPage(pageIndex, this);
+        var _x = !this.PositionH.Align ? x - this.GraphicObj.bounds.x : x;
+        var _y = !this.PositionV.Align ? y - this.GraphicObj.bounds.y : y;
+        this.graphicObjects.addObjectOnPage(pageIndex, this.GraphicObj);
+        this.selectX = x;
+        this.selectY = y;
 
-        if(this.GraphicObj instanceof CChartAsGroup)
+        if( this.GraphicObj.bNeedUpdatePosition || !(isRealNumber(this.GraphicObj.posX) && isRealNumber(this.GraphicObj.posY)) ||
+            !(Math.abs(this.GraphicObj.posX-_x) < MOVE_DELTA && Math.abs(this.GraphicObj.posY-_y) < MOVE_DELTA))
+            this.GraphicObj.updatePosition(_x, _y);
+        // if(this.Use_TextWrap())
         {
-            this.GraphicObj.recalculate();
+            if( this.GraphicObj.bNeedUpdatePosition || !(isRealNumber(this.wrappingPolygon.posX) && isRealNumber(this.wrappingPolygon.posY)) ||
+                !(Math.abs(this.wrappingPolygon.posX -_x) < MOVE_DELTA && Math.abs(this.wrappingPolygon.posY-_y) < MOVE_DELTA))
+                this.wrappingPolygon.updatePosition(_x, _y);
         }
-        if(this.bNeedUpdateWH)
-        {
-            this.updateWidthHeight();
-        }
-        var bounds = this;
-
-        // this.X = bounds.l;
-       // this.Y = bounds.t;
-
-        if(!(isRealObject(this.Parent) && isRealObject(this.Parent.Parent) && typeof this.Parent.Parent.Is_HdrFtr === "function" && this.Parent.Parent.Is_HdrFtr()))
-        {
-            if(this.selected && isRealObject(this.GraphicObj))
-                this.GraphicObj.selectStartPage = pageIndex;
-        }   */
-
-        this.graphicObjects.addObjectOnPage(pageIndex, this);
-        var bounds = this.getBounds();
-        this.W = bounds.r - bounds.l;
-        this.H = bounds.b - bounds.t;
-        // this.X = bounds.l;
-        // this.Y = bounds.t;
-
-        if(!(isRealObject(this.Parent) && isRealObject(this.Parent.Parent) && typeof this.Parent.Parent.Is_HdrFtr === "function" && this.Parent.Parent.Is_HdrFtr()))
-        {
-            if(this.selected && isRealObject(this.GraphicObj))
-                this.GraphicObj.selectStartPage = pageIndex;
-        }
-        var off_x, off_y;
-        var absX, absY;
-        if(isRealObject(this.GraphicObj))
-        {
-            absX = this.GraphicObj.absOffsetX;
-            absY = this.GraphicObj.absOffsetY;
-        }
-        else
-        {
-            absX = this.absOffsetX;
-            absY = this.absOffsetY;
-        }
-        if(this.Is_Inline())
-        {
-
-            off_x = absX - bounds.l;
-            off_y = absY - bounds.t;
-            this.setAbsoluteTransform(x + off_x, y + off_y, null, null, null, null, null, false);
-        }
-        else
-        {
-            if(this.PositionH.Align)
-            {
-                off_x = absX - bounds.l;
-            }
-            else
-            {
-                off_x = 0;
-            }
-            if(this.PositionV.Align)
-            {
-                off_y = absY - bounds.t;
-            }
-            else
-            {
-                off_y = 0;
-            }
-            this.setAbsoluteTransform(x + off_x, y + off_y, null, null, null, null, null, false);
-        }
-        if(isRealObject(this.GraphicObj))
-        {
-            var off_x2 = absX - bounds.l;
-            var off_y2 = absY - bounds.t;
-            this.selectX = this.GraphicObj.absOffsetX - off_x2;
-            this.selectY = this.GraphicObj.absOffsetY - off_y2;
-        }
-        if(!this.Is_Inline())
-        {
-            if( this.wrappingType !== WRAPPING_TYPE_NONE)
-                this.recalculateWrapPolygon();
-        }
-        this.calculateSnapArrays();
-        this.updateCursorTypes();
     },
 
     Set_XYForAdd2 : function(X, Y)
@@ -4614,7 +4505,7 @@ ParaDrawing.prototype =
         History.Add( this, { Type : historyitem_Drawing_DrawingType, New : DrawingType, Old : this.DrawingType } );
         this.DrawingType = DrawingType;
         /*if(typeof this.graphicObjects.curState.updateAnchorPos === "function")
-            this.graphicObjects.curState.updateAnchorPos();      */
+         this.graphicObjects.curState.updateAnchorPos();      */
         this.updateWidthHeight();
     },
 
@@ -4622,7 +4513,6 @@ ParaDrawing.prototype =
     {
         History.Add( this, { Type : historyitem_Drawing_WrappingType, New : WrapType, Old : this.wrappingType } );
         this.wrappingType = WrapType;
-        this.updateWidthHeight();
     },
 
     Set_BehindDoc : function(BehindDoc)
@@ -4732,39 +4622,39 @@ ParaDrawing.prototype =
         }
 
         /*
-        this.Set_PositionH( c_oAscRelativeFromH.Column, false, 0 );
-        this.Set_PositionV( c_oAscRelativeFromV.Paragraph, false, 0 );
+         this.Set_PositionH( c_oAscRelativeFromH.Column, false, 0 );
+         this.Set_PositionV( c_oAscRelativeFromV.Paragraph, false, 0 );
 
-        this.PositionH_Old =
-        {
-            RelativeFrom : this.PositionH.RelativeFrom,
-            Align        : this.PositionH.Align,
-            Value        : this.PositionH.Value,
+         this.PositionH_Old =
+         {
+         RelativeFrom : this.PositionH.RelativeFrom,
+         Align        : this.PositionH.Align,
+         Value        : this.PositionH.Value,
 
-            RelativeFrom2 : c_oAscRelativeFromH.Page,
-            Align2        : false,
-            Value2        : X
-        };
+         RelativeFrom2 : c_oAscRelativeFromH.Page,
+         Align2        : false,
+         Value2        : X
+         };
 
-        this.PositionV_Old =
-        {
-            RelativeFrom : this.PositionV.RelativeFrom,
-            Align        : this.PositionV.Align,
-            Value        : this.PositionV.Value,
+         this.PositionV_Old =
+         {
+         RelativeFrom : this.PositionV.RelativeFrom,
+         Align        : this.PositionV.Align,
+         Value        : this.PositionV.Value,
 
-            RelativeFrom2 : c_oAscRelativeFromV.Page,
-            Align2        : false,
-            Value2        : Y
-        };
+         RelativeFrom2 : c_oAscRelativeFromV.Page,
+         Align2        : false,
+         Value2        : Y
+         };
 
-        this.PositionH.RelativeFrom = c_oAscRelativeFromH.Page;
-        this.PositionH.Align        = false;
-        this.PositionH.Value        = X;
+         this.PositionH.RelativeFrom = c_oAscRelativeFromH.Page;
+         this.PositionH.Align        = false;
+         this.PositionH.Value        = X;
 
-        this.PositionV.RelativeFrom = c_oAscRelativeFromV.Page;
-        this.PositionV.Align        = false;
-        this.PositionV.Value        = Y;
-        */
+         this.PositionV.RelativeFrom = c_oAscRelativeFromV.Page;
+         this.PositionV.Align        = false;
+         this.PositionV.Value        = Y;
+         */
     },
 
     Get_DrawingType : function()
@@ -4792,32 +4682,22 @@ ParaDrawing.prototype =
 
     OnEnd_MoveInline : function(NearPos)
     {
-        var LogicDocument = editor.WordControl.m_oLogicDocument;
-        if ( false === LogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props, { Type : changestype_2_Element_and_Type, Element : NearPos.Paragraph, CheckType : changestype_Paragraph_Content } ) && false === editor.isViewMode)
+        if ( true !== Debug_ParaRunMode )
         {
-            LogicDocument.Create_NewHistoryPoint();
+            var bCorrectIndex = this.Parent === NearPos.Paragraph ? true : false;
+            var Index = this.Remove_FromDocument( false );
 
-            if ( true !== Debug_ParaRunMode )
-            {
-                var bCorrectIndex = this.Parent === NearPos.Paragraph ? true : false;
-                var Index = this.Remove_FromDocument( false );
+            if ( true === bCorrectIndex && Index < NearPos.ContentPos )
+                NearPos.ContentPos--;
 
-                if ( true === bCorrectIndex && Index < NearPos.ContentPos )
-                    NearPos.ContentPos--;
-
-                this.Add_ToDocument( NearPos, true );
-            }
-            else
-            {
-                NearPos.Paragraph.Check_NearestPos( NearPos );
-
-                var RunPr = this.Remove_FromDocument( false );
-                this.Add_ToDocument( NearPos, true, RunPr );
-            }
+            this.Add_ToDocument( NearPos, true );
         }
         else
         {
-            LogicDocument.Document_UpdateSelectionState();
+            NearPos.Paragraph.Check_NearestPos( NearPos );
+
+            var RunPr = this.Remove_FromDocument( false );
+            this.Add_ToDocument( NearPos, true, RunPr );
         }
     },
 
@@ -4827,7 +4707,7 @@ ParaDrawing.prototype =
         // Проверяем, залочено ли данное изображение
         if (true/* false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Image_Properties)*/ )
         {
-         //   LogicDocument.Create_NewHistoryPoint();
+            //   LogicDocument.Create_NewHistoryPoint();
             this.Update_Size( W, H );
             LogicDocument.Recalculate();
         }
@@ -4845,8 +4725,8 @@ ParaDrawing.prototype =
         {
             var Layout = NearPos.Paragraph.Get_Layout( NearPos.ContentPos, this );
 
-            var _W = (this.PositionH.Align ? this.W : this.getXfrmExtX() );
-            var _H = (this.PositionV.Align ? this.H : this.getXfrmExtY() );
+            var _W = this.W;
+            var _H = this.H;
 
             this.Internal_Position.Set( _W, _H, this.YOffset, Layout.ParagraphLayout );
             this.Internal_Position.Calculate_X(false, c_oAscRelativeFromH.Page, false, X);
@@ -4918,6 +4798,18 @@ ParaDrawing.prototype =
             return Result;
         }
     },
+
+
+
+    Get_ParentParagraph: function()
+    {
+        if(this.Parent instanceof Paragraph )
+            return this.Parent;
+        if(this.Parent instanceof ParaRun)
+            return this.Parent.Paragraph;
+        return null;
+    },
+
 
     Add_ToDocument : function(NearPos, bRecalculate, RunPr)
     {
@@ -5818,7 +5710,7 @@ ParaDrawing.prototype =
 
             case historyitem_Drawing_AbsoluteTransform:
             {
-                    var reader = Reader;
+                var reader = Reader;
                 if(reader.GetBool())
                 {
                     this.absOffsetX = reader.GetDouble();
@@ -5870,7 +5762,7 @@ ParaDrawing.prototype =
             case historyitem_Drawing_SetGraphicObject:
             {
                 /*if(this.GraphicObj != null)
-                    this.GraphicObj.parent = null;  */
+                 this.GraphicObj.parent = null;  */
                 if(Reader.GetBool())
                 {
                     this.GraphicObj = g_oTableId.Get_ById(Reader.GetString2());
@@ -5990,9 +5882,9 @@ ParaDrawing.prototype =
         this.Distance.B  = Reader.GetDouble();
         this.Distance.L  = Reader.GetDouble();
         this.Distance.R  = Reader.GetDouble();
-       // this.GraphicObj  = new GraphicPicture( Reader.GetString2() );
+        // this.GraphicObj  = new GraphicPicture( Reader.GetString2() );
 
-      //  CollaborativeEditing.Add_NewImage( this.GraphicObj.Img );
+        //  CollaborativeEditing.Add_NewImage( this.GraphicObj.Img );
         this.drawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
         this.document = editor.WordControl.m_oLogicDocument;
         this.graphicObjects = editor.WordControl.m_oLogicDocument.DrawingObjects;
@@ -6022,7 +5914,7 @@ ParaDrawing.prototype =
         if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.draw === "function")
         {
             graphics.SaveGrState();
-            this.GraphicObj.draw(graphics, pageIndex);
+            this.GraphicObj.draw(graphics);
             graphics.RestoreGrState();
         }
     },
@@ -6070,10 +5962,10 @@ ParaDrawing.prototype =
         return false;
     },
 
-    isShapeChild: function()
+    isShapeChild: function(bRetShape)
     {
         if(!this.Is_Inline())
-            return false;
+            return bRetShape ? null : false;
 
         var cur_doc_content = this.DocumentContent;
         while(cur_doc_content.Is_TableCellContent())
@@ -6081,10 +5973,10 @@ ParaDrawing.prototype =
             cur_doc_content = cur_doc_content.Parent.Row.Table.Parent;
         }
 
-        if(isRealObject(cur_doc_content.Parent) && typeof cur_doc_content.Parent.isShape === "function")
-            return cur_doc_content.Parent.isShape();
+        if(isRealObject(cur_doc_content.Parent) && typeof cur_doc_content.Parent.getObjectType === "function" && cur_doc_content.Parent.getObjectType() === historyitem_type_Shape)
+            return bRetShape ? cur_doc_content.Parent : true;
 
-        return false;
+        return bRetShape ? null : false;
     },
 
     getParentShape: function()
@@ -6103,6 +5995,57 @@ ParaDrawing.prototype =
 
         return null;
     },
+
+
+    checkShapeChildAndGetTopParagraph: function(paragraph)
+    {
+        var parent_paragraph = !paragraph ? this.Get_ParentParagraph() : paragraph;
+        var parent_doc_content = parent_paragraph.Parent;
+        if(parent_doc_content.Parent instanceof CShape)
+        {
+            if(!parent_doc_content.Parent.group)
+            {
+                return parent_doc_content.Parent.parent.Get_ParentParagraph();
+            }
+            else
+            {
+                var top_group = parent_doc_content.Parent.group;
+                while(top_group.group)
+                    top_group = top_group.group;
+                return top_group.parent.Get_ParentParagraph();
+            }
+        }
+        else if(parent_doc_content.Is_TableCellContent())
+        {
+            var top_doc_content = parent_doc_content;
+            while(top_doc_content.Is_TableCellContent())
+            {
+                top_doc_content = top_doc_content.Parent.Row.Table.Parent;
+            }
+            if(top_doc_content.Parent instanceof CShape)
+            {
+                if(!top_doc_content.Parent.group)
+                {
+                    return top_doc_content.Parent.parent.Get_ParentParagraph();
+                }
+                else
+                {
+                    var top_group = top_doc_content.Parent.group;
+                    while(top_group.group)
+                        top_group = top_group.group;
+                    return top_group.parent.Get_ParentParagraph();
+                }
+            }
+            else
+            {
+                return parent_paragraph;
+            }
+
+        }
+
+        return parent_paragraph;
+    },
+
 
 
     getArrContentDrawingObjects: function()
@@ -6476,6 +6419,8 @@ ParaDrawing.prototype =
             y0 = Y0Sp;
             y1 = Y1Sp;
         }
+
+        this.wrappingPolygon.wordGraphicObject = this;
         return this.wrappingPolygon.getArrayWrapIntervals(x0,y0, x1, y1, LeftField, RightField, arr_intervals);
     },
 
@@ -6671,7 +6616,7 @@ ParaDrawing.prototype =
         if(this.wrappingPolygon && this.wrappingPolygon.arrPoints.length > 0)
         {
             var radius = this.drawingDocument.GetMMPerDot(TRACK_CIRCLE_RADIUS);
-            var arr_point = this.wrappingPolygon.arrPoints;
+            var arr_point = this.wrappingPolygon.calculatedPoints;
             var point_count = arr_point.length;
             var dx, dy;
 
@@ -6752,27 +6697,27 @@ ParaDrawing.prototype =
     calculateAfterOpen: function()
     {
         /*if(isRealObject(this.GraphicObj) && typeof  this.GraphicObj.calculateAfterOpen === "function")
-        {
-            this.GraphicObj.parent = this;
-            this.GraphicObj.drawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
-            this.GraphicObj.calculateAfterOpen();
-            this.GraphicObj.recalculate(false, true);
+         {
+         this.GraphicObj.parent = this;
+         this.GraphicObj.drawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
+         this.GraphicObj.calculateAfterOpen();
+         this.GraphicObj.recalculate(false, true);
 
-            var bounds = this.getBounds();
-            this.W = bounds.r - bounds.l;
-            this.H = bounds.b - bounds.t;
-            if(isRealObject(this.wrappingPolygon) && this.wrappingPolygon.edited === true)
-            {
-                var kw = this.GraphicObj.absExtX/0.6;
-                var kh = this.GraphicObj.absExtY/0.6;
-                var rel_points = this.wrappingPolygon.relativeArrPoints;
-                for(var i = 0; i < rel_points.length; ++i)
-                {
-                    rel_points[i].x *= kw;
-                    rel_points[i].y *= kh;
-                }
-            }
-        }     */
+         var bounds = this.getBounds();
+         this.W = bounds.r - bounds.l;
+         this.H = bounds.b - bounds.t;
+         if(isRealObject(this.wrappingPolygon) && this.wrappingPolygon.edited === true)
+         {
+         var kw = this.GraphicObj.absExtX/0.6;
+         var kh = this.GraphicObj.absExtY/0.6;
+         var rel_points = this.wrappingPolygon.relativeArrPoints;
+         for(var i = 0; i < rel_points.length; ++i)
+         {
+         rel_points[i].x *= kw;
+         rel_points[i].y *= kh;
+         }
+         }
+         }     */
     },
 
     calculateOffset: function()
@@ -6791,29 +6736,8 @@ ParaDrawing.prototype =
 
     getBounds: function()
     {
-        if(this.GraphicObj.transform == null)
-        {
-            this.GraphicObj.transform = new CMatrix();
-            this.GraphicObj.transform.Translate(this.absOffsetX, this.absOffsetY);
-            this.GraphicObj.ownTransform = new CMatrix();
-            this.GraphicObj.ownTransform.Translate(this.absOffsetX, this.absOffsetY);
-        }
-        var bounds_checker = new  CSlideBoundsChecker();
-        bounds_checker.init(Page_Width, Page_Height, Page_Width, Page_Height);
-        var temp_transform = this.GraphicObj.transform;
-        if(this.GraphicObj instanceof  WordImage || (typeof  CChartAsGroup != "undefined" && this.GraphicObj instanceof CChartAsGroup))
-        {
-           this.GraphicObj.transform = this.GraphicObj.ownTransform;
-        }
-        bounds_checker.transform3(this.GraphicObj.transform);
-        bounds_checker.rect(0,0, this.GraphicObj.absExtX, this.GraphicObj.absExtY);
 
-        if(!(typeof  CChartAsGroup != "undefined" && this.GraphicObj instanceof CChartAsGroup))
-            this.draw(bounds_checker);
-        this.GraphicObj.transform = temp_transform;
-
-        bounds_checker.CorrectBounds();
-        return {l: bounds_checker.Bounds.min_x, t: bounds_checker.Bounds.min_y, r: bounds_checker.Bounds.max_x , b: bounds_checker.Bounds.max_y};
+        return this.GraphicObj.bounds;
     },
 
     getCenterPoint: function()
@@ -6981,17 +6905,17 @@ ParaDrawing.prototype =
             var g_o = this.GraphicObj;
             if(g_o.isImage() && !isRealObject(g_o.chart))
                 start_string = "TeamLabImage";
-                //w.WriteString2("TeamLabImage");
+            //w.WriteString2("TeamLabImage");
             else if(g_o.isImage() && isRealObject(g_o.chart))
                 start_string = "TeamLabChart";
             //w.WriteString2("TeamLabChart");
             else if(g_o.isShape())
                 start_string = "TeamLabShape";
 
-           // w.WriteString2("TeamLabShape");
+            // w.WriteString2("TeamLabShape");
             else if(g_o.isGroup())
                 start_string = "TeamLabGroup";
-                //w.WriteString2("TeamLabGroup");
+            //w.WriteString2("TeamLabGroup");
         }
         w.WriteLong(this.DrawingType);
         this.GraphicObj.writeToBinaryForCopyPaste(w);
@@ -7022,7 +6946,7 @@ ParaDrawing.prototype =
         w.WriteDouble(this.PositionV.Value);
         w.WriteLong(this.wrappingType);
         w.WriteBool(this.behindDoc);
-       // this.wrappingPolygon.writeToBinaryForCopyPaste(w);
+        // this.wrappingPolygon.writeToBinaryForCopyPaste(w);
         return start_string + w.pos + ";" + w.GetBase64Memory();
     },
 
@@ -7106,7 +7030,7 @@ ParaDrawing.prototype =
             this.Set_PositionV(this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value);
             this.Set_WrappingType(r.GetLong());
             this.Set_BehindDoc(r.GetBool());
-           // this.wrappingPolygon.readFromBinaryForCopyPaste(r);
+            // this.wrappingPolygon.readFromBinaryForCopyPaste(r);
             History.Add(this, {Type: historyitem_CalculateAfterPaste});
         }
     },
@@ -7121,9 +7045,9 @@ ParaDrawing.prototype =
 
     setExtent: function(extX, extY)
     {
-       History.Add(this,  {Type: historyitem_SetExtent, oldW: this.Extent.W, oldH: this.Extent.H, newW: extX, newH: extY});
-       this.Extent.W = extX;
-       this.Extent.H = extY;
+        History.Add(this,  {Type: historyitem_SetExtent, oldW: this.Extent.W, oldH: this.Extent.H, newW: extX, newH: extY});
+        this.Extent.W = extX;
+        this.Extent.H = extY;
     },
 
     addWrapPolygon: function(wrapPolygon)
@@ -7216,12 +7140,12 @@ function ParaPageNum()
     this.Type = para_PageNum;
 
     this.FontKoef = 1;
-    
+
     this.NumWidths = [];
-    
+
     this.Widths = [];
     this.String = [];
-    
+
     this.Width        = 0;
     this.Height       = 0;
     this.WidthVisible = 0;
@@ -7262,7 +7186,7 @@ ParaPageNum.prototype =
         this.Height       = 0;
         this.WidthVisible = 0;
     },
-    
+
     Set_Page : function(PageNum)
     {
         this.String = "" + PageNum;
@@ -7272,11 +7196,11 @@ ParaPageNum.prototype =
         for ( var Index = 0; Index < Len; Index++ )
         {
             var Char = parseInt(this.String.charAt(Index));
-            
+
             this.Widths[Index] = this.NumWidths[Char];
             RealWidth         += this.NumWidths[Char];
         }
-        
+
         this.Width        = RealWidth;
         this.WidthVisible = RealWidth;
     },
@@ -7290,7 +7214,7 @@ ParaPageNum.prototype =
     {
         this.Widths = RecalcObj.Widths;
         this.String = RecalcObj.String;
-        
+
         this.Width  = RecalcObj.Width;
         this.WidthVisible = this.Width;
     },
@@ -7343,7 +7267,7 @@ function CPageNumRecalculateObject(Type, Widths, String, Width, Copy)
     this.Widths = Widths;
     this.String = String;
     this.Width  = Width;
-    
+
     if ( true === Copy )
     {
         this.Widths = [];
@@ -7351,7 +7275,7 @@ function CPageNumRecalculateObject(Type, Widths, String, Width, Copy)
         for ( var Index = 0; Index < Count; Index++ )
             this.Widths[Index] = Widths[Index];
     }
-       
+
 }
 
 
@@ -7657,7 +7581,7 @@ ParaHyperlinkStart.prototype =
         this.ToolTip = Reader.GetString2();
 
         //if ( "" === this.ToolTip )
-         //   this.ToolTip = null;
+        //   this.ToolTip = null;
     },
 
     Write_ToBinary : function(Writer)
@@ -7967,7 +7891,7 @@ function ParaMath(bAddMenu, bCollaborative)
     this.Type  = para_Math;
 
     this.Jc   = undefined;
-	this.Math = new CMathComposition(bCollaborative);
+    this.Math = new CMathComposition(bCollaborative);
     this.Math.Parent = this;
 
     this.Inline = false; // внутристроковая формула или нет (проверяемся внутри Internal_Recalculate_0)
@@ -7988,9 +7912,9 @@ function ParaMath(bAddMenu, bCollaborative)
     this.CurLines = 0;
     this.CurRange = 0;
 
-	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
-	if (!bAddMenu)		
-		g_oTableId.Add( this, this.Id );
+    // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
+    if (!bAddMenu)
+        g_oTableId.Add( this, this.Id );
 
     // TODO:
     // по двойному, тройному клику селект элемента (мат. объекта/Run), формулы
@@ -8012,7 +7936,7 @@ ParaMath.prototype =
 
     Draw : function( X, Y, Context)
     {
-		this.Math.Draw( X, Y, Context );
+        this.Math.Draw( X, Y, Context );
     },
 
     Measure : function( Context, TextPr )
@@ -8052,32 +7976,32 @@ ParaMath.prototype =
             this.Math.AddToComposition(Item.Math.Root);
         }
     },
-	
-	AddText : function(oElem, sText, props)
+
+    AddText : function(oElem, sText, props)
     {
         if(sText)
-		{
-			var rPr = new CTextPr();
-			var oMRun = new CMathRunPrp();
-			if (props)
-				oMRun.setMathRunPrp(props);
-			oMRun.setTxtPrp(rPr);
-			if (oElem)
-			{
-				oElem.addElementToContent(oMRun);		
-				for (var i=0;i<sText.length;i++)
-				{
-					/*text[i].replace("&",	"&amp;");
-					text[i].Replace("'",	"&apos;");
-					text[i].Replace("<",	"&lt;");
-					text[i].Replace(">",	"&gt;");
-					text[i].Replace("\"",	"&quot;");*/
-					oText = new CMathText();
-					oText.addTxt(sText[i]);
-					oElem.addElementToContent(oText);
-				}	
-			}
-		}
+        {
+            var rPr = new CTextPr();
+            var oMRun = new CMathRunPrp();
+            if (props)
+                oMRun.setMathRunPrp(props);
+            oMRun.setTxtPrp(rPr);
+            if (oElem)
+            {
+                oElem.addElementToContent(oMRun);
+                for (var i=0;i<sText.length;i++)
+                {
+                    /*text[i].replace("&",	"&amp;");
+                     text[i].Replace("'",	"&apos;");
+                     text[i].Replace("<",	"&lt;");
+                     text[i].Replace(">",	"&gt;");
+                     text[i].Replace("\"",	"&quot;");*/
+                    oText = new CMathText();
+                    oText.addTxt(sText[i]);
+                    oElem.addElementToContent(oText);
+                }
+            }
+        }
     },
 
     CreateElem : function (oElem, oParent, props)
@@ -8091,64 +8015,64 @@ ParaMath.prototype =
             oParent.addElementToContent(oElem);
 
     },
-	
-	CreateFraction : function (oFraction,oParentElem,props,sNumText,sDenText)
-	{
-		this.CreateElem(oFraction, oParentElem, props);
-		
-		var oElemDen = oFraction.getDenominator();
-		this.AddText(oElemDen, sDenText);
-		
-		var oElemNum = oFraction.getNumerator();
-		this.AddText(oElemNum, sNumText);
-	},
-	
-	CreateDegree : function (oDegree, oParentElem,props,sBaseText,sSupText,sSubText)
-	{	
-		this.CreateElem(oDegree, oParentElem, props);
-		
-		var oElem = oDegree.getBase();
-		this.AddText(oElem, sBaseText);
-		
-		var oSup = oDegree.getUpperIterator();
-		this.AddText(oSup, sSupText);
-		
-		var oSub = oDegree.getLowerIterator();
-		this.AddText(oSub, sSubText);
-	},
-	
-	CreateRadical : function (oRad,oParentElem,props,sElemText,sDegText)
-	{
-		this.CreateElem(oRad, oParentElem, props);
-		
-		var oElem = oRad.getBase();
-		this.AddText(oElem, sElemText);
-		
-		var oDeg = oRad.getDegree();
-		this.AddText(oDeg, sDegText);		
-	},
-	
-	CreateNary : function (oNary,oParentElem,props,sElemText,sSubText,sSupText)
-	{
-		this.CreateElem(oNary, oParentElem, props);
-		
-		var oElem = oNary.getBase();
-		this.AddText(oElem, sElemText);
-		
-		var oSub = oNary.getLowerIterator();
-		this.AddText(oSub, sSubText);
-		
-		var oSup = oNary.getUpperIterator();
-		this.AddText(oSup, sSupText);	
-	},
-	
-	CreateBox : function (oBox,oParentElem,props,sElemText)
-	{
-		this.CreateElem(oBox, oParentElem, props);
-		
-		var oElem = oBox.getBase();
-		this.AddText(oElem, sElemText);
-	},
+
+    CreateFraction : function (oFraction,oParentElem,props,sNumText,sDenText)
+    {
+        this.CreateElem(oFraction, oParentElem, props);
+
+        var oElemDen = oFraction.getDenominator();
+        this.AddText(oElemDen, sDenText);
+
+        var oElemNum = oFraction.getNumerator();
+        this.AddText(oElemNum, sNumText);
+    },
+
+    CreateDegree : function (oDegree, oParentElem,props,sBaseText,sSupText,sSubText)
+    {
+        this.CreateElem(oDegree, oParentElem, props);
+
+        var oElem = oDegree.getBase();
+        this.AddText(oElem, sBaseText);
+
+        var oSup = oDegree.getUpperIterator();
+        this.AddText(oSup, sSupText);
+
+        var oSub = oDegree.getLowerIterator();
+        this.AddText(oSub, sSubText);
+    },
+
+    CreateRadical : function (oRad,oParentElem,props,sElemText,sDegText)
+    {
+        this.CreateElem(oRad, oParentElem, props);
+
+        var oElem = oRad.getBase();
+        this.AddText(oElem, sElemText);
+
+        var oDeg = oRad.getDegree();
+        this.AddText(oDeg, sDegText);
+    },
+
+    CreateNary : function (oNary,oParentElem,props,sElemText,sSubText,sSupText)
+    {
+        this.CreateElem(oNary, oParentElem, props);
+
+        var oElem = oNary.getBase();
+        this.AddText(oElem, sElemText);
+
+        var oSub = oNary.getLowerIterator();
+        this.AddText(oSub, sSubText);
+
+        var oSup = oNary.getUpperIterator();
+        this.AddText(oSup, sSupText);
+    },
+
+    CreateBox : function (oBox,oParentElem,props,sElemText)
+    {
+        this.CreateElem(oBox, oParentElem, props);
+
+        var oElem = oBox.getBase();
+        this.AddText(oElem, sElemText);
+    },
 
     Is_Empty : function()
     {
@@ -8256,9 +8180,9 @@ ParaMath.prototype =
         this.Math.Cursor_MoveToEndPos();
     },
     /*Apply_TextPr: function(TextPr)
-    {
-        this.Math.Apply_TextPr(TextPr);
-    },*/
+     {
+     this.Math.Apply_TextPr(TextPr);
+     },*/
 
     Copy : function()
     {
@@ -8277,58 +8201,58 @@ ParaMath.prototype =
 
     Write_ToBinary2 : function(Writer)
     {
-		Writer.WriteLong( historyitem_type_Math );
-		
-		var oThis = this;
-		this.bs = new BinaryCommonWriter(Writer);
-		this.boMaths = new Binary_oMathWriter(Writer);
+        Writer.WriteLong( historyitem_type_Math );
 
-		this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteOMathParaCollaborative(oThis.Math);});//WriteOMathParaCollaborative
+        var oThis = this;
+        this.bs = new BinaryCommonWriter(Writer);
+        this.boMaths = new Binary_oMathWriter(Writer);
+
+        this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteOMathParaCollaborative(oThis.Math);});//WriteOMathParaCollaborative
     },
 
-	/*Write_ElemToBinary2 : function(Writer, elem)
-    {
-		var oThis = this;
-		this.bs = new BinaryCommonWriter(Writer);
-		this.boMaths = new Binary_oMathWriter(Writer);
-		
-		this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteArgNodes(elem);});
-    },*/
-	
-	//добавление формулы в формулу
-	
-	
+    /*Write_ElemToBinary2 : function(Writer, elem)
+     {
+     var oThis = this;
+     this.bs = new BinaryCommonWriter(Writer);
+     this.boMaths = new Binary_oMathWriter(Writer);
+
+     this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteArgNodes(elem);});
+     },*/
+
+    //добавление формулы в формулу
+
+
     Read_FromBinary2 : function(Reader)
     {
-		var oThis = this;
-		this.boMathr = new Binary_oMathReader(Reader);
-		this.bcr = new Binary_CommonReader(Reader);
-		
-		var length = Reader.GetUChar();
-		
-		var res = false;
-		Reader.cur += 3;
-		res = this.bcr.Read1(length, function(t, l){
-			return oThis.boMathr.ReadMathOMathParaCollaborative(t,l,oThis.Math);
-		});
-	},
-	
-	/*Read_ElemFromBinary2 : function(Reader, elem)
-    {
-		var oThis = this;
-		this.boMathr = new Binary_oMathReader(Reader);
-		this.bcr = new Binary_CommonReader(Reader);
-		
-		var length = Reader.GetUChar();
-		
-		var res = false;
-		Reader.cur += 3;
-		res = this.bcr.Read1(length, function(t, l){
-			return oThis.boMathr.ReadMathArg(t,l,elem);
-		});
-	},*/
-	
-	
+        var oThis = this;
+        this.boMathr = new Binary_oMathReader(Reader);
+        this.bcr = new Binary_CommonReader(Reader);
+
+        var length = Reader.GetUChar();
+
+        var res = false;
+        Reader.cur += 3;
+        res = this.bcr.Read1(length, function(t, l){
+            return oThis.boMathr.ReadMathOMathParaCollaborative(t,l,oThis.Math);
+        });
+    },
+
+    /*Read_ElemFromBinary2 : function(Reader, elem)
+     {
+     var oThis = this;
+     this.boMathr = new Binary_oMathReader(Reader);
+     this.bcr = new Binary_CommonReader(Reader);
+
+     var length = Reader.GetUChar();
+
+     var res = false;
+     Reader.cur += 3;
+     res = this.bcr.Read1(length, function(t, l){
+     return oThis.boMathr.ReadMathArg(t,l,elem);
+     });
+     },*/
+
+
 
     Save_Changes : function(Data, Writer)
     {
@@ -8337,7 +8261,7 @@ ParaMath.prototype =
 
     Load_Changes : function(Reader)
     {
-		this.Math.CurrentContent.Load_Changes(Reader);
+        this.Math.CurrentContent.Load_Changes(Reader);
     }
 };
 
@@ -8380,7 +8304,6 @@ function ParagraphContent_Read_FromBinary(Reader)
 
     return Element;
 }
-
 
 
 

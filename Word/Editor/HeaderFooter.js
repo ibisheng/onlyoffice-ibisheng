@@ -64,6 +64,17 @@ CHeaderFooter.prototype =
     {
         return this.Id;
     },
+
+
+    Get_Theme: function()
+    {
+        return this.LogicDocument.Get_Theme();
+    },
+
+    Get_ColorMap: function()
+    {
+        return this.LogicDocument.Get_ColorMap();
+    },
     
     Copy : function()
     {
@@ -233,6 +244,12 @@ CHeaderFooter.prototype =
     {
         return null;
     },
+
+    Get_ShapeStyleForPara: function()
+    {
+        return null;
+    },
+
 
     Get_TextBackGroundColor : function()
     {

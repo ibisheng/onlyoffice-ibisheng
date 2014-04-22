@@ -2165,6 +2165,12 @@ CSlideBoundsChecker.prototype =
     DrawLockParagraph: function()
     {},
 
+    GetIntegerGrid: function()
+    {
+        return false;
+    },
+
+
     drawCollaborativeChanges: function()
     {},
 

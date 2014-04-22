@@ -153,6 +153,11 @@ function RotateTrackShapeImage(originalObject)
 
     this.trackEnd = function()
     {
+        if(!this.originalObject.spPr.xfrm)
+        {
+            this.originalObject.spPr.setXfrm(new CXfrm());
+            this.originalObject.spPr.xfrm.setParent(this.originalObject.spPr);
+        }
         this.originalObject.spPr.xfrm.setRot(this.angle);
     };
 
@@ -254,6 +259,11 @@ function RotateTrackGroup(originalObject)
 
     this.trackEnd = function()
     {
+        if(!this.originalObject.spPr.xfrm)
+        {
+            this.originalObject.spPr.setXfrm(new CXfrm());
+            this.originalObject.spPr.xfrm.setParent(this.originalObject.spPr);
+        }
         this.originalObject.spPr.xfrm.setRot(this.angle);
     }
 }

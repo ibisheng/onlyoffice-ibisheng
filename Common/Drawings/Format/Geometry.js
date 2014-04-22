@@ -750,14 +750,7 @@ Geometry.prototype=
             }
             case historyitem_GeometryAddPath:
             {
-                for(var i = this.pathLst.length; i > -1; --i)
-                {
-                    if(this.pathLst[i] === data.newPr)
-                    {
-                        this.pathLst.splice(i, 1);
-                        break;
-                    }
-                }
+                this.pathLst.push(data.newPr);
                 break;
             }
             case historyitem_GeometryAddRect:

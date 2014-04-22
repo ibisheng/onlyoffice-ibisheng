@@ -1,12 +1,29 @@
 "use strict";
 
-CChartSpace.prototype.addToDrawingObjects =  CShape.prototype.addToDrawingObjects;
-CChartSpace.prototype.setDrawingObjects = CShape.prototype.setDrawingObjects;
-CChartSpace.prototype.setDrawingBase = CShape.prototype.setDrawingBase;
-CChartSpace.prototype.deleteDrawingBase = CShape.prototype.deleteDrawingBase;
-
 CChartSpace.prototype.recalculateTransform = CShape.prototype.recalculateTransform;
-CChartSpace.prototype.recalculateBounds = CShape.prototype.recalculateBounds;
+CChartSpace.prototype.recalculateBounds =  function()
+{
+    var t = this.localTransform;
+    var arr_p_x = [];
+    var arr_p_y = [];
+    arr_p_x.push(t.TransformPointX(0,0));
+    arr_p_y.push(t.TransformPointY(0,0));
+    arr_p_x.push(t.TransformPointX(this.extX,0));
+    arr_p_y.push(t.TransformPointY(this.extX,0));
+    arr_p_x.push(t.TransformPointX(this.extX,this.extY));
+    arr_p_y.push(t.TransformPointY(this.extX,this.extY));
+    arr_p_x.push(t.TransformPointX(0,this.extY));
+    arr_p_y.push(t.TransformPointY(0,this.extY));
+
+    this.bounds.x = Math.min.apply(Math, arr_p_x);
+    this.bounds.y = Math.min.apply(Math, arr_p_y);
+    this.bounds.l = this.bounds.x;
+    this.bounds.t = this.bounds.y;
+    this.bounds.r = Math.max.apply(Math, arr_p_x);
+    this.bounds.b = Math.max.apply(Math, arr_p_y);
+    this.bounds.w = this.bounds.r - this.bounds.l;
+    this.bounds.h = this.bounds.b - this.bounds.t;
+};
 CChartSpace.prototype.deselect = CShape.prototype.deselect;
 CChartSpace.prototype.hitToHandles = CShape.prototype.hitToHandles;
 CChartSpace.prototype.hitInBoundingRect = CShape.prototype.hitInBoundingRect;
@@ -23,6 +40,8 @@ CChartSpace.prototype.check_bounds = CShape.prototype.check_bounds;
 CChartSpace.prototype.normalize = CShape.prototype.normalize;
 CChartSpace.prototype.getFullFlipH = CShape.prototype.getFullFlipH;
 CChartSpace.prototype.getFullFlipV = CShape.prototype.getFullFlipV;
+CChartSpace.prototype.Get_Theme = CShape.prototype.Get_Theme;
+CChartSpace.prototype.Get_ColorMap = CShape.prototype.Get_ColorMap;
 
 CChartSpace.prototype.setRecalculateInfo = function()
 {
@@ -40,6 +59,7 @@ CChartSpace.prototype.setRecalculateInfo = function()
         dataLbls:[],
         axisLabels: [],
         recalculateAxisVal: true,
+        recalculateAxisCat: true ,
         recalculateAxisTickMark: true,
         recalculateBrush: true,
         recalculatePen: true,
@@ -47,11 +67,17 @@ CChartSpace.prototype.setRecalculateInfo = function()
         recalculatePlotAreaPen: true,
         recalculateHiLowLines: true,
         recalculateUpDownBars: true,
-        recalculateLegend: true
+        recalculateLegend: true,
+        recalculateWrapPolygon: true
     };
     this.baseColors = [];
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
     this.chartObj = null;
+    this.localTransform = new CMatrix();
+    this.snapArrayX = [];
+    this.snapArrayY = [];
+    this.rectGeometry = ExecuteNoHistory(function(){return  CreateGeometry("rect");},  this, []);
+    this.bNeedUpdatePosition = true;
 };
 CChartSpace.prototype.recalcTransform = function()
 {
@@ -60,6 +86,10 @@ CChartSpace.prototype.recalcTransform = function()
 CChartSpace.prototype.recalcBounds = function()
 {
     this.recalcInfo.recalculateBounds = true;
+};
+CChartSpace.prototype.recalcWrapPolygon = function()
+{
+    this.recalcInfo.recalculateWrapPolygon = true;
 };
 CChartSpace.prototype.recalcChart = function()
 {
@@ -79,6 +109,14 @@ CChartSpace.prototype.recalcDLbls = function()
     this.recalcInfo.recalculateDLbls = true;
 };
 
+CChartSpace.prototype.addToSetPosition = function(dLbl)
+{
+    if(dLbl instanceof CDLbl)
+        this.recalcInfo.dataLbls.push(dLbl);
+    else if(dLbl instanceof CTitle)
+        this.recalcInfo.axisLabels.push(dLbl);
+};
+
 CChartSpace.prototype.addToRecalculate = CShape.prototype.addToRecalculate;
 
 CChartSpace.prototype.handleUpdatePosition = function()
@@ -94,12 +132,14 @@ CChartSpace.prototype.handleUpdateExtents = function()
     this.recalcChart();
     this.recalcBounds();
     this.recalcDLbls();
+    this.recalcWrapPolygon();
     this.setRecalculateInfo();
     this.addToRecalculate();
 };
 CChartSpace.prototype.handleUpdateFlip = function()
 {
     this.recalcTransform();
+    this.recalcWrapPolygon();
     this.setRecalculateInfo();
     this.addToRecalculate();
 };
@@ -112,21 +152,14 @@ CChartSpace.prototype.handleUpdateChart = function()
 CChartSpace.prototype.handleUpdateStyle = function()
 {
     this.setRecalculateInfo();
+
     this.addToRecalculate();
 };
 CChartSpace.prototype.canGroup = CShape.prototype.canGroup;
 CChartSpace.prototype.convertPixToMM = CShape.prototype.convertPixToMM;
 CChartSpace.prototype.getCanvasContext = CShape.prototype.getCanvasContext;
 CChartSpace.prototype.getHierarchy = CShape.prototype.getHierarchy;
-CChartSpace.prototype.getParentObjects = function()
-{
-    var parents = { slide: null, layout: null, master: null, theme: window["Asc"]["editor"].wbModel.theme };
-    if(this.clrMapOvr)
-    {
-        parents.slide = {clrMap: this.clrMapOvr};
-    }
-    return parents;
-};
+CChartSpace.prototype.getParentObjects = CShape.prototype.getParentObjects;
 CChartSpace.prototype.recalculateTransform = CShape.prototype.recalculateTransform;
 CChartSpace.prototype.recalculateChart = function()
 {
@@ -147,31 +180,67 @@ CChartSpace.prototype.createMoveTrack = CShape.prototype.createMoveTrack;
 CChartSpace.prototype.getAspect = CShape.prototype.getAspect;
 CChartSpace.prototype.getRectBounds = CShape.prototype.getRectBounds;
 
-CChartSpace.prototype.recalculateBounds = function()
+CChartSpace.prototype.draw = function(graphics)
 {
-    var transform = this.transform;
-    var a_x = [];
-    var a_y = [];
-    a_x.push(transform.TransformPointX(0, 0));
-    a_y.push(transform.TransformPointY(0, 0));
-    a_x.push(transform.TransformPointX(this.extX, 0));
-    a_y.push(transform.TransformPointY(this.extX, 0));
-    a_x.push(transform.TransformPointX(this.extX, this.extY));
-    a_y.push(transform.TransformPointY(this.extX, this.extY));
-    a_x.push(transform.TransformPointX(0, this.extY));
-    a_y.push(transform.TransformPointY(0, this.extY));
-    this.bounds.l = Math.min.apply(Math, a_x);
-    this.bounds.t = Math.min.apply(Math, a_y);
-    this.bounds.r = Math.max.apply(Math, a_x);
-    this.bounds.b = Math.max.apply(Math, a_y);
-    this.bounds.w = this.bounds.r - this.bounds.l;
-    this.bounds.h = this.bounds.b - this.bounds.t;
-    this.bounds.x = this.bounds.l;
-    this.bounds.y = this.bounds.t;
-};
+    /*this.setRecalculateInfo();
+     this.recalculate();*/
+    var intGrid = graphics.GetIntegerGrid();
+    graphics.SetIntegerGrid(false);
+    graphics.transform3(this.transform, false);
 
+    this.chartObj.draw(this, graphics);
+    graphics.reset();
+    graphics.SetIntegerGrid(intGrid);
+
+    if(this.chart)
+    {
+        if(this.chart.plotArea)
+        {
+            if(this.chart.plotArea.chart && this.chart.plotArea.chart.series)
+            {
+                var series = this.chart.plotArea.chart.series;
+                for(var i = 0; i < series.length; ++i)
+                {
+                    var ser = series[i];
+                    var pts = getPtsFromSeries(ser);
+                    for(var j = 0; j < pts.length; ++j)
+                    {
+                        if(pts[j].compiledDlb)
+                            pts[j].compiledDlb.draw(graphics);
+                    }
+                }
+            }
+            if(this.chart.plotArea.catAx)
+            {
+                if(this.chart.plotArea.catAx.title)
+                    this.chart.plotArea.catAx.title.draw(graphics);
+                if(this.chart.plotArea.catAx.labels)
+                    this.chart.plotArea.catAx.labels.draw(graphics);
+            }
+            if(this.chart.plotArea.valAx)
+            {
+                if(this.chart.plotArea.valAx.title)
+                    this.chart.plotArea.valAx.title.draw(graphics);
+                if(this.chart.plotArea.valAx.labels)
+                    this.chart.plotArea.valAx.labels.draw(graphics);
+            }
+
+        }
+        if(this.chart.title)
+        {
+            this.chart.title.draw(graphics);
+        }
+        if(this.chart.legend)
+        {
+            this.chart.legend.draw(graphics);
+        }
+    }
+
+};
 CChartSpace.prototype.recalculate = function()
 {
+    if(this.bDeleted)
+        return;
     ExecuteNoHistory(function()
     {
         this.updateLinks();
@@ -179,12 +248,8 @@ CChartSpace.prototype.recalculate = function()
         if(this.recalcInfo.recalculateTransform)
         {
             this.recalculateTransform();
+            this.rectGeometry.Recalculate(this.extX, this.extY);
             this.recalcInfo.recalculateTransform = false;
-        }
-        if(this.recalcInfo.recalculateBounds)
-        {
-            this.recalculateBounds();
-            this.recalcInfo.recalculateBounds = false;
         }
         if(this.recalcInfo.recalculateBaseColors)
         {
@@ -278,20 +343,10 @@ CChartSpace.prototype.recalculate = function()
 
         for(var i = 0; i < this.recalcInfo.dataLbls.length; ++i)
         {
-            var series = this.chart.plotArea.chart.series;
             if(this.recalcInfo.dataLbls[i].series && this.recalcInfo.dataLbls[i].pt)
             {
-
-                var ser_idx = this.recalcInfo.dataLbls[i].series.idx; //сделаем проверку лежит ли серия с индексом this.recalcInfo.dataLbls[i].series.idx в сериях первой диаграммы
-                for(var j = 0;  j < series.length; ++j)
-                {
-                    if(series[j].idx === this.recalcInfo.dataLbls[i].series.idx)
-                    {
-                        var pos = this.chartObj.reCalculatePositionText("dlbl", this, /*this.recalcInfo.dataLbls[i].series.idx todo здесь оставить как есть в chartDrawere выбирать серии по индексу*/j, this.recalcInfo.dataLbls[i].pt.idx);//
-                        this.recalcInfo.dataLbls[i].setPosition(pos.x, pos.y);
-                        break;
-                    }
-                }
+                var pos = this.chartObj.reCalculatePositionText("dlbl", this, this.recalcInfo.dataLbls[i].series.idx, this.recalcInfo.dataLbls[i].pt.idx);
+                this.recalcInfo.dataLbls[i].setPosition(pos.x, pos.y);
             }
         }
         this.recalcInfo.dataLbls.length = 0;
@@ -329,14 +384,118 @@ CChartSpace.prototype.recalculate = function()
             var pos = this.chartObj.reCalculatePositionText("legend", this, this.chart.legend);
             this.chart.legend.setPosition(pos.x, pos.y);
         }
+
+        if(this.recalcInfo.recalculateBounds)
+        {
+            this.recalculateBounds();
+            this.recalcInfo.recalculateBounds = false;
+        }
+        if(this.recalcInfo.recalculateWrapPolygon)
+        {
+            this.recalculateWrapPolygon();
+            this.recalcInfo.recalculateWrapPolygon = false;
+        }
         this.recalcInfo.axisLabels.length = 0;
+        this.bNeedUpdatePosition = true;
 
     }, this, []);
 };
 
-CChartSpace.prototype.deselect = CShape.prototype.deselect;
-CChartSpace.prototype.getDrawingDocument = CShape.prototype.getDrawingDocument;
-CChartSpace.prototype.recalculateLocalTransform = CShape.prototype.recalculateLocalTransform;
 
-CChartSpace.prototype.Get_Theme = CShape.prototype.Get_Theme;
-CChartSpace.prototype.Get_ColorMap = CShape.prototype.Get_ColorMap;
+
+CChartSpace.prototype.deselect = CShape.prototype.deselect;
+
+CChartSpace.prototype.getDrawingDocument = CShape.prototype.getDrawingDocument;
+
+CChartSpace.prototype.updatePosition = CShape.prototype.updatePosition;
+CChartSpace.prototype.recalculateWrapPolygon = CShape.prototype.recalculateWrapPolygon;
+CChartSpace.prototype.getArrayWrapPolygons = function()
+{
+    return this.rectGeometry.getArrayPolygons();
+};
+
+
+
+CChartSpace.prototype.checkContentDrawings = function()
+{};
+
+CChartSpace.prototype.checkShapeChildTransform = function()
+{
+    if(this.chart)
+    {
+        if(this.chart.plotArea)
+        {
+            if(this.chart.plotArea.chart && this.chart.plotArea.chart.series)
+            {
+                var series = this.chart.plotArea.chart.series;
+                for(var i = 0; i < series.length; ++i)
+                {
+                    var ser = series[i];
+                    var pts = getPtsFromSeries(ser);
+                    for(var j = 0; j < pts.length; ++j)
+                    {
+                        if(pts[j].compiledDlb)
+                            pts[j].compiledDlb.updatePosition(this.posX, this.posY);
+                    }
+                }
+            }
+            if(this.chart.plotArea.catAx)
+            {
+                if(this.chart.plotArea.catAx.title)
+                    this.chart.plotArea.catAx.title.updatePosition(this.posX, this.posY);
+                if(this.chart.plotArea.catAx.labels)
+                    this.chart.plotArea.catAx.labels.updatePosition(this.posX, this.posY);
+            }
+            if(this.chart.plotArea.valAx)
+            {
+                if(this.chart.plotArea.valAx.title)
+                    this.chart.plotArea.valAx.title.updatePosition(this.posX, this.posY);
+                if(this.chart.plotArea.valAx.labels)
+                    this.chart.plotArea.valAx.labels.updatePosition(this.posX, this.posY);
+            }
+
+        }
+        if(this.chart.title)
+        {
+            this.chart.title.updatePosition(this.posX, this.posY);
+        }
+        if(this.chart.legend)
+        {
+            this.chart.legend.updatePosition(this.posX, this.posY);
+        }
+    }
+};
+
+
+CChartSpace.prototype.recalculateLocalTransform = CShape.prototype.recalculateLocalTransform;
+CChartSpace.prototype.updateTransformMatrix = CShape.prototype.updateTransformMatrix;
+CChartSpace.prototype.getArrayWrapIntervals = CShape.prototype.getArrayWrapIntervals;
+CChartSpace.prototype.select = CShape.prototype.select;
+CChartSpace.prototype.Refresh_RecalcData = function(data)
+{
+    this.addToRecalculate();
+};
+
+function CreateUnifillSolidFillSchemeColor(colorId, tintOrShade)
+{
+    var unifill = new CUniFill();
+    unifill.setFill(new CSolidFill());
+    unifill.fill.setColor(new CUniColor());
+    unifill.fill.color.setColor(new CSchemeColor());
+    unifill.fill.color.color.setId(colorId);
+    return CreateUniFillSolidFillWidthTintOrShade(unifill, tintOrShade);
+}
+
+function CreateNoFillLine()
+{
+    var ret = new CLn();
+    ret.setFill(CreateNoFillUniFill());
+    return ret;
+}
+
+function CreateNoFillUniFill()
+{
+    var ret = new CUniFill();
+    ret.setFill(new CNoFill());
+    return ret;
+}

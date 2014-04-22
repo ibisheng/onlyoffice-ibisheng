@@ -18,7 +18,12 @@ function CHistory(Document)
     {
         Inline : { Pos : -1, PageNum : 0 },
         Flow   : new Array(),
-        HdrFtr : new Array()
+        HdrFtr : new Array(),
+        Drawings:
+        {
+            All: false,
+            Map: {}
+        }
     };
 
     this.TurnOffHistory = false;
@@ -219,7 +224,12 @@ CHistory.prototype =
         {
             Inline : { Pos : -1, PageNum : 0 },
             Flow   : new Array(),
-            HdrFtr : new Array()
+            HdrFtr : new Array(),
+            Drawings:
+            {
+                All: false,
+                Map: {}
+            }
         };
     },
 
@@ -278,6 +288,20 @@ CHistory.prototype =
                 }
 
                 break;
+            }
+            case historyrecalctype_Drawing:
+            {
+                if(!this.RecalculateData.Drawings.All)
+                {
+                    if(Data.All)
+                    {
+                        this.RecalculateData.Drawings.All = true;
+                    }
+                    else
+                    {
+                        this.RecalculateData.Drawings.Map[Data.Object.Get_Id()] = Data.Object;
+                    }
+                }
             }
         }
     },

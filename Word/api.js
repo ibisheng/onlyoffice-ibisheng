@@ -712,6 +712,7 @@ function asc_docs_api(name)
         if (window["NATIVE_EDITOR_ENJINE"])
             editor = window.editor;
     }
+    CHART_STYLE_MANAGER = new CChartStyleManager();
 }
 
 asc_docs_api.prototype.LoadFontsFromServer = function(_fonts)
@@ -784,29 +785,7 @@ asc_docs_api.prototype.sync_EndCatchSelectedElements = function()
 {
     if (this.WordControl && this.WordControl.m_oDrawingDocument)
         this.WordControl.m_oDrawingDocument.EndTableStylesCheck();
-    
-	if ( (this.chartStyleManager &&  this.chartPreviewManager)&&(!this.chartStyleManager.isReady() || !this.chartPreviewManager.isReady()) )
-	{
-		for ( var i = 0; i < this.SelectedObjectsStack.length; i++ )
-		{
-			if ( this.SelectedObjectsStack[i].Value.ChartProperties )
-			{
-                var is_on = History.Is_On();
-                if(is_on)
-                {
-                    History.TurnOff();
-                }
-				this.chartStyleManager.init();
-				this.chartPreviewManager.init();
-				this.asc_fireCallback("asc_onUpdateChartStyles");
-                if(is_on)
-                {
-                    History.TurnOn();
-                }
-				break;
-			}
-		}
-	}
+
     this.asc_fireCallback("asc_onFocusObject", this.SelectedObjectsStack);
 }
 asc_docs_api.prototype.getSelectedElements = function(bUpdate)
@@ -6328,9 +6307,29 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
 //                }
 
 
-                Document.DrawingObjects.calculateAfterOpen();
-                Document.DrawingObjects.calculateAfterChangeTheme();
 
+               /* if(hdr.Odd != null)
+                {
+                    if((hdr.Odd != null && hdr.Odd == hdr.First) )
+                        drawing_objects.headerFooter.header.odd = drawing_objects.headerFooter.header.first;
+                    else if((hdr.Odd != null && hdr.Odd == hdr.Even))
+                        drawing_objects.headerFooter.header.odd = drawing_objects.headerFooter.header.even;
+                    else
+                        drawing_objects.headerFooter.header.odd = new HeaderFooterGraphicObjects();
+                }
+
+
+                if(ftr.Odd != null)
+                {
+                    if((ftr.Odd != null && ftr.Odd == ftr.First) )
+                        drawing_objects.headerFooter.footer.odd = drawing_objects.headerFooter.footer.first;
+                    else if((ftr.Odd != null && ftr.Odd == ftr.Even))
+                        drawing_objects.headerFooter.footer.odd = drawing_objects.headerFooter.footer.even;
+                    else
+                        drawing_objects.headerFooter.footer.odd = new HeaderFooterGraphicObjects();
+                }              */
+                History.RecalcData_Add({Type: historyrecalctype_Drawing, All: true});
+                Document.DrawingObjects.addToZIndexManagerAfterOpen();
                 if (!this.isOnlyReaderMode)
                 {
                     Document.Recalculate();
@@ -7369,40 +7368,13 @@ asc_docs_api.prototype.asc_getChartObject = function()
     return graphicObject;
 }
 
-asc_docs_api.prototype.asc_addChartDrawingObject = function(chartBinary)
+asc_docs_api.prototype.asc_addChartDrawingObject = function(options)
 {
-    /**/
-	
-	// Приводим бинарик к объекту типа CChartAsGroup и добавляем объект
-	if ( isObject(chartBinary) )
-	{
-		var binary = chartBinary["binary"];
-
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+    {
         History.Create_NewPoint();
-        var Drawing = new ParaDrawing( null, null, null, this.WordControl.m_oDrawingDocument, this );
-        var Image = new CChartAsGroup(Drawing, this, this.WordControl.m_oDrawingDocument, null);
-        Drawing.Set_GraphicObject(Image);
-        Image.initFromBinary(binary);
-        var font_map = {};
-        Image.documentGetAllFontNames(font_map);
-        var aPrepareFonts = [];
-        for(var i in font_map)
-            aPrepareFonts.push(new CFont(i, 0, "", 0));
-        var document = this.WordControl.m_oLogicDocument;
-        var paste_callback = function ()
-        {
-            if ( false === document.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
-            {
-                document.Add_InlineImage( null, null, null, Drawing );
-            }
-            else
-            {
-                document.Document_Undo();
-            }
-        };
-        this.pre_Paste(aPrepareFonts, [], paste_callback);
-
-	}
+        this.WordControl.m_oLogicDocument.Add_InlineImage( null, null, null, options );
+    }
 }
 
 asc_docs_api.prototype.asc_editChartDrawingObject = function(chartBinary)

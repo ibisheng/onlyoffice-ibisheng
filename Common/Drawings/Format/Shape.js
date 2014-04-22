@@ -157,6 +157,11 @@ function CShape()
     this.pen = null;
     this.selected = false;
 
+    this.bDeleted = true;
+
+    this.localTransform = new CMatrix();
+    this.localTransformText = new CMatrix();
+
     this.setRecalculateInfo();
 
     this.Lock = new CLock();
@@ -185,6 +190,31 @@ CShape.prototype =
     Read_FromBinary2: function (r)
     {
         this.Id = r.GetString2();
+    },
+
+    documentGetAllFontNames: function(AllFonts)
+    {
+        //TODO
+        var content = this.getDocContent();
+        if(content)
+        {
+            content.Document_Get_AllFontNames(AllFonts);
+        }
+    },
+
+    documentCreateFontMap: function(map)
+    {
+        var content = this.getDocContent();
+        if(content)
+        {
+            content.Document_CreateFontMap(map);
+        }
+    },
+
+    setBDeleted: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ShapeSetBDeleted, oldPr: this.bDeleted, newPr: pr});
+        this.bDeleted = pr;
     },
 
     setNvSpPr: function (pr)
@@ -235,7 +265,9 @@ CShape.prototype =
     createTextBoxContent: function()
     {
         this.setBodyPr(new CBodyPr());
+        this.bodyPr.setAnchor(1);
         this.setTextBoxContent(new CDocumentContent(this, this.getDrawingDocument(), 0, 0, 0, 20000, false, false));
+        this.textBoxContent.Set_ParagraphAlign(align_Center);
         this.textBoxContent.Content[0].Set_DocumentIndex(0);
     },
 
@@ -1777,33 +1809,15 @@ CShape.prototype =
         if (isRealObject(this.style) && isRealObject(this.style.fontRef))
         {
             shape_text_style = new CStyle("shapeTextStyle", null, null, null);
-            switch (this.style.fontRef.idx)
-            {
-                case fntStyleInd_major:
-                {
-                    var name = getFontInfo("+mj-lt")(parent_objects.theme.themeElements.fontScheme);
-                    shape_text_style.TextPr.RFonts.Ascii =  { Name: name, Index: -1 };
-                    shape_text_style.TextPr.RFonts.EastAsia =  { Name: name, Index: -1 };
-                    shape_text_style.TextPr.RFonts.HAnsi =  { Name: name, Index: -1 };
-                    shape_text_style.TextPr.RFonts.CS =  { Name: name, Index: -1 };
-                    shape_text_style.TextPr.RFonts.Hint =  { Name: name, Index: -1 };
-                    break;
-                }
-                case fntStyleInd_minor:
-                {
-                    var name = getFontInfo("+mj-lt")(parent_objects.theme.themeElements.fontScheme);
-                    shape_text_style.TextPr.RFonts.Ascii =  { Name: name, Index: -1 };
-                    shape_text_style.TextPr.RFonts.EastAsia =  { Name: name, Index: -1 };
-                    shape_text_style.TextPr.RFonts.HAnsi =  { Name: name, Index: -1 };
-                    shape_text_style.TextPr.RFonts.CS =  { Name: name, Index: -1 };
-                    shape_text_style.TextPr.RFonts.Hint =  { Name: name, Index: -1 };
-                    break;
-                }
-                default:
-                {
-                    break;
-                }
-            }
+            var first_name;
+            if(this.style.fontRef.idx === fntStyleInd_major)
+                first_name = "+mj-";
+            else
+                first_name = "+mn-";
+
+            shape_text_style.TextPr.RFonts.Ascii =  { Name: first_name + "lt", Index: -1 };
+            shape_text_style.TextPr.RFonts.EastAsia =  { Name: first_name +"ea", Index: -1 };
+            shape_text_style.TextPr.RFonts.CS =  { Name: first_name +"cs", Index: -1 };
 
             if (this.style.fontRef.Color != null && this.style.fontRef.Color.color != null)
             {
@@ -1988,7 +2002,7 @@ CShape.prototype =
     {
         if (!isRealObject(this.group))
         {
-            if (this.spPr.xfrm.isNotNull())
+            if (this.spPr && this.spPr.xfrm && this.spPr.xfrm.isNotNull())
             {
                 var xfrm = this.spPr.xfrm;
                 this.x = xfrm.offX;
@@ -2035,8 +2049,19 @@ CShape.prototype =
                 {
                     this.x = 0;
                     this.y = 0;
-                    this.extX = 5;
-                    this.extY = 5;
+                    var extX, extY;
+                    if(this.parent && this.parent.Extent)
+                    {
+                        extX = this.parent.Extent.W;
+                        extY = this.parent.Extent.H;
+                    }
+                    else
+                    {
+                        extX = 5;
+                        extY = 5;
+                    }
+                    this.extX = extX;
+                    this.extY = extY;
                     this.rot = 0;
                     this.flipH = false;
                     this.flipV = false;
@@ -2465,6 +2490,11 @@ CShape.prototype =
             ty = this.invertTransformText.TransformPointY(x, y);
             content.Selection_SetEnd(tx, ty, slideIndex, e);
         }
+    },
+
+    Get_Theme: function()
+    {
+        return this.getParentObjects().theme;
     },
 
     updateSelectionState: function ()
@@ -3665,6 +3695,11 @@ CShape.prototype =
 
         switch (data.Type)
         {
+            case historyitem_ShapeSetBDeleted:
+            {
+                this.bDeleted = data.oldPr;
+                break;
+            }
             case historyitem_ShapeSetNvSpPr:
             {
                 this.nvSpPr = data.oldPr;
@@ -3717,6 +3752,11 @@ CShape.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_ShapeSetBDeleted:
+            {
+                this.bDeleted = data.newPr;
+                break;
+            }
             case historyitem_ShapeSetNvSpPr:
             {
                 this.nvSpPr = data.newPr;
@@ -3784,6 +3824,8 @@ CShape.prototype =
                 break;
             }
             case historyitem_ShapeSetWordShape:
+
+            case historyitem_ShapeSetBDeleted:
             {
                 writeBool(w, data.newPr);
                 break;
@@ -3798,6 +3840,12 @@ CShape.prototype =
             var type = r.GetLong();
             switch (r.GetLong())
             {
+
+                case historyitem_ShapeSetBDeleted:
+                {
+                    this.bDeleted = readBool(r);
+                    break;
+                }
                 case historyitem_ShapeSetNvSpPr:
                 {
                     this.nvSpPr = readObject(r);
@@ -3868,19 +3916,56 @@ CShape.prototype =
         return null;
     },
 
+    OnContentRecalculate: function()
+    {},
+
     recalculateBounds: function()
     {
         var boundsChecker = new  CSlideBoundsChecker();
         this.draw(boundsChecker, this.localTransform, this.localTransformText);
+        if(!this.group)
+        {
+            var tr = this.localTransform;
+            var arr_p_x = [];
+            var arr_p_y = [];
+            arr_p_x.push(tr.TransformPointX(0,0));
+            arr_p_y.push(tr.TransformPointY(0,0));
+            arr_p_x.push(tr.TransformPointX(this.extX,0));
+            arr_p_y.push(tr.TransformPointY(this.extX,0));
+            arr_p_x.push(tr.TransformPointX(this.extX,this.extY));
+            arr_p_y.push(tr.TransformPointY(this.extX,this.extY));
+            arr_p_x.push(tr.TransformPointX(0,this.extY));
+            arr_p_y.push(tr.TransformPointY(0,this.extY));
 
-        this.bounds.x = boundsChecker.Bounds.min_x;
-        this.bounds.y = boundsChecker.Bounds.min_y;
-        this.bounds.l = boundsChecker.Bounds.min_x;
-        this.bounds.t = boundsChecker.Bounds.min_y;
-        this.bounds.r = boundsChecker.Bounds.max_x;
-        this.bounds.b = boundsChecker.Bounds.max_y;
-        this.bounds.w = boundsChecker.Bounds.max_x - boundsChecker.Bounds.min_x;
-        this.bounds.h = boundsChecker.Bounds.max_y - boundsChecker.Bounds.min_y;
+            arr_p_x.push(boundsChecker.Bounds.min_x);
+            arr_p_x.push(boundsChecker.Bounds.max_x);
+            arr_p_y.push(boundsChecker.Bounds.min_y);
+            arr_p_y.push(boundsChecker.Bounds.max_y);
+
+            var min_b_x = Math.min.apply(Math, arr_p_x);
+            var max_b_x = Math.max.apply(Math, arr_p_x);
+            var min_b_y = Math.min.apply(Math, arr_p_y);
+            var max_b_y = Math.max.apply(Math, arr_p_y);
+
+            this.bounds.l = min_b_x;
+            this.bounds.t = min_b_y;
+            this.bounds.r = max_b_x;
+            this.bounds.b = max_b_y;
+        }
+        else
+        {
+
+            this.bounds.l = boundsChecker.Bounds.min_x;
+            this.bounds.t = boundsChecker.Bounds.min_y;
+            this.bounds.r = boundsChecker.Bounds.max_x;
+            this.bounds.b = boundsChecker.Bounds.max_y;
+        }
+
+
+        this.bounds.x = this.bounds.l;
+        this.bounds.y = this.bounds.t;
+        this.bounds.w = this.bounds.r - this.bounds.r;
+        this.bounds.h = this.bounds.b - this.bounds.t;
     }
 };
 

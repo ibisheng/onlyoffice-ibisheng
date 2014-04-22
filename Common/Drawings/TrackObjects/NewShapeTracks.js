@@ -330,6 +330,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         xfrm.setExtY(this.extY);
         xfrm.setFlipH(this.flipH);
         xfrm.setFlipV(this.flipV);
+        shape.setBDeleted(false);
 
         if(this.presetGeom === "textRect")
         {

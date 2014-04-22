@@ -729,6 +729,16 @@ CDocument.prototype =
         return { X : X, Y : Y, XLimit : XLimit, YLimit : YLimit };
     },
 
+    Get_Theme : function()
+    {
+        return this.theme;
+    },
+
+    Get_ColorMap: function()
+    {
+        return this.clrSchemeMap;
+    },
+
     // Пересчет содержимого Документа
     Recalculate : function(bOneParagraph, bRecalcContentLast, _RecalcData)
     {
@@ -809,6 +819,9 @@ CDocument.prototype =
         var RecalcData = ( undefined === _RecalcData ? History.Get_RecalcData() : _RecalcData );
 
         History.Reset_RecalcIndex();
+
+        this.DrawingObjects.recalculate_(RecalcData.Drawings);
+        this.DrawingObjects.recalculateText_(RecalcData.Drawings);
 
         // 1. Пересчитываем все автофигуры, которые нужно пересчитать. Изменения в них ни на что не влияют.
         for ( var GraphIndex = 0; GraphIndex < RecalcData.Flow.length; GraphIndex++ )
@@ -1001,7 +1014,6 @@ CDocument.prototype =
         if ( true === MainChange )  
             this.FullRecalc.MainStartPos = StartIndex;
 
-        this.DrawingObjects.updateCharts();
         this.DrawingDocument.OnStartRecalculate( StartPage );
         this.Recalculate_Page();
     },
@@ -2319,15 +2331,26 @@ CDocument.prototype =
                 var Drawing;
                 if(!isRealObject(Chart))
                 {
-                    Drawing = new ParaDrawing( W, H, null, this.DrawingDocument, this );
-                    var Image = new WordImage( Drawing, this, this.DrawingDocument, null );
+                    Drawing = new ParaDrawing( W, H, null, this.DrawingDocument, this, null);
+                    var Image = this.DrawingObjects.createImage(Img, 0, 0, W, H);
+                    Image.setParent(Drawing);
                     Drawing.Set_GraphicObject(Image);
-
-                    Image.init( Img, W, H, Chart );
                 }
                 else
                 {
-                    Drawing = Chart;
+                    Drawing = new ParaDrawing( W, H, null, this.DrawingDocument, this, null);
+                    var Image = this.DrawingObjects.getChartSpace(Chart,null);
+                    Image.setParent(Drawing);
+                    Image.setStyle(2);
+                    Image.setSpPr(new CSpPr());
+                    Image.spPr.setParent(Image);
+                    Image.spPr.setXfrm(new CXfrm());
+                    Image.spPr.xfrm.setParent(Image.spPr);
+                    Image.spPr.xfrm.setOffX(0);
+                    Image.spPr.xfrm.setOffY(0);
+                    Image.spPr.xfrm.setExtX(152);
+                    Image.spPr.xfrm.setExtY(89);
+                    Drawing.Set_GraphicObject(Image);
                 }
                 if ( true === bFlow )
                 {
@@ -9975,6 +9998,12 @@ CDocument.prototype =
         return null;
     },
 
+
+    Get_ShapeStyleForPara: function()
+    {
+        return null;
+    },
+
     Get_TextBackGroundColor : function()
     {
         return undefined;
@@ -11021,7 +11050,7 @@ CDocument.prototype =
                     this.DrawingObjects.documentCreateFontMap( ++CurPage, FontMap );
             }
         }
-
+        checkThemeFonts(FontMap, this.theme.themeElements.fontScheme);
         return FontMap;
     },
 
@@ -11045,6 +11074,7 @@ CDocument.prototype =
         this.SectionsInfo.Document_Get_AllFontNames( AllFonts );
         this.Numbering.Document_Get_AllFontNames( AllFonts );
         this.Styles.Document_Get_AllFontNames( AllFonts );
+        this.theme.Document_Get_AllFontNames( AllFonts );
 
         var Count = this.Content.length;
         for ( var Index = 0; Index < Count; Index++ )
@@ -11052,7 +11082,7 @@ CDocument.prototype =
             var Element = this.Content[Index];
             Element.Document_Get_AllFontNames( AllFonts );
         }
-
+        checkThemeFonts(AllFonts, this.theme.themeElements.fontScheme);
         return AllFonts;
     },
 

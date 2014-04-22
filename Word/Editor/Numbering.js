@@ -855,13 +855,13 @@ CAbstractNum.prototype =
     // Lvl - уровень, с которого мы берем текст и настройки для текста
     // NumInfo - информация о номере данного элемента в списке (массив из Lvl элементов)
     // NumTextPr - рассчитанные настройки для символов нумерации (уже с учетом настроек текущего уровня)
-    Draw : function(X,Y, Context, Lvl, NumInfo, NumTextPr)
+    Draw : function(X,Y, Context, Lvl, NumInfo, NumTextPr, Theme)
     {
         var Text = this.Lvl[Lvl].LvlText;
 
-        Context.SetTextPr( NumTextPr );
+        Context.SetTextPr( NumTextPr, Theme );
         Context.SetFontSlot( fontslot_ASCII );
-        g_oTextMeasurer.SetTextPr( NumTextPr );
+        g_oTextMeasurer.SetTextPr( NumTextPr, Theme );
         g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
 
         for ( var Index = 0; Index < Text.length; Index++ )
@@ -1023,12 +1023,12 @@ CAbstractNum.prototype =
         }
     },
 
-    Measure : function(Context, Lvl, NumInfo, NumTextPr)
+    Measure : function(Context, Lvl, NumInfo, NumTextPr, Theme)
     {
         var X = 0;
         var Text = this.Lvl[Lvl].LvlText;
 
-        Context.SetTextPr( NumTextPr );
+        Context.SetTextPr( NumTextPr, Theme );
         Context.SetFontSlot( fontslot_ASCII );
         var Ascent = Context.GetAscender();
 
@@ -1778,16 +1778,16 @@ CNumbering.prototype =
         return false;
     },
 
-    Draw : function(NumId, Lvl, X, Y, Context, NumInfo, TextPr)
+    Draw : function(NumId, Lvl, X, Y, Context, NumInfo, TextPr, Theme)
     {
         var AbstractId = this.Get_AbstractNum(NumId);
-        return AbstractId.Draw(X,Y, Context, Lvl, NumInfo, TextPr);
+        return AbstractId.Draw(X,Y, Context, Lvl, NumInfo, TextPr, Theme);
     },
 
-    Measure : function(NumId, Lvl, Context, NumInfo, TextPr)
+    Measure : function(NumId, Lvl, Context, NumInfo, TextPr, Theme)
     {
         var AbstractId = this.Get_AbstractNum(NumId);
-        return AbstractId.Measure( Context, Lvl, NumInfo, TextPr );
+        return AbstractId.Measure( Context, Lvl, NumInfo, TextPr, Theme );
     },
 
     Document_CreateFontCharMap : function(FontCharMap, NumTextPr, NumPr, NumInfo)

@@ -704,6 +704,11 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
                     this.resizedPosY = 0;
                 }
             }
+            if(!this.originalObject.spPr.xfrm)
+            {
+                this.originalObject.spPr.setXfrm(new CXfrm());
+                this.originalObject.spPr.xfrm.setParent(this.originalObject.spPr);
+            }
             var xfrm = this.originalObject.spPr.xfrm;
             xfrm.setOffX(this.resizedPosX/scale_coefficients.cx + ch_off_x);
             xfrm.setOffY(this.resizedPosY/scale_coefficients.cy + ch_off_y);
@@ -1349,6 +1354,12 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
             {
                 this.original.normalize();
             }
+
+            if(!this.original.spPr.xfrm)
+            {
+                this.original.spPr.setXfrm(new CXfrm());
+                this.original.spPr.xfrm.setParent(this.original.spPr);
+            }
             var xfrm = this.original.spPr.xfrm;
 
             if(bWord)
@@ -1454,6 +1465,12 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
 
         this.trackEnd = function()
         {
+
+            if(!this.originalObject.spPr.xfrm)
+            {
+                this.originalObject.spPr.setXfrm(new CXfrm());
+                this.originalObject.spPr.xfrm.setParent(this.originalObject.spPr);
+            }
             var xfrm = this.originalObject.spPr.xfrm;
             xfrm.setOffX(this.x);
             xfrm.setOffY(this.y);

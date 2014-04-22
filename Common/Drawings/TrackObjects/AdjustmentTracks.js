@@ -1,5 +1,4 @@
 "use strict";
-
 function XYAdjustmentTrack(originalShape, adjIndex)
 {
     this.originalShape = originalShape;

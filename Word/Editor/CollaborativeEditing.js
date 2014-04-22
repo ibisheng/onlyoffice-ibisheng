@@ -720,12 +720,15 @@ function CCollaborativeEditing()
         {
             Inline : { Pos : 0, PageNum : 0 },
             Flow   : new Array(),
-            HdrFtr : new Array()
+            HdrFtr : new Array(),
+            Drawings: {
+                All: true,
+                Map:{}
+            }
         };        
 
         LogicDocument.Reset_RecalculateCache();
 
-        LogicDocument.DrawingObjects.calculateAfterOpen();
         LogicDocument.Recalculate( false, false, RecalculateData );
         LogicDocument.Document_UpdateSelectionState();
         LogicDocument.Document_UpdateInterfaceState();

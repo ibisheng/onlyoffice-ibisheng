@@ -128,9 +128,9 @@ CTextBody.prototype =
         if(this.bodyPr)
             ret.setBodyPr(this.bodyPr.createDuplicate());
         if(this.lstStyle)
-            ret.setLastStyle(this.lstStyle.createDuplicate());
+            ret.setLstStyle(this.lstStyle.createDuplicate());
         if(this.content)
-            ret.setContent(this.content.Copy(ret))
+            ret.setContent(this.content.Copy(ret));
         return ret;
     },
 
@@ -144,6 +144,15 @@ CTextBody.prototype =
         return false;
     },
 
+    Get_Theme : function()
+    {
+        return this.parent.Get_Theme();
+    },
+
+    Get_ColorMap: function()
+    {
+        return this.parent.Get_ColorMap();
+    },
 
     setParent: function(pr)
     {
@@ -903,7 +912,7 @@ CTextBody.prototype =
 
     Get_Styles: function(level)
     {
-        return this.parent.Get_Styles(level);
+        return this.parent.getStyles(level);
     },
 
     Is_Cell: function()
@@ -1067,9 +1076,15 @@ CTextBody.prototype =
         return content_height + t_ins + b_ins;
     },
 
-    getMaxContentWidth: function(maxWidth)
+    getMaxContentWidth: function(maxWidth, bLeft)
     {
         this.content.Reset(0, 0, maxWidth - 0.01, 20000);
+        if(bLeft)
+        {
+            this.content.Set_ApplyToAll(true);
+            this.content.Set_ParagraphAlign(align_Left);
+            this.content.Set_ApplyToAll(false);
+        }
         this.content.Recalculate_Page(0, true);
         var max_width = 0, arr_content = this.content.Content, paragraph_lines, i, j;
         for(i = 0;  i < arr_content.length; ++i)

@@ -10,136 +10,6 @@ var HANDLE_EVENT_MODE_HANDLE = 0;
 var HANDLE_EVENT_MODE_CURSOR = 1;
 
 
-function CContentChangesElement(Type, Pos, Count, Data)
-{
-    this.m_nType  = Type;  // Тип изменений (удаление или добавление)
-    this.m_nPos   = Pos;   // Позиция, в которой произошли изменения
-    this.m_nCount = Count; // Количество добавленных/удаленных элементов
-    this.m_pData  = Data;  // Связанные с данным изменением данные из истории
-
-    this.Refresh_BinaryData = function()
-    {
-        this.m_pData.oldValue = this.m_aPositions[0];
-    };
-
-    this.Check_Changes = function(Type, Pos)
-    {
-        var CurPos = Pos;
-        if ( contentchanges_Add === Type )
-        {
-            for ( var Index = 0; Index < this.m_nCount; Index++ )
-            {
-                if ( false !== this.m_aPositions[Index] )
-                {
-                    if ( CurPos <= this.m_aPositions[Index] )
-                        this.m_aPositions[Index]++;
-                    else
-                    {
-                        if ( contentchanges_Add === this.m_nType )
-                            CurPos++;
-                        else //if ( contentchanges_Remove === this.m_nType )
-                            CurPos--;
-                    }
-                }
-            }
-        }
-        else //if ( contentchanges_Remove === Type )
-        {
-            for ( var Index = 0; Index < this.m_nCount; Index++ )
-            {
-                if ( false !== this.m_aPositions[Index] )
-                {
-                    if ( CurPos < this.m_aPositions[Index] )
-                        this.m_aPositions[Index]--;
-                    else if ( CurPos > this.m_aPositions[Index] )
-                    {
-                        if ( contentchanges_Add === this.m_nType )
-                            CurPos++;
-                        else //if ( contentchanges_Remove === this.m_nType )
-                            CurPos--;
-                    }
-                    else //if ( CurPos === this.m_aPositions[Index] )
-                    {
-                        if ( contentchanges_Remove === this.m_nType )
-                        {
-                            // Отмечаем, что действия совпали
-                            this.m_aPositions[Index] = false;
-                            return false;
-                        }
-                        else
-                        {
-                            CurPos++;
-                        }
-                    }
-                }
-            }
-        }
-
-        return CurPos;
-    };
-
-    this.Make_ArrayOfSimpleActions = function(Type, Pos, Count)
-    {
-        // Разбиваем действие на простейшие
-        var Positions = [];
-        if ( contentchanges_Add === Type )
-        {
-            for ( var Index = 0; Index < Count; Index++ )
-                Positions[Index] = Pos + Index;
-        }
-        else //if ( contentchanges_Remove === Type )
-        {
-            for ( var Index = 0; Index < Count; Index++ )
-                Positions[Index] = Pos;
-        }
-
-        return Positions;
-    };
-
-    // Разбиваем сложное действие на простейшие
-    this.m_aPositions = this.Make_ArrayOfSimpleActions( Type, Pos, Count );
-}
-
-function CContentChanges()
-{
-    this.m_aChanges = [];
-
-    this.Add = function(Changes)
-    {
-        this.m_aChanges.push( Changes );
-    };
-
-    this.Clear = function()
-    {
-        this.m_aChanges.length = 0;
-    };
-
-    this.Check = function(Type, Pos)
-    {
-        var CurPos = Pos;
-        var Count = this.m_aChanges.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            var NewPos = this.m_aChanges[Index].Check_Changes(Type, CurPos);
-            if ( false === NewPos )
-                return false;
-
-            CurPos = NewPos;
-        }
-
-        return CurPos;
-    };
-
-    this.Refresh = function()
-    {
-        var Count = this.m_aChanges.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            this.m_aChanges[Index].Refresh_BinaryData();
-        }
-    };
-}
-
 function CheckLinePreset(preset)
 {
     return preset === "line";
@@ -2618,6 +2488,7 @@ DrawingObjectsController.prototype =
             arrDrawings[i].setGroup(group);
             group.addToSpTree(group.spTree.length, arrDrawings[i]);
         }
+        group.setBDeleted(false);
         return group;
     },
 
@@ -3366,6 +3237,7 @@ DrawingObjectsController.prototype =
         image.blipFill.setRasterImageId(rasterImageId);
         image.blipFill.setStretch(true);
         image.setNvPicPr(new UniNvPr());
+        image.setBDeleted(false);
         return image;
     },
 
@@ -4312,7 +4184,7 @@ asc_CFillSolid.prototype = {
 //{ asc_CFillSolid export
 window["Asc"].asc_CFillSolid = asc_CFillSolid;
 window["Asc"]["asc_CFillSolid"] = asc_CFillSolid;
-prot = asc_CFillSolid.prototype;
+var prot = asc_CFillSolid.prototype;
 
 prot["asc_getColor"] = prot.asc_getColor;
 prot["asc_putColor"] = prot.asc_putColor;

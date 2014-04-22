@@ -28,6 +28,8 @@ function CGroupShape(parent)
     this.arrGraphicObjects = [];
     this.selectedObjects = [];
 
+    this.bDeleted = true;
+
     this.selection =
     {
         groupSelection: null,
@@ -54,6 +56,29 @@ CGroupShape.prototype =
     Get_Id: function()
     {
         return this.Id;
+    },
+
+    documentGetAllFontNames: function(allFonts)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].documentGetAllFontNames)
+                this.spTree[i].documentGetAllFontNames(allFonts);
+        }
+    },
+
+    documentCreateFontMap: function(allFonts)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].documentCreateFontMap)
+                this.spTree[i].documentCreateFontMap(allFonts);
+        }
+    },
+    setBDeleted: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ShapeSetBDeleted, oldPr: this.bDeleted, newPr: pr});
+        this.bDeleted = pr;
     },
 
     documentUpdateSelectionState: function()
@@ -1708,16 +1733,10 @@ CGroupShape.prototype =
 
     setNvSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_SetSetNvSpPr, oldPr: this.nvGrpSpPr, newPr: pr});
+        History.Add(this, {Type: historyitem_GroupShapeSetNvGrpSpPr, oldPr: this.nvGrpSpPr, newPr: pr});
         this.nvGrpSpPr = pr;
-        if(this.parent && pr && pr.cNvPr && isRealNumber(pr.cNvPr.id))
-        {
-            if(pr.cNvPr.id > this.parent.maxId)
-            {
-                this.parent.maxId = pr.cNvPr.id+1;
-            }
-        }
     },
+    recalculateLocalTransform: CShape.prototype.recalculateLocalTransform,
 
     swapGraphicObject: function(idRemove, idAdd)
     {
@@ -1816,6 +1835,12 @@ CGroupShape.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_ShapeSetBDeleted:
+            {
+                this.bDeleted = data.oldPr;
+                break;
+            }
+
             case historyitem_GroupShapeAddToSpTree:
             {
                 for(var i = this.spTree.length - 1; i > -1; --i)
@@ -1857,6 +1882,11 @@ CGroupShape.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_ShapeSetBDeleted:
+            {
+                this.bDeleted = data.newPr;
+                break;
+            }
             case historyitem_GroupShapeAddToSpTree:
             {
                 this.spTree.splice(data.pos, 0, data.item);
@@ -1921,6 +1951,12 @@ CGroupShape.prototype =
                 writeObject(w, data.newPr);
                 break;
             }
+
+            case historyitem_ShapeSetBDeleted:
+            {
+                writeBool(w, data.oldPr);
+                break;
+            }
         }
     },
 
@@ -1929,13 +1965,19 @@ CGroupShape.prototype =
         var type  = r.GetLong();
         switch (type)
         {
+
+            case historyitem_ShapeSetBDeleted:
+            {
+                this.bDeleted = readBool(r);
+                break;
+            }
             case historyitem_GroupShapeAddToSpTree:
             {
                 var pos = readLong(r);
                 var item = readObject(r);
                 if(isRealObject(item) && isRealNumber(pos))
                 {
-                    this.spTree.splice(pos, 0, data.item);
+                    this.spTree.splice(pos, 0, item);
                 }
                 break;
             }

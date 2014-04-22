@@ -25,7 +25,7 @@ function ParaRun(Paragraph, bMathRun)
     this.YOffset     = 0; // смещение по Y
 
     this.NeedAddNumbering = false;  // Нужно ли добавлять нумерацию (true - нужно, false - не нужно, первый элемент,
-                                    // у которого будет false и будет элемент с нумерацией)
+    // у которого будет false и будет элемент с нумерацией)
 
     this.Lines       = []; // Массив CParaRunLine
     this.Lines[0]    = new CParaRunLine();
@@ -646,13 +646,19 @@ ParaRun.prototype =
                 if ( true === UpdateTarget )
                 {
                     var CurTextPr = this.Get_CompiledPr(false);
-                    g_oTextMeasurer.SetTextPr( CurTextPr );
+                    g_oTextMeasurer.SetTextPr( CurTextPr, this.Paragraph.Get_Theme() );
                     g_oTextMeasurer.SetFontSlot( fontslot_ASCII, CurTextPr.Get_FontKoef() );
                     var Height    = g_oTextMeasurer.GetHeight();
                     var Descender = Math.abs( g_oTextMeasurer.GetDescender() );
                     var Ascender  = Height - Descender;
 
+
                     Para.DrawingDocument.SetTargetSize( Height );
+
+
+
+                    CurTextPr.Unifill.check(Para.Get_Theme(), Para.Get_ColorMap());
+                    var RGBA = CurTextPr.Unifill.getRGBAColor();
 
                     if ( true === CurTextPr.Color.Auto )
                     {
@@ -674,7 +680,7 @@ ParaRun.prototype =
                         Para.DrawingDocument.SetTargetColor( AutoColor.r, AutoColor.g, AutoColor.b );
                     }
                     else
-                        Para.DrawingDocument.SetTargetColor( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b );
+                        Para.DrawingDocument.SetTargetColor( RGBA.R, RGBA.G, RGBA.B );
 
                     var TargetY = Y - Ascender - CurTextPr.Position;
                     switch( CurTextPr.VertAlign )
@@ -715,8 +721,10 @@ ParaRun.prototype =
             if ( true === ReturnTarget )
             {
                 var CurTextPr = this.Get_CompiledPr(false);
-                g_oTextMeasurer.SetTextPr( CurTextPr );
+                g_oTextMeasurer.SetTextPr( CurTextPr, this.Paragraph.Get_Theme() );
                 g_oTextMeasurer.SetFontSlot( fontslot_ASCII, CurTextPr.Get_FontKoef() );
+
+
                 var Height    = g_oTextMeasurer.GetHeight();
                 var Descender = Math.abs( g_oTextMeasurer.GetDescender() );
                 var Ascender  = Height - Descender;
@@ -978,7 +986,7 @@ ParaRun.prototype =
                 Bottom_Margin = 0;
                 Page_H        = 0;
             }
-                                    
+
             if ( undefined != Drawing && true != Drawing.Use_TextWrap() )
             {
                 PageFields = LD_PageFields;
@@ -1073,7 +1081,15 @@ ParaRun.prototype =
     Create_FontMap : function(Map)
     {
         var TextPr = this.Get_CompiledPr(false);
-        TextPr.Document_CreateFontMap( Map );
+        TextPr.Document_CreateFontMap( Map, this.Paragraph.Get_Theme().themeElements.fontScheme);
+        var Count = this.Content.length;
+        for (var Index = 0; Index < Count; Index++)
+        {
+            var Item = this.Content[Index];
+
+            if ( para_Drawing === Item.Type )
+                Item.documentCreateFontMap( Map );
+        }
     },
 
     Get_AllFontNames : function(AllFonts)
@@ -1108,7 +1124,9 @@ ParaRun.prototype =
             return;
 
         var Pr = this.Get_CompiledPr(false);
-        g_oTextMeasurer.SetTextPr( Pr );
+
+
+        g_oTextMeasurer.SetTextPr( Pr, this.Paragraph.Get_Theme());
         g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
 
         // Запрашиваем текущие метрики шрифта, под TextAscent мы будем понимать ascent + linegap(которые записаны в шрифте)
@@ -1509,7 +1527,7 @@ ParaRun.prototype =
                 case para_PageNum:
                 {
                     // Выставляем номер страницы
-                    
+
                     var LogicDocument = Para.LogicDocument;
                     var SectionPage   = LogicDocument.Get_SectionPageNumInfo2(PRS.Page + Para.Get_StartPage_Absolute()).CurPage;
                     
@@ -1552,7 +1570,7 @@ ParaRun.prototype =
                     }
 
                     SpaceLen    = 0;
-                    
+
                     break;
                 }
                 case para_Tab:
@@ -1708,7 +1726,7 @@ ParaRun.prototype =
                 PRS.LineTextAscent = this.TextAscent;
 
             //if ( PRS.LineTextAscent2 < this.TextAscent2 )
-                //PRS.LineTextAscent2 = this.TextAscent2;
+            //PRS.LineTextAscent2 = this.TextAscent2;
 
             if ( PRS.LineTextDescent < this.TextDescent )
                 PRS.LineTextDescent = this.TextDescent;
@@ -1994,7 +2012,7 @@ ParaRun.prototype =
                     var X_Right_Margin  = Page_Width  - X_Right_Field;
                     var Y_Bottom_Margin = Page_Height - Y_Bottom_Field;
                     var Y_Top_Margin    = Y_Top_Field;
-                    
+
                     var DrawingObjects = Para.Parent.DrawingObjects;
                     var PageLimits     = Para.Parent.Get_PageLimits(Para.PageNum + CurPage);
                     var PageFields     = Para.Parent.Get_PageFields(Para.PageNum + CurPage);
@@ -2189,8 +2207,9 @@ ParaRun.prototype =
                 NumTextPr.Merge( Para.TextPr.Value );
                 NumTextPr.Merge( NumLvl.TextPr );
 
+
                 // Здесь измеряется только ширина символов нумерации, без суффикса
-                NumberingItem.Measure( g_oTextMeasurer, Numbering, NumInfo, NumTextPr, NumPr );
+                NumberingItem.Measure( g_oTextMeasurer, Numbering, NumInfo, NumTextPr, NumPr, Para.Get_Theme() );
 
                 // При рассчете высоты строки, если у нас параграф со списком, то размер символа
                 // в списке влияет только на высоту строки над Baseline, но не влияет на высоту строки
@@ -2230,10 +2249,14 @@ ParaRun.prototype =
                     case numbering_suff_Space:
                     {
                         var OldTextPr = g_oTextMeasurer.GetTextPr();
-                        g_oTextMeasurer.SetTextPr( NumTextPr );
+
+
+
+                        var Theme = Para.Get_Theme();
+                        g_oTextMeasurer.SetTextPr( NumTextPr, Theme );
                         g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
                         NumberingItem.WidthSuff = g_oTextMeasurer.Measure( " " ).Width;
-                        g_oTextMeasurer.SetTextPr( OldTextPr );
+                        g_oTextMeasurer.SetTextPr( OldTextPr, Theme );
                         break;
                     }
                     case numbering_suff_Tab:
@@ -2356,9 +2379,9 @@ ParaRun.prototype =
         var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
         RecalcObj.Save_Lines( this );
         RecalcObj.Save_RunContent( this );
-        
+
         // TODO: Разобраться с картинками
-        
+
         return RecalcObj;
     },
 
@@ -2376,12 +2399,12 @@ ParaRun.prototype =
         this.LinesLength = 0;
 
         this.Range = this.Lines[0].Ranges[0];
-        
+
         var Count = this.Content.length;
         for ( var Index = 0; Index < Count; Index++ )
         {
             var Item = this.Content[Index];
-            
+
             if ( para_PageNum === Item.Type || para_Drawing === Item.Type )
                 Item.Prepare_RecalculateObject();
         }
@@ -2679,7 +2702,7 @@ ParaRun.prototype =
                 }
             }
         }
-    },   
+    },
 //-----------------------------------------------------------------------------------
 // Функции отрисовки
 //-----------------------------------------------------------------------------------
@@ -2827,19 +2850,26 @@ ParaRun.prototype =
         var Para      = PDSE.Paragraph;
         var pGraphics = PDSE.Graphics;
         var AutoColor = PDSE.AutoColor;
+        var Theme     = PDSE.Theme;
+        var FontScheme = Theme.themeElements.fontScheme;
 
         var X = PDSE.X;
         var Y = PDSE.Y;
 
         var CurTextPr = this.Get_CompiledPr( false );
-        pGraphics.SetTextPr( CurTextPr );
+        pGraphics.SetTextPr( CurTextPr, Theme );
+
+        CurTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
+        var RGBA = CurTextPr.Unifill.getRGBAColor();
 
         if ( true === PDSE.VisitedHyperlink )
             pGraphics.b_color1( 128, 0, 151, 255 );
         else if ( true === CurTextPr.Color.Auto )
             pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
         else
-            pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+        {
+            pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, RGBA.A);
+        }
 
         for ( var Pos = StartPos; Pos < EndPos; Pos++ )
         {
@@ -2882,7 +2912,7 @@ ParaRun.prototype =
                     // Внутри отрисовки инлайн-автофигур могут изменится цвета и шрифт, поэтому восстанавливаем настройки
                     if ( para_Drawing === Item.Type && drawing_Inline === Item.DrawingType )
                     {
-                        pGraphics.SetTextPr( CurTextPr );
+                        pGraphics.SetTextPr( CurTextPr, Theme );
 
                         if ( true === CurTextPr.Color.Auto )
                         {
@@ -2891,8 +2921,8 @@ ParaRun.prototype =
                         }
                         else
                         {
-                            pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
-                            pGraphics.p_color( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+                            pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, 255);
+                            pGraphics.p_color( RGBA.R, RGBA.G, RGBA.B, 255);
                         }
                     }
 
@@ -2916,12 +2946,14 @@ ParaRun.prototype =
                         var EndTextPr = Para.Get_CompiledPr2(false).TextPr.Copy();
                         EndTextPr.Merge(Para.TextPr.Value);
 
-                        pGraphics.SetTextPr(EndTextPr);
+                        EndTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
+                        var RGBAEnd = EndTextPr.Unifill.getRGBAColor();
+                        pGraphics.SetTextPr(EndTextPr, PDSE.Theme);
 
                         if (true === EndTextPr.Color.Auto)
                             pGraphics.b_color1(AutoColor.r, AutoColor.g, AutoColor.b, 255);
                         else
-                            pGraphics.b_color1(EndTextPr.Color.r, EndTextPr.Color.g, EndTextPr.Color.b, 255);
+                            pGraphics.b_color1(RGBAEnd.R, RGBAEnd.G, RGBAEnd.B, 255);
 
                         bEnd = true;
                         var bEndCell = false;
@@ -2949,7 +2981,6 @@ ParaRun.prototype =
 
             Y = TempY;
         }
-
         // Обновляем позицию
         PDSE.X = X;
     },
@@ -3257,7 +3288,7 @@ ParaRun.prototype =
             SearchPos.Pos.Update( StartPos, Depth );
             Result = true;
         }
-        
+
         if ( MATH_PARA_RUN === this.typeObj )
         {
             var Diff = SearchPos.X - SearchPos.CurX;

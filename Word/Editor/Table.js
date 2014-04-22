@@ -724,6 +724,15 @@ CTable.prototype =
 // Общие функции
 //-----------------------------------------------------------------------------------
 
+    Get_Theme : function()
+    {
+        return this.Parent.Get_Theme();
+    },
+
+    Get_ColorMap: function()
+    {
+        return this.Parent.Get_ColorMap();
+    },
     // Получаем настройки для интерфейса
     Get_Props : function()
     {
@@ -4706,7 +4715,7 @@ CTable.prototype =
             {
                 cur_doc_content = cur_doc_content.Parent.Row.Table.Parent;
             }
-            if(cur_doc_content.Parent && cur_doc_content.Parent instanceof WordShape)
+            if(cur_doc_content.Parent && cur_doc_content.Parent instanceof CShape)
             {
                 transform = cur_doc_content.Parent.transformText;
             }
@@ -4750,7 +4759,7 @@ CTable.prototype =
             {
                 cur_doc_content = cur_doc_content.Parent.Row.Table.Parent;
             }
-            if(cur_doc_content.Parent && cur_doc_content.Parent instanceof WordShape)
+            if(cur_doc_content.Parent && cur_doc_content.Parent instanceof CShape)
             {
                 transform = cur_doc_content.Parent.transformText;
             }
@@ -10330,6 +10339,12 @@ CTable.prototype =
         var Pr = this.Get_CompiledPr(false).TablePr;
         return Pr.TableStyleColBandSize;
     },
+
+    Get_ShapeStyleForPara: function()
+    {
+        return this.Parent.Get_ShapeStyleForPara();
+    },
+
 
     Set_TableW : function(Type, W)
     {
@@ -18050,7 +18065,7 @@ CTable.prototype =
             {
                 cur_doc_content = cur_doc_content.Parent.Row.Table.Parent;
             }
-            if(cur_doc_content.Parent && cur_doc_content.Parent instanceof WordShape)
+            if(cur_doc_content.Parent && cur_doc_content.Parent instanceof CShape)
             {
                 transform = cur_doc_content.Parent.transformText;
             }
@@ -20035,6 +20050,18 @@ CTableCell.prototype =
         return this.Id;
     },
 
+
+    Get_Theme : function()
+    {
+        return this.Row.Table.Get_Theme();
+    },
+
+    Get_ColorMap: function()
+    {
+        return this.Row.Table.Get_ColorMap();
+    },
+
+
     Copy : function(Row)
     {
         var Cell = new CTableCell(Row);
@@ -20318,6 +20345,13 @@ CTableCell.prototype =
 
         return { TextPr : TextPr, ParaPr : ParaPr };
     },
+
+
+    Get_ShapeStyleForPara: function()
+    {
+        return this.Row.Table.Get_ShapeStyleForPara();
+    },
+
 
     Get_TextBackGroundColor : function()
     {
