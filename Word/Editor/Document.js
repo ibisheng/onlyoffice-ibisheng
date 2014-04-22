@@ -9615,7 +9615,7 @@ CDocument.prototype =
 
         //Ctrl и Atl только для команд, word не водит текста с зажатыми Ctrl или Atl
         //команды полностью обрабатываются в keypress
-        if ((e.CtrlKey || e.AltKey) && !AscBrowser.isMacOs)
+        if (e.CtrlKey || (e.AltKey && !AscBrowser.isMacOs))
             return false;
 
         var Code;
