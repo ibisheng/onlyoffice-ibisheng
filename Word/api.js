@@ -1075,6 +1075,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
     this.asyncServerIdStartLoaded();
 }
 
+
 asc_docs_api.prototype.SetFontsPath = function(path)
 {
 	this.FontLoader.fontFilesPath = path;
