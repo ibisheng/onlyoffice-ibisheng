@@ -262,28 +262,34 @@ function getyieldmat( settle, mat, issue, rate, price, base ){
 
 function getduration( settlement, maturity, coupon, yld, frequency, basis ){
 
-    var yearfrac = yearFrac( new Date( settlement ), new Date( maturity ), basis ).getValue();
-    var numOfCoups = getcoupnum( new Date( settlement ), new Date( maturity ), frequency );
-    var duration = 0, f100 = 100;
-    coupon *= f100 / frequency;
-    yld /= frequency;
-    yld += 1;
+    var dbc = getcoupdaybs(new Date( settlement ),new Date( maturity ),frequency,basis),
+        coupD = getcoupdays(new Date( settlement ),new Date( maturity ),frequency,basis),
+        numCoup = getcoupnum(new Date( settlement ),new Date( maturity ),frequency);
 
-    var nDiff = yearfrac * frequency - numOfCoups;
+    var duration = 0, p = 0;
 
-    var p = 0;
+    var dsc = coupD - dbc;
+    var diff = dsc / coupD - 1;
+    yld = yld / frequency + 1;
 
-    for ( var i = 1; i < numOfCoups; i++ ) {
-        duration += ( i + nDiff ) * ( coupon ) / Math.pow( yld, i + nDiff );
-        p += coupon / Math.pow( yld, i + nDiff );
+
+    coupon *= 100/frequency;
+
+    for(var index = 1; index <= numCoup; index++ ){
+        var di = index + diff;
+
+        var yldPOW = Math.pow( yld, di);
+
+        duration += di * coupon / yldPOW;
+
+        p += coupon / yldPOW;
     }
 
-    duration += ( numOfCoups + nDiff ) * ( coupon + f100 ) / Math.pow( yld, numOfCoups + nDiff );
-    p += ( coupon + f100 ) / Math.pow( yld, numOfCoups + nDiff );
+    duration += (diff + numCoup) * 100 / Math.pow( yld, diff + numCoup);
+    p += 100 / Math.pow( yld, diff + numCoup);
 
-    duration = duration / p / frequency;
+    return duration / p / frequency ;
 
-    return duration;
 }
 
 /**

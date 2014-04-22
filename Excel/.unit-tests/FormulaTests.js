@@ -332,29 +332,33 @@
     }
 
     function _duration( settlement, maturity, coupon, yld, frequency, basis ){
+        var dbc = getcoupdaybs(new Date( settlement ),new Date( maturity ),frequency,basis),
+            coupD = getcoupdays(new Date( settlement ),new Date( maturity ),frequency,basis),
+            numCoup = getcoupnum(new Date( settlement ),new Date( maturity ),frequency);
 
-        var yearfrac = _yearFrac( new Date( settlement ), new Date( maturity ), basis );
-        var numOfCoups = _coupnum( new Date( settlement ), new Date( maturity ), frequency );
-        var duration = 0, f100 = 100;
-        coupon *= f100 / frequency;
-        yld /= frequency;
-        yld += 1;
+        var duration = 0, p = 0;
 
-        var nDiff = yearfrac * frequency - numOfCoups;
+        var dsc = coupD - dbc;
+        var diff = dsc / coupD - 1;
+        yld = yld / frequency + 1;
 
-        var p = 0;
 
-        for ( var i = 1; i < numOfCoups; i++ ) {
-            duration += ( i + nDiff ) * ( coupon ) / Math.pow( yld, i + nDiff );
-            p += coupon / Math.pow( yld, i + nDiff );
+        coupon *= 100/frequency;
+
+        for(var index = 1; index <= numCoup; index++ ){
+            var di = index + diff;
+
+            var yldPOW = Math.pow( yld, di);
+
+            duration += di * coupon / yldPOW;
+
+            p += coupon / yldPOW;
         }
 
-        duration += ( numOfCoups + nDiff ) * ( coupon + f100 ) / Math.pow( yld, numOfCoups + nDiff );
-        p += ( coupon + f100 ) / Math.pow( yld, numOfCoups + nDiff );
+        duration += (diff + numCoup) * 100 / Math.pow( yld, diff + numCoup);
+        p += 100 / Math.pow( yld, diff + numCoup);
 
-        duration = duration / p / frequency;
-
-        return duration;
+        return duration / p / frequency ;
     }
 
     var ver = 2;
