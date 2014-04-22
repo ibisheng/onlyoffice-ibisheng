@@ -522,7 +522,7 @@ CBreve.prototype.relate = function(parent)
 
 function CSign()
 {
-    this.sign = new CMathText();
+    this.sign = new CMathText(true);
     this.typeOper = null;
     this.Parent = null;
 }
@@ -586,20 +586,6 @@ CSign.prototype.setPosition = function(pos)
         y: pos.y + this.sign.size.ascent
     };
     this.sign.setPosition(position);
-}
-CSign.prototype.old_fixSize = function(bIncline)
-{
-    this.sign.recalculateSize();
-
-    this.dH = 0.7*this.Parent.getCtrPrp().FontSize/36;
-
-    var height = this.sign.size.height + this.dH,
-        width = this.sign.size.widthG;
-
-    if(bIncline)
-        width += 0.1 * this.sign.size.height; // incline
-
-    this.size = {width: width, height: height};
 }
 CSign.prototype.fixSize = function(oMeasure, stretch, bIncline)
 {

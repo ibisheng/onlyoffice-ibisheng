@@ -142,7 +142,7 @@ CNary.prototype.init = function(props)
     {
         this.code = signCode;
         this.type = NARY_TEXT_OPER;
-        sign = new CMathText();
+        sign = new CMathText(true);
         sign.add(signCode);
 
     }

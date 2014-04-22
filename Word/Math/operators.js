@@ -2828,7 +2828,7 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
         codeChr  = code;
         typeOper = OPERATOR_TEXT;
 
-        operator = new CMathText();
+        operator = new CMathText(true);
         operator.add(code);
         operator.setJustDraw(true);
     }

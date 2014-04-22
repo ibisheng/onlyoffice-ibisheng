@@ -8535,7 +8535,7 @@ function Binary_oMathReader(stream)
         {			
 			var text = this.ReadMathText(length);
 			//var text = this.stream.GetString2LE(length);
-			var oText = new CMathText();
+			var oText = new CMathText(false);
 			oText.addTxt(text);
 			oElem.addElementToContent(oText);
         }
@@ -10207,7 +10207,7 @@ function Binary_oMathReader(stream)
 				//управляющие символы
 				if (0x001F < text[i].charCodeAt(0))
 				{
-					var oText = new CMathText();
+					var oText = new CMathText(false);
 					oText.addTxt(text[i]);
 					oMRun.Content.splice( i, 0, oText );
 				}

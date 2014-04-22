@@ -1072,7 +1072,7 @@ CMathContent.prototype =
                 code =  0x1D6A5;
         }
 
-        var symb = new CMathText();
+        var symb = new CMathText(false);
         symb.add(code);
 
         this.addToContent(symb);
@@ -4325,7 +4325,7 @@ CMathContent.prototype =
     },
     fillPlaceholders: function()
     {
-        var placeholder = new CMathText();
+        var placeholder = new CMathText(false);
         placeholder.relate(this);
         placeholder.fillPlaceholders();
 
@@ -7730,12 +7730,14 @@ CMathContent.prototype =
             this.content[pos].Get_TextPr(ContentPos, Depth);
         }
 
-
-
     },
     Get_Default_TPrp: function()
     {
         return this.Composition.Parent.Get_Default_TPrp();
+    },
+    Get_LeftPos: function()
+    {
+
     },
     //////////////////////////
 

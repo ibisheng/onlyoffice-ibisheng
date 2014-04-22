@@ -98,14 +98,14 @@ ParaMath.prototype =
 
 		if ( para_Text === Type)
 		{
-			var oText = new CMathText();
+			var oText = new CMathText(false);
 			oText.addTxt(Item.Value);
 			oStartContent.Add(oText);
 		}
 		else if ( para_Space === Type )
 		{
 			//var oSpace = new ParaSpace(1);
-			var oText = new CMathText();
+			var oText = new CMathText(false);
 			oText.addTxt(" ");
 			oStartContent.Add(oText);
 		}
@@ -151,7 +151,7 @@ ParaMath.prototype =
 			var items = new Array();
             for (var Pos=0; Pos < sText.length; Pos++)
             {
-                var oText = new CMathText();
+                var oText = new CMathText(false);
                 oText.addTxt(sText[Pos]);				
                 MathRun.Content.splice( Pos, 0, oText );
 				items.push(oText);

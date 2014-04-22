@@ -50,7 +50,7 @@ CMathTextPrp.prototype =
     }
 }
 
-function CMathText()
+function CMathText(bJDraw)
 {
     this.typeObj = MATH_TEXT;
 
@@ -59,6 +59,10 @@ function CMathText()
     this.value = null;
 
     this.bJDraw = false;
+
+    if(bJDraw === false || bJDraw === true)
+        this.bJDraw = bJDraw;
+
     this.type  = TXT_ROMAN;
 
     this.GapLeft = 0;
@@ -100,13 +104,14 @@ CMathText.prototype =
     {
         var code = this.value;
 
-        if(this.typeObj === MATH_PLACEHOLDER)
+        if(this.typeObj === MATH_PLACEHOLDER || this.bJDraw)
             return code;
 
         var bCapitale = (code > 0x0040 && code < 0x005B),
             bSmall = (code > 0x0060 && code < 0x007b);
 
         var Type = this.Parent.Math_GetTypeText();
+
 
         if(Type == TXT_ROMAN )
         {
