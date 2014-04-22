@@ -90,10 +90,10 @@ var ACCENT_HALF_ARROW_RIGHT     = 30;
 var TXT_NORMAL                  =  0;
 var TXT_ROMAN                   =  1;   // math roman
 var TXT_SCRIPT                  =  2;
-var TXT_FRAKTUR                 =  2;
-var TXT_DOUBLE_STRUCK           =  3;
-var TXT_SANS_SERIF              =  4;
-var TXT_MONOSPACE               =  5;
+var TXT_FRAKTUR                 =  3;
+var TXT_DOUBLE_STRUCK           =  4;
+var TXT_SANS_SERIF              =  5;
+var TXT_MONOSPACE               =  6;
 
 /*var SCR_ROMAN                 =  0;
 var SCR_SCRIPT                  =  1;

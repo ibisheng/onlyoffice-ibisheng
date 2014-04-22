@@ -189,11 +189,32 @@ CMathText.prototype =
         }
         else if(Type == TXT_SCRIPT)
         {
-            if(bCapitale)
-                //code = code + 0x1D504;
-                code  = code + 0x1D45C;
+            if(code == 0x42)
+                code = 0x212C;
+            else if(code == 0x45)
+                code = 0x2130;
+            else if(code == 0x46)
+                code = 0x2131;
+            else if(code == 0x48)
+                code = 0x210B;
+            else if(code == 0x49)
+                code = 0x2110;
+            else if(code == 0x4C)
+                code = 0x2112;
+            else if(code == 0x4D)
+                code = 0x2133;
+            else if(code == 0x52)
+                code = 0x211B;
+            else if(code == 0x65)
+                code = 0x212F;
+            else if(code == 0x67)
+                code = 0x210A;
+            else if(code == 0x6F)
+                code = 0x2134;
+            else if(bCapitale)
+                code  = code + 0x1D45B;
             else if(bSmall)
-                code  = code + 0x1D456;
+                code  = code + 0x1D455;
         }
 
         return code;
@@ -397,10 +418,6 @@ CMathText.prototype =
             this.pos = {x : pos.x + this.GapLeft, y: pos.y };
         else                                    // for symbol only drawing
             this.pos = {x:  pos.x + this.GapLeft, y: pos.y + this.size.ascent};
-    },
-    new_setPosition: function(pos)
-    {
-        this.pos = {x: pos.x , y: pos.y};
     },
     setCoeffTransform: function(sx, shx, shy, sy)
     {

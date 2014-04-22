@@ -7665,7 +7665,7 @@ CMathContent.prototype =
                 this.content[i].SetRunEmptyToContent(bAll);
         }
 
-        if(this.content[len - 1].typeObj == MATH_COMP)
+        if(len > 0 && this.content[len - 1].typeObj == MATH_COMP)
         {
             NewContent.push( new ParaRun(this.Composition.Parent.Paragraph, true) );
         }
