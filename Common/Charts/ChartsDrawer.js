@@ -3060,7 +3060,9 @@ CChartsDrawer.prototype =
 
 		/*
 		var SYMBOL_PICTURE = 5;*/
-
+		
+		path.moveTo(x * pathW, y * pathW);
+		
 		switch ( symbol )
 		{
 			case SYMBOL_DASH:
@@ -4066,123 +4068,100 @@ drawLineChart.prototype =
 		//соответствует подписям оси значений(OY)
 		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
 		
-		var isSplineLine = false;
+		var points;
 		
-		var y, y1, y2, y3, x, x1, x2, x3, val, nextVal, tempVal, seria, dataSeries, compiledMarkerSize, compiledMarkerSymbol;
+		var y, y1, y2, y3, x, x1, x2, x3, val, nextVal, tempVal, seria, dataSeries, compiledMarkerSize, compiledMarkerSymbol, idx, numCache;
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 		
 			seria = this.chartProp.series[i];
 			
-			isSplineLine = seria.smooth;
-			
-			dataSeries = seria.val.numRef ? seria.val.numRef.numCache.pts : seria.val.numLit.pts;
-			
-			if(dataSeries.length == 1)
+			numCache   = seria.val.numRef ? seria.val.numRef.numCache : seria.val.numLit;
+			dataSeries = numCache.pts;
+
+			for(var n = 0; n < numCache.ptCount; n++)
 			{
-				var n = 0;
+				idx = dataSeries[n] && dataSeries[n].idx != null ? dataSeries[n].idx : n;
+				
 				//рассчитываем значения				
 				val = this._getYVal(n, i);
 				
-				if(this.cChartSpace.chart.plotArea.valAx && this.cChartSpace.chart.plotArea.valAx.scaling.logBase)
-					val = this.cChartDrawer.getLogarithmicValue(val, this.cChartSpace.chart.plotArea.valAx.scaling.logBase, yPoints);
-				
-				y  = this.cChartDrawer.getYPosition(val, yPoints);
 				x  = xPoints[n].pos;
+				y  = this.cChartDrawer.getYPosition(val, yPoints);
+				
 				if(!this.paths.points)
 					this.paths.points = [];
 				if(!this.paths.points[i])
 					this.paths.points[i] = [];
+					
+				if(!points)
+					points = [];
+				if(!points[i])
+					points[i] = [];
 				
-				compiledMarkerSize = dataSeries[n].compiledMarker && dataSeries[n].compiledMarker.size ? dataSeries[n].compiledMarker.size : null;
-				compiledMarkerSymbol = dataSeries[n].compiledMarker && dataSeries[n].compiledMarker.symbol ? dataSeries[n].compiledMarker.symbol : null;
 				
-				this.paths.points[i][n] = this.cChartDrawer.calculatePoint(x, y, compiledMarkerSize, compiledMarkerSymbol);
-			}
-			else
-			{
-				for(var n = 0; n < dataSeries.length - 1; n++)
+				compiledMarkerSize = dataSeries[n] && dataSeries[n].compiledMarker && dataSeries[n].compiledMarker.size ? dataSeries[n].compiledMarker.size : null;
+				compiledMarkerSymbol = dataSeries[n] && dataSeries[n].compiledMarker && dataSeries[n].compiledMarker.symbol ? dataSeries[n].compiledMarker.symbol : null;
+				
+				if(val != null)
 				{
-					//рассчитываем значения				
-					val = this._getYVal(n, i);
-					if(this.cChartSpace.chart.plotArea.valAx && this.cChartSpace.chart.plotArea.valAx.scaling.logBase)
-						val = this.cChartDrawer.getLogarithmicValue(val, this.cChartSpace.chart.plotArea.valAx.scaling.logBase, yPoints);
+					this.paths.points[i][n] = this.cChartDrawer.calculatePoint(x, y, compiledMarkerSize, compiledMarkerSymbol);
+					points[i][n] = {x: x, y: y};
+				}	
+				else
+				{
+					this.paths.points[i][n] = null;
+					points[i][n] = null;
+				}
+			}
+		};
+		
+		this._calculateAllLines(points);
+	},
+	
+	_calculateAllLines: function(points)
+	{
+		var startPoint, endPoint;
+		//соответствует подписям оси категорий(OX)
+		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
+		//соответствует подписям оси значений(OY)
+		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
+		
+		var x, y, x1, y1, x2, y2, x3, y3, isSplineLine;
+		
+		for(var i = 0; i < points.length; i++)
+		{	
+			isSplineLine = this.chartProp.series[i].smooth;
+			
+			for(var n = 0; n < points[i].length; n++)
+			{
+				if(!this.paths.series)
+					this.paths.series = [];
+				if(!this.paths.series[i])
+					this.paths.series[i] = [];
 					
-					nextVal = this._getYVal(n + 1, i);
-					if(this.cChartSpace.chart.plotArea.valAx && this.cChartSpace.chart.plotArea.valAx.scaling.logBase)
-						nextVal = this.cChartDrawer.getLogarithmicValue(nextVal, this.cChartSpace.chart.plotArea.valAx.scaling.logBase, yPoints);
-					
-					//точки находятся внутри диапазона
-					if(!this.paths.series)
-						this.paths.series = [];
-					if(!this.paths.series[i])
-						this.paths.series[i] = [];
-						
+				if(points[i][n] != null && points[i][n + 1] != null)
+				{	
 					if(isSplineLine)
 					{
-						x = n - 1 >= 0 ? n - 1 : 0;
+						x = points[i][n - 1] ? n - 1 : 0;
 						y = this._getYVal(x, i);
 						
 						x1 = n;
-						y1 = val;
+						y1 = this._getYVal(x1, i);
 						
-						x2 = n + 1 <= dataSeries.length - 1 ? n + 1 : dataSeries.length - 1;
+						x2 = points[i][n + 1]  ? n + 1 : n;
 						y2 = this._getYVal(x2, i);
 						
-						x3 = n + 2 <= dataSeries.length - 1 ? n + 2 : dataSeries.length - 1;
+						x3 = points[i][n + 2] ? n + 2 : points[i][n + 1] ? n + 1 : n;
 						y3 = this._getYVal(x3, i);
 						
 						this.paths.series[i][n] = this._calculateSplineLine(x, y, x1, y1, x2, y2, x3, y3, xPoints, yPoints);
-						
-						y  = this.cChartDrawer.getYPosition(val, yPoints);
-						y1 = this.cChartDrawer.getYPosition(nextVal, yPoints);
-						
-						x  = xPoints[n].pos; 
-						x1 = xPoints[n + 1].pos;
 					}
 					else
-					{
-						y  = this.cChartDrawer.getYPosition(val, yPoints);
-						y1 = this.cChartDrawer.getYPosition(nextVal, yPoints);
-						
-						x  = xPoints[n].pos; 
-						x1 = xPoints[n + 1].pos;
-						
-						if(!this.paths.series)
-							this.paths.series = [];
-						if(!this.paths.series[i])
-							this.paths.series[i] = []
-						
-						this.paths.series[i][n] = this._calculateLine(x, y, x1, y1);
-					}
-					
-					
-					if(!this.paths.points)
-						this.paths.points = [];
-					if(!this.paths.points[i])
-						this.paths.points[i] = [];
-					
-					if(n == 0)
-					{
-						compiledMarkerSize = dataSeries[n].compiledMarker && dataSeries[n].compiledMarker.size ? dataSeries[n].compiledMarker.size : null;
-						compiledMarkerSymbol = dataSeries[n].compiledMarker && dataSeries[n].compiledMarker.symbol ? dataSeries[n].compiledMarker.symbol : null;
-						
-						this.paths.points[i][n] = this.cChartDrawer.calculatePoint(x, y, compiledMarkerSize, compiledMarkerSymbol);
-						
-						compiledMarkerSize = dataSeries[n + 1].compiledMarker && dataSeries[n + 1].compiledMarker.size ? dataSeries[n + 1].compiledMarker.size : null;
-						compiledMarkerSymbol = dataSeries[n + 1].compiledMarker && dataSeries[n + 1].compiledMarker.symbol ? dataSeries[n + 1].compiledMarker.symbol : null;
-						
-						this.paths.points[i][n + 1] = this.cChartDrawer.calculatePoint(x1, y1, compiledMarkerSize, compiledMarkerSymbol);
-					}
-					else
-					{
-						compiledMarkerSize = dataSeries[n + 1].compiledMarker && dataSeries[n + 1].compiledMarker.size ? dataSeries[n + 1].compiledMarker.size : null;
-						compiledMarkerSymbol = dataSeries[n + 1].compiledMarker && dataSeries[n + 1].compiledMarker.symbol ? dataSeries[n + 1].compiledMarker.symbol : null;
-						
-						this.paths.points[i][n + 1] = this.cChartDrawer.calculatePoint(x1, y1, compiledMarkerSize, compiledMarkerSymbol);
-					}	
+						this.paths.series[i][n] = this._calculateLine(points[i][n].x, points[i][n].y, points[i][n + 1].x, points[i][n + 1].y);
 				}
 			}
-		}
+		};
 	},
 	
 	_getYPosition: function(val, yPoints)
@@ -4226,32 +4205,16 @@ drawLineChart.prototype =
 	_calculateDLbl: function(chartSpace, ser, val)
 	{
 		var numCache = this.chartProp.series[ser].val.numRef ? this.chartProp.series[ser].val.numRef.numCache : this.chartProp.series[ser].val.numLit;
-		var point = numCache.pts[val];
+		var point = this.cChartDrawer.getIdxPoint(this.chartProp.series[ser], val);
 		var path;
-		var isSplineLine = false;
 		
-		if(this.paths.series)
-		{
-			if(val == numCache.pts.length - 1)
-				path = this.paths.series[ser][val - 1].ArrPathCommand[1];
-			else
-				path = this.paths.series[ser][val].ArrPathCommand[0];
-		}
-		else if(this.paths.points)
-		{
-			path = this.paths.points[ser][val].path.ArrPathCommand[0];
-		}
+		path = this.paths.points[ser][val].path.ArrPathCommand[0];
 		
 		if(!path)
 			return;
 				
 		var x = path.X;
 		var y = path.Y;
-		if(val == numCache.pts.length - 1 && isSplineLine == true)
-		{
-			x = path.X2;
-			y = path.Y2;
-		}
 		
 		var pxToMm = this.chartProp.pxToMM;
 		var constMargin = 5 / pxToMm;
@@ -4313,18 +4276,18 @@ drawLineChart.prototype =
 		
 		this.cShapeDrawer.Graphics.SaveGrState();
 		this.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, this.chartProp.chartGutter._top / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
-		for (var i = 0; i < this.chartProp.series.length; i++) {
+		for (var i = 0; i < this.paths.series.length; i++) {
 			seria = this.chartProp.series[i];
 			brush = seria.brush;
 			pen = seria.pen;
 			
 			numCache = seria.val.numRef ? seria.val.numRef.numCache : seria.val.numLit;
-			dataSeries = numCache.pts;
-			for(var n = 0; n < dataSeries.length - 1; n++)
+			dataSeries = this.paths.series[i];
+			for(var n = 0; n < dataSeries.length; n++)
 			{
-				if(numCache.pts[n].pen)
+				if(numCache.pts[n] && numCache.pts[n].pen)
 					pen = numCache.pts[n].pen;
-				if(numCache.pts[n].brush)
+				if(numCache.pts[n] && numCache.pts[n].brush)
 					brush = numCache.pts[n].brush;
 					
 				this.cChartDrawer.drawPath(this.paths.series[i][n], pen, brush);
@@ -4333,14 +4296,18 @@ drawLineChart.prototype =
 			//draw point
 			for(var k = 0; k < this.paths.points[i].length; k++)
 			{	
-				markerBrush = numCache.pts[k].compiledMarker ? numCache.pts[k].compiledMarker.brush : null;
-				markerPen = numCache.pts[k].compiledMarker ? numCache.pts[k].compiledMarker.pen : null;
+				if(numCache.pts[k])
+				{
+					markerBrush = numCache.pts[k].compiledMarker ? numCache.pts[k].compiledMarker.brush : null;
+					markerPen = numCache.pts[k].compiledMarker ? numCache.pts[k].compiledMarker.pen : null;
+				};
 				
 				//frame of point
-				if(this.paths.points[i][0].framePaths)
+				if(this.paths.points[i][0] && this.paths.points[i][0].framePaths)
 					this.cChartDrawer.drawPath(this.paths.points[i][k].framePaths, markerPen, markerBrush, false);
-				//point		
-				this.cChartDrawer.drawPath(this.paths.points[i][k].path, markerPen, markerBrush, true);
+				//point	
+				if(this.paths.points[i][k])
+					this.cChartDrawer.drawPath(this.paths.points[i][k].path, markerPen, markerBrush, true);
 			}
         }
 		this.cShapeDrawer.Graphics.RestoreGrState();
@@ -4351,12 +4318,15 @@ drawLineChart.prototype =
 		var tempVal;
 		var val = 0;
 		var numCache;
+		var idxPoint;
+		
 		if(this.chartProp.subType == "stacked")
 		{
 			for(var k = 0; k <= i; k++)
 			{
 				numCache = this.chartProp.series[k].val.numRef ? this.chartProp.series[k].val.numRef.numCache :  this.chartProp.series[k].val.numLit;
-				tempVal = parseFloat(numCache.pts[n].val);
+				idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[k], n);
+				tempVal = idxPoint ? parseFloat(idxPoint.val) : 0;
 				if(tempVal)
 					val += tempVal;
 			}
@@ -4367,7 +4337,8 @@ drawLineChart.prototype =
 			for(var k = 0; k < this.chartProp.series.length; k++)
 			{
 				numCache = this.chartProp.series[k].val.numRef ? this.chartProp.series[k].val.numRef.numCache :  this.chartProp.series[k].val.numLit;
-				tempVal = parseFloat(numCache.pts[n].val);
+				idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[k], n);
+				tempVal = idxPoint ? parseFloat(idxPoint.val) : 0;
 				if(tempVal)
 				{
 					if(k <= i)
@@ -4380,7 +4351,8 @@ drawLineChart.prototype =
 		else
 		{
 			numCache = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache :  this.chartProp.series[i].val.numLit;
-			val = parseFloat(numCache.pts[n].val);
+			idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[i], n);
+			val = idxPoint ? parseFloat(idxPoint.val) : null;
 		}
 		return val;
 	},
