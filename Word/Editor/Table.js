@@ -17652,7 +17652,7 @@ CTable.prototype =
         }
     },
     
-    ReIndexing : function()
+    ReIndexing : function(StartIndex)
     {
         this.Internal_ReIndexing(0);
 
