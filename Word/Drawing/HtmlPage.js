@@ -199,6 +199,7 @@ function CEditorPage(api)
     this.TextBoxChangedValueEvent = true;
     this.TextBoxMaxWidth = 20;
     this.TextBoxMaxHeight = 20;
+    this.TextboxUsedForSpecials = false;
 
     this.MobileTouchManager = null;
     this.ReaderTouchManager = null;
@@ -2181,10 +2182,22 @@ function CEditorPage(api)
         oWordControl.bIsUseKeyPress = (oWordControl.m_oLogicDocument.OnKeyDown(global_keyboardEvent) === true) ? false : true ;
 
         oWordControl.EndUpdateOverlay();
-        if (false === oWordControl.bIsUseKeyPress || true === global_keyboardEvent.AltKey)
-        {
-            e.preventDefault();
-        }
+
+		if (false == oWordControl.TextboxUsedForSpecials)
+		{
+        	if (false === oWordControl.bIsUseKeyPress || true === global_keyboardEvent.AltKey)
+        	{
+            	e.preventDefault();
+        	}
+		}
+		else
+		{
+			if (true !== global_keyboardEvent.AltKey && true !== global_keyboardEvent.CtrlKey)
+			{
+				if (false === oWordControl.bIsUseKeyPress)
+					e.preventDefault();
+			}
+		}
     }
 
     this.onKeyDownNoActiveControl = function(e)
@@ -2377,13 +2390,42 @@ function CEditorPage(api)
             return;
         */
 
-        oWordControl.StartUpdateOverlay();
-        var retValue = oWordControl.m_oLogicDocument.OnKeyPress(global_keyboardEvent);
-        oWordControl.EndUpdateOverlay();
-        if ( true === retValue )
-        {
-            e.preventDefault();
-        }
+		if (false === oWordControl.TextboxUsedForSpecials)
+		{
+			oWordControl.StartUpdateOverlay();
+        	var retValue = oWordControl.m_oLogicDocument.OnKeyPress(global_keyboardEvent);
+        	oWordControl.EndUpdateOverlay();
+        	if ( true === retValue )
+        	{
+            	e.preventDefault();
+        	}
+		}
+		else
+		{
+			var _oldCtrl = global_keyboardEvent.CtrlKey;
+        	var _oldAlt = global_keyboardEvent.AltKey;
+
+       		if ((_oldCtrl || _oldAlt) && ("" != oWordControl.TextBoxInput.value))
+        	{
+            	global_keyboardEvent.CtrlKey = false;
+            	global_keyboardEvent.AltKey = false;
+
+	            global_keyboardEvent.Which = oWordControl.TextBoxInput.value.charCodeAt(0);
+        	}
+
+        	oWordControl.StartUpdateOverlay();
+        	var retValue = oWordControl.m_oLogicDocument.OnKeyPress(global_keyboardEvent);
+        	oWordControl.EndUpdateOverlay();
+        	if ( true === retValue )
+        	{
+            	e.preventDefault();
+        	}
+
+        	oWordControl.TextBoxInput.value = "";
+
+	        global_keyboardEvent.CtrlKey = _oldCtrl;
+    	    global_keyboardEvent.AltKey = _oldAlt;
+		}
     }
 
     this.verticalScroll = function(sender,scrollPositionY,maxY,isAtTop,isAtBottom)
@@ -3661,10 +3703,10 @@ function CEditorPage(api)
                 this.TextBoxInput.rows = 1;
 
                 this.m_oMainView.HtmlElement.appendChild(this.TextBoxInput);
-
-                this.TextBoxInput["oninput"] = this.OnTextBoxInput;
-                this.TextBoxInput.onkeydown = this.TextBoxOnKeyDown;
             }
+
+            this.TextBoxInput["oninput"] = this.OnTextBoxInput;
+            this.TextBoxInput.onkeydown = this.TextBoxOnKeyDown;
 
             if (this.TextBoxInputFocus)
             {
@@ -3686,12 +3728,41 @@ function CEditorPage(api)
             if (this.TextBoxInputFocus)
                 this.onChangeTB();
 
-            // удаляем текстбокс
-            if (null != this.TextBoxInput)
-            {
-                this.m_oMainView.HtmlElement.removeChild(this.TextBoxInput);
-                this.TextBoxInput = null;
-            }
+			if (false === this.TextboxUsedForSpecials)
+			{
+            	// удаляем текстбокс
+            	if (null != this.TextBoxInput)
+            	{
+                	this.m_oMainView.HtmlElement.removeChild(this.TextBoxInput);
+	                this.TextBoxInput = null;
+    	        }
+			}
+			else
+			{
+                if (null == this.TextBoxInput)
+                {
+    	            this.TextBoxInput = document.createElement('textarea');
+	                this.TextBoxInput.id = "area_id";
+
+                	this.TextBoxInput.setAttribute("style", "font-family:arial;font-size:12pt;position:absolute;resize:none;padding:2px;margin:0px;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;");
+                	this.TextBoxInput.style.border = "2px solid #4363A4";
+
+            	    this.TextBoxInput.style.width = "100px";
+        	        //this.TextBoxInput.style.height = "40px";
+    	            this.TextBoxInput.rows = 1;
+
+	                this.m_oMainView.HtmlElement.appendChild(this.TextBoxInput);
+            	}
+
+            	//this.TextBoxInput["oninput"] = function(){};
+            	//this.TextBoxInput.onkeydown = function(){};
+
+        	    this.TextBoxInput.style.overflow = 'hidden';
+    	        this.TextBoxInput.style.zIndex = -1;
+	            this.TextBoxInput.style.top = "-1000px";
+
+            	this.TextBoxInput.focus();
+			}
         }
     }
 
