@@ -3330,11 +3330,19 @@
 				
 				//backgroundColor
 				var backgroundColor = null;
-				if(paragraph.Parent && paragraph.Parent.Parent && paragraph.Parent.Parent instanceof CTableCell && paragraph.Parent.Parent.CompiledPr && paragraph.Parent.Parent.CompiledPr.Pr.Shd && paragraph.Parent.Parent.CompiledPr.Pr.Shd.Color)
+				var compiledPrCell, color;
+				
+				if(paragraph.Parent && paragraph.Parent.Parent && paragraph.Parent.Parent instanceof CTableCell)
 				{
-					var color = paragraph.Parent.Parent.CompiledPr.Pr.Shd.Color;
-					backgroundColor = new RgbColor(this.clipboard._getBinaryColor("rgb(" + color.r + "," + color.g + "," + color.b + ")"));
-				}
+					compiledPrCell = paragraph.Parent.Parent.Get_CompiledPr();
+					
+					if(compiledPrCell)
+					{	
+						var color = compiledPrCell.Shd.Color;
+						backgroundColor = new RgbColor(this.clipboard._getBinaryColor("rgb(" + color.r + "," + color.g + "," + color.b + ")"));
+					};
+				};
+				
 				if(backgroundColor)
 					oNewItem.bc = backgroundColor;
 				
@@ -3574,7 +3582,10 @@
 						oNewElem.height = 1;
 					}
 					else if(type_Table == elem.GetType())
+					{
+						elem.ReIndexing(0);
 						oNewElem = this._getTableMeasure(elem, oRes);
+					}
 					if(null != oNewElem)
 					{
 						oRes.children.push(oNewElem);
