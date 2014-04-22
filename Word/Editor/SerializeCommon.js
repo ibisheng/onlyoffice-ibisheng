@@ -478,7 +478,8 @@ function CPPTXContentLoader()
         shape.setParent(this.TempMainObject == null ? this.ParaDrawing : null);
         this.TempGroupObject = shape;
 
-        var arrGraphicObjects = shape.arrGraphicObjects;
+        var oldParaDrawing = this.ParaDrawing;
+        this.ParaDrawing = null;
 
         var _rec_start = s.cur;
         var _end_rec = _rec_start + s.GetULong() + 4;
@@ -568,6 +569,7 @@ function CPPTXContentLoader()
             }
         }
 
+        this.ParaDrawing = oldParaDrawing;
         s.Seek2(_end_rec);
         this.TempGroupObject = null;
         return shape;

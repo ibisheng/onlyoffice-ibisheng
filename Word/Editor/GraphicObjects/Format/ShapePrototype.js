@@ -348,6 +348,11 @@ CShape.prototype.recalculateWrapPolygon = function()
         var wrapping_polygon = this.parent.wrappingPolygon;
         if(!wrapping_polygon.edited)
         {
+            if(this.spTree)
+            {
+                for(var i = 0; i < this.spTree.length; ++i)
+                    this.spTree[i].recalculate();
+            }
             wrapping_polygon.calculate(this);
         }
         else
@@ -359,10 +364,26 @@ CShape.prototype.recalculateWrapPolygon = function()
 
 CShape.prototype.getArrayWrapPolygons = function()
 {
-    if(this.spPr.geometry)
-        return this.spPr.geometry.getArrayPolygons();
 
-    return [];
+    var ret;
+    if(this.spPr.geometry)
+        ret =  this.spPr.geometry.getArrayPolygons();
+    else
+        ret = [];
+    var t = this.localTransform;
+    for(var i = 0; i < ret.length; ++i)
+    {
+        var polygon = ret[i];
+        for(var j = 0; j < polygon.length; ++j)
+        {
+            var p = polygon[j];
+            var x = t.TransformPointX(p.x, p.y);
+            var y = t.TransformPointY(p.x, p.y);
+            p.x = x;
+            p.y = y;
+        }
+    }
+    return ret;
 };
 
 CShape.prototype.recalculateContent = function()

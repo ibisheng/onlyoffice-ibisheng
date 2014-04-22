@@ -57,7 +57,7 @@ function handleSelectedObjects(drawingObjectsController, e, x, y, group, pageInd
         }
         if(selected_objects[i].hitInBoundingRect(x, y))
         {
-            if(bWord && selected_objects[i].parent.Is_Inline())
+            if(bWord && selected_objects[i].parent && selected_objects[i].parent.Is_Inline())
                 return handleInlineHitNoText(selected_objects[i], drawingObjectsController, e, x, y, pageIndex);
             else
                 return drawingObjectsController.handleMoveHit(selected_objects[i], e, x, y, group, true, selected_objects[i].selectStartPage, true);

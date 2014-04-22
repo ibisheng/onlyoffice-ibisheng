@@ -3964,7 +3964,7 @@ CShape.prototype =
 
         this.bounds.x = this.bounds.l;
         this.bounds.y = this.bounds.t;
-        this.bounds.w = this.bounds.r - this.bounds.r;
+        this.bounds.w = this.bounds.r - this.bounds.l;
         this.bounds.h = this.bounds.b - this.bounds.t;
     }
 };
