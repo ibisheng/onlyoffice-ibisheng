@@ -2436,7 +2436,8 @@ CGraphicObjects.prototype =
         var i;
         if(this.selection.textSelection)
         {
-            this.drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.selection.textSelection.getTransformMatrix(), 0, 0, this.selection.textSelection.extX, this.selection.textSelection.extY, false, this.selection.textSelection.canRotate());
+            if(this.selection.textSelection.selectStartPage === pageIndex)
+                this.drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.selection.textSelection.getTransformMatrix(), 0, 0, this.selection.textSelection.extX, this.selection.textSelection.extY, false, this.selection.textSelection.canRotate());
         }
         else if(this.selection.groupSelection)
         {
@@ -2480,7 +2481,11 @@ CGraphicObjects.prototype =
             for(i = 0; i < this.selectedObjects.length; ++i)
             {
                 if(this.selectedObjects[i].selectStartPage === pageIndex)
+                {
                     this.drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selectedObjects[i].getTransformMatrix(), 0, 0, this.selectedObjects[i].extX, this.selectedObjects[i].extY, false, this.selectedObjects[i].canRotate());
+              //      this.drawingDocument.AutoShapesTrack.DrawEditWrapPointsPolygon(this.selectedObjects[i].parent.wrappingPolygon.calculatedPoints, new CMatrix());
+                }
+
             }
             if(this.selectedObjects.length === 1 && this.selectedObjects[0].drawAdjustments && this.selectedObjects[0].selectStartPage === pageIndex)
             {

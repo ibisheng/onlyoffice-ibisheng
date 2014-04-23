@@ -1677,6 +1677,12 @@ CShape.prototype =
         this.invertTransformText2 = global_MatrixTransformer.Invert(this.transformText2);
     },
 
+    setWordShape: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ShapeSetWordShape, oldPr: this.bWordShape, newPr: pr});
+        this.bWordShape = pr;
+    },
+
     copy: function (sp) {
         if (!(sp instanceof CShape))
             sp = new CShape();
@@ -2327,6 +2333,9 @@ CShape.prototype =
     {
         this.selected = true;
         this.selectStartPage = pageIndex;
+        var content = this.getDocContent && this.getDocContent();
+        if(content)
+            content.Set_StartPage(pageIndex);
         var selected_objects;
         if (!isRealObject(this.group))
             selected_objects = drawingObjectsController.selectedObjects;

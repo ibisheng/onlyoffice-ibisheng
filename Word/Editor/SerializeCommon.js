@@ -249,7 +249,7 @@ function CPPTXContentLoader()
         var s = this.stream;
 
         var shape = new CShape();
-
+        shape.setWordShape(true);
         shape.setBDeleted(false);
         shape.setParent(this.TempMainObject == null ? this.ParaDrawing : null);
         var _rec_start = s.cur;
@@ -357,6 +357,7 @@ function CPPTXContentLoader()
         var s = this.stream;
 
         var shape = new CShape( );
+        shape.setWordShape(true);
         shape.setParent(this.TempMainObject == null ? this.ParaDrawing : null);
         var _rec_start = s.cur;
         var _end_rec = _rec_start + s.GetULong() + 4;

@@ -430,11 +430,7 @@ CShape.prototype.recalculateTransform =  function()
     this.recalculateLocalTransform(this.localTransform);
 };
 
-CShape.prototype.setWordShape = function(pr)
-{
-    History.Add(this, {Type: historyitem_ShapeSetWordShape, oldPr: this.bWordShape, newPr: pr});
-    this.bWordShape = pr;
-};
+
 
 CShape.prototype.updatePosition = function(x, y)
 {
