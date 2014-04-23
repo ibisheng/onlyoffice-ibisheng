@@ -234,11 +234,16 @@ var c_oSerProp_secPrType = {
     setting: 2,
 	headers: 3,
 	footers: 4,
-	hdrftrelem: 5
+	hdrftrelem: 5,
+	pageNumType: 6
 };
 var c_oSerProp_secPrSettingsType = {
     titlePg: 0,
-    EvenAndOddHeaders: 1
+    EvenAndOddHeaders: 1,
+	SectionType: 2
+};
+var c_oSerProp_secPrPageNumType = {
+	start: 0
 };
 var c_oSerParType = {
     Par:0,
@@ -635,7 +640,14 @@ var ETblLayoutType = {
 	tbllayouttypeAutofit: 1,
 	tbllayouttypeFixed: 2
 };
-
+var ESectionMark = {
+	sectionmarkContinious: 0,
+	sectionmarkEvenPage: 1,
+	sectionmarkNextColumn: 2,
+	sectionmarkNextPage: 3,
+	sectionmarkOddPage: 4
+};
+	
 var g_sErrorCharCountMessage = "g_sErrorCharCountMessage";
 var g_nErrorCharCount = 30000;
 var g_nErrorParagraphCount = 1000;
@@ -1340,6 +1352,9 @@ function Binary_pPrWriter(memory, oNumIdMap, oBinaryHeaderFooterTableWriter)
 		//footer
 		if(null != sectPr.FooterFirst || null != sectPr.FooterEven || null != sectPr.FooterDefault)
 			this.bs.WriteItem(c_oSerProp_secPrType.footers, function(){oThis.WriteFtr(sectPr);});
+		var PageNumType = sectPr.Get_PageNum_Start();
+		if(-1 != PageNumType)
+			this.bs.WriteItem(c_oSerProp_secPrType.pageNumType, function(){oThis.WritePageNumType(PageNumType);});
     };
     this.WritePageSize = function(sectPr, oDocument)
     {
@@ -1402,6 +1417,21 @@ function Binary_pPrWriter(memory, oNumIdMap, oBinaryHeaderFooterTableWriter)
 			this.memory.WriteByte(c_oSerPropLenType.Byte);
 			this.memory.WriteBool(EvenAndOddHeaders);
 		}
+		var nFormatType = null;
+		switch(sectPr.Get_Type())
+		{
+			case section_type_Continuous: nFormatType = ESectionMark.sectionmarkContinious;break;
+			case section_type_EvenPage: nFormatType = ESectionMark.sectionmarkEvenPage;break;
+			case section_type_Column: nFormatType = ESectionMark.sectionmarkNextColumn;break;
+			case section_type_NextPage: nFormatType = ESectionMark.sectionmarkNextPage;break;
+			case section_type_OddPage: nFormatType = ESectionMark.sectionmarkOddPage;break;
+		}
+		if(null != nFormatType)
+		{
+			this.memory.WriteByte(c_oSerProp_secPrSettingsType.SectionType);
+			this.memory.WriteByte(c_oSerPropLenType.Byte);
+			this.memory.WriteByte(nFormatType);
+		}
     };
 	this.WriteHdr = function(sectPr)
 	{
@@ -1446,6 +1476,11 @@ function Binary_pPrWriter(memory, oNumIdMap, oBinaryHeaderFooterTableWriter)
 				this.oBinaryHeaderFooterTableWriter.aFooters.push({type: c_oSerHdrFtrTypes.HdrFtr_First, elem: sectPr.FooterFirst});
 			}
 		}
+	}
+	this.WritePageNumType = function(PageNumType)
+	{
+		var oThis = this;
+		this.bs.WriteItem(c_oSerProp_secPrPageNumType.start, function(){oThis.memory.WriteLong(PageNumType);});
 	}
 };
 function Binary_rPrWriter(memory)
@@ -5968,6 +6003,12 @@ function Binary_pPrReader(doc, oReadResult, stream)
                 return oThis.Read_pgHdrFtr(t, l, oSectPr, oThis.oReadResult.footers, false);
             });
         }
+		else if( c_oSerProp_secPrType.pageNumType === type )
+        {
+			res = this.bcr.Read1(length, function(t, l){
+                return oThis.Read_pageNumType(t, l, oSectPr);
+            });
+        }
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
@@ -5983,6 +6024,20 @@ function Binary_pPrReader(doc, oReadResult, stream)
         else if( c_oSerProp_secPrSettingsType.EvenAndOddHeaders === type )
         {
             oAdditional.EvenAndOddHeaders = this.stream.GetBool();
+        }
+		else if( c_oSerProp_secPrSettingsType.SectionType === type )
+        {
+			var nEditorType = null;
+			switch(this.stream.GetByte())
+			{
+				case ESectionMark.sectionmarkContinious: nEditorType = section_type_Continuous;break;
+				case ESectionMark.sectionmarkEvenPage: nEditorType = section_type_EvenPage;break;
+				case ESectionMark.sectionmarkNextColumn: nEditorType = section_type_Column;break;
+				case ESectionMark.sectionmarkNextPage: nEditorType = section_type_NextPage;break;
+				case ESectionMark.sectionmarkOddPage: nEditorType = section_type_OddPage;break;
+			}
+			if(null != nEditorType)
+				oSectPr.Set_Type(nEditorType);
         }
         else
             res = c_oSerConstants.ReadUnknown;
@@ -6072,6 +6127,18 @@ function Binary_pPrReader(doc, oReadResult, stream)
             res = c_oSerConstants.ReadUnknown;
         return res;
 	}
+	this.Read_pageNumType = function(type, length, oSectPr)
+    {
+        var res = c_oSerConstants.ReadOk;
+        var oThis = this;
+        if( c_oSerProp_secPrPageNumType.start === type )
+        {
+            oSectPr.Set_PageNum_Start(this.stream.GetULongLE());
+        }
+        else
+            res = c_oSerConstants.ReadUnknown;
+        return res;
+    }
 };
 function Binary_rPrReader(doc, stream)
 {
