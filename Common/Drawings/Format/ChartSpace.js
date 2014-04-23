@@ -4917,17 +4917,19 @@ CChartSpace.prototype =
         }
         if(this.chart && this.chart.plotArea)
         {
-            if(this.chart.plotArea.catAx && this.chart.plotArea.catAx.title)
+            var hor_axis = this.chart.plotArea.getHorizontalAxis();
+            if(hor_axis && hor_axis.title)
             {
-                var title = this.chart.plotArea.catAx.title;
-                title.parent = this.chart.plotArea.catAx;
+                var title = hor_axis.title;
+                title.parent = hor_axis;
                 title.chart = this;
                 title.recalculate();
             }
-            if(this.chart.plotArea.valAx && this.chart.plotArea.valAx.title)
+            var vert_axis = this.chart.plotArea.getVerticalAxis();
+            if(vert_axis && vert_axis.title)
             {
-                var title = this.chart.plotArea.valAx.title;
-                title.parent = this.chart.plotArea.valAx;
+                var title = vert_axis.title;
+                title.parent = vert_axis;
                 title.chart = this;
                 title.recalculate();
             }

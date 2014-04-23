@@ -494,7 +494,7 @@ CDLbl.prototype =
             global_MatrixTransformer.TranslateAppend(_text_transform, 0, _vertical_shift);
             if (_body_pr.vert === nVertTTvert) {
                 global_MatrixTransformer.TranslateAppend(_text_transform, -_content_width * 0.5, -content_height2 * 0.5);
-                global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI * 0.5);
+                global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI * 1.5);
                 global_MatrixTransformer.TranslateAppend(_text_transform, _content_width * 0.5, content_height2 * 0.5);
 
             }
@@ -604,7 +604,7 @@ CDLbl.prototype =
                 style.TextPr.Merge(this.legend.txPr.content.Content[0].Pr.DefaultRunPr);
         }
 
-        if(this.parent && this.parent.txPr
+        if(!(this instanceof  CTitle) && this.parent && this.parent.txPr
             && this.parent.txPr.content
             && this.parent.txPr.content.Content[0]
             && this.parent.txPr.content.Content[0].Pr)
@@ -705,7 +705,7 @@ CDLbl.prototype =
 
     getMaxWidth: function(bodyPr)
     {
-        if(!(this.parent && this.chart && this.chart.plotArea && this.chart.plotArea.valAx === this.parent))
+        if(!(this.parent && (this.parent.axPos === AX_POS_L || this.parent.axPos === AX_POS_R)))
         {
             switch (bodyPr.vert)
             {
@@ -739,6 +739,15 @@ CDLbl.prototype =
         if(this.txPr && this.txPr.bodyPr)
         {
             ret.merge(this.txPr.bodyPr);
+        }
+        if(this.parent && isRealNumber(this.parent.axPos) && (this.parent.axPos === AX_POS_L || this.parent.axPos === AX_POS_R)
+            && (!this.txPr || !this.txPr.bodyPr || !isRealNumber(this.txPr.bodyPr.vert)))
+        {
+            ret.vert = nVertTTvert270;
+        }
+        if( (!this.txPr || !this.txPr.bodyPr || !isRealNumber(this.txPr.bodyPr.anchor)))
+        {
+            ret.anchor = 1;
         }
 
         switch (ret.vert)
@@ -2733,6 +2742,8 @@ CAreaSeries.prototype =
             this.val.setFromOtherObject(o.yVal);
         }
     },
+
+
 
     getSeriesName: function()
     {
@@ -15675,6 +15686,12 @@ CTitle.prototype =
             case nVertTTwordArtVertRtl:
             case nVertTTvert270:
             {
+                var vert_axis = this.chart.chart.plotArea.getVerticalAxis();
+                if( vert_axis  && vert_axis.title === this)
+                {
+                    var hor_axis = this.chart.chart.plotArea.getHorizontalAxis();
+                    return this.chart.extY - (hor_axis && hor_axis.title ? hor_axis.title.extY : 0 )
+                }
                 return this.chart.extY/2;
             }
             case nVertTThorz:

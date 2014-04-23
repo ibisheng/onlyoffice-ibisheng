@@ -459,8 +459,8 @@ function CColorMod()
 {
     this.name = "";
     this.val = 0;
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
+    //this.Id = g_oIdCounter.Get_NewId();
+    //g_oTableId.Add(this, this.Id);
 }
 
 CColorMod.prototype =
@@ -479,13 +479,13 @@ CColorMod.prototype =
 
     setName: function(name)
     {
-        History.Add(this, {Type: historyitem_ColorMod_SetName, oldName: this.name, newName: name});
+        //History.Add(this, {Type: historyitem_ColorMod_SetName, oldName: this.name, newName: name});
         this.name = name;
     },
 
     setVal: function(val)
     {
-        History.Add(this, {Type: historyitem_ColorMod_SetVal, oldVal: this.val, newVal: val});
+        //History.Add(this, {Type: historyitem_ColorMod_SetVal, oldVal: this.val, newVal: val});
         this.val = val;
     },
 
@@ -590,8 +590,8 @@ function CColorModifiers()
 {
     this.Mods = [];
 
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
+    //this.Id = g_oIdCounter.Get_NewId();
+    //g_oTableId.Add(this, this.Id);
 }
 
 CColorModifiers.prototype =
@@ -712,14 +712,14 @@ CColorModifiers.prototype =
     addMod: function(mod)
     {
         this.Mods.push(mod);
-        History.Add(this, {Type: historyitem_ColorModifiers_AddColorMod, modId: mod.Get_Id()});
+        //History.Add(this, {Type: historyitem_ColorModifiers_AddColorMod, modId: mod.Get_Id()});
     },
 
 
     removeMod: function(pos)
     {
         var mod = this.Mods.splice(pos, 1)[0];
-        History.Add(this, {Type: historyitem_ColorModifiers_RemoveColorMod, pos: pos, pr: mod});
+        //History.Add(this, {Type: historyitem_ColorModifiers_RemoveColorMod, pos: pos, pr: mod});
 
     },
 
@@ -1020,8 +1020,8 @@ function CSysColor()
     };
 
 
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
+    //this.Id = g_oIdCounter.Get_NewId();
+    //g_oTableId.Add(this, this.Id);
 }
 
 CSysColor.prototype =
@@ -1037,17 +1037,17 @@ CSysColor.prototype =
 
     setR: function(pr)
     {
-        History.Add(this, {Type:historyitem_SysColor_SetR, oldPr: this.RGBA.R, newPr:pr});
+        //History.Add(this, {Type:historyitem_SysColor_SetR, oldPr: this.RGBA.R, newPr:pr});
         this.RGBA.R = pr;
     },
     setG: function(pr)
     {
-        History.Add(this, {Type:historyitem_SysColor_SetG, oldPr: this.RGBA.G, newPr:pr});
+        //History.Add(this, {Type:historyitem_SysColor_SetG, oldPr: this.RGBA.G, newPr:pr});
         this.RGBA.G = pr;
     },
     setB: function(pr)
     {
-        History.Add(this, {Type:historyitem_SysColor_SetB, oldPr: this.RGBA.B, newPr:pr});
+        //History.Add(this, {Type:historyitem_SysColor_SetB, oldPr: this.RGBA.B, newPr:pr});
         this.RGBA.B = pr;
     },
 
@@ -1130,7 +1130,7 @@ CSysColor.prototype =
 
     setId: function(id)
     {
-        History.Add(this, {Type: historyitem_SysColor_SetId, oldId: this.id, newId: id});
+        //History.Add(this, {Type: historyitem_SysColor_SetId, oldId: this.id, newId: id});
         this.id = id;
     },
 
@@ -1214,8 +1214,8 @@ function CPrstColor()
     this.RGBA = {
         R:0, G:0, B:0, A:255, needRecalc: true
     };
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
+    //this.Id = g_oIdCounter.Get_NewId();
+    //g_oTableId.Add(this, this.Id);
 }
 
 CPrstColor.prototype =
@@ -1246,7 +1246,7 @@ CPrstColor.prototype =
 
     setId: function(id)
     {
-        History.Add(this, {Type: historyitem_PrstColor_SetId, oldId: this.id, newId: id});
+        //History.Add(this, {Type: historyitem_PrstColor_SetId, oldId: this.id, newId: id});
         this.id = id;
     },
 
@@ -1333,8 +1333,8 @@ function CRGBColor()
 {
     this.type = COLOR_TYPE_SRGB;
     this.RGBA = {R:0, G:0, B:0, A:255, needRecalc: true};
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
+    //this.Id = g_oIdCounter.Get_NewId();
+    //g_oTableId.Add(this, this.Id);
 }
 
 CRGBColor.prototype =
@@ -1376,7 +1376,7 @@ CRGBColor.prototype =
     setColor: function(r, g, b)
     {
         var rgba = this.RGBA;
-        History.Add(this, {Type: historyitem_RGBColor_SetColor, oldColor: {r: rgba.R, g: rgba.G, b: rgba.B}, newColor: {r: r, g: g, b: b}});
+       // History.Add(this, {Type: historyitem_RGBColor_SetColor, oldColor: {r: rgba.R, g: rgba.G, b: rgba.B}, newColor: {r: r, g: g, b: b}});
         this.RGBA.R = r;
         this.RGBA.G = g;
         this.RGBA.B = b;
@@ -1484,8 +1484,8 @@ function CSchemeColor()
         A:255,
         needRecalc: true
     };
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
+    //this.Id = g_oIdCounter.Get_NewId();
+    //g_oTableId.Add(this, this.Id);
 }
 
 CSchemeColor.prototype =
@@ -1549,7 +1549,7 @@ CSchemeColor.prototype =
 
     setId: function(id)
     {
-        History.Add(this, {Type: historyitem_SchemeColor_SetId, oldId: this.id, newId: id});
+        //History.Add(this, {Type: historyitem_SchemeColor_SetId, oldId: this.id, newId: id});
         this.id = id;
     },
 
@@ -1667,8 +1667,8 @@ function CUniColor()
         B: 0,
         A: 255
     };
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
+    //this.Id = g_oIdCounter.Get_NewId();
+    //g_oTableId.Add(this, this.Id);
 }
 
 CUniColor.prototype =
@@ -1713,13 +1713,13 @@ CUniColor.prototype =
 
     setColor: function(color)
     {
-        History.Add(this, {Type: historyitem_UniColor_SetColor, oldColor: this.color, newColor: color});
+        //History.Add(this, {Type: historyitem_UniColor_SetColor, oldColor: this.color, newColor: color});
         this.color = color;
     },
 
     setMods: function(mods)
     {
-        History.Add(this, {Type: historyitem_UniColor_SetMods, oldMods: this.Mods, newMods: mods});
+        //History.Add(this, {Type: historyitem_UniColor_SetMods, oldMods: this.Mods, newMods: mods});
         this.Mods = mods;
     },
 
@@ -2179,37 +2179,37 @@ CBlipFill.prototype =
 
     setRasterImageId: function(rasterImageId)
     {
-        History.Add(this, {Type: historyitem_BlipFill_SetRasterImageId, oldRasterImageId: this.RasterImageId, newRasterImageId: rasterImageId});
+        //History.Add(this, {Type: historyitem_BlipFill_SetRasterImageId, oldRasterImageId: this.RasterImageId, newRasterImageId: rasterImageId});
         this.RasterImageId = rasterImageId;
     },
 
     setVectorImageBin: function(vectorImageBin)
     {
-        History.Add(this, {Type: historyitem_BlipFill_SetVectorImageBin, oldVectorImageBin: this.VectorImageBin, newVectorImageBin: vectorImageBin});
+        //History.Add(this, {Type: historyitem_BlipFill_SetVectorImageBin, oldVectorImageBin: this.VectorImageBin, newVectorImageBin: vectorImageBin});
         this.VectorImageBin = vectorImageBin;
     },
 
     setSrcRect: function(srcRect)
     {
-        History.Add(this, {Type: historyitem_BlipFill_SetSrcRect, oldSrcRect: this.srcRect, newSrcRect: srcRect});
+        //History.Add(this, {Type: historyitem_BlipFill_SetSrcRect, oldSrcRect: this.srcRect, newSrcRect: srcRect});
         this.srcRect = srcRect;
     },
 
     setStretch: function(stretch)
     {
-        History.Add(this, {Type: historyitem_BlipFill_SetStretch, oldStretch: this.stretch, newStretch: stretch});
+        //History.Add(this, {Type: historyitem_BlipFill_SetStretch, oldStretch: this.stretch, newStretch: stretch});
         this.stretch = stretch;
     },
 
     setTile: function(tile)
     {
-        History.Add(this, {Type: historyitem_BlipFill_SetTile, oldTile: this.tile, newTile: tile});
+        //History.Add(this, {Type: historyitem_BlipFill_SetTile, oldTile: this.tile, newTile: tile});
         this.tile = tile;
     },
 
     setRotWithShape: function(rotWithShape)
     {
-        History.Add(this, {Type: historyitem_BlipFill_SetRotWithShape, oldRotWithShape: this.rotWithShape, newRotWidth: rotWithShape});
+        //History.Add(this, {Type: historyitem_BlipFill_SetRotWithShape, oldRotWithShape: this.rotWithShape, newRotWidth: rotWithShape});
         this.rotWithShape = rotWithShape;
     },
 
@@ -2548,7 +2548,7 @@ function CSolidFill()
 {
     this.type = FILL_TYPE_SOLID;
     this.color = null;
-    this.Id = g_oIdCounter.Get_NewId();
+    //this.Id = g_oIdCounter.Get_NewId();
 }
 
 CSolidFill.prototype =
@@ -2577,7 +2577,7 @@ CSolidFill.prototype =
 
     setColor: function(color)
     {
-        History.Add(this, {Type: historyitem_SolidFill_SetColor, oldColor: this.color, newColor: color});
+        //History.Add(this, {Type: historyitem_SolidFill_SetColor, oldColor: this.color, newColor: color});
         this.color = color;
     },
 
@@ -3215,19 +3215,19 @@ CGradFill.prototype =
 
     addColor: function(color)
     {
-        History.Add(this, {Type: historyitem_GradFill_AddColor, color: color});
+        //History.Add(this, {Type: historyitem_GradFill_AddColor, color: color});
         this.colors.push(color);
     },
 
     setLin: function(lin)
     {
-        History.Add(this, {Type: historyitem_GradFill_SetLin, oldLin: this.lin, newLin: lin});
+        //History.Add(this, {Type: historyitem_GradFill_SetLin, oldLin: this.lin, newLin: lin});
         this.lin = lin;
     },
 
     setPath: function(path)
     {
-        History.Add(this, {Type: historyitem_GradFill_SetPath, oldPath: this.path, newPath: path});
+        //History.Add(this, {Type: historyitem_GradFill_SetPath, oldPath: this.path, newPath: path});
         this.path = path;
     },
 
@@ -3444,19 +3444,19 @@ CPattFill.prototype =
 
     setFType: function(fType)
     {
-        History.Add(this, {Type: historyitem_PathFill_SetFType, oldFType: this.ftype, newFType: fType});
+        //History.Add(this, {Type: historyitem_PathFill_SetFType, oldFType: this.ftype, newFType: fType});
         this.ftype = fType;
     },
 
     setFgColor: function(fgClr)
     {
-        History.Add(this, {Type: historyitem_PathFill_SetFgClr, oldFgClr: this.fgClr, newFgClr: fgClr});
+        //History.Add(this, {Type: historyitem_PathFill_SetFgClr, oldFgClr: this.fgClr, newFgClr: fgClr});
         this.fgClr = fgClr;
     },
 
     setBgColor: function(bgClr)
     {
-        History.Add(this, {Type: historyitem_PathFill_SetBgClr, oldBgClr: this.bgClr, newBgClr: bgClr});
+        //History.Add(this, {Type: historyitem_PathFill_SetBgClr, oldBgClr: this.bgClr, newBgClr: bgClr});
         this.bgClr = bgClr;
     },
 
@@ -3741,7 +3741,7 @@ function CUniFill()
 {
     this.fill = null;
     this.transparent = null;
-    this.Id = g_oIdCounter.Get_NewId();
+   // this.Id = g_oIdCounter.Get_NewId();
 }
 
 CUniFill.prototype =
@@ -3774,13 +3774,13 @@ CUniFill.prototype =
 
     setFill: function(fill)
     {
-        History.Add(this, {Type: historyitem_UniFill_SetFill, oldFill: this.fill, newFill: fill});
+        //History.Add(this, {Type: historyitem_UniFill_SetFill, oldFill: this.fill, newFill: fill});
         this.fill = fill;
     },
 
     setTransparent: function(transparent)
     {
-        History.Add(this, {Type: historyitem_UniFill_SetTransparent, oldTransparent: this.transparent, newTransparent: transparent});
+        //History.Add(this, {Type: historyitem_UniFill_SetTransparent, oldTransparent: this.transparent, newTransparent: transparent});
         this.transparent = transparent;
     },
 
