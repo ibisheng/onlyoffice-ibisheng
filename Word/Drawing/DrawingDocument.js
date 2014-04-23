@@ -143,6 +143,7 @@ function CTextMeasurer()
 
     // RFonts
     this.m_oTextPr      = null;
+    this.m_oGrFonts     = new CGrRFonts();
     this.m_oLastFont    = new CFontSetup();
 
     this.Init = function()
@@ -187,18 +188,16 @@ function CTextMeasurer()
 
     this.SetTextPr = function(textPr, theme)
     {
-        this.m_oTextPr = textPr.Copy();
-        this.theme = theme;
-        var FontScheme = theme.themeElements.fontScheme;
-        this.m_oTextPr.RFonts.Ascii    = {Name: FontScheme.checkFont(this.m_oTextPr.RFonts.Ascii.Name), Index: -1};
-        this.m_oTextPr.RFonts.EastAsia = {Name: FontScheme.checkFont(this.m_oTextPr.RFonts.EastAsia.Name), Index: -1};
-        this.m_oTextPr.RFonts.HAnsi    = {Name: FontScheme.checkFont(this.m_oTextPr.RFonts.HAnsi.Name), Index: -1};
-        this.m_oTextPr.RFonts.CS       = {Name: FontScheme.checkFont(this.m_oTextPr.RFonts.CS.Name), Index: -1};
+        this.m_oTextPr = textPr;
+        if (theme)
+            this.m_oGrFonts.checkFromTheme(theme.themeElements.fontScheme, this.m_oTextPr.RFonts);
+        else
+            this.m_oGrFonts = this.m_oTextPr.RFonts;
     };
 
     this.SetFontSlot = function(slot, fontSizeKoef)
     {
-        var _rfonts = this.m_oTextPr.RFonts;
+        var _rfonts = this.m_oGrFonts;
         var _lastFont = this.m_oLastFont;
 
         switch (slot)
