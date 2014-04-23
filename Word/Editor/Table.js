@@ -579,9 +579,16 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
         if (typeof CollaborativeEditing !== "undefined")
             CollaborativeEditing.Add_Unlock2( this );
     }
-
-    this.LogicDocument   = editor && editor.isDocumentEditor ? editor.WordControl.m_oLogicDocument : null;
-    this.DrawingDocument = DrawingDocument;
+    
+    this.DrawingDocument = null;
+    this.LogicDocument   = null;
+    
+    if ( undefined !== DrawingDocument && null !== DrawingDocument )
+    {
+        this.DrawingDocument = DrawingDocument;
+        this.LogicDocument   = this.DrawingDocument.m_oLogicDocument;
+    }
+    
     this.Parent          = Parent;
     this.PageNum         = PageNum;
 
@@ -6903,7 +6910,12 @@ CTable.prototype =
 
         CollaborativeEditing.Add_NewObject(this);
 
-        this.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
+        var DrawingDocument = editor.WordControl.m_oDrawingDocument;
+        if ( undefined !== DrawingDocument && null !== DrawingDocument )
+        {
+            this.DrawingDocument = DrawingDocument;
+            this.LogicDocument   = this.DrawingDocument.m_oLogicDocument;
+        }
 
         // Добавляем, чтобы в конце выставить CurCell
         var LinkData = new Object();

@@ -158,8 +158,9 @@ function CTableId()
             case historyitem_type_ParaRun          : Element = new ParaRun(); break;
             case historyitem_type_Section          : Element = new CSectionPr(); break;
         }
-
-        Element.Read_FromBinary2(Reader);
+        
+        if ( null !== Element )
+            Element.Read_FromBinary2(Reader);
 
         // Включаем назад регистрацию новых классов
         this.m_bTurnOff = false;
@@ -272,6 +273,7 @@ function CCollaborativeChanges()
 {
     this.m_sId           = null;
     this.m_pData         = null;
+    this.m_oColor        = null;
 
     this.Set_Id = function(sId)
     {
@@ -281,6 +283,11 @@ function CCollaborativeChanges()
     this.Set_Data = function(pData)
     {
         this.m_pData = pData;
+    };
+    
+    this.Set_Color = function(oColor)
+    {
+        this.m_oColor = oColor;
     };
 
     this.Set_FromUndoRedo = function(Class, Data, Binary)
@@ -312,7 +319,7 @@ function CCollaborativeChanges()
         LoadData.Reader.Seek2(0);
 
         if ( null != Class )
-            return Class.Load_Changes( LoadData.Reader, LoadData.Reader2 );
+            return Class.Load_Changes( LoadData.Reader, LoadData.Reader2, this.m_oColor );
         else
             return false;
     };

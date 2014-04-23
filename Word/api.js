@@ -1054,7 +1054,6 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
     this.asyncServerIdStartLoaded();
 }
 
-
 asc_docs_api.prototype.SetFontsPath = function(path)
 {
 	this.FontLoader.fontFilesPath = path;
@@ -1556,8 +1555,8 @@ asc_docs_api.prototype._coAuthoringInit = function()
 	this.CoAuthoringApi.onSaveChanges				= function (e, userId, bSendEvent)
 	{
 		var oUser = t.CoAuthoringApi.getUser(userId);
-		var oColor = oUser ? oUser.asc_getColorValue() : null;
-		// ToDo add select changes color
+		var nColor = oUser ? oUser.asc_getColorValue() :  null;
+        var oColor = null !== nColor ? new CDocumentColor( (nColor >> 16) & 0xFF, (nColor >> 8) & 0xFF, nColor & 0xFF ) : new CDocumentColor( 191, 255, 199 );
 
         var Count = e.length;
         for ( var Index = 0; Index < Count; Index++ )
@@ -1565,6 +1564,7 @@ asc_docs_api.prototype._coAuthoringInit = function()
             var Changes = new CCollaborativeChanges();
             Changes.Set_Id( e[Index]["Id"] );
             Changes.Set_Data( e[Index]["Data"] );
+            Changes.Set_Color( oColor );
             CollaborativeEditing.Add_Changes( Changes );
         }
 
@@ -9522,6 +9522,7 @@ asc_docs_api.prototype.asc_AddMath2 = function(Type)
 						break;
 		}
 		g_oTableId.Add( MathElement, MathElement.Id );
+        
         this.WordControl.m_oLogicDocument.Paragraph_Add( MathElement );
     }
 }

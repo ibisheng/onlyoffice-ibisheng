@@ -2593,9 +2593,9 @@ CGraphics.prototype =
             this.m_oContext.globalAlpha = this.globalAlpha;
     },
 
-    drawCollaborativeChanges : function(x, y, w, h)
+    drawCollaborativeChanges : function(x, y, w, h, Color)
     {
-        this.b_color1( 191, 255, 191, 255 );
+        this.b_color1( Color.r, Color.g, Color.b, 255 );
         this.rect( x, y, w, h );
         this.df();
     },

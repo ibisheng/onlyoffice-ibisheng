@@ -20,8 +20,21 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
     this.YLimit = YLimit;
 
     this.Parent = Parent;
-    this.DrawingDocument = DrawingDocument;
-    this.LogicDocument   = typeof (editor) != "undefined" && editor.isDocumentEditor ? editor.WordControl.m_oLogicDocument : null;
+    
+    this.DrawingDocument = null;
+    this.LogicDocument   = null;
+    this.Styles          = null;
+    this.Numbering       = null;
+    this.DrawingObjects  = null;
+    
+    if ( undefined !== DrawingDocument && null !== DrawingDocument )
+    {
+        this.DrawingDocument = DrawingDocument;
+        this.LogicDocument   = DrawingDocument.m_oLogicDocument;
+        this.Styles          = DrawingDocument.m_oLogicDocument.Get_Styles();
+        this.Numbering       = DrawingDocument.m_oLogicDocument.Get_Numbering();
+        this.DrawingObjects  = DrawingDocument.m_oLogicDocument.DrawingObjects; // Массив укзателей на все инлайновые графические объекты
+    }
 
     if ( "undefined" === typeof(TurnOffInnerWrap) )
         TurnOffInnerWrap = false;
@@ -59,12 +72,6 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
         Flag     : selectionflag_Common,
         Data     : null
     };
-
-    // Массив укзателей на все инлайновые графические объекты
-    this.DrawingObjects = this.LogicDocument ? this.LogicDocument.DrawingObjects : null;
-
-    this.Styles    = typeof (editor) != "undefined" && editor.isDocumentEditor ? editor.WordControl.m_oLogicDocument.Get_Styles() : null;
-    this.Numbering = typeof (editor) != "undefined" && editor.isDocumentEditor ? editor.WordControl.m_oLogicDocument.Get_Numbering() : null;
 
     this.ClipInfo =
     {
@@ -8341,7 +8348,15 @@ CDocumentContent.prototype =
 
         CollaborativeEditing.Add_LinkData( this, LinkData );
 
-        this.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
+        var DrawingDocument = editor.WordControl.m_oDrawingDocument;
+        if ( undefined !== DrawingDocument && null !== DrawingDocument )
+        {
+            this.DrawingDocument = DrawingDocument;
+            this.LogicDocument   = DrawingDocument.m_oLogicDocument;
+            this.Styles          = DrawingDocument.m_oLogicDocument.Get_Styles();
+            this.Numbering       = DrawingDocument.m_oLogicDocument.Get_Numbering();
+            this.DrawingObjects  = DrawingDocument.m_oLogicDocument.DrawingObjects; // Массив укзателей на все инлайновые графические объекты
+        }
     },
 
     Load_LinkData : function(LinkData)

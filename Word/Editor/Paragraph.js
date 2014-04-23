@@ -86,9 +86,18 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
     this.Selection = new CParagraphSelection();
 
     this.NeedReDraw = true;
-    this.DrawingDocument = DrawingDocument;
-    this.LogicDocument = bFromPresentation ? null : this.DrawingDocument.m_oLogicDocument;
-    this.bFromDocument = bFromPresentation === true ? false : !!this.LogicDocument;
+    
+    this.DrawingDocument = null;
+    this.LogicDocument   = null;
+    this.bFromDocument   = true;
+    
+    if ( undefined !== DrawingDocument && null !== DrawingDocument )
+    {
+        this.DrawingDocument = DrawingDocument;
+        this.LogicDocument   = bFromPresentation ? null : this.DrawingDocument.m_oLogicDocument;
+        this.bFromDocument   = bFromPresentation === true ? false : !!this.LogicDocument;
+    }
+    
     this.TurnOffRecalcEvent = false;
 
     this.ApplyToAll = false; // Специальный параметр, используемый в ячейках таблицы.
@@ -6654,7 +6663,7 @@ Paragraph.prototype =
                     Element = aColl.Get_Next();
                     while ( null != Element )
                     {
-                        pGraphics.drawCollaborativeChanges( Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0 );
+                        pGraphics.drawCollaborativeChanges( Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0, Element );
                         Element = aColl.Get_Next();
                     }
 
@@ -20297,6 +20306,7 @@ Paragraph.prototype =
             // String2   : Id TextPr
             // Long      : количество элементов
             // Array of String2 : массив с Id элементами
+            // Bool     : bFromDocument
 
             Writer.WriteString2( "" + this.Id );
             Writer.WriteString2( "" + this.Parent.Get_Id() );
@@ -20310,6 +20320,8 @@ Paragraph.prototype =
             {
                 Writer.WriteString2( "" + this.Content[Index].Get_Id() );
             }
+            
+            Writer.WriteBool( this.bFromDocument );
         }
     },
 
@@ -20321,7 +20333,7 @@ Paragraph.prototype =
             // String   : Id родительского класса
             // Variable : ParaPr
             // String   : Id TextPr
-            // Long     : количество элементов, у которых Is_RealContent = true
+            // Long     : количество элементов, у которых Is_RealContent = true            
 
             this.Id = Reader.GetString2();
             this.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
@@ -20346,7 +20358,7 @@ Paragraph.prototype =
                 if ( null != Element )
                     this.Content.push( Element );
             }
-
+            
             CollaborativeEditing.Add_NewObject( this );
         }
         else
@@ -20357,9 +20369,8 @@ Paragraph.prototype =
             // String2   : Id TextPr
             // Long      : количество элементов
             // Array of String2 : массив с Id элементами
-
-            this.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
-
+            // Bool     : bFromDocument
+            
             this.Id     = Reader.GetString2();
             //this.Parent = g_oTableId.Get_ById( Reader.GetString2() );
 
@@ -20384,6 +20395,15 @@ Paragraph.prototype =
             }
 
             CollaborativeEditing.Add_NewObject( this );
+            
+            this.bFromDocument = Reader.GetBool();
+
+            var DrawingDocument = editor.WordControl.m_oDrawingDocument;
+            if ( undefined !== DrawingDocument && null !== DrawingDocument )
+            {
+                this.DrawingDocument = DrawingDocument;
+                this.LogicDocument   = this.bFromDocument ? this.DrawingDocument.m_oLogicDocument : null;
+            }
         }
     },
 

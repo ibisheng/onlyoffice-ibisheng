@@ -2827,8 +2827,8 @@ ParaRun.prototype =
 
                     if ( true === DrawSearch )
                         aFind.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0  );
-                    else if ( true === DrawColl )
-                        aColl.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0  );
+                    else if ( null !== DrawColl )
+                        aColl.Add( Y0, Y1, X, X + Item.WidthVisible, 0, DrawColl.r, DrawColl.g, DrawColl.b );
 
                     if ( para_Drawing != Item.Type || drawing_Anchor != Item.DrawingType )
                         X += Item.WidthVisible;
@@ -2850,8 +2850,8 @@ ParaRun.prototype =
 
                     if ( true === DrawSearch )
                         aFind.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0  );
-                    else if ( true === DrawColl )
-                        aColl.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0  );
+                    else if ( null !== DrawColl )
+                        aColl.Add( Y0, Y1, X, X + Item.WidthVisible, 0, DrawColl.r, DrawColl.g, DrawColl.b  );
 
                     X += Item.WidthVisible;
 
@@ -2859,8 +2859,8 @@ ParaRun.prototype =
                 }
                 case para_End:
                 {
-                    if ( true === DrawColl )
-                        aColl.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0  );
+                    if ( null !== DrawColl )
+                        aColl.Add( Y0, Y1, X, X + Item.WidthVisible, 0, DrawColl.r, DrawColl.g, DrawColl.b  );
 
                     X += Item.Width;
                     break;
@@ -5767,7 +5767,7 @@ ParaRun.prototype =
         return Writer;
     },
 
-    Load_Changes : function(Reader)
+    Load_Changes : function(Reader, Reader2, Color)
     {
         // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
         // Long : тип класса
@@ -5800,7 +5800,7 @@ ParaRun.prototype =
                     if ( null != Element )
                     {
                         this.CollaborativeMarks.Update_OnAdd( Pos );
-                        this.CollaborativeMarks.Add( Pos, Pos + 1 );
+                        this.CollaborativeMarks.Add( Pos, Pos + 1, Color );
                         this.Content.splice( Pos, 0, Element );
 
                         CollaborativeEditing.Add_ChangedClass(this);
@@ -6498,43 +6498,66 @@ function CRunCollaborativeMarks()
 
 CRunCollaborativeMarks.prototype =
 {
-    Add : function(PosS, PosE)
+    Add : function(PosS, PosE, Color)
     {
         var Count = this.Ranges.length;
         for ( var Index = 0; Index < Count; Index++ )
         {
             var Range = this.Ranges[Index];
 
-            if ( PosE < Range.PosS )
+            if ( PosS > Range.PosE )
                 continue;
             else if ( PosS >= Range.PosS && PosS <= Range.PosE && PosE >= Range.PosS && PosE <= Range.PosE )
             {
+                if ( true !== Color.Compare(Range.Color) )
+                {            
+                    var _PosE = Range.PosE;
+                    Range.PosE = PosS;
+                    this.Ranges.splice( Index + 1, 0, new CRunCollaborativeRange(PosS, PosE, Color) );
+                    this.Ranges.splice( Index + 2, 0, new CRunCollaborativeRange(PosE, _PosE, Range.Color) );                    
+                }
+                
                 return;
             }
-            else if ( PosS > Range.PosE )
+            else if ( PosE < Range.PosS )
             {
-                this.Ranges.splice( Index + 1, 0, new CRunCollaborativeRange(PosS, PosE) );
+                this.Ranges.splice( Index, 0, new CRunCollaborativeRange(PosS, PosE, Color) );
                 return;
             }
             else if ( PosS < Range.PosS && PosE > Range.PosE )
             {
                 Range.PosS = PosS;
                 Range.PosE = PosE;
+                Range.Color = Color;
                 return;
             }
             else if ( PosS < Range.PosS ) // && PosE <= Range.PosE )
             {
-                Range.PosS = PosS;
+                if ( true === Color.Compare(Range.Color) )
+                    Range.PosS = PosS;
+                else
+                {
+                    Range.PosS = PosE;
+                    this.Ranges.splice( Index, 0, new CRunCollaborativeRange(PosS, PosE, Color) );
+                }
+                
                 return;
             }
             else //if ( PosS >= Range.PosS && PosE > Range.Pos.E )
             {
-                Range.PosE = PosE;
+                if ( true === Color.Compare(Range.Color) )
+                    Range.PosE = PosE;
+                else
+                {
+                    Range.PosE = PosS;
+                    this.Ranges.splice( Index + 1, 0, new CRunCollaborativeRange(PosS, PosE, Color) );
+                }
+                
                 return;
             }
         }
 
-        this.Ranges.push( new CRunCollaborativeRange(PosS, PosE) );
+        this.Ranges.push( new CRunCollaborativeRange(PosS, PosE, Color) );
     },
 
     Update_OnAdd : function(Pos)
@@ -6551,7 +6574,7 @@ CRunCollaborativeMarks.prototype =
             }
             else if ( Pos > Range.PosS && Pos < Range.PosE )
             {
-                var NewRange = new CRunCollaborativeRange( Pos + 1, Range.PosE + 1 );
+                var NewRange = new CRunCollaborativeRange( Pos + 1, Range.PosE + 1, Range.Color.Copy() );
                 this.Ranges.splice( Index + 1, 0, NewRange );
                 Range.PosE = Pos;
                 Count++;
@@ -6617,23 +6640,24 @@ CRunCollaborativeMarks.prototype =
             var Range = this.Ranges[CurPos];
 
             for ( var Pos = Range.PosS; Pos < Range.PosE; Pos++ )
-                this.DrawingObj[Pos] = true;
+                this.DrawingObj[Pos] = Range.Color;
         }
     },
 
     Check : function(Pos)
     {
-        if ( true === this.DrawingObj[Pos] )
-            return true;
+        if ( undefined !== this.DrawingObj[Pos] )
+            return this.DrawingObj[Pos];
 
-        return false;
+        return null;
     }
 };
 
-function CRunCollaborativeRange(PosS, PosE)
+function CRunCollaborativeRange(PosS, PosE, Color)
 {
-    this.PosS = PosS;
-    this.PosE = PosE;
+    this.PosS  = PosS;
+    this.PosE  = PosE;
+    this.Color = Color;
 }
 
 
