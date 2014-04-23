@@ -2609,8 +2609,13 @@ CChartsDrawer.prototype =
 		//минимальное значение оси
 		//TODO use axisMin
 		var minUnit = 0;
+		
 		if(manualMin != null)
 			minUnit = manualMin;
+		else if(manualMin == null && axisMin != null && axisMin != 0)//TODO пересмотреть все значения, где-то могут быть расхождения с EXCEL
+		{
+			minUnit = parseInt(axisMin / step) * step;
+		}
 		else
 		{
 			if(axisMin < 0)
