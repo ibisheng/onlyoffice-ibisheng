@@ -804,6 +804,7 @@ function CMetafile(width, height)
 
     // RFonts
     this.m_oTextPr      = null;
+    this.m_oGrFonts     = new CGrRFonts();
     this.m_oLastFont    = new CFontSetup();
 }
 
@@ -1308,7 +1309,7 @@ CMetafile.prototype =
 
     SetFontSlot : function(slot, fontSizeKoef)
     {
-        var _rfonts = this.m_oTextPr.RFonts;
+        var _rfonts = this.m_oGrFonts;
         var _lastFont = this.m_oLastFont;
 
         switch (slot)
@@ -2064,10 +2065,18 @@ CDocumentRenderer.prototype =
             this.m_arrayPages[this.m_lPagesCount - 1].endCommand(32);
     },
 
-    SetTextPr : function(textPr)
+    SetTextPr : function(textPr, theme)
     {
         if (0 != this.m_lPagesCount)
-            this.m_arrayPages[this.m_lPagesCount - 1].m_oTextPr = textPr.Copy();
+        {
+            var _page = this.m_arrayPages[this.m_lPagesCount - 1];
+
+            _page.m_oTextPr = textPr;
+            if (theme)
+                _page.m_oGrFonts.checkFromTheme(theme.themeElements.fontScheme, _page.m_oTextPr.RFonts);
+            else
+                _page.m_oGrFonts = _page.m_oTextPr.RFonts;
+        }
     },
 
     SetFontSlot : function(slot, fontSizeKoef)

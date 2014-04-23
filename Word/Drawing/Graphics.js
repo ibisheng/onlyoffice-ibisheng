@@ -1,5 +1,28 @@
 var g_fontManager2 = null;
 
+function CGrRFonts()
+{
+    this.Ascii    = {Name: "Empty", Index: -1};
+    this.EastAsia = {Name: "Empty", Index: -1};
+    this.HAnsi    = {Name: "Empty", Index: -1};
+    this.CS       = {Name: "Empty", Index: -1};
+}
+CGrRFonts.prototype =
+{
+    checkFromTheme : function(fontScheme, rFonts)
+    {
+        this.Ascii.Name     = fontScheme.checkFont(rFonts.Ascii.Name);
+        this.EastAsia.Name  = fontScheme.checkFont(rFonts.EastAsia.Name);
+        this.HAnsi.Name     = fontScheme.checkFont(rFonts.HAnsi.Name);
+        this.CS.Name        = fontScheme.checkFont(rFonts.CS.Name);
+
+        this.Ascii.Index    = -1;
+        this.EastAsia.Index = -1;
+        this.HAnsi.Index    = -1;
+        this.CS.Index       = -1;
+    }
+};
+
 function CClipManager()
 {
     this.clipRects = [];
@@ -482,6 +505,7 @@ function CGraphics()
 
     // RFonts
     this.m_oTextPr      = null;
+    this.m_oGrFonts     = new CGrRFonts();
     this.m_oLastFont    = new CFontSetup();
 
     this.m_bIntegerGrid = true;
@@ -1180,18 +1204,16 @@ CGraphics.prototype =
 
     SetTextPr : function(textPr, theme)
     {
-        this.m_oTextPr = textPr.Copy();
-        this.theme = theme;
-        var FontScheme = theme.themeElements.fontScheme;
-        this.m_oTextPr.RFonts.Ascii    = {Name: FontScheme.checkFont(this.m_oTextPr.RFonts.Ascii.Name), Index: -1};
-        this.m_oTextPr.RFonts.EastAsia = {Name: FontScheme.checkFont(this.m_oTextPr.RFonts.EastAsia.Name), Index: -1};
-        this.m_oTextPr.RFonts.HAnsi    = {Name: FontScheme.checkFont(this.m_oTextPr.RFonts.HAnsi.Name), Index: -1};
-        this.m_oTextPr.RFonts.CS       = {Name: FontScheme.checkFont(this.m_oTextPr.RFonts.CS.Name), Index: -1};
+        this.m_oTextPr = textPr;
+        if (theme)
+            this.m_oGrFonts.checkFromTheme(theme.themeElements.fontScheme, this.m_oTextPr.RFonts);
+        else
+            this.m_oGrFonts = this.m_oTextPr.RFonts;
     },
 
     SetFontSlot : function(slot, fontSizeKoef)
     {
-        var _rfonts = this.m_oTextPr.RFonts;
+        var _rfonts = this.m_oGrFonts;
         var _lastFont = this.IsUseFonts2 ? this.m_oLastFont2 : this.m_oLastFont;
 
         switch (slot)
