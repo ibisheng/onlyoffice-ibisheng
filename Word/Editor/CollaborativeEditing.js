@@ -133,9 +133,8 @@ function CTableId()
         {
             case historyitem_type_Paragraph        : Element = new Paragraph(); break;
             case historyitem_type_TextPr           : Element = new ParaTextPr(); break;
-            case historyitem_type_Hyperlink        : if ( true !== Debug_ParaRunMode ) Element = new ParaHyperlinkStart(); else Element = new ParaHyperlink(); break;
+            case historyitem_type_Hyperlink        : Element = new ParaHyperlink(); break;
             case historyitem_type_Drawing          : Element = new ParaDrawing(); break;
-            case historyitem_type_DrawingObjects   : Element = new CDrawingObjects(); break;
             case historyitem_type_Table            : Element = new CTable(); break;
             case historyitem_type_TableRow         : Element = new CTableRow(); break;
             case historyitem_type_TableCell        : Element = new CTableCell(); break;

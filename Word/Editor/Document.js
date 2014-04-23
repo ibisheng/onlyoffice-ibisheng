@@ -474,11 +474,6 @@ function CDocument(DrawingDocument)
 
     this.NeedUpdateTarget = false;
 
-    // Массив укзателей на все инлайновые графические объекты
-    this.DrawingObjects = null;
-    if (typeof CDrawingObjects !== "undefined")
-        this.DrawingObjects = new CDrawingObjects();
-
     // Класс для работы с колонтитулами
     this.HdrFtr = new CHeaderFooterController(this, this.DrawingDocument);
 
@@ -512,6 +507,9 @@ function CDocument(DrawingDocument)
     this.Lock = new CLock();
 
     this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
+
+    // Массив укзателей на все инлайновые графические объекты
+    this.DrawingObjects = null;
 
     if (typeof CGraphicObjects !== "undefined")
         this.DrawingObjects = new CGraphicObjects(this, this.DrawingDocument, editor);
