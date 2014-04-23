@@ -8,7 +8,7 @@ var CellValueType =
 	String:1,	
 	Bool:2,
 	Error:3
-}
+};
 
 //NumFormat defines
 var c_oAscNumFormatType = {
@@ -23,7 +23,7 @@ var c_oAscNumFormatType = {
 	Time : 8,
 	Percent : 9,
 	Fraction : 10
-}
+};
 
 
 

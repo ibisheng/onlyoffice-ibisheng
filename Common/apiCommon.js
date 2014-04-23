@@ -189,6 +189,7 @@
 		prot["getA"]	= prot.getA;
 		prot["get_hex"]	= prot.get_hex;
 
+		/** @constructor */
         function asc_ChartSettings()
         {
             this.style         = null;
@@ -422,6 +423,7 @@
 
         window["asc_ChartSettings"] = asc_ChartSettings;
 
+		/** @constructor */
         function asc_ValAxisSettings()
         {
             this.minValRule       = null;
@@ -624,6 +626,7 @@
     window["asc_ValAxisSettings"] = asc_ValAxisSettings;
 
 
+	/** @constructor */
     function asc_CatAxisSettings()
     {
         this.intervalBetweenTick       = null;

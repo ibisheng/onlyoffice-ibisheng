@@ -1556,7 +1556,7 @@ asc_docs_api.prototype._coAuthoringInit = function()
 	this.CoAuthoringApi.onSaveChanges				= function (e, userId, bSendEvent)
 	{
 		var oUser = t.CoAuthoringApi.getUser(userId);
-		var oColor = oUser ? oUser.asc_getColor() : null;
+		var oColor = oUser ? oUser.asc_getColorValue() : null;
 		// ToDo add select changes color
 
         var Count = e.length;
