@@ -1,0 +1,14 @@
+Common/3rdparty
+Common/.unit-tests
+Fonts
+OfflineDocuments
+Excel/menu
+Excel/jquery
+Excel/.unit-tests
+Excel/.build
+PowerPoint/Build
+PowerPoint/menu
+Word/Build
+Word/menu
+Word/merge
+
