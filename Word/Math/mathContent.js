@@ -7614,7 +7614,8 @@ CMathContent.prototype =
         ContentPos.Update(len, Depth);
         Depth++;
 
-        this.content[len].Get_EndPos(BehindEnd, ContentPos, Depth);
+        if(len > 0)
+            this.content[len].Get_EndPos(BehindEnd, ContentPos, Depth);
     },
     Get_Id : function()
     {

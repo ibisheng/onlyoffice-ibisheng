@@ -567,6 +567,10 @@ CSign.prototype.init = function(props)
 }
 CSign.prototype.setPosition = function(pos)
 {
+    this.sign.setPosition(pos);
+}
+/*CSign.prototype.setPosition = function(pos)
+{
     var shX = 0;
 
     if(this.typeOper == ACCENT_GRAVE)
@@ -586,7 +590,7 @@ CSign.prototype.setPosition = function(pos)
         y: pos.y + this.sign.size.ascent
     };
     this.sign.setPosition(position);
-}
+}*/
 CSign.prototype.fixSize = function(oMeasure, stretch, bIncline)
 {
     var ctrPrp = this.Parent.getCtrPrp();

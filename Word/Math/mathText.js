@@ -65,6 +65,8 @@ function CMathText(bJDraw)
 
     this.type  = TXT_ROMAN;
 
+    this.rasterOffsetX = 0;
+    this.rasterOffsetY = 0;
     this.GapLeft = 0;
     this.GapRight = 0;
     this.WidthVisible = 0;
@@ -302,6 +304,9 @@ CMathText.prototype =
         var metricsTxt = oMeasure.Measure2Code(letter);
         var width = metricsTxt.Width;
 
+        this.rasterOffsetX = metricsTxt.rasterOffsetX;
+        this.rasterOffsetY = metricsTxt.rasterOffsetY;
+
         var ascent  =  metricsTxt.Ascent;
         var descent = (metricsTxt.Height - metricsTxt.Ascent);
         var height  =  ascent + descent;
@@ -411,13 +416,27 @@ CMathText.prototype =
         pGraphics.FillTextCode(xx, yy , this.getCode());    //на отрисовку символа отправляем положение baseLine
 		//pGraphics.FillTextCode(xx, yy , this.value);
 
+        /*if(this.bJDraw)
+        {
+            console.log("Value: " + this.value);
+            console.log("RasterOffsetX : " + this.rasterOffsetX + ", RasterOffsetY : " + this.rasterOffsetY);
+        }*/
+
+
     },
     setPosition: function(pos)
     {
         if( ! this.bJDraw)                      // for text
             this.pos = {x : pos.x + this.GapLeft, y: pos.y };
         else                                    // for symbol only drawing
-            this.pos = {x:  pos.x + this.GapLeft, y: pos.y + this.size.ascent};
+            this.pos = {x: pos.x + this.rasterOffsetX, y: pos.y + this.rasterOffsetY};
+            //this.pos = {x:  pos.x + this.GapLeft, y: pos.y + this.size.ascent};
+
+        /*if(this.bJDraw)
+        {
+            console.log("Value: " + this.value);
+            console.log("RasterOffsetX : " + this.rasterOffsetX + ", RasterOffsetY : " + this.rasterOffsetY);
+        }*/
     },
     setCoeffTransform: function(sx, shx, shy, sy)
     {
