@@ -1757,7 +1757,8 @@ Woorksheet.prototype.generateFontMap=function(oFontMap){
 		if(drawing)
 			drawing.getAllFonts(oFontMap);
 	}
-    checkThemeFonts(oFontMap, this.workbook.theme.themeElements.fontScheme);
+	if(null != this.workbook.theme)
+		checkThemeFonts(oFontMap, this.workbook.theme.themeElements.fontScheme);
 	//пробегаемся по колонкам
 	for(var i in this.aCols)
 	{
