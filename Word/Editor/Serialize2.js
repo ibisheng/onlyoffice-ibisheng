@@ -8174,7 +8174,7 @@ function Binary_oMathReader(stream)
 		props.aln = false;
 		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
-			props.aln = this.stream.GetBool(length);
+			props.aln = this.stream.GetBool();
         }
 		else
             res = c_oSerConstants.ReadUnknown;
@@ -8186,7 +8186,7 @@ function Binary_oMathReader(stream)
         var oThis = this;
 		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
-			props.alnScr = this.stream.GetBool(length);
+			props.alnScr = this.stream.GetBool();
         }
 		else
             res = c_oSerConstants.ReadUnknown;
@@ -8910,7 +8910,7 @@ function Binary_oMathReader(stream)
         var oThis = this;
 		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
-			props.brk = this.stream.GetBool(length);
+			props.brk = this.stream.GetBool();
         }
 		else if (c_oSer_OMathBottomNodesValType.AlnAt === type)
         {
@@ -9120,7 +9120,7 @@ function Binary_oMathReader(stream)
         var oThis = this;
 		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
-			props.degHide = this.stream.GetBool(length);
+			props.degHide = this.stream.GetBool();
         }		
 		else
             res = c_oSerConstants.ReadUnknown;
@@ -9132,7 +9132,7 @@ function Binary_oMathReader(stream)
         var oThis = this;
 		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
-			props.diff = this.stream.GetBool(length);
+			props.diff = this.stream.GetBool();
         }		
 		else
             res = c_oSerConstants.ReadUnknown;
@@ -9614,7 +9614,7 @@ function Binary_oMathReader(stream)
         var oThis = this;
 		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
-			props.grow = this.stream.GetBool(length);
+			props.grow = this.stream.GetBool();
         }
 		else
             res = c_oSerConstants.ReadUnknown;
@@ -10467,7 +10467,7 @@ function Binary_oMathReader(stream)
         var oThis = this;
 		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
-			props.noBreak = this.stream.GetBool(length);
+			props.noBreak = this.stream.GetBool();
         }
 		else
             res = c_oSerConstants.ReadUnknown;
@@ -10583,7 +10583,7 @@ function Binary_oMathReader(stream)
         var oThis = this;
 		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
-			props.opEmu = this.stream.GetBool(length);
+			props.opEmu = this.stream.GetBool();
         }
 		else
             res = c_oSerConstants.ReadUnknown;
@@ -10697,7 +10697,7 @@ function Binary_oMathReader(stream)
         var oThis = this;
 		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
-			props.plcHide = this.stream.GetBool(length);
+			props.plcHide = this.stream.GetBool();
         }
 		else
             res = c_oSerConstants.ReadUnknown;
@@ -11352,7 +11352,7 @@ function Binary_oMathReader(stream)
         var oThis = this;
 		if (c_oSer_OMathBottomNodesType.AlnScr === type)
         {
-			res = this.bcr.Read1(length, function(t, l){
+			res = this.bcr.Read2(length, function(t, l){
                 return oThis.ReadMathAlnScr(t,l,props);
             });	           	
         }

@@ -428,3 +428,7 @@ CPhantom.prototype.getPropsForWrite = function()
 {
     return this.props;
 }
+CPhantom.prototype.getBase = function()
+{
+    return this.elements[0][0];
+}
