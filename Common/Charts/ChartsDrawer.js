@@ -5213,6 +5213,8 @@ drawPieChart.prototype =
 		{
 			case DLBL_POS_BEST_FIT:
 			{
+				centerX = centerX + (radius / 2) * Math.cos(-1 * stAng - swAng / 2) - width / 2;
+				centerY = centerY - (radius / 2) * Math.sin(-1 * stAng - swAng / 2) - height / 2;
 				break;
 			}
 			case DLBL_POS_CTR:
