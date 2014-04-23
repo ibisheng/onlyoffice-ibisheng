@@ -6,6 +6,7 @@
 
     // RFonts
     this.m_oTextPr      = null;
+    this.m_oGrFonts     = new CGrRFonts();
     this.m_oLastFont    = new CFontSetup();
 
     // font params
@@ -70,14 +71,18 @@ CTextMeasurerWrapper.prototype =
         }
     },
 
-    SetTextPr : function(textPr)
+    SetTextPr : function(textPr, theme)
     {
-        this.m_oTextPr = textPr.Copy();
+        this.m_oTextPr = textPr;
+        if (theme)
+            this.m_oGrFonts.checkFromTheme(theme.themeElements.fontScheme, this.m_oTextPr.RFonts);
+        else
+            this.m_oGrFonts = this.m_oTextPr.RFonts;
     },
 
     SetFontSlot : function(slot, fontSizeKoef)
     {
-        var _rfonts = this.m_oTextPr.RFonts;
+        var _rfonts = this.m_oGrFonts;
         var _lastFont = this.m_oLastFont;
 
         switch (slot)

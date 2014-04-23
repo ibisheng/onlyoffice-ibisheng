@@ -3,6 +3,7 @@
     this.Native = window.native;
 
     this.m_oTextPr      = null;
+    this.m_oGrFonts     = new CGrRFonts();
     this.m_oLastFont    = new CFontSetup();
 
     this.IsUseFonts2    = false;
@@ -183,9 +184,13 @@ CDrawingStream.prototype =
         this.Native["PD_LoadFont"](_info.Path, _info.FaceIndex, font.FontSize, flag);
     },
 
-    SetTextPr : function(textPr)
+    SetTextPr : function(textPr, theme)
     {
         this.m_oTextPr = textPr;
+        if (theme)
+            this.m_oGrFonts.checkFromTheme(theme.themeElements.fontScheme, this.m_oTextPr.RFonts);
+        else
+            this.m_oGrFonts = this.m_oTextPr.RFonts;
     },
     GetTextPr : function()
     {
@@ -194,7 +199,7 @@ CDrawingStream.prototype =
 
     SetFontSlot : function(slot, fontSizeKoef)
     {
-        var _rfonts = this.m_oTextPr.RFonts;
+        var _rfonts = this.m_oGrFonts;
         var _lastFont = this.IsUseFonts2 ? this.m_oLastFont2 : this.m_oLastFont;
 
         switch (slot)

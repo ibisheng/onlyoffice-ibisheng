@@ -9622,8 +9622,11 @@ window["asc_docs_api"].prototype["asc_nativeCalculateFile"] = function()
 //    }
 
 
-    Document.DrawingObjects.calculateAfterOpen();
-    Document.DrawingObjects.calculateAfterChangeTheme();
+    //Document.DrawingObjects.calculateAfterOpen();
+    //Document.DrawingObjects.calculateAfterChangeTheme();
+    
+    History.RecalcData_Add({Type: historyrecalctype_Drawing, All: true});
+    Document.DrawingObjects.addToZIndexManagerAfterOpen();
 
     Document.Recalculate();
     
