@@ -9658,7 +9658,7 @@ Paragraph.prototype =
         if ( true === this.Numbering.Check_Range(CurRange, CurLine) )
         {
             var NumPr = this.Numbering_Get();
-            if ( para_Numbering === this.Numbering.Type && undefined !== NumPr )
+            if ( para_Numbering === this.Numbering.Type && undefined !== NumPr && undefined !== NumPr.NumId && 0 !== NumPr.NumId && "0" !== NumPr.NumId )
             {
                 var NumJc = this.Parent.Get_Numbering().Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl].Jc;
 
