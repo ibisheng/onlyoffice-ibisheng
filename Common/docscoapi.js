@@ -732,7 +732,7 @@
 					"user": {
 						"id":docsCoApi._user.asc_getId(),
 						"name":docsCoApi._user.asc_getUserName(),
-						"color":docsCoApi._user.asc_getColor()
+						"color":docsCoApi._user.asc_getColorValue()
 					},
                     "locks":docsCoApi.ownedLockBlocks,
                     "sessionId":docsCoApi._id,
