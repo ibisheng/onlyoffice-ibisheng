@@ -806,7 +806,7 @@
 	prot["asc_getHeight"]		= prot.asc_getHeight;
 
 	function generateColor() {
-		return '#' + ('000000' + Math.floor(Math.random()*0xFFFFFF).toString(16)).substr(-6);
+		return Math.floor(Math.random()*0xFFFFFF);
 	}
 
 	window["Asc"].generateColor = generateColor;
