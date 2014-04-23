@@ -12580,16 +12580,23 @@ CDocument.prototype =
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
             var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
-            Result.X0    = ParaDrawing.GraphicObj.x;
-            Result.Y     = ParaDrawing.GraphicObj.y;
-            Result.X1    = ParaDrawing.GraphicObj.x + ParaDrawing.GraphicObj.extX;
-            Result.Page  = ParaDrawing.PageNum;
+            Result =
+            {
+                X0   : ParaDrawing.GraphicObj.x,
+                Y    : ParaDrawing.GraphicObj.y,
+                X1   : ParaDrawing.GraphicObj.x + ParaDrawing.GraphicObj.extX,
+                Page : ParaDrawing.PageNum
+            };
         }
         else
         {
             var Pos = ( true === this.Selection.Use ? ( this.Selection.StartPos < this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos )  : this.CurPos.ContentPos );
             Result = this.Content[Pos].Get_SelectionAnchorPos();
         }
+
+        var PageLimit = this.Get_PageLimits(Result.Page);
+        Result.X0 = PageLimit.X;
+        Result.X1 = PageLimit.XLimit;
 
         var Coords0 = this.DrawingDocument.ConvertCoordsToCursorWR( Result.X0, Result.Y, Result.Page );
         var Coords1 = this.DrawingDocument.ConvertCoordsToCursorWR( Result.X1, Result.Y, Result.Page );

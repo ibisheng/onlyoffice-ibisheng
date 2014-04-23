@@ -336,6 +336,19 @@ ParaMath.prototype =
         // TODO: ParaMath.Get_AllFontNames
         AllFonts["Cambria Math"] = true;
     },
+
+    Get_SelectedText : function(bAll, bClearText)
+    {
+        if ( true === bAll || true === this.Selection_IsUse() )
+        {
+            if ( true === bClearText )
+                return null;
+
+            return "";
+        }
+        
+        return "";
+    },
 //-----------------------------------------------------------------------------------
 // Функции пересчета
 //-----------------------------------------------------------------------------------

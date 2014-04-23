@@ -5296,6 +5296,11 @@ Paragraph.prototype =
             // TODO: Сделать проверку на само изменение, переместилась ли нумерация
             return -1;
         }
+        
+        if ( 0 === Line && 0 === Range && undefined !== this.Get_SectionPr() )
+        {
+            return -1;
+        }
 
         // Мы должны пересчитать как минимум 3 отрезка: текущий, предыдущий и следующий, потому что при удалении элемента
         // или добавлении пробела первое слово в данном отрезке может убраться в предыдущем отрезке, и кроме того при
@@ -9334,7 +9339,7 @@ Paragraph.prototype =
             var _CurPos = CurPos + 1;
 
             // Пропускаем пустые раны
-            while ( true === this.Content[_CurPos].Is_Empty( { SkipAnchor : true } ) && _CurPos < Count )
+            while ( _CurPos < Count && true === this.Content[_CurPos].Is_Empty( { SkipAnchor : true } ) )
                 _CurPos++;
 
             if ( _CurPos < Count && true === this.Content[_CurPos].Is_StartFromNewLine() )
@@ -14464,13 +14469,10 @@ Paragraph.prototype =
 
     Get_SelectionAnchorPos : function()
     {
-        var X0 = 0, X1 = 0, Y = 0, Page = 0;
+        var X0 = this.X, X1 = this.XLimit, Y = this.Y, Page = this.Get_StartPage_Absolute();
         if ( true === this.ApplyToAll )
-        {
-            X0   = this.X;
-            X1   = this.XLimit;
-            Y    = this.Y;
-            Page = this.Get_StartPage_Absolute();
+        {            
+            // Ничего не делаем
         }
         else if ( true === this.Selection.Use )
         {
@@ -14484,165 +14486,136 @@ Paragraph.prototype =
                 EndPos   = this.Selection.StartPos;
             }
 
-            var CurLine = 0;
             var LinesCount = this.Lines.length;
-            for (; CurLine < LinesCount; CurLine++ )
+            var StartLine = -1;
+            var EndLine   = -1;
+            
+            for (var CurLine = 0; CurLine < LinesCount; CurLine++ )
             {
-                if ( StartPos >= this.Lines[CurLine].StartPos && StartPos <= this.Lines[CurLine].EndPos )
-                    break;
+                if ( -1 === StartLine && StartPos >= this.Lines[CurLine].StartPos && StartPos <= this.Lines[CurLine].EndPos )
+                    StartLine = CurLine;
+                
+                if ( EndPos >= this.Lines[CurLine].StartPos && EndPos <= this.Lines[CurLine].EndPos )
+                    EndLine = CurLine;
             }
 
-            CurLine = Math.min( LinesCount - 1, CurLine );
+            StartLine = Math.min( Math.max( 0, StartLine ), LinesCount - 1 );
+            EndLine   = Math.min( Math.max( 0, EndLine   ), LinesCount - 1 );
 
-            var CurPage = 0;
             var PagesCount = this.Pages.length;
-            for (; CurPage < PagesCount; CurPage++ )
-            {
-                if ( CurPage >= this.Pages[CurPage].StartLine && CurPage <= this.Pages[CurPage].EndLine )
-                    break;
-            }
-
-            CurPage = Math.min( PagesCount - 1, CurPage );
-
             var DrawSelection = new CParagraphDrawSelectionRange();
 
-            var Line = this.Lines[CurLine];
-            var RangesCount = Line.Ranges.length;
-
-            // Определяем позицию и высоту строки
-            DrawSelection.StartY = this.Pages[CurPage].Y      + this.Lines[CurLine].Top;
-            DrawSelection.H      = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
-
-            for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
+            for ( var CurLine = StartLine; CurLine <= EndLine; CurLine++ )
             {
-                var Range = Line.Ranges[CurRange];
-
-                var RStartPos = Range.StartPos;
-                var REndPos   = Range.EndPos;
-
-                // Если пересечение пустое с селектом, тогда пропускаем данный отрезок
-                if ( StartPos > REndPos || EndPos < RStartPos )
-                    continue;
-
-                DrawSelection.StartX    = this.Lines[CurLine].Ranges[CurRange].XVisible;
-                DrawSelection.W         = 0;
-                DrawSelection.FindStart = true;
-
-                if ( CurLine === this.Numbering.Line && CurRange === this.Numbering.Range )
-                    DrawSelection.StartX += this.Numbering.WidthVisible;
-
-                for ( var CurPos = RStartPos; CurPos <= REndPos; CurPos++ )
+                var Line = this.Lines[CurLine];                                
+                var RangesCount = Line.Ranges.length;
+                
+                // Определим номер страницы
+                var CurPage = 0;
+                for (; CurPage < PagesCount; CurPage++ )
                 {
-                    var Item = this.Content[CurPos];
-                    Item.Selection_DrawRange( CurLine, CurRange, DrawSelection );
+                    if ( CurLine >= this.Pages[CurPage].StartLine && CurLine <= this.Pages[CurPage].EndLine )
+                        break;
                 }
 
-                var StartX = DrawSelection.StartX;
-                var W      = DrawSelection.W;
+                CurPage = Math.min( PagesCount - 1, CurPage );
 
-                var StartY = DrawSelection.StartY;
-                var H      = DrawSelection.H;
+                // Определяем позицию и высоту строки
+                DrawSelection.StartY = this.Pages[CurPage].Y      + this.Lines[CurLine].Top;
+                DrawSelection.H      = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
+                
+                var Result = null;
 
-                if ( W > 0.001 )
+                for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
                 {
-                    X0 = StartX;
-                    X1 = StartX + W;
-                    Y  = StartY;
+                    var Range = Line.Ranges[CurRange];
 
-                    Page = CurPage + this.Get_StartPage_Absolute();
+                    var RStartPos = Range.StartPos;
+                    var REndPos   = Range.EndPos;
 
-                    return { X0 : X0, X1 : X1, Y : Y, Page : Page };
+                    // Если пересечение пустое с селектом, тогда пропускаем данный отрезок
+                    if ( StartPos > REndPos || EndPos < RStartPos )
+                        continue;
+
+                    DrawSelection.StartX    = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                    DrawSelection.W         = 0;
+                    DrawSelection.FindStart = true;
+
+                    if ( CurLine === this.Numbering.Line && CurRange === this.Numbering.Range )
+                        DrawSelection.StartX += this.Numbering.WidthVisible;
+
+                    for ( var CurPos = RStartPos; CurPos <= REndPos; CurPos++ )
+                    {
+                        var Item = this.Content[CurPos];
+                        Item.Selection_DrawRange( CurLine, CurRange, DrawSelection );
+                    }
+
+                    var StartX = DrawSelection.StartX;
+                    var W      = DrawSelection.W;
+
+                    var StartY = DrawSelection.StartY;
+                    var H      = DrawSelection.H;
+
+                    var StartX = DrawSelection.StartX;
+                    var W      = DrawSelection.W;
+
+                    var StartY = DrawSelection.StartY;
+                    var H      = DrawSelection.H;
+
+                    if ( W > 0.001 )
+                    {
+                        X0 = StartX;
+                        X1 = StartX + W;
+                        Y  = StartY;
+
+                        Page = CurPage + this.Get_StartPage_Absolute();
+
+                        if ( null === Result )
+                            Result = { X0 : X0, X1 : X1, Y : Y, Page : Page };
+                        else
+                        {
+                            Result.X0 = Math.min( Result.X0, X0 );
+                            Result.X1 = Math.max( Result.X1, X1 );
+                        }
+                    }
                 }
-            }
+                
+                if ( null !== Result )
+                {
+                    console.log("Good");
+                    return Result;
+                }
+            }            
         }
         else
         {
+            // Текущая точка
             X0   = this.CurPos.X;
             X1   = this.CurPos.X;
             Y    = this.CurPos.Y;
             Page = this.Get_StartPage_Absolute() + this.CurPos.PagesPos;
         }
 
-        return { X0 : X0, X1 : X1, Y : Y, Page : Page };
+        console.log("Bad");
+        return { X0 : X0, X1 : X1, Y : Y, Page : this.Get_StartPage_Absolute() };
     },
 
     // Возвращаем выделенный текст
     Get_SelectedText : function(bClearText)
     {
-        if ( true === this.ApplyToAll )
+        var Str = "";
+        var Count = this.Content.length;        
+        for ( var Pos = 0; Pos < Count; Pos++ )
         {
-            var Str = "";
+            var _Str = this.Content[Pos].Get_SelectedText( true === this.ApplyToAll, bClearText );
 
-            var Count = this.Content.length;
-            for ( var Pos = 0; Pos < Count; Pos++ )
-            {
-                var Item = this.Content[Pos];
+            if ( null === _Str )
+                return null;
 
-                switch ( Item.Type )
-                {
-                    case para_Drawing:
-                    case para_End:
-                    case para_Numbering:
-                    case para_PresentationNumbering:
-                    case para_PageNum:
-                    case para_Math:
-                    {
-                        if ( true === bClearText )
-                            return null;
-
-                        break;
-                    }
-
-                    case para_Text : Str += Item.Value; break;
-                    case para_Space:
-                    case para_Tab  : Str += " "; break;
-                }
-            }
-
-            return Str;
+            Str += _Str;     
         }
-
-        if ( true === this.Selection.Use )
-        {
-            var StartPos = this.Selection.StartPos;
-            var EndPos   = this.Selection.EndPos;
-
-            if ( EndPos < StartPos )
-            {
-                StartPos = this.Selection.EndPos;
-                EndPos   = this.Selection.StartPos;
-            }
-
-            var Str = "";
-
-            for ( var Pos = StartPos; Pos < EndPos; Pos++ )
-            {
-                var Item = this.Content[Pos];
-
-                switch ( Item.Type )
-                {
-                    case para_Drawing:
-                    case para_End:
-                    case para_Numbering:
-                    case para_PresentationNumbering:
-                    case para_PageNum:
-                    {
-                        if ( true === bClearText )
-                            return null;
-
-                        break;
-                    }
-
-                    case para_Text : Str += Item.Value; break;
-                    case para_Space:
-                    case para_Tab  : Str += " "; break;
-                }
-            }
-
-            return Str;
-        }
-
-        return "";
+        
+        return Str;
     },
 
     Get_SelectedElementsInfo : function(Info)

@@ -134,6 +134,24 @@ ParaHyperlink.prototype =
 
         return this.Content[0].Is_StartFromNewLine();
     },
+    
+    Get_SelectedText : function(bAll, bClearText)
+    {
+        var Str = "";        
+        var Count = this.Content.length;
+        
+        for ( var Pos = 0; Pos < Count; Pos++ )
+        {
+            var _Str = this.Content[Pos].Get_SelectedText( bAll, bClearText );
+            
+            if ( null === _Str )
+                return null;
+            
+            Str += _Str;
+        }
+        
+        return Str;
+    },
 
     Get_TextPr : function(_ContentPos, Depth)
     {

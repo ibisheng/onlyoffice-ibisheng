@@ -1105,6 +1105,58 @@ ParaRun.prototype =
                 Item.documentGetAllFontNames( AllFonts );
         }
     },
+
+    Get_SelectedText : function(bAll, bClearText)
+    {
+        var StartPos = 0;
+        var EndPos   = 0;
+        
+        if ( true === bAll )
+        {
+            StartPos = 0;
+            EndPos   = this.Content.length;
+        }
+        else if ( true === this.Selection.Use )
+        {
+            StartPos = this.State.Selection.StartPos;
+            EndPos   = this.State.Selection.EndPos;
+            
+            if ( StartPos > EndPos )
+            {
+                var Temp = EndPos;
+                EndPos   = StartPos;
+                StartPos = Temp;
+            }
+        }
+        
+        var Str = "";
+        
+        for ( var Pos = StartPos; Pos < EndPos; Pos++ )
+        {
+            var Item = this.Content[Pos];
+
+            switch ( Item.Type )
+            {
+                case para_Drawing:
+                case para_End:
+                case para_Numbering:
+                case para_PresentationNumbering:
+                case para_PageNum:
+                {
+                    if ( true === bClearText )
+                        return null;
+
+                    break;
+                }
+
+                case para_Text : Str += Item.Value; break;
+                case para_Space:
+                case para_Tab  : Str += " "; break;
+            }
+        }
+
+        return Str;
+    },
 //-----------------------------------------------------------------------------------
 // Функции пересчета
 //-----------------------------------------------------------------------------------
