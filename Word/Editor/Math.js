@@ -274,6 +274,10 @@ ParaMath.prototype =
         var DefaultPrp =
         {
             FontFamily:     {Name  : "Cambria Math", Index : -1 },
+            RFonts:
+            {
+                Ascii:      {Name  : "Cambria Math", Index : -1 }
+            },
             FontSize:       11,
             FontSizeCS:     11,
             Italic:         true,
@@ -886,14 +890,6 @@ ParaMath.prototype =
                 this.Get_EndPos(false, SearchPos.Pos, Depth);
                 SearchPos.DiffX = Diff - 0.0015;
 
-                /*var str = "";
-                for(var i = 0; i < SearchPos.Pos.Data.length; i++)
-                {
-                    str += SearchPos.Pos.Data[i] + " ";
-                }
-
-                console.log("Get_EndPos : " + str);*/
-
             }
 
             Result = true;
@@ -989,34 +985,7 @@ ParaMath.prototype =
 //-----------------------------------------------------------------------------------
     Set_SelectionContentPos : function(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag)
     {
-        /*var startStr = "";
-
-         if(StartContentPos !== null)
-         {
-         for(var i = 0; i < StartContentPos.Data.length; i++)
-         {
-         startStr += StartContentPos.Data[i] + " ";
-         }
-
-         console.log("StartContent : " + startStr);
-         }
-
-
-         var endStr = "";
-
-         if(EndContentPos !== null)
-         {
-         for(var i = 0; i < EndContentPos.Data.length; i++)
-         {
-         endStr += EndContentPos.Data[i] + " ";
-         }
-
-         console.log("EndContent : " + endStr);
-         }*/
-
         // TODO: ParaMath.Set_SelectionContentPos
-
-
 
         this.Root.Set_SelectionContentPos(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag);
 
@@ -1038,7 +1007,6 @@ ParaMath.prototype =
         // TODO: ParaMath.Selection_Remove
 
         this.bSelectionUse = false;
-
     },
     Select_All : function(Direction)
     {

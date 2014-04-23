@@ -95,13 +95,6 @@ var TXT_DOUBLE_STRUCK           =  4;
 var TXT_SANS_SERIF              =  5;
 var TXT_MONOSPACE               =  6;
 
-/*var SCR_ROMAN                 =  0;
-var SCR_SCRIPT                  =  1;
-var SCR_FRAKTUR                 =  2;
-var SCR_DOUBLE_STRUCK           =  3;
-var SCR_SANS_SERIF              =  4;
-var SCR_MONOSPACE               =  5;*/
-
 var OPER_DELIMITER              =  0;
 var OPER_SEPARATOR              =  1;
 var OPER_GROUP_CHAR             =  2;

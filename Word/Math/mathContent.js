@@ -7740,6 +7740,10 @@ CMathContent.prototype =
     {
 
     },
+    Selection_Remove: function()
+    {
+
+    },
     //////////////////////////
 
     ////////////////  Test function for test_math  //////////////////
