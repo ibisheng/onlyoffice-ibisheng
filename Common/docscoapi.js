@@ -52,7 +52,7 @@
 		else {
 			// Фиктивные вызовы
 			this.callback_OnSetIndexUser ("123");
-			this.callback_OnFirstLoadChanges ([]);
+			this.onFirstLoadChangesEnd ();
 		}
 	};
 
