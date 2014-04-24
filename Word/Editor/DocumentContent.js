@@ -30,10 +30,14 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
     if ( undefined !== DrawingDocument && null !== DrawingDocument )
     {
         this.DrawingDocument = DrawingDocument;
-        this.LogicDocument   = DrawingDocument.m_oLogicDocument;
-        this.Styles          = DrawingDocument.m_oLogicDocument.Get_Styles();
-        this.Numbering       = DrawingDocument.m_oLogicDocument.Get_Numbering();
-        this.DrawingObjects  = DrawingDocument.m_oLogicDocument.DrawingObjects; // Массив укзателей на все инлайновые графические объекты
+        
+        if ( undefined !== editor && true === editor.isDocumentEditor )
+        {
+            this.LogicDocument   = DrawingDocument.m_oLogicDocument;
+            this.Styles          = DrawingDocument.m_oLogicDocument.Get_Styles();
+            this.Numbering       = DrawingDocument.m_oLogicDocument.Get_Numbering();
+            this.DrawingObjects  = DrawingDocument.m_oLogicDocument.DrawingObjects; // Массив укзателей на все инлайновые графические объекты
+        }
     }
 
     if ( "undefined" === typeof(TurnOffInnerWrap) )
@@ -8352,10 +8356,14 @@ CDocumentContent.prototype =
         if ( undefined !== DrawingDocument && null !== DrawingDocument )
         {
             this.DrawingDocument = DrawingDocument;
-            this.LogicDocument   = DrawingDocument.m_oLogicDocument;
-            this.Styles          = DrawingDocument.m_oLogicDocument.Get_Styles();
-            this.Numbering       = DrawingDocument.m_oLogicDocument.Get_Numbering();
-            this.DrawingObjects  = DrawingDocument.m_oLogicDocument.DrawingObjects; // Массив укзателей на все инлайновые графические объекты
+
+            if ( undefined !== editor && true === editor.isDocumentEditor )
+            {
+                this.LogicDocument   = DrawingDocument.m_oLogicDocument;
+                this.Styles          = DrawingDocument.m_oLogicDocument.Get_Styles();
+                this.Numbering       = DrawingDocument.m_oLogicDocument.Get_Numbering();
+                this.DrawingObjects  = DrawingDocument.m_oLogicDocument.DrawingObjects; // Массив укзателей на все инлайновые графические объекты
+            }
         }
     },
 
