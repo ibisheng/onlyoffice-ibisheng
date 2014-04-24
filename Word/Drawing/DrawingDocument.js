@@ -377,7 +377,7 @@ function CTextMeasurer()
             Ascent : (Temp.oBBox.fMaxY * 25.4 / 72),
             Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
             WidthG : ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72),
-            rasterOffsetX: Temp.oBBox.rasterDistances.dist_l * 25.4 / 72,
+            rasterOffsetX: (Temp.oBBox.rasterDistances.dist_l + Temp.oBBox.fMinX) * 25.4 / 72,
             rasterOffsetY: Temp.oBBox.rasterDistances.dist_t * 25.4 / 72
         };
     }
