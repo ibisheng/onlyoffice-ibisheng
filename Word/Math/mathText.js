@@ -312,9 +312,12 @@ CMathText.prototype =
         if( ! this.bJDraw)                      // for text
             this.pos = {x : pos.x, y: pos.y};
         else                                    // for symbol only drawing
-            this.pos = {x: pos.x - this.rasterOffsetX, y: pos.y - this.rasterOffsetY};
-            //this.pos = {x:  pos.x + this.GapLeft, y: pos.y + this.size.ascent};
-
+        {
+            var x = pos.x - this.rasterOffsetX,
+                y = pos.y - this.rasterOffsetY + this.size.ascent;
+            
+            this.pos = {x: x, y: y};
+        }
     },
     setCoeffTransform: function(sx, shx, shy, sy)
     {
