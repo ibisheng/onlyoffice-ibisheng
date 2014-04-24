@@ -182,6 +182,8 @@
 					this._onChangeSelection(null !== this.selectElement ?
 						this.selectElement.nextSibling : this.firstElement);
 					break;
+				case 16: // Shift
+					break;
 				default:
 					retVal = true;
 			}
