@@ -8,9 +8,7 @@
 //api 2212: asc_docs_api.prototype.sync_TextPrFontFamilyCallBack
 // возвращает название шрифта
 
-//var DIV_CENT = 0.2487852283770651;
 
-// /var DIV_CENT = 0.1;
 var DIV_CENT = 0.1386;
 
 var StartTextElement = 0x2B1A; // Cambria Math
@@ -77,13 +75,13 @@ function CMathText(bJDraw)
     // TO DO
     // убрать
 
-    this.transform =
+    /*this.transform =
     {
         sx:  1,
         shy: 0,
         shx: 0,
         sy:  1
-    };
+    };*/
 
 }
 CMathText.prototype =
@@ -242,16 +240,17 @@ CMathText.prototype =
          height = g_oTextMeasurer.GetHeight();
         */
 
-
-        //  смещения
-        //  rasterOffsetX
-        //  rasterOffsetY
-
         var letter = this.getCode();
 
-        var metricsTxt = oMeasure.Measure2Code(letter);
-        var width = metricsTxt.Width;
 
+        var metricsTxt = oMeasure.Measure2Code(letter);
+
+        if(this.bJDraw)
+            metricsTxt = oMeasure.Measure2Code(letter);
+        else
+            metricsTxt = oMeasure.MeasureCode(letter);
+
+        //  смещения
         this.rasterOffsetX = metricsTxt.rasterOffsetX;
         this.rasterOffsetY = metricsTxt.rasterOffsetY;
 
@@ -259,24 +258,30 @@ CMathText.prototype =
         var descent = (metricsTxt.Height - metricsTxt.Ascent);
         var height  =  ascent + descent;
 
-        var widthG   = metricsTxt.WidthG;
+        var width;
 
-        width += this.GapLeft + this.GapRight;
+        if(this.bJDraw)
+            width = metricsTxt.WidthG + this.GapLeft + this.GapRight;
+        else
+            width = metricsTxt.Width + this.GapLeft + this.GapRight;
 
         this.WidthVisible = width;
 
-        this.size = {width: width, widthG: widthG, height: height, ascent: ascent};
+        this.size = {width: width, widthG: width, height: height, ascent: ascent};
     },
     draw: function(x, y, pGraphics)
     {
-        /*
-        var txtPrp = this.getTxtPrp();
-        g_oTextMeasurer.SetFont( txtPrp );*/
 
         var X = this.pos.x + x,
             Y = this.pos.y + y;
 
-        var invert = new CMatrix();
+        /*var tx = 0;
+         var ty = 0;
+
+         var x = (X*sy  - Y*shx - tx*sy)/(sx*sy- shy*shx);
+         var y = (Y - x*shy - ty*shx)/sy;*/
+
+        /*var invert = new CMatrix();
         invert.sx = this.transform.sx;
         invert.sy = this.transform.sy;
         invert.shx = this.transform.shx;
@@ -292,15 +297,15 @@ CMathText.prototype =
         var sx = this.transform.sx, shx = this.transform.shx,
             shy = this.transform.shy, sy = this.transform.sy;
 
-        /*var tx = 0;
-         var ty = 0;
-
-         var x = (X*sy  - Y*shx - tx*sy)/(sx*sy- shy*shx);
-         var y = (Y - x*shy - ty*shx)/sy;*/
+        pGraphics.transform(sx, shy, shx, sy, 0, 0);*/
 
 
-        pGraphics.transform(sx, shy, shx, sy, 0, 0);
-        pGraphics.FillTextCode(xx, yy , this.getCode());    //на отрисовку символа отправляем положение baseLine
+        var bJDraw;
+
+        if(this.bJDraw)
+            bJDraw = this.bJDraw;
+
+        pGraphics.FillTextCode(X, Y, this.getCode(), bJDraw);    //на отрисовку символа отправляем положение baseLine
 
     },
     setPosition: function(pos)
@@ -311,11 +316,6 @@ CMathText.prototype =
             this.pos = {x: pos.x - this.rasterOffsetX, y: pos.y - this.rasterOffsetY};
             //this.pos = {x:  pos.x + this.GapLeft, y: pos.y + this.size.ascent};
 
-        /*if(this.bJDraw)
-        {
-            console.log("Value: " + this.value);
-            console.log("RasterOffsetX : " + this.rasterOffsetX + ", RasterOffsetY : " + this.rasterOffsetY);
-        }*/
     },
     setCoeffTransform: function(sx, shx, shy, sy)
     {
@@ -338,12 +338,6 @@ CMathText.prototype =
         this.size.ascent = this.size.ascent*(sy + shy);
         this.size.descent = this.size.descent*(sy + shy);
         this.size.center = this.size.center*(sy + shy);
-
-        /*this.size.width = this.size.width*this.transform.sx + (-1)*this.size.width*this.transform.shx;
-        this.size.height = this.size.height*this.transform.sy + this.size.height*this.transform.shy;
-        this.size.ascent = this.size.ascent*(this.transform.sy + this.transform.shy);
-        this.size.descent = this.size.descent*(this.transform.sy + this.transform.shy);
-        this.size.center = this.size.center*(this.transform.sy + this.transform.shy);*/
 
     },
     IsJustDraw: function()
@@ -420,103 +414,6 @@ CMathText.prototype =
     {},
     Write_ToBinary: function()
     {}
-
-    /*draw2: function()
-     {
-     MathControl.pGraph.b_color1(0,0,0,255);
-     MathControl.pGraph.SetFont(this.font);
-
-     var sx = this.transform.sx, shx = this.transform.shx,
-     shy = this.transform.shy, sy = this.transform.sy;
-     var X = this.pos.x,
-     Y = this.pos.y - this.size.center + this.size.ascent;
-
-     var tx = 0;
-     var ty = 0;
-
-     var x = (X*sy  - Y*shx - tx*sy)/(sx*sy- shy*shx);
-     var y = (Y - x*shy - ty*shx)/sy;
-
-     MathControl.pGraph.transform(sx, shy, shx, sy, tx, ty);
-     MathControl.pGraph.FillTextCode(x, y , this.value); // прибавляем аскент, тк на отрисовку символа отправляем положение baseLine
-     },*/
-    /*getMetrics: function()
-     {
-     return g_oTextMeasurer.Measure2Code(this.value);
-     },*/
-    /*IsHighElement: function()
-     {
-     g_oTextMeasurer.SetFont(this.font);
-     return (this.size.ascent - 0.001 > g_oTextMeasurer.Measure2Code(0x1D44E).Ascent) ;
-     },*/
-    /*trasformByDimensions: function(width, height, restrW, restrH)
-     {
-     //если restrict == 0 => ограничений нет
-     var restrictW = (restrW > 0 && restrW < 90) ?  restrW : 90;
-     var restrictH = (restrH > 0 && restrH < 90) ?  restrH : 90;
-
-     var sx = width/this.size.width,
-     sy = height/this.size.height,
-     shx = this.transform.shx,
-     shy = this.transform.shy;
-
-     sx = (sx > restrictW) ? restrictW : sx;
-     sy = (sy > restrictH) ? restrictH : sy;
-
-     this.setCoeffTransform(sx, shx, shy, sy);
-     },
-     transformByWidth: function(width, restrict, restrict0)
-     {
-     var restr0 = (restrict0 > 0) ? restrict0 : 0;
-     var restr = ( restrict > 0 && restrict < 90) ? restrict : 90;
-     restr = (restr < restr0) ? restr0 : restr;
-
-     var sx = width/this.size.width,
-     sy = this.transform.sy,
-     shx = this.transform.shx,
-     shy = this.transform.shy;
-
-     sx = (sx > restr) ? restr : sx;
-
-     this.setCoeffTransform(sx, shx, shy, sy);
-     },
-     trasformByHeight: function(height, restrict, restrict0)
-     {
-     var restr0 = (restrict0 > 0) ? restrict0 : 0;
-     var restr = ( restrict > 0 && restrict < 90) ? restrict : 90;
-     restr = (restr < restr0) ? restr0 : restr;
-
-     var sx =  this.transform.sx,
-     sy = height/this.size.height,
-     shx = this.transform.shx,
-     shy = this.transform.shy;
-
-     sy = (sy > restr) ? restr : sy;
-
-     this.setCoeffTransform(sx, shx, shy, sy);
-     },
-     transformLength: function(height)
-     {
-     var sx =  height/this.size.height,
-     sy = height/this.size.height,
-     shx = this.transform.shx,
-     shy = this.transform.shy;
-
-     this.setCoeffTransform(sx, shx, shy, sy);
-     },*/
-    /*IsIncline: function()
-     {
-     var flag = false;
-
-     if(this.value >= 0x1D434 && this.value <= 0x1D44D ) // capitale
-     flag = true;
-     else if(this.value >= 0x1D44E && this.value <= 0x1D467) //small
-     flag = true;
-     else if(this.value == 0x1D6A4 || this.value == 0x1D6A5)// i & j without dot
-     flag = true;
-
-     return flag;
-     },*/
 
 }
 
