@@ -10053,12 +10053,12 @@ function Binary_oMathReader(stream)
 			var mcJc = this.stream.GetUChar(length);
 			switch (mcJc)
 			{
-				case 0:	props.mcJc = "center"; break;
-				case 1:	props.mcJc = "inside"; break;
-				case 2:	props.mcJc = "left"; break;
-				case 3:	props.mcJc = "outside"; break;
-				case 4:	props.mcJc = "right"; break;
-				default: props.mcJc = "center";
+				case 0:	props.mcJc = MCJC_CENTER; break;
+				case 1:	props.mcJc = MCJC_INSIDE; break;
+				case 2:	props.mcJc = MCJC_LEFT; break;
+				case 3:	props.mcJc = MCJC_OUTSIDE; break;
+				case 4:	props.mcJc = MCJC_RIGHT; break;
+				default: props.mcJc = MCJC_CENTER;
 			}
         }
 		else
@@ -10109,11 +10109,11 @@ function Binary_oMathReader(stream)
 			var mJc = this.stream.GetUChar(length);
 			switch (mJc)
 			{
-				case 0:	props.mJc = "center"; break;
-				case 1:	props.mJc = "centerGroup"; break;
-				case 2:	props.mJc = "left"; break;
-				case 3:	props.mJc = "right"; break;
-				default: props.mJc = "centerGroup";
+				case 0:	props.mJc = JC_CENTER; break;
+				case 1:	props.mJc = JC_CENTERGROUP; break;
+				case 2:	props.mJc = JC_LEFT; break;
+				case 3:	props.mJc = JC_RIGHT; break;
+				default: props.mJc = JC_CENTERGROUP;
 			}
         }
 		else
@@ -11588,11 +11588,11 @@ function Binary_oMathReader(stream)
 			var sty = this.stream.GetUChar(length);
 			switch (sty)
 			{
-				case 0:	props.sty = "b"; break;
-				case 1:	props.sty = "bi"; break;
-				case 2:	props.sty = "i"; break;
-				case 3:	props.sty = "p"; break;
-				default: props.sty = "i";
+				case 0:	props.sty = STY_BOLD; break;
+				case 1:	props.sty = STY_BI; break;
+				case 2:	props.sty = STY_ITALIC; break;
+				case 3:	props.sty = STY_PLAIN; break;
+				default: props.sty = STY_ITALIC;
 			}
         }
 		else
