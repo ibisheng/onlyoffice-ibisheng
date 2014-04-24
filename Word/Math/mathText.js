@@ -242,9 +242,6 @@ CMathText.prototype =
 
         var letter = this.getCode();
 
-
-        var metricsTxt = oMeasure.Measure2Code(letter);
-
         if(this.bJDraw)
             metricsTxt = oMeasure.Measure2Code(letter);
         else
@@ -311,7 +308,7 @@ CMathText.prototype =
     setPosition: function(pos)
     {
         if( ! this.bJDraw)                      // for text
-            this.pos = {x : pos.x + this.GapLeft, y: pos.y };
+            this.pos = {x : pos.x, y: pos.y};
         else                                    // for symbol only drawing
             this.pos = {x: pos.x - this.rasterOffsetX, y: pos.y - this.rasterOffsetY};
             //this.pos = {x:  pos.x + this.GapLeft, y: pos.y + this.size.ascent};
