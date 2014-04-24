@@ -597,13 +597,14 @@
     DocsCoApi.prototype._onFirstLoadChanges = function (allServerChanges) {
 		var t = this;
         if (allServerChanges && this.onFirstLoadChanges) {
-			var allChanges = [];
+			var hasChanges = false;
 			for (var changeId in allServerChanges) if (allServerChanges.hasOwnProperty(changeId)){
 				var change = allServerChanges[changeId];
 				if (change["skipChange"])
 					continue;
 				var changesOneUser = change["changes"];
 				if (changesOneUser) {
+					hasChanges = true;
 					t.onFirstLoadChanges(JSON.parse(changesOneUser), change["user"]);
 				}
 			}
@@ -612,7 +613,7 @@
 			if (t.onFirstLoadChangesEnd)
 				t.onFirstLoadChangesEnd();
 			// Если были изменения, то мы все еще в совместном редактировании (иначе при сохранениях мы будем затирать изменения на сервере)
-			if (0 < allChanges.length)
+			if (hasChanges)
 				t._onStartCoAuthoring(/*isStartEvent*/ true);
         }
     };
