@@ -21,6 +21,8 @@
 			this.selector		= null;
 			this.selectorStyle	= null;
 			this.selectorList	= null;
+			this.selectorListEl	= [];
+			this.selectorListJQ	= null;
 			this.selectElement	= null;
 			this.firstElement	= null;
 
@@ -39,9 +41,9 @@
 		PopUpSelector.prototype._init = function () {
 			var t = this;
 			if (null != this.element) {
-				this.selector = document.createElement("div");
+				this.selector = document.createElement('div');
 				this.selectorStyle = this.selector.style;
-				this.selector.id = "apiPopUpSelector";
+				this.selector.id = 'apiPopUpSelector';
 				this.selector.innerHTML = '<div style="max-height:210px;" class="combobox"><ul id="apiPopUpList" class="dropdown-menu"></ul></div>';
 
 				this.element.appendChild(this.selector);
@@ -65,6 +67,10 @@
 						t.hide();
 					}, false);
 				}
+
+				// Для того, чтобы работал scroll
+				this.selectorListJQ = $('#apiPopUpList');
+				this.selectorListJQ.perfectScrollbar();
 			}
 		};
 		PopUpSelector.prototype.show = function (isFormula, arrItems, cellRect) {
@@ -106,6 +112,7 @@
 				}
 
 				this.selectorList.appendChild(item);
+				this.selectorListEl.push(item);
 			}
 
 			// Selection hack
@@ -119,6 +126,10 @@
 				}
 			}*/
 			// TODO: В Mozilla избавиться от селекта текста при dblclick
+
+			// Для того, чтобы работал scroll
+			this.selectorListJQ.perfectScrollbar("update");
+
 		};
 		PopUpSelector.prototype.hide = function () {
 			if (this.isVisible) {
@@ -136,7 +147,10 @@
 			return this.isVisible;
 		};
 		PopUpSelector.prototype._clearList = function () {
-			this.selectorList.innerHTML = "";
+			var elem;
+			while(elem = this.selectorListEl.pop())
+				this.selectorList.removeChild(elem);
+			
 			this.selectElement = null;
 			this.firstElement = null;
 			this.isFormula = false;
