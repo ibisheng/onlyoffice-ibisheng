@@ -615,13 +615,12 @@ CDocumentContent.prototype =
 
             Element.TurnOff_RecalcEvent();
 
-
             var RecalcResult = recalcresult_NextElement;
-            var bFlowTable = false;
+            var bFlow = false;
             if ( type_Table === Element.GetType() && true != Element.Is_Inline() )
             {
-                bFlowTable = true;
-                if ( null === this.RecalcInfo.FlowObject )
+                bFlow = true;
+                if ( true === this.RecalcInfo.Can_RecalcObject() )
                 {
                     if ( ( 0 === Index && 0 === PageIndex ) || Index != StartIndex )
                     {
@@ -636,7 +635,7 @@ CDocumentContent.prototype =
 						this.DrawingObjects.addFloatTable( new CFlowTable( Element, PageIndex ) );
                     RecalcResult = recalcresult_CurPage;
                 }
-                else if ( Element === this.RecalcInfo.FlowObject )
+                else if ( true === this.RecalcInfo.Check_FlowObject(Element) )
                 {
                     // Если у нас текущая страница совпадает с той, которая указана в таблице, тогда пересчитываем дальше
                     if ( Element.PageNum > PageIndex || ( this.RecalcInfo.FlowObjectPage <= 0 && Element.PageNum < PageIndex ) || Element.PageNum === PageIndex )
@@ -701,6 +700,289 @@ CDocumentContent.prototype =
                     RecalcResult = recalcresult_NextElement;
                 }
             }
+            else if ( type_Paragraph === Element.GetType() && true != Element.Is_Inline() )
+            {
+                bFlow = true;
+
+                if ( true === this.RecalcInfo.Can_RecalcObject() )
+                {
+                    var FramePr = Element.Get_FramePr();
+
+                    // Рассчитаем количество подряд идущих параграфов с одинаковыми FramePr
+                    var FlowCount = 1;
+                    for ( var TempIndex = Index + 1; TempIndex < Count; TempIndex++ )
+                    {
+                        var TempElement = this.Content[TempIndex];
+                        if ( type_Paragraph === TempElement.GetType() && true != TempElement.Is_Inline() )
+                        {
+                            var TempFramePr = TempElement.Get_FramePr();
+                            if ( true === FramePr.Compare( TempFramePr ) )
+                                FlowCount++;
+                            else
+                                break;
+                        }
+                        else
+                            break;
+                    }
+                    
+                    var LD_PageLimits = this.LogicDocument.Get_PageLimits( PageIndex + this.Get_StartPage_Absolute() );
+                    var LD_PageFields = this.LogicDocument.Get_PageFields( PageIndex + this.Get_StartPage_Absolute() );
+                    
+                    var Page_W = LD_PageLimits.XLimit;
+                    var Page_H = LD_PageLimits.YLimit;
+                    
+                    var Page_Field_L = LD_PageFields.X;
+                    var Page_Field_R = LD_PageFields.XLimit;
+                    var Page_Field_T = LD_PageFields.Y;
+                    var Page_Field_B = LD_PageFields.YLimit;
+
+                    //--------------------------------------------------------------------------------------------------
+                    // 1. Рассчитаем размер рамки
+                    //--------------------------------------------------------------------------------------------------
+                    var FrameH = 0;
+                    var FrameW = -1;
+
+                    var Frame_XLimit = FramePr.Get_W();
+                    var Frame_YLimit = FramePr.Get_H();
+
+                    if ( undefined === Frame_XLimit )
+                        Frame_XLimit = Page_Field_R - Page_Field_L;
+
+                    if ( undefined === Frame_YLimit )
+                        Frame_YLimit = Page_H;
+
+                    for ( var TempIndex = Index; TempIndex < Index + FlowCount; TempIndex++ )
+                    {
+                        var TempElement = this.Content[TempIndex];
+                        // Получим параметры расположения рамки
+                        TempElement.Set_DocumentIndex( TempIndex );
+
+                        if ( Index != TempIndex || true != this.RecalcInfo.FrameRecalc )
+                            TempElement.Reset( 0, FrameH, Frame_XLimit, Frame_YLimit, PageIndex );
+
+                        TempElement.Recalculate_Page( PageIndex );
+
+                        FrameH = TempElement.Get_PageBounds( PageIndex - TempElement.Get_StartPage_Relative() ).Bottom;
+                    }
+                    
+                    // Обработаем "авто" ширину рамки. Ширина "авто" может быть в случае, когда значение W в FramePr 
+                    // отсутствует, когда, у нас ровно 1 параграф, с 1 строкой.
+                    if ( -1 === FrameW && 1 === FlowCount && 1 === Element.Lines.length && undefined === FramePr.Get_W() )
+                    {
+                        FrameW = Element.Lines[0].Ranges[0].W;
+                        var ParaPr = Element.Get_CompiledPr2(false).ParaPr;
+                        FrameW += ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
+
+                        // Если прилегание в данном случае не к левой стороне, тогда пересчитываем параграф,
+                        // с учетом того, что ширина буквицы должна быть FrameW
+                        if ( align_Left != ParaPr.Jc )
+                        {
+                            TempElement.Reset( 0, 0, FrameW, Frame_YLimit, PageIndex );
+                            TempElement.Recalculate_Page( PageIndex );
+                            FrameH = TempElement.Get_PageBounds( PageIndex - TempElement.Get_StartPage_Absolute()).Bottom;
+                        }
+                    }
+                    else if ( -1 === FrameW )
+                        FrameW = Frame_XLimit;
+
+                    var FrameHRule = ( undefined === FramePr.HRule ? heightrule_Auto : FramePr.HRule );
+                    switch ( FrameHRule )
+                    {
+                        case heightrule_Auto : break;
+                        case heightrule_AtLeast :
+                        {
+                            if ( FrameH < FramePr.H )
+                                FrameH = FramePr.H;
+
+                            break;
+                        }
+
+                        case heightrule_Exact:
+                        {
+                            FrameH = FramePr.H;
+                            break;
+                        }
+                    }
+
+                    //--------------------------------------------------------------------------------------------------
+                    // 2. Рассчитаем положение рамки
+                    //--------------------------------------------------------------------------------------------------
+
+                    // Теперь зная размеры рамки можем рассчитать ее позицию
+                    var FrameHAnchor = ( FramePr.HAnchor === undefined ? c_oAscHAnchor.Page : FramePr.HAnchor );
+                    var FrameVAnchor = ( FramePr.VAnchor === undefined ? c_oAscVAnchor.Page : FramePr.VAnchor );
+
+                    // Рассчитаем положение по горизонтали
+                    var FrameX = 0;
+                    if ( undefined != FramePr.XAlign || undefined === FramePr.X )
+                    {
+                        var XAlign = c_oAscXAlign.Left;
+                        if ( undefined != FramePr.XAlign )
+                            XAlign = FramePr.XAlign;
+
+                        switch ( FrameHAnchor )
+                        {
+                            case c_oAscHAnchor.Page   :
+                            {
+                                switch ( XAlign )
+                                {
+                                    case c_oAscXAlign.Inside  :
+                                    case c_oAscXAlign.Outside :
+                                    case c_oAscXAlign.Left    : FrameX = Page_Field_L - FrameW; break;
+                                    case c_oAscXAlign.Right   : FrameX = Page_Field_R; break;
+                                    case c_oAscXAlign.Center  : FrameX = (Page_W - FrameW) / 2; break;
+                                }
+
+                                break;
+                            }
+                            case c_oAscHAnchor.Text   :
+                            case c_oAscHAnchor.Margin :
+                            {
+                                switch ( XAlign )
+                                {
+                                    case c_oAscXAlign.Inside  :
+                                    case c_oAscXAlign.Outside :
+                                    case c_oAscXAlign.Left    : FrameX = Page_Field_L; break;
+                                    case c_oAscXAlign.Right   : FrameX = Page_Field_R - FrameW; break;
+                                    case c_oAscXAlign.Center  : FrameX = (Page_Field_R + Page_Field_L - FrameW) / 2; break;
+                                }
+
+                                break;
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        switch ( FrameHAnchor )
+                        {
+                            case c_oAscHAnchor.Page   : FrameX = FramePr.X; break;
+                            case c_oAscHAnchor.Text   :
+                            case c_oAscHAnchor.Margin : FrameX = Page_Field_L + FramePr.X; break;
+                        }
+                    }
+
+                    if ( FrameW + FrameX > Page_W )
+                        FrameX = Page.Width - FrameW;
+
+                    if ( FrameX < 0 )
+                        FrameX = 0;
+
+                    // Рассчитаем положение по вертикали
+                    var FrameY = 0;
+                    if ( undefined != FramePr.YAlign )
+                    {
+                        var YAlign = FramePr.YAlign;
+
+                        switch ( FrameVAnchor )
+                        {
+                            case c_oAscVAnchor.Page   :
+                            {
+                                switch ( YAlign )
+                                {
+                                    case c_oAscYAlign.Inside  :
+                                    case c_oAscYAlign.Inline  :
+                                    case c_oAscYAlign.Outside :
+                                    case c_oAscYAlign.Top     : FrameY = 0; break;
+                                    case c_oAscYAlign.Bottom  : FrameY = Page_H - FrameH; break;
+                                    case c_oAscYAlign.Center  : FrameY = (Page_H - FrameH) / 2; break;
+                                }
+
+                                break;
+                            }
+                            case c_oAscVAnchor.Text   :
+                            {
+                                FrameY = Y;
+                                break;
+                            }
+                            case c_oAscVAnchor.Margin :
+                            {
+                                switch ( YAlign )
+                                {
+                                    case c_oAscYAlign.Inside  :
+                                    case c_oAscYAlign.Inline  :
+                                    case c_oAscYAlign.Outside :
+                                    case c_oAscYAlign.Top     : FrameY = Page_Field_T; break;
+                                    case c_oAscYAlign.Bottom  : FrameY = Page_Field_B - FrameH; break;
+                                    case c_oAscYAlign.Center  : FrameY = (Page_Field_B + Page_Field_T - FrameH) / 2; break;
+                                }
+
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var FramePrY = 0;
+                        if ( undefined != FramePr.Y )
+                            FramePrY = FramePr.Y;
+
+                        switch ( FrameVAnchor )
+                        {
+                            case c_oAscVAnchor.Page   : FrameY = FramePrY; break;
+                            case c_oAscVAnchor.Text   : FrameY = FramePrY + Y; break;
+                            case c_oAscVAnchor.Margin : FrameY = FramePrY + Page_Field_T; break;
+                        }
+                    }
+
+                    if ( FrameH + FrameY > Page_H )
+                        FrameY = Page_H - FrameH;
+
+                    // TODO: Пересмотреть, почему эти погрешности возникают
+                    // Избавляемся от погрешности
+                    FrameY += 0.001;
+                    FrameH -= 0.002;
+
+                    if ( FrameY < 0 )
+                        FrameY = 0;
+
+                    var FrameBounds = this.Content[Index].Get_FrameBounds(FrameX, FrameY, FrameW, FrameH);
+                    var FrameX2 = FrameBounds.X, FrameY2 = FrameBounds.Y, FrameW2 = FrameBounds.W, FrameH2 = FrameBounds.H;
+
+                    if ( (FrameY2 + FrameH2 > YLimit || Y > YLimit - 0.001 ) && Index != StartIndex )
+                    {
+                        this.RecalcInfo.Set_FrameRecalc(true);
+                        this.Content[Index].Start_FromNewPage();
+                        RecalcResult = recalcresult_NextPage;
+                    }
+                    else
+                    {
+                        this.RecalcInfo.Set_FrameRecalc(false);
+                        for ( var TempIndex = Index; TempIndex < Index + FlowCount; TempIndex++ )
+                        {
+                            var TempElement = this.Content[TempIndex];
+                            TempElement.Shift( TempElement.Pages.length - 1, FrameX, FrameY );
+                            TempElement.Set_CalculatedFrame( FrameX, FrameY, FrameW, FrameH, FrameX2, FrameY2, FrameW2, FrameH2, PageIndex );
+                        }
+
+                        var FrameDx = ( undefined === FramePr.HSpace ? 0 : FramePr.HSpace );
+                        var FrameDy = ( undefined === FramePr.VSpace ? 0 : FramePr.VSpace );
+
+                        this.DrawingObjects.addFloatTable( new CFlowParagraph( Element, FrameX2, FrameY2, FrameW2, FrameH2, FrameDx, FrameDy, Index, FlowCount ) );
+
+                        Index += FlowCount - 1;
+
+                        if ( FrameY >= Y )
+                            RecalcResult = recalcresult_NextElement;
+                        else
+                        {
+                            this.RecalcInfo.Set_FlowObject(Element, FlowCount, recalcresult_NextElement);
+                            RecalcResult = recalcresult_CurPage;
+                        }
+                    }
+                }
+                else if ( true === this.RecalcInfo.Check_FlowObject(Element) )
+                {
+                    Index += this.RecalcInfo.FlowObjectPage - 1;
+                    this.RecalcInfo.Reset();
+                    RecalcResult = recalcresult_NextElement;
+                }
+                else
+                {
+                    // Пропускаем
+                    RecalcResult = recalcresult_NextElement;
+                }
+            }
             else
             {
                 if ( ( 0 === Index && 0 === PageIndex ) || Index != StartIndex )
@@ -714,7 +996,7 @@ CDocumentContent.prototype =
 
             Element.TurnOn_RecalcEvent();
 
-            if ( true != bFlowTable )
+            if ( true != bFlow )
             {
                 var Bounds = Element.Get_PageBounds( PageIndex - Element.Get_StartPage_Relative() );
                 Y = Bounds.Bottom;

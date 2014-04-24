@@ -1060,6 +1060,7 @@ CGraphicObjects.prototype =
         else
         {
             var hdr_or_ftr = table.Table.Parent.Is_HdrFtr(true);
+            return;
             var hdr_ftr_controller_content = this.document.HdrFtr.Content[0];
             var headers, footers;
             headers = hdr_ftr_controller_content.Header;
