@@ -350,7 +350,7 @@ function CTextMeasurer()
         Width  = Temp.fAdvanceX * 25.4 / 72;
         Height = ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72);
 
-        return { Width : Width, Height : Height };
+        return { Width : Width, Height : Height, Ascent : (Temp.oBBox.fMaxY * 25.4 / 72) };
     }
     this.Measure2Code = function(lUnicode)
     {
