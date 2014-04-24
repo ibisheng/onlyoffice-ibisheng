@@ -889,7 +889,7 @@ function CFontFile(fileName, faceIndex)
             this.UpdateMatrix1();
         }
 
-        var pCurGlyph = pString.m_pGlyphsBuffer[0]
+        var pCurGlyph = pString.m_pGlyphsBuffer[0];
         var ushUnicode = pCurGlyph.lUnicode;
 
         var unGID = 0;
@@ -1227,7 +1227,7 @@ function CFontFile(fileName, faceIndex)
 		return nCharIndex;
 	}
 
-    this.GetChar = function(lUnicode)
+    this.GetChar = function(lUnicode, is_raster_distances)
     {
         var pFace = this.m_pFace;
         var pCurentGliph = pFace.glyph;
@@ -1336,6 +1336,14 @@ function CFontFile(fileName, faceIndex)
 
             oSizes.bBitmap = false;
             oSizes.oBitmap = null;
+
+            if (is_raster_distances === true)
+            {
+                if (0 == FT_Render_Glyph(pCurentGliph, REND_MODE))
+                {
+                    oSizes.oBBox.rasterDistances = get_raster_bounds(raster_memory.m_oBuffer.data, pCurentGliph.bitmap.width, pCurentGliph.bitmap.rows, raster_memory.pitch);
+                }
+            }
 
             this.m_arrCacheSizes[oSizes.ushUnicode] = oSizes;
             Result = oSizes;

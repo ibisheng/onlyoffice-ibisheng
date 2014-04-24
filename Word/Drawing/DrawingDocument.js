@@ -314,14 +314,29 @@ function CTextMeasurer()
     {
         var Width  = 0;
 
-        var Temp = this.m_oManager.MeasureChar( text.charCodeAt(0) );
+        var Temp = this.m_oManager.MeasureChar( text.charCodeAt(0), true );
 
         Width  = Temp.fAdvanceX * 25.4 / 72;
 
-        return { Width : Width, Ascent : (Temp.oBBox.fMaxY * 25.4 / 72), Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
-            WidthG: ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72),
-            rasterOffsetX: Temp.oBBox.fMinX * 25.4 / 72,
-            rasterOffsetY: Temp.oBBox.fMinY * 25.4 / 72
+        if (Temp.oBBox.rasterDistances == null)
+        {
+            return {
+                Width  : Width,
+                Ascent : (Temp.oBBox.fMaxY * 25.4 / 72),
+                Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
+                WidthG : ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72),
+                rasterOffsetX: 0,
+                rasterOffsetY: 0
+            };
+        }
+
+        return {
+            Width  : Width,
+            Ascent : (Temp.oBBox.fMaxY * 25.4 / 72),
+            Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
+            WidthG : ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72),
+            rasterOffsetX: Temp.oBBox.rasterDistances.dist_l * 25.4 / 72,
+            rasterOffsetY: Temp.oBBox.rasterDistances.dist_t * 25.4 / 72
         };
     }
 
@@ -333,7 +348,7 @@ function CTextMeasurer()
         var Temp = this.m_oManager.MeasureChar( lUnicode );
 
         Width  = Temp.fAdvanceX * 25.4 / 72;
-        Height = 0;//Temp.fHeight;
+        Height = ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72);
 
         return { Width : Width, Height : Height };
     }
@@ -341,14 +356,29 @@ function CTextMeasurer()
     {
         var Width  = 0;
 
-        var Temp = this.m_oManager.MeasureChar( lUnicode );
+        var Temp = this.m_oManager.MeasureChar( lUnicode, true );
 
         Width  = Temp.fAdvanceX * 25.4 / 72;
 
-        return { Width : Width, Ascent : (Temp.oBBox.fMaxY * 25.4 / 72), Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
-            WidthG: ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72),
-            rasterOffsetX: Temp.oBBox.fMinX * 25.4 / 72,
-            rasterOffsetY: Temp.oBBox.fMinY * 25.4 / 72
+        if (Temp.oBBox.rasterDistances == null)
+        {
+            return {
+                Width  : Width,
+                Ascent : (Temp.oBBox.fMaxY * 25.4 / 72),
+                Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
+                WidthG : ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72),
+                rasterOffsetX: 0,
+                rasterOffsetY: 0
+            };
+        }
+
+        return {
+            Width  : Width,
+            Ascent : (Temp.oBBox.fMaxY * 25.4 / 72),
+            Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
+            WidthG : ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72),
+            rasterOffsetX: Temp.oBBox.rasterDistances.dist_l * 25.4 / 72,
+            rasterOffsetY: Temp.oBBox.rasterDistances.dist_t * 25.4 / 72
         };
     }
 

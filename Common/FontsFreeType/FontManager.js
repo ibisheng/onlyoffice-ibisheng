@@ -1,5 +1,105 @@
 ﻿var g_bIsAppleDevices = AscBrowser.isAppleDevices;
 
+function get_raster_bounds(data, width, height, stride)
+{
+    var ret = { dist_l : 0, dist_t : 0, dist_r : 0, dist_b : 0 };
+
+    // left
+    var bIsBreak = false;
+    for (var i = 0; i < width; i++)
+    {
+        var _ind = i * 4 + 3;
+        for (var j = 0; j < height; j++, _ind += stride)
+        {
+            if (data[_ind] != 0)
+            {
+                bIsBreak = true;
+                break;
+            }
+        }
+        if (bIsBreak)
+            break;
+
+        ret.dist_l++;
+    }
+
+    // right
+    bIsBreak = false;
+    for (var i = width - 1; i >= 0; i--)
+    {
+        var _ind = i * 4 + 3;
+        for (var j = 0; j < height; j++, _ind += stride)
+        {
+            if (data[_ind] != 0)
+            {
+                bIsBreak = true;
+                break;
+            }
+        }
+        if (bIsBreak)
+            break;
+
+        ret.dist_r++;
+    }
+
+    // top
+    var bIsBreak = false;
+    for (var j = 0; j < height; j++)
+    {
+        var _ind = j * stride + 3;
+        for (var i = 0; i < width; i++, _ind += 4)
+        {
+            if (data[_ind] != 0)
+            {
+                bIsBreak = true;
+                break;
+            }
+        }
+        if (bIsBreak)
+            break;
+
+        ret.dist_t++;
+    }
+
+    // bottom
+    var bIsBreak = false;
+    for (var j = height - 1; j >= 0; j--)
+    {
+        var _ind = j * stride + 3;
+        for (var i = 0; i < width; i++, _ind += 4)
+        {
+            if (data[_ind] != 0)
+            {
+                bIsBreak = true;
+                break;
+            }
+        }
+        if (bIsBreak)
+            break;
+
+        ret.dist_b++;
+    }
+
+    // clear
+    if (null != raster_memory.m_oBuffer)
+    {
+        var nIndexDst = 3;
+        var nPitch = 4 * (raster_memory.width - width);
+        var dst = raster_memory.m_oBuffer.data;
+        for (var j = 0; j < height; j++)
+        {
+            for (var i = 0; i < width; i++)
+            {
+                dst[nIndexDst] = 0;
+                nIndexDst += 4;
+            }
+            nIndexDst += nPitch;
+        }
+    }
+
+    return ret;
+}
+
 function CGlyphData()
 {
     this.m_oCanvas  = null;
@@ -794,10 +894,12 @@ function TGlyph()
 
 function TBBox()
 {
-	this.fMinX;
-	this.fMaxX;
-	this.fMinY;
-	this.fMaxY;
+	this.fMinX = 0;
+	this.fMaxX = 0;
+	this.fMinY = 0;
+	this.fMaxY = 0;
+
+    this.rasterDistances = null;
 }
 
 function TFontCacheSizes()
@@ -1357,12 +1459,12 @@ function CFontManager()
         return this.m_pFont.GetChar2(lUnicode);
     }
 
-    this.MeasureChar = function(lUnicode)
+    this.MeasureChar = function(lUnicode, is_raster_distances)
     {
         if (!this.m_pFont)
             return;
 
-        return this.m_pFont.GetChar(lUnicode);
+        return this.m_pFont.GetChar(lUnicode, is_raster_distances);
     }
 
     this.GetKerning = function(unPrevGID, unGID)
