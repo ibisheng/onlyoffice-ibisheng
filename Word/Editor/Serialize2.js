@@ -2105,8 +2105,8 @@ function Binary_oMathWriter(memory, oMathPara)
 	this.WriteCGpRule = function(CGpRule)
 	{
 		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
-		this.memory.WriteByte(c_oSerPropLenType.Byte);
-		this.memory.WriteByte(CGpRule);
+		this.memory.WriteByte(c_oSerPropLenType.Long);
+		this.memory.WriteLong(CGpRule);
 	}
 	this.WriteChr = function(Chr)
 	{
@@ -2753,8 +2753,8 @@ function Binary_oMathWriter(memory, oMathPara)
 	this.WriteRSpRule = function(RSpRule)
 	{
 		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
-		this.memory.WriteByte(c_oSerPropLenType.Byte);
-		this.memory.WriteByte(RSpRule);
+		this.memory.WriteByte(c_oSerPropLenType.Long);
+		this.memory.WriteLong(RSpRule);
 	}
 	this.WriteScr = function(Scr)
 	{
@@ -8999,19 +8999,10 @@ function Binary_oMathReader(stream)
 	this.ReadMathCGpRule = function(type, length, props)
     {
         var res = c_oSerConstants.ReadOk;
-        var oThis = this;
-		if (c_oSer_OMathBottomNodesValType.Val === type)
-        {
-			var cGpRule = this.stream.GetUChar(length);
-			switch (cGpRule)
-			{
-				case 0:	props.cGpRule = "centered"; break;
-				case 1:	props.cGpRule = "match"; break;
-				default: props.cGpRule = "centered";
-			}
-        }
-		else
-            res = c_oSerConstants.ReadUnknown;
+		
+        if(c_oSer_OMathBottomNodesValType.Val == type)
+            props.cGpRule = this.stream.GetULongLE();
+			
         return res;
     };
 	this.ReadMathCSp = function(type, length, props)
@@ -10934,19 +10925,10 @@ function Binary_oMathReader(stream)
 	this.ReadMathRSpRule = function(type, length, props)
     {
         var res = c_oSerConstants.ReadOk;
-        var oThis = this;
-		if (c_oSer_OMathBottomNodesValType.Val === type)
-        {
-			var rSpRule = this.stream.GetUChar(length);
-			switch (rSpRule)
-			{
-				case 0:	props.rSpRule = "centered"; break;
-				case 1:	props.rSpRule = "match"; break;
-				default: props.rSpRule = "centered";
-			}
-        }
-		else
-            res = c_oSerConstants.ReadUnknown;
+		
+        if(c_oSer_OMathBottomNodesValType.Val == type)
+            props.rSpRule = this.stream.GetULongLE();
+			
         return res;
     };
 	this.ReadMathScr = function(type, length, props)
@@ -10958,13 +10940,13 @@ function Binary_oMathReader(stream)
 			var scr = this.stream.GetUChar(length);
 			switch (scr)
 			{
-				case 0:	props.scr = "double-struck"; break;
-				case 1:	props.scr = "fraktur"; break;
-				case 2:	props.scr = "monospace"; break;
-				case 3:	props.scr = "roman"; break;
-				case 4:	props.scr = "sans-serif"; break;
-				case 5:	props.scr = "script"; break;
-				default: props.scr = "roman";
+				case 0:	props.scr = TXT_DOUBLE_STRUCK; break;
+				case 1:	props.scr = TXT_FRAKTUR; break;
+				case 2:	props.scr = TXT_MONOSPACE; break;
+				case 3:	props.scr = TXT_ROMAN; break;
+				case 4:	props.scr = TXT_SANS_SERIF; break;
+				case 5:	props.scr = TXT_SCRIPT; break;
+				default: props.scr = TXT_ROMAN;
 			}
         }
 		else
