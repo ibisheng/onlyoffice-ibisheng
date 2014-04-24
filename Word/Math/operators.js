@@ -3874,11 +3874,8 @@ CCharacter.prototype.setPosition = function(pos)
 {
     this.pos = {x: pos.x, y: pos.y - this.size.ascent};
 
-    //var alignOp  =  this.align(this.operator),
-    //    alignCnt = this.align(this.elements[0][0]);
-
-    var alignOp = 0,
-        alignCnt = 0;
+    var alignOp  =  this.align(this.operator),
+        alignCnt = this.align(this.elements[0][0]);
 
     if(this.loc === LOCATION_TOP)
     {
