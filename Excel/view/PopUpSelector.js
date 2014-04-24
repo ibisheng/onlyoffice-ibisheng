@@ -150,7 +150,7 @@
 			var elem;
 			while(elem = this.selectorListEl.pop())
 				this.selectorList.removeChild(elem);
-			
+
 			this.selectElement = null;
 			this.firstElement = null;
 			this.isFormula = false;

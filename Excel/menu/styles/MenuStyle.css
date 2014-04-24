@@ -919,6 +919,7 @@ input, textarea {outline:none;}
 
 .ToolbarShapeUnGroup { background: url("../img/ungroup.png") no-repeat scroll 0 0 transparent; }
 
+/* scroll */
 .ps-container .ps-scrollbar-x-rail {
     position: absolute;
     bottom: 3px;
@@ -1015,6 +1016,10 @@ input, textarea {outline:none;}
 .combobox li.selected a {
     color: #ffffff;
 }
+.combobox li:hover {
+    background-color: #cbced1;
+}
+
 .dropdown-menu li > a {
     padding: 5px 20px;
     cursor: pointer;
