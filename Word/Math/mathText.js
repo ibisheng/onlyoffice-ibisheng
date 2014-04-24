@@ -242,6 +242,9 @@ CMathText.prototype =
 
         var letter = this.getCode();
 
+
+        var metricsTxt;
+
         if(this.bJDraw)
             metricsTxt = oMeasure.Measure2Code(letter);
         else
