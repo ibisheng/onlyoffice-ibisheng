@@ -1231,7 +1231,7 @@ CSectionPr.prototype =
         // Variable : PageNumType
 
         this.Id = Reader.GetString2();
-        this.LogicDocument = g_oTable.Id.Get_ById( Reader.GetString2() );
+        this.LogicDocument = g_oTableId.Get_ById( Reader.GetString2() );
         this.PageSize.Read_FromBinary( Reader );
         this.PageMargins.Read_FromBinary( Reader );
         this.Type = Reader.GetByte();
