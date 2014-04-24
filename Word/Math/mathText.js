@@ -257,6 +257,9 @@ CMathText.prototype =
         var descent = (metricsTxt.Height - metricsTxt.Ascent);
         var height  =  ascent + descent;
 
+        if(this.bJDraw)
+            console.log("Ascent of " + this.value + "  " + ascent);
+
         var width;
 
         if(this.bJDraw)
@@ -315,7 +318,7 @@ CMathText.prototype =
         {
             var x = pos.x - this.rasterOffsetX,
                 y = pos.y - this.rasterOffsetY + this.size.ascent;
-            
+
             this.pos = {x: x, y: y};
         }
     },

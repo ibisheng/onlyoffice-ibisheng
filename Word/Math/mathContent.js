@@ -1,20 +1,3 @@
-//поправить центр у N-арных операторов
-/*
-     FRACTION
-     MATH_FUNCTION
-     NARY
-     BOX (доделать Spacing)
-     DEGREE
-     DEGREE_SubSup
-     RADICAL
-     LIMIT
- */
-
-//Bugs
-
-// При добавлении в начало контента элемента , он вставляется с размером шрифта 11, посмотреть getCurrRunPrp
-// При удаление из начала контента элемента, у всех остальных автоматом 11 размер шрифта
-
 /// TODO
 
 //  1.  Пересмотреть схему для findDisposition(base.js), т.к. если нажали за границами элемента, то происходит селект, т.к. теперь на mouseDown и mouseDown одни и те же функции
@@ -49,9 +32,6 @@
 var historyitem_Math_AddItem                   =  1; // Добавляем элемент
 var historyitem_Math_RemoveItem                =  2; // Удаляем элемент
 
-var TEST = true;
-var SELECT_PARENT = 0;
-var SELECT_CHILD  = 1;
 
 
 
@@ -693,6 +673,46 @@ CMPrp.prototype =
 
         return props;
     },
+    setMathProps: function(props)
+    {
+        this.SetBProp(this.aln, props.aln);
+        this.SetBProp(this.brk, props.brk);
+        this.SetBProp(this.lit, props.lit);
+
+
+        // если приходит несколько параметров style из xml, то запоминается последний
+        if(props.sty === "i")
+            this.italic = true;
+        else if(props.sty === "bi")
+        {
+            this.italic = true;
+            this.bold = true;
+        }
+        else if(props.sty === "b")
+        {
+            this.italic = false;
+            this.bold = true;
+        }
+        else if(props.sty === "p")
+        {
+            // plain text ?!    // default
+            this.plain = true;  // italic = true
+                                // bold   = false
+        }
+
+        // TXT_DOUBLE_STRUCK        U+1D538 - U+1D56B
+        // TXT_MONOSPACE            U+1D670 - U+1D6A3
+        // TXT_FRAKTUR              U+1D504 - U+1D537
+        // TXT_SANS_SERIF           U+1D608 - U+1D63B
+        // TXT_SCRIPT               U+1D49C - U+1D4CF
+
+        props.scr = this.typeText;
+
+
+        if(props.nor)
+            this.typeText = TXT_NORMAL;
+
+    },
     getPropsForWrite: function()
     {
         var props = {};
@@ -727,61 +747,9 @@ CMPrp.prototype =
         if(this.lit)
             props.lit = 1;
 
-
-        if(this.typeText === TXT_DOUBLE_STRUCK)
-            props.scr = "double-struck";
-        else if(this.typeText === TXT_MONOSPACE)
-            props.scr = "monospace";
-        else if(this.typeText === TXT_FRAKTUR)
-            props.scr = "fraktur";
-        else if(this.typeText === TXT_SANS_SERIF)
-            props.scr = "sans-serif";
-        else if(this.typeText === TXT_SCRIPT)
-            props.scr = "script";
+        props.scr = this.typeText;
 
         return props;
-    },
-    setMathProps: function(props)
-    {
-        this.SetBProp(this.aln, props.aln);
-        this.SetBProp(this.brk, props.brk);
-        this.SetBProp(this.lit, props.lit);
-
-
-        // если приходит несколько параметров style из xml, то запоминается последний
-        if(props.sty === "i")
-            this.italic = true;
-        else if(props.sty === "bi")
-        {
-            this.italic = true;
-            this.bold = true;
-        }
-        else if(props.sty === "b")
-        {
-            this.italic = false;
-            this.bold = true;
-        }
-        else if(props.sty === "p")
-        {
-            // plain text ?!    // default
-            this.plain = true;  // italic = true
-                                // bold   = false
-        }
-
-        if(props.scr === "double-struck")    // U+1D538 - U+1D56B
-            this.typeText = TXT_DOUBLE_STRUCK;
-        else if(props.scr === "monospace")   // U+1D670 - U+1D6A3
-            this.typeText = TXT_MONOSPACE;
-        else if(props.scr === "fraktur")     // U+1D504 - U+1D537
-            this.typeText = TXT_FRAKTUR;
-        else if(props.scr === "sans-serif")  // U+1D608 - U+1D63B
-            this.typeText = TXT_SANS_SERIF;
-        else if(props.scr === "script")      // U+1D49C - U+1D4CF
-            this.typeText = TXT_SCRIPT;
-
-        if(props.nor)
-            this.typeText = TXT_NORMAL;
-
     },
     getTypeText: function()
     {
@@ -1080,129 +1048,6 @@ CMathContent.prototype =
 
         return [item];
     },
-    _addMComponent: function(ind)
-    {
-        //var l_gap =  0, r_gap = 0;
-        var mathElem = null;    //положение этого элемента будет this.CurPos + 1
-
-        switch(ind)
-        {
-            case MATH_FRACTION:
-                mathElem = new CFraction();
-                break;
-            case MATH_DEGREE:
-                mathElem = new CDegree();
-                break;
-            case MATH_DEGREESubSup:
-                mathElem = new CDegreeSubSup();
-                break;
-            case MATH_RADICAL:
-                mathElem = new CRadical();
-                break;
-            case MATH_NARY:
-                mathElem = new CNary();
-                break;
-            case MATH_DELIMITER:
-                mathElem = new CDelimiter();
-                break;
-            case MATH_GROUP_CHARACTER:
-                mathElem = new CGroupCharacter();
-                break;
-            case MATH_FUNCTION:
-                mathElem = new CMathFunc();
-                break;
-            case MATH_ACCENT:
-                mathElem = new CAccent();
-                break;
-            case MATH_BORDER_BOX:
-                mathElem = new CBorderBox();
-                break;
-            case MATH_LIMIT:
-                mathElem = new CLimit();
-                break;
-            case MATH_MATRIX:
-                mathElem = new CMathMatrix();
-                break;
-            case MATH_BOX:
-                mathElem = new CBox();
-                break;
-            case MATH_EQ_ARRAY:
-                mathElem = new CEqArray();
-                break;
-            case MATH_BAR:
-                mathElem = new CBar();
-                break;
-
-        }
-
-        if( mathElem !== null )
-        {
-
-            //l_gap = r_gap = Math.floor( this.font.FontSize / 5 )*g_dKoef_pix_to_mm;
-
-            mathElem.relate(this);
-            //mathElem.setComposition(this.Composition);
-
-            var runPrp = new CMathRunPrp();
-
-            if(this.CurPos > 0) // т.к. всегда добавляем только в текущий контент, то если контент не пуст, в начале стоят либо runPrp, либо другой MathObj
-            {
-                runPrp = this.getRunPrp(this.CurPos);
-            }
-            else if(!this.bRoot && this.content.length == 1) // нет RunPrp, добавляем мат. объект
-            {
-                runPrp = this.Parent.getRunPrp();
-            }
-            else if(this.bRoot && this.content.length == 1)
-            {
-                runPrp.Merge( this.Composition.GetDefaultRunPrp() );
-            }
-            else //на всякий случай
-            {
-                runPrp.Merge( this.Composition.GetDefaultRunPrp() );
-            }
-
-            mathElem.setRPrp(runPrp);
-            //mathElem.setCtrPrp(ctrPrp);
-
-            var shift;
-            if(this.content[this.CurPos].value.typeObj === MATH_RUN_PRP)
-                shift = -1;
-            else
-                shift = 0;
-
-            this.addToContent(mathElem, shift);
-
-            var empty = new CEmpty();
-            this.addToContent(empty, shift);
-
-            this.verifyRPrp_MC(runPrp);
-
-        }
-
-        return mathElem; // for finished equation
-    },
-    old_addElementToContent: function(obj)   //for "read"
-    {
-        var element = new mathElem(obj);
-        //obj.relate(this);
-        obj.Parent = this;
-
-        if(obj.typeObj === MATH_COMP)
-            obj.setComposition(this.Composition);
-
-        this.content.push(element);
-        this.CurPos++;
-
-        if(obj.typeObj === MATH_COMP)
-            this.addElementToContent( new CEmpty() );
-
-        this.setLogicalPosition(this.CurPos);
-
-        if(obj.typeObj == MATH_COMP)
-            obj.setArgSize(this.argSize);
-
-    },
     addElementToContent: function(obj)   //for "read"
     {
         obj.Parent = this;
@@ -1213,54 +1058,14 @@ CMathContent.prototype =
             obj.setArgSize(this.argSize);
 
             this.content.push(obj);
-
-            /*if(this.content.length == 0)
-            {
-                this.content.push(new ParaRun(this.Composition.Parent.Paragraph, true));
-                //this.CurPos++;
-            }
-            this.content.push(new ParaRun(this.Composition.Parent.Paragraph, true));*/
-
-
-            //this.CurPos += 2;
-
         }
         else
         {
             this.content.push(obj);
-            //this.CurPos++;
         }
 
         this.CurPos = this.content.length-1;
 
-        this.setLogicalPosition(this.CurPos);
-    },
-    addToContent: function(obj, shift)   // for "edit", letters
-    {
-        var elem = new mathElem(obj);
-
-        if(obj.typeObj === MATH_COMP)
-            obj.setComposition(this.Composition);
-
-        var bDef = typeof(shift) !== "undefined" && shift !== null;
-        var bNum = shift === shift - 0;
-        var bCont = bNum ? ( this.CurPos + shift >= 0 && this.CurPos + shift < this.content.length) : false;
-
-        if(!(bDef || bNum || bCont))
-            shift = 0;
-
-        var tmp = this.content.splice(0, this.CurPos + 1 + shift );
-        tmp.push(elem);
-        tmp = tmp.concat( this.content.splice(0, this.content.length) );
-
-        this.content.length = 0;
-        this.content = tmp;
-
-        this.CurPos++;
-        this.setLogicalPosition(this.CurPos);
-
-        //this.setStart_Selection(this.CurPos);
-        //this.selection.active = false;
     },
     addToContent_2: function(oSub)   // for "menu"
     {
@@ -5198,45 +5003,6 @@ CMathContent.prototype =
 
     //////////////////////////////////////
 
-    // не вызываем из mouseDown эту ф-ию, тк иначе не установим селект для внутреннего объекта (setStart_Selection)
-    afterDisplacement: function(coord) //аналог mouseDown для goToUpperLevel и goToLowerLever
-    {
-        var content = null;
-
-        this.CurPos = this.findPosition( coord );
-
-        if( this.content[this.CurPos].value.typeObj === MATH_COMP )
-        {
-            var _coord = this.getCoordElem(this.CurPos, msCoord);
-            content = this.content[this.CurPos].value.afterDisplacement(_coord);
-        }
-        else
-            content = this;
-
-        return content;
-    },
-    old_recalculateSize: function()
-    {
-        var width      =   0 ;
-        var ascent     =   0 ;
-        var descent    =   0 ;
-
-        for(var i = 0; i < this.content.length; i++)
-        {
-            var oSize = this.content[i].value.size;
-            var gps = this.content[i].gaps;
-
-            width += oSize.width + gps.left + gps.right;
-
-            ascent = ascent > oSize.ascent ? ascent : oSize.ascent;
-            var oDescent = oSize.height - oSize.ascent;
-            descent =  descent < oDescent ? oDescent : descent;
-        }
-
-        this.size = {width: width, height: ascent + descent, ascent: ascent};
-
-        this.update_widthContent(); /// !!!!
-    },
     recalculateSize: function()
     {
         var width      =   0 ;
@@ -5261,102 +5027,6 @@ CMathContent.prototype =
         }
 
         this.size = {width: width, height: ascent + descent, ascent: ascent};
-    },
-    old_Resize: function(oMeasure)      // пересчитываем всю формулу
-    {
-        // default для случая с плейсхолдером, RunPrp в контенте отсутствуют
-        var TxtSettings =
-        {
-            type:   TXT_ROMAN,
-            lit:    false
-        };
-
-        var RecalcInfo = new CRecalculateInfo(this.argSize, oMeasure);
-
-        if(this.content.length > 1)
-        {
-            if(this.IsEmptyRun(0))
-            {
-                RecalcInfo.Current = this.content[1];
-
-                if(this.IsEmptyRun(2))
-                    RecalcInfo.Right = this.content[2];
-            }
-            else
-                RecalcInfo.Current = this.content[0]; // right не прописываем
-        }
-
-        for(var i = 0; i < this.content.length; i++)
-        {
-
-            if(RecalcInfo.Current.typeObj == MATH_TEXT)
-            {
-                this.content[i].setMText(TxtSettings.type);
-                this.content[i].Resize(oMeasure);
-
-                if(TxtSettings.type !== TXT_NORMAL && TxtSettings.lit === false)
-                    this.checkGapsSign(oMeasure, i);
-            }
-            else if(RecalcInfo.Current.typeObj == MATH_COMP)
-            {
-                RecalcInfo.Current.Resize(oMeasure);
-
-                RecalcInfo.checkGapsSign(oMeasure);
-            }
-            else if(RecalcInfo.Current.typeObj == MATH_RUN_PRP)
-            {
-                var mergedWPrp = obj.getMergedWPrp();
-                var oWPrp = new CTextPr();
-                oWPrp.Merge(mergedWPrp);
-
-                this.applyArgSize(oWPrp); // здесь мержим с DEFAULT_RUN_PRP
-
-                TxtSettings = obj.getTxtSettings();
-
-                /*if(typeTxt == TXT_ROMAN) // MATH TEXT, наклон не меняем, если italic
-                 oWPrp.Italic = false;*/
-
-
-                oMeasure.SetFont(oWPrp);
-            }
-            else if(RecalcInfo.Current.typeObj == MATH_PLACEHOLDER)
-            {
-                if(!this.bRoot)
-                {
-                    var oWPrp = this.Parent.getCtrPrp();
-
-                    /*var txtPrp = new CMathTextPrp();
-                     txtPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
-                     txtPrp.Merge(ctrPrp);*/
-
-                    this.applyArgSize(oWPrp);
-                    oWPrp.Italic = false;
-
-                    oMeasure.SetFont(oWPrp);
-
-                    this.content[i].Resize(oMeasure);
-                }
-            }
-            else if(RecalcInfo.Current.typeObj == MATH_PARA_RUN)
-            {
-                RecalcInfo.Current.Math_Recalculate(RecalcInfo);
-            }
-
-            RecalcInfo.Left = RecalcInfo.Сurrent;
-            RecalcInfo.Сurrent = RecalcInfo.Right;
-
-            if( i+1 == this.content.length )
-                RecalcInfo.Right = null;
-            else if(this.IsEmptyRun(i+1))
-            {
-                if(i + 2 == this.content.length)
-                    RecalcInfo.Right = null;
-                else
-                    RacalcInfo.Right = this.content[i+2];
-            }
-        }
-
-        this.recalculateSize();
     },
     Resize: function(oMeasure)      // пересчитываем всю формулу
     {
@@ -5536,62 +5206,6 @@ CMathContent.prototype =
         }
 
     },
-    update_widthContent: function()
-    {
-        for(var i = 1; i <this.content.length; i++)
-        {
-            this.content[i].widthToEl = this.content[i-1].widthToEl + this.content[i].value.size.width + this.content[i].GapLeft + this.content[i].GapRight;
-        }
-    },
-    _old_update_Cursor: function()
-    {
-        //var sizeCursor = this.getRunPrp(this.CurPos).FontSize*g_dKoef_pt_to_mm;
-
-        /*var rPrp = new CMathTextPrp();
-        rPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
-        rPrp.Merge(this.getCurrRunPrp());*/
-
-        var runPrp = this.getRunPrp(this.CurPos);
-        var oWPrp = runPrp.getMergedWPrp();
-        this.applyArgSize(oWPrp);
-
-        var absPos = this.Composition.absPos;
-
-        var sizeCursor = oWPrp.FontSize*g_dKoef_pt_to_mm;
-        var position = {x: this.pos.x + absPos.x + this.content[this.CurPos].widthToEl, y: this.pos.y + absPos.y + this.size.ascent - sizeCursor*0.8 };
-
-        editor.WordControl.m_oLogicDocument.DrawingDocument.SetTargetSize( sizeCursor );
-        editor.WordControl.m_oDrawingDocument.UpdateTargetFromPaint = true;
-        editor.WordControl.m_oLogicDocument.DrawingDocument.UpdateTarget( position.x, position.y, 0 );
-        editor.WordControl.m_oDrawingDocument.UpdateTargetFromPaint = false;
-
-    },
-    old_update_Cursor: function(CurPage, UpdateTarget)
-    {
-        var runPrp = this.getRunPrp(this.CurPos);
-        var oWPrp = runPrp.getMergedWPrp();
-        this.applyArgSize(oWPrp);
-
-        var absPos = this.Composition.absPos;
-
-        var sizeCursor = oWPrp.FontSize*g_dKoef_pt_to_mm;
-
-        var X = this.pos.x + absPos.x + this.content[this.CurPos].widthToEl,
-            Y = this.pos.y + absPos.y + this.size.ascent - sizeCursor*0.8;
-
-        var Para = this.Composition.Parent.Paragraph;
-        if ( null !== Para && undefined !== Para && UpdateTarget == true)
-        {
-            Para.DrawingDocument.SetTargetSize( sizeCursor );
-            //Para.DrawingDocument.UpdateTargetFromPaint = true;
-            Para.DrawingDocument.UpdateTarget( X, Y, Para.Get_StartPage_Absolute() + CurPage );
-            //console.log("CurPos: " + this.CurPos);
-            //console.log("x " + X + " Y " + Y);
-            //Para.DrawingDocument.UpdateTargetFromPaint = false;
-        }
-
-        return {X: X, Y: Y, Height: sizeCursor};
-    },
     update_Cursor: function(CurPage, UpdateTarget)
     {
         var result;
@@ -5649,19 +5263,6 @@ CMathContent.prototype =
             else if(X >= W - this.content[pos].GapRight)
                 pos++;
         }
-
-        return pos;
-    },
-    verifyCurPos: function(pos)  // проверка на RunPrp, смещенная позиция
-    {
-        var currType  = this.content[pos].value.typeObj,
-            prevType = pos > 0 ? this.content[pos-1].value.typeObj : null,
-            nextType = pos < this.content.length -1 ? this.content[pos+1].value.typeObj : null;
-
-        if(currType == MATH_RUN_PRP && prevType == MATH_TEXT)
-            pos--;
-        else if(currType == MATH_EMPTY && nextType == MATH_RUN_PRP)
-            pos++;
 
         return pos;
     },
@@ -5859,202 +5460,6 @@ CMathContent.prototype =
 
         return {bDelete: bDelete, bAddRPrp: bAddRPrp, items: items};
     },
-    old_remove_internal: function(order)
-    {
-        var bDelete = false;
-        var bSelect = this.selection.startPos !== this.selection.endPos;
-        var currType = this.content[this.CurPos].value.typeObj,
-            prevType = this.CurPos > 1 ? this.content[this.CurPos - 1].value.typeObj : null,
-            prev2_Type = this.CurPos > 2 ? this.content[this.CurPos - 2].value.typeObj : null,
-            prev3_Type = this.CurPos > 3 ? this.content[this.CurPos - 3].value.typeObj : null,
-            nextType = this.CurPos + 1 < this.content.length ? this.content[this.CurPos + 1].value.typeObj : null,
-            next2_Type = this.CurPos + 2 < this.content.length ? this.content[this.CurPos + 2].value.typeObj : null,
-            next3_Type = this.CurPos + 3 < this.content.length ? this.content[this.CurPos + 3].value.typeObj : null;
-
-        var bDirectlyBegin = this.CurPos == 0 || (currType == MATH_EMPTY && this.CurPos == 1) && bMEDirect,
-            bReverseEnd = this.CurPos == this.content.length - 1 && bMEReverse;
-
-        var bNotRemove = bDirectlyBegin || bReverseEnd;
-
-        // directly
-
-        var bMEDirect = order == 1,
-            bMEReverse = order == -1;
-
-        var bDirectly_CurrComp = currType == MATH_EMPTY && prevType == MATH_COMP,
-            bDirectly_RPrpComp = currType == MATH_RUN_PRP && prevType == MATH_EMPTY && prev2_Type == MATH_COMP;
-
-        bDirectly_CurrComp = bDirectly_CurrComp && bMEDirect;
-        bDirectly_RPrpComp = bDirectly_RPrpComp && bMEDirect;
-
-        // reverse
-
-        var bReverseComp = nextType == MATH_COMP && next2_Type == MATH_EMPTY,
-            bAfterRPrp   = next3_Type == MATH_RUN_PRP;
-
-        bReverseComp = bReverseComp && bMEReverse;
-
-        var bSet_Select = (bDirectly_CurrComp|| bDirectly_RPrpComp || bReverseComp) && !bSelect;
-
-
-        // NB !
-        // учесть случаи :
-        // 1. если нажата delete и справа стоят RunPrp
-        // 2. если все текстовые элементы удалили из Run, нужно удалить RunPrp (delete и backspace)
-
-
-        if(bSet_Select)
-        {
-            var start, end;
-
-            if(bDirectly_CurrComp) // directly, only composition
-            {
-                start = this.CurPos;
-                end = this.CurPos - 2;
-            }
-            else if(bReverseComp && !bAfterRPrp) // reverse, only composition
-            {
-                start = this.CurPos;
-                end = this.CurPos + 2;
-            }
-            else // composition + RunPrp(after)
-            {
-                var bSelectRunPrp = false;
-
-                var bDirectlySearch = prev3_Type === MATH_TEXT && bDirectly_RPrpComp, // перед мат. объектом текст, а после RunPrp
-                    bReverseSeach = currType === MATH_TEXT && bMEReverse && bAfterRPrp;
-
-                if(bDirectlySearch || bReverseSeach)
-                {
-                    var shift;
-                    if(bMEDirect)
-                        shift = 3;
-                    else
-                        shift = 0;
-
-                    for(var i = this.CurPos - shift; i > 0; i--)
-                    {
-                        if(this.content[i].value.typeObj === MATH_RUN_PRP)
-                        {
-                            currRPrp = this.content[this.CurPos + shift].value;
-                            prevRPrp = this.content[i].value;
-                            bSelectRunPrp = currRPrp.isEqual(currRPrp, prevRPrp);
-                            break;
-                        }
-                    }
-                }
-
-                if(bMEDirect)
-                {
-                    if(bSelectRunPrp)
-                    {
-                        start = this.CurPos;
-                        end = this.CurPos - 3;
-                    }
-                    else
-                    {
-                        start = this.CurPos - 1;
-                        end = this.CurPos - 3;
-                    }
-                }
-                else
-                {
-                    if(bSelectRunPrp)
-                    {
-                        start = this.CurPos - 1;
-                        end = this.CurPos + 2;
-                    }
-                    else
-                    {
-                        start = this.CurPos - 1;
-                        end = this.CurPos + 1;
-                    }
-                }
-
-            }
-
-            this.setStart_Selection(start);
-            this.setEnd_Selection(end);
-            this.selection.active = false;
-
-        }
-        else if(!bNotRemove)
-        {
-            var start, end;
-
-            var bDirRPrp = currType === MATH_RUN_PRP && bMEDirect,
-                bRevRPrp = nextType === MATH_RUN_PRP && bMEReverse;
-
-            if(bDirRPrp) // проверку на начало прошли
-            {
-                start = this.CurPos - 1;
-                end = this.CurPos;
-            }
-            else if(bRevRPrp) // на всякий случай, может получится, что после удаления элемента, стоим после RunPrp
-            {
-                start = this.CurPos + 2;
-                end = this.CurPos + 3;
-            }
-            else if(bSelect)
-            {
-                start = this.selection.startPos;
-                end = this.selection.endPos;
-                var tmp;
-
-                if(start > end)
-                {
-                    tmp = start;
-                    start = end;
-                    end = tmp;
-                }
-            }
-            else if(bMEReverse)
-            {
-                if(nextType == MATH_RUN_PRP && next3_Type !== MATH_TEXT) //единственная буква в Run
-                {
-                    start = this.CurPos;
-                    end = this.CurPos + 2;
-                }
-                else
-                {
-                    start = this.CurPos + 1;
-                    end = this.CurPos + 2;
-                }
-            }
-            else
-            {
-                if(prevType == MATH_RUN_PRP && nextType !== MATH_TEXT) //единственная буква в Run
-                {
-                    start = this.CurPos - 1;
-                    end = this.CurPos + 1;
-                }
-                else
-                {
-                    start = this.CurPos;
-                    end = this.CurPos + 1;
-                }
-
-            }
-
-            items = this.content.splice(start, end - start);
-
-            if(!TEST)
-            {
-                History.Create_NewPoint();
-                //items = this.content.splice(start, end - start);
-                History.Add(this, {Type: historyitem_Math_RemoveItem, Items: items, Pos: start});
-            }
-
-            this.CurPos -= (end - start);
-            this.setStart_Selection(this.CurPos);
-            this.selection.active = false;
-
-            bDelete = true;
-        }
-
-
-        return {bDelete: bDelete, items: items};
-    },
     removeLetter: function(pos, order)
     {
         var start, end;
@@ -6224,10 +5629,6 @@ CMathContent.prototype =
         if(this.content.length == 1 && ! this.bRoot )//только CEmpty
             this.fillPlaceholders();
     },
-    old_selectUse: function()
-    {
-        return this.RealSelect.startPos !== this.RealSelect.endPos;
-    },
     selectUse: function()
     {
         var result;
@@ -6252,31 +5653,6 @@ CMathContent.prototype =
     {
 
     },
-    old_setStart_Selection: function(StartIndSelect)
-    {
-        if( this.content.length != 1)
-        {
-            this.selection.active = true;
-            StartIndSelect++; // start+1 ... end
-            this.selection.startPos = StartIndSelect;
-            this.selection.endPos   = StartIndSelect;
-        }
-        else // один CEmpty
-        {
-            this.selection.startPos = 0;
-            this.selection.endPos = 0;
-            this.selection.active = false;
-        }
-
-    },
-    old_setEnd_Selection: function(EndIndSelect)
-    {
-        if(this.selection.active)
-        {
-            this.selection.endPos = EndIndSelect + 1;
-            this.drawSelect();
-        }
-    },
     IsPlaceholder: function()
     {
         var flag = false;
@@ -6288,30 +5664,6 @@ CMathContent.prototype =
     IsJustDraw: function()
     {
         return false;
-    },
-    old_setPosition: function(pos)
-    {
-        this.pos = { x: pos.x + this.gaps.left, y: pos.y};
-        var max_cent = this.size.center;
-
-        //var txtPrp = this.getTxtPrp();
-        //g_oTextMeasurer.SetFont ( txtPrp );
-        //var baseLine = DIV_CENT*g_oTextMeasurer.GetHeight();
-
-        /*var rPrp = this.getCurrRunPrp();
-        g_oTextMeasurer.SetFont ( rPrp );
-        var baseLine = DIV_CENT*g_oTextMeasurer.GetHeight();*/
-        //var baseLine = 0;
-        var baseLine = 0;
-
-        for(var i=1; i < this.content.length;i++)
-        {
-            var t = {x: this.pos.x + this.content[i-1].widthToEl + this.content[i].gaps.left, y: this.pos.y + max_cent };
-            if( this.content[i].value.typeObj !== MATH_COMP )
-                t.y += baseLine;
-
-            this.content[i].value.setPosition(t);
-        }
     },
     setPosition: function(pos)
     {
@@ -6335,41 +5687,6 @@ CMathContent.prototype =
                 this.content[i].setPosition(_pos);
         }
     },
-    old_drawSelect: function()
-    {
-        var start   = this.RealSelect.startPos,
-            end     = this.RealSelect.endPos;
-
-        if( start > end)
-        {
-            var tmp = start;
-            start = end;
-            end = tmp;
-        }
-
-        if(this.IsPlaceholder())
-        {
-            start = 1;
-            end = 2;
-        }
-
-        //var heightSelect = this.size.ascent + this.size.descent;
-        var heightSelect = this.size.height;
-        var widthSelect = 0;
-
-        for(var j= start; j < end ; j++)
-            widthSelect += this.content[j].widthToEl - this.content[j-1].widthToEl;
-
-        var startPos = start > 0 ? start-1 : start;
-        var X = this.pos.x + this.Composition.absPos.x + this.content[startPos].widthToEl,
-            Y = this.pos.y + this.Composition.absPos.y;
-
-        if( widthSelect != 0)
-        {
-            editor.WordControl.m_oLogicDocument.DrawingDocument.AddPageSelection(0, X, Y, widthSelect, heightSelect );
-
-        }
-    },
     ///// properties /////
     SetDot: function(flag)
     {
@@ -6380,138 +5697,6 @@ CMathContent.prototype =
         this.plhHide = flag;
     },
     ///////// RunPrp, CtrPrp
-    addRunPrp: function(rPrp)
-    {
-        var RunPrp = new CMathRunPrp();
-        RunPrp.Merge(rPrp);
-
-        var element = new mathElem(RunPrp);
-
-        var tmp = this.content.splice(0, this.CurPos + 1);
-        tmp.push(element);
-        tmp = tmp.concat( this.content.splice(0, this.content.length) );
-
-        this.content.length = 0;
-        this.content = tmp;
-
-        this.CurPos++;
-    },
-    old_readContent: function()          // for "read"
-    {
-        var result = new Array();
-
-        for(var i=0; i < this.content.length; i++)
-        {
-            if(this.content[i].value.typeObj === MATH_RUN_PRP)
-            {
-                var run = new CMRun();
-
-                run.setTxtPrp(this.content[i].value);
-                run.setMathRunPrp(this.content[i].value);
-
-                while(this.content[i + 1].value.typeObj === MATH_TEXT)
-                {
-                    run.addLetter(this.content[i + 1].value);
-                    i++;
-                }
-
-                result.push(run);
-            }
-            else if(this.content[i].value.typeObj === MATH_COMP)
-            {
-                result.push(this.content[i].value);
-            }
-        }
-
-        return result;
-    },
-    old_getCurrTxtPrp: function()
-    {
-        return this.getTextPrpMObj(this.CurPos);
-    },
-    old_getTextPrpMObj: function(position)
-    {
-        var textPrp = new CTextPr();
-
-        if(this.content.length > 1)
-        {
-            if( this.IsPlaceholder())
-            {
-                textPrp.Merge(this.Parent.getCtrPrp());
-            }
-            else if(position == 0 && this.content[1].value.typeObj == MATH_COMP)
-            {
-                textPrp.Merge(this.content[1].value.getCtrPrp());
-            }
-            else
-            {
-                for(var i = position; i > 0; i--)
-                {
-                    var obj = this.content[i].value;
-
-                    if(obj.typeObj == MATH_RUN_PRP)
-                    {
-                        textPrp.Merge(obj.getMergedWPrp());
-                        break;
-                    }
-                    else if(obj.typeObj == MATH_COMP)
-                    {
-                        textPrp.Merge(obj.getCtrPrp());
-                        break;
-                    }
-                }
-            }
-        }
-        else
-        {
-            //runPrp = this.Composition.GetFirstPrp();
-            textPrp.Merge(this.Composition.GetTxtPrp());
-        }
-
-        return textPrp;
-    },
-    getRunPrp: function(position) // по позиции возвращаем ближайшие RunPrp
-    {
-        var RunPrp = new CMathRunPrp();
-
-        if(this.content.length > 1)
-        {
-            if( this.IsPlaceholder())
-            {
-                RunPrp.Merge(this.Parent.getRunPrp());
-            }
-            else if(position == 0 && this.content[1].value.typeObj == MATH_COMP)
-            {
-                var rPrp = this.content[1].value.getRunPrp();
-                RunPrp.Merge(rPrp);
-            }
-            else
-            {
-                for(var i = position; i > 0; i--)
-                {
-                    var obj = this.content[i].value;
-
-                    if(obj.typeObj === MATH_RUN_PRP)
-                    {
-                        RunPrp.Merge(obj);
-                        break;
-                    }
-                    else if(obj.typeObj === MATH_COMP)
-                    {
-                        RunPrp.Merge(obj.getRunPrp());
-                        break;
-                    }
-                }
-            }
-        }
-        else
-        {
-            var defaultRPrp = this.Composition.GetDefaultRunPrp();
-            RunPrp.Merge(defaultRPrp);
-        }
-
-        return RunPrp;
-    },
     getFirstRPrp:    function()
     {
         var rPrp =  new CMathRunPrp();
@@ -6586,152 +5771,6 @@ CMathContent.prototype =
         if( this.argSize > -2 )
             this.argSize--;
     },
-    old_old_checkRunPrp: function()
-    {
-        var bEmpty = this.IsEmpty(),
-            OnlyRunPrp = this.content.length == 2 && this.content[1].value.typeObj == MATH_RUN_PRP;
-
-        if(bEmpty || OnlyRunPrp)
-        {
-            var txtPrp;
-            if(this.bRoot)
-                txtPrp = this.Composition.DEFAULT_RUN_PRP;
-            else
-                txtPrp = this.Parent.getCtrPrp();
-
-
-            if(bEmpty)
-                this.addRunPrp(txtPrp);
-            else
-            {
-                var Run = this.content[1].value.runPrp;
-                var currRun = new CTextPr();
-                currRun.Merge(Run);
-
-                Run.Merge(txtPrp);
-                Run.Merge(currRun);
-
-            }
-
-        }
-    },
-    old_checkRunPrp: function()
-    {
-        var bEmpty = this.IsEmpty(),
-            OnlyRunPrp = this.content.length == 2 && this.content[1].value.typeObj == MATH_RUN_PRP,
-            bComposition = this.content[this.CurPos].value.typeObj == MATH_EMPTY && this.content.length > 1;
-
-        if(this.bRoot && bEmpty)
-        {
-            var rPrp = this.Composition.DEFAULT_RUN_PRP;
-            this.addRunPrp(rPrp);
-        }
-        else if(bEmpty)
-        {
-            var rPrp = this.Parent.getCtrPrp();
-            this.addRunPrp(rPrp);
-        }
-        else if(OnlyRunPrp)
-        {
-            var rPrp = this.Parent.getCtrPrp();
-
-            var Run = this.content[1].value.runPrp;
-            var currRun = new CTextPr();
-            currRun.Merge(Run);
-
-            Run.Merge(rPrp);
-            Run.Merge(currRun);
-        }
-        else if(bComposition)
-        {
-            //возможны два случая:
-            // 1. если стоим в начале перед CEmpty и после идет Composition
-            // 2. стоим после CEmpty, который относится к Composition
-
-            var rPrp;
-            if(this.CurPos == 1 && this.content[this.CurPos].value.typeObj == MATH_COMP)
-                rPrp = this.content[this.CurPos].value.getCtrPrp();
-            else if(this.content[this.CurPos - 2].value.typeObj == MATH_COMP)
-                rPrp = this.content[this.CurPos - 2].value.getCtrPrp();
-            else // на всякий случай
-                rPrp = this.Composition.DEFAULT_RUN_PRP;
-
-            this.addRunPrp(rPrp);
-        }
-
-        //this.addToBeginningRPrp(txtPrp);
-
-    },
-    verifyRPrp_MC: function(runPrp)
-    {
-        // добавляем RunPrp для текста, они будут такие же как и ctrPrp
-        // mathTextPrp при этом слетают,  в ворде кстати, тоже
-        if(this.CurPos !== this.content.length - 1 && this.content[this.CurPos].value.typeObj !== MATH_RUN_PRP) // после того как добавили мат. объект, текущий объект не RunPrp, а текст
-        {
-            var RunPrp = Common_CopyObj(runPrp);
-            this.addRunPrp(RunPrp);
-        }
-    },
-    verifyRPrp_MC_2: function(runPrp) // for "menu"
-    {
-        // добавляем RunPrp для текста, они будут такие же как и ctrPrp
-        if(this.CurPos !== this.content.length - 1 && this.content[this.CurPos].value.typeObj !== MATH_TEXT) // после того как добавили мат. объект, текущий объект не RunPrp, а текст
-        {
-            var TextPrp = Common_CopyObj(runPrp);
-            this.addRunPrp(runPrp);
-        }
-    },
-    verifyRPrp_Letter: function()
-    {
-        var currType = this.content[this.CurPos].value.typeObj,
-            prevType = this.CurPos > 0 ? this.content[this.CurPos - 1].value.typeObj : null,
-            nextType = this.CurPos < this.content.length - 1 ? this.content[this.CurPos + 1].value.typeObj : null;
-
-
-        var bEmpty = this.IsEmpty(),
-            OnlyRunPrp = this.content.length == 2 && currType == MATH_RUN_PRP,
-            bPreComposition = currType == MATH_EMPTY && prevType == MATH_COMP, // стоим между двумя мат. объектами
-            bFirstComp = this.CurPos == 0 && nextType == MATH_COMP;
-
-        if(this.bRoot && bEmpty)
-        {
-            var defaultRPrp = this.Composition.GetDefaultRunPrp();
-            this.addRunPrp(defaultRPrp);
-        }
-        else if(bEmpty)
-        {
-            var parentRPrp = this.Parent.getRunPrp();
-            this.addRunPrp(parentRPrp);
-        }
-        else if(OnlyRunPrp)
-        {
-            var parentRPrp = this.Parent.getRunPrp();
-            this.content[1].value.Merge(parentRPrp);
-
-            /*
-            var Run = this.content[1].value;
-            var txtPrp = Run.getTxtPrp();
-
-            var currTPrp = new CTextPr();
-            currTPrp.Merge(txtPrp);
-            currTPrp.Merge(ctrPrp);
-
-            Run.Merge(currTPrp); // set TxtPrp*/
-        }
-        else if(bPreComposition)
-        {
-            // стоим после CEmpty, который относится к Composition, и соответственно дальше текста нет (либо конец формулы, либо между двумя мат объектами)
-
-            var rPrp = this.content[this.CurPos - 1].value.getRunPrp();
-            this.addRunPrp(rPrp);
-        }
-        else if(bFirstComp)
-        {
-            // если стоим в начале перед CEmpty и после идет Composition
-            var rPrp = this.content[1].value.getRunPrp();
-            this.addRunPrp(rPrp);
-        }
-    },
     setItalic: function(flag)
     {
         var rPrp = new CTextPr();
@@ -6747,31 +5786,6 @@ CMathContent.prototype =
             {
                 if(this.content[i].value.typeObj == MATH_RUN_PRP)
                     this.content[i].value.Merge(rPrp);
-            }
-        }
-    },
-    old_addRPrpForSelect: function(rPrp)
-    {
-        var start   = this.RealSelect.startPos,
-            end     = this.RealSelect.endPos;
-
-        if(start > end)
-        {
-            var temp = start;
-            start = end;
-            end = temp;
-        }
-
-        for(var i = start; i < end; i++)
-        {
-            var obj = this.content[i].value;
-            if(obj.typeObj == MATH_RUN_PRP)
-            {
-                obj.Merge(rPrp);
-            }
-            else if(obj.typeObj == MATH_COMP)
-            {
-                obj.setRPrp(rPrp);
             }
         }
     },
@@ -6826,527 +5840,6 @@ CMathContent.prototype =
             bIncline = this.content[1].value.IsIncline();
 
         return bIncline;
-    },
-
-    ////////////////////////////////////////////////////////////////
-
-    Undo: function(Data)
-    {
-        var type = Data.Type;
-
-        switch(type)
-        {
-            case historyitem_Math_AddItem:
-            {
-                var Pos = Data.Pos,
-                    PosEnd = Data.PosEnd;
-
-                var Content_start = this.content.slice(0, Pos);
-                var Content_end   = this.content.slice(PosEnd);
-
-                this.content = Content_start.concat(Content_end);
-                this.CurPos = Pos - 1;
-                this.setPlaceholderAfterRemove(); // выставляем placeholder после удаления всех остальных элементов
-
-              break;
-            }
-            case historyitem_Math_RemoveItem:
-            {
-                var Pos = Data.Pos;
-
-                if( this.IsPlaceholder() ) //удаляем тагет
-                {
-                    var empty = this.content[0]; //CEmpty
-                    this.content.length = 0;
-                    this.content.push( empty );
-                }
-
-                var Content_start = this.content.slice(0, Pos);
-                var Content_end   = this.content.slice(Pos);
-
-                this.content = Content_start.concat(Data.Items, Content_end);
-                break;
-            }
-        }
-    },
-    Redo: function(Data)
-    {
-        var type = Data.Type;
-
-        switch(type)
-        {
-            case historyitem_Math_AddItem:
-            {
-                var Pos = Data.Pos;
-
-                if( this.IsPlaceholder() ) //удаляем тагет
-                {
-                    var empty = this.content[0]; //CEmpty
-                    this.content.length = 0;
-                    this.content.push( empty );
-                }
-
-                var Content_start = this.content.slice(0, Pos);
-                var Content_end   = this.content.slice(Pos);
-                
-				this.setStartPos_Selection(Pos);
-                //this.selection.active = false;
-
-                this.content = Content_start.concat(Data.Items, Content_end);
-                break;
-            }
-            case historyitem_Math_RemoveItem:
-            {
-
-                var Pos = Data.Pos,
-                    PosEnd = Pos + Data.Items.length;
-
-                var Content_start = this.content.slice(0, Pos);
-                var Content_end   = this.content.slice(PosEnd);
-				this.setStartPos_Selection(Pos);
-                //this.selection.active = false;
-
-                this.content = Content_start.concat(Content_end);
-                this.CurPos = Pos - 1;
-                this.setPlaceholderAfterRemove(); // выставляем placeholder после удаления всех остальных элементов
-
-                break;
-
-            }
-        }
-    },
-    Save_Changes: function(Data, Writer)
-    {
-        Writer.WriteLong( historyitem_type_MathContent );
-
-        var Type = Data.Type;
-        // Пишем тип
-        Writer.WriteLong( Type );
-		
-        switch ( Type )
-		{
-			case historyitem_Math_AddItem:
-			{
-				var bArray = Data.UseArray;
-                var Count  = Data.Items.length;
-
-                Writer.WriteLong( Count );
-				
-				for ( var Index = 0; Index < Count; Index++ )
-                {
-                    if ( true === bArray )
-                        Writer.WriteLong( Data.PosArray[Index] );
-                    else
-                        Writer.WriteLong( Data.Pos + Index );
-
-                    this.Write_MathElemToBinary(Writer, Data.Items[Index]);
-				}
-				break;
-			}
-			case historyitem_Math_RemoveItem:
-			{
-				var bArray = Data.UseArray;
-                var Count  = Data.Items.length;
-
-                var StartPos = Writer.GetCurPosition();
-                Writer.Skip(4);
-                var RealCount = Count;
-
-                for ( var Index = 0; Index < Count; Index++ )
-                {
-                    if ( true === bArray )
-                    {
-                        if ( false === Data.PosArray[Index] )
-                            RealCount--;
-                        else
-                            Writer.WriteLong( Data.PosArray[Index] );
-                    }
-                    else
-                        Writer.WriteLong( Data.Pos );
-						
-                }
-
-                var EndPos = Writer.GetCurPosition();
-                Writer.Seek( StartPos );
-                Writer.WriteLong( RealCount );
-                Writer.Seek( EndPos );
-
-                break;
-			}			
-		}
-		
-		/*var oThis = this;
-		this.bs = new BinaryCommonWriter(Writer);
-		this.boMaths = new Binary_oMathWriter(Writer);
-		
-		this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteArgNodes(oThis.Data);});
-		*/
-    },
-	Load_Changes : function(Reader)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        var ClassType = Reader.GetLong();
-        if ( historyitem_type_MathContent != ClassType )
-            return;
-
-        var Type = Reader.GetLong();
-
-        switch ( Type )
-        {
-            case  historyitem_Math_AddItem:
-            {
-				var Count = Reader.GetLong();
-	
-                for ( var Index = 0; Index < Count; Index++ )
-                {
-                    var Pos     = Reader.GetLong()
-                    var elem = this.Read_MathElemFromBinary(Reader);
-                    if ( null != elem )
-                    {
-                        this.content.splice( Pos, 0, elem );
-                        CollaborativeEditing.Add_ChangedClass(this);
-                    }
-                }
-
-                this.DeleteCollaborativeMarks = false;
-
-                break;
-			}
-		}
-		//this.Composition.Resize(g_oTextMeasurer);
-	},
-	Write_MathElemToBinary : function(Writer, elem)
-	{
-		var oThis = this;
-		this.bs = new BinaryCommonWriter(Writer);
-		this.boMaths = new Binary_oMathWriter(Writer);
-		
-		this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteMathElem(elem);});
-	},
-	Read_MathElemFromBinary : function(Reader)
-    {
-		var oThis = this;
-		this.boMathr = new Binary_oMathReader(Reader);
-		this.bcr = new Binary_CommonReader(Reader);
-		
-		var length = Reader.GetUChar();		
-		var res = false;
-		Reader.cur += 3;
-		
-		//var obj = null;
-		var bCollaborative = true;
-		var obj = new CMathContent();
-		obj.setReferenceComposition(this.Composition);
-		var elem = null;
-		res = this.bcr.Read1(length, function(t, l){
-			oThis.boMathr.ReadMathArg(t,l,obj);
-		});
-		elem = obj.content[1];
-		return elem;
-	},
-	//добавление cmathcontent в формулу
-	Write_ToBinary2 : function(Writer)
-    {
-		Writer.WriteLong( historyitem_type_MathContent );
-		
-		/*var oThis = this;
-		this.bs = new BinaryCommonWriter(Writer);
-		this.boMaths = new Binary_oMathWriter(Writer);
-		
-		this.bs.WriteItem(c_oSerParType.OMathPara, function(){oThis.boMaths.WriteOMathPara(oThis.Math);});
-		this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteOMathPara(oThis);});*/
-    },
-	Read_FromBinary2 : function(Reader)
-    {
-		var i=1;
-		/*var oThis = this;
-		this.boMathr = new Binary_oMathReader(Reader);
-		this.bcr = new Binary_CommonReader(Reader);
-		
-		var length = Reader.GetUChar();
-		
-		var res = false;
-		Reader.cur += 3;
-		res = this.bcr.Read1(length, function(t, l){
-			return oThis.boMathr.ReadMathOMathPara(t,l,oThis);
-		});*/
-	},
-    Refresh_RecalcData: function()
-    {
-        this.Composition.Refresh_RecalcData2(); // Refresh_RecalcData сообщает родительскому классу, что у него произошли изменения, нужно пересчитать
-                                                // Refresh_RecalcData2 у родительского класса сообщает, что у внутреннего класса произошли изменения, нужен пересчет
-        // временно
-        //this.RecalculateReverse();
-        //this.Root.Resize();
-    },
-    /*Refresh_RecalcData2: function()
-    {
-        this.Composition.Refresh_RecalcData2();
-    },*/
-    _Check_HistoryUninon: function(Data1, Data2)
-    {
-        var Type1 = Data1.Type;
-        var Type2 = Data2.Type;
-
-        if ( historyitem_Paragraph_AddItem === Type1 && historyitem_Paragraph_AddItem === Type2 )
-        {
-            if ( 1 === Data1.Items.length && 1 === Data2.Items.length && Data1.Pos === Data2.Pos - 1 && !this.content[Data1.Pos].typeObj === MATH_COMP && !this.content[Data2.Pos].typeObj === MATH_COMP )
-                return true;
-        }
-        return false
-    },
-    Check_HistoryUninon: function(Data1, Data2)
-    {
-        return false;
-    },
-    getStackPositions: function(stack)
-    {
-        stack.push( {X: this.CurPos} );
-
-        if(!this.bRoot)
-            this.Parent.getStackPositions( stack );
-    },
-    getContent: function(stack, bCurrent)
-    {
-        var content = null;
-        var pos = stack.pop();
-
-        if(bCurrent)
-            this.CurPos = pos.X;
-
-        if(stack.length > 0)
-            content = this.content[pos.X].value.getContent(stack, bCurrent);
-        else
-            content = this;
-
-        return content;
-
-    },
-    IsEmpty:    function()
-    {
-        return this.content.length == 1;
-    },
-
-    ///////  selection for Edit   ////////
-    selection_Start: function(x, y)
-    {
-        if(this.IsPlaceholder())
-        {
-            this.LogicalSelect.start = 1;
-            this.LogicalSelect.end = 2;
-        }
-        else
-        {
-            var msCoord = {x: x, y: y};
-            var pos = this.findPosition(msCoord);
-
-            this.LogicalSelect.start = pos;
-            this.LogicalSelect.end = pos;
-
-            if(this.content[pos].value.typeObj === MATH_COMP)
-            {
-                var coord = this.getCoordElem(pos, msCoord);
-                this.content[pos].value.selection_Start(coord.x, coord.y);
-            }
-        }
-    },
-    selection_End: function(x, y, MouseEvent)
-    {
-        // впоследствии нужно будет учитывать MouseEvent
-
-        var state = true; // вышли / не вышли за переделы контента
-        var SelectContent = null;
-
-        if(this.IsPlaceholder())
-        {
-            SelectContent = this;
-        }
-        else
-        {
-            var msCoord = {x: x, y: y};
-            var posEnd = this.findPosition(msCoord),
-                posStart = this.LogicalSelect.start;
-
-            this.CurPos = posStart;
-            this.LogicalSelect.end = posEnd;
-
-            //селект внутри элемента (дроби и пр.)
-            if(posStart === posEnd && this.content[posEnd].value.typeObj === MATH_COMP)
-            {
-                var coord = this.getCoordElem(posEnd, msCoord );
-                var movement = this.content[posEnd].value.selection_End(coord.x, coord.y);
-                this.setStartPos_Selection(posStart-1);
-
-                if( ! movement.state )
-                {
-                    this.setEndPos_Selection(posEnd + 1);
-                    SelectContent = this;
-                }
-                else
-                    SelectContent = movement.SelectContent;
-            }
-            //селект элементов контента
-            else
-            {
-                SelectContent = this;
-                var direction = (posStart < posEnd) ? 1 : -1;
-
-
-                if( this.content[posStart].value.typeObj === MATH_COMP )
-                {
-                    if( direction == 1 )
-                        this.setStartPos_Selection( posStart - 1);
-                    else if( direction == -1 )
-                        this.setStartPos_Selection( posStart + 1);
-                }
-                else
-                    this.setStartPos_Selection(posStart);
-
-
-                if( this.content[posEnd].value.typeObj === MATH_COMP )
-                {
-                    if( direction == 1 )
-                        this.setEndPos_Selection(posEnd + 1);
-                    else if( direction == -1 )
-                        this.setEndPos_Selection(posEnd - 1);
-                }
-                else
-                    this.setEndPos_Selection(posEnd);
-            }
-        }
-
-        return {state: state, SelectContent:  SelectContent};
-    },
-    setStartPos_Selection: function( StartIndSelect )
-    {
-        if( this.content.length != 1)
-        {
-            //this.selection.active = true;
-            StartIndSelect++; // start+1 ... end
-            this.RealSelect.startPos = StartIndSelect;
-            this.RealSelect.endPos   = StartIndSelect;
-        }
-        else // один CEmpty
-        {
-            this.RealSelect.startPos = 0;
-            this.RealSelect.endPos = 0;
-        }
-
-    },
-    setEndPos_Selection: function( EndIndSelect )
-    {
-        this.RealSelect.endPos = EndIndSelect + 1;
-    },
-    setLogicalPosition:  function(pos)
-    {
-        this.CurPos = pos; // на всякий случай
-
-        this.LogicalSelect.start = pos;
-        this.LogicalSelect.end   = pos;
-
-        this.RealSelect.startPos = pos;
-        this.RealSelect.endPos = pos;
-    },
-    setSelect_Beginning: function(bStart)
-    {
-        if(bStart)
-        {
-            /*this.LogicalSelect.start = 1; /// в итоге, селект начнется с позиции 1
-            this.LogicalSelect.end   = 1;
-            this.CurPos = 1;
-
-            this.RealSelect.endPos    = 1;
-            this.RealSelect.startPos    = 1;*/
-
-            this.setLogicalPosition(1);
-        }
-        else
-        {
-            this.LogicalSelect.end   = 1;
-            this.RealSelect.endPos    = 1;
-
-            // проверка на то, чтобы CEmpty был включен !!! когда идем из мат объекта(например из числителя) и идем наверх, выходим за пределы формулы
-            // если стоим в конце, то this.RealSelect.endPos равен this.content.length и соответственно, нужно сделать проверку на то, что запрашиваем у существующего объекта typeObj (!)
-            var start = this.RealSelect.startPos; // проверяем именно тот, который идет на отрисовку, т.к. логический мб выставлен на мат. объект
-            if(start < this.content.length)
-            {
-                var current   = this.content[this.CurPos].value.typeObj;
-                var selectStart = this.content[start].value.typeObj;    // only for draw select
-
-                if(current == MATH_COMP && selectStart == MATH_COMP)
-                {
-                    this.RealSelect.startPos++;
-                }
-            }
-
-
-           /* if(this.content[this.RealSelect.startPos].value.typeObj == MATH_COMP)
-                console.log("Select is composition");
-            else
-                console.log("Select is other object");
-
-            if(this.content[this.CurPos].value.typeObj == MATH_COMP)
-                console.log("current is composition");
-            else
-                console.log("current is other object");*/
-
-        }
-    },
-    setSelect_Ending: function(bStart)
-    {
-        if(bStart)
-        {
-            /*this.LogicalSelect.start = this.content.length - 1;
-            this.LogicalSelect.end   = this.content.length - 1;
-            this.CurPos = this.content.length - 1;*/
-
-            this.setLogicalPosition(this.content.length - 1);
-        }
-        else
-        {
-            this.LogicalSelect.end   = this.content.length - 1;
-            this.RealSelect.endPos   = this.content.length;
-
-            var start = this.RealSelect.startPos - 2,
-                current   = this.content[this.CurPos].value.typeObj,
-                selectStart = start > 0 ? this.content[start].value.typeObj : null;
-
-            if(current == MATH_COMP && selectStart == MATH_COMP)
-            {
-                this.RealSelect.startPos -= 2;
-            }
-        }
-    },
-    selection_check:  function(X, Y)
-    {
-        var flag = false;
-
-        var x = X - this.pos.x,
-            y = Y - this.pos.y;
-
-        var bWidth =  x >= 0 && x <= this.size.width,    // попали в контент по ширине
-            bHeight = y >= 0 && y <= this.size.height,   // попали в контент по высоте
-            bSelect = this.selectUse();
-
-        if(this.IsPlaceholder())
-        {
-            flag = false;
-        }
-        else if(bSelect && bWidth && bHeight)
-        {
-            var start = this.RealSelect.startPos - 1,
-                end   = this.RealSelect.endPos - 1;
-
-            var beforeSelect = this.content[start].widthToEl,
-                afterSelect = this.content[end].widthToEl  + this.content[end].gaps.right;
-
-            flag = beforeSelect <= x && x <= afterSelect;
-        }
-
-        return flag;
     },
 
     /// Position for Paragraph
@@ -7744,153 +6237,303 @@ CMathContent.prototype =
     {
 
     },
-    //////////////////////////
-
-    ////////////////  Test function for test_math  //////////////////
-
-    mouseUp: function()
+    getContent: function(stack, bCurrent)
     {
-        /*if( this.selection.active )
-        {
+        var content = null;
+        var pos = stack.pop();
 
-            if( this.content[this.CurPos].value.typeObj === MATH_COMP )
-                this.content[this.CurPos].value.mouseUp();
-        }*/
-    },
-    mouseDown: function(mouseCoord, inside_flag)  // mouseDown идем сверху вниз по иерархии
-    {
-        var result = null;
+        if(bCurrent)
+            this.CurPos = pos.X;
 
-        if(typeof(inside_flag) === "undefined")
-            inside_flag = -1;
-
-        if(this.IsPlaceholder())
-        {
-            result = this;
-        }
+        if(stack.length > 0)
+            content = this.content[pos.X].value.getContent(stack, bCurrent);
         else
-        {
-            if(inside_flag == 0)
-                this.CurPos = 0;
-            else if(inside_flag == 1)
-                this.CurPos = this.content.length - 1;
-            else
-                this.CurPos = this.findPosition(mouseCoord);
+            content = this;
 
-            if( this.content[this.CurPos].value.typeObj === MATH_COMP )
-            {
-                var coord = this.getCoordElem(this.CurPos, mouseCoord);
-                result = this.content[this.CurPos].value.mouseDown(coord);
-            }
-            else
-                result = this;
+        return content;
 
-            //this.setStart_Selection(this.CurPos);
-            this.setLogicalPosition(this.CurPos);
-        }
-
-        return result;
     },
-    mouseMove: function(mouseCoord) // mouseMove идем сверху вниз по иерархии
+    IsEmpty:    function()
     {
-        var state = true;
-        var SelectContent = null;
-
-        if(this.IsPlaceholder())
-        {
-            SelectContent = this;
-        }
-        else
-        {
-            var pos = this.findPosition( mouseCoord );
-
-            //селект внутри элемента (дроби и пр.)
-            if(this.CurPos === pos && this.content[pos].value.typeObj === MATH_COMP)
-            {
-                //this.setStart_Selection( pos - 1 );
-                this.setStartPos_Selection(pos - 1);
-                var coord = this.getCoordElem(this.CurPos, mouseCoord );
-                var movement = this.content[pos].value.mouseMove(coord);
-
-                if( ! movement.state )
-                {
-                    this.setEndPos_Selection(pos+1);
-                    //this.setEnd_Selection( pos + 1 );
-                    SelectContent = this;
-                }
-                else
-                    SelectContent = movement.SelectContent;
-            }
-            //селект элементов контента
-            else
-            {
-                SelectContent = this;
-
-                var direction = ( this.CurPos < pos ) ? 1 : -1;
-
-                if ( this.content[this.CurPos].value.typeObj === MATH_COMP )
-                {
-                    if( direction == 1 )
-                        this.setStartPos_Selection(this.CurPos - 1);
-                        //this.setStart_Selection( this.CurPos - 1);
-                    else if( direction == -1 )
-                        this.setStartPos_Selection(this.CurPos + 1);
-                        //this.setStart_Selection( this.CurPos + 1);
-                }
-                else
-                    this.setStartPos_Selection(this.CurPos);
-                    //this.setStart_Selection( this.CurPos );
-
-                if( this.content[pos].value.typeObj === MATH_COMP )
-                {
-                    if( direction == 1 )
-                        this.setEndPos_Selection(pos+1);
-                        //this.setEnd_Selection(pos + 1);
-                    else if( direction == -1 )
-                        this.setEndPos_Selection(pos-1);
-                        //this.setEnd_Selection(pos - 1);
-                }
-                else
-                    this.setEndPos_Selection( pos );
-                    //this.setEnd_Selection( pos );
-            }
-        }
-
-        return {state: state, SelectContent: SelectContent }; //для CMathContent state всегда true
+        return this.content.length == 1;
     },
-    tgtSelect: function()
+
+
+    ////////////////////////////////////////////////////////////////
+
+    Undo: function(Data)
     {
-        this.CurPos = 1;
-        //this.setStart_Selection(0);
-        this.setStartPos_Selection(0);
-        this.setEndPos_Selection(1);
-        //this.setEnd_Selection(1);
-        //this.selection.active = false;
+        var type = Data.Type;
+
+        switch(type)
+        {
+            case historyitem_Math_AddItem:
+            {
+                var Pos = Data.Pos,
+                    PosEnd = Data.PosEnd;
+
+                var Content_start = this.content.slice(0, Pos);
+                var Content_end   = this.content.slice(PosEnd);
+
+                this.content = Content_start.concat(Content_end);
+                this.CurPos = Pos - 1;
+                this.setPlaceholderAfterRemove(); // выставляем placeholder после удаления всех остальных элементов
+
+                break;
+            }
+            case historyitem_Math_RemoveItem:
+            {
+                var Pos = Data.Pos;
+
+                if( this.IsPlaceholder() ) //удаляем тагет
+                {
+                    var empty = this.content[0]; //CEmpty
+                    this.content.length = 0;
+                    this.content.push( empty );
+                }
+
+                var Content_start = this.content.slice(0, Pos);
+                var Content_end   = this.content.slice(Pos);
+
+                this.content = Content_start.concat(Data.Items, Content_end);
+                break;
+            }
+        }
     },
-	getElem: function(nNum)
-	{
-		return this.content[nNum];
-	}
-	
-    /////////////////////////////////////////////////////////////////
+    Redo: function(Data)
+    {
+        var type = Data.Type;
 
-    ////  test function for me  ////
+        switch(type)
+        {
+            case historyitem_Math_AddItem:
+            {
+                var Pos = Data.Pos;
 
-    /*RecalculateReverse: function(oMeasure)
+                if( this.IsPlaceholder() ) //удаляем тагет
+                {
+                    var empty = this.content[0]; //CEmpty
+                    this.content.length = 0;
+                    this.content.push( empty );
+                }
+
+                var Content_start = this.content.slice(0, Pos);
+                var Content_end   = this.content.slice(Pos);
+
+                this.setStartPos_Selection(Pos);
+                //this.selection.active = false;
+
+                this.content = Content_start.concat(Data.Items, Content_end);
+                break;
+            }
+            case historyitem_Math_RemoveItem:
+            {
+
+                var Pos = Data.Pos,
+                    PosEnd = Pos + Data.Items.length;
+
+                var Content_start = this.content.slice(0, Pos);
+                var Content_end   = this.content.slice(PosEnd);
+                this.setStartPos_Selection(Pos);
+                //this.selection.active = false;
+
+                this.content = Content_start.concat(Content_end);
+                this.CurPos = Pos - 1;
+                this.setPlaceholderAfterRemove(); // выставляем placeholder после удаления всех остальных элементов
+
+                break;
+
+            }
+        }
+    },
+    Save_Changes: function(Data, Writer)
+    {
+        Writer.WriteLong( historyitem_type_MathContent );
+
+        var Type = Data.Type;
+        // Пишем тип
+        Writer.WriteLong( Type );
+
+        switch ( Type )
+        {
+            case historyitem_Math_AddItem:
+            {
+                var bArray = Data.UseArray;
+                var Count  = Data.Items.length;
+
+                Writer.WriteLong( Count );
+
+                for ( var Index = 0; Index < Count; Index++ )
+                {
+                    if ( true === bArray )
+                        Writer.WriteLong( Data.PosArray[Index] );
+                    else
+                        Writer.WriteLong( Data.Pos + Index );
+
+                    this.Write_MathElemToBinary(Writer, Data.Items[Index]);
+                }
+                break;
+            }
+            case historyitem_Math_RemoveItem:
+            {
+                var bArray = Data.UseArray;
+                var Count  = Data.Items.length;
+
+                var StartPos = Writer.GetCurPosition();
+                Writer.Skip(4);
+                var RealCount = Count;
+
+                for ( var Index = 0; Index < Count; Index++ )
+                {
+                    if ( true === bArray )
+                    {
+                        if ( false === Data.PosArray[Index] )
+                            RealCount--;
+                        else
+                            Writer.WriteLong( Data.PosArray[Index] );
+                    }
+                    else
+                        Writer.WriteLong( Data.Pos );
+
+                }
+
+                var EndPos = Writer.GetCurPosition();
+                Writer.Seek( StartPos );
+                Writer.WriteLong( RealCount );
+                Writer.Seek( EndPos );
+
+                break;
+            }
+        }
+
+        /*var oThis = this;
+         this.bs = new BinaryCommonWriter(Writer);
+         this.boMaths = new Binary_oMathWriter(Writer);
+
+         this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteArgNodes(oThis.Data);});
+         */
+    },
+    Load_Changes : function(Reader)
+    {
+        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
+        // Long : тип класса
+        // Long : тип изменений
+
+        var ClassType = Reader.GetLong();
+        if ( historyitem_type_MathContent != ClassType )
+            return;
+
+        var Type = Reader.GetLong();
+
+        switch ( Type )
+        {
+            case  historyitem_Math_AddItem:
+            {
+                var Count = Reader.GetLong();
+
+                for ( var Index = 0; Index < Count; Index++ )
+                {
+                    var Pos     = Reader.GetLong()
+                    var elem = this.Read_MathElemFromBinary(Reader);
+                    if ( null != elem )
+                    {
+                        this.content.splice( Pos, 0, elem );
+                        CollaborativeEditing.Add_ChangedClass(this);
+                    }
+                }
+
+                this.DeleteCollaborativeMarks = false;
+
+                break;
+            }
+        }
+        //this.Composition.Resize(g_oTextMeasurer);
+    },
+    Write_MathElemToBinary : function(Writer, elem)
+    {
+        var oThis = this;
+        this.bs = new BinaryCommonWriter(Writer);
+        this.boMaths = new Binary_oMathWriter(Writer);
+
+        this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteMathElem(elem);});
+    },
+    Read_MathElemFromBinary : function(Reader)
+    {
+        var oThis = this;
+        this.boMathr = new Binary_oMathReader(Reader);
+        this.bcr = new Binary_CommonReader(Reader);
+
+        var length = Reader.GetUChar();
+        var res = false;
+        Reader.cur += 3;
+
+        //var obj = null;
+        var bCollaborative = true;
+        var obj = new CMathContent();
+        obj.setReferenceComposition(this.Composition);
+        var elem = null;
+        res = this.bcr.Read1(length, function(t, l){
+            oThis.boMathr.ReadMathArg(t,l,obj);
+        });
+        elem = obj.content[1];
+        return elem;
+    },
+    //добавление cmathcontent в формулу
+    Write_ToBinary2 : function(Writer)
+    {
+        Writer.WriteLong( historyitem_type_MathContent );
+
+        /*var oThis = this;
+         this.bs = new BinaryCommonWriter(Writer);
+         this.boMaths = new Binary_oMathWriter(Writer);
+
+         this.bs.WriteItem(c_oSerParType.OMathPara, function(){oThis.boMaths.WriteOMathPara(oThis.Math);});
+         this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteOMathPara(oThis);});*/
+    },
+    Read_FromBinary2 : function(Reader)
+    {
+        var i=1;
+        /*var oThis = this;
+         this.boMathr = new Binary_oMathReader(Reader);
+         this.bcr = new Binary_CommonReader(Reader);
+
+         var length = Reader.GetUChar();
+
+         var res = false;
+         Reader.cur += 3;
+         res = this.bcr.Read1(length, function(t, l){
+         return oThis.boMathr.ReadMathOMathPara(t,l,oThis);
+         });*/
+    },
+    Refresh_RecalcData: function()
+    {
+        this.Composition.Refresh_RecalcData2(); // Refresh_RecalcData сообщает родительскому классу, что у него произошли изменения, нужно пересчитать
+        // Refresh_RecalcData2 у родительского класса сообщает, что у внутреннего класса произошли изменения, нужен пересчет
+        // временно
+        //this.RecalculateReverse();
+        //this.Root.Resize();
+    },
+    /*Refresh_RecalcData2: function()
      {
-     // for add component, set Txt Properties
-     var start = this.rInterval.startPos,
-     end = this.rInterval.endPos;
-     for(var i = start; i < end; i++)
-     this.content[i].value.Resize(oMeasure);
-
-     this.rInterval.startPos = this.rInterval.endPos = this.CurPos;
-
-     this.recalculateSize();
-     if(! this.bRoot )
-     this.Parent.RecalculateReverse(oMeasure);
+     this.Composition.Refresh_RecalcData2();
      },*/
-    //////////////*    end  of  test  functions   *//////////////////
+    _Check_HistoryUninon: function(Data1, Data2)
+    {
+        var Type1 = Data1.Type;
+        var Type2 = Data2.Type;
+
+        if ( historyitem_Paragraph_AddItem === Type1 && historyitem_Paragraph_AddItem === Type2 )
+        {
+            if ( 1 === Data1.Items.length && 1 === Data2.Items.length && Data1.Pos === Data2.Pos - 1 && !this.content[Data1.Pos].typeObj === MATH_COMP && !this.content[Data2.Pos].typeObj === MATH_COMP )
+                return true;
+        }
+        return false
+    },
+    Check_HistoryUninon: function(Data1, Data2)
+    {
+        return false;
+    }
+
 
 }
 
@@ -8851,48 +7494,9 @@ function CEmpty()
     this.Resize = function(){};
 
     this.IsHighElement =  function() { return false; };
-    /*this.setTxtPrp = function(txtPrp) { this.TxtPrp.Merge(txtPrp); };
-    this.setCtrPrp = function(txtPrp) {};
-    this.getRunPrp = function() {return this.TxtPrp; };
-    this.setOwnTPrp = function() {};*/
     this.relate     = function() {};
 }
 
-function CMRun()
-{
-    /**this.text = "";
-    this.txtPrp = null;
-    this.mathRunPrp = null;*/
-
-    this.props =
-    {
-        text:       "",
-        txtPrp:     null,
-        mathRunPrp: null
-    };
-}
-CMRun.prototype =
-{
-    getTypeElement: function()
-    {
-        return MATH_RUN;
-    },
-    setRunPrp:  function(oRunPrp)
-    {
-        var rPrp = oRunPrp.getPropsForWrite();
-
-        this.props.txtPrp     = rPrp.textPrp;
-        this.props.mathRunPrp = rPrp.mathRunPrp;
-    },
-    addLetter:  function(oMText)
-    {
-        this.props.text += String.fromCharCode(oMText.value);
-    },
-    getPropsForWrite: function()
-    {
-        return this.props;
-    }
-}
 
 
 function TEST_MATH_EDIT()
@@ -8909,62 +7513,6 @@ function TEST_MATH_EDIT()
         Top    : Y_Top_Field,
         Bottom : Y_Bottom_Field
     } } );
-}
-
-function TEST_UNION_CONTENT(indef)
-{
-    var oMathComp = new CMathComposition();
-
-    if(indef == 1)
-    {
-        oMathComp.Root.addTxt("a");
-        oMathComp.CreateEquation(1);
-        oMathComp.Root.addTxt("b");
-    }
-    else
-    {
-        oMathComp.CreateEquation(0);
-    }
-
-
-    var oRoot =  oMathComp.Root;
-    var rPr = MathComposition.GetCurrentRPrp();
-    oRoot.setRPrp(rPr);
-    MathComposition.AddToComposition(oRoot);
-
-    //MathComposition.RecalculateComposition(g_oTextMeasurer);
-
-    //MathComposition.CurrentContent.update_Cursor();
-
-    //editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(0, editor.WordControl.m_oLogicDocument.Pages[0]);
-
-    //oCurContent.verifyRPrp_MC_2(rPr);
-}
-
-function GetShiftCenter()
-{
-    // 1.5875 / FontSize
-    var txtPrp =
-    {
-        FontFamily:     {Name  : "Cambria Math", Index : -1 },
-        FontSize:       11,
-        Italic:         true,
-        Bold:           false,
-        RFonts:         {},
-        Lang:           {}
-    };
-
-    for(var i = 2; i < 255; i += 2)
-    {
-        txtPrp.FontSize = i;
-        g_oTextMeasurer.SetFont(txtPrp);
-        //var metricsTxt = g_oTextMeasurer.Measure2Code(StartTextElement);
-        var Height = g_oTextMeasurer.GetHeight();
-        var shift = Height / i;
-
-        //var shift = metricsTxt.Height/2 / i;
-        console.log(i + ": " + shift);
-    }
 }
 
 function TEST_COEFF_ITERATORS()
@@ -9035,7 +7583,5 @@ function TEST_COEFF_ITERATORS()
     console.log("check11: " + check11);
     console.log("check22: " + check22);
     console.log("check33: " + check33);
-
-
 
 }

@@ -1078,11 +1078,6 @@ CMathBase.prototype =
     {
      return this.elements[x][y];
     },
-    getStackPositions: function(stack)
-    {
-        stack.push({X: this.CurPos_X, Y: this.CurPos_Y});
-        this.Parent.getStackPositions(stack);
-    },
     getContent: function(stack, bCurrent)
     {
         var pos = stack.pop();
