@@ -195,7 +195,9 @@
             "externs": [
                 "../../Common/Build/Externs.js",
                 "../../Excel/jquery/jquery-1.7.1.js",
-                "../../Common/3rdparty/XRegExp/xregexp-all-min.js"
+                "../../Common/3rdparty/XRegExp/xregexp-all-min.js",
+				"../../Common/3rdparty/perfect-scrollbar/jquery.mousewheel.js",
+				"../../Common/3rdparty/perfect-scrollbar/perfect-scrollbar.js"
             ],
             "map": "sdk-all.js.map",
             "log": "../../Excel/.build/Log",
