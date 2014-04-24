@@ -7402,7 +7402,7 @@ catAxisChart.prototype =
 		var posMinorX;
 		
 		var firstDiff = 0, posXtemp;
-		if(this.chartSpace.chart.plotArea.valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+		if(this.chartSpace.chart.plotArea.valAx.crossBetween == CROSS_BETWEEN_BETWEEN && this.chartProp.type != "Scatter")
 			firstDiff = Math.abs(xPoints[1].pos - xPoints[0].pos);
 		
 		if(orientation == ORIENTATION_MIN_MAX)
