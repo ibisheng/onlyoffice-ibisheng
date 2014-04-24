@@ -779,7 +779,7 @@ CDocumentContent.prototype =
                         {
                             TempElement.Reset( 0, 0, FrameW, Frame_YLimit, PageIndex );
                             TempElement.Recalculate_Page( PageIndex );
-                            FrameH = TempElement.Get_PageBounds( PageIndex - TempElement.Get_StartPage_Absolute()).Bottom;
+                            FrameH = TempElement.Get_PageBounds( PageIndex - TempElement.Get_StartPage_Relative() ).Bottom;
                         }
                     }
                     else if ( -1 === FrameW )
