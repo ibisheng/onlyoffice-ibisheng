@@ -134,9 +134,23 @@ var ACCENT_TEXT                 = 20;
 
 /////////////////////////////////////////
 
+var MCJC_CENTER                 =  0;
+var MCJC_LEFT                   =  1;
+var MCJC_RIGHT                  =  2;
+var MCJC_INSIDE                 =  0;
+var MCJC_OUTSIDE                =  0;
+
 var BASEJC_CENTER               =  0;
 var BASEJC_TOP                  =  1;
 var BASEJC_BOTTOM               =  2;
+var BASEJC_INLINE               =  0;
+var BASEJC_INSIDE               =  0;
+var BASEJC_OUTSIDE              =  0;
+
+var JC_CENTER                   =  0;
+var JC_CENTERGROUP              =  1;
+var JC_LEFT                     =  2;
+var JC_RIGHT                    =  3;
 
 var MATH_TEXT                   =  0;
 var MATH_RUN_PRP                =  1;
@@ -155,6 +169,10 @@ var BREAK_MIN_MIN             =  0;
 var BREAK_PLUS_MIN            =  1;
 var BREAK_MIN_PLUS            =  2;
 
+var STY_BOLD                  =  0;
+var STY_BI                    =  1;
+var STY_ITALIC                =  2;
+var STY_PLAIN                 =  3;
 
 
 var extend = function(Child, Parent)

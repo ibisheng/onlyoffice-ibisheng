@@ -35,6 +35,7 @@ function CMathMatrix()
     this.column = 0;
     ////
 
+
     CMathBase.call(this);
 }
 extend(CMathMatrix, CMathBase);
@@ -68,6 +69,9 @@ CMathMatrix.prototype.init = function(props)
 
     if(props.baseJc === BASEJC_CENTER || props.baseJc === BASEJC_TOP || props.baseJc === BASEJC_BOTTOM)
         this.baseJc = props.baseJc;
+
+    if(props.mcJc == MCJC_CENTER || props.mcJc == MCJC_LEFT || props.mcJc == MCJC_RIGHT)
+        this.mcJc = props.mcJc;
 
     this.setRuleGap(this.spaceColumn, props.cGpRule, props.cGp, props.cSp);
     this.setRuleGap(this.spaceRow, props.rSpRule, props.rSp);
