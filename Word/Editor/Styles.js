@@ -4080,6 +4080,9 @@ CStyles.prototype =
 
         if ( null === Style.BasedOn )
         {
+            // TODO: Проверить нужно ли копировать стили по умолчанию для данного типа стиля, когда сам стиль задан
+            //       Для параграфа, вроде как не нужно (см. ivanova_veronica.docx стиль "Colon")
+            
             // Копируем свойства по умолчанию для данного типа
             if ( true === bUseDefault )
             {
@@ -4088,10 +4091,10 @@ CStyles.prototype =
                 {
                     case styletype_Paragraph:
                     {
-                        var DefId = this.Default.Paragraph;
-
-                        Pr.ParaPr.Merge( this.Style[DefId].ParaPr );
-                        Pr.TextPr.Merge( this.Style[DefId].TextPr );
+//                        var DefId = this.Default.Paragraph;
+//
+//                        Pr.ParaPr.Merge( this.Style[DefId].ParaPr );
+//                        Pr.TextPr.Merge( this.Style[DefId].TextPr );
 
                         break;
                     }
