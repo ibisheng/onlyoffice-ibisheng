@@ -2046,11 +2046,17 @@
 			    var oTempDrawingDocument = new CDrawingDocument();
 			    var newCDocument = new CDocument(oTempDrawingDocument);
 			    oTempDrawingDocument.m_oLogicDocument = newCDocument;
+			    var oOldEditor = undefined;
+			    if ("undefined" != typeof editor)
+			        oOldEditor = editor;
+			    //создается глобальная переменная
+			    editor = { isDocumentEditor: true, WordControl: { m_oLogicDocument: newCDocument } };
 			    var openParams = { checkFileSize: false, charCount: 0, parCount: 0 };
 			    History.TurnOff();
 			    var oBinaryFileReader = new BinaryFileReader(newCDocument, openParams);
 			    var oRes = oBinaryFileReader.ReadFromString(sBase64);
 			    History.TurnOn();
+			    editor = oOldEditor;
 			    return oBinaryFileReader.oReadResult;
 
 				//TODO ПРОСМОТРЕТЬ ВСЕ ЗАКОММЕНТИРОВАННЫЕ ОБЛАСТИ!!!!
