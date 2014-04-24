@@ -1241,17 +1241,42 @@ CChartSpace.prototype =
                     //расчитаем подписи для горизонтальной оси
                     var ser = chart_object.series[0];
                     var string_pts = [], pts_len = 0;
+
+                    /*string_pts  pts_len*/
                     if(ser && ser.cat)
                     {
+                        var  lit;
                         if(ser.cat.strRef && ser.cat.strRef.strCache)
                         {
-                            string_pts = ser.cat.strRef.strCache.pt;
-                            pts_len = string_pts.length;
+                            lit = ser.cat.strRef.strCache;
                         }
                         else if(ser.cat.strLit)
                         {
-                            string_pts = ser.cat.strLit.pt;
-                            pts_len = string_pts.length;
+                            lit = ser.cat.strLit;
+                        }
+                        else if(ser.cat.numRef && ser.cat.numRef.numCache)
+                        {
+                            lit = ser.cat.numRef.numCache;
+                        }
+                        else if(ser.cat.numLit)
+                        {
+                            lit = ser.cat.numLit;
+                        }
+                        if(lit)
+                        {
+                            pts_len = lit.ptCount;
+                            for(i = 0; i < pts_len; ++i)
+                            {
+                                var pt = lit.getPtByIndex(i);
+                                if(pt)
+                                {
+                                    string_pts.push({val: pt.val + ""});
+                                }
+                                else
+                                {
+                                    string_pts.push({val: i + ""});
+                                }
+                            }
                         }
                     }
                     if(string_pts.length === 0)
@@ -1260,15 +1285,16 @@ CChartSpace.prototype =
                         for(i = 0; i < chart_object.series.length; ++i)
                         {
                             var cur_pts= null;
+                            ser = chart_object.series[i];
                             if(ser.val)
                             {
                                 if(ser.val.numRef && ser.val.numRef.numCache)
-                                    cur_pts = ser.val.numRef.numCache.pts;
+                                    cur_pts = ser.val.numRef.numCache;
                                 else if(ser.val.numLit)
-                                    cur_pts = ser.val.numLit.pts;
+                                    cur_pts = ser.val.numLit;
                                 if(cur_pts)
                                 {
-                                    pts_len = Math.max(pts_len, getMaxIdx(cur_pts));
+                                    pts_len = Math.max(pts_len, cur_pts.ptCount);
                                 }
                             }
                         }
@@ -4689,7 +4715,7 @@ CChartSpace.prototype =
                     {
                         compiled_marker.setSpPr(new CSpPr());
                     }
-                    compiled_marker.spPr.setFill(brushes[i]);
+                    compiled_marker.spPr.setFill(brushes[pts[i].idx]);
                     compiled_marker.spPr.Fill.merge(pts[i].brush);
                     if(!compiled_marker.spPr.ln)
                         compiled_marker.spPr.setLn(new CLn());
@@ -4765,11 +4791,11 @@ CChartSpace.prototype =
                         {
                             compiled_marker.setSpPr(new CSpPr());
                         }
-                        compiled_marker.spPr.setFill(brushes[i]);
+                        compiled_marker.spPr.setFill(brushes[series[i].idx]);
                         if(!compiled_marker.spPr.ln)
                             compiled_marker.spPr.setLn(new CLn());
-                        compiled_marker.spPr.ln.setFill(pens_fills[i]);
-                        compiled_marker.setSymbol(GetTypeMarkerByIndex(i));
+                        compiled_marker.spPr.ln.setFill(pens_fills[series[i].idx]);
+                        compiled_marker.setSymbol(GetTypeMarkerByIndex(series[i].idx));
                         compiled_marker.merge(ser.marker);
                         if(j === 0)
                             ser.compiledSeriesMarker = compiled_marker.createDuplicate();
@@ -6949,7 +6975,6 @@ function CreateLineChart(asc_chart, type)
     var title = plot_area.valAx.title;
     title.setTxPr(new CTextBody());
     title.txPr.setBodyPr(new CBodyPr());
-    title.txPr.bodyPr.setVert(nVertTTvert);
     var line_chart = plot_area.charts[0];
     line_chart.setGrouping(type);
     line_chart.setVaryColors(false);
@@ -7657,11 +7682,12 @@ function CreateScatterChart(asc_chart)
     var first_series = asc_series.length > 1 ? asc_series[0] : null;
     var start_index = asc_series.length > 1 ? 1 : 0;
     var parsedHeaders = asc_chart.parseSeriesHeaders();
+    var minus = start_index === 1 ? 1 : 0;
     for(var i = start_index; i < asc_series.length; ++i)
     {
         var series = new CScatterSeries();
-        series.setIdx(i);
-        series.setOrder(i);
+        series.setIdx(i - minus);
+        series.setOrder(i - minus);
         if(first_series)
         {
             series.setXVal(new CXVal());

@@ -639,6 +639,53 @@ var historyitem_GraphicObjectsRemoveHeaderOrFooter  = 2606;
 var historyitem_WrapPolygonSetEdited     = 2607;
 var historyitem_WrapPolygonSetRelPoints  = 2608;
 
+
+
+var historyitem_DateAxAuto            = 2609;
+var historyitem_DateAxAxId            = 2610;
+var historyitem_DateAxAxPos           = 2611;
+var historyitem_DateAxBaseTimeUnit    = 2612;
+var historyitem_DateAxCrossAx         = 2613;
+var historyitem_DateAxCrosses         = 2614;
+var historyitem_DateAxCrossesAt       = 2615;
+var historyitem_DateAxDelete          = 2616;
+var historyitem_DateAxLblOffset       = 2617;
+var historyitem_DateAxMajorGridlines  = 2618;
+var historyitem_DateAxMajorTickMark   = 2619;
+var historyitem_DateAxMajorTimeUnit   = 2620;
+var historyitem_DateAxMajorUnit       = 2621;
+var historyitem_DateAxMinorGridlines  = 2622;
+var historyitem_DateAxMinorTickMark   = 2623;
+var historyitem_DateAxMinorTimeUnit   = 2624;
+var historyitem_DateAxMinorUnit       = 2625;
+var historyitem_DateAxNumFmt          = 2626;
+var historyitem_DateAxScaling         = 2627;
+var historyitem_DateAxSpPr            = 2628;
+var historyitem_DateAxTickLblPos      = 2629;
+var historyitem_DateAxTitle           = 2630;
+var historyitem_DateAxTxPr            = 2631;
+
+
+
+var historyitem_SerAxSetAxId            = 2632;
+var historyitem_SerAxSetAxPos           = 2633;
+var historyitem_SerAxSetCrossAx         = 2634;
+var historyitem_SerAxSetCrosses         = 2635;
+var historyitem_SerAxSetCrossesAt       = 2636;
+var historyitem_SerAxSetDelete          = 2637;
+var historyitem_SerAxSetMajorGridlines  = 2638;
+var historyitem_SerAxSetMajorTickMark   = 2639;
+var historyitem_SerAxSetMinorGridlines  = 2640;
+var historyitem_SerAxSetMinorTickMark   = 2641;
+var historyitem_SerAxSetNumFmt          = 2642;
+var historyitem_SerAxSetScaling         = 2643;
+var historyitem_SerAxSetSpPr            = 2644;
+var historyitem_SerAxSetTickLblPos      = 2645;
+var historyitem_SerAxSetTickLblSkip     = 2646;
+var historyitem_SerAxSetTickMarkSkip    = 2647;
+var historyitem_SerAxSetTitle           = 2648;
+var historyitem_SerAxSetTxPr            = 2649;
+
 var historyitem_type_ColorMod = 1001;
 var historyitem_type_ColorModifiers = 1002;
 var historyitem_type_SysColor = 1003;
@@ -752,6 +799,8 @@ var historyitem_type_TextBody = 1109;
 var historyitem_type_CatAx = 1110;
 var historyitem_type_ValAx = 1111;
 var historyitem_type_WrapPolygon = 1112;
+var historyitem_type_DateAx = 1113;
+var historyitem_type_SerAx = 1114;
 
 
 

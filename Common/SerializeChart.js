@@ -10235,7 +10235,7 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         val.addAxis(oNewVal);
     }
     else if (c_oserct_plotareaDATEAX === type) {
-        var oNewVal = new CCatAx();
+        var oNewVal = new CDateAx();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DateAx(t, l, oNewVal);
         });
@@ -10244,7 +10244,7 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         val.addAxis(oNewVal);
     }
     else if (c_oserct_plotareaSERAX === type) {
-        var oNewVal = new CCatAx();
+        var oNewVal = new CSerAx();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_SerAx(t, l, oNewVal);
         });

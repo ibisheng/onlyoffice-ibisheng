@@ -1781,6 +1781,7 @@ CPlotArea.prototype =
             switch(axis.getObjectType())
             {
                 case historyitem_type_CatAx:
+                case historyitem_type_DateAx:
                 {
                     ret.catAx.push(axis);
                     break;
@@ -4520,6 +4521,599 @@ CCatAx.prototype =
     },
 
 
+    Save_Changes: function()
+    {},
+
+    Load_Changes: function()
+    {}
+};
+
+
+
+function CDateAx()
+{
+    this.auto           = null;
+    this.axId           = null;
+    this.axPos          = null;
+    this.baseTimeUnit   = null;
+    this.crossAx        = null;
+    this.crosses        = null;
+    this.crossesAt      = null;
+    this.bDelete        = null;
+    this.extLst         = null;
+    this.lblOffset      = null;
+    this.majorGridlines = null;
+    this.majorTickMark  = null;
+    this.majorTimeUnit  = null;
+    this.majorUnit      = null;
+    this.minorGridlines = null;
+    this.minorTickMark  = null;
+    this.minorTimeUnit  = null;
+
+    this.minorUnit      = null;
+    this.numFmt         = null;
+    this.scaling        = null;
+    this.spPr           = null;
+    this.tickLblPos     = null;
+    this.title          = null;
+    this.txPr           = null;
+
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
+}
+
+CDateAx.prototype =
+{
+    Get_Id: function()
+    {
+        return  this.Id;
+    },
+
+    getObjectsType: function()
+    {
+        return historyitem_type_DateAx;
+    },
+
+    setAuto: function(pr)
+    {
+        History.Add(this, {Type:historyitem_DateAxAuto, oldPr: this.auto, newPr: pr});
+        this.auto = pr;
+
+    },
+    setAxId: function(pr)
+    {
+        History.Add(this, {Type:historyitem_DateAxAxId, oldPr: this.axId, newPr: pr});
+        this.axId = pr;
+
+    },
+    setAxPos: function(pr)
+    {
+        History.Add(this, {Type:historyitem_DateAxPos, oldPr: this.axPos, newPr: pr});
+        this.axPos = pr;
+
+    },
+    setBaseTimeUnit: function(pr)
+    {
+        History.Add(this, {Type:historyitem_DateAxBaseTimeUnit, oldPr: this.baseTimeUnit, newPr: pr});
+        this.baseTimeUnit = pr;
+
+    },
+    setCrossAx: function(pr)
+    {
+        History.Add(this, {Type:historyitem_DateAxCrossAx, oldPr: this.crossAx, newPr: pr});
+        this.crossAx = pr;
+
+    },
+    setCrosses: function(pr)
+    {
+        History.Add(this, {Type:historyitem_DateAxCrosses, oldPr: this.crosses, newPr: pr});
+        this.crosses = pr;
+
+    },
+    setCrossesAt: function(pr)
+    {
+        History.Add(this, {Type:historyitem_DateAxCrossesAt, oldPr: this.crossesAt, newPr: pr});
+        this.crossesAt = pr;
+
+    },
+    setDelete: function(pr)
+    {
+        History.Add(this, {Type:historyitem_DateAxDelete, oldPr: this.bDelete, newPr: pr});
+        this.bDelete = pr;
+
+    },
+    setLblOffset: function(pr)
+    {
+        History.Add(this, {Type:historyitem_DateAxLblOffset, oldPr: this.lblOffset, newPr: pr});
+        this.lblOffset = pr;
+
+    },
+    setMajorGridlines: function(pr)
+    {
+        History.Add(this, {Type:historyitem_DateAxMajorGridlines, oldPr: this.majorGridlines, newPr: pr});
+        this.majorGridlines = pr;
+
+    },
+    setMajorTickMark: function(pr)
+    {
+        History.Add(this, {Type:historyitem_DateAxMajorTickMark, oldPr: this.majorTickMark, newPr: pr});
+        this.majorTickMark = pr;
+
+    },
+    setMajorTimeUnit: function(pr)
+    {
+        History.Add(this, {Type:historyitem_DateAxMajorTimeUnit, oldPr: this.majorTimeUnit, newPr: pr});
+        this.majorTimeUnit = pr;
+
+    },
+    setMajorUnit: function(pr)
+    {
+        History.Add(this, {Type:historyitem_DateAxMajorUnit, oldPr: this.majorUnit, newPr: pr});
+        this.majorUnit = pr;
+
+    },
+    setMinorGridlines: function(pr)
+    {
+        History.Add(this, {Type:historyitem_DateAxMajorGridlines, oldPr: this.majorGridlines, newPr: pr});
+        this.majorGridlines = pr;
+
+    },
+    setMinorTickMark: function(pr)
+    {
+        History.Add(this, {Type:historyitem_DateAxMinorTickMark, oldPr: this.minorTickMark, newPr: pr});
+        this.minorTickMark = pr;
+
+    },
+    setMinorTimeUnit: function(pr)
+    {
+        History.Add(this, {Type:historyitem_DateAxMinorTimeUnit, oldPr: this.minorTimeUnit, newPr: pr});
+        this.minorTimeUnit = pr;
+    },
+          ///
+    setMinorUnit: function(pr)
+    {
+        History.Add(this, {Type:historyitem_DateAxMinorUnit, oldPr: this.minorUnit, newPr: pr});
+        this.minorUnit = pr;
+    },
+    setNumFmt: function(pr)
+    {
+        History.Add(this, {Type:historyitem_DateAxNumFmt, oldPr: this.numFmt, newPr: pr});
+        this.numFmt = pr;
+    },
+    setScaling: function(pr)
+    {
+        History.Add(this, {Type:historyitem_DateAxScaling, oldPr: this.scaling, newPr: pr});
+        this.scaling = pr;
+    },
+    setSpPr: function(pr)
+    {
+        History.Add(this, {Type:historyitem_DateAxSpPr, oldPr: this.spPr, newPr: pr});
+        this.spPr = pr;
+    },
+    setTickLblPos: function(pr)
+    {
+        History.Add(this, {Type:historyitem_DateAxTickLblPos, oldPr: this.tickLblPos, newPr: pr});
+        this.tickLblPos = pr;
+    },
+    setTitle: function(pr)
+    {
+        History.Add(this, {Type:historyitem_DateAxTitle, oldPr: this.title, newPr: pr});
+        this.title = pr;
+    },
+    setTxPr: function(pr)
+    {
+        History.Add(this, {Type:historyitem_DateAxTxPr, oldPr: this.txPr, newPr: pr});
+        this.txPr = pr;
+    },
+    //
+
+        Write_ToBinary2: function(w)
+    {
+        w.WriteLong(this.getObjectType());
+        w.WriteString2(this.Get_Id());
+    },
+
+
+    Read_FromBinar2: function(r)
+    {
+        this.Id = r.GetString2();
+    },
+
+
+    Undo: function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_DateAxAuto:
+            {
+                this.auto = data.oldPr;
+                break;
+            }
+            case historyitem_DateAxAxId:
+            {
+                this.axId = data.oldPr;
+                break;
+            }
+            case historyitem_DateAxAxPos:
+            {
+                this.axPos = data.oldPr;
+                break;
+            }
+            case historyitem_DateAxBaseTimeUnit:
+            {
+                this.baseTimeUnit = data.oldPr;
+                break;
+            }
+            case historyitem_DateAxCrossAx:
+            {
+                this.crossAx = data.oldPr;
+                break;
+            }
+            case historyitem_DateAxCrosses:
+            {
+                this.crosses = data.oldPr;
+                break;
+            }
+            case historyitem_DateAxCrossesAt:
+            {
+                this.crossesAt = data.oldPr;
+                break;
+            }
+            case historyitem_DateAxDelete:
+            {
+                this.bDelete = data.oldPr;
+                break;
+            }
+            case historyitem_DateAxLblOffset:
+            {
+                this.lblOffset = data.oldPr;
+                break;
+            }
+            case historyitem_DateAxMajorGridlines:
+            {
+                this.majorGridlines = data.oldPr;
+                break;
+            }
+            case historyitem_DateAxMajorTickMark:
+            {
+                this.majorTickMark = data.oldPr;
+                break;
+            }
+            case historyitem_DateAxMajorTimeUnit:
+            {
+                this.majorTimeUnit = data.oldPr;
+                break;
+            }
+            case historyitem_DateAxMajorUnit:
+            {
+                this.majorUnit = data.oldPr;
+                break;
+            }
+            case historyitem_DateAxMinorGridlines:
+            {
+                this.minorGridlines = data.oldPr;
+                break;
+            }
+            case historyitem_DateAxMinorTickMark:
+            {
+                this.minorTickMark = data.oldPr;
+                break;
+            }
+            case historyitem_DateAxMinorTimeUnit:
+            {
+                this.minorTimeUnit = data.oldPr;
+                break;
+            }
+
+            case historyitem_DateAxMinorUnit:
+            {
+                this.minorUnit = data.oldPr;
+                break;
+            }
+            case historyitem_DateAxNumFmt:
+            {
+                this.numFmt = data.oldPr;
+                break;
+            }
+            case historyitem_DateAxScaling:
+            {
+                this.scaling = data.oldPr;
+                break;
+            }
+            case historyitem_DateAxSpPr:
+            {
+                this.spPr = data.oldPr;
+                break;
+            }
+            case historyitem_DateAxTickLblPos:
+            {
+                this.tickLblPos = data.oldPr;
+                break;
+            }
+            case historyitem_DateAxTitle:
+            {
+                this.title = data.oldPr;
+                break;
+            }
+            case historyitem_DateAxTxPr:
+            {
+                this.txPr = data.oldPr;
+                break;
+            }
+        }
+    },
+
+    Redo: function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_DateAxAuto:
+            {
+                this.auto = data.newPr;
+                break;
+            }
+            case historyitem_DateAxAxId:
+            {
+                this.axId = data.newPr;
+                break;
+            }
+            case historyitem_DateAxAxPos:
+            {
+                this.axPos = data.newPr;
+                break;
+            }
+            case historyitem_DateAxBaseTimeUnit:
+            {
+                this.baseTimeUnit = data.newPr;
+                break;
+            }
+            case historyitem_DateAxCrossAx:
+            {
+                this.crossAx = data.newPr;
+                break;
+            }
+            case historyitem_DateAxCrosses:
+            {
+                this.crosses = data.newPr;
+                break;
+            }
+            case historyitem_DateAxCrossesAt:
+            {
+                this.crossesAt = data.newPr;
+                break;
+            }
+            case historyitem_DateAxDelete:
+            {
+                this.bDelete = data.newPr;
+                break;
+            }
+            case historyitem_DateAxLblOffset:
+            {
+                this.lblOffset = data.newPr;
+                break;
+            }
+            case historyitem_DateAxMajorGridlines:
+            {
+                this.majorGridlines = data.newPr;
+                break;
+            }
+            case historyitem_DateAxMajorTickMark:
+            {
+                this.majorTickMark = data.newPr;
+                break;
+            }
+            case historyitem_DateAxMajorTimeUnit:
+            {
+                this.majorTimeUnit = data.newPr;
+                break;
+            }
+            case historyitem_DateAxMajorUnit:
+            {
+                this.majorUnit = data.newPr;
+                break;
+            }
+            case historyitem_DateAxMinorGridlines:
+            {
+                this.minorGridlines = data.newPr;
+                break;
+            }
+            case historyitem_DateAxMinorTickMark:
+            {
+                this.minorTickMark = data.newPr;
+                break;
+            }
+            case historyitem_DateAxMinorTimeUnit:
+            {
+                this.minorTimeUnit = data.newPr;
+                break;
+            }
+
+
+            case historyitem_DateAxMinorUnit:
+            {
+                this.minorUnit = data.newPr;
+                break;
+            }
+            case historyitem_DateAxNumFmt:
+            {
+                this.numFmt = data.newPr;
+                break;
+            }
+            case historyitem_DateAxScaling:
+            {
+                this.scaling = data.newPr;
+                break;
+            }
+            case historyitem_DateAxSpPr:
+            {
+                this.spPr = data.newPr;
+                break;
+            }
+            case historyitem_DateAxTickLblPos:
+            {
+                this.tickLblPos = data.newPr;
+                break;
+            }
+            case historyitem_DateAxTitle:
+            {
+                this.title = data.newPr;
+                break;
+            }
+            case historyitem_DateAxTxPr:
+            {
+                this.txPr = data.newPr;
+                break;
+            }
+        }
+    },
+
+    Save_Changes: function(w)
+    {},
+
+    Load_Changes: function(r)
+    {}
+};
+
+function CSerAx()
+{
+    this.axId           = null;
+    this.axPos          = null;
+    this.crossAx        = null;
+    this.crosses        = null;
+    this.crossesAt      = null;
+    this.bDelete        = null;
+    this.extLst         = null;
+    this.majorGridlines = null;
+    this.majorTickMark  = null;
+    this.minorGridlines = null;
+    this.minorTickMark  = null;
+    this.numFmt         = null;
+    this.scaling        = null;
+    this.spPr           = null;
+    this.tickLblPos     = null;
+    this.tickLblSkip    = null;
+    this.tickMarkSkip   = null;
+    this.title          = null;
+    this.txPr           = null;
+
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
+}
+
+CSerAx.prototype =
+{
+    getObjectType: function()
+    {
+        return historyitem_type_SerAx;
+    },
+
+    Get_Id: function()
+    {
+        return this.Id;
+    },
+    setAxId: function(pr)
+    {
+        History.Add(this, {Type: historyitem_SerAxSetAxId, oldPr: this.axId, newPr: pr});
+        this.axId = pr;
+    },
+    setAxPos: function(pr)
+    {
+        History.Add(this, {Type: historyitem_SerAxSetAxPos, oldPr: this.axPos, newPr: pr});
+        this.axPos = pr;
+    },
+    setCrossAx: function(pr)
+    {
+        History.Add(this, {Type: historyitem_SerAxSetCrossAx, oldPr: this.crossAx, newPr: pr});
+        this.crossAx = pr;
+    },
+    setCrosses: function(pr)
+    {
+        History.Add(this, {Type: historyitem_SerAxSetCrosses, oldPr: this.crosses, newPr: pr});
+        this.crosses = pr;
+    },
+    setCrossesAt: function(pr)
+    {
+        History.Add(this, {Type: historyitem_SerAxSetCrossesAt, oldPr: this.crossesAt, newPr: pr});
+        this.crossesAt = pr;
+    },
+    setDelete: function(pr)
+    {
+        History.Add(this, {Type: historyitem_SerAxSetDelete, oldPr: this.bDelete, newPr: pr});
+        this.bDelete = pr;
+    },
+    setMajorGridlines: function(pr)
+    {
+        History.Add(this, {Type: historyitem_SerAxSetMajorGridlines, oldPr: this.majorGridlines, newPr: pr});
+        this.majorGridlines = pr;
+    },
+    setMajorTickMark: function(pr)
+    {
+        History.Add(this, {Type: historyitem_SerAxSetMajorTickMark, oldPr: this.majorTickMark, newPr: pr});
+        this.majorTickMark = pr;
+    },
+    setMinorGridlines: function(pr)
+    {
+        History.Add(this, {Type: historyitem_SerAxSetMajorGridlines, oldPr: this.majorGridlines, newPr: pr});
+        this.majorGridlines = pr;
+    },
+    setMinorTickMark: function(pr)
+    {
+        History.Add(this, {Type: historyitem_SerAxSetMinorTickMark, oldPr: this.minorTickMark, newPr: pr});
+        this.minorTickMark = pr;
+    },
+    setNumFmt: function(pr)
+    {
+        History.Add(this, {Type: historyitem_SerAxSetNumFmt, oldPr: this.numFmt, newPr: pr});
+        this.numFmt = pr;
+    },
+    setScaling: function(pr)
+    {
+        History.Add(this, {Type: historyitem_SerAxSetScaling, oldPr: this.scaling, newPr: pr});
+        this.scaling = pr;
+    },
+    setSpPr: function(pr)
+    {
+        History.Add(this, {Type: historyitem_SerAxSetSpPr, oldPr: this.spPr, newPr: pr});
+        this.spPr = pr;
+    },
+    setTickLblPos: function(pr)
+    {
+        History.Add(this, {Type: historyitem_SerAxSetTickLblPos, oldPr: this.tickLblPos, newPr: pr});
+        this.tickLblPos = pr;
+    },
+    setTickLblSkip: function(pr)
+    {
+        History.Add(this, {Type: historyitem_SerAxSetTickLblSkip, oldPr: this.tickLblSkip, newPr: pr});
+        this.tickLblSkip = pr;
+    },
+    setTickMarkSkip: function(pr)
+    {
+        History.Add(this, {Type: historyitem_SerAxSetTickMarkSkip, oldPr: this.tickMarkSkip, newPr: pr});
+        this.tickMarkSkip = pr;
+    },
+    setTitle: function(pr)
+    {
+        History.Add(this, {Type: historyitem_SerAxSetTitle, oldPr: this.title, newPr: pr});
+        this.title = pr;
+    },
+    setTxPr: function(pr)
+    {
+        History.Add(this, {Type: historyitem_SerAxSetTxPr, oldPr: this.txPr, newPr: pr});
+        this.txPr = pr;
+    },
+
+    Undo: function()
+    {},
+
+    Redo: function()
+    {},
+
+
+    Write_ToBinary2: function(w)
+    {},
+
+    Read_FrommBinary2: function()
+    {},
     Save_Changes: function()
     {},
 
@@ -11230,6 +11824,17 @@ CNumLit.prototype =
     Refresh_RecalcData: function()
     {},
 
+
+    getPtByIndex: function(idx)
+    {
+        for(var i = 0; i < this.pts.length; ++i)
+        {
+            if(this.pts[i].idx === idx)
+                return this.pts[i];
+        }
+        return null;
+    },
+
     getObjectType: function()
     {
         return historyitem_type_NumLit;
@@ -15715,18 +16320,18 @@ CTitle.prototype =
     {
         if(this.chart)
         {
-            graphics.SetIntegerGrid(false);
-            graphics.p_width(70);
-            graphics.transform3(this.chart.transform, false);
-            graphics.p_color(0, 0, 0, 255);
-            graphics._s();
-            graphics._m(this.x, this.y);
-            graphics._l(this.x + this.extX, this.y + 0);
-            graphics._l(this.x + this.extX, this.y + this.extY);
-            graphics._l(this.x + 0, this.y + this.extY);
-            graphics._z();
-            graphics.ds();
-            graphics.SetIntegerGrid(true);
+            //graphics.SetIntegerGrid(false);
+            //graphics.p_width(70);
+            //graphics.transform3(this.chart.transform, false);
+            //graphics.p_color(0, 0, 0, 255);
+            //graphics._s();
+            //graphics._m(this.x, this.y);
+            //graphics._l(this.x + this.extX, this.y + 0);
+            //graphics._l(this.x + this.extX, this.y + this.extY);
+            //graphics._l(this.x + 0, this.y + this.extY);
+            //graphics._z();
+            //graphics.ds();
+            //graphics.SetIntegerGrid(true);
         }
         CDLbl.prototype.draw.call(this, graphics);
     },
@@ -17611,18 +18216,18 @@ CValAxisLabels.prototype =
     {
         if(this.chart)
         {
-            g.SetIntegerGrid(false);
-            g.p_width(70);
-            g.transform3(this.chart.transform, false);
-            g.p_color(0, 0, 0, 255);
-            g._s();
-            g._m(this.x, this.y);
-            g._l(this.x + this.extX, this.y + 0);
-            g._l(this.x + this.extX, this.y + this.extY);
-            g._l(this.x + 0, this.y + this.extY);
-            g._z();
-            g.ds();
-            g.SetIntegerGrid(true);
+            //g.SetIntegerGrid(false);
+            //g.p_width(70);
+            //g.transform3(this.chart.transform, false);
+            //g.p_color(0, 0, 0, 255);
+            //g._s();
+            //g._m(this.x, this.y);
+            //g._l(this.x + this.extX, this.y + 0);
+            //g._l(this.x + this.extX, this.y + this.extY);
+            //g._l(this.x + 0, this.y + this.extY);
+            //g._z();
+            //g.ds();
+            //g.SetIntegerGrid(true);
         }
         for(var i = 0; i < this.arrLabels.length; ++i)
         {
