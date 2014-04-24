@@ -2970,7 +2970,7 @@ function DrawingObjects() {
         _this.drawingArea = currentSheet.drawingArea;
         _this.drawingArea.init();
         _this.coordsManager = new CoordsManager(worksheet, true);
-        _this.drawingDocument = currentSheet.model.DrawingDocument;
+        _this.drawingDocument = currentSheet.model.DrawingDocument ? currentSheet.model.DrawingDocument : new CDrawingDocument(this);
         _this.drawingDocument.drawingObjects = this;
         _this.drawingDocument.AutoShapesTrack = autoShapeTrack;
         _this.drawingDocument.TargetHtmlElement = document.getElementById('id_target_cursor');
