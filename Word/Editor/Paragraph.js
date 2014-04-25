@@ -14595,7 +14595,6 @@ Paragraph.prototype =
                 
                 if ( null !== Result )
                 {
-                    console.log("Good");
                     return Result;
                 }
             }            
@@ -14609,7 +14608,6 @@ Paragraph.prototype =
             Page = this.Get_StartPage_Absolute() + this.CurPos.PagesPos;
         }
 
-        console.log("Bad");
         return { X0 : X0, X1 : X1, Y : Y, Page : this.Get_StartPage_Absolute() };
     },
 

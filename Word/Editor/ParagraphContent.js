@@ -241,16 +241,6 @@ function ParaSpace(Count)
     this.Width        = 0;
     this.Height       = 0;
     this.WidthVisible = 0;
-
-//    this.TextAscent  = 0;
-//    this.TextDescent = 0;
-//    this.TextHeight  = 0;
-//    this.TextAscent2 = 0;
-//    this.YOffset     = 0;
-
-//    this.CurPage  = 0;
-//    this.CurLines = 0;
-//    this.CurRange = 0;
 }
 ParaSpace.prototype =
 {
@@ -299,7 +289,9 @@ ParaSpace.prototype =
 
         this.Width        = Temp.Width;
         this.Height       = Temp.Height;
-        this.WidthVisible = Temp.Width;
+        
+        // Не меняем здесь WidthVisible, это значение для пробела высчитывается отдельно, и не должно меняться при пересчете
+        //this.WidthVisible = Temp.Width;
     },
 
     Is_RealContent : function()
@@ -2261,7 +2253,9 @@ function ParaEnd()
     this.TextPr    = null; // Рассчитанные настройки текста для символа конца параграфа
     this.SectionPr = null;
 
-    this.Width = 0;
+    this.Width        = 0;
+    this.Height       = 0;
+    this.WidthVisible = 0;
 }
 
 ParaEnd.prototype =
@@ -2429,6 +2423,10 @@ function ParaNewLine(BreakType)
 
     if ( break_Page === this.BreakType )
         this.Flags.NewLine = true;
+    
+    this.Height       = 0;
+    this.Width        = 0;
+    this.WidthVisible = 0;
 }
 
 ParaNewLine.prototype =
@@ -2905,6 +2903,7 @@ function ParaTab()
     this.Width        = 0;
     this.Height       = 0;
     this.WidthVisible = 0;
+    this.RealWidth    = 0;
 }
 
 ParaTab.prototype =
