@@ -2,6 +2,7 @@
 {
     this.Shape      = null;
     this.Graphics   = null;
+    this.NativeGraphics = null;
     this.UniFill    = null;
     this.Ln         = null;
     this.Transform  = null;
@@ -26,8 +27,8 @@ CShapeDrawer.prototype =
 {
     Clear : function()
     {
-        this.Shape      = null;
-        this.Graphics   = null;
+        //this.Shape      = null;
+        //this.Graphics   = null;
         this.UniFill    = null;
         this.Ln         = null;
         this.Transform  = null;
@@ -80,11 +81,18 @@ CShapeDrawer.prototype =
         this.IsRectShape    = false;
         this.Shape          = shape;
 
-        this.Graphics = window.native;
+        this.Graphics = graphics;
+        this.NativeGraphics = window.native;
+        
         if (graphics.IsSlideBoundsCheckerType)
+        {
             this.Graphics = graphics;
+            this.NativeGraphics = null;
+        }
         else if (graphics.IsTrack)
-            this.Graphics = graphics.Native;
+        {
+            this.NativeGraphics = graphics.Native;
+        }
 
         this.UniFill        = shape.brush;
         this.Ln             = shape.pen;
@@ -229,7 +237,7 @@ CShapeDrawer.prototype =
 			return;
 		}
 
-        this.Graphics["PD_StartShapeDraw"](this.IsRectShape);
+        this.NativeGraphics["PD_StartShapeDraw"](this.IsRectShape);
         if(geom)
         {
             geom.draw(this);
@@ -245,14 +253,12 @@ CShapeDrawer.prototype =
             this.drawFillStroke(true, "norm", true && !this.bIsNoStrokeAttack);
             this._e();
         }
-        this.Graphics["PD_EndShapeDraw"]();
+        this.NativeGraphics["PD_EndShapeDraw"]();
     },
 
     p_width : function(w)
     {
-		if (this.Graphics.IsSlideBoundsCheckerType)
-			return this.Graphics.p_width(w);
-        this.Graphics["PD_p_width"](w);
+		return this.Graphics.p_width(w);
     },
 
     _m : function(x, y)
@@ -262,9 +268,7 @@ CShapeDrawer.prototype =
             this.CheckPoint(x, y);
             return;
         }
-		if (this.Graphics.IsSlideBoundsCheckerType)
-			return this.Graphics._m(x, y);
-        this.Graphics["PD_PathMoveTo"](x, y);
+		return this.Graphics._m(x, y);
     },
     _l : function(x, y)
     {
@@ -273,9 +277,7 @@ CShapeDrawer.prototype =
             this.CheckPoint(x, y);
             return;
         }
-		if (this.Graphics.IsSlideBoundsCheckerType)
-			return this.Graphics._l(x, y);
-        this.Graphics["PD_PathLineTo"](x, y);
+		return this.Graphics._l(x, y);        
     },
     _c : function(x1, y1, x2, y2, x3, y3)
     {
@@ -286,9 +288,7 @@ CShapeDrawer.prototype =
             this.CheckPoint(x3, y3);
             return;
         }
-		if (this.Graphics.IsSlideBoundsCheckerType)
-			return this.Graphics._c(x1, y1, x2, y2, x3, y3);
-        this.Graphics["PD_PathCurveTo"](x1, y1, x2, y2, x3, y3);
+		return this.Graphics._c(x1, y1, x2, y2, x3, y3);
     },
     _c2 : function(x1, y1, x2, y2)
     {
@@ -298,29 +298,21 @@ CShapeDrawer.prototype =
             this.CheckPoint(x2, y2);
             return;
         }
-		if (this.Graphics.IsSlideBoundsCheckerType)
-			return this.Graphics._c2(x1, y1, x2, y2);
-        this.Graphics["PD_PathCurveTo2"](x1, y1, x2, y2);
+		return this.Graphics._c2(x1, y1, x2, y2);
     },
     _z : function()
     {
         if (this.bIsCheckBounds)
             return;
-		if (this.Graphics.IsSlideBoundsCheckerType)
-			return this.Graphics._z();
-		this.Graphics["PD_PathClose"]();
+		return this.Graphics._z();		
     },
     _s : function()
     {
-		if (this.Graphics.IsSlideBoundsCheckerType)
-			return this.Graphics._s();
-        this.Graphics["PD_PathStart"]();
+		return this.Graphics._s();
     },
     _e : function()
     {
-		if (this.Graphics.IsSlideBoundsCheckerType)
-			return this.Graphics._e();
-        this.Graphics["PD_PathEnd"]();
+		return this.Graphics._e();    
     },
 
     df : function(mode)
@@ -337,15 +329,15 @@ CShapeDrawer.prototype =
             case FILL_TYPE_BLIP:
             {
                 if (!_fill.srcRect)
-                    this.Graphics["PD_put_BrushTextute"](_fill.RasterImageId);
+                    this.NativeGraphics["PD_put_BrushTextute"](_fill.RasterImageId);
                 else
                 {
                     var _sR = _fill.srcRect;
-                    this.Graphics["PD_put_BrushTextute"](_fill.RasterImageId, _sR.l, _sR.t, _sR.r, _sR.b);
+                    this.NativeGraphics["PD_put_BrushTextute"](_fill.RasterImageId, _sR.l, _sR.t, _sR.r, _sR.b);
                 }
 
-                this.Graphics["PD_put_BrushTextureMode"]((null == _fill.tile) ? 1 : 2);
-                this.Graphics["PD_put_BrushBounds"](this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y));
+                this.NativeGraphics["PD_put_BrushTextureMode"]((null == _fill.tile) ? 1 : 2);
+                this.NativeGraphics["PD_put_BrushBounds"](this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y));
 
                 break;
             }
@@ -380,31 +372,31 @@ CShapeDrawer.prototype =
                 {
                     if (this.UniFill.transparent != null)
                         rgba.A = this.UniFill.transparent;
-                    this.Graphics["PD_b_color1"](rgba.R, rgba.G, rgba.B, rgba.A);
+                    this.NativeGraphics["PD_b_color1"](rgba.R, rgba.G, rgba.B, rgba.A);
                 }
                 break;
             }
             case FILL_TYPE_GRAD:
             {
-                this.Graphics["PD_put_BrushBounds"](this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y));
+                this.NativeGraphics["PD_put_BrushBounds"](this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y));
                 var points = null;
                 if (_fill.lin)
                 {
                     points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, _fill.lin.angle, _fill.lin.scale);
-                    this.Graphics["PD_put_BrushGradientLinear"](points.x0, points.y0, points.x1, points.y1);
+                    this.NativeGraphics["PD_put_BrushGradientLinear"](points.x0, points.y0, points.x1, points.y1);
                 }
                 else if (_fill.path)
                 {
                     var _cx = (this.min_x + this.max_x) / 2;
                     var _cy = (this.min_y + this.max_y) / 2;
                     var _r = Math.max(this.max_x - this.min_x, this.max_y - this.min_y) / 2;
-                    this.Graphics["PD_put_BrushGradientRadial"](_cx, _cy, 1, _cx, _cy, _r);
+                    this.NativeGraphics["PD_put_BrushGradientRadial"](_cx, _cy, 1, _cx, _cy, _r);
                 }
                 else
                 {
                     //gradObj = _ctx.createLinearGradient(this.min_x, this.min_y, this.max_x, this.min_y);
                     points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, 90 * 60000, false);
-                    this.Graphics["PD_put_BrushGradientLinear"](points.x0, points.y0, points.x1, points.y1);
+                    this.NativeGraphics["PD_put_BrushGradientLinear"](points.x0, points.y0, points.x1, points.y1);
                 }
 
                 var arr_pos = [];
@@ -416,7 +408,7 @@ CShapeDrawer.prototype =
                     var _c = _fill.colors[i].color.RGBA;
                     arr_colors.push(_c.R * 256*256*256 + _c.G * 256*256 + _c.B * 256 + _c.A);
                 }
-                this.Graphics["PD_put_BrushGragientColors"](arr_pos, arr_colors);
+                this.NativeGraphics["PD_put_BrushGragientColors"](arr_pos, arr_colors);
 
                 break;
             }
@@ -432,16 +424,16 @@ CShapeDrawer.prototype =
                 var __fa = (null === this.UniFill.transparent) ? _fc.A : 255;
                 var __ba = (null === this.UniFill.transparent) ? _bc.A : 255;
 
-                this.Graphics["PD_put_BrushPattern"](_patt_name);
-                this.Graphics["PD_b_color1"](_fc.R, _fc.G, _fc.B, __fa);
-                this.Graphics["PD_b_color2"](_bc.R, _bc.G, _bc.B, __ba);
+                this.NativeGraphics["PD_put_BrushPattern"](_patt_name);
+                this.NativeGraphics["PD_b_color1"](_fc.R, _fc.G, _fc.B, __fa);
+                this.NativeGraphics["PD_b_color2"](_bc.R, _bc.G, _bc.B, __ba);
                 break;
             }
             default:
                 break;
         }
 
-        this.Graphics["PD_Fill"]();
+        this.NativeGraphics["PD_Fill"]();
     },
     ds : function()
     {
@@ -457,32 +449,32 @@ CShapeDrawer.prototype =
             {
                 case LineJoinType.Round:
                 {
-                    this.Graphics["PD_lineJoin"]("round");
+                    this.NativeGraphics["PD_lineJoin"]("round");
                     break;
                 }
                 case LineJoinType.Bevel:
                 {
-                    this.Graphics["PD_lineJoin"]("bevel");
+                    this.NativeGraphics["PD_lineJoin"]("bevel");
                     break;
                 }
                 case LineJoinType.Empty:
                 {
-                    this.Graphics["PD_lineJoin"]("miter");
+                    this.NativeGraphics["PD_lineJoin"]("miter");
                     break;
                 }
                 case LineJoinType.Miter:
                 {
-                    this.Graphics["PD_lineJoin"]("miter");
+                    this.NativeGraphics["PD_lineJoin"]("miter");
                     break;
                 }
             }
         }
 
         var rgba = this.StrokeUniColor;
-        this.Graphics["PD_p_width"](this.StrokeWidth);
-        this.Graphics["PD_p_color"](rgba.R, rgba.G, rgba.B, rgba.A);
+        this.NativeGraphics["PD_p_width"](this.StrokeWidth);
+        this.NativeGraphics["PD_p_color"](rgba.R, rgba.G, rgba.B, rgba.A);
         
-        this.Graphics["PD_Stroke"]();
+        this.NativeGraphics["PD_Stroke"]();
     },
 
     drawFillStroke : function(bIsFill, fill_mode, bIsStroke)
