@@ -58,6 +58,10 @@ CBorderBox.prototype.init = function(props)
 
     this.setDimension(1, 1);
     this.setContent();
+
+
+    /// вызов этой функции обязательно в конце
+    this.WriteContentsToHistory();
 }
 CBorderBox.prototype.recalculateSize = function()
 {
@@ -332,6 +336,9 @@ CBox.prototype.init = function(props)
 
     if(this.opEmu)
         this.elements[0][0].decreaseArgSize();
+
+    /// вызов этой функции обязательно в конце
+    this.WriteContentsToHistory();
 }
 CBox.prototype.getBase = function()
 {
@@ -390,6 +397,10 @@ CBar.prototype.init = function(props)
     };
 
     this.setCharacter(props, defaultProps);
+
+
+    /// вызов этой функции обязательно в конце
+    this.WriteContentsToHistory();
 }
 CBar.prototype.getAscent = function()
 {
@@ -423,6 +434,9 @@ CPhantom.prototype.init = function(props)
     this.props = props;
     this.setDimension(1, 1);
     this.setContent();
+
+    /// вызов этой функции обязательно в конце
+    this.WriteContentsToHistory();
 }
 CPhantom.prototype.getPropsForWrite = function()
 {

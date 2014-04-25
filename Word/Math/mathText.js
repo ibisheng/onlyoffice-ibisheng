@@ -257,9 +257,6 @@ CMathText.prototype =
         var descent = (metricsTxt.Height - metricsTxt.Ascent);
         var height  =  ascent + descent;
 
-        if(this.bJDraw)
-            console.log("Ascent of " + this.value + "  " + ascent);
-
         var width;
 
         if(this.bJDraw)
@@ -302,12 +299,7 @@ CMathText.prototype =
         pGraphics.transform(sx, shy, shx, sy, 0, 0);*/
 
 
-        var bJDraw;
-
-        if(this.bJDraw)
-            bJDraw = this.bJDraw;
-
-        pGraphics.FillTextCode(X, Y, this.getCode(), bJDraw);    //на отрисовку символа отправляем положение baseLine
+        pGraphics.FillTextCode(X, Y, this.getCode());    //на отрисовку символа отправляем положение baseLine
 
     },
     setPosition: function(pos)
@@ -317,7 +309,7 @@ CMathText.prototype =
         else                                    // for symbol only drawing
         {
             var x = pos.x - this.rasterOffsetX,
-                y = pos.y - this.rasterOffsetY + this.size.ascent;
+                y = pos.y - this.rasterOffsetY;
 
             this.pos = {x: x, y: y};
         }

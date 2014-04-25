@@ -206,6 +206,8 @@ CNary.prototype.init = function(props)
 
     this.addMCToContent(base, arg);
 
+    /// вызов этой функции обязательно в конце
+    this.WriteContentsToHistory();
 }
 CNary.prototype.setCtrPrp = function(txtPrp)
 {

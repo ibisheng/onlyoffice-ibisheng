@@ -119,6 +119,10 @@ CMathMatrix.prototype.init = function(props)
         // если rSpRule не выставлено, то какое выставлено rSp не имеет значение
         this.setRuleGap(this.spaceRow, props.rSpRule, props.rSp);
     }*/
+
+
+    /// вызов этой функции обязательно в конце
+    this.WriteContentsToHistory();
 }
 CMathMatrix.prototype.setRuleGap = function(space, rule, gap, minGap)
 {
@@ -375,7 +379,6 @@ CMathMatrix.prototype.findDistance = function() // для получения п�
     return {w : w, h: h };
 }
 
-////  open  ////
 CMathMatrix.prototype.addRow = function()
 {
     this.nRow++;
@@ -391,7 +394,6 @@ CMathMatrix.prototype.addRow = function()
     // не будет работать, т.к. нужен для пересчета oMeasure
     this.recalculateSize();
 }
-
 CMathMatrix.prototype.setRowGapRule = function(rule, gap)
 {
     this.spaceRow.rule = rule;

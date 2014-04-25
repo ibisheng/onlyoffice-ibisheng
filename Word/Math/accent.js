@@ -1162,6 +1162,20 @@ CAccent.prototype.init = function(properties)
 
     //this.setOperator(accent);
     this.elements[0][0].SetDot(true);
+
+
+    /// вызов этой функции обязательно в конце
+    this.WriteContentsToHistory();
+}
+CAccent.prototype.setPosition = function(pos)
+{
+
+
+
+}
+CAccent.prototype.Resize = function(oMeasure)
+{
+
 }
 CAccent.prototype.getAscent = function()
 {

@@ -932,6 +932,9 @@ CRadical.prototype.init = function(props)
 
         this.addMCToContent(oDegree, oBase);
     }
+
+    /// вызов этой функции обязательно в конце
+    this.WriteContentsToHistory();
 }
 CRadical.prototype.recalculateSize = function(oMeasure)
 {

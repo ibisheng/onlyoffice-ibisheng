@@ -32,6 +32,9 @@ CDegree.prototype.init_2 = function(props, oBase)
     oDegree.decreaseArgSize();
 
     this.addMCToContent(oBase, oDegree);
+
+    /// вызов этой функции обязательно в конце
+    this.WriteContentsToHistory();
 }
 CDegree.prototype.recalculateSize = function(oMeasure)
 {
@@ -642,6 +645,8 @@ CDegreeSubSup.prototype.init_2 = function(props, oBase)
         this.addMCToContent(oIters, oBase);
     }
 
+    /// вызов этой функции обязательно в конце
+    this.WriteContentsToHistory();
 }
 CDegreeSubSup.prototype.old_old_recalculateSize = function(oMeasure)
 {

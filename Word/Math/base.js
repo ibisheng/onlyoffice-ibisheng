@@ -1237,6 +1237,18 @@ CMathBase.prototype =
 
         return gaps;
     },
+    WriteContentsToHistory: function()
+    {
+        for(var i = 0; i < this.nRow; i++)
+        {
+            for(var j = 0; j < this.nCol; j++)
+            {
+                var Pos = {row: i, column: j};
+                History.Add(this, {Type: historyitem_Math_AddItem, Items: this.elements[i][j], Pos: Pos});
+            }
+        }
+
+    },
     /// Position for Paragraph
     Get_ParaContentPosByXY: function(SearchPos, Depth)
     {

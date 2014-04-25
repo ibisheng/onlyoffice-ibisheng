@@ -46,6 +46,9 @@ CFraction.prototype.init = function(props)
         this.setDimension(1, 2);
         this.setContent();
     }
+
+    /// вызов этой функции обязательно в конце
+    this.WriteContentsToHistory();
 }
 CFraction.prototype.getType = function()
 {

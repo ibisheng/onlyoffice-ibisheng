@@ -22,6 +22,9 @@ CLimit.prototype.init = function(props)
         this.addMCToContent(oBase, oIter);
     else if(this.type == LIMIT_UP)
         this.addMCToContent(oIter, oBase);
+
+    /// вызов этой функции обязательно в конце
+    this.WriteContentsToHistory();
 }
 CLimit.prototype.getAscent = function()
 {
@@ -77,6 +80,9 @@ CMathFunc.prototype.init = function()
 {
     this.setDimension(1, 2);
     this.setContent();
+
+    /// вызов этой функции обязательно в конце
+    this.WriteContentsToHistory();
 }
 CMathFunc.prototype.setDistance = function()
 {

@@ -3246,6 +3246,9 @@ CDelimiter.prototype.init = function(props)
 
     this.setDimension(1, props.column);
     this.setContent();
+
+    /// вызов этой функции обязательно в конце
+    this.WriteContentsToHistory();
 }
 CDelimiter.prototype.old_recalculateSize = function()
 {
@@ -4003,24 +4006,8 @@ CGroupCharacter.prototype.init = function(props)
 
     this.setCharacter(operProps, operDefaultPrp);
 
-    /*var type = props.chrType;
-    var code = typeof(props.chr) === "string" ? props.chr.charCodeAt(0) : null;
-
-    if( typeof(type) === "undefined"|| type === null && code === null )
-    {
-        type = BRACKET_CURLY_BOTTOM;
-        this.loc = LOCATION_BOT;
-    }
-
-    var operator = this.getGlyph(code, type);
-
-    if(operator.bArrow)
-        this.setReduct(DEGR_REDUCT);*/
-
-    /*this.setOperator(new COperator(operator));*/
-
-    /*if(this.operator.IsArrow())
-        this.setReduct(DEGR_REDUCT);*/
+    /// вызов этой функции обязательно в конце
+    this.WriteContentsToHistory();
 }
 CGroupCharacter.prototype.getAscent = function(oMeasure)
 {
