@@ -1058,9 +1058,6 @@ CDocument.prototype =
                 this.Pages[PageIndex].Margins.Right  = SectPr.PageSize.H - SectPr.PageMargins.Top;
                 this.Pages[PageIndex].Margins.Bottom = SectPr.PageSize.W - SectPr.PageMargins.Right;
             }
-
-            this.DrawingObjects.createGraphicPage(PageIndex);
-            this.DrawingObjects.resetDrawingArrays(PageIndex, this);
         }
 
         var Count = this.Content.length;
@@ -1135,8 +1132,13 @@ CDocument.prototype =
         else
         {
             if ( true === bStart )
+            {
                 this.Pages.length = PageIndex + 1;
-        }
+
+                this.DrawingObjects.createGraphicPage(PageIndex);
+                this.DrawingObjects.resetDrawingArrays(PageIndex, this);
+            }
+        }                
 
         //console.log( "Regular Recalc " + PageIndex );
 
