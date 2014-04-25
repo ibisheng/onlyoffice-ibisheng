@@ -142,15 +142,8 @@ function CTableId()
             case historyitem_type_HdrFtr           : Element = new CHeaderFooter(); break;
             case historyitem_type_AbstractNum      : Element = new CAbstractNum(); break;
             case historyitem_type_Comment          : Element = new CComment(); break;
-            case historyitem_type_Shape            : Element = new WordShape(); break;
-            case historyitem_type_Image            : Element = new WordImage(); break;
-            case historyitem_type_GroupShapes      : Element = new WordGroupShapes(); break;
-			case historyitem_type_Chart		       : Element = new CChartAsGroup(); break;
             case historyitem_type_WrapPolygon      : Element = new CWrapPolygon(); break;
-            case historyitem_type_HdrFtrGrObjects  : Element = new HeaderFooterGraphicObjects(); break;
             case historyitem_type_Style            : Element = new CStyle(); break;
-            case historyitem_type_TextBody         : Element = new CTextBody(); break;
-            case historyitem_type_ChartTitle       : Element = new CChartTitle(); break;
 			case historyitem_type_Math		       : Element = new ParaMath(false); break;
 			case historyitem_type_MathContent      : Element = new CMathContent(); break;
             case historyitem_type_CommentMark      : Element = new ParaComment(); break;
