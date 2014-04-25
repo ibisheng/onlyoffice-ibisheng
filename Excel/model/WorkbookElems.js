@@ -550,8 +550,10 @@ Font.prototype =
     },
 	set : function(oVal)
 	{
-        if(null != oVal.fn)
-            this.fn = oVal.fn;
+	    if (null != oVal.fn) {
+	        this.fn = oVal.fn;
+	        this.scheme = null;
+	    }
 		if(null != oVal.scheme)
             this.scheme = oVal.scheme;
         if(null != oVal.fs)
