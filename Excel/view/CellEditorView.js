@@ -1535,7 +1535,7 @@
 
 			_setFormatProperty: function (format, prop, val) {
 				switch (prop) {
-					case "fn": format.fn = val; break;
+					case "fn": format.fn = val; format.scheme = Asc.EFontScheme.fontschemeNone; break;
 					case "fs": format.fs = val; break;
 					case "b":
 						val = (null === val) ? ((format.b) ? !format.b : true) : val;
