@@ -57,47 +57,47 @@ function cERROR_TYPE() {
 cERROR_TYPE.prototype = Object.create( cBaseFunction.prototype )
 cERROR_TYPE.prototype.Calculate = function ( arg ) {
     function typeError( elem ) {
-        if ( elem instanceof cError ) {
+        if ( elem instanceof CError ) {
             if ( elem.errorType == cErrorType.null_value ) {
-                return new cNumber( 1 );
+                return new CNumber( 1 );
             }
             else if ( elem.errorType == cErrorType.division_by_zero ) {
-                return new cNumber( 2 );
+                return new CNumber( 2 );
             }
             else if ( elem.errorType == cErrorType.wrong_value_type ) {
-                return new cNumber( 3 );
+                return new CNumber( 3 );
             }
             else if ( elem.errorType == cErrorType.bad_reference ) {
-                return new cNumber( 4 );
+                return new CNumber( 4 );
             }
             else if ( elem.errorType == cErrorType.wrong_name ) {
-                return new cNumber( 5 );
+                return new CNumber( 5 );
             }
             else if ( elem.errorType == cErrorType.not_numeric ) {
-                return new cNumber( 6 );
+                return new CNumber( 6 );
             }
             else if ( elem.errorType == cErrorType.not_available ) {
-                return new cNumber( 7 );
+                return new CNumber( 7 );
             }
             else if ( elem.errorType == cErrorType.getting_data ) {
-                return new cNumber( 8 );
+                return new CNumber( 8 );
             }
             else {
-                return new cError( cErrorType.not_available );
+                return new CError( cErrorType.not_available );
             }
         }
-        else return new cError( cErrorType.not_available );
+        else return new CError( cErrorType.not_available );
     }
 
     var arg0 = arg[0];
-    if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+    if ( arg0 instanceof CRef || arg0 instanceof CRef3D ) {
         arg0 = arg0.getValue();
     }
-    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+    else if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof cArray ) {
-        var ret = new cArray();
+    else if ( arg0 instanceof CArray ) {
+        var ret = new CArray();
         arg0.foreach( function ( elem, r, c ) {
             if ( !ret.array[r] )
                 ret.addRow();
@@ -135,16 +135,16 @@ function cISBLANK() {
 cISBLANK.prototype = Object.create( cBaseFunction.prototype )
 cISBLANK.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
-    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+    else if ( arg0 instanceof CRef || arg0 instanceof CRef3D ) {
         arg0 = arg0.getValue();
     }
-    if ( arg0 instanceof cEmpty )
-        return this.value = new cBool( true );
+    if ( arg0 instanceof CEmpty )
+        return this.value = new CBool( true );
     else
-        return this.value = new cBool( false );
+        return this.value = new CBool( false );
 }
 cISBLANK.prototype.getInfo = function () {
     return {
@@ -174,20 +174,20 @@ function cISERR() {
 cISERR.prototype = Object.create( cBaseFunction.prototype )
 cISERR.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
-    if ( arg0 instanceof cArray ) {
+    if ( arg0 instanceof CArray ) {
         arg0 = arg0.getElement( 0 );
     }
-    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+    else if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+    else if ( arg0 instanceof CRef || arg0 instanceof CRef3D ) {
         arg0 = arg0.getValue();
     }
 
-    if ( arg0 instanceof cError && arg0.errorType != cErrorType.not_available )
-        return this.value = new cBool( true );
+    if ( arg0 instanceof CError && arg0.errorType != cErrorType.not_available )
+        return this.value = new CBool( true );
     else
-        return this.value = new cBool( false );
+        return this.value = new CBool( false );
 }
 cISERR.prototype.getInfo = function () {
     return {
@@ -217,20 +217,20 @@ function cISERROR() {
 cISERROR.prototype = Object.create( cBaseFunction.prototype )
 cISERROR.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
-    if ( arg0 instanceof cArray ) {
+    if ( arg0 instanceof CArray ) {
         arg0 = arg0.getElement( 0 );
     }
-    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+    else if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+    else if ( arg0 instanceof CRef || arg0 instanceof CRef3D ) {
         arg0 = arg0.getValue();
     }
 
-    if ( arg0 instanceof cError )
-        return this.value = new cBool( true );
+    if ( arg0 instanceof CError )
+        return this.value = new CBool( true );
     else
-        return this.value = new cBool( false );
+        return this.value = new CBool( false );
 }
 cISERROR.prototype.getInfo = function () {
     return {
@@ -260,24 +260,24 @@ function cISEVEN() {
 cISEVEN.prototype = Object.create( cBaseFunction.prototype )
 cISEVEN.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
-    if ( arg0 instanceof cArray ) {
+    if ( arg0 instanceof CArray ) {
         arg0 = arg0.getElement( 0 );
     }
-    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+    else if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+    else if ( arg0 instanceof CRef || arg0 instanceof CRef3D ) {
         arg0 = arg0.getValue();
     }
 
-    if ( arg0 instanceof cError )
+    if ( arg0 instanceof CError )
         return this.value = arg0;
 
     var arg0 = arg0.tocNumber();
-    if ( arg0 instanceof cError )
+    if ( arg0 instanceof CError )
         return this.value = arg0;
     else
-        return this.value = new cBool( (arg0.getValue() & 1) == 0 );
+        return this.value = new CBool( (arg0.getValue() & 1) == 0 );
 }
 cISEVEN.prototype.getInfo = function () {
     return {
@@ -307,19 +307,19 @@ function cISLOGICAL() {
 cISLOGICAL.prototype = Object.create( cBaseFunction.prototype )
 cISLOGICAL.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
-    if ( arg0 instanceof cArray ) {
+    if ( arg0 instanceof CArray ) {
         arg0 = arg0.getElement( 0 );
     }
-    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+    else if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+    else if ( arg0 instanceof CRef || arg0 instanceof CRef3D ) {
         arg0 = arg0.getValue();
     }
 
-    if ( arg0 instanceof cBool )
-        return this.value = new cBool( true );
-    else return this.value = new cBool( false );
+    if ( arg0 instanceof CBool )
+        return this.value = new CBool( true );
+    else return this.value = new CBool( false );
 }
 cISLOGICAL.prototype.getInfo = function () {
     return {
@@ -349,20 +349,20 @@ function cISNA() {
 cISNA.prototype = Object.create( cBaseFunction.prototype )
 cISNA.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
-    if ( arg0 instanceof cArray ) {
+    if ( arg0 instanceof CArray ) {
         arg0 = arg0.getElement( 0 );
     }
-    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+    else if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+    else if ( arg0 instanceof CRef || arg0 instanceof CRef3D ) {
         arg0 = arg0.getValue();
     }
 
-    if ( arg0 instanceof cError && arg0.errorType == cErrorType.not_available )
-        return this.value = new cBool( true );
+    if ( arg0 instanceof CError && arg0.errorType == cErrorType.not_available )
+        return this.value = new CBool( true );
     else
-        return this.value = new cBool( false );
+        return this.value = new CBool( false );
 }
 cISNA.prototype.getInfo = function () {
     return {
@@ -392,19 +392,19 @@ function cISNONTEXT() {
 cISNONTEXT.prototype = Object.create( cBaseFunction.prototype )
 cISNONTEXT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
-    if ( arg0 instanceof cArray ) {
+    if ( arg0 instanceof CArray ) {
         arg0 = arg0.getElement( 0 );
     }
-    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+    else if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+    else if ( arg0 instanceof CRef || arg0 instanceof CRef3D ) {
         arg0 = arg0.getValue();
     }
-    if ( !(arg0 instanceof cString) )
-        return this.value = new cBool( true );
+    if ( !(arg0 instanceof CString) )
+        return this.value = new CBool( true );
     else
-        return this.value = new cBool( false );
+        return this.value = new CBool( false );
 }
 cISNONTEXT.prototype.getInfo = function () {
     return {
@@ -434,20 +434,20 @@ function cISNUMBER() {
 cISNUMBER.prototype = Object.create( cBaseFunction.prototype )
 cISNUMBER.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
-    if ( arg0 instanceof cArray ) {
+    if ( arg0 instanceof CArray ) {
         arg0 = arg0.getElement( 0 );
     }
-    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+    else if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+    else if ( arg0 instanceof CRef || arg0 instanceof CRef3D ) {
         arg0 = arg0.getValue();
     }
 
-    if ( arg0 instanceof cNumber )
-        return this.value = new cBool( true );
+    if ( arg0 instanceof CNumber )
+        return this.value = new CBool( true );
     else
-        return this.value = new cBool( false );
+        return this.value = new CBool( false );
 }
 cISNUMBER.prototype.getInfo = function () {
     return {
@@ -477,24 +477,24 @@ function cISODD() {
 cISODD.prototype = Object.create( cBaseFunction.prototype )
 cISODD.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
-    if ( arg0 instanceof cArray ) {
+    if ( arg0 instanceof CArray ) {
         arg0 = arg0.getElement( 0 );
     }
-    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+    else if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+    else if ( arg0 instanceof CRef || arg0 instanceof CRef3D ) {
         arg0 = arg0.getValue();
     }
 
-    if ( arg0 instanceof cError )
+    if ( arg0 instanceof CError )
         return this.value = arg0;
 
     var arg0 = arg0.tocNumber();
-    if ( arg0 instanceof cError )
+    if ( arg0 instanceof CError )
         return this.value = arg0;
     else
-        return this.value = new cBool( (arg0.getValue() & 1) == 1 );
+        return this.value = new CBool( (arg0.getValue() & 1) == 1 );
 }
 cISODD.prototype.getInfo = function () {
     return {
@@ -523,9 +523,9 @@ function cISREF() {
 }
 cISREF.prototype = Object.create( cBaseFunction.prototype )
 cISREF.prototype.Calculate = function ( arg ) {
-    if ( (arg[0] instanceof cRef || arg[0] instanceof cArea || arg[0] instanceof cArea3D || arg[0] instanceof cRef3D) && arg[0].isValid && arg[0].isValid() )
-        return this.value = new cBool( true );
-    else return this.value = new cBool( false );
+    if ( (arg[0] instanceof CRef || arg[0] instanceof CArea || arg[0] instanceof CArea3D || arg[0] instanceof CRef3D) && arg[0].isValid && arg[0].isValid() )
+        return this.value = new CBool( true );
+    else return this.value = new CBool( false );
 }
 cISREF.prototype.getInfo = function () {
     return {
@@ -555,20 +555,20 @@ function cISTEXT() {
 cISTEXT.prototype = Object.create( cBaseFunction.prototype )
 cISTEXT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
-    if ( arg0 instanceof cArray ) {
+    if ( arg0 instanceof CArray ) {
         arg0 = arg0.getElement( 0 );
     }
-    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+    else if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+    else if ( arg0 instanceof CRef || arg0 instanceof CRef3D ) {
         arg0 = arg0.getValue();
     }
 
-    if ( arg0 instanceof cString )
-        return this.value = new cBool( true );
+    if ( arg0 instanceof CString )
+        return this.value = new CBool( true );
     else
-        return this.value = new cBool( false );
+        return this.value = new CBool( false );
 }
 cISTEXT.prototype.getInfo = function () {
     return {
@@ -599,31 +599,31 @@ function cN() {
 cN.prototype = Object.create( cBaseFunction.prototype )
 cN.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
-    if ( arg0 instanceof cArray ) {
-        var arr = new cArray();
+    if ( arg0 instanceof CArray ) {
+        var arr = new CArray();
         arg.foreach( function ( elem, r, c ) {
-            if ( elem instanceof cNumber || elem instanceof cError )
+            if ( elem instanceof CNumber || elem instanceof CError )
                 arr.array[r][c] = elem;
-            else if ( elem instanceof cBool )
+            else if ( elem instanceof CBool )
                 arr.array[r][c] = elem.tocNumber();
             else
-                arr.array[r][c] = new cNumber( 0 );
+                arr.array[r][c] = new CNumber( 0 );
         } )
         return this.value = arr;
     }
-    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+    else if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+    else if ( arg0 instanceof CRef || arg0 instanceof CRef3D ) {
         arg0 = arg0.getValue();
     }
 
-    if ( arg0 instanceof cNumber || arg0 instanceof cError )
+    if ( arg0 instanceof CNumber || arg0 instanceof CError )
         return this.value = arg0;
-    else if ( arg0 instanceof cBool )
+    else if ( arg0 instanceof CBool )
         return this.value = arg0.tocNumber();
     else
-        return this.value = new cNumber( 0 );
+        return this.value = new CNumber( 0 );
 
 }
 cN.prototype.getInfo = function () {
@@ -653,7 +653,7 @@ function cNA() {
 }
 cNA.prototype = Object.create( cBaseFunction.prototype )
 cNA.prototype.Calculate = function () {
-    return this.value = new cError( cErrorType.not_available );
+    return this.value = new CError( cErrorType.not_available );
 }
 cNA.prototype.getInfo = function () {
     return {
@@ -683,23 +683,23 @@ function cTYPE() {
 cTYPE.prototype = Object.create( cBaseFunction.prototype )
 cTYPE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
-    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+    else if ( arg0 instanceof CRef || arg0 instanceof CRef3D ) {
         arg0 = arg0.getValue();
     }
 
-    if ( arg0 instanceof cNumber )
-        return this.value = new cNumber( 1 );
-    else if ( arg0 instanceof cString )
-        return this.value = new cNumber( 2 )
-    else if ( arg0 instanceof cBool )
-        return this.value = new cNumber( 4 )
-    else if ( arg0 instanceof cError )
-        return this.value = new cNumber( 16 )
+    if ( arg0 instanceof CNumber )
+        return this.value = new CNumber( 1 );
+    else if ( arg0 instanceof CString )
+        return this.value = new CNumber( 2 )
+    else if ( arg0 instanceof CBool )
+        return this.value = new CNumber( 4 )
+    else if ( arg0 instanceof CError )
+        return this.value = new CNumber( 16 )
     else
-        return this.value = new cNumber( 64 );
+        return this.value = new CNumber( 64 );
 }
 cTYPE.prototype.getInfo = function () {
     return {

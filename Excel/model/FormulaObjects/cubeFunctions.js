@@ -16,7 +16,7 @@ cFormulaFunction.Cube = {
     'CUBESET':cCUBESET,
     'CUBESETCOUNT':cCUBESETCOUNT,
     'CUBEVALUE':cCUBEVALUE
-}
+};
 
 function cCUBEKPIMEMBER() {
 //    cBaseFunction.call( this, "CUBEKPIMEMBER" );
@@ -34,7 +34,7 @@ function cCUBEKPIMEMBER() {
     this.numFormat = this.formatType.def;
 
 }
-cCUBEKPIMEMBER.prototype = Object.create( cBaseFunction.prototype )
+cCUBEKPIMEMBER.prototype = Object.create( cBaseFunction.prototype );
 
 function cCUBEMEMBER() {
 //    cBaseFunction.call( this, "CUBEMEMBER" );
@@ -52,7 +52,7 @@ function cCUBEMEMBER() {
     this.numFormat = this.formatType.def;
 
 }
-cCUBEMEMBER.prototype = Object.create( cBaseFunction.prototype )
+cCUBEMEMBER.prototype = Object.create( cBaseFunction.prototype );
 
 function cCUBEMEMBERPROPERTY() {
 //    cBaseFunction.call( this, "CUBEMEMBERPROPERTY" );
@@ -70,7 +70,7 @@ function cCUBEMEMBERPROPERTY() {
     this.numFormat = this.formatType.def;
 
 }
-cCUBEMEMBERPROPERTY.prototype = Object.create( cBaseFunction.prototype )
+cCUBEMEMBERPROPERTY.prototype = Object.create( cBaseFunction.prototype );
 
 function cCUBERANKEDMEMBER() {
 //    cBaseFunction.call( this, "CUBERANKEDMEMBER" );
@@ -88,7 +88,7 @@ function cCUBERANKEDMEMBER() {
     this.numFormat = this.formatType.def;
 
 }
-cCUBERANKEDMEMBER.prototype = Object.create( cBaseFunction.prototype )
+cCUBERANKEDMEMBER.prototype = Object.create( cBaseFunction.prototype );
 
 function cCUBESET() {
 //    cBaseFunction.call( this, "CUBESET" );
@@ -106,7 +106,7 @@ function cCUBESET() {
     this.numFormat = this.formatType.def;
 
 }
-cCUBESET.prototype = Object.create( cBaseFunction.prototype )
+cCUBESET.prototype = Object.create( cBaseFunction.prototype );
 
 function cCUBESETCOUNT() {
 //    cBaseFunction.call( this, "CUBESETCOUNT" );
@@ -124,7 +124,7 @@ function cCUBESETCOUNT() {
     this.numFormat = this.formatType.def;
 
 }
-cCUBESETCOUNT.prototype = Object.create( cBaseFunction.prototype )
+cCUBESETCOUNT.prototype = Object.create( cBaseFunction.prototype );
 
 function cCUBEVALUE() {
 //    cBaseFunction.call( this, "CUBEVALUE" );
@@ -142,4 +142,4 @@ function cCUBEVALUE() {
     this.numFormat = this.formatType.def;
 
 }
-cCUBEVALUE.prototype = Object.create( cBaseFunction.prototype )
+cCUBEVALUE.prototype = Object.create( cBaseFunction.prototype );
