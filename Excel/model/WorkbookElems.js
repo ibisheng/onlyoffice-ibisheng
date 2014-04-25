@@ -3007,8 +3007,10 @@ CCellValue.prototype =
 		}
 		return aRes;
 	},
-	getValueForEdit2 : function()
+	getValueForEdit2: function (cultureInfo)
 	{
+	    if (null == cultureInfo)
+	        cultureInfo = g_oDefaultCultureInfo;
 		if(null == this.textValueForEdit2)
 		{
 			//todo проблема точности. в excel у чисел только 15 значащих цифр у нас больше.
@@ -3056,13 +3058,27 @@ CCellValue.prototype =
 											if(false == bDate && nValue >= 1)
 												bDate = true;
 											if(false == bTime && Math.floor(nValue) != nValue)
-												bTime = true;
+											    bTime = true;
+											var sDateFormat = "";
+											if (bDate) {
+											    for (var i = 0, length = cultureInfo.ShortDatePattern.length; i < length; i++) {
+											        var nIndex = cultureInfo.ShortDatePattern[i] - 0;
+											        if (0 != i)
+											            sDateFormat += "/";
+											        if (0 == nIndex)
+											            sDateFormat += "d";
+											        else if (1 == nIndex)
+											            sDateFormat += "m";
+											        else if (2 == nIndex)
+											            sDateFormat += "yyyy";
+											    }
+											}
 											if(bDate && bTime)
-												oNumFormat = oNumFormatCache.get("m/d/yyyy h:mm:ss AM/PM");
+											    oNumFormat = oNumFormatCache.get(sDateFormat + " h:mm:ss AM/PM");
 											else if(bTime)
 												oNumFormat = oNumFormatCache.get("h:mm:ss AM/PM");
 											else
-												oNumFormat = oNumFormatCache.get("m/d/yyyy");
+											    oNumFormat = oNumFormatCache.get(sDateFormat);
 											
 											var aFormatedValue = oNumFormat.format(nValue, CellValueType.Number, gc_nMaxDigCount);
 											oValueText = "";
@@ -3178,10 +3194,10 @@ CCellValue.prototype =
 		}
 		else
 		{
-			if(Asc.isNumber(val))
+		    if (g_oFormatParser.isLocaleNumber(val))
 			{
 				this.type = CellValueType.Number;
-				this.number = parseFloat(val);
+				this.number = g_oFormatParser.parseLocaleNumber(val);
 			}
 			else
 			{
