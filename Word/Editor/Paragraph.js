@@ -219,7 +219,7 @@ Paragraph.prototype =
         Para.TextPr.Set_Value( this.TextPr.Value );
 
         // Удаляем содержимое нового параграфа
-        //Para.Internal_Content_Remove2(0, Para.Content.length);
+        Para.Internal_Content_Remove2(0, Para.Content.length);
 
         // Копируем содержимое параграфа
         var Count = this.Content.length;
@@ -4222,6 +4222,10 @@ Paragraph.prototype =
 
             if ( false === this.Parent.Is_TableCellContent() && Bottom > this.YLimit && Bottom - this.YLimit <= ParaPr.Spacing.After )
                 Bottom = this.YLimit;
+            
+            // В ячейке перенос страницы происходит по нижней границе, т.е. с учетом Spacing.After и границы
+            if ( true === this.Parent.Is_TableCellContent() )
+                Bottom2 = Bottom;
         }
 
         // Верхнюю границу мы сохраняем только для первой строки данной страницы

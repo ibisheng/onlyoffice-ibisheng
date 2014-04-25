@@ -14957,7 +14957,7 @@ CTable.prototype =
         }
         else
         {
-            StartPos = this.Parent.Get_PageContentStartPos( CurPage );
+            StartPos = this.Parent.Get_PageContentStartPos( this.PageNum + CurPage );
         }
 
         this.Pages[CurPage] = new CTablePage( StartPos.X, StartPos.Y, StartPos.XLimit, StartPos.YLimit, FirstRow, TempMaxTopBorder );
@@ -14985,6 +14985,7 @@ CTable.prototype =
 
             // Временно отключаем регистрацию новых классов
             g_oTableId.m_bTurnOff = true;
+            History.TurnOff();
 
             for ( var Index = 0; Index < this.HeaderInfo.Count; Index++ )
             {
@@ -14992,6 +14993,7 @@ CTable.prototype =
                 HeaderPage.Rows[Index].Index = Index;
             }
             g_oTableId.m_bTurnOff = false;
+            History.TurnOn();
 
             var bHeaderNextPage = false;
             for ( var CurRow = 0; CurRow < this.HeaderInfo.Count; CurRow++  )
