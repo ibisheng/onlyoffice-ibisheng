@@ -2621,7 +2621,7 @@
 
             var nSize = A.length;
             if ( A.length < 1 || nSize == 0 )
-                return new cError( cErrorType.not_available ).toString();
+                return new CError( cErrorType.not_available ).toString();
             else {
                 if ( nSize == 1 )
                     return toFixed( A[0] );
@@ -3570,7 +3570,7 @@
 
         oParser = new parserFormula( "ACCRINT(DATE(2006,3,1),DATE(2006,9,1),DATE(2006,5,1),0.1,,2,0)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 16.666666666666668 );
+        strictEqual( oParser.calculate().getValue(), 16.666666666666664 );
 
     } )
 
@@ -3582,11 +3582,11 @@
 
         oParser = new parserFormula( "ACCRINTM(DATE(2006,3,1),DATE(2006,5,1),0.1,,0)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 16.666666666666668 )
+        strictEqual( oParser.calculate().getValue(), 16.666666666666664 )
 
         oParser = new parserFormula( "ACCRINTM(DATE(2006,3,1),DATE(2006,5,1),0.1,)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 16.666666666666668 );
+        strictEqual( oParser.calculate().getValue(), 16.666666666666664 );
 
     } )
 
