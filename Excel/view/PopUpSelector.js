@@ -199,7 +199,7 @@
 
 		PopUpSelector.prototype._onMouseDown = function (event) {
 			this.skipClose = true;
-			var element = (event.target || event.srcElement);
+			var element = event.currentTarget;
 			if (this.isFormula) {
 				this._onChangeSelection(element);
 			} else {
@@ -214,15 +214,14 @@
 				this._onMouseDown(event);
 				return;
 			}
-			var elementVal = (event ? (event.target || event.srcElement) : this.selectElement).getAttribute("val") + "(";
+			var elementVal = (event ? event.currentTarget : this.selectElement).getAttribute("val") + "(";
 			this._onInsert(elementVal);
 		};
 		PopUpSelector.prototype._onMouseOver = function (event) {
 			if (this.isFormula)
 				return;
 
-			var element = (event.target || event.srcElement);
-			this._onChangeSelection(element);
+			this._onChangeSelection(event.currentTarget);
 		};
 		PopUpSelector.prototype._onChangeSelection = function (newElement) {
 			if (null === newElement)
