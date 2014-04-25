@@ -9,7 +9,7 @@
     },
     "extract_api": {
         "src": "../../Word/apiCommon.js",
-        "dst": "../../Excel/.build/Log/apiCommonExport.js"
+        "dst": "../../Excel/Build/Log/apiCommonExport.js"
     },
     "compile": {
         "sdk": {
@@ -188,7 +188,7 @@
                 "../../Excel/model/DrawingObjects/GlobalCounters.js",
 
                 "../../Word/apiCommon.js",
-                "../../Excel/.build/Log/apiCommonExport.js",
+                "../../Excel/Build/Log/apiCommonExport.js",
                 "../../Excel/api.js"
             ],
             "dst": "../../Excel/sdk-all.js",
@@ -200,7 +200,7 @@
 				"../../Common/3rdparty/perfect-scrollbar/perfect-scrollbar.js"
             ],
             "map": "sdk-all.js.map",
-            "log": "../../Excel/.build/Log",
+            "log": "../../Excel/Build/Log",
             "define": [
                 "ASC_DOCS_API_LOAD_COAUTHORING_SETTINGS=false",
                 "ASC_DOCS_API_USE_FONTS_ORIGINAL_FORMAT=true"
@@ -278,7 +278,7 @@
             }
         },
         "store_log": {
-            "dst": "../../Excel/.build/Log"
+            "dst": "../../Excel/Build/Log"
         }
     },
     "tasks": {
