@@ -552,7 +552,7 @@ Font.prototype =
 	{
 	    if (null != oVal.fn) {
 	        this.fn = oVal.fn;
-	        this.scheme = null;
+	        this.scheme = Asc.EFontScheme.fontschemeNone;
 	    }
 		if(null != oVal.scheme)
             this.scheme = oVal.scheme;
