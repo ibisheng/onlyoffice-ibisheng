@@ -633,8 +633,6 @@ var historyitem_ValAxSetTxPr              = 2603;
 
 var historyitem_ZIndexManagerRemoveItem   = 2604;
 var historyitem_ZIndexManagerAddItem      = 2605;
-var historyitem_GraphicObjectsAddHeaderOrFooter  = 2606;
-var historyitem_GraphicObjectsRemoveHeaderOrFooter  = 2606;
 
 var historyitem_WrapPolygonSetEdited     = 2607;
 var historyitem_WrapPolygonSetRelPoints  = 2608;

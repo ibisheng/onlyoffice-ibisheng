@@ -6280,54 +6280,6 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
 
                 //Recalculate для Document
                 Document.CurPos.ContentPos = 0;
-
-                // TODO: Переделать 
-//                var hdr = Document.HdrFtr.Content[0].Header;
-//                var ftr = Document.HdrFtr.Content[0].Footer;
-//                var drawing_objects = Document.DrawingObjects;
-//                if(hdr.First != null || ftr.First != null)
-//                {
-//                    drawing_objects.firstPage = new HeaderFooterGraphicObjects();
-//                }
-//                if(hdr.Even != null || ftr.Even != null)
-//                {
-//                    if((hdr.Even != null && hdr.Even == hdr.First) || (ftr.Even != null && ftr.Even == ftr.First))
-//                        drawing_objects.evenPage = drawing_objects.firstPage;
-//                    else
-//                        drawing_objects.evenPage = new HeaderFooterGraphicObjects();
-//                }
-//                if(hdr.Odd != null || ftr.Odd != null)
-//                {
-//                    if((hdr.Odd != null && hdr.Odd == hdr.First) || (ftr.Odd != null && ftr.Odd == ftr.First))
-//                        drawing_objects.oddPage = drawing_objects.firstPage;
-//                    else if((hdr.Odd != null && hdr.Odd == hdr.Even)|| (ftr.Odd != null && ftr.Odd == ftr.Even))
-//                        drawing_objects.oddPage = drawing_objects.evenPage;
-//                    else
-//                        drawing_objects.oddPage = new HeaderFooterGraphicObjects();
-//                }
-
-
-
-               /* if(hdr.Odd != null)
-                {
-                    if((hdr.Odd != null && hdr.Odd == hdr.First) )
-                        drawing_objects.headerFooter.header.odd = drawing_objects.headerFooter.header.first;
-                    else if((hdr.Odd != null && hdr.Odd == hdr.Even))
-                        drawing_objects.headerFooter.header.odd = drawing_objects.headerFooter.header.even;
-                    else
-                        drawing_objects.headerFooter.header.odd = new HeaderFooterGraphicObjects();
-                }
-
-
-                if(ftr.Odd != null)
-                {
-                    if((ftr.Odd != null && ftr.Odd == ftr.First) )
-                        drawing_objects.headerFooter.footer.odd = drawing_objects.headerFooter.footer.first;
-                    else if((ftr.Odd != null && ftr.Odd == ftr.Even))
-                        drawing_objects.headerFooter.footer.odd = drawing_objects.headerFooter.footer.even;
-                    else
-                        drawing_objects.headerFooter.footer.odd = new HeaderFooterGraphicObjects();
-                }              */
                 History.RecalcData_Add({Type: historyrecalctype_Drawing, All: true});
                 Document.DrawingObjects.addToZIndexManagerAfterOpen();
                 if (!this.isOnlyReaderMode)
@@ -9596,36 +9548,6 @@ window["asc_docs_api"].prototype["asc_nativeCalculateFile"] = function()
 
     //Recalculate для Document
     Document.CurPos.ContentPos = 0;
-
-    // TODO: Переделать
-//    var hdr = Document.HdrFtr.Content[0].Header;
-//    var ftr = Document.HdrFtr.Content[0].Footer;
-//    var drawing_objects = Document.DrawingObjects;
-//    if(hdr.First != null || ftr.First != null)
-//    {
-//        drawing_objects.firstPage = new HeaderFooterGraphicObjects();
-//    }
-//    if(hdr.Even != null || ftr.Even != null)
-//    {
-//        if((hdr.Even != null && hdr.Even == hdr.First) || (ftr.Even != null && ftr.Even == ftr.First))
-//            drawing_objects.evenPage = drawing_objects.firstPage;
-//        else
-//            drawing_objects.evenPage = new HeaderFooterGraphicObjects();
-//    }
-//    if(hdr.Odd != null || ftr.Odd != null)
-//    {
-//        if((hdr.Odd != null && hdr.Odd == hdr.First) || (ftr.Odd != null && ftr.Odd == ftr.First))
-//            drawing_objects.oddPage = drawing_objects.firstPage;
-//        else if((hdr.Odd != null && hdr.Odd == hdr.Even)|| (ftr.Odd != null && ftr.Odd == ftr.Even))
-//            drawing_objects.oddPage = drawing_objects.evenPage;
-//        else
-//            drawing_objects.oddPage = new HeaderFooterGraphicObjects();
-//    }
-
-
-    //Document.DrawingObjects.calculateAfterOpen();
-    //Document.DrawingObjects.calculateAfterChangeTheme();
-    
     History.RecalcData_Add({Type: historyrecalctype_Drawing, All: true});
     Document.DrawingObjects.addToZIndexManagerAfterOpen();
 

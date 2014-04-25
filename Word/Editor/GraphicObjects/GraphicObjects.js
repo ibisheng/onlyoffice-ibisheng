@@ -127,228 +127,6 @@ CGraphicObjects.prototype =
         return this.Id;
     },
 
-    AddHeaderOrFooter : function(Type, PageType)
-    {
-
-        var Content_old =
-        {
-            Header:
-            {
-                First: this.headerFooter.header.first,
-                Even : this.headerFooter.header.even,
-                Odd  : this.headerFooter.header.odd
-            },
-
-            Footer:
-            {
-                First: this.headerFooter.footer.first,
-                Even : this.headerFooter.footer.even,
-                Odd  : this.headerFooter.footer.odd
-            }
-        };
-
-        var HdrFtr = new HeaderFooterGraphicObjects();
-        switch( Type )
-        {
-            case hdrftr_Footer:
-            {
-                switch ( PageType )
-                {
-                    case hdrftr_Default:
-                    {
-                        if (null === this.headerFooter.footer.first)
-                            this.headerFooter.footer.first = HdrFtr;
-
-                        if (null === this.headerFooter.footer.even)
-                            this.headerFooter.footer.even = HdrFtr;
-
-                        this.headerFooter.footer.odd = HdrFtr;
-                        break;
-                    }
-                    case hdrftr_Even :
-                    {
-                        this.headerFooter.footer.even = HdrFtr;
-
-                        break;
-                    }
-                    case hdrftr_First :
-                    {
-                        this.headerFooter.footer.first = HdrFtr;
-                        break;
-                    }
-                }
-                break;
-            }
-            case hdrftr_Header:
-            {
-                switch ( PageType )
-                {
-                    case hdrftr_Default:
-                    {
-                        if ( null === this.headerFooter.header.first )
-                            this.headerFooter.header.first = HdrFtr;
-
-                        if ( null === this.headerFooter.header.even )
-                            this.headerFooter.header.even  = HdrFtr;
-
-                        this.headerFooter.header.odd  = HdrFtr;
-                        break;
-                    }
-                    case hdrftr_Even :
-                    {
-                        this.headerFooter.header.even = HdrFtr;
-                        break;
-                    }
-                    case hdrftr_First :
-                    {
-                        this.headerFooter.header.first = HdrFtr;
-                        break;
-                    }
-                }
-                break;
-            }
-        }
-        var Content_new =
-        {
-            Header:
-            {
-                First: this.headerFooter.header.first,
-                Even : this.headerFooter.header.even,
-                Odd  : this.headerFooter.header.odd
-            },
-
-            Footer:
-            {
-                First: this.headerFooter.footer.first,
-                Even : this.headerFooter.footer.even,
-                Odd  : this.headerFooter.footer.odd
-            }
-        };
-        History.Add(this, {Type: historyitem_GraphicObjectsAddHeaderOrFooter, oldPr: Content_old, newPr: Content_new});
-        return HdrFtr;
-    },
-
-    RemoveHeaderOrFooter : function(Type, PageType)
-    {
-        var Content_old =
-        {
-            Header:
-            {
-                First: this.headerFooter.header.first,
-                Even : this.headerFooter.header.even,
-                Odd  : this.headerFooter.header.odd
-            },
-
-            Footer:
-            {
-                First: this.headerFooter.footer.first,
-                Even : this.headerFooter.footer.even,
-                Odd  : this.headerFooter.footer.odd
-            }
-        };
-
-
-        switch( Type )
-        {
-            case hdrftr_Footer:
-            {
-                switch ( PageType )
-                {
-                    case hdrftr_Default:
-                    {
-                        var HdrFtr = this.headerFooter.footer.odd;
-
-                        if ( HdrFtr === this.headerFooter.footer.first )
-                            this.headerFooter.footer.first = null;
-
-                        if ( HdrFtr === this.headerFooter.footer.even )
-                            this.headerFooter.footer.even = null;
-
-                        this.headerFooter.footer.odd = null;
-
-                        break;
-                    }
-                    case hdrftr_Even :
-                    {
-                        if ( this.headerFooter.footer.odd != this.headerFooter.footer.even )
-                            this.headerFooter.footer.even = this.headerFooter.footer.odd;
-
-                        break;
-                    }
-                    case hdrftr_First :
-                    {
-                        if ( this.headerFooter.footer.odd != this.headerFooter.footer.first )
-                            this.headerFooter.footer.first  = this.headerFooter.footer.odd;
-
-                        break;
-                    }
-                }
-
-                break;
-            }
-            case hdrftr_Header:
-            {
-                switch ( PageType )
-                {
-                    case hdrftr_Default:
-                    {
-                        var HdrFtr = this.headerFooter.header.odd;
-
-                        if ( HdrFtr === this.headerFooter.header.first )
-                            this.headerFooter.header.first = null;
-
-                        if ( HdrFtr === this.headerFooter.header.even )
-                            this.headerFooter.header.even = null;
-
-                        this.headerFooter.header.odd = null;
-
-                        break;
-                    }
-                    case hdrftr_Even :
-                    {
-                        if ( this.headerFooter.header.odd != this.headerFooter.header.even )
-                        {
-                            if ( this.headerFooter.header.even === this.headerFooter.header.first )
-                                this.headerFooter.header.first = this.headerFooter.header.odd;
-
-                            this.headerFooter.header.even = this.headerFooter.header.odd;
-                        }
-
-                        break;
-                    }
-                    case hdrftr_First :
-                    {
-                        if ( this.headerFooter.header.odd != this.headerFooter.header.first )
-                            this.headerFooter.header.first  = this.headerFooter.Header.odd;
-
-                        break;
-                    }
-                }
-
-                break;
-            }
-        }
-
-        var Content_new =
-        {
-            Header:
-            {
-                First: this.headerFooter.header.first,
-                Even : this.headerFooter.header.even,
-                Odd  : this.headerFooter.header.odd
-            },
-
-            Footer:
-            {
-                First: this.headerFooter.footer.first,
-                Even : this.headerFooter.footer.even,
-                Odd  : this.headerFooter.footer.odd
-            }
-        };
-        History.Add(this, {Type: historyitem_GraphicObjectsAddHeaderOrFooter, oldPr: Content_old, newPr: Content_new});
-    },
-
-
     sortDrawingArrays: function()
     {
         for(var i = 0; i < this.graphicPages.length; ++i)
@@ -1748,7 +1526,13 @@ CGraphicObjects.prototype =
     resetDrawingArrays : function(pageIndex, docContent)
     {
         if(isRealObject(this.graphicPages[pageIndex]))
-            this.graphicPages[pageIndex].resetDrawingArrays(docContent);
+        {
+
+            if(!docContent || !docContent.Is_HdrFtr())
+                this.graphicPages[pageIndex].resetDrawingArrays(docContent);
+            else
+                this.graphicPages[pageIndex].hdrFtrPage.resetDrawingArrays(docContent);
+        }
     },
 
     onEndRecalculateDocument: function(pagesCount)
@@ -2260,13 +2044,7 @@ CGraphicObjects.prototype =
 
     getHdrFtrObjectsByPageIndex: function(pageIndex)
     {
-        if(pageIndex === 0)
-            return this.headerFooter.commonFirst;
-
-        if(pageIndex % 2 === 1)
-            return this.headerFooter.commonEven;
-
-        return this.headerFooter.commonOdd;
+        return this.graphicPages[pageIndex].hdrFtrPage;
     },
 
     getNearestPos: function(x, y, pageIndex, drawing)
@@ -2549,7 +2327,6 @@ CGraphicObjects.prototype =
         graphics.shapePageIndex = null;
     },
 
-
     drawBeforeObjectsHdrFtr: function(pageIndex, graphics)
     {
         graphics.shapePageIndex = pageIndex;
@@ -2564,7 +2341,6 @@ CGraphicObjects.prototype =
         }
         graphics.shapePageIndex = null;
     },
-
 
     setStartTrackPos: function(x, y, pageIndex)
     {
@@ -2637,166 +2413,45 @@ CGraphicObjects.prototype =
 
     addObjectOnPage: function(pageIndex, object)
     {
-        if(!object.parent.DocumentContent.Is_HdrFtr())
+        if(!this.graphicPages[pageIndex])
         {
-            if(!this.graphicPages[pageIndex])
+            this.graphicPages[pageIndex] = new CGraphicPage(pageIndex, this);
+            for(var z = 0; z < pageIndex; ++z)
             {
-                this.graphicPages[pageIndex] = new CGraphicPage(pageIndex, this);
-                for(var z = 0; z < pageIndex; ++z)
-                {
-                    if(!this.graphicPages[z])
-                        this.graphicPages[z] = new CGraphicPage(z, this);
-                }
-            }
-            var page = this.graphicPages[pageIndex];
-            var array_type = object.parent.getDrawingArrayType();
-            switch(array_type)
-            {
-                case DRAWING_ARRAY_TYPE_INLINE:
-                {
-                    page.inlineObjects.push(object);
-                    break;
-                }
-                case DRAWING_ARRAY_TYPE_BEHIND:
-                {
-                    page.behindDocObjects.push(object);
-                    page.behindDocObjects.sort(ComparisonByZIndexSimpleParent);
-                    break;
-                }
-                case DRAWING_ARRAY_TYPE_BEFORE:
-                {
-                    page.beforeTextObjects.push(object);
-                    page.beforeTextObjects.sort(ComparisonByZIndexSimpleParent);
-                    break;
-                }
-                case DRAWING_ARRAY_TYPE_WRAPPING:
-                {
-                    page.wrappingObjects.push(object);
-                    page.wrappingObjects.sort(ComparisonByZIndexSimpleParent);
-                    break;
-                }
+                if(!this.graphicPages[z])
+                    this.graphicPages[z] = new CGraphicPage(z, this);
             }
         }
+        var page;
+        if(!object.parent.DocumentContent.Is_HdrFtr())
+            page = this.graphicPages[pageIndex];
         else
+            page = this.graphicPages[pageIndex].hdrFtrPage;
+        var array_type = object.parent.getDrawingArrayType();
+        switch(array_type)
         {
-            return;
-            if(isRealObject(object.parent) && isRealObject(object.parent.DocumentContent))
+            case DRAWING_ARRAY_TYPE_INLINE:
             {
-                //var top_doc_content = ;
-                var hdr_or_ftr = object.parent.DocumentContent.Is_HdrFtr(true);
-                var hdr_ftr_controller_content = this.document.HdrFtr.Content[0];
-                var headers, footers;
-                headers = hdr_ftr_controller_content.Header;
-                footers = hdr_ftr_controller_content.Footer;
-                var hdr_footer_objects, common_hdr_footer_objects = [];
-
-                if(headers.First === hdr_or_ftr)
-                {
-                    hdr_footer_objects = this.headerFooter.header.first;
-                    common_hdr_footer_objects.push(this.headerFooter.commonFirst);
-                    if(this.headerFooter.header.first === this.headerFooter.header.even)
-                        common_hdr_footer_objects.push(this.headerFooter.commonEven);
-                    if(this.headerFooter.header.first === this.headerFooter.header.odd)
-                        common_hdr_footer_objects.push(this.headerFooter.commonOdd);
-
-                }
-                else if(footers.First === hdr_or_ftr)
-                {
-                    hdr_footer_objects = this.headerFooter.footer.first;
-                    common_hdr_footer_objects.push(this.headerFooter.commonFirst);
-
-                    if(this.headerFooter.header.first === this.headerFooter.header.even)
-                        common_hdr_footer_objects.push(this.headerFooter.commonEven);
-                    if(this.headerFooter.header.first === this.headerFooter.header.odd)
-                        common_hdr_footer_objects.push(this.headerFooter.commonOdd);
-                }
-                else if(headers.Even === hdr_or_ftr)
-                {
-                    hdr_footer_objects = this.headerFooter.header.even;
-                    common_hdr_footer_objects.push(this.headerFooter.commonEven);
-
-                    if(this.headerFooter.header.even === this.headerFooter.header.first)
-                        common_hdr_footer_objects.push(this.headerFooter.commonFirst);
-                    if(this.headerFooter.header.even === this.headerFooter.header.odd)
-                        common_hdr_footer_objects.push(this.headerFooter.commonOdd);
-                }
-                else if(footers.Even === hdr_or_ftr)
-                {
-                    hdr_footer_objects = this.headerFooter.footer.even;
-                    common_hdr_footer_objects.push(this.headerFooter.commonEven);
-
-                    if(this.headerFooter.header.even === this.headerFooter.header.first)
-                        common_hdr_footer_objects.push(this.headerFooter.commonFirst);
-                    if(this.headerFooter.header.even === this.headerFooter.header.odd)
-                        common_hdr_footer_objects.push(this.headerFooter.commonOdd);
-                }
-                else if(headers.Odd === hdr_or_ftr)
-                {
-                    hdr_footer_objects = this.headerFooter.header.odd;
-                    common_hdr_footer_objects.push(this.headerFooter.commonOdd);
-
-                    if(this.headerFooter.header.odd === this.headerFooter.header.first)
-                        common_hdr_footer_objects.push(this.headerFooter.commonFirst);
-                    if(this.headerFooter.header.odd === this.headerFooter.header.even)
-                        common_hdr_footer_objects.push(this.headerFooter.commonEven);
-                }
-                else if(footers.Odd === hdr_or_ftr)
-                {
-                    hdr_footer_objects = this.headerFooter.footer.odd;
-                    common_hdr_footer_objects.push(this.headerFooter.commonOdd);
-
-                    if(this.headerFooter.header.odd === this.headerFooter.header.first)
-                        common_hdr_footer_objects.push(this.headerFooter.commonFirst);
-                    if(this.headerFooter.header.odd === this.headerFooter.header.even)
-                        common_hdr_footer_objects.push(this.headerFooter.commonEven);
-                }
-
-                var i;
-                if(hdr_footer_objects != null)
-                {
-                    array_type = object.parent.getDrawingArrayType();
-                    switch(array_type)
-                    {
-                        case DRAWING_ARRAY_TYPE_INLINE:
-                        {
-                            hdr_footer_objects.inlineArray.push(object);
-                            for(i = 0; i < common_hdr_footer_objects.length; ++i)
-                                common_hdr_footer_objects[i].inlineObjects.push(object);
-                            break;
-                        }
-                        case DRAWING_ARRAY_TYPE_BEHIND:
-                        {
-                            hdr_footer_objects.behindDocArray.push(object);
-                            for(i = 0; i < common_hdr_footer_objects.length; ++i)
-                            {
-                                common_hdr_footer_objects[i].behindDocObjects.push(object);
-                                common_hdr_footer_objects[i].behindDocObjects.sort(ComparisonByZIndexSimpleParent);
-                            }
-
-                            break;
-                        }
-                        case DRAWING_ARRAY_TYPE_BEFORE:
-                        {
-                            hdr_footer_objects.beforeTextArray.push(object);
-                            for(i = 0; i < common_hdr_footer_objects.length; ++i)
-                            {
-                                common_hdr_footer_objects[i].beforeTextObjects.push(object);
-                                common_hdr_footer_objects[i].beforeTextObjects.sort(ComparisonByZIndexSimpleParent);
-                            }
-                            break;
-                        }
-                        case DRAWING_ARRAY_TYPE_WRAPPING:
-                        {
-                            hdr_footer_objects.wrappingArray.push(object);
-                            for(i = 0; i < common_hdr_footer_objects.length; ++i)
-                            {
-                                common_hdr_footer_objects[i].wrappingObjects.push(object);
-                                common_hdr_footer_objects[i].wrappingObjects.sort(ComparisonByZIndexSimpleParent);
-                            }
-                            break;
-                        }
-                    }
-                }
+                page.inlineObjects.push(object);
+                break;
+            }
+            case DRAWING_ARRAY_TYPE_BEHIND:
+            {
+                page.behindDocObjects.push(object);
+                page.behindDocObjects.sort(ComparisonByZIndexSimpleParent);
+                break;
+            }
+            case DRAWING_ARRAY_TYPE_BEFORE:
+            {
+                page.beforeTextObjects.push(object);
+                page.beforeTextObjects.sort(ComparisonByZIndexSimpleParent);
+                break;
+            }
+            case DRAWING_ARRAY_TYPE_WRAPPING:
+            {
+                page.wrappingObjects.push(object);
+                page.wrappingObjects.sort(ComparisonByZIndexSimpleParent);
+                break;
             }
         }
     },
@@ -3485,7 +3140,6 @@ CGraphicObjects.prototype =
                 return true;
         }
         return false;
-
     },
 
     canChangeWrapPolygon: function()
@@ -3518,74 +3172,11 @@ CGraphicObjects.prototype =
         if(isRealObject(object))
         {
             var hdr_ftr = object.DocumentContent.Is_HdrFtr(true);
-            if(hdr_ftr != null)
+            var page = !hdr_ftr ? this.graphicPages[pageIndex] : this.graphicPages[pageIndex] && this.graphicPages[pageIndex].hdrFtrPage;
+            if(isRealObject(page))
             {
-                function findInArrayAndRemove(drawingArray, Id)
-                {
-                    for(var i = drawingArray.length-1; i > -1; --i)
-                    {
-                        if(drawingArray[i].parent.Id === Id)
-                            drawingArray.splice(i, 1);
-                    }
-                }
-
-                function findInArrayAndRemoveFromDrawingPage(drawingPage, Id)
-                {
-                    if(!drawingPage)
-                        return;
-                    if(Array.isArray(drawingPage.inlineObjects))
-                    {
-                        findInArrayAndRemove(drawingPage.inlineObjects, Id);
-                        findInArrayAndRemove(drawingPage.behindDocObjects, Id);
-                        findInArrayAndRemove(drawingPage.wrappingObjects, Id);
-                        findInArrayAndRemove(drawingPage.beforeTextObjects, Id);
-                    }
-                    else if(Array.isArray(drawingPage.inlineArray))
-                    {
-                        findInArrayAndRemove(drawingPage.inlineArray, Id);
-                        findInArrayAndRemove(drawingPage.behindDocArray, Id);
-                        findInArrayAndRemove(drawingPage.wrappingArray, Id);
-                        findInArrayAndRemove(drawingPage.beforeTextArray, Id);
-                    }
-                }
-
-                var check_hdr_ftr_arrays = [];
-                if(pageIndex === 0)
-                {
-                    check_hdr_ftr_arrays.push(this.headerFooter.header.first);
-                    check_hdr_ftr_arrays.push(this.headerFooter.footer.first);
-                }
-                else
-                {
-                    if(pageIndex  % 2 === 1)
-                    {
-                        check_hdr_ftr_arrays.push(this.headerFooter.header.even);
-                        check_hdr_ftr_arrays.push(this.headerFooter.footer.even);
-                    }
-                    else
-                    {
-                        check_hdr_ftr_arrays.push(this.headerFooter.header.odd);
-                        check_hdr_ftr_arrays.push(this.headerFooter.footer.odd);
-                    }
-                }
-
-                check_hdr_ftr_arrays.push(this.headerFooter.commonFirst);
-                check_hdr_ftr_arrays.push(this.headerFooter.commonEven);
-                check_hdr_ftr_arrays.push(this.headerFooter.commonOdd);
-
-                for(var i = 0; i < check_hdr_ftr_arrays.length; ++i)
-                {
-                    findInArrayAndRemoveFromDrawingPage(check_hdr_ftr_arrays[i], id);
-                }
-            }
-            else
-            {
-                var page = this.graphicPages[object.pageIndex];
-                if(isRealObject(page))
-                {
-                    var array_type = object.getDrawingArrayType();
-                    page.delObjectById(id, array_type);
-                }
+                var array_type = object.getDrawingArrayType();
+                page.delObjectById(id, array_type);
             }
         }
     },
@@ -3987,16 +3578,6 @@ CGraphicObjects.prototype =
                 this.drawingDocument.CheckGuiControlColors();
                 break;
             }
-            case historyitem_GraphicObjectsAddHeaderOrFooter:
-            {
-                this.headerFooter.header.first = data.oldPr.Header.First;
-                this.headerFooter.header.even = data.oldPr.Header.Even;
-                this.headerFooter.header.odd = data.oldPr.Header.Odd;
-                this.headerFooter.footer.first = data.oldPr.Footer.First;
-                this.headerFooter.footer.even = data.oldPr.Footer.Even;
-                this.headerFooter.footer.odd = data.oldPr.Footer.Odd;
-                break;
-            }
         }
     },
 
@@ -4008,16 +3589,6 @@ CGraphicObjects.prototype =
             {
                 this.document.theme.themeElements.clrScheme = data.newScheme;
                 this.drawingDocument.CheckGuiControlColors();
-                break;
-            }
-            case historyitem_GraphicObjectsAddHeaderOrFooter:
-            {
-                this.headerFooter.header.first = data.newPr.Header.First;
-                this.headerFooter.header.even = data.newPr.Header.Even;
-                this.headerFooter.header.odd = data.newPr.Header.Odd;
-                this.headerFooter.footer.first = data.newPr.Footer.First;
-                this.headerFooter.footer.even = data.newPr.Footer.Even;
-                this.headerFooter.footer.odd = data.newPr.Footer.Odd;
                 break;
             }
         }
@@ -4033,16 +3604,6 @@ CGraphicObjects.prototype =
             case historyitem_ChangeColorScheme:
             {
                 data.newScheme.Write_ToBinary2(w);
-                break;
-            }
-            case historyitem_GraphicObjectsAddHeaderOrFooter:
-            {
-                writeObject(w, data.newPr.Header.First);
-                writeObject(w, data.newPr.Header.Even);
-                writeObject(w, data.newPr.Header.Odd);
-                writeObject(w, data.newPr.Footer.First);
-                writeObject(w, data.newPr.Footer.Even);
-                writeObject(w, data.newPr.Footer.Odd);
                 break;
             }
         }
@@ -4064,23 +3625,12 @@ CGraphicObjects.prototype =
                 this.drawingDocument.CheckGuiControlColors();
                 break;
             }
-            case historyitem_GraphicObjectsAddHeaderOrFooter:
-            {
-                this.headerFooter.header.first = readObject(r);
-                this.headerFooter.header.even  = readObject(r);
-                this.headerFooter.header.odd   = readObject(r);
-                this.headerFooter.footer.first = readObject(r);
-                this.headerFooter.footer.even  = readObject(r);
-                this.headerFooter.footer.odd   = readObject(r);
-                break;
-            }
         }
     },
 
     Refresh_RecalcData: function(data)
     {}
 };
-
 
 function ComparisonByZIndexSimpleParent(obj1, obj2)
 {

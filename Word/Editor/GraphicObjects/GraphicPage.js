@@ -3,15 +3,11 @@ var DRAWING_ARRAY_TYPE_BEHIND = 0x01;
 var DRAWING_ARRAY_TYPE_WRAPPING = 0x02;
 var DRAWING_ARRAY_TYPE_BEFORE = 0x03;
 
-
-
-
-
 function CGraphicPage(pageIndex, graphicObjects)
 {
     this.pageIndex = pageIndex;
     this.graphicObjects = graphicObjects;
-    this.drawingDocument = graphicObjects.drawingDocument;
+    this.drawingDocument = editor.WordControl.m_oDrawingDocument;
 
     this.arrGraphicObjects = [];
 
@@ -27,11 +23,16 @@ function CGraphicPage(pageIndex, graphicObjects)
     this.behindDocObjects = [];
     this.wrappingObjects = [];
     this.beforeTextObjects = [];
-
-
-    this.wrapManager = new CWrapManager(this);
-
     this.flowTables = [];
+
+
+    this.hdrFtrPage = null;
+    this.wrapManager = null;
+    if(graphicObjects)
+    {
+        this.hdrFtrPage =  new CGraphicPage(pageIndex, null);
+        this.wrapManager = new CWrapManager(this);
+    }
 }
 
 CGraphicPage.prototype =
@@ -171,7 +172,7 @@ CGraphicPage.prototype =
             if(Array.isArray(drawing_array))
             {
                 for(var index = 0; index < drawing_array.length; ++index)
-                    if(drawing_array[index].Get_Id() === id)
+                    if(drawing_array[index].parent.Get_Id() === id)
                         return drawing_array.splice(index, 1);
             }
         }
@@ -179,22 +180,22 @@ CGraphicPage.prototype =
         {
             drawing_array = this.beforeTextObjects;
             for(index = 0; index < drawing_array.length; ++index)
-                if(drawing_array[index].Get_Id() === id)
+                if(drawing_array[index].parent.Get_Id() === id)
                     return drawing_array.splice(index, 1);
 
             drawing_array = this.behindDocObjects;
             for(index = 0; index < drawing_array.length; ++index)
-                if(drawing_array[index].Get_Id() === id)
+                if(drawing_array[index].parent.Get_Id() === id)
                     return drawing_array.splice(index, 1);
 
             drawing_array = this.inlineObjects;
             for(index = 0; index < drawing_array.length; ++index)
-                if(drawing_array[index].Get_Id() === id)
+                if(drawing_array[index].parent.Get_Id() === id)
                     return drawing_array.splice(index, 1);
 
             drawing_array = this.wrappingObjects;
             for(index = 0; index < drawing_array.length; ++index)
-                if(drawing_array[index].Get_Id() === id)
+                if(drawing_array[index].parent.Get_Id() === id)
                     return drawing_array.splice(index, 1);
         }
         return null;
@@ -254,45 +255,7 @@ CGraphicPage.prototype =
         if(!isRealObject(docContent))
             docContent = this.graphicObjects.document;
 
-
-        if(isRealObject(docContent))
-        {
-            if(!docContent.Is_HdrFtr())
-            {
-                findInArrayAndRemoveFromDrawingPage(this, docContent, this.graphicObjects.document)
-            }
-            else
-            {
-                var check_hdr_ftr_arrays = [];
-                if(this.pageIndex === 0)
-                {
-                    check_hdr_ftr_arrays.push(this.graphicObjects.headerFooter.header.first);
-                    check_hdr_ftr_arrays.push(this.graphicObjects.headerFooter.footer.first);
-                }
-                else
-                {
-                    if(this.pageIndex  % 2 === 1)
-                    {
-                        check_hdr_ftr_arrays.push(this.graphicObjects.headerFooter.header.even);
-                        check_hdr_ftr_arrays.push(this.graphicObjects.headerFooter.footer.even);
-                    }
-                    else
-                    {
-                        check_hdr_ftr_arrays.push(this.graphicObjects.headerFooter.header.odd);
-                        check_hdr_ftr_arrays.push(this.graphicObjects.headerFooter.footer.odd);
-                    }
-                }
-
-                check_hdr_ftr_arrays.push(this.graphicObjects.headerFooter.commonFirst);
-                check_hdr_ftr_arrays.push(this.graphicObjects.headerFooter.commonEven);
-                check_hdr_ftr_arrays.push(this.graphicObjects.headerFooter.commonOdd);
-
-                for(var i = 0; i < check_hdr_ftr_arrays.length; ++i)
-                {
-                    findInArrayAndRemoveFromDrawingPage(check_hdr_ftr_arrays[i], docContent);
-                }
-            }
-        }
+        findInArrayAndRemoveFromDrawingPage(this, docContent, editor.WordControl.m_oLogicDocument);
     },
 
     draw: function(graphics)

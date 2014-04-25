@@ -4406,7 +4406,7 @@ ParaDrawing.prototype =
 
     updatePosition3: function(pageIndex, x, y)
     {
-        this.graphicObjects.removeById(this.pageIndex, this.Get_Id());
+        this.graphicObjects.removeById(pageIndex, this.Get_Id());
         this.setPageIndex(pageIndex);
         if(typeof this.GraphicObj.setStartPage === "function")
             this.GraphicObj.setStartPage(pageIndex);
@@ -6284,8 +6284,6 @@ ParaDrawing.prototype =
     {
         this.pageIndex = newPageIndex;
         this.PageNum = newPageIndex;
-        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.setPageIndex === "function")
-            this.GraphicObj.setPageIndex(newPageIndex);
     },
 
     setAbsoluteTransform: function(offsetX, offsetY, extX, extY, rot, flipH, flipV, bFromChild)
