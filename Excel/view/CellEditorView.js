@@ -157,7 +157,7 @@
 				textAlign   : kLeftAlign,
 				textColor   : new CColor(0, 0, 0),
 
-				canvasZindex  : "1000",
+				canvasZindex  : 1000,
 				blinkInterval : 500,
 				cursorShape   : "text",
 
@@ -181,7 +181,7 @@
 
 			_init: function () {
 				var t = this;
-				var z = parseInt(t.settings.canvasZindex);
+				var z = t.settings.canvasZindex;
 
 				if (null != this.element) {
 					t.canvasOuter = document.createElement('div');
@@ -980,7 +980,7 @@
 
 			_adjustCanvas: function () {
 				var t = this;
-				var z = parseInt(t.settings.canvasZindex);
+				var z = t.settings.canvasZindex;
 
 				t.canvasOuterStyle.left = (t.left * t.kx) + "px";
 				t.canvasOuterStyle.top = (t.top * t.ky) + "px";
