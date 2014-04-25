@@ -77,6 +77,8 @@ function CArrowDrawer() {
     this.ImageRight = null;
     this.ImageBottom = null;
 
+    this.IsNeedInvertOnActive = false;
+
     this.InitSize = function ( size, is_retina ) {
         if ( size == this.Size && is_retina == this.IsRetina && null != this.ImageLeft )
             return;
@@ -234,7 +236,47 @@ function CArrowDrawer() {
                 ctx.fillStyle = this.ColorBackActive;
                 ctx.rect( x + 0.5, y + 0.5, strokeW, strokeH );
                 ctx.fill();
-                ctx.drawImage( img, x, y, this.Size, this.Size );
+
+                if (!this.IsNeedInvertOnActive)
+                {
+                    ctx.drawImage( img, x, y, this.Size, this.Size );
+                }
+                else
+                {
+                    // slow method
+                    var _ctx = img.getContext("2d");
+
+                    var _data = _ctx.getImageData(0, 0, this.Size, this.Size);
+                    var _data2 = _ctx.getImageData(0, 0, this.Size, this.Size);
+
+                    var _len = 4 * this.Size * this.Size;
+                    for (var i = 0; i < _len; i += 4)
+                    {
+                        if (_data.data[i + 3] == 255)
+                        {
+                            _data.data[i]       = 255;// - _data.data[i];
+                            _data.data[i + 1]   = 255;// - _data.data[i + 1];
+                            _data.data[i + 2]   = 255;// - _data.data[i + 2];
+                        }
+                    }
+
+                    _ctx.putImageData(_data, 0, 0);
+                    ctx.drawImage( img, x, y, this.Size, this.Size );
+
+                    for (var i = 0; i < _len; i += 4)
+                    {
+                        if (_data.data[i + 3] == 255)
+                        {
+                            _data.data[i]       = 255 - _data.data[i];
+                            _data.data[i + 1]   = 255 - _data.data[i + 1];
+                            _data.data[i + 2]   = 255 - _data.data[i + 2];
+                        }
+                    }
+                    _ctx.putImageData(_data2, 0, 0);
+
+                    _data = null;
+                    _data2 = null;
+                }
                 ctx.strokeStyle = this.ColorBorder;
                 ctx.rect( x + 0.5, y + 0.5, strokeW, strokeH );
                 ctx.stroke();

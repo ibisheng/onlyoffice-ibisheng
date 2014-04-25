@@ -45,6 +45,8 @@ if (AscBrowser.isIE || window.opera)
 }
 
 var GlobalSkinTeamlab = {
+    Name : "classic",
+    RulersButton : true,
     BackgroundColor : "#B0B0B0",
     RulerDark : "#B0B0B0",
     RulerLight : "EDEDED",
@@ -56,6 +58,8 @@ var GlobalSkinTeamlab = {
     STYLE_THUMBNAIL_HEIGHT : 40
 };
 var GlobalSkinFlat = {
+    Name : "flat",
+    RulersButton : false,
     BackgroundColor : "#F4F4F4",
     RulerDark : "#D8DADC",
     RulerLight : "#FFFFFF",
@@ -293,6 +297,11 @@ function CEditorPage(api)
         this.m_oPanelRight_buttonRulers.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right);
         this.m_oPanelRight.AddControl(this.m_oPanelRight_buttonRulers);
 
+        if (GlobalSkin.RulersButton === false)
+        {
+            this.m_oPanelRight_buttonRulers.HtmlElement.style.display = "none";
+        }
+
         this.m_oPanelRight_buttonNextPage = CreateControl("id_buttonNextPage");
         this.m_oPanelRight_buttonNextPage.Bounds.SetParams(0,0,1000,1000,false,false,false,false,-1,scrollWidthMm);
         this.m_oPanelRight_buttonNextPage.Anchor = (g_anchor_left | g_anchor_bottom | g_anchor_right);
@@ -304,7 +313,10 @@ function CEditorPage(api)
         this.m_oPanelRight.AddControl(this.m_oPanelRight_buttonPrevPage);
 
         this.m_oPanelRight_vertScroll = CreateControl("id_vertical_scroll");
-        this.m_oPanelRight_vertScroll.Bounds.SetParams(0,scrollWidthMm,1000,2*scrollWidthMm,false,true,false,true,-1,-1);
+        if (GlobalSkin.RulersButton === false)
+            this.m_oPanelRight_vertScroll.Bounds.SetParams(0,0,1000,2*scrollWidthMm,false,true,false,true,-1,-1);
+        else
+            this.m_oPanelRight_vertScroll.Bounds.SetParams(0,scrollWidthMm,1000,2*scrollWidthMm,false,true,false,true,-1,-1);
         this.m_oPanelRight_vertScroll.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right | g_anchor_bottom);
         this.m_oPanelRight.AddControl(this.m_oPanelRight_vertScroll);
         // --------------------------------------------------------------------------
@@ -2540,7 +2552,11 @@ function CEditorPage(api)
             if (this.m_oScrollHor_)
                 this.m_oScrollHor_.Repos(settings, this.m_bIsHorScrollVisible);
             else {
-                this.m_oScrollHor_ = new ScrollObject( "id_horizontal_scroll",settings);
+                this.m_oScrollHor_ = new ScrollObject( "id_horizontal_scroll", settings );
+
+                if (GlobalSkin.Name == "flat")
+                    this.m_oScrollHor_.ArrowDrawer.IsNeedInvertOnActive = true;
+
 				this.m_oScrollHor_.onLockMouse = function(evt){
 					check_MouseDownEvent(evt, true);
 					global_mouseEvent.LockMouse();
@@ -2558,9 +2574,11 @@ function CEditorPage(api)
                 this.m_oScrollVer_.Repos(settings, undefined, true);
             }
             else {
-                this.m_oScrollVer_ = new ScrollObject( "id_vertical_scroll",
-                                    settings
-                                   );
+                this.m_oScrollVer_ = new ScrollObject( "id_vertical_scroll", settings );
+
+                if (GlobalSkin.Name == "flat")
+                    this.m_oScrollVer_.ArrowDrawer.IsNeedInvertOnActive = true;
+
 				this.m_oScrollVer_.onLockMouse = function(evt){
 					check_MouseDownEvent(evt, true);
 					global_mouseEvent.LockMouse();

@@ -1104,7 +1104,7 @@ asc_docs_api.prototype.CreateCSS = function()
     var style1 = document.createElement('style');
     style1.type = 'text/css';
     style1.innerHTML = ".buttonTabs {\
-background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAA5CAYAAADUZxCcAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABp0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjUuMTAw9HKhAAABM0lEQVRYR+2Wu4qAMBBF/TIbBQXFylclPtBGf2KrLfdX/DFb21musOLikJ0MwW0sDoab5EgmOOit6+oMNtTChlrOwcfnF2lhZdu2eba8Mn6DCbFsnmdalsX4ErGsbVvqus6NrCxLqqrKjSxJEsqyzI0sDEOKougQ1nVNfd/faiiW+b5PEKZpSjgyaohLua4RyyQ8I9Nyk7mADbWwoZZzwNVCCivjbusvXhm/wYRaho98mqZf69QyiJqmcSODKM9zN7KiKAjd95qJZajROI7H0SBCkwyCQCf7qRGOBhG6LrrvdY1YJuEZmZabzAVsqIUNtbChlnPAFVYKK9v33bPllfEbTFjL0IoAN/e/Mvx+DsPgRoYuC7g5kQw/xhxxHB9PKxnaswkrmZRnZFpuMhewoY7V+wa2hli8QmxDtwAAAABJRU5ErkJggg==);\
+background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAA5CAMAAADjueCuAAAABGdBTUEAALGPC/xhBQAAAEhQTFRFAAAAWFhYZWVlSEhIY2NjV1dXQ0NDYWFhYmJiTk5OVlZWYGBgVFRUS0tLbGxsRERETExMZmZmVVVVXl5eR0dHa2trPj4+u77CpAZQrwAAAAF0Uk5TAEDm2GYAAABwSURBVDjL1dHHDoAgEEVR7NLr4P//qQm6EMaFxtje8oTF5ELIpU35Fstf3GegsPEBG+uwSYpNB1qNKreoDeNw/r6dLr/tnFpbbNZj8wKbk8W/1d6ZPjfrhdHx9c4fbA9wzMYWm3OFhbQmbC2ue6z9DCH/Exf/mU3YAAAAAElFTkSuQmCC);\
 background-position: 0px 0px;\
 background-repeat: no-repeat;\
 }";
@@ -6541,6 +6541,33 @@ asc_docs_api.prototype.asc_setAutoSaveGap = function (autoSaveGap) {
 		this.autoSaveInit();
 	}
 };
+
+asc_docs_api.prototype.asc_SetViewRulers = function(bRulers)
+{
+    if (false === this.bInit_word_control || true === this.isViewMode)
+        return;
+
+    if (this.WordControl.m_bIsRuler != bRulers)
+    {
+        this.WordControl.m_bIsRuler = bRulers;
+        this.WordControl.checkNeedRules();
+        this.WordControl.OnResize(true);
+    }
+}
+asc_docs_api.prototype.asc_SetViewRulersChange = function()
+{
+    if (false === this.bInit_word_control || true === this.isViewMode)
+        return;
+
+    this.WordControl.m_bIsRuler = !this.WordControl.m_bIsRuler;
+    this.WordControl.checkNeedRules();
+    this.WordControl.OnResize(true);
+    return this.WordControl.m_bIsRuler;
+}
+asc_docs_api.prototype.asc_GetViewRulers = function()
+{
+    return this.WordControl.m_bIsRuler;
+}
 
 asc_docs_api.prototype.SetMobileVersion = function(val)
 {
