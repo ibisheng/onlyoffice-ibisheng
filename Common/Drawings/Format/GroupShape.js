@@ -197,25 +197,24 @@ CGroupShape.prototype =
         }
     },
 
-
-    copy: function(sp)
+    copy: function()
     {
-        if(!(sp instanceof CGroupShape))
-            sp = new CGroupShape();
-        sp.setSpPr(this.spPr.createDuplicate());
+        var copy = new CGroupShape();
         if(this.nvGrpSpPr)
         {
-            sp.setNvSpPr(this.nvGrpSpPr.createDuplicate());
+            copy.setNvGrpSpPr(this.nvGrpSpPr.createDuplicate());
+        }
+        if(this.spPr)
+        {
+            copy.setSpPr(this.spPr.createDuplicate());
+            this.spPr.setParent(this);
         }
         for(var i = 0; i < this.spTree.length; ++i)
         {
-            if(this.spTree[i].copy)
-            {
-                sp.addToSpTree(sp.spTree.length, this.spTree[i].copy())
-                sp.spTree[sp.spTree.length - 1].setGroup(sp);
-            }
+            copy.addToSpTree(this.spTree.length, this.spTree[i].copy());
+            copy.spTree[this.spTree.length-1].setGroup(copy);
         }
-        return sp;
+        copy.setBDeleted(this.bDeleted);
     },
 
     getAllImages: function(images)

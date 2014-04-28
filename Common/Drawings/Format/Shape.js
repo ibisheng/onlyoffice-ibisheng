@@ -1687,36 +1687,36 @@ CShape.prototype =
         this.bWordShape = pr;
     },
 
-    copy: function (sp) {
-        if (!(sp instanceof CShape))
-            sp = new CShape();
-        sp.setSpPr(this.spPr.createDuplicate());
-        sp.setStyle(this.style);
-        if (this.nvSpPr) {
-            sp.setNvSpPr(this.nvSpPr.createDuplicate());
+    copy: function ()
+    {
+        var copy = new CShape();
+        if(this.nvSpPr)
+            copy.setNvSpPr(this.nvSpPr.createDuplicate());
+        if(this.spPr)
+        {
+            copy.setSpPr(this.spPr.createDuplicate());
+            copy.spPr.setParent(copy);
         }
-        if (isRealObject(this.txBody)) {
-            var txBody = new CTextBody(sp);
-            this.txBody.copy(txBody);
-            sp.setTextBody(txBody);
-            sp.setBodyPr(this.txBody.bodyPr);
+        if(this.style)
+        {
+            copy.setStyle(this.style.createDuplicate());
         }
-        return sp;
-    },
-
-    copy2: function (sp) {
-        sp.setSpPr(this.spPr.createDuplicate());
-        sp.setStyle(this.style);
-        sp.setNvSpPr(this.nvSpPr);
-        if (isRealObject(this.txBody)) {
-            var txBody = new CTextBody(sp);
-            this.txBody.copy(txBody);
-            sp.setTextBody(txBody);
-            sp.setBodyPr(this.txBody.bodyPr);
-            sp.txBody.content.Set_ApplyToAll(true);
-            sp.txBody.content.Remove(-1, true, true, false);
-            sp.txBody.content.Set_ApplyToAll(false);
+        if(this.txBody)
+        {
+            copy.setTxBody(this.txBody.createDublicate());
+            copy.txBody.setParent(copy);
         }
+        if(this.bodyPr)
+        {
+            copy.setBodyPr(this.bodyPr.createDuplicate());
+        }
+        if(this.textBoxContent)
+        {
+            copy.setTextBoxContent(this.textBoxContent.Copy(copy));
+        }
+        copy.setWordShape(this.bWordShape);
+        copy.setBDeleted(this.bDeleted);
+        return copy;
     },
 
     Get_Styles: function (level) {

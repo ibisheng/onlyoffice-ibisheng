@@ -2270,7 +2270,7 @@ CGraphicObjects.prototype =
                 if(this.selectedObjects[i].selectStartPage === pageIndex)
                 {
                     this.drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selectedObjects[i].getTransformMatrix(), 0, 0, this.selectedObjects[i].extX, this.selectedObjects[i].extY, false, this.selectedObjects[i].canRotate());
-                    this.drawingDocument.AutoShapesTrack.DrawEditWrapPointsPolygon(this.selectedObjects[i].parent.wrappingPolygon.calculatedPoints, new CMatrix());
+                    //  this.drawingDocument.AutoShapesTrack.DrawEditWrapPointsPolygon(this.selectedObjects[i].parent.wrappingPolygon.calculatedPoints, new CMatrix());
                 }
 
             }

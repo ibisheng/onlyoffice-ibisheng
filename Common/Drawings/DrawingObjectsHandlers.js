@@ -264,15 +264,15 @@ function handleInlineObjects(drawingObjectsController, drawingArr, e, x, y, page
                 }
                 return false;
             }
-           // case historyitem_type_ChartSpace:
-           // {
-           //
-           //     break;
-           // }
-           // case historyitem_type_GroupShape:
-           // {
-           //     break;
-           // }
+            // case historyitem_type_ChartSpace:
+            // {
+            //
+            //     break;
+            // }
+            // case historyitem_type_GroupShape:
+            // {
+            //     break;
+            // }
         }
     }
 }

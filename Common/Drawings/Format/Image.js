@@ -92,18 +92,25 @@ CImageShape.prototype =
         this.group = pr;
     },
 
-    copy: function(sp)
+    copy: function()
     {
-        if(!(sp instanceof CImageShape))
-            sp = new CImageShape();
-        if(this.blipFill)
-            sp.setBlipFill(this.blipFill.createDuplicate());
-        sp.setSpPr(this.spPr.createDuplicate());
+        var copy = new CImageShape();
+
         if(this.nvPicPr)
         {
-            sp.setNvSpPr(this.nvPicPr.createDuplicate());
+            copy.setNvPicPr(this.nvPicPr.createDuplicate());
         }
-        return sp;
+        if(this.spPr)
+        {
+            copy.setSpPr(this.spPr.createDuplicate());
+            copy.spPr.setParent(copy);
+        }
+        if(this.blipFill)
+        {
+            copy.setBlipFill(this.blipFill.createDuplicate());
+        }
+        copy.setBDeleted(this.bDeleted);
+        return copy;
     },
 
     getImageUrl: function()

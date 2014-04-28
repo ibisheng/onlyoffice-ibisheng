@@ -215,6 +215,51 @@ CChartSpace.prototype =
     select: CShape.prototype.select,
 
 
+    copy: function()
+    {
+        var copy = new CChartSpace();
+        if(this.chart)
+        {
+            copy.setChart(this.chart.createDuplicate());
+        }
+        if(this.clrMapOvr)
+        {
+            copy.setClrMapOvr(this.clrMapOvr.createDuplicate());
+        }
+        copy.setDate1904(this.date1904);
+        if(this.externalData)
+        {
+            copy.setExternalData(this.externalData.createDuplicate());
+        }
+        copy.setLang(this.lang);
+        if(this.pivotSource)
+        {
+            copy.setPivotSource(this.pivotSource.createDuplicate());
+        }
+        if(this.printSettings)
+        {
+            copy.setPrintSettings(this.printSettings.createDuplicate());
+        }
+        if(this.protection)
+        {
+            copy.setProtection(this.protection.createDuplicate());
+        }
+        copy.setRoundedCorners(this.roundedCorners);
+        if(this.spPr)
+        {
+            copy.setSpPr(this.spPr.createDuplicate());
+            copy.spPr.setParent(copy);
+        }
+        copy.setStyle(this.style);
+        if(this.txPr)
+        {
+            copy.setTxPr(this.txPr.createDuplicate())
+        }
+        copy.setUserShapes(this.userShapes);
+        copy.setThemeOverride(this.themeOverride);
+        copy.setBDeleted(this.bDeleted);
+    },
+
     Write_ToBinary2: function (w)
     {
         w.WriteLong(this.getObjectType());

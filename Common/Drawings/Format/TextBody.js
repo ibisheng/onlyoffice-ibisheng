@@ -892,8 +892,8 @@ CTextBody.prototype =
                     graphics.rect(this.content2.X, this.content2.Y, _w2, _h2);
                 }
 
+                this.content2.Set_StartPage(0);
                 this.content2.Draw(0, graphics);
-
             }
         }
         else if(this.content)
@@ -904,7 +904,7 @@ CTextBody.prototype =
                 var _h = this.content.Get_SummaryHeight();
                 graphics.rect(this.content.X, this.content.Y, _w, _h);
             }
-
+            this.content.Set_StartPage(0);
             this.content.Draw(0, graphics);
 
         }

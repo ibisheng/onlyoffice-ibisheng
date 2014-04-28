@@ -10,6 +10,7 @@ var HANDLE_EVENT_MODE_HANDLE = 0;
 var HANDLE_EVENT_MODE_CURSOR = 1;
 
 
+
 function CheckLinePreset(preset)
 {
     return preset === "line";

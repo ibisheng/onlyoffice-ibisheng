@@ -289,7 +289,7 @@ ParaSpace.prototype =
 
         this.Width        = Temp.Width;
         this.Height       = Temp.Height;
-        
+
         // Не меняем здесь WidthVisible, это значение для пробела высчитывается отдельно, и не должно меняться при пересчете
         //this.WidthVisible = Temp.Width;
     },
@@ -2423,7 +2423,7 @@ function ParaNewLine(BreakType)
 
     if ( break_Page === this.BreakType )
         this.Flags.NewLine = true;
-    
+
     this.Height       = 0;
     this.Width        = 0;
     this.WidthVisible = 0;
@@ -4223,36 +4223,22 @@ ParaDrawing.prototype =
 
     Copy : function()
     {
-        return this.copy();
-
-        var Drawing = new ParaDrawing(this.W, this.H, this.GraphicObj, this.DrawingDocument, null, null);
-        this.GraphicObj.parent = Drawing;
-        Drawing.Set_DrawingType(this.DrawingType);
-        Drawing.Distance.T = this.Distance.T;
-        Drawing.Distance.L = this.Distance.L;
-        Drawing.Distance.B = this.Distance.B;
-        Drawing.Distance.R = this.Distance.R;
-
-        Drawing.LayoutInCell = this.LayoutInCell;
-
-        Drawing.RelativeHeight = this.RelativeHeight;
-
-        Drawing.SimplePos.Use = this.SimplePos.Use;
-        Drawing.SimplePos.X   = this.SimplePos.X;
-        Drawing.SimplePos.Y   = this.SimplePos.Y;
-
-        Drawing.Extent.W   = this.Extent.W;
-        Drawing.Extent.H   = this.Extent.H;
-
-        Drawing.PositionH.RelativeFrom = this.PositionH.RelativeFrom;
-        Drawing.PositionH.Align        = this.PositionH.Align;
-        Drawing.PositionH.Value        = this.PositionH.Value;
-
-        Drawing.PositionV.RelativeFrom = this.PositionV.RelativeFrom;
-        Drawing.PositionV.Align        = this.PositionV.Align;
-        Drawing.PositionV.Value        = this.PositionV.Value;
-
-        return Drawing;
+        var c = new ParaDrawing(this.W,  this.H, null, editor.WordControl.m_oLogicDocument.DrawingDocument, null, null);
+        c.Set_DrawingType(this.DrawingType);
+        if(isRealObject(this.GraphicObj))
+        {
+            c.Set_GraphicObject( this.GraphicObj.copy());
+            c.GraphicObj.setParent(c);
+        }
+        var d = this.Distance;
+        c.Set_PositionH( this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value );
+        c.Set_PositionV( this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value );
+        c.Set_Distance(d.L, d.T, d.R, d.B);
+        c.Set_AllowOverlap(this.AllowOverlap);
+        c.Set_WrappingType(this.wrappingType);
+        c.Set_BehindDoc(this.behindDoc);
+        c.Update_Size(this.W, this.H);
+        return c;
     },
 
     //--------------------------------------------
@@ -8294,6 +8280,5 @@ function ParagraphContent_Read_FromBinary(Reader)
 
     return Element;
 }
-
 
 
