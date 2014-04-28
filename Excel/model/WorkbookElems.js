@@ -2125,7 +2125,7 @@ function SheetFormatPr(){
 	this.nBaseColWidth = null;
 	this.dDefaultColWidth = null;
 	this.oAllRow = null;
-};
+}
 SheetFormatPr.prototype = {
 	clone : function(){
 		var oRes = new SheetFormatPr();
@@ -2133,8 +2133,9 @@ SheetFormatPr.prototype = {
 		oRes.dDefaultColWidth = this.dDefaultColWidth;
 		if(null != this.oAllRow)
 			oRes.oAllRow = this.oAllRow.clone();
+		return oRes;
 	}
-}
+};
 /** @constructor */
 function Col(worksheet, index)
 {

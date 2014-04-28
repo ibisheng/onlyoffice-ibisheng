@@ -1151,8 +1151,7 @@ Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFrom
 		History.Create_NewPoint();
 		History.TurnOff();
 		var wsFrom = this.aWorksheets[index];
-		var nameSheet = wsFrom.getName();
-		var newSheet = wsFrom.clone(sId, bFromRedo);
+		var newSheet = wsFrom.clone(sId);
 		if(null != sName)
 		{
 			if(true == this.checkValidSheetName(sName))
@@ -1795,8 +1794,8 @@ Woorksheet.prototype.generateFontMap=function(oFontMap){
 			}
 		}
 	}
-}
-Woorksheet.prototype.clone=function(sNewId, bFromRedo){
+};
+Woorksheet.prototype.clone=function(sNewId){
 	var oNewWs, i, elem, range;
 	if(null != sNewId)
 		oNewWs = new Woorksheet(this.workbook, this.workbook.aWorksheets.length, sNewId);
