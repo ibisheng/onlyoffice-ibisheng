@@ -28,7 +28,6 @@
 		var asc_HL = asc.HandlersList;
 		var asc_DC = asc.DrawingContext;
 		var asc_TR = asc.CellTextRender;
-		var asc_FP = asc.FontProperties;
 		var asc_incDecFonSize = asc.incDecFonSize;
 
 
@@ -77,7 +76,7 @@
 		 * @param {Array} fmgrGraphics
 		 * @param {FontProperties} oFont
 		 * @param {HandlersList} handlers
-		 * @param {Object} settings  See CellEditor.defaults
+		 * @param {Object} settings
 		 */
 		function CellEditor(elem, input, fmgrGraphics, oFont, handlers, settings) {
 			if ( !(this instanceof CellEditor) ) {return new CellEditor(elem, input, fmgrGraphics, oFont, handlers, settings);}
@@ -85,7 +84,6 @@
 			this.element = elem;
 			this.input = input;
 			this.handlers = new asc_HL(handlers);
-			this.settings = $.extend(true, {}, this.defaults, settings);
 			this.options = {};
 
 			//---declaration---
@@ -134,13 +132,31 @@
 			this.fKeyMouseUp	= null;
 			this.fKeyMouseMove	= null;
 			//-----------------
-			
-			// Автоподстановка формул. Цвет селекта
-			this.formulaSelectorColor = "rgba(105, 119, 62, 0.2)";
 
 			this.objAutoComplete = {};
 
-			this._init();
+			/** @type RegExp */
+			this.reReplaceNL =  /\r?\n|\r/g;
+			/** @type RegExp */
+			this.reReplaceTab = /[\t\v\f]/g;
+			// RegExp с поддержкой рэнджей вида $E1:$F2
+			this.reRangeStr = "[^a-z0-9_$!:](\\$?[a-z]+\\$?\\d+:\\$?[a-z]+\\$?\\d+(?=[^a-z0-9_]|$)|\\$?[a-z]+:\\$?[a-z]+(?=[^a-z0-9_]|$)|\\$?\\d+:\\$?\\d+(?=[^a-z0-9_]|$)|\\$?[a-z]+\\$?\\d+(?=[^a-z0-9_]|$))";
+			this.rangeChars = "= - + * / ( { , < > ^ ! & : ;".split(' ');
+			this.reNotFormula = /[^a-z0-9_]/i;
+			this.reFormula = /^([a-z_][a-z0-9_]*)/i;
+
+			this.defaults = {
+				padding     : 2,
+				selectColor : new CColor(190, 190, 255, 0.5),
+
+				canvasZIndex  : 1000,
+				blinkInterval : 500,
+				cursorShape   : "text",
+
+				selectionTimeout: 20
+			};
+
+			this._init(settings);
 
 			return this;
 		}
@@ -149,39 +165,9 @@
 
 			constructor: CellEditor,
 
-			defaults: {
-				background  : new CColor(255, 255, 255),
-				font        : new asc_FP("Calibri", 11),
-				padding     : 2,
-				selectColor : new CColor(190, 190, 255, 0.5),
-				textAlign   : kLeftAlign,
-				textColor   : new CColor(0, 0, 0),
-
-				canvasZindex  : 1000,
-				blinkInterval : 500,
-				cursorShape   : "text",
-
-				selectionTimeout: 20
-			},
-
-			/** @type RegExp */
-			reReplaceNL:  /\r?\n|\r/g,
-
-			/** @type RegExp */
-			reReplaceTab: /[\t\v\f]/g,
-
-			// RegExp с поддержкой рэнджей вида $E1:$F2
-			reRangeStr: "[^a-z0-9_$!:](\\$?[a-z]+\\$?\\d+:\\$?[a-z]+\\$?\\d+(?=[^a-z0-9_]|$)|\\$?[a-z]+:\\$?[a-z]+(?=[^a-z0-9_]|$)|\\$?\\d+:\\$?\\d+(?=[^a-z0-9_]|$)|\\$?[a-z]+\\$?\\d+(?=[^a-z0-9_]|$))",
-
-			rangeChars: "= - + * / ( { , < > ^ ! & : ;".split(' '),
-
-            reNotFormula: /[^a-z0-9_]/i,
-
-            reFormula: /^([a-z_][a-z0-9_]*)/i,
-
-			_init: function () {
+			_init: function (settings) {
 				var t = this;
-				var z = t.settings.canvasZindex;
+				var z = t.defaults.canvasZIndex;
 
 				if (null != this.element) {
 					t.canvasOuter = document.createElement('div');
@@ -189,7 +175,7 @@
 					t.canvasOuter.style.display = "none";
 					t.canvasOuter.style.zIndex = z;
 					var innerHTML = '<canvas id="ce-canvas" style="z-index: ' + (z+1) + '"></canvas>';
-					innerHTML += '<canvas id="ce-canvas-overlay" style="z-index: ' + (z+2) + '; cursor: ' + t.settings.cursorShape + '"></canvas>';
+					innerHTML += '<canvas id="ce-canvas-overlay" style="z-index: ' + (z+2) + '; cursor: ' + t.defaults.cursorShape + '"></canvas>';
 					innerHTML += '<div id="ce-cursor" style="display: none; z-index: ' + (z+3) + '"></div>';
 					t.canvasOuter.innerHTML = innerHTML;
 					this.element.appendChild(t.canvasOuter);
@@ -205,7 +191,7 @@
 				t.drawingCtx = asc_DC({canvas: t.canvas, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
 				t.overlayCtx = asc_DC({canvas: t.canvasOverlay, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
 				t.textRender = asc_TR(t.drawingCtx);
-				t.textRender.setDefaultFont(t.settings.font.clone());
+				t.textRender.setDefaultFont(settings.font.clone());
 
 				// bind event handlers
 				if (t.canvasOverlay && t.canvasOverlay.addEventListener) {
@@ -253,7 +239,6 @@
 			 *   font
 			 *   background
 			 *   textColor
-			 *   selectColor
 			 *   saveValueCallback
 			 */
 			open: function (options) {
@@ -636,11 +621,11 @@
 				function cmpNumRev(a, b) {return b - a;}
 
 				var t = this;
-				var opt = t.options = $.extend(true, {}, t.settings, options);
+				var opt = t.options = options;
 				var ctx = t.drawingCtx;
 				var u = ctx.getUnits();
 
-				t.textFlags = $.extend(true, {}, opt.flags);
+				t.textFlags = opt.flags;
 				if (t.textFlags.textAlign.toLowerCase() === "justify" || this.isFormula()) {
 					t.textFlags.textAlign = "left";
 				}
@@ -980,7 +965,7 @@
 
 			_adjustCanvas: function () {
 				var t = this;
-				var z = t.settings.canvasZindex;
+				var z = t.defaults.canvasZIndex;
 
 				t.canvasOuterStyle.left = (t.left * t.kx) + "px";
 				t.canvasOuterStyle.top = (t.top * t.ky) + "px";
@@ -1011,37 +996,36 @@
 			},
 
 			_drawSelection: function () {
-				var t = this, opt = t.options, ctx = t.overlayCtx, ppix = ctx.getPPIX(), ppiy = ctx.getPPIY();
+				var ctx = this.overlayCtx, ppix = ctx.getPPIX(), ppiy = ctx.getPPIY();
 				var begPos, endPos, top, top1, top2, begInfo, endInfo, line1, line2, i;
 
 				function drawRect(x, y, w, h) {
 					ctx.fillRect(
-							asc_calcnpt(x, ppix), asc_calcnpt(y, ppiy),
-							asc_calcnpt(w, ppix), asc_calcnpt(h, ppiy));
+						asc_calcnpt(x, ppix), asc_calcnpt(y, ppiy),
+						asc_calcnpt(w, ppix), asc_calcnpt(h, ppiy));
 				}
 
-				begPos = t.selectionBegin;
-				endPos = t.selectionEnd;
+				begPos = this.selectionBegin;
+				endPos = this.selectionEnd;
 
-				ctx.setFillStyle(opt.selectColor)
-						.clear();
+				ctx.setFillStyle(this.defaults.selectColor).clear();
 
-				if (begPos !== endPos && !t.isTopLineActive) {
-					top = t.textRender.calcLineOffset(t.topLineIndex);
-					begInfo = t.textRender.calcCharOffset(Math.min(begPos, endPos));
-					line1 = t.textRender.getLineInfo(begInfo.lineIndex);
-					top1 = t.textRender.calcLineOffset(begInfo.lineIndex);
-					endInfo = t.textRender.calcCharOffset(Math.max(begPos, endPos));
+				if (begPos !== endPos && !this.isTopLineActive) {
+					top = this.textRender.calcLineOffset(this.topLineIndex);
+					begInfo = this.textRender.calcCharOffset(Math.min(begPos, endPos));
+					line1 = this.textRender.getLineInfo(begInfo.lineIndex);
+					top1 = this.textRender.calcLineOffset(begInfo.lineIndex);
+					endInfo = this.textRender.calcCharOffset(Math.max(begPos, endPos));
 					if (begInfo.lineIndex === endInfo.lineIndex) {
 						drawRect(begInfo.left, top1 - top, endInfo.left - begInfo.left, line1.th);
 					} else {
-						line2 = t.textRender.getLineInfo(endInfo.lineIndex);
-						top2 = t.textRender.calcLineOffset(endInfo.lineIndex);
+						line2 = this.textRender.getLineInfo(endInfo.lineIndex);
+						top2 = this.textRender.calcLineOffset(endInfo.lineIndex);
 						drawRect(begInfo.left, top1 - top, line1.tw - begInfo.left + line1.startX, line1.th);
 						if (line2) {drawRect(line2.startX, top2 - top, endInfo.left - line2.startX, line2.th);}
 						top = top1 - top + line1.th;
 						for (i = begInfo.lineIndex + 1; i < endInfo.lineIndex; ++i, top += line1.th) {
-							line1 = t.textRender.getLineInfo(i);
+							line1 = this.textRender.getLineInfo(i);
 							drawRect(line1.startX, top, line1.tw, line1.th);
 						}
 					}
@@ -1063,7 +1047,7 @@
 				t.cursorStyle.display = "block";
 				t.cursorTID = window.setInterval(function () {
 					t.cursorStyle.display = ("none" === t.cursorStyle.display) ? "block" : "none";
-				}, t.settings.blinkInterval);
+				}, t.defaults.blinkInterval);
 			},
 
 			_hideCursor: function () {
@@ -1209,13 +1193,12 @@
 			// Content
 
 			_getContentLeft: function () {
-				var t = this, opt = t.options;
-				return asc_calcnpt(0, t.drawingCtx.getPPIX(), opt.padding/*px*/);
+				return asc_calcnpt(0, this.drawingCtx.getPPIX(), this.defaults.padding/*px*/);
 			},
 
 			_getContentWidth: function () {
-				var t = this, opt = t.options;
-				return t.right - t.left - asc_calcnpt(0, t.drawingCtx.getPPIX(), opt.padding + opt.padding + 1/*px*/);
+				return this.right - this.left - asc_calcnpt(0, this.drawingCtx.getPPIX(),
+						this.defaults.padding + this.defaults.padding + 1/*px*/);
 			},
 
 			_getContentHeight: function () {
@@ -1224,15 +1207,15 @@
 			},
 
 			_getContentPosition: function () {
-				var t = this, opt = t.options, ppix = t.drawingCtx.getPPIX();
+				var ppix = this.drawingCtx.getPPIX();
 
-				switch (t.textFlags.textAlign) {
+				switch (this.textFlags.textAlign) {
 					case kRightAlign:
-						return asc_calcnpt(t.right - t.left, ppix, -opt.padding - 1);
+						return asc_calcnpt(this.right - this.left, ppix, -this.defaults.padding - 1);
 					case kCenterAlign:
-						return asc_calcnpt(0.5 * (t.right - t.left), ppix, 0);
+						return asc_calcnpt(0.5 * (this.right - this.left), ppix, 0);
 				}
-				return asc_calcnpt(0, ppix, opt.padding);
+				return asc_calcnpt(0, ppix, this.defaults.padding);
 			},
 
 			_wrapFragments: function (frag) {
@@ -1374,7 +1357,7 @@
 					if (t.isSelectMode) {
 						t.selectionTimer = window.setTimeout(
 								function () {doChangeSelection(coord);},
-								t.settings.selectionTimeout);
+								t.defaults.selectionTimeout);
 					}
 				}
 
