@@ -14,7 +14,7 @@
     this.Descender      = 0;
     this.Height         = 0;
     this.UnitsPerEm     = 0;
-}
+};
 
 CTextMeasurerWrapper.prototype =
 {
@@ -377,4 +377,4 @@ function GetLoadInfoForMeasurer(info, lStyle)
         SrcBold     : bSrcBold,
         SrcItalic   : bSrcItalic
     };
-}
+};

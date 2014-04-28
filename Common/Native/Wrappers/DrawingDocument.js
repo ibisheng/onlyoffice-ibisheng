@@ -415,7 +415,7 @@
 
 function CDrawingDocument()
 {
-    this.Native = window.native;
+    this.Native = window["native"];
     this.Api    = window.editor;
 
     this.IsLockObjectsEnable    = false;
