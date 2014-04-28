@@ -82,7 +82,7 @@ CShapeDrawer.prototype =
         this.Shape          = shape;
 
         this.Graphics = graphics;
-        this.NativeGraphics = window.native;
+        this.NativeGraphics = window["native"];
         
         if (graphics.IsSlideBoundsCheckerType)
         {

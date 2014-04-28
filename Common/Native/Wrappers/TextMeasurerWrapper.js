@@ -20,7 +20,7 @@ CTextMeasurerWrapper.prototype =
 {
     Init : function()
     {
-        this.Measurer["Initialize"](window.native);
+        this.Measurer["Initialize"](window["native"]);
     },
 
     SetFont : function(font)

@@ -22,7 +22,7 @@
     this.TableMatrix        = null;
     this.CurrentPageIndex   = null;
 
-    this.Native = window.native;
+    this.Native = window["native"];
 
     this.checkMouseDown = function(pos, drDoc)
     {

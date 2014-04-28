@@ -10,3 +10,182 @@ asc_docs_api.prototype.Internal_Update_Ind_Left = function(Left)
 asc_docs_api.prototype.Internal_Update_Ind_Right = function(Right)
 {
 };
+
+// editor
+asc_docs_api.prototype["GetNativePageMeta"] = function(pageIndex)
+{
+    this.WordControl.m_oDrawingDocument.LogicDocument = _api.WordControl.m_oDrawingDocument.m_oLogicDocument;
+    this.WordControl.m_oDrawingDocument.RenderPage(pageIndex);
+};
+
+// HTML page interface
+asc_docs_api.prototype["Call_OnUpdateOverlay"] = function(param)
+{
+    this.WordControl.m_oDrawingDocument.OnUpdateOverlay();
+};
+
+asc_docs_api.prototype["Call_OnMouseDown"] = function(e)
+{
+    this.WordControl.m_oDrawingDocument.OnMouseDown(e);
+};
+asc_docs_api.prototype["Call_OnMouseUp"] = function(e)
+{
+    this.WordControl.m_oDrawingDocument.OnMouseUp(e);
+};
+asc_docs_api.prototype["Call_OnMouseMove"] = function(e)
+{
+    this.WordControl.m_oDrawingDocument.OnMouseMove(e);
+};
+
+asc_docs_api.prototype["Call_OnKeyDown"] = function(e)
+{
+    this.WordControl.m_oDrawingDocument.OnKeyDown(e);
+};
+asc_docs_api.prototype["Call_OnKeyPress"] = function(e)
+{
+    this.WordControl.m_oDrawingDocument.OnKeyPress(e);
+};
+asc_docs_api.prototype["Call_OnKeyUp"] = function(e)
+{
+    this.WordControl.m_oDrawingDocument.OnKeyUp(e);
+};
+
+asc_docs_api.prototype["Call_CalculateResume"] = function()
+{
+    Document_Recalculate_Page();
+};
+
+asc_docs_api.prototype["Call_TurnOffRecalculate"] = function()
+{
+    this.WordControl.m_oLogicDocument.TurnOffRecalc = true;
+};
+asc_docs_api.prototype["Call_TurnOnRecalculate"] = function()
+{
+    this.WordControl.m_oLogicDocument.TurnOffRecalc = false;
+    this.WordControl.m_oLogicDocument.Recalculate();
+};
+
+asc_docs_api.prototype["Call_CheckTargetUpdate"] = function()
+{
+    this.WordControl.m_oLogicDocument.CheckTargetUpdate();
+};
+
+asc_docs_api.prototype["Call_HR_Tabs"] = function(arrT, arrP)
+{
+    var _arr = new CParaTabs();
+    var _c = arrT.length;
+    for (var i = 0; i < _c; i++)
+    {
+        if (arrT[i] == 1)
+            _arr.Add( new CParaTab( tab_Left, arrP[i] ) );
+        if (arrT[i] == 2)
+            _arr.Add( new CParaTab( tab_Right, arrP[i] ) );
+        if (arrT[i] == 3)
+            _arr.Add( new CParaTab( tab_Center, arrP[i] ) );
+    }
+
+    var _logic = this.WordControl.m_oLogicDocument;
+    if ( false === _logic.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+    {
+        _logic.Create_NewHistoryPoint();
+        _logic.Set_ParagraphTabs(_arr);
+    }
+};
+asc_docs_api.prototype["Call_HR_Pr"] = function(_indent_left, _indent_right, _indent_first)
+{
+    var _logic = this.WordControl.m_oLogicDocument;
+    if ( false === _logic.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+    {
+        _logic.Create_NewHistoryPoint();
+        _logic.Set_ParagraphIndent( { Left : _indent_left, Right : _indent_right, FirstLine: _indent_first } );
+        _logic.Document_UpdateInterfaceState();
+    }
+};
+asc_docs_api.prototype["Call_HR_Margins"] = function(_margin_left, _margin_right)
+{
+    var _logic = this.WordControl.m_oLogicDocument;
+    if ( false === _logic.Document_Is_SelectionLocked(changestype_Document_SectPr) )
+    {
+        _logic.Create_NewHistoryPoint();
+        _logic.Set_DocumentMargin( { Left : _margin_left, Right : _margin_right });
+    }
+};
+asc_docs_api.prototype["Call_HR_Table"] = function(_params, _cols, _margins, _rows)
+{
+    var _logic = this.WordControl.m_oLogicDocument;
+    if ( false === _logic.Document_Is_SelectionLocked(changestype_Table_Properties) )
+    {
+        _logic.Create_NewHistoryPoint();
+
+        var _table_murkup = Deserialize_Table_Markup(_params, _cols, _margins, _rows);
+        _table_murkup.Table = this.WordControl.m_oDrawingDocument.Table;
+
+        _table_murkup.CorrectTo();
+        _table_murkup.Table.Update_TableMarkupFromRuler(_table_murkup, true, _params[6]);
+        _table_murkup.CorrectFrom();
+    }
+};
+
+asc_docs_api.prototype["Call_VR_Margins"] = function(_top, _bottom)
+{
+    var _logic = this.WordControl.m_oLogicDocument;
+    if ( false === _logic.Document_Is_SelectionLocked(changestype_Document_SectPr) )
+    {
+        _logic.Create_NewHistoryPoint();
+        _logic.Set_DocumentMargin( { Top : _top, Bottom : _bottom });
+    }
+};
+asc_docs_api.prototype["Call_VR_Header"] = function(_header_top, _header_bottom)
+{
+    var _logic = this.WordControl.m_oLogicDocument;
+    if ( false === _logic.Document_Is_SelectionLocked(changestype_HdrFtr) )
+    {
+        _logic.Create_NewHistoryPoint();
+        _logic.Document_SetHdrFtrBounds(_header_top, _header_bottom);
+    }
+};
+asc_docs_api.prototype["Call_VR_Table"] = function(_params, _cols, _margins, _rows)
+{
+    var _logic = this.WordControl.m_oLogicDocument;
+    if ( false === _logic.Document_Is_SelectionLocked(changestype_Table_Properties) )
+    {
+        _logic.Create_NewHistoryPoint();
+
+        var _table_murkup = Deserialize_Table_Markup(_params, _cols, _margins, _rows);
+        _table_murkup.Table = this.WordControl.m_oDrawingDocument.Table;
+
+        _table_murkup.CorrectTo();
+        _table_murkup.Table.Update_TableMarkupFromRuler(_table_murkup, false, _params[6]);
+        _table_murkup.CorrectFrom();
+    }
+};
+
+function Deserialize_Table_Markup(_params, _cols, _margins, _rows)
+{
+    var _markup = new CTableMarkup(null);
+    _markup.Internal.RowIndex   = _params[0];
+    _markup.Internal.CellIndex  = _params[1];
+    _markup.Internal.PageNum    = _params[2];
+    _markup.X                   = _params[3];
+    _markup.CurCol              = _params[4];
+    _markup.CurRow              = _params[5];
+    // 6 - DragPos
+    _markup.TransformX          = _params[7];
+    _markup.TransformY          = _params[8];
+
+    _markup.Cols    = _cols;
+
+    var _len = _margins.length;
+    for (var i = 0; i < _len; i += 2)
+    {
+        _markup.Margins.push({ Left : _margins[i], Right : _margins[i + 1] });
+    }
+
+    _len = _rows.length;
+    for (var i = 0; i < _len; i += 2)
+    {
+        _markup.Rows.push({ Y : _rows[i], H : _rows[i + 1] });
+    }
+
+    return _markup;
+}

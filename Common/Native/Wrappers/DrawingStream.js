@@ -1,6 +1,6 @@
 ﻿function CDrawingStream()
 {
-    this.Native = window.native;
+    this.Native = window["native"];
 
     this.m_oTextPr      = null;
     this.m_oGrFonts     = new CGrRFonts();

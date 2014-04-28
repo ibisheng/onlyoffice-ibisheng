@@ -355,8 +355,7 @@ function GetNativePageBase64(pageIndex)
 
 function GetNativePageMeta(pageIndex)
 {
-	_api.WordControl.m_oDrawingDocument.LogicDocument = _api.WordControl.m_oDrawingDocument.m_oLogicDocument;
-    _api.WordControl.m_oDrawingDocument.RenderPage(pageIndex);
+    return _api.GetNativePageMeta(pageIndex);
 }
 
 function GetNativeId()
@@ -384,171 +383,80 @@ var console = {
 // HTML page interface
 window.native.Call_OnUpdateOverlay = function(param)
 {
-    _api.WordControl.m_oDrawingDocument.OnUpdateOverlay();
+    return _api.Call_OnUpdateOverlay(param);
 };
 
 window.native.Call_OnMouseDown = function(e)
 {
-    _api.WordControl.m_oDrawingDocument.OnMouseDown(e);
+    return _api.Call_OnMouseDown(e);
 };
 window.native.Call_OnMouseUp = function(e)
 {
-    _api.WordControl.m_oDrawingDocument.OnMouseUp(e);
+    return _api.Call_OnMouseUp(e);
 };
 window.native.Call_OnMouseMove = function(e)
 {
-    _api.WordControl.m_oDrawingDocument.OnMouseMove(e);
+    return _api.Call_OnMouseMove(e);
 };
 
 window.native.Call_OnKeyDown = function(e)
 {
-    _api.WordControl.m_oDrawingDocument.OnKeyDown(e);
+    return _api.Call_OnKeyDown(e);
 };
 window.native.Call_OnKeyPress = function(e)
 {
-    _api.WordControl.m_oDrawingDocument.OnKeyPress(e);
+    return _api.Call_OnKeyPress(e);
 };
 window.native.Call_OnKeyUp = function(e)
 {
-    _api.WordControl.m_oDrawingDocument.OnKeyUp(e);
+    return _api.Call_OnKeyUp(e);
 };
 
 window.native.Call_CalculateResume = function()
 {
-    Document_Recalculate_Page();
+    return _api.Call_CalculateResume();
 };
 
 window.native.Call_TurnOffRecalculate = function()
 {
-    _api.WordControl.m_oLogicDocument.TurnOffRecalc = true;
+    return _api.Call_TurnOffRecalculate();
 };
 window.native.Call_TurnOnRecalculate = function()
 {
-    _api.WordControl.m_oLogicDocument.TurnOffRecalc = false;
-    _api.WordControl.m_oLogicDocument.Recalculate();
+    return _api.Call_TurnOnRecalculate();
 };
 
 window.native.Call_CheckTargetUpdate = function()
 {
-    _api.WordControl.m_oLogicDocument.CheckTargetUpdate();
+    return _api.Call_CheckTargetUpdate();
 };
 
 window.native.Call_HR_Tabs = function(arrT, arrP)
 {
-    var _arr = new CParaTabs();
-    var _c = arrT.length;
-    for (var i = 0; i < _c; i++)
-    {
-        if (arrT[i] == 1)
-            _arr.Add( new CParaTab( tab_Left, arrP[i] ) );
-        if (arrT[i] == 2)
-            _arr.Add( new CParaTab( tab_Right, arrP[i] ) );
-        if (arrT[i] == 3)
-            _arr.Add( new CParaTab( tab_Center, arrP[i] ) );
-    }
-    
-    var _logic = _api.WordControl.m_oLogicDocument;
-    if ( false === _logic.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
-    {
-        _logic.Create_NewHistoryPoint();
-        _logic.Set_ParagraphTabs(_arr);
-    }
+    return _api.Call_HR_Tabs(arrT, arrP);
 };
 window.native.Call_HR_Pr = function(_indent_left, _indent_right, _indent_first)
 {
-    var _logic = _api.WordControl.m_oLogicDocument;
-    if ( false === _logic.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
-    {
-        _logic.Create_NewHistoryPoint();
-        _logic.Set_ParagraphIndent( { Left : _indent_left, Right : _indent_right, FirstLine: _indent_first } );
-        _logic.Document_UpdateInterfaceState();
-    }
+    return _api.Call_HR_Pr(_indent_left, _indent_right, _indent_first);
 };
 window.native.Call_HR_Margins = function(_margin_left, _margin_right)
 {
-    var _logic = _api.WordControl.m_oLogicDocument;
-    if ( false === _logic.Document_Is_SelectionLocked(changestype_Document_SectPr) )
-    {
-        _logic.Create_NewHistoryPoint();
-        _logic.Set_DocumentMargin( { Left : _margin_left, Right : _margin_right });
-    }
+    return _api.Call_HR_Margins(_margin_left, _margin_right);
 };
 window.native.Call_HR_Table = function(_params, _cols, _margins, _rows)
 {
-    var _logic = _api.WordControl.m_oLogicDocument;
-    if ( false === _logic.Document_Is_SelectionLocked(changestype_Table_Properties) )
-    {
-        _logic.Create_NewHistoryPoint();
-
-        var _table_murkup = Deserialize_Table_Markup(_params, _cols, _margins, _rows);
-        _table_murkup.Table = _api.WordControl.m_oDrawingDocument.Table;
-
-        _table_murkup.CorrectTo();
-        _table_murkup.Table.Update_TableMarkupFromRuler(_table_murkup, true, _params[6]);
-        _table_murkup.CorrectFrom();
-    }
+    return _api.Call_HR_Table(_params, _cols, _margins, _rows);
 };
 
 window.native.Call_VR_Margins = function(_top, _bottom)
 {
-    var _logic = _api.WordControl.m_oLogicDocument;
-    if ( false === _logic.Document_Is_SelectionLocked(changestype_Document_SectPr) )
-    {
-        _logic.Create_NewHistoryPoint();
-        _logic.Set_DocumentMargin( { Top : _top, Bottom : _bottom });
-    }
+    return _api.Call_VR_Margins(_top, _bottom);
 };
 window.native.Call_VR_Header = function(_header_top, _header_bottom)
 {
-    var _logic = _api.WordControl.m_oLogicDocument;
-    if ( false === _logic.Document_Is_SelectionLocked(changestype_HdrFtr) )
-    {
-        _logic.Create_NewHistoryPoint();
-        _logic.Document_SetHdrFtrBounds(_header_top, _header_bottom);
-    }
+    return _api.Call_VR_Header(_header_top, _header_bottom);
 };
 window.native.Call_VR_Table = function(_params, _cols, _margins, _rows)
 {
-    var _logic = _api.WordControl.m_oLogicDocument;
-    if ( false === _logic.Document_Is_SelectionLocked(changestype_Table_Properties) )
-    {
-        _logic.Create_NewHistoryPoint();
-
-        var _table_murkup = Deserialize_Table_Markup(_params, _cols, _margins, _rows);
-        _table_murkup.Table = _api.WordControl.m_oDrawingDocument.Table;
-
-        _table_murkup.CorrectTo();
-        _table_murkup.Table.Update_TableMarkupFromRuler(_table_murkup, false, _params[6]);
-        _table_murkup.CorrectFrom();
-    }
+    return _api.Call_VR_Table(_params, _cols, _margins, _rows);
 };
-
-function Deserialize_Table_Markup(_params, _cols, _margins, _rows)
-{
-    var _markup = new CTableMarkup(null);
-    _markup.Internal.RowIndex   = _params[0];
-    _markup.Internal.CellIndex  = _params[1];
-    _markup.Internal.PageNum    = _params[2];
-    _markup.X                   = _params[3];
-    _markup.CurCol              = _params[4];
-    _markup.CurRow              = _params[5];
-    // 6 - DragPos
-    _markup.TransformX          = _params[7];
-    _markup.TransformY          = _params[8];
-
-    _markup.Cols    = _cols;
-
-    var _len = _margins.length;
-    for (var i = 0; i < _len; i += 2)
-    {
-        _markup.Margins.push({ Left : _margins[i], Right : _margins[i + 1] });
-    }
-
-    _len = _rows.length;
-    for (var i = 0; i < _len; i += 2)
-    {
-        _markup.Rows.push({ Y : _rows[i], H : _rows[i + 1] });
-    }
-
-    return _markup;
-}
