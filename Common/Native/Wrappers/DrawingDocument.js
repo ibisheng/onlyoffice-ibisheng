@@ -1264,13 +1264,13 @@ CDrawingDocument.prototype =
 	__DD_ConvertCoordsFromCursor : function(x, y)
 	{
 		var pos = this.Native["DD_ConvertCoordsFromCursor"];
-		return { X: pos["X"], Y : pos["Y"], Page : ["Page"] };
+		return { X: pos["X"], Y : pos["Y"], Page : pos["Page"] };
 	},
 	
 	__DD_ConvetToPageCoords : function(x, y)
 	{
 		var pos = this.Native["DD_ConvetToPageCoords"];
-		return { X: pos["X"], Y : pos["Y"], Page : ["Page"] };
+		return { X: pos["X"], Y : pos["Y"], Page : pos["Page"] };
 	},
     
     ///////////////////////////////////////////
