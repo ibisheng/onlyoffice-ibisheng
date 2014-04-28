@@ -1263,13 +1263,13 @@ CDrawingDocument.prototype =
 	
 	__DD_ConvertCoordsFromCursor : function(x, y)
 	{
-		var pos = this.Native["DD_ConvertCoordsFromCursor"];
+		var pos = this.Native["DD_ConvertCoordsFromCursor"](x, y);
 		return { X: pos["X"], Y : pos["Y"], Page : pos["Page"] };
 	},
 	
-	__DD_ConvetToPageCoords : function(x, y)
+	__DD_ConvetToPageCoords : function(x, y, page)
 	{
-		var pos = this.Native["DD_ConvetToPageCoords"];
+		var pos = this.Native["DD_ConvetToPageCoords"](x, y, page);
 		return { X: pos["X"], Y : pos["Y"], Page : pos["Page"] };
 	},
     
