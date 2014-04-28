@@ -12,6 +12,10 @@ asc_docs_api.prototype.Internal_Update_Ind_Right = function(Right)
 };
 
 // editor
+asc_docs_api.prototype["NativeAfterLoad"] = function()
+{
+    this.WordControl.m_oDrawingDocument.AfterLoad();
+};
 asc_docs_api.prototype["GetNativePageMeta"] = function(pageIndex)
 {
     this.WordControl.m_oDrawingDocument.LogicDocument = _api.WordControl.m_oDrawingDocument.m_oLogicDocument;
