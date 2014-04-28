@@ -262,7 +262,6 @@ function handleInlineObjects(drawingObjectsController, drawingArr, e, x, y, page
                 {
                     return false;
                 }
-                return false;
             }
             // case historyitem_type_ChartSpace:
             // {
@@ -275,6 +274,7 @@ function handleInlineObjects(drawingObjectsController, drawingArr, e, x, y, page
             // }
         }
     }
+    return false;
 }
 
 function handleMouseUpPreMoveState(drawingObjects, e, x, y, pageIndex, bWord)
