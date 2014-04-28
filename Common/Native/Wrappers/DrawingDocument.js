@@ -1837,7 +1837,7 @@ function check_MouseDownEvent(e, isClicks)
 
     if (isClicks)
     {
-        global_mouseEvent.ClickCount = e.ClickCount;
+        global_mouseEvent.ClickCount = e["ClickCount"];
     }
     else
     {
