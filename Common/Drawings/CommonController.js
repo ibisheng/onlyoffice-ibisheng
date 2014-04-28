@@ -2083,7 +2083,7 @@ DrawingObjectsController.prototype =
         var objects_by_types = this.getSelectedObjectsByTypes();
         var ret = {};
         ret.chartProps = this.getChartProps();
-        window["asc"]["editor"].handlers.trigger("asc_onChangeSelectDrawingObjects", ret);
+        window["Asc"]["editor"].handlers.trigger("asc_onChangeSelectDrawingObjects", ret);
     },
 
 
