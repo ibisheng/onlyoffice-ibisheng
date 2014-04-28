@@ -250,7 +250,7 @@ function NativeOpenFile()
 
 function NativeOpenFile2()
 {
-	g_oTextMeasurer = new CTextMeasurerWrapper();
+	g_oTextMeasurer = window["CreateTextMeasurerWrapper"]();
 	g_oTextMeasurer.Init();
 
 	window.g_file_path = "native_open_file";

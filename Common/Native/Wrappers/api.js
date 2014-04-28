@@ -241,5 +241,4 @@ function CFontManager()
 // -------------------------------------------------
 
 // declarate unused methods and objects
-window["tmw"] = CTextMeasurerWrapper;
 window["ftm"] = FT_Memory;

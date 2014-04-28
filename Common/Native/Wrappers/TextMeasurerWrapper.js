@@ -378,3 +378,10 @@ function GetLoadInfoForMeasurer(info, lStyle)
         SrcItalic   : bSrcItalic
     };
 };
+
+CTextMeasurerWrapper.prototype["Init"] = CTextMeasurerWrapper.prototype.Init;
+
+window["CreateTextMeasurerWrapper"] = function()
+{
+	return new CTextMeasurerWrapper();
+}
