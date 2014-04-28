@@ -203,7 +203,7 @@ CHeaderFooter.prototype =
         
         // Ежели текущая страница не задана, тогда выставляем ту, которая оказалась пересчитанной первой. В противном
         // случае, выставляем рассчет страницы, которая была до этого.
-        if ( -1 === this.RecalcInfo.CurPage )
+        if ( -1 === this.RecalcInfo.CurPage || false !== this.RecalcInfo.NeedRecalc[this.RecalcInfo.CurPage] )
         {
             this.RecalcInfo.CurPage = Page_abs;
             
