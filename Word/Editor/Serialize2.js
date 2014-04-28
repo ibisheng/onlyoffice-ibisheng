@@ -5259,7 +5259,7 @@ function BinaryFileReader(doc, openParams)
 
         this.Document.On_EndLoad();
     };
-    this.ReadFromString = function (sBase64) {
+    this.ReadFromString = function (sBase64, isCopyPaste) {
         //надо сбросить то, что остался после открытия документа
         window.global_pptx_content_loader.Clear();
         window.global_pptx_content_loader.Start_UseFullUrl();
@@ -5372,6 +5372,20 @@ function BinaryFileReader(doc, openParams)
         var aPrepeareImages = [];
         for (var i in oPastedImagesUnique)
             aPrepeareImages.push(i);
+			
+		if(!isCopyPaste)
+		{
+			this.Document.Content = this.oReadResult.DocumentContent;
+			
+			if(this.Document.Content.length == 0)
+			{
+				var oNewParagraph = new Paragraph(this.Document.DrawingDocument, this.Document, 0, 0, 0, 0, 0 );
+				this.Document.Content.push(oNewParagraph);
+			};
+			
+			this.Document.On_EndLoad();
+		};
+		
         return { content: aContent, fonts: aPrepeareFonts, images: aPrepeareImages, bAddNewStyles: addNewStyles, aPastedImages: aPastedImages, bInBlock: bInBlock };
     }
 };

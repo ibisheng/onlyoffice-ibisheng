@@ -2993,7 +2993,7 @@ PasteProcessor.prototype =
 	{
         var openParams = { checkFileSize: false, charCount: 0, parCount: 0 };
         var oBinaryFileReader = new BinaryFileReader(this.oDocument, openParams);
-        var oRes = oBinaryFileReader.ReadFromString(sBase64);
+        var oRes = oBinaryFileReader.ReadFromString(sBase64, true);
         this.bInBlock = oRes.bInBlock;
         return oRes;
 	},
