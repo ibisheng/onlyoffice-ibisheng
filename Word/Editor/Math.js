@@ -51,6 +51,7 @@ ParaMath.prototype =
         // TODO: ParaMath.Copy
 
         var NewMath = new ParaMath();
+        this.Root.Copy(Selected);
 
         return NewMath;
     },
@@ -73,8 +74,6 @@ ParaMath.prototype =
     Get_TextPr : function(_ContentPos, Depth)
     {
         // TODO: ParaMath.Get_TextPr
-
-
 
         return new CTextPr();
     },
@@ -770,7 +769,9 @@ ParaMath.prototype =
 
         if ( EndPos >= 1 )
         {
-            this.Math.Draw( PDSE.X, PDSE.Y - this.Root.size.ascent, PDSE.Graphics );
+            //this.Math.Draw( PDSE.X, PDSE.Y - this.Root.size.ascent, PDSE.Graphics );
+
+            this.Math.Draw( PDSE.X, PDSE.Y, PDSE.Graphics );
             PDSE.X += this.Width;
         }
     },

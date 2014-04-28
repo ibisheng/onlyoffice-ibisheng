@@ -5842,7 +5842,7 @@ CMathContent.prototype =
         return bIncline;
     },
 
-    /// Position for Paragraph
+    /// For Para Math
     Recalculate_CurPos : function(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
     {
         var result;
@@ -6233,10 +6233,6 @@ CMathContent.prototype =
     {
 
     },
-    Selection_Remove: function()
-    {
-
-    },
     getContent: function(stack, bCurrent)
     {
         var content = null;
@@ -6257,7 +6253,28 @@ CMathContent.prototype =
     {
         return this.content.length == 1;
     },
+    Copy: function(Selected)
+    {
 
+    },
+    Selection_Remove: function()
+    {
+        var start = this.SelectStartPos,
+            end   = this.SelectEndPos;
+
+        if(this.content[start].typeObj !== MATH_PLACEHOLDER)
+            this.content[start].Selection_Remove();
+
+        if(this.content[end].typeObj !== MATH_PLACEHOLDER)
+            this.content[end].Selection_Remove();
+
+        this.SelectStartPos = 0;
+        this.SelectEndPos   = 0;
+    },
+    getElem: function(nNum)
+    {
+        return this.content[nNum];
+    },
 
     ////////////////////////////////////////////////////////////////
 

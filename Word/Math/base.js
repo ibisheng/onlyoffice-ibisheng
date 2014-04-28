@@ -1390,7 +1390,7 @@ CMathBase.prototype =
     },
     IsSelectEmpty: function()
     {
-        return (this.SelectStart_X == this.SelectEnd_X) && (this.SelectStart_Y == this.SelectEnd_Y);
+        return (this.SelectStart_X == this.SelectEnd_X) && (this.SelectStart_Y == this.SelectEnd_Y) && (this.SelectStart_X !== -1 && this.SelectStart_Y !== -1);
     },
     Recalculate_CurPos: function(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
     {
@@ -1411,6 +1411,15 @@ CMathBase.prototype =
             for(var j = 0; j < this.nCol; j++)
                 if(!this.elements[i][j].IsJustDraw())
                     this.elements[i][j].SetRunEmptyToContent(bAll);
+    },
+    Selection_Remove: function()
+    {
+        var start_X = this.SelectStart_X,
+            start_Y = this.SelectStart_Y;
+
+        if(start_X !== -1 && start_Y !== -1)
+            this.elements[start_X][start_Y].Selection_Remove();
+
     }
 
     //////////////////////////
