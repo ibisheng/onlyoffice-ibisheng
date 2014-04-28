@@ -3408,95 +3408,121 @@
 					{
 						case para_Run://*paraRun*
 						{
-							paraRunContent = content[n].Content;
-						
-							cTextPr = content[n].Get_CompiledPr();
-							if(cTextPr && !(paraRunContent.length == 1 && paraRunContent[0] instanceof ParaEnd))//settings for text	
-								formatText = this._getPrParaRun(paraPr, cTextPr);
-							else if(!formatText)
-								formatText = this._getPrParaRun(paraPr, cTextPr);
+							s = this._parseParaRun(content[n], oNewItem, paraPr, s, row, c1, text, formatText);
+							break;
+						};
+						case para_Hyperlink://*link*
+						{	
+							oNewItem.hyperLink = content[n].Value;
+							oNewItem.toolTip = content[n].ToolTip;
 							
-							//проходимся по контенту paraRun
-							for(var pR = 0; pR < paraRunContent.length; pR++)
+							for(var h = 0; h < content[n].Content.length; h++)
 							{
-		
-								switch(paraRunContent[pR].Type)
+								switch(content[n].Content[h].Type)
 								{
-									case para_Text://*paraText*
+									case para_Run://*paraRun*
 									{
-										text += paraRunContent[pR].Value;
+										s = this._parseParaRun(content[n].Content[h], oNewItem, paraPr, s, row, c1, text, formatText);
 										break;
 									};
-									
-									case para_Space://*paraSpace*
-									{
-										text += " ";
-										break;
-									};
-									
-									case para_Tab://*paraEnd / paraTab*
-									{
-										//if(!oNewItem.length)
-										//{
-											fontFamily = paragraphFontFamily;
-											this.fontsNew[fontFamily] = 1;
-											
-											oNewItem.push(formatText);
-										//}
-										
-										if(text !== null)
-											oNewItem[oNewItem.length - 1].text = text;
-										
-										cloneNewItem  = this._getCloneNewItem(oNewItem);
-										
-										//переходим в следующую ячейку
-										if(typeof aResult[row][s + c1] == "object")
-											aResult[row][s + c1][aResult[row][s + c1].length] = cloneNewItem;
-										else
-										{
-											aResult[row][s + c1] = [];
-											aResult[row][s + c1][0] = cloneNewItem;
-										}
-											
-										text = "";
-										oNewItem = [];
-										s++;
-										break;
-									};
-									
-									case para_End:
-									{	
-										if(typeof aResult[row][s + c1] == "object")
-											aResult[row][s + c1][aResult[row][s + c1].length] = oNewItem;
-										else
-										{
-											aResult[row][s + c1] = [];
-											aResult[row][s + c1][0] = oNewItem;
-										}
-									};
-								}
+								};
 							};
-							
-							if(text != "")
-							{	
-								fontFamily = paragraphFontFamily;
-								this.fontsNew[fontFamily] = 1;
-								
-								oNewItem.push(formatText);
-								
-								
-								if(text !== null)
-									oNewItem[oNewItem.length - 1].text = text;
-									
-								cloneNewItem  = this._getCloneNewItem(oNewItem);
-								
-								text = "";
-							};
-							
 							break;
 						};
 					};
 				};
+			},
+			
+			
+			_parseParaRun: function(paraRun, oNewItem, paraPr, s, row, c1, text, formatText)
+			{
+				var paraRunContent = paraRun.Content;
+				var aResult = this.aResult;
+				var paragraphFontFamily = paraPr.TextPr.FontFamily.Name;
+				var cloneNewItem;
+			
+				var cTextPr = paraRun.Get_CompiledPr();
+				if(cTextPr && !(paraRunContent.length == 1 && paraRunContent[0] instanceof ParaEnd))//settings for text	
+					formatText = this._getPrParaRun(paraPr, cTextPr);
+				else if(!formatText)
+					formatText = this._getPrParaRun(paraPr, cTextPr);
+				
+				//проходимся по контенту paraRun
+				for(var pR = 0; pR < paraRunContent.length; pR++)
+				{
+
+					switch(paraRunContent[pR].Type)
+					{
+						case para_Text://*paraText*
+						{
+							text += paraRunContent[pR].Value;
+							break;
+						};
+						
+						case para_Space://*paraSpace*
+						{
+							text += " ";
+							break;
+						};
+						
+						case para_Tab://*paraEnd / paraTab*
+						{
+							//if(!oNewItem.length)
+							//{
+								this.fontsNew[paragraphFontFamily] = 1;
+								
+								oNewItem.push(formatText);
+							//}
+							
+							if(text !== null)
+								oNewItem[oNewItem.length - 1].text = text;
+							
+							cloneNewItem  = this._getCloneNewItem(oNewItem);
+							
+							//переходим в следующую ячейку
+							if(typeof aResult[row][s + c1] == "object")
+								aResult[row][s + c1][aResult[row][s + c1].length] = cloneNewItem;
+							else
+							{
+								aResult[row][s + c1] = [];
+								aResult[row][s + c1][0] = cloneNewItem;
+							}
+								
+							text = "";
+							oNewItem = [];
+							s++;
+							break;
+						};
+						
+						case para_End:
+						{	
+							if(typeof aResult[row][s + c1] == "object")
+								aResult[row][s + c1][aResult[row][s + c1].length] = oNewItem;
+							else
+							{
+								aResult[row][s + c1] = [];
+								aResult[row][s + c1][0] = oNewItem;
+							}
+						};
+					}
+				};
+				
+				if(text != "")
+				{	
+					this.fontsNew[paragraphFontFamily] = 1;
+					
+					oNewItem.push(formatText);
+					
+					
+					if(text !== null)
+						oNewItem[oNewItem.length - 1].text = text;
+						
+					cloneNewItem  = this._getCloneNewItem(oNewItem);
+					
+					text = "";
+				};
+				
+				return s;
 			},
 			
 			_getAllNumberingText: function(Lvl, numberingText)
@@ -3816,7 +3842,9 @@
 				result.borders = oNewItem.borders;
 				result.rowSpan = oNewItem.rowSpan;
 				result.colSpan = oNewItem.colSpan;
+				result.toolTip = result.toolTip;
 				result.bc = oNewItem.bc;
+				result.hyperLink = oNewItem.hyperLink;
 				
 				return result;
 			}
