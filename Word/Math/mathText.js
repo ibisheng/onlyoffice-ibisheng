@@ -274,6 +274,7 @@ CMathText.prototype =
         var X = this.pos.x + x,
             Y = this.pos.y + y;
 
+
         /*var tx = 0;
          var ty = 0;
 
@@ -297,7 +298,6 @@ CMathText.prototype =
             shy = this.transform.shy, sy = this.transform.sy;
 
         pGraphics.transform(sx, shy, shx, sy, 0, 0);*/
-
 
         pGraphics.FillTextCode(X, Y, this.getCode());    //на отрисовку символа отправляем положение baseLine
 

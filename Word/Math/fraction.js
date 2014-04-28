@@ -76,6 +76,8 @@ CFraction.prototype.old_getCenter = function()
 }
 CFraction.prototype.draw = function(x, y, pGraphics)
 {
+    console.log("Draw fraction");
+
     if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
         this.drawBarFraction(x, y, pGraphics);
     else if(this.type == SKEWED_FRACTION)

@@ -3055,10 +3055,6 @@ COperator.prototype.fixSize = function(oMeasure, stretch)
                 //height = this.operator.size.height;
             }
 
-            //var betta = this.getCtrPrp().FontSize;
-            //ascent = height/2 + 0.2*betta;
-
-
         }
 
         var mgCtrPrp = this.Parent.mergeCtrTPrp();
@@ -3849,6 +3845,8 @@ CDelimiter.prototype.getPropsForWrite = function()
 function CCharacter()
 {
     this.operator = new COperator(OPER_GROUP_CHAR);
+    this.shiftOperator = 0;
+
     CMathBase.call(this);
 }
 extend(CCharacter, CMathBase);
@@ -3870,6 +3868,15 @@ CCharacter.prototype.Resize = function(oMeasure)
     var width  = base.size.width > this.operator.size.width ? base.size.width : this.operator.size.width,
         height = base.size.height + this.operator.size.height,
         ascent = this.getAscent(oMeasure);
+
+    var ctrPrp = this.mergeCtrTPrp();
+    oMeasure.SetFont(ctrPrp);
+
+    var letterX = new CMathText(true);
+    letterX.add(0x78);
+    letterX.Resize(oMeasure);
+    this.shiftOperator = base.size.ascent - letterX.size.ascent;
+
 
     this.size = {height: height, width: width, ascent: ascent};
 }
@@ -3912,7 +3919,23 @@ CCharacter.prototype.align = function(element)
 CCharacter.prototype.draw = function(x, y, pGraphics)
 {
     this.elements[0][0].draw(x, y, pGraphics);
+
+    var mgCtrPrp = this.mergeCtrTPrp();
+    var FontSize = mgCtrPrp.FontSize,
+        FontFamily = {Name: "Cambria Math", Index: -1};
+
+    var obj = {FontSize: FontSize, FontFamily: FontFamily};
+
+    var accFont = new CTextPr();
+    accFont.Set_FromObject(obj);
+
+
+    pGraphics.SetFont(accFont);
+    pGraphics.p_color(0,0,0, 255);
+    pGraphics.b_color1(0,0,0, 255);
+
     this.operator.draw(x, y, pGraphics);
+
 }
 CCharacter.prototype.findDisposition = function(pos)
 {
