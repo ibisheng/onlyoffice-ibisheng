@@ -384,4 +384,7 @@ CTextMeasurerWrapper.prototype["Init"] = CTextMeasurerWrapper.prototype.Init;
 window["CreateTextMeasurerWrapper"] = function()
 {
 	return new CTextMeasurerWrapper();
-}
+};
+
+g_oTextMeasurer = window["CreateTextMeasurerWrapper"]();
+g_oTextMeasurer.Init();
