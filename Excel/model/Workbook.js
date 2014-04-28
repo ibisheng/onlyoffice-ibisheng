@@ -3422,29 +3422,29 @@ Woorksheet.prototype._BuildDependencies=function(cellRange){
 							var oNewElem;
 							if(range.isOneCell())
 							{
-								if(elem instanceof CRef3D)
-									oNewElem = new CRef3D(ref, elem.ws.getName(), elem._wb);
-								else if(elem instanceof CArea3D)
+								if(elem instanceof cRef3D)
+									oNewElem = new cRef3D(ref, elem.ws.getName(), elem._wb);
+								else if(elem instanceof cArea3D)
 								{
 									var wsFrom = elem._wb.getWorksheetById( elem.wsFrom ).getName();
 									var wsTo = elem._wb.getWorksheetById( elem.wsTo ).getName();
-									oNewElem = new CArea3D(ref, wsFrom, wsTo, elem._wb);
+									oNewElem = new cArea3D(ref, wsFrom, wsTo, elem._wb);
 								}
 								else
-									oNewElem = new CRef(ref, elem.ws);
+									oNewElem = new cRef(ref, elem.ws);
 							}
 							else
 							{
-								if(elem instanceof CRef3D)
-									oNewElem = new CArea3D(ref, elem.ws.getName(), elem.ws.getName(), elem._wb);
-								else if(elem instanceof CArea3D)
+								if(elem instanceof cRef3D)
+									oNewElem = new cArea3D(ref, elem.ws.getName(), elem.ws.getName(), elem._wb);
+								else if(elem instanceof cArea3D)
 								{
 									var wsFrom = elem._wb.getWorksheetById( elem.wsFrom ).getName();
 									var wsTo = elem._wb.getWorksheetById( elem.wsTo ).getName();
-									oNewElem = new CArea3D(ref, wsFrom, wsTo, elem._wb);
+									oNewElem = new cArea3D(ref, wsFrom, wsTo, elem._wb);
 								}
 								else
-									oNewElem = new CArea(ref, elem.ws);
+									oNewElem = new cArea(ref, elem.ws);
 							}
 							if ( ref.indexOf( "$" ) > -1 )
 								oNewElem.isAbsolute = true;
@@ -3535,9 +3535,9 @@ Woorksheet.prototype._RecalculatedFunctions=function(cell,bad){
         if ( c.formulaParsed && c.formulaParsed.outStack ) {
             for ( var i = 0, length = c.formulaParsed.outStack.length; i < length; i++ ) {
                 elem = c.formulaParsed.outStack[i];
-                if ( elem instanceof CRef || elem instanceof CRef3D || elem instanceof CArea || elem instanceof CArea3D ) {
+                if ( elem instanceof cRef || elem instanceof cRef3D || elem instanceof cArea || elem instanceof cArea3D ) {
                     var r = elem.getRange();
-                    if ( elem instanceof CArea3D && r.length > 0 )
+                    if ( elem instanceof cArea3D && r.length > 0 )
                         r = r[0];
                     if ( r && r.getNumFormatStr ) {
                         var sCurFormat = c.getNumFormatStr();
@@ -3568,7 +3568,7 @@ Woorksheet.prototype._RecalculatedFunctions=function(cell,bad){
 		res = __cell.formulaParsed.calculate();
 	}
 	else {
-		res = new CError( cErrorType.bad_reference )
+		res = new cError( cErrorType.bad_reference )
 	}
 	if(res){
 		if( res.type == cElementType.cell){

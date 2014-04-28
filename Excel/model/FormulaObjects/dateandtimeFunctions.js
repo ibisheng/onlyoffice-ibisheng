@@ -22,6 +22,7 @@ var DayCountBasis = {
 }
 
 function yearFrac(d1, d2, mode) {
+
     d1.truncate();
     d2.truncate();
 
@@ -34,7 +35,7 @@ function yearFrac(d1, d2, mode) {
 
     switch ( mode ) {
         case DayCountBasis.UsPsa30_360:
-            return new CNumber( Math.abs( GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, true ) ) / 360 );
+            return new cNumber( Math.abs( GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, true ) ) / 360 );
         case DayCountBasis.ActualActual:
             var yc = /*Math.abs*/( year2 - year1 ),
                 sd = year1 > year2 ? new Date(d2) : new Date(d1),
@@ -45,19 +46,19 @@ function yearFrac(d1, d2, mode) {
             }
             yearAverage /= (yc + 1);
             dayDiff /= (yearAverage * c_msPerDay);
-            return new CNumber( dayDiff );
+            return new cNumber( dayDiff );
         case DayCountBasis.Actual360:
             var dayDiff = Math.abs( d2 - d1 );
             dayDiff /= (360 * c_msPerDay);
-            return new CNumber( dayDiff );
+            return new cNumber( dayDiff );
         case DayCountBasis.Actual365:
             var dayDiff = Math.abs( d2 - d1 );
             dayDiff /= (365 * c_msPerDay);
-            return new CNumber( dayDiff );
+            return new cNumber( dayDiff );
         case DayCountBasis.Europ30_360:
-            return new CNumber( Math.abs( GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, false ) ) / 360 );
+            return new cNumber( Math.abs( GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, false ) ) / 360 );
         default:
-            return new CError( cErrorType.not_numeric );
+            return new cError( cErrorType.not_numeric );
     }
 }
 
@@ -71,7 +72,7 @@ function diffDate(d1, d2, mode){
 
     switch ( mode ) {
         case DayCountBasis.UsPsa30_360:
-            return new CNumber( GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, true ) );
+            return new cNumber( GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, true ) );
         case DayCountBasis.ActualActual:
             var yc = /*Math.abs*/( year2 - year1 ),
                 sd = year1 > year2 ? new Date(d2) : new Date(d1),
@@ -82,19 +83,19 @@ function diffDate(d1, d2, mode){
             }
             yearAverage /= (yc + 1);
             dayDiff /= c_msPerDay;
-            return new CNumber( dayDiff );
+            return new cNumber( dayDiff );
         case DayCountBasis.Actual360:
             var dayDiff = d2 - d1;
             dayDiff /= c_msPerDay;
-            return new CNumber( dayDiff );
+            return new cNumber( dayDiff );
         case DayCountBasis.Actual365:
             var dayDiff = d2 - d1;
             dayDiff /= c_msPerDay;
-            return new CNumber( dayDiff );
+            return new cNumber( dayDiff );
         case DayCountBasis.Europ30_360:
-            return new CNumber( GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, false ) );
+            return new cNumber( GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, false ) );
         default:
-            return new CError( cErrorType.not_numeric );
+            return new cError( cErrorType.not_numeric );
     }
 }
 
@@ -113,7 +114,7 @@ function diffDate2(d1, d2, mode){
             nDaysInYear = 360;
             nYears = year1 - year2;
             nDayDiff = Math.abs( GetDiffDate360( date1, month1+1, year1, d1.isLeapYear(), date2, month2+1, year2, true ) ) - nYears * nDaysInYear;
-            return new CNumber( nYears + nDayDiff / nDaysInYear );
+            return new cNumber( nYears + nDayDiff / nDaysInYear );
         case DayCountBasis.ActualActual:
             nYears = year2 - year1;
             nDaysInYear = d1.isLeapYear() ? 366 : 365;
@@ -130,26 +131,26 @@ function diffDate2(d1, d2, mode){
 
             if( dayDiff < 0 )
                 dayDiff += nDaysInYear;
-            return new CNumber( nYears + dayDiff / nDaysInYear );
+            return new cNumber( nYears + dayDiff / nDaysInYear );
         case DayCountBasis.Actual360:
             nDaysInYear = 360;
             nYears = parseInt( ( d2 - d1 )/c_msPerDay / nDaysInYear );
             nDayDiff = (d2 - d1)/c_msPerDay;
             nDayDiff %= nDaysInYear;
-            return new CNumber( nYears + nDayDiff / nDaysInYear );
+            return new cNumber( nYears + nDayDiff / nDaysInYear );
         case DayCountBasis.Actual365:
             nDaysInYear = 365;
             nYears = parseInt( ( d2 - d1 )/c_msPerDay / nDaysInYear );
             nDayDiff = (d2 - d1)/c_msPerDay;
             nDayDiff %= nDaysInYear;
-            return new CNumber( nYears + nDayDiff / nDaysInYear );
+            return new cNumber( nYears + nDayDiff / nDaysInYear );
         case DayCountBasis.Europ30_360:
             nDaysInYear = 360;
             nYears = year1 - year2;
             nDayDiff = Math.abs( GetDiffDate360( date1, month1+1, year1, d1.isLeapYear(), date2, month2+1, year2, false ) ) - nYears * nDaysInYear;
-            return new CNumber( nYears + nDayDiff / nDaysInYear );
+            return new cNumber( nYears + nDayDiff / nDaysInYear );
         default:
-            return new CError( cErrorType.not_numeric );
+            return new cError( cErrorType.not_numeric );
     }
 }
 
@@ -258,22 +259,22 @@ cDATE.prototype = Object.create( cBaseFunction.prototype )
 cDATE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], year, month, day;
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 );
     }
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElement( 0 );
     }
-    if ( arg2 instanceof CArea || arg2 instanceof CArea3D ) {
+    if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
         arg2 = arg2.cross( arguments[1].first );
     }
-    else if ( arg2 instanceof CArray ) {
+    else if ( arg2 instanceof cArray ) {
         arg2 = arg2.getElement( 0 );
     }
 
@@ -281,9 +282,9 @@ cDATE.prototype.Calculate = function ( arg ) {
     arg1 = arg1.tocNumber();
     arg2 = arg2.tocNumber();
 
-    if ( arg0 instanceof CError )    return this.setCA( arg0, true );
-    if ( arg1 instanceof CError )    return this.setCA( arg1, true );
-    if ( arg2 instanceof CError )    return this.setCA( arg2, true );
+    if ( arg0 instanceof cError )    return this.setCA( arg0, true );
+    if ( arg1 instanceof cError )    return this.setCA( arg1, true );
+    if ( arg2 instanceof cError )    return this.setCA( arg2, true );
 
     year = arg0.getValue();
     month = arg1.getValue();
@@ -292,9 +293,9 @@ cDATE.prototype.Calculate = function ( arg ) {
     if ( year >= 0 && year <= 1899 )
         year += 1900;
     if ( month == 0 ) {
-        return this.setCA( new CError( cErrorType.not_numeric ), true );
+        return this.setCA( new cError( cErrorType.not_numeric ), true );
     }
-    this.value = new CNumber( Math.round( new Date( year, month - 1, day ).getExcelDate() ) )
+    this.value = new cNumber( Math.round( new Date( year, month - 1, day ).getExcelDate() ) )
     this.value.numFormat = 14;
     this.value.ca = true;
     return this.value;
@@ -328,24 +329,24 @@ function cDATEDIF() {
 cDATEDIF.prototype = Object.create( cBaseFunction.prototype )
 cDATEDIF.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
     }
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
     }
 
-    if ( arg2 instanceof CArea || arg2 instanceof CArea3D ) {
+    if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
         arg2 = arg2.cross( arguments[1].first );
     }
-    else if ( arg2 instanceof CArray ) {
+    else if ( arg2 instanceof cArray ) {
         arg2 = arg2.getElementRowCol( 0, 0 );
     }
 
@@ -353,14 +354,14 @@ cDATEDIF.prototype.Calculate = function ( arg ) {
     arg1 = arg1.tocNumber();
     arg2 = arg2.tocString();
 
-    if ( arg0 instanceof CError ) return this.value = arg0;
-    if ( arg1 instanceof CError ) return this.value = arg1;
-    if ( arg2 instanceof CError ) return this.value = arg2;
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = arg1;
+    if ( arg2 instanceof cError ) return this.value = arg2;
 
     var val0 = arg0.getValue(), val1 = arg1.getValue();
 
     if ( val0 < 0 || val1 < 0 || val0 >= val1 )
-        return this.setCA( new CError( cErrorType.not_numeric ), true );
+        return this.setCA( new cError( cErrorType.not_numeric ), true );
 
     val0 = Date.prototype.getDateFromExcel( val0 );
     val1 = Date.prototype.getDateFromExcel( val1 );
@@ -379,38 +380,38 @@ cDATEDIF.prototype.Calculate = function ( arg ) {
 
     switch ( arg2.getValue().toUpperCase() ) {
         case "Y":
-            return this.value = new CNumber( dateDiff( val0, val1 )[0] );
+            return this.value = new cNumber( dateDiff( val0, val1 )[0] );
             break;
         case "M":
-            return this.value = new CNumber( dateDiff( val0, val1 )[1] );
+            return this.value = new cNumber( dateDiff( val0, val1 )[1] );
             break;
         case "D":
-            return this.value = new CNumber( parseInt( (val1 - val0) / c_msPerDay ) );
+            return this.value = new cNumber( parseInt( (val1 - val0) / c_msPerDay ) );
             break;
         case "MD":
             if ( val0.getDate() > val1.getDate() ) {
-                this.value = new CNumber( Math.abs( new Date( val0.getFullYear(), val0.getMonth(), val0.getDate() ) - new Date( val0.getFullYear(), val0.getMonth() + 1, val1.getDate() ) ) / c_msPerDay );
+                this.value = new cNumber( Math.abs( new Date( val0.getFullYear(), val0.getMonth(), val0.getDate() ) - new Date( val0.getFullYear(), val0.getMonth() + 1, val1.getDate() ) ) / c_msPerDay );
             }
             else {
-                this.value = new CNumber( val1.getDate() - val0.getDate() );
+                this.value = new cNumber( val1.getDate() - val0.getDate() );
             }
             return this.value;
             break;
         case "YM":
             var d = dateDiff( val0, val1 );
-            return this.value = new CNumber( d[1] - d[0] * 12 );
+            return this.value = new cNumber( d[1] - d[0] * 12 );
             break;
         case "YD":
             if ( val0.getMonth() > val1.getMonth() ) {
-                this.value = new CNumber( Math.abs( new Date( val0.getFullYear(), val0.getMonth(), val0.getDate() ) - new Date( val0.getFullYear() + 1, val1.getMonth(), val1.getDate() ) ) / c_msPerDay );
+                this.value = new cNumber( Math.abs( new Date( val0.getFullYear(), val0.getMonth(), val0.getDate() ) - new Date( val0.getFullYear() + 1, val1.getMonth(), val1.getDate() ) ) / c_msPerDay );
             }
             else {
-                this.value = new CNumber( Math.abs( new Date( val0.getFullYear(), val0.getMonth(), val0.getDate() ) - new Date( val0.getFullYear(), val1.getMonth(), val1.getDate() ) ) / c_msPerDay );
+                this.value = new cNumber( Math.abs( new Date( val0.getFullYear(), val0.getMonth(), val0.getDate() ) - new Date( val0.getFullYear(), val1.getMonth(), val1.getDate() ) ) / c_msPerDay );
             }
             return this.value;
             break;
         default:
-            return this.value = new CError( cErrorType.not_numeric )
+            return this.value = new cError( cErrorType.not_numeric )
     }
 
 }
@@ -444,27 +445,27 @@ cDATEVALUE.prototype = Object.create( cBaseFunction.prototype )
 cDATEVALUE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
     }
 
     arg0 = arg0.tocString();
 
-    if ( arg0 instanceof CError )
+    if ( arg0 instanceof cError )
         return this.value = arg0;
 
-    if ( arg0.tocNumber() instanceof CNumber && arg0.tocNumber().getValue() > 0 )
-        return this.value = new CNumber( parseInt( arg0.tocNumber().getValue() ) );
+    if ( arg0.tocNumber() instanceof cNumber && arg0.tocNumber().getValue() > 0 )
+        return this.value = new cNumber( parseInt( arg0.tocNumber().getValue() ) );
 
     var res = g_oFormatParser.parse( arg0.getValue() );
 
     if ( res && res.bDateTime )
-        return this.value = new CNumber( parseInt( res.value ) );
+        return this.value = new cNumber( parseInt( res.value ) );
     else
-        return this.value = new CError( cErrorType.wrong_value_type );
+        return this.value = new cError( cErrorType.wrong_value_type );
 }
 cDATEVALUE.prototype.getInfo = function () {
     return {
@@ -495,32 +496,32 @@ function cDAY() {
 cDAY.prototype = Object.create( cBaseFunction.prototype )
 cDAY.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], val;
-    if ( arg0 instanceof CArray ) {
+    if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 );
     }
-    else if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first ).tocNumber();
         val = arg0.tocNumber().getValue();
     }
-    if ( arg0 instanceof CError ) return this.setCA( arg0, true );
-    else if ( arg0 instanceof CNumber || arg0 instanceof CBool ) {
+    if ( arg0 instanceof cError ) return this.setCA( arg0, true );
+    else if ( arg0 instanceof cNumber || arg0 instanceof cBool ) {
         val = arg0.tocNumber().getValue();
     }
-    else if ( arg0 instanceof CRef || arg0 instanceof CRef3D ) {
+    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
         val = arg0.getValue().tocNumber();
-        if ( val instanceof CNumber || val instanceof CBool ) {
+        if ( val instanceof cNumber || val instanceof cBool ) {
             val = arg0.tocNumber().getValue();
         }
         else {
-            return this.setCA( new CError( cErrorType.wrong_value_type ), true );
+            return this.setCA( new cError( cErrorType.wrong_value_type ), true );
         }
     }
-    else if ( arg0 instanceof CString ) {
+    else if ( arg0 instanceof cString ) {
         val = arg0.tocNumber();
-        if ( val instanceof CError || val instanceof CEmpty ) {
+        if ( val instanceof cError || val instanceof cEmpty ) {
             var d = new Date( arg0.getValue() );
             if ( isNaN( d ) ) {
-                return this.setCA( new CError( cErrorType.wrong_value_type ), true );
+                return this.setCA( new cError( cErrorType.wrong_value_type ), true );
             }
             else
                 val = Math.floor( ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (g_bDate1904 ? 0 : 1) ) );
@@ -530,17 +531,17 @@ cDAY.prototype.Calculate = function ( arg ) {
         }
     }
     if ( val < 0 )
-        return this.setCA( new CError( cErrorType.not_numeric ), true );
+        return this.setCA( new cError( cErrorType.not_numeric ), true );
     else if ( !g_bDate1904 ) {
         if ( val < 60 )
-            return this.setCA( new CNumber( ( new Date( (val - c_DateCorrectConst) * c_msPerDay ) ).getUTCDate() ), true, 0 );
+            return this.setCA( new cNumber( ( new Date( (val - c_DateCorrectConst) * c_msPerDay ) ).getUTCDate() ), true, 0 );
         else if ( val == 60 )
-            return this.setCA( new CNumber( ( new Date( (val - c_DateCorrectConst - 1) * c_msPerDay ) ).getUTCDate() + 1 ), true, 0 );
+            return this.setCA( new cNumber( ( new Date( (val - c_DateCorrectConst - 1) * c_msPerDay ) ).getUTCDate() + 1 ), true, 0 );
         else
-            return this.setCA( new CNumber( ( new Date( (val - c_DateCorrectConst - 1) * c_msPerDay ) ).getUTCDate() ), true, 0 );
+            return this.setCA( new cNumber( ( new Date( (val - c_DateCorrectConst - 1) * c_msPerDay ) ).getUTCDate() ), true, 0 );
     }
     else
-        return this.setCA( new CNumber( ( new Date( (val - c_DateCorrectConst) * c_msPerDay ) ).getUTCDate() ), true, 0 );
+        return this.setCA( new cNumber( ( new Date( (val - c_DateCorrectConst) * c_msPerDay ) ).getUTCDate() ), true, 0 );
 }
 cDAY.prototype.getInfo = function () {
     return {
@@ -570,26 +571,26 @@ function cDAYS360() {
 }
 cDAYS360.prototype = Object.create( cBaseFunction.prototype )
 cDAYS360.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new CBool( false );
+    var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cBool( false );
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
     }
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
     }
 
-    if ( arg2 instanceof CArea || arg2 instanceof CArea3D ) {
+    if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
         arg2 = arg2.cross( arguments[1].first );
     }
-    else if ( arg2 instanceof CArray ) {
+    else if ( arg2 instanceof cArray ) {
         arg2 = arg2.getElementRowCol( 0, 0 );
     }
 
@@ -597,16 +598,16 @@ cDAYS360.prototype.Calculate = function ( arg ) {
     arg1 = arg1.tocNumber();
     arg2 = arg2.tocBool();
 
-    if ( arg0 instanceof CError )return this.value = arg0;
-    if ( arg1 instanceof CError )return this.value = arg1;
-    if ( arg2 instanceof CError )return this.value = arg2;
+    if ( arg0 instanceof cError )return this.value = arg0;
+    if ( arg1 instanceof cError )return this.value = arg1;
+    if ( arg2 instanceof cError )return this.value = arg2;
 
-    if ( arg0.getValue() < 0 )return this.value = new CError( cErrorType.not_numeric );
-    if ( arg1.getValue() < 0 )return this.value = new CError( cErrorType.not_numeric );
+    if ( arg0.getValue() < 0 )return this.value = new cError( cErrorType.not_numeric );
+    if ( arg1.getValue() < 0 )return this.value = new cError( cErrorType.not_numeric );
 
     var date1 = Date.prototype.getDateFromExcel( arg0.getValue() ), date2 = Date.prototype.getDateFromExcel( arg1.getValue() );
 
-    return this.value = new CNumber( GetDiffDate360( date1.getDate(), date1.getMonth() + 1, date1.getFullYear(), date1.isLeapYear(),
+    return this.value = new cNumber( GetDiffDate360( date1.getDate(), date1.getMonth() + 1, date1.getFullYear(), date1.isLeapYear(),
         date2.getDate(), date2.getMonth() + 1, date2.getFullYear(), !arg2.toBool() ) )
 
 }
@@ -640,30 +641,30 @@ cEDATE.prototype = Object.create( cBaseFunction.prototype )
 cEDATE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
     }
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
     }
 
     arg0 = arg0.tocNumber();
     arg1 = arg1.tocNumber();
 
-    if ( arg0 instanceof CError ) return this.value = arg0;
-    if ( arg1 instanceof CError ) return this.value = arg1;
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = arg1;
 
     var val = arg0.getValue(), date, _date;
 
     if ( val < 0 )
-        return this.setCA( new CError( cErrorType.not_numeric ), true );
+        return this.setCA( new cError( cErrorType.not_numeric ), true );
     else if ( !g_bDate1904 ) {
         if ( val < 60 )
             val = new Date( (val - c_DateCorrectConst) * c_msPerDay );
@@ -689,7 +690,7 @@ cEDATE.prototype.Calculate = function ( arg ) {
         val = new Date( val.setMonth( val.getMonth() + arg1.getValue() ) );
     }
 
-    return this.value = new CNumber( Math.floor( ( val.getTime() / 1000 - val.getTimezoneOffset() * 60 ) / c_sPerDay + (c_DateCorrectConst + 1) ) )
+    return this.value = new cNumber( Math.floor( ( val.getTime() / 1000 - val.getTimezoneOffset() * 60 ) / c_sPerDay + (c_DateCorrectConst + 1) ) )
 }
 cEDATE.prototype.getInfo = function () {
     return {
@@ -721,30 +722,30 @@ cEOMONTH.prototype = Object.create( cBaseFunction.prototype )
 cEOMONTH.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
     }
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
     }
 
     arg0 = arg0.tocNumber();
     arg1 = arg1.tocNumber();
 
-    if ( arg0 instanceof CError ) return this.value = arg0;
-    if ( arg1 instanceof CError ) return this.value = arg1;
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = arg1;
 
     var val = arg0.getValue(), date, _date;
 
     if ( val < 0 )
-        return this.setCA( new CError( cErrorType.not_numeric ), true );
+        return this.setCA( new cError( cErrorType.not_numeric ), true );
     else if ( !g_bDate1904 ) {
         if ( val < 60 )
             val = new Date( (val - c_DateCorrectConst) * c_msPerDay );
@@ -762,7 +763,7 @@ cEOMONTH.prototype.Calculate = function ( arg ) {
     val.setMonth( val.getMonth() + arg1.getValue() );
     val.setDate( val.getDaysInMonth() );
 
-    return this.value = new CNumber( Math.floor( ( val.getTime() / 1000 - val.getTimezoneOffset() * 60 ) / c_sPerDay + (c_DateCorrectConst + 1) ) );
+    return this.value = new cNumber( Math.floor( ( val.getTime() / 1000 - val.getTimezoneOffset() * 60 ) / c_sPerDay + (c_DateCorrectConst + 1) ) );
 }
 cEOMONTH.prototype.getInfo = function () {
     return {
@@ -793,35 +794,35 @@ function cHOUR() {
 cHOUR.prototype = Object.create( cBaseFunction.prototype )
 cHOUR.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], val;
-    if ( arg0 instanceof CArray ) {
+    if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 );
     }
-    else if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first ).tocNumber();
     }
 
-    if ( arg0 instanceof CError )return this.setCA( arg0, true );
-    else if ( arg0 instanceof CNumber || arg0 instanceof CBool ) {
+    if ( arg0 instanceof cError )return this.setCA( arg0, true );
+    else if ( arg0 instanceof cNumber || arg0 instanceof cBool ) {
         val = arg0.tocNumber().getValue();
     }
-    else if ( arg0 instanceof CRef || arg0 instanceof CRef3D ) {
+    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
         val = arg0.getValue();
-        if ( val instanceof CError )return this.setCA( val, true );
-        else if ( val instanceof CNumber || val instanceof CBool ) {
+        if ( val instanceof cError )return this.setCA( val, true );
+        else if ( val instanceof cNumber || val instanceof cBool ) {
             val = arg0.tocNumber().getValue();
         }
         else {
-            return this.setCA( new CError( cErrorType.wrong_value_type ), true );
+            return this.setCA( new cError( cErrorType.wrong_value_type ), true );
         }
     }
-    else if ( arg0 instanceof CString ) {
+    else if ( arg0 instanceof cString ) {
         val = arg0.tocNumber();
-        if ( val instanceof CError || val instanceof CEmpty ) {
+        if ( val instanceof cError || val instanceof cEmpty ) {
             var d = new Date( arg0.getValue() );
             if ( isNaN( d ) ) {
                 d = g_oFormatParser.parseDate( arg0.getValue() );
                 if ( d == null ) {
-                    return this.setCA( new CError( cErrorType.wrong_value_type ), true );
+                    return this.setCA( new cError( cErrorType.wrong_value_type ), true );
                 }
                 val = d.value;
             }
@@ -833,9 +834,9 @@ cHOUR.prototype.Calculate = function ( arg ) {
         }
     }
     if ( val < 0 )
-        return this.setCA( new CError( cErrorType.not_numeric ), true );
+        return this.setCA( new cError( cErrorType.not_numeric ), true );
     else                             //1		 2 3 4					   4	3		 	 					2 1
-        return this.setCA( new CNumber( parseInt( ( ( val - Math.floor( val ) ) * 24 ).toFixed( cExcelDateTimeDigits ) ) ), true, 0 );
+        return this.setCA( new cNumber( parseInt( ( ( val - Math.floor( val ) ) * 24 ).toFixed( cExcelDateTimeDigits ) ) ), true, 0 );
 }
 cHOUR.prototype.getInfo = function () {
     return {
@@ -866,35 +867,35 @@ function cMINUTE() {
 cMINUTE.prototype = Object.create( cBaseFunction.prototype )
 cMINUTE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], val;
-    if ( arg0 instanceof CArray ) {
+    if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 );
     }
-    else if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first ).tocNumber();
     }
 
-    if ( arg0 instanceof CError ) return this.setCA( arg0, true );
-    else if ( arg0 instanceof CNumber || arg0 instanceof CBool ) {
+    if ( arg0 instanceof cError ) return this.setCA( arg0, true );
+    else if ( arg0 instanceof cNumber || arg0 instanceof cBool ) {
         val = arg0.tocNumber().getValue();
     }
-    else if ( arg0 instanceof CRef || arg0 instanceof CRef3D ) {
+    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
         val = arg0.getValue();
-        if ( val instanceof CError ) return this.setCA( val, true );
-        else if ( val instanceof CNumber || val instanceof CBool ) {
+        if ( val instanceof cError ) return this.setCA( val, true );
+        else if ( val instanceof cNumber || val instanceof cBool ) {
             val = arg0.tocNumber().getValue();
         }
         else {
-            return this.setCA( new CError( cErrorType.wrong_value_type ), true );
+            return this.setCA( new cError( cErrorType.wrong_value_type ), true );
         }
     }
-    else if ( arg0 instanceof CString ) {
+    else if ( arg0 instanceof cString ) {
         val = arg0.tocNumber();
-        if ( val instanceof CError || val instanceof CEmpty ) {
+        if ( val instanceof cError || val instanceof cEmpty ) {
             var d = new Date( arg0.getValue() );
             if ( isNaN( d ) ) {
                 d = g_oFormatParser.parseDate( arg0.getValue() );
                 if ( d == null ) {
-                    return this.setCA( new CError( cErrorType.wrong_value_type ), true );
+                    return this.setCA( new cError( cErrorType.wrong_value_type ), true );
                 }
                 val = d.value;
             }
@@ -906,10 +907,10 @@ cMINUTE.prototype.Calculate = function ( arg ) {
         }
     }
     if ( val < 0 )
-        return this.setCA( new CError( cErrorType.not_numeric ), true );
+        return this.setCA( new cError( cErrorType.not_numeric ), true );
     else {
         val = parseInt( ( ( val * 24 - Math.floor( val * 24 ) ) * 60 ).toFixed( cExcelDateTimeDigits ) ) % 60;
-        return this.setCA( new CNumber( val ), true, 0 );
+        return this.setCA( new cNumber( val ), true, 0 );
     }
 }
 cMINUTE.prototype.getInfo = function () {
@@ -941,33 +942,33 @@ function cMONTH() {
 cMONTH.prototype = Object.create( cBaseFunction.prototype )
 cMONTH.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], val;
-    if ( arg0 instanceof CArray ) {
+    if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 );
     }
-    else if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first ).tocNumber();
     }
 
-    if ( arg0 instanceof CError ) return this.setCA( arg0, true );
-    else if ( arg0 instanceof CNumber || arg0 instanceof CBool ) {
+    if ( arg0 instanceof cError ) return this.setCA( arg0, true );
+    else if ( arg0 instanceof cNumber || arg0 instanceof cBool ) {
         val = arg0.tocNumber().getValue();
     }
-    else if ( arg0 instanceof CRef || arg0 instanceof CRef3D ) {
+    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
         val = arg0.getValue();
-        if ( val instanceof CError ) return this.setCA( val, true );
-        else if ( val instanceof CNumber || val instanceof CBool ) {
+        if ( val instanceof cError ) return this.setCA( val, true );
+        else if ( val instanceof cNumber || val instanceof cBool ) {
             val = arg0.tocNumber().getValue();
         }
         else {
-            return this.setCA( new CError( cErrorType.wrong_value_type ), true );
+            return this.setCA( new cError( cErrorType.wrong_value_type ), true );
         }
     }
-    else if ( arg0 instanceof CString ) {
+    else if ( arg0 instanceof cString ) {
         val = arg0.tocNumber();
-        if ( val instanceof CError || val instanceof CEmpty ) {
+        if ( val instanceof cError || val instanceof cEmpty ) {
             var d = new Date( arg0.getValue() );
             if ( isNaN( d ) ) {
-                return this.setCA( new CError( cErrorType.wrong_value_type ), true );
+                return this.setCA( new cError( cErrorType.wrong_value_type ), true );
             }
             else
                 val = Math.floor( ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (g_bDate1904 ? 0 : 1) ) );
@@ -977,15 +978,15 @@ cMONTH.prototype.Calculate = function ( arg ) {
         }
     }
     if ( val < 0 )
-        return this.setCA( new CError( cErrorType.not_numeric ), true );
+        return this.setCA( new cError( cErrorType.not_numeric ), true );
     if ( !g_bDate1904 ) {
         if ( val == 60 )
-            return this.setCA( new CNumber( 2 ), true, 0 );
+            return this.setCA( new cNumber( 2 ), true, 0 );
         else
-            return this.setCA( new CNumber( ( new Date( ( (val == 0 ? 1 : val) - c_DateCorrectConst - 1 ) * c_msPerDay ) ).getUTCMonth() + 1 ), true, 0 );
+            return this.setCA( new cNumber( ( new Date( ( (val == 0 ? 1 : val) - c_DateCorrectConst - 1 ) * c_msPerDay ) ).getUTCMonth() + 1 ), true, 0 );
     }
     else
-        return this.setCA( new CNumber( ( new Date( ( (val == 0 ? 1 : val) - c_DateCorrectConst ) * c_msPerDay ) ).getUTCMonth() + 1 ), true, 0 );
+        return this.setCA( new cNumber( ( new Date( ( (val == 0 ? 1 : val) - c_DateCorrectConst ) * c_msPerDay ) ).getUTCMonth() + 1 ), true, 0 );
 }
 cMONTH.prototype.getInfo = function () {
     return {
@@ -1017,30 +1018,30 @@ cNETWORKDAYS.prototype = Object.create( cBaseFunction.prototype )
 cNETWORKDAYS.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arrDateIncl = [];
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
     }
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
     }
 
     arg0 = arg0.tocNumber();
     arg1 = arg1.tocNumber();
 
-    if ( arg0 instanceof CError ) return this.value = arg0;
-    if ( arg1 instanceof CError ) return this.value = arg1;
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = arg1;
 
     var val0 = arg0.getValue(), val1 = arg1.getValue(), dif, count = 0;
 
     if ( val0 < 0 )
-        return this.setCA( new CError( cErrorType.not_numeric ), true );
+        return this.setCA( new cError( cErrorType.not_numeric ), true );
     else if ( !g_bDate1904 ) {
         if ( val0 < 60 )
             val0 = new Date( (val0 - c_DateCorrectConst) * c_msPerDay );
@@ -1053,7 +1054,7 @@ cNETWORKDAYS.prototype.Calculate = function ( arg ) {
         val0 = new Date( (val0 - c_DateCorrectConst) * c_msPerDay );
 
     if ( val1 < 0 )
-        return this.setCA( new CError( cErrorType.not_numeric ), true );
+        return this.setCA( new cError( cErrorType.not_numeric ), true );
     else if ( !g_bDate1904 ) {
         if ( val1 < 60 )
             val1 = new Date( (val1 - c_DateCorrectConst) * c_msPerDay );
@@ -1068,29 +1069,29 @@ cNETWORKDAYS.prototype.Calculate = function ( arg ) {
     var holidays = [];
 
     if ( arg2 ) {
-        if ( arg2 instanceof CRef ) {
+        if ( arg2 instanceof cRef ) {
             var a = arg2.getValue();
-            if ( a instanceof CNumber && a.getValue() >= 0 ) {
+            if ( a instanceof cNumber && a.getValue() >= 0 ) {
                 holidays.push( a );
             }
         }
-        else if ( arg2 instanceof CArea || arg2 instanceof CArea3D ) {
+        else if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
             var arr = arg2.getValue();
             for ( var i = 0; i < arr.length; i++ ) {
-                if ( arr[i] instanceof CNumber && arr[i].getValue() >= 0 ) {
+                if ( arr[i] instanceof cNumber && arr[i].getValue() >= 0 ) {
                     holidays.push( arr[i] );
                 }
             }
         }
-        else if ( arg2 instanceof CArray ) {
+        else if ( arg2 instanceof cArray ) {
             arg2.foreach( function ( elem, r, c ) {
-                if ( elem instanceof CNumber ) {
+                if ( elem instanceof cNumber ) {
                     holidays.push( elem );
                 }
-                else if ( elem instanceof CString ) {
+                else if ( elem instanceof cString ) {
                     var res = g_oFormatParser.parse( elem.getValue() );
                     if ( res && res.bDateTime && res.value >= 0 )
-                        holidays.push( new CNumber( parseInt( res.value ) ) );
+                        holidays.push( new cNumber( parseInt( res.value ) ) );
                 }
             } )
         }
@@ -1116,7 +1117,7 @@ cNETWORKDAYS.prototype.Calculate = function ( arg ) {
         if ( date.getDay() != 6 && date.getDay() != 0 && includeInHolidays( date ) )
             count++;
     }
-    return this.value = new CNumber( (dif < 0 ? -1 : 1) * count );
+    return this.value = new cNumber( (dif < 0 ? -1 : 1) * count );
 }
 cNETWORKDAYS.prototype.getInfo = function () {
     return {
@@ -1151,7 +1152,7 @@ function cNOW() {
 cNOW.prototype = Object.create( cBaseFunction.prototype )
 cNOW.prototype.Calculate = function () {
     var d = new Date();
-    this.value = new CNumber( Math.floor( ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + (c_DateCorrectConst + 1) ) + ( (d.getHours() * 60 * 60 + d.getMinutes() * 60 + d.getSeconds()) / c_sPerDay ) );
+    this.value = new cNumber( Math.floor( ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + (c_DateCorrectConst + 1) ) + ( (d.getHours() * 60 * 60 + d.getMinutes() * 60 + d.getSeconds()) / c_sPerDay ) );
     this.value.numFormat = 22;
     return this.setCA( this.value, true );
 }
@@ -1184,35 +1185,35 @@ function cSECOND() {
 cSECOND.prototype = Object.create( cBaseFunction.prototype )
 cSECOND.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], val;
-    if ( arg0 instanceof CArray ) {
+    if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 );
     }
-    else if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first ).tocNumber();
     }
 
-    if ( arg0 instanceof CError ) return this.setCA( arg0, true );
-    else if ( arg0 instanceof CNumber || arg0 instanceof CBool ) {
+    if ( arg0 instanceof cError ) return this.setCA( arg0, true );
+    else if ( arg0 instanceof cNumber || arg0 instanceof cBool ) {
         val = arg0.tocNumber().getValue();
     }
-    else if ( arg0 instanceof CRef || arg0 instanceof CRef3D ) {
+    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
         val = arg0.getValue();
-        if ( val instanceof CError ) return this.setCA( val, true );
-        else if ( val instanceof CNumber || val instanceof CBool ) {
+        if ( val instanceof cError ) return this.setCA( val, true );
+        else if ( val instanceof cNumber || val instanceof cBool ) {
             val = arg0.tocNumber().getValue();
         }
         else {
-            return this.setCA( new CError( cErrorType.wrong_value_type ), true );
+            return this.setCA( new cError( cErrorType.wrong_value_type ), true );
         }
     }
-    else if ( arg0 instanceof CString ) {
+    else if ( arg0 instanceof cString ) {
         val = arg0.tocNumber();
-        if ( val instanceof CError || val instanceof CEmpty ) {
+        if ( val instanceof cError || val instanceof cEmpty ) {
             var d = new Date( arg0.getValue() );
             if ( isNaN( d ) ) {
                 d = g_oFormatParser.parseDate( arg0.getValue() );
                 if ( d == null ) {
-                    return this.setCA( new CError( cErrorType.wrong_value_type ), true );
+                    return this.setCA( new cError( cErrorType.wrong_value_type ), true );
                 }
                 val = d.value;
             }
@@ -1224,10 +1225,10 @@ cSECOND.prototype.Calculate = function ( arg ) {
         }
     }
     if ( val < 0 )
-        return this.setCA( new CError( cErrorType.not_numeric ), true );
+        return this.setCA( new cError( cErrorType.not_numeric ), true );
     else {
         val = parseInt( (( val * 24 * 60 - Math.floor( val * 24 * 60 ) ) * 60).toFixed( cExcelDateTimeDigits ) ) % 60;
-        return this.setCA( new CNumber( val ), true, 0 );
+        return this.setCA( new cNumber( val ), true, 0 );
     }
 }
 cSECOND.prototype.getInfo = function () {
@@ -1259,22 +1260,22 @@ cTIME.prototype = Object.create( cBaseFunction.prototype )
 cTIME.prototype.Calculate = function ( arg ) {
     var hour = arg[0], minute = arg[1], second = arg[2];
 
-    if ( hour instanceof CArea || hour instanceof CArea3D ) {
+    if ( hour instanceof cArea || hour instanceof cArea3D ) {
         hour = hour.cross( arguments[1].first );
     }
-    else if ( hour instanceof CArray ) {
+    else if ( hour instanceof cArray ) {
         hour = hour.getElement( 0 );
     }
-    if ( minute instanceof CArea || minute instanceof CArea3D ) {
+    if ( minute instanceof cArea || minute instanceof cArea3D ) {
         minute = minute.cross( arguments[1].first );
     }
-    else if ( minute instanceof CArray ) {
+    else if ( minute instanceof cArray ) {
         minute = minute.getElement( 0 );
     }
-    if ( second instanceof CArea || second instanceof CArea3D ) {
+    if ( second instanceof cArea || second instanceof cArea3D ) {
         second = second.cross( arguments[1].first );
     }
-    else if ( second instanceof CArray ) {
+    else if ( second instanceof cArray ) {
         second = second.getElement( 0 );
     }
 
@@ -1282,16 +1283,16 @@ cTIME.prototype.Calculate = function ( arg ) {
     minute = minute.tocNumber();
     second = second.tocNumber();
 
-    if ( hour instanceof CError )    return this.setCA( hour, true );
-    if ( minute instanceof CError )    return this.setCA( minute, true );
-    if ( second instanceof CError )    return this.setCA( second, true );
+    if ( hour instanceof cError )    return this.setCA( hour, true );
+    if ( minute instanceof cError )    return this.setCA( minute, true );
+    if ( second instanceof cError )    return this.setCA( second, true );
 
     hour = hour.getValue();
     minute = minute.getValue();
     second = second.getValue();
 
     var v = (hour * 60 * 60 + minute * 60 + second) / c_sPerDay;
-    this.setCA( new CNumber( v - Math.floor( v ) ), true );
+    this.setCA( new cNumber( v - Math.floor( v ) ), true );
     if ( arguments[1].getNumFormatStr().toLowerCase() === "general" )
         this.value.numFormat = 18;
     return this.value;
@@ -1326,27 +1327,27 @@ cTIMEVALUE.prototype = Object.create( cBaseFunction.prototype )
 cTIMEVALUE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
     }
 
     arg0 = arg0.tocString();
 
-    if ( arg0 instanceof CError )
+    if ( arg0 instanceof cError )
         return this.value = arg0;
 
-    if ( arg0.tocNumber() instanceof CNumber && arg0.tocNumber().getValue() > 0 )
-        return this.value = new CNumber( parseInt( arg0.tocNumber().getValue() ) );
+    if ( arg0.tocNumber() instanceof cNumber && arg0.tocNumber().getValue() > 0 )
+        return this.value = new cNumber( parseInt( arg0.tocNumber().getValue() ) );
 
     var res = g_oFormatParser.parse( arg0.getValue() );
 
     if ( res && res.bDateTime )
-        return this.value = new CNumber( res.value - parseInt( res.value ) );
+        return this.value = new cNumber( res.value - parseInt( res.value ) );
     else
-        return this.value = new CError( cErrorType.wrong_value_type );
+        return this.value = new cError( cErrorType.wrong_value_type );
 }
 cTIMEVALUE.prototype.getInfo = function () {
     return {
@@ -1375,7 +1376,7 @@ function cTODAY() {
 }
 cTODAY.prototype = Object.create( cBaseFunction.prototype )
 cTODAY.prototype.Calculate = function () {
-    this.setCA( new CNumber( new Date().getExcelDate() ), true );
+    this.setCA( new cNumber( new Date().getExcelDate() ), true );
     if ( arguments[1].getNumFormatStr().toLowerCase() === "general" )
         this.value.numFormat = 14;
     return this.value;
@@ -1408,29 +1409,29 @@ function cWEEKDAY() {
 }
 cWEEKDAY.prototype = Object.create( cBaseFunction.prototype )
 cWEEKDAY.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new CNumber( 1 );
+    var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cNumber( 1 );
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
     }
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
     }
 
     arg0 = arg0.tocNumber();
     arg1 = arg1.tocNumber();
 
-    if ( arg0 instanceof CError )
+    if ( arg0 instanceof cError )
         return this.value = arg0;
 
-    if ( arg1 instanceof CError )
+    if ( arg1 instanceof cError )
         return this.value = arg1;
 
     var weekday;
@@ -1463,12 +1464,12 @@ cWEEKDAY.prototype.Calculate = function ( arg ) {
             weekday = [2, 3, 4, 5, 6, 7, 1];
             break;
         default:
-            return this.value = new CError( cErrorType.not_numeric );
+            return this.value = new cError( cErrorType.not_numeric );
     }
     if ( arg0.getValue() < 0 )
-        return this.value = new CError( cErrorType.wrong_value_type );
+        return this.value = new cError( cErrorType.wrong_value_type );
 
-    return this.value = new CNumber( weekday[new Date( (arg0.getValue() - (c_DateCorrectConst + 1)) * c_msPerDay ).getDay()] );
+    return this.value = new cNumber( weekday[new Date( (arg0.getValue() - (c_DateCorrectConst + 1)) * c_msPerDay ).getDay()] );
 }
 cWEEKDAY.prototype.getInfo = function () {
     return {
@@ -1498,7 +1499,7 @@ function cWEEKNUM() {
 }
 cWEEKNUM.prototype = Object.create( cBaseFunction.prototype )
 cWEEKNUM.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new CNumber( 1 ), type = 0;
+    var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cNumber( 1 ), type = 0;
 
     function WeekNumber( dt, iso, type ) {
         dt.setHours( 0, 0, 0 );
@@ -1516,43 +1517,43 @@ cWEEKNUM.prototype.Calculate = function ( arg ) {
                 case 53:
                     // Если 31 декабря выпадает до четверга 1 недели следующего года
                     if ( endOfYear.getDay() < 4 )
-                        return new CNumber( 1 );
+                        return new cNumber( 1 );
                     else
-                        return new CNumber( wk );
+                        return new cNumber( wk );
                 default:
-                    return new CNumber( wk );
+                    return new cNumber( wk );
             }
         else {
             wk = parseInt( ((dt - startOfYear) / c_msPerDay + iso[startOfYear.getDay()] + 7) / 7 );
-            return new CNumber( wk );
+            return new cNumber( wk );
         }
     }
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
     }
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
     }
 
     arg0 = arg0.tocNumber();
     arg1 = arg1.tocNumber();
 
-    if ( arg0 instanceof CError )
+    if ( arg0 instanceof cError )
         return this.value = arg0;
 
-    if ( arg1 instanceof CError )
+    if ( arg1 instanceof cError )
         return this.value = arg1;
 
     if ( arg0.getValue() < 0 )
-        return this.value = new CError( cErrorType.not_numeric );
+        return this.value = new cError( cErrorType.not_numeric );
 
     var weekdayStartDay;
 
@@ -1586,10 +1587,10 @@ cWEEKNUM.prototype.Calculate = function ( arg ) {
             type = 1;
             break;
         default:
-            return this.value = new CError( cErrorType.not_numeric );
+            return this.value = new cError( cErrorType.not_numeric );
     }
 
-    return this.value = new CNumber( WeekNumber( new Date( (arg0.getValue() - (c_DateCorrectConst + 1)) * c_msPerDay ), weekdayStartDay, type ) );
+    return this.value = new cNumber( WeekNumber( new Date( (arg0.getValue() - (c_DateCorrectConst + 1)) * c_msPerDay ), weekdayStartDay, type ) );
 
 }
 cWEEKNUM.prototype.getInfo = function () {
@@ -1622,30 +1623,30 @@ cWORKDAY.prototype = Object.create( cBaseFunction.prototype )
 cWORKDAY.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arrDateIncl = [];
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
     }
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
     }
 
     arg0 = arg0.tocNumber();
     arg1 = arg1.tocNumber();
 
-    if ( arg0 instanceof CError ) return this.value = arg0;
-    if ( arg1 instanceof CError ) return this.value = arg1;
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = arg1;
 
     var val0 = arg0.getValue(), val1 = arg1.getValue(), holidays = []
 
     if ( val0 < 0 )
-        return this.setCA( new CError( cErrorType.not_numeric ), true );
+        return this.setCA( new cError( cErrorType.not_numeric ), true );
     else if ( !g_bDate1904 ) {
         if ( val0 < 60 )
             val0 = new Date( (val0 - c_DateCorrectConst) * c_msPerDay );
@@ -1658,23 +1659,23 @@ cWORKDAY.prototype.Calculate = function ( arg ) {
         val0 = new Date( (val0 - c_DateCorrectConst) * c_msPerDay );
 
     if ( arg2 ) {
-        if ( arg2 instanceof CArea || arg2 instanceof CArea3D ) {
+        if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
             var arr = arg2.getValue();
             for ( var i = 0; i < arr.length; i++ ) {
-                if ( arr[i] instanceof CNumber && arr[i].getValue() >= 0 ) {
+                if ( arr[i] instanceof cNumber && arr[i].getValue() >= 0 ) {
                     holidays.push( arr[i] );
                 }
             }
         }
-        else if ( arg2 instanceof CArray ) {
+        else if ( arg2 instanceof cArray ) {
             arg2.foreach( function ( elem, r, c ) {
-                if ( elem instanceof CNumber ) {
+                if ( elem instanceof cNumber ) {
                     holidays.push( elem );
                 }
-                else if ( elem instanceof CString ) {
+                else if ( elem instanceof cString ) {
                     var res = g_oFormatParser.parse( elem.getValue() );
                     if ( res && res.bDateTime && res.value >= 0 )
-                        holidays.push( new CNumber( parseInt( res.value ) ) );
+                        holidays.push( new cNumber( parseInt( res.value ) ) );
                 }
             } )
         }
@@ -1712,12 +1713,12 @@ cWORKDAY.prototype.Calculate = function ( arg ) {
     val = parseInt( ( date.getTime() / 1000 - date.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (g_bDate1904 ? 0 : 1) ) );
 
     if ( val < 0 )
-        return this.setCA( new CError( cErrorType.not_numeric ), true );
+        return this.setCA( new cError( cErrorType.not_numeric ), true );
 
     if ( arguments[1].getNumFormatStr().toLowerCase() === "general" )
-        return this.setCA( new CNumber( val ), true, 14 );
+        return this.setCA( new cNumber( val ), true, 14 );
     else
-        return this.setCA( new CNumber( val ), true );
+        return this.setCA( new cNumber( val ), true );
 }
 cWORKDAY.prototype.getInfo = function () {
     return {
@@ -1753,36 +1754,36 @@ function cYEAR() {
 cYEAR.prototype = Object.create( cBaseFunction.prototype )
 cYEAR.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], val;
-    if ( arg0 instanceof CArray ) {
+    if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 );
     }
-    else if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first ).tocNumber();
     }
 
-    if ( arg0 instanceof CError ) return this.setCA( arg0, true );
-    else if ( arg0 instanceof CNumber || arg0 instanceof CBool ) {
+    if ( arg0 instanceof cError ) return this.setCA( arg0, true );
+    else if ( arg0 instanceof cNumber || arg0 instanceof cBool ) {
         val = arg0.tocNumber().getValue();
     }
-    else if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
-        return this.setCA( new CError( cErrorType.wrong_value_type ), true );
+    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        return this.setCA( new cError( cErrorType.wrong_value_type ), true );
     }
-    else if ( arg0 instanceof CRef || arg0 instanceof CRef3D ) {
+    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
         val = arg0.getValue();
-        if ( val instanceof CError ) return this.setCA( val, true );
-        else if ( val instanceof CNumber || val instanceof CBool ) {
+        if ( val instanceof cError ) return this.setCA( val, true );
+        else if ( val instanceof cNumber || val instanceof cBool ) {
             val = arg0.tocNumber().getValue();
         }
         else {
-            return this.setCA( new CError( cErrorType.wrong_value_type ), true );
+            return this.setCA( new cError( cErrorType.wrong_value_type ), true );
         }
     }
-    else if ( arg0 instanceof CString ) {
+    else if ( arg0 instanceof cString ) {
         val = arg0.tocNumber();
-        if ( val instanceof CError || val instanceof CEmpty ) {
+        if ( val instanceof cError || val instanceof cEmpty ) {
             var d = new Date( arg0.getValue() );
             if ( isNaN( d ) ) {
-                return this.setCA( new CError( cErrorType.wrong_value_type ), true );
+                return this.setCA( new cError( cErrorType.wrong_value_type ), true );
             }
             else
                 val = Math.floor( ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (g_bDate1904 ? 0 : 1) ) );
@@ -1792,9 +1793,9 @@ cYEAR.prototype.Calculate = function ( arg ) {
         }
     }
     if ( val < 0 )
-        return this.setCA( new CError( cErrorType.not_numeric ), true, 0 );
+        return this.setCA( new cError( cErrorType.not_numeric ), true, 0 );
     else
-        return this.setCA( new CNumber( (new Date( (val - (c_DateCorrectConst + 1)) * c_msPerDay )).getUTCFullYear() ), true, 0 );
+        return this.setCA( new cNumber( (new Date( (val - (c_DateCorrectConst + 1)) * c_msPerDay )).getUTCFullYear() ), true, 0 );
 }
 cYEAR.prototype.getInfo = function () {
     return {
@@ -1824,25 +1825,25 @@ function cYEARFRAC() {
 }
 cYEARFRAC.prototype = Object.create( cBaseFunction.prototype )
 cYEARFRAC.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new CNumber( 0 );
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber( 0 );
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
     }
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
     }
 
-    if ( arg2 instanceof CArea || arg2 instanceof CArea3D ) {
+    if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
         arg2 = arg2.cross( arguments[1].first );
     }
-    else if ( arg2 instanceof CArray ) {
+    else if ( arg2 instanceof cArray ) {
         arg2 = arg2.getElementRowCol( 0, 0 );
     }
 
@@ -1850,14 +1851,14 @@ cYEARFRAC.prototype.Calculate = function ( arg ) {
     arg1 = arg1.tocNumber();
     arg2 = arg2.tocNumber();
 
-    if ( arg0 instanceof CError ) return this.value = arg0;
-    if ( arg1 instanceof CError ) return this.value = arg1;
-    if ( arg2 instanceof CError ) return this.value = arg2;
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = arg1;
+    if ( arg2 instanceof cError ) return this.value = arg2;
 
     var val0 = arg0.getValue(), val1 = arg1.getValue();
 
     if ( val0 < 0 || val1 < 0 )
-        return this.setCA( new CError( cErrorType.not_numeric ), true );
+        return this.setCA( new cError( cErrorType.not_numeric ), true );
 
     val0 = Date.prototype.getDateFromExcel( val0 );
     val1 = Date.prototype.getDateFromExcel( val1 );

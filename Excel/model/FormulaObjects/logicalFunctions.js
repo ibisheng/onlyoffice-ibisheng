@@ -7,7 +7,6 @@
  * Time: 15:22
  * To change this template use File | Settings | File Templates.
  */
-"use strict";
 cFormulaFunction.Logical = {
     'groupName':"Logical",
     'AND':cAND,
@@ -17,7 +16,7 @@ cFormulaFunction.Logical = {
     'NOT':cNOT,
     'OR':cOR,
     'TRUE':cTRUE
-}
+};
 
 function cAND() {
 //    cBaseFunction.call( this, "AND" );
@@ -37,69 +36,82 @@ function cAND() {
     this.numFormat = this.formatType.def;
 
 }
-cAND.prototype = Object.create( cBaseFunction.prototype )
+cAND.prototype = Object.create( cBaseFunction.prototype );
 cAND.prototype.Calculate = function ( arg ) {
     var argResult = null;
     for ( var i = 0; i < arg.length; i++ ) {
-        if ( arg[i] instanceof CArea || arg[i] instanceof CArea3D ) {
+        if ( arg[i] instanceof cArea || arg[i] instanceof cArea3D ) {
             var argArr = arg[i].getValue();
             for ( var j = 0; j < argArr.length; j++ ) {
-                if ( argArr[j] instanceof CString || argArr[j] instanceof CEmpty ) continue;
-                else if ( argArr[j] instanceof CError ) return this.value = argArr[j];
-                else {
-                    if ( argResult == null )
+                if ( argArr[j] instanceof cError ) {
+                    return this.value = argArr[j];
+                }
+                else if ( !(argArr[j] instanceof cString || argArr[j] instanceof cEmpty) ) {
+                    if ( argResult === null ) {
                         argResult = argArr[j].tocBool();
-                    else
-                        argResult = new CBool( argResult.value && argArr[j].tocBool().value );
-                    if ( argResult.value == false ) return this.value = new CBool( false );
+                    }
+                    else {
+                        argResult = new cBool( argResult.value && argArr[j].tocBool().value );
+                    }
+                    if ( argResult.value === false ) {
+                        return this.value = new cBool( false );
+                    }
                 }
             }
         }
         else {
-            if ( arg[i] instanceof CString ) return this.value = new CError( cErrorType.wrong_value_type );
-            else if ( arg[i] instanceof CError ) {
+            if ( arg[i] instanceof cString ) {
+                return this.value = new cError( cErrorType.wrong_value_type );
+            }
+            else if ( arg[i] instanceof cError ) {
                 return this.value = arg[i];
             }
-            else if ( arg[i] instanceof CArray ) {
-                var thas = this;
+            else if ( arg[i] instanceof cArray ) {
                 arg[i].foreach( function ( elem ) {
-                    if ( elem instanceof CError ) {
+                    if ( elem instanceof cError ) {
                         argResult = elem;
                         return true;
                     }
-                    else if ( elem instanceof CString || elem instanceof CEmpty ) {
-                        return;
+                    else if ( elem instanceof cString || elem instanceof cEmpty ) {
+                        return false;
                     }
                     else {
-                        if ( argResult == null )
+                        if ( argResult === null ) {
                             argResult = elem.tocBool();
-                        else
-                            argResult = new CBool( argResult.value && elem.tocBool().value );
-                        if ( argResult.value == false ) {
+                        }
+                        else {
+                            argResult = new cBool( argResult.value && elem.tocBool().value );
+                        }
+                        if ( argResult.value === false ) {
                             return true;
                         }
                     }
-                } )
+                } );
             }
             else {
-                if ( argResult == null )
+                if ( argResult === null ) {
                     argResult = arg[i].tocBool();
-                else
-                    argResult = new CBool( argResult.value && arg[i].tocBool().value );
-                if ( argResult.value == false ) return this.value = new CBool( false );
+                }
+                else {
+                    argResult = new cBool( argResult.value && arg[i].tocBool().value );
+                }
+                if ( argResult.value === false ) {
+                    return this.value = new cBool( false );
+                }
             }
         }
     }
-    if ( argResult == null )
-        return this.value = new CError( cErrorType.wrong_value_type );
+    if ( argResult === null ) {
+        return this.value = new cError( cErrorType.wrong_value_type );
+    }
     return this.value = argResult;
-}
+};
 cAND.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"(logical1, logical2, ...)"
     };
-}
+};
 
 function cFALSE() {
 //    cBaseFunction.call( this, "FALSE" );
@@ -118,16 +130,16 @@ function cFALSE() {
     };
     this.numFormat = this.formatType.def;
 }
-cFALSE.prototype = Object.create( cBaseFunction.prototype )
+cFALSE.prototype = Object.create( cBaseFunction.prototype );
 cFALSE.prototype.Calculate = function () {
-    return this.value = new CBool( false );
-}
+    return this.value = new cBool( false );
+};
 cFALSE.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"()"
     };
-}
+};
 
 function cIF() {
 //    cBaseFunction.call( this, "IF" );
@@ -147,43 +159,50 @@ function cIF() {
 //    this.setArgumentsMin( 1 );
 //    this.setArgumentsMax( 3 );
 }
-cIF.prototype = Object.create( cBaseFunction.prototype )
+cIF.prototype = Object.create( cBaseFunction.prototype );
 cIF.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
 
-    if ( arg0 instanceof CArray )
+    if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 );
-    if ( arg1 instanceof CArray )
+    }
+    if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElement( 0 );
-    if ( arg2 instanceof CArray )
+    }
+    if ( arg2 instanceof cArray ) {
         arg2 = arg2.getElement( 0 );
+    }
 
-    if ( arg0 instanceof CError )
+    if ( arg0 instanceof cError ) {
         return this.value = arg0;
+    }
     else {
         arg0 = arg0.tocBool();
-        if ( arg0 instanceof CString )
-            return this.value = new CError( cErrorType.wrong_value_type );
-        else if ( arg0.value )
+        if ( arg0 instanceof cString ) {
+            return this.value = new cError( cErrorType.wrong_value_type );
+        }
+        else if ( arg0.value ) {
             return this.value = arg1 ?
-                arg1 instanceof CEmpty ?
-                    new CNumber( 0 ) :
+                arg1 instanceof cEmpty ?
+                    new cNumber( 0 ) :
                     arg1 :
-                new CBool( true );
-
-        else return this.value = arg2 ?
-                arg2 instanceof CEmpty ?
-                    new CNumber( 0 ) :
+                new cBool( true );
+        }
+        else {
+            return this.value = arg2 ?
+                arg2 instanceof cEmpty ?
+                    new cNumber( 0 ) :
                     arg2 :
-                new CBool( false );
+                new cBool( false );
+        }
     }
-}
+};
 cIF.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"(logical_test, value_if_true, value_if_false)"
     };
-}
+};
 
 function cIFERROR() {
 //    cBaseFunction.call( this, "IFERROR" );
@@ -203,29 +222,32 @@ function cIFERROR() {
     this.numFormat = this.formatType.def;
 
 }
-cIFERROR.prototype = Object.create( cBaseFunction.prototype )
+cIFERROR.prototype = Object.create( cBaseFunction.prototype );
 cIFERROR.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
-    if ( arg0 instanceof CArray ) {
+    if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 );
     }
-    if ( arg0 instanceof CRef || arg0 instanceof CRef3D ) {
+    if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
         arg0 = arg0.getValue();
     }
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
 
-    if ( arg0 instanceof CError )
-        return this.value = arg[1] instanceof CArray ? arg[1].getElement( 0 ) : arg[1];
-    else return this.value = arg[0];
-}
+    if ( arg0 instanceof cError ) {
+        return this.value = arg[1] instanceof cArray ? arg[1].getElement( 0 ) : arg[1];
+    }
+    else {
+        return this.value = arg[0];
+    }
+};
 cIFERROR.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"(value, value_if_error)"
     };
-}
+};
 
 function cNOT() {
 //    cBaseFunction.call( this, "NOT" );
@@ -245,34 +267,39 @@ function cNOT() {
     this.numFormat = this.formatType.def;
 
 }
-cNOT.prototype = Object.create( cBaseFunction.prototype )
+cNOT.prototype = Object.create( cBaseFunction.prototype );
 cNOT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
-    if ( arg0 instanceof CArray )
+    if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 );
+    }
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
 
-    if ( arg0 instanceof CString ) {
+    if ( arg0 instanceof cString ) {
         var res = arg0.tocBool();
-        if ( res instanceof CString )
-            return  this.value = new CError( cErrorType.wrong_value_type );
-        else
-            return this.value = new CBool( !res.value );
+        if ( res instanceof cString ) {
+            return  this.value = new cError( cErrorType.wrong_value_type );
+        }
+        else {
+            return this.value = new cBool( !res.value );
+        }
     }
-    else if ( arg0 instanceof CError )
+    else if ( arg0 instanceof cError ) {
         return  this.value = arg0;
-    else
-        return this.value = new CBool( !arg0.tocBool().value );
-}
+    }
+    else {
+        return this.value = new cBool( !arg0.tocBool().value );
+    }
+};
 cNOT.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"(logical)"
     };
-}
+};
 
 function cOR() {
 //    cBaseFunction.call( this, "OR" );
@@ -292,64 +319,75 @@ function cOR() {
     this.numFormat = this.formatType.def;
 
 }
-cOR.prototype = Object.create( cBaseFunction.prototype )
+cOR.prototype = Object.create( cBaseFunction.prototype );
 cOR.prototype.Calculate = function ( arg ) {
     var argResult = null;
     for ( var i = 0; i < arg.length; i++ ) {
-        if ( arg[i] instanceof CArea || arg[i] instanceof CArea3D ) {
+        if ( arg[i] instanceof cArea || arg[i] instanceof cArea3D ) {
             var argArr = arg[i].getValue();
             for ( var j = 0; j < argArr.length; j++ ) {
-                if ( argArr[j] instanceof CString || argArr[j] instanceof CEmpty ) continue;
-                else if ( argArr[j] instanceof CError ) return this.value = argArr[j];
-                else {
-                    if ( argResult == null )
+                if ( argArr[j] instanceof cError ) {
+                    return this.value = argArr[j];
+                }
+                else if ( argArr[j] instanceof cString || argArr[j] instanceof cEmpty ) {
+                    if ( argResult === null ) {
                         argResult = argArr[j].tocBool();
-                    else
-                        argResult = new CBool( argResult.value || argArr[j].tocBool().value );
-                    if ( argResult.value === true ) return this.value = new CBool( true );
+                    }
+                    else {
+                        argResult = new cBool( argResult.value || argArr[j].tocBool().value );
+                    }
+                    if ( argResult.value === true ) {
+                        return this.value = new cBool( true );
+                    }
                 }
             }
         }
         else {
-            if ( arg[i] instanceof CString ) return this.value = new CError( cErrorType.wrong_value_type );
-            else if ( arg[i] instanceof CError ) return this.value = arg[i];
-            else if ( arg[i] instanceof CArray ) {
-                var thas = this;
+            if ( arg[i] instanceof cString ) return this.value = new cError( cErrorType.wrong_value_type );
+            else if ( arg[i] instanceof cError ) return this.value = arg[i];
+            else if ( arg[i] instanceof cArray ) {
                 arg[i].foreach( function ( elem ) {
-                    if ( elem instanceof CError ) {
+                    if ( elem instanceof cError ) {
                         argResult = elem;
                         return true;
                     }
-                    else if ( elem instanceof CString || elem instanceof CEmpty ) {
-                        return;
+                    else if ( elem instanceof cString || elem instanceof cEmpty ) {
+                        return false;
                     }
                     else {
-                        if ( argResult == null )
+                        if ( argResult === null ) {
                             argResult = elem.tocBool();
-                        else
-                            argResult = new CBool( argResult.value || elem.tocBool().value );
+                        }
+                        else {
+                            argResult = new cBool( argResult.value || elem.tocBool().value );
+                        }
                     }
                 } )
             }
             else {
-                if ( argResult == null )
+                if ( argResult == null ) {
                     argResult = arg[i].tocBool();
-                else
-                    argResult = new CBool( argResult.value || arg[i].tocBool().value );
-                if ( argResult.value === true ) return this.value = new CBool( true );
+                }
+                else {
+                    argResult = new cBool( argResult.value || arg[i].tocBool().value );
+                }
+                if ( argResult.value === true ) {
+                    return this.value = new cBool( true );
+                }
             }
         }
     }
-    if ( argResult == null )
-        return this.value = new CError( cErrorType.wrong_value_type );
+    if ( argResult == null ) {
+        return this.value = new cError( cErrorType.wrong_value_type );
+    }
     return this.value = argResult;
-}
+};
 cOR.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"(logical1, logical2, ...)"
     };
-}
+};
 
 function cTRUE() {
 //    cBaseFunction.call( this, "TRUE" );
@@ -369,13 +407,13 @@ function cTRUE() {
     this.numFormat = this.formatType.def;
 
 }
-cTRUE.prototype = Object.create( cBaseFunction.prototype )
+cTRUE.prototype = Object.create( cBaseFunction.prototype );
 cTRUE.prototype.Calculate = function () {
-    return this.value = new CBool( true );
-}
+    return this.value = new cBool( true );
+};
 cTRUE.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"()"
     };
-}
+};

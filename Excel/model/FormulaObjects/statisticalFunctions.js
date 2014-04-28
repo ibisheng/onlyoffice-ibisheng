@@ -113,37 +113,37 @@ function cAVEDEV() {
 }
 cAVEDEV.prototype = Object.create( cBaseFunction.prototype )
 cAVEDEV.prototype.Calculate = function ( arg ) {
-    var count = 0, sum = new CNumber( 0 ), arrX = [];
+    var count = 0, sum = new cNumber( 0 ), arrX = [];
     for ( var i = 0; i < arg.length; i++ ) {
         var _arg = arg[i];
-        if ( _arg instanceof CRef || _arg instanceof CRef3D ) {
+        if ( _arg instanceof cRef || _arg instanceof cRef3D ) {
             var _argV = _arg.getValue();
-            if ( _argV instanceof CNumber ) {
+            if ( _argV instanceof cNumber ) {
                 arrX.push( _argV );
                 count++;
             }
         }
-        else if ( _arg instanceof CArea || _arg instanceof CArea3D ) {
+        else if ( _arg instanceof cArea || _arg instanceof cArea3D ) {
             var _argAreaValue = _arg.getValue();
             for ( var j = 0; j < _argAreaValue.length; j++ ) {
                 var __arg = _argAreaValue[j];
-                if ( __arg instanceof CNumber ) {
+                if ( __arg instanceof cNumber ) {
                     arrX.push( __arg );
                     count++;
                 }
             }
         }
-        else if ( _arg instanceof CArray ) {
+        else if ( _arg instanceof cArray ) {
             _arg.foreach( function ( elem ) {
                 var e = elem.tocNumber();
-                if ( e instanceof CNumber ) {
+                if ( e instanceof cNumber ) {
                     arrX.push( e );
                     count++;
                 }
             } )
         }
         else {
-            if ( _arg instanceof CError )
+            if ( _arg instanceof cError )
                 continue;
             arrX.push( _arg );
             count++;
@@ -153,13 +153,13 @@ cAVEDEV.prototype.Calculate = function ( arg ) {
     for ( var i = 0; i < arrX.length; i++ ) {
         sum = _func[sum.type][arrX[i].type]( sum, arrX[i], "+" );
     }
-    sum = new CNumber( sum.getValue() / count );
+    sum = new cNumber( sum.getValue() / count );
     var a = 0
     for ( var i = 0; i < arrX.length; i++ ) {
         a += Math.abs( _func[sum.type][arrX[i].type]( sum, arrX[i], "-" ).getValue() );
     }
 
-    return this.value = new CNumber( a / count );
+    return this.value = new cNumber( a / count );
 };
 cAVEDEV.prototype.getInfo = function () {
     return {
@@ -189,45 +189,45 @@ function cAVERAGE() {
 }
 cAVERAGE.prototype = Object.create( cBaseFunction.prototype )
 cAVERAGE.prototype.Calculate = function ( arg ) {
-    var count = 0, sum = new CNumber( 0 );
+    var count = 0, sum = new cNumber( 0 );
     for ( var i = 0; i < arg.length; i++ ) {
         var _arg = arg[i];
-        if ( _arg instanceof CRef || _arg instanceof CRef3D ) {
+        if ( _arg instanceof cRef || _arg instanceof cRef3D ) {
             var _argV = _arg.getValue();
-            if ( _argV instanceof CString || _argV instanceof CEmpty || _argV instanceof CBool ) {
+            if ( _argV instanceof cString || _argV instanceof cEmpty || _argV instanceof cBool ) {
                 continue;
             }
-            else if ( _argV instanceof CNumber ) {
+            else if ( _argV instanceof cNumber ) {
                 sum = _func[sum.type][_argV.type]( sum, _argV, "+" );
                 count++;
             }
-            else if ( _argV instanceof CError ) {
+            else if ( _argV instanceof cError ) {
                 return this.value = _argV;
             }
         }
-        else if ( _arg instanceof CArea || _arg instanceof CArea3D ) {
+        else if ( _arg instanceof cArea || _arg instanceof cArea3D ) {
             var _argAreaValue = _arg.getValue();
             for ( var j = 0; j < _argAreaValue.length; j++ ) {
                 var __arg = _argAreaValue[j];
-                if ( __arg instanceof CString || __arg instanceof CEmpty || __arg instanceof CBool ) {
+                if ( __arg instanceof cString || __arg instanceof cEmpty || __arg instanceof cBool ) {
                     continue;
                 }
-                else if ( __arg instanceof CNumber ) {
+                else if ( __arg instanceof cNumber ) {
                     sum = _func[sum.type][__arg.type]( sum, __arg, "+" );
                     count++;
                 }
-                else if ( __arg instanceof CError ) {
+                else if ( __arg instanceof cError ) {
                     return this.value = __arg;
                 }
             }
         }
-        else if ( _arg instanceof CArray ) {
+        else if ( _arg instanceof cArray ) {
             _arg.foreach( function ( elem ) {
-                if ( elem instanceof CString || elem instanceof CEmpty || elem instanceof CBool ) {
+                if ( elem instanceof cString || elem instanceof cEmpty || elem instanceof cBool ) {
                     return false;
                 }
                 var e = elem.tocNumber();
-                if ( e instanceof CNumber ) {
+                if ( e instanceof cNumber ) {
                     sum = _func[sum.type][e.type]( sum, e, "+" );
                     count++;
                 }
@@ -235,13 +235,13 @@ cAVERAGE.prototype.Calculate = function ( arg ) {
         }
         else {
             _arg = _arg.tocNumber();
-            if ( _arg instanceof CError )
+            if ( _arg instanceof cError )
                 return this.value = _arg;
             sum = _func[sum.type][_arg.type]( sum, _arg, "+" );
             count++;
         }
     }
-    return this.value = new CNumber( sum.getValue() / count );
+    return this.value = new cNumber( sum.getValue() / count );
 };
 cAVERAGE.prototype.getInfo = function () {
     return {
@@ -270,31 +270,31 @@ function cAVERAGEA() {
 }
 cAVERAGEA.prototype = Object.create( cBaseFunction.prototype )
 cAVERAGEA.prototype.Calculate = function ( arg ) {
-    var count = 0, sum = new CNumber( 0 );
+    var count = 0, sum = new cNumber( 0 );
     for ( var i = 0; i < arg.length; i++ ) {
         var _arg = arg[i];
-        if ( _arg instanceof CRef || _arg instanceof CRef3D ) {
+        if ( _arg instanceof cRef || _arg instanceof cRef3D ) {
             var _argV = _arg.getValue();
-            if ( _argV instanceof CNumber || _argV instanceof  CBool ) {
+            if ( _argV instanceof cNumber || _argV instanceof  cBool ) {
                 sum = _func[sum.type][_argV.type]( sum, _argV, "+" );
                 count++;
             }
-            else if ( _argV instanceof CString ) {
+            else if ( _argV instanceof cString ) {
                 if ( parseNum( _argV.getValue() ) ) {
                     sum = _func[sum.type][_argV.type]( sum, _argV.tocNumber(), "+" );
                 }
                 count++;
             }
         }
-        else if ( _arg instanceof CArea || _arg instanceof CArea3D ) {
+        else if ( _arg instanceof cArea || _arg instanceof cArea3D ) {
             var _argAreaValue = _arg.getValue();
             for ( var j = 0; j < _argAreaValue.length; j++ ) {
                 var __arg = _argAreaValue[j];
-                if ( __arg instanceof CNumber || __arg instanceof  CBool ) {
+                if ( __arg instanceof cNumber || __arg instanceof  cBool ) {
                     sum = _func[sum.type][__arg.type]( sum, __arg, "+" );
                     count++;
                 }
-                else if ( __arg instanceof CString ) {
+                else if ( __arg instanceof cString ) {
                     if ( parseNum( __arg.getValue() ) ) {
                         sum = _func[sum.type][__arg.type]( sum, __arg.tocNumber(), "+" );
                     }
@@ -302,15 +302,15 @@ cAVERAGEA.prototype.Calculate = function ( arg ) {
                 }
             }
         }
-        else if ( _arg instanceof CArray ) {
+        else if ( _arg instanceof cArray ) {
             _arg.foreach( function ( elem ) {
 
-                if ( elem instanceof CString || elem instanceof CEmpty ) {
+                if ( elem instanceof cString || elem instanceof cEmpty ) {
                     return false;
                 }
 
                 var e = elem.tocNumber();
-                if ( e instanceof CNumber ) {
+                if ( e instanceof cNumber ) {
                     sum = _func[sum.type][e.type]( sum, e, "+" );
                     count++;
                 }
@@ -318,13 +318,13 @@ cAVERAGEA.prototype.Calculate = function ( arg ) {
         }
         else {
             _arg = _arg.tocNumber();
-            if ( _arg instanceof CError )
+            if ( _arg instanceof cError )
                 return this.value = _arg;
             sum = _func[sum.type][_arg.type]( sum, _arg, "+" );
             count++;
         }
     }
-    return this.value = new CNumber( sum.getValue() / count );
+    return this.value = new cNumber( sum.getValue() / count );
 };
 cAVERAGEA.prototype.getInfo = function () {
     return {
@@ -354,25 +354,25 @@ function cAVERAGEIF() {
 cAVERAGEIF.prototype = Object.create( cBaseFunction.prototype )
 cAVERAGEIF.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : arg[0], _sum = 0, _count = 0, valueForSearching;
-    if ( !(arg0 instanceof CRef || arg0 instanceof CRef3D || arg0 instanceof CArea) ) {
-        return this.value = new CError( cErrorType.wrong_value_type );
+    if ( !(arg0 instanceof cRef || arg0 instanceof cRef3D || arg0 instanceof cArea) ) {
+        return this.value = new cError( cErrorType.wrong_value_type );
     }
 
-    if ( !(arg2 instanceof CRef || arg2 instanceof CRef3D || arg2 instanceof CArea) ) {
-        return this.value = new CError( cErrorType.wrong_value_type );
+    if ( !(arg2 instanceof cRef || arg2 instanceof cRef3D || arg2 instanceof cArea) ) {
+        return this.value = new cError( cErrorType.wrong_value_type );
     }
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
     }
 
     arg1 = arg1.tocString();
 
-    if ( !(arg1 instanceof CString) ) {
-        return this.value = new CError( cErrorType.wrong_value_type );
+    if ( !(arg1 instanceof cString) ) {
+        return this.value = new cError( cErrorType.wrong_value_type );
     }
 
     arg1 = arg1.toString();
@@ -385,14 +385,14 @@ cAVERAGEIF.prototype.Calculate = function ( arg ) {
     else {
         search = arg1;
     }
-    valueForSearching = parseNum( search ) ? new CNumber( search ) : new CString( search );
-    if ( arg0 instanceof CArea ) {
+    valueForSearching = parseNum( search ) ? new cNumber( search ) : new cString( search );
+    if ( arg0 instanceof cArea ) {
         var r = arg0.getRange().first.getRow0(), ws = arg0.getWS(), c1 = arg2.getRange().first.getCol0(), i = 0;
         arg0.foreach2( function ( c ) {
             if ( matching( c, valueForSearching, oper ) ) {
                 var r1 = r + i,
-                    r2 = new CRef( ws.getRange3( r1, c1, r1, c1 ).getName(), ws );
-                if ( r2.getValue() instanceof CNumber ) {
+                    r2 = new cRef( ws.getRange3( r1, c1, r1, c1 ).getName(), ws );
+                if ( r2.getValue() instanceof cNumber ) {
                     _sum += r2.getValue().getValue();
                     _count++;
                 }
@@ -405,8 +405,8 @@ cAVERAGEIF.prototype.Calculate = function ( arg ) {
         if ( matching( val, valueForSearching, oper ) ) {
             var r = arg0.getRange(), ws = arg0.getWS(),
                 r1 = r.first.getRow0() + 0, c1 = arg2.getRange().first.getCol0();
-            r = new CRef( ws.getRange3( r1, c1, r1, c1 ).getName(), ws );
-            if ( r.getValue() instanceof CNumber ) {
+            r = new cRef( ws.getRange3( r1, c1, r1, c1 ).getName(), ws );
+            if ( r.getValue() instanceof cNumber ) {
                 _sum += r.getValue().getValue();
                 _count++;
             }
@@ -414,10 +414,10 @@ cAVERAGEIF.prototype.Calculate = function ( arg ) {
     }
 
     if ( _count == 0 ) {
-        return new CError( cErrorType.division_by_zero );
+        return new cError( cErrorType.division_by_zero );
     }
     else {
-        return this.value = new CNumber( _sum / _count );
+        return this.value = new cNumber( _sum / _count );
     }
 }
 cAVERAGEIF.prototype.getInfo = function () {
@@ -470,31 +470,31 @@ cBINOMDIST.prototype.Calculate = function ( arg ) {
         return Math.binomCoeff( n, x ) * Math.pow( p, x ) * Math.pow( 1 - p, n - x );
     }
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 );
     }
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElement( 0 );
     }
 
-    if ( arg2 instanceof CArea || arg2 instanceof CArea3D ) {
+    if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
         arg2 = arg2.cross( arguments[1].first );
     }
-    else if ( arg2 instanceof CArray ) {
+    else if ( arg2 instanceof cArray ) {
         arg2 = arg2.getElement( 0 );
     }
 
-    if ( arg3 instanceof CArea || arg3 instanceof CArea3D ) {
+    if ( arg3 instanceof cArea || arg3 instanceof cArea3D ) {
         arg3 = arg3.cross( arguments[1].first );
     }
-    else if ( arg3 instanceof CArray ) {
+    else if ( arg3 instanceof cArray ) {
         arg3 = arg3.getElement( 0 );
     }
 
@@ -503,24 +503,24 @@ cBINOMDIST.prototype.Calculate = function ( arg ) {
     arg2 = arg2.tocNumber();
     arg3 = arg3.tocBool();
 
-    if ( arg0 instanceof CError ) return this.value = arg0;
-    if ( arg1 instanceof CError ) return this.value = arg1;
-    if ( arg2 instanceof CError ) return this.value = arg2;
-    if ( arg3 instanceof CError ) return this.value = arg3;
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = arg1;
+    if ( arg2 instanceof cError ) return this.value = arg2;
+    if ( arg3 instanceof cError ) return this.value = arg3;
 
 
     if ( arg0.getValue() < 0 || arg0.getValue() > arg1.getValue() || arg2.getValue() < 0 || arg2.getValue() > 1 )
-        return this.value = new CError( cErrorType.not_numeric );
+        return this.value = new cError( cErrorType.not_numeric );
 
     if ( arg3.toBool() ) {
         var x = parseInt( arg0.getValue() ), n = parseInt( arg1.getValue() ), p = arg2.getValue(), bm = 0;
         for ( var y = 0; y <= x; y++ ) {
             bm += binomdist( y, n, p );
         }
-        return this.value = new CNumber( bm );
+        return this.value = new cNumber( bm );
     }
     else
-        return this.value = new CNumber( binomdist( arg0.getValue(), arg1.getValue(), arg2.getValue() ) );
+        return this.value = new cNumber( binomdist( arg0.getValue(), arg1.getValue(), arg2.getValue() ) );
 }
 cBINOMDIST.prototype.getInfo = function () {
     return {
@@ -566,24 +566,24 @@ cCONFIDENCE.prototype = Object.create( cBaseFunction.prototype )
 cCONFIDENCE.prototype.Calculate = function ( arg ) {
 
     var alpha = arg[0], stdev_sigma = arg[1], size = arg[2];
-    if ( alpha instanceof CArea || alpha instanceof CArea3D ) {
+    if ( alpha instanceof cArea || alpha instanceof cArea3D ) {
         alpha = alpha.cross( arguments[1].first );
     }
-    else if ( alpha instanceof CArray ) {
+    else if ( alpha instanceof cArray ) {
         alpha = alpha.getElement( 0 );
     }
 
-    if ( stdev_sigma instanceof CArea || stdev_sigma instanceof CArea3D ) {
+    if ( stdev_sigma instanceof cArea || stdev_sigma instanceof cArea3D ) {
         stdev_sigma = stdev_sigma.cross( arguments[1].first );
     }
-    else if ( stdev_sigma instanceof CArray ) {
+    else if ( stdev_sigma instanceof cArray ) {
         stdev_sigma = stdev_sigma.getElement( 0 );
     }
 
-    if ( size instanceof CArea || size instanceof CArea3D ) {
+    if ( size instanceof cArea || size instanceof cArea3D ) {
         size = size.cross( arguments[1].first );
     }
-    else if ( size instanceof CArray ) {
+    else if ( size instanceof cArray ) {
         size = size.getElement( 0 );
     }
 
@@ -591,14 +591,14 @@ cCONFIDENCE.prototype.Calculate = function ( arg ) {
     stdev_sigma = stdev_sigma.tocNumber();
     size = size.tocNumber();
 
-    if ( alpha instanceof CError ) return this.value = alpha;
-    if ( stdev_sigma instanceof CError ) return this.value = stdev_sigma;
-    if ( size instanceof CError ) return this.value = size;
+    if ( alpha instanceof cError ) return this.value = alpha;
+    if ( stdev_sigma instanceof cError ) return this.value = stdev_sigma;
+    if ( size instanceof cError ) return this.value = size;
 
     if ( alpha.getValue() <= 0 || alpha.getValue() >= 1 || stdev_sigma.getValue <= 0 || size.getValue() < 1 )
-        return this.value = new CError( cErrorType.not_numeric );
+        return this.value = new cError( cErrorType.not_numeric );
 
-    return this.value = new CNumber( gaussinv( 1.0 - alpha.getValue() / 2.0 ) * stdev_sigma.getValue() / Math.sqrt( size.getValue() ) );
+    return this.value = new cNumber( gaussinv( 1.0 - alpha.getValue() / 2.0 ) * stdev_sigma.getValue() / Math.sqrt( size.getValue() ) );
 
 }
 cCONFIDENCE.prototype.getInfo = function () {
@@ -633,10 +633,10 @@ cCORREL.prototype.Calculate = function ( arg ) {
 
         var s1 = 0, s2 = 0, s3 = 0, _x = 0, _y = 0, xLength = 0;
         if ( x.length != y.length )
-            return new CError( cErrorType.not_available );
+            return new cError( cErrorType.not_available );
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( !( x[i] instanceof CNumber && y[i] instanceof CNumber ) ) {
+            if ( !( x[i] instanceof cNumber && y[i] instanceof cNumber ) ) {
                 continue;
             }
 
@@ -650,7 +650,7 @@ cCORREL.prototype.Calculate = function ( arg ) {
 
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( !( x[i] instanceof CNumber && y[i] instanceof CNumber ) ) {
+            if ( !( x[i] instanceof cNumber && y[i] instanceof cNumber ) ) {
                 continue;
             }
 
@@ -661,34 +661,34 @@ cCORREL.prototype.Calculate = function ( arg ) {
         }
 
         if ( s2 == 0 || s3 == 0 )
-            return new CError( cErrorType.division_by_zero );
+            return new cError( cErrorType.division_by_zero );
         else
-            return new CNumber( s1 / Math.sqrt( s2 * s3 ) );
+            return new cNumber( s1 / Math.sqrt( s2 * s3 ) );
     }
 
     var arg0 = arg[0], arg1 = arg[1], arr0 = [], arr1 = [];
 
-    if ( arg0 instanceof CArea ) {
+    if ( arg0 instanceof cArea ) {
         arr0 = arg0.getValue();
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0.foreach( function ( elem ) {
             arr0.push( elem );
         } );
     }
     else
-        return this.value = CError( cErrorType.wrong_value_type )
+        return this.value = cError( cErrorType.wrong_value_type )
 
-    if ( arg1 instanceof CArea ) {
+    if ( arg1 instanceof cArea ) {
         arr1 = arg1.getValue();
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1.foreach( function ( elem ) {
             arr1.push( elem );
         } );
     }
     else
-        return this.value = CError( cErrorType.wrong_value_type )
+        return this.value = cError( cErrorType.wrong_value_type )
 
     return this.value = correl( arr0, arr1 );
 
@@ -724,37 +724,37 @@ cCOUNT.prototype.Calculate = function ( arg ) {
     var count = 0;
     for ( var i = 0; i < arg.length; i++ ) {
         var _arg = arg[i];
-        if ( _arg instanceof CRef || _arg instanceof CRef3D ) {
+        if ( _arg instanceof cRef || _arg instanceof cRef3D ) {
             var _argV = _arg.getValue();
-            if ( _argV instanceof CNumber ) {
+            if ( _argV instanceof cNumber ) {
                 count++;
             }
         }
-        else if ( _arg instanceof CArea || _arg instanceof CArea3D ) {
+        else if ( _arg instanceof cArea || _arg instanceof cArea3D ) {
             var _argAreaValue = _arg.getValue();
             for ( var j = 0; j < _argAreaValue.length; j++ ) {
-                if ( _argAreaValue[j] instanceof CNumber ) {
+                if ( _argAreaValue[j] instanceof cNumber ) {
                     count++;
                 }
             }
         }
-        else if ( _arg instanceof CNumber || _arg instanceof CBool || _arg instanceof CEmpty ) {
+        else if ( _arg instanceof cNumber || _arg instanceof cBool || _arg instanceof cEmpty ) {
             count++;
         }
-        else if ( _arg instanceof CString ) {
-            if ( _arg.tocNumber() instanceof CNumber )
+        else if ( _arg instanceof cString ) {
+            if ( _arg.tocNumber() instanceof cNumber )
                 count++;
         }
-        else if ( _arg instanceof CArray ) {
+        else if ( _arg instanceof cArray ) {
             _arg.foreach( function ( elem ) {
                 var e = elem.tocNumber();
-                if ( e instanceof CNumber ) {
+                if ( e instanceof cNumber ) {
                     count++;
                 }
             } )
         }
     }
-    return this.value = new CNumber( count );
+    return this.value = new cNumber( count );
 };
 cCOUNT.prototype.getInfo = function () {
     return {
@@ -787,32 +787,32 @@ cCOUNTA.prototype.Calculate = function ( arg ) {
     var count = 0;
     for ( var i = 0; i < arg.length; i++ ) {
         var _arg = arg[i];
-        if ( _arg instanceof CRef || _arg instanceof CRef3D ) {
+        if ( _arg instanceof cRef || _arg instanceof cRef3D ) {
             var _argV = _arg.getValue();
-            if ( !(_argV instanceof CEmpty) ) {
+            if ( !(_argV instanceof cEmpty) ) {
                 count++;
             }
         }
-        else if ( _arg instanceof CArea || _arg instanceof CArea3D ) {
+        else if ( _arg instanceof cArea || _arg instanceof cArea3D ) {
             var _argAreaValue = _arg.getValue();
             for ( var j = 0; j < _argAreaValue.length; j++ ) {
-                if ( !(_argAreaValue[j] instanceof CEmpty) ) {
+                if ( !(_argAreaValue[j] instanceof cEmpty) ) {
                     count++;
                 }
             }
         }
-        else if ( _arg instanceof CArray ) {
+        else if ( _arg instanceof cArray ) {
             _arg.foreach( function ( elem ) {
-                if ( !(elem instanceof CEmpty) ) {
+                if ( !(elem instanceof cEmpty) ) {
                     count++;
                 }
             } )
         }
-        else if ( !( _arg instanceof CEmpty ) ) {
+        else if ( !( _arg instanceof cEmpty ) ) {
             count++;
         }
     }
-    return this.value = new CNumber( count );
+    return this.value = new cNumber( count );
 };
 cCOUNTA.prototype.getInfo = function () {
     return {
@@ -843,13 +843,13 @@ function cCOUNTBLANK() {
 cCOUNTBLANK.prototype = Object.create( cBaseFunction.prototype )
 cCOUNTBLANK.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D )
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D )
         return this.value = arg0.countCells();
-    else if ( arg0 instanceof CRef || arg0 instanceof CRef3D ) {
-        return this.value = new CNumber( 1 );
+    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+        return this.value = new cNumber( 1 );
     }
     else
-        return this.value = new CError( cErrorType.bad_reference );
+        return this.value = new cError( cErrorType.bad_reference );
 }
 cCOUNTBLANK.prototype.getInfo = function () {
     return {
@@ -879,21 +879,21 @@ function cCOUNTIF() {
 cCOUNTIF.prototype = Object.create( cBaseFunction.prototype )
 cCOUNTIF.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], _count = 0, valueForSearching;
-    if ( !(arg0 instanceof CRef || arg0 instanceof CRef3D || arg0 instanceof CArea || arg0 instanceof CArea3D) ) {
-        return this.value = new CError( cErrorType.wrong_value_type );
+    if ( !(arg0 instanceof cRef || arg0 instanceof cRef3D || arg0 instanceof cArea || arg0 instanceof cArea3D) ) {
+        return this.value = new cError( cErrorType.wrong_value_type );
     }
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
     }
 
     arg1 = arg1.tocString();
 
-    if ( !(arg1 instanceof CString) ) {
-        return this.value = new CError( cErrorType.wrong_value_type );
+    if ( !(arg1 instanceof cString) ) {
+        return this.value = new cError( cErrorType.wrong_value_type );
     }
 
     arg1 = arg1.toString();
@@ -907,13 +907,13 @@ cCOUNTIF.prototype.Calculate = function ( arg ) {
     else {
         search = arg1;
     }
-    valueForSearching = parseNum( search ) ? new CNumber( search ) : new CString( search );
-    if ( arg0 instanceof CArea ) {
+    valueForSearching = parseNum( search ) ? new cNumber( search ) : new cString( search );
+    if ( arg0 instanceof cArea ) {
         arg0.foreach2( function ( _val ) {
             _count += matching( _val, valueForSearching, oper );
         } )
     }
-    else if ( arg0 instanceof CArea3D ) {
+    else if ( arg0 instanceof cArea3D ) {
         val = arg0.getValue();
         for ( var i = 0; i < val.length; i++ ) {
             _count += matching( val[i], valueForSearching, oper );
@@ -924,7 +924,7 @@ cCOUNTIF.prototype.Calculate = function ( arg ) {
         _count += matching( val, valueForSearching, oper );
     }
 
-    return this.value = new CNumber( _count );
+    return this.value = new cNumber( _count );
 }
 cCOUNTIF.prototype.getInfo = function () {
     return {
@@ -964,7 +964,7 @@ cCOVAR.prototype.Calculate = function ( arg ) {
         var s1 = 0, _x = 0, _y = 0, xLength = 0;
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( !( x[i] instanceof CNumber && y[i] instanceof CNumber ) ) {
+            if ( !( x[i] instanceof cNumber && y[i] instanceof cNumber ) ) {
                 continue;
             }
 
@@ -974,46 +974,46 @@ cCOVAR.prototype.Calculate = function ( arg ) {
         }
 
         if ( xLength == 0 )
-            return new CError( cErrorType.division_by_zero );
+            return new cError( cErrorType.division_by_zero );
 
         _x /= xLength;
         _y /= xLength;
 
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( !( x[i] instanceof CNumber && y[i] instanceof CNumber ) ) {
+            if ( !( x[i] instanceof cNumber && y[i] instanceof cNumber ) ) {
                 continue;
             }
 
             s1 += (x[i].getValue() - _x) * (y[i].getValue() - _y);
 
         }
-        return new CNumber( s1 / xLength );
+        return new cNumber( s1 / xLength );
     }
 
     var arg0 = arg[0], arg1 = arg[1], arr0 = [], arr1 = [];
 
-    if ( arg0 instanceof CArea ) {
+    if ( arg0 instanceof cArea ) {
         arr0 = arg0.getValue();
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0.foreach( function ( elem ) {
             arr0.push( elem );
         } );
     }
     else
-        return this.value = CError( cErrorType.wrong_value_type )
+        return this.value = cError( cErrorType.wrong_value_type )
 
-    if ( arg1 instanceof CArea ) {
+    if ( arg1 instanceof cArea ) {
         arr1 = arg1.getValue();
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1.foreach( function ( elem ) {
             arr1.push( elem );
         } );
     }
     else
-        return this.value = CError( cErrorType.wrong_value_type )
+        return this.value = cError( cErrorType.wrong_value_type )
 
     return this.value = covar( arr0, arr1 );
 
@@ -1049,14 +1049,14 @@ cCRITBINOM.prototype.Calculate = function ( arg ) {
 
     function critbinom( n, p, alpha ) {
         if ( n < 0 || alpha <= 0 || alpha >= 1 || p < 0 || p > 1 )
-            return new CError( cErrorType.not_numeric );
+            return new cError( cErrorType.not_numeric );
         else {
             var q = 1 - p,
                 factor = Math.pow( q, n );
             if ( factor == 0 ) {
                 factor = Math.pow( p, n );
                 if ( factor == 0.0 )
-                    return new CError( cErrorType.wrong_value_type );
+                    return new cError( cErrorType.wrong_value_type );
                 else {
                     var sum = 1 - factor, max = n, i = 0;
 
@@ -1064,7 +1064,7 @@ cCRITBINOM.prototype.Calculate = function ( arg ) {
                         factor *= (n - i) / (i + 1) * q / p;
                         sum -= factor;
                     }
-                    return new CNumber( n - i );
+                    return new cNumber( n - i );
                 }
             }
             else {
@@ -1074,29 +1074,29 @@ cCRITBINOM.prototype.Calculate = function ( arg ) {
                     factor *= (n - i) / (i + 1) * p / q;
                     sum += factor;
                 }
-                return new CNumber( i );
+                return new cNumber( i );
             }
         }
     }
 
-    if ( alpha instanceof CArea || alpha instanceof CArea3D ) {
+    if ( alpha instanceof cArea || alpha instanceof cArea3D ) {
         alpha = alpha.cross( arguments[1].first );
     }
-    else if ( alpha instanceof CArray ) {
+    else if ( alpha instanceof cArray ) {
         alpha = alpha.getElement( 0 );
     }
 
-    if ( n instanceof CArea || n instanceof CArea3D ) {
+    if ( n instanceof cArea || n instanceof cArea3D ) {
         n = n.cross( arguments[1].first );
     }
-    else if ( n instanceof CArray ) {
+    else if ( n instanceof cArray ) {
         n = n.getElement( 0 );
     }
 
-    if ( p instanceof CArea || p instanceof CArea3D ) {
+    if ( p instanceof cArea || p instanceof cArea3D ) {
         p = p.cross( arguments[1].first );
     }
-    else if ( p instanceof CArray ) {
+    else if ( p instanceof cArray ) {
         p = p.getElement( 0 );
     }
 
@@ -1104,9 +1104,9 @@ cCRITBINOM.prototype.Calculate = function ( arg ) {
     n = n.tocNumber();
     p = p.tocNumber();
 
-    if ( alpha instanceof CError ) return this.value = alpha;
-    if ( n instanceof CError ) return this.value = n;
-    if ( p instanceof CError ) return this.value = p;
+    if ( alpha instanceof cError ) return this.value = alpha;
+    if ( n instanceof cError ) return this.value = n;
+    if ( p instanceof cError ) return this.value = p;
 
     return this.value = critbinom( n, p, alpha );
 
@@ -1144,7 +1144,7 @@ cDEVSQ.prototype.Calculate = function ( arg ) {
         var s1 = 0, _x = 0, xLength = 0;
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( x[i] instanceof CNumber ) {
+            if ( x[i] instanceof cNumber ) {
                 _x += x[i].getValue();
                 xLength++;
             }
@@ -1155,44 +1155,44 @@ cDEVSQ.prototype.Calculate = function ( arg ) {
 
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( x[i] instanceof CNumber ) {
+            if ( x[i] instanceof cNumber ) {
                 s1 += Math.pow( x[i].getValue() - _x, 2 );
             }
 
         }
 
-        return new CNumber( s1 );
+        return new cNumber( s1 );
     }
 
     var arr0 = [];
 
     for ( var j = 0; j < this.getArguments(); j++ ) {
 
-        if ( arg[j] instanceof CArea || arg[j] instanceof CArea3D ) {
+        if ( arg[j] instanceof cArea || arg[j] instanceof cArea3D ) {
             arg[j].foreach2( function ( elem ) {
-                if ( elem instanceof  CNumber )
+                if ( elem instanceof  cNumber )
                     arr0.push( elem );
             } );
         }
-        else if ( arg[j] instanceof CRef || arg[j] instanceof CRef3D ) {
+        else if ( arg[j] instanceof cRef || arg[j] instanceof cRef3D ) {
             var a = arg[j].getValue();
-            if ( a instanceof  CNumber )
+            if ( a instanceof  cNumber )
                 arr0.push( a );
         }
-        else if ( arg[j] instanceof CArray ) {
+        else if ( arg[j] instanceof cArray ) {
             arg[j].foreach( function ( elem ) {
-                if ( elem instanceof  CNumber )
+                if ( elem instanceof  cNumber )
                     arr0.push( elem );
             } );
         }
-        else if ( arg[j] instanceof CNumber || arg[j] instanceof CBool ) {
+        else if ( arg[j] instanceof cNumber || arg[j] instanceof cBool ) {
             arr0.push( arg[j].tocNumber() );
         }
-        else if ( arg[j] instanceof CString ) {
+        else if ( arg[j] instanceof cString ) {
             continue;
         }
         else
-            return this.value = CError( cErrorType.wrong_value_type )
+            return this.value = cError( cErrorType.wrong_value_type )
 
     }
     return this.value = devsq( arr0 );
@@ -1227,24 +1227,24 @@ cEXPONDIST.prototype = Object.create( cBaseFunction.prototype )
 cEXPONDIST.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 );
     }
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElement( 0 );
     }
 
-    if ( arg2 instanceof CArea || arg2 instanceof CArea3D ) {
+    if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
         arg2 = arg2.cross( arguments[1].first );
     }
-    else if ( arg2 instanceof CArray ) {
+    else if ( arg2 instanceof cArray ) {
         arg2 = arg2.getElement( 0 );
     }
 
@@ -1252,18 +1252,18 @@ cEXPONDIST.prototype.Calculate = function ( arg ) {
     arg1 = arg1.tocNumber();
     arg2 = arg2.tocBool();
 
-    if ( arg0 instanceof CError ) return this.value = arg0;
-    if ( arg1 instanceof CError ) return this.value = arg1;
-    if ( arg2 instanceof CError ) return this.value = arg2;
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = arg1;
+    if ( arg2 instanceof cError ) return this.value = arg2;
 
     if ( arg0.getValue() < 0 || arg2.getValue() <= 0 )
-        return this.value = new CError( cErrorType.not_numeric );
+        return this.value = new cError( cErrorType.not_numeric );
 
     if ( arg2.toBool() ) {
-        return this.value = new CNumber( 1 - Math.exp( -arg1.getValue() * arg0.getValue() ) );
+        return this.value = new cNumber( 1 - Math.exp( -arg1.getValue() * arg0.getValue() ) );
     }
     else
-        return this.value = new CNumber( arg1.getValue() * Math.exp( -arg1.getValue() * arg0.getValue() ) );
+        return this.value = new cNumber( arg1.getValue() * Math.exp( -arg1.getValue() * arg0.getValue() ) );
 }
 cEXPONDIST.prototype.getInfo = function () {
     return {
@@ -1308,26 +1308,26 @@ cFISHER.prototype.Calculate = function ( arg ) {
         return 0.5 * Math.ln( (1 + x) / (1 - x) );
     }
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
     arg0 = arg0.tocNumber();
-    if ( arg0 instanceof CError )
+    if ( arg0 instanceof cError )
         return this.value = arg0;
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0.foreach( function ( elem, r, c ) {
-            if ( elem instanceof CNumber ) {
+            if ( elem instanceof cNumber ) {
                 var a = fisher( elem.getValue() );
-                this.array[r][c] = isNaN( a ) ? new CError( cErrorType.not_numeric ) : new CNumber( a );
+                this.array[r][c] = isNaN( a ) ? new cError( cErrorType.not_numeric ) : new cNumber( a );
             }
             else {
-                this.array[r][c] = new CError( cErrorType.wrong_value_type );
+                this.array[r][c] = new cError( cErrorType.wrong_value_type );
             }
         } )
     }
     else {
         var a = fisher( arg0.getValue() );
-        return this.value = isNaN( a ) ? new CError( cErrorType.not_numeric ) : new CNumber( a );
+        return this.value = isNaN( a ) ? new cError( cErrorType.not_numeric ) : new cNumber( a );
     }
     return this.value = arg0;
 
@@ -1365,26 +1365,26 @@ cFISHERINV.prototype.Calculate = function ( arg ) {
         return ( Math.exp( 2 * x ) - 1 ) / ( Math.exp( 2 * x ) + 1 );
     }
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
     arg0 = arg0.tocNumber();
-    if ( arg0 instanceof CError )
+    if ( arg0 instanceof cError )
         return this.value = arg0;
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0.foreach( function ( elem, r, c ) {
-            if ( elem instanceof CNumber ) {
+            if ( elem instanceof cNumber ) {
                 var a = fisherInv( elem.getValue() );
-                this.array[r][c] = isNaN( a ) ? new CError( cErrorType.not_numeric ) : new CNumber( a );
+                this.array[r][c] = isNaN( a ) ? new cError( cErrorType.not_numeric ) : new cNumber( a );
             }
             else {
-                this.array[r][c] = new CError( cErrorType.wrong_value_type );
+                this.array[r][c] = new cError( cErrorType.wrong_value_type );
             }
         } )
     }
     else {
         var a = fisherInv( arg0.getValue() );
-        return this.value = isNaN( a ) ? new CError( cErrorType.not_numeric ) : new CNumber( a );
+        return this.value = isNaN( a ) ? new cError( cErrorType.not_numeric ) : new cNumber( a );
     }
     return this.value = arg0;
 
@@ -1422,7 +1422,7 @@ cFORECAST.prototype.Calculate = function ( arg ) {
         var fSumDeltaXDeltaY = 0, fSumSqrDeltaX = 0, _x = 0, _y = 0, xLength = 0;
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( !( x[i] instanceof CNumber && y[i] instanceof CNumber ) ) {
+            if ( !( x[i] instanceof cNumber && y[i] instanceof cNumber ) ) {
                 continue;
             }
 
@@ -1436,7 +1436,7 @@ cFORECAST.prototype.Calculate = function ( arg ) {
 
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( !( x[i] instanceof CNumber && y[i] instanceof CNumber ) ) {
+            if ( !( x[i] instanceof cNumber && y[i] instanceof cNumber ) ) {
                 continue;
             }
 
@@ -1449,47 +1449,47 @@ cFORECAST.prototype.Calculate = function ( arg ) {
         }
 
         if ( fSumDeltaXDeltaY == 0 )
-            return new CError( cErrorType.division_by_zero );
+            return new cError( cErrorType.division_by_zero );
         else {
-            return new CNumber( _y + fSumDeltaXDeltaY / fSumSqrDeltaX * ( fx.getValue() - _x ) );
+            return new cNumber( _y + fSumDeltaXDeltaY / fSumSqrDeltaX * ( fx.getValue() - _x ) );
         }
 
     }
 
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arr0 = [], arr1 = [];
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 );
     }
     arg0 = arg0.tocNumber();
 
-    if ( arg0 instanceof CError ) return this.value = arg0;
+    if ( arg0 instanceof cError ) return this.value = arg0;
 
 
-    if ( arg1 instanceof CArea ) {
+    if ( arg1 instanceof cArea ) {
         arr0 = arg1.getValue();
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1.foreach( function ( elem ) {
             arr0.push( elem );
         } );
     }
     else
-        return this.value = CError( cErrorType.wrong_value_type )
+        return this.value = cError( cErrorType.wrong_value_type )
 
-    if ( arg2 instanceof CArea ) {
+    if ( arg2 instanceof cArea ) {
         arr1 = arg2.getValue();
     }
-    else if ( arg2 instanceof CArray ) {
+    else if ( arg2 instanceof cArray ) {
         arg2.foreach( function ( elem ) {
             arr1.push( elem );
         } );
     }
     else
-        return this.value = CError( cErrorType.wrong_value_type )
+        return this.value = cError( cErrorType.wrong_value_type )
 
     return this.value = forecast( arg0, arr0, arr1 );
 
@@ -1533,26 +1533,26 @@ cFREQUENCY.prototype.Calculate = function ( arg ) {
 
         for ( var i = 0; i < A.length; i++ ) {
             for ( var j = 0; j < A[i].length; j++ ) {
-                if ( A[i][j] instanceof  CError ) {
+                if ( A[i][j] instanceof  cError ) {
                     return A[i][j];
                 }
-                else if ( A[i][j] instanceof CNumber ) {
+                else if ( A[i][j] instanceof cNumber ) {
                     tA.push( A[i][j].getValue() );
                 }
-                else if ( A[i][j] instanceof CBool ) {
+                else if ( A[i][j] instanceof cBool ) {
                     tA.push( A[i][j].tocNumber().getValue() );
                 }
             }
         }
         for ( var i = 0; i < B.length; i++ ) {
             for ( var j = 0; j < B[i].length; j++ ) {
-                if ( B[i][j] instanceof  CError ) {
+                if ( B[i][j] instanceof  cError ) {
                     return B[i][j];
                 }
-                else if ( B[i][j] instanceof CNumber ) {
+                else if ( B[i][j] instanceof cNumber ) {
                     tB.push( B[i][j].getValue() );
                 }
-                else if ( B[i][j] instanceof CBool ) {
+                else if ( B[i][j] instanceof cBool ) {
                     tB.push( B[i][j].tocNumber().getValue() );
                 }
             }
@@ -1564,37 +1564,37 @@ cFREQUENCY.prototype.Calculate = function ( arg ) {
 
         var C = [[]], k = 0;
         for ( var i = 1; i < tB.length; i++, k++ ) {
-            C[0][k] = new CNumber( 0 );
+            C[0][k] = new cNumber( 0 );
             for ( var j = 0; j < tA.length; j++ ) {
                 if ( tA[j] > tB[i - 1] && tA[j] <= tB[i] ) {
                     var a = C[0][k].getValue();
-                    C[0][k] = new CNumber( ++a );
+                    C[0][k] = new cNumber( ++a );
                 }
             }
         }
-        var res = new CArray();
+        var res = new cArray();
         res.fillFromArray( C );
         return res;
     }
 
     var arg0 = arg[0], arg1 = arg[1];
-    if ( arg0 instanceof CArea || arg0 instanceof CArray ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArray ) {
         arg0 = arg0.getMatrix();
     }
-    else if ( arg0 instanceof CArea3D ) {
+    else if ( arg0 instanceof cArea3D ) {
         arg0 = arg0.getMatrix()[0];
     }
     else
-        return this.value = new CError( cErrorType.not_available );
+        return this.value = new cError( cErrorType.not_available );
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArray ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArray ) {
         arg1 = arg1.getMatrix();
     }
-    else if ( arg1 instanceof CArea3D ) {
+    else if ( arg1 instanceof cArea3D ) {
         arg1 = arg1.getMatrix()[0];
     }
     else
-        return this.value = new CError( cErrorType.not_available );
+        return this.value = new cError( cErrorType.not_available );
 
     return this.value = frequency( arg0, arg1 );
 
@@ -1650,26 +1650,26 @@ cGAMMALN.prototype.Calculate = function ( arg ) {
      */
 
     var arg0 = arg[0];
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
     arg0 = arg0.tocNumber();
-    if ( arg0 instanceof CError )
+    if ( arg0 instanceof cError )
         return this.value = arg0;
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0.foreach( function ( elem, r, c ) {
-            if ( elem instanceof CNumber ) {
+            if ( elem instanceof cNumber ) {
                 var a = getLogGamma( elem.getValue() );
-                this.array[r][c] = isNaN( a ) ? new CError( cErrorType.not_numeric ) : new CNumber( a );
+                this.array[r][c] = isNaN( a ) ? new cError( cErrorType.not_numeric ) : new cNumber( a );
             }
             else {
-                this.array[r][c] = new CError( cErrorType.wrong_value_type );
+                this.array[r][c] = new cError( cErrorType.wrong_value_type );
             }
         } )
     }
     else {
         var a = getLogGamma( arg0.getValue() );
-        return this.value = isNaN( a ) ? new CError( cErrorType.not_numeric ) : new CNumber( a );
+        return this.value = isNaN( a ) ? new cError( cErrorType.not_numeric ) : new cNumber( a );
     }
     return this.value = arg0;
 }
@@ -1703,11 +1703,11 @@ cGEOMEAN.prototype.Calculate = function ( arg ) {
         var _x = 1, xLength = 0, _tx;
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( x[i] instanceof CNumber ) {
+            if ( x[i] instanceof cNumber ) {
                 _x *= x[i].getValue();
                 xLength++;
             }
-            else if ( ( x[i] instanceof CString || x[i] instanceof CBool ) && ( _tx = x[i].tocNumber()) instanceof CNumber ) {
+            else if ( ( x[i] instanceof cString || x[i] instanceof cBool ) && ( _tx = x[i].tocNumber()) instanceof cNumber ) {
                 _x *= _tx.getValue();
                 xLength++;
             }
@@ -1715,40 +1715,40 @@ cGEOMEAN.prototype.Calculate = function ( arg ) {
         }
 
         if ( _x <= 0 )
-            return new CError( cErrorType.not_numeric );
+            return new cError( cErrorType.not_numeric );
         else
-            return new CNumber( Math.pow( _x, 1 / xLength ) );
+            return new cNumber( Math.pow( _x, 1 / xLength ) );
     }
 
     var arr0 = [];
 
     for ( var j = 0; j < this.getArguments(); j++ ) {
 
-        if ( arg[j] instanceof CArea || arg[j] instanceof CArea3D ) {
+        if ( arg[j] instanceof cArea || arg[j] instanceof cArea3D ) {
             arg[j].foreach2( function ( elem ) {
-                if ( elem instanceof  CNumber )
+                if ( elem instanceof  cNumber )
                     arr0.push( elem );
             } );
         }
-        else if ( arg[j] instanceof CRef || arg[j] instanceof CRef3D ) {
+        else if ( arg[j] instanceof cRef || arg[j] instanceof cRef3D ) {
             var a = arg[j].getValue();
-            if ( a instanceof  CNumber )
+            if ( a instanceof  cNumber )
                 arr0.push( a );
         }
-        else if ( arg[j] instanceof CArray ) {
+        else if ( arg[j] instanceof cArray ) {
             arg[j].foreach( function ( elem ) {
-                if ( elem instanceof  CNumber )
+                if ( elem instanceof  cNumber )
                     arr0.push( elem );
             } );
         }
-        else if ( arg[j] instanceof CNumber || arg[j] instanceof CBool ) {
+        else if ( arg[j] instanceof cNumber || arg[j] instanceof cBool ) {
             arr0.push( arg[j].tocNumber() );
         }
-        else if ( arg[j] instanceof CString && arg[j].tocNumber() instanceof CNumber ) {
+        else if ( arg[j] instanceof cString && arg[j].tocNumber() instanceof cNumber ) {
             arr0.push( arg[j].tocNumber() );
         }
         else
-            return this.value = CError( cErrorType.wrong_value_type )
+            return this.value = cError( cErrorType.wrong_value_type )
 
     }
     return this.value = geommean( arr0 );
@@ -1792,15 +1792,15 @@ cHARMEAN.prototype.Calculate = function ( arg ) {
         var _x = 0, xLength = 0, _tx;
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( x[i] instanceof CNumber ) {
+            if ( x[i] instanceof cNumber ) {
                 if ( x[i].getValue() == 0 )
-                    return new CError( cErrorType.not_numeric );
+                    return new cError( cErrorType.not_numeric );
                 _x += 1 / x[i].getValue();
                 xLength++;
             }
-            else if ( ( x[i] instanceof CString || x[i] instanceof CBool ) && ( _tx = x[i].tocNumber()) instanceof CNumber ) {
+            else if ( ( x[i] instanceof cString || x[i] instanceof cBool ) && ( _tx = x[i].tocNumber()) instanceof cNumber ) {
                 if ( _tx.getValue() == 0 )
-                    return new CError( cErrorType.not_numeric );
+                    return new cError( cErrorType.not_numeric );
                 _x += 1 / _tx.getValue();
                 xLength++;
             }
@@ -1808,40 +1808,40 @@ cHARMEAN.prototype.Calculate = function ( arg ) {
         }
 
         if ( _x <= 0 )
-            return new CError( cErrorType.not_numeric );
+            return new cError( cErrorType.not_numeric );
         else
-            return new CNumber( xLength / _x );
+            return new cNumber( xLength / _x );
     }
 
     var arr0 = [];
 
     for ( var j = 0; j < this.getArguments(); j++ ) {
 
-        if ( arg[j] instanceof CArea || arg[j] instanceof CArea3D ) {
+        if ( arg[j] instanceof cArea || arg[j] instanceof cArea3D ) {
             arg[j].foreach2( function ( elem ) {
-                if ( elem instanceof  CNumber )
+                if ( elem instanceof  cNumber )
                     arr0.push( elem );
             } );
         }
-        else if ( arg[j] instanceof CRef || arg[j] instanceof CRef3D ) {
+        else if ( arg[j] instanceof cRef || arg[j] instanceof cRef3D ) {
             var a = arg[j].getValue();
-            if ( a instanceof  CNumber )
+            if ( a instanceof  cNumber )
                 arr0.push( a );
         }
-        else if ( arg[j] instanceof CArray ) {
+        else if ( arg[j] instanceof cArray ) {
             arg[j].foreach( function ( elem ) {
-                if ( elem instanceof  CNumber )
+                if ( elem instanceof  cNumber )
                     arr0.push( elem );
             } );
         }
-        else if ( arg[j] instanceof CNumber || arg[j] instanceof CBool ) {
+        else if ( arg[j] instanceof cNumber || arg[j] instanceof cBool ) {
             arr0.push( arg[j].tocNumber() );
         }
-        else if ( arg[j] instanceof CString && arg[j].tocNumber() instanceof CNumber ) {
+        else if ( arg[j] instanceof cString && arg[j].tocNumber() instanceof cNumber ) {
             arr0.push( arg[j].tocNumber() );
         }
         else
-            return this.value = CError( cErrorType.wrong_value_type )
+            return this.value = cError( cErrorType.wrong_value_type )
 
     }
     return this.value = harmmean( arr0 );
@@ -1876,31 +1876,31 @@ cHYPGEOMDIST.prototype = Object.create( cBaseFunction.prototype )
 cHYPGEOMDIST.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 );
     }
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElement( 0 );
     }
 
-    if ( arg2 instanceof CArea || arg2 instanceof CArea3D ) {
+    if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
         arg2 = arg2.cross( arguments[1].first );
     }
-    else if ( arg2 instanceof CArray ) {
+    else if ( arg2 instanceof cArray ) {
         arg2 = arg2.getElement( 0 );
     }
 
-    if ( arg3 instanceof CArea || arg3 instanceof CArea3D ) {
+    if ( arg3 instanceof cArea || arg3 instanceof cArea3D ) {
         arg3 = arg3.cross( arguments[1].first );
     }
-    else if ( arg3 instanceof CArray ) {
+    else if ( arg3 instanceof cArray ) {
         arg3 = arg3.getElement( 0 );
     }
 
@@ -1909,10 +1909,10 @@ cHYPGEOMDIST.prototype.Calculate = function ( arg ) {
     arg2 = arg2.tocNumber();
     arg3 = arg3.tocNumber();
 
-    if ( arg0 instanceof CError ) return this.value = arg0;
-    if ( arg1 instanceof CError ) return this.value = arg1;
-    if ( arg2 instanceof CError ) return this.value = arg2;
-    if ( arg3 instanceof CError ) return this.value = arg3;
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = arg1;
+    if ( arg2 instanceof cError ) return this.value = arg2;
+    if ( arg3 instanceof cError ) return this.value = arg3;
 
 
     if ( arg0.getValue() < 0 ||
@@ -1921,9 +1921,9 @@ cHYPGEOMDIST.prototype.Calculate = function ( arg ) {
         arg1.getValue() <= 0 || arg1.getValue() > arg3.getValue() ||
         arg2.getValue() <= 0 || arg2.getValue() > arg3.getValue() ||
         arg3.getValue() <= 0 )
-        return this.value = new CError( cErrorType.not_numeric );
+        return this.value = new cError( cErrorType.not_numeric );
 
-    return this.value = new CNumber( Math.binomCoeff( arg2.getValue(), arg0.getValue() ) * Math.binomCoeff( arg3.getValue() - arg2.getValue(), arg1.getValue() - arg0.getValue() ) /
+    return this.value = new cNumber( Math.binomCoeff( arg2.getValue(), arg0.getValue() ) * Math.binomCoeff( arg3.getValue() - arg2.getValue(), arg1.getValue() - arg0.getValue() ) /
         Math.binomCoeff( arg3.getValue(), arg1.getValue() ) );
 
 }
@@ -1960,7 +1960,7 @@ cINTERCEPT.prototype.Calculate = function ( arg ) {
         var fSumDeltaXDeltaY = 0, fSumSqrDeltaX = 0, _x = 0, _y = 0, xLength = 0;
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( !( x[i] instanceof CNumber && y[i] instanceof CNumber ) ) {
+            if ( !( x[i] instanceof cNumber && y[i] instanceof cNumber ) ) {
                 continue;
             }
 
@@ -1974,7 +1974,7 @@ cINTERCEPT.prototype.Calculate = function ( arg ) {
 
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( !( x[i] instanceof CNumber && y[i] instanceof CNumber ) ) {
+            if ( !( x[i] instanceof cNumber && y[i] instanceof cNumber ) ) {
                 continue;
             }
 
@@ -1987,36 +1987,36 @@ cINTERCEPT.prototype.Calculate = function ( arg ) {
         }
 
         if ( fSumDeltaXDeltaY == 0 )
-            return new CError( cErrorType.division_by_zero );
+            return new cError( cErrorType.division_by_zero );
         else {
-            return new CNumber( _y - fSumDeltaXDeltaY / fSumSqrDeltaX * _x );
+            return new cNumber( _y - fSumDeltaXDeltaY / fSumSqrDeltaX * _x );
         }
 
     }
 
     var arg0 = arg[0], arg1 = arg[1], arr0 = [], arr1 = [];
 
-    if ( arg0 instanceof CArea ) {
+    if ( arg0 instanceof cArea ) {
         arr0 = arg0.getValue();
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0.foreach( function ( elem ) {
             arr0.push( elem );
         } );
     }
     else
-        return this.value = CError( cErrorType.wrong_value_type )
+        return this.value = cError( cErrorType.wrong_value_type )
 
-    if ( arg1 instanceof CArea ) {
+    if ( arg1 instanceof cArea ) {
         arr1 = arg1.getValue();
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1.foreach( function ( elem ) {
             arr1.push( elem );
         } );
     }
     else
-        return this.value = CError( cErrorType.wrong_value_type )
+        return this.value = cError( cErrorType.wrong_value_type )
 
     return this.value = intercept( arr0, arr1 );
 
@@ -2054,7 +2054,7 @@ cKURT.prototype.Calculate = function ( arg ) {
         var sumSQRDeltaX = 0, _x = 0, xLength = 0, standDev = 0, sumSQRDeltaXDivstandDev = 0;
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( x[i] instanceof CNumber ) {
+            if ( x[i] instanceof cNumber ) {
                 _x += x[i].getValue();
                 xLength++;
             }
@@ -2065,7 +2065,7 @@ cKURT.prototype.Calculate = function ( arg ) {
 
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( x[i] instanceof CNumber ) {
+            if ( x[i] instanceof cNumber ) {
                 sumSQRDeltaX += Math.pow( x[i].getValue() - _x, 2 );
             }
 
@@ -2075,13 +2075,13 @@ cKURT.prototype.Calculate = function ( arg ) {
 
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( x[i] instanceof CNumber ) {
+            if ( x[i] instanceof cNumber ) {
                 sumSQRDeltaXDivstandDev += Math.pow( (x[i].getValue() - _x) / standDev, 4 );
             }
 
         }
 
-        return new CNumber( xLength * (xLength + 1) / (xLength - 1) / (xLength - 2) / (xLength - 3) * sumSQRDeltaXDivstandDev - 3 * (xLength - 1) * (xLength - 1) / (xLength - 2) / (xLength - 3) )
+        return new cNumber( xLength * (xLength + 1) / (xLength - 1) / (xLength - 2) / (xLength - 3) * sumSQRDeltaXDivstandDev - 3 * (xLength - 1) * (xLength - 1) / (xLength - 2) / (xLength - 3) )
 
     }
 
@@ -2089,31 +2089,31 @@ cKURT.prototype.Calculate = function ( arg ) {
 
     for ( var j = 0; j < this.getArguments(); j++ ) {
 
-        if ( arg[j] instanceof CArea || arg[j] instanceof CArea3D ) {
+        if ( arg[j] instanceof cArea || arg[j] instanceof cArea3D ) {
             arg[j].foreach2( function ( elem ) {
-                if ( elem instanceof  CNumber )
+                if ( elem instanceof  cNumber )
                     arr0.push( elem );
             } );
         }
-        else if ( arg[j] instanceof CRef || arg[j] instanceof CRef3D ) {
+        else if ( arg[j] instanceof cRef || arg[j] instanceof cRef3D ) {
             var a = arg[j].getValue();
-            if ( a instanceof  CNumber )
+            if ( a instanceof  cNumber )
                 arr0.push( a );
         }
-        else if ( arg[j] instanceof CArray ) {
+        else if ( arg[j] instanceof cArray ) {
             arg[j].foreach( function ( elem ) {
-                if ( elem instanceof  CNumber )
+                if ( elem instanceof  cNumber )
                     arr0.push( elem );
             } );
         }
-        else if ( arg[j] instanceof CNumber || arg[j] instanceof CBool ) {
+        else if ( arg[j] instanceof cNumber || arg[j] instanceof cBool ) {
             arr0.push( arg[j].tocNumber() );
         }
-        else if ( arg[j] instanceof CString ) {
+        else if ( arg[j] instanceof cString ) {
             continue;
         }
         else
-            return this.value = CError( cErrorType.wrong_value_type )
+            return this.value = cError( cErrorType.wrong_value_type )
 
     }
     return this.value = kurt( arr0 );
@@ -2154,13 +2154,13 @@ cLARGE.prototype.Calculate = function ( arg ) {
 
         for ( var i = 0; i < A.length; i++ ) {
             for ( var j = 0; j < A[i].length; j++ ) {
-                if ( A[i][j] instanceof  CError ) {
+                if ( A[i][j] instanceof  cError ) {
                     return A[i][j];
                 }
-                else if ( A[i][j] instanceof CNumber ) {
+                else if ( A[i][j] instanceof cNumber ) {
                     tA.push( A[i][j].getValue() );
                 }
-                else if ( A[i][j] instanceof CBool ) {
+                else if ( A[i][j] instanceof cBool ) {
                     tA.push( A[i][j].tocNumber().getValue() );
                 }
             }
@@ -2171,32 +2171,32 @@ cLARGE.prototype.Calculate = function ( arg ) {
         } )
 
         if ( k.getValue() > tA.length || k.getValue() <= 0 )
-            return new CError( cErrorType.not_available );
+            return new cError( cErrorType.not_available );
         else
-            return new CNumber( tA[k.getValue() - 1] );
+            return new cNumber( tA[k.getValue() - 1] );
     }
 
     var arg0 = arg[0], arg1 = arg[1];
-    if ( arg0 instanceof CArea || arg0 instanceof CArray ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArray ) {
         arg0 = arg0.getMatrix();
     }
-    else if ( arg0 instanceof CArea3D ) {
+    else if ( arg0 instanceof cArea3D ) {
         arg0 = arg0.getMatrix()[0];
     }
     else
-        return this.value = new CError( cErrorType.not_available );
+        return this.value = new cError( cErrorType.not_available );
 
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElement( 0 );
     }
 
     arg1 = arg1.tocNumber();
 
-    if ( arg1 instanceof CError ) return this.value = arg1;
+    if ( arg1 instanceof cError ) return this.value = arg1;
 
     return this.value = frequency( arg0, arg1 );
 
@@ -2243,29 +2243,29 @@ cLOGINV.prototype.Calculate = function ( arg ) {
 
     function loginv( x, mue, sigma ) {
         if ( sigma <= 0 || x <= 0 || x >= 1 )
-            return new CError( cErrorType.not_numeric );
+            return new cError( cErrorType.not_numeric );
         else
-            return new CNumber( Math.exp( mue + sigma * ( gaussinv( x ) ) ) );
+            return new cNumber( Math.exp( mue + sigma * ( gaussinv( x ) ) ) );
     }
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 );
     }
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElement( 0 );
     }
 
-    if ( arg2 instanceof CArea || arg2 instanceof CArea3D ) {
+    if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
         arg2 = arg2.cross( arguments[1].first );
     }
-    else if ( arg2 instanceof CArray ) {
+    else if ( arg2 instanceof cArray ) {
         arg2 = arg2.getElement( 0 );
     }
 
@@ -2273,9 +2273,9 @@ cLOGINV.prototype.Calculate = function ( arg ) {
     arg1 = arg1.tocNumber();
     arg2 = arg2.tocNumber();
 
-    if ( arg0 instanceof CError ) return this.value = arg0;
-    if ( arg1 instanceof CError ) return this.value = arg1;
-    if ( arg2 instanceof CError ) return this.value = arg2;
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = arg1;
+    if ( arg2 instanceof cError ) return this.value = arg2;
 
     return this.value = loginv( arg0.getValue(), arg1.getValue(), arg2.getValue() );
 }
@@ -2311,29 +2311,29 @@ cLOGNORMDIST.prototype.Calculate = function ( arg ) {
 
     function normdist( x, mue, sigma ) {
         if ( sigma <= 0 || x <= 0 )
-            return new CError( cErrorType.not_numeric );
+            return new cError( cErrorType.not_numeric );
         else
-            return new CNumber( 0.5 + gauss( (Math.ln( x ) - mue) / sigma ) );
+            return new cNumber( 0.5 + gauss( (Math.ln( x ) - mue) / sigma ) );
     }
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 );
     }
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElement( 0 );
     }
 
-    if ( arg2 instanceof CArea || arg2 instanceof CArea3D ) {
+    if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
         arg2 = arg2.cross( arguments[1].first );
     }
-    else if ( arg2 instanceof CArray ) {
+    else if ( arg2 instanceof cArray ) {
         arg2 = arg2.getElement( 0 );
     }
 
@@ -2341,9 +2341,9 @@ cLOGNORMDIST.prototype.Calculate = function ( arg ) {
     arg1 = arg1.tocNumber();
     arg2 = arg2.tocNumber();
 
-    if ( arg0 instanceof CError ) return this.value = arg0;
-    if ( arg1 instanceof CError ) return this.value = arg1;
-    if ( arg2 instanceof CError ) return this.value = arg2;
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = arg1;
+    if ( arg2 instanceof cError ) return this.value = arg2;
 
     return this.value = normdist( arg0.getValue(), arg1.getValue(), arg2.getValue() );
 }
@@ -2377,53 +2377,53 @@ cMAX.prototype.Calculate = function ( arg ) {
     var argI, argIVal, max = Number.NEGATIVE_INFINITY;
     for ( var i = 0; i < this.argumentsCurrent; i++ ) {
         argI = arg[i], argIVal = argI.getValue();
-        if ( argI instanceof CRef || argI instanceof CRef3D ) {
-            if ( argIVal instanceof CError )
+        if ( argI instanceof cRef || argI instanceof cRef3D ) {
+            if ( argIVal instanceof cError )
                 return this.value = argIVal;
-            if ( argIVal instanceof CNumber || argIVal instanceof CBool || argIVal instanceof CEmpty ) {
+            if ( argIVal instanceof cNumber || argIVal instanceof cBool || argIVal instanceof cEmpty ) {
                 var v = argIVal.tocNumber();
                 if ( v.getValue() > max )
                     max = v.getValue();
             }
         }
-        else if ( argI instanceof CArea || argI instanceof CArea3D ) {
+        else if ( argI instanceof cArea || argI instanceof cArea3D ) {
             var argArr = argI.getValue();
             for ( var j = 0; j < argArr.length; j++ ) {
-                if ( argArr[j] instanceof CNumber || argArr[j] instanceof CBool || argArr[j] instanceof CEmpty ) {
+                if ( argArr[j] instanceof cNumber || argArr[j] instanceof cBool || argArr[j] instanceof cEmpty ) {
                     var v = argArr[j].tocNumber();
                     if ( v.getValue() > max )
                         max = v.getValue();
                 }
-                else if ( argArr[j] instanceof CError ) {
+                else if ( argArr[j] instanceof cError ) {
                     return this.value = argArr[j];
                 }
             }
         }
-        else if ( argI instanceof CError )
+        else if ( argI instanceof cError )
             return this.value = argI;
-        else if ( argI instanceof CString ) {
+        else if ( argI instanceof cString ) {
             var v = argI.tocNumber();
-            if ( v instanceof CNumber )
+            if ( v instanceof cNumber )
                 if ( v.getValue() > max )
                     max = v.getValue();
         }
-        else if ( argI instanceof CBool || argI instanceof CEmpty ) {
+        else if ( argI instanceof cBool || argI instanceof cEmpty ) {
             var v = argI.tocNumber();
             if ( v.getValue() > max )
                 max = v.getValue();
         }
-        else if ( argI instanceof CArray ) {
+        else if ( argI instanceof cArray ) {
             argI.foreach( function ( elem ) {
-                if ( elem instanceof CNumber ) {
+                if ( elem instanceof cNumber ) {
                     if ( elem.getValue() > max )
                         max = elem.getValue();
                 }
-                else if ( elem instanceof CError ) {
+                else if ( elem instanceof cError ) {
                     max = elem;
                     return true;
                 }
             } )
-            if ( max instanceof CError ) {
+            if ( max instanceof cError ) {
                 return this.value = max;
             }
         }
@@ -2432,7 +2432,7 @@ cMAX.prototype.Calculate = function ( arg ) {
                 max = argI.getValue();
         }
     }
-    return this.value = ( max.value === Number.NEGATIVE_INFINITY ? new CNumber( 0 ) : new CNumber( max ) );
+    return this.value = ( max.value === Number.NEGATIVE_INFINITY ? new cNumber( 0 ) : new cNumber( max ) );
 };
 cMAX.prototype.getInfo = function () {
     return {
@@ -2464,55 +2464,55 @@ cMAXA.prototype.Calculate = function ( arg ) {
     var argI, argIVal, max = Number.NEGATIVE_INFINITY;
     for ( var i = 0; i < this.argumentsCurrent; i++ ) {
         argI = arg[i], argIVal = argI.getValue();
-        if ( argI instanceof CRef || argI instanceof CRef3D ) {
+        if ( argI instanceof cRef || argI instanceof cRef3D ) {
 
-            if ( argIVal instanceof CError )
+            if ( argIVal instanceof cError )
                 return this.value = argIVal;
 
             var v = argIVal.tocNumber();
 
-            if ( v instanceof CNumber && v.getValue() > max )
+            if ( v instanceof cNumber && v.getValue() > max )
                 max = v.getValue();
         }
-        else if ( argI instanceof CArea || argI instanceof CArea3D ) {
+        else if ( argI instanceof cArea || argI instanceof cArea3D ) {
             var argArr = argI.getValue();
             for ( var j = 0; j < argArr.length; j++ ) {
 
-                if ( argArr[j] instanceof CError )
+                if ( argArr[j] instanceof cError )
                     return this.value = argArr[j];
 
                 var v = argArr[j].tocNumber();
 
-                if ( v instanceof CNumber && v.getValue() > max )
+                if ( v instanceof cNumber && v.getValue() > max )
                     max = v.getValue();
             }
         }
-        else if ( argI instanceof CError )
+        else if ( argI instanceof cError )
             return this.value = argI;
-        else if ( argI instanceof CString ) {
+        else if ( argI instanceof cString ) {
             var v = argI.tocNumber();
-            if ( v instanceof CNumber )
+            if ( v instanceof cNumber )
                 if ( v.getValue() > max )
                     max = v.getValue();
         }
-        else if ( argI instanceof CBool || argI instanceof CEmpty ) {
+        else if ( argI instanceof cBool || argI instanceof cEmpty ) {
             var v = argI.tocNumber();
             if ( v.getValue() > max )
                 max = v.getValue();
         }
-        else if ( argI instanceof CArray ) {
+        else if ( argI instanceof cArray ) {
             argI.foreach( function ( elem ) {
-                if ( elem instanceof CError ) {
+                if ( elem instanceof cError ) {
                     max = elem;
                     return true;
                 }
                 elem = elem.tocNumber();
 
-                if ( elem instanceof CNumber && elem.getValue() > max ) {
+                if ( elem instanceof cNumber && elem.getValue() > max ) {
                     max = elem.getValue();
                 }
             } )
-            if ( max instanceof CError ) {
+            if ( max instanceof cError ) {
                 return this.value = max;
             }
         }
@@ -2521,7 +2521,7 @@ cMAXA.prototype.Calculate = function ( arg ) {
                 max = argI.getValue();
         }
     }
-    return this.value = ( max.value === Number.NEGATIVE_INFINITY ? new CNumber( 0 ) : new CNumber( max ) )
+    return this.value = ( max.value === Number.NEGATIVE_INFINITY ? new cNumber( 0 ) : new cNumber( max ) )
 };
 cMAXA.prototype.getInfo = function () {
     return {
@@ -2557,7 +2557,7 @@ cMEDIAN.prototype.Calculate = function ( arg ) {
 
         for ( var i = 0; i < x.length; i++ ) {
             t = x[i].tocNumber();
-            if ( t instanceof  CNumber ) {
+            if ( t instanceof  cNumber ) {
                 medArr.push( t.getValue() )
             }
         }
@@ -2567,12 +2567,12 @@ cMEDIAN.prototype.Calculate = function ( arg ) {
         } );
 
         if ( medArr.length < 1 )
-            return CError( cErrorType.wrong_value_type );
+            return cError( cErrorType.wrong_value_type );
         else {
             if ( medArr.length % 2 )
-                return new CNumber( medArr[(medArr.length - 1) / 2] );
+                return new cNumber( medArr[(medArr.length - 1) / 2] );
             else
-                return new CNumber( (medArr[medArr.length / 2 - 1] + medArr[medArr.length / 2]) / 2 );
+                return new cNumber( (medArr[medArr.length / 2 - 1] + medArr[medArr.length / 2]) / 2 );
         }
     }
 
@@ -2580,31 +2580,31 @@ cMEDIAN.prototype.Calculate = function ( arg ) {
 
     for ( var j = 0; j < this.getArguments(); j++ ) {
 
-        if ( arg[j] instanceof CArea || arg[j] instanceof CArea3D ) {
+        if ( arg[j] instanceof cArea || arg[j] instanceof cArea3D ) {
             arg[j].foreach2( function ( elem ) {
-                if ( elem instanceof  CNumber )
+                if ( elem instanceof  cNumber )
                     arr0.push( elem );
             } );
         }
-        else if ( arg[j] instanceof CRef || arg[j] instanceof CRef3D ) {
+        else if ( arg[j] instanceof cRef || arg[j] instanceof cRef3D ) {
             var a = arg[j].getValue();
-            if ( a instanceof  CNumber )
+            if ( a instanceof  cNumber )
                 arr0.push( a );
         }
-        else if ( arg[j] instanceof CArray ) {
+        else if ( arg[j] instanceof cArray ) {
             arg[j].foreach( function ( elem ) {
-                if ( elem instanceof  CNumber )
+                if ( elem instanceof  cNumber )
                     arr0.push( elem );
             } );
         }
-        else if ( arg[j] instanceof CNumber || arg[j] instanceof CBool ) {
+        else if ( arg[j] instanceof cNumber || arg[j] instanceof cBool ) {
             arr0.push( arg[j].tocNumber() );
         }
-        else if ( arg[j] instanceof CString ) {
+        else if ( arg[j] instanceof cString ) {
             continue;
         }
         else
-            return this.value = CError( cErrorType.wrong_value_type )
+            return this.value = cError( cErrorType.wrong_value_type )
 
     }
     return this.value = median( arr0 );
@@ -2640,54 +2640,54 @@ cMIN.prototype.Calculate = function ( arg ) {
     var argI, argIVal, min = Number.POSITIVE_INFINITY;
     for ( var i = 0; i < this.argumentsCurrent; i++ ) {
         argI = arg[i], argIVal = argI.getValue();
-        if ( argI instanceof CRef || argI instanceof CRef3D ) {
-            if ( argIVal instanceof CError )
+        if ( argI instanceof cRef || argI instanceof cRef3D ) {
+            if ( argIVal instanceof cError )
                 return this.value = argIVal;
-            if ( argIVal instanceof CNumber || argIVal instanceof CBool || argIVal instanceof CEmpty ) {
+            if ( argIVal instanceof cNumber || argIVal instanceof cBool || argIVal instanceof cEmpty ) {
                 var v = argIVal.tocNumber();
                 if ( v.getValue() < min )
                     min = v.getValue();
             }
         }
-        else if ( argI instanceof CArea || argI instanceof CArea3D ) {
+        else if ( argI instanceof cArea || argI instanceof cArea3D ) {
             var argArr = argI.getValue();
             for ( var j = 0; j < argArr.length; j++ ) {
-                if ( argArr[j] instanceof CNumber || argArr[j] instanceof CBool || argArr[j] instanceof CEmpty ) {
+                if ( argArr[j] instanceof cNumber || argArr[j] instanceof cBool || argArr[j] instanceof cEmpty ) {
                     var v = argArr[j].tocNumber();
                     if ( v.getValue() < min )
                         min = v.getValue();
                     continue;
                 }
-                else if ( argArr[j] instanceof CError ) {
+                else if ( argArr[j] instanceof cError ) {
                     return this.value = argArr[j];
                 }
             }
         }
-        else if ( argI instanceof CError )
+        else if ( argI instanceof cError )
             return this.value = argI;
-        else if ( argI instanceof CString ) {
+        else if ( argI instanceof cString ) {
             var v = argI.tocNumber();
-            if ( v instanceof CNumber )
+            if ( v instanceof cNumber )
                 if ( v.getValue() < min )
                     min = v.getValue();
         }
-        else if ( argI instanceof CBool || argI instanceof CEmpty ) {
+        else if ( argI instanceof cBool || argI instanceof cEmpty ) {
             var v = argI.tocNumber();
             if ( v.getValue() < min )
                 min = v.getValue();
         }
-        else if ( argI instanceof CArray ) {
+        else if ( argI instanceof cArray ) {
             argI.foreach( function ( elem ) {
-                if ( elem instanceof CNumber ) {
+                if ( elem instanceof cNumber ) {
                     if ( elem.getValue() < min )
                         min = elem.getValue();
                 }
-                else if ( elem instanceof CError ) {
+                else if ( elem instanceof cError ) {
                     min = elem;
                     return true;
                 }
             } )
-            if ( min instanceof CError ) {
+            if ( min instanceof cError ) {
                 return this.value = min;
             }
         }
@@ -2696,7 +2696,7 @@ cMIN.prototype.Calculate = function ( arg ) {
                 min = argI.getValue();
         }
     }
-    return this.value = ( min.value === Number.POSITIVE_INFINITY ? new CNumber( 0 ) : new CNumber( min ) );
+    return this.value = ( min.value === Number.POSITIVE_INFINITY ? new cNumber( 0 ) : new cNumber( min ) );
 };
 cMIN.prototype.getInfo = function () {
     return {
@@ -2728,57 +2728,57 @@ cMINA.prototype.Calculate = function ( arg ) {
     var argI, argIVal, min = Number.POSITIVE_INFINITY;
     for ( var i = 0; i < this.argumentsCurrent; i++ ) {
         argI = arg[i], argIVal = argI.getValue();
-        if ( argI instanceof CRef || argI instanceof CRef3D ) {
+        if ( argI instanceof cRef || argI instanceof cRef3D ) {
 
-            if ( argIVal instanceof CError )
+            if ( argIVal instanceof cError )
                 return this.value = argIVal;
 
             var v = argIVal.tocNumber();
 
-            if ( v instanceof CNumber && v.getValue() < min )
+            if ( v instanceof cNumber && v.getValue() < min )
                 min = v.getValue();
         }
-        else if ( argI instanceof CArea || argI instanceof CArea3D ) {
+        else if ( argI instanceof cArea || argI instanceof cArea3D ) {
             var argArr = argI.getValue();
             for ( var j = 0; j < argArr.length; j++ ) {
 
-                if ( argArr[j] instanceof CError ) {
+                if ( argArr[j] instanceof cError ) {
                     return this.value = argArr[j];
                 }
 
                 var v = argArr[j].tocNumber();
 
-                if ( v instanceof CNumber && v.getValue() < min )
+                if ( v instanceof cNumber && v.getValue() < min )
                     min = v.getValue();
             }
         }
-        else if ( argI instanceof CError )
+        else if ( argI instanceof cError )
             return this.value = argI;
-        else if ( argI instanceof CString ) {
+        else if ( argI instanceof cString ) {
             var v = argI.tocNumber();
-            if ( v instanceof CNumber )
+            if ( v instanceof cNumber )
                 if ( v.getValue() < min )
                     min = v.getValue();
         }
-        else if ( argI instanceof CBool || argI instanceof CEmpty ) {
+        else if ( argI instanceof cBool || argI instanceof cEmpty ) {
             var v = argI.tocNumber();
             if ( v.getValue() < min )
                 min = v.getValue();
         }
-        else if ( argI instanceof CArray ) {
+        else if ( argI instanceof cArray ) {
             argI.foreach( function ( elem ) {
-                if ( elem instanceof CError ) {
+                if ( elem instanceof cError ) {
                     min = elem;
                     return true;
                 }
 
                 elem = elem.tocNumber();
 
-                if ( elem instanceof CNumber && elem.getValue() < min ) {
+                if ( elem instanceof cNumber && elem.getValue() < min ) {
                     min = elem.getValue();
                 }
             } )
-            if ( min instanceof CError ) {
+            if ( min instanceof cError ) {
                 return this.value = min;
             }
         }
@@ -2787,7 +2787,7 @@ cMINA.prototype.Calculate = function ( arg ) {
                 min = argI.getValue();
         }
     }
-    return this.value = ( min.value === Number.POSITIVE_INFINITY ? new CNumber( 0 ) : new CNumber( min ) );
+    return this.value = ( min.value === Number.POSITIVE_INFINITY ? new cNumber( 0 ) : new cNumber( min ) );
 };
 cMINA.prototype.getInfo = function () {
     return {
@@ -2823,7 +2823,7 @@ cMODE.prototype.Calculate = function ( arg ) {
 
         for ( var i = 0; i < x.length; i++ ) {
             t = x[i].tocNumber();
-            if ( t instanceof  CNumber ) {
+            if ( t instanceof  cNumber ) {
                 medArr.push( t.getValue() )
             }
         }
@@ -2833,7 +2833,7 @@ cMODE.prototype.Calculate = function ( arg ) {
         } );
 
         if ( medArr.length < 1 )
-            return CError( cErrorType.wrong_value_type );
+            return cError( cErrorType.wrong_value_type );
         else {
             var nMaxIndex = 0, nMax = 1, nCount = 1, nOldVal = medArr[0], i;
 
@@ -2854,11 +2854,11 @@ cMODE.prototype.Calculate = function ( arg ) {
                 nMaxIndex = i - 1;
             }
             if ( nMax == 1 && nCount == 1 )
-                return new CError( cErrorType.wrong_value_type );
+                return new cError( cErrorType.wrong_value_type );
             else if ( nMax == 1 )
-                return new CNumber( nOldVal );
+                return new cNumber( nOldVal );
             else
-                return new CNumber( medArr[nMaxIndex] );
+                return new cNumber( medArr[nMaxIndex] );
         }
     }
 
@@ -2866,31 +2866,31 @@ cMODE.prototype.Calculate = function ( arg ) {
 
     for ( var j = 0; j < this.getArguments(); j++ ) {
 
-        if ( arg[j] instanceof CArea || arg[j] instanceof CArea3D ) {
+        if ( arg[j] instanceof cArea || arg[j] instanceof cArea3D ) {
             arg[j].foreach2( function ( elem ) {
-                if ( elem instanceof  CNumber )
+                if ( elem instanceof  cNumber )
                     arr0.push( elem );
             } );
         }
-        else if ( arg[j] instanceof CRef || arg[j] instanceof CRef3D ) {
+        else if ( arg[j] instanceof cRef || arg[j] instanceof cRef3D ) {
             var a = arg[j].getValue();
-            if ( a instanceof  CNumber )
+            if ( a instanceof  cNumber )
                 arr0.push( a );
         }
-        else if ( arg[j] instanceof CArray ) {
+        else if ( arg[j] instanceof cArray ) {
             arg[j].foreach( function ( elem ) {
-                if ( elem instanceof  CNumber )
+                if ( elem instanceof  cNumber )
                     arr0.push( elem );
             } );
         }
-        else if ( arg[j] instanceof CNumber || arg[j] instanceof CBool ) {
+        else if ( arg[j] instanceof cNumber || arg[j] instanceof cBool ) {
             arr0.push( arg[j].tocNumber() );
         }
-        else if ( arg[j] instanceof CString ) {
+        else if ( arg[j] instanceof cString ) {
             continue;
         }
         else
-            return this.value = CError( cErrorType.wrong_value_type )
+            return this.value = cError( cErrorType.wrong_value_type )
 
     }
     return this.value = mode( arr0 );
@@ -2930,29 +2930,29 @@ cNEGBINOMDIST.prototype.Calculate = function ( arg ) {
         r = parseInt( r.getValue() );
         p = p.getValue()
         if ( x < 0 || r < 1 || p < 0 || p > 1 )
-            return new CError( cErrorType.not_numeric );
+            return new cError( cErrorType.not_numeric );
         else
-            return new CNumber( Math.binomCoeff( x + r - 1, r - 1 ) * Math.pow( p, r ) * Math.pow( 1 - p, x ) );
+            return new cNumber( Math.binomCoeff( x + r - 1, r - 1 ) * Math.pow( p, r ) * Math.pow( 1 - p, x ) );
     }
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 );
     }
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElement( 0 );
     }
 
-    if ( arg2 instanceof CArea || arg2 instanceof CArea3D ) {
+    if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
         arg2 = arg2.cross( arguments[1].first );
     }
-    else if ( arg2 instanceof CArray ) {
+    else if ( arg2 instanceof cArray ) {
         arg2 = arg2.getElement( 0 );
     }
 
@@ -2960,9 +2960,9 @@ cNEGBINOMDIST.prototype.Calculate = function ( arg ) {
     arg1 = arg1.tocNumber();
     arg2 = arg2.tocNumber();
 
-    if ( arg0 instanceof CError ) return this.value = arg0;
-    if ( arg1 instanceof CError ) return this.value = arg1;
-    if ( arg2 instanceof CError ) return this.value = arg2;
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = arg1;
+    if ( arg2 instanceof cError ) return this.value = arg2;
 
     return this.value = negbinomdist( arg0, arg1, arg2 );
 
@@ -2999,40 +2999,40 @@ cNORMDIST.prototype.Calculate = function ( arg ) {
 
     function normdist( x, mue, sigma, kum ) {
         if ( sigma <= 0 )
-            return new CError( cErrorType.not_numeric );
+            return new cError( cErrorType.not_numeric );
 
         if ( kum )
-            return new CNumber( integralPhi( (x - mue) / sigma ) );
+            return new cNumber( integralPhi( (x - mue) / sigma ) );
         else
-            return new CNumber( phi( (x - mue) / sigma ) / sigma );
+            return new cNumber( phi( (x - mue) / sigma ) / sigma );
 
     }
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 );
     }
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElement( 0 );
     }
 
-    if ( arg2 instanceof CArea || arg2 instanceof CArea3D ) {
+    if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
         arg2 = arg2.cross( arguments[1].first );
     }
-    else if ( arg2 instanceof CArray ) {
+    else if ( arg2 instanceof cArray ) {
         arg2 = arg2.getElement( 0 );
     }
 
-    if ( arg3 instanceof CArea || arg3 instanceof CArea3D ) {
+    if ( arg3 instanceof cArea || arg3 instanceof cArea3D ) {
         arg3 = arg3.cross( arguments[1].first );
     }
-    else if ( arg3 instanceof CArray ) {
+    else if ( arg3 instanceof cArray ) {
         arg3 = arg3.getElement( 0 );
     }
 
@@ -3041,10 +3041,10 @@ cNORMDIST.prototype.Calculate = function ( arg ) {
     arg2 = arg2.tocNumber();
     arg3 = arg3.tocBool();
 
-    if ( arg0 instanceof CError ) return this.value = arg0;
-    if ( arg1 instanceof CError ) return this.value = arg1;
-    if ( arg2 instanceof CError ) return this.value = arg2;
-    if ( arg3 instanceof CError ) return this.value = arg3;
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = arg1;
+    if ( arg2 instanceof cError ) return this.value = arg2;
+    if ( arg3 instanceof cError ) return this.value = arg3;
 
 
     return this.value = normdist( arg0.getValue(), arg1.getValue(), arg2.getValue(), arg3.toBool() );
@@ -3081,29 +3081,29 @@ cNORMINV.prototype.Calculate = function ( arg ) {
 
     function norminv( x, mue, sigma ) {
         if ( sigma <= 0.0 || x <= 0.0 || x >= 1.0 )
-            return new CError( cErrorType.not_numeric );
+            return new cError( cErrorType.not_numeric );
         else
-            return new CNumber( gaussinv( x ) * sigma + mue );
+            return new cNumber( gaussinv( x ) * sigma + mue );
     }
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 );
     }
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElement( 0 );
     }
 
-    if ( arg2 instanceof CArea || arg2 instanceof CArea3D ) {
+    if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
         arg2 = arg2.cross( arguments[1].first );
     }
-    else if ( arg2 instanceof CArray ) {
+    else if ( arg2 instanceof cArray ) {
         arg2 = arg2.getElement( 0 );
     }
 
@@ -3111,9 +3111,9 @@ cNORMINV.prototype.Calculate = function ( arg ) {
     arg1 = arg1.tocNumber();
     arg2 = arg2.tocNumber();
 
-    if ( arg0 instanceof CError ) return this.value = arg0;
-    if ( arg1 instanceof CError ) return this.value = arg1;
-    if ( arg2 instanceof CError ) return this.value = arg2;
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = arg1;
+    if ( arg2 instanceof cError ) return this.value = arg2;
 
     return this.value = norminv( arg0.getValue(), arg1.getValue(), arg2.getValue() );
 }
@@ -3145,26 +3145,26 @@ function cNORMSDIST() {
 cNORMSDIST.prototype = Object.create( cBaseFunction.prototype )
 cNORMSDIST.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
     arg0 = arg0.tocNumber();
-    if ( arg0 instanceof CError )
+    if ( arg0 instanceof cError )
         return this.value = arg0;
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0.foreach( function ( elem, r, c ) {
-            if ( elem instanceof CNumber ) {
+            if ( elem instanceof cNumber ) {
                 var a = 0.5 + gauss( elem.getValue() )
-                this.array[r][c] = isNaN( a ) ? new CError( cErrorType.not_numeric ) : new CNumber( a );
+                this.array[r][c] = isNaN( a ) ? new cError( cErrorType.not_numeric ) : new cNumber( a );
             }
             else {
-                this.array[r][c] = new CError( cErrorType.wrong_value_type );
+                this.array[r][c] = new cError( cErrorType.wrong_value_type );
             }
         } )
     }
     else {
         var a = 0.5 + gauss( arg0.getValue() );
-        return this.value = isNaN( a ) ? new CError( cErrorType.not_numeric ) : new CNumber( a );
+        return this.value = isNaN( a ) ? new cError( cErrorType.not_numeric ) : new cNumber( a );
     }
     return this.value = arg0;
 }
@@ -3198,32 +3198,32 @@ cNORMSINV.prototype.Calculate = function ( arg ) {
 
     function normsinv( x ) {
         if ( x <= 0.0 || x >= 1.0 )
-            return new CError( cErrorType.not_numeric );
+            return new cError( cErrorType.not_numeric );
         else
-            return new CNumber( gaussinv( x ) );
+            return new cNumber( gaussinv( x ) );
     }
 
     var arg0 = arg[0];
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
     arg0 = arg0.tocNumber();
-    if ( arg0 instanceof CError )
+    if ( arg0 instanceof cError )
         return this.value = arg0;
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0.foreach( function ( elem, r, c ) {
-            if ( elem instanceof CNumber ) {
+            if ( elem instanceof cNumber ) {
                 var a = normsinv( elem.getValue() );
-                this.array[r][c] = isNaN( a ) ? new CError( cErrorType.not_available ) : new CNumber( a );
+                this.array[r][c] = isNaN( a ) ? new cError( cErrorType.not_available ) : new cNumber( a );
             }
             else {
-                this.array[r][c] = new CError( cErrorType.wrong_value_type );
+                this.array[r][c] = new cError( cErrorType.wrong_value_type );
             }
         } )
     }
     else {
         var a = normsinv( arg0.getValue() );
-        return this.value = isNaN( a ) ? new CError( cErrorType.not_available ) : new CNumber( a );
+        return this.value = isNaN( a ) ? new cError( cErrorType.not_available ) : new cNumber( a );
     }
     return this.value = arg0;
 }
@@ -3260,10 +3260,10 @@ cPEARSON.prototype.Calculate = function ( arg ) {
         var sumXDeltaYDelta = 0, sqrXDelta = 0, sqrYDelta = 0, _x = 0, _y = 0, xLength = 0;
 
         if ( x.length != y.length )
-            return new CError( cErrorType.not_available );
+            return new cError( cErrorType.not_available );
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( !( x[i] instanceof CNumber && y[i] instanceof CNumber ) ) {
+            if ( !( x[i] instanceof cNumber && y[i] instanceof cNumber ) ) {
                 continue;
             }
 
@@ -3277,7 +3277,7 @@ cPEARSON.prototype.Calculate = function ( arg ) {
 
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( !( x[i] instanceof CNumber && y[i] instanceof CNumber ) ) {
+            if ( !( x[i] instanceof cNumber && y[i] instanceof cNumber ) ) {
                 continue;
             }
 
@@ -3288,34 +3288,34 @@ cPEARSON.prototype.Calculate = function ( arg ) {
         }
 
         if ( sqrXDelta == 0 || sqrYDelta == 0 )
-            return new CError( cErrorType.division_by_zero );
+            return new cError( cErrorType.division_by_zero );
         else
-            return new CNumber( sumXDeltaYDelta / Math.sqrt( sqrXDelta * sqrYDelta ) );
+            return new cNumber( sumXDeltaYDelta / Math.sqrt( sqrXDelta * sqrYDelta ) );
     }
 
     var arg0 = arg[0], arg1 = arg[1], arr0 = [], arr1 = [];
 
-    if ( arg0 instanceof CArea ) {
+    if ( arg0 instanceof cArea ) {
         arr0 = arg0.getValue();
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0.foreach( function ( elem ) {
             arr0.push( elem );
         } );
     }
     else
-        return this.value = CError( cErrorType.wrong_value_type )
+        return this.value = cError( cErrorType.wrong_value_type )
 
-    if ( arg1 instanceof CArea ) {
+    if ( arg1 instanceof cArea ) {
         arr1 = arg1.getValue();
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1.foreach( function ( elem ) {
             arr1.push( elem );
         } );
     }
     else
-        return this.value = CError( cErrorType.wrong_value_type )
+        return this.value = cError( cErrorType.wrong_value_type )
 
     return this.value = pearson( arr0, arr1 );
 
@@ -3355,13 +3355,13 @@ cPERCENTILE.prototype.Calculate = function ( arg ) {
 
         for ( var i = 0; i < A.length; i++ ) {
             for ( var j = 0; j < A[i].length; j++ ) {
-                if ( A[i][j] instanceof  CError ) {
+                if ( A[i][j] instanceof  cError ) {
                     return A[i][j];
                 }
-                else if ( A[i][j] instanceof CNumber ) {
+                else if ( A[i][j] instanceof cNumber ) {
                     tA.push( A[i][j].getValue() );
                 }
-                else if ( A[i][j] instanceof CBool ) {
+                else if ( A[i][j] instanceof cBool ) {
                     tA.push( A[i][j].tocNumber().getValue() );
                 }
             }
@@ -3373,17 +3373,17 @@ cPERCENTILE.prototype.Calculate = function ( arg ) {
 
         var nSize = tA.length;
         if ( tA.length < 1 || nSize == 0 )
-            return new CError( cErrorType.not_available );
+            return new cError( cErrorType.not_available );
         else {
             if ( nSize == 1 )
-                return new CNumber( tA[0] );
+                return new cNumber( tA[0] );
             else {
                 var nIndex = Math.floor( alpha * (nSize - 1) );
                 var fDiff = alpha * (nSize - 1) - Math.floor( alpha * (nSize - 1) );
                 if ( fDiff == 0.0 )
-                    return new CNumber( tA[nIndex] );
+                    return new cNumber( tA[nIndex] );
                 else {
-                    return new CNumber( tA[nIndex] +
+                    return new cNumber( tA[nIndex] +
                         fDiff * (tA[nIndex + 1] - tA[nIndex]) );
                 }
             }
@@ -3392,26 +3392,26 @@ cPERCENTILE.prototype.Calculate = function ( arg ) {
     }
 
     var arg0 = arg[0], arg1 = arg[1];
-    if ( arg0 instanceof CArea || arg0 instanceof CArray ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArray ) {
         arg0 = arg0.getMatrix();
     }
-    else if ( arg0 instanceof CArea3D ) {
+    else if ( arg0 instanceof cArea3D ) {
         arg0 = arg0.getMatrix()[0];
     }
     else
-        return this.value = new CError( cErrorType.not_available );
+        return this.value = new cError( cErrorType.not_available );
 
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElement( 0 );
     }
 
     arg1 = arg1.tocNumber();
 
-    if ( arg1 instanceof CError ) return this.value = arg1;
+    if ( arg1 instanceof cError ) return this.value = arg1;
 
     return this.value = percentile( arg0, arg1 );
 
@@ -3452,7 +3452,7 @@ cPERCENTRANK.prototype.Calculate = function ( arg ) {
 
         for ( var i = 0; i < A.length; i++ ) {
             t = A[i].tocNumber();
-            if ( t instanceof  CNumber ) {
+            if ( t instanceof  cNumber ) {
                 tA.push( t.getValue() )
             }
         }
@@ -3465,13 +3465,13 @@ cPERCENTRANK.prototype.Calculate = function ( arg ) {
 
         var nSize = tA.length;
         if ( tA.length < 1 || nSize == 0 )
-            return new CError( cErrorType.not_available );
+            return new cError( cErrorType.not_available );
 
         else {
             if ( fNum < tA[0] || fNum > tA[nSize - 1] )
-                return new CError( cErrorType.not_available );
+                return new cError( cErrorType.not_available );
             else if ( nSize == 1 )
-                return new CNumber( 1 )
+                return new cNumber( 1 )
             else {
                 var fRes, nOldCount = 0, fOldVal = tA[0], i;
                 for ( i = 1; i < nSize && tA[i] < fNum; i++ ) {
@@ -3494,48 +3494,48 @@ cPERCENTRANK.prototype.Calculate = function ( arg ) {
                         fRes = ( nOldCount - 1 + fFract ) / (nSize - 1);
                     }
                 }
-                return new CNumber( fRes.toString().substr( 0, fRes.toString().indexOf( "." ) + 1 + k ) - 0 );
+                return new cNumber( fRes.toString().substr( 0, fRes.toString().indexOf( "." ) + 1 + k ) - 0 );
             }
         }
     }
 
-    var arr0 = [], arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new CNumber( 3 );
+    var arr0 = [], arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber( 3 );
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0.foreach2( function ( elem ) {
-            if ( elem instanceof  CNumber )
+            if ( elem instanceof  cNumber )
                 arr0.push( elem );
         } );
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0.foreach( function ( elem ) {
-            if ( elem instanceof  CNumber )
+            if ( elem instanceof  cNumber )
                 arr0.push( elem );
         } );
     }
     else {
-        return this.value = new CError( cErrorType.wrong_value_type );
+        return this.value = new cError( cErrorType.wrong_value_type );
     }
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElement( 0 );
     }
 
-    if ( arg2 instanceof CArea || arg2 instanceof CArea3D ) {
+    if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
         arg2 = arg2.cross( arguments[1].first );
     }
-    else if ( arg2 instanceof CArray ) {
+    else if ( arg2 instanceof cArray ) {
         arg2 = arg2.getElement( 0 );
     }
 
     arg1 = arg1.tocNumber();
     arg2 = arg2.tocNumber();
 
-    if ( arg1 instanceof CError ) return this.value = arg1;
-    if ( arg2 instanceof CError ) return this.value = arg2;
+    if ( arg1 instanceof cError ) return this.value = arg1;
+    if ( arg2 instanceof cError ) return this.value = arg2;
 
     return this.value = percentrank( arr0, arg1, arg2 );
 
@@ -3568,73 +3568,73 @@ function cPERMUT() {
 cPERMUT.prototype = Object.create( cBaseFunction.prototype )
 cPERMUT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
     arg0 = arg0.tocNumber();
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
     arg1 = arg1.tocNumber();
 
-    if ( arg0 instanceof CError ) return this.value = arg0;
-    if ( arg1 instanceof CError ) return this.value = arg1;
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = arg1;
 
-    if ( arg0 instanceof CArray && arg1 instanceof CArray ) {
+    if ( arg0 instanceof cArray && arg1 instanceof cArray ) {
         if ( arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount() ) {
-            return this.value = new CError( cErrorType.not_available );
+            return this.value = new cError( cErrorType.not_available );
         }
         else {
             arg0.foreach( function ( elem, r, c ) {
                 var a = elem,
                     b = arg1.getElementRowCol( r, c );
-                if ( a instanceof CNumber && b instanceof CNumber ) {
-                    this.array[r][c] = new CNumber( Math.permut( a.getValue(), b.getValue() ) );
+                if ( a instanceof cNumber && b instanceof cNumber ) {
+                    this.array[r][c] = new cNumber( Math.permut( a.getValue(), b.getValue() ) );
                 }
                 else
-                    this.array[r][c] = new CError( cErrorType.wrong_value_type );
+                    this.array[r][c] = new cError( cErrorType.wrong_value_type );
             } )
             return this.value = arg0;
         }
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0.foreach( function ( elem, r, c ) {
             var a = elem,
                 b = arg1;
-            if ( a instanceof CNumber && b instanceof CNumber ) {
+            if ( a instanceof cNumber && b instanceof cNumber ) {
 
                 if ( a.getValue() <= 0 || b.getValue() <= 0 || a.getValue() < b.getValue() )
-                    this.array[r][c] = new CError( cErrorType.not_numeric );
+                    this.array[r][c] = new cError( cErrorType.not_numeric );
 
-                this.array[r][c] = new CNumber( Math.permut( a.getValue(), b.getValue() ) );
+                this.array[r][c] = new cNumber( Math.permut( a.getValue(), b.getValue() ) );
             }
             else
-                this.array[r][c] = new CError( cErrorType.wrong_value_type );
+                this.array[r][c] = new cError( cErrorType.wrong_value_type );
         } )
         return this.value = arg0;
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1.foreach( function ( elem, r, c ) {
             var a = arg0,
                 b = elem;
-            if ( a instanceof CNumber && b instanceof CNumber ) {
+            if ( a instanceof cNumber && b instanceof cNumber ) {
 
                 if ( a.getValue() <= 0 || b.getValue() <= 0 || a.getValue() < b.getValue() )
-                    this.array[r][c] = new CError( cErrorType.not_numeric );
+                    this.array[r][c] = new cError( cErrorType.not_numeric );
 
-                this.array[r][c] = new CNumber( Math.permut( a.getValue(), b.getValue() ) );
+                this.array[r][c] = new cNumber( Math.permut( a.getValue(), b.getValue() ) );
             }
             else
-                this.array[r][c] = new CError( cErrorType.wrong_value_type );
+                this.array[r][c] = new cError( cErrorType.wrong_value_type );
         } )
         return this.value = arg1;
     }
 
     if ( arg0.getValue() <= 0 || arg1.getValue() <= 0 || arg0.getValue() < arg1.getValue() )
-        return this.value = new CError( cErrorType.not_numeric );
+        return this.value = new cError( cErrorType.not_numeric );
 
-    return this.value = new CNumber( Math.permut( arg0.getValue(), arg1.getValue() ) );
+    return this.value = new cNumber( Math.permut( arg0.getValue(), arg1.getValue() ) );
 }
 cPERMUT.prototype.getInfo = function () {
     return {
@@ -3673,34 +3673,34 @@ cPOISSON.prototype.Calculate = function ( arg ) {
                 sum += Math.pow( _l, k ) / Math.fact( k );
             }
             sum *= Math.exp( -_l );
-            return new CNumber( sum );
+            return new cNumber( sum );
         }
         else {
-            return new CNumber( Math.exp( -_l ) * Math.pow( _l, _x ) / Math.fact( _x ) );
+            return new cNumber( Math.exp( -_l ) * Math.pow( _l, _x ) / Math.fact( _x ) );
         }
 
     }
 
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 );
     }
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElement( 0 );
     }
 
-    if ( arg2 instanceof CArea || arg2 instanceof CArea3D ) {
+    if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
         arg2 = arg2.cross( arguments[1].first );
     }
-    else if ( arg2 instanceof CArray ) {
+    else if ( arg2 instanceof cArray ) {
         arg2 = arg2.getElement( 0 );
     }
 
@@ -3708,14 +3708,14 @@ cPOISSON.prototype.Calculate = function ( arg ) {
     arg1 = arg1.tocNumber();
     arg2 = arg2.tocBool();
 
-    if ( arg0 instanceof CError ) return this.value = arg0;
-    if ( arg1 instanceof CError ) return this.value = arg1;
-    if ( arg2 instanceof CError ) return this.value = arg2;
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = arg1;
+    if ( arg2 instanceof cError ) return this.value = arg2;
 
     if ( arg0.getValue() < 0 || arg1.getValue() <= 0 )
-        return this.value = new CError( cErrorType.not_numeric );
+        return this.value = new cError( cErrorType.not_numeric );
 
-    return this.value = new CNumber( poisson( arg0, arg1, arg2 ) );
+    return this.value = new cNumber( poisson( arg0, arg1, arg2 ) );
 
 }
 cPOISSON.prototype.getInfo = function () {
@@ -3750,7 +3750,7 @@ cPROB.prototype.Calculate = function ( arg ) {
     function prob( x, p, l, u ) {
         var fUp, fLo;
         fLo = l.getValue();
-        if ( u instanceof CEmpty )
+        if ( u instanceof cEmpty )
             fUp = fLo;
         else
             fUp = u.getValue();
@@ -3765,13 +3765,13 @@ cPROB.prototype.Calculate = function ( arg ) {
 
         if ( nC1 != nC2 || nR1 != nR2 || nC1 == 0 || nR1 == 0 ||
             nC2 == 0 || nR2 == 0 )
-            return new CError( cErrorType.not_available );
+            return new cError( cErrorType.not_available );
         else {
             var fSum = 0,
                 fRes = 0, bStop = false, fP, fW;
             for ( var i = 0; i < nR1 && !bStop; i++ ) {
                 for ( var j = 0; j < nC1 && !bStop; j++ ) {
-                    if ( x[i][j] instanceof CNumber && p[i][j] instanceof CNumber ) {
+                    if ( x[i][j] instanceof cNumber && p[i][j] instanceof cNumber ) {
                         fP = p[i][j].getValue();
                         fW = x[i][j].getValue();
                         if ( fP < 0.0 || fP > 1.0 )
@@ -3783,57 +3783,57 @@ cPROB.prototype.Calculate = function ( arg ) {
                         }
                     }
                     else
-                        return new CError( cErrorType.not_available );
+                        return new cError( cErrorType.not_available );
                 }
 
             }
             if ( bStop || Math.abs( fSum - 1.0 ) > 1.0E-7 )
-                return new CError( cErrorType.not_available );
+                return new cError( cErrorType.not_available );
             else
-                return new CNumber( fRes );
+                return new cNumber( fRes );
         }
     }
 
-    var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3] ? arg[3] : new CEmpty();
-    if ( arg0 instanceof CArea || arg0 instanceof CArray ) {
+    var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3] ? arg[3] : new cEmpty();
+    if ( arg0 instanceof cArea || arg0 instanceof cArray ) {
         arg0 = arg0.getMatrix();
     }
-    else if ( arg0 instanceof CArea3D ) {
+    else if ( arg0 instanceof cArea3D ) {
         arg0 = arg0.getMatrix()[0];
     }
     else
-        return this.value = new CError( cErrorType.not_available );
+        return this.value = new cError( cErrorType.not_available );
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArray ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArray ) {
         arg1 = arg1.getMatrix();
     }
-    else if ( arg1 instanceof CArea3D ) {
+    else if ( arg1 instanceof cArea3D ) {
         arg1 = arg1.getMatrix()[0];
     }
     else
-        return this.value = new CError( cErrorType.not_available );
+        return this.value = new cError( cErrorType.not_available );
 
 
-    if ( arg2 instanceof CArea || arg2 instanceof CArea3D ) {
+    if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
         arg2 = arg2.cross( arguments[1].first );
     }
-    else if ( arg2 instanceof CArray ) {
+    else if ( arg2 instanceof cArray ) {
         arg2 = arg2.getElement( 0 );
     }
 
-    if ( arg3 instanceof CArea || arg3 instanceof CArea3D ) {
+    if ( arg3 instanceof cArea || arg3 instanceof cArea3D ) {
         arg3 = arg3.cross( arguments[1].first );
     }
-    else if ( arg3 instanceof CArray ) {
+    else if ( arg3 instanceof cArray ) {
         arg3 = arg3.getElement( 0 );
     }
 
     arg2 = arg2.tocNumber();
-    if ( !arg3 instanceof CEmpty )
+    if ( !arg3 instanceof cEmpty )
         arg3 = arg3.tocNumber();
 
-    if ( arg2 instanceof CError ) return this.value = arg2;
-    if ( arg3 instanceof CError ) return this.value = arg3;
+    if ( arg2 instanceof cError ) return this.value = arg2;
+    if ( arg3 instanceof cError ) return this.value = arg3;
 
     return this.value = prob( arg0, arg1, arg2, arg3 );
 
@@ -3873,13 +3873,13 @@ cQUARTILE.prototype.Calculate = function ( arg ) {
 
         for ( var i = 0; i < A.length; i++ ) {
             for ( var j = 0; j < A[i].length; j++ ) {
-                if ( A[i][j] instanceof  CError ) {
+                if ( A[i][j] instanceof  cError ) {
                     return A[i][j];
                 }
-                else if ( A[i][j] instanceof CNumber ) {
+                else if ( A[i][j] instanceof cNumber ) {
                     tA.push( A[i][j].getValue() );
                 }
-                else if ( A[i][j] instanceof CBool ) {
+                else if ( A[i][j] instanceof cBool ) {
                     tA.push( A[i][j].tocNumber().getValue() );
                 }
             }
@@ -3891,44 +3891,44 @@ cQUARTILE.prototype.Calculate = function ( arg ) {
 
         var nSize = tA.length;
         if ( tA.length < 1 || nSize == 0 )
-            return new CError( cErrorType.not_available );
+            return new cError( cErrorType.not_available );
         else {
             if ( nSize == 1 )
-                return new CNumber( tA[0] );
+                return new cNumber( tA[0] );
             else {
 
                 if ( fFlag < 0.0 || fFlag > 4 )
-                    return new CError( cErrorType.not_numeric );
+                    return new cError( cErrorType.not_numeric );
                 else if ( fFlag == 0.0 )
-                    return new CNumber( tA[0] );
+                    return new cNumber( tA[0] );
                 else if ( fFlag == 1.0 ) {
                     var nIndex = Math.floor( 0.25 * (nSize - 1) ),
                         fDiff = 0.25 * (nSize - 1) - Math.floor( 0.25 * (nSize - 1) );
                     if ( fDiff == 0.0 )
-                        return new CNumber( tA[nIndex] );
+                        return new cNumber( tA[nIndex] );
                     else {
-                        return new CNumber( tA[nIndex] +
+                        return new cNumber( tA[nIndex] +
                             fDiff * (tA[nIndex + 1] - tA[nIndex]) );
                     }
                 }
                 else if ( fFlag == 2.0 ) {
                     if ( nSize % 2 == 0 )
-                        return new CNumber( (tA[nSize / 2 - 1] + tA[nSize / 2]) / 2.0 );
+                        return new cNumber( (tA[nSize / 2 - 1] + tA[nSize / 2]) / 2.0 );
                     else
-                        return new CNumber( tA[(nSize - 1) / 2] );
+                        return new cNumber( tA[(nSize - 1) / 2] );
                 }
                 else if ( fFlag == 3.0 ) {
                     var nIndex = Math.floor( 0.75 * (nSize - 1) ),
                         fDiff = 0.75 * (nSize - 1) - Math.floor( 0.75 * (nSize - 1) );
                     if ( fDiff == 0.0 )
-                        return new CNumber( tA[nIndex] );
+                        return new cNumber( tA[nIndex] );
                     else {
-                        return new CNumber( tA[nIndex] +
+                        return new cNumber( tA[nIndex] +
                             fDiff * (tA[nIndex + 1] - tA[nIndex]) );
                     }
                 }
                 else
-                    return new CNumber( tA[nSize - 1] );
+                    return new cNumber( tA[nSize - 1] );
 
             }
         }
@@ -3936,26 +3936,26 @@ cQUARTILE.prototype.Calculate = function ( arg ) {
     }
 
     var arg0 = arg[0], arg1 = arg[1];
-    if ( arg0 instanceof CArea || arg0 instanceof CArray ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArray ) {
         arg0 = arg0.getMatrix();
     }
-    else if ( arg0 instanceof CArea3D ) {
+    else if ( arg0 instanceof cArea3D ) {
         arg0 = arg0.getMatrix()[0];
     }
     else
-        return this.value = new CError( cErrorType.not_available );
+        return this.value = new cError( cErrorType.not_available );
 
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElement( 0 );
     }
 
     arg1 = arg1.tocNumber();
 
-    if ( arg1 instanceof CError ) return this.value = arg1;
+    if ( arg1 instanceof cError ) return this.value = arg1;
 
     return this.value = quartile( arg0, arg1 );
 
@@ -3998,10 +3998,10 @@ cRSQ.prototype.Calculate = function ( arg ) {
         var sumXDeltaYDelta = 0, sqrXDelta = 0, sqrYDelta = 0, _x = 0, _y = 0, xLength = 0;
 
         if ( x.length != y.length )
-            return new CError( cErrorType.not_available );
+            return new cError( cErrorType.not_available );
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( !( x[i] instanceof CNumber && y[i] instanceof CNumber ) ) {
+            if ( !( x[i] instanceof cNumber && y[i] instanceof cNumber ) ) {
                 continue;
             }
 
@@ -4015,7 +4015,7 @@ cRSQ.prototype.Calculate = function ( arg ) {
 
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( !( x[i] instanceof CNumber && y[i] instanceof CNumber ) ) {
+            if ( !( x[i] instanceof cNumber && y[i] instanceof cNumber ) ) {
                 continue;
             }
 
@@ -4026,35 +4026,35 @@ cRSQ.prototype.Calculate = function ( arg ) {
         }
 
         if ( sqrXDelta == 0 || sqrYDelta == 0 )
-            return new CError( cErrorType.division_by_zero );
+            return new cError( cErrorType.division_by_zero );
         else
-            return new CNumber( Math.pow( sumXDeltaYDelta / Math.sqrt( sqrXDelta * sqrYDelta ), 2 ) );
+            return new cNumber( Math.pow( sumXDeltaYDelta / Math.sqrt( sqrXDelta * sqrYDelta ), 2 ) );
     }
 
 
     var arg0 = arg[0], arg1 = arg[1], arr0 = [], arr1 = [];
 
-    if ( arg0 instanceof CArea ) {
+    if ( arg0 instanceof cArea ) {
         arr0 = arg0.getValue();
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0.foreach( function ( elem ) {
             arr0.push( elem );
         } );
     }
     else
-        return this.value = CError( cErrorType.wrong_value_type )
+        return this.value = cError( cErrorType.wrong_value_type )
 
-    if ( arg1 instanceof CArea ) {
+    if ( arg1 instanceof cArea ) {
         arr1 = arg1.getValue();
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1.foreach( function ( elem ) {
             arr1.push( elem );
         } );
     }
     else
-        return this.value = CError( cErrorType.wrong_value_type )
+        return this.value = cError( cErrorType.wrong_value_type )
 
     return this.value = rsq( arr0, arr1 );
 
@@ -4092,7 +4092,7 @@ cSKEW.prototype.Calculate = function ( arg ) {
         var sumSQRDeltaX = 0, _x = 0, xLength = 0, standDev = 0, sumSQRDeltaXDivstandDev = 0;
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( x[i] instanceof CNumber ) {
+            if ( x[i] instanceof cNumber ) {
                 _x += x[i].getValue();
                 xLength++;
             }
@@ -4100,13 +4100,13 @@ cSKEW.prototype.Calculate = function ( arg ) {
         }
 
         if ( xLength <= 2 )
-            return new CError( cErrorType.not_available )
+            return new cError( cErrorType.not_available )
 
         _x /= xLength;
 
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( x[i] instanceof CNumber ) {
+            if ( x[i] instanceof cNumber ) {
                 sumSQRDeltaX += Math.pow( x[i].getValue() - _x, 2 );
             }
 
@@ -4116,13 +4116,13 @@ cSKEW.prototype.Calculate = function ( arg ) {
 
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( x[i] instanceof CNumber ) {
+            if ( x[i] instanceof cNumber ) {
                 sumSQRDeltaXDivstandDev += Math.pow( (x[i].getValue() - _x) / standDev, 3 );
             }
 
         }
 
-        return new CNumber( xLength / (xLength - 1) / (xLength - 2) * sumSQRDeltaXDivstandDev )
+        return new cNumber( xLength / (xLength - 1) / (xLength - 2) * sumSQRDeltaXDivstandDev )
 
     }
 
@@ -4130,31 +4130,31 @@ cSKEW.prototype.Calculate = function ( arg ) {
 
     for ( var j = 0; j < this.getArguments(); j++ ) {
 
-        if ( arg[j] instanceof CArea || arg[j] instanceof CArea3D ) {
+        if ( arg[j] instanceof cArea || arg[j] instanceof cArea3D ) {
             arg[j].foreach2( function ( elem ) {
-                if ( elem instanceof  CNumber )
+                if ( elem instanceof  cNumber )
                     arr0.push( elem );
             } );
         }
-        else if ( arg[j] instanceof CRef || arg[j] instanceof CRef3D ) {
+        else if ( arg[j] instanceof cRef || arg[j] instanceof cRef3D ) {
             var a = arg[j].getValue();
-            if ( a instanceof  CNumber )
+            if ( a instanceof  cNumber )
                 arr0.push( a );
         }
-        else if ( arg[j] instanceof CArray ) {
+        else if ( arg[j] instanceof cArray ) {
             arg[j].foreach( function ( elem ) {
-                if ( elem instanceof  CNumber )
+                if ( elem instanceof  cNumber )
                     arr0.push( elem );
             } );
         }
-        else if ( arg[j] instanceof CNumber || arg[j] instanceof CBool ) {
+        else if ( arg[j] instanceof cNumber || arg[j] instanceof cBool ) {
             arr0.push( arg[j].tocNumber() );
         }
-        else if ( arg[j] instanceof CString ) {
+        else if ( arg[j] instanceof cString ) {
             continue;
         }
         else
-            return this.value = CError( cErrorType.wrong_value_type )
+            return this.value = cError( cErrorType.wrong_value_type )
 
     }
     return this.value = skew( arr0 );
@@ -4193,10 +4193,10 @@ cSLOPE.prototype.Calculate = function ( arg ) {
         var sumXDeltaYDelta = 0, sqrXDelta = 0, _x = 0, _y = 0, xLength = 0;
 
         if ( x.length != y.length )
-            return new CError( cErrorType.not_available );
+            return new cError( cErrorType.not_available );
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( !( x[i] instanceof CNumber && y[i] instanceof CNumber ) ) {
+            if ( !( x[i] instanceof cNumber && y[i] instanceof cNumber ) ) {
                 continue;
             }
 
@@ -4210,7 +4210,7 @@ cSLOPE.prototype.Calculate = function ( arg ) {
 
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( !( x[i] instanceof CNumber && y[i] instanceof CNumber ) ) {
+            if ( !( x[i] instanceof cNumber && y[i] instanceof cNumber ) ) {
                 continue;
             }
 
@@ -4220,35 +4220,35 @@ cSLOPE.prototype.Calculate = function ( arg ) {
         }
 
         if ( sqrXDelta == 0 )
-            return new CError( cErrorType.division_by_zero );
+            return new cError( cErrorType.division_by_zero );
         else
-            return new CNumber( sumXDeltaYDelta / sqrXDelta );
+            return new cNumber( sumXDeltaYDelta / sqrXDelta );
     }
 
 
     var arg0 = arg[0], arg1 = arg[1], arr0 = [], arr1 = [];
 
-    if ( arg0 instanceof CArea ) {
+    if ( arg0 instanceof cArea ) {
         arr0 = arg0.getValue();
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0.foreach( function ( elem ) {
             arr0.push( elem );
         } );
     }
     else
-        return this.value = CError( cErrorType.wrong_value_type )
+        return this.value = cError( cErrorType.wrong_value_type )
 
-    if ( arg1 instanceof CArea ) {
+    if ( arg1 instanceof cArea ) {
         arr1 = arg1.getValue();
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1.foreach( function ( elem ) {
             arr1.push( elem );
         } );
     }
     else
-        return this.value = CError( cErrorType.wrong_value_type )
+        return this.value = cError( cErrorType.wrong_value_type )
 
     return this.value = slope( arr0, arr1 );
 
@@ -4288,13 +4288,13 @@ cSMALL.prototype.Calculate = function ( arg ) {
 
         for ( var i = 0; i < A.length; i++ ) {
             for ( var j = 0; j < A[i].length; j++ ) {
-                if ( A[i][j] instanceof  CError ) {
+                if ( A[i][j] instanceof  cError ) {
                     return A[i][j];
                 }
-                else if ( A[i][j] instanceof CNumber ) {
+                else if ( A[i][j] instanceof cNumber ) {
                     tA.push( A[i][j].getValue() );
                 }
-                else if ( A[i][j] instanceof CBool ) {
+                else if ( A[i][j] instanceof cBool ) {
                     tA.push( A[i][j].tocNumber().getValue() );
                 }
             }
@@ -4305,32 +4305,32 @@ cSMALL.prototype.Calculate = function ( arg ) {
         } )
 
         if ( k.getValue() > tA.length || k.getValue() <= 0 )
-            return new CError( cErrorType.not_available );
+            return new cError( cErrorType.not_available );
         else
-            return new CNumber( tA[k.getValue() - 1] );
+            return new cNumber( tA[k.getValue() - 1] );
     }
 
     var arg0 = arg[0], arg1 = arg[1];
-    if ( arg0 instanceof CArea || arg0 instanceof CArray ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArray ) {
         arg0 = arg0.getMatrix();
     }
-    else if ( arg0 instanceof CArea3D ) {
+    else if ( arg0 instanceof cArea3D ) {
         arg0 = arg0.getMatrix()[0];
     }
     else
-        return this.value = new CError( cErrorType.not_available );
+        return this.value = new cError( cErrorType.not_available );
 
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElement( 0 );
     }
 
     arg1 = arg1.tocNumber();
 
-    if ( arg1 instanceof CError ) return this.value = arg1;
+    if ( arg1 instanceof cError ) return this.value = arg1;
 
     return this.value = frequency( arg0, arg1 );
 
@@ -4367,29 +4367,29 @@ cSTANDARDIZE.prototype.Calculate = function ( arg ) {
 
     function standardize( x, mue, sigma ) {
         if ( sigma <= 0.0 )
-            return new CError( cErrorType.not_numeric );
+            return new cError( cErrorType.not_numeric );
         else
-            return new CNumber( (x - mue) / sigma );
+            return new cNumber( (x - mue) / sigma );
     }
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 );
     }
 
-    if ( arg1 instanceof CArea || arg1 instanceof CArea3D ) {
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
         arg1 = arg1.cross( arguments[1].first );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1 = arg1.getElement( 0 );
     }
 
-    if ( arg2 instanceof CArea || arg2 instanceof CArea3D ) {
+    if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
         arg2 = arg2.cross( arguments[1].first );
     }
-    else if ( arg2 instanceof CArray ) {
+    else if ( arg2 instanceof cArray ) {
         arg2 = arg2.getElement( 0 );
     }
 
@@ -4397,9 +4397,9 @@ cSTANDARDIZE.prototype.Calculate = function ( arg ) {
     arg1 = arg1.tocNumber();
     arg2 = arg2.tocNumber();
 
-    if ( arg0 instanceof CError ) return this.value = arg0;
-    if ( arg1 instanceof CError ) return this.value = arg1;
-    if ( arg2 instanceof CError ) return this.value = arg2;
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = arg1;
+    if ( arg2 instanceof cError ) return this.value = arg2;
 
     return this.value = standardize( arg0.getValue(), arg1.getValue(), arg2.getValue() );
 }
@@ -4431,32 +4431,32 @@ function cSTDEV() {
 }
 cSTDEV.prototype = Object.create( cBaseFunction.prototype )
 cSTDEV.prototype.Calculate = function ( arg ) {
-    var count = 0, sum = new CNumber( 0 ), member = [];
+    var count = 0, sum = new cNumber( 0 ), member = [];
     for ( var i = 0; i < arg.length; i++ ) {
         var _arg = arg[i];
-        if ( _arg instanceof CRef || _arg instanceof CRef3D ) {
+        if ( _arg instanceof cRef || _arg instanceof cRef3D ) {
             var _argV = _arg.getValue();
-            if ( _argV instanceof CNumber ) {
+            if ( _argV instanceof cNumber ) {
                 member.push( _argV );
                 sum = _func[sum.type][_argV.type]( sum, _argV, "+" );
                 count++;
             }
         }
-        else if ( _arg instanceof CArea || _arg instanceof CArea3D ) {
+        else if ( _arg instanceof cArea || _arg instanceof cArea3D ) {
             var _argAreaValue = _arg.getValue();
             for ( var j = 0; j < _argAreaValue.length; j++ ) {
                 var __arg = _argAreaValue[j];
-                if ( __arg instanceof CNumber ) {
+                if ( __arg instanceof cNumber ) {
                     member.push( __arg );
                     sum = _func[sum.type][__arg.type]( sum, __arg, "+" );
                     count++;
                 }
             }
         }
-        else if ( _arg instanceof CArray ) {
+        else if ( _arg instanceof cArray ) {
             _arg.foreach( function ( elem ) {
                 var e = elem.tocNumber();
-                if ( e instanceof CNumber ) {
+                if ( e instanceof cNumber ) {
                     member.push( e );
                     sum = _func[sum.type][e.type]( sum, e, "+" );
                     count++;
@@ -4465,7 +4465,7 @@ cSTDEV.prototype.Calculate = function ( arg ) {
         }
         else {
             _arg = _arg.tocNumber();
-            if ( _arg instanceof CNumber ) {
+            if ( _arg instanceof cNumber ) {
                 member.push( _arg );
                 sum = _func[sum.type][_arg.type]( sum, _arg, "+" );
                 count++;
@@ -4477,7 +4477,7 @@ cSTDEV.prototype.Calculate = function ( arg ) {
         av = member[i] - average;
         res += av * av;
     }
-    return this.value = new CNumber( Math.sqrt( res / (count - 1) ) );
+    return this.value = new cNumber( Math.sqrt( res / (count - 1) ) );
 };
 cSTDEV.prototype.getInfo = function () {
     return {
@@ -4507,32 +4507,32 @@ function cSTDEVA() {
 }
 cSTDEVA.prototype = Object.create( cBaseFunction.prototype )
 cSTDEVA.prototype.Calculate = function ( arg ) {
-    var count = 0, sum = new CNumber( 0 ), member = [];
+    var count = 0, sum = new cNumber( 0 ), member = [];
     for ( var i = 0; i < arg.length; i++ ) {
         var _arg = arg[i];
-        if ( _arg instanceof CRef || _arg instanceof CRef3D ) {
+        if ( _arg instanceof cRef || _arg instanceof cRef3D ) {
             var _argV = _arg.getValue().tocNumber();
-            if ( _argV instanceof CNumber ) {
+            if ( _argV instanceof cNumber ) {
                 member.push( _argV );
                 sum = _func[sum.type][_argV.type]( sum, _argV, "+" );
                 count++;
             }
         }
-        else if ( _arg instanceof CArea || _arg instanceof CArea3D ) {
+        else if ( _arg instanceof cArea || _arg instanceof cArea3D ) {
             var _argAreaValue = _arg.getValue();
             for ( var j = 0; j < _argAreaValue.length; j++ ) {
                 var __arg = _argAreaValue[j].tocNumber();
-                if ( __arg instanceof CNumber ) {
+                if ( __arg instanceof cNumber ) {
                     member.push( __arg );
                     sum = _func[sum.type][__arg.type]( sum, __arg, "+" );
                     count++;
                 }
             }
         }
-        else if ( _arg instanceof CArray ) {
+        else if ( _arg instanceof cArray ) {
             _arg.foreach( function ( elem ) {
                 var e = elem.tocNumber();
-                if ( e instanceof CNumber ) {
+                if ( e instanceof cNumber ) {
                     member.push( e );
                     sum = _func[sum.type][e.type]( sum, e, "+" );
                     count++;
@@ -4541,7 +4541,7 @@ cSTDEVA.prototype.Calculate = function ( arg ) {
         }
         else {
             _arg = _arg.tocNumber();
-            if ( _arg instanceof CNumber ) {
+            if ( _arg instanceof cNumber ) {
                 member.push( _arg );
                 sum = _func[sum.type][_arg.type]( sum, _arg, "+" );
                 count++;
@@ -4553,7 +4553,7 @@ cSTDEVA.prototype.Calculate = function ( arg ) {
         av = member[i] - average;
         res += av * av;
     }
-    return this.value = new CNumber( Math.sqrt( res / (count - 1) ) );
+    return this.value = new cNumber( Math.sqrt( res / (count - 1) ) );
 };
 cSTDEVA.prototype.getInfo = function () {
     return {
@@ -4586,12 +4586,12 @@ cSTDEVP.prototype.Calculate = function ( arg ) {
         var tA = [], sumSQRDeltaX = 0, _x = 0, xLength = 0;
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( x[i] instanceof CNumber ) {
+            if ( x[i] instanceof cNumber ) {
                 _x += x[i].getValue();
                 tA.push( x[i].getValue() )
                 xLength++;
             }
-            else if( x[i] instanceof  CError ){
+            else if( x[i] instanceof  cError ){
                 return x[i];
             }
 
@@ -4605,7 +4605,7 @@ cSTDEVP.prototype.Calculate = function ( arg ) {
 
         }
 
-        return new CNumber( Math.sqrt( sumSQRDeltaX / xLength ) );
+        return new cNumber( Math.sqrt( sumSQRDeltaX / xLength ) );
 
     }
 
@@ -4613,34 +4613,34 @@ cSTDEVP.prototype.Calculate = function ( arg ) {
 
     for ( var j = 0; j < this.getArguments(); j++ ) {
 
-        if ( arg[j] instanceof CArea || arg[j] instanceof CArea3D ) {
+        if ( arg[j] instanceof cArea || arg[j] instanceof cArea3D ) {
             arg[j].foreach2( function ( elem ) {
-                if ( elem instanceof  CNumber || elem instanceof  CError ){
+                if ( elem instanceof  cNumber || elem instanceof  cError ){
                     arr0.push( elem );
                 }
             } );
         }
-        else if ( arg[j] instanceof CRef || arg[j] instanceof CRef3D ) {
+        else if ( arg[j] instanceof cRef || arg[j] instanceof cRef3D ) {
             var a = arg[j].getValue();
-            if ( a instanceof  CNumber || a instanceof  CError ){
+            if ( a instanceof  cNumber || a instanceof  cError ){
                 arr0.push( a );
             }
         }
-        else if ( arg[j] instanceof CArray ) {
+        else if ( arg[j] instanceof cArray ) {
             arg[j].foreach( function ( elem ) {
-                if ( elem instanceof  CNumber || elem instanceof  CError ){
+                if ( elem instanceof  cNumber || elem instanceof  cError ){
                     arr0.push( elem );
                 }
             } );
         }
-        else if ( arg[j] instanceof CNumber || arg[j] instanceof CBool ) {
+        else if ( arg[j] instanceof cNumber || arg[j] instanceof cBool ) {
             arr0.push( arg[j].tocNumber() );
         }
-        else if ( arg[j] instanceof CString || arg[j] instanceof  CEmpty ) {
-            arr0.push( new CNumber(0) );
+        else if ( arg[j] instanceof cString || arg[j] instanceof  cEmpty ) {
+            arr0.push( new cNumber(0) );
         }
         else
-            return this.value = CError( cErrorType.wrong_value_type )
+            return this.value = cError( cErrorType.wrong_value_type )
 
     }
     return this.value = _var( arr0 );
@@ -4676,12 +4676,12 @@ cSTDEVPA.prototype.Calculate = function ( arg ) {
         var tA = [], sumSQRDeltaX = 0, _x = 0, xLength = 0;
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( x[i] instanceof CNumber ) {
+            if ( x[i] instanceof cNumber ) {
                 _x += x[i].getValue();
                 tA.push( x[i].getValue() )
                 xLength++;
             }
-            else if( x[i] instanceof  CError ){
+            else if( x[i] instanceof  cError ){
                 return x[i];
             }
 
@@ -4695,7 +4695,7 @@ cSTDEVPA.prototype.Calculate = function ( arg ) {
 
         }
 
-        return new CNumber( Math.sqrt( sumSQRDeltaX / xLength ) );
+        return new cNumber( Math.sqrt( sumSQRDeltaX / xLength ) );
 
     }
 
@@ -4703,52 +4703,52 @@ cSTDEVPA.prototype.Calculate = function ( arg ) {
 
     for ( var j = 0; j < this.getArguments(); j++ ) {
 
-        if ( arg[j] instanceof CArea || arg[j] instanceof CArea3D ) {
+        if ( arg[j] instanceof cArea || arg[j] instanceof cArea3D ) {
             arg[j].foreach2( function ( elem ) {
-                if ( elem instanceof  CNumber || elem instanceof  CError ){
+                if ( elem instanceof  cNumber || elem instanceof  cError ){
                     arr0.push( elem );
                 }
-                else if ( elem instanceof  CBool ) {
+                else if ( elem instanceof  cBool ) {
                     arr0.push( elem.tocNumber() );
                 }
                 else{
-                    arr0.push( new CNumber(0) );
+                    arr0.push( new cNumber(0) );
                 }
             } );
         }
-        else if ( arg[j] instanceof CRef || arg[j] instanceof CRef3D ) {
+        else if ( arg[j] instanceof cRef || arg[j] instanceof cRef3D ) {
             var a = arg[j].getValue();
-            if ( a instanceof  CNumber || a instanceof  CError ){
+            if ( a instanceof  cNumber || a instanceof  cError ){
                 arr0.push( a );
             }
-            else if ( a instanceof  CBool ) {
+            else if ( a instanceof  cBool ) {
                 arr0.push( a.tocNumber() );
             }
             else{
-                arr0.push( new CNumber(0) );
+                arr0.push( new cNumber(0) );
             }
         }
-        else if ( arg[j] instanceof CArray ) {
+        else if ( arg[j] instanceof cArray ) {
             arg[j].foreach( function ( elem ) {
-                if ( elem instanceof  CNumber || elem instanceof  CError ){
+                if ( elem instanceof  cNumber || elem instanceof  cError ){
                     arr0.push( elem );
                 }
-                else if ( elem instanceof  CBool ) {
+                else if ( elem instanceof  cBool ) {
                     arr0.push( elem.tocNumber() );
                 }
                 else{
-                    arr0.push( new CNumber(0) );
+                    arr0.push( new cNumber(0) );
                 }
             } );
         }
-        else if ( arg[j] instanceof CNumber || arg[j] instanceof CBool ) {
+        else if ( arg[j] instanceof cNumber || arg[j] instanceof cBool ) {
             arr0.push( arg[j].tocNumber() );
         }
-        else if ( arg[j] instanceof CString || arg[j] instanceof  CEmpty ) {
-            arr0.push( new CNumber(0) );
+        else if ( arg[j] instanceof cString || arg[j] instanceof  cEmpty ) {
+            arr0.push( new cNumber(0) );
         }
         else
-            return this.value = CError( cErrorType.wrong_value_type )
+            return this.value = cError( cErrorType.wrong_value_type )
 
     }
     return this.value = _var( arr0 );
@@ -4784,10 +4784,10 @@ cSTEYX.prototype.Calculate = function ( arg ) {
         var sumXDeltaYDelta = 0, sqrXDelta = 0, sqrYDelta = 0, _x = 0, _y = 0, xLength = 0;
 
         if ( x.length != y.length )
-            return new CError( cErrorType.not_available );
+            return new cError( cErrorType.not_available );
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( !( x[i] instanceof CNumber && y[i] instanceof CNumber ) ) {
+            if ( !( x[i] instanceof cNumber && y[i] instanceof cNumber ) ) {
                 continue;
             }
 
@@ -4801,7 +4801,7 @@ cSTEYX.prototype.Calculate = function ( arg ) {
 
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( !( x[i] instanceof CNumber && y[i] instanceof CNumber ) ) {
+            if ( !( x[i] instanceof cNumber && y[i] instanceof cNumber ) ) {
                 continue;
             }
 
@@ -4814,35 +4814,35 @@ cSTEYX.prototype.Calculate = function ( arg ) {
 
 
         if ( sqrXDelta == 0 || sqrYDelta == 0 || xLength < 3 )
-            return new CError( cErrorType.division_by_zero );
+            return new cError( cErrorType.division_by_zero );
         else
-            return new CNumber( Math.sqrt( (1/(xLength-2)) * (sqrYDelta - sumXDeltaYDelta * sumXDeltaYDelta / sqrXDelta) ) );
+            return new cNumber( Math.sqrt( (1/(xLength-2)) * (sqrYDelta - sumXDeltaYDelta * sumXDeltaYDelta / sqrXDelta) ) );
     }
 
 
     var arg0 = arg[0], arg1 = arg[1], arr0 = [], arr1 = [];
 
-    if ( arg0 instanceof CArea ) {
+    if ( arg0 instanceof cArea ) {
         arr0 = arg0.getValue();
     }
-    else if ( arg0 instanceof CArray ) {
+    else if ( arg0 instanceof cArray ) {
         arg0.foreach( function ( elem ) {
             arr0.push( elem );
         } );
     }
     else
-        return this.value = CError( cErrorType.wrong_value_type )
+        return this.value = cError( cErrorType.wrong_value_type )
 
-    if ( arg1 instanceof CArea ) {
+    if ( arg1 instanceof cArea ) {
         arr1 = arg1.getValue();
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1.foreach( function ( elem ) {
             arr1.push( elem );
         } );
     }
     else
-        return this.value = CError( cErrorType.wrong_value_type )
+        return this.value = cError( cErrorType.wrong_value_type )
 
     return this.value = steyx( arr0, arr1 );
 
@@ -4905,12 +4905,12 @@ cVAR.prototype.Calculate = function ( arg ) {
         var tA = [], sumSQRDeltaX = 0, _x = 0, xLength = 0;
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( x[i] instanceof CNumber ) {
+            if ( x[i] instanceof cNumber ) {
                 _x += x[i].getValue();
                 tA.push( x[i].getValue() )
                 xLength++;
             }
-            else if( x[i] instanceof  CError ){
+            else if( x[i] instanceof  cError ){
                 return x[i];
             }
 
@@ -4924,7 +4924,7 @@ cVAR.prototype.Calculate = function ( arg ) {
 
         }
 
-        return new CNumber( sumSQRDeltaX / (xLength - 1) )
+        return new cNumber( sumSQRDeltaX / (xLength - 1) )
 
     }
 
@@ -4932,31 +4932,31 @@ cVAR.prototype.Calculate = function ( arg ) {
 
     for ( var j = 0; j < this.getArguments(); j++ ) {
 
-        if ( arg[j] instanceof CArea || arg[j] instanceof CArea3D ) {
+        if ( arg[j] instanceof cArea || arg[j] instanceof cArea3D ) {
             arg[j].foreach2( function ( elem ) {
-                if ( elem instanceof  CNumber )
+                if ( elem instanceof  cNumber )
                     arr0.push( elem );
             } );
         }
-        else if ( arg[j] instanceof CRef || arg[j] instanceof CRef3D ) {
+        else if ( arg[j] instanceof cRef || arg[j] instanceof cRef3D ) {
             var a = arg[j].getValue();
-            if ( a instanceof  CNumber )
+            if ( a instanceof  cNumber )
                 arr0.push( a );
         }
-        else if ( arg[j] instanceof CArray ) {
+        else if ( arg[j] instanceof cArray ) {
             arg[j].foreach( function ( elem ) {
-                if ( elem instanceof  CNumber )
+                if ( elem instanceof  cNumber )
                     arr0.push( elem );
             } );
         }
-        else if ( arg[j] instanceof CNumber || arg[j] instanceof CBool ) {
+        else if ( arg[j] instanceof cNumber || arg[j] instanceof cBool ) {
             arr0.push( arg[j].tocNumber() );
         }
-        else if ( arg[j] instanceof CString || arg[j] instanceof  CEmpty ) {
+        else if ( arg[j] instanceof cString || arg[j] instanceof  cEmpty ) {
             continue;
         }
         else
-            return this.value = CError( cErrorType.wrong_value_type )
+            return this.value = cError( cErrorType.wrong_value_type )
 
     }
     return this.value = _var( arr0 );
@@ -4993,12 +4993,12 @@ cVARA.prototype.Calculate = function ( arg ) {
         var tA = [], sumSQRDeltaX = 0, _x = 0, xLength = 0;
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( x[i] instanceof CNumber ) {
+            if ( x[i] instanceof cNumber ) {
                 _x += x[i].getValue();
                 tA.push( x[i].getValue() )
                 xLength++;
             }
-            else if( x[i] instanceof  CError ){
+            else if( x[i] instanceof  cError ){
                 return x[i];
             }
 
@@ -5012,7 +5012,7 @@ cVARA.prototype.Calculate = function ( arg ) {
 
         }
 
-        return new CNumber( sumSQRDeltaX / (xLength - 1) )
+        return new cNumber( sumSQRDeltaX / (xLength - 1) )
 
     }
 
@@ -5020,52 +5020,52 @@ cVARA.prototype.Calculate = function ( arg ) {
 
     for ( var j = 0; j < this.getArguments(); j++ ) {
 
-        if ( arg[j] instanceof CArea || arg[j] instanceof CArea3D ) {
+        if ( arg[j] instanceof cArea || arg[j] instanceof cArea3D ) {
             arg[j].foreach2( function ( elem ) {
-                if ( elem instanceof  CNumber || elem instanceof  CError ){
+                if ( elem instanceof  cNumber || elem instanceof  cError ){
                     arr0.push( elem );
                 }
-                else if ( elem instanceof  CBool ) {
+                else if ( elem instanceof  cBool ) {
                     arr0.push( elem.tocNumber() );
                 }
                 else{
-                    arr0.push( new CNumber(0) );
+                    arr0.push( new cNumber(0) );
                 }
             } );
         }
-        else if ( arg[j] instanceof CRef || arg[j] instanceof CRef3D ) {
+        else if ( arg[j] instanceof cRef || arg[j] instanceof cRef3D ) {
             var a = arg[j].getValue();
-            if ( a instanceof  CNumber || a instanceof  CError ){
+            if ( a instanceof  cNumber || a instanceof  cError ){
                 arr0.push( a );
             }
-            else if ( a instanceof  CBool ) {
+            else if ( a instanceof  cBool ) {
                 arr0.push( a.tocNumber() );
             }
             else{
-                arr0.push( new CNumber(0) );
+                arr0.push( new cNumber(0) );
             }
         }
-        else if ( arg[j] instanceof CArray ) {
+        else if ( arg[j] instanceof cArray ) {
             arg[j].foreach( function ( elem ) {
-                if ( elem instanceof  CNumber || elem instanceof  CError ){
+                if ( elem instanceof  cNumber || elem instanceof  cError ){
                     arr0.push( elem );
                 }
-                else if ( elem instanceof  CBool ) {
+                else if ( elem instanceof  cBool ) {
                     arr0.push( elem.tocNumber() );
                 }
                 else{
-                    arr0.push( new CNumber(0) );
+                    arr0.push( new cNumber(0) );
                 }
             } );
         }
-        else if ( arg[j] instanceof CNumber || arg[j] instanceof CBool ) {
+        else if ( arg[j] instanceof cNumber || arg[j] instanceof cBool ) {
             arr0.push( arg[j].tocNumber() );
         }
-        else if ( arg[j] instanceof CString || arg[j] instanceof  CEmpty ) {
-            arr0.push( new CNumber(0) );
+        else if ( arg[j] instanceof cString || arg[j] instanceof  cEmpty ) {
+            arr0.push( new cNumber(0) );
         }
         else
-            return this.value = CError( cErrorType.wrong_value_type )
+            return this.value = cError( cErrorType.wrong_value_type )
 
     }
     return this.value = _var( arr0 );
@@ -5101,12 +5101,12 @@ cVARP.prototype.Calculate = function ( arg ) {
         var tA = [], sumSQRDeltaX = 0, _x = 0, xLength = 0;
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( x[i] instanceof CNumber ) {
+            if ( x[i] instanceof cNumber ) {
                 _x += x[i].getValue();
                 tA.push( x[i].getValue() )
                 xLength++;
             }
-            else if( x[i] instanceof  CError ){
+            else if( x[i] instanceof  cError ){
                 return x[i];
             }
 
@@ -5120,7 +5120,7 @@ cVARP.prototype.Calculate = function ( arg ) {
 
         }
 
-        return new CNumber( sumSQRDeltaX / xLength )
+        return new cNumber( sumSQRDeltaX / xLength )
 
     }
 
@@ -5128,34 +5128,34 @@ cVARP.prototype.Calculate = function ( arg ) {
 
     for ( var j = 0; j < this.getArguments(); j++ ) {
 
-        if ( arg[j] instanceof CArea || arg[j] instanceof CArea3D ) {
+        if ( arg[j] instanceof cArea || arg[j] instanceof cArea3D ) {
             arg[j].foreach2( function ( elem ) {
-                if ( elem instanceof  CNumber || elem instanceof  CError ){
+                if ( elem instanceof  cNumber || elem instanceof  cError ){
                     arr0.push( elem );
                 }
             } );
         }
-        else if ( arg[j] instanceof CRef || arg[j] instanceof CRef3D ) {
+        else if ( arg[j] instanceof cRef || arg[j] instanceof cRef3D ) {
             var a = arg[j].getValue();
-            if ( a instanceof  CNumber || a instanceof  CError ){
+            if ( a instanceof  cNumber || a instanceof  cError ){
                 arr0.push( a );
             }
         }
-        else if ( arg[j] instanceof CArray ) {
+        else if ( arg[j] instanceof cArray ) {
             arg[j].foreach( function ( elem ) {
-                if ( elem instanceof  CNumber || elem instanceof  CError ){
+                if ( elem instanceof  cNumber || elem instanceof  cError ){
                     arr0.push( elem );
                 }
                } );
         }
-        else if ( arg[j] instanceof CNumber || arg[j] instanceof CBool ) {
+        else if ( arg[j] instanceof cNumber || arg[j] instanceof cBool ) {
             arr0.push( arg[j].tocNumber() );
         }
-        else if ( arg[j] instanceof CString || arg[j] instanceof  CEmpty ) {
-            arr0.push( new CNumber(0) );
+        else if ( arg[j] instanceof cString || arg[j] instanceof  cEmpty ) {
+            arr0.push( new cNumber(0) );
         }
         else
-            return this.value = CError( cErrorType.wrong_value_type )
+            return this.value = cError( cErrorType.wrong_value_type )
 
     }
     return this.value = _var( arr0 );
@@ -5191,12 +5191,12 @@ cVARPA.prototype.Calculate = function ( arg ) {
         var tA = [], sumSQRDeltaX = 0, _x = 0, xLength = 0;
         for ( var i = 0; i < x.length; i++ ) {
 
-            if ( x[i] instanceof CNumber ) {
+            if ( x[i] instanceof cNumber ) {
                 _x += x[i].getValue();
                 tA.push( x[i].getValue() )
                 xLength++;
             }
-            else if( x[i] instanceof  CError ){
+            else if( x[i] instanceof  cError ){
                 return x[i];
             }
 
@@ -5210,7 +5210,7 @@ cVARPA.prototype.Calculate = function ( arg ) {
 
         }
 
-        return new CNumber( sumSQRDeltaX / xLength );
+        return new cNumber( sumSQRDeltaX / xLength );
 
     }
 
@@ -5218,52 +5218,52 @@ cVARPA.prototype.Calculate = function ( arg ) {
 
     for ( var j = 0; j < this.getArguments(); j++ ) {
 
-        if ( arg[j] instanceof CArea || arg[j] instanceof CArea3D ) {
+        if ( arg[j] instanceof cArea || arg[j] instanceof cArea3D ) {
             arg[j].foreach2( function ( elem ) {
-                if ( elem instanceof  CNumber || elem instanceof  CError ){
+                if ( elem instanceof  cNumber || elem instanceof  cError ){
                     arr0.push( elem );
                 }
-                else if ( elem instanceof  CBool ) {
+                else if ( elem instanceof  cBool ) {
                     arr0.push( elem.tocNumber() );
                 }
                 else{
-                    arr0.push( new CNumber(0) );
+                    arr0.push( new cNumber(0) );
                 }
             } );
         }
-        else if ( arg[j] instanceof CRef || arg[j] instanceof CRef3D ) {
+        else if ( arg[j] instanceof cRef || arg[j] instanceof cRef3D ) {
             var a = arg[j].getValue();
-            if ( a instanceof  CNumber || a instanceof  CError ){
+            if ( a instanceof  cNumber || a instanceof  cError ){
                 arr0.push( a );
             }
-            else if ( a instanceof  CBool ) {
+            else if ( a instanceof  cBool ) {
                 arr0.push( a.tocNumber() );
             }
             else{
-                arr0.push( new CNumber(0) );
+                arr0.push( new cNumber(0) );
             }
         }
-        else if ( arg[j] instanceof CArray ) {
+        else if ( arg[j] instanceof cArray ) {
             arg[j].foreach( function ( elem ) {
-                if ( elem instanceof  CNumber || elem instanceof  CError ){
+                if ( elem instanceof  cNumber || elem instanceof  cError ){
                     arr0.push( elem );
                 }
-                else if ( elem instanceof  CBool ) {
+                else if ( elem instanceof  cBool ) {
                     arr0.push( elem.tocNumber() );
                 }
                 else{
-                    arr0.push( new CNumber(0) );
+                    arr0.push( new cNumber(0) );
                 }
             } );
         }
-        else if ( arg[j] instanceof CNumber || arg[j] instanceof CBool ) {
+        else if ( arg[j] instanceof cNumber || arg[j] instanceof cBool ) {
             arr0.push( arg[j].tocNumber() );
         }
-        else if ( arg[j] instanceof CString || arg[j] instanceof  CEmpty ) {
-            arr0.push( new CNumber(0) );
+        else if ( arg[j] instanceof cString || arg[j] instanceof  cEmpty ) {
+            arr0.push( new cNumber(0) );
         }
         else
-            return this.value = CError( cErrorType.wrong_value_type )
+            return this.value = cError( cErrorType.wrong_value_type )
 
     }
     return this.value = _var( arr0 );

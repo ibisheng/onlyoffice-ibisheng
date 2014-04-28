@@ -54,9 +54,9 @@ var f_2_DIV_PI = 2.0 / Math.PI;
 
 function BesselJ( x, N ) {
     if ( N < 0 ){
-        return new CError( cErrorType.not_numeric );}
+        return new cError( cErrorType.not_numeric );}
     if ( x === 0.0 ){
-        return new CNumber( (N == 0) ? 1 : 0 );}
+        return new cNumber( (N == 0) ? 1 : 0 );}
 
     /*  The algorithm works only for x>0, therefore remember sign. BesselJ
      with integer order N is an even function for even N (means J(-x)=J(x))
@@ -69,9 +69,9 @@ function BesselJ( x, N ) {
     var bAsymptoticPossible = Math.pow( fX, 0.4 ) > N;
     if ( fEstimateIteration > fMaxIteration ) {
         if ( bAsymptoticPossible ){
-            return new CNumber(fSign * Math.sqrt( f_2_DIV_PI / fX ) * Math.cos( fX - N * f_PI_DIV_2 - f_PI_DIV_4 ) );}
+            return new cNumber(fSign * Math.sqrt( f_2_DIV_PI / fX ) * Math.cos( fX - N * f_PI_DIV_2 - f_PI_DIV_4 ) );}
         else{
-            return new CError(cErrorType.not_numeric);}
+            return new cError(cErrorType.not_numeric);}
     }
 
     var epsilon = 1.0e-15; // relative error
@@ -125,15 +125,15 @@ function BesselJ( x, N ) {
     }
     while ( !bHasfound && k <= fMaxIteration );
     if ( bHasfound ){
-        return new CNumber( u * fSign );}
+        return new cNumber( u * fSign );}
     else{
-        return new CError(cErrorType.not_numeric);}// unlikely to happen
+        return new cError(cErrorType.not_numeric);}// unlikely to happen
 }
 
 function BesselI( x, n ) {
     var nMaxIteration = 2000, fXHalf = x / 2, fResult = 0;
     if ( n < 0 ){
-        return new CError( cErrorType.not_numeric );}
+        return new cError( cErrorType.not_numeric );}
 
     /*  Start the iteration without TERM(n,0), which is set here.
 
@@ -175,7 +175,7 @@ function BesselI( x, n ) {
         while ( (Math.abs( fTerm ) > Math.abs( fResult ) * fEpsilon) && (nK < nMaxIteration) );
 
     }
-    return new CNumber( fResult );
+    return new cNumber( fResult );
 }
 
 function Besselk0( fNum ) {
@@ -239,7 +239,7 @@ function BesselK( fNum, nOrder ) {
 
 function Bessely0( fX ) {
     if ( fX <= 0 )
-        return new CError( cErrorType.not_numeric );
+        return new cError( cErrorType.not_numeric );
     var fMaxIteration = 9000000; // should not be reached
     if ( fX > 5.0e+6 ) // iteration is not considerable better then approximation
         return Math.sqrt( 1 / Math.PI / fX ) * (Math.sin( fX ) - Math.cos( fX ));
@@ -274,14 +274,14 @@ function Bessely0( fX ) {
     if ( bHasFound )
         return u * f_2_DIV_PI;
     else
-        return new CError( cErrorType.not_numeric );
+        return new cError( cErrorType.not_numeric );
 }
 
 // See #i31656# for a commented version of this implementation, attachment #desc6
 // http://www.openoffice.org/nonav/issues/showattachment.cgi/63609/Comments%20to%20the%20implementation%20of%20the%20Bessel%20functions.odt
 function Bessely1( fX ) {
     if ( fX <= 0 )
-        return new CError( cErrorType.not_numeric );
+        return new cError( cErrorType.not_numeric );
     var fMaxIteration = 9000000; // should not be reached
     if ( fX > 5e+6 ) // iteration is not considerable better then approximation
         return -Math.sqrt( 1 / Math.PI / fX ) * (Math.sin( fX ) + Math.cos( fX ));
@@ -320,7 +320,7 @@ function Bessely1( fX ) {
     if ( bHasFound )
         return -u * 2 / Math.PI;
     else
-        return new CError( cErrorType.not_numeric );
+        return new cError( cErrorType.not_numeric );
 }
 
 function BesselY( fNum, nOrder ) {

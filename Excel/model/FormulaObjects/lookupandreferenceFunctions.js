@@ -55,42 +55,42 @@ cADDRESS.prototype.Calculate = function ( arg ) {
     }
 
     var rowNumber = arg[0], colNumber = arg[1],
-        refType = arg[2] ? arg[2] : new CNumber( 1 ),
-        A1RefType = arg[3] ? arg[3] : new CBool( true ),
-        sheetName = arg[4] ? arg[4] : new CEmpty();
+        refType = arg[2] ? arg[2] : new cNumber( 1 ),
+        A1RefType = arg[3] ? arg[3] : new cBool( true ),
+        sheetName = arg[4] ? arg[4] : new cEmpty();
 
-    if ( rowNumber instanceof CArea || rowNumber instanceof CArea3D ) {
+    if ( rowNumber instanceof cArea || rowNumber instanceof cArea3D ) {
         rowNumber = rowNumber.cross( arguments[1].first );
     }
-    else if ( rowNumber instanceof CArray ) {
+    else if ( rowNumber instanceof cArray ) {
         rowNumber = rowNumber.getElementRowCol( 0, 0 );
     }
 
-    if ( colNumber instanceof CArea || colNumber instanceof CArea3D ) {
+    if ( colNumber instanceof cArea || colNumber instanceof cArea3D ) {
         colNumber = colNumber.cross( arguments[1].first );
     }
-    else if ( colNumber instanceof CArray ) {
+    else if ( colNumber instanceof cArray ) {
         colNumber = colNumber.getElementRowCol( 0, 0 );
     }
 
-    if ( refType instanceof CArea || refType instanceof CArea3D ) {
+    if ( refType instanceof cArea || refType instanceof cArea3D ) {
         refType = refType.cross( arguments[1].first );
     }
-    else if ( refType instanceof CArray ) {
+    else if ( refType instanceof cArray ) {
         refType = refType.getElementRowCol( 0, 0 );
     }
 
-    if ( A1RefType instanceof CArea || A1RefType instanceof CArea3D ) {
+    if ( A1RefType instanceof cArea || A1RefType instanceof cArea3D ) {
         A1RefType = A1RefType.cross( arguments[1].first );
     }
-    else if ( A1RefType instanceof CArray ) {
+    else if ( A1RefType instanceof cArray ) {
         A1RefType = A1RefType.getElementRowCol( 0, 0 );
     }
 
-    if ( sheetName instanceof CArea || sheetName instanceof CArea3D ) {
+    if ( sheetName instanceof cArea || sheetName instanceof cArea3D ) {
         sheetName = sheetName.cross( arguments[1].first );
     }
-    else if ( sheetName instanceof CArray ) {
+    else if ( sheetName instanceof cArray ) {
         sheetName = sheetName.getElementRowCol( 0, 0 );
     }
 
@@ -99,14 +99,14 @@ cADDRESS.prototype.Calculate = function ( arg ) {
     refType = refType.tocNumber();
     A1RefType = A1RefType.tocBool();
 
-    if ( rowNumber instanceof CError ) return this.value = rowNumber;
-    if ( colNumber instanceof CError ) return this.value = colNumber;
-    if ( refType instanceof CError ) return this.value = refType;
-    if ( A1RefType instanceof CError ) return this.value = A1RefType;
-    if ( sheetName instanceof CError ) return this.value = sheetName;
+    if ( rowNumber instanceof cError ) return this.value = rowNumber;
+    if ( colNumber instanceof cError ) return this.value = colNumber;
+    if ( refType instanceof cError ) return this.value = refType;
+    if ( A1RefType instanceof cError ) return this.value = A1RefType;
+    if ( sheetName instanceof cError ) return this.value = sheetName;
 
     if ( refType.getValue() > 4 && refType.getValue() < 1 || rowNumber.getValue() < 1 || colNumber.getValue() < 1 ) {
-        return this.value = new CError( cErrorType.not_numeric );
+        return this.value = new cError( cErrorType.not_numeric );
     }
     var strRef;
     switch ( refType.getValue() ) {
@@ -124,15 +124,15 @@ cADDRESS.prototype.Calculate = function ( arg ) {
             break;
     }
 
-    if ( sheetName instanceof CEmpty ) {
-        return this.value = new CString( strRef );
+    if ( sheetName instanceof cEmpty ) {
+        return this.value = new cString( strRef );
     }
     else {
         if ( !rx_test_ws_name.test( sheetName.toString() ) ) {
-            return this.value = new CString( "'" + sheetName.toString().replace( /'/g, "''" ) + "'" + "!" + strRef );
+            return this.value = new cString( "'" + sheetName.toString().replace( /'/g, "''" ) + "'" + "!" + strRef );
         }
         else {
-            return this.value = new CString( sheetName.toString() + "!" + strRef );
+            return this.value = new cString( sheetName.toString() + "!" + strRef );
         }
     }
 
@@ -171,24 +171,24 @@ cCHOOSE.prototype = Object.create( cBaseFunction.prototype )
 cCHOOSE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
-    if ( arg0 instanceof CArea || arg0 instanceof CArea3D ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
     arg0 = arg0.tocNumber();
 
-    if ( arg0 instanceof CError ) {
+    if ( arg0 instanceof cError ) {
         return this.value = arg0;
     }
 
-    if ( arg0 instanceof CNumber ) {
+    if ( arg0 instanceof cNumber ) {
         if ( arg0.getValue() < 1 || arg0.getValue() > this.getArguments() ) {
-            return this.value = new CError( cErrorType.wrong_value_type );
+            return this.value = new cError( cErrorType.wrong_value_type );
         }
 
         return this.value = arg[arg0.getValue()];
     }
 
-    return this.value = new CError( cErrorType.wrong_value_type );
+    return this.value = new cError( cErrorType.wrong_value_type );
 }
 cCHOOSE.prototype.getInfo = function () {
     return {
@@ -220,27 +220,27 @@ cCOLUMN.prototype.Calculate = function ( arg ) {
     var arg0;
     if ( this.argumentsCurrent == 0 ) {
         arg0 = arguments[1];
-        return this.value = new CNumber( arg0.getFirst().getCol() );
+        return this.value = new cNumber( arg0.getFirst().getCol() );
     }
     arg0 = arg[0];
-    if ( arg0 instanceof CRef || arg0 instanceof CRef3D || arg0 instanceof CArea ) {
+    if ( arg0 instanceof cRef || arg0 instanceof cRef3D || arg0 instanceof cArea ) {
         var range = arg0.getRange();
         if ( range )
-            return this.value = new CNumber( range.getFirst().getCol() );
+            return this.value = new cNumber( range.getFirst().getCol() );
         else
-            return this.value = new CError( cErrorType.bad_reference );
+            return this.value = new cError( cErrorType.bad_reference );
     }
-    else if ( arg0 instanceof CArea3D ) {
+    else if ( arg0 instanceof cArea3D ) {
         var r = arg0.getRange();
         if ( r && r[0] && r[0].getFirst() ) {
-            return this.value = new CNumber( r[0].getFirst().getCol() );
+            return this.value = new cNumber( r[0].getFirst().getCol() );
         }
         else {
-            return this.value = new CError( cErrorType.bad_reference );
+            return this.value = new cError( cErrorType.bad_reference );
         }
     }
     else
-        return this.value = new CError( cErrorType.bad_reference );
+        return this.value = new cError( cErrorType.bad_reference );
 }
 cCOLUMN.prototype.getInfo = function () {
     return {
@@ -270,22 +270,22 @@ function cCOLUMNS() {
 cCOLUMNS.prototype = Object.create( cBaseFunction.prototype )
 cCOLUMNS.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
-    if ( arg0 instanceof CArray ) {
-        return this.value = new CNumber( arg0.getCountElementInRow() );
+    if ( arg0 instanceof cArray ) {
+        return this.value = new cNumber( arg0.getCountElementInRow() );
     }
-    else if ( arg0 instanceof CArea || arg0 instanceof CRef || arg0 instanceof CRef3D ) {
+    else if ( arg0 instanceof cArea || arg0 instanceof cRef || arg0 instanceof cRef3D ) {
         var range = arg0.getRange();
-        return this.value = new CNumber( Math.abs( range.getBBox().c1 - range.getBBox().c2 ) + 1 );
+        return this.value = new cNumber( Math.abs( range.getBBox().c1 - range.getBBox().c2 ) + 1 );
     }
-    else if ( arg0 instanceof CArea3D ) {
+    else if ( arg0 instanceof cArea3D ) {
         var range = arg0.getRange();
         if ( range.length > 1 )
-            return this.value = new CError( cErrorType.wrong_value_type );
+            return this.value = new cError( cErrorType.wrong_value_type );
 
-        return this.value = new CNumber( Math.abs( range[0].getBBox().c1 - range[0].getBBox().c2 ) + 1 );
+        return this.value = new cNumber( Math.abs( range[0].getBBox().c1 - range[0].getBBox().c2 ) + 1 );
     }
     else
-        return this.value = new CError( cErrorType.wrong_value_type );
+        return this.value = new cError( cErrorType.wrong_value_type );
 }
 cCOLUMNS.prototype.getInfo = function () {
     return {
@@ -321,20 +321,20 @@ function cHLOOKUP() {
 }
 cHLOOKUP.prototype = Object.create( cBaseFunction.prototype )
 cHLOOKUP.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = this.argumentsCurrent == 4 ? arg[3].tocBool() : new CBool( true );
+    var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = this.argumentsCurrent == 4 ? arg[3].tocBool() : new cBool( true );
     var numberRow = arg2.getValue() - 1, valueForSearching = arg0.getValue(), resC = -1, min, regexp;
 
     if ( isNaN( numberRow ) )
-        return this.value = new CError( cErrorType.bad_reference );
+        return this.value = new cError( cErrorType.bad_reference );
 
     if ( numberRow < 0 )
-        return this.value = new CError( cErrorType.wrong_value_type );
+        return this.value = new cError( cErrorType.wrong_value_type );
 
-    if ( arg0 instanceof CString ) {
+    if ( arg0 instanceof cString ) {
         valueForSearching = arg0.getValue();
         regexp = searchRegExp( valueForSearching );
     }
-    else if ( arg0 instanceof CError )
+    else if ( arg0 instanceof cError )
         return this.value = arg0;
     else {
         valueForSearching = arg0.getValue();
@@ -342,13 +342,13 @@ cHLOOKUP.prototype.Calculate = function ( arg ) {
 
     var found = false, bb;
 
-    if ( arg1 instanceof CRef || arg1 instanceof CRef3D || arg1 instanceof CArea ) {
+    if ( arg1 instanceof cRef || arg1 instanceof cRef3D || arg1 instanceof cArea ) {
         var range = arg1.getRange(), ws = arg1.getWS();
         bb = range.getBBox0();
         if ( numberRow > bb.r2 - bb.r1 )
-            return this.value = new CError( cErrorType.bad_reference );
+            return this.value = new cError( cErrorType.bad_reference );
         var oSearchRange = ws.getRange3(bb.r1, bb.c1, bb.r1, bb.c2);
-        var oCache = g_oHLOOKUPCache.get(oSearchRange, valueForSearching, arg0 instanceof CString, arg3.value);
+        var oCache = g_oHLOOKUPCache.get(oSearchRange, valueForSearching, arg0 instanceof cString, arg3.value);
         if(oCache)
         {
             resC = oCache.index;
@@ -356,14 +356,14 @@ cHLOOKUP.prototype.Calculate = function ( arg ) {
         }
 //        range._foreachColNoEmpty( /*func for col*/ null, /*func for cell in col*/ f );
     }
-    else if ( arg1 instanceof CArea3D ) {
+    else if ( arg1 instanceof cArea3D ) {
         var range = arg1.getRange()[0], ws = arg1.getWS()
         bb = range.getBBox0();
         if ( numberRow > bb.r2 - bb.r1 )
-            return this.value = new CError( cErrorType.bad_reference );
+            return this.value = new cError( cErrorType.bad_reference );
 
         var oSearchRange = ws.getRange3(bb.r1, bb.c1, bb.r1, bb.c2);
-        var oCache = g_oHLOOKUPCache.get(oSearchRange, valueForSearching, arg0 instanceof CString, arg3.value);
+        var oCache = g_oHLOOKUPCache.get(oSearchRange, valueForSearching, arg0 instanceof cString, arg3.value);
         if(oCache)
         {
             resC = oCache.index;
@@ -372,7 +372,7 @@ cHLOOKUP.prototype.Calculate = function ( arg ) {
 
 //        range._foreachColNoEmpty( /*func for col*/ null, /*func for cell in col*/ f );
     }
-    else if ( arg1 instanceof CArray ) {
+    else if ( arg1 instanceof cArray ) {
         arg1.foreach( function ( elem, r, c ) {
             if ( c == 0 )
                 min = elem.getValue();
@@ -387,7 +387,7 @@ cHLOOKUP.prototype.Calculate = function ( arg ) {
                 }
             }
             else {
-                if ( arg0 instanceof CString ) {
+                if ( arg0 instanceof cString ) {
                     if ( regexp.test( elem.getValue() ) )
                         resC = c;
                 }
@@ -400,15 +400,15 @@ cHLOOKUP.prototype.Calculate = function ( arg ) {
         } )
 
         if ( min > valueForSearching ) {
-            return this.value = new CError( cErrorType.not_available );
+            return this.value = new cError( cErrorType.not_available );
         }
 
         if ( resC == -1 ) {
-            return this.value = new CError( cErrorType.not_available );
+            return this.value = new cError( cErrorType.not_available );
         }
 
         if ( numberRow > arg1.getRowCount() - 1 ) {
-            return this.value = new CError( cErrorType.bad_reference );
+            return this.value = new cError( cErrorType.bad_reference );
         }
 
         return this.value = arg1.getElementRowCol( numberRow, resC );
@@ -416,11 +416,11 @@ cHLOOKUP.prototype.Calculate = function ( arg ) {
     }
 
     if ( min > valueForSearching ) {
-        return this.value = new CError( cErrorType.not_available );
+        return this.value = new cError( cErrorType.not_available );
     }
 
     if ( resC == -1 ) {
-        return this.value = new CError( cErrorType.not_available );
+        return this.value = new cError( cErrorType.not_available );
     }
 
     var c = new CellAddress( bb.r1 + numberRow, resC, 0 );
@@ -464,15 +464,15 @@ function cINDEX() {
 cINDEX.prototype = Object.create( cBaseFunction.prototype )
 cINDEX.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0],
-        arg1 = arg[1] && !(arg[1] instanceof CEmpty) ? arg[1] : new CNumber(1),
-        arg2 = arg[2] && !(arg[2] instanceof CEmpty) ? arg[2] : new CNumber(1),
-        arg3 = arg[3] && !(arg[3] instanceof CEmpty) ? arg[3] : new CNumber(1),
+        arg1 = arg[1] && !(arg[1] instanceof cEmpty) ? arg[1] : new cNumber(1),
+        arg2 = arg[2] && !(arg[2] instanceof cEmpty) ? arg[2] : new cNumber(1),
+        arg3 = arg[3] && !(arg[3] instanceof cEmpty) ? arg[3] : new cNumber(1),
         isArrayForm = false, res;
 
-    if( arg0 instanceof CArea3D ){
-        return this.value = new CError( cErrorType.not_available );
+    if( arg0 instanceof cArea3D ){
+        return this.value = new cError( cErrorType.not_available );
     }
-    else if( arg0 instanceof CError ){
+    else if( arg0 instanceof cError ){
         return this.value = arg0;
     }
 
@@ -480,18 +480,18 @@ cINDEX.prototype.Calculate = function ( arg ) {
     arg2 = arg2.tocNumber();
     arg3 = arg3.tocNumber();
 
-    if( arg1 instanceof CError || arg2 instanceof CError || arg3 instanceof CError ){
-        return this.value = new CError( cErrorType.wrong_value_type );
+    if( arg1 instanceof cError || arg2 instanceof cError || arg3 instanceof cError ){
+        return this.value = new cError( cErrorType.wrong_value_type );
     }
 
     if( arg1.getValue() < 0 || arg2.getValue() < 0 ){
-        return this.value = new CError( cErrorType.wrong_value_type );
+        return this.value = new cError( cErrorType.wrong_value_type );
     }
 
-    if( arg0 instanceof CArray ){
+    if( arg0 instanceof cArray ){
         arg0 = arg0.getMatrix();
     }
-    else if( arg0 instanceof CArea ){
+    else if( arg0 instanceof cArea ){
         arg0 = arg0.getMatrix();
     }
     else{
@@ -502,7 +502,7 @@ cINDEX.prototype.Calculate = function ( arg ) {
     if( res )
         res = res[arg2.getValue()-1];
 
-    return this.value = res ? res : new CError( cErrorType.bad_reference );
+    return this.value = res ? res : new cError( cErrorType.bad_reference );
 
 }
 cINDEX.prototype.getInfo = function () {
@@ -532,48 +532,48 @@ function cINDIRECT() {
 }
 cINDIRECT.prototype = Object.create( cBaseFunction.prototype )
 cINDIRECT.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0].tocString(), arg1 = arg[1] ? arg[1] : new CBool( true ), r = arguments[1], wb = r.worksheet.workbook, o = { Formula:"", pCurrPos:0 }, ref, found_operand;
+    var arg0 = arg[0].tocString(), arg1 = arg[1] ? arg[1] : new cBool( true ), r = arguments[1], wb = r.worksheet.workbook, o = { Formula:"", pCurrPos:0 }, ref, found_operand;
 
     function parseReference() {
         if ( (ref = parserHelp.is3DRef.call( o, o.Formula, o.pCurrPos ))[0] ) {
             var _wsFrom = ref[1],
                 _wsTo = ( (ref[2] !== null) && (ref[2] !== undefined) ) ? ref[2] : _wsFrom;
             if ( !(wb.getWorksheetByName( _wsFrom ) && wb.getWorksheetByName( _wsTo )) ) {
-                return this.value = new CError( cErrorType.bad_reference );
+                return this.value = new cError( cErrorType.bad_reference );
             }
             if ( parserHelp.isArea.call( o, o.Formula, o.pCurrPos ) ) {
-                found_operand = new CArea3D( o.operand_str.toUpperCase(), _wsFrom, _wsTo, wb );
+                found_operand = new cArea3D( o.operand_str.toUpperCase(), _wsFrom, _wsTo, wb );
                 if ( o.operand_str.indexOf( "$" ) > -1 )
                     found_operand.isAbsolute = true;
             }
             else if ( parserHelp.isRef.call( o, o.Formula, o.pCurrPos ) ) {
                 if ( _wsTo != _wsFrom ) {
-                    found_operand = new CArea3D( o.operand_str.toUpperCase(), _wsFrom, _wsTo, wb );
+                    found_operand = new cArea3D( o.operand_str.toUpperCase(), _wsFrom, _wsTo, wb );
                 }
                 else {
-                    found_operand = new CRef3D( o.operand_str.toUpperCase(), _wsFrom, wb );
+                    found_operand = new cRef3D( o.operand_str.toUpperCase(), _wsFrom, wb );
                 }
                 if ( o.operand_str.indexOf( "$" ) > -1 )
                     found_operand.isAbsolute = true;
             }
         }
         else if ( parserHelp.isName.call( o, o.Formula, o.pCurrPos, wb )[0] ) {
-            found_operand = new CName( o.operand_str, wb );
+            found_operand = new cName( o.operand_str, wb );
         }
         else if ( parserHelp.isArea.call( o, o.Formula, o.pCurrPos ) ) {
-            found_operand = new CArea( o.operand_str.toUpperCase(), r.worksheet );
+            found_operand = new cArea( o.operand_str.toUpperCase(), r.worksheet );
             if ( o.operand_str.indexOf( "$" ) > -1 )
                 found_operand.isAbsolute = true;
         }
         else if ( parserHelp.isRef.call( o, o.Formula, o.pCurrPos, true ) ) {
-            found_operand = new CRef( o.operand_str.toUpperCase(), r.worksheet );
+            found_operand = new cRef( o.operand_str.toUpperCase(), r.worksheet );
             if ( o.operand_str.indexOf( "$" ) > -1 )
                 found_operand.isAbsolute = true;
         }
     }
 
-    if ( arg0 instanceof CArray ) {
-        var ret = new CArray();
+    if ( arg0 instanceof cArray ) {
+        var ret = new cArray();
         arg0.foreach( function ( elem, r, c ) {
             o = { Formula:elem.toString(), pCurrPos:0 };
             parseReference();
@@ -589,12 +589,12 @@ cINDIRECT.prototype.Calculate = function ( arg ) {
     }
 
     if ( found_operand ) {
-        if ( found_operand instanceof CName )
+        if ( found_operand instanceof cName )
             found_operand = found_operand.toRef();
 
         var cellName = r.getCells()[0].getName(), wsId = r.worksheet.getId();
 
-        if ( (found_operand instanceof CRef || found_operand instanceof CRef3D || found_operand instanceof CArea) && found_operand.isValid() ) {
+        if ( (found_operand instanceof cRef || found_operand instanceof cRef3D || found_operand instanceof cArea) && found_operand.isValid() ) {
             var nFrom = wb.dependencyFormulas.addNode( wsId, cellName ),
                 nTo = wb.dependencyFormulas.addNode( found_operand.getWsId(), found_operand._cells );
 
@@ -602,7 +602,7 @@ cINDIRECT.prototype.Calculate = function ( arg ) {
 
             wb.dependencyFormulas.addEdge2( nFrom, nTo );
         }
-        else if ( found_operand instanceof CArea3D && found_operand.isValid() ) {
+        else if ( found_operand instanceof cArea3D && found_operand.isValid() ) {
             var wsR = found_operand.wsRange();
             for ( var j = 0; j < wsR.length; j++ )
                 wb.dependencyFormulas.addEdge( wsId, cellName.replace( /\$/g, "" ), wsR[j].Id, found_operand._cells.replace( /\$/g, "" ) );
@@ -611,7 +611,7 @@ cINDIRECT.prototype.Calculate = function ( arg ) {
         return this.value = found_operand;
     }
 
-    return this.value = new CError( cErrorType.bad_reference );
+    return this.value = new cError( cErrorType.bad_reference );
 
 }
 cINDIRECT.prototype.getInfo = function () {
@@ -644,10 +644,10 @@ cLOOKUP.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = this.argumentsCurrent == 2 ? arg1 : arg[2],
         resC = -1, resR = -1;
 
-    if ( arg0 instanceof CError ) {
+    if ( arg0 instanceof cError ) {
         return this.value = arg0;
     }
-    if ( arg0 instanceof CRef ) {
+    if ( arg0 instanceof cRef ) {
         arg0 = arg0.tryConvert();
     }
 
@@ -666,42 +666,42 @@ cLOOKUP.prototype.Calculate = function ( arg ) {
         }
     }
 
-    if ( !( arg1 instanceof CArea || arg1 instanceof CArea3D || arg1 instanceof CArray || arg2 instanceof CArea || arg2 instanceof CArea3D || arg2 instanceof CArray) ) {
-        return this.value = new CError( cErrorType.not_available );
+    if ( !( arg1 instanceof cArea || arg1 instanceof cArea3D || arg1 instanceof cArray || arg2 instanceof cArea || arg2 instanceof cArea3D || arg2 instanceof cArray) ) {
+        return this.value = new cError( cErrorType.not_available );
     }
 
-    if ( arg1 instanceof CArray && arg2 instanceof CArray ) {
+    if ( arg1 instanceof cArray && arg2 instanceof cArray ) {
         if ( arg1.getRowCount() != arg2.getRowCount() && arg1.getCountElementInRow() != arg2.getCountElementInRow() ) {
-            return this.value = new CError( cErrorType.not_available );
+            return this.value = new cError( cErrorType.not_available );
         }
 
         arrFinder( arg1 );
 
         if ( resR <= -1 && resC <= -1 || resR <= -2 || resC <= -2 ) {
-            return this.value = new CError( cErrorType.not_available );
+            return this.value = new cError( cErrorType.not_available );
         }
 
         return this.value = arg2.getElementRowCol( resR, resC );
 
     }
-    else if ( arg1 instanceof CArray || arg2 instanceof CArray ) {
+    else if ( arg1 instanceof cArray || arg2 instanceof cArray ) {
 
         var _arg1, _arg2;
 
-        _arg1 = arg1 instanceof CArray ? arg1 : arg2;
+        _arg1 = arg1 instanceof cArray ? arg1 : arg2;
 
-        _arg2 = arg2 instanceof CArray ? arg1 : arg2;
+        _arg2 = arg2 instanceof cArray ? arg1 : arg2;
 
         var BBox = _arg2.getBBox();
 
         if ( _arg1.getRowCount() != (BBox.r2 - BBox.r1) && _arg1.getCountElementInRow() != (BBox.c2 - BBox.c1) ) {
-            return this.value = new CError( cErrorType.not_available );
+            return this.value = new cError( cErrorType.not_available );
         }
 
         arrFinder( _arg1 );
 
         if ( resR <= -1 && resC <= -1 || resR <= -2 || resC <= -2 ) {
-            return this.value = new CError( cErrorType.not_available );
+            return this.value = new cError( cErrorType.not_available );
         }
 
         var c = new CellAddress( BBox.r1 + resR, BBox.c1 + resC )
@@ -712,23 +712,23 @@ cLOOKUP.prototype.Calculate = function ( arg ) {
     else {
         var arg1Range = arg1.getRange(), arg2Range = arg2.getRange();
 
-        if ( arg1 instanceof CArea3D && arg1Range.length > 1 || arg2 instanceof CArea3D && arg2Range.length > 1 )
-            return this.value = new CError( cErrorType.not_available );
+        if ( arg1 instanceof cArea3D && arg1Range.length > 1 || arg2 instanceof cArea3D && arg2Range.length > 1 )
+            return this.value = new cError( cErrorType.not_available );
 
-        if ( arg1 instanceof CArea3D ) {
+        if ( arg1 instanceof cArea3D ) {
             arg1Range = arg1.getMatrix()[0];
 //                    arg1Range = arg1Range[0];
         }
-        else if ( arg1 instanceof CArea ) {
+        else if ( arg1 instanceof cArea ) {
             arg1Range = arg1.getMatrix();
         }
 
 
-        if ( arg2 instanceof CArea3D ) {
+        if ( arg2 instanceof cArea3D ) {
             arg2Range = arg2.getMatrix()[0];
 //                    arg2Range = arg2Range[0];
         }
-        else if ( arg2 instanceof CArea ) {
+        else if ( arg2 instanceof cArea ) {
             arg2Range = arg2.getMatrix();
         }
 
@@ -741,22 +741,22 @@ cLOOKUP.prototype.Calculate = function ( arg ) {
         }() )
 
 
-        if ( index < 0 ) return this.value = new CError( cErrorType.not_available );
+        if ( index < 0 ) return this.value = new cError( cErrorType.not_available );
         if ( this.argumentsCurrent == 2 ) {
             if ( arg1Range[0].length >= 2 ) {
                 var b = arg1.getBBox();
-                return this.value = new CRef( arg1.ws.getCell3( (b.r1 - 1) + index, (b.c1 - 1) + 1 ).getName(), arg1.ws );
+                return this.value = new cRef( arg1.ws.getCell3( (b.r1 - 1) + index, (b.c1 - 1) + 1 ).getName(), arg1.ws );
             }
             else
-                return this.value = new CRef( arg1.ws.getCell3( (b.r1 - 1) + 0, (b.c1 - 1) + index ).getName(), arg1.ws );
+                return this.value = new cRef( arg1.ws.getCell3( (b.r1 - 1) + 0, (b.c1 - 1) + index ).getName(), arg1.ws );
         }
         else {
             var b = arg2.getBBox();
             if ( arg2Range.length == 1 ) {
-                return this.value = new CRef( arg1.ws.getCell3( (b.r1 - 1) + 0, (b.c1 - 1) + index ).getName(), arg1.ws );
+                return this.value = new cRef( arg1.ws.getCell3( (b.r1 - 1) + 0, (b.c1 - 1) + index ).getName(), arg1.ws );
             }
             else
-                return this.value = new CRef( arg1.ws.getCell3( (b.r1 - 1) + index, (b.c1 - 1) + 0 ).getName(), arg1.ws );
+                return this.value = new cRef( arg1.ws.getCell3( (b.r1 - 1) + index, (b.c1 - 1) + 0 ).getName(), arg1.ws );
         }
 
         return this.value = arg2.getValue()[index];
@@ -788,16 +788,16 @@ function cMATCH() {
 }
 cMATCH.prototype = Object.create( cBaseFunction.prototype )
 cMATCH.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new CNumber(1);
+    var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber(1);
 
     function findMatch(a0,a1,a2){
         var a1RowCount = a1.length, a1ColumnCount = a1[0].length,
             a0Value = a0.getValue(), a2Value = a2.getValue(),
-            arr = [], res = new CError( cErrorType.not_available ),
+            arr = [], res = new cError( cErrorType.not_available ),
             index = -1;
 
         if( a1RowCount > 1 && a1ColumnCount > 1 ){
-            return new CError( cErrorType.not_available );
+            return new cError( cErrorType.not_available );
         }
         else if( a1RowCount == 1 && a1ColumnCount > 1 ){
             for(var i = 0; i < a1ColumnCount; i++){
@@ -814,7 +814,7 @@ cMATCH.prototype.Calculate = function ( arg ) {
         }
 
         if( !(a2Value == 1 || a2Value == 0 || a2Value == -1) ){
-            return new CError( cErrorType.not_numeric );
+            return new cError( cErrorType.not_numeric );
         }
 
         if( a2Value == -1 ){
@@ -827,7 +827,7 @@ cMATCH.prototype.Calculate = function ( arg ) {
             }
         }
         else if( a2Value == 0 ){
-            if( a0 instanceof CString ){
+            if( a0 instanceof cString ){
                 for(var i = 0; i<arr.length; i++){
                     if( searchRegExp2(arr[i].toString(),a0Value) ){
                         index = i;
@@ -853,37 +853,37 @@ cMATCH.prototype.Calculate = function ( arg ) {
         }
 
         if( index > -1 )
-            res = new CNumber(index+1);
+            res = new cNumber(index+1);
 
         return res;
 
     }
 
-    if( arg0 instanceof CArea3D || arg0 instanceof CArray || arg0 instanceof CArea ){
-        return this.value = new CError( cErrorType.not_available );
+    if( arg0 instanceof cArea3D || arg0 instanceof cArray || arg0 instanceof cArea ){
+        return this.value = new cError( cErrorType.not_available );
     }
-    else if( arg0 instanceof CError ){
+    else if( arg0 instanceof cError ){
         return this.value = arg0;
     }
 /*    else{
 
     }*/
 
-    if( !(arg1 instanceof CArray || arg1 instanceof CArea) ){
-        return this.value = new CError( cErrorType.not_available );
+    if( !(arg1 instanceof cArray || arg1 instanceof cArea) ){
+        return this.value = new cError( cErrorType.not_available );
     }
     else {
         arg1 = arg1.getMatrix();
     }
 
-    if( arg2 instanceof CNumber || arg2 instanceof CBool ){
+    if( arg2 instanceof cNumber || arg2 instanceof cBool ){
 
     }
-    else if( arg2 instanceof CError ){
+    else if( arg2 instanceof cError ){
         return this.value = arg2;
     }
     else{
-        return this.value = new CError( cErrorType.not_available );
+        return this.value = new cError( cErrorType.not_available );
     }
 
     return this.value = findMatch(arg0,arg1,arg2)
@@ -914,7 +914,7 @@ function cOFFSET() {
 }
 cOFFSET.prototype = Object.create( cBaseFunction.prototype )
 cOFFSET.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3] ? arg[3] : new CNumber(0 ), arg4 = arg[4] ? arg[4] : new CNumber(0);
+    var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3] ? arg[3] : new cNumber(0 ), arg4 = arg[4] ? arg[4] : new cNumber(0);
 
     if(1){}
 
@@ -949,27 +949,27 @@ cROW.prototype.Calculate = function ( arg ) {
     var arg0;
     if ( this.argumentsCurrent == 0 ) {
         arg0 = arguments[1];
-        return this.value = new CNumber( arg0.getFirst().getRow() );
+        return this.value = new cNumber( arg0.getFirst().getRow() );
     }
     arg0 = arg[0];
-    if ( arg0 instanceof CRef || arg0 instanceof CRef3D || arg0 instanceof CArea ) {
+    if ( arg0 instanceof cRef || arg0 instanceof cRef3D || arg0 instanceof cArea ) {
         var range = arg0.getRange();
         if ( range )
-            return this.value = new CNumber( range.getFirst().getRow() );
+            return this.value = new cNumber( range.getFirst().getRow() );
         else
-            return this.value = new CError( cErrorType.bad_reference );
+            return this.value = new cError( cErrorType.bad_reference );
     }
-    else if ( arg0 instanceof CArea3D ) {
+    else if ( arg0 instanceof cArea3D ) {
         var r = arg0.getRange();
         if ( r && r[0] && r[0].getFirst() ) {
-            return this.value = new CNumber( r[0].getFirst().getRow() );
+            return this.value = new cNumber( r[0].getFirst().getRow() );
         }
         else {
-            return this.value = new CError( cErrorType.bad_reference );
+            return this.value = new cError( cErrorType.bad_reference );
         }
     }
     else
-        return this.value = new CError( cErrorType.bad_reference );
+        return this.value = new cError( cErrorType.bad_reference );
 }
 cROW.prototype.getInfo = function () {
     return {
@@ -999,22 +999,22 @@ function cROWS() {
 cROWS.prototype = Object.create( cBaseFunction.prototype )
 cROWS.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
-    if ( arg0 instanceof CArray ) {
-        return this.value = new CNumber( arg0.getRowCount() );
+    if ( arg0 instanceof cArray ) {
+        return this.value = new cNumber( arg0.getRowCount() );
     }
-    else if ( arg0 instanceof CArea || arg0 instanceof CRef || arg0 instanceof CRef3D ) {
+    else if ( arg0 instanceof cArea || arg0 instanceof cRef || arg0 instanceof cRef3D ) {
         var range = arg0.getRange();
-        return this.value = new CNumber( Math.abs( range.getBBox().r1 - range.getBBox().r2 ) + 1 );
+        return this.value = new cNumber( Math.abs( range.getBBox().r1 - range.getBBox().r2 ) + 1 );
     }
-    else if ( arg0 instanceof CArea3D ) {
+    else if ( arg0 instanceof cArea3D ) {
         var range = arg0.getRange();
         if ( range.length > 1 )
-            return this.value = new CError( cErrorType.wrong_value_type );
+            return this.value = new cError( cErrorType.wrong_value_type );
 
-        return this.value = new CNumber( Math.abs( range[0].getBBox().r1 - range[0].getBBox().r2 ) + 1 );
+        return this.value = new cNumber( Math.abs( range[0].getBBox().r1 - range[0].getBBox().r2 ) + 1 );
     }
     else
-        return this.value = new CError( cErrorType.wrong_value_type );
+        return this.value = new cError( cErrorType.wrong_value_type );
 }
 cROWS.prototype.getInfo = function () {
     return {
@@ -1049,7 +1049,7 @@ cTRANSPOSE.prototype.Calculate = function ( arg ) {
 
     function TransposeMatrix( A ) {
 
-        var tMatrix = [], res = new CArray();
+        var tMatrix = [], res = new cArray();
 
         for ( var i = 0; i < A.length; i++ ) {
             for ( var j = 0; j < A[i].length; j++ ) {
@@ -1064,17 +1064,17 @@ cTRANSPOSE.prototype.Calculate = function ( arg ) {
     }
 
     var arg0 = arg[0];
-    if ( arg0 instanceof CArea || arg0 instanceof CArray ) {
+    if ( arg0 instanceof cArea || arg0 instanceof cArray ) {
         arg0 = arg0.getMatrix();
     }
-    else if( arg0 instanceof CNumber || arg0 instanceof CString || arg0 instanceof CBool || arg0 instanceof CRef || arg0 instanceof CRef3D ){
+    else if( arg0 instanceof cNumber || arg0 instanceof cString || arg0 instanceof cBool || arg0 instanceof cRef || arg0 instanceof cRef3D ){
         return this.value = arg0.getValue();
     }
-    else if( arg0 instanceof CError ){
+    else if( arg0 instanceof cError ){
         return this.value = arg0;
     }
     else
-        return this.value = new CError( cErrorType.not_available );
+        return this.value = new cError( cErrorType.not_available );
 
 
     return this.value = TransposeMatrix( arg0 );
@@ -1141,7 +1141,7 @@ VHLOOKUPCache.prototype._calculate = function(cacheArray, valueForSearching, isV
         }
         if ( arg3Value == true ) {
             if ( isValueString ) {
-                if ( cvType instanceof CString ) {
+                if ( cvType instanceof cString ) {
                     if ( valueForSearching.localeCompare( cvType.getValue() ) == 0 ) {
                         res.index = index;
                         found = true;
@@ -1212,23 +1212,23 @@ function cVLOOKUP() {
 }
 cVLOOKUP.prototype = Object.create( cBaseFunction.prototype )
 cVLOOKUP.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = this.argumentsCurrent == 4 ? arg[3].tocBool() : new CBool( true );
+    var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = this.argumentsCurrent == 4 ? arg[3].tocBool() : new cBool( true );
     var numberCol = arg2.getValue() - 1, valueForSearching, resR = -1, min, regexp;
 
     if ( isNaN( numberCol ) )
-        return this.value = new CError( cErrorType.bad_reference );
+        return this.value = new cError( cErrorType.bad_reference );
 
     if ( numberCol < 0 )
-        return this.value = new CError( cErrorType.wrong_value_type );
+        return this.value = new cError( cErrorType.wrong_value_type );
 
-    if ( arg0 instanceof CRef ) {
+    if ( arg0 instanceof cRef ) {
         arg0 = arg0.getValue()
     }
 
-    if ( arg0 instanceof CString ) {
+    if ( arg0 instanceof cString ) {
         valueForSearching = arg0.getValue();
     }
-    else if ( arg0 instanceof CError )
+    else if ( arg0 instanceof cError )
         return this.value = arg0;
     else {
         valueForSearching = arg0.getValue();
@@ -1236,27 +1236,27 @@ cVLOOKUP.prototype.Calculate = function ( arg ) {
 
 
     var found = false, bb;
-    if ( arg1 instanceof CRef || arg1 instanceof CRef3D ) {
+    if ( arg1 instanceof cRef || arg1 instanceof cRef3D ) {
         var range = arg1.getRange(), ws = arg1.getWS();
         bb = range.getBBox0();
         if ( numberCol > bb.c2 - bb.c1 )
-            return this.value = new CError( cErrorType.bad_reference );
+            return this.value = new cError( cErrorType.bad_reference );
         var oSearchRange = ws.getRange3(bb.r1, bb.c1, bb.r2, bb.c1);
-        var oCache = g_oVLOOKUPCache.get(oSearchRange, valueForSearching, arg0 instanceof CString, arg3.value);
+        var oCache = g_oVLOOKUPCache.get(oSearchRange, valueForSearching, arg0 instanceof cString, arg3.value);
         if(oCache)
         {
             resR = oCache.index;
             min = oCache.min;
         }
     }
-    else if ( arg1 instanceof CArea ) {
+    else if ( arg1 instanceof cArea ) {
         var range = arg1.getRange(), ws = arg1.getWS();
         bb = range.getBBox0();
         if ( numberCol > bb.c2 - bb.c1 )
-            return this.value = new CError( cErrorType.bad_reference );
+            return this.value = new cError( cErrorType.bad_reference );
 
         var oSearchRange = ws.getRange3(bb.r1, bb.c1, bb.r2, bb.c1);
-        var oCache = g_oVLOOKUPCache.get(oSearchRange, valueForSearching, arg0 instanceof CString, arg3.value);
+        var oCache = g_oVLOOKUPCache.get(oSearchRange, valueForSearching, arg0 instanceof cString, arg3.value);
         if(oCache)
         {
             resR = oCache.index;
@@ -1305,11 +1305,11 @@ cVLOOKUP.prototype.Calculate = function ( arg ) {
          }
          }*/
     }
-    else if ( arg1 instanceof CArea3D ) {
+    else if ( arg1 instanceof cArea3D ) {
         var range = arg1.getRange()[0], ws = arg1.getWS();
         bb = range.getBBox0();
         if ( numberCol > bb.c2 - bb.c1 )
-            return this.value = new CError( cErrorType.bad_reference );
+            return this.value = new cError( cErrorType.bad_reference );
 
         /*var matrix = arg1.getMatrix()[0]
 
@@ -1355,7 +1355,7 @@ cVLOOKUP.prototype.Calculate = function ( arg ) {
          }*/
 
         var oSearchRange = ws.getRange3(bb.r1, bb.c1, bb.r2, bb.c1);
-        var oCache = g_oVLOOKUPCache.get(oSearchRange, valueForSearching, arg0 instanceof CString, arg3.value);
+        var oCache = g_oVLOOKUPCache.get(oSearchRange, valueForSearching, arg0 instanceof cString, arg3.value);
         if(oCache)
         {
             resR = oCache.index;
@@ -1363,8 +1363,8 @@ cVLOOKUP.prototype.Calculate = function ( arg ) {
         }
 
     }
-    else if ( arg1 instanceof CArray ) {
-        if(arg0 instanceof CString)
+    else if ( arg1 instanceof cArray ) {
+        if(arg0 instanceof cString)
             regexp = searchRegExp( valueForSearching );
         arg1.foreach( function ( elem, r, c ) {
             if ( r == 0 )
@@ -1380,7 +1380,7 @@ cVLOOKUP.prototype.Calculate = function ( arg ) {
                 }
             }
             else {
-                if ( arg0 instanceof CString ) {
+                if ( arg0 instanceof cString ) {
                     if ( regexp.test( elem.getValue() ) )
                         resR = r;
                 }
@@ -1393,15 +1393,15 @@ cVLOOKUP.prototype.Calculate = function ( arg ) {
         } )
 
         if ( min > valueForSearching ) {
-            return this.value = new CError( cErrorType.not_available );
+            return this.value = new cError( cErrorType.not_available );
         }
 
         if ( resR == -1 ) {
-            return this.value = new CError( cErrorType.not_available );
+            return this.value = new cError( cErrorType.not_available );
         }
 
         if ( numberCol > arg1.getCountElementInRow() - 1 ) {
-            return this.value = new CError( cErrorType.bad_reference );
+            return this.value = new cError( cErrorType.bad_reference );
         }
 
         return this.value = arg1.getElementRowCol( resR, numberCol );
@@ -1409,11 +1409,11 @@ cVLOOKUP.prototype.Calculate = function ( arg ) {
     }
 
     if ( min > valueForSearching ) {
-        return this.value = new CError( cErrorType.not_available );
+        return this.value = new cError( cErrorType.not_available );
     }
 
     if ( resR == -1 ) {
-        return this.value = new CError( cErrorType.not_available );
+        return this.value = new cError( cErrorType.not_available );
     }
 
     var c = new CellAddress( resR, bb.c1 + numberCol, 0 );
