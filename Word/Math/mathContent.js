@@ -6268,8 +6268,8 @@ CMathContent.prototype =
         if(this.content[end].typeObj !== MATH_PLACEHOLDER)
             this.content[end].Selection_Remove();
 
-        this.SelectStartPos = 0;
-        this.SelectEndPos   = 0;
+        this.SelectStartPos = this.CurPos;
+        this.SelectEndPos   = this.CurPos;
     },
     getElem: function(nNum)
     {

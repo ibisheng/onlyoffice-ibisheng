@@ -914,6 +914,8 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Set_ParaContentPos
 
+        console.log("Set_ParaContentPos");
+
         var Pos = ContentPos.Get(Depth);
         this.State.ContentPos = Pos;
 
@@ -1007,7 +1009,11 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Selection_Remove
 
+        console.log("Selection_Remove");
+
         this.bSelectionUse = false;
+
+        this.Root.Selection_Remove();
     },
     Select_All : function(Direction)
     {

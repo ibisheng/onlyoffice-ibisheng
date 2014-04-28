@@ -76,8 +76,6 @@ CFraction.prototype.old_getCenter = function()
 }
 CFraction.prototype.draw = function(x, y, pGraphics)
 {
-    console.log("Draw fraction");
-
     if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
         this.drawBarFraction(x, y, pGraphics);
     else if(this.type == SKEWED_FRACTION)
@@ -87,7 +85,6 @@ CFraction.prototype.draw = function(x, y, pGraphics)
 }
 CFraction.prototype.drawBarFraction = function(x, y, pGraphics)
 {
-    //var ctrPrp = this.getCtrPrp();
     var mgCtrPrp = this.mergeCtrTPrp();
     var penW = mgCtrPrp.FontSize* 25.4/96 * 0.08;
 
