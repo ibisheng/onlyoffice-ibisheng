@@ -250,6 +250,8 @@ function NativeOpenFile()
 
 function NativeOpenFile2()
 {
+	window["CreateMainTextMeasurerWrapper"]();
+
 	window.g_file_path = "native_open_file";
 	window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
     var doc_bin = window.native.GetFileString(window.g_file_path);

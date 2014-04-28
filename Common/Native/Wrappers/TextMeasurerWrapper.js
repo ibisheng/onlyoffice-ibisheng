@@ -385,6 +385,8 @@ window["CreateTextMeasurerWrapper"] = function()
 {
 	return new CTextMeasurerWrapper();
 };
-
-g_oTextMeasurer = window["CreateTextMeasurerWrapper"]();
-g_oTextMeasurer.Init();
+window["CreateMainTextMeasurerWrapper"] = function()
+{
+	g_oTextMeasurer = new CTextMeasurerWrapper();
+	g_oTextMeasurer.Init();
+};
