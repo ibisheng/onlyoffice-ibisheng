@@ -253,7 +253,14 @@ NullState.prototype =
         ret = handleFloatObjects(this.drawingObjects, drawing_page.beforeTextObjects, e, x, y, null, pageIndex, true);
         if(ret)
             return ret;
-        ret = handleInlineObjects(this.drawingObjects, drawing_page.inlineObjects, e, x, y, pageIndex, true);
+
+        var no_shape_child_array = [];
+        for(var i = 0; i < drawing_page.inlineObjects.length; ++i)
+        {
+            if(!drawing_page.inlineObjects[i].parent.isShapeChild())
+                no_shape_child_array.push(drawing_page.inlineObjects[i]);
+        }
+        ret = handleInlineObjects(this.drawingObjects, no_shape_child_array, e, x, y, pageIndex, true);
         if(ret)
             return ret;
 

@@ -116,6 +116,18 @@ function handleShapeImage(drawing, drawingObjectsController, e, x, y, group, pag
     }
     else if(hit_in_text_rect)
     {
+        if(bWord)
+        {
+            var all_drawings = drawing.getDocContent().Get_AllDrawingObjects();
+            var drawings2 = [];
+            for(var i = 0; i < all_drawings.length; ++i)
+            {
+                drawings2.push(all_drawings[i].GraphicObj);
+            }
+            var ret = handleInlineObjects(drawingObjectsController, drawings2, e, x, y, pageIndex, bWord);
+            if(ret)
+                return ret;
+        }
         return drawingObjectsController.handleTextHit(drawing, e, x, y, group, pageIndex, bWord);
     }
     return false;
@@ -236,10 +248,12 @@ function handleInlineObjects(drawingObjectsController, drawingArr, e, x, y, page
         {
             case historyitem_type_Shape:
             case historyitem_type_ImageShape:
+            case historyitem_type_ChartSpace:
+            case historyitem_type_GroupShape:
             {
-                var _hit = drawing.hit(x, y);
-                var _hit_to_path = drawing.hitToPath(x, y);
-                var b_hit_to_text = drawing.hitToTextRect(x, y);
+                var _hit = drawing.hit && drawing.hit(x, y);
+                var _hit_to_path = drawing.hitToPath && drawing.hitToPath(x, y);
+                var b_hit_to_text = drawing.hitToTextRect && drawing.hitToTextRect(x, y);
                 if((_hit && !b_hit_to_text) || _hit_to_path)
                 {
                     return handleInlineHitNoText(drawing, drawingObjectsController, e, x, y, pageIndex);
@@ -250,15 +264,15 @@ function handleInlineObjects(drawingObjectsController, drawingArr, e, x, y, page
                 }
                 return false;
             }
-            case historyitem_type_ChartSpace:
-            {
-
-                break;
-            }
-            case historyitem_type_GroupShape:
-            {
-                break;
-            }
+           // case historyitem_type_ChartSpace:
+           // {
+           //
+           //     break;
+           // }
+           // case historyitem_type_GroupShape:
+           // {
+           //     break;
+           // }
         }
     }
 }

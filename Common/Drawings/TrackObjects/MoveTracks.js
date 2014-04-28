@@ -6,6 +6,7 @@ function MoveShapeImageTrack(originalObject)
     this.x = null;
     this.y = null;
     this.pageIndex = null;
+    this.originalShape = originalObject;
 
     if(!originalObject.isChart())
     {
@@ -69,13 +70,6 @@ function MoveShapeImageTrack(originalObject)
             this.pageIndex = pageIndex;
     };
 
-    this.getBounds = function()
-    {
-        var bounds_checker = new CSlideBoundsChecker();
-        this.overlayObject.draw(bounds_checker);
-        return bounds_checker.Bounds;
-    };
-
     this.draw = function(overlay)
     {
         if(isRealNumber(this.pageIndex))
@@ -124,6 +118,34 @@ function MoveShapeImageTrack(originalObject)
         this.originalObject.spPr.xfrm.setOffY(this.y/scale_coefficients.cy + ch_off_y);
     };
 }
+
+MoveShapeImageTrack.prototype.getBounds = function()
+{
+    var boundsChecker = new  CSlideBoundsChecker();
+    this.draw(boundsChecker);
+    var tr = this.transform;
+    var arr_p_x = [];
+    var arr_p_y = [];
+    arr_p_x.push(tr.TransformPointX(0,0));
+    arr_p_y.push(tr.TransformPointY(0,0));
+    arr_p_x.push(tr.TransformPointX(this.originalObject.extX,0));
+    arr_p_y.push(tr.TransformPointY(this.originalObject.extX,0));
+    arr_p_x.push(tr.TransformPointX(this.originalObject.extX,this.originalObject.extY));
+    arr_p_y.push(tr.TransformPointY(this.originalObject.extX,this.originalObject.extY));
+    arr_p_x.push(tr.TransformPointX(0,this.originalObject.extY));
+    arr_p_y.push(tr.TransformPointY(0,this.originalObject.extY));
+
+    arr_p_x.push(boundsChecker.Bounds.min_x);
+    arr_p_x.push(boundsChecker.Bounds.max_x);
+    arr_p_y.push(boundsChecker.Bounds.min_y);
+    arr_p_y.push(boundsChecker.Bounds.max_y);
+
+    boundsChecker.Bounds.min_x = Math.min.apply(Math, arr_p_x);
+    boundsChecker.Bounds.max_x = Math.max.apply(Math, arr_p_x);
+    boundsChecker.Bounds.min_y = Math.min.apply(Math, arr_p_y);
+    boundsChecker.Bounds.max_y = Math.max.apply(Math, arr_p_y);
+    return boundsChecker.Bounds;
+};
 
 function MoveShapeImageTrackInGroup(originalObject)
 {

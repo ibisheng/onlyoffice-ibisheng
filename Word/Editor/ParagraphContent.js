@@ -4192,12 +4192,16 @@ ParaDrawing.prototype =
                 H : this.H + this.Distance.B
             }
         }
+        DrawingObj.PageNum = this.PageNum;
+        DrawingObj.X = this.X;
+        DrawingObj.Y = this.Y;
 
         return DrawingObj;
     },
 
     Load_RecalculateObject : function(RecalcObj)
     {
+        this.updatePosition3(RecalcObj.PageNum, RecalcObj.X, RecalcObj.Y);
     },
 
     Prepare_RecalculateObject : function()
@@ -4418,12 +4422,9 @@ ParaDrawing.prototype =
         if( this.GraphicObj.bNeedUpdatePosition || !(isRealNumber(this.GraphicObj.posX) && isRealNumber(this.GraphicObj.posY)) ||
             !(Math.abs(this.GraphicObj.posX-_x) < MOVE_DELTA && Math.abs(this.GraphicObj.posY-_y) < MOVE_DELTA))
             this.GraphicObj.updatePosition(_x, _y);
-        // if(this.Use_TextWrap())
-        {
-            if( this.GraphicObj.bNeedUpdatePosition || !(isRealNumber(this.wrappingPolygon.posX) && isRealNumber(this.wrappingPolygon.posY)) ||
-                !(Math.abs(this.wrappingPolygon.posX -_x) < MOVE_DELTA && Math.abs(this.wrappingPolygon.posY-_y) < MOVE_DELTA))
-                this.wrappingPolygon.updatePosition(_x, _y);
-        }
+        if( this.GraphicObj.bNeedUpdatePosition || !(isRealNumber(this.wrappingPolygon.posX) && isRealNumber(this.wrappingPolygon.posY)) ||
+            !(Math.abs(this.wrappingPolygon.posX -_x) < MOVE_DELTA && Math.abs(this.wrappingPolygon.posY-_y) < MOVE_DELTA))
+            this.wrappingPolygon.updatePosition(_x, _y);
     },
 
     Set_XYForAdd2 : function(X, Y)
@@ -6375,14 +6376,6 @@ ParaDrawing.prototype =
             this.GraphicObj.select(pageIndex);
 
     },
-
-    deselect: function()
-    {
-        this.selected = false;
-        if(isRealObject(this.GraphicObj) && typeof  this.GraphicObj.deselect === "function")
-            this.GraphicObj.deselect();
-    },
-
 
     paragraphClearFormatting: function()
     {

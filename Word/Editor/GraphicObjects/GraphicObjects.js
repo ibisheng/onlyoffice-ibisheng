@@ -131,11 +131,9 @@ CGraphicObjects.prototype =
     {
         for(var i = 0; i < this.graphicPages.length; ++i)
         {
-            this.graphicPages[i].sortDrawingArrays();
+            if(this.graphicPages[i])
+                this.graphicPages[i].sortDrawingArrays();
         }
-        CGraphicPage.prototype.sortDrawingArrays.apply(this.headerFooter.commonEven, []);
-        CGraphicPage.prototype.sortDrawingArrays.apply(this.headerFooter.commonFirst, []);
-        CGraphicPage.prototype.sortDrawingArrays.apply(this.headerFooter.commonOdd, []);
     },
 
     getSelectedObjects: function()
@@ -159,7 +157,12 @@ CGraphicObjects.prototype =
 
     createImage: DrawingObjectsController.prototype.createImage,
 
-    getChartSpace: DrawingObjectsController.prototype.getChartSpace,
+    getChartSpace: function(chart, options)
+    {
+        var ret = DrawingObjectsController.prototype.getChartSpace.call(this, chart,options);
+        ret.setBDeleted(false);
+        return ret;
+    },
 
     getProps: function()
     {
@@ -1681,7 +1684,9 @@ CGraphicObjects.prototype =
             {
                 if(this.selectedObjects[0])
                 {
-                    para_pr = this.selectedObjects[0].parent.Get_ParentParagraph().Get_CompiledPr2(true).ParaPr;
+                    var parent_para = this.selectedObjects[0].parent.Get_ParentParagraph();
+                    if(parent_para)
+                        para_pr = parent_para.Get_CompiledPr2(true).ParaPr;
                 }
             }
             editor.UpdateParagraphProp(para_pr);
@@ -2216,7 +2221,11 @@ CGraphicObjects.prototype =
         if(this.selection.textSelection)
         {
             if(this.selection.textSelection.selectStartPage === pageIndex)
+            {
                 this.drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.selection.textSelection.getTransformMatrix(), 0, 0, this.selection.textSelection.extX, this.selection.textSelection.extY, false, this.selection.textSelection.canRotate());
+                if(this.selection.textSelection.drawAdjustments)
+                    this.selection.textSelection.drawAdjustments(this.drawingDocument);
+            }
         }
         else if(this.selection.groupSelection)
         {
@@ -2248,7 +2257,6 @@ CGraphicObjects.prototype =
         }
         else if(this.selection.chartSelection)
         {
-
         }
         else if(this.selection.wrapPolygonSelection)
         {
@@ -2262,7 +2270,7 @@ CGraphicObjects.prototype =
                 if(this.selectedObjects[i].selectStartPage === pageIndex)
                 {
                     this.drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selectedObjects[i].getTransformMatrix(), 0, 0, this.selectedObjects[i].extX, this.selectedObjects[i].extY, false, this.selectedObjects[i].canRotate());
-              //      this.drawingDocument.AutoShapesTrack.DrawEditWrapPointsPolygon(this.selectedObjects[i].parent.wrappingPolygon.calculatedPoints, new CMatrix());
+                    this.drawingDocument.AutoShapesTrack.DrawEditWrapPointsPolygon(this.selectedObjects[i].parent.wrappingPolygon.calculatedPoints, new CMatrix());
                 }
 
             }
@@ -3172,11 +3180,14 @@ CGraphicObjects.prototype =
         if(isRealObject(object))
         {
             var hdr_ftr = object.DocumentContent.Is_HdrFtr(true);
-            var page = !hdr_ftr ? this.graphicPages[pageIndex] : this.graphicPages[pageIndex] && this.graphicPages[pageIndex].hdrFtrPage;
-            if(isRealObject(page))
+            //for(var i = 0; i < this.graphicPages.length; ++i)
             {
-                var array_type = object.getDrawingArrayType();
-                page.delObjectById(id, array_type);
+                var page = !hdr_ftr ? this.graphicPages[pageIndex] : this.graphicPages[pageIndex] && this.graphicPages[pageIndex].hdrFtrPage;
+                if(isRealObject(page))
+                {
+                    var array_type = object.getDrawingArrayType();
+                    page.delObjectById(id, array_type);
+                }
             }
         }
     },

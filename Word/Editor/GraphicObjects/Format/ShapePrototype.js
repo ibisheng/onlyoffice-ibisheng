@@ -742,3 +742,8 @@ CShape.prototype.Get_ColorMap = function()
 {
     return editor.WordControl.m_oLogicDocument.Get_ColorMap();
 };
+
+CShape.prototype.Is_TopDocument = function()
+{
+    return false;
+};

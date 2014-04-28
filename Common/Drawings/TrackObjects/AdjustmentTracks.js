@@ -92,13 +92,6 @@ function XYAdjustmentTrack(originalShape, adjIndex)
         this.overlayObject.draw(overlay);
     };
 
-    this.getBounds = function()
-    {
-        var bounds_checker = new  CSlideBoundsChecker();
-        bounds_checker.init(Page_Width, Page_Height, Page_Width, Page_Height);
-        this.draw(bounds_checker);
-        return bounds_checker.Bounds;
-    };
 
     this.track = function(posX, posY)
     {
@@ -172,6 +165,36 @@ function XYAdjustmentTrack(originalShape, adjIndex)
     };
 
 }
+
+XYAdjustmentTrack.prototype.getBounds = function()
+{
+    var bounds_checker = new  CSlideBoundsChecker();
+    bounds_checker.init(Page_Width, Page_Height, Page_Width, Page_Height);
+    this.draw(bounds_checker);
+    var tr = this.originalShape.transform;
+    var arr_p_x = [];
+    var arr_p_y = [];
+    arr_p_x.push(tr.TransformPointX(0,0));
+    arr_p_y.push(tr.TransformPointY(0,0));
+    arr_p_x.push(tr.TransformPointX(this.originalShape.extX,0));
+    arr_p_y.push(tr.TransformPointY(this.originalShape.extX,0));
+    arr_p_x.push(tr.TransformPointX(this.originalShape.extX,this.originalShape.extY));
+    arr_p_y.push(tr.TransformPointY(this.originalShape.extX,this.originalShape.extY));
+    arr_p_x.push(tr.TransformPointX(0,this.originalShape.extY));
+    arr_p_y.push(tr.TransformPointY(0,this.originalShape.extY));
+
+    arr_p_x.push(bounds_checker.Bounds.min_x);
+    arr_p_x.push(bounds_checker.Bounds.max_x);
+    arr_p_y.push(bounds_checker.Bounds.min_y);
+    arr_p_y.push(bounds_checker.Bounds.max_y);
+
+    bounds_checker.Bounds.min_x = Math.min.apply(Math, arr_p_x);
+    bounds_checker.Bounds.max_x = Math.max.apply(Math, arr_p_x);
+    bounds_checker.Bounds.min_y = Math.min.apply(Math, arr_p_y);
+    bounds_checker.Bounds.max_y = Math.max.apply(Math, arr_p_y);
+
+    return bounds_checker.Bounds;
+};
 
 function PolarAdjustmentTrack(originalShape, adjIndex)
 {
@@ -331,3 +354,4 @@ function PolarAdjustmentTrack(originalShape, adjIndex)
         }
     };
 }
+PolarAdjustmentTrack.prototype.getBounds = XYAdjustmentTrack.prototype.getBounds;

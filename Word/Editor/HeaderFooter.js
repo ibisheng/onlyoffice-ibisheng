@@ -1253,7 +1253,10 @@ CHeaderFooterController.prototype =
         this.Pages[PageIndex] = new CHdrFtrPage();
         this.Pages[PageIndex].Header = Header;
         this.Pages[PageIndex].Footer = Footer;
-        
+        if(this.LogicDocument.DrawingObjects.graphicPages[PageIndex])
+        {
+            this.LogicDocument.DrawingObjects.graphicPages[PageIndex].hdrFtrPage.resetDrawingArrays(this.LogicDocument);
+        }
         var X, XLimit;
         
         var Orient = SectPr.Get_Orientation();

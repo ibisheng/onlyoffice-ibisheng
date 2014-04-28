@@ -396,7 +396,7 @@ CWrapPolygon.prototype =
     calculate: function(drawing)
     {
         var arrPolygons = drawing.getArrayWrapPolygons();
-        var transform = drawing.localTransform;
+        var transform = new CMatrix();
         var arrEdges = [];
         var arrPoints = [];
 

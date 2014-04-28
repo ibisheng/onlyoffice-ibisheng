@@ -196,6 +196,7 @@ CImageShape.prototype.checkShapeChildTransform = function()
         if(parent_shape)
         {
             global_MatrixTransformer.MultiplyAppend(this.transform, parent_shape.transformText);
+            this.invertTransform = global_MatrixTransformer.Invert(this.transform);
         }
     }
 };

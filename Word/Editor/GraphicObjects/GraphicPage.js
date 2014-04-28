@@ -205,14 +205,16 @@ CGraphicPage.prototype =
     {
         function findInArrayAndRemove(drawingArray, docContent, document)
         {
-            if(!docContent === document)
+            if(docContent === document)
             {
                 drawingArray.length = 0;
                 return;
             }
+            var b_is_top_doc = docContent.Is_TopDocument();
             for(var i = drawingArray.length-1; i > -1; --i)
             {
-                if(!drawingArray[i].parent || drawingArray[i].parent.DocumentContent === docContent)
+                if(!drawingArray[i].parent || drawingArray[i].parent.DocumentContent === docContent
+                    || (b_is_top_doc && drawingArray[i].parent.DocumentContent.Is_TopDocument(true) === docContent))
                     drawingArray.splice(i, 1);
             }
         }

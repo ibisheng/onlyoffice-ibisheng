@@ -113,6 +113,13 @@ CDLbl.prototype =
         return historyitem_type_DLbl;
     },
 
+    checkShapeChildTransform: function(transform)
+    {
+        this.updatePosition(this.posX, this.posY);
+        global_MatrixTransformer.MultiplyAppend(this.transform, transform);
+        global_MatrixTransformer.MultiplyAppend(this.transformText, transform);
+    },
+
     getCompiledFill: function()
     {
         return this.spPr && this.spPr.Fill ? this.spPr.Fill : null;
@@ -1045,6 +1052,8 @@ CDLbl.prototype =
 
     updatePosition: function(x, y)
     {
+        this.posX = x;
+        this.posY = y;
         this.transform = this.localTransform.CreateDublicate();
         global_MatrixTransformer.TranslateAppend(this.transform, x, y);
 
@@ -4669,7 +4678,7 @@ CDateAx.prototype =
         History.Add(this, {Type:historyitem_DateAxMinorTimeUnit, oldPr: this.minorTimeUnit, newPr: pr});
         this.minorTimeUnit = pr;
     },
-          ///
+    ///
     setMinorUnit: function(pr)
     {
         History.Add(this, {Type:historyitem_DateAxMinorUnit, oldPr: this.minorUnit, newPr: pr});
@@ -4707,7 +4716,7 @@ CDateAx.prototype =
     },
     //
 
-        Write_ToBinary2: function(w)
+    Write_ToBinary2: function(w)
     {
         w.WriteLong(this.getObjectType());
         w.WriteString2(this.Get_Id());
@@ -9515,6 +9524,8 @@ CLegend.prototype =
 
     updatePosition: function(x, y)
     {
+        this.posX = x;
+        this.posY = y;
         this.transform = this.localTransform.CreateDublicate();
         global_MatrixTransformer.TranslateAppend(this.transform, x, y);
         var entry;
@@ -9534,6 +9545,41 @@ CLegend.prototype =
             {
                 entry.calcMarkerUnion.lineMarker.transform = entry.calcMarkerUnion.lineMarker.localTransform.CreateDublicate();
                 global_MatrixTransformer.TranslateAppend(entry.calcMarkerUnion.lineMarker.transform, x, y);
+            }
+        }
+    },
+
+
+    checkShapeChildTransform: function(t)
+    {
+        this.transform = this.localTransform.CreateDublicate();
+        global_MatrixTransformer.TranslateAppend(this.transform, this.posX, this.posY);
+
+        global_MatrixTransformer.MultiplyAppend(this.transform, t);
+        var entry;
+        for(var i = 0; i < this.calcEntryes.length; ++i)
+        {
+            entry = this.calcEntryes[i];
+            entry.transformText = entry.localTransformText.CreateDublicate();
+            global_MatrixTransformer.TranslateAppend(entry.transformText, this.posX, this.posY);
+
+
+            global_MatrixTransformer.MultiplyAppend(entry.transformText, t);
+
+
+            if(entry.calcMarkerUnion.marker)
+            {
+                entry.calcMarkerUnion.marker.transform = entry.calcMarkerUnion.marker.localTransform.CreateDublicate();
+                global_MatrixTransformer.TranslateAppend(entry.calcMarkerUnion.marker.transform, this.posX, this.posY);
+
+                global_MatrixTransformer.MultiplyAppend(entry.calcMarkerUnion.marker.transform, t);
+            }
+
+            if(entry.calcMarkerUnion.lineMarker)
+            {
+                entry.calcMarkerUnion.lineMarker.transform = entry.calcMarkerUnion.lineMarker.localTransform.CreateDublicate();
+                global_MatrixTransformer.TranslateAppend(entry.calcMarkerUnion.lineMarker.transform, this.posX, this.posY);
+                global_MatrixTransformer.MultiplyAppend(entry.calcMarkerUnion.lineMarker.transform, t);
             }
         }
     },
@@ -11911,7 +11957,7 @@ CNumLit.prototype =
 
             case historyitem_NumLit_AddPt:
             {
-                this.pts.push(data.newPr);
+                this.pts.push(data.pt);
                 break;
             }
 
@@ -16343,6 +16389,7 @@ CTitle.prototype =
     recalculateBrush: CShape.prototype.recalculateBrush,
 
 
+    checkShapeChildTransform: CDLbl.prototype.checkShapeChildTransform,
     updatePosition: function(x, y)
     {
         this.transform = this.localTransform.CreateDublicate();
@@ -18183,6 +18230,8 @@ function CValAxisLabels(chart)
     this.localTransform = new CMatrix();
     this.arrLabels = [];
     this.chart = chart;
+    this.posX = null;
+    this.posY = null;
 }
 
 CValAxisLabels.prototype =
@@ -18252,6 +18301,8 @@ CValAxisLabels.prototype =
 
     updatePosition: function(x, y)
     {
+        this.posX = x;
+        this.posY = y;
         this.transform = this.localTransform.CreateDublicate();
         global_MatrixTransformer.TranslateAppend(this.transform, x, y);
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
@@ -18259,6 +18310,18 @@ CValAxisLabels.prototype =
         {
             if(this.arrLabels[i])
                 this.arrLabels[i].updatePosition(x, y);
+        }
+    },
+
+    checkShapeChildTransform: function(t)
+    {
+        this.transform = this.localTransform.CreateDublicate();
+        global_MatrixTransformer.TranslateAppend(this.transform, this.posX, this.posY);
+        this.invertTransform = global_MatrixTransformer.Invert(this.transform);
+        for(var i = 0; i < this.arrLabels.length; ++i)
+        {
+            if(this.arrLabels[i])
+                this.arrLabels[i].checkShapeChildTransform(t);
         }
     }
 

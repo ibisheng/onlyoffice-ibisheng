@@ -1329,6 +1329,10 @@ CShape.prototype =
         {
             this.checkPosTransformText();
         }
+        if(this.checkContentDrawings)
+        {
+            this.checkContentDrawings();
+        }
     },
 
     getFullFlip: function()
