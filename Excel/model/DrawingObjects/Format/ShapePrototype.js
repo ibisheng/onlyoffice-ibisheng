@@ -276,6 +276,7 @@ CShape.prototype.recalculateContent = function()
             w = this.extX - (l_ins + r_ins);
             h = this.extY - (t_ins + b_ins);
         }
+        content.Set_StartPage(0);
         content.Reset(0, 0, w, h);
         content.Recalculate_Page(content.StartPage, true);
     }
