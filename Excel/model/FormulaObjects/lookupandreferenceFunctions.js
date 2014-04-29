@@ -913,7 +913,7 @@ function cOFFSET() {
 
 }
 cOFFSET.prototype = Object.create( cBaseFunction.prototype )
-cOFFSET.prototype.Calculate = function ( arg ) {
+/* cOFFSET.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3] ? arg[3] : new cNumber(0 ), arg4 = arg[4] ? arg[4] : new cNumber(0);
 
     if(1){}
@@ -924,7 +924,7 @@ cOFFSET.prototype.getInfo = function () {
         name:this.name,
         args:"( reference , rows , cols [ , [ height ] [ , [ width ] ] ] )"
     };
-}
+} */
 
 function cROW() {
 //    cBaseFunction.call( this, "ROW" );
