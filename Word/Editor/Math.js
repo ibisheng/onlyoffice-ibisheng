@@ -914,7 +914,6 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Set_ParaContentPos
 
-        console.log("Set_ParaContentPos");
 
         var Pos = ContentPos.Get(Depth);
         this.State.ContentPos = Pos;
@@ -936,15 +935,15 @@ ParaMath.prototype =
     Get_LeftPos : function(SearchPos, ContentPos, Depth, UseContentPos)
     {
         // TODO: ParaMath.Get_LeftPos
-        this.Root.Get_LeftPos(SearchPos, ContentPos, Depth, UseContentPos);
-        return false;
+        var result = this.Root.Get_LeftPos(SearchPos, ContentPos, Depth, UseContentPos, false);
+        return result;
     },
 
     Get_RightPos : function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
     {
         // TODO: ParaMath.Get_RightPos
-        this.Root.Get_RightPos(SearchPos, ContentPos, Depth, UseContentPos, StepEnd);
-        return false;
+        var result = this.Root.Get_RightPos(SearchPos, ContentPos, Depth, UseContentPos, StepEnd, false);
+        return result;
     },
 
     Get_WordStartPos : function(SearchPos, ContentPos, Depth, UseContentPos)
@@ -1008,8 +1007,6 @@ ParaMath.prototype =
     Selection_Remove : function()
     {
         // TODO: ParaMath.Selection_Remove
-
-        console.log("Selection_Remove");
 
         this.bSelectionUse = false;
 

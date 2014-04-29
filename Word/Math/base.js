@@ -1420,6 +1420,149 @@ CMathBase.prototype =
         if(start_X !== -1 && start_Y !== -1)
             this.elements[start_X][start_Y].Selection_Remove();
 
+    },
+    Get_LeftPos: function(SearchPos, ContentPos, Depth, UseContentPos, EndRun)
+    {
+        var CurPos_X, CurPos_Y;
+        var result = false;
+
+        if(UseContentPos === true)
+        {
+            CurPos_X = ContentPos.Get(Depth);
+            CurPos_Y = ContentPos.Get(Depth + 1);
+        }
+        else
+        {
+            CurPos_X = this.nRow - 1;
+            CurPos_Y = this.nCol - 1;
+        }
+
+        var bUseContent = UseContentPos;
+
+        while(CurPos_X >= 0)
+        {
+            while(CurPos_Y >= 0)
+            {
+                if( ! this.elements[CurPos_X][CurPos_Y].IsJustDraw() )
+                {
+                    this.elements[CurPos_X][CurPos_Y].Get_LeftPos(SearchPos, ContentPos, Depth + 2, bUseContent, EndRun);
+                    SearchPos.Pos.Update(CurPos_X, Depth);
+                    SearchPos.Pos.Update(CurPos_Y, Depth+1);
+                }
+
+                if(SearchPos.Found === true)
+                    break;
+
+                CurPos_Y--;
+
+                bUseContent = false;
+                EndRun      = true;
+            }
+
+            if(SearchPos.Found === true)
+                break;
+
+            CurPos_X--;
+            CurPos_Y = this.nCol - 1;
+
+        }
+
+        result = SearchPos.Found;
+
+
+
+        /*if( ! this.elements[CurPos_X][CurPos_Y].IsJustDraw() )
+        {
+            this.elements[CurPos_X][CurPos_Y].Get_LeftPos(SearchPos, ContentPos, Depth + 2, UseContentPos, EndRun);
+            SearchPos.Pos.Update(CurPos_X, Depth);
+            SearchPos.Pos.Update(CurPos_Y, Depth+1);
+
+            if(SearchPos.Found === true)
+                result = true;
+        }
+
+        if( result == false)
+        {
+            while(CurPos_Y >= 0)
+            {
+                while(CurPos_X >= 0)
+                {
+                    if( this.elements[CurPos_X][CurPos_Y].IsJustDraw() == false)
+                    {
+                        this.elements[CurPos_X][CurPos_Y].Get_LeftPos(SearchPos, ContentPos, Depth + 2, false, true);
+                        SearchPos.Pos.Update(CurPos_X, Depth);
+                        SearchPos.Pos.Update(CurPos_Y, Depth+1);
+                    }
+
+                    if(SearchPos.Found === true)
+                    {
+                        result = true;
+                        break;
+                    }
+
+                    CurPos_X--;
+                }
+
+                if(SearchPos.Found === true)
+                    break;
+
+                CurPos_Y--;
+                CurPos_X = this.nRow;
+            }
+        }*/
+
+        return result;
+    },
+    Get_RightPos: function(SearchPos, ContentPos, Depth, UseContentPos, BegRun)
+    {
+        var CurPos_X, CurPos_Y;
+        var result = false;
+
+        if(UseContentPos === true)
+        {
+            CurPos_X = ContentPos.Get(Depth);
+            CurPos_Y = ContentPos.Get(Depth + 1);
+        }
+        else
+        {
+            CurPos_X = 0;
+            CurPos_Y = 0;
+        }
+
+        var bUseContent = UseContentPos;
+
+        while(CurPos_X < this.nRow)
+        {
+            while(CurPos_Y < this.nCol)
+            {
+                if( ! this.elements[CurPos_X][CurPos_Y].IsJustDraw() )
+                {
+                    this.elements[CurPos_X][CurPos_Y].Get_RightPos(SearchPos, ContentPos, Depth + 2, bUseContent, BegRun);
+                    SearchPos.Pos.Update(CurPos_X, Depth);
+                    SearchPos.Pos.Update(CurPos_Y, Depth+1);
+                }
+
+                if(SearchPos.Found === true)
+                    break;
+
+                CurPos_Y++;
+
+                bUseContent = false;
+                BegRun      = true;
+            }
+
+            if(SearchPos.Found === true)
+                break;
+
+            CurPos_X++;
+            CurPos_Y = 0;
+
+        }
+
+        result = SearchPos.Found;
+
+        return result;
+
     }
 
     //////////////////////////
