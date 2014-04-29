@@ -3183,10 +3183,11 @@
 					var documentContentBounds = new Asc.DocumentContentBounds();
 					var coverDocument = documentContentBounds.getBounds(0,0, documentContent);
 					this._parseChildren(coverDocument, activeRange);
-					//this.parseDocumentContent(documentContent, activeRange);
 				}
 				
 				this.aResult.fontsNew = this.fontsNew;
+				this.aResult.rowSpanSpCount = 0;
+				this.aResult.cellCount = coverDocument.width;
 				worksheet.setSelectionInfo('paste', this.aResult, this);
 			},
 			
