@@ -4056,6 +4056,12 @@ asc_docs_api.prototype.asc_setAutoSaveGap = function (autoSaveGap) {
 	}
 };
 
+asc_docs_api.prototype.asc_SetDocumentPlaceChangedEnabled = function(bEnabled)
+{
+    if (this.WordControl)
+        this.WordControl.m_bDocumentPlaceChangedEnabled = bEnabled;
+}
+
 asc_docs_api.prototype.SetMobileVersion = function(val)
 {
     this.isMobileVersion = val;

@@ -131,6 +131,7 @@ function CEditorPage(api)
     this.m_bIsHorScrollVisible = false;
     this.m_bIsCheckHeedHorScrollRepeat = false;
     this.m_bIsRuler         = false;
+    this.m_bDocumentPlaceChangedEnabled = false;
 
     this.m_nZoomValue       = 100;
     this.zoom_values = [50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200];
@@ -2462,6 +2463,9 @@ function CEditorPage(api)
             var lPage = this.m_oApi.GetCurrentVisiblePage();
             this.m_oApi.asc_fireCallback("asc_onCurrentVisiblePage", this.m_oApi.GetCurrentVisiblePage());
         }
+
+        if (this.m_bDocumentPlaceChangedEnabled)
+            this.m_oApi.asc_fireCallback("asc_onDocumentPlaceChanged");
     }
 
     this.OnPaint = function()
