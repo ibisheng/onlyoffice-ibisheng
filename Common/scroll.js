@@ -53,7 +53,7 @@ function GetClientHeight( elem ) {
     return 0;
 }
 
-function CArrowDrawer() {
+function CArrowDrawer(settings) {
     // размер квадратика в пикселах
     this.Size = 16;
     this.IsRetina = false;
@@ -62,11 +62,10 @@ function CArrowDrawer() {
     this.ColorGradStart = {R:69, G:70, B:71};
     this.ColorGradEnd = {R:116, G:117, B:118};
 
-    this.ColorBorder = "#BBBEC2";
-
-    this.ColorBackNone = "#F4F4F4";
-    this.ColorBackOver = "#D8DADC";
-    this.ColorBackActive = "#7A7A7A";
+    this.ColorBorder =      settings && settings.strokeStyle            ? settings.strokeStyle              : "#BBBEC2";
+    this.ColorBackNone =    settings && settings.scrollBackgroundColor  ? settings.scrollBackgroundColor    : "#F4F4F4";
+    this.ColorBackOver =    settings && settings.scrollerColorOver      ? settings.scrollerColorOver        : "#D8DADC";
+    this.ColorBackActive =  settings && settings.scrollerColorActive    ? settings.scrollerColorActive      : "#7A7A7A";
 
     // вот такие мега настройки для кастомизации)
     this.IsDrawBorderInNoneMode = false;
@@ -77,7 +76,7 @@ function CArrowDrawer() {
     this.ImageRight = null;
     this.ImageBottom = null;
 
-    this.IsNeedInvertOnActive = false;
+    this.IsNeedInvertOnActive = settings && settings.isNeedInvertOnActive ? settings.isNeedInvertOnActive  : false;
 
     this.InitSize = function ( size, is_retina ) {
         if ( size == this.Size && is_retina == this.IsRetina && null != this.ImageLeft )
@@ -346,8 +345,7 @@ function ScrollObject( elemID, settings, dbg ) {
 
     this.settings = extendSettings( settings, scrollSettings );
 
-    this.ArrowDrawer = new CArrowDrawer();
-    this.ArrowDrawer.ColorBackNone = this.settings.scrollBackgroundColor;
+    this.ArrowDrawer = new CArrowDrawer(this.settings);
 
     this.mouseUp = false;
     this.mouseDown = false;

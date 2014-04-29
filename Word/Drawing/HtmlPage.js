@@ -68,7 +68,8 @@ var GlobalSkinFlat = {
     RulerMarkersFillColor : "#FFFFFF",
     PageOutline : "#BBBEC2",
     STYLE_THUMBNAIL_WIDTH : 109,
-    STYLE_THUMBNAIL_HEIGHT : 45
+    STYLE_THUMBNAIL_HEIGHT : 45,
+    isNeedInvertOnActive: true
 };
 
 var GlobalSkin = GlobalSkinTeamlab;
@@ -2541,7 +2542,8 @@ function CEditorPage(api)
                 screenW: this.m_oEditor.HtmlElement.width,
                 screenH: this.m_oEditor.HtmlElement.height,
 				vscrollStep: 45,
-				hscrollStep: 45
+				hscrollStep: 45,
+                isNeedInvertOnActive: GlobalSkin.isNeedInvertOnActive
             };
 
             if (this.bIsRetinaSupport)
@@ -2554,9 +2556,6 @@ function CEditorPage(api)
                 this.m_oScrollHor_.Repos(settings, this.m_bIsHorScrollVisible);
             else {
                 this.m_oScrollHor_ = new ScrollObject( "id_horizontal_scroll", settings );
-
-                if (GlobalSkin.Name == "flat")
-                    this.m_oScrollHor_.ArrowDrawer.IsNeedInvertOnActive = true;
 
 				this.m_oScrollHor_.onLockMouse = function(evt){
 					check_MouseDownEvent(evt, true);
@@ -2576,9 +2575,6 @@ function CEditorPage(api)
             }
             else {
                 this.m_oScrollVer_ = new ScrollObject( "id_vertical_scroll", settings );
-
-                if (GlobalSkin.Name == "flat")
-                    this.m_oScrollVer_.ArrowDrawer.IsNeedInvertOnActive = true;
 
 				this.m_oScrollVer_.onLockMouse = function(evt){
 					check_MouseDownEvent(evt, true);
