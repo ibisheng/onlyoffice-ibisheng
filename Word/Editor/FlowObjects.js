@@ -75,6 +75,8 @@ function CFlowTable(Table, PageIndex)
     this.Y = Bounds.Top;
     this.W = Bounds.Right  - Bounds.Left;
     this.H = Bounds.Bottom - Bounds.Top;
+
+    this.WrappingType = WRAPPING_TYPE_SQUARE;
 };
 
 CFlowTable.prototype =
@@ -100,7 +102,7 @@ CFlowTable.prototype =
 
 };
 
-function CFlowParagraph(Paragraph, X, Y, W, H, Dx, Dy, StartIndex, FlowCount)
+function CFlowParagraph(Paragraph, X, Y, W, H, Dx, Dy, StartIndex, FlowCount, Wrap)
 {
     this.Table     = Paragraph;
     this.Paragraph = Paragraph;
@@ -124,6 +126,19 @@ function CFlowParagraph(Paragraph, X, Y, W, H, Dx, Dy, StartIndex, FlowCount)
     this.Y = Y;
     this.W = W;
     this.H = H;
+    
+    this.WrappingType = WRAPPING_TYPE_SQUARE;
+    
+    switch (Wrap)
+    {
+        case undefined:
+        case wrap_Around:
+        case wrap_Auto:      this.WrappingType = WRAPPING_TYPE_SQUARE;         break;        
+        case wrap_None:      this.WrappingType = WRAPPING_TYPE_NONE;           break;
+        case wrap_NotBeside: this.WrappingType = WRAPPING_TYPE_TOP_AND_BOTTOM; break;
+        case wrap_Through:   this.WrappingType = WRAPPING_TYPE_THROUGH;        break;
+        case wrap_Tight:     this.WrappingType = WRAPPING_TYPE_TIGHT;          break;
+    }
 }
 
 CFlowParagraph.prototype =
