@@ -1159,9 +1159,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			 * asc_onAdvancedOptions		(asc_CAdvancedOptions, ascAdvancedOptionsAction)			- эвент на получение дополнительных опций (открытие/сохранение CSV)
 			 * asc_onError					(c_oAscError.ID, c_oAscError.Level)
 			 * asc_onEditCell				(c_oAscCellEditorState)										- эвент на редактирование ячейки с состоянием (переходами из формулы и обратно)
-			 * asc_onSelectionChanged		(asc_CCellInfo);											- эвент на смену информации о выделении
-			 * asc_onSelectionNameChanged	(sName);													- эвент на смену имени выделения (Id-ячейки, число выделенных столбцов/строк, имя диаграммы и др.)
-			 * asc_onSelectionMathChanged	(asc_CSelectionMathInfo);									- эвент на смену математической информации о выделении
+			 * asc_onSelectionChanged		(asc_CCellInfo)												- эвент на смену информации о выделении
+			 * asc_onSelectionNameChanged	(sName)														- эвент на смену имени выделения (Id-ячейки, число выделенных столбцов/строк, имя диаграммы и др.)
+			 * asc_onSelectionMathChanged	(asc_CSelectionMathInfo)									- эвент на смену математической информации о выделении
 			 * asc_onZoomChanged			(zoom)
 			 * asc_onSheetsChanged			()															- эвент на обновление списка листов
 			 * asc_onActiveSheetChanged		(indexActiveSheet)											- эвент на обновление активного листа
@@ -1998,6 +1998,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			asc_getWorksheetName: function (index) {
 				return this.wbModel.getWorksheet(index).getName();
+			},
+
+
+			asc_getWorksheetTabColor: function (index) {
+				return this.wbModel.getWorksheet(index).getTabColor();
+			},
+			asc_setWorksheetTabColor: function (index, color) {
+				this.wbModel.getWorksheet(index).setTabColor(color);
 			},
 
 			asc_getActiveWorksheetIndex: function () {
@@ -3609,6 +3617,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 		prot["asc_getWorksheetsCount"] = prot.asc_getWorksheetsCount;
 		prot["asc_getWorksheetName"] = prot.asc_getWorksheetName;
+		prot["asc_getWorksheetTabColor"] = prot.asc_getWorksheetTabColor;
+		prot["asc_setWorksheetTabColor"] = prot.asc_setWorksheetTabColor;
 		prot["asc_getActiveWorksheetIndex"] = prot.asc_getActiveWorksheetIndex;
 		prot["asc_getActiveWorksheetId"] = prot.asc_getActiveWorksheetId;
 		prot["asc_getWorksheetId"] = prot.asc_getWorksheetId;

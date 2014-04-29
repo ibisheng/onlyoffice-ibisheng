@@ -2083,6 +2083,14 @@ Woorksheet.prototype.setName=function(name){
 		}
 	}
 };
+Woorksheet.prototype.getTabColor=function(){
+	return this.sheetPr ? this.sheetPr.TabColor : null;
+};
+Woorksheet.prototype.setTabColor=function(color){
+	if (!this.sheetPr)
+		this.sheetPr = new Asc.asc_CSheetPr();
+	this.sheetPr.TabColor = color;
+};
 Woorksheet.prototype.renameWsToCollaborate=function(name){
 	var lastname = this.getName();
 	//из-за особенностей реализации формул, сначала делаем parse со старым именем, потом преименовываем, потом assemble
