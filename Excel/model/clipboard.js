@@ -3192,6 +3192,7 @@
 			
 			_parseChildren: function(children, activeRange)
 			{
+				var backgroundColor;
 				var childrens = children.children;
 				for(var i = 0; i < childrens.length; i++)
 				{
@@ -3230,6 +3231,11 @@
 
 								this.aResult[row + activeRange.r1][col + activeRange.c1][0].rowSpan = rowSpan;
 								this.aResult[row + activeRange.r1][col + activeRange.c1][0].colSpan = colSpan;
+								
+								//backgroundColor
+								backgroundColor = this.getBackgroundColorTCell(childrens[i].elem);
+								if(backgroundColor)
+									this.aResult[row + activeRange.r1][col + activeRange.c1][0].bc = backgroundColor;
 								
 								this.aResult[row + activeRange.r1][col + activeRange.c1][0].borders = this._getBorders(childrens[i], row, col, this.aResult[row + activeRange.r1][col + activeRange.c1][0].borders);
 							}
@@ -3336,19 +3342,7 @@
 				var c1 = col !== undefined ? col : activeRange.c1;
 				
 				//backgroundColor
-				var backgroundColor = null;
-				var compiledPrCell, color;
-				if(paragraph.Parent && paragraph.Parent.Parent && paragraph.Parent.Parent instanceof CTableCell)
-				{
-					compiledPrCell = paragraph.Parent.Parent.Get_CompiledPr();
-					
-					if(compiledPrCell)
-					{	
-						var color = compiledPrCell.Shd.Color;
-						backgroundColor = new RgbColor(this.clipboard._getBinaryColor("rgb(" + color.r + "," + color.g + "," + color.b + ")"));
-					};
-				};
-				
+				var backgroundColor = this.getBackgroundColorTCell(paragraph);
 				if(backgroundColor)
 					oNewItem.bc = backgroundColor;
 				
@@ -3363,6 +3357,7 @@
 				var Lvl = null;
 				var oNumPr = paragraph.Numbering_Get();
 				var numberingText = null;
+				var formatText;
 				if(oNumPr != null)
 				{
 					var aNum = paragraph.Parent.Numbering.Get_AbstractNum( oNumPr.NumId );
@@ -3392,7 +3387,6 @@
 				};
 
 				
-				var cTextPr, formatText;
 				//проходимся по контенту paragraph
 				for(var n = 0; n < content.length; n++)
 				{
@@ -3408,7 +3402,7 @@
 					{
 						case para_Run://*paraRun*
 						{
-							s = this._parseParaRun(content[n], oNewItem, paraPr, s, row, c1, text, formatText);
+							s = this._parseParaRun(content[n], oNewItem, paraPr, s, row, c1, text);
 							break;
 						};
 						case para_Hyperlink://*link*
@@ -3422,7 +3416,7 @@
 								{
 									case para_Run://*paraRun*
 									{
-										s = this._parseParaRun(content[n].Content[h], oNewItem, paraPr, s, row, c1, text, formatText);
+										s = this._parseParaRun(content[n].Content[h], oNewItem, paraPr, s, row, c1, text);
 										break;
 									};
 								};
@@ -3431,15 +3425,42 @@
 						};
 					};
 				};
+				
 			},
 			
+			getBackgroundColorTCell: function(elem)
+			{
+				var compiledPrCell, color;
+				var backgroundColor = null;
+				
+				var tableCell;
+				if(elem && elem instanceof CTableCell)
+					tableCell = elem;
+				else if(elem && elem.Parent && elem.Parent instanceof CTableCell)
+					tableCell = elem.Parent;
+				else if(elem.Parent && elem.Parent.Parent && elem.Parent.Parent instanceof CTableCell)
+					tableCell = elem.Parent.Parent;
+				
+				if(tableCell)
+				{
+					compiledPrCell = tableCell.Get_CompiledPr();
+					
+					if(compiledPrCell)
+					{	
+						var color = compiledPrCell.Shd.Color;
+						backgroundColor = new RgbColor(this.clipboard._getBinaryColor("rgb(" + color.r + "," + color.g + "," + color.b + ")"));
+					};
+				};
+				
+				return backgroundColor;
+			},
 			
-			_parseParaRun: function(paraRun, oNewItem, paraPr, s, row, c1, text, formatText)
+			_parseParaRun: function(paraRun, oNewItem, paraPr, s, row, c1, text)
 			{
 				var paraRunContent = paraRun.Content;
 				var aResult = this.aResult;
 				var paragraphFontFamily = paraPr.TextPr.FontFamily.Name;
-				var cloneNewItem;
+				var cloneNewItem, formatText;
 			
 				var cTextPr = paraRun.Get_CompiledPr();
 				if(cTextPr && !(paraRunContent.length == 1 && paraRunContent[0] instanceof ParaEnd))//settings for text	
