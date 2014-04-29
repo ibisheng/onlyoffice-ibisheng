@@ -3359,6 +3359,9 @@
 				else if(horisonalAlign == null)
 					oNewItem.wrap = true;
 					
+				//вертикальное выравнивание
+				oNewItem.va = "center";
+					
 				//так же wrap выставляем у параграфа, чьим родителем является ячейка таблицы	
 				if(this._getParentByTag(paragraph, c_oAscBoundsElementType.Cell) != null)
 					oNewItem.wrap = true;
