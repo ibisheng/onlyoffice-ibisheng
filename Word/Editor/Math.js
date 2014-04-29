@@ -959,6 +959,7 @@ ParaMath.prototype =
     Get_EndRangePos : function(_CurLine, _CurRange, SearchPos, Depth)
     {
         // TODO: ParaMath.Get_EndRangePos
+
     },
 
     Get_StartRangePos : function(_CurLine, _CurRange, SearchPos, Depth)

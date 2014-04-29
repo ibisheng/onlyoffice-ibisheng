@@ -6160,6 +6160,10 @@ CMathContent.prototype =
     {
         if(!this.IsEmpty())
         {
+            this.CurPos = 0;
+            this.SelectStartPos = 0;
+            this.SelectEndPos   = 0;
+
             this.content[0].Cursor_MoveToStartPos();
         }
     },
@@ -6168,6 +6172,10 @@ CMathContent.prototype =
         if(!this.IsEmpty())
         {
             var len = this.content.length - 1;
+            this.CurPos = len;
+            this.SelectStartPos = len;
+            this.SelectEndPos   = len;
+
             this.content[len].Cursor_MoveToEndPos();
         }
     },
