@@ -7,7 +7,7 @@
  * Time: 15:18
  * To change this template use File | Settings | File Templates.
  */
-cFormulaFunction.Statistical = {
+FormulaObjects.cFormulaFunction.Statistical = {
     'groupName':"Statistical",
     'AVEDEV':cAVEDEV,
     'AVERAGE':cAVERAGE,

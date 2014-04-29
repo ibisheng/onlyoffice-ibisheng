@@ -351,7 +351,7 @@ function BesselY( fNum, nOrder ) {
  * Time: 12:25
  * To change this template use File | Settings | File Templates.
  */
-cFormulaFunction.Engineering = {
+FormulaObjects.cFormulaFunction.Engineering = {
     'groupName':"Engineering",
     'BESSELI':cBESSELI,
     'BESSELJ':cBESSELJ,

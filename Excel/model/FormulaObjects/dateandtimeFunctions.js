@@ -26,12 +26,12 @@ function yearFrac(d1, d2, mode) {
     d1.truncate();
     d2.truncate();
 
-    var date1 = d1.getDate(),
-        month1 = d1.getMonth()+1,
-        year1 = d1.getFullYear(),
-        date2 = d2.getDate(),
-        month2 = d2.getMonth()+1,
-        year2 = d2.getFullYear();
+    var date1 = d1.getUTCDate(),
+        month1 = d1.getUTCMonth()+1,
+        year1 = d1.getUTCFullYear(),
+        date2 = d2.getUTCDate(),
+        month2 = d2.getUTCMonth()+1,
+        year2 = d2.getUTCFullYear();
 
     switch ( mode ) {
         case DayCountBasis.UsPsa30_360:
@@ -63,12 +63,12 @@ function yearFrac(d1, d2, mode) {
 }
 
 function diffDate(d1, d2, mode){
-    var date1 = d1.getDate(),
-        month1 = d1.getMonth()+1,
-        year1 = d1.getFullYear(),
-        date2 = d2.getDate(),
-        month2 = d2.getMonth()+1,
-        year2 = d2.getFullYear();
+    var date1 = d1.getUTCDate(),
+        month1 = d1.getUTCMonth()+1,
+        year1 = d1.getUTCFullYear(),
+        date2 = d2.getUTCDate(),
+        month2 = d2.getUTCMonth()+1,
+        year2 = d2.getUTCFullYear();
 
     switch ( mode ) {
         case DayCountBasis.UsPsa30_360:
@@ -100,12 +100,12 @@ function diffDate(d1, d2, mode){
 }
 
 function diffDate2(d1, d2, mode){
-    var date1 = d1.getDate(),
-        month1 = d1.getMonth(),
-        year1 = d1.getFullYear(),
-        date2 = d2.getDate(),
-        month2 = d2.getMonth(),
-        year2 = d2.getFullYear();
+    var date1 = d1.getUTCDate(),
+        month1 = d1.getUTCMonth(),
+        year1 = d1.getUTCFullYear(),
+        date2 = d2.getUTCDate(),
+        month2 = d2.getUTCMonth(),
+        year2 = d2.getUTCFullYear();
 
     var nDaysInYear, nYears, nDayDiff;
 
@@ -125,7 +125,7 @@ function diffDate2(d1, d2, mode){
                 nYears--;
 
             if( nYears )
-                dayDiff = parseInt((d2 - new Date( year2, month1, date1 ))/c_msPerDay);
+                dayDiff = parseInt((d2 - new Date( Date.UTC(year2, month1, date1) ))/c_msPerDay);
             else
                 dayDiff = parseInt(( d2 - d1 )/c_msPerDay);
 
@@ -166,12 +166,12 @@ function GetDiffDate( d1,d2, nMode ){
 
     var nRet,pOptDaysIn1stYear
 
-    var nD1 = d1.getDate(),
-        nM1 = d1.getMonth(),
-        nY1  = d1.getFullYear(),
-        nD2 = d2.getDate(),
-        nM2 = d2.getMonth(),
-        nY2 = d2.getFullYear();
+    var nD1 = d1.getUTCDate(),
+        nM1 = d1.getUTCMonth(),
+        nY1  = d1.getUTCFullYear(),
+        nD2 = d2.getUTCDate(),
+        nM2 = d2.getUTCMonth(),
+        nY2 = d2.getUTCFullYear();
 
     switch( nMode )
     {
@@ -210,7 +210,7 @@ function GetDiffDate( d1,d2, nMode ){
     return (bNeg ? -nRet : nRet) / c_msPerDay / pOptDaysIn1stYear;
 }
 
-cFormulaFunction.DateAndTime = {
+FormulaObjects.cFormulaFunction.DateAndTime = {
     'groupName':"DateAndTime",
     'DATE':cDATE,
     'DATEDIF':cDATEDIF,
@@ -295,7 +295,7 @@ cDATE.prototype.Calculate = function ( arg ) {
     if ( month == 0 ) {
         return this.setCA( new cError( cErrorType.not_numeric ), true );
     }
-    this.value = new cNumber( Math.round( new Date( year, month - 1, day ).getExcelDate() ) )
+    this.value = new cNumber( Math.round( new Date( Date.UTC(year, month - 1, day) ).getExcelDate() ) )
     this.value.numFormat = 14;
     this.value.ca = true;
     return this.value;
@@ -367,13 +367,13 @@ cDATEDIF.prototype.Calculate = function ( arg ) {
     val1 = Date.prototype.getDateFromExcel( val1 );
 
     function dateDiff( date1, date2 ) {
-        var years = date2.getFullYear() - date1.getFullYear();
-        var months = years * 12 + date2.getMonth() - date1.getMonth();
-        var days = date2.getDate() - date1.getDate();
+        var years = date2.getUTCFullYear() - date1.getUTCFullYear();
+        var months = years * 12 + date2.getUTCMonth() - date1.getUTCMonth();
+        var days = date2.getUTCDate() - date1.getUTCDate();
 
-        years -= date2.getMonth() < date1.getMonth();
-        months -= date2.getDate() < date1.getDate();
-        days += days < 0 ? new Date( date2.getFullYear(), date2.getMonth() - 1, 0 ).getDate() + 1 : 0;
+        years -= date2.getUTCMonth() < date1.getUTCMonth();
+        months -= date2.getUTCDate() < date1.getUTCDate();
+        days += days < 0 ? new Date( Date.UTC(date2.getUTCFullYear(), date2.getUTCMonth() - 1, 0) ).getUTCDate() + 1 : 0;
 
         return [ years, months, days ];
     }
@@ -389,11 +389,11 @@ cDATEDIF.prototype.Calculate = function ( arg ) {
             return this.value = new cNumber( parseInt( (val1 - val0) / c_msPerDay ) );
             break;
         case "MD":
-            if ( val0.getDate() > val1.getDate() ) {
-                this.value = new cNumber( Math.abs( new Date( val0.getFullYear(), val0.getMonth(), val0.getDate() ) - new Date( val0.getFullYear(), val0.getMonth() + 1, val1.getDate() ) ) / c_msPerDay );
+            if ( val0.getUTCDate() > val1.getUTCDate() ) {
+                this.value = new cNumber( Math.abs( new Date( Date.UTC(val0.getUTCFullYear(), val0.getUTCMonth(), val0.getUTCDate()) ) - new Date( Date.UTC(val0.getUTCFullYear(), val0.getUTCMonth() + 1, val1.getUTCDate()) ) ) / c_msPerDay );
             }
             else {
-                this.value = new cNumber( val1.getDate() - val0.getDate() );
+                this.value = new cNumber( val1.getUTCDate() - val0.getUTCDate() );
             }
             return this.value;
             break;
@@ -402,11 +402,11 @@ cDATEDIF.prototype.Calculate = function ( arg ) {
             return this.value = new cNumber( d[1] - d[0] * 12 );
             break;
         case "YD":
-            if ( val0.getMonth() > val1.getMonth() ) {
-                this.value = new cNumber( Math.abs( new Date( val0.getFullYear(), val0.getMonth(), val0.getDate() ) - new Date( val0.getFullYear() + 1, val1.getMonth(), val1.getDate() ) ) / c_msPerDay );
+            if ( val0.getUTCMonth() > val1.getUTCMonth() ) {
+                this.value = new cNumber( Math.abs( new Date( Date.UTC(val0.getUTCFullYear(), val0.getUTCMonth(), val0.getUTCDate()) ) - new Date( Date.UTC(val0.getUTCFullYear() + 1, val1.getUTCMonth(), val1.getUTCDate()) ) ) / c_msPerDay );
             }
             else {
-                this.value = new cNumber( Math.abs( new Date( val0.getFullYear(), val0.getMonth(), val0.getDate() ) - new Date( val0.getFullYear(), val1.getMonth(), val1.getDate() ) ) / c_msPerDay );
+                this.value = new cNumber( Math.abs( new Date( Date.UTC(val0.getUTCFullYear(), val0.getUTCMonth(), val0.getUTCDate()) ) - new Date( Date.UTC(val0.getUTCFullYear(), val1.getUTCMonth(), val1.getUTCDate()) ) ) / c_msPerDay );
             }
             return this.value;
             break;
@@ -607,8 +607,8 @@ cDAYS360.prototype.Calculate = function ( arg ) {
 
     var date1 = Date.prototype.getDateFromExcel( arg0.getValue() ), date2 = Date.prototype.getDateFromExcel( arg1.getValue() );
 
-    return this.value = new cNumber( GetDiffDate360( date1.getDate(), date1.getMonth() + 1, date1.getFullYear(), date1.isLeapYear(),
-        date2.getDate(), date2.getMonth() + 1, date2.getFullYear(), !arg2.toBool() ) )
+    return this.value = new cNumber( GetDiffDate360( date1.getUTCDate(), date1.getUTCMonth() + 1, date1.getUTCFullYear(), date1.isLeapYear(),
+        date2.getUTCDate(), date2.getUTCMonth() + 1, date2.getUTCFullYear(), !arg2.toBool() ) )
 
 }
 cDAYS360.prototype.getInfo = function () {
@@ -678,16 +678,16 @@ cEDATE.prototype.Calculate = function ( arg ) {
 
     date = new Date( val );
 
-    if ( 0 <= date.getDate() && 28 >= date.getDate() ) {
-        val = new Date( val.setMonth( val.getMonth() + arg1.getValue() ) )
+    if ( 0 <= date.getUTCDate() && 28 >= date.getUTCDate() ) {
+        val = new Date( val.setUTCMonth( val.getUTCMonth() + arg1.getValue() ) )
     }
-    else if ( 29 <= date.getDate() && 31 >= date.getDate() ) {
-        date.setDate( 1 );
-        date.setMonth( date.getMonth() + arg1.getValue() );
-        if ( val.getDate() > (_date = date.getDaysInMonth()) ) {
-            val.setDate( _date );
+    else if ( 29 <= date.getUTCDate() && 31 >= date.getUTCDate() ) {
+        date.setUTCDate( 1 );
+        date.setUTCMonth( date.getUTCMonth() + arg1.getValue() );
+        if ( val.getUTCDate() > (_date = date.getDaysInMonth()) ) {
+            val.setUTCDate( _date );
         }
-        val = new Date( val.setMonth( val.getMonth() + arg1.getValue() ) );
+        val = new Date( val.setUTCMonth( val.getUTCMonth() + arg1.getValue() ) );
     }
 
     return this.value = new cNumber( Math.floor( ( val.getTime() / 1000 - val.getTimezoneOffset() * 60 ) / c_sPerDay + (c_DateCorrectConst + 1) ) )
@@ -759,9 +759,9 @@ cEOMONTH.prototype.Calculate = function ( arg ) {
 
     date = new Date( val );
 
-    val.setDate( 1 );
-    val.setMonth( val.getMonth() + arg1.getValue() );
-    val.setDate( val.getDaysInMonth() );
+    val.setUTCDate( 1 );
+    val.setUTCMonth( val.getUTCMonth() + arg1.getValue() );
+    val.setUTCDate( val.getDaysInMonth() );
 
     return this.value = new cNumber( Math.floor( ( val.getTime() / 1000 - val.getTimezoneOffset() * 60 ) / c_sPerDay + (c_DateCorrectConst + 1) ) );
 }
@@ -1113,8 +1113,8 @@ cNETWORKDAYS.prototype.Calculate = function ( arg ) {
     dif = ( dif + (dif >= 0 ? c_msPerDay : 0 ) ) / c_msPerDay;
     for ( var i = 0; i < Math.abs( dif ); i++ ) {
         var date = new Date( val0 );
-        date.setDate( val0.getDate() + i );
-        if ( date.getDay() != 6 && date.getDay() != 0 && includeInHolidays( date ) )
+        date.setUTCDate( val0.getUTCDate() + i );
+        if ( date.getUTCDay() != 6 && date.getUTCDay() != 0 && includeInHolidays( date ) )
             count++;
     }
     return this.value = new cNumber( (dif < 0 ? -1 : 1) * count );
@@ -1469,7 +1469,7 @@ cWEEKDAY.prototype.Calculate = function ( arg ) {
     if ( arg0.getValue() < 0 )
         return this.value = new cError( cErrorType.wrong_value_type );
 
-    return this.value = new cNumber( weekday[new Date( (arg0.getValue() - (c_DateCorrectConst + 1)) * c_msPerDay ).getDay()] );
+    return this.value = new cNumber( weekday[new Date( (arg0.getValue() - (c_DateCorrectConst + 1)) * c_msPerDay ).getUTCDay()] );
 }
 cWEEKDAY.prototype.getInfo = function () {
     return {
@@ -1502,21 +1502,21 @@ cWEEKNUM.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cNumber( 1 ), type = 0;
 
     function WeekNumber( dt, iso, type ) {
-        dt.setHours( 0, 0, 0 );
-        var startOfYear = new Date( dt.getFullYear(), 0, 1 );
+        dt.setUTCHours( 0, 0, 0 );
+        var startOfYear = new Date( Date.UTC(dt.getUTCFullYear(), 0, 1) );
         var endOfYear = new Date( dt );
-        endOfYear.setMonth( 11 );
-        endOfYear.setDate( 31 );
-        var wk = parseInt( ((dt - startOfYear) / c_msPerDay + iso[startOfYear.getDay()]) / 7 );
+        endOfYear.setUTCMonth( 11 );
+        endOfYear.setUTCDate( 31 );
+        var wk = parseInt( ((dt - startOfYear) / c_msPerDay + iso[startOfYear.getUTCDay()]) / 7 );
         if ( type )
             switch ( wk ) {
                 case 0:
                     // Возвращаем номер недели от 31 декабря предыдущего года
-                    startOfYear.setDate( 0 );
+                    startOfYear.setUTCDate( 0 );
                     return WeekNumber( startOfYear, iso, type );
                 case 53:
                     // Если 31 декабря выпадает до четверга 1 недели следующего года
-                    if ( endOfYear.getDay() < 4 )
+                    if ( endOfYear.getUTCDay() < 4 )
                         return new cNumber( 1 );
                     else
                         return new cNumber( wk );
@@ -1524,7 +1524,7 @@ cWEEKNUM.prototype.Calculate = function ( arg ) {
                     return new cNumber( wk );
             }
         else {
-            wk = parseInt( ((dt - startOfYear) / c_msPerDay + iso[startOfYear.getDay()] + 7) / 7 );
+            wk = parseInt( ((dt - startOfYear) / c_msPerDay + iso[startOfYear.getUTCDay()] + 7) / 7 );
             return new cNumber( wk );
         }
     }
@@ -1590,7 +1590,7 @@ cWEEKNUM.prototype.Calculate = function ( arg ) {
             return this.value = new cError( cErrorType.not_numeric );
     }
 
-    return this.value = new cNumber( WeekNumber( new Date( (arg0.getValue() - (c_DateCorrectConst + 1)) * c_msPerDay ), weekdayStartDay, type ) );
+    return this.value = new cNumber( WeekNumber( Date.prototype.getDateFromExcel( arg0.getValue() ), weekdayStartDay, type ) );
 
 }
 cWEEKNUM.prototype.getInfo = function () {
@@ -1705,12 +1705,12 @@ cWORKDAY.prototype.Calculate = function ( arg ) {
     var dif = arg1.getValue(), count = 1, dif1 = dif > 0 ? 1 : dif < 0 ? -1 : 0, val, date = val0;
     while ( Math.abs( dif ) > count ) {
         date = new Date( val0.getTime() + dif1 * c_msPerDay );
-        if ( date.getDay() != 6 && date.getDay() != 0 && notAHolidays( date ) )
+        if ( date.getUTCDay() != 6 && date.getUTCDay() != 0 && notAHolidays( date ) )
             count++;
         dif >= 0 ? dif1++ : dif1--;
     }
     date = new Date( val0.getTime() + dif1 * c_msPerDay );
-    val = parseInt( ( date.getTime() / 1000 - date.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (g_bDate1904 ? 0 : 1) ) );
+    val = date.getExcelDate();
 
     if ( val < 0 )
         return this.setCA( new cError( cErrorType.not_numeric ), true );

@@ -7,7 +7,7 @@
  * Time: 15:15
  * To change this template use File | Settings | File Templates.
  */
-cFormulaFunction.Cube = {
+FormulaObjects.cFormulaFunction.Cube = {
     'groupName':"Cube",
     'CUBEKPIMEMBER':cCUBEKPIMEMBER,
     'CUBEMEMBER':cCUBEMEMBER,

@@ -165,7 +165,7 @@ function RateIteration( nper, payment, pv, fv, payType, guess ) {
 
 function lcl_GetCouppcd( settl, matur, freq ) {
     var n = new Date( matur );
-    n.setFullYear( settl.getFullYear() );
+    n.setUTCFullYear( settl.getUTCFullYear() );
     if ( n < settl ) {
         n.addYears( 1 );
     }
@@ -176,7 +176,7 @@ function lcl_GetCouppcd( settl, matur, freq ) {
 }
 
 function lcl_GetCoupncd( settl, matur, freq ) {
-    matur.setFullYear( settl.getFullYear() );
+    matur.setUTCFullYear( settl.getUTCFullYear() );
     if ( matur > settl ) {
         matur.addYears( -1 );
     }
@@ -199,7 +199,7 @@ function getcoupdays( settl, matur, frequency, basis ) {
 
 function getcoupnum( settl, matur, frequency ) {
     var n = lcl_GetCouppcd( settl, matur, frequency ),
-        months = (matur.getFullYear() - n.getFullYear()) * 12 + matur.getMonth() - n.getMonth();
+        months = (matur.getUTCFullYear() - n.getUTCFullYear()) * 12 + matur.getUTCMonth() - n.getUTCMonth();
     return Math.ceil( months * frequency / 12 );
 }
 
@@ -289,9 +289,9 @@ function getyieldmat( settle, mat, issue, rate, price, base ) {
 
 function getduration( settlement, maturity, coupon, yld, frequency, basis ) {
 
-    var dbc = getcoupdaybs( new Date( settlement ).truncate(), new Date( maturity ).truncate(), frequency, basis ),
-        coupD = getcoupdays( new Date( settlement ).truncate(), new Date( maturity ).truncate(), frequency, basis ),
-        numCoup = getcoupnum( new Date( settlement ).truncate(), new Date( maturity ).truncate(), frequency );
+    var dbc = getcoupdaybs( new Date( settlement ), new Date( maturity ), frequency, basis ),
+        coupD = getcoupdays( new Date( settlement ), new Date( maturity ), frequency, basis ),
+        numCoup = getcoupnum( new Date( settlement ), new Date( maturity ), frequency );
 
     var duration = 0, p = 0;
 
@@ -326,7 +326,7 @@ function getduration( settlement, maturity, coupon, yld, frequency, basis ) {
  * Time: 15:19
  * To change this template use File | Settings | File Templates.
  */
-cFormulaFunction.Financial = {
+FormulaObjects.cFormulaFunction.Financial = {
     'groupName':"Financial",
     'ACCRINT':cACCRINT,
     'ACCRINTM':cACCRINTM,
@@ -3278,7 +3278,7 @@ cODDFPRICE.prototype.Calculate = function ( arg ) {
         var newDate = new Date( orgDate );
         newDate.addMonths( numMonths );
         if ( returnLastDay )
-            return new Date( newDate.getFullYear(), newDate.getMonth(), newDate.getDaysInMonth() );
+            return new Date( newDate.getUTCFullYear(), newDate.getUTCMonth(), newDate.getDaysInMonth() );
         else
             return newDate;
     }
@@ -3302,8 +3302,8 @@ cODDFPRICE.prototype.Calculate = function ( arg ) {
     }
 
     function coupNumber( mat, settl, numMonths, isWholeNumber ) {
-        var my = mat.getFullYear(), mm = mat.getMonth() + 1, md = mat.getDate(),
-            sy = settl.getFullYear(), sm = settl.getMonth() + 1, sd = settl.getDate(),
+        var my = mat.getUTCFullYear(), mm = mat.getUTCMonth() + 1, md = mat.getDate(),
+            sy = settl.getUTCFullYear(), sm = settl.getUTCMonth() + 1, sd = settl.getDate(),
             endOfMonthTemp = lastDayOfMonth( my, mm, md ),
             endOfMonth = (!endOfMonthTemp && mm != 2 && md > 28 && md < new Date( my, mm ).getDaysInMonth()) ? lastDayOfMonth( sy, sm, sd ) : endOfMonthTemp,
             startDate = changeMonth( settl, 0, endOfMonth ),
@@ -4684,8 +4684,8 @@ cTBILLEQ.prototype.Calculate = function ( arg ) {
 
     var d1 = Date.prototype.getDateFromExcel( settlement.getValue() );
     var d2 = Date.prototype.getDateFromExcel( nMat );
-    var date1 = d1.getDate(), month1 = d1.getMonth(), year1 = d1.getFullYear(),
-        date2 = d2.getDate(), month2 = d2.getMonth(), year2 = d2.getFullYear();
+    var date1 = d1.getUTCDate(), month1 = d1.getUTCMonth(), year1 = d1.getUTCFullYear(),
+        date2 = d2.getUTCDate(), month2 = d2.getUTCMonth(), year2 = d2.getUTCFullYear();
 
     var nDiff = GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, true );
 
@@ -4838,8 +4838,8 @@ cTBILLYIELD.prototype.Calculate = function ( arg ) {
 
     var d1 = Date.prototype.getDateFromExcel( settlement.getValue() );
     var d2 = Date.prototype.getDateFromExcel( maturity.getValue() );
-    var date1 = d1.getDate(), month1 = d1.getMonth(), year1 = d1.getFullYear(),
-        date2 = d2.getDate(), month2 = d2.getMonth(), year2 = d2.getFullYear();
+    var date1 = d1.getUTCDate(), month1 = d1.getUTCMonth(), year1 = d1.getUTCFullYear(),
+        date2 = d2.getUTCDate(), month2 = d2.getUTCMonth(), year2 = d2.getUTCFullYear();
 
     var nDiff = GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, true );
     nDiff++;

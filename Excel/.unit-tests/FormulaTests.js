@@ -2621,7 +2621,7 @@
 
             var nSize = A.length;
             if ( A.length < 1 || nSize == 0 )
-                return new CError( cErrorType.not_available ).toString();
+                return new cError( cErrorType.not_available ).toString();
             else {
                 if ( nSize == 1 )
                     return toFixed( A[0] );
@@ -4142,7 +4142,7 @@
 
         oParser = new parserFormula( "PRICE(DATE(2008,2,15),DATE(2017,11,15),0.0575,0.065,100,2,0)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), _getprice( new Date( 2008, 1, 15 ), new Date( 2017, 10, 15 ), 0.0575, 0.065, 100, 2, 0 ) );
+        strictEqual( oParser.calculate().getValue(), _getprice( new Date( Date.UTC(2008, 1, 15 )), new Date( Date.UTC(2017, 10, 15 )), 0.0575, 0.065, 100, 2, 0 ) );
 
     } )
 
@@ -4184,7 +4184,7 @@
 
         oParser = new parserFormula( "YIELD(DATE(2008,2,15),DATE(2016,11,15),0.0575,95.04287,100,2,0)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), _getYield( new Date(2008,1,15), new Date(2016,10,15),0.0575,95.04287,100,2,0 ) );
+        strictEqual( oParser.calculate().getValue(), _getYield( new Date(Date.UTC(2008,1,15)), new Date(Date.UTC(2016,10,15)),0.0575,95.04287,100,2,0 ) );
 
     } )
 
@@ -4229,7 +4229,7 @@
 
         oParser = new parserFormula( "ODDLPRICE(DATE(2008,11,11),DATE(2021,3,1),DATE(2008,10,15),0.0785,0.0625,100,2,1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), oddlprice( new Date(2008,10,11), new Date(2021,2,1), new Date(2008,9,15), 0.0785, 0.0625, 100, 2, 1 ) );
+        strictEqual( oParser.calculate().getValue(), oddlprice( new Date(Date.UTC(2008,10,11)), new Date(Date.UTC(2021,2,1)), new Date(Date.UTC(2008,9,15)), 0.0785, 0.0625, 100, 2, 1 ) );
 
     } )
 
@@ -4259,7 +4259,7 @@
 
         oParser = new parserFormula( "DURATION(DATE(2008,1,1),DATE(2016,1,1),0.08,0.09,2,1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), _duration( new Date(2008,0,1), new Date(2016,0,1), 0.08, 0.09, 2, 1 ) );
+        strictEqual( oParser.calculate().getValue(), _duration( new Date(Date.UTC(2008,0,1)), new Date(Date.UTC(2016,0,1)), 0.08, 0.09, 2, 1 ) );
 
     } )
 
@@ -4273,7 +4273,7 @@
 
         oParser = new parserFormula( "MDURATION(DATE(2008,1,1),DATE(2016,1,1),0.08,0.09,2,1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), mduration( new Date(2008,0,1), new Date(2016,0,1), 0.08, 0.09, 2, 1 ) );
+        strictEqual( oParser.calculate().getValue(), mduration( new Date(Date.UTC(2008,0,1)), new Date(Date.UTC(2016,0,1)), 0.08, 0.09, 2, 1 ) );
 
     } )
 

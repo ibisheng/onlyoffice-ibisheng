@@ -7,7 +7,7 @@
  * Time: 15:16
  * To change this template use File | Settings | File Templates.
  */
-cFormulaFunction.Database = {
+FormulaObjects.cFormulaFunction.Database = {
     'groupName':"Database",
     'DAVERAGE':cDAVERAGE,
     'DCOUNT':cDCOUNT,

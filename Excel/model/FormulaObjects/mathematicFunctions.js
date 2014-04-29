@@ -7,7 +7,7 @@
  * Time: 15:20
  * To change this template use File | Settings | File Templates.
  */
-cFormulaFunction.Mathematic = {
+FormulaObjects.cFormulaFunction.Mathematic = {
     'groupName':"Mathematic",
     'ABS':cABS,
     'ACOS':cACOS,
@@ -2857,42 +2857,39 @@ function cROMAN() {
 }
 cROMAN.prototype = Object.create( cBaseFunction.prototype )
 cROMAN.prototype.Calculate = function ( arg ) {
-    function roman( fVal, fMode ) {
-        if ( (fMode >= 0.0) && (fMode < 5.0) && (fVal >= 0.0) && (fVal < 4000.0) ) {
-            var pChars = [ 'M', 'D', 'C', 'L', 'X', 'V', 'I' ];
-            var pValues = [ 1000, 500, 100, 50, 10, 5, 1 ];
-            var nMaxIndex = pValues.length - 1;
+    function roman( num, mode ) {
+        if ( (mode >= 0) && (mode < 5) && (num >= 0) && (num < 4000) ) {
+            var chars = [ 'M', 'D', 'C', 'L', 'X', 'V', 'I' ],
+                values = [ 1000, 500, 100, 50, 10, 5, 1 ],
+                maxIndex = values.length - 1,
+                aRoman = "",
+                index, digit, index2, steps;
+            for ( var i = 0; i <= maxIndex / 2; i++ ) {
+                index = 2 * i;
+                digit = parseInt( num / values[ index ] );
 
-            var aRoman = "";
-            var nVal = fVal;
-            var nMode = fMode;
-
-            for ( var i = 0; i <= nMaxIndex / 2; i++ ) {
-                var nIndex = 2 * i;
-                var nDigit = parseInt( nVal / pValues[ nIndex ] );
-
-                if ( (nDigit % 5) == 4 ) {
-                    var nIndex2 = (nDigit == 4) ? nIndex - 1 : nIndex - 2;
-                    var nSteps = 0;
-                    while ( (nSteps < nMode) && (nIndex < nMaxIndex) ) {
-                        nSteps++;
-                        if ( pValues[ nIndex2 ] - pValues[ nIndex + 1 ] <= nVal )
-                            nIndex++;
+                if ( (digit % 5) == 4 ) {
+                    index2 = (digit == 4) ? index - 1 : index - 2;
+                    steps = 0;
+                    while ( (steps < mode) && (index < maxIndex) ) {
+                        steps++;
+                        if ( values[ index2 ] - values[ index + 1 ] <= num )
+                            index++;
                         else
-                            nSteps = nMode;
+                            steps = mode;
                     }
-                    aRoman += pChars[ nIndex ];
-                    aRoman += pChars[ nIndex2 ];
-                    nVal = ( nVal + pValues[ nIndex ] );
-                    nVal = ( nVal - pValues[ nIndex2 ] );
+                    aRoman += chars[ index ];
+                    aRoman += chars[ index2 ];
+                    num = ( num + values[ index ] );
+                    num = ( num - values[ index2 ] );
                 }
                 else {
-                    if ( nDigit > 4 )
-                        aRoman += pChars[ nIndex - 1 ];
-                    for ( var j = nDigit % 5; j > 0; j-- ) {
-                        aRoman += pChars[ nIndex ];
+                    if ( digit > 4 )
+                        aRoman += chars[ index - 1 ];
+                    for ( var j = digit % 5; j > 0; j-- ) {
+                        aRoman += chars[ index ];
                     }
-                    nVal %= pValues[ nIndex ];
+                    num %= values[ index ];
                 }
             }
             return new cString( aRoman );

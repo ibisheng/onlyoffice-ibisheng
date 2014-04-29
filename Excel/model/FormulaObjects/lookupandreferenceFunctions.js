@@ -7,7 +7,7 @@
  * Time: 15:21
  * To change this template use File | Settings | File Templates.
  */
-cFormulaFunction.LookupAndReference = {
+FormulaObjects.cFormulaFunction.LookupAndReference = {
     'groupName':"LookupAndReference",
     'ADDRESS':cADDRESS,
     'AREAS':cAREAS,

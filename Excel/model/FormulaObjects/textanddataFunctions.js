@@ -7,7 +7,7 @@
  * Time: 15:17
  * To change this template use File | Settings | File Templates.
  */
-cFormulaFunction.TextAndData = {
+FormulaObjects.cFormulaFunction.TextAndData = {
     'groupName':"TextAndData",
     'ASC':cASC,
     'BAHTTEXT':cBAHTTEXT,
@@ -609,7 +609,7 @@ cFIND.prototype.getInfo = function () {
 }
 
 function cFINDB() {
-    var r = new cFormulaFunction.TextAndData["FIND"]()
+    var r = new FormulaObjects.cFormulaFunction.TextAndData["FIND"]()
     r.setName( "FINDB" );
     return r;
 }
@@ -869,7 +869,7 @@ cLEFT.prototype.getInfo = function () {
 }
 
 function cLEFTB() {
-    var r = new cFormulaFunction.TextAndData["LEFT"]()
+    var r = new FormulaObjects.cFormulaFunction.TextAndData["LEFT"]()
     r.setName( "LEFTB" );
     return r;
 }
@@ -918,7 +918,7 @@ cLEN.prototype.getInfo = function () {
 }
 
 function cLENB() {
-    var r = new cFormulaFunction.TextAndData["LEN"]();
+    var r = new FormulaObjects.cFormulaFunction.TextAndData["LEN"]();
     r.setName( "LENB" );
     return r;
 }
@@ -1033,7 +1033,7 @@ cMID.prototype.getInfo = function () {
 }
 
 function cMIDB() {
-    var r = new cFormulaFunction.TextAndData["MID"]();
+    var r = new FormulaObjects.cFormulaFunction.TextAndData["MID"]();
     r.setName( "MIDB" );
     return r;
 }
@@ -1210,7 +1210,7 @@ cREPLACE.prototype.getInfo = function () {
 }
 
 function cREPLACEB() {
-    var r = new cFormulaFunction.TextAndData["REPLACE"]();
+    var r = new FormulaObjects.cFormulaFunction.TextAndData["REPLACE"]();
     r.setName( "REPLACEB" );
     return r;
 }
@@ -1344,7 +1344,7 @@ cRIGHT.prototype.getInfo = function () {
 }
 
 function cRIGHTB() {
-    var r = new cFormulaFunction.TextAndData["RIGHT"]()
+    var r = new FormulaObjects.cFormulaFunction.TextAndData["RIGHT"]()
     r.setName( "RIGHTB" );
     return r;
 }
@@ -1450,7 +1450,7 @@ cSEARCH.prototype.getInfo = function () {
 }
 
 function cSEARCHB() {
-    var r = new cFormulaFunction.TextAndData["SEARCH"]();
+    var r = new FormulaObjects.cFormulaFunction.TextAndData["SEARCH"]();
     r.setName( "SEARCHB" );
     return r;
 }

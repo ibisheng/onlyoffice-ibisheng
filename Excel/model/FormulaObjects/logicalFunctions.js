@@ -7,7 +7,7 @@
  * Time: 15:22
  * To change this template use File | Settings | File Templates.
  */
-cFormulaFunction.Logical = {
+FormulaObjects.cFormulaFunction.Logical = {
     'groupName':"Logical",
     'AND':cAND,
     'FALSE':cFALSE,

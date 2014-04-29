@@ -7,7 +7,7 @@
  * Time: 15:21
  * To change this template use File | Settings | File Templates.
  */
-cFormulaFunction.Information = {
+FormulaObjects.cFormulaFunction.Information = {
     'groupName':"Information",
     'ERROR.TYPE':cERROR_TYPE,
     'ISBLANK':cISBLANK,
