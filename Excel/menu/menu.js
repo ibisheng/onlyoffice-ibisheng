@@ -507,9 +507,6 @@
 
 	api.asc_registerCallback("asc_onSelectionRangeChanged", function (val) {
 		$("#chartRange").val(val);
-	});
-
-	api.asc_registerCallback("asc_onSelectionRangeChanged", function (val) {
 		$("#formatTableRange").val(val);
 	});
 
