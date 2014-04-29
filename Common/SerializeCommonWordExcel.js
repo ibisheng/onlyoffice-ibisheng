@@ -38,7 +38,8 @@ var c_oSerBorderType = {
     Color: 0,
     Space: 1,
     Size: 2,
-    Value: 3
+    Value: 3,
+	ColorTheme: 4
 };
 var c_oSerBordersType = {
     left: 0,
@@ -62,7 +63,8 @@ var c_oSerPaddingType = {
 };
 var c_oSerShdType = {
     Value: 0,
-    Color: 1
+    Color: 1,
+	ColorTheme: 2
 };
 
 var g_tabtype_left = 0;
@@ -380,13 +382,19 @@ Binary_CommonReader.prototype.ReadColor = function()
     var b = this.stream.GetUChar()
     return new CDocumentColor(r, g, b);
 };
-Binary_CommonReader.prototype.ReadShd = function(type, length, Shd)
+Binary_CommonReader.prototype.ReadShd = function(type, length, Shd, themeColor)
 {
     var res = c_oSerConstants.ReadOk;
+	var oThis = this;
     switch(type)
     {
         case c_oSerShdType.Value: Shd.Value = this.stream.GetUChar();break;
         case c_oSerShdType.Color: Shd.Color = this.ReadColor();break;
+		case c_oSerShdType.ColorTheme:
+			res = this.Read2(length, function(t, l){
+				return oThis.ReadColorTheme(t, l, themeColor);
+			});
+			break;
         default:
             res = c_oSerConstants.ReadUnknown;
             break;
@@ -404,6 +412,21 @@ Binary_CommonReader.prototype.ReadColorSpreadsheet = function(type, length, colo
         color.theme = this.stream.GetUChar();
 	else if ( c_oSer_ColorObjectType.Tint == type )
         color.tint = this.stream.GetDoubleLE();
+    else
+        res = c_oSerConstants.ReadUnknown;
+    return res;
+};
+Binary_CommonReader.prototype.ReadColorTheme = function(type, length, color)
+{
+    var res = c_oSerConstants.ReadOk;
+    if ( c_oSer_ColorThemeType.Auto == type )
+        color.Auto = true;
+	else if ( c_oSer_ColorThemeType.Color == type )
+        color.Color = this.stream.GetByte();
+	else if ( c_oSer_ColorThemeType.Tint == type )
+        color.Tint = this.stream.GetByte();
+	else if ( c_oSer_ColorThemeType.Shade == type )
+        color.Shade = this.stream.GetByte();
     else
         res = c_oSerConstants.ReadUnknown;
     return res;
