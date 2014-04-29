@@ -219,9 +219,12 @@ function CFontFileLoader(id)
     
     this.LoadFontNative = function()
     {
-		// all font engine now native
-		this.Status = 0;
-		return;
+		if (window["use_native_fonts_only"] === true)
+		{
+			// all font engine now native
+			this.Status = 0;
+			return;
+		}
 		
         var __font_data_idx = g_fonts_streams.length;
         var _data = window["native"]["GetFontBinary"](this.Id);

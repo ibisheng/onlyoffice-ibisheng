@@ -242,6 +242,8 @@ function CFontManager()
     this.m_oLibrary = new Object();
     this.Initialize = function(){};
 };
+
+window["use_native_fonts_only"] = true;
 // -------------------------------------------------
 
 // declarate unused methods and objects
