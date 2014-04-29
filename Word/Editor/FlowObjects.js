@@ -98,6 +98,59 @@ CFlowTable.prototype =
     Update_CursorType : function(X, Y, PageIndex)
     {
 
+    },
+
+    getArrayWrapIntervals: function(x0,y0, x1, y1, Y0Sp, Y1Sp, LeftField, RightField, ret)
+    {
+        if(this.WrappingType === WRAPPING_TYPE_THROUGH || this.WrappingType === WRAPPING_TYPE_TIGHT)
+        {
+            y0 = Y0Sp;
+            y1 = Y1Sp;
+        }
+        var top = this.Y - this.Distance.T;
+        var bottom = this.Y + this.H + this.Distance.B;
+        if(y1 < top || y0 > bottom)
+            return ret;
+
+        var b_check = false, X0, X1, Y1;
+        switch(this.WrappingType)
+        {
+            case WRAPPING_TYPE_NONE:
+            {
+                return ret;
+            }
+            case WRAPPING_TYPE_SQUARE:
+            case WRAPPING_TYPE_THROUGH:
+            case WRAPPING_TYPE_TIGHT:
+            {
+                X0 = this.X - this.Distance.L;
+                X1 = this.X + this.W + this.Distance.R;
+                Y1 = bottom;
+                b_check = true;
+                break;
+            }
+            case WRAPPING_TYPE_TOP_AND_BOTTOM:
+            {
+                X0 = x0;
+                X1 = x1;
+                Y1 = bottom;
+                break;
+            }
+        }
+        if(b_check)
+        {
+            var dx = this.WrappingType === WRAPPING_TYPE_SQUARE ? 6.35 : 3.175 ;
+            if(X0  < LeftField + dx)
+            {
+                X0 = x0 ;
+            }
+            if(X1 > RightField - dx)
+            {
+                X1 = x1;
+            }
+        }
+        ret.push({X0: X0, X1: X1, Y1: Y1, typeLeft: this.WrappingType, typeRight: this.WrappingType});
+        return ret;
     }
 
 };

@@ -914,10 +914,7 @@ CWrapManager.prototype =
             var arrFlowTables = this.graphicPage.flowTables;
             for(index = 0; index < arrFlowTables.length; ++index)
             {
-                var cur_float_table = arrFlowTables[index];
-                if(y1 < cur_float_table.Y - cur_float_table.Distance.T|| y0 > cur_float_table.Y + cur_float_table.H + cur_float_table.Distance.B)
-                    continue;
-                arr_intervals.push({X0: cur_float_table.X - cur_float_table.Distance.L,  X1: cur_float_table.X + cur_float_table.W +  cur_float_table.Distance.R, Y1: cur_float_table.Y + cur_float_table.H +  cur_float_table.Distance.B });
+                arrFlowTables[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField,  arr_intervals);
             }
         }
         else
@@ -931,16 +928,13 @@ CWrapManager.prototype =
                         arrGraphicObjects[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, arr_intervals);
                     }
                 }
-
                 arrFlowTables = this.graphicPage.flowTables;
                 for(index = 0; index < arrFlowTables.length; ++index)
                 {
-                    cur_float_table = arrFlowTables[index];
+                    var cur_float_table = arrFlowTables[index];
                     if(cur_float_table.Table.Parent === docContent)
                     {
-                        if(y1 < cur_float_table.Y - cur_float_table.Distance.T|| y0 > cur_float_table.Y + cur_float_table.H + cur_float_table.Distance.B)
-                            continue;
-                        arr_intervals.push({X0: cur_float_table.X - cur_float_table.Distance.L,  X1: cur_float_table.X + cur_float_table.W +  cur_float_table.Distance.R, Y1: cur_float_table.Y + cur_float_table.H +  cur_float_table.Distance.B });
+                        cur_float_table.getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, arr_intervals);
                     }
                 }
             }
@@ -962,16 +956,13 @@ CWrapManager.prototype =
                     arrFlowTables = hdr_footer_objects.flowTables;
                     for(index = 0; index < arrFlowTables.length; ++index)
                     {
-                        cur_float_table = arrFlowTables[index];
+                        var cur_float_table = arrFlowTables[index];
                         if(cur_float_table.Table.Parent === docContent)
                         {
-                            if(y1 < cur_float_table.Y - cur_float_table.Distance.T|| y0 > cur_float_table.Y + cur_float_table.H + cur_float_table.Distance.B)
-                                continue;
-                            arr_intervals.push({X0: cur_float_table.X - cur_float_table.Distance.L,  X1: cur_float_table.X + cur_float_table.W +  cur_float_table.Distance.R, Y1: cur_float_table.Y + cur_float_table.H +  cur_float_table.Distance.B });
+                            cur_float_table.getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, arr_intervals);
                         }
                     }
                 }
-
             }
         }
 
