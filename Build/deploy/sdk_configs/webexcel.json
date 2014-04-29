@@ -32,7 +32,6 @@
                 "../../Common/FontsFreeType/FontFile.js",
                 "../../Common/FontsFreeType/FontManager.js",
                 "../../Word/Drawing/HatchPattern.js",
-				"../../Common/AllFonts.js",
                 "../../Word/Drawing/Externals.js",
                 "../../Word/Drawing/Metafile.js",
                 "../../Excel/model/DrawingObjects/GlobalLoaders.js",
