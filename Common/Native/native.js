@@ -229,7 +229,7 @@ function GetNativeEngine()
 
 var native_renderer = null;
 var _api = null;
-var Asc = null;
+var Asc = window["Asc"];
 
 function NativeOpenFile()
 {
@@ -240,8 +240,7 @@ function NativeOpenFile()
         _api.asc_nativeOpenFile(doc_bin);
     }
     else
-    {
-        Asc = window["Asc"];    
+    { 
         _api = new window["Asc"]["spreadsheet_api"];
         var doc_bin = window.native.GetFileString(g_file_path);
         _api.asc_nativeOpenFile(doc_bin);
@@ -265,7 +264,6 @@ function NativeOpenFile2()
     }
     else
     {
-        Asc = window["Asc"];    
         _api = new window["Asc"]["spreadsheet_api"];
         var doc_bin = window.native.GetFileString(window.g_file_path);
         _api.asc_nativeOpenFile(doc_bin);

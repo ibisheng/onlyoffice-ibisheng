@@ -2062,4 +2062,4 @@ CMobileTouchManager.prototype = {
             }
         }
     }
-}
+};

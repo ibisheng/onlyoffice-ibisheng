@@ -22,6 +22,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		var asc_CAscLicense = asc.asc_CAscLicense;
 		var asc_CTrackFile = asc.CTrackFile;
 		var prot;
+		var CDocsCoApi = window["CDocsCoApi"];
 
 		/** @constructor */
 		function spreadsheet_api(name, inputName, eventsHandlers, options) {

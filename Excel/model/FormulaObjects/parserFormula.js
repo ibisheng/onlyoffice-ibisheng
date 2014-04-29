@@ -1,5 +1,5 @@
 ﻿"use strict";
-window.FormulaObjects = {};
+var FormulaObjects = {};
 /** @enum */
 var cElementType = {
     number:0,

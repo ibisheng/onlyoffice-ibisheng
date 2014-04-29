@@ -1,28 +1,5 @@
 var g_fontManager2 = null;
 
-function CGrRFonts()
-{
-    this.Ascii    = {Name: "Empty", Index: -1};
-    this.EastAsia = {Name: "Empty", Index: -1};
-    this.HAnsi    = {Name: "Empty", Index: -1};
-    this.CS       = {Name: "Empty", Index: -1};
-}
-CGrRFonts.prototype =
-{
-    checkFromTheme : function(fontScheme, rFonts)
-    {
-        this.Ascii.Name     = fontScheme.checkFont(rFonts.Ascii.Name);
-        this.EastAsia.Name  = fontScheme.checkFont(rFonts.EastAsia.Name);
-        this.HAnsi.Name     = fontScheme.checkFont(rFonts.HAnsi.Name);
-        this.CS.Name        = fontScheme.checkFont(rFonts.CS.Name);
-
-        this.Ascii.Index    = -1;
-        this.EastAsia.Index = -1;
-        this.HAnsi.Index    = -1;
-        this.CS.Index       = -1;
-    }
-};
-
 function CClipManager()
 {
     this.clipRects = [];
