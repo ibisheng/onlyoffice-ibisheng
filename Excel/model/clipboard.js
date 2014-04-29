@@ -3352,6 +3352,16 @@
 				var paraPr = paragraph.elem.Get_CompiledPr();
 				var paragraphFontFamily = paraPr.TextPr.FontFamily.Name;
 				
+				//горизонтальное выравнивание
+				var horisonalAlign = this._getAlignHorisontal(paraPr);
+				if(horisonalAlign)
+					oNewItem.a = this._getAlignHorisontal(paraPr);
+				else if(horisonalAlign == null)
+					oNewItem.wrap = true;
+					
+				//так же wrap выставляем у параграфа, чьим родителем является ячейка таблицы	
+				if(this._getParentByTag(paragraph, c_oAscBoundsElementType.Cell) != null)
+					oNewItem.wrap = true;
 				
 				//Numbering
 				var LvlPr = null;
@@ -3406,7 +3416,7 @@
 							s = this._parseParaRun(content[n], oNewItem, paraPr, s, row, c1, text);
 							break;
 						};
-						case para_Hyperlink://*link*
+						case para_Hyperlink://*hyperLink*
 						{	
 							oNewItem.hyperLink = content[n].Value;
 							oNewItem.toolTip = content[n].ToolTip;
@@ -3427,6 +3437,41 @@
 					};
 				};
 				
+			},
+			
+			_getAlignHorisontal: function(paraPr)
+			{
+				var result;
+				var settings = paraPr.ParaPr;
+				
+				if(!settings)
+					return;
+				
+				switch(settings.Jc)
+				{
+					case 0:
+					{
+						result = "right";
+						break;
+					}
+					case 1:
+					{
+						result = "left";
+						break;
+					}
+					case 2:
+					{
+						result = "center";
+						break;
+					}
+					case 3:
+					{
+						result = null;
+						break;
+					}
+				};
+				
+				return result;
 			},
 			
 			getBackgroundColorTCell: function(elem)
