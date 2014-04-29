@@ -36,11 +36,6 @@ function CGraphicObjects(document, drawingDocument, api, documentContent)
     this.drawingObjects = [];
     this.objectsMap = {};
 
-    ////header footer graphicObjects
-
-    this.firstPage = null;
-    this.evenPage = null;
-    this.oddPage = null;
 
     this.urlMap = [];
     this.recalcMap = {};
@@ -60,46 +55,6 @@ function CGraphicObjects(document, drawingDocument, api, documentContent)
 
     this.selectedObjects = [];
 
-    this.headerFooter =
-    {
-        header:{
-            first: null,
-            even : null,
-            odd  : null
-        },
-
-        footer: {
-            first: null,
-            even : null,
-            odd  : null
-        },
-
-        commonFirst:
-        {
-            inlineObjects: [],
-            behindDocObjects: [],
-            wrappingObjects: [],
-            beforeTextObjects: [],
-            flowTables: []
-        },
-
-        commonEven:
-        {
-            inlineObjects: [],
-            behindDocObjects: [],
-            wrappingObjects: [],
-            beforeTextObjects: [],
-            flowTables: []
-        },
-        commonOdd:
-        {
-            inlineObjects: [],
-            behindDocObjects: [],
-            wrappingObjects: [],
-            beforeTextObjects: [],
-            flowTables: []
-        }
-    };
 
     this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
 
@@ -834,149 +789,32 @@ CGraphicObjects.prototype =
 
     addFloatTable: function(table)
     {
+        if(!this.graphicPages[table.PageNum + table.PageController])
+        {
+            this.graphicPages[table.PageNum + table.PageController] = new CGraphicPage(table.PageNum + table.PageController, this);
+        }
         if(!table.Table.Parent.Is_HdrFtr())
         {
             this.graphicPages[table.PageNum + table.PageController].addFloatTable(table);
         }
         else
         {
-            var hdr_or_ftr = table.Table.Parent.Is_HdrFtr(true);
-            return;
-            var hdr_ftr_controller_content = this.document.HdrFtr.Content[0];
-            var headers, footers;
-            headers = hdr_ftr_controller_content.Header;
-            footers = hdr_ftr_controller_content.Footer;
-            var hdr_footer_objects, common_hdr_footer_objects = [];
-
-            if(headers.First === hdr_or_ftr)
-            {
-                hdr_footer_objects = this.headerFooter.header.first;
-                common_hdr_footer_objects.push(this.headerFooter.commonFirst);
-                if(this.headerFooter.header.first === this.headerFooter.header.even)
-                    common_hdr_footer_objects.push(this.headerFooter.commonEven);
-                if(this.headerFooter.header.first === this.headerFooter.header.odd)
-                    common_hdr_footer_objects.push(this.headerFooter.commonOdd);
-
-            }
-            else if(footers.First === hdr_or_ftr)
-            {
-                hdr_footer_objects = this.headerFooter.footer.first;
-                common_hdr_footer_objects.push(this.headerFooter.commonFirst);
-
-                if(this.headerFooter.header.first === this.headerFooter.header.even)
-                    common_hdr_footer_objects.push(this.headerFooter.commonEven);
-                if(this.headerFooter.header.first === this.headerFooter.header.odd)
-                    common_hdr_footer_objects.push(this.headerFooter.commonOdd);
-            }
-            else if(headers.Even === hdr_or_ftr)
-            {
-                hdr_footer_objects = this.headerFooter.header.even;
-                common_hdr_footer_objects.push(this.headerFooter.commonEven);
-
-                if(this.headerFooter.header.even === this.headerFooter.header.first)
-                    common_hdr_footer_objects.push(this.headerFooter.commonFirst);
-                if(this.headerFooter.header.even === this.headerFooter.header.odd)
-                    common_hdr_footer_objects.push(this.headerFooter.commonOdd);
-            }
-            else if(footers.Even === hdr_or_ftr)
-            {
-                hdr_footer_objects = this.headerFooter.footer.even;
-                common_hdr_footer_objects.push(this.headerFooter.commonEven);
-
-                if(this.headerFooter.header.even === this.headerFooter.header.first)
-                    common_hdr_footer_objects.push(this.headerFooter.commonFirst);
-                if(this.headerFooter.header.even === this.headerFooter.header.odd)
-                    common_hdr_footer_objects.push(this.headerFooter.commonOdd);
-            }
-            else if(headers.Odd === hdr_or_ftr)
-            {
-                hdr_footer_objects = this.headerFooter.header.odd;
-                common_hdr_footer_objects.push(this.headerFooter.commonOdd);
-
-                if(this.headerFooter.header.odd === this.headerFooter.header.first)
-                    common_hdr_footer_objects.push(this.headerFooter.commonFirst);
-                if(this.headerFooter.header.odd === this.headerFooter.header.even)
-                    common_hdr_footer_objects.push(this.headerFooter.commonEven);
-            }
-            else if(footers.Odd === hdr_or_ftr)
-            {
-                hdr_footer_objects = this.headerFooter.footer.odd;
-                common_hdr_footer_objects.push(this.headerFooter.commonOdd);
-
-                if(this.headerFooter.header.odd === this.headerFooter.header.first)
-                    common_hdr_footer_objects.push(this.headerFooter.commonFirst);
-                if(this.headerFooter.header.odd === this.headerFooter.header.even)
-                    common_hdr_footer_objects.push(this.headerFooter.commonEven);
-            }
-
-            var i;
-            if(hdr_footer_objects != null)
-            {
-                hdr_footer_objects.floatTables.push(table);
-                for(i = 0; i < common_hdr_footer_objects.length; ++i)
-                    common_hdr_footer_objects[i].flowTables.push(table);
-            }
+            this.graphicPages[table.PageNum + table.PageController].hdrFtrPage.addFloatTable(table);
         }
     },
 
     removeFloatTableById: function(pageIndex, id)
     {
+        if(!this.graphicPages[pageIndex])
+        {
+            this.graphicPages[pageIndex] = new CGraphicPage(pageIndex, this);
+        }
         var table = g_oTableId.Get_ById(id);
         if(!table.Parent.Is_HdrFtr())
             this.graphicPages[pageIndex].removeFloatTableById(id);
         else
         {
-            var check_hdr_ftr_arrays = [];
-            if(pageIndex === 0)
-            {
-                check_hdr_ftr_arrays.push(this.headerFooter.header.first);
-                check_hdr_ftr_arrays.push(this.headerFooter.footer.first);
-            }
-            else
-            {
-                if(pageIndex  % 2 === 1)
-                {
-                    check_hdr_ftr_arrays.push(this.headerFooter.header.even);
-                    check_hdr_ftr_arrays.push(this.headerFooter.footer.even);
-                }
-                else
-                {
-                    check_hdr_ftr_arrays.push(this.headerFooter.header.odd);
-                    check_hdr_ftr_arrays.push(this.headerFooter.footer.odd);
-                }
-            }
-
-            check_hdr_ftr_arrays.push(this.headerFooter.commonFirst);
-            check_hdr_ftr_arrays.push(this.headerFooter.commonEven);
-            check_hdr_ftr_arrays.push(this.headerFooter.commonOdd);
-
-
-            function findTableInArrayAndRemove(drawingArray, Id)
-            {
-                for(var i = drawingArray.length-1; i >-1; --i)
-                {
-                    if(drawingArray[i].Table.Get_Id() === Id)
-                        drawingArray.splice(i, 1);
-                }
-            }
-
-            function findInArrayAndRemoveFromDrawingPage(drawingPage, Id)
-            {
-                if(!drawingPage)
-                    return;
-                if(Array.isArray(drawingPage.flowTables))
-                {
-                    findTableInArrayAndRemove(drawingPage.flowTables, Id);
-                }
-                else if(Array.isArray(drawingPage.floatTables))
-                {
-                    findTableInArrayAndRemove(drawingPage.floatTables, Id);
-                }
-            }
-            for(var i = 0; i < check_hdr_ftr_arrays.length; ++i)
-            {
-                findInArrayAndRemoveFromDrawingPage(check_hdr_ftr_arrays[i], id);
-            }
+            this.graphicPages[pageIndex].hdrFtrPage.removeFloatTableById(id);
         }
     },
 
@@ -991,56 +829,14 @@ CGraphicObjects.prototype =
 
     getTableByXY: function(x, y, pageIndex, documentContent)
     {
+        if(!this.graphicPages[pageIndex])
+        {
+            this.graphicPages[pageIndex] = new CGraphicPage(pageIndex, this);
+        }
         if(!documentContent.Is_HdrFtr())
             return this.graphicPages[pageIndex].getTableByXY(x, y, documentContent);
-
-        var check_hdr_ftr_arrays = [];
-        if(pageIndex === 0)
-        {
-            check_hdr_ftr_arrays.push(this.headerFooter.header.first);
-            check_hdr_ftr_arrays.push(this.headerFooter.footer.first);
-        }
         else
-        {
-            if(pageIndex  % 2 === 1)
-            {
-                check_hdr_ftr_arrays.push(this.headerFooter.header.even);
-                check_hdr_ftr_arrays.push(this.headerFooter.footer.even);
-            }
-            else
-            {
-                check_hdr_ftr_arrays.push(this.headerFooter.header.odd);
-                check_hdr_ftr_arrays.push(this.headerFooter.footer.odd);
-            }
-        }
-
-        function findTableInArrayAndRemove(drawingArray, documentContent, x, y)
-        {
-            for(var i = drawingArray.length-1; i >-1; --i)
-            {
-                if(drawingArray[i].IsPointIn(x, y) && drawingArray[i].Table.Parent === documentContent)
-                    return drawingArray[i];
-            }
-            return null;
-        }
-
-        function findInArrayAndRemoveFromDrawingPage(drawingPage, documentContent, x, y)
-        {
-            if(!drawingPage)
-                return null;
-            else if(Array.isArray(drawingPage.floatTables))
-            {
-                return findTableInArrayAndRemove(drawingPage.floatTables, documentContent, x, y);
-            }
-        }
-        var ret;
-        for(var i = 0; i < check_hdr_ftr_arrays.length; ++i)
-        {
-            ret = findInArrayAndRemoveFromDrawingPage(check_hdr_ftr_arrays[i], documentContent, x, y);
-            if(ret)
-                return ret;
-        }
-
+            return this.graphicPages[pageIndex].hdrFtrPage.getTableByXY(x, y, documentContent);
         return null;
     },
 
@@ -1310,6 +1106,8 @@ CGraphicObjects.prototype =
 
     getAllFloatObjectsOnPage: function(pageIndex, docContent)
     {
+        if(!this.graphicPages[pageIndex])
+            this.graphicPages[pageIndex] = new CGraphicPage(pageIndex, this);
         var arr, page, i, ret = [];
         if(!docContent.Is_HdrFtr())
         {
@@ -1318,22 +1116,7 @@ CGraphicObjects.prototype =
         }
         else
         {
-            if(pageIndex === 0)
-            {
-                page = this.headerFooter.commonFirst;
-            }
-            else
-            {
-                if(pageIndex  % 2 === 1)
-                {
-
-                    page = this.headerFooter.commonEven;
-                }
-                else
-                {
-                    page = this.headerFooter.commonOdd;
-                }
-            }
+            page = this.graphicPages[pageIndex].hdrFtrPage;
         }
         arr = page.wrappingObjects.concat(page.behindDocObjects.concat(page.beforeTextObjects));
         for(i = 0; i < arr.length; ++i)
@@ -1348,34 +1131,22 @@ CGraphicObjects.prototype =
 
     getAllFloatTablesOnPage: function(pageIndex, docContent)
     {
+        if(!this.graphicPages[pageIndex])
+            this.graphicPages[pageIndex] = new CGraphicPage(pageIndex, this);
         if(!docContent)
         {
             docContent = this.document;
         }
 
         var tables, page;
-        if(!docContent.Is_HdrFtr(false))
+        if(!docContent.Is_HdrFtr())
         {
+
             page = this.graphicPages[pageIndex];
         }
         else
         {
-            if(pageIndex === 0)
-            {
-                page = this.headerFooter.commonFirst;
-            }
-            else
-            {
-                if(pageIndex  % 2 === 1)
-                {
-
-                    page = this.headerFooter.commonEven;
-                }
-                else
-                {
-                    page = this.headerFooter.commonOdd;
-                }
-            }
+            page = this.graphicPages[pageIndex].hdrFtrPage;
         }
         tables = page.flowTables;
         var ret = [];

@@ -39,6 +39,11 @@ CGraphicPage.prototype =
 {
     addFloatTable: function(table)
     {
+        for(var i = 0; i < this.flowTables.length; ++i)
+        {
+            if(this.flowTables[i] === table)
+                return;
+        }
         this.flowTables.push(table);
     },
     CheckRange: function(X0, Y0, X1, Y1, Y0sp, Y1Ssp, LeftField, RightField, HdrFtrRanges, docContent)
