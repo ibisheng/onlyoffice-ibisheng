@@ -6542,10 +6542,16 @@ asc_docs_api.prototype.asc_setAutoSaveGap = function (autoSaveGap) {
 	}
 };
 
+asc_docs_api.prototype.asc_SetDocumentPlaceChangedEnabled = function(bEnabled)
+{
+    if (this.WordControl)
+        this.WordControl.m_bDocumentPlaceChangedEnabled = bEnabled;
+}
+
 asc_docs_api.prototype.asc_SetViewRulers = function(bRulers)
 {
-    if (false === this.bInit_word_control || true === this.isViewMode)
-        return;
+    //if (false === this.bInit_word_control || true === this.isViewMode)
+    //    return;
 
     if (this.WordControl.m_bIsRuler != bRulers)
     {
@@ -6556,8 +6562,8 @@ asc_docs_api.prototype.asc_SetViewRulers = function(bRulers)
 }
 asc_docs_api.prototype.asc_SetViewRulersChange = function()
 {
-    if (false === this.bInit_word_control || true === this.isViewMode)
-        return;
+    //if (false === this.bInit_word_control || true === this.isViewMode)
+    //    return;
 
     this.WordControl.m_bIsRuler = !this.WordControl.m_bIsRuler;
     this.WordControl.checkNeedRules();

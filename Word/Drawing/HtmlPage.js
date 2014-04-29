@@ -113,6 +113,7 @@ function CEditorPage(api)
 
     this.m_bIsHorScrollVisible = false;
     this.m_bIsRuler         = (api.isMobileVersion === true) ? false : true;
+    this.m_bDocumentPlaceChangedEnabled = false;
 
     this.m_nZoomValue       = 100;
     this.m_oBoundsController = new CBoundsController();
@@ -868,8 +869,8 @@ function CEditorPage(api)
 
     this.HideRulers = function()
     {
-        if (false === oThis.m_oApi.bInit_word_control)
-            return;
+        //if (false === oThis.m_oApi.bInit_word_control)
+        //    return;
 
         if (oThis.m_bIsRuler === false)
             return;
@@ -3106,6 +3107,9 @@ function CEditorPage(api)
                 this.m_oApi.asc_fireCallback("asc_onCurrentPage", lPage);
             }
         }
+
+        if (this.m_bDocumentPlaceChangedEnabled)
+            this.m_oApi.asc_fireCallback("asc_onDocumentPlaceChanged");
     }
 
     this.OnPaint = function()
