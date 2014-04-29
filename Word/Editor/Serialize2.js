@@ -1384,7 +1384,7 @@ function Binary_pPrWriter(memory, oNumIdMap, oBinaryHeaderFooterTableWriter)
         {
             this.memory.WriteByte(c_oSer_FramePrType.Wrap);
             this.memory.WriteByte(c_oSerPropLenType.Byte);
-            this.memory.WriteByte(oFramePr.Wrap);
+            this.memory.WriteByte(oFramePr.Wrap - 1);//todo
         }
 		if(null != oFramePr.X)
         {
@@ -6057,7 +6057,7 @@ function Binary_pPrReader(doc, oReadResult, stream)
 		else if(c_oSer_FramePrType.W == type)
             oFramePr.W = g_dKoef_twips_to_mm * this.stream.GetULongLE();
 		else if(c_oSer_FramePrType.Wrap == type)
-            oFramePr.Wrap = this.stream.GetUChar();
+            oFramePr.Wrap = this.stream.GetUChar() + 1;//todo
 		else if(c_oSer_FramePrType.X == type)
             oFramePr.X = g_dKoef_twips_to_mm * this.stream.GetULongLE();
 		else if(c_oSer_FramePrType.XAlign == type)
