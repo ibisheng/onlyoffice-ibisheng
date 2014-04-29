@@ -212,5 +212,10 @@ CFlowParagraph.prototype =
     Update_CursorType : function(X, Y, PageIndex)
     {
 
+    },
+
+    getArrayWrapIntervals: function(x0,y0, x1, y1, Y0Sp, Y1Sp, LeftField, RightField, ret)
+    {
+        return CFlowTable.prototype.getArrayWrapIntervals.call(this, x0,y0, x1, y1, Y0Sp, Y1Sp, LeftField, RightField, ret);
     }
 };
