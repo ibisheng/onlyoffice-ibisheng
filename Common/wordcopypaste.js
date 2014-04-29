@@ -3050,7 +3050,6 @@ PasteProcessor.prototype =
                     var fPrepasteCallback = function(){
                         if(false == oThis.bNested)
                         {
-                            editor.WordControl.m_oLogicDocument.DrawingObjects.calculateAfterOpen(true);
                             oThis.InsertInDocument();
                             nodeDisplay.blur();
                             nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
