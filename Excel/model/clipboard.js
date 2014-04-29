@@ -3233,7 +3233,7 @@
 								this.aResult[row + activeRange.r1][col + activeRange.c1][0].colSpan = colSpan;
 								
 								//backgroundColor
-								backgroundColor = this.getBackgroundColorTCell(childrens[i].elem);
+								backgroundColor = this.getBackgroundColorTCell(childrens[i]);
 								if(backgroundColor)
 									this.aResult[row + activeRange.r1][col + activeRange.c1][0].bc = backgroundColor;
 								
@@ -3248,7 +3248,7 @@
 						var colSpan = null;
 						var rowSpan = null;
 						
-						this._parseParagraph(childrens[i].elem, activeRange, childrens[i].top + activeRange.r1, childrens[i].left + activeRange.c1);
+						this._parseParagraph(childrens[i], activeRange, childrens[i].top + activeRange.r1, childrens[i].left + activeRange.c1);
 					}
 					else
 						this._parseChildren(childrens[i], activeRange);
@@ -3306,7 +3306,7 @@
 			
 			_parseParagraph: function(paragraph, activeRange, row, col, rowSpan, colSpan)
 			{
-				var content = paragraph.Content;
+				var content = paragraph.elem.Content;
 				var row, cTextPr, fontFamily = "Arial";
 				var text = null;
 				var oNewItem = [], cloneNewItem;
@@ -3347,27 +3347,27 @@
 					oNewItem.bc = backgroundColor;
 				
 				//настройки параграфа
-				paragraph.CompiledPr.NeedRecalc = true;
-				var paraPr = paragraph.Get_CompiledPr();
+				paragraph.elem.CompiledPr.NeedRecalc = true;
+				var paraPr = paragraph.elem.Get_CompiledPr();
 				var paragraphFontFamily = paraPr.TextPr.FontFamily.Name;
 				
 				
 				//Numbering
 				var LvlPr = null;
 				var Lvl = null;
-				var oNumPr = paragraph.Numbering_Get();
+				var oNumPr = paragraph.elem.Numbering_Get();
 				var numberingText = null;
 				var formatText;
 				if(oNumPr != null)
 				{
-					var aNum = paragraph.Parent.Numbering.Get_AbstractNum( oNumPr.NumId );
+					var aNum = paragraph.elem.Parent.Numbering.Get_AbstractNum( oNumPr.NumId );
 					if(null != aNum)
 					{
 						LvlPr = aNum.Lvl[oNumPr.Lvl];
 						Lvl = oNumPr.Lvl;
 					};
 					
-					numberingText = this._parseNumbering(paragraph);
+					numberingText = this._parseNumbering(paragraph.elem);
 					
 					if(text == null)
 						text = "";
@@ -3433,17 +3433,12 @@
 				var compiledPrCell, color;
 				var backgroundColor = null;
 				
-				var tableCell;
-				if(elem && elem instanceof CTableCell)
-					tableCell = elem;
-				else if(elem && elem.Parent && elem.Parent instanceof CTableCell)
-					tableCell = elem.Parent;
-				else if(elem.Parent && elem.Parent.Parent && elem.Parent.Parent instanceof CTableCell)
-					tableCell = elem.Parent.Parent;
+				//TODO внутреннии таблицы без стиля - цвет фона белый
+				var tableCell = this._getParentByTag(elem, c_oAscBoundsElementType.Cell);
 				
 				if(tableCell)
 				{
-					compiledPrCell = tableCell.Get_CompiledPr();
+					compiledPrCell = tableCell.elem.Get_CompiledPr();
 					
 					if(compiledPrCell)
 					{	
@@ -3453,6 +3448,22 @@
 				};
 				
 				return backgroundColor;
+			},
+			
+			_getParentByTag: function(elem, tag)
+			{
+				var result;
+				if(!elem)
+					return null;
+				
+				if(elem.type == tag)
+					result =  elem;
+				else if(elem.parent)
+					result =  this._getParentByTag(elem.parent, tag);
+				else if(!elem.parent)
+					result =  null;
+					
+				return result;
 			},
 			
 			_parseParaRun: function(paraRun, oNewItem, paraPr, s, row, c1, text)
