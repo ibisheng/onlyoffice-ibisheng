@@ -323,7 +323,6 @@ CChartSpace.prototype =
 
     documentGetAllFontNames: function(allFonts)
     {
-        var parent_objects = this.getParentObjects();
         allFonts["+mn-lt"] = 1;
         allFonts["+mn-ea"] = 1;
         allFonts["+mn-cs"] = 1;
