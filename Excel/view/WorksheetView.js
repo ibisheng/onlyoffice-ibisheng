@@ -6124,20 +6124,26 @@
 			var range = this.model.getRange3(ar.r1, ar.c1, ar.r2, ar.c2);
 			var tmp;
 			var oSelectionMathInfo = new asc_CSelectionMathInfo();
-			var sum = 0, countNumbers = 0;
+			var sum = 0;
 			range._setPropertyNoEmpty(null, null, function (c) {
 				++oSelectionMathInfo.count;
 				if (CellValueType.Number === c.getType() && false === c.isEmptyTextString()) {
 					tmp = parseFloat(c.getValueWithoutFormat());
 					if (isNaN(tmp))
 						return;
-					++countNumbers;
+					if (0 === oSelectionMathInfo.countNumbers)
+						oSelectionMathInfo.min = oSelectionMathInfo.max = tmp;
+					else {
+						oSelectionMathInfo.min = Math.min(oSelectionMathInfo.min, tmp);
+						oSelectionMathInfo.max = Math.max(oSelectionMathInfo.max, tmp);
+					}
+					++oSelectionMathInfo.countNumbers;
 					sum += tmp;
 				}
 			});
-			if (0 !== countNumbers) {
+			if (0 !== oSelectionMathInfo.countNumbers) {
 				oSelectionMathInfo.sum = sum;
-				oSelectionMathInfo.average = sum / countNumbers;
+				oSelectionMathInfo.average = sum / oSelectionMathInfo.countNumbers;
 			}
 			return oSelectionMathInfo;
 		};

@@ -1246,15 +1246,21 @@
 		/** @constructor */
 		function asc_CSelectionMathInfo() {
 			this.count = 0;
+			this.countNumbers = 0;
 			this.sum = null;
 			this.average = null;
+			this.min = null;
+			this.max = null;
 		}
 
 		asc_CSelectionMathInfo.prototype = {
 			constructor: asc_CSelectionMathInfo,
 			asc_getCount: function () { return this.count; },
+			asc_getCountNumbers: function () { return this.countNumbers; },
 			asc_getSum: function () { return this.sum; },
-			asc_getAverage: function () { return this.average; }
+			asc_getAverage: function () { return this.average; },
+			asc_getMin: function () { return this.min; },
+			asc_getMax: function () { return this.max; }
 		};
 
 		/** @constructor */
@@ -1444,8 +1450,11 @@
 		window["Asc"]["asc_CSelectionMathInfo"] = window["Asc"].asc_CSelectionMathInfo = asc_CSelectionMathInfo;
 		prot = asc_CSelectionMathInfo.prototype;
 		prot["asc_getCount"] = prot.asc_getCount;
+		prot["asc_getCountNumbers"] = prot.asc_getCountNumbers;
 		prot["asc_getSum"] = prot.asc_getSum;
 		prot["asc_getAverage"] = prot.asc_getAverage;
+		prot["asc_getMin"] = prot.asc_getMin;
+		prot["asc_getMax"] = prot.asc_getMax;
 
 		window["Asc"]["asc_CFindOptions"] = window["Asc"].asc_CFindOptions = asc_CFindOptions;
 
