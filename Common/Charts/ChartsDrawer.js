@@ -2477,7 +2477,7 @@ CChartsDrawer.prototype =
 			for(var l = 0; l < series.length; ++l)
 			{
 				newArr[l] = [];
-				yNumCache = series[l].yVal.numRef.numCache ? series[l].yVal.numRef.numCache : series[l].yVal.numLit;
+				yNumCache = series[l].yVal.numRef && series[l].yVal.numRef.numCache ? series[l].yVal.numRef.numCache : series[l].yVal && series[l].yVal.numLit ? series[l].yVal.numLit : null;
 				for(var j = 0; j < yNumCache.pts.length; ++j)
 				{
 					yVal = parseFloat(yNumCache.pts[j].val);
@@ -6033,7 +6033,7 @@ drawScatterChart.prototype =
 		for(var i = 0; i < this.chartProp.series.length; i++)
 		{
 			seria = this.chartProp.series[i];
-			yNumCache = seria.yVal.numRef.numCache ? seria.yVal.numRef.numCache : seria.yVal.numRef.numLit;
+			yNumCache = seria.yVal.numRef && seria.yVal.numRef.numCache ? seria.yVal.numRef.numCache : seria.yVal && seria.yVal.numLit ? seria.yVal.numLit : null;
 			
 			
 			for(var n = 0; n < yNumCache.ptCount; n++)
