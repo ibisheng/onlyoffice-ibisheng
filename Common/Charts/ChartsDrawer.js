@@ -3396,9 +3396,9 @@ CChartsDrawer.prototype =
         var i, sum;
         for(i = 0,sum = 0; i < arr.length; i++)
 		{
-			if(typeof(arr[i]) == 'object' && arr[i].val)
+			if(typeof(arr[i]) == 'object' && arr[i].val != null && arr[i].val != undefined)
 				sum += parseFloat(isAbs ? Math.abs(arr[i].val) : arr[i].val);
-			else
+			else if(arr[i])
 				sum += isAbs ? Math.abs(arr[i]) : arr[i];
 		}
         return sum;
@@ -5395,19 +5395,20 @@ drawDoughnutChart.prototype =
     {
 		var brush, pen, val;
 		var path;
-		var numCache, curNumCache;
+		var idxPoint, numCache;
 		
         for(var n = 0; n < this.chartProp.series.length; n++) {
 			numCache = this.chartProp.series[n].val.numRef ? this.chartProp.series[n].val.numRef.numCache : this.chartProp.series[n].val.numLit;
 			
-			for (var k = 0; k < numCache.pts.length; k++) {
-				curNumCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
-				val = this.chartProp.series[0].val.numRef.numCache.pts[k];
-				brush = val.brush;
-				pen = val.pen;
+			for (var k = 0; k < numCache.ptCount; k++) {
+				
+				idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[0], k);
+				
+				brush = idxPoint ? idxPoint.brush : null;
+				pen = idxPoint ? idxPoint.pen : null;
 				path = this.paths.series[n][k];
 				
-				 this.cChartDrawer.drawPath(path, pen, brush);
+				this.cChartDrawer.drawPath(path, pen, brush);
 			}
 		}
     },
@@ -5435,7 +5436,7 @@ drawDoughnutChart.prototype =
 		var xCenter = this.chartProp.chartGutter._left + trueWidth/2;
 		var yCenter = this.chartProp.chartGutter._top + trueHeight/2;
 		
-		var numCache;
+		var numCache, idxPoint, angle, curVal;
 		for(var n = 0; n < this.chartProp.series.length; n++)
 		{
 			this.tempAngle = Math.PI/2;
@@ -5443,14 +5444,21 @@ drawDoughnutChart.prototype =
 			sumData = this.cChartDrawer._getSumArray(numCache.pts, true);
 			
 			//рисуем против часовой стрелки, поэтому цикл с конца
-			for (var k = numCache.pts.length - 1; k >= 0; k--) {
+			for (var k = numCache.ptCount - 1; k >= 0; k--) {
 				
-				var angle = Math.abs((parseFloat(numCache.pts[k].val / sumData)) * (Math.PI * 2));
+				idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[n], k);
+				curVal = idxPoint ? idxPoint.val : 0;
+				angle = Math.abs((parseFloat(curVal / sumData)) * (Math.PI * 2));
+				
 				if(!this.paths.series)
 					this.paths.series = [];
 				if(!this.paths.series[n])
 					this.paths.series[n] = [];
-				this.paths.series[n][k] = this._calculateSegment(angle, radius, xCenter, yCenter, radius + step * (n + 1), radius + step * n, firstSliceAng);
+				
+				if(angle)
+					this.paths.series[n][k] = this._calculateSegment(angle, radius, xCenter, yCenter, radius + step * (n + 1), radius + step * n, firstSliceAng);
+				else
+					this.paths.series[n][k] = null;
 			}
 		}
     },
