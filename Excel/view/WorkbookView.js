@@ -130,6 +130,9 @@
 			// Комментарии для всего документа
 			this.cellCommentator = null;
 
+			// Флаг о подписке на эвенты о смене позиции документа (скролл) для меню
+			this.isDocumentPlaceChangedEnabled = false;
+
 			// Максимальная ширина числа из 0,1,2...,9, померенная в нормальном шрифте(дефалтовый для книги) в px(целое)
 			// Ecma-376 Office Open XML Part 1, пункт 18.3.1.13
 			this.maxDigitWidth = 0;
@@ -479,7 +482,6 @@
 			return this;
 		};
 
-
 		WorkbookView.prototype._createWorksheetView = function (wsModel) {
 			var self = this, opt  = $.extend(true, {}, this.settings.worksheetDefaults);
 			return new asc_WSV(wsModel, /*handlers*/{
@@ -498,7 +500,8 @@
 				"onRenameCellTextEnd"		: function (countFind, countReplace) {self.handlers.trigger("asc_onRenameCellTextEnd", countFind, countReplace);},
 				"onStopFormatPainter"		: function () {self.handlers.trigger("asc_onStopFormatPainter");},
 				"onChangeColumnWidth"		: function (widthCC, widthPx) {self.handlers.trigger("asc_onChangeColumnWidth", widthCC, widthPx);},
-				"onChangeRowHeight"			: function (heightPt, heightPx) {self.handlers.trigger("asc_onChangeRowHeight", heightPt, heightPx);}
+				"onChangeRowHeight"			: function (heightPt, heightPx) {self.handlers.trigger("asc_onChangeRowHeight", heightPt, heightPx);},
+				"onDocumentPlaceChanged"	: function () {self._onDocumentPlaceChanged();}
 			}, this.buffers, this.stringRender, this.maxDigitWidth, this.collaborativeEditing, opt);
 		};
 
@@ -774,6 +777,7 @@
 				}
 				ws.objectRender.updateSizeDrawingObjects();
 				ws.cellCommentator.updateCommentPosition();
+				this._onDocumentPlaceChanged();
 			}
 			ws.draw();
 		};
@@ -1105,6 +1109,11 @@
 				if (ws.getCellEditMode())
 					this.cellEditor.showCursor();
 			}
+		};
+
+		WorkbookView.prototype._onDocumentPlaceChanged = function () {
+			if (this.isDocumentPlaceChangedEnabled)
+				this.handlers.trigger("asc_onDocumentPlaceChanged");
 		};
 
 		WorkbookView.prototype.getTablePictures = function () {
@@ -1859,6 +1868,10 @@
 			else {
 				ws.setSelectionInfo("rh");
 			}
+		};
+
+		WorkbookView.prototype.setDocumentPlaceChangedEnabled = function (val) {
+			this.isDocumentPlaceChangedEnabled = val;
 		};
 
 		/*

@@ -1242,6 +1242,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 //				return null;
 			},
 
+			asc_SetDocumentPlaceChangedEnabled: function (val) {
+				this.wb.setDocumentPlaceChangedEnabled(val);
+			},
+
 			// Посылает эвент о том, что обновились листы
 			sheetsChanged: function () {
 				this.handlers.trigger("asc_onSheetsChanged");
@@ -3605,6 +3609,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_unregisterCallback"] = prot.asc_unregisterCallback;
 
 		prot["asc_getController"] = prot.asc_getController;
+
+		prot["asc_SetDocumentPlaceChangedEnabled"] = prot.asc_SetDocumentPlaceChangedEnabled;
 
 		// Toolbar interface
 

@@ -581,6 +581,7 @@
 				this._prepareCellTextMetricsCache(this.visibleRange);
 				this._shiftVisibleRange();
 				this.cellCommentator.updateCommentPosition();
+				this.handlers.trigger("onDocumentPlaceChanged");
 				this.updateZoom = false;
 			} else {
 				this.updateZoom = true;
@@ -597,6 +598,7 @@
 			this._prepareCellTextMetricsCache(this.visibleRange);
 			this._shiftVisibleRange();
 			this.cellCommentator.updateCommentPosition();
+			this.handlers.trigger("onDocumentPlaceChanged");
 
 			this.updateResize = false;
 			this.updateZoom = false;
@@ -5206,6 +5208,7 @@
 				this.handlers.trigger("reinitializeScrollY");
 
 			this.cellCommentator.updateCommentPosition();
+			this.handlers.trigger("onDocumentPlaceChanged");
 			this.cellCommentator.drawCommentCells();
 			//ToDo this.drawDepCells();
 			this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollVertical, rangeGraphic));
@@ -5300,6 +5303,7 @@
 				this.handlers.trigger("reinitializeScrollX");
 
 			this.cellCommentator.updateCommentPosition();
+			this.handlers.trigger("onDocumentPlaceChanged");
 			this.cellCommentator.drawCommentCells();
 			//ToDo this.drawDepCells();
 			this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollHorizontal, rangeGraphic));
@@ -10371,6 +10375,7 @@
 
 			t.objectRender.rebuildChartGraphicObjects(t.activeRange.clone(true));
 			t.cellCommentator.updateCommentPosition();
+			t.handlers.trigger("onDocumentPlaceChanged");
 			t.draw(lockDraw);
 		};
 

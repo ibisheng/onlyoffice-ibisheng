@@ -20,6 +20,7 @@
 		asc_typeOf = asc.typeOf;
 
 
+		/** @constructor */
 		function asc_CHandlersList(handlers) {
 			if ( !(this instanceof asc_CHandlersList) ) {
 				return new asc_CHandlersList(handlers);
