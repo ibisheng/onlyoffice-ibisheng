@@ -67,12 +67,12 @@ module.exports = function(grunt) {
             grunt.log.error().writeln('Could not load config file'.red);
     });
 
-	grunt.registerTask('build_webword_server_init', 'Initialize build WebWord SDK.', function(){
-        defaultConfig = './sdk_configs/webword_server.json';
+	grunt.registerTask('build_nativeword_init', 'Initialize build NativeWord SDK.', function(){
+        defaultConfig = './sdk_configs/nativeword.json';
         packageFile = require(defaultConfig);
 
         if (packageFile)
-            grunt.log.ok('WebWord_server config loaded successfully'.green);
+            grunt.log.ok('nativeword config loaded successfully'.green);
         else
             grunt.log.error().writeln('Could not load config file'.red);
     });
@@ -109,7 +109,7 @@ module.exports = function(grunt) {
     });
 	
 	grunt.registerTask('build_webword',     ['setup_tools', 'build_webword_init', 'build_sdk']);
-	grunt.registerTask('build_webword_server', ['setup_tools', 'build_webword_server_init', 'build_sdk']);
+	grunt.registerTask('build_nativeword', ['setup_tools', 'build_nativeword_init', 'build_sdk']);
     grunt.registerTask('build_webexcel',  ['setup_tools', 'build_webexcel_init', 'build_sdk']);
     grunt.registerTask('build_webpowerpoint', ['setup_tools', 'build_webpowerpoint_init', 'build_sdk']);
 	
