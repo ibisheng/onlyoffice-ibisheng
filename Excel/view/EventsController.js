@@ -164,9 +164,13 @@
 				this.element.addEventListener("dblclick"	, function () {return self._onMouseDblClick.apply(self, arguments);}	, false);
 			}
 			if (this.widget.addEventListener) {
-				this.widget.addEventListener("mousewheel"	, function () {return self._onMouseWheel.apply(self, arguments);}		, false);
-				// for Mozilla Firefox (можно делать проверку на window.MouseScrollEvent || window.WheelEvent для FF)
-				this.widget.addEventListener("DOMMouseScroll", function () {return self._onMouseWheel.apply(self, arguments);}		, false);
+				// https://developer.mozilla.org/en-US/docs/Web/Reference/Events/wheel
+				// detect available wheel event
+				var nameWheelEvent = "onwheel" in document.createElement("div") ? "wheel" :	// Modern browsers support "wheel"
+						document.onmousewheel !== undefined ? "mousewheel" : 				// Webkit and IE support at least "mousewheel"
+							"DOMMouseScroll";												// let's assume that remaining browsers are older Firefox
+
+				this.widget.addEventListener(nameWheelEvent, function () {return self._onMouseWheel.apply(self, arguments);} , false);
 			}
 
 			// Курсор для графических объектов. Определяем mousedown и mouseup для выделения текста.
@@ -1504,12 +1508,12 @@
 			}
 			var delta = 0;
 			if (undefined !== event.wheelDelta && 0 !== event.wheelDelta) {
-				delta = -1 * event.wheelDelta / 120;
+				delta = -1 * event.wheelDelta / 40;
 			} else if (undefined != event.detail && 0 !== event.detail) {
 				// FF
-				delta = event.detail / 3;
+				delta = event.detail;
 			}
-
+			delta /= 3;
 
 			var self = this;
 			delta *= event.shiftKey ? 1 : this.settings.wheelScrollLines;

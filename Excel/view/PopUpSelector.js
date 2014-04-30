@@ -176,11 +176,11 @@
 					break;
 				case 38: // Up
 					this._onChangeSelection(null !== this.selectElement ?
-						this.selectElement.previousSibling : this.firstElement);
+						this.selectElement.previousSibling : this.firstElement, -1);
 					break;
 				case 40: // Down
 					this._onChangeSelection(null !== this.selectElement ?
-						this.selectElement.nextSibling : this.firstElement);
+						this.selectElement.nextSibling : this.firstElement, +1);
 					break;
 				case 16: // Shift
 					break;
@@ -223,15 +223,21 @@
 
 			this._onChangeSelection(event.currentTarget);
 		};
-		PopUpSelector.prototype._onChangeSelection = function (newElement) {
+		PopUpSelector.prototype._onChangeSelection = function (newElement, scrollDir) {
 			if (null === newElement)
 				return;
 
-			if (null !== this.selectElement)
+			var height = 0;
+			if (null !== this.selectElement) {
+				height = this.selectElement.offsetHeight;
 				this.selectElement.className = "";
+			}
 
 			this.selectElement = newElement;
 			this.selectElement.className = "selected";
+
+			if (scrollDir && height)
+				this.selectorListJQ.scrollTop(scrollDir * height);
 		};
 
 		/*
