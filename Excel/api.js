@@ -1179,7 +1179,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			 * asc_onGetEditorPermissions	(permission)												- эвент о правах редактора
 			 * asc_onGetLicense				(license)													- эвент о лицензии
 			 * asc_onStopFormatPainter		()															- эвент об окончании форматирования по образцу
-			 * asc_onShowAutoComplete		(isFormula, arrValues)										- эвент о вызове всплывающего меню для дополнения ячейки
+			 //* asc_onShowAutoComplete		(isFormula, arrValues)										- эвент о вызове всплывающего меню для дополнения ячейки
 			 * asc_onChangeColumnWidth		(widthCC, widthPx)											- эвент о изменении ширины столбца с помощью мышки (для показа точной информации пользователю)
 			 * asc_onChangeRowHeight		(heightPt, heightPx)										- эвент о изменении высоты строки с помощью мышки (для показа точной информации пользователю)
 			 */

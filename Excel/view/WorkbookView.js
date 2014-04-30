@@ -839,7 +839,7 @@
 			var ws = this.getWorksheet();
 			var arrValues = ws.getCellAutoCompleteValues(ws.activeRange.startCol, ws.activeRange.startRow);
 			this.popUpSelector.show(false, arrValues, this.getWorksheet().getActiveCellCoord());
-			this.handlers.trigger("asc_onShowAutoComplete", false, arrValues);
+			//this.handlers.trigger("asc_onShowAutoComplete", false, arrValues);
 		};
 
 		WorkbookView.prototype._onAutoFiltersClick = function (idFilter) {
@@ -1401,7 +1401,7 @@
 			}
 			if (0 < arrResult.length) {
 				this.popUpSelector.show(true, arrResult, this.getWorksheet().getActiveCellCoord());
-				this.handlers.trigger("asc_onShowAutoComplete", true, arrResult);
+				//this.handlers.trigger("asc_onShowAutoComplete", true, arrResult);
 				this.lastFormulaPos = formulaPos;
 				this.lastFormulaName = formulaName;
 			} else {
