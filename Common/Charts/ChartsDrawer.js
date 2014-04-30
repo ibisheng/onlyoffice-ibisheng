@@ -2407,7 +2407,7 @@ CChartsDrawer.prototype =
 				var firstCol = 0;
 				var firstRow = 0;
 				
-				curSeria = series[l].val.numRef.numCache.pts;
+				curSeria = series[l].val.numRef && series[l].val.numRef.numCache ? series[l].val.numRef.numCache.pts : series[l].val.numLit ? series[l].val.numLit.pts : null;
 				
 				skipSeries[l] = true;
 			
