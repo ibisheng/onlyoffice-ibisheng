@@ -305,7 +305,7 @@ CChartSpace.prototype =
                     if(axis)
                     {
                         axis.spPr && axis.spPr.checkBlipFillRasterImage(images);
-                        axis.title && axis.title && axis.title.spPr.checkBlipFillRasterImage(images);
+                        axis.title && axis.title && axis.title.spPr && axis.title.spPr.checkBlipFillRasterImage(images);
                     }
                 }
                 for(i = 0; i < plot_area.charts.length; ++i)
@@ -324,7 +324,10 @@ CChartSpace.prototype =
     documentGetAllFontNames: function(allFonts)
     {
         var parent_objects = this.getParentObjects();
-        checkTxBodyDefFonts(this.txPr);
+        allFonts["+mn-lt"] = 1;
+        allFonts["+mn-ea"] = 1;
+        allFonts["+mn-cs"] = 1;
+        checkTxBodyDefFonts(allFonts, this.txPr);
         var chart = this.chart, i;
         if(chart)
         {
@@ -4415,21 +4418,8 @@ CChartSpace.prototype =
             var RGBA = {R: 0, G: 0, B: 0, A: 255};
             if(this.chart.plotArea.chart.varyColors && series.length === 1 || ((this.chart.plotArea.chart instanceof CPieChart || this.chart.plotArea.chart instanceof CDoughnutChart)  && this.chart.plotArea.chart.varyColors))
             {
-                var pts;
                 var ser = series[0];
-                if(ser.val)
-                {
-                    pts = ser.val.numRef.numCache.pts;
-                }
-                else if(ser.yVal)
-                {
-                    pts = ser.yVal.numRef.numCache.pts;
-                }
-                else
-                {
-                    pts = [];
-                }
-
+                var pts = getPtsFromSeries(ser);
                 if(!(this.chart.plotArea.chart instanceof CLineChart))
                 {
                     var base_fills = getArrayFillsFromBase(style.fill2, getMaxIdx(pts));
@@ -4557,19 +4547,7 @@ CChartSpace.prototype =
                     for(var i = 0; i < series.length; ++i)
                     {
                         var ser = series[i];
-                        var pts;
-                        if(ser.val)
-                        {
-                            pts = ser.val.numRef.numCache.pts;
-                        }
-                        else if(ser.yVal)
-                        {
-                            pts = ser.yVal.numRef.numCache.pts;
-                        }
-                        else
-                        {
-                            pts = [];
-                        }
+                        var pts = getPtsFromSeries(ser);
                         for(var j = 0; j < pts.length; ++j)
                         {
                             var compiled_brush = new CUniFill();
@@ -4664,19 +4642,7 @@ CChartSpace.prototype =
                     {
                         var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
                         var ser = series[i];
-                        var pts;
-                        if(ser.val)
-                        {
-                            pts = ser.val.numRef.numCache.pts;
-                        }
-                        else if(ser.yVal)
-                        {
-                            pts = ser.yVal.numRef.numCache.pts;
-                        }
-                        else
-                        {
-                            pts = [];
-                        }
+                        var pts = getPtsFromSeries(ser);
                         for(var j = 0; j < pts.length; ++j)
                         {
                             var compiled_line = new CLn();
@@ -4736,18 +4702,7 @@ CChartSpace.prototype =
             if(this.chart.plotArea.chart.varyColors && (this.chart.plotArea.chart.series.length === 1 || this.chart.plotArea.chart.getObjectType() === historyitem_type_PieChart || this.chart.plotArea.chart.getObjectType() === historyitem_type_DoughnutChart))
             {
                 var ser = this.chart.plotArea.chart.series[0], pts;
-                if(ser.val)
-                {
-                    pts = ser.val.numRef.numCache.pts;
-                }
-                else if(ser.yVal)
-                {
-                    pts = ser.yVal.numRef.numCache.pts;
-                }
-                else
-                {
-                    pts = [];
-                }
+                pts = getPtsFromSeries(ser);
                 var series_marker = ser.marker;
                 var brushes = getArrayFillsFromBase(fill, getMaxIdx(pts));
                 var pens_fills = getArrayFillsFromBase(line, getMaxIdx(pts));
@@ -4816,18 +4771,7 @@ CChartSpace.prototype =
                 for(var i = 0; i < series.length; ++i)
                 {
                     var ser = series[i];
-                    if(ser.val)
-                    {
-                        pts = ser.val.numRef.numCache.pts;
-                    }
-                    else if(ser.yVal)
-                    {
-                        pts = ser.yVal.numRef.numCache.pts;
-                    }
-                    else
-                    {
-                        pts = [];
-                    }
+                    pts = getPtsFromSeries(ser);
                     for(var j = 0; j < pts.length; ++j)
                     {
                         var compiled_marker = new CMarker();
@@ -4871,18 +4815,7 @@ CChartSpace.prototype =
             {
                 var ser = series[i];
                 ser.compiledSeriesMarker = null;
-                if(ser.val)
-                {
-                    pts = ser.val.numRef.numCache.pts;
-                }
-                else if(ser.yVal)
-                {
-                    pts = ser.yVal.numRef.numCache.pts;
-                }
-                else
-                {
-                    pts = [];
-                }
+                pts =  getPtsFromSeries(ser);
                 for(var j = 0; j < pts.length; ++j)
                 {
                     pts[j].compiledMarker = null;
@@ -5469,11 +5402,17 @@ function getPtsFromSeries(ser)
     {
         if(ser.val)
         {
-            return ser.val.numRef.numCache.pts;
+            if(ser.val.numRef && ser.val.numRef.numCache)
+                return ser.val.numRef.numCache.pts;
+            else if(ser.val.numLit)
+                return ser.val.numLit.pts
         }
         else if(ser.yVal)
         {
-            return ser.yVal.numRef.numCache.pts;
+            if(ser.yVal.numRef && ser.yVal.numRef.numCache)
+                return ser.yVal.numRef.numCache.pts;
+            else if(ser.yVal.numLit)
+                return ser.yVal.numLit.pts
         }
     }
     return [];

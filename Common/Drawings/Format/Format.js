@@ -608,6 +608,28 @@ CColorModifiers.prototype =
     Refresh_RecalcData: function()
     {},
 
+    Write_ToBinary: function(w)
+    {
+        w.WriteLong(this.Mods.length);
+        for(var i = 0; i < this.Mods.length; ++i)
+        {
+            w.WriteString2(this.Mods[i].name);
+            w.WriteString2(this.Mods[i].val);
+        }
+    },
+
+    Read_FromBinary: function(r)
+    {
+        var len = r.GetLong();
+        for(var i = 0; i < len; ++i)
+        {
+            var mod = new CColorMod();
+            mod.name = r.GetString2();
+            mod.val = r.GetDouble();
+            this.Mods.push(mod);
+        }
+    },
+
     Write_ToBinary2: function (w) {
         w.WriteLong(this.getObjectType());
         w.WriteString2(this.Id);
@@ -1074,6 +1096,24 @@ CSysColor.prototype =
         this.Id = r.GetString2();
     },
 
+
+    Write_ToBinary: function (w)
+    {
+        w.WriteLong(COLOR_TYPE_SYS);
+        w.WriteString2(this.id);
+        w.WriteLong(((this.RGBA.R << 16) & 0xFF0000) + ((this.RGBA.G << 8) & 0xFF00) + this.RGBA.B);
+    },
+
+    Read_FromBinary: function (r)
+    {
+        this.id = r.GetString2();
+
+        var RGB = r.GetLong();
+        this.RGBA.R = (RGB >> 16) & 0xFF;
+        this.RGBA.G = (RGB >> 8) & 0xFF;
+        this.RGBA.B = RGB & 0xFF;
+    },
+
     Undo: function(data)
     {
         switch(data.Type)
@@ -1244,6 +1284,18 @@ CPrstColor.prototype =
         this.Id = r.GetString2();
     },
 
+
+    Write_ToBinary: function (w)
+    {
+        w.WriteLong(COLOR_TYPE_PRST);
+        w.WriteString2(this.id);
+    },
+
+    Read_FromBinary: function (r)
+    {
+        this.id = r.GetString2();
+    },
+
     setId: function(id)
     {
         //History.Add(this, {Type: historyitem_PrstColor_SetId, oldId: this.id, newId: id});
@@ -1366,6 +1418,20 @@ CRGBColor.prototype =
     },
 
     readFromBinaryLong: function(r)
+    {
+        var RGB = r.GetLong();
+        this.RGBA.R = (RGB >> 16) & 0xFF;
+        this.RGBA.G = (RGB >> 8) & 0xFF;
+        this.RGBA.B = RGB & 0xFF;
+    },
+
+    Write_ToBinary: function(w)
+    {
+        w.WriteLong(COLOR_TYPE_SRGB);
+        w.WriteLong(((this.RGBA.R << 16) & 0xFF0000) + ((this.RGBA.G << 8) & 0xFF00) + this.RGBA.B);
+    },
+
+    Read_FromBinary: function(r)
     {
         var RGB = r.GetLong();
         this.RGBA.R = (RGB >> 16) & 0xFF;
@@ -1545,6 +1611,18 @@ CSchemeColor.prototype =
     Read_FromBinary2: function (r)
     {
         this.Id = r.GetString2();
+    },
+
+
+    Write_ToBinary: function (w)
+    {
+        w.WriteLong(COLOR_TYPE_SCHEME);
+        w.WriteLong(this.id);
+    },
+
+    Read_FromBinary: function (r)
+    {
+        this.id = r.GetLong();
     },
 
     setId: function(id)
@@ -1817,6 +1895,76 @@ CUniColor.prototype =
                 }
                 break;
             }
+        }
+    },
+
+    Write_ToBinary: function(w)
+    {
+        if(this.color)
+        {
+            w.WriteBool(true);
+            this.color.Write_ToBinary(w);
+        }
+        else
+        {
+            w.WriteBool(false);
+        }
+        if(this.Mods)
+        {
+            w.WriteBool(true);
+            this.Mods.Write_ToBinary(w);
+        }
+        else
+        {
+            w.WriteBool(false);
+        }
+    },
+
+    Read_FromBinary: function(r)
+    {
+        if(r.GetBool())
+        {
+            var type = r.GetLong();
+            switch(type)
+            {
+                case COLOR_TYPE_NONE:
+                {
+                    break;
+                }
+                case COLOR_TYPE_SRGB:
+                {
+                    this.color = new CRGBColor();
+                    this.color.Read_FromBinary(r);
+                    break;
+                }
+                case COLOR_TYPE_PRST:
+                {
+                    this.color = new CPrstColor();
+                    this.color.Read_FromBinary(r);
+                    break;
+                }
+                case COLOR_TYPE_SCHEME:
+                {
+                    this.color = new CSchemeColor();
+                    this.color.Read_FromBinary(r);
+                    break;
+                }
+                case COLOR_TYPE_SYS:
+                {
+                    this.color = new CSysColor();
+                    this.color.Read_FromBinary(r);
+                    break;
+                }
+            }
+        }
+        if(r.GetBool())
+        {
+            this.Mods = new CColorModifiers();
+            this.Mods.Read_FromBinary(r);
+        }
+        else
+        {
+            this.Mods = null;
         }
     },
 
@@ -2164,6 +2312,51 @@ CBlipFill.prototype =
         return this.Id;
     },
 
+    Write_ToBinary: function(w)
+    {
+        w.WriteLong(this.type);
+        writeString(w, this.RasterImageId);
+        writeString(w, this.VectorImageBin);
+        if(this.srcRect)
+        {
+            writeBool(true);
+            writeDouble(this.srcRect.l);
+            writeDouble(this.srcRect.t);
+            writeDouble(this.srcRect.r);
+            writeDouble(this.srcRect.b);
+        }
+        else
+        {
+            writeBool(false);
+        }
+        writeBool(this.stretch);
+        writeBool(this.tile);
+        writeBool(this.rotWithShape);
+    },
+
+    Read_FromBinary: function(r)
+    {
+        this.RasterImageId = readString(r);
+        this.VectorImageBin = readString(r);
+
+        if(readBool(r))
+        {
+
+            this.srcRect = new CSrcRect();
+            this.srcRect.l = readDouble(r);
+            this.srcRect.t = readDouble(r);
+            this.srcRect.r = readDouble(r);
+            this.srcRect.b = readDouble(r);
+        }
+        else
+        {
+            this.srcRect = null;
+        }
+        this.stretch      = readBool(r);
+        this.tile         = readBool(r);
+        this.rotWithShape = readBool(r);
+    },
+
 
     Refresh_RecalcData: function()
     {},
@@ -2460,6 +2653,7 @@ CBlipFill.prototype =
         this.Id = r.GetString2();
     },
 
+
     createDuplicate : function()
     {
         var duplicate = new CBlipFill();
@@ -2579,6 +2773,28 @@ CSolidFill.prototype =
     {
         //History.Add(this, {Type: historyitem_SolidFill_SetColor, oldColor: this.color, newColor: color});
         this.color = color;
+    },
+
+    Write_ToBinary: function(w)
+    {
+        if(this.color)
+        {
+            w.WriteBool(true);
+            this.color.Write_ToBinary(w);
+        }
+        else
+        {
+            w.WriteBool(false);
+        }
+    },
+
+    Read_FromBinary: function(r)
+    {
+        if(r.GetBool())
+        {
+            this.color = new CUniColor();
+            this.color.Read_FromBinary(r);
+        }
     },
 
     Undo: function(data)
@@ -3680,6 +3896,16 @@ CNoFill.prototype =
     Load_Changes: function()
     {},
 
+
+    Write_ToBinary: function(w)
+    {
+        w.WriteLong(FILL_TYPE_NOFILL);
+    },
+
+    Read_FromBinary: function(r)
+    {
+    },
+
     Write_ToBinary2: function (w)
     {
         w.WriteLong(this.getObjectType());
@@ -3897,10 +4123,54 @@ CUniFill.prototype =
     },
 
     Write_ToBinary: function(w)
-    {},
+    {
+        writeDouble(w, this.transparent);
+        if(this.fill)
+            this.fill.Write_ToBinary();
+    },
 
-    Read_FromBinary: function()
-    {},
+    Read_FromBinary: function(r)
+    {
+        this.transparent = readDouble(r);
+        var type = r.GetLong();
+        switch(type)
+        {
+            case FILL_TYPE_NONE:
+            {
+                break;
+            }
+            case FILL_TYPE_BLIP:
+            {
+                this.fill = new CBlipFill();
+                this.fill.Read_FromBinary(r);
+                break;
+            }
+            case FILL_TYPE_NOFILL:
+            {
+                this.fill = new CNoFill();
+                this.fill.Read_FromBinary(r);
+                break;
+            }
+            case FILL_TYPE_SOLID:
+            {
+                this.fill = new CSolidFill();
+                this.fill.Read_FromBinary(r);
+                break;
+            }
+            case FILL_TYPE_GRAD:
+            {
+                this.fill = new CGradFill();
+                this.fill.Read_FromBinary(r);
+                break;
+            }
+            case FILL_TYPE_PATT:
+            {
+                this.fill = new CPattFill();
+                this.fill.Read_FromBinary(r);
+                break;
+            }
+        }
+    },
 
 
 
@@ -4055,6 +4325,151 @@ function CompareUniFill(unifill_1, unifill_2)
     }
     _ret.fill = unifill_1.compare(unifill_2);
     return _ret;
+}
+
+
+function CompareUnifillBool(u1, u2)
+{
+    if(!u1 && !u2)
+        return true;
+    if(!u1 && u2 || u1 && !u2)
+        return false;
+
+    if(!u1.fill && !u2.fill)
+        return true;
+    if(!u1.fill && u2.fill || u1.fill && !u2.fill)
+        return false;
+
+    if(u1.fill.type !== u2.fill.type)
+        return false
+    switch(u1.fill.type)
+    {
+        case FILL_TYPE_BLIP:
+        {
+            if(u1.fill.RasterImageId && !u2.fill.RasterImageId || u2.fill.RasterImageId && !u1.fill.RasterImageId)
+                return false;
+
+            if(typeof u1.fill.RasterImageId === "string" && typeof u2.fill.RasterImageId === "string"
+                && _getFullImageSrc(u1.fill.RasterImageId) !== _getFullImageSrc(u2.fill.RasterImageId))
+                return false;
+
+            if(u1.fill.VectorImageBin !== u2.fill.VectorImageBin)
+                return false;
+
+            if(u1.fill.srcRect && !u2.fill.srcRect || !u1.fill.srcRect && u2.fill.srcRect)
+                return false;
+
+            if(u1.fill.srcRect && u2.fill.srcRect)
+            {
+                if( u1.fill.srcRect.l !== u2.fill.srcRect.l||
+                    u1.fill.srcRect.t !== u2.fill.srcRect.t||
+                    u1.fill.srcRect.r !== u2.fill.srcRect.r||
+                    u1.fill.srcRect.b !== u2.fill.srcRect.b)
+                    return false;
+            }
+
+            if(u1.fill.stretch !== u2.fill.stretch || u1.fill.tile !== u2.fill.tile || u1.fill.rotWithShape !== u2.fill.rotWithShape)
+                return false;
+            break;
+        }
+        case FILL_TYPE_SOLID:
+        {
+            if(u1.fill.color && u2.fill.color)
+            {
+                return CompareUniColor(u1.fill.color, u2.fill.color)
+            }
+            break;
+        }
+        case FILL_TYPE_GRAD:
+        {
+            if(u1.fill.colors.length !== u2.fill.colors.length)
+                return false;
+            for(var i = 0; i < u1.fill.colors.length; ++i)
+            {
+                if(u1.fill.colors[i].pos !== u1.fill.colors[i].pos
+                || ! CompareUniColor(u1.fill.colors[i].color, u2.fill.colors[i].color))
+                    return false;
+            }
+            break;
+        }
+        case FILL_TYPE_PATT:
+        {
+            if(u1.fill.ftype !== u2.fill.ftype
+                || !CompareUniColor(u1.fill.fgClr, u2.fill.fgClr)
+                || !CompareUniColor(u1.fill.bgClr, u2.fill.bgClr))
+                return false;
+            break;
+        }
+    }
+    return true;
+}
+
+
+function CompareUniColor(u1, u2)
+{
+    if(!u1 && !u2)
+        return true;
+    if(!u1 && u2 || u1 && !u2)
+        return false;
+    if(!u1.color && u2.color || u1.color && !u2.color)
+        return false;
+    if(u1.color && u2.color)
+    {
+        if(u1.color.type !== u2.color.type)
+            return false;
+        switch (u1.color.type)
+        {
+            case COLOR_TYPE_NONE:
+            {
+                break;
+            }
+            case COLOR_TYPE_SRGB:
+            {
+                if(u1.color.RGBA.R !== u2.color.RGBA.R
+                    || u1.color.RGBA.G !== u2.color.RGBA.G
+                    || u1.color.RGBA.B !== u2.color.RGBA.B
+                    || u1.color.RGBA.A !== u2.color.RGBA.A)
+                {
+                    return false;
+                }
+                break;
+            }
+            case COLOR_TYPE_PRST:
+            case COLOR_TYPE_SCHEME:
+            {
+                if(u1.color.id !== u2.color.id)
+                    return false;
+                break;
+            }
+            case COLOR_TYPE_SYS:
+            {
+                if(u1.color.RGBA.R !== u2.color.RGBA.R
+                    || u1.color.RGBA.G !== u2.color.RGBA.G
+                    || u1.color.RGBA.B !== u2.color.RGBA.B
+                    || u1.color.RGBA.A !== u2.color.RGBA.A
+                    || u1.color.id !== u2.color.id)
+                {
+                    return false;
+                }
+                break;
+            }
+        }
+    }
+    if(!u1.Mods && u2.Mods || !u2.Mods && u1.Mods)
+        return false;
+
+    if(u1.Mods && u2.Mods)
+    {
+        if(u1.Mods.length !== u2.Mods.length)
+            return false;
+        for(var i = 0; i < u1.Mods.length; ++i)
+        {
+            if(u1.Mods[i].name !== u2.Mods[i].name
+                || u1.Mods[i].val !== u2.Mods[i].val)
+                return false;
+        }
+    }
+    return true;
 }
 // -----------------------------
 

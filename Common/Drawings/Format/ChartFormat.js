@@ -4011,7 +4011,7 @@ CDateAx.prototype =
         return  this.Id;
     },
 
-    getObjectsType: function()
+    getObjectType: function()
     {
         return historyitem_type_DateAx;
     },
@@ -4044,7 +4044,7 @@ CDateAx.prototype =
         }
         if(this.scaling)
         {
-            c.setScaling(this.sclaing.createDuplicate());
+            c.setScaling(this.scaling.createDuplicate());
         }
         if(this.spPr)
         {
@@ -4059,6 +4059,7 @@ CDateAx.prototype =
         {
             c.setTxPr(this.txPr.createDuplicate());
         }
+        return c;
     },
 
     setAuto: function(pr)
@@ -4075,7 +4076,7 @@ CDateAx.prototype =
     },
     setAxPos: function(pr)
     {
-        History.Add(this, {Type:historyitem_DateAxPos, oldPr: this.axPos, newPr: pr});
+        History.Add(this, {Type:historyitem_DateAxAxPos, oldPr: this.axPos, newPr: pr});
         this.axPos = pr;
 
     },
@@ -4498,6 +4499,50 @@ CSerAx.prototype =
     {
         return this.Id;
     },
+
+    createDuplicate: function()
+    {
+        var c = new CSerAx();
+        c.setAxPos(this.axPos);
+        c.setCrosses(this.crosses);
+        c.setCrossesAt(this.crossesAt);
+        c.setDelete(this.bDelete);
+        if(this.majorGridlines)
+        {
+            c.setMajorGridlines(this.majorGridlines.createDuplicate());
+        }
+        c.setMajorTickMark(this.majorTickMark);
+        if(this.minorGridlines)
+        {
+            c.setMajorGridlines(this.minorGridlines.createDuplicate());
+        }
+        c.setMajorTickMark(this.minorTickMark);
+        if(this.numFmt)
+        {
+            c.setNumFmt(this.numFmt.createDuplicate());
+        }
+        if(this.scaling)
+        {
+            c.setScaling(this.scaling.createDuplicate());
+        }
+        if(this.spPr)
+        {
+            c.setSpPr(this.spPr.createDuplicate());
+        }
+        c.setTickLblPos(this.tickLblPos);
+        c.setTickLblSkip(this.tickLblSkip);
+        c.setTickMarkSkip(this.tickMarkSkip);
+        if(this.title)
+        {
+            c.setTitle(this.title.createDuplicate());
+        }
+        if(this.txPr)
+        {
+            c.setTxPr(this.txPr.createDuplicate());
+        }
+        return c;
+    },
+
     setAxId: function(pr)
     {
         History.Add(this, {Type: historyitem_SerAxSetAxId, oldPr: this.axId, newPr: pr});
@@ -4650,6 +4695,42 @@ CValAx.prototype =
 
     Refresh_RecalcData: function()
     {},
+
+    createDuplicate: function()
+    {
+        var c = new CValAx();
+        c.setAxPos(this.axPos);
+        c.setCrossBetween(this.crossBetween);
+        c.setCrossesAt(this.crossesAt);
+        c.setDelete(this.bDelete);
+        if(this.dispUnits)
+        {
+            c.setDispUnits(this.dispUnits.createDuplicate());
+        }
+        if(this.majorGridlines)
+        {
+            c.setMajorGridlines(this.majorGridlines.createDuplicate());
+        }
+        c.setMajorTickMark(this.majorTickMark);
+        c.setMajorUnit(this.majorUnit);
+        c.setNumFmt(this.numFmt.createDuplicate());
+        c.setScaling(this.scaling.createDuplicate());
+        if(this.spPr)
+        {
+            c.setSpPr(this.spPr.createDuplicate());
+        }
+        c.setTickLblPos(this.tickLblPos);
+        if(this.title)
+        {
+            c.setTitle(this.title.createDuplicate());
+        }
+        if(this.txPr)
+        {
+            c.setTxPr(this.txPr.createDuplicate());
+        }
+        return c;
+    },
+
     getObjectType: function()
     {
         return historyitem_type_ValAx;
@@ -5010,6 +5091,17 @@ CBandFmt.prototype =
     Refresh_RecalcData: function()
     {},
 
+    createDuplicate: function()
+    {
+        var c = new CBandFmt();
+        c.setIdx(this.idx);
+        if(this.spPr)
+        {
+            c.setSpPr(this.spPr.createDuplicate());
+        }
+        return c;
+    },
+
     getObjectType: function()
     {
         return historyitem_type_BandFmt;
@@ -5171,6 +5263,52 @@ CBarSeries.prototype =
     getObjectType: function()
     {
         return historyitem_type_BarSeries;
+    },
+
+    createDuplicate: function()
+    {
+        var c = new CBarSeries();
+        if(this.cat)
+        {
+            c.setCat(this.cat.createDuplicate());
+        }
+        if(this.dLbls)
+        {
+            c.setDLbls(this.dLbls.createDuplicate());
+        }
+        for(var i = 0; i < this.dPt.length; ++i)
+        {
+            c.addDPt(this.dPt[i].createDuplicate());
+        }
+        if(this.errBars)
+        {
+            c.setErrBars(this.errBars.createDuplicate());
+        }
+        c.setIdx(this.idx);
+        c.setInvertIfNegative(this.invertIfNegative);
+        c.setOrder(this.order);
+        if(this.pictureOptions)
+        {
+            c.setPictureOptions(this.pictureOptions.createDuplicate());
+        }
+        c.setShape(this.shape);
+        if(this.spPr)
+        {
+            c.setSpPr(this.spPr.createDuplicate());
+        }
+        if(this.trendline)
+        {
+            c.setTrendline(this.trendline.createDuplicate());
+        }
+        if(this.tx)
+        {
+            c.setTx(this.tx.createDuplicate());
+        }
+        if(this.val)
+        {
+            c.setVal(this.val.createDuplicate());
+        }
+        return c;
     },
 
     documentCreateFontMap: CAreaSeries.prototype.documentCreateFontMap,
@@ -5583,6 +5721,25 @@ CBubbleChart.prototype =
     },
 
 
+    createDuplicate: function()
+    {
+        var c = new CBubbleChart();
+        c.setBubble3D(this.bubble3D);
+        c.setBubbleScale(this.bubbleScale);
+        if(this.dLbls)
+        {
+            c.setDLbls(this.dLbls.createDuplicate());
+        }
+        for(var i = 0; i < this.series.length; ++i)
+        {
+            c.addSer(this.series[i].createDuplicate());
+        }
+        c.setShowNegBubbles(this.showNegBubbles);
+        c.setSizeRepresents(this.sizeRepresents);
+        c.setVaryColors(this.varyColors);
+        return c;
+    },
+
     documentCreateFontMap: CBarChart.prototype.documentCreateFontMap,
 
     getAllRasterImages: CBarChart.prototype.getAllRasterImages,
@@ -5876,6 +6033,52 @@ CBubbleSeries.prototype =
     getObjectType: function()
     {
         return historyitem_type_BubbleSeries;
+    },
+
+    cd: function()
+    {},
+
+    createDuplicate: function()
+    {
+        var c = new CBubbleSeries();
+        c.setBubble3D(this.bubble3D);
+        c.setBubbleSize(this.bubbleSize);
+        if(this.dLbls)
+        {
+            c.setDLbls(this.dLbls.createDuplicate());
+        }
+        for(var i = 0; i < this.dPt.length; ++i)
+        {
+            c.addDPt(this.dPt[i].createDuplicate());
+        }
+        if(this.errBars)
+        {
+            c.setErrBars(this.errBars.createDuplicate());
+        }
+        c.setIdx(this.idx);
+        c.setInvertIfNegative(this.invertIfNegative);
+        c.setOrder(this.order);
+        if(this.spPr)
+        {
+            c.setSpPr(this.spPr.createDuplicate());
+        }
+        if(this.trendline)
+        {
+            c.setTrendline(this.trendline.createDuplicate());
+        }
+        if(this.tx)
+        {
+            c.setTx(this.tx.createDuplicate());
+        }
+        if(this.xVal)
+        {
+            c.setXVal(this.xVal.createDuplicate());
+        }
+        if(this.yVal)
+        {
+            c.setYVal(this.yVal.createDuplicate());
+        }
+        return c;
     },
 
 
@@ -6255,6 +6458,33 @@ CCat.prototype =
         this.Id = r.GetString2();
     },
 
+
+    createDuplicate: function()
+    {
+        var c = new CCat();
+        if(this.multiLvlStrRef)
+        {
+            c.setMultiLvlStrRef(this.multiLvlStrRef.createDuplicate());
+        }
+        if(this.numLit)
+        {
+            c.setNumLit(this.numLit.createDuplicate());
+        }
+        if(this.numRef)
+        {
+            c.setNumRef(this.numRef.createDuplicate());
+        }
+        if(this.strLit)
+        {
+            c.setStrLit(this.strLit.createDuplicate());
+        }
+        if(this.strRef)
+        {
+            c.setStrRef(this.strRef.createDuplicate());
+        }
+        return c;
+    },
+
     getObjectType: function()
     {
         return historyitem_type_Cat;
@@ -6435,6 +6665,20 @@ CChartText.prototype =
     },
     Refresh_RecalcData: function()
     {},
+
+
+    createDuplicate: function()
+    {
+        var c = new CChartText();
+        if(this.rich)
+            c.setRich(this.rich.createDuplicate());
+        if(this.strRef)
+        {
+            c.setStrRef(this.strRef.createDuplicate());
+        }
+        //Todo: разобраться с ссылками на chart
+        return c;
+    },
 
     getStyles: CDLbl.prototype.getStyles,
 
@@ -6648,6 +6892,42 @@ CDLbls.prototype =
     },
     Refresh_RecalcData: function()
     {},
+
+    createDuplicate: function()
+    {
+        var c = new CDLbls();
+        c.setDelete(this.bDelete);
+        for(var i = 0; i < this.dLbl.length; ++i)
+        {
+            c.addDLbl(this.dLbl[i].createDuplicate());
+        }
+        c.setDLblPos(this.dLblPos);
+        if(this.leaderLines)
+        {
+            c.setLeaderLines(this.leaderLines.createDuplicate());
+        }
+        if(this.numFmt)
+        {
+            c.setNumFmt(this.numFmt.createDuplicate());
+        }
+        c.setSeparator(this.separator);
+        c.setShowBubbleSize(this.showBubbleSize);
+        c.setShowCatName(this.showCatName);
+        c.setShowLeaderLines(this.showLeaderLines);
+        c.setShowLegendKey(this.showLegendKey);
+        c.setShowPercent(this.showPercent);
+        c.setShowSerName(this.showSerName);
+        c.setShowVal(this.showVal);
+        if(this.spPr)
+        {
+            c.setSpPr(this.spPr.createDuplicate());
+        }
+        if(this.txPr)
+        {
+            c.setTxPr(this.txPr.createDuplicate());
+        }
+        return c;
+    },
 
 
     documentCreateFontMap: function(allFonts)
@@ -7081,7 +7361,7 @@ function CDPt()
     this.recalcInfo =
     {
         recalcLbl: true
-    }
+    };
     this.compiledLbl = null;
 
     this.Id = g_oIdCounter.Get_NewId();
@@ -7100,6 +7380,28 @@ CDPt.prototype =
     getObjectType: function()
     {
         return historyitem_type_DPt;
+    },
+
+    createDuplicate: function()
+    {
+        var c = new CDPt();
+        c.setBubble3D(this.bubble3D);
+        c.setExplosion(this.explosion);
+        c.setIdx(this.idx);
+        c.setInvertIfNegative(this.invertIfNegative);
+        if(this.marker)
+        {
+            c.setMarker(this.marker.createDuplicate());
+        }
+        if(this.pictureOptions)
+        {
+            c.setPictureOptions(this.pictureOptions.createDuplicate());
+        }
+        if(this.spPr)
+        {
+            c.setSpPr(this.spPr.createDuplicate());
+        }
+        return c;
     },
 
     Write_ToBinary2: function(w)
@@ -7409,6 +7711,20 @@ CDTable.prototype =
     Read_FromBinary: function(r)
     {
         this.Id = r.GetString2();
+    },
+
+    createDuplicate: function()
+    {
+        var c = new CDTable();
+        c.setShowHorzBorder(this.showHorzBorder);
+        c.setShowKeys(this.showKeys);
+        c.setShowOutline(this.showOutline);
+        c.setShowVertBorder(this.showVertBorder);
+        if(this.spPr)
+            c.setSpPr(this.spPr.createDuplicate());
+        if(this.txPr)
+            c.setTxPr(this.txPr.createDuplicate());
+        return c;
     },
 
     setShowHorzBorder: function(pr)
@@ -7725,6 +8041,18 @@ CDispUnits.prototype =
     Refresh_RecalcData: function()
     {},
 
+    createDuplicate: function()
+    {
+        var c = new CDispUnits();
+        c.setBuiltInUnit(this.builtInUnit);
+        c.setCustUnit(this.custUnit);
+        if(this.dispUnitsLbl)
+        {
+            c.setDispUnitsLbl(this.dispUnitsLbl.createDuplicate());
+        }
+        return c;
+    },
+
     getMultiplier: function()
     {
         if(isRealNumber(this.builtInUnit))
@@ -7869,6 +8197,23 @@ CDoughnutChart.prototype =
     },
     Refresh_RecalcData: function()
     {},
+
+    createDuplicate: function()
+    {
+        var c = new CDoughnutChart();
+        if(this.dLbls)
+        {
+            c.setDLbls(this.dLbls.createDuplicate());
+        }
+        c.setFirstSliceAng(this.firstSliceAng);
+        c.setHoleSize(this.holeSize);
+        for(var i = 0; i < this.series.length; ++i)
+        {
+            c.addSer(this.series[i].createDuplicate());
+        }
+        c.setVaryColors(this.varyColors);
+        return c;
+    },
 
     getObjectType: function()
     {
@@ -8172,6 +8517,29 @@ CErrBars.prototype =
     },
     Refresh_RecalcData: function()
     {},
+
+    createDuplicate: function()
+    {
+        var c = new CErrBars();
+        c.setErrBarType(this.errBarType);
+        c.setErrDir(this.errDir);
+        c.setErrValType(this.errValType);
+        if(this.minus)
+        {
+            c.setMinus(this.minus.createDuplicate());
+        }
+        c.setNoEndCap(this.noEndCap);
+        if(this.plus)
+        {
+            c.setPlus(this.plus.createDuplicate());
+        }
+        if(this.spPr)
+        {
+            c.setSpPr(this.spPr.createDuplicate());
+        }
+        c.setVal(this.val);
+        return c;
+    },
 
     getObjectType: function()
     {
@@ -8519,6 +8887,21 @@ CLayout.prototype =
     Read_FromBinary2: function (r)
     {
         this.Id = r.GetString2();
+    },
+
+    createDuplicate: function()
+    {
+        var c = new CLayout();
+        c.setH(this.h);
+        c.setHMode(this.hMode);
+        c.setLayoutTarget(this.layoutTarget);
+        c.setW(this.w);
+        c.setWMode(this.wMode);
+        c.setX(this.x);
+        c.setXMode(this.xMode);
+        c.setY(this.y);
+        c.setYMode(this.yMode);
+        return c;
     },
 
     getObjectType: function()
@@ -8892,6 +9275,30 @@ CLegend.prototype =
     },
     Refresh_RecalcData: function()
     {},
+
+    createDuplicate: function()
+    {
+        var c = new CLegend();
+        if(this.layout)
+        {
+            c.setLayout(this.layout.createDuplicate());
+        }
+        for(var i = 0; i < this.legendEntryes.length; ++i)
+        {
+            c.addLegendEntry(this.legendEntryes[i].createDuplicate());
+        }
+        c.setLegendPos(this.legendPos);
+        c.setOverlay(this.overlay);
+        if(this.spPr)
+        {
+            c.setSpPr(this.spPr.createDuplicate());
+        }
+        if(this.txPr)
+        {
+            c.setTxPr(this.txPr.createDuplicate());
+        }
+        return c;
+    },
 
     Write_ToBinary2: function (w)
     {
@@ -9339,6 +9746,18 @@ CLegendEntry.prototype =
         return historyitem_type_LegendEntry;
     },
 
+    createDuplicate: function()
+    {
+        var c = new CLegendEntry();
+        c.setDelete(this.bDelete);
+        c.setIdx(this.idx);
+        if(this.txPr)
+        {
+            c.setTxPr(this.txPr.createDuplicate());
+        }
+        return c;
+    },
+
     Get_Id: function()
     {
         return this.Id;
@@ -9539,6 +9958,36 @@ CLineChart.prototype =
     getObjectType: function()
     {
         return  historyitem_type_LineChart;
+    },
+
+    craeteDuplicate: function()
+    {
+        var c = new CLineChart();
+        if(this.dLbls)
+        {
+            c.setDLbls(this.dLbls.createDuplicate());
+        }
+        if(this.dropLines)
+        {
+            c.setDropLines(this.dropLines.createDuplicate());
+        }
+        c.setGrouping(this.grouping);
+        if(this.hiLowLines)
+        {
+            c.setHiLowLines(this.hiLowLines.createDuplicate());
+        }
+        c.setMarker(this.marker);
+        for(var i = 0; i < this.series.length; ++i)
+        {
+            c.addSer(this.series[i].createDuplicate());
+        }
+        c.setSmooth(this.smooth);
+        if(this.upDownBars)
+        {
+            c.setUpDownBars(this.upDownBars.createDuplicate());
+        }
+        c.setVaryColors(this.varyColors);
+        return c;
     },
 
 
@@ -9934,6 +10383,50 @@ CLineSeries.prototype =
 
     Refresh_RecalcData: function()
     {},
+    createDuplicate: function()
+    {
+        var c = new CLineSeries();
+        if(this.cat)
+        {
+            c.setCat(this.cat.createDuplicate());
+        }
+        if(this.dLbls)
+        {
+            c.setDLbls(this.dLbls.createDuplicate());
+        }
+        for(var i = 0; i < this.dPt.length; ++i)
+        {
+            c.addDPt(this.dPt.createDuplicate());
+        }
+        if(this.errBars)
+        {
+            c.setErrBars(this.errBars.createDuplicate());
+        }
+        c.setIdx(this.idx);
+        if(this.marker)
+        {
+            c.setMarker(this.marker.createDuplicate());
+        }
+        c.setOrder(this.order);
+        c.setSmooth(this.smooth);
+        if(this.spPr)
+        {
+            c.setSpPr(this.spPr.createDuplicate());
+        }
+        if(this.trendline)
+        {
+            c.setTrendline(this.trendline.createDuplicate());
+        }
+        if(this.tx)
+        {
+            c.setTx(this.tx.createDuplicate());
+        }
+        if(this.val)
+        {
+            c.setVal(this.val.createDuplicate());
+        }
+        return c;
+    },
 
     getObjectType: function()
     {
@@ -10344,7 +10837,6 @@ CMarker.prototype =
         return this.Id;
     },
 
-
     Refresh_RecalcData: function()
     {},
 
@@ -10370,11 +10862,11 @@ CMarker.prototype =
         {
             if(isRealNumber(otherMarker.size))
             {
-                this.size = otherMarker.size;
+                this.setSize(otherMarker.size);
             }
             if(isRealNumber(otherMarker.symbol))
             {
-                this.symbol = otherMarker.symbol;
+                this.setSymbol(otherMarker.symbol);
             }
             if(otherMarker.spPr && (otherMarker.spPr.Fill || otherMarker.spPr.ln))
             {
@@ -10560,6 +11052,20 @@ CMinusPlus.prototype =
     Refresh_RecalcData: function()
     {},
 
+    createDuplicate: function()
+    {
+        var c = new CMinusPlus();
+        if(this.numRef)
+        {
+            c.setNumRef(this.numRef.createDuplicate());
+        }
+        if(this.numLit)
+        {
+            c.setNumLit(this.numLit.craeteDuplicate());
+        }
+        return c;
+    },
+
     getObjectType: function()
     {
         return historyitem_type_MinusPlus;
@@ -10694,6 +11200,18 @@ CMultiLvlStrCache.prototype =
     Refresh_RecalcData: function()
     {},
 
+
+    createDuplicate: function()
+    {
+        var c = new CMultiLvlStrCache();
+        if(this.lvl)
+        {
+            c.setLvl(this.lv.createDuplicate());
+        }
+        c.setPtCount(this.ptCount);
+        return c;
+    },
+
     getObjectType: function()
     {
         return historyitem_type_MultiLvlStrCache;
@@ -10818,6 +11336,17 @@ CMultiLvlStrRef.prototype =
         this.Id = r.GetString2();
     },
 
+    createDuplicate: function()
+    {
+        var c = new CMultiLvlStrRef();
+        c.setF(this.f);
+        if(this.multiLvlStrCache)
+        {
+            c.setMultiLvlStrCache(this.multiLvlStrCache.createDuplicate());
+        }
+        return c;
+    },
+
     setF: function(pr)
     {
         History.Add(this, {Type: historyitem_MultiLvlStrRef_SetF, oldPr: this.f, newPr: pr});
@@ -10922,6 +11451,16 @@ CNumRef.prototype =
     Refresh_RecalcData: function()
     {},
 
+    createDuplicate: function()
+    {
+        var c = new CNumRef();
+        c.setF(this.f);
+        if(this.numCache)
+        {
+            c.setNumCache(this.numCache.createDuplicate());
+        }
+    },
+
     getObjectType: function()
     {
         return historyitem_type_NumRef;
@@ -10988,13 +11527,13 @@ CNumRef.prototype =
         switch(data.Type)
         {
             case historyitem_NumRef_SetF:
+            {
+                writeString(w, data.newPr);
+                break;
+            }
             case historyitem_NumRef_SetNumCache:
             {
-                w.WriteBool(isRealObject(data.newPr));
-                if(isRealObject(data.newPr))
-                {
-                    w.WriteString2(data.newPr.Get_Id());
-                }
+                writeObject(w, data.newPr);
                 break;
             }
         }
@@ -11007,26 +11546,12 @@ CNumRef.prototype =
         {
             case historyitem_NumRef_SetF:
             {
-                if(r.GetBool())
-                {
-                    this.f = g_oTableId.Get_ById(r.GetString2());
-                }
-                else
-                {
-                    this.f = null;
-                }
+                this.f = readString(r);
                 break;
             }
             case historyitem_NumRef_SetNumCache:
             {
-                if(r.GetBool())
-                {
-                    this.numCache = g_oTableId.Get_ById(r.GetString2());
-                }
-                else
-                {
-                    this.numCache = null;
-                }
+                this.numCache = readObject(r);
             }
         }
     }
@@ -11050,6 +11575,15 @@ CNumericPoint.prototype =
         return this.Id;
     },
 
+
+    createDuplicate: function()
+    {
+        var c = new CNumericPoint();
+        c.setFormatCode(this.formatCode);
+        c.setIdx(this.idx);
+        c.setVal(this.val);
+        return c;
+    },
 
     Refresh_RecalcData: function()
     {},
@@ -11225,6 +11759,14 @@ CNumFmt.prototype =
     Refresh_RecalcData: function()
     {},
 
+    createDuplicate: function()
+    {
+        var c = new CNumFmt();
+        c.setFormatCode(this.formatCode);
+        c.setSourceLinked(this.sourceLinked);
+        return c;
+    },
+
     getObjectType: function()
     {
         return historyitem_type_NumFmt;
@@ -11348,6 +11890,18 @@ CNumLit.prototype =
     Refresh_RecalcData: function()
     {},
 
+
+    createDuplicate: function()
+    {
+        var c = new CNumLit();
+        c.setFormatCode(this.formatCode);
+        for(var i = 0; i < this.pts.length; ++i)
+        {
+            c.addPt(this.pts[i].createDuplicate());
+        }
+        c.setPtCount(this.ptCount);
+        return c;
+    },
 
     getPtByIndex: function(idx)
     {
@@ -11541,6 +12095,34 @@ COfPieChart.prototype =
 
     Refresh_RecalcData: function()
     {},
+
+    createDuplicate: function()
+    {
+        var c = new COfPieChart(), i;
+        for(i = 0; i < this.custSplit.length; ++i)
+        {
+            c.addCustSplit(this.custSplit[i].createDuplicate());
+        }
+        if(this.dLbls)
+        {
+            c.setDLbls((this.dLbls.createDuplicate()));
+        }
+        c.setGapWidth(this.gapWidth);
+        c.setOfPieType(this.ofPieType);
+        c.setSecondPieSize(this.secondPieSize);
+        for(i = 0; i < this.series.length; ++i)
+        {
+            c.addSer(this.series[i].createDuplicate());
+        }
+        if(this.serLines)
+        {
+            c.setSerLines(this.serLines.createDuplicate());
+        }
+        c.setSplitPos(this.splitPos);
+        c.setSplitType(this.splitType);
+        c.setVaryColors(this.varyColors);
+        return c;
+    },
 
     getObjectType: function()
     {
@@ -11958,6 +12540,17 @@ CPictureOptions.prototype =
     Refresh_RecalcData: function()
     {},
 
+    createDuplicate: function()
+    {
+        var c = new CPictureOptions();
+        c.setApplyToEnd(this.applyToEnd);
+        c.setApplyToFront(this.applyToFront);
+        c.setApplyToSides(this.applyToSides);
+        c.setPictureFormat(this.pictureFormat);
+        c.setPictureStackUnit(this.pictureStackUnit);
+        return  c;
+    },
+
     getObjectType: function()
     {
         return historyitem_type_PictureOptions;
@@ -12145,6 +12738,22 @@ CPieChart.prototype =
 
     Refresh_RecalcData: function()
     {},
+
+    createDuplicate: function()
+    {
+        var c = new CPieChart();
+        if(this.dLbls)
+        {
+            c.setDLbls(this.dLbls.createDuplicate());
+        }
+        c.setFirstSliceAng(this.firstSliceAng);
+        for(var i = 0; i < this.series.length; ++i)
+        {
+            c.addSer(this.series[i].createDuplicate());
+        }
+        c.setVaryColors(this.varyColors);
+        return c;
+    },
 
     getObjectType: function()
     {
@@ -12397,6 +13006,39 @@ CPieSeries.prototype =
 
     Refresh_RecalcData: function()
     {},
+
+    createDuplicate: function()
+    {
+        var c = new CPieSeries();
+        if(this.cat)
+        {
+            c.setCat(this.cat.createDuplicate());
+        }
+        if(this.dLbls)
+        {
+            c.setDLbls(this.dLbls.createDuplicate());
+        }
+        for(var  i = 0; i < this.dPt.length; ++i)
+        {
+            c.addDPt(this.dPt[i].createDuplicate());
+        }
+        c.setExplosion(this.explosion);
+        c.setIdx(this.idx);
+        c.setOrder(this.order);
+        if(this.spPr)
+        {
+            c.setSpPr(this.spPr.createDuplicate());
+        }
+        if(this.tx)
+        {
+            c.setTx(this.tx.createDuplicate());
+        }
+        if(this.val)
+        {
+            c.setVal(this.val.createDuplicate());
+        }
+        return c;
+    },
 
     getObjectType: function()
     {
@@ -12713,6 +13355,29 @@ CPivotFmt.prototype =
     Refresh_RecalcData: function()
     {},
 
+    createDuplicate: function()
+    {
+        var c = new CPivotFmt();
+        if(this.dLbl)
+        {
+            c.setLbl(this.dLbl.createDuplicate());
+        }
+        c.setIdx(this.idx);
+        if(this.marker)
+        {
+            c.setMarker(this.marker.createDuplicate());
+        }
+        if(this.spPr)
+        {
+            c.setSpPr(this.spPr.createDuplicate());
+        }
+        if(this.txPr)
+        {
+            c.setTxPr(this.txPr.craeteDuplicate());
+        }
+        return c;
+    },
+
     getObjectType: function()
     {
         return historyitem_type_PivotFmt;
@@ -12936,6 +13601,22 @@ CRadarChart.prototype =
 
     Refresh_RecalcData: function()
     {},
+
+    createDuplicate: function()
+    {
+        var c = new CRadarChart();
+        if(this.dLbls)
+        {
+            c.setDLbls(this.dLbls.craeteDuplicate());
+        }
+        c.setRadarStyle(this.radarStyle);
+        for(var  i = 0; i < this.series.length; ++i)
+        {
+            c.addSer(this.series[i].createDuplicate());
+        }
+        c.setVaryColors(this.varyColors);
+        return c;
+    },
 
     getObjectType: function()
     {
@@ -13199,6 +13880,42 @@ CRadarSeries.prototype =
 
     Refresh_RecalcData: function()
     {},
+
+    createDuplicate: function()
+    {
+        var c = new CRadarSeries();
+        if(this.cat)
+        {
+            c.setCat(this.cat.createDuplicate());
+        }
+        if(this.dLbls)
+        {
+            c.setDLbls(this.dLbls.craeteDuplicate());
+        }
+        for(var i = 0; i < this.dPt.length; ++i)
+        {
+            c.addDPt(this.dPt[i].createDuplicate());
+        }
+        c.setIdx(this.idx);
+        if(this.marker)
+        {
+            c.setMarker(this.marker.createDuplicate());
+        }
+        c.setOrder(this.order);
+        if(this.spPr)
+        {
+            c.setSpPr(this.spPr.createDuplicate());
+        }
+        if(this.tx)
+        {
+            c.setTx(this.tx.createDuplicate());
+        }
+        if(this.val)
+        {
+            c.setVal(this.val.createDuplicate());
+        }
+        return c;
+    },
 
     getObjectType: function()
     {
@@ -13509,6 +14226,16 @@ CScaling.prototype =
     Refresh_RecalcData: function()
     {},
 
+    createDuplicate: function()
+    {
+        var c = new CScaling();
+        c.setLogBase(this.logBase);
+        c.setMax(this.max);
+        c.setMin(this.min);
+        c.setOrientation(this.orientation);
+        return c;
+    },
+
     getObjectType: function()
     {
         return historyitem_type_Scaling;
@@ -13682,6 +14409,22 @@ CScatterChart.prototype =
 
     Refresh_RecalcData: function()
     {},
+
+    createDuplicate: function()
+    {
+        var c = new CScatterChart();
+        if(this.dLbls)
+        {
+            c.setDLbls(this.dLbls.createDuplicate());
+        }
+        c.setScatterStyle(this.scatterStyle);
+        for(var i = 0; i < this.series.length; ++i)
+        {
+            c.addSer(this.series[i].createDuplicate());
+        }
+        c.setVaryColors(this.varyColors);
+        return c;
+    },
 
     getObjectType: function()
     {
@@ -13956,6 +14699,48 @@ CScatterSeries.prototype =
     },
 
     documentCreateFontMap: CAreaSeries.prototype.documentCreateFontMap,
+
+    createDuplicate: function()
+    {
+        var c = new CScatterSeries();
+        c.setDLbls(this.dLbls.createDuplicate());
+        for(var i = 0; i < this.dPt.length; ++i)
+        {
+            c.addDPt(this.dPt[i].createDuplicate());
+        }
+        if(this.errBars)
+        {
+            c.setErrBars(this.errBars.createDuplicate());
+        }
+        c.setIdx(this.idx);
+        if(this.marker)
+        {
+            c.setMarker(this.marker.createDuplicate());
+        }
+        c.setOrder(this.order);
+        c.setSmooth(this.smooth);
+        if(this.spPr)
+        {
+            c.setSpPr(this.spPr.craeteDuplicate());
+        }
+        if(this.trendline)
+        {
+            c.setTrendline(this.trendline.createDuplicate())
+        }
+        if(this.tx)
+        {
+            c.setTx(this.tx.createDuplicate());
+        }
+        if(this.xVal)
+        {
+            c.setXVal(this.xVal.createDuplicate());
+        }
+        if(this.yVal)
+        {
+            c.setYVal(this.yVal.createDuplicate());
+        }
+        return c;
+    },
 
     Refresh_RecalcData: function()
     {},
@@ -14429,6 +15214,17 @@ CTx.prototype =
     Refresh_RecalcData: function()
     {},
 
+    createDuplicate: function()
+    {
+        var c = new CTx();
+        if(this.strRef)
+        {
+            c.setStrRef(this.strRef.createDuplicate());
+        }
+        c.setVal(this.val);
+        return c;
+    },
+
     getObjectType: function()
     {
         return historyitem_type_Tx;
@@ -14552,6 +15348,32 @@ CStockChart.prototype =
 
     Refresh_RecalcData: function()
     {},
+
+    createDuplicate: function()
+    {
+        var c = new CStockChart();
+        if(this.dLbls)
+        {
+            c.setDLbls(this.dLbls.createDuplicate());
+        }
+        if(this.dropLines)
+        {
+            c.setDropLines(this.dropLines.createDuplicate());
+        }
+        if(this.hiLowLines)
+        {
+            c.setHiLowLines(this.hiLowLines.createDuplicate());
+        }
+        for(var i = 0; i < this.series.length; ++i)
+        {
+            c.addSer(this.series[i].createDuplicate());
+        }
+        if(this.upDownBars)
+        {
+            c.setUpDownBars(this.upDownBars.createDuplicate());
+        }
+        return c;
+    },
 
     getObjectType: function()
     {
@@ -14780,6 +15602,17 @@ CStrCache.prototype =
     Refresh_RecalcData: function()
     {},
 
+    createDuplicate: function()
+    {
+        var c = new CStrCache();
+        for(var i = 0; i < this.pt.length; ++i)
+        {
+            c.addPt(this.pt[i].createDuplicate());
+        }
+        c.setPtCount(this.ptCount);
+        return c;
+    },
+
     getPtByIndex: function(idx)
     {
         for(var i = 0; i < this.pt.length; ++i)
@@ -14921,6 +15754,17 @@ CStringLiteral.prototype =
     Refresh_RecalcData: function()
     {},
 
+    createDuplicate: function()
+    {
+        var c = new CStrCache();
+        for(var i = 0; i < this.pt.length; ++i)
+        {
+            c.addPt(this.pt[i].createDuplicate());
+        }
+        c.setPtCount(this.ptCount);
+        return c;
+    },
+
     getObjectType: function()
     {
         return historyitem_type_StringLiteral;
@@ -15028,6 +15872,14 @@ CStringPoint.prototype =
 
     Refresh_RecalcData: function()
     {},
+
+    createDuplicate: function()
+    {
+        var c = new CStringPoint();
+        c.setIdx(this.idx);
+        c.setVal(this.val);
+        return c;
+    },
 
     getObjectType: function()
     {
@@ -15149,6 +16001,17 @@ CStrRef.prototype =
     Refresh_RecalcData: function()
     {},
 
+    createDuplicate: function()
+    {
+        var c = new CStrRef();
+        c.setF(this.f);
+        if(this.strCache)
+        {
+            c.setStrCache(this.strCache.createDuplicate());
+        }
+        return c;
+    },
+
     getObjectType: function()
     {
         return historyitem_type_StrRef;
@@ -15268,6 +16131,21 @@ CSurfaceChart.prototype =
 
     Refresh_RecalcData: function()
     {},
+
+    createDuplicate: function()
+    {
+        var c = new CSurfaceChart(), i;
+        for(i = 0; i < this.bandFmts.length; ++i)
+        {
+            c.addBandFmt(this.bandFmts[i].craeteDuplicate());
+        }
+        for(var  i =0 ; i < this.series.length; ++i)
+        {
+            c.addSer(this.series[i].createDuplicate());
+        }
+        c.setWireframe(this.wireframe);
+        return c;
+    },
 
     getObjectType: function()
     {
@@ -15511,6 +16389,31 @@ CSurfaceSeries.prototype =
 
     Refresh_RecalcData: function()
     {},
+
+    createDuplicate: function()
+    {
+        var c = new CSurfaceSeries();
+        if(this.cat)
+        {
+            c.setCat(this.cat.createDuplicate());
+        }
+        c.setIdx(this.idx);
+        c.setOrder(this.order);
+        if(this.spPr)
+        {
+            c.setSpPr(this.spPr.createDuplicate());
+        }
+        if(this.tx)
+        {
+            c.setTx(this.tx.createDuplicate());
+        }
+
+        if(this.val)
+        {
+            c.setVal(this.val.createDuplicate());
+        }
+        return c;
+    },
 
     getObjectType: function()
     {
@@ -15785,6 +16688,29 @@ CTitle.prototype =
 
     Refresh_RecalcData: function()
     {},
+
+    createDuplicate: function()
+    {
+        var c = new CTitle();
+        if(this.layout)
+        {
+            c.setLayout(this.layout.createDuplicate());
+        }
+        c.setOverlay(this.overlay);
+        if(this.spPr)
+        {
+            c.setSpPr(this.spPr.createDuplicate());
+        }
+        if(this.tx)
+        {
+            c.setTx(this.tx.craeteDuplicate());
+        }
+        if(this.txPr)
+        {
+            c.setTxPr(this.txPr.createDuplciate());
+        }
+        return c;
+    },
 
     getObjectType: function()
     {
