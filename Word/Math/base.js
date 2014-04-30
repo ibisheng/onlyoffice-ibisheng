@@ -183,16 +183,19 @@ CMathBase.prototype =
                 if( !this.elements[i][j].IsJustDraw())
                     this.elements[i][j].setArgSize(argSize);
     },
+    // TO DO
+    // посмотреть для всех мат. объектов, где используется эта функция
     mergeCtrTPrp: function()
     {
         var tPrp = this.getCtrPrp();
+        this.Composition.Parent.ApplyArgSize(tPrp);
 
-        if(this.argSize == -1)
+        /*if(this.argSize == -1)
         //tPrp.FontSize *= 0.8;
             tPrp.FontSize *= 0.728;
         else if(this.argSize == -2)
         //tPrp.FontSize *= 0.65;
-            tPrp.FontSize *= 0.53;
+            tPrp.FontSize *= 0.53;*/
 
         return tPrp;
     },
@@ -1443,7 +1446,10 @@ CMathBase.prototype =
         {
             while(CurPos_Y >= 0)
             {
-                if( ! this.elements[CurPos_X][CurPos_Y].IsJustDraw() )
+                var bJDraw = this.elements[CurPos_X][CurPos_Y].IsJustDraw(),
+                    usePlh = bUseContent && this.elements[CurPos_X][CurPos_Y].IsPlaceholder();
+
+                if(!bJDraw && ! usePlh)
                 {
                     this.elements[CurPos_X][CurPos_Y].Get_LeftPos(SearchPos, ContentPos, Depth + 2, bUseContent, EndRun);
                     SearchPos.Pos.Update(CurPos_X, Depth);
@@ -1469,48 +1475,6 @@ CMathBase.prototype =
 
         result = SearchPos.Found;
 
-
-
-        /*if( ! this.elements[CurPos_X][CurPos_Y].IsJustDraw() )
-        {
-            this.elements[CurPos_X][CurPos_Y].Get_LeftPos(SearchPos, ContentPos, Depth + 2, UseContentPos, EndRun);
-            SearchPos.Pos.Update(CurPos_X, Depth);
-            SearchPos.Pos.Update(CurPos_Y, Depth+1);
-
-            if(SearchPos.Found === true)
-                result = true;
-        }
-
-        if( result == false)
-        {
-            while(CurPos_Y >= 0)
-            {
-                while(CurPos_X >= 0)
-                {
-                    if( this.elements[CurPos_X][CurPos_Y].IsJustDraw() == false)
-                    {
-                        this.elements[CurPos_X][CurPos_Y].Get_LeftPos(SearchPos, ContentPos, Depth + 2, false, true);
-                        SearchPos.Pos.Update(CurPos_X, Depth);
-                        SearchPos.Pos.Update(CurPos_Y, Depth+1);
-                    }
-
-                    if(SearchPos.Found === true)
-                    {
-                        result = true;
-                        break;
-                    }
-
-                    CurPos_X--;
-                }
-
-                if(SearchPos.Found === true)
-                    break;
-
-                CurPos_Y--;
-                CurPos_X = this.nRow;
-            }
-        }*/
-
         return result;
     },
     Get_RightPos: function(SearchPos, ContentPos, Depth, UseContentPos, BegRun)
@@ -1535,7 +1499,10 @@ CMathBase.prototype =
         {
             while(CurPos_Y < this.nCol)
             {
-                if( ! this.elements[CurPos_X][CurPos_Y].IsJustDraw() )
+                var bJDraw = this.elements[CurPos_X][CurPos_Y].IsJustDraw(),
+                    usePlh = bUseContent && this.elements[CurPos_X][CurPos_Y].IsPlaceholder();
+
+                if(!bJDraw && ! usePlh)
                 {
                     this.elements[CurPos_X][CurPos_Y].Get_RightPos(SearchPos, ContentPos, Depth + 2, bUseContent, BegRun);
                     SearchPos.Pos.Update(CurPos_X, Depth);

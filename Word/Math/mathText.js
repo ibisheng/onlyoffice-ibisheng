@@ -13,6 +13,9 @@ var DIV_CENT = 0.1386;
 
 var StartTextElement = 0x2B1A; // Cambria Math
 
+// TODO
+// убрать CMathTextPrp
+
 function CMathTextPrp()
 {
     this.FontFamily = undefined;
@@ -305,7 +308,7 @@ CMathText.prototype =
     setPosition: function(pos)
     {
         if( ! this.bJDraw)                      // for text
-            this.pos = {x : pos.x, y: pos.y};
+            this.pos = {x : pos.x + this.GapLeft, y: pos.y};
         else                                    // for symbol only drawing
         {
             var x = pos.x - this.rasterOffsetX,

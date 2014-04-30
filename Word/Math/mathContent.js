@@ -142,6 +142,9 @@ CCoeffGaps.prototype =
 
 var COEFF_GAPS = new CCoeffGaps();
 
+// TODO
+// проконтролировать GapLeft и GapRight для setPosition всех элементов
+
 function CRecalculateInfo(oMeasure, Parent)
 {
     this.measure = oMeasure;
@@ -5045,7 +5048,8 @@ CMathContent.prototype =
 
                 var runPrp = this.content[pos].getRunPrp();
                 var currRPrp = runPrp.getMergedWPrp();
-                this.applyArgSize(currRPrp);
+                //this.applyArgSize(currRPrp);
+                this.Composition.Parent.ApplyArgSize(currRPrp); // в ParaMath
 
                 RecalcInfo.currRunPrp = currRPrp;
 
@@ -5059,7 +5063,8 @@ CMathContent.prototype =
                 {
                     var oWPrp = this.Parent.getCtrPrp();
 
-                    this.applyArgSize(oWPrp);
+                    //this.applyArgSize(oWPrp);
+                    this.Composition.Parent.ApplyArgSize(oWPrp);
                     oWPrp.Italic = false;
 
                     oMeasure.SetFont(oWPrp);
@@ -5181,7 +5186,8 @@ CMathContent.prototype =
                     var oWPrp = new CTextPr();
                     oWPrp.Merge(mgWPrp);
 
-                    this.applyArgSize(oWPrp);
+                    //this.applyArgSize(oWPrp);
+                    this.Composition.Parent.ApplyArgSize(oWPrp);
 
                     pGraphics.SetFont(oWPrp);
                 }
@@ -5191,7 +5197,9 @@ CMathContent.prototype =
 
                     var oWPrp = this.Parent.getCtrPrp();
 
-                    this.applyArgSize(oWPrp);
+                    //this.applyArgSize(oWPrp);
+                    this.Composition.Parent.ApplyArgSize(oWPrp);
+
                     oWPrp.Italic = false;
                     pGraphics.SetFont(oWPrp);
 
@@ -5719,48 +5727,6 @@ CMathContent.prototype =
 
         return rPrp;
     },
-    applyArgSize: function(oWPrp)
-    {
-        var tPrp = new CTextPr();
-        var defaultRPrp = this.Composition.GetDefaultRunPrp();
-        var gWPrp = defaultRPrp.getMergedWPrp();
-        tPrp.Merge(gWPrp);
-        tPrp.Merge(oWPrp);
-
-        var FSize = tPrp.FontSize;
-
-        if(this.argSize == -1)
-        {
-            //aa: 0.0013  bb: 0.66  cc: 0.5
-            //aa: 0.0009  bb: 0.68  cc: 0.26
-            FSize = 0.0009*FSize*FSize + 0.68*FSize + 0.26;
-            //FSize = 0.001*FSize*FSize + 0.723*FSize - 1.318;
-            //FSize = 0.0006*FSize*FSize + 0.743*FSize - 1.53;
-        }
-        else if(this.argSize == -2)
-        {
-            // aa: -0.0004  bb: 0.66  cc: 0.87
-            // aa: -0.0014  bb: 0.71  cc: 0.39
-            // aa: 0  bb: 0.63  cc: 1.11
-            //FSize = 0.63*FSize + 1.11;
-            FSize = -0.0004*FSize*FSize + 0.66*FSize + 0.87;
-            //tPrp.FontSize *= 0.473;
-        }
-
-        tPrp.FontSize = FSize;
-
-        oWPrp.Merge(tPrp);
-
-        /*
-         if(this.argSize == -1)
-         //tPrp.FontSize *= 0.8;
-         tPrp.FontSize *= 0.728;
-         //tPrp.FontSize *= 0.65;
-         else if(this.argSize == -2)
-         //tPrp.FontSize *= 0.65;
-         tPrp.FontSize *= 0.53;
-         //tPrp.FontSize *= 0.473;*/
-    },
     increaseArgSize: function()
     {
         if(this.argSize < 2)
@@ -5868,7 +5834,21 @@ CMathContent.prototype =
             Y = this.pos.y + absPos.y + this.size.ascent;
             _X = this.pos.x + absPos.x + this.size.width;
 
-            result = { X: _X};
+            var ctrPrp = this.Parent.getCtrPrp();
+            this.Composition.Parent.ApplyArgSize(ctrPrp);
+            //this.applyArgSize(ctrPrp);
+
+            var sizeCursor = ctrPrp.FontSize*g_dKoef_pt_to_mm;
+
+            Y -= sizeCursor*0.8;
+
+            this.Composition.Parent.Paragraph.DrawingDocument.SetTargetSize(sizeCursor);
+            //Para.DrawingDocument.UpdateTargetFromPaint = true;
+            this.Composition.Parent.Paragraph.DrawingDocument.UpdateTarget( _X, Y, this.Composition.Parent.Paragraph.Get_StartPage_Absolute() + _CurPage );
+
+            //console.log("X of placeholder  " + _X);
+
+            result = {X: _X, Y: Y};
         }
 
         return result;
@@ -6241,7 +6221,13 @@ CMathContent.prototype =
             var curType = this.content[CurPos].typeObj,
                 prevType = CurPos > 0 ? this.content[CurPos - 1].typeObj : null;
 
-            if(curType == MATH_COMP)
+            if(curType == MATH_PLACEHOLDER)
+            {
+                SearchPos.Pos.Update(0, Depth + 1);
+                SearchPos.Found = true;
+
+            }
+            else if(curType == MATH_COMP)
             {
                 this.content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, bUseContent, EndRun);
             }
@@ -6273,37 +6259,6 @@ CMathContent.prototype =
         /// для коррекции позиции курсора в начале Run
         // используется функция Correct_ContentPos в Paragraph
 
-
-        /*if ( true === SearchPos.Found )
-            result = true;
-
-        if(this.content[CurPos].typeObj == MATH_COMP)
-            EndRun = true;
-
-        CurPos--;
-
-        if(result == false)
-        {
-            while ( CurPos >= 0 )
-            {
-                this.content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, false, EndRun);
-                SearchPos.Pos.Update( CurPos, Depth );
-
-                if ( true === SearchPos.Found )
-                {
-                    result = true;
-                    break;
-                }
-
-                if(this.content[CurPos].typeObj == MATH_COMP)
-                    EndRun = true;
-                else
-                    EndRun = false;
-
-                CurPos--;
-            }
-        }*/
-
         return result;
 
     },
@@ -6319,7 +6274,12 @@ CMathContent.prototype =
             var curType = this.content[CurPos].typeObj,
                 nextType = CurPos < this.content.length - 1 ? this.content[CurPos + 1].typeObj : null;
 
-            if(curType == MATH_COMP)
+            if(curType == MATH_PLACEHOLDER)
+            {
+                SearchPos.Pos.Update(0, Depth + 1);
+                SearchPos.Found = true;
+            }
+            else if(curType == MATH_COMP)
             {
                 this.content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, bUseContent, BegRun);
             }
@@ -7289,7 +7249,6 @@ CMathComposition.prototype =
      this.SelectContent.RecalculateReverse(oMeasure);
      },*/
     //////////////*    end  of  test  functions   *//////////////////
-
     Init: function()
     {
         this.Root = new CMathContent();
