@@ -3878,35 +3878,36 @@ drawBarChart.prototype =
 	{
 		if(!this.summBarVal[j])
 		{
-			var tempVal;
+			var curVal;
 			var temp = 0;
-			var numCache;
+			var idxPoint;
 			for(var k = 0; k < this.chartProp.series.length; k++)
 			{
-				numCache = this.chartProp.series[k].val.numRef ? this.chartProp.series[k].val.numRef.numCache : this.chartProp.series[k].val.numLit;
-				tempVal = parseFloat(this.chartProp.series[k].val.numRef.numCache.pts[j].val);
-				if(tempVal)
-					temp += Math.abs(tempVal);
-			}
+				idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[k], j);
+				curVal = idxPoint ? parseFloat(idxPoint.val) : 0;
+				
+				if(curVal)
+					temp += Math.abs(curVal);
+			};
+			
 			this.summBarVal[j] = temp;
 		}
 	},
 	
 	_getStackedValue: function(series, i, j, val)
 	{
-		var numCache, result = 0, curVal, idxPoint;
-		for(var nSer = 0; nSer <= i; nSer++)
+		var result = 0, curVal, idxPoint;
+		for(var k = 0; k <= i; k++)
 		{
-			numCache = series[nSer].val.numRef ? series[nSer].val.numRef.numCache.pts : series[nSer].val.numLit.pts;
-			idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[nSer], j);
+			idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[k], j);
 			curVal = idxPoint ? idxPoint.val : 0;
 			
 			if(idxPoint && val > 0 && curVal > 0)
 				result += parseFloat(curVal);
 			else if(idxPoint && val < 0 && curVal < 0)
 				result += parseFloat(curVal);
-			
 		};
+		
 		return result;
 	},
 	
@@ -4951,34 +4952,34 @@ drawHBarChart.prototype =
 	{
 		if(!this.summBarVal[j])
 		{
-			var tempVal;
-			var temp = 0, numCache;
+			var curVal;
+			var temp = 0, idxPoint;
 			for(var k = 0; k < this.chartProp.series.length; k++)
 			{
-				numCache = this.chartProp.series[k].val.numRef ? this.chartProp.series[k].val.numRef.numCache : this.chartProp.series[k].val.numLit;
-				tempVal = parseFloat(this.chartProp.series[k].val.numRef.numCache.pts[j].val);
-				if(tempVal)
-					temp += Math.abs(tempVal);
-			}
+				idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[k], j);	
+				curVal = idxPoint ? parseFloat(idxPoint.val) : 0;
+					
+				if(curVal)
+					temp += Math.abs(curVal);
+			};
 			this.summBarVal[j] = temp;
-		}
+		};
 	},
 	
 	_getStackedValue: function(series, i, j, val)
 	{
-		var numCache, result = 0, curVal, idxPoint;
-		for(var nSer = 0; nSer <= i; nSer++)
+		var result = 0, curVal, idxPoint;
+		for(var k = 0; k <= i; k++)
 		{
-			numCache = series[nSer].val.numRef ? series[nSer].val.numRef.numCache.pts : series[nSer].val.numLit.pts;
-			idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[nSer], j);
+			idxPoint = this.cChartDrawer.getIdxPoint(series[k], j);
 			curVal = idxPoint ? idxPoint.val : 0;
 			
 			if(idxPoint && val > 0 && curVal > 0)
 				result += parseFloat(curVal);
 			else if(idxPoint && val < 0 && curVal < 0)
-				result += parseFloat(curVal);
-			
+				result += parseFloat(curVal);	
 		};
+		
 		return result;
 	},
 	
