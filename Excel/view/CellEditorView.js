@@ -149,7 +149,7 @@
 				padding     : 2,
 				selectColor : new CColor(190, 190, 255, 0.5),
 
-				canvasZIndex  : 1000,
+				canvasZIndex  : 500,
 				blinkInterval : 500,
 				cursorShape   : "text",
 
