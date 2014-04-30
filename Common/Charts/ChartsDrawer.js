@@ -7472,7 +7472,13 @@ catAxisChart.prototype =
 		
 		var firstDiff = 0, posXtemp;
 		if(this.chartSpace.chart.plotArea.valAx.crossBetween == CROSS_BETWEEN_BETWEEN && this.chartProp.type != "Scatter")
-			firstDiff = Math.abs(xPoints[1].pos - xPoints[0].pos);
+		{
+			if(xPoints[1])
+				firstDiff = Math.abs(xPoints[1].pos - xPoints[0].pos);
+			else if(this.chartSpace.chart.plotArea.catAx.posY)
+				firstDiff = Math.abs(this.chartSpace.chart.plotArea.catAx.posY - xPoints[0].pos);
+		};
+			
 		
 		if(orientation == ORIENTATION_MIN_MAX)
 		{
