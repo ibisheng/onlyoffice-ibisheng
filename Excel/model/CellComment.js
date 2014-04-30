@@ -491,7 +491,7 @@ CompositeCommentData.prototype = {
 // CellCommentator
 //-----------------------------------------------------------------------------------
 /** @constructor */
-function asc_CCellCommentator(currentSheet) {
+function CCellCommentator(currentSheet) {
 
 	var _this = this;
 	var asc = window["Asc"];
@@ -1319,7 +1319,7 @@ function asc_CCellCommentator(currentSheet) {
 }
 
 // Prototype
-asc_CCellCommentator.prototype = {
+CCellCommentator.prototype = {
 
 	// Show/Hide
 
@@ -1784,19 +1784,3 @@ asc_CCellCommentator.prototype = {
 		}
 	}
 };
-
-window["Asc"]["asc_CCellCommentator"] = window["Asc"].asc_CCellCommentator = asc_CCellCommentator;
-prot = asc_CCellCommentator.prototype;
-
-prot["asc_showComments"] = prot.asc_showComments;
-prot["asc_hideComments"] = prot.asc_hideComments;
-
-prot["asc_selectComment"] = prot.asc_selectComment;
-prot["asc_showComment"] = prot.asc_showComment;
-prot["asc_findComment"] = prot.asc_findComment;
-prot["asc_addComment"] = prot.asc_addComment;
-prot["asc_changeComment"] = prot.asc_changeComment;
-prot["asc_removeComment"] = prot.asc_removeComment;
-
-prot["asc_getComments"] = prot.asc_getComments;
-prot["asc_getDocumentComments"] = prot.asc_getDocumentComments;

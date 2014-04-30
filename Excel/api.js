@@ -12,7 +12,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 	 */
 	function ($, window, undefined) {
 
-
 		var asc = window["Asc"];
 		var asc_applyFunction = asc.applyFunction;
 		var asc_CCollaborativeEditing = asc.CCollaborativeEditing;

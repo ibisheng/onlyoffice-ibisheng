@@ -32,7 +32,6 @@
 		var asc_SR				= asc.StringRender;
 		var asc_getcvt			= asc.getCvtRatio;
 		var asc_CSP				= asc.asc_CStylesPainter;
-		var asc_CCellComments	= asc.asc_CCellCommentator;
 
 		function WorkbookCommentsModel (handlers) {
 			this.workbook = {handlers: handlers};
@@ -450,7 +449,7 @@
 				});
 			}
 
-			this.cellCommentator = new asc_CCellComments({
+			this.cellCommentator = new CCellCommentator({
 				model: new WorkbookCommentsModel(this.handlers),
 				collaborativeEditing: this.collaborativeEditing,
 				draw: function() {},

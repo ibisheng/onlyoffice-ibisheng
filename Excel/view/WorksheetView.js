@@ -43,7 +43,6 @@
 		var asc_CPageMargins	= asc.asc_CPageMargins;
 		var asc_CPagePrint		= asc.CPagePrint;
 		var asc_CCollaborativeRange = asc.asc_CCollaborativeRange;
-		var asc_CCellCommentator = asc.asc_CCellCommentator;
 		var asc_CSelectionMathInfo = asc.asc_CSelectionMathInfo;
 
 		/*
@@ -431,7 +430,7 @@
 			// Auto filters
 			this.autoFilters = new asc_AF(this);
 			this.drawingArea = new DrawingArea(this);
-			this.cellCommentator = new asc_CCellCommentator(this);
+			this.cellCommentator = new CCellCommentator(this);
 			this.objectRender = null;
 
 			this._init();
