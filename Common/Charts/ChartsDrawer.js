@@ -4301,10 +4301,10 @@ drawLineChart.prototype =
 			dataSeries = this.paths.series[i];
 			for(var n = 0; n < dataSeries.length; n++)
 			{
-				if(numCache.pts[n] && numCache.pts[n].pen)
-					pen = numCache.pts[n].pen;
-				if(numCache.pts[n] && numCache.pts[n].brush)
-					brush = numCache.pts[n].brush;
+				if(numCache.pts[n + 1] && numCache.pts[n + 1].pen)
+					pen = numCache.pts[n + 1].pen;
+				if(numCache.pts[n + 1] && numCache.pts[n + 1].brush)
+					brush = numCache.pts[n + 1].brush;
 					
 				this.cChartDrawer.drawPath(this.paths.series[i][n], pen, brush);
 			}
@@ -6153,10 +6153,10 @@ drawScatterChart.prototype =
 			dataSeries = this.paths.series[i];
 			for(var n = 0; n < dataSeries.length; n++)
 			{
-				if(numCache.pts[n] && numCache.pts[n].pen)
-					pen = numCache.pts[n].pen;
-				if(numCache.pts[n] && numCache.pts[n].brush)
-					brush = numCache.pts[n].brush;
+				if(numCache.pts[n + 1] && numCache.pts[n + 1].pen)
+					pen = numCache.pts[n + 1].pen;
+				if(numCache.pts[n + 1] && numCache.pts[n + 1].brush)
+					brush = numCache.pts[n + 1].brush;
 					
 				this.cChartDrawer.drawPath(this.paths.series[i][n], pen, brush);
 			}
@@ -6339,8 +6339,8 @@ drawScatterChart.prototype =
 		var x2 = points[k + 1] ? points[k + 1].x : points[k].x;
 		var y2 = points[k + 1] ? points[k + 1].y : points[k].y;
 		
-		var x3 = points[k + 2] ? points[k + 2].x : points[k].x;
-		var y3 = points[k + 2] ? points[k + 2].y : points[k].y;
+		var x3 = points[k + 2] ? points[k + 2].x : points[k + 1] ? points[k + 1].x : points[k].x;
+		var y3 = points[k + 2] ? points[k + 2].y : points[k + 1] ? points[k + 1].y : points[k].y;
 		
 		
 		var splineCoords = this.cChartDrawer.calculate_Bezier(x, y, x1, y1, x2, y2, x3, y3, i);
