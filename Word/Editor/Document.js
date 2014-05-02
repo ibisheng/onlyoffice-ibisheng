@@ -9711,7 +9711,7 @@ CDocument.prototype =
             if ( true != this.DrawingObjects.isPolylineAddition() )
                 this.DrawingObjects.startAddShape( editor.addShapePreset );
             
-            this.DrawingObjects.OnMouseDown(MouseEvent, X, Y, this.CurPage);
+            this.DrawingObjects.OnMouseDown(e, X, Y, this.CurPage);
         }
         else
         {
@@ -11106,7 +11106,9 @@ CDocument.prototype =
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
             var drawin_objects = this.DrawingObjects;
-            if(drawin_objects.curState.id === STATES_ID_TEXT_ADD || drawin_objects.curState.id === STATES_ID_TEXT_ADD_IN_GROUP || drawin_objects.curState.id === STATES_ID_CHART_TITLE_TEXT)
+            if(drawin_objects.selection.textSelection
+                || drawin_objects.selection.groupSelection && drawin_objects.selection.groupSelection.textSelection
+                || drawin_objects.selection.chartSelection && drawin_objects.selection.chartSelection.textSelection)
             {
                 this.Interface_Update_DrawingPr();
                 this.DrawingObjects.documentUpdateInterfaceState();

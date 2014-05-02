@@ -1551,7 +1551,9 @@ CDocumentContent.prototype =
         if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
             var drawin_objects = this.LogicDocument.DrawingObjects;
-            if(drawin_objects.curState.id === STATES_ID_TEXT_ADD || drawin_objects.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
+            if(drawin_objects.selection.textSelection
+                || drawin_objects.selection.groupSelection && drawin_objects.selection.groupSelection.textSelection
+                || drawin_objects.selection.chartSelection && drawin_objects.selection.chartSelection.textSelection)
             {
                 this.LogicDocument.Interface_Update_DrawingPr();
                 drawin_objects.documentUpdateInterfaceState();
