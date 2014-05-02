@@ -57,12 +57,27 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         this.presetGeom = presetGeom;
         this.arrowsCount = 1;
 
+
+
     }
-    if(presetGeom.indexOf("WithTwoArrows") > -1)
+    if(presetGeom.indexOf("WithTwoArrow") > -1)
     {
-        presetGeom = presetGeom.substr(0, presetGeom.length - 13);
+        presetGeom = presetGeom.substr(0, presetGeom.length - 12);
         this.presetGeom = presetGeom;
         this.arrowsCount = 2;
+    }
+
+    if(this.arrowsCount > 0)
+    {
+        pen.setTailEnd(new EndArrow());
+        pen.tailEnd.setType(LineEndType.Arrow);
+        pen.tailEnd.setLen(LineEndSize.Mid);
+        if(this.arrowsCount === 2)
+        {
+            pen.setHeadEnd(new EndArrow());
+            pen.headEnd.setType(LineEndType.Arrow);
+            pen.headEnd.setLen(LineEndSize.Mid);
+        }
     }
 
     var geometry = CreateGeometry(presetGeom !== "textRect" ? presetGeom : "rect");
@@ -301,7 +316,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         this.overlayObject.draw(overlay);
     };
 
-    this.getShape = function(bFromWord)
+    this.getShape = function(bFromWord, DrawingDocument)
     {
         var shape = new CShape();
         shape.setSpPr(new CSpPr());
@@ -352,7 +367,20 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
             ln.Fill.fill.setColor(new CUniColor());
             ln.Fill.fill.color.setColor(new CPrstColor());
             ln.Fill.fill.color.color.setId("black");
-            shape.setTxBody(new CTextBody());
+            if(bFromWord)
+            {
+                shape.setTextBoxContent(new CDocumentContent(shape, DrawingDocument, 0, 0, 0, 0, false, false, false));
+                shape.setBodyPr(new CBodyPr());
+                shape.bodyPr.setDefault();
+            }
+            else
+            {
+                shape.setTxBody(new CTextBody());
+                var content = new CDocumentContent(shape, DrawingDocument, 0, 0, 0, 0, false, false, true);
+                shape.txBody.setContent(content);
+                shape.txBody.setBodyPr(new CBodyPr());
+                shape.txBody.bodyPr.setDefault();
+            }
         }
         else
         {

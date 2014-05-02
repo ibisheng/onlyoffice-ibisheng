@@ -42,9 +42,10 @@ function SplineCommandBezier(x1, y1, x2, y2, x3, y3)
     }
 }
 
-function Spline(drawingObjects)
+function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
 {
 
+    this.pageIndex = pageIndex;
     this.path = [];
 
     this.drawingObjects = drawingObjects;
@@ -54,29 +55,19 @@ function Spline(drawingObjects)
 
     this.style  = CreateDefaultShapeStyle();
 
-    var _calculated_line;
-    var _theme = drawingObjects.getWorkbook().theme;
-    var colorMap = GenerateDefaultColorMap().color_map;
-    var RGBA = {R: 0, G: 0, B: 0, A: 255};
-    if(isRealObject(_theme) && typeof _theme.getLnStyle === "function"
-        && isRealObject(this.style) && isRealObject(this.style.lnRef) && isRealNumber(this.style.lnRef.idx)
-        && isRealObject(this.style.lnRef.Color) && typeof  this.style.lnRef.Color.Calculate === "function")
+    var style = this.style;
+    style.fillRef.Color.Calculate(theme, slide, layout, master, {R:0, G: 0, B:0, A:255});
+    var RGBA = style.fillRef.Color.RGBA;
+    var pen = theme.getLnStyle(style.lnRef.idx);
+    style.lnRef.Color.Calculate(theme, slide, layout, master);
+    RGBA = style.lnRef.Color.RGBA;
+
+    if(pen.Fill)
     {
-        _calculated_line = _theme.getLnStyle(this.style.lnRef.idx);
-        this.style.lnRef.Color.Calculate(_theme, colorMap, {R: 0 , G: 0, B: 0, A: 255});
-        RGBA = this.style.lnRef.Color.RGBA;
-    }
-    else
-    {
-        _calculated_line = new CLn();
+        pen.Fill.calculate(theme, slide, layout, master, RGBA);
     }
 
-    if(isRealObject(_calculated_line.Fill))
-    {
-        _calculated_line.Fill.calculate(_theme, colorMap, RGBA) ;
-    }
-
-    this.pen = _calculated_line;
+    this.pen = pen;
     this.splineForDraw = new SplineForDrawer(this);
     this.Draw = function(graphics)
     {
@@ -171,7 +162,7 @@ function Spline(drawingObjects)
         return {x: min_x, y: min_y};
     };
 
-    this.createShape =  function(drawingObjects)
+    this.getShape =  function(bWord, drawingDocument)
     {
         var xMax = this.path[0].x, yMax = this.path[0].y, xMin = xMax, yMin = yMax;
         var i;
@@ -252,13 +243,26 @@ function Spline(drawingObjects)
         xMax = max_x;
         yMin = min_y;
         yMax = max_y;
-        var shape = new CShape(null, this.drawingObjects);
+        var shape = new CShape();
 
-        shape.setPosition(xMin, yMin);
-        shape.setExtents(xMax-xMin, yMax-yMin);
+        shape.setSpPr(new CSpPr());
+        shape.spPr.setParent(shape);
+        shape.spPr.setXfrm(new CXfrm());
+        shape.spPr.xfrm.setParent(shape.spPr);
+        if(!bWord)
+        {
+            shape.spPr.xfrm.setOffX(xMin);
+            shape.spPr.xfrm.setOffY(yMin);
+        }
+        else
+        {
+            shape.spPr.xfrm.setOffX(0);
+            shape.spPr.xfrm.setOffY(0);
+        }
+        shape.spPr.xfrm.setExtX(xMax-xMin, yMax - yMin);
         shape.setStyle(CreateDefaultShapeStyle());
 
-        var geometry = new CGeometry();
+        var geometry = new Geometry();
         geometry.AddPathCommand(0, undefined, bClosed ? "norm": "none", undefined, xMax - xMin, yMax-yMin);
         geometry.AddRect("l", "t", "r", "b");
         for(i = 0;  i< this.path.length; ++i)
@@ -286,16 +290,21 @@ function Spline(drawingObjects)
         {
             geometry.AddPathCommand(6);
         }
-        geometry.Init( xMax-xMin, yMax-yMin);
-        shape.spPr.geometry = geometry;
+        shape.spPr.setGeometry(geometry);
         shape.recalculate();
-        this.drawingObjects.addGraphicObject(shape);
+        return shape;
     };
 
     this.addPathCommand = function(pathCommand)
     {
         this.path.push(pathCommand);
-    }
+    };
+    this.getBounds = function()
+    {
+        var boundsChecker = new  CSlideBoundsChecker();
+        this.draw(boundsChecker);
+        return boundsChecker.Bounds;
+    };
 }
 
 function SplineForDrawer(spline)

@@ -12608,6 +12608,7 @@ function CreateDefaultTextRectStyle()
     var mod = new CColorMod();
     mod.name = "shade";
     mod.val = 50000;
+    style.lnRef.Color.Mods = new CColorModifiers();
     style.lnRef.Color.Mods.Mods.push(mod);
 
     style.fillRef = new StyleRef();
