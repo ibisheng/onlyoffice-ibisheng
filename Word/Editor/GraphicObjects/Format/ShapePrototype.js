@@ -144,11 +144,14 @@ CShape.prototype.handleUpdateFlip = function()
 CShape.prototype.handleUpdateFill = function()
 {
     this.recalcBrush();
+    this.recalcFill();
+    this.recalcTransparent();
     this.addToRecalculate();
 };
 CShape.prototype.handleUpdateLn = function()
 {
     this.recalcLine();
+    this.recalcPen();
     this.addToRecalculate();
 };
 CShape.prototype.handleUpdateGeometry = function()

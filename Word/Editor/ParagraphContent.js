@@ -3841,9 +3841,8 @@ ParaDrawing.prototype =
         // Сначала заполняем свойства
 
         var Props = new Object();
-        Props.Width  = this.GraphicObj.absExtX;
-        Props.Height = this.GraphicObj.absExtY;
-
+        Props.Width  = this.GraphicObj.extX;
+        Props.Height = this.GraphicObj.extY;
         if ( drawing_Inline === this.DrawingType )
             Props.WrappingStyle = c_oAscWrapStyle2.Inline;
         else if ( WRAPPING_TYPE_NONE === this.wrappingType )
@@ -3907,54 +3906,19 @@ ParaDrawing.prototype =
 
         Props.Internal_Position = this.Internal_Position;
 
-        Props.Locked = this.Parent.Lock.Is_Locked();
-
-        //Props.ChartProperties = isRealObject(this.GraphicObj) && isRealObject(this.GraphicObj.chart) ? this.GraphicObj.chart.serializeChart() : undefined;
-
-        var dr_objects = editor.WordControl.m_oLogicDocument.DrawingObjects;
-
-        /*if(isRealObject(this.GraphicObj))
-         {
-         if(this.GraphicObj.isShape() || (this.GraphicObj.isGroup() && this.GraphicObj.haveShapes()))
-         {
-         Props.ShapeProperties =
-         {
-         type: this.GraphicObj.getPresetGeom(),
-         fill: this.GraphicObj.getFill(),
-         stroke: this.GraphicObj.getStroke(),
-         canChangeArrows: this.GraphicObj.canChangeArrows()
-         }
-         }
-         else if(this.GraphicObj.isImage()|| (this.GraphicObj.isGroup() && this.GraphicObj.haveImages()))
-         {
-         Props.ImageUrl = this.GraphicObj.getImageUrl();
-         }
-         }    */
-
-
-        if ( undefined != this.Parent && undefined != this.Parent.Parent && true === this.Parent.Parent.Is_DrawingShape() )
-            Props.CanBeFlow = false;
+        var ParentParagraph = this.Get_ParentParagraph();
+        if(ParentParagraph)
+        {
+            Props.Locked = ParentParagraph.Lock.Is_Locked();
+            if(ParentParagraph)
+            {
+                if (undefined != ParentParagraph.Parent && true === ParentParagraph.Parent.Is_DrawingShape() )
+                    Props.CanBeFlow = false;
+            }
+        }
 
         if ( null != OtherProps && undefined != OtherProps )
         {
-            if(OtherProps.ShapeProperties != null)
-                Props.ShapeProperties = OtherProps.ShapeProperties;
-
-            if(OtherProps.ChartProperties != null)
-                Props.ChartProperties = OtherProps.ChartProperties;
-
-            if(OtherProps.severalCharts != null)
-                Props.severalCharts = OtherProps.severalCharts;
-
-            if(OtherProps.severalChartStyles != null)
-                Props.severalChartStyles = OtherProps.severalChartStyles;
-
-            if(OtherProps.severalChartTypes != null)
-                Props.severalChartTypes = OtherProps.severalChartTypes;
-
-            if(OtherProps.ImageUrl != null)
-                Props.ImageUrl = OtherProps.ImageUrl;
-
             // Соединяем
             if ( undefined === OtherProps.Width || 0.001 > Math.abs( Props.Width - OtherProps.Width ) )
                 Props.Width = undefined;
@@ -4023,12 +3987,10 @@ ParaDrawing.prototype =
             if ( false === OtherProps.Locked )
                 Props.Locked = false;
 
-
             if ( false === OtherProps.CanBeFlow || false === Props.CanBeFlow )
                 Props.CanBeFlow = false;
             else
                 Props.CanBeFlow = true;
-
         }
 
         return Props;
@@ -4058,56 +4020,6 @@ ParaDrawing.prototype =
 
     Set_Props : function(Props)
     {
-        /*if ( undefined != Props.Width || undefined != Props.Height )
-         {
-         var result_width, result_height;
-         var b_is_line = this.GraphicObj.checkLine();
-         if(Props.Width != undefined)
-         if(Props.Width >= MIN_SHAPE_SIZE || b_is_line)
-         result_width = Props.Width;
-         else
-         result_width = MIN_SHAPE_SIZE;
-         else
-         result_width = this.GraphicObj.absExtX;
-
-         if(Props.Height != undefined)
-         if(Props.Height >= MIN_SHAPE_SIZE || b_is_line)
-         result_height = Props.Height;
-         else
-         result_height = MIN_SHAPE_SIZE;
-         else
-         result_height = this.GraphicObj.absExtY;
-
-         if(this.GraphicObj.isShape() || this.GraphicObj.isImage() || (typeof  CChartAsGroup != "undefined" && this.GraphicObj instanceof  CChartAsGroup))
-         {
-         this.GraphicObj.setAbsoluteTransform(null, null, result_width, result_height, null, null, null);
-         this.GraphicObj.setXfrm(null, null, result_width, result_height, null, null, null);
-         this.GraphicObj.calculateAfterResize();
-         }
-         else if(this.GraphicObj.isGroup())
-         {
-         //this.GraphicObj.setSizes2(result_width, result_height);
-         }
-
-         var bounds = this.getBounds();
-         this.Update_Size(bounds.r - bounds.l, bounds.b - bounds.t);
-         }
-
-         if(isRealObject(Props.ChartProperties))
-         {
-         if(this.GraphicObj.setDiagram)
-         {
-         this.GraphicObj.setDiagram(Props.ChartProperties)
-         }
-         if(this.GraphicObj.isGroup())
-         this.GraphicObj.setDiagram(Props.ChartProperties);
-         }
-
-         if(typeof Props.ImageUrl === "string" && this.GraphicObj.isImage() && !isRealObject(this.GraphicObj.chart))
-         {
-         this.GraphicObj.setRasterImage2(Props.ImageUrl);
-         }
-         */
         if ( undefined != Props.WrappingStyle )
         {
             if ( drawing_Inline === this.DrawingType && c_oAscWrapStyle2.Inline != Props.WrappingStyle && undefined === Props.Paddings )

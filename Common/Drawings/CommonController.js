@@ -16,6 +16,13 @@ function CheckLinePreset(preset)
     return preset === "line";
 }
 
+function CreateBlipFillUniFillFromUrl(url)
+{
+    var ret = new CUniFill();
+    ret.setFill(new CBlipFill());
+    ret.fill.setRasterImageId(url);
+    return ret;
+}
 
 function DrawingObjectsController(drawingObjects)
 {
@@ -1155,12 +1162,101 @@ DrawingObjectsController.prototype =
 
     },
 
-
+    applyDrawingProps: function(props)
+    {
+        var objects_by_type = this.getSelectedObjectsByTypes();
+        var i;
+        if(isRealNumber(props.verticalTextAlign))
+        {
+            for(i = 0; i < objects_by_type.shapes.length; ++i)
+            {
+                objects_by_type.shapes[i].setVerticalAlign(props.verticalTextAlign);
+            }
+            for(i = 0; i < objects_by_type.groups.length; ++i)
+            {
+                objects_by_type.groups[i].setVerticalAlign(props.verticalTextAlign);
+            }
+        }
+        if(isRealObject(props.paddings))
+        {
+            for(i = 0; i < objects_by_type.shapes.length; ++i)
+            {
+                objects_by_type.shapes[i].setPaddings(props.paddings);
+            }
+            for(i = 0; i < objects_by_type.groups.length; ++i)
+            {
+                objects_by_type.groups[i].setPaddings(props.paddings);
+            }
+        }
+        if(typeof(props.type) === "string")
+        {
+            for(i = 0; i < objects_by_type.shapes.length; ++i)
+            {
+                objects_by_type.shapes[i].changePresetGeom(props.type);
+            }
+            for(i = 0; i < objects_by_type.groups.length; ++i)
+            {
+                objects_by_type.groups[i].changePresetGeom(props.type);
+            }
+        }
+        if(isRealObject(props.stroke))
+        {
+            for(i = 0; i < objects_by_type.shapes.length; ++i)
+            {
+                objects_by_type.shapes[i].changeLine(props.stroke);
+            }
+            for(i = 0; i < objects_by_type.groups.length; ++i)
+            {
+                objects_by_type.groups[i].changeLine(props.stroke);
+            }
+        }
+        if(isRealObject(props.fill))
+        {
+            for(i = 0; i < objects_by_type.shapes.length; ++i)
+            {
+                objects_by_type.shapes[i].changeFill(props.fill);
+            }
+            for(i = 0; i < objects_by_type.groups.length; ++i)
+            {
+                objects_by_type.groups[i].changeFill(props.fill);
+            }
+        }
+        if(typeof props.ImageUrl === "string" && props.ImageUrl.length > 0)
+        {
+            for(i = 0; i < objects_by_type.images.length; ++i)
+            {
+                objects_by_type.images[i].setBlipFill(CreateBlipFillUniFillFromUrl(props.ImageUrl));
+            }
+        }
+        if(isRealNumber(props.Width) && isRealNumber(props.Height))
+        {
+            //Todo: может отсутствовать spPr и xfrm
+            for(i = 0; i < objects_by_type.shapes.length; ++i)
+            {
+                objects_by_type.shapes[i].spPr.xfrm.setExtX(props.Width);
+                objects_by_type.shapes[i].spPr.xfrm.setExtY(props.Height);
+            }
+            for(i = 0; i < objects_by_type.images.length; ++i)
+            {
+                objects_by_type.images[i].spPr.xfrm.setExtX(props.Width);
+                objects_by_type.images[i].spPr.xfrm.setExtY(props.Height);
+            }
+            for(i = 0; i < objects_by_type.charts.length; ++i)
+            {
+                objects_by_type.charts[i].spPr.xfrm.setExtX(props.Width);
+                objects_by_type.charts[i].spPr.xfrm.setExtY(props.Height);
+            }
+            if(this.selection.groupSelection)
+            {
+                this.selection.groupSelection.updateCoordinatesAfterInternalResize();
+            }
+        }
+    },
 
     getSelectedObjectsByTypes: function()
     {
         var ret = {shapes: [], images: [], groups: [], charts: []};
-        var selected_objects = this.curState.group ? this.curState.group.selectedObjects : this.selectedObjects;
+        var selected_objects = this.selection.groupSelection ? this.selection.groupSelection.selectedObjects : this.selectedObjects;
         for(var i = 0;  i < selected_objects.length; ++i)
         {
             var drawing = selected_objects[i];
@@ -1708,72 +1804,74 @@ DrawingObjectsController.prototype =
         var ret = null;
         if(objects_by_types.charts.length === 1)
         {
-            var chart_space = objects_by_types.charts[0];
-            var chart = chart_space.chart, plot_area = chart_space.chart.plotArea;
-            ret = new asc_ChartSettings();
-            ret.putStyle(isRealNumber(chart_space.style) ? chart_space.style : null);
-            ret.putTitle(isRealObject(chart.title) ? (chart.title.overlay ? c_oAscChartTitleShowSettings.overlay : c_oAscChartTitleShowSettings.noOverlay) : c_oAscChartTitleShowSettings.none);
-            var hor_axis = plot_area.getHorizontalAxis();
-            var vert_axis = plot_area.getVerticalAxis();
+            ret = this.getPropsFromChart(objects_by_types.charts[0]);
+        }
+        return ret;
+    },
 
-            var calc_grid_lines = function(axis)
+
+    getPropsFromChart: function(chart_space)
+    {
+        var chart = chart_space.chart, plot_area = chart_space.chart.plotArea;
+        var ret = new asc_ChartSettings();
+        ret.putStyle(isRealNumber(chart_space.style) ? chart_space.style : null);
+        ret.putTitle(isRealObject(chart.title) ? (chart.title.overlay ? c_oAscChartTitleShowSettings.overlay : c_oAscChartTitleShowSettings.noOverlay) : c_oAscChartTitleShowSettings.none);
+        var hor_axis = plot_area.getHorizontalAxis();
+        var vert_axis = plot_area.getVerticalAxis();
+
+        var calc_grid_lines = function(axis)
+        {
+            if(!axis || (!axis.majorGridlines && !axis.minorGridlines))
+                return c_oAscGridLinesSettings.none;
+            if(axis.majorGridlines && !axis.minorGridlines)
+                return c_oAscGridLinesSettings.major;
+            if(axis.minorGridlines && !axis.majorGridlines)
+                return c_oAscGridLinesSettings.minor;
+            return c_oAscGridLinesSettings.majorMinor;
+        }
+        if(hor_axis)
+            ret.putHorAxisProps(hor_axis.getMenuProps());
+        ret.putHorGridLines(calc_grid_lines(hor_axis));
+
+        if(vert_axis)
+            ret.putVertAxisProps(vert_axis.getMenuProps());
+        ret.putVertGridLines(calc_grid_lines(vert_axis));
+
+
+        //TODO: переделать ret.putHorAxisLabel(hor_axis ? (isRealObject(hor_axis.title) ? (hor_axis.title.overlay ? c_oAscChartTitleShowSettings.overlay : c_oAscChartTitleShowSettings.noOverlay) : c_oAscChartTitleShowSettings.none): null);
+        //TODO: переделать ret.putVertAxisLabel(vert_axis ? (isRealObject(vert_axis.title) ? (vert_axis.title.overlay ? c_oAscChartTitleShowSettings.overlay : c_oAscChartTitleShowSettings.noOverlay) : c_oAscChartTitleShowSettings.none): null);
+
+
+        var data_labels = plot_area.chart.dLbls;
+        if(data_labels)
+        {
+            ret.putShowSerName(data_labels.showSerName === true);
+            ret.putShowCatName(data_labels.showCatName === true);
+            ret.putShowVal(data_labels.showVal === true);
+            ret.putSeparator(data_labels.separator);
+            ret.putDataLabelsPos(REV_DLBL_POS_DEFINES_MAP[data_labels.dLblPos]);
+        }
+
+
+        if(chart.legend)
+        {
+            if(isRealNumber(chart.legend.legendPos))
             {
-                if(!axis || (!axis.majorGridlines && !axis.minorGridlines))
-                    return c_oAscGridLinesSettings.none;
-                if(axis.majorGridlines && !axis.minorGridlines)
-                    return c_oAscGridLinesSettings.major;
-                if(axis.minorGridlines && !axis.majorGridlines)
-                    return c_oAscGridLinesSettings.minor;
-                return c_oAscGridLinesSettings.majorMinor;
-            }
-            if(hor_axis)
-                ret.putHorAxisProps(hor_axis.getMenuProps());
-            ret.putHorGridLines(calc_grid_lines(hor_axis));
-
-            if(vert_axis)
-                ret.putVertAxisProps(vert_axis.getMenuProps());
-            ret.putVertGridLines(calc_grid_lines(vert_axis));
-
-
-            //TODO: переделать ret.putHorAxisLabel(hor_axis ? (isRealObject(hor_axis.title) ? (hor_axis.title.overlay ? c_oAscChartTitleShowSettings.overlay : c_oAscChartTitleShowSettings.noOverlay) : c_oAscChartTitleShowSettings.none): null);
-            //TODO: переделать ret.putVertAxisLabel(vert_axis ? (isRealObject(vert_axis.title) ? (vert_axis.title.overlay ? c_oAscChartTitleShowSettings.overlay : c_oAscChartTitleShowSettings.noOverlay) : c_oAscChartTitleShowSettings.none): null);
-
-
-            var data_labels = plot_area.chart.dLbls;
-            if(data_labels)
-            {
-                ret.putShowSerName(data_labels.showSerName === true);
-                ret.putShowCatName(data_labels.showCatName === true);
-                ret.putShowVal(data_labels.showVal === true);
-                ret.putSeparator(data_labels.separator);
-                ret.putDataLabelsPos(REV_DLBL_POS_DEFINES_MAP[data_labels.dLblPos]);
-            }
-
-
-            if(chart.legend)
-            {
-                if(isRealNumber(chart.legend.legendPos))
+                if(chart.legend.legendPos === LEGEND_POS_L)
                 {
-                    if(chart.legend.legendPos === LEGEND_POS_L)
-                    {
-                        ret.putLegendPos(!chart.legend.overlay ? c_oAscChartLegendShowSettings.left : c_oAscChartLegendShowSettings.leftOverlay);
-                    }
-                    else if(chart.legend.legendPos === LEGEND_POS_T)
-                    {
-                        ret.putLegendPos(c_oAscChartLegendShowSettings.top);
-                    }
-                    else if(chart.legend.legendPos === LEGEND_POS_R)
-                    {
-                        ret.putLegendPos(!chart.legend.overlay ? c_oAscChartLegendShowSettings.right : c_oAscChartLegendShowSettings.rightOverlay);
-                    }
-                    else if(chart.legend.legendPos === LEGEND_POS_B)
-                    {
-                        ret.putLegendPos(c_oAscChartLegendShowSettings.bottom);
-                    }
-                    else
-                    {
-                        ret.putLegendPos(c_oAscChartLegendShowSettings.layout);
-                    }
+                    ret.putLegendPos(!chart.legend.overlay ? c_oAscChartLegendShowSettings.left : c_oAscChartLegendShowSettings.leftOverlay);
+                }
+                else if(chart.legend.legendPos === LEGEND_POS_T)
+                {
+                    ret.putLegendPos(c_oAscChartLegendShowSettings.top);
+                }
+                else if(chart.legend.legendPos === LEGEND_POS_R)
+                {
+                    ret.putLegendPos(!chart.legend.overlay ? c_oAscChartLegendShowSettings.right : c_oAscChartLegendShowSettings.rightOverlay);
+                }
+                else if(chart.legend.legendPos === LEGEND_POS_B)
+                {
+                    ret.putLegendPos(c_oAscChartLegendShowSettings.bottom);
                 }
                 else
                 {
@@ -1782,192 +1880,193 @@ DrawingObjectsController.prototype =
             }
             else
             {
-                ret.putLegendPos(c_oAscChartLegendShowSettings.none);
+                ret.putLegendPos(c_oAscChartLegendShowSettings.layout);
             }
+        }
+        else
+        {
+            ret.putLegendPos(c_oAscChartLegendShowSettings.none);
+        }
 
-            var chart_type = plot_area.chart;
-            var chart_type_object_type = chart_type.getObjectType();
+        var chart_type = plot_area.chart;
+        var chart_type_object_type = chart_type.getObjectType();
 
-            var calc_chart_type;
-            if(chart_type_object_type === historyitem_type_PieChart)
-                calc_chart_type = c_oAscChartTypeSettings.pie;
-            else if(chart_type_object_type === historyitem_type_DoughnutChart)
-                calc_chart_type = c_oAscChartTypeSettings.doughnut;
-            else if(chart_type_object_type === historyitem_type_StockChart)
-                calc_chart_type = c_oAscChartTypeSettings.stock;
-            else if(chart_type_object_type === historyitem_type_BarChart)
-            {
-                var b_hbar = chart_type.barDir === BAR_DIR_BAR;
-                if(b_hbar)
-                {
-                    switch(chart_type.grouping)
-                    {
-                        case BAR_GROUPING_CLUSTERED:
-                        {
-                            calc_chart_type = c_oAscChartTypeSettings.hBarNormal;
-                            break;
-                        }
-                        case BAR_GROUPING_STACKED:
-                        {
-                            calc_chart_type = c_oAscChartTypeSettings.hBarStacked;
-                            break;
-                        }
-                        case BAR_GROUPING_PERCENT_STACKED:
-                        {
-                            calc_chart_type = c_oAscChartTypeSettings.hBarStackedPer;
-                            break;
-                        }
-                        default:
-                        {
-                            calc_chart_type = c_oAscChartTypeSettings.hBarNormal;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    switch(chart_type.grouping)
-                    {
-                        case BAR_GROUPING_CLUSTERED:
-                        {
-                            calc_chart_type = c_oAscChartTypeSettings.barNormal;
-                            break;
-                        }
-                        case BAR_GROUPING_STACKED:
-                        {
-                            calc_chart_type = c_oAscChartTypeSettings.barStacked;
-                            break;
-                        }
-                        case BAR_GROUPING_PERCENT_STACKED:
-                        {
-                            calc_chart_type = c_oAscChartTypeSettings.barStackedPer;
-                            break;
-                        }
-                        default:
-                        {
-                            calc_chart_type = c_oAscChartTypeSettings.barNormal;
-                            break;
-                        }
-                    }
-                }
-            }
-            else if(chart_type_object_type === historyitem_type_LineChart)
-            {
-                if(!chart_type.marker)
-                {
-                    switch(chart_type.grouping)
-                    {
-                        case GROUPING_PERCENT_STACKED :
-                        {
-                            calc_chart_type = c_oAscChartTypeSettings.lineStackedPer;
-                            break;
-                        }
-                        case GROUPING_STACKED         :
-                        {
-                            calc_chart_type = c_oAscChartTypeSettings.lineStacked;
-                            break;
-                        }
-                        default        :
-                        {
-                            calc_chart_type = c_oAscChartTypeSettings.lineNormal;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    switch(chart_type.grouping)
-                    {
-                        case GROUPING_PERCENT_STACKED:
-                        {
-                            calc_chart_type = c_oAscChartTypeSettings.lineStackedPerMarker;
-                            break;
-                        }
-                        case GROUPING_STACKED:
-                        {
-                            calc_chart_type = c_oAscChartTypeSettings.lineStackedMarker;
-                            break;
-                        }
-                        default:
-                        {
-                            calc_chart_type = c_oAscChartTypeSettings.lineNormalMarker;
-                            break;
-                        }
-                    }
-                }
-            }
-            else if(chart_type_object_type === historyitem_type_AreaChart)
+        var calc_chart_type;
+        if(chart_type_object_type === historyitem_type_PieChart)
+            calc_chart_type = c_oAscChartTypeSettings.pie;
+        else if(chart_type_object_type === historyitem_type_DoughnutChart)
+            calc_chart_type = c_oAscChartTypeSettings.doughnut;
+        else if(chart_type_object_type === historyitem_type_StockChart)
+            calc_chart_type = c_oAscChartTypeSettings.stock;
+        else if(chart_type_object_type === historyitem_type_BarChart)
+        {
+            var b_hbar = chart_type.barDir === BAR_DIR_BAR;
+            if(b_hbar)
             {
                 switch(chart_type.grouping)
                 {
-                    case GROUPING_PERCENT_STACKED :
+                    case BAR_GROUPING_CLUSTERED:
                     {
-                        calc_chart_type = c_oAscChartTypeSettings.areaStackedPer;
+                        calc_chart_type = c_oAscChartTypeSettings.hBarNormal;
                         break;
                     }
-                    case GROUPING_STACKED         :
+                    case BAR_GROUPING_STACKED:
                     {
-                        calc_chart_type = c_oAscChartTypeSettings.areaStacked;
+                        calc_chart_type = c_oAscChartTypeSettings.hBarStacked;
                         break;
                     }
-                    default        :
+                    case BAR_GROUPING_PERCENT_STACKED:
                     {
-                        calc_chart_type = c_oAscChartTypeSettings.areaNormal;
-                        break;
-                    }
-                }
-            }
-            else if(chart_type_object_type === historyitem_type_ScatterChart)
-            {
-                switch (chart_type.scatterStyle)
-                {
-                    case SCATTER_STYLE_LINE:
-                    {
-                        calc_chart_type = c_oAscChartTypeSettings.scatterLine;
-                        break;
-                    }
-                    case SCATTER_STYLE_LINE_MARKER:
-                    {
-                        calc_chart_type = c_oAscChartTypeSettings.scatterLineMarker;
-                        break;
-                    }
-                    case SCATTER_STYLE_MARKER:
-                    {
-                        calc_chart_type = c_oAscChartTypeSettings.scatterMarker;
-                        break;
-                    }
-                    case SCATTER_STYLE_NONE:
-                    {
-                        calc_chart_type = c_oAscChartTypeSettings.scatterNone;
-                        break;
-                    }
-                    case SCATTER_STYLE_SMOOTH:
-                    {
-                        calc_chart_type = c_oAscChartTypeSettings.scatterSmooth;
-                        break;
-                    }
-                    case SCATTER_STYLE_SMOOTH_MARKER:
-                    {
-                        calc_chart_type = c_oAscChartTypeSettings.scatterSmoothMarker;
+                        calc_chart_type = c_oAscChartTypeSettings.hBarStackedPer;
                         break;
                     }
                     default:
                     {
-                        calc_chart_type = c_oAscChartTypeSettings.scatterMarker;
+                        calc_chart_type = c_oAscChartTypeSettings.hBarNormal;
                         break;
                     }
                 }
             }
             else
             {
-                calc_chart_type = c_oAscChartTypeSettings.unknown;
+                switch(chart_type.grouping)
+                {
+                    case BAR_GROUPING_CLUSTERED:
+                    {
+                        calc_chart_type = c_oAscChartTypeSettings.barNormal;
+                        break;
+                    }
+                    case BAR_GROUPING_STACKED:
+                    {
+                        calc_chart_type = c_oAscChartTypeSettings.barStacked;
+                        break;
+                    }
+                    case BAR_GROUPING_PERCENT_STACKED:
+                    {
+                        calc_chart_type = c_oAscChartTypeSettings.barStackedPer;
+                        break;
+                    }
+                    default:
+                    {
+                        calc_chart_type = c_oAscChartTypeSettings.barNormal;
+                        break;
+                    }
+                }
             }
-
-            ret.type = calc_chart_type;
         }
-        return ret;
+        else if(chart_type_object_type === historyitem_type_LineChart)
+        {
+            if(!chart_type.marker)
+            {
+                switch(chart_type.grouping)
+                {
+                    case GROUPING_PERCENT_STACKED :
+                    {
+                        calc_chart_type = c_oAscChartTypeSettings.lineStackedPer;
+                        break;
+                    }
+                    case GROUPING_STACKED         :
+                    {
+                        calc_chart_type = c_oAscChartTypeSettings.lineStacked;
+                        break;
+                    }
+                    default        :
+                    {
+                        calc_chart_type = c_oAscChartTypeSettings.lineNormal;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                switch(chart_type.grouping)
+                {
+                    case GROUPING_PERCENT_STACKED:
+                    {
+                        calc_chart_type = c_oAscChartTypeSettings.lineStackedPerMarker;
+                        break;
+                    }
+                    case GROUPING_STACKED:
+                    {
+                        calc_chart_type = c_oAscChartTypeSettings.lineStackedMarker;
+                        break;
+                    }
+                    default:
+                    {
+                        calc_chart_type = c_oAscChartTypeSettings.lineNormalMarker;
+                        break;
+                    }
+                }
+            }
+        }
+        else if(chart_type_object_type === historyitem_type_AreaChart)
+        {
+            switch(chart_type.grouping)
+            {
+                case GROUPING_PERCENT_STACKED :
+                {
+                    calc_chart_type = c_oAscChartTypeSettings.areaStackedPer;
+                    break;
+                }
+                case GROUPING_STACKED         :
+                {
+                    calc_chart_type = c_oAscChartTypeSettings.areaStacked;
+                    break;
+                }
+                default        :
+                {
+                    calc_chart_type = c_oAscChartTypeSettings.areaNormal;
+                    break;
+                }
+            }
+        }
+        else if(chart_type_object_type === historyitem_type_ScatterChart)
+        {
+            switch (chart_type.scatterStyle)
+            {
+                case SCATTER_STYLE_LINE:
+                {
+                    calc_chart_type = c_oAscChartTypeSettings.scatterLine;
+                    break;
+                }
+                case SCATTER_STYLE_LINE_MARKER:
+                {
+                    calc_chart_type = c_oAscChartTypeSettings.scatterLineMarker;
+                    break;
+                }
+                case SCATTER_STYLE_MARKER:
+                {
+                    calc_chart_type = c_oAscChartTypeSettings.scatterMarker;
+                    break;
+                }
+                case SCATTER_STYLE_NONE:
+                {
+                    calc_chart_type = c_oAscChartTypeSettings.scatterNone;
+                    break;
+                }
+                case SCATTER_STYLE_SMOOTH:
+                {
+                    calc_chart_type = c_oAscChartTypeSettings.scatterSmooth;
+                    break;
+                }
+                case SCATTER_STYLE_SMOOTH_MARKER:
+                {
+                    calc_chart_type = c_oAscChartTypeSettings.scatterSmoothMarker;
+                    break;
+                }
+                default:
+                {
+                    calc_chart_type = c_oAscChartTypeSettings.scatterMarker;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            calc_chart_type = c_oAscChartTypeSettings.unknown;
+        }
+        ret.type = calc_chart_type;
     },
-
 
     getChartSpace: function(chart, options)
     {
@@ -2885,6 +2984,164 @@ DrawingObjectsController.prototype =
     getSelectedObjects: function()
     {
         return this.selectedObjects;
+    },
+
+    getDrawingPropsFromArray: function(drawings)
+    {
+        var image_props, shape_props, chart_props, new_image_props, new_shape_props, new_chart_props;
+        var drawing;
+        for(var i = 0; i < drawings.length; ++i)
+        {
+            drawing = drawings[i];
+            switch(drawing.getObjectType())
+            {
+                case historyitem_type_Shape:
+                {
+                    new_shape_props =
+                    {
+                        type: drawing.getPresetGeom(),
+                        fill: drawing.getFill(),
+                        stroke: drawing.getStroke(),
+                        paddings: drawing.getPaddings(),
+                        verticalTextAlign: drawing.getBodyPr().anchor,
+                        w: drawing.extX,
+                        h: drawing.extY
+                    };
+                    if(!shape_props)
+                        shape_props = new_shape_props;
+                    else
+                    {
+                        shape_props = CompareShapeProperties(shape_props, new_shape_props);
+                    }
+                    break;
+                }
+                case historyitem_type_ImageShape:
+                {
+                    new_image_props =
+                    {
+                        imageUrl: drawing.getImageUrl(),
+                        w: drawing.extX,
+                        h: drawing.extY
+                    };
+                    if(!image_props)
+                        image_props = new_image_props;
+                    else
+                    {
+                        if(image_props.imageUrl !== null && image_props.imageUrl !== new_image_props.imageUrl)
+                            image_props.imageUrl = null;
+                        if(image_props.w != null && image_props.w !== new_image_props.w)
+                            image_props.w = null;
+                        if(image_props.h != null && image_props.h !== new_image_props.h)
+                            image_props.h = null;
+                    }
+                    break;
+                }
+                case historyitem_type_ChartSpace:
+                {
+                    var type_subtype = drawing.getTypeSubType();
+                    new_chart_props =
+                    {
+                        type: type_subtype.type,
+                        subtype: type_subtype.subtype,
+                        styleId: drawing.style,
+                        w: drawing.extX,
+                        h: drawing.extY
+                    };
+                    if(!chart_props)
+                    {
+                        chart_props = new_chart_props;
+                        chart_props.chartProps = this.getPropsFromChart(drawing);
+                        chart_props.severalCharts = false;
+                        chart_props.severalChartStyles = false;
+                        chart_props.severalChartTypes = false;
+                    }
+                    else
+                    {
+                        chart_props.chartProps = null;
+                        chart_props.severalCharts = true;
+                        if(!chart_props.severalChartStyles)
+                        {
+                            chart_props.severalChartStyles = (chart_props.styleId !== new_chart_props.styleId);
+                        }
+                        if(!chart_props.severalChartTypes)
+                        {
+                            chart_props.severalChartTypes = (chart_props.type !== new_chart_props.type);
+                        }
+
+                        if(chart_props.w != null && chart_props.w !== new_chart_props.w)
+                            chart_props.w = null;
+                        if(chart_props.h != null && chart_props.h !== new_chart_props.h)
+                            chart_props.h = null;
+                    }
+                    break;
+                }
+                case historyitem_type_GroupShape:
+                {
+                    var group_drawing_props = this.getDrawingPropsFromArray(drawing.spTree);
+                    if(group_drawing_props.shapeProps)
+                    {
+                        if(!shape_props)
+                            shape_props = group_drawing_props.shapeProps;
+                        else
+                        {
+                            shape_props = CompareShapeProperties(shape_props, group_drawing_props.shapeProps);
+                        }
+                    }
+                    if(group_drawing_props.imageProps)
+                    {
+                        if(!image_props)
+                            image_props = group_drawing_props.imageProps;
+                        else
+                        {
+                            if(image_props.imageUrl !== null && image_props.imageUrl !== group_drawing_props.imageProps.imageUrl)
+                                image_props.imageUrl = null;
+
+                            if(image_props.w != null && image_props.w !== new_image_props.w)
+                                image_props.w = null;
+                            if(image_props.h != null && image_props.h !== new_image_props.h)
+                                image_props.h = null;
+                        }
+                    }
+                    if(group_drawing_props.chartProps)
+                    {
+                        if(!chart_props)
+                        {
+                            chart_props = group_drawing_props.chartProps;
+                        }
+                        else
+                        {
+                            chart_props.chartProps = null;
+                            chart_props.severalCharts = true;
+                            if(!chart_props.severalChartStyles)
+                            {
+                                chart_props.severalChartStyles = (chart_props.styleId !== group_drawing_props.chartProps.styleId);
+                            }
+                            if(!chart_props.severalChartTypes)
+                            {
+                                chart_props.severalChartTypes = (chart_props.type !== group_drawing_props.chartProps.type);
+                            }
+                            if(chart_props.w != null && chart_props.w !== new_chart_props.w)
+                                chart_props.w = null;
+                            if(chart_props.h != null && chart_props.h !== new_chart_props.h)
+                                chart_props.h = null;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        return {imageProps: image_props, shapeProps: shape_props, chartProps: chart_props};
+    },
+
+
+
+    getDrawingProps: function()
+    {
+        if(this.selection.groupSelection)
+        {
+            return this.getDrawingPropsFromArray(this.selection.groupSelection.selectedObjects);
+        }
+        return this.getDrawingPropsFromArray(this.selectedObjects);
     },
 
     getGraphicObjectProps: function()

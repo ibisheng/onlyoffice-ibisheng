@@ -561,7 +561,7 @@ CGraphicObjects.prototype =
         this.zIndexManager.bTurnOff = false;
         for(var i = 0; i < this.drawingObjects.length; ++i)
         {
-            this.zIndexManager.addItem(null, this.drawingObjects);
+            this.zIndexManager.addItem(null, this.drawingObjects[i]);
         }
     },
 
@@ -577,18 +577,84 @@ CGraphicObjects.prototype =
         }
     },
 
+    getDrawingPropsFromArray: DrawingObjectsController.prototype.getDrawingPropsFromArray,
+    getPropsFromChart: DrawingObjectsController.prototype.getPropsFromChart,
+    getSelectedObjectsByTypes: DrawingObjectsController.prototype.getSelectedObjectsByTypes,
+
+
     Get_Props: function()
     {
-        return this.getProps();
+        var props_by_types = DrawingObjectsController.prototype.getDrawingProps.call(this);
+        var para_drawing_props = null;
+        for(var i = 0; i < this.selectedObjects.length; ++i)
+        {
+            para_drawing_props = this.selectedObjects[i].parent.Get_Props(para_drawing_props);
+        }
+        var chart_props, shape_props, image_props;
+        if(para_drawing_props)
+        {
+            if(props_by_types.shapeProps)
+            {
+                shape_props = new CImgProperty(para_drawing_props);
+                shape_props.ShapeProperties = CreateAscShapePropFromProp(props_by_types.shapeProps);
+                shape_props.fromGroup = (this.selection.groupSelection ? true : false);
+                shape_props.verticalTextAlign = props_by_types.shapeProps.verticalTextAlign;
+                shape_props.Width = props_by_types.shapeProps.w;
+                shape_props.Height = props_by_types.shapeProps.h;
+            }
+            if(props_by_types.imageProps)
+            {
+                image_props = new CImgProperty(para_drawing_props);
+                image_props.ImageUrl = props_by_types.imageProps.imageUrl;
+                image_props.fromGroup = (this.selection.groupSelection ? true : false);
+                image_props.Width = props_by_types.imageProps.w;
+                image_props.Height = props_by_types.imageProps.h;
+            }
+            if(props_by_types.chartProps)
+            {
+                chart_props = new CImgProperty(para_drawing_props);
+                chart_props.ChartProperties = new asc_CChart(props_by_types.chartProps);
+                chart_props.severalCharts = props_by_types.chartProps.severalCharts;
+                chart_props.severalChartStyles = props_by_types.chartProps.severalChartStyles;
+                chart_props.severalChartTypes = props_by_types.chartProps.severalChartTypes;
+            }
+        }
+
+        if(props_by_types.shapeProps)
+        {
+            var pr = props_by_types.shapeProps;
+            if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == FILL_TYPE_BLIP)
+            {
+                this.drawingDocument.DrawImageTextureFillShape(pr.fill.fill.RasterImageId);
+            }
+            else
+            {
+                this.drawingDocument.DrawImageTextureFillShape(null);
+            }
+        }
+        else
+        {
+            this.drawingDocument.DrawImageTextureFillShape(null);
+        }
+        var ret = [];
+        if(isRealObject(shape_props))
+        {
+            ret.push(shape_props);
+        }
+        if(isRealObject(image_props))
+        {
+            ret.push(image_props);
+        }
+
+        if(isRealObject(chart_props))
+        {
+            ret.push(chart_props);
+        }
+        return ret;
     },
 
     setProps: function(props)
     {
-        //TODO
-        for(var i = 0;  i< this.selectedObjects.length; ++i)
-        {
-            this.selectedObjects[i].parent.Set_Props(props);
-        }
         if(props.Group === 1)
         {
             this.groupSelectedObjects();
@@ -597,30 +663,44 @@ CGraphicObjects.prototype =
         {
             this.unGroupSelectedObjects();
         }
-
-        switch(props.ChangeLevel)
+        else if(isRealNumber(props.ChangeLevel))
         {
-            case 0:
+            switch(props.ChangeLevel)
             {
-                this.bringToFront();
-                break;
-            }
-            case 1:
-            {
-                this.bringForward();
-                break;
-            }
-            case 2:
-            {
-                this.sendToBack();
-                break;
-            }
-            case 3:
-            {
-                this.bringBackward();
+                case 0:
+                {
+                    this.bringToFront();
+                    break;
+                }
+                case 1:
+                {
+                    this.bringForward();
+                    break;
+                }
+                case 2:
+                {
+                    this.sendToBack();
+                    break;
+                }
+                case 3:
+                {
+                    this.bringBackward();
+                }
             }
         }
+        else
+        {
+            var i;
+            for(i = 0; i < this.selectedObjects.length; ++i)
+            {
+                this.selectedObjects[i].parent.Set_Props(props);
+            }
+            this.applyDrawingProps(props.ShapeProperties ? props.ShapeProperties : props);
+        }
+        this.document.Recalculate();
     },
+
+    applyDrawingProps: DrawingObjectsController.prototype.applyDrawingProps,
 
     bringToFront : function()//перемещаем заселекченые объекты наверх
     {
@@ -3192,6 +3272,7 @@ CGraphicObjects.prototype =
             {
                 this.selection.textSelection = this.selectedObjects[0];
                 this.selection.textSelection.paragraphAdd(paraItem, bRecalculate);
+                this.selection.textSelection.select(this, this.selection.textSelection.selectStartPage);
             }
             else if(this.selectedObjects.length > 0)
             {

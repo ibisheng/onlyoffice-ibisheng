@@ -139,6 +139,7 @@ function CShape()
     this.group          = null;
     this.drawingBase    = null;//DrawingBase в Excell'е
     this.bWordShape     = null;//если этот флаг стоит в true то автофигура имеет формат как в редакторе документов
+    this.bDeleted = true;
 
 
 
@@ -157,7 +158,6 @@ function CShape()
     this.pen = null;
     this.selected = false;
 
-    this.bDeleted = true;
 
     this.localTransform = new CMatrix();
     this.localTransformText = new CMatrix();
@@ -190,6 +190,101 @@ CShape.prototype =
     Read_FromBinary2: function (r)
     {
         this.Id = r.GetString2();
+    },
+
+    convertToWord: function(document)
+    {
+        var c = new CShape();
+        c.setWordShape(true);
+        c.setBDeleted(false);
+        if(this.nvSpPr)
+        {
+            c.setNvSpPr(this.nvSpPr.createDuplicate());
+        }
+        if(this.spPr)
+        {
+            c.setSpPr(this.spPr.createDuplicate());
+            c.spPr.setParent(c);
+        }
+        if(this.style)
+        {
+            c.setStyle(this.style.createDuplicate());
+        }
+        if(this.txBody)
+        {
+            if(this.txBody.bodyPr)
+            {
+                c.setBodyPr(this.txBody.bodyPr.createDuplicate());
+            }
+            if(this.txBody.content)
+            {
+                var new_content = new CDocumentContent(c, document.DrawingDocument, 0, 0, 0, 20000, false, false, false);
+                var paragraphs = this.txBody.content.Content;
+                //TODO: Обработать нумерацию
+                new_content.Internal_Content_RemoveAll();
+                for(var i = 0; i < paragraphs.length; ++i)
+                {
+                    var cur_par = paragraphs[i];
+                    var new_paragraph = cur_par.Copy(new_content);
+                    new_content.Internal_Content_Add( i, new_paragraph, false );
+                }
+                c.setTextBoxContent(new_content);
+            }
+        }
+        return c;
+    },
+
+    convertToPPTX: function(drawingDocument)
+    {
+        var c = new CShape();
+        c.setWordShape(false);
+        c.setBDeleted(false);
+        if(this.nvSpPr)
+        {
+            c.setNvSpPr(this.nvSpPr.createDuplicate());
+        }
+        if(this.spPr)
+        {
+            c.setSpPr(this.spPr.createDuplicate());
+            c.spPr.setParent(c);
+        }
+        if(this.style)
+        {
+            c.setStyle(this.style.createDuplicate());
+        }
+        if(this.textBoxContent)
+        {
+            var tx_body = new CTextBody();
+            tx_body.setParent(c);
+            if(this.bodyPr)
+            {
+                tx_body.setBodyPr(this.bodyPr.createDuplicate());
+            }
+            var new_content = new CDocumentContent(tx_body, drawingDocument, 0, 0, 0, 0, false, false, true);
+            new_content.Internal_Content_RemoveAll();
+            var paragraphs = this.textBoxContent.Content;
+            for(var i = 0; i < paragraphs.length; ++i)
+            {
+                //TODO: обработать нумерацию
+                var cur_par = paragraphs[i];
+                var new_paragraph = new Paragraph(drawingDocument, tx_body, 0, 0, 0, 0, 0);
+                new_paragraph.Set_Pr(cur_par.Pr.Copy());
+                new_paragraph.TextPr.Set_Value( cur_par.TextPr.Value );
+                new_paragraph.Internal_Content_Remove2(0, new_paragraph.Content.length);
+                var Count = cur_par.Content.length;
+                for ( var Index = 0; Index < Count; Index++ )
+                {
+                    var Item = cur_par.Content[Index];
+                    new_paragraph.Internal_Content_Add( new_paragraph.Content.length, Item.Copy(false), false );
+                }
+                var EndRun = new ParaRun(new_paragraph);
+                EndRun.Add_ToContent( 0, new ParaEnd() );
+                new_paragraph.Internal_Content_Add( new_paragraph.Content.length, EndRun, false );
+                new_content.Internal_Content_Add( i, new_paragraph, false );
+            }
+            tx_body.setContent(new_content);
+        }
+        return c;
     },
 
     documentGetAllFontNames: function(AllFonts)
@@ -329,6 +424,8 @@ CShape.prototype =
     },
 
 
+
+
     documentSearch: function(String, search_Common)
     {
         if(this.textBoxContent)
@@ -443,7 +540,6 @@ CShape.prototype =
         if (this.txBody) {
             this.txBody.recalcAll();
         }
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
     recalcAllColors: function () {
@@ -505,7 +601,6 @@ CShape.prototype =
             }
             this.setLine(ln);
         }
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
     Hyperlink_CanAdd: function (bCheck) {
@@ -526,7 +621,6 @@ CShape.prototype =
             this.txBody.content.Hyperlink_Add(HyperProps);
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 
@@ -535,7 +629,6 @@ CShape.prototype =
             this.txBody.content.Hyperlink_Modify(HyperProps);
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 
@@ -544,7 +637,6 @@ CShape.prototype =
             this.txBody.content.Hyperlink_Remove();
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 
@@ -604,7 +696,6 @@ CShape.prototype =
         ln.Fill.fill.color.color.id = ("black");
         this.setLine(ln);
         this.setTextBody(new CTextBody(this));
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
 
@@ -2457,7 +2548,6 @@ CShape.prototype =
             var new_geometry = this.spPr.geometry.createDuplicate();
             History.Add(this, { Type: historyitem_SetShapeSetGeometry, oldGeometry: old_geometry, newGeometry: new_geometry });
             this.recalcInfo.recalculateGeometry = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 
@@ -2668,7 +2758,6 @@ CShape.prototype =
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
             this.txBody.bRecalculateNumbering = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 
@@ -2678,7 +2767,6 @@ CShape.prototype =
 
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
 
     },
@@ -2689,7 +2777,6 @@ CShape.prototype =
             //this.txBody.content.RecalculateCurPos();
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 
@@ -2700,7 +2787,6 @@ CShape.prototype =
             this.txBody.content.Set_ApplyToAll(false);
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 
@@ -2710,7 +2796,6 @@ CShape.prototype =
             this.txBody.content.RecalculateCurPos();
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 
@@ -2720,7 +2805,6 @@ CShape.prototype =
             this.txBody.content.RecalculateCurPos();
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 
@@ -2731,7 +2815,6 @@ CShape.prototype =
             this.txBody.content.Set_ApplyToAll(false);
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 
@@ -2741,7 +2824,6 @@ CShape.prototype =
             this.txBody.content.RecalculateCurPos();
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 
@@ -2752,7 +2834,6 @@ CShape.prototype =
             this.txBody.content.Set_ApplyToAll(false);
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 
@@ -2763,7 +2844,6 @@ CShape.prototype =
             this.txBody.content.RecalculateCurPos();
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 
@@ -2774,7 +2854,6 @@ CShape.prototype =
             this.txBody.content.Set_ApplyToAll(false);
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 
@@ -2784,7 +2863,6 @@ CShape.prototype =
             this.txBody.content.RecalculateCurPos();
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 
@@ -2795,7 +2873,6 @@ CShape.prototype =
             this.txBody.content.Set_ApplyToAll(false);
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 
@@ -2884,7 +2961,6 @@ CShape.prototype =
     onParagraphChanged: function () {
         this.recalcInfo.recalculateContent = true;
         this.recalcInfo.recalculateTransformText = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
     isSimpleObject: function () {
@@ -3220,7 +3296,7 @@ CShape.prototype =
     },
 
     getPresetGeom: function () {
-        if (this.spPr.geometry != null) {
+        if (this.spPr && this.spPr.geometry) {
             return this.spPr.geometry.preset;
         }
         else {
@@ -3294,7 +3370,6 @@ CShape.prototype =
             this.txBody.recalcInfo.recalculateBodyPr = true;
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
             var new_body_pr = this.txBody.bodyPr.createDuplicate();
             History.Add(this, { Type: historyitem_SetShapeBodyPr, oldBodyPr: old_body_pr, newBodyPr: new_body_pr });
             this.txBody.recalcInfo.recalculateBodyPr = true;
@@ -3443,8 +3518,7 @@ CShape.prototype =
         }
         var old_geometry = isRealObject(this.spPr.geometry) ? this.spPr.geometry : null;
         if (_final_preset != null) {
-            this.spPr.geometry = CreateGeometry(_final_preset);
-            this.spPr.geometry.Init(100, 100);
+            this.spPr.setGeometry(CreateGeometry(_final_preset));
         }
         else {
             this.spPr.geometry = null;
@@ -3464,10 +3538,6 @@ CShape.prototype =
         }
         else
             this.setLine(_new_line);
-
-        History.Add(this, { Type: historyitem_SetShapeSetGeometry, oldGeometry: old_geometry, newGeometry: new_geometry });
-        this.recalcInfo.recalculateGeometry = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
     setGeometry: function (geometry) {
@@ -3476,59 +3546,28 @@ CShape.prototype =
         this.spPr.geometry = geometry;
         History.Add(this, { Type: historyitem_SetShapeSetGeometry, oldGeometry: old_geometry, newGeometry: new_geometry });
         this.recalcInfo.recalculateGeometry = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
     changeFill: function (unifill) {
 
-        var old_fill = this.spPr.Fill ? this.spPr.Fill.createDuplicate() : null;
-
-        if (this.spPr.Fill == null) {
-            this.spPr.Fill = new CUniFill();
-        }
-        this.spPr.Fill = CorrectUniFill(unifill, this.spPr.Fill);
-
-        var new_fill = this.spPr.Fill.createDuplicate();
-        History.Add(this, { Type: historyitem_SetShapeSetFill, oldFill: old_fill, newFill: new_fill });
-
-        this.recalcInfo.recalculateFill = true;
-        this.recalcInfo.recalculateBrush = true;
-        this.recalcInfo.recalculateTransparent = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+        this.spPr.setFill(CorrectUniFill(unifill, this.spPr.Fill));
     },
     setFill: function (fill) {
-        var old_fill = this.spPr.Fill;
-        this.spPr.Fill = fill;
 
-        var new_fill = this.spPr.Fill.createDuplicate();
-        History.Add(this, { Type: historyitem_SetShapeSetFill, oldFill: old_fill, newFill: new_fill });
+        this.spPr.setFill(fill);
     },
 
     changeLine: function (line) {
-        var old_line = this.spPr.ln ? this.spPr.ln.createDuplicate() : null;
-        if (!isRealObject(this.spPr.ln)) {
-            this.spPr.ln = new CLn();
-        }
-        this.spPr.ln = CorrectUniStroke(line, this.spPr.ln);
-        var new_line = this.spPr.ln.createDuplicate();
-
-
-        History.Add(this, { Type: historyitem_SetShapeSetLine, oldLine: old_line, newLine: new_line });
-
-        this.recalcInfo.recalculateLine = true;
-        this.recalcInfo.recalculatePen = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+        this.spPr.setLn(CorrectUniStroke(line, this.spPr.ln));
     },
 
     setLine: function (line) {
         var old_line = this.spPr.ln;
         var new_line = line;
         this.spPr.ln = line;
-        History.Add(this, { Type: historyitem_SetShapeSetLine, oldLine: old_line, newLine: new_line });
 
         this.recalcInfo.recalculateLine = true;
         this.recalcInfo.recalculatePen = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
     transformPointRelativeShape: function (x, y) {
@@ -3667,7 +3706,6 @@ CShape.prototype =
             this.txBody.content.Set_ApplyToAll(false);
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 
@@ -3676,7 +3714,6 @@ CShape.prototype =
             this.txBody.content.Remove(Count, bOnlyText, bRemoveOnlySelection);
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 

@@ -691,8 +691,17 @@ CImageShape.prototype =
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
-    Refresh_RecalcData: function()
-    {},
+    Refresh_RecalcData: function(data)
+    {
+        switch(data)
+        {
+            case historyitem_ImageShapeSetBlipFill:
+            {
+
+                break;
+            }
+        }
+    },
 
     setOffset: function(offX, offY)
     {

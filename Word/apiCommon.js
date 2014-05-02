@@ -178,6 +178,10 @@ function CorrectUniColor(asc_color, unicolor)
 
             var array_colors_types = [6, 15, 7, 16, 0, 1, 2, 3, 4, 5];
             ret.color.id = array_colors_types[_id];
+            if(!ret.Mods)
+            {
+                ret.setMods(new CColorModifiers());
+            }
 
             if (ret.Mods.Mods.length != 0)
                 ret.Mods.Mods.splice(0, ret.Mods.Mods.length);
@@ -224,7 +228,7 @@ function CorrectUniColor(asc_color, unicolor)
             ret.color.RGBA.B = asc_color.get_b();
             ret.color.RGBA.A = asc_color.get_a();
 
-            if (ret.Mods.Mods.length != 0)
+            if (ret.Mods && ret.Mods.Mods.length != 0)
                 ret.Mods.Mods.splice(0, ret.Mods.Mods.length);
         }
     }

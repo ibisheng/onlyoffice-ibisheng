@@ -7390,7 +7390,7 @@ CDocument.prototype =
     {
        // if(!(this.DrawingObjects.curState.id === STATES_ID_TEXT_ADD || this.DrawingObjects.curState.id === STATES_ID_TEXT_ADD_IN_GROUP))
         {
-            var DrawingPr = this.DrawingObjects.getProps();
+            var DrawingPr = this.DrawingObjects.Get_Props();
 
             if ( true === Flag )
                 return DrawingPr;

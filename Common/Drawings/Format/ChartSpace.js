@@ -215,6 +215,111 @@ CChartSpace.prototype =
     select: CShape.prototype.select,
 
 
+    getTypeSubType: function()
+    {
+        /*
+        *
+        *
+         normal: "normal",
+         stacked: "stacked",
+         stackedPer: "stackedPer"
+         */
+        var type = null, subtype = null;
+        if(this.chart && this.chart.plotArea && this.chart.plotArea.chart)
+        {
+            switch (this.chart.plotArea.chart.getObjectType())
+            {
+                case historyitem_type_LineChart:
+                {
+                    type = c_oAscChartType.line;
+                    break;
+                }
+                case historyitem_type_AreaChart:
+                {
+                    type = c_oAscChartType.area;
+                    break;
+                }
+                case historyitem_type_DoughnutChart:
+                {
+                    type = c_oAscChartType.doughnut;
+                    break;
+                }
+                case historyitem_type_PieChart:
+                {
+                    type = c_oAscChartType.pie;
+                    break;
+                }
+                case historyitem_type_ScatterChart:
+                {
+                    type = c_oAscChartType.scatter;
+                    break;
+                }
+                case historyitem_type_StockChart:
+                {
+                    type = c_oAscChartType.stock;
+                    break;
+                }
+                case historyitem_type_BarChart:
+                {
+                    if(this.chart.plotArea.chart.barDir === BAR_DIR_BAR)
+                        type = c_oAscChartType.hbar;
+                    else
+                        type = c_oAscChartType.bar;
+                    break;
+                }
+            }
+
+            if(isRealNumber(this.chart.plotArea.chart.grouping))
+            {
+                if(!this.chart.plotArea.chart.getObjectType() === historyitem_type_BarChart)
+                {
+                    switch(this.chart.plotArea.chart.grouping)
+                    {
+                        case GROUPING_STANDARD:
+                        {
+                            subtype = c_oAscChartSubType.normal;
+                            break;
+                        }
+                        case GROUPING_STACKED:
+                        {
+                            subtype = c_oAscChartSubType.stacked;
+                            break;
+                        }
+                        case GROUPING_PERCENT_STACKED:
+                        {
+                            subtype = c_oAscChartSubType.stackedPer;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    switch(this.chart.plotArea.chart.grouping)
+                    {
+                        case BAR_GROUPING_CLUSTERED:
+                        case BAR_GROUPING_STANDARD:
+                        {
+                            subtype = c_oAscChartSubType.normal;
+                            break;
+                        }
+                        case BAR_GROUPING_STACKED:
+                        {
+                            subtype = c_oAscChartSubType.stacked;
+                            break;
+                        }
+                        case BAR_GROUPING_PERCENT_STACKED:
+                        {
+                            subtype = c_oAscChartSubType.stackedPer;
+                            break;
+                        }
+                    }
+                }
+            }
+
+        }
+        return {type: type, subtype: subtype};
+    },
+
     copy: function()
     {
         var copy = new CChartSpace();
@@ -258,6 +363,16 @@ CChartSpace.prototype =
         copy.setUserShapes(this.userShapes);
         copy.setThemeOverride(this.themeOverride);
         copy.setBDeleted(this.bDeleted);
+    },
+
+    convertToWord: function(document)
+    {
+        return this.createDuplicate();
+    },
+
+    convertToPPTX: function(drawingDocument)
+    {
+
     },
 
     Write_ToBinary2: function (w)
@@ -593,13 +708,7 @@ CChartSpace.prototype =
                         y_ax.labels.arrLabels.push(dlbl);
                     }
 
-                    if(isRealObject(y_ax.scaling) && isRealNumber(y_ax.scaling.logBase) && y_ax.scaling.logBase >= 2 && y_ax.scaling.logBase <= 1000)
-                    {
-                        for(i = 0; i < arr_val.length; ++i)
-                        {
-                            arr_val[i] = Math.log(arr_val[i])/Math.log(y_ax.scaling.logBase);
-                        }
-                    }
+
 
 
                     //пока расстояние между подписями и краем блока с подписями берем размер шрифта.
@@ -626,14 +735,6 @@ CChartSpace.prototype =
                         {
                             var calc_value = arr_x_val[i]*multiplier;
                             string_pts.push({val:calc_value + ""});
-                        }
-                    }
-
-                    if(isRealObject(x_ax.scaling) && isRealNumber(x_ax.scaling.logBase) && x_ax.scaling.logBase >= 2 && x_ax.scaling.logBase <= 1000)
-                    {
-                        for(i = 0; i < arr_x_val.length; ++i)
-                        {
-                            arr_x_val[i] = Math.log(arr_x_val[i])/Math.log(x_ax.scaling.logBase);
                         }
                     }
 
@@ -697,7 +798,7 @@ CChartSpace.prototype =
 
                     var first_hor_label_half_width = (x_ax.tickLblPos === TICK_LABEL_POSITION_NONE || x_ax.bDelete) ? 0 : x_ax.labels.arrLabels[0].tx.rich.content.XLimit/2;
                     var last_hor_label_half_width = (x_ax.tickLblPos === TICK_LABEL_POSITION_NONE || x_ax.bDelete) ? 0 : x_ax.labels.arrLabels[x_ax.labels.arrLabels.length-1].tx.rich.content.XLimit/2;
-                    var left_gap, right_gap;
+                    var left_gap = 0, right_gap = 0;
                     if(x_ax_orientation === ORIENTATION_MIN_MAX)
                     {
                         switch(labels_pos)
@@ -888,7 +989,7 @@ CChartSpace.prototype =
                     var first_vert_label_half_height = 0; //TODO (y_ax.tickLblPos === TICK_LABEL_POSITION_NONE || y_ax.bDelete) ? 0 :  y_ax.labels.arrLabels[0].tx.rich.content.Get_SummaryHeight()/2;
                     var last_vert_label_half_height =  0; //(y_ax.tickLblPos === TICK_LABEL_POSITION_NONE || y_ax.bDelete) ? 0 :  y_ax.labels.arrLabels[0].tx.rich.content.Get_SummaryHeight()/2;
 
-                    var bottom_gap, top_height;
+                    var bottom_gap = 0, top_height = 0;
                     if(y_ax_orientation === ORIENTATION_MIN_MAX)
                     {
                         switch(tick_labels_pos_x)
@@ -1050,14 +1151,6 @@ CChartSpace.prototype =
                         }
                     }
 
-                    if(isRealObject(y_ax.scaling) && isRealNumber(y_ax.scaling.logBase) && y_ax.scaling.logBase >= 2 && y_ax.scaling.logBase <= 1000)
-                    {
-                        for(i = 0; i < arr_val.length; ++i)
-                        {
-                            arr_val[i] = Math.pow(y_ax.scaling.logBase, arr_val[i]);
-                        }
-                    }
-
 
                     y_ax.yPoints = [];
                     for(i = 0; i < arr_val.length; ++i)
@@ -1067,13 +1160,7 @@ CChartSpace.prototype =
 
 
 
-                    if(isRealObject(x_ax.scaling) && isRealNumber(x_ax.scaling.logBase) && x_ax.scaling.logBase >= 2 && x_ax.scaling.logBase <= 1000)
-                    {
-                        for(i = 0; i < arr_val.length; ++i)
-                        {
-                            arr_x_val[i] = Math.pow(x_ax.scaling.logBase, arr_x_val[i]);
-                        }
-                    }
+
 
                     x_ax.xPoints = [];
                     for(i = 0; i < arr_x_val.length; ++i)
@@ -1251,13 +1338,7 @@ CChartSpace.prototype =
 
 
                     /*если у нас шкала логарифмическая то будем вместо полученных значений использовать логарифм*/
-                    if(isRealObject(val_ax.scaling) && isRealNumber(val_ax.scaling.logBase) && val_ax.scaling.logBase >= 2 && val_ax.scaling.logBase <= 1000)
-                    {
-                        for(i = 0; i < arr_val.length; ++i)
-                        {
-                            arr_val[i] = Math.log(arr_val[i])/Math.log(val_ax.scaling.logBase);
-                        }
-                    }
+
                     val_ax.labels = new CValAxisLabels(this);
                     var max_width = 0;
                     val_ax.yPoints = [];
@@ -2074,13 +2155,6 @@ CChartSpace.prototype =
                         }
                     }
                     val_ax.yPoints = [];
-                    if(isRealObject(val_ax.scaling) && isRealNumber(val_ax.scaling.logBase) && val_ax.scaling.logBase >= 2 && val_ax.scaling.logBase <= 1000)
-                    {
-                        for(i = 0; i < arr_val.length; ++i)
-                        {
-                            arr_val[i] = Math.pow(val_ax.scaling.logBase, arr_val[i]);
-                        }
-                    }
                     for(i = 0; i < arr_val_labels_points.length; ++i)
                     {
                         val_ax.yPoints[i] = {val:arr_val[i], pos: arr_val_labels_points[i]};
@@ -2285,14 +2359,7 @@ CChartSpace.prototype =
                         }
                     }
 
-                    /*если у нас шкала логарифмическая то будем вместо полученных значений использовать логарифм*/
-                    if(isRealObject(val_ax.scaling) && isRealNumber(val_ax.scaling.logBase) && val_ax.scaling.logBase >= 2 && val_ax.scaling.logBase <= 1000)
-                    {
-                        for(i = 0; i < arr_val.length; ++i)
-                        {
-                            arr_val[i] = Math.log(arr_val[i])/Math.log(val_ax.scaling.logBase);
-                        }
-                    }
+
 
                     //расчитаем подписи горизонтальной оси значений
                     val_ax.labels = new CValAxisLabels(this);
@@ -2863,13 +2930,7 @@ CChartSpace.prototype =
                     }
                     val_ax.xPoints = [];
 
-                    if(isRealObject(val_ax.scaling) && isRealNumber(val_ax.scaling.logBase) && val_ax.scaling.logBase >= 2 && val_ax.scaling.logBase <= 1000)
-                    {
-                        for(i = 0; i < arr_val.length; ++i)
-                        {
-                            arr_val[i] = Math.pow(val_ax.scaling.logBase, arr_val[i]);
-                        }
-                    }
+
                     for(i = 0; i < arr_val_labels_points.length; ++i)
                     {
                         val_ax.xPoints[i] = {val:arr_val[i], pos: arr_val_labels_points[i]};

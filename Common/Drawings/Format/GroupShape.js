@@ -690,6 +690,8 @@ CGroupShape.prototype =
             {
                 this.selection.textSelection = this.selectedObjects[0];
                 this.selection.textSelection.paragraphAdd(paraItem, bRecalculate);
+                if(isRealNumber(this.selection.textSelection.selectStartPage))
+                    this.selection.textSelection.select(this, this.selection.textSelection.selectStartPage);
             }
             else if(this.selectedObjects.length > 0)
             {
@@ -1205,11 +1207,22 @@ CGroupShape.prototype =
 
     setVerticalAlign : function(align)
     {
-        for(var _shape_index = 0; _shape_index < this.arrGraphicObjects.length; ++_shape_index)
+        for(var _shape_index = 0; _shape_index < this.spTree.length; ++_shape_index)
         {
-            if(this.arrGraphicObjects[_shape_index].setVerticalAlign)
+            if(this.spTree[_shape_index].setVerticalAlign)
             {
-                this.arrGraphicObjects[_shape_index].setVerticalAlign(align);
+                this.spTree[_shape_index].setVerticalAlign(align);
+            }
+        }
+    },
+
+    setPaddings: function(paddings)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].setPaddings)
+            {
+                this.spTree[i].setPaddings(paddings);
             }
         }
     },
@@ -1359,22 +1372,22 @@ CGroupShape.prototype =
 
     changePresetGeom: function(preset)
     {
-        for(var _shape_index = 0; _shape_index < this.arrGraphicObjects.length; ++_shape_index)
+        for(var _shape_index = 0; _shape_index < this.spTree.length; ++_shape_index)
         {
-            if(this.arrGraphicObjects[_shape_index].changePresetGeom)
+            if(this.spTree[_shape_index].changePresetGeom)
             {
-                this.arrGraphicObjects[_shape_index].changePresetGeom(preset);
+                this.spTree[_shape_index].changePresetGeom(preset);
             }
         }
     },
 
     changeFill: function(fill)
     {
-        for(var _shape_index = 0; _shape_index < this.arrGraphicObjects.length; ++_shape_index)
+        for(var _shape_index = 0; _shape_index < this.spTree.length; ++_shape_index)
         {
-            if(this.arrGraphicObjects[_shape_index].changeFill)
+            if(this.spTree[_shape_index].changeFill)
             {
-                this.arrGraphicObjects[_shape_index].changeFill(fill);
+                this.spTree[_shape_index].changeFill(fill);
             }
         }
     },
@@ -1382,11 +1395,11 @@ CGroupShape.prototype =
 
     changeLine: function(line)
     {
-        for(var _shape_index = 0; _shape_index < this.arrGraphicObjects.length; ++_shape_index)
+        for(var _shape_index = 0; _shape_index < this.spTree.length; ++_shape_index)
         {
-            if(this.arrGraphicObjects[_shape_index].changeLine)
+            if(this.spTree[_shape_index].changeLine)
             {
-                this.arrGraphicObjects[_shape_index].changeLine(line);
+                this.spTree[_shape_index].changeLine(line);
             }
         }
     },

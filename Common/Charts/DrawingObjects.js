@@ -230,8 +230,8 @@ function asc_CChart(object) {
         }
     }
 
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
+   // this.Id = g_oIdCounter.Get_NewId();
+   // g_oTableId.Add(this, this.Id);
 }
 
 asc_CChart.prototype = {

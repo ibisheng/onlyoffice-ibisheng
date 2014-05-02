@@ -4512,11 +4512,11 @@ function CompareShapeProperties(shapeProp1, shapeProp2)
         _result_shape_prop.stroke = shapeProp1.stroke.compare(shapeProp2.stroke)
     }
 
-    if(shapeProp1.verticalTextAlign === shapeProp2.verticalTextAlign)
+   /* if(shapeProp1.verticalTextAlign === shapeProp2.verticalTextAlign)
     {
         _result_shape_prop.verticalTextAlign = shapeProp1.verticalTextAlign;
     }
-    else
+    else */
     {
         _result_shape_prop.verticalTextAlign = null;
     }
