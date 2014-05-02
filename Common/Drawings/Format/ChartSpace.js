@@ -463,7 +463,7 @@ CChartSpace.prototype =
             {
                 for(i = 0; i < plot_area.charts.length; ++i)
                 {
-                    plot_area.charts[i] && plot_area.charts[i].documentCreateFontMap(allFonts)
+                    plot_area.charts[i] && plot_area.charts[i].documentCreateFontMap(allFonts);/*TODO нажо бы этот метод переименовать чтоб название не вводило в заблуждение*/
                 }
             }
         }

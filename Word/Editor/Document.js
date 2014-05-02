@@ -2343,15 +2343,6 @@ CDocument.prototype =
                     Drawing = new ParaDrawing( W, H, null, this.DrawingDocument, this, null);
                     var Image = this.DrawingObjects.getChartSpace(Chart,null);
                     Image.setParent(Drawing);
-                    Image.setStyle(2);
-                    Image.setSpPr(new CSpPr());
-                    Image.spPr.setParent(Image);
-                    Image.spPr.setXfrm(new CXfrm());
-                    Image.spPr.xfrm.setParent(Image.spPr);
-                    Image.spPr.xfrm.setOffX(0);
-                    Image.spPr.xfrm.setOffY(0);
-                    Image.spPr.xfrm.setExtX(152);
-                    Image.spPr.xfrm.setExtY(89);
                     Drawing.Set_GraphicObject(Image);
                 }
                 if ( true === bFlow )
@@ -2385,9 +2376,9 @@ CDocument.prototype =
         }
     },
 
-    Get_ChartObject: function()
+    Get_ChartObject: function(type, subtype)
     {
-        return this.DrawingObjects.getChartObject();
+        return this.DrawingObjects.getChartObject(type, subtype);
     },
 
     Add_FlowTable : function(Cols, Rows)

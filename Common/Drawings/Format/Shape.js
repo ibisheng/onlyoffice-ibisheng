@@ -3125,8 +3125,8 @@ CShape.prototype =
             }
             graphics.transform3(transform_text);
             this.txBody.draw(graphics);
-            /* if (graphics.FreeFont !== undefined)
-             graphics.FreeFont();*/
+            /*if (graphics.FreeFont !== undefined)
+                graphics.FreeFont(); */
 
             /*var _masrgins = this.getMargins();
              graphics.reset();

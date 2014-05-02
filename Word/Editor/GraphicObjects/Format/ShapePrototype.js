@@ -119,6 +119,8 @@ CShape.prototype.handleUpdateExtents = function()
     this.recalcWrapPolygon();
     this.recalcContent();
     this.recalcTxBoxContent();
+    this.recalcTransform();
+    this.recalcTransformText();
     this.addToRecalculate();
 };
 CShape.prototype.handleUpdateRot = function()
@@ -749,4 +751,26 @@ CShape.prototype.Get_ColorMap = function()
 CShape.prototype.Is_TopDocument = function()
 {
     return false;
+};
+CShape.prototype.setStartPage = function(pageIndex)
+{
+    this.selectStartPage = pageIndex;
+    if(this.getDocContent)
+    {
+        var content = this.getDocContent();
+        if(content)
+        {
+            content.Set_StartPage(pageIndex);
+        }
+        if(this.spTree)
+        {
+            for(var i = 0; i < this.spTree.length; ++i)
+            {
+                if(this.spTree[i].setStartPage)
+                {
+                    this.spTree[i].setStartPage(pageIndex);
+                }
+            }
+        }
+    }
 };

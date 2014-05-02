@@ -680,61 +680,19 @@ CImageShape.prototype =
         }
     },
 
-    setRotate: function(rot)
-    {
-        var xfrm = this.spPr.xfrm;
-        History.Add(this, {Type: historyitem_SetShapeRot, oldRot: xfrm.rot, newRot: rot});
-
-        this.recalcInfo.recalculateTransform = true;
-        this.recalcInfo.recalculateTransformText = true;
-        xfrm.rot = rot;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-    },
-
     Refresh_RecalcData: function(data)
     {
-        switch(data)
+        switch(data.Type)
         {
             case historyitem_ImageShapeSetBlipFill:
             {
-
+                this.recalcBrush();
+                this.recalcFill();
+                this.addToRecalculate();
                 break;
             }
         }
     },
-
-    setOffset: function(offX, offY)
-    {
-        History.Add(this, {Type: historyitem_SetShapeOffset, oldOffsetX: this.spPr.xfrm.offX, newOffsetX: offX, oldOffsetY: this.spPr.xfrm.offY, newOffsetY: offY});
-        this.spPr.xfrm.offX = offX;
-        this.spPr.xfrm.offY = offY;
-        this.recalcInfo.recalculateTransform = true;
-        this.recalcInfo.recalculateTransformText = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-    },
-
-
-    setExtents: function(extX, extY)
-    {
-        History.Add(this, {Type: historyitem_SetShapeExtents, oldExtentX: this.spPr.xfrm.extX, newExtentX: extX, oldExtentY: this.spPr.xfrm.extY, newExtentY: extY});
-        this.spPr.xfrm.extX = extX;
-        this.spPr.xfrm.extY = extY;
-        this.recalcInfo.recalculateTransform = true;
-        this.recalcInfo.recalculateTransformText = true;
-        this.recalcInfo.recalculateGeometry = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-    },
-
-    setFlips: function(flipH, flipV)
-    {
-        History.Add(this, {Type: historyitem_SetShapeFlips, oldFlipH: this.spPr.xfrm.flipH, newFlipH: flipH, oldFlipV: this.spPr.xfrm.flipV, newFlipV: flipV});
-        this.spPr.xfrm.flipH = flipH;
-        this.spPr.xfrm.flipV = flipV;
-        this.recalcInfo.recalculateTransform = true;
-        this.recalcInfo.recalculateTransformText = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-    },
-
 
     recalculateCursorTypes: function()
     {

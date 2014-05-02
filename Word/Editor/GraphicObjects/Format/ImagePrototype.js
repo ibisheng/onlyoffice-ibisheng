@@ -96,6 +96,7 @@ CImageShape.prototype.handleUpdateExtents = function()
 {
     this.recalcGeometry();
     this.recalcBounds();
+    this.recalcTransform();
     this.recalcWrapPolygon();
     this.addToRecalculate();
 };
@@ -185,6 +186,7 @@ CImageShape.prototype.updateTransformMatrix = CShape.prototype.updateTransformMa
 CImageShape.prototype.getDrawingDocument = CShape.prototype.getDrawingDocument;
 CImageShape.prototype.getArrayWrapIntervals = CShape.prototype.getArrayWrapIntervals;
 CImageShape.prototype.getBounds = CShape.prototype.getBounds;
+CImageShape.prototype.setStartPage = CShape.prototype.setStartPage;
 CImageShape.prototype.checkContentDrawings = function()
 {};
 CImageShape.prototype.hit = CShape.prototype.hit;

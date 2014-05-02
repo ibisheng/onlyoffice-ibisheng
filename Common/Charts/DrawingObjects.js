@@ -1170,14 +1170,29 @@ prot["asc_removeSeries"] = prot.asc_removeSeries;
 function asc_CChartBinary(chart) {
 
     this["binary"] = null;
-    if (typeof CChartAsGroup != "undefined" && chart instanceof CChartAsGroup)
-        this["binary"] = chart.getChartBinary();
+    if (chart && chart.getObjectType() === historyitem_type_ChartSpace)
+    {
+        var writer = new BinaryChartWriter(new CMemory(false));
+        writer.WriteCT_ChartSpace(chart);
+        this["binary"] = writer.memory.pos + ";" + writer.memory.GetBase64Memory();
+    }
 }
 
 asc_CChartBinary.prototype = {
 
     asc_getBinary: function() { return this["binary"]; },
-    asc_setBinary: function(val) { this["binary"] = val; }
+    asc_setBinary: function(val) { this["binary"] = val; },
+    getChartSpace: function(workSheet)
+    {
+        var binary = this["binary"];
+        var stream = CreateBinaryReader(this["binary"], 0, this["binary"].length);
+        var chartReader = new  BinaryChartReader(stream);
+        var oNewChartSpace = new CChartSpace();
+        var oBinaryChartReader = new BinaryChartReader(stream);
+        oBinaryChartReader.ExternalReadCT_ChartSpace(stream.size , oNewChartSpace, workSheet);
+        return oNewChartSpace;
+    }
+
 }
 
 //{ asc_CChartBinary export
@@ -3863,11 +3878,20 @@ function DrawingObjects() {
         else if ( isObject(chart) && chart["binary"] ) {
 
             History.TurnOff();
-            var graphicObject = new CChartAsGroup(null, _this);
-            graphicObject.setChartBinary(chart["binary"]);
+
+            var asc_chart_binary = new Asc.asc_CChartBinary();
+            asc_chart_binary.asc_setBinary(chart["binary"]);
+            var oNewChartSpace = asc_chart_binary.getChartSpace(worksheet.model);
+            oNewChartSpace.getAllRasterImages(aImagesSync);
+
+            oNewChartSpace.drawingObjects = this;
+            oNewChartSpace.addToDrawingObjects();
+            oNewChartSpace.recalculate();
+           //var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
+           //aBoundsCheckers.push(boundsChecker);
 
             // Формируем общий диапазон по сериям
-            var seriesCount = graphicObject.chart.series.length;
+           /* var seriesCount = graphicObject.chart.series.length;
             if ( seriesCount ) {
 
                 // Нужно переименовать лист для дальнейшего поиска
@@ -3970,8 +3994,8 @@ function DrawingObjects() {
                 for ( var i = 0; i < aCells.length; i++ ) {
                     aCells[i].setValue( (i + 1).toString() );
                 }
-            }
-            worksheet._updateCellsRange(graphicObject.chart.range.intervalObject.getBBox0());
+            }  */
+           // worksheet._updateCellsRange(graphicObject.chart.range.intervalObject.getBBox0());
             _this.showDrawingObjects(false);
             History.TurnOn();
         }

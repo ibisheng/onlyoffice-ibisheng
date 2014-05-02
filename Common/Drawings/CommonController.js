@@ -16,6 +16,25 @@ function CheckLinePreset(preset)
     return preset === "line";
 }
 
+function CheckSpPrXfrm(object)
+{
+    if(!object.spPr)
+    {
+        object.setSpPr(new CSpPr());
+        object.spPr.setParent(object);
+    }
+    if(!object.spPr.xfrm)
+    {
+        object.spPr.setXfrm(new CXfrm());
+        object.spPr.xfrm.setParent(object.spPr);
+        object.spPr.xfrm.setOffX(object.x);
+        object.spPr.xfrm.setOffY(object.y);
+        object.spPr.xfrm.setExtX(object.extX);
+        object.spPr.xfrm.setExtY(object.extY);
+    }
+
+}
+
 function CreateBlipFillUniFillFromUrl(url)
 {
     var ret = new CUniFill();
@@ -87,7 +106,7 @@ DrawingObjectsController.prototype =
     {
         if(this.selection.groupSelection)
         {
-            this.selection.groupSelection.resetSelection();
+            this.selection.groupSelection.resetSelection(this);
             this.selection.groupSelection = null;
         }
         if(this.selection.textSelection)
@@ -1162,6 +1181,8 @@ DrawingObjectsController.prototype =
 
     },
 
+
+
     applyDrawingProps: function(props)
     {
         var objects_by_type = this.getSelectedObjectsByTypes();
@@ -1225,7 +1246,7 @@ DrawingObjectsController.prototype =
         {
             for(i = 0; i < objects_by_type.images.length; ++i)
             {
-                objects_by_type.images[i].setBlipFill(CreateBlipFillUniFillFromUrl(props.ImageUrl));
+                objects_by_type.images[i].setBlipFill(CreateBlipFillUniFillFromUrl(props.ImageUrl).fill);
             }
         }
         if(isRealNumber(props.Width) && isRealNumber(props.Height))
@@ -1233,16 +1254,19 @@ DrawingObjectsController.prototype =
             //Todo: может отсутствовать spPr и xfrm
             for(i = 0; i < objects_by_type.shapes.length; ++i)
             {
+                CheckSpPrXfrm(objects_by_type.shapes[i]);
                 objects_by_type.shapes[i].spPr.xfrm.setExtX(props.Width);
                 objects_by_type.shapes[i].spPr.xfrm.setExtY(props.Height);
             }
             for(i = 0; i < objects_by_type.images.length; ++i)
             {
+                CheckSpPrXfrm(objects_by_type.images[i]);
                 objects_by_type.images[i].spPr.xfrm.setExtX(props.Width);
                 objects_by_type.images[i].spPr.xfrm.setExtY(props.Height);
             }
             for(i = 0; i < objects_by_type.charts.length; ++i)
             {
+                CheckSpPrXfrm(objects_by_type.charts[i]);
                 objects_by_type.charts[i].spPr.xfrm.setExtX(props.Width);
                 objects_by_type.charts[i].spPr.xfrm.setExtY(props.Height);
             }
@@ -1251,6 +1275,7 @@ DrawingObjectsController.prototype =
                 this.selection.groupSelection.updateCoordinatesAfterInternalResize();
             }
         }
+        return objects_by_type;
     },
 
     getSelectedObjectsByTypes: function()

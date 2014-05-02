@@ -7336,21 +7336,12 @@ CErrorData.prototype.get_Value = function() { return this.Value; };
 //test
 
 // Вставка диаграмм
-asc_docs_api.prototype.asc_getChartObject = function()
+asc_docs_api.prototype.asc_getChartObject = function(type, subtype)
 {	
 	this.isChartEditor = true;		// Для совместного редактирования
 
-	var oColor, oNewColor;
-	var graphicObject = this.WordControl.m_oLogicDocument.Get_ChartObject();
-	for (var i = 0; i < this.WordControl.m_oDrawingDocument.GuiControlColorsMap.length; i++) {
-		oColor = this.WordControl.m_oDrawingDocument.GuiControlColorsMap[i];
-		oNewColor = new CRGBColor();
-		oNewColor.RGBA.R = oColor.r;
-		oNewColor.RGBA.G = oColor.g;
-		oNewColor.RGBA.B = oColor.b;
-		graphicObject.chart.themeColors.push(oNewColor);
-	}
-    return graphicObject;
+
+    return this.WordControl.m_oLogicDocument.Get_ChartObject(type, subtype);
 }
 
 asc_docs_api.prototype.asc_addChartDrawingObject = function(options)

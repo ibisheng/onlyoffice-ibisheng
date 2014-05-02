@@ -1286,6 +1286,8 @@ SplineBezierState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
     {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+            return {objectId: null, bMarker: true};
         this.drawingObjects.startTrackPos = {x: x, y: y, pageIndex: pageIndex};
         this.drawingObjects.clearTrackObjects();
         this.drawingObjects.addTrackObject(new Spline(this.drawingObjects, this.drawingObjects.document.theme, null, null, null, pageIndex));
@@ -1320,6 +1322,8 @@ SplineBezierState33.prototype =
 
     onMouseDown: function(e, x, y, pageIndex)
     {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+            return {objectId: null, bMarker: true};
     },
 
     onMouseMove: function(e, x, y, pageIndex)
@@ -1362,6 +1366,8 @@ SplineBezierState2.prototype =
 
     onMouseDown: function(e, x, y, pageIndex)
     {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+            return {objectId: null, bMarker: true};
         if(e.ClickCount >= 2)
         {
             this.bStart = true;
@@ -1424,6 +1430,8 @@ SplineBezierState3.prototype =
 
     onMouseDown: function(e, x, y, pageIndex)
     {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+            return {objectId: null, bMarker: true};
         if(e.ClickCount >= 2)
         {
             this.bStart = true;
@@ -1509,6 +1517,8 @@ SplineBezierState4.prototype =
 
     onMouseDown: function(e, x, y, pageIndex)
     {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+            return {objectId: null, bMarker: true};
         if(e.ClickCount >= 2)
         {
             this.bStart = true;
@@ -1620,6 +1630,8 @@ SplineBezierState5.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
     {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+            return {objectId: null, bMarker: true};
         if(e.ClickCount >= 2)
         {
             this.bStart = true;

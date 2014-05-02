@@ -256,10 +256,12 @@ function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
         }
         else
         {
+            shape.setWordShape(true);
             shape.spPr.xfrm.setOffX(0);
             shape.spPr.xfrm.setOffY(0);
         }
-        shape.spPr.xfrm.setExtX(xMax-xMin, yMax - yMin);
+        shape.spPr.xfrm.setExtX(xMax-xMin);
+        shape.spPr.xfrm.setExtY(yMax - yMin);
         shape.setStyle(CreateDefaultShapeStyle());
 
         var geometry = new Geometry();
@@ -291,6 +293,7 @@ function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
             geometry.AddPathCommand(6);
         }
         shape.spPr.setGeometry(geometry);
+        shape.setBDeleted(false);
         shape.recalculate();
         return shape;
     };

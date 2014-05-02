@@ -131,6 +131,7 @@ CChartSpace.prototype.handleUpdateExtents = function()
 {
     this.recalcChart();
     this.recalcBounds();
+    this.recalcTransform();
     this.recalcDLbls();
     this.recalcWrapPolygon();
     this.setRecalculateInfo();
@@ -169,6 +170,7 @@ CChartSpace.prototype.recalculateChart = function()
 };
 CChartSpace.prototype.canResize = CShape.prototype.canResize;
 CChartSpace.prototype.canMove = CShape.prototype.canMove;
+CChartSpace.prototype.setStartPage = CShape.prototype.setStartPage;
 CChartSpace.prototype.canRotate = function()
 {
     return false;

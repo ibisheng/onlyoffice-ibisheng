@@ -60,9 +60,9 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
 
 
     }
-    if(presetGeom.indexOf("WithTwoArrow") > -1)
+    if(presetGeom.indexOf("WithTwoArrows") > -1)
     {
-        presetGeom = presetGeom.substr(0, presetGeom.length - 12);
+        presetGeom = presetGeom.substr(0, presetGeom.length - 13);
         this.presetGeom = presetGeom;
         this.arrowsCount = 2;
     }

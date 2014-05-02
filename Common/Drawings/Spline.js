@@ -285,6 +285,7 @@ function Spline(drawingObjects)
             geometry.AddPathCommand(6);
         }
         shape.setGeometry(geometry);
+        shape.setBDeleted(false);
         return shape;
     };
 

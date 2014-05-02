@@ -3,6 +3,7 @@ CGroupShape.prototype.addToRecalculate = CShape.prototype.addToRecalculate;
 
 
 CGroupShape.prototype.Get_Theme = CShape.prototype.Get_Theme;
+CGroupShape.prototype.setStartPage = CShape.prototype.setStartPage;
 CGroupShape.prototype.Get_ColorMap = CShape.prototype.Get_ColorMap;
 CGroupShape.prototype.setRecalculateInfo = function()
 {

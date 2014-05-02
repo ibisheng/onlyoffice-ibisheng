@@ -114,8 +114,28 @@ CGraphicObjects.prototype =
 
     getChartSpace: function(chart, options)
     {
-        var ret = DrawingObjectsController.prototype.getChartSpace.call(this, chart,options);
-        ret.setBDeleted(false);
+        var ret = null;
+         if(isRealObject(chart) && typeof chart["binary"] === "string" && chart["binary"].length > 0)
+        {
+            var asc_chart_binary = new Asc.asc_CChartBinary();
+            asc_chart_binary.asc_setBinary(chart["binary"]);
+            ret = asc_chart_binary.getChartSpace(this.document);
+            ret.setBDeleted(false);
+        }
+        else if(isRealObject(chart))
+         {
+             var ret = DrawingObjectsController.prototype.getChartSpace.call(this, chart,options);
+             ret.setBDeleted(false);
+             ret.setStyle(2);
+             ret.setSpPr(new CSpPr());
+             ret.spPr.setParent(Image);
+             ret.spPr.setXfrm(new CXfrm());
+             ret.spPr.xfrm.setParent(Image.spPr);
+             ret.spPr.xfrm.setOffX(0);
+             ret.spPr.xfrm.setOffY(0);
+             ret.spPr.xfrm.setExtX(152);
+             ret.spPr.xfrm.setExtY(89);
+         }
         return ret;
     },
 
@@ -254,7 +274,7 @@ CGraphicObjects.prototype =
             {
                 shape_props = new CImgProperty(para_drawing_props);
                 shape_props.ShapeProperties = CreateAscShapePropFromProp(props_by_types.shapeProps);
-                shape_props.fromGroup = (this.selection.groupSelection ? true : false);
+                //shape_props.fromGroup = (this.selection.groupSelection ? true : false);
                 shape_props.verticalTextAlign = props_by_types.shapeProps.verticalTextAlign;
                 shape_props.Width = props_by_types.shapeProps.w;
                 shape_props.Height = props_by_types.shapeProps.h;
@@ -263,7 +283,7 @@ CGraphicObjects.prototype =
             {
                 image_props = new CImgProperty(para_drawing_props);
                 image_props.ImageUrl = props_by_types.imageProps.imageUrl;
-                image_props.fromGroup = (this.selection.groupSelection ? true : false);
+                //image_props.fromGroup = (this.selection.groupSelection ? true : false);
                 image_props.Width = props_by_types.imageProps.w;
                 image_props.Height = props_by_types.imageProps.h;
             }
@@ -352,7 +372,61 @@ CGraphicObjects.prototype =
             {
                 this.selectedObjects[i].parent.Set_Props(props);
             }
-            this.applyDrawingProps(props.ShapeProperties ? props.ShapeProperties : props);
+            var apply_props;
+            if(isRealNumber(props.Width) && isRealNumber(props.Height))
+            {
+                apply_props = props;
+            }
+            else
+            {
+                apply_props = props.ShapeProperties ? props.ShapeProperties : props;
+            }
+            var objects_by_types = this.applyDrawingProps(apply_props);
+            if(isRealNumber(apply_props.Width) && isRealNumber(apply_props.Height))
+            {
+                for(i = 0; i < objects_by_types.shapes.length; ++i)
+                {
+                    objects_by_types.shapes[i].recalculate();
+                    objects_by_types.shapes[i].recalculateText();
+                }
+                for(i = 0; i < objects_by_types.images.length; ++i)
+                {
+                    objects_by_types.images[i].recalculate();
+                }
+
+                for(i = 0; i < objects_by_types.charts.length; ++i)
+                {
+                    objects_by_types.charts[i].recalculate();
+                }
+                for(i = 0; i < objects_by_types.groups.length; ++i)
+                {
+                    objects_by_types.groups[i].recalculate();
+                }
+                if(!(this.selectedObjects.length === 1 && this.selectedObjects[0].parent.Is_Inline()))
+                {
+                    var a_objects = [], nearest_pos;
+                    for(i = 0; i < this.selectedObjects.length; ++i)
+                    {
+                        nearest_pos = this.document.Get_NearestPos(this.selectedObjects[i].parent.PageNum, this.selectedObjects[i].bounds.x + this.selectedObjects[i].posX, this.selectedObjects[i].bounds.y + this.selectedObjects[i].posY, true, this.selectedObjects[i].parent);
+                        a_objects.push(
+                            {
+                                nearestPos: nearest_pos,
+                                pageNum: this.selectedObjects[i].parent.PageNum,
+                                drawing: this.selectedObjects[i].parent,
+                                par: this.selectedObjects[i].parent.Get_ParentParagraph()
+                            });
+                    }
+                    for(i = 0; i < this.selectedObjects.length; ++i)
+                    {
+                        this.selectedObjects[i].parent.Remove_FromDocument(false);
+                        this.selectedObjects[i].parent.Set_XYForAdd(this.selectedObjects[i].bounds.x + this.selectedObjects[i].posX, this.selectedObjects[i].bounds.y + this.selectedObjects[i].posY, a_objects[i].nearestPos, a_objects[i].pageNum);
+                    }
+                    for(i = 0; i < a_objects.length; ++i)
+                    {
+                        a_objects[i].drawing.Add_ToDocument2(a_objects[i].par);
+                    }
+                }
+            }
         }
         this.document.Recalculate();
     },
@@ -445,27 +519,44 @@ CGraphicObjects.prototype =
     {
     },
 
-    getChartObject: function()
+    getChartObject: function(type, subtype)
     {
-        //TODO
-        var selected_arr = this.selectionInfo.selectionArray;
-        for(var  i = 0;  i < selected_arr.length; ++i)
-        {
-            if(selected_arr[i].GraphicObj.chart != null)
-                return selected_arr[i].GraphicObj;
-        }
 
-        var ret = new CChartAsGroup();
-        g_oTableId.m_bTurnOff = true;
-        ret.setAscChart(new asc_CChart());
-        g_oTableId.m_bTurnOff = false;
-        ret.chart.initDefault();
-        ret.setChart(ret.chart);
-        ret.spPr.xfrm.offX = 0;
-        ret.spPr.xfrm.offY = 0;
-        ret.spPr.xfrm.extX = this.drawingDocument.GetMMPerDot(c_oAscChartDefines.defaultChartWidth);
-        ret.spPr.xfrm.extY = this.drawingDocument.GetMMPerDot(c_oAscChartDefines.defaultChartHeight);
-        return ret;
+        if(typeof type === "string" && type.length > 0)
+        {
+            return ExecuteNoHistory(function()
+            {
+                var asc_chart = new asc_CChart();
+                asc_chart.initDefault();
+                asc_chart.type = type;
+                asc_chart.subType = subtype;
+                var ret = this.getChartSpace(asc_chart);
+                if(!ret)
+                {
+                    asc_chart.type = "Bar";
+                    asc_chart.subType = "normal";
+                    ret = this.getChartSpace(asc_chart);
+                }
+                CheckSpPrXfrm(ret);
+                ret.spPr.xfrm.setOffX(0);
+                ret.spPr.xfrm.setOffY(0);
+                return ret;
+            }, this, [])
+        }
+        else
+        {
+            if(this.selection.groupSelection)
+            {
+                if(this.selection.groupSelection.selectedObjects.length === 1 && this.selection.groupSelection.selectedObjects[0].getObjectType() === historyitem_type_ChartSpace)
+                    return this.selection.groupSelection.selectedObjects[0];
+            }
+            else
+            {
+                if(this.selectedObjects.length === 1 && this.selectedObjects[0].getObjectType() === historyitem_type_ChartSpace)
+                    return this.selectedObjects[0];
+            }
+        }
+        return null;
     },
 
 
