@@ -46,6 +46,88 @@ CGraphicPage.prototype =
         }
         this.flowTables.push(table);
     },
+
+    addObject: function(object)
+    {
+        var array_type = object.parent.getDrawingArrayType();
+        var drawing_array, need_sort = true;
+        switch(array_type)
+        {
+            case DRAWING_ARRAY_TYPE_INLINE:
+            {
+                drawing_array = this.inlineObjects;
+                need_sort = false;
+                break;
+            }
+            case DRAWING_ARRAY_TYPE_BEHIND:
+            {
+                drawing_array  = this.behindDocObjects;
+                break;
+            }
+            case DRAWING_ARRAY_TYPE_BEFORE:
+            {
+                drawing_array = this.beforeTextObjects;
+                break;
+            }
+            case DRAWING_ARRAY_TYPE_WRAPPING:
+            {
+                drawing_array = this.wrappingObjects;
+                break;
+            }
+        }
+        if(Array.isArray(drawing_array))
+        {
+            for(var i = 0; i < drawing_array.length; ++i)
+            {
+                if(drawing_array[i] === object)
+                {
+                    break;
+                }
+            }
+            if(i === drawing_array.length)
+            {
+                drawing_array.push(object);
+                if(need_sort)
+                {
+                    drawing_array.sort(ComparisonByZIndexSimpleParent);
+                }
+            }
+        }
+    },
+
+    concatPage: function(page)
+    {
+        this.inlineObjects = this.inlineObjects.concat(page.inlineObjects);
+        this.behindDocObjects = this.behindDocObjects.concat(page.behindDocObjects);
+        this.wrappingObjects = this.wrappingObjects.concat(page.wrappingObjects);
+        this.beforeTextObjects = this.beforeTextObjects.concat(page.beforeTextObjects);
+        this.flowTables = this.flowTables.concat(page.flowTables);
+    },
+
+    mergePages: function(page1, page2)
+    {
+        if(page1)
+        {
+            this.concatPage(page1);
+        }
+        if(page2)
+        {
+            this.concatPage(page2);
+        }
+        this.behindDocObjects.sort(ComparisonByZIndexSimpleParent);
+        this.wrappingObjects.sort(ComparisonByZIndexSimpleParent);
+        this.beforeTextObjects.sort(ComparisonByZIndexSimpleParent);
+    },
+
+    clear: function()
+    {
+        this.inlineObjects = [];
+        this.behindDocObjects = [];
+        this.wrappingObjects = [];
+        this.beforeTextObjects = [];
+        this.flowTables = [];
+    },
+
     CheckRange: function(X0, Y0, X1, Y1, Y0sp, Y1Ssp, LeftField, RightField, HdrFtrRanges, docContent)
     {
         return this.wrapManager.checkRanges(X0, Y0, X1, Y1, Y0sp, Y1Ssp, LeftField, RightField, HdrFtrRanges, docContent);
@@ -249,14 +331,6 @@ CGraphicPage.prototype =
                 findInArrayAndRemove(drawingPage.beforeTextObjects, docContent, document);
                 findTableInArrayAndRemove(drawingPage.flowTables, docContent, document);
             }
-            else if(Array.isArray(drawingPage.inlineArray))
-            {
-                findInArrayAndRemove(drawingPage.inlineArray, docContent, document);
-                findInArrayAndRemove(drawingPage.behindDocArray, docContent, document);
-                findInArrayAndRemove(drawingPage.wrappingArray, docContent, document);
-                findInArrayAndRemove(drawingPage.beforeTextArray, docContent, document);
-                findTableInArrayAndRemove(drawingPage.floatTables, docContent, document);
-            }
         }
 
         if(!isRealObject(docContent))
@@ -264,6 +338,7 @@ CGraphicPage.prototype =
 
         findInArrayAndRemoveFromDrawingPage(this, docContent, editor.WordControl.m_oLogicDocument);
     },
+
 
     draw: function(graphics)
     {

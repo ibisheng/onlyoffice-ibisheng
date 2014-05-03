@@ -562,17 +562,18 @@ CGraphicObjects.prototype =
 
     addFloatTable: function(table)
     {
-        if(!this.graphicPages[table.PageNum + table.PageController])
+        var hdr_ftr = table.Table.Parent.Is_HdrFtr(true);
+        if(!hdr_ftr)
         {
-            this.graphicPages[table.PageNum + table.PageController] = new CGraphicPage(table.PageNum + table.PageController, this);
-        }
-        if(!table.Table.Parent.Is_HdrFtr())
-        {
-            this.graphicPages[table.PageNum + table.PageController].addFloatTable(table);
+            if(!this.graphicPages[table.PageNum + table.PageController])
+            {
+                this.graphicPages[table.PageNum + table.PageController] = new CGraphicPage(table.PageNum + table.PageController, this);
+            }
+            this.graphicPages[table.PageNum + table.PageController].hdrFtrPage.addFloatTable(table);
         }
         else
         {
-            this.graphicPages[table.PageNum + table.PageController].hdrFtrPage.addFloatTable(table);
+            hdr_ftr.DrawingPage.addFloatTable(table);
         }
     },
 
@@ -583,11 +584,17 @@ CGraphicObjects.prototype =
             this.graphicPages[pageIndex] = new CGraphicPage(pageIndex, this);
         }
         var table = g_oTableId.Get_ById(id);
-        if(!table.Parent.Is_HdrFtr())
-            this.graphicPages[pageIndex].removeFloatTableById(id);
-        else
+        if(table)
         {
-            this.graphicPages[pageIndex].hdrFtrPage.removeFloatTableById(id);
+            var hdr_ftr = table.Parent.Is_HdrFtr(true);
+            if(!hdr_ftr)
+            {
+                this.graphicPages[pageIndex].removeFloatTableById(id);
+            }
+            else
+            {
+                hdr_ftr.DrawingPage.removeFloatTableById(id);
+            }
         }
     },
 
@@ -874,15 +881,29 @@ CGraphicObjects.prototype =
 
     resetDrawingArrays : function(pageIndex, docContent)
     {
-        if(isRealObject(this.graphicPages[pageIndex]))
+        var hdr_ftr = docContent.Is_HdrFtr(true);
+        if(!hdr_ftr)
         {
-
-            if(!docContent || !docContent.Is_HdrFtr())
+            if(isRealObject(this.graphicPages[pageIndex]))
+            {
                 this.graphicPages[pageIndex].resetDrawingArrays(docContent);
-            else
-                this.graphicPages[pageIndex].hdrFtrPage.resetDrawingArrays(docContent);
+            }
+        }
+        else
+        {
+            hdr_ftr.DrawingPage.resetDrawingArrays(docContent);
         }
     },
+
+    mergeHdrFtrPages: function(page1, page2, pageIndex)
+    {
+        if(!isRealObject(this.graphicPages[pageIndex]))
+            this.graphicPages[pageIndex] = new CGraphicPage(pageIndex, this);
+        this.graphicPages[pageIndex].hdrFtrPage.clear();
+        this.graphicPages[pageIndex].hdrFtrPage.mergePages(page1, page2);
+    },
+
+
 
     onEndRecalculateDocument: function(pagesCount)
     {
@@ -1767,46 +1788,23 @@ CGraphicObjects.prototype =
 
     addObjectOnPage: function(pageIndex, object)
     {
-        if(!this.graphicPages[pageIndex])
+        var hdr_ftr = object.parent.DocumentContent.Is_HdrFtr(true);
+        if(!hdr_ftr)
         {
-            this.graphicPages[pageIndex] = new CGraphicPage(pageIndex, this);
-            for(var z = 0; z < pageIndex; ++z)
+            if(!this.graphicPages[pageIndex])
             {
-                if(!this.graphicPages[z])
-                    this.graphicPages[z] = new CGraphicPage(z, this);
+                this.graphicPages[pageIndex] = new CGraphicPage(pageIndex, this);
+                for(var z = 0; z < pageIndex; ++z)
+                {
+                    if(!this.graphicPages[z])
+                        this.graphicPages[z] = new CGraphicPage(z, this);
+                }
             }
+            this.graphicPages[pageIndex].addObject(object);
         }
-        var page;
-        if(!object.parent.DocumentContent.Is_HdrFtr())
-            page = this.graphicPages[pageIndex];
         else
-            page = this.graphicPages[pageIndex].hdrFtrPage;
-        var array_type = object.parent.getDrawingArrayType();
-        switch(array_type)
         {
-            case DRAWING_ARRAY_TYPE_INLINE:
-            {
-                page.inlineObjects.push(object);
-                break;
-            }
-            case DRAWING_ARRAY_TYPE_BEHIND:
-            {
-                page.behindDocObjects.push(object);
-                page.behindDocObjects.sort(ComparisonByZIndexSimpleParent);
-                break;
-            }
-            case DRAWING_ARRAY_TYPE_BEFORE:
-            {
-                page.beforeTextObjects.push(object);
-                page.beforeTextObjects.sort(ComparisonByZIndexSimpleParent);
-                break;
-            }
-            case DRAWING_ARRAY_TYPE_WRAPPING:
-            {
-                page.wrappingObjects.push(object);
-                page.wrappingObjects.sort(ComparisonByZIndexSimpleParent);
-                break;
-            }
+            hdr_ftr.DrawingPage.addObject(object);
         }
     },
 
@@ -2529,14 +2527,11 @@ CGraphicObjects.prototype =
         if(isRealObject(object))
         {
             var hdr_ftr = object.DocumentContent.Is_HdrFtr(true);
-            //for(var i = 0; i < this.graphicPages.length; ++i)
+            var page = !hdr_ftr ? this.graphicPages[pageIndex] : hdr_ftr.DrawingPage;
+            if(isRealObject(page))
             {
-                var page = !hdr_ftr ? this.graphicPages[pageIndex] : this.graphicPages[pageIndex] && this.graphicPages[pageIndex].hdrFtrPage;
-                if(isRealObject(page))
-                {
-                    var array_type = object.getDrawingArrayType();
-                    page.delObjectById(id, array_type);
-                }
+                var array_type = object.getDrawingArrayType();
+                page.delObjectById(id, array_type);
             }
         }
     },

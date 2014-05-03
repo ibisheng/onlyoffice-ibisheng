@@ -1877,10 +1877,7 @@ CDocument.prototype =
         if ( section_borders_ZOrderBack === SectPr.Get_Borders_ZOrder() )
             this.Draw_Borders(pGraphics, SectPr);
 
-        this.DrawingObjects.drawBehindDocHdrFtr( nPageIndex, pGraphics );
-        this.DrawingObjects.drawWrappingObjectsHdrFtr( nPageIndex, pGraphics );
         this.HdrFtr.Draw( nPageIndex, pGraphics );
-        this.DrawingObjects.drawBeforeObjectsHdrFtr( nPageIndex, pGraphics );
 
         // Рисуем содержимое документа на данной странице
         if ( docpostype_HdrFtr === this.CurPos.Type )

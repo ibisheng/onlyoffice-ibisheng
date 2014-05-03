@@ -47,6 +47,7 @@ function CHeaderFooter(Parent, LogicDocument, DrawingDocument, Type)
         NeedRecalc    : {}, // Объект с ключом - номером страницы, нужно ли пересчитывать данную страницу
         SectPr        : {}  // Объект с ключом - номером страницы и полем - ссылкой на секцию
     };
+    this.DrawingPage = new CGraphicPage(0, null);
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -145,7 +146,7 @@ CHeaderFooter.prototype =
         // Если у нас до этого был какой-то пересчет, тогда сравним его с текущим.
         // 1. Сравним границы: у верхнего колонтитула смотрим на изменение нижней границы, а нижнего - верхней
         // 2. Сравним положение и размер Flow-объектов
-        
+
         if ( false === bChanges )
         {
             var NewBounds = this.Content.Get_PageBounds( 0 );
@@ -215,7 +216,7 @@ CHeaderFooter.prototype =
             var RecalcObj = this.RecalcInfo.RecalcObj[this.RecalcInfo.CurPage];
             this.Content.Load_RecalculateObject( RecalcObj );
         }
-        
+
         return bChanges;
     },
     
@@ -1234,6 +1235,8 @@ CHeaderFooterController.prototype =
             return this.CurHdrFtr.RecalculateCurPos();
     },
 
+
+
     Recalculate : function(PageIndex)    
     {
         // Определим четность страницы и является ли она первой в данной секции. Заметим, что четность страницы 
@@ -1253,10 +1256,6 @@ CHeaderFooterController.prototype =
         this.Pages[PageIndex] = new CHdrFtrPage();
         this.Pages[PageIndex].Header = Header;
         this.Pages[PageIndex].Footer = Footer;
-        if(this.LogicDocument.DrawingObjects.graphicPages[PageIndex])
-        {
-            this.LogicDocument.DrawingObjects.graphicPages[PageIndex].hdrFtrPage.resetDrawingArrays(this.LogicDocument);
-        }
         var X, XLimit;
         
         var Orient = SectPr.Get_Orientation();
@@ -1286,7 +1285,7 @@ CHeaderFooterController.prototype =
             }
             else 
             {
-                if ( -1 === Header.RecalcInfo.CurPage )
+               if ( -1 === Header.RecalcInfo.CurPage )
                     Header.Set_Page(PageIndex);
             }
         }
@@ -1319,7 +1318,7 @@ CHeaderFooterController.prototype =
                     Footer.Set_Page(PageIndex);
             }
         }
-        
+
         if ( true === bRecalcHeader || true === bRecalcFooter )
             return true;
         
@@ -1331,12 +1330,19 @@ CHeaderFooterController.prototype =
     {
         var Header = this.Pages[nPageIndex].Header;
         var Footer = this.Pages[nPageIndex].Footer;
-        
+
+        this.LogicDocument.DrawingObjects.mergeHdrFtrPages(Header && Header.DrawingPage, Footer && Footer.DrawingPage, nPageIndex);
+        this.LogicDocument.DrawingObjects.drawBehindDocHdrFtr( nPageIndex, pGraphics );
+        this.LogicDocument.DrawingObjects.drawWrappingObjectsHdrFtr( nPageIndex, pGraphics );
+
         if ( null !== Header )
             Header.Draw( nPageIndex, pGraphics );
 
         if ( null !== Footer )
             Footer.Draw( nPageIndex, pGraphics );
+
+
+        this.LogicDocument.DrawingObjects.drawBeforeObjectsHdrFtr( nPageIndex, pGraphics );
     },
 
     CheckRange : function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageIndex)
