@@ -673,6 +673,14 @@ var EThemeColor = {
 	themecolorText1: 15,
 	themecolorText2: 16
 };
+var EWrap = {
+	wrapAround: 0,
+	wrapAuto: 1,
+	wrapNone: 2,
+	wrapNotBeside: 3,
+	wrapThrough: 4,
+	wrapTight: 5
+};
 
 var g_sErrorCharCountMessage = "g_sErrorCharCountMessage";
 var g_nErrorCharCount = 30000;
@@ -1382,9 +1390,18 @@ function Binary_pPrWriter(memory, oNumIdMap, oBinaryHeaderFooterTableWriter)
         }
 		if(null != oFramePr.Wrap)
         {
+			var nFormatWrap = EWrap.None;
+			switch(oFramePr.Wrap){
+				case wrap_Around: nFormatWrap = EWrap.wrapAround;break;
+				case wrap_Auto: nFormatWrap = EWrap.wrapAuto;break;
+				case wrap_None: nFormatWrap = EWrap.wrapNone;break;
+				case wrap_NotBeside: nFormatWrap = EWrap.wrapNotBeside;break;
+				case wrap_Through: nFormatWrap = EWrap.wrapThrough;break;
+				case wrap_Tight: nFormatWrap = EWrap.wrapTight;break;
+			}
             this.memory.WriteByte(c_oSer_FramePrType.Wrap);
             this.memory.WriteByte(c_oSerPropLenType.Byte);
-            this.memory.WriteByte(oFramePr.Wrap - 1);//todo
+            this.memory.WriteByte(nFormatWrap);
         }
 		if(null != oFramePr.X)
         {
@@ -6056,8 +6073,18 @@ function Binary_pPrReader(doc, oReadResult, stream)
             oFramePr.VSpace = g_dKoef_twips_to_mm * this.stream.GetULongLE();
 		else if(c_oSer_FramePrType.W == type)
             oFramePr.W = g_dKoef_twips_to_mm * this.stream.GetULongLE();
-		else if(c_oSer_FramePrType.Wrap == type)
-            oFramePr.Wrap = this.stream.GetUChar() + 1;//todo
+		else if(c_oSer_FramePrType.Wrap == type){
+			var nEditorWrap = wrap_None;
+			switch(this.stream.GetUChar()){
+				case EWrap.wrapAround: nEditorWrap = wrap_Around;break;
+				case EWrap.wrapAuto: nEditorWrap = wrap_Auto;break;
+				case EWrap.wrapNone: nEditorWrap = wrap_None;break;
+				case EWrap.wrapNotBeside: nEditorWrap = wrap_NotBeside;break;
+				case EWrap.wrapThrough: nEditorWrap = wrap_Through;break;
+				case EWrap.wrapTight: nEditorWrap = wrap_Tight;break;
+			}
+			oFramePr.Wrap = nEditorWrap;
+		}
 		else if(c_oSer_FramePrType.X == type)
             oFramePr.X = g_dKoef_twips_to_mm * this.stream.GetULongLE();
 		else if(c_oSer_FramePrType.XAlign == type)
