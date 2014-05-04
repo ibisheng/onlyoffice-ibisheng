@@ -1580,6 +1580,7 @@ function Binary_rPrWriter(memory)
     this.bs = new BinaryCommonWriter(this.memory);
     this.Write_rPr = function(rPr)
     {
+		var _this = this;
         //Bold
         if(null != rPr.Bold)
         {
@@ -1660,7 +1661,7 @@ function Binary_rPrWriter(memory)
             this.memory.WriteLong(rPr.FontSize * 2);
         }
         //Color
-        if(null != rPr.Color)
+        if(null != rPr.Color && !rPr.Color.Auto)
         {
             this.bs.WriteColor(c_oSerProp_rPrType.Color, rPr.Color);
         }
@@ -1783,6 +1784,12 @@ function Binary_rPrWriter(memory)
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
 				this.memory.WriteString2(g_oLcidIdToNameMap[rPr.Lang.EastAsia]);
 			}
+		}
+		if(null != rPr.Unifill || (null != rPr.Color && rPr.Color.Auto))
+		{
+			this.memory.WriteByte(c_oSerProp_rPrType.ColorTheme);
+            this.memory.WriteByte(c_oSerPropLenType.Variable);
+            this.bs.WriteItemWithLength(function(){_this.bs.WriteColorTheme(rPr.Unifill, rPr.Color);});
 		}
     };
 };
@@ -5894,9 +5901,9 @@ function Binary_pPrReader(doc, oReadResult, stream)
     this.NormalizeBorder = function(border)
     {
         if(null == border.Color)
-            border.Color = new CDocumentColor(0, 0, 0);
+            border.Color = new CDocumentColor(0, 0, 0, true);
         else
-            border.Color = new CDocumentColor(border.Color.r, border.Color.g, border.Color.b);
+            border.Color = new CDocumentColor(border.Color.r, border.Color.g, border.Color.b, border.Color.Auto);
         if(null == border.Space)
             border.Space = 0;
         if(null == border.Size)

@@ -121,9 +121,10 @@ BinaryCommonWriter.prototype.WriteItemWithLengthEnd = function(nStart)
 };
 BinaryCommonWriter.prototype.WriteBorder = function(border)
 {
+	var _this = this;
     if(border_None != border.Value)
     {
-        if(null != border.Color)
+        if(null != border.Color && !border.Color.Auto)
             this.WriteColor(c_oSerBorderType.Color, border.Color);
         if(null != border.Space)
         {
@@ -136,6 +137,12 @@ BinaryCommonWriter.prototype.WriteBorder = function(border)
             this.memory.WriteByte(c_oSerBorderType.Size);
             this.memory.WriteByte(c_oSerPropLenType.Double);
             this.memory.WriteDouble(border.Size);
+        }
+		if(null != border.Unifill || (null != border.Color && border.Color.Auto))
+        {
+			this.memory.WriteByte(c_oSerBorderType.ColorTheme);
+			this.memory.WriteByte(c_oSerPropLenType.Variable);
+			this.WriteItemWithLength(function(){_this.WriteColorTheme(border.Unifill, border.Color);});
         }
     }
     if(null != border.Value)
@@ -180,6 +187,7 @@ BinaryCommonWriter.prototype.WriteColor = function(type, color)
 };
 BinaryCommonWriter.prototype.WriteShd = function(Shd)
 {
+	var _this = this;
     //Value
     if(null != Shd.Value)
     {
@@ -188,9 +196,15 @@ BinaryCommonWriter.prototype.WriteShd = function(Shd)
         this.memory.WriteByte(Shd.Value);
     }
     //Value
-    if(null != Shd.Color)
+    if(null != Shd.Color && !Shd.Color.Auto)
     {
         this.WriteColor(c_oSerShdType.Color, Shd.Color);
+    }
+	if(null != Shd.Unifill || (null != Shd.Color && Shd.Color.Auto))
+    {
+		this.memory.WriteByte(c_oSerShdType.ColorTheme);
+		this.memory.WriteByte(c_oSerPropLenType.Variable);
+		this.WriteItemWithLength(function(){_this.WriteColorTheme(Shd.Unifill, Shd.Color);});
     }
 };
 BinaryCommonWriter.prototype.WritePaddings = function(Paddings)
@@ -246,6 +260,56 @@ BinaryCommonWriter.prototype.WriteColorSpreadsheet = function(color)
 		this.memory.WriteByte(c_oSer_ColorObjectType.Rgb);
 		this.memory.WriteByte(c_oSerPropLenType.Long);
 		this.memory.WriteLong(color.getRgb());
+	}
+};
+BinaryCommonWriter.prototype.WriteColorTheme = function(unifill, color)
+{
+	if(null != color && color.Auto){
+		this.memory.WriteByte(c_oSer_ColorThemeType.Auto);
+		this.memory.WriteByte(c_oSerPropLenType.Null);
+	}
+	if(null != unifill && null != unifill.fill && null != unifill.fill.color){
+		var uniColor = unifill.fill.color;
+		if(null != uniColor.color){
+			var nFormatId = EThemeColor.themecolorNone;
+			switch(uniColor.color.id){
+				case 0: nFormatId = EThemeColor.themecolorAccent1;break;
+				case 1: nFormatId = EThemeColor.themecolorAccent2;break;
+				case 2: nFormatId = EThemeColor.themecolorAccent3;break;
+				case 3: nFormatId = EThemeColor.themecolorAccent4;break;
+				case 4: nFormatId = EThemeColor.themecolorAccent5;break;
+				case 5: nFormatId = EThemeColor.themecolorAccent6;break;
+				case 6: nFormatId = EThemeColor.themecolorBackground1;break;
+				case 7: nFormatId = EThemeColor.themecolorBackground2;break;
+				case 8: nFormatId = EThemeColor.themecolorDark1;break;
+				case 9: nFormatId = EThemeColor.themecolorDark2;break;
+				case 10: nFormatId = EThemeColor.themecolorFollowedHyperlink;break;
+				case 11: nFormatId = EThemeColor.themecolorHyperlink;break;
+				case 12: nFormatId = EThemeColor.themecolorLight1;break;
+				case 13: nFormatId = EThemeColor.themecolorLight2;break;
+				case 14: nFormatId = EThemeColor.themecolorNone;break;
+				case 15: nFormatId = ThemeColor.themecolorText1;break;
+				case 16: nFormatId = EThemeColor.themecolorText2;break;
+			}
+			this.memory.WriteByte(c_oSer_ColorThemeType.Color);
+			this.memory.WriteByte(c_oSerPropLenType.Byte);
+			this.memory.WriteByte(nFormatId);
+		}
+		if(null != uniColor.Mods){
+			for(var i = 0, length = uniColor.Mods.Mods.length; i < length; ++i){
+				var mod = uniColor.Mods.Mods[i];
+				if("tint" == mod.name){
+					this.memory.WriteByte(c_oSer_ColorThemeType.Tint);
+					this.memory.WriteByte(c_oSerPropLenType.Byte);
+					this.memory.WriteByte(Math.round(0xff * mod.val / 100000));
+				}
+				else if("shade" == mod.name){
+					this.memory.WriteByte(c_oSer_ColorThemeType.Shade);
+					this.memory.WriteByte(c_oSerPropLenType.Byte);
+					this.memory.WriteByte(Math.round(0xff * mod.val / 100000));
+				}
+			}
+		}
 	}
 };
 function Binary_CommonReader(stream)
