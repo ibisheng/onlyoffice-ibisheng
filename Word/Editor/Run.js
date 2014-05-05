@@ -1177,7 +1177,6 @@ ParaRun.prototype =
 
         var Pr = this.Get_CompiledPr(false);
 
-
         g_oTextMeasurer.SetTextPr( Pr, this.Paragraph.Get_Theme());
         g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
 

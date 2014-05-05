@@ -4085,13 +4085,36 @@ Paragraph.prototype =
         {
             var LastItem = ( true === PRS.End ? this.Content[this.Content.length - 1] : this.Content[this.Lines[CurLine].EndPos] );
 
-            if ( undefined !== LastItem )
+            if ( true === PRS.End )
+            {
+                // TODO: Как только переделаем para_End переделать тут
+                
+                // Выставляем настройки для символа параграфа
+                var EndTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
+                EndTextPr.Merge(this.TextPr.Value);
+
+                g_oTextMeasurer.SetTextPr( EndTextPr, this.Get_Theme());
+                g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
+
+                // Запрашиваем текущие метрики шрифта, под TextAscent мы будем понимать ascent + linegap(которые записаны в шрифте)
+                var EndTextHeight  = g_oTextMeasurer.GetHeight();
+                var EndTextDescent = Math.abs( g_oTextMeasurer.GetDescender() );
+                var EndTextAscent  = EndTextHeight - EndTextDescent;
+                var EndTextAscent2 = g_oTextMeasurer.GetAscender();
+
+                PRS.LineTextAscent  = EndTextAscent;
+                PRS.LineTextAscent2 = EndTextAscent2;
+                PRS.LineTextDescent = EndTextDescent;
+                PRS.LineAscent      = EndTextAscent;
+                PRS.LineDescent     = EndTextDescent;
+            }
+            else if ( undefined !== LastItem )
             {
                 if ( PRS.LineTextAscent < LastItem.TextAscent )
                     PRS.LineTextAscent = LastItem.TextAscent;
 
                 if ( PRS.LineTextAscent2 < LastItem.TextAscent2 )
-                    LineTextAscent2 = LastItem.TextAscent2;
+                    PRS.LineTextAscent2 = LastItem.TextAscent2;
 
                 if ( PRS.LineTextDescent < LastItem.TextDescent )
                     PRS.LineTextDescent = LastItem.TextDescent;
