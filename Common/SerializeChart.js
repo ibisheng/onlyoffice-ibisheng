@@ -170,6 +170,7 @@ var c_oserct_chartspaceEXTERNALDATA = 11;
 var c_oserct_chartspacePRINTSETTINGS = 12;
 var c_oserct_chartspaceUSERSHAPES = 13;
 var c_oserct_chartspaceEXTLST = 14;
+var c_oserct_chartspaceTHEMEOVERRIDE = 15;
 
 var c_oserct_booleanVAL = 0;
 
@@ -1047,6 +1048,8 @@ BinaryChartWriter.prototype.WriteCT_ChartSpace = function (oVal) {
     // oThis.WriteCT_extLst(oCurVal);
     // });
     // }
+    if (null != oVal.themeOverride)
+	    this.bs.WriteItem(c_oserct_chartspaceTHEMEOVERRIDE, function () { window.global_pptx_content_writer.WriteTheme(oThis.memory, oVal.themeOverride); });
 }
 BinaryChartWriter.prototype.WriteSpPr = function (oVal) {
     window.global_pptx_content_writer.WriteSpPr(this.memory, oVal);
@@ -5364,6 +5367,12 @@ BinaryChartReader.prototype.ReadCT_ChartSpace = function (type, length, val, cur
             return oThis.ReadCT_extLst(t, l, oNewVal);
         });
         // val.m_extLst = oNewVal;
+    }
+    else if (c_oserct_chartspaceTHEMEOVERRIDE === type) {
+        var theme = window.global_pptx_content_loader.ReadTheme(this, this.stream);
+        if (null != theme)
+            val.setThemeOverride(theme);
+        res = c_oSerConstants.ReadUnknown;
     }
     else
         res = c_oSerConstants.ReadUnknown;

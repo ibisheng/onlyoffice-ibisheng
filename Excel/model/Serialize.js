@@ -6383,6 +6383,7 @@
             else if ( c_oSer_OtherType.Theme === type )
             {
                 this.wb.theme = window.global_pptx_content_loader.ReadTheme(this, this.stream);
+                res = c_oSerConstants.ReadUnknown;
             }
             else
                 res = c_oSerConstants.ReadUnknown;
