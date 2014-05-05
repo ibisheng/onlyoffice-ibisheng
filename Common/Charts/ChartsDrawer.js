@@ -134,9 +134,9 @@ CChartsDrawer.prototype =
 		
 		if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart")
 		{
+			this.gridChart.draw(this, cShapeDrawer, chartSpace);
 			this.catAxisChart.draw(this, cShapeDrawer, chartSpace);
 			this.valAxisChart.draw(this, cShapeDrawer, chartSpace);
-			this.gridChart.draw(this, cShapeDrawer, chartSpace);
 		}
 		
 		this.chart.draw(this, cShapeDrawer, chartSpace);
@@ -312,6 +312,8 @@ CChartsDrawer.prototype =
 		var isHBar = (chartSpace.chart.plotArea.chart.getObjectType() == historyitem_type_BarChart && chartSpace.chart.plotArea.chart.barDir === BAR_DIR_BAR) ? true : false;
 		
 		var calculateLeft = 0, calculateRight = 0, calculateTop = 0, calculateBottom = 0;
+		
+		//если точки рассчитаны - ставим маргин в зависимости от них
 		if(chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.labels)
 		{
 			var valAx = chartSpace.chart.plotArea.valAx;
@@ -337,9 +339,24 @@ CChartsDrawer.prototype =
 				}
 				else
 				{
-					calculateTop  = valAx.yPoints[valAx.yPoints.length - 1].pos;
-					calculateBottom = this.calcProp.heightCanvas / pxToMM - valAx.yPoints[0].pos;
+					calculateTop  = valAx.yPoints[0].pos;
+					calculateBottom = this.calcProp.heightCanvas / pxToMM - valAx.yPoints[valAx.yPoints.length - 1].pos;
 				}
+				
+				if(this.calcProp.type == "Scatter" && chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.labels)
+				{
+					var catAx = chartSpace.chart.plotArea.catAx;
+					if(catAx.scaling.orientation == ORIENTATION_MIN_MAX)
+					{
+						calculateLeft  = catAx.xPoints[0].pos;
+						calculateRight = this.calcProp.widthCanvas / pxToMM - catAx.xPoints[catAx.xPoints.length - 1].pos;
+					}
+					else
+					{
+						calculateLeft  = catAx.xPoints[catAx.xPoints.length - 1].pos;
+						calculateRight = this.calcProp.widthCanvas / pxToMM - catAx.xPoints[0].pos;
+					}
+				};
 			};
 		};
 
@@ -7044,6 +7061,9 @@ gridChart.prototype =
 		var stepY = (this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom - this.chartProp.chartGutter._top)/(this.chartProp.numhlines);
 		var minorStep = stepY / this.chartProp.numhMinorlines;
 		var widthLine = this.chartProp.widthCanvas - (this.chartProp.chartGutter._left + this.chartProp.chartGutter._right);
+		
+		var bottomMargin = this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom;
+		
 		var posX = this.chartProp.chartGutter._left;
 		var posY;
 		var posMinorY;
@@ -7142,13 +7162,18 @@ gridChart.prototype =
 				for(var n = 0; n < this.chartProp.numhMinorlines; n++)
 				{
 					posMinorY = posY + n*minorStep;
+					
+					if(posMinorY < this.chartProp.chartGutter._top || posMinorY > bottomMargin)
+						break;
+					
 					if(!this.paths.horisontalMinorLines)
 						this.paths.horisontalMinorLines = [];
 					if(!this.paths.horisontalMinorLines[i])
 						this.paths.horisontalMinorLines[i] = [];
 					
 					this.paths.horisontalMinorLines[i][n] = this._calculateLine(posX, posMinorY, posX + widthLine, posMinorY);
-				}
+				};
+					
 				
 				if(crossDiff && i == yPoints.length - 1)
 				{
@@ -7167,13 +7192,18 @@ gridChart.prototype =
 	
 	_calculateVerticalLines: function()
 	{
-		var stepX = (this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right)/(this.chartProp.numvlines);
-		var minorStep = stepX / this.chartProp.numvMinorlines;
-		var heightLine = this.chartProp.heightCanvas - (this.chartProp.chartGutter._bottom +this.chartProp.chartGutter._top);
+		var heightLine = this.chartProp.heightCanvas - (this.chartProp.chartGutter._bottom + this.chartProp.chartGutter._top);
+		
+		var rightMargin = this.chartProp.widthCanvas - this.chartProp.chartGutter._right;
+		
 		var posY = this.chartProp.chartGutter._top;
 		var posX;
 		var posMinorX;
 		var xPoints = this.chartSpace.chart.plotArea.valAx.xPoints ? this.chartSpace.chart.plotArea.valAx.xPoints : this.chartSpace.chart.plotArea.catAx.xPoints;
+		
+		var stepX = xPoints[1] ? Math.abs((xPoints[1].pos - xPoints[0].pos)) : (Math.abs(xPoints[0].pos - this.chartSpace.chart.plotArea.valAx.posX) * 2);
+		
+		var minorStep = (stepX * this.chartProp.pxToMM) / this.chartProp.numvMinorlines;
 		
 		if(!xPoints)
 			return;
@@ -7195,16 +7225,20 @@ gridChart.prototype =
 			this.paths.verticalLines[i] = this._calculateLine(posX, posY, posX, posY + heightLine);
 			
 			//промежуточные линии
-			for(var n = 0; n < this.chartProp.numvMinorlines; n++)
+			for(var n = 1; n <= this.chartProp.numvMinorlines; n++)
 			{
 				posMinorX = posX + n*minorStep;
+				
+				if(posMinorX < this.chartProp.chartGutter._left || posMinorX > rightMargin)
+					break;
+				
 				if(!this.paths.verticalMinorLines)
 					this.paths.verticalMinorLines = [];
 				if(!this.paths.verticalMinorLines[i])
 					this.paths.verticalMinorLines[i] = [];
 				
 				this.paths.verticalMinorLines[i][n] = this._calculateLine(posMinorX, posY, posMinorX, posY + heightLine);
-			}
+			};
 			
 			if(crossDiff && i == xPoints.length - 1)
 			{
@@ -7345,14 +7379,17 @@ catAxisChart.prototype =
 	_calculateAxis : function()
 	{
 		var nullPoisition = this.chartProp.nullPositionOX;
+		var axisPos;
 		if(this.chartProp.type == "HBar" && this.chartSpace.chart.plotArea.catAx.bDelete != true)
 		{	
-			this.paths.axisLine = this._calculateLine( this.chartSpace.chart.plotArea.catAx.posX, this.chartProp.chartGutter._top / this.chartProp.pxToMM, this.chartSpace.chart.plotArea.catAx.posX, (this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom) / this.chartProp.pxToMM);
+			axisPos = this.chartSpace.chart.plotArea.catAx.posX;
+			this.paths.axisLine = this._calculateLine( axisPos, this.chartProp.chartGutter._top / this.chartProp.pxToMM, axisPos, (this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom) / this.chartProp.pxToMM);
 		}
 		else if(this.chartSpace.chart.plotArea.catAx.bDelete != true)
 		{
 			//TODO сделать по аналогии с HBAR
-			this.paths.axisLine = this._calculateLine( this.chartProp.chartGutter._left / this.chartProp.pxToMM, this.chartSpace.chart.plotArea.catAx.posY, (this.chartProp.widthCanvas - this.chartProp.chartGutter._right) / this.chartProp.pxToMM, this.chartSpace.chart.plotArea.catAx.posY );
+			axisPos = this.chartSpace.chart.plotArea.catAx.posY ? this.chartSpace.chart.plotArea.catAx.posY : this.chartSpace.chart.plotArea.catAx.yPos;
+			this.paths.axisLine = this._calculateLine( this.chartProp.chartGutter._left / this.chartProp.pxToMM, axisPos, (this.chartProp.widthCanvas - this.chartProp.chartGutter._right) / this.chartProp.pxToMM, axisPos);
 		}
 	},
 	
@@ -7477,6 +7514,10 @@ catAxisChart.prototype =
 					for(var n = 0; n < this.chartProp.numhMinorlines; n++)
 					{
 						posMinorY = posY - n * minorStep;
+						
+						if(posMinorY < yPoints[yPoints.length - 1].pos || posMinorY > yPoints[0].pos)
+							break;
+						
 						if(!this.paths.minorTickMarks)
 							this.paths.minorTickMarks = [];
 						if(!this.paths.minorTickMarks[i])
@@ -7511,6 +7552,10 @@ catAxisChart.prototype =
 					for(var n = 0; n < this.chartProp.numhMinorlines; n++)
 					{
 						posMinorY = posY - n * minorStep;
+						
+						if(posMinorY < yPoints[0].pos || posMinorY > yPoints[yPoints.length - 1].pos)
+							break;
+						
 						if(!this.paths.minorTickMarks)
 							this.paths.minorTickMarks = [];
 						if(!this.paths.minorTickMarks[i])
@@ -7531,7 +7576,7 @@ catAxisChart.prototype =
 		var stepX = xPoints[1] ? Math.abs(xPoints[1].pos - xPoints[0].pos) : Math.abs(xPoints[0].pos - this.chartProp.chartGutter._bottom / this.chartProp.pxToMM);
 		var minorStep = stepX / this.chartProp.numvMinorlines;
 		
-		var posY = this.chartProp.nullPositionOX / this.chartProp.pxToMM;
+		var posY = this.chartSpace.chart.plotArea.catAx.posY ? this.chartSpace.chart.plotArea.catAx.posY : this.chartSpace.chart.plotArea.catAx.yPos;
 		var posX;
 		var posMinorX;
 		
@@ -7566,6 +7611,10 @@ catAxisChart.prototype =
 					for(var n = 0; n < this.chartProp.numvMinorlines; n++)
 					{
 						posMinorX = posX + n * minorStep;
+						
+						if(posMinorX > xPoints[xPoints.length - 1].pos || posMinorX < xPoints[0].pos)
+							break;
+						
 						if(!this.paths.minorTickMarks)
 							this.paths.minorTickMarks = [];
 						if(!this.paths.minorTickMarks[i])
@@ -7597,6 +7646,10 @@ catAxisChart.prototype =
 					for(var n = 0; n < this.chartProp.numvMinorlines; n++)
 					{
 						posMinorX = posX + n * minorStep;
+						
+						if(posMinorX < xPoints[xPoints.length - 1].pos || posMinorX > xPoints[0].pos)
+							break;
+						
 						if(!this.paths.minorTickMarks)
 							this.paths.minorTickMarks = [];
 						if(!this.paths.minorTickMarks[i])
