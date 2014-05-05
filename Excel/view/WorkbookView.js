@@ -1156,10 +1156,16 @@
 				this.showWorksheet(wsModel.getIndex());
 		};
 
-		/** @param index {Number} */
+		/**
+		 *
+	 	 * @param index
+	 	 * @param isResized
+	 	 * @returns {WorkbookView}
+	 	 */
 		WorkbookView.prototype.showWorksheet = function (index, isResized) {
 			if (index === this.wsActive) {return this;}
 
+			var isSendInfo = (-1 === this.wsActive) || !isResized;
 			// Только если есть активный
 			if (-1 !== this.wsActive) {
 				var ws = this.getWorksheet();
@@ -1190,9 +1196,11 @@
 				ws.changeZoom(true);
 			
 			ws.draw();
-			this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
-			this._onWSSelectionChanged(ws.getSelectionInfo());
-			this._onSelectionMathInfoChanged(ws.getSelectionMathInfo());
+			if (isSendInfo) {
+				this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
+				this._onWSSelectionChanged(ws.getSelectionInfo());
+				this._onSelectionMathInfoChanged(ws.getSelectionMathInfo());
+			}
 			this.controller.reinitializeScroll();
             if(this.Api.isMobileVersion)
                 this.MobileTouchManager.Resize();
@@ -1300,10 +1308,10 @@
 					item.resize(/*isDraw*/i == activeIndex);
 				}
 				this.showWorksheet(undefined, true);
-
 			} else {
-				// ToDo не должно происходить ничего, но нам приходит resize сверху
-				this.showWorksheet(undefined, true);
+				// ToDo не должно происходить ничего, но нам приходит resize сверху, поэтому проверим отрисовывали ли мы
+				if (-1 === this.wsActive)
+					this.showWorksheet(undefined, true);
 			}
 		};
 
