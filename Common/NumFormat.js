@@ -2678,8 +2678,12 @@ FormatParser.prototype =
 						bError = true;
 				}
 			}
-			if(2 == nBracket)
-			    bMinus = true;
+			if (nBracket > 0) {
+			    if (2 == nBracket)
+			        bMinus = true;
+			    else
+			        bError = true;
+			}
 			var CurrencyNegativePattern = cultureInfo.CurrencyNegativePattern;
 			if(null != sCurrency){
 			    if (sCurrency == cultureInfo.CurrencySymbol) {
