@@ -3690,8 +3690,14 @@ CChartsDrawer.prototype =
 			seriaVal = series[i].val ? series[i].val : series[i].yVal;
 			numCache = seriaVal && seriaVal.numRef ? seriaVal.numRef.numCache : seriaVal.numLit;
 			if(numCache != null)
+			{
+				if(!this.calcProp.ptCount)
+					this.calcProp.ptCount = numCache.ptCount;
+				
 				counter++;
-		}
+			};
+		};
+		
 		return counter;
 	}
 }
@@ -3767,7 +3773,7 @@ drawBarChart.prototype =
 		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 100 : 0;
 		var overlap        = this.cShapeDrawer.chart.plotArea.chart.overlap ? this.cShapeDrawer.chart.plotArea.chart.overlap : defaultOverlap;
 		var numCache       = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
-		var width          = widthGraph / this.chartProp.seriesCount;
+		var width          = widthGraph / this.chartProp.ptCount;
 		if(this.cShapeDrawer.chart.plotArea.catAx.crossAx.crossBetween)
 			width = widthGraph / (numCache.ptCount - 1);
 		
