@@ -2413,7 +2413,7 @@ CChartsDrawer.prototype =
 			
 				if(series[l].isHidden == true)
 					continue;
-				if(!curSeria.length)
+				if(!curSeria || !curSeria.length)
 					continue;
 				
 				skipSeries[l] = false;
@@ -2478,6 +2478,10 @@ CChartsDrawer.prototype =
 			{
 				newArr[l] = [];
 				yNumCache = series[l].yVal.numRef && series[l].yVal.numRef.numCache ? series[l].yVal.numRef.numCache : series[l].yVal && series[l].yVal.numLit ? series[l].yVal.numLit : null;
+				
+				if(!yNumCache)
+					continue;
+				
 				for(var j = 0; j < yNumCache.pts.length; ++j)
 				{
 					yVal = parseFloat(yNumCache.pts[j].val);
@@ -3003,6 +3007,9 @@ CChartsDrawer.prototype =
 		
 		//***series***
 		this.calcProp.series = chartProp.chart.plotArea.chart.series;
+		
+		//отсеиваем пустые серии
+		this.calcProp.seriesCount = this._calculateCountSeries(chartProp);
 		
 		//находим значния для осей
 		/*this.calcProp.scale = this._getAxisData(false, this.calcProp, this.calcProp.min, this.calcProp.max, this.calcProp.ymin, this.calcProp.ymax, chartProp);	
@@ -3559,7 +3566,15 @@ CChartsDrawer.prototype =
 	getIdxPoint: function(seria, val)
 	{
 		var seriaVal = seria.val ? seria.val :  seria.yVal;
-		var pts = seriaVal.numRef ? seriaVal.numRef.numCache.pts : seriaVal.numLit.pts;
+		
+		if(!seriaVal)
+			return null;
+		
+		var pts = seriaVal.numRef &&  seriaVal.numRef.numCache ? seriaVal.numRef.numCache.pts : seriaVal.numLit ? seriaVal.numLit.pts : null;
+		
+		if(pts == null)
+			return null;
+		
 		for(var p = 0; p < pts.length; p++)
 		{
 			if(pts[p].idx == val)
@@ -3647,6 +3662,20 @@ CChartsDrawer.prototype =
 	XYZDist: function(a, b)
 	{
 		return Math.pow((Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)), 0.5);
+	},
+	
+	_calculateCountSeries: function(chartSpace)
+	{
+		var series = chartSpace.chart.plotArea.chart.series;
+		var counter = 0, numCache, seriaVal;
+		for(var i = 0; i < series.length; i++)
+		{
+			seriaVal = series[i].val ? series[i].val : series[i].yVal;
+			numCache = seriaVal && seriaVal.numRef ? seriaVal.numRef.numCache : seriaVal.numLit;
+			if(numCache != null)
+				counter++;
+		}
+		return counter;
 	}
 }
 
@@ -3721,12 +3750,12 @@ drawBarChart.prototype =
 		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 100 : 0;
 		var overlap        = this.cShapeDrawer.chart.plotArea.chart.overlap ? this.cShapeDrawer.chart.plotArea.chart.overlap : defaultOverlap;
 		var numCache       = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
-		var width          = widthGraph / numCache.ptCount;
+		var width          = widthGraph / this.chartProp.seriesCount;
 		if(this.cShapeDrawer.chart.plotArea.catAx.crossAx.crossBetween)
 			width = widthGraph / (numCache.ptCount - 1);
 		
 		
-		var individualBarWidth = width / (this.chartProp.series.length - (this.chartProp.series.length - 1) * (overlap / 100) + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
+		var individualBarWidth = width / (this.chartProp.seriesCount - (this.chartProp.seriesCount - 1) * (overlap / 100) + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
 		var widthOverLap       = individualBarWidth * (overlap / 100);
 		var hmargin            = (this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100 * individualBarWidth) / 2;
 		
@@ -3737,7 +3766,7 @@ drawBarChart.prototype =
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 	
 			numCache        = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache : this.chartProp.series[i].val.numLit;
-			seria           = numCache.pts;
+			seria           = numCache ? numCache.pts : [];
 			seriesHeight[i] = [];
 			tempValues[i]   = [];
 			
@@ -4093,8 +4122,12 @@ drawLineChart.prototype =
 			seria = this.chartProp.series[i];
 			
 			numCache   = seria.val.numRef ? seria.val.numRef.numCache : seria.val.numLit;
+			
+			if(!numCache)
+				continue;
+			
 			dataSeries = numCache.pts;
-
+			
 			for(var n = 0; n < numCache.ptCount; n++)
 			{
 				idx = dataSeries[n] && dataSeries[n].idx != null ? dataSeries[n].idx : n;
@@ -4148,6 +4181,9 @@ drawLineChart.prototype =
 		for(var i = 0; i < points.length; i++)
 		{	
 			isSplineLine = this.chartProp.series[i].smooth;
+			
+			if(!points[i])
+				continue;
 			
 			for(var n = 0; n < points[i].length; n++)
 			{
@@ -4479,7 +4515,11 @@ drawAreaChart.prototype =
 		
 			seria = this.chartProp.series[i];
 			
-			numCache   = seria.val.numRef ? seria.val.numRef.numCache : seria.val.numLit;
+			numCache = seria.val.numRef ? seria.val.numRef.numCache : seria.val.numLit;
+			
+			if(!numCache)
+				continue;
+			
 			dataSeries = numCache.pts;
 
 			for(var n = 0; n < numCache.ptCount; n++)
@@ -4710,7 +4750,10 @@ drawAreaChart.prototype =
 			else*/
 			seria = this.chartProp.series[i];
 			
-			dataSeries = seria.val.numRef ? seria.val.numRef.numCache.pts : seria.val.numLit.pts;
+			dataSeries = seria.val.numRef && seria.val.numRef.numCache ? seria.val.numRef.numCache.pts : seria.val.numLit ? seria.val.numLit.pts : null;
+			
+			if(!dataSeries)
+				continue;
 			
 			if(dataSeries[0].pen)
 				pen = dataSeries[0].pen;
@@ -4818,7 +4861,7 @@ drawHBarChart.prototype =
         var height         = heightGraph / numCache.ptCount;
 		
 		
-		var individualBarHeight = height / (this.chartProp.series.length - (this.chartProp.series.length - 1) * (overlap / 100) + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
+		var individualBarHeight = height / (this.chartProp.seriesCount - (this.chartProp.seriesCount - 1) * (overlap / 100) + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
 		var widthOverLap = individualBarHeight * (overlap / 100);
 		var hmargin = (this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100 * individualBarHeight) / 2;
 		
@@ -4827,6 +4870,10 @@ drawHBarChart.prototype =
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 		
 			numCache = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache : his.chartProp.series[i].val.numLit;
+			
+			if(!numCache)
+				continue;
+			
 			seria = this.chartProp.series[i].val.numRef.numCache.pts;
 			seriesHeight[i] = [];
 			
@@ -5400,6 +5447,9 @@ drawDoughnutChart.prototype =
         for(var n = 0; n < this.chartProp.series.length; n++) {
 			numCache = this.chartProp.series[n].val.numRef ? this.chartProp.series[n].val.numRef.numCache : this.chartProp.series[n].val.numLit;
 			
+			if(!numCache)
+				continue;
+			
 			for (var k = 0; k < numCache.ptCount; k++) {
 				
 				idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[0], k);
@@ -5431,7 +5481,7 @@ drawDoughnutChart.prototype =
 		
 		//inner radius
 		var radius = outRadius * (holeSize / 100);
-		var step = (outRadius - radius) / this.chartProp.series.length;
+		var step = (outRadius - radius) / this.chartProp.seriesCount;
 		
 		var xCenter = this.chartProp.chartGutter._left + trueWidth/2;
 		var yCenter = this.chartProp.chartGutter._top + trueHeight/2;
@@ -5441,6 +5491,10 @@ drawDoughnutChart.prototype =
 		{
 			this.tempAngle = Math.PI/2;
 			numCache = this.chartProp.series[n].val.numRef ? this.chartProp.series[n].val.numRef.numCache : this.chartProp.series[n].val.numLit;
+			
+			if(!numCache)
+				continue;
+			
 			sumData = this.cChartDrawer._getSumArray(numCache.pts, true);
 			
 			//рисуем против часовой стрелки, поэтому цикл с конца
@@ -6044,6 +6098,8 @@ drawScatterChart.prototype =
 			seria = this.chartProp.series[i];
 			yNumCache = seria.yVal.numRef && seria.yVal.numRef.numCache ? seria.yVal.numRef.numCache : seria.yVal && seria.yVal.numLit ? seria.yVal.numLit : null;
 			
+			if(!yNumCache)
+				continue;
 			
 			for(var n = 0; n < yNumCache.ptCount; n++)
 			{
@@ -8369,7 +8425,7 @@ drawBar3DChart.prototype =
 		var overlap       = this.cShapeDrawer.chart.plotArea.chart.overlap ? this.cShapeDrawer.chart.plotArea.chart.overlap : defaultOverlap;
         var width         = widthGraph / this.chartProp.series[0].val.numRef.numCache.pts.length;
 		
-		var individualBarWidth = width / (this.chartProp.series.length - (this.chartProp.series.length - 1) * (overlap / 100) + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
+		var individualBarWidth = width / (this.chartProp.seriesCount - (this.chartProp.seriesCount - 1) * (overlap / 100) + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
 		
 		var widthOverLap = individualBarWidth * (overlap / 100);
 		
