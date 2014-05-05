@@ -761,8 +761,10 @@ CShape.prototype.setStartPage = function(pageIndex)
         if(content)
         {
             content.Set_StartPage(pageIndex);
-            if(this.recalculateText)
+            if(this.recalculateText && this.recalcTxBoxContent && this.recalculateText)
             {
+                this.recalcTxBoxContent();
+                this.recalcTransformText();
                 this.recalculateText();
             }
         }
