@@ -128,6 +128,8 @@ CGraphicPage.prototype =
         this.flowTables = [];
     },
 
+
+
     CheckRange: function(X0, Y0, X1, Y1, Y0sp, Y1Ssp, LeftField, RightField, HdrFtrRanges, docContent)
     {
         return this.wrapManager.checkRanges(X0, Y0, X1, Y1, Y0sp, Y1Ssp, LeftField, RightField, HdrFtrRanges, docContent);

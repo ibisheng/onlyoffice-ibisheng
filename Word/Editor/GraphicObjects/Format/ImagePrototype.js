@@ -187,6 +187,8 @@ CImageShape.prototype.getDrawingDocument = CShape.prototype.getDrawingDocument;
 CImageShape.prototype.getArrayWrapIntervals = CShape.prototype.getArrayWrapIntervals;
 CImageShape.prototype.getBounds = CShape.prototype.getBounds;
 CImageShape.prototype.setStartPage = CShape.prototype.setStartPage;
+CImageShape.prototype.getRecalcObject = CShape.prototype.getRecalcObject;
+CImageShape.prototype.setRecalcObject = CShape.prototype.setRecalcObject;
 CImageShape.prototype.checkContentDrawings = function()
 {};
 CImageShape.prototype.hit = CShape.prototype.hit;

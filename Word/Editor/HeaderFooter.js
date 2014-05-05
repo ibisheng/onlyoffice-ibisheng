@@ -47,7 +47,6 @@ function CHeaderFooter(Parent, LogicDocument, DrawingDocument, Type)
         NeedRecalc    : {}, // Объект с ключом - номером страницы, нужно ли пересчитывать данную страницу
         SectPr        : {}  // Объект с ключом - номером страницы и полем - ссылкой на секцию
     };
-    this.DrawingPage = new CGraphicPage(0, null);
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -315,13 +314,13 @@ CHeaderFooter.prototype =
 
     Draw : function(nPageIndex, pGraphics)
     {
-        var OldPage = this.RecalcInfo.CurPage;
-        
-        this.Set_Page( nPageIndex );
+        //var OldPage = this.RecalcInfo.CurPage;
+        //
+        //this.Set_Page( nPageIndex );
         this.Content.Draw( nPageIndex, pGraphics );
         
-        if ( -1 !== OldPage )
-            this.Set_Page( OldPage );
+        //if ( -1 !== OldPage )
+        //    this.Set_Page( OldPage );
     },
 
     // Пришло сообщение о том, что контент изменился и пересчитался
@@ -1264,7 +1263,8 @@ CHeaderFooterController.prototype =
         var XLimit = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
         
         var bRecalcHeader = false;
-        
+
+        var HeaderDrawings, HeaderTables, FooterDrawings, FooterTables;
         // Рассчитываем верхний колонтитул
         if ( null !== Header )
         {
@@ -1281,6 +1281,8 @@ CHeaderFooterController.prototype =
                if ( -1 === Header.RecalcInfo.CurPage )
                     Header.Set_Page(PageIndex);
             }
+            HeaderDrawings = Header.Content.Get_AllDrawingObjects([]);
+            //HeaderTables = Header.Content
         }
         
         var bRecalcFooter = false;
@@ -1310,8 +1312,10 @@ CHeaderFooterController.prototype =
                 if ( -1 === Footer.RecalcInfo.CurPage )
                     Footer.Set_Page(PageIndex);
             }
+            FooterDrawings = Footer.Content.Get_AllDrawingObjects([]);
+            //FooterTables = Footer
         }
-
+        this.LogicDocument.DrawingObjects.mergeDrawings(PageIndex, HeaderDrawings, HeaderTables, FooterDrawings, FooterTables);
         if ( true === bRecalcHeader || true === bRecalcFooter )
             return true;
         
@@ -1321,10 +1325,15 @@ CHeaderFooterController.prototype =
     // Отрисовка колонтитулов на данной странице
     Draw : function(nPageIndex, pGraphics)
     {
+
         var Header = this.Pages[nPageIndex].Header;
         var Footer = this.Pages[nPageIndex].Footer;
 
-        this.LogicDocument.DrawingObjects.mergeHdrFtrPages(Header && Header.DrawingPage, Footer && Footer.DrawingPage, nPageIndex);
+        var OldPageHdr = Header && Header.RecalcInfo.CurPage;
+        var OldPageFtr = Footer && Footer.RecalcInfo.CurPage;
+
+        Header &&  Header.Set_Page(nPageIndex);
+        Footer && Footer.Set_Page(nPageIndex);
         this.LogicDocument.DrawingObjects.drawBehindDocHdrFtr( nPageIndex, pGraphics );
         this.LogicDocument.DrawingObjects.drawWrappingObjectsHdrFtr( nPageIndex, pGraphics );
 
@@ -1334,8 +1343,10 @@ CHeaderFooterController.prototype =
         if ( null !== Footer )
             Footer.Draw( nPageIndex, pGraphics );
 
-
         this.LogicDocument.DrawingObjects.drawBeforeObjectsHdrFtr( nPageIndex, pGraphics );
+
+        Header &&  Header.Set_Page(OldPageHdr);
+        Footer && Footer.Set_Page(OldPageFtr);
     },
 
     CheckRange : function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageIndex)

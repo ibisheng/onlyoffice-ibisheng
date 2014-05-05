@@ -12752,6 +12752,8 @@ CDocument.prototype =
     
     Get_SectionPageNumInfo2 : function(Page_abs)
     {
+        if(!this.Pages[Page_abs])
+            return {CurPage: 0};
         var StartIndex = this.Pages[Page_abs].Pos;
         var SectIndex  = this.SectionsInfo.Get_Index(StartIndex);
 

@@ -6905,7 +6905,7 @@ CDocumentContent.prototype =
         // Сначала проверим, не попали ли мы в один из "плавающих" объектов
         var bInText      = (null === this.Is_InText(X, Y, this.CurPage + this.Get_StartPage_Absolute())      ? false : true);
         var bTableBorder = (null === this.Is_TableBorder(X, Y, this.CurPage + this.Get_StartPage_Absolute()) ? false : true);
-        var nInDrawing   = this.LogicDocument.DrawingObjects.isPointInDrawingObjects( X, Y, this.CurPage + this.Get_StartPage_Absolute(), this );
+        var nInDrawing   = this.LogicDocument && this.LogicDocument.DrawingObjects.isPointInDrawingObjects( X, Y, this.CurPage + this.Get_StartPage_Absolute(), this );
 
         if ( this.Parent instanceof CHeaderFooter && ( nInDrawing === DRAWING_ARRAY_TYPE_BEFORE || nInDrawing === DRAWING_ARRAY_TYPE_INLINE || ( false === bTableBorder && false === bInText && nInDrawing >= 0 ) ) )
         {
@@ -7769,7 +7769,7 @@ CDocumentContent.prototype =
         PageNum = Math.min( PageNum, this.Pages.length - 1 );
 
         // Сначала проверим Flow-таблицы
-        var FlowTable = this.LogicDocument.DrawingObjects.getTableByXY( X, Y, PageNum + this.Get_StartPage_Absolute(), this );
+        var FlowTable = this.LogicDocument && this.LogicDocument.DrawingObjects.getTableByXY( X, Y, PageNum + this.Get_StartPage_Absolute(), this );
         if ( null != FlowTable )
             return FlowTable.Table.Index;
 

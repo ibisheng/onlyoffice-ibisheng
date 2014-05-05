@@ -781,3 +781,38 @@ CShape.prototype.setStartPage = function(pageIndex)
         }
     }
 };
+
+CShape.prototype.getRecalcObject = function()
+{
+    var content = this.getDocContent && this.getDocContent();
+    if(content)
+    {
+        return content.Save_RecalculateObject();
+    }
+    if(this.spTree)
+    {
+        var ret = [];
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            ret.push(this.spTree[i].getRecalcObject())
+        }
+        return ret;
+    }
+    return null;
+};
+
+CShape.prototype.setRecalcObject =  function(object)
+{
+    var content = this.getDocContent && this.getDocContent();
+    if(content)
+    {
+        content.Load_RecalculateObject(object);
+    }
+    if(Array.isArray(object) && this.spTree && this.spTree.length === object.length)
+    {
+        for(var i = 0;  i < this.spTree.length; ++i)
+        {
+            this.spTree[i].setRecalcObject(object[i]);
+        }
+    }
+};

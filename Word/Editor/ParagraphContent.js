@@ -4129,6 +4129,7 @@ ParaDrawing.prototype =
         DrawingObj.PageNum = this.PageNum;
         DrawingObj.X = this.X;
         DrawingObj.Y = this.Y;
+        DrawingObj.spRecaclcObject = this.GraphicObj.getRecalcObject();
 
         return DrawingObj;
     },
@@ -4136,6 +4137,7 @@ ParaDrawing.prototype =
     Load_RecalculateObject : function(RecalcObj)
     {
         this.updatePosition3(RecalcObj.PageNum, RecalcObj.X, RecalcObj.Y);
+        this.GraphicObj.setRecalcObject(RecalcObj.spRecaclcObject);
     },
 
     Prepare_RecalculateObject : function()

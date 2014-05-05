@@ -171,6 +171,8 @@ CChartSpace.prototype.recalculateChart = function()
 CChartSpace.prototype.canResize = CShape.prototype.canResize;
 CChartSpace.prototype.canMove = CShape.prototype.canMove;
 CChartSpace.prototype.setStartPage = CShape.prototype.setStartPage;
+CChartSpace.prototype.getRecalcObject = CShape.prototype.getRecalcObject;
+CChartSpace.prototype.setRecalcObject = CShape.prototype.setRecalcObject;
 CChartSpace.prototype.canRotate = function()
 {
     return false;
