@@ -76,6 +76,15 @@ function getNumberParts(x)
     return {mantissa: man, exponent: exp, sign: sig};//для 0,123 exponent == - gc_nMaxDigCount
 }
 
+function NumFormatFont() {
+    this.skip = null;
+    this.repeat = null;
+    this.c = null;
+}
+NumFormatFont.prototype.isEqual = function (val) {
+    return this.skip == val.skip && this.repeat == val.repeat && this.c == val.c;
+};
+
 function FormatObj(type, val)
 {
     this.type = type;
@@ -1235,8 +1244,7 @@ NumFormat.prototype =
         }
         else if(numFormat_DigitSpace == item.type)
         {
-			var oNewFont = new Font();
-			oNewFont.clean();
+            var oNewFont = new NumFormatFont();
 			oNewFont.skip = true;
             this._CommitText(res, oCurText, "0", oNewFont);
             if(null != item.val)
@@ -1263,10 +1271,7 @@ NumFormat.prototype =
             if(-1 != this.Color)
             {
                 if(null == format)
-				{
-                    format = new Font();
-					format.clean();
-				}
+                    format = new NumFormatFont();
                 format.c = new RgbColor(this.Color);
             }
             if(null != prev && ((null == prev.format && null == format) || (null != prev.format && null != format && format.isEqual(prev.format))))
@@ -1362,8 +1367,7 @@ NumFormat.prototype =
             {
                 if(this.isInvalidDateValue(number))
                 {
-					var oNewFont = new Font();
-					oNewFont.clean();
+                    var oNewFont = new NumFormatFont();
 					oNewFont.repeat = true;
                     this._CommitText(res, null, "#", oNewFont);
                     return res;
@@ -1556,15 +1560,13 @@ NumFormat.prototype =
                 }
                 else if(numFormat_Repeat == item.type)
                 {
-					var oNewFont = new Font();
-					oNewFont.clean();
+                    var oNewFont = new NumFormatFont();
 					oNewFont.repeat = true;
                     this._CommitText(res, oCurText, item.val, oNewFont);
                 }
                 else if(numFormat_Skip == item.type)
                 {
-					var oNewFont = new Font();
-					oNewFont.clean();
+                    var oNewFont = new NumFormatFont();
 					oNewFont.skip = true;
                     this._CommitText(res, oCurText, item.val, oNewFont);
                 }
@@ -2159,8 +2161,7 @@ CellFormat.prototype =
 				res = oFormat.format(number, nValType, dDigitsCount, oAdditionalResult);
 			else if(null != this.aComporationFormats)
 			{
-				var oNewFont = new Font();
-				oNewFont.clean();
+			    var oNewFont = new NumFormatFont();
 				oNewFont.repeat = true;
 				res = [{text: "#", format: oNewFont}];
 			}

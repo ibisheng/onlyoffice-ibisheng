@@ -2969,8 +2969,11 @@ CCellValue.prototype =
 					{
 						aRes = null;
 						sText = null;
-						if(dDigitsCount > 1)
-							aText = [{text: "#", format: {repeat: true}}];
+						if (dDigitsCount > 1){
+						    var oNumFormatFont = new NumFormatFont();
+						    oNumFormatFont.repeat = true;
+						    aText = [{ text: "#", format: oNumFormatFont }];
+						}
 						else
 							aText = [{text: "", format: {}}];
 					}
@@ -2994,7 +2997,9 @@ CCellValue.prototype =
 				{
 					aRes = null;
 					sText = null;
-					aText = [{text: "#", format: {repeat: true}}];
+					var oNumFormatFont = new NumFormatFont();
+					oNumFormatFont.repeat = true;
+					aText = [{ text: "#", format: oNumFormatFont }];
 				}
 			}
 			if(null == aRes)
