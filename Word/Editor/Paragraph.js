@@ -3195,7 +3195,7 @@ Paragraph.prototype =
             while ( null != Curr && type_Paragraph === Curr.GetType() )
             {
                 var CurrKeepNext = Curr.Get_CompiledPr2(false).ParaPr.KeepNext;
-                if ( (true === CurrKeepNext && Curr.Pages.length > 1) || false === CurrKeepNext )
+                if ( (true === CurrKeepNext && Curr.Pages.length > 1) || false === CurrKeepNext || true !== Curr.Is_Inline() )
                 {
                     break;
                 }
@@ -3228,9 +3228,12 @@ Paragraph.prototype =
         //-------------------------------------------------------------------------------------------------------------
         // Если это первая страница параграфа (CurPage = 0), тогда мы должны использовать координаты, которые нам
         // были заданы сверху, а если не первая, тогда координаты мы должны запросить у родительского класса.
+        // TODO: Тут отдельно обрабатывается случай, когда рамка переносится на новую страницу, т.е. страница начинается 
+        //       сразу с рамки. Надо бы не разбивать в данной ситуации рамку на страницы, а просто новую страницу начать
+        //       с нее на уровне DocumentContent.
 
         var XStart, YStart, XLimit, YLimit;
-        if ( 0 === CurPage )//|| ( undefined != this.Get_FramePr() && this.Parent instanceof CDocument ) )
+        if ( 0 === CurPage || ( undefined != this.Get_FramePr() && this.LogicDocument === this.Parent ) )
         {
             XStart = this.X;
             YStart = this.Y;
@@ -3272,9 +3275,24 @@ Paragraph.prototype =
             // Начинаем параграф с новой страницы
             if ( 0 === CurPage && true === ParaPr.PageBreakBefore )
             {
-                // Если это первый элемент документа, тогда не надо начинать его с новой страницы
+                // Если это первый элемент документа или секции, тогда не надо начинать его с новой страницы.
+                // Кроме случая, когда у нас разрыв секции на текущей странице. Также не добавляем разрыв страницы для 
+                // особого пустого параграфа с разрывом секции.
+                
+                var bNeedPageBreak = true;
+
                 var Prev = this.Get_DocumentPrev();
-                if ( null != Prev )
+                if ( (true === this.IsEmpty() && undefined !== this.Get_SectionPr()) || null === Prev )
+                    bNeedPageBreak = false;
+                else if ( this.Parent === this.LogicDocument && type_Paragraph === Prev.GetType() && undefined !== Prev.Get_SectionPr()  )
+                {
+                    var PrevSectPr = Prev.Get_SectionPr();
+                    var CurSectPr  = this.LogicDocument.SectionsInfo.Get_SectPr( this.Index).SectPr;
+                    if ( section_type_Continuous !== CurSectPr.Get_Type() || true !== CurSectPr.Compare_PageSize( PrevSectPr ) )
+                        bNeedPageBreak = false;                    
+                }
+                
+                if ( true === bNeedPageBreak )
                 {
                     // Добавляем разрыв страницы
                     this.Pages[CurPage].Set_EndLine( CurLine - 1 );
@@ -5314,6 +5332,11 @@ Paragraph.prototype =
         {
             return -1;
         }
+        
+        // Если наш параграф является рамкой с авто шириной, тогда пересчитываем по обычному
+        // TODO: Улучишить данную проверку
+        if ( 1 === this.Lines.length && true !== this.Is_Inline() )
+            return -1;
 
         // Мы должны пересчитать как минимум 3 отрезка: текущий, предыдущий и следующий, потому что при удалении элемента
         // или добавлении пробела первое слово в данном отрезке может убраться в предыдущем отрезке, и кроме того при
@@ -6443,6 +6466,8 @@ Paragraph.prototype =
         }
         else
         {
+            var bDrawBorders = this.Is_NeedDrawBorders();
+
             var PDSH = g_oPDSH;
 
             var _Page = this.Pages[CurPage];
@@ -6686,7 +6711,7 @@ Paragraph.prototype =
                 //----------------------------------------------------------------------------------------------------------
                 // Рисуем боковые линии границы параграфа
                 //----------------------------------------------------------------------------------------------------------
-                if ( ( this.Pages.length - 1 === CurPage ) || ( CurLine < this.Pages[CurPage + 1].FirstLine ) )
+                if ( true === bDrawBorders && ( ( this.Pages.length - 1 === CurPage ) || ( CurLine < this.Pages[CurPage + 1].FirstLine ) ) )
                 {
                     var TempX0 = Math.min( this.Lines[CurLine].Ranges[0].X, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left + Pr.ParaPr.Ind.FirstLine);
                     var TempX1 = this.Lines[CurLine].Ranges[this.Lines[CurLine].Ranges.length - 1].XEnd;
@@ -6701,9 +6726,10 @@ Paragraph.prototype =
 
                     if ( 0 === CurLine )
                     {
-                        if ( true === Pr.ParaPr.Brd.First && ( Pr.ParaPr.Brd.Top.Value === border_Single || shd_Clear === Pr.ParaPr.Shd.Value ) )
+                        if ( Pr.ParaPr.Brd.Top.Value === border_Single || shd_Clear === Pr.ParaPr.Shd.Value )
                         {
-                            if ( false === this.Is_StartFromNewPage() || null === this.Get_DocumentPrev() )
+                            if ( ( true === Pr.ParaPr.Brd.First && ( false === this.Is_StartFromNewPage() || null === this.Get_DocumentPrev() || ( 1 === CurPage && true === this.Is_StartFromNewPage() ) ) ) ||
+                                 ( true !== Pr.ParaPr.Brd.First && ( ( 0 === CurPage && null === this.Get_DocumentPrev() ) || ( 1 === CurPage && true === this.Is_StartFromNewPage() )  ) ) )
                                 TempTop += Pr.ParaPr.Spacing.Before;
                         }
                     }
@@ -7540,6 +7566,9 @@ Paragraph.prototype =
 
     Internal_Draw_6 : function(CurPage, pGraphics, Pr)
     {
+        if ( true !== this.Is_NeedDrawBorders() )
+            return;
+        
         var bEmpty  = this.IsEmpty();
         var X_left  = Math.min( this.Pages[CurPage].X + Pr.ParaPr.Ind.Left, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left + Pr.ParaPr.Ind.FirstLine );
         var X_right = this.Pages[CurPage].XLimit - Pr.ParaPr.Ind.Right;
@@ -7564,7 +7593,7 @@ Paragraph.prototype =
         if ( true === Pr.ParaPr.Brd.First && border_Single === Pr.ParaPr.Brd.Top.Value && ( ( 0 === CurPage && ( false === this.Is_StartFromNewPage() || null === this.Get_DocumentPrev() ) ) || ( 1 === CurPage && true === this.Is_StartFromNewPage() )  ) )
         {
             var Y_top = this.Pages[CurPage].Y;
-            if ( 0 === CurPage )
+            if ( 0 === CurPage || ( 1 === CurPage && true === this.Is_StartFromNewPage() ) )
                 Y_top += Pr.ParaPr.Spacing.Before;
 
             pGraphics.p_color( Pr.ParaPr.Brd.Top.Color.r, Pr.ParaPr.Brd.Top.Color.g, Pr.ParaPr.Brd.Top.Color.b, 255 );
@@ -7577,7 +7606,7 @@ Paragraph.prototype =
                 var X0 = ( 0 === CurRange ? X_left : this.Lines[StartLine].Ranges[CurRange].X );
                 var X1 = ( RangesCount - 1 === CurRange ? X_right : this.Lines[StartLine].Ranges[CurRange].XEnd );
 
-                if ( this.Lines[StartLine].Ranges[CurRange].W > 0.001 || ( true === bEmpty && 1 === RangesCount ) )
+                if ( false === this.Is_EmptyRange(StartLine, CurRange) || ( true === bEmpty && 1 === RangesCount ) )
                     pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y_top, X0, X1, Pr.ParaPr.Brd.Top.Size, LeftMW, RightMW );
             }
         }
@@ -7590,14 +7619,14 @@ Paragraph.prototype =
             {
                 pGraphics.p_color( Pr.ParaPr.Brd.Top.Color.r, Pr.ParaPr.Brd.Top.Color.g, Pr.ParaPr.Brd.Top.Color.b, 255 );
                 Size  = Pr.ParaPr.Brd.Top.Size;
-                Y     = this.Pages[CurPage].Y + this.Lines[this.Pages[CurPage].FirstLine].Top;
+                Y     = this.Pages[CurPage].Y + this.Lines[this.Pages[CurPage].FirstLine].Top + Pr.ParaPr.Spacing.Before;
                 bDraw = true;
             }
             else if ( 0 === CurPage && false === this.Is_StartFromNewPage() && border_Single === Pr.ParaPr.Brd.Between.Value )
             {
                 pGraphics.p_color( Pr.ParaPr.Brd.Between.Color.r, Pr.ParaPr.Brd.Between.Color.g, Pr.ParaPr.Brd.Between.Color.b, 255 );
                 Size  = Pr.ParaPr.Brd.Between.Size;
-                Y     = this.Pages[CurPage].Y;
+                Y     = this.Pages[CurPage].Y + Pr.ParaPr.Spacing.Before;
                 bDraw = true;
             }
 
@@ -7611,7 +7640,7 @@ Paragraph.prototype =
                     var X0 = ( 0 === CurRange ? X_left : this.Lines[StartLine].Ranges[CurRange].X );
                     var X1 = ( RangesCount - 1 === CurRange ? X_right : this.Lines[StartLine].Ranges[CurRange].XEnd );
 
-                    if ( this.Lines[StartLine].Ranges[CurRange].W > 0.001 || ( true === bEmpty && 1 === RangesCount ) )
+                    if ( false === this.Is_EmptyRange(StartLine, CurRange) || ( true === bEmpty && 1 === RangesCount ) )
                         pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y, X0, X1, Size, LeftMW, RightMW );
                 }
             }
@@ -7647,7 +7676,7 @@ Paragraph.prototype =
                 var X0 = ( 0 === CurRange ? X_left : this.Lines[EndLine].Ranges[CurRange].X );
                 var X1 = ( RangesCount - 1 === CurRange ? X_right : this.Lines[EndLine].Ranges[CurRange].XEnd );
 
-                if ( this.Lines[EndLine].Ranges[CurRange].W > 0.001 || ( true === bEmpty && 1 === RangesCount ) )
+                if ( false === this.Is_EmptyRange(EndLine, CurRange) || ( true === bEmpty && 1 === RangesCount ) )
                     pGraphics.drawHorLineExt( DrawLineRule, TempY, X0, X1, Pr.ParaPr.Brd.Bottom.Size, LeftMW, RightMW );
             }
         }
@@ -7666,12 +7695,20 @@ Paragraph.prototype =
                     var X0 = ( 0 === CurRange ? X_left : this.Lines[EndLine].Ranges[CurRange].X );
                     var X1 = ( RangesCount - 1 === CurRange ? X_right : this.Lines[EndLine].Ranges[CurRange].XEnd );
 
-                    if ( this.Lines[EndLine].Ranges[CurRange].W > 0.001 || ( true === bEmpty && 1 === RangesCount ) )
+                    if ( false === this.Is_EmptyRange(EndLine, CurRange) || ( true === bEmpty && 1 === RangesCount ) )
                         pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, this.Pages[CurPage].Y + this.Lines[CurLine].Y + this.Lines[CurLine].Metrics.Descent + this.Lines[CurLine].Metrics.LineGap, X0, X1, Pr.ParaPr.Brd.Bottom.Size, LeftMW, RightMW );
                 }
             }
         }
 
+    },
+    
+    Is_NeedDrawBorders : function()
+    {
+        if ( true === this.IsEmpty() && undefined !== this.SectPr )
+            return false;
+        
+        return true;
     },
 
     ReDraw : function()
@@ -7692,19 +7729,30 @@ Paragraph.prototype =
         var Page_abs = PageIndex + this.Get_StartPage_Absolute();
         this.Pages[PageIndex].Shift( Dx, Dy );
 
-        var StartLine = this.Pages[PageIndex].FirstLine;
-        var EndLine   = ( PageIndex >= this.Pages.length - 1 ? this.Lines.length - 1 : this.Pages[PageIndex + 1].FirstLine - 1 );
+        var StartLine = this.Pages[PageIndex].StartLine;
+        var EndLine   = this.Pages[PageIndex].EndLine;
+        
         for ( var CurLine = StartLine; CurLine <= EndLine; CurLine++ )
             this.Lines[CurLine].Shift( Dx, Dy );
 
         // Пробегаемся по всем картинкам на данной странице и обновляем координаты
         var Count = this.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
+        for ( var CurLine = StartLine; CurLine <= EndLine; CurLine++ )
         {
-            var Item = this.Content[Index];
-            if ( para_Drawing === Item.Type && Item.PageNum === Page_abs )
+            var Line = this.Lines[CurLine];
+            var RangesCount = Line.Ranges.length;
+
+            for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
             {
-                Item.Shift( Dx, Dy );
+                var Range    = Line.Ranges[CurRange];
+                var StartPos = Range.StartPos;
+                var EndPos   = Range.EndPos;
+
+                for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
+                {
+                    var Item = this.Content[Pos];
+                    Item.Shift_Range( Dx, Dy, CurLine, CurRange );
+                }
             }
         }
     },
@@ -15288,7 +15336,7 @@ Paragraph.prototype =
                 }
             }
 
-            if ( false === this.Internal_Is_NullBorders(Pr.ParaPr.Brd) && true === this.Internal_CompareBrd( Prev_Pr, Pr.ParaPr ) )
+            if ( false === this.Internal_Is_NullBorders(Pr.ParaPr.Brd) && true === this.Internal_CompareBrd( Prev_Pr, Pr.ParaPr ) && undefined === PrevEl.Get_SectionPr() )
                 Pr.ParaPr.Brd.First = false;
             else
                 Pr.ParaPr.Brd.First = true;
@@ -15334,7 +15382,7 @@ Paragraph.prototype =
                     }
                 }
 
-                if ( false === this.Internal_Is_NullBorders(Pr.ParaPr.Brd) && true === this.Internal_CompareBrd( Next_Pr, Pr.ParaPr ) )
+                if ( false === this.Internal_Is_NullBorders(Pr.ParaPr.Brd) && true === this.Internal_CompareBrd( Next_Pr, Pr.ParaPr ) && undefined === this.Get_SectionPr() && (undefined === NextEl.Get_SectionPr() || true !== NextEl.IsEmpty() ) )
                     Pr.ParaPr.Brd.Last = false;
                 else
                     Pr.ParaPr.Brd.Last = true;
@@ -20968,8 +21016,10 @@ Paragraph.prototype =
         var H = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
         var X = this.Lines[CurLine].Ranges[CurRange].XVisible;
         var W = RangeW.W;
+        var B = this.Lines[CurLine].Y      - this.Lines[CurLine].Top;
+        var XLimit = this.XLimit - this.Get_CompiledPr2(false).ParaPr.Ind.Right
 
-        return { X : X, Y : Y, W : W, H : H };
+        return { X : X, Y : Y, W : W, H : H, BaseLine : B, XLimit : XLimit };
     },
 
 
@@ -21201,7 +21251,7 @@ CParaLineMetrics.prototype =
             }
             case linerule_Exact:
             {
-                var ExactValue = Math.max( 1, ParaPr.Spacing.Line );
+                var ExactValue = Math.max( 25.4 / 72, ParaPr.Spacing.Line );
                 LineGap = ExactValue - ( TextAscent + TextDescent );
 
                 var Gap = this.Ascent + this.Descent - ExactValue;

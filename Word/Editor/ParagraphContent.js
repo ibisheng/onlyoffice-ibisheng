@@ -2420,9 +2420,12 @@ function ParaNewLine(BreakType)
     this.BreakType = BreakType;
 
     this.Flags = new Object(); // специальные флаги для разных break
+    this.Flags.Use = true;
 
     if ( break_Page === this.BreakType )
-        this.Flags.NewLine = true;
+    {
+        this.Flags.NewLine = true;        
+    }
 
     this.Height       = 0;
     this.Width        = 0;
@@ -2433,6 +2436,9 @@ ParaNewLine.prototype =
 {
     Draw : function(X,Y,Context)
     {
+        if ( false === this.Flags.Use )
+            return;
+        
         if ( typeof (editor) !== "undefined" && editor.ShowParaMarks )
         {
             switch( this.BreakType )
@@ -2471,6 +2477,14 @@ ParaNewLine.prototype =
 
     Measure : function(Context)
     {
+        if ( false === this.Flags.Use )
+        {
+            this.Width        = 0;
+            this.WidthVisible = 0;
+            this.Height       = 0;
+            return;
+        }
+
         switch( this.BreakType )
         {
             case break_Line:
@@ -2498,6 +2512,14 @@ ParaNewLine.prototype =
 
     Update_String : function(_W)
     {
+        if ( false === this.Flags.Use )
+        {
+            this.Width        = 0;
+            this.WidthVisible = 0;
+            this.Height       = 0;
+            return;
+        }
+        
         if ( break_Page === this.BreakType )
         {
             var W = ( false === this.Flags.NewLine ? 50 : _W );

@@ -63,7 +63,7 @@ CSectionPr.prototype =
 
         // Настройки страницы
         this.Set_PageSize( Other.PageSize.W, Other.PageSize.H );
-        this.Set_Orientation( Other.PageSize.Orient );
+        this.Set_Orientation( Other.PageSize.Orient, false );
 
         // Настройки отступов
         this.Set_PageMargins( Other.PageMargins.L, Other.PageMargins.T, Other.PageMargins.R, Other.PageMargins.B );
@@ -84,6 +84,8 @@ CSectionPr.prototype =
         this.Set_Footer_First( Other.FooterFirst );
         this.Set_Footer_Even( Other.FooterEven );
         this.Set_Footer_Default( Other.FooterDefault );
+        
+        this.Set_PageNum_Start( Other.PageNumType.Start );
     },
     
     Clear_AllHdrFtr : function()
@@ -181,12 +183,32 @@ CSectionPr.prototype =
         return this.PageMargins.Bottom;
     },
 
-    Set_Orientation : function(Orient)
+    Set_Orientation : function(Orient, ApplySize)    
     {
         if ( this.PageSize.Orient !== Orient )
-        {
+        {            
             History.Add(this, { Type: historyitem_Section_PageSize_Orient, Old: this.PageSize.Orient, New: Orient });
             this.PageSize.Orient = Orient;
+            
+            if ( true === ApplySize )
+            {
+                // При смене ориентации меняем местами высоту и ширину страницы и изменяем отступы
+
+                var W = this.PageSize.W;
+                var H = this.PageSize.H;
+
+                var L = this.PageMargins.Left;
+                var R = this.PageMargins.Right;
+                var T = this.PageMargins.Top;
+                var B = this.PageMargins.Bottom;
+                
+                this.Set_PageSize(H, W);
+                
+                if ( orientation_Portrait === Orient )
+                    this.Set_PageMargins( T, R, B, L );
+                else
+                    this.Set_PageMargins( B, L, T, R );
+            }
         }
     },
 
@@ -1326,7 +1348,7 @@ function CSectionBorders()
     this.Bottom     = new CDocumentBorder();
     this.Left       = new CDocumentBorder();
     this.Right      = new CDocumentBorder();
-
+    
     this.Display    = section_borders_DisplayAllPages;
     this.OffsetFrom = section_borders_OffsetFromPage;
     this.ZOrder     = section_borders_ZOrderFront;

@@ -742,6 +742,20 @@ ParaMath.prototype =
             RangeW.W += this.Width;
         }
     },
+    
+    Shift_Range : function(Dx, Dy, _CurLine, _CurRange)
+    {
+        var CurLine = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
+        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
+
+        if ( EndPos >= 1 )
+        {
+            // TODO: Сделать смещение на Dx, Dy
+        }        
+    },
 //-----------------------------------------------------------------------------------
 // Функции отрисовки
 //-----------------------------------------------------------------------------------

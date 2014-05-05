@@ -4516,19 +4516,22 @@ CTable.prototype =
         var Y_offset = Cell.Temp.Y_VAlign_offset[Cell_PageRel];
 
         var Y = 0;
+        var H = 0;
         if ( 0 != Cell_PageRel )
         {
             // мы должны определить ряд, на котором случился перенос на новую страницу
             var TempRowIndex = this.Pages[CurPage].FirstRow;
 
             Y = this.RowsInfo[TempRowIndex].Y[CurPage] + this.RowsInfo[TempRowIndex].TopDy[CurPage] + CellMar.Top.W + Y_offset;
+            H = this.RowsInfo[TempRowIndex].H[CurPage];
         }
         else
         {
             Y = this.RowsInfo[CurRow].Y[CurPage] + this.RowsInfo[CurRow].TopDy[CurPage] + CellMar.Top.W + Y_offset;
+            H = this.RowsInfo[CurRow].H[CurPage];
         }
 
-        return { X : X_start, Y : Y, W : X_end - X_start, H : 10 };
+        return { X : X_start, Y : Y, W : X_end - X_start, H : H, BaseLine : H, XLimit : this.XLimit };
     },
 
 

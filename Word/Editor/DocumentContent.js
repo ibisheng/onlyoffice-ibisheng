@@ -181,8 +181,8 @@ CDocumentContent.prototype =
             var SectPr = this.LogicDocument.SectionsInfo.Get_SectPr(Index).SectPr;
             var Orient = SectPr.Get_Orientation();
 
-            var W = ( orientation_Portrait === Orient ? SectPr.Get_PageWidth() : SectPr.Get_PageHeight() );
-            var H = ( orientation_Portrait !== Orient ? SectPr.Get_PageWidth() : SectPr.Get_PageHeight() );
+            var W = SectPr.Get_PageWidth();
+            var H = SectPr.Get_PageHeight();
 
             return { X : 0, Y : 0, XLimit : W, YLimit : H };
         }
@@ -211,8 +211,8 @@ CDocumentContent.prototype =
                 var SectPr = this.LogicDocument.SectionsInfo.Get_SectPr(Index).SectPr;
                 var Orient = SectPr.Get_Orientation();
 
-                var W = ( orientation_Portrait === Orient ? SectPr.Get_PageWidth() : SectPr.Get_PageHeight() );
-                var H = ( orientation_Portrait !== Orient ? SectPr.Get_PageWidth() : SectPr.Get_PageHeight() );
+                var W = SectPr.Get_PageWidth();
+                var H = SectPr.Get_PageHeight();
 
                 return { X : 0, Y : 0, XLimit : W, YLimit : H };
             }
@@ -227,21 +227,10 @@ CDocumentContent.prototype =
             var SectPr = this.LogicDocument.SectionsInfo.Get_SectPr(Index).SectPr;
             var Orient = SectPr.Get_Orientation();
 
-            var X, Y, XLimit, YLimit;
-            if ( orientation_Portrait == SectPr.PageSize.Orient )
-            {
-                Y      = SectPr.PageMargins.Top;
-                YLimit = SectPr.PageSize.H - SectPr.PageMargins.Bottom;
-                X      = SectPr.PageMargins.Left;
-                XLimit = SectPr.PageSize.W - SectPr.PageMargins.Right;
-            }
-            else
-            {
-                Y      = SectPr.PageMargins.Left;
-                YLimit = SectPr.PageSize.W - SectPr.PageMargins.Right;
-                X      = SectPr.PageMargins.Bottom;
-                XLimit = SectPr.PageSize.H - SectPr.PageMargins.Top;
-            }
+            var Y      = SectPr.PageMargins.Top;
+            var YLimit = SectPr.PageSize.H - SectPr.PageMargins.Bottom;
+            var X      = SectPr.PageMargins.Left;
+            var XLimit = SectPr.PageSize.W - SectPr.PageMargins.Right;
 
             return { X : X, Y : Y, XLimit : XLimit, YLimit : YLimit };            
         }
@@ -757,7 +746,7 @@ CDocumentContent.prototype =
                         // Получим параметры расположения рамки
                         TempElement.Set_DocumentIndex( TempIndex );
 
-                        if ( Index != TempIndex || true != this.RecalcInfo.FrameRecalc )
+                        if ( Index != TempIndex || ( true != this.RecalcInfo.FrameRecalc &&  ( ( 0 === Index && 0 === PageIndex ) || Index != StartIndex ) ) )
                             TempElement.Reset( 0, FrameH, Frame_XLimit, Frame_YLimit, PageIndex );
 
                         TempElement.Recalculate_Page( PageIndex );
@@ -809,8 +798,8 @@ CDocumentContent.prototype =
                     //--------------------------------------------------------------------------------------------------
 
                     // Теперь зная размеры рамки можем рассчитать ее позицию
-                    var FrameHAnchor = ( FramePr.HAnchor === undefined ? c_oAscHAnchor.Page : FramePr.HAnchor );
-                    var FrameVAnchor = ( FramePr.VAnchor === undefined ? c_oAscVAnchor.Page : FramePr.VAnchor );
+                    var FrameHAnchor = ( FramePr.HAnchor === undefined ? c_oAscHAnchor.Margin : FramePr.HAnchor );
+                    var FrameVAnchor = ( FramePr.VAnchor === undefined ? c_oAscVAnchor.Text : FramePr.VAnchor );
 
                     // Рассчитаем положение по горизонтали
                     var FrameX = 0;
@@ -863,7 +852,7 @@ CDocumentContent.prototype =
                     }
 
                     if ( FrameW + FrameX > Page_W )
-                        FrameX = Page.Width - FrameW;
+                        FrameX = Page_W - FrameW;
 
                     if ( FrameX < 0 )
                         FrameX = 0;
@@ -958,7 +947,7 @@ CDocumentContent.prototype =
                         var FrameDx = ( undefined === FramePr.HSpace ? 0 : FramePr.HSpace );
                         var FrameDy = ( undefined === FramePr.VSpace ? 0 : FramePr.VSpace );
 
-                        this.DrawingObjects.addFloatTable( new CFlowParagraph( Element, FrameX2, FrameY2, FrameW2, FrameH2, FrameDx, FrameDy, Index, FlowCount ) );
+                        this.DrawingObjects.addFloatTable( new CFlowParagraph( Element, FrameX2, FrameY2, FrameW2, FrameH2, FrameDx, FrameDy, Index, FlowCount, FramePr.Wrap ) );
 
                         Index += FlowCount - 1;
 

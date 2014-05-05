@@ -1012,7 +1012,21 @@ ParaHyperlink.prototype =
 
         for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
         {
-            this.Content[CurPos].Get_Range_VisibleWidth(RangeW, CurLine, CurRange);
+            this.Content[CurPos].Get_Range_VisibleWidth(RangeW, _CurLine, _CurRange);
+        }
+    },
+
+    Shift_Range : function(Dx, Dy, _CurLine, _CurRange)
+    {
+        var CurLine = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
+        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
+
+        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+        {
+            this.Content[CurPos].Shift_Range(Dx, Dy, _CurLine, _CurRange);
         }
     },
 //-----------------------------------------------------------------------------------

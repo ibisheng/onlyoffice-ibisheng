@@ -661,21 +661,10 @@ CDocument.prototype =
     {
         var SectPr = this.SectionsInfo.Get_SectPr(ElementIndex).SectPr;
 
-        var X, Y, XLimit, YLimit;
-        if ( orientation_Portrait == SectPr.PageSize.Orient )
-        {
-            Y      = SectPr.PageMargins.Top;
-            YLimit = SectPr.PageSize.H - SectPr.PageMargins.Bottom;
-            X      = SectPr.PageMargins.Left;
-            XLimit = SectPr.PageSize.W - SectPr.PageMargins.Right;
-        }
-        else
-        {
-            Y      = SectPr.PageMargins.Left;
-            YLimit = SectPr.PageSize.W - SectPr.PageMargins.Right;
-            X      = SectPr.PageMargins.Bottom;
-            XLimit = SectPr.PageSize.H - SectPr.PageMargins.Top;
-        }
+        var Y      = SectPr.PageMargins.Top;
+        var YLimit = SectPr.PageSize.H - SectPr.PageMargins.Bottom;
+        var X      = SectPr.PageMargins.Left;
+        var XLimit = SectPr.PageSize.W - SectPr.PageMargins.Right;
 
         var HdrFtrLine = this.HdrFtr.Get_HdrFtrLines( PageIndex );
 
@@ -694,10 +683,9 @@ CDocument.prototype =
     {
         var Index = ( undefined !== this.Pages[PageIndex] ? this.Pages[PageIndex].Pos : 0 );
         var SectPr = this.SectionsInfo.Get_SectPr(Index).SectPr;
-        var Orient = SectPr.Get_Orientation();
-        
-        var W = ( orientation_Portrait === Orient ? SectPr.Get_PageWidth() : SectPr.Get_PageHeight() );
-        var H = ( orientation_Portrait !== Orient ? SectPr.Get_PageWidth() : SectPr.Get_PageHeight() );
+
+        var W = SectPr.Get_PageWidth();
+        var H = SectPr.Get_PageHeight();
         
         return { X : 0, Y : 0, XLimit : W, YLimit : H };
     },
@@ -706,23 +694,11 @@ CDocument.prototype =
     {
         var Index = ( undefined !== this.Pages[PageIndex] ? this.Pages[PageIndex].Pos : 0 );
         var SectPr = this.SectionsInfo.Get_SectPr(Index).SectPr;
-        var Orient = SectPr.Get_Orientation();
 
-        var X, Y, XLimit, YLimit;
-        if ( orientation_Portrait == SectPr.PageSize.Orient )
-        {
-            Y      = SectPr.PageMargins.Top;
-            YLimit = SectPr.PageSize.H - SectPr.PageMargins.Bottom;
-            X      = SectPr.PageMargins.Left;
-            XLimit = SectPr.PageSize.W - SectPr.PageMargins.Right;
-        }
-        else
-        {
-            Y      = SectPr.PageMargins.Left;
-            YLimit = SectPr.PageSize.W - SectPr.PageMargins.Right;
-            X      = SectPr.PageMargins.Bottom;
-            XLimit = SectPr.PageSize.H - SectPr.PageMargins.Top;
-        }
+        var Y      = SectPr.PageMargins.Top;
+        var YLimit = SectPr.PageSize.H - SectPr.PageMargins.Bottom;
+        var X      = SectPr.PageMargins.Left;
+        var XLimit = SectPr.PageSize.W - SectPr.PageMargins.Right;
         
         return { X : X, Y : Y, XLimit : XLimit, YLimit : YLimit };
     },
@@ -1040,24 +1016,12 @@ CDocument.prototype =
 
             var SectPr = this.SectionsInfo.Get_SectPr(StartIndex).SectPr;
 
-            if ( orientation_Portrait === SectPr.PageSize.Orient )
-            {
-                this.Pages[PageIndex].Width          = SectPr.PageSize.W;
-                this.Pages[PageIndex].Height         = SectPr.PageSize.H;
-                this.Pages[PageIndex].Margins.Left   = SectPr.PageMargins.Left;
-                this.Pages[PageIndex].Margins.Top    = SectPr.PageMargins.Top;
-                this.Pages[PageIndex].Margins.Right  = SectPr.PageSize.W - SectPr.PageMargins.Right;
-                this.Pages[PageIndex].Margins.Bottom = SectPr.PageSize.H - SectPr.PageMargins.Bottom;
-            }
-            else
-            {
-                this.Pages[PageIndex].Width          = SectPr.PageSize.H;
-                this.Pages[PageIndex].Height         = SectPr.PageSize.W;
-                this.Pages[PageIndex].Margins.Left   = SectPr.PageMargins.Bottom;
-                this.Pages[PageIndex].Margins.Top    = SectPr.PageMargins.Left;
-                this.Pages[PageIndex].Margins.Right  = SectPr.PageSize.H - SectPr.PageMargins.Top;
-                this.Pages[PageIndex].Margins.Bottom = SectPr.PageSize.W - SectPr.PageMargins.Right;
-            }
+            this.Pages[PageIndex].Width          = SectPr.PageSize.W;
+            this.Pages[PageIndex].Height         = SectPr.PageSize.H;
+            this.Pages[PageIndex].Margins.Left   = SectPr.PageMargins.Left;
+            this.Pages[PageIndex].Margins.Top    = SectPr.PageMargins.Top;
+            this.Pages[PageIndex].Margins.Right  = SectPr.PageSize.W - SectPr.PageMargins.Right;
+            this.Pages[PageIndex].Margins.Bottom = SectPr.PageSize.H - SectPr.PageMargins.Bottom;
         }
 
         var Count = this.Content.length;
@@ -1284,7 +1248,17 @@ CDocument.prototype =
                             break;
                     }
 
-                    // Сначала рассчитаем размер рамки
+                    var Page_W = Page.Width;
+                    var Page_H = Page.Height;
+
+                    var Page_Field_L = Page.Margins.Left;
+                    var Page_Field_R = Page.Margins.Right;
+                    var Page_Field_T = Page.Margins.Top;
+                    var Page_Field_B = Page.Margins.Bottom;
+
+                    //--------------------------------------------------------------------------------------------------
+                    // 1. Рассчитаем размер рамки
+                    //--------------------------------------------------------------------------------------------------
                     var FrameH = 0;
                     var FrameW = -1;
 
@@ -1292,21 +1266,24 @@ CDocument.prototype =
                     var Frame_YLimit = FramePr.Get_H();
 
                     if ( undefined === Frame_XLimit )
-                        Frame_XLimit = Page.Width - Page.Margins.Left - Page.Margins.Right;
+                        Frame_XLimit = Page_Field_R - Page_Field_L;
 
                     if ( undefined === Frame_YLimit )
-                        Frame_YLimit = Page.Height;
-
+                        Frame_YLimit = Page_H;
+                    
                     for ( var TempIndex = Index; TempIndex < Index + FlowCount; TempIndex++ )
                     {
                         var TempElement = this.Content[TempIndex];
                         // Получим параметры расположения рамки
                         TempElement.Set_DocumentIndex( TempIndex );
 
-                        if ( Index != TempIndex || true != this.RecalcInfo.FrameRecalc )
+                        if ( Index != TempIndex || ( true != this.RecalcInfo.FrameRecalc &&  ( ( 0 === Index && 0 === PageIndex ) || Index != StartIndex || ( Index === StartIndex && true === bStartNewSection ) ) ) )
                             TempElement.Reset( 0, FrameH, Frame_XLimit, Frame_YLimit, PageIndex );
 
-                        TempElement.Recalculate_Page( PageIndex );
+                        RecalcResult = TempElement.Recalculate_Page( PageIndex );
+                        
+                        if ( recalcresult_NextElement !== RecalcResult )
+                            break;                        
 
                         FrameH = TempElement.Get_PageBounds( PageIndex - TempElement.Get_StartPage_Absolute()).Bottom;
                     }
@@ -1348,9 +1325,13 @@ CDocument.prototype =
                         }
                     }
 
+                    //--------------------------------------------------------------------------------------------------
+                    // 2. Рассчитаем положение рамки
+                    //--------------------------------------------------------------------------------------------------
+
                     // Теперь зная размеры рамки можем рассчитать ее позицию
-                    var FrameHAnchor = ( FramePr.HAnchor === undefined ? c_oAscHAnchor.Page : FramePr.HAnchor );
-                    var FrameVAnchor = ( FramePr.VAnchor === undefined ? c_oAscVAnchor.Page : FramePr.VAnchor );
+                    var FrameHAnchor = ( FramePr.HAnchor === undefined ? c_oAscHAnchor.Margin : FramePr.HAnchor );
+                    var FrameVAnchor = ( FramePr.VAnchor === undefined ? c_oAscVAnchor.Text : FramePr.VAnchor );
 
                     // Рассчитаем положение по горизонтали
                     var FrameX = 0;
@@ -1368,9 +1349,9 @@ CDocument.prototype =
                                 {
                                     case c_oAscXAlign.Inside  :
                                     case c_oAscXAlign.Outside :
-                                    case c_oAscXAlign.Left    : FrameX = Page.Margins.Left - FrameW; break;
-                                    case c_oAscXAlign.Right   : FrameX = Page.Width - Page.Margins.Right; break;
-                                    case c_oAscXAlign.Center  : FrameX = (Page.Width - FrameW) / 2; break;
+                                    case c_oAscXAlign.Left    : FrameX = Page_Field_L - FrameW; break;
+                                    case c_oAscXAlign.Right   : FrameX = Page_Field_R; break;
+                                    case c_oAscXAlign.Center  : FrameX = (Page_W - FrameW) / 2; break;
                                 }
 
                                 break;
@@ -1382,9 +1363,9 @@ CDocument.prototype =
                                 {
                                     case c_oAscXAlign.Inside  :
                                     case c_oAscXAlign.Outside :
-                                    case c_oAscXAlign.Left    : FrameX = Page.Margins.Left; break;
-                                    case c_oAscXAlign.Right   : FrameX = Page.Width - Page.Margins.Right - FrameW; break;
-                                    case c_oAscXAlign.Center  : FrameX = (Page.Margins.Left + Page.Width - Page.Margins.Right - FrameW) / 2; break;
+                                    case c_oAscXAlign.Left    : FrameX = Page_Field_L; break;
+                                    case c_oAscXAlign.Right   : FrameX = Page_Field_R - FrameW; break;
+                                    case c_oAscXAlign.Center  : FrameX = (Page_Field_R + Page_Field_L - FrameW) / 2; break;
                                 }
 
                                 break;
@@ -1398,12 +1379,12 @@ CDocument.prototype =
                         {
                             case c_oAscHAnchor.Page   : FrameX = FramePr.X; break;
                             case c_oAscHAnchor.Text   :
-                            case c_oAscHAnchor.Margin : FrameX = Page.Margins.Left + FramePr.X; break;
+                            case c_oAscHAnchor.Margin : FrameX = Page_Field_L + FramePr.X; break;
                         }
                     }
 
-                    if ( FrameW + FrameX > Page.Width )
-                        FrameX = Page.Width - FrameW;
+                    if ( FrameW + FrameX > Page_W )
+                        FrameX = Page_W - FrameW;
 
                     if ( FrameX < 0 )
                         FrameX = 0;
@@ -1424,8 +1405,8 @@ CDocument.prototype =
                                     case c_oAscYAlign.Inline  :
                                     case c_oAscYAlign.Outside :
                                     case c_oAscYAlign.Top     : FrameY = 0; break;
-                                    case c_oAscYAlign.Bottom  : FrameY = Page.Height - FrameH; break;
-                                    case c_oAscYAlign.Center  : FrameY = (Page.Height - FrameH) / 2; break;
+                                    case c_oAscYAlign.Bottom  : FrameY = Page_H - FrameH; break;
+                                    case c_oAscYAlign.Center  : FrameY = (Page_H - FrameH) / 2; break;
                                 }
 
                                 break;
@@ -1442,9 +1423,9 @@ CDocument.prototype =
                                     case c_oAscYAlign.Inside  :
                                     case c_oAscYAlign.Inline  :
                                     case c_oAscYAlign.Outside :
-                                    case c_oAscYAlign.Top     : FrameY = Page.Margins.Top; break;
-                                    case c_oAscYAlign.Bottom  : FrameY = Page.Height - Page.Margins.Bottom - FrameH; break;
-                                    case c_oAscYAlign.Center  : FrameY = (Page.Margins.Top + Page.Height - Page.Margins.Bottom - FrameH) / 2; break;
+                                    case c_oAscYAlign.Top     : FrameY = Page_Field_T; break;
+                                    case c_oAscYAlign.Bottom  : FrameY = Page_Field_B - FrameH; break;
+                                    case c_oAscYAlign.Center  : FrameY = (Page_Field_B + Page_Field_T - FrameH) / 2; break;
                                 }
 
                                 break;
@@ -1461,12 +1442,12 @@ CDocument.prototype =
                         {
                             case c_oAscVAnchor.Page   : FrameY = FramePrY; break;
                             case c_oAscVAnchor.Text   : FrameY = FramePrY + Y; break;
-                            case c_oAscVAnchor.Margin : FrameY = FramePrY + Page.Margins.Top; break;
+                            case c_oAscVAnchor.Margin : FrameY = FramePrY + Page_Field_T; break;
                         }
                     }
 
-                    if ( FrameH + FrameY > Page.Height )
-                        FrameY = Page.Height - FrameH;
+                    if ( FrameH + FrameY > Page_H )
+                        FrameY = Page_H - FrameH;
 
                     // TODO: Пересмотреть, почему эти погрешности возникают
                     // Избавляемся от погрешности
@@ -1479,7 +1460,16 @@ CDocument.prototype =
                     var FrameBounds = this.Content[Index].Get_FrameBounds(FrameX, FrameY, FrameW, FrameH);
                     var FrameX2 = FrameBounds.X, FrameY2 = FrameBounds.Y, FrameW2 = FrameBounds.W, FrameH2 = FrameBounds.H;
 
-                    if ( (FrameY2 + FrameH2 > YLimit || Y > YLimit - 0.001 ) && Index != StartIndex )
+                    if ( recalcresult_NextElement !== RecalcResult )
+                    {
+                        // Ничего не делаем здесь, пересчитываем текущую страницу заново, либо предыдущую
+                        
+                        if ( recalcresult_PrevPage === RecalcResult )
+                            this.RecalcInfo.Set_FrameRecalc(false);
+                        
+                        // TODO: Если мы заново пересчитываем текущую страницу, проверить надо ли обнулять параметр RecalcInfo.FrameRecalc
+                    }
+                    else if ( (FrameY2 + FrameH2 > YLimit || Y > YLimit - 0.001 ) && Index != StartIndex )
                     {
                         this.RecalcInfo.Set_FrameRecalc(true);
                         this.Content[Index].Start_FromNewPage();
@@ -1498,7 +1488,7 @@ CDocument.prototype =
                         var FrameDx = ( undefined === FramePr.HSpace ? 0 : FramePr.HSpace );
                         var FrameDy = ( undefined === FramePr.VSpace ? 0 : FramePr.VSpace );
 
-                        this.DrawingObjects.addFloatTable( new CFlowParagraph( Element, FrameX2, FrameY2, FrameW2, FrameH2, FrameDx, FrameDy, Index, FlowCount ) );
+                        this.DrawingObjects.addFloatTable( new CFlowParagraph( Element, FrameX2, FrameY2, FrameW2, FrameH2, FrameDx, FrameDy, Index, FlowCount, FramePr.Wrap ) );
 
                         Index += FlowCount - 1;
 
@@ -1533,20 +1523,41 @@ CDocument.prototype =
 
                 // Делаем как в Word: Обработаем особый случай, когда на данном параграфе заканчивается секция, и он
                 // пустой. В такой ситуации этот параграф не добавляет смещения по Y, и сам приписывается в конец
-                // предыдущего элемента.
+                // предыдущего элемента. Второй подряд идущий такой же параграф обсчитывается по обычному.
 
                 var SectInfoElement = this.SectionsInfo.Get_SectPr(Index);
-                if ( Index > 0 && ( Index !== StartIndex || true !== bStartNewSection ) && Index === SectInfoElement.Index && true === Element.IsEmpty() )
+                var PrevElement = this.Content[Index - 1]; // может быть undefined, но в следующем условии сразу стоит проверка на Index > 0
+                if ( Index > 0 && ( Index !== StartIndex || true !== bStartNewSection ) && Index === SectInfoElement.Index && true === Element.IsEmpty() && ( type_Paragraph !== PrevElement.GetType() || true !== PrevElement.IsEmpty() || undefined === PrevElement.Get_SectionPr() ) )
                 {
                     RecalcResult = recalcresult_NextElement;
-                    var LastVisibleBounds = this.Content[Index - 1].Get_LastRangeVisibleBounds();
+                    var LastVisibleBounds = PrevElement.Get_LastRangeVisibleBounds();
 
                     var ___X = LastVisibleBounds.X + LastVisibleBounds.W;
                     var ___Y = LastVisibleBounds.Y;
 
+                    // Чтобы у нас знак разрыва секции рисовался красиво и где надо делаем небольшую хитрость:
+                    // перед пересчетом данного параграфа меняем в нем в скомпилированных настройках прилегание и 
+                    // отступы, а после пересчета помечаем, что настройки нужно скомпилировать заново.
+                    var CompiledPr = Element.Get_CompiledPr2(false).ParaPr;
+                    CompiledPr.Jc = align_Left;
+                    CompiledPr.Ind.FirstLine = 0;   
+                    CompiledPr.Ind.Left      = 0;
+                    CompiledPr.Ind.Right     = 0;
+
                     // Делаем предел по X минимум 10 мм, чтобы всегда было видно элемент разрыва секции
-                    Element.Reset( ___X, ___Y, Math.max( ___X + 10, XLimit ), 10000, PageIndex );
+                    Element.Reset( ___X, ___Y, Math.max( ___X + 10, LastVisibleBounds.XLimit ), 10000, PageIndex );
                     Element.Recalculate_Page( PageIndex );
+                    
+                    Element.Recalc_CompiledPr();
+                    
+                    // Меняем насильно размер строки и страницы данного параграфа, чтобы у него границы попадания и
+                    // селект были ровно такие же как и у последней строки предыдущего элемента.
+                    Element.Pages[0].Y      = ___Y;
+                    Element.Lines[0].Top    = 0;
+                    Element.Lines[0].Y      = LastVisibleBounds.BaseLine;
+                    Element.Lines[0].Bottom = LastVisibleBounds.H;
+                    Element.Pages[0].Bounds.Top    = ___Y;
+                    Element.Pages[0].Bounds.Bottom = ___Y + LastVisibleBounds.H;
 
                     // Добавим в список особых параграфов
                     this.Pages[PageIndex].EndSectionParas.push( Element );
@@ -1923,16 +1934,6 @@ CDocument.prototype =
 
         if (section_borders_OffsetFromPage === Offset)
         {
-            if ( orientation_Portrait !== Orient )
-            {
-                // В случае альбомной ориентации мы не переворачиваем границы вместе со страницей, т.е. левая граница так
-                // и рисуется слева, верхняя - сверху и т.д.
-
-                var Temp = W;
-                W = H;
-                H = Temp;
-            }
-
             // Рисуем левую границу
             if (border_None !== LBorder.Value)
             {
@@ -1979,25 +1980,10 @@ CDocument.prototype =
         }
         else
         {
-            var _X0, _X1, _Y0, _Y1;
-
-            if ( orientation_Portrait === Orient )
-            {
-                _X0 = SectPr.Get_PageMargin_Left();
-                _X1 = W - SectPr.Get_PageMargin_Right();
-                _Y0 = SectPr.Get_PageMargin_Top();
-                _Y1 = H - SectPr.Get_PageMargin_Bottom();
-            }
-            else
-            {
-                // В случае альбомной ориентации мы не переворачиваем границы вместе со страницей, т.е. левая граница так
-                // и рисуется слева, верхняя - сверху и т.д.
-
-                _X0 = SectPr.Get_PageMargin_Bottom();
-                _X1 = H - SectPr.Get_PageMargin_Top();
-                _Y0 = SectPr.Get_PageMargin_Left();
-                _Y1 = W - SectPr.Get_PageMargin_Right();
-            }
+            var _X0 = SectPr.Get_PageMargin_Left();
+            var _X1 = W - SectPr.Get_PageMargin_Right();
+            var _Y0 = SectPr.Get_PageMargin_Top();
+            var _Y1 = H - SectPr.Get_PageMargin_Bottom();
 
             // Рисуем левую границу
             if (border_None !== LBorder.Value)
@@ -7218,22 +7204,10 @@ CDocument.prototype =
         var CurPos = this.CurPos.ContentPos;
         var SectPr = this.SectionsInfo.Get_SectPr( CurPos).SectPr;
 
-        var L, T, R, B;
-
-        if ( orientation_Portrait === SectPr.Get_Orientation() )
-        {
-            L = MarPr.Left;
-            T = MarPr.Top;
-            R = ( undefined === MarPr.Right ? undefined : SectPr.Get_PageWidth() - MarPr.Right );
-            B = ( undefined === MarPr.Bottom ? undefined : SectPr.Get_PageHeight() - MarPr.Bottom );
-        }
-        else
-        {
-            L = MarPr.Top;
-            T = ( undefined === MarPr.Right ? undefined : SectPr.Get_PageHeight() - MarPr.Right );
-            R = ( undefined === MarPr.Bottom ? undefined : SectPr.Get_PageWidth() - MarPr.Bottom );
-            B = MarPr.Left;
-        }
+        var L = MarPr.Left;
+        var T = MarPr.Top;
+        var R = ( undefined === MarPr.Right ? undefined : SectPr.Get_PageWidth() - MarPr.Right );
+        var B = ( undefined === MarPr.Bottom ? undefined : SectPr.Get_PageHeight() - MarPr.Bottom );
 
         SectPr.Set_PageMargins( L, T, R, B );
 
@@ -7285,8 +7259,7 @@ CDocument.prototype =
         var CurPos = this.CurPos.ContentPos;
         var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
 
-        SectPr.Set_Orientation( Orientation );
-        // TODO: Добавить обработку колонтитулов
+        SectPr.Set_Orientation( Orientation, true );
 
         if( true != bNoRecalc )
         {
@@ -10314,12 +10287,7 @@ CDocument.prototype =
                 SectPr.Set_PageMargins_Header( Y0 );
             
             if ( null !== Y1 )
-            {
-                if ( orientation_Portrait === SectPr.Get_Orientation() )
-                    SectPr.Set_PageMargins( undefined, Y1, undefined, undefined );
-                else
-                    SectPr.Set_PageMargins( Y1, undefined, undefined, undefined );
-            }
+                SectPr.Set_PageMargins( undefined, Y1, undefined, undefined );
         }
         else
         {
@@ -10328,7 +10296,7 @@ CDocument.prototype =
                 var H = Bounds.Bottom - Bounds.Top;
                 var _Y1 = Y0 + H;
 
-                SectPr.Set_PageMargins_Footer( orientation_Portrait === SectPr.Get_Orientation() ? SectPr.Get_PageHeight() - _Y1 : SectPr.Get_PageWidth() - _Y1 );
+                SectPr.Set_PageMargins_Footer( SectPr.Get_PageHeight() - _Y1 );
             }
         }
         
@@ -11217,22 +11185,10 @@ CDocument.prototype =
 
         var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
 
-        var L, T, R, B;
-
-        if ( orientation_Portrait === SectPr.Get_Orientation() )
-        {
-            L = SectPr.Get_PageMargin_Left();
-            T = SectPr.Get_PageMargin_Top();
-            R = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
-            B = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Bottom();
-        }
-        else
-        {
-            L = SectPr.Get_PageMargin_Bottom();
-            T = SectPr.Get_PageMargin_Left();
-            R = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Top();
-            B = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
-        }
+        var L = SectPr.Get_PageMargin_Left();
+        var T = SectPr.Get_PageMargin_Top();
+        var R = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
+        var B = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Bottom();
 
         this.DrawingDocument.Set_RulerState_Paragraph( { L : L, T : T, R : R, B : B } );
     },
@@ -12742,6 +12698,7 @@ CDocument.prototype =
                 
                 SectPr.Copy( CurSectPr );
                 CurSectPr.Set_Type( SectionBreakType );
+                CurSectPr.Set_PageNum_Start( -1 );
                 CurSectPr.Clear_AllHdrFtr();
 
                 History.MinorChanges = false;
@@ -12798,11 +12755,15 @@ CDocument.prototype =
         if ( 0 === SectIndex )
         {
             var PageNumStart = this.SectionsInfo.Get_SectPr2(0).SectPr.Get_PageNum_Start();
+            var BT           = this.SectionsInfo.Get_SectPr2(0).SectPr.Get_Type();
 
             // Нумерация начинается с 1, если начальное значение не задано. Заметим, что в Word нумерация может начинаться и 
             // со значения 0, а все отрицательные значения воспринимаются как продолжение нумерации с предыдущей секции.
             if ( PageNumStart < 0 )
                 PageNumStart = 1;
+
+            if ( (section_type_OddPage === BT && 0 === PageNumStart % 2) || (section_type_EvenPage === BT && 1 === PageNumStart % 2) )
+                PageNumStart++;
 
             return { FirstPage : PageNumStart, CurPage : Page_abs + PageNumStart };
         }
@@ -12811,6 +12772,10 @@ CDocument.prototype =
 
         var FirstPage    = SectionFirstPage;
         var PageNumStart = this.SectionsInfo.Get_SectPr2(SectIndex).SectPr.Get_PageNum_Start();
+        var BreakType    = this.SectionsInfo.Get_SectPr2(SectIndex).SectPr.Get_Type();
+        
+        var StartInfo = new Array();
+        StartInfo.push( { FirstPage : FirstPage, BreakType : BreakType } );
 
         while ( PageNumStart < 0 && SectIndex > 0 )
         {
@@ -12818,20 +12783,44 @@ CDocument.prototype =
 
             FirstPage    = this.Get_SectionFirstPage( SectIndex, Page_abs );
             PageNumStart = this.SectionsInfo.Get_SectPr2(SectIndex).SectPr.Get_PageNum_Start();
+            BreakType    = this.SectionsInfo.Get_SectPr2(SectIndex).SectPr.Get_Type();
+
+            StartInfo.splice( 0, 0, { FirstPage : FirstPage, BreakType : BreakType } );
         }
 
         // Нумерация начинается с 1, если начальное значение не задано. Заметим, что в Word нумерация может начинаться и 
         // со значения 0, а все отрицательные значения воспринимаются как продолжение нумерации с предыдущей секции.
         if ( PageNumStart < 0 )
             PageNumStart = 1;
+        
+        var InfoIndex = 0;
+        var InfoCount = StartInfo.length;
+        
+        var FP = StartInfo[0].FirstPage;
+        var BT = StartInfo[0].BreakType;
+        var PrevFP = StartInfo[0].FirstPage;
+        
+        while ( InfoIndex < InfoCount )
+        {
+            FP = StartInfo[InfoIndex].FirstPage;
+            BT = StartInfo[InfoIndex].BreakType;
+            
+            PageNumStart += FP - PrevFP;
+            PrevFP = FP;
+            
+            if ( (section_type_OddPage === BT && 0 === PageNumStart % 2) || (section_type_EvenPage === BT && 1 === PageNumStart % 2) )
+                PageNumStart++;      
+            
+            InfoIndex++;
+        }
+        
+        if ( FP > Page_abs )
+            Page_abs = FP;
+        
+        var _FP = PageNumStart;
+        var _CP = PageNumStart + Page_abs - FP;       
 
-        if ( FirstPage > Page_abs )
-            return { FirstPage : PageNumStart, CurPage : PageNumStart };       
-
-        var FP = PageNumStart + SectionFirstPage - FirstPage;
-        var CP = PageNumStart + Math.max( Page_abs - FirstPage, SectionFirstPage - FirstPage, 0 );
-
-        return { FirstPage : FP, CurPage : CP };
+        return { FirstPage : _FP, CurPage : _CP };
     },
     
     Get_SectionHdrFtr : function(Page_abs, _bFirst, _bEven)

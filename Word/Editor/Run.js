@@ -1711,11 +1711,12 @@ ParaRun.prototype =
                         Item.Flags.NewLine = true;
 
                         // PageBreak вне самого верхнего документа не надо учитывать
-                        if ( !(Para.Parent instanceof CDocument) )
+                        if ( !(Para.Parent instanceof CDocument) || true !== Para.Is_Inline() )
                         {
                             // TODO: Продумать, как избавиться от данного элемента, т.к. удалять его при пересчете нельзя,
                             //       иначе будут проблемы с совместным редактированием.
 
+                            Item.Flags.Use = false;
                             continue;
                         }
 
@@ -2750,6 +2751,23 @@ ParaRun.prototype =
                     break;
                 }
             }
+        }
+    },
+
+    Shift_Range : function(Dx, Dy, _CurLine, _CurRange)
+    {
+        var CurLine = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
+        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
+
+        for ( var CurPos = StartPos; CurPos < EndPos; CurPos++ )
+        {
+            var Item = this.Content[CurPos];
+            
+            if ( para_Drawing === Item.Type )
+                Item.Shift( Dx, Dy );
         }
     },
 //-----------------------------------------------------------------------------------

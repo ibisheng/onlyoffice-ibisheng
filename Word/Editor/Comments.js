@@ -1077,6 +1077,10 @@ ParaComment.prototype =
     Get_Range_VisibleWidth : function(RangeW, _CurLine, _CurRange)
     {
     },
+
+    Shift_Range : function(Dx, Dy, _CurLine, _CurRange)
+    {
+    },    
 //-----------------------------------------------------------------------------------
 // Функции отрисовки
 //-----------------------------------------------------------------------------------
