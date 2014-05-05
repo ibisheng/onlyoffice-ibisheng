@@ -823,6 +823,9 @@ CMPrp.prototype =
 // 1. (!!) повтор IsIncline, IsHighElement
 
 
+// TODO List
+// посмотреть баг, когда выходим за пределы мат объекта и добавляем букву
+
 function CMathContent()
 {
 	this.Id = g_oIdCounter.Get_NewId();		
@@ -862,6 +865,7 @@ function CMathContent()
 
     ///////////////////////////////
 
+    this.bSelectionUse = false;
     this.SelectStartPos = 0;
     this.SelectEndPos   = 0;
 
@@ -5809,6 +5813,7 @@ CMathContent.prototype =
     },
 
     /// For Para Math
+
     Recalculate_CurPos : function(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
     {
         var result;
@@ -5846,7 +5851,6 @@ CMathContent.prototype =
             //Para.DrawingDocument.UpdateTargetFromPaint = true;
             this.Composition.Parent.Paragraph.DrawingDocument.UpdateTarget( _X, Y, this.Composition.Parent.Paragraph.Get_StartPage_Absolute() + _CurPage );
 
-            //console.log("X of placeholder  " + _X);
 
             result = {X: _X, Y: Y};
         }
@@ -5917,18 +5921,28 @@ CMathContent.prototype =
             }
         }
 
+        this.bSelectionUse = true;
+
     },
     GetSelectContent: function()
     {
-        var startPos = this.SelectStartPos,
+        var startPos, endPos;
+
+        if(this.bSelectionUse)
+        {
+            startPos = this.SelectStartPos;
             endPos = this.SelectEndPos;
 
-        if(startPos > endPos)
-        {
-            var temp = startPos;
-            startPos = endPos;
-            endPos = temp;
+            if(startPos > endPos)
+            {
+                var temp = startPos;
+                startPos = endPos;
+                endPos = temp;
+            }
         }
+        else
+            startPos = endPos = this.CurPos;
+
 
         var bEqual = startPos == endPos,
             bNotSelectComp = bEqual ? this.content[startPos].typeObj === MATH_COMP && this.content[startPos].IsSelectEmpty() : false;
@@ -5936,13 +5950,9 @@ CMathContent.prototype =
         var result;
 
         if(bNotSelectComp)
-        {
             result = this.content[startPos].GetSelectContent(); // startPos == endPos
-        }
         else
-        {
             result = {Content: this, Start: startPos, End: endPos};
-        }
 
         return result;
 
@@ -6124,6 +6134,8 @@ CMathContent.prototype =
     Set_ParaContentPos: function(ContentPos, Depth)
     {
         this.CurPos = ContentPos.Get(Depth);
+        /*this.SelectStartPos = this.CurPos;
+        this.SelectEndPos   = this.CurPos;*/
 
         Depth++;
 
@@ -6352,6 +6364,8 @@ CMathContent.prototype =
 
         this.SelectStartPos = this.CurPos;
         this.SelectEndPos   = this.CurPos;
+
+        this.bSelectionUse = false;
     },
     getElem: function(nNum)
     {

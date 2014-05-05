@@ -54,10 +54,6 @@ CFraction.prototype.init = function(props)
     /// вызов этой функции обязательно в конце
     this.WriteContentsToHistory();
 }
-CFraction.prototype.init_2 = function(props)
-{
-
-}
 CFraction.prototype.getType = function()
 {
     return this.Pr.type;

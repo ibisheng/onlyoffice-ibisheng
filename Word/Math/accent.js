@@ -637,9 +637,16 @@ function CAccent()
     this.kind = MATH_ACCENT;
 
     this.operator = new COperator(OPER_ACCENT);
+    this.Pr =
+    {
+        code:       null,
+        typeOper:   null
+    };
+
     this.code = null;   // храним код буквы и тип здесь
     this.typeOper = null;  // т.к в класах, которые вызываем, не учитываем случаи, когда элементы (стрелки/скобки) переворачиваются
     this.loc = LOCATION_TOP;
+
     CCharacter.call(this);
 }
 extend(CAccent, CCharacter);
@@ -1139,8 +1146,18 @@ CAccent.prototype.init = function(properties)
 
     this.operator = operator;
     this.operator.relate(this);
+
+    ////
+    // TO DO
+    // убрать
+    //
     this.typeOper = typeOper;
     this.code = codeChr;
+
+    ////
+
+    this.Pr.typeOper = typeOper;
+    this.Pr.code = codeChr;
 
     this.setDimension(1, 1);
     this.setContent();
@@ -1165,7 +1182,7 @@ CAccent.prototype.setPosition = function(pos)
     // выставить правильно смещение для остальных значков
     // для обычных текстовых значков (ACCENT_SIGN) выставлено
 
-    if(this.typeOper == ACCENT_SIGN)
+    if(this.Pr.typeOper == ACCENT_SIGN)
         y1 = this.pos.y - this.shiftOperator + this.size.ascent; //shiftOperator to "CCharacter"
     else
         y1 = this.pos.y;

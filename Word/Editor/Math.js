@@ -705,7 +705,6 @@ ParaMath.prototype =
         this.Paragraph.Refresh_RecalcData2(0);
     },
 
-
     Recalculate_MinMaxContentWidth : function(MinMax)
     {
         // TODO: Если формула не измерена, тогда здесь её надо измерить
@@ -755,6 +754,50 @@ ParaMath.prototype =
         {
             // TODO: Сделать смещение на Dx, Dy
         }        
+    },
+//-----------------------------------------------------------------------------------
+// Функция для работы с дефолтными текстовыми настройками и argSize для формулы
+//-----------------------------------------------------------------------------------
+    ApplyArgSize : function(oWPrp)
+    {
+        var tPrp = new CTextPr();
+        var defaultWPrp =
+        {
+            FontFamily:     {Name  : "Cambria Math", Index : -1 },
+            FontSize:       11,
+            Italic:         true,
+            Bold:           false,
+            RFonts:         {},
+            Lang:           {}
+        };
+
+        tPrp.Merge(defaultWPrp);
+        tPrp.Merge(oWPrp);
+
+        var FSize = tPrp.FontSize;
+
+        if(this.argSize == -1)
+        {
+            //aa: 0.0013  bb: 0.66  cc: 0.5
+            //aa: 0.0009  bb: 0.68  cc: 0.26
+            FSize = 0.0009*FSize*FSize + 0.68*FSize + 0.26;
+            //FSize = 0.001*FSize*FSize + 0.723*FSize - 1.318;
+            //FSize = 0.0006*FSize*FSize + 0.743*FSize - 1.53;
+        }
+        else if(this.argSize == -2)
+        {
+            // aa: -0.0004  bb: 0.66  cc: 0.87
+            // aa: -0.0014  bb: 0.71  cc: 0.39
+            // aa: 0  bb: 0.63  cc: 1.11
+            //FSize = 0.63*FSize + 1.11;
+            FSize = -0.0004*FSize*FSize + 0.66*FSize + 0.87;
+            //tPrp.FontSize *= 0.473;
+        }
+
+        tPrp.FontSize = FSize;
+
+        oWPrp.Merge(tPrp);
+
     },
 //-----------------------------------------------------------------------------------
 // Функции отрисовки
@@ -932,6 +975,15 @@ ParaMath.prototype =
         var Pos = ContentPos.Get(Depth);
         this.State.ContentPos = Pos;
 
+        console.log("Set_ParaContentPos");
+        var str = "";
+        for(var i = 0; i < ContentPos.Data.length; i++)
+        {
+            str += ContentPos.Data[i] + "  ";
+        }
+
+        console.log(str);
+
         this.Root.Set_ParaContentPos(ContentPos, Depth);
     },
     Get_PosByElement : function(Class, ContentPos, Depth, UseRange, Range, Line)
@@ -950,6 +1002,16 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Get_LeftPos
         var result = this.Root.Get_LeftPos(SearchPos, ContentPos, Depth, UseContentPos, false);
+
+        console.log("Get_LeftPos");
+        var str = "";
+        for(var i = 0; i < SearchPos.Pos.Data.length; i++)
+        {
+            str += SearchPos.Pos.Data[i] + "  ";
+        }
+
+        console.log(str);
+
         return result;
     },
 

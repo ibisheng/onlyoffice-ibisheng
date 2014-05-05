@@ -26,6 +26,8 @@ function CMathBase()
     this.SelectEnd_X = 0;
     this.SelectEnd_Y = 0;
 
+    this.bSelectionUse = false;
+
 
     this.nRow = 0;
     this.nCol = 0;
@@ -62,6 +64,10 @@ function CMathBase()
 }
 CMathBase.prototype =
 {
+    init_2: function(props)
+    {
+        this.Pr = Common_CopyObj(props);
+    },
     setContent: function()
     {
         this.elements = new Array();
@@ -1328,6 +1334,12 @@ CMathBase.prototype =
             this.CurPos_Y = CurPos_Y;
         }
 
+        /*this.SelectStart_X = this.CurPos_X;
+        this.SelectStart_Y = this.CurPos_Y;
+
+        this.SelectEnd_X = this.CurPos_X;
+        this.SelectEnd_Y = this.CurPos_Y;*/
+
 
         Depth += 2;
 
@@ -1401,7 +1413,14 @@ CMathBase.prototype =
     },
     GetSelectContent: function()
     {
-        return this.elements[this.SelectStart_X][this.SelectStart_Y].GetSelectContent();
+        var result;
+
+        if(this.bSelectionUse)
+            result = this.elements[this.SelectStart_X][this.SelectStart_Y].GetSelectContent();
+        else
+            result = this.elements[this.CurPos_X][this.CurPos_Y].GetSelectContent();
+
+        return result;
     },
     Selection_DrawRange: function(CurLine, CurPage, SelectionDraw) // первые два параметра нужны только для аналогичной функции в ParaRun
     {
@@ -1423,6 +1442,7 @@ CMathBase.prototype =
         if(start_X !== -1 && start_Y !== -1)
             this.elements[start_X][start_Y].Selection_Remove();
 
+        this.bSelectionUse = false;
     },
     Get_LeftPos: function(SearchPos, ContentPos, Depth, UseContentPos, EndRun)
     {
@@ -1447,7 +1467,7 @@ CMathBase.prototype =
             while(CurPos_Y >= 0)
             {
                 var bJDraw = this.elements[CurPos_X][CurPos_Y].IsJustDraw(),
-                    usePlh = bUseContent && this.elements[CurPos_X][CurPos_Y].IsPlaceholder();
+                    usePlh = !bJDraw && bUseContent && this.elements[CurPos_X][CurPos_Y].IsPlaceholder();
 
                 if(!bJDraw && ! usePlh)
                 {
@@ -1500,7 +1520,7 @@ CMathBase.prototype =
             while(CurPos_Y < this.nCol)
             {
                 var bJDraw = this.elements[CurPos_X][CurPos_Y].IsJustDraw(),
-                    usePlh = bUseContent && this.elements[CurPos_X][CurPos_Y].IsPlaceholder();
+                    usePlh = !bJDraw && bUseContent && this.elements[CurPos_X][CurPos_Y].IsPlaceholder();
 
                 if(!bJDraw && ! usePlh)
                 {
@@ -1530,6 +1550,10 @@ CMathBase.prototype =
 
         return result;
 
+    },
+    IsPlaceholder: function()
+    {
+        return false;
     }
 
     //////////////////////////

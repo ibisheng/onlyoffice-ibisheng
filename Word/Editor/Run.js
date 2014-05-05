@@ -745,10 +745,12 @@ ParaRun.prototype =
                     }
                 }
 
+
                 return { X : X, Y : TargetY, Height : Height, Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
             }
             else
                 return { X : X, Y : Y, PageNum : CurPage + Para.Get_StartPage_Absolute(), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
+
         }
 
         return { X : X, Y: Y,  Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
@@ -4081,7 +4083,7 @@ ParaRun.prototype =
                 TextPr.Merge(MPrp); // bold, italic
             }
 
-            this.Parent.applyArgSize(TextPr);
+            this.Parent.Composition.Parent.ApplyArgSize(TextPr);
         }
         else
             TextPr.Merge( this.Pr ); // Мержим прямые настройки данного рана
@@ -6413,7 +6415,6 @@ CParaRunLine.prototype =
         return NewLine;
     },
 
-
     Compare : function(OtherLine, CurRange)
     {
         // Сначала проверим наличие данного отрезка в обеих строках
@@ -6765,7 +6766,7 @@ ParaRun.prototype.Math_Update_Cursor = function(X, Y, CurPage, UpdateTarget)
     {
         this.Paragraph.DrawingDocument.SetTargetSize(sizeCursor);
         //Para.DrawingDocument.UpdateTargetFromPaint = true;
-        this.Paragraph.DrawingDocument.UpdateTarget( X, Y, this.Paragraph.Get_StartPage_Absolute() + CurPage );
+        this.Paragraph.DrawingDocument.UpdateTarget(X, Y, this.Paragraph.Get_StartPage_Absolute() + CurPage );
         //Para.DrawingDocument.UpdateTargetFromPaint = false;
     }
 
