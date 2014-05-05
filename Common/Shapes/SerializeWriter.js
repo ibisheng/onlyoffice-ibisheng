@@ -816,6 +816,10 @@ function CBinaryFileWriter()
 
         this.WriteUChar(g_nodeAttributeStart);
         this._WriteString2(0, _theme.name);
+
+        if (_theme.isThemeOverride)
+            this._WriteBool1(1, true);
+
         this.WriteUChar(g_nodeAttributeEnd);
 
         this.WriteRecord1(0, _theme.themeElements, this.WriteThemeElements);

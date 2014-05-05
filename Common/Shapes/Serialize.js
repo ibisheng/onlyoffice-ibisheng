@@ -3287,6 +3287,8 @@ function BinaryPPTYLoader()
 
             if (0 == _at)
                 theme.name = s.GetString2();
+            else if (1 == _at)
+                theme.isThemeOverride = s.GetBool();
             else
                 break;
         }

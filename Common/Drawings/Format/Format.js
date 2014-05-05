@@ -9401,6 +9401,8 @@ function CTheme()
 
     this.extraClrSchemeLst = [];
 
+    this.isThemeOverride = false;
+
     // pointers
     this.presentation = null;
     this.clrMap = null;
