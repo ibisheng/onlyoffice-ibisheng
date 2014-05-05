@@ -814,13 +814,16 @@ CDocument.prototype =
             var HdrFtr = RecalcData.HdrFtr[HdrFtrIndex];            
             var FindIndex = this.SectionsInfo.Find_ByHdrFtr( HdrFtr );
             
+            if ( -1 === FindIndex )
+                continue;
+            
             // Колонтитул может быть записан в данной секции, но в ней не использоваться. Нам нужно начинать пересчет
             // с места использования данного колонтитула.
             
             var SectPr = this.SectionsInfo.Get_SectPr2( FindIndex).SectPr;
             var HdrFtrInfo = SectPr.Get_HdrFtrInfo( HdrFtr );
             
-            if ( null !== HdrFtrInfo && -1 !== FindIndex )
+            if ( null !== HdrFtrInfo )
             {
                 var bHeader = HdrFtrInfo.Header;
                 var bFirst  = HdrFtrInfo.First;
@@ -10081,12 +10084,12 @@ CDocument.prototype =
         if ( null != NextObj )
             NextObj.Set_DocumentPrev( NewObject );
 
+        // Обновим информацию о секциях
+        this.SectionsInfo.Update_OnAdd( Position, [ NewObject ] );
+
         // Проверим, что последний элемент не таблица
         if ( type_Table == this.Content[this.Content.length - 1].GetType() )
             this.Internal_Content_Add(this.Content.length, new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 ) );
-
-        // Обновим информацию о секциях
-        this.SectionsInfo.Update_OnAdd( Position, [ NewObject ] );
     },
 
     Internal_Content_Remove : function(Position, Count)
