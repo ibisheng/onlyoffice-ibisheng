@@ -22,7 +22,7 @@
 <script type="text/javascript" src="../Common/3rdparty/XRegExp/xregexp-all.js"></script>
 
 <!-- scroll -->
-<script type="text/css" src="menu/perfect-scrollbar/perfect-scrollbar.css"></script>
+<link rel="stylesheet" type="text/css" href="menu/perfect-scrollbar/perfect-scrollbar.css" />
 <script type="text/javascript" src="menu/perfect-scrollbar/jquery.mousewheel.js"></script>
 <script type="text/javascript" src="menu/perfect-scrollbar/perfect-scrollbar.js"></script>
 
@@ -1751,35 +1751,6 @@ Format
 </td>
 <td>
     <ul class="noListStyle">
-        <li class="ToolbarIconOut selectableIcon" title="Set fixed area">
-            <div id="td_set_fixed_area" class="iconToolbar">
-                <img class="ToolbarIcon FixedArea" src="menu/img/spacer.gif"/>
-            </div>
-        </li>
-        <li class="ToolbarIconOut selectableIcon" title="Set fixed first col">
-            <div id="td_set_fixed_col" class="iconToolbar">
-                <img class="ToolbarIcon FixedArea" src="menu/img/spacer.gif"/>
-            </div>
-        </li>
-    </ul>
-    <ul class="noListStyle">
-        <li class="ToolbarIconOut selectableIcon" title="Clean fixed area">
-            <div id="td_clean_fixed_area" class="iconToolbar">
-                <img class="ToolbarIcon FixedAreaClean" src="menu/img/spacer.gif"/>
-            </div>
-        </li>
-        <li class="ToolbarIconOut selectableIcon" title="Set fixed first row">
-            <div id="td_set_fixed_row" class="iconToolbar">
-                <img class="ToolbarIcon FixedArea" src="menu/img/spacer.gif"/>
-            </div>
-        </li>
-    </ul>
-</td>
-<td class="cp toolbarSep" style="vertical-align: top; width: 15px;min-width:15px;">
-    <div class="sepMenu ToolbarIconOut" style="position: absolute; background: url('menu/img/sep.png') repeat-y scroll 0pt 0pt transparent; margin-top: -7px; height: 65px; margin-left: 6px;"></div>
-</td>
-<td>
-    <ul class="noListStyle">
         <li class="ToolbarIconOut selectableIcon" title="Show Grid Liines">
             <input id="showGridLines" type="checkbox" name="showGrid" checked>Show grid
         </li>
@@ -1787,6 +1758,11 @@ Format
     <ul class="noListStyle">
         <li class="ToolbarIconOut selectableIcon" title="Show Headers">
             <input id="showHeaders" type="checkbox" name="showHeaders" checked>Show headers
+        </li>
+    </ul>
+    <ul class="noListStyle">
+        <li class="ToolbarIconOut selectableIcon" title="Freeze Pane">
+            <input id="freezePane" type="checkbox" name="freezePane">Freeze Pane
         </li>
     </ul>
 </td>

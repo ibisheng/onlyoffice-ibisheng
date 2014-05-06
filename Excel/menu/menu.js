@@ -210,6 +210,7 @@
 		g_sheetViewSettings = api.asc_getSheetViewSettings();
 		$("#showGridLines").attr("checked", g_sheetViewSettings.asc_getShowGridLines());
 		$("#showHeaders").attr("checked", g_sheetViewSettings.asc_getShowRowColHeaders());
+		$("#freezePane").attr("checked", api.asc_isFreezePane());
 	}
 
 	function onTabNavigationBtnClicked(event) {
@@ -915,22 +916,6 @@
 			}
 			case "td_auto_filter_local":{
 				showAddFilterDialog();
-				break;
-			}
-			case "td_set_fixed_area":{
-				api.asc_freezePane();
-				break;
-			}
-			case "td_clean_fixed_area":{
-				api.asc_freezePane();
-				break;
-			}
-			case "td_set_fixed_col":{
-				api.asc_freezePane();
-				break;
-			}
-			case "td_set_fixed_row":{
-				api.asc_freezePane();
 				break;
 			}
 		}
@@ -2626,6 +2611,9 @@
 	});
 	$("#showHeaders").change(function () {
 		onChangeView();
+	});
+	$("#freezePane").change(function () {
+		api.asc_freezePane();
 	});
 
     var chart_subtype_image_map = {};
