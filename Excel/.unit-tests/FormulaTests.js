@@ -4665,7 +4665,40 @@
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), vdb(2400,300,10*12,6,18) );
 
+    } )
+
+    test( "Test: \"ODDFPRICE\"", function () {
+
+        oParser = new parserFormula( "ODDFPRICE(DATE(1999,2,28),DATE(2016,1,1),DATE(1998,2,28),DATE(2015,1,1),7%,0,100,2,1)", "A2", ws );
+        ok( oParser.parse() );
+        ok( difBetween(oParser.calculate().getValue(), 217.878453038674) );
+
+        oParser = new parserFormula( "ODDFPRICE(DATE(2008,11,11),DATE(2021,3,1),DATE(2008,10,15),DATE(2009,3,1),0.0785,0.0625,100,2,1)", "A2", ws );
+        ok( oParser.parse() );
+        ok( difBetween(oParser.calculate().getValue(), 113.597717474079) );
+
+        oParser = new parserFormula( "ODDFPRICE(DATE(1990;6;1);DATE(1995;12;31);DATE(1990;1;1);DATE(1990;12;31);6%;5%;1000;1;1)", "A2", ws );
+        ok( oParser.parse() );
+        ok( difBetween(oParser.calculate().getValue(), 790.11323221867) );
 
     } )
+
+    test( "Test: \"ODDFYIELD\"", function () {
+
+        oParser = new parserFormula( "ODDFYIELD(DATE(1990;6;1);DATE(1995;12;31);DATE(1990;1;1);DATE(1990;12;31);6%;790;100;1;1)", "A2", ws );
+        ok( oParser.parse() );
+        ok( difBetween(oParser.calculate().getValue(),-0.2889178784774840 ) );
+
+        oParser = new parserFormula( "ODDFYIELD(DATE(2008,11,11),DATE(2021,3,1),DATE(2008,10,15),DATE(2009,3,1),0.0575,84.5,100,2,0)", "A2", ws );
+        ok( oParser.parse() );
+        ok( difBetween(oParser.calculate().getValue(), 0.0772455415972989 ) );
+
+        oParser = new parserFormula( "ODDFYIELD(DATE(2008;12;11);DATE(2021;4;1);DATE(2008;10;15);DATE(2009;4;1);6%;100;100;4;1)", "A2", ws );
+        ok( oParser.parse() );
+        ok( difBetween(oParser.calculate().getValue(), 0.0599769985558904 ) );
+
+    } )
+
+
 
 } );

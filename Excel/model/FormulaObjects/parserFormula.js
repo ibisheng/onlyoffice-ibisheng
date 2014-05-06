@@ -159,6 +159,10 @@ Math.approxEqual = function ( a, b ) {
     return this.abs( a - b ) < 1e-15;
 };
 
+Math.sign = function(a){
+    return (a < 0) ? -1 : (a == 0) ? 0 : 1;
+}
+
 /** @constructor */
 function cBaseType( val ) {
     this.needRecalc = false;

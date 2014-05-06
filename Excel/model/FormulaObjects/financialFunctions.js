@@ -184,7 +184,7 @@ function lcl_GetCoupncd( settl, matur, freq ) {
     if ( matur > settl ) {
         matur.addYears( -1 );
     }
-    while ( matur <= settl ) {
+    while ( matur < settl ) {
         matur.addMonths( 12 / freq );
     }
 }
@@ -331,7 +331,7 @@ function getduration( settlement, maturity, coupon, yld, frequency, basis ) {
 
 function oddFPrice(settl,matur,iss,firstCoup,rate,yld,redemption,frequency,basis) {
     function positiveDaysBetween( d1, d2, b ) {
-        var res = diffDate( d1, d2, b );
+        var res = diffDate( d1, d2, b ).getValue();
         return res > 0 ? res : 0;
     }
 
@@ -364,7 +364,7 @@ function oddFPrice(settl,matur,iss,firstCoup,rate,yld,redemption,frequency,basis
     var res = 0, DSC,
         numMonths = 12 / frequency,
         numMonthsNeg = -numMonths,
-        E = getcoupdays( settl, new Date( firstCoup ), frequency, basis ),
+        E = getcoupdays( settl, new Date( firstCoup ), frequency, basis ).getValue(),
         coupNums = getcoupnum( settl, new Date( matur ), frequency ),
         dfc = positiveDaysBetween( new Date( iss ), new Date( firstCoup ), basis );
 
@@ -408,7 +408,7 @@ function oddFPrice(settl,matur,iss,firstCoup,rate,yld,redemption,frequency,basis
             DSC = positiveDaysBetween( settl, getcoupncd( settl, firstCoup, frequency ), basis );
         }
         else {
-            DSC = E - diffDate( getcoupncd( settl, firstCoup, frequency ), settl, basis );
+            DSC = E - diffDate( lcl_GetCouppcd( settl, firstCoup, frequency ), settl, basis );
         }
 
         var Nq = coupNumber( firstCoup, settl, numMonths, true );
@@ -3421,11 +3421,23 @@ cODDFPRICE.prototype.getInfo = function () {
 };
 
 function cODDFYIELD() {
-    cBaseFunction.call( this, "ODDFYIELD" );
+//    cBaseFunction.call( this, "ODDFYIELD" );
+
+    this.name = "ODDFYIELD";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 8;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 9;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.noneFormat;
 }
 
 cODDFYIELD.prototype = Object.create( cBaseFunction.prototype );
-/*cODDFYIELD.prototype.Calculate = function ( arg ) {
+cODDFYIELD.prototype.Calculate = function ( arg ) {
     var settlement = arg[0],
         maturity = arg[1],
         issue = arg[2],
@@ -3542,7 +3554,78 @@ cODDFYIELD.prototype = Object.create( cBaseFunction.prototype );
         iss = Date.prototype.getDateFromExcel( issue ),
         firstCoup = Date.prototype.getDateFromExcel( first_coupon );
 
-    this.value = new cNumber( oddFPrice(settl,matur,iss,firstCoup,rate,pr,redemption,frequency,basis) );
+    var years = diffDate(settl, matur,basis ),
+        px = pr - 100,
+        num = rate * years * 100 - px,
+        denum = px * 0.25 * ( 1 + 2 * years ) + years * 100,
+        guess = num / denum, x = guess, g_Eps = 1e-7, nIM = 500, eps = 1, nMC= 0, xN;
+
+    function iterF(yld) {return pr - oddFPrice( settl, matur, iss, firstCoup, rate, yld, redemption, frequency, basis)}
+
+    while ( eps > g_Eps && nMC < nIM ) {
+        xN = x - iterF( x ) / (iterF( x + g_Eps ) - iterF( x - g_Eps )) / (2 * g_Eps);
+        nMC++;
+        eps = Math.abs( xN - x );
+        x = xN;
+    }
+    if ( isNaN( x ) || Infinity == Math.abs(x) ) {
+        var max = Number.MAX_VALUE, min = -Number.MAX_VALUE,
+            step = 1.6,
+            low = guess - 0.01 <= min ? min + g_Eps : guess - 0.01,
+            high = guess + 0.01 >= max ? max - g_Eps : guess + 0.01,
+            i, xBegin, xEnd, x, y, currentIter = 0;
+
+        if ( guess <= min || guess >= max ) {
+            return new cError( cErrorType.not_numeric );
+        }
+
+        for ( i = 0; i < nIM; i++ ) {
+            xBegin = low <= min ? min + g_Eps : low;
+            xEnd = high >= max ? max - g_Eps : high;
+            x = iterF( xBegin );
+            y = iterF( xEnd );
+            if ( x * y == 0 || x * y < 0 ) {
+                break;
+            }
+            else if ( x * y > 0 ) {
+                low = (xBegin + step * (xBegin - xEnd));
+                high = (xEnd + step * (xEnd - xBegin));
+            }
+            else {
+                return new cError( cErrorType.not_numeric );
+            }
+        }
+
+        if ( i == nIM ) {
+            return new cError( cErrorType.not_numeric );
+        }
+
+        var fXbegin = iterF( xBegin ), fXend = iterF( xEnd ), fXi, xI;
+
+        if ( Math.abs( fXbegin ) < g_Eps ) {
+            return this.value = new cNumber( fXbegin );
+        }
+        if ( Math.abs( fXend ) < g_Eps ) {
+            return this.value = new cNumber( fXend );
+        }
+        do {
+            xI = xBegin + (xEnd - xBegin) / 2;
+            fXi = iterF( xI );
+            if ( fXbegin * fXi < 0 ) {
+                xEnd = xI;
+            }
+            else {
+                xBegin = xI;
+            }
+            fXbegin = iterF( xBegin );
+            currentIter++;
+        } while ( Math.abs( fXi ) > g_Eps && currentIter < nIM )
+
+        this.value = new cNumber( xI );
+    }
+    else
+        this.value = new cNumber( x );
+
     return this.value;
 
 };
@@ -3551,7 +3634,7 @@ cODDFYIELD.prototype.getInfo = function () {
         name:this.name,
         args:"( settlement , maturity , issue , first-coupon , rate , pr , redemption , frequency [ , [ basis ] ] )"
     };
-};*/
+};
 
 function cODDLPRICE() {
 //    cBaseFunction.call( this, "ODDLPRICE" );
