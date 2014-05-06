@@ -12423,8 +12423,17 @@ Paragraph.prototype =
                 if ( para_Run === this.Content[StartPos].Type )
                     this.Internal_ReplaceRun( StartPos, NewElements );
 
-                // Заметим, что здесь не нужно подправлять метки выделения, за счет того, что EndPos - StartPos > 1 и
-                // сами метки подправляются в функиях Internal_Content_Add.
+                // Подправим селект. Заметим, что метки выделения изменяются внутри функции Internal_Content_Add 
+                // за счет того, что EndPos - StartPos > 1.
+                if ( this.Selection.StartPos < this.Selection.EndPos && true === this.Content[this.Selection.StartPos].Selection_IsEmpty() )
+                    this.Selection.StartPos++;
+                else if ( this.Selection.EndPos < this.Selection.StartPos && true === this.Content[this.Selection.EndPos].Selection_IsEmpty() )
+                    this.Selection.EndPos++;
+
+                if ( this.Selection.StartPos < this.Selection.EndPos && true === this.Content[this.Selection.EndPos].Selection_IsEmpty() )
+                    this.Selection.EndPos--;
+                else if ( this.Selection.EndPos < this.Selection.StartPos && true === this.Content[this.Selection.StartPos].Selection_IsEmpty() )
+                    this.Selection.StartPos--;                    
             }
         }
         else

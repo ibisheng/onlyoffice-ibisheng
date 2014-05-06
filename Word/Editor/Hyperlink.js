@@ -533,8 +533,17 @@ ParaHyperlink.prototype =
                     if ( para_Run === this.Content[StartPos].Type )
                         this.Internal_ReplaceRun( StartPos, NewElements );
 
-                    // Заметим, что здесь не нужно подправлять метки выделения, за счет того, что EndPos - StartPos > 1 и
-                    // сами метки подправляются в функциях Add_ToContent.
+                    // Подправим селект. Заметим, что метки выделения изменяются внутри функции Add_ToContent 
+                    // за счет того, что EndPos - StartPos > 1.
+                    if ( Selection.StartPos < Selection.EndPos && true === this.Content[Selection.StartPos].Selection_IsEmpty() )
+                        Selection.StartPos++;
+                    else if ( Selection.EndPos < Selection.StartPos && true === this.Content[Selection.EndPos].Selection_IsEmpty() )
+                        Selection.EndPos++;
+
+                    if ( Selection.StartPos < Selection.EndPos && true === this.Content[Selection.EndPos].Selection_IsEmpty() )
+                        Selection.EndPos--;
+                    else if ( Selection.EndPos < Selection.StartPos && true === this.Content[Selection.StartPos].Selection_IsEmpty() )
+                        Selection.StartPos--;
                 }
             }
             else
