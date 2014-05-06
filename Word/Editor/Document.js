@@ -9870,7 +9870,7 @@ CDocument.prototype =
 
                     this.Create_NewHistoryPoint();
                     this.Paragraph_Add( ParaItem );
-                    this.Cursor_MoveLeft(false, false);
+                    this.Cursor_MoveAt(X, Y, false);
                     this.Document_UpdateSelectionState();
 
                     editor.sync_MarkerFormatCallback( true );
