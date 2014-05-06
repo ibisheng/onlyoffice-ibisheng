@@ -4957,18 +4957,20 @@ function CDrawingDocument()
         _textPr.Spacing    = this.GuiLastTextProps.TextSpacing;
         _textPr.Position   = this.GuiLastTextProps.Position;
 
-        par.Add(new ParaTextPr(_textPr));
-        par.Add(new ParaText("H"));
-        par.Add(new ParaText("e"));
-        par.Add(new ParaText("l"));
-        par.Add(new ParaText("l"));
-        par.Add(new ParaText("o"));
-        par.Add(new ParaSpace(1));
-        par.Add(new ParaText("W"));
-        par.Add(new ParaText("o"));
-        par.Add(new ParaText("r"));
-        par.Add(new ParaText("l"));
-        par.Add(new ParaText("d"));
+        var parRun = new ParaRun(par); var Pos = 0;
+        parRun.Set_Pr(_textPr);
+        parRun.Add_ToContent(Pos++,new ParaText("H"), false);
+        parRun.Add_ToContent(Pos++,new ParaText("e"), false);
+        parRun.Add_ToContent(Pos++,new ParaText("l"), false);
+        parRun.Add_ToContent(Pos++,new ParaText("l"), false);
+        parRun.Add_ToContent(Pos++,new ParaText("o"), false);
+        parRun.Add_ToContent(Pos++,new ParaSpace(1), false);
+        parRun.Add_ToContent(Pos++, new ParaText("W"), false);
+        parRun.Add_ToContent(Pos++, new ParaText("o"), false);
+        parRun.Add_ToContent(Pos++, new ParaText("r"), false);
+        parRun.Add_ToContent(Pos++, new ParaText("l"), false);
+        parRun.Add_ToContent(Pos++, new ParaText("d"), false);
+        par.Add_ToContent(0, parRun);
 
         par.Recalculate_Page(0);
 
@@ -4985,7 +4987,7 @@ function CDrawingDocument()
         ctx.fillStyle = "#FFFFFF";
         ctx.fillRect(0, 0, _wPx, _hPx);
 
-        var _pxBoundsW = par.Lines[0].W * g_dKoef_mm_to_pix;//(_bounds.Right - _bounds.Left) * g_dKoef_mm_to_pix;
+        var _pxBoundsW = par.Lines[0].Ranges[0].W * g_dKoef_mm_to_pix;//(_bounds.Right - _bounds.Left) * g_dKoef_mm_to_pix;
         var _pxBoundsH = (_bounds.Bottom - _bounds.Top) * g_dKoef_mm_to_pix;
 
         if (this.GuiLastTextProps.Position !== undefined && this.GuiLastTextProps.Position != null && this.GuiLastTextProps.Position != 0)
