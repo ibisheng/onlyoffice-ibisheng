@@ -309,57 +309,12 @@ CChartsDrawer.prototype =
 		
 		var pxToMM = this.calcProp.pxToMM;
 		var standartMargin = 13 / pxToMM;
+		
 		var isHBar = (chartSpace.chart.plotArea.chart.getObjectType() == historyitem_type_BarChart && chartSpace.chart.plotArea.chart.barDir === BAR_DIR_BAR) ? true : false;
 		
-		var calculateLeft = 0, calculateRight = 0, calculateTop = 0, calculateBottom = 0;
-		
 		//если точки рассчитаны - ставим маргин в зависимости от них
-		if(chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.labels)
-		{
-			var valAx = chartSpace.chart.plotArea.valAx;
-			if(isHBar)
-			{
-				if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
-				{
-					calculateLeft  = valAx.xPoints[0].pos;
-					calculateRight = this.calcProp.widthCanvas / pxToMM - valAx.xPoints[valAx.xPoints.length - 1].pos;
-				}
-				else
-				{
-					calculateLeft  = valAx.xPoints[valAx.xPoints.length - 1].pos;
-					calculateRight = this.calcProp.widthCanvas / pxToMM - valAx.xPoints[0].pos;
-				}
-			}
-			else
-			{
-				if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
-				{
-					calculateTop  = valAx.yPoints[valAx.yPoints.length - 1].pos;
-					calculateBottom = this.calcProp.heightCanvas / pxToMM - valAx.yPoints[0].pos;
-				}
-				else
-				{
-					calculateTop  = valAx.yPoints[0].pos;
-					calculateBottom = this.calcProp.heightCanvas / pxToMM - valAx.yPoints[valAx.yPoints.length - 1].pos;
-				}
-				
-				if(this.calcProp.type == "Scatter" && chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.labels)
-				{
-					var catAx = chartSpace.chart.plotArea.catAx;
-					if(catAx.scaling.orientation == ORIENTATION_MIN_MAX)
-					{
-						calculateLeft  = catAx.xPoints[0].pos;
-						calculateRight = this.calcProp.widthCanvas / pxToMM - catAx.xPoints[catAx.xPoints.length - 1].pos;
-					}
-					else
-					{
-						calculateLeft  = catAx.xPoints[catAx.xPoints.length - 1].pos;
-						calculateRight = this.calcProp.widthCanvas / pxToMM - catAx.xPoints[0].pos;
-					}
-				};
-			};
-		};
-
+		var marginOnPoints = this._calculateMarginOnPoints(chartSpace, isHBar);
+		var calculateLeft = marginOnPoints.calculateLeft, calculateRight = marginOnPoints.calculateRight, calculateTop = marginOnPoints.calculateTop, calculateBottom = marginOnPoints.calculateBottom;
 		
 		//высчитываем выходящие за пределы подписи осей
 		var labelsMargin = this._calculateMarginLabels(chartSpace);
@@ -440,6 +395,110 @@ CChartsDrawer.prototype =
 		this.calcProp.chartGutter._right = calculateRight ? calculateRight * pxToMM : right * pxToMM;
 		this.calcProp.chartGutter._top = calculateTop ? calculateTop * pxToMM : top * pxToMM;
 		this.calcProp.chartGutter._bottom = calculateBottom ? calculateBottom * pxToMM : bottom * pxToMM;
+	},
+	
+	_calculateMarginOnPoints: function(chartSpace, isHBar)
+	{
+		var calculateLeft = 0, calculateRight = 0, calculateTop = 0, calculateBottom = 0;
+		var pxToMM = this.calcProp.pxToMM;
+		
+		//valAx
+		if(chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.labels)
+		{
+			var valAx = chartSpace.chart.plotArea.valAx;
+			if(isHBar)
+			{
+				if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
+				{
+					calculateLeft  = valAx.xPoints[0].pos;
+					calculateRight = this.calcProp.widthCanvas / pxToMM - valAx.xPoints[valAx.xPoints.length - 1].pos;
+				}
+				else
+				{
+					calculateLeft  = valAx.xPoints[valAx.xPoints.length - 1].pos;
+					calculateRight = this.calcProp.widthCanvas / pxToMM - valAx.xPoints[0].pos;
+				}
+			}
+			else
+			{
+				if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
+				{
+					calculateTop  = valAx.yPoints[valAx.yPoints.length - 1].pos;
+					calculateBottom = this.calcProp.heightCanvas / pxToMM - valAx.yPoints[0].pos;
+				}
+				else
+				{
+					calculateTop  = valAx.yPoints[0].pos;
+					calculateBottom = this.calcProp.heightCanvas / pxToMM - valAx.yPoints[valAx.yPoints.length - 1].pos;
+				}
+			};
+		};
+		
+		
+		//catAx
+		if(chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.labels)
+		{
+			var catAx = chartSpace.chart.plotArea.catAx;
+			var curBetween = 0, diffPoints = 0;
+			
+			if(this.calcProp.type == "Scatter")
+			{
+				if(catAx.scaling.orientation == ORIENTATION_MIN_MAX)
+				{
+					calculateLeft  = catAx.xPoints[0].pos;
+					calculateRight = this.calcProp.widthCanvas / pxToMM - catAx.xPoints[catAx.xPoints.length - 1].pos;
+				}
+				else
+				{
+					calculateLeft  = catAx.xPoints[catAx.xPoints.length - 1].pos;
+					calculateRight = this.calcProp.widthCanvas / pxToMM - catAx.xPoints[0].pos;
+				};
+			}
+			else if(isHBar)
+			{
+				diffPoints = catAx.yPoints[1] ? Math.abs(catAx.yPoints[1].pos - catAx.yPoints[0].pos) : Math.abs(catAx.yPoints[0].pos - valAx.posY);
+				
+				if(catAx.scaling.orientation == ORIENTATION_MIN_MAX)
+				{
+					if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+						curBetween = diffPoints / 2;
+					
+					calculateTop  = catAx.yPoints[catAx.yPoints.length - 1].pos - curBetween;
+					calculateBottom = this.calcProp.heightCanvas / pxToMM - (catAx.yPoints[0].pos + curBetween);
+				}
+				else
+				{
+					if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+						curBetween = diffPoints / 2;
+					
+					calculateTop  = catAx.yPoints[0].pos - curBetween;
+					calculateBottom = this.calcProp.heightCanvas / pxToMM - (catAx.yPoints[catAx.yPoints.length - 1].pos + curBetween);
+				};
+			}
+			else
+			{
+				diffPoints = catAx.xPoints[1] ? Math.abs(catAx.xPoints[1].pos - catAx.xPoints[0].pos) : Math.abs(catAx.xPoints[0].pos - valAx.posX);
+				
+				if(catAx.scaling.orientation == ORIENTATION_MIN_MAX)
+				{
+					if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+						curBetween = diffPoints / 2;
+					
+					calculateLeft  = catAx.xPoints[0].pos - curBetween;
+					calculateRight = this.calcProp.widthCanvas / pxToMM - (catAx.xPoints[catAx.xPoints.length - 1].pos + curBetween);
+				}
+				else
+				{
+					if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+						curBetween = diffPoints / 2;
+					
+					calculateLeft  = catAx.xPoints[catAx.xPoints.length - 1].pos - curBetween;
+					calculateRight = this.calcProp.widthCanvas / pxToMM - (catAx.xPoints[0].pos + curBetween);
+				};
+			};
+		};
+		
+		return {calculateLeft: calculateLeft, calculateRight : calculateRight, calculateTop: calculateTop, calculateBottom: calculateBottom};
 	},
 	
 	_getStandartMargin: function(labelsMargin, keyMargin, textMargin, topMainTitleMargin)
