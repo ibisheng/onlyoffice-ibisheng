@@ -918,19 +918,19 @@
 				break;
 			}
 			case "td_set_fixed_area":{
-				api.asc_freezePane(c_oAscFreezePane.FreezeSheetPanes);
+				api.asc_freezePane();
 				break;
 			}
 			case "td_clean_fixed_area":{
-				api.asc_freezePane(c_oAscFreezePane.FreezeClean);
+				api.asc_freezePane();
 				break;
 			}
 			case "td_set_fixed_col":{
-				api.asc_freezePane(c_oAscFreezePane.FreezeFirstColumn);
+				api.asc_freezePane();
 				break;
 			}
 			case "td_set_fixed_row":{
-				api.asc_freezePane(c_oAscFreezePane.FreezeTopRow);
+				api.asc_freezePane();
 				break;
 			}
 		}

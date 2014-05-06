@@ -3144,29 +3144,18 @@
 		
 		/** Для api закрепленных областей */
 
-		WorksheetView.prototype.freezePane = function (type) {
+		WorksheetView.prototype.freezePane = function () {
 			var t = this;
+			var ar = this.activeRange.clone();
 			var onChangeFreezePane = function (isSuccess) {
 				if (false === isSuccess)
 					return;
 				var col, row;
-				switch(type) {
-					case c_oAscFreezePane.FreezeSheetPanes:
-						col = t.getSelectedColumnIndex();
-						row = t.getSelectedRowIndex();
-						break;
-					case c_oAscFreezePane.FreezeFirstColumn:
-						col = 1;
-						row = 0;
-						break;
-					case c_oAscFreezePane.FreezeTopRow:
-						col = 0;
-						row = 1;
-						break;
-					case c_oAscFreezePane.FreezeClean:
-						col = 0;
-						row = 0;
-						break;
+				if (null !== t.topLeftFrozenCell)
+					col = row = 0;
+				else {
+					col = ar.startCol;
+					row = ar.startRow;
 				}
 				t._updateFreezePane(col, row);
 			};

@@ -463,13 +463,6 @@ var c_oAscPaneState = {
 	FrozenSplit	: "frozenSplit"
 };
 
-var c_oAscFreezePane = {
-	FreezeSheetPanes	: 1,
-	FreezeTopRow		: 2,
-	FreezeFirstColumn	: 3,
-	FreezeClean			: 4
-};
-
 var c_oAscFindLookIn = {
 	Formulas	: 1,
 	Value		: 2,
