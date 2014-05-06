@@ -247,7 +247,7 @@ function FrozenPlace(ws, type) {
 		}
 		
 		return fv;
-	}
+	};
 	
 	_this.isPointInside = function(x, y) {
 		var rect = _this.getRect();
@@ -255,7 +255,7 @@ function FrozenPlace(ws, type) {
 		if ( log && result )
 			console.log( x + "," + y + " in " + _this.type);
 		return result;			
-	}
+	};
 	
 	_this.isCellInside = function(cell) {
 		var result = false;
@@ -269,7 +269,7 @@ function FrozenPlace(ws, type) {
 			}
 		}
 		return result;
-	}
+	};
 	
 	_this.isObjectInside = function(object) {
 		// TODO Нужно учитывать collOff, rowOff
@@ -280,7 +280,7 @@ function FrozenPlace(ws, type) {
 		if ( _r )
 			result = true;
 		return result;
-	}
+	};
 	
 	_this.getVerticalScroll = function() {
 		
@@ -331,7 +331,7 @@ function FrozenPlace(ws, type) {
 			break;
 		}
 		return scroll;
-	}
+	};
 	
 	_this.getHorizontalScroll = function() {
 		
@@ -382,7 +382,7 @@ function FrozenPlace(ws, type) {
 			break;
 		}
 		return scroll;
-	}
+	};
 	
 	_this.clip = function(canvas) {
 		var rect = _this.getRect();
@@ -392,13 +392,13 @@ function FrozenPlace(ws, type) {
 		canvas.m_oContext.clip();
         // этот сэйв нужен для восстановления сложных вложенных клипов
         canvas.m_oContext.save();
-	}
+	};
 	
 	_this.restore = function(canvas) {
 		canvas.m_oContext.restore();
 		// этот рестор нужен для восстановления сложных вложенных клипов
         canvas.m_oContext.restore();
-	}
+	};
 	
 	_this.clear = function(isOverlay) {
 		var rect = _this.getRect();
@@ -412,7 +412,7 @@ function FrozenPlace(ws, type) {
 		else {
 			_this.worksheet.drawingGraphicCtx.clearRect( x, y, w, h );
 		}
-	}
+	};
 	
 	_this.drawObject = function(object) {
 		var canvas = _this.worksheet.objectRender.getDrawingCanvas();
@@ -431,7 +431,7 @@ function FrozenPlace(ws, type) {
 		}
 					
 		_this.restore(canvas.shapeCtx);
-	}
+	};
 	
 	_this.setTransform = function(shapeCtx, shapeOverlayCtx, autoShapeTrack) {
 		
@@ -453,7 +453,7 @@ function FrozenPlace(ws, type) {
 			autoShapeTrack.Graphics.CalculateFullTransform();
             _this.worksheet.objectRender.controller.recalculateCurPos();
 		}
-	}
+	};
 	
 	_this.calculateCell = function(x, y) {
 		
@@ -462,8 +462,6 @@ function FrozenPlace(ws, type) {
 					 
 		if ( _this.isPointInside(x, y) ) {
 		
-			var fv = _this.getFirstVisible();
-
 			var _x = x + _this.worksheet.getCellLeft(0, 0);
 			var _y = y + _this.worksheet.getCellTop(0, 0);
 		
@@ -479,14 +477,14 @@ function FrozenPlace(ws, type) {
 				if ( _this.worksheet.cols.length >= gc_nMaxCol )
 					result = true;
 				return result;
-			}
+			};
 			
 			var isMaxRow = function() {
 				var result = false;
 				if ( _this.worksheet.rows.length >= gc_nMaxRow )
 					result = true;
 				return result;
-			}
+			};
 			//
 			
 			var delta = 0;
@@ -527,7 +525,7 @@ function FrozenPlace(ws, type) {
 		}		
 		return cell;
 		
-	}
+	};
 	
 	// Range constructor	
 	_this.initRange();
@@ -590,13 +588,13 @@ function DrawingArea(ws) {
 			else
 				_this.frozenPlaces.push(new FrozenPlace(_this.worksheet, FrozenAreaType.Center));
 		}
-	}
+	};
 
 	_this.clear = function() {
 		for ( var i = 0; i < _this.frozenPlaces.length; i++ ) {
 			_this.frozenPlaces[i].clear();
 		}
-	}
+	};
 	
 	_this.drawObject = function(object) {
 		for ( var i = 0; i < _this.frozenPlaces.length; i++ ) {
@@ -604,7 +602,7 @@ function DrawingArea(ws) {
 				_this.frozenPlaces[i].drawObject(object);
 			}
 		}
-	}
+	};
 	
 	_this.drawSelection = function(drawingDocument) {
 		
@@ -668,9 +666,9 @@ function DrawingArea(ws) {
 				ctx.fillStyle = "rgba(51,102,204,255)";
 				ctx.beginPath();
 
-				for (var i = drawingDocument.m_lDrawingFirst; i <= drawingDocument.m_lDrawingEnd; i++) {
-					var drawPage = drawingDocument.m_arrPages[i].drawingPage;
-					drawingDocument.m_oDocumentRenderer.DrawSelection(i, trackOverlay, drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top);
+				for (var j = drawingDocument.m_lDrawingFirst; j <= drawingDocument.m_lDrawingEnd; j++) {
+					var drawPage = drawingDocument.m_arrPages[j].drawingPage;
+					drawingDocument.m_oDocumentRenderer.DrawSelection(j, trackOverlay, drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top);
 				}
 
 				ctx.globalAlpha = 0.2;
@@ -682,7 +680,7 @@ function DrawingArea(ws) {
 			// Restore
 			_this.frozenPlaces[i].restore(shapeOverlayCtx);
 		}
-	}
+	};
 	
 	_this.getOffsets = function(x, y) {
 		for ( var i = 0; i < _this.frozenPlaces.length; i++ ) {
@@ -691,7 +689,7 @@ function DrawingArea(ws) {
 			}
 		}
 		return null;
-	}
+	};
 	
 	_this.calculateCell = function(x, y) {
 		var cell = { col: 0, colOff: 0, colOffPx: 0,
@@ -704,8 +702,8 @@ function DrawingArea(ws) {
 			}
 		}
 		return cell;
-	}
+	};
 	
 	_this.calculateCoords = function(cell) {
-	}
+	};
 }
