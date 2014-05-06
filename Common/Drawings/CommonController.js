@@ -2746,6 +2746,8 @@ DrawingObjectsController.prototype =
 
     onKeyDown: function(e)
     {
+		// TODO!!! var ctrlKey = e.metaKey || e.ctrlKey
+
         var drawingObjectsController = this;
         var bRetValue = false;
         var state = drawingObjectsController.curState;

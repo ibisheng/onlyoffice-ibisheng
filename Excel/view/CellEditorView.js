@@ -1638,9 +1638,10 @@
 
 		// Event handlers
 
-		/** @param event {jQuery.Event} */
+		/** @param event {KeyboardEvent} */
 		CellEditor.prototype._onWindowKeyDown = function (event) {
 			var t = this, kind = undefined, hieroglyph = false;
+			var ctrlKey = event.metaKey || event.ctrlKey;
 
 			if (!t.isOpened || !t.enableKeyEvents) {return true;}
 
@@ -1688,27 +1689,27 @@
 
 				case 8:   // "backspace"
 					if (hieroglyph) {t._syncEditors();}
-					t._removeChars(event.ctrlKey ? kPrevWord : kPrevChar);
+					t._removeChars(ctrlKey ? kPrevWord : kPrevChar);
 					return false;
 
 				case 46:  // "del"
 					if (!t.hasFocus) {t.setFocus(true);}
 					if (hieroglyph) {t._syncEditors();}
 					t.skipTLUpdate = true;
-					t._removeChars(event.ctrlKey ? kNextWord : kNextChar);
+					t._removeChars(ctrlKey ? kNextWord : kNextChar);
 					return true;
 
 				case 37:  // "left"
 					if (!t.hasFocus) {break;}
 					if (hieroglyph) {t._syncEditors();}
-					kind = event.ctrlKey ? kPrevWord : kPrevChar;
+					kind = ctrlKey ? kPrevWord : kPrevChar;
 					event.shiftKey ? t._selectChars(kind) : t._moveCursor(kind);
 					return false;
 
 				case 39:  // "right"
 					if (!t.hasFocus) {break;}
 					if (hieroglyph) {t._syncEditors();}
-					kind = event.ctrlKey ? kNextWord : kNextChar;
+					kind = ctrlKey ? kNextWord : kNextChar;
 					event.shiftKey ? t._selectChars(kind) : t._moveCursor(kind);
 					return false;
 
@@ -1727,19 +1728,19 @@
 				case 35:  // "end"
 					if (!t.hasFocus) {break;}
 					if (hieroglyph) {t._syncEditors();}
-					kind = event.ctrlKey ? kEndOfText : kEndOfLine;
+					kind = ctrlKey ? kEndOfText : kEndOfLine;
 					event.shiftKey ? t._selectChars(kind) : t._moveCursor(kind);
 					return false;
 
 				case 36:  // "home"
 					if (!t.hasFocus) {break;}
 					if (hieroglyph) {t._syncEditors();}
-					kind = event.ctrlKey ? kBeginOfText : kBeginOfLine;
+					kind = ctrlKey ? kBeginOfText : kBeginOfLine;
 					event.shiftKey ? t._selectChars(kind) : t._moveCursor(kind);
 					return false;
 
 				case 53: // 5
-					if (event.ctrlKey) {
+					if (ctrlKey) {
 						if (!t.hasFocus) {t.setFocus(true);}
 						// Отключим стандартную обработку браузера нажатия ctlr + 5
 						event.stopPropagation();
@@ -1751,7 +1752,7 @@
 					break;
 
 				case 65: // A
-					if (event.ctrlKey) {
+					if (ctrlKey) {
 						if (!t.hasFocus) {t.setFocus(true);}
 						// Отключим стандартную обработку браузера нажатия ctlr + a
 						if (!t.isTopLineActive) {
@@ -1765,7 +1766,7 @@
 					break;
 
 				case 66: // B
-					if (event.ctrlKey) {
+					if (ctrlKey) {
 						if (!t.hasFocus) {t.setFocus(true);}
 						// Отключим стандартную обработку браузера нажатия ctlr + b
 						event.stopPropagation();
@@ -1777,7 +1778,7 @@
 					break;
 
 				case 73: // I
-					if (event.ctrlKey) {
+					if (ctrlKey) {
 						if (!t.hasFocus) {t.setFocus(true);}
 						// Отключим стандартную обработку браузера нажатия ctlr + i
 						event.stopPropagation();
@@ -1789,7 +1790,7 @@
 					break;
 
 				/*case 83: // S
-					if (event.ctrlKey) {
+					if (ctrlKey) {
 						if (!t.hasFocus) {t.setFocus(true);}
 						if (hieroglyph) {t._syncEditors();}
 
@@ -1800,7 +1801,7 @@
 					break;*/
 
 				case 85: // U
-					if (event.ctrlKey) {
+					if (ctrlKey) {
 						if (!t.hasFocus) {t.setFocus(true);}
 						// Отключим стандартную обработку браузера нажатия ctlr + u
 						event.stopPropagation();
@@ -1820,7 +1821,7 @@
 					return false;
 
 				case 80: // print           Ctrl + p
-					if (event.ctrlKey) {
+					if (ctrlKey) {
 						event.stopPropagation();
 						event.preventDefault();
 						return false;
@@ -1830,7 +1831,7 @@
 				case 67: // copy  Ctrl + c
 				case 86: // paste Ctrl + v
 				case 88: // redo  Ctrl + x
-					if (event.ctrlKey) {
+					if (ctrlKey) {
 						if (!t.hasFocus) {t.setFocus(true);}
 						// возвращение фокуса в top line
 						if (t.isTopLineActive) {
@@ -1850,7 +1851,7 @@
 
 				case 89:  // ctrl + y
 				case 90:  // ctrl + z
-					if (event.ctrlKey) {
+					if (ctrlKey) {
 						if (!t.hasFocus) {t.setFocus(true);}
 						event.which === 90 ? t.undo() : t.redo();
 						return false;
@@ -1871,13 +1872,14 @@
 			return true;
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {KeyboardEvent} */
 		CellEditor.prototype._onWindowKeyPress = function (event) {
 			var t = this;
+			var ctrlKey = event.metaKey || event.ctrlKey;
 
 			if (!t.isOpened || !t.enableKeyEvents) {return true;}
 
-			if (t.skipKeyPress || event.which < 32 || event.altKey || event.ctrlKey) {
+			if (t.skipKeyPress || event.which < 32 || event.altKey || ctrlKey) {
 				t.skipKeyPress = true;
 				return true;
 			}
@@ -1915,7 +1917,7 @@
 			return t.isTopLineActive ? true : false; // prevent event bubbling
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {KeyboardEvent} */
 		CellEditor.prototype._onWindowKeyUp = function (event) {
 			var t = this;
 
@@ -1925,20 +1927,20 @@
 			}
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {MouseEvent} */
 		CellEditor.prototype._onWindowMouseUp = function (event) {
 			this.isSelectMode = false;
 			if (this.callTopLineMouseup) {this._topLineMouseUp();}
 			return true;
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {MouseEvent} */
 		CellEditor.prototype._onWindowMouseMove = function (event) {
 			if (this.isSelectMode && !this.hasCursor) {this._changeSelection(this._getCoordinates(event));}
 			return true;
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {MouseEvent} */
 		CellEditor.prototype._onMouseDown = function (event) {
 			var t = this;
 			var coord = t._getCoordinates(event);
@@ -1962,13 +1964,13 @@
 			return true;
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {MouseEvent} */
 		CellEditor.prototype._onMouseUp = function (event) {
 			this.isSelectMode = false;
 			return true;
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {MouseEvent} */
 		CellEditor.prototype._onMouseMove = function (event) {
 			this.hasCursor = true;
 			if (this.isSelectMode) {
@@ -1977,13 +1979,13 @@
 			return true;
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {MouseEvent} */
 		CellEditor.prototype._onMouseLeave = function (event) {
 			this.hasCursor = false;
 			return true;
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {MouseEvent} */
 		CellEditor.prototype._onMouseDblClick = function (event) {
 			var t = this;
 			// Окончание слова
@@ -2014,7 +2016,7 @@
 			return true;
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {MouseEvent} */
 		CellEditor.prototype._getCoordinates = function (event) {
 			var t = this;
 			var offs = $(t.canvasOverlay).offset();

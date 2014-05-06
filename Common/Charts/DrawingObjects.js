@@ -4908,7 +4908,7 @@ function DrawingObjects() {
     _this.graphicObjectKeyPress = function(e) {
 
         e.KeyCode = e.keyCode;
-        e.CtrlKey = e.ctrlKey;
+        e.CtrlKey = e.metaKey || e.ctrlKey;
         e.AltKey = e.altKey;
         e.ShiftKey = e.shiftKey;
         e.Which = e.which;

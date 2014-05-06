@@ -101,7 +101,6 @@
             return this;
 		}
 
-
 		/**
 		 * @param {WorkbookView} view
 		 * @param {Element} widgetElem
@@ -221,10 +220,7 @@
 			this.isFormulaEditMode = !!isFormulaEditMode;
 		};
 
-		/**
-		 *
-		 * @param {Boolean} isSelectionDialogMode
-		 */
+		/** @param {Boolean} isSelectionDialogMode */
 		asc_CEventsController.prototype.setSelectionDialogMode = function (isSelectionDialogMode) {
 			this.isSelectionDialogMode = isSelectionDialogMode;
 		};
@@ -261,7 +257,10 @@
 			return this;
 		};
 
-		/** @param delta {Number} */
+		/**
+		 * @param delta {Number}
+		 * @param event {MouseEvent}
+		 */
 		asc_CEventsController.prototype.scrollVertical = function (delta, event) {
 			if( event && event.preventDefault )
 				event.preventDefault();
@@ -269,9 +268,12 @@
 			return true;
 		};
 
-		/** @param delta {Number} */
+		/**
+		 * @param delta {Number}
+		 * @param event {MouseEvent}
+		 */
 		asc_CEventsController.prototype.scrollHorizontal = function (delta, event) {
-			if( event && event.preventDefault )
+			if (event && event.preventDefault)
 				event.preventDefault();
 			this.hsbApi.scrollByX(this.settings.hscrollStep * delta);
 			return true;
@@ -280,6 +282,7 @@
 		// Будем делать dblClick как в Excel
 		asc_CEventsController.prototype.doMouseDblClick = function (event, isHideCursor) {
 			var t = this;
+			var ctrlKey = event.metaKey || event.ctrlKey;
 
 			// Для формулы не нужно выходить из редактирования ячейки
 			if (t.settings.isViewerMode || t.isFormulaEditMode || t.isSelectionDialogMode) {return true;}
@@ -299,7 +302,7 @@
 				var coord = t._getCoordinates(event);
 				t.handlers.trigger("mouseDblClick", coord.x, coord.y, isHideCursor, function () {
 					// Мы изменяли размеры колонки/строки, не редактируем ячейку. Обновим состояние курсора
-					t.handlers.trigger("updateWorksheet", t.element, coord.x, coord.y, event.ctrlKey,
+					t.handlers.trigger("updateWorksheet", t.element, coord.x, coord.y, ctrlKey,
 						function (info) {t.targetInfo = info;});
 				});
 			}, 100);
@@ -385,7 +388,8 @@
 		};
 
 		/**
-		 * @param event {jQuery.Event}
+		 * @param event {MouseEvent}
+		 * @param isSelectMode {Boolean}
 		 * @param callback {Function}
 		 */
 		asc_CEventsController.prototype._changeSelection = function (event, isSelectMode, callback) {
@@ -400,29 +404,25 @@
 			}
 
 			this.handlers.trigger("changeSelection", /*isStartPoint*/false, coord.x, coord.y,
-					/*isCoord*/true, /*isSelectMode*/isSelectMode,
-					function (d) {
-						if (d.deltaX) {t.scrollHorizontal(d.deltaX);}
-						if (d.deltaY) {t.scrollVertical(d.deltaY);}
+				/*isCoord*/true, /*isSelectMode*/isSelectMode,
+				function (d) {
+					if (d.deltaX) {t.scrollHorizontal(d.deltaX);}
+					if (d.deltaY) {t.scrollVertical(d.deltaY);}
 
-						if (t.isFormulaEditMode) {
-							t.handlers.trigger("enterCellRange");
-						} else if (t.isCellEditMode) {
-							if (!t.handlers.trigger("stopCellEditing")) {return;}
-						}
+					if (t.isFormulaEditMode)
+						t.handlers.trigger("enterCellRange");
+					else if (t.isCellEditMode)
+						if (!t.handlers.trigger("stopCellEditing")) {return;}
 
-						asc_applyFunction(callback);
-					});
+					asc_applyFunction(callback);
+				});
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._changeSelection2 = function (event) {
 			var t = this;
 
-			var fn = function () {
-				t._changeSelection2(event);
-			};
-
+			var fn = function () { t._changeSelection2(event); };
 			var callback = function () {
 				if (t.isSelectMode && !t.hasCursor) {
 					t.scrollTimerId = window.setTimeout(fn, t.settings.scrollTimeout);
@@ -437,7 +437,7 @@
 			}, 0);
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._moveRangeHandle2 = function (event) {
 			var t = this;
 
@@ -459,7 +459,7 @@
 			}, 0);
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._moveResizeRangeHandle2 = function (event) {
 			var t = this;
 
@@ -481,30 +481,37 @@
 			}, 0);
 		};
 
-		// Окончание выделения
+		/**
+		 * Окончание выделения
+		 * @param event {MouseEvent}
+		 */
 		asc_CEventsController.prototype._changeSelectionDone = function (event) {
 			var coord = this._getCoordinates(event);
-			if (false === event.ctrlKey) {
+			var ctrlKey = event.metaKey || event.ctrlKey;
+			if (false === ctrlKey) {
 				coord.x = -1;
 				coord.y = -1;
 			}
 			this.handlers.trigger("changeSelectionDone", coord.x, coord.y);
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._resizeElement = function (event) {
 			var coord = this._getCoordinates(event);
 			this.handlers.trigger("resizeElement", this.targetInfo, coord.x, coord.y);
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._resizeElementDone = function (event) {
 			var coord = this._getCoordinates(event);
 			this.handlers.trigger("resizeElementDone", this.targetInfo, coord.x, coord.y, this.isResizeModeMove);
 			this.isResizeModeMove = false;
 		};
 
-		/** @param event {jQuery.Event} */
+		/**
+		 * @param event {MouseEvent}
+		 * @param callback {Function}
+		 */
 		asc_CEventsController.prototype._changeFillHandle = function (event, callback) {
 			var t = this;
 			// Обновляемся в режиме автозаполнения
@@ -522,7 +529,8 @@
 				});
 		};
 
-		asc_CEventsController.prototype._changeFillHandle2 = function (event){
+		/** @param event {MouseEvent} */
+		asc_CEventsController.prototype._changeFillHandle2 = function (event) {
 			var t = this;
 
 			var fn = function () {
@@ -543,15 +551,17 @@
 			}, 0);
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._changeFillHandleDone = function (event) {
 			// Закончили автозаполнение, пересчитаем
 			var coord = this._getCoordinates(event);
-			var ctrlPress = event.ctrlKey;
-			this.handlers.trigger("changeFillHandleDone", coord.x, coord.y, ctrlPress);
+			this.handlers.trigger("changeFillHandleDone", coord.x, coord.y, event.metaKey || event.ctrlKey);
 		};
 
-		/** @param event {jQuery.Event} */
+		/**
+		 * @param event {MouseEvent}
+		 * @param callback {Function}
+		 */
 		asc_CEventsController.prototype._moveRangeHandle = function (event, callback) {
 			var t = this;
 			// Обновляемся в режиме перемещения диапазона
@@ -566,18 +576,23 @@
 						t.scrollVertical(d.deltaY);
 					}
 					asc_applyFunction(callback);
-				},
-				event.ctrlKey);
+				}, event.metaKey || event.ctrlKey);
 		};
-		
-		/** @param event {jQuery.Event} */
+
+		/**
+		 * @param event {MouseEvent}
+		 * @param targetInfo
+		 */
 		asc_CEventsController.prototype._moveFrozenAnchorHandle = function (event, targetInfo) {
 			var t = this;
 			var coord = t._getCoordinates(event);
 			t.handlers.trigger("moveFrozenAnchorHandle", coord.x, coord.y, targetInfo);
 		};
 		
-		/** @param event {jQuery.Event} */
+		/**
+		 * @param event {MouseEvent}
+		 * @param targetInfo
+		 */
 		asc_CEventsController.prototype._moveFrozenAnchorHandleDone = function (event, targetInfo) {
 			// Закрепляем область
 			var t = this;
@@ -585,7 +600,11 @@
 			t.handlers.trigger("moveFrozenAnchorHandleDone", coord.x, coord.y, targetInfo);
 		};
 
-		/** @param event {jQuery.Event} */
+		/**
+		 * @param event {MouseEvent}
+		 * @param target
+		 * @param callback {Function}
+		 */
 		asc_CEventsController.prototype._moveResizeRangeHandle = function (event, target, callback) {
 			var t = this;
 			// Обновляемся в режиме перемещения диапазона
@@ -613,10 +632,10 @@
 			this.handlers.trigger("commentCellClick", coord.x, coord.y);
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._moveRangeHandleDone = function (event) {
 			// Закончили перемещение диапазона, пересчитаем
-			this.handlers.trigger("moveRangeHandleDone",event.ctrlKey);
+			this.handlers.trigger("moveRangeHandleDone", event.metaKey || event.ctrlKey);
 		};
 
 		asc_CEventsController.prototype._moveResizeRangeHandleDone = function (event, target) {
@@ -631,15 +650,13 @@
 			this.resizeTimerId = window.setTimeout(function () {self.handlers.trigger("resize", event);}, 150);
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {KeyboardEvent} */
 		asc_CEventsController.prototype._onWindowKeyDown = function (event) {
 			var t = this, dc = 0, dr = 0, isViewerMode = t.settings.isViewerMode;
+			var ctrlKey = event.metaKey || event.ctrlKey;
+			var shiftKey = event.shiftKey;
 
 			t.__retval = true;
-
-			// Mac OS
-			if ( event.metaKey )
-				event.ctrlKey = true;
 
 			function stop(immediate) {
 				event.stopPropagation();
@@ -655,11 +672,7 @@
 			}
 
 			var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
-			if ( !t.isMousePressed && graphicObjects.length && t.enableKeyEvents ) {
-				// Mac OS
-				if ( event.metaKey )
-					event.ctrlKey = true;
-					
+			if (!t.isMousePressed && graphicObjects.length && t.enableKeyEvents) {
 				if (t.handlers.trigger("graphicObjectWindowKeyDown", event))
 					return true;
 			}
@@ -679,7 +692,7 @@
 				}
 
 				// Почему-то очень хочется обрабатывать лишние условия в нашем коде, вместо обработки наверху...
-				if (!t.enableKeyEvents && event.ctrlKey && (80 === event.which/* || 83 === event.which*/)) {
+				if (!t.enableKeyEvents && ctrlKey && (80 === event.which/* || 83 === event.which*/)) {
 					// Только если отключены эвенты и нажаты Ctrl+S или Ctrl+P мы их обработаем
 					break;
 				}
@@ -728,11 +741,11 @@
 
 					// Особый случай (возможно движение в выделенной области)
 					selectionActivePointChanged = true;
-					if (event.shiftKey){
-						dc = -1;                 // (shift + tab) - движение по ячейкам влево на 1 столбец
-						event.shiftKey = false;  // Сбросим shift, потому что мы не выделяем
+					if (shiftKey){
+						dc = -1;			// (shift + tab) - движение по ячейкам влево на 1 столбец
+						shiftKey = false;	// Сбросим shift, потому что мы не выделяем
 					} else {
-						dc = +1;                 // (tab) - движение по ячейкам вправо на 1 столбец
+						dc = +1;			// (tab) - движение по ячейкам вправо на 1 столбец
 					}
 					break;
 
@@ -740,11 +753,11 @@
 					if (t.isCellEditMode) {return true;}
 					// Особый случай (возможно движение в выделенной области)
 					selectionActivePointChanged = true;
-					if (event.shiftKey) {
-						dr = -1;                 // (shift + enter) - движение по ячейкам наверх на 1 строку
-						event.shiftKey = false;  // Сбросим shift, потому что мы не выделяем
+					if (shiftKey) {
+						dr = -1;			// (shift + enter) - движение по ячейкам наверх на 1 строку
+						shiftKey = false;	// Сбросим shift, потому что мы не выделяем
 					} else {
-						dr = +1;                 // (enter) - движение по ячейкам вниз на 1 строку
+						dr = +1;			// (enter) - движение по ячейкам вниз на 1 строку
 					}
 					break;
 
@@ -764,7 +777,7 @@
 				case 32: // Spacebar
 					if (t.isCellEditMode) {return true;}
 					// Обработать как обычный текст
-					if (!event.ctrlKey && !event.shiftKey) {
+					if (!ctrlKey && !shiftKey) {
 						t.skipKeyPress = false;
 						return true;
 					}
@@ -772,10 +785,10 @@
 					// Ctrl+Shift+Spacebar, Ctrl+Spacebar, Shift+Spacebar
 					stop();
 					// Обработать как спец селект
-					if (event.ctrlKey && event.shiftKey) {
+					if (ctrlKey && shiftKey) {
 						t.handlers.trigger("changeSelection", /*isStartPoint*/true, 0,
 							0, /*isCoord*/true, /*isSelectMode*/false);
-					} else if (event.ctrlKey) {
+					} else if (ctrlKey) {
 						t.handlers.trigger("selectColumnsByRange");
 					} else {
 						t.handlers.trigger("selectRowsByRange");
@@ -785,7 +798,7 @@
 				case 33: // PageUp
 					// Отключим стандартную обработку браузера нажатия PageUp
 					stop();
-					if (event.ctrlKey) {
+					if (ctrlKey) {
 						// Перемещение по листам справа налево
 						// В chrome не работает (т.к. там своя обработка на некоторые нажатия вместе с Ctrl
 						t.handlers.trigger("showNextPrevWorksheet", -1);
@@ -798,7 +811,7 @@
 				case 34: // PageDown
 					// Отключим стандартную обработку браузера нажатия PageDown
 					stop();
-					if (event.ctrlKey) {
+					if (ctrlKey) {
 						// Перемещение по листам слева направо
 						// В chrome не работает (т.к. там своя обработка на некоторые нажатия вместе с Ctrl
 						t.handlers.trigger("showNextPrevWorksheet", +1);
@@ -810,7 +823,7 @@
 
 				case 37: // left
 					stop();                          // Отключим стандартную обработку браузера нажатия left
-					dc = event.ctrlKey ? -1.5 : -1;  // Движение стрелками (влево-вправо, вверх-вниз)
+					dc = ctrlKey ? -1.5 : -1;  // Движение стрелками (влево-вправо, вверх-вниз)
 					break;
 
 				case 38: // up
@@ -818,12 +831,12 @@
 					// Если у нас открыто меню для подстановки формулы, то мы не обрабатываем верх/вниз
 					if (t.isCellEditMode && t.handlers.trigger("isPopUpSelectorOpen"))
 						return t.__retval;
-					dr = event.ctrlKey ? -1.5 : -1;  // Движение стрелками (влево-вправо, вверх-вниз)
+					dr = ctrlKey ? -1.5 : -1;  // Движение стрелками (влево-вправо, вверх-вниз)
 					break;
 
 				case 39: // right
 					stop();                          // Отключим стандартную обработку браузера нажатия right
-					dc = event.ctrlKey ? +1.5 : +1;  // Движение стрелками (влево-вправо, вверх-вниз)
+					dc = ctrlKey ? +1.5 : +1;  // Движение стрелками (влево-вправо, вверх-вниз)
 					break;
 
 				case 40: // down
@@ -836,19 +849,19 @@
 						t.handlers.trigger("showAutoComplete");
 						return t.__retval;
 					}
-					dr = event.ctrlKey ? +1.5 : +1;  // Движение стрелками (влево-вправо, вверх-вниз)
+					dr = ctrlKey ? +1.5 : +1;  // Движение стрелками (влево-вправо, вверх-вниз)
 					break;
 
 				case 36: // home
 					stop();                          // Отключим стандартную обработку браузера нажатия home
 					dc = -2.5;
-					if (event.ctrlKey) {dr = -2.5;}
+					if (ctrlKey) {dr = -2.5;}
 					break;
 
 				case 35: // end
 					stop();                          // Отключим стандартную обработку браузера нажатия end
 					dc = 2.5;
-					if (event.ctrlKey) {
+					if (ctrlKey) {
 						dr = 2.5;
 					}
 					break;
@@ -871,7 +884,7 @@
 				case 80: // print           Ctrl + p
 					if (t.isCellEditMode) { stop(); return false; }
 
-					if (!event.ctrlKey) { t.skipKeyPress = false; return true; }
+					if (!ctrlKey) { t.skipKeyPress = false; return true; }
 
 					// Вызовем обработчик
 					if (!t.__handlers) {
@@ -930,7 +943,7 @@
 
 				default:
 					// При зажатом Ctrl не вводим символ
-					if (!event.ctrlKey) {t.skipKeyPress = false;}
+					if (!ctrlKey) {t.skipKeyPress = false;}
 					return true;
 
 			} // end of switch
@@ -956,7 +969,7 @@
 						}
 					}
 
-					t.handlers.trigger("changeSelection", /*isStartPoint*/!event.shiftKey, dc, dr,
+					t.handlers.trigger("changeSelection", /*isStartPoint*/!shiftKey, dc, dr,
 							/*isCoord*/false, /*isSelectMode*/false,
 							function (d) {
 								if (d.deltaX) {t.scrollHorizontal(d.deltaX);}
@@ -974,7 +987,7 @@
 			return t.__retval;
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {KeyboardEvent} */
 		asc_CEventsController.prototype._onWindowKeyPress = function (event) {
 			var t = this;
 
@@ -1022,7 +1035,7 @@
 			return true;
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {KeyboardEvent} */
 		asc_CEventsController.prototype._onWindowKeyUp = function (event) {
 			var t = this;
 
@@ -1038,7 +1051,7 @@
 			return true;
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onWindowMouseMove = function (event) {
 			var t = this;
 			var coord = t._getCoordinates(event);
@@ -1048,10 +1061,9 @@
 				this.isResizeModeMove = true;
 				this._resizeElement(event);
 			}
-            if( this.hsbApiLockMouse )
+            if (this.hsbApiLockMouse)
                 this.hsbApi.mouseDown ? this.hsbApi.evt_mousemove.call(this.hsbApi,event) : false;
-
-            else if( this.vsbApiLockMouse )
+            else if (this.vsbApiLockMouse)
                 this.vsbApi.mouseDown ? this.vsbApi.evt_mousemove.call(this.vsbApi,event) : false;
 				
 			// Режим установки закреплённых областей
@@ -1067,7 +1079,7 @@
 			return true;
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onWindowMouseUp = function (event) {
 
 			// this.vsbApi.evt_mouseup(event);
@@ -1132,7 +1144,11 @@
 			return true;
 		};
 
-		/** @param event {jQuery.Event} */
+		/**
+		 *
+		 * @param x
+		 * @param y
+		 */
 		asc_CEventsController.prototype._onWindowMouseUpExternal = function (x, y) {
 			if (this.isSelectMode) {
 				this.isSelectMode = false;
@@ -1171,7 +1187,7 @@
 			return true;
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onWindowMouseLeaveOut = function (event) {
 			// Когда обрабатывать нечего - выходим
 			if (!this.isDoBrowserDblClick)
@@ -1190,7 +1206,7 @@
 			return true;
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onMouseDown = function (event) {
 			var t = this;
 			var coord = t._getCoordinates(event);
@@ -1212,10 +1228,6 @@
 				
 				t.isShapeAction = true;
 				t.isMouseDownMode = true;
-					
-				// Mac OS
-				if ( event.metaKey )
-					event.ctrlKey = true;
 				
 				t.clickCounter.mouseDownEvent(coord.x, coord.y, event.button);
 				event.ClickCount = t.clickCounter.clickCount;
@@ -1346,27 +1358,21 @@
 					// В режиме автозаполнения
 					t.isFillHandleMode = true;
 					t._changeFillHandle(event);
-					return;
 				} else {
 					t.isSelectMode = true;
 					t.handlers.trigger("changeSelection", /*isStartPoint*/true, coord.x,
 						coord.y, /*isCoord*/true, /*isSelectMode*/true);
-					return;
 				}
 			}
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onMouseUp = function (event) {
-
 			// Shapes
 			var coord = this._getCoordinates(event);
 			event.isLocked = this.isMousePressed = false;
 
 			if ( this.isShapeAction ) {
-				// Mac OS
-				if ( event.metaKey )
-					event.ctrlKey = true;
 				if (this.isCellEditMode) {
 					this.handlers.trigger("stopCellEditing");
 					this.isCellEditMode = false;
@@ -1416,9 +1422,10 @@
 			this.showCellEditorCursor();
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onMouseMove = function (event) {
 			var t = this;
+			var ctrlKey = event.metaKey || event.ctrlKey;
 			var coord = t._getCoordinates(event);
 			event.isLocked = t.isMousePressed;
 
@@ -1448,12 +1455,7 @@
 
 			// Режим перемещения диапазона
 			if (t.isMoveRangeMode) {
-                if(event.ctrlKey){
-                    event.currentTarget.style.cursor = "copy";
-                }
-                else{
-                    event.currentTarget.style.cursor = "move";
-                }
+				event.currentTarget.style.cursor = ctrlKey ? "copy" : "move";
 				t._moveRangeHandle(event);
 				return true;
 			}
@@ -1471,15 +1473,15 @@
 
 			if (t.isShapeAction || graphicsInfo) {
 				t.handlers.trigger("graphicObjectMouseMove", event, coord.x, coord.y);
-				t.handlers.trigger("updateWorksheet", t.element, coord.x, coord.y, event.ctrlKey, function(info){t.targetInfo = info;});
+				t.handlers.trigger("updateWorksheet", t.element, coord.x, coord.y, ctrlKey, function(info){t.targetInfo = info;});
 				return true;
 			}
 
-			t.handlers.trigger("updateWorksheet", t.element, coord.x, coord.y, event.ctrlKey, function(info){t.targetInfo = info;});
+			t.handlers.trigger("updateWorksheet", t.element, coord.x, coord.y, ctrlKey, function(info){t.targetInfo = info;});
 			return true;
 		};
 
-    	/** @param event {jQuery.Event} */
+    	/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onMouseLeave = function (event) {
 			var t = this;
 			this.hasCursor = false;
@@ -1499,9 +1501,7 @@
 			return true;
 		};
 
-		/**
-		 * @param event
-		 */
+		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onMouseWheel = function (event) {
 			if (this.isFillHandleMode || this.isMoveRangeMode || this.isMoveResizeChartsRange || this.isMoveResizeRange) {
 				return true;
@@ -1525,7 +1525,7 @@
 			return true;
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {KeyboardEvent} */
 		asc_CEventsController.prototype._onMouseDblClick = function (event) {
 			if (this.handlers.trigger("isGlobalLockEditCell"))
 				return false;
@@ -1541,7 +1541,7 @@
 			return true;
 		};
 
-		/** @param event {jQuery.Event} */
+		/** @param event {KeyboardEvent} */
 		asc_CEventsController.prototype._getCoordinates = function (event) {
 			var offs = $(this.element).offset();
 			var x = event.pageX - offs.left;

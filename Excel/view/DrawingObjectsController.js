@@ -246,7 +246,7 @@ DrawingObjectsController.prototype.checkSelectedObjectsAndFireCallback = functio
 DrawingObjectsController.prototype.onMouseDown = function(e, x, y)
 {
     e.ShiftKey = e.shiftKey;
-    e.CtrlKey = e.ctrlKey;
+    e.CtrlKey = e.metaKey || e.ctrlKey;
     return this.curState.onMouseDown(e, x, y, 0);
 
 };
@@ -256,7 +256,7 @@ DrawingObjectsController.prototype.OnMouseDown = DrawingObjectsController.protot
 DrawingObjectsController.prototype.onMouseMove = function(e, x, y)
 {
     e.ShiftKey = e.shiftKey;
-    e.CtrlKey = e.ctrlKey;
+    e.CtrlKey = e.metaKey || e.ctrlKey;
     this.curState.onMouseMove(e, x, y, 0);
 };
 DrawingObjectsController.prototype.OnMouseMove = DrawingObjectsController.prototype.onMouseMove;
@@ -265,7 +265,7 @@ DrawingObjectsController.prototype.OnMouseMove = DrawingObjectsController.protot
 DrawingObjectsController.prototype.onMouseUp = function(e, x, y)
 {
     e.ShiftKey = e.shiftKey;
-    e.CtrlKey = e.ctrlKey;
+    e.CtrlKey = e.metaKey || e.ctrlKey;
     this.curState.onMouseUp(e, x, y, 0);
 };
 DrawingObjectsController.prototype.OnMouseUp = DrawingObjectsController.prototype.onMouseUp;
