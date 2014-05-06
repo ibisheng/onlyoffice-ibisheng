@@ -363,12 +363,10 @@ ParaMath.prototype =
         this.LinesLength = 0;
     },
 
-    Recalculate_Range : function(ParaPr, Depth)
+    Recalculate_Range : function(PRS, ParaPr, Depth)
     {
         // TODO: Пока у нас контент здесь состоит из 1 элемента (всего элемента Math). Поэтому у нас в данном
         //       контенте есть 2 позиции 0 и 1, т.е. до или после Math.
-
-        var PRS = g_oPRSW;
 
         if ( this.Paragraph !== PRS.Paragraph )
         {

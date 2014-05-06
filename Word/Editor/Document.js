@@ -1530,7 +1530,7 @@ CDocument.prototype =
 
                 var SectInfoElement = this.SectionsInfo.Get_SectPr(Index);
                 var PrevElement = this.Content[Index - 1]; // может быть undefined, но в следующем условии сразу стоит проверка на Index > 0
-                if ( Index > 0 && ( Index !== StartIndex || true !== bStartNewSection ) && Index === SectInfoElement.Index && true === Element.IsEmpty() && ( type_Paragraph !== PrevElement.GetType() || true !== PrevElement.IsEmpty() || undefined === PrevElement.Get_SectionPr() ) )
+                if ( Index > 0 && ( Index !== StartIndex || true !== bStartNewSection ) && Index === SectInfoElement.Index && true === Element.IsEmpty() && ( type_Paragraph !== PrevElement.GetType() || undefined === PrevElement.Get_SectionPr() ) )
                 {
                     RecalcResult = recalcresult_NextElement;
                     var LastVisibleBounds = PrevElement.Get_LastRangeVisibleBounds();
@@ -12752,9 +12752,12 @@ CDocument.prototype =
     
     Get_SectionPageNumInfo2 : function(Page_abs)
     {
-        if(!this.Pages[Page_abs])
-            return {CurPage: 0};
-        var StartIndex = this.Pages[Page_abs].Pos;
+        var StartIndex = 0;
+        
+        // Такое может случится при первом рассчете документа, и когда мы находимся в автофигуре
+        if ( undefined !== this.Pages[Page_abs] )        
+            StartIndex = this.Pages[Page_abs].Pos;        
+        
         var SectIndex  = this.SectionsInfo.Get_Index(StartIndex);
 
         if ( 0 === SectIndex )

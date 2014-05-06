@@ -997,7 +997,7 @@ ParaComment.prototype =
         this.StartRange  = StartRange;
     },
 
-    Recalculate_Range : function(ParaPr)
+    Recalculate_Range : function(PRS, ParaPr)
     {
     },
 

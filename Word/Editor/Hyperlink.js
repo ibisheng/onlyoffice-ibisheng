@@ -731,10 +731,8 @@ ParaHyperlink.prototype =
         this.LinesLength = 0;
     },
 
-    Recalculate_Range : function(ParaPr, Depth)
+    Recalculate_Range : function(PRS, ParaPr, Depth)
     {
-        var PRS = g_oPRSW;
-
         if ( this.Paragraph !== PRS.Paragraph )
         {
             this.Paragraph = PRS.Paragraph;
@@ -797,7 +795,7 @@ ParaHyperlink.prototype =
             }
 
             PRS.Update_CurPos( Pos, Depth );
-            Item.Recalculate_Range( ParaPr, Depth + 1 );
+            Item.Recalculate_Range( PRS, ParaPr, Depth + 1 );
 
             if ( true === PRS.NewRange )
             {

@@ -1209,13 +1209,11 @@ ParaRun.prototype =
         this.RecalcInfo.Measure = false;
     },
 
-    Recalculate_Range : function(ParaPr, Depth)
+    Recalculate_Range : function(PRS, ParaPr, Depth)
     {
-        var PRS = g_oPRSW;
-
-        if ( this.Paragraph !== g_oPRSW.Paragraph )
+        if ( this.Paragraph !== PRS.Paragraph )
         {
-            this.Paragraph = g_oPRSW.Paragraph;
+            this.Paragraph = PRS.Paragraph;
             this.RecalcInfo.TextPr = true;
 
             this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );

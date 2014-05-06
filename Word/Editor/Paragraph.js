@@ -150,6 +150,8 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
         this.Content[0] = EndRun;
     }
 
+    this.m_oPRSW = new CParagraphRecalculateStateWrap();
+
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
 }
@@ -3167,7 +3169,7 @@ Paragraph.prototype =
     // Пересчет переносов строк в параграфе, с учетом возможного обтекания
     Recalculate_Page__ : function(CurPage)
     {
-        var PRS = g_oPRSW;
+        var PRS = this.m_oPRSW;
         PRS.Paragraph = this;
         PRS.Page      = CurPage;
 
@@ -3938,7 +3940,7 @@ Paragraph.prototype =
 
     Recalculate_Range : function(ParaPr)
     {
-        var PRS = g_oPRSW;
+        var PRS = this.m_oPRSW;
 
         var CurLine     = PRS.Line;
         var CurRange    = PRS.Range;
@@ -3990,7 +3992,7 @@ Paragraph.prototype =
             }
 
             PRS.Update_CurPos( Pos, 0 );
-            Item.Recalculate_Range( ParaPr, 1 );
+            Item.Recalculate_Range( PRS, ParaPr, 1 );
 
             if ( true === PRS.NewRange )
             {
@@ -5466,7 +5468,7 @@ Paragraph.prototype =
 
     Recalculate_Fast_Range : function(_Line, _Range)
     {
-        var PRS = g_oPRSW;
+        var PRS = this.m_oPRSW;
 
         var XStart, YStart, XLimit, YLimit;
 
@@ -22232,7 +22234,7 @@ CParagraphRecalculateStateInfo.prototype =
 }
 
 
-var g_oPRSW = new CParagraphRecalculateStateWrap();
+//var g_oPRSW = new CParagraphRecalculateStateWrap();
 var g_oPRSC = new CParagraphRecalculateStateCounter();
 var g_oPRSA = new CParagraphRecalculateStateAlign();
 var g_oPRSI = new CParagraphRecalculateStateInfo();

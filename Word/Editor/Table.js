@@ -4505,6 +4505,7 @@ CTable.prototype =
         var CurRow = this.Content.length - 1;
         var Row = this.Content[CurRow];
 
+        // Ищем границы по горизонтали для последней ячейки
         var CurCell = Row.Get_CellsCount() - 1;
 
         var Cell     = Row.Get_Cell( CurCell );
@@ -4515,6 +4516,20 @@ CTable.prototype =
         var X_end   = CellInfo.X_cell_end;
 
         var Cell_PageRel = Page_abs - Cell.Content.Get_StartPage_Absolute();
+        
+        // Не все ячейки могут иметь страницу с номером Cell_PageRel, но хотя бы одна такая должна быть (иначе переноса
+        // на новую страницу не было бы)        
+        var CellsCount = Row.Get_CellsCount();
+        for ( CurCell = 0; CurCell < CellsCount; CurCell++ )
+        {
+            Cell = Row.Get_Cell( CurCell );
+            
+            if ( Cell_PageRel <= Cell.PagesCount - 1 )
+                break;
+        }
+        
+        if ( CurCell >= CellsCount )
+            return { X : X_start, Y : 0, W : X_end - X_start, H : 0, BaseLine : 0, XLimit : this.XLimit };
 
         var Bounds = Cell.Content_Get_PageBounds( Cell_PageRel );
         var Y_offset = Cell.Temp.Y_VAlign_offset[Cell_PageRel];

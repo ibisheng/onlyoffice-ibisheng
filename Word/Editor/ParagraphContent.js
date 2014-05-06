@@ -4171,6 +4171,7 @@ ParaDrawing.prototype =
         c.Set_PositionV( this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value );
         c.Set_Distance(d.L, d.T, d.R, d.B);
         c.Set_AllowOverlap(this.AllowOverlap);
+        
         c.Set_WrappingType(this.wrappingType);
         c.Set_BehindDoc(this.behindDoc);
         c.Update_Size(this.W, this.H);
