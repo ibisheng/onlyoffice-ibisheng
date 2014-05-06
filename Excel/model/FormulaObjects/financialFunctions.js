@@ -92,75 +92,79 @@ function getIPMT( rate, per, pv, type, pmt ) {
  */
 function RateIteration( nper, payment, pv, fv, payType, guess ) {
 
-    var bValid = true, bFound = false, fX, fXnew, fTerm, fTermDerivation, fGeoSeries, fGeoSeriesDerivation,
+    var valid = true, found = false, x, xnew, term, termDerivation, geoSeries, geoSeriesDerivation,
         iterationMax = 150, nCount = 0, minEps = 1E-14, eps = 1E-7,
-        fPowN, fPowNminus1;
+        powN, powNminus1;
     fv = fv - payment * payType;
     pv = pv + payment * payType;
     if ( nper === Math.round( nper ) ) {
-        fX = guess.fGuess;
-        while ( !bFound && nCount < iterationMax ) {
-            fPowNminus1 = Math.pow( 1 + fX, nper - 1 );
-            fPowN = fPowNminus1 * (1 + fX);
-            if ( Math.approxEqual( Math.abs( fX ), 0 ) ) {
-                fGeoSeries = nper;
-                fGeoSeriesDerivation = nper * (nper - 1) / 2;
+        x = guess;
+        while ( !found && nCount < iterationMax ) {
+            powNminus1 = Math.pow( 1 + x, nper - 1 );
+            powN = powNminus1 * (1 + x);
+            if ( Math.approxEqual( Math.abs( x ), 0 ) ) {
+                geoSeries = nper;
+                geoSeriesDerivation = nper * (nper - 1) / 2;
             }
             else {
-                fGeoSeries = (fPowN - 1) / fX;
-                fGeoSeriesDerivation = nper * fPowNminus1 / fX - fGeoSeries / fX;
+                geoSeries = (powN - 1) / x;
+                geoSeriesDerivation = ( nper * powNminus1 - geoSeries ) / x;
             }
-            fTerm = fv + pv * fPowN + payment * fGeoSeries;
-            fTermDerivation = pv * nper * fPowNminus1 + payment * fGeoSeriesDerivation;
-            if ( Math.abs( fTerm ) < minEps ) {
-                bFound = true;
+            term = fv + pv * powN + payment * geoSeries;
+            termDerivation = pv * nper * powNminus1 + payment * geoSeriesDerivation;
+            if ( Math.abs( term ) < minEps ) {
+                found = true;
             }
             else {
-                if ( Math.approxEqual( Math.abs( fTermDerivation ), 0 ) ) {
-                    fXnew = fX + 1.1 * eps;
+                if ( Math.approxEqual( Math.abs( termDerivation ), 0 ) ) {
+                    xnew = x + 1.1 * eps;
                 }
                 else {
-                    fXnew = fX - fTerm / fTermDerivation;
+                    xnew = x - term / termDerivation;
                 }
                 nCount++;
-                bFound = (Math.abs( fXnew - fX ) < eps);
-                fX = fXnew;
+                found = (Math.abs( xnew - x ) < eps);
+                x = xnew;
             }
         }
-        bValid = (fX >= -1);
+        valid = (x >= -1);
     }
     else {
-        fX = (guess.fGuest < -1) ? -1 : guess.fGuest;
-        while ( bValid && !bFound && nCount < iterationMax ) {
-            if ( Math.approxEqual( Math.abs( fX ), 0 ) ) {
-                fGeoSeries = nper;
-                fGeoSeriesDerivation = nper * (nper - 1) / 2;
+        x = (guess < -1) ? -1 : guess;
+        while ( valid && !found && nCount < iterationMax ) {
+            if ( Math.approxEqual( Math.abs( x ), 0 ) ) {
+                geoSeries = nper;
+                geoSeriesDerivation = nper * (nper - 1) / 2;
             }
             else {
-                fGeoSeries = (Math.pow( 1 + fX, nper ) - 1) / fX;
-                fGeoSeriesDerivation = nper * Math.pow( 1 + fX, nper - 1 ) / fX - fGeoSeries / fX;
+                geoSeries = (Math.pow( 1 + x, nper ) - 1) / x;
+                geoSeriesDerivation = nper * Math.pow( 1 + x, nper - 1 ) / x - geoSeries / x;
             }
-            fTerm = fv + pv * Math.pow( 1 + fX, nper ) + payment * fGeoSeries;
-            fTermDerivation = pv * nper * Math.pow( 1 + fX, nper - 1 ) + payment * fGeoSeriesDerivation;
-            if ( Math.abs( fTerm ) < minEps ) {
-                bFound = true;
+            term = fv + pv * Math.pow( 1 + x, nper ) + payment * geoSeries;
+            termDerivation = pv * nper * Math.pow( 1 + x, nper - 1 ) + payment * geoSeriesDerivation;
+            if ( Math.abs( term ) < minEps ) {
+                found = true;
             }
             else {
-                if ( Math.approxEqual( Math.abs( fTermDerivation ), 0 ) ) {
-                    fXnew = fX + 1.1 * eps;
+                if ( Math.approxEqual( Math.abs( termDerivation ), 0 ) ) {
+                    xnew = x + 1.1 * eps;
                 }
                 else {
-                    fXnew = fX - fTerm / fTermDerivation;
+                    xnew = x - term / termDerivation;
                 }
                 nCount++;
-                bFound = (Math.abs( fXnew - fX ) < eps);
-                fX = fXnew;
-                bValid = (fX >= -1);
+                found = (Math.abs( xnew - x ) < eps);
+                x = xnew;
+                valid = (x >= -1);
             }
         }
     }
-    guess.fGuess = fX;
-    return bValid && bFound;
+    if( valid && found ){
+        return new cNumber( x );
+    }
+    else{
+        return new cError( cErrorType.wrong_value_type );
+    }
 }
 
 function lcl_GetCouppcd( settl, matur, freq ) {
@@ -213,6 +217,12 @@ function getcoupdaysnc( settl, matur, frequency, basis ) {
     }
 
     return getcoupdays( new Date( settl ), new Date( matur ), frequency, basis ) - getcoupdaybs( new Date( settl ), new Date( matur ), frequency, basis );
+}
+
+function getcoupncd( settl, matur, frequency ) {
+    var s = new Date( settl ), m = new Date( matur );
+    lcl_GetCoupncd( s, m, frequency );
+    return m;
 }
 
 function getprice( settle, mat, rate, yld, redemp, freq, base ) {
@@ -319,6 +329,108 @@ function getduration( settlement, maturity, coupon, yld, frequency, basis ) {
 
 }
 
+function oddFPrice(settl,matur,iss,firstCoup,rate,yld,redemption,frequency,basis) {
+    function positiveDaysBetween( d1, d2, b ) {
+        var res = diffDate( d1, d2, b );
+        return res > 0 ? res : 0;
+    }
+
+    function addMonth( orgDate, numMonths, returnLastDay ) {
+        var newDate = new Date( orgDate );
+        newDate.addMonths( numMonths );
+        if ( returnLastDay ) {
+            newDate.setUTCDate( newDate.getDaysInMonth() );
+        }
+        return newDate;
+    }
+
+    function coupNumber( mat, settl, numMonths, isWholeNumber ) {
+        var my = mat.getUTCFullYear(), mm = mat.getUTCMonth(), md = mat.getUTCDate(),
+            endOfMonthTemp = mat.lastDayOfMonth(),
+            endOfMonth = (!endOfMonthTemp && mm != 1 && md > 28 && md < new Date( my, mm ).getDaysInMonth()) ? settl.lastDayOfMonth() : endOfMonthTemp,
+            startDate = addMonth( settl, 0, endOfMonth ),
+            coupons = (isWholeNumber - 0) + (settl < startDate),
+            frontDate = addMonth( startDate, numMonths, endOfMonth );
+
+        while ( !(numMonths > 0 ? frontDate >= endDate : frontDate <= endDate) ) {
+            frontDate = addMonth( frontDate, numMonths, endOfMonth );
+            coupons++;
+        }
+
+        return coupons;
+
+    }
+
+    var res = 0, DSC,
+        numMonths = 12 / frequency,
+        numMonthsNeg = -numMonths,
+        E = getcoupdays( settl, new Date( firstCoup ), frequency, basis ),
+        coupNums = getcoupnum( settl, new Date( matur ), frequency ),
+        dfc = positiveDaysBetween( new Date( iss ), new Date( firstCoup ), basis );
+
+    if ( dfc < E ) {
+        DSC = positiveDaysBetween( settl, firstCoup, basis );
+        rate *= 100 / frequency;
+        yld /= frequency;
+        yld++;
+        DSC /= E;
+
+        res = redemption / Math.pow( yld, (coupNums - 1 + DSC) );
+        res += rate * dfc / E / Math.pow( yld, DSC );
+        res -= rate * positiveDaysBetween( iss, settl, basis ) / E;
+
+        for ( var i = 1; i < coupNums; i++ ) {
+            res += rate / Math.pow( yld, (i + DSC) );
+        }
+
+    }
+    else {
+
+        var nc = getcoupnum( iss, firstCoup, frequency ),
+            lateCoupon = new Date( firstCoup ),
+            DCdivNL = 0, AdivNL = 0, startDate, endDate,
+            earlyCoupon, NLi, DCi;
+
+        for ( var index = nc; index >= 1; index-- ) {
+
+            earlyCoupon = addMonth( lateCoupon, numMonthsNeg, false );
+            NLi = basis == DayCountBasis.ActualActual ? positiveDaysBetween( earlyCoupon, lateCoupon, basis ) : E;
+            DCi = index > 1 ? NLi : positiveDaysBetween( iss, lateCoupon, basis );
+            startDate = iss > earlyCoupon ? iss : earlyCoupon;
+            endDate = settl < lateCoupon ? settl : lateCoupon;
+            lateCoupon = new Date( earlyCoupon );
+            DCdivNL += DCi / NLi;
+            AdivNL += positiveDaysBetween( startDate, endDate, basis ) / NLi;
+
+        }
+
+        if ( basis == DayCountBasis.Actual360 || basis == DayCountBasis.Actual365 ) {
+            DSC = positiveDaysBetween( settl, getcoupncd( settl, firstCoup, frequency ), basis );
+        }
+        else {
+            DSC = E - diffDate( getcoupncd( settl, firstCoup, frequency ), settl, basis );
+        }
+
+        var Nq = coupNumber( firstCoup, settl, numMonths, true );
+        coupNums = getcoupnum( firstCoup, matur, frequency );
+        yld /= frequency;
+        yld++;
+        DSC /= E;
+        rate *= 100 / frequency;
+
+        for ( var i = 1; i <= coupNums; i++ ) {
+            res += 1 / Math.pow( yld, (i + Nq + DSC) );
+        }
+
+        res *= rate;
+        res += redemption / Math.pow( yld, (DSC + Nq + coupNums) );
+        res += rate * DCdivNL / Math.pow( yld, (Nq + DSC) );
+        res -= rate * AdivNL;
+
+    }
+    return res;
+}
+
 /**
  * Created with JetBrains WebStorm.
  * User: Dmitry.Shahtanov
@@ -326,7 +438,7 @@ function getduration( settlement, maturity, coupon, yld, frequency, basis ) {
  * Time: 15:19
  * To change this template use File | Settings | File Templates.
  */
-FormulaObjects.cFormulaFunction.Financial = {
+cFormulaFunction.Financial = {
     'groupName':"Financial",
     'ACCRINT':cACCRINT,
     'ACCRINTM':cACCRINTM,
@@ -399,6 +511,7 @@ function cACCRINT() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cACCRINT.prototype = Object.create( cBaseFunction.prototype );
 cACCRINT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1],
@@ -507,6 +620,7 @@ function cACCRINTM() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cACCRINTM.prototype = Object.create( cBaseFunction.prototype );
 cACCRINTM.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0],
@@ -595,6 +709,7 @@ function cAMORDEGRC() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cAMORDEGRC.prototype = Object.create( cBaseFunction.prototype );
 cAMORDEGRC.prototype.Calculate = function ( arg ) {
     var cost = arg[0],
@@ -740,6 +855,7 @@ function cAMORLINC() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cAMORLINC.prototype = Object.create( cBaseFunction.prototype );
 cAMORLINC.prototype.Calculate = function ( arg ) {
     var cost = arg[0],
@@ -863,6 +979,7 @@ function cCOUPDAYBS() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cCOUPDAYBS.prototype = Object.create( cBaseFunction.prototype );
 cCOUPDAYBS.prototype.Calculate = function ( arg ) {
     var settlement = arg[0],
@@ -940,6 +1057,7 @@ function cCOUPDAYS() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cCOUPDAYS.prototype = Object.create( cBaseFunction.prototype );
 cCOUPDAYS.prototype.Calculate = function ( arg ) {
     var settlement = arg[0],
@@ -1017,6 +1135,7 @@ function cCOUPDAYSNC() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cCOUPDAYSNC.prototype = Object.create( cBaseFunction.prototype );
 cCOUPDAYSNC.prototype.Calculate = function ( arg ) {
     var settlement = arg[0],
@@ -1097,6 +1216,7 @@ function cCOUPNCD() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cCOUPNCD.prototype = Object.create( cBaseFunction.prototype );
 cCOUPNCD.prototype.Calculate = function ( arg ) {
     var settlement = arg[0],
@@ -1150,8 +1270,7 @@ cCOUPNCD.prototype.Calculate = function ( arg ) {
 
     frequency = frequency.getValue();
 
-    lcl_GetCoupncd( settl, matur, frequency );
-    this.value = new cNumber( matur.getExcelDate() );
+    this.value = new cNumber( getcoupncd( settl, matur, frequency ).getExcelDate() );
     this.value.numFormat = 14;
     return this.value;
 
@@ -1179,6 +1298,7 @@ function cCOUPNUM() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cCOUPNUM.prototype = Object.create( cBaseFunction.prototype );
 cCOUPNUM.prototype.Calculate = function ( arg ) {
     var settlement = arg[0],
@@ -1259,6 +1379,7 @@ function cCOUPPCD() {
     };
     this.numFormat = this.formatType.noneFormat;
 }
+
 cCOUPPCD.prototype = Object.create( cBaseFunction.prototype );
 cCOUPPCD.prototype.Calculate = function ( arg ) {
     var settlement = arg[0],
@@ -1342,6 +1463,7 @@ function cCUMIPMT() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cCUMIPMT.prototype = Object.create( cBaseFunction.prototype );
 cCUMIPMT.prototype.Calculate = function ( arg ) {
     var rate = arg[0],
@@ -1462,6 +1584,7 @@ function cCUMPRINC() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cCUMPRINC.prototype = Object.create( cBaseFunction.prototype );
 cCUMPRINC.prototype.Calculate = function ( arg ) {
     var rate = arg[0],
@@ -1586,6 +1709,7 @@ function cDB() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cDB.prototype = Object.create( cBaseFunction.prototype );
 cDB.prototype.Calculate = function ( arg ) {
     var cost = arg[0],
@@ -1696,6 +1820,7 @@ function cDDB() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cDDB.prototype = Object.create( cBaseFunction.prototype );
 cDDB.prototype.Calculate = function ( arg ) {
     var cost = arg[0],
@@ -1788,6 +1913,7 @@ function cDISC() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cDISC.prototype = Object.create( cBaseFunction.prototype );
 cDISC.prototype.Calculate = function ( arg ) {
     var settlement = arg[0],
@@ -1876,6 +2002,7 @@ function cDOLLARDE() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cDOLLARDE.prototype = Object.create( cBaseFunction.prototype );
 cDOLLARDE.prototype.Calculate = function ( arg ) {
     var fractionalDollar = arg[0],
@@ -1943,6 +2070,7 @@ function cDOLLARFR() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cDOLLARFR.prototype = Object.create( cBaseFunction.prototype );
 cDOLLARFR.prototype.Calculate = function ( arg ) {
     var decimalDollar = arg[0],
@@ -2010,6 +2138,7 @@ function cDURATION() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cDURATION.prototype = Object.create( cBaseFunction.prototype );
 cDURATION.prototype.Calculate = function ( arg ) {
     var settlement = arg[0],
@@ -2117,6 +2246,7 @@ function cEFFECT() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cEFFECT.prototype = Object.create( cBaseFunction.prototype );
 cEFFECT.prototype.Calculate = function ( arg ) {
     var nominalRate = arg[0], npery = arg[1];
@@ -2174,6 +2304,7 @@ function cFV() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cFV.prototype = Object.create( cBaseFunction.prototype );
 cFV.prototype.Calculate = function ( arg ) {
     var rate = arg[0], nper = arg[1], pmt = arg[2], pv = arg[3] ? arg[3] : new cNumber( 0 ), type = arg[4] ? arg[4] : new cNumber( 0 );
@@ -2260,6 +2391,7 @@ function cFVSCHEDULE() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cFVSCHEDULE.prototype = Object.create( cBaseFunction.prototype );
 cFVSCHEDULE.prototype.Calculate = function ( arg ) {
     var principal = arg[0],
@@ -2329,6 +2461,7 @@ function cINTRATE() {
 
 
 }
+
 cINTRATE.prototype = Object.create( cBaseFunction.prototype );
 cINTRATE.prototype.Calculate = function ( arg ) {
     var settlement = arg[0],
@@ -2418,6 +2551,7 @@ function cIPMT() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cIPMT.prototype = Object.create( cBaseFunction.prototype );
 cIPMT.prototype.Calculate = function ( arg ) {
     var rate = arg[0], per = arg[1], nper = arg[2], pv = arg[3], fv = arg[4] ? arg[4] : new cNumber( 0 ), type = arg[5] ? arg[5] : new cNumber( 0 );
@@ -2520,6 +2654,7 @@ function cIRR() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cIRR.prototype = Object.create( cBaseFunction.prototype );
 cIRR.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cNumber( 0.1 );
@@ -2527,7 +2662,7 @@ cIRR.prototype.Calculate = function ( arg ) {
     function irr( arr, x ) {
         x = x.getValue();
 
-        var nC = 0, g_Eps = 1e-7, fEps = 1, fZ = 0, fN = 0, xN = 0, nIM = 100, nMC = 0, arr0 = arr[0], arrI, wasNegative = false, wasPositive = false;
+        var count = 0, g_Eps = 1e-7, eps = 1, funcVal = 0, derivVal = 0, xN = 0, nIM = 100, nMC = 0, arr0 = arr[0], arrI, wasNegative = false, wasPositive = false;
 
         if ( arr0 instanceof cError ) {
             return new cError( cErrorType.not_available );
@@ -2540,36 +2675,36 @@ cIRR.prototype.Calculate = function ( arg ) {
         if ( arr.length < 2 )
             return new cError( cErrorType.not_numeric );
 
-        while ( fEps > g_Eps && nMC < nIM ) {
-            nC = 0;
-            fZ = 0;
-            fN = 0;
-            fZ += arr0.getValue() / Math.pow( 1 + x, nC );
-            fN += -nC * arr0.getValue() / Math.pow( 1 + x, nC + 1 );
-            nC++;
+        while ( eps > g_Eps && nMC < nIM ) {
+            count = 0;
+            funcVal = 0;
+            derivVal = 0;
+            funcVal += arr0.getValue() / Math.pow( 1 + x, count );
+            derivVal += -count * arr0.getValue() / Math.pow( 1 + x, count + 1 );
+            count++;
             for ( var i = 1; i < arr.length; i++ ) {
                 if ( arr[i] instanceof cError ) {
                     return new cError( cErrorType.not_available );
                 }
                 arrI = arr[i].getValue();
-                fZ += arrI / Math.pow( 1 + x, nC );
-                fN += -nC * arrI / Math.pow( 1 + x, nC + 1 );
+                funcVal += arrI / Math.pow( 1 + x, count );
+                derivVal += -count * arrI / Math.pow( 1 + x, count + 1 );
                 if ( arrI < 0 )
                     wasNegative = true;
                 else if ( arrI > 0 )
                     wasPositive = true;
-                nC++
+                count++
             }
-            xN = x - fZ / fN;
+            xN = x - funcVal / derivVal;
             nMC++;
-            fEps = Math.abs( xN - x );
+            eps = Math.abs( xN - x );
             x = xN;
         }
 
         if ( !(wasNegative && wasPositive) )
             return new cError( cErrorType.not_numeric );
 
-        if ( fEps < g_Eps )
+        if ( eps < g_Eps )
             return new cNumber( x );
         else
             return new cError( cErrorType.not_numeric );
@@ -2620,6 +2755,7 @@ function cISPMT() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cISPMT.prototype = Object.create( cBaseFunction.prototype );
 cISPMT.prototype.Calculate = function ( arg ) {
     var rate = arg[0], per = arg[1], nper = arg[2], pv = arg[3];
@@ -2687,6 +2823,7 @@ function cMDURATION() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cMDURATION.prototype = Object.create( cBaseFunction.prototype );
 cMDURATION.prototype.Calculate = function ( arg ) {
     var settlement = arg[0],
@@ -2798,6 +2935,7 @@ function cMIRR() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cMIRR.prototype = Object.create( cBaseFunction.prototype );
 cMIRR.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], fRate1_invest = arg[1], fRate1_reinvest = arg[2];
@@ -2912,6 +3050,7 @@ function cNOMINAL() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cNOMINAL.prototype = Object.create( cBaseFunction.prototype );
 cNOMINAL.prototype.Calculate = function ( arg ) {
     var effectRate = arg[0],
@@ -2973,6 +3112,7 @@ function cNPER() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cNPER.prototype = Object.create( cBaseFunction.prototype );
 cNPER.prototype.Calculate = function ( arg ) {
     var rate = arg[0], pmt = arg[1], pv = arg[2], fv = arg[3] ? arg[3] : new cNumber( 0 ), type = arg[4] ? arg[4] : new cNumber( 0 );
@@ -3068,6 +3208,7 @@ function cNPV() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cNPV.prototype = Object.create( cBaseFunction.prototype );
 cNPV.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], iStart = 1, res = 0, rate;
@@ -3149,6 +3290,7 @@ function cODDFPRICE() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cODDFPRICE.prototype = Object.create( cBaseFunction.prototype );
 cODDFPRICE.prototype.Calculate = function ( arg ) {
     var settlement = arg[0],
@@ -3254,9 +3396,11 @@ cODDFPRICE.prototype.Calculate = function ( arg ) {
     frequency = frequency.getValue();
     basis = basis.getValue();
 
-    if ( settlement >= maturity || maturity <= first_coupon ||
+    if ( maturity <= first_coupon || first_coupon <= settlement ||
+        settlement <= issue ||
         basis < 0 || basis > 4 ||
         yld < 0 || rate < 0 ||
+        redemption < 0 ||
         frequency != 1 && frequency != 2 && frequency != 4 )
         return this.value = new cError( cErrorType.not_numeric );
 
@@ -3265,124 +3409,7 @@ cODDFPRICE.prototype.Calculate = function ( arg ) {
         iss = Date.prototype.getDateFromExcel( issue ),
         firstCoup = Date.prototype.getDateFromExcel( first_coupon );
 
-    function lastDayOfMonth( y, m, d ) {
-        return (new Date( y, m - 1 )).getDaysInMonth() == d;
-    }
-
-    function daysBetweenNotNeg( d1, d2, b ) {
-        var res = diffDate( d1, d2, b );
-        return res > 0 ? res : 0;
-    }
-
-    function changeMonth( orgDate, numMonths, returnLastDay ) {
-        var newDate = new Date( orgDate );
-        newDate.addMonths( numMonths );
-        if ( returnLastDay )
-            return new Date( newDate.getUTCFullYear(), newDate.getUTCMonth(), newDate.getDaysInMonth() );
-        else
-            return newDate;
-    }
-
-    function _getcoupncd( settl, matur, frequency ) {
-        var s = new Date( settl ), m = new Date( matur );
-        lcl_GetCoupncd( s, m, frequency );
-        return m;
-    }
-
-    function datesAggregate1( startDate, endDate, numMonths, acc, returnLastMonth ) {
-        var frontDate = startDate, trailingDate = endDate;
-
-        while ( !(numMonths > 0 ? frontDate >= endDate : frontDate <= endDate) ) {
-            trailingDate = frontDate;
-            frontDate = changeMonth( frontDate, numMonths, returnLastMonth );
-            acc++;
-        }
-        return acc;
-
-    }
-
-    function coupNumber( mat, settl, numMonths, isWholeNumber ) {
-        var my = mat.getUTCFullYear(), mm = mat.getUTCMonth() + 1, md = mat.getDate(),
-            sy = settl.getUTCFullYear(), sm = settl.getUTCMonth() + 1, sd = settl.getDate(),
-            endOfMonthTemp = lastDayOfMonth( my, mm, md ),
-            endOfMonth = (!endOfMonthTemp && mm != 2 && md > 28 && md < new Date( my, mm ).getDaysInMonth()) ? lastDayOfMonth( sy, sm, sd ) : endOfMonthTemp,
-            startDate = changeMonth( settl, 0, endOfMonth ),
-            coupons =  (isWholeNumber - 0) + (settl < startDate);
-
-        var frontDate = changeMonth( startDate, numMonths, endOfMonth ), trailingDate = mat;
-
-        while ( !(numMonths > 0 ? frontDate >= endDate : frontDate <= endDate) ) {
-            trailingDate = frontDate;
-            frontDate = changeMonth( frontDate, numMonths, endOfMonth );
-            coupons++;
-        }
-
-        return coupons;
-
-    }
-
-    var res = 0, dsc,
-        numMonths = 12 / frequency, numMonthsNeg = -numMonths,
-        e = getcoupdays( settl, new Date( firstCoup ), frequency, basis ),
-        coupNums = getcoupnum( settl, new Date( matur ), frequency ),
-        dfc = daysBetweenNotNeg( new Date( iss ), new Date( firstCoup ), basis );
-
-    if ( dfc < e ) {
-        dsc = daysBetweenNotNeg( settl, firstCoup, basis );
-        rate *= 100 / frequency;
-        yld /= frequency;
-        yld++;
-        dsc /= e;
-
-        res = redemption / Math.pow( yld, (coupNums - 1 + dsc) );
-        res += rate * dfc / e / Math.pow( yld, dsc );
-        res -= rate * daysBetweenNotNeg( iss, settl, basis ) / e;
-
-        for ( var i = 1; i < coupNums; i++ ) {
-            res += rate / Math.pow( yld, (i + dsc) );
-        }
-
-    }
-    else {
-        var nc = getcoupnum( iss, firstCoup, frequency ),
-            lateCoupon = new Date( firstCoup ),
-            dcnl = 0, anl = 0, startDate, endDate,
-            earlyCoupon, nl, dci;
-
-        for ( var index = nc; index >= 1; index-- ) {
-
-            earlyCoupon = changeMonth( lateCoupon, numMonthsNeg, false );
-            nl = basis == DayCountBasis.ActualActual ? daysBetweenNotNeg( earlyCoupon, lateCoupon, basis ) : e;
-            dci = index > 1 ? nl : daysBetweenNotNeg( iss, lateCoupon, basis );
-            startDate = iss > earlyCoupon ? iss : earlyCoupon;
-            endDate = settl < lateCoupon ? settl : lateCoupon;
-            lateCoupon = new Date( earlyCoupon );
-            dcnl += dci / nl;
-            anl += daysBetweenNotNeg( startDate, endDate, basis ) / nl;
-
-        }
-
-        if ( basis == DayCountBasis.Actual360 || basis == DayCountBasis.Actual365 ) {
-            dsc = daysBetweenNotNeg( settl, _getcoupncd( settl, firstCoup, frequency ), basis );
-        }
-        else {
-            dsc = e - diffDate( _getcoupncd( settl, firstCoup, frequency ), settl, basis );
-        }
-        var nq = coupNumber( firstCoup, settl, numMonths, true );
-        coupNums = getcoupnum( firstCoup, matur, frequency );
-        yld = yld / frequency + 1;
-        dsc = dsc / e;
-        rate *= 100 / frequency;
-        res = redemption / Math.pow( yld, (dsc + nq + coupNums) );
-        res += rate * dcnl / Math.pow( yld, (nq + dsc) );
-        res -= rate * anl;
-
-        for ( var i = 1; i <= coupNums; i++ ) {
-            res += rate / Math.pow( yld, (i + nq + dsc) );
-        }
-
-    }
-    this.value = new cNumber( res );
+    this.value = new cNumber( oddFPrice(settl,matur,iss,firstCoup,rate,yld,redemption,frequency,basis) );
     return this.value;
 
 };
@@ -3396,7 +3423,135 @@ cODDFPRICE.prototype.getInfo = function () {
 function cODDFYIELD() {
     cBaseFunction.call( this, "ODDFYIELD" );
 }
+
 cODDFYIELD.prototype = Object.create( cBaseFunction.prototype );
+/*cODDFYIELD.prototype.Calculate = function ( arg ) {
+    var settlement = arg[0],
+        maturity = arg[1],
+        issue = arg[2],
+        first_coupon = arg[3],
+        rate = arg[4],
+        pr = arg[5],
+        redemption = arg[6],
+        frequency = arg[7],
+        basis = arg[8] && !(arg[8] instanceof cEmpty) ? arg[8] : new cNumber( 0 );
+
+    if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
+        settlement = settlement.cross( arguments[1].first );
+    }
+    else if ( settlement instanceof cArray ) {
+        settlement = settlement.getElementRowCol( 0, 0 );
+    }
+
+    if ( maturity instanceof cArea || maturity instanceof cArea3D ) {
+        maturity = maturity.cross( arguments[1].first );
+    }
+    else if ( maturity instanceof cArray ) {
+        maturity = maturity.getElementRowCol( 0, 0 );
+    }
+
+    if ( issue instanceof cArea || issue instanceof cArea3D ) {
+        issue = issue.cross( arguments[1].first );
+    }
+    else if ( issue instanceof cArray ) {
+        issue = issue.getElementRowCol( 0, 0 );
+    }
+
+    if ( first_coupon instanceof cArea || first_coupon instanceof cArea3D ) {
+        first_coupon = first_coupon.cross( arguments[1].first );
+    }
+    else if ( first_coupon instanceof cArray ) {
+        first_coupon = first_coupon.getElementRowCol( 0, 0 );
+    }
+
+    if ( rate instanceof cArea || rate instanceof cArea3D ) {
+        rate = rate.cross( arguments[1].first );
+    }
+    else if ( rate instanceof cArray ) {
+        rate = rate.getElementRowCol( 0, 0 );
+    }
+
+    if ( pr instanceof cArea || pr instanceof cArea3D ) {
+        pr = pr.cross( arguments[1].first );
+    }
+    else if ( pr instanceof cArray ) {
+        pr = pr.getElementRowCol( 0, 0 );
+    }
+
+    if ( redemption instanceof cArea || redemption instanceof cArea3D ) {
+        redemption = redemption.cross( arguments[1].first );
+    }
+    else if ( redemption instanceof cArray ) {
+        redemption = redemption.getElementRowCol( 0, 0 );
+    }
+
+    if ( frequency instanceof cArea || frequency instanceof cArea3D ) {
+        frequency = frequency.cross( arguments[1].first );
+    }
+    else if ( frequency instanceof cArray ) {
+        frequency = frequency.getElementRowCol( 0, 0 );
+    }
+
+    if ( basis instanceof cArea || basis instanceof cArea3D ) {
+        basis = basis.cross( arguments[1].first );
+    }
+    else if ( basis instanceof cArray ) {
+        basis = basis.getElementRowCol( 0, 0 );
+    }
+
+    settlement = settlement.tocNumber();
+    maturity = maturity.tocNumber();
+    issue = issue.tocNumber();
+    first_coupon = first_coupon.tocNumber();
+    rate = rate.tocNumber();
+    pr = pr.tocNumber();
+    redemption = redemption.tocNumber();
+    frequency = frequency.tocNumber();
+    basis = basis.tocNumber();
+
+    if ( settlement instanceof cError ) return this.value = settlement;
+    if ( maturity instanceof cError ) return this.value = maturity;
+    if ( issue instanceof cError ) return this.value = issue;
+    if ( first_coupon instanceof cError ) return this.value = first_coupon;
+    if ( rate instanceof cError ) return this.value = rate;
+    if ( pr instanceof cError ) return this.value = pr;
+    if ( redemption instanceof cError ) return this.value = redemption;
+    if ( frequency instanceof cError ) return this.value = frequency;
+    if ( basis instanceof cError ) return this.value = basis;
+
+    settlement = settlement.getValue();
+    maturity = maturity.getValue();
+    issue = issue.getValue();
+    first_coupon = first_coupon.getValue();
+    rate = rate.getValue();
+    pr = pr.getValue();
+    redemption = redemption.getValue();
+    frequency = frequency.getValue();
+    basis = basis.getValue();
+
+    if ( maturity <= first_coupon || first_coupon <= settlement ||
+        settlement <= issue ||
+        basis < 0 || basis > 4 ||
+        pr < 0 || rate < 0 ||
+        redemption < 0 ||
+        frequency != 1 && frequency != 2 && frequency != 4 )
+        return this.value = new cError( cErrorType.not_numeric );
+
+    var settl = Date.prototype.getDateFromExcel( settlement ),
+        matur = Date.prototype.getDateFromExcel( maturity ),
+        iss = Date.prototype.getDateFromExcel( issue ),
+        firstCoup = Date.prototype.getDateFromExcel( first_coupon );
+
+    this.value = new cNumber( oddFPrice(settl,matur,iss,firstCoup,rate,pr,redemption,frequency,basis) );
+    return this.value;
+
+};
+cODDFYIELD.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( settlement , maturity , issue , first-coupon , rate , pr , redemption , frequency [ , [ basis ] ] )"
+    };
+};*/
 
 function cODDLPRICE() {
 //    cBaseFunction.call( this, "ODDLPRICE" );
@@ -3414,6 +3569,7 @@ function cODDLPRICE() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cODDLPRICE.prototype = Object.create( cBaseFunction.prototype );
 cODDLPRICE.prototype.Calculate = function ( arg ) {
     var settlement = arg[0],
@@ -3508,9 +3664,8 @@ cODDLPRICE.prototype.Calculate = function ( arg ) {
     frequency = frequency.getValue();
     basis = basis.getValue();
 
-    if ( settlement >= maturity || maturity <= last_interest ||
-        basis < 0 || basis > 4 ||
-        yld < 0 || rate < 0 ||
+    if ( maturity <= settlement || settlement <= last_interest ||
+        basis < 0 || basis > 4 || yld < 0 || rate < 0 ||
         frequency != 1 && frequency != 2 && frequency != 4 )
         return this.value = new cError( cErrorType.not_numeric );
 
@@ -3553,6 +3708,7 @@ function cODDLYIELD() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cODDLYIELD.prototype = Object.create( cBaseFunction.prototype );
 cODDLYIELD.prototype.Calculate = function ( arg ) {
     var settlement = arg[0],
@@ -3647,9 +3803,8 @@ cODDLYIELD.prototype.Calculate = function ( arg ) {
     frequency = frequency.getValue();
     basis = basis.getValue();
 
-    if ( settlement >= maturity || maturity <= last_interest ||
-        basis < 0 || basis > 4 ||
-        pr < 0 || rate < 0 ||
+    if ( maturity <= settlement || settlement <= last_interest ||
+        basis < 0 || basis > 4 || pr < 0 || rate < 0 ||
         frequency != 1 && frequency != 2 && frequency != 4 )
         return this.value = new cError( cErrorType.not_numeric );
 
@@ -3696,6 +3851,7 @@ function cPMT() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cPMT.prototype = Object.create( cBaseFunction.prototype );
 cPMT.prototype.Calculate = function ( arg ) {
     var rate = arg[0], nper = arg[1], pv = arg[2], fv = arg[3] ? arg[3] : new cNumber( 0 ), type = arg[4] ? arg[4] : new cNumber( 0 );
@@ -3786,6 +3942,7 @@ function cPPMT() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cPPMT.prototype = Object.create( cBaseFunction.prototype );
 cPPMT.prototype.Calculate = function ( arg ) {
     var rate = arg[0], per = arg[1], nper = arg[2], pv = arg[3], fv = arg[4] ? arg[4] : new cNumber( 0 ), type = arg[5] ? arg[5] : new cNumber( 0 );
@@ -3890,6 +4047,7 @@ function cPRICE() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cPRICE.prototype = Object.create( cBaseFunction.prototype );
 cPRICE.prototype.Calculate = function ( arg ) {
     var settlement = arg[0],
@@ -4009,6 +4167,7 @@ function cPRICEDISC() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cPRICEDISC.prototype = Object.create( cBaseFunction.prototype );
 cPRICEDISC.prototype.Calculate = function ( arg ) {
     var settlement = arg[0],
@@ -4106,6 +4265,7 @@ function cPRICEMAT() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cPRICEMAT.prototype = Object.create( cBaseFunction.prototype );
 cPRICEMAT.prototype.Calculate = function ( arg ) {
     var settlement = arg[0],
@@ -4225,6 +4385,7 @@ function cPV() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cPV.prototype = Object.create( cBaseFunction.prototype );
 cPV.prototype.Calculate = function ( arg ) {
     var rate = arg[0], nper = arg[1], pmt = arg[2], fv = arg[3] ? arg[3] : new cNumber( 0 ), type = arg[4] ? arg[4] : new cNumber( 0 );
@@ -4311,6 +4472,7 @@ function cRATE() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cRATE.prototype = Object.create( cBaseFunction.prototype );
 cRATE.prototype.Calculate = function ( arg ) {
 
@@ -4374,13 +4536,7 @@ cRATE.prototype.Calculate = function ( arg ) {
 
     if ( type.getValue() != 1 && type.getValue() != 0 ) return this.value = new cError( cErrorType.not_numeric );
 
-    var guess = {fGuess:quess.getValue()};
-
-    var bValid = RateIteration( nper.getValue(), pmt.getValue(), pv.getValue(), fv.getValue(), type.getValue(), guess );
-    if ( !bValid )
-        return this.value = new cError( cErrorType.wrong_value_type );
-
-    this.value = new cNumber( guess.fGuess );
+    this.value = new cNumber( RateIteration( nper.getValue(), pmt.getValue(), pv.getValue(), fv.getValue(), type.getValue(), quess.getValue() ) );
     this.value.numFormat = 9;
     return this.value;
 };
@@ -4407,6 +4563,7 @@ function cRECEIVED() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cRECEIVED.prototype = Object.create( cBaseFunction.prototype );
 cRECEIVED.prototype.Calculate = function ( arg ) {
     var settlement = arg[0],
@@ -4495,6 +4652,7 @@ function cSLN() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cSLN.prototype = Object.create( cBaseFunction.prototype );
 cSLN.prototype.Calculate = function ( arg ) {
     var cost = arg[0],
@@ -4564,6 +4722,7 @@ function cSYD() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cSYD.prototype = Object.create( cBaseFunction.prototype );
 cSYD.prototype.Calculate = function ( arg ) {
     var cost = arg[0], salvage = arg[1], life = arg[2], per = arg[3];
@@ -4644,6 +4803,7 @@ function cTBILLEQ() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cTBILLEQ.prototype = Object.create( cBaseFunction.prototype );
 cTBILLEQ.prototype.Calculate = function ( arg ) {
     var settlement = arg[0],
@@ -4722,6 +4882,7 @@ function cTBILLPRICE() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cTBILLPRICE.prototype = Object.create( cBaseFunction.prototype );
 cTBILLPRICE.prototype.Calculate = function ( arg ) {
     var settlement = arg[0],
@@ -4801,6 +4962,7 @@ function cTBILLYIELD() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cTBILLYIELD.prototype = Object.create( cBaseFunction.prototype );
 cTBILLYIELD.prototype.Calculate = function ( arg ) {
     var settlement = arg[0],
@@ -4878,6 +5040,7 @@ function cVDB() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cVDB.prototype = Object.create( cBaseFunction.prototype );
 cVDB.prototype.Calculate = function ( arg ) {
     var cost = arg[0], salvage = arg[1], life = arg[2],
@@ -5054,6 +5217,7 @@ function cXIRR() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cXIRR.prototype = Object.create( cBaseFunction.prototype );
 cXIRR.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber( 0.1 );
@@ -5222,6 +5386,7 @@ function cXNPV() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cXNPV.prototype = Object.create( cBaseFunction.prototype );
 cXNPV.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -5342,6 +5507,7 @@ function cYIELD() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cYIELD.prototype = Object.create( cBaseFunction.prototype );
 cYIELD.prototype.Calculate = function ( arg ) {
     var settlement = arg[0],
@@ -5463,6 +5629,7 @@ function cYIELDDISC() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cYIELDDISC.prototype = Object.create( cBaseFunction.prototype );
 cYIELDDISC.prototype.Calculate = function ( arg ) {
     var settlement = arg[0],
@@ -5563,6 +5730,7 @@ function cYIELDMAT() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cYIELDMAT.prototype = Object.create( cBaseFunction.prototype );
 cYIELDMAT.prototype.Calculate = function ( arg ) {
     var settlement = arg[0],
@@ -5657,3 +5825,4 @@ cYIELDMAT.prototype.getInfo = function () {
         args:"( settlement , maturity , issue , rate , pr [ , [ basis ] ] )"
     };
 };
+

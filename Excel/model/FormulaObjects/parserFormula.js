@@ -1,5 +1,4 @@
 ﻿"use strict";
-var FormulaObjects = {};
 /** @enum */
 var cElementType = {
     number:0,
@@ -27,10 +26,10 @@ var cErrorType = {
     not_available:7,
     getting_data:8
 };
-var cExcelSignificantDigits = 15,//количество цифр в числе после запятой
+var cExcelSignificantDigits = 15, //количество цифр в числе после запятой
     cExcelMaxExponent = 308,
     cExcelMinExponent = -308,
-    cExcelDateTimeDigits = 8,//количество цифр после запятой в числах отвечающих за время специализация $18.17.4.2
+    cExcelDateTimeDigits = 8, //количество цифр после запятой в числах отвечающих за время специализация $18.17.4.2
     c_Date1904Const = 24107, //разница в днях между 01.01.1970 и 01.01.1904 годами
     c_Date1900Const = 25568, //разница в днях между 01.01.1970 и 01.01.1900 годами
     c_DateCorrectConst = c_Date1900Const,
@@ -90,6 +89,10 @@ Date.prototype.addMonths = function ( counts ) {
 
 Date.prototype.addDays = function ( counts ) {
     this.setUTCDate( this.getUTCDate() + counts );
+};
+
+Date.prototype.lastDayOfMonth = function ( ) {
+    return this.getDaysInMonth() == this.getUTCDate();
 };
 
 Math.sinh = function ( arg ) {
@@ -157,7 +160,7 @@ Math.approxEqual = function ( a, b ) {
 };
 
 /** @constructor */
-FormulaObjects.cBaseType = function ( val ) {
+function cBaseType( val ) {
     this.needRecalc = false;
     this.numFormat = null;
     this.type = null;
@@ -165,8 +168,8 @@ FormulaObjects.cBaseType = function ( val ) {
     this.ca = false;
     this.node = undefined;
 }
-FormulaObjects.cBaseType.prototype = {
-    constructor:FormulaObjects.cBaseType,
+cBaseType.prototype = {
+    constructor:cBaseType,
     cloneTo:function ( oRes ) {
         oRes.needRecalc = this.needRecalc;
         oRes.numFormat = this.numFormat;
@@ -192,8 +195,8 @@ FormulaObjects.cBaseType.prototype = {
 /*Basic types of an elements used into formulas*/
 /** @constructor */
 function cNumber( val ) {
-//    FormulaObjects.cBaseType.apply( this, arguments );
-//    FormulaObjects.cBaseType.call( this, val );
+//    cBaseType.apply( this, arguments );
+//    cBaseType.call( this, val );
     this.needRecalc = false;
     this.numFormat = null;
     this.ca = false;
@@ -206,12 +209,16 @@ function cNumber( val ) {
     if ( !isNaN( this.value ) && Math.abs( this.value ) !== Infinity ) {
         res = this;
     }
+    else if( val instanceof cError ){
+        res = val;
+    }
     else {
         res = new cError( cErrorType.not_numeric );
     }
     return res;
 }
-cNumber.prototype = Object.create( FormulaObjects.cBaseType.prototype );
+
+cNumber.prototype = Object.create( cBaseType.prototype );
 cNumber.prototype.getValue = function () {
     return this.value;//.toFixed( cExcelSignificantDigits ) - 0;
 };
@@ -227,7 +234,7 @@ cNumber.prototype.tocBool = function () {
 
 /** @constructor */
 function cString( val ) {
-//    FormulaObjects.cBaseType.call( this, val );
+//    cBaseType.call( this, val );
 
     this.needRecalc = false;
     this.numFormat = null;
@@ -237,7 +244,8 @@ function cString( val ) {
 
     this.type = cElementType.string;
 }
-cString.prototype = Object.create( FormulaObjects.cBaseType.prototype );
+
+cString.prototype = Object.create( cBaseType.prototype );
 cString.prototype.tocNumber = function () {
     var res, m = this.value;
     if ( this.value === "" ) {
@@ -283,7 +291,7 @@ cString.prototype.tryConvert = function () {
 
 /** @constructor */
 function cBool( val ) {
-    FormulaObjects.cBaseType.call( this, val );
+    cBaseType.call( this, val );
 
     this.needRecalc = false;
     this.numFormat = null;
@@ -294,7 +302,8 @@ function cBool( val ) {
     var v = val.toString().toUpperCase();
     this.value = v === "TRUE";
 }
-cBool.prototype = Object.create( FormulaObjects.cBaseType.prototype );
+
+cBool.prototype = Object.create( cBaseType.prototype );
 cBool.prototype.toString = function () {
     return this.value.toString().toUpperCase();
 };
@@ -316,7 +325,7 @@ cBool.prototype.toBool = function () {
 
 /** @constructor */
 function cError( val ) {
-//    FormulaObjects.cBaseType.call( this, val );
+//    cBaseType.call( this, val );
 
     this.needRecalc = false;
     this.numFormat = null;
@@ -327,55 +336,64 @@ function cError( val ) {
     this.type = cElementType.error;
     this.errorType = -1;
 
-    switch(val){
+    switch ( val ) {
         case "#VALUE!":
-        case cErrorType.wrong_value_type:{
+        case cErrorType.wrong_value_type:
+        {
             this.value = "#VALUE!";
             this.errorType = cErrorType.wrong_value_type;
             break;
         }
         case "#NULL!":
-        case cErrorType.null_value:{
+        case cErrorType.null_value:
+        {
             break;
         }
         case "#DIV/0!":
-        case cErrorType.division_by_zero:{
+        case cErrorType.division_by_zero:
+        {
             this.value = "#DIV/0!";
             this.errorType = cErrorType.division_by_zero;
             break;
         }
         case "#REF!":
-        case cErrorType.bad_reference:{
+        case cErrorType.bad_reference:
+        {
             this.value = "#REF!";
             this.errorType = cErrorType.bad_reference;
             break;
         }
         case "#NAME?":
-        case cErrorType.wrong_name:{
+        case cErrorType.wrong_name:
+        {
             this.value = "#NAME?";
             this.errorType = cErrorType.wrong_name;
             break;
         }
         case "#NUM!":
-        case cErrorType.not_numeric:{
+        case cErrorType.not_numeric:
+        {
             this.value = "#NUM!";
             this.errorType = cErrorType.not_numeric;
             break;
         }
         case "#N/A":
-        case cErrorType.not_available:{
+        case cErrorType.not_available:
+        {
             this.value = "#N/A";
             this.errorType = cErrorType.not_available;
             break;
         }
         case "#GETTING_DATA":
-        case cErrorType.getting_data:{
+        case cErrorType.getting_data:
+        {
             this.value = "#GETTING_DATA";
             this.errorType = cErrorType.getting_data;
             break;
         }
         case "#UNSUPPORTED_FUNCTION!":
-        case cErrorType.unsupported_function:{
+        case cErrorType.unsupported_function:
+        {
             this.value = "#UNSUPPORTED_FUNCTION!";
             this.errorType = cErrorType.unsupported_function;
             break;
@@ -385,14 +403,15 @@ function cError( val ) {
 
     return this;
 }
-cError.prototype = Object.create( FormulaObjects.cBaseType.prototype );
+
+cError.prototype = Object.create( cBaseType.prototype );
 cError.prototype.tocNumber = cError.prototype.tocString = cError.prototype.tocBool = cError.prototype.tocEmpty = function () {
     return this;
 };
 
 /** @constructor */
 function cArea( val, ws ) {/*Area means "A1:E5" for example*/
-//    FormulaObjects.cBaseType.call( this, val, _ws );
+//    cBaseType.call( this, val, _ws );
 
     this.needRecalc = false;
     this.numFormat = null;
@@ -408,10 +427,11 @@ function cArea( val, ws ) {/*Area means "A1:E5" for example*/
     // this.range = this.wb.getWorksheetById(this.ws).getRange2(val);
     // this._valid = this.range ? true : false;
 }
-cArea.prototype = Object.create( FormulaObjects.cBaseType.prototype );
+
+cArea.prototype = Object.create( cBaseType.prototype );
 cArea.prototype.clone = function () {
     var oRes = new cArea( this._cells, this.ws );
-//	FormulaObjects.cBaseType.prototype.cloneTo.call( this, oRes );
+//	cBaseType.prototype.cloneTo.call( this, oRes );
     this.constructor.prototype.cloneTo.call( this, oRes );
     oRes.isAbsolute = this.isAbsolute;
     return oRes;
@@ -630,8 +650,8 @@ cArea.prototype.getMatrix = function () {
 
 /** @constructor */
 function cRef( val, ws ) {/*Ref means A1 for example*/
-//    FormulaObjects.cBaseType.apply( this, arguments );
-//    FormulaObjects.cBaseType.call( this, val, _ws );
+//    cBaseType.apply( this, arguments );
+//    cBaseType.call( this, val, _ws );
 
     this.needRecalc = false;
     this.numFormat = null;
@@ -654,10 +674,11 @@ function cRef( val, ws ) {/*Ref means A1 for example*/
         this.range = ws.getRange3( 0, 0, 0, 0 );
     }
 }
-cRef.prototype = Object.create( FormulaObjects.cBaseType.prototype );
+
+cRef.prototype = Object.create( cBaseType.prototype );
 cRef.prototype.clone = function () {
     var oRes = new cRef( this._cells, this.ws );
-//	FormulaObjects.cBaseType.prototype.cloneTo.call( this, oRes );
+//	cBaseType.prototype.cloneTo.call( this, oRes );
     this.constructor.prototype.cloneTo.call( this, oRes );
     oRes.isAbsolute = this.isAbsolute;
     return oRes;
@@ -719,7 +740,7 @@ cRef.prototype.isValid = function () {
 
 /** @constructor */
 function cArea3D( val, wsFrom, wsTo, wb ) {/*Area3D means "Sheat1!A1:E5" for example*/
-//    FormulaObjects.cBaseType.call( this, val, _wsFrom, _wsTo, wb );
+//    cBaseType.call( this, val, _wsFrom, _wsTo, wb );
 
     this.needRecalc = false;
     this.numFormat = null;
@@ -734,12 +755,13 @@ function cArea3D( val, wsFrom, wsTo, wb ) {/*Area3D means "Sheat1!A1:E5" for exa
     this.wsFrom = this._wb.getWorksheetByName( wsFrom ).getId();
     this.wsTo = this._wb.getWorksheetByName( wsTo ).getId();
 }
-cArea3D.prototype = Object.create( FormulaObjects.cBaseType.prototype );
+
+cArea3D.prototype = Object.create( cBaseType.prototype );
 cArea3D.prototype.clone = function () {
     var wsFrom = this._wb.getWorksheetById( this.wsFrom ).getName(),
         wsTo = this._wb.getWorksheetById( this.wsTo ).getName(),
         oRes = new cArea3D( this._cells, wsFrom, wsTo, this._wb );
-//	FormulaObjects.cBaseType.prototype.cloneTo.call( this, oRes );
+//	cBaseType.prototype.cloneTo.call( this, oRes );
     this.constructor.prototype.cloneTo.call( this, oRes );
     oRes.isAbsolute = this.isAbsolute;
     return oRes;
@@ -1058,7 +1080,7 @@ cArea3D.prototype.foreach2 = function ( action ) {
 
 /** @constructor */
 function cRef3D( val, _wsFrom, wb ) {/*Ref means Sheat1!A1 for example*/
-//    FormulaObjects.cBaseType.call( this, val, _wsFrom, wb );
+//    cBaseType.call( this, val, _wsFrom, wb );
 
     this.needRecalc = false;
     this.numFormat = null;
@@ -1072,10 +1094,11 @@ function cRef3D( val, _wsFrom, wb ) {/*Ref means Sheat1!A1 for example*/
     this.type = cElementType.cell;
     this.ws = this._wb.getWorksheetByName( _wsFrom );
 }
-cRef3D.prototype = Object.create( FormulaObjects.cBaseType.prototype );
+
+cRef3D.prototype = Object.create( cBaseType.prototype );
 cRef3D.prototype.clone = function () {
     var oRes = new cRef3D( this._cells, this.ws.getName(), this._wb );
-//	FormulaObjects.cBaseType.prototype.cloneTo.call( this, oRes );
+//	cBaseType.prototype.cloneTo.call( this, oRes );
     this.constructor.prototype.cloneTo.call( this, oRes );
     oRes.isAbsolute = this.isAbsolute;
     return oRes;
@@ -1154,7 +1177,7 @@ cRef3D.prototype.getWS = function () {
 
 /** @constructor */
 function cEmpty() {
-//    FormulaObjects.cBaseType.call( this );
+//    cBaseType.call( this );
 
     this.needRecalc = false;
     this.numFormat = null;
@@ -1164,7 +1187,8 @@ function cEmpty() {
 
     this.type = cElementType.empty;
 }
-cEmpty.prototype = Object.create( FormulaObjects.cBaseType.prototype );
+
+cEmpty.prototype = Object.create( cBaseType.prototype );
 cEmpty.prototype.tocNumber = function () {
     return new cNumber( 0 );
 };
@@ -1180,7 +1204,7 @@ cEmpty.prototype.toString = function () {
 
 /** @constructor */
 function cName( val, wb ) {
-//    FormulaObjects.cBaseType.call( this, val, wb );
+//    cBaseType.call( this, val, wb );
 
     this.needRecalc = false;
     this.numFormat = null;
@@ -1191,7 +1215,8 @@ function cName( val, wb ) {
     this.wb = wb;
     this.type = cElementType.name;
 }
-cName.prototype = Object.create( FormulaObjects.cBaseType.prototype );
+
+cName.prototype = Object.create( cBaseType.prototype );
 cName.prototype.toRef = function ( wsID ) {
     var _3DRefTmp,
         ref = this.wb.getDefinesNames( this.value, wsID ).Ref;
@@ -1216,7 +1241,7 @@ cName.prototype.toRef = function ( wsID ) {
 
 /** @constructor */
 function cArray() {
-//    FormulaObjects.cBaseType.call( this );
+//    cBaseType.call( this );
 
     this.needRecalc = false;
     this.numFormat = null;
@@ -1230,7 +1255,8 @@ function cArray() {
     this.countElement = 0;
     this.type = cElementType.array;
 }
-cArray.prototype = Object.create( FormulaObjects.cBaseType.prototype );
+
+cArray.prototype = Object.create( cBaseType.prototype );
 cArray.prototype.addRow = function () {
     this.array[this.array.length] = [];
     this.countElementInRow[this.rowCount++] = 0;
@@ -1397,6 +1423,7 @@ function checkTypeCell( val ) {
         return new cString( val );
     }
 }
+
 /*--------------------------------------------------------------------------*/
 /*Base classes for operators & functions */
 /** @constructor */
@@ -1428,6 +1455,7 @@ function cBaseOperator( name, priority, argumentCount ) {
     };
     this.numFormat = this.formatType.def;
 }
+
 cBaseOperator.prototype = {
     constructor:cBaseOperator,
     getArguments:function () {
@@ -1465,6 +1493,7 @@ function cBaseFunction( name ) {
     };
     this.numFormat = this.formatType.def;
 }
+
 cBaseFunction.prototype = {
     constructor:cBaseFunction,
     Calculate:function () {
@@ -1531,6 +1560,7 @@ function parentLeft() {
     this.type = cElementType.operator;
     this.argumentsCurrent = 1;
 }
+
 parentLeft.prototype.constructor = parentLeft;
 parentLeft.prototype.DecrementArguments = function () {
     --this.argumentsCurrent;
@@ -1552,6 +1582,7 @@ function parentRight() {
     this.name = ")";
     this.type = cElementType.operator;
 }
+
 parentRight.prototype.constructor = parentRight;
 parentRight.prototype.toString = function () {
     return this.name;
@@ -1561,6 +1592,7 @@ function cUnarMinusOperator() {
     cBaseOperator.apply( this, ['un_minus'/**name operator*/, 50/**priority of operator*/, 1/**count arguments*/] );
     this.isRightAssociative = true;
 }
+
 cUnarMinusOperator.prototype = Object.create( cBaseOperator.prototype );
 cUnarMinusOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -1590,6 +1622,7 @@ function cUnarPlusOperator() {
     cBaseOperator.apply( this, ['un_plus', 50, 1] );
     this.isRightAssociative = true;
 }
+
 cUnarPlusOperator.prototype = Object.create( cBaseOperator.prototype );
 cUnarPlusOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -1609,6 +1642,7 @@ cUnarPlusOperator.prototype.Assemble = function ( arg ) {
 function cPlusOperator() {
     cBaseOperator.apply( this, ['+', 20] );
 }
+
 cPlusOperator.prototype = Object.create( cBaseOperator.prototype );
 cPlusOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
@@ -1618,6 +1652,7 @@ cPlusOperator.prototype.Calculate = function ( arg ) {
 function cMinusOperator() {
     cBaseOperator.apply( this, ['-', 20] );
 }
+
 cMinusOperator.prototype = Object.create( cBaseOperator.prototype );
 cMinusOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
@@ -1628,6 +1663,7 @@ function cPercentOperator() {
     cBaseOperator.apply( this, ['%', 45, 1] );
     this.isRightAssociative = true;
 }
+
 cPercentOperator.prototype = Object.create( cBaseOperator.prototype );
 cPercentOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -1655,6 +1691,7 @@ cPercentOperator.prototype.Assemble = function ( arg ) {
 function cPowOperator() {
     cBaseOperator.apply( this, ['^', 40] );
 }
+
 cPowOperator.prototype = Object.create( cBaseOperator.prototype );
 cPowOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
@@ -1686,6 +1723,7 @@ cPowOperator.prototype.Calculate = function ( arg ) {
 function cMultOperator() {
     cBaseOperator.apply( this, ['*', 30] );
 }
+
 cMultOperator.prototype = Object.create( cBaseOperator.prototype );
 cMultOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
@@ -1695,6 +1733,7 @@ cMultOperator.prototype.Calculate = function ( arg ) {
 function cDivOperator() {
     cBaseOperator.apply( this, ['/', 30] );
 }
+
 cDivOperator.prototype = Object.create( cBaseOperator.prototype );
 cDivOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
@@ -1704,6 +1743,7 @@ cDivOperator.prototype.Calculate = function ( arg ) {
 function cConcatSTROperator() {
     cBaseOperator.apply( this, ['&', 15] );
 }
+
 cConcatSTROperator.prototype = Object.create( cBaseOperator.prototype );
 cConcatSTROperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
@@ -1724,6 +1764,7 @@ cConcatSTROperator.prototype.Calculate = function ( arg ) {
 function cEqualsOperator() {
     cBaseOperator.apply( this, ['=', 10] );
 }
+
 cEqualsOperator.prototype = Object.create( cBaseOperator.prototype );
 cEqualsOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
@@ -1733,6 +1774,7 @@ cEqualsOperator.prototype.Calculate = function ( arg ) {
 function cNotEqualsOperator() {
     cBaseOperator.apply( this, ['<>', 10] );
 }
+
 cNotEqualsOperator.prototype = Object.create( cBaseOperator.prototype );
 cNotEqualsOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
@@ -1742,6 +1784,7 @@ cNotEqualsOperator.prototype.Calculate = function ( arg ) {
 function cLessOperator() {
     cBaseOperator.apply( this, ['<', 10] );
 }
+
 cLessOperator.prototype = Object.create( cBaseOperator.prototype );
 cLessOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
@@ -1751,6 +1794,7 @@ cLessOperator.prototype.Calculate = function ( arg ) {
 function cLessOrEqualOperator() {
     cBaseOperator.apply( this, ['<=', 10] );
 }
+
 cLessOrEqualOperator.prototype = Object.create( cBaseOperator.prototype );
 cLessOrEqualOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
@@ -1760,6 +1804,7 @@ cLessOrEqualOperator.prototype.Calculate = function ( arg ) {
 function cGreaterOperator() {
     cBaseOperator.apply( this, ['>', 10] );
 }
+
 cGreaterOperator.prototype = Object.create( cBaseOperator.prototype );
 cGreaterOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
@@ -1769,6 +1814,7 @@ cGreaterOperator.prototype.Calculate = function ( arg ) {
 function cGreaterOrEqualOperator() {
     cBaseOperator.apply( this, ['>=', 10] );
 }
+
 cGreaterOrEqualOperator.prototype = Object.create( cBaseOperator.prototype );
 cGreaterOrEqualOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
@@ -1814,7 +1860,7 @@ var cFormulaOperators = {
     /* 10 is lowest priopity */
 };
 
-/* FormulaObjects.cFormulaFunction is container for holding all ECMA-376 function, see chapter $18.17.7 in "ECMA-376, Second Edition, Part 1 - Fundamentals And Markup Language Reference" */
+/* cFormulaFunction is container for holding all ECMA-376 function, see chapter $18.17.7 in "ECMA-376, Second Edition, Part 1 - Fundamentals And Markup Language Reference" */
 /*
  Каждая формула представляет собой копию функции cBaseFunction.
  Для реализации очередной функции необходимо указать количество (минимальное и максимальное) принимаемых аргументов. Берем в спецификации.
@@ -1822,15 +1868,15 @@ var cFormulaOperators = {
  В методе Calculate необходимо отслеживать тип принимаемых аргументов. Для примера, если мы обращаемся к ячейке A1, в которой лежит 123, то этот аргумент будет числом. Если же там лежит "123", то это уже строка. Для более подробной информации смотреть спецификацию.
  Метод getInfo является обязательным, ибо через этот метод в интерфейс передается информация о реализованных функциях.
  */
-FormulaObjects.cFormulaFunction = {};
+var cFormulaFunction = {};
 
 function getFormulasInfo() {
     var list = [], a, b;
-    for ( var type in FormulaObjects.cFormulaFunction ) {
-        b = new Asc.asc_CFormulaGroup( FormulaObjects.cFormulaFunction[type]["groupName"] );
-        for ( var f in FormulaObjects.cFormulaFunction[type] ) {
+    for ( var type in cFormulaFunction ) {
+        b = new Asc.asc_CFormulaGroup( cFormulaFunction[type]["groupName"] );
+        for ( var f in cFormulaFunction[type] ) {
             if ( f != "groupName" ) {
-                a = new FormulaObjects.cFormulaFunction[type][f]();
+                a = new cFormulaFunction[type][f]();
                 if ( a.getInfo )
                     b.asc_addFormulaElement( new Asc.asc_CFormula( a.getInfo() ) );
             }
@@ -1839,6 +1885,7 @@ function getFormulasInfo() {
     }
     return list;
 }
+
 /*--------------------------------------------------------------------------*/
 
 
@@ -2976,6 +3023,7 @@ function parserFormula( formula, _cellId, _ws ) {
     this.RefPos = [];
     this.operand_str = null;
 }
+
 parserFormula.prototype = {
 
     /** @type parserFormula */
@@ -3352,38 +3400,38 @@ parserFormula.prototype = {
                 else if ( parserHelp.isFunc.call( this, this.Formula, this.pCurrPos ) ) {
 
                     var found_operator = null;
-                    if ( this.operand_str.toUpperCase() in FormulaObjects.cFormulaFunction.Mathematic )//Mathematic
-                        found_operator = new FormulaObjects.cFormulaFunction.Mathematic[this.operand_str.toUpperCase()]();
+                    if ( this.operand_str.toUpperCase() in cFormulaFunction.Mathematic )//Mathematic
+                        found_operator = new cFormulaFunction.Mathematic[this.operand_str.toUpperCase()]();
 
-                    else if ( this.operand_str.toUpperCase() in FormulaObjects.cFormulaFunction.Logical )//Logical
-                        found_operator = new FormulaObjects.cFormulaFunction.Logical[this.operand_str.toUpperCase()]();
+                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.Logical )//Logical
+                        found_operator = new cFormulaFunction.Logical[this.operand_str.toUpperCase()]();
 
-                    else if ( this.operand_str.toUpperCase() in FormulaObjects.cFormulaFunction.Information )//Information
-                        found_operator = new FormulaObjects.cFormulaFunction.Information[this.operand_str.toUpperCase()]();
+                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.Information )//Information
+                        found_operator = new cFormulaFunction.Information[this.operand_str.toUpperCase()]();
 
-                    else if ( this.operand_str.toUpperCase() in FormulaObjects.cFormulaFunction.Statistical )//Statistical
-                        found_operator = new FormulaObjects.cFormulaFunction.Statistical[this.operand_str.toUpperCase()]();
+                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.Statistical )//Statistical
+                        found_operator = new cFormulaFunction.Statistical[this.operand_str.toUpperCase()]();
 
-                    else if ( this.operand_str.toUpperCase() in FormulaObjects.cFormulaFunction.TextAndData )//Text and data
-                        found_operator = new FormulaObjects.cFormulaFunction.TextAndData[this.operand_str.toUpperCase()]();
+                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.TextAndData )//Text and data
+                        found_operator = new cFormulaFunction.TextAndData[this.operand_str.toUpperCase()]();
 
-                    else if ( this.operand_str.toUpperCase() in FormulaObjects.cFormulaFunction.Cube )//Cube
-                        found_operator = new FormulaObjects.cFormulaFunction.Cube[this.operand_str.toUpperCase()]();
+                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.Cube )//Cube
+                        found_operator = new cFormulaFunction.Cube[this.operand_str.toUpperCase()]();
 
-                    else if ( this.operand_str.toUpperCase() in FormulaObjects.cFormulaFunction.Database )//Database
-                        found_operator = new FormulaObjects.cFormulaFunction.Database[this.operand_str.toUpperCase()]();
+                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.Database )//Database
+                        found_operator = new cFormulaFunction.Database[this.operand_str.toUpperCase()]();
 
-                    else if ( this.operand_str.toUpperCase() in FormulaObjects.cFormulaFunction.DateAndTime )//Date and time
-                        found_operator = new FormulaObjects.cFormulaFunction.DateAndTime[this.operand_str.toUpperCase()]();
+                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.DateAndTime )//Date and time
+                        found_operator = new cFormulaFunction.DateAndTime[this.operand_str.toUpperCase()]();
 
-                    else if ( this.operand_str.toUpperCase() in FormulaObjects.cFormulaFunction.Engineering )//Engineering
-                        found_operator = new FormulaObjects.cFormulaFunction.Engineering[this.operand_str.toUpperCase()]();
+                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.Engineering )//Engineering
+                        found_operator = new cFormulaFunction.Engineering[this.operand_str.toUpperCase()]();
 
-                    else if ( this.operand_str.toUpperCase() in FormulaObjects.cFormulaFunction.Financial )//Financial
-                        found_operator = new FormulaObjects.cFormulaFunction.Financial[this.operand_str.toUpperCase()]();
+                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.Financial )//Financial
+                        found_operator = new cFormulaFunction.Financial[this.operand_str.toUpperCase()]();
 
-                    else if ( this.operand_str.toUpperCase() in FormulaObjects.cFormulaFunction.LookupAndReference )//Lookup and reference
-                        found_operator = new FormulaObjects.cFormulaFunction.LookupAndReference[this.operand_str.toUpperCase()]();
+                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.LookupAndReference )//Lookup and reference
+                        found_operator = new cFormulaFunction.LookupAndReference[this.operand_str.toUpperCase()]();
 
                     if ( found_operator !== null && found_operator !== undefined )
                         this.elemArr.push( found_operator );
@@ -4082,6 +4130,7 @@ function searchRegExp( str, flags ) {
 
     return new RegExp( vFS + "$", flags ? flags : "i" );
 }
+
 function searchRegExp2( s, mask ) {
     //todo протестировать
     var bRes = true;
@@ -4138,6 +4187,7 @@ function searchRegExp2( s, mask ) {
     }
     return bRes;
 }
+
 /*
  Next code take from OpenOffice Source.
  */
@@ -4607,3 +4657,4 @@ function getLogGamma( fZ ) {
         return Math.log( lcl_GetGammaHelper( fZ + 1 ) / fZ );
     return lcl_GetLogGammaHelper( fZ + 2 ) - Math.log( fZ + 1 ) - Math.log( fZ );
 }
+

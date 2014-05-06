@@ -1,46 +1,50 @@
 "use strict";
 
-function ConvertToDec( aStrSource, nBase, nCharLim ){
-    if ( nBase < 2 || nBase > 36 ){
-        return "Error #1";}
+function ConvertToDec( aStrSource, nBase, nCharLim ) {
+    if ( nBase < 2 || nBase > 36 ) {
+        return "Error #1";
+    }
 
     var nStrLen = aStrSource.length;
-    if( nStrLen > nCharLim ){
-        return "Error #2";}
-    else if( !nStrLen ){
-        return 0;}
+    if ( nStrLen > nCharLim ) {
+        return "Error #2";
+    }
+    else if ( !nStrLen ) {
+        return 0;
+    }
 
     var fVal = 0, nFirstDig = 0,
         bFirstDig = true;
 
-    for(var i=0; i < aStrSource.length; i++)
-    {
+    for ( var i = 0; i < aStrSource.length; i++ ) {
         var n;
 
-        if( '0' <= aStrSource[i] && aStrSource[i] <= '9' ){
-            n = aStrSource[i].charCodeAt(0) - '0'.charCodeAt(0);}
-        else if( 'A' <= aStrSource[i] && aStrSource[i] <= 'Z' ){
-            n = 10 + ( aStrSource[i].charCodeAt(0) - 'A'.charCodeAt(0) );}
-        else if ( 'a' <= aStrSource[i] && aStrSource[i] <= 'z' ){
-            n = 10 + ( aStrSource[i].charCodeAt(0) - 'a'.charCodeAt(0) );}
-        else{
-            n = nBase;}
+        if ( '0' <= aStrSource[i] && aStrSource[i] <= '9' ) {
+            n = aStrSource[i].charCodeAt( 0 ) - '0'.charCodeAt( 0 );
+        }
+        else if ( 'A' <= aStrSource[i] && aStrSource[i] <= 'Z' ) {
+            n = 10 + ( aStrSource[i].charCodeAt( 0 ) - 'A'.charCodeAt( 0 ) );
+        }
+        else if ( 'a' <= aStrSource[i] && aStrSource[i] <= 'z' ) {
+            n = 10 + ( aStrSource[i].charCodeAt( 0 ) - 'a'.charCodeAt( 0 ) );
+        }
+        else {
+            n = nBase;
+        }
 
-        if( n < nBase )
-        {
-            if( bFirstDig )
-            {
+        if ( n < nBase ) {
+            if ( bFirstDig ) {
                 bFirstDig = false;
                 nFirstDig = n;
             }
             fVal = fVal * nBase + n;
         }
-        else{
-            return "Error #3";}
+        else {
+            return "Error #3";
+        }
     }
 
-    if( nStrLen === nCharLim && !bFirstDig && (nFirstDig >= nBase / 2) )
-    {   // handling negativ values
+    if ( nStrLen === nCharLim && !bFirstDig && (nFirstDig >= nBase / 2) ) {   // handling negativ values
         fVal = ( Math.pow( nBase, nCharLim ) - fVal );   // complement
         fVal *= -1.0;
     }
@@ -53,10 +57,12 @@ var f_PI_DIV_4 = Math.PI / 4.0;
 var f_2_DIV_PI = 2.0 / Math.PI;
 
 function BesselJ( x, N ) {
-    if ( N < 0 ){
-        return new cError( cErrorType.not_numeric );}
-    if ( x === 0.0 ){
-        return new cNumber( (N == 0) ? 1 : 0 );}
+    if ( N < 0 ) {
+        return new cError( cErrorType.not_numeric );
+    }
+    if ( x === 0.0 ) {
+        return new cNumber( (N == 0) ? 1 : 0 );
+    }
 
     /*  The algorithm works only for x>0, therefore remember sign. BesselJ
      with integer order N is an even function for even N (means J(-x)=J(x))
@@ -68,10 +74,12 @@ function BesselJ( x, N ) {
     var fEstimateIteration = fX * 1.5 + N;
     var bAsymptoticPossible = Math.pow( fX, 0.4 ) > N;
     if ( fEstimateIteration > fMaxIteration ) {
-        if ( bAsymptoticPossible ){
-            return new cNumber(fSign * Math.sqrt( f_2_DIV_PI / fX ) * Math.cos( fX - N * f_PI_DIV_2 - f_PI_DIV_4 ) );}
-        else{
-            return new cError(cErrorType.not_numeric);}
+        if ( bAsymptoticPossible ) {
+            return new cNumber( fSign * Math.sqrt( f_2_DIV_PI / fX ) * Math.cos( fX - N * f_PI_DIV_2 - f_PI_DIV_4 ) );
+        }
+        else {
+            return new cError( cErrorType.not_numeric );
+        }
     }
 
     var epsilon = 1.0e-15; // relative error
@@ -124,16 +132,19 @@ function BesselJ( x, N ) {
         k = k + 1;
     }
     while ( !bHasfound && k <= fMaxIteration );
-    if ( bHasfound ){
-        return new cNumber( u * fSign );}
-    else{
-        return new cError(cErrorType.not_numeric);}// unlikely to happen
+    if ( bHasfound ) {
+        return new cNumber( u * fSign );
+    }
+    else {
+        return new cError( cErrorType.not_numeric );
+    }// unlikely to happen
 }
 
 function BesselI( x, n ) {
     var nMaxIteration = 2000, fXHalf = x / 2, fResult = 0;
-    if ( n < 0 ){
-        return new cError( cErrorType.not_numeric );}
+    if ( n < 0 ) {
+        return new cError( cErrorType.not_numeric );
+    }
 
     /*  Start the iteration without TERM(n,0), which is set here.
 
@@ -152,21 +163,21 @@ function BesselI( x, n ) {
         {
             /*  Calculation of TERM(n,k) from TERM(n,k-1):
 
-                            (x/2)^(n+2k)
+             (x/2)^(n+2k)
              TERM(n,k)  =  --------------
-                              k! (n+k)!
+             k! (n+k)!
 
-                (x/2)^2 (x/2)^(n+2(k-1))
+             (x/2)^2 (x/2)^(n+2(k-1))
              =  --------------------------
-                k (k-1)! (n+k) (n+k-1)!
+             k (k-1)! (n+k) (n+k-1)!
 
-                 (x/2)^2     (x/2)^(n+2(k-1))
+             (x/2)^2     (x/2)^(n+2(k-1))
              =  --------- * ------------------
-                 k(n+k)      (k-1)! (n+k-1)!
+             k(n+k)      (k-1)! (n+k-1)!
 
-                  x^2/4
+             x^2/4
              =  -------- TERM(n,k-1)
-                  k(n+k)
+             k(n+k)
              */
             fTerm = fTerm * fXHalf / nK * fXHalf / (nK + n);
             fResult += fTerm;
@@ -179,7 +190,7 @@ function BesselI( x, n ) {
 }
 
 function Besselk0( fNum ) {
-    var fRet,y;
+    var fRet, y;
 
     if ( fNum <= 2 ) {
         var fNum2 = fNum * 0.5;
@@ -351,7 +362,8 @@ function BesselY( fNum, nOrder ) {
  * Time: 12:25
  * To change this template use File | Settings | File Templates.
  */
-FormulaObjects.cFormulaFunction.Engineering = {
+
+cFormulaFunction.Engineering = {
     'groupName':"Engineering",
     'BESSELI':cBESSELI,
     'BESSELJ':cBESSELJ,
@@ -397,194 +409,233 @@ FormulaObjects.cFormulaFunction.Engineering = {
 function cBESSELI() {
     cBaseFunction.call( this, "BESSELI" );
 }
+
 cBESSELI.prototype = Object.create( cBaseFunction.prototype );
 
 function cBESSELJ() {
     cBaseFunction.call( this, "BESSELJ" );
 }
+
 cBESSELJ.prototype = Object.create( cBaseFunction.prototype );
 
 function cBESSELK() {
     cBaseFunction.call( this, "BESSELK" );
 }
+
 cBESSELK.prototype = Object.create( cBaseFunction.prototype );
 
 function cBESSELY() {
     cBaseFunction.call( this, "BESSELY" );
 }
+
 cBESSELY.prototype = Object.create( cBaseFunction.prototype );
 
 function cBIN2DEC() {
     cBaseFunction.call( this, "BIN2DEC" );
 }
+
 cBIN2DEC.prototype = Object.create( cBaseFunction.prototype );
 
 function cBIN2HEX() {
     cBaseFunction.call( this, "BIN2HEX" );
 }
+
 cBIN2HEX.prototype = Object.create( cBaseFunction.prototype );
 
 function cBIN2OCT() {
     cBaseFunction.call( this, "BIN2OCT" );
 }
+
 cBIN2OCT.prototype = Object.create( cBaseFunction.prototype );
 
 function cCOMPLEX() {
     cBaseFunction.call( this, "COMPLEX" );
 }
+
 cCOMPLEX.prototype = Object.create( cBaseFunction.prototype );
 
 function cCONVERT() {
     cBaseFunction.call( this, "CONVERT" );
 }
+
 cCONVERT.prototype = Object.create( cBaseFunction.prototype );
 
 function cDEC2BIN() {
     cBaseFunction.call( this, "DEC2BIN" );
 }
+
 cDEC2BIN.prototype = Object.create( cBaseFunction.prototype );
 
 function cDEC2HEX() {
     cBaseFunction.call( this, "DEC2HEX" );
 }
+
 cDEC2HEX.prototype = Object.create( cBaseFunction.prototype );
 
 function cDEC2OCT() {
     cBaseFunction.call( this, "DEC2OCT" );
 }
+
 cDEC2OCT.prototype = Object.create( cBaseFunction.prototype );
 
 function cDELTA() {
     cBaseFunction.call( this, "DELTA" );
 }
+
 cDELTA.prototype = Object.create( cBaseFunction.prototype );
 
 function cERF() {
     cBaseFunction.call( this, "ERF" );
 }
+
 cERF.prototype = Object.create( cBaseFunction.prototype );
 
 function cERFC() {
     cBaseFunction.call( this, "ERFC" );
 }
+
 cERFC.prototype = Object.create( cBaseFunction.prototype );
 
 function cGESTEP() {
     cBaseFunction.call( this, "GESTEP" );
 }
+
 cGESTEP.prototype = Object.create( cBaseFunction.prototype );
 
 function cHEX2BIN() {
     cBaseFunction.call( this, "HEX2BIN" );
 }
+
 cHEX2BIN.prototype = Object.create( cBaseFunction.prototype );
 
 function cHEX2DEC() {
     cBaseFunction.call( this, "HEX2DEC" );
 }
+
 cHEX2DEC.prototype = Object.create( cBaseFunction.prototype );
 
 function cHEX2OCT() {
     cBaseFunction.call( this, "HEX2OCT" );
 }
+
 cHEX2OCT.prototype = Object.create( cBaseFunction.prototype );
 
 function cIMABS() {
     cBaseFunction.call( this, "IMABS" );
 }
+
 cIMABS.prototype = Object.create( cBaseFunction.prototype );
 
 function cIMAGINARY() {
     cBaseFunction.call( this, "IMAGINARY" );
 }
+
 cIMAGINARY.prototype = Object.create( cBaseFunction.prototype );
 
 function cIMARGUMENT() {
     cBaseFunction.call( this, "IMARGUMENT" );
 }
+
 cIMARGUMENT.prototype = Object.create( cBaseFunction.prototype );
 
 function cIMCONJUGATE() {
     cBaseFunction.call( this, "IMCONJUGATE" );
 }
+
 cIMCONJUGATE.prototype = Object.create( cBaseFunction.prototype );
 
 function cIMCOS() {
     cBaseFunction.call( this, "IMCOS" );
 }
+
 cIMCOS.prototype = Object.create( cBaseFunction.prototype );
 
 function cIMDIV() {
     cBaseFunction.call( this, "IMDIV" );
 }
+
 cIMDIV.prototype = Object.create( cBaseFunction.prototype );
 
 function cIMEXP() {
     cBaseFunction.call( this, "IMEXP" );
 }
+
 cIMEXP.prototype = Object.create( cBaseFunction.prototype );
 
 function cIMLN() {
     cBaseFunction.call( this, "IMLN" );
 }
+
 cIMLN.prototype = Object.create( cBaseFunction.prototype );
 
 function cIMLOG10() {
     cBaseFunction.call( this, "IMLOG10" );
 }
+
 cIMLOG10.prototype = Object.create( cBaseFunction.prototype );
 
 function cIMLOG2() {
     cBaseFunction.call( this, "IMLOG2" );
 }
+
 cIMLOG2.prototype = Object.create( cBaseFunction.prototype );
 
 function cIMPOWER() {
     cBaseFunction.call( this, "IMPOWER" );
 }
+
 cIMPOWER.prototype = Object.create( cBaseFunction.prototype );
 
 function cIMPRODUCT() {
     cBaseFunction.call( this, "IMPRODUCT" );
 }
+
 cIMPRODUCT.prototype = Object.create( cBaseFunction.prototype );
 
 function cIMREAL() {
     cBaseFunction.call( this, "IMREAL" );
 }
+
 cIMREAL.prototype = Object.create( cBaseFunction.prototype );
 
 function cIMSIN() {
     cBaseFunction.call( this, "IMSIN" );
 }
+
 cIMSIN.prototype = Object.create( cBaseFunction.prototype );
 
 function cIMSQRT() {
     cBaseFunction.call( this, "IMSQRT" );
 }
+
 cIMSQRT.prototype = Object.create( cBaseFunction.prototype );
 
 function cIMSUB() {
     cBaseFunction.call( this, "IMSUB" );
 }
+
 cIMSUB.prototype = Object.create( cBaseFunction.prototype );
 
 function cIMSUM() {
     cBaseFunction.call( this, "IMSUM" );
 }
+
 cIMSUM.prototype = Object.create( cBaseFunction.prototype );
 
 function cOCT2BIN() {
     cBaseFunction.call( this, "OCT2BIN" );
 }
+
 cOCT2BIN.prototype = Object.create( cBaseFunction.prototype );
 
 function cOCT2DEC() {
     cBaseFunction.call( this, "OCT2DEC" );
 }
+
 cOCT2DEC.prototype = Object.create( cBaseFunction.prototype );
 
 function cOCT2HEX() {
     cBaseFunction.call( this, "OCT2HEX" );
 }
+
 cOCT2HEX.prototype = Object.create( cBaseFunction.prototype );

@@ -7,7 +7,9 @@
  * Time: 15:15
  * To change this template use File | Settings | File Templates.
  */
-FormulaObjects.cFormulaFunction.Cube = {
+
+
+cFormulaFunction.Cube = {
     'groupName':"Cube",
     'CUBEKPIMEMBER':cCUBEKPIMEMBER,
     'CUBEMEMBER':cCUBEMEMBER,
@@ -34,6 +36,7 @@ function cCUBEKPIMEMBER() {
     this.numFormat = this.formatType.def;
 
 }
+
 cCUBEKPIMEMBER.prototype = Object.create( cBaseFunction.prototype );
 
 function cCUBEMEMBER() {
@@ -52,6 +55,7 @@ function cCUBEMEMBER() {
     this.numFormat = this.formatType.def;
 
 }
+
 cCUBEMEMBER.prototype = Object.create( cBaseFunction.prototype );
 
 function cCUBEMEMBERPROPERTY() {
@@ -70,6 +74,7 @@ function cCUBEMEMBERPROPERTY() {
     this.numFormat = this.formatType.def;
 
 }
+
 cCUBEMEMBERPROPERTY.prototype = Object.create( cBaseFunction.prototype );
 
 function cCUBERANKEDMEMBER() {
@@ -88,6 +93,7 @@ function cCUBERANKEDMEMBER() {
     this.numFormat = this.formatType.def;
 
 }
+
 cCUBERANKEDMEMBER.prototype = Object.create( cBaseFunction.prototype );
 
 function cCUBESET() {
@@ -106,6 +112,7 @@ function cCUBESET() {
     this.numFormat = this.formatType.def;
 
 }
+
 cCUBESET.prototype = Object.create( cBaseFunction.prototype );
 
 function cCUBESETCOUNT() {
@@ -124,6 +131,7 @@ function cCUBESETCOUNT() {
     this.numFormat = this.formatType.def;
 
 }
+
 cCUBESETCOUNT.prototype = Object.create( cBaseFunction.prototype );
 
 function cCUBEVALUE() {
@@ -142,4 +150,5 @@ function cCUBEVALUE() {
     this.numFormat = this.formatType.def;
 
 }
+
 cCUBEVALUE.prototype = Object.create( cBaseFunction.prototype );

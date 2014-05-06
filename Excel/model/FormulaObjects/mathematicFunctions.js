@@ -7,7 +7,7 @@
  * Time: 15:20
  * To change this template use File | Settings | File Templates.
  */
-FormulaObjects.cFormulaFunction.Mathematic = {
+cFormulaFunction.Mathematic = {
     'groupName':"Mathematic",
     'ABS':cABS,
     'ACOS':cACOS,
@@ -91,6 +91,7 @@ function cABS() {
     this.numFormat = this.formatType.def;
 
 }
+
 cABS.prototype = Object.create( cBaseFunction.prototype )
 cABS.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -140,6 +141,7 @@ function cACOS() {
     this.numFormat = this.formatType.def;
 
 }
+
 cACOS.prototype = Object.create( cBaseFunction.prototype )
 cACOS.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -191,6 +193,7 @@ function cACOSH() {
     this.numFormat = this.formatType.def;
 
 }
+
 cACOSH.prototype = Object.create( cBaseFunction.prototype )
 cACOSH.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -242,6 +245,7 @@ function cASIN() {
     this.numFormat = this.formatType.def;
 
 }
+
 cASIN.prototype = Object.create( cBaseFunction.prototype )
 cASIN.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -293,6 +297,7 @@ function cASINH() {
     this.numFormat = this.formatType.def;
 
 }
+
 cASINH.prototype = Object.create( cBaseFunction.prototype )
 cASINH.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -344,6 +349,7 @@ function cATAN() {
     this.numFormat = this.formatType.def;
 
 }
+
 cATAN.prototype = Object.create( cBaseFunction.prototype )
 cATAN.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -396,6 +402,7 @@ function cATAN2() {
     this.numFormat = this.formatType.def;
 
 }
+
 cATAN2.prototype = Object.create( cBaseFunction.prototype )
 cATAN2.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
@@ -489,6 +496,7 @@ function cATANH() {
     this.numFormat = this.formatType.def;
 
 }
+
 cATANH.prototype = Object.create( cBaseFunction.prototype )
 cATANH.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -540,6 +548,7 @@ function cCEILING() {
     this.numFormat = this.formatType.def;
 
 }
+
 cCEILING.prototype = Object.create( cBaseFunction.prototype )
 cCEILING.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
@@ -647,6 +656,7 @@ function cCOMBIN() {
     this.numFormat = this.formatType.def;
 
 }
+
 cCOMBIN.prototype = Object.create( cBaseFunction.prototype )
 cCOMBIN.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
@@ -743,6 +753,7 @@ function cCOS() {
     this.numFormat = this.formatType.def;
 
 }
+
 cCOS.prototype = Object.create( cBaseFunction.prototype )
 cCOS.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -794,6 +805,7 @@ function cCOSH() {
     this.numFormat = this.formatType.def;
 
 }
+
 cCOSH.prototype = Object.create( cBaseFunction.prototype )
 cCOSH.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -845,6 +857,7 @@ function cDEGREES() {
     this.numFormat = this.formatType.def;
 
 }
+
 cDEGREES.prototype = Object.create( cBaseFunction.prototype )
 cDEGREES.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -882,6 +895,7 @@ cDEGREES.prototype.getInfo = function () {
 function cECMA_CEILING() {
     cBaseFunction.call( this, "ECMA_CEILING" );
 }
+
 cECMA_CEILING.prototype = Object.create( cBaseFunction.prototype )
 
 function cEVEN() {
@@ -902,6 +916,7 @@ function cEVEN() {
     this.numFormat = this.formatType.def;
 
 }
+
 cEVEN.prototype = Object.create( cBaseFunction.prototype )
 cEVEN.prototype.Calculate = function ( arg ) {
 
@@ -974,6 +989,7 @@ function cEXP() {
     this.numFormat = this.formatType.def;
 
 }
+
 cEXP.prototype = Object.create( cBaseFunction.prototype )
 cEXP.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -1028,6 +1044,7 @@ function cFACT() {
     this.numFormat = this.formatType.def;
 
 }
+
 cFACT.prototype = Object.create( cBaseFunction.prototype )
 cFACT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -1084,6 +1101,7 @@ function cFACTDOUBLE() {
     this.numFormat = this.formatType.def;
 
 }
+
 cFACTDOUBLE.prototype = Object.create( cBaseFunction.prototype )
 cFACTDOUBLE.prototype.Calculate = function ( arg ) {
     function factDouble( n ) {
@@ -1154,6 +1172,7 @@ function cFLOOR() {
     this.numFormat = this.formatType.def;
 
 }
+
 cFLOOR.prototype = Object.create( cBaseFunction.prototype )
 cFLOOR.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
@@ -1260,6 +1279,7 @@ function cGCD() {
     this.numFormat = this.formatType.def;
 
 }
+
 cGCD.prototype = Object.create( cBaseFunction.prototype )
 cGCD.prototype.Calculate = function ( arg ) {
 
@@ -1363,6 +1383,7 @@ function cINT() {
     this.numFormat = this.formatType.def;
 
 }
+
 cINT.prototype = Object.create( cBaseFunction.prototype )
 cINT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -1399,6 +1420,7 @@ cINT.prototype.getInfo = function () {
 function cISO_CEILING() {
     cBaseFunction.call( this, "ISO_CEILING" );
 }
+
 cISO_CEILING.prototype = Object.create( cBaseFunction.prototype )
 
 function cLCM() {
@@ -1419,6 +1441,7 @@ function cLCM() {
     this.numFormat = this.formatType.def;
 
 }
+
 cLCM.prototype = Object.create( cBaseFunction.prototype )
 cLCM.prototype.Calculate = function ( arg ) {
 
@@ -1526,6 +1549,7 @@ function cLN() {
     this.numFormat = this.formatType.def;
 
 }
+
 cLN.prototype = Object.create( cBaseFunction.prototype )
 cLN.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -1582,6 +1606,7 @@ function cLOG() {
     this.numFormat = this.formatType.def;
 
 }
+
 cLOG.prototype = Object.create( cBaseFunction.prototype )
 cLOG.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cNumber( 10 );
@@ -1681,6 +1706,7 @@ function cLOG10() {
     this.numFormat = this.formatType.def;
 
 }
+
 cLOG10.prototype = Object.create( cBaseFunction.prototype )
 cLOG10.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -1738,6 +1764,7 @@ function cMDETERM() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cMDETERM.prototype = Object.create( cBaseFunction.prototype )
 cMDETERM.prototype.Calculate = function ( arg ) {
 
@@ -1828,6 +1855,7 @@ function cMINVERSE() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cMINVERSE.prototype = Object.create( cBaseFunction.prototype )
 cMINVERSE.prototype.Calculate = function ( arg ) {
 
@@ -1971,6 +1999,7 @@ function cMMULT() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cMMULT.prototype = Object.create( cBaseFunction.prototype )
 cMMULT.prototype.Calculate = function ( arg ) {
 
@@ -2048,6 +2077,7 @@ function cMOD() {
     this.numFormat = this.formatType.def;
 
 }
+
 cMOD.prototype = Object.create( cBaseFunction.prototype )
 cMOD.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
@@ -2140,6 +2170,7 @@ function cMROUND() {
     this.numFormat = this.formatType.def;
 
 }
+
 cMROUND.prototype = Object.create( cBaseFunction.prototype )
 cMROUND.prototype.Calculate = function ( arg ) {
 
@@ -2250,6 +2281,7 @@ function cMULTINOMIAL() {
     this.numFormat = this.formatType.def;
 
 }
+
 cMULTINOMIAL.prototype = Object.create( cBaseFunction.prototype )
 cMULTINOMIAL.prototype.Calculate = function ( arg ) {
     var arg0 = new cNumber( 0 ), fact = 1;
@@ -2354,6 +2386,7 @@ function cODD() {
     this.numFormat = this.formatType.def;
 
 }
+
 cODD.prototype = Object.create( cBaseFunction.prototype )
 cODD.prototype.Calculate = function ( arg ) {
 
@@ -2426,6 +2459,7 @@ function cPI() {
     this.numFormat = this.formatType.def;
 
 }
+
 cPI.prototype = Object.create( cBaseFunction.prototype )
 cPI.prototype.Calculate = function () {
     return new cNumber( Math.PI );
@@ -2455,6 +2489,7 @@ function cPOWER() {
     this.numFormat = this.formatType.def;
 
 }
+
 cPOWER.prototype = Object.create( cBaseFunction.prototype )
 cPOWER.prototype.Calculate = function ( arg ) {
 
@@ -2543,6 +2578,7 @@ function cPRODUCT() {
     this.numFormat = this.formatType.def;
 
 }
+
 cPRODUCT.prototype = Object.create( cBaseFunction.prototype )
 cPRODUCT.prototype.Calculate = function ( arg ) {
     var arg0 = new cNumber( 1 ), _aVal = null;
@@ -2602,6 +2638,7 @@ function cQUOTIENT() {
     this.numFormat = this.formatType.def;
 
 }
+
 cQUOTIENT.prototype = Object.create( cBaseFunction.prototype )
 cQUOTIENT.prototype.Calculate = function ( arg ) {
 
@@ -2688,6 +2725,7 @@ function cRADIANS() {
     this.numFormat = this.formatType.def;
 
 }
+
 cRADIANS.prototype = Object.create( cBaseFunction.prototype )
 cRADIANS.prototype.Calculate = function ( arg ) {
 
@@ -2743,6 +2781,7 @@ function cRAND() {
     this.numFormat = this.formatType.def;
 
 }
+
 cRAND.prototype = Object.create( cBaseFunction.prototype )
 cRAND.prototype.Calculate = function () {
     return this.setCA( new cNumber( Math.random() ), true );
@@ -2772,6 +2811,7 @@ function cRANDBETWEEN() {
     this.numFormat = this.formatType.def;
 
 }
+
 cRANDBETWEEN.prototype = Object.create( cBaseFunction.prototype )
 cRANDBETWEEN.prototype.Calculate = function ( arg ) {
 
@@ -2855,6 +2895,7 @@ function cROMAN() {
     this.numFormat = this.formatType.def;
 
 }
+
 cROMAN.prototype = Object.create( cBaseFunction.prototype )
 cROMAN.prototype.Calculate = function ( arg ) {
     function roman( num, mode ) {
@@ -2979,6 +3020,7 @@ function cROUND() {
     this.numFormat = this.formatType.def;
 
 }
+
 cROUND.prototype = Object.create( cBaseFunction.prototype )
 cROUND.prototype.Calculate = function ( arg ) {
 
@@ -3130,6 +3172,7 @@ function cROUNDDOWN() {
     this.numFormat = this.formatType.def;
 
 }
+
 cROUNDDOWN.prototype = Object.create( cBaseFunction.prototype )
 cROUNDDOWN.prototype.Calculate = function ( arg ) {
     function rounddownHelper( number, num_digits ) {
@@ -3254,6 +3297,7 @@ function cROUNDUP() {
     this.numFormat = this.formatType.def;
 
 }
+
 cROUNDUP.prototype = Object.create( cBaseFunction.prototype )
 cROUNDUP.prototype.Calculate = function ( arg ) {
     function roundupHelper( number, num_digits ) {
@@ -3378,6 +3422,7 @@ function cSERIESSUM() {
     this.numFormat = this.formatType.def;
 
 }
+
 cSERIESSUM.prototype = Object.create( cBaseFunction.prototype )
 cSERIESSUM.prototype.Calculate = function ( arg ) {
 
@@ -3460,6 +3505,7 @@ function cSIGN() {
     this.numFormat = this.formatType.def;
 
 }
+
 cSIGN.prototype = Object.create( cBaseFunction.prototype )
 cSIGN.prototype.Calculate = function ( arg ) {
 
@@ -3523,6 +3569,7 @@ function cSIN() {
     this.numFormat = this.formatType.def;
 
 }
+
 cSIN.prototype = Object.create( cBaseFunction.prototype )
 cSIN.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -3571,6 +3618,7 @@ function cSINH() {
     this.numFormat = this.formatType.def;
 
 }
+
 cSINH.prototype = Object.create( cBaseFunction.prototype )
 cSINH.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -3622,6 +3670,7 @@ function cSQRT() {
     this.numFormat = this.formatType.def;
 
 }
+
 cSQRT.prototype = Object.create( cBaseFunction.prototype )
 cSQRT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -3673,6 +3722,7 @@ function cSQRTPI() {
     this.numFormat = this.formatType.def;
 
 }
+
 cSQRTPI.prototype = Object.create( cBaseFunction.prototype )
 cSQRTPI.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -3709,6 +3759,7 @@ cSQRTPI.prototype.getInfo = function () {
 function cSUBTOTAL() {
     cBaseFunction.call( this, "SUBTOTAL" );
 }
+
 cSUBTOTAL.prototype = Object.create( cBaseFunction.prototype )
 
 function cSUM() {
@@ -3729,6 +3780,7 @@ function cSUM() {
     this.numFormat = this.formatType.def;
 
 }
+
 cSUM.prototype = Object.create( cBaseFunction.prototype )
 cSUM.prototype.Calculate = function ( arg ) {
     var arg0 = new cNumber( 0 ), _aVal = null;
@@ -3791,6 +3843,7 @@ function cSUMIF() {
     this.numFormat = this.formatType.def;
 
 }
+
 cSUMIF.prototype = Object.create( cBaseFunction.prototype )
 cSUMIF.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : arg[0], _sum = 0, valueForSearching, regexpSearch;
@@ -3864,6 +3917,7 @@ cSUMIF.prototype.getInfo = function () {
 function cSUMIFS() {
     cBaseFunction.call( this, "SUMIFS" );
 }
+
 cSUMIFS.prototype = Object.create( cBaseFunction.prototype )
 
 function cSUMPRODUCT() {
@@ -3884,6 +3938,7 @@ function cSUMPRODUCT() {
     this.numFormat = this.formatType.def;
 
 }
+
 cSUMPRODUCT.prototype = Object.create( cBaseFunction.prototype )
 cSUMPRODUCT.prototype.Calculate = function ( arg ) {
     var arg0 = new cNumber( 0 ), resArr = [], col = 0, row = 0, res = 1, _res = [];
@@ -3968,6 +4023,7 @@ function cSUMSQ() {
     this.numFormat = this.formatType.def;
 
 }
+
 cSUMSQ.prototype = Object.create( cBaseFunction.prototype )
 cSUMSQ.prototype.Calculate = function ( arg ) {
     var arg0 = new cNumber( 0 ), _aVal = null;
@@ -4036,6 +4092,7 @@ function cSUMX2MY2() {
     this.numFormat = this.formatType.def;
 
 }
+
 cSUMX2MY2.prototype = Object.create( cBaseFunction.prototype )
 cSUMX2MY2.prototype.Calculate = function ( arg ) {
 
@@ -4133,6 +4190,7 @@ function cSUMX2PY2() {
     this.numFormat = this.formatType.def;
 
 }
+
 cSUMX2PY2.prototype = Object.create( cBaseFunction.prototype )
 cSUMX2PY2.prototype.Calculate = function ( arg ) {
 
@@ -4230,6 +4288,7 @@ function cSUMXMY2() {
     this.numFormat = this.formatType.def;
 
 }
+
 cSUMXMY2.prototype = Object.create( cBaseFunction.prototype )
 cSUMXMY2.prototype.Calculate = function ( arg ) {
 
@@ -4327,6 +4386,7 @@ function cTAN() {
     this.numFormat = this.formatType.def;
 
 }
+
 cTAN.prototype = Object.create( cBaseFunction.prototype )
 cTAN.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -4378,6 +4438,7 @@ function cTANH() {
     this.numFormat = this.formatType.def;
 
 }
+
 cTANH.prototype = Object.create( cBaseFunction.prototype )
 cTANH.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -4429,6 +4490,7 @@ function cTRUNC() {
     this.numFormat = this.formatType.def;
 
 }
+
 cTRUNC.prototype = Object.create( cBaseFunction.prototype )
 cTRUNC.prototype.Calculate = function ( arg ) {
 
@@ -4519,3 +4581,4 @@ cTRUNC.prototype.getInfo = function () {
         args:"( x [ , number-digits ] )"
     };
 }
+

@@ -7,7 +7,8 @@
  * Time: 15:22
  * To change this template use File | Settings | File Templates.
  */
-FormulaObjects.cFormulaFunction.Logical = {
+
+cFormulaFunction.Logical = {
     'groupName':"Logical",
     'AND':cAND,
     'FALSE':cFALSE,
@@ -36,6 +37,7 @@ function cAND() {
     this.numFormat = this.formatType.def;
 
 }
+
 cAND.prototype = Object.create( cBaseFunction.prototype );
 cAND.prototype.Calculate = function ( arg ) {
     var argResult = null;
@@ -130,6 +132,7 @@ function cFALSE() {
     };
     this.numFormat = this.formatType.def;
 }
+
 cFALSE.prototype = Object.create( cBaseFunction.prototype );
 cFALSE.prototype.Calculate = function () {
     return this.value = new cBool( false );
@@ -159,6 +162,7 @@ function cIF() {
 //    this.setArgumentsMin( 1 );
 //    this.setArgumentsMax( 3 );
 }
+
 cIF.prototype = Object.create( cBaseFunction.prototype );
 cIF.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -222,6 +226,7 @@ function cIFERROR() {
     this.numFormat = this.formatType.def;
 
 }
+
 cIFERROR.prototype = Object.create( cBaseFunction.prototype );
 cIFERROR.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -267,6 +272,7 @@ function cNOT() {
     this.numFormat = this.formatType.def;
 
 }
+
 cNOT.prototype = Object.create( cBaseFunction.prototype );
 cNOT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -319,6 +325,7 @@ function cOR() {
     this.numFormat = this.formatType.def;
 
 }
+
 cOR.prototype = Object.create( cBaseFunction.prototype );
 cOR.prototype.Calculate = function ( arg ) {
     var argResult = null;
@@ -407,6 +414,7 @@ function cTRUE() {
     this.numFormat = this.formatType.def;
 
 }
+
 cTRUE.prototype = Object.create( cBaseFunction.prototype );
 cTRUE.prototype.Calculate = function () {
     return this.value = new cBool( true );

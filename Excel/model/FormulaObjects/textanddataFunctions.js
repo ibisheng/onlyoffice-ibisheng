@@ -7,7 +7,8 @@
  * Time: 15:17
  * To change this template use File | Settings | File Templates.
  */
-FormulaObjects.cFormulaFunction.TextAndData = {
+
+cFormulaFunction.TextAndData = {
     'groupName':"TextAndData",
     'ASC':cASC,
     'BAHTTEXT':cBAHTTEXT,
@@ -48,11 +49,13 @@ FormulaObjects.cFormulaFunction.TextAndData = {
 function cASC() {
     cBaseFunction.call( this, "ASC" );
 }
+
 cASC.prototype = Object.create( cBaseFunction.prototype )
 
 function cBAHTTEXT() {
     cBaseFunction.call( this, "BAHTTEXT" );
 }
+
 cBAHTTEXT.prototype = Object.create( cBaseFunction.prototype )
 
 function cCHAR() {
@@ -73,6 +76,7 @@ function cCHAR() {
     this.numFormat = this.formatType.def;
 
 }
+
 cCHAR.prototype = Object.create( cBaseFunction.prototype )
 cCHAR.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -129,6 +133,7 @@ function cCLEAN() {
 
 
 }
+
 cCLEAN.prototype = Object.create( cBaseFunction.prototype )
 cCLEAN.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -176,6 +181,7 @@ function cCODE() {
     this.numFormat = this.formatType.def;
 
 }
+
 cCODE.prototype = Object.create( cBaseFunction.prototype )
 cCODE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -231,6 +237,7 @@ function cCONCATENATE() {
     this.numFormat = this.formatType.def;
 
 }
+
 cCONCATENATE.prototype = Object.create( cBaseFunction.prototype )
 cCONCATENATE.prototype.Calculate = function ( arg ) {
     var arg0 = new cString( "" ), argI;
@@ -288,6 +295,7 @@ function cDOLLAR() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cDOLLAR.prototype = Object.create( cBaseFunction.prototype )
 cDOLLAR.prototype.Calculate = function ( arg ) {
 
@@ -484,6 +492,7 @@ function cEXACT() {
     this.numFormat = this.formatType.def;
 
 }
+
 cEXACT.prototype = Object.create( cBaseFunction.prototype )
 cEXACT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
@@ -539,6 +548,7 @@ function cFIND() {
     this.numFormat = this.formatType.def;
 
 }
+
 cFIND.prototype = Object.create( cBaseFunction.prototype )
 cFIND.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = this.getArguments() == 3 ? arg[2] : null, res, str, searchStr, pos = -1;
@@ -609,7 +619,7 @@ cFIND.prototype.getInfo = function () {
 }
 
 function cFINDB() {
-    var r = new FormulaObjects.cFormulaFunction.TextAndData["FIND"]()
+    var r = new cFormulaFunction.TextAndData["FIND"]()
     r.setName( "FINDB" );
     return r;
 }
@@ -632,6 +642,7 @@ function cFIXED() {
     this.numFormat = this.formatType.def;
 
 }
+
 cFIXED.prototype = Object.create( cBaseFunction.prototype )
 cFIXED.prototype.Calculate = function ( arg ) {
 
@@ -809,6 +820,7 @@ cFIXED.prototype.getInfo = function () {
 function cJIS() {
     cBaseFunction.call( this, "JIS" );
 }
+
 cJIS.prototype = Object.create( cBaseFunction.prototype )
 
 function cLEFT() {
@@ -829,6 +841,7 @@ function cLEFT() {
     this.numFormat = this.formatType.def;
 
 }
+
 cLEFT.prototype = Object.create( cBaseFunction.prototype )
 cLEFT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = this.argumentsCurrent == 1 ? new cNumber( 1 ) : arg[1];
@@ -869,7 +882,7 @@ cLEFT.prototype.getInfo = function () {
 }
 
 function cLEFTB() {
-    var r = new FormulaObjects.cFormulaFunction.TextAndData["LEFT"]()
+    var r = new cFormulaFunction.TextAndData["LEFT"]()
     r.setName( "LEFTB" );
     return r;
 }
@@ -892,6 +905,7 @@ function cLEN() {
     this.numFormat = this.formatType.def;
 
 }
+
 cLEN.prototype = Object.create( cBaseFunction.prototype )
 cLEN.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -918,7 +932,7 @@ cLEN.prototype.getInfo = function () {
 }
 
 function cLENB() {
-    var r = new FormulaObjects.cFormulaFunction.TextAndData["LEN"]();
+    var r = new cFormulaFunction.TextAndData["LEN"]();
     r.setName( "LENB" );
     return r;
 }
@@ -941,6 +955,7 @@ function cLOWER() {
     this.numFormat = this.formatType.def;
 
 }
+
 cLOWER.prototype = Object.create( cBaseFunction.prototype )
 cLOWER.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -981,6 +996,7 @@ function cMID() {
     this.numFormat = this.formatType.def;
 
 }
+
 cMID.prototype = Object.create( cBaseFunction.prototype )
 cMID.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -1033,7 +1049,7 @@ cMID.prototype.getInfo = function () {
 }
 
 function cMIDB() {
-    var r = new FormulaObjects.cFormulaFunction.TextAndData["MID"]();
+    var r = new cFormulaFunction.TextAndData["MID"]();
     r.setName( "MIDB" );
     return r;
 }
@@ -1041,6 +1057,7 @@ function cMIDB() {
 function cPHONETIC() {
     cBaseFunction.call( this, "PHONETIC" );
 }
+
 cPHONETIC.prototype = Object.create( cBaseFunction.prototype )
 
 function cPROPER() {
@@ -1061,6 +1078,7 @@ function cPROPER() {
     this.numFormat = this.formatType.def;
 
 }
+
 cPROPER.prototype = Object.create( cBaseFunction.prototype )
 cPROPER.prototype.Calculate = function ( arg ) {
     var reg_PROPER = new RegExp( "[-#$+*/^&%<\\[\\]='?_\\@!~`\">: ;.\\)\\(,]|\\d|\\s" ), arg0 = arg[0];
@@ -1138,6 +1156,7 @@ function cREPLACE() {
     this.numFormat = this.formatType.def;
 
 }
+
 cREPLACE.prototype = Object.create( cBaseFunction.prototype )
 cREPLACE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
@@ -1210,7 +1229,7 @@ cREPLACE.prototype.getInfo = function () {
 }
 
 function cREPLACEB() {
-    var r = new FormulaObjects.cFormulaFunction.TextAndData["REPLACE"]();
+    var r = new cFormulaFunction.TextAndData["REPLACE"]();
     r.setName( "REPLACEB" );
     return r;
 }
@@ -1233,6 +1252,7 @@ function cREPT() {
     this.numFormat = this.formatType.def;
 
 }
+
 cREPT.prototype = Object.create( cBaseFunction.prototype )
 cREPT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], res = "";
@@ -1304,6 +1324,7 @@ function cRIGHT() {
     this.numFormat = this.formatType.def;
 
 }
+
 cRIGHT.prototype = Object.create( cBaseFunction.prototype )
 cRIGHT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = this.argumentsCurrent == 1 ? new cNumber( 1 ) : arg[1];
@@ -1344,7 +1365,7 @@ cRIGHT.prototype.getInfo = function () {
 }
 
 function cRIGHTB() {
-    var r = new FormulaObjects.cFormulaFunction.TextAndData["RIGHT"]()
+    var r = new cFormulaFunction.TextAndData["RIGHT"]()
     r.setName( "RIGHTB" );
     return r;
 }
@@ -1367,6 +1388,7 @@ function cSEARCH() {
     this.numFormat = this.formatType.def;
 
 }
+
 cSEARCH.prototype = Object.create( cBaseFunction.prototype )
 cSEARCH.prototype.Calculate = function ( arg ) {
 
@@ -1450,7 +1472,7 @@ cSEARCH.prototype.getInfo = function () {
 }
 
 function cSEARCHB() {
-    var r = new FormulaObjects.cFormulaFunction.TextAndData["SEARCH"]();
+    var r = new cFormulaFunction.TextAndData["SEARCH"]();
     r.setName( "SEARCHB" );
     return r;
 }
@@ -1473,6 +1495,7 @@ function cSUBSTITUTE() {
     this.numFormat = this.formatType.def;
 
 }
+
 cSUBSTITUTE.prototype = Object.create( cBaseFunction.prototype )
 cSUBSTITUTE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3] ? arg[3] : new cNumber( 0 );
@@ -1565,6 +1588,7 @@ function cT() {
     this.numFormat = this.formatType.def;
 
 }
+
 cT.prototype = Object.create( cBaseFunction.prototype )
 cT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -1610,6 +1634,7 @@ function cTEXT() {
     this.numFormat = this.formatType.def;
 
 }
+
 cTEXT.prototype = Object.create( cBaseFunction.prototype )
 cTEXT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
@@ -1685,6 +1710,7 @@ function cTRIM() {
     this.numFormat = this.formatType.def;
 
 }
+
 cTRIM.prototype = Object.create( cBaseFunction.prototype )
 cTRIM.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -1701,7 +1727,7 @@ cTRIM.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cError )
         return this.value = arg0;
 
-    return this.value = new cString( arg0.getValue().replace( rx_space_g, function ( $0, $1, $2 ) {
+    return this.value = new cString( arg0.getValue().replace( rx_space_g,function ( $0, $1, $2 ) {
         var res;
         rx_space.test( $2[$1 + 1] ) ? res = "" : res = $2[$1];
         return res;
@@ -1732,6 +1758,7 @@ function cUPPER() {
     this.numFormat = this.formatType.def;
 
 }
+
 cUPPER.prototype = Object.create( cBaseFunction.prototype )
 cUPPER.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -1772,6 +1799,7 @@ function cVALUE() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cVALUE.prototype = Object.create( cBaseFunction.prototype )
 cVALUE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];

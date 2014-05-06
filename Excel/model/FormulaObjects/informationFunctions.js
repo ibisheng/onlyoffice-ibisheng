@@ -7,7 +7,8 @@
  * Time: 15:21
  * To change this template use File | Settings | File Templates.
  */
-FormulaObjects.cFormulaFunction.Information = {
+
+cFormulaFunction.Information = {
     'groupName':"Information",
     'ERROR.TYPE':cERROR_TYPE,
     'ISBLANK':cISBLANK,
@@ -54,6 +55,7 @@ function cERROR_TYPE() {
     this.numFormat = this.formatType.def;
 
 }
+
 cERROR_TYPE.prototype = Object.create( cBaseFunction.prototype );
 cERROR_TYPE.prototype.Calculate = function ( arg ) {
     function typeError( elem ) {
@@ -127,6 +129,7 @@ function cISBLANK() {
     this.numFormat = this.formatType.def;
 
 }
+
 cISBLANK.prototype = Object.create( cBaseFunction.prototype );
 cISBLANK.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -166,6 +169,7 @@ function cISERR() {
     this.numFormat = this.formatType.def;
 
 }
+
 cISERR.prototype = Object.create( cBaseFunction.prototype );
 cISERR.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -209,6 +213,7 @@ function cISERROR() {
     this.numFormat = this.formatType.def;
 
 }
+
 cISERROR.prototype = Object.create( cBaseFunction.prototype );
 cISERROR.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -252,6 +257,7 @@ function cISEVEN() {
     this.numFormat = this.formatType.def;
 
 }
+
 cISEVEN.prototype = Object.create( cBaseFunction.prototype );
 cISEVEN.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -299,6 +305,7 @@ function cISLOGICAL() {
     this.numFormat = this.formatType.def;
 
 }
+
 cISLOGICAL.prototype = Object.create( cBaseFunction.prototype );
 cISLOGICAL.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -341,6 +348,7 @@ function cISNA() {
     this.numFormat = this.formatType.def;
 
 }
+
 cISNA.prototype = Object.create( cBaseFunction.prototype );
 cISNA.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -384,6 +392,7 @@ function cISNONTEXT() {
     this.numFormat = this.formatType.def;
 
 }
+
 cISNONTEXT.prototype = Object.create( cBaseFunction.prototype );
 cISNONTEXT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -426,6 +435,7 @@ function cISNUMBER() {
     this.numFormat = this.formatType.def;
 
 }
+
 cISNUMBER.prototype = Object.create( cBaseFunction.prototype );
 cISNUMBER.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -469,6 +479,7 @@ function cISODD() {
     this.numFormat = this.formatType.def;
 
 }
+
 cISODD.prototype = Object.create( cBaseFunction.prototype );
 cISODD.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -516,6 +527,7 @@ function cISREF() {
     this.numFormat = this.formatType.def;
 
 }
+
 cISREF.prototype = Object.create( cBaseFunction.prototype );
 cISREF.prototype.Calculate = function ( arg ) {
     if ( (arg[0] instanceof cRef || arg[0] instanceof cArea || arg[0] instanceof cArea3D || arg[0] instanceof cRef3D) && arg[0].isValid && arg[0].isValid() )
@@ -547,6 +559,7 @@ function cISTEXT() {
     this.numFormat = this.formatType.def;
 
 }
+
 cISTEXT.prototype = Object.create( cBaseFunction.prototype );
 cISTEXT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -591,6 +604,7 @@ function cN() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cN.prototype = Object.create( cBaseFunction.prototype );
 cN.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -646,6 +660,7 @@ function cNA() {
     this.numFormat = this.formatType.def;
 
 }
+
 cNA.prototype = Object.create( cBaseFunction.prototype );
 cNA.prototype.Calculate = function () {
     return this.value = new cError( cErrorType.not_available );
@@ -675,6 +690,7 @@ function cTYPE() {
     this.numFormat = this.formatType.def;
 
 }
+
 cTYPE.prototype = Object.create( cBaseFunction.prototype );
 cTYPE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];

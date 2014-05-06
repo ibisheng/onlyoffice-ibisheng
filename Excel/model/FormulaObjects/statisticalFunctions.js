@@ -7,7 +7,8 @@
  * Time: 15:18
  * To change this template use File | Settings | File Templates.
  */
-FormulaObjects.cFormulaFunction.Statistical = {
+
+cFormulaFunction.Statistical = {
     'groupName':"Statistical",
     'AVEDEV':cAVEDEV,
     'AVERAGE':cAVERAGE,
@@ -111,6 +112,7 @@ function cAVEDEV() {
     this.numFormat = this.formatType.def;
 
 }
+
 cAVEDEV.prototype = Object.create( cBaseFunction.prototype )
 cAVEDEV.prototype.Calculate = function ( arg ) {
     var count = 0, sum = new cNumber( 0 ), arrX = [];
@@ -187,6 +189,7 @@ function cAVERAGE() {
     this.numFormat = this.formatType.def;
 
 }
+
 cAVERAGE.prototype = Object.create( cBaseFunction.prototype )
 cAVERAGE.prototype.Calculate = function ( arg ) {
     var count = 0, sum = new cNumber( 0 );
@@ -268,6 +271,7 @@ function cAVERAGEA() {
     this.numFormat = this.formatType.def;
 
 }
+
 cAVERAGEA.prototype = Object.create( cBaseFunction.prototype )
 cAVERAGEA.prototype.Calculate = function ( arg ) {
     var count = 0, sum = new cNumber( 0 );
@@ -351,6 +355,7 @@ function cAVERAGEIF() {
     this.numFormat = this.formatType.def;
 
 }
+
 cAVERAGEIF.prototype = Object.create( cBaseFunction.prototype )
 cAVERAGEIF.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : arg[0], _sum = 0, _count = 0, valueForSearching;
@@ -430,16 +435,19 @@ cAVERAGEIF.prototype.getInfo = function () {
 function cAVERAGEIFS() {
     cBaseFunction.call( this, "AVERAGEIFS" );
 }
+
 cAVERAGEIFS.prototype = Object.create( cBaseFunction.prototype )
 
 function cBETADIST() {/*Нет реализации в Google Docs*/
     cBaseFunction.call( this, "BETADIST" );
 }
+
 cBETADIST.prototype = Object.create( cBaseFunction.prototype )
 
 function cBETAINV() {/*Нет реализации в Google Docs*/
     cBaseFunction.call( this, "BETAINV" );
 }
+
 cBETAINV.prototype = Object.create( cBaseFunction.prototype )
 
 function cBINOMDIST() {
@@ -460,6 +468,7 @@ function cBINOMDIST() {
     this.numFormat = this.formatType.def;
 
 }
+
 cBINOMDIST.prototype = Object.create( cBaseFunction.prototype )
 cBINOMDIST.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
@@ -532,16 +541,19 @@ cBINOMDIST.prototype.getInfo = function () {
 function cCHIDIST() {
     cBaseFunction.call( this, "CHIDIST" );
 }
+
 cCHIDIST.prototype = Object.create( cBaseFunction.prototype )
 
 function cCHIINV() {
     cBaseFunction.call( this, "CHIINV" );
 }
+
 cCHIINV.prototype = Object.create( cBaseFunction.prototype )
 
 function cCHITEST() {
     cBaseFunction.call( this, "CHITEST" );
 }
+
 cCHITEST.prototype = Object.create( cBaseFunction.prototype )
 
 function cCONFIDENCE() {
@@ -562,6 +574,7 @@ function cCONFIDENCE() {
     this.numFormat = this.formatType.def;
 
 }
+
 cCONFIDENCE.prototype = Object.create( cBaseFunction.prototype )
 cCONFIDENCE.prototype.Calculate = function ( arg ) {
 
@@ -626,6 +639,7 @@ function cCORREL() {
     this.numFormat = this.formatType.def;
 
 }
+
 cCORREL.prototype = Object.create( cBaseFunction.prototype )
 cCORREL.prototype.Calculate = function ( arg ) {
 
@@ -719,6 +733,7 @@ function cCOUNT() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cCOUNT.prototype = Object.create( cBaseFunction.prototype )
 cCOUNT.prototype.Calculate = function ( arg ) {
     var count = 0;
@@ -782,6 +797,7 @@ function cCOUNTA() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cCOUNTA.prototype = Object.create( cBaseFunction.prototype )
 cCOUNTA.prototype.Calculate = function ( arg ) {
     var count = 0;
@@ -840,6 +856,7 @@ function cCOUNTBLANK() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cCOUNTBLANK.prototype = Object.create( cBaseFunction.prototype )
 cCOUNTBLANK.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -876,6 +893,7 @@ function cCOUNTIF() {
     this.numFormat = this.formatType.def;
 
 }
+
 cCOUNTIF.prototype = Object.create( cBaseFunction.prototype )
 cCOUNTIF.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], _count = 0, valueForSearching;
@@ -936,6 +954,7 @@ cCOUNTIF.prototype.getInfo = function () {
 function cCOUNTIFS() {
     cBaseFunction.call( this, "COUNTIFS" );
 }
+
 cCOUNTIFS.prototype = Object.create( cBaseFunction.prototype )
 
 function cCOVAR() {
@@ -956,6 +975,7 @@ function cCOVAR() {
     this.numFormat = this.formatType.def;
 
 }
+
 cCOVAR.prototype = Object.create( cBaseFunction.prototype )
 cCOVAR.prototype.Calculate = function ( arg ) {
 
@@ -1043,6 +1063,7 @@ function cCRITBINOM() {
     this.numFormat = this.formatType.def;
 
 }
+
 cCRITBINOM.prototype = Object.create( cBaseFunction.prototype )
 cCRITBINOM.prototype.Calculate = function ( arg ) {
     var n = arg[0], p = arg[1], alpha = arg[2];                    // alpha
@@ -1136,6 +1157,7 @@ function cDEVSQ() {
     this.numFormat = this.formatType.def;
 
 }
+
 cDEVSQ.prototype = Object.create( cBaseFunction.prototype )
 cDEVSQ.prototype.Calculate = function ( arg ) {
 
@@ -1223,6 +1245,7 @@ function cEXPONDIST() {
     this.numFormat = this.formatType.def;
 
 }
+
 cEXPONDIST.prototype = Object.create( cBaseFunction.prototype )
 cEXPONDIST.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
@@ -1275,11 +1298,13 @@ cEXPONDIST.prototype.getInfo = function () {
 function cFDIST() {
     cBaseFunction.call( this, "FDIST" );
 }
+
 cFDIST.prototype = Object.create( cBaseFunction.prototype )
 
 function cFINV() {
     cBaseFunction.call( this, "FINV" );
 }
+
 cFINV.prototype = Object.create( cBaseFunction.prototype )
 
 function cFISHER() {
@@ -1300,6 +1325,7 @@ function cFISHER() {
     this.numFormat = this.formatType.def;
 
 }
+
 cFISHER.prototype = Object.create( cBaseFunction.prototype )
 cFISHER.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -1357,6 +1383,7 @@ function cFISHERINV() {
     this.numFormat = this.formatType.def;
 
 }
+
 cFISHERINV.prototype = Object.create( cBaseFunction.prototype )
 cFISHERINV.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -1414,6 +1441,7 @@ function cFORECAST() {
     this.numFormat = this.formatType.def;
 
 }
+
 cFORECAST.prototype = Object.create( cBaseFunction.prototype )
 cFORECAST.prototype.Calculate = function ( arg ) {
 
@@ -1520,12 +1548,13 @@ function cFREQUENCY() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cFREQUENCY.prototype = Object.create( cBaseFunction.prototype )
 cFREQUENCY.prototype.Calculate = function ( arg ) {
 
     function frequency( A, B ) {
 
-        function sort(a,b){
+        function sort( a, b ) {
             return a - b;
         }
 
@@ -1562,7 +1591,9 @@ cFREQUENCY.prototype.Calculate = function ( arg ) {
         tB.push( Number.POSITIVE_INFINITY );
         tB.sort( sort );
 
-        var C = [[]], k = 0;
+        var C = [
+            []
+        ], k = 0;
         for ( var i = 1; i < tB.length; i++, k++ ) {
             C[0][k] = new cNumber( 0 );
             for ( var j = 0; j < tA.length; j++ ) {
@@ -1614,11 +1645,13 @@ function cFTEST() {
 function cGAMMADIST() {
     cBaseFunction.call( this, "GAMMADIST" );
 }
+
 cGAMMADIST.prototype = Object.create( cBaseFunction.prototype )
 
 function cGAMMAINV() {
     cBaseFunction.call( this, "GAMMAINV" );
 }
+
 cGAMMAINV.prototype = Object.create( cBaseFunction.prototype )
 
 function cGAMMALN() {
@@ -1639,6 +1672,7 @@ function cGAMMALN() {
     this.numFormat = this.formatType.def;
 
 }
+
 cGAMMALN.prototype = Object.create( cBaseFunction.prototype )
 cGAMMALN.prototype.Calculate = function ( arg ) {
 
@@ -1695,6 +1729,7 @@ function cGEOMEAN() {
     this.numFormat = this.formatType.def;
 
 }
+
 cGEOMEAN.prototype = Object.create( cBaseFunction.prototype )
 cGEOMEAN.prototype.Calculate = function ( arg ) {
 
@@ -1764,6 +1799,7 @@ cGEOMEAN.prototype.getInfo = function () {
 function cGROWTH() {
     cBaseFunction.call( this, "GROWTH" );
 }
+
 cGROWTH.prototype = Object.create( cBaseFunction.prototype )
 
 function cHARMEAN() {
@@ -1784,6 +1820,7 @@ function cHARMEAN() {
     this.numFormat = this.formatType.def;
 
 }
+
 cHARMEAN.prototype = Object.create( cBaseFunction.prototype )
 cHARMEAN.prototype.Calculate = function ( arg ) {
 
@@ -1872,6 +1909,7 @@ function cHYPGEOMDIST() {
     this.numFormat = this.formatType.def;
 
 }
+
 cHYPGEOMDIST.prototype = Object.create( cBaseFunction.prototype )
 cHYPGEOMDIST.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
@@ -1952,6 +1990,7 @@ function cINTERCEPT() {
     this.numFormat = this.formatType.def;
 
 }
+
 cINTERCEPT.prototype = Object.create( cBaseFunction.prototype )
 cINTERCEPT.prototype.Calculate = function ( arg ) {
 
@@ -2046,6 +2085,7 @@ function cKURT() {
     this.numFormat = this.formatType.def;
 
 }
+
 cKURT.prototype = Object.create( cBaseFunction.prototype )
 cKURT.prototype.Calculate = function ( arg ) {
 
@@ -2145,6 +2185,7 @@ function cLARGE() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cLARGE.prototype = Object.create( cBaseFunction.prototype )
 cLARGE.prototype.Calculate = function ( arg ) {
 
@@ -2211,11 +2252,13 @@ cLARGE.prototype.getInfo = function () {
 function cLINEST() {
     cBaseFunction.call( this, "LINEST" );
 }
+
 cLINEST.prototype = Object.create( cBaseFunction.prototype )
 
 function cLOGEST() {
     cBaseFunction.call( this, "LOGEST" );
 }
+
 cLOGEST.prototype = Object.create( cBaseFunction.prototype )
 
 function cLOGINV() {
@@ -2236,6 +2279,7 @@ function cLOGINV() {
     this.numFormat = this.formatType.def;
 
 }
+
 cLOGINV.prototype = Object.create( cBaseFunction.prototype )
 cLOGINV.prototype.Calculate = function ( arg ) {
 
@@ -2304,6 +2348,7 @@ function cLOGNORMDIST() {
     this.numFormat = this.formatType.def;
 
 }
+
 cLOGNORMDIST.prototype = Object.create( cBaseFunction.prototype )
 cLOGNORMDIST.prototype.Calculate = function ( arg ) {
 
@@ -2372,6 +2417,7 @@ function cMAX() {
     this.numFormat = this.formatType.def;
 
 }
+
 cMAX.prototype = Object.create( cBaseFunction.prototype )
 cMAX.prototype.Calculate = function ( arg ) {
     var argI, argIVal, max = Number.NEGATIVE_INFINITY;
@@ -2459,6 +2505,7 @@ function cMAXA() {
     this.numFormat = this.formatType.def;
 
 }
+
 cMAXA.prototype = Object.create( cBaseFunction.prototype )
 cMAXA.prototype.Calculate = function ( arg ) {
     var argI, argIVal, max = Number.NEGATIVE_INFINITY;
@@ -2548,6 +2595,7 @@ function cMEDIAN() {
     this.numFormat = this.formatType.def;
 
 }
+
 cMEDIAN.prototype = Object.create( cBaseFunction.prototype )
 cMEDIAN.prototype.Calculate = function ( arg ) {
 
@@ -2635,6 +2683,7 @@ function cMIN() {
     this.numFormat = this.formatType.def;
 
 }
+
 cMIN.prototype = Object.create( cBaseFunction.prototype )
 cMIN.prototype.Calculate = function ( arg ) {
     var argI, argIVal, min = Number.POSITIVE_INFINITY;
@@ -2723,6 +2772,7 @@ function cMINA() {
     this.numFormat = this.formatType.def;
 
 }
+
 cMINA.prototype = Object.create( cBaseFunction.prototype )
 cMINA.prototype.Calculate = function ( arg ) {
     var argI, argIVal, min = Number.POSITIVE_INFINITY;
@@ -2814,6 +2864,7 @@ function cMODE() {
     this.numFormat = this.formatType.def;
 
 }
+
 cMODE.prototype = Object.create( cBaseFunction.prototype )
 cMODE.prototype.Calculate = function ( arg ) {
 
@@ -2921,6 +2972,7 @@ function cNEGBINOMDIST() {
     this.numFormat = this.formatType.def;
 
 }
+
 cNEGBINOMDIST.prototype = Object.create( cBaseFunction.prototype )
 cNEGBINOMDIST.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -2992,6 +3044,7 @@ function cNORMDIST() {
     this.numFormat = this.formatType.def;
 
 }
+
 cNORMDIST.prototype = Object.create( cBaseFunction.prototype )
 cNORMDIST.prototype.Calculate = function ( arg ) {
 
@@ -3074,6 +3127,7 @@ function cNORMINV() {
     this.numFormat = this.formatType.def;
 
 }
+
 cNORMINV.prototype = Object.create( cBaseFunction.prototype )
 cNORMINV.prototype.Calculate = function ( arg ) {
 
@@ -3142,6 +3196,7 @@ function cNORMSDIST() {
     this.numFormat = this.formatType.def;
 
 }
+
 cNORMSDIST.prototype = Object.create( cBaseFunction.prototype )
 cNORMSDIST.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -3193,6 +3248,7 @@ function cNORMSINV() {
     this.numFormat = this.formatType.def;
 
 }
+
 cNORMSINV.prototype = Object.create( cBaseFunction.prototype )
 cNORMSINV.prototype.Calculate = function ( arg ) {
 
@@ -3252,6 +3308,7 @@ function cPEARSON() {
     this.numFormat = this.formatType.def;
 
 }
+
 cPEARSON.prototype = Object.create( cBaseFunction.prototype )
 cPEARSON.prototype.Calculate = function ( arg ) {
 
@@ -3346,6 +3403,7 @@ function cPERCENTILE() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cPERCENTILE.prototype = Object.create( cBaseFunction.prototype )
 cPERCENTILE.prototype.Calculate = function ( arg ) {
 
@@ -3441,6 +3499,7 @@ function cPERCENTRANK() {
     this.numFormat = this.formatType.def;
 
 }
+
 cPERCENTRANK.prototype = Object.create( cBaseFunction.prototype )
 cPERCENTRANK.prototype.Calculate = function ( arg ) {
 
@@ -3565,6 +3624,7 @@ function cPERMUT() {
     this.numFormat = this.formatType.def;
 
 }
+
 cPERMUT.prototype = Object.create( cBaseFunction.prototype )
 cPERMUT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
@@ -3661,6 +3721,7 @@ function cPOISSON() {
     this.numFormat = this.formatType.def;
 
 }
+
 cPOISSON.prototype = Object.create( cBaseFunction.prototype )
 cPOISSON.prototype.Calculate = function ( arg ) {
 
@@ -3744,6 +3805,7 @@ function cPROB() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cPROB.prototype = Object.create( cBaseFunction.prototype )
 cPROB.prototype.Calculate = function ( arg ) {
 
@@ -3864,6 +3926,7 @@ function cQUARTILE() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cQUARTILE.prototype = Object.create( cBaseFunction.prototype )
 cQUARTILE.prototype.Calculate = function ( arg ) {
 
@@ -3970,6 +4033,7 @@ cQUARTILE.prototype.getInfo = function () {
 function cRANK() {
     cBaseFunction.call( this, "RANK" );
 }
+
 cRANK.prototype = Object.create( cBaseFunction.prototype )
 
 function cRSQ() {
@@ -3990,6 +4054,7 @@ function cRSQ() {
     this.numFormat = this.formatType.def;
 
 }
+
 cRSQ.prototype = Object.create( cBaseFunction.prototype )
 cRSQ.prototype.Calculate = function ( arg ) {
 
@@ -4084,6 +4149,7 @@ function cSKEW() {
     this.numFormat = this.formatType.def;
 
 }
+
 cSKEW.prototype = Object.create( cBaseFunction.prototype )
 cSKEW.prototype.Calculate = function ( arg ) {
 
@@ -4185,6 +4251,7 @@ function cSLOPE() {
     this.numFormat = this.formatType.def;
 
 }
+
 cSLOPE.prototype = Object.create( cBaseFunction.prototype )
 cSLOPE.prototype.Calculate = function ( arg ) {
 
@@ -4279,6 +4346,7 @@ function cSMALL() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cSMALL.prototype = Object.create( cBaseFunction.prototype )
 cSMALL.prototype.Calculate = function ( arg ) {
 
@@ -4360,6 +4428,7 @@ function cSTANDARDIZE() {
     this.numFormat = this.formatType.def;
 
 }
+
 cSTANDARDIZE.prototype = Object.create( cBaseFunction.prototype )
 cSTANDARDIZE.prototype.Calculate = function ( arg ) {
 
@@ -4429,6 +4498,7 @@ function cSTDEV() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cSTDEV.prototype = Object.create( cBaseFunction.prototype )
 cSTDEV.prototype.Calculate = function ( arg ) {
     var count = 0, sum = new cNumber( 0 ), member = [];
@@ -4505,6 +4575,7 @@ function cSTDEVA() {
     this.numFormat = this.formatType.def;
 
 }
+
 cSTDEVA.prototype = Object.create( cBaseFunction.prototype )
 cSTDEVA.prototype.Calculate = function ( arg ) {
     var count = 0, sum = new cNumber( 0 ), member = [];
@@ -4578,6 +4649,7 @@ function cSTDEVP() {
     this.numFormat = this.formatType.def;
 
 }
+
 cSTDEVP.prototype = Object.create( cBaseFunction.prototype )
 cSTDEVP.prototype.Calculate = function ( arg ) {
 
@@ -4591,7 +4663,7 @@ cSTDEVP.prototype.Calculate = function ( arg ) {
                 tA.push( x[i].getValue() )
                 xLength++;
             }
-            else if( x[i] instanceof  cError ){
+            else if ( x[i] instanceof  cError ) {
                 return x[i];
             }
 
@@ -4615,20 +4687,20 @@ cSTDEVP.prototype.Calculate = function ( arg ) {
 
         if ( arg[j] instanceof cArea || arg[j] instanceof cArea3D ) {
             arg[j].foreach2( function ( elem ) {
-                if ( elem instanceof  cNumber || elem instanceof  cError ){
+                if ( elem instanceof  cNumber || elem instanceof  cError ) {
                     arr0.push( elem );
                 }
             } );
         }
         else if ( arg[j] instanceof cRef || arg[j] instanceof cRef3D ) {
             var a = arg[j].getValue();
-            if ( a instanceof  cNumber || a instanceof  cError ){
+            if ( a instanceof  cNumber || a instanceof  cError ) {
                 arr0.push( a );
             }
         }
         else if ( arg[j] instanceof cArray ) {
             arg[j].foreach( function ( elem ) {
-                if ( elem instanceof  cNumber || elem instanceof  cError ){
+                if ( elem instanceof  cNumber || elem instanceof  cError ) {
                     arr0.push( elem );
                 }
             } );
@@ -4637,7 +4709,7 @@ cSTDEVP.prototype.Calculate = function ( arg ) {
             arr0.push( arg[j].tocNumber() );
         }
         else if ( arg[j] instanceof cString || arg[j] instanceof  cEmpty ) {
-            arr0.push( new cNumber(0) );
+            arr0.push( new cNumber( 0 ) );
         }
         else
             return this.value = cError( cErrorType.wrong_value_type )
@@ -4668,6 +4740,7 @@ function cSTDEVPA() {
     this.numFormat = this.formatType.def;
 
 }
+
 cSTDEVPA.prototype = Object.create( cBaseFunction.prototype )
 cSTDEVPA.prototype.Calculate = function ( arg ) {
 
@@ -4681,7 +4754,7 @@ cSTDEVPA.prototype.Calculate = function ( arg ) {
                 tA.push( x[i].getValue() )
                 xLength++;
             }
-            else if( x[i] instanceof  cError ){
+            else if ( x[i] instanceof  cError ) {
                 return x[i];
             }
 
@@ -4705,39 +4778,39 @@ cSTDEVPA.prototype.Calculate = function ( arg ) {
 
         if ( arg[j] instanceof cArea || arg[j] instanceof cArea3D ) {
             arg[j].foreach2( function ( elem ) {
-                if ( elem instanceof  cNumber || elem instanceof  cError ){
+                if ( elem instanceof  cNumber || elem instanceof  cError ) {
                     arr0.push( elem );
                 }
                 else if ( elem instanceof  cBool ) {
                     arr0.push( elem.tocNumber() );
                 }
-                else{
-                    arr0.push( new cNumber(0) );
+                else {
+                    arr0.push( new cNumber( 0 ) );
                 }
             } );
         }
         else if ( arg[j] instanceof cRef || arg[j] instanceof cRef3D ) {
             var a = arg[j].getValue();
-            if ( a instanceof  cNumber || a instanceof  cError ){
+            if ( a instanceof  cNumber || a instanceof  cError ) {
                 arr0.push( a );
             }
             else if ( a instanceof  cBool ) {
                 arr0.push( a.tocNumber() );
             }
-            else{
-                arr0.push( new cNumber(0) );
+            else {
+                arr0.push( new cNumber( 0 ) );
             }
         }
         else if ( arg[j] instanceof cArray ) {
             arg[j].foreach( function ( elem ) {
-                if ( elem instanceof  cNumber || elem instanceof  cError ){
+                if ( elem instanceof  cNumber || elem instanceof  cError ) {
                     arr0.push( elem );
                 }
                 else if ( elem instanceof  cBool ) {
                     arr0.push( elem.tocNumber() );
                 }
-                else{
-                    arr0.push( new cNumber(0) );
+                else {
+                    arr0.push( new cNumber( 0 ) );
                 }
             } );
         }
@@ -4745,7 +4818,7 @@ cSTDEVPA.prototype.Calculate = function ( arg ) {
             arr0.push( arg[j].tocNumber() );
         }
         else if ( arg[j] instanceof cString || arg[j] instanceof  cEmpty ) {
-            arr0.push( new cNumber(0) );
+            arr0.push( new cNumber( 0 ) );
         }
         else
             return this.value = cError( cErrorType.wrong_value_type )
@@ -4776,6 +4849,7 @@ function cSTEYX() {
     this.numFormat = this.formatType.def;
 
 }
+
 cSTEYX.prototype = Object.create( cBaseFunction.prototype )
 cSTEYX.prototype.Calculate = function ( arg ) {
 
@@ -4812,11 +4886,10 @@ cSTEYX.prototype.Calculate = function ( arg ) {
         }
 
 
-
         if ( sqrXDelta == 0 || sqrYDelta == 0 || xLength < 3 )
             return new cError( cErrorType.division_by_zero );
         else
-            return new cNumber( Math.sqrt( (1/(xLength-2)) * (sqrYDelta - sumXDeltaYDelta * sumXDeltaYDelta / sqrXDelta) ) );
+            return new cNumber( Math.sqrt( (1 / (xLength - 2)) * (sqrYDelta - sumXDeltaYDelta * sumXDeltaYDelta / sqrXDelta) ) );
     }
 
 
@@ -4857,26 +4930,31 @@ cSTEYX.prototype.getInfo = function () {
 function cTDIST() {
     cBaseFunction.call( this, "TDIST" );
 }
+
 cTDIST.prototype = Object.create( cBaseFunction.prototype )
 
 function cTINV() {
     cBaseFunction.call( this, "TINV" );
 }
+
 cTINV.prototype = Object.create( cBaseFunction.prototype )
 
 function cTREND() {
     cBaseFunction.call( this, "TREND" );
 }
+
 cTREND.prototype = Object.create( cBaseFunction.prototype )
 
 function cTRIMMEAN() {
     cBaseFunction.call( this, "TRIMMEAN" );
 }
+
 cTRIMMEAN.prototype = Object.create( cBaseFunction.prototype )
 
 function cTTEST() {
     cBaseFunction.call( this, "TTEST" );
 }
+
 cTTEST.prototype = Object.create( cBaseFunction.prototype )
 
 function cVAR() {
@@ -4897,6 +4975,7 @@ function cVAR() {
     this.numFormat = this.formatType.def;
 
 }
+
 cVAR.prototype = Object.create( cBaseFunction.prototype )
 cVAR.prototype.Calculate = function ( arg ) {
 
@@ -4910,7 +4989,7 @@ cVAR.prototype.Calculate = function ( arg ) {
                 tA.push( x[i].getValue() )
                 xLength++;
             }
-            else if( x[i] instanceof  cError ){
+            else if ( x[i] instanceof  cError ) {
                 return x[i];
             }
 
@@ -4985,6 +5064,7 @@ function cVARA() {
     this.numFormat = this.formatType.def;
 
 }
+
 cVARA.prototype = Object.create( cBaseFunction.prototype )
 cVARA.prototype.Calculate = function ( arg ) {
 
@@ -4998,7 +5078,7 @@ cVARA.prototype.Calculate = function ( arg ) {
                 tA.push( x[i].getValue() )
                 xLength++;
             }
-            else if( x[i] instanceof  cError ){
+            else if ( x[i] instanceof  cError ) {
                 return x[i];
             }
 
@@ -5022,39 +5102,39 @@ cVARA.prototype.Calculate = function ( arg ) {
 
         if ( arg[j] instanceof cArea || arg[j] instanceof cArea3D ) {
             arg[j].foreach2( function ( elem ) {
-                if ( elem instanceof  cNumber || elem instanceof  cError ){
+                if ( elem instanceof  cNumber || elem instanceof  cError ) {
                     arr0.push( elem );
                 }
                 else if ( elem instanceof  cBool ) {
                     arr0.push( elem.tocNumber() );
                 }
-                else{
-                    arr0.push( new cNumber(0) );
+                else {
+                    arr0.push( new cNumber( 0 ) );
                 }
             } );
         }
         else if ( arg[j] instanceof cRef || arg[j] instanceof cRef3D ) {
             var a = arg[j].getValue();
-            if ( a instanceof  cNumber || a instanceof  cError ){
+            if ( a instanceof  cNumber || a instanceof  cError ) {
                 arr0.push( a );
             }
             else if ( a instanceof  cBool ) {
                 arr0.push( a.tocNumber() );
             }
-            else{
-                arr0.push( new cNumber(0) );
+            else {
+                arr0.push( new cNumber( 0 ) );
             }
         }
         else if ( arg[j] instanceof cArray ) {
             arg[j].foreach( function ( elem ) {
-                if ( elem instanceof  cNumber || elem instanceof  cError ){
+                if ( elem instanceof  cNumber || elem instanceof  cError ) {
                     arr0.push( elem );
                 }
                 else if ( elem instanceof  cBool ) {
                     arr0.push( elem.tocNumber() );
                 }
-                else{
-                    arr0.push( new cNumber(0) );
+                else {
+                    arr0.push( new cNumber( 0 ) );
                 }
             } );
         }
@@ -5062,7 +5142,7 @@ cVARA.prototype.Calculate = function ( arg ) {
             arr0.push( arg[j].tocNumber() );
         }
         else if ( arg[j] instanceof cString || arg[j] instanceof  cEmpty ) {
-            arr0.push( new cNumber(0) );
+            arr0.push( new cNumber( 0 ) );
         }
         else
             return this.value = cError( cErrorType.wrong_value_type )
@@ -5093,6 +5173,7 @@ function cVARP() {
     this.numFormat = this.formatType.def;
 
 }
+
 cVARP.prototype = Object.create( cBaseFunction.prototype )
 cVARP.prototype.Calculate = function ( arg ) {
 
@@ -5106,7 +5187,7 @@ cVARP.prototype.Calculate = function ( arg ) {
                 tA.push( x[i].getValue() )
                 xLength++;
             }
-            else if( x[i] instanceof  cError ){
+            else if ( x[i] instanceof  cError ) {
                 return x[i];
             }
 
@@ -5130,29 +5211,29 @@ cVARP.prototype.Calculate = function ( arg ) {
 
         if ( arg[j] instanceof cArea || arg[j] instanceof cArea3D ) {
             arg[j].foreach2( function ( elem ) {
-                if ( elem instanceof  cNumber || elem instanceof  cError ){
+                if ( elem instanceof  cNumber || elem instanceof  cError ) {
                     arr0.push( elem );
                 }
             } );
         }
         else if ( arg[j] instanceof cRef || arg[j] instanceof cRef3D ) {
             var a = arg[j].getValue();
-            if ( a instanceof  cNumber || a instanceof  cError ){
+            if ( a instanceof  cNumber || a instanceof  cError ) {
                 arr0.push( a );
             }
         }
         else if ( arg[j] instanceof cArray ) {
             arg[j].foreach( function ( elem ) {
-                if ( elem instanceof  cNumber || elem instanceof  cError ){
+                if ( elem instanceof  cNumber || elem instanceof  cError ) {
                     arr0.push( elem );
                 }
-               } );
+            } );
         }
         else if ( arg[j] instanceof cNumber || arg[j] instanceof cBool ) {
             arr0.push( arg[j].tocNumber() );
         }
         else if ( arg[j] instanceof cString || arg[j] instanceof  cEmpty ) {
-            arr0.push( new cNumber(0) );
+            arr0.push( new cNumber( 0 ) );
         }
         else
             return this.value = cError( cErrorType.wrong_value_type )
@@ -5183,6 +5264,7 @@ function cVARPA() {
     this.numFormat = this.formatType.def;
 
 }
+
 cVARPA.prototype = Object.create( cBaseFunction.prototype )
 cVARPA.prototype.Calculate = function ( arg ) {
 
@@ -5196,7 +5278,7 @@ cVARPA.prototype.Calculate = function ( arg ) {
                 tA.push( x[i].getValue() )
                 xLength++;
             }
-            else if( x[i] instanceof  cError ){
+            else if ( x[i] instanceof  cError ) {
                 return x[i];
             }
 
@@ -5220,39 +5302,39 @@ cVARPA.prototype.Calculate = function ( arg ) {
 
         if ( arg[j] instanceof cArea || arg[j] instanceof cArea3D ) {
             arg[j].foreach2( function ( elem ) {
-                if ( elem instanceof  cNumber || elem instanceof  cError ){
+                if ( elem instanceof  cNumber || elem instanceof  cError ) {
                     arr0.push( elem );
                 }
                 else if ( elem instanceof  cBool ) {
                     arr0.push( elem.tocNumber() );
                 }
-                else{
-                    arr0.push( new cNumber(0) );
+                else {
+                    arr0.push( new cNumber( 0 ) );
                 }
             } );
         }
         else if ( arg[j] instanceof cRef || arg[j] instanceof cRef3D ) {
             var a = arg[j].getValue();
-            if ( a instanceof  cNumber || a instanceof  cError ){
+            if ( a instanceof  cNumber || a instanceof  cError ) {
                 arr0.push( a );
             }
             else if ( a instanceof  cBool ) {
                 arr0.push( a.tocNumber() );
             }
-            else{
-                arr0.push( new cNumber(0) );
+            else {
+                arr0.push( new cNumber( 0 ) );
             }
         }
         else if ( arg[j] instanceof cArray ) {
             arg[j].foreach( function ( elem ) {
-                if ( elem instanceof  cNumber || elem instanceof  cError ){
+                if ( elem instanceof  cNumber || elem instanceof  cError ) {
                     arr0.push( elem );
                 }
                 else if ( elem instanceof  cBool ) {
                     arr0.push( elem.tocNumber() );
                 }
-                else{
-                    arr0.push( new cNumber(0) );
+                else {
+                    arr0.push( new cNumber( 0 ) );
                 }
             } );
         }
@@ -5260,7 +5342,7 @@ cVARPA.prototype.Calculate = function ( arg ) {
             arr0.push( arg[j].tocNumber() );
         }
         else if ( arg[j] instanceof cString || arg[j] instanceof  cEmpty ) {
-            arr0.push( new cNumber(0) );
+            arr0.push( new cNumber( 0 ) );
         }
         else
             return this.value = cError( cErrorType.wrong_value_type )
@@ -5278,9 +5360,11 @@ cVARPA.prototype.getInfo = function () {
 function cWEIBULL() {
     cBaseFunction.call( this, "WEIBULL" );
 }
+
 cWEIBULL.prototype = Object.create( cBaseFunction.prototype )
 
 function cZTEST() {
     cBaseFunction.call( this, "ZTEST" );
 }
+
 cZTEST.prototype = Object.create( cBaseFunction.prototype )

@@ -7,7 +7,8 @@
  * Time: 15:21
  * To change this template use File | Settings | File Templates.
  */
-FormulaObjects.cFormulaFunction.LookupAndReference = {
+
+cFormulaFunction.LookupAndReference = {
     'groupName':"LookupAndReference",
     'ADDRESS':cADDRESS,
     'AREAS':cAREAS,
@@ -47,6 +48,7 @@ function cADDRESS() {
     this.numFormat = this.formatType.def;
 
 }
+
 cADDRESS.prototype = Object.create( cBaseFunction.prototype )
 cADDRESS.prototype.Calculate = function ( arg ) {
 
@@ -147,6 +149,7 @@ cADDRESS.prototype.getInfo = function () {
 function cAREAS() {
     cBaseFunction.call( this, "AREAS" );
 }
+
 cAREAS.prototype = Object.create( cBaseFunction.prototype )
 
 function cCHOOSE() {
@@ -167,6 +170,7 @@ function cCHOOSE() {
     this.numFormat = this.formatType.def;
 
 }
+
 cCHOOSE.prototype = Object.create( cBaseFunction.prototype )
 cCHOOSE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -215,6 +219,7 @@ function cCOLUMN() {
     this.numFormat = this.formatType.def;
 
 }
+
 cCOLUMN.prototype = Object.create( cBaseFunction.prototype )
 cCOLUMN.prototype.Calculate = function ( arg ) {
     var arg0;
@@ -267,6 +272,7 @@ function cCOLUMNS() {
     this.numFormat = this.formatType.def;
 
 }
+
 cCOLUMNS.prototype = Object.create( cBaseFunction.prototype )
 cCOLUMNS.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -297,9 +303,10 @@ cCOLUMNS.prototype.getInfo = function () {
 function cGETPIVOTDATA() {
     cBaseFunction.call( this, "GETPIVOTDATA" );
 }
+
 cGETPIVOTDATA.prototype = Object.create( cBaseFunction.prototype )
 
-var g_oHLOOKUPCache = new VHLOOKUPCache(true);
+var g_oHLOOKUPCache = new VHLOOKUPCache( true );
 
 function cHLOOKUP() {
 //    cBaseFunction.call( this, "HLOOKUP" );
@@ -319,6 +326,7 @@ function cHLOOKUP() {
     this.numFormat = this.formatType.def;
 
 }
+
 cHLOOKUP.prototype = Object.create( cBaseFunction.prototype )
 cHLOOKUP.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = this.argumentsCurrent == 4 ? arg[3].tocBool() : new cBool( true );
@@ -347,10 +355,9 @@ cHLOOKUP.prototype.Calculate = function ( arg ) {
         bb = range.getBBox0();
         if ( numberRow > bb.r2 - bb.r1 )
             return this.value = new cError( cErrorType.bad_reference );
-        var oSearchRange = ws.getRange3(bb.r1, bb.c1, bb.r1, bb.c2);
-        var oCache = g_oHLOOKUPCache.get(oSearchRange, valueForSearching, arg0 instanceof cString, arg3.value);
-        if(oCache)
-        {
+        var oSearchRange = ws.getRange3( bb.r1, bb.c1, bb.r1, bb.c2 );
+        var oCache = g_oHLOOKUPCache.get( oSearchRange, valueForSearching, arg0 instanceof cString, arg3.value );
+        if ( oCache ) {
             resC = oCache.index;
             min = oCache.min;
         }
@@ -362,10 +369,9 @@ cHLOOKUP.prototype.Calculate = function ( arg ) {
         if ( numberRow > bb.r2 - bb.r1 )
             return this.value = new cError( cErrorType.bad_reference );
 
-        var oSearchRange = ws.getRange3(bb.r1, bb.c1, bb.r1, bb.c2);
-        var oCache = g_oHLOOKUPCache.get(oSearchRange, valueForSearching, arg0 instanceof cString, arg3.value);
-        if(oCache)
-        {
+        var oSearchRange = ws.getRange3( bb.r1, bb.c1, bb.r1, bb.c2 );
+        var oCache = g_oHLOOKUPCache.get( oSearchRange, valueForSearching, arg0 instanceof cString, arg3.value );
+        if ( oCache ) {
             resC = oCache.index;
             min = oCache.min;
         }
@@ -443,6 +449,7 @@ cHLOOKUP.prototype.getInfo = function () {
 function cHYPERLINK() {
     cBaseFunction.call( this, "HYPERLINK" );
 }
+
 cHYPERLINK.prototype = Object.create( cBaseFunction.prototype )
 
 function cINDEX() {
@@ -461,18 +468,19 @@ function cINDEX() {
     this.numFormat = this.formatType.def;
 
 }
+
 cINDEX.prototype = Object.create( cBaseFunction.prototype )
 cINDEX.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0],
-        arg1 = arg[1] && !(arg[1] instanceof cEmpty) ? arg[1] : new cNumber(1),
-        arg2 = arg[2] && !(arg[2] instanceof cEmpty) ? arg[2] : new cNumber(1),
-        arg3 = arg[3] && !(arg[3] instanceof cEmpty) ? arg[3] : new cNumber(1),
+        arg1 = arg[1] && !(arg[1] instanceof cEmpty) ? arg[1] : new cNumber( 1 ),
+        arg2 = arg[2] && !(arg[2] instanceof cEmpty) ? arg[2] : new cNumber( 1 ),
+        arg3 = arg[3] && !(arg[3] instanceof cEmpty) ? arg[3] : new cNumber( 1 ),
         isArrayForm = false, res;
 
-    if( arg0 instanceof cArea3D ){
+    if ( arg0 instanceof cArea3D ) {
         return this.value = new cError( cErrorType.not_available );
     }
-    else if( arg0 instanceof cError ){
+    else if ( arg0 instanceof cError ) {
         return this.value = arg0;
     }
 
@@ -480,27 +488,29 @@ cINDEX.prototype.Calculate = function ( arg ) {
     arg2 = arg2.tocNumber();
     arg3 = arg3.tocNumber();
 
-    if( arg1 instanceof cError || arg2 instanceof cError || arg3 instanceof cError ){
+    if ( arg1 instanceof cError || arg2 instanceof cError || arg3 instanceof cError ) {
         return this.value = new cError( cErrorType.wrong_value_type );
     }
 
-    if( arg1.getValue() < 0 || arg2.getValue() < 0 ){
+    if ( arg1.getValue() < 0 || arg2.getValue() < 0 ) {
         return this.value = new cError( cErrorType.wrong_value_type );
     }
 
-    if( arg0 instanceof cArray ){
+    if ( arg0 instanceof cArray ) {
         arg0 = arg0.getMatrix();
     }
-    else if( arg0 instanceof cArea ){
+    else if ( arg0 instanceof cArea ) {
         arg0 = arg0.getMatrix();
     }
-    else{
-        arg0 = [[arg0.tryConvert()]]
+    else {
+        arg0 = [
+            [arg0.tryConvert()]
+        ]
     }
 
-    res = arg0[arg1.getValue()-1];
-    if( res )
-        res = res[arg2.getValue()-1];
+    res = arg0[arg1.getValue() - 1];
+    if ( res )
+        res = res[arg2.getValue() - 1];
 
     return this.value = res ? res : new cError( cErrorType.bad_reference );
 
@@ -508,7 +518,7 @@ cINDEX.prototype.Calculate = function ( arg ) {
 cINDEX.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"( array , [ row-number ] [ , [ column-number ] ] ) "+this.name+"( reference , [ row-number ] [ , [ column-number ] [ , [ area-number ] ] ] )"
+        args:"( array , [ row-number ] [ , [ column-number ] ] ) " + this.name + "( reference , [ row-number ] [ , [ column-number ] [ , [ area-number ] ] ] )"
     };
 }
 
@@ -530,6 +540,7 @@ function cINDIRECT() {
     this.numFormat = this.formatType.def;
 
 }
+
 cINDIRECT.prototype = Object.create( cBaseFunction.prototype )
 cINDIRECT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0].tocString(), arg1 = arg[1] ? arg[1] : new cBool( true ), r = arguments[1], wb = r.worksheet.workbook, o = { Formula:"", pCurrPos:0 }, ref, found_operand;
@@ -639,6 +650,7 @@ function cLOOKUP() {
     this.numFormat = this.formatType.def;
 
 }
+
 cLOOKUP.prototype = Object.create( cBaseFunction.prototype )
 cLOOKUP.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = this.argumentsCurrent == 2 ? arg1 : arg[2],
@@ -786,65 +798,66 @@ function cMATCH() {
     };
     this.numFormat = this.formatType.def;
 }
+
 cMATCH.prototype = Object.create( cBaseFunction.prototype )
 cMATCH.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber(1);
+    var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber( 1 );
 
-    function findMatch(a0,a1,a2){
+    function findMatch( a0, a1, a2 ) {
         var a1RowCount = a1.length, a1ColumnCount = a1[0].length,
             a0Value = a0.getValue(), a2Value = a2.getValue(),
             arr = [], res = new cError( cErrorType.not_available ),
             index = -1;
 
-        if( a1RowCount > 1 && a1ColumnCount > 1 ){
+        if ( a1RowCount > 1 && a1ColumnCount > 1 ) {
             return new cError( cErrorType.not_available );
         }
-        else if( a1RowCount == 1 && a1ColumnCount > 1 ){
-            for(var i = 0; i < a1ColumnCount; i++){
+        else if ( a1RowCount == 1 && a1ColumnCount > 1 ) {
+            for ( var i = 0; i < a1ColumnCount; i++ ) {
                 arr[i] = a1[0][i].getValue();
             }
         }
-        else if( a1RowCount > 1 && a1ColumnCount == 1 ){
-            for(var i = 0; i < a1RowCount; i++){
+        else if ( a1RowCount > 1 && a1ColumnCount == 1 ) {
+            for ( var i = 0; i < a1RowCount; i++ ) {
                 arr[i] = a1[i][0].getValue();
             }
         }
         else {
-            arr[0]=a1[0][0];
+            arr[0] = a1[0][0];
         }
 
-        if( !(a2Value == 1 || a2Value == 0 || a2Value == -1) ){
+        if ( !(a2Value == 1 || a2Value == 0 || a2Value == -1) ) {
             return new cError( cErrorType.not_numeric );
         }
 
-        if( a2Value == -1 ){
-            for(var i = 0; i<arr.length; i++){
-                if( arr[i] >= a0Value ){
+        if ( a2Value == -1 ) {
+            for ( var i = 0; i < arr.length; i++ ) {
+                if ( arr[i] >= a0Value ) {
                     index = i;
                 }
                 else
                     break;
             }
         }
-        else if( a2Value == 0 ){
-            if( a0 instanceof cString ){
-                for(var i = 0; i<arr.length; i++){
-                    if( searchRegExp2(arr[i].toString(),a0Value) ){
+        else if ( a2Value == 0 ) {
+            if ( a0 instanceof cString ) {
+                for ( var i = 0; i < arr.length; i++ ) {
+                    if ( searchRegExp2( arr[i].toString(), a0Value ) ) {
                         index = i;
                     }
                 }
             }
-            else{
-                for(var i = 0; i<arr.length; i++){
-                    if( arr[i] == a0Value ){
+            else {
+                for ( var i = 0; i < arr.length; i++ ) {
+                    if ( arr[i] == a0Value ) {
                         index = i;
                     }
                 }
             }
         }
-        else if( a2Value == 1 ){
-            for(var i = 0; i<arr.length; i++){
-                if( arr[i] <= a0Value ){
+        else if ( a2Value == 1 ) {
+            for ( var i = 0; i < arr.length; i++ ) {
+                if ( arr[i] <= a0Value ) {
                     index = i;
                 }
                 else
@@ -852,41 +865,41 @@ cMATCH.prototype.Calculate = function ( arg ) {
             }
         }
 
-        if( index > -1 )
-            res = new cNumber(index+1);
+        if ( index > -1 )
+            res = new cNumber( index + 1 );
 
         return res;
 
     }
 
-    if( arg0 instanceof cArea3D || arg0 instanceof cArray || arg0 instanceof cArea ){
+    if ( arg0 instanceof cArea3D || arg0 instanceof cArray || arg0 instanceof cArea ) {
         return this.value = new cError( cErrorType.not_available );
     }
-    else if( arg0 instanceof cError ){
+    else if ( arg0 instanceof cError ) {
         return this.value = arg0;
     }
-/*    else{
+    /*    else{
 
-    }*/
+     }*/
 
-    if( !(arg1 instanceof cArray || arg1 instanceof cArea) ){
+    if ( !(arg1 instanceof cArray || arg1 instanceof cArea) ) {
         return this.value = new cError( cErrorType.not_available );
     }
     else {
         arg1 = arg1.getMatrix();
     }
 
-    if( arg2 instanceof cNumber || arg2 instanceof cBool ){
+    if ( arg2 instanceof cNumber || arg2 instanceof cBool ) {
 
     }
-    else if( arg2 instanceof cError ){
+    else if ( arg2 instanceof cError ) {
         return this.value = arg2;
     }
-    else{
+    else {
         return this.value = new cError( cErrorType.not_available );
     }
 
-    return this.value = findMatch(arg0,arg1,arg2)
+    return this.value = findMatch( arg0, arg1, arg2 )
 
 }
 cMATCH.prototype.getInfo = function () {
@@ -912,19 +925,20 @@ function cOFFSET() {
     this.numFormat = this.formatType.def;
 
 }
+
 cOFFSET.prototype = Object.create( cBaseFunction.prototype )
 /* cOFFSET.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3] ? arg[3] : new cNumber(0 ), arg4 = arg[4] ? arg[4] : new cNumber(0);
+ var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3] ? arg[3] : new cNumber(0 ), arg4 = arg[4] ? arg[4] : new cNumber(0);
 
-    if(1){}
+ if(1){}
 
-}
-cOFFSET.prototype.getInfo = function () {
-    return {
-        name:this.name,
-        args:"( reference , rows , cols [ , [ height ] [ , [ width ] ] ] )"
-    };
-} */
+ }
+ cOFFSET.prototype.getInfo = function () {
+ return {
+ name:this.name,
+ args:"( reference , rows , cols [ , [ height ] [ , [ width ] ] ] )"
+ };
+ } */
 
 function cROW() {
 //    cBaseFunction.call( this, "ROW" );
@@ -944,6 +958,7 @@ function cROW() {
     this.numFormat = this.formatType.def;
 
 }
+
 cROW.prototype = Object.create( cBaseFunction.prototype )
 cROW.prototype.Calculate = function ( arg ) {
     var arg0;
@@ -996,6 +1011,7 @@ function cROWS() {
     this.numFormat = this.formatType.def;
 
 }
+
 cROWS.prototype = Object.create( cBaseFunction.prototype )
 cROWS.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
@@ -1026,6 +1042,7 @@ cROWS.prototype.getInfo = function () {
 function cRTD() {
     cBaseFunction.call( this, "RTD" );
 }
+
 cRTD.prototype = Object.create( cBaseFunction.prototype )
 
 function cTRANSPOSE() {
@@ -1044,6 +1061,7 @@ function cTRANSPOSE() {
     this.numFormat = this.formatType.noneFormat;
 
 }
+
 cTRANSPOSE.prototype = Object.create( cBaseFunction.prototype )
 cTRANSPOSE.prototype.Calculate = function ( arg ) {
 
@@ -1053,7 +1071,7 @@ cTRANSPOSE.prototype.Calculate = function ( arg ) {
 
         for ( var i = 0; i < A.length; i++ ) {
             for ( var j = 0; j < A[i].length; j++ ) {
-                if(!tMatrix[j]) tMatrix[j] = [];
+                if ( !tMatrix[j] ) tMatrix[j] = [];
                 tMatrix[j][i] = A[i][j];
             }
         }
@@ -1067,10 +1085,10 @@ cTRANSPOSE.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cArea || arg0 instanceof cArray ) {
         arg0 = arg0.getMatrix();
     }
-    else if( arg0 instanceof cNumber || arg0 instanceof cString || arg0 instanceof cBool || arg0 instanceof cRef || arg0 instanceof cRef3D ){
+    else if ( arg0 instanceof cNumber || arg0 instanceof cString || arg0 instanceof cBool || arg0 instanceof cRef || arg0 instanceof cRef3D ) {
         return this.value = arg0.getValue();
     }
-    else if( arg0 instanceof cError ){
+    else if ( arg0 instanceof cError ) {
         return this.value = arg0;
     }
     else
@@ -1086,49 +1104,46 @@ cTRANSPOSE.prototype.getInfo = function () {
     };
 }
 
-function VHLOOKUPCache(bHor){
+function VHLOOKUPCache( bHor ) {
     this.cacheId = {};
-	this.cacheRanges = {};
-	this.bHor = bHor;
+    this.cacheRanges = {};
+    this.bHor = bHor;
 }
-VHLOOKUPCache.prototype.get = function(range, valueForSearching, isValueString, arg3Value){
+
+VHLOOKUPCache.prototype.get = function ( range, valueForSearching, isValueString, arg3Value ) {
     var res = null;
-	var _this = this;
-	var wsId = range.getWorksheet().getId();
+    var _this = this;
+    var wsId = range.getWorksheet().getId();
     var sRangeName = wsId + cCharDelimiter + range.getName();
     var cacheElem = this.cacheId[sRangeName];
-    if(null == cacheElem)
-    {
-        cacheElem = {id: sRangeName, foreachArray: [], results: {}};
-        range._foreachNoEmpty( /*func for cell in col*/ function(cell, r, c, r1, c1){
+    if ( null == cacheElem ) {
+        cacheElem = {id:sRangeName, foreachArray:[], results:{}};
+        range._foreachNoEmpty( /*func for cell in col*/ function ( cell, r, c, r1, c1 ) {
             var cv = cell.getValueWithoutFormat();
-			if(_this.bHor)
-				cacheElem.foreachArray.push({cv: cv, cvType: checkTypeCell( cv ), index: c, indexStart: c1});
-			else
-				cacheElem.foreachArray.push({cv: cv, cvType: checkTypeCell( cv ), index: r, indexStart: r1});
-        });
+            if ( _this.bHor )
+                cacheElem.foreachArray.push( {cv:cv, cvType:checkTypeCell( cv ), index:c, indexStart:c1} );
+            else
+                cacheElem.foreachArray.push( {cv:cv, cvType:checkTypeCell( cv ), index:r, indexStart:r1} );
+        } );
         this.cacheId[sRangeName] = cacheElem;
-		var cacheRange = this.cacheRanges[wsId];
-		if(null == cacheRange)
-		{
-			cacheRange = new RangeDataManager(null);
-			this.cacheRanges[wsId] = cacheRange;
-		}
-		cacheRange.add(range.getBBox0(), cacheElem);
+        var cacheRange = this.cacheRanges[wsId];
+        if ( null == cacheRange ) {
+            cacheRange = new RangeDataManager( null );
+            this.cacheRanges[wsId] = cacheRange;
+        }
+        cacheRange.add( range.getBBox0(), cacheElem );
     }
     var sInputKey = valueForSearching + cCharDelimiter + isValueString + cCharDelimiter + arg3Value;
     res = cacheElem.results[sInputKey];
-    if(null == res)
-    {
-        res = this._calculate(cacheElem.foreachArray, valueForSearching, isValueString, arg3Value);
+    if ( null == res ) {
+        res = this._calculate( cacheElem.foreachArray, valueForSearching, isValueString, arg3Value );
         cacheElem.results[sInputKey] = res;
     }
     return res;
 };
-VHLOOKUPCache.prototype._calculate = function(cacheArray, valueForSearching, isValueString, arg3Value){
-    var res = {min: undefined, index: -1}, found = false, regexp = null;
-    for(var i = 0, length = cacheArray.length; i < length; i++)
-    {
+VHLOOKUPCache.prototype._calculate = function ( cacheArray, valueForSearching, isValueString, arg3Value ) {
+    var res = {min:undefined, index:-1}, found = false, regexp = null;
+    for ( var i = 0, length = cacheArray.length; i < length; i++ ) {
         var cache = cacheArray[i];
         var cv = cache.cv;
         var index = cache.index;
@@ -1161,7 +1176,7 @@ VHLOOKUPCache.prototype._calculate = function(cacheArray, valueForSearching, isV
         }
         else {
             if ( isValueString ) {
-                if(null == regexp)
+                if ( null == regexp )
                     regexp = searchRegExp( valueForSearching );
                 if ( regexp.test( cv ) )
                     res.index = index;
@@ -1173,24 +1188,22 @@ VHLOOKUPCache.prototype._calculate = function(cacheArray, valueForSearching, isV
     }
     return res;
 };
-VHLOOKUPCache.prototype.remove = function(cell){
-	var wsId = cell.ws.getId();
-	var cacheRange = this.cacheRanges[wsId];
-	if(null != cacheRange)
-	{
-		var oGetRes = cacheRange.get(new Asc.Range(cell.oId.getCol0(), cell.oId.getRow0(), cell.oId.getCol0(), cell.oId.getRow0()));
-		for(var i = 0, length = oGetRes.all.length; i < length; ++i)
-		{
-			var elem = oGetRes.all[i];
-			elem.data.results = {};
-		}
-	}
+VHLOOKUPCache.prototype.remove = function ( cell ) {
+    var wsId = cell.ws.getId();
+    var cacheRange = this.cacheRanges[wsId];
+    if ( null != cacheRange ) {
+        var oGetRes = cacheRange.get( new Asc.Range( cell.oId.getCol0(), cell.oId.getRow0(), cell.oId.getCol0(), cell.oId.getRow0() ) );
+        for ( var i = 0, length = oGetRes.all.length; i < length; ++i ) {
+            var elem = oGetRes.all[i];
+            elem.data.results = {};
+        }
+    }
 };
-VHLOOKUPCache.prototype.clean = function(){
+VHLOOKUPCache.prototype.clean = function () {
     this.cacheId = {};
-	this.cacheRanges = {};
+    this.cacheRanges = {};
 };
-var g_oVLOOKUPCache = new VHLOOKUPCache(false);
+var g_oVLOOKUPCache = new VHLOOKUPCache( false );
 
 function cVLOOKUP() {
 //    cBaseFunction.call( this, "VLOOKUP" );
@@ -1210,6 +1223,7 @@ function cVLOOKUP() {
 //    this.setArgumentsMin( 3 );
 //    this.setArgumentsMax( 4 );
 }
+
 cVLOOKUP.prototype = Object.create( cBaseFunction.prototype )
 cVLOOKUP.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = this.argumentsCurrent == 4 ? arg[3].tocBool() : new cBool( true );
@@ -1241,10 +1255,9 @@ cVLOOKUP.prototype.Calculate = function ( arg ) {
         bb = range.getBBox0();
         if ( numberCol > bb.c2 - bb.c1 )
             return this.value = new cError( cErrorType.bad_reference );
-        var oSearchRange = ws.getRange3(bb.r1, bb.c1, bb.r2, bb.c1);
-        var oCache = g_oVLOOKUPCache.get(oSearchRange, valueForSearching, arg0 instanceof cString, arg3.value);
-        if(oCache)
-        {
+        var oSearchRange = ws.getRange3( bb.r1, bb.c1, bb.r2, bb.c1 );
+        var oCache = g_oVLOOKUPCache.get( oSearchRange, valueForSearching, arg0 instanceof cString, arg3.value );
+        if ( oCache ) {
             resR = oCache.index;
             min = oCache.min;
         }
@@ -1255,10 +1268,9 @@ cVLOOKUP.prototype.Calculate = function ( arg ) {
         if ( numberCol > bb.c2 - bb.c1 )
             return this.value = new cError( cErrorType.bad_reference );
 
-        var oSearchRange = ws.getRange3(bb.r1, bb.c1, bb.r2, bb.c1);
-        var oCache = g_oVLOOKUPCache.get(oSearchRange, valueForSearching, arg0 instanceof cString, arg3.value);
-        if(oCache)
-        {
+        var oSearchRange = ws.getRange3( bb.r1, bb.c1, bb.r2, bb.c1 );
+        var oCache = g_oVLOOKUPCache.get( oSearchRange, valueForSearching, arg0 instanceof cString, arg3.value );
+        if ( oCache ) {
             resR = oCache.index;
             min = oCache.min;
         }
@@ -1354,17 +1366,16 @@ cVLOOKUP.prototype.Calculate = function ( arg ) {
          }
          }*/
 
-        var oSearchRange = ws.getRange3(bb.r1, bb.c1, bb.r2, bb.c1);
-        var oCache = g_oVLOOKUPCache.get(oSearchRange, valueForSearching, arg0 instanceof cString, arg3.value);
-        if(oCache)
-        {
+        var oSearchRange = ws.getRange3( bb.r1, bb.c1, bb.r2, bb.c1 );
+        var oCache = g_oVLOOKUPCache.get( oSearchRange, valueForSearching, arg0 instanceof cString, arg3.value );
+        if ( oCache ) {
             resR = oCache.index;
             min = oCache.min;
         }
 
     }
     else if ( arg1 instanceof cArray ) {
-        if(arg0 instanceof cString)
+        if ( arg0 instanceof cString )
             regexp = searchRegExp( valueForSearching );
         arg1.foreach( function ( elem, r, c ) {
             if ( r == 0 )
