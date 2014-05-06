@@ -11193,7 +11193,7 @@ CDocument.prototype =
         var R = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
         var B = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Bottom();
 
-        this.DrawingDocument.Set_RulerState_Paragraph( { L : L, T : T, R : R, B : B } );
+        this.DrawingDocument.Set_RulerState_Paragraph( { L : L, T : T, R : R, B : B }, true );
     },
 
     // Обновляем линейки

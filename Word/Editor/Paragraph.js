@@ -17088,7 +17088,7 @@ Paragraph.prototype =
         else
         {
             var Frame = this.CalculatedFrame;
-            this.Parent.DrawingDocument.Set_RulerState_Paragraph( { L : Frame.L, T : Frame.T, R : Frame.L + Frame.W, B : Frame.T + Frame.H, PageIndex : Frame.PageIndex, Frame : this } );
+            this.Parent.DrawingDocument.Set_RulerState_Paragraph( { L : Frame.L, T : Frame.T, R : Frame.L + Frame.W, B : Frame.T + Frame.H, PageIndex : Frame.PageIndex, Frame : this }, false );
         }
     },
 

@@ -5875,7 +5875,7 @@ WordShape.prototype =
         var hc = (r - l)*0.5;
         var vc = (b - t)*0.5;
 
-        this.drawingDocument.Set_RulerState_Paragraph({L: xc - hc, T: yc - vc, R: xc + hc, B: yc + vc});
+        this.drawingDocument.Set_RulerState_Paragraph({L: xc - hc, T: yc - vc, R: xc + hc, B: yc + vc}, false);
         if(isRealObject(this.textBoxContent))
             this.textBoxContent.Document_UpdateRulersState(0);
     },
