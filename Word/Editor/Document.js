@@ -7346,7 +7346,24 @@ CDocument.prototype =
         var TextPr = this.Get_Paragraph_TextPr();
 
         if ( null != TextPr )
+        {
+            var theme = this.Get_Theme();
+            if(theme && theme.themeElements && theme.themeElements.fontScheme)
+            {
+                if(TextPr.FontFamily)
+                {
+                    TextPr.FontFamily.Name =  theme.themeElements.fontScheme.checkFont(TextPr.FontFamily.Name);
+                }
+                if(TextPr.RFonts)
+                {
+                    TextPr.RFonts.Ascii.Name     = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.Ascii.Name);
+                    TextPr.RFonts.EastAsia.Name  = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.EastAsia.Name);
+                    TextPr.RFonts.HAnsi.Name     = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.HAnsi.Name);
+                    TextPr.RFonts.CS.Name        = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.CS.Name);
+                }
+            }
             editor.UpdateTextPr(TextPr);
+        }
     },
 
     // Обновляем данные в интерфейсе о свойствах графики (картинки, автофигуры)

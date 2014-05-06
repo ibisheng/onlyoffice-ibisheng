@@ -288,7 +288,7 @@ BinaryCommonWriter.prototype.WriteColorTheme = function(unifill, color)
 				case 12: nFormatId = EThemeColor.themecolorLight1;break;
 				case 13: nFormatId = EThemeColor.themecolorLight2;break;
 				case 14: nFormatId = EThemeColor.themecolorNone;break;
-				case 15: nFormatId = ThemeColor.themecolorText1;break;
+				case 15: nFormatId = EThemeColor.themecolorText1;break;
 				case 16: nFormatId = EThemeColor.themecolorText2;break;
 			}
 			this.memory.WriteByte(c_oSer_ColorThemeType.Color);

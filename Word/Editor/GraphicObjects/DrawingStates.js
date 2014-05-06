@@ -30,6 +30,7 @@ StartAddNewShape.prototype =
         this.drawingObjects.arrPreTrackObjects.push(new NewShapeTrack(this.preset, x, y, this.drawingObjects.document.theme, null, null, null, pageIndex));
         this.bStart = true;
         this.drawingObjects.swapTrackObjects();
+        return true;
     },
 
     onMouseMove: function(e, x, y, pageIndex)
@@ -662,9 +663,9 @@ MoveState.prototype =
         var tr_to_start_page_x;
         var tr_to_start_page_y;
 
-        var t = CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.parent.pageIndex, this.drawingObjects.drawingDocument);
+        var t = CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage, this.drawingObjects.drawingDocument);
 
-        var startPage = this.drawingObjects.graphicPages[this.majorObject.parent.pageIndex];
+        var startPage = this.drawingObjects.graphicPages[this.majorObject.selectStartPage];
         var startPos = {x: this.startX, y: this.startY};
         var start_arr = startPage.beforeTextObjects.concat(startPage.wrappingObjects, startPage.inlineObjects, startPage.behindDocObjects);
         var min_dx = null, min_dy = null;

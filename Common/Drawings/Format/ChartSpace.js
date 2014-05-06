@@ -200,6 +200,7 @@ function CChartSpace()
     this.snapArrayX = [];
     this.snapArrayY = [];
 
+
     this.setRecalculateInfo();
 
 
@@ -216,6 +217,12 @@ CChartSpace.prototype =
 
     select: CShape.prototype.select,
 
+    getMainGroup: function()
+    {
+        if(!isRealObject(this.group))
+            return this;
+        return this.group.getMainGroup();
+    },
 
     getTypeSubType: function()
     {
@@ -3162,6 +3169,7 @@ CChartSpace.prototype =
                         }
                         case historyitem_type_LineSeries:
                         case historyitem_type_ScatterSer:
+                        case historyitem_type_SurfaceSeries:
                         {
                             if(ser.compiledSeriesMarker)
                             {
@@ -3963,6 +3971,208 @@ CChartSpace.prototype =
         }
     },
 
+
+    recalculatePenBrush: function()
+    {
+        var parents = this.getParentObjects(), RGBA = {R: 0, G: 0, B: 0, A: 255};
+        if(this.brush)
+        {
+            this.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+        }
+        if(this.pen)
+        {
+            this.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+        }
+        if(this.chart)
+        {
+            if(this.chart.title)
+            {
+                if(this.chart.title.brush)
+                {
+                    this.chart.title.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                }
+                if(this.chart.title.pen)
+                {
+                    this.chart.title.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                }
+            }
+            if(this.chart.plotArea)
+            {
+                if(this.chart.plotArea.brush)
+                {
+                    this.chart.plotArea.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                }
+                if(this.chart.plotArea.pen)
+                {
+                    this.chart.plotArea.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                }
+                if(this.chart.plotArea.valAx)
+                {
+                    if(this.chart.plotArea.valAx.compiledTickMarkLn)
+                    {
+                        this.chart.plotArea.valAx.compiledTickMarkLn.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                    }
+                    if(this.chart.plotArea.valAx.compiledMajorGridLines)
+                    {
+                        this.chart.plotArea.valAx.compiledMajorGridLines.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                    }
+                    if(this.chart.plotArea.valAx.compiledMinorGridLines)
+                    {
+                        this.chart.plotArea.valAx.compiledMajorGridLines.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                    }
+                    if(this.chart.plotArea.valAx.title)
+                    {
+
+                        if(this.chart.plotArea.valAx.title.brush)
+                        {
+                            this.chart.plotArea.valAx.title.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                        }
+                        if(this.chart.plotArea.valAx.title.pen)
+                        {
+                            this.chart.plotArea.valAx.title.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                        }
+                    }
+
+                }
+                if(this.chart.plotArea.catAx)
+                {
+                    if(this.chart.plotArea.catAx.compiledTickMarkLn)
+                    {
+                        this.chart.plotArea.catAx.compiledTickMarkLn.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                    }
+                    if(this.chart.plotArea.catAx.compiledMajorGridLines)
+                    {
+                        this.chart.plotArea.catAx.compiledMajorGridLines.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                    }
+                    if(this.chart.plotArea.catAx.compiledMinorGridLines)
+                    {
+                        this.chart.plotArea.catAx.compiledMajorGridLines.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                    }
+                    if(this.chart.plotArea.catAx.title)
+                    {
+                        if(this.chart.plotArea.catAx.title.brush)
+                        {
+                            this.chart.plotArea.catAx.title.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                        }
+                        if(this.chart.plotArea.catAx.title.pen)
+                        {
+                            this.chart.plotArea.catAx.title.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                        }
+                    }
+                }
+
+                if(this.chart.plotArea.chart)
+                {
+                    var series = this.chart.plotArea.chart.series;
+                    for(var i = 0; i < series.length; ++i)
+                    {
+                        var pts = getPtsFromSeries(series[i]);
+                        for(var j = 0; j < pts.length; ++j)
+                        {
+                            var pt = pts[j];
+                            if(pt.brush)
+                            {
+                                pt.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+
+                            }
+                            if(pt.pen)
+                            {
+                                pt.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                            }
+                            if(pt.compiledMarker)
+                            {
+                                if(pt.compiledMarker.brush)
+                                {
+                                    pt.compiledMarker.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                                }
+                                if(pt.compiledMarker.pen)
+                                {
+                                    pt.compiledMarker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                                }
+                            }
+                            if(pt.compiledDlb)
+                            {
+                                if(pt.compiledDlb.brush)
+                                {
+                                    pt.compiledDlb.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                                }
+                                if(pt.compiledDlb.pen)
+                                {
+                                    pt.compiledDlb.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                                }
+
+                            }
+                        }
+                    }
+                    if(this.chart.plotArea.chart.calculatedHiLowLines)
+                    {
+                        this.chart.plotArea.chart.calculatedHiLowLines.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                    }
+                    if( this.chart.plotArea.chart.upDownBars)
+                    {
+                        if(this.chart.plotArea.chart.upDownBars.upBarsBrush)
+                        {
+                            this.chart.plotArea.chart.upDownBars.upBarsBrush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                        }
+                        if(this.chart.plotArea.chart.upDownBars.upBarsPen)
+                        {
+                            this.chart.plotArea.chart.upDownBars.upBarsPen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                        }
+                        if(this.chart.plotArea.chart.upDownBars.downBarsBrush)
+                        {
+                            this.chart.plotArea.chart.upDownBars.downBarsBrush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                        }
+                        if(this.chart.plotArea.chart.upDownBars.downBarsPen)
+                        {
+                            this.chart.plotArea.chart.upDownBars.downBarsPen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                        }
+                    }
+                }
+            }
+            if(this.chart.legend)
+            {
+                if(this.chart.legend.brush)
+                {
+                    this.chart.legend.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                }
+                if(this.chart.legend.pen)
+                {
+                    this.chart.legend.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                }
+
+                var legend = this.chart.legend;
+                for(var i = 0; i < legend.calcEntryes.length; ++i)
+                {
+                    var union_marker = legend.calcEntryes[i].calcMarkerUnion;
+                    if(union_marker)
+                    {
+                        if(union_marker.marker)
+                        {
+                            if(union_marker.marker.pen)
+                            {
+                                union_marker.marker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                            }
+                            if(union_marker.marker.brush)
+                            {
+                                union_marker.marker.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                            }
+                        }
+                        if(union_marker.lineMarker)
+                        {
+                            if(union_marker.lineMarker.pen)
+                            {
+                                union_marker.lineMarker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                            }
+                            if(union_marker.lineMarker.brush)
+                            {
+                                union_marker.lineMarker.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
 
     getChartSizes: function()
     {

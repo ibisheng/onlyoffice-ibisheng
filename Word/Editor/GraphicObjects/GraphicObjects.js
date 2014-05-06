@@ -96,6 +96,11 @@ CGraphicObjects.prototype =
         return this.selectedObjects;
     },
 
+    getTheme: function()
+    {
+        return this.document.theme;
+    },
+
     updateCursorType: function(pageIndex, x, y, e, bTextFlag)
     {
         var ret;
@@ -2047,6 +2052,11 @@ CGraphicObjects.prototype =
         if(isRealObject(ret))
         {
             var object = g_oTableId.Get_ById(ret.objectId);
+            if(isRealObject(object))
+            {
+                if(object.group)
+                    object = object.getMainGroup();
+            }
             if(isRealObject(object) && isRealObject(object.parent))
             {
                 return ret.bMarker ?  DRAWING_ARRAY_TYPE_BEFORE : object.parent.getDrawingArrayType();
@@ -2379,7 +2389,18 @@ CGraphicObjects.prototype =
     },
 
     Refresh_RecalcData: function(data)
-    {}
+    {
+        History.RecalcData_Add({All: true});
+        for(var i = 0; i < this.drawingObjects.length; ++i)
+        {
+            if(this.drawingObjects[i].GraphicObj)
+            {
+
+                this.drawingObjects[i].GraphicObj.handleUpdateFill();
+                this.drawingObjects[i].GraphicObj.handleUpdateLn();
+            }
+        }
+    }
 };
 
 function ComparisonByZIndexSimpleParent(obj1, obj2)

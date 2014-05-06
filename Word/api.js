@@ -3809,7 +3809,10 @@ asc_docs_api.prototype.put_TextColor = function(color)
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-        this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Color :  { r : color.get_r(), g : color.get_g(), b : color.get_b(), Auto : color.get_auto() }  } ) );
+        var Unifill = new CUniFill();
+        Unifill.fill = new CSolidFill();
+        Unifill.fill.color = CorrectUniColor(color, Unifill.fill.color);
+        this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Unifill : Unifill} ) );
 
         if ( true === this.isMarkerFormat )
             this.sync_MarkerFormatCallback( false );
@@ -6121,14 +6124,14 @@ asc_docs_api.prototype.ChangeColorScheme = function(index_scheme)
         {
             History.TurnOff();
         }
-        this.chartStyleManager.init();
-        this.chartPreviewManager.init();
+        //this.chartStyleManager.init();
+        //this.chartPreviewManager.init();
         if(is_on)
         {
             History.TurnOn();
         }
         this.asc_fireCallback("asc_onUpdateChartStyles");
-        _changer.calculateAfterChangeTheme();
+        this.WordControl.m_oLogicDocument.Recalculate();
 
         // TODO:
         this.WordControl.m_oDrawingDocument.ClearCachePages();

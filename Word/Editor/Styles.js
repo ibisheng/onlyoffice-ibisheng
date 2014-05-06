@@ -6528,7 +6528,7 @@ CTextPr.prototype =
         this.CS         = false;
         this.RTL        = false;
         this.Lang.Init_Default();
-        this.Unifill    = CreateUnfilFromRGB(0,0,0);
+        this.Unifill    = undefined;//CreateUnfilFromRGB(0,0,0);
     },
 
     Set_FromObject : function(TextPr)

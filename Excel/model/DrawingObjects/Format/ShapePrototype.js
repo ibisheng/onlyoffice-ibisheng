@@ -153,10 +153,12 @@ CShape.prototype.handleUpdateFlip = function()
 CShape.prototype.handleUpdateFill = function()
 {
     this.recalcBrush();
+    this.recalcFill();
     this.addToRecalculate();
 };
 CShape.prototype.handleUpdateLn = function()
 {
+    this.recalcPen();
     this.recalcLine();
     this.addToRecalculate();
 };

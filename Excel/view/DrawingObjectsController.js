@@ -193,6 +193,10 @@ DrawingObjectsController.prototype.recalculate = function()
 
 DrawingObjectsController.prototype.updateRecalcObjects = function()
 {};
+DrawingObjectsController.prototype. getTheme = function()
+{
+    return window["Asc"]["editor"].wbModel.theme;
+};
 
 DrawingObjectsController.prototype.startRecalculate = function()
 {

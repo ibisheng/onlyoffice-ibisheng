@@ -43,6 +43,17 @@ CChartSpace.prototype.getFullFlipV = CShape.prototype.getFullFlipV;
 CChartSpace.prototype.Get_Theme = CShape.prototype.Get_Theme;
 CChartSpace.prototype.Get_ColorMap = CShape.prototype.Get_ColorMap;
 
+CChartSpace.prototype.handleUpdateFill = function()
+{
+    this.recalcInfo.recalculatePenBrush = true;
+    this.addToRecalculate();
+};
+CChartSpace.prototype.handleUpdateLn = function()
+{
+    this.recalcInfo.recalculatePenBrush = true;
+    this.addToRecalculate();
+};
+
 CChartSpace.prototype.setRecalculateInfo = function()
 {
     this.recalcInfo =
@@ -68,7 +79,8 @@ CChartSpace.prototype.setRecalculateInfo = function()
         recalculateHiLowLines: true,
         recalculateUpDownBars: true,
         recalculateLegend: true,
-        recalculateWrapPolygon: true
+        recalculateWrapPolygon: true,
+        recalculatePenBrush: true
     };
     this.baseColors = [];
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
@@ -319,16 +331,20 @@ CChartSpace.prototype.recalculate = function()
             this.recalcInfo.recalculateUpDownBars = false;
         }
 
+        var b_recalc_legend = false;
         if(this.recalcInfo.recalculateLegend)
         {
             this.recalculateLegend();
-            //this.recalcInfo.recalculateLegend = false;
+            this.recalcInfo.recalculateLegend = false;
+            b_recalc_legend = true;
         }
 
+        var b_recalc_labels = false;
         if(this.recalcInfo.recalculateAxisLabels)
         {
             this.recalculateAxisLabels();
             this.recalcInfo.recalculateAxisLabels = false;
+            b_recalc_labels = true;
         }
 
 
@@ -336,7 +352,13 @@ CChartSpace.prototype.recalculate = function()
         if(this.recalcInfo.recalculateAxisVal)
         {
             this.recalculateAxis();
-            //this.recalcInfo.recalculateAxisVal = false;
+            this.recalcInfo.recalculateAxisVal = false;
+        }
+
+        if(this.recalcInfo.recalculatePenBrush)
+        {
+            this.recalculatePenBrush();
+            this.recalcInfo.recalculatePenBrush = false;
         }
 
         if(this.recalcInfo.recalculateChart)
@@ -355,35 +377,39 @@ CChartSpace.prototype.recalculate = function()
         }
         this.recalcInfo.dataLbls.length = 0;
 
-        if(this.chart && this.chart.title)
+        if(b_recalc_labels)
         {
-            var pos = this.chartObj.reCalculatePositionText("title", this, this.chart.title);
-            this.chart.title.setPosition(pos.x, pos.y);
+            if(this.chart && this.chart.title)
+            {
+                var pos = this.chartObj.reCalculatePositionText("title", this, this.chart.title);
+                this.chart.title.setPosition(pos.x, pos.y);
+            }
+
+            if(this.chart && this.chart.plotArea && this.chart.plotArea)
+            {
+                var hor_axis = this.chart.plotArea.getHorizontalAxis();
+                if(hor_axis && hor_axis.title)
+                {
+                    var old_cat_ax = this.chart.plotArea.catAx;
+                    this.chart.plotArea.catAx = hor_axis;
+                    var pos = this.chartObj.reCalculatePositionText("catAx", this, hor_axis.title);
+                    hor_axis.title.setPosition(pos.x, pos.y);
+
+                    this.chart.plotArea.catAx = old_cat_ax;
+                }
+                var vert_axis = this.chart.plotArea.getVerticalAxis();
+                if(vert_axis && vert_axis.title)
+                {
+                    var old_val_ax = this.chart.plotArea.valAx;
+                    this.chart.plotArea.valAx = vert_axis;
+                    var pos = this.chartObj.reCalculatePositionText("valAx", this, vert_axis.title);
+                    vert_axis.title.setPosition(pos.x, pos.y);
+                    this.chart.plotArea.valAx = old_val_ax;
+                }
+            }
         }
 
-        if(this.chart && this.chart.plotArea && this.chart.plotArea)
-        {
-            var hor_axis = this.chart.plotArea.getHorizontalAxis();
-            if(hor_axis && hor_axis.title)
-            {
-                var old_cat_ax = this.chart.plotArea.catAx;
-                this.chart.plotArea.catAx = hor_axis;
-                var pos = this.chartObj.reCalculatePositionText("catAx", this, hor_axis.title);
-                hor_axis.title.setPosition(pos.x, pos.y);
-
-                this.chart.plotArea.catAx = old_cat_ax;
-            }
-            var vert_axis = this.chart.plotArea.getVerticalAxis();
-            if(vert_axis && vert_axis.title)
-            {
-                var old_val_ax = this.chart.plotArea.valAx;
-                this.chart.plotArea.valAx = vert_axis;
-                var pos = this.chartObj.reCalculatePositionText("valAx", this, vert_axis.title);
-                vert_axis.title.setPosition(pos.x, pos.y);
-                this.chart.plotArea.valAx = old_val_ax;
-            }
-        }
-        if(this.chart && this.chart.legend)
+        if(b_recalc_legend && this.chart && this.chart.legend)
         {
             var pos = this.chartObj.reCalculatePositionText("legend", this, this.chart.legend);
             this.chart.legend.setPosition(pos.x, pos.y);
@@ -399,6 +425,7 @@ CChartSpace.prototype.recalculate = function()
             this.recalculateWrapPolygon();
             this.recalcInfo.recalculateWrapPolygon = false;
         }
+
         this.recalcInfo.axisLabels.length = 0;
         this.bNeedUpdatePosition = true;
 

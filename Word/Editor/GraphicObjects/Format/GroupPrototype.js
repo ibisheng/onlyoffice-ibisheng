@@ -5,6 +5,21 @@ CGroupShape.prototype.addToRecalculate = CShape.prototype.addToRecalculate;
 CGroupShape.prototype.Get_Theme = CShape.prototype.Get_Theme;
 CGroupShape.prototype.setStartPage = CShape.prototype.setStartPage;
 
+CGroupShape.prototype.handleUpdateFill = function()
+{
+    for(var i = 0; i < this.spTree.length; ++i)
+    {
+        this.spTree[i].handleUpdateFill();
+    }
+};
+CGroupShape.prototype.handleUpdateLn = function()
+{
+    for(var i = 0; i < this.spTree.length; ++i)
+    {
+        this.spTree[i].handleUpdateLn();
+    }
+};
+
 CGroupShape.prototype.getRecalcObject = CShape.prototype.getRecalcObject;
 CGroupShape.prototype.setRecalcObject = CShape.prototype.setRecalcObject;
 CGroupShape.prototype.Get_ColorMap = CShape.prototype.Get_ColorMap;
