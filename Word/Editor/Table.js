@@ -2820,6 +2820,8 @@ CTable.prototype =
                 }
 
                 editor.WordControl.m_oLogicDocument.Recalculate();
+                
+                this.Start_TrackTable();
             }
         }
         else
@@ -2886,6 +2888,8 @@ CTable.prototype =
 
                     editor.WordControl.m_oLogicDocument.Recalculate();
                 }
+
+                this.Start_TrackTable();
             }
         }
         editor.WordControl.m_oLogicDocument.Selection_Remove();
