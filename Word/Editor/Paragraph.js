@@ -5547,7 +5547,7 @@ Paragraph.prototype =
 
             var SavedLines = Item.Save_RecalculateObject(true);
 
-            Item.Recalculate_Range( ParaPr, 1 );
+            Item.Recalculate_Range( PRS, ParaPr, 1 );
 
             if ( ( true === PRS.NewRange && Pos !== EndPos ) || ( Pos === EndPos && true !== PRS.NewRange ) )
                 return -1;
@@ -9523,7 +9523,7 @@ Paragraph.prototype =
         this.CurPos.Range = Range;
     },
 
-    Set_SelectionContentPos : function(StartContentPos, EndContentPos)
+    Set_SelectionContentPos : function(StartContentPos, EndContentPos, CorrectAnchor)
     {
         var Depth = 0;
 
@@ -9598,77 +9598,90 @@ Paragraph.prototype =
 //            if ( para_Hyperlink === this.Content[EndPos].Type && true !== this.Content[EndPos].Selection_IsEmpty(true) )
 //                this.Content[EndPos].Select_All( StartPos > EndPos ? -1 : 1 );
         }
-
-        // Дополнительная проверка. Если у нас визуально выделен весь параграф (т.е. весь текст и знак параграфа
-        // обязательно!), тогда выделяем весь параграф целиком, чтобы в селект попадали и все привязанные объекты.
-        // Но если у нас выделен параграф не целиком, тогда мы снимаем выделение с привязанных объектов, стоящих в
-        // начале параграфа.
-
-        if ( true === this.Selection_CheckParaEnd() )
+        
+        if ( false !== CorrectAnchor )
         {
-            // Эта ветка нужна для выделения плавающих объектов, стоящих в начале параграфа, когда параграф выделен весь
+            // Дополнительная проверка. Если у нас визуально выделен весь параграф (т.е. весь текст и знак параграфа
+            // обязательно!), тогда выделяем весь параграф целиком, чтобы в селект попадали и все привязанные объекты.
+            // Но если у нас выделен параграф не целиком, тогда мы снимаем выделение с привязанных объектов, стоящих в
+            // начале параграфа.
 
-            var bNeedSelectAll = true;
-            var StartPos = Math.min( this.Selection.StartPos, this.Selection.EndPos );
-            for ( var Pos = 0; Pos <= StartPos; Pos++ )
+            if ( true === this.Selection_CheckParaEnd() )
             {
-                if ( false === this.Content[Pos].Is_SelectedAll( { SkipAnchor : true } ) )
-                {
-                    bNeedSelectAll = false;
-                    break;
-                }
-            }
+                // Эта ветка нужна для выделения плавающих объектов, стоящих в начале параграфа, когда параграф выделен весь
 
-            if ( true === bNeedSelectAll )
-            {
-                if ( 1 === Direction )
-                    this.Selection.StartPos = 0;
-                else
-                    this.Selection.EndPos   = 0;
-
+                var bNeedSelectAll = true;
+                var StartPos = Math.min( this.Selection.StartPos, this.Selection.EndPos );
                 for ( var Pos = 0; Pos <= StartPos; Pos++ )
                 {
-                    this.Content[Pos].Select_All( Direction );
-                }
-            }
-        }
-        else if ( true !== this.Selection_IsEmpty(true) )
-        {
-            // Эта ветка нужна для снятие выделения с плавающих объектов, стоящих в начале параграфа, когда параграф
-            // выделен не весь. Заметим, что это ветка имеет смысл, только при direction = 1, поэтому выделен весь
-            // параграф или нет, проверяется попаданием para_End в селект. Кроме того, ничего не делаем с селектом,
-            // если он пустой.
-
-            var bNeedCorrectLeftPos = true;
-            var _StartPos = Math.min( StartPos, EndPos );
-            var _EndPos   = Math.max( StartPos, EndPos );
-            for ( var Pos = 0; Pos < StartPos; Pos++ )
-            {
-                if ( true !== this.Content[Pos].Is_Empty( { SkipAnchor : true } ) )
-                {
-                    bNeedCorrectLeftPos = false;
-                    break;
-                }
-            }
-
-            if ( true === bNeedCorrectLeftPos )
-            {
-                for ( var Pos = _StartPos; Pos <= EndPos; Pos++ )
-                {
-                    if ( true === this.Content[Pos].Selection_CorrectLeftPos(Direction) )
+                    if ( false === this.Content[Pos].Is_SelectedAll( { SkipAnchor : true } ) )
                     {
-                        if ( 1 === Direction )
-                            this.Selection.StartPos = Pos + 1;
-                        else
-                            this.Selection.EndPos   = Pos + 1;
-
-                        this.Content[Pos].Selection_Remove();
-                    }
-                    else
+                        bNeedSelectAll = false;
                         break;
+                    }
+                }
+
+                if ( true === bNeedSelectAll )
+                {
+                    if ( 1 === Direction )
+                        this.Selection.StartPos = 0;
+                    else
+                        this.Selection.EndPos   = 0;
+
+                    for ( var Pos = 0; Pos <= StartPos; Pos++ )
+                    {
+                        this.Content[Pos].Select_All( Direction );
+                    }
                 }
             }
+            else if ( true !== this.Selection_IsEmpty(true) )
+            {
+                // Эта ветка нужна для снятие выделения с плавающих объектов, стоящих в начале параграфа, когда параграф
+                // выделен не весь. Заметим, что это ветка имеет смысл, только при direction = 1, поэтому выделен весь
+                // параграф или нет, проверяется попаданием para_End в селект. Кроме того, ничего не делаем с селектом,
+                // если он пустой.
 
+                var bNeedCorrectLeftPos = true;
+                var _StartPos = Math.min( StartPos, EndPos );
+                var _EndPos   = Math.max( StartPos, EndPos );
+                for ( var Pos = 0; Pos < StartPos; Pos++ )
+                {
+                    if ( true !== this.Content[Pos].Is_Empty( { SkipAnchor : true } ) )
+                    {
+                        bNeedCorrectLeftPos = false;
+                        break;
+                    }
+                }
+
+                if ( true === bNeedCorrectLeftPos )
+                {
+                    for ( var Pos = _StartPos; Pos <= EndPos; Pos++ )
+                    {
+                        if ( true === this.Content[Pos].Selection_CorrectLeftPos(Direction) )
+                        {
+                            if ( 1 === Direction )
+                            {
+                                if ( Pos + 1 > this.Selection.EndPos )
+                                    break;
+
+                                this.Selection.StartPos = Pos + 1;
+                            }
+                            else
+                            {
+                                if ( Pos + 1 > this.Selection.StartPos )
+                                    break;
+
+                                this.Selection.EndPos   = Pos + 1;
+                            }
+
+                            this.Content[Pos].Selection_Remove();
+                        }
+                        else
+                            break;
+                    }
+                }
+
+            }
         }
     },
 
@@ -14521,11 +14534,11 @@ Paragraph.prototype =
 
         if ( true === StartSelection )
         {
-            this.Set_SelectionContentPos( ContentPos, this.Get_ParaContentPos( true, false ) );
+            this.Set_SelectionContentPos( ContentPos, this.Get_ParaContentPos( true, false ), false );
         }
         else
         {
-            this.Set_SelectionContentPos( this.Get_ParaContentPos( true, true ), ContentPos );
+            this.Set_SelectionContentPos( this.Get_ParaContentPos( true, true ), ContentPos, false );
         }
     },
 
