@@ -1153,7 +1153,7 @@ CDocument.prototype =
                     }
 
                     var TempRecalcResult = Element.Recalculate_Page( PageIndex );
-                    this.RecalcInfo.Set_FlowObject( Element, 0, Element.Recalculate_Page( PageIndex ) );
+                    this.RecalcInfo.Set_FlowObject( Element, 0, TempRecalcResult );
 
                     var FlowTable = new CFlowTable( Element, PageIndex );
                     this.DrawingObjects.addFloatTable( FlowTable );

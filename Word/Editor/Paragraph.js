@@ -151,6 +151,9 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
     }
 
     this.m_oPRSW = new CParagraphRecalculateStateWrap();
+    this.m_oPRSC = new CParagraphRecalculateStateCounter();
+    this.m_oPRSA = new CParagraphRecalculateStateAlign();
+    this.m_oPRSI = new CParagraphRecalculateStateInfo();
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -4543,7 +4546,7 @@ Paragraph.prototype =
         var StartLine = this.Pages[CurPage].StartLine;
         var EndLine   = this.Pages[CurPage].EndLine;
 
-        var PRSC = g_oPRSC;
+        var PRSC = this.m_oPRSC;
 
         for ( var CurLine = StartLine; CurLine <= EndLine; CurLine++ )
         {
@@ -4599,7 +4602,7 @@ Paragraph.prototype =
         var EndLine   = this.Pages[CurPage].EndLine;
         var LinesCount = this.Lines.length;
 
-        var PRSA = g_oPRSA;
+        var PRSA = this.m_oPRSA;
         PRSA.Paragraph  = this;
         PRSA.LastW      = 0;
         PRSA.RecalcFast = Fast;
@@ -4741,7 +4744,7 @@ Paragraph.prototype =
     {
         var PrevInfo = ( 0 === CurPage ? this.Parent.Get_PrevElementEndInfo( this ) : this.Pages[CurPage - 1].EndInfo.Copy() );
 
-        var PRSI = g_oPRSI;
+        var PRSI = this.m_oPRSI;
 
         PRSI.Reset( PrevInfo );
 
@@ -5564,7 +5567,7 @@ Paragraph.prototype =
         }
 
         // Recalculate_Lines_Width
-        var PRSC = g_oPRSC;
+        var PRSC = this.m_oPRSC;
 
         var StartPos = Range.StartPos;
         var EndPos   = Range.EndPos;
@@ -22248,9 +22251,9 @@ CParagraphRecalculateStateInfo.prototype =
 
 
 //var g_oPRSW = new CParagraphRecalculateStateWrap();
-var g_oPRSC = new CParagraphRecalculateStateCounter();
-var g_oPRSA = new CParagraphRecalculateStateAlign();
-var g_oPRSI = new CParagraphRecalculateStateInfo();
+//var g_oPRSC = new CParagraphRecalculateStateCounter();
+//var g_oPRSA = new CParagraphRecalculateStateAlign();
+//var g_oPRSI = new CParagraphRecalculateStateInfo();
 
 function CParagraphDrawStateHightlights()
 {
