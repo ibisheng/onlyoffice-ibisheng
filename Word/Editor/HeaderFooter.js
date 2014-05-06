@@ -1507,7 +1507,7 @@ CHeaderFooterController.prototype =
         var Header = this.Pages[PageIndex].Header;
         var Footer = this.Pages[PageIndex].Footer;
 
-        if ( true === bHeader && HdrFtr === Header || HdrFtr === Footer )
+        if ( HdrFtr === Header || HdrFtr === Footer )
             return true;
 
         return false;
