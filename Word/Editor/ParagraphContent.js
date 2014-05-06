@@ -549,6 +549,11 @@ ParaTextPr.prototype =
 
         if ( undefined != TextPr.Lang )
             this.Set_Lang( TextPr.Lang );
+
+        if(undefined != TextPr.Unifill)
+        {
+            this.Set_Unifill(TextPr.Unifill.createDuplicate());
+        }
     },
 
     Clear_Style : function()
@@ -960,6 +965,16 @@ ParaTextPr.prototype =
 
         History.Add( this, { Type : historyitem_TextPr_Lang_Val, New : Value, Old : OldValue } );
     },
+
+
+    Set_Unifill : function(Value)
+    {
+        if ( undefined != Value )
+            this.Value.Unifill = Value;
+        else
+            this.Value.Unifill = undefined;
+        History.Add(this, {Type: historyitem_TextPr_Unifill, New: Value, Old: this.Value.Unifill});
+    },
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
@@ -1225,6 +1240,15 @@ ParaTextPr.prototype =
                 else
                     this.Value.Lang.Val = undefined;
 
+                break;
+            }
+
+            case historyitem_TextPr_Unifill:
+            {
+                if ( undefined != Data.Old )
+                    this.Value.Unifill = Data.Old;
+                else
+                    this.Value.Unifill = undefined;
                 break;
             }
         }
@@ -1502,6 +1526,15 @@ ParaTextPr.prototype =
 
                 break;
             }
+            case historyitem_TextPr_Unifill:
+            {
+                if ( undefined != Data.New )
+                    this.Value.Unifill = Data.New;
+                else
+                    this.Value.Unifill = undefined;
+
+                break;
+            }
         }
     },
 
@@ -1628,6 +1661,7 @@ ParaTextPr.prototype =
             }
 
             case historyitem_TextPr_Color:
+            case historyitem_TextPr_Unifill:
             {
                 // Bool     : IsUndefined
                 // Variable : Color (CDocumentColor)
@@ -1956,6 +1990,19 @@ ParaTextPr.prototype =
                 else
                     this.Value.Color = undefined;
 
+                break;
+            }
+
+            case historyitem_TextPr_Unifill:
+            {
+                if ( true != Reader.GetBool() )
+                {
+                    var unifill = new CUniFill();
+                    unifill.Read_FromBinary(r);
+                    this.Value.Unifill = unifill;
+                }
+                else
+                    this.Value.Unifill = undefined;
                 break;
             }
 

@@ -7174,11 +7174,19 @@ Paragraph.prototype =
                                     X_start = X - NumberingItem.WidthNum / 2;
 
                                 NumTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
-                                var RGBA = NumTextPr.Unifill.getRGBAColor();
-                                if ( true === NumTextPr.Color.Auto )
-                                    pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
-                                else
+                                var RGBA ;
+                                if(NumTextPr.Unifill)
+                                {
+                                    RGBA = NumTextPr.Unifill.getRGBAColor();
                                     pGraphics.b_color1(RGBA.R, RGBA.G, RGBA.B, 255 );
+                                }
+                                else
+                                {
+                                    if ( true === NumTextPr.Color.Auto )
+                                        pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+                                    else
+                                        pGraphics.b_color1(NumTextPr.Color.r, NumTextPr.Color.g, NumTextPr.Color.b, 255 );
+                                }
 
                                 // Рисуется только сам символ нумерации
                                 switch ( NumJc )
@@ -7230,10 +7238,17 @@ Paragraph.prototype =
 
                                 if ( true === NumTextPr.Strikeout || true === NumTextPr.Underline )
                                 {
-                                    if ( true === NumTextPr.Color.Auto )
-                                        pGraphics.p_color( AutoColor.r, AutoColor.g, AutoColor.b, 255);
-                                    else
+                                    if(NumTextPr.Unifill)
+                                    {
                                         pGraphics.p_color( RGBA.R, RGBA.G, RGBA.B, 255 );
+                                    }
+                                    else
+                                    {
+                                        if ( true === NumTextPr.Color.Auto )
+                                            pGraphics.p_color( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+                                        else
+                                            pGraphics.p_color( NumTextPr.Color.r, NumTextPr.Color.g, NumTextPr.Color.b, 255 );
+                                    }
                                 }
 
                                 if ( true === NumTextPr.Strikeout )

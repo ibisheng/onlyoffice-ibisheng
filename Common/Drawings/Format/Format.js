@@ -4126,7 +4126,7 @@ CUniFill.prototype =
     {
         writeDouble(w, this.transparent);
         if(this.fill)
-            this.fill.Write_ToBinary();
+            this.fill.Write_ToBinary(w);
     },
 
     Read_FromBinary: function(r)

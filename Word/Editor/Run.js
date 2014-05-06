@@ -656,31 +656,37 @@ ParaRun.prototype =
                     Para.DrawingDocument.SetTargetSize( Height );
 
 
-
-                    CurTextPr.Unifill.check(Para.Get_Theme(), Para.Get_ColorMap());
-                    var RGBA = CurTextPr.Unifill.getRGBAColor();
-
-                    if ( true === CurTextPr.Color.Auto )
+                    var RGBA;
+                    if(CurTextPr.Unifill)
                     {
-                        // Выясним какая заливка у нашего текста
-                        var Pr = Para.Get_CompiledPr();
-                        var BgColor = undefined;
-                        if ( undefined !== Pr.ParaPr.Shd && shd_Nil !== Pr.ParaPr.Shd.Value )
-                        {
-                            BgColor = Pr.ParaPr.Shd.Color;
-                        }
-                        else
-                        {
-                            // Нам надо выяснить заливку у родительского класса (возможно мы находимся в ячейке таблицы с забивкой)
-                            BgColor = Para.Parent.Get_TextBackGroundColor();
-                        }
-
-                        // Определим автоцвет относительно заливки
-                        var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
-                        Para.DrawingDocument.SetTargetColor( AutoColor.r, AutoColor.g, AutoColor.b );
+                        CurTextPr.Unifill.check(Para.Get_Theme(), Para.Get_ColorMap());
+                        RGBA = CurTextPr.Unifill.getRGBAColor();
+                        Para.DrawingDocument.SetTargetColor( RGBA.R, RGBA.G, RGBA.B );
                     }
                     else
-                        Para.DrawingDocument.SetTargetColor( RGBA.R, RGBA.G, RGBA.B );
+                    {
+                        if ( true === CurTextPr.Color.Auto )
+                        {
+                            // Выясним какая заливка у нашего текста
+                            var Pr = Para.Get_CompiledPr();
+                            var BgColor = undefined;
+                            if ( undefined !== Pr.ParaPr.Shd && shd_Nil !== Pr.ParaPr.Shd.Value )
+                            {
+                                BgColor = Pr.ParaPr.Shd.Color;
+                            }
+                            else
+                            {
+                                // Нам надо выяснить заливку у родительского класса (возможно мы находимся в ячейке таблицы с забивкой)
+                                BgColor = Para.Parent.Get_TextBackGroundColor();
+                            }
+
+                            // Определим автоцвет относительно заливки
+                            var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
+                            Para.DrawingDocument.SetTargetColor( AutoColor.r, AutoColor.g, AutoColor.b );
+                        }
+                        else
+                            Para.DrawingDocument.SetTargetColor( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b );
+                    }
 
                     var TargetY = Y - Ascender - CurTextPr.Position;
                     switch( CurTextPr.VertAlign )
@@ -2925,16 +2931,29 @@ ParaRun.prototype =
         var CurTextPr = this.Get_CompiledPr( false );
         pGraphics.SetTextPr( CurTextPr, Theme );
 
-        CurTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
-        var RGBA = CurTextPr.Unifill.getRGBAColor();
+        var RGBA;
+        if(CurTextPr.Unifill)
+        {
+            CurTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
+            RGBA = CurTextPr.Unifill.getRGBAColor();
 
-        if ( true === PDSE.VisitedHyperlink )
-            pGraphics.b_color1( 128, 0, 151, 255 );
-        else if ( true === CurTextPr.Color.Auto )
-            pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+            if ( true === PDSE.VisitedHyperlink )
+                pGraphics.b_color1( 128, 0, 151, 255 );
+            else
+            {
+                pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, RGBA.A);
+            }
+        }
         else
         {
-            pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, RGBA.A);
+            if ( true === PDSE.VisitedHyperlink )
+                pGraphics.b_color1( 128, 0, 151, 255 );
+            else if ( true === CurTextPr.Color.Auto )
+                pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+            else
+            {
+                pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+            }
         }
 
         for ( var Pos = StartPos; Pos < EndPos; Pos++ )
@@ -2980,15 +2999,23 @@ ParaRun.prototype =
                     {
                         pGraphics.SetTextPr( CurTextPr, Theme );
 
-                        if ( true === CurTextPr.Color.Auto )
-                        {
-                            pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
-                            pGraphics.p_color( AutoColor.r, AutoColor.g, AutoColor.b, 255);
-                        }
-                        else
+                        if(RGBA)
                         {
                             pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, 255);
                             pGraphics.p_color( RGBA.R, RGBA.G, RGBA.B, 255);
+                        }
+                        else
+                        {
+                            if ( true === CurTextPr.Color.Auto )
+                            {
+                                pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+                                pGraphics.p_color( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+                            }
+                            else
+                            {
+                                pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+                                pGraphics.p_color(  CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+                            }
                         }
                     }
 
@@ -3012,14 +3039,20 @@ ParaRun.prototype =
                         var EndTextPr = Para.Get_CompiledPr2(false).TextPr.Copy();
                         EndTextPr.Merge(Para.TextPr.Value);
 
-                        EndTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
-                        var RGBAEnd = EndTextPr.Unifill.getRGBAColor();
-                        pGraphics.SetTextPr(EndTextPr, PDSE.Theme);
-
-                        if (true === EndTextPr.Color.Auto)
-                            pGraphics.b_color1(AutoColor.r, AutoColor.g, AutoColor.b, 255);
+                        if(EndTextPr.Unifill)
+                        {
+                            EndTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
+                            var RGBAEnd = EndTextPr.Unifill.getRGBAColor();
+                            pGraphics.SetTextPr(EndTextPr, PDSE.Theme);
+                        }
                         else
-                            pGraphics.b_color1(RGBAEnd.R, RGBAEnd.G, RGBAEnd.B, 255);
+                        {
+                            pGraphics.SetTextPr(EndTextPr, PDSE.Theme);
+                            if (true === EndTextPr.Color.Auto)
+                                pGraphics.b_color1(AutoColor.r, AutoColor.g, AutoColor.b, 255);
+                            else
+                                pGraphics.b_color1(EndTextPr.Color.r, EndTextPr.Color.g, EndTextPr.Color.b, 255);
+                        }
 
                         bEnd = true;
                         var bEndCell = false;
@@ -4356,6 +4389,9 @@ ParaRun.prototype =
         if ( undefined !== TextPr.Color )
             this.Set_Color( null === TextPr.Color ? undefined : TextPr.Color );
 
+        if ( undefined !== TextPr.Unifill )
+            this.Set_Unifill( null === TextPr.Unifill ? undefined : TextPr.Unifill );
+
         if ( undefined != TextPr.VertAlign )
             this.Set_VertAlign( null === TextPr.VertAlign ? undefined : TextPr.VertAlign );
 
@@ -4489,6 +4525,20 @@ ParaRun.prototype =
             this.Recalc_CompiledPr( false );
         }
     },
+
+    Set_Unifill : function(Value)
+    {
+        if ( ( undefined === Value && undefined !== this.Pr.Unifill ) || ( Value instanceof CUniFill && ( undefined === this.Pr.Unifill || false === CompareUnifillBool(this.Pr.Unifill, Value) ) ) )
+        {
+            var OldValue = this.Pr.Unifill;
+            this.Pr.Unifill = Value;
+
+            History.Add( this, { Type : historyitem_ParaRun_Unifill, New : Value, Old : OldValue } );
+
+            this.Recalc_CompiledPr( false );
+        }
+    },
+
 
     Get_Color : function()
     {
@@ -4911,6 +4961,16 @@ ParaRun.prototype =
 
                 break;
             }
+            case historyitem_ParaRun_Unifill:
+            {
+                if ( undefined != Data.Old )
+                    this.Pr.Unifill = Data.Old;
+                else
+                    this.Pr.Unifill = undefined;
+
+                this.Recalc_CompiledPr(false);
+                break;
+            }
 
             case historyitem_ParaRun_VertAlign:
             {
@@ -5244,6 +5304,16 @@ ParaRun.prototype =
 
                 this.Recalc_CompiledPr(false);
 
+                break;
+            }
+            case historyitem_ParaRun_Unifill:
+            {
+                if ( undefined != Data.New )
+                    this.Pr.Unifill = Data.New;
+                else
+                    this.Pr.Unifill = undefined;
+
+                this.Recalc_CompiledPr(false);
                 break;
             }
 
@@ -5592,6 +5662,19 @@ ParaRun.prototype =
                 // Bool     : IsUndefined
                 // Variable : Color (CDocumentColor)
 
+                if ( undefined != Data.New )
+                {
+                    Writer.WriteBool(false);
+                    Data.New.Write_ToBinary( Writer );
+                }
+                else
+                    Writer.WriteBool(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_Unifill:
+            {
                 if ( undefined != Data.New )
                 {
                     Writer.WriteBool(false);
@@ -5957,6 +6040,24 @@ ParaRun.prototype =
                 }
                 else
                     this.Pr.Color = undefined;
+
+                this.Recalc_CompiledPr(false);
+
+                break;
+            }
+
+
+            case historyitem_ParaRun_Unifill:
+            {
+
+                if ( true != Reader.GetBool() )
+                {
+                    var unifill = new CUniFill();
+                    unifill.Read_FromBinary(Reader);
+                    this.Pr.Unifill = unifill;
+                }
+                else
+                    this.Pr.Unifill = undefined;
 
                 this.Recalc_CompiledPr(false);
 

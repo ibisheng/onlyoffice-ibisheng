@@ -879,6 +879,7 @@ var historyitem_ParaRun_Lang_Bidi       = 26; // �������� ��
 var historyitem_ParaRun_Lang_EastAsia   = 27; // �������� ��������� �����
 var historyitem_ParaRun_Lang_Val        = 28; // �������� ��������� �����
 var historyitem_ParaRun_TextPr          = 29; // �������� ��� ��������� �������
+var historyitem_ParaRun_Unifill         = 30; // �������� ��� ��������� �������
 
 // Типы изменений в классе ParaTextPr
 var historyitem_TextPr_Change     =  1; // Изменяем настройку
@@ -908,6 +909,7 @@ var historyitem_TextPr_RFonts_Hint     = 24; // Изменяем настрой�
 var historyitem_TextPr_Lang_Bidi       = 25; // Изменяем настройку языка
 var historyitem_TextPr_Lang_EastAsia   = 26; // Изменяем настройку языка
 var historyitem_TextPr_Lang_Val        = 27; // Изменяем настройку языка
+var historyitem_TextPr_Unifill         = 28; // Изменяем настройку языка
 
 // Типы изменений в классе ParaDrawing
 var historyitem_Drawing_Size              = 1; // Изменяем размер картинки
