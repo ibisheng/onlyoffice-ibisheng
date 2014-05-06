@@ -5758,7 +5758,7 @@ CBubbleChart.prototype =
         this.Id = r.GetString2();
     },
 
-    setAxId: function(pr)
+    addAxId: function(pr)
     {
         History.Add(this, {Type:historyitem_BubbleChart_AddAxId, newPr: pr});
         this.axId.push(pr);
