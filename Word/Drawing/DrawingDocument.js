@@ -4046,7 +4046,7 @@ function CDrawingDocument()
         }
     }
 
-    this.Set_RulerState_Paragraph = function(margins)
+    this.Set_RulerState_Paragraph = function(margins, isCanTrackMargins)
     {
         if (margins && margins.Frame !== undefined)
         {
@@ -4146,8 +4146,16 @@ function CDrawingDocument()
                 ver_ruler.CreateBackground(cachedPage);
 
                 // disable margins
-                hor_ruler.IsCanMoveMargins = false;
-                ver_ruler.IsCanMoveMargins = false;
+                if (true !== isCanTrackMargins)
+                {
+                    hor_ruler.IsCanMoveMargins = false;
+                    ver_ruler.IsCanMoveMargins = false;
+                }
+                else
+                {
+                    hor_ruler.IsCanMoveMargins = true;
+                    ver_ruler.IsCanMoveMargins = true;
+                }
 
                 this.LastParagraphMargins = {};
                 this.LastParagraphMargins.L = margins.L;

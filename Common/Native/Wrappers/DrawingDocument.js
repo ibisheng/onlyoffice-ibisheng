@@ -760,7 +760,7 @@ CDrawingDocument.prototype =
         this.Native["DD_Set_RulerState_Table"](_array_params1, markup.Cols, _array_params_margins, _array_params_rows);
     },
 
-    Set_RulerState_Paragraph : function(margins)
+    Set_RulerState_Paragraph : function(margins, isCanTrackMargins)
     {
         if (margins && margins.Frame !== undefined)
         {
