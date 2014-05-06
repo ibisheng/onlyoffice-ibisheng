@@ -403,7 +403,7 @@ CChartsDrawer.prototype =
 		var pxToMM = this.calcProp.pxToMM;
 		
 		//valAx
-		if(chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.labels)
+		if(chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.labels && this.calcProp.widthCanvas != undefined)
 		{
 			var valAx = chartSpace.chart.plotArea.valAx;
 			if(isHBar)
@@ -419,7 +419,7 @@ CChartsDrawer.prototype =
 					calculateRight = this.calcProp.widthCanvas / pxToMM - valAx.xPoints[0].pos;
 				}
 			}
-			else
+			else if(this.calcProp.heightCanvas != undefined)
 			{
 				if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
 				{
@@ -441,7 +441,7 @@ CChartsDrawer.prototype =
 			var catAx = chartSpace.chart.plotArea.catAx;
 			var curBetween = 0, diffPoints = 0;
 			
-			if(this.calcProp.type == "Scatter")
+			if(this.calcProp.type == "Scatter" && this.calcProp.widthCanvas != undefined)
 			{
 				if(catAx.scaling.orientation == ORIENTATION_MIN_MAX)
 				{
@@ -454,9 +454,9 @@ CChartsDrawer.prototype =
 					calculateRight = this.calcProp.widthCanvas / pxToMM - catAx.xPoints[0].pos;
 				};
 			}
-			else if(isHBar)
+			else if(isHBar && !isNaN(valAx.posY) && this.calcProp.heightCanvas != undefined)
 			{
-				diffPoints = catAx.yPoints[1] ? Math.abs(catAx.yPoints[1].pos - catAx.yPoints[0].pos) : Math.abs(catAx.yPoints[0].pos - valAx.posY);
+				diffPoints = catAx.yPoints[1] ? Math.abs(catAx.yPoints[1].pos - catAx.yPoints[0].pos) : Math.abs(catAx.yPoints[0].pos - valAx.posY) * 2;
 				
 				if(catAx.scaling.orientation == ORIENTATION_MIN_MAX)
 				{
@@ -475,9 +475,9 @@ CChartsDrawer.prototype =
 					calculateBottom = this.calcProp.heightCanvas / pxToMM - (catAx.yPoints[catAx.yPoints.length - 1].pos + curBetween);
 				};
 			}
-			else
+			else if(valAx && !isNaN(valAx.posX) && this.calcProp.widthCanvas != undefined)
 			{
-				diffPoints = catAx.xPoints[1] ? Math.abs(catAx.xPoints[1].pos - catAx.xPoints[0].pos) : Math.abs(catAx.xPoints[0].pos - valAx.posX);
+				diffPoints = catAx.xPoints[1] ? Math.abs(catAx.xPoints[1].pos - catAx.xPoints[0].pos) : Math.abs(catAx.xPoints[0].pos - valAx.posX) * 2;
 				
 				if(catAx.scaling.orientation == ORIENTATION_MIN_MAX)
 				{
@@ -547,7 +547,7 @@ CChartsDrawer.prototype =
 		var catAx = chartSpace.chart.plotArea.catAx;
 		
 
-		if(isHBar === 'HBar' && catAx && valAx && catAx.yPoints && valAx.xPoints)
+		if(isHBar === 'HBar' && catAx && valAx && catAx.yPoints && valAx.xPoints && valAx.labels)
 		{
 			if(catAx.yPoints.length > 1)
 			{
@@ -2675,7 +2675,18 @@ CChartsDrawer.prototype =
 			firstStep = step;
 			step = step * firstDegree.numPow;
 		};
-		arrayValues = this._getArrayDataValues(step, axisMin, axisMax, manualMin, manualMax);
+		
+		if(isNaN(step))
+		{
+			if('HBar' == this.calcProp.type && this.calcProp.subType == 'stackedPer')
+				arrayValues = [0, 0.2, 0.4, 0.6, 0.8, 1];
+			else if(this.calcProp.subType == 'stackedPer')
+				arrayValues = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1];
+			else
+				arrayValues = [0, 0.2, 0.4, 0.6, 0.8, 1, 1.2];
+		}
+		else
+			arrayValues = this._getArrayDataValues(step, axisMin, axisMax, manualMin, manualMax);
 		
 		//проверка на переход в другой диапазон из-за ограничения по высоте
 		/*if(!isOx)
@@ -7553,7 +7564,8 @@ catAxisChart.prototype =
 		//сдвиг, если положение оси - между делениями
 		var firstDiff = 0, posYtemp;
 		if(this.chartSpace.chart.plotArea.valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
-			firstDiff = Math.abs(yPoints[1].pos - yPoints[0].pos);
+			firstDiff = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[0].pos - this.chartSpace.chart.plotArea.valAx.posY) * 2;
+			
 		
 		if(orientation == ORIENTATION_MIN_MAX)
 		{
@@ -7638,7 +7650,7 @@ catAxisChart.prototype =
 		var orientation = this.chartSpace && this.chartSpace.chart.plotArea.catAx ? this.chartSpace.chart.plotArea.catAx.scaling.orientation : ORIENTATION_MIN_MAX;
 		var xPoints = this.chartSpace.chart.plotArea.catAx.xPoints;
 				
-		var stepX = xPoints[1] ? Math.abs(xPoints[1].pos - xPoints[0].pos) : Math.abs(xPoints[0].pos - this.chartProp.chartGutter._bottom / this.chartProp.pxToMM);
+		var stepX = xPoints[1] ? Math.abs(xPoints[1].pos - xPoints[0].pos) : Math.abs(xPoints[0].pos - this.chartSpace.chart.plotArea.catAx.posX) * 2;
 		var minorStep = stepX / this.chartProp.numvMinorlines;
 		
 		var posY = this.chartSpace.chart.plotArea.catAx.posY ? this.chartSpace.chart.plotArea.catAx.posY : this.chartSpace.chart.plotArea.catAx.yPos;
@@ -7650,8 +7662,8 @@ catAxisChart.prototype =
 		{
 			if(xPoints[1])
 				firstDiff = Math.abs(xPoints[1].pos - xPoints[0].pos);
-			else if(this.chartSpace.chart.plotArea.catAx.posY)
-				firstDiff = Math.abs(this.chartSpace.chart.plotArea.catAx.posY - xPoints[0].pos);
+			else if(this.chartSpace.chart.plotArea.valAx.posX)
+				firstDiff = Math.abs(this.chartSpace.chart.plotArea.valAx.posX - xPoints[0].pos) * 2;
 		};
 			
 		
