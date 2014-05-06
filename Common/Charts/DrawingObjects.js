@@ -3152,6 +3152,7 @@ function DrawingObjects() {
     };
 
     _this.resizeCanvas = function() {
+		_this.drawingArea.init();
 
         for (var i = 0; i < drawingCtx.fmgrGraphics.length; i++) {
             drawingCtx.fmgrGraphics[i].ClearRasterMemory();
