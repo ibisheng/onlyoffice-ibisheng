@@ -85,7 +85,7 @@ function XYAdjustmentTrack(originalShape, adjIndex)
 
     this.draw = function(overlay)
     {
-        if(isRealNumber(this.originalShape.selectStartPage))
+        if(isRealNumber(this.originalShape.selectStartPage) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.originalShape.selectStartPage);
         }
@@ -268,7 +268,7 @@ function PolarAdjustmentTrack(originalShape, adjIndex)
 
     this.draw = function(overlay)
     {
-        if(this.originalShape.parent && isRealNumber(this.originalShape.selectStartPage))
+        if(this.originalShape.parent && isRealNumber(this.originalShape.selectStartPage) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.originalShape.selectStartPage);
         }

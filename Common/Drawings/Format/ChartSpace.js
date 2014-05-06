@@ -197,6 +197,8 @@ function CChartSpace()
 
 
     this.bDeleted = true;
+    this.snapArrayX = [];
+    this.snapArrayY = [];
 
     this.setRecalculateInfo();
 

@@ -25,6 +25,8 @@ function CImageShape()
 
     this.selected = false;
 
+    this.snapArrayX = [];
+    this.snapArrayY = [];
 
     this.setRecalculateInfo();
     this.Lock = new CLock();

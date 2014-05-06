@@ -195,32 +195,7 @@ CPosition.prototype.put_X = function(v) { this.X = v; }
 CPosition.prototype.get_Y = function() { return this.Y; }
 CPosition.prototype.put_Y = function(v) { this.Y = v; }
 
-function CPaddings( obj )
-{
-	if ( obj )
-	{
-		this.Left = (undefined == obj.Left) ? null : obj.Left;
-		this.Top = (undefined == obj.Top) ? null : obj.Top;
-		this.Bottom = (undefined == obj.Bottom) ? null : obj.Bottom;
-		this.Right = (undefined == obj.Right) ? null : obj.Right;
-	}
-	else
-	{
-		this.Left = null;
-		this.Top = null;
-		this.Bottom = null;
-		this.Right = null;
-	}
-}
 
-CPaddings.prototype.get_Left = function() { return this.Left; }
-CPaddings.prototype.put_Left = function(v) { this.Left = v; }
-CPaddings.prototype.get_Top = function() { return this.Top; }
-CPaddings.prototype.put_Top = function(v) { this.Top = v; }
-CPaddings.prototype.get_Bottom = function() { return this.Bottom; }
-CPaddings.prototype.put_Bottom = function(v) { this.Bottom = v; }
-CPaddings.prototype.get_Right = function() { return this.Right; }
-CPaddings.prototype.put_Right = function(v) { this.Right = v; }
 
 function CImageSize( width, height, isCorrect )
 {

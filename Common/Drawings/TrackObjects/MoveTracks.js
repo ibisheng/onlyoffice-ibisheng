@@ -72,7 +72,7 @@ function MoveShapeImageTrack(originalObject)
 
     this.draw = function(overlay)
     {
-        if(isRealNumber(this.pageIndex))
+        if(isRealNumber(this.pageIndex) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.pageIndex);
         }
@@ -170,7 +170,7 @@ function MoveShapeImageTrackInGroup(originalObject)
     this.inv.ty = 0;
     this.draw = function(overlay)
     {
-        if(isRealNumber(this.pageIndex))
+        if(isRealNumber(this.pageIndex) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.pageIndex);
         }
@@ -281,7 +281,7 @@ function MoveGroupTrack(originalObject)
 
     this.draw = function(overlay)
     {
-        if(isRealNumber(this.pageIndex))
+        if(isRealNumber(this.pageIndex) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.pageIndex);
         }

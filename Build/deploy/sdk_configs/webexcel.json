@@ -32,6 +32,7 @@
                 "../../Common/FontsFreeType/FontFile.js",
                 "../../Common/FontsFreeType/FontManager.js",
                 "../../Word/Drawing/HatchPattern.js",
+                "../../Word/Drawing/WorkEvents.js",
                 "../../Word/Drawing/Externals.js",
                 "../../Word/Drawing/Metafile.js",
                 "../../Excel/model/DrawingObjects/GlobalLoaders.js",
@@ -95,6 +96,7 @@
 
                 "../../Common/Drawings/Hit.js",
                 "../../Common/Drawings/States.js",
+                "../../Common/Drawings/DrawingObjectsHandlers.js",
                 "../../Common/Drawings/TrackObjects/AdjustmentTracks.js",
                 "../../Common/Drawings/TrackObjects/ResizeTracks.js",
                 "../../Common/Drawings/TrackObjects/RotateTracks.js",

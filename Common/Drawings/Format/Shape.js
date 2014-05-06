@@ -159,6 +159,9 @@ function CShape()
     this.selected = false;
 
 
+    this.snapArrayX = [];
+    this.snapArrayY = [];
+
     this.localTransform = new CMatrix();
     this.localTransformText = new CMatrix();
 
@@ -353,6 +356,7 @@ CShape.prototype =
         var tx_body = new CTextBody();
         tx_body.setParent(this);
         tx_body.setContent(new CDocumentContent(tx_body, this.getDrawingDocument(), 0, 0, 0, 20000, false, false));
+        tx_body.setBodyPr(new CBodyPr());
         tx_body.content.Content[0].Set_DocumentIndex(0);
         this.setTxBody(tx_body);
     },
@@ -2605,10 +2609,10 @@ CShape.prototype =
         var drawing_document = this.getDrawingDocument();
         if(drawing_document)
         {
-            drawing_document.UpdateTargetTransform(this.transformText);
             var content = this.getDocContent();
             if(content)
             {
+                drawing_document.UpdateTargetTransform(this.transformText);
                 if ( true === content.Is_SelectionUse() )
                 {
                     // Выделение нумерации
@@ -2655,7 +2659,7 @@ CShape.prototype =
             }
             else
             {
-                drawing_document.UpdateTargetTransform(null);
+                drawing_document.UpdateTargetTransform(new CMatrix());
                 drawing_document.TargetEnd();
                 drawing_document.SelectEnabled(false);
                 drawing_document.SelectClear();

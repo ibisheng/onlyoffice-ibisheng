@@ -5120,7 +5120,7 @@ function DrawingObjects() {
             var obj = aObjects[i];
             if ( obj.graphicObject.Id == id ) {
                 if ( obj.isChart() ) {
-                    if ( _this.controller.curState.id == STATES_ID_CHART_TEXT_ADD )
+                    if ( _this.controller.selection.chartSelection && _this.controller.selection.chartSelection.textSelection)
                         return c_oAscSelectionType.RangeChartText;
                     return c_oAscSelectionType.RangeChart;
                 }
@@ -5129,7 +5129,7 @@ function DrawingObjects() {
                     return c_oAscSelectionType.RangeImage;
 
                 if ( obj.graphicObject.isShape() || obj.graphicObject.isGroup() ) {
-                    if ( _this.controller.curState.id == STATES_ID_TEXT_ADD )
+                    if ( _this.controller.selection.textSelection )
                         return c_oAscSelectionType.RangeShapeText;
                     return c_oAscSelectionType.RangeShape;
                 }

@@ -3931,7 +3931,7 @@ CStyles.prototype =
         }
 
         // Рассчитываем стиль
-        this.Internal_Get_Pr( Pr, StyleId, Type, ( null === TableStyle ? true : false ) );
+        this.Internal_Get_Pr( Pr, StyleId, Type, ( null === TableStyle && null == ShapeStyle  ? true : false ) );
 
         if ( styletype_Table === Type )
         {
@@ -4545,6 +4545,7 @@ function CDocumentShd()
 {
     this.Value = shd_Nil;
     this.Color = new CDocumentColor(255, 255, 255);
+    this.Unifill = undefined;
 };
 
 CDocumentShd.prototype =
@@ -4554,6 +4555,10 @@ CDocumentShd.prototype =
         var Shd = new CDocumentShd();
         Shd.Value = this.Value;
         Shd.Color.Set( this.Color.r, this.Color.g, this.Color.b );
+        if(this.Unifill)
+        {
+            Shd.Unifill = this.Unifill.createDuplicate();
+        }
         return Shd;
     },
 
@@ -4567,7 +4572,9 @@ CDocumentShd.prototype =
                     return true;
 
                 case shd_Clear:
-                    return this.Color.Compare( Shd.Color );
+                {
+                    return this.Color.Compare( Shd.Color ) && CompareUnifillBool(this.Unifill, Shd.Unifill);
+                }
             }
         }
 
@@ -4577,8 +4584,15 @@ CDocumentShd.prototype =
     Set_FromObject : function(Shd)
     {
         this.Value = Shd.Value;
-        if ( shd_Nil != Shd.Value && undefined != Shd.Color )
-            this.Color.Set( Shd.Color.r, Shd.Color.g, Shd.Color.b );
+        if ( shd_Nil != Shd.Value )
+        {
+            if( undefined != Shd.Color )
+                this.Color.Set( Shd.Color.r, Shd.Color.g, Shd.Color.b );
+            if(undefined != Shd.Unifill)
+            {
+                this.Unifill = Shd.Unifill.createDuplicate();
+            }
+        }
         else if ( undefined === Shd.Color )
             this.Color = undefined;
     },
@@ -4592,7 +4606,18 @@ CDocumentShd.prototype =
 
         Writer.WriteByte( this.Value );
         if ( shd_Clear === this.Value )
+        {
             this.Color.Write_ToBinary(Writer);
+            if(this.Unifill)
+            {
+                Writer.WriteBool(true);
+                this.Unifill.Write_ToBinary(Writer);
+            }
+            else
+            {
+                Writer.WriteBool(false);
+            }
+        }
     },
 
     Read_FromBinary : function(Reader)
@@ -4605,7 +4630,14 @@ CDocumentShd.prototype =
         this.Value = Reader.GetByte();
 
         if ( shd_Clear === this.Value )
+        {
             this.Color.Read_FromBinary(Reader);
+            if(Reader.GetBool())
+            {
+                this.Unifill = new CUniFill();
+                this.Unifill.Read_FromBinary(Reader);
+            }
+        }
         else
             this.Color.Set(0, 0, 0);
     }
@@ -4614,6 +4646,7 @@ CDocumentShd.prototype =
 function CDocumentBorder()
 {
     this.Color = new CDocumentColor( 0, 0, 0 );
+    this.Unifill = undefined;
     this.Space = 0;
     this.Size  = 0.5 * g_dKoef_pt_to_mm;
     this.Value = border_None;
@@ -4629,6 +4662,11 @@ CDocumentBorder.prototype =
             Border.Color = undefined;
         else
             Border.Color.Set(this.Color.r, this.Color.g, this.Color.b);
+
+        if(undefined === this.Unifill)
+            Border.Unifill = undefined;
+        else
+            Border.Unifill = this.Unifill.createDuplicate();
 
         if ( undefined === this.Space )
             Border.Space = undefined;
@@ -4653,6 +4691,9 @@ CDocumentBorder.prototype =
         if ( false === this.Color.Compare(Border.Color) )
             return false;
 
+        if(CompareUnifillBool(this.Unifill, Border.Unifill) === false)
+            return false;
+
         if ( Math.abs( this.Size - Border.Size ) > 0.001 )
             return false;
 
@@ -4675,11 +4716,16 @@ CDocumentBorder.prototype =
             this.Color = new CDocumentColor( Border.Color.r, Border.Color.g, Border.Color.b );
         else
             this.Color = undefined;
+
+        if(undefined != Border.Unifill)
+        {
+            this.Unifill = Border.Unifill.createDuplicate();
+        }
     },
 
     Check_Null : function()
     {
-        if ( undefined === this.Space || undefined === this.Size || undefined === this.Value || undefined === this.Color )
+        if ( undefined === this.Space || undefined === this.Size || undefined === this.Value || undefined === this.Color || undefined === this.Unifill)
             return false;
 
         return true;
@@ -4696,6 +4742,15 @@ CDocumentBorder.prototype =
         Writer.WriteLong( this.Space );
         Writer.WriteByte( this.Value );
         this.Color.Write_ToBinary( Writer );
+        if(this.Unifill)
+        {
+            Writer.WriteBool(true);
+            this.Unifill.Write_ToBinary(Writer);
+        }
+        else
+        {
+            Writer.WriteBool(false);
+        }
     },
 
     Read_FromBinary : function(Reader)
@@ -4709,6 +4764,11 @@ CDocumentBorder.prototype =
         this.Space = Reader.GetLong();
         this.Value = Reader.GetByte();
         this.Color.Read_FromBinary( Reader );
+        if(Reader.GetBool())
+        {
+            this.Unifill = new CUniFill();
+            this.Unifill.Read_FromBinary(Reader);
+        }
     }
 }
 

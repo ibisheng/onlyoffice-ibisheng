@@ -642,7 +642,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
 
         this.draw = function(overlay)
         {
-            if(isRealNumber(this.originalObject.selectStartPage))
+            if(isRealNumber(this.originalObject.selectStartPage) && overlay.SetCurrentPage)
             {
                 overlay.SetCurrentPage(this.originalObject.selectStartPage);
             }
@@ -1321,7 +1321,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
 
         this.draw = function(graphics)
         {
-            if( isRealNumber(this.originalObject.selectStartPage))
+            if( isRealNumber(this.originalObject.selectStartPage) && graphics.SetCurrentPage)
             {
                 graphics.SetCurrentPage(this.originalObject.selectStartPage);
             }

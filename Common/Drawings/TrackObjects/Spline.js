@@ -80,7 +80,7 @@ function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
     };
     this.draw = function(g)
     {
-        if(isRealNumber(this.pageIndex))
+        if(isRealNumber(this.pageIndex) && g.SetCurrentPage)
         {
             g.SetCurrentPage(this.pageIndex);
         }
@@ -162,7 +162,7 @@ function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
         return {x: min_x, y: min_y};
     };
 
-    this.getShape =  function(bWord, drawingDocument)
+    this.getShape =  function(bWord, drawingDocument, drawingObjects)
     {
         var xMax = this.path[0].x, yMax = this.path[0].y, xMin = xMax, yMin = yMax;
         var i;
@@ -244,7 +244,11 @@ function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
         yMin = min_y;
         yMax = max_y;
         var shape = new CShape();
-
+        if(drawingObjects)
+        {
+            shape.setDrawingObjects(drawingObjects);
+            shape.addToDrawingObjects();
+        }
         shape.setSpPr(new CSpPr());
         shape.spPr.setParent(shape);
         shape.spPr.setXfrm(new CXfrm());

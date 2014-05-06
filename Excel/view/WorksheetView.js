@@ -5526,7 +5526,7 @@
 			}
 
 			var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
-			if (asc["editor"].isStartAddShape && CheckIdSatetShapeAdd(this.objectRender.controller.curState.id))
+            if (asc["editor"].isStartAddShape && CheckIdSatetShapeAdd(this.objectRender.controller.curState))
 				return {cursor: kCurFillHandle, target: "shape", col: -1, row: -1};
 
 			if (drawingInfo && drawingInfo.id) {

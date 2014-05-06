@@ -604,6 +604,9 @@ CHistory.prototype =
             }
         }
     },
+
+    Set_Additional_ExtendDocumentToPos: function()
+    {},
 	
 	Create_NewPoint : function()
     {
@@ -639,7 +642,7 @@ CHistory.prototype =
 		
         var Item;
 		
-		if(!Class.Read_FromBinary2)
+		if(!Class.Save_Changes)
 		{
 			Item =
 			{

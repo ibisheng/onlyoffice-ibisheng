@@ -309,16 +309,20 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
 
     this.draw = function(overlay)
     {
-        if(isRealNumber(this.pageIndex))
+        if(isRealNumber(this.pageIndex) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.pageIndex);
         }
         this.overlayObject.draw(overlay);
     };
 
-    this.getShape = function(bFromWord, DrawingDocument)
+    this.getShape = function(bFromWord, DrawingDocument, drawingObjects)
     {
         var shape = new CShape();
+        if(drawingObjects)
+        {
+            shape.setDrawingObjects(drawingObjects);
+        }
         shape.setSpPr(new CSpPr());
         shape.spPr.setParent(shape);
         shape.spPr.setXfrm(new CXfrm());
@@ -376,7 +380,8 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
             else
             {
                 shape.setTxBody(new CTextBody());
-                var content = new CDocumentContent(shape, DrawingDocument, 0, 0, 0, 0, false, false, true);
+                var content = new CDocumentContent(shape.txBody, DrawingDocument, 0, 0, 0, 0, false, false, true);
+                shape.txBody.setParent(shape);
                 shape.txBody.setContent(content);
                 shape.txBody.setBodyPr(new CBodyPr());
                 shape.txBody.bodyPr.setDefault();

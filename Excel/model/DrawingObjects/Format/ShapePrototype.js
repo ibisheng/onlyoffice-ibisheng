@@ -276,6 +276,60 @@ CShape.prototype.recalculateContent = function()
             w = this.extX - (l_ins + r_ins);
             h = this.extY - (t_ins + b_ins);
         }
+
+        if(this.txBody)
+        {
+            if(!body_pr.upright)
+            {
+                if(!(body_pr.vert === nVertTTvert || body_pr.vert === nVertTTvert270))
+                {
+                    this.txBody.contentWidth = w;
+                    this.txBody.contentHeight = h;
+                }
+                else
+                {
+                    this.txBody.contentWidth = h;
+                    this.txBody.contentHeight = w;
+                }
+
+            }
+            else
+            {
+                var _full_rotate = this.getFullRotate();
+                if((_full_rotate >= 0 && _full_rotate < Math.PI*0.25)
+                    || (_full_rotate > 3*Math.PI*0.25 && _full_rotate < 5*Math.PI*0.25)
+                    || (_full_rotate > 7*Math.PI*0.25 && _full_rotate < 2*Math.PI))
+                {
+                    if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
+                    {
+
+                        this.txBody.contentWidth = w;
+                        this.txBody.contentHeight = h;
+                    }
+                    else
+                    {
+                        this.txBody.contentWidth = h;
+                        this.txBody.contentHeight = w;
+                    }
+                }
+                else
+                {
+                    if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
+                    {
+
+                        this.txBody.contentWidth = h;
+                        this.txBody.contentHeight = w;
+                    }
+                    else
+                    {
+                        this.txBody.contentWidth = w;
+                        this.txBody.contentHeight = h;
+                    }
+                }
+            }
+        }
+
+
         content.Set_StartPage(0);
         content.Reset(0, 0, w, h);
         content.Recalculate_Page(content.StartPage, true);

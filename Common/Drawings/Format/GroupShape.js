@@ -37,6 +37,8 @@ function CGroupShape(parent)
         textSelection: null
     };
 
+    this.snapArrayX = [];
+    this.snapArrayY = [];
 
     this.setRecalculateInfo();
     this.Lock = new CLock();

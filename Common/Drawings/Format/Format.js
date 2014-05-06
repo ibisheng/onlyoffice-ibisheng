@@ -1174,7 +1174,7 @@ CSysColor.prototype =
         this.id = id;
     },
 
-    Save_Change: function(data, w)
+    Save_Changes: function(data, w)
     {
         w.WriteLong(this.getObjectType());
         w.WriteLong(data.Type);
@@ -12473,8 +12473,12 @@ function GenerateDefaultTheme(presentation)
     {
         var theme = new CTheme();
         theme.presentation = presentation;
-        theme.themeElements.fontScheme.majorFont.latin = "Arial";
-        theme.themeElements.fontScheme.minorFont.latin = "Arial";
+        theme.setFontScheme(new FontScheme());
+        theme.themeElements.fontScheme.setMajorFont(new FontCollection(theme.themeElements.fontScheme));
+        theme.themeElements.fontScheme.setMinorFont(new FontCollection(theme.themeElements.fontScheme));
+        theme.themeElements.fontScheme.majorFont.setLatin("Arial");
+        theme.themeElements.fontScheme.minorFont.setLatin("Arial");
+
 
         var scheme = theme.themeElements.clrScheme;
 

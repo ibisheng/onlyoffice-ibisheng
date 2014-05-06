@@ -1,3 +1,15 @@
+function CheckCoordsNeedPage(x, y, pageIndex, needPageIndex, drawingDocument)
+{
+    if(pageIndex === needPageIndex)
+        return {x:x, y:y};
+    else
+    {
+        var  t = drawingDocument.ConvertCoordsToAnotherPage(x,y, pageIndex, needPageIndex);
+        return {x: t.X, y: t.Y};
+    }
+}
+
+
 function handleSelectedObjects(drawingObjectsController, e, x, y, group, pageIndex, bWord)
 {
     var selected_objects = group ? group.selectedObjects : drawingObjectsController.getSelectedObjects();

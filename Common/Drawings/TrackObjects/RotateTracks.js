@@ -103,7 +103,7 @@ function RotateTrackShapeImage(originalObject)
     this.signum = !full_flip_h && !full_flip_v || full_flip_h && full_flip_v ? 1 : -1;
     this.draw = function(overlay)
     {
-        if(isRealNumber(this.originalObject.selectStartPage))
+        if(isRealNumber(this.originalObject.selectStartPage) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.originalObject.selectStartPage);
         }
@@ -216,7 +216,7 @@ function RotateTrackGroup(originalObject)
 
     this.draw = function(overlay)
     {
-        if(isRealNumber(this.originalObject.selectStartPage))
+        if(isRealNumber(this.originalObject.selectStartPage) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.originalObject.selectStartPage);
         }

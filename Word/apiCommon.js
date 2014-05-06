@@ -158,7 +158,7 @@ function CorrectUniColor(asc_color, unicolor)
             {
                 ret.color = new CPrstColor();
             }
-            ret.color.id = asc_color.get_value();
+            ret.color.id = asc_color.value;
 
             if (ret.Mods.Mods.length != 0)
                 ret.Mods.Mods.splice(0, ret.Mods.Mods.length);
@@ -172,7 +172,7 @@ function CorrectUniColor(asc_color, unicolor)
             }
 
             // тут выставляется ТОЛЬКО из меню. поэтому:
-            var _index = parseInt(asc_color.get_value());
+            var _index = parseInt(asc_color.value);
             var _id = (_index / 6) >> 0;
             var _pos = _index - _id * 6;
 
@@ -223,10 +223,10 @@ function CorrectUniColor(asc_color, unicolor)
             {
                 ret.color = new CRGBColor();
             }
-            ret.color.RGBA.R = asc_color.get_r();
-            ret.color.RGBA.G = asc_color.get_g();
-            ret.color.RGBA.B = asc_color.get_b();
-            ret.color.RGBA.A = asc_color.get_a();
+            ret.color.RGBA.R = asc_color.r;
+            ret.color.RGBA.G = asc_color.g;
+            ret.color.RGBA.B = asc_color.b;
+            ret.color.RGBA.A = asc_color.a;
 
             if (ret.Mods && ret.Mods.Mods.length != 0)
                 ret.Mods.Mods.splice(0, ret.Mods.Mods.length);
@@ -390,8 +390,8 @@ function CorrectUniFill(asc_fill, unifill)
     if (null == ret)
         ret = new CUniFill();
 
-    var _fill = asc_fill.get_fill();
-    var _type = asc_fill.get_type();
+    var _fill = asc_fill.fill;
+    var _type = asc_fill.type;
 
     if (null != _type)
     {
@@ -409,8 +409,8 @@ function CorrectUniFill(asc_fill, unifill)
                     ret.fill = new CBlipFill();
                 }
 
-                var _url = _fill.get_url();
-                var _tx_id = _fill.get_texture_id();
+                var _url = _fill.url;
+                var _tx_id = _fill.texture_id;
                 if (null != _tx_id && (0 <= _tx_id) && (_tx_id < g_oUserTexturePresets.length))
                 {
                     _url = g_oUserTexturePresets[_tx_id];
@@ -422,7 +422,7 @@ function CorrectUniFill(asc_fill, unifill)
                 if (ret.fill.RasterImageId == null)
                     ret.fill.RasterImageId = "";
 
-                var tile = _fill.get_type();
+                var tile = _fill.type;
                 if (tile == c_oAscFillBlipType.STRETCH)
                     ret.fill.tile = null;
                 else if (tile == c_oAscFillBlipType.TILE)
@@ -443,11 +443,11 @@ function CorrectUniFill(asc_fill, unifill)
                 }
                 if (undefined != _fill.fgClr)
                 {
-                    ret.fill.fgClr = CorrectUniColor(_fill.get_color_fg(), ret.fill.fgClr);
+                    ret.fill.fgClr = CorrectUniColor(_fill.fgClr, ret.fill.fgClr);
                 }
                 if (undefined != _fill.bgClr)
                 {
-                    ret.fill.bgClr = CorrectUniColor(_fill.get_color_bg(), ret.fill.bgClr);
+                    ret.fill.bgClr = CorrectUniColor(_fill.bgClr, ret.fill.bgClr);
                 }
 
                 break;
@@ -459,8 +459,8 @@ function CorrectUniFill(asc_fill, unifill)
                     ret.fill = new CGradFill();
                 }
 
-                var _colors     = _fill.get_colors();
-                var _positions  = _fill.get_positions();
+                var _colors     = _fill.Colors;
+                var _positions  = _fill.Positions;
                 if (undefined != _colors && undefined != _positions)
                 {
                     if (_colors.length == _positions.length)
@@ -498,12 +498,12 @@ function CorrectUniFill(asc_fill, unifill)
                     }
                 }
 
-                var _grad_type = _fill.get_grad_type();
+                var _grad_type = _fill.GradType;
 
                 if (c_oAscFillGradType.GRAD_LINEAR == _grad_type)
                 {
-                    var _angle = _fill.get_linear_angle();
-                    var _scale = _fill.get_linear_scale();
+                    var _angle = _fill.LinearAngle;
+                    var _scale = _fill.LinearScale;
 
                     if (!ret.fill.lin)
                         ret.fill.lin = new GradLin();
@@ -526,12 +526,12 @@ function CorrectUniFill(asc_fill, unifill)
                 {
                     ret.fill = new CSolidFill();
                 }
-                ret.fill.color = CorrectUniColor(_fill.get_color(), ret.fill.color);
+                ret.fill.color = CorrectUniColor(_fill.color, ret.fill.color);
             }
         }
     }
 
-    var _alpha = asc_fill.get_transparent();
+    var _alpha = asc_fill.transparent;
     if (null != _alpha)
         ret.transparent = _alpha;
 
@@ -697,13 +697,13 @@ function CorrectUniStroke(asc_stroke, unistroke)
     if (null == ret)
         ret = new CLn();
 
-    var _type = asc_stroke.get_type();
-    var _w = asc_stroke.get_width();
+    var _type = asc_stroke.type;
+    var _w = asc_stroke.width;
 
     if (_w != null && _w !== undefined)
         ret.w = _w * 36000.0;
 
-    var _color = asc_stroke.get_color();
+    var _color = asc_stroke.color;
     if (_type == c_oAscStrokeType.STROKE_NONE)
     {
         ret.Fill = new CUniFill();
@@ -720,20 +720,20 @@ function CorrectUniStroke(asc_stroke, unistroke)
         }
     }
 
-    var _join = asc_stroke.get_linejoin();
+    var _join = asc_stroke.LineJoin;
     if (null != _join)
     {
         ret.LineJoin = new LineJoin();
         ret.LineJoin.type = _join;
     }
 
-    var _cap = asc_stroke.get_linecap();
+    var _cap = asc_stroke.LineCap;
     if (null != _cap)
     {
         ret.cap = _cap;
     }
 
-    var _begin_style = asc_stroke.get_linebeginstyle();
+    var _begin_style = asc_stroke.LineBeginStyle;
     if (null != _begin_style)
     {
         if (ret.headEnd == null)
@@ -742,7 +742,7 @@ function CorrectUniStroke(asc_stroke, unistroke)
         ret.headEnd.type = _begin_style;
     }
 
-    var _end_style = asc_stroke.get_lineendstyle();
+    var _end_style = asc_stroke.LineEndStyle;
     if (null != _end_style)
     {
         if (ret.tailEnd == null)
@@ -751,7 +751,7 @@ function CorrectUniStroke(asc_stroke, unistroke)
         ret.tailEnd.type = _end_style;
     }
 
-    var _begin_size = asc_stroke.get_linebeginsize();
+    var _begin_size = asc_stroke.LineBeginSize;
     if (null != _begin_size)
     {
         if (ret.headEnd == null)
@@ -761,7 +761,7 @@ function CorrectUniStroke(asc_stroke, unistroke)
         ret.headEnd.len = 2 - (_begin_size % 3);
     }
 
-    var _end_size = asc_stroke.get_lineendsize();
+    var _end_size = asc_stroke.LineEndSize;
     if (null != _end_size)
     {
         if (ret.tailEnd == null)
@@ -905,6 +905,33 @@ CAscTableStyle.prototype.get_Id = function(){ return this.Id; }
 CAscTableStyle.prototype.get_Image = function(){ return this.Image; }
 CAscTableStyle.prototype.get_Type = function(){ return this.Type; }
 
+
+function CPaddings( obj )
+{
+    if ( obj )
+    {
+        this.Left = (undefined == obj.Left) ? null : obj.Left;
+        this.Top = (undefined == obj.Top) ? null : obj.Top;
+        this.Bottom = (undefined == obj.Bottom) ? null : obj.Bottom;
+        this.Right = (undefined == obj.Right) ? null : obj.Right;
+    }
+    else
+    {
+        this.Left = null;
+        this.Top = null;
+        this.Bottom = null;
+        this.Right = null;
+    }
+}
+
+CPaddings.prototype.get_Left = function() { return this.Left; }
+CPaddings.prototype.put_Left = function(v) { this.Left = v; }
+CPaddings.prototype.get_Top = function() { return this.Top; }
+CPaddings.prototype.put_Top = function(v) { this.Top = v; }
+CPaddings.prototype.get_Bottom = function() { return this.Bottom; }
+CPaddings.prototype.put_Bottom = function(v) { this.Bottom = v; }
+CPaddings.prototype.get_Right = function() { return this.Right; }
+CPaddings.prototype.put_Right = function(v) { this.Right = v; }
 
 // ---------------------------------------------------------------
 function GenerateTableStyles(drawingDoc, logicDoc, tableLook)
