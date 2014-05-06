@@ -37,7 +37,6 @@ function convertFormula(formula, ws) {
 }
 
 function getFullImageSrc(src) {
-    var start = src.substring(0, 6);
     if ( 0 != src.indexOf("http:") && 0 != src.indexOf("data:") && 0 != src.indexOf("https:") && 0 != src.indexOf("ftp:") && 0 != src.indexOf("file:") ) {
         var api = window["Asc"]["editor"];
         if ( 0 == src.indexOf(g_sResourceServiceLocalUrl + api.documentId) )
@@ -65,7 +64,7 @@ function roundPlus(x, n) { //x - число, n - количество знако
 //-----------------------------------------------------------------------------------
 // Chart style
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CChartStyle() {
     this.style = null;
     this.imageUrl = null;
@@ -77,7 +76,7 @@ asc_CChartStyle.prototype = {
 
     asc_getImageUrl: function() { return this.imageUrl; },
     asc_setImageUrl: function(imageUrl) { this.imageUrl = imageUrl; }
-}
+};
 
 //{ asc_CChartStyle export
 window["Asc"].asc_CChartStyle = asc_CChartStyle;
@@ -94,7 +93,7 @@ prot["asc_setImageUrl"] = prot.asc_setImageUrl;
 //-----------------------------------------------------------------------------------
 // Chart translate
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CChartTranslate() {
 
     this.title = "Diagram Title";
@@ -116,7 +115,7 @@ asc_CChartTranslate.prototype = {
 
     asc_getSeries: function() { return this.series; },
     asc_setSeries: function(val) { this.series = val; }
-}
+};
 
 //{ asc_CChartTranslate export
 window["Asc"].asc_CChartTranslate = asc_CChartTranslate;
@@ -139,7 +138,7 @@ prot["asc_setSeries"] = prot.asc_setSeries;
 //-----------------------------------------------------------------------------------
 // Chart
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CChart(object) {
 
     var bCopy = isObject(object);
@@ -674,7 +673,7 @@ asc_CChart.prototype = {
     getLegendInfo: function() {
 
         var aInfo = [];
-        function legendInfo() { return { text: null, color: null, marker: null } };
+        function legendInfo() { return { text: null, color: null, marker: null } }
 
         for ( var i = 0; i < this.series.length; i++ ) {
 
@@ -1118,7 +1117,7 @@ asc_CChart.prototype = {
         if ( ws )
             ws.objectRender.rebuildChartGraphicObjects();
     }
-}
+};
 
 //{ asc_CChart export
 window["Asc"].asc_CChart = asc_CChart;
@@ -1166,7 +1165,7 @@ prot["asc_removeSeries"] = prot.asc_removeSeries;
 //-----------------------------------------------------------------------------------
 // Chart binary
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CChartBinary(chart) {
 
     this["binary"] = null;
@@ -1186,14 +1185,13 @@ asc_CChartBinary.prototype = {
     {
         var binary = this["binary"];
         var stream = CreateBinaryReader(this["binary"], 0, this["binary"].length);
-        var chartReader = new  BinaryChartReader(stream);
         var oNewChartSpace = new CChartSpace();
         var oBinaryChartReader = new BinaryChartReader(stream);
         oBinaryChartReader.ExternalReadCT_ChartSpace(stream.size , oNewChartSpace, workSheet);
         return oNewChartSpace;
     }
 
-}
+};
 
 //{ asc_CChartBinary export
 window["Asc"].asc_CChartBinary = asc_CChartBinary;
@@ -1207,7 +1205,7 @@ prot["asc_setBinary"] = prot.asc_setBinary;
 //-----------------------------------------------------------------------------------
 // Chart range
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CChartRange(object) {
 
     var bCopy = isObject(object);
@@ -1238,7 +1236,7 @@ asc_CChartRange.prototype = {
         this.rows = !value;
         this.columns = value;
     }
-}
+};
 
 //{ asc_CChartRange export
 window["Asc"].asc_CChartRange = asc_CChartRange;
@@ -1258,7 +1256,7 @@ prot["asc_setColumnsFlag"] = prot.asc_setColumnsFlag;
 //-----------------------------------------------------------------------------------
 // Chart title
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CChartHeader(object) {
 
     var bCopy = isObject(object);
@@ -1282,7 +1280,7 @@ asc_CChartHeader.prototype = {
 
     asc_getDefaultTitleFlag: function() { return this.bDefaultTitle; },
     asc_setDefaultTitleFlag: function(defaultTitleFlag) { this.bDefaultTitle = defaultTitleFlag; }
-}
+};
 
 //{ asc_CChartHeader export
 window["Asc"].asc_CChartHeader = asc_CChartHeader;
@@ -1302,7 +1300,7 @@ prot["asc_setDefaultTitleFlag"] = prot.asc_setDefaultTitleFlag;
 //-----------------------------------------------------------------------------------
 // Chart axis X
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CChartAxisX(object) {
 
     var bCopy = isObject(object);
@@ -1330,7 +1328,7 @@ asc_CChartAxisX.prototype = {
 
     asc_getGridFlag: function() { return this.bGrid; },
     asc_setGridFlag: function(gridFlag) { this.bGrid = gridFlag; }
-}
+};
 
 //{ asc_CChartAxisX export
 window["Asc"].asc_CChartAxisX = asc_CChartAxisX;
@@ -1353,7 +1351,7 @@ prot["asc_setGridFlag"] = prot.asc_setGridFlag;
 //-----------------------------------------------------------------------------------
 // Chart axis Y
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CChartAxisY(object) {
 
     var bCopy = isObject(object);
@@ -1381,7 +1379,7 @@ asc_CChartAxisY.prototype = {
 
     asc_getGridFlag: function() { return this.bGrid; },
     asc_setGridFlag: function(gridFlag) { this.bGrid = gridFlag; }
-}
+};
 
 //{ asc_CChartAxisY export
 window["Asc"].asc_CChartAxisY = asc_CChartAxisY;
@@ -1404,7 +1402,7 @@ prot["asc_setGridFlag"] = prot.asc_setGridFlag;
 //-----------------------------------------------------------------------------------
 // Chart legend
 //-----------------------------------------------------------------------------------	
-
+/** @constructor */
 function asc_CChartLegend(object) {
 
     var bCopy = isObject(object);
@@ -1428,7 +1426,7 @@ asc_CChartLegend.prototype = {
 
     asc_getOverlayFlag: function() { return this.bOverlay; },
     asc_setOverlayFlag: function(overlayFlag) { this.bOverlay = overlayFlag; }
-}
+};
 
 //{ asc_CChartLegend export
 window["Asc"].asc_CChartLegend = asc_CChartLegend;
@@ -1448,7 +1446,7 @@ prot["asc_setOverlayFlag"] = prot.asc_setOverlayFlag;
 //-----------------------------------------------------------------------------------
 // Chart font
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CChartFont(object) {
 
     var bCopy = isObject(object);
@@ -1522,7 +1520,7 @@ asc_CChartFont.prototype = {
             case this.Properties.underline: this.underline = value; break;
         }
     }
-}
+};
 
 //{ asc_CChartFont export
 window["Asc"].asc_CChartFont = asc_CChartFont;
@@ -1551,7 +1549,7 @@ prot["asc_setUnderline"] = prot.asc_setUnderline;
 //-----------------------------------------------------------------------------------
 // Chart series
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CChartSeria() {
     this.Val = { Formula: "", NumCache: [] };
     this.xVal = { Formula: "", NumCache: [] };
@@ -1597,7 +1595,7 @@ asc_CChartSeria.prototype = {
 
     asc_getFormatCode: function() { return this.FormatCode; },
     asc_setFormatCode: function(format) { this.FormatCode = format; }
-}
+};
 
 //{ asc_CChartSeria export
 window["Asc"].asc_CChartSeria = asc_CChartSeria;
@@ -1636,7 +1634,7 @@ prot["asc_setFormatCode"] = prot.asc_setFormatCode;
 //-----------------------------------------------------------------------------------
 // Selected graphic object(properties)
 //-----------------------------------------------------------------------------------	
-
+/** @constructor */
 function asc_CSelectedObject( type, val ) {
     this.Type = (undefined != type) ? type : null;
     this.Value = (undefined != val) ? val : null;
@@ -1645,7 +1643,7 @@ function asc_CSelectedObject( type, val ) {
 asc_CSelectedObject.prototype = {
     asc_getObjectType: function() { return this.Type; },
     asc_getObjectValue: function() { return this.Value; }
-}
+};
 
 //{ asc_CSelectedObject export
 window["Asc"].asc_CSelectedObject = asc_CSelectedObject;
@@ -1659,7 +1657,7 @@ prot["asc_getObjectValue"] = prot.asc_getObjectValue;
 //-----------------------------------------------------------------------------------
 // CImgProperty
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CImgProperty( obj ) {
 
     if( obj ) {
@@ -1775,7 +1773,7 @@ asc_CImgProperty.prototype = {
     asc_putChartProperties: function(v) { this.ChartProperties = v; },
     asc_getShapeProperties: function() { return this.ShapeProperties; },
     asc_putShapeProperties: function(v) { this.ShapeProperties = v; }
-}
+};
 
 //{ asc_CImgProperty export
 window["Asc"].asc_CImgProperty = asc_CImgProperty;
@@ -1833,7 +1831,7 @@ prot["asc_putShapeProperties"] = prot.asc_putShapeProperties;
 //-----------------------------------------------------------------------------------
 // CShapeProperty
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CShapeProperty() {
     this.type = null; // custom
     this.fill = null;
@@ -1857,7 +1855,7 @@ asc_CShapeProperty.prototype = {
     asc_putCanFill: function(v) { this.canFill = v; },
     asc_getCanChangeArrows: function() { return this.canChangeArrows; },
     asc_setCanChangeArrows: function(v) { this.canChangeArrows = v; }
-}
+};
 
 //{ asc_CShapeProperty export
 window["Asc"].asc_CShapeProperty = asc_CShapeProperty;
@@ -1881,7 +1879,7 @@ prot["asc_setCanChangeArrows"] = prot.asc_setCanChangeArrows;
 //-----------------------------------------------------------------------------------
 // CPaddings
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CPaddings(obj) {
 
     if ( obj ) {
@@ -1907,7 +1905,7 @@ asc_CPaddings.prototype = {
     asc_putBottom: function(v) { this.Bottom = v; },
     asc_getRight: function() { return this.Right; },
     asc_putRight: function(v) { this.Right = v; }
-}
+};
 
 //{ asc_CPaddings export
 window["Asc"].asc_CPaddings = asc_CPaddings;
@@ -1927,7 +1925,7 @@ prot["asc_putRight"] = prot.asc_putRight;
 //-----------------------------------------------------------------------------------
 // CImageSize
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CImageSize( width, height, isCorrect ) {
     this.Width = (undefined == width) ? 0.0 : width;
     this.Height = (undefined == height) ? 0.0 : height;
@@ -1939,7 +1937,7 @@ asc_CImageSize.prototype = {
     asc_getImageWidth: function() { return this.Width; },
     asc_getImageHeight: function() { return this.Height; },
     asc_getIsCorrect: function() { return this.IsCorrect; }
-}
+};
 
 //{ asc_CImageSize export
 window["Asc"].asc_CImageSize = asc_CImageSize;
@@ -1954,7 +1952,7 @@ prot["asc_getIsCorrect"] = prot.asc_getIsCorrect;
 //-----------------------------------------------------------------------------------
 // CTexture
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CTexture() {
     this.Id = 0;
     this.Image = "";
@@ -1963,7 +1961,7 @@ function asc_CTexture() {
 asc_CTexture.prototype = {
     asc_getId: function() { return this.Id; },
     asc_getImage: function() { return this.Image; }
-}
+};
 
 //{ asc_CTexture export
 window["Asc"].asc_CTexture = asc_CTexture;
@@ -1977,7 +1975,7 @@ prot["asc_getImage"] = prot.asc_getImage;
 //-----------------------------------------------------------------------------------
 // CParagraphProperty
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CParagraphProperty(obj) {
 
     if (obj) {
@@ -2088,7 +2086,7 @@ asc_CParagraphProperty.prototype = {
     asc_putTabs: function (v) { this.Tabs = v; },
     asc_getDefaultTab: function () { return this.DefaultTab; },
     asc_putDefaultTab: function (v) { this.DefaultTab = v; }
-}
+};
 
 //{ asc_CParagraphProperty export
 window["Asc"].asc_CParagraphProperty = asc_CParagraphProperty;
@@ -2140,7 +2138,7 @@ prot["asc_putDefaultTab"] = prot.asc_putDefaultTab;
 //-----------------------------------------------------------------------------------
 // CParagraphInd
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CParagraphInd(obj) {
     if (obj) {
         this.Left      = (undefined != obj.Left     ) ? obj.Left      : null; // Левый отступ
@@ -2161,7 +2159,7 @@ asc_CParagraphInd.prototype = {
     asc_putRight: function (v) { this.Right = v; },
     asc_getFirstLine: function () { return this.FirstLine; },
     asc_putFirstLine: function (v) { this.FirstLine = v; }
-}
+};
 
 //{ asc_CParagraphInd export
 window["Asc"].asc_CParagraphInd = asc_CParagraphInd;
@@ -2179,7 +2177,7 @@ prot["asc_getFirstLine"] = prot.asc_getFirstLine;
 //-----------------------------------------------------------------------------------
 // CParagraphSpacing
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CParagraphSpacing(obj) {
 
     if (obj) {
@@ -2201,7 +2199,7 @@ asc_CParagraphSpacing.prototype = {
     asc_getLineRule: function () { return this.LineRule; },
     asc_getBefore: function () { return this.Before; },
     asc_getAfter: function () { return this.After; }
-}
+};
 
 //{ asc_CParagraphSpacing export
 window["Asc"].asc_CParagraphSpacing = asc_CParagraphSpacing;
@@ -2217,7 +2215,7 @@ prot["asc_getAfter"] = prot.asc_getAfter;
 //-----------------------------------------------------------------------------------
 // CParagraphShd
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CParagraphShd(obj) {
 
     if (obj) {
@@ -2235,7 +2233,7 @@ asc_CParagraphShd.prototype = {
     asc_putValue: function (v){ this.Value = v; },
     asc_getColor: function (){ return this.Color; },
     asc_putColor: function (v){ this.Color = (v) ? v : null; }
-}
+};
 
 //{ asc_CParagraphShd export
 window["Asc"].asc_CParagraphShd = asc_CParagraphShd;
@@ -2251,7 +2249,7 @@ prot["asc_putColor"] = prot.asc_putColor;
 //-----------------------------------------------------------------------------------
 // CParagraphTab
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CParagraphTab(Pos, Value) {
     this.Pos   = Pos;
     this.Value = Value;
@@ -2262,7 +2260,7 @@ asc_CParagraphTab.prototype = {
     asc_putValue: function (v){ this.Value = v; },
     asc_getPos: function (){ return this.Pos; },
     asc_putPos: function (v){ this.Pos = v; }
-}
+};
 
 //{ asc_CParagraphTab export
 window["Asc"].asc_CParagraphTab = asc_CParagraphTab;
@@ -2278,7 +2276,7 @@ prot["asc_putPos"] = prot.asc_putPos;
 //-----------------------------------------------------------------------------------
 // CParagraphTabs
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CParagraphTabs(obj) {
     this.Tabs = [];
 
@@ -2297,7 +2295,7 @@ asc_CParagraphTabs.prototype = {
     asc_addTab: function (Tab){ this.Tabs.push(Tab) },
     asc_clear: function (){ this.Tabs.length = 0; },
     add_Tab: function (Tab){ this.Tabs.push(Tab) }
-}
+};
 
 //{ asc_CParagraphTabs export
 window["Asc"].asc_CParagraphTabs = asc_CParagraphTabs;
@@ -2315,7 +2313,7 @@ prot["add_Tab"] = prot.add_Tab;
 //-----------------------------------------------------------------------------------
 // CParagraphBorders
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CParagraphBorders(obj) {
 
     if (obj) {
@@ -2345,7 +2343,7 @@ asc_CParagraphBorders.prototype = {
     asc_putBottom: function(v){this.Bottom = (v) ? new asc_CTextBorder (v) : null;},
     asc_getBetween: function(){return this.Between; },
     asc_putBetween: function(v){this.Between = (v) ? new asc_CTextBorder (v) : null;}
-}
+};
 
 //{ asc_CParagraphBorders export
 window["Asc"].asc_CParagraphBorders = asc_CParagraphBorders;
@@ -2367,7 +2365,7 @@ prot["asc_putBetween"] = prot.asc_putBetween;
 //-----------------------------------------------------------------------------------
 // CBorder
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CTextBorder(obj) {
 
     if (obj) {
@@ -2395,7 +2393,7 @@ asc_CTextBorder.prototype = {
     asc_putSpace: function(v){this.Space = v;},
     asc_getForSelectedCells: function(){return this.ForSelectedCells; },
     asc_putForSelectedCells: function(v){this.ForSelectedCells = v;}
-}
+};
 
 //{ asc_CTextBorder export
 window["Asc"].asc_CTextBorder = asc_CTextBorder;
@@ -2417,7 +2415,7 @@ prot["asc_putForSelectedCells"] = prot.asc_putForSelectedCells;
 //-----------------------------------------------------------------------------------
 // CListType
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CListType(obj) {
 
     if (obj) {
@@ -2433,7 +2431,7 @@ function asc_CListType(obj) {
 asc_CListType.prototype = {
     asc_getListType: function() { return this.Type; },
     asc_getListSubType: function() { return this.SubType; }
-}
+};
 
 //{ asc_CListType export
 window["Asc"].asc_CListType = asc_CListType;
@@ -2447,7 +2445,7 @@ prot["asc_getListSubType"] = prot.asc_getListSubType;
 //-----------------------------------------------------------------------------------
 // CTextFontFamily
 //-----------------------------------------------------------------------------------
-
+/** @constructor */
 function asc_CTextFontFamily(obj) {
 
     if (obj) {
@@ -2463,7 +2461,7 @@ function asc_CTextFontFamily(obj) {
 asc_CTextFontFamily.prototype = {
     asc_getName: function () { return this.Name; },
     asc_getIndex: function () { return this.Index; }
-}
+};
 
 //{ asc_CTextFontFamily export
 window["Asc"].asc_CTextFontFamily = asc_CTextFontFamily;
@@ -2505,7 +2503,7 @@ function GraphicOption(ws, type, range, aId) {
 
     _this.isScrollType = function() {
         return ( (_this.type === c_oAscGraphicOption.ScrollVertical) || (_this.type === c_oAscGraphicOption.ScrollHorizontal) );
-    }
+    };
 
     _this.getUpdatedRange = function() {
 
@@ -2585,12 +2583,12 @@ function DrawingObjects() {
 
         this.getX = function() {
             return -ptToPx((worksheet.cols[worksheet.getFirstVisibleCol(true)].left - worksheet.cellsLeft)) + worksheet.getCellLeft(0, 0);
-        }
+        };
 
         this.getY = function() {
             return -ptToPx((worksheet.rows[worksheet.getFirstVisibleRow(true)].top - worksheet.cellsTop)) + worksheet.getCellTop(0, 0);
         }
-    }
+    };
 
     //-----------------------------------------------------------------------------------
     // Private
@@ -2682,46 +2680,46 @@ function DrawingObjects() {
     DrawingBase.prototype.getAllFonts = function(AllFonts) {
         var _t = this;
         _t.graphicObject && _t.graphicObject.documentGetAllFontNames && _t.graphicObject.documentGetAllFontNames(AllFonts);
-    }
+    };
 
     DrawingBase.prototype.isImage = function() {
         var _t = this;
         return _t.graphicObject ? _t.graphicObject.isImage() : false;
-    }
+    };
 
     DrawingBase.prototype.isShape = function() {
         var _t = this;
         return _t.graphicObject ? _t.graphicObject.isShape() : false;
-    }
+    };
 
     DrawingBase.prototype.isGroup = function() {
         var _t = this;
         return _t.graphicObject ? _t.graphicObject.isGroup() : false;
-    }
+    };
 
     DrawingBase.prototype.isChart = function() {
         var _t = this;
         return _t.graphicObject ? _t.graphicObject.isChart() : false;
-    }
+    };
 
     DrawingBase.prototype.isGraphicObject = function() {
         var _t = this;
         return _t.graphicObject != null;
-    }
+    };
 
     DrawingBase.prototype.isLocked = function() {
         var _t = this;
         return ( (_t.graphicObject.lockType != c_oAscLockTypes.kLockTypeNone) && (_t.graphicObject.lockType != c_oAscLockTypes.kLockTypeMine) )
-    }
+    };
 
     DrawingBase.prototype.getWorkbook = function() {
         var _t = this;
         return (_t.worksheet ? _t.worksheet.model.workbook : null);
-    }
+    };
 
     DrawingBase.prototype.getCanvasContext = function() {
         return _this.drawingDocument.CanvasHitContext;
-    }
+    };
 
     // GraphicObject: x, y, extX, extY
     DrawingBase.prototype.getGraphicObjectMetrics = function() {
@@ -2737,7 +2735,7 @@ function DrawingObjects() {
         metrics.extY = pxToMm( coordsTo.y - coordsFrom.y );
 
         return metrics;
-    }
+    };
 
     // Считаем From/To исходя из graphicObject
     DrawingBase.prototype.setGraphicObjectCoords = function() {
@@ -2762,7 +2760,7 @@ function DrawingObjects() {
             _t.to.row = toCell.row;
             _t.to.rowOff = toCell.rowOff;
         }
-    }
+    };
 
     // Проверяет выход за границы
     DrawingBase.prototype.inVisibleArea = function(scrollType) {
@@ -2792,7 +2790,7 @@ function DrawingObjects() {
         }
 
         return result;
-    }
+    };
 
     DrawingBase.prototype.updateAnchorPosition = function() {
         var _t = this;
@@ -2834,35 +2832,35 @@ function DrawingObjects() {
                 break;
         }
         _t.flags.anchorUpdated = true;
-    }
+    };
 
     // Реальное смещение по высоте
     DrawingBase.prototype.getRealTopOffset = function() {
         var _t = this;
         var val = _t.worksheet.getCellTop(_t.from.row, 0) + mmToPx(_t.from.rowOff);
         return asc.round(val);
-    }
+    };
 
     // Реальное смещение по ширине
     DrawingBase.prototype.getRealLeftOffset = function() {
         var _t = this;
         var val = _t.worksheet.getCellLeft(_t.from.col, 0) + mmToPx(_t.from.colOff);
         return asc.round(val);
-    }
+    };
 
     // Ширина по координатам
     DrawingBase.prototype.getWidthFromTo = function() {
         var _t = this;
         var val = _t.worksheet.getCellLeft(_t.to.col, 0) + mmToPx(_t.to.colOff) - _t.worksheet.getCellLeft(_t.from.col, 0) - mmToPx(_t.from.colOff);
         return val;
-    }
+    };
 
     // Высота по координатам
     DrawingBase.prototype.getHeightFromTo = function() {
         var _t = this;
         var val = _t.worksheet.getCellTop(_t.to.row, 0) + mmToPx(_t.to.rowOff) - _t.worksheet.getCellTop(_t.from.row, 0) - mmToPx(_t.from.rowOff);
         return val;
-    }
+    };
 
     // Видимое смещение объекта от первой видимой строки
     DrawingBase.prototype.getVisibleTopOffset = function(withHeader) {
@@ -2872,7 +2870,7 @@ function DrawingObjects() {
         var off = _t.getRealTopOffset() - fvr;
         var off = (off > 0) ? off : 0;
         return withHeader ? headerRowOff + off : off;
-    }
+    };
 
     // Видимое смещение объекта от первой видимой колонки
     DrawingBase.prototype.getVisibleLeftOffset = function(withHeader) {
@@ -2882,7 +2880,7 @@ function DrawingObjects() {
         var off = _t.getRealLeftOffset() - fvc;
         var off = (off > 0) ? off : 0;
         return withHeader ? headerColOff + off : off;
-    }
+    };
 
     // смещение по высоте внутри объекта
     DrawingBase.prototype.getInnerOffsetTop = function() {
@@ -2890,7 +2888,7 @@ function DrawingObjects() {
         var fvr = _t.worksheet.getCellTop(_t.worksheet.getFirstVisibleRow(true), 0);
         var off = _t.getRealTopOffset() - fvr;
         return (off > 0) ? 0 : asc.round( Math.abs(off) );
-    }
+    };
 
     // смещение по ширине внутри объекта
     DrawingBase.prototype.getInnerOffsetLeft = function() {
@@ -2898,11 +2896,11 @@ function DrawingObjects() {
         var fvc = _t.worksheet.getCellLeft(_t.worksheet.getFirstVisibleCol(true), 0);
         var off = _t.getRealLeftOffset() - fvc;
         return (off > 0) ? 0 : asc.round( Math.abs(off) );
-    }
+    };
 
     DrawingBase.prototype.getDrawingObjects = function() {
         return _this;
-    }
+    };
 
     //}
 
@@ -2954,7 +2952,7 @@ function DrawingObjects() {
         }
 
         return copyObject;
-    }
+    };
 
     //-----------------------------------------------------------------------------------
     // Public methods
@@ -3089,7 +3087,7 @@ function DrawingObjects() {
                     aBoundsCheckers.push(boundsChecker);
                 }
             }
-        }
+        };
 
         api.ImageLoader.LoadDocumentImages(aImagesSync, null, _this.asyncImagesDocumentEndLoaded);
 
@@ -3101,7 +3099,7 @@ function DrawingObjects() {
         _this.shiftMap = {};
         worksheet.model.Drawings = aObjects;
         isInit = true;
-    }
+    };
 
     _this.preCopy = function() {
         _this.shiftMap = {};
@@ -3151,7 +3149,7 @@ function DrawingObjects() {
         _this.resizeCanvas();
         _this.setScrollOffset();
         _this.rebuildChartGraphicObjects();
-    }
+    };
 
     _this.resizeCanvas = function() {
 
@@ -3168,23 +3166,23 @@ function DrawingObjects() {
         trackOverlay.init( shapeOverlayCtx.m_oContext, "ws-canvas-graphic-overlay", 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );
         autoShapeTrack.init( trackOverlay, 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );
         autoShapeTrack.Graphics.CalculateFullTransform();
-    }
+    };
 
     _this.getWorkbook = function() {
         return (worksheet ? worksheet.model.workbook : null);
-    }
+    };
 
     _this.getCanvasContext = function() {
         return _this.drawingDocument.CanvasHitContext;
-    }
+    };
 
     _this.getDrawingObjects = function() {
         return aObjects;
-    }
+    };
 
     _this.getWorksheet = function() {
         return worksheet;
-    }
+    };
 
     _this._uploadMessage = function(event) {
         if ( null != event && null != event.data ) {
@@ -3220,12 +3218,12 @@ function DrawingObjects() {
                 var msg = e.message;
             }
         }
-    }
+    };
 
     _this.callTrigger = function(triggerName, param) {
         if ( triggerName )
             worksheet.model.workbook.handlers.trigger(triggerName, param);
-    }
+    };
 
     _this.getBoundsChecker = function(graphicObject) {
         if ( graphicObject ) {
@@ -3255,7 +3253,7 @@ function DrawingObjects() {
             return boundsChecker;
         }
         return null;
-    }
+    };
 
     _this.getBoundsCheckerCoords = function(checker) {
 
@@ -3271,7 +3269,7 @@ function DrawingObjects() {
             return coords;
         }
         return null;
-    }
+    };
 
     _this.clearDrawingObjects = function(graphicOption) {
 
@@ -3295,7 +3293,7 @@ function DrawingObjects() {
             var boundsChecker = _this.getBoundsChecker(aObjects[i].graphicObject);
             aBoundsCheckers.push(boundsChecker);
         }
-    }
+    };
 
     _this.restoreSheetArea = function(checker) {
 
@@ -3330,7 +3328,7 @@ function DrawingObjects() {
                 worksheet._drawCellsBorders(/*drawingCtx*/undefined, r_);
             }
         }
-    }
+    };
 
     //-----------------------------------------------------------------------------------
     // Drawing objects
@@ -3354,7 +3352,7 @@ function DrawingObjects() {
                 return;
         }
         aDrawTasks.push({ time: currTime, params: { clearCanvas: clearCanvas, graphicOption: graphicOption, printOptions: printOptions} });
-    }
+    };
 
     _this.showDrawingObjectsEx = function(clearCanvas, graphicOption, printOptions) {
 
@@ -3372,7 +3370,7 @@ function DrawingObjects() {
         if ( drawingCtx ) {
             if ( clearCanvas ) {
             }
-            this.drawingArea.clear();
+			_this.drawingArea.clear();
 
             if ( aObjects.length ) {
 
@@ -3415,8 +3413,6 @@ function DrawingObjects() {
                  shapeCtx.updatedRect = null;*/
 
                 for (var i = 0; i < aObjects.length; i++) {
-
-                    var index = i;
                     var drawingObject = aObjects[i];
 
                     if ( !drawingObject.flags.anchorUpdated )
@@ -3441,7 +3437,7 @@ function DrawingObjects() {
                             }
                         }
                         else {
-                            this.drawingArea.drawObject(drawingObject);
+							_this.drawingArea.drawObject(drawingObject);
                         }
                     }
                 }
@@ -3455,7 +3451,7 @@ function DrawingObjects() {
                     _this.OnUpdateOverlay();
             }
         }
-    }
+    };
 
     _this.printGraphicObject = function(graphicObject, ctx, top, left) {
 
@@ -3576,7 +3572,7 @@ function DrawingObjects() {
                 }
             }
         }
-    }
+    };
 
     _this.getDrawingAreaMetrics = function() {
 
@@ -3587,7 +3583,7 @@ function DrawingObjects() {
         var metrics = {
             maxCol: 0,
             maxRow: 0
-        }
+        };
 
         for (var i = 0; aObjects && (i < aObjects.length); i++) {
 
@@ -3598,7 +3594,7 @@ function DrawingObjects() {
                 metrics.maxRow = drawingObject.to.row + 1; // учитываем rowOff
         }
         return metrics;
-    }
+    };
 
     _this.clipGraphicsCanvas = function(canvas, graphicOption) {
         if ( canvas instanceof CGraphics ) {
@@ -3640,7 +3636,7 @@ function DrawingObjects() {
             // этот сэйв нужен для восстановления сложных вложенных клипов
             canvas.m_oContext.save();
         }
-    }
+    };
 
     _this.restoreGraphicsCanvas = function(canvas) {
         if ( canvas instanceof CGraphics ) {
@@ -3649,7 +3645,7 @@ function DrawingObjects() {
             // этот рестор нужен для восстановления сложных вложенных клипов
             canvas.m_oContext.restore();
         }
-    }
+    };
 
     _this._drawWorksheetLayer = function (range, offsetLeft, offsetTop) {
         worksheet._drawGrid(/*drawingCtx*/undefined, range, offsetLeft, offsetTop);
@@ -3757,7 +3753,7 @@ function DrawingObjects() {
                 object.to.rowOff = cellTo.rowOff;
 
                 worksheet.handlers.trigger("reinitializeScroll");
-            }
+            };
 
             var addImageObject = function (_image) {
 
@@ -3807,7 +3803,7 @@ function DrawingObjects() {
                 }
             }
         }
-    }
+    };
 
     _this.editImageDrawingObject = function(imageUrl) {
 
@@ -3853,7 +3849,7 @@ function DrawingObjects() {
                 }
             }
         }
-    }
+    };
 
     _this.addChartDrawingObject = function(chart, options) {
 
@@ -3873,7 +3869,7 @@ function DrawingObjects() {
                 chart.worksheet = worksheet; 	// Для формул серий
             }, this, []);
 
-            return this.controller.addChartDrawingObject(chart, options);
+            return _this.controller.addChartDrawingObject(chart, options);
         }
         else if ( isObject(chart) && chart["binary"] ) {
 
@@ -3999,7 +3995,7 @@ function DrawingObjects() {
             _this.showDrawingObjects(false);
             History.TurnOn();
         }
-    }
+    };
 
     _this.editChartDrawingObject = function(chart) {
 
@@ -4007,7 +4003,7 @@ function DrawingObjects() {
             _this.controller.editChartDrawingObjects(chart);
             _this.showDrawingObjects(false);
         }
-    }
+    };
 
     _this.rebuildChartGraphicObjects = function(range) {
         /*var bRebuild = true;
@@ -4025,7 +4021,7 @@ function DrawingObjects() {
          }
          }
          }*/
-    }
+    };
 
     _this.updateDrawingObject = function(bInsert, operType, updateRange) {
 
@@ -4391,7 +4387,7 @@ function DrawingObjects() {
                 }
             }
         }
-    }
+    };
 
     _this.moveRangeDrawingObject = function(oBBoxFrom, oBBoxTo, bResize) {
 
@@ -4443,14 +4439,14 @@ function DrawingObjects() {
                 }
             }
             // Проверяем локи
-            this.objectLocker.reset();
+            _this.objectLocker.reset();
             for (var i = 0; i < chartDrawings.length; i++) {
                 this.objectLocker.addObjectId( chartDrawings[i].graphicObject.Get_Id() );
             }
-            this.objectLocker.checkObjects(callbackCheck);
+            _this.objectLocker.checkObjects(callbackCheck);
             History.EndTransaction();
         }
-    }
+    };
 
     //-----------------------------------------------------------------------------------
     // Chart
@@ -4464,7 +4460,7 @@ function DrawingObjects() {
                 result = true;
         }
         return result;
-    }
+    };
 
     _this.calcChartInterval = function(chart) {
         if (chart.range.intervalObject) {
@@ -4485,7 +4481,7 @@ function DrawingObjects() {
                 }
             }
         }
-    }
+    };
 
     _this.intervalToIntervalObject = function(chart) {
         if (chart.range.interval && worksheet) {
@@ -4493,7 +4489,7 @@ function DrawingObjects() {
             if (_range)
                 chart.range.intervalObject = _range;
         }
-    }
+    };
 
     _this.updateChartReferences = function(oldWorksheet, newWorksheet) {
 
@@ -4519,7 +4515,7 @@ function DrawingObjects() {
             }
         }
         History.EndTransaction();
-    }
+    };
 
     //-----------------------------------------------------------------------------------
     // Graphic object
@@ -4559,7 +4555,7 @@ function DrawingObjects() {
          aBoundsCheckers.push(boundsChecker);*/
 
         return ret;
-    }
+    };
 
     _this.groupGraphicObjects = function() {
 
@@ -4567,7 +4563,7 @@ function DrawingObjects() {
             _this.controller.createGroup(null);
             worksheet.setSelectionShape(true);
         }
-    }
+    };
 
     _this.unGroupGraphicObjects = function() {
 
@@ -4576,7 +4572,7 @@ function DrawingObjects() {
             worksheet.setSelectionShape(true);
             api.isStartAddShape = false;
         }
-    }
+    };
 
     _this.insertUngroupedObjects = function(idGroup, aGraphics) {
 
@@ -4607,7 +4603,7 @@ function DrawingObjects() {
                 }
             }
         }
-    }
+    };
 
     _this.getDrawingBase = function(graphicId) {
         for (var i = 0; i < aObjects.length; i++) {
@@ -4615,7 +4611,7 @@ function DrawingObjects() {
                 return aObjects[i];
         }
         return null;
-    }
+    };
 
     _this.deleteDrawingBase = function(graphicId) {
 
@@ -4718,7 +4714,7 @@ function DrawingObjects() {
         }
 
         return response;
-    }
+    };
 
     _this.setGraphicObjectLockState = function(id, state) {
 
@@ -4728,14 +4724,14 @@ function DrawingObjects() {
                 break;
             }
         }
-    }
+    };
 
     _this.resetLockedGraphicObjects = function() {
 
         for (var i = 0; i < aObjects.length; i++) {
             aObjects[i].graphicObject.lockType = c_oAscLockTypes.kLockTypeNone;
         }
-    }
+    };
 
     _this.tryResetLockedGraphicObject = function(id) {
 
@@ -4748,7 +4744,7 @@ function DrawingObjects() {
             }
         }
         return bObjectFound;
-    }
+    };
 
     _this.setScrollOffset = function() {
         /*if ( shapeCtx && shapeOverlayCtx && autoShapeTrack ) {
@@ -4756,26 +4752,26 @@ function DrawingObjects() {
          _this.drawingArea.frozenPlaces[i].setTransform(shapeCtx, shapeOverlayCtx, autoShapeTrack);
          }
          }*/
-    }
+    };
 
     _this.getDrawingCanvas = function() {
         return { shapeCtx: shapeCtx, shapeOverlayCtx: shapeOverlayCtx, autoShapeTrack: autoShapeTrack, trackOverlay: trackOverlay };
-    }
+    };
 
     _this.convertMetric = function(val, from, to) {
         /* Параметры конвертирования (from/to)
          0 - px, 1 - pt, 2 - in, 3 - mm
          */
         return val * ascCvtRatio(from, to);
-    }
+    };
 
     _this.getSelectedGraphicObjects = function() {
         return _this.controller.selectedObjects;
-    }
+    };
 
     _this.selectedGraphicObjectsExists = function() {
         return _this.controller.selectedObjects.length > 0;
-    }
+    };
 
     _this.loadImageRedraw = function(imageUrl) {
 
@@ -4798,7 +4794,7 @@ function DrawingObjects() {
             else
                 _this.showDrawingObjects(true);
         }
-    }
+    };
 
     _this.getOriginalImageSize = function() {
 
@@ -4823,12 +4819,12 @@ function DrawingObjects() {
             }
         }
         return new asc_CImageSize( 50, 50, false );
-    }
+    };
 
     _this.sendGraphicObjectProps = function() {
         if ( worksheet )
             worksheet.handlers.trigger("selectionChanged", worksheet.getSelectionInfo());
-    }
+    };
 
     _this.setGraphicObjectProps = function(props) {
 
@@ -4867,16 +4863,16 @@ function DrawingObjects() {
         }
 
         _this.sendGraphicObjectProps();
-    }
+    };
 
     _this.showChartSettings = function() {
         api.wb.handlers.trigger("asc_onShowChartDialog", true);
-    }
+    };
 
     _this.setDrawImagePlaceParagraph = function(element_id, props) {
         _this.drawingDocument.InitGuiCanvasTextProps(element_id);
         _this.drawingDocument.DrawGuiCanvasTextProps(props);
-    }
+    };
 
     //-----------------------------------------------------------------------------------
     // Graphic object mouse & keyboard events
@@ -4886,7 +4882,7 @@ function DrawingObjects() {
         var offsets = _this.drawingArea.getOffsets(x, y);
         if ( offsets )
             _this.controller.onMouseDown( e, pxToMm(x - offsets.x), pxToMm(y - offsets.y) );
-    }
+    };
 
     _this.graphicObjectMouseMove = function(e, x, y) {
         e.IsLocked = e.isLocked;
@@ -4894,19 +4890,19 @@ function DrawingObjects() {
         var offsets = _this.drawingArea.getOffsets(x, y);
         if ( offsets )
             _this.controller.onMouseMove( e, pxToMm(x - offsets.x), pxToMm(y - offsets.y) );
-    }
+    };
 
     _this.graphicObjectMouseUp = function(e, x, y) {
         var offsets = _this.drawingArea.getOffsets(x, y);
         if ( offsets )
             _this.controller.onMouseUp( e, pxToMm(x - offsets.x), pxToMm(y - offsets.y) );
-    }
+    };
 
     // keyboard
 
     _this.graphicObjectKeyDown = function(e) {
         return _this.controller.onKeyDown( e );
-    }
+    };
 
     _this.graphicObjectKeyPress = function(e) {
 
@@ -4916,7 +4912,7 @@ function DrawingObjects() {
         e.ShiftKey = e.shiftKey;
         e.Which = e.which;
         return _this.controller.onKeyPress( e );
-    }
+    };
 
     //-----------------------------------------------------------------------------------
     // Asc
@@ -4949,7 +4945,7 @@ function DrawingObjects() {
         shapeOverlayCtx.m_oContext.clearRect(0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix);
         _this.OnUpdateOverlay();
         History.Clear();
-    }
+    };
 
     _this.getWordChartObject = function() {
         for (var i = 0; i < aObjects.length; i++) {
@@ -4962,7 +4958,7 @@ function DrawingObjects() {
             }
         }
         return null;
-    }
+    };
 
     _this.getAscChartObject = function() {
 
@@ -4979,7 +4975,7 @@ function DrawingObjects() {
             }
         }
 
-        var chart = this.controller.getAscChartObject();
+        var chart = _this.controller.getAscChartObject();
         if ( !chart ) {
 
             History.Create_NewPoint();
@@ -5027,7 +5023,7 @@ function DrawingObjects() {
             }();
         }
         return chart;
-    }
+    };
 
     //-----------------------------------------------------------------------------------
     // Selection
@@ -5093,7 +5089,7 @@ function DrawingObjects() {
                 worksheet._drawFormulaRanges(worksheet.arrActiveChartsRanges);
             }
         }
-    }
+    };
 
     _this.unselectDrawingObjects = function() {
 
@@ -5112,7 +5108,7 @@ function DrawingObjects() {
                 return aObjects[i];
         }
         return null;
-    }
+    };
 
     _this.getGraphicSelectionType = function(id) {
 
@@ -5136,7 +5132,7 @@ function DrawingObjects() {
             }
         }
         return undefined;
-    }
+    };
 
     //-----------------------------------------------------------------------------------
     // Position
@@ -5144,7 +5140,7 @@ function DrawingObjects() {
 
     _this.setGraphicObjectLayer = function(layerType) {
         _this.controller.setGraphicObjectLayer(layerType);
-    }
+    };
 
     _this.saveSizeDrawingObjects = function() {
 
@@ -5154,7 +5150,7 @@ function DrawingObjects() {
             obj.size.width = obj.getWidthFromTo();
             obj.size.height = obj.getHeightFromTo();
         }
-    }
+    };
 
     _this.updateSizeDrawingObjects = function() {
 
@@ -5175,7 +5171,7 @@ function DrawingObjects() {
             drawingObject.graphicObject.calculateTransformTextMatrix();
         }
         _this.showDrawingObjects(true);
-    }
+    };
 
     _this.checkCursorDrawingObject = function(x, y) {
 
@@ -5194,7 +5190,7 @@ function DrawingObjects() {
             }
         }
         return null;
-    }
+    };
 
     _this.getPositionInfo = function(x, y) {
 
@@ -5212,7 +5208,7 @@ function DrawingObjects() {
         }
 
         return info;
-    }
+    };
 
     //-----------------------------------------------------------------------------------
     // File Dialog
@@ -5248,13 +5244,13 @@ function DrawingObjects() {
                 worksheet.model.workbook.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
                 fileSubmit.click();
             }
-        }
+        };
 
         if (window.opera != undefined)
             setTimeout(function() { fileName.click(); }, 0);
         else
             fileName.click();
-    }
+    };
 
     //-----------------------------------------------------------------------------------
     // Shapes controller
@@ -5420,7 +5416,7 @@ function ClickCounter() {
             console.log("");
         }
         _this.time = currTime;
-    }
+    };
 
     _this.mouseMoveEvent = function(x, y) {
         if ( (_this.x != x) || (_this.y != y) ) {
@@ -5431,7 +5427,7 @@ function ClickCounter() {
             if ( _this.log )
                 console.log("Reset counter");
         }
-    }
+    };
 
     _this.getClickCount = function() {
         return _this.clickCount;
@@ -5511,7 +5507,7 @@ function CoordsManager(ws, bLog) {
         cell.rowOff = worksheet.objectRender.convertMetric(cell.rowOffPx, 0, 3);
 
         return cell;
-    }
+    };
 
     _t.calculateCoords = function(cell) {
 
