@@ -3832,7 +3832,10 @@ asc_docs_api.prototype.put_ParagraphShade = function(is_flag, color)
             this.WordControl.m_oLogicDocument.Set_ParagraphShd( { Value : shd_Nil  }  );
         else
         {
-            this.WordControl.m_oLogicDocument.Set_ParagraphShd( { Value : shd_Clear, Color : { r : color.get_r(), g : color.get_g(), b : color.get_b() } } );
+            var Unifill = new CUniFill();
+            Unifill.fill = new CSolidFill();
+            Unifill.fill.color = CorrectUniColor(color, Unifill.fill.color);
+            this.WordControl.m_oLogicDocument.Set_ParagraphShd( { Value : shd_Clear, Color : { r : color.get_r(), g : color.get_g(), b : color.get_b() }, Unifill: Unifill } );
         }
     }
 }
