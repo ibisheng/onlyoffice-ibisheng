@@ -1688,6 +1688,9 @@
 					return false;
 
 				case 8:   // "backspace"
+					// Отключим стандартную обработку браузера нажатия backspace
+					event.stopPropagation();
+					event.preventDefault();
 					if (hieroglyph) {t._syncEditors();}
 					t._removeChars(ctrlKey ? kPrevWord : kPrevChar);
 					return false;
@@ -1742,7 +1745,7 @@
 				case 53: // 5
 					if (ctrlKey) {
 						if (!t.hasFocus) {t.setFocus(true);}
-						// Отключим стандартную обработку браузера нажатия ctlr + 5
+						// Отключим стандартную обработку браузера нажатия ctrl + 5
 						event.stopPropagation();
 						event.preventDefault();
 						if (hieroglyph) {t._syncEditors();}
@@ -1754,7 +1757,7 @@
 				case 65: // A
 					if (ctrlKey) {
 						if (!t.hasFocus) {t.setFocus(true);}
-						// Отключим стандартную обработку браузера нажатия ctlr + a
+						// Отключим стандартную обработку браузера нажатия ctrl + a
 						if (!t.isTopLineActive) {
 							event.stopPropagation();
 							event.preventDefault();
@@ -1768,7 +1771,7 @@
 				case 66: // B
 					if (ctrlKey) {
 						if (!t.hasFocus) {t.setFocus(true);}
-						// Отключим стандартную обработку браузера нажатия ctlr + b
+						// Отключим стандартную обработку браузера нажатия ctrl + b
 						event.stopPropagation();
 						event.preventDefault();
 						if (hieroglyph) {t._syncEditors();}
@@ -1780,7 +1783,7 @@
 				case 73: // I
 					if (ctrlKey) {
 						if (!t.hasFocus) {t.setFocus(true);}
-						// Отключим стандартную обработку браузера нажатия ctlr + i
+						// Отключим стандартную обработку браузера нажатия ctrl + i
 						event.stopPropagation();
 						event.preventDefault();
 						if (hieroglyph) {t._syncEditors();}
@@ -1803,7 +1806,7 @@
 				case 85: // U
 					if (ctrlKey) {
 						if (!t.hasFocus) {t.setFocus(true);}
-						// Отключим стандартную обработку браузера нажатия ctlr + u
+						// Отключим стандартную обработку браузера нажатия ctrl + u
 						event.stopPropagation();
 						event.preventDefault();
 						if (hieroglyph) {t._syncEditors();}

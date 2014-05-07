@@ -722,6 +722,7 @@
 
 				case 8: // backspace
 					if (isViewerMode || t.isCellEditMode || t.isSelectionDialogMode) {return true;}
+					stop();
 
 					// При backspace фокус не в редакторе (стираем содержимое)
 					t.handlers.trigger("editCell", 0, 0, /*isCoord*/false, /*isFocus*/false, /*isClearCell*/true,
