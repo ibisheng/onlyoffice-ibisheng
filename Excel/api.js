@@ -149,6 +149,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		}
 
 		spreadsheet_api.prototype = {
+		
+			asc_GetFontThumbnailsPath = function()
+			{
+				return "../Common/Images/";
+			},
 
 			_init: function() {
 				var t = this;
@@ -3570,6 +3575,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		asc["spreadsheet_api"] = spreadsheet_api;
 		prot = spreadsheet_api.prototype;
 
+		prot["asc_GetFontThumbnailsPath"] = prot.asc_GetFontThumbnailsPath;
 		prot["asc_Init"] = prot.asc_Init;
 		prot["asc_setDocInfo"] = prot.asc_setDocInfo;
 		prot["asc_setLocale"] = prot.asc_setLocale;

@@ -719,6 +719,11 @@ asc_docs_api.prototype.SetLanguage = function(langId)
         this.CurrentTranslate = translations_map[langId];
 }
 
+asc_docs_api.prototype.asc_GetFontThumbnailsPath = function()
+{
+    return "../Common/Images/";
+}
+
 asc_docs_api.prototype.TranslateStyleName = function(style_name)
 {
     var ret = this.CurrentTranslate.DefaultStyles[style_name];
