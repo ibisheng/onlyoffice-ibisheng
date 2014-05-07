@@ -7903,7 +7903,7 @@ valAxisChart.prototype =
 			}
 			case TICK_MARK_IN:
 			{
-				widthLine = 3;
+				widthLine = 5;
 				break;
 			}
 			case TICK_MARK_NONE:
@@ -7913,7 +7913,7 @@ valAxisChart.prototype =
 			}
 			case TICK_MARK_OUT:
 			{
-				widthLine = -3;
+				widthLine = -5;
 				break;
 			}
 		};
@@ -7945,7 +7945,14 @@ valAxisChart.prototype =
 		{
 			widthMinorLine = - widthMinorLine;
 			widthLine = - widthLine;
-		}
+		};
+		
+		var orientation = this.chartSpace && this.chartSpace.chart.plotArea.catAx ? this.chartSpace.chart.plotArea.catAx.scaling.orientation : ORIENTATION_MIN_MAX;
+		if(orientation !== ORIENTATION_MIN_MAX)
+		{
+			widthMinorLine = - widthMinorLine;
+			widthLine = - widthLine;
+		};
 		
 		if(!(widthLine === 0 && widthMinorLine === 0))
 		{
@@ -7989,7 +7996,7 @@ valAxisChart.prototype =
 				var stepY = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[1].pos - this.chartProp.chartGutter._bottom / this.chartProp.pxToMM);
 				var minorStep = stepY / this.chartProp.numhMinorlines;
 				
-				var posX = this.chartSpace.chart.plotArea.valAx.posX;
+				var posX = this.chartSpace.chart.plotArea.valAx.posX ? this.chartSpace.chart.plotArea.valAx.posX : this.chartSpace.chart.plotArea.valAx.xPos;
 
 				var posY;
 				var posMinorY;
