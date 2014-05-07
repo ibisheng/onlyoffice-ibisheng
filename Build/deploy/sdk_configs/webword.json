@@ -236,7 +236,8 @@
                     "commonDefines.js",
                     "apiCommon.js",
                     "downloaderfiles.js",
-                    "Images/*.cur"
+                    "Images/*.cur",
+                    "Images/fonts_thumbnail**.png"
                 ],
                 "dest": "<%= pkg.menu_path %>/Common/"
             },
