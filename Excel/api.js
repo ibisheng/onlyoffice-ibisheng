@@ -2721,10 +2721,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_freezePane: function () {
 				this.wb.getWorksheet().freezePane();
 			},
-
-			asc_isFreezePane: function () {
-				return null !== this.wb.getWorksheet().getFrozenCell();
-			},
 			
 			// Cell interface
 			asc_getCellInfo: function (bExt) {
@@ -3741,7 +3737,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		
 		// Frozen pane
 		prot["asc_freezePane"] = prot.asc_freezePane;
-		prot["asc_isFreezePane"] = prot.asc_isFreezePane;
 		
 		// Cell interface
 		prot["asc_getCellInfo"] = prot.asc_getCellInfo;

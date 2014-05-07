@@ -1000,6 +1000,7 @@
 			},
 			asc_getShowGridLines: function () { return false !== this.showGridLines; },
 			asc_getShowRowColHeaders: function () { return false !== this.showRowColHeaders; },
+			asc_getIsFreezePane: function () { return null !== this.pane; },
 			asc_setShowGridLines: function (val) { this.showGridLines = val; },
 			asc_setShowRowColHeaders: function (val) { this.showRowColHeaders = val; },
 			getType : function () {
@@ -1425,6 +1426,7 @@
 		prot = asc_CSheetViewSettings.prototype;
 		prot["asc_getShowGridLines"] = prot.asc_getShowGridLines;
 		prot["asc_getShowRowColHeaders"] = prot.asc_getShowRowColHeaders;
+		prot["asc_getIsFreezePane"] = prot.asc_getIsFreezePane;
 		prot["asc_setShowGridLines"] = prot.asc_setShowGridLines;
 		prot["asc_setShowRowColHeaders"] = prot.asc_setShowRowColHeaders;
 

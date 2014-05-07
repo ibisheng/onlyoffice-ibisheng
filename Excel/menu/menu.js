@@ -210,7 +210,7 @@
 		g_sheetViewSettings = api.asc_getSheetViewSettings();
 		$("#showGridLines").attr("checked", g_sheetViewSettings.asc_getShowGridLines());
 		$("#showHeaders").attr("checked", g_sheetViewSettings.asc_getShowRowColHeaders());
-		$("#freezePane").attr("checked", api.asc_isFreezePane());
+		$("#freezePane").attr("checked", g_sheetViewSettings.asc_getIsFreezePane());
 	}
 
 	function onTabNavigationBtnClicked(event) {
