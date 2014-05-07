@@ -183,7 +183,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
         this.resizedRot = originalObject.rot;
 
         this.transform = originalObject.transform.CreateDublicate();
-        this.geometry = originalObject.spPr.geometry ?  originalObject.spPr.geometry.createDuplicate() : (function(){ var geometry = CreateGeometry("rect"); geometry.Recalculate(5, 5); return geometry})();
+        this.geometry = originalObject.spPr && originalObject.spPr.geometry ?  originalObject.spPr.geometry.createDuplicate() : (function(){ var geometry = CreateGeometry("rect"); geometry.Recalculate(5, 5); return geometry})();
 
         if(!originalObject.isChart())
         {
@@ -198,7 +198,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
         }
 
 
-        this.isLine = originalObject.spPr.geometry && originalObject.spPr.geometry.preset === "line";
+        this.isLine = originalObject.spPr && originalObject.spPr.geometry && originalObject.spPr.geometry.preset === "line";
         this.bChangeCoef = this.translatetNumberHandle % 2 === 0 && this.originalFlipH !== this.originalFlipV;
 
         this.overlayObject = new OverlayObject(this.geometry, this.resizedExtX, this.resizedExtY, this.brush, this.pen, this.transform);
@@ -723,6 +723,10 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
                     this.resizedPosX = 0;
                     this.resizedPosY = 0;
                 }
+            }
+            if(!this.originalObject.spPr)
+            {
+                this.originalObject.setSpPr(new CSpPr());
             }
             if(!this.originalObject.spPr.xfrm)
             {
@@ -1395,6 +1399,10 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
                 this.original.normalize();
             }
 
+            if(!this.original.spPr)
+            {
+                this.original.setSpPr(new CSpPr());
+            }
             if(!this.original.spPr.xfrm)
             {
                 this.original.spPr.setXfrm(new CXfrm());

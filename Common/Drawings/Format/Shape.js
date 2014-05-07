@@ -3620,7 +3620,7 @@ CShape.prototype =
         var invert_transform = this.getInvertTransform();
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
-        if (isRealObject(this.spPr.geometry))
+        if (isRealObject(this.spPr) && isRealObject(this.spPr.geometry))
             return this.spPr.geometry.hitInPath(this.getCanvasContext(), x_t, y_t);
         else
             return this.hitInBoundingRect(x, y);
@@ -3633,7 +3633,7 @@ CShape.prototype =
             var invert_transform = this.getInvertTransform();
             var x_t = invert_transform.TransformPointX(x, y);
             var y_t = invert_transform.TransformPointY(x, y);
-            if (isRealObject(this.spPr.geometry))
+            if (isRealObject(this.spPr) && isRealObject(this.spPr.geometry))
                 return this.spPr.geometry.hitInInnerArea(this.getCanvasContext(), x_t, y_t);
             return x_t > 0 && x_t < this.extX && y_t > 0 && y_t < this.extY;
         }

@@ -19,7 +19,7 @@ function MoveShapeImageTrack(originalObject)
         this.brush = pen_brush.brush;
         this.pen = pen_brush.pen;
     }
-    this.overlayObject = new OverlayObject(this.originalObject.spPr.geometry, this.originalObject.extX, this.originalObject.extY, this.brush, this.pen, this.transform);
+    this.overlayObject = new OverlayObject(this.originalObject.spPr && this.originalObject.spPr.geometry, this.originalObject.extX, this.originalObject.extY, this.brush, this.pen, this.transform);
 
     this.groupInvertMatrix = null;
     if(this.originalObject.group)
@@ -164,7 +164,7 @@ function MoveShapeImageTrackInGroup(originalObject)
         this.brush = pen_brush.brush;
         this.pen = pen_brush.pen;
     }
-    this.overlayObject = new OverlayObject(this.originalObject.spPr.geometry, this.originalObject.extX, this.originalObject.extY, this.brush, this.pen, this.transform);
+    this.overlayObject = new OverlayObject(this.originalObject.spPr && this.originalObject.spPr.geometry, this.originalObject.extX, this.originalObject.extY, this.brush, this.pen, this.transform);
     this.inv = global_MatrixTransformer.Invert(originalObject.group.transform);
     this.inv.tx = 0;
     this.inv.ty = 0;
