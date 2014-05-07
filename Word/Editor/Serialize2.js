@@ -4190,19 +4190,10 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 		
 			if(null != img.GraphicObj.chart)
 			{
-				this.memory.WriteByte(c_oSerImageType2.Chart);
+				this.memory.WriteByte(c_oSerImageType2.Chart2);
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
-				
 				var oBinaryChartWriter = new BinaryChartWriter(this.memory);
-				this.bs.WriteItemWithLength(function(){oBinaryChartWriter.WriteChartContent(img.GraphicObj);});
-				
-				var chartSrc = img.GraphicObj.chart.img;
-				if(null != chartSrc && "" != chartSrc)
-				{
-					this.memory.WriteByte(c_oSerImageType2.ChartImg);
-					this.memory.WriteByte(c_oSerPropLenType.Variable);
-					this.bs.WriteItemWithLength(function(){window.global_pptx_content_writer.WriteImageBySrc(oThis.memory, chartSrc, img.Extent.W, img.Extent.H);});
-				}
+				this.bs.WriteItemWithLength(function () { oBinaryChartWriter.WriteCT_ChartSpace(img.GraphicObj.chart); });
 			}
 			else
 			{
