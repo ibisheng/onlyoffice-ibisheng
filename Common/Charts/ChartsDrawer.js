@@ -454,7 +454,7 @@ CChartsDrawer.prototype =
 					calculateRight = this.calcProp.widthCanvas / pxToMM - catAx.xPoints[0].pos;
 				};
 			}
-			else if(isHBar && !isNaN(valAx.posY) && this.calcProp.heightCanvas != undefined)
+			else if(isHBar && valAx && !isNaN(valAx.posY) && this.calcProp.heightCanvas != undefined)
 			{
 				diffPoints = catAx.yPoints[1] ? Math.abs(catAx.yPoints[1].pos - catAx.yPoints[0].pos) : Math.abs(catAx.yPoints[0].pos - valAx.posY) * 2;
 				
@@ -3812,10 +3812,14 @@ drawBarChart.prototype =
 		this.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, this.chartProp.chartGutter._top / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
 		var brush, pen, seria, numCache;
 		for (var i = 0; i < this.paths.series.length; i++) {
+		
+			if(!this.paths.series[i])
+				continue;
+			
 			seria = this.chartProp.series[i];
 			brush = seria.brush;
 			pen = seria.pen;
-
+			
 			for (var j = 0; j < this.paths.series[i].length; j++) {
 				numCache = seria.val.numRef ? seria.val.numRef.numCache : seria.val.numLit;
 				if(numCache.pts[j] && numCache.pts[j].pen)
@@ -3852,16 +3856,16 @@ drawBarChart.prototype =
 		var widthOverLap       = individualBarWidth * (overlap / 100);
 		var hmargin            = (this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100 * individualBarWidth) / 2;
 		
-		var height, startX, startY, diffYVal, val, paths, seriesHeight = [], tempValues = [], seria, startYColumnPosition, startXPosition, newStartX, newStartY, prevVal, idx;
-		
-		
+		var height, startX, startY, diffYVal, val, paths, seriesHeight = [], tempValues = [], seria, startYColumnPosition, startXPosition, newStartX, newStartY, prevVal, idx, seriesCounter = 0;
 	
 		for (var i = 0; i < this.chartProp.series.length; i++) {
-	
 			numCache        = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache : this.chartProp.series[i].val.numLit;
 			seria           = numCache ? numCache.pts : [];
 			seriesHeight[i] = [];
 			tempValues[i]   = [];
+			
+			if(numCache == null)
+				continue;
 			
 			for (var j = 0; j < seria.length; j++) {
 				
@@ -3907,17 +3911,17 @@ drawBarChart.prototype =
 				
 				if(this.cShapeDrawer.chart.plotArea.catAx.scaling.orientation == ORIENTATION_MIN_MAX)
 				{
-					if(i == 0)
-						startX = startXPosition * this.chartProp.pxToMM + hmargin + i * (individualBarWidth);
+					if(seriesCounter == 0)
+						startX = startXPosition * this.chartProp.pxToMM + hmargin + seriesCounter * (individualBarWidth);
 					else
-						startX = startXPosition * this.chartProp.pxToMM + hmargin + (i * individualBarWidth - i * widthOverLap);
+						startX = startXPosition * this.chartProp.pxToMM + hmargin + (seriesCounter * individualBarWidth - seriesCounter * widthOverLap);
 				}
 				else
 				{
 					if(i == 0)
-						startX = startXPosition * this.chartProp.pxToMM - hmargin - i * (individualBarWidth);
+						startX = startXPosition * this.chartProp.pxToMM - hmargin - seriesCounter * (individualBarWidth);
 					else
-						startX = startXPosition * this.chartProp.pxToMM - hmargin - (i * individualBarWidth - i * widthOverLap);
+						startX = startXPosition * this.chartProp.pxToMM - hmargin - (seriesCounter * individualBarWidth - seriesCounter * widthOverLap);
 				}
 				
 				
@@ -3940,8 +3944,10 @@ drawBarChart.prototype =
 						this.paths.series[i] = [];
 					this.paths.series[i][idx] = paths;
 				//}
-			}
-		}
+			};
+			
+			seriesCounter++;
+		};
     },
 	
 	_getStartYColumnPosition: function (seriesHeight, i, j, val, yPoints, prevVal)
@@ -4429,6 +4435,10 @@ drawLineChart.prototype =
 			
 			numCache = seria.val.numRef ? seria.val.numRef.numCache : seria.val.numLit;
 			dataSeries = this.paths.series[i];
+			
+			if(!dataSeries)
+				continue;
+			
 			for(var n = 0; n < dataSeries.length; n++)
 			{
 				if(numCache.pts[n + 1] && numCache.pts[n + 1].pen)
@@ -4660,10 +4670,27 @@ drawAreaChart.prototype =
 			
 			prevPoints = null;
 			if(this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked")
-				prevPoints = points[i - 1] ? points[i - 1] : null;
+				prevPoints = this._getPrevSeriesPoints(points, i);
 				
-			this.paths.series[i] = this._calculateLine(points[i], prevPoints);
+			if(points[i])
+				this.paths.series[i] = this._calculateLine(points[i], prevPoints);
 		};
+	},
+	
+	_getPrevSeriesPoints: function(points, i)
+	{
+		var prevPoints = null;
+		
+		for(var p = i - 1; p >= 0; p--)
+		{
+			if(points[p])
+			{
+				prevPoints = points[p];
+				break;
+			}
+		};
+		
+		return prevPoints;
 	},
 	
 	_calculateLine: function(points, prevPoints)
@@ -4958,10 +4985,9 @@ drawHBarChart.prototype =
 		var widthOverLap = individualBarHeight * (overlap / 100);
 		var hmargin = (this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100 * individualBarHeight) / 2;
 		
-		var width, startX, startY, diffYVal, val, paths, seriesHeight = [], seria, startXColumnPosition, startYPosition, newStartX, newStartY, idx;
+		var width, startX, startY, diffYVal, val, paths, seriesHeight = [], seria, startXColumnPosition, startYPosition, newStartX, newStartY, idx, seriesCounter = 0;
 		
 		for (var i = 0; i < this.chartProp.series.length; i++) {
-		
 			numCache = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache : his.chartProp.series[i].val.numLit;
 			
 			if(!numCache)
@@ -5007,17 +5033,17 @@ drawHBarChart.prototype =
 				
 				if(this.cShapeDrawer.chart.plotArea.catAx.scaling.orientation == ORIENTATION_MIN_MAX)
 				{
-					if(i == 0)
-						startY = startYPosition * this.chartProp.pxToMM - hmargin - i * (individualBarHeight);
+					if(seriesCounter == 0)
+						startY = startYPosition * this.chartProp.pxToMM - hmargin - seriesCounter * (individualBarHeight);
 					else
-						startY = startYPosition * this.chartProp.pxToMM - hmargin - (i * individualBarHeight - i * widthOverLap);
+						startY = startYPosition * this.chartProp.pxToMM - hmargin - (seriesCounter * individualBarHeight - seriesCounter * widthOverLap);
 				}
 				else
 				{
 					if(i == 0)
-						startY = startYPosition * this.chartProp.pxToMM + hmargin + i * (individualBarHeight);
+						startY = startYPosition * this.chartProp.pxToMM + hmargin + seriesCounter * (individualBarHeight);
 					else
-						startY = startYPosition * this.chartProp.pxToMM + hmargin + (i * individualBarHeight - i * widthOverLap);
+						startY = startYPosition * this.chartProp.pxToMM + hmargin + (seriesCounter * individualBarHeight - seriesCounter * widthOverLap);
 				}
 				
 				
@@ -5041,8 +5067,11 @@ drawHBarChart.prototype =
 						this.paths.series[i] = [];
 					this.paths.series[i][idx] = paths;
 				}
-			}
-        }
+			};
+			
+			seriesCounter++;
+			
+        };
     },
 	
 	_getStartYColumnPosition: function (seriesHeight, j, i, val, xPoints, summBarVal)
@@ -5174,10 +5203,14 @@ drawHBarChart.prototype =
 		this.cShapeDrawer.Graphics.SaveGrState();
 		this.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, this.chartProp.chartGutter._top / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
 		for (var i = 0; i < this.paths.series.length; i++) {
+			
+			if(!this.paths.series[i])
+				continue;
+			
 			seria = this.chartProp.series[i];
 			brush = seria.brush;
 			pen = seria.pen;
-
+			
 			for (var j = 0; j < this.paths.series[i].length; j++) {
 				numCache = seria.val.numRef ? seria.val.numRef.numCache : seria.val.numLit;
 				if(numCache.pts[j] && numCache.pts[j].pen)
@@ -5579,7 +5612,7 @@ drawDoughnutChart.prototype =
 		var xCenter = this.chartProp.chartGutter._left + trueWidth/2;
 		var yCenter = this.chartProp.chartGutter._top + trueHeight/2;
 		
-		var numCache, idxPoint, angle, curVal;
+		var numCache, idxPoint, angle, curVal, seriesCounter = 0;
 		for(var n = 0; n < this.chartProp.series.length; n++)
 		{
 			this.tempAngle = Math.PI/2;
@@ -5603,11 +5636,14 @@ drawDoughnutChart.prototype =
 					this.paths.series[n] = [];
 				
 				if(angle)
-					this.paths.series[n][k] = this._calculateSegment(angle, radius, xCenter, yCenter, radius + step * (n + 1), radius + step * n, firstSliceAng);
+					this.paths.series[n][k] = this._calculateSegment(angle, radius, xCenter, yCenter, radius + step * (seriesCounter + 1), radius + step * seriesCounter, firstSliceAng);
 				else
 					this.paths.series[n][k] = null;
-			}
-		}
+			};
+			
+			seriesCounter++;
+			
+		};
     },
 	
 	_calculateSegment: function (angle, radius, xCenter, yCenter, radius1, radius2, firstSliceAng)
@@ -6254,7 +6290,10 @@ drawScatterChart.prototype =
 		for(var i = 0; i < points.length; i++)
 		{	
 			isSplineLine = this.chartProp.series[i].smooth;
-
+			
+			if(!points[i])
+				continue;
+			
 			for(var n = 0; n < points[i].length; n++)
 			{
 				if(!this.paths.series)
@@ -6309,6 +6348,10 @@ drawScatterChart.prototype =
 			
 			numCache = seria.yVal.numRef ? seria.yVal.numRef.numCache : seria.yVal.numLit;
 			dataSeries = this.paths.series[i];
+			
+			if(!dataSeries)
+				continue;
+			
 			for(var n = 0; n < dataSeries.length; n++)
 			{
 				if(numCache.pts[n + 1] && numCache.pts[n + 1].pen)
