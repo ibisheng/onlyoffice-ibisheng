@@ -1337,10 +1337,14 @@
 			this.buffers.mainGraphic.changeZoom(factor);
 			this.buffers.overlayGraphic.changeZoom(factor);
 			this.drawingCtxCharts.changeZoom(factor);
+			// Нужно сбросить кэш букв
+			var i, length;
+			for (i = 0, length = this.fmgrGraphics.length; i < length; ++i)
+				this.fmgrGraphics[i].ClearFontsRasterCache();
 
 			var item;
 			var activeIndex = this.model.getActive();
-			for(var i in this.wsViews) if (this.wsViews.hasOwnProperty(i)) {
+			for(i in this.wsViews) if (this.wsViews.hasOwnProperty(i)) {
 				item = this.wsViews[i];
 				// Меняем zoom (для не активных сменим как только сделаем его активным)
 				item.changeZoom(/*isDraw*/i == activeIndex);
@@ -1906,12 +1910,9 @@
 		};
 
 		WorkbookView.prototype._setHintsProps = function (bIsHinting, bIsSubpixHinting) {
-			var index, manager, hintProps;
-			for (index in this.fmgrGraphics) {
-				if (!this.fmgrGraphics.hasOwnProperty(index))
-					continue;
-
-				manager = this.fmgrGraphics[index];
+			var manager, hintProps;
+			for (var i = 0, length = this.fmgrGraphics.length; i < length; ++i) {
+				manager = this.fmgrGraphics[i];
 				hintProps = manager.m_oLibrary.tt_hint_props;
 				if (!hintProps)
 					continue;
