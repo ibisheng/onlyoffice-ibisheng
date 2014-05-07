@@ -880,6 +880,7 @@ var historyitem_ParaRun_Lang_EastAsia   = 27; // �������� ��
 var historyitem_ParaRun_Lang_Val        = 28; // �������� ��������� �����
 var historyitem_ParaRun_TextPr          = 29; // �������� ��� ��������� �������
 var historyitem_ParaRun_Unifill         = 30; // �������� ��� ��������� �������
+var historyitem_ParaRun_Shd             = 31;
 
 // Типы изменений в классе ParaTextPr
 var historyitem_TextPr_Change     =  1; // Изменяем настройку
