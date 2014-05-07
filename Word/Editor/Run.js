@@ -5158,9 +5158,9 @@ ParaRun.prototype =
             case historyitem_ParaRun_RFonts_HAnsi:
             {
                 if ( undefined != Data.Old )
-                    this.Pr.RFonts.Ascii = Data.Old;
+                    this.Pr.RFonts.HAnsi = Data.Old;
                 else
-                    this.Pr.RFonts.Ascii = undefined;
+                    this.Pr.RFonts.HAnsi = undefined;
 
                 this.Recalc_CompiledPr(true);
 
@@ -5170,9 +5170,9 @@ ParaRun.prototype =
             case historyitem_ParaRun_RFonts_CS:
             {
                 if ( undefined != Data.Old )
-                    this.Pr.RFonts.Ascii = Data.Old;
+                    this.Pr.RFonts.CS = Data.Old;
                 else
-                    this.Pr.RFonts.Ascii = undefined;
+                    this.Pr.RFonts.CS = undefined;
 
                 this.Recalc_CompiledPr(true);
 
@@ -5182,9 +5182,9 @@ ParaRun.prototype =
             case historyitem_ParaRun_RFonts_EastAsia:
             {
                 if ( undefined != Data.Old )
-                    this.Pr.RFonts.Ascii = Data.Old;
+                    this.Pr.RFonts.EastAsia = Data.Old;
                 else
-                    this.Pr.RFonts.Ascii = undefined;
+                    this.Pr.RFonts.EastAsia = undefined;
 
                 this.Recalc_CompiledPr(true);
 
@@ -5194,9 +5194,9 @@ ParaRun.prototype =
             case historyitem_ParaRun_RFonts_Hint:
             {
                 if ( undefined != Data.Old )
-                    this.Pr.RFonts.Ascii = Data.Old;
+                    this.Pr.RFonts.Hint = Data.Old;
                 else
-                    this.Pr.RFonts.Ascii = undefined;
+                    this.Pr.RFonts.Hint = undefined;
 
                 this.Recalc_CompiledPr(true);
 
@@ -5511,9 +5511,9 @@ ParaRun.prototype =
             case historyitem_ParaRun_RFonts_HAnsi:
             {
                 if ( undefined != Data.New )
-                    this.Pr.RFonts.Ascii = Data.New;
+                    this.Pr.RFonts.HAnsi = Data.New;
                 else
-                    this.Pr.RFonts.Ascii = undefined;
+                    this.Pr.RFonts.HAnsi = undefined;
 
                 this.Recalc_CompiledPr(true);
 
@@ -5523,9 +5523,9 @@ ParaRun.prototype =
             case historyitem_ParaRun_RFonts_CS:
             {
                 if ( undefined != Data.New )
-                    this.Pr.RFonts.Ascii = Data.New;
+                    this.Pr.RFonts.CS = Data.New;
                 else
-                    this.Pr.RFonts.Ascii = undefined;
+                    this.Pr.RFonts.CS = undefined;
 
                 this.Recalc_CompiledPr(true);
 
@@ -5535,9 +5535,9 @@ ParaRun.prototype =
             case historyitem_ParaRun_RFonts_EastAsia:
             {
                 if ( undefined != Data.New )
-                    this.Pr.RFonts.Ascii = Data.New;
+                    this.Pr.RFonts.EastAsia = Data.New;
                 else
-                    this.Pr.RFonts.Ascii = undefined;
+                    this.Pr.RFonts.EastAsia = undefined;
 
                 this.Recalc_CompiledPr(true);
 
@@ -5547,9 +5547,9 @@ ParaRun.prototype =
             case historyitem_ParaRun_RFonts_Hint:
             {
                 if ( undefined != Data.New )
-                    this.Pr.RFonts.Ascii = Data.New;
+                    this.Pr.RFonts.Hint = Data.New;
                 else
-                    this.Pr.RFonts.Ascii = undefined;
+                    this.Pr.RFonts.Hint = undefined;
 
                 this.Recalc_CompiledPr(true);
 
@@ -6391,7 +6391,7 @@ ParaRun.prototype =
                     };
                 }
                 else
-                    this.Pr.RFonts.Ascii = undefined;
+                    this.Pr.RFonts.EastAsia = undefined;
 
                 this.Recalc_CompiledPr(true);
 
