@@ -4566,6 +4566,9 @@ CDocumentShd.prototype =
 
     Compare : function(Shd)
     {
+        if ( undefined === Shd )
+            return false;
+        
         if ( this.Value === Shd.Value )
         {
             switch ( this.Value )
@@ -4583,6 +4586,18 @@ CDocumentShd.prototype =
         return false;
     },
     
+    Get_Color : function(Paragraph)
+    {
+        if ( undefined !== this.Unifill )
+        {
+            this.Unifill.check(Paragraph.Get_Theme(), Paragraph.Get_ColorMap());
+            var RGBA = this.Unifill.getRGBAColor();
+            return new CDocumentColor( RGBA.R, RGBA.G, RGBA.B, false );
+        }
+        else
+            return this.Color;
+    },
+    
     Init_Default : function()
     {
         this.Value = shd_Nil;
@@ -4592,6 +4607,12 @@ CDocumentShd.prototype =
 
     Set_FromObject : function(Shd)
     {
+        if ( undefined === Shd )
+        {
+            this.Value = shd_Nil;
+            return;
+        }
+        
         this.Value = Shd.Value;
         if ( shd_Nil != Shd.Value )
         {
