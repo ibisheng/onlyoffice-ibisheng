@@ -3526,7 +3526,34 @@ asc_docs_api.prototype.paraApply = function(Props)
             this.WordControl.m_oLogicDocument.Set_ParagraphShd( Props.Shd );
 
         if ( "undefined" != typeof(Props.Brd) && null != Props.Brd )
+        {
+            if(Props.Brd.Left && Props.Brd.Left.Color)
+            {
+                Props.Brd.Left.Unifill = CreateUnifillFromAscColor(Props.Brd.Left.Color);
+            }
+            if(Props.Brd.Top && Props.Brd.Top.Color)
+            {
+                Props.Brd.Top.Unifill = CreateUnifillFromAscColor(Props.Brd.Top.Color);
+            }
+            if(Props.Brd.Right && Props.Brd.Right.Color)
+            {
+                Props.Brd.Right.Unifill = CreateUnifillFromAscColor(Props.Brd.Right.Color);
+            }
+            if(Props.Brd.Bottom && Props.Brd.Bottom.Color)
+            {
+                Props.Brd.Bottom.Unifill = CreateUnifillFromAscColor(Props.Brd.Bottom.Color);
+            }
+            if(Props.Brd.InsideH && Props.Brd.InsideH.Color)
+            {
+                Props.Brd.InsideH.Unifill = CreateUnifillFromAscColor(Props.Brd.InsideH.Color);
+            }
+            if(Props.Brd.InsideV && Props.Brd.InsideV.Color)
+            {
+                Props.Brd.InsideV.Unifill = CreateUnifillFromAscColor(Props.Brd.InsideV.Color);
+            }
+
             this.WordControl.m_oLogicDocument.Set_ParagraphBorders( Props.Brd );
+        }
 
         if ( undefined != Props.Tabs )
         {
@@ -4872,6 +4899,38 @@ asc_docs_api.prototype.tblApply = function(obj)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Table_Properties) )
     {
+        if(obj.CellBorders)
+        {
+            if(obj.CellBorders.Left && obj.CellBorders.Left.Color)
+            {
+                obj.CellBorders.Left.Unifill = CreateUnifillFromAscColor(obj.CellBorders.Left.Color);
+            }
+            if(obj.CellBorders.Top && obj.CellBorders.Top.Color)
+            {
+                obj.CellBorders.Top.Unifill = CreateUnifillFromAscColor(obj.CellBorders.Top.Color);
+            }
+            if(obj.CellBorders.Right && obj.CellBorders.Right.Color)
+            {
+                obj.CellBorders.Right.Unifill = CreateUnifillFromAscColor(obj.CellBorders.Right.Color);
+            }
+            if(obj.CellBorders.Bottom && obj.CellBorders.Bottom.Color)
+            {
+                obj.CellBorders.Bottom.Unifill = CreateUnifillFromAscColor(obj.CellBorders.Bottom.Color);
+            }
+            if(obj.CellBorders.InsideH && obj.CellBorders.InsideH.Color)
+            {
+                obj.CellBorders.InsideH.Unifill = CreateUnifillFromAscColor(obj.CellBorders.InsideH.Color);
+            }
+            if(obj.CellBorders.InsideV && obj.CellBorders.InsideV.Color)
+            {
+                obj.CellBorders.InsideV.Unifill = CreateUnifillFromAscColor(obj.CellBorders.InsideV.Color);
+            }
+        }
+        if(obj.CellsBackground && obj.CellsBackground.Color)
+        {
+            obj.CellsBackground.Unifill = CreateUnifillFromAscColor(obj.CellsBackground.Color);
+        }
+
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Set_TableProps(obj);
     }

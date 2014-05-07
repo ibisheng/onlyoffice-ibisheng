@@ -140,6 +140,15 @@ function CreateAscColor(unicolor)
     }
     return ret;
 }
+
+function CreateUnifillFromAscColor(asc_color)
+{
+    var Unifill = new CUniFill();
+    Unifill.fill = new CSolidFill();
+    Unifill.fill.color = CorrectUniColor(asc_color, Unifill.fill.color);
+    return Unifill;
+}
+
 function CorrectUniColor(asc_color, unicolor)
 {
     if (null == asc_color)

@@ -4597,6 +4597,18 @@ CDocumentShd.prototype =
         else
             return this.Color;
     },
+
+    Get_Color2 : function(Theme, ColorMap)
+    {
+        if ( undefined !== this.Unifill )
+        {
+            this.Unifill.check(Theme, ColorMap);
+            var RGBA = this.Unifill.getRGBAColor();
+            return new CDocumentColor( RGBA.R, RGBA.G, RGBA.B, false );
+        }
+        else
+            return this.Color;
+    },
     
     Init_Default : function()
     {
@@ -4734,6 +4746,31 @@ CDocumentBorder.prototype =
             return false;
 
         return true;
+    },
+
+
+    Get_Color : function(Paragraph)
+    {
+        if ( undefined !== this.Unifill )
+        {
+            this.Unifill.check(Paragraph.Get_Theme(), Paragraph.Get_ColorMap());
+            var RGBA = this.Unifill.getRGBAColor();
+            return new CDocumentColor( RGBA.R, RGBA.G, RGBA.B, false );
+        }
+        else
+            return this.Color;
+    },
+
+    Get_Color2 : function(Theme, ColorMap)
+    {
+        if ( undefined !== this.Unifill )
+        {
+            this.Unifill.check(Theme, ColorMap);
+            var RGBA = this.Unifill.getRGBAColor();
+            return new CDocumentColor( RGBA.R, RGBA.G, RGBA.B, false );
+        }
+        else
+            return this.Color;
     },
 
     Set_FromObject : function(Border)

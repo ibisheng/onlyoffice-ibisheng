@@ -672,7 +672,16 @@ ParaRun.prototype =
                             var BgColor = undefined;
                             if ( undefined !== Pr.ParaPr.Shd && shd_Nil !== Pr.ParaPr.Shd.Value )
                             {
-                                BgColor = Pr.ParaPr.Shd.Color;
+                                if(Pr.ParaPr.Shd.Unifill)
+                                {
+                                    Pr.ParaPr.Shd.Unifill.check(this.Paragraph.Get_Theme(), this.Paragraph.Get_ColorMap());
+                                    var RGBA =  Pr.ParaPr.Shd.Unifill.getRGBAColor();
+                                    BgColor = new CDocumentColor(RGBA.R, RGBA.G, RGBA.B, false);
+                                }
+                                else
+                                {
+                                    BgColor = Pr.ParaPr.Shd.Color;
+                                }
                             }
                             else
                             {
@@ -3134,15 +3143,26 @@ ParaRun.prototype =
 
         var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
 
-        var CurColor = new CDocumentColor( 0, 0, 0, false );
+        var CurColor, RGBA, Theme = this.Paragraph.Get_Theme(), ColorMap = this.Paragraph.Get_ColorMap();
 
         // Выставляем цвет обводки
         if ( true === PDSL.VisitedHyperlink )
-            CurColor.Set( 128, 0, 151, 255 );
-        else if ( true === CurTextPr.Color.Auto )
-            CurColor.Set( AutoColor.r, AutoColor.g, AutoColor.b );
+            CurColor = new CDocumentColor( 128, 0, 151 );
+        else if ( true === CurTextPr.Color.Auto && !CurTextPr.Unifill)
+            CurColor = new CDocumentColor( AutoColor.r, AutoColor.g, AutoColor.b );
         else
-            CurColor.Set( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+        {
+            if(CurTextPr.Unifill)
+            {
+                CurTextPr.Unifill.check(Theme, ColorMap);
+                RGBA = CurTextPr.Unifill.getRGBAColor();
+                CurColor = new CDocumentColor( RGBA.R, RGBA.G, RGBA.B );
+            }
+            else
+            {
+                CurColor = new CDocumentColor( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b );
+            }
+        }
 
         var SpellingMarksArray = new Object();
         var SpellingMarksCount = this.SpellingMarks.length;
