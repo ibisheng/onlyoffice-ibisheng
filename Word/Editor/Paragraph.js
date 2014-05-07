@@ -5980,10 +5980,9 @@ Paragraph.prototype =
             BgColor = this.Parent.Get_TextBackGroundColor();
         }
 
-        // Определим автоцвет относительно заливки
-        var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
-        var Theme = this.Get_Theme();
+        var Theme    = this.Get_Theme();
         var ColorMap = this.Get_ColorMap();
+        
         // 1 часть отрисовки :
         //    Рисуем слева от параграфа знак, если данный параграф зажат другим пользователем
         this.Internal_Draw_1( CurPage, pGraphics, Pr );
@@ -6001,11 +6000,11 @@ Paragraph.prototype =
 
         // 4 часть отрисовки :
         //    Рисуем сами элементы параграфа
-        this.Internal_Draw_4( CurPage, pGraphics, Pr, AutoColor, Theme, ColorMap);
+        this.Internal_Draw_4( CurPage, pGraphics, Pr, BgColor, Theme, ColorMap);
 
         // 5 часть отрисовки :
         //    Рисуем различные подчеркивания и зачеркивания.
-        this.Internal_Draw_5( CurPage, pGraphics, Pr, AutoColor );
+        this.Internal_Draw_5( CurPage, pGraphics, Pr, BgColor );
 
         // 6 часть отрисовки :
         //    Рисуем верхнюю, нижнюю и промежуточную границы
@@ -6808,87 +6807,44 @@ Paragraph.prototype =
         }
     },
 
-    Internal_Draw_4 : function(CurPage, pGraphics, Pr, AutoColor, Theme, ColorMap)
+    Internal_Draw_4 : function(CurPage, pGraphics, Pr, BgColor, Theme, ColorMap)
     {
-        if ( true !== Debug_ParaRunMode )
+        var PDSE = g_oPDSE;
+        PDSE.Reset( this, pGraphics, BgColor, Theme, ColorMap);
+
+        var StartLine = this.Pages[CurPage].StartLine;
+        var EndLine   = this.Pages[CurPage].EndLine;
+
+        for ( var CurLine = StartLine; CurLine <= EndLine; CurLine++ )
         {
-            var StartPagePos = this.Lines[this.Pages[CurPage].StartLine].StartPos;
+            var Line = this.Lines[CurLine];
+            var RangesCount = Line.Ranges.length;
 
-            var HyperPos = this.Internal_FindBackward( StartPagePos, [para_HyperlinkStart, para_HyperlinkEnd] );
-            var bVisitedHyperlink = false;
-
-            if ( true === HyperPos.Found && para_HyperlinkStart === HyperPos.Type )
-                bVisitedHyperlink = this.Content[HyperPos.LetterPos].Get_Visited();
-
-            var CurTextPr = this.Pages[CurPage].TextPr;
-
-            // Выставляем шрифт и заливку текста
-            pGraphics.SetTextPr( CurTextPr, this.Get_Theme() );
-
-            if ( true === bVisitedHyperlink )
-                pGraphics.b_color1( 128, 0, 151, 255 );
-            else if ( true === CurTextPr.Color.Auto )
-                pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
-            else
-                pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
-
-            var StartLine = this.Pages[CurPage].StartLine;
-            var EndLine   = this.Pages[CurPage].EndLine;
-
-            for ( var CurLine = StartLine; CurLine <= EndLine; CurLine++ )
+            for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
             {
-                var StartPos = this.Lines[CurLine].StartPos;
-                var EndPos   = this.Lines[CurLine].EndPos;
-
-                var bFirstLineItem = true;
-                var CurRange = 0;
                 var Y = this.Pages[CurPage].Y + this.Lines[CurLine].Y;
                 var X = this.Lines[CurLine].Ranges[CurRange].XVisible;
 
-                var bEnd = false;
+                var Range = Line.Ranges[CurRange];
 
-                for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
+                PDSE.Reset_Range( CurPage, CurLine, CurRange, X, Y );
+
+                var StartPos = Range.StartPos;
+                var EndPos   = Range.EndPos;
+
+                // Отрисовка нумерации
+                if ( true === this.Numbering.Check_Range(CurRange, CurLine) )
                 {
-                    var Item = this.Content[Pos];
-
-                    // Отслеживаем изменение позиции (отрезок)
-                    // Изменении страницы и строки не отслеживаем
-                    if ( undefined != Item.CurRange )
+                    var NumberingItem = this.Numbering;
+                    if ( para_Numbering === NumberingItem.Type )
                     {
-                        if ( Item.CurRange > CurRange )
+                        var NumPr = Pr.ParaPr.NumPr;
+                        if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId )
                         {
-                            CurRange = Item.CurRange;
-                            X        = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                            // Ничего не делаем
                         }
-                    }
-
-                    var TempY = Y;
-
-                    switch( CurTextPr.VertAlign )
-                    {
-                        case vertalign_SubScript:
+                        else
                         {
-                            Y -= vertalign_Koef_Sub * CurTextPr.FontSize * g_dKoef_pt_to_mm;
-
-                            break;
-                        }
-                        case vertalign_SuperScript:
-                        {
-                            Y -= vertalign_Koef_Super * CurTextPr.FontSize * g_dKoef_pt_to_mm;
-
-                            break;
-                        }
-                    }
-
-                    if ( Pos === this.Numbering.Pos )
-                    {
-                        var NumberingItem = this.Numbering;
-                        if ( para_Numbering === this.Numbering.Type )
-                        {
-                            var NumPr = Pr.ParaPr.NumPr;
-                            if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId )
-                                break;
-
                             var Numbering = this.Parent.Get_Numbering();
                             var NumLvl    = Numbering.Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl];
                             var NumSuff   = NumLvl.Suff;
@@ -6911,25 +6867,37 @@ Paragraph.prototype =
                             else if ( align_Center === NumJc )
                                 X_start = X - NumberingItem.WidthNum / 2;
 
-                            if ( true === NumTextPr.Color.Auto )
-                                pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+                            var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
+
+                            NumTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
+                            var RGBA ;
+                            if(NumTextPr.Unifill)
+                            {
+                                RGBA = NumTextPr.Unifill.getRGBAColor();
+                                pGraphics.b_color1(RGBA.R, RGBA.G, RGBA.B, 255 );
+                            }
                             else
-                                pGraphics.b_color1( NumTextPr.Color.r, NumTextPr.Color.g, NumTextPr.Color.b, 255 );
+                            {
+                                if ( true === NumTextPr.Color.Auto )
+                                    pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+                                else
+                                    pGraphics.b_color1(NumTextPr.Color.r, NumTextPr.Color.g, NumTextPr.Color.b, 255 );
+                            }
 
                             // Рисуется только сам символ нумерации
                             switch ( NumJc )
                             {
                                 case align_Right:
-                                    NumberingItem.Draw( X - NumberingItem.WidthNum, Y, pGraphics, Numbering, NumTextPr, NumPr );
+                                    NumberingItem.Draw( X - NumberingItem.WidthNum, Y, pGraphics, Numbering, NumTextPr, NumPr, PDSE.Theme );
                                     break;
 
                                 case align_Center:
-                                    NumberingItem.Draw( X - NumberingItem.WidthNum / 2, Y, pGraphics, Numbering, NumTextPr, NumPr );
+                                    NumberingItem.Draw( X - NumberingItem.WidthNum / 2, Y, pGraphics, Numbering, NumTextPr, NumPr, PDSE.Theme );
                                     break;
 
                                 case align_Left:
                                 default:
-                                    NumberingItem.Draw( X, Y, pGraphics, Numbering, NumTextPr, NumPr );
+                                    NumberingItem.Draw( X, Y, pGraphics, Numbering, NumTextPr, NumPr, PDSE.Theme );
                                     break;
                             }
 
@@ -6966,10 +6934,17 @@ Paragraph.prototype =
 
                             if ( true === NumTextPr.Strikeout || true === NumTextPr.Underline )
                             {
-                                if ( true === NumTextPr.Color.Auto )
-                                    pGraphics.p_color( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+                                if(NumTextPr.Unifill)
+                                {
+                                    pGraphics.p_color( RGBA.R, RGBA.G, RGBA.B, 255 );
+                                }
                                 else
-                                    pGraphics.p_color( NumTextPr.Color.r, NumTextPr.Color.g, NumTextPr.Color.b, 255 );
+                                {
+                                    if ( true === NumTextPr.Color.Auto )
+                                        pGraphics.p_color( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+                                    else
+                                        pGraphics.p_color( NumTextPr.Color.r, NumTextPr.Color.g, NumTextPr.Color.b, 255 );
+                                }
                             }
 
                             if ( true === NumTextPr.Strikeout )
@@ -6977,650 +6952,126 @@ Paragraph.prototype =
 
                             if ( true === NumTextPr.Underline )
                                 pGraphics.drawHorLine( 0, (Y + this.Lines[CurLine].Metrics.TextDescent * 0.4), X_start, X_start + NumberingItem.WidthNum, (NumTextPr.FontSize / 18) * g_dKoef_pt_to_mm);
-
-
-                            X += NumberingItem.WidthVisible;
-
-                            // Восстановим настройки
-                            pGraphics.SetTextPr( CurTextPr, this.Get_Theme() );
-                            if ( true === bVisitedHyperlink )
-                                pGraphics.b_color1( 128, 0, 151, 255 );
-                            else if ( true === CurTextPr.Color.Auto )
-                                pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
-                            else
-                                pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
-                        }
-                        else if ( para_PresentationNumbering === this.Numbering.Type )
-                        {
-                            if ( true != this.IsEmpty() )
-                            {
-                                // Найдем настройки для первого текстового элемента
-                                var FirstTextPr = this.Internal_CalculateTextPr( this.Internal_GetStartPos() );
-
-                                if ( Pr.ParaPr.Ind.FirstLine < 0 )
-                                    NumberingItem.Draw( X, Y, pGraphics, FirstTextPr );
-                                else
-                                    NumberingItem.Draw( this.X + Pr.ParaPr.Ind.Left, Y, pGraphics, FirstTextPr );
-                            }
-
-                            X += NumberingItem.WidthVisible;
                         }
                     }
-
-                    switch( Item.Type )
+                    else if ( para_PresentationNumbering === this.Numbering.Type )
                     {
-                        case para_PageNum:
-                        case para_Drawing:
-                        case para_Tab:
-                        case para_Text:
-                        case para_Math:
+                        if ( true != this.IsEmpty() )
                         {
-                            if ( para_Drawing != Item.Type || drawing_Anchor != Item.DrawingType )
-                            {
-                                bFirstLineItem = false;
-
-                                if ( para_PageNum != Item.Type )
-                                    Item.Draw( X, Y - Item.YOffset, pGraphics );
-                                else
-                                    Item.Draw( X, Y - Item.YOffset, pGraphics, this.Get_StartPage_Absolute() + CurPage, Pr.ParaPr.Jc );
-
-                                X += Item.WidthVisible;
-                            }
-
-                            // Внутри отрисовки инлайн-автофигур могут изменится цвета и шрифт, поэтому восстанавливаем настройки
-                            if ( para_Drawing === Item.Type && drawing_Inline === Item.DrawingType )
-                            {
-                                pGraphics.SetTextPr( CurTextPr, this.Get_Theme() );
-
-                                if ( true === CurTextPr.Color.Auto )
-                                {
-                                    pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
-                                    pGraphics.p_color( AutoColor.r, AutoColor.g, AutoColor.b, 255);
-                                }
-                                else
-                                {
-                                    pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
-                                    pGraphics.p_color( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
-                                }
-                            }
-
-                            break;
-                        }
-                        case para_Space:
-                        {
-                            Item.Draw( X, Y - Item.YOffset, pGraphics );
-
-                            X += Item.WidthVisible;
-
-                            break;
-                        }
-                        case para_TextPr:
-                        {
-                            CurTextPr = Item.CalcValue;//this.Internal_CalculateTextPr( Pos );
-                            pGraphics.SetTextPr( CurTextPr, this.Get_Theme() );
-
-                            if ( true === bVisitedHyperlink )
-                                pGraphics.b_color1( 128, 0, 151, 255 );
-                            else if ( true === CurTextPr.Color.Auto )
-                                pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+                            if ( Pr.ParaPr.Ind.FirstLine < 0 )
+                                NumberingItem.Draw( X, Y, pGraphics, CurTextPr, Theme );
                             else
-                                pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
-
-                            break;
-                        }
-                        case para_End:
-                        {
-                            // Выставляем настройки для символа параграфа
-                            var EndTextPr = Item.TextPr;
-
-                            pGraphics.SetTextPr( EndTextPr, this.Get_Theme() );
-
-                            if ( true === EndTextPr.Color.Auto )
-                                pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
-                            else
-                                pGraphics.b_color1( EndTextPr.Color.r, EndTextPr.Color.g, EndTextPr.Color.b, 255);
-
-                            bEnd = true;
-                            var bEndCell = false;
-                            if ( null === this.Get_DocumentNext() && true === this.Parent.Is_TableCellContent() )
-                                bEndCell = true;
-
-                            Item.Draw( X, Y - Item.YOffset, pGraphics, bEndCell );
-                            X += Item.Width;
-                            break;
-                        }
-                        case para_NewLine:
-                        {
-                            Item.Draw( X, Y - Item.YOffset, pGraphics );
-                            X += Item.WidthVisible;
-                            break;
-                        }
-
-                        case para_HyperlinkStart:
-                        {
-                            bVisitedHyperlink = Item.Get_Visited();
-
-                            if ( true === bVisitedHyperlink )
-                                pGraphics.b_color1( 128, 0, 151, 255 );
-                            else if ( true === CurTextPr.Color.Auto )
-                                pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
-                            else
-                                pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
-
-                            break;
-                        }
-                        case para_HyperlinkEnd:
-                        {
-                            bVisitedHyperlink = false;
-
-                            if ( true === CurTextPr.Color.Auto )
-                                pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
-                            else
-                                pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
-
-                            break;
+                                NumberingItem.Draw( this.X + Pr.ParaPr.Ind.Left, Y, pGraphics, CurTextPr, Theme );
                         }
                     }
 
-                    Y = TempY;
+                    PDSE.X += NumberingItem.WidthVisible;
                 }
-            }
-        }
-        else
-        {
-            var PDSE = g_oPDSE;
-            PDSE.Reset( this, pGraphics, AutoColor, Theme, ColorMap);
 
-            var StartLine = this.Pages[CurPage].StartLine;
-            var EndLine   = this.Pages[CurPage].EndLine;
-
-            for ( var CurLine = StartLine; CurLine <= EndLine; CurLine++ )
-            {
-                var Line = this.Lines[CurLine];
-                var RangesCount = Line.Ranges.length;
-
-                for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
+                for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
                 {
-                    var Y = this.Pages[CurPage].Y + this.Lines[CurLine].Y;
-                    var X = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                    var Item = this.Content[Pos];
+                    PDSE.CurPos.Update( Pos, 0 );
 
-                    var Range = Line.Ranges[CurRange];
-
-                    PDSE.Reset_Range( CurPage, CurLine, CurRange, X, Y );
-
-                    var StartPos = Range.StartPos;
-                    var EndPos   = Range.EndPos;
-
-                    // Отрисовка нумерации
-                    if ( true === this.Numbering.Check_Range(CurRange, CurLine) )
-                    {
-                        var NumberingItem = this.Numbering;
-                        if ( para_Numbering === NumberingItem.Type )
-                        {
-                            var NumPr = Pr.ParaPr.NumPr;
-                            if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId )
-                            {
-                                // Ничего не делаем
-                            }
-                            else
-                            {
-                                var Numbering = this.Parent.Get_Numbering();
-                                var NumLvl    = Numbering.Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl];
-                                var NumSuff   = NumLvl.Suff;
-                                var NumJc     = NumLvl.Jc;
-                                var NumTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
-
-                                // Word не рисует подчеркивание у символа списка, если оно пришло из настроек для
-                                // символа параграфа.
-
-                                var TextPr_temp = this.TextPr.Value.Copy();
-                                TextPr_temp.Underline = undefined;
-
-                                NumTextPr.Merge( TextPr_temp );
-                                NumTextPr.Merge( NumLvl.TextPr );
-
-                                var X_start = X;
-
-                                if ( align_Right === NumJc )
-                                    X_start = X - NumberingItem.WidthNum;
-                                else if ( align_Center === NumJc )
-                                    X_start = X - NumberingItem.WidthNum / 2;
-
-                                NumTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
-                                var RGBA ;
-                                if(NumTextPr.Unifill)
-                                {
-                                    RGBA = NumTextPr.Unifill.getRGBAColor();
-                                    pGraphics.b_color1(RGBA.R, RGBA.G, RGBA.B, 255 );
-                                }
-                                else
-                                {
-                                    if ( true === NumTextPr.Color.Auto )
-                                        pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
-                                    else
-                                        pGraphics.b_color1(NumTextPr.Color.r, NumTextPr.Color.g, NumTextPr.Color.b, 255 );
-                                }
-
-                                // Рисуется только сам символ нумерации
-                                switch ( NumJc )
-                                {
-                                    case align_Right:
-                                        NumberingItem.Draw( X - NumberingItem.WidthNum, Y, pGraphics, Numbering, NumTextPr, NumPr, PDSE.Theme );
-                                        break;
-
-                                    case align_Center:
-                                        NumberingItem.Draw( X - NumberingItem.WidthNum / 2, Y, pGraphics, Numbering, NumTextPr, NumPr, PDSE.Theme );
-                                        break;
-
-                                    case align_Left:
-                                    default:
-                                        NumberingItem.Draw( X, Y, pGraphics, Numbering, NumTextPr, NumPr, PDSE.Theme );
-                                        break;
-                                }
-
-                                if ( true === editor.ShowParaMarks && numbering_suff_Tab === NumSuff )
-                                {
-                                    var TempWidth     = NumberingItem.WidthSuff;
-                                    var TempRealWidth = 3.143; // ширина символа "стрелка влево" в шрифте Wingding3,10
-
-                                    var X1 = X;
-                                    switch ( NumJc )
-                                    {
-                                        case align_Right:
-                                            break;
-
-                                        case align_Center:
-                                            X1 += NumberingItem.WidthNum / 2;
-                                            break;
-
-                                        case align_Left:
-                                        default:
-                                            X1 += NumberingItem.WidthNum;
-                                            break;
-                                    }
-
-                                    var X0 = TempWidth / 2 - TempRealWidth / 2;
-
-                                    pGraphics.SetFont( {FontFamily: { Name : "Wingdings 3", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
-
-                                    if ( X0 > 0 )
-                                        pGraphics.FillText2( X1 + X0, Y, String.fromCharCode( tab_Symbol ), 0, TempWidth );
-                                    else
-                                        pGraphics.FillText2( X1, Y, String.fromCharCode( tab_Symbol ), TempRealWidth - TempWidth, TempWidth );
-                                }
-
-                                if ( true === NumTextPr.Strikeout || true === NumTextPr.Underline )
-                                {
-                                    if(NumTextPr.Unifill)
-                                    {
-                                        pGraphics.p_color( RGBA.R, RGBA.G, RGBA.B, 255 );
-                                    }
-                                    else
-                                    {
-                                        if ( true === NumTextPr.Color.Auto )
-                                            pGraphics.p_color( AutoColor.r, AutoColor.g, AutoColor.b, 255);
-                                        else
-                                            pGraphics.p_color( NumTextPr.Color.r, NumTextPr.Color.g, NumTextPr.Color.b, 255 );
-                                    }
-                                }
-
-                                if ( true === NumTextPr.Strikeout )
-                                    pGraphics.drawHorLine(0, (Y - NumTextPr.FontSize * g_dKoef_pt_to_mm * 0.27), X_start, X_start + NumberingItem.WidthNum, (NumTextPr.FontSize / 18) * g_dKoef_pt_to_mm);
-
-                                if ( true === NumTextPr.Underline )
-                                    pGraphics.drawHorLine( 0, (Y + this.Lines[CurLine].Metrics.TextDescent * 0.4), X_start, X_start + NumberingItem.WidthNum, (NumTextPr.FontSize / 18) * g_dKoef_pt_to_mm);
-                            }
-                        }
-                        else if ( para_PresentationNumbering === this.Numbering.Type )
-                        {
-                            if ( true != this.IsEmpty() )
-                            {
-                                if ( Pr.ParaPr.Ind.FirstLine < 0 )
-                                    NumberingItem.Draw( X, Y, pGraphics, CurTextPr, Theme );
-                                else
-                                    NumberingItem.Draw( this.X + Pr.ParaPr.Ind.Left, Y, pGraphics, CurTextPr, Theme );
-                            }
-                        }
-
-                        PDSE.X += NumberingItem.WidthVisible;
-                    }
-
-                    for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
-                    {
-                        var Item = this.Content[Pos];
-                        PDSE.CurPos.Update( Pos, 0 );
-
-                        Item.Draw_Elements( PDSE );
-                    }
+                    Item.Draw_Elements( PDSE );
                 }
             }
         }
     },
 
-    Internal_Draw_5 : function(CurPage, pGraphics, Pr, AutoColor)
+    Internal_Draw_5 : function(CurPage, pGraphics, Pr, BgColor)
     {
-        if ( true !== Debug_ParaRunMode )
+        var PDSL = g_oPDSL;
+        PDSL.Reset( this, pGraphics, BgColor );
+
+        var Page = this.Pages[CurPage];
+
+        var StartLine = Page.StartLine;
+        var EndLine   = Page.EndLine;
+
+        PDSL.SpellingCounter = this.SpellChecker.Get_DrawingInfo( this.Get_PageStartPos(CurPage) );
+
+        for ( var CurLine = StartLine; CurLine <= EndLine; CurLine++ )
         {
+            var Line      = this.Lines[CurLine];
+            var LineM     = Line.Metrics;
 
-            var _Page = this.Pages[CurPage];
-            var StartPagePos = this.Lines[_Page.StartLine].StartPos;
+            var Baseline        = Page.Y + Line.Y;
+            var UnderlineOffset = LineM.TextDescent  * 0.4;
 
-            var HyperPos = this.Internal_FindBackward( StartPagePos, [para_HyperlinkStart, para_HyperlinkEnd] );
-            var bVisitedHyperlink = false;
+            PDSL.Reset_Line( CurPage, CurLine, Baseline, UnderlineOffset );
 
-            if ( true === HyperPos.Found && para_HyperlinkStart === HyperPos.Type )
-                bVisitedHyperlink = this.Content[HyperPos.LetterPos].Get_Visited();
+            // Сначала проанализируем данную строку: в массивы aStrikeout, aDStrikeout, aUnderline
+            // aSpelling сохраним позиции начала и конца продолжительных одинаковых настроек зачеркивания,
+            // двойного зачеркивания, подчеркивания и подчеркивания орфографии.
 
-            var CurTextPr = _Page.TextPr;
-
-            // Выставляем цвет обводки
-            var CurColor;
-            if ( true === bVisitedHyperlink )
-                CurColor = new CDocumentColor( 128, 0, 151 );
-            else if ( true === CurTextPr.Color.Auto )
-                CurColor = new CDocumentColor( AutoColor.r, AutoColor.g, AutoColor.b );
-            else
-                CurColor = new CDocumentColor( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b );
-
-            var StartLine = _Page.StartLine;
-            var EndLine   = _Page.EndLine;
-
-            var CheckSpelling = this.SpellChecker.Get_DrawingInfo();
-
-            var aStrikeout  = new CParaDrawingRangeLines();
-            var aDStrikeout = new CParaDrawingRangeLines();
-            var aUnderline  = new CParaDrawingRangeLines();
-            var aSpelling   = new CParaDrawingRangeLines();
-            for ( var CurLine = StartLine; CurLine <= EndLine; CurLine++ )
+            var RangesCount = Line.Ranges.length;
+            for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
             {
-                var _Line      = this.Lines[CurLine];
-                var EndLinePos = _Line.EndPos;
-                var LineY      = _Page.Y + _Line.Y;
-                var Y          = LineY;
+                var Range = Line.Ranges[CurRange];
+                var X = Range.XVisible;
 
-                var LineM      = _Line.Metrics;
-                var LineM_D_04 = LineM.TextDescent * 0.4;
+                PDSL.Reset_Range( CurRange, X, Range.SpacesSkip + Range.Spaces );
 
-                var RangesCount = _Line.Ranges.length;
+                var StartPos = Range.StartPos;
+                var EndPos   = Range.EndPos;
 
-                aStrikeout.Clear();
-                aDStrikeout.Clear();
-                aUnderline.Clear();
-                aSpelling.Clear();
+                // TODO: Нумерация подчеркивается и зачеркивается в Draw_Elements, неплохо бы сюда перенести
+                if ( true === this.Numbering.Check_Range( CurRange, CurLine ) )
+                    PDSL.X += this.Numbering.WidthVisible;
 
-                for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
+                for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
                 {
-                    var _Range = _Line.Ranges[CurRange];
+                    PDSL.CurPos.Update( Pos, 0 );
+                    var Item = this.Content[Pos];
 
-                    // Сначала проанализируем данную строку: в массивы aStrikeout, aDStrikeout, aUnderline
-                    // aSpelling сохраним позиции начала и конца продолжительных одинаковых настроек зачеркивания,
-                    // двойного зачеркивания, подчеркивания и подчеркивания орфографии.
-
-                    var X = _Range.XVisible;
-
-                    var StartPos = _Range.StartPos;
-                    var EndPos   = ( CurRange === RangesCount - 1 ? EndLinePos : _Line.Ranges[CurRange + 1].StartPos - 1 );
-
-                    for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
-                    {
-                        var Item = this.Content[Pos];
-
-                        // Нумерацию подчеркиваем и зачеркиваем в Internal_Draw_4
-                        if ( Pos === this.Numbering.Pos )
-                            X += this.Numbering.WidthVisible;
-
-                        switch( Item.Type )
-                        {
-                            case para_End:
-                            case para_NewLine:
-                            {
-                                X += Item.WidthVisible;
-
-                                break;
-                            }
-
-                            case para_PageNum:
-                            case para_Drawing:
-                            case para_Tab:
-                            case para_Text:
-                            case para_Math:
-                            {
-                                if ( para_Drawing != Item.Type || drawing_Anchor != Item.DrawingType )
-                                {
-                                    if ( true === CurTextPr.DStrikeout )
-                                        aDStrikeout.Add( Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b );
-                                    else if ( true === CurTextPr.Strikeout )
-                                        aStrikeout.Add( Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b );
-
-                                    if ( true === CurTextPr.Underline )
-                                        aUnderline.Add( Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b );
-
-                                    if ( true === CheckSpelling[Pos] )
-                                        aSpelling.Add( Y + LineM_D_04, Y + LineM_D_04, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, 0, 0, 0 );
-
-                                    X += Item.WidthVisible;
-                                }
-
-                                break;
-                            }
-                            case para_Space:
-                            {
-                                // Пробелы в конце строки (и строку состоящую из пробелов) не подчеркиваем, не зачеркиваем и не выделяем
-                                if ( Pos >= _Range.StartPos2 && Pos <= _Range.EndPos2 )
-                                {
-                                    if ( true === CurTextPr.DStrikeout )
-                                        aDStrikeout.Add( Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b );
-                                    else if ( true === CurTextPr.Strikeout )
-                                        aStrikeout.Add( Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b );
-
-                                    if ( true === CurTextPr.Underline )
-                                        aUnderline.Add( Y + LineM_D_04, Y + LineM_D_04, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b );
-                                }
-
-                                X += Item.WidthVisible;
-
-                                break;
-                            }
-                            case para_TextPr:
-                            {
-                                CurTextPr = Item.CalcValue;
-
-                                // Выставляем цвет обводки
-                                if ( true === bVisitedHyperlink )
-                                    CurColor.Set( 128, 0, 151, 255 );
-                                else if ( true === CurTextPr.Color.Auto )
-                                    CurColor.Set( AutoColor.r, AutoColor.g, AutoColor.b );
-                                else
-                                    CurColor.Set( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
-
-                                switch( CurTextPr.VertAlign )
-                                {
-                                    case vertalign_SubScript:
-                                    {
-                                        Y = LineY - vertalign_Koef_Sub * CurTextPr.FontSize * g_dKoef_pt_to_mm;
-
-                                        break;
-                                    }
-                                    case vertalign_SuperScript:
-                                    {
-                                        Y = LineY - vertalign_Koef_Super * CurTextPr.FontSize * g_dKoef_pt_to_mm;
-
-                                        break;
-                                    }
-                                    default :
-                                    {
-                                        Y = LineY;
-                                        break;
-                                    }
-                                }
-
-                                break;
-                            }
-                            case para_HyperlinkStart:
-                            {
-                                bVisitedHyperlink = Item.Get_Visited();
-
-                                // Выставляем цвет обводки
-                                if ( true === bVisitedHyperlink )
-                                    CurColor.Set( 128, 0, 151, 255 );
-                                else if ( true === CurTextPr.Color.Auto )
-                                    CurColor.Set( AutoColor.r, AutoColor.g, AutoColor.b );
-                                else
-                                    CurColor.Set( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
-
-                                break;
-                            }
-                            case para_HyperlinkEnd:
-                            {
-                                bVisitedHyperlink = false;
-
-                                if ( true === CurTextPr.Color.Auto )
-                                    CurColor.Set( AutoColor.r, AutoColor.g, AutoColor.b );
-                                else
-                                    CurColor.Set( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
-
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                // Рисуем зачеркивание
-                var Element = aStrikeout.Get_Next();
-                while ( null != Element )
-                {
-                    pGraphics.p_color( Element.r, Element.g, Element.b, 255 );
-                    pGraphics.drawHorLine(c_oAscLineDrawingRule.Top, Element.y0, Element.x0, Element.x1, Element.w );
-                    Element = aStrikeout.Get_Next();
-                }
-
-                // Рисуем двойное зачеркивание
-                Element = aDStrikeout.Get_Next();
-                while ( null != Element )
-                {
-                    pGraphics.p_color( Element.r, Element.g, Element.b, 255 );
-                    pGraphics.drawHorLine2(c_oAscLineDrawingRule.Top, Element.y0, Element.x0, Element.x1, Element.w );
-                    Element = aDStrikeout.Get_Next();
-                }
-
-                // Рисуем подчеркивание
-                aUnderline.Correct_w_ForUnderline();
-                Element = aUnderline.Get_Next();
-                while ( null != Element )
-                {
-                    pGraphics.p_color( Element.r, Element.g, Element.b, 255 );
-                    pGraphics.drawHorLine(0, Element.y0, Element.x0, Element.x1, Element.w );
-                    Element = aUnderline.Get_Next();
-                }
-
-                // Рисуем подчеркивание орфографии
-                if(this.bFromDocument)
-                {
-                    pGraphics.p_color( 255, 0, 0, 255 );
-                    var SpellingW = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
-                    Element = aSpelling.Get_Next();
-                    while ( null != Element )
-                    {
-                        pGraphics.DrawSpellingLine(Element.y0, Element.x0, Element.x1, SpellingW);
-                        Element = aSpelling.Get_Next();
-                    }
+                    Item.Draw_Lines(PDSL);
                 }
             }
-        }
-        else
-        {
-            var PDSL = g_oPDSL;
-            PDSL.Reset( this, pGraphics, AutoColor );
 
-            var Page = this.Pages[CurPage];
+            var aStrikeout  = PDSL.Strikeout;
+            var aDStrikeout = PDSL.DStrikeout;
+            var aUnderline  = PDSL.Underline;
+            var aSpelling   = PDSL.Spelling;
 
-            var StartLine = Page.StartLine;
-            var EndLine   = Page.EndLine;
-
-            PDSL.SpellingCounter = this.SpellChecker.Get_DrawingInfo( this.Get_PageStartPos(CurPage) );
-
-            for ( var CurLine = StartLine; CurLine <= EndLine; CurLine++ )
+            // Рисуем зачеркивание
+            var Element = aStrikeout.Get_Next();
+            while ( null != Element )
             {
-                var Line      = this.Lines[CurLine];
-                var LineM     = Line.Metrics;
+                pGraphics.p_color( Element.r, Element.g, Element.b, 255 );
+                pGraphics.drawHorLine(c_oAscLineDrawingRule.Top, Element.y0, Element.x0, Element.x1, Element.w );
+                Element = aStrikeout.Get_Next();
+            }
 
-                var Baseline        = Page.Y + Line.Y;
-                var UnderlineOffset = LineM.TextDescent  * 0.4;
-
-                PDSL.Reset_Line( CurPage, CurLine, Baseline, UnderlineOffset );
-
-                // Сначала проанализируем данную строку: в массивы aStrikeout, aDStrikeout, aUnderline
-                // aSpelling сохраним позиции начала и конца продолжительных одинаковых настроек зачеркивания,
-                // двойного зачеркивания, подчеркивания и подчеркивания орфографии.
-
-                var RangesCount = Line.Ranges.length;
-                for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
-                {
-                    var Range = Line.Ranges[CurRange];
-                    var X = Range.XVisible;
-
-                    PDSL.Reset_Range( CurRange, X, Range.SpacesSkip + Range.Spaces );
-
-                    var StartPos = Range.StartPos;
-                    var EndPos   = Range.EndPos;
-
-                    // TODO: Нумерация подчеркивается и зачеркивается в Draw_Elements, неплохо бы сюда перенести
-                    if ( true === this.Numbering.Check_Range( CurRange, CurLine ) )
-                        PDSL.X += this.Numbering.WidthVisible;
-
-                    for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
-                    {
-                        PDSL.CurPos.Update( Pos, 0 );
-                        var Item = this.Content[Pos];
-
-                        Item.Draw_Lines(PDSL);
-                    }
-                }
-
-                var aStrikeout  = PDSL.Strikeout;
-                var aDStrikeout = PDSL.DStrikeout;
-                var aUnderline  = PDSL.Underline;
-                var aSpelling   = PDSL.Spelling;
-
-                // Рисуем зачеркивание
-                var Element = aStrikeout.Get_Next();
-                while ( null != Element )
-                {
-                    pGraphics.p_color( Element.r, Element.g, Element.b, 255 );
-                    pGraphics.drawHorLine(c_oAscLineDrawingRule.Top, Element.y0, Element.x0, Element.x1, Element.w );
-                    Element = aStrikeout.Get_Next();
-                }
-
-                // Рисуем двойное зачеркивание
+            // Рисуем двойное зачеркивание
+            Element = aDStrikeout.Get_Next();
+            while ( null != Element )
+            {
+                pGraphics.p_color( Element.r, Element.g, Element.b, 255 );
+                pGraphics.drawHorLine2(c_oAscLineDrawingRule.Top, Element.y0, Element.x0, Element.x1, Element.w );
                 Element = aDStrikeout.Get_Next();
-                while ( null != Element )
-                {
-                    pGraphics.p_color( Element.r, Element.g, Element.b, 255 );
-                    pGraphics.drawHorLine2(c_oAscLineDrawingRule.Top, Element.y0, Element.x0, Element.x1, Element.w );
-                    Element = aDStrikeout.Get_Next();
-                }
+            }
 
-                // Рисуем подчеркивание
-                aUnderline.Correct_w_ForUnderline();
+            // Рисуем подчеркивание
+            aUnderline.Correct_w_ForUnderline();
+            Element = aUnderline.Get_Next();
+            while ( null != Element )
+            {
+                pGraphics.p_color( Element.r, Element.g, Element.b, 255 );
+                pGraphics.drawHorLine(0, Element.y0, Element.x0, Element.x1, Element.w );
                 Element = aUnderline.Get_Next();
+            }
+
+            // Рисуем подчеркивание орфографии
+            if(this.bFromDocument)
+            {
+                pGraphics.p_color( 255, 0, 0, 255 );
+                var SpellingW = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
+                Element = aSpelling.Get_Next();
                 while ( null != Element )
                 {
-                    pGraphics.p_color( Element.r, Element.g, Element.b, 255 );
-                    pGraphics.drawHorLine(0, Element.y0, Element.x0, Element.x1, Element.w );
-                    Element = aUnderline.Get_Next();
-                }
-
-                // Рисуем подчеркивание орфографии
-                if(this.bFromDocument)
-                {
-                    pGraphics.p_color( 255, 0, 0, 255 );
-                    var SpellingW = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
+                    pGraphics.DrawSpellingLine(Element.y0, Element.x0, Element.x1, SpellingW);
                     Element = aSpelling.Get_Next();
-                    while ( null != Element )
-                    {
-                        pGraphics.DrawSpellingLine(Element.y0, Element.x0, Element.x1, SpellingW);
-                        Element = aSpelling.Get_Next();
-                    }
                 }
             }
         }
@@ -22412,7 +21863,7 @@ function CParagraphDrawStateElements()
 {
     this.Paragraph = undefined;
     this.Graphics  = undefined;
-    this.AutoColor = undefined;
+    this.BgColor   = undefined;
 
     this.Theme     = undefined;
     this.ColorMap  = undefined;
@@ -22431,13 +21882,13 @@ function CParagraphDrawStateElements()
 
 CParagraphDrawStateElements.prototype =
 {
-    Reset : function(Paragraph, Graphics, AutoColor, Theme, ColorMap)
+    Reset : function(Paragraph, Graphics, BgColor, Theme, ColorMap)
     {
         this.Paragraph = Paragraph;
         this.Graphics  = Graphics;
-        this.AutoColor = AutoColor;
-        this.Theme = Theme;
-        this.ColorMap = ColorMap;
+        this.BgColor   = BgColor;
+        this.Theme     = Theme;
+        this.ColorMap  = ColorMap;
 
         this.VisitedHyperlink = false;
 
@@ -22459,7 +21910,7 @@ function CParagraphDrawStateLines()
 {
     this.Paragraph = undefined;
     this.Graphics  = undefined;
-    this.AutoColor = undefined;
+    this.BgColor   = undefined;
 
     this.CurPos = new CParagraphContentPos();
 
@@ -22484,11 +21935,11 @@ function CParagraphDrawStateLines()
 
 CParagraphDrawStateLines.prototype =
 {
-    Reset : function(Paragraph, Graphics, AutoColor)
+    Reset : function(Paragraph, Graphics, BgColor)
     {
         this.Paragraph = Paragraph;
         this.Graphics  = Graphics;
-        this.AutoColor = AutoColor;
+        this.BgColor   = BgColor;
 
         this.VisitedHyperlink = false;
 

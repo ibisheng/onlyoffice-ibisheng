@@ -678,6 +678,9 @@ ParaRun.prototype =
                             {
                                 // Нам надо выяснить заливку у родительского класса (возможно мы находимся в ячейке таблицы с забивкой)
                                 BgColor = Para.Parent.Get_TextBackGroundColor();
+                                
+                                if ( undefined !== CurTextPr.Shd && shd_Nil !== CurTextPr.Shd.Value )
+                                    BgColor = CurTextPr.Shd.Get_Color( this.Paragraph );
                             }
 
                             // Определим автоцвет относительно заливки
@@ -2929,15 +2932,20 @@ ParaRun.prototype =
 
         var Para      = PDSE.Paragraph;
         var pGraphics = PDSE.Graphics;
-        var AutoColor = PDSE.AutoColor;
+        var BgColor   = PDSE.BgColor;
         var Theme     = PDSE.Theme;
         var FontScheme = Theme.themeElements.fontScheme;
-
+        
         var X = PDSE.X;
         var Y = PDSE.Y;
 
         var CurTextPr = this.Get_CompiledPr( false );
         pGraphics.SetTextPr( CurTextPr, Theme );
+
+        if ( undefined !== CurTextPr.Shd && shd_Nil !== CurTextPr.Shd.Value )
+            BgColor = CurTextPr.Shd.Get_Color( Para );
+
+        var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
 
         var RGBA;
         if(CurTextPr.Unifill)
@@ -3119,7 +3127,13 @@ ParaRun.prototype =
         var UnderlineY = Y + UndOff;
         var LineW      = (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm;
 
-        var AutoColor = PDSL.AutoColor;
+
+        var BgColor = PDSL.BgColor;
+        if ( undefined !== CurTextPr.Shd && shd_Nil !== CurTextPr.Shd.Value )
+            BgColor = CurTextPr.Shd.Get_Color( Para );
+
+        var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
+
         var CurColor = new CDocumentColor( 0, 0, 0, false );
 
         // Выставляем цвет обводки

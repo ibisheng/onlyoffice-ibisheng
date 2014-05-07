@@ -5271,28 +5271,37 @@ CDocumentContent.prototype =
                     {
                         var StartPos = this.Selection.StartPos;
                         var EndPos   = this.Selection.EndPos;
-                        if ( EndPos < StartPos )
-                        {
-                            var Temp = StartPos;
-                            StartPos = EndPos;
-                            EndPos   = Temp;
-                        }
 
-                        for ( var Index = StartPos; Index <= EndPos; Index++ )
+                        if ( StartPos === EndPos && type_Paragraph === this.Content[StartPos].GetType() && false === this.Content[StartPos].Selection_CheckParaEnd() )
                         {
-                            // При изменении цвета фона параграфа, не надо ничего пересчитывать
-                            var Item = this.Content[Index];
-                            if ( type_Paragraph == Item.GetType() )
-                                Item.Set_Shd( Shd );
-                            else if ( type_Table == Item.GetType() )
+                            this.Paragraph_Add( new ParaTextPr( { Shd : Shd } ) );
+                            this.Parent.OnContentRecalculate( false );
+                        }
+                        else
+                        {
+                            if ( EndPos < StartPos )
                             {
-                                Item.TurnOff_RecalcEvent();
-                                Item.Set_ParagraphShd( Shd );
-                                Item.TurnOn_RecalcEvent();
+                                var Temp = StartPos;
+                                StartPos = EndPos;
+                                EndPos   = Temp;
                             }
-                        }
 
-                        this.Parent.OnContentRecalculate( false );
+                            for ( var Index = StartPos; Index <= EndPos; Index++ )
+                            {
+                                // При изменении цвета фона параграфа, не надо ничего пересчитывать
+                                var Item = this.Content[Index];
+                                if ( type_Paragraph == Item.GetType() )
+                                    Item.Set_Shd( Shd );
+                                else if ( type_Table == Item.GetType() )
+                                {
+                                    Item.TurnOff_RecalcEvent();
+                                    Item.Set_ParagraphShd( Shd );
+                                    Item.TurnOn_RecalcEvent();
+                                }
+                            }
+
+                            this.Parent.OnContentRecalculate( false );
+                        }
 
                         break;
                     }

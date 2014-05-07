@@ -5710,48 +5710,57 @@ CDocument.prototype =
                     {
                         var StartPos = this.Selection.StartPos;
                         var EndPos   = this.Selection.EndPos;
-                        if ( EndPos < StartPos )
+                        
+                        if ( StartPos === EndPos && type_Paragraph === this.Content[StartPos].GetType() && false === this.Content[StartPos].Selection_CheckParaEnd() )
                         {
-                            var Temp = StartPos;
-                            StartPos = EndPos;
-                            EndPos   = Temp;
+                            this.Paragraph_Add( new ParaTextPr( { Shd : Shd } ) );                            
+                            this.Recalculate();
                         }
-
-                        for ( var Index = StartPos; Index <= EndPos; Index++ )
+                        else
                         {
-                            // При изменении цвета фона параграфа, не надо ничего пересчитывать
-                            var Item = this.Content[Index];
-                            if ( type_Paragraph == Item.GetType() )
-                                Item.Set_Shd( Shd );
-                            else if ( type_Table == Item.GetType() )
+                            if ( EndPos < StartPos )
                             {
-                                Item.TurnOff_RecalcEvent();
-                                Item.Set_ParagraphShd( Shd );
-                                Item.TurnOn_RecalcEvent();
+                                var Temp = StartPos;
+                                StartPos = EndPos;
+                                EndPos   = Temp;
                             }
+
+                            for ( var Index = StartPos; Index <= EndPos; Index++ )
+                            {
+                                // При изменении цвета фона параграфа, не надо ничего пересчитывать
+                                var Item = this.Content[Index];
+                                if ( type_Paragraph == Item.GetType() )
+                                    Item.Set_Shd( Shd );
+                                else if ( type_Table == Item.GetType() )
+                                {
+                                    Item.TurnOff_RecalcEvent();
+                                    Item.Set_ParagraphShd( Shd );
+                                    Item.TurnOn_RecalcEvent();
+                                }
+                            }
+
+                            // Нам надо определить какие страницы мы должны перерисовать
+                            var PageStart = -1;
+                            var PageEnd   = -1;
+                            for ( var Index = 0; Index < this.Pages.length - 1; Index++ )
+                            {
+                                if ( PageStart == -1 && StartPos <= this.Pages[Index + 1].Pos )
+                                    PageStart = Index;
+
+                                if ( PageEnd == -1 && EndPos < this.Pages[Index + 1].Pos )
+                                    PageEnd = Index;
+                            }
+
+                            if ( -1 === PageStart )
+                                PageStart = this.Pages.length - 1;
+                            if ( -1 === PageEnd )
+                                PageEnd = this.Pages.length - 1;
+
+                            for ( var Index = PageStart; Index <= PageEnd; Index++ )
+                                this.DrawingDocument.OnRecalculatePage( Index, this.Pages[Index] );
+
+                            this.DrawingDocument.OnEndRecalculate(false, true);
                         }
-
-                        // Нам надо определить какие страницы мы должны перерисовать
-                        var PageStart = -1;
-                        var PageEnd   = -1;
-                        for ( var Index = 0; Index < this.Pages.length - 1; Index++ )
-                        {
-                            if ( PageStart == -1 && StartPos <= this.Pages[Index + 1].Pos )
-                                PageStart = Index;
-
-                            if ( PageEnd == -1 && EndPos < this.Pages[Index + 1].Pos )
-                                PageEnd = Index;
-                        }
-
-                        if ( -1 === PageStart )
-                            PageStart = this.Pages.length - 1;
-                        if ( -1 === PageEnd )
-                            PageEnd = this.Pages.length - 1;
-
-                        for ( var Index = PageStart; Index <= PageEnd; Index++ )
-                            this.DrawingDocument.OnRecalculatePage( Index, this.Pages[Index] );
-
-                        this.DrawingDocument.OnEndRecalculate(false, true);
 
                         break;
                     }
