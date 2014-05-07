@@ -1409,176 +1409,153 @@ CopyProcessor.prototype =
 
                 if(oDocument.CurPos.Type === docpostype_DrawingObjects)
                 {
-                    switch(oDocument.DrawingObjects.curState.id)
+                    var content = oDocument.DrawingObjects.getTargetDocContent();
+                    if(content)
                     {
-                        case STATES_ID_TEXT_ADD:
-                        {
-                            var text_object = oDocument.DrawingObjects.curState.textObject;
-                            if(text_object != null && text_object.GraphicObj != null && text_object.GraphicObj.textBoxContent != null)
-                                oDocument = text_object.GraphicObj.textBoxContent;
-                            break;
-                        }
-                        case STATES_ID_TEXT_ADD_IN_GROUP:
-                        {
-                            text_object = oDocument.DrawingObjects.curState.textObject;
-                            if(text_object != null &&  text_object.textBoxContent != null)
-                                oDocument = text_object.textBoxContent;
-                            break;
-                        }
-                        case STATES_ID_CHART_TITLE_TEXT:
-                        case STATES_ID_CHART_TITLE_TEXT_GROUP:
-                        {
-                            var text_object = oDocument.DrawingObjects.curState.title;
-                            if(text_object != null &&  text_object.txBody != null &&  text_object.txBody != null)
-                                oDocument = text_object.txBody.getDocContentForCopyPaste();
-                            break;
-                        }
+                        oDocument = content;
+                    }
+                    else if(oDocument.DrawingObjects.selection.groupSelection)
+                    {
 
-                        case STATES_ID_GROUP:
-                        {
-                            var s_arr = oDocument.DrawingObjects.curState.group.selectionInfo.selectionArray;
+                            var s_arr = oDocument.DrawingObjects.selection.groupSelection.selectedObjects;
 
                             this.Para = document.createElement( "p" );
-							
-							if(copyPasteUseBinery)
-							{
-								var newArr = null;
-								var tempAr = null;
-								if(s_arr)
-								{
-									tempAr = [];
-									for(var k = 0; k < s_arr.length; k++)
-									{
-										tempAr[k] = s_arr[k].absOffsetY;
-									}
-								}
-								tempAr.sort(function(a,b){return a-b;})
-								newArr = [];
-								for(var k = 0; k < tempAr.length; k++)
-								{
-									var absOffsetY = tempAr[k];
-									for(var i = 0; i < s_arr.length; i++)
-									{
-										if(absOffsetY == s_arr[i].absOffsetY)
-										{
-											newArr[k] = s_arr[i];
-										}
-									}
-								}
-								if(newArr != null)
-									s_arr = newArr;
-							}
-		
+
+                            if(copyPasteUseBinery)
+                            {
+                                var newArr = null;
+                                var tempAr = null;
+                                if(s_arr)
+                                {
+                                    tempAr = [];
+                                    for(var k = 0; k < s_arr.length; k++)
+                                    {
+                                        tempAr[k] = s_arr[k].y;
+                                    }
+                                }
+                                tempAr.sort(function(a,b){return a-b;})
+                                newArr = [];
+                                for(var k = 0; k < tempAr.length; k++)
+                                {
+                                    var absOffsetY = tempAr[k];
+                                    for(var i = 0; i < s_arr.length; i++)
+                                    {
+                                        if(absOffsetY == s_arr[i].y)
+                                        {
+                                            newArr[k] = s_arr[i];
+                                        }
+                                    }
+                                }
+                                if(newArr != null)
+                                    s_arr = newArr;
+                            }
+
                             for(var i = 0; i < s_arr.length; ++i)
                             {
                                 var cur_element = s_arr[i];
                                 if(isRealObject(cur_element.parent))
                                 {
-                                    var base64_img = cur_element.parent.getBase64Img();
-									
-									if(copyPasteUseBinery)
-									{
-										var wrappingType = cur_element.parent.wrappingType;
-										var DrawingType = cur_element.parent.DrawingType;
-										var tempParagraph = new Paragraph(oDocument, oDocument, 0, 0, 0, 0, 0);
-										var index = 0;
-										tempParagraph.Content.unshift(new ParaDrawing());
-										tempParagraph.Content[index].wrappingType = wrappingType;
-										tempParagraph.Content[index].DrawingType = DrawingType;
-										tempParagraph.Content[index].GraphicObj = cur_element
-										tempParagraph.Selection.EndPos = index + 1;
-										tempParagraph.Selection.StartPos = index;
-										tempParagraph.Selection.Use = true;
-										
-										this.oBinaryFileWriter.CopyParagraph(tempParagraph);
-									}
-									
-									var src = this.getSrc(base64_img);
+                                    var base64_img = cur_element.getBase64Img();
+
+                                    if(copyPasteUseBinery)
+                                    {
+                                        var wrappingType = oDocument.DrawingObjects.selection.groupSelection.parent.wrappingType;
+                                        var DrawingType = oDocument.DrawingObjects.selection.groupSelection.parent.DrawingType;
+                                        var tempParagraph = new Paragraph(oDocument, oDocument, 0, 0, 0, 0, 0);
+                                        var index = 0;
+                                        tempParagraph.Content.unshift(new ParaDrawing());
+                                        tempParagraph.Content[index].wrappingType = wrappingType;
+                                        tempParagraph.Content[index].DrawingType = DrawingType;
+                                        tempParagraph.Content[index].GraphicObj = cur_element;
+                                        tempParagraph.Selection.EndPos = index + 1;
+                                        tempParagraph.Selection.StartPos = index;
+                                        tempParagraph.Selection.Use = true;
+
+                                        this.oBinaryFileWriter.CopyParagraph(tempParagraph);
+                                    }
+
+                                    var src = this.getSrc(base64_img);
                                     this.Para.innerHTML += "<img style=\"max-width:100%;\" width=\""+Math.round(cur_element.absExtX * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(cur_element.absExtY * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" />";
 
                                     this.ElemToSelect.appendChild( this.Para );
                                 }
 
                             }
-							
-							if(copyPasteUseBinery)
-							{
-								this.oBinaryFileWriter.CopyEnd();
-								var sBase64 = this.oBinaryFileWriter.GetResult();
-								if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && window.USER_AGENT_SAFARI_MACOS)
-								{
-									$(this.ElemToSelect.children[0]).css("font-weight", "normal");
-									$(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
-								}
-								if(this.ElemToSelect.children[0])
-									$(this.ElemToSelect.children[0]).addClass("docData;" + sBase64);
-							}
-                            return;
-                        }
-                        default :
-                        {
-                            var gr_objects = oDocument.DrawingObjects;
-                            var selection_array = gr_objects.selectionInfo.selectionArray;
 
-                            this.Para = document.createElement( "span" );
-							var selectionTrue;
-							var selectIndex;
-                            for(var i = 0; i < selection_array.length; ++i)
+                            if(copyPasteUseBinery)
                             {
-                                var cur_element = selection_array[i];
-                                var base64_img = cur_element.getBase64Img();
-                                var src = this.getSrc(base64_img);
-
-                                this.Para.innerHTML = "<img style=\"max-width:100%;\" width=\""+Math.round(cur_element.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(cur_element.H * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" />";
-
-                                this.ElemToSelect.appendChild( this.Para );
-								
-								if(copyPasteUseBinery)
-								{
-									var parent = cur_element.Parent;
-									selectionTrue = 
-									{
-										EndPos : parent.Selection.EndPos,
-										StartPos: parent.Selection.StartPos
-									};
-									var inIndex;
-									for(var k = 0; k < parent.Content.length;k++)
-									{
-										if(parent.Content[k] == cur_element)
-										{
-											inIndex = k;
-											break;
-										}
-									}
-									//меняем Selection
-									parent.Selection.EndPos = inIndex + 1;
-									parent.Selection.StartPos = inIndex;
-									parent.Selection.Use = true;
-									
-									this.oBinaryFileWriter.CopyParagraph(parent);
-									
-									//возвращаем Selection
-									parent.Selection.StartPos = selectionTrue.StartPos;
-									parent.Selection.EndPos = selectionTrue.EndPos;
-									
-								}
+                                this.oBinaryFileWriter.CopyEnd();
+                                var sBase64 = this.oBinaryFileWriter.GetResult();
+                                if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && window.USER_AGENT_SAFARI_MACOS)
+                                {
+                                    $(this.ElemToSelect.children[0]).css("font-weight", "normal");
+                                    $(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
+                                }
+                                if(this.ElemToSelect.children[0])
+                                    $(this.ElemToSelect.children[0]).addClass("docData;" + sBase64);
                             }
-						
-							if(copyPasteUseBinery)
-							{
-								this.oBinaryFileWriter.CopyEnd();
-								var sBase64 = this.oBinaryFileWriter.GetResult();
-								if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && window.USER_AGENT_SAFARI_MACOS)
-								{
-									$(this.ElemToSelect.children[0]).css("font-weight", "normal");
-									$(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
-								}
-								if(this.ElemToSelect.children[0])
-									$(this.ElemToSelect.children[0]).addClass("docData;" + sBase64);
-							}
-                            return;
-                        }
+                    }
+                    else
+                    {
+                        var gr_objects = oDocument.DrawingObjects;
+                        var selection_array = gr_objects.selectedObjects;
 
+                        this.Para = document.createElement( "span" );
+                        var selectionTrue;
+                        var selectIndex;
+                        for(var i = 0; i < selection_array.length; ++i)
+                        {
+                            var cur_element = selection_array[i].parent;
+                            var base64_img = cur_element.getBase64Img();
+                            var src = this.getSrc(base64_img);
+
+                            this.Para.innerHTML = "<img style=\"max-width:100%;\" width=\""+Math.round(cur_element.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(cur_element.H * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" />";
+
+                            this.ElemToSelect.appendChild( this.Para );
+
+                            if(copyPasteUseBinery)
+                            {
+                                var parent = cur_element.Parent;
+                                selectionTrue =
+                                {
+                                    EndPos : parent.Selection.EndPos,
+                                    StartPos: parent.Selection.StartPos
+                                };
+                                var inIndex;
+                                for(var k = 0; k < parent.Content.length;k++)
+                                {
+                                    if(parent.Content[k] == cur_element)
+                                    {
+                                        inIndex = k;
+                                        break;
+                                    }
+                                }
+                                //меняем Selection
+                                parent.Selection.EndPos = inIndex + 1;
+                                parent.Selection.StartPos = inIndex;
+                                parent.Selection.Use = true;
+
+                                this.oBinaryFileWriter.CopyParagraph(parent);
+
+                                //возвращаем Selection
+                                parent.Selection.StartPos = selectionTrue.StartPos;
+                                parent.Selection.EndPos = selectionTrue.EndPos;
+
+                            }
+                        }
+                        if(copyPasteUseBinery)
+                        {
+                            this.oBinaryFileWriter.CopyEnd();
+                            var sBase64 = this.oBinaryFileWriter.GetResult();
+                            if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && window.USER_AGENT_SAFARI_MACOS)
+                            {
+                                $(this.ElemToSelect.children[0]).css("font-weight", "normal");
+                                $(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
+                            }
+                            if(this.ElemToSelect.children[0])
+                                $(this.ElemToSelect.children[0]).addClass("docData;" + sBase64);
+                        }
+                        return;
                     }
                 }
 				if ( true === oDocument.Selection.Use )
@@ -2637,30 +2614,10 @@ PasteProcessor.prototype =
 
             if(oDocument.CurPos.Type === docpostype_DrawingObjects)
             {
-                switch(oDocument.DrawingObjects.curState.id)
+                var content = oDocument.DrawingObjects.getTargetDocContent();
+                if(content)
                 {
-                    case STATES_ID_TEXT_ADD:
-                    {
-                        var text_object = oDocument.DrawingObjects.curState.textObject;
-                        if(text_object != null && text_object.GraphicObj != null && text_object.GraphicObj.textBoxContent != null)
-                            oDocument = text_object.GraphicObj.textBoxContent;
-                        break;
-                    }
-                    case STATES_ID_TEXT_ADD_IN_GROUP:
-                    {
-                        text_object = oDocument.DrawingObjects.curState.textObject;
-                        if(text_object != null &&  text_object.textBoxContent != null)
-                            oDocument = text_object.textBoxContent;
-                        break;
-                    }
-                    case STATES_ID_CHART_TITLE_TEXT:
-                    case STATES_ID_CHART_TITLE_TEXT_GROUP:
-                    {
-                        text_object = oDocument.DrawingObjects.curState.title;
-                        if(text_object != null &&  text_object.txBody != null && text_object.txBody.content != null)
-                            oDocument = text_object.txBody.content;
-                        break;
-                    }
+                    oDocument = content;
                 }
             }
 
