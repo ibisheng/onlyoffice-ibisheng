@@ -256,7 +256,7 @@ g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("az-Latn-AZ", 0x042c));
 //{ "ar-IQ", 0x0801 },
 //{ "zh-CN", 0x0804 },
 g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("de-CH", 0x0807));
-//{ "en-GB", 0x0809 },
+g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("en-GB", 0x0809));
 //{ "es-MX", 0x080a },
 //{ "fr-BE", 0x080c },
 //{ "it-CH", 0x0810 },
@@ -287,7 +287,7 @@ g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("pt-PT", 0x0816));
 //{ "ar-EG", 0x0c01 },
 //{ "zh-HK", 0x0c04 },
 g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("de-AT", 0x0c07));
-//{ "en-AU", 0x0c09 },
+g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("en-AU", 0x0c09));
 g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("es-ES", 0x0c0a));
 //{ "fr-CA", 0x0c0c },
 //{ "sr-Cyrl-CS", 0x0c1a },
