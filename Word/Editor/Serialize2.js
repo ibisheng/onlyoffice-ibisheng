@@ -201,7 +201,8 @@ var c_oSerProp_rPrType = {
 	Lang: 25,
 	LangBidi: 26,
 	LangEA: 27,
-	ColorTheme: 28
+	ColorTheme: 28,
+	Shd: 29
 };
 var c_oSerProp_rowPrType = {
     CantSplit:0,
@@ -1785,11 +1786,16 @@ function Binary_rPrWriter(memory)
 				this.memory.WriteString2(g_oLcidIdToNameMap[rPr.Lang.EastAsia]);
 			}
 		}
-		if(null != rPr.Unifill || (null != rPr.Color && rPr.Color.Auto))
+		if (null != rPr.Unifill || (null != rPr.Color && rPr.Color.Auto)) {
+		    this.memory.WriteByte(c_oSerProp_rPrType.ColorTheme);
+		    this.memory.WriteByte(c_oSerPropLenType.Variable);
+		    this.bs.WriteItemWithLength(function () { _this.bs.WriteColorTheme(rPr.Unifill, rPr.Color); });
+		}
+		if(null != rPr.Shd)
 		{
-			this.memory.WriteByte(c_oSerProp_rPrType.ColorTheme);
+			this.memory.WriteByte(c_oSerProp_rPrType.Shd);
             this.memory.WriteByte(c_oSerPropLenType.Variable);
-            this.bs.WriteItemWithLength(function(){_this.bs.WriteColorTheme(rPr.Unifill, rPr.Color);});
+            this.bs.WriteItemWithLength(function () { _this.bs.WriteShd(rPr.Shd); });
 		}
     };
 };
@@ -5790,6 +5796,8 @@ function Binary_pPrReader(doc, oReadResult, stream)
 				var unifill = CreateThemeUnifill(themeColor.Color, themeColor.Tint, themeColor.Shade);
 				if(null != unifill)
 					pPr.Shd.Unifill = unifill;
+				else if (null != pPr.Shd.Color && !pPr.Shd.Color.Auto)
+				    pPr.Shd.Unifill = CreteSolidFillRGB(pPr.Shd.Color.r, pPr.Shd.Color.g, pPr.Shd.Color.b);
                 break;
             case c_oSerProp_pPrType.WidowControl:
 				pPr.WidowControl = this.stream.GetBool();
@@ -5893,6 +5901,8 @@ function Binary_pPrReader(doc, oReadResult, stream)
 			var unifill = CreateThemeUnifill(themeColor.Color, themeColor.Tint, themeColor.Shade);
 			if(null != unifill)
 				Border.Unifill = unifill;
+			else if (null != Border.Color && !Border.Color.Auto)
+			    Border.Unifill = CreteSolidFillRGB(Border.Color.r, Border.Color.g, Border.Color.b);
         }
         else
             res = c_oSerConstants.ReadUnknown;
@@ -6438,6 +6448,22 @@ function Binary_rPrReader(doc, stream)
 				var unifill = CreateThemeUnifill(themeColor.Color, themeColor.Tint, themeColor.Shade);
 				if(null != unifill)
 					rPr.Unifill = unifill;
+				else if (null != rPr.Color && !rPr.Color.Auto)
+				    rPr.Unifill = CreteSolidFillRGB(rPr.Color.r, rPr.Color.g, rPr.Color.b);
+				break;
+            case c_oSerProp_rPrType.Shd:
+                rPr.Shd = new CDocumentShd();
+                var themeColor = { Auto: null, Color: null, Tint: null, Shade: null };
+                res = this.bcr.Read2(length, function (t, l) {
+                    return oThis.bcr.ReadShd(t, l, rPr.Shd, themeColor);
+                });
+                if (true == themeColor.Auto && null != rPr.Shd.Color)
+                    rPr.Shd.Color.Auto = true;//todo менять полностью цвет
+                var unifill = CreateThemeUnifill(themeColor.Color, themeColor.Tint, themeColor.Shade);
+                if (null != unifill)
+                    rPr.Shd.Unifill = unifill;
+                else if (null != rPr.Shd.Color && !Pr.Shd.Color.Auto)
+                    rPr.Shd.Unifill = CreteSolidFillRGB(rPr.Shd.Color.r, rPr.Shd.Color.g, rPr.Shd.Color.b);
                 break;
             default:
                 res = c_oSerConstants.ReadUnknown;
@@ -6515,6 +6541,8 @@ Binary_tblPrReader.prototype =
 			var unifill = CreateThemeUnifill(themeColor.Color, themeColor.Tint, themeColor.Shade);
 			if(null != unifill)
 				Pr.Shd.Unifill = unifill;
+			else if (null != Pr.Shd.Color && !Pr.Shd.Color.Auto)
+			    Pr.Shd.Unifill = CreteSolidFillRGB(Pr.Shd.Color.r, Pr.Shd.Color.g, Pr.Shd.Color.b);
         }
 		else if( c_oSerProp_tblPrType.Layout === type )
 		{
@@ -6856,6 +6884,8 @@ Binary_tblPrReader.prototype =
 			var unifill = CreateThemeUnifill(themeColor.Color, themeColor.Tint, themeColor.Shade);
 			if(null != unifill)
 				Pr.Shd.Unifill = unifill;
+			else if (null != Pr.Shd.Color && !Pr.Shd.Color.Auto)
+			    Pr.Shd.Unifill = CreteSolidFillRGB(Pr.Shd.Color.r, Pr.Shd.Color.g, Pr.Shd.Color.b);
         }
         else if( c_oSerProp_cellPrType.TableCellBorders === type )
         {

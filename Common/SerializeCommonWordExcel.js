@@ -268,7 +268,7 @@ BinaryCommonWriter.prototype.WriteColorTheme = function(unifill, color)
 		this.memory.WriteByte(c_oSer_ColorThemeType.Auto);
 		this.memory.WriteByte(c_oSerPropLenType.Null);
 	}
-	if(null != unifill && null != unifill.fill && null != unifill.fill.color){
+	if (null != unifill && null != unifill.fill && null != unifill.fill.color && unifill.fill.color.color instanceof CSchemeColor) {
 		var uniColor = unifill.fill.color;
 		if(null != uniColor.color){
 			var nFormatId = EThemeColor.themecolorNone;
