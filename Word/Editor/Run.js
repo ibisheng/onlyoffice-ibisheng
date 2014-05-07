@@ -2789,6 +2789,7 @@ ParaRun.prototype =
         var aColl     = PDSH.Coll;
         var aFind     = PDSH.Find;
         var aComm     = PDSH.Comm;
+        var aShd      = PDSH.Shd;
 
         var Range    = this.Lines[CurLine].Ranges[CurRange];
         var StartPos = Range.StartPos;
@@ -2799,7 +2800,11 @@ ParaRun.prototype =
 
         var bDrawFind = PDSH.DrawFind;
         var bDrawColl = PDSH.DrawColl;
-
+        
+        var oShd = this.Get_CompiledPr(false).Shd;
+        var bDrawShd  = ( oShd === undefined || shd_Nil === oShd.Value ? false : true );
+        var ShdColor  = ( true === bDrawShd ? oShd.Get_Color( PDSH.Paragraph ) : null );
+        
         var X  = PDSH.X;
         var Y0 = PDSH.Y0;
         var Y1 = PDSH.Y1;
@@ -2831,6 +2836,9 @@ ParaRun.prototype =
             var DrawSearch = ( PDSH.SearchCounter > 0 ? true : false );
 
             var DrawColl = this.CollaborativeMarks.Check( Pos );
+
+            if ( true === bDrawShd )
+                aShd.Add( Y0, Y1, X, X + Item.WidthVisible, 0, ShdColor.r, ShdColor.g, ShdColor.b );
 
             switch( Item.Type )
             {
@@ -4421,6 +4429,9 @@ ParaRun.prototype =
 
         if ( undefined != TextPr.Lang )
             this.Set_Lang2( TextPr.Lang );
+        
+        if ( undefined !== TextPr.Shd )
+            this.Set_Shd( TextPr.Shd );
     },
 
     Set_Bold : function(Value)
@@ -4843,6 +4854,25 @@ ParaRun.prototype =
             this.Recalc_CompiledPr(false);
         }
     },
+    
+    Set_Shd : function(Shd)
+    {
+        if ( (undefined === this.Pr.Shd && undefined === Shd) || (undefined !== this.Pr.Shd && undefined !== Shd && true === this.Pr.Shd.Compare( Shd ) ) )
+            return;
+
+        var OldShd = this.Pr.Shd;
+
+        if ( undefined !== Shd )
+        {
+            this.Pr.Shd = new CDocumentShd();
+            this.Pr.Shd.Set_FromObject( Shd );
+        }
+        else
+            this.Pr.Shd = undefined;
+
+        History.Add( this, { Type : historyitem_ParaRun_Shd, New : this.Pr.Shd, Old : OldShd } );
+        this.Recalc_CompiledPr(false);
+    },
 
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
@@ -5186,6 +5216,14 @@ ParaRun.prototype =
                 this.Recalc_CompiledPr(false);
                 this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
 
+                break;
+            }
+                
+            case historyitem_ParaRun_Shd:
+            {
+                this.Pr.Shd = Data.Old;
+                this.Recalc_CompiledPr(false);
+                
                 break;
             }
         }
@@ -5533,6 +5571,14 @@ ParaRun.prototype =
 
                 break;
             }
+
+            case historyitem_ParaRun_Shd:
+            {
+                this.Pr.Shd = Data.New;
+                this.Recalc_CompiledPr(false);
+
+                break;
+            }
         }
     },
 
@@ -5862,6 +5908,24 @@ ParaRun.prototype =
 
                 break;
             }
+
+            case historyitem_ParaRun_Shd:
+            {
+                // Bool : undefined
+                // false - >
+                // Variable : CDocumentShd
+                
+                if ( undefined !== Data.New )
+                {
+                    Writer.WriteBool(false);
+                    Data.New.Write_ToBinary(Writer);
+                }
+                else
+                    Writer.WriteBool(true);
+
+                break;
+            }
+
         }
 
         return Writer;
@@ -6373,6 +6437,27 @@ ParaRun.prototype =
 
                 break;
             }
+
+            case historyitem_ParaRun_Shd:
+            {
+                // Bool : undefined
+                // false - >
+                // Variable : CDocumentShd
+
+                if ( false === Reader.GetBool() )
+                {
+                    this.Pr.Shd = new CDocumentShd();
+                    this.Pr.Shd.Read_FromBinary( Reader );
+                }
+                else
+                    this.Pr.Shd = undefined;
+
+                this.Recalc_CompiledPr(false);
+
+                break;
+            }
+                
+                
         }
     },
 

@@ -6372,7 +6372,7 @@ function CTextPr()
     this.RTL        = undefined;
     this.Lang       = new CLang();
     this.Unifill    = undefined;
-    this.Shd        = new CDocumentShd();
+    this.Shd        = undefined;
 }
 
 CTextPr.prototype =
@@ -6403,7 +6403,7 @@ CTextPr.prototype =
         this.RTL        = undefined;
         this.Lang       = new CLang();
         this.Unifill    = undefined;
-        this.Shd        = new CDocumentShd();
+        this.Shd        = undefined;
     },
 
     Copy : function()
@@ -6451,7 +6451,8 @@ CTextPr.prototype =
         if(undefined != this.Unifill)
             TextPr.Unifill = this.Unifill.createDuplicate();
         
-        TextPr.Shd        = this.Shd.Copy();
+        if (undefined !== this.Shd )
+            TextPr.Shd = this.Shd.Copy();
 
         return TextPr;
     },
@@ -6533,7 +6534,8 @@ CTextPr.prototype =
         if(undefined != TextPr.Unifill)
             this.Unifill = TextPr.Unifill.createDuplicate();
         
-        this.Shd = TextPr.Shd.Copy();
+        if ( undefined !== TextPr.Shd )
+            this.Shd = TextPr.Shd.Copy();
     },
 
     Init_Default : function()
@@ -6565,7 +6567,7 @@ CTextPr.prototype =
         this.RTL        = false;
         this.Lang.Init_Default();
         this.Unifill    = undefined;
-        this.Shd.Init_Default();        
+        this.Shd        = undefined;      
     },
 
     Set_FromObject : function(TextPr)
@@ -6625,7 +6627,12 @@ CTextPr.prototype =
             this.Unifill =  TextPr.Unifill ;
         
         if ( undefined !== TextPr.Shd )
+        {
+            this.Shd = new CDocumentShd();
             this.Shd.Set_FromObject( TextPr.Shd );
+        }
+        else
+            this.Shd = undefined;
     },
 
     Compare : function(TextPr)
@@ -6715,11 +6722,7 @@ CTextPr.prototype =
 
         // Lang
         this.Lang.Compare( TextPr.Lang );
-        //Result_TextPr.Unifill = CompareUniFill(this.Unifill, TextPr.Unifill);
-        
-        // Shd
-        if ( this.Shd.Value !== TextPr.Shd.Value  )
-            this.Shd.Value = shd_Nil;
+        //Result_TextPr.Unifill = CompareUniFill(this.Unifill, TextPr.Unifill);        
 
         return this;
     },
@@ -7003,6 +7006,7 @@ CTextPr.prototype =
         // Shd
         if ( Flags & 8388608 )
         {
+            this.Shd = new CDocumentShd();
             this.Shd.Read_FromBinary( Reader );
         }
     },

@@ -6690,6 +6690,19 @@ Paragraph.prototype =
                     }
 
                     //----------------------------------------------------------------------------------------------------------
+                    // Рисуем заливку текста
+                    //----------------------------------------------------------------------------------------------------------
+                    var aShd = PDSH.Shd;
+                    var Element = aShd.Get_Next();
+                    while ( null != Element )
+                    {
+                        pGraphics.b_color1( Element.r, Element.g, Element.b, 255 );
+                        pGraphics.rect( Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0 );
+                        pGraphics.df();
+                        Element = aShd.Get_Next();
+                    }
+
+                    //----------------------------------------------------------------------------------------------------------
                     // Рисуем выделение текста
                     //----------------------------------------------------------------------------------------------------------
                     var aHigh = PDSH.High;
@@ -22293,6 +22306,7 @@ function CParagraphDrawStateHightlights()
     this.Coll   = new CParaDrawingRangeLines();
     this.Find   = new CParaDrawingRangeLines();
     this.Comm   = new CParaDrawingRangeLines();
+    this.Shd    = new CParaDrawingRangeLines();
 
     this.Comments     = new Array();
     this.CommentsFlag = comments_NoComment;
