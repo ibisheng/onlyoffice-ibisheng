@@ -4107,11 +4107,13 @@ CStyles.prototype =
                     {
                         var DefId = this.Default.Table;
 
+                        /*
                         Pr.ParaPr.Merge( this.Style[DefId].ParaPr );
                         Pr.TextPr.Merge( this.Style[DefId].TextPr );
                         Pr.TablePr.Merge( this.Styles[DefId].TablePr );
                         Pr.TableRowPr.Merge( this.Styles[DefId].TableRowPr );
                         Pr.TableCellPr.Merge( this.Styles[DefId].TableCellPr );
+                        */
 
                         break;
                     }
@@ -4579,6 +4581,13 @@ CDocumentShd.prototype =
         }
 
         return false;
+    },
+    
+    Init_Default : function()
+    {
+        this.Value = shd_Nil;
+        this.Color.Set( 0, 0, 0 );
+        this.Unifill = undefined;
     },
 
     Set_FromObject : function(Shd)
@@ -6342,6 +6351,7 @@ function CTextPr()
     this.RTL        = undefined;
     this.Lang       = new CLang();
     this.Unifill    = undefined;
+    this.Shd        = new CDocumentShd();
 }
 
 CTextPr.prototype =
@@ -6372,6 +6382,7 @@ CTextPr.prototype =
         this.RTL        = undefined;
         this.Lang       = new CLang();
         this.Unifill    = undefined;
+        this.Shd        = new CDocumentShd();
     },
 
     Copy : function()
@@ -6418,6 +6429,8 @@ CTextPr.prototype =
         TextPr.Lang       = this.Lang.Copy();
         if(undefined != this.Unifill)
             TextPr.Unifill = this.Unifill.createDuplicate();
+        
+        TextPr.Shd        = this.Shd.Copy();
 
         return TextPr;
     },
@@ -6498,6 +6511,8 @@ CTextPr.prototype =
 
         if(undefined != TextPr.Unifill)
             this.Unifill = TextPr.Unifill.createDuplicate();
+        
+        this.Shd = TextPr.Shd.Copy();
     },
 
     Init_Default : function()
@@ -6528,7 +6543,8 @@ CTextPr.prototype =
         this.CS         = false;
         this.RTL        = false;
         this.Lang.Init_Default();
-        this.Unifill    = undefined;//CreateUnfilFromRGB(0,0,0);
+        this.Unifill    = undefined;
+        this.Shd.Init_Default();        
     },
 
     Set_FromObject : function(TextPr)
@@ -6586,6 +6602,9 @@ CTextPr.prototype =
 
         if ( undefined != TextPr.Unifill )
             this.Unifill =  TextPr.Unifill ;
+        
+        if ( undefined !== TextPr.Shd )
+            this.Shd.Set_FromObject( TextPr.Shd );
     },
 
     Compare : function(TextPr)
@@ -6676,6 +6695,10 @@ CTextPr.prototype =
         // Lang
         this.Lang.Compare( TextPr.Lang );
         //Result_TextPr.Unifill = CompareUniFill(this.Unifill, TextPr.Unifill);
+        
+        // Shd
+        if ( this.Shd.Value !== TextPr.Shd.Value  )
+            this.Shd.Value = shd_Nil;
 
         return this;
     },
@@ -6832,7 +6855,12 @@ CTextPr.prototype =
             this.Unifill.Write_ToBinary(Writer);
             Flags |= 4194304;
         }
-        Writer.WriteBool(false);
+        
+        if ( undefined !== this.Shd )
+        {
+            this.Shd.Write_ToBinary(Writer);
+            Flags |= 8388608;
+        }
 
         var EndPos = Writer.GetCurPosition();
         Writer.Seek( StartPos );
@@ -6945,12 +6973,17 @@ CTextPr.prototype =
             this.Lang.Read_FromBinary( Reader );
 
         // Unifill
-        if( Flags & 4194304 )
+        if ( Flags & 4194304 )
         {
             this.Unifill = new CUniFill()
             this.Unifill.Read_FromBinary( Reader );
         }
-        Reader.GetBool();
+        
+        // Shd
+        if ( Flags & 8388608 )
+        {
+            this.Shd.Read_FromBinary( Reader );
+        }
     },
 
     Check_NeedRecalc : function()
@@ -7008,6 +7041,9 @@ CTextPr.prototype =
             return true;
 
         if ( undefined != this.HighLight )
+            return true;
+        
+        if ( undefined != this.Shd )
             return true;
 
         return false;
