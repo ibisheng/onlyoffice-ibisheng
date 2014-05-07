@@ -4056,6 +4056,28 @@ ParaRun.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с настройками текста свойств
 //-----------------------------------------------------------------------------------
+    Clear_TextFormatting : function( DefHyper )
+    {   
+        // Highlight и Lang не сбрасываются при очистке текстовых настроек
+        
+        this.Set_Bold( undefined );
+        this.Set_Italic( undefined );
+        this.Set_Strikeout( undefined );
+        this.Set_Underline( undefined );
+        this.Set_FontSize( undefined );
+        this.Set_Color( undefined );
+        this.Set_Unifill( undefined );
+        this.Set_VertAlign( undefined );
+        this.Set_Spacing( undefined );
+        this.Set_DStrikeout( undefined );
+        this.Set_Caps( undefined );
+        this.Set_SmallCaps( undefined );
+        this.Set_Position( undefined );
+        this.Set_RFonts2( undefined );
+        this.Set_RStyle( undefined );
+        this.Set_Shd( undefined );
+    },
+    
     Get_TextPr : function()
     {
         return this.Pr.Copy();

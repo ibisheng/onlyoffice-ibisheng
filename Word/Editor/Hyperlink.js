@@ -729,6 +729,20 @@ ParaHyperlink.prototype =
         for (var Index = 0; Index < Count; Index++)
             this.Content[Index].Get_AllFontNames( AllFonts );
     },
+    
+    Clear_TextFormatting : function( DefHyper )
+    {
+        var Count = this.Content.length;
+        
+        for ( var Pos = 0; Pos < Count; Pos++ )
+        {
+            var Item = this.Content[Pos];
+            Item.Clear_TextFormatting( DefHyper );
+            
+            if ( para_Run === Item.Type )
+                Item.Set_RStyle( DefHyper );
+        }
+    },
 //-----------------------------------------------------------------------------------
 // Функции пересчета
 //-----------------------------------------------------------------------------------

@@ -2375,6 +2375,9 @@ CDocument.prototype =
 
     Add_InlineTable : function(Cols, Rows)
     {
+        if ( Cols <= 0 || Rows <= 0 )
+            return;
+        
         // Добавляем таблицу в колонтитул
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
