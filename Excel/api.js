@@ -149,11 +149,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		}
 
 		spreadsheet_api.prototype = {
-		
-			asc_GetFontThumbnailsPath = function()
-			{
-				return "../Common/Images/";
-			},
 
 			_init: function() {
 				var t = this;
@@ -404,6 +399,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				}
 
 				this.asc_SendThemeColorSchemes(infos);
+			},
+
+			asc_GetFontThumbnailsPath: function () {
+				return "../Common/Images/";
 			},
 
 			asc_Init: function(fontsPath) {
