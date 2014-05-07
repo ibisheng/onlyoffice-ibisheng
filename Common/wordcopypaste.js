@@ -2722,19 +2722,49 @@ PasteProcessor.prototype =
             {
                 //������� ������ � ��������
                 var oInsertPar = aNewContent[0];
-
-                var oTempPar = null;
-                if (true !== Item.Cursor_IsEnd()) {
-                    oTempPar = new Paragraph(oDoc.DrawingDocument, oDoc, 0, 50, 50, X_Right_Field, Y_Bottom_Field);
-                    Item.Split(oTempPar);
-                }
-                Item.Concat(oInsertPar);
-                Item.Cursor_MoveToEndPos(false, false);
-                if (null != oTempPar)
-                    Item.Concat(oTempPar);
-				Item.RecalcInfo.Set_Type_0(pararecalc_0_All);
-				Item.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
-                this.oRecalcDocument.ContentLastChangePos = this.oRecalcDocument.CurPos.ContentPos;
+				// Убираем метку конца параграфа у данного параграфа
+				oInsertPar.Remove_ParaEnd();
+				//Ищем в глубину run который нужно разбить
+				var oCurContent = Item;
+				var nCurContentContentPos = oCurContent.CurPos.ContentPos;
+				var oCurRunToSplit = oCurContent.Content[nCurContentContentPos];
+				while(null != oCurRunToSplit && para_Run != oCurRunToSplit.Type ){
+					oCurContent = oCurRunToSplit;
+					if(null != oCurRunToSplit.CurPos && null != oCurRunToSplit.CurPos.ContentPos)
+						nCurContentContentPos = oCurRunToSplit.CurPos.ContentPos;
+					else if(null != oCurRunToSplit.State && null != oCurRunToSplit.State.ContentPos)
+						nCurContentContentPos = oCurRunToSplit.State.ContentPos;
+					oCurRunToSplit = oCurContent.Content[nCurContentContentPos];
+				}
+				if(null != oCurRunToSplit && null != oCurContent){
+				    //разбиваем run, если находимся в середине
+				    var bSplit = false;
+					if ( oCurRunToSplit.State.ContentPos > 0 && oCurRunToSplit.State.ContentPos < oCurRunToSplit.Content.length ){
+						var RRun = oCurRunToSplit.Split_Run( oCurRunToSplit.State.ContentPos );
+						oInsertPar.Content.push(RRun);
+						bSplit = true;
+					}
+					for(var i = 0, length = oInsertPar.Content.length; i < length; ++i){
+						var run = oInsertPar.Content[i];
+						if(run.Content.length > 0){
+							if(null != oCurContent.Internal_Content_Add)
+								oCurContent.Internal_Content_Add(++nCurContentContentPos, run, false);
+							else if(null != oCurContent.Add_ToContent)
+								oCurContent.Add_ToContent(++nCurContentContentPos, run, false);
+						}
+					}
+					if (bSplit)
+					    nCurContentContentPos--;
+					oCurContent.Content[nCurContentContentPos].Cursor_MoveToEndPos();
+					if (null != oCurContent.Set_ContentPos)
+					    oCurContent.Set_ContentPos(nCurContentContentPos, false, -1);
+					else
+					    oCurContent.State.ContentPos = nCurContentContentPos;
+					
+					Item.RecalcInfo.Set_Type_0(pararecalc_0_All);
+					Item.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
+					this.oRecalcDocument.ContentLastChangePos = this.oRecalcDocument.CurPos.ContentPos;
+				}
             }
             else
             {
