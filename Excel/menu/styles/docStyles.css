@@ -119,12 +119,12 @@ table {
 	display:inline-block;
 	height:21px;
 	margin-left:-2px;
-	padding-top:5px;
+	padding-top:2px;
 }
 .ToolbarButtonCaption {
 	display:inline-block;
 	height:21px;
-	padding:5px 4px 0;
+	padding:2px 2px 0;
 }
 .txt_color {
 	background-position:-161px 50%;
