@@ -1760,6 +1760,17 @@ function CEditorPage(api)
         if (oWordControl.m_oVerRuler.DragType != 0)
             oWordControl.m_oVerRuler.OnMouseUpExternal();
 
+        if ( oWordControl.m_oScrollVerApi.getIsLockedMouse() )
+        {
+            var __e = { clientX : x, clientY : y };
+            oWordControl.m_oScrollVerApi.evt_mouseup(__e);
+        }
+        if ( oWordControl.m_oScrollHorApi.getIsLockedMouse() )
+        {
+            var __e = { clientX : x, clientY : y };
+            oWordControl.m_oScrollHorApi.evt_mouseup(__e);
+        }
+
         global_mouseEvent.Sender = null;
 
         global_mouseEvent.UnLockMouse();

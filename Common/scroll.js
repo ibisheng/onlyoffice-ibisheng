@@ -1117,10 +1117,19 @@ ScrollObject.prototype = {
     getMaxScrolledX:function () {
         return this.maxScrollX;
     },
+    getIsLockedMouse : function()
+    {
+        return (this.that.mouseDownArrow || this.that.mouseDown);
+    },
     /************************************************************************/
     /*events*/
     evt_mousemove:function ( e ) {
-        var evt = e || windows.event;
+        var evt = e || window.event;
+        if (evt.preventDefault)
+            evt.preventDefault();
+        else
+            evt.returnValue = false;
+
         var mousePos = this.that.getMousePosition( evt );
         this.that.EndMousePosition.x = mousePos.x;
         this.that.EndMousePosition.y = mousePos.y;
@@ -1230,7 +1239,12 @@ ScrollObject.prototype = {
 
     },
     evt_mouseout:function ( e ) {
-        var evt = e || windows.event;
+        var evt = e || window.event;
+        if (evt.preventDefault)
+            evt.preventDefault();
+        else
+            evt.returnValue = false;
+
         if ( this.that.settings.showArrows ) {
             this.that.mouseDownArrow = false;
             if ( this.that.nonePointer ) {
@@ -1246,7 +1260,12 @@ ScrollObject.prototype = {
         this.that._draw();
     },
     evt_mouseup:function ( e ) {
-        var evt = e || windows.event;
+        var evt = e || window.event;
+        if (evt.preventDefault)
+            evt.preventDefault();
+        else
+            evt.returnValue = false;
+
         var mousePos = this.that.getMousePosition( evt );
         this.that.scrollTimeout && clearTimeout( this.that.scrollTimeout );
         this.that.scrollTimeout = null;
@@ -1276,7 +1295,12 @@ ScrollObject.prototype = {
         this.that.handleEvents( "onmouseup", evt );
     },
     evt_mousedown:function ( e ) {
-        var evt = e || windows.event;
+        var evt = e || window.event;
+        if (evt.preventDefault)
+            evt.preventDefault();
+        else
+            evt.returnValue = false;
+
         var mousePos = this.that.getMousePosition( evt );
         var downHover = this.that._MouseHoverOnArrowDown( mousePos );
         var upHover = this.that._MouseHoverOnArrowUp( mousePos );
@@ -1393,7 +1417,13 @@ ScrollObject.prototype = {
         }
     },
     evt_mousewheel:function ( e ) {
-        var evt = e || windows.event, delta = 1;
+        var evt = e || window.event;
+        if (evt.preventDefault)
+            evt.preventDefault();
+        else
+            evt.returnValue = false;
+
+        var delta = 1;
         if ( this.that.isHorizontalScroll ) return;
         var mp = {}, isTop = false, isBottom = false;
         if ( undefined != evt.wheelDelta )
