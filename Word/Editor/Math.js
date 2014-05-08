@@ -8,9 +8,15 @@ function ParaMath(bAddMenu)
     this.Type  = para_Math;
 
     this.Jc   = undefined;
-    this.Math = new CMathComposition();
-    this.Math.Parent = this;
-    this.Root = this.Math.Root;
+    //this.Math = new CMathComposition();
+    //this.Math.Parent = this;
+    //this.Root = this.Math.Root;
+
+    this.Root       = new CMathContent();
+
+    this.X          = 0;
+    this.Y          = 0;
+
     //this.CurrentContent    = this.RootComposition;
     //this.SelectContent     = this.RootComposition;
     this.bSelectionUse     = false;
@@ -51,7 +57,17 @@ ParaMath.prototype =
         // TODO: ParaMath.Copy
 
         var NewMath = new ParaMath();
-        this.Root.Copy(Selected);
+        var NewRoot;
+
+        if(Selected)
+        {
+            var Content = this.GetSelectContent();
+            NewRoot = Content.Copy(Selected, this);
+        }
+        else
+        {
+            NewRoot = this.Root.Copy(Selected, this);
+        }
 
         return NewMath;
     },
@@ -388,15 +404,16 @@ ParaMath.prototype =
         var TextPr = new CTextPr();
         TextPr.Init_Default();
 
-       this.Math.RecalculateComposition(g_oTextMeasurer, TextPr);
+        //this.Math.RecalculateComposition(g_oTextMeasurer, TextPr);
 
-        var Size = this.Math.Size;
+        this.Root.Resize(g_oTextMeasurer, TextPr);
+        this.Root.setPosition({x: 0, y: 0});
 
-        this.Width        = Size.Width;
-        this.Height       = Size.Height;
-        this.WidthVisible = Size.WidthVisible;
-        this.Ascent       = Size.Ascent;
-        this.Descent      = Size.Descent;
+        this.Width        = this.Root.size.width;
+        this.Height       = this.Root.size.height;
+        this.WidthVisible = this.Root.size.width;
+        this.Ascent       = this.Root.size.ascent;
+        this.Descent      = this.Root.size.height - this.Root.size.ascent;
 
         //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         // TODO: ParaMath.Recalculate_Range
@@ -594,7 +611,9 @@ ParaMath.prototype =
                 this.WidthVisible = this.Width + PRSA.JustifyWord;
 
             // Позиция в документе для формулы
-            this.Math.absPos = {x: PRSA.X, y: PRSA.Y - this.Root.size.ascent};
+            //this.Math.absPos = {x: PRSA.X, y: PRSA.Y - this.Root.size.ascent};
+            this.X     = PRSA.X;
+            this.Y     = PRSA.Y - this.Root.size.ascent;
 
             PRSA.X    += this.WidthVisible;
             PRSA.LastW = this.WidthVisible;
@@ -828,9 +847,8 @@ ParaMath.prototype =
 
         if ( EndPos >= 1 )
         {
-            //this.Math.Draw( PDSE.X, PDSE.Y - this.Root.size.ascent, PDSE.Graphics );
-
-            this.Math.Draw( PDSE.X, PDSE.Y, PDSE.Graphics );
+            //this.Math.Draw( PDSE.X, PDSE.Y, PDSE.Graphics );
+            this.Root.draw( PDSE.X, PDSE.Y, PDSE.Graphics );
             PDSE.X += this.Width;
         }
     },
@@ -923,8 +941,11 @@ ParaMath.prototype =
                 var X = SearchPos.X,
                     Y = SearchPos.Y;
 
-                SearchPos.X -= this.Math.absPos.x;
-                SearchPos.Y -= this.Math.absPos.y;
+                //SearchPos.X -= this.Math.absPos.x;
+                //SearchPos.Y -= this.Math.absPos.y;
+
+                SearchPos.X -= this.X;
+                SearchPos.Y -= this.Y;
 
 
 
@@ -1135,8 +1156,8 @@ ParaMath.prototype =
 
                 if(!oCont.bRoot)
                 {
-                    //SelectionDraw.StartY += oCont.pos.y;
-                    SelectionDraw.StartY = this.Math.absPos.y + oCont.pos.y; // выставляем так, чтобы для формул с различной высотой в одной строке, всё было ok
+                    //SelectionDraw.StartY = this.Math.absPos.y + oCont.pos.y; // выставляем так, чтобы для формул с различной высотой в одной строке, всё было ok
+                    SelectionDraw.StartY = this.Y + oCont.pos.y; // выставляем так, чтобы для формул с различной высотой в одной строке, всё было ok
                     SelectionDraw.H = oCont.size.height;
                 }
 

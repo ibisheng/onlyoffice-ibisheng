@@ -55,6 +55,11 @@ var BOX_ALIGN               	=  2;
 var BOX_BREAK               	=  3;
 var BOX_NOBREAK             	=  4;
 
+////////////////////////////////////////////////////
+
+//  operators:
+//  accent, delimiters, group character
+
 var OPERATOR_EMPTY              = -1;
 var OPERATOR_TEXT               =  0;
 var PARENTHESIS_LEFT        	=  1;
@@ -87,6 +92,26 @@ var ACCENT_ARROW_LR             = 28;
 var ACCENT_HALF_ARROW_LEFT      = 29;
 var ACCENT_HALF_ARROW_RIGHT     = 30;
 
+var ACCENT_ONE_DOT              = 31;
+var ACCENT_TWO_DOTS             = 32;
+var ACCENT_THREE_DOTS           = 33;
+var ACCENT_GRAVE                = 34;
+var ACCENT_ACUTE                = 35;
+var ACCENT_CIRCUMFLEX           = 36;
+var ACCENT_COMB_CARON           = 37;
+var ACCENT_LINE                 = 38;
+var ACCENT_DOUBLE_LINE          = 39;
+var SINGLE_LINE                 = 40;
+var DOUBLE_LINE                 = 41;
+var ACCENT_TILDE                = 42;
+var ACCENT_BREVE                = 43;
+var ACCENT_INVERT_BREVE         = 44;
+
+var ACCENT_SIGN                 = 45;
+var ACCENT_TEXT                 = 46;
+
+///////////////////////////////////////////////////
+
 var TXT_NORMAL                  =  0;
 var TXT_ROMAN                   =  1;   // math roman
 var TXT_SCRIPT                  =  2;
@@ -112,25 +137,6 @@ var DELIMITER_SHAPE_CENTERED    =  1;
 
 var LIMIT_LOW               	=  0;
 var LIMIT_UP                	=  1;
-
-//////////////////////////////////////////
-var ACCENT_ONE_DOT              =  0;
-var ACCENT_TWO_DOTS             =  1;
-var ACCENT_THREE_DOTS           =  2;
-var ACCENT_GRAVE                =  3;
-var ACCENT_ACUTE                =  4;
-var ACCENT_CIRCUMFLEX           =  5;
-var ACCENT_COMB_CARON           =  6;
-var ACCENT_LINE                 =  7;
-var ACCENT_DOUBLE_LINE          =  8;
-var SINGLE_LINE                 =  9;
-var DOUBLE_LINE                 = 10;
-var ACCENT_TILDE                = 11;
-var ACCENT_BREVE                = 12;
-var ACCENT_INVERT_BREVE         = 13;
-
-var ACCENT_SIGN                 = 19;
-var ACCENT_TEXT                 = 20;
 
 /////////////////////////////////////////
 

@@ -823,9 +823,6 @@ CMPrp.prototype =
 // 1. (!!) повтор IsIncline, IsHighElement
 
 
-// TODO List
-// посмотреть баг, когда выходим за пределы мат объекта и добавляем букву
-
 function CMathContent()
 {
 	this.Id = g_oIdCounter.Get_NewId();		
@@ -5227,9 +5224,9 @@ CMathContent.prototype =
         }
         else if(this.content[this.CurPos].typeObj == MATH_PARA_RUN)
         {
-            var absPos = this.Composition.absPos;
-            var X = this.pos.x + absPos.x + this.WidthToElement[this.CurPos],
-                Y = this.pos.y + absPos.y + this.size.ascent;
+            //var absPos = this.Composition.absPos;
+            var X = this.pos.x + this.Composition.X + this.WidthToElement[this.CurPos],
+                Y = this.pos.y + this.Composition.Y + this.size.ascent;
 
             result = this.content[this.CurPos].Math_Update_Cursor(X, Y, CurPage, UpdateTarget);
         }
@@ -5824,20 +5821,20 @@ CMathContent.prototype =
         }
         else if(this.content[this.CurPos].typeObj == MATH_PARA_RUN)
         {
-            var absPos = this.Composition.absPos;
+            //var absPos = this.Composition.absPos;
 
-            Y = this.pos.y + absPos.y + this.size.ascent;
-            _X = this.pos.x + absPos.x + this.WidthToElement[this.CurPos];
+            Y = this.pos.y + this.Composition.Y + this.size.ascent;
+            _X = this.pos.x + this.Composition.X + this.WidthToElement[this.CurPos];
 
 
             result = this.content[this.CurPos].Recalculate_CurPos(_X, Y, CurrentRun, 0, 0, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
         }
         else
         {
-            var absPos = this.Composition.absPos;
+            //var absPos = this.Composition.absPos;
 
-            Y = this.pos.y + absPos.y + this.size.ascent;
-            _X = this.pos.x + absPos.x + this.size.width;
+            Y = this.pos.y + this.Composition.Y + this.size.ascent;
+            _X = this.pos.x + this.Composition.X + this.size.width;
 
             var ctrPrp = this.Parent.getCtrPrp();
             this.Composition.Parent.ApplyArgSize(ctrPrp);
@@ -6059,8 +6056,12 @@ CMathContent.prototype =
 
             if(bCurrComp && !bLeftRun) // добавление пустого Run перед мат объектом
             {
-                NewContent.push( new ParaRun(this.Composition.Parent.Paragraph, true) );
-                NewContent.push( this.content[i] ); // Math Object
+                var emptyRun = new ParaRun(this.Composition.Parent.Paragraph, true);
+                var txtPrp = current.Get_TxtPrp();
+                emptyRun.Set_Pr(txtPrp);
+
+                NewContent.push(emptyRun);
+                NewContent.push(this.content[i]); // Math Object
 
                 left = current;
 
@@ -6078,7 +6079,11 @@ CMathContent.prototype =
 
         if(len > 0 && this.content[len - 1].typeObj == MATH_COMP)
         {
-            NewContent.push( new ParaRun(this.Composition.Parent.Paragraph, true) );
+            var emptyRun = new ParaRun(this.Composition.Parent.Paragraph, true);
+            var txtPrp = current.Get_TxtPrp();
+            emptyRun.Set_Pr(txtPrp);
+
+            NewContent.push(emptyRun);
         }
 
         this.content = NewContent;
@@ -6105,7 +6110,7 @@ CMathContent.prototype =
             }
             else if(this.content[pos].typeObj == MATH_PARA_RUN)      // проверка на gaps в findDisposition
             {
-                SearchPos.X += this.pos.x + this.Composition.absPos.x + this.WidthToElement[pos];
+                SearchPos.X += this.pos.x + this.Composition.X + this.WidthToElement[pos];
                 SearchPos.CurX += this.pos.x + this.WidthToElement[pos];
                 this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth, 0, 0);
             }
@@ -6345,6 +6350,28 @@ CMathContent.prototype =
     },
     Copy: function(Selected)
     {
+        var start, end;
+
+        if(Selected)
+        {
+            start = this.SelectStartPos;
+            end =   this.SelectEndPos;
+        }
+        else
+        {
+            start = 0;
+            end = this.content.length - 1;
+        }
+
+        var content = new CMathContent();
+
+        for(var i = start; i < end; i++)
+        {
+            var element = this.content[i].Copy(Selected);
+            content.Copy(element);
+        }
+
+
 
     },
     Selection_Remove: function()

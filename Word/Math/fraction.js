@@ -22,10 +22,10 @@ CFraction.prototype.init = function(props)
             bLin = props.type === LINEAR_FRACTION;
 
         if(bBar || bSkew || bLin) // на всякий случай
-            this.Pr.type = props.type;
+            this.type = props.type;
     }
 
-    if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
+    if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
     {
         var num = new CNumerator();
         num.init();
@@ -35,17 +35,17 @@ CFraction.prototype.init = function(props)
 
         this.setDimension(2, 1);
 
-        if(this.Pr.type == NO_BAR_FRACTION)
+        if(this.type == NO_BAR_FRACTION)
             this.bHideBar = true;
 
         this.addMCToContent(num, den);
     }
-    else if(this.Pr.type == SKEWED_FRACTION)
+    else if(this.type == SKEWED_FRACTION)
     {
         this.setDimension(1, 2);
         this.setContent();
     }
-    else if(this.Pr.type == LINEAR_FRACTION)
+    else if(this.type == LINEAR_FRACTION)
     {
         this.setDimension(1, 2);
         this.setContent();
@@ -56,15 +56,15 @@ CFraction.prototype.init = function(props)
 }
 CFraction.prototype.getType = function()
 {
-    return this.Pr.type;
+    return this.type;
 }
 CFraction.prototype.draw = function(x, y, pGraphics)
 {
-    if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
+    if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
         this.drawBarFraction(x, y, pGraphics);
-    else if(this.Pr.type == SKEWED_FRACTION)
+    else if(this.type == SKEWED_FRACTION)
         this.drawSkewedFraction(x, y, pGraphics);
-    else if(this.Pr.type == LINEAR_FRACTION)
+    else if(this.type == LINEAR_FRACTION)
         this.drawLinearFraction(x, y, pGraphics);
 }
 CFraction.prototype.drawBarFraction = function(x, y, pGraphics)
@@ -230,7 +230,7 @@ CFraction.prototype.getNumerator = function()
 {
     var numerator;
 
-    if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
+    if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
         numerator = this.elements[0][0].getElement();
     else
         numerator = this.elements[0][0];
@@ -241,7 +241,7 @@ CFraction.prototype.getDenominator = function()
 {
     var denominator;
 
-    if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
+    if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
         denominator = this.elements[1][0].getElement();
     else
         denominator = this.elements[0][1];
@@ -250,11 +250,11 @@ CFraction.prototype.getDenominator = function()
 }
 CFraction.prototype.recalculateSize = function(oMeasure)
 {
-    if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
+    if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
         this.recalculateBarFraction(oMeasure);
-    else if(this.Pr.type == SKEWED_FRACTION)
+    else if(this.type == SKEWED_FRACTION)
         this.recalculateSkewed(oMeasure);
-    else if(this.Pr.type == LINEAR_FRACTION)
+    else if(this.type == LINEAR_FRACTION)
         this.recalculateLinear(oMeasure);
 }
 CFraction.prototype.recalculateBarFraction = function(oMeasure)
@@ -326,7 +326,7 @@ CFraction.prototype.recalculateLinear = function()
 }
 CFraction.prototype.setPosition = function(pos)
 {
-    if(this.Pr.type == SKEWED_FRACTION)
+    if(this.type == SKEWED_FRACTION)
     {
         this.pos = {x: pos.x, y: pos.y - this.size.ascent};
 
@@ -347,7 +347,7 @@ CFraction.prototype.findDisposition = function( mCoord )
 {
     var disposition;
 
-    if(this.Pr.type == SKEWED_FRACTION)
+    if(this.type == SKEWED_FRACTION)
     {
         var mouseCoord = {x: mCoord.x, y: mCoord.y},
             posCurs =    {x: null, y: null},
@@ -413,13 +413,13 @@ CFraction.prototype.findDisposition = function( mCoord )
 CFraction.prototype.getPropsForWrite = function()
 {
     var type = null;
-    if (this.Pr.type == BAR_FRACTION)
+    if (this.type == BAR_FRACTION)
         type = 0;
-    else if (this.Pr.type == LINEAR_FRACTION)
+    else if (this.type == LINEAR_FRACTION)
         type = 1;
-    else if (this.Pr.type == NO_BAR_FRACTION)
+    else if (this.type == NO_BAR_FRACTION)
         type = 2;
-    else if (this.Pr.type == SKEWED_FRACTION)
+    else if (this.type == SKEWED_FRACTION)
         type = 3;
 
     var props = {

@@ -64,10 +64,6 @@ function CMathBase()
 }
 CMathBase.prototype =
 {
-    init_2: function(props)
-    {
-        this.Pr = Common_CopyObj(props);
-    },
     setContent: function()
     {
         this.elements = new Array();
@@ -100,7 +96,6 @@ CMathBase.prototype =
 
         for(u=0; u < this.nRow; u++)
             this.alignment.wdt[u] = CENTER;
-
     },
     ///////// RunPrp, CtrPrp
     setCtrPrp: function(txtPrp)
@@ -1554,6 +1549,10 @@ CMathBase.prototype =
     IsPlaceholder: function()
     {
         return false;
+    },
+    Get_TxtPrp: function()
+    {
+        return this.getCtrPrp();
     }
 
     //////////////////////////

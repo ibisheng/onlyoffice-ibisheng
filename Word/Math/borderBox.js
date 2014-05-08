@@ -43,7 +43,7 @@ CBorderBox.prototype.init = function(props)
         if(props.hideBot === true || props.hideBot === 1)
             this.bBot = false;
 
-        /*if(props.strikeBLTR === true || props.strikeBLTR === 1)
+        if(props.strikeBLTR === true || props.strikeBLTR === 1)
             this.bRDiag = true;
 
         if(props.strikeTLBR === true || props.strikeTLBR === 1)
@@ -53,7 +53,7 @@ CBorderBox.prototype.init = function(props)
             this.bHor = true;
 
         if(props.strikeV === true || props.strikeV === 1)
-            this.bVert = true;*/
+            this.bVert = true;
     }
 
     this.setDimension(1, 1);
