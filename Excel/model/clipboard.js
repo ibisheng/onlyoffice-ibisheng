@@ -298,6 +298,7 @@
 						}
 						if(this.element.children[0])
 							$(this.element.children[0]).addClass("xslData;" + sBase64);
+						
 						//for buttons copy/paste
 						this.lStorage = sBase64;
 					}
@@ -582,6 +583,7 @@
 				}
 				return false;
 			},
+			
 			
 			//****insert into cell****
 			pasteAsText: function (callback) {
@@ -2046,6 +2048,8 @@
 			    var oTempDrawingDocument = new CDrawingDocument();
 			    var newCDocument = new CDocument(oTempDrawingDocument);
 				newCDocument.bFromDocument = true;
+				newCDocument.theme = this.Api.wbModel.theme;
+				
 			    oTempDrawingDocument.m_oLogicDocument = newCDocument;
 			    var oOldEditor = undefined;
 			    if ("undefined" != typeof editor)
