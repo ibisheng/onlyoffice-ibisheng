@@ -4600,6 +4600,13 @@ function CDrawingDocument()
         }
 
         this.m_oWordControl.m_oApi.sync_SendThemeColors(_ret_array, standart_colors);
+
+        // regenerate styles
+        if (null == this.m_oWordControl.m_oApi._gui_styles)
+        {
+            var StylesPainter = new CStylesPainter();
+            StylesPainter.GenerateStyles(this.m_oWordControl.m_oApi, this.m_oWordControl.m_oLogicDocument.Get_Styles().Style);
+        }
     }
 
     this.SendThemeColorScheme = function()
