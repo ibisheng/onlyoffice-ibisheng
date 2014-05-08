@@ -3057,14 +3057,17 @@ PasteProcessor.prototype =
                 }
                 var aContent;
 				//если находимся внутри шейп, вставляем html
-				if(this.oDocument.Parent && this.oDocument.Parent instanceof WordShape)
+				if(this.oDocument.Parent && this.oDocument.Parent instanceof CShape)
 					base64 = null;
 					
                 if(base64 != null)
                     aContent = this.ReadFromBinary(base64);
+					
                 if(aContent)
                 {
-                    var fPrepasteCallback = function(){
+                    checkThemeFonts(aContent.fonts, this.oDocument.theme.themeElements.fontScheme)
+					
+					var fPrepasteCallback = function(){
                         if(false == oThis.bNested)
                         {
                             oThis.InsertInDocument();
