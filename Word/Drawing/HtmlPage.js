@@ -1675,6 +1675,12 @@ function CEditorPage(api)
              (oThis.TextBoxBackground && oThis.TextBoxBackground.HtmlElement != global_mouseEvent.Sender))
             return;
 
+        if (-1 != oWordControl.m_oTimerScrollSelect)
+        {
+            clearInterval(oWordControl.m_oTimerScrollSelect);
+            oWordControl.m_oTimerScrollSelect = -1;
+        }
+
         check_MouseUpEvent(e);
         var pos = null;
         if (oWordControl.m_oDrawingDocument.AutoShapesTrackLockPageNum == -1)
@@ -1699,12 +1705,6 @@ function CEditorPage(api)
         if (is_drawing === true)
             return;
 
-        if (-1 != oWordControl.m_oTimerScrollSelect)
-        {
-            clearInterval(oWordControl.m_oTimerScrollSelect);
-            oWordControl.m_oTimerScrollSelect = -1;
-        }
-        
         if (null != oWordControl.m_oDrawingDocument.m_oDocumentRenderer)
         {
             oWordControl.m_oDrawingDocument.m_oDocumentRenderer.OnMouseUp();
@@ -1766,6 +1766,12 @@ function CEditorPage(api)
 
         global_mouseEvent.IsPressed = false;
 
+        if (-1 != oWordControl.m_oTimerScrollSelect)
+        {
+            clearInterval(oWordControl.m_oTimerScrollSelect);
+            oWordControl.m_oTimerScrollSelect = -1;
+        }
+
         //---
         var pos = null;
         if (oWordControl.m_oDrawingDocument.AutoShapesTrackLockPageNum == -1)
@@ -1789,12 +1795,6 @@ function CEditorPage(api)
         var is_drawing = oWordControl.m_oDrawingDocument.checkMouseUp_Drawing(pos);
         if (is_drawing === true)
             return;
-
-        if (-1 != oWordControl.m_oTimerScrollSelect)
-        {
-            clearInterval(oWordControl.m_oTimerScrollSelect);
-            oWordControl.m_oTimerScrollSelect = -1;
-        }
 
         if (null != oWordControl.m_oDrawingDocument.m_oDocumentRenderer)
         {
