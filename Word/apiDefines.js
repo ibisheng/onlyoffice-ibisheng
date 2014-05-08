@@ -50,12 +50,6 @@ var c_oAscAlignType = {
 	BOTTOM:6
 };
 
-// image wrap style
-var c_oAscWrapStyle = {
-	Inline:0,
-	Flow : 1
-};
-
 var c_oAscWrapStyle2 = {
     Inline       : 0,
     Square       : 1,

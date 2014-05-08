@@ -324,3 +324,9 @@ var c_oAscRelativeFromV = {
     Paragraph: 0x06,
     TopMargin: 0x07
 };
+
+// image wrap style
+var c_oAscWrapStyle = {
+	Inline:0,
+	Flow : 1
+};
