@@ -7498,7 +7498,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			oParStruct.addToContent(oMathPara);
 			
 			res = this.bcr.Read1(length, function(t, l){
-                return oThis.boMathr.ReadMathOMathPara(t,l,oMathPara.Math);
+                return oThis.boMathr.ReadMathOMathPara(t,l,oMathPara);
 			});
 		}
 		else if ( c_oSerParType.OMath == type )
