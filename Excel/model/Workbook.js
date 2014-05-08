@@ -3839,6 +3839,9 @@ Cell.prototype.setValue=function(val,callback){
 				switch( this.formulaParsed.error[this.formulaParsed.error.length-1] ){
 					case c_oAscError.ID.FrmlWrongFunctionName:
 						break;
+                    case c_oAscError.ID.FrmlWrongCountParentheses:
+                        //do something
+						break;
 					default :{
 						wb.handlers.trigger("asc_onError",this.formulaParsed.error[this.formulaParsed.error.length-1], c_oAscError.Level.NoCritical);
 						if( callback )

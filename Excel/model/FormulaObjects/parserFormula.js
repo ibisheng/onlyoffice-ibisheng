@@ -541,6 +541,9 @@ cArea.prototype.getWS = function () {
 cArea.prototype.getBBox = function () {
     return this.getRange().getBBox();
 };
+cArea.prototype.getBBox0 = function () {
+    return this.getRange().getBBox0();
+};
 cArea.prototype.cross = function ( arg ) {
     var r = this.getRange(), cross;
     if ( !r ) {
@@ -650,96 +653,6 @@ cArea.prototype.getMatrix = function () {
         }
     } );
     return arr;
-};
-
-/** @constructor */
-function cRef( val, ws ) {/*Ref means A1 for example*/
-//    cBaseType.apply( this, arguments );
-//    cBaseType.call( this, val, _ws );
-
-    this.needRecalc = false;
-    this.numFormat = null;
-    this.value = val;
-    this.ca = false;
-    this.node = undefined;
-
-    this._cells = val;
-    this.ws = ws;
-    this.wb = ws.workbook;
-    this.isAbsolute = false;
-    this.type = cElementType.cell;
-    var ca = g_oCellAddressUtils.getCellAddress( val.replace( rx_space_g, "" ) );
-    this.range = null;
-    this._valid = ca.isValid();
-    if ( this._valid ) {
-        this.range = ws.getRange3( ca.getRow0(), ca.getCol0(), ca.getRow0(), ca.getCol0() );
-    }
-    else {
-        this.range = ws.getRange3( 0, 0, 0, 0 );
-    }
-}
-
-cRef.prototype = Object.create( cBaseType.prototype );
-cRef.prototype.clone = function () {
-    var oRes = new cRef( this._cells, this.ws );
-//	cBaseType.prototype.cloneTo.call( this, oRes );
-    this.constructor.prototype.cloneTo.call( this, oRes );
-    oRes.isAbsolute = this.isAbsolute;
-    return oRes;
-};
-cRef.prototype.getWsId = function () {
-    return this.ws.Id;
-};
-cRef.prototype.getValue = function () {
-    if ( !this._valid ) {
-        return new cError( cErrorType.bad_reference );
-    }
-    var cellType = this.range.getType(), v, res;
-    if ( cellType === CellValueType.Number ) {
-        v = this.range.getValueWithoutFormat();
-        if ( v === "" ) {
-            res = new cEmpty();
-        }
-        else {
-            res = new cNumber( "" + v );
-        }
-    }
-    else if ( cellType === CellValueType.Bool ) {
-        res = new cBool( "" + this.range.getValueWithoutFormat() );
-    }
-    else if ( cellType === CellValueType.Error ) {
-        res = new cError( "" + this.range.getValueWithoutFormat() );
-    }
-    else {
-        res = checkTypeCell( "" + this.range.getValueWithoutFormat() );
-    }
-
-    return res;
-};
-cRef.prototype.tocNumber = function () {
-    return this.getValue().tocNumber();
-};
-cRef.prototype.tocString = function () {
-    return this.getValue().tocString();
-    /* new cString(""+this.range.getValueWithFormat()); */
-};
-cRef.prototype.tocBool = function () {
-    return this.getValue().tocBool();
-};
-cRef.prototype.tryConvert = function () {
-    return this.getValue();
-};
-cRef.prototype.toString = function () {
-    return this._cells;
-};
-cRef.prototype.getRange = function () {
-    return this.range;
-};
-cRef.prototype.getWS = function () {
-    return this.ws;
-};
-cRef.prototype.isValid = function () {
-    return this._valid;
 };
 
 /** @constructor */
@@ -955,6 +868,9 @@ cArea3D.prototype.cross = function ( arg ) {
 cArea3D.prototype.getBBox = function () {
     return this.getRange()[0].getBBox();
 };
+cArea3D.prototype.getBBox0 = function () {
+    return this.getRange()[0].getBBox0();
+};
 cArea3D.prototype.isValid = function () {
     var r = this.getRange();
     for ( var i = 0; i < r.length; i++ ) {
@@ -1080,6 +996,96 @@ cArea3D.prototype.foreach2 = function ( action ) {
             }
         }
     }
+};
+
+/** @constructor */
+function cRef( val, ws ) {/*Ref means A1 for example*/
+//    cBaseType.apply( this, arguments );
+//    cBaseType.call( this, val, _ws );
+
+    this.needRecalc = false;
+    this.numFormat = null;
+    this.value = val;
+    this.ca = false;
+    this.node = undefined;
+
+    this._cells = val;
+    this.ws = ws;
+    this.wb = ws.workbook;
+    this.isAbsolute = false;
+    this.type = cElementType.cell;
+    var ca = g_oCellAddressUtils.getCellAddress( val.replace( rx_space_g, "" ) );
+    this.range = null;
+    this._valid = ca.isValid();
+    if ( this._valid ) {
+        this.range = this.ws.getRange3( ca.getRow0(), ca.getCol0(), ca.getRow0(), ca.getCol0() );
+    }
+    else {
+        this.range = this.ws.getRange3( 0, 0, 0, 0 );
+    }
+}
+
+cRef.prototype = Object.create( cBaseType.prototype );
+cRef.prototype.clone = function () {
+    var oRes = new cRef( this._cells, this.ws );
+//	cBaseType.prototype.cloneTo.call( this, oRes );
+    this.constructor.prototype.cloneTo.call( this, oRes );
+    oRes.isAbsolute = this.isAbsolute;
+    return oRes;
+};
+cRef.prototype.getWsId = function () {
+    return this.ws.Id;
+};
+cRef.prototype.getValue = function () {
+    if ( !this._valid ) {
+        return new cError( cErrorType.bad_reference );
+    }
+    var cellType = this.range.getType(), v, res;
+    if ( cellType === CellValueType.Number ) {
+        v = this.range.getValueWithoutFormat();
+        if ( v === "" ) {
+            res = new cEmpty();
+        }
+        else {
+            res = new cNumber( "" + v );
+        }
+    }
+    else if ( cellType === CellValueType.Bool ) {
+        res = new cBool( "" + this.range.getValueWithoutFormat() );
+    }
+    else if ( cellType === CellValueType.Error ) {
+        res = new cError( "" + this.range.getValueWithoutFormat() );
+    }
+    else {
+        res = checkTypeCell( "" + this.range.getValueWithoutFormat() );
+    }
+
+    return res;
+};
+cRef.prototype.tocNumber = function () {
+    return this.getValue().tocNumber();
+};
+cRef.prototype.tocString = function () {
+    return this.getValue().tocString();
+    /* new cString(""+this.range.getValueWithFormat()); */
+};
+cRef.prototype.tocBool = function () {
+    return this.getValue().tocBool();
+};
+cRef.prototype.tryConvert = function () {
+    return this.getValue();
+};
+cRef.prototype.toString = function () {
+    return this._cells;
+};
+cRef.prototype.getRange = function () {
+    return this.range;
+};
+cRef.prototype.getWS = function () {
+    return this.ws;
+};
+cRef.prototype.isValid = function () {
+    return this._valid;
 };
 
 /** @constructor */
@@ -3026,6 +3032,7 @@ function parserFormula( formula, _cellId, _ws ) {
     this.elemArr = [];
     this.RefPos = [];
     this.operand_str = null;
+    this.parenthesesNotEnough = false;
 }
 
 parserFormula.prototype = {
@@ -3454,10 +3461,15 @@ parserFormula.prototype = {
                     operand_expected = false;
                 }
                 else {
-                    this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
+                    /*this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
                     this.outStack = [];
                     this.elemArr = [];
-                    return false;
+                    return false;*/
+                    this.outStack.push( new cError(cErrorType.wrong_name) );
+                    operand_expected = false;
+                    break;
+//                    this.outStack = [new cError(cErrorType.wrong_name)];
+//                    return this.isParsed = false;
                 }
                 wasLeftParentheses = false;
             }
@@ -3469,18 +3481,29 @@ parserFormula.prototype = {
             this.error.push( c_oAscError.ID.FrmlOperandExpected );
             return false;
         }
-        var operand;
+        var operand, parenthesesNotEnough = false;
         while ( this.elemArr.length != 0 ) {
             operand = this.elemArr.pop();
-            if ( operand.name == "(" || operand.name == ")" ) {
+            if ( operand.name == "(" && !this.parenthesesNotEnough ) {
+                this.Formula += ")";
+                parenthesesNotEnough = true;
+            }
+            else if ( operand.name == "(" || operand.name == ")" ) {
                 this.outStack = [];
                 this.elemArr = [];
                 this.error.push( c_oAscError.ID.FrmlWrongCountParentheses );
                 return false;
             }
-            else
+            else{
                 this.outStack.push( operand );
+            }
         }
+        this.parenthesesNotEnough = parenthesesNotEnough;
+        if(this.parenthesesNotEnough){
+            this.error.push( c_oAscError.ID.FrmlWrongCountParentheses );
+            return this.isParsed = false;
+        }
+
         if ( this.outStack.length != 0 )
             return this.isParsed = true;
         else
@@ -3755,8 +3778,11 @@ parserFormula.prototype = {
 
     /* Сборка функции в инфиксную форму */
     assemble:function () {/*При сборке формул вида A1+A2+A3 формула получает вид (A1+A2)+A3. Добавить проверку приоритета операций.*/
-        var elemArr = [];
-        var stack = [];
+        if ( this.outStack.length == 1 && this.outStack[this.outStack.length-1] instanceof cError ) {
+            return this.Formula;
+        }
+        var elemArr = [],
+            stack = [];
         for ( var i = 0; i < this.outStack.length; i++ )
             stack[i] = this.outStack[i];
         var currentElement = null;
