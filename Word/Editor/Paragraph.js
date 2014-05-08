@@ -5734,11 +5734,6 @@ Paragraph.prototype =
         }
     },
 
-    Is_SimpleChanges : function(DataArray)
-    {
-        return false;
-    },
-
     RecalculateCurPos : function()
     {
         if ( true !== Debug_ParaRunMode )
@@ -18245,30 +18240,6 @@ Paragraph.prototype =
         if ( this.Index >= 0 )
             this.Parent.Refresh_RecalcData2( this.Index, this.PageNum + CurPage );
     },
-
-    Check_HistoryUninon : function(Data1, Data2)
-    {
-        var Type1 = Data1.Type;
-        var Type2 = Data2.Type;
-
-        if ( historyitem_Paragraph_AddItem === Type1 && historyitem_Paragraph_AddItem === Type2 )
-        {
-            if ( 1 === Data1.Items.length && 1 === Data2.Items.length && Data1.Pos === Data2.Pos - 1 && para_Text === Data1.Items[0].Type && para_Text === Data2.Items[0].Type )
-                return true;
-        }
-        return false;
-    },
-
-    Is_SimpleChanges : function(DataArray)
-    {
-        // Здесь мы проверяем можно ли пересчитать только данный параграф
-        var Count = DataArray.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-
-        }
-    },
-
 //-----------------------------------------------------------------------------------
 // Функции для совместного редактирования
 //-----------------------------------------------------------------------------------

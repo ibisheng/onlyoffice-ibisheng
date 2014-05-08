@@ -5723,6 +5723,18 @@ ParaRun.prototype =
         }
     },
 
+    Check_HistoryUninon : function(Data1, Data2)
+    {
+        var Type1 = Data1.Type;
+        var Type2 = Data2.Type;
+
+        if ( historyitem_ParaRun_AddItem === Type1 && historyitem_ParaRun_AddItem === Type2 )
+        {
+            if ( 1 === Data1.Items.length && 1 === Data2.Items.length && Data1.Pos === Data2.Pos - 1 && para_Text === Data1.Items[0].Type && para_Text === Data2.Items[0].Type )
+                return true;
+        }
+        return false;
+    },
 //-----------------------------------------------------------------------------------
 // Функции для совместного редактирования
 //-----------------------------------------------------------------------------------
