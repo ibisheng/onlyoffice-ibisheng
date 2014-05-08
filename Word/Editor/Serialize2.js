@@ -6448,7 +6448,7 @@ function Binary_rPrReader(doc, stream)
                 var unifill = CreateThemeUnifill(themeColor.Color, themeColor.Tint, themeColor.Shade);
                 if (null != unifill)
                     rPr.Shd.Unifill = unifill;
-                else if (null != rPr.Shd.Color && !Pr.Shd.Color.Auto)
+                else if (null != rPr.Shd.Color && !rPr.Shd.Color.Auto)
                     rPr.Shd.Unifill = CreteSolidFillRGB(rPr.Shd.Color.r, rPr.Shd.Color.g, rPr.Shd.Color.b);
                 break;
             default:
