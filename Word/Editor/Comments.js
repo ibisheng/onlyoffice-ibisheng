@@ -1001,6 +1001,15 @@ ParaComment.prototype =
                 Item.Set_RStyle( DefHyper );
         }
     },
+    
+    Can_AddDropCap : function()
+    {
+        return null;
+    },
+
+    Get_TextForDropCap : function(DropCapText, UseContentPos, ContentPos, Depth)
+    {
+    },
 //-----------------------------------------------------------------------------------
 // Функции пересчета
 //-----------------------------------------------------------------------------------

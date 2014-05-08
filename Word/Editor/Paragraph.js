@@ -14436,11 +14436,35 @@ Paragraph.prototype =
         // параграфы. Например, для формирования интервала между параграфами.
         // max(Prev.After, Cur.Before) - реальное значение расстояния между параграфами.
         // Поэтому Prev.After = Prev.After (значение не меняем), а вот Cur.Before = max(Prev.After, Cur.Before) - Prev.After
-
+        
         var StyleId = this.Style_Get();
+        var NumPr   = this.Numbering_Get();
+        var FramePr = this.Get_FramePr();
+
         var PrevEl  = this.Get_DocumentPrev();
         var NextEl  = this.Get_DocumentNext();
-        var NumPr   = this.Numbering_Get();
+
+        // Предыдущий и последующий параграфы - это не обязательно именно предыдущий и последующий. Если данный параграф 
+        // находится в рамке, тогда надо искать предыдущий и последующий только в текущей рамке, а если мы вне рамки, тогда
+        // надо пропускать все параграфы находящиеся в рамке.
+        if ( undefined !== FramePr )
+        {
+            var PrevFramePr = PrevEl.Get_FramePr();
+            if ( undefined === PrevFramePr || true !== FramePr.Compare( PrevFramePr ) )
+                PrevEl = null;
+            
+            var NextFramePr = NextEl.Get_FramePr();
+            if ( undefined === NextFramePr || true !== FramePr.Compare( NextFramePr ) )
+                NextEl = null;
+        }
+        else
+        {
+            while ( null !== PrevEl && undefined !== PrevEl.Get_FramePr() )
+                PrevEl = PrevEl.Get_DocumentPrev();
+            
+            while ( null !== NextEl && undefined !== NextEl.Get_FramePr() )
+                NextEl = NextEl.Get_DocumentNext();            
+        }
 
         if ( null != PrevEl && type_Paragraph === PrevEl.GetType() )
         {
@@ -16442,12 +16466,13 @@ Paragraph.prototype =
                 if ( null === AnchorPara || AnchorPara.Lines.length <= 0 )
                     return;
 
-                var LineH  = AnchorPara.Lines[0].Bottom - AnchorPara.Lines[0].Top;
+                var Before = AnchorPara.Get_CompiledPr().ParaPr.Spacing.Before;
+                var LineH  = AnchorPara.Lines[0].Bottom - AnchorPara.Lines[0].Top - Before;
                 var LineTA = AnchorPara.Lines[0].Metrics.TextAscent2;
                 var LineTD = AnchorPara.Lines[0].Metrics.TextDescent + AnchorPara.Lines[0].Metrics.LineGap;
 
                 this.Set_Spacing( { LineRule : linerule_Exact, Line : FramePr.Lines * LineH }, false );
-                this.Update_DropCapByLines( this.Internal_CalculateTextPr( this.Internal_GetStartPos() ), FramePr.Lines, LineH, LineTA, LineTD );
+                this.Update_DropCapByLines( this.Internal_CalculateTextPr( this.Internal_GetStartPos() ), FramePr.Lines, LineH, LineTA, LineTD, Before );
             }
 
             if ( undefined != FramePr.FontFamily )
@@ -16540,9 +16565,11 @@ Paragraph.prototype =
 
     Set_FrameParaPr : function(Para)
     {
-        Para.CopyPr( this );
+        Para.CopyPr( this );        
+        Para.Set_Ind( { FirstLine : 0 }, false );
         this.Set_Spacing( { After : 0 }, false );
-        this.Numbering_Remove();
+        this.Set_Ind( { Right : 0 }, false );
+        this.Numbering_Remove();        
     },
 
     Get_FrameBounds : function(FrameX, FrameY, FrameW, FrameH)
@@ -16784,11 +16811,26 @@ Paragraph.prototype =
         var Count = this.Content.length;
         for ( var Pos = 0; Pos < Count; Pos++ )
         {
-            if ( para_Text === this.Content[Pos].Type )
-                return true;
+            var TempRes = this.Content[Pos].Can_AddDropCap();
+            
+            if ( null !== TempRes )
+                return TempRes;
         }
 
         return false;
+    },
+    
+    Get_TextForDropCap : function(DropCapText, UseContentPos, ContentPos, Depth)
+    {
+        var EndPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.Content.length - 1 );
+
+        for ( var Pos = 0; Pos <= EndPos; Pos++ )
+        {
+            this.Content[Pos].Get_TextForDropCap( DropCapText, (true === UseContentPos && Pos === EndPos ? true : false), ContentPos, Depth + 1 );
+            
+            if ( true === DropCapText.Mixed && ( true === DropCapText.Check || DropCapText.Runs.length > 0 ) )
+                return;
+        }
     },
 
     Split_DropCap : function(NewParagraph)
@@ -16797,63 +16839,61 @@ Paragraph.prototype =
         // тогда мы добавляем в буквицу только первый текстовый элемент, иначе добавляем все от начала параграфа и до
         // конца выделения, кроме этого в буквицу добавляем все табы идущие в начале.
 
-        var Count      = this.Content.length;
-        var EndPos     = this.Selection.StartPos > this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos;
-        var bSelection = false;
-        var LastTextPr = null;
-
-        if ( true === this.Selection.Use )
+        var DropCapText = new CParagraphGetDropCapText();     
+        if ( true == this.Selection.Use )
         {
-            var EndPos = Math.min( this.Selection.StartPos > this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos, this.Content.length );
+            var SelSP = this.Get_ParaContentPos( true, true );
+            var SelEP = this.Get_ParaContentPos( true, false );
+            
+            if ( 0 <= SelSP.Compare( SelEP ) )
+                SelEP = SelSP;
 
-            bSelection = true;
-            for (var Pos = 0; Pos < EndPos; Pos++ )
+            DropCapText.Check = true;
+            this.Get_TextForDropCap( DropCapText, true, SelEP, 0 );
+            
+            DropCapText.Check = false;
+            this.Get_TextForDropCap( DropCapText, true, SelEP, 0 );
+        }
+        else
+        {
+            DropCapText.Mixed = true;
+            DropCapText.Check = false;
+            this.Get_TextForDropCap( DropCapText, false );
+        }
+        
+        var Count = DropCapText.Text.length;
+        var PrevRun = null;
+        var CurrRun = null;
+        
+        for ( var Pos = 0, ParaPos = 0, RunPos = 0; Pos < Count; Pos++ )
+        {
+            if ( PrevRun !== DropCapText.Runs[Pos] )
             {
-                var Type = this.Content[Pos].Type;
-                if ( para_Text != Type && para_TextPr != Type && para_Tab != Type )
-                {
-                    bSelection = false;
-                    break;
-                }
-                else if ( para_TextPr === Type )
-                    LastTextPr = this.Content[Pos];
+                PrevRun = DropCapText.Runs[Pos];
+                CurrRun = new ParaRun(NewParagraph);
+                CurrRun.Set_Pr( DropCapText.Runs[Pos].Pr.Copy() );
+                
+                NewParagraph.Internal_Content_Add( ParaPos++, CurrRun, false );
+                
+                RunPos = 0;
             }
-
+            
+            CurrRun.Add_ToContent( RunPos++, DropCapText.Text[Pos], false );
         }
-
-        if ( false === bSelection )
-        {
-            var Pos = 0;
-            for (; Pos < Count; Pos++ )
-            {
-                var Type = this.Content[Pos].Type;
-                if ( para_Text === Type )
-                    break;
-                else if ( para_TextPr === Type )
-                    LastTextPr = this.Content[Pos];
-            }
-
-            EndPos = Pos + 1;
-        }
-
-        for ( var Pos = 0; Pos < EndPos; Pos++ )
-        {
-            NewParagraph.Internal_Content_Add(Pos, this.Content[Pos]);
-        }
-
-        var TextPr = this.Internal_CalculateTextPr(EndPos);
-        this.Internal_Content_Remove2( 0, EndPos );
-
-        if ( null != LastTextPr )
-            this.Internal_Content_Add( 0, new ParaTextPr(LastTextPr.Value) );
-
-        return TextPr;
+        
+        if ( Count > 0 )
+            return DropCapText.Runs[Count - 1].Get_CompiledPr(true);
+        
+        return null;
     },
 
-    Update_DropCapByLines : function(TextPr, Count, LineH, LineTA, LineTD)
+    Update_DropCapByLines : function(TextPr, Count, LineH, LineTA, LineTD, Before)
     {
+        if ( null === TextPr )
+            return;
+        
         // Мы должны сделать так, чтобы высота данного параграфа была точно Count * LineH
-        this.Set_Spacing( { Before : 0, After : 0, LineRule : linerule_Exact, Line : Count * LineH - 0.001 }, false );
+        this.Set_Spacing( { Before : Before, After : 0, LineRule : linerule_Exact, Line : Count * LineH - 0.001 }, false );
 
         var FontSize = 72;
         TextPr.FontSize = FontSize;
@@ -16861,24 +16901,16 @@ Paragraph.prototype =
         g_oTextMeasurer.SetTextPr(TextPr, this.Get_Theme());
         g_oTextMeasurer.SetFontSlot(fontslot_ASCII, 1);
 
-        var TDescent = null;
-        var TAscent  = null;
+        var TMetrics = { Ascent : null, Descent : null };
 
         var TempCount = this.Content.length;
         for ( var Index = 0; Index < TempCount; Index++ )
         {
-            var Item = this.Content[Index];
-            if ( para_Text === Item.Type )
-            {
-                var Temp = g_oTextMeasurer.Measure2( Item.Value );
-
-                if ( null === TAscent || TAscent < Temp.Ascent )
-                    TAscent = Temp.Ascent;
-
-                if ( null === TDescent || TDescent > Temp.Ascent - Temp.Height )
-                    TDescent = Temp.Ascent - Temp.Height;
-            }
+            this.Content[Index].Recalculate_Measure2( TMetrics );
         }
+        
+        var TDescent = TMetrics.Descent;
+        var TAscent  = TMetrics.Ascent;
 
         var THeight = 0;
         if ( null === TAscent || null === TDescent )
@@ -16897,24 +16929,15 @@ Paragraph.prototype =
         g_oTextMeasurer.SetTextPr(TextPr, this.Get_Theme());
         g_oTextMeasurer.SetFontSlot(fontslot_ASCII, 1);
 
-        var TNewDescent = null;
-        var TNewAscent  = null;
-
+        var TNewMetrics = { Ascent : null, Descent : null };
         var TempCount = this.Content.length;
         for ( var Index = 0; Index < TempCount; Index++ )
         {
-            var Item = this.Content[Index];
-            if ( para_Text === Item.Type )
-            {
-                var Temp = g_oTextMeasurer.Measure2( Item.Value );
-
-                if ( null === TNewAscent || TNewAscent < Temp.Ascent )
-                    TNewAscent = Temp.Ascent;
-
-                if ( null === TNewDescent || TNewDescent > Temp.Ascent - Temp.Height )
-                    TNewDescent = Temp.Ascent - Temp.Height;
-            }
+            this.Content[Index].Recalculate_Measure2( TNewMetrics );
         }
+
+        var TNewDescent = TNewMetrics.Descent;
+        var TNewAscent  = TNewMetrics.Ascent;        
 
         var TNewHeight = 0;
         if ( null === TNewAscent || null === TNewDescent )
@@ -16934,18 +16957,21 @@ Paragraph.prototype =
         this.Selection_Remove();
     },
 
-    Update_DropCapByHeight : function(Height)
-    {
+    Update_DropCapByHeight : function(_Height)
+    {       
         // Ищем следующий параграф, к которому относится буквица
         var AnchorPara = this.Get_FrameAnchorPara();
         if ( null === AnchorPara || AnchorPara.Lines.length <= 0 )
             return 1;
 
-        this.Set_Spacing( { LineRule : linerule_Exact, Line : Height }, false );
-
-        var LineH  = AnchorPara.Lines[0].Bottom - AnchorPara.Lines[0].Top;
+        var Before = AnchorPara.Get_CompiledPr().ParaPr.Spacing.Before;
+        var LineH  = AnchorPara.Lines[0].Bottom - AnchorPara.Lines[0].Top - Before;
         var LineTA = AnchorPara.Lines[0].Metrics.TextAscent2;
         var LineTD = AnchorPara.Lines[0].Metrics.TextDescent + AnchorPara.Lines[0].Metrics.LineGap;
+
+        var Height = _Height - Before;
+
+        this.Set_Spacing( { LineRule : linerule_Exact, Line : Height }, false );
 
         // Посчитаем количество строк
         var LinesCount = Math.ceil( Height / LineH );
@@ -16954,25 +16980,15 @@ Paragraph.prototype =
         g_oTextMeasurer.SetTextPr(TextPr, this.Get_Theme());
         g_oTextMeasurer.SetFontSlot(fontslot_ASCII, 1);
 
-
-        var TDescent = null;
-        var TAscent  = null;
-
+        var TMetrics = { Ascent : null, Descent : null };
         var TempCount = this.Content.length;
         for ( var Index = 0; Index < TempCount; Index++ )
         {
-            var Item = this.Content[Index];
-            if ( para_Text === Item.Type )
-            {
-                var Temp = g_oTextMeasurer.Measure2( Item.Value );
-
-                if ( null === TAscent || TAscent < Temp.Ascent )
-                    TAscent = Temp.Ascent;
-
-                if ( null === TDescent || TDescent > Temp.Ascent - Temp.Height )
-                    TDescent = Temp.Ascent - Temp.Height;
-            }
+            this.Content[Index].Recalculate_Measure2( TMetrics );
         }
+
+        var TDescent = TMetrics.Descent;
+        var TAscent  = TMetrics.Ascent;
 
         var THeight = 0;
         if ( null === TAscent || null === TDescent )
@@ -16988,24 +17004,15 @@ Paragraph.prototype =
         g_oTextMeasurer.SetTextPr(TextPr, this.Get_Theme());
         g_oTextMeasurer.SetFontSlot(fontslot_ASCII, 1);
 
-        var TNewDescent = null;
-        var TNewAscent  = null;
-
+        var TNewMetrics = { Ascent : null, Descent : null };
         var TempCount = this.Content.length;
         for ( var Index = 0; Index < TempCount; Index++ )
         {
-            var Item = this.Content[Index];
-            if ( para_Text === Item.Type )
-            {
-                var Temp = g_oTextMeasurer.Measure2( Item.Value );
-
-                if ( null === TNewAscent || TNewAscent < Temp.Ascent )
-                    TNewAscent = Temp.Ascent;
-
-                if ( null === TNewDescent || TNewDescent > Temp.Ascent - Temp.Height )
-                    TNewDescent = Temp.Ascent - Temp.Height;
-            }
+            this.Content[Index].Recalculate_Measure2( TNewMetrics );
         }
+
+        var TNewDescent = TNewMetrics.Descent;
+        var TNewAscent  = TNewMetrics.Ascent;
 
         var TNewHeight = 0;
         if ( null === TNewAscent || null === TNewDescent )
@@ -21703,6 +21710,14 @@ function CParagraphDrawingLayout(Drawing, Paragraph, X, Y, Line, Range, Page)
 
     this.Layout    = null;
     this.Limits    = null;
+}
+
+function CParagraphGetDropCapText()
+{
+    this.Runs  = [];
+    this.Text  = [];
+    this.Mixed = false;
+    this.Check = true;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -388,6 +388,17 @@ ParaMath.prototype =
     Clear_TextFormatting : function( DefHyper )
     {
     },
+    
+    Can_AddDropCap : function()
+    {
+        return false;
+    },
+    
+    Get_TextForDropCap : function(DropCapText, UseContentPos, ContentPos, Depth)
+    {
+        if ( true === DropCapText.Check )
+            DropCapText.Mixed = true;
+    },    
 //-----------------------------------------------------------------------------------
 // Функции пересчета
 //-----------------------------------------------------------------------------------

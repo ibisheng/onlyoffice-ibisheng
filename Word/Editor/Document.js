@@ -2506,7 +2506,8 @@ CDocument.prototype =
             var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 );
 
             var TextPr = OldParagraph.Split_DropCap( NewParagraph );
-            var LineH  = OldParagraph.Lines[0].Bottom - OldParagraph.Lines[0].Top;
+            var Before = OldParagraph.Get_CompiledPr().ParaPr.Spacing.Before;
+            var LineH  = OldParagraph.Lines[0].Bottom - OldParagraph.Lines[0].Top - Before;
             var LineTA = OldParagraph.Lines[0].Metrics.TextAscent2;
             var LineTD = OldParagraph.Lines[0].Metrics.TextDescent + OldParagraph.Lines[0].Metrics.LineGap;
 
@@ -2514,7 +2515,7 @@ CDocument.prototype =
             FramePr.Init_Default_DropCap( bInText );
             NewParagraph.Set_FrameParaPr( OldParagraph );
             NewParagraph.Set_FramePr2( FramePr );
-            NewParagraph.Update_DropCapByLines( TextPr, NewParagraph.Pr.FramePr.Lines, LineH, LineTA, LineTD );
+            NewParagraph.Update_DropCapByLines( TextPr, NewParagraph.Pr.FramePr.Lines, LineH, LineTA, LineTD, Before );
 
             this.Internal_Content_Add( Pos, NewParagraph );
             OldParagraph.Cursor_MoveToStartPos();

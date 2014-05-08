@@ -743,6 +743,33 @@ ParaHyperlink.prototype =
                 Item.Set_RStyle( DefHyper );
         }
     },
+    
+    Can_AddDropCap : function()
+    {
+        var Count = this.Content.length;
+        for ( var Pos = 0; Pos < Count; Pos++ )
+        {
+            var TempRes = this.Content[Pos].Can_AddDropCap();
+
+            if ( null !== TempRes )
+                return TempRes;
+        }
+        
+        return null;
+    },
+
+    Get_TextForDropCap : function(DropCapText, UseContentPos, ContentPos, Depth)
+    {
+        var EndPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.Content.length - 1 );
+
+        for ( var Pos = 0; Pos <= EndPos; Pos++ )
+        {
+            this.Content[Pos].Get_TextForDropCap( DropCapText, (true === UseContentPos && Pos === EndPos ? true : false), ContentPos, Depth + 1 );
+            
+            if ( true === DropCapText.Mixed && ( true === DropCapText.Check || DropCapText.Runs.length > 0 ) )
+                return;
+        }
+    },
 //-----------------------------------------------------------------------------------
 // Функции пересчета
 //-----------------------------------------------------------------------------------

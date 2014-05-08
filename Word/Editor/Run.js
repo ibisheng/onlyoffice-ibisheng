@@ -1177,6 +1177,65 @@ ParaRun.prototype =
 
         return Str;
     },
+    
+    Can_AddDropCap : function()
+    {
+        var Count = this.Content.length;
+        
+        for ( var Pos = 0; Pos < Count; Pos++ )
+        {
+            var Item = this.Content[Pos];
+            
+            switch ( Item.Type )
+            {
+                case para_Text: 
+                    return true;
+                
+                case para_Space:
+                case para_Tab:
+                case para_PageNum:
+                    return false;
+                
+            }
+        }
+        
+        return null;
+    },
+
+    Get_TextForDropCap : function(DropCapText, UseContentPos, ContentPos, Depth)
+    {
+        var EndPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.Content.length );
+
+        for ( var Pos = 0; Pos < EndPos; Pos++ )
+        {
+            var Item = this.Content[Pos];
+            var ItemType = Item.Type;
+            
+            if ( true === DropCapText.Check )
+            {
+                if ( para_Space === ItemType || para_Tab === ItemType || para_PageNum === ItemType || para_Drawing === ItemType )
+                {
+                    DropCapText.Mixed = true;
+                    return;
+                }
+            }
+            else
+            {
+                if ( para_Text === ItemType )
+                {
+                    DropCapText.Runs.push(this);
+                    DropCapText.Text.push(Item);
+                    
+                    this.Remove_FromContent( Pos, 1, true );
+                    Pos--;
+                    EndPos--;
+                    
+                    if ( true === DropCapText.Mixed )
+                        return;
+                }
+            }
+        }
+    },    
 //-----------------------------------------------------------------------------------
 // Функции пересчета
 //-----------------------------------------------------------------------------------
@@ -1225,6 +1284,32 @@ ParaRun.prototype =
 
         this.RecalcInfo.Recalc  = true;
         this.RecalcInfo.Measure = false;
+    },
+    
+    Recalculate_Measure2 : function(Metrics)
+    {
+        var TAscent  = Metrics.Ascent;
+        var TDescent = Metrics.Descent;
+        
+        var Count = this.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var Item = this.Content[Index];
+            
+            if ( para_Text === Item.Type )
+            {
+                var Temp = g_oTextMeasurer.Measure2( Item.Value );
+
+                if ( null === TAscent || TAscent < Temp.Ascent )
+                    TAscent = Temp.Ascent;
+
+                if ( null === TDescent || TDescent > Temp.Ascent - Temp.Height )
+                    TDescent = Temp.Ascent - Temp.Height;
+            }
+        }
+        
+        Metrics.Ascent  = TAscent;
+        Metrics.Descent = TDescent;
     },
 
     Recalculate_Range : function(PRS, ParaPr, Depth)
@@ -1795,8 +1880,8 @@ ParaRun.prototype =
             if ( PRS.LineTextAscent < this.TextAscent )
                 PRS.LineTextAscent = this.TextAscent;
 
-            //if ( PRS.LineTextAscent2 < this.TextAscent2 )
-            //PRS.LineTextAscent2 = this.TextAscent2;
+            if ( PRS.LineTextAscent2 < this.TextAscent2 )
+                PRS.LineTextAscent2 = this.TextAscent2;
 
             if ( PRS.LineTextDescent < this.TextDescent )
                 PRS.LineTextDescent = this.TextDescent;
