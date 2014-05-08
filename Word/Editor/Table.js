@@ -20687,13 +20687,7 @@ CTableCell.prototype =
             this.Set_Border( undefined, 0 );
         else
         {
-            var Border_top_new = ( null === OtherPr.TableCellBorders.Top ? null :
-            {
-                Value : OtherPr.TableCellBorders.Top.Value,
-                Size  : OtherPr.TableCellBorders.Top.Size,
-                Color : { r : OtherPr.TableCellBorders.Top.Color.r, g : OtherPr.TableCellBorders.Top.Color.g, b : OtherPr.TableCellBorders.Top.Color.b },
-                Space : OtherPr.TableCellBorders.Top.Space
-            } );
+            var Border_top_new = ( null === OtherPr.TableCellBorders.Top ? null : OtherPr.TableCellBorders.Top.Copy() );
 
             this.Set_Border( Border_top_new, 0 );
         }
@@ -20703,13 +20697,7 @@ CTableCell.prototype =
             this.Set_Border( undefined, 2 );
         else
         {
-            var Border_bottom_new = ( null === OtherPr.TableCellBorders.Bottom ? null :
-            {
-                Value : OtherPr.TableCellBorders.Bottom.Value,
-                Size  : OtherPr.TableCellBorders.Bottom.Size,
-                Color : { r : OtherPr.TableCellBorders.Bottom.Color.r, g : OtherPr.TableCellBorders.Bottom.Color.g, b : OtherPr.TableCellBorders.Bottom.Color.b },
-                Space : OtherPr.TableCellBorders.Bottom.Space
-            } );
+            var Border_bottom_new = ( null === OtherPr.TableCellBorders.Bottom ? null : OtherPr.TableCellBorders.Bottom.Copy() );
 
             this.Set_Border( Border_bottom_new, 2 );
         }
@@ -20719,13 +20707,7 @@ CTableCell.prototype =
             this.Set_Border( undefined, 3 );
         else
         {
-            var Border_left_new = ( null === OtherPr.TableCellBorders.Left ? null :
-            {
-                Value : OtherPr.TableCellBorders.Left.Value,
-                Size  : OtherPr.TableCellBorders.Left.Size,
-                Color : { r : OtherPr.TableCellBorders.Left.Color.r, g : OtherPr.TableCellBorders.Left.Color.g, b : OtherPr.TableCellBorders.Left.Color.b },
-                Space : OtherPr.TableCellBorders.Left.Space
-            } );
+            var Border_left_new = ( null === OtherPr.TableCellBorders.Left ? null : OtherPr.TableCellBorders.Left.Copy() );
 
             this.Set_Border( Border_left_new, 3 );
         }
@@ -20735,13 +20717,7 @@ CTableCell.prototype =
             this.Set_Border( undefined, 1 );
         else
         {
-            var Border_right_new = ( null === OtherPr.TableCellBorders.Right ? null :
-            {
-                Value : OtherPr.TableCellBorders.Right.Value,
-                Size  : OtherPr.TableCellBorders.Right.Size,
-                Color : { r : OtherPr.TableCellBorders.Right.Color.r, g : OtherPr.TableCellBorders.Right.Color.g, b : OtherPr.TableCellBorders.Right.Color.b },
-                Space : OtherPr.TableCellBorders.Right.Space
-            } );
+            var Border_right_new = ( null === OtherPr.TableCellBorders.Right ? null : OtherPr.TableCellBorders.Right.Copy() );
 
             this.Set_Border( Border_right_new, 1 );
         }
@@ -21218,6 +21194,10 @@ CTableCell.prototype =
         else
         {
             var NewBorder = new CDocumentBorder();
+            
+            if ( undefined === DstBorder )
+                DstBorder = new CDocumentBorder();
+            
             NewBorder.Value   = ( null != Border.Value ? Border.Value   : DstBorder.Value );
             NewBorder.Size    = ( null != Border.Size  ? Border.Size    : DstBorder.Size  );
             NewBorder.Color.r = ( null != Border.Color ? Border.Color.r : DstBorder.Color.r );

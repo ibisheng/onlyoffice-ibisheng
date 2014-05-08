@@ -154,6 +154,8 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
     this.m_oPRSC = new CParagraphRecalculateStateCounter();
     this.m_oPRSA = new CParagraphRecalculateStateAlign();
     this.m_oPRSI = new CParagraphRecalculateStateInfo();
+    
+    this.m_oPDSE = new CParagraphDrawStateElements(); 
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -6403,7 +6405,7 @@ Paragraph.prototype =
 
     Internal_Draw_4 : function(CurPage, pGraphics, Pr, BgColor, Theme, ColorMap)
     {
-        var PDSE = g_oPDSE;
+        var PDSE = this.m_oPDSE;
         PDSE.Reset( this, pGraphics, BgColor, Theme, ColorMap);
 
         var StartLine = this.Pages[CurPage].StartLine;
@@ -14449,20 +14451,30 @@ Paragraph.prototype =
         // надо пропускать все параграфы находящиеся в рамке.
         if ( undefined !== FramePr )
         {
-            var PrevFramePr = PrevEl.Get_FramePr();
-            if ( undefined === PrevFramePr || true !== FramePr.Compare( PrevFramePr ) )
-                PrevEl = null;
-            
-            var NextFramePr = NextEl.Get_FramePr();
-            if ( undefined === NextFramePr || true !== FramePr.Compare( NextFramePr ) )
+            if ( null === PrevEl || type_Paragraph !== PrevEl.GetType() )
+                PrevEl = null
+            else
+            {
+                var PrevFramePr = PrevEl.Get_FramePr();
+                if ( undefined === PrevFramePr || true !== FramePr.Compare( PrevFramePr ) )
+                    PrevEl = null;
+            }
+
+            if ( null === NextEl || type_Paragraph !== NextEl.GetType() )
                 NextEl = null;
+            else
+            {
+                var NextFramePr = NextEl.Get_FramePr();
+                if ( undefined === NextFramePr || true !== FramePr.Compare( NextFramePr ) )
+                    NextEl = null;
+            }
         }
         else
         {
-            while ( null !== PrevEl && undefined !== PrevEl.Get_FramePr() )
+            while ( null !== PrevEl && type_Paragraph === PrevEl.GetType() && undefined !== PrevEl.Get_FramePr() )
                 PrevEl = PrevEl.Get_DocumentPrev();
             
-            while ( null !== NextEl && undefined !== NextEl.Get_FramePr() )
+            while ( null !== NextEl && type_Paragraph === NextEl.GetType() && undefined !== NextEl.Get_FramePr() )
                 NextEl = NextEl.Get_DocumentNext();            
         }
 
@@ -21616,7 +21628,7 @@ CParagraphDrawStateLines.prototype =
 };
 
 var g_oPDSH = new CParagraphDrawStateHightlights();
-var g_oPDSE = new CParagraphDrawStateElements();
+//var g_oPDSE = new CParagraphDrawStateElements();
 var g_oPDSL = new CParagraphDrawStateLines();
 
 //----------------------------------------------------------------------------------------------------------------------
