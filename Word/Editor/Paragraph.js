@@ -6369,7 +6369,7 @@ Paragraph.prototype =
                 {
                     if ( Pr.ParaPr.Brd.Top.Value === border_Single || shd_Clear === Pr.ParaPr.Shd.Value )
                     {
-                        if ( ( true === Pr.ParaPr.Brd.First && ( false === this.Is_StartFromNewPage() || null === this.Get_DocumentPrev() || ( 1 === CurPage && true === this.Is_StartFromNewPage() ) ) ) ||
+                        if ( ( true === Pr.ParaPr.Brd.First && ( 0 === CurPage || true === this.Parent.Is_TableCellContent() || true === Pr.ParaPr.PageBreakBefore ) ) ||
                              ( true !== Pr.ParaPr.Brd.First && ( ( 0 === CurPage && null === this.Get_DocumentPrev() ) || ( 1 === CurPage && true === this.Is_StartFromNewPage() )  ) ) )
                             TempTop += Pr.ParaPr.Spacing.Before;
                     }
@@ -6704,7 +6704,7 @@ Paragraph.prototype =
         if ( true === Pr.ParaPr.Brd.First && border_Single === Pr.ParaPr.Brd.Top.Value && ( ( 0 === CurPage && ( false === this.Is_StartFromNewPage() || null === this.Get_DocumentPrev() ) ) || ( 1 === CurPage && true === this.Is_StartFromNewPage() )  ) )
         {
             var Y_top = this.Pages[CurPage].Y;
-            if ( 0 === CurPage || ( 1 === CurPage && true === this.Is_StartFromNewPage() ) )
+            if ( 0 === CurPage || true === this.Parent.Is_TableCellContent() || true === Pr.ParaPr.PageBreakBefore )
                 Y_top += Pr.ParaPr.Spacing.Before;
 
             RGBA = Pr.ParaPr.Brd.Top.Get_Color(this);
