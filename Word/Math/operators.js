@@ -9,11 +9,12 @@ var VJUST_BOT          = 1;
 
 function CGlyphOperator()
 {
-    this.loc = null;
+    this.loc =  null;
     this.turn = null;
 
     this.size = null;
     this.stretch = 0;
+    this.bStretch = true;
 
     this.penW = 1; // px
 }
@@ -35,6 +36,7 @@ CGlyphOperator.prototype.init = function(props)
 
     this.loc = props.location;
     this.turn = props.turn;
+    this.bStretch = (props.bStretch == true || props.bStretch == false) ? props.bStretch : true;
 }
 CGlyphOperator.prototype.fixSize = function(stretch)
 {
@@ -50,7 +52,12 @@ CGlyphOperator.prototype.fixSize = function(stretch)
         height = sizeGlyph.height;
 
         ascent = height/2;
-        this.stretch = stretch > width ? stretch : width;
+        //
+        if(this.bStretch)
+            this.stretch = stretch > width ? stretch : width;
+        else
+            this.stretch = width;
+
     }
     else
     {
@@ -230,6 +237,7 @@ CGlyphOperator.prototype.getCoordinateGlyph = function()
         bArrow = this.Parent.typeOper == ARROW_LEFT || this.Parent.typeOper == ARROW_RIGHT || this.Parent.typeOper == ARROW_LR,
         bDoubleArrow = this.Parent.typeOper == DOUBLE_LEFT_ARROW || this.Parent.typeOper == DOUBLE_RIGHT_ARROW || this.Parent.typeOper == DOUBLE_ARROW_LR;
 
+    var a1, a2, b1, b2, c1, c2;
 
     if(bLine)
     {
@@ -2260,21 +2268,25 @@ function COperator(type)
     this.pos = null;
     this.coordGlyph = null;
     this.size = {width: 0, height: 0};
+
+    this.shiftAccent = 0;
 }
 COperator.prototype.init = function(properties, defaultProps)        // props (chr, type, location), defaultProps (chr, location)
+{
+    var prp = this.getProps(properties, defaultProps);
+    this.init_2(prp);
+}
+COperator.prototype.init_2 = function(props) // для копирования
 {
     var operator = null,
         typeOper = null,
         codeChr  = null;
 
-    var prp = this.getProps(properties, defaultProps);
+    var type = props.type,
+        location = props.loc,
+        code = props.code;
 
-    //var code = typeof(prp.chr) === "string" && prp.chr.length > 0 ? prp.chr.charCodeAt(0) : null;
-
-    var type = prp.type,
-        location = prp.loc,
-        code = prp.code;
-
+    var prp = {};
 
     //////////    delimiters    //////////
 
@@ -2284,12 +2296,12 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
         typeOper = PARENTHESIS_LEFT;
 
         operator = new COperatorParenthesis();
-        var props =
+        prp =
         {
             location:   location,
             turn:       TURN_0
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x29 || type === PARENTHESIS_RIGHT)
     {
@@ -2297,12 +2309,12 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
         typeOper = PARENTHESIS_RIGHT;
 
         operator = new COperatorParenthesis();
-        var props =
+        prp =
         {
             location:   location,
             turn:       TURN_180
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code == 0x7B || type === BRACKET_CURLY_LEFT)
     {
@@ -2310,12 +2322,12 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
         typeOper = BRACKET_CURLY_LEFT;
 
         operator = new COperatorBracket();
-        var props =
+        prp =
         {
             location:   location,
             turn:       TURN_0
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x7D || type === BRACKET_CURLY_RIGHT)
     {
@@ -2323,12 +2335,12 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
         typeOper = BRACKET_CURLY_RIGHT;
 
         operator = new COperatorBracket();
-        var props =
+        prp =
         {
             location:   location,
             turn:       TURN_180
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x5B || type === BRACKET_SQUARE_LEFT)
     {
@@ -2336,12 +2348,12 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
         typeOper = BRACKET_SQUARE_LEFT;
 
         operator = new CSquareBracket();
-        var props =
+        prp =
         {
             location:   location,
             turn:       TURN_0
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x5D || type === BRACKET_SQUARE_RIGHT)
     {
@@ -2349,12 +2361,12 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
         typeOper = BRACKET_SQUARE_RIGHT;
 
         operator = new CSquareBracket();
-        var props =
+        prp =
         {
             location:   location,
             turn:       TURN_180
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x27E8 || type === BRACKET_ANGLE_LEFT) // 0x3C => 0x27E8
     {
@@ -2362,12 +2374,12 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
         typeOper = BRACKET_ANGLE_LEFT;
 
         operator = new COperatorAngleBracket();
-        var props =
+        prp =
         {
             location:   location,
             turn:       TURN_0
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x27E9 || type === BRACKET_ANGLE_RIGHT) // 0x3E => 0x27E9
     {
@@ -2375,12 +2387,12 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
         typeOper = BRACKET_ANGLE_RIGHT;
 
         operator = new COperatorAngleBracket();
-        var props =
+        prp =
         {
             location:   location,
             turn:       TURN_180
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x7C || type === DELIMITER_LINE)
     {
@@ -2388,13 +2400,12 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
         typeOper = DELIMITER_LINE;
 
         operator = new COperatorLine();
-        var props =
+        prp =
         {
             location:   location,
-            //location:   DELIMITER_LOCATION_LEFT,
             turn:       TURN_0
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x230A || type === HALF_SQUARE_LEFT)
     {
@@ -2402,13 +2413,12 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
         typeOper = HALF_SQUARE_LEFT;
 
         operator = new CHalfSquareBracket();
-        var props =
+        prp =
         {
-            //location:   DELIMITER_LOCATION_LEFT,
             location:   location,
             turn:       TURN_0
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x230B || type == HALF_SQUARE_RIGHT)
     {
@@ -2416,13 +2426,12 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
         typeOper = HALF_SQUARE_RIGHT;
 
         operator = new CHalfSquareBracket();
-        var props =
+        prp =
         {
-            //location:   DELIMITER_LOCATION_LEFT,
             location:   location,
             turn:       TURN_180
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x2308 || type == HALF_SQUARE_LEFT_UPPER)
     {
@@ -2430,13 +2439,12 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
         typeOper = HALF_SQUARE_LEFT_UPPER;
 
         operator = new CHalfSquareBracket();
-        var props =
+        prp =
         {
-            //location:   DELIMITER_LOCATION_LEFT,
             location:   location,
             turn:       TURN_MIRROR_0
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x2309 || type == HALF_SQUARE_RIGHT_UPPER)
     {
@@ -2444,13 +2452,12 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
         typeOper = HALF_SQUARE_RIGHT_UPPER;
 
         operator = new CHalfSquareBracket();
-        var props =
+        prp =
         {
-            //location:   DELIMITER_LOCATION_LEFT,
             location:   location,
             turn:       TURN_MIRROR_180
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x2016 || type == DELIMITER_DOUBLE_LINE)
     {
@@ -2458,13 +2465,12 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
         typeOper = DELIMITER_DOUBLE_LINE;
 
         operator = new COperatorDoubleLine();
-        var props =
+        prp =
         {
             location:   location,
-            //location:   DELIMITER_LOCATION_LEFT,
             turn:       TURN_0
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x27E6 || type == WHITE_SQUARE_LEFT)
     {
@@ -2472,13 +2478,12 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
         typeOper = WHITE_SQUARE_LEFT;
 
         operator = new CWhiteSquareBracket();
-        var props =
+        prp =
         {
-            //location:   DELIMITER_LOCATION_LEFT,
             location:   location,
             turn:       TURN_0
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x27E7 || type == WHITE_SQUARE_RIGHT)
     {
@@ -2486,13 +2491,12 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
         typeOper = WHITE_SQUARE_RIGHT;
 
         operator = new CWhiteSquareBracket();
-        var props =
+        prp =
         {
-            //location:   DELIMITER_LOCATION_LEFT,
             location:   location,
             turn:       TURN_180
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(type === OPERATOR_EMPTY)
     {
@@ -2512,12 +2516,12 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
         typeOper = ACCENT_ARROW_LEFT;
 
         operator = new CCombiningArrow();
-        var props =
+        prp =
         {
             location:   LOCATION_TOP,
             turn:       TURN_0
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x20D7 || type === ACCENT_ARROW_RIGHT)
     {
@@ -2525,12 +2529,12 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
         codeChr = 0x20D7;
 
         operator = new CCombiningArrow();
-        var props =
+        prp =
         {
             location:   LOCATION_TOP,
             turn:       TURN_180
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x20E1 || type === ACCENT_ARROW_LR)
     {
@@ -2538,13 +2542,13 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
         codeChr = 0x20E1;
 
         operator = new CCombining_LR_Arrow();
-        var props =
+        prp =
         {
             location:   LOCATION_TOP,
             turn:       TURN_0
         };
 
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x20D0 || type === ACCENT_HALF_ARROW_LEFT)
     {
@@ -2552,12 +2556,12 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
         codeChr = 0x20D0;
 
         operator = new CCombiningHalfArrow();
-        var props =
+        prp =
         {
             location:   LOCATION_TOP,
             turn:       TURN_0
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x20D1 || type ===  ACCENT_HALF_ARROW_RIGHT)
     {
@@ -2565,151 +2569,259 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
         codeChr = 0x20D1;
 
         operator = new CCombiningHalfArrow();
-        var props =
+        prp =
         {
             location:   LOCATION_TOP,
             turn:       TURN_180
         };
-        operator.init(props);
+        operator.init(prp);
     }
 
-    /////////////////////////
+    ///////////////////////////////
 
-    /*else if(code === 0x302 || type === ACCENT_CIRCUMFLEX)
+    else if(code === 0x302 || type === ACCENT_CIRCUMFLEX)
     {
         typeOper = ACCENT_CIRCUMFLEX;
         codeChr = 0x302;
 
-        operator = new CCircumflex();
-        var props =
+        //operator = new CCircumflex();
+        operator = new CAccentCircumflex();
+
+        prp =
         {
-            turn:   TURN_0
+            location:   LOCATION_TOP,
+            turn:       TURN_MIRROR_0,
+            bStretch:   false
+
         };
-        operator.init(props);
+        operator.init(prp);
+
     }
     else if(code === 0x30C || type === ACCENT_COMB_CARON)
     {
         typeOper = ACCENT_COMB_CARON;
         codeChr = 0x30C;
 
-        operator = new CCircumflex();
-        var props =
+        operator = new CAccentCircumflex();
+        prp =
         {
-            turn:   TURN_MIRROR_0
+            location:   LOCATION_TOP,
+            turn:   TURN_0,
+            bStretch:   false
         };
-        operator.init(props);
+        operator.init(prp);
+
     }
-    else if(code === 0x332 || type === ACCENT_LINE)
+    else if(code === 0x305 || type === ACCENT_LINE)
     {
         typeOper = ACCENT_LINE;
-        codeChr = 0x332;
+        //codeChr = 0x332;
+        codeChr = 0x305;
 
-        operator = new CLine();
+        operator = new CAccentLine();
+        prp =
+        {
+            location:   LOCATION_TOP,
+            turn:   TURN_0
+        };
+        operator.init(prp);
     }
-    else if(code === 0x333 || type === ACCENT_DOUBLE_LINE)
+    else if(code === 0x33F || type === ACCENT_DOUBLE_LINE)
     {
         typeOper = ACCENT_DOUBLE_LINE;
-        codeChr = 0x333;
+        //codeChr = 0x333;
+        codeChr = 0x33F;
 
-        operator = new CDoubleLine();
-
+        operator = new CAccentDoubleLine();
+        prp =
+        {
+            location:   LOCATION_TOP,
+            turn:   TURN_0
+        };
+        operator.init(prp);
     }
     else if(code === 0x303 || type === ACCENT_TILDE)
     {
         typeOper = ACCENT_TILDE;
         codeChr = 0x303;
 
-        operator = new CTilde();
+        operator = new CAccentTilde();
+        prp =
+        {
+            location:   LOCATION_TOP,
+            turn:   TURN_0,
+            bStretch:   false
+        };
+        operator.init(prp);
     }
     else if(code === 0x306 || type === ACCENT_BREVE)
     {
         typeOper = ACCENT_BREVE;
         codeChr = 0x306;
 
-        operator = new CBreve();
-        var props =
+        operator = new CAccentBreve();
+        prp =
         {
-            turn:   TURN_MIRROR_0
+            location:   LOCATION_TOP,
+            turn:   TURN_MIRROR_0,
+            bStretch:   false
         };
-        operator.init(props);
+        operator.init(prp);
+
     }
     else if(code == 0x311 || type == ACCENT_INVERT_BREVE)
     {
         typeOper = ACCENT_INVERT_BREVE;
         codeChr = 0x311;
 
-        operator = new CBreve();
-        var props =
-        {
-            turn:   TURN_0
-        };
-        operator.init(props);
-    }
-    else if(code === 0x20D6 || type === ACCENT_ARROW_LEFT)
-    {
-        typeOper = ACCENT_ARROW_LEFT;
-        codeChr = 0x20D6;
-
-        operator = new CCombiningArrow();
-        var props =
+        operator = new CAccentBreve();
+        prp =
         {
             location:   LOCATION_TOP,
-            turn:       TURN_0
+            turn:   TURN_0,
+            bStretch:   false
         };
-        operator.init(props);
-    }
-    else if(code === 0x20D7 || type === ACCENT_ARROW_RIGHT)
-    {
-        typeOper = ACCENT_ARROW_RIGHT;
-        codeChr = 0x20D7;
+        operator.init(prp);
 
-        operator = new CCombiningArrow();
-        var props =
-        {
-            location:   LOCATION_TOP,
-            turn:       TURN_180
-        };
-        operator.init(props);
     }
-    else if(code === 0x20E1 || type === ACCENT_ARROW_LR)
-    {
-        typeOper = ACCENT_ARROW_LR;
-        codeChr = 0x20E1;
 
-        operator = new CCombining_LR_Arrow();
-        var props =
-        {
-            location:   LOCATION_TOP,
-            turn:       TURN_0
-        };
-        operator.init(props);
-    }
-    else if(code === 0x20D0 || type === ACCENT_HALF_ARROW_LEFT)
-    {
-        typeOper = ACCENT_HALF_ARROW_LEFT;
-        codeChr = 0x20D0;
+    //////////////////////////////////////////////////////
 
-        operator = new CCombiningHalfArrow();
-        var props =
-        {
-            location:   LOCATION_TOP,
-            turn:       TURN_0
-        };
-        operator.init(props);
-    }
-    else if(code === 0x20D1 || type ===  ACCENT_HALF_ARROW_RIGHT)
-    {
-        typeOper = ACCENT_HALF_ARROW_RIGHT;
-        codeChr = 0x20D1;
+    /*else if(code === 0x302 || type === ACCENT_CIRCUMFLEX)
+     {
+     typeOper = ACCENT_CIRCUMFLEX;
+     codeChr = 0x302;
 
-        operator = new CCombiningHalfArrow();
-        var props =
-        {
-            location:   LOCATION_TOP,
-            turn:       TURN_180
-        };
-        operator.init(props);
-    }*/
+     operator = new CCircumflex();
+     var props =
+     {
+     turn:   TURN_0
+     };
+     operator.init(props);
+     }
+     else if(code === 0x30C || type === ACCENT_COMB_CARON)
+     {
+     typeOper = ACCENT_COMB_CARON;
+     codeChr = 0x30C;
+
+     operator = new CCircumflex();
+     var props =
+     {
+     turn:   TURN_MIRROR_0
+     };
+     operator.init(props);
+     }
+     else if(code === 0x332 || type === ACCENT_LINE)
+     {
+     typeOper = ACCENT_LINE;
+     codeChr = 0x332;
+
+     operator = new CLine();
+     }
+     else if(code === 0x333 || type === ACCENT_DOUBLE_LINE)
+     {
+     typeOper = ACCENT_DOUBLE_LINE;
+     codeChr = 0x333;
+
+     operator = new CDoubleLine();
+
+     }
+     else if(code === 0x303 || type === ACCENT_TILDE)
+     {
+     typeOper = ACCENT_TILDE;
+     codeChr = 0x303;
+
+     operator = new CTilde();
+     }
+     else if(code === 0x306 || type === ACCENT_BREVE)
+     {
+     typeOper = ACCENT_BREVE;
+     codeChr = 0x306;
+
+     operator = new CBreve();
+     var props =
+     {
+     turn:   TURN_MIRROR_0
+     };
+     operator.init(props);
+     }
+     else if(code == 0x311 || type == ACCENT_INVERT_BREVE)
+     {
+     typeOper = ACCENT_INVERT_BREVE;
+     codeChr = 0x311;
+
+     operator = new CBreve();
+     var props =
+     {
+     turn:   TURN_0
+     };
+     operator.init(props);
+     }
+     else if(code === 0x20D6 || type === ACCENT_ARROW_LEFT)
+     {
+     typeOper = ACCENT_ARROW_LEFT;
+     codeChr = 0x20D6;
+
+     operator = new CCombiningArrow();
+     var props =
+     {
+     location:   LOCATION_TOP,
+     turn:       TURN_0
+     };
+     operator.init(props);
+     }
+     else if(code === 0x20D7 || type === ACCENT_ARROW_RIGHT)
+     {
+     typeOper = ACCENT_ARROW_RIGHT;
+     codeChr = 0x20D7;
+
+     operator = new CCombiningArrow();
+     var props =
+     {
+     location:   LOCATION_TOP,
+     turn:       TURN_180
+     };
+     operator.init(props);
+     }
+     else if(code === 0x20E1 || type === ACCENT_ARROW_LR)
+     {
+     typeOper = ACCENT_ARROW_LR;
+     codeChr = 0x20E1;
+
+     operator = new CCombining_LR_Arrow();
+     var props =
+     {
+     location:   LOCATION_TOP,
+     turn:       TURN_0
+     };
+     operator.init(props);
+     }
+     else if(code === 0x20D0 || type === ACCENT_HALF_ARROW_LEFT)
+     {
+     typeOper = ACCENT_HALF_ARROW_LEFT;
+     codeChr = 0x20D0;
+
+     operator = new CCombiningHalfArrow();
+     var props =
+     {
+     location:   LOCATION_TOP,
+     turn:       TURN_0
+     };
+     operator.init(props);
+     }
+     else if(code === 0x20D1 || type ===  ACCENT_HALF_ARROW_RIGHT)
+     {
+     typeOper = ACCENT_HALF_ARROW_RIGHT;
+     codeChr = 0x20D1;
+
+     operator = new CCombiningHalfArrow();
+     var props =
+     {
+     location:   LOCATION_TOP,
+     turn:       TURN_180
+     };
+     operator.init(props);
+     }*/
 
     //////////////////////////////////////////
 
@@ -2821,7 +2933,7 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
         operator.init(props);
     }
 
-    //////////////////////////////////////////
+    //////////////////////////////////////////////////////
 
     else if(code !== null)
     {
@@ -2838,7 +2950,6 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
     this.operator = operator;
     this.code = codeChr;
     this.typeOper = typeOper;
-
 }
 COperator.prototype.getProps = function(props, defaultProps)
 {
@@ -2902,12 +3013,14 @@ COperator.prototype.draw = function(x, y, pGraphics)
     else
     {
         if(this.type === OPER_SEPARATOR)
-            this.drawSeparator(x, y,pGraphics);
+            this.drawSeparator(x, y, pGraphics);
+        else if(this.type == OPER_ACCENT)
+            this.drawAccent(x, y, pGraphics);
         else
             this.drawOperator(x, y, pGraphics);
     }
 }
-COperator.prototype.drawOperator = function( absX, absY, pGraphics)
+COperator.prototype.drawOperator = function(absX, absY, pGraphics)
 {
     if(this.operator !== -1)
     {
@@ -3035,6 +3148,11 @@ COperator.prototype.fixSize = function(oMeasure, stretch)
                 width = this.operator.size.width;
                 height = this.operator.size.height;
             }
+
+            var letterX = new CMathText(true);
+            letterX.add(0x78);
+            letterX.Resize(oMeasure);
+            this.shiftAccent = letterX.size.ascent;
         }
         else
         {
@@ -3084,7 +3202,13 @@ COperator.prototype.setPosition = function(pos)
             y = pos.y + ascent - k*this.operator.size.height;
 
         this.operator.setPosition({x: x, y: y});*/
-        this.operator.setPosition(pos);
+
+        if(this.type == OPER_ACCENT)
+        {
+            this.operator.setPosition({x: pos.x, y: pos.y + this.shiftAccent});
+        }
+        else
+            this.operator.setPosition(pos);
     }
 
 }
@@ -3170,6 +3294,7 @@ function CDelimiter()
 
     this.shape = DELIMITER_SHAPE_CENTERED;
     this.grow = true;
+
 
     this.code = null;
     this.typeOper = null;
@@ -3845,7 +3970,7 @@ CDelimiter.prototype.getPropsForWrite = function()
 function CCharacter()
 {
     this.operator = new COperator(OPER_GROUP_CHAR);
-    this.shiftOperator = 0;
+    this.shiftX = 0;
 
     CMathBase.call(this);
 }
@@ -3865,18 +3990,17 @@ CCharacter.prototype.Resize = function(oMeasure)
 
     this.operator.fixSize(oMeasure, base.size.width);
 
+    var letterX = new CMathText(true);
+    letterX.add(0x78);
+    letterX.Resize(oMeasure);
+    this.shiftX = base.size.ascent - letterX.size.ascent;
+
     var width  = base.size.width > this.operator.size.width ? base.size.width : this.operator.size.width,
-        height = base.size.height + this.operator.size.height,
+        height = base.size.height + this.operator.size.height + this.shiftX,
         ascent = this.getAscent(oMeasure);
 
     var ctrPrp = this.mergeCtrTPrp();
     oMeasure.SetFont(ctrPrp);
-
-    var letterX = new CMathText(true);
-    letterX.add(0x78);
-    letterX.Resize(oMeasure);
-    this.shiftOperator = base.size.ascent - letterX.size.ascent;
-
 
     this.size = {height: height, width: width, ascent: ascent};
 }
@@ -3895,7 +4019,7 @@ CCharacter.prototype.setPosition = function(pos)
         this.operator.setPosition({x: x1, y: y1});
 
         var x2 = this.pos.x + this.GapLeft + alignCnt,
-            y2 = this.pos.y + this.operator.size.height;
+            y2 = this.pos.y + this.operator.size.height + this.shiftX;
 
         this.elements[0][0].setPosition({x: x2, y: y2});
     }

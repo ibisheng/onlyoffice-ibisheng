@@ -195,7 +195,32 @@ CPosition.prototype.put_X = function(v) { this.X = v; }
 CPosition.prototype.get_Y = function() { return this.Y; }
 CPosition.prototype.put_Y = function(v) { this.Y = v; }
 
+function CPaddings( obj )
+{
+	if ( obj )
+	{
+		this.Left = (undefined == obj.Left) ? null : obj.Left;
+		this.Top = (undefined == obj.Top) ? null : obj.Top;
+		this.Bottom = (undefined == obj.Bottom) ? null : obj.Bottom;
+		this.Right = (undefined == obj.Right) ? null : obj.Right;
+	}
+	else
+	{
+		this.Left = null;
+		this.Top = null;
+		this.Bottom = null;
+		this.Right = null;
+	}
+}
 
+CPaddings.prototype.get_Left = function() { return this.Left; }
+CPaddings.prototype.put_Left = function(v) { this.Left = v; }
+CPaddings.prototype.get_Top = function() { return this.Top; }
+CPaddings.prototype.put_Top = function(v) { this.Top = v; }
+CPaddings.prototype.get_Bottom = function() { return this.Bottom; }
+CPaddings.prototype.put_Bottom = function(v) { this.Bottom = v; }
+CPaddings.prototype.get_Right = function() { return this.Right; }
+CPaddings.prototype.put_Right = function(v) { this.Right = v; }
 
 function CImageSize( width, height, isCorrect )
 {
@@ -719,11 +744,6 @@ asc_docs_api.prototype.SetLanguage = function(langId)
         this.CurrentTranslate = translations_map[langId];
 }
 
-asc_docs_api.prototype.asc_GetFontThumbnailsPath = function()
-{
-    return "../Common/Images/";
-}
-
 asc_docs_api.prototype.TranslateStyleName = function(style_name)
 {
     var ret = this.CurrentTranslate.DefaultStyles[style_name];
@@ -1026,7 +1046,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
         this.DocInfo.put_OfflineApp(true);
 
         // For test create unique id
-        documentId = "test_document_id";
+        documentId = "test_document_id_27jaies45983th";
         this.OfflineAppDocumentStartLoad();
         this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, 0);
     }
@@ -1084,7 +1104,7 @@ asc_docs_api.prototype.CreateCSS = function()
     var style1 = document.createElement('style');
     style1.type = 'text/css';
     style1.innerHTML = ".buttonTabs {\
-background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAA5CAMAAADjueCuAAAABGdBTUEAALGPC/xhBQAAAEhQTFRFAAAAWFhYZWVlSEhIY2NjV1dXQ0NDYWFhYmJiTk5OVlZWYGBgVFRUS0tLbGxsRERETExMZmZmVVVVXl5eR0dHa2trPj4+u77CpAZQrwAAAAF0Uk5TAEDm2GYAAABwSURBVDjL1dHHDoAgEEVR7NLr4P//qQm6EMaFxtje8oTF5ELIpU35Fstf3GegsPEBG+uwSYpNB1qNKreoDeNw/r6dLr/tnFpbbNZj8wKbk8W/1d6ZPjfrhdHx9c4fbA9wzMYWm3OFhbQmbC2ue6z9DCH/Exf/mU3YAAAAAElFTkSuQmCC);\
+background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAA5CAYAAADUZxCcAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABp0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjUuMTAw9HKhAAABM0lEQVRYR+2Wu4qAMBBF/TIbBQXFylclPtBGf2KrLfdX/DFb21musOLikJ0MwW0sDoab5EgmOOit6+oMNtTChlrOwcfnF2lhZdu2eba8Mn6DCbFsnmdalsX4ErGsbVvqus6NrCxLqqrKjSxJEsqyzI0sDEOKougQ1nVNfd/faiiW+b5PEKZpSjgyaohLua4RyyQ8I9Nyk7mADbWwoZZzwNVCCivjbusvXhm/wYRaho98mqZf69QyiJqmcSODKM9zN7KiKAjd95qJZajROI7H0SBCkwyCQCf7qRGOBhG6LrrvdY1YJuEZmZabzAVsqIUNtbChlnPAFVYKK9v33bPllfEbTFjL0IoAN/e/Mvx+DsPgRoYuC7g5kQw/xhxxHB9PKxnaswkrmZRnZFpuMhewoY7V+wa2hli8QmxDtwAAAABJRU5ErkJggg==);\
 background-position: 0px 0px;\
 background-repeat: no-repeat;\
 }";
@@ -1102,7 +1122,7 @@ background-repeat: no-repeat;\
     var style3 = document.createElement('style');
     style3.type = 'text/css';
     style3.innerHTML = ".buttonPrevPage {\
-background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAABgBAMAAADm/++TAAAABGdBTUEAALGPC/xhBQAAABJQTFRFAAAA////UVNVu77Cenp62Nrc3x8hMQAAAAF0Uk5TAEDm2GYAAABySURBVCjPY2AgETDBGEoKUAElJcJSxANjKGAwDQWDYAKMIBhDSRXCCFJSIixF0GS4M+AMExcwcCbAcIQxBEUgDEdBQcJSBE2GO4PU6IJHASxS4NGER4p28YWIAlikwKMJjxTt4gsRBbBIgUcTHini4wsAwMmIvYZODL0AAAAASUVORK5CYII=);\
+background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAABgCAYAAAAU0fKgAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwwAADsMBx2+oZAAAABp0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjUuMTAw9HKhAAABU0lEQVRYR+XWQW6DQBBEUV8xinwxzsWOc3AGoorUUgv9qZ4Gr/DiZVFQxSwg8mvbtlsw7MCwA8MODDswDD+/74PyDENROdD1gGEuVyMYBlcMGMrM0wXDXK5GMOzAsAPDDgw7MOx4Lcty3PE/sO/7Jd8woFeY8mAH8ndA12U4kMtuxJ5ARsVgB6qny3Agl92IPcGMJw3c8ZmBdV0v+YYBvcKUBzuQvwO6LsOBXHYj9gQyKgY7UD1dhgO57EbsCWY8aeAO/NHQgWEHhh0YdmDYgSG9ynSfYCgzZcEwVGXBMD890H2CocyUBcNQlQXDDgw7MOzAsAPDjvv/UPSHfr7MePJA/g7C+R6xJ6jKYgfElWU4kJ8ezveIPUFVFjsgrizlQOVJA3d8ZoB+vsx48kD+DsL5HrEnqMpiB8SVZTiQnx7O94g9QVUWOyCuLOVA5UkD1y3HHxBw7VBakRjXAAAAAElFTkSuQmCC);\
 background-position: 0px 0px;\
 background-repeat: no-repeat;\
 }";
@@ -1111,7 +1131,7 @@ background-repeat: no-repeat;\
     var style4 = document.createElement('style');
     style4.type = 'text/css';
     style4.innerHTML = ".buttonNextPage {\
-background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAABgBAMAAADm/++TAAAABGdBTUEAALGPC/xhBQAAABJQTFRFAAAA////UVNVu77Cenp62Nrc3x8hMQAAAAF0Uk5TAEDm2GYAAABySURBVCjPY2AgETDBGEoKUAElJcJSxANjKGAwDQWDYAKMIBhDSRXCCFJSIixF0GS4M+AMExcwcCbAcIQxBEUgDEdBQcJSBE2GO4PU6IJHASxS4NGER4p28YWIAlikwKMJjxTt4gsRBbBIgUcTHini4wsAwMmIvYZODL0AAAAASUVORK5CYII=);\
+background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAABgCAYAAAAU0fKgAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwwAADsMBx2+oZAAAABp0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjUuMTAw9HKhAAABU0lEQVRYR+XWQW6DQBBEUV8xinwxzsWOc3AGoorUUgv9qZ4Gr/DiZVFQxSwg8mvbtlsw7MCwA8MODDswDD+/74PyDENROdD1gGEuVyMYBlcMGMrM0wXDXK5GMOzAsAPDDgw7MOx4Lcty3PE/sO/7Jd8woFeY8mAH8ndA12U4kMtuxJ5ARsVgB6qny3Agl92IPcGMJw3c8ZmBdV0v+YYBvcKUBzuQvwO6LsOBXHYj9gQyKgY7UD1dhgO57EbsCWY8aeAO/NHQgWEHhh0YdmDYgSG9ynSfYCgzZcEwVGXBMD890H2CocyUBcNQlQXDDgw7MOzAsAPDjvv/UPSHfr7MePJA/g7C+R6xJ6jKYgfElWU4kJ8ezveIPUFVFjsgrizlQOVJA3d8ZoB+vsx48kD+DsL5HrEnqMpiB8SVZTiQnx7O94g9QVUWOyCuLOVA5UkD1y3HHxBw7VBakRjXAAAAAElFTkSuQmCC);\
 background-position: 0px -48px;\
 background-repeat: no-repeat;\
 }";
@@ -3526,34 +3546,7 @@ asc_docs_api.prototype.paraApply = function(Props)
             this.WordControl.m_oLogicDocument.Set_ParagraphShd( Props.Shd );
 
         if ( "undefined" != typeof(Props.Brd) && null != Props.Brd )
-        {
-            if(Props.Brd.Left && Props.Brd.Left.Color)
-            {
-                Props.Brd.Left.Unifill = CreateUnifillFromAscColor(Props.Brd.Left.Color);
-            }
-            if(Props.Brd.Top && Props.Brd.Top.Color)
-            {
-                Props.Brd.Top.Unifill = CreateUnifillFromAscColor(Props.Brd.Top.Color);
-            }
-            if(Props.Brd.Right && Props.Brd.Right.Color)
-            {
-                Props.Brd.Right.Unifill = CreateUnifillFromAscColor(Props.Brd.Right.Color);
-            }
-            if(Props.Brd.Bottom && Props.Brd.Bottom.Color)
-            {
-                Props.Brd.Bottom.Unifill = CreateUnifillFromAscColor(Props.Brd.Bottom.Color);
-            }
-            if(Props.Brd.InsideH && Props.Brd.InsideH.Color)
-            {
-                Props.Brd.InsideH.Unifill = CreateUnifillFromAscColor(Props.Brd.InsideH.Color);
-            }
-            if(Props.Brd.InsideV && Props.Brd.InsideV.Color)
-            {
-                Props.Brd.InsideV.Unifill = CreateUnifillFromAscColor(Props.Brd.InsideV.Color);
-            }
-
             this.WordControl.m_oLogicDocument.Set_ParagraphBorders( Props.Brd );
-        }
 
         if ( undefined != Props.Tabs )
         {
@@ -3841,10 +3834,7 @@ asc_docs_api.prototype.put_TextColor = function(color)
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-        var Unifill = new CUniFill();
-        Unifill.fill = new CSolidFill();
-        Unifill.fill.color = CorrectUniColor(color, Unifill.fill.color);
-        this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Unifill : Unifill} ) );
+        this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Color :  { r : color.get_r(), g : color.get_g(), b : color.get_b(), Auto : color.get_auto() }  } ) );
 
         if ( true === this.isMarkerFormat )
             this.sync_MarkerFormatCallback( false );
@@ -3859,10 +3849,7 @@ asc_docs_api.prototype.put_ParagraphShade = function(is_flag, color)
             this.WordControl.m_oLogicDocument.Set_ParagraphShd( { Value : shd_Nil  }  );
         else
         {
-            var Unifill = new CUniFill();
-            Unifill.fill = new CSolidFill();
-            Unifill.fill.color = CorrectUniColor(color, Unifill.fill.color);
-            this.WordControl.m_oLogicDocument.Set_ParagraphShd( { Value : shd_Clear, Color : { r : color.get_r(), g : color.get_g(), b : color.get_b() }, Unifill: Unifill } );
+            this.WordControl.m_oLogicDocument.Set_ParagraphShd( { Value : shd_Clear, Color : { r : color.get_r(), g : color.get_g(), b : color.get_b() } } );
         }
     }
 }
@@ -4899,38 +4886,6 @@ asc_docs_api.prototype.tblApply = function(obj)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Table_Properties) )
     {
-        if(obj.CellBorders)
-        {
-            if(obj.CellBorders.Left && obj.CellBorders.Left.Color)
-            {
-                obj.CellBorders.Left.Unifill = CreateUnifillFromAscColor(obj.CellBorders.Left.Color);
-            }
-            if(obj.CellBorders.Top && obj.CellBorders.Top.Color)
-            {
-                obj.CellBorders.Top.Unifill = CreateUnifillFromAscColor(obj.CellBorders.Top.Color);
-            }
-            if(obj.CellBorders.Right && obj.CellBorders.Right.Color)
-            {
-                obj.CellBorders.Right.Unifill = CreateUnifillFromAscColor(obj.CellBorders.Right.Color);
-            }
-            if(obj.CellBorders.Bottom && obj.CellBorders.Bottom.Color)
-            {
-                obj.CellBorders.Bottom.Unifill = CreateUnifillFromAscColor(obj.CellBorders.Bottom.Color);
-            }
-            if(obj.CellBorders.InsideH && obj.CellBorders.InsideH.Color)
-            {
-                obj.CellBorders.InsideH.Unifill = CreateUnifillFromAscColor(obj.CellBorders.InsideH.Color);
-            }
-            if(obj.CellBorders.InsideV && obj.CellBorders.InsideV.Color)
-            {
-                obj.CellBorders.InsideV.Unifill = CreateUnifillFromAscColor(obj.CellBorders.InsideV.Color);
-            }
-        }
-        if(obj.CellsBackground && obj.CellsBackground.Color)
-        {
-            obj.CellsBackground.Unifill = CreateUnifillFromAscColor(obj.CellsBackground.Color);
-        }
-
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Set_TableProps(obj);
     }
@@ -6191,14 +6146,14 @@ asc_docs_api.prototype.ChangeColorScheme = function(index_scheme)
         {
             History.TurnOff();
         }
-        //this.chartStyleManager.init();
-        //this.chartPreviewManager.init();
+        this.chartStyleManager.init();
+        this.chartPreviewManager.init();
         if(is_on)
         {
             History.TurnOn();
         }
         this.asc_fireCallback("asc_onUpdateChartStyles");
-        this.WordControl.m_oLogicDocument.Recalculate();
+        _changer.calculateAfterChangeTheme();
 
         // TODO:
         this.WordControl.m_oDrawingDocument.ClearCachePages();
@@ -6325,6 +6280,54 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
 
                 //Recalculate для Document
                 Document.CurPos.ContentPos = 0;
+
+                // TODO: Переделать 
+//                var hdr = Document.HdrFtr.Content[0].Header;
+//                var ftr = Document.HdrFtr.Content[0].Footer;
+//                var drawing_objects = Document.DrawingObjects;
+//                if(hdr.First != null || ftr.First != null)
+//                {
+//                    drawing_objects.firstPage = new HeaderFooterGraphicObjects();
+//                }
+//                if(hdr.Even != null || ftr.Even != null)
+//                {
+//                    if((hdr.Even != null && hdr.Even == hdr.First) || (ftr.Even != null && ftr.Even == ftr.First))
+//                        drawing_objects.evenPage = drawing_objects.firstPage;
+//                    else
+//                        drawing_objects.evenPage = new HeaderFooterGraphicObjects();
+//                }
+//                if(hdr.Odd != null || ftr.Odd != null)
+//                {
+//                    if((hdr.Odd != null && hdr.Odd == hdr.First) || (ftr.Odd != null && ftr.Odd == ftr.First))
+//                        drawing_objects.oddPage = drawing_objects.firstPage;
+//                    else if((hdr.Odd != null && hdr.Odd == hdr.Even)|| (ftr.Odd != null && ftr.Odd == ftr.Even))
+//                        drawing_objects.oddPage = drawing_objects.evenPage;
+//                    else
+//                        drawing_objects.oddPage = new HeaderFooterGraphicObjects();
+//                }
+
+
+
+               /* if(hdr.Odd != null)
+                {
+                    if((hdr.Odd != null && hdr.Odd == hdr.First) )
+                        drawing_objects.headerFooter.header.odd = drawing_objects.headerFooter.header.first;
+                    else if((hdr.Odd != null && hdr.Odd == hdr.Even))
+                        drawing_objects.headerFooter.header.odd = drawing_objects.headerFooter.header.even;
+                    else
+                        drawing_objects.headerFooter.header.odd = new HeaderFooterGraphicObjects();
+                }
+
+
+                if(ftr.Odd != null)
+                {
+                    if((ftr.Odd != null && ftr.Odd == ftr.First) )
+                        drawing_objects.headerFooter.footer.odd = drawing_objects.headerFooter.footer.first;
+                    else if((ftr.Odd != null && ftr.Odd == ftr.Even))
+                        drawing_objects.headerFooter.footer.odd = drawing_objects.headerFooter.footer.even;
+                    else
+                        drawing_objects.headerFooter.footer.odd = new HeaderFooterGraphicObjects();
+                }              */
                 History.RecalcData_Add({Type: historyrecalctype_Drawing, All: true});
                 Document.DrawingObjects.addToZIndexManagerAfterOpen();
                 if (!this.isOnlyReaderMode)
@@ -6586,39 +6589,6 @@ asc_docs_api.prototype.asc_setAutoSaveGap = function (autoSaveGap) {
 		this.autoSaveInit();
 	}
 };
-
-asc_docs_api.prototype.asc_SetDocumentPlaceChangedEnabled = function(bEnabled)
-{
-    if (this.WordControl)
-        this.WordControl.m_bDocumentPlaceChangedEnabled = bEnabled;
-}
-
-asc_docs_api.prototype.asc_SetViewRulers = function(bRulers)
-{
-    //if (false === this.bInit_word_control || true === this.isViewMode)
-    //    return;
-
-    if (this.WordControl.m_bIsRuler != bRulers)
-    {
-        this.WordControl.m_bIsRuler = bRulers;
-        this.WordControl.checkNeedRules();
-        this.WordControl.OnResize(true);
-    }
-}
-asc_docs_api.prototype.asc_SetViewRulersChange = function()
-{
-    //if (false === this.bInit_word_control || true === this.isViewMode)
-    //    return;
-
-    this.WordControl.m_bIsRuler = !this.WordControl.m_bIsRuler;
-    this.WordControl.checkNeedRules();
-    this.WordControl.OnResize(true);
-    return this.WordControl.m_bIsRuler;
-}
-asc_docs_api.prototype.asc_GetViewRulers = function()
-{
-    return this.WordControl.m_bIsRuler;
-}
 
 asc_docs_api.prototype.SetMobileVersion = function(val)
 {
@@ -7381,12 +7351,21 @@ CErrorData.prototype.get_Value = function() { return this.Value; };
 //test
 
 // Вставка диаграмм
-asc_docs_api.prototype.asc_getChartObject = function(type, subtype)
+asc_docs_api.prototype.asc_getChartObject = function()
 {	
 	this.isChartEditor = true;		// Для совместного редактирования
 
-
-    return this.WordControl.m_oLogicDocument.Get_ChartObject(type, subtype);
+	var oColor, oNewColor;
+	var graphicObject = this.WordControl.m_oLogicDocument.Get_ChartObject();
+	for (var i = 0; i < this.WordControl.m_oDrawingDocument.GuiControlColorsMap.length; i++) {
+		oColor = this.WordControl.m_oDrawingDocument.GuiControlColorsMap[i];
+		oNewColor = new CRGBColor();
+		oNewColor.RGBA.R = oColor.r;
+		oNewColor.RGBA.G = oColor.g;
+		oNewColor.RGBA.B = oColor.b;
+		graphicObject.chart.themeColors.push(oNewColor);
+	}
+    return graphicObject;
 }
 
 asc_docs_api.prototype.asc_addChartDrawingObject = function(options)
@@ -9617,6 +9596,36 @@ window["asc_docs_api"].prototype["asc_nativeCalculateFile"] = function()
 
     //Recalculate для Document
     Document.CurPos.ContentPos = 0;
+
+    // TODO: Переделать
+//    var hdr = Document.HdrFtr.Content[0].Header;
+//    var ftr = Document.HdrFtr.Content[0].Footer;
+//    var drawing_objects = Document.DrawingObjects;
+//    if(hdr.First != null || ftr.First != null)
+//    {
+//        drawing_objects.firstPage = new HeaderFooterGraphicObjects();
+//    }
+//    if(hdr.Even != null || ftr.Even != null)
+//    {
+//        if((hdr.Even != null && hdr.Even == hdr.First) || (ftr.Even != null && ftr.Even == ftr.First))
+//            drawing_objects.evenPage = drawing_objects.firstPage;
+//        else
+//            drawing_objects.evenPage = new HeaderFooterGraphicObjects();
+//    }
+//    if(hdr.Odd != null || ftr.Odd != null)
+//    {
+//        if((hdr.Odd != null && hdr.Odd == hdr.First) || (ftr.Odd != null && ftr.Odd == ftr.First))
+//            drawing_objects.oddPage = drawing_objects.firstPage;
+//        else if((hdr.Odd != null && hdr.Odd == hdr.Even)|| (ftr.Odd != null && ftr.Odd == ftr.Even))
+//            drawing_objects.oddPage = drawing_objects.evenPage;
+//        else
+//            drawing_objects.oddPage = new HeaderFooterGraphicObjects();
+//    }
+
+
+    //Document.DrawingObjects.calculateAfterOpen();
+    //Document.DrawingObjects.calculateAfterChangeTheme();
+    
     History.RecalcData_Add({Type: historyrecalctype_Drawing, All: true});
     Document.DrawingObjects.addToZIndexManagerAfterOpen();
 
