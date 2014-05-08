@@ -1844,22 +1844,7 @@ CGraphicObjects.prototype =
         //TODO
     },
 
-    resetSelection: function()
-    {
-        this.resetInternalSelection();
-        for(var i = 0; i < this.selectedObjects.length; ++i)
-        {
-            this.selectedObjects[i].selected = false;
-        }
-        this.selectedObjects.length = 0;
-        this.selection =
-        {
-            selectedObjects: [],
-            groupSelection: null,
-            chartSelection: null,
-            textSelection: null
-        };
-    },
+    resetSelection: DrawingObjectsController.prototype.resetSelection,
 
     resetSelection2: function()
     {

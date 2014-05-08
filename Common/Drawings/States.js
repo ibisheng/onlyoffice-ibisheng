@@ -63,6 +63,7 @@ StartAddNewShape.prototype =
             asc["editor"].asc_endAddShape();
         }
         this.drawingObjects.clearTrackObjects();
+        this.drawingObjects.drawingObjects.showDrawingObjects(true);
         this.drawingObjects.updateOverlay();
         this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
     }
@@ -83,7 +84,7 @@ NullState.prototype =
         var b_no_handle_selected = false;
         if(selection.groupSelection)
         {
-            ret = handleSelectedObjects(this.drawingObjects, e, x, y, selection.groupSelection, pageIndex, true);
+            ret = handleSelectedObjects(this.drawingObjects, e, x, y, selection.groupSelection, pageIndex, false);
             if(ret)
                 return ret;
             ret = handleFloatObjects(this.drawingObjects, selection.groupSelection.arrGraphicObjects, e, x, y, selection.groupSelection, pageIndex, false);
@@ -95,7 +96,6 @@ NullState.prototype =
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
             this.drawingObjects.resetInternalSelection();
-            this.drawingObjects.updateOverlay();
         }
         if(!b_no_handle_selected)
         {
@@ -106,7 +106,9 @@ NullState.prototype =
 
         ret = handleFloatObjects(this.drawingObjects, this.drawingObjects.getDrawingArray(), e, x, y, null, pageIndex, false);
         if(ret)
+        {
             return ret;
+        }
         return null;
     },
 
@@ -348,7 +350,7 @@ PreMoveState.prototype =
             this.onMouseUp(e, x, y, pageIndex);
             return;
         }
-        if(Math.abs(this.startX - x) > MOVE_DELTA || Math.abs(this.startY - y) > MOVE_DELTA || pageIndex !== this.majorObject.parent.pageIndex)
+        if(Math.abs(this.startX - x) > MOVE_DELTA || Math.abs(this.startY - y) > MOVE_DELTA || pageIndex !== this.majorObject.selectStartPage)
         {
             this.drawingObjects.swapTrackObjects();
             this.drawingObjects.changeCurrentState(new MoveState(this.drawingObjects, this.majorObject, this.startX, this.startY));
@@ -617,7 +619,7 @@ PreMoveInGroupState.prototype =
             this.onMouseUp(e, x, y, pageIndex);
             return;
         }
-        if(Math.abs(this.startX - x) > MOVE_DELTA || Math.abs(this.startY - y) > MOVE_DELTA || pageIndex !== this.majorObject.parent.pageIndex)
+        if(Math.abs(this.startX - x) > MOVE_DELTA || Math.abs(this.startY - y) > MOVE_DELTA || pageIndex !== this.majorObject.selectStartPage)
         {
             this.drawingObjects.swapTrackObjects();
             this.drawingObjects.changeCurrentState(new MoveInGroupState(this.drawingObjects, this.majorObject, this.group, this.startX, this.startY));

@@ -3060,6 +3060,7 @@ function DrawingObjects() {
                 drawingObject.graphicObject.setDrawingObjects(this);
                 aObjects.push(drawingObject);
                 //drawingObject.graphicObject.addToDrawingObjects();
+                drawingObject.setGraphicObjectCoords();
                 var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
                 aBoundsCheckers.push(boundsChecker);
             }

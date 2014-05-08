@@ -330,8 +330,8 @@ DrawingObjectsController.prototype =
                 group.selection.textSelection = object;
             }
             this.changeCurrentState(new TextAddState(this, object));
-            if(e.ClickCount < 2)
-                this.updateSelectionState();
+            //if(e.ClickCount < 2)
+            this.updateSelectionState();
             return true;
         }
         else
@@ -1195,7 +1195,7 @@ DrawingObjectsController.prototype =
 
     getTheme: function()
     {
-        return this.draw
+        return window["Asc"]["editor"].wbModel.theme;
     },
 
     getParagraphTextPr: function()
@@ -2457,8 +2457,8 @@ DrawingObjectsController.prototype =
                 this.recalculate();
             }
         }
-
         this.drawingObjects.showDrawingObjects(true);
+        this.updateOverlay();
     },
 
 
@@ -3117,12 +3117,7 @@ DrawingObjectsController.prototype =
     {
         if(this.bNoResetSeclectionState === true)
             return;
-        var count = this.selectedObjects.length;
-        while(count > 0)
-        {
-            this.selectedObjects[0].deselect(this);
-            --count;
-        }
+        this.resetSelection();
         this.changeCurrentState(new NullState(this, this.drawingObjects));
         this.updateSelectionState();
         var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
@@ -3144,16 +3139,19 @@ DrawingObjectsController.prototype =
 
     resetSelection: function()
     {
-        var count = this.selectedObjects.length;
-        while(count > 0)
+        this.resetInternalSelection();
+        for(var i = 0; i < this.selectedObjects.length; ++i)
         {
-            var selected_object = this.selectedObjects[0];
-            var old_group = selected_object.group;
-            selected_object.group = null;
-            this.selectedObjects[0].deselect(this);
-            selected_object.group = old_group;
-            --count;
+            this.selectedObjects[i].selected = false;
         }
+        this.selectedObjects.length = 0;
+        this.selection =
+        {
+            selectedObjects: [],
+            groupSelection: null,
+            chartSelection: null,
+            textSelection: null
+        };
     },
 
     clearPreTrackObjects: function()
@@ -3697,6 +3695,25 @@ DrawingObjectsController.prototype =
         var ParaPr = this.getParagraphParaPr();
         var TextPr = this.getParagraphTextPr();
         if ( ParaPr && TextPr ) {
+            var theme = this.getTheme();
+            if(theme && theme.themeElements && theme.themeElements.fontScheme)
+            {
+                if(TextPr.FontFamily)
+                {
+                    TextPr.FontFamily.Name =  theme.themeElements.fontScheme.checkFont(TextPr.FontFamily.Name);
+                }
+                if(TextPr.RFonts)
+                {
+                    if(TextPr.RFonts.Ascii)
+                        TextPr.RFonts.Ascii.Name     = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.Ascii.Name);
+                    if(TextPr.RFonts.EastAsia)
+                        TextPr.RFonts.EastAsia.Name  = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.EastAsia.Name);
+                    if(TextPr.RFonts.HAnsi)
+                        TextPr.RFonts.HAnsi.Name     = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.HAnsi.Name);
+                    if(TextPr.RFonts.CS)
+                        TextPr.RFonts.CS.Name        = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.CS.Name);
+                }
+            }
             this.prepareParagraphProperties(ParaPr, TextPr, ascSelectedObjects);
         }
 

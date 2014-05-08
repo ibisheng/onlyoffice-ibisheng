@@ -6279,7 +6279,28 @@
 				selectionType = objectInfo.flags.selectionType = this.objectRender.getGraphicSelectionType(graphicObjects[0].Id);
 
 			var textPr = this.objectRender.controller.getParagraphTextPr();
+            var theme = this.objectRender.controller.getTheme();
+            if(theme && theme.themeElements && theme.themeElements.fontScheme)
+            {
+                if(textPr.FontFamily)
+                {
+                    textPr.FontFamily.Name =  theme.themeElements.fontScheme.checkFont(textPr.FontFamily.Name);
+                }
+                if(textPr.RFonts)
+                {
+                    if(textPr.RFonts.Ascii)
+                        textPr.RFonts.Ascii.Name     = theme.themeElements.fontScheme.checkFont(textPr.RFonts.Ascii.Name);
+                    if(textPr.RFonts.EastAsia)
+                        textPr.RFonts.EastAsia.Name  = theme.themeElements.fontScheme.checkFont(textPr.RFonts.EastAsia.Name);
+                    if(textPr.RFonts.HAnsi)
+                        textPr.RFonts.HAnsi.Name     = theme.themeElements.fontScheme.checkFont(textPr.RFonts.HAnsi.Name);
+                    if(textPr.RFonts.CS)
+                        textPr.RFonts.CS.Name        = theme.themeElements.fontScheme.checkFont(textPr.RFonts.CS.Name);
+                }
+            }
+
 			var paraPr = this.objectRender.controller.getParagraphParaPr();
+            var shape_props = this.objectRender.controller.getDrawingProps().shapeProps;
 			if (textPr && paraPr) {
 				objectInfo.text = this.objectRender.controller.Get_SelectedText();
 
@@ -6291,14 +6312,17 @@
 					case align_Justify	: horAlign = "justify";	break;
 				}
 				var vertAlign = "center";
-				switch (paraPr.anchor) {
-					case VERTICAL_ANCHOR_TYPE_BOTTOM:			vertAlign = "bottom"; break;
-					case VERTICAL_ANCHOR_TYPE_CENTER:			vertAlign = "center"; break;
+                if(shape_props)
+                {
+                    switch (shape_props.verticalTextAlign) {
+                        case VERTICAL_ANCHOR_TYPE_BOTTOM:			vertAlign = "bottom"; break;
+                        case VERTICAL_ANCHOR_TYPE_CENTER:			vertAlign = "center"; break;
 
-					case VERTICAL_ANCHOR_TYPE_TOP:
-					case VERTICAL_ANCHOR_TYPE_DISTRIBUTED:
-					case VERTICAL_ANCHOR_TYPE_JUSTIFIED:		vertAlign = "top"; break;
-				}
+                        case VERTICAL_ANCHOR_TYPE_TOP:
+                        case VERTICAL_ANCHOR_TYPE_DISTRIBUTED:
+                        case VERTICAL_ANCHOR_TYPE_JUSTIFIED:		vertAlign = "top"; break;
+                    }
+                }
 
 				objectInfo.halign = horAlign;
 				objectInfo.valign = vertAlign;

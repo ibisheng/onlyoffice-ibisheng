@@ -196,10 +196,9 @@ CChartSpace.prototype.createMoveTrack = CShape.prototype.createMoveTrack;
 CChartSpace.prototype.getAspect = CShape.prototype.getAspect;
 CChartSpace.prototype.getRectBounds = CShape.prototype.getRectBounds;
 
-CChartSpace.prototype.draw = function(graphics)
+/*CChartSpace.prototype.draw = function(graphics)
 {
-    /*this.setRecalculateInfo();
-     this.recalculate();*/
+
     var intGrid = graphics.GetIntegerGrid();
     graphics.SetIntegerGrid(false);
     graphics.transform3(this.transform, false);
@@ -252,7 +251,7 @@ CChartSpace.prototype.draw = function(graphics)
         }
     }
 
-};
+};  */
 CChartSpace.prototype.recalculate = function()
 {
     if(this.bDeleted)

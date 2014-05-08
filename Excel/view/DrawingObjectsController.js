@@ -251,8 +251,10 @@ DrawingObjectsController.prototype.onMouseDown = function(e, x, y)
 {
     e.ShiftKey = e.shiftKey;
     e.CtrlKey = e.metaKey || e.ctrlKey;
-    return this.curState.onMouseDown(e, x, y, 0);
-
+    var ret = this.curState.onMouseDown(e, x, y, 0);
+    this.updateOverlay();
+    this.updateSelectionState();
+    return ret;
 };
 
 DrawingObjectsController.prototype.OnMouseDown = DrawingObjectsController.prototype.onMouseDown;
@@ -332,7 +334,7 @@ DrawingObjectsController.prototype.addChartDrawingObject = function(asc_chart, o
 DrawingObjectsController.prototype.isPointInDrawingObjects = function(x, y, e)
 {
     this.handleEventMode = HANDLE_EVENT_MODE_CURSOR;
-    var ret = this.onMouseDown(e || {}, x, y);
+    var ret = this.curState.onMouseDown(e || {}, x, y);
     this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
     return ret;
 }
