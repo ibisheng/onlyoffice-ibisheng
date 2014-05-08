@@ -1515,35 +1515,65 @@ CopyProcessor.prototype =
 
                             if(copyPasteUseBinery)
                             {
-                                var parent = cur_element.Parent;
+                                var paragraph = cur_element.Parent;
                                 selectionTrue =
                                 {
-                                    EndPos : parent.Selection.EndPos,
-                                    StartPos: parent.Selection.StartPos
+                                    EndPos : paragraph.Selection.EndPos,
+                                    StartPos: paragraph.Selection.StartPos
                                 };
-                                var inIndex;
-                                for(var k = 0; k < parent.Content.length;k++)
+                                
+								var inIndex;
+								var paragraphIndex;
+								var content;
+								var curParaRun;
+                                for(var k = 0; k < paragraph.Content.length;k++)
                                 {
-                                    if(parent.Content[k] == cur_element)
-                                    {
-                                        inIndex = k;
-                                        break;
-                                    }
-                                }
+                                    content = paragraph.Content[k].Content;
+									for(var n = 0; n < content.length; n++)
+									{
+										if(content[n] == cur_element)
+										{
+											curParaRun = paragraph.Content[k];
+											inIndex = n;
+											paragraphIndex = k;
+											break;
+										};
+									};
+									
+									if(inIndex != undefined)
+										break;
+                                };
+								
+								selectionTrue =
+                                {
+                                    EndPos : curParaRun.Selection.EndPos,
+                                    StartPos: curParaRun.Selection.StartPos,
+									EndPosParagraph : paragraph.Selection.EndPos,
+                                    StartPosParagraph: paragraph.Selection.StartPos
+                                };
+								
                                 //меняем Selection
-                                parent.Selection.EndPos = inIndex + 1;
-                                parent.Selection.StartPos = inIndex;
-                                parent.Selection.Use = true;
+                                curParaRun.Selection.EndPos = inIndex + 1;
+                                curParaRun.Selection.StartPos = inIndex;
+                                curParaRun.Selection.Use = true;
+								
+								paragraph.Selection.EndPos = paragraphIndex + 1;
+                                paragraph.Selection.StartPos = paragraphIndex;
+                                paragraph.Selection.Use = true;
 
-                                this.oBinaryFileWriter.CopyParagraph(parent);
+                                this.oBinaryFileWriter.CopyParagraph(paragraph);
 
                                 //возвращаем Selection
-                                parent.Selection.StartPos = selectionTrue.StartPos;
-                                parent.Selection.EndPos = selectionTrue.EndPos;
+                                curParaRun.Selection.StartPos = selectionTrue.StartPos;
+                                curParaRun.Selection.EndPos = selectionTrue.EndPos;
+								
+								paragraph.Selection.StartPos = selectionTrue.StartPosParagraph;
+                                paragraph.Selection.EndPos = selectionTrue.EndPosParagraph;
 
                             }
                         }
-                        if(copyPasteUseBinery)
+                        
+						if(copyPasteUseBinery)
                         {
                             this.oBinaryFileWriter.CopyEnd();
                             var sBase64 = this.oBinaryFileWriter.GetResult();
