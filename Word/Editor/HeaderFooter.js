@@ -1351,6 +1351,9 @@ CHeaderFooterController.prototype =
 
     CheckRange : function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageIndex)
     {
+        if (undefined === this.Pages[PageIndex])
+            return [];
+
         var Header = this.Pages[PageIndex].Header;
         var Footer = this.Pages[PageIndex].Footer;              
 

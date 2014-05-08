@@ -5961,6 +5961,7 @@ function CStylesPainter()
 
                 var _dr_style = __Styles.Get_Pr(i, styletype_Paragraph);
                 _dr_style.Name = style.Name;
+                _dr_style.Id = i;
 
 				this.drawStyle(graphics, _dr_style, cur_index);
 				this.docStyles[cur_index] = new CStyleImage(style.Name, cur_index, c_oAscStyleImage.Document, style.uiPriority);
@@ -6070,24 +6071,115 @@ function CStylesPainter()
         }
         else
         {
+            g_oTableId.m_bTurnOff = true;
+            History.TurnOff();
+
+            var oldDefTabStop = Default_Tab_Stop;
+            Default_Tab_Stop = 1;
+
+            var hdr = new CHeaderFooter(editor.WordControl.m_oLogicDocument.HdrFtr, editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, hdrftr_Header);
+            var _dc = hdr.Content;//new CDocumentContent(editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, 0, 0, 0, 0, false, true, false);
+
+            var par = new Paragraph(editor.WordControl.m_oDrawingDocument, _dc, 0, 0, 0, 0, false);
+            var run = new ParaRun(par, false);
+
+            for (var i = 0; i < style.Name.length; i++)
+            {
+                run.Add_ToContent(i, new ParaText(style.Name.charAt(i)), false);
+            }
+
+            _dc.Internal_Content_Add(0, par, false);
+            par.Add_ToContent(0, run);
+            par.Style_Add(style.Id, false);
+            par.Set_Align(align_Left);
+            par.Set_Tabs(new CParaTabs());
+
+            var _brdL = style.ParaPr.Brd.Left;
+            if ( undefined !== _brdL && null !== _brdL )
+            {
+                var brdL = new CDocumentBorder();
+                brdL.Set_FromObject(_brdL);
+                brdL.Space = 0;
+                par.Set_Border(brdL, historyitem_Paragraph_Borders_Left);
+            }
+
+            var _brdT = style.ParaPr.Brd.Top;
+            if ( undefined !== _brdT && null !== _brdT )
+            {
+                var brd = new CDocumentBorder();
+                brd.Set_FromObject(_brdT);
+                brd.Space = 0;
+                par.Set_Border(brd, historyitem_Paragraph_Borders_Top);
+            }
+
+            var _brdB = style.ParaPr.Brd.Bottom;
+            if ( undefined !== _brdB && null !== _brdB )
+            {
+                var brd = new CDocumentBorder();
+                brd.Set_FromObject(_brdB);
+                brd.Space = 0;
+                par.Set_Border(brd, historyitem_Paragraph_Borders_Bottom);
+            }
+
+            var _brdR = style.ParaPr.Brd.Right;
+            if ( undefined !== _brdR && null !== _brdR )
+            {
+                var brd = new CDocumentBorder();
+                brd.Set_FromObject(_brdR);
+                brd.Space = 0;
+                par.Set_Border(brd, historyitem_Paragraph_Borders_Right);
+            }
+
+            var _ind = new CParaInd();
+            _ind.FirstLine = 0;
+            _ind.Left = 0;
+            _ind.Right = 0;
+            par.Set_Ind(_ind, false);
+
+            var _sp = new CParaSpacing();
+            _sp.Line              = 1;
+            _sp.LineRule          = linerule_Auto;
+            _sp.Before            = 0;
+            _sp.BeforeAutoSpacing = false;
+            _sp.After             = 0;
+            _sp.AfterAutoSpacing  = false;
+            par.Set_Spacing(_sp, false);
+
+            _dc.Reset(0, 0, 10000, 10000);
+            _dc.Recalculate_Page(0, true);
+
+            _dc.Reset(0, 0, par.Lines[0].Ranges[0].W + 0.001, 10000);
+            _dc.Recalculate_Page(0, true);
+            //par.Reset(0, 0, 10000, 10000, 0);
+            //par.Recalculate_Page(0);
+
             var y = index * dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
             var b = (index + 1) * dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
             var w = dKoefToMM * this.STYLE_THUMBNAIL_WIDTH;
             var off = 10 * dKoefToMM;
+            var off2 = 5 * dKoefToMM;
 
             graphics.transform(1,0,0,1,0,0);
             graphics.save();
             graphics._s();
-            graphics._m(off, y);
+            graphics._m(off2, y);
             graphics._l(w - off, y);
             graphics._l(w - off, b);
-            graphics._l(off, b);
+            graphics._l(off2, b);
             graphics._z();
             graphics.clip();
 
-            graphics.t(style.Name, off + 0.5, y + 0.75 * (b - y));
+            //graphics.t(style.Name, off + 0.5, y + 0.75 * (b - y));
+            var baseline = par.Lines[0].Y;
+            par.Shift(0, off + 0.5, y + 0.75 * (b - y) - baseline);
+            par.Draw(0, graphics);
 
             graphics.restore();
+
+            Default_Tab_Stop = oldDefTabStop;
+
+            g_oTableId.m_bTurnOff = false;
+            History.TurnOn();
         }
     }
 }
