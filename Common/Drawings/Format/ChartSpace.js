@@ -647,6 +647,9 @@ CChartSpace.prototype =
     getBoundsInGroup: CShape.prototype.getBoundsInGroup,
     setGroup: CShape.prototype.setGroup,
 
+    getBase64Img: function () {
+        return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
+    },
 
     recalculateAxis: function()
     {
