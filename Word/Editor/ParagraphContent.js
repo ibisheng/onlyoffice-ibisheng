@@ -3845,7 +3845,9 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
     this.selectX = 0;
     this.selectY = 0;
     this.wrappingType = WRAPPING_TYPE_THROUGH;
-    this.wrappingPolygon = new CWrapPolygon(this);
+	
+	if(typeof CWrapPolygon !== "undefined")
+		this.wrappingPolygon = new CWrapPolygon(this);
 
     this.document = editor.WordControl.m_oLogicDocument;
     this.drawingDocument = DrawingDocument;
@@ -3879,7 +3881,8 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
 //------------------------------------------------------------
     g_oTableId.Add( this, this.Id );
 
-    this.graphicObjects.addGraphicObject(this);
+	if(this.graphicObjects)
+		this.graphicObjects.addGraphicObject(this);
 }
 
 
@@ -6036,7 +6039,8 @@ ParaDrawing.prototype =
     setZIndex: function()
     {
         var data = {Type:historyitem_Drawing_SetZIndex, oldIndex: this.RelativeHeight};
-        this.RelativeHeight = ++this.mainGraphicObjects.maximalGraphicObjectZIndex;
+		if(this.mainGraphicObjects)
+			this.RelativeHeight = ++this.mainGraphicObjects.maximalGraphicObjectZIndex;
         data.newIndex = this.RelativeHeight;
         History.Add(this, data);
     },
@@ -6650,7 +6654,7 @@ ParaDrawing.prototype =
     init: function()
     {
         this.calculateAfterOpen();
-        if(this.RelativeHeight > editor.WordControl.m_oLogicDocument.DrawingObjects.maximalGraphicObjectZIndex)
+        if(editor.WordControl.m_oLogicDocument.DrawingObjects && this.RelativeHeight > editor.WordControl.m_oLogicDocument.DrawingObjects.maximalGraphicObjectZIndex)
             editor.WordControl.m_oLogicDocument.DrawingObjects.maximalGraphicObjectZIndex = this.RelativeHeight;
     },
 
