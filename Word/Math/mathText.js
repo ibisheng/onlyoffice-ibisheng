@@ -16,7 +16,7 @@ var StartTextElement = 0x2B1A; // Cambria Math
 // TODO
 // убрать CMathTextPrp
 
-function CMathTextPrp()
+/*function CMathTextPrp()
 {
     this.FontFamily = undefined;
     this.FontSize   = undefined;
@@ -49,7 +49,7 @@ CMathTextPrp.prototype =
         this.Bold = prp.Bold;
         this.Italic = prp.Italic;
     }
-}
+}*/
 
 function CMathText(bJDraw)
 {

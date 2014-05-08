@@ -6679,7 +6679,7 @@ CMathContent.prototype =
 
 }
 
-function CMathComposition()
+/*function CMathComposition()
 {
     this.Parent = undefined;
 
@@ -6730,7 +6730,7 @@ CMathComposition.prototype =
     },
     SetProperties: function(props)
     {
-        /*****  FOR FORMULA  *****/
+        *//*****  FOR FORMULA  *****//*
 
         // В документации везде, где нет примера использования свояства, означает, что Word не поддерживает это свойство !
 
@@ -6755,7 +6755,7 @@ CMathComposition.prototype =
         if(props.wrapIndent + 0 == props.wrapIndent && isNaN(props.wrapIndent)) // проверка на число
             this.props.wrapIndent = props.wrapIndent/1440;
 
-        /********  check for element 0x1FFD - 0xA721  *******/
+        *//********  check for element 0x1FFD - 0xA721  *******//*
         // This element specifies the right justification of the wrapped line of an instance of mathematical text
         // Instance : Arrows 0x2190-0x21B3, 0x21B6, 0x21B7, 0x21BA-0x21E9, 0x21F4-0x21FF,
         // 0x3D, 0x2234 - 0x2237, 0x2239, 0x223B - 0x228B, 0x228F - 0x2292, 0x22A2 - 0x22B9,
@@ -6767,7 +6767,7 @@ CMathComposition.prototype =
             this.props.wrapRight = props.wrapRight;
 
 
-        /*****  FOR DOCUMENT  *****/
+        *//*****  FOR DOCUMENT  *****//*
 
         // defaultJc
         // выравнивание формулы в документе
@@ -6786,7 +6786,7 @@ CMathComposition.prototype =
         this.props.lMargin = props.lMargin;
         this.props.rMargin = props.rMargin;
 
-        /*****  НЕПОДДЕРЖИВАЕМЫЕ Вордом свойства  *****/
+        *//*****  НЕПОДДЕРЖИВАЕМЫЕ Вордом свойства  *****//*
 
         // mathFont: в качестве font поддерживается только Cambria Math
         // остальные шрифты  возможно будут поддержаны MS в будущем
@@ -6800,7 +6800,7 @@ CMathComposition.prototype =
         // http://blogs.msdn.com/b/murrays/archive/2008/10/27/default-document-math-properties.aspx
 
 
-        /*****  FOR FORMULA  *****/
+        *//*****  FOR FORMULA  *****//*
 
         // http://msdn.microsoft.com/en-us/library/ff529906(v=office.12).aspx
         // Word ignores the interSp attribute and fails to write it back out.
@@ -6810,7 +6810,7 @@ CMathComposition.prototype =
         // Word does not implement this feature and does not write the intraSp element.
         this.props.intraSp = intraSp;
 
-        /*****  FOR DOCUMENT  *****/
+        *//*****  FOR DOCUMENT  *****//*
 
         // http://msdn.microsoft.com/en-us/library/ff533406(v=office.12).aspx
         // Word ignores and discards postSp
@@ -7611,7 +7611,7 @@ CMathComposition.prototype =
     {
         return this.CurrentContent.getRunPrp(this.CurrentContent.CurPos);
     }
-}
+}*/
 
 
 function CEmpty()

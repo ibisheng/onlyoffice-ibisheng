@@ -2999,8 +2999,9 @@ COperator.prototype.draw = function(x, y, pGraphics)
         pGraphics.b_color1(0,0,0,255);
         var ctrPrp = this.getCtrPrp();
 
-        var rPrp = new CMathTextPrp();
-        var defaultRPrp = this.Parent.Composition.DEFAULT_RUN_PRP;
+        var rPrp = new CTextPr();
+        //var defaultRPrp = this.Parent.Composition.DEFAULT_RUN_PRP;
+        var defaultRPrp = this.Parent.Composition.Get_Default_TPrp();
         rPrp.Merge(defaultRPrp);
         rPrp.Merge(ctrPrp);
         rPrp.Italic = false;
@@ -3067,8 +3068,13 @@ COperator.prototype.old_fixSize = function(oMeasure, stretch)
         {
             var ctrPrp = this.getCtrPrp();
 
-            var rPrp = new CMathTextPrp();
-            var defaultRPrp = this.Parent.Composition.DEFAULT_RUN_PRP;
+            //var rPrp = new CMathTextPrp();
+            //var defaultRPrp = this.Parent.Composition.DEFAULT_RUN_PRP;
+
+            var rPrp = new CTextPr();
+            //var defaultRPrp = this.Parent.Composition.DEFAULT_RUN_PRP;
+            var defaultRPrp = this.Parent.Composition.Get_Default_TPrp();
+
             rPrp.Merge(defaultRPrp);
             rPrp.Merge(ctrPrp);
             rPrp.Italic = false;
@@ -3128,8 +3134,10 @@ COperator.prototype.fixSize = function(oMeasure, stretch)
         {
             var ctrPrp = this.getCtrPrp();
 
-            var rPrp = new CMathTextPrp();
-            var defaultRPrp = this.Parent.Composition.DEFAULT_RUN_PRP;
+            var rPrp = new CTextPr();
+            //var defaultRPrp = this.Parent.Composition.DEFAULT_RUN_PRP;
+            var defaultRPrp = this.Parent.Composition.Get_Default_TPrp();
+
             rPrp.Merge(defaultRPrp);
             rPrp.Merge(ctrPrp);
             rPrp.Italic = false;

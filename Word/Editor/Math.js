@@ -146,7 +146,7 @@ ParaMath.prototype =
 			}
 			
 			//Item.Math.AddToComposition(Item.Math.Root);
-			var oNewContent = Item.Math.Root.content;
+			var oNewContent = Item.Root.content;
 			for(var i = 0; i < oNewContent.length; i++)
 				oContent.Content.content.push(oNewContent[i]);
 

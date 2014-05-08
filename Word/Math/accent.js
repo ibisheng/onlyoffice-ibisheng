@@ -963,7 +963,7 @@ CSign.prototype.fixSize = function(oMeasure, stretch, bIncline)
 {
     var ctrPrp = this.Parent.getCtrPrp();
 
-    var rPrp = new CMathTextPrp();
+    var rPrp = new CTextPr();
     var defaultRPrp = this.Parent.Composition.Get_Default_TPrp();
     rPrp.Merge(defaultRPrp);
     rPrp.Merge(ctrPrp);
@@ -1006,12 +1006,12 @@ function CAccent()
     this.kind = MATH_ACCENT;
 
     this.operator = new COperator(OPER_ACCENT);
-    this.code = null;      // храним код буквы и тип здесь
-    this.typeOper = null;  // т.к в класах, которые вызываем, не учитываем случаи, когда элементы (стрелки/скобки) переворачиваются
+    //this.code = null;      // храним код буквы и тип здесь
+    //this.typeOper = null;  // т.к в класах, которые вызываем, не учитываем случаи, когда элементы (стрелки/скобки) переворачиваются
     this.loc = LOCATION_TOP;
-    CCharacter.call(this);
+    CMathBase.call(this);
 }
-extend(CAccent, CCharacter);
+extend(CAccent, CMathBase);
 CAccent.prototype.init = function(props)
 {
     var prp =
@@ -1556,20 +1556,21 @@ CAccent.prototype.setPosition = function(pos)
 {
     this.pos = {x: pos.x, y: pos.y - this.size.ascent};
 
-    var alignOp  =  this.align(this.operator),
-        alignCnt = this.align(this.elements[0][0]);
+    var alignOp  =  (this.size.width - this.operator.size.width)/2,
+        alignCnt =  (this.size.width - this.elements[0][0].size.width)/2;
 
     var x1 = this.pos.x + this.GapLeft + alignOp,
-        y1;
+        y1 = this.pos.y;
 
     // TODO
     // выставить правильно смещение для остальных значков
     // для обычных текстовых значков (ACCENT_SIGN) выставлено
 
-    if(this.typeOper == ACCENT_SIGN)
-        y1 = this.pos.y - this.shiftOperator + this.size.ascent; //shiftOperator to "CCharacter"
+    /*if(this.typeOper == ACCENT_SIGN)
+        //y1 = this.pos.y - this.shiftX + this.size.ascent; //shiftOperator to "CCharacter"
+        y1 = this.pos.y + this.shiftX; //shiftOperator to "CCharacter"
     else
-        y1 = this.pos.y;
+        y1 = this.pos.y;*/
 
 
     this.operator.setPosition({x: x1, y: y1});
@@ -1596,4 +1597,89 @@ CAccent.prototype.getPropsForWrite = function()
     props.chr = String.fromCharCode(this.code);
 
     return props;
+}
+CAccent.prototype.Resize = function(oMeasure)
+{
+    var base = this.elements[0][0];
+    base.Resize(oMeasure);
+
+    this.operator.fixSize(oMeasure, base.size.width);
+
+    var letterX = new CMathText(true);
+    letterX.add(0x78);
+    letterX.Resize(oMeasure);
+    this.shiftX = base.size.ascent - letterX.size.ascent;
+
+    var width  = base.size.width > this.operator.size.width ? base.size.width : this.operator.size.width,
+        height = base.size.height + this.operator.size.height + this.shiftX,
+        ascent = this.getAscent(oMeasure);
+
+    var ctrPrp = this.mergeCtrTPrp();
+    oMeasure.SetFont(ctrPrp);
+
+    this.size = {height: height, width: width, ascent: ascent};
+}
+CAccent.prototype.getBase = function()
+{
+    return this.elements[0][0];
+}
+CAccent.prototype.draw = function(x, y, pGraphics)
+{
+    this.elements[0][0].draw(x, y, pGraphics);
+
+    var mgCtrPrp = this.mergeCtrTPrp();
+    var FontSize = mgCtrPrp.FontSize,
+        FontFamily = {Name: "Cambria Math", Index: -1};
+
+    var obj = {FontSize: FontSize, FontFamily: FontFamily};
+
+    var accFont = new CTextPr();
+    accFont.Set_FromObject(obj);
+
+
+    pGraphics.SetFont(accFont);
+    pGraphics.p_color(0,0,0, 255);
+    pGraphics.b_color1(0,0,0, 255);
+
+    this.operator.draw(x, y, pGraphics);
+
+}
+CAccent.prototype.findDisposition = function(pos)
+{
+    var curs_X = 0,
+        curs_Y = 0;
+    var X, Y;
+
+    var inside_flag = -1;
+
+    var content = this.elements[0][0],
+        align = (this.size.width - this.elements[0][0].size.width)/2;
+
+    if(pos.x < align)
+    {
+        X = 0;
+        inside_flag = 0;
+    }
+    else if(pos.x > align + content.size.width)
+    {
+        X = content.size.width;
+        inside_flag = 1;
+    }
+    else
+        X = pos.x - align;
+
+    if(pos.y < this.operator.size.height)
+    {
+        Y = 0;
+        inside_flag = 2;
+    }
+    else
+        Y = pos.y - this.operator.size.height;
+
+
+
+    var mouseCoord = {x: X, y: Y},
+        posCurs =    {x: curs_X, y: curs_Y};
+
+    return {pos: posCurs, mCoord: mouseCoord, inside_flag: inside_flag};
 }
