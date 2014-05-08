@@ -10141,6 +10141,12 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Bar3DChart(t, l, oNewVal, aChartWithAxis);
         });
+        //3d->2d
+        if (BAR_GROUPING_STANDARD == oNewVal.grouping)
+            oNewVal.setGrouping(BAR_GROUPING_CLUSTERED);
+        else if(BAR_GROUPING_CLUSTERED != oNewVal.grouping){
+            oNewVal.setOverlap(100);
+        }
         val.addChart(oNewVal);
     }
     else if (c_oserct_plotareaBARCHART === type) {
@@ -10169,6 +10175,17 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Line3DChart(t, l, oNewVal, aChartWithAxis);
         });
+        //3d->2d
+        oNewVal.setMarker(true);
+        oNewVal.setSmooth(false);
+        for (var i = 0, length = oNewVal.series.length; i < length; ++i) {
+            var seria = oNewVal.series[i];
+            if (null == seria.marker) {
+                var marker = new CMarker();
+                marker.setSymbol(SYMBOL_NONE);
+                seria.setMarker(marker);
+            }
+        }
         val.addChart(oNewVal);
     }
     else if (c_oserct_plotareaLINECHART === type) {
@@ -10190,6 +10207,8 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Pie3DChart(t, l, oNewVal, aChartWithAxis);
         });
+        //3d->2d
+        oNewVal.setFirstSliceAng(0);
         val.addChart(oNewVal);
     }
     else if (c_oserct_plotareaPIECHART === type) {
