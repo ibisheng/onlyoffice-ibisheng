@@ -7507,9 +7507,9 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			oParStruct.addToContent(oMathPara);
 			
 			res = this.bcr.Read1(length, function(t, l){
-                return oThis.boMathr.ReadMathArg(t,l,oMathPara.Math.Root);
+                return oThis.boMathr.ReadMathArg(t,l,oMathPara.Root);
 			});			
-			oMathPara.Math.Root.SetRunEmptyToContent(true);
+			oMathPara.Root.SetRunEmptyToContent(true);
 		}
 		else if (c_oSerParType.Hyperlink == type) {
 		    var oHyperlinkObj = {Link: null, Anchor: null, Tooltip: null, History: null, DocLocation: null, TgtFrame: null};

@@ -258,13 +258,29 @@ ParaMath.prototype =
 		if (oContent.Start == oContent.End)
 		{
 			var oElem = oContent.Content.getElem(oContent.Start);
-			if (oElem.typeObj == MATH_COMP)
-				this.Math.Remove(oContent, Direction, bOnAddText);
+			if (oElem.typeObj == MATH_COMP || oElem.typeObj == MATH_PLACEHOLDER)
+				this.RemoveElem(oContent, Direction, bOnAddText);
 			else	//mathrun
 				oElem.Remove(Direction, bOnAddText);
 		}
 		else
-			return this.Math.Remove(oContent, Direction, bOnAddText);
+			return this.RemoveElem(oContent, Direction, bOnAddText);
+    },
+		
+	RemoveElem: function(oContent, nCount, bOnAdd)
+    {
+        History.Create_NewPoint();
+		
+		var oStartContent = oContent.Content.content[oContent.Start];
+		var oEndContent = oContent.Content.content[oContent.End];		
+		var Items = new Array();
+		for (var i=oContent.Start; i<=oContent.End; i++)
+		{
+			Items.push(oContent.Content.content[i]);
+			oContent.Content.content.splice( i, 1 );
+		}
+		History.Add(oContent.Content, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: oContent.Start});
+		return;
     },
 
     GetSelectContent: function()
@@ -1231,19 +1247,20 @@ ParaMath.prototype =
     },
 	Write_ToBinary2 : function(Writer)
     {
-		Writer.WriteLong( historyitem_type_Math );
+		/*Writer.WriteLong( historyitem_type_Math );
 		
-		/*var oThis = this;
+		var oThis = this;
 		this.bs = new BinaryCommonWriter(Writer);
 		this.boMaths = new Binary_oMathWriter(Writer);
 
-		this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteOMathParaCollaborative(oThis.Math);});//WriteOMathParaCollaborative
+		this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteOMathPara(oThis.Math);});
 		*/
 	},
 
     Read_FromBinary2 : function(Reader)
     {
-		/*var oThis = this;
+		/*
+		var oThis = this;
 		this.boMathr = new Binary_oMathReader(Reader);
 		this.bcr = new Binary_CommonReader(Reader);
 		
@@ -1252,8 +1269,9 @@ ParaMath.prototype =
 		var res = false;
 		Reader.cur += 3;
 		res = this.bcr.Read1(length, function(t, l){
-			return oThis.boMathr.ReadMathOMathParaCollaborative(t,l,oThis.Math);
+			return oThis.boMathr.ReadMathOMathPara(t,l,oThis.Math);
 		});
 		*/
+		
 	}
 };
