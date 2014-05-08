@@ -359,7 +359,7 @@ CHistory.prototype =
         {
             var DiffIndex = -this.Index + (this.Points.length - 1);
             this.Index    += DiffIndex;
-            this.RecIndex += DiffIndex;
+            this.RecIndex  = Math.max( -1, this.RecIndex + DiffIndex);
         }
     },
 

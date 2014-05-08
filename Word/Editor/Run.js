@@ -831,6 +831,23 @@ ParaRun.prototype =
 
         // Копируем настройки
         NewRun.Set_Pr( this.Pr.Copy() );
+        
+        // TODO: Как только избавимся от para_End переделать тут
+        // Проверим, если наш ран содержит para_End, тогда мы должны para_End переметить в правый ран
+        
+        var CheckEndPos = -1;
+        var CheckEndPos2 = Math.min( CurPos, this.Content.length );
+        for ( var Pos = 0; Pos < CheckEndPos2; Pos++ )
+        {
+            if ( para_End === this.Content[Pos].Type )
+            {
+                CheckEndPos = Pos;
+                break;
+            }
+        }
+        
+        if ( -1 !== CheckEndPos )
+            CurPos = CheckEndPos;
 
         // Разделяем содержимое по ранам
         NewRun.Concat_ToContent( this.Content.slice(CurPos) );

@@ -780,6 +780,8 @@ CDocument.prototype =
                     this.DrawingDocument.OnRecalculatePage( Res, this.Pages[Res] );
                     this.DrawingDocument.OnEndRecalculate( false, true );
 
+                    History.Reset_RecalcIndex();
+
                     return;
                 }
             }
