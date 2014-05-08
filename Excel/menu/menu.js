@@ -520,6 +520,15 @@
 		}
 		$("#cellStyleSelect ul").empty().append(cellStyleContent);
 	});
+	api.asc_registerCallback("asc_onSendThemeColorSchemes", function (colorSchemes) {
+		var cellThemeContent = "";
+		var themeName;
+		for (var i = 0; i < colorSchemes.length; ++i) {
+			themeName = colorSchemes[i].get_name();
+			cellThemeContent += '<li id="'+themeName.replace(/\s/g,"")+'" class="SubItem cellStyleListElement" indexTheme="'+i+'">'+themeName+'</li>';
+		}
+		$("#themeSelect ul").empty().append(cellThemeContent);
+	});
 	
 	api.asc_Init("../Fonts/");
 	//api.asc_setViewerMode(true);
@@ -674,10 +683,23 @@
 	$("#textMenu2").clickMenu({onClick:function(){
 		$('#textMenu2').trigger('closemenu');
 		if ($(this).hasClass("cellStyleListElement")){
-			$('#cellStyleSelectVal').text(this.innerHTML);
-			$('#cellStyleSelectVal').val(this.getAttribute("value"));
-			$('#cellStyleSelectVal').change();
+			var cellStyleSelectVal = $('#cellStyleSelectVal');
+			cellStyleSelectVal.text(this.innerHTML);
+			cellStyleSelectVal.val(this.getAttribute("value"));
+			cellStyleSelectVal.change();
 			api.asc_setCellStyle($(this).attr("nameStyle"));
+		}
+
+		return false;
+	}});
+	$("#textMenu3").clickMenu({onClick:function(){
+		$('#textMenu3').trigger('closemenu');
+		if ($(this).hasClass("cellStyleListElement")){
+			var themeSelectVal = $('#themeSelectVal');
+			themeSelectVal.text(this.innerHTML);
+			themeSelectVal.val(this.getAttribute("value"));
+			themeSelectVal.change();
+			api.asc_ChangeColorScheme($(this).attr("indexTheme"));
 		}
 
 		return false;

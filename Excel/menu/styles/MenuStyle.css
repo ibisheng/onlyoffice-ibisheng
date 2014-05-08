@@ -13,7 +13,7 @@
 
 }
 
-#textMenu, #shapeMenu, #AutoShapesMenu, #textMenu2
+#textMenu, #shapeMenu, #AutoShapesMenu, #textMenu2, #textMenu3
 {
 	background: none repeat scroll 0 0 #E3E9FF;
 	clear: both;
@@ -24,6 +24,9 @@
 	position: relative;
 	text-align: left;
 	vertical-align: top;
+}
+#textMenu3 {
+    margin-top: 3px;
 }
 
 #fontFormat
@@ -47,7 +50,7 @@
 	height: 26px;
 }
 
-#cellStyleSelect {
+#cellStyleSelect, #themeSelect {
 	min-width: 80px;
 	width: 80px;
 	height: 26px;
@@ -556,7 +559,7 @@ li.SubItem.hover
 	border-radius-topleft: 5px;*/
 
 }
-#textMenu .item, #shapeMenu .item, #textMenu2 .item
+#textMenu .item, #shapeMenu .item, #textMenu2 .item, #textMenu3 .item
 {
 	margin-left: 2px;
 	vertical-align: top;
@@ -575,7 +578,7 @@ li.SubItem.hover
 	user-select: none;
 	min-width: 254px;
 }
-#textMenu span, #AutoShapesMenu span, #shapeMenu span, #textMenu2 span
+#textMenu span, #AutoShapesMenu span, #shapeMenu span, #textMenu2 span, #textMenu3 span
 {
 	border-top: 15px;
 	margin-top: 3px;
@@ -633,7 +636,7 @@ li.SubItem.hover
 	border-bottom-color:#ACACAC !important;
 	border-right-color: #ACACAC !important;
 }
-#textMenu .innerBox, #shapeMenu .innerBox, #AutoShapesMenu .innerBox, #textMenu2 .innerBox
+#textMenu .innerBox, #shapeMenu .innerBox, #AutoShapesMenu .innerBox, #textMenu2 .innerBox, #textMenu3 .innerBox
 {
 	font:12px Arial,sans-serif;
 	background:none repeat scroll 0 0 #FFFFFF;
@@ -680,7 +683,7 @@ li.SubItem.hover
 	padding:4px 7em 4px 28px;
 }
 
-#textMenu .SubItem, #shapeMenu .SubItem, #AutoShapesMenu .SubItem, #textMenu2 .SubItem
+#textMenu .SubItem, #shapeMenu .SubItem, #AutoShapesMenu .SubItem, #textMenu2 .SubItem, #textMenu3 .SubItem
 {
 	list-style:none outside none;
 	margin:0 3px;
@@ -823,7 +826,7 @@ li.SubItem.hover
 	margin-top:6px;
 }
 
-#textMenu ul, #shapeMenu ul, #AutoShapesMenu ul, #textMenu2 ul{min-width:15px !important; }
+#textMenu ul, #shapeMenu ul, #AutoShapesMenu ul, #textMenu2 ul, #textMenu3 ul{min-width:15px !important; }
 a.big_button3 {
     cursor: pointer;
     display: block;
