@@ -4056,11 +4056,11 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 			
 			if(null != img.GraphicObj.chart)
 			{
-				this.memory.WriteByte(c_oSerImageType2.Chart);
+				this.memory.WriteByte(c_oSerImageType2.Chart2);
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
 				
 				var oBinaryChartWriter = new BinaryChartWriter(this.memory);
-				this.bs.WriteItemWithLength(function () { oBinaryChartWriter.WriteCT_ChartSpace(img.GraphicObj.chart); });
+				this.bs.WriteItemWithLength(function () { oBinaryChartWriter.WriteCT_ChartSpace(img.GraphicObj); });
 			}
 			else
 			{
@@ -4185,7 +4185,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 				this.memory.WriteByte(c_oSerImageType2.Chart2);
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
 				var oBinaryChartWriter = new BinaryChartWriter(this.memory);
-				this.bs.WriteItemWithLength(function () { oBinaryChartWriter.WriteCT_ChartSpace(img.GraphicObj.chart); });
+				this.bs.WriteItemWithLength(function () { oBinaryChartWriter.WriteCT_ChartSpace(img.GraphicObj); });
 			}
 			else
 			{
@@ -5447,6 +5447,9 @@ function BinaryFileReader(doc, openParams)
         for (var Index = 0, Count = aContent.length; Index < Count; Index++)
             aContent[Index].Document_Get_AllFontNames(AllFonts);
         var aPrepeareFonts = [];
+		
+		checkThemeFonts(AllFonts, this.Document.theme.themeElements.fontScheme)
+		
         for (var i in AllFonts)
             aPrepeareFonts.push(new CFont(i, 0, "", 0));
         //создаем список используемых картинок
@@ -7683,9 +7686,12 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
                 oParaDrawing.setExtent(oParaDrawing.Extent.W, oParaDrawing.Extent.H);
             if(null != oParaDrawing.wrappingPolygon)
                 oParaDrawing.addWrapPolygon(oParaDrawing.wrappingPolygon);
-            editor.WordControl.m_oLogicDocument.DrawingObjects.arrForCalculateAfterOpen.push(oParaDrawing);
+			
+			if(editor.WordControl.m_oLogicDocument.DrawingObjects)
+				editor.WordControl.m_oLogicDocument.DrawingObjects.arrForCalculateAfterOpen.push(oParaDrawing);
             oParaDrawing.init();
-            if(drawing_Anchor == oParaDrawing.DrawingType)
+			//TODO некорректная проверка typeof
+            if(drawing_Anchor == oParaDrawing.DrawingType && typeof History.RecalcData_Add === "function")
                 History.RecalcData_Add( { Type : historyrecalctype_Flow, Data : oParaDrawing});
             if(null != oParaDrawing.GraphicObj)
                 oNewElem = oParaDrawing;
