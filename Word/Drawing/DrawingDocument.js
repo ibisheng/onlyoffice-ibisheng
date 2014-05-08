@@ -6158,14 +6158,15 @@ function CStylesPainter()
             var w = dKoefToMM * this.STYLE_THUMBNAIL_WIDTH;
             var off = 10 * dKoefToMM;
             var off2 = 5 * dKoefToMM;
+            var off3 = 1 * dKoefToMM;
 
             graphics.transform(1,0,0,1,0,0);
             graphics.save();
             graphics._s();
-            graphics._m(off2, y);
-            graphics._l(w - off, y);
-            graphics._l(w - off, b);
-            graphics._l(off2, b);
+            graphics._m(off2, y + off3);
+            graphics._l(w - off, y + off3);
+            graphics._l(w - off, b - off3);
+            graphics._l(off2, b - off3);
             graphics._z();
             graphics.clip();
 
