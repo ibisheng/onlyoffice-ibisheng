@@ -36,7 +36,7 @@ function CMathBase()
     this.Composition = null; // ссылка на общую формулу
 
     this.CtrPrp = new CTextPr();
-    this.RunPrp = new CMathRunPrp();
+    //this.RunPrp = new CMathRunPrp();
 
 
     //this.textPrp = new CMathTextPrp(); // для рассчета размера расстояний
@@ -101,14 +101,14 @@ CMathBase.prototype =
     setCtrPrp: function(txtPrp)
     {
         this.CtrPrp.Merge(txtPrp); // only runPrp for paragraph
-        this.RunPrp.setTxtPrp(txtPrp);
+        //this.RunPrp.setTxtPrp(txtPrp);
     },
     getCtrPrp: function()
     {
         var ctrPrp = new CTextPr();
         var defaultRPrp = this.Composition.GetFirstRPrp();
-        var gWPrp = defaultRPrp.getMergedWPrp();
-        ctrPrp.Merge(gWPrp);
+        //var gWPrp = defaultRPrp.getMergedWPrp();
+        ctrPrp.Merge(defaultRPrp);
         ctrPrp.Merge(this.CtrPrp);
         return ctrPrp;
     },
@@ -118,14 +118,15 @@ CMathBase.prototype =
         var defaultRPrp = this.Composition.GetFirstRPrp();
         runPrp.Merge(defaultRPrp);
         runPrp.Merge(this.RunPrp);
+
         return runPrp;
     },
     getCtrPrpForFirst: function()
     {
         var ctrPrp = new CTextPr();
-        var defaultRPrp = this.Composition.GetDefaultRunPrp();
-        var gWPrp = defaultRPrp.getMergedWPrp();
-        ctrPrp.Merge(gWPrp);
+        var defaultRPrp = this.Composition.Get_Default_TPrp();
+        //var gWPrp = defaultRPrp.getMergedWPrp();
+        ctrPrp.Merge(defaultRPrp);
         ctrPrp.Merge(this.CtrPrp);
 
         return ctrPrp;
@@ -141,13 +142,12 @@ CMathBase.prototype =
     },
     setRPrp: function(rPrp)
     {
-        //this.RunPrp.Merge(rPrp);
-        this.RunPrp.mathPrp.bold = rPrp.mathPrp.bold; // как в Ворде, все остальные стили не поддерживаются
-        this.RunPrp.setTxtPrp(rPrp.textPrp); // Merge wTxtPrp
+        //this.RunPrp.mathPrp.bold = rPrp.mathPrp.bold; // как в Ворде, все остальные стили не поддерживаются
+        //this.RunPrp.setTxtPrp(rPrp.textPrp); // Merge wTxtPrp
 
         this.CtrPrp = new CTextPr();
-        var gPrp  = rPrp.getMergedWPrp();
-        this.CtrPrp.Merge(gPrp);
+        //var gPrp  = rPrp.getMergedWPrp();
+        this.CtrPrp.Merge(rPrp);
 
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
@@ -189,7 +189,7 @@ CMathBase.prototype =
     mergeCtrTPrp: function()
     {
         var tPrp = this.getCtrPrp();
-        this.Composition.Parent.ApplyArgSize(tPrp);
+        this.Composition.ApplyArgSize(tPrp);
 
         /*if(this.argSize == -1)
         //tPrp.FontSize *= 0.8;

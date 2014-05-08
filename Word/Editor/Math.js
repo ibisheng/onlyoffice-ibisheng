@@ -13,6 +13,7 @@ function ParaMath(bAddMenu)
     //this.Root = this.Math.Root;
 
     this.Root       = new CMathContent();
+    this.Root.setComposition(this);
 
     this.X          = 0;
     this.Y          = 0;
@@ -59,7 +60,7 @@ ParaMath.prototype =
         var NewMath = new ParaMath();
         var NewRoot;
 
-        if(Selected)
+        /*if(Selected)
         {
             var Content = this.GetSelectContent();
             NewRoot = Content.Copy(Selected, this);
@@ -67,7 +68,7 @@ ParaMath.prototype =
         else
         {
             NewRoot = this.Root.Copy(Selected, this);
-        }
+        }*/
 
         return NewMath;
     },
@@ -467,7 +468,7 @@ ParaMath.prototype =
         PRS.StartWord = true;
 
         // При проверке, убирается ли слово, мы должны учитывать ширину предшествующих пробелов.
-        var LetterLen = Size.Width;
+        var LetterLen = this.Width;
         if ( true !== PRS.Word )
         {
             // Слово только началось. Делаем следующее:
@@ -847,6 +848,33 @@ ParaMath.prototype =
         oWPrp.Merge(tPrp);
 
     },
+    /*GetDefaultTxtPrp: function()
+    {
+        var txtPrp = new CTextPr();
+
+        var defaultTxtPr =
+        {
+            FontFamily:     {Name  : "Cambria Math", Index : -1 },
+            FontSize:       11,
+            Italic:         true,
+            Bold:           false
+        };
+
+       txtPrp.Set_FromObject(defaultTxtPr);
+
+        return txtPrp;
+    },*/
+    GetFirstRPrp: function()
+    {
+        return this.Root.getFirstRPrp();
+    },
+    GetShiftCenter: function(oMeasure, font)
+    {
+        oMeasure.SetFont(font);
+        var metrics = oMeasure.Measure2Code(0x2217); // "+"
+
+        return 0.6*metrics.Height;
+    },
 //-----------------------------------------------------------------------------------
 // Функции отрисовки
 //-----------------------------------------------------------------------------------
@@ -875,7 +903,10 @@ ParaMath.prototype =
         if ( EndPos >= 1 )
         {
             //this.Math.Draw( PDSE.X, PDSE.Y, PDSE.Graphics );
-            this.Root.draw( PDSE.X, PDSE.Y, PDSE.Graphics );
+            // CMathComposition     =>   this.Root.draw(this.absPos.x, this.absPos.y , pGraphics);
+            // this.absPos.x ~> this.X
+            // this.absPos.y ~> this.Y
+            this.Root.draw( PDSE.X, PDSE.Y - this.Ascent, PDSE.Graphics );
             PDSE.X += this.Width;
         }
     },

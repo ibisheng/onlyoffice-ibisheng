@@ -212,7 +212,7 @@ CNary.prototype.init = function(props)
 CNary.prototype.setCtrPrp = function(txtPrp)
 {
     this.CtrPrp.Merge(txtPrp); // only runPrp for paragraph
-    this.RunPrp.setTxtPrp(txtPrp);
+    //this.RunPrp.setTxtPrp(txtPrp);
 
     if(this.elements !== null)
     {

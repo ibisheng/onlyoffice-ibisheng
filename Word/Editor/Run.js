@@ -4263,7 +4263,7 @@ ParaRun.prototype =
                 TextPr.Merge(MPrp); // bold, italic
             }
 
-            this.Parent.Composition.Parent.ApplyArgSize(TextPr);
+            this.Parent.Composition.ApplyArgSize(TextPr);
         }
         else
             TextPr.Merge( this.Pr ); // Мержим прямые настройки данного рана
@@ -7112,9 +7112,9 @@ ParaRun.prototype.Math_Update_Cursor = function(X, Y, CurPage, UpdateTarget)
 ParaRun.prototype.Math_applyArgSize = function(oWPrp)
 {
     var tPrp = new CTextPr();
-    var defaultRPrp = this.Parent.Composition.GetDefaultRunPrp();
-    var gWPrp = defaultRPrp.getMergedWPrp();
-    tPrp.Merge(gWPrp);
+    var defaultRPrp = this.Parent.Composition.Get_Default_TPrp();
+    //var gWPrp = defaultRPrp.getMergedWPrp();
+    tPrp.Merge(defaultRPrp);
     tPrp.Merge(oWPrp);
 
     var FSize = tPrp.FontSize;

@@ -5047,12 +5047,13 @@ CMathContent.prototype =
 
                 //var currRPrp = this.content[pos].getRunPrp();
 
-                var runPrp = this.content[pos].getRunPrp();
-                var currRPrp = runPrp.getMergedWPrp();
+                var runPrp = this.content[pos].getCtrPrp();
+                //var runPrp = this.content[pos].getRunPrp();
+                //var currRPrp = runPrp.getMergedWPrp();
                 //this.applyArgSize(currRPrp);
-                this.Composition.ApplyArgSize(currRPrp); // в ParaMath
+                this.Composition.ApplyArgSize(runPrp); // в ParaMath
 
-                RecalcInfo.currRunPrp = currRPrp;
+                RecalcInfo.currRunPrp = runPrp;
 
                 RecalcInfo.setGaps();
 
@@ -5708,8 +5709,9 @@ CMathContent.prototype =
     ///////// RunPrp, CtrPrp
     getFirstRPrp:    function()
     {
-        var rPrp =  new CMathRunPrp();
-        var defaultRPrp = this.Composition.GetDefaultRunPrp();
+        //var rPrp =  new CMathRunPrp();
+        var rPrp = new CTextPr();
+        var defaultRPrp = this.Composition.Get_Default_TPrp();
         rPrp.Merge(defaultRPrp);
 
         if(this.content.length > 1)
@@ -6677,7 +6679,7 @@ CMathContent.prototype =
 
 }
 
-/*function CMathComposition()
+function CMathComposition()
 {
     this.Parent = undefined;
 
@@ -6728,7 +6730,7 @@ CMathComposition.prototype =
     },
     SetProperties: function(props)
     {
-        /*//******  FOR FORMULA  ******//*/
+        /*****  FOR FORMULA  *****/
 
         // В документации везде, где нет примера использования свояства, означает, что Word не поддерживает это свойство !
 
@@ -6753,7 +6755,7 @@ CMathComposition.prototype =
         if(props.wrapIndent + 0 == props.wrapIndent && isNaN(props.wrapIndent)) // проверка на число
             this.props.wrapIndent = props.wrapIndent/1440;
 
-        /*//*********  check for element 0x1FFD - 0xA721  ********//*/
+        /********  check for element 0x1FFD - 0xA721  *******/
         // This element specifies the right justification of the wrapped line of an instance of mathematical text
         // Instance : Arrows 0x2190-0x21B3, 0x21B6, 0x21B7, 0x21BA-0x21E9, 0x21F4-0x21FF,
         // 0x3D, 0x2234 - 0x2237, 0x2239, 0x223B - 0x228B, 0x228F - 0x2292, 0x22A2 - 0x22B9,
@@ -6765,7 +6767,7 @@ CMathComposition.prototype =
             this.props.wrapRight = props.wrapRight;
 
 
-        /*//******  FOR DOCUMENT  ******//*/
+        /*****  FOR DOCUMENT  *****/
 
         // defaultJc
         // выравнивание формулы в документе
@@ -6784,7 +6786,7 @@ CMathComposition.prototype =
         this.props.lMargin = props.lMargin;
         this.props.rMargin = props.rMargin;
 
-        /*//******  НЕПОДДЕРЖИВАЕМЫЕ Вордом свойства  ******//*/
+        /*****  НЕПОДДЕРЖИВАЕМЫЕ Вордом свойства  *****/
 
         // mathFont: в качестве font поддерживается только Cambria Math
         // остальные шрифты  возможно будут поддержаны MS в будущем
@@ -6798,7 +6800,7 @@ CMathComposition.prototype =
         // http://blogs.msdn.com/b/murrays/archive/2008/10/27/default-document-math-properties.aspx
 
 
-        /*//******  FOR FORMULA  ******//*/
+        /*****  FOR FORMULA  *****/
 
         // http://msdn.microsoft.com/en-us/library/ff529906(v=office.12).aspx
         // Word ignores the interSp attribute and fails to write it back out.
@@ -6808,7 +6810,7 @@ CMathComposition.prototype =
         // Word does not implement this feature and does not write the intraSp element.
         this.props.intraSp = intraSp;
 
-        /*//******  FOR DOCUMENT  ******//*/
+        /*****  FOR DOCUMENT  *****/
 
         // http://msdn.microsoft.com/en-us/library/ff533406(v=office.12).aspx
         // Word ignores and discards postSp
@@ -6826,13 +6828,13 @@ CMathComposition.prototype =
 
         return 0.6*metrics.Height;
     },
-    *//*GetGapSign: function(oMeasure, font)
+    GetGapSign: function(oMeasure, font)
     {
         oMeasure.SetFont(font);
         var metrics = oMeasure.Measure2Code(0x2217); // "+"
 
         return metrics.Height;
-    },*//*
+    },
     CheckTarget: function()
     {
         var bSelect = this.SelectContent.selectUse(),
@@ -6981,7 +6983,7 @@ CMathComposition.prototype =
         var code = e.CharCode;
 
         //
-        *//*if(code == 42)
+        if(code == 42)
          code = 8727;
          else if(code == 45)
          code = 8722;
@@ -6993,11 +6995,11 @@ CMathComposition.prototype =
          code = 0x2211;
 
          if(code == 0x0068)
-         code = 0x210E;*//*
-        *//*else if(code > 0x0040 && code < 0x005B)
+         code = 0x210E;
+        else if(code > 0x0040 && code < 0x005B)
          code = code + 0x1D3F3;
          else if(code > 0x0060 && code < 0x007b)
-         code = code + 0x1D3ED;*//*
+         code = code + 0x1D3ED;
 
         if(code>=0x0020 )
         {
@@ -7076,8 +7078,8 @@ CMathComposition.prototype =
 
                 m++;
 
-                *//*if(k%10 == 0 && m%10 == 0)
-                    console.log("k: " + k, "m: " + m);*//*
+                if(k%10 == 0 && m%10 == 0)
+                    console.log("k: " + k, "m: " + m);
 
                 // x = 53.10799999999981
                 // y = 18.008999999999965
@@ -7091,8 +7093,8 @@ CMathComposition.prototype =
         if(TEST)
         {
             History.Create_NewPoint();
-            *//*var start = this.SelectContent.selection.startPos,
-             end = this.SelectContent.selection.endPos;*//*
+            var start = this.SelectContent.selection.startPos,
+             end = this.SelectContent.selection.endPos;
             var start = this.SelectContent.RealSelect.startPos,
                 end   = this.SelectContent.RealSelect.endPos;
             var Pos;
@@ -7150,8 +7152,8 @@ CMathComposition.prototype =
         this.SelectContent.removeAreaSelect();
 
 
-        *//*if(this.Root.IsEmpty())
-         this.Root.addRunPrp(this.DefaultTxtPrp);*//*
+        if(this.Root.IsEmpty())
+         this.Root.addRunPrp(this.DefaultTxtPrp);
 
         var items =  this.SelectContent.addLetter(code);
 
@@ -7285,11 +7287,11 @@ CMathComposition.prototype =
     {
         simulatorMComposition(this, MATH_EDIT);
     },
-    *//*RecalculateReverse: function(oMeasure) // for edit
+    RecalculateReverse: function(oMeasure) // for edit
      {
      this.SelectContent.RecalculateReverse(oMeasure);
-     },*//*
-    /////////////*//*    end  of  test  functions   *//*/////////////////
+     },
+    /////////////    end  of  test  functions   /////////////////
     Init: function()
     {
         this.Root = new CMathContent();
@@ -7317,13 +7319,13 @@ CMathComposition.prototype =
         // Math Run Properties default прокинуты
 
     },
-    *//*SetTestRunPrp: function()
+    SetTestRunPrp: function()
     {
         var runPrp = new CTextPr();
         runPrp.Merge(this.DefaultTxtPrp);
 
         this.Root.addRunPrp(runPrp);
-    },*//*
+    },
     GetDefaultRunPrp: function()
     {
         var rPrp = new CMathRunPrp();
@@ -7427,7 +7429,7 @@ CMathComposition.prototype =
     },
     old_getSize: function()
     {
-        *//*return this.Root.size;*//*
+        return this.Root.size;
 
         //
         //var sh = 0.2487852283770651*g_oTextMeasurer.GetHeight();
@@ -7609,7 +7611,7 @@ CMathComposition.prototype =
     {
         return this.CurrentContent.getRunPrp(this.CurrentContent.CurPos);
     }
-}*/
+}
 
 
 function CEmpty()

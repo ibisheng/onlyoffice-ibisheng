@@ -2,11 +2,9 @@ function CFraction()
 {
     this.kind = MATH_FRACTION;
 
-    this.Pr =
-    {
-        type:       BAR_FRACTION,
-        bHideBar:   false
-    };
+    this.type     =   BAR_FRACTION;
+    this.bHideBar =   false
+
 
     CMathBase.call(this);
 }
