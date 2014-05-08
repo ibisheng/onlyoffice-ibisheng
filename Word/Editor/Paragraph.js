@@ -13898,32 +13898,51 @@ Paragraph.prototype =
     Get_Paragraph_TextPr : function()
     {
         var TextPr;
-        if ( true === this.Selection.Use )
+        if ( true === this.ApplyToAll )
         {
-            var StartPos = this.Selection.StartPos;
-            var EndPos   = this.Selection.EndPos;
+            this.Select_All(1);
+            
+            TextPr = this.Content[0].Get_CompiledTextPr(true);
+            var Count = this.Content.length;
 
-            if ( StartPos > EndPos )
-            {
-                StartPos = this.Selection.EndPos;
-                EndPos   = this.Selection.StartPos;
-            }
-
-            while ( true === this.Content[StartPos].Selection_IsEmpty() && StartPos < EndPos )
-                StartPos++;
-
-            TextPr = this.Content[StartPos].Get_CompiledTextPr(true);
-
-            for ( var CurPos = StartPos + 1; CurPos <= EndPos; CurPos++ )
+            for ( var CurPos = 1; CurPos < Count; CurPos++ )
             {
                 var TempTextPr = this.Content[CurPos].Get_CompiledTextPr(false);
                 if ( null !== TempTextPr && undefined !== TempTextPr && true !== this.Content[CurPos].Selection_IsEmpty() )
                     TextPr = TextPr.Compare( TempTextPr );
             }
+            
+            this.Selection_Remove();
         }
         else
         {
-            TextPr = this.Content[this.CurPos.ContentPos].Get_CompiledTextPr(true);
+            if ( true === this.Selection.Use )
+            {
+                var StartPos = this.Selection.StartPos;
+                var EndPos   = this.Selection.EndPos;
+
+                if ( StartPos > EndPos )
+                {
+                    StartPos = this.Selection.EndPos;
+                    EndPos   = this.Selection.StartPos;
+                }
+
+                while ( true === this.Content[StartPos].Selection_IsEmpty() && StartPos < EndPos )
+                    StartPos++;
+
+                TextPr = this.Content[StartPos].Get_CompiledTextPr(true);
+
+                for ( var CurPos = StartPos + 1; CurPos <= EndPos; CurPos++ )
+                {
+                    var TempTextPr = this.Content[CurPos].Get_CompiledTextPr(false);
+                    if ( null !== TempTextPr && undefined !== TempTextPr && true !== this.Content[CurPos].Selection_IsEmpty() )
+                        TextPr = TextPr.Compare( TempTextPr );
+                }
+            }
+            else
+            {
+                TextPr = this.Content[this.CurPos.ContentPos].Get_CompiledTextPr(true);
+            }
         }
 
         return TextPr;
