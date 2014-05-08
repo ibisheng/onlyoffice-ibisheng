@@ -245,6 +245,7 @@ function NumFormat(bAddMinusIfNes)
     this.Color = -1;
 	this.ComporationOperator = null;
     
+	this.bGeneralChart = false;//если в формате только один текст(например в chart "Основной")
     this.bGeneral = false;//Форматирование не задано
     this.bAddMinusIfNes = bAddMinusIfNes;//когда не задано форматирование для отрицательных чисел иногда надо вставлять минус
 };
@@ -355,9 +356,11 @@ NumFormat.prototype =
     },
     _parseFormat : function(format)
     {
+        this.bGeneralChart = true;
         while(true)
         {
             var next = this._readChar();
+            var bNoFormat = false;
             if(this.EOF == next)
                 break;
             else if("[" == next)
@@ -448,12 +451,15 @@ NumFormat.prototype =
             {
                 this._addToFormat2(new FormatObjDateVal(numFormat_Second, 1, false));
             }
-            else if("A" == next || "a" == next)
-            {
+            else if ("A" == next || "a" == next) {
                 this._ReadAmPm(next);
             }
-            else
+            else {
+                bNoFormat = true;
                 this._addToFormat(numFormat_Text, next);
+            }
+            if (!bNoFormat)
+                this.bGeneralChart = false;
         }
         return true;
     },
@@ -1353,7 +1359,7 @@ NumFormat.prototype =
     {
         return (number == number - 0) && ((number < 0 && false == g_bDate1904) || number > 2958465.9999884);
     },
-    format: function (number, nValType, dDigitsCount, oAdditionalResult, cultureInfo)
+    format: function (number, nValType, dDigitsCount, oAdditionalResult, cultureInfo, bChart)
     {
         if (null == cultureInfo)
             cultureInfo = g_oDefaultCultureInfo;
@@ -1374,7 +1380,7 @@ NumFormat.prototype =
                 }
             }
             var oParsedNumber = this._parseNumber(number, this.aDecFormat, this.aFracFormat.length, nValType, cultureInfo);
-            if(true == this.bGeneral || (true == oParsedNumber.bDigit && true == this.bTextFormat) || (false == oParsedNumber.bDigit && false == this.bTextFormat))
+            if (true == this.bGeneral || (true == oParsedNumber.bDigit && true == this.bTextFormat) || (false == oParsedNumber.bDigit && false == this.bTextFormat) || (bChart && this.bGeneralChart))
             {
                 //Строим подходящий general format
                 if(null != oAdditionalResult)
@@ -2139,26 +2145,38 @@ CellFormat.prototype =
 		}
 		return oRes;
 	},
-    format : function(number, nValType, dDigitsCount, oAdditionalResult)
+    format : function(number, nValType, dDigitsCount, oAdditionalResult, bChart)
     {
+        var res = null;
+        if (null == bChart)
+            bChart = false;
         var cacheVal = this.formatCache[number];
+        var cacheType = null;
+        var cacheRes = null;
         if(null != cacheVal)
         {
-            cacheVal = cacheVal[nValType];
-            if(null != cacheVal)
+            cacheType = cacheVal[nValType];
+            if (null != cacheType)
             {
-                cacheVal = cacheVal[dDigitsCount];
-                if(null != cacheVal)
-                    return cacheVal;
+                cacheRes = cacheType[dDigitsCount];
+                if (null != cacheRes) {
+                    if (bChart)
+                        res = cacheRes.chart;
+                    else
+                        res = cacheRes.nochart;
+                    if (null != res)
+                        return res;
+                }
             }
         }
-        var res = [{text: number}];
+        res = [{text: number}];
         var dNumber = number - 0;
+        var oFormat = null;
 		if(CellValueType.String != nValType && number == dNumber)
 		{
-			var oFormat = this.getFormatByValue(dNumber);
+			oFormat = this.getFormatByValue(dNumber);
 			if(null != oFormat)
-				res = oFormat.format(number, nValType, dDigitsCount, oAdditionalResult);
+			    res = oFormat.format(number, nValType, dDigitsCount, oAdditionalResult, null, bChart);
 			else if(null != this.aComporationFormats)
 			{
 			    var oNewFont = new NumFormatFont();
@@ -2169,22 +2187,35 @@ CellFormat.prototype =
 		else
 		{
 			//text
-			if(null != this.oTextFormat)
-				res = this.oTextFormat.format(number, nValType, dDigitsCount, oAdditionalResult);
+		    if (null != this.oTextFormat) {
+		        oFormat = this.oTextFormat;
+		        res = oFormat.format(number, nValType, dDigitsCount, oAdditionalResult, null, bChart);
+		    }
 		}
-        var cacheVal = this.formatCache[number];
         if(null == cacheVal)
         {
             cacheVal = {};
             this.formatCache[number] = cacheVal;
         }
-        var cacheType = cacheVal[nValType];
         if(null == cacheType)
         {
             cacheType = {};
             cacheVal[nValType] = cacheType;
         }
-        cacheType[dDigitsCount] = res;
+        if (null == cacheRes) {
+            cacheRes = { chart: null, nochart: null };
+        cacheType[dDigitsCount] = cacheRes;
+        }
+        if (null != oFormat && oFormat.bGeneralChart) {
+            if (bChart)
+                cacheRes.chart = res;
+            else
+                cacheRes.nochart = res;
+        }
+        else {
+            cacheRes.chart = res;
+            cacheRes.nochart = res;
+        }
         return res;
     },
     shiftFormat : function(output, nShift)
