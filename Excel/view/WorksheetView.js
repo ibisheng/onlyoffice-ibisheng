@@ -685,7 +685,7 @@
                     if (row < r1)
                         r1 = 0;
                     else
-                        offsetFrozenY = t.rows[rFrozen].left - t.rows[0].left;
+                        offsetFrozenY = t.rows[rFrozen].top - t.rows[0].top;
                 }
             }
 			var offsetY = t.rows[r1].top - t.cellsTop;
