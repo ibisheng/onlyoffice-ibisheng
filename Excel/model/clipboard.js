@@ -1495,6 +1495,98 @@
 				 return newArr;
 			},
 			
+			_pasteFromBinary: function(worksheet, node, onlyFromLocalStorage)
+			{
+				var base64 = null;
+				if(onlyFromLocalStorage)
+				{
+					if(typeof t.lStorage == "object")
+					{
+						if(t.lStorage.htmlInShape)
+						{
+							return t.lStorage.htmlInShape;
+						}
+						else
+						{
+							worksheet.setSelectionInfo('paste',t,false,true);
+							
+							window.GlobalPasteFlag = false;
+							window.GlobalPasteFlagCounter = 0;
+							return true;
+						}
+					}
+					else
+						base64 = t.lStorage;
+				}
+				else//find class xsl
+				{
+					var base64 = null;
+					var base64FromWord = null;
+					var classNode;
+					if(node.children[0] && node.children[0].getAttribute("class") != null && (node.children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].getAttribute("class").indexOf("docData;") > -1))
+						classNode = node.children[0].getAttribute("class");
+					else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].getAttribute("class").indexOf("docData;") > -1))
+						classNode = node.children[0].children[0].getAttribute("class");
+					else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].children[0] && node.children[0].children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].children[0].getAttribute("class").indexOf("docData;") > -1))
+						classNode = node.children[0].children[0].children[0].getAttribute("class");
+					
+					if( classNode != null ){
+						var cL = classNode.split(" ");
+						for (var i = 0; i < cL.length; i++){
+							if(cL[i].indexOf("xslData;") > -1)
+							{
+								base64 = cL[i].split('xslData;')[1];
+							}
+							else if(cL[i].indexOf("docData;") > -1)
+							{
+								base64FromWord = cL[i].split('docData;')[1];
+							}
+						}
+					}
+				}
+				
+				if(base64 != null)//from excel
+				{
+					var oBinaryFileReader = new Asc.BinaryFileReader(null, true);
+					var tempWorkbook = new Workbook;
+					oBinaryFileReader.Read(base64, tempWorkbook);
+					this.activeRange = oBinaryFileReader.copyPasteObj.activeRange;
+					var pasteData = null;
+					if (tempWorkbook)
+						pasteData = tempWorkbook.aWorksheets[0];
+					if (pasteData) {
+						History.TurnOn();
+						if(pasteData.Drawings && pasteData.Drawings.length)
+							t._insertImagesFromBinary(worksheet, pasteData);
+						else {
+							var newFonts = {};
+							pasteData.generateFontMap(newFonts);
+							worksheet._loadFonts(newFonts, function() {
+								worksheet.setSelectionInfo('paste', pasteData, false, "binary");
+							});
+						}
+						window.GlobalPasteFlag = false;
+						window.GlobalPasteFlagCounter = 0;
+						
+						return true;
+					}
+				} 
+				else if (base64FromWord && copyPasteFromWordUseBinary)//from word
+				{
+					var pasteData = this.ReadFromBinaryWord(base64FromWord);
+					var pasteFromBinaryWord = new Asc.pasteFromBinaryWord(this, worksheet);
+					
+					pasteFromBinaryWord._paste(worksheet, pasteData);
+					
+					window.GlobalPasteFlag = false;
+					window.GlobalPasteFlagCounter = 0;
+					
+					return true;
+				};
+				
+				return false;
+			},
+			
             _editorPasteExec: function (worksheet, node, isText,onlyFromLocalStorage)
             {
 				if(node == undefined)
@@ -1521,88 +1613,20 @@
 				}
 				
 				//****binary****
+				var binaryResult;
 				if(copyPasteUseBinary)
 				{
-					var base64 = null;
-					if(onlyFromLocalStorage)
-					{
-						if(typeof t.lStorage == "object")
-						{
-							if(t.lStorage.htmlInShape)
-							{
-								node = t.lStorage.htmlInShape;
-								pasteFragment = node;
-							}
-							else
-							{
-								worksheet.setSelectionInfo('paste',t,false,true);
-								window.GlobalPasteFlag = false;
-								window.GlobalPasteFlagCounter = 0;
-								return;
-							}
-						}
-						else
-							base64 = t.lStorage;
-					}
-					else//find class xsl
-					{
-						var base64 = null;
-						var base64FromWord = null;
-						var classNode;
-						if(node.children[0] && node.children[0].getAttribute("class") != null && (node.children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].getAttribute("class").indexOf("docData;") > -1))
-							classNode = node.children[0].getAttribute("class");
-						else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].getAttribute("class").indexOf("docData;") > -1))
-							classNode = node.children[0].children[0].getAttribute("class");
-						else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].children[0] && node.children[0].children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].children[0].getAttribute("class").indexOf("docData;") > -1))
-							classNode = node.children[0].children[0].children[0].getAttribute("class");
-						
-						if( classNode != null ){
-							var cL = classNode.split(" ");
-							for (var i = 0; i < cL.length; i++){
-								if(cL[i].indexOf("xslData;") > -1)
-								{
-									base64 = cL[i].split('xslData;')[1];
-								}
-								else if(cL[i].indexOf("docData;") > -1)
-								{
-									base64FromWord = cL[i].split('docData;')[1];
-								}
-							}
-						}
-					}
-					if(base64 != null)
-					{
-					    var oBinaryFileReader = new Asc.BinaryFileReader(null, true);
-						var tempWorkbook = new Workbook;
-						oBinaryFileReader.Read(base64, tempWorkbook);
-						this.activeRange = oBinaryFileReader.copyPasteObj.activeRange;
-						var pasteData = null;
-						if (tempWorkbook)
-							pasteData = tempWorkbook.aWorksheets[0];
-						if (pasteData) {
-							History.TurnOn();
-							if(pasteData.Drawings && pasteData.Drawings.length)
-								t._insertImagesFromBinary(worksheet, pasteData);
-							else {
-								var newFonts = {};
-								pasteData.generateFontMap(newFonts);
-								worksheet._loadFonts(newFonts, function() {
-									worksheet.setSelectionInfo('paste', pasteData, false, "binary");
-								});
-							}
-							window.GlobalPasteFlag = false;
-							window.GlobalPasteFlagCounter = 0;
-							return;
-						}
-					} else if (base64FromWord && copyPasteFromWordUseBinary) {
-						var pasteData = this.ReadFromBinaryWord(base64FromWord);
-						var pasteFromBinaryWord = new Asc.pasteFromBinaryWord(this, worksheet);
-						pasteFromBinaryWord._paste(worksheet, pasteData);
-						window.GlobalPasteFlag = false;
-						window.GlobalPasteFlagCounter = 0;
+					binaryResult = this._pasteFromBinary(worksheet, node, onlyFromLocalStorage);
+					
+					if(binaryResult === true)
 						return;
-					}
-				}
+					else if(binaryResult !== false && binaryResult != undefined)
+					{
+						pasteFragment = binaryResult;
+						node = binaryResult;
+					};
+				};
+				
 				
 				if(activateLocalStorage)
 				{
