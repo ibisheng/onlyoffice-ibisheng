@@ -15,10 +15,10 @@
 		
 		var isTruePaste = false;
 		//activate local buffer
-		var activateLocalStorage = true;
+		var activateLocalStorage = false;
 		var isOnlyLocalBufferSafari = false;
-		var copyPasteUseBinary = false;
-		var copyPasteFromWordUseBinary = false;
+		var copyPasteUseBinary = true;
+		var copyPasteFromWordUseBinary = true;
 		
 		var Base64 = {
 		 
