@@ -1302,6 +1302,8 @@ function CHorRuler()
         this.IsDrawingCurTab = true;
         this.DragType = 0;
         this.m_bIsMouseDown = false;
+
+        this.m_oWordControl.m_oDrawingDocument.UnlockCursorType();
     }
 
     this.OnMouseUpExternal = function()
@@ -1377,6 +1379,8 @@ function CHorRuler()
         this.IsDrawingCurTab = true;
         this.DragType = 0;
         this.m_bIsMouseDown = false;
+
+        this.m_oWordControl.m_oDrawingDocument.UnlockCursorType();
     }
 
     this.SetTabsProperties = function()
@@ -2530,6 +2534,7 @@ function CVerRuler()
         }
 
         this.DragType = 0;
+        this.m_oWordControl.m_oDrawingDocument.UnlockCursorType();
     }
 
     this.OnMouseUpExternal = function()
@@ -2560,6 +2565,7 @@ function CVerRuler()
         }
 
         this.DragType = 0;
+        this.m_oWordControl.m_oDrawingDocument.UnlockCursorType();
     }
 
     this.BlitToMain = function(left, top, htmlElement)

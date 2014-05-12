@@ -1681,6 +1681,21 @@ function CEditorPage(api)
             oWordControl.m_oTimerScrollSelect = -1;
         }
 
+        if (oWordControl.m_oHorRuler.m_bIsMouseDown)
+            oWordControl.m_oHorRuler.OnMouseUpExternal();
+
+        if (oWordControl.m_oVerRuler.DragType != 0)
+            oWordControl.m_oVerRuler.OnMouseUpExternal();
+
+        if ( oWordControl.m_oScrollVerApi.getIsLockedMouse() )
+        {
+            oWordControl.m_oScrollVerApi.evt_mouseup(e);
+        }
+        if ( oWordControl.m_oScrollHorApi.getIsLockedMouse() )
+        {
+            oWordControl.m_oScrollHorApi.evt_mouseup(e);
+        }
+
         check_MouseUpEvent(e);
         var pos = null;
         if (oWordControl.m_oDrawingDocument.AutoShapesTrackLockPageNum == -1)

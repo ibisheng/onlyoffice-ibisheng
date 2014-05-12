@@ -1125,6 +1125,7 @@ ScrollObject.prototype = {
     /*events*/
     evt_mousemove:function ( e ) {
         var evt = e || window.event;
+
         if (evt.preventDefault)
             evt.preventDefault();
         else
@@ -1240,6 +1241,7 @@ ScrollObject.prototype = {
     },
     evt_mouseout:function ( e ) {
         var evt = e || window.event;
+
         if (evt.preventDefault)
             evt.preventDefault();
         else
@@ -1261,6 +1263,7 @@ ScrollObject.prototype = {
     },
     evt_mouseup:function ( e ) {
         var evt = e || window.event;
+
         if (evt.preventDefault)
             evt.preventDefault();
         else
@@ -1296,10 +1299,14 @@ ScrollObject.prototype = {
     },
     evt_mousedown:function ( e ) {
         var evt = e || window.event;
+
+        // если сделать превент дефолт - перестанет приходить mousemove от window
+        /*
         if (evt.preventDefault)
             evt.preventDefault();
         else
             evt.returnValue = false;
+        */
 
         var mousePos = this.that.getMousePosition( evt );
         var downHover = this.that._MouseHoverOnArrowDown( mousePos );
