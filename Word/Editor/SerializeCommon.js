@@ -847,24 +847,31 @@ function CPPTXContentWriter()
 
         this.BinaryFileWriter.StartRecord(0);
         this.BinaryFileWriter.StartRecord(1);
-
-        if ("undefined" !== typeof(WordShape) && grObject instanceof WordShape)
+        switch(grObject.getObjectType())
         {
-            this.WriteShape(grObject, Document, oMapCommentId, oNumIdMap, copyParams);
+            case historyitem_type_Shape:
+            {
+                if(grObject.bWordShape)
+                {
+                    this.WriteShape(grObject, Document, oMapCommentId, oNumIdMap, copyParams);
+                }
+                else
+                {
+                    this.WriteShape2(grObject, Document, oMapCommentId, oNumIdMap, copyParams);
+                }
+                break;
+            }
+            case historyitem_type_ImageShape:
+            {
+                this.WriteImage(grObject);
+                break;
+            }
+            case historyitem_type_GroupShape:
+            {
+                this.WriteGroup(grObject, Document, oMapCommentId, oNumIdMap, copyParams);
+                break;
+            }
         }
-        else if ("undefined" !== typeof(CShape) && grObject instanceof CShape)
-        {
-            this.WriteShape2(grObject, Document, oMapCommentId, oNumIdMap, copyParams);
-        }
-        else if (("undefined" !== typeof(WordImage) && grObject instanceof WordImage) || ("undefined" !== typeof(CImageShape) && grObject instanceof CImageShape))
-        {
-            this.WriteImage(grObject);
-        }
-        else if (("undefined" !== typeof(WordGroupShapes) && grObject instanceof WordGroupShapes) || ("undefined" !== typeof(CGroupShape) && grObject instanceof CGroupShape))
-        {
-            this.WriteGroup(grObject, Document, oMapCommentId, oNumIdMap, copyParams);
-        }
-
         this.BinaryFileWriter.EndRecord();
         this.BinaryFileWriter.EndRecord();
 
