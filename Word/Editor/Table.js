@@ -7323,9 +7323,9 @@ CTable.prototype =
 
             var Row = this.Content[Pos.Row];
 
-            var _X = parseInt(X / 2.5 + 0.5) * 2.5;
-            var _Y = parseInt(Y / 2.5 + 0.5) * 2.5;
-
+            var _X = X;
+            var _Y = Y;
+            
             if ( 0 === Result.Border || 2 === Result.Border )
             {
                 var PageH = this.LogicDocument.Get_PageLimits( this.Get_StartPage_Absolute()).YLimit;
@@ -7336,6 +7336,7 @@ CTable.prototype =
                 this.Selection.Data2.bCol = false;
 
                 var Row_start = this.Pages[PageNum].FirstRow;
+                var Row_end   = this.Pages[PageNum].LastRow;
                 if ( 0 === Result.Border )
                     this.Selection.Data2.Index = Pos.Row - Row_start;
                 else
@@ -7346,6 +7347,12 @@ CTable.prototype =
                     var TempRow = this.Selection.Data2.Index + Row_start - 1;
                     Y_min = this.RowsInfo[TempRow].Y[PageNum];
                 }
+                
+                // Подправим Y, чтобы первоначально точно по границе проходила линия
+                if ( this.Selection.Data2.Index !== Row_end - Row_start + 1 )
+                    _Y = this.RowsInfo[this.Selection.Data2.Index + Row_start].Y[PageNum];
+                else
+                    _Y = this.RowsInfo[this.Selection.Data2.Index + Row_start - 1].Y[PageNum] + this.RowsInfo[this.Selection.Data2.Index + Row_start - 1].H[PageNum];
 
                 this.Selection.Data2.Min = Y_min;
                 this.Selection.Data2.Max = Y_max;
@@ -7386,6 +7393,12 @@ CTable.prototype =
                     else
                         X_max = Row.Get_CellInfo( this.Selection.Data2.Index ).X_grid_end - ( Margins.Left.W + Margins.Right.W + 1.5 * CellSpacing);
                 }
+                                
+                // Подправим значение по X, чтобы первоначально точно по границе проходила линия
+                if ( CellsCount != this.Selection.Data2.Index )
+                    _X = Row.Get_CellInfo( this.Selection.Data2.Index ).X_grid_start;
+                else
+                    _X = Row.Get_CellInfo( this.Selection.Data2.Index - 1 ).X_grid_end;
 
                 this.Selection.Data2.Min = X_min;
                 this.Selection.Data2.Max = X_max;
@@ -7405,6 +7418,12 @@ CTable.prototype =
 
             this.Selection.Data2.X = _X;
             this.Selection.Data2.Y = _Y;
+            
+            this.Selection.Data2.StartCX = _X; // Начальная позиция скорректированная относительно положения границы
+            this.Selection.Data2.StartCY = _Y;
+            this.Selection.Data2.StartX  =  X; // Начальная позиция нажатия мыши (без корректировки)
+            this.Selection.Data2.StartY  =  Y;
+            this.Selection.Data2.Start   = true;
 
             this.DrawingDocument.LockCursorTypeCur();
         }
@@ -7421,9 +7440,22 @@ CTable.prototype =
         {
             if ( true === editor.isViewMode || this.Selection.Data2.PageNum != PageIndex - this.PageNum )
                 return;
-
-            var _X = this.DrawingDocument.CorrectRulerPosition(X);
-            var _Y = this.DrawingDocument.CorrectRulerPosition(Y);
+            
+            var _X = X;
+            var _Y = Y;
+                        
+            // Проверяем, случайное нажатие на границу. (т.е. случайное однократное нажатие или с малым смещением)
+            if ( true !== this.Selection.Data2.Start || Math.abs( X - this.Selection.Data2.StartX ) > 0.05 || Math.abs( Y - this.Selection.Data2.StartY ) > 0.05 )
+            {
+                _X = this.DrawingDocument.CorrectRulerPosition(X);
+                _Y = this.DrawingDocument.CorrectRulerPosition(Y);
+                this.Selection.Data2.Start = false;
+            }
+            else
+            {
+                _X = this.Selection.Data2.X;
+                _Y = this.Selection.Data2.Y;
+            }
 
             if ( true === this.Selection.Data2.bCol )
             {
@@ -7445,12 +7477,21 @@ CTable.prototype =
 
                 this.DrawingDocument.UpdateTableRuler( this.Selection.Data2.bCol, this.Selection.Data2.Index, _Y );
             }
-
+            
             this.Selection.Data2.X = _X;
             this.Selection.Data2.Y = _Y;
 
             if ( MouseEvent.Type === g_mouse_event_type_up )
             {
+                // Обрабатываем случай, когда граница не изменила своего первоначального положения
+                if ( Math.abs( _X - this.Selection.Data2.StartCX ) < 0.001 && Math.abs( _Y - this.Selection.Data2.StartCY ) < 0.001 )
+                {
+                    this.Selection.Type2 = table_Selection_Common;
+                    this.Selection.Data2 = null;
+                    
+                    return;
+                }
+                
                 if ( true === this.Selection.Data2.bCol )
                 {
                     // Найдем колонку в TableGrid, с которой мы работаем
