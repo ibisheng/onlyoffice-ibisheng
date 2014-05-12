@@ -1939,6 +1939,7 @@ CHeaderFooterController.prototype =
                 NewMouseEvent.Type       = g_mouse_event_type_up;
                 NewMouseEvent.ClickCount = 1;
                 this.CurHdrFtr.Selection_SetEnd( X, Y, PageIndex, NewMouseEvent );
+                this.CurHdrFtr.Content.Cursor_MoveToStartPos(false);
             }
         }
 
