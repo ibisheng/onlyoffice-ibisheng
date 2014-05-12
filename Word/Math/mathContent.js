@@ -524,7 +524,8 @@ CRecalculateInfo.prototype =
     }
 }
 
-
+// TO DO
+// убрать
 function dist(_left, _right, _top, _bottom)
 {
     this.left = _left;
@@ -794,6 +795,21 @@ CMPrp.prototype =
             textPrp.Italic = false;
 
         return textPrp;
+    },
+    Copy: function()
+    {
+        var NewMPrp = new CMPrp();
+        
+        NewMPrp.aln      = this.aln;
+        NewMPrp.brk      = this.brk;
+        NewMPrp.lit      = this.lit;
+        NewMPrp.nor      = this.nor;
+        NewMPrp.typeText = this.typeText;
+        NewMPrp.italic   = this.italic;
+        NewMPrp.bold     = this.bold;
+        NewMPrp.plain    = this.plain;
+        
+        return NewMPrp;
     }
 }
 
@@ -826,21 +842,22 @@ CMPrp.prototype =
 function CMathContent()
 {
 	this.Id = g_oIdCounter.Get_NewId();		
-    this.bDot       =   false;
-    this.plhHide    =   false;
-    this.bRoot      =   false;
+
 
     this.content = new Array(); // array of mathElem
     //this.length = 0;
 
-    this.WidthToElement = [];
-
     this.CurPos = 0;
-
+    this.WidthToElement = [];
     this.pos = {x:0,    y:0};   // относительная позиция
 
+    //  Properties
     this.Composition = null; // ссылка на общую формулу
     this.argSize     = 0;
+    this.bDot       =   false;
+    this.plhHide    =   false;
+    this.bRoot      =   false;
+    //////////////////
 
 
     ////**  real select  **////
@@ -865,7 +882,6 @@ function CMathContent()
     this.bSelectionUse = false;
     this.SelectStartPos = 0;
     this.SelectEndPos   = 0;
-
 
     this.size =
     {
@@ -6350,7 +6366,7 @@ CMathContent.prototype =
     {
         return this.content.length == 1;
     },
-    Copy: function(Selected)
+    Copy: function(Selected, Composition)
     {
         var start, end;
 
@@ -6365,16 +6381,27 @@ CMathContent.prototype =
             end = this.content.length - 1;
         }
 
-        var content = new CMathContent();
+        var NewContent = new CMathContent();
+        NewContent.setComposition(Composition);
+        NewContent.plHide = this.plHide;
 
         for(var i = start; i < end; i++)
         {
-            var element = this.content[i].Copy(Selected);
-            content.Copy(element);
+            var element;
+            if(this.content[i].typeObj == MATH_PARA_RUN)
+            {
+                element = this.content[i].Copy(Selected);
+            }
+            else
+            {
+                element = this.content[i].Copy(false, Composition);
+                element.relate(this);
+            }
+
+            NewContent.push(element);
         }
 
-
-
+        return NewContent;
     },
     Selection_Remove: function()
     {

@@ -405,7 +405,12 @@ CMathText.prototype =
         SearchPos.Pos.Update(0, Depth);
         SearchPos.Pos.bPlaceholder = true;
     },
+    Copy: function()
+    {
+        var NewLetter = new CMathText(this.bJDraw);
 
+
+    },
 
     // заглушка для текста (для n-арных операторов, когда выставляется текст вместо оператора)
     setComposition: function() // заглушка

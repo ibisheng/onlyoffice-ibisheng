@@ -8,7 +8,16 @@ function CMathBase()
 
     this.pos = null;
     this.size = null;
+
+    //  Properties
     this.argSize = 0;
+    this.Parent = null;
+    this.Composition = null; // ссылка на общую формулу
+
+    this.CtrPrp = new CTextPr();
+   /////////////////
+
+    //this.RunPrp = new CMathRunPrp();
 
     this.CurPos_X = 0;
     this.CurPos_Y = 0;
@@ -28,19 +37,8 @@ function CMathBase()
 
     this.bSelectionUse = false;
 
-
     this.nRow = 0;
     this.nCol = 0;
-
-    this.Parent = null;
-    this.Composition = null; // ссылка на общую формулу
-
-    this.CtrPrp = new CTextPr();
-    //this.RunPrp = new CMathRunPrp();
-
-
-    //this.textPrp = new CMathTextPrp(); // для рассчета размера расстояний
-    //this.RunPrp = new CMathTextPrp(); // запоминаем, если передаются спец. настройки для контента
 
     // todo
     // убрать !!!
@@ -1553,6 +1551,25 @@ CMathBase.prototype =
     Get_TxtPrp: function()
     {
         return this.getCtrPrp();
+    },
+    Copy_2: function(Selected, Composition, NewObj)
+    {
+        NewObj.Composition = Composition;
+        var CtrPrp = this.CtrPrp.Copy();
+
+        NewObj.setCtrPrp(CtrPrp);
+
+        for(var i=0; i < this.nRow; i++)
+            for(var j = 0; j < this.nCol; j++)
+            {
+                NewObj.elements[i][j] = this.elements[i][j].Copy(Selected, Composition);
+
+                var argSize = this.elements[i][j].argSize;
+                NewObj.elements[i][j].setArgSize(argSize);
+
+                NewObj.elements[i][j].relate(NewObj);
+
+            }
     }
 
     //////////////////////////

@@ -3,7 +3,7 @@ function CFraction()
     this.kind = MATH_FRACTION;
 
     this.type     =   BAR_FRACTION;
-    this.bHideBar =   false
+    this.bHideBar =   false;
 
 
     CMathBase.call(this);
@@ -424,6 +424,16 @@ CFraction.prototype.getPropsForWrite = function()
         type: type
     };
     return props;
+}
+CFraction.prototype.Copy = function(Selected, Composition)
+{
+    var props = this.getPropsForWrite();
+
+    var NewFraction = new CFraction();
+    NewFraction.init(props);
+    this.Copy_2(Selected, Composition, NewFraction);
+
+    return NewFraction;
 }
 
 

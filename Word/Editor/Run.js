@@ -60,7 +60,6 @@ function ParaRun(Paragraph, bMathRun)
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
 }
-
 ParaRun.prototype =
 {
 //-----------------------------------------------------------------------------------
@@ -94,6 +93,12 @@ ParaRun.prototype =
         var NewRun = new ParaRun(this.Paragraph);
 
         NewRun.Set_Pr( this.Pr.Copy() );
+
+        if(this.typeObj == MATH_PARA_RUN)
+        {
+            NewRun.MathPrp = this.MathPrp.Copy();
+        }
+
 
         var StartPos = 0;
         var EndPos   = this.Content.length;
@@ -7125,48 +7130,6 @@ ParaRun.prototype.Math_Update_Cursor = function(X, Y, CurPage, UpdateTarget)
     }
 
     return {X: X, Y: Y, Height: sizeCursor};
-}
-ParaRun.prototype.Math_applyArgSize = function(oWPrp)
-{
-    var tPrp = new CTextPr();
-    var defaultRPrp = this.Parent.Composition.Get_Default_TPrp();
-    //var gWPrp = defaultRPrp.getMergedWPrp();
-    tPrp.Merge(defaultRPrp);
-    tPrp.Merge(oWPrp);
-
-    var FSize = tPrp.FontSize;
-
-    if(this.argSize == -1)
-    {
-        //aa: 0.0013  bb: 0.66  cc: 0.5
-        //aa: 0.0009  bb: 0.68  cc: 0.26
-        FSize = 0.0009*FSize*FSize + 0.68*FSize + 0.26;
-        //FSize = 0.001*FSize*FSize + 0.723*FSize - 1.318;
-        //FSize = 0.0006*FSize*FSize + 0.743*FSize - 1.53;
-    }
-    else if(this.argSize == -2)
-    {
-        // aa: -0.0004  bb: 0.66  cc: 0.87
-        // aa: -0.0014  bb: 0.71  cc: 0.39
-        // aa: 0  bb: 0.63  cc: 1.11
-        //FSize = 0.63*FSize + 1.11;
-        FSize = -0.0004*FSize*FSize + 0.66*FSize + 0.87;
-        //tPrp.FontSize *= 0.473;
-    }
-
-    tPrp.FontSize = FSize;
-
-    oWPrp.Merge(tPrp);
-
-    /*
-     if(this.argSize == -1)
-     //tPrp.FontSize *= 0.8;
-     tPrp.FontSize *= 0.728;
-     //tPrp.FontSize *= 0.65;
-     else if(this.argSize == -2)
-     //tPrp.FontSize *= 0.65;
-     tPrp.FontSize *= 0.53;
-     //tPrp.FontSize *= 0.473;*/
 }
 ParaRun.prototype.Set_MathPrp = function(props)
 {
