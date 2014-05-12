@@ -1067,25 +1067,35 @@ function CPPTXContentWriter()
                 _writer.StartRecord(0);
 
                 var elem = spTree[i];
-                if ("undefined" !== typeof(WordShape) && elem instanceof WordShape)
+                switch(grObject.getObjectType())
                 {
-                    this.WriteShape(elem, Document, oMapCommentId, oNumIdMap, copyParams);
-                }
-                else if ("undefined" !== typeof(CShape) && elem instanceof CShape)
-                {
-                    this.WriteShape2(elem, Document, oMapCommentId, oNumIdMap, copyParams);
-                }
-                else if (("undefined" !== typeof(WordImage) && elem instanceof WordImage) || ("undefined" !== typeof(CImageShape) && elem instanceof CImageShape))
-                {
-                    this.WriteImage(elem);
-                }
-                else if (("undefined" !== typeof(WordGroupShapes) && elem instanceof WordGroupShapes) || ("undefined" !== typeof(CGroupShape) && elem instanceof CGroupShape))
-                {
-                    this.WriteGroup(elem, Document, oMapCommentId, oNumIdMap, copyParams);
-                }
-                else if ("undefined" !== typeof(CChartAsGroup) && elem instanceof CChartAsGroup)
-                {
-                    this.BinaryFileWriter.WriteChart(elem);
+                    case historyitem_type_Shape:
+                    {
+                        if(grObject.bWordShape)
+                        {
+                            this.WriteShape(elem, Document, oMapCommentId, oNumIdMap, copyParams);
+                        }
+                        else
+                        {
+                            this.WriteShape2(elem, Document, oMapCommentId, oNumIdMap, copyParams);
+                        }
+                        break;
+                    }
+                    case historyitem_type_ImageShape:
+                    {
+                        this.WriteImage(elem);
+                        break;
+                    }
+                    case historyitem_type_GroupShape:
+                    {
+                        this.WriteGroup(elem, Document, oMapCommentId, oNumIdMap, copyParams);
+                        break;
+                    }
+                    case historyitem_type_ChartSpace:
+                    {
+                        this.BinaryFileWriter.WriteChart(elem);
+                        break;
+                    }
                 }
 
                 _writer.EndRecord(0);

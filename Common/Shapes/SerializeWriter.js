@@ -1379,26 +1379,36 @@ function CBinaryFileWriter()
             for (var i = 0; i < _len; i++)
             {
                 oThis.StartRecord(0);
-
-                if (spTree[i] instanceof CShape)
+				
+				switch(spTree[i].getObjectType())
                 {
-                    oThis.WriteShape(spTree[i]);
-                }
-                else if(spTree[i] instanceof CImageShape)
-                {
-                    oThis.WriteImage(spTree[i]);
-                }
-                else if (spTree[i] instanceof CGroupShape)
-                {
-                    oThis.WriteGroupShape(spTree[i]);
-                }
-                else if (spTree[i] instanceof CGraphicFrame && spTree[i].graphicObject instanceof CTable)
-                {
-                    oThis.WriteTable(spTree[i]);
-                }
-                else if (typeof CChartAsGroup != "undefined" && spTree[i] instanceof CChartAsGroup)
-                {
-                    oThis.WriteChart(spTree[i]);
+                    case historyitem_type_Shape:
+                    {
+						oThis.WriteShape(spTree[i]);
+                        break;
+                    }
+                    case historyitem_type_ImageShape:
+                    {
+                        oThis.WriteImage(spTree[i]);
+                        break;
+                    }
+                    case historyitem_type_GroupShape:
+                    {
+                        oThis.WriteGroupShape(spTree[i]);
+                        break;
+                    }
+                    case historyitem_type_ChartSpace:
+                    {
+                        oThis.WriteChart(spTree[i]);
+                        break;
+                    }
+					default:
+					{
+						if (spTree[i] instanceof CGraphicFrame && spTree[i].graphicObject instanceof CTable)
+						{
+							oThis.WriteTable(spTree[i]);
+						}
+					}
                 }
 
                 oThis.EndRecord();
@@ -2608,7 +2618,7 @@ function CBinaryFileWriter()
         oThis.UseContinueWriter = true;
 
         var oBinaryChartWriter = new BinaryChartWriter(_memory);
-        oBinaryChartWriter.WriteChartContent(grObj);
+        oBinaryChartWriter.WriteCT_ChartSpace(grObj);
 
         oThis.ImData = _memory.ImData;
         oThis.data = _memory.data;
@@ -2905,27 +2915,37 @@ function CBinaryFileWriter()
             {
                 oThis.StartRecord(0);
 
-                if (spTree[i] instanceof CShape)
+				switch(spTree[i].getObjectType())
                 {
-                    oThis.WriteShape(spTree[i]);
+                    case historyitem_type_Shape:
+                    {
+						oThis.WriteShape(spTree[i]);
+                        break;
+                    }
+                    case historyitem_type_ImageShape:
+                    {
+                        oThis.WriteImage(spTree[i]);
+                        break;
+                    }
+                    case historyitem_type_GroupShape:
+                    {
+                        oThis.WriteGroupShape(spTree[i]);
+                        break;
+                    }
+                    case historyitem_type_ChartSpace:
+                    {
+                        oThis.WriteChart(spTree[i]);
+                        break;
+                    }
+					default:
+					{
+						if (spTree[i] instanceof CGraphicFrame && spTree[i].graphicObject instanceof CTable)
+						{
+							oThis.WriteTable(spTree[i]);
+						}
+					}
                 }
-                else if(spTree[i] instanceof CImageShape)
-                {
-                    oThis.WriteImage(spTree[i]);
-                }
-                else if (spTree[i] instanceof CGroupShape)
-                {
-                    oThis.WriteGroupShape(spTree[i]);
-                }
-                else if (spTree[i] instanceof CGraphicFrame && spTree[i].graphicObject instanceof CTable)
-                {
-                    oThis.WriteTable(spTree[i]);
-                }
-                else if (typeof CChartAsGroup != "undefined" && spTree[i] instanceof CChartAsGroup)
-                {
-                    oThis.WriteChart(spTree[i]);
-                }
-
+				
                 oThis.EndRecord(0);
             }
 

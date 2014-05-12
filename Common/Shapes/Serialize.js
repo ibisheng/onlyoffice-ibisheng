@@ -4845,23 +4845,22 @@ function BinaryPPTYLoader()
                     _stream.cur = s.cur;
                     _stream.size = s.size;
 
-                    // _chart = new CChartSpace();
-                    // var oBinaryChartReader = new BinaryChartReader(this.stream);
-                    // oBinaryChartReader.ExternalReadCT_ChartSpace(length, _chart);
-                    // if (_xfrm)
-                    // {
-                    // if (_chart.setXfrm)
-                    // {
-                    // _chart.setXfrm(_xfrm.offX, _xfrm.offY, _xfrm.extX, _xfrm.extY, _xfrm.rot, _xfrm.flipH, _xfrm.flipV);
-                    // }
-                    // else
-                    // {
-                    // _chart.setPosition(_xfrm.offX, _xfrm.offY);
-                    // _chart.setExtents(_xfrm.extX, _xfrm.extY);
-                    // }
-                    // }
-
-
+                    _chart = new CChartSpace();
+                    var oBinaryChartReader = new BinaryChartReader(this.stream);
+                    oBinaryChartReader.ExternalReadCT_ChartSpace(length, _chart);
+                    if (_xfrm)
+                    {
+						if (_chart.setXfrm)
+						{
+							_chart.setXfrm(_xfrm.offX, _xfrm.offY, _xfrm.extX, _xfrm.extY, _xfrm.rot, _xfrm.flipH, _xfrm.flipV);
+						}
+						else
+						{
+							_chart.setPosition(_xfrm.offX, _xfrm.offY);
+							_chart.setExtents(_xfrm.extX, _xfrm.extY);
+						}
+                    }
+					
                     s.Seek2(_pos + _length);
                     break;
                 }
@@ -4946,16 +4945,16 @@ function BinaryPPTYLoader()
                     var _length = s.GetLong();
                     var _pos = s.cur;
 
-                    if(typeof CChartAsGroup !== "undefined")
+                    if(typeof CChartSpace !== "undefined")
                     {
                         var _stream = new FT_Stream2();
                         _stream.data = s.data;
                         _stream.pos = s.pos;
                         _stream.cur = s.cur;
                         _stream.size = s.size;
-                        // _chart = new CChartSpace();
-                        // var oBinaryChartReader = new BinaryChartReader(this.stream);
-                        // oBinaryChartReader.ExternalReadCT_ChartSpace(length, _chart);
+                        _chart = new CChartSpace();
+                        var oBinaryChartReader = new BinaryChartReader(this.stream);
+                        oBinaryChartReader.ExternalReadCT_ChartSpace(length, _chart);
                     }
 
                     s.Seek2(_pos + _length);
