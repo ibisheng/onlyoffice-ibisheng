@@ -1414,7 +1414,7 @@ CopyProcessor.prototype =
                     {
                         oDocument = content;
                     }
-                    else if(oDocument.DrawingObjects.selection.groupSelection)
+                    else if(oDocument.DrawingObjects.selection.groupSelection && oDocument.DrawingObjects.selection.groupSelection.selectedObjects && oDocument.DrawingObjects.selection.groupSelection.selectedObjects.length)
                     {
 
                             var s_arr = oDocument.DrawingObjects.selection.groupSelection.selectedObjects;
@@ -1452,30 +1452,42 @@ CopyProcessor.prototype =
 
                             for(var i = 0; i < s_arr.length; ++i)
                             {
-                                var cur_element = s_arr[i];
-                                if(isRealObject(cur_element.parent))
+                                var paraDrawing = s_arr[i].parent ? s_arr[i].parent : s_arr[i].group.parent;
+								var graphicObj = s_arr[i];
+								
+                                if(isRealObject(paraDrawing.Parent))
                                 {
-                                    var base64_img = cur_element.getBase64Img();
+                                    var base64_img = paraDrawing.getBase64Img();
 
                                     if(copyPasteUseBinery)
                                     {
-                                        var wrappingType = oDocument.DrawingObjects.selection.groupSelection.parent.wrappingType;
+										var wrappingType = oDocument.DrawingObjects.selection.groupSelection.parent.wrappingType;
                                         var DrawingType = oDocument.DrawingObjects.selection.groupSelection.parent.DrawingType;
                                         var tempParagraph = new Paragraph(oDocument, oDocument, 0, 0, 0, 0, 0);
                                         var index = 0;
-                                        tempParagraph.Content.unshift(new ParaDrawing());
-                                        tempParagraph.Content[index].wrappingType = wrappingType;
-                                        tempParagraph.Content[index].DrawingType = DrawingType;
-                                        tempParagraph.Content[index].GraphicObj = cur_element;
+										
+										tempParagraph.Content.unshift(new ParaRun());
+										
+										var paraRun = tempParagraph.Content[index];
+                                        paraRun.Content.unshift(new ParaDrawing());
+                                        paraRun.Content[index].wrappingType = wrappingType;
+                                        paraRun.Content[index].DrawingType = DrawingType;
+                                        paraRun.Content[index].GraphicObj = graphicObj;
+										
+										paraRun.Selection.EndPos = index + 1;
+										paraRun.Selection.StartPos = index;
+										paraRun.Selection.Use = true;
+										
                                         tempParagraph.Selection.EndPos = index + 1;
                                         tempParagraph.Selection.StartPos = index;
-                                        tempParagraph.Selection.Use = true;
+										tempParagraph.Selection.Use = true;
+										tempParagraph.bFromDocument = true;
 
                                         this.oBinaryFileWriter.CopyParagraph(tempParagraph);
-                                    }
+                                    };
 
                                     var src = this.getSrc(base64_img);
-                                    this.Para.innerHTML += "<img style=\"max-width:100%;\" width=\""+Math.round(cur_element.absExtX * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(cur_element.absExtY * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" />";
+                                    this.Para.innerHTML += "<img style=\"max-width:100%;\" width=\""+Math.round(paraDrawing.absExtX * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(paraDrawing.absExtY * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" />";
 
                                     this.ElemToSelect.appendChild( this.Para );
                                 }
@@ -1516,11 +1528,6 @@ CopyProcessor.prototype =
                             if(copyPasteUseBinery)
                             {
                                 var paragraph = cur_element.Parent;
-                                selectionTrue =
-                                {
-                                    EndPos : paragraph.Selection.EndPos,
-                                    StartPos: paragraph.Selection.StartPos
-                                };
                                 
 								var inIndex;
 								var paragraphIndex;
@@ -1539,9 +1546,6 @@ CopyProcessor.prototype =
 											break;
 										};
 									};
-									
-									if(inIndex != undefined)
-										break;
                                 };
 								
 								selectionTrue =
@@ -1569,7 +1573,6 @@ CopyProcessor.prototype =
 								
 								paragraph.Selection.StartPos = selectionTrue.StartPosParagraph;
                                 paragraph.Selection.EndPos = selectionTrue.EndPosParagraph;
-
                             }
                         }
                         
