@@ -681,10 +681,7 @@ CGroupShape.prototype =
             var i;
             if(paraItem.Type === para_TextPr)
             {
-                for(i = 0; i < this.selectedObjects.length; ++i)
-                {
-                    this.selectedObjects[i].applyTextPr(paraItem, bRecalculate);
-                }
+                DrawingObjectsController.prototype.applyDocContentFunction.call(this, CDocumentContent.prototype.Paragraph_Add, [paraItem, bRecalculate]);
             }
             else if(this.selectedObjects.length === 1
                 && this.selectedObjects[0].getObjectType() === historyitem_type_Shape
@@ -859,7 +856,7 @@ CGroupShape.prototype =
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
         if(this.drawingBase)
         {
-            this.drawingBase.setGraphicObjectCoords();
+            this.drawingBase.updateAnchorPosition();
         }
     },
 
@@ -1849,6 +1846,21 @@ CGroupShape.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            {
+                addToDrawings(this.worksheet, this, data.oldPr);
+                break;
+            }
+            case historyitem_AutoShapes_AddToDrawingObjects:
+            {
+                deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
+                break;
+            }
+            case historyitem_AutoShapes_SetWorksheet:
+            {
+                this.worksheet = data.oldPr;
+                break;
+            }
             case historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = data.oldPr;
@@ -1896,6 +1908,21 @@ CGroupShape.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            {
+                deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
+                break;
+            }
+            case historyitem_AutoShapes_AddToDrawingObjects:
+            {
+                addToDrawings(this.worksheet, this, data.oldPr);
+                break;
+            }
+            case historyitem_AutoShapes_SetWorksheet:
+            {
+                this.worksheet = data.newPr;
+                break;
+            }
             case historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = data.newPr;
@@ -1951,6 +1978,24 @@ CGroupShape.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
+            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            {
+                break;
+            }
+            case historyitem_AutoShapes_AddToDrawingObjects:
+            {
+                writeLong(w, data.oldPr);
+                break;
+            }
+            case historyitem_AutoShapes_SetWorksheet:
+            {
+                writeBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    writeString(data.newPr.getId());
+                }
+                break;
+            }
             case historyitem_GroupShapeAddToSpTree:
             case historyitem_GroupShapeRemoveFromSpTree:
             {
@@ -1979,7 +2024,34 @@ CGroupShape.prototype =
         var type  = r.GetLong();
         switch (type)
         {
-
+            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            {
+                deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
+                break;
+            }
+            case historyitem_AutoShapes_AddToDrawingObjects:
+            {
+                var pos = readLong(r);
+                addToDrawings(this.worksheet, this, pos);
+                break;
+            }
+            case historyitem_AutoShapes_SetWorksheet:
+            {
+                if(readBool(r))
+                {
+                    var api = window["Asc"]["editor"];
+                    if ( api.wb )
+                    {
+                        var id = readString(r);
+                        this.worksheet = api.wbModel.getWorksheetById(id);
+                    }
+                }
+                else
+                {
+                    this.worksheet = null;
+                }
+                break;
+            }
             case historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = readBool(r);

@@ -1,6 +1,9 @@
 ﻿"use strict";
 
 var historyitem_ChartFormatSetChart = 1;
+var historyitem_AutoShapes_SetWorksheet = 2;
+var historyitem_AutoShapes_AddToDrawingObjects = 3;
+var historyitem_AutoShapes_RemoveFromDrawingObjects = 4;
 var historyitem_ColorMod_SetName = 2001;
 var historyitem_ColorMod_SetVal = 2002;
 var historyitem_ColorModifiers_AddColorMod = 2003;

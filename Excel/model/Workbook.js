@@ -1742,7 +1742,21 @@ function Woorksheet(wb, _index, sId){
 	
 	this.nMaxRowId = 1;
 	this.nMaxColId = 1;
+
+    this.contentChanges = new CContentChanges();
 }
+
+Woorksheet.prototype.addContentChanges = function(changes)
+{
+    this.contentChanges.Add(changes);
+};
+
+Woorksheet.prototype.refreshContentChanges = function()
+{
+    this.contentChanges.Refresh();
+    this.contentChanges.Clear();
+};
+
 Woorksheet.prototype.rebuildColors=function(){
 	this._forEachCell(function(cell){
 		cell.cleanCache();

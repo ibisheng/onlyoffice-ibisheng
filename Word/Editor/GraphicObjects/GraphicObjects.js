@@ -1462,24 +1462,7 @@ CGraphicObjects.prototype =
         return true;
     },
 
-    canUnGroup: function(bRetArray)
-    {
-        var _arr_selected_objects = this.selectedObjects;
-        var ret_array = [];
-        for(var _index = 0; _index < _arr_selected_objects.length; ++_index)
-        {
-            if(_arr_selected_objects[_index].getObjectType() === historyitem_type_GroupShape && !_arr_selected_objects[_index].parent.Is_Inline())
-            {
-                if(!(bRetArray === true))
-                    return true;
-                ret_array.push(_arr_selected_objects[_index]);
-
-            }
-        }
-        return bRetArray === true ? ret_array : false;
-    },
-
-
+    canUnGroup: DrawingObjectsController.prototype.canUnGroup,
     getBoundsForGroup: DrawingObjectsController.prototype.getBoundsForGroup,
 
 

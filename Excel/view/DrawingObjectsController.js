@@ -179,14 +179,27 @@ DrawingObjectsController.prototype.endTrackNewShape = function()
     this.arrTrackObjects.length = 0;
     this.changeCurrentState(new NullState(this));
     this.resetSelection();
-    this.selectObject(shape);
+    this.selectObject(shape, 0);
     this.startRecalculate();
 };
-DrawingObjectsController.prototype.recalculate = function()
+DrawingObjectsController.prototype.recalculate = function(bAll, Point)
 {
-    for(var key in this.objectsForRecalculate)
+
+    History.Get_RecalcData(Point);//Только для таблиц
+    if(bAll)
     {
-        this.objectsForRecalculate[key].recalculate();
+        var drawings = this.getDrawingObjects();
+        for(var i = 0; i < drawings.length; ++i)
+        {
+            drawings[i].recalculate();
+        }
+    }
+    else
+    {
+        for(var key in this.objectsForRecalculate)
+        {
+            this.objectsForRecalculate[key].recalculate();
+        }
     }
     this.objectsForRecalculate = {};
 };
@@ -200,9 +213,9 @@ DrawingObjectsController.prototype. getTheme = function()
 
 DrawingObjectsController.prototype.startRecalculate = function()
 {
-    History.Get_RecalcData();//Только для таблиц
     this.recalculate();
     this.drawingObjects.showDrawingObjects(true);
+    this.updateSelectionState();
 };
 
 DrawingObjectsController.prototype.getDrawingObjects = function()
@@ -286,9 +299,10 @@ DrawingObjectsController.prototype.createGroup = function()
         group_array[i].deleteDrawingBase();
     }
     this.resetSelection();
+    group.setWorksheet(this.drawingObjects.getWorksheetModel());
     group.setDrawingObjects(this.drawingObjects);
     group.addToDrawingObjects();
-    this.selectObject(group);
+    this.selectObject(group, 0);
     group.addToRecalculate();
     this.startRecalculate();
 };
@@ -324,8 +338,9 @@ DrawingObjectsController.prototype.addChartDrawingObject = function(asc_chart, o
         chart.spPr.xfrm.setExtY(h);
 
         chart.setDrawingObjects(this.drawingObjects);
+        chart.setWorksheet(this.drawingObjects.getWorksheetModel());
         chart.addToDrawingObjects();
-        this.selectObject(chart);
+        this.selectObject(chart, 0);
         chart.addToRecalculate();
         this.startRecalculate();
     }
@@ -349,9 +364,10 @@ DrawingObjectsController.prototype.addImageFromParams = function(rasterImageId, 
     History.Create_NewPoint();
     var image = this.createImage(rasterImageId, x, y, extX, extY);
     this.resetSelection();
+    image.setWorksheet(this.drawingObjects.getWorksheetModel());
     image.setDrawingObjects(this.drawingObjects);
     image.addToDrawingObjects();
-    this.selectObject(image);
+    this.selectObject(image, 0);
     image.addToRecalculate();
     this.startRecalculate();
 }

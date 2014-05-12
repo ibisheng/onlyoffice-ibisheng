@@ -34,7 +34,6 @@ CShape.prototype.setRecalculateInfo = function()
     this.localTransformText = new CMatrix();
 };
 
-
 CShape.prototype.recalcContent = function()
 {
     this.recalcInfo.recalcContent = true;

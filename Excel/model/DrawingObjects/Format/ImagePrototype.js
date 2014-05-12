@@ -15,6 +15,8 @@ CImageShape.prototype.deselect = CShape.prototype.deselect;
 CImageShape.prototype.hitToHandles = CShape.prototype.hitToHandles;
 CImageShape.prototype.hitInBoundingRect = CShape.prototype.hitInBoundingRect;
 CImageShape.prototype.getRotateAngle = CShape.prototype.getRotateAngle;
+CImageShape.prototype.setWorksheet = CShape.prototype.setWorksheet;
+CImageShape.prototype.getDrawingObjectsController = CShape.prototype.getDrawingObjectsController;
 
 CImageShape.prototype.setRecalculateInfo = function()
 {

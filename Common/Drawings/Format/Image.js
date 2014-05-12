@@ -881,6 +881,21 @@ CImageShape.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            {
+                addToDrawings(this.worksheet, this, data.oldPr);
+                break;
+            }
+            case historyitem_AutoShapes_AddToDrawingObjects:
+            {
+                deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
+                break;
+            }
+            case historyitem_AutoShapes_SetWorksheet:
+            {
+                this.worksheet = data.oldPr;
+                break;
+            }
             case historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = data.oldPr;
@@ -914,12 +929,25 @@ CImageShape.prototype =
         }
     },
 
-
-
     Redo: function(data)
     {
         switch(data.Type)
         {
+            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            {
+                deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
+                break;
+            }
+            case historyitem_AutoShapes_AddToDrawingObjects:
+            {
+                addToDrawings(this.worksheet, this, data.oldPr);
+                break;
+            }
+            case historyitem_AutoShapes_SetWorksheet:
+            {
+                this.worksheet = data.newPr;
+                break;
+            }
             case historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = data.newPr;
@@ -958,6 +986,24 @@ CImageShape.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
+            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            {
+                break;
+            }
+            case historyitem_AutoShapes_AddToDrawingObjects:
+            {
+                writeLong(w, data.oldPr);
+                break;
+            }
+            case historyitem_AutoShapes_SetWorksheet:
+            {
+                writeBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    writeString(data.newPr.getId());
+                }
+                break;
+            }
             case historyitem_ImageShapeSetNvPicPr:
             case historyitem_ImageShapeSetSpPr:
             case historyitem_ImageShapeSetBlipFill:
@@ -980,7 +1026,34 @@ CImageShape.prototype =
         var type = r.GetLong();
         switch(type)
         {
-
+            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            {
+                deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
+                break;
+            }
+            case historyitem_AutoShapes_AddToDrawingObjects:
+            {
+                var pos = readLong(r);
+                addToDrawings(this.worksheet, this, pos);
+                break;
+            }
+            case historyitem_AutoShapes_SetWorksheet:
+            {
+                if(readBool(r))
+                {
+                    var api = window["Asc"]["editor"];
+                    if ( api.wb )
+                    {
+                        var id = readString(r);
+                        this.worksheet = api.wbModel.getWorksheetById(id);
+                    }
+                }
+                else
+                {
+                    this.worksheet = null;
+                }
+                break;
+            }
             case historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = readBool(r);

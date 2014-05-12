@@ -5226,7 +5226,7 @@
             else if ( c_oSerWorksheetsTypes.Drawings == type )
             {
                 res = this.bcr.Read1(length, function(t,l){
-                    return oThis.ReadDrawings(t,l, oWorksheet.Drawings, oWorksheet.Id);
+                    return oThis.ReadDrawings(t,l, oWorksheet.Drawings, oWorksheet);
                 });
             }
             else if ( c_oSerWorksheetsTypes.Autofilter == type )
@@ -5611,7 +5611,7 @@
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };
-        this.ReadDrawings = function(type, length, aDrawings, wsId)
+        this.ReadDrawings = function(type, length, aDrawings, ws)
         {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
@@ -5631,6 +5631,10 @@
                         oNewDrawing.Type = ECellAnchorType.cellanchorOneCell;
                     else if(false != oFlags.pos && false != oFlags.ext)
                         oNewDrawing.Type = ECellAnchorType.cellanchorAbsolute;
+                    if(oNewDrawing.graphicObject)
+                    {
+                        oNewDrawing.graphicObject.setWorksheet(ws);
+                    }
                     aDrawings.push(oNewDrawing);
                 }
             }

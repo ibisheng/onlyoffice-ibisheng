@@ -170,7 +170,10 @@ DrawingObjectsController.prototype =
                         this.changeCurrentState(new PreRotateState(this, selectedObject));
                     }
                     else
+                    {
+                        group.resetInternalSelection();
                         this.changeCurrentState(new PreRotateInGroupState(this, group, selectedObject));
+                    }
                 }
             }
             else
@@ -189,7 +192,10 @@ DrawingObjectsController.prototype =
                         this.changeCurrentState(new PreResizeState(this, selectedObject, card_direction));
                     }
                     else
+                    {
+                        group.resetInternalSelection();
                         this.changeCurrentState(new PreResizeInGroupState(this, group, selectedObject, card_direction));
+                    }
                 }
             }
             return true;
@@ -2323,9 +2329,9 @@ DrawingObjectsController.prototype =
         {
             text_object = this.selection.textSelection;
         }
-        else if(this.selection.groupSelection && this.selection.groupSelection.textSelection)
+        else if(this.selection.groupSelection && this.selection.groupSelection.selection.textSelection)
         {
-            text_object = this.selection.groupSelection.textSelection;
+            text_object = this.selection.groupSelection.selection.textSelection;
         }
         if(isRealObject(text_object))
         {
@@ -2753,7 +2759,7 @@ DrawingObjectsController.prototype =
 
     onKeyDown: function(e)
     {
-		// TODO!!! var ctrlKey = e.metaKey || e.ctrlKey
+        // TODO!!! var ctrlKey = e.metaKey || e.ctrlKey
 
         var drawingObjectsController = this;
         var bRetValue = false;
@@ -3306,78 +3312,51 @@ DrawingObjectsController.prototype =
     unGroupCallback: function()
     {
         History.Create_NewPoint();
-        if(isRealObject(this.curState.group) )
+        var ungroup_arr = this.canUnGroup(true);
+        if(ungroup_arr.length > 0)
         {
-            this.curState.group.resetSelection();
-        }
-
-        if(isRealObject(this.curState.chart) )
-        {
-            this.curState.chart.resetSelection();
-        }
-        var selected_objects = this.selectedObjects;
-        var ungrouped_objects = [];
-        for(var i = 0; i < selected_objects.length; ++i)
-        {
-            if(selected_objects[i].isGroup() && selected_objects[i].canUnGroup())
+            History.Create_NewPoint();
+            this.resetSelection();
+            var i, j,   cur_group, sp_tree, sp;
+            var a_objects = [];
+            for(i = 0; i < ungroup_arr.length; ++i)
             {
-                ungrouped_objects.push(selected_objects[i]);
-
-            }
-        }
-        var drawing_bases = this.drawingObjects.getDrawingObjects();
-        this.resetSelection();
-        for(i = 0; i < ungrouped_objects.length; ++i)
-        {
-            var cur_group = ungrouped_objects[i];
-            var start_position = null;
-            for(var j = 0; j < drawing_bases.length; ++j)
-            {
-                if(drawing_bases[j].graphicObject === cur_group)
+                cur_group = ungroup_arr[i];
+                sp_tree = cur_group.spTree;
+                for(j = 0; j < sp_tree.length; ++j)
                 {
-                    start_position = j;
-                    break;
+                    sp = sp_tree[j];
+                    sp.spPr.xfrm.setRot(normalizeRotate(sp.rot + cur_group.rot));
+                    sp.spPr.xfrm.setOffX(sp.spPr.xfrm.offX + cur_group.spPr.xfrm.offX);
+                    sp.spPr.xfrm.setOffY(sp.spPr.xfrm.offY + cur_group.spPr.xfrm.offY);
+                    sp.spPr.xfrm.setFlipH(cur_group.spPr.xfrm.flipH === true ? !(sp.spPr.xfrm.flipH === true) : sp.spPr.xfrm.flipH === true);
+                    sp.spPr.xfrm.setFlipV(cur_group.spPr.xfrm.flipV === true ? !(sp.spPr.xfrm.flipV === true) : sp.spPr.xfrm.flipV === true);
+                    sp.setGroup(null);
+                    sp.addToDrawingObjects();
+                    this.selectObject(sp, 0);
                 }
+                cur_group.deleteDrawingBase();
             }
-            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateUndo, null, null,
-                new UndoRedoDataGraphicObjects(ungrouped_objects[i].Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
-            cur_group.deleteDrawingBase();
-            var ungrouped_sp_tree = ungrouped_objects[i].getUnGroupedSpTree();
-
-            // Блокируем дочерние объекты
-            var _this = this;
-            this.drawingObjects.objectLocker.reset();
-
-            var callbackUngroupedObjects = function (result) {
-                if ( result ) {
-                    for (var j = 0; j < ungrouped_sp_tree.length; ++j) {
-                        ungrouped_sp_tree[j].recalculateTransform();
-                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(ungrouped_sp_tree[j].Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
-                        ungrouped_sp_tree[j].addToDrawingObjects(start_position + j);
-                        ungrouped_sp_tree[j].select(_this);
-
-                    }
-                }
-            }
-
-            for(var j = 0; j < ungrouped_sp_tree.length; ++j)
-            {
-                this.drawingObjects.objectLocker.addObjectId(ungrouped_sp_tree[j].Get_Id());
-            }
-            this.drawingObjects.objectLocker.checkObjects(callbackUngroupedObjects);
+            this.startRecalculate();
         }
-        this.changeCurrentState(new NullState(this, this.drawingObjects));
-        this.drawingObjects.OnUpdateOverlay();
     },
 
-    canUnGroup: function()
+    canUnGroup: function(bRetArray)
     {
-        for (var i = 0; i < this.selectedObjects.length; i++)
+        var _arr_selected_objects = this.selectedObjects;
+        var ret_array = [];
+        for(var _index = 0; _index < _arr_selected_objects.length; ++_index)
         {
-            if (this.selectedObjects[i].isGroup())
-                return true;
+            if(_arr_selected_objects[_index].getObjectType() === historyitem_type_GroupShape
+                && (!_arr_selected_objects[_index].parent || _arr_selected_objects[_index].parent && !_arr_selected_objects[_index].parent.Is_Inline()))
+            {
+                if(!(bRetArray === true))
+                    return true;
+                ret_array.push(_arr_selected_objects[_index]);
+
+            }
         }
-        return false;
+        return bRetArray === true ? ret_array : false;
     },
 
     startTrackNewShape: function(presetGeom)
@@ -3669,7 +3648,7 @@ DrawingObjectsController.prototype =
             shape_props.ShapeProperties.fill = CreateAscFillEx(shape_props.ShapeProperties.fill);
             shape_props.ShapeProperties.stroke = CreateAscStrokeEx(shape_props.ShapeProperties.stroke);
             shape_props.ShapeProperties.stroke.canChangeArrows  = shape_props.ShapeProperties.canChangeArrows === true;
-            shape_props.IsLocked = false;
+            //shape_props.Locked = false;
             ret.push(shape_props);
         }
         if (isRealObject(props.imageProps))
@@ -3678,7 +3657,7 @@ DrawingObjectsController.prototype =
             image_props.Width = props.imageProps.w;
             image_props.Height = props.imageProps.h;
             image_props.ImageUrl = props.imageProps.imageUrl;
-            image_props.IsLocked = false;//TODO!(props.imageProps.lockType === c_oAscLockTypes.kLockTypeNone);
+            //image_props.Locked = false;//TODO!(props.imageProps.lockType === c_oAscLockTypes.kLockTypeNone);
             ret.push(image_props);
         }
         if (isRealObject(chart_props))

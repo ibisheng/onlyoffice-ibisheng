@@ -164,6 +164,7 @@ function CShape()
 
     this.localTransform = new CMatrix();
     this.localTransformText = new CMatrix();
+    this.worksheet = null;
 
     this.setRecalculateInfo();
 
@@ -2097,7 +2098,7 @@ CShape.prototype =
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
         if(this.drawingBase)
         {
-            this.drawingBase.setGraphicObjectCoords();
+            this.drawingBase.updateAnchorPosition();
         }
         this.localTransform = this.transform.CreateDublicate();
     },
@@ -2152,16 +2153,26 @@ CShape.prototype =
                 }
                 else
                 {
-                    this.x = 0;
-                    this.y = 0;
                     var extX, extY;
                     if(this.parent && this.parent.Extent)
                     {
+                        this.x = 0;
+                        this.y = 0;
                         extX = this.parent.Extent.W;
                         extY = this.parent.Extent.H;
                     }
+                    else if(this.drawingBase)
+                    {
+                        var metrics = this.drawingBase.getGraphicObjectMetrics();
+                        this.x = metrics.x;
+                        this.y = metrics.y;
+                        extX = metrics.extX;
+                        extY = metrics.extY;
+                    }
                     else
                     {
+                        this.x = 0;
+                        this.y = 0;
                         extX = 5;
                         extY = 5;
                     }
@@ -3130,7 +3141,7 @@ CShape.prototype =
             graphics.transform3(transform_text);
             this.txBody.draw(graphics);
             /*if (graphics.FreeFont !== undefined)
-                graphics.FreeFont(); */
+             graphics.FreeFont(); */
 
             /*var _masrgins = this.getMargins();
              graphics.reset();
@@ -3736,6 +3747,9 @@ CShape.prototype =
 
     Refresh_RecalcData: function (data)
     {
+        //this.recalcTxBoxContent();
+        //this.recalcTransformText();
+        this.Refresh_RecalcData2();
     },
 
     Refresh_RecalcData2: function(pageIndex/*для текста*/)
@@ -3745,10 +3759,26 @@ CShape.prototype =
         this.addToRecalculate();
     },
 
-    Undo: function (data) {
-
+    Undo: function (data)
+    {
         switch (data.Type)
         {
+            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            {
+                addToDrawings(this.worksheet, this, data.oldPr);
+                break;
+            }
+
+            case historyitem_AutoShapes_AddToDrawingObjects:
+            {
+                deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
+                break;
+            }
+            case historyitem_AutoShapes_SetWorksheet:
+            {
+                this.worksheet = data.oldPr;
+                break;
+            }
             case historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = data.oldPr;
@@ -3806,6 +3836,21 @@ CShape.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            {
+                deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
+                break;
+            }
+            case historyitem_AutoShapes_AddToDrawingObjects:
+            {
+                addToDrawings(this.worksheet, this, data.oldPr);
+                break;
+            }
+            case historyitem_AutoShapes_SetWorksheet:
+            {
+                this.worksheet = data.newPr;
+                break;
+            }
             case historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = data.newPr;
@@ -3865,6 +3910,24 @@ CShape.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            {
+                break;
+            }
+            case historyitem_AutoShapes_AddToDrawingObjects:
+            {
+                writeLong(w, data.oldPr);
+                break;
+            }
+            case historyitem_AutoShapes_SetWorksheet:
+            {
+                writeBool(w, isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    writeString(w, data.newPr.getId());
+                }
+                break;
+            }
             case historyitem_ShapeSetNvSpPr:
             case historyitem_ShapeSetSpPr:
             case historyitem_ShapeSetStyle:
@@ -3894,7 +3957,34 @@ CShape.prototype =
             var type = r.GetLong();
             switch (r.GetLong())
             {
-
+                case historyitem_AutoShapes_RemoveFromDrawingObjects:
+                {
+                    deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
+                    break;
+                }
+                case historyitem_AutoShapes_AddToDrawingObjects:
+                {
+                    var pos = readLong(r);
+                    addToDrawings(this.worksheet, this, pos);
+                    break;
+                }
+                case historyitem_AutoShapes_SetWorksheet:
+                {
+                    if(readBool(r))
+                    {
+                        var api = window["Asc"]["editor"];
+                        if ( api.wb )
+                        {
+                            var id = readString(r);
+                            this.worksheet = api.wbModel.getWorksheetById(id);
+                        }
+                    }
+                    else
+                    {
+                        this.worksheet = null;
+                    }
+                    break;
+                }
                 case historyitem_ShapeSetBDeleted:
                 {
                     this.bDeleted = readBool(r);

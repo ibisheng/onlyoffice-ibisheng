@@ -4,6 +4,7 @@ CChartSpace.prototype.addToDrawingObjects =  CShape.prototype.addToDrawingObject
 CChartSpace.prototype.setDrawingObjects = CShape.prototype.setDrawingObjects;
 CChartSpace.prototype.setDrawingBase = CShape.prototype.setDrawingBase;
 CChartSpace.prototype.deleteDrawingBase = CShape.prototype.deleteDrawingBase;
+CChartSpace.prototype.getDrawingObjectsController = CShape.prototype.getDrawingObjectsController;
 
 CChartSpace.prototype.recalculateTransform = CShape.prototype.recalculateTransform;
 CChartSpace.prototype.recalculateBounds = CShape.prototype.recalculateBounds;
@@ -23,6 +24,7 @@ CChartSpace.prototype.check_bounds = CShape.prototype.check_bounds;
 CChartSpace.prototype.normalize = CShape.prototype.normalize;
 CChartSpace.prototype.getFullFlipH = CShape.prototype.getFullFlipH;
 CChartSpace.prototype.getFullFlipV = CShape.prototype.getFullFlipV;
+CChartSpace.prototype.setWorksheet = CShape.prototype.setWorksheet;
 
 CChartSpace.prototype.setRecalculateInfo = function()
 {

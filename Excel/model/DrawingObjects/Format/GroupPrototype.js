@@ -27,7 +27,13 @@ CGroupShape.prototype.setRecalculateInfo = function()
 
 CGroupShape.prototype.recalcTransform = function()
 {
+
+    this.recalcInfo.recalculateScaleCoefficients = true;
     this.recalcInfo.recalculateTransform = true;
+    for(var i = 0; i < this.spTree.length; ++i)
+    {
+        this.spTree[i].recalcTransform();
+    }
 };
 
 CGroupShape.prototype.recalcBounds = function()
@@ -36,6 +42,7 @@ CGroupShape.prototype.recalcBounds = function()
 };
 
 CGroupShape.prototype.addToDrawingObjects =  CShape.prototype.addToDrawingObjects;
+CGroupShape.prototype.getDrawingObjectsController =  CShape.prototype.getDrawingObjectsController;
 CGroupShape.prototype.setDrawingObjects = function(drawingObjects)
 {
     this.drawingObjects = drawingObjects;
@@ -43,7 +50,18 @@ CGroupShape.prototype.setDrawingObjects = function(drawingObjects)
     {
         this.spTree[i].setDrawingObjects(drawingObjects);
     }
-}
+};
+
+CGroupShape.prototype.setWorksheet = function(worksheet)
+{
+    History.Add(this, {Type: historyitem_AutoShapes_SetWorksheet, oldPr: this.worksheet, newPr: worksheet});
+    this.worksheet = worksheet;
+    for(var i = 0; i < this.spTree.length; ++i)
+    {
+        this.spTree[i].setWorksheet(worksheet);
+    }
+};
+
 CGroupShape.prototype.setDrawingBase = CShape.prototype.setDrawingBase;
 CGroupShape.prototype.deleteDrawingBase = CShape.prototype.deleteDrawingBase;
 CGroupShape.prototype.addToRecalculate = CShape.prototype.addToRecalculate;
@@ -116,10 +134,12 @@ CGroupShape.prototype.handleUpdatePosition = function()
             this.spTree[i].recalcTransform();
         }
     }
+    this.addToRecalculate();
 };
 CGroupShape.prototype.handleUpdateExtents = function()
 {
     this.recalcTransform();
+    this.addToRecalculate();
 };
 CGroupShape.prototype.handleUpdateRot = CGroupShape.prototype.handleUpdatePosition;
 CGroupShape.prototype.handleUpdateFlip = CGroupShape.prototype.handleUpdatePosition;

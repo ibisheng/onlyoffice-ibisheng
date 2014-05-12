@@ -350,6 +350,7 @@ function CHistory(workbook)
 	this.IsModify = false;
     this.TurnOffHistory = 0;
 	this.Transaction = 0;
+    this.RecIndex = -1;
 }
 CHistory.prototype =
 {
@@ -429,6 +430,14 @@ CHistory.prototype =
 				isReInit = true;
 			if (g_oUndoRedoGraphicObjects === Item.Class)
 				isRedrawAll = false;
+        }
+        var wsViews = Asc.editor.wb.wsViews;
+        for(var i = 0; i < wsViews.length; ++i)
+        {
+            if(wsViews[i])
+            {
+                wsViews[i].objectRender.controller.recalculate(undefined, Point);
+            }
         }
 		gUndoInsDelCellsFlag = true;
 		for(var i in Point.UpdateRigions)
@@ -514,6 +523,15 @@ CHistory.prototype =
 				oRedoObjectParam.oChangeWorksheetUpdate[Item.SheetId] = Item.SheetId;
 			}
         }
+        var wsViews = Asc.editor.wb.wsViews;
+        for(var i = 0; i < wsViews.length; ++i)
+        {
+            if(wsViews[i])
+            {
+                wsViews[i].objectRender.controller.recalculate(undefined, Point);
+            }
+        }
+
         // Восстанавливаем состояние на следующую точку
         var State = null;
         if ( this.Index === this.Points.length - 1 )
@@ -587,26 +605,101 @@ CHistory.prototype =
 		
 		this.RedoEnd(Point, oRedoObjectParam);
 	},
-   
-	Get_RecalcData : function()
-    {
-        if ( this.Index >= 0 )
-        {
-            // Считываем изменения, начиная с последней точки, и смотрим что надо пересчитать.
-            var Point = this.CurPoint;
 
-            // Выполняем все действия в прямом порядке
-            for ( var Index = 0; Index < Point.Items.length; Index++ )
+    Get_RecalcData : function(Point2)
+    {
+        //if ( this.Index >= 0 )
+        {
+            //for ( var Pos = this.RecIndex + 1; Pos <= this.Index; Pos++ )
             {
-                var Item = Point.Items[Index];
-				if(Item.Class.Refresh_RecalcData)
-					Item.Class.Refresh_RecalcData( Item.Data );
+                // Считываем изменения, начиная с последней точки, и смотрим что надо пересчитать.
+                var Point;
+                if(Point2)
+                {
+                    Point = Point2;
+                }
+                else
+                {
+                    Point = this.CurPoint;
+                }
+                if(Point)
+                {
+                    // Выполняем все действия в прямом порядке
+                    for ( var Index = 0; Index < Point.Items.length; Index++ )
+                    {
+                        var Item = Point.Items[Index];
+
+                        if ( /*true === Item.NeedRecalc*/Item.Class.Refresh_RecalcData )
+                            Item.Class.Refresh_RecalcData( Item.Data );
+                    }
+                }
             }
         }
     },
 
+    Reset_RecalcIndex : function()
+    {
+        this.RecIndex = this.Index;
+    },
+
+
     Set_Additional_ExtendDocumentToPos: function()
     {},
+
+
+    Check_UninonLastPoints : function()
+    {
+        // Не объединяем точки истории, если на предыдущей точке произошло сохранение
+        if ( this.Points.length < 2)
+            return;
+
+        var Point1 = this.Points[this.Points.length - 2];
+        var Point2 = this.Points[this.Points.length - 1];
+
+        // Не объединяем слова больше 63 элементов
+        if ( Point1.Items.length > 63 )
+            return;
+
+        var PrevItem = null;
+        var Class = null;
+        for ( var Index = 0; Index < Point1.Items.length; Index++ )
+        {
+            var Item = Point1.Items[Index];
+
+            if ( null === Class )
+                Class = Item.Class;
+            else if ( Class != Item.Class || "undefined" === typeof(Class.Check_HistoryUninon) || false === Class.Check_HistoryUninon(PrevItem.Data, Item.Data) )
+                return;
+
+            PrevItem = Item;
+        }
+
+        for ( var Index = 0; Index < Point2.Items.length; Index++ )
+        {
+            var Item = Point2.Items[Index];
+
+            if ( Class != Item.Class || "undefined" === typeof(Class.Check_HistoryUninon) || false === Class.Check_HistoryUninon(PrevItem.Data, Item.Data) )
+                return;
+
+            PrevItem = Item;
+        }
+
+        var NewPoint =
+        {
+            State : Point1.State,
+            Items : Point1.Items.concat(Point2.Items),
+            Time  : Point1.Time,
+            Additional : {}
+        };
+
+        this.Points.splice( this.Points.length - 2, 2, NewPoint );
+        if ( this.Index >= this.Points.length )
+        {
+            var DiffIndex = -this.Index + (this.Points.length - 1);
+            this.Index    += DiffIndex;
+            this.RecIndex += Math.max( -1, this.RecIndex + DiffIndex);
+        }
+    },
 	
 	Create_NewPoint : function()
     {
@@ -639,8 +732,10 @@ CHistory.prototype =
         if ( null == this.CurPoint )
             return;
 		var oCurPoint = this.CurPoint;
-		
+
         var Item;
+        if ( this.RecIndex >= this.Index )
+            this.RecIndex = this.Index - 1;
 		
 		if(!Class.Save_Changes)
 		{

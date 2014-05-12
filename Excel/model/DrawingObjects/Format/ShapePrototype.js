@@ -4,36 +4,119 @@ var G_O_DEFAULT_COLOR_MAP = GenerateDefaultColorMap();
 
 CShape.prototype.setDrawingObjects = function(drawingObjects)
 {
-    if ( isRealObject(drawingObjects) && drawingObjects.getWorksheet() )
+};
+CShape.prototype.setWorksheet = function(worksheet)
+{
+    History.Add(this, {Type: historyitem_AutoShapes_SetWorksheet, oldPr: this.worksheet, newPr: worksheet});
+    this.worksheet = worksheet;
+    if(this.spTree)
     {
-        var newValue = drawingObjects.getWorksheet().model.getId();
-        var oldValue = isRealObject(this.drawingObjects) ? this.drawingObjects.getWorksheet().model.getId() : null;
-        // History.Add(this, {Type: historyitem_AutoShapes_SetDrawingObjects, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
-        this.drawingObjects = drawingObjects;
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            this.spTree[i].setWorksheet(worksheet);
+        }
     }
 };
 CShape.prototype.setDrawingBase = function(drawingBase)
 {
     this.drawingBase = drawingBase;
 };
+
+CShape.prototype.getDrawingObjectsController = function()
+{
+    var wsViews = Asc.editor && Asc.editor.wb && Asc.editor.wb.wsViews;
+    if(wsViews)
+    {
+        for(var i = 0; i < wsViews.length; ++i)
+        {
+            if(wsViews[i] && wsViews[i].model === this.worksheet)
+                return wsViews[i].objectRender.controller;
+        }
+    }
+    return null;
+};
+
+
+function addToDrawings(worksheet, graphic, position, lockByDefault)
+{
+
+    var drawingObjects;
+    var wsViews = Asc.editor.wb.wsViews;
+    for(var i = 0; i < wsViews.length; ++i)
+    {
+        if(wsViews[i] && wsViews[i].model === worksheet)
+        {
+            drawingObjects = wsViews[i].objectRender;
+            break;
+        }
+    }
+    if(!drawingObjects)
+    {
+        drawingObjects = new DrawingObjects();
+    }
+
+    var drawingObject = drawingObjects.createDrawingObject();
+    drawingObject.graphicObject = graphic;
+    graphic.setDrawingBase(drawingObject);
+    var ret, aObjects = worksheet.Drawings;
+    if (isRealNumber(position)) {
+        aObjects.splice(position, 0, drawingObject);
+        ret = position;
+    }
+    else {
+        ret = aObjects.length;
+        aObjects.push(drawingObject);
+    }
+
+    /*if ( lockByDefault ) {
+     _this.objectLocker.reset();
+     _this.objectLocker.addObjectId(drawingObject.graphicObject.Id);
+     _this.objectLocker.checkObjects( function(result) {} );
+     }
+     worksheet.setSelectionShape(true);  */
+    return ret;
+}
+
+function deleteDrawingBase(aObjects, graphicId)
+{
+    var position = null;
+    for (var i = 0; i < aObjects.length; i++) {
+        if ( aObjects[i].graphicObject.Get_Id() == graphicId ) {
+            aObjects.splice(i, 1);
+            position = i;
+            break;
+        }
+    }
+    return position;
+}
+
 CShape.prototype.addToDrawingObjects =  function(pos)
 {
-    var position = this.drawingObjects.addGraphicObject(this, pos, true);
-    var data = new UndoRedoDataGOSingleProp(position, null);
-    // History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_To_Drawing_Objects, null, null, new UndoRedoDataGraphicObjects(this.Id, data), null);
-    this.drawingObjects.controller.addContentChanges(new CContentChangesElement(contentchanges_Add, data.oldValue, 1, data));
+    var controller = this.getDrawingObjectsController();
+    var position = addToDrawings(this.worksheet, this, pos, /*lockByDefault*/undefined);
+    var data = {Type: historyitem_AutoShapes_AddToDrawingObjects, oldPr: position};
+    History.Add(this, data);
+    this.worksheet.addContentChanges(new CContentChangesElement(contentchanges_Add, data.oldPr, 1, data));
 };
+
+
 CShape.prototype.deleteDrawingBase = function()
 {
-    var position = this.drawingObjects.deleteDrawingBase(this.Get_Id());
+    var position = deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
     if(isRealNumber(position))
     {
-        //var data = new UndoRedoDataGOSingleProp(position, null);
-        //History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_DeleteDrawingBase, null, null, new UndoRedoDataGraphicObjects(this.Id, data), null);
-        //this.drawingObjects.controller.addContentChanges(new CContentChangesElement(contentchanges_Remove, data.oldValue, 1, data));
+        var data = {Type: historyitem_AutoShapes_RemoveFromDrawingObjects, oldPr: position};
+        History.Add(this, data);
+        this.worksheet.addContentChanges(new CContentChangesElement(contentchanges_Remove, data.oldPr, 1, data));
     }
     return position;
 };
+
+function getDrawingObjects_Sp(sp)
+{
+    var controller = sp.getDrawingObjectsController();
+    return controller && controller.drawingObjects;
+}
 
 CShape.prototype.setRecalculateInfo = function()
 {
@@ -63,7 +146,8 @@ CShape.prototype.recalcContent = function()
 
 CShape.prototype.getDrawingDocument = function()
 {
-    return this.drawingObjects.drawingDocument;
+    var drawingObjects =  getDrawingObjects_Sp(this);
+    return drawingObjects && drawingObjects.drawingDocument;
 };
 
 CShape.prototype.recalcBrush = function()
@@ -113,9 +197,10 @@ CShape.prototype.recalcTextStyles = function()
 };
 CShape.prototype.addToRecalculate = function()
 {
-    if(this.drawingObjects && this.drawingObjects.controller)
+    var controller = this.getDrawingObjectsController();
+    if(controller)
     {
-        this.drawingObjects.controller.objectsForRecalculate[this.Id] = this;
+        controller.objectsForRecalculate[this.Id] = this;
     }
 };
 CShape.prototype.handleUpdatePosition = function()
@@ -169,11 +254,13 @@ CShape.prototype.handleUpdateGeometry = function()
 };
 CShape.prototype.convertPixToMM = function(pix)
 {
-    return this.drawingObjects ? this.drawingObjects.convertMetric(pix, 0, 3) : 0;
+    var drawingObjects =  getDrawingObjects_Sp(this);
+    return drawingObjects ? drawingObjects.convertMetric(pix, 0, 3) : 0;
 };
 CShape.prototype.getCanvasContext = function()
 {
-    return this.drawingObjects ? this.drawingObjects.getCanvasContext() : null;
+    var drawingObjects =  getDrawingObjects_Sp(this);
+    return drawingObjects ? drawingObjects.getCanvasContext() : null;
 };
 CShape.prototype.getCompiledStyle = function()
 {

@@ -724,15 +724,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
                     this.resizedPosY = 0;
                 }
             }
-            if(!this.originalObject.spPr)
-            {
-                this.originalObject.setSpPr(new CSpPr());
-            }
-            if(!this.originalObject.spPr.xfrm)
-            {
-                this.originalObject.spPr.setXfrm(new CXfrm());
-                this.originalObject.spPr.xfrm.setParent(this.originalObject.spPr);
-            }
+            CheckSpPrXfrm(this.originalObject);
             var xfrm = this.originalObject.spPr.xfrm;
             xfrm.setOffX(this.resizedPosX/scale_coefficients.cx + ch_off_x);
             xfrm.setOffY(this.resizedPosY/scale_coefficients.cy + ch_off_y);

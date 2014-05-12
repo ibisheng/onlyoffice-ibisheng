@@ -45,11 +45,10 @@ StartAddNewShape.prototype =
         {
             History.Create_NewPoint();
             var shape = this.drawingObjects.arrTrackObjects[0].getShape(false, this.drawingObjects.getDrawingDocument(), this.drawingObjects.drawingObjects);
-
+            shape.setWorksheet(this.drawingObjects.drawingObjects.getWorksheetModel());
             shape.addToDrawingObjects();
             this.drawingObjects.resetSelection();
             shape.select(this.drawingObjects, 0);
-            this.drawingObjects.recalculate();
             if(this.preset === "textRect")
             {
                 this.drawingObjects.selection.textSelection = shape;
@@ -59,7 +58,7 @@ StartAddNewShape.prototype =
             this.drawingObjects.drawingObjects.objectLocker.reset();
             this.drawingObjects.drawingObjects.objectLocker.addObjectId(shape.Get_Id());
             this.drawingObjects.drawingObjects.objectLocker.checkObjects(function(bLock){});
-
+            this.drawingObjects.startRecalculate();
             asc["editor"].asc_endAddShape();
         }
         this.drawingObjects.clearTrackObjects();
@@ -173,9 +172,11 @@ ChangeAdjState.prototype =
         if(this.drawingObjects.isViewMode() === false)
         {
             var track = this.drawingObjects.arrTrackObjects[0];
+            var drawingObjects = this.drawingObjects;
             this.drawingObjects.checkSelectedObjectsAndCallback(function()
             {
                 track.trackEnd();
+                drawingObjects.startRecalculate();
             },[]);
 
         }
@@ -244,6 +245,7 @@ RotateState.prototype =
         {
             var tracks = [].concat(this.drawingObjects.arrTrackObjects);
             var group = this.group;
+            var drawingObjects = this.drawingObjects;
             this.drawingObjects.checkSelectedObjectsAndCallback(
                 function()
                 {
@@ -255,6 +257,8 @@ RotateState.prototype =
                     {
                         group.updateCoordinatesAfterInternalResize();
                     }
+
+                    drawingObjects.startRecalculate();
                 }, []
             )
 

@@ -2747,8 +2747,9 @@ function DrawingObjects() {
 
             //var fromCell = _this.coordsManager.calculateCell( mmToPx(_t.graphicObject.x), mmToPx(_t.graphicObject.y) );
             //var toCell = _this.coordsManager.calculateCell( mmToPx(_t.graphicObject.x + _t.graphicObject.extX), mmToPx(_t.graphicObject.y + _t.graphicObject.extY) );
-            var fromCell = _this.drawingArea.calculateCell( mmToPx(_t.graphicObject.x), mmToPx(_t.graphicObject.y) );
-            var toCell = _this.drawingArea.calculateCell( mmToPx(_t.graphicObject.x + _t.graphicObject.extX), mmToPx(_t.graphicObject.y + _t.graphicObject.extY) );
+            var leftTop = _t.worksheet.getCellsOffset(0);
+            var fromCell = _this.drawingArea.calculateCell(leftTop.left +  mmToPx(_t.graphicObject.x),leftTop.top +  mmToPx(_t.graphicObject.y) );
+            var toCell = _this.drawingArea.calculateCell(leftTop.left +  mmToPx(_t.graphicObject.x + _t.graphicObject.extX), leftTop.top + mmToPx(_t.graphicObject.y + _t.graphicObject.extY) );
 
             _t.from.col = fromCell.col;
             _t.from.colOff = fromCell.colOff;
@@ -2792,8 +2793,93 @@ function DrawingObjects() {
         return result;
     };
 
+    DrawingBase.prototype.calculateCell = function(x, y)//pix
+    {
+
+    };
+
+    DrawingBase.prototype.getColUnderCursor = function(x)
+    {
+        var col = worksheet._findColUnderCursor(x, true);
+        while(!col)
+        {
+            var isMaxCol = function() {
+                var result = false;
+                if ( worksheet.cols.length >= gc_nMaxCol ) {
+                    var lastCol = worksheet.cols[gc_nMaxCol - 1];
+                    if ( mmToPt(x + w) + scrollX > lastCol.left ) {
+                        response.result = false;
+                        response.x = ptToMm( lastCol.left - (mmToPt(x + w) + scrollX) );
+                        result = true;
+                    }
+                }
+                return result;
+            }
+        }
+        return col;
+    };
+
     DrawingBase.prototype.updateAnchorPosition = function() {
         var _t = this;
+
+        /*var leftTop = worksheet.getCellsOffset(0);
+        switch(_t.Type)
+        {
+            case c_oAscCellAnchorType.cellanchorOneCell:
+            {
+                var _x = mmToPx(_t.graphicObject.x) + leftTop.left;
+                var _y = mmToPx(_t.graphicObject.y) + leftTop.top;
+
+
+                var col = _this.worksheet._findColUnderCursor( what, true );
+                while (col == null) {
+                    if ( isMaxCol() ) {
+                        col = _this.worksheet._findColUnderCursor( _this.worksheet.cols[gc_nMaxCol - 1].left - 1, true );
+                        break;
+                    }
+                    _this.worksheet.expandColsOnScroll(true);
+                    _this.worksheet.handlers.trigger("reinitializeScrollX");
+                    col = _this.worksheet._findColUnderCursor( what + delta, true );
+                    if ( what < 0 )
+                        delta++;
+                }
+
+
+                var coordsFrom = _this.coordsManager.calculateCoords(_t.from);
+                //var cellTo = _this.coordsManager.calculateCell( coordsFrom.x + mmToPx(_t.ext.cx), coordsFrom.y + mmToPx(_t.ext.cy) );
+                var cellTo = _this.drawingArea.calculateCell( coordsFrom.x + mmToPx(_t.ext.cx), coordsFrom.y + mmToPx(_t.ext.cy) );
+
+                _t.to.col = cellTo.col;
+                _t.to.colOff = cellTo.colOff;
+                _t.to.row = cellTo.row;
+                _t.to.rowOff = cellTo.rowOff;
+                break;
+            }
+
+            case c_oAscCellAnchorType.cellanchorAbsolute:
+            {
+                _t.Pos.X = _t.graphicObject.x;
+                _t.Pos.Y = _t.graphicObject.y;
+                break;
+            }
+            case c_oAscCellAnchorType.cellanchorTwoCell:
+            {
+                //var cellFrom = _this.coordsManager.calculateCell( mmToPx(_t.Pos.X), mmToPx(_t.Pos.Y) );
+                var cellFrom = _this.drawingArea.calculateCell( mmToPx(_t.Pos.X), mmToPx(_t.Pos.Y) );
+                _t.from.col = cellFrom.col;
+                _t.from.colOff = cellFrom.colOff;
+                _t.from.row = cellFrom.row;
+                _t.from.rowOff = cellFrom.rowOff;
+
+                //var cellTo = _this.coordsManager.calculateCell( mmToPx(_t.Pos.X + _t.ext.cx), mmToPx(_t.Pos.Y + _t.ext.cy));
+                var cellTo = _this.drawingArea.calculateCell( mmToPx(_t.Pos.X + _t.ext.cx), mmToPx(_t.Pos.Y + _t.ext.cy));
+                _t.to.col = cellTo.col;
+                _t.to.colOff = cellTo.colOff;
+                _t.to.row = cellTo.row;
+                _t.to.rowOff = cellTo.rowOff;
+                break;
+            }
+        }  */
         switch (_t.Type) {
             case c_oAscCellAnchorType.cellanchorOneCell:
             {
@@ -2806,15 +2892,16 @@ function DrawingObjects() {
                 _t.to.row = cellTo.row;
                 _t.to.rowOff = cellTo.rowOff;
             }
-                break;
+            break;
 
             case c_oAscCellAnchorType.cellanchorAbsolute:
             {
-                if ( _t.Pos.X < 0 )
-                    _t.Pos.X = 0;
-                if ( _t.Pos.Y < 0 )
-                    _t.Pos.Y = 0;
-
+                _t.Pos.X = _t.graphicObject.x;
+                _t.Pos.Y = _t.graphicObject.y;
+                break;
+            }
+            case c_oAscCellAnchorType.cellanchorTwoCell:
+            {
                 //var cellFrom = _this.coordsManager.calculateCell( mmToPx(_t.Pos.X), mmToPx(_t.Pos.Y) );
                 var cellFrom = _this.drawingArea.calculateCell( mmToPx(_t.Pos.X), mmToPx(_t.Pos.Y) );
                 _t.from.col = cellFrom.col;
@@ -2933,24 +3020,6 @@ function DrawingObjects() {
         copyObject.to.rowOff = object.to.rowOff;
 
         copyObject.graphicObject = object.graphicObject;
-
-        // Series colors
-        if ( typeof CChartAsGroup !== "undefined" && copyObject.graphicObject instanceof  CChartAsGroup ) {
-
-            var chart = copyObject.graphicObject.chart;
-            var uniColors = chart.generateUniColors(chart.series.length);
-
-            if ( chart.type == c_oAscChartType.hbar )
-                uniColors = OfficeExcel.array_reverse(uniColors);
-
-            for (var i = 0; i < chart.series.length; i++) {
-                if ( !chart.series[i].OutlineColor )
-                    chart.series[i].OutlineColor = uniColors[i];
-                if ( !chart.series[i].Tx )
-                    chart.series[i].Tx = api.chartTranslate.series + " " + (i + 1);
-            }
-        }
-
         return copyObject;
     };
 
@@ -2979,6 +3048,7 @@ function DrawingObjects() {
         autoShapeTrack.init( trackOverlay, 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );
         shapeCtx.m_oAutoShapesTrack = autoShapeTrack;
 
+
         _this.objectLocker = new ObjectLocker(worksheet);
         _this.drawingArea = currentSheet.drawingArea;
         _this.drawingArea.init();
@@ -2988,6 +3058,7 @@ function DrawingObjects() {
         _this.drawingDocument.AutoShapesTrack = autoShapeTrack;
         _this.drawingDocument.TargetHtmlElement = document.getElementById('id_target_cursor');
         _this.drawingDocument.InitGuiCanvasShape(api.shapeElementId);
+        _this.controller = new DrawingObjectsController(_this);
 
         _this.isViewerMode = function() { return worksheet.handlers.trigger("getViewerMode"); };
 
@@ -2997,13 +3068,14 @@ function DrawingObjects() {
 
         isInit = false;
         var theme = api.wbModel.theme;
+        aObjects = currentSheet.model.Drawings;
         for (var i = 0; currentSheet.model.Drawings && (i < currentSheet.model.Drawings.length); i++)
         {
-
-            var drawingObject = _this.cloneDrawingObject(currentSheet.model.Drawings[i]);
-            drawingObject.updateAnchorPosition();
-
+            aObjects[i] = _this.cloneDrawingObject(aObjects[i]);
+            var drawingObject = aObjects[i];
             // Check drawing area
+            drawingObject.drawingArea = _this.drawingArea;
+            drawingObject.worksheet = currentSheet;
             if ( !worksheet.cols[drawingObject.to.col] ) {
                 while ( !worksheet.cols[drawingObject.to.col] ) {
                     worksheet.expandColsOnScroll(true);
@@ -3016,78 +3088,41 @@ function DrawingObjects() {
                 }
                 worksheet.expandRowsOnScroll(true); 	// для rowOff
             }
-
-            // Object types
-            // if (drawingObject.graphicObject instanceof  CChartSpace)
-            {
-                drawingObject.graphicObject.drawingBase = drawingObject;
-                drawingObject.graphicObject.drawingObjects = this;
-                var metrics = drawingObject.graphicObject.drawingBase.getGraphicObjectMetrics();
-
-
-                if(!drawingObject.graphicObject.spPr)
-                {
-                    drawingObject.graphicObject.setSpPr(new CSpPr());
-                    drawingObject.graphicObject.spPr.setParent(drawingObject.graphicObject);
-                }
-                if(!drawingObject.graphicObject.spPr.xfrm)
-                {
-                    drawingObject.graphicObject.spPr.setXfrm(new CXfrm());
-                    drawingObject.graphicObject.spPr.xfrm.setParent(drawingObject.graphicObject.spPr);
-                }
-
-                if(drawingObject.graphicObject.getObjectType() === historyitem_type_GroupShape && !drawingObject.graphicObject.spPr.xfrm.isNotNullForGroup())
-                {
-                    drawingObject.graphicObject.spPr.xfrm.setOffX(metrics.x);
-                    drawingObject.graphicObject.spPr.xfrm.setOffY(metrics.y);
-                    drawingObject.graphicObject.spPr.xfrm.setChOffX(0);
-                    drawingObject.graphicObject.spPr.xfrm.setChOffY(0);
-                    drawingObject.graphicObject.spPr.xfrm.setExtX(metrics.extX);
-                    drawingObject.graphicObject.spPr.xfrm.setExtY(metrics.extY);
-                    drawingObject.graphicObject.spPr.xfrm.setChExtX(metrics.extX);
-                    drawingObject.graphicObject.spPr.xfrm.setChExtY(metrics.extY);
-                }
-                else if(!drawingObject.graphicObject.spPr.xfrm.isNotNull())
-                {
-                    drawingObject.graphicObject.spPr.xfrm.setOffX(metrics.x);
-                    drawingObject.graphicObject.spPr.xfrm.setOffY(metrics.y);
-                    drawingObject.graphicObject.spPr.xfrm.setExtX(metrics.extX);
-                    drawingObject.graphicObject.spPr.xfrm.setExtY(metrics.extY);
-                }
-                drawingObject.graphicObject.recalculate();
-                drawingObject.graphicObject.getAllRasterImages(aImagesSync);
-
-                drawingObject.graphicObject.setDrawingObjects(this);
-                aObjects.push(drawingObject);
-                //drawingObject.graphicObject.addToDrawingObjects();
-                drawingObject.setGraphicObjectCoords();
-                var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
-                aBoundsCheckers.push(boundsChecker);
-            }
+            drawingObject.graphicObject.drawingBase = aObjects[i];
+            drawingObject.graphicObject.drawingObjects = _this;
+            drawingObject.graphicObject.getAllRasterImages(aImagesSync);
         }
+        this.recalculate(true);
         for(i = 0; i < aImagesSync.length; ++i)
         {
             aImagesSync[i] = getFullImageSrc(aImagesSync[i]);
         }
 
+        for (var i = 0; i < currentSheet.model.Drawings.length; ++i)
+        {
+            var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
+            aBoundsCheckers.push(boundsChecker);
+        }
+
         // Загружаем все картинки листа
         _this.asyncImagesDocumentEndLoaded = function() {
 
-            for (var i = 0; i < aObjectsSync.length; i++) {
-
-                var drawingObject = aObjectsSync[i];
-                var image = api.ImageLoader.LoadImage(aImagesSync[i], 1);	// Должна быть в мапе
-
-                if ( image != null ) {
-
-                    drawingObject.graphicObject.recalculate();
-                    drawingObject.setGraphicObjectCoords();
-                    drawingObject.graphicObject.draw(shapeCtx);
-
-                    var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
-                    aBoundsCheckers.push(boundsChecker);
-                }
-            }
+            //TODO: переделать
+            //for (var i = 0; i < aObjectsSync.length; i++) {
+            //
+            //    var drawingObject = aObjectsSync[i];
+            //    var image = api.ImageLoader.LoadImage(aImagesSync[i], 1);	// Должна быть в мапе
+            //
+            //    if ( image != null ) {
+            //
+            //        drawingObject.graphicObject.recalculate();
+            //        drawingObject.updateAnchorPosition();
+            //        drawingObject.graphicObject.draw(shapeCtx);
+            //
+            //        var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
+            //        aBoundsCheckers.push(boundsChecker);
+            //    }
+            //}
         };
 
         api.ImageLoader.LoadDocumentImages(aImagesSync, null, _this.asyncImagesDocumentEndLoaded);
@@ -3100,6 +3135,11 @@ function DrawingObjects() {
         _this.shiftMap = {};
         worksheet.model.Drawings = aObjects;
         isInit = true;
+    };
+
+    _this.recalculate =  function(all)
+    {
+        _this.controller.recalculate(all);
     };
 
     _this.preCopy = function() {
@@ -3180,6 +3220,10 @@ function DrawingObjects() {
 
     _this.getWorksheet = function() {
         return worksheet;
+    };
+
+    _this.getWorksheetModel = function() {
+        return worksheet.model;
     };
 
     _this._uploadMessage = function(event) {
@@ -5254,7 +5298,6 @@ function DrawingObjects() {
     // Shapes controller
     //-----------------------------------------------------------------------------------
 
-    _this.controller = new DrawingObjectsController(_this);
 
     //-----------------------------------------------------------------------------------
     // Private Misc Methods
