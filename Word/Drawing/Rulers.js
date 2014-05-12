@@ -79,6 +79,44 @@ function RulerCorrectPosition(val, mm_1_8, mm_1_4, margin)
     return margin + (((val - margin + mm_1_8) / mm_1_4) >> 0) * mm_1_4;
 }
 
+function RulerCheckSimpleChanges()
+{
+    this.X = -1;
+    this.Y = -1;
+    this.IsSimple = true;
+
+    this.IsDown   = false;
+}
+RulerCheckSimpleChanges.prototype =
+{
+    Clear : function()
+    {
+        this.X = -1;
+        this.Y = -1;
+        this.IsSimple = true;
+        this.IsDown = false;
+    },
+
+    Reinit : function()
+    {
+        this.X = global_mouseEvent.X;
+        this.Y = global_mouseEvent.Y;
+        this.IsSimple = true;
+        this.IsDown = true;
+    },
+
+    CheckMove : function()
+    {
+        if (!this.IsDown)
+            return;
+        if (!this.IsSimple)
+            return;
+
+        if (Math.abs(global_mouseEvent.X - this.X) > 0 && Math.abs(global_mouseEvent.Y - this.Y) > 0)
+            this.IsSimple = false;
+    }
+};
+
 function CHorRuler()
 {
     this.m_oPage        = null;     // текущая страница. Нужна для размеров и маргинов в режиме RULER_OBJECT_TYPE_PARAGRAPH
@@ -132,6 +170,8 @@ function CHorRuler()
     this.IsCanMoveMargins = true;
     this.IsCanMoveAnyMarkers = true;
     this.IsDrawAnyMarkers = true;
+
+    this.SimpleChanges = new RulerCheckSimpleChanges();
 
     this.InitTablePict = function()
     {
@@ -715,6 +755,9 @@ function CHorRuler()
         var word_control = this.m_oWordControl;
         
         check_MouseMoveEvent(e);
+
+        this.SimpleChanges.CheckMove();
+
         var hor_ruler = word_control.m_oTopRuler_horRuler;
         var dKoefPxToMM = 100 * g_dKoef_pix_to_mm / word_control.m_nZoomValue;
 
@@ -1098,6 +1141,8 @@ function CHorRuler()
         check_MouseDownEvent(e);
         global_mouseEvent.LockMouse();
 
+        this.SimpleChanges.Reinit();
+
         var dKoefPxToMM = 100 * g_dKoef_pix_to_mm / word_control.m_nZoomValue;
         var dKoef_mm_to_pix = g_dKoef_mm_to_pix * this.m_dZoom;
         
@@ -1231,6 +1276,7 @@ function CHorRuler()
     this.OnMouseUp = function(left, top, e)
     {
         var word_control = this.m_oWordControl;
+        this.m_oWordControl.m_oOverlayApi.Clear();
         var lockedElement = check_MouseUpEvent(e);
 
         this.m_dIndentLeft_old      = -10000;
@@ -1256,7 +1302,8 @@ function CHorRuler()
             case 1:
             case 2:
             {
-                this.SetMarginProperties();
+                if (!this.SimpleChanges.IsSimple)
+                    this.SetMarginProperties();
                 break;
             }
             case 3:
@@ -1264,7 +1311,8 @@ function CHorRuler()
             case 5:
             case 6:
             {
-                this.SetPrProperties();
+                if (!this.SimpleChanges.IsSimple)
+                    this.SetPrProperties();
                 break;
             }
             case 7:
@@ -1287,7 +1335,8 @@ function CHorRuler()
             }
             case 8:
             {
-                this.SetTableProperties();
+                if (!this.SimpleChanges.IsSimple)
+                    this.SetTableProperties();
                 this.DragTablePos = -1;
                 break;
             }
@@ -1304,11 +1353,13 @@ function CHorRuler()
         this.m_bIsMouseDown = false;
 
         this.m_oWordControl.m_oDrawingDocument.UnlockCursorType();
+        this.SimpleChanges.Clear();
     }
 
     this.OnMouseUpExternal = function()
     {
         var word_control = this.m_oWordControl;
+        this.m_oWordControl.m_oOverlayApi.Clear();
 
         this.m_dIndentLeft_old      = -10000;
         this.m_dIndentLeftFirst_old = -10000;
@@ -1333,7 +1384,8 @@ function CHorRuler()
             case 1:
             case 2:
             {
-                this.SetMarginProperties();
+                if (!this.SimpleChanges.IsSimple)
+                    this.SetMarginProperties();
                 break;
             }
             case 3:
@@ -1341,7 +1393,8 @@ function CHorRuler()
             case 5:
             case 6:
             {
-                this.SetPrProperties();
+                if (!this.SimpleChanges.IsSimple)
+                    this.SetPrProperties();
                 break;
             }
             case 7:
@@ -1364,7 +1417,8 @@ function CHorRuler()
             }
             case 8:
             {
-                this.SetTableProperties();
+                if (!this.SimpleChanges.IsSimple)
+                    this.SetTableProperties();
                 this.DragTablePos = -1;
                 break;
             }
@@ -1381,6 +1435,7 @@ function CHorRuler()
         this.m_bIsMouseDown = false;
 
         this.m_oWordControl.m_oDrawingDocument.UnlockCursorType();
+        this.SimpleChanges.Clear();
     }
 
     this.SetTabsProperties = function()
@@ -1841,6 +1896,8 @@ function CVerRuler()
     this.m_oWordControl = null;
     this.IsRetina = false;
 
+    this.SimpleChanges = new RulerCheckSimpleChanges();
+
     this.CheckCanvas = function()
     {
         this.m_dZoom = this.m_oWordControl.m_nZoomValue / 100;
@@ -2198,6 +2255,8 @@ function CVerRuler()
     {
         var word_control = this.m_oWordControl;
         check_MouseMoveEvent(e);
+
+        this.SimpleChanges.CheckMove();
         var ver_ruler = word_control.m_oLeftRuler_vertRuler;
         var dKoefPxToMM = 100 * g_dKoef_pix_to_mm / word_control.m_nZoomValue;
 
@@ -2448,6 +2507,8 @@ function CVerRuler()
     {
         var word_control = this.m_oWordControl;
         check_MouseDownEvent(e);
+
+        this.SimpleChanges.Reinit();
         global_mouseEvent.LockMouse();
 
         var dKoefPxToMM = 100 * g_dKoef_pix_to_mm / word_control.m_nZoomValue;
@@ -2516,18 +2577,21 @@ function CVerRuler()
             case 1:
             case 2:
             {
-                this.SetMarginProperties();
+                if (!this.SimpleChanges.IsSimple)
+                    this.SetMarginProperties();
                 break;
             }
             case 3:
             case 4:
             {
-                this.SetHeaderProperties();
+                if (!this.SimpleChanges.IsSimple)
+                    this.SetHeaderProperties();
                 break;
             }
             case 5:
             {
-                this.SetTableProperties();
+                if (!this.SimpleChanges.IsSimple)
+                    this.SetTableProperties();
                 this.DragTablePos = -1;
                 break;
             }
@@ -2535,6 +2599,8 @@ function CVerRuler()
 
         this.DragType = 0;
         this.m_oWordControl.m_oDrawingDocument.UnlockCursorType();
+
+        this.SimpleChanges.Clear();
     }
 
     this.OnMouseUpExternal = function()
@@ -2547,18 +2613,21 @@ function CVerRuler()
             case 1:
             case 2:
             {
-                this.SetMarginProperties();
+                if (!this.SimpleChanges.IsSimple)
+                    this.SetMarginProperties();
                 break;
             }
             case 3:
             case 4:
             {
-                this.SetHeaderProperties();
+                if (!this.SimpleChanges.IsSimple)
+                    this.SetHeaderProperties();
                 break;
             }
             case 5:
             {
-                this.SetTableProperties();
+                if (!this.SimpleChanges.IsSimple)
+                    this.SetTableProperties();
                 this.DragTablePos = -1;
                 break;
             }
@@ -2566,6 +2635,8 @@ function CVerRuler()
 
         this.DragType = 0;
         this.m_oWordControl.m_oDrawingDocument.UnlockCursorType();
+
+        this.SimpleChanges.Clear();
     }
 
     this.BlitToMain = function(left, top, htmlElement)
