@@ -6118,11 +6118,15 @@
         };
         this.ReadPane = function (type, length, oPane) {
             var res = c_oSerConstants.ReadOk;
-            if (c_oSer_Pane.State === type) {
+            if (c_oSer_Pane.State === type)
                 oPane.state = this.stream.GetString2LE(length);
-            } else if (c_oSer_Pane.TopLeftCell === type) {
-                oPane.topLeftCell = this.stream.GetString2LE(length);
-            } else
+            else if (c_oSer_Pane.TopLeftCell === type)
+				oPane.topLeftCell = this.stream.GetString2LE(length);
+			else if (c_oSer_Pane.XSplit === type)
+				oPane.xSplit = this.stream.GetDoubleLE();
+			else if (c_oSer_Pane.YSplit === type)
+				oPane.ySplit = this.stream.GetDoubleLE();
+            else
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };

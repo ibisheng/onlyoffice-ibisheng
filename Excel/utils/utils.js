@@ -1031,6 +1031,8 @@
 
 			this.state = null;
 			this.topLeftCell = null;
+			this.xSplit = 0;
+			this.ySplit = 0;
 			// CellAddress для удобства
 			this.topLeftFrozenCell = null;
 
@@ -1040,14 +1042,17 @@
 			var res = new asc_CPane();
 			res.state = this.state;
 			res.topLeftCell = this.topLeftCell;
+			res.xSplit = this.xSplit;
+			res.ySplit = this.ySplit;
 			res.topLeftFrozenCell = this.topLeftFrozenCell ?
 				new CellAddress(this.topLeftFrozenCell.row, this.topLeftFrozenCell.col) : null;
 			return res;
 		};
 		asc_CPane.prototype.init = function() {
 			// ToDo Обрабатываем пока только frozen и frozenSplit
-			if (c_oAscPaneState.Frozen === this.state || c_oAscPaneState.FrozenSplit === this.state) {
-				this.topLeftFrozenCell = new CellAddress(this.topLeftCell);
+			if ((c_oAscPaneState.Frozen === this.state || c_oAscPaneState.FrozenSplit === this.state) &&
+				(0 < this.xSplit || 0 < this.ySplit)) {
+				this.topLeftFrozenCell = new CellAddress(this.ySplit, this.xSplit, 0);
 				if (!this.topLeftFrozenCell.isValid())
 					this.topLeftFrozenCell = null;
 			}
