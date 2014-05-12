@@ -406,6 +406,10 @@ Paragraph.prototype =
 
         if(this.bFromDocument)
             OtherParagraph.Style_Add( this.Style_Get(), true );
+        
+        // TODO: Другой параграф, как правило новый, поэтому можно использовать функцию Apply, но на самом деле надо 
+        //       переделать на нормальную функцию Set_Pr.
+        OtherParagraph.TextPr.Apply_TextPr( this.TextPr.Value );
     },
 
     Split_Element_ByPos : function(SplitType, ContentPos)
@@ -4108,12 +4112,16 @@ Paragraph.prototype =
                 var EndTextDescent = Math.abs( g_oTextMeasurer.GetDescender() );
                 var EndTextAscent  = EndTextHeight - EndTextDescent;
                 var EndTextAscent2 = g_oTextMeasurer.GetAscender();
-
+                                
                 PRS.LineTextAscent  = EndTextAscent;
                 PRS.LineTextAscent2 = EndTextAscent2;
                 PRS.LineTextDescent = EndTextDescent;
-                PRS.LineAscent      = EndTextAscent;
-                PRS.LineDescent     = EndTextDescent;
+
+                if ( PRS.LineAscent < EndTextAscent )
+                    PRS.LineAscent = EndTextAscent;
+
+                if ( PRS.LineDescent < EndTextDescent )
+                    PRS.LineDescent = EndTextDescent;
             }
             else if ( undefined !== LastItem )
             {
@@ -7158,8 +7166,9 @@ Paragraph.prototype =
                 {
                     this.Content[StartPos].Remove(nCount, bOnAddText);
 
-                    // Мы не удаляем последний элемент с ParaEnd
-                    if ( StartPos !== this.Content.length - 1 && true === this.Content[StartPos].Is_Empty() )
+                    // TODO: Как только избавимся от para_End переделать здесь
+                    // Последние 2 элемента не удаляем (один для para_End, второй для всего остального)
+                    if ( StartPos < this.Content.length - 2 && true === this.Content[StartPos].Is_Empty() )
                     {
                         this.Internal_Content_Remove( StartPos );
 
@@ -7172,8 +7181,9 @@ Paragraph.prototype =
                 {
                     this.Content[EndPos].Remove(nCount, bOnAddText);
 
-                    // Мы не удаляем последний элемент с ParaEnd
-                    if ( EndPos !== this.Content.length - 1 && true === this.Content[EndPos].Is_Empty() )
+                    // TODO: Как только избавимся от para_End переделать здесь
+                    // Последние 2 элемента не удаляем (один для para_End, второй для всего остального)
+                    if ( EndPos < this.Content.length - 2 && true === this.Content[EndPos].Is_Empty() )
                     {
                         this.Internal_Content_Remove( EndPos );
 
@@ -7190,7 +7200,7 @@ Paragraph.prototype =
                     this.Content[StartPos].Remove(nCount, bOnAddText);
 
                     // Мы не удаляем последний элемент с ParaEnd
-                    if ( true === this.Content[StartPos].Is_Empty() )
+                    if ( StartPos < this.Content.length - 2  && true === this.Content[StartPos].Is_Empty() )
                         this.Internal_Content_Remove( StartPos );
                 }
 
@@ -7253,7 +7263,9 @@ Paragraph.prototype =
                         return true;
                     }
 
-                    if ( ContentPos !== this.Content.length - 1 && true === this.Content[ContentPos].Is_Empty() )
+                    // TODO: Как только избавимся от para_End переделать здесь
+                    // Последние 2 элемента не удаляем (один для para_End, второй для всего остального)
+                    if ( ContentPos < this.Content.length - 2 && true === this.Content[ContentPos].Is_Empty() )
                     {
                         this.Internal_Content_Remove( ContentPos );
 

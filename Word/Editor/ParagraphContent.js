@@ -516,6 +516,9 @@ ParaTextPr.prototype =
 
         if ( undefined != TextPr.FontSize )
             this.Set_FontSize( TextPr.FontSize );
+        
+        if ( undefined != TextPr.FontSizeCS )
+            this.Set_FontSizeCS( TextPr.FontSizeCS );
 
         if ( undefined != TextPr.Color )
             this.Set_Color( TextPr.Color );
@@ -707,6 +710,18 @@ ParaTextPr.prototype =
             this.Value.FontSize = undefined;
 
         History.Add( this, { Type : historyitem_TextPr_FontSize, New : Value, Old : OldValue } );
+    },
+    
+    Set_FontSizeCS : function(Value)
+    {
+        var OldValue = ( undefined != this.Value.FontSizeCS ? this.Value.FontSizeCS : undefined );
+
+        if ( undefined != Value )
+            this.Value.FontSizeCS = Value;
+        else
+            this.Value.FontSizeCS = undefined;
+
+        History.Add( this, { Type : historyitem_TextPr_FontSizeCS, New : Value, Old : OldValue } );
     },
 
     Set_Color : function(Value)
@@ -1054,6 +1069,16 @@ ParaTextPr.prototype =
                 break;
             }
 
+            case historyitem_TextPr_FontSizeCS:
+            {
+                if ( undefined != Data.Old )
+                    this.Value.FontSizeCS = Data.Old;
+                else
+                    this.Value.FontSizeCS = undefined;
+
+                break;
+            }
+
             case historyitem_TextPr_Color:
             {
                 if ( undefined != Data.Old )
@@ -1326,6 +1351,16 @@ ParaTextPr.prototype =
                     this.Value.FontSize = Data.New;
                 else
                     this.Value.FontSize = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_FontSizeCS:
+            {
+                if ( undefined != Data.New )
+                    this.Value.FontSizeCS = Data.New;
+                else
+                    this.Value.FontSizeCS = undefined;
 
                 break;
             }
@@ -1645,6 +1680,7 @@ ParaTextPr.prototype =
             }
 
             case historyitem_TextPr_FontSize:
+            case historyitem_TextPr_FontSizeCS:
             {
                 // Bool   : IsUndefined
                 // Double : FontSize
@@ -1974,6 +2010,19 @@ ParaTextPr.prototype =
 
                 break;
             }
+
+            case historyitem_TextPr_FontSizeCS:
+            {
+                // Bool   : IsUndefined
+                // Double : FontSize
+
+                if ( true != Reader.GetBool() )
+                    this.Value.FontSizeCS = Reader.GetDouble();
+                else
+                    this.Value.FontSizeCS = undefined;
+
+                break;
+            }                
 
             case historyitem_TextPr_Color:
             {
