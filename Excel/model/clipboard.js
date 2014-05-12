@@ -2541,7 +2541,9 @@
 						else if(cloneImg.graphicObject && (cloneImg.graphicObject.isShape() || cloneImg.graphicObject.isImage() || cloneImg.graphicObject.isGroup() || cloneImg.graphicObject.isChart()))
 						{
 							var cMemory = new CMemory();
-							var altAttr = cloneImg.graphicObject.writeToBinaryForCopyPaste(cMemory);
+							
+							var altAttr = null;
+							//altAttr = cloneImg.graphicObject.writeToBinaryForCopyPaste(cMemory);
 							var isImage = cloneImg.graphicObject.isImage();
 							var imageUrl;
 							if(isImage)
@@ -2549,7 +2551,7 @@
 							if(isImage && imageUrl)
 								url = getFullImageSrc(imageUrl);
 							else
-								url = cloneImg.graphicObject.getBase64Image();
+								url = cloneImg.graphicObject.getBase64Img();
 							curImage.alt = altAttr;
 						}
 						else
@@ -3024,13 +3026,11 @@
 			_insertImagesFromBinary: function(ws, data)
 			{
 				var activeRange = ws.activeRange;
-				var curCol;
-				var curRow;
-				var startCol;
-				var startRow;
-				var xfrm;
+				var curCol, drawingObject, curRow, startCol, startRow, xfrm;
+
 				History.Create_NewPoint();
 				History.StartTransaction();
+				
 				//определяем стартовую позицию, если изображений несколько вставляется
 				for(var i = 0; i < data.Drawings.length; i++)
 				{
@@ -3074,58 +3074,36 @@
 							}	
 						}
 					}
-				}
+				};
+				
 				for(var i = 0; i < data.Drawings.length; i++)
 				{
 					if(i == 0)
 						window["Asc"]["editor"].isStartAddShape = true;
 					drawingObject = data.Drawings[i];
-					// Object types
-					if (typeof  CChartAsGroup != "undefined" && drawingObject.graphicObject instanceof  CChartAsGroup) {
-						
-						ws.objectRender.calcChartInterval(drawingObject.graphicObject.chart);
-						//drawingObject.graphicObject.setPosition(10,10);
-						drawingObject.graphicObject.drawingBase = drawingObject;
-						drawingObject.graphicObject.setDrawingObjects(ws.objectRender);
-						
-						if (drawingObject.graphicObject.chartTitle)
-							drawingObject.graphicObject.chartTitle.drawingObjects = ws.objectRender;
-							
-						drawingObject.graphicObject.chart.worksheet = ws.model;
-						//drawingObject.graphicObject.chart.rebuildSeries();
-						//drawingObject.graphicObject.recalculate();
-						drawingObject.graphicObject.init();
-						
-						drawingObject.graphicObject.addToDrawingObjects();
-						//aObjects.push( drawingObject );
-						
-						//var boundsChecker = _this.getBoundsChecker(drawingObject);
-						//aBoundsCheckers.push(boundsChecker);
-					}
-					else if (drawingObject.graphicObject instanceof  CShape || drawingObject.graphicObject instanceof  CImageShape || drawingObject.graphicObject instanceof  CGroupShape) {
-						
-						xfrm = drawingObject.graphicObject.spPr.xfrm;
-						if(xfrm)
-						{
-							curCol = xfrm.offX - startCol + ws.objectRender.convertMetric(ws.cols[activeRange.c1].left - ws.getCellLeft(0, 1), 1, 3);
-							curRow = xfrm.offY - startRow + ws.objectRender.convertMetric(ws.rows[activeRange.r1].top  - ws.getCellTop(0, 1), 1, 3);
-							drawingObject.graphicObject.setPosition(curCol, curRow);
-						}
-						else
-						{
-							curCol = drawingObject.from.col - startCol + activeRange.c1;
-							curRow = drawingObject.from.row - startRow + activeRange.r1;
-							drawingObject.graphicObject.setPosition(ws.objectRender.convertMetric(ws.cols[curCol].left, 1, 3), ws.objectRender.convertMetric(ws.rows[curRow].top, 1, 3));
-						}
+
+					CheckSpPrXfrm(drawingObject.graphicObject);
+					xfrm = drawingObject.graphicObject.spPr.xfrm;
+
+					curCol = xfrm.offX - startCol + ws.objectRender.convertMetric(ws.cols[activeRange.c1].left - ws.getCellLeft(0, 1), 1, 3);
+					curRow = xfrm.offY - startRow + ws.objectRender.convertMetric(ws.rows[activeRange.r1].top  - ws.getCellTop(0, 1), 1, 3);
 					
-						drawingObject.graphicObject.setDrawingObjects(ws.objectRender);
-						drawingObject.graphicObject.setDrawingDocument(ws.objectRender.drawingDocument);
-						drawingObject.graphicObject.recalculate();
-						
-						drawingObject.graphicObject.addToDrawingObjects();
-						drawingObject.graphicObject.select(ws.objectRender.controller);
-					}
-				}
+					xfrm.setOffX(curCol);
+					xfrm.setOffY(curRow);
+
+					drawingObject = ws.objectRender.cloneDrawingObject(drawingObject);
+					drawingObject.graphicObject.setDrawingBase(drawingObject);
+					
+					drawingObject.graphicObject.setDrawingObjects(ws.objectRender);
+					drawingObject.graphicObject.setWorksheet(ws.model);
+					
+					//drawingObject.graphicObject.setDrawingDocument(ws.objectRender.drawingDocument);
+					drawingObject.graphicObject.recalculate();
+					
+					drawingObject.graphicObject.addToDrawingObjects();
+					drawingObject.graphicObject.select(ws.objectRender.controller, 0);
+				};
+				
 				History.EndTransaction();
 			},
 			
