@@ -801,7 +801,7 @@ CGraphicObjects.prototype =
         var ret = [];
         for(var i = 0; i < tables.length; ++i)
         {
-            if(tables[i].Table.Parent === docContent)
+            if(flowobject_Table === tables[i].Type && tables[i].Table.Parent === docContent)
                 ret.push(tables[i]);
         }
         return ret;

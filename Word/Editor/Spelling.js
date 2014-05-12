@@ -704,7 +704,7 @@ CDocument.prototype.Get_DefaultLanguage = function()
 CDocument.prototype.Restart_CheckSpelling = function()
 {
     // TODO: добавить обработку в автофигурах
-    this.HdrFtr.Restart_CheckSpelling();
+    this.SectionsInfo.Restart_CheckSpelling();
 
     var Count = this.Content.length;
     for ( var Index = 0; Index < Count; Index++ )
@@ -739,92 +739,34 @@ CHeaderFooter.prototype.Restart_CheckSpelling = function()
 };
 
 //----------------------------------------------------------------------------------------------------------------------
-// CHeaderFooterController
+// CDocumentSectionsInfo
 //----------------------------------------------------------------------------------------------------------------------
-CHeaderFooterController.prototype.Restart_CheckSpelling = function()
+CDocumentSectionsInfo.prototype.Restart_CheckSpelling = function()
 {
-    var bHdr_first = false;
-    var bHdr_even  = false;
-
-    if ( this.Content[0].Header.First != this.Content[0].Header.Odd )
-        bHdr_first = true;
-
-    if ( this.Content[0].Header.Even != this.Content[0].Header.Odd )
-        bHdr_even = true;
-
-    if ( true === bHdr_even && true === bHdr_first )
+    var bEvenOdd = EvenAndOddHeaders;
+    var Count = this.Elements.length;
+    for ( var Index = 0; Index < Count; Index++ )
     {
-        if ( null != this.Content[0].Header.First )
-            this.Content[0].Header.First.Restart_CheckSpelling();
+        var SectPr = this.Elements[Index].SectPr;
+        var bFirst = SectPr.Get_TitlePage();
 
-        if ( null != this.Content[0].Header.Even )
-            this.Content[0].Header.Even.Restart_CheckSpelling();
+        if ( null != SectPr.HeaderFirst && true === bFirst )
+            SectPr.HeaderFirst.Restart_CheckSpelling();
 
-        if ( null != this.Content[0].Header.Odd )
-            this.Content[0].Header.Odd.Restart_CheckSpelling();
-    }
-    else if ( true === bHdr_even )
-    {
-        if ( null != this.Content[0].Header.Even )
-            this.Content[0].Header.Even.Restart_CheckSpelling();
+        if ( null != SectPr.HeaderEven && true === bEvenOdd )
+            SectPr.HeaderEven.Restart_CheckSpelling();
 
-        if ( null != this.Content[0].Header.Odd )
-            this.Content[0].Header.Odd.Restart_CheckSpelling();
-    }
-    else if ( true === bHdr_first )
-    {
-        if ( null != this.Content[0].Header.First )
-            this.Content[0].Header.First.Restart_CheckSpelling();
+        if ( null != SectPr.HeaderDefault )
+            SectPr.HeaderDefault.Restart_CheckSpelling();
 
-        if ( null != this.Content[0].Header.Odd )
-            this.Content[0].Header.Odd.Restart_CheckSpelling();
-    }
-    else
-    {
-        if ( null != this.Content[0].Header.Odd )
-            this.Content[0].Header.Odd.Restart_CheckSpelling();
-    }
+        if ( null != SectPr.FooterFirst && true === bFirst )
+            SectPr.FooterFirst.Restart_CheckSpelling();
 
-    var bFtr_first = false;
-    var bFtr_even  = false;
+        if ( null != SectPr.FooterEven && true === bEvenOdd )
+            SectPr.FooterEven.Restart_CheckSpelling();
 
-    if ( this.Content[0].Footer.First != this.Content[0].Footer.Odd )
-        bFtr_first = true;
-
-    if ( this.Content[0].Footer.Even != this.Content[0].Footer.Odd )
-        bFtr_even = true;
-
-    if ( true === bFtr_even && true === bFtr_first )
-    {
-        if ( null != this.Content[0].Footer.First )
-            this.Content[0].Footer.First.Restart_CheckSpelling();
-
-        if ( null != this.Content[0].Footer.Even )
-            this.Content[0].Footer.Even.Restart_CheckSpelling();
-
-        if ( null != this.Content[0].Footer.Odd )
-            this.Content[0].Footer.Odd.Restart_CheckSpelling();
-    }
-    else if ( true === bFtr_even )
-    {
-        if ( null != this.Content[0].Footer.Even )
-            this.Content[0].Footer.Even.Restart_CheckSpelling();
-
-        if ( null != this.Content[0].Footer.Odd )
-            this.Content[0].Footer.Odd.Restart_CheckSpelling();
-    }
-    else if ( true === bFtr_first )
-    {
-        if ( null != this.Content[0].Footer.First )
-            this.Content[0].Footer.First.Restart_CheckSpelling();
-
-        if ( null != this.Content[0].Footer.Odd )
-            this.Content[0].Footer.Odd.Restart_CheckSpelling();
-    }
-    else
-    {
-        if ( null != this.Content[0].Footer.Odd )
-            this.Content[0].Footer.Odd.Restart_CheckSpelling();
+        if ( null != SectPr.FooterDefault )
+            SectPr.FooterDefault.Restart_CheckSpelling();
     }
 };
 

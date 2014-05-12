@@ -1148,7 +1148,7 @@ CDocument.prototype =
                 bFlow = true;
                 if ( true === this.RecalcInfo.Can_RecalcObject() )
                 {
-                    if ( ( 0 === Index && 0 === PageIndex ) || Index != StartIndex )
+                    if ( ( 0 === Index && 0 === PageIndex ) || Index != StartIndex || ( Index === StartIndex && true === bStartNewSection ) )
                     {
                         Element.Set_DocumentIndex( Index );
                         Element.Reset( X, Y, XLimit, YLimit, PageIndex );

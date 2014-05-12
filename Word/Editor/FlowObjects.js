@@ -64,6 +64,8 @@ function FlowObjects_CompareRanges(Range1, Range2)
 
 function CFlowTable(Table, PageIndex)
 {
+    this.Type           = flowobject_Table;
+    
     this.Table          = Table;
     this.Id             = Table.Get_Id();
     this.PageNum        = Table.PageNum;
@@ -157,6 +159,8 @@ CFlowTable.prototype =
 
 function CFlowParagraph(Paragraph, X, Y, W, H, Dx, Dy, StartIndex, FlowCount, Wrap)
 {
+    this.Type      = flowobject_Paragraph;
+    
     this.Table     = Paragraph;
     this.Paragraph = Paragraph;
     this.Id        = Paragraph.Get_Id();

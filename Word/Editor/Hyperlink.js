@@ -849,6 +849,7 @@ ParaHyperlink.prototype =
 
             if ( true === PRS.NewRange )
             {
+                RangeEndPos = Pos;
                 break;
             }
         }
