@@ -12101,6 +12101,13 @@ Paragraph.prototype =
                 // Создаем гиперссылку
                 var Hyperlink = new ParaHyperlink();
 
+                // Заполняем гиперссылку полями
+                if ( undefined != HyperProps.Value && null != HyperProps.Value )
+                    Hyperlink.Set_Value( HyperProps.Value );
+
+                if ( undefined != HyperProps.ToolTip && null != HyperProps.ToolTip )
+                    Hyperlink.Set_ToolTip( HyperProps.ToolTip );
+
                 // Разделяем содержимое по меткам селекта
                 var StartContentPos = this.Get_ParaContentPos(true, true);
                 var EndContentPos   = this.Get_ParaContentPos(true, false);
@@ -12158,6 +12165,13 @@ Paragraph.prototype =
 
                 // Создаем гиперссылку
                 var Hyperlink = new ParaHyperlink();
+
+                // Заполняем гиперссылку полями
+                if ( undefined != HyperProps.Value && null != HyperProps.Value )
+                    Hyperlink.Set_Value( HyperProps.Value );
+
+                if ( undefined != HyperProps.ToolTip && null != HyperProps.ToolTip )
+                    Hyperlink.Set_ToolTip( HyperProps.ToolTip );
 
                 // Создаем текстовый ран в гиперссылке
                 var HyperRun = new ParaRun(this);
