@@ -1878,13 +1878,24 @@ CDocument.prototype =
 
         // Определим секцию
         var Page_StartPos = this.Pages[nPageIndex].Pos;
-        var SectPr = this.SectionsInfo.Get_SectPr( Page_StartPos).SectPr;
+        var SectPr        = this.SectionsInfo.Get_SectPr(Page_StartPos).SectPr;        
 
         // Рисуем колонтитулы
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
-            pGraphics.DrawHeaderEdit( this.Pages[nPageIndex].Y,      this.HdrFtr.Lock.Get_Type() );
-            pGraphics.DrawFooterEdit( this.Pages[nPageIndex].YLimit, this.HdrFtr.Lock.Get_Type() );
+            var SectIndex = this.SectionsInfo.Get_Index(Page_StartPos);
+            var SectCount = this.SectionsInfo.Get_Count();
+            
+            var SectIndex = ( 1 === SectCount ? -1 : SectIndex );
+
+            var Header = this.HdrFtr.Pages[nPageIndex].Header;
+            var Footer = this.HdrFtr.Pages[nPageIndex].Footer;
+            
+            var RepH = ( null === Header || null !== SectPr.Get_HdrFtrInfo(Header) ? false : true );
+            var RepF = ( null === Footer || null !== SectPr.Get_HdrFtrInfo(Footer) ? false : true );
+                        
+            pGraphics.DrawHeaderEdit( this.Pages[nPageIndex].Y,      this.HdrFtr.Lock.Get_Type(), SectIndex, RepH );
+            pGraphics.DrawFooterEdit( this.Pages[nPageIndex].YLimit, this.HdrFtr.Lock.Get_Type(), SectIndex, RepF );
         }
         else
             pGraphics.Start_GlobalAlpha();
@@ -13246,6 +13257,11 @@ CDocumentSectionsInfo.prototype =
 
         // Последний элемент здесь это всегда конечная секция документа
         return (Count - 1);
+    },
+    
+    Get_Count : function()
+    {
+        return this.Elements.length;
     },
 
     Get_SectPr : function(Index)
