@@ -499,8 +499,6 @@
 				"getDCForCharts"			: function () { return self.drawingCtxCharts; },
 				"onRenameCellTextEnd"		: function (countFind, countReplace) {self.handlers.trigger("asc_onRenameCellTextEnd", countFind, countReplace);},
 				"onStopFormatPainter"		: function () {self.handlers.trigger("asc_onStopFormatPainter");},
-				"onChangeColumnWidth"		: function (widthCC, widthPx) {self.handlers.trigger("asc_onChangeColumnWidth", widthCC, widthPx);},
-				"onChangeRowHeight"			: function (heightPt, heightPx) {self.handlers.trigger("asc_onChangeRowHeight", heightPt, heightPx);},
 				"onDocumentPlaceChanged"	: function () {self._onDocumentPlaceChanged();}
 			}, this.buffers, this.stringRender, this.maxDigitWidth, this.collaborativeEditing, opt);
 		};

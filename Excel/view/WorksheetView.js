@@ -3938,9 +3938,7 @@
 
 			var x1 = t.cols[col].left - offsetX - this.width_1px;
 			var h = ctx.getHeight();
-
 			var widthPt = (x - x1);
-			t.handlers.trigger("onChangeColumnWidth", t._colWidthToCharCount(widthPt), widthPt * 96 / 72);
 
 			ctx.clear();
 			t._drawSelection();
@@ -3967,9 +3965,7 @@
 
 			var y1 = t.rows[row].top - offsetY - this.height_1px;
 			var w = ctx.getWidth();
-
 			var heightPt = (y - y1);
-			t.handlers.trigger("onChangeRowHeight", heightPt, heightPt * 96 / 72);
 
 			ctx.clear();
 			t._drawSelection();
