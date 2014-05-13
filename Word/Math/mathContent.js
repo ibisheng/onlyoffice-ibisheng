@@ -710,7 +710,8 @@ CMPrp.prototype =
         // TXT_SANS_SERIF           U+1D608 - U+1D63B
         // TXT_SCRIPT               U+1D49C - U+1D4CF
 
-        this.typeText = props.scr;
+        if(typeof(props.scr)!=="undefined" && props.scr !== null)
+            this.typeText = props.scr;
 
 
         if(props.nor)
