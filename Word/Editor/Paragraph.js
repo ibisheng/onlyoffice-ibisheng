@@ -4081,7 +4081,12 @@ Paragraph.prototype =
             this.Recalculate_Range( ParaPr );
 
             if ( true === PRS.ForceNewPage || true === PRS.NewPage )
+            {
+                // Поскольку мы выходим досрочно из цикла, нам надо удалить лишние отрезки обтекания
+                this.Lines[CurLine].Ranges.length = CurRange + 1;
+                
                 break;
+            }
 
             CurRange++;
         }
