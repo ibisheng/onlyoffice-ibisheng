@@ -6372,8 +6372,17 @@ CMathContent.prototype =
 
         if(Selected)
         {
-            start = this.SelectStartPos;
-            end =   this.SelectEndPos;
+            if(this.SelectStartPos < this.SelectEndPos)
+            {
+                start = this.SelectStartPos;
+                end   = this.SelectEndPos;
+            }
+            else
+            {
+                start = this.SelectEndPos;
+                end   = this.SelectStartPos;
+            }
+
         }
         else
         {
@@ -6383,9 +6392,9 @@ CMathContent.prototype =
 
         var NewContent = new CMathContent();
         NewContent.setComposition(Composition);
-        NewContent.plHide = this.plHide;
+        NewContent.plhHide = this.plhHide;
 
-        for(var i = start; i < end; i++)
+        for(var i = start; i <= end; i++)
         {
             var element;
             if(this.content[i].typeObj == MATH_PARA_RUN)
@@ -6398,7 +6407,7 @@ CMathContent.prototype =
                 element.relate(this);
             }
 
-            NewContent.push(element);
+            NewContent.content.push(element);
         }
 
         return NewContent;

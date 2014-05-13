@@ -1219,7 +1219,7 @@ CRadical.prototype.getPropsForWrite = function()
 {
     var props = {};
 
-    props.degHide = this.type == SQUARE_RADICAL ? 1 : 0;
+    props.degHide = this.type;
 
     return props;
 }

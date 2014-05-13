@@ -241,15 +241,10 @@ CNary.prototype.getLowerIterator = function()
 }
 CNary.prototype.getPropsForWrite = function()
 {
-    var limLoc = null;
-    if (this.limLoc == NARY_SubSup)
-        limLoc = 0;
-    else if (this.limLoc == NARY_UndOvr)
-        limLoc = 1;
     var props = {
         chr:		String.fromCharCode(this.code),
         grow:		this.grow,
-        limLoc: 	limLoc,
+        limLoc: 	this.limLoc,
         subHide:	this.subHide,
         supHide:	this.supHide
     };

@@ -165,6 +165,15 @@ var MATH_EMPTY                  =  3;
 var MATH_PLACEHOLDER            =  4;
 var MATH_PARA_RUN               =  5;
 
+var LOCATION_TOP      =  0;
+var LOCATION_BOT      =  1;
+var LOCATION_LEFT     =  2;
+var LOCATION_RIGHT    =  3;
+var LOCATION_SEP      =  4;
+
+var VJUST_TOP          = 0;
+var VJUST_BOT          = 1;
+
 
 ////////////////////////////////////////
 var BREAK_BEFORE              =  0;
@@ -179,6 +188,8 @@ var STY_BOLD                  =  0;
 var STY_BI                    =  1;
 var STY_ITALIC                =  2;
 var STY_PLAIN                 =  3;
+
+/////////////////////////////////////////
 
 
 var extend = function(Child, Parent)

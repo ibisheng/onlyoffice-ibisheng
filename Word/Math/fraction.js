@@ -410,30 +410,11 @@ CFraction.prototype.findDisposition = function( mCoord )
 }
 CFraction.prototype.getPropsForWrite = function()
 {
-    var type = null;
-    if (this.type == BAR_FRACTION)
-        type = 0;
-    else if (this.type == LINEAR_FRACTION)
-        type = 1;
-    else if (this.type == NO_BAR_FRACTION)
-        type = 2;
-    else if (this.type == SKEWED_FRACTION)
-        type = 3;
-
     var props = {
-        type: type
+        type: this.type
     };
+
     return props;
-}
-CFraction.prototype.Copy = function(Selected, Composition)
-{
-    var props = this.getPropsForWrite();
-
-    var NewFraction = new CFraction();
-    NewFraction.init(props);
-    this.Copy_2(Selected, Composition, NewFraction);
-
-    return NewFraction;
 }
 
 
@@ -500,6 +481,12 @@ CNumerator.prototype.getCtrPrp = function()
 CNumerator.prototype.getRunPrp = function()
 {
     return this.Parent.getRunPrp();
+}
+CNumerator.prototype.getPropsForWrite = function()
+{
+    var props = {};
+
+    return props;
 }
 
 function CDenominator()
@@ -571,5 +558,10 @@ CDenominator.prototype.getRunPrp = function()
 {
     return this.Parent.getRunPrp();
 }
+CDenominator.prototype.getPropsForWrite = function()
+{
+    var props = {};
 
+    return props;
+}
 //////////

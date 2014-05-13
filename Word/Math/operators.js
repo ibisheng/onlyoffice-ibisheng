@@ -1,12 +1,3 @@
-var LOCATION_TOP      =  0;
-var LOCATION_BOT      =  1;
-var LOCATION_LEFT     =  2;
-var LOCATION_RIGHT    =  3;
-var LOCATION_SEP      =  4;
-
-var VJUST_TOP          = 0;
-var VJUST_BOT          = 1;
-
 function CGlyphOperator()
 {
     this.loc =  null;
@@ -3959,13 +3950,8 @@ CDelimiter.prototype.getPropsForWrite = function()
 
     props.grow = this.grow == true ? 1 : 0;
     props.column = this.nCol;
-	
-	var shp = null
-	if ( this.shape == DELIMITER_SHAPE_MATH)
-		shp = 0;
-	else if ( this.shape == DELIMITER_SHAPE_CENTERED )
-		shp = 1;
-    props.shp = shp;
+
+    props.shp = this.shape;
 
     props.begChr = this.begOper.getChr(); // default: PARENTHESIS_LEFT
     props.endChr = this.endOper.getChr(); // default: PARENTHESIS_RIGHT
@@ -4346,22 +4332,10 @@ CGroupCharacter.prototype.old_getGlyph = function(code, type)
 }
 CGroupCharacter.prototype.getPropsForWrite = function()
 {
-    var vertJc = null;
-    if (this.vertJc == VJUST_TOP)
-        vertJc = 1;
-    else 
-        vertJc = 0;
-
-    var pos = null;
-    if (this.loc == LOCATION_BOT)
-        pos = 0;
-    else if ( this.loc == LOCATION_TOP)
-        pos = 1;
-
     var props = {
         chr:	this.operator.getChr(),
-        pos:	pos,
-        vertJc:	vertJc
+        pos:	this.loc,
+        vertJc:	this.vertJc
     };
     return props;
 

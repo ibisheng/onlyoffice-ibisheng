@@ -1093,7 +1093,6 @@ CMathBase.prototype =
         return content;
     },
     ////    For Edit   /////
-
     selection_Start: function(x, y)
     {
         var elem = this.findDisposition({x: x, y: y});
@@ -1552,8 +1551,14 @@ CMathBase.prototype =
     {
         return this.getCtrPrp();
     },
-    Copy_2: function(Selected, Composition, NewObj)
+    Copy: function(Selected, Composition)
     {
+        var props = this.getPropsForWrite();
+
+        var NewObj = new this.constructor();
+        NewObj.init(props);
+        NewObj.argSize = this.argSize;
+
         NewObj.Composition = Composition;
         var CtrPrp = this.CtrPrp.Copy();
 
@@ -1563,13 +1568,12 @@ CMathBase.prototype =
             for(var j = 0; j < this.nCol; j++)
             {
                 NewObj.elements[i][j] = this.elements[i][j].Copy(Selected, Composition);
-
-                var argSize = this.elements[i][j].argSize;
-                NewObj.elements[i][j].setArgSize(argSize);
+                NewObj.elements[i][j].argSize = this.elements[i][j].argSize;
 
                 NewObj.elements[i][j].relate(NewObj);
-
             }
+
+        return NewObj;
     }
 
     //////////////////////////

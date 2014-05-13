@@ -408,8 +408,9 @@ CMathText.prototype =
     Copy: function()
     {
         var NewLetter = new CMathText(this.bJDraw);
+        NewLetter.add(this.value);
 
-
+        return NewLetter;
     },
 
     // заглушка для текста (для n-арных операторов, когда выставляется текст вместо оператора)

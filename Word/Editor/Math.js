@@ -70,16 +70,16 @@ ParaMath.prototype =
 
         var NewMath = new ParaMath();
 
-        /*if(Selected)
+        if(Selected)
         {
-            var Content = this.GetSelectContent();
-            NewMath.Root = Content.Copy(Selected, NewMath);
+            var result = this.GetSelectContent();
+            NewMath.Root = result.Content.Copy(Selected, NewMath);
         }
         else
         {
             NewMath.Root = this.Root.Copy(Selected, NewMath);
 
-        }*/
+        }
 
         /// argSize, bDot и bRoot выставить на объединении контентов
 

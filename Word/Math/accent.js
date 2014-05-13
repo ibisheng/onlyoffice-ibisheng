@@ -1683,13 +1683,3 @@ CAccent.prototype.findDisposition = function(pos)
 
     return {pos: posCurs, mCoord: mouseCoord, inside_flag: inside_flag};
 }
-CAccent.prototype.Copy = function(Selected, Composition)
-{
-    var props = this.getPropsForWrite();
-
-    var NewAccent = new CAccent();
-    NewAccent.init(props);
-    this.Copy_2(Selected, Composition, NewAccent);
-
-    return NewAccent;
-}

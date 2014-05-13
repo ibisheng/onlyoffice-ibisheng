@@ -456,6 +456,7 @@ CDegree.prototype.getBase = function()
 CDegree.prototype.getPropsForWrite = function()
 {
     var props = {};
+
     props.type = this.type;
     props.alnScr = this.alnScr;
 
