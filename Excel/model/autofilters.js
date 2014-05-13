@@ -3655,14 +3655,10 @@ var gUndoInsDelCellsFlag = true;
 				}
 			},
 			
-			_getArrayOpenCells : function(index,buttonId)
+			_getArrayOpenCells : function(index, buttonId)
 			{
-				var ws = this.worksheet;
-				var aWs = this._getCurrentWS();
-				var currentFilter;
-				var numFilter;
-				var curIndex = index.split(':');
-				var opFil;
+				var aWs = this._getCurrentWS(), currentFilter, numFilter, curIndex = index.split(':'), opFil;
+				
 				if(curIndex[0] == 'all')
 				{
 					currentFilter = aWs.AutoFilter;
@@ -3682,183 +3678,35 @@ var gUndoInsDelCellsFlag = true;
 					if(!currentFilter.AutoFilter.FilterColumns)
 						currentFilter.AutoFilter.FilterColumns = [];
 					opFil = currentFilter.AutoFilter.FilterColumns;
-				}
+				};
 					
-
 				//анализируем структуру фильтра
 				//проверяем какие параметры применены к данному столбцу и к другим в этом фильтре
 				//проходимся по всем фильтрам
-				var idDigitalFilter = false;
-				var min;
 				if(opFil)
 				{
-					var isFilterCol = false;
-					var result = [];
-					for(var fN = 0; fN < opFil.length; fN++)
+					var result = this._getOpenAndClosedValues(numFilter, currentFilter, opFil, buttonId);
+					return result;
+				};
+			},
+			
+			_getOpenAndClosedValues: function(numFilter, currentFilter, opFil, buttonId)
+			{
+				var isFilterCol = false, idDigitalFilter = false, result = [], ws = this.worksheet;
+		
+		
+				for(var fN = 0; fN < opFil.length; fN++)
+				{
+					var curFilter = opFil[fN];
+					//стандартный фильтр
+					if(curFilter && curFilter.Filters)
 					{
-						var curFilter = opFil[fN];
-						//стандартный фильтр
-						if(curFilter && curFilter.Filters)
-						{
-							if(curFilter.Filters.Values || curFilter.Filters.Dates)
-							{
-								//пересматриваем все значения
-								var filValue = curFilter.Filters.Values;
-								var dataValues = curFilter.Filters.Dates;
-								var isBlank = curFilter.Filters.Blank;
-								var nC = 0;
-								var acCell = currentFilter.result[curFilter.ColId];
-								//если имеются мерженные ячейки, переносим кнопку
-								if(acCell.showButton == false)
-								{
-									for(var sb = curFilter.ColId + 1; sb < currentFilter.result.length; sb++)
-									{
-										if(currentFilter.result[sb].showButton != false)
-										{
-											//acCell = currentFilter.result[sb];
-											break;
-										}	
-									}
-								}
-								if(sb && sb == numFilter)
-									numFilter = curFilter.ColId;
-								
-								var startRow = ws.model.getCell(new CellAddress(acCell.id)).first.row - 1;
-								var endRow = ws.model.getCell(new CellAddress(acCell.idNext)).first.row - 1;
-								var col = ws.model.getCell(new CellAddress(acCell.id)).first.col - 1;
-								var visible;
-								for(var nRow = startRow + 1; nRow <= endRow; nRow++)
-								{
-									var cell = ws.model.getCell(new CellAddress(nRow,col,0));
-									var val = cell.getValueWithFormat();
-									var val2 = cell.getValueWithoutFormat();
-									if(!result[nC])
-										result[nC] = new AutoFiltersOptionsElements();
-									if(curFilter.ColId == numFilter)//щёлкнули по кнопке данного фильтра
-									{
-										var isFilterCol = true;
-										var isInput = false;
-										result[nC].val = val;
-										result[nC].val2 = val2;
-										visible = (result[nC].visible == "hidden") ? true : false;
-										if(filValue && filValue.length != 0)
-										{
-											for(var nVal = 0; nVal < filValue.length; nVal++)
-											{
-												if(val2 == '' && isBlank == null)
-												{
-													if(!visible)
-														result[nC].visible = false;
-												}
-												if(val2 == '' && isBlank == true)
-												{
-													isInput = true;
-													if(!visible)
-														result[nC].visible = true;
-													break;
-												}
-												else if(filValue[nVal] == val2)
-												{
-													isInput = true;
-													if(!visible)
-														result[nC].visible = true;
-													break;
-												}
-												else
-												{
-													if(!visible)
-														result[nC].visible = false;
-												}
-											}
-										}
-										else if(filValue && filValue.length == 0 && val2 == '' && isBlank == true)
-										{
-											isInput = true;
-											if(!visible)
-												result[nC].visible = true;
-										}
-										
-										if(dataValues && dataValues.length != 0 && !isInput)
-										{
-											for(var nVal = 0; nVal < dataValues.length; nVal++)
-											{
-												if(this._dataFilterParse(dataValues[nVal],val2))
-												{
-													result[nC].val = val;
-													result[nC].val2 = val2;
-													if(result[nC].visible != 'hidden')
-														result[nC].visible = true;
-													break;
-												}
-												else
-												{
-													result[nC].val = val;
-													result[nC].val2 = val2;
-													if(result[nC].visible != 'hidden')
-														result[nC].visible = false;
-												}
-											}
-										}
-									}
-									else//тот же диапазон просмотатриваем другими кнопками фильтра
-									{
-										var check = false;
-										if(filValue.length == 0 && val == '' && isBlank == true)
-											check = true;
-										for(var nVal = 0; nVal < filValue.length; nVal++)
-										{
-											if((filValue[nVal] == val2) || (val == '' && isBlank == true))
-											{
-												check = true;
-												break;
-											}
-										}
-										if(dataValues)
-										{
-											for(var nVal = 0; nVal < dataValues.length; nVal++)
-											{
-												if(this._dataFilterParse(dataValues[nVal],val2))
-												{
-													check = true;
-													break;
-												}
-											}
-										}
-										
-										if(!check)
-										{
-											result[nC].visible = 'hidden';
-										}
-									}
-									if(result[nC].visible != 'hidden')
-									{
-										if(result[nC].val == undefined)
-										{
-											result[nC].val = val;
-											result[nC].val2 = val2;
-										}
-											
-										/*var anotherFilterHidden = this._isHiddenAnotherFilter(buttonId,nRow,ws);
-										if(anotherFilterHidden != undefined)
-											result[nC].visible = anotherFilterHidden;
-										if(anotherFilterHidden == undefined && result[nC].visible == undefined)
-											result[nC].visible = false;*/
-									}
-									
-									if(nC >= 1000)
-									{
-										break;
-									}
-									else
-										nC++;
-								}
-
-							}
-						}
-						else if(curFilter && curFilter.CustomFiltersObj && curFilter.CustomFiltersObj.CustomFilters)//числовой фильтр
+						if(curFilter.Filters.Values || curFilter.Filters.Dates)
 						{
 							//пересматриваем все значения
-							//var filValue = curFilter.Filters.Values;
+							var filValue = curFilter.Filters.Values;
+							var dataValues = curFilter.Filters.Dates;
+							var isBlank = curFilter.Filters.Blank;
 							var nC = 0;
 							var acCell = currentFilter.result[curFilter.ColId];
 							//если имеются мерженные ячейки, переносим кнопку
@@ -3875,49 +3723,129 @@ var gUndoInsDelCellsFlag = true;
 							}
 							if(sb && sb == numFilter)
 								numFilter = curFilter.ColId;
+							
 							var startRow = ws.model.getCell(new CellAddress(acCell.id)).first.row - 1;
 							var endRow = ws.model.getCell(new CellAddress(acCell.idNext)).first.row - 1;
 							var col = ws.model.getCell(new CellAddress(acCell.id)).first.col - 1;
-							for(nRow = startRow + 1; nRow <= endRow; nRow++)
+							var visible;
+							for(var nRow = startRow + 1; nRow <= endRow; nRow++)
 							{
 								var cell = ws.model.getCell(new CellAddress(nRow,col,0));
 								var val = cell.getValueWithFormat();
 								var val2 = cell.getValueWithoutFormat();
-								var type = cell.getType();
 								if(!result[nC])
 									result[nC] = new AutoFiltersOptionsElements();
-								if(curFilter.ColId == numFilter)
+								if(curFilter.ColId == numFilter)//щёлкнули по кнопке данного фильтра
 								{
 									var isFilterCol = true;
-									idDigitalFilter = true;
-									/*for(nVal = 0; nVal < filValue.length; nVal++)
-									{*/
-									result[nC].rep = this._findCloneElement(result,val);
+									var isInput = false;
 									result[nC].val = val;
 									result[nC].val2 = val2;
-									if(result[nC].visible != 'hidden')
-										result[nC].visible = false;
+									visible = (result[nC].visible == "hidden") ? true : false;
+									if(filValue && filValue.length != 0)
+									{
+										for(var nVal = 0; nVal < filValue.length; nVal++)
+										{
+											if(val2 == '' && isBlank == null)
+											{
+												if(!visible)
+													result[nC].visible = false;
+											}
+											if(val2 == '' && isBlank == true)
+											{
+												isInput = true;
+												if(!visible)
+													result[nC].visible = true;
+												break;
+											}
+											else if(filValue[nVal] == val2)
+											{
+												isInput = true;
+												if(!visible)
+													result[nC].visible = true;
+												break;
+											}
+											else
+											{
+												if(!visible)
+													result[nC].visible = false;
+											}
+										}
+									}
+									else if(filValue && filValue.length == 0 && val2 == '' && isBlank == true)
+									{
+										isInput = true;
+										if(!visible)
+											result[nC].visible = true;
+									}
+									
+									if(dataValues && dataValues.length != 0 && !isInput)
+									{
+										for(var nVal = 0; nVal < dataValues.length; nVal++)
+										{
+											if(this._dataFilterParse(dataValues[nVal],val2))
+											{
+												result[nC].val = val;
+												result[nC].val2 = val2;
+												if(result[nC].visible != 'hidden')
+													result[nC].visible = true;
+												break;
+											}
+											else
+											{
+												result[nC].val = val;
+												result[nC].val2 = val2;
+												if(result[nC].visible != 'hidden')
+													result[nC].visible = false;
+											}
+										}
+									}
 								}
-								else
+								else//тот же диапазон просмотатриваем другими кнопками фильтра
 								{
 									var check = false;
-									//проверка на скрытие данных строк другим числовым фильтром
-									var filterCust = 
-									{	
-										filter1: curFilter.CustomFiltersObj.CustomFilters[0].Operator,
-										filter2: curFilter.CustomFiltersObj.CustomFilters[1] ? curFilter.CustomFiltersObj.CustomFilters[1].Operator : undefined,
-										valFilter1: curFilter.CustomFiltersObj.CustomFilters[0].Val,
-										valFilter2: curFilter.CustomFiltersObj.CustomFilters[1]?curFilter.CustomFiltersObj.CustomFilters[1].Val : undefined,
-										isChecked: curFilter.CustomFiltersObj.And
-									};
-									if(!isNaN(parseFloat(val2)))
-										val2 = parseFloat(val2);
-									if(!this._getLogical(filterCust,{val: val2, type: type, valWithFormat: val}))
+									if(filValue.length == 0 && val == '' && isBlank == true)
+										check = true;
+									for(var nVal = 0; nVal < filValue.length; nVal++)
+									{
+										if((filValue[nVal] == val2) || (val == '' && isBlank == true))
+										{
+											check = true;
+											break;
+										}
+									}
+									if(dataValues)
+									{
+										for(var nVal = 0; nVal < dataValues.length; nVal++)
+										{
+											if(this._dataFilterParse(dataValues[nVal],val2))
+											{
+												check = true;
+												break;
+											}
+										}
+									}
+									
+									if(!check)
 									{
 										result[nC].visible = 'hidden';
 									}
 								}
-								this._isHiddenAnotherFilter(curFilter.ColId,nRow);
+								if(result[nC].visible != 'hidden')
+								{
+									if(result[nC].val == undefined)
+									{
+										result[nC].val = val;
+										result[nC].val2 = val2;
+									}
+										
+									/*var anotherFilterHidden = this._isHiddenAnotherFilter(buttonId,nRow,ws);
+									if(anotherFilterHidden != undefined)
+										result[nC].visible = anotherFilterHidden;
+									if(anotherFilterHidden == undefined && result[nC].visible == undefined)
+										result[nC].visible = false;*/
+								}
+								
 								if(nC >= 1000)
 								{
 									break;
@@ -3925,133 +3853,72 @@ var gUndoInsDelCellsFlag = true;
 								else
 									nC++;
 							}
-						}
-						else if(curFilter && curFilter.Top10)//Top10
-						{
-							//пересматриваем все значения
-							var nC = 0;
-							var acCell = currentFilter.result[curFilter.ColId];
-							var startRow = ws.model.getCell(new CellAddress(acCell.id)).first.row - 1;
-							var endRow = ws.model.getCell(new CellAddress(acCell.idNext)).first.row - 1;
-							var col = ws.model.getCell(new CellAddress(acCell.id)).first.col - 1;
-							var top10Arr = [];
-							for(nRow = startRow + 1; nRow <= endRow; nRow++)
-							{
-								var cell = ws.model.getCell(new CellAddress(nRow,col,0));
-								var val = cell.getValueWithFormat();
-								var val2 = cell.getValueWithoutFormat();
-								if(!result[nC])
-									result[nC] = new AutoFiltersOptionsElements();
-								if(curFilter.ColId == numFilter)
-								{
-									var isFilterCol = true;
-									idDigitalFilter = true;
-									result[nC].rep = this._findCloneElement(result,val);
-									result[nC].val = val;
-									result[nC].val2 = val2;
-									if(result[nC].visible != 'hidden')
-										result[nC].visible = false;
-								}
-								else
-								{
-									if(!isNaN(parseFloat(val2)))
-										val2 = parseFloat(val2);
-									top10Arr[nC] = val2;
-								}
-								this._isHiddenAnotherFilter(curFilter.ColId,nRow);
-								if(this._findCloneElement2(result,nC))
-								{
-									result.splice(nC,1);
-								}
-								else if(nC >= 1000)
-								{
-									break;
-								}
-								else
-									nC++;
-							}
-							if(top10Arr.length != 0)
-							{
-								var top10Filter = curFilter.Top10;
-								var sortTop10;
-								if(top10Filter.Top != false)
-								{
-									sortTop10 = top10Arr.sort(function sortArr(a, b)
-									{
-										return b - a;
-									})
-								}	
-								else
-									sortTop10 = top10Arr.sort();
-								var nC = 0;
-								if(sortTop10.length > top10Filter.Val - 1)
-								{
-									var limit = sortTop10[top10Filter.Val - 1];
-									for(nRow = startRow + 1; nRow <= endRow; nRow++)
-									{
-										var cell = ws.model.getCell(new CellAddress(nRow,col,0));
-										var val2 = cell.getValueWithoutFormat();
-										if(!isNaN(parseFloat(val2)))
-											val2 = parseFloat(val2);
-										if(top10Filter.Top == false)
-										{
-											if(val2 > limit)
-												result[nC].visible = 'hidden';
-										}
-										else
-										{
-											if(val2 < limit)
-												result[nC].visible = 'hidden';
-										}
-										if(this._findCloneElement2(result,nC))
-										{
-											result.splice(nC,1);
-										}
-										else if(nC >= 1000)
-										{
-											break;
-										}
-										else
-											nC++;
-									}
-								}
-							}
+
 						}
 					}
-					if(!isFilterCol)//если фильтр не применен
+					else if(curFilter && curFilter.CustomFiltersObj && curFilter.CustomFiltersObj.CustomFilters)//числовой фильтр
 					{
-						var ref = currentFilter.Ref;
-						var filterStart = ws.model.getCell(new CellAddress(ref.split(':')[0]));
-						var filterEnd = ws.model.getCell(new CellAddress(ref.split(':')[1]));
-						//если есть мерженные ячейки в головной строке
-						var cell = ws.model.getCell(new CellAddress(buttonId));
-						var isMerged = cell.hasMerged();
-						if(isMerged)
-						{
-							var range  = this._idToRange(buttonId);
-							range.c1 = isMerged.c1;
-							buttonId = this._rangeToId(range);
-						}
-						
-						var col = ws.model.getCell(new CellAddress(buttonId)).first.col - 1;
-						var startRow = filterStart.first.row;
-						var endRow = filterEnd.first.row - 1;
+						//пересматриваем все значения
+						//var filValue = curFilter.Filters.Values;
 						var nC = 0;
-						for(var s = startRow; s <= endRow; s++)
+						var acCell = currentFilter.result[curFilter.ColId];
+						//если имеются мерженные ячейки, переносим кнопку
+						if(acCell.showButton == false)
 						{
-							var cell = ws.model.getCell(new CellAddress(s,col,0));
+							for(var sb = curFilter.ColId + 1; sb < currentFilter.result.length; sb++)
+							{
+								if(currentFilter.result[sb].showButton != false)
+								{
+									//acCell = currentFilter.result[sb];
+									break;
+								}	
+							}
+						}
+						if(sb && sb == numFilter)
+							numFilter = curFilter.ColId;
+						var startRow = ws.model.getCell(new CellAddress(acCell.id)).first.row - 1;
+						var endRow = ws.model.getCell(new CellAddress(acCell.idNext)).first.row - 1;
+						var col = ws.model.getCell(new CellAddress(acCell.id)).first.col - 1;
+						for(var nRow = startRow + 1; nRow <= endRow; nRow++)
+						{
+							var cell = ws.model.getCell(new CellAddress(nRow,col,0));
+							var val = cell.getValueWithFormat();
+							var val2 = cell.getValueWithoutFormat();
+							var type = cell.getType();
 							if(!result[nC])
 								result[nC] = new AutoFiltersOptionsElements();
-
-							result[nC].val = cell.getValueWithFormat();
-							result[nC].val2 = cell.getValueWithoutFormat();
-							if(result[nC].visible != 'hidden')
-								result[nC].visible = true;
-							if(result[nC].visible != 'hidden')
+							if(curFilter.ColId == numFilter)
 							{
-								if(ws.model._getRow(s).hd)
-									result[nC].visible = 'hidden';
+								var isFilterCol = true;
+								idDigitalFilter = true;
+								/*for(nVal = 0; nVal < filValue.length; nVal++)
+								{*/
+								result[nC].rep = this._findCloneElement(result,val);
+								result[nC].val = val;
+								result[nC].val2 = val2;
+								if(result[nC].visible != 'hidden')
+									result[nC].visible = false;
 							}
+							else
+							{
+								var check = false;
+								//проверка на скрытие данных строк другим числовым фильтром
+								var filterCust = 
+								{	
+									filter1: curFilter.CustomFiltersObj.CustomFilters[0].Operator,
+									filter2: curFilter.CustomFiltersObj.CustomFilters[1] ? curFilter.CustomFiltersObj.CustomFilters[1].Operator : undefined,
+									valFilter1: curFilter.CustomFiltersObj.CustomFilters[0].Val,
+									valFilter2: curFilter.CustomFiltersObj.CustomFilters[1]?curFilter.CustomFiltersObj.CustomFilters[1].Val : undefined,
+									isChecked: curFilter.CustomFiltersObj.And
+								};
+								if(!isNaN(parseFloat(val2)))
+									val2 = parseFloat(val2);
+								if(!this._getLogical(filterCust,{val: val2, type: type, valWithFormat: val}))
+								{
+									result[nC].visible = 'hidden';
+								}
+							}
+							this._isHiddenAnotherFilter(curFilter.ColId,nRow);
 							if(nC >= 1000)
 							{
 								break;
@@ -4060,28 +3927,166 @@ var gUndoInsDelCellsFlag = true;
 								nC++;
 						}
 					}
-					for(var i = 0; i < result.length; i++)
+					else if(curFilter && curFilter.Top10)//Top10
 					{
-						if(this._findCloneElement2(result,i))
+						//пересматриваем все значения
+						var nC = 0;
+						var acCell = currentFilter.result[curFilter.ColId];
+						var startRow = ws.model.getCell(new CellAddress(acCell.id)).first.row - 1;
+						var endRow = ws.model.getCell(new CellAddress(acCell.idNext)).first.row - 1;
+						var col = ws.model.getCell(new CellAddress(acCell.id)).first.col - 1;
+						var top10Arr = [];
+						for(nRow = startRow + 1; nRow <= endRow; nRow++)
 						{
-							result.splice(i,1);
-							i--;
+							var cell = ws.model.getCell(new CellAddress(nRow,col,0));
+							var val = cell.getValueWithFormat();
+							var val2 = cell.getValueWithoutFormat();
+							if(!result[nC])
+								result[nC] = new AutoFiltersOptionsElements();
+							if(curFilter.ColId == numFilter)
+							{
+								var isFilterCol = true;
+								idDigitalFilter = true;
+								result[nC].rep = this._findCloneElement(result,val);
+								result[nC].val = val;
+								result[nC].val2 = val2;
+								if(result[nC].visible != 'hidden')
+									result[nC].visible = false;
+							}
+							else
+							{
+								if(!isNaN(parseFloat(val2)))
+									val2 = parseFloat(val2);
+								top10Arr[nC] = val2;
+							}
+							this._isHiddenAnotherFilter(curFilter.ColId,nRow);
+							if(this._findCloneElement2(result,nC))
+							{
+								result.splice(nC,1);
+							}
+							else if(nC >= 1000)
+							{
+								break;
+							}
+							else
+								nC++;
+						}
+						if(top10Arr.length != 0)
+						{
+							var top10Filter = curFilter.Top10;
+							var sortTop10;
+							if(top10Filter.Top != false)
+							{
+								sortTop10 = top10Arr.sort(function sortArr(a, b)
+								{
+									return b - a;
+								})
+							}	
+							else
+								sortTop10 = top10Arr.sort();
+							var nC = 0;
+							if(sortTop10.length > top10Filter.Val - 1)
+							{
+								var limit = sortTop10[top10Filter.Val - 1];
+								for(nRow = startRow + 1; nRow <= endRow; nRow++)
+								{
+									var cell = ws.model.getCell(new CellAddress(nRow,col,0));
+									var val2 = cell.getValueWithoutFormat();
+									if(!isNaN(parseFloat(val2)))
+										val2 = parseFloat(val2);
+									if(top10Filter.Top == false)
+									{
+										if(val2 > limit)
+											result[nC].visible = 'hidden';
+									}
+									else
+									{
+										if(val2 < limit)
+											result[nC].visible = 'hidden';
+									}
+									if(this._findCloneElement2(result,nC))
+									{
+										result.splice(nC,1);
+									}
+									else if(nC >= 1000)
+									{
+										break;
+									}
+									else
+										nC++;
+								}
+							}
 						}
 					}
-					if(idDigitalFilter)
-						result.dF = true;
-					/*for(var l = 0; l < result.length; )
-					{
-						if(result[l].rep)
-							result.splice(l,1);
-						else
-							l++*/
-						/*if(result[l].rep)
-							result[l].visible = 'hidden';
-						delete result[l].rep;*/
-					//}
-					return result;
 				}
+				
+				if(!isFilterCol)//если фильтр не применен
+				{
+					var ref = currentFilter.Ref;
+					
+					var rangeFilter = this._refToRange(ref);
+					
+					//var filterStart = ws.model.getCell(new CellAddress(ref.split(':')[0]));
+					//var filterEnd = ws.model.getCell(new CellAddress(ref.split(':')[1]));
+					
+					//если есть мерженные ячейки в головной строке
+					var cell = ws.model.getCell(new CellAddress(buttonId));
+					var isMerged = cell.hasMerged();
+					if(isMerged)
+					{
+						var range  = this._idToRange(buttonId);
+						range.c1 = isMerged.c1;
+						buttonId = this._rangeToId(range);
+					}
+					
+					var col = ws.model.getCell(new CellAddress(buttonId)).first.col - 1;
+					
+					//var startRow = filterStart.first.row;
+					//var endRow = filterEnd.first.row - 1;
+					
+					var startRow = rangeFilter.r1 + 1;
+					var endRow = rangeFilter.r2;
+					
+					var nC = 0;
+					for(var s = startRow; s <= endRow; s++)
+					{
+						var cell = ws.model.getCell(new CellAddress(s,col,0));
+						if(!result[nC])
+							result[nC] = new AutoFiltersOptionsElements();
+
+						result[nC].val = cell.getValueWithFormat();
+						result[nC].val2 = cell.getValueWithoutFormat();
+						if(result[nC].visible != 'hidden')
+							result[nC].visible = true;
+						if(result[nC].visible != 'hidden')
+						{
+							if(ws.model._getRow(s).hd)
+								result[nC].visible = 'hidden';
+						}
+						if(nC >= 1000)
+						{
+							break;
+						}
+						else
+							nC++;
+					}
+				};
+				
+				var idDigitalFilter = result.dF;
+					
+				for(var i = 0; i < result.length; i++)
+				{
+					if(this._findCloneElement2(result,i))
+					{
+						result.splice(i,1);
+						i--;
+					}
+				};
+				
+				if(idDigitalFilter)
+					result.dF = true;
+				
+				return result;
 			},
 			
 			_addNewFilter: function(val,tableColumns,aWs,isAll,style)
