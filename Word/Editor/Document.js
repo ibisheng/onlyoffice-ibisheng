@@ -7116,16 +7116,7 @@ CDocument.prototype =
                             StartPos = this.Selection.EndPos;
 
                         var Item = this.Content[StartPos];
-                        if ( type_Paragraph == Item.GetType() )
-                        {
-                            var StartPos_item = Item.Selection.StartPos;
-                            if ( Item.Selection.EndPos < StartPos_item )
-                                StartPos_item = Item.Selection.EndPos;
-
-                            VisTextPr = Item.Internal_CalculateTextPr( StartPos_item - 1 );
-                        }
-                        else if ( type_Table == Item.GetType() )
-                            VisTextPr = Item.Get_Paragraph_TextPr_Copy();
+                        VisTextPr = Item.Get_Paragraph_TextPr_Copy();
 
                         break;
                     }
@@ -7147,14 +7138,7 @@ CDocument.prototype =
             else
             {
                 var Item = this.Content[this.CurPos.ContentPos];
-                if ( type_Paragraph == Item.GetType() )
-                {
-                    Result_TextPr = Item.Internal_CalculateTextPr( Item.CurPos.ContentPos - 1 );
-                }
-                else if ( type_Table == Item.GetType() )
-                {
-                    Result_TextPr = Item.Get_Paragraph_TextPr_Copy();
-                }
+                Result_TextPr = Item.Get_Paragraph_TextPr_Copy();
             }
 
             return Result_TextPr;

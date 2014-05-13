@@ -14771,6 +14771,49 @@ Paragraph.prototype =
 
         return Result;
     },
+    
+    Get_Paragraph_TextPr_Copy : function()
+    {             
+        var TextPr;
+        if ( true === this.ApplyToAll )
+        {
+            this.Select_All(1);
+
+            var Count = this.Content.length;
+            var StartPos = 0;
+            while ( true === this.Content[StartPos].Selection_IsEmpty() && StartPos < Count )
+                StartPos++;
+
+            TextPr = this.Content[StartPos].Get_CompiledTextPr(true);
+
+            this.Selection_Remove();
+        }
+        else
+        {
+            if ( true === this.Selection.Use )
+            {
+                var StartPos = this.Selection.StartPos;
+                var EndPos   = this.Selection.EndPos;
+
+                if ( StartPos > EndPos )
+                {
+                    StartPos = this.Selection.EndPos;
+                    EndPos   = this.Selection.StartPos;
+                }
+
+                while ( true === this.Content[StartPos].Selection_IsEmpty() && StartPos < EndPos )
+                    StartPos++;
+
+                TextPr = this.Content[StartPos].Get_CompiledTextPr(true);
+            }
+            else
+            {
+                TextPr = this.Content[this.CurPos.ContentPos].Get_CompiledTextPr(true);
+            }
+        }
+
+        return TextPr;
+    },
 
     Get_Paragraph_ParaPr_Copy : function()
     {
