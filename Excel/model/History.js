@@ -431,7 +431,7 @@ CHistory.prototype =
 			if (g_oUndoRedoGraphicObjects === Item.Class)
 				isRedrawAll = false;
         }
-        var wsViews = Asc.editor.wb.wsViews;
+        var wsViews = Asc["editor"].wb.wsViews;
         for(var i = 0; i < wsViews.length; ++i)
         {
             if(wsViews[i])
@@ -523,7 +523,7 @@ CHistory.prototype =
 				oRedoObjectParam.oChangeWorksheetUpdate[Item.SheetId] = Item.SheetId;
 			}
         }
-        var wsViews = Asc.editor.wb.wsViews;
+        var wsViews = Asc["editor"].wb.wsViews;
         for(var i = 0; i < wsViews.length; ++i)
         {
             if(wsViews[i])

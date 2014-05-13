@@ -24,7 +24,7 @@ CShape.prototype.setDrawingBase = function(drawingBase)
 
 CShape.prototype.getDrawingObjectsController = function()
 {
-    var wsViews = Asc.editor && Asc.editor.wb && Asc.editor.wb.wsViews;
+    var wsViews = Asc["editor"] && Asc["editor"].wb && Asc["editor"].wb.wsViews;
     if(wsViews)
     {
         for(var i = 0; i < wsViews.length; ++i)
@@ -41,7 +41,7 @@ function addToDrawings(worksheet, graphic, position, lockByDefault)
 {
 
     var drawingObjects;
-    var wsViews = Asc.editor.wb.wsViews;
+    var wsViews = Asc["editor"].wb.wsViews;
     for(var i = 0; i < wsViews.length; ++i)
     {
         if(wsViews[i] && wsViews[i].model === worksheet)
