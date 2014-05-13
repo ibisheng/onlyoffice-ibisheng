@@ -343,7 +343,7 @@
 			    this.model.handlers.add("setDocumentModified", function (bIsModified) {
 				    self.handlers.trigger("asc_onDocumentModifiedChanged", bIsModified);
 			    });
-			    this.model.handlers.add("initCommentsToSave", function (bIsModified) {
+			    this.model.handlers.add("initCommentsToSave", function () {
 				    self._initCommentsToSave();
 			    });
 			    this.model.handlers.add("replaceWorksheet", function (from, to) {
@@ -639,7 +639,7 @@
 
 			var ct = ws.getCursorTypeFromXY(x, y, this.controller.settings.isViewerMode);
 
-			if ("hyperlink" === ct.target) {
+			if (c_oTargetType.Hyperlink === ct.target) {
 				// Проверим замерженность
 				var isHyperlinkClick = false;
 				if ((ar.c1 === ar.c2 && ar.r1 === ar.r2) || isSelectOnShape)
@@ -697,38 +697,38 @@
 
 				// Отправление эвента об удалении всего листа (именно удалении, т.к. если просто залочен, то не рисуем рамку вокруг)
 				if (undefined !== ct.userIdAllSheet) {
-					arrMouseMoveObjects.push(asc_CMM({type: c_oAscMouseMoveType.LockedObject, x: ct.lockAllPosLeft,
+					arrMouseMoveObjects.push(new asc_CMM({type: c_oAscMouseMoveType.LockedObject, x: ct.lockAllPosLeft,
 						y: ct.lockAllPosTop, userId: ct.userIdAllSheet,
 						lockedObjectType: c_oAscMouseMoveLockedObjectType.Sheet}));
 				} else {
 					// Отправление эвента о залоченности свойств всего листа (только если не удален весь лист)
 					if (undefined !== ct.userIdAllProps) {
-						arrMouseMoveObjects.push(asc_CMM({type: c_oAscMouseMoveType.LockedObject, x: ct.lockAllPosLeft,
+						arrMouseMoveObjects.push(new asc_CMM({type: c_oAscMouseMoveType.LockedObject, x: ct.lockAllPosLeft,
 							y: ct.lockAllPosTop, userId: ct.userIdAllProps,
 							lockedObjectType: c_oAscMouseMoveLockedObjectType.TableProperties}));
 					}
 				}
 				// Отправление эвента о наведении на залоченный объект
 				if (undefined !== ct.userId) {
-					arrMouseMoveObjects.push(asc_CMM({type: c_oAscMouseMoveType.LockedObject, x: ct.lockRangePosLeft,
+					arrMouseMoveObjects.push(new asc_CMM({type: c_oAscMouseMoveType.LockedObject, x: ct.lockRangePosLeft,
 						y: ct.lockRangePosTop, userId: ct.userId,
 						lockedObjectType: c_oAscMouseMoveLockedObjectType.Range}));
 				}
 
 				// Проверяем комментарии ячейки
 				if (undefined !== ct.commentIndexes) {
-					arrMouseMoveObjects.push(asc_CMM({type: c_oAscMouseMoveType.Comment,
+					arrMouseMoveObjects.push(new asc_CMM({type: c_oAscMouseMoveType.Comment,
 						x: ct.commentCoords.asc_getLeftPX(), reverseX: ct.commentCoords.asc_getReverseLeftPX(), y: ct.commentCoords.asc_getTopPX(),
 						aCommentIndexes: ct.commentIndexes}));
 				}
 				// Проверяем гиперссылку
-				if (ct.target === "hyperlink") {
+				if (ct.target === c_oTargetType.Hyperlink) {
 					if (true === ctrlKey) {
 						// Мы без нажатия на гиперлинк
 					} else {
 						ct.cursor = ct.cellCursor.cursor;
 					}
-					arrMouseMoveObjects.push(asc_CMM({type: c_oAscMouseMoveType.Hyperlink, x: x, y: y,
+					arrMouseMoveObjects.push(new asc_CMM({type: c_oAscMouseMoveType.Hyperlink, x: x, y: y,
 						hyperlink: ct.hyperlink}));
 				}
 
@@ -737,19 +737,19 @@
 				 */
 				if (0 === arrMouseMoveObjects.length) {
 					// Отправляем эвент, что мы ни на какой области
-					arrMouseMoveObjects.push(asc_CMM({type: c_oAscMouseMoveType.None}));
+					arrMouseMoveObjects.push(new asc_CMM({type: c_oAscMouseMoveType.None}));
 				}
 				// Отсылаем эвент с объектами
 				this.handlers.trigger("asc_onMouseMove", arrMouseMoveObjects);
 
-                if(ct.target === "moveRange" && ctrlKey && ct.cursor == "move"){
+                if(ct.target === c_oTargetType.MoveRange && ctrlKey && ct.cursor == "move"){
                     ct.cursor = "copy";
                 }
 
 				if (canvasElem.style.cursor !== ct.cursor) {
 					canvasElem.style.cursor = ct.cursor;
 				}
-				if (ct.target === "colheader" || ct.target === "rowheader") {
+				if (ct.target === c_oTargetType.ColumnHeader || ct.target === c_oTargetType.RowHeader) {
 					ws.drawHighlightedHeaders(ct.col, ct.row);
 				} else {
 					ws.cleanHighlightedHeaders();
@@ -759,9 +759,9 @@
 		};
 
 		WorkbookView.prototype._onResizeElement = function (target, x, y) {
-			if (target.target === "colresize") {
+			if (target.target === c_oTargetType.ColumnResize) {
 				this.getWorksheet().drawColumnGuides(target.col, x, y, target.mouseX);
-			} else if (target.target === "rowresize") {
+			} else if (target.target === c_oTargetType.RowResize) {
 				this.getWorksheet().drawRowGuides(target.row, x, y, target.mouseY);
 			}
 		};
@@ -770,9 +770,9 @@
 			var ws = this.getWorksheet();
 			if (isResizeModeMove) {
 				ws.objectRender.saveSizeDrawingObjects();
-				if (target.target === "colresize") {
+				if (target.target === c_oTargetType.ColumnResize) {
 					ws.changeColumnWidth(target.col, x, target.mouseX);
-				} else if (target.target === "rowresize") {
+				} else if (target.target === c_oTargetType.RowResize) {
 					ws.changeRowHeight(target.row, y, target.mouseY);
 				}
 				ws.objectRender.updateSizeDrawingObjects();
@@ -918,15 +918,16 @@
 			var ws = this.getWorksheet();
 			var ct = ws.getCursorTypeFromXY(x, y, this.controller.settings.isViewerMode);
 
-			if (ct.target === "colresize" || ct.target === "rowresize") {
-				ct.target === "colresize" ? ws.optimizeColWidth(ct.col) : ws.optimizeRowHeight(ct.row);
+			if (ct.target === c_oTargetType.ColumnResize || ct.target === c_oTargetType.RowResize) {
+				ct.target === c_oTargetType.ColumnResize ? ws.optimizeColWidth(ct.col) : ws.optimizeRowHeight(ct.row);
 				asc_applyFunction(callback);
 			} else {
 				if (ct.col >=0 && ct.row >= 0)
 					this.controller.setStrictClose(!ws._isCellEmptyText(ct.col, ct.row));
 
 				// Для нажатия на колонку/строку/all обрабатывать dblClick не нужно
-				if ("colheader" === ct.target || "rowheader" === ct.target || "corner" === ct.target) {
+				if (c_oTargetType.ColumnHeader === ct.target || c_oTargetType.RowHeader === ct.target ||
+					c_oTargetType.Corner === ct.target) {
 					asc_applyFunction(callback);
 					return;
 				}

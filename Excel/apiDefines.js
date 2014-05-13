@@ -228,7 +228,9 @@ var c_oAscMouseMoveType = {
 	None			: 0,
 	Hyperlink		: 1,
 	Comment			: 2,
-	LockedObject	: 3
+	LockedObject	: 3,
+	ResizeColumn	: 4,
+	ResizeRow		: 5
 };
 
 var c_oAscMouseMoveLockedObjectType = {
@@ -468,6 +470,22 @@ var c_oAscFindLookIn = {
 	Formulas	: 1,
 	Value		: 2,
 	Annotations	: 3
+};
+
+var c_oTargetType = {
+	None			: 0,
+	ColumnResize	: 1,
+	RowResize		: 2,
+	FillHandle		: 3,
+	MoveRange		: 4,
+	MoveResizeRange	: 5,
+	FilterObject	: 6,
+	ColumnHeader	: 7,
+	RowHeader		: 8,
+	Corner			: 9,
+	Hyperlink		: 10,
+	Cells			: 11,
+	Shape			: 12
 };
  
 var c_oAscCoAuthoringMeBorderColor					= new window.CColor(22, 156, 0);

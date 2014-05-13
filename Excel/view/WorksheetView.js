@@ -5465,7 +5465,7 @@
 					}
 				}
 				if (cursor) {
-					return {cursor: cursor, target: "moveResizeRange", col: col, row: row,
+					return {cursor: cursor, target: c_oTargetType.MoveResizeRange, col: col, row: row,
 						formulaRange: oFormulaRange, indexFormulaRange: i, targetArr: targetArr};
 				}
 			}
@@ -5497,7 +5497,7 @@
 		WorksheetView.prototype.getCursorTypeFromXY = function (x, y, isViewerMode) {
 			var c, r, f, i, offsetX, offsetY, cellCursor, sheetId = this.model.getId(), userId,
 				lockRangePosLeft, lockRangePosTop, lockInfo, oHyperlink, widthDiff = 0, heightDiff = 0,
-				isLocked = false, ar = this.activeRange, target = "cells", row = -1, col = -1, isSelGraphicObject;
+				isLocked = false, ar = this.activeRange, target = c_oTargetType.Cells, row = -1, col = -1, isSelGraphicObject;
 				
 			var frozenCursor = this._isFrozenAnchor(x, y);
 			if (frozenCursor.result) {
@@ -5516,7 +5516,7 @@
 
 			var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
             if (asc["editor"].isStartAddShape && CheckIdSatetShapeAdd(this.objectRender.controller.curState))
-				return {cursor: kCurFillHandle, target: "shape", col: -1, row: -1};
+				return {cursor: kCurFillHandle, target: c_oTargetType.Shape, col: -1, row: -1};
 
 			if (drawingInfo && drawingInfo.id) {
 				// Возможно картинка с lock
@@ -5538,12 +5538,12 @@
 					else
 						oHyperlink.Hyperlink = drawingInfo.hyperlink.Value;
 
-					cellCursor = {cursor: drawingInfo.cursor, target: "cells", col: -1, row: -1, userId: userId};
-					return {cursor: kCurHyperlink, target: "hyperlink",
+					cellCursor = {cursor: drawingInfo.cursor, target: c_oTargetType.Cells, col: -1, row: -1, userId: userId};
+					return {cursor: kCurHyperlink, target: c_oTargetType.Hyperlink,
 							hyperlink: new asc_CHyperlink(oHyperlink), cellCursor: cellCursor, userId: userId};
 				}
 
-				return {cursor: drawingInfo.cursor, target: "shape", drawingId: drawingInfo.id, col: -1, row: -1,
+				return {cursor: drawingInfo.cursor, target: c_oTargetType.Shape, drawingId: drawingInfo.id, col: -1, row: -1,
 					userId: userId, lockRangePosLeft: lockRangePosLeft, lockRangePosTop: lockRangePosTop};
 			}
 
@@ -5554,23 +5554,23 @@
 				if (x <= this.cellsLeft && y >= this.cellsTop) {
 					r = this._findRowUnderCursor(y, true);
 					if (r !== null) {
-						target = "rowheader";
+						target = c_oTargetType.RowHeader;
 						row = r.row;
 					}
 				}
 				if (y <= this.cellsTop && x >= this.cellsLeft) {
 					c = this._findColUnderCursor(x, true);
 					if (c !== null) {
-						target = "colheader";
+						target = c_oTargetType.ColumnHeader;
 						col = c.col;
 					}
 				}
 				return {cursor: kCurFormatPainter, target: target, col: col, row: row};
 			}
 
-			var oResDefault = {cursor: kCurDefault, target: "none", col: -1, row: -1};
+			var oResDefault = {cursor: kCurDefault, target: c_oTargetType.None, col: -1, row: -1};
 			if (x < this.cellsLeft && y < this.cellsTop) {
-				return {cursor: kCurCorner, target: "corner", col: -1, row: -1};
+				return {cursor: kCurCorner, target: c_oTargetType.Corner, col: -1, row: -1};
 			}
 			if (x <= this.cellsLeft && y >= this.cellsTop) {
 				r = this._findRowUnderCursor(y, true);
@@ -5580,7 +5580,7 @@
 				// ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
 				return {
 					cursor: f ? kCurRowResize : kCurRowSelect,
-					target: f ? "rowresize" : "rowheader",
+					target: f ? c_oTargetType.RowResize : c_oTargetType.RowHeader,
 					col: -1,
 					row: r.row + (r.row !== this.visibleRange.r1 && f && y < r.top + 3 ? -1 : 0),
 					mouseY: f ? ((y < r.top + 3) ? (r.top - y - this.height_1px): (r.bottom - y - this.height_1px))  : null
@@ -5594,7 +5594,7 @@
 				// ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
 				return {
 					cursor: f ? kCurColResize : kCurColSelect,
-					target: f ? "colresize" : "colheader",
+					target: f ? c_oTargetType.ColumnResize : c_oTargetType.ColumnHeader,
 					col: c.col + (c.col !== this.visibleRange.c1 && f && x < c.left + 3 ? -1 : 0),
 					row: -1,
 					mouseX: f ? ((x < c.left + 3) ? (c.left - x - this.width_1px): (c.right - x - this.width_1px))  : null
@@ -5603,7 +5603,7 @@
 
 			var autoFilterInfo = this.autoFilters.checkCursor(x, y);
 			if (autoFilterInfo)
-				return {cursor: kCurAutoFilter, target: "aFilterObject", col: -1, row: -1, idFilter: autoFilterInfo.id};
+				return {cursor: kCurAutoFilter, target: c_oTargetType.FilterObject, col: -1, row: -1, idFilter: autoFilterInfo.id};
 
 			offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
 			offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
@@ -5632,14 +5632,14 @@
 					x >= (this.fillHandleL - fillHandleEpsilon) && x <= (this.fillHandleR + fillHandleEpsilon) &&
 					y >= (this.fillHandleT - fillHandleEpsilon) && y <= (this.fillHandleB + fillHandleEpsilon)) {
 					// Мы на "квадрате" для автозаполнения
-					return {cursor: kCurFillHandle, target: "fillhandle", col: -1, row: -1};
+					return {cursor: kCurFillHandle, target: c_oTargetType.FillHandle, col: -1, row: -1};
 				}
 
 				// Навели на выделение
 				var xWithOffset = x + offsetX;
 				var yWithOffset = y + offsetY;
 				if (this._isCursorOnSelectionBorder(ar, this.visibleRange, xWithOffset, yWithOffset))
-					return {cursor: kCurMove, target: "moveRange", col: -1, row: -1};
+					return {cursor: kCurMove, target: c_oTargetType.MoveRange, col: -1, row: -1};
 			}
 
 			if (x > this.cellsLeft && y > this.cellsTop) {
@@ -5731,14 +5731,14 @@
 
 				// Проверим, может мы в гиперлинке
 				oHyperlink = this.model.getHyperlinkByCell(r.row, c.col);
-				cellCursor = {cursor: kCurCells, target: "cells", col: (c ? c.col : -1),
+				cellCursor = {cursor: kCurCells, target: c_oTargetType.Cells, col: (c ? c.col : -1),
 					row: (r ? r.row : -1), userId: userId,
 					lockRangePosLeft: lockRangePosLeft, lockRangePosTop: lockRangePosTop,
 					userIdAllProps: userIdAllProps, lockAllPosLeft: lockAllPosLeft,
 					lockAllPosTop: lockAllPosTop, userIdAllSheet: userIdAllSheet,
 					commentIndexes: indexes, commentCoords: coords};
 				if (null !== oHyperlink) {
-					return {cursor: kCurHyperlink, target: "hyperlink",
+					return {cursor: kCurHyperlink, target: c_oTargetType.Hyperlink,
 						hyperlink: new asc_CHyperlink(oHyperlink), cellCursor: cellCursor,
 						userId: userId, lockRangePosLeft: lockRangePosLeft,
 						lockRangePosTop: lockRangePosTop, userIdAllProps: userIdAllProps,

@@ -287,9 +287,10 @@
 			// Для формулы не нужно выходить из редактирования ячейки
 			if (t.settings.isViewerMode || t.isFormulaEditMode || t.isSelectionDialogMode) {return true;}
 
-			if( this.targetInfo && ( this.targetInfo.target == "moveResizeRange" || this.targetInfo.target == "moveRange" || this.targetInfo.target == "fillhandle" ) ){
+			if(this.targetInfo && (this.targetInfo.target == c_oTargetType.MoveResizeRange ||
+				this.targetInfo.target == c_oTargetType.MoveRange ||
+				this.targetInfo.target == c_oTargetType.FillHandle))
 				return true;
-			}
 
 			if (t.isCellEditMode) {if (!t.handlers.trigger("stopCellEditing")) {return true;}}
 
@@ -1278,35 +1279,31 @@
 					return;
 				}
 				if (t.targetInfo){
-					if (t.targetInfo.target === "colresize" || t.targetInfo.target === "rowresize") {
+					if (t.targetInfo.target === c_oTargetType.ColumnResize || t.targetInfo.target === c_oTargetType.RowResize) {
 						t.isResizeMode = true;
 						t._resizeElement(event);
 						return;
-					} else if (t.targetInfo && t.targetInfo.target === "fillhandle" && false === this.settings.isViewerMode){
+					} else if (t.targetInfo && t.targetInfo.target === c_oTargetType.FillHandle && false === this.settings.isViewerMode) {
 						// В режиме автозаполнения
 						this.isFillHandleMode = true;
 						t._changeFillHandle(event);
 						return;
-					} else if ( t.targetInfo && t.targetInfo.target === "moveRange" && false === this.settings.isViewerMode ) {
+					} else if (t.targetInfo && t.targetInfo.target === c_oTargetType.MoveRange && false === this.settings.isViewerMode) {
 						// В режиме перемещения диапазона
 						this.isMoveRangeMode = true;
 						t._moveRangeHandle(event);
 						return;
-					}
-					else if (t.targetInfo && (t.targetInfo.target === "aFilterObject")) {
+					} else if (t.targetInfo && t.targetInfo.target === c_oTargetType.FilterObject) {
 						  t._autoFiltersClick(t.targetInfo.idFilter);
 						  return;
-					}
-					else if (t.targetInfo && (undefined !== t.targetInfo.commentIndexes) && (false === this.settings.isViewerMode)) {
+					} else if (t.targetInfo && (undefined !== t.targetInfo.commentIndexes) && (false === this.settings.isViewerMode)) {
 						t._commentCellClick(event);
-					}
-					else if ( t.targetInfo && t.targetInfo.target === "moveResizeRange" && false === this.settings.isViewerMode ){
+					} else if ( t.targetInfo && t.targetInfo.target === c_oTargetType.MoveResizeRange && false === this.settings.isViewerMode ){
 						this.isMoveResizeRange = true;
 						this.isMoveResizeChartsRange = true;
 						t._moveResizeRangeHandle(event, t.targetInfo);
 						return;
-					}
-					else if ( t.targetInfo && ((t.targetInfo.target === "frozenAnchorV") || (t.targetInfo.target === "frozenAnchorH")) ) {
+					} else if ( t.targetInfo && ((t.targetInfo.target === "frozenAnchorV") || (t.targetInfo.target === "frozenAnchorH")) ) {
 						// Режим установки закреплённых областей
 						this.isFrozenAnchorMode = t.targetInfo.target;
 						t._moveFrozenAnchorHandle(event, t.targetInfo);
@@ -1324,7 +1321,7 @@
 					} else {
 						if (t.isFormulaEditMode) {
 							// !!! в зависимости от цели делаем разные действия - либо селектим область либо мувим существующий диапазон
-							if ( t.targetInfo && t.targetInfo.target === "moveResizeRange" && false === this.settings.isViewerMode ){
+							if ( t.targetInfo && t.targetInfo.target === c_oTargetType.MoveResizeRange && false === this.settings.isViewerMode ){
 								this.isMoveResizeRange = true;
 								t._moveResizeRangeHandle(event, t.targetInfo);
 								return;
@@ -1355,7 +1352,7 @@
 			if (2 === event.button) {
 				t.handlers.trigger("changeSelectionRightClick", coord.x, coord.y);
 			} else {
-				if (t.targetInfo && t.targetInfo.target === "fillhandle"  && false === this.settings.isViewerMode){
+				if (t.targetInfo && t.targetInfo.target === c_oTargetType.FillHandle  && false === this.settings.isViewerMode){
 					// В режиме автозаполнения
 					t.isFillHandleMode = true;
 					t._changeFillHandle(event);
