@@ -8,6 +8,10 @@
  * To change this template use File | Settings | File Templates.
  */
 
+function _getRowTitle( row ) {
+    return "" + (row + 1);
+}
+
 cFormulaFunction.LookupAndReference = {
     'groupName':"LookupAndReference",
     'ADDRESS':cADDRESS,
@@ -51,10 +55,6 @@ function cADDRESS() {
 
 cADDRESS.prototype = Object.create( cBaseFunction.prototype )
 cADDRESS.prototype.Calculate = function ( arg ) {
-
-    function _getRowTitle( row ) {
-        return "" + (row + 1);
-    }
 
     var rowNumber = arg[0], colNumber = arg[1],
         refType = arg[2] ? arg[2] : new cNumber( 1 ),
@@ -600,8 +600,9 @@ cINDIRECT.prototype.Calculate = function ( arg ) {
     }
 
     if ( found_operand ) {
-        if ( found_operand instanceof cName )
+        if ( found_operand instanceof cName ){
             found_operand = found_operand.toRef();
+        }
 
         var cellName = r.getCells()[0].getName(), wsId = r.worksheet.getId();
 
@@ -615,8 +616,9 @@ cINDIRECT.prototype.Calculate = function ( arg ) {
         }
         else if ( found_operand instanceof cArea3D && found_operand.isValid() ) {
             var wsR = found_operand.wsRange();
-            for ( var j = 0; j < wsR.length; j++ )
+            for ( var j = 0; j < wsR.length; j++ ){
                 wb.dependencyFormulas.addEdge( wsId, cellName.replace( /\$/g, "" ), wsR[j].Id, found_operand._cells.replace( /\$/g, "" ) );
+            }
         }
 
         return this.value = found_operand;
@@ -927,18 +929,135 @@ function cOFFSET() {
 }
 
 cOFFSET.prototype = Object.create( cBaseFunction.prototype )
-/* cOFFSET.prototype.Calculate = function ( arg ) {
- var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3] ? arg[3] : new cNumber(0 ), arg4 = arg[4] ? arg[4] : new cNumber(0);
+cOFFSET.prototype.Calculate = function ( arg ) {
 
- if(1){}
+    function validCol( nCol ) {
+        return 0 <= nCol && nCol <= gc_nMaxCol;
+    }
 
- }
- cOFFSET.prototype.getInfo = function () {
- return {
- name:this.name,
- args:"( reference , rows , cols [ , [ height ] [ , [ width ] ] ] )"
- };
- } */
+    function validRow( nRow ) {
+        return 0 <= nRow && nRow <= gc_nMaxRow;
+    }
+
+    function validBBOX( bbox ) {
+        return  0 <= bbox.r1 && bbox.r1 <= gc_nMaxRow0 &&
+            0 <= bbox.c1 && bbox.c1 <= gc_nMaxCol0 &&
+            0 <= bbox.r2 && bbox.r2 <= gc_nMaxRow0 &&
+            0 <= bbox.c2 && bbox.c2 <= gc_nMaxCol0;
+    }
+
+    var arg0 = arg[0],
+        arg1 = arg[1].tocNumber(),
+        arg2 = arg[2].tocNumber(),
+        arg3 = new cNumber( -1 ), arg4 = new cNumber( -1 );
+
+    if ( this.argumentsCurrent >= 4 ) {
+        arg3 = arg[3].tocNumber();
+    }
+    if ( this.argumentsCurrent == 5 ) {
+        arg4 = arg[4].tocNumber();
+    }
+
+    if ( arg1 instanceof cError || arg2 instanceof cError || arg3 instanceof cError || arg4 instanceof cError ) {
+        return this.value = new cError( cErrorType.bad_reference );
+    }
+
+    arg1 = arg1.getValue();
+    arg2 = arg2.getValue();
+    arg3 = arg3.getValue();
+    arg4 = arg4.getValue();
+
+
+    if ( arg3 < 0 ) {
+        arg3 = 1;
+    }
+    if ( arg4 < 0 ) {
+        arg4 = 1;
+    }
+
+    if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+
+        var range = arg0.getRange(),
+            bbox = range.getBBox0(),
+            box = {r1:0, r2:0, c1:0, c2:0}, ref;
+
+        box.r1 = bbox.r1 + arg1;
+        box.c1 = bbox.c1 + arg2;
+        box.r2 = bbox.r1 + arg1 + arg3 - 1;
+        box.c2 = bbox.c1 + arg2 + arg4 - 1;
+
+        if ( !validBBOX( box ) ) {
+            return this.value = new cError( cErrorType.bad_reference );
+        }
+
+        var wsName = arg0.ws.getName();
+        if ( box.r1 == box.r2 && box.c1 == box.c2 ) {
+            ref = g_oCellAddressUtils.colnumToColstrFromWsView( box.c1 + 1 ) + _getRowTitle( box.r1 );
+            this.value = (arg0 instanceof cRef) ? new cRef( ref, arg0.ws ) : new cRef3D( ref, wsName, arg0.wb );
+        }
+        else {
+            ref = g_oCellAddressUtils.colnumToColstrFromWsView( box.c1 + 1 ) + _getRowTitle( box.r1 ) + ":" +
+                g_oCellAddressUtils.colnumToColstrFromWsView( box.c2 + 1 ) + _getRowTitle( box.r2 );
+            this.value = (arg0 instanceof cRef) ? new cArea( ref, arg0.ws ) : new cArea3D( ref, wsName, wsName, arg0.wb );
+        }
+
+    }
+    else if ( arg0 instanceof cArea ) {
+
+        var bbox = arg0.getBBox0(),
+            box = {r1:0, r2:0, c1:0, c2:0}, ref;
+
+        box.r1 = bbox.r1 + arg1;
+        box.c1 = bbox.c1 + arg2;
+        box.r2 = bbox.r1 + arg1 + arg3 - 1;
+        box.c2 = bbox.c1 + arg2 + arg4 - 1;
+
+        if ( !validBBOX( box ) ) {
+            return this.value = new cError( cErrorType.bad_reference );
+        }
+        if ( box.r1 == box.r2 && box.c1 == box.c2 ) {
+            ref = g_oCellAddressUtils.colnumToColstrFromWsView( box.c1 + 1 ) + _getRowTitle( box.r1 );
+            this.value = new cRef( ref, arg0.ws );
+        }
+        else {
+            ref = g_oCellAddressUtils.colnumToColstrFromWsView( box.c1 + 1 ) + _getRowTitle( box.r1 ) +
+                ":" +
+                g_oCellAddressUtils.colnumToColstrFromWsView( box.c2 + 1 ) + _getRowTitle( box.r2 );
+            this.value = new cArea( ref, arg0.ws );
+        }
+    }
+    else {
+        this.value = new cError( cErrorType.wrong_value_type );
+    }
+
+    if( this.value instanceof cArea || this.value instanceof cRef || this.value instanceof cRef3D || this.value instanceof cArea3D ){
+        var r = arguments[1], wb = r.worksheet.workbook, cellName = r.getCells()[0].getName(), wsId = r.worksheet.getId();
+
+        if ( (this.value instanceof cRef || this.value instanceof cRef3D || this.value instanceof cArea) && this.value.isValid() ) {
+            var nFrom = wb.dependencyFormulas.addNode( wsId, cellName ),
+                nTo = wb.dependencyFormulas.addNode( this.value.getWsId(), this.value._cells );
+
+            this.value.setNode( nTo );
+
+            wb.dependencyFormulas.addEdge2( nFrom, nTo );
+        }
+        else if ( this.value instanceof cArea3D && this.value.isValid() ) {
+            var wsR = this.value.wsRange();
+            for ( var j = 0; j < wsR.length; j++ ){
+                wb.dependencyFormulas.addEdge( wsId, cellName.replace( /\$/g, "" ), wsR[j].Id, this.value._cells.replace( /\$/g, "" ) );
+            }
+        }
+    }
+
+    return this.value;
+
+}
+cOFFSET.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( reference , rows , cols [ , [ height ] [ , [ width ] ] ] )"
+    };
+}
 
 function cROW() {
 //    cBaseFunction.call( this, "ROW" );

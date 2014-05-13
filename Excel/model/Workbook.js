@@ -743,18 +743,24 @@ Vertex.prototype = {
 	},
 	//добавляем ведущую ячейку.
 	addMasterEdge : function(node){
-		if( !this.masterEdges )
+		if( !this.masterEdges ){
 			this.masterEdges = {};
-		this.masterEdges[node.nodeId] = node;
-		this.refCount ++;
+        }
+        if( !this.masterEdges[node.nodeId] ){
+		    this.masterEdges[node.nodeId] = node;
+    		this.refCount ++;
+        }
 	},
 
 	//добавляем зависимую(ведомую) ячейку.
 	addSlaveEdge : function(node){
-		if( !this.slaveEdges )
+		if( !this.slaveEdges ){
 			this.slaveEdges = {};
-		this.slaveEdges[node.nodeId] = node;
-		this.refCount ++;
+        }
+        if( !this.slaveEdges[node.nodeId] ){
+            this.slaveEdges[node.nodeId] = node;
+            this.refCount ++;
+        }
 	},
 	
 	getMasterEdges : function(){

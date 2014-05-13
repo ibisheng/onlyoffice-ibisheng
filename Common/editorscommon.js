@@ -280,7 +280,7 @@ parserHelper.prototype = {
                 return true;
             }
         }
-        this.operand_str = null;
+//        this.operand_str = null;
         return false;
     },
 
@@ -296,7 +296,7 @@ parserHelper.prototype = {
             this.operand_str = match[0];
             return true;
         }
-        this.operand_str = null;
+//        this.operand_str = null;
         return false;
     },
 
@@ -324,7 +324,7 @@ parserHelper.prototype = {
             }
         }
 
-        this.operand_str = null;
+//        this.operand_str = null;
         return false;
     },
 
@@ -341,7 +341,7 @@ parserHelper.prototype = {
             this.operand_str = match[1];
             return [ true, match["name_from"] ? match["name_from"].replace( /''/g, "'" ) : null, match["name_to"] ? match["name_to"].replace( /''/g, "'" ) : null ];
         }
-        this.operand_str = null;
+//        this.operand_str = null;
         return [false, null, null];
     },
 
@@ -482,6 +482,7 @@ parserHelper.prototype = {
                 this.operand_str = name;
                 return [ true, name ];
             }
+            this.operand_str = name;
         }
         return [false];
     },

@@ -361,15 +361,12 @@
         return duration / p / frequency ;
     }
 
-    var ver = 2;
-
-    var oParser, wb, ws, date1, date2, dif = 1e-9,
+    var oParser, wb, ws, dif = 1e-9,
         data = getTestWorkbook(),
         sData = data + "";
     if ( Asc.c_oSerFormat.Signature === sData.substring( 0, Asc.c_oSerFormat.Signature.length ) ) {
         var sUrlPath = "offlinedocs/";
-        var wb = new Workbook( sUrlPath, new Asc.asc_CHandlersList(), {} );
-//        wb.initGlobalObjects();
+        wb = new Workbook( sUrlPath, new Asc.asc_CHandlersList(), {} );
 
         History = new CHistory(wb);
 
@@ -390,8 +387,8 @@
 
         var oBinaryFileReader = new Asc.BinaryFileReader( sUrlPath );
         oBinaryFileReader.Read( sData, wb );
+        ws = wb.getWorksheet( wb.getActive() );
     }
-    ws = wb.getWorksheet( wb.getActive() );
 
     /*QUnit.log( function ( details ) {
         console.log( "Log: " + details.name + ", result - " + details.result );
@@ -3113,7 +3110,6 @@
     /*
     * Lookup and Reference
     */
-
     test( "Test: \"HLOOKUP\"", function () {
 
         ws.getRange2( "A401" ).setValue( "Axles" );ws.getRange2( "B401" ).setValue( "Bearings" );ws.getRange2( "C401" ).setValue( "Bolts" );
@@ -3277,10 +3273,37 @@
 
     } )
 
+    test( "Test: \"OFFSET\"", function () {
+
+        ws.getRange2( "C150" ).setValue( "1" );
+        ws.getRange2( "D150" ).setValue( "2" );
+        ws.getRange2( "E150" ).setValue( "3" );
+
+        ws.getRange2( "C151" ).setValue( "2" );
+        ws.getRange2( "D151" ).setValue( "3" );
+        ws.getRange2( "E151" ).setValue( "4" );
+
+        ws.getRange2( "C152" ).setValue( "3" );
+        ws.getRange2( "D152" ).setValue( "4" );
+        ws.getRange2( "E152" ).setValue( "5" );
+
+        oParser = new parserFormula( "OFFSET(C3,2,3,1,1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().toString(), "F5" );
+
+        oParser = new parserFormula( "SUM(OFFSET(C151:E155,-1,0,3,3))", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 27 );
+
+        oParser = new parserFormula( "OFFSET(B3; -2; 0; 1; 1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().toString(), "B1" );
+
+    } )
+
     /*
     * Financial
     */
-
     test( "Test: \"FV\"", function () {
 
         function fv( rate, nper, pmt, pv, type ) {
@@ -4698,7 +4721,5 @@
         ok( difBetween(oParser.calculate().getValue(), 0.0599769985558904 ) );
 
     } )
-
-
 
 } );

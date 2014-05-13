@@ -3146,6 +3146,9 @@ parserFormula.prototype = {
                     return false;*/
                     this.outStack.push( new cError(cErrorType.wrong_name) );
                     operand_expected = false;
+                    if( this.operand_str != null ){
+                        this.pCurrPos += this.operand_str.length;
+                    }
 //                    break;
                     /*this.outStack = [new cError(cErrorType.wrong_name)];
                     return this.isParsed = false;*/
@@ -3321,6 +3324,7 @@ parserFormula.prototype = {
         }
         return this;
     },
+
     setRefError:function ( wsId, cellId ) {
         for ( var i = 0; i < this.outStack.length; i++ ) {
             var node = this.outStack[i];
@@ -3601,6 +3605,7 @@ parserFormula.prototype = {
             }
         }
     },
+
     insertSheet:function ( index ) {
         var bRes = false;
         for ( var i = 0; i < this.outStack.length; i++ ) {
@@ -3616,6 +3621,7 @@ parserFormula.prototype = {
         }
         return bRes;
     },
+
     moveSheet:function ( tempW ) {
         var nRes = 0;
         for ( var i = 0; i < this.outStack.length; i++ ) {
