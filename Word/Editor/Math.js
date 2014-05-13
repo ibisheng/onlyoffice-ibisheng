@@ -314,8 +314,26 @@ ParaMath.prototype =
     Get_Default_TPrp: function()
     {
         var TextPrp = new CTextPr();
+        TextPrp.Init_Default();
 
-        var DefaultPrp =
+        var mathFont = new CTextPr();
+
+        var obj =
+        {
+            FontFamily:     {Name  : "Cambria Math", Index : -1 },
+            RFonts:
+            {
+                Ascii:      {Name  : "Cambria Math", Index : -1 }
+            }
+        };
+
+        mathFont.Set_FromObject(obj);
+
+        
+        TextPrp.Merge(mathFont);
+
+
+        /*var DefaultPrp =
         {
             FontFamily:     {Name  : "Cambria Math", Index : -1 },
             RFonts:
@@ -328,7 +346,7 @@ ParaMath.prototype =
             Bold:           false
         };
 
-        TextPrp.Set_FromObject(DefaultPrp);
+        TextPrp.Set_FromObject(DefaultPrp);*/
 
         return TextPrp;
     },

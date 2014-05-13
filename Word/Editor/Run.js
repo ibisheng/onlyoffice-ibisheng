@@ -4280,7 +4280,7 @@ ParaRun.prototype =
             TextPr.Merge(oWPrp);
             TextPr.Merge( this.Pr );            // Мержим прямые настройки данного рана
 
-            if(!this.MathPrp.nor) // math text, style: plain
+            if(TXT_NORMAL !== this.Math_GetTypeText()) // math text
             {
                 var MPrp = this.MathPrp.getTxtPrp();
                 TextPr.Merge(MPrp); // bold, italic
@@ -7055,7 +7055,9 @@ ParaRun.prototype.Math_Draw = function(x, y, pGraphics)
     var Y = y + this.size.ascent;
 
     var oWPrp = this.Get_CompiledPr(true);
-    oWPrp.Italic = false;
+
+    if(TXT_NORMAL !== this.Math_GetTypeText()) // выставляем false, чтобы не применился наклон к спец символам
+        oWPrp.Italic = false;
 
     pGraphics.SetFont(oWPrp);
     pGraphics.b_color1(0,0,0,255);
@@ -7079,6 +7081,8 @@ ParaRun.prototype.Math_Recalculate = function(RecalcInfo)
     var width = 0,
         ascent = 0, descent = 0;
     var oWPrp = this.Get_CompiledPr(true);
+
+    if(TXT_NORMAL !== this.Math_GetTypeText()) // выставляем false, чтобы не применился наклон к спец символам
         oWPrp.Italic = false;
 
 

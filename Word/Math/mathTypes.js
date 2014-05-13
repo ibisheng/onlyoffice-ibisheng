@@ -113,12 +113,13 @@ var ACCENT_TEXT                 = 46;
 ///////////////////////////////////////////////////
 
 var TXT_NORMAL                  =  0;
-var TXT_ROMAN                   =  1;   // math roman
-var TXT_SCRIPT                  =  2;
-var TXT_FRAKTUR                 =  3;
-var TXT_DOUBLE_STRUCK           =  4;
-var TXT_SANS_SERIF              =  5;
-var TXT_MONOSPACE               =  6;
+var TXT_PLAIN                   =  1;
+var TXT_ROMAN                   =  2;   // math roman
+var TXT_SCRIPT                  =  3;
+var TXT_FRAKTUR                 =  4;
+var TXT_DOUBLE_STRUCK           =  5;
+var TXT_SANS_SERIF              =  6;
+var TXT_MONOSPACE               =  7;
 
 var OPER_DELIMITER              =  0;
 var OPER_SEPARATOR              =  1;

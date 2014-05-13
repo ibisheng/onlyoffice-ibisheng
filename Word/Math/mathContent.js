@@ -628,12 +628,21 @@ function CMPrp()
     this.aln      = false;
     this.brk      = false;
     this.lit      = false;
-    this.nor      = false;       // если normal = false, то берем TextPrp отсюда (в wRunPrp bold/italic не учитываем, выставляем отсюда)
-                                // если normal = true, то их Word не учитывает и берет TextPr из wRunPrp
+
+    // TXT_NORMAL
+    // если normal == false, то берем TextPrp отсюда (в wRunPrp bold/italic не учитываем, выставляем отсюда)
+    // если normal == true, то их Word не учитывает и берет TextPr из wRunPrp
+
+    // TXT_PLAIN
+    // если plain == true
+    // буквы берутся обычные, не специальные для Cambria Math : то есть как для TXT_NORMAL
+    // отличие от TXT_NORMAL w:rPrp в этом случае не учитываются !
+
     this.typeText = TXT_ROMAN;
     this.italic   = true;
     this.bold     = false;
-    this.plain    = false;
+    //this.nor      = false;
+    //this.plain    = false;
 
 }
 CMPrp.prototype =
@@ -699,9 +708,9 @@ CMPrp.prototype =
         }
         else if(props.sty === STY_PLAIN )
         {
-            // plain text ?!    // default
-            this.plain = true;  // italic = true
-                                // bold   = false
+            this.typeText = TXT_PLAIN;  // буквы берутся обычные, не специальные для Cambria Math : то есть как для TXT_NORMAL
+                                        // отличие от TXT_NORMAL w:rPrp не учитываются !
+
         }
 
         // TXT_DOUBLE_STRUCK        U+1D538 - U+1D56B
@@ -758,17 +767,7 @@ CMPrp.prototype =
     },
     getTypeText: function()
     {
-        var type;
-
-        if(this.plain && this.typeText == TXT_ROMAN)
-            type = TXT_NORMAL;
-        else
-            type = this.typeText;
-
-        if(this.nor)
-            type = TXT_NORMAL;
-
-        return type;
+        return this.typeText;
     },
     getTxtSettings: function()
     {
