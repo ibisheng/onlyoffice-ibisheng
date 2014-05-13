@@ -1586,12 +1586,92 @@
 				return false;
 			},
 			
+			_pasteFromLocalStorage: function(worksheet, node, onlyFromLocalStorage)
+			{
+				var textNode, t = this;
+				
+				//в случае вставки по нажатию на правую кнопку мыши
+				if(onlyFromLocalStorage)
+				{
+					if(t.lStorage)
+					{
+						if(t.copyText && t.copyText.isImage)
+						{
+							if(t._insertImages(worksheet,t.lStorage,onlyFromLocalStorage))
+							{
+								window.GlobalPasteFlag = false;
+								window.GlobalPasteFlagCounter = 0;
+								return true;
+							}
+						}
+						else
+						{
+							if(t.lStorage.htmlInShape)
+							{
+								return t.lStorage.htmlInShape;
+							}
+							else
+							{
+								worksheet.setSelectionInfo('paste',t,false,true);
+								window.GlobalPasteFlag = false;
+								window.GlobalPasteFlagCounter = 0;
+								return true;
+							}
+						}	
+					}	
+				}
+				
+				//проверяем на равенство содержимому локального буфера
+				textNode = t._getTextFromTable(node);
+				if(t._isEqualText(textNode, node) && !onlyFromLocalStorage)
+				{
+					if(t.copyText.isImage)
+					{
+						if(t._insertImages(worksheet,t.lStorage,onlyFromLocalStorage))
+						{
+							window.GlobalPasteFlag = false;
+							window.GlobalPasteFlagCounter = 0;
+							return true;
+						}
+					}
+					else
+					{
+						if(t.lStorage.htmlInShape)
+						{
+							return t.lStorage.htmlInShape;
+						}
+						else
+						{
+							worksheet.setSelectionInfo('paste',t,false,true);
+							window.GlobalPasteFlag = false;
+							window.GlobalPasteFlagCounter = 0;
+							return true;
+						}
+					}	
+				};
+				
+				return false;
+			},
+			
+			_pasteInShape: function(worksheet, node)
+			{
+				if(onlyFromLocalStorage)
+				{
+					if(t.lStorage && t.lStorage.htmlInShape)
+						worksheet.objectRender.controller.curState.textObject.txBody.insertHtml(t.lStorage.htmlInShape);
+				}
+				else
+					worksheet.objectRender.controller.curState.textObject.txBody.insertHtml(node);
+				window.GlobalPasteFlag = false;
+				window.GlobalPasteFlagCounter = 0;
+			},
+			
             _editorPasteExec: function (worksheet, node, isText,onlyFromLocalStorage)
             {
 				if(node == undefined)
 					return;
 					
-				var aResult, binaryResult, textNode, pasteFragment = node, t = this;
+				var aResult, binaryResult, pasteFragment = node, t = this, localStorageResult;
 
 				if(isOnlyLocalBufferSafari && navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac'))
 					onlyFromLocalStorage = true;
@@ -1599,17 +1679,9 @@
 				//если находимся внутри шейпа
 				if(worksheet.objectRender.controller.curState.textObject && worksheet.objectRender.controller.curState.textObject.txBody)
 				{
-					if(onlyFromLocalStorage)
-					{
-						if(t.lStorage && t.lStorage.htmlInShape)
-							worksheet.objectRender.controller.curState.textObject.txBody.insertHtml(t.lStorage.htmlInShape);
-					}
-					else
-						worksheet.objectRender.controller.curState.textObject.txBody.insertHtml(node);
-					window.GlobalPasteFlag = false;
-					window.GlobalPasteFlagCounter = 0;
+					this._pasteInShape(worksheet, node, onlyFromLocalStorage);
 					return;
-				}
+				};
 				
 				//****binary****
 				if(copyPasteUseBinary)
@@ -1628,67 +1700,15 @@
 				//local storage
 				if(activateLocalStorage)
 				{
-					//в случае вставки по нажатию на правую кнопку мыши
-					if(onlyFromLocalStorage)
-					{
-						if(t.lStorage)
-						{
-							if(t.copyText && t.copyText.isImage)
-							{
-								if(t._insertImages(worksheet,t.lStorage,onlyFromLocalStorage))
-								{
-									window.GlobalPasteFlag = false;
-									window.GlobalPasteFlagCounter = 0;
-									return;
-								}
-							}
-							else
-							{
-								if(t.lStorage.htmlInShape)
-								{
-									node = t.lStorage.htmlInShape;
-									pasteFragment = node;
-								}
-								else
-								{
-									worksheet.setSelectionInfo('paste',t,false,true);
-									window.GlobalPasteFlag = false;
-									window.GlobalPasteFlagCounter = 0;
-									return;
-								}
-							}	
-						}	
-					}
+					localStorageResult = this._pasteFromLocalStorage();
 					
-					//проверяем на равенство содержимому локального буфера
-					textNode = t._getTextFromTable(node);
-					if(t._isEqualText(textNode, node) && !onlyFromLocalStorage)
+					if(localStorageResult === true)
+						return;
+					else if(localStorageResult !== false && localStorageResult != undefined)
 					{
-						if(t.copyText.isImage)
-						{
-							if(t._insertImages(worksheet,t.lStorage,onlyFromLocalStorage))
-							{
-								window.GlobalPasteFlag = false;
-								window.GlobalPasteFlagCounter = 0;
-								return;
-							}
-						}
-						else
-						{
-							if(t.lStorage.htmlInShape)
-							{
-								node = t.lStorage.htmlInShape;
-								pasteFragment = node;
-							}
-							else
-							{
-								worksheet.setSelectionInfo('paste',t,false,true);
-								window.GlobalPasteFlag = false;
-								window.GlobalPasteFlagCounter = 0;
-								return;
-							}
-						}	
-					}
+						pasteFragment = localStorageResult;
+						node = localStorageResult;
+					};
 				};
 				
 				//parse HTML
