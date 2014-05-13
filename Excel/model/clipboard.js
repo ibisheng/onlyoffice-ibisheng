@@ -1497,7 +1497,7 @@
 			
 			_pasteFromBinary: function(worksheet, node, onlyFromLocalStorage)
 			{
-				var base64 = null, base64FromWord = null;
+				var base64 = null, base64FromWord = null, t = this;
 				
 				if(onlyFromLocalStorage)
 				{
