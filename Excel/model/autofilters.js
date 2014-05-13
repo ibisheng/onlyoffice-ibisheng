@@ -622,7 +622,9 @@ var gUndoInsDelCellsFlag = true;
 									History.TurnOn();
 								return true;
 							}
-						} else if(paramsForCallBackAdd) {
+						} 
+						else if(paramsForCallBackAdd) 
+						{
 							switch(paramsForCallBackAdd)
 							{
 								case "addTableFilterOneCell":
@@ -5900,7 +5902,7 @@ var gUndoInsDelCellsFlag = true;
 				{
 					var startRange, endRange, range;
 					
-					if(isNaN(parseFloat(parseRef[1])))
+					if(!this._isStringContainDigit(parseRef[1]))
 					{
 						startRange = this._idToRange(parseRef[0]);
 						endRange = this._idToRange((this.worksheet.rows.length - 1).toString());
@@ -5928,6 +5930,18 @@ var gUndoInsDelCellsFlag = true;
 					return ref;
 				}
 				return false;
+			},
+			
+			_isStringContainDigit: function(str)
+			{
+				var regexp = /[1-9]/gi;
+				var matches = str.match(regexp);
+				var result = false;
+				
+				if(matches && matches.length)
+					result = true;
+					
+				return result;
 			},
 			
 			//ShowButton(в случае объединенных ячеек в автофильтрах)
