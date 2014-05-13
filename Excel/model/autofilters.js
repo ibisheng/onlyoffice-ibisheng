@@ -5891,11 +5891,24 @@ var gUndoInsDelCellsFlag = true;
 				if(splitRef[1])
 					ref = splitRef[1];
 				var parseRef = ref.split(":");
+				
 				if(parseRef[0] && parseRef[1])
 				{
-					var startRange = this._idToRange(parseRef[0]);
-					var endRange = this._idToRange(parseRef[1]);
-					var range = Asc.Range(startRange.c1, startRange.r1, endRange.c1, endRange.r1);
+					var startRange, endRange, range;
+					
+					if(isNaN(parseFloat(parseRef[1])))
+					{
+						startRange = this._idToRange(parseRef[0]);
+						endRange = this._idToRange((this.worksheet.rows.length - 1).toString());
+						range = Asc.Range(startRange.c1, startRange.r1, endRange.c1, endRange.r1);
+					}
+					else
+					{
+						startRange = this._idToRange(parseRef[0]);
+						endRange = this._idToRange(parseRef[1]);
+						range = Asc.Range(startRange.c1, startRange.r1, endRange.c1, endRange.r1);
+					};
+					
 					return range;
 				}
 				return false;
