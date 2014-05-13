@@ -1497,7 +1497,8 @@
 			
 			_pasteFromBinary: function(worksheet, node, onlyFromLocalStorage)
 			{
-				var base64 = null;
+				var base64 = null, base64FromWord = null;
+				
 				if(onlyFromLocalStorage)
 				{
 					if(typeof t.lStorage == "object")
@@ -1518,10 +1519,8 @@
 					else
 						base64 = t.lStorage;
 				}
-				else//find class xsl
+				else//find class xslData or docData
 				{
-					var base64 = null;
-					var base64FromWord = null;
 					var classNode;
 					if(node.children[0] && node.children[0].getAttribute("class") != null && (node.children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].getAttribute("class").indexOf("docData;") > -1))
 						classNode = node.children[0].getAttribute("class");
@@ -1543,7 +1542,7 @@
 							}
 						}
 					}
-				}
+				};
 				
 				if(base64 != null)//from excel
 				{
@@ -1591,9 +1590,9 @@
             {
 				if(node == undefined)
 					return;
-				var pasteFragment = node;
-                var t = this;
-				
+					
+				var aResult, binaryResult, textNode, pasteFragment = node, t = this;
+
 				if(isOnlyLocalBufferSafari && navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac'))
 					onlyFromLocalStorage = true;
 				
@@ -1613,7 +1612,6 @@
 				}
 				
 				//****binary****
-				var binaryResult;
 				if(copyPasteUseBinary)
 				{
 					binaryResult = this._pasteFromBinary(worksheet, node, onlyFromLocalStorage);
@@ -1627,7 +1625,7 @@
 					};
 				};
 				
-				
+				//local storage
 				if(activateLocalStorage)
 				{
 					//в случае вставки по нажатию на правую кнопку мыши
@@ -1663,7 +1661,7 @@
 					}
 					
 					//проверяем на равенство содержимому локального буфера
-					var textNode = t._getTextFromTable(node);
+					textNode = t._getTextFromTable(node);
 					if(t._isEqualText(textNode, node) && !onlyFromLocalStorage)
 					{
 						if(t.copyText.isImage)
@@ -1691,10 +1689,23 @@
 							}
 						}	
 					}
-				}
+				};
 				
-                var aResult = [];
-                var range = worksheet.activeRange.clone(true);
+				//parse HTML
+				aResult = this._parseHtml(pasteFragment, node, worksheet, isText);
+				
+				//insert into document content
+				worksheet.setSelectionInfo('paste',aResult,t);
+				
+				window.GlobalPasteFlagCounter = 0;
+				window.GlobalPasteFlag = false;
+            },
+			
+			_parseHtml: function(pasteFragment, node, worksheet, isText)
+			{
+				var cellCountAll = [], rowSpanPlus = 0, tableRowCount = 0, l = 0, n = 0, s = 0, countEmptyRow = 0, rowCount = 0, arrTags = [], t = this, aResult = [];
+				var range = worksheet.activeRange.clone(true);
+				
 				var testFragment = $.extend(true, {},node);
 				var is_chrome = AscBrowser.isChrome;
 				$(testFragment).children('br').remove();
@@ -1717,13 +1728,8 @@
 					if(!is_chrome)
 					  isText = true;
 				}
-				/*else
-				{
-					$(pasteFragment).children('br').remove()
-				}*/
+
 				
-                
-                //var children = t._getSignChildNodes(pasteFragment.childNodes);
 				var mainChildrens = t._getSignTags(pasteFragment.childNodes);
 				var countChild = mainChildrens.length;
 				
@@ -1739,21 +1745,14 @@
 						range.c2 = range.c2 + max - 1;
                 }
 				this.fontsNew = {};
-
-				var cellCountAll = [];
-				var rowSpanPlus = 0;
-				var tableRowCount = 0;
-				var l = 0;
-                var n = 0;
-				var s = 0;
-				var countEmptyRow = 0;
-				var rowCount = 0;
+				
+				
 				if(null != $(pasteFragment).find('table') && 1 == countChild && pasteFragment.children[0] != undefined && pasteFragment.children[0].children[0] != undefined && pasteFragment.children[0].children[0].nodeName.toLowerCase() == 'table')
 				{
 					pasteFragment = pasteFragment.children[0];
 				}
-				var arrTags = [];
-				var countTrueTags = t._countTags(mainChildrens,arrTags);
+
+				var countTrueTags = t._countTags(mainChildrens, arrTags);
 
 				if(countTrueTags.length != 0 && node.length != countTrueTags.length && node.children[0] != countTrueTags[0])
 				{
@@ -1774,6 +1773,7 @@
 				var imCount = 0;
 				//пробегаемся по html
                 for (var r = range.r1;r - range.r1 < countChild; ++r) {//цикл по r
+					
 					var firstRow = mainChildrens[r - range.r1 - countEmptyRow];
                     if(firstRow.nodeName.toLowerCase() == 'br')
                         r++;
@@ -1781,7 +1781,9 @@
                     var tag = mainChildrens[r - range.r1 - countEmptyRow];
 					if(pasteFragment.children.length == 1 && pasteFragment.children[0].nodeName.toLowerCase() == 'table')
 						aResult.isOneTable = true;
-                    for (var c = range.c1; c <= range.c2; ++c) {
+                    
+					
+					for (var c = range.c1; c <= range.c2; ++c) {
                         if((tag.nodeName.toLowerCase() == 'div' || tag.nodeName.toLowerCase() == 'p' || tag.nodeName.toLowerCase() == 'h' ||  tag.nodeName.toLowerCase().search('h') != -1) && c == range.c1 || tag.nodeName.toLowerCase() == 'li')
 						{
 							var prevSib = mainChildrens[r - range.r1 - countEmptyRow -1];
@@ -1873,126 +1875,110 @@
                             
 							if(tableBody.children.length == 1 && tableBody.children[0].children.length == 1 && tableBody.children[0].children[0].rowSpan != '' && tableBody.children[0].children[0].rowSpan != null)
 								rowSpanPlus = tableBody.children[0].children[0].rowSpan - 1;
-                            //aResult.cellCount = cellCount;
+ 
 							cellCountAll[s] = cellCount;
 							s++;
-							/*if(tag.children.length == 1 && tag.children[0].children.length == 1 && tag.offsetParent != null && tag.offsetParent != undefined && tag.offsetParent.children.length == 1 && $(tag).find('td')[0].rowSpan == 1 && $(tag).find('td')[0].colSpan == 1 && isMerge.hasMerged() == null && tableBody.children.length == 1 && tableBody.children[0].children != undefined && tableBody.children[0].children.length == 1)//сделать ещё для вставки из Excel
-							{
-								for (tR = startNum; tR <= range.r2; ++tR) {
-									aResult[tR] = [];
-									var cNew = 0;
-									for(tC = range.c1; tC <= range.c2; ++tC) {
-										var _tBody = tableBody.children[0].children[0];
-										aResult[tR][tC] = t._getArray(_tBody);
-									}
-								}
-								cellCountAll[s] = range.c2 - range.c1 + 1;
-								s++;
-								r = tR;
-								break;
-							}
-							else
-							{*/
-								for (var tR = startNum; tR < tableBody.children.length + startNum; ++tR) {
-									aResult[tR] = [];
-									var cNew = 0;
-									for(var tC = range.c1; tC < range.c1 + cellCount; ++tC) {
-										
-										if(0 != mergeArr.length)
+
+							
+							for (var tR = startNum; tR < tableBody.children.length + startNum; ++tR) {
+								aResult[tR] = [];
+								var cNew = 0;
+								for(var tC = range.c1; tC < range.c1 + cellCount; ++tC) {
+									
+									if(0 != mergeArr.length)
+									{
+										for(var k = 0; k < mergeArr.length; ++k)
 										{
-											for(var k = 0; k < mergeArr.length; ++k)
+											if(tC >= mergeArr[k].c1 && tC <= mergeArr[k].c2 && tR >= mergeArr[k].r1 && tR <= mergeArr[k].r2)
 											{
-												if(tC >= mergeArr[k].c1 && tC <= mergeArr[k].c2 && tR >= mergeArr[k].r1 && tR <= mergeArr[k].r2)
+												break;
+											}
+											else if (k == mergeArr.length -1)
+											{	
+												var _tBody = tableBody.children[tR -startNum ].children[cNew];
+												var findImg = $(_tBody).find('img');
+												if(findImg.length != 0)
 												{
-													break;
-												}
-												else if (k == mergeArr.length -1)
-												{	
-													var _tBody = tableBody.children[tR -startNum ].children[cNew];
-													var findImg = $(_tBody).find('img');
-													if(findImg.length != 0)
+													for(var imgCol = 0; imgCol < findImg.length; imgCol++)
 													{
-														for(var imgCol = 0; imgCol < findImg.length; imgCol++)
+														if(addImages == null)
+															addImages = [];
+														var curCell = {
+															col: tC ,
+															row: tR + imgCol
+														};
+														var tag = $(_tBody).find('img')[imgCol];
+														addImages[imCount] = 
 														{
-															if(addImages == null)
-																addImages = [];
-															var curCell = {
-																col: tC ,
-																row: tR + imgCol
-															};
-															var tag = $(_tBody).find('img')[imgCol];
-															addImages[imCount] = 
-															{
-																curCell: curCell,
-																tag: tag
-															};
-															imCount++;
-														}
-														
-														//worksheet.objectRender.addImageDrawingObject(tag.src, { cell: curCell, width: tag.width, height: tag.height });
+															curCell: curCell,
+															tag: tag
+														};
+														imCount++;
 													}
-													if(_tBody == undefined)
-														_tBody = document.createElement('td');
-													aResult[tR][tC] = t._getArray(_tBody,isText);
-													if(undefined != _tBody && (_tBody.colSpan > 1 || _tBody.rowSpan > 1))
-													{
-														mergeArr[n++] = {
-															r1: tR,
-															r2: tR + _tBody.rowSpan - 1,
-															c1: tC,
-															c2: tC + _tBody.colSpan - 1
-														}
-													}
-													 cNew++;
 												}
-											}
-										}
-										else
-										{
-											var _tBody = tableBody.children[tR -startNum ].children[cNew];
-											var findImg = $(_tBody).find('img');
-											if(findImg.length != 0)
-											{
-												for(var imgCol = 0; imgCol < findImg.length; imgCol++)
+												if(_tBody == undefined)
+													_tBody = document.createElement('td');
+												aResult[tR][tC] = t._getArray(_tBody,isText);
+												if(undefined != _tBody && (_tBody.colSpan > 1 || _tBody.rowSpan > 1))
 												{
-													if(addImages == null)
-														addImages = [];
-													var curCell = {
-														col: tC,
-														row: tR + imgCol
-													};
-													var tag = $(_tBody).find('img')[imgCol];
-													addImages[imCount] = 
-													{
-														curCell: curCell,
-														tag: tag
-													};
-													imCount++;
+													mergeArr[n++] = {
+														r1: tR,
+														r2: tR + _tBody.rowSpan - 1,
+														c1: tC,
+														c2: tC + _tBody.colSpan - 1
+													}
 												}
-												
-												//worksheet.objectRender.addImageDrawingObject(tag.src, { cell: curCell, width: tag.width, height: tag.height });
+												 cNew++;
 											}
-											aResult[tR][tC] = t._getArray(_tBody,isText);
-											if(undefined != _tBody && (_tBody.colSpan > 1 || _tBody.rowSpan > 1))
-											{
-												mergeArr[n++] = {
-													r1: tR,
-													r2: tR + _tBody.rowSpan - 1,
-													c1: tC,
-													c2: tC + _tBody.colSpan - 1
-												}
-											}
-											cNew++;
 										}
 									}
+									else
+									{
+										var _tBody = tableBody.children[tR -startNum ].children[cNew];
+										var findImg = $(_tBody).find('img');
+										if(findImg.length != 0)
+										{
+											for(var imgCol = 0; imgCol < findImg.length; imgCol++)
+											{
+												if(addImages == null)
+													addImages = [];
+												var curCell = {
+													col: tC,
+													row: tR + imgCol
+												};
+												var tag = $(_tBody).find('img')[imgCol];
+												addImages[imCount] = 
+												{
+													curCell: curCell,
+													tag: tag
+												};
+												imCount++;
+											}
+											
+											//worksheet.objectRender.addImageDrawingObject(tag.src, { cell: curCell, width: tag.width, height: tag.height });
+										}
+										aResult[tR][tC] = t._getArray(_tBody,isText);
+										if(undefined != _tBody && (_tBody.colSpan > 1 || _tBody.rowSpan > 1))
+										{
+											mergeArr[n++] = {
+												r1: tR,
+												r2: tR + _tBody.rowSpan - 1,
+												c1: tC,
+												c2: tC + _tBody.colSpan - 1
+											}
+										}
+										cNew++;
+									}
 								}
-								//tableRowCount += tableBody.children.length + 1;
-								if(countChild == 1)//если только таблица приходит
-									r = tR;
-								else//если помимо таблицы есть ещё и прочее содержимое
-									tableRowCount += tableBody.children.length -1;
-								break;
-							//}
+							}
+							
+							
+							if(countChild == 1)//если только таблица приходит
+								r = tR;
+							else//если помимо таблицы есть ещё и прочее содержимое
+								tableRowCount += tableBody.children.length -1;
+							break;
+						
 							onlyImages = false;
                             
                         }
@@ -2031,7 +2017,7 @@
 								textArr = text.split('\n');
 							}
 								
-							for(k=0;k < textArr.length ; ++k)
+							for(k = 0;k < textArr.length; ++k)
 							{
 								aResult[r + tableRowCount] = [];
 								var newP = document.createElement('p');
@@ -2050,7 +2036,8 @@
 							onlyImages = false;
 						}
                     }
-                }
+                };
+				
 				if(cellCountAll.length == 0)
 					aResult.cellCount = 0;
 				else
@@ -2062,10 +2049,9 @@
 				aResult.fontsNew = t.fontsNew;
 				
 				aResult.onlyImages = onlyImages;
-				worksheet.setSelectionInfo('paste',aResult,t);
-				window.GlobalPasteFlagCounter = 0;
-				window.GlobalPasteFlag = false;
-            },
+				
+				return aResult;
+			},
 			
 			ReadFromBinaryWord : function(sBase64)
 			{
