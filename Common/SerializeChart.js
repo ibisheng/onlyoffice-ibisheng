@@ -5437,7 +5437,7 @@ BinaryChartReader.prototype.ParseMetric = function (val) {
     }
     return nRes;
 }
-BinaryChartReader.prototype.ConvertSurfaceToLine = function (oSurface) {
+BinaryChartReader.prototype.ConvertSurfaceToLine = function (oSurface, aChartWithAxis) {
     var oLine = new CLineChart();
     oLine.setGrouping(GROUPING_STANDARD);
     oLine.setVaryColors(false);
@@ -5472,12 +5472,122 @@ BinaryChartReader.prototype.ConvertSurfaceToLine = function (oSurface) {
     oLine.setDLbls(dLbls);
     oLine.setMarker(true);
     oLine.setSmooth(false);
+    this.CorrectChartWithAxis(oSurface, oLine, aChartWithAxis);
     return oLine;
 };
 BinaryChartReader.prototype.ConvertSurfaceValAxToLineValAx = function (oSurfaceValAx) {
     oSurfaceValAx.setCrossBetween(CROSS_BETWEEN_BETWEEN);
     oSurfaceValAx.setTickLblPos(TICK_LABEL_POSITION_NEXT_TO);
 }
+BinaryChartReader.prototype.ConvertRadarToLine = function (oRadar, aChartWithAxis) {
+    var bMarkerNull = RADAR_STYLE_FILLED == oRadar.radarStyle;
+    var oLine = new CLineChart();
+    oLine.setGrouping(GROUPING_STANDARD);
+    if (null != oRadar.varyColors)
+        oLine.setVaryColors(oRadar.varyColors);
+    if (null != oRadar.dLbls)
+        oLine.setDLbls(oRadar.dLbls);
+    for (var i = 0, length = oRadar.series.length; i < length; ++i) {
+        var radarSer = oRadar.series[i];
+        var lineSer = new CLineSeries();
+        if (null != radarSer.idx)
+            lineSer.setIdx(radarSer.idx);
+        if (null != radarSer.order)
+            lineSer.setOrder(radarSer.order);
+        if (null != radarSer.tx)
+            lineSer.setTx(radarSer.tx);
+        if (null != radarSer.spPr)
+            lineSer.setSpPr(radarSer.spPr);
+        if (null != radarSer.marker)
+            lineSer.setMarker(radarSer.marker);
+        else if(bMarkerNull){
+            var marker = new CMarker();
+            marker.setSymbol(SYMBOL_NONE);
+            lineSer.setMarker(marker);
+        }
+        
+        for (var j = 0, length2 = radarSer.dPt.length; j < length2; ++j) {
+            lineSer.addDPt(radarSer.dPt[j]);
+        }
+        if (null != radarSer.dLbls)
+            lineSer.setDLbls(radarSer.dLbls);
+        if (null != radarSer.cat)
+            lineSer.setCat(radarSer.cat);
+        if (null != radarSer.val)
+            lineSer.setVal(radarSer.val);
+        lineSer.setSmooth(false);
+        oLine.addSer(lineSer);
+    }
+    oLine.setMarker(true);
+    oLine.setSmooth(false);
+    this.CorrectChartWithAxis(oRadar, oLine, aChartWithAxis);
+    return oLine;
+};
+BinaryChartReader.prototype.ConvertBubbleToScatter = function (oBubble, aChartWithAxis) {
+    var oScatter = new CScatterChart();
+    oScatter.setScatterStyle(SCATTER_STYLE_LINE_MARKER);
+    if (null != oBubble.varyColors)
+        oScatter.setVaryColors(oBubble.varyColors);
+    if (null != oBubble.dLbls)
+        oScatter.setDLbls(oBubble.dLbls);
+    for (var i = 0, length = oBubble.series.length; i < length; ++i) {
+        var bubbleSer = oBubble.series[i];
+        var scatterSer = new CScatterSeries();
+        if (null != bubbleSer.idx)
+            scatterSer.setIdx(bubbleSer.idx);
+        if (null != bubbleSer.order)
+            scatterSer.setOrder(bubbleSer.order);
+        if (null != bubbleSer.tx)
+            scatterSer.setTx(bubbleSer.tx);
+        //if (null != bubbleSer.spPr)
+        //    scatterSer.setSpPr(bubbleSer.spPr);
+        for (var j = 0, length2 = bubbleSer.dPt.length; j < length2; ++j) {
+            scatterSer.addDPt(bubbleSer.dPt[j]);
+        }
+        if (null != bubbleSer.dLbls)
+            scatterSer.setDLbls(bubbleSer.dLbls);
+        if (null != bubbleSer.trendline)
+            scatterSer.setTrendline(bubbleSer.trendline);
+        if (null != bubbleSer.errBars)
+            scatterSer.setErrBars(bubbleSer.errBars);
+        if (null != bubbleSer.xVal)
+            scatterSer.setXVal(bubbleSer.xVal);
+        if (null != bubbleSer.yVal)
+            scatterSer.setYVal(bubbleSer.yVal);
+        var spPr = new CSpPr();
+        var ln = new CLn();
+        ln.setW(28575);
+        var uni_fill = new CUniFill();
+        uni_fill.setFill(new CNoFill());
+        ln.setFill(uni_fill);
+        spPr.setLn(ln);
+        scatterSer.setSpPr(spPr);
+        scatterSer.setSmooth(false);
+        oScatter.addSer(scatterSer);
+    }
+    this.CorrectChartWithAxis(oBubble, oScatter, aChartWithAxis);
+    return oScatter;
+};
+BinaryChartReader.prototype.ConvertOfPieToPie = function (oOfPie, aChartWithAxis) {
+    var oPie = new CPieChart();
+    if (null != oOfPie.varyColors)
+        oPie.setVaryColors(oOfPie.varyColors);
+    if (null != oOfPie.dLbls)
+        oPie.setDLbls(oOfPie.dLbls);
+    for (var i = 0, length = oOfPie.series.length; i < length; ++i) {
+        oPie.addSer(oOfPie.series[i]);
+    }
+    oPie.setFirstSliceAng(0);
+    this.CorrectChartWithAxis(oOfPie, oPie, aChartWithAxis);
+    return oPie;
+};
+BinaryChartReader.prototype.CorrectChartWithAxis = function (chartOld, chartNew, aChartWithAxis) {
+    for (var i = 0, length = aChartWithAxis.length; i < length; ++i) {
+        var item = aChartWithAxis[i];
+        if (item.chart == chartOld)
+            item.chart = chartNew;
+    }
+};
 BinaryChartReader.prototype.ReadCT_Boolean = function (type, length, val) {
     var res = c_oSerConstants.ReadOk;
     var oThis = this;
@@ -10202,7 +10312,9 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_BubbleChart(t, l, oNewVal, aChartWithAxis);
         });
-        val.addChart(oNewVal);
+        //bubble -> scatter
+        var scatter = this.ConvertBubbleToScatter(oNewVal, aChartWithAxis);
+        val.addChart(scatter);
     }
     else if (c_oserct_plotareaDOUGHNUTCHART === type) {
         var oNewVal = new CDoughnutChart();
@@ -10241,7 +10353,9 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_OfPieChart(t, l, oNewVal, aChartWithAxis);
         });
-        val.addChart(oNewVal);
+        //ofPie -> pie
+        var pie = this.ConvertOfPieToPie(oNewVal, aChartWithAxis);
+        val.addChart(pie);
     }
     else if (c_oserct_plotareaPIE3DCHART === type) {
         var oNewVal = new CPieChart();
@@ -10264,7 +10378,9 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_RadarChart(t, l, oNewVal, aChartWithAxis);
         });
-        val.addChart(oNewVal);
+        //radar -> line
+        var line = this.ConvertRadarToLine(oNewVal, aChartWithAxis);
+        val.addChart(line);
     }
     else if (c_oserct_plotareaSCATTERCHART === type) {
         var oNewVal = new CScatterChart();
@@ -10285,14 +10401,18 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Surface3DChart(t, l, oNewVal, aChartWithAxis);
         });
-        val.addChart(this.ConvertSurfaceToLine(oNewVal));
+        //surface -> line
+        var line = this.ConvertSurfaceToLine(oNewVal, aChartWithAxis);
+        val.addChart(line);
     }
     else if (c_oserct_plotareaSURFACECHART === type) {
         var oNewVal = new CSurfaceChart();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_SurfaceChart(t, l, oNewVal, aChartWithAxis);
         });
-        val.addChart(this.ConvertSurfaceToLine(oNewVal));
+        //surface -> line
+        var line = this.ConvertSurfaceToLine(oNewVal, aChartWithAxis);
+        val.addChart(line);
     }
     else if (c_oserct_plotareaCATAX === type) {
         var oNewVal = new CCatAx();
