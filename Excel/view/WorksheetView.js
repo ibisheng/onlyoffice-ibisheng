@@ -30,8 +30,9 @@
 		var asc_debug   = asc.outputDebugStr;
 		var asc_Range   = asc.Range;
 		var asc_ActiveRange   = asc.ActiveRange;
-		var asc_FP      = asc.FontProperties;
-		var asc_AF     = asc.AutoFilters;
+		var asc_FP		= asc.FontProperties;
+		var asc_AF		= asc.AutoFilters;
+		var asc_CMM		= asc.asc_CMouseMoveData;
 
 		var asc_CCellFlag		= asc.asc_CCellFlag;
 		var asc_CFont			= asc.asc_CFont;
@@ -3946,6 +3947,9 @@
 			ctx.setFillPattern(t.ptrnLineDotted1)
 				.fillRect(x1, 0, this.width_1px, h)
 				.fillRect(x, 0, this.width_1px, h);
+
+			return new asc_CMM({type: c_oAscMouseMoveType.ResizeColumn, sizeCCOrPt: t._colWidthToCharCount(widthPt),
+				sizePx: widthPt * 96 / 72, x: x1, y: this.cellsTop});
 		};
 
 		// mouseY - это разница стартовых координат от мыши при нажатии и границы
@@ -3972,6 +3976,9 @@
 			ctx.setFillPattern(t.ptrnLineDotted1)
 				.fillRect(0, y1, w, this.height_1px)
 				.fillRect(0, y, w, this.height_1px);
+
+			return new asc_CMM({type: c_oAscMouseMoveType.ResizeRow, sizeCCOrPt: heightPt, sizePx: heightPt * 96 / 72,
+				x: y1, y: this.cellsLeft});
 		};
 
 

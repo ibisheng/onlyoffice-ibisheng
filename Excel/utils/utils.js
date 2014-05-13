@@ -744,6 +744,10 @@
 				this.aCommentIndexes = obj.aCommentIndexes;
 				this.userId = obj.userId;
 				this.lockedObjectType = obj.lockedObjectType;
+
+				// Для resize
+				this.sizeCCOrPt = obj.sizeCCOrPt;
+				this.sizePx = obj.sizePx;
 			}
 
 			return this;
@@ -757,7 +761,9 @@
 			asc_getHyperlink: function () { return this.hyperlink; },
 			asc_getCommentIndexes: function () { return this.aCommentIndexes; },
 			asc_getUserId: function () { return this.userId; },
-			asc_getLockedObjectType: function () { return this.lockedObjectType; }
+			asc_getLockedObjectType: function () { return this.lockedObjectType; },
+			asc_getSizeCCOrPt: function () { return this.sizeCCOrPt; },
+			asc_getSizePx: function () { return this.sizePx; }
 		};
 
 		// Гиперссылка
@@ -1364,6 +1370,8 @@
 		prot["asc_getCommentIndexes"] = prot.asc_getCommentIndexes;
 		prot["asc_getUserId"] = prot.asc_getUserId;
 		prot["asc_getLockedObjectType"] = prot.asc_getLockedObjectType;
+		prot["asc_getSizeCCOrPt"] = prot.asc_getSizeCCOrPt;
+		prot["asc_getSizePx"] = prot.asc_getSizePx;
 
 		window["Asc"]["asc_CHyperlink"] = window["Asc"].asc_CHyperlink = asc_CHyperlink;
 		prot = asc_CHyperlink.prototype;

@@ -759,11 +759,22 @@
 		};
 
 		WorkbookView.prototype._onResizeElement = function (target, x, y) {
+			var arrMouseMoveObjects = [];
 			if (target.target === c_oTargetType.ColumnResize) {
-				this.getWorksheet().drawColumnGuides(target.col, x, y, target.mouseX);
+				arrMouseMoveObjects.push(this.getWorksheet().drawColumnGuides(target.col, x, y, target.mouseX));
 			} else if (target.target === c_oTargetType.RowResize) {
-				this.getWorksheet().drawRowGuides(target.row, x, y, target.mouseY);
+				arrMouseMoveObjects.push(this.getWorksheet().drawRowGuides(target.row, x, y, target.mouseY));
 			}
+
+			/* Проверяем, может мы на никаком объекте (такая схема оказалась приемлимой
+			 * для отдела разработки приложений)
+			 */
+			if (0 === arrMouseMoveObjects.length) {
+				// Отправляем эвент, что мы ни на какой области
+				arrMouseMoveObjects.push(new asc_CMM({type: c_oAscMouseMoveType.None}));
+			}
+			// Отсылаем эвент с объектами
+			this.handlers.trigger("asc_onMouseMove", arrMouseMoveObjects);
 		};
 
 		WorkbookView.prototype._onResizeElementDone = function (target, x, y, isResizeModeMove) {
