@@ -98,9 +98,9 @@ CHeaderFooter.prototype =
     
     Is_NeedRecalculate : function(Page_abs)
     {
-        var PageNum = this.LogicDocument.Get_SectionPageNumInfo2(Page_abs).CurPage;
+        var PageNumInfo = this.LogicDocument.Get_SectionPageNumInfo(Page_abs);
         
-        if ( PageNum === this.RecalcInfo.NeedRecalc[Page_abs] && undefined !== this.RecalcInfo.RecalcObj[Page_abs] )
+        if ( true === PageNumInfo.Compare( this.RecalcInfo.NeedRecalc[Page_abs] ) && undefined !== this.RecalcInfo.RecalcObj[Page_abs] )
             return false;
         
         return true;
@@ -141,7 +141,7 @@ CHeaderFooter.prototype =
             RecalcResult = this.Content.Recalculate_Page( CurPage++, true );
         
         this.RecalcInfo.RecalcObj[Page_abs]  = this.Content.Save_RecalculateObject();
-        this.RecalcInfo.NeedRecalc[Page_abs] = this.LogicDocument.Get_SectionPageNumInfo2(Page_abs).CurPage;
+        this.RecalcInfo.NeedRecalc[Page_abs] = this.LogicDocument.Get_SectionPageNumInfo(Page_abs);
         this.RecalcInfo.SectPr[Page_abs]     = false;
         
         // Если у нас до этого был какой-то пересчет, тогда сравним его с текущим.
@@ -205,7 +205,7 @@ CHeaderFooter.prototype =
         
         // Ежели текущая страница не задана, тогда выставляем ту, которая оказалась пересчитанной первой. В противном
         // случае, выставляем рассчет страницы, которая была до этого.
-        if ( -1 === this.RecalcInfo.CurPage || this.LogicDocument.Get_SectionPageNumInfo2(this.RecalcInfo.CurPage).CurPage !== this.RecalcInfo.NeedRecalc[this.RecalcInfo.CurPage] )
+        if ( -1 === this.RecalcInfo.CurPage || false === this.LogicDocument.Get_SectionPageNumInfo(this.RecalcInfo.CurPage).Compare( this.RecalcInfo.NeedRecalc[this.RecalcInfo.CurPage] ) )
         {
             this.RecalcInfo.CurPage = Page_abs;
             
@@ -1282,7 +1282,6 @@ CHeaderFooterController.prototype =
                     Header.Set_Page(PageIndex);
             }
             HeaderDrawings = Header.Content.Get_AllDrawingObjects([]);
-            //HeaderTables = Header.Content
         }
         
         var bRecalcFooter = false;
@@ -1313,7 +1312,6 @@ CHeaderFooterController.prototype =
                     Footer.Set_Page(PageIndex);
             }
             FooterDrawings = Footer.Content.Get_AllDrawingObjects([]);
-            //FooterTables = Footer
         }
         this.LogicDocument.DrawingObjects.mergeDrawings(PageIndex, HeaderDrawings, HeaderTables, FooterDrawings, FooterTables);
         if ( true === bRecalcHeader || true === bRecalcFooter )

@@ -15419,7 +15419,7 @@ Paragraph.prototype =
         // TODO: пока здесь стоит простая проверка. В будущем надо будет данную проверку улучшить.
         //       Например, сейчас не учитывается случай, когда в начале параграфа стоит PageBreak.
 
-        if ( ( this.Pages.length > 1 && 0 === this.Pages[1].FirstLine ) || ( null === this.Get_DocumentPrev() ) )
+        if ( ( this.Pages.length > 1 && 0 === this.Pages[1].FirstLine ) || ( 1 === this.Pages.length && -1 === this.Pages[0].EndLine ) || ( null === this.Get_DocumentPrev() ) )
             return true;
 
         return false;

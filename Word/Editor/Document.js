@@ -12790,11 +12790,28 @@ CDocument.prototype =
         
         var FP = PageNumInfo.FirstPage;
         var CP = PageNumInfo.CurPage;
+
+        // Первая страница учитывается, только если параграф, идущий сразу за разрывом секции, начинается с новой страницы
+        var bCheckFP = true;
+        var SectIndex = PageNumInfo.SectIndex;
+        if ( SectIndex > 0 )
+        {
+            var CurSectInfo  = this.SectionsInfo.Get_SectPr2( SectIndex );
+            var PrevSectInfo = this.SectionsInfo.Get_SectPr2( SectIndex - 1 );
+            
+            if ( CurSectInfo !== PrevSectInfo && section_type_Continuous === CurSectInfo.SectPr.Get_Type() && true === CurSectInfo.SectPr.Compare_PageSize( PrevSectInfo.SectPr ) )
+            {
+                var ElementIndex = PrevSectInfo.Index;
+                if ( ElementIndex < this.Content.length - 1 && true !== this.Content[ElementIndex + 1].Is_StartFromNewPage() )
+                    bCheckFP = false;
+            }            
+        }
+            
         
-        var bFirst = ( FP === CP ? true : false );
+        var bFirst = ( FP === CP && true === bCheckFP ? true : false );
         var bEven  = ( 0 === CP % 2 ? true : false ); // Четность/нечетность проверяется по текущему номеру страницы в секции, с учетом нумерации в секциях
                 
-        return { FirstPage : FP, CurPage : CP, bFirst : bFirst, bEven : bEven };
+        return new CSectionPageNumInfo( FP, CP, bFirst, bEven, Page_abs );
     },
     
     Get_SectionPageNumInfo2 : function(Page_abs)
@@ -12806,6 +12823,7 @@ CDocument.prototype =
             StartIndex = this.Pages[Page_abs].Pos;        
         
         var SectIndex  = this.SectionsInfo.Get_Index(StartIndex);
+        var StartSectIndex = SectIndex;
 
         if ( 0 === SectIndex )
         {
@@ -12820,7 +12838,7 @@ CDocument.prototype =
             if ( (section_type_OddPage === BT && 0 === PageNumStart % 2) || (section_type_EvenPage === BT && 1 === PageNumStart % 2) )
                 PageNumStart++;
 
-            return { FirstPage : PageNumStart, CurPage : Page_abs + PageNumStart };
+            return { FirstPage : PageNumStart, CurPage : Page_abs + PageNumStart, SectIndex : StartSectIndex };
         }
 
         var SectionFirstPage = this.Get_SectionFirstPage( SectIndex, Page_abs );
@@ -12875,7 +12893,7 @@ CDocument.prototype =
         var _FP = PageNumStart;
         var _CP = PageNumStart + Page_abs - FP;       
 
-        return { FirstPage : _FP, CurPage : _CP };
+        return { FirstPage : _FP, CurPage : _CP, SectIndex : StartSectIndex };
     },
     
     Get_SectionHdrFtr : function(Page_abs, _bFirst, _bEven)

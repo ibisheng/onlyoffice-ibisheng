@@ -1417,3 +1417,25 @@ CSectionPageNumType.prototype =
         this.Start = Reader.GetLong();
     }    
 }
+
+
+function CSectionPageNumInfo(FP, CP, bFirst, bEven, PageNum)
+{
+    this.FirstPage = FP;
+    this.CurPage   = CP;
+    this.bFirst    = bFirst;
+    this.bEven     = bEven;
+    
+    this.PageNum   = PageNum;
+}
+
+CSectionPageNumInfo.prototype =
+{
+    Compare : function(Other)
+    {
+        if ( undefined === Other || null === Other || this.CurPage !== Other.CurPage || this.bFirst !== Other.bFirst || this.bEven !== Other.bEven || this.PageNum !== Other.PageNum )
+            return false;
+        
+        return true;
+    }
+}
