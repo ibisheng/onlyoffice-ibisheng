@@ -1011,7 +1011,7 @@ function cRef( val, ws ) {/*Ref means A1 for example*/
 
     this._cells = val;
     this.ws = ws;
-    this.wb = ws.workbook;
+    this.wb = this._wb = ws.workbook;
     this.isAbsolute = false;
     this.type = cElementType.cell;
     var ca = g_oCellAddressUtils.getCellAddress( val.replace( rx_space_g, "" ) );
@@ -1098,7 +1098,7 @@ function cRef3D( val, _wsFrom, wb ) {/*Ref means Sheat1!A1 for example*/
     this.ca = false;
     this.node = undefined;
 
-    this._wb = wb;
+    this.wb = this._wb = wb;
     this._cells = val;
     this.isAbsolute = false;
     this.type = cElementType.cell;
@@ -2674,346 +2674,6 @@ _func.binarySearch = function ( sElem, arrTagert, regExp ) {
 };
 
 
-/*function testPars(){}
- testPars.prototype = {
- isalpha:function(c){
- c = c.toUpperCase();
- return c >= "A" && c <= "Z";
- },
- isalnum:function(c){
- return isdigit(c) || rg_str_allLang.test(c);
- },
- isdigit:function( n ) {
- return n == "0" || n == "1" ||
- n == "2" || n == "3" ||
- n == "4" || n == "5" ||
- n == "6" || n == "7" ||
- n == "8" || n == "9";
- },
- isoper:function(c){
- return rx_operators.test(c)
- },
- isOperator:function( str, pos ) {
- skipSpace.call( this );
- var op = this.Formula[this.pCurrPos];
- switch ( op ) {
- case "-":
- case "%":
- case "^":
- case "*":
- case "/":
- case "+":
- case "&":
- case "=":
- {
- this.operand_str = op;
- this.pCurrPos += op.length;
- return true;
- }
- case "<":
- {
- if ( this.Formula[this.pCurrPos + 1] == ">" || this.Formula[this.pCurrPos + 1] == "=" ) {
- this.operand_str = op + this.Formula[this.pCurrPos + 1];
- this.pCurrPos += this.operand_str.length;
- return true
- }
- this.operand_str = op;
- this.pCurrPos += op.length;
- return true;
- }
- case ">":
- {
- if ( this.Formula[this.pCurrPos + 1] == "=" ) {
- this.operand_str = op + this.Formula[this.pCurrPos + 1];
- this.pCurrPos += this.operand_str.length;
- return true
- }
- this.operand_str = op;
- this.pCurrPos += op.length;
- return true;
- }
- }
- return false;
- },
- skipSpace:function( str, pos ) {
- while ( this.Formula[this.pCurrPos] == " " ) this.pCurrPos++;
- },
- isLeftParentheses:function( str, pos ) {
- skipSpace.call( this );
- var op = this.Formula[this.pCurrPos];
- if ( op == "(" ) {
- this.operand_str = op;
- this.pCurrPos += op.length;
- return true;
- }
- return false;
- },
- isRightParentheses:function( str, pos ) {
- skipSpace.call( this );
- var op = this.Formula[this.pCurrPos];
- if ( op == ")" ) {
- this.operand_str = op;
- this.pCurrPos += op.length;
- return true;
- }
- return false;
- },
- isLeftBrace:function( str, pos ) {
- skipSpace.call( this );
- var op = this.Formula[this.pCurrPos];
- if ( op == "{" ) {
- this.operand_str = op;
- this.pCurrPos += op.length;
- return true;
- }
- return false;
- },
- isRightBrace:function( str, pos ) {
- skipSpace.call( this );
- var op = this.Formula[this.pCurrPos];
- if ( op == "}" ) {
- this.operand_str = op;
- this.pCurrPos += op.length;
- return true;
- }
- return false;
- },
- isComma:function( str, pos ) {
- skipSpace.call( this );
- var op = this.Formula[this.pCurrPos];
- if ( op == "," || op == ";" ) {
- this.operand_str = op;
- this.pCurrPos += op.length;
- return true;
- }
- return false;
- },
- isNumber:function( str, pos ) {
- skipSpace.call( this );
- var k = this.pCurrPos, pos = this.pCurrPos;
- if ( isdigit( this.Formula[pos] ) ) {
- pos++;
- while ( isdigit( this.Formula[pos] ) ) pos++;
- }
- if ( this.Formula[pos] == '.' )//Дробная часть
- {
- pos++;
- if ( isdigit( this.Formula[pos] ) ) {
- pos++;
- while ( isdigit( this.Formula[pos] ) ) pos++;
- }
- else return false;
- }
- if ( k!= pos && ((this.Formula[pos] == 'e') || (this.Formula[pos] == 'E')) ) {//Показатель
- pos++;
- if ( (this.Formula[pos] == '+') || (this.Formula[pos] == '-') ) pos++;
- if ( isdigit( this.Formula[pos] ) ) {
- pos++;
- while ( isdigit( this.Formula[pos] ) ) pos++;
- }
- else return false;
- }
- var op = this.Formula.substring( k, pos );
- if ( op.length > 0 ) {
- this.operand_str = op;
- this.pCurrPos = pos;
- return true;
- }
- return false;
- },
- isString:function( str, pos ){
- skipSpace.call( this );
- var op = this.Formula[this.pCurrPos], pos = this.pCurrPos, isString = true,
- str = "", quoteCounts = 0, res = false;
- if( op != '"' ) return res;
- pos++;
- while( true && pos < this.Formula.length ){
- if( this.Formula[pos] == '"' && this.Formula[pos+1] == '"' ){
- str += '"';
- pos += 2;
- continue;
- }
- else if( this.Formula[pos] == '"' && (this.Formula[pos+1] != '"' || this.Formula[pos+1] != '!')){
- pos++;
- res = true;
- break;
- }
-
- str += this.Formula[pos];
- pos++;
- }
- if( res ){
- this.operand_str = str;
- this.pCurrPos = pos;
- }
- return res;
- },
- isRef:function( str, pos ){
- skipSpace.call( this );
- var op = this.Formula[this.pCurrPos], pos = this.pCurrPos, res = false, countChar = 3, ref = "", col = "", row = "";
- while( pos < this.Formula.length ){
- op = this.Formula[pos].toUpperCase();
- if( op >= "A" && op <= "Z" ){
- ref += op;
- col += op;
- countChar --;
- pos++;
- continue;
- }
- else if( isdigit(op) ){
- ref += op;
- row += op;
- pos++;
- continue;
- }
- else if( op == "$" ){
- ref += op;
- pos++;
- continue;
- }
- else if( op=="(" )
- {
- return false;
- }
- break;
- }
-
- if( col == "" || row == "" ){
- res = false;
- }
- else
- res = true;
-
- if(res){
- this.pCurrPos = pos;
- this.operand_str = ref;
- }
-
- return res;
-
- },
- isArea:function( str, pos ){
- skipSpace.call( this );
- var op = this.Formula[this.pCurrPos], pos = this.pCurrPos, res = false, wasDelim = false, ref = "", wasDigit = false;
-
- while(pos<this.Formula.length){
-
- op = this.Formula[pos];
-
- if( isalpha(op) ){
-
- if( wasDigit )
- return false;
-
- //            ref+=op;
- pos++;
- }
- else if( isdigit(op) ){
- //            ref+=op;
- pos++;
- wasDigit = true;
- }
- else if( op == ":" ){
- //            ref+=op;
- pos++;
- wasDigit = false;
- wasDelim = true;
- }
- else if( op == "$" ){
- pos++;
- }
- else if( wasDelim ){
- res = true;
- break;
- }else
- return false;
-
- }
-
- if(pos == this.Formula.length && wasDelim){
- res = true;
- }
-
- if(res){
- this.operand_str = this.Formula.substring(this.pCurrPos,pos);
- this.pCurrPos = pos;
- }
-
- return res;
-
- },
- is3DRef:function(str,pos){
- skipSpace.call( this );
- var op = this.Formula[this.pCurrPos], pos = this.pCurrPos, sheetDelimPos = -1, sheetDelimPosCount = 0;
- if( op == "'"){
- var wasAp = false;
- pos++;
- if( this.Formula[pos] == "["){
- return [false];//ToDo!!!!!
- }
- else{
- op = this.Formula[pos];
- if( op == "'" || op=="*" || op == "[" || op == "]" || op == "\\" || op == ":" || op == "/" || op == "?" ){
- return [false];
- }
- while ( pos < this.Formula.length ) {
- pos++;
- op = this.Formula[pos];
- if(op==":"){
- if( wasAp ) return [false];
- sheetDelimPos = pos;
- sheetDelimPosCount++;
- }
- else if( isoper(op) || op == "[" || op == "]" || op == "\\" || op == "?" ){
- return [false];
- }
- else if( op=="'" ){
- wasAp = !wasAp;
- }
- else if( op=="!" ){
- if( !wasAp )
- return [false];
- break;
- }
- }
- }
- }
- else if( op == "[" ){
- return [false];//ToDo!!!!!
- }
- else if( !isoper(op) && !(op == "'" || op == "[" || op == "]" || op == "\\" || op == "?" )){
- while ( pos < this.Formula.length && op != "!" ) {
- pos++;
- op = this.Formula[pos];
- if(op==":"){
- sheetDelimPos = pos;
- sheetDelimPosCount++;
- }
- else if( isoper(op) || op == "'" || op == "[" || op == "]" || op == "\\" || op == "?" || op == "(" || op==")" ){
- return [false];
- }
- }
- if( pos == this.Formula.length ){
- return [false];
- }
- }
-
- if ( sheetDelimPosCount > 1 ) return [false];
-
- var s = this.operand_str = this.Formula.substring( this.pCurrPos, pos );
- pos++;
- this.pCurrPos = pos;
- if( s.indexOf("'") > -1 ){
- s = s.substring( 1, s.length-1 ).replace(/''/g,"'");
- //        s = s.replace(/''/g,"'");
- }
- if ( sheetDelimPos > -1 ) {
- s = s.split( ":" );
- return [true, s[0], s[1]];
- }
- return [true, s, s];
- }
- }*/
 /** класс отвечающий за парсинг строки с формулой, подсчета формулы, перестройки формулы при манипуляции с ячейкой*/
 /** @constructor */
 function parserFormula( formula, _cellId, _ws ) {
@@ -3091,12 +2751,13 @@ parserFormula.prototype = {
          Что упрощает вычисление результата формулы.
          При разборе формулы важен порядок проверки очередной части выражения на принадлежность тому или иному типу.
          */
-        var operand_expected = true, wasLeftParentheses = false;
+        var operand_expected = true, wasLeftParentheses = false, wasRigthParentheses = false,
+            found_operand = null, _3DRefTmp = null;
         while ( this.pCurrPos < this.Formula.length ) {
             /* Operators*/
             if ( parserHelp.isOperator.call( this, this.Formula, this.pCurrPos )/*  || isNextPtg(this.formula,this.pCurrPos) */ ) {
-                wasLeftParentheses = false;
-                var found_operator = null;
+                wasLeftParentheses = false;wasRigthParentheses = false;
+                found_operator = null;
 
                 if ( operand_expected ) {
                     if ( this.operand_str == "-" ) {
@@ -3150,16 +2811,24 @@ parserFormula.prototype = {
                     this.outStack.push( this.elemArr.pop() );
                 }
                 this.elemArr.push( found_operator );
+
+                found_operand = null;
             }
 
             /* Left & Right Parentheses */
             else if ( parserHelp.isLeftParentheses.call( this, this.Formula, this.pCurrPos ) ) {
+                if( wasRigthParentheses || found_operand){
+                    this.elemArr.push( new cMultOperator() );
+                }
                 operand_expected = true;
                 wasLeftParentheses = true;
+                wasRigthParentheses = false;
+                found_operand = null;
                 this.elemArr.push( new cFormulaOperators[this.operand_str]() );
             }
 
             else if ( parserHelp.isRightParentheses.call( this, this.Formula, this.pCurrPos ) ) {
+                wasRigthParentheses = true;
                 var top_elem = null;
                 if ( this.elemArr.length != 0 && ( (top_elem = this.elemArr[this.elemArr.length - 1]).name == "(" ) && operand_expected ) {
                     if ( top_elem.getArguments() > 1 ) {
@@ -3229,7 +2898,7 @@ parserFormula.prototype = {
 
             /*Comma & arguments union*/
             else if ( parserHelp.isComma.call( this, this.Formula, this.pCurrPos ) ) {
-                wasLeftParentheses = false;
+                wasLeftParentheses = false; wasRigthParentheses = false;
                 /* if( operand_expected ){
                  this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
                  this.outStack = [];
@@ -3269,7 +2938,7 @@ parserFormula.prototype = {
 
             /* Array */
             else if ( parserHelp.isArray.call( this, this.Formula, this.pCurrPos ) ) {
-                wasLeftParentheses = false;
+                wasLeftParentheses = false; wasRigthParentheses = false;
                 var pH = new parserHelper(), tO = {pCurrPos:0, Formula:this.operand_str, operand_str:""};
                 var arr = new cArray(), operator = { isOperator:false, operatorName:""};
                 while ( tO.pCurrPos < tO.Formula.length ) {
@@ -3320,7 +2989,12 @@ parserFormula.prototype = {
 
             /* Operands*/
             else {
-                var found_operand = null, _3DRefTmp = null;
+
+                found_operand = null;
+
+                if( wasRigthParentheses ){
+                    operand_expected = true;
+                }
 
                 if ( !operand_expected ) {
                     this.error.push( c_oAscError.ID.FrmlWrongOperator );
@@ -3410,6 +3084,10 @@ parserFormula.prototype = {
                 /* Function*/
                 else if ( parserHelp.isFunc.call( this, this.Formula, this.pCurrPos ) ) {
 
+                    if( wasRigthParentheses && operand_expected ){
+                        this.elemArr.push( new cMultOperator() );
+                    }
+
                     var found_operator = null;
                     if ( this.operand_str.toUpperCase() in cFormulaFunction.Mathematic )//Mathematic
                         found_operator = new cFormulaFunction.Mathematic[this.operand_str.toUpperCase()]();
@@ -3453,6 +3131,7 @@ parserFormula.prototype = {
                         return false;
                     }
                     operand_expected = false;
+                    wasRigthParentheses = false;
                     continue;
                 }
 
@@ -3467,11 +3146,14 @@ parserFormula.prototype = {
                     return false;*/
                     this.outStack.push( new cError(cErrorType.wrong_name) );
                     operand_expected = false;
-                    break;
-//                    this.outStack = [new cError(cErrorType.wrong_name)];
-//                    return this.isParsed = false;
+//                    break;
+                    /*this.outStack = [new cError(cErrorType.wrong_name)];
+                    return this.isParsed = false;*/
                 }
-                wasLeftParentheses = false;
+                if( wasRigthParentheses ){
+                    this.elemArr.push( new cMultOperator() );
+                }
+                wasLeftParentheses = false; wasRigthParentheses = false;
             }
 
         }
@@ -3500,7 +3182,7 @@ parserFormula.prototype = {
         }
         this.parenthesesNotEnough = parenthesesNotEnough;
         if(this.parenthesesNotEnough){
-            this.error.push( c_oAscError.ID.FrmlWrongCountParentheses );
+            this.error.push( c_oAscError.ID.FrmlParenthesesCorrectCount );
             return this.isParsed = false;
         }
 
@@ -4687,4 +4369,3 @@ function getLogGamma( fZ ) {
         return Math.log( lcl_GetGammaHelper( fZ + 1 ) / fZ );
     return lcl_GetLogGammaHelper( fZ + 2 ) - Math.log( fZ + 1 ) - Math.log( fZ );
 }
-

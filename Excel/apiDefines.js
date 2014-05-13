@@ -45,10 +45,11 @@ var c_oAscError = {
 		FrmlAnotherParsingError:	-35,
 		FrmlWrongArgumentRange:		-36,
 		FrmlOperandExpected:		-37,
+        FrmlParenthesesCorrectCount:		    -38,
 		
-		AutoFilterDataRangeError:           -38,
-		AutoFilterChangeFormatTableError:   -39,
-		AutoFilterChangeError:              -40
+		AutoFilterDataRangeError:           -50,
+		AutoFilterChangeFormatTableError:   -51,
+		AutoFilterChangeError:              -52
 	}
 };
 var c_oAscConfirm = {
