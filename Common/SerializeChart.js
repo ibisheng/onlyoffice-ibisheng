@@ -5437,6 +5437,47 @@ BinaryChartReader.prototype.ParseMetric = function (val) {
     }
     return nRes;
 }
+BinaryChartReader.prototype.ConvertSurfaceToLine = function (oSurface) {
+    var oLine = new CLineChart();
+    oLine.setGrouping(GROUPING_STANDARD);
+    oLine.setVaryColors(false);
+    for (var i = 0, length = oSurface.series.length; i < length; ++i) {
+        var surfaceSer = oSurface.series[i];
+        var lineSer = new CLineSeries();
+        if (null != surfaceSer.idx)
+            lineSer.setIdx(surfaceSer.idx);
+        if (null != surfaceSer.order)
+            lineSer.setOrder(surfaceSer.order);
+        if (null != surfaceSer.tx)
+            lineSer.setTx(surfaceSer.tx);
+        if (null != surfaceSer.spPr)
+            lineSer.setSpPr(surfaceSer.spPr);
+        if (null != surfaceSer.cat)
+            lineSer.setCat(surfaceSer.cat);
+        if (null != surfaceSer.val)
+            lineSer.setVal(surfaceSer.val);
+        var marker = new CMarker();
+        marker.setSymbol(SYMBOL_NONE);
+        lineSer.setMarker(marker);
+        lineSer.setSmooth(false);
+        oLine.addSer(lineSer);
+    }
+    var dLbls = new CDLbls();
+    dLbls.setShowLegendKey(false);
+    dLbls.setShowVal(false);
+    dLbls.setShowCatName(false);
+    dLbls.setShowSerName(false);
+    dLbls.setShowPercent(false);
+    dLbls.setShowBubbleSize(false);
+    oLine.setDLbls(dLbls);
+    oLine.setMarker(true);
+    oLine.setSmooth(false);
+    return oLine;
+};
+BinaryChartReader.prototype.ConvertSurfaceValAxToLineValAx = function (oSurfaceValAx) {
+    oSurfaceValAx.setCrossBetween(CROSS_BETWEEN_BETWEEN);
+    oSurfaceValAx.setTickLblPos(TICK_LABEL_POSITION_NEXT_TO);
+}
 BinaryChartReader.prototype.ReadCT_Boolean = function (type, length, val) {
     var res = c_oSerConstants.ReadOk;
     var oThis = this;
@@ -8340,7 +8381,7 @@ BinaryChartReader.prototype.ReadCT_Surface3DChart = function (type, length, val,
             return oThis.ReadCT_UnsignedInt(t, l, oNewVal);
         });
         if (null != oNewVal.m_val)
-            aChartWithAxis.push({ axisId: oNewVal.m_val, chart: val });
+            aChartWithAxis.push({ axisId: oNewVal.m_val, chart: val, surface: true });
     }
     else if (c_oserct_surface3dchartEXTLST === type) {
         var oNewVal = {};
@@ -8454,7 +8495,7 @@ BinaryChartReader.prototype.ReadCT_SurfaceChart = function (type, length, val, a
             return oThis.ReadCT_UnsignedInt(t, l, oNewVal);
         });
         if (null != oNewVal.m_val)
-            aChartWithAxis.push({ axisId: oNewVal.m_val, chart: val });
+            aChartWithAxis.push({ axisId: oNewVal.m_val, chart: val, surface: true });
     }
     else if (c_oserct_surfacechartEXTLST === type) {
         var oNewVal;
@@ -10244,14 +10285,14 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Surface3DChart(t, l, oNewVal, aChartWithAxis);
         });
-        val.addChart(oNewVal);
+        val.addChart(this.ConvertSurfaceToLine(oNewVal));
     }
     else if (c_oserct_plotareaSURFACECHART === type) {
         var oNewVal = new CSurfaceChart();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_SurfaceChart(t, l, oNewVal, aChartWithAxis);
         });
-        val.addChart(oNewVal);
+        val.addChart(this.ConvertSurfaceToLine(oNewVal));
     }
     else if (c_oserct_plotareaCATAX === type) {
         var oNewVal = new CCatAx();
@@ -10591,8 +10632,11 @@ BinaryChartReader.prototype.ReadCT_Chart = function (type, length, val) {
         for (var i = 0, length = aChartWithAxis.length; i < length; ++i) {
             var item = aChartWithAxis[i];
             var axis = oIdToAxisMap[item.axisId];
-            if (null != axis && null != item.chart)
+            if (null != axis && null != item.chart) {
+                if (item.surface && axis instanceof CValAx)
+                    this.ConvertSurfaceValAxToLineValAx(axis);
                 item.chart.addAxId(axis);
+            }
         }
         val.setPlotArea(oNewVal);
     }
