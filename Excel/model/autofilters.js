@@ -2360,7 +2360,10 @@ var gUndoInsDelCellsFlag = true;
 				}
 				var oldFilter = filterObj.clone(aWs);
 				var cell = ws.model.getCell( new CellAddress(activeCells.r1, activeCells.c1,0));
-				var rangeStart = this._idToRange(ref.split(':')[0]);
+				
+				var filterRange = this._refToRange(ref);
+				var rangeStart = filterRange;
+
 				if(newAcCells.c1 == (rangeStart.c1 + parseInt(filtersOp[1])))
 				{
 					var isMerged = cell.hasMerged();
@@ -2394,7 +2397,8 @@ var gUndoInsDelCellsFlag = true;
 					
 					var lengthRows = array.length;
 					if(ref && ref.split(":")[1])
-						lengthRows = this._idToRange(ref.split(":")[1]).r1 - this._idToRange(ref.split(":")[0]).r1;
+						lengthRows = filterRange.r2 - filterRange.r1;
+						
 					var allFilterOpenElements = true;
 					//возможно открыты все значения фильтра
 					for(var s = 0; s < array.length; s++)
@@ -3879,7 +3883,7 @@ var gUndoInsDelCellsFlag = true;
 						var startRow = ws.model.getCell(new CellAddress(acCell.id)).first.row - 1;
 						var endRow = ws.model.getCell(new CellAddress(acCell.idNext)).first.row - 1;
 						var col = ws.model.getCell(new CellAddress(acCell.id)).first.col - 1;
-						for(var nRow = startRow + 1; nRow <= endRow; nRow++)
+						for(nRow = startRow + 1; nRow <= endRow; nRow++)
 						{
 							var cell = ws.model.getCell(new CellAddress(nRow,col,0));
 							var val = cell.getValueWithFormat();
