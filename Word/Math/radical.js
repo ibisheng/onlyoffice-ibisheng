@@ -1219,4 +1219,3 @@ CRadical.prototype.getPropsForWrite = function()
     return props;
 }
 
-

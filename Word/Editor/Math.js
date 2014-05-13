@@ -78,7 +78,6 @@ ParaMath.prototype =
         else
         {
             NewMath.Root = this.Root.Copy(Selected, NewMath);
-
         }
 
         /// argSize, bDot и bRoot выставить на объединении контентов

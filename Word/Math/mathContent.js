@@ -685,19 +685,19 @@ CMPrp.prototype =
 
 
         // если приходит несколько параметров style из xml, то запоминается последний
-        if(props.sty === "i")
+        if(props.sty === STY_ITALIC)
             this.italic = true;
-        else if(props.sty === "bi")
+        else if(props.sty === STY_BI)
         {
             this.italic = true;
             this.bold = true;
         }
-        else if(props.sty === "b")
+        else if(props.sty === STY_BOLD)
         {
             this.italic = false;
             this.bold = true;
         }
-        else if(props.sty === "p")
+        else if(props.sty === STY_PLAIN )
         {
             // plain text ?!    // default
             this.plain = true;  // italic = true
@@ -710,7 +710,7 @@ CMPrp.prototype =
         // TXT_SANS_SERIF           U+1D608 - U+1D63B
         // TXT_SCRIPT               U+1D49C - U+1D4CF
 
-        props.scr = this.typeText;
+        this.typeText = props.scr;
 
 
         if(props.nor)
@@ -733,13 +733,13 @@ CMPrp.prototype =
         else
         {
             if(BoldItalic)
-                props.sty = "bi";
+                props.sty = STY_BI;
             else if(Bold)
-                props.sty = "b";
+                props.sty = STY_BOLD;
             else if(Italic)
-                props.sty = "i";
+                props.sty = STY_ITALIC;
             else if(Plain)
-                props.sty = "p";
+                props.sty = STY_PLAIN;
         }
 
         if(this.aln)

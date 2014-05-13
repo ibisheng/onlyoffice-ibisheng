@@ -17,6 +17,7 @@ function ParaRun(Paragraph, bMathRun)
     this.RecalcInfo = new CParaRunRecalcInfo();  // Флаги для пересчета (там же флаг пересчета стиля)
 
     this.TextAscent  = 0; // текстовый ascent + linegap
+    this.TextAscent  = 0; // текстовый ascent + linegap
     this.TextDescent = 0; // текстовый descent
     this.TextHeight  = 0; // высота текста
     this.TextAscent2 = 0; // текстовый ascent
