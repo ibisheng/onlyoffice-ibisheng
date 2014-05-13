@@ -3070,7 +3070,8 @@ CChartsDrawer.prototype =
 			}
 			case historyitem_type_BubbleChart:
 			{
-				this.calcProp.type = "BubbleChart";
+				//this.calcProp.type = "BubbleChart";
+				this.calcProp.type = "Scatter";
 				break;
 			}
 		};
