@@ -3949,7 +3949,7 @@
 				.fillRect(x, 0, this.width_1px, h);
 
 			return new asc_CMM({type: c_oAscMouseMoveType.ResizeColumn, sizeCCOrPt: t._colWidthToCharCount(widthPt),
-				sizePx: widthPt * 96 / 72, x: x1 * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX()),
+				sizePx: widthPt * 96 / 72, x: (x1 + t.cols[col].width) * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX()),
 				y: this.cellsTop * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY())});
 		};
 
@@ -3980,7 +3980,7 @@
 
 			return new asc_CMM({type: c_oAscMouseMoveType.ResizeRow, sizeCCOrPt: heightPt, sizePx: heightPt * 96 / 72,
 				x: this.cellsLeft * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX()),
-				y: y1 * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY())});
+				y: (y1 + t.rows[row].height) * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY())});
 		};
 
 
