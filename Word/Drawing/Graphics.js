@@ -1827,14 +1827,17 @@ CGraphics.prototype =
         if (-1 != sectionNum)
             _header_text += (" -Section " + (sectionNum + 1) + "-");
 
-        if (type.bFirst)
-            _header_text = "First Page " + _header_text;
-        else if (EvenAndOddHeaders)
+        if (type)
         {
-            if (type.bEven)
-                _header_text = "Even Page " + _header_text;
-            else
-                _header_text = "Odd Page " + _header_text;
+            if (type.bFirst)
+                _header_text = "First Page " + _header_text;
+            else if (EvenAndOddHeaders)
+            {
+                if (type.bEven)
+                    _header_text = "Even Page " + _header_text;
+                else
+                    _header_text = "Odd Page " + _header_text;
+            }
         }
 
         this.DrawStringASCII("Courier New", 9, false, false, _header_text, 2, yPos, true);
@@ -1909,14 +1912,17 @@ CGraphics.prototype =
         if (-1 != sectionNum)
             _header_text += (" -Section " + (sectionNum + 1) + "-");
 
-        if (type.bFirst)
-            _header_text = "First Page " + _header_text;
-        else if (EvenAndOddHeaders)
+        if (type)
         {
-            if (type.bEven)
-                _header_text = "Even Page " + _header_text;
-            else
-                _header_text = "Odd Page " + _header_text;
+            if (type.bFirst)
+                _header_text = "First Page " + _header_text;
+            else if (EvenAndOddHeaders)
+            {
+                if (type.bEven)
+                    _header_text = "Even Page " + _header_text;
+                else
+                    _header_text = "Odd Page " + _header_text;
+            }
         }
 
         this.DrawStringASCII("Courier New", 9, false, false, _header_text, 2, yPos, false);
