@@ -1667,78 +1667,186 @@ CGraphics.prototype =
         return this.m_bIntegerGrid;
     },
 
-    DrawHeaderEdit : function(yPos, lock_type)
+    DrawStringASCII : function(name, size, bold, italic, text, x, y, bIsHeader)
     {
-        var _y = this.m_oFullTransform.TransformPointY(0,yPos);
-        _y = (_y >> 0) + 0.5;
-        var _x = 0;
-        var _wmax = this.m_lWidthPix;
+        var _textProp = {
+            RFonts : { Ascii : { Name : name, Index : -1 } },
+            FontSize : (((size * 2 * 96 / this.m_dDpiY) + 0.5) >> 0) / 2,
+            Bold : false,
+            Italic : false
+        };
 
-        var _w1 = 6;
-        var _w2 = 3;
+        this.m_oTextPr = _textProp;
+        this.m_oGrFonts.Ascii.Name = this.m_oTextPr.RFonts.Ascii.Name;
+        this.m_oGrFonts.Ascii.Index = -1;
 
-        var ctx = this.m_oContext;
+        this.SetFontSlot(fontslot_ASCII, 1);
 
-        switch (lock_type)
-        {
-            case locktype_None:
-            case locktype_Mine:
-            {
-                this.p_color(155, 187, 277, 255);
-                ctx.lineWidth = 2;
-                break;
-            }
-            case locktype_Other:
-            case locktype_Other2:
-            {
-                this.p_color(238, 53, 37, 255);
-                ctx.lineWidth = 1;
-                _w1 = 2;
-                _w2 = 1;
-                break;
-            }
-            default:
-            {
-                this.p_color(155, 187, 277, 255);
-                ctx.lineWidth = 2;
-                _w1 = 2;
-                _w2 = 1;
-            }
-        }
+        this.m_oFontManager.LoadString2(text, 0, 0);
+        var measure = this.m_oFontManager.MeasureString2();
 
-        if (true === this.m_bIntegerGrid)
-        {
-            this._s();
-            while (true)
-            {
-                if (_x > _wmax)
-                    break;
-                ctx.moveTo(_x,_y);
-                _x+=_w1;
-                ctx.lineTo(_x,_y);
-                _x+=_w2;
-            }
-            this.ds();
-        }
+        var _ctx = this.m_oContext;
+        _ctx.beginPath();
+        _ctx.fillStyle = "#E1E1E1";
+        _ctx.strokeStyle = GlobalSkin.RulerOutline;
+
+        var __x = this.m_oFullTransform.TransformPointX(x, y) >> 0;
+        var __y = this.m_oFullTransform.TransformPointY(x, y) >> 0;
+        var __w = (measure.fWidth >> 0) + 20;
+        var __h = (measure.fHeight >> 0) + 10;
+
+        if (!bIsHeader)
+            __y -= __h;
+
+        _ctx.rect(__x + 0.5, __y + 0.5, __w, __h);
+
+        _ctx.fill();
+        _ctx.stroke();
+        _ctx.beginPath();
+
+        this.b_color1(68, 68, 68, 255);
+
+        var _koef_px_to_mm = 25.4 / this.m_dDpiY;
+
+        if (bIsHeader)
+            this.t(text, x + 10 * _koef_px_to_mm, y + (__h - 5) * _koef_px_to_mm);
         else
-        {
-            this.SetIntegerGrid(true);
-            this._s();
-            while (true)
-            {
-                if (_x > _wmax)
-                    break;
-                ctx.moveTo(_x,_y);
-                _x+=_w1;
-                ctx.lineTo(_x,_y);
-                _x+=_w2;
-            }
-            this.ds();
-            this.SetIntegerGrid(false);
-        }
+            this.t(text, x + 10 * _koef_px_to_mm, y - 5 * _koef_px_to_mm);
     },
 
-    DrawFooterEdit : function(yPos, lock_type)
+    DrawStringASCII2 : function(name, size, bold, italic, text, x, y, bIsHeader)
+    {
+        var _textProp = {
+            RFonts : { Ascii : { Name : name, Index : -1 } },
+            FontSize : (((size * 2 * 96 / this.m_dDpiY) + 0.5) >> 0) / 2,
+            Bold : false,
+            Italic : false
+        };
+
+        this.m_oTextPr = _textProp;
+        this.m_oGrFonts.Ascii.Name = this.m_oTextPr.RFonts.Ascii.Name;
+        this.m_oGrFonts.Ascii.Index = -1;
+
+        this.SetFontSlot(fontslot_ASCII, 1);
+
+        this.m_oFontManager.LoadString2(text, 0, 0);
+        var measure = this.m_oFontManager.MeasureString2();
+
+        var _ctx = this.m_oContext;
+        _ctx.beginPath();
+        _ctx.fillStyle = "#E1E1E1";
+        _ctx.strokeStyle = GlobalSkin.RulerOutline;
+
+        var __x = this.m_oFullTransform.TransformPointX(this.m_dWidthMM - x, y) >> 0;
+        var __y = this.m_oFullTransform.TransformPointY(this.m_dWidthMM - x, y) >> 0;
+        var __w = (measure.fWidth >> 0) + 20;
+        var __h = (measure.fHeight >> 0) + 10;
+        __x -= __w;
+
+        if (!bIsHeader)
+            __y -= __h;
+
+        _ctx.rect(__x + 0.5, __y + 0.5, __w, __h);
+
+        _ctx.fill();
+        _ctx.stroke();
+        _ctx.beginPath();
+
+        this.b_color1(68, 68, 68, 255);
+
+        var _koef_px_to_mm = 25.4 / this.m_dDpiY;
+
+        var xPos = this.m_dWidthMM - x - (__w - 10) * _koef_px_to_mm;
+
+        if (bIsHeader)
+            this.t(text, xPos, y + (__h - 5) * _koef_px_to_mm);
+        else
+            this.t(text, xPos, y - 5 * _koef_px_to_mm);
+    },
+
+    DrawHeaderEdit : function(yPos, lock_type, sectionNum, bIsRepeat, type)
+    {
+        var _y = this.m_oFullTransform.TransformPointY(0,yPos);
+        _y = (_y >> 0) + 0.5;
+        var _x = 0;
+        var _wmax = this.m_lWidthPix;
+
+        var _w1 = 6;
+        var _w2 = 3;
+
+        var ctx = this.m_oContext;
+
+        switch (lock_type)
+        {
+            case locktype_None:
+            case locktype_Mine:
+            {
+                //this.p_color(155, 187, 277, 255);
+                //ctx.lineWidth = 2;
+                // GlobalSkin.RulerOutline
+                this.p_color(0xBB, 0xBE, 0xC2, 255);
+                ctx.lineWidth = 1;
+                break;
+            }
+            case locktype_Other:
+            case locktype_Other2:
+            {
+                this.p_color(238, 53, 37, 255);
+                ctx.lineWidth = 1;
+                _w1 = 2;
+                _w2 = 1;
+                break;
+            }
+            default:
+            {
+                this.p_color(155, 187, 277, 255);
+                ctx.lineWidth = 2;
+                _w1 = 2;
+                _w2 = 1;
+            }
+        }
+
+        var bIsNoIntGrid = this.m_bIntegerGrid;
+
+        if (false == bIsNoIntGrid)
+            this.SetIntegerGrid(true);
+
+        this._s();
+        while (true)
+        {
+            if (_x > _wmax)
+                break;
+            ctx.moveTo(_x,_y);
+            _x+=_w1;
+            ctx.lineTo(_x,_y);
+            _x+=_w2;
+        }
+        this.ds();
+
+        var _header_text = "Header"
+        if (-1 != sectionNum)
+            _header_text += (" -Section " + (sectionNum + 1) + "-");
+
+        if (type.bFirst)
+            _header_text = "First Page " + _header_text;
+        else if (EvenAndOddHeaders)
+        {
+            if (type.bEven)
+                _header_text = "Even Page " + _header_text;
+            else
+                _header_text = "Odd Page " + _header_text;
+        }
+
+        this.DrawStringASCII("Courier New", 9, false, false, _header_text, 2, yPos, true);
+
+        if (bIsRepeat)
+            this.DrawStringASCII2("Courier New", 9, false, false, "Same as Previous", 2, yPos, true);
+
+        if (false == bIsNoIntGrid)
+            this.SetIntegerGrid(false);
+    },
+
+    DrawFooterEdit : function(yPos, lock_type, sectionNum, bIsRepeat, type)
     {
         var _y = this.m_oFullTransform.TransformPointY(0,yPos);
         _y = (_y >> 0) + 0.5;
@@ -1753,8 +1861,11 @@ CGraphics.prototype =
             case locktype_None:
             case locktype_Mine:
             {
-                this.p_color(155, 187, 277, 255);
-                ctx.lineWidth = 2;
+                //this.p_color(155, 187, 277, 255);
+                //ctx.lineWidth = 2;
+                // GlobalSkin.RulerOutline
+                this.p_color(0xBB, 0xBE, 0xC2, 255);
+                ctx.lineWidth = 1;
                 break;
             }
             case locktype_Other:
@@ -1777,36 +1888,44 @@ CGraphics.prototype =
 
         var _wmax = this.m_lWidthPix;
 
-        if (true === this.m_bIntegerGrid)
-        {
-            this._s();
-            while (true)
-            {
-                if (_x > _wmax)
-                    break;
-                ctx.moveTo(_x,_y);
-                _x+=_w1;
-                ctx.lineTo(_x,_y);
-                _x+=_w2;
-            }
-            this.ds();
-        }
-        else
-        {
+        var bIsNoIntGrid = this.m_bIntegerGrid;
+
+        if (false == bIsNoIntGrid)
             this.SetIntegerGrid(true);
-            this._s();
-            while (true)
-            {
-                if (_x > _wmax)
-                    break;
-                ctx.moveTo(_x,_y);
-                _x+=_w1;
-                ctx.lineTo(_x,_y);
-                _x+=_w2;
-            }
-            this.ds();
-            this.SetIntegerGrid(false);
+
+        this._s();
+        while (true)
+        {
+            if (_x > _wmax)
+                break;
+            ctx.moveTo(_x,_y);
+            _x+=_w1;
+            ctx.lineTo(_x,_y);
+            _x+=_w2;
         }
+        this.ds();
+
+        var _header_text = "Footer"
+        if (-1 != sectionNum)
+            _header_text += (" -Section " + (sectionNum + 1) + "-");
+
+        if (type.bFirst)
+            _header_text = "First Page " + _header_text;
+        else if (EvenAndOddHeaders)
+        {
+            if (type.bEven)
+                _header_text = "Even Page " + _header_text;
+            else
+                _header_text = "Odd Page " + _header_text;
+        }
+
+        this.DrawStringASCII("Courier New", 9, false, false, _header_text, 2, yPos, false);
+
+        if (bIsRepeat)
+            this.DrawStringASCII2("Courier New", 9, false, false, "Same as Previous", 2, yPos, false);
+
+        if (false == bIsNoIntGrid)
+            this.SetIntegerGrid(false);
     },
 
     DrawLockParagraph : function(lock_type, x, y1, y2)
