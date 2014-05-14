@@ -1067,11 +1067,11 @@ function CPPTXContentWriter()
                 _writer.StartRecord(0);
 
                 var elem = spTree[i];
-                switch(grObject.getObjectType())
+                switch(elem.getObjectType())
                 {
                     case historyitem_type_Shape:
                     {
-                        if(grObject.bWordShape)
+                        if(elem.bWordShape)
                         {
                             this.WriteShape(elem, Document, oMapCommentId, oNumIdMap, copyParams);
                         }

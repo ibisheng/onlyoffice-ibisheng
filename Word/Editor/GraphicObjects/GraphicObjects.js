@@ -101,6 +101,16 @@ CGraphicObjects.prototype =
         return this.document.theme;
     },
 
+    isViewMode: function()
+    {
+        return editor.isViewMode;
+    },
+
+    convertPixToMM: function(v)
+    {
+        return this.document.DrawingDocument.GetMMPerDot(v);
+    },
+
     updateCursorType: function(pageIndex, x, y, e, bTextFlag)
     {
         var ret;

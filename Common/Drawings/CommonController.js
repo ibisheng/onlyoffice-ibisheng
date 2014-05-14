@@ -932,7 +932,7 @@ DrawingObjectsController.prototype =
                 this.selection.textSelection.paragraphAdd(paraItem, bRecalculate);
                 this.selection.textSelection.select(this, this.selection.textSelection.selectStartPage);
             }
-            else if(this.selectedObjects.length > 0)
+            else if(this.selectedObjects.length > 0 && this.selectedObjects[0].parent)
             {
                 this.selectedObjects[0].parent.GoTo_Text();
                 this.resetSelection();
@@ -2686,7 +2686,7 @@ DrawingObjectsController.prototype =
         {
             if(this.selectedObjects.length === 0)
                 return;
-            this.moveSelectedObjects(-this.drawingDocument.GetMMPerDot(5), 0);
+            this.moveSelectedObjects(-this.convertPixToMM(5), 0);
         }
     },
 
@@ -2702,7 +2702,7 @@ DrawingObjectsController.prototype =
         {
             if(this.selectedObjects.length === 0)
                 return;
-            this.moveSelectedObjects(this.drawingDocument.GetMMPerDot(5), 0);
+            this.moveSelectedObjects(this.convertPixToMM(5), 0);
         }
     },
 
@@ -2719,7 +2719,7 @@ DrawingObjectsController.prototype =
         {
             if(this.selectedObjects.length === 0)
                 return;
-            this.moveSelectedObjects(0, -this.drawingDocument.GetMMPerDot(5));
+            this.moveSelectedObjects(0, -this.convertPixToMM(5));
         }
     },
 
@@ -2735,7 +2735,7 @@ DrawingObjectsController.prototype =
         {
             if(this.selectedObjects.length === 0)
                 return;
-            this.moveSelectedObjects(0, this.drawingDocument.GetMMPerDot(5));
+            this.moveSelectedObjects(0, this.convertPixToMM(5));
         }
     },
 
