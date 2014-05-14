@@ -1927,8 +1927,8 @@ CDocument.prototype =
             var RepH = ( null === Header || null !== SectPr.Get_HdrFtrInfo(Header) ? false : true );
             var RepF = ( null === Footer || null !== SectPr.Get_HdrFtrInfo(Footer) ? false : true );
 
-            pGraphics.DrawHeaderEdit( this.Pages[nPageIndex].Y,      this.HdrFtr.Lock.Get_Type(), SectIndex, RepH, Header.RecalcInfo.NeedRecalc[nPageIndex] );
-            pGraphics.DrawFooterEdit( this.Pages[nPageIndex].YLimit, this.HdrFtr.Lock.Get_Type(), SectIndex, RepF, Footer.RecalcInfo.NeedRecalc[nPageIndex] );
+            pGraphics.DrawHeaderEdit( this.Pages[nPageIndex].Y,      this.HdrFtr.Lock.Get_Type(), SectIndex, RepH, null === Header ? undefined : Header.RecalcInfo.NeedRecalc[nPageIndex] );
+            pGraphics.DrawFooterEdit( this.Pages[nPageIndex].YLimit, this.HdrFtr.Lock.Get_Type(), SectIndex, RepF, null === Footer ? undefined : Footer.RecalcInfo.NeedRecalc[nPageIndex] );
         }
     },
 
