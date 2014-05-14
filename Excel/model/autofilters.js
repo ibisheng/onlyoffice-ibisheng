@@ -2639,7 +2639,6 @@ var gUndoInsDelCellsFlag = true;
 				
 				//есть ли вообще на странице мерженные ячейки
 				//TODO стоит пересмотреть проверку мерженных ячеек
-				console.time("_getAdjacentCellsAF");
 				var allRange = ws.model.getRange3(0, 0, ws.nRowsCount, ws.nColsCount);
 				var isMergedCells = allRange.hasMerged();
 				
@@ -2734,7 +2733,6 @@ var gUndoInsDelCellsFlag = true;
 						};
 					};
 				};
-				console.timeEnd("_getAdjacentCellsAF");
 				
 				//проверяем есть ли пустые строчки и столбцы в диапазоне
 				if(ar.r1 == cloneActiveRange.r1)
