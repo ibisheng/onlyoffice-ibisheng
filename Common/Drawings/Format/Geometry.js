@@ -586,13 +586,10 @@ Geometry.prototype=
             case historyitem_GeometryAddAdj:
             {
                 this.gdLst[data.name] = data.oldVal;
-                this.gdLst[data.name] = data.oldAvVal;
-                if(this.oldAvVal)
+                this.avLst[data.name] = data.oldAvVal;
+                if(this.parent && this.parent.handleUpdateGeometry)
                 {
-                    if(this.parent && this.parent.handleUpdateGeometry)
-                    {
-                        this.parent.handleUpdateGeometry();
-                    }
+                    this.parent.handleUpdateGeometry();
                 }
                 break;
             }
