@@ -7638,8 +7638,7 @@
 					case "value":  range.setValue(val); break;
 					case "format": range.setNumFormat(val); canChangeColWidth = c_oAscCanChangeColWidth.numbers; break;
                     case "angle": range.setAngle(val); break;
-					case "rh": /*ToDo удаление гиперссылки из range*/ break;
-
+				    case "rh": range.removeHyperlink(null, true); break;
 					case "border":
 						if (isLargeRange) { callTrigger = true; t.handlers.trigger("slowOperation", true); }
 						// None

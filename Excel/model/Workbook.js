@@ -1722,7 +1722,7 @@ function Woorksheet(wb, _index, sId){
 			History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ChangeMerge, oThis.getId(), oHistoryRange, new UndoRedoData_FromTo(new UndoRedoData_BBox(from), new UndoRedoData_BBox(to)));
 		}
 	});
-	this.hyperlinkManager = new RangeDataManager(function(data, from, to){
+	this.hyperlinkManager = new RangeDataManager(function(data, from, to, oChangeParam){
 		if(History.Is_On() && (null != from || null != to))
 		{
 			if(null != from)
@@ -1737,8 +1737,10 @@ function Woorksheet(wb, _index, sId){
 				oHistoryData = data.clone();
 			History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ChangeHyperlink, oThis.getId(), oHistoryRange, new UndoRedoData_FromToHyperlink(from, to, oHistoryData));
 		}
-		if(null != to)
-			data.Ref = oThis.getRange3(to.r1, to.c1, to.r2, to.c2);
+		if (null != to)
+		    data.Ref = oThis.getRange3(to.r1, to.c1, to.r2, to.c2);
+		else if (oChangeParam && oChangeParam.removeStyle && null != data.Ref)
+		    data.Ref.cleanFormat();
 	});
 	this.hyperlinkManager.setDependenceManager(this.mergeManager);
 
@@ -6457,7 +6459,7 @@ Range.prototype.setHyperlink=function(val, bWithoutStyle){
 		History.EndTransaction();
 	}
 };
-Range.prototype.removeHyperlink=function(val){
+Range.prototype.removeHyperlink = function (val, removeStyle) {
 	var bbox = this.bbox;
 	var elem = null;
 	if(null != val)
@@ -6465,16 +6467,17 @@ Range.prototype.removeHyperlink=function(val){
 		bbox = val.Ref.getBBox0();
 		elem = new RangeDataManagerElem(bbox, val);
 	}
-	History.Create_NewPoint();
-	History.StartTransaction();
 	if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
 	{
+	    History.Create_NewPoint();
+	    History.StartTransaction();
+	    var oChangeParam = { removeStyle: removeStyle };
 		if(null != elem)
-			this.worksheet.hyperlinkManager.removeElement(elem);
+		    this.worksheet.hyperlinkManager.removeElement(elem, oChangeParam);
 		else
-			this.worksheet.hyperlinkManager.remove(bbox);
+		    this.worksheet.hyperlinkManager.remove(bbox, !bbox.isOneCell(), oChangeParam);
+		History.EndTransaction();
 	}
-	History.EndTransaction();
 };
 Range.prototype.deleteCellsShiftUp=function(){
 	return this._shiftUpDown(true);

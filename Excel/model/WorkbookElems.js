@@ -3858,7 +3858,7 @@ function RangeDataManager(fChange)
 	this.fChange = fChange;
 }
 RangeDataManager.prototype = {
-	add : function(bbox, data)
+    add: function (bbox, data, oChangeParam)
 	{
 		var oNewNode = new IntervalTreeRBNode(bbox.r1, bbox.r2, null);
 		var oStoredNode = this.oIntervalTreeRB.insertOrGet(oNewNode);
@@ -3867,7 +3867,7 @@ RangeDataManager.prototype = {
 		var oNewElem = new RangeDataManagerElem(new Asc.Range(bbox.c1, bbox.r1, bbox.c2, bbox.r2), data);
 		oStoredNode.storedValue.push(oNewElem);
 		if(null != this.fChange)
-			this.fChange.call(this, oNewElem.data, null, oNewElem.bbox);
+		    this.fChange.call(this, oNewElem.data, null, oNewElem.bbox, oChangeParam);
 	},
 	get : function(bbox)
 	{
@@ -3933,16 +3933,21 @@ RangeDataManager.prototype = {
 		}
 		return oRes;
 	},
-	remove : function(bbox)
+	remove: function (bbox, bInnerOnly, oChangeParam)
 	{
-		var aElems = this.get(bbox);
-		for(var i = 0, length = aElems.all.length; i < length; ++i)
+	    var aElems = this.get(bbox);
+	    var aTargetArray;
+	    if (bInnerOnly)
+	        aTargetArray = aElems.inner;
+	    else
+	        aTargetArray = aElems.all;
+	    for (var i = 0, length = aTargetArray.length; i < length; ++i)
 		{
-			var elem = aElems.all[i];
-			this.removeElement(elem);
+	        var elem = aTargetArray[i];
+	        this.removeElement(elem, oChangeParam);
 		}
 	},
-	removeElement : function(elemToDelete)
+	removeElement: function (elemToDelete, oChangeParam)
 	{
 		if(null != elemToDelete)
 		{
@@ -3967,12 +3972,12 @@ RangeDataManager.prototype = {
 				}
 			}
 			if(null != this.fChange)
-				this.fChange.call(this, elemToDelete.data, elemToDelete.bbox, null);
+			    this.fChange.call(this, elemToDelete.data, elemToDelete.bbox, null, oChangeParam);
 		}
 	},
-	removeAll : function()
+	removeAll : function(oChangeParam)
 	{
-		this.remove(new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0));
+	    this.remove(new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), null, oChangeParam);
 		//todo
 		this.oIntervalTreeRB = new IntervalTreeRB();
 	},
@@ -3981,7 +3986,7 @@ RangeDataManager.prototype = {
 		var bboxGet = shiftGetBBox(bbox, bHor);
 		return {bbox: bboxGet, elems: this.get(bboxGet)};
 	},
-	shift : function(bbox, bAdd, bHor, oGetRes)
+	shift: function (bbox, bAdd, bHor, oGetRes, oChangeParam)
 	{
 		var _this = this;
 		if(null == oGetRes)
@@ -4101,7 +4106,7 @@ RangeDataManager.prototype = {
 			for(var i = 0, length = aToChange.length; i < length; ++i)
 			{
 				var item = aToChange[i];
-				this.fChange.call(this, item.elem.data, item.elem.bbox, item.to);
+				this.fChange.call(this, item.elem.data, item.elem.bbox, item.to, oChangeParam);
 			}
 		}
 		//убираем fChange, чтобы потом послать его только на одну операцию, а не 2
@@ -4112,18 +4117,18 @@ RangeDataManager.prototype = {
 		{
 			var item = aToChange[i];
 			var elem = item.elem;
-			this.removeElement(elem);
+			this.removeElement(elem, oChangeParam);
 		}
 		//добавляем измененные ячейки
 		for(var i = 0, length = aToChange.length; i < length; ++i)
 		{
 			var item = aToChange[i];
 			if(null != item.to)
-				this.add(item.to, item.elem.data);
+			    this.add(item.to, item.elem.data, oChangeParam);
 		}
 		this.fChange = fOldChange;
 	},
-	move : function(from, to)
+	move: function (from, to, oChangeParam)
 	{
         var fOldChange = this.fChange;
 		var nOffsetRow = to.r1 - from.r1;
@@ -4134,11 +4139,11 @@ RangeDataManager.prototype = {
 			var elem = oGetRes.inner[i];
 			var oNewBBox = new Asc.Range(elem.bbox.c1 + nOffsetCol, elem.bbox.r1 + nOffsetRow, elem.bbox.c2 + nOffsetCol, elem.bbox.r2 + nOffsetRow);
 			if(null != fOldChange)
-				fOldChange.call(this, elem.data, elem.bbox, oNewBBox);
+			    fOldChange.call(this, elem.data, elem.bbox, oNewBBox, oChangeParam);
             //убираем fChange, чтобы потом послать его только на одну операцию, а не 2
             this.fChange = null;
-			this.removeElement(elem);
-			this.add(oNewBBox, elem.data);
+            this.removeElement(elem, oChangeParam);
+			this.add(oNewBBox, elem.data, oChangeParam);
             this.fChange = fOldChange;
 		}
 
