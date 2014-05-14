@@ -3103,9 +3103,18 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.asc_ApplyColorScheme(true);
 			},
 			asc_ApplyColorScheme : function(bRedraw) {
-				
+
+                var wsViews = Asc["editor"].wb.wsViews;
+                for(var i = 0; i < wsViews.length; ++i)
+                {
+                    if(wsViews[i])
+                    {
+                        wsViews[i].objectRender.controller.startRecalculate();
+                    }
+                }
+
 				var ws = this.wb.getWorksheet();
-				ws.objectRender.controller.applyColorScheme();
+				//ws.objectRender.controller.applyColorScheme();
 
 				// На view-режиме не нужно отправлять стили
 				if (true !== this.asc_getViewerMode() && !this.isMobileVersion) {

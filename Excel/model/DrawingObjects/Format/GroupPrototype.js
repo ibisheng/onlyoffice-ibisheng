@@ -8,6 +8,23 @@ CGroupShape.prototype.addToRecalculate = function()
     }
 };
 
+CGroupShape.prototype.handleUpdateFill = function()
+{
+    for(var i = 0; i < this.spTree.length; ++i)
+    {
+        this.spTree[i].handleUpdateFill();
+    }
+    this.addToRecalculate();
+};
+CGroupShape.prototype.handleUpdateLn = function()
+{
+    for(var i = 0; i < this.spTree.length; ++i)
+    {
+        this.spTree[i].handleUpdateLn();
+    }
+    this.addToRecalculate();
+};
+
 
 CGroupShape.prototype.setRecalculateInfo = function()
 {

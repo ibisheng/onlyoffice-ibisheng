@@ -368,10 +368,20 @@ CChartSpace.prototype.recalculate = function()
 
         for(var i = 0; i < this.recalcInfo.dataLbls.length; ++i)
         {
+            var series = this.chart.plotArea.chart.series;
             if(this.recalcInfo.dataLbls[i].series && this.recalcInfo.dataLbls[i].pt)
             {
-                var pos = this.chartObj.reCalculatePositionText("dlbl", this, this.recalcInfo.dataLbls[i].series.idx, this.recalcInfo.dataLbls[i].pt.idx);
-                this.recalcInfo.dataLbls[i].setPosition(pos.x, pos.y);
+
+                var ser_idx = this.recalcInfo.dataLbls[i].series.idx; //сделаем проверку лежит ли серия с индексом this.recalcInfo.dataLbls[i].series.idx в сериях первой диаграммы
+                for(var j = 0;  j < series.length; ++j)
+                {
+                    if(series[j].idx === this.recalcInfo.dataLbls[i].series.idx)
+                    {
+                        var pos = this.chartObj.reCalculatePositionText("dlbl", this, /*this.recalcInfo.dataLbls[i].series.idx todo здесь оставить как есть в chartDrawere выбирать серии по индексу*/j, this.recalcInfo.dataLbls[i].pt.idx);//
+                        this.recalcInfo.dataLbls[i].setPosition(pos.x, pos.y);
+                        break;
+                    }
+                }
             }
         }
         this.recalcInfo.dataLbls.length = 0;

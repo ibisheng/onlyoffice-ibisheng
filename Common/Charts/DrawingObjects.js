@@ -2745,8 +2745,8 @@ function DrawingObjects() {
             if ( (_t.graphicObject.x < 0) || (_t.graphicObject.y < 0) || (_t.graphicObject.extX <= 0) || (_t.graphicObject.extY <= 0) )
                 return;
 
-            //var fromCell = _this.coordsManager.calculateCell( mmToPx(_t.graphicObject.x), mmToPx(_t.graphicObject.y) );
-            //var toCell = _this.coordsManager.calculateCell( mmToPx(_t.graphicObject.x + _t.graphicObject.extX), mmToPx(_t.graphicObject.y + _t.graphicObject.extY) );
+            ////var fromCell = _this.coordsManager.calculateCell( mmToPx(_t.graphicObject.x), mmToPx(_t.graphicObject.y) );
+            ////var toCell = _this.coordsManager.calculateCell( mmToPx(_t.graphicObject.x + _t.graphicObject.extX), mmToPx(_t.graphicObject.y + _t.graphicObject.extY) );
             var leftTop = _t.worksheet.getCellsOffset(0);
             var fromCell = _this.drawingArea.calculateCell(leftTop.left +  mmToPx(_t.graphicObject.x),leftTop.top +  mmToPx(_t.graphicObject.y) );
             var toCell = _this.drawingArea.calculateCell(leftTop.left +  mmToPx(_t.graphicObject.x + _t.graphicObject.extX), leftTop.top + mmToPx(_t.graphicObject.y + _t.graphicObject.extY) );
@@ -2803,56 +2803,47 @@ function DrawingObjects() {
         var col = worksheet._findColUnderCursor(x, true);
         while(!col)
         {
-            var isMaxCol = function() {
-                var result = false;
-                if ( worksheet.cols.length >= gc_nMaxCol ) {
-                    var lastCol = worksheet.cols[gc_nMaxCol - 1];
-                    if ( mmToPt(x + w) + scrollX > lastCol.left ) {
-                        response.result = false;
-                        response.x = ptToMm( lastCol.left - (mmToPt(x + w) + scrollX) );
-                        result = true;
-                    }
-                }
-                return result;
+            if ( worksheet.cols.length >= gc_nMaxCol ) {
+               return null;
             }
+            worksheet.expandColsOnScroll(true);
+            col = worksheet._findColUnderCursor(x, true);
         }
         return col;
+    };
+
+
+    DrawingBase.prototype.getRowUnderCursor = function(y)
+    {
+        var row = worksheet._findRowUnderCursor(y, true);
+        while(!row)
+        {
+            if ( worksheet.rows.length >= gc_nMaxRow ) {
+                return null;
+            }
+            worksheet.expandRowsOnScroll(true);
+            row = worksheet._findRowUnderCursor(y, true);
+        }
+        return row;
     };
 
     DrawingBase.prototype.updateAnchorPosition = function() {
         var _t = this;
 
-        /*var leftTop = worksheet.getCellsOffset(0);
+        var leftTop = worksheet.getCellsOffset(1), _x, _y, col, row, offsets;
         switch(_t.Type)
         {
             case c_oAscCellAnchorType.cellanchorOneCell:
             {
-                var _x = mmToPx(_t.graphicObject.x) + leftTop.left;
-                var _y = mmToPx(_t.graphicObject.y) + leftTop.top;
-
-
-                var col = _this.worksheet._findColUnderCursor( what, true );
-                while (col == null) {
-                    if ( isMaxCol() ) {
-                        col = _this.worksheet._findColUnderCursor( _this.worksheet.cols[gc_nMaxCol - 1].left - 1, true );
-                        break;
-                    }
-                    _this.worksheet.expandColsOnScroll(true);
-                    _this.worksheet.handlers.trigger("reinitializeScrollX");
-                    col = _this.worksheet._findColUnderCursor( what + delta, true );
-                    if ( what < 0 )
-                        delta++;
-                }
-
-
-                var coordsFrom = _this.coordsManager.calculateCoords(_t.from);
-                //var cellTo = _this.coordsManager.calculateCell( coordsFrom.x + mmToPx(_t.ext.cx), coordsFrom.y + mmToPx(_t.ext.cy) );
-                var cellTo = _this.drawingArea.calculateCell( coordsFrom.x + mmToPx(_t.ext.cx), coordsFrom.y + mmToPx(_t.ext.cy) );
-
-                _t.to.col = cellTo.col;
-                _t.to.colOff = cellTo.colOff;
-                _t.to.row = cellTo.row;
-                _t.to.rowOff = cellTo.rowOff;
+                _x = mmToPt(_t.graphicObject.x + _t.graphicObject.extX) + leftTop.left;
+                _y = mmToPt(_t.graphicObject.y + _t.graphicObject.extY) + leftTop.top;
+                offsets = _this.drawingArea.getOffsets(ptToPx(_x), ptToPx(_y));
+                col = _t.getColUnderCursor(_x - pxToPt(offsets.x)+ leftTop.left);
+                row = _t.getRowUnderCursor(_y - pxToPt(offsets.y)+ leftTop.top);
+                _t.to.col = col.col;
+                _t.to.colOff = ptToMm(_x - col.left);
+                _t.to.row = row.row;
+                _t.to.rowOff = ptToMm(_y - row.top);
                 break;
             }
 
@@ -2864,59 +2855,27 @@ function DrawingObjects() {
             }
             case c_oAscCellAnchorType.cellanchorTwoCell:
             {
-                //var cellFrom = _this.coordsManager.calculateCell( mmToPx(_t.Pos.X), mmToPx(_t.Pos.Y) );
-                var cellFrom = _this.drawingArea.calculateCell( mmToPx(_t.Pos.X), mmToPx(_t.Pos.Y) );
-                _t.from.col = cellFrom.col;
-                _t.from.colOff = cellFrom.colOff;
-                _t.from.row = cellFrom.row;
-                _t.from.rowOff = cellFrom.rowOff;
+                _x = mmToPt(_t.graphicObject.x) + leftTop.left;
+                _y = mmToPt(_t.graphicObject.y) + leftTop.top;
+                offsets = _this.drawingArea.getOffsets(ptToPx(_x), ptToPx(_y));
+                col = _t.getColUnderCursor(_x - pxToPt(offsets.x) + leftTop.left);
+                row = _t.getRowUnderCursor(_y - pxToPt(offsets.y) + leftTop.top);
+                _t.from.col = col.col;
+                _t.from.colOff = ptToMm(_x - col.left);
+                _t.from.row = row.row;
+                _t.from.rowOff = ptToMm(_y - row.top);
 
-                //var cellTo = _this.coordsManager.calculateCell( mmToPx(_t.Pos.X + _t.ext.cx), mmToPx(_t.Pos.Y + _t.ext.cy));
-                var cellTo = _this.drawingArea.calculateCell( mmToPx(_t.Pos.X + _t.ext.cx), mmToPx(_t.Pos.Y + _t.ext.cy));
-                _t.to.col = cellTo.col;
-                _t.to.colOff = cellTo.colOff;
-                _t.to.row = cellTo.row;
-                _t.to.rowOff = cellTo.rowOff;
+                _x = mmToPt(_t.graphicObject.x + _t.graphicObject.extX) + leftTop.left;
+                _y = mmToPt(_t.graphicObject.y + _t.graphicObject.extY) + leftTop.top;
+                offsets = _this.drawingArea.getOffsets(ptToPx(_x), ptToPx(_y));
+                col = _t.getColUnderCursor(_x - pxToPt(offsets.x) + leftTop.left);
+                row = _t.getRowUnderCursor(_y - pxToPt(offsets.y) + leftTop.top);
+                _t.to.col = col.col;
+                _t.to.colOff = ptToMm(_x - col.left);
+                _t.to.row = row.row;
+                _t.to.rowOff = ptToMm(_y - row.top);
                 break;
             }
-        }  */
-        switch (_t.Type) {
-            case c_oAscCellAnchorType.cellanchorOneCell:
-            {
-                var coordsFrom = _this.coordsManager.calculateCoords(_t.from);
-                //var cellTo = _this.coordsManager.calculateCell( coordsFrom.x + mmToPx(_t.ext.cx), coordsFrom.y + mmToPx(_t.ext.cy) );
-                var cellTo = _this.drawingArea.calculateCell( coordsFrom.x + mmToPx(_t.ext.cx), coordsFrom.y + mmToPx(_t.ext.cy) );
-
-                _t.to.col = cellTo.col;
-                _t.to.colOff = cellTo.colOff;
-                _t.to.row = cellTo.row;
-                _t.to.rowOff = cellTo.rowOff;
-            }
-            break;
-
-            case c_oAscCellAnchorType.cellanchorAbsolute:
-            {
-                _t.Pos.X = _t.graphicObject.x;
-                _t.Pos.Y = _t.graphicObject.y;
-                break;
-            }
-            case c_oAscCellAnchorType.cellanchorTwoCell:
-            {
-                //var cellFrom = _this.coordsManager.calculateCell( mmToPx(_t.Pos.X), mmToPx(_t.Pos.Y) );
-                var cellFrom = _this.drawingArea.calculateCell( mmToPx(_t.Pos.X), mmToPx(_t.Pos.Y) );
-                _t.from.col = cellFrom.col;
-                _t.from.colOff = cellFrom.colOff;
-                _t.from.row = cellFrom.row;
-                _t.from.rowOff = cellFrom.rowOff;
-
-                //var cellTo = _this.coordsManager.calculateCell( mmToPx(_t.Pos.X + _t.ext.cx), mmToPx(_t.Pos.Y + _t.ext.cy));
-                var cellTo = _this.drawingArea.calculateCell( mmToPx(_t.Pos.X + _t.ext.cx), mmToPx(_t.Pos.Y + _t.ext.cy));
-                _t.to.col = cellTo.col;
-                _t.to.colOff = cellTo.colOff;
-                _t.to.row = cellTo.row;
-                _t.to.rowOff = cellTo.rowOff;
-            }
-                break;
         }
         _t.flags.anchorUpdated = true;
     };
@@ -5208,9 +5167,10 @@ function DrawingObjects() {
             drawingObject.to.rowOff = cellTo.rowOff;
 
             // Update graphic object
-            drawingObject.graphicObject.setPosition( pxToMm(coords.x), pxToMm(coords.y) );
-            drawingObject.graphicObject.recalculateTransform();
-            drawingObject.graphicObject.calculateTransformTextMatrix();
+            CheckSpPrXfrm(drawingObject.graphicObject);
+            drawingObject.graphicObject.spPr.xfrm.setOffX( pxToMm(coords.x));
+            drawingObject.graphicObject.spPr.xfrm.setOffY( pxToMm(coords.y) );
+            _this.controller.recalculate();
         }
         _this.showDrawingObjects(true);
     };

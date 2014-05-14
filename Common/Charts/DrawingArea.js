@@ -187,9 +187,80 @@ function FrozenPlace(ws, type) {
 		rect.y = _this.worksheet.getCellTop(_this.range.r1, 0);
 		rect.w = _this.worksheet.getCellLeft(_this.range.c2, 0) + _this.worksheet.getColumnWidth(_this.range.c2, 0) - rect.x;
 		rect.h = _this.worksheet.getCellTop(_this.range.r2, 0) + _this.worksheet.getRowHeight(_this.range.r2, 0) - rect.y;
+
+        switch (_this.type) {
+
+            case FrozenAreaType.Top:
+            {
+                rect.w = +Infinity;
+                break;
+            }
+
+            case FrozenAreaType.Bottom:
+            {
+                rect.w = +Infinity;
+                rect.h = +Infinity;
+                break;
+            }
+
+            case FrozenAreaType.Left:
+            {
+                rect.h = +Infinity;
+                break;
+            }
+
+            case FrozenAreaType.Right:
+            {
+
+                rect.w = +Infinity;
+                rect.h = +Infinity;
+                break;
+            }
+
+            case FrozenAreaType.Center:
+            {
+                rect.w = +Infinity;
+                rect.h = +Infinity;
+                break;
+            }
+            // Other
+            case FrozenAreaType.LeftTop:
+            {
+                break;
+            }
+
+            case FrozenAreaType.RightTop:
+            {
+                rect.w = +Infinity;
+                break;
+            }
+
+            case FrozenAreaType.LeftBottom:
+            {
+                rect.h = +Infinity;
+                break;
+            }
+
+            case FrozenAreaType.RightBottom:
+            {
+                rect.w = +Infinity;
+                rect.h = +Infinity;
+                break;
+            }
+        }
+
 		return rect;
 	};
-	
+
+    _this.getRect2 = function() {
+        var rect = { x: 0, y: 0, w: 0, h: 0 };
+        rect.x = _this.worksheet.getCellLeft(_this.range.c1, 0);
+        rect.y = _this.worksheet.getCellTop(_this.range.r1, 0);
+        rect.w = _this.worksheet.getCellLeft(_this.range.c2, 0) + _this.worksheet.getColumnWidth(_this.range.c2, 0) - rect.x;
+        rect.h = _this.worksheet.getCellTop(_this.range.r2, 0) + _this.worksheet.getRowHeight(_this.range.r2, 0) - rect.y;
+        return rect;
+    };
+
 	_this.getFirstVisible = function() {
 		var fv = { col: 0, row: 0 };
 		
@@ -251,7 +322,7 @@ function FrozenPlace(ws, type) {
 	
 	_this.isPointInside = function(x, y) {
 		var rect = _this.getRect();
-		var result = (x > rect.x ) && (y > rect.y) && (x <= rect.x + rect.w) && (y <= rect.y + rect.h);
+		var result = (x >= rect.x ) && (y >= rect.y) && (x <= rect.x + rect.w) && (y <= rect.y + rect.h);
 		if ( log && result )
 			console.log( x + "," + y + " in " + _this.type);
 		return result;			
@@ -385,7 +456,7 @@ function FrozenPlace(ws, type) {
 	};
 	
 	_this.clip = function(canvas) {
-		var rect = _this.getRect();
+		var rect = _this.getRect2();
 		canvas.m_oContext.save();
 		canvas.m_oContext.beginPath();
 		canvas.m_oContext.rect(rect.x, rect.y, rect.w, rect.h);
@@ -401,7 +472,7 @@ function FrozenPlace(ws, type) {
 	};
 	
 	_this.clear = function(isOverlay) {
-		var rect = _this.getRect();
+		var rect = _this.getRect2();
 		var x = convertMetrics(rect.x, 0, 1);
 		var y = convertMetrics(rect.y, 0, 1);
 		var w = convertMetrics(rect.w, 0, 1);
@@ -603,6 +674,13 @@ function DrawingArea(ws) {
 			}
 		}
 	};
+
+    _this.reinitRanges = function()
+    {
+        for ( var i = 0; i < _this.frozenPlaces.length; i++ ) {
+            _this.frozenPlaces[i].initRange();
+        }
+    };
 	
 	_this.drawSelection = function(drawingDocument) {
 		

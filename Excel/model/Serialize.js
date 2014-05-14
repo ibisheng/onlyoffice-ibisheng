@@ -5717,6 +5717,7 @@
                 var oBinaryChartReader = new BinaryChartReader(this.stream);
                 res = oBinaryChartReader.ExternalReadCT_ChartSpace(length, oNewChartSpace, this.curWorksheet);
                 oDrawing.graphicObject = oNewChartSpace;
+                oNewChartSpace.setBDeleted(false);
             }
             else
                 res = c_oSerConstants.ReadUnknown;

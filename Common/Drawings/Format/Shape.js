@@ -1,7 +1,7 @@
 "use strict";
 function CheckObjectLine(obj)
 {
-    return (obj instanceof CShape && obj.spPr.geometry && obj.spPr.geometry.preset === "line");
+    return (obj instanceof CShape && obj.spPr && obj.spPr.geometry && obj.spPr.geometry.preset === "line");
 }
 function hitToHandles(x, y, object)
 {
@@ -350,6 +350,9 @@ CShape.prototype =
     {
         History.Add(this, {Type: historyitem_ShapeSetBodyPr, oldPr: this.bodyPr, newPr: pr});
         this.bodyPr = pr;
+        this.recalcInfo.recalcContent = true;
+        this.recalcInfo.recalcTransformText = true;
+        this.addToRecalculate();
     },
 
     createTextBody: function()
@@ -471,7 +474,7 @@ CShape.prototype =
         else
             b_ins = 1.27;
 
-        if(isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect))
+        if(this.spPr && isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect))
         {
             l = this.spPr.geometry.rect.l+l_ins;
             t = this.spPr.geometry.rect.t+t_ins;
@@ -519,7 +522,7 @@ CShape.prototype =
     },
 
     getAllImages: function (images) {
-        if (this.spPr.Fill && this.spPr.Fill.fill instanceof CBlipFill && typeof this.spPr.Fill.fill.RasterImageId === "string") {
+        if (this.spPr && this.spPr.Fill && this.spPr.Fill.fill instanceof CBlipFill && typeof this.spPr.Fill.fill.RasterImageId === "string") {
             images[_getFullImageSrc(this.spPr.Fill.fill.RasterImageId)] = true;
         }
     },
@@ -577,6 +580,14 @@ CShape.prototype =
         }
     },
 
+    canFill: function()
+    {
+        if(this.spPr && this.spPr.geometry)
+        {
+            return this.spPr.geometry.canFill();
+        }
+        return false;
+    },
 
     initDefault: function (x, y, extX, extY, flipH, flipV, presetGeom, arrowsCount) {
         this.setXfrm(x, y, extX, extY, 0, flipH, flipV);
@@ -747,7 +758,7 @@ CShape.prototype =
     },
 
     checkNotNullTransform: function () {
-        if (this.spPr.xfrm && this.spPr.xfrm.isNotNull())
+        if (this.spPr && this.spPr.xfrm && this.spPr.xfrm.isNotNull())
             return true;
         if (this.isPlaceholder()) {
             var ph_type = this.getPlaceholderType();
@@ -1066,36 +1077,58 @@ CShape.prototype =
         return this.isPlaceholder() ? this.nvSpPr.nvPr.ph.idx : null;
     },
 
-    setTextVerticalAlign: function (align) {
-        if (this.txBody) {
-            this.txBody.bodyPr.anchor = align;
-            this.recalculateContent();
-            this.recalculateTransformText();
+    setVerticalAlign: function (align) {
+        var new_body_pr = this.getBodyPr();
+        if(new_body_pr)
+        {
+            new_body_pr = new_body_pr.createDuplicate();
+            new_body_pr.anchor = align;
+            if(this.bWordShape)
+            {
+                this.setBodyPr(new_body_pr);
+            }
+            else
+            {
+                if(this.txBody)
+                {
+                    this.txBody.setBodyPr(new_body_pr);
+                }
+            }
         }
     },
     setPaddings: function (paddings) {
         if (paddings) {
-            if (this.txBody) {
-                var old_body_pr = this.txBody.bodyPr.createDuplicate();
+
+            var new_body_pr = this.getBodyPr();
+            if(new_body_pr)
+            {
+                new_body_pr = new_body_pr.createDuplicate();
                 if (isRealNumber(paddings.Left)) {
-                    this.txBody.bodyPr.lIns = paddings.Left;
+                    new_body_pr.lIns = paddings.Left;
                 }
 
                 if (isRealNumber(paddings.Top)) {
-                    this.txBody.bodyPr.tIns = paddings.Top;
+                    new_body_pr.tIns = paddings.Top;
                 }
 
                 if (isRealNumber(paddings.Right)) {
-                    this.txBody.bodyPr.rIns = paddings.Right;
+                    new_body_pr.rIns = paddings.Right;
                 }
                 if (isRealNumber(paddings.Bottom)) {
-                    this.txBody.bodyPr.bIns = paddings.Bottom;
+                    new_body_pr.bIns = paddings.Bottom;
                 }
-                var new_body_pr = this.txBody.bodyPr.createDuplicate();
-                History.Add(this, { Type: historyitem_SetShapeBodyPr, oldBodyPr: old_body_pr, newBodyPr: new_body_pr });
-                this.txBody.recalcInfo.recalculateBodyPr = true;
-                this.recalculateContent();
-                this.recalculateTransformText();
+
+                if(this.bWordShape)
+                {
+                    this.setBodyPr(new_body_pr);
+                }
+                else
+                {
+                    if(this.txBody)
+                    {
+                        this.txBody.setBodyPr(new_body_pr);
+                    }
+                }
             }
         }
     },
@@ -1113,7 +1146,7 @@ CShape.prototype =
         var _l, _t, _r, _b;
 
         var _t_x_lt, _t_y_lt, _t_x_rt, _t_y_rt, _t_x_lb, _t_y_lb, _t_x_rb, _t_y_rb;
-        if (isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect)) {
+        if (this.spPr && isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect)) {
             var _rect = this.spPr.geometry.rect;
             _l = _rect.l + _body_pr.lIns;
             _t = _rect.t + _body_pr.tIns;
@@ -1284,7 +1317,7 @@ CShape.prototype =
                     }
                 }
             }
-            if(isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect))
+            if(this.spPr && isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect))
             {
                 var rect = this.spPr.geometry.rect;
                 this.clipRect = {x: rect.l, y: rect.t, w: rect.r - rect.l, h: rect.b - rect.t};
@@ -1472,7 +1505,7 @@ CShape.prototype =
         var _l, _t, _r, _b;
 
         var _t_x_lt, _t_y_lt, _t_x_rt, _t_y_rt, _t_x_lb, _t_y_lb, _t_x_rb, _t_y_rb;
-        if (isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect)) {
+        if (this.spPr && isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect)) {
             var _rect = this.spPr.geometry.rect;
             _l = _rect.l + _body_pr.lIns;
             _t = _rect.t + _body_pr.tIns;
@@ -1643,7 +1676,7 @@ CShape.prototype =
                     }
                 }
             }
-            if (isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect)) {
+            if (this.spPr && isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect)) {
                 var rect = this.spPr.geometry.rect;
                 this.clipRect = { x: rect.l, y: rect.t, w: rect.r - rect.l, h: rect.b - rect.t };
             }
@@ -2085,7 +2118,7 @@ CShape.prototype =
 
 
     changeSize: function (kw, kh) {
-        if (this.spPr.xfrm.isNotNull()) {
+        if (this.spPr && this.spPr.xfrm.isNotNull()) {
             var xfrm = this.spPr.xfrm;
             this.setOffset(xfrm.offX * kw, xfrm.offY * kh);
             this.setExtents(xfrm.extX * kw, xfrm.extY * kh);
@@ -2098,7 +2131,7 @@ CShape.prototype =
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
         if(this.drawingBase)
         {
-            this.drawingBase.updateAnchorPosition();
+            this.drawingBase.setGraphicObjectCoords();
         }
         this.localTransform = this.transform.CreateDublicate();
     },
@@ -2187,7 +2220,7 @@ CShape.prototype =
         else
         {
             var xfrm;
-            if (this.spPr.xfrm.isNotNull())
+            if (this.spPr && this.spPr.xfrm && this.spPr.xfrm.isNotNull())
             {
                 xfrm = this.spPr.xfrm;
             }
@@ -2344,13 +2377,13 @@ CShape.prototype =
     },
 
     recalculateGeometry: function () {
-        if (isRealObject(this.spPr.geometry)) {
+        if (this.spPr && isRealObject(this.spPr.geometry)) {
             var transform = this.getTransform();
             this.spPr.geometry.Recalculate(transform.extX, transform.extY);
         }
     },
     drawAdjustments: function (drawingDocument) {
-        if (isRealObject(this.spPr.geometry)) {
+        if (this.spPr && isRealObject(this.spPr.geometry)) {
             this.spPr.geometry.drawAdjustments(drawingDocument, this.transform);
         }
     },
@@ -2502,7 +2535,7 @@ CShape.prototype =
     },
 
     hitToAdj: function (x, y) {
-        if (isRealObject(this.spPr.geometry)) {
+        if (this.spPr && isRealObject(this.spPr.geometry)) {
             var px, py;
             px = this.invertTransform.TransformPointX(x, y);
             py = this.invertTransform.TransformPointY(x, y);
@@ -2514,7 +2547,7 @@ CShape.prototype =
 
 
     hitToPath: function (x, y) {
-        if (isRealObject(this.spPr.geometry)) {
+        if (this.spPr &&  isRealObject(this.spPr.geometry)) {
             var px = this.invertTransform.TransformPointX(x, y);
             var py = this.invertTransform.TransformPointY(x, y);
             return this.spPr.geometry.hitInPath(this.getDrawingDocument().CanvasHitContext, px, py);
@@ -2523,7 +2556,7 @@ CShape.prototype =
     },
 
     hitToInnerArea: function (x, y) {
-        if (isRealObject(this.spPr.geometry)) {
+        if (this.spPr &&  isRealObject(this.spPr.geometry)) {
             var px = this.invertTransform.TransformPointX(x, y);
             var py = this.invertTransform.TransformPointY(x, y);
             return this.spPr.geometry.hitInInnerArea(this.getDrawingDocument().CanvasHitContext, px, py);
@@ -2556,7 +2589,7 @@ CShape.prototype =
     },
 
     setAdjustmentValue: function (ref1, value1, ref2, value2) {
-        if (isRealObject(this.spPr.geometry)) {
+        if (this.spPr && isRealObject(this.spPr.geometry)) {
             var old_geometry = this.spPr.geometry.createDuplicate();
             this.spPr.geometry.setGuideValue(ref1, value1);
             this.spPr.geometry.setGuideValue(ref2, value2);
@@ -2741,7 +2774,7 @@ CShape.prototype =
     },
 
     check_bounds: function (checker) {
-        if (this.spPr.geometry) {
+        if (this.spPr && this.spPr.geometry) {
             this.spPr.geometry.check_bounds(checker);
         }
         else {
@@ -3328,7 +3361,7 @@ CShape.prototype =
     },
 
     canChangeArrows: function () {
-        if (this.spPr.geometry == null) {
+        if (!this.spPr || this.spPr.geometry == null) {
             return false;
         }
         var _path_list = this.spPr.geometry.pathLst;
@@ -3375,22 +3408,6 @@ CShape.prototype =
     {
         if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && typeof this.spPr.Fill.fill.RasterImageId === "string" && this.spPr.Fill.fill.RasterImageId.length > 0)
             images.push(this.spPr.Fill.fill.RasterImageId);
-    },
-
-    setVerticalAlign: function (align) {
-
-        if (this.txBody) {
-            var old_body_pr = this.txBody.bodyPr.createDuplicate();
-            this.txBody.bodyPr.anchor = align;
-            this.txBody.recalcInfo.recalculateBodyPr = true;
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-            var new_body_pr = this.txBody.bodyPr.createDuplicate();
-            History.Add(this, { Type: historyitem_SetShapeBodyPr, oldBodyPr: old_body_pr, newBodyPr: new_body_pr });
-            this.txBody.recalcInfo.recalculateBodyPr = true;
-            this.recalculateContent();
-            this.recalculateTransformText();
-        }
     },
 
     changePresetGeom: function (sPreset) {
@@ -3531,14 +3548,14 @@ CShape.prototype =
                 break;
             }
         }
-        var old_geometry = isRealObject(this.spPr.geometry) ? this.spPr.geometry : null;
+        var old_geometry = this.spPr && isRealObject(this.spPr.geometry) ? this.spPr.geometry : null;
         if (_final_preset != null) {
             this.spPr.setGeometry(CreateGeometry(_final_preset));
         }
         else {
             this.spPr.geometry = null;
         }
-        var new_geometry = isRealObject(this.spPr.geometry) ? this.spPr.geometry : null;
+        var new_geometry = this.spPr &&  isRealObject(this.spPr.geometry) ? this.spPr.geometry : null;
         if ((!this.brush || !this.brush.fill) && (!this.pen || !this.pen.Fill || !this.pen.Fill.fill)) {
             var new_line2 = new CLn();
             new_line2.Fill = new CUniFill();
@@ -3565,7 +3582,11 @@ CShape.prototype =
 
     changeFill: function (unifill) {
 
-        this.spPr.setFill(CorrectUniFill(unifill, this.spPr.Fill));
+        if(this.recalcInfo.recalculateBrush)
+        {
+            this.recalculateBrush();
+        }
+        this.spPr.setFill(CorrectUniFill(unifill, this.brush));
     },
     setFill: function (fill) {
 
@@ -3613,7 +3634,7 @@ CShape.prototype =
         var t_x, t_y;
         t_x = invert_transform.TransformPointX(x, y);
         t_y = invert_transform.TransformPointY(x, y);
-        if (isRealObject(this.spPr.geometry))
+        if (this.spPr && isRealObject(this.spPr.geometry))
             return this.spPr.geometry.hitToAdj(t_x, t_y, this.convertPixToMM(TRACK_DISTANCE_ROTATE));
         return { hit: false, adjPolarFlag: null, adjNum: null };
     },
@@ -4047,7 +4068,7 @@ CShape.prototype =
     {
         if(this.textBoxContent)
         {
-            if(this.spPr.geometry && this.spPr.geometry.rect)
+            if(this.spPr && this.spPr.geometry && this.spPr.geometry.rect)
             {
                 var rect = this.spPr.geometry.rect;
                 return {X: 0, Y: 0, XLimit: rect.r - rect.l, YLimit: 20000};

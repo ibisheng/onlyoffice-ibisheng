@@ -213,10 +213,11 @@ CGroupShape.prototype =
         }
         for(var i = 0; i < this.spTree.length; ++i)
         {
-            copy.addToSpTree(this.spTree.length, this.spTree[i].copy());
-            copy.spTree[this.spTree.length-1].setGroup(copy);
+            copy.addToSpTree(copy.spTree.length, this.spTree[i].copy());
+            copy.spTree[copy.spTree.length-1].setGroup(copy);
         }
         copy.setBDeleted(this.bDeleted);
+        return copy;
     },
 
     getAllImages: function(images)
@@ -856,7 +857,7 @@ CGroupShape.prototype =
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
         if(this.drawingBase)
         {
-            this.drawingBase.updateAnchorPosition();
+            this.drawingBase.setGraphicObjectCoords();
         }
     },
 

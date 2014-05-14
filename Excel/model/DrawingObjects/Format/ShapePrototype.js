@@ -215,6 +215,7 @@ CShape.prototype.handleUpdateExtents = function()
     this.recalcContent();
     this.recalcGeometry();
     this.recalcBounds();
+    this.recalcTransform();
     this.addToRecalculate();
 };
 CShape.prototype.handleUpdateRot = function()
@@ -239,6 +240,7 @@ CShape.prototype.handleUpdateFill = function()
 {
     this.recalcBrush();
     this.recalcFill();
+    this.recalcTransparent();
     this.addToRecalculate();
 };
 CShape.prototype.handleUpdateLn = function()

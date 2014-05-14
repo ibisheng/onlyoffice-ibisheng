@@ -60,6 +60,7 @@ StartAddNewShape.prototype =
             this.drawingObjects.drawingObjects.objectLocker.checkObjects(function(bLock){});
             this.drawingObjects.startRecalculate();
             asc["editor"].asc_endAddShape();
+            this.drawingObjects.drawingObjects.sendGraphicObjectProps();
         }
         this.drawingObjects.clearTrackObjects();
         this.drawingObjects.drawingObjects.showDrawingObjects(true);

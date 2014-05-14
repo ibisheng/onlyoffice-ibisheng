@@ -61,6 +61,48 @@ function CheckSpPrXfrm(object)
 
 }
 
+function getObjectsByTypesFromArr(arr, bGrouped)
+{
+    var ret = {shapes: [], images: [], groups: [], charts: []};
+    var selected_objects = arr;
+    for(var i = 0;  i < selected_objects.length; ++i)
+    {
+        var drawing = selected_objects[i];
+        var type = drawing.getObjectType();
+        switch(type)
+        {
+            case historyitem_type_Shape:
+            {
+                ret.shapes.push(drawing);
+                break;
+            }
+            case historyitem_type_ImageShape:
+            {
+                ret.images.push(drawing);
+                break;
+            }
+            case historyitem_type_GroupShape:
+            {
+                ret.groups.push(drawing);
+                if(bGrouped)
+                {
+                    var by_types = getObjectsByTypesFromArr(drawing.spTree, true);
+                    ret.shapes = ret.shapes.concat(by_types.shapes);
+                    ret.images = ret.images.concat(by_types.images);
+                    ret.charts = ret.charts.concat(by_types.charts);
+                }
+                break;
+            }
+            case historyitem_type_ChartSpace:
+            {
+                ret.charts.push(drawing);
+                break;
+            }
+        }
+    }
+    return ret;
+}
+
 function CreateBlipFillUniFillFromUrl(url)
 {
     var ret = new CUniFill();
@@ -775,6 +817,10 @@ DrawingObjectsController.prototype =
         {
             applyToArrayDrawings(this.selectedObjects);
         }
+        if(this.document)
+        {
+            this.document.Recalculate();
+        }
     },
 
     setParagraphSpacing: function(Spacing)
@@ -1295,7 +1341,7 @@ DrawingObjectsController.prototype =
 
     applyDrawingProps: function(props)
     {
-        var objects_by_type = this.getSelectedObjectsByTypes();
+        var objects_by_type = this.getSelectedObjectsByTypes(true);
         var i;
         if(isRealNumber(props.verticalTextAlign))
         {
@@ -1367,60 +1413,44 @@ DrawingObjectsController.prototype =
                 CheckSpPrXfrm(objects_by_type.shapes[i]);
                 objects_by_type.shapes[i].spPr.xfrm.setExtX(props.Width);
                 objects_by_type.shapes[i].spPr.xfrm.setExtY(props.Height);
+                if(objects_by_type.shapes[i].group)
+                {
+                    objects_by_type.shapes[i].group.updateCoordinatesAfterInternalResize();
+                }
             }
             for(i = 0; i < objects_by_type.images.length; ++i)
             {
                 CheckSpPrXfrm(objects_by_type.images[i]);
                 objects_by_type.images[i].spPr.xfrm.setExtX(props.Width);
                 objects_by_type.images[i].spPr.xfrm.setExtY(props.Height);
+                if(objects_by_type.images[i].group)
+                {
+                    objects_by_type.images[i].group.updateCoordinatesAfterInternalResize();
+                }
             }
             for(i = 0; i < objects_by_type.charts.length; ++i)
             {
                 CheckSpPrXfrm(objects_by_type.charts[i]);
                 objects_by_type.charts[i].spPr.xfrm.setExtX(props.Width);
                 objects_by_type.charts[i].spPr.xfrm.setExtY(props.Height);
+                if(objects_by_type.charts[i].group)
+                {
+                    objects_by_type.charts[i].group.updateCoordinatesAfterInternalResize();
+                }
             }
-            if(this.selection.groupSelection)
-            {
-                this.selection.groupSelection.updateCoordinatesAfterInternalResize();
-            }
+            //if(this.selection.groupSelection)
+            //{
+            //    this.selection.groupSelection.updateCoordinatesAfterInternalResize();
+            //}
         }
         return objects_by_type;
     },
 
-    getSelectedObjectsByTypes: function()
+    getSelectedObjectsByTypes: function(bGroupedObjects)
     {
         var ret = {shapes: [], images: [], groups: [], charts: []};
         var selected_objects = this.selection.groupSelection ? this.selection.groupSelection.selectedObjects : this.selectedObjects;
-        for(var i = 0;  i < selected_objects.length; ++i)
-        {
-            var drawing = selected_objects[i];
-            var type = drawing.getObjectType();
-            switch(type)
-            {
-                case historyitem_type_Shape:
-                {
-                    ret.shapes.push(drawing);
-                    break;
-                }
-                case historyitem_type_ImageShape:
-                {
-                    ret.images.push(drawing);
-                    break;
-                }
-                case historyitem_type_GroupShape:
-                {
-                    ret.groups.push(drawing);
-                    break;
-                }
-                case historyitem_type_ChartSpace:
-                {
-                    ret.charts.push(drawing);
-                    break;
-                }
-            }
-        }
-        return ret;
+        return getObjectsByTypesFromArr(selected_objects, bGroupedObjects);
     },
 
     editChartCallback: function(chartSettings)
@@ -3466,6 +3496,7 @@ DrawingObjectsController.prototype =
                 {
                     new_shape_props =
                     {
+                        canFill: drawing.canFill(),
                         type: drawing.getPresetGeom(),
                         fill: drawing.getFill(),
                         stroke: drawing.getStroke(),
@@ -3630,9 +3661,16 @@ DrawingObjectsController.prototype =
             shape_props.ShapeProperties.fill = props.shapeProps.fill;
             shape_props.ShapeProperties.stroke = props.shapeProps.stroke;
             shape_props.ShapeProperties.canChangeArrows = props.shapeProps.canChangeArrows;
-            shape_props.ShapeProperties.paddings = props.shapeProps.paddings;
+
+            if(props.shapeProps.paddings)
+            {
+                shape_props.ShapeProperties.paddings = new asc_CPaddings(props.shapeProps.paddings);
+            }
             shape_props.verticalTextAlign = props.shapeProps.verticalTextAlign;
-            shape_props.ShapeProperties.canFill = props.shapeProps.canFill; var pr = shape_props.ShapeProperties;
+            shape_props.ShapeProperties.canFill = props.shapeProps.canFill;
+            shape_props.Width = props.shapeProps.w;
+            shape_props.Height = props.shapeProps.h;
+            var pr = shape_props.ShapeProperties;
             if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == FILL_TYPE_BLIP)
             {
                 if(asc && asc["editor"])

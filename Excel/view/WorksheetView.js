@@ -5203,6 +5203,7 @@
 			this.handlers.trigger("onDocumentPlaceChanged");
 			this.cellCommentator.drawCommentCells();
 			//ToDo this.drawDepCells();
+            this.objectRender.drawingArea.reinitRanges();
 			this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollVertical, rangeGraphic));
 			return this;
 		};
@@ -5298,6 +5299,7 @@
 			this.handlers.trigger("onDocumentPlaceChanged");
 			this.cellCommentator.drawCommentCells();
 			//ToDo this.drawDepCells();
+            this.objectRender.drawingArea.reinitRanges();
 			this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollHorizontal, rangeGraphic));
 			return this;
 		};
@@ -9474,6 +9476,7 @@
 			}
 
 			t._calcColumnWidths(/*fullRecalc*/2);
+            this.objectRender.drawingArea.reinitRanges();
 			return (nLastCols !== this.nColsCount || bIsMaxCols);
 		};
 
@@ -9510,6 +9513,7 @@
 			}
 
 			t._calcRowHeights(/*fullRecalc*/2);
+            this.objectRender.drawingArea.reinitRanges();
 			return (nLastRows !== this.nRowsCount || bIsMaxRows);
 		};
 

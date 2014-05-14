@@ -72,13 +72,6 @@ CImageShape.prototype.recalcTransparent = function()
 {
     this.recalcInfo.recalculateTransparent = true;
 };
-CImageShape.prototype.addToRecalculate = function()
-{
-    if(this.drawingObjects && this.drawingObjects.controller)
-    {
-        this.drawingObjects.controller.objectsForRecalculate[this.Id] = this;
-    }
-};
 CImageShape.prototype.handleUpdatePosition = function()
 {
     this.recalcTransform();
@@ -88,7 +81,8 @@ CImageShape.prototype.handleUpdatePosition = function()
 CImageShape.prototype.handleUpdateExtents = function()
 {
     this.recalcGeometry();
-	this.recalcBounds();
+    this.recalcBounds();
+    this.recalcTransform();
     this.addToRecalculate();
 };
 CImageShape.prototype.handleUpdateRot = function()

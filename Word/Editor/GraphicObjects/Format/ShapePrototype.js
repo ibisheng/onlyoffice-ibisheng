@@ -196,7 +196,7 @@ CShape.prototype.recalculateTxBoxContent = function()
     var b_ins = typeof body_pr.bIns === "number" ? body_pr.bIns : 1.27;
 
     var _body_pr = this.getBodyPr();
-    if(isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect))
+    if(this.spPr && isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect))
     {
         var _rect = this.spPr.geometry.rect;
         _l = _rect.l + l_ins;
@@ -370,7 +370,7 @@ CShape.prototype.getArrayWrapPolygons = function()
 {
 
     var ret;
-    if(this.spPr.geometry)
+    if(this.spPr && this.spPr.geometry)
         ret =  this.spPr.geometry.getArrayPolygons();
     else
         ret = [];
@@ -412,7 +412,7 @@ CShape.prototype.recalculateContent = function()
             t_ins = 1.27;
             b_ins = 1.27;
         }
-        if(this.spPr.geometry && this.spPr.geometry.rect
+        if(this.spPr && this.spPr.geometry && this.spPr.geometry.rect
             && isRealNumber(this.spPr.geometry.rect.l) && isRealNumber(this.spPr.geometry.rect.t)
             && isRealNumber(this.spPr.geometry.rect.r) && isRealNumber(this.spPr.geometry.rect.r))
         {

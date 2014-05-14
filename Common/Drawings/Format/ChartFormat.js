@@ -3963,8 +3963,9 @@ CCatAx.prototype =
     },
 
 
-    Save_Changes: function()
-    {},
+    Save_Changes: function(data, w)
+    {
+    },
 
     Load_Changes: function()
     {}

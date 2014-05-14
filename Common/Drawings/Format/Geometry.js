@@ -729,7 +729,9 @@ Geometry.prototype=
                         maxX: data.maxX,
                         gdRefY: data.gdRefY,
                         minY: data.minY,
-                        maxY: data.maxY});
+                        maxY: data.maxY,
+                    posX: data.posX,
+                    posY: data.posY});
                 break;
             }
             case historyitem_GeometryAddHandlePolar:

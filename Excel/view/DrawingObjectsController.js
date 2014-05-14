@@ -157,6 +157,20 @@ DrawingObjectsController.prototype.getSlide = function()
 {
     return null;
 };
+
+DrawingObjectsController.prototype.RefreshAfterChangeColorScheme = function()
+{
+    var drawings = this.getDrawingArray();
+    for(var i = 0; i < drawings.length; ++i)
+    {
+        if(drawings[i])
+        {
+            drawings[i].handleUpdateFill();
+            drawings[i].handleUpdateLn();
+            drawings[i].addToRecalculate();
+        }
+    }
+};
 DrawingObjectsController.prototype.getLayout = function()
 {
     return null;
@@ -313,7 +327,9 @@ DrawingObjectsController.prototype.addChartDrawingObject = function(asc_chart, o
     var chart = this.getChartSpace(asc_chart, options);
     if(chart)
     {
+        chart.setWorksheet(this.drawingObjects.getWorksheetModel());
         chart.setStyle(2);
+        chart.setBDeleted(false);
         this.resetSelection();
         var chartLeft = this.drawingObjects.convertMetric(options && options.left ? ptToPx(options.left) : (parseInt($("#ws-canvas").css('width')) / 2) - c_oAscChartDefines.defaultChartWidth / 2, 0, 3);
         var chartTop = this.drawingObjects.convertMetric(options && options.top ? ptToPx(options.top) : (parseInt($("#ws-canvas").css('height')) / 2) - c_oAscChartDefines.defaultChartHeight / 2, 0, 3);

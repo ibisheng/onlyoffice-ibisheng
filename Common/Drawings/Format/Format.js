@@ -7952,9 +7952,9 @@ CSpPr.prototype =
     {
         History.Add(this, {Type: historyitem_SpPr_SetFill, oldPr: this.Fill, newPr: pr});
         this.Fill = pr;
-        if(this.parent && this.parent.recalcBrush)
+        if(this.parent && this.parent.handleUpdateFill)
         {
-            this.parent.recalcBrush();
+            this.parent.handleUpdateFill();
         }
     },
 
@@ -11333,6 +11333,9 @@ function CBodyPr()
     this.vertOverflow     = null;
     this.wrap             = null;
     this.textFit          = null;
+
+
+    this.parent = null;
 
 
 

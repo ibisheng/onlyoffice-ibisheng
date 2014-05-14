@@ -372,6 +372,7 @@ CChartSpace.prototype =
         copy.setUserShapes(this.userShapes);
         copy.setThemeOverride(this.themeOverride);
         copy.setBDeleted(this.bDeleted);
+        return copy;
     },
 
     convertToWord: function(document)
@@ -4021,7 +4022,7 @@ CChartSpace.prototype =
                     }
                     if(this.chart.plotArea.valAx.compiledMinorGridLines)
                     {
-                        this.chart.plotArea.valAx.compiledMajorGridLines.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                        this.chart.plotArea.valAx.compiledMinorGridLines.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
                     }
                     if(this.chart.plotArea.valAx.title)
                     {
@@ -4049,7 +4050,7 @@ CChartSpace.prototype =
                     }
                     if(this.chart.plotArea.catAx.compiledMinorGridLines)
                     {
-                        this.chart.plotArea.catAx.compiledMajorGridLines.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                        this.chart.plotArea.catAx.compiledMinorGridLines.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
                     }
                     if(this.chart.plotArea.catAx.title)
                     {

@@ -164,6 +164,15 @@ CTextBody.prototype =
     {
         History.Add(this, {Type: historyitem_TextBodySetBodyPr, oldPr: this.bodyPr, newPr: pr});
         this.bodyPr = pr;
+        if(this.parent && this.parent.recalcInfo)
+        {
+            this.parent.recalcInfo.recalcContent = true;
+            this.parent.recalcInfo.recalcTransformText = true;
+            if(this.parent.addToRecalculate)
+            {
+                this.parent.addToRecalculate();
+            }
+        }
     },
 
     setContent: function(pr)
@@ -349,7 +358,17 @@ CTextBody.prototype =
     },
 
     Refresh_RecalcData: function()
-    {},
+    {
+        if(this.parent && this.parent.recalcInfo)
+        {
+            this.parent.recalcInfo.recalcContent = true;
+            this.parent.recalcInfo.recalcTransformText = true;
+            if(this.parent.addToRecalculate)
+            {
+                this.parent.addToRecalculate();
+            }
+        }
+    },
 
 
     updateSelectionState: function(drawingDocument)

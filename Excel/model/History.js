@@ -631,6 +631,17 @@ CHistory.prototype =
 
                         if ( /*true === Item.NeedRecalc*/Item.Class.Refresh_RecalcData )
                             Item.Class.Refresh_RecalcData( Item.Data );
+                        if(Item.Type === historyitem_Workbook_ChangeColorScheme)
+                        {
+                            var wsViews = Asc["editor"].wb.wsViews;
+                            for(var i = 0; i < wsViews.length; ++i)
+                            {
+                                if(wsViews[i])
+                                {
+                                    wsViews[i].objectRender.controller.RefreshAfterChangeColorScheme();
+                                }
+                            }
+                        }
                     }
                 }
             }
