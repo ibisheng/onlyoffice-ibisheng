@@ -2633,13 +2633,16 @@ var gUndoInsDelCellsFlag = true;
 			_getAdjacentCellsAF: function(ar,aWs) 
 			{
 				var ws = this.worksheet;
-				var cell = ws.model.getCell( new CellAddress(ar.r1, ar.c1, 0)).getCells();
 				var cloneActiveRange = ar.clone(true); // ToDo слишком много клонирования
-				var isEnd = true;
-				var range;
-				var merged;
-				var valueMerg;
-				var rowNum = cloneActiveRange.r1;
+				
+				var isEnd = true, cell, range, merged, valueMerg, rowNum = cloneActiveRange.r1, isEmptyCell;
+				
+				//есть ли вообще на странице мерженные ячейки
+				//TODO стоит пересмотреть проверку мерженных ячеек
+				console.time("_getAdjacentCellsAF");
+				var allRange = ws.model.getRange3(0, 0, ws.nRowsCount, ws.nColsCount);
+				var isMergedCells = allRange.hasMerged();
+				
 				for(var n = cloneActiveRange.r1 - 1; n <= cloneActiveRange.r2 + 1; n++)
 				{
 					if(n < 0)
@@ -2667,16 +2670,18 @@ var gUndoInsDelCellsFlag = true;
 							continue;
 							
 						cell = ws.model._getCell(n,k);
-						range = ws.model.getRange3(n, k, n, k);
+						isEmptyCell = cell.isEmptyText();
 						
 						//если мерженная ячейка
-						if(!(n == ar.r1 && k == ar.c1) && range)
+						if(!(n == ar.r1 && k == ar.c1) && isMergedCells != null && isEmptyCell)
 						{
+							range = ws.model.getRange3(n, k, n, k);
+							
 							merged = range.hasMerged();
 							valueMerg = null;
 							if(merged)
 							{
-								valueMerg = ws.model.getRange3(merged.r1 + 1, merged.c1 + 1, merged.r2 + 1, merged.c2 + 1).getValue();
+								valueMerg = ws.model.getRange3(merged.r1, merged.c1, merged.r2, merged.c2).getValue();
 								if(valueMerg != null && valueMerg != "")
 								{	
 									if(merged.r1 < cloneActiveRange.r1)
@@ -2704,11 +2709,11 @@ var gUndoInsDelCellsFlag = true;
 									if(k < 0)
 										k = 0;
 									cell = ws.model._getCell(n,k);	
-								}
-							}
-						}
+								};
+							};
+						};
 						
-						if(cell.getValueWithoutFormat() != '' || (valueMerg != null && valueMerg != ""))
+						if(!isEmptyCell || (valueMerg != null && valueMerg != ""))
 						{
 							if(k < cloneActiveRange.c1)
 							{
@@ -2725,11 +2730,12 @@ var gUndoInsDelCellsFlag = true;
 							else if(n > cloneActiveRange.r2)
 							{
 								cloneActiveRange.r2 = n;isEnd = false;
-							}
-								
-						}
-					}
-				}
+							};	
+						};
+					};
+				};
+				console.timeEnd("_getAdjacentCellsAF");
+				
 				//проверяем есть ли пустые строчки и столбцы в диапазоне
 				if(ar.r1 == cloneActiveRange.r1)
 				{
@@ -2778,7 +2784,6 @@ var gUndoInsDelCellsFlag = true;
 				}
 				
 				//проверяем не вошёл ли другой фильтр в область нового фильтра
-				
 				if(aWs.AutoFilter || aWs.TableParts)
 				{
 					//var oldFilters = this.allAutoFilter;
