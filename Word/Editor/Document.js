@@ -1880,24 +1880,7 @@ CDocument.prototype =
         var Page_StartPos = this.Pages[nPageIndex].Pos;
         var SectPr        = this.SectionsInfo.Get_SectPr(Page_StartPos).SectPr;        
 
-        // Рисуем колонтитулы
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-        {
-            var SectIndex = this.SectionsInfo.Get_Index(Page_StartPos);
-            var SectCount = this.SectionsInfo.Get_Count();
-            
-            var SectIndex = ( 1 === SectCount ? -1 : SectIndex );
-
-            var Header = this.HdrFtr.Pages[nPageIndex].Header;
-            var Footer = this.HdrFtr.Pages[nPageIndex].Footer;
-            
-            var RepH = ( null === Header || null !== SectPr.Get_HdrFtrInfo(Header) ? false : true );
-            var RepF = ( null === Footer || null !== SectPr.Get_HdrFtrInfo(Footer) ? false : true );
-                        
-            pGraphics.DrawHeaderEdit( this.Pages[nPageIndex].Y,      this.HdrFtr.Lock.Get_Type(), SectIndex, RepH );
-            pGraphics.DrawFooterEdit( this.Pages[nPageIndex].YLimit, this.HdrFtr.Lock.Get_Type(), SectIndex, RepF );
-        }
-        else
+        if ( docpostype_HdrFtr !== this.CurPos.Type )
             pGraphics.Start_GlobalAlpha();
 
         // Рисуем границы вокруг страницы (если границы надо рисовать под текстом)
@@ -1929,7 +1912,24 @@ CDocument.prototype =
             this.Draw_Borders(pGraphics, SectPr);
 
         if ( docpostype_HdrFtr === this.CurPos.Type )
+        {
             pGraphics.put_GlobalAlpha(false, 1.0);
+
+            // Рисуем колонтитулы
+            var SectIndex = this.SectionsInfo.Get_Index(Page_StartPos);
+            var SectCount = this.SectionsInfo.Get_Count();
+
+            var SectIndex = ( 1 === SectCount ? -1 : SectIndex );
+
+            var Header = this.HdrFtr.Pages[nPageIndex].Header;
+            var Footer = this.HdrFtr.Pages[nPageIndex].Footer;
+
+            var RepH = ( null === Header || null !== SectPr.Get_HdrFtrInfo(Header) ? false : true );
+            var RepF = ( null === Footer || null !== SectPr.Get_HdrFtrInfo(Footer) ? false : true );
+
+            pGraphics.DrawHeaderEdit( this.Pages[nPageIndex].Y,      this.HdrFtr.Lock.Get_Type(), SectIndex, RepH, Header.RecalcInfo.NeedRecalc[nPageIndex] );
+            pGraphics.DrawFooterEdit( this.Pages[nPageIndex].YLimit, this.HdrFtr.Lock.Get_Type(), SectIndex, RepF, Footer.RecalcInfo.NeedRecalc[nPageIndex] );
+        }
     },
 
     Draw_Borders : function(Graphics, SectPr)
