@@ -526,13 +526,17 @@
 		RangeCache.prototype = {
 			getAscRange : function(sRange)
 			{
-				return this._getRange(sRange, true);
+				return this._getRange(sRange, 1);
+			},
+			getActiveRange : function(sRange)
+			{
+				return this._getRange(sRange, 2);
 			},
 			getFormulaRange : function(sRange)
 			{
-				return this._getRange(sRange, false);
+				return this._getRange(sRange, 3);
 			},
-			_getRange : function(sRange, bAscRange)
+			_getRange : function(sRange, type)
 			{
 				var oRes = null;
 				var oCacheVal = this.oCache[sRange];
@@ -544,45 +548,79 @@
 					{
 						oFirstAddr = g_oCellAddressUtils.getCellAddress(sRange.substring(0, nIndex));
 						oLastAddr = g_oCellAddressUtils.getCellAddress(sRange.substring(nIndex + 1));
-						if(oFirstAddr.getIsRow() && oLastAddr.getIsRow())
-						{
-							oFirstAddr.setCol(1);
-							oLastAddr.setCol(gc_nMaxCol);
-						}
-						if(oFirstAddr.getIsCol() && oLastAddr.getIsCol())
-						{
-							oFirstAddr.setRow(1);
-							oLastAddr.setRow(gc_nMaxRow);
-						}
 					}
 					else
 						oFirstAddr = oLastAddr = g_oCellAddressUtils.getCellAddress(sRange);
-					oCacheVal = {first: null, last: null, ascRange: null, formulaRange: null};
+					oCacheVal = {first: null, last: null, ascRange: null, formulaRange: null, activeRange: null};
 					if(oFirstAddr.isValid() && oLastAddr.isValid())
 					{
-						oCacheVal.first = oFirstAddr;
-						oCacheVal.last = oLastAddr;
+					    oCacheVal.first = oFirstAddr;
+					    oCacheVal.last = oLastAddr;
 					}
 					this.oCache[sRange] = oCacheVal;
 				}
-				if(bAscRange)
-				{
-					if(null == oCacheVal.ascRange && null != oCacheVal.first && null != oCacheVal.last)
-						oCacheVal.ascRange = new Asc.Range(oCacheVal.first.getCol0(), oCacheVal.first.getRow0(), oCacheVal.last.getCol0(), oCacheVal.last.getRow0());
-					oRes = oCacheVal.ascRange;
-				}
+				if (1 == type)
+				    oRes = oCacheVal.ascRange;
+				else if (2 == type)
+				    oRes = oCacheVal.activeRange;
 				else
-				{
-					if(null == oCacheVal.formulaRange && null != oCacheVal.first && null != oCacheVal.last)
-					{
-						var oFormulaRange = new Asc.FormulaRange(oCacheVal.first.getCol0(), oCacheVal.first.getRow0(), oCacheVal.last.getCol0(), oCacheVal.last.getRow0());
-						oFormulaRange.r1Abs = oCacheVal.first.getRowAbs();
-						oFormulaRange.c1Abs = oCacheVal.first.getColAbs();
-						oFormulaRange.r2Abs = oCacheVal.last.getRowAbs();
-						oFormulaRange.c2Abs = oCacheVal.last.getColAbs();
-						oCacheVal.formulaRange = oFormulaRange;
-					}
-					oRes = oCacheVal.formulaRange;
+				    oRes = oCacheVal.formulaRange;
+				if (null == oRes && null != oCacheVal.first && null != oCacheVal.last) {
+				    var r1 = oCacheVal.first.getRow0(), r2 = oCacheVal.last.getRow0(), c1 = oCacheVal.first.getCol0(), c2 = oCacheVal.last.getCol0();
+				    if (oFirstAddr.getIsRow() && oLastAddr.getIsRow()) {
+				        c1 = 0;
+				        c2 = gc_nMaxCol0;
+				    }
+				    if (oFirstAddr.getIsCol() && oLastAddr.getIsCol()) {
+				        r1 = 0;
+				        r2 = gc_nMaxRow0;
+				    }
+				    if (r1 > r2) {
+				        var temp = r1;
+				        r1 = r2;
+				        r2 = temp;
+				    }
+				    if (c1 > c2) {
+				        var temp = c1;
+				        c1 = c2;
+				        c2 = temp;
+				    }
+
+				    if (1 == type) {
+				        if (null == oCacheVal.ascRange)
+				            oCacheVal.ascRange = new Asc.Range(c1, r1, c2, r2);
+				        oRes = oCacheVal.ascRange;
+				    }
+				    else if (2 == type) {
+				        if (null == oCacheVal.activeRange) {
+				            var oActiveRange = new Asc.ActiveRange(c1, r1, c2, r2);
+				            var bCol = 0 == r1 && gc_nMaxRow0 == r2;
+				            var bRow = 0 == c1 && gc_nMaxCol0 == c2;
+				            if (bCol && bRow)
+				                oActiveRange.type = c_oAscSelectionType.RangeMax;
+				            else if (bCol)
+				                oActiveRange.type = c_oAscSelectionType.RangeCol;
+				            else if (bRow)
+				                oActiveRange.type = c_oAscSelectionType.RangeRow;
+				            else
+				                oActiveRange.type = c_oAscSelectionType.RangeCells;
+				            oActiveRange.startCol = oActiveRange.c1;
+				            oActiveRange.startRow = oActiveRange.r1;
+				            oCacheVal.activeRange = oActiveRange;
+				        }
+				        oRes = oCacheVal.activeRange;
+				    }
+				    else {
+				        if (null == oCacheVal.formulaRange) {
+				            var oFormulaRange = new Asc.FormulaRange(c1, r1, c2, r2);
+				            oFormulaRange.r1Abs = oCacheVal.first.getRowAbs();
+				            oFormulaRange.c1Abs = oCacheVal.first.getColAbs();
+				            oFormulaRange.r2Abs = oCacheVal.last.getRowAbs();
+				            oFormulaRange.c2Abs = oCacheVal.last.getColAbs();
+				            oCacheVal.formulaRange = oFormulaRange;
+				        }
+				        oRes = oCacheVal.formulaRange;
+				    }
 				}
 				return oRes;
 			}
