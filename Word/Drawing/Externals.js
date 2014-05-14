@@ -1427,11 +1427,26 @@ function CLanguageFontSelect()
     this.DefaultFont = "Arial";
 }
 
+CLanguageFontSelect.prototype =
+{
+    checkChar : function(_code)
+    {
+        var _len = this.Ranges.length;
+        for (var i = 0; i < _len; i += 2)
+        {
+            if (_code >= this.Ranges[i] && _code <= this.Ranges[i + 1])
+                return true;
+        }
+        return false;
+    }
+};
+
 var LanguagesFontSelectTypes =
 {
+    Unknown     : -1,
     Arabic      : 1,
-    Japan       : 2,
-    Korean      : 3,
+    Korean      : 2,
+    Japan       : 3,
     Chinese     : 4
 };
 
@@ -1484,6 +1499,7 @@ CFontSelectList.prototype =
         _arabic_lang.CodePage1Mask = (1 << 6);
         _arabic_lang.CodePage2Mask = (1 << 19) | (1 << 29);
         _arabic_lang.DefaultFont = "Tahoma";
+        this.Languages.push(_arabic_lang);
 
         // 2) japan
         var _japan_lang = new CLanguageFontSelect();
@@ -1497,6 +1513,7 @@ CFontSelectList.prototype =
         _japan_lang.CodePage1Mask = (1 << 17) | (1 << 30);
         _japan_lang.CodePage2Mask = 0;
         _japan_lang.DefaultFont = "MS Mincho";
+        this.Languages.push(_japan_lang);
 
         // 3) chinese http://stackoverflow.com/questions/1366068/whats-the-complete-range-for-chinese-characters-in-unicode
         var _chinese_lang = new CLanguageFontSelect();
@@ -1514,6 +1531,7 @@ CFontSelectList.prototype =
         _chinese_lang.CodePage1Mask = (1 << 18) | (1 << 20);
         _chinese_lang.CodePage2Mask = 0;
         _chinese_lang.DefaultFont = "SimSun";
+        this.Languages.push(_chinese_lang);
 
         // 4) korean
         var _korean_lang = new CLanguageFontSelect();
@@ -1527,8 +1545,9 @@ CFontSelectList.prototype =
         _korean_lang.CodePage1Mask = (1 << 19);
         _korean_lang.CodePage2Mask = 0;
         _korean_lang.DefaultFont = "Batang";
+        this.Languages.push(_korean_lang);
 
-        // test
+        /*
         var _array_results = [];
         var _count_fonts = this.List.length;
         for (var i = 0; i < _count_fonts; i++)
@@ -1537,9 +1556,62 @@ CFontSelectList.prototype =
 
             console.log(f.m_wsFontPath + "_" + f.m_lIndex + " codepage1: " + f.m_ulCodePageRange1 + ", codepage2: " + f.m_ulCodePageRange2);
         }
+        */
+    },
+
+    isSpaceSymbol : function(_code)
+    {
+        switch (_code)
+        {
+            case 32:
+            case 91:
+            case 93:
+                return true;
+            default:
+                break;
+        }
+        return false;
     },
 
     checkText : function(text)
+    {
+        var _text_len = text.length;
+        if (_text_len == 0)
+            return LanguagesFontSelectTypes.Unknown;
+
+        var _array_detect_languages = new Array();
+        var _detect_languages_length = this.Languages.length;
+
+        for (var _lang = 0; _lang < _detect_languages_length; _lang++)
+        {
+            var _language = this.Languages[_lang];
+
+            var _is_support = true;
+            for (var i = 0; i < _text_len; i++)
+            {
+                var _code = text.charCodeAt(i);
+                if (!this.isSpaceSymbol(_code))
+                {
+                    if (!_language.checkChar(_code))
+                    {
+                        _is_support = false;
+                        break;
+                    }
+                }
+            }
+
+            if (_is_support)
+                _array_detect_languages.push(_language.Type);
+        }
+
+        var _len = _array_detect_languages.length;
+        if (0 == _len)
+            return LanguagesFontSelectTypes.Unknown;
+
+        return _array_detect_languages[_len - 1];
+    },
+
+    checkText2 : function(text)
     {
         var r1 = 0;
         var r2 = 0;
@@ -1600,7 +1672,7 @@ CFontSelectList.prototype =
             }
         }
 
-        console.log(_array_results);
+        //console.log(_array_results);
     },
 
     initRanges : function()
