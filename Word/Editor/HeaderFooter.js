@@ -142,7 +142,7 @@ CHeaderFooter.prototype =
         
         this.RecalcInfo.RecalcObj[Page_abs]  = this.Content.Save_RecalculateObject();
         this.RecalcInfo.NeedRecalc[Page_abs] = this.LogicDocument.Get_SectionPageNumInfo(Page_abs);
-        this.RecalcInfo.SectPr[Page_abs]     = false;
+        this.RecalcInfo.SectPr[Page_abs]     = SectPr;
         
         // Если у нас до этого был какой-то пересчет, тогда сравним его с текущим.
         // 1. Сравним границы: у верхнего колонтитула смотрим на изменение нижней границы, а нижнего - верхней
@@ -1274,7 +1274,7 @@ CHeaderFooterController.prototype =
                 var YLimit = SectPr.Get_PageHeight() / 2;
 
                 Header.Reset( X, Y, XLimit, YLimit );
-                bRecalcHeader = Header.Recalculate(PageIndex);
+                bRecalcHeader = Header.Recalculate(PageIndex, SectPr);
             }
             else 
             {
@@ -1304,7 +1304,7 @@ CHeaderFooterController.prototype =
                 Y = Math.max( 2 * YLimit / 3, YLimit - SectPr.Get_PageMargins_Footer() - SummaryHeight );
 
                 Footer.Reset( X, Y, XLimit, YLimit );
-                bRecalcFooter = Footer.Recalculate(PageIndex);
+                bRecalcFooter = Footer.Recalculate(PageIndex, SectPr);
             }
             else
             {

@@ -1915,7 +1915,7 @@ CDocument.prototype =
         {
             pGraphics.put_GlobalAlpha(false, 1.0);
 
-            // Рисуем колонтитулы
+            // Рисуем колонтитулы            
             var SectIndex = this.SectionsInfo.Get_Index(Page_StartPos);
             var SectCount = this.SectionsInfo.Get_Count();
 
@@ -1926,9 +1926,37 @@ CDocument.prototype =
 
             var RepH = ( null === Header || null !== SectPr.Get_HdrFtrInfo(Header) ? false : true );
             var RepF = ( null === Footer || null !== SectPr.Get_HdrFtrInfo(Footer) ? false : true );
+            
+            var HeaderInfo = undefined;
+            if ( null !== Header && undefined !== Header.RecalcInfo.NeedRecalc[nPageIndex] )
+            {
+                var bFirst = Header.RecalcInfo.NeedRecalc[nPageIndex].bFirst;
+                var bEven  = Header.RecalcInfo.NeedRecalc[nPageIndex].bEven;
 
-            pGraphics.DrawHeaderEdit( this.Pages[nPageIndex].Y,      this.HdrFtr.Lock.Get_Type(), SectIndex, RepH, null === Header ? undefined : Header.RecalcInfo.NeedRecalc[nPageIndex] );
-            pGraphics.DrawFooterEdit( this.Pages[nPageIndex].YLimit, this.HdrFtr.Lock.Get_Type(), SectIndex, RepF, null === Footer ? undefined : Footer.RecalcInfo.NeedRecalc[nPageIndex] );
+                var HeaderSectPr = Header.RecalcInfo.SectPr[nPageIndex];
+                
+                if ( undefined !== HeaderSectPr )
+                    bFirst = ( true === bFirst && true === HeaderSectPr.Get_TitlePage() ? true : false );
+                
+                HeaderInfo = { bFirst : bFirst, bEven : bEven };
+            }
+
+            var FooterInfo = undefined;
+            if ( null !== Footer && undefined !== Footer.RecalcInfo.NeedRecalc[nPageIndex] )
+            {
+                var bFirst = Footer.RecalcInfo.NeedRecalc[nPageIndex].bFirst;
+                var bEven  = Footer.RecalcInfo.NeedRecalc[nPageIndex].bEven;
+
+                var FooterSectPr = Footer.RecalcInfo.SectPr[nPageIndex];
+
+                if ( undefined !== FooterSectPr )
+                    bFirst = ( true === bFirst && true === FooterSectPr.Get_TitlePage() ? true : false );
+
+                FooterInfo = { bFirst : bFirst, bEven : bEven };
+            }
+            
+            pGraphics.DrawHeaderEdit( this.Pages[nPageIndex].Y,      this.HdrFtr.Lock.Get_Type(), SectIndex, RepH, HeaderInfo );
+            pGraphics.DrawFooterEdit( this.Pages[nPageIndex].YLimit, this.HdrFtr.Lock.Get_Type(), SectIndex, RepF, FooterInfo );
         }
     },
 
