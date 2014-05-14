@@ -20557,7 +20557,13 @@ CParaLineMetrics.prototype =
             {
                 var LineGap1 = ParaPr.Spacing.Line;
                 var LineGap2 = TextAscent + TextDescent;
-                LineGap = Math.max( LineGap1, LineGap2 ) - ( TextAscent + TextDescent );
+                
+                // Специальный случай, когда в строке нет никакого текста
+                if ( Math.abs( LineGap2 ) < 0.001 )
+                    LineGap = 0;
+                else
+                    LineGap = Math.max( LineGap1, LineGap2 ) - ( TextAscent + TextDescent );
+                
                 break;
             }
 
