@@ -776,7 +776,7 @@ Paragraph.prototype =
 
             // Удаляем комментарий, если это необходимо
             if ( true === this.DeleteCommentOnRemove && para_Comment === Item.Type )
-                this.LogicDocument.Remove_Comment( Item.Id, true );
+                this.LogicDocument.Remove_Comment( Item.CommentId, true );
 
             var SpellingsCount  = this.SpellChecker.Elements.length;
             for ( var Pos = 0; Pos < SpellingsCount; Pos++ )
@@ -16468,7 +16468,7 @@ Paragraph.prototype =
             var Item = this.Content[Index];
             if ( para_CommentEnd === Item.Type || para_CommentStart === Item.Type || para_Comment === Item.Type )
             {
-                editor.WordControl.m_oLogicDocument.Remove_Comment( Item.Id, true );
+                editor.WordControl.m_oLogicDocument.Remove_Comment( Item.CommentId, true );
             }
         }
     },
