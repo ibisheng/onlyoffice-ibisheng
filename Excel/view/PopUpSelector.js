@@ -132,6 +132,9 @@
 		};
 		PopUpSelector.prototype.hide = function () {
 			if (this.isVisible) {
+				// Чтобы не было непонятных анимаций
+				this.selectorListJQ.scrollTop(0);
+				
 				this.selectorStyle.display = "none";
 				this.isVisible = false;
 
