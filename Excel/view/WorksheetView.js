@@ -3939,6 +3939,8 @@
 			var x1 = t.cols[col].left - offsetX - this.width_1px;
 			var h = ctx.getHeight();
 			var widthPt = (x - x1);
+			if (0 > widthPt)
+				widthPt = 0;
 
 			ctx.clear();
 			t._drawSelection();
@@ -3966,6 +3968,8 @@
 			var y1 = t.rows[row].top - offsetY - this.height_1px;
 			var w = ctx.getWidth();
 			var heightPt = (y - y1);
+			if (0 > heightPt)
+				heightPt = 0;
 
 			ctx.clear();
 			t._drawSelection();
