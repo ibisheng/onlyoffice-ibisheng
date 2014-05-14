@@ -2651,19 +2651,24 @@ var gUndoInsDelCellsFlag = true;
 							n = cloneActiveRange.r1 - 1;
 						if(cloneActiveRange.c1 > 0)
 							k = cloneActiveRange.c1 - 1;
-					}
+					};
+					
 					if(n > cloneActiveRange.r1 && n < cloneActiveRange.r2 && k > cloneActiveRange.c1 && k < cloneActiveRange.c2)
 						continue;
+						
 					isEnd  = true;
 					for(var k = cloneActiveRange.c1 - 1; k <= cloneActiveRange.c2 + 1; k++)
 					{
 						if(k < 0)
 							continue;
-						cell = ws.model._getCell(n,k);
+						
 						//если находимся уже внутри выделенного фрагмента, то смысла его просматривать нет
 						if(k >= cloneActiveRange.c1 && k <= cloneActiveRange.c2 && n >= cloneActiveRange.r1 && n <= cloneActiveRange.r2)
 							continue;
-						range = ws.model.getCell(new CellAddress(n + 1,k + 1));
+							
+						cell = ws.model._getCell(n,k);
+						range = ws.model.getRange3(n, k, n, k);
+						
 						//если мерженная ячейка
 						if(!(n == ar.r1 && k == ar.c1) && range)
 						{
