@@ -15,6 +15,10 @@ function CDocumentSpelling()
     this.Words       = new Object(); // Слова, которые пользователь решил пропустить(нажал "пропустить все") при проверке орфографии
     this.CheckPara   = new Object(); // Параграфы, в которых нужно запустить проверку орфографии
     this.CurPara     = new Object(); // Параграфы, в которых мы не проверили некотырые слова, из-за того что в них стоял курсор
+    
+    // Добавим в список исключений слово Teamlab
+    this.Words["Teamlab"] = true;
+    this.Words["teamlab"] = true;
 }
 
 CDocumentSpelling.prototype =
