@@ -4431,7 +4431,19 @@ CDocument.prototype =
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
-            this.DrawingObjects.setParagraphAlign(Align);
+            if ( true != this.DrawingObjects.isSelectedText() )
+            {
+                var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
+                if ( null != ParaDrawing )
+                {
+                    var Paragraph = ParaDrawing.Parent;
+                    Paragraph.Set_Align(Align);
+                }
+            }
+            else
+            {
+                this.DrawingObjects.setParagraphAlign(Align);
+            }
         }
         else //if ( docpostype_Content === this.CurPos.Type )
         {
