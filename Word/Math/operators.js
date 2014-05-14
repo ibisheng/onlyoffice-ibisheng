@@ -3006,8 +3006,8 @@ COperator.prototype.draw = function(x, y, pGraphics)
     {
         if(this.type === OPER_SEPARATOR)
             this.drawSeparator(x, y, pGraphics);
-        else if(this.type == OPER_ACCENT)
-            this.drawAccent(x, y, pGraphics);
+        /*else if(this.type == OPER_ACCENT)
+            this.drawAccent(x, y, pGraphics);*/
         else
             this.drawOperator(x, y, pGraphics);
     }
