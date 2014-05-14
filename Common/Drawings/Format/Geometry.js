@@ -701,13 +701,10 @@ Geometry.prototype=
             case historyitem_GeometryAddAdj:
             {
                 this.gdLst[data.name] = parseInt(data.newVal);
-                this.gdLst[data.name] = true;
-                if(this.oldAvVal)
+                this.avLst[data.name] = true;
+                if(this.parent && this.parent.handleUpdateGeometry)
                 {
-                    if(this.parent && this.parent.handleUpdateGeometry)
-                    {
-                        this.parent.handleUpdateGeometry();
-                    }
+                    this.parent.handleUpdateGeometry();
                 }
                 break;
             }

@@ -1197,7 +1197,7 @@ CShape.prototype =
         var _text_rect_width = _r - _l;
         if (!_body_pr.upright) {
             if (!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270)) {
-                if (/*_content_height < _text_rect_height*/true) {
+                if (!this.bWordShape || _content_height < _text_rect_height) {
                     switch (_body_pr.anchor) {
                         case 0: //b
                         { // (Text Anchor Enum ( Bottom ))
@@ -1228,17 +1228,15 @@ CShape.prototype =
 
                 }
                 else {
-                    _vertical_shift = 0;
-
-                    //_vertical_shift =  _text_rect_height - _content_height;
-                    /*if(_body_pr.anchor === 0)
+                    _vertical_shift =  _text_rect_height - _content_height;
+                    if(_body_pr.anchor === 0)
                      {
-                     _vertical_shift =  _text_rect_height - _content_height;
+                        _vertical_shift =  _text_rect_height - _content_height;
                      }
                      else
                      {
-                     _vertical_shift = 0;
-                     } */
+                        _vertical_shift = 0;
+                     }
                 }
                 global_MatrixTransformer.TranslateAppend(_text_transform, 0, _vertical_shift);
                 if (_dx_lt_rb * _dy_t - _dy_lt_rb * _dx_t <= 0) {
@@ -1253,7 +1251,7 @@ CShape.prototype =
                 }
             }
             else {
-                if (/*_content_height < _text_rect_width*/true) {
+                if (!this.bWordShape || _content_height < _text_rect_width) {
                     switch (_body_pr.anchor) {
                         case 0: //b
                         { // (Text Anchor Enum ( Bottom ))
@@ -1283,15 +1281,14 @@ CShape.prototype =
                     }
                 }
                 else {
-                    _vertical_shift = 0;
-                    /*if(_body_pr.anchor === 0)
+                    if(_body_pr.anchor === 0)
                      {
-                     _vertical_shift =  _text_rect_width - _content_height;
+                        _vertical_shift =  _text_rect_width - _content_height;
                      }
                      else
                      {
-                     _vertical_shift = 0;
-                     }  */
+                        _vertical_shift = 0;
+                     }
                 }
                 global_MatrixTransformer.TranslateAppend(_text_transform, 0, _vertical_shift);
                 var _alpha;
@@ -1362,7 +1359,7 @@ CShape.prototype =
                 }
             }
 
-            if (/*_content_height < content_height2*/true) {
+            if (!this.bWordShape || _content_height < content_height2) {
                 switch (_body_pr.anchor) {
                     case 0: //b
                     { // (Text Anchor Enum ( Bottom ))
@@ -1392,15 +1389,14 @@ CShape.prototype =
                 }
             }
             else {
-                _vertical_shift = 0;
-                /*if(_body_pr.anchor === 0)
+                if(_body_pr.anchor === 0)
                  {
-                 _vertical_shift =  content_height2 - _content_height;
+                    _vertical_shift =  content_height2 - _content_height;
                  }
                  else
                  {
-                 _vertical_shift = 0;
-                 } */
+                    _vertical_shift = 0;
+                 }
             }
 
             var _text_rect_xc = _l + (_r - _l) * 0.5;
