@@ -2644,14 +2644,14 @@ FormatParser.prototype =
             value = value.replace(new RegExp(String.fromCharCode(0xA0), "g"));
         var rx_thouthand = this.aThouthandRegexp[cultureInfo.LCID];
         if (null == rx_thouthand) {
-            rx_thouthand = new RegExp("^(([ \\+\\-%\\$€£¥\\(]|" + escapeRegExp(cultureInfo.CurrencySymbol) + ")*)((\\d+(" + escapeRegExp(cultureInfo.NumberGroupSeparator) + "|\\d)*\\d+)?" + escapeRegExp(cultureInfo.NumberDecimalSeparator) + "?\\d*)(([ %\\)]|р.|" + escapeRegExp(cultureInfo.CurrencySymbol) + ")*)$");
+            rx_thouthand = new RegExp("^(([ \\+\\-%\\$€£¥\\(]|" + escapeRegExp(cultureInfo.CurrencySymbol) + ")*)((\\d+" + escapeRegExp(cultureInfo.NumberGroupSeparator) + "\\d+)*\\d*" + escapeRegExp(cultureInfo.NumberDecimalSeparator) + "?\\d*)(([ %\\)]|р.|" + escapeRegExp(cultureInfo.CurrencySymbol) + ")*)$");
             this.aThouthandRegexp[cultureInfo.LCID] = rx_thouthand;
         }
         var match = value.match(rx_thouthand);
         if (null != match) {
             var sBefore = match[1];
             var sVal = match[3];
-            var sAfter = match[6];
+            var sAfter = match[5];
 			var oChartCount = {};
 			if(null != sBefore)
 			    this._parseStringLetters(sBefore, cultureInfo.CurrencySymbol, true, oChartCount);
