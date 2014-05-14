@@ -4537,7 +4537,10 @@ ParaRun.prototype =
 
     Clear_TextPr : function()
     {
-        this.Set_Pr( new CTextPr() );
+        // Данная функция вызывается пока только при изменении стиля параграфа. Оставляем в этой ситуации язык неизмененным.        
+        var NewTextPr = new CTextPr();        
+        NewTextPr.Lang = this.Pr.Lang.Copy();        
+        this.Set_Pr( NewTextPr );
     },
 
     // В данной функции мы применяем приходящие настройки поверх старых, т.е. старые не удаляем

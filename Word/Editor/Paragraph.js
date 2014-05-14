@@ -14964,24 +14964,9 @@ Paragraph.prototype =
             // которые присутствуют в стиле. Пока мы удалим вообще все настроки.
             // TODO : переделать
 
-            if ( true !== Debug_ParaRunMode )
+            for ( var Index = 0; Index < this.Content.length; Index++ )
             {
-                for ( var Index = 0; Index < this.Content.length; Index++ )
-                {
-                    var Item = this.Content[Index];
-
-                    if ( para_TextPr === Item.Type )
-                    {
-                        Item.Clear_Style();
-                    }
-                }
-            }
-            else
-            {
-                for ( var Index = 0; Index < this.Content.length; Index++ )
-                {
-                    this.Content[Index].Clear_TextPr();
-                }
+                this.Content[Index].Clear_TextPr();
             }
         }
     },
