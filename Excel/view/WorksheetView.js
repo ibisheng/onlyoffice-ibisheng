@@ -3978,7 +3978,7 @@
 				.fillRect(0, y, w, this.height_1px);
 
 			return new asc_CMM({type: c_oAscMouseMoveType.ResizeRow, sizeCCOrPt: heightPt, sizePx: heightPt * 96 / 72,
-				x: y1, y: this.cellsLeft});
+				x: this.cellsLeft, y: y1});
 		};
 
 
