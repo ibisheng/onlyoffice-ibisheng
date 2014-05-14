@@ -82,7 +82,7 @@
 			}
 			this.isFormula = isFormula;
 
-			var item, isFirst, value;
+			var item, isFirst, value, selectElement = null;
 			for (var i = 0; i < arrItems.length; ++i) {
 				item = document.createElement("li");
 				isFirst = (0 === i);
@@ -90,10 +90,8 @@
 					this.firstElement = item;
 
 				if (this.isFormula) {
-					if (isFirst) {
-						this.selectElement = item;
-						item.className = "selected";
-					}
+					if (isFirst)
+						selectElement = item;
 
 					value = arrItems[i].name;
 					item.setAttribute("title", arrItems[i].arg);
@@ -130,6 +128,7 @@
 			// Для того, чтобы работал scroll
 			this.selectorListJQ.perfectScrollbar("update");
 
+			this._onChangeSelection(selectElement);
 		};
 		PopUpSelector.prototype.hide = function () {
 			if (this.isVisible) {
@@ -176,11 +175,11 @@
 					break;
 				case 38: // Up
 					this._onChangeSelection(null !== this.selectElement ?
-						this.selectElement.previousSibling : this.firstElement, -1);
+						this.selectElement.previousSibling : this.firstElement);
 					break;
 				case 40: // Down
 					this._onChangeSelection(null !== this.selectElement ?
-						this.selectElement.nextSibling : this.firstElement, +1);
+						this.selectElement.nextSibling : this.firstElement);
 					break;
 				case 16: // Shift
 					break;
@@ -200,11 +199,10 @@
 		PopUpSelector.prototype._onMouseDown = function (event) {
 			this.skipClose = true;
 			var element = event.currentTarget;
-			if (this.isFormula) {
+			if (this.isFormula)
 				this._onChangeSelection(element);
-			} else {
+			else
 				this._onInsert(element.getAttribute("val"));
-			}
 		};
 		PopUpSelector.prototype._onMouseDblClick = function (event) {
 			if (!this.isVisible)
@@ -223,21 +221,28 @@
 
 			this._onChangeSelection(event.currentTarget);
 		};
-		PopUpSelector.prototype._onChangeSelection = function (newElement, scrollDir) {
-			if (null === newElement)
+		PopUpSelector.prototype._onChangeSelection = function (newElement) {
+			if (null === newElement || null === newElement.getAttribute("val"))
 				return;
 
-			var height = 0;
-			if (null !== this.selectElement) {
-				height = this.selectElement.offsetHeight;
+			if (null !== this.selectElement)
 				this.selectElement.className = "";
-			}
 
 			this.selectElement = newElement;
 			this.selectElement.className = "selected";
 
-			if (scrollDir && height)
-				this.selectorListJQ.scrollTop(scrollDir * height);
+			this.scrollToRecord();
+		};
+
+		PopUpSelector.prototype.scrollToRecord = function () {
+			var innerEl = $(this.selectorList);
+			var inner_top = innerEl.offset().top;
+			var div = $(this.selectElement);
+			var div_top = div.offset().top;
+
+			if (div_top < inner_top || div_top+div.height() > inner_top + innerEl.height()) {
+				this.selectorListJQ.scrollTop(this.selectorListJQ.scrollTop() + div_top - inner_top);
+			}
 		};
 
 		/*
