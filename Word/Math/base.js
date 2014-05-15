@@ -1596,7 +1596,7 @@ CMathBase.prototype =
         while(start_x < this.nCol && start_y < this.nRow && (TextPr == null || this.elements[start_x][start_y].IsJustDraw() ))
         {
             if(!this.elements[start_x][start_y].IsJustDraw())
-                TextPr = this.elements[start_x][start_y].Get_CompiledTextPr(Copy);
+                TextPr = this.elements[start_x][start_y].Get_CompiledTextPr(Copy, true);
 
             start_y++;
 
@@ -1613,7 +1613,7 @@ CMathBase.prototype =
             {
                 if(!this.elements[i][j].IsJustDraw())
                 {
-                    var CurTextPr = this.elements[i][j].Get_CompiledPr(false);
+                    var CurTextPr = this.elements[i][j].Get_CompiledTextPr(false, true);
 
                     if ( null !== CurTextPr )
                         TextPr = TextPr.Compare( CurTextPr );

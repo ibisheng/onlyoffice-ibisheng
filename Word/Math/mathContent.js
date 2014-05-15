@@ -6235,7 +6235,7 @@ CMathContent.prototype =
 
         return TextPr;
     },
-    Get_CompiledTextPr : function(Copy)
+    Get_CompiledTextPr : function(Copy, bAll)
     {
         var TextPr = null;
 
@@ -6243,21 +6243,29 @@ CMathContent.prototype =
         {
             TextPr = this.Parent.getCtrPrp();
         }
-        else if ( true === this.bSelectionUse )
+        else if ( true === this.bSelectionUse || bAll == true)
         {
-            var StartPos = this.SelectStartPos;
-            var EndPos   = this.SelectEndPos;
-
-            if ( StartPos > EndPos )
+            var StartPos, EndPos;
+            if(true === this.bSelectionUse)
             {
-                StartPos = this.SelectEndPos;
-                EndPos   = this.SelectStartPos;
+                StartPos = this.SelectStartPos;
+                EndPos   = this.SelectEndPos;
+
+                if ( StartPos > EndPos )
+                {
+                    StartPos = this.SelectEndPos;
+                    EndPos   = this.SelectStartPos;
+                }
+            }
+            else
+            {
+                StartPos = 0;
+                EndPos = this.content.length - 1;
             }
 
             while ( null === TextPr && StartPos <= EndPos )
             {
                 TextPr = this.content[StartPos].Get_CompiledTextPr(Copy);
-
                 StartPos++;
             }
 

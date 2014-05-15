@@ -56,12 +56,12 @@ CNary.prototype.init = function(props)
     {
         var bIntegral = signCode > 0x222A && signCode < 0x2231;
 
-        var MPrp = this.Parent.Composition.GetMathPr();
+        //var MPrp = this.Parent.Composition.GetMathPr();
 
         if(bIntegral)
-            this.limLoc = MPrp.intLim;
+            this.limLoc = g_oMathSettings.intLim;
         else
-            this.limLoc = MPrp.naryLim;
+            this.limLoc = g_oMathSettings.naryLim;
     }
 
 

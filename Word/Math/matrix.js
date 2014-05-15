@@ -35,10 +35,11 @@ function CMathMatrix(props)
     this.column = 0;
     ////
 
-
     CMathBase.call(this);
 
-    CMathMatrix.superclass.init.call(this, props);
+    //CMathMatrix.init.call(this, props);
+
+    this.init(props);
     this.setCtrPrp(props.ctrPrp);
 }
 extend(CMathMatrix, CMathBase);
@@ -509,11 +510,11 @@ function CEqArray(props)
     this.maxDist = 0;
     this.objDist = 0;
 
-    this.init(props);
+    this.init_2(props);
     this.setCtrPrp(props.ctrPrp);
 }
 extend(CEqArray, CMathMatrix);
-CEqArray.prototype.init = function(props)
+CEqArray.prototype.init_2 = function(props)
 {
     var Pr =
     {
