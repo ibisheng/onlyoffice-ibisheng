@@ -7363,15 +7363,16 @@
 			return d;
 		};
 
-		WorksheetView.prototype.changeSelectionMoveResizeRangeHandle = function (x, y, targetInfo) {
+		WorksheetView.prototype.changeSelectionMoveResizeRangeHandle = function (x, y, targetInfo, editor) {
 			// Возвращаемый результат
-			if( !targetInfo )
+			if (!targetInfo)
 				return null;
-			var indexFormulaRange = targetInfo.indexFormulaRange, d, ret;
+			var indexFormulaRange = targetInfo.indexFormulaRange, d, newFormulaRange = null;
 			// Пересчитываем координаты
 			x *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIX() );
 			y *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIY() );
-			var ar = 0 == targetInfo.targetArr ? this.arrActiveFormulaRanges[indexFormulaRange].clone(true) : this.arrActiveChartsRanges[indexFormulaRange].clone(true);
+			var ar = 0 == targetInfo.targetArr ? this.arrActiveFormulaRanges[indexFormulaRange].clone(true) :
+				this.arrActiveChartsRanges[indexFormulaRange].clone(true);
 
 			// Колонка по X и строка по Y
 			var colByX = this._findColUnderCursor (x, /*canReturnNull*/false, /*dX*/false).col;
@@ -7379,12 +7380,11 @@
 
 			// Если мы только первый раз попали сюда, то копируем выделенную область
 			if (null === this.startCellMoveResizeRange) {
-				if( (targetInfo.cursor == kCurNEResize || targetInfo.cursor == kCurSEResize) /* && 0 == targetInfo.targetArr */ ){
+				if ((targetInfo.cursor == kCurNEResize || targetInfo.cursor == kCurSEResize)) {
 					this.startCellMoveResizeRange = ar.clone(true);
-					// this.startCellMoveResizeRange2 = asc_Range(this.startCellMoveResizeRange.c1, this.startCellMoveResizeRange.r1, this.startCellMoveResizeRange.c1, this.startCellMoveResizeRange.r1,true);
-					this.startCellMoveResizeRange2 = asc_Range(targetInfo.col, targetInfo.row, targetInfo.col, targetInfo.row,true);
-				}
-				else{
+					this.startCellMoveResizeRange2 = asc_Range(targetInfo.col, targetInfo.row,
+						targetInfo.col, targetInfo.row, true);
+				} else {
 					this.startCellMoveResizeRange = ar.clone(true);
 					if (colByX < ar.c1) { colByX = ar.c1; }
 					else if (colByX > ar.c2) { colByX = ar.c2; }
@@ -7399,80 +7399,75 @@
 			// this.cleanSelection();
 			this.overlayCtx.clear();
 
-			if( targetInfo.cursor == kCurNEResize || targetInfo.cursor == kCurSEResize ){
-				if( colByX < this.startCellMoveResizeRange2.c1 ){
+			if (targetInfo.cursor == kCurNEResize || targetInfo.cursor == kCurSEResize) {
+				if (colByX < this.startCellMoveResizeRange2.c1) {
 					ar.c2 = this.startCellMoveResizeRange2.c1;
 					ar.c1 = colByX;
-				}
-				else if( colByX > this.startCellMoveResizeRange2.c1 ){
+				} else if (colByX > this.startCellMoveResizeRange2.c1) {
 					ar.c1 = this.startCellMoveResizeRange2.c1;
 					ar.c2 = colByX;
-				}
-				else{
+				} else {
 					ar.c1 = this.startCellMoveResizeRange2.c1;
 					ar.c2 = this.startCellMoveResizeRange2.c1
 				}
 
-				if( rowByY < this.startCellMoveResizeRange2.r1 ){
-					if(this.visibleRange.r2 > ar.r2)
+				if (rowByY < this.startCellMoveResizeRange2.r1) {
+					if (this.visibleRange.r2 > ar.r2)
 						ar.r2 = this.startCellMoveResizeRange2.r2;
 					ar.r1 = rowByY;
-				}
-				else if( rowByY > this.startCellMoveResizeRange2.r1 ){
-					if(this.visibleRange.r1 < ar.r1)
+				} else if (rowByY > this.startCellMoveResizeRange2.r1) {
+					if (this.visibleRange.r1 < ar.r1)
 						ar.r1 = this.startCellMoveResizeRange2.r1;
 
-					if(this.visibleRange.r2 > ar.r2)
+					if (this.visibleRange.r2 > ar.r2)
 						ar.r2 = rowByY;
-				}
-				else{
+				} else {
 					ar.r1 = this.startCellMoveResizeRange2.r1;
 					ar.r2 = this.startCellMoveResizeRange2.r1;
 				}
-			}
-			else{
+			} else {
 				this.startCellMoveResizeRange.normalize();
 				var colDelta = colByX - this.startCellMoveResizeRange2.c1;
 				var rowDelta = rowByY - this.startCellMoveResizeRange2.r1;
 
-				ar.c1 = this.startCellMoveResizeRange.c1+colDelta;
+				ar.c1 = this.startCellMoveResizeRange.c1 + colDelta;
 				if (0 > ar.c1) {
 					colDelta -= ar.c1;
 					ar.c1 = 0;
 				}
-				ar.c2 = this.startCellMoveResizeRange.c2+colDelta;
+				ar.c2 = this.startCellMoveResizeRange.c2 + colDelta;
 
-				ar.r1 = this.startCellMoveResizeRange.r1+rowDelta;
+				ar.r1 = this.startCellMoveResizeRange.r1 + rowDelta;
 				if (0 > ar.r1) {
 					rowDelta -= ar.r1;
 					ar.r1 = 0;
 				}
-				ar.r2 = this.startCellMoveResizeRange.r2+rowDelta;
+				ar.r2 = this.startCellMoveResizeRange.r2 + rowDelta;
 
-				d = { deltaX : ar.c1 <= this.visibleRange.c1 ? ar.c1-this.visibleRange.c1 :
-																				ar.c2>=this.visibleRange.c2 ? ar.c2-this.visibleRange.c2 : 0,
-					  deltaY : ar.r1 <= this.visibleRange.r1 ? ar.r1-this.visibleRange.r1 :
-																				ar.r2>=this.visibleRange.r2 ? ar.r2-this.visibleRange.r2 : 0
-					}
+				d = {
+					deltaX : ar.c1 <= this.visibleRange.c1 ? ar.c1 - this.visibleRange.c1 :
+						ar.c2 >= this.visibleRange.c2 ? ar.c2 - this.visibleRange.c2 : 0,
+					deltaY : ar.r1 <= this.visibleRange.r1 ? ar.r1 - this.visibleRange.r1 :
+						ar.r2 >= this.visibleRange.r2 ? ar.r2 - this.visibleRange.r2 : 0};
 			}
 
-			if( 0 == targetInfo.targetArr ){
+			if (0 == targetInfo.targetArr) {
 				var _p = this.arrActiveFormulaRanges[indexFormulaRange].cursorePos,
-					_l = this.arrActiveFormulaRanges[indexFormulaRange].formulaRangeLength,
-					_a = this.arrActiveFormulaRanges[indexFormulaRange].isAbsolute;
+					_l = this.arrActiveFormulaRanges[indexFormulaRange].formulaRangeLength;
 				this.arrActiveFormulaRanges[indexFormulaRange] = ar.clone(true);
 				this.arrActiveFormulaRanges[indexFormulaRange].cursorePos = _p;
 				this.arrActiveFormulaRanges[indexFormulaRange].formulaRangeLength = _l;
-				this.arrActiveFormulaRanges[indexFormulaRange].isAbsolute = _a;
-				ret = this.arrActiveFormulaRanges[indexFormulaRange];
-			}
-			else{
+				newFormulaRange = this.arrActiveFormulaRanges[indexFormulaRange];
+			} else {
 				this.arrActiveChartsRanges[indexFormulaRange] = ar.clone(true);
 				this.moveRangeDrawingObjectTo = ar;
 			}
 			this._drawSelection();
 
-			return { ar: ret, d:d };
+			if (newFormulaRange)
+				editor.changeCellRange(newFormulaRange);
+
+			return d;
 		};
 
 		/* Функция для применения перемещения диапазона */
@@ -10427,37 +10422,6 @@
 			var s = t.getActiveRange(ar);
 
 			editor.enterCellRange(s);
-		};
-
-		WorksheetView.prototype.changeCellRange = function (editor, range){
-			var s = this.getActiveRange(range);
-			if( range.isAbsolute ){
-				var ra = range.isAbsolute.split(":"), _s;
-				if( ra.length >= 1 ){
-					var sa = s.split(":");
-					for( var ind = 0; ind < sa.length; ind++ ){
-						if( ra[ra.length>1?ind:0].indexOf("$") == 0 ){
-							sa[ind] = "$"+sa[ind];
-						}
-						if( ra[ra.length>1?ind:0].lastIndexOf("$") != 0 ){
-							for(var i = 0; i< sa[ind].length; i++){
-								if(sa[ind].charAt(i).match(/[0-9]/gi)){
-									_s = i;
-									break;
-								}
-							}
-							sa[ind] = sa[ind].substr(0,_s) + "$" +sa[ind].substr(_s,sa[ind].length);
-						}
-					}
-					s = "";
-					sa.forEach(function(e,i){
-						s += (i!=0?":":"");
-						s += e;
-					})
-				}
-			}
-			editor.changeCellRange(range, s);
-			return true;
 		};
 
 		WorksheetView.prototype.getActiveRange = function (ar) {

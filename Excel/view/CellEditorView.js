@@ -419,11 +419,11 @@
 			t._addChars(rangeStr, undefined, /*isRange*/true);
 		};
 
-		CellEditor.prototype.changeCellRange = function(range,rangeStr){
+		CellEditor.prototype.changeCellRange = function (range) {
 			var t = this;
 			t._moveCursor(kPosition, range.cursorePos/* -length */);
 			t._selectChars(kPositionLength, range.formulaRangeLength);
-			t._addChars(rangeStr, undefined, /*isRange*/true);
+			t._addChars(range.getName(), undefined, /*isRange*/true);
 			t._moveCursor(kEndOfText);
 		};
 
@@ -688,9 +688,6 @@
 				range = this._parseRangeStr(m[1]);
 				if (range) {
 					ret = true;
-					if (m[1].indexOf("$") > -1) {
-						range.isAbsolute = m[1];
-					}
 					range.cursorePos = m.input.indexOf(m[0])+1;
 					range.formulaRangeLength = m[1].length;
 					this.handlers.trigger("newRange", range);

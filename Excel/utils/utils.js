@@ -364,6 +364,11 @@
 			{
 				var range = arguments[0];
 				ActiveRange.superclass.constructor.call(this, range.c1, range.r1, range.c2, range.r2);
+				// ToDo стоит пересмотреть конструкторы.
+				this.r1Abs = range.r1Abs;
+				this.c1Abs = range.c1Abs;
+				this.r2Abs = range.r2Abs;
+				this.c2Abs = range.c2Abs;
 			}
 			else if(arguments.length > 1)
 				ActiveRange.superclass.constructor.apply(this, arguments);

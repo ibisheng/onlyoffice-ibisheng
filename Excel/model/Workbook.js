@@ -3476,7 +3476,7 @@ Woorksheet.prototype._BuildDependencies=function(cellRange){
 									oNewElem = new cArea(ref, elem.ws);
 							}
 							if ( ref.indexOf( "$" ) > -1 )
-								oNewElem.isAbsolute = true;
+								oNewElem.isAbsolute = true; // ToDo - пересмотреть этот параметр (есть в Range информация о абсолютной ссылке)
 							oNewFormula.outStack[pos.index] = oNewElem;
 						}
 						else

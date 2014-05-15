@@ -243,7 +243,6 @@
 															    return ret;
 														    },
 				    "enterCellRange":			function () {self.cellEditor.setFocus(false); self.getWorksheet().enterCellRange(self.cellEditor);},
-				    "changeCellRange":			function () {self.getWorksheet().changeCellRange(self.cellEditor)},
 				    "copy":						function () {self.copyToClipboard.apply(self, arguments);},
 				    "paste":					function () {self.pasteFromClipboard.apply(self, arguments);},
 				    "cut":						function () {self.cutToClipboard.apply(self, arguments);},
@@ -819,17 +818,13 @@
 
 		WorkbookView.prototype._onMoveResizeRangeHandle = function (x, y, target, callback) {
 			var ws = this.getWorksheet();
-			var res = ws.changeSelectionMoveResizeRangeHandle(x, y, target);
-			if(res){
-				if(0 == target.targetArr)
-					ws.changeCellRange(this.cellEditor,res.ar);
-				asc_applyFunction(callback, res.d);
-			}
+			var d = ws.changeSelectionMoveResizeRangeHandle(x, y, target, this.cellEditor);
+			asc_applyFunction(callback, d);
 		};
 
-		WorkbookView.prototype._onMoveResizeRangeHandleDone = function (target, callback) {
+		WorkbookView.prototype._onMoveResizeRangeHandleDone = function (target) {
 			var ws = this.getWorksheet();
-			var d = ws.applyMoveResizeRangeHandle(target);
+			ws.applyMoveResizeRangeHandle(target);
 		};
 		
 		// Frozen anchor
