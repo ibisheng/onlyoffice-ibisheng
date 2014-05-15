@@ -6177,8 +6177,10 @@
 		};
 
 		WorksheetView.prototype.getSelectionRangeValue = function () {
+			// ToDo стоит добавлять $ и проблема с выбором целого столбца/строки
 			var sListName = this.model.getName();
-			return sListName + "!" + this.getActiveRange(this.activeRange.clone(true));
+			var tmpRange = this.activeRange.clone(true);
+			return sListName + "!" + tmpRange.getName();
 		};
 
 		WorksheetView.prototype.getSelectionInfo = function (bExt) {
@@ -10425,18 +10427,7 @@
 				ar.c2 = ar.c1;
 			}
 
-			var s = t.getActiveRange(ar);
-
-			editor.enterCellRange(s);
-		};
-
-		WorksheetView.prototype.getActiveRange = function (ar) {
-			if (ar.c1 === ar.c2 && ar.r1 === ar.r2) {return this._getCellTitle(ar.c1, ar.r1);}
-			if (ar.c1 === ar.c2 && ar.r1 === 0 && ar.r2 === this.rows.length -1) {var ct = this._getColumnTitle(ar.c1); return ct + ":" + ct;}
-			if (ar.r1 === ar.r2 && ar.c1 === 0 && ar.c2 === this.cols.length -1) {var rt = this._getRowTitle(ar.r1); return rt + ":" + rt;}
-			if (ar.r1 === 0 && ar.r2 === gc_nMaxRow0 || ar.r1 === 1 && ar.r2 === gc_nMaxRow ){return this._getColumnTitle(ar.c1) + ":" + this._getColumnTitle(ar.c2);}
-			if (ar.c1 === 0 && ar.c2 === gc_nMaxCol0 || ar.c1 === 1 && ar.c2 === gc_nMaxCol ){return this._getRowTitle(ar.r1) + ":" + this._getRowTitle(ar.r2);}
-			return this._getCellTitle(ar.c1, ar.r1) + ":" + this._getCellTitle(ar.c2, ar.r2);
+			editor.enterCellRange(ar.getName());
 		};
 
 		WorksheetView.prototype.addFormulaRange = function (range) {
