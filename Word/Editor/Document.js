@@ -12667,8 +12667,19 @@ CDocument.prototype =
                 
                 RunPr.RFonts = rFonts;
                 
-                var Run = new CParaRun( Para );
+                var Run = new ParaRun( Para );
                 Run.Set_Pr( RunPr );
+
+                var Count = sText.length;
+                for ( var Index = 0; Index < Count; Index++ )
+                {
+                    var _char = sText.charAt(Index);
+                    if (" " == _char)
+                        Run.Add_ToContent( Index, new ParaSpace(1), false );
+                    else
+                        Run.Add_ToContent( Index, new ParaText(_char), false );
+                }
+
                 Para.Add( Run );
                 
                 this.Recalculate();

@@ -834,7 +834,7 @@ ParaRun.prototype =
         return this.Split2( CurPos );
     },
     
-    Split2 : function(Pos)
+    Split2 : function(CurPos)
     {
         // Создаем новый ран
         var NewRun = new ParaRun(this.Paragraph);
