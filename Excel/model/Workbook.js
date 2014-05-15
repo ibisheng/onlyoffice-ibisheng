@@ -838,7 +838,7 @@ Vertex.prototype = {
 		return this.cell;
 	}
 	
-}
+};
 
 function getVertexId(sheetId, cellId){
 	return sheetId + cCharDelimiter + cellId;
@@ -1214,7 +1214,7 @@ Workbook.prototype.insertWorksheet=function(index, sheet, cwf){
 	this.cwf[sheet.getId()] = cwf;
 	sheet._BuildDependencies(cwf.cells);
 	sortDependency(this);
-}
+};
 Workbook.prototype._insertWorksheetFormula=function(index){
 	if( index > 0 && index < this.aWorksheets.length - 1 ){
 		var oWsTo = this.aWorksheets[index - 1];
@@ -1235,7 +1235,7 @@ Workbook.prototype._insertWorksheetFormula=function(index){
 			}
 		}
 	}
-}
+};
 Workbook.prototype.replaceWorksheet=function(indexFrom, indexTo){
 	if(indexFrom >= 0 && indexFrom < this.aWorksheets.length &&
 		indexTo >= 0 && indexTo < this.aWorksheets.length){
@@ -3500,7 +3500,7 @@ Woorksheet.prototype._BuildDependencies=function(cellRange){
 			}
 		}
 	}
-}
+};
 function inCache(aCache, sFormula, aRefs)
 {
 	var oRes = null;
@@ -3650,7 +3650,7 @@ Woorksheet.prototype._RecalculatedFunctions=function(cell,bad){
 			adjustCellFormat(__cell,__cell.sFormula);
 		}
 	}
-}
+};
 Woorksheet.prototype._ReBuildFormulas=function(cellRange){
 	/*
 		Если существуют трехмерные ссылки на ячейки, то у них необходимо поменять имя листа на новое после переименования листа.
@@ -3664,20 +3664,20 @@ Woorksheet.prototype._ReBuildFormulas=function(cellRange){
 			c.setFormula(c.formulaParsed.assemble());
 		}
 	}
-}
+};
 Woorksheet.prototype.renameDependencyNodes = function(offset, oBBox, rec, noDelete){
 	this.workbook.dependencyFormulas.checkOffset(oBBox, offset, this.Id, noDelete);
-			}
+			};
 Woorksheet.prototype.getAllCol = function(){
 	if(null == this.oAllCol)
 		this.oAllCol = new Col(this, g_nAllColIndex);
 	return this.oAllCol;
-}
+};
 Woorksheet.prototype.getAllRow = function(){
 	if(null == this.oSheetFormatPr.oAllRow)
 		this.oSheetFormatPr.oAllRow = new Row(this);
 	return this.oSheetFormatPr.oAllRow;
-}
+};
 Woorksheet.prototype.getHyperlinkByCell = function(row, col){
 	var oHyperlink = this.hyperlinkManager.getByCell(row, col);
 	return oHyperlink ? oHyperlink.data : null;
@@ -3693,7 +3693,7 @@ Woorksheet.prototype._expandRangeByMergedAddToOuter = function(aOuter, range, aM
 		if(!range.containsRange(elem.bbox))
 			aOuter.push(elem);
 	}
-}
+};
 Woorksheet.prototype._expandRangeByMergedGetOuter = function(range){
 	var aOuter = [];
 	//смотрим только границы
@@ -3709,7 +3709,7 @@ Woorksheet.prototype._expandRangeByMergedGetOuter = function(range){
 		}
 	}
 	return aOuter;
-}
+};
 Woorksheet.prototype.expandRangeByMerged = function(range){
 	if(null != range)
 	{
@@ -4123,7 +4123,7 @@ Cell.prototype.setFontAlign=function(val){
         History.Add(g_oUndoRedoCell, historyitem_Cell_FontAlign, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
 	this.oValue.cleanCache();
-}
+};
 Cell.prototype.setAlignVertical=function(val){
 	var oRes = this.sm.setAlignVertical(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
@@ -4260,21 +4260,21 @@ Cell.prototype.moveVer=function(val){
 Cell.prototype.getOffset=function(cell){
 	var cAddr1 = this.oId, cAddr2 = cell.oId;
 	return {offsetCol:(cAddr1.col - cAddr2.col), offsetRow:(cAddr1.row - cAddr2.row)};
-}
+};
 Cell.prototype.getOffset2=function(cellId){
 	var cAddr1 = this.oId, cAddr2 = new CellAddress(cellId);
 	return {offsetCol:(cAddr1.col - cAddr2.col), offsetRow:(cAddr1.row - cAddr2.row)};
-}
+};
 Cell.prototype.getOffset3=function(cellAddr){
 	var cAddr1 = this.oId, cAddr2 = cellAddr;
 	return {offsetCol:(cAddr1.col - cAddr2.col), offsetRow:(cAddr1.row - cAddr2.row)};
-}
+};
 Cell.prototype.getCellAddress = function(){
 	return this.oId;
-}
+};
 Cell.prototype.getValueData = function(){
 	return new UndoRedoData_CellValueData(this.sFormula, this.oValue.clone(null));
-}
+};
 Cell.prototype.setValueData = function(Val){
 	//значения устанавляваются через setValue, чтобы пересчитались формулы
 	if(null != Val.formula)
@@ -4292,11 +4292,11 @@ Cell.prototype.setValueData = function(Val){
 	}
 	else
 		this.setValue("");
-}
+};
 Cell.prototype.setFormulaCA = function(ca){
 	if(ca) this.sFormulaCA = true;
 	else if( this.sFormulaCA ) this.sFormulaCA = null;
-}
+};
 //-------------------------------------------------------------------------------------------------
 
 /**
@@ -4579,7 +4579,7 @@ Range.prototype._getRangeType=function(oBBox){
 	if(null == oBBox)
 		oBBox = this.bbox;
 	return getRangeType(oBBox);
-}
+};
 Range.prototype._setProperty=function(actionRow, actionCol, actionCell){
 	var nRangeType = this._getRangeType();
 	if(c_oRangeType.Range == nRangeType)
@@ -4595,7 +4595,7 @@ Range.prototype._setProperty=function(actionRow, actionCol, actionCell){
 		// if(null != actionCol)
 			// this._foreachCol(actionCol, null);
 	}
-}
+};
 Range.prototype._setPropertyNoEmpty=function(actionRow, actionCol, actionCell){
 	var nRangeType = this._getRangeType();
 	if(c_oRangeType.Range == nRangeType)
@@ -4610,12 +4610,12 @@ Range.prototype._setPropertyNoEmpty=function(actionRow, actionCol, actionCell){
 		if(null != actionCol)
 			this._foreachColNoEmpty(actionCol, null);
 	}
-}
+};
 Range.prototype.containCell=function(cellId){
 	var cellAddress = cellId;
 	return 	cellAddress.getRow0() >= this.bbox.r1 && cellAddress.getCol0() >= this.bbox.c1 &&
 			cellAddress.getRow0() <= this.bbox.r2 && cellAddress.getCol0() <= this.bbox.c2;
-}
+};
 Range.prototype.cross = function(cellAddress){
 
 	if( cellAddress.getRow0() >= this.bbox.r1 && cellAddress.getRow0() <= this.bbox.r2 && this.bbox.c1 == this.bbox.c2)
@@ -4624,7 +4624,7 @@ Range.prototype.cross = function(cellAddress){
 		return {c:cellAddress.getCol()};
 
 	return undefined;
-}
+};
 Range.prototype.getWorksheet=function(){
 	return this.worksheet;
 };
@@ -4633,23 +4633,23 @@ Range.prototype.isFormula = function(){
 	var nCol = this.bbox.c1;
 	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
 	return cell.isFormula();
-}
+};
 Range.prototype.isOneCell=function(){
 	var oBBox = this.bbox;
 	return oBBox.r1 == oBBox.r2 && oBBox.c1 == oBBox.c2;
-}
+};
 Range.prototype.isColumn = function(){
 	if(this.first.getRow() == 1 && this.last.getRow() == gc_nMaxRow)
 		return true;
 	else
 		return false;
-}
+};
 Range.prototype.isRow = function(){
 	if(this.first.getCol() == 1 && this.last.getCol() == gc_nMaxCol)
 		return true;
 	else
 		return false;
-}
+};
 Range.prototype.getBBox=function(){
 	//1 - based
 	return {r1: this.bbox.r1 + 1, r2: this.bbox.r2 + 1, c1: this.bbox.c1 + 1, c2: this.bbox.c2 + 1};
@@ -4779,7 +4779,7 @@ Range.prototype.shiftNumFormat=function(nShift, aDigitsCount){
 		bRes |= cell.shiftNumFormat(nShift, aDigitsCount[nCol0 - nColStart] || 8);
 	});
 	return bRes;
-}
+};
 Range.prototype.setFont=function(val){
 	History.Create_NewPoint();
 	this.createCellOnRowColCross();
@@ -5111,7 +5111,7 @@ Range.prototype._setBorderMerge=function(bLeft, bTop, bRight, bBottom, oNewBorde
 	else
 		oRes = oTargetBorder;
 	return oRes;
-}
+};
 Range.prototype._setCellBorder=function(bbox, cell, oNewBorder){
 	if(null == oNewBorder)
 		cell.setBorder(oNewBorder);
@@ -5126,7 +5126,7 @@ Range.prototype._setCellBorder=function(bbox, cell, oNewBorder){
 		var nCol = cell.oId.getCol0();
 		cell.setBorder(this._setBorderMerge(nCol == bbox.c1, nRow == bbox.r1, nCol == bbox.c2, nRow == bbox.r2, oNewBorder, oCurBorder));
 	}
-}
+};
 Range.prototype._setRowColBorder=function(bbox, rowcol, bRow, oNewBorder){
 	if(null == oNewBorder)
 		rowcol.setBorder(oNewBorder);
@@ -5148,7 +5148,7 @@ Range.prototype._setRowColBorder=function(bbox, rowcol, bRow, oNewBorder){
 		}
 		rowcol.setBorder(this._setBorderMerge(bLeft, bTop, bRight, bBottom, oNewBorder, oCurBorder));
 	}
-}
+};
 Range.prototype._setBorderEdge=function(bbox, oItemWithXfs, nRow, nCol, oNewBorder){
 	var oCurBorder = null;
     if(null != oItemWithXfs.xfs && null != oItemWithXfs.xfs.border)
@@ -5193,7 +5193,7 @@ Range.prototype._setBorderEdge=function(bbox, oItemWithXfs, nRow, nCol, oNewBord
 				oItemWithXfs.setBorder(oTargetBorder);
 			}
 	}
-}
+};
 Range.prototype.setBorder=function(border){
 	//border = null очисть border
 	//"ih" - внутренние горизонтальные, "iv" - внутренние вертикальные
@@ -5485,7 +5485,7 @@ Range.prototype.getNumFormatStr=function(){
 };
 Range.prototype.getNumFormatType=function(){
 	return this.getNumFormat().getType();
-}
+};
 Range.prototype.getFont = function(){
 	var nRow = this.bbox.r1;
 	var nCol = this.bbox.c1;
@@ -5507,7 +5507,7 @@ Range.prototype.getFont = function(){
 			return col.xfs.font;
 	}
     return g_oDefaultFont;
-}
+};
 Range.prototype.getFontname=function(){
 	var nRow = this.bbox.r1;
 	var nCol = this.bbox.c1;
@@ -5996,7 +5996,7 @@ Range.prototype.getVerticalText=function(){
 			return g_nVerticalTextAngle == col.xfs.align.angle;
 	}
     return g_nVerticalTextAngle == g_oDefaultAlign.angle;
-}
+};
 Range.prototype.hasMerged=function(){
 	var aMerged = this.worksheet.mergeManager.get(this.bbox);
 	if(aMerged.all.length > 0)
@@ -6005,7 +6005,7 @@ Range.prototype.hasMerged=function(){
 };
 Range.prototype.mergeOpen=function(){
 	this.worksheet.mergeManager.add(this.bbox, 1);
-}
+};
 Range.prototype.merge=function(type){
 	if(null == type)
 		type = c_oAscMergeOptions.Merge;
@@ -7134,7 +7134,7 @@ Range.prototype.promoteFromTo=function(from, to){
 			}
 		}
 	}
-}
+};
 Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 	//todo отдельный метод для promote в таблицах и merge в таблицах
 	var oBBox = this.bbox;
@@ -7226,7 +7226,7 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 		History.SetSelectionRedo(oSelectionRedo);
 	}
 	this._promoteFromTo(oBBox, oPromoteAscRange, true, oCanPromote, bCtrl, bVertical, nIndex);
-}
+};
 Range.prototype._promoteFromTo=function(from, to, bIsPromote, oCanPromote, bCtrl, bVertical, nIndex){
 	lockDraw(this.worksheet.workbook);
     History.StartTransaction();
@@ -7600,7 +7600,7 @@ Range.prototype.createCellOnRowColCross=function(){
 			}
 		}, null);
 	}
-}
+};
 //-------------------------------------------------------------------------------------------------
 /**
  * @constructor
@@ -7620,7 +7620,7 @@ function PromoteHelper(bVerical, bReverse, bbox){
 		this.nColLength = this.bbox.r2 - this.bbox.r1 + 1;
 	else
 		this.nColLength = this.bbox.c2 - this.bbox.c1 + 1;
-};
+}
 PromoteHelper.prototype = {
 	add: function(nRow, nCol, nVal, bDelimiter, sPrefix, bDate, oAdditional){
 		if(this.bVerical)
@@ -7973,7 +7973,7 @@ function NameGenerator(wb){
 	this.aExistNames = {};
 	this.sTableNamePattern = "Table";
 	this.nTableNameMaxIndex = 0;
-};
+}
 NameGenerator.prototype = {
 	addName : function(sName){
 		this.aExistNames[sName] = 1;

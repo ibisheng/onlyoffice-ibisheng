@@ -990,7 +990,7 @@ function Num(val)
 		f: 0
 	};
 	this.f = val.f;
-};
+}
 Num.prototype =
 {
 	merge : function(num)
@@ -1191,7 +1191,7 @@ function Align(val)
 	this.angle = val.angle;
 	this.ver = val.ver;
 	this.wrap = val.wrap;
-};
+}
 Align.prototype =
 {
 	_mergeProperty : function(first, second, def)
@@ -4456,7 +4456,7 @@ function FilterColumns() {
 	this.CustomFiltersObj = null;
 }
 FilterColumns.prototype.clone = function() {
-	var i, res = new FilterColumns();
+	var res = new FilterColumns();
 	res.ColId = this.ColId;
 	res.CustomFiltersObj = this.CustomFiltersObj;
 	
