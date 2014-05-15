@@ -10429,7 +10429,7 @@
 			editor.enterCellRange(s);
 		};
 
-		WorksheetView.prototype.changeCellRange = function (editor,range){
+		WorksheetView.prototype.changeCellRange = function (editor, range){
 			var s = this.getActiveRange(range);
 			if( range.isAbsolute ){
 				var ra = range.isAbsolute.split(":"), _s;
@@ -10456,7 +10456,7 @@
 					})
 				}
 			}
-			editor.changeCellRange(range,s);
+			editor.changeCellRange(range, s);
 			return true;
 		};
 

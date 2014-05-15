@@ -665,32 +665,8 @@
 		};
 
 		CellEditor.prototype._parseRangeStr = function (s) {
-			var p, range, ca1, ca2;
-
-			p = s.replace(/\$/g, "").split(":");
-			if (p.length > 1) {
-				ca1 = new CellAddress(p[0]);
-				ca2 = new CellAddress(p[1]);
-				if (!ca1 || !ca1.isValid() || !ca2 || !ca2.isValid()) { return null; }
-				range = asc.Range(ca1.getCol0(), ca1.getRow0(), ca2.getCol0(), ca2.getRow0());
-				if (range.r2 === gc_nMaxRow0) {              // range вида A:C
-					range.r1 = 0;
-					range.type = c_oAscSelectionType.RangeCol;
-				} else if (range.c2 === gc_nMaxCol0) {       // range вида 1:5
-					range.c1 = 0;
-					range.type = c_oAscSelectionType.RangeRow;
-				} else {                                     // range вида A1:C5
-					range.type = c_oAscSelectionType.RangeCells;
-				}
-			} else {                                       // range вида A1
-				ca1 = new CellAddress(p[0]);
-				if (!ca1 || !ca1.isValid()) { return null; }
-				range = asc.Range(ca1.getCol0(), ca1.getRow0(), ca1.getCol0(), ca1.getRow0());
-				range.type = c_oAscSelectionType.RangeCells;
-			}
-			range.startCol = range.c1;
-			range.startRow = range.r1;
-			return range;
+			var range = asc.g_oRangeCache.getActiveRange(s);
+			return range ? range.clone() : null;
 		};
 
 		CellEditor.prototype._parseFormulaRanges = function () {
@@ -712,7 +688,7 @@
 				range = this._parseRangeStr(m[1]);
 				if (range) {
 					ret = true;
-					if( m[1].indexOf("$") > -1 ){
+					if (m[1].indexOf("$") > -1) {
 						range.isAbsolute = m[1];
 					}
 					range.cursorePos = m.input.indexOf(m[0])+1;
