@@ -1425,6 +1425,8 @@ function CLanguageFontSelect()
     this.CodePage1Mask = 0;
     this.CodePage2Mask = 0;
     this.DefaultFont = "Arial";
+
+    this.FullSupportPages = false;
 }
 
 CLanguageFontSelect.prototype =
@@ -1447,12 +1449,17 @@ var LanguagesFontSelectTypes =
     Arabic      : 1,
     Korean      : 2,
     Japan       : 3,
-    Chinese     : 4
+    Chinese     : 4,
+
+    EastAsiaStart   : this.Korean,
+    EastAsiaEnd     : this.Chinese
 };
 
 function CFontSelectList()
 {
     this.List = new Array();
+    this.ListMap = {};
+
     this.Languages = [];
 
     this.m_pRanges = null;
@@ -1487,6 +1494,7 @@ CFontSelectList.prototype =
             var _fs = new CFontSelect();
             _fs.fromStream(_file_stream);
             this.List.push(_fs);
+            this.ListMap[_fs.m_wsFontPath] = this.List.length - 1;
         }
 
         // add languages
@@ -1508,7 +1516,21 @@ CFontSelectList.prototype =
         _arabic_lang.DefaultFont = "Tahoma";
         this.Languages.push(_arabic_lang);
 
-        // 2) japan
+        // 2) korean
+        var _korean_lang = new CLanguageFontSelect();
+        _korean_lang.Type = LanguagesFontSelectTypes.Korean;
+        _korean_lang.Ranges.push(0x1100);
+        _korean_lang.Ranges.push(0x11FF);
+        _korean_lang.Ranges.push(0x3130);
+        _korean_lang.Ranges.push(0x318F);
+        _korean_lang.Ranges.push(0xAC00);
+        _korean_lang.Ranges.push(0xD7AF);
+        _korean_lang.CodePage1Mask = (1 << 19);
+        _korean_lang.CodePage2Mask = 0;
+        _korean_lang.DefaultFont = "Batang";
+        this.Languages.push(_korean_lang);
+
+        // 3) japan
         var _japan_lang = new CLanguageFontSelect();
         _japan_lang.Type = LanguagesFontSelectTypes.Japan;
         _japan_lang.Ranges.push(0x4E00);
@@ -1528,9 +1550,10 @@ CFontSelectList.prototype =
         _japan_lang.CodePage1Mask = (1 << 17) | (1 << 30);
         _japan_lang.CodePage2Mask = 0;
         _japan_lang.DefaultFont = "MS Mincho";
+        _japan_lang.FullSupportPages = true;
         this.Languages.push(_japan_lang);
 
-        // 3) chinese http://stackoverflow.com/questions/1366068/whats-the-complete-range-for-chinese-characters-in-unicode
+        // 4) chinese http://stackoverflow.com/questions/1366068/whats-the-complete-range-for-chinese-characters-in-unicode
         var _chinese_lang = new CLanguageFontSelect();
         _chinese_lang.Type = LanguagesFontSelectTypes.Chinese;
         _chinese_lang.Ranges.push(0x4E00);
@@ -1547,20 +1570,6 @@ CFontSelectList.prototype =
         _chinese_lang.CodePage2Mask = 0;
         _chinese_lang.DefaultFont = "SimSun";
         this.Languages.push(_chinese_lang);
-
-        // 4) korean
-        var _korean_lang = new CLanguageFontSelect();
-        _korean_lang.Type = LanguagesFontSelectTypes.Korean;
-        _korean_lang.Ranges.push(0x1100);
-        _korean_lang.Ranges.push(0x11FF);
-        _korean_lang.Ranges.push(0x3130);
-        _korean_lang.Ranges.push(0x318F);
-        _korean_lang.Ranges.push(0xAC00);
-        _korean_lang.Ranges.push(0xD7AF);
-        _korean_lang.CodePage1Mask = (1 << 19);
-        _korean_lang.CodePage2Mask = 0;
-        _korean_lang.DefaultFont = "Batang";
-        this.Languages.push(_korean_lang);
 
         // debug!!!
         /*
@@ -1687,6 +1696,121 @@ CFontSelectList.prototype =
             return LanguagesFontSelectTypes.Unknown;
 
         return _array_detect_languages[_len - 1];
+    },
+
+    checkPasteText : function(textPr, langId)
+    {
+        if (!textPr.RFonts)
+            return false;
+
+        var _lang = null;
+        for (var i = 0; i < this.Languages.length; i++)
+        {
+            _lang = this.Languages[i];
+            if (_lang.Type == langId)
+            {
+                break;
+            }
+        }
+        if (null == _lang)
+        {
+            // такого быть не должно
+            return false;
+        }
+
+        var _fontSlot = fontslot_ASCII;
+
+        if (langId >= LanguagesFontSelectTypes.EastAsiaStart && langId <= LanguagesFontSelectTypes.EastAsiaEnd)
+            _fontSlot = fontslot_EastAsia;
+
+        if (langId == LanguagesFontSelectTypes.Arabic)
+        {
+            if (textPr.CS || textPr.RTL)
+                _fontSlot = fontslot_CS;
+        }
+
+        var _fontFamily = undefined;
+        var bold    = undefined;
+        var italic  = undefined;
+        switch (_fontSlot)
+        {
+            case fontslot_ASCII:
+            {
+                _fontFamily = textPr.RFonts.Ascii;
+                bold    = textPr.Bold;
+                italic  = textPr.Italic;
+                break;
+            }
+            case fontslot_HAnsi:
+            {
+                _fontFamily = textPr.RFonts.HAnsi;
+                bold    = textPr.Bold;
+                italic  = textPr.Italic;
+                break;
+            }
+            case fontslot_CS:
+            {
+                _fontFamily = textPr.RFonts.CS;
+                bold    = textPr.BoldCS;
+                italic  = textPr.ItalicCS;
+                break;
+            }
+            case fontslot_EastAsia:
+            {
+                _fontFamily = textPr.RFonts.EastAsia;
+                bold    = textPr.Bold;
+                italic  = textPr.Italic;
+                break;
+            }
+            default:
+                break;
+        }
+
+        if (undefined == _fontFamily)
+            return false;
+
+        var _info = window.g_font_infos[window.g_map_font_index[_fontFamily.Name]];
+
+        var oFontStyle = FontStyle.FontStyleRegular;
+        if (!italic && bold)
+            oFontStyle = FontStyle.FontStyleBold;
+        else if (italic && !bold)
+            oFontStyle = FontStyle.FontStyleItalic;
+        else if (italic && bold)
+            oFontStyle = FontStyle.FontStyleBoldItalic;
+
+        var _id = _info.GetFontID(window.g_font_loader, oFontStyle);
+        var _select = this.List[this.ListMap[_id.id]];
+
+        var _bIsNeed = false;
+        if (0 != _lang.CodePage1Mask)
+        {
+            if (!_lang.FullSupportPages)
+            {
+                if (0 == (_lang.CodePage1Mask & _select.m_ulCodePageRange1))
+                    _bIsNeed = true;
+            }
+            else
+            {
+                if (_lang.CodePage1Mask != (_lang.CodePage1Mask & _select.m_ulCodePageRange1))
+                    _bIsNeed = true;
+            }
+        }
+        if (0 != _lang.CodePage2Mask)
+        {
+            if (!_lang.FullSupportPages)
+            {
+                if (0 == (_lang.CodePage2Mask & _select.m_ulCodePageRange2))
+                    _bIsNeed = true;
+            }
+            else
+            {
+                if (_lang.CodePage2Mask != (_lang.CodePage2Mask & _select.m_ulCodePageRange2))
+                    _bIsNeed = true;
+            }
+        }
+
+        return _bIsNeed;
     },
 
     checkText2 : function(text)

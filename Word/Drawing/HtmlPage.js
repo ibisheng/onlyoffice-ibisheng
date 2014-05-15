@@ -3902,8 +3902,9 @@ function CEditorPage(api)
         this.TextBoxInput.style.top = "-1000px";
         this.TextBoxInputFocus = false;
 
-        /*
         var _language = g_fontSelections.checkText(oThis.TextBoxInput.value);
+
+        /*
         switch (_language)
         {
             case LanguagesFontSelectTypes.Arabic:
@@ -3936,11 +3937,30 @@ function CEditorPage(api)
                 console.log("error");
                 break;
             }
-        }
-        */
+        }*/
 
-        oThis.m_oLogicDocument.TextBox_Put(oThis.TextBoxInput.value);
-        this.ReinitTB();
+        if (_language == LanguagesFontSelectTypes.Unknown)
+        {
+            oThis.m_oLogicDocument.TextBox_Put(oThis.TextBoxInput.value);
+            this.ReinitTB();
+        }
+        else
+        {
+            var _textPr = oThis.m_oLogicDocument.Get_Paragraph_TextPr();
+
+            if (g_fontSelections.checkPasteText(_textPr, _language))
+            {
+                // ждем коллбэка
+                // TODO:
+                oThis.m_oLogicDocument.TextBox_Put(oThis.TextBoxInput.value);
+                this.ReinitTB();
+            }
+            else
+            {
+                oThis.m_oLogicDocument.TextBox_Put(oThis.TextBoxInput.value);
+                this.ReinitTB();
+            }
+        }
     }
     this.CheckTextBoxInputPos = function()
     {
