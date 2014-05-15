@@ -885,7 +885,7 @@ function CRadical(props)
 {
     this.kind = MATH_RADICAL;
 
-    this.type = SQUARE_RADICAL; // default
+    this.type = DEGREE_RADICAL; // default
     this.degHide = false;
     this.signRadical = null;
 

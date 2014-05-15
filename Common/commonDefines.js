@@ -330,3 +330,53 @@ var c_oAscWrapStyle = {
 	Inline:0,
 	Flow : 1
 };
+
+// math
+var c_oAscLimLoc = {
+    SubSup: 0x00,
+    UndOvr: 0x01
+};
+var c_oAscMathJc = {
+    Center: 0x00,
+    CenterGroup: 0x01,
+    Left: 0x02,
+    Right: 0x03
+};
+var c_oAscTopBot = {
+    Bot: 0x00,
+    Top: 0x01
+};
+var c_oAscScript = {
+    DoubleStruck: 0x00,
+    Fraktur: 0x01,
+    Monospace: 0x02,
+    Roman: 0x03,
+    SansSerif: 0x04,
+    Script: 0x05
+};
+var c_oAscShp = {
+    Centered: 0x00,
+    Match: 0x01
+};
+var c_oAscSty = {
+    Bold: 0x00,
+    BoldItalic: 0x01,
+    Italic: 0x02,
+    Plain: 0x03
+};
+var c_oAscFType = {
+    Bar: 0x00,
+    Lin: 0x01,
+    NoBar: 0x02,
+    Skw: 0x03
+};
+var c_oAscBrkBin = {
+    After: 0x00,
+    Before: 0x01,
+    Repeat: 0x02
+};
+var c_oAscBrkBinSub = {
+    PlusMinus: 0x00,
+    MinusPlus: 0x01,
+    MinusMinus: 0x02
+};

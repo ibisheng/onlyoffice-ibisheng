@@ -1,7 +1,7 @@
 /**
  * Created by Ilja.Kirillov on 18.03.14.
  */
-
+var g_oMathSettings = new Object();
 function ParaMath(bAddMenu)
 {
     this.Id = g_oIdCounter.Get_NewId();
