@@ -2576,7 +2576,7 @@ CShape.prototype =
 
     hitInTextRect: function (x, y) {
         var tx_body = this.bWordShape ? this : this.txBody;
-        var content = this.getDocContent();
+        var content = this.getDocContent && this.getDocContent();
         if (isRealObject(tx_body) && content) {
 
             var t_x, t_y;
