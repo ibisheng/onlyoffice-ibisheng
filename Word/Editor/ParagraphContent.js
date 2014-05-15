@@ -2047,7 +2047,7 @@ ParaTextPr.prototype =
                 if ( true != Reader.GetBool() )
                 {
                     var unifill = new CUniFill();
-                    unifill.Read_FromBinary(r);
+                    unifill.Read_FromBinary(Reader);
                     this.Value.Unifill = unifill;
                 }
                 else
