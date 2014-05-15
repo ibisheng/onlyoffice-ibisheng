@@ -17,6 +17,19 @@
 		function PopUpSelector(element, handlers) {
 			this.handlers		= new asc_HL(handlers);
 
+			this.scrollOptions = {
+				wheelSpeed			: 20,
+				wheelPropagation	: false,
+				minScrollbarLength	: 50,
+				useBothWheelAxes	: false,
+				useKeyboard			: true,
+				suppressScrollX		: false,
+				suppressScrollY		: false,
+				scrollXMarginOffset	: 5,
+				scrollYMarginOffset	: 5,
+				includePadding		: true
+			};
+
 			this.element		= element;
 			this.selector		= null;
 			this.selectorStyle	= null;
@@ -70,7 +83,7 @@
 
 				// Для того, чтобы работал scroll
 				this.selectorListJQ = $('#apiPopUpList');
-				this.selectorListJQ.perfectScrollbar({minScrollbarLength: 50});
+				this.selectorListJQ.perfectScrollbar(this.scrollOptions);
 			}
 		};
 		PopUpSelector.prototype.show = function (isFormula, arrItems, cellRect) {
