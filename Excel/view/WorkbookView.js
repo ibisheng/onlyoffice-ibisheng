@@ -571,7 +571,6 @@
 		WorkbookView.prototype._onSetSelection = function (range, validRange) {
 			var ws = this.getWorksheet();
 			ws._checkSelectionShape();
-			ws.setActiveRangeObj(range);
 			var d = ws.setSelectionUndoRedo(range, validRange);
 			if (d) {
 				if (d.deltaX) {this.controller.scrollHorizontal(d.deltaX);}

@@ -1856,7 +1856,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			// Переход на диапазон в листе
 			_asc_setWorksheetRange: function (val) {
 				// Получаем sheet по имени
-				var ws = this.wbModel.getWorksheetByName (val.asc_getSheet());
+				var ws = this.wbModel.getWorksheetByName(val.asc_getSheet());
 				if (!ws || ws.getHidden())
 					return;
 				// Индекс листа
@@ -1868,9 +1868,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					// Посылаем эвент о смене активного листа
 					this.handlers.trigger ("asc_onActiveSheetChanged", sheetIndex);
 				}
-				var range = ws.getRange2 (val.asc_getRange());
+				var range = ws.getRange2(val.asc_getRange());
 				if (null !== range) {
-					this.wb._onSetSelection (range.getBBox0(), /*validRange*/ true);
+					this.wb._onSetSelection(range.getBBox0(), /*validRange*/ true);
 				}
 			},
 

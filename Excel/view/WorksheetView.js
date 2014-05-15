@@ -6427,9 +6427,6 @@
 		WorksheetView.prototype.getActiveRangeObj = function (){
 			return this.activeRange.clone(true);
 		};
-		WorksheetView.prototype.setActiveRangeObj = function (val){
-			this.activeRange = val.clone();
-		};
 		WorksheetView.prototype.setSelection = function (range, validRange) {
 			// Проверка на валидность range.
 			if (validRange && (range.c2 >= this.nColsCount || range.r2 >= this.nRowsCount)) {
@@ -6470,21 +6467,20 @@
 		};
 
 		WorksheetView.prototype.setSelectionUndoRedo = function (range, validRange) {
+			var ar = this.activeRange = (range instanceof asc_ActiveRange) ? range.clone() : new asc_ActiveRange(range);
+
 			// Проверка на валидность range.
-			if (validRange && (range.c2 >= this.nColsCount || range.r2 >= this.nRowsCount)) {
-				if (range.c2 >= this.nColsCount)
-					this.expandColsOnScroll(false, true, range.c2 + 1);
-				if (range.r2 >= this.nRowsCount)
-					this.expandRowsOnScroll(false, true, range.r2 + 1);
+			if (validRange && (ar.c2 >= this.nColsCount || ar.r2 >= this.nRowsCount)) {
+				if (ar.c2 >= this.nColsCount)
+					this.expandColsOnScroll(false, true, ar.c2 + 1);
+				if (ar.r2 >= this.nRowsCount)
+					this.expandRowsOnScroll(false, true, ar.r2 + 1);
 			}
 			var oRes = null;
 			var type = this.activeRange.type;
-			if(type == c_oAscSelectionType.RangeCells || type == c_oAscSelectionType.RangeCol ||
-				type == c_oAscSelectionType.RangeRow || type == c_oAscSelectionType.RangeMax)
-			{
-				this.cleanSelection();
-
-				this._drawSelection();
+			if (type == c_oAscSelectionType.RangeCells || type == c_oAscSelectionType.RangeCol ||
+				type == c_oAscSelectionType.RangeRow || type == c_oAscSelectionType.RangeMax) {
+				this.updateSelection();
 
 				this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
 				this.handlers.trigger("selectionChanged", this.getSelectionInfo());
