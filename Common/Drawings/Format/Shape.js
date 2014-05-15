@@ -367,8 +367,9 @@ CShape.prototype =
 
     createTextBoxContent: function()
     {
-        this.setBodyPr(new CBodyPr());
-        this.bodyPr.setAnchor(1);
+        var body_pr = new CBodyPr();
+        body_pr.setAnchor(1);
+        this.setBodyPr(body_pr);
         this.setTextBoxContent(new CDocumentContent(this, this.getDrawingDocument(), 0, 0, 0, 20000, false, false));
         this.textBoxContent.Set_ParagraphAlign(align_Center);
         this.textBoxContent.Content[0].Set_DocumentIndex(0);
@@ -3952,9 +3953,17 @@ CShape.prototype =
             case historyitem_ShapeSetTextBoxContent:
             case historyitem_ShapeSetParent:
             case historyitem_ShapeSetGroup:
-            case historyitem_ShapeSetBodyPr:
             {
                 writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_ShapeSetBodyPr:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                   data.newPr.Write_ToBinary(w);
+                }
                 break;
             }
             case historyitem_ShapeSetWordShape:
@@ -3969,10 +3978,10 @@ CShape.prototype =
 
     Load_Changes: function (r)
     {
-        if (r.GetLong() === this.getObjecType())
+        if (r.GetLong() === this.getObjectType())
         {
             var type = r.GetLong();
-            switch (r.GetLong())
+            switch (type)
             {
                 case historyitem_AutoShapes_RemoveFromDrawingObjects:
                 {
@@ -4044,7 +4053,15 @@ CShape.prototype =
                 }
                 case historyitem_ShapeSetBodyPr:
                 {
-                    this.bodyPr = readObject(r);
+                    if(r.GetBool())
+                    {
+                        this.bodyPr = new CBodyPr();
+                        this.bodyPr.Read_FromBinary(r);
+                    }
+                    else
+                    {
+                        this.bodyPr = null;
+                    }
                     break;
                 }
                 case historyitem_ShapeSetWordShape:

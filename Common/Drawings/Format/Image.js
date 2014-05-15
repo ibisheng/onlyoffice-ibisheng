@@ -1006,7 +1006,6 @@ CImageShape.prototype =
             }
             case historyitem_ImageShapeSetNvPicPr:
             case historyitem_ImageShapeSetSpPr:
-            case historyitem_ImageShapeSetBlipFill:
             case historyitem_ImageShapeSetParent:
             case historyitem_ImageShapeSetGroup:
             {
@@ -1015,7 +1014,17 @@ CImageShape.prototype =
             }
             case historyitem_ShapeSetBDeleted:
             {
-                writeBool(w, data.oldPr);
+                writeBool(w, data.newPr);
+                break;
+            }
+
+            case historyitem_ImageShapeSetBlipFill:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    data.newPr.Write_ToBinary(w);
+                }
                 break;
             }
         }
@@ -1069,9 +1078,38 @@ CImageShape.prototype =
                 this.spPr = readObject(r);
                 break;
             }
+
             case historyitem_ImageShapeSetBlipFill:
             {
-                this.blipFill = readObject(r);
+                if(r.GetBool())
+                {
+                    this.blipFill = new CBlipFill();
+                    r.GetLong();
+                    this.blipFill.Read_FromBinary(r);
+                    if(typeof CollaborativeEditing !== "undefined")
+                    {
+                        if(typeof this.blipFill.RasterImageId === "string" && this.blipFill.RasterImageId.length > 0)
+                        {
+                            var full_image_src_func;
+                            if(!editor.isDocumentEditor && typeof getFullImageSrc === "function")
+                            {
+                                full_image_src_func = getFullImageSrc;
+                            }
+                            else if(typeof _getFullImageSrc === "function")
+                            {
+                                full_image_src_func = _getFullImageSrc;
+                            }
+                            if(full_image_src_func)
+                            {
+                                CollaborativeEditing.Add_NewImage(full_image_src_func(this.blipFill.RasterImageId));
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    this.blipFill = null;
+                }
                 break;
             }
             case historyitem_ImageShapeSetParent:

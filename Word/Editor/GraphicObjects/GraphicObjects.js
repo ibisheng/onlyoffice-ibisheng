@@ -1373,7 +1373,7 @@ CGraphicObjects.prototype =
 
     isSelectedText: function()
     {
-        return isRealObject(this.selection.textSelection || this.selection.groupSelection && this.selection.groupSelection.textSelection);
+        return isRealObject(this.selection.textSelection || this.selection.groupSelection && this.selection.groupSelection.selection.textSelection);
     },
 
     selectAll: DrawingObjectsController.prototype.selectAll,
@@ -1701,6 +1701,7 @@ CGraphicObjects.prototype =
         para_drawing.Set_GraphicObject(group);
 
         var page_index = objects_for_grouping[0].parent.pageIndex;
+        var first_paragraph = objects_for_grouping[0].parent.Get_ParentParagraph();
         var nearest_pos = this.document.Get_NearestPos(objects_for_grouping[0].parent.pageIndex, common_bounds.minX, common_bounds.minY, true, para_drawing);
         parent_paragraph = nearest_pos.Paragraph;
         for(j = 0; j < check_paragraphs.length; ++j)
@@ -1711,23 +1712,23 @@ CGraphicObjects.prototype =
         if(j === check_paragraphs.length)
             check_paragraphs.push(parent_paragraph);
 
-        if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : check_paragraphs, CheckType : changestype_Paragraph_Content}))
+//        if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : check_paragraphs, CheckType : changestype_Paragraph_Content}))
         {
             for(i = 0; i < objects_for_grouping.length; ++i)
             {
                 objects_for_grouping[i].parent.Remove_FromDocument(false);
             }
             para_drawing.Set_XYForAdd( common_bounds.minX,  common_bounds.minY, nearest_pos, objects_for_grouping[0].parent.pageIndex);
-            para_drawing.Add_ToDocument(nearest_pos, false);
+            para_drawing.Add_ToDocument2(first_paragraph);
             this.addGraphicObject(para_drawing);
             this.resetSelection();
             this.selectObject(group, page_index);
             this.document.Recalculate();
         }
-        else
-        {
-            this.document.Document_Undo();
-        }
+       // else
+       // {
+       //     this.document.Document_Undo();
+       // }
     },
 
     getParentParagraphsFromArr: function(drawings)
@@ -2361,7 +2362,7 @@ CGraphicObjects.prototype =
         {
             case historyitem_ChangeColorScheme:
             {
-                data.newScheme.Write_ToBinary2(w);
+                data.newScheme.Write_ToBinary(w);
                 break;
             }
         }
@@ -2378,9 +2379,18 @@ CGraphicObjects.prototype =
             case historyitem_ChangeColorScheme:
             {
                 var clr_scheme = new ClrScheme();
-                clr_scheme.Read_FromBinary2(r);
-                this.document.theme.themeElements.clrScheme =clr_scheme;
+                clr_scheme.Read_FromBinary(r);
+                this.document.theme.themeElements.clrScheme = clr_scheme;
                 this.drawingDocument.CheckGuiControlColors();
+                for(var i = 0; i < this.drawingObjects.length; ++i)
+                {
+                    if(this.drawingObjects[i].GraphicObj)
+                    {
+
+                        this.drawingObjects[i].GraphicObj.handleUpdateFill();
+                        this.drawingObjects[i].GraphicObj.handleUpdateLn();
+                    }
+                }
                 break;
             }
         }

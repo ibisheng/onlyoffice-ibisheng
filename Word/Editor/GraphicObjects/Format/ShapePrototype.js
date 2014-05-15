@@ -767,15 +767,14 @@ CShape.prototype.setStartPage = function(pageIndex)
                 this.recalculateText();
             }
         }
-
-        if(this.spTree)
+    }
+    if(this.spTree)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
         {
-            for(var i = 0; i < this.spTree.length; ++i)
+            if(this.spTree[i].setStartPage)
             {
-                if(this.spTree[i].setStartPage)
-                {
-                    this.spTree[i].setStartPage(pageIndex);
-                }
+                this.spTree[i].setStartPage(pageIndex);
             }
         }
     }

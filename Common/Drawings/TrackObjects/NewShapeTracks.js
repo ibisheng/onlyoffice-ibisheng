@@ -356,26 +356,28 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
             shape.spPr.setGeometry(CreateGeometry("rect"));
             shape.spPr.geometry.setParent(shape.spPr);
             shape.setStyle(CreateDefaultTextRectStyle());
-            shape.spPr.setFill(new CUniFill());
-            var fill = shape.spPr.Fill;
+
+            var fill = new CUniFill();
             fill.setFill(new CSolidFill());
             fill.fill.setColor(new CUniColor());
             fill.fill.color.setColor(new CSchemeColor());
             fill.fill.color.color.setId(12);
+            shape.spPr.setFill(fill);
 
-            shape.spPr.setLn(new CLn());
-            var ln = shape.spPr.ln;
+            var ln = new CLn();
             ln.setW(6350);
             ln.setFill(new CUniFill());
             ln.Fill.setFill(new CSolidFill());
             ln.Fill.fill.setColor(new CUniColor());
             ln.Fill.fill.color.setColor(new CPrstColor());
             ln.Fill.fill.color.color.setId("black");
+            shape.spPr.setLn(ln);
             if(bFromWord)
             {
                 shape.setTextBoxContent(new CDocumentContent(shape, DrawingDocument, 0, 0, 0, 0, false, false, false));
-                shape.setBodyPr(new CBodyPr());
-                shape.bodyPr.setDefault();
+                var body_pr = new CBodyPr();
+                body_pr.setDefault();
+                shape.setBodyPr(body_pr);
             }
             else
             {
@@ -383,8 +385,9 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
                 var content = new CDocumentContent(shape.txBody, DrawingDocument, 0, 0, 0, 0, false, false, true);
                 shape.txBody.setParent(shape);
                 shape.txBody.setContent(content);
-                shape.txBody.setBodyPr(new CBodyPr());
-                shape.txBody.bodyPr.setDefault();
+                var body_pr = new CBodyPr();
+                body_pr.setDefault();
+                shape.txBody.setBodyPr(body_pr);
             }
         }
         else
@@ -394,8 +397,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
             shape.setStyle(CreateDefaultShapeStyle());
             if(this.arrowsCount > 0)
             {
-                shape.spPr.setLn(new CLn());
-                var ln = shape.spPr.ln;
+                var ln = new CLn();
                 ln.setTailEnd(new EndArrow());
                 ln.tailEnd.setType(LineEndType.Arrow);
                 ln.tailEnd.setLen(LineEndSize.Mid);
@@ -405,6 +407,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
                     ln.headEnd.setType(LineEndType.Arrow);
                     ln.headEnd.setLen(LineEndSize.Mid);
                 }
+                shape.spPr.setLn(ln);
             }
         }
         return shape;

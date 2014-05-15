@@ -372,6 +372,16 @@ CWrapPolygon.prototype =
 
     },
 
+    checkBottomNaN: function(arr)
+    {
+        for(var i = 0; i < arr.length; ++i)
+        {
+            if(isNaN(arr[i].Y1))
+                return true;
+        }
+        return false;
+    },
+
     isRect: function()
     {
         if(this.arrPoints.length === 4)
@@ -766,22 +776,6 @@ CWrapPolygon.prototype =
         this.bottom = this.localBottom + y;
     },
 
-    updateSizes: function(kw, kh)
-    {
-        if(!this.edited)
-            return;
-        else
-        {
-            History.Add(this, {Type: historyitem_UpdateWrapSizes, kw: kw, kh: kh});
-            for(var i = 0; i < this.relativeArrPoints.length; ++i)
-            {
-                var p = this.relativeArrPoints[i];
-                p.x *= kw;
-                p.y *= kh;
-            }
-            this.calculateRelToAbs(this.wordGraphicObject.getTransformMatrix());
-        }
-    },
 
     Undo: function(data)
     {
@@ -1016,70 +1010,6 @@ CWrapManager.prototype =
         return arr_intervals;
     }
 };
-
-function CTrackWrapPolygon(originalWrapPolygon, pointNum)
-{
-    this.originalWrapPolygon = originalWrapPolygon;
-    this.pointNum = pointNum;
-    this.curPage = originalWrapPolygon.wordGraphicObject.pageIndex;
-    var arr_points = this.originalWrapPolygon.arrPoints;
-    if(this.pointNum === 0)
-    {
-        this.point1 = arr_points[arr_points.length - 1];
-        this.point2 = arr_points[1];
-    }
-    else if(this.pointNum === arr_points.length - 1)
-    {
-        this.point1 = arr_points[arr_points.length - 2];
-        this.point2 = arr_points[0];
-    }
-    else
-    {
-        this.point1 = arr_points[this.pointNum - 1];
-        this.point2 = arr_points[this.pointNum + 1];
-    }
-
-    this.curPosX = arr_points[this.pointNum].x;
-    this.curPosY = arr_points[this.pointNum].y;
-
-    this.matrix = new CMatrix();
-
-    this.track = function(x, y)
-    {
-        this.curPosX = x;
-        this.curPosY = y;
-    };
-
-    this.draw = function(overlay)
-    {
-        overlay.SetCurrentPage(this.curPage);
-        overlay.DrawEditWrapPointsTrackLines([this.point1, {x: this.curPosX, y: this.curPosY}, this.point2], this.matrix);
-        overlay.ds();
-    };
-
-    this.trackEnd = function()
-    {
-        var point = this.originalWrapPolygon.arrPoints[this.pointNum];
-        var data = {Type: historyitem_ChangePolygon};
-        var wrap_polygon = this.originalWrapPolygon;
-        data.oldEdited = wrap_polygon.edited;
-        data.oldRelArr = [];
-        for(var i = 0; i < wrap_polygon.relativeArrPoints.length; ++i)
-        {
-            data.oldRelArr[i] = {x: wrap_polygon.relativeArrPoints[i].x, y: wrap_polygon.relativeArrPoints[i].y};
-        }
-        point.x = this.curPosX;
-        point.y = this.curPosY;
-        this.originalWrapPolygon.edited = true;
-        this.originalWrapPolygon.calculateAbsToRel(this.originalWrapPolygon.wordGraphicObject.getTransformMatrix());
-        data.newRelArr = [];
-        for(i = 0; i < wrap_polygon.relativeArrPoints.length; ++i)
-        {
-            data.newRelArr[i] = {x: wrap_polygon.relativeArrPoints[i].x, y: wrap_polygon.relativeArrPoints[i].y};
-        }
-        History.Add(wrap_polygon, data);
-    };
-}
 
 function TrackNewPointWrapPolygon(originalObject, point1)
 {

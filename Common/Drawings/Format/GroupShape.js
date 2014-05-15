@@ -4,9 +4,9 @@ function CGroupShape(parent)
 {
 
     this.nvGrpSpPr = null;
-    this.spPr      = new CSpPr();
+    this.spPr      = null;
     this.spTree    = [];
-    this.parent   = null;
+    this.parent    = null;
     this.group     = null;
 
 
@@ -1868,6 +1868,12 @@ CGroupShape.prototype =
                 break;
             }
 
+            case historyitem_GroupShapeSetSpPr:
+            {
+                this.spPr = data.oldPr;
+                break;
+            }
+
             case historyitem_GroupShapeAddToSpTree:
             {
                 for(var i = this.spTree.length - 1; i > -1; --i)
@@ -1927,6 +1933,12 @@ CGroupShape.prototype =
             case historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = data.newPr;
+                break;
+            }
+
+            case historyitem_GroupShapeSetSpPr:
+            {
+                this.spPr = data.newPr;
                 break;
             }
             case historyitem_GroupShapeAddToSpTree:
@@ -2007,6 +2019,7 @@ CGroupShape.prototype =
             case historyitem_GroupShapeSetGroup:
             case historyitem_GroupShapeSetNvGrpSpPr:
             case historyitem_GroupShapeSetParent:
+            case historyitem_GroupShapeSetSpPr:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -2014,7 +2027,7 @@ CGroupShape.prototype =
 
             case historyitem_ShapeSetBDeleted:
             {
-                writeBool(w, data.oldPr);
+                writeBool(w, data.newPr);
                 break;
             }
         }
@@ -2094,6 +2107,12 @@ CGroupShape.prototype =
                         this.spTree.splice(i, 1);
                     }
                 }
+                break;
+            }
+
+            case historyitem_GroupShapeSetSpPr:
+            {
+                this.spPr = readObject(r);
                 break;
             }
         }

@@ -3841,7 +3841,6 @@ CCatAx.prototype =
 
     Redo: function(data)
     {
-
         switch(data.Type)
         {
             case historyitem_CatAxSetAuto:
@@ -3965,10 +3964,239 @@ CCatAx.prototype =
 
     Save_Changes: function(data, w)
     {
+        w.WriteLong(data.Type);
+        switch(data.Type)
+        {
+            case historyitem_CatAxSetAuto:
+            {
+                writeBool(w, data.newPr);
+                break;
+            }
+            case historyitem_CatAxSetAxId:
+            {
+                writeString(w, data.newPr);
+                break;
+            }
+            case historyitem_CatAxSetAxPos:
+            {
+                writeLong(w, data.newPr);
+                break;
+            }
+            case historyitem_CatAxSetCrossAx:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_CatAxSetCrosses:
+            {
+                writeLong(w, data.newPr);
+                break;
+            }
+            case historyitem_CatAxSetCrossesAt:
+            {
+                writeDouble(w, data.newPr);
+                break;
+            }
+            case historyitem_CatAxSetDelete:
+            {
+                writeBool(w, data.newPr);
+                break;
+            }
+            case historyitem_CatAxSetLblAlgn:
+            {
+                writeLong(w, data.newPr);
+                break;
+            }
+            case historyitem_CatAxSetLblOffset:
+            {
+                writeLong(w, data.newPr);
+                break;
+            }
+            case historyitem_CatAxSetMajorGridlines:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_CatAxSetMajorTickMark:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_CatAxSetMinorGridlines:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_CatAxSetMinorTickMark:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_CatAxSetNoMultiLvlLbl:
+            {
+                writeBool(w, data.newPr);
+                break;
+            }
+            case historyitem_CatAxSetNumFmt:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_CatAxSetScaling:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_CatAxSetSpPr:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_CatAxSetTickLblPos:
+            {
+                writeLong(w, data.newPr);
+                break;
+            }
+            case historyitem_CatAxSetTickLblSkip:
+            {
+                writeLong(w, data.newPr);
+                break;
+            }
+            case historyitem_CatAxSetTickMarkSkip:
+            {
+                writeLong(w, data.newPr);
+                break;
+            }
+            case historyitem_CatAxSetTitle:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_CatAxSetTxPr:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+        }
     },
 
-    Load_Changes: function()
-    {}
+    Load_Changes: function(r)
+    {
+        var type = r.GetLong();
+        switch(type)
+        {
+            case historyitem_CatAxSetAuto:
+            {
+                this.auto = readBool(r);
+                break;
+            }
+            case historyitem_CatAxSetAxId:
+            {
+                this.axId = readString(r);
+                break;
+            }
+            case historyitem_CatAxSetAxPos:
+            {
+                this.axPos = readLong(r);
+                break;
+            }
+            case historyitem_CatAxSetCrossAx:
+            {
+                this.crossAx = readObject(r);
+                break;
+            }
+            case historyitem_CatAxSetCrosses:
+            {
+                this.crosses = readLong(r);
+                break;
+            }
+            case historyitem_CatAxSetCrossesAt:
+            {
+                this.crossesAt = readDouble(r);
+                break;
+            }
+            case historyitem_CatAxSetDelete:
+            {
+                this.bDelete = readBool(r);
+                break;
+            }
+            case historyitem_CatAxSetLblAlgn:
+            {
+                this.lblAlgn = readLong(r);
+                break;
+            }
+            case historyitem_CatAxSetLblOffset:
+            {
+                this.lblOffset = readLong(r);
+                break;
+            }
+            case historyitem_CatAxSetMajorGridlines:
+            {
+                this.majorGridlines = readObject(r);
+                break;
+            }
+            case historyitem_CatAxSetMajorTickMark:
+            {
+                this.majorTickMark = readObject(r);
+                break;
+            }
+            case historyitem_CatAxSetMinorGridlines:
+            {
+                this.majorGridlines = readObject(r);
+                break;
+            }
+            case historyitem_CatAxSetMinorTickMark:
+            {
+                this.minorTickMark = readObject(r);
+                break;
+            }
+            case historyitem_CatAxSetNoMultiLvlLbl:
+            {
+                this.noMultiLvlLbl = readBool(r);
+                break;
+            }
+            case historyitem_CatAxSetNumFmt:
+            {
+                this.numFmt = readObject(r);
+                break;
+            }
+            case historyitem_CatAxSetScaling:
+            {
+                this.scaling = readObject(r);
+                break;
+            }
+            case historyitem_CatAxSetSpPr:
+            {
+                this.spPr = readObject(r);
+                break;
+            }
+            case historyitem_CatAxSetTickLblPos:
+            {
+                this.tickLblPos = readLong(r);
+                break;
+            }
+            case historyitem_CatAxSetTickLblSkip:
+            {
+                this.tickLblSkip = readLong(r);
+                break;
+            }
+            case historyitem_CatAxSetTickMarkSkip:
+            {
+                this.tickMarkSkip = readLong(r);
+                break;
+            }
+            case historyitem_CatAxSetTitle:
+            {
+                this.title = readObject(r);
+                break;
+            }
+            case historyitem_CatAxSetTxPr:
+            {
+                this.txPr = readObject(r);
+                break;
+            }
+        }
+    }
 };
 
 
@@ -4456,11 +4684,249 @@ CDateAx.prototype =
         }
     },
 
-    Save_Changes: function(w)
-    {},
+    Save_Changes: function(data, w)
+    {
+        switch(data.Type)
+        {
+            case historyitem_DateAxAuto:
+            {
+                writeBool(w, data.newPr);
+                break;
+            }
+            case historyitem_DateAxAxId:
+            {
+                writeString(w, data.newPr);
+                break;
+            }
+            case historyitem_DateAxAxPos:
+            {
+                writeLong(w, data.newPr);
+                break;
+            }
+            case historyitem_DateAxBaseTimeUnit:
+            {
+                writeDouble(w, data.newPr);
+                break;
+            }
+            case historyitem_DateAxCrossAx:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_DateAxCrosses:
+            {
+                writeLong(w, data.newPr);
+                break;
+            }
+            case historyitem_DateAxCrossesAt:
+            {
+                writeDouble(w, data.newPr);
+                break;
+            }
+            case historyitem_DateAxDelete:
+            {
+                writeBool(w, data.newPr);
+                break;
+            }
+            case historyitem_DateAxLblOffset:
+            {
+                writeLong(w, data.newPr);
+                break;
+            }
+            case historyitem_DateAxMajorGridlines:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_DateAxMajorTickMark:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_DateAxMajorTimeUnit:
+            {
+                writeDouble(w, data.newPr);
+                break;
+            }
+            case historyitem_DateAxMajorUnit:
+            {
+                writeDouble(w, data.newPr);
+                break;
+            }
+            case historyitem_DateAxMinorGridlines:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_DateAxMinorTickMark:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_DateAxMinorTimeUnit:
+            {
+                writeDouble(w, data.newPr);
+                break;
+            }
+            case historyitem_DateAxMinorUnit:
+            {
+                writeDouble(w, data.newPr);
+                break;
+            }
+            case historyitem_DateAxNumFmt:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_DateAxScaling:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_DateAxSpPr:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_DateAxTickLblPos:
+            {
+                writeLong(w, data.newPr);
+                break;
+            }
+            case historyitem_DateAxTitle:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_DateAxTxPr:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+        }
+    },
 
     Load_Changes: function(r)
-    {}
+    {
+        switch(data.Type)
+        {
+            case historyitem_DateAxAuto:
+            {
+                this.auto = readBool(r);
+                break;
+            }
+            case historyitem_DateAxAxId:
+            {
+                this.axId = readString(r);
+                break;
+            }
+            case historyitem_DateAxAxPos:
+            {
+                this.axPos = readLong(r);
+                break;
+            }
+            case historyitem_DateAxBaseTimeUnit:
+            {
+                this.baseTimeUnit = readDouble(r);
+                break;
+            }
+            case historyitem_DateAxCrossAx:
+            {
+                this.crossAx = readObject(r);
+                break;
+            }
+            case historyitem_DateAxCrosses:
+            {
+                this.crosses = readLong(r);
+                break;
+            }
+            case historyitem_DateAxCrossesAt:
+            {
+                this.crossesAt = readDouble(r);
+                break;
+            }
+            case historyitem_DateAxDelete:
+            {
+                this.bDelete = readBool(r);
+                break;
+            }
+            case historyitem_DateAxLblOffset:
+            {
+                this.lblOffset = readLong(r);
+                break;
+            }
+            case historyitem_DateAxMajorGridlines:
+            {
+                this.majorGridlines = readObject(r);
+                break;
+            }
+            case historyitem_DateAxMajorTickMark:
+            {
+                this.majorTickMark = readObject(r);
+                break;
+            }
+            case historyitem_DateAxMajorTimeUnit:
+            {
+                this.majorTimeUnit = readDouble(r);
+                break;
+            }
+            case historyitem_DateAxMajorUnit:
+            {
+                this.majorUnit = readDouble(r);
+                break;
+            }
+            case historyitem_DateAxMinorGridlines:
+            {
+                this.minorGridlines = readObject(r);
+                break;
+            }
+            case historyitem_DateAxMinorTickMark:
+            {
+                this.minorTickMark = readObject(r);
+                break;
+            }
+            case historyitem_DateAxMinorTimeUnit:
+            {
+                this.minorTimeUnit = readDouble(r);
+                break;
+            }
+            case historyitem_DateAxMinorUnit:
+            {
+                this.minorUnit = readDouble(r);
+                break;
+            }
+            case historyitem_DateAxNumFmt:
+            {
+                this.numFmt = readObject(r);
+                break;
+            }
+            case historyitem_DateAxScaling:
+            {
+                this.scaling = readObject(r);
+                break;
+            }
+            case historyitem_DateAxSpPr:
+            {
+                this.spPr = readObject(r);
+                break;
+            }
+            case historyitem_DateAxTickLblPos:
+            {
+                this.tickLblPos = readLong(r);
+                break;
+            }
+            case historyitem_DateAxTitle:
+            {
+                this.title = readObject(r);
+                break;
+            }
+            case historyitem_DateAxTxPr:
+            {
+                this.txPr = readObject(r);
+                break;
+            }
+        }
+    }
 };
 
 function CSerAx()
@@ -4586,7 +5052,7 @@ CSerAx.prototype =
     },
     setMinorGridlines: function(pr)
     {
-        History.Add(this, {Type: historyitem_SerAxSetMajorGridlines, oldPr: this.majorGridlines, newPr: pr});
+        History.Add(this, {Type: historyitem_SerAxSetMinorGridlines, oldPr: this.majorGridlines, newPr: pr});
         this.majorGridlines = pr;
     },
     setMinorTickMark: function(pr)
@@ -4635,23 +5101,406 @@ CSerAx.prototype =
         this.txPr = pr;
     },
 
-    Undo: function()
-    {},
+    Undo: function(data)
+    {
+        switch (data.Type)
+        {
+            case historyitem_SerAxSetAxId:
+            {
+                this.axId = data.oldPr;
+                break;
+            }
+            case historyitem_SerAxSetAxPos:
+            {
+                this.axPos = data.oldPr;
+                break;
+            }
+            case historyitem_SerAxSetCrossAx:
+            {
+                this.crossAx = data.oldPr;
+                break;
+            }
+            case historyitem_SerAxSetCrosses:
+            {
+                this.crosses = data.oldPr;
+                break;
+            }
+            case historyitem_SerAxSetCrossesAt:
+            {
+                this.crossesAt = data.oldPr;
+                break;
+            }
+            case historyitem_SerAxSetDelete:
+            {
+                this.bDelete = data.oldPr;
+                break;
+            }
+            case historyitem_SerAxSetMajorGridlines:
+            {
+                this.majorGridlines = data.oldPr;
+                break;
+            }
+            case historyitem_SerAxSetMajorTickMark:
+            {
+                this.majorTickMark = data.oldPr;
+                break;
+            }
+            case historyitem_SerAxSetMinorGridlines:
+            {
+                this.minorGridlines = data.oldPr;
+                break;
+            }
+            case historyitem_SerAxSetMinorTickMark:
+            {
+                this.minorTickMark = data.oldPr;
+                break;
+            }
+            case historyitem_SerAxSetNumFmt:
+            {
+                this.numFmt = data.oldPr;
+                break;
+            }
+            case historyitem_SerAxSetScaling:
+            {
+                this.scaling = data.oldPr;
+                break;
+            }
+            case historyitem_SerAxSetSpPr:
+            {
+                this.spPr = data.oldPr;
+                break;
+            }
+            case historyitem_SerAxSetTickLblPos:
+            {
+                this.tickLblPos = data.oldPr;
+                break;
+            }
+            case historyitem_SerAxSetTickLblSkip:
+            {
+                this.tickLblSkip = data.oldPr;
+                break;
+            }
+            case historyitem_SerAxSetTickMarkSkip:
+            {
+                this.tickMarkSkip = data.oldPr;
+                break;
+            }
+            case historyitem_SerAxSetTitle:
+            {
+                this.title = data.oldPr;
+                break;
+            }
+            case historyitem_SerAxSetTxPr:
+            {
+                this.txPr = data.oldPr;
+                break;
+            }
+        }
+    },
 
-    Redo: function()
-    {},
+    Redo: function(data)
+    {
+        switch (data.Type)
+        {
+            case historyitem_SerAxSetAxId:
+            {
+                this.axId = data.newPr;
+                break;
+            }
+            case historyitem_SerAxSetAxPos:
+            {
+                this.axPos = data.newPr;
+                break;
+            }
+            case historyitem_SerAxSetCrossAx:
+            {
+                this.crossAx = data.newPr;
+                break;
+            }
+            case historyitem_SerAxSetCrosses:
+            {
+                this.crosses = data.newPr;
+                break;
+            }
+            case historyitem_SerAxSetCrossesAt:
+            {
+                this.crossesAt = data.newPr;
+                break;
+            }
+            case historyitem_SerAxSetDelete:
+            {
+                this.bDelete = data.newPr;
+                break;
+            }
+            case historyitem_SerAxSetMajorGridlines:
+            {
+                this.majorGridlines = data.newPr;
+                break;
+            }
+            case historyitem_SerAxSetMajorTickMark:
+            {
+                this.majorTickMark = data.newPr;
+                break;
+            }
+            case historyitem_SerAxSetMinorGridlines:
+            {
+                this.minorGridlines = data.newPr;
+                break;
+            }
+            case historyitem_SerAxSetMinorTickMark:
+            {
+                this.minorTickMark = data.newPr;
+                break;
+            }
+            case historyitem_SerAxSetNumFmt:
+            {
+                this.numFmt = data.newPr;
+                break;
+            }
+            case historyitem_SerAxSetScaling:
+            {
+                this.scaling = data.newPr;
+                break;
+            }
+            case historyitem_SerAxSetSpPr:
+            {
+                this.spPr = data.newPr;
+                break;
+            }
+            case historyitem_SerAxSetTickLblPos:
+            {
+                this.tickLblPos = data.newPr;
+                break;
+            }
+            case historyitem_SerAxSetTickLblSkip:
+            {
+                this.tickLblSkip = data.newPr;
+                break;
+            }
+            case historyitem_SerAxSetTickMarkSkip:
+            {
+                this.tickMarkSkip = data.newPr;
+                break;
+            }
+            case historyitem_SerAxSetTitle:
+            {
+                this.title = data.newPr;
+                break;
+            }
+            case historyitem_SerAxSetTxPr:
+            {
+                this.txPr = data.newPr;
+                break;
+            }
+        }
+    },
 
 
     Write_ToBinary2: function(w)
-    {},
+    {
+        w.WriteLong(this.getObjectType());
+        w.WriteString2(this.Get_Id());
+    },
 
-    Read_FrommBinary2: function()
-    {},
-    Save_Changes: function()
-    {},
+    Read_FrommBinary2: function(r)
+    {
+        this.Id = r.GetString2();
+    },
+    Save_Changes: function(data, w)
+    {
+        w.WriteLong(data.Type);
+        switch (data.Type)
+        {
+            case historyitem_SerAxSetAxId:
+            {
+                writeString(w, data.newPr);
+                break;
+            }
+            case historyitem_SerAxSetAxPos:
+            {
+                writeLong(w, data.newPr);
+                break;
+            }
+            case historyitem_SerAxSetCrossAx:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_SerAxSetCrosses:
+            {
+                writeLong(w, data.newPr);
+                break;
+            }
+            case historyitem_SerAxSetCrossesAt:
+            {
+                writeDouble(w, data.newPr);
+                break;
+            }
+            case historyitem_SerAxSetDelete:
+            {
+                writeBool(w,data.newPr);
+                break;
+            }
+            case historyitem_SerAxSetMajorGridlines:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_SerAxSetMajorTickMark:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_SerAxSetMinorGridlines:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_SerAxSetMinorTickMark:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_SerAxSetNumFmt:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_SerAxSetScaling:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_SerAxSetSpPr:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_SerAxSetTickLblPos:
+            {
+                writeLong(w, daya.newPr);
+                break;
+            }
+            case historyitem_SerAxSetTickLblSkip:
+            {
+                writeLong(w, data.newPr);
+                break;
+            }
+            case historyitem_SerAxSetTickMarkSkip:
+            {
+                writeLong(w, data.newPr);
+                break;
+            }
+            case historyitem_SerAxSetTitle:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_SerAxSetTxPr:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+        }
+    },
 
-    Load_Changes: function()
-    {}
+    Load_Changes: function(r)
+    {
+        var type = r.GetLong();
+        switch (type)
+        {
+            case historyitem_SerAxSetAxId:
+            {
+                this.axId = readString(r);
+                break;
+            }
+            case historyitem_SerAxSetAxPos:
+            {
+                this.axPos = readLong(r);
+                break;
+            }
+            case historyitem_SerAxSetCrossAx:
+            {
+                this.crossAx = readObject(r);
+                break;
+            }
+            case historyitem_SerAxSetCrosses:
+            {
+                this.crosses = readLong(r);
+                break;
+            }
+            case historyitem_SerAxSetCrossesAt:
+            {
+                this.crossesAt = readDouble(r);
+                break;
+            }
+            case historyitem_SerAxSetDelete:
+            {
+                this.bDelete = readDouble(r);
+                break;
+            }
+            case historyitem_SerAxSetMajorGridlines:
+            {
+                this.majorGridlines = readObject(r);
+                break;
+            }
+            case historyitem_SerAxSetMajorTickMark:
+            {
+                this.majorTickMark = readObject(r);
+                break;
+            }
+            case historyitem_SerAxSetMinorGridlines:
+            {
+                this.minorGridlines = readObject(r);
+                break;
+            }
+            case historyitem_SerAxSetMinorTickMark:
+            {
+                this.minorTickMark = readObject(r);
+                break;
+            }
+            case historyitem_SerAxSetNumFmt:
+            {
+                this.numFmt = readObject(r);
+                break;
+            }
+            case historyitem_SerAxSetScaling:
+            {
+                this.scaling = readObject(r);
+                break;
+            }
+            case historyitem_SerAxSetSpPr:
+            {
+                this.spPr = readObject(r);
+                break;
+            }
+            case historyitem_SerAxSetTickLblPos:
+            {
+                this.tickLblPos = readLong(r);
+                break;
+            }
+            case historyitem_SerAxSetTickLblSkip:
+            {
+                this.tickLblSkip = readLong(r);
+                break;
+            }
+            case historyitem_SerAxSetTickMarkSkip:
+            {
+                this.tickMarkSkip = readLong(r);
+                break;
+            }
+            case historyitem_SerAxSetTitle:
+            {
+                this.title = readObject(r);
+                break;
+            }
+            case historyitem_SerAxSetTxPr:
+            {
+                this.txPr = readObject(r);;
+                break;
+            }
+        }
+    }
 };
 
 
@@ -4855,18 +5704,436 @@ CValAx.prototype =
         this.txPr = pr;
     },
 
-    Undo: function()
-    {},
+    Undo: function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_ValAxSetAxId:
+            {
+                this.axId = data.oldPr;
+                break;
+            }
+            case historyitem_ValAxSetAxPos:
+            {
+                this.axPos = data.oldPr;
+                break;
+            }
+            case historyitem_ValAxSetCrossAx:
+            {
+                this.crossAx = data.oldPr;
+                break;
+            }
+            case historyitem_ValAxSetCrossBetween:
+            {
+                this.crossBetween = data.oldPr;
+                break;
+            }
+            case historyitem_ValAxSetCrosses:
+            {
+                this.crosses = data.oldPr;
+                break;
+            }
+            case historyitem_ValAxSetCrossesAt:
+            {
+                this.crossesAt = data.oldPr;
+                break;
+            }
+            case historyitem_ValAxSetDelete:
+            {
+                this.bDelete = data.oldPr;
+                break;
+            }
+            case historyitem_ValAxSetDispUnits:
+            {
+                this.dispUnits = data.oldPr;
+                break;
+            }
+            case historyitem_ValAxSetMajorGridlines:
+            {
+                this.majorGridlines = data.oldPr;
+                break;
+            }
+            case historyitem_ValAxSetMajorTickMark:
+            {
+                this.majorTickMark = data.oldPr;
+                break;
+            }
+            case historyitem_ValAxSetMajorUnit:
+            {
+                this.majorUnit = data.oldPr;
+                break;
+            }
+            case historyitem_ValAxSetMinorGridlines:
+            {
+                this.minorGridlines = data.oldPr;
+                break;
+            }
+            case historyitem_ValAxSetMinorTickMark:
+            {
+                this.minorTickMark = data.oldPr;
+                break;
+            }
+            case historyitem_ValAxSetMinorUnit:
+            {
+                this.minorUnit = data.oldPr;
+                break;
+            }
+            case historyitem_ValAxSetNumFmt:
+            {
+                this.numFmt = data.oldPr;
+                break;
+            }
+            case historyitem_ValAxSetScaling:
+            {
+                this.scaling = data.oldPr;
+                break;
+            }
+            case historyitem_ValAxSetSpPr:
+            {
+                this.axId = data.oldPr;
+                break;
+            }
+            case historyitem_ValAxSetTickLblPos:
+            {
+                this.tickLblPos = data.oldPr;
+                break;
+            }
+            case historyitem_ValAxSetTitle:
+            {
+                this.title = data.oldPr;
+                break;
+            }
+            case historyitem_ValAxSetTxPr:
+            {
+                this.txPr = data.oldPr;
+                break;
+            }
+        }
+    },
 
 
-    Redo: function()
-    {},
+    Redo: function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_ValAxSetAxId:
+            {
+                this.axId = data.newPr;
+                break;
+            }
+            case historyitem_ValAxSetAxPos:
+            {
+                this.axPos = data.newPr;
+                break;
+            }
+            case historyitem_ValAxSetCrossAx:
+            {
+                this.crossAx = data.newPr;
+                break;
+            }
+            case historyitem_ValAxSetCrossBetween:
+            {
+                this.crossBetween = data.newPr;
+                break;
+            }
+            case historyitem_ValAxSetCrosses:
+            {
+                this.crosses = data.newPr;
+                break;
+            }
+            case historyitem_ValAxSetCrossesAt:
+            {
+                this.crossesAt = data.newPr;
+                break;
+            }
+            case historyitem_ValAxSetDelete:
+            {
+                this.bDelete = data.newPr;
+                break;
+            }
+            case historyitem_ValAxSetDispUnits:
+            {
+                this.dispUnits = data.newPr;
+                break;
+            }
+            case historyitem_ValAxSetMajorGridlines:
+            {
+                this.majorGridlines = data.newPr;
+                break;
+            }
+            case historyitem_ValAxSetMajorTickMark:
+            {
+                this.majorTickMark = data.newPr;
+                break;
+            }
+            case historyitem_ValAxSetMajorUnit:
+            {
+                this.majorUnit = data.newPr;
+                break;
+            }
+            case historyitem_ValAxSetMinorGridlines:
+            {
+                this.minorGridlines = data.newPr;
+                break;
+            }
+            case historyitem_ValAxSetMinorTickMark:
+            {
+                this.minorTickMark = data.newPr;
+                break;
+            }
+            case historyitem_ValAxSetMinorUnit:
+            {
+                this.minorUnit = data.newPr;
+                break;
+            }
+            case historyitem_ValAxSetNumFmt:
+            {
+                this.numFmt = data.newPr;
+                break;
+            }
+            case historyitem_ValAxSetScaling:
+            {
+                this.scaling = data.newPr;
+                break;
+            }
+            case historyitem_ValAxSetSpPr:
+            {
+                this.axId = data.newPr;
+                break;
+            }
+            case historyitem_ValAxSetTickLblPos:
+            {
+                this.tickLblPos = data.newPr;
+                break;
+            }
+            case historyitem_ValAxSetTitle:
+            {
+                this.title = data.newPr;
+                break;
+            }
+            case historyitem_ValAxSetTxPr:
+            {
+                this.txPr = data.newPr;
+                break;
+            }
+        }
+    },
 
-    Save_Changes: function()
-    {},
+    Save_Changes: function(data, w)
+    {
+        w.WriteLong(data.Type);
+        switch(data.Type)
+        {
+            case historyitem_ValAxSetAxId:
+            {
+                writeString(w, data.newPr);
+                break;
+            }
+            case historyitem_ValAxSetAxPos:
+            {
+                writeLong(w, data.newPr);
+                break;
+            }
+            case historyitem_ValAxSetCrossAx:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_ValAxSetCrossBetween:
+            {
+                writeLong(w, data.newPr);
+                break;
+            }
+            case historyitem_ValAxSetCrosses:
+            {
+                writeLong(w, data.newPr);
+                break;
+            }
+            case historyitem_ValAxSetCrossesAt:
+            {
+                writeDouble(w, data.newPr);
+                break;
+            }
+            case historyitem_ValAxSetDelete:
+            {
+                writeBool(w, data.newPr);
+                break;
+            }
+            case historyitem_ValAxSetDispUnits:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_ValAxSetMajorGridlines:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_ValAxSetMajorTickMark:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_ValAxSetMajorUnit:
+            {
+                writeDouble(w, data.newPr);
+                break;
+            }
+            case historyitem_ValAxSetMinorGridlines:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_ValAxSetMinorTickMark:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_ValAxSetMinorUnit:
+            {
+                writeDouble(w, data.newPr);
+                break;
+            }
+            case historyitem_ValAxSetNumFmt:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_ValAxSetScaling:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_ValAxSetSpPr:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_ValAxSetTickLblPos:
+            {
+                writeLong(w, data.newPr);
+                break;
+            }
+            case historyitem_ValAxSetTitle:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_ValAxSetTxPr:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+        }
+    },
 
-    Load_Changes: function()
-    {},
+    Load_Changes: function(r)
+    {
+        var type = r.GetLong();
+        switch(type)
+        {
+            case historyitem_ValAxSetAxId:
+            {
+                this.axId = readString(r);
+                break;
+            }
+            case historyitem_ValAxSetAxPos:
+            {
+                this.axPos = readLong(r);
+                break;
+            }
+            case historyitem_ValAxSetCrossAx:
+            {
+                this.crossAx = readObject(r);
+                break;
+            }
+            case historyitem_ValAxSetCrossBetween:
+            {
+                this.crossBetween = readLong(r);
+                break;
+            }
+            case historyitem_ValAxSetCrosses:
+            {
+                this.crosses = readLong(r);
+                break;
+            }
+            case historyitem_ValAxSetCrossesAt:
+            {
+                this.crossesAt = readDouble(r);
+                break;
+            }
+            case historyitem_ValAxSetDelete:
+            {
+                this.bDelete = readBool(r);
+                break;
+            }
+            case historyitem_ValAxSetDispUnits:
+            {
+                this.dispUnits = readObject(r);
+                break;
+            }
+            case historyitem_ValAxSetMajorGridlines:
+            {
+                this.majorGridlines = readObject(r);
+                break;
+            }
+            case historyitem_ValAxSetMajorTickMark:
+            {
+                this.majorTickMark = readObject(r);
+                break;
+            }
+            case historyitem_ValAxSetMajorUnit:
+            {
+                this.majorUnit = readDouble(r);
+                break;
+            }
+            case historyitem_ValAxSetMinorGridlines:
+            {
+                this.minorGridlines = readObject(r);
+                break;
+            }
+            case historyitem_ValAxSetMinorTickMark:
+            {
+                this.minorTickMark = readObject(r);
+                break;
+            }
+            case historyitem_ValAxSetMinorUnit:
+            {
+                this.minorUnit = readDouble(r);
+                break;
+            }
+            case historyitem_ValAxSetNumFmt:
+            {
+                this.numFmt = readObject(r);
+                break;
+            }
+            case historyitem_ValAxSetScaling:
+            {
+                this.scaling = readObject(r);
+                break;
+            }
+            case historyitem_ValAxSetSpPr:
+            {
+                this.spPr = readObject(r);
+                break;
+            }
+            case historyitem_ValAxSetTickLblPos:
+            {
+                this.tickLblPos = readLong(r);
+                break;
+            }
+            case historyitem_ValAxSetTitle:
+            {
+                this.title = readObject(r);
+                break;
+            }
+            case historyitem_ValAxSetTxPr:
+            {
+                this.txPr = readObject(r);
+                break;
+            }
+        }
+    },
 
 
     getMenuProps: function()
@@ -8451,10 +9718,6 @@ CDoughnutChart.prototype =
             }
             case historyitem_DoughnutChart_AddSer:
             {
-                if(isRealObject(data.ser))
-                {
-                    this.series.push(data.ser);
-                }
                 if(r.GetBool())
                 {
                     var ser = g_oTableId.Get_ById(r.GetString2());
@@ -10338,23 +11601,6 @@ CLineChart.prototype =
     }
 };
 
-
-function CalculateSeriesPenBrush()
-{
-    var is_on = History.IS_On();
-    if(is_on)
-    {
-        History.TurnOff();
-    }
-
-    var brush = new CUniFill();
-
-    if(is_on)
-    {
-        History.TurnOn();
-    }
-}
-
 function CLineSeries()
 {
     this.cat           = null;
@@ -11289,7 +12535,7 @@ CMultiLvlStrCache.prototype =
         {
             case historyitem_MultiLvlStrCache_SetLvl:
             {
-                this.lvl = readObject(r);;
+                this.lvl = readObject(r);
                 break;
             }
             case historyitem_MultiLvlStrCache_SetPtCount:

@@ -379,7 +379,12 @@ Geometry.prototype=
     },
 
     Refresh_RecalcData: function(data)
-    {},
+    {
+        if(this.parent && this.parent.handleUpdateGeometry)
+        {
+            this.parent.handleUpdateGeometry();
+        }
+    },
 
     createDuplicate: function()
     {
@@ -844,7 +849,7 @@ Geometry.prototype=
     Load_Changes: function(r)
     {
         var type = r.GetLong();
-        switch(data.Type)
+        switch(type)
         {
             case historyitem_GeometrySetParent:
             {
@@ -1053,62 +1058,6 @@ Geometry.prototype=
     hitToPath: function(hitCanvasContext, x, y)
     {
         return false;
-    },
-
-
-    setPolarAdjustments: function(refR, rValue, refAng, angValue)
-    {
-        var history_data;
-        if(typeof refR === "string" && typeof this.gdLst[refR] === "number" && typeof rValue === "number")
-        {
-            history_data = {};
-            history_data.Type = historyitem_SetGuideValue;
-            history_data.guideName = refR;
-            history_data.oldGdValue = this.gdLst[refR];
-            history_data.newGdValue = rValue;
-            History.Add(this, history_data);
-            this.gdLst[refR] = rValue;
-        }
-        if( typeof refAng === "string" && typeof this.gdLst[refAng] === "number" && typeof angValue === "number")
-        {
-            history_data = {};
-            history_data.Type = historyitem_SetGuideValue;
-            history_data.guideName = refAng;
-            history_data.oldGdValue = this.gdLst[refAng];
-            history_data.newGdValue = angValue;
-            History.Add(this, history_data);
-            this.gdLst[refAng] = angValue;
-        }
-
-    },
-
-    setXYAdjustments: function(refX, xValue, refY, yValue)
-    {
-        var history_data;
-        if(typeof refX === "string" && typeof this.gdLst[refX] === "number" && typeof xValue === "number")
-        {
-            history_data = {};
-            history_data.Type = historyitem_SetGuideValue;
-            history_data.guideName = refX;
-            history_data.oldGdValue = this.gdLst[refX];
-            history_data.newGdValue = xValue;
-            History.Add(this, history_data);
-
-            this.gdLst[refX] = xValue;
-        }
-        if( typeof refY === "string" && typeof this.gdLst[refY] === "number" && typeof yValue === "number")
-        {
-            history_data = {};
-            history_data.Type = historyitem_SetGuideValue;
-            history_data.guideName = refY;
-            history_data.refAng = refY;
-            history_data.oldGdValue = this.gdLst[refY];
-            history_data.newGdValue = yValue;
-            History.Add(this, history_data);
-
-            this.gdLst[refY] = yValue;
-        }
-
     },
 
 

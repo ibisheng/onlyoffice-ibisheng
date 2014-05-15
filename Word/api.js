@@ -6201,11 +6201,13 @@ asc_docs_api.prototype.ChangeColorScheme = function(index_scheme)
         this.asc_fireCallback("asc_onUpdateChartStyles");
         this.WordControl.m_oLogicDocument.Recalculate();
 
+
         // TODO:
         this.WordControl.m_oDrawingDocument.ClearCachePages();
         this.WordControl.OnScroll();
 
         this.WordControl.m_oDrawingDocument.CheckGuiControlColors();
+        this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
     }
 
 }

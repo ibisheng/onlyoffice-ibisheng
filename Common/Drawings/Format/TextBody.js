@@ -249,11 +249,19 @@ CTextBody.prototype =
         switch(data.Type)
         {
             case historyitem_TextBodySetParent:
-            case historyitem_TextBodySetBodyPr:
             case historyitem_TextBodySetContent:
             case historyitem_TextBodySetLstStyle:
             {
                 writeObject(w, data.newPr);
+                break;
+            }
+            case historyitem_TextBodySetBodyPr:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    data.newPr.Write_ToBinary(w);
+                }
                 break;
             }
         }
@@ -274,7 +282,15 @@ CTextBody.prototype =
 
                 case historyitem_TextBodySetBodyPr:
                 {
-                    this.bodyPr = readObject(r);
+                    if(r.GetBool())
+                    {
+                        this.bodyPr = new CBodyPr();
+                        this.bodyPr.Read_FromBinary(r);
+                    }
+                    else
+                    {
+                        this.bodyPr = null;
+                    }
                     break;
                 }
                 case historyitem_TextBodySetContent:

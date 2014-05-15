@@ -791,9 +791,12 @@ DrawingObjectsController.prototype =
                 else if(arr[i].getDocContent)
                 {
                     var content = arr[i].getDocContent();
-                    content.Set_ApplyToAll(true);
-                    f.apply(content, args);
-                    content.Set_ApplyToAll(false);
+                    if(content)
+                    {
+                        content.Set_ApplyToAll(true);
+                        f.apply(content, args);
+                        content.Set_ApplyToAll(false);
+                    }
                 }
             }
         }
@@ -804,9 +807,9 @@ DrawingObjectsController.prototype =
         }
         else if(this.selection.groupSelection)
         {
-            if(this.selection.groupSelection.textSelection)
-                f.apply(this.selection.groupSelection.textSelection.getDocContent(), args);
-            else if(this.selection.groupSelection.chartSelection)
+            if(this.selection.groupSelection.selection.textSelection)
+                f.apply(this.selection.groupSelection.selection.textSelection.getDocContent(), args);
+            else if(this.selection.groupSelection.selection.chartSelection)
             {/*todo*/}
             else
                 applyToArrayDrawings(this.selection.groupSelection.selectedObjects);
@@ -3799,9 +3802,11 @@ DrawingObjectsController.prototype =
         image.spPr.xfrm.setOffY(y);
         image.spPr.xfrm.setExtX(extX);
         image.spPr.xfrm.setExtY(extY);
-        image.setBlipFill(new CBlipFill());
-        image.blipFill.setRasterImageId(rasterImageId);
-        image.blipFill.setStretch(true);
+
+        var blip_fill = new CBlipFill();
+        blip_fill.setRasterImageId(rasterImageId);
+        blip_fill.setStretch(true);
+        image.setBlipFill(blip_fill);
         image.setNvPicPr(new UniNvPr());
         image.setBDeleted(false);
         return image;

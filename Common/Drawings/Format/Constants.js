@@ -1052,70 +1052,7 @@ var historyitem_AddNewGraphicObject = 0;
 var historyitem_RemoveGraphicObject = 1;
 
 
-//Типы изменений в классе CGeometry
-var historyitem_SetGuideValue = 0;
-var historyitem_SetAdjustmentValue = 1;
-
-
-//Типы изменений в классе WordShape
-var historyitem_SetAbsoluteTransform = 0;
-var historyitem_SetXfrmShape = 1;
-var historyitem_SetRotate = 2;
-var historyitem_SetSizes = 3;
-var historyitem_SetSizesInGroup = 4;
-var historyitem_SetAdjValue = 5;
-var historyitem_SetMainGroup = 7;
-var historyitem_SetGroup = 8;
-var historyitem_InitShape = 9;
-var historyitem_AddGraphicObject = 10;
-var historyitem_AddToSpTree = 11;
-var historyitem_ChangeDiagram = 12;
-var historyitem_Init2Shape = 13;
-var historyitem_ChangeFill = 14;
-var historyitem_ChangeLine = 15;
-var historyitem_ChangePresetGeom = 16;
-var historyitem_CreatePolyine = 17;
-var historyitem_AddDocContent = 18;
-var historyitem_SetSizes2 = 19;
-var historyitem_RemoveFromSpTree = 20;
-var historyitem_RemoveFromArrGraphicObj = 21;
-var historyitem_RemoveFromArrGraphicObj2 = 22;
-var historyitem_MoveShapeInArray = 23;
-var historyitem_UpadteSpTreeBefore = 24;
-var historyitem_UpadteSpTreeAfter = 25;
-var historyitem_ChangeDiagram2 = 26;
-var historyitem_SwapGrObject = 27;
-var historyitem_SetSpPr = 28;
-var historyitem_SetStyle = 29;
-var historyitem_SetBodyPr = 30;
-var historyitem_SetTextBoxContent = 31;
-var historyitem_SetRasterImage2 = 32;
-var historyitem_CalculateAfterCopyInGroup = 33;
-var historyitem_SetVerticalShapeAlign = 34;
-var historyitem_SetParent = 35;
-var historyitem_SetBlipFill = 36;
-var historyitem_AutoShapes_AddXAxis = 37;
-var historyitem_AutoShapes_AddYAxis = 38;
-var historyitem_AutoShapes_AddTitle = 39;
-var historyitem_AutoShapes_AddChart = 40;
-var historyitem_SetShapeBodyPr = 41;
-var historyitem_AutoShapes_SetChartTitleOverlay = 42;
-var historyitem_SetCahrtLayout = 43;
-var historyitem_AutoShapes_SetChartGroup = 44;
-var historyitem_AutoShapes_SetChartTitleType = 45;
-var historyitem_SetSetSpPr = 46;
-var historyitem_AutoShapes_SetChartTitleTxBody = 47;
-var historyitem_AutoShapes_RecalculateAfterResize = 48;
-var historyitem_AutoShapes_SetTextPaddings = 49;
-var historyitem_AutoShapes_RecalculateChartUndo = 50;
-var historyitem_AutoShapes_RecalculateChartRedo = 51;
-var historyitem_AutoShapes_UpdateParentWidthHeight = 52;
-
-
-
-
 //Типы изменений в классе GraphicObjects
-var historyitem_AddHdrFtrGrObjects = 0;
 var historyitem_ChangeColorScheme = 1;
 
 //Типы изменений в классе HeaderFooterGraphicObjects
@@ -1130,14 +1067,6 @@ var historyitem_RemoveFtr = 3;
 var historyitem_InternalChanges = 6;
 var historyitem_GroupRecalculate = 32;
 
-
-
-//Типы изменений в классе WrapPolygon
-var historyitem_AddNewPoint = 0;
-var historyitem_RemovePoint = 1;
-var historyitem_MovePoint   = 2;
-var historyitem_UpdateWrapSizes = 3;
-var historyitem_ChangePolygon = 4;
 
 // Типы изменений в классе CStyle
 var historyitem_Style_TextPr          = 1;  // Изменяем TextPr
@@ -1228,33 +1157,19 @@ var historyitem_type_HdrFtr           = 15;
 var historyitem_type_AbstractNum      = 16;
 var historyitem_type_Comment          = 17;
 var historyitem_type_Comments         = 18;
-var historyitem_type_Shape            = 19;
-var historyitem_type_Image            = 20;
-var historyitem_type_GroupShapes      = 21;
-var historyitem_type_Geometry         = 22;
-var historyitem_type_WrapPolygon      = 23;
-var historyitem_type_Chart			  = 24;
-var historyitem_type_HdrFtrGrObjects  = 25;
-var historyitem_type_GrObjects        = 26;
-var historyitem_type_Hyperlink        = 27;
-var historyitem_type_ChartGroup       = 28;
-var historyitem_type_Style            = 29;
-var historyitem_type_Styles           = 30;
-var historyitem_type_TextBody         = 31;
-var historyitem_type_ChartTitle       = 32;
-var historyitem_type_Math			  = 33;
-var historyitem_type_CommentMark      = 34;
-var historyitem_type_ParaRun          = 35;
-var historyitem_type_MathContent	  = 36;
-var historyitem_type_Section          = 37;
+var historyitem_type_Image            = 19;
+var historyitem_type_GrObjects        = 20;
+var historyitem_type_Hyperlink        = 21;
+var historyitem_type_ChartGroup       = 22;
+var historyitem_type_Style            = 23;
+var historyitem_type_Styles           = 24;
+var historyitem_type_ChartTitle       = 25;
+var historyitem_type_Math			  = 26;
+var historyitem_type_CommentMark      = 27;
+var historyitem_type_ParaRun          = 28;
+var historyitem_type_MathContent	  = 29;
+var historyitem_type_Section          = 30;
 
-//Типы изменений в классе CChartAsGroup
-var historyitem_SetCahrtLayout = 1000;
-
-//Типы изменений в классе TexBody
-var historyitem_SetShape = 0;
-var historyitem_SetDocContent = 1;
-var historyitem_SetLstStyle = 2;
 
 
 
