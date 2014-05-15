@@ -442,12 +442,12 @@
 			if(1 == arguments.length)
 			{
 				var range = arguments[0];
-				ActiveRange.superclass.constructor.call(this, range.c1, range.r1, range.c2, range.r2);
+				FormulaRange.superclass.constructor.call(this, range.c1, range.r1, range.c2, range.r2);
 			}
 			else if(arguments.length > 1)
-				ActiveRange.superclass.constructor.apply(this, arguments);
+				FormulaRange.superclass.constructor.apply(this, arguments);
 			else
-				ActiveRange.superclass.constructor.call(this, 0, 0, 0, 0);
+				FormulaRange.superclass.constructor.call(this, 0, 0, 0, 0);
 			this.r1Abs = false;
 			this.c1Abs = false;
 			this.r2Abs = false;
@@ -567,11 +567,11 @@
 				    oRes = oCacheVal.formulaRange;
 				if (null == oRes && null != oCacheVal.first && null != oCacheVal.last) {
 				    var r1 = oCacheVal.first.getRow0(), r2 = oCacheVal.last.getRow0(), c1 = oCacheVal.first.getCol0(), c2 = oCacheVal.last.getCol0();
-				    if (oFirstAddr.getIsRow() && oLastAddr.getIsRow()) {
+				    if (oCacheVal.first.getIsRow() && oCacheVal.last.getIsRow()) {
 				        c1 = 0;
 				        c2 = gc_nMaxCol0;
 				    }
-				    if (oFirstAddr.getIsCol() && oLastAddr.getIsCol()) {
+				    if (oCacheVal.first.getIsCol() && oCacheVal.last.getIsCol()) {
 				        r1 = 0;
 				        r2 = gc_nMaxRow0;
 				    }
