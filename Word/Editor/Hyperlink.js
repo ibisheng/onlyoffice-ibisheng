@@ -387,6 +387,7 @@ ParaHyperlink.prototype =
 
                         this.Internal_Content_Add( CurPos + 1, Item );
                         this.Internal_Content_Add( CurPos + 2, NewRun );
+                        this.State.ContentPos = CurPos + 1;
                         break;
                     }
 

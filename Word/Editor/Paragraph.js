@@ -7897,6 +7897,7 @@ Paragraph.prototype =
                         
                         this.Internal_Content_Add( CurPos + 1, Item );
                         this.Internal_Content_Add( CurPos + 2, NewRun );                        
+                        this.CurPos.ContentPos = CurPos + 1;
                         break;
                     }
                         
@@ -7909,11 +7910,14 @@ Paragraph.prototype =
                         
                     default:
                     {
-                        this.Internal_Content_Add( CurPos + 1, Item );                        
+                        this.Internal_Content_Add( CurPos + 1, Item );
+                        this.CurPos.ContentPos = CurPos + 1;
                         break;
                     }
-                }                                
+                } 
                 
+                Item.Cursor_MoveToEndPos(false);
+                                
                 break;
             }
         }
