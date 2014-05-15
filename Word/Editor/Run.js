@@ -870,18 +870,18 @@ ParaRun.prototype =
             var Mark    = this.SpellingMarks[Index];
             var MarkPos = ( true === Mark.Start ? Mark.Element.StartPos.Get(Mark.Depth) : Mark.Element.EndPos.Get(Mark.Depth) );
 
-            if ( MarkPos >= ContentPos )
+            if ( MarkPos >= CurPos )
             {
                 var MarkElement = Mark.Element;
                 if ( true === Mark.Start )
                 {
                     MarkElement.ClassesS[Mark.Depth]       = NewRun;
-                    MarkElement.StartPos.Data[Mark.Depth] -= ContentPos;
+                    MarkElement.StartPos.Data[Mark.Depth] -= CurPos;
                 }
                 else
                 {
                     MarkElement.ClassesE[Mark.Depth]     = NewRun;
-                    MarkElement.EndPos.Data[Mark.Depth] -= ContentPos;
+                    MarkElement.EndPos.Data[Mark.Depth] -= CurPos;
                 }
 
                 NewRun.SpellingMarks.push( Mark );
