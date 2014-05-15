@@ -163,6 +163,14 @@ Math.sign = function(a){
     return (a < 0) ? -1 : (a == 0) ? 0 : 1;
 }
 
+String.prototype.repeat = function (s, n){
+    var a = [];
+    while(a.length < n){
+        a.push(s);
+    }
+    return a.join('');
+}
+
 /** @constructor */
 function cBaseType( val ) {
     this.needRecalc = false;
@@ -451,25 +459,30 @@ cArea.prototype.getValue = function () {
     else {
         r._foreachNoEmpty( function ( cell ) {
             var cellType = cell.getType();
-            if ( cellType === CellValueType.Number ) {
-                cell.getValueWithoutFormat() === "" ? val.push( new cEmpty() ) : val.push( new cNumber( cell.getValueWithoutFormat() ) );
-            }
-            else if ( cellType === CellValueType.Bool ) {
-                val.push( new cBool( cell.getValueWithoutFormat() ) );
-            }
-            else if ( cellType === CellValueType.Error ) {
-                val.push( new cError( cell.getValueWithoutFormat() ) );
-            }
-            else if ( cellType === CellValueType.String ) {
-                val.push( checkTypeCell( "" + cell.getValueWithoutFormat() ) );
-            }
-            else {
-                if ( cell.getValueWithoutFormat() && cell.getValueWithoutFormat() !== "" ) {
-                    val.push( new cNumber( cell.getValueWithoutFormat() ) );
-                }
-                else {
+            switch ( cellType ) {
+                case CellValueType.Number:
+                    cell.getValueWithoutFormat() === "" ? val.push( new cEmpty() ) : val.push( new cNumber( cell.getValueWithoutFormat() ) );
+                    break;
+
+                case CellValueType.Bool:
+                    val.push( new cBool( cell.getValueWithoutFormat() ) );
+                    break;
+
+                case CellValueType.Error:
+                    val.push( new cError( cell.getValueWithoutFormat() ) );
+                    break;
+
+                case CellValueType.String:
                     val.push( checkTypeCell( "" + cell.getValueWithoutFormat() ) );
-                }
+                    break;
+
+                default:
+                    if ( cell.getValueWithoutFormat() && cell.getValueWithoutFormat() !== "" ) {
+                        val.push( new cNumber( cell.getValueWithoutFormat() ) );
+                    }
+                    else {
+                        val.push( checkTypeCell( "" + cell.getValueWithoutFormat() ) );
+                    }
             }
         } );
     }
@@ -528,6 +541,7 @@ cArea.prototype.tocBool = function () {
     return this.getValue()[0].tocBool();
 };
 cArea.prototype.toString = function () {
+//    return this.getRange().getName();
     return this._cells;
 };
 cArea.prototype.setRange = function ( cell ) {
@@ -820,14 +834,16 @@ cArea3D.prototype.changeSheet = function ( lastName, newName ) {
     }
 };
 cArea3D.prototype.toString = function () {
-    var wsFrom = this._wb.getWorksheetById( this.wsFrom ).getName();
-    var wsTo = this._wb.getWorksheetById( this.wsTo ).getName();
+    var wsFrom = this._wb.getWorksheetById( this.wsFrom ).getName(),
+        wsTo = this._wb.getWorksheetById( this.wsTo ).getName(),
+//        name = Asc.g_oRangeCache.getActiveRange(this._cells ).getName();
+        name = this._cells;
     if ( !rx_test_ws_name.test( wsFrom ) || !rx_test_ws_name.test( wsTo ) ) {
         wsFrom = wsFrom.replace( /'/g, "''" );
         wsTo = wsTo.replace( /'/g, "''" );
-        return "'" + (wsFrom !== wsTo ? wsFrom + ":" + wsTo : wsFrom) + "'!" + this._cells;
+        return "'" + (wsFrom !== wsTo ? wsFrom + ":" + wsTo : wsFrom) + "'!" + name;
     }
-    return (wsFrom !== wsTo ? wsFrom + ":" + wsTo : wsFrom) + "!" + this._cells;
+    return (wsFrom !== wsTo ? wsFrom + ":" + wsTo : wsFrom) + "!" + name;
 };
 cArea3D.prototype.tocNumber = function () {
     return this.getValue()[0].tocNumber();
@@ -1490,13 +1506,13 @@ cBaseOperator.prototype = {
 };
 
 /** @constructor */
-function cBaseFunction( name ) {
+function cBaseFunction( name, argMin, argMax ) {
     this.name = name;
     this.type = cElementType.func;
     this.value = null;
-    this.argumentsMin = 0;
+    this.argumentsMin = argMin ? argMin : 0;
     this.argumentsCurrent = 0;
-    this.argumentsMax = 255;
+    this.argumentsMax = argMax ? argMax : 255;
     this.formatType = {
         def:-1, //подразумевается формат первой ячейки входящей в формулу.
         noneFormat:-2
@@ -3138,6 +3154,7 @@ parserFormula.prototype = {
                 if ( found_operand != null && found_operand != undefined ) {
                     this.outStack.push( found_operand );
                     operand_expected = false;
+                    found_operand = null
                 }
                 else {
                     /*this.error.push( c_oAscError.ID.FrmlAnotherParsingError );

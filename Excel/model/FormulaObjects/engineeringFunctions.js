@@ -52,6 +52,13 @@ function ConvertToDec( aStrSource, nBase, nCharLim ) {
     return fVal;
 }
 
+var NumberBase = {
+    BIN : 2,
+    OCT : 8,
+    DEC : 10,
+    HEX : 16
+}
+
 var f_PI_DIV_2 = Math.PI / 2.0;
 var f_PI_DIV_4 = Math.PI / 4.0;
 var f_2_DIV_PI = 2.0 / Math.PI;
@@ -355,6 +362,47 @@ function BesselY( fNum, nOrder ) {
     }
 }
 
+function validBINNumber(n){
+    return rg_validBINNumber.test(n);
+}
+
+function validDEC2BINNumber(n){
+    return rg_validDEC2BINNumber.test(n);
+}
+
+function validDEC2OCTNumber(n){
+    return rg_validDEC2OCTNumber.test(n);
+}
+
+function validDEC2HEXNumber(n){
+    return rg_validDEC2HEXNumber.test(n);
+}
+
+function validHEXNumber(n){
+    return rg_validHEXNumber.test(n);
+}
+
+function validOCTNumber(n){
+    return rg_validOCTNumber.test(n);
+}
+
+function convertFromTo(src,from,to,charLim){
+    var res = parseInt( src, from ).toString( to );
+    if ( charLim == 1) {
+        return new cString(res.toUpperCase());
+    }
+    else {
+        charLim = parseInt( charLim );
+//        charLim -= res.length;
+        if( charLim >= res.length ){
+            return new cString( (String.prototype.repeat( '0', charLim - res.length ) + res).toUpperCase() );
+        }
+        else {
+            return new cError( cErrorType.not_numeric );
+        }
+    }
+}
+
 /**
  * Created with JetBrains WebStorm.
  * User: Dmitry.Shahtanov
@@ -431,22 +479,162 @@ function cBESSELY() {
 cBESSELY.prototype = Object.create( cBaseFunction.prototype );
 
 function cBIN2DEC() {
-    cBaseFunction.call( this, "BIN2DEC" );
+    cBaseFunction.call( this, "BIN2DEC", 1, 1 );
 }
 
 cBIN2DEC.prototype = Object.create( cBaseFunction.prototype );
+cBIN2DEC.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0];
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocNumber();
+
+    if ( arg0 instanceof cError ) return this.value = arg0;
+
+    arg0 = arg0.getValue();
+
+    if( validBINNumber(arg0) ){
+        var substr = arg0.toString();
+        if ( substr.length == 10 && substr.substring( 0, 1 ) == "1" ) {
+            this.value = new cNumber( parseInt( substr.substring( 1 ), NumberBase.BIN ) - 512 );
+        }
+        else {
+            this.value = new cNumber( parseInt( arg0, NumberBase.BIN ) );
+        }
+    }
+    else{
+        this.value = new cError( cErrorType.not_numeric );
+    }
+
+    return this.value;
+
+}
+cBIN2DEC.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( number )"
+    };
+}
 
 function cBIN2HEX() {
-    cBaseFunction.call( this, "BIN2HEX" );
+    cBaseFunction.call( this, "BIN2HEX", 1, 2 );
 }
 
 cBIN2HEX.prototype = Object.create( cBaseFunction.prototype );
+cBIN2HEX.prototype.Calculate = function ( arg ) {
+
+    var arg0 = arg[0],
+        arg1 = arg[1] ? arg[1] : new cNumber(1);
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    else if ( arg1 instanceof cArray ) {
+        arg1 = arg1.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocNumber();
+    arg1 = arg1.tocNumber();
+
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+
+    arg0 = arg0.getValue();
+    arg1 = arg1.getValue();
+
+    if( validBINNumber(arg0) && arg1 > 0 && arg1 <= 10 ){
+
+        var substr = arg0.toString();
+        if ( substr.length === 10 && substr.substring( 0, 1 ) === '1' ) {
+            this.value = new cString( (1099511627264 + parseInt( substr.substring( 1 ), NumberBase.BIN )).toString( NumberBase.HEX ).toUpperCase() );
+        }
+        else{
+            this.value = convertFromTo( arg0, NumberBase.BIN, NumberBase.HEX, arg1 );
+        }
+    }
+    else{
+        this.value = new cError( cErrorType.not_numeric );
+    }
+
+    return this.value;
+
+}
+cBIN2HEX.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( number [ , num-hex-digits ] )"
+    };
+}
 
 function cBIN2OCT() {
     cBaseFunction.call( this, "BIN2OCT" );
 }
 
 cBIN2OCT.prototype = Object.create( cBaseFunction.prototype );
+cBIN2OCT.prototype.Calculate = function ( arg ) {
+
+    var arg0 = arg[0],
+        arg1 = arg[1] ? arg[1] : new cNumber(1);
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    else if ( arg1 instanceof cArray ) {
+        arg1 = arg1.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocNumber();
+    arg1 = arg1.tocNumber();
+
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+
+    arg0 = arg0.getValue();
+    arg1 = arg1.getValue();
+
+    if( validBINNumber(arg0) && arg1 > 0 && arg1 <= 10 ){
+
+        var substr = arg0.toString();
+        if ( substr.length === 10 && substr.substring( 0, 1 ) === '1' ) {
+            this.value = new cString( (1073741312 + parseInt( substr.substring( 1 ), NumberBase.BIN )).toString( NumberBase.OCT ).toUpperCase() );
+        }
+        else{
+            this.value = convertFromTo( arg0, NumberBase.BIN, NumberBase.OCT, arg1 );
+        }
+    }
+    else{
+        this.value = new cError( cErrorType.not_numeric );
+    }
+
+    return this.value;
+
+}
+cBIN2OCT.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( number [ , num-hex-digits ] )"
+    };
+}
 
 function cCOMPLEX() {
     cBaseFunction.call( this, "COMPLEX" );
@@ -461,22 +649,172 @@ function cCONVERT() {
 cCONVERT.prototype = Object.create( cBaseFunction.prototype );
 
 function cDEC2BIN() {
-    cBaseFunction.call( this, "DEC2BIN" );
+    cBaseFunction.call( this, "DEC2BIN", 1, 2 );
 }
 
 cDEC2BIN.prototype = Object.create( cBaseFunction.prototype );
+cDEC2BIN.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0],
+        arg1 = arg[1] ? arg[1] : new cNumber(1);
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    else if ( arg1 instanceof cArray ) {
+        arg1 = arg1.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocNumber();
+    arg1 = arg1.tocNumber();
+
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+
+    arg0 = arg0.getValue();
+    arg1 = arg1.getValue();
+
+    if( validDEC2BINNumber(arg0) && arg0 >= -512 && arg0 <= 511 && arg1 > 0 && arg1 <= 10 ){
+
+        if ( arg0 < 0 ) {
+            this.value = new cString( '1' + String.prototype.repeat( '0', 9 - (512 + arg0).toString( NumberBase.BIN ).length ) + (512 + arg0).toString( NumberBase.BIN ).toUpperCase() );
+        }
+        else{
+            this.value = convertFromTo( arg0, NumberBase.DEC, NumberBase.BIN, arg1 );
+        }
+
+    }
+    else{
+        this.value = new cError( cErrorType.not_numeric );
+    }
+
+    return this.value;
+
+}
+cDEC2BIN.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( number [ , num-hex-digits ] )"
+    };
+}
 
 function cDEC2HEX() {
-    cBaseFunction.call( this, "DEC2HEX" );
+    cBaseFunction.call( this, "DEC2HEX", 1, 2 );
 }
 
 cDEC2HEX.prototype = Object.create( cBaseFunction.prototype );
+cDEC2HEX.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0],
+        arg1 = arg[1] ? arg[1] : new cNumber(1);
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    else if ( arg1 instanceof cArray ) {
+        arg1 = arg1.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocNumber();
+    arg1 = arg1.tocNumber();
+
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+
+    arg0 = arg0.getValue();
+    arg1 = arg1.getValue();
+
+    if( validDEC2HEXNumber(arg0) && arg0 >= -549755813888 && arg0 <= 549755813887 && arg1 > 0 && arg1 <= 10 ){
+
+        if ( arg0 < 0 ) {
+            this.value = new cString( (1099511627776 + arg0).toString( NumberBase.HEX ).toUpperCase() );
+        }
+        else{
+            this.value = convertFromTo( arg0, NumberBase.DEC, NumberBase.HEX, arg1 );
+        }
+
+    }
+    else{
+        this.value = new cError( cErrorType.not_numeric );
+    }
+
+    return this.value;
+
+}
+cDEC2HEX.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( number [ , num-hex-digits ] )"
+    };
+}
 
 function cDEC2OCT() {
-    cBaseFunction.call( this, "DEC2OCT" );
+    cBaseFunction.call( this, "DEC2OCT", 1, 2 );
 }
 
 cDEC2OCT.prototype = Object.create( cBaseFunction.prototype );
+cDEC2OCT.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0],
+        arg1 = arg[1] ? arg[1] : new cNumber(1);
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    else if ( arg1 instanceof cArray ) {
+        arg1 = arg1.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocNumber();
+    arg1 = arg1.tocNumber();
+
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+
+    arg0 = arg0.getValue();
+    arg1 = arg1.getValue();
+
+    if( validDEC2OCTNumber(arg0) && arg0 >= -536870912 && arg0 <= 536870911 && arg1 > 0 && arg1 <= 10 ){
+
+        if ( arg0 < 0 ) {
+            this.value = new cString( (1073741824 + arg0).toString( NumberBase.OCT ).toUpperCase() );
+        }
+        else{
+            this.value = convertFromTo( arg0, NumberBase.DEC, NumberBase.OCT, arg1 );
+        }
+
+    }
+    else{
+        this.value = new cError( cErrorType.not_numeric );
+    }
+
+    return this.value;
+
+}
+cDEC2OCT.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( number [ , num-hex-digits ] )"
+    };
+}
 
 function cDELTA() {
     cBaseFunction.call( this, "DELTA" );
@@ -503,22 +841,175 @@ function cGESTEP() {
 cGESTEP.prototype = Object.create( cBaseFunction.prototype );
 
 function cHEX2BIN() {
-    cBaseFunction.call( this, "HEX2BIN" );
+    cBaseFunction.call( this, "HEX2BIN", 1, 2 );
 }
 
 cHEX2BIN.prototype = Object.create( cBaseFunction.prototype );
+cHEX2BIN.prototype.Calculate = function ( arg ) {
+
+    var arg0 = arg[0],
+        arg1 = arg[1] ? arg[1] : new cNumber(1);
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    else if ( arg1 instanceof cArray ) {
+        arg1 = arg1.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocString();
+    arg1 = arg1.tocNumber();
+
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+
+    arg0 = arg0.getValue();
+    arg1 = arg1.getValue();
+
+    if( validHEXNumber(arg0) && arg1 > 0 && arg1 <= 10 ){
+
+        var negative = (arg0.length === 10 && arg0.substring( 0, 1 ).toUpperCase() === 'F'),
+            arg0DEC = (negative) ? parseInt( arg0, NumberBase.HEX ) - 1099511627776 : parseInt( arg0, NumberBase.HEX );
+
+        if ( arg0DEC < -512 || arg0DEC > 511 ) {
+            this.value = new cError( cErrorType.not_numeric )
+        }else{
+
+            if ( negative ) {
+                var str = (512 + arg0DEC).toString( NumberBase.BIN );
+                this.value = new cString( '1' + String.prototype.repeat( '0', 9 - str.length ) + str );
+            }else{
+                this.value = convertFromTo( arg0DEC, NumberBase.DEC, NumberBase.BIN, arg1 );
+            }
+
+        }
+    }
+    else{
+        this.value = new cError( cErrorType.not_numeric );
+    }
+
+    return this.value;
+
+}
+cHEX2BIN.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( number [ , num-hex-digits ] )"
+    };
+}
 
 function cHEX2DEC() {
-    cBaseFunction.call( this, "HEX2DEC" );
+    cBaseFunction.call( this, "HEX2DEC", 1, 1 );
 }
 
 cHEX2DEC.prototype = Object.create( cBaseFunction.prototype );
+cHEX2DEC.prototype.Calculate = function ( arg ) {
+
+    var arg0 = arg[0];
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocString();
+
+    if ( arg0 instanceof cError ) return this.value = arg0;
+
+    arg0 = arg0.getValue();
+
+    if( validHEXNumber(arg0) ){
+
+        arg0 = parseInt( arg0, NumberBase.HEX );
+        this.value = new cNumber( (arg0 >= 549755813888) ? arg0 - 1099511627776 : arg0 );
+
+    }
+    else{
+        this.value = new cError( cErrorType.not_numeric );
+    }
+
+    return this.value;
+
+}
+cHEX2DEC.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( number )"
+    };
+}
 
 function cHEX2OCT() {
-    cBaseFunction.call( this, "HEX2OCT" );
+    cBaseFunction.call( this, "HEX2OCT", 1, 2 );
 }
 
 cHEX2OCT.prototype = Object.create( cBaseFunction.prototype );
+cHEX2OCT.prototype.Calculate = function ( arg ) {
+
+    var arg0 = arg[0],
+        arg1 = arg[1] ? arg[1] : new cNumber(1);
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    else if ( arg1 instanceof cArray ) {
+        arg1 = arg1.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocString();
+    arg1 = arg1.tocNumber();
+
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+
+    arg0 = arg0.getValue();
+    arg1 = arg1.getValue();
+
+    if( validHEXNumber(arg0) && arg1 > 0 && arg1 <= 10 ){
+
+        arg0 = parseInt( arg0, NumberBase.HEX );
+
+        if ( arg0 > 536870911 && arg0 < 1098974756864 ) {
+            this.value = new cError( cErrorType.not_numeric );
+        }else{
+
+            if ( arg0 >= 1098974756864 ) {
+                this.value = new cString( (arg0 - 1098437885952).toString( NumberBase.OCT ).toUpperCase() );
+            }else{
+                this.value = convertFromTo( arg0, NumberBase.DEC, NumberBase.OCT, arg1 );
+            }
+
+        }
+
+    }
+    else{
+        this.value = new cError( cErrorType.not_numeric );
+    }
+
+    return this.value;
+
+}
+cHEX2OCT.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( number [ , num-hex-digits ] )"
+    };
+}
 
 function cIMABS() {
     cBaseFunction.call( this, "IMABS" );
@@ -623,19 +1114,166 @@ function cIMSUM() {
 cIMSUM.prototype = Object.create( cBaseFunction.prototype );
 
 function cOCT2BIN() {
-    cBaseFunction.call( this, "OCT2BIN" );
+    cBaseFunction.call( this, "OCT2BIN", 1, 2 );
 }
 
 cOCT2BIN.prototype = Object.create( cBaseFunction.prototype );
+cOCT2BIN.prototype.Calculate = function ( arg ) {
+
+    var arg0 = arg[0],
+        arg1 = arg[1] ? arg[1] : new cNumber(1);
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    else if ( arg1 instanceof cArray ) {
+        arg1 = arg1.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocString();
+    arg1 = arg1.tocNumber();
+
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+
+    arg0 = arg0.getValue();
+    arg1 = arg1.getValue();
+
+    if( validOCTNumber(arg0) && arg1 > 0 && arg1 <= 10 ){
+
+        var negative = (arg0.length === 10 && arg0.substring( 0, 1 ).toUpperCase() === '7'),
+            arg0DEC = (negative) ? parseInt( arg0, NumberBase.OCT ) - 1073741824 : parseInt( arg0, NumberBase.OCT );
+
+        if ( arg0DEC < -512 || arg0DEC > 511 ) {
+            this.value = new cError( cErrorType.not_numeric )
+        }else{
+
+            if ( negative ) {
+                var str = (512 + arg0DEC).toString( NumberBase.BIN );
+                this.value = new cString( ('1' + String.prototype.repeat( '0', 9 - str.length ) + str).toUpperCase() );
+            }else{
+                this.value = convertFromTo( arg0DEC, NumberBase.DEC, NumberBase.BIN, arg1 );
+            }
+
+        }
+    }
+    else{
+        this.value = new cError( cErrorType.not_numeric );
+    }
+
+    return this.value;
+
+}
+cOCT2BIN.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( number [ , num-hex-digits ] )"
+    };
+}
 
 function cOCT2DEC() {
-    cBaseFunction.call( this, "OCT2DEC" );
+    cBaseFunction.call( this, "OCT2DEC", 1, 1 );
 }
 
 cOCT2DEC.prototype = Object.create( cBaseFunction.prototype );
+cOCT2DEC.prototype.Calculate = function ( arg ) {
+
+    var arg0 = arg[0];
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocString();
+
+    if ( arg0 instanceof cError ) return this.value = arg0;
+
+    arg0 = arg0.getValue();
+
+    if( validOCTNumber(arg0) ){
+
+        arg0 = parseInt( arg0, NumberBase.OCT );
+        this.value = new cNumber( (arg0 >= 536870912) ? arg0 - 1073741824 : arg0 );
+
+    }
+    else{
+        this.value = new cError( cErrorType.not_numeric );
+    }
+
+    return this.value;
+
+}
+cOCT2DEC.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( number )"
+    };
+}
 
 function cOCT2HEX() {
-    cBaseFunction.call( this, "OCT2HEX" );
+    cBaseFunction.call( this, "OCT2HEX", 1, 2 );
 }
 
 cOCT2HEX.prototype = Object.create( cBaseFunction.prototype );
+cOCT2HEX.prototype.Calculate = function ( arg ) {
+
+    var arg0 = arg[0],
+        arg1 = arg[1] ? arg[1] : new cNumber(1);
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    else if ( arg1 instanceof cArray ) {
+        arg1 = arg1.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocString();
+    arg1 = arg1.tocNumber();
+
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+
+    arg0 = arg0.getValue();
+    arg1 = arg1.getValue();
+
+    if( validHEXNumber(arg0) && arg1 > 0 && arg1 <= 10 ){
+
+        arg0 = parseInt( arg0, NumberBase.OCT );
+
+        if ( arg0 >= 536870912 ) {
+            this.value = new cString( ('ff' + (arg0 + 3221225472).toString( NumberBase.HEX )).toUpperCase() );
+        }else{
+            this.value = convertFromTo( arg0, NumberBase.DEC, NumberBase.HEX, arg1 );
+        }
+
+    }
+    else{
+        this.value = new cError( cErrorType.not_numeric );
+    }
+
+    return this.value;
+
+}
+cOCT2HEX.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( number [ , num-hex-digits ] )"
+    };
+}
