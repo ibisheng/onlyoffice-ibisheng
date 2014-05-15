@@ -3948,12 +3948,25 @@ function CEditorPage(api)
         {
             var _textPr = oThis.m_oLogicDocument.Get_Paragraph_TextPr();
 
-            if (g_fontSelections.checkPasteText(_textPr, _language))
+            var _check_obj = g_fontSelections.checkPasteText(_textPr, _language);
+            if (_check_obj.is_async)
             {
-                // ждем коллбэка
-                // TODO:
-                oThis.m_oLogicDocument.TextBox_Put(oThis.TextBoxInput.value);
-                this.ReinitTB();
+                var loader = window.g_font_loader;
+                var nIndex = loader.map_font_index[_check_obj.name];
+                var fontinfo = loader.fontInfos[nIndex];
+                var isasync = loader.LoadFont(fontinfo);
+                if (false === isasync)
+                {
+                    var _rfonts = g_fontSelections.getSetupRFonts(_check_obj);
+                    oThis.m_oLogicDocument.TextBox_Put(oThis.TextBoxInput.value, _rfonts);
+                    this.ReinitTB();
+                }
+                else
+                {
+                    oThis.m_oApi.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadFont);
+                    _check_obj.text = oThis.TextBoxInput.value;
+                    g_fontSelections.CurrentLoadedObj = _check_obj;
+                }
             }
             else
             {

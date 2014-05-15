@@ -6383,6 +6383,17 @@ asc_docs_api.prototype.asyncFontEndLoaded = function(fontinfo)
 {
     this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
 
+    if (g_fontSelections.CurrentLoadedObj != null)
+    {
+        var _rfonts = g_fontSelections.getSetupRFonts(g_fontSelections.CurrentLoadedObj);
+        this.WordControl.m_oLogicDocument.TextBox_Put(g_fontSelections.CurrentLoadedObj.text, _rfonts);
+        this.WordControl.ReinitTB();
+
+        g_fontSelections.CurrentLoadedObj = null;
+        this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadFont);
+        return;
+    }
+
     if (this.FontAsyncLoadType == 1)
     {
         this.FontAsyncLoadType = 0;

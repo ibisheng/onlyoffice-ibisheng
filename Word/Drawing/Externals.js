@@ -961,7 +961,7 @@ CFontInfo.prototype =
 
         // index != -1 (!!!)
         var fontfile = (this.Type == FONT_TYPE_EMBEDDED) ? font_loader.embeddedFontFiles[index] : font_loader.fontFiles[index];
-        return { id: fontfile.Id, faceIndex : faceIndex };
+        return { id: fontfile.Id, faceIndex : faceIndex, file : fontfile };
     }
 }
 
@@ -1451,8 +1451,8 @@ var LanguagesFontSelectTypes =
     Japan       : 3,
     Chinese     : 4,
 
-    EastAsiaStart   : this.Korean,
-    EastAsiaEnd     : this.Chinese
+    EastAsiaStart   : 2,
+    EastAsiaEnd     : 4
 };
 
 function CFontSelectList()
@@ -1466,6 +1466,7 @@ function CFontSelectList()
     this.m_pRangesNums = null;
 
     this.IsInit = false;
+    this.CurrentLoadedObj = null;
 }
 
 function memset(p, start, val, count)
@@ -1700,8 +1701,10 @@ CFontSelectList.prototype =
 
     checkPasteText : function(textPr, langId)
     {
+        var _ret_obj = { is_async : false, name : "", fontSlot : fontslot_ASCII };
+
         if (!textPr.RFonts)
-            return false;
+            return _ret_obj;
 
         var _lang = null;
         for (var i = 0; i < this.Languages.length; i++)
@@ -1715,24 +1718,24 @@ CFontSelectList.prototype =
         if (null == _lang)
         {
             // такого быть не должно
-            return false;
+            return _ret_obj;
         }
 
-        var _fontSlot = fontslot_ASCII;
+        _ret_obj.fontSlot = fontslot_ASCII;
 
         if (langId >= LanguagesFontSelectTypes.EastAsiaStart && langId <= LanguagesFontSelectTypes.EastAsiaEnd)
-            _fontSlot = fontslot_EastAsia;
+            _ret_obj.fontSlot = fontslot_EastAsia;
 
         if (langId == LanguagesFontSelectTypes.Arabic)
         {
             if (textPr.CS || textPr.RTL)
-                _fontSlot = fontslot_CS;
+                _ret_obj.fontSlot = fontslot_CS;
         }
 
         var _fontFamily = undefined;
         var bold    = undefined;
         var italic  = undefined;
-        switch (_fontSlot)
+        switch (_ret_obj.fontSlot)
         {
             case fontslot_ASCII:
             {
@@ -1767,7 +1770,7 @@ CFontSelectList.prototype =
         }
 
         if (undefined == _fontFamily)
-            return false;
+            return _ret_obj;
 
         var _info = window.g_font_infos[window.g_map_font_index[_fontFamily.Name]];
 
@@ -1782,18 +1785,17 @@ CFontSelectList.prototype =
         var _id = _info.GetFontID(window.g_font_loader, oFontStyle);
         var _select = this.List[this.ListMap[_id.id]];
 
-        var _bIsNeed = false;
         if (0 != _lang.CodePage1Mask)
         {
             if (!_lang.FullSupportPages)
             {
                 if (0 == (_lang.CodePage1Mask & _select.m_ulCodePageRange1))
-                    _bIsNeed = true;
+                    _ret_obj.is_async = true;
             }
             else
             {
                 if (_lang.CodePage1Mask != (_lang.CodePage1Mask & _select.m_ulCodePageRange1))
-                    _bIsNeed = true;
+                    _ret_obj.is_async = true;
             }
         }
         if (0 != _lang.CodePage2Mask)
@@ -1801,16 +1803,112 @@ CFontSelectList.prototype =
             if (!_lang.FullSupportPages)
             {
                 if (0 == (_lang.CodePage2Mask & _select.m_ulCodePageRange2))
-                    _bIsNeed = true;
+                    _ret_obj.is_async = true;
             }
             else
             {
                 if (_lang.CodePage2Mask != (_lang.CodePage2Mask & _select.m_ulCodePageRange2))
-                    _bIsNeed = true;
+                    _ret_obj.is_async = true;
             }
         }
 
-        return _bIsNeed;
+        if (!_ret_obj.is_async)
+            return _ret_obj;
+
+        _ret_obj.name = this.selectNeedFont(_lang, oFontStyle);
+        if (_ret_obj.name == "")
+            _ret_obj.is_async = false;
+
+        return _ret_obj;
+    },
+
+    getSetupRFonts : function(obj)
+    {
+        var _rfonts = new CRFonts();
+        switch (obj.fontSlot)
+        {
+            case fontslot_EastAsia:
+            {
+                _rfonts.EastAsia = { Name : obj.name, Index : -1 };
+                break;
+            }
+            case fontslot_CS:
+            {
+                _rfonts.CS = { Name : obj.name, Index : -1 };
+                break;
+            }
+            case fontslot_HAnsi:
+            {
+                _rfonts.HAnsi = { Name : obj.name, Index : -1 };
+                break;
+            }
+            case fontslot_ASCII:
+            default:
+            {
+                _rfonts.Ascii = { Name : obj.name, Index : -1 };
+                break;
+            }
+        }
+        return _rfonts;
+    },
+
+    selectNeedFont : function(_lang, _style)
+    {
+        var _error = 0x01000000;
+        var _name = "";
+
+        var _len = window.g_font_infos.length;
+        for (var i = 0; i < _len; i++)
+        {
+            var _info = window.g_font_infos[i];
+            var _id = _info.GetFontID(window.g_font_loader, _style);
+            var _select = this.List[this.ListMap[_id.id]];
+
+            var _bIsNeed = false;
+            if (0 != _lang.CodePage1Mask)
+            {
+                if (!_lang.FullSupportPages)
+                {
+                    if (0 == (_lang.CodePage1Mask & _select.m_ulCodePageRange1))
+                        _bIsNeed = true;
+                }
+                else
+                {
+                    if (_lang.CodePage1Mask != (_lang.CodePage1Mask & _select.m_ulCodePageRange1))
+                        _bIsNeed = true;
+                }
+            }
+            if (0 != _lang.CodePage2Mask)
+            {
+                if (!_lang.FullSupportPages)
+                {
+                    if (0 == (_lang.CodePage2Mask & _select.m_ulCodePageRange2))
+                        _bIsNeed = true;
+                }
+                else
+                {
+                    if (_lang.CodePage2Mask != (_lang.CodePage2Mask & _select.m_ulCodePageRange2))
+                        _bIsNeed = true;
+                }
+            }
+
+            if (!_bIsNeed)
+            {
+                var _tmp_error = 0;
+                if (_id.file.Status != 0)
+                    _tmp_error += 0x00010000;
+                if (_info.Name != _lang.DefaultFont)
+                    _tmp_error += 0x00000100;
+
+                if (_tmp_error < _error)
+                {
+                    _error = _tmp_error;
+                    _name = _info.Name;
+                }
+            }
+        }
+
+        return _name;
     },
 
     checkText2 : function(text)
