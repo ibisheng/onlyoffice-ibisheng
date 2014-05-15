@@ -12626,32 +12626,53 @@ CDocument.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с textbox
 //-----------------------------------------------------------------------------------
-    TextBox_Put : function(sText)
+    TextBox_Put : function(sText, rFonts)
     {
         if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
         {
             this.Create_NewHistoryPoint();
-
-            // Отключаем пересчет, включим перед последним добавлением. Поскольку,
-            // у нас все добавляется в 1 параграф, так можно делать.
-            this.TurnOffRecalc = true;
-
-            var Count = sText.length;
-            var e = global_keyboardEvent;
-            for ( var Index = 0; Index < Count; Index++ )
+            
+            if ( undefined === rFonts )
             {
-                if ( Index === Count - 1 )
-                    this.TurnOffRecalc = false;
+                // Отключаем пересчет, включим перед последним добавлением. Поскольку,
+                // у нас все добавляется в 1 параграф, так можно делать.
+                this.TurnOffRecalc = true;
 
-                var _char = sText.charAt(Index);
-                if (" " == _char)
-                    this.Paragraph_Add( new ParaSpace(1) );
-                else
-                    this.Paragraph_Add( new ParaText(_char) );                
+                var Count = sText.length;
+                var e = global_keyboardEvent;
+                for ( var Index = 0; Index < Count; Index++ )
+                {
+                    if ( Index === Count - 1 )
+                        this.TurnOffRecalc = false;
+
+                    var _char = sText.charAt(Index);
+                    if (" " == _char)
+                        this.Paragraph_Add( new ParaSpace(1) );
+                    else
+                        this.Paragraph_Add( new ParaText(_char) );
+                }
+
+                // На случай, если Count = 0
+                this.TurnOffRecalc = false;
             }
-
-            // На случай, если Count = 0
-            this.TurnOffRecalc = false;
+            else
+            {
+                var Para = this.Get_CurrentParagraph();
+                if ( null === Para )
+                    return;
+                
+                var RunPr = Para.Get_TextPr();
+                if ( null === RunPr || undefined === RunPr )
+                    RunPr = new CTextPr();
+                
+                RunPr.RFonts = rFonts;
+                
+                var Run = new CParaRun( Para );
+                Run.Set_Pr( RunPr );
+                Para.Add( Run );
+                
+                this.Recalculate();
+            }
         }
     },
 //-----------------------------------------------------------------------------------

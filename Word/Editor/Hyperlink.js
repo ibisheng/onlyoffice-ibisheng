@@ -373,7 +373,39 @@ ParaHyperlink.prototype =
 
     Add : function(Item)
     {
-        this.Content[this.State.ContentPos].Add( Item );
+        switch (Item.Type)
+        {            
+            case para_Run :
+            {
+                var CurItem = this.Content[this.State.ContentPos];
+
+                switch ( CurItem.Type )
+                {
+                    case para_Run :
+                    {
+                        var NewRun = CurItem.Split2(CurItem.State.ContentPos);
+
+                        this.Internal_Content_Add( CurPos + 1, Item );
+                        this.Internal_Content_Add( CurPos + 2, NewRun );
+                        break;
+                    }
+
+                    default:
+                    {
+                        this.Content[this.State.ContentPos].Add( Item );
+                        break;
+                    }
+                }
+
+                break;
+            }
+                
+            default :
+            {
+                this.Content[this.State.ContentPos].Add( Item );
+                break;
+            }
+        }
     },
 
     Remove : function(Direction, bOnAddText)

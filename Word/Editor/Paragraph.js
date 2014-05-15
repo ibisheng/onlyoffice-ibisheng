@@ -4264,7 +4264,8 @@ Paragraph.prototype =
             }
         }
 
-        Bottom = Bottom2 + this.Lines[CurLine].Metrics.LineGap;
+        Bottom2 += this.Lines[CurLine].Metrics.LineGap;
+        Bottom   = Bottom2;
 
         // Если данная строка последняя, тогда подкорректируем нижнюю границу
         if ( true === PRS.End )
@@ -7747,204 +7748,175 @@ Paragraph.prototype =
     // Добавляем новый элемент к содержимому параграфа (на текущую позицию)
     Add : function(Item)
     {
-        if ( true !== Debug_ParaRunMode )
+        // Выставляем родительский класс
+        Item.Parent = this;
+
+        switch (Item.Type)
         {
-            var CurPos  = this.CurPos.ContentPos;
-            var CurPos2 = this.CurPos.ContentPos2;
-
-            if ( "undefined" != typeof(Item.Parent) )
-                Item.Parent = this;
-
-            switch (Item.Type)
+            case para_Text:
+            case para_Space:
+            case para_PageNum:
+            case para_Tab:
+            case para_Drawing:
+            case para_NewLine:
             {
-                case para_Text:
-                case para_Space:
-                {
-                    if ( undefined !== this.Content[CurPos2] && para_Math === this.Content[CurPos2].Type )
-                        this.Content[CurPos2].Add( Item );
-                    else
-                        this.Internal_Content_Add( CurPos, Item );
+                // Элементы данного типа добавляем во внутренний элемент
+                this.Content[this.CurPos.ContentPos].Add( Item );
 
-                    break;
-                }
-                case para_TextPr:
-                {
-                    this.Internal_AddTextPr( Item.Value );
-                    break;
-                }
-                case para_HyperlinkStart:
-                {
-                    this.Internal_AddHyperlink( Item );
-                    break;
-                }
-                case para_Math:
-                {
-                    if ( undefined !== this.Content[CurPos2] && para_Math === this.Content[CurPos2].Type )
-                        this.Content[CurPos2].Add( Item );
-                    else
-                    {
-                        var TextPr = this.Internal_GetTextPr( CurPos );
-                        var NewParaTextPr = new ParaTextPr( TextPr );
-                        this.Internal_Content_Add( CurPos, Item );
-                        this.Internal_Content_Add( CurPos + 1, NewParaTextPr );
-                    }
-                    break;
-                }
-                case para_PageNum:
-                case para_Tab:
-                case para_Drawing:
-                default:
-                {
-                    this.Internal_Content_Add( CurPos, Item );
-
-                    break;
-                }
+                break;
             }
-
-            if ( para_TextPr != Item.Type )
-                this.DeleteCollaborativeMarks = true;
-
-            this.RecalcInfo.Set_Type_0(pararecalc_0_All);
-        }
-        else
-        {
-
-            // Выставляем родительский класс
-            Item.Parent = this;
-
-            switch (Item.Type)
+            case para_TextPr:
             {
-                case para_Text:
-                case para_Space:
-                case para_PageNum:
-                case para_Tab:
-                case para_Drawing:
-                case para_NewLine:
-                {
-                    // Элементы данного типа добавляем во внутренний элемент
-                    this.Content[this.CurPos.ContentPos].Add( Item );
+                var TextPr = Item.Value;
 
-                    break;
+                if ( undefined != TextPr.FontFamily )
+                {
+                    var FName  = TextPr.FontFamily.Name;
+                    var FIndex = TextPr.FontFamily.Index;
+
+                    TextPr.RFonts = new CRFonts();
+                    TextPr.RFonts.Ascii    = { Name : FName, Index : FIndex };
+                    TextPr.RFonts.EastAsia = { Name : FName, Index : FIndex };
+                    TextPr.RFonts.HAnsi    = { Name : FName, Index : FIndex };
+                    TextPr.RFonts.CS       = { Name : FName, Index : FIndex };
                 }
-                case para_TextPr:
+
+                if ( true === this.ApplyToAll )
                 {
-                    var TextPr = Item.Value;
+                    // Применяем настройки ко всем элементам параграфа
+                    var ContentLen = this.Content.length;
 
-                    if ( undefined != TextPr.FontFamily )
+                    for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
                     {
-                        var FName  = TextPr.FontFamily.Name;
-                        var FIndex = TextPr.FontFamily.Index;
-
-                        TextPr.RFonts = new CRFonts();
-                        TextPr.RFonts.Ascii    = { Name : FName, Index : FIndex };
-                        TextPr.RFonts.EastAsia = { Name : FName, Index : FIndex };
-                        TextPr.RFonts.HAnsi    = { Name : FName, Index : FIndex };
-                        TextPr.RFonts.CS       = { Name : FName, Index : FIndex };
+                        this.Content[CurPos].Apply_TextPr( TextPr, undefined, true );
                     }
 
-                    if ( true === this.ApplyToAll )
+                    // Выставляем настройки для символа параграфа
+                    this.TextPr.Apply_TextPr( TextPr );
+                }
+                else
+                {
+                    if ( true === this.Selection.Use )
                     {
-                        // Применяем настройки ко всем элементам параграфа
-                        var ContentLen = this.Content.length;
-
-                        for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
-                        {
-                            this.Content[CurPos].Apply_TextPr( TextPr, undefined, true );
-                        }
-
-                        // Выставляем настройки для символа параграфа
-                        this.TextPr.Apply_TextPr( TextPr );
+                        this.Apply_TextPr(TextPr);
                     }
                     else
                     {
-                        if ( true === this.Selection.Use )
+                        var CurParaPos = this.Get_ParaContentPos( false, false );
+                        var CurPos = CurParaPos.Get(0);
+
+                        // Сначала посмотрим на элемент слева и справа(текущий)
+                        var SearchLPos = new CParagraphSearchPos();
+                        this.Get_LeftPos( SearchLPos, CurParaPos );
+
+                        var RItem = this.Get_RunElementByPos( CurParaPos );
+                        var LItem = ( false === SearchLPos.Found ? null : this.Get_RunElementByPos( SearchLPos.Pos ) );
+
+                        // 1. Если мы находимся в конце параграфа, тогда применяем заданную настройку к знаку параграфа
+                        //    и добавляем пустой ран с заданными настройками.
+                        // 2. Если мы находимся в середине слова (справа и слева текстовый элемент, причем оба не пунктуация),
+                        //    тогда меняем настройки для данного слова.
+                        // 3. Во всех остальных случаях вставляем пустой ран с заданными настройкми и переносим курсор в этот
+                        //    ран, чтобы при последующем наборе текст отрисовывался с нужными настройками.
+
+                        if ( null === RItem || para_End === RItem.Type )
                         {
-                            this.Apply_TextPr(TextPr);
+                            this.Apply_TextPr( TextPr );
+                            this.TextPr.Apply_TextPr( TextPr );
+                        }
+                        else if ( null !== RItem && null !== LItem && para_Text === RItem.Type && para_Text === LItem.Type && false === RItem.Is_Punctuation() && false === LItem.Is_Punctuation() )
+                        {
+                            var SearchSPos = new CParagraphSearchPos();
+                            var SearchEPos = new CParagraphSearchPos();
+
+                            this.Get_WordStartPos( SearchSPos, CurParaPos );
+                            this.Get_WordEndPos( SearchEPos, CurParaPos );
+
+                            // Такого быть не должно, т.к. мы уже проверили, что справа и слева точно есть текст
+                            if ( true !== SearchSPos.Found || true !== SearchEPos.Found )
+                                return;
+
+                            // Выставим временно селект от начала и до конца слова
+                            this.Selection.Use = true;
+                            this.Set_SelectionContentPos( SearchSPos.Pos, SearchEPos.Pos );
+
+                            this.Apply_TextPr( TextPr );
+
+                            // Убираем селект
+                            this.Selection_Remove();
                         }
                         else
                         {
-                            var CurParaPos = this.Get_ParaContentPos( false, false );
-                            var CurPos = CurParaPos.Get(0);
-
-                            // Сначала посмотрим на элемент слева и справа(текущий)
-                            var SearchLPos = new CParagraphSearchPos();
-                            this.Get_LeftPos( SearchLPos, CurParaPos );
-
-                            var RItem = this.Get_RunElementByPos( CurParaPos );
-                            var LItem = ( false === SearchLPos.Found ? null : this.Get_RunElementByPos( SearchLPos.Pos ) );
-
-                            // 1. Если мы находимся в конце параграфа, тогда применяем заданную настройку к знаку параграфа
-                            //    и добавляем пустой ран с заданными настройками.
-                            // 2. Если мы находимся в середине слова (справа и слева текстовый элемент, причем оба не пунктуация),
-                            //    тогда меняем настройки для данного слова.
-                            // 3. Во всех остальных случаях вставляем пустой ран с заданными настройкми и переносим курсор в этот
-                            //    ран, чтобы при последующем наборе текст отрисовывался с нужными настройками.
-
-                            if ( null === RItem || para_End === RItem.Type )
-                            {
-                                this.Apply_TextPr( TextPr );
-                                this.TextPr.Apply_TextPr( TextPr );
-                            }
-                            else if ( null !== RItem && null !== LItem && para_Text === RItem.Type && para_Text === LItem.Type && false === RItem.Is_Punctuation() && false === LItem.Is_Punctuation() )
-                            {
-                                var SearchSPos = new CParagraphSearchPos();
-                                var SearchEPos = new CParagraphSearchPos();
-
-                                this.Get_WordStartPos( SearchSPos, CurParaPos );
-                                this.Get_WordEndPos( SearchEPos, CurParaPos );
-
-                                // Такого быть не должно, т.к. мы уже проверили, что справа и слева точно есть текст
-                                if ( true !== SearchSPos.Found || true !== SearchEPos.Found )
-                                    return;
-
-                                // Выставим временно селект от начала и до конца слова
-                                this.Selection.Use = true;
-                                this.Set_SelectionContentPos( SearchSPos.Pos, SearchEPos.Pos );
-
-                                this.Apply_TextPr( TextPr );
-
-                                // Убираем селект
-                                this.Selection_Remove();
-                            }
-                            else
-                            {
-                                this.Apply_TextPr( TextPr );
-                            }
+                            this.Apply_TextPr( TextPr );
                         }
                     }
-
-                    break;
                 }
-                case para_Math:
+
+                break;
+            }
+            case para_Math:
+            {
+                var ContentPos = this.Get_ParaContentPos(false, false);
+                var CurPos = ContentPos.Get(0);
+
+                if ( para_Math !== this.Content[CurPos].Type )
                 {
-                    var ContentPos = this.Get_ParaContentPos(false, false);
-                    var CurPos = ContentPos.Get(0);
+                    // Разделяем текущий элемент (возвращается правая часть)
+                    var NewElement = this.Content[CurPos].Split( ContentPos, 1 );
 
-                    if ( para_Math !== this.Content[CurPos].Type )
-                    {
-                        // Разделяем текущий элемент (возвращается правая часть)
-                        var NewElement = this.Content[CurPos].Split( ContentPos, 1 );
+                    if ( null !== NewElement )
+                        this.Internal_Content_Add( CurPos + 1, NewElement );
 
-                        if ( null !== NewElement )
-                            this.Internal_Content_Add( CurPos + 1, NewElement );
+                    // Добавляем гиперссылку в содержимое параграфа
+                    this.Internal_Content_Add( CurPos + 1, Item );
 
-                        // Добавляем гиперссылку в содержимое параграфа
-                        this.Internal_Content_Add( CurPos + 1, Item );
+                    // TODO: ParaMath Сделать перемещение курсора в формулу
 
-                        // TODO: ParaMath Сделать перемещение курсора в формулу
-
-                        // Перемещаем кусор в конец гиперссылки
-                        this.CurPos.ContentPos = CurPos;
-                        this.Content[CurPos].Cursor_MoveToEndPos( false );
-                    }
-                    else
-                        this.Content[CurPos].Add( Item );
-
-                    break;
+                    // Перемещаем кусор в конец гиперссылки
+                    this.CurPos.ContentPos = CurPos;
+                    this.Content[CurPos].Cursor_MoveToEndPos( false );
                 }
+                else
+                    this.Content[CurPos].Add( Item );
+
+                break;
+            }
+                
+            case para_Run :
+            {
+                var ContentPos = this.Get_ParaContentPos(false, false);
+                var CurPos = ContentPos.Get(0);
+                
+                var CurItem = this.Content[CurPos];
+                
+                switch ( CurItem.Type )
+                {
+                    case para_Run :
+                    {
+                        var NewRun = CurItem.Split(ContentPos, 1);
+                        
+                        this.Internal_Content_Add( CurPos + 1, Item );
+                        this.Internal_Content_Add( CurPos + 2, NewRun );                        
+                        break;
+                    }
+                        
+                    case para_Math:
+                    case para_Hyperlink:
+                    {
+                        CurItem.Add( Item );
+                        break;
+                    }
+                        
+                    default:
+                    {
+                        this.Internal_Content_Add( CurPos + 1, Item );                        
+                        break;
+                    }
+                }                                
+                
+                break;
             }
         }
-
     },
 
     // Данная функция вызывается, когда уже точно известно, что у нас либо выделение начинается с начала параграфа, либо мы стоим курсором в начале параграфа
