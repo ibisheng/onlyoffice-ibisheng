@@ -3737,6 +3737,8 @@ function CEditorPage(api)
         this.TextBoxInputMode = isEA;
         if (isEA)
         {
+            g_fontSelections.fromStream();
+
             if (null == this.TextBoxInput)
             {
                 this.TextBoxInput = document.createElement('textarea');
@@ -3899,6 +3901,44 @@ function CEditorPage(api)
         this.TextBoxInput.style.zIndex = -1;
         this.TextBoxInput.style.top = "-1000px";
         this.TextBoxInputFocus = false;
+
+        /*
+        var _language = g_fontSelections.checkText(oThis.TextBoxInput.value);
+        switch (_language)
+        {
+            case LanguagesFontSelectTypes.Arabic:
+            {
+                console.log("arabic");
+                break;
+            }
+            case LanguagesFontSelectTypes.Korean:
+            {
+                console.log("korean");
+                break;
+            }
+            case LanguagesFontSelectTypes.Japan:
+            {
+                console.log("japan");
+                break;
+            }
+            case LanguagesFontSelectTypes.Chinese:
+            {
+                console.log("chinese");
+                break;
+            }
+            case LanguagesFontSelectTypes.Unknown:
+            {
+                console.log("unknown");
+                break;
+            }
+            default:
+            {
+                console.log("error");
+                break;
+            }
+        }
+        */
+
         oThis.m_oLogicDocument.TextBox_Put(oThis.TextBoxInput.value);
         this.ReinitTB();
     }

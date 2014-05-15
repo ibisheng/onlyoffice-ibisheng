@@ -1457,6 +1457,8 @@ function CFontSelectList()
 
     this.m_pRanges = null;
     this.m_pRangesNums = null;
+
+    this.IsInit = false;
 }
 
 function memset(p, start, val, count)
@@ -1470,6 +1472,11 @@ CFontSelectList.prototype =
 {
     fromStream : function()
     {
+        if (true == this.IsInit)
+            return;
+
+        this.IsInit = true;
+
         // read from stream
         var _ft_stream = CreateFontData2(window["g_fonts_selection_bin"]);
         var _file_stream = new FileStream(_ft_stream.data, _ft_stream.size);
@@ -1506,10 +1513,18 @@ CFontSelectList.prototype =
         _japan_lang.Type = LanguagesFontSelectTypes.Japan;
         _japan_lang.Ranges.push(0x4E00);
         _japan_lang.Ranges.push(0x9FBF);
+
+        /*
+        _japan_lang.Ranges.push(0x3000);// punctuation
+        _japan_lang.Ranges.push(0x303F);
         _japan_lang.Ranges.push(0x3040);// Hiragana
         _japan_lang.Ranges.push(0x309F);
         _japan_lang.Ranges.push(0x30A0);// Katakana
         _japan_lang.Ranges.push(0x30FF);
+        */
+        _japan_lang.Ranges.push(0x3000);
+        _japan_lang.Ranges.push(0x30FF);
+
         _japan_lang.CodePage1Mask = (1 << 17) | (1 << 30);
         _japan_lang.CodePage2Mask = 0;
         _japan_lang.DefaultFont = "MS Mincho";
@@ -1547,6 +1562,15 @@ CFontSelectList.prototype =
         _korean_lang.DefaultFont = "Batang";
         this.Languages.push(_korean_lang);
 
+        // debug!!!
+        /*
+        var _symbols = " `~><.,:;?!/\\|[](){}$€%#@&\'\"=+-*^_1234567890";
+        console.log("start dump multisymbols -----------------------------");
+        for (var i = 0; i < _symbols.length; i++)
+        console.log("" + _symbols.charCodeAt(i));
+        console.log("end dump multisymbols -------------------------------");
+        */
+
         /*
         var _array_results = [];
         var _count_fonts = this.List.length;
@@ -1559,16 +1583,66 @@ CFontSelectList.prototype =
         */
     },
 
-    isSpaceSymbol : function(_code)
+    isMultiLanguageSymbol : function(_code)
     {
+        // здесь те символы, которые не влияют на язык
+
         switch (_code)
         {
             case 32:
+            case 96:
+            case 126:
+            case 62:
+            case 60:
+            case 46:
+            case 44:
+            case 58:
+            case 59:
+            case 63:
+            case 33:
+            case 47:
+            case 92:
+            case 124:
             case 91:
             case 93:
+            case 40:
+            case 41:
+            case 123:
+            case 125:
+            case 36:
+            case 37:
+            case 35:
+            case 64:
+            case 38:
+            case 39:
+            case 34:
+            case 61:
+            case 43:
+            case 45:
+            case 42:
+            case 94:
+            case 95:
+            case 49:
+            case 50:
+            case 51:
+            case 52:
+            case 53:
+            case 54:
+            case 55:
+            case 56:
+            case 57:
+            case 48:
                 return true;
             default:
+            {
+                if (_code >= 0x2000 && _code <= 0x206F) // general punctuation
+                    return true;
+
+                if (_code >= 0x20A0 && _code <= 0x20CF) // Currency Symbols
+                    return true;
+
                 break;
+            }
         }
         return false;
     },
@@ -1587,11 +1661,13 @@ CFontSelectList.prototype =
             var _language = this.Languages[_lang];
 
             var _is_support = true;
+            var _no_multi_symbols = 0;
             for (var i = 0; i < _text_len; i++)
             {
                 var _code = text.charCodeAt(i);
-                if (!this.isSpaceSymbol(_code))
+                if (!this.isMultiLanguageSymbol(_code))
                 {
+                    _no_multi_symbols++;
                     if (!_language.checkChar(_code))
                     {
                         _is_support = false;
@@ -1599,6 +1675,8 @@ CFontSelectList.prototype =
                     }
                 }
             }
+            if (0 == _no_multi_symbols)
+                return -1;
 
             if (_is_support)
                 _array_detect_languages.push(_language.Type);
