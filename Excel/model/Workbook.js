@@ -4659,14 +4659,7 @@ Range.prototype.getBBox0=function(){
 	return this.bbox;
 };
 Range.prototype.getName=function(){
-	var first = this.getFirst();
-	var sRes = first.getID();
-	if(false == this.isOneCell())
-	{
-		var last = this.getLast();
-		sRes = sRes + ":" + last.getID();
-	}
-	return sRes;
+    return this.bbox.getName();
 };
 Range.prototype.getCells=function(){
 	var aResult = [];
