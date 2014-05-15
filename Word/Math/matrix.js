@@ -509,10 +509,8 @@ function CEqArray(props)
     this.maxDist = 0;
     this.objDist = 0;
 
-    CMathMatrix.call(this);
-
     this.init(props);
-    this.setCtrPrp(props.ctrPrp);
+    this.setCtrPrp(props.ctrPrp)
 }
 extend(CEqArray, CMathMatrix);
 CEqArray.prototype.init = function(props)
@@ -544,8 +542,11 @@ CEqArray.prototype.init = function(props)
 
     if(props.objDist !== "undefined" && props.objDist !== null)
         this.objDist = props.objDist;
+
+
+    CMathMatrix.call(this, Pr);
     
-    CEqArray.superclass.init.call(this, Pr);
+    //CEqArray.superclass.init.call(this, Pr);
 }
 CEqArray.prototype.old_init = function(props)
 {
