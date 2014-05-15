@@ -164,6 +164,10 @@
 			this.c2 = c2;
 			/** @type Number */
 			this.r2 = r2;
+			this.r1Abs = false;
+			this.c1Abs = false;
+			this.r2Abs = false;
+			this.c2Abs = false;
 
 			return normalize ? this.normalize() : this;
 		}
@@ -185,7 +189,12 @@
 			},
 
 			clone: function (normalize) {
-				return new Range(this.c1, this.r1, this.c2, this.r2, normalize);
+			    var oRes = new Range(this.c1, this.r1, this.c2, this.r2, normalize);
+			    oRes.r1Abs = this.r1Abs;
+			    oRes.c1Abs = this.c1Abs;
+			    oRes.r2Abs = this.r2Abs;
+			    oRes.c2Abs = this.c2Abs;
+			    return oRes;
 			},
 
 			normalize: function () {
@@ -205,6 +214,10 @@
 
 			isEqual: function (range) {
 				return range && this.c1 === range.c1 && this.r1 === range.r1 && this.c2 === range.c2 && this.r2 === range.r2;
+			},
+
+			isEqualAll: function (range) {
+			    return this.isEqual(range) && this.r1Abs === range.r1Abs && this.r2Abs === range.r2Abs && this.c1Abs === range.c1Abs && this.c2Abs === range.c2Abs;
 			},
 
 			contains: function (c, r) {
@@ -294,19 +307,41 @@
 			},
 			
 			getName : function() {
-				var sRes;
-				if(0 == this.c1 && gc_nMaxCol0 == this.c2)
-					sRes = (this.r1 + 1) + ":" + (this.r2 + 1);
-				else if(0 == this.r1 && gc_nMaxRow0 == this.r2)
-					sRes = g_oCellAddressUtils.colnumToColstr(this.c1 + 1) + ":" + g_oCellAddressUtils.colnumToColstr(this.c2 + 1);
-				else
-				{
-					if(this.isOneCell())
-						sRes = g_oCellAddressUtils.colnumToColstr(this.c1 + 1) + (this.r1 + 1);
-					else
-						sRes = g_oCellAddressUtils.colnumToColstr(this.c1 + 1) + (this.r1 + 1) + ":" + g_oCellAddressUtils.colnumToColstr(this.c2 + 1) + (this.r2 + 1);
-				}
-				return sRes;
+			    var sRes = "";
+			    if (0 == this.c1 && gc_nMaxCol0 == this.c2) {
+			        if (this.r1Abs)
+			            sRes += "$";
+			        sRes += (this.r1 + 1) + ":";
+			        if (this.r2Abs)
+			            sRes += "$";
+			        sRes += (this.r2 + 1);
+			    }
+			    else if (0 == this.r1 && gc_nMaxRow0 == this.r2) {
+			        if (this.c1Abs)
+			            sRes += "$";
+			        sRes += g_oCellAddressUtils.colnumToColstr(this.c1 + 1) + ":";
+			        if (this.c2Abs)
+			            sRes += "$";
+			        sRes += g_oCellAddressUtils.colnumToColstr(this.c2 + 1);
+			    }
+			    else {
+			        if (this.c1Abs)
+			            sRes += "$";
+			        sRes += g_oCellAddressUtils.colnumToColstr(this.c1 + 1);
+			        if (this.r1Abs)
+			            sRes += "$";
+			        sRes += (this.r1 + 1);
+			        if (!this.isOneCell()) {
+			            sRes += ":";
+			            if (this.c2Abs)
+			                sRes += "$";
+			            sRes += g_oCellAddressUtils.colnumToColstr(this.c2 + 1);
+			            if (this.r2Abs)
+			                sRes += "$";
+			            sRes += (this.r2 + 1);
+			        }
+			    }
+			    return sRes;
 			},
 
 			getAllRange: function () {
@@ -587,13 +622,23 @@
 				    }
 
 				    if (1 == type) {
-				        if (null == oCacheVal.ascRange)
-				            oCacheVal.ascRange = new Asc.Range(c1, r1, c2, r2);
+				        if (null == oCacheVal.ascRange) {
+				            var oAscRange = new Asc.Range(c1, r1, c2, r2);
+				            oAscRange.r1Abs = oCacheVal.first.getRowAbs();
+				            oAscRange.c1Abs = oCacheVal.first.getColAbs();
+				            oAscRange.r2Abs = oCacheVal.last.getRowAbs();
+				            oAscRange.c2Abs = oCacheVal.last.getColAbs();
+				            oCacheVal.ascRange = oAscRange;
+				        }
 				        oRes = oCacheVal.ascRange;
 				    }
 				    else if (2 == type) {
 				        if (null == oCacheVal.activeRange) {
 				            var oActiveRange = new Asc.ActiveRange(c1, r1, c2, r2);
+				            oActiveRange.r1Abs = oCacheVal.first.getRowAbs();
+				            oActiveRange.c1Abs = oCacheVal.first.getColAbs();
+				            oActiveRange.r2Abs = oCacheVal.last.getRowAbs();
+				            oActiveRange.c2Abs = oCacheVal.last.getColAbs();
 				            var bCol = 0 == r1 && gc_nMaxRow0 == r2;
 				            var bRow = 0 == c1 && gc_nMaxCol0 == c2;
 				            if (bCol && bRow)
