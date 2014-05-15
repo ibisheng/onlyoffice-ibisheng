@@ -38,7 +38,7 @@ function CMathMatrix(props)
 
     CMathBase.call(this);
 
-    CMathMatrix.superclass.init.call(props);
+    CMathMatrix.superclass.init.call(this, props);
     this.setCtrPrp(props.ctrPrp);
 }
 extend(CMathMatrix, CMathBase);
