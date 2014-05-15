@@ -1,9 +1,11 @@
-function CLimit()
+function CLimit(props)
 {
     this.kind = MATH_LIMIT;
 
     this.type = LIMIT_LOW;
     CMathBase.call(this);
+
+    this.init(props);
 }
 extend(CLimit, CMathBase);
 CLimit.prototype.init = function(props)

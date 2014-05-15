@@ -1,4 +1,4 @@
-function CMathMatrix()
+function CMathMatrix(props)
 {
     this.kind = MATH_MATRIX;
 
@@ -37,6 +37,8 @@ function CMathMatrix()
 
 
     CMathBase.call(this);
+
+    this.init(props);
 }
 extend(CMathMatrix, CMathBase);
 CMathMatrix.prototype.init = function(props)

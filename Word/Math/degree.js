@@ -1,4 +1,4 @@
-function CDegree()
+function CDegree(props)
 {
     this.kind = MATH_DEGREE;
 
@@ -8,6 +8,8 @@ function CDegree()
     this.alnScr = false;  // не выровнены, итераторы идут в соответствии с наклоном буквы/мат. объекта
 
     CMathBase.call(this);
+
+    this.init(props);
 }
 extend(CDegree, CMathBase);
 CDegree.prototype.init = function(props)
@@ -17,10 +19,11 @@ CDegree.prototype.init = function(props)
     else if(props.alnScr === false || props.alnScr === 0)
         this.alnScr = false;
 
-    this.init_2( props, new CMathContent() );
-}
-CDegree.prototype.init_2 = function(props, oBase)
-{
+    var oBase = new CMathContent();
+
+    if(props.indef == 2) /// props include Base for CNary
+        oBase = props.oBase;
+
     if(props.type === DEGREE_SUPERSCRIPT)
         this.type = DEGREE_SUPERSCRIPT;
     else if(props.type === DEGREE_SUBSCRIPT)
@@ -36,6 +39,20 @@ CDegree.prototype.init_2 = function(props, oBase)
     /// вызов этой функции обязательно в конце
     this.WriteContentsToHistory();
 }
+/*CDegree.prototype.init_2 = function(props, oBase)
+{
+    if(props.type === DEGREE_SUPERSCRIPT)
+        this.type = DEGREE_SUPERSCRIPT;
+    else if(props.type === DEGREE_SUBSCRIPT)
+        this.type = DEGREE_SUBSCRIPT;
+
+    this.setDimension(1, 2);
+
+    var oDegree = new CMathContent();
+    oDegree.decreaseArgSize();
+
+    this.addMCToContent(oBase, oDegree);
+}*/
 CDegree.prototype.recalculateSize = function(oMeasure)
 {
     if(this.type === DEGREE_SUPERSCRIPT)
@@ -598,7 +615,7 @@ CIterators.prototype.getCtrPrp = function()
     return this.Parent.getCtrPrp();
 }
 
-function CDegreeSubSup()
+function CDegreeSubSup(props)
 {
     this.kind = MATH_DEGREESubSup;
 
@@ -606,6 +623,8 @@ function CDegreeSubSup()
     this.type = DEGREE_SubSup;
     this.alnScr = false;    // не выровнены, итераторы идут в соответствии с наклоном буквы/мат. объекта
     CMathBase.call(this);
+
+    this.init(props);
 }
 extend(CDegreeSubSup, CMathBase);
 CDegreeSubSup.prototype.init = function(props)
@@ -616,10 +635,10 @@ CDegreeSubSup.prototype.init = function(props)
         this.alnScr = false;
 
     var oBase = new CMathContent();
-    this.init_2(props, oBase);
-}
-CDegreeSubSup.prototype.init_2 = function(props, oBase)
-{
+
+    if(props.indef == 2) /// props include Base for CNary
+        oBase = props.oBase;
+
     if(props.type === DEGREE_SubSup)
         this.type = DEGREE_SubSup;
     else if(props.type === DEGREE_PreSubSup)
@@ -649,6 +668,37 @@ CDegreeSubSup.prototype.init_2 = function(props, oBase)
     /// вызов этой функции обязательно в конце
     this.WriteContentsToHistory();
 }
+/*CDegreeSubSup.prototype.init_2 = function(props, oBase)
+{
+    if(props.type === DEGREE_SubSup)
+        this.type = DEGREE_SubSup;
+    else if(props.type === DEGREE_PreSubSup)
+        this.type = DEGREE_PreSubSup;
+
+    this.setDimension(1, 2);
+
+    var oIters = new CIterators();
+    oIters.init();
+    oIters.decreaseArgSize();
+
+
+    oIters.lUp = 0;
+    oIters.lD = 0;
+
+    if(this.type == DEGREE_SubSup)
+    {
+        oIters.alignHor(-1, 0);
+        this.addMCToContent(oBase, oIters);
+    }
+    else if(this.type == DEGREE_PreSubSup)
+    {
+        oIters.alignHor(-1, 1);
+        this.addMCToContent(oIters, oBase);
+    }
+
+    /// вызов этой функции обязательно в конце
+    this.WriteContentsToHistory();
+}*/
 CDegreeSubSup.prototype.old_old_recalculateSize = function(oMeasure)
 {
     var mgCtrPrp = this.mergeCtrTPrp();

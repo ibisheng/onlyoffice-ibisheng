@@ -104,9 +104,14 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Get_TextPr
 
-        return new CTextPr();
-    },
+        var TextPr = new CTextPr();
 
+        var mTextPr = this.Root.Get_TextPr(_ContentPos, Depth);
+        TextPr.Merge( mTextPr );
+
+
+        return TextPr;
+    },
     Get_CompiledTextPr : function(Copy)
     {
         // TODO: ParaMath.Get_CompiledTextPr
@@ -114,9 +119,12 @@ ParaMath.prototype =
         var TextPr = new CTextPr();
         TextPr.Init_Default();
 
+        var oContent = this.GetSelectContent();
+        var mTextPr = oContent.Content.Get_CompiledTextPr(Copy);
+        TextPr.Merge( mTextPr );
+
         return TextPr;
     },
-
     Add : function(Item)
     {
 		var Type = Item.Type;
@@ -311,49 +319,13 @@ ParaMath.prototype =
         return new CParaPos( this.StartRange, this.StartLine, 0, 0 );
     },
 
-    Get_Default_TPrp: function()
-    {
-        var TextPrp = new CTextPr();
-        TextPrp.Init_Default();
-
-        var mathFont = new CTextPr();
-
-        var obj =
-        {
-            FontFamily:     {Name  : "Cambria Math", Index : -1 },
-            RFonts:
-            {
-                Ascii:      {Name  : "Cambria Math", Index : -1 }
-            }
-        };
-
-        mathFont.Set_FromObject(obj);
-
-        
-        TextPrp.Merge(mathFont);
-
-
-        /*var DefaultPrp =
-        {
-            FontFamily:     {Name  : "Cambria Math", Index : -1 },
-            RFonts:
-            {
-                Ascii:      {Name  : "Cambria Math", Index : -1 }
-            },
-            FontSize:       11,
-            FontSizeCS:     11,
-            Italic:         true,
-            Bold:           false
-        };
-
-        TextPrp.Set_FromObject(DefaultPrp);*/
-
-        return TextPrp;
-    },
 
     Apply_TextPr : function(TextPr, IncFontSize, ApplyToAll)
     {
         // TODO: ParaMath.Apply_TextPr
+
+
+
     },
 
     Clear_TextPr : function()
@@ -1002,6 +974,45 @@ ParaMath.prototype =
     GetMathPr: function()
     {
         return this.MathPr;
+    },
+    Get_Default_TPrp: function()
+    {
+        var TextPrp = new CTextPr();
+        TextPrp.Init_Default();
+
+        var mathFont = new CTextPr();
+
+        var obj =
+        {
+            FontFamily:     {Name  : "Cambria Math", Index : -1 },
+            RFonts:
+            {
+                Ascii:      {Name  : "Cambria Math", Index : -1 }
+            }
+        };
+
+        mathFont.Set_FromObject(obj);
+
+
+        TextPrp.Merge(mathFont);
+
+
+        /*var DefaultPrp =
+         {
+         FontFamily:     {Name  : "Cambria Math", Index : -1 },
+         RFonts:
+         {
+         Ascii:      {Name  : "Cambria Math", Index : -1 }
+         },
+         FontSize:       11,
+         FontSizeCS:     11,
+         Italic:         true,
+         Bold:           false
+         };
+
+         TextPrp.Set_FromObject(DefaultPrp);*/
+
+        return TextPrp;
     },
 //-----------------------------------------------------------------------------------
 // Функции отрисовки

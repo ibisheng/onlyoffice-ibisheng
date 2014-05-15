@@ -1385,6 +1385,8 @@ CMathBase.prototype =
             this.elements[startX][startY].Set_SelectionContentPos(StartContentPos, null, Depth, StartFlag, -1);
         }
 
+        this.bSelectionUse = true;
+
     },
     Selection_IsEmpty: function()
     {
@@ -1574,6 +1576,52 @@ CMathBase.prototype =
             }
 
         return NewObj;
+    },
+    Get_TextPr: function(ContentPos, Depth)
+    {
+        var row = ContentPos.Get(Depth),
+            col = ContentPos.Get(Depth+1);
+
+        var TextPr = this.elements[row][col].Get_TextPr(ContentPos, Depth + 2);
+
+        return TextPr;
+    },
+    Get_CompiledTextPr : function(Copy)
+    {
+        var start_x = 0,
+            start_y = 0;
+
+        var TextPr = null;
+
+        while(start_x < this.nCol && start_y < this.nRow && (TextPr == null || this.elements[start_x][start_y].IsJustDraw() ))
+        {
+            if(!this.elements[start_x][start_y].IsJustDraw())
+                TextPr = this.elements[start_x][start_y].Get_CompiledTextPr(Copy);
+
+            start_y++;
+
+            if(start_x >= this.nCol)
+            {
+                start_x++;
+                start_y = 0;
+            }
+        }
+
+        for(var i=start_y; i < this.nRow; i++)
+        {
+            for(var j = start_x; j < this.nCol; j++)
+            {
+                if(!this.elements[i][j].IsJustDraw())
+                {
+                    var CurTextPr = this.elements[i][j].Get_CompiledPr(false);
+
+                    if ( null !== CurTextPr )
+                        TextPr = TextPr.Compare( CurTextPr );
+                }
+            }
+        }
+
+        return TextPr;
     }
 
     //////////////////////////

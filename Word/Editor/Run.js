@@ -7118,8 +7118,6 @@ ParaRun.prototype.Math_Recalculate = function(RecalcInfo)
 ParaRun.prototype.Math_Update_Cursor = function(X, Y, CurPage, UpdateTarget)
 {
     var runPrp = this.Get_CompiledPr(true);
-    this.Parent.applyArgSize(runPrp);
-
 
     var sizeCursor = runPrp.FontSize*g_dKoef_pt_to_mm;
 

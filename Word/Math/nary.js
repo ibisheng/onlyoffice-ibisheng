@@ -11,7 +11,7 @@
 //  0 - итраторы по прямой линии
 //  1 - итераторы расположены также, как у степени
 
-function CNary()
+function CNary(props)
 {
     this.kind = MATH_NARY;
 
@@ -21,6 +21,8 @@ function CNary()
     this.supHide = false;
     this.subHide = false;
     CMathBase.call(this);
+
+    this.init(props);
 }
 extend(CNary, CMathBase);
 CNary.prototype.init = function(props)
@@ -185,20 +187,20 @@ CNary.prototype.init = function(props)
         if( this.supHide && !this.subHide )
         {
             base = new CDegree();
-            var prp = {type: DEGREE_SUBSCRIPT};
-            base.init_2(prp, sign);
+            var prp = {type: DEGREE_SUBSCRIPT, indef: 2, oBase: sign};
+            //base.init_2(prp, sign);
         }
         else if( !this.supHide && this.subHide )
         {
             base = new CDegree();
-            var prp = {type: DEGREE_SUPERSCRIPT};
-            base.init_2(prp, sign);
+            var prp = {type: DEGREE_SUPERSCRIPT, indef: 2, oBase: sign};
+            //base.init_2(prp, sign);
         }
         else
         {
             base = new CDegreeSubSup();
-            var prp = {type: DEGREE_SubSup};
-            base.init_2(prp, sign);
+            var prp = {type: DEGREE_SubSup, indef: 2, oBase: sign};
+            //base.init_2(prp, sign);
         }
 
     }

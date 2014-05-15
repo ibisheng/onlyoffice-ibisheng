@@ -881,7 +881,7 @@ CSignRadical.prototype.relate = function(parent)
 //context.fill() для заливки
 //Graphics : df()
 
-function CRadical()
+function CRadical(props)
 {
     this.kind = MATH_RADICAL;
 
@@ -892,8 +892,9 @@ function CRadical()
     this.gapDegree = 0;
     this.gapWidth = 0; //  в случае со степенью, если ширина степени не нулевая, добавляется расстояние для ширины
 
-
     CMathBase.call(this);
+
+    this.init(props);
 }
 extend(CRadical, CMathBase);
 CRadical.prototype.init = function(props)

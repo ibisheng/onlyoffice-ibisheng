@@ -1,4 +1,4 @@
-function CBorderBox()
+function CBorderBox(props)
 {
     this.kind = MATH_BORDER_BOX;
 
@@ -28,6 +28,8 @@ function CBorderBox()
     this.bVert = true;*/
 
     CMathBase.call(this);
+
+    this.init(props);
 }
 extend(CBorderBox, CMathBase);
 CBorderBox.prototype.init = function(props)
@@ -300,7 +302,7 @@ CBorderBox.prototype.getPropsForWrite = function()
     return props;
 }
 
-function CBox()
+function CBox(props)
 {
     this.kind = MATH_BOX;
 
@@ -311,6 +313,8 @@ function CBox()
     this.brk = false;
 
     CMathBase.call(this);
+
+    this.init(props);
 }
 extend(CBox, CMathBase);
 CBox.prototype.init = function(props)
@@ -357,7 +361,7 @@ CBox.prototype.getPropsForWrite = function()
     return props;
 }
 
-function CBar()
+function CBar(props)
 {
     this.kind = MATH_BAR;
 
@@ -365,6 +369,8 @@ function CBar()
     this.operator = new COperator(OPER_BAR);
 
     CCharacter.call(this);
+
+    this.init(props);
 }
 extend(CBar, CCharacter);
 CBar.prototype.init = function(props)
@@ -422,10 +428,12 @@ CBar.prototype.getPropsForWrite = function()
     return props;
 }
 
-function CPhantom()
+function CPhantom(props)
 {
     this.props = null;
     CMathBase.call(this);
+
+    this.init(props);
 }
 extend(CPhantom, CMathBase);
 CPhantom.prototype.init = function(props)

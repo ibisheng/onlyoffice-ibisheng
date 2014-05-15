@@ -791,9 +791,6 @@ CMPrp.prototype =
         textPrp.Italic = this.italic;
         textPrp.Bold = this.bold;
 
-        if(this.typeText == TXT_ROMAN)
-            textPrp.Italic = false;
-
         return textPrp;
     },
     Copy: function()
@@ -6222,28 +6219,73 @@ CMathContent.prototype =
         return result;
     },
 
-    ///////////////////
+    /////////////////////////
+    //  Text Properties
+    ///////////////
     Get_TextPr: function(ContentPos, Depth)
     {
         var pos = ContentPos.Get(Depth);
-        Depth++;
 
+        var TextPr;
 
-        if(this.content[pos].typeObj == MATH_PLACEHOLDER)
+        if(this.IsPlaceholder())
+            TextPr = this.Parent.getCtrPrp();
+        else
+            TextPr = this.content[pos].Get_TextPr(ContentPos, Depth + 1);
+
+        return TextPr;
+    },
+    Get_CompiledTextPr : function(Copy)
+    {
+        var TextPr = null;
+
+        if(this.IsPlaceholder())
         {
+            TextPr = this.Parent.getCtrPrp();
+        }
+        else if ( true === this.bSelectionUse )
+        {
+            var StartPos = this.SelectStartPos;
+            var EndPos   = this.SelectEndPos;
 
+            if ( StartPos > EndPos )
+            {
+                StartPos = this.SelectEndPos;
+                EndPos   = this.SelectStartPos;
+            }
+
+            while ( null === TextPr && StartPos <= EndPos )
+            {
+                TextPr = this.content[StartPos].Get_CompiledTextPr(Copy);
+
+                StartPos++;
+            }
+
+            for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+            {
+                var CurTextPr = this.content[CurPos].Get_CompiledPr(false);
+
+                if ( null !== CurTextPr )
+                    TextPr = TextPr.Compare( CurTextPr );
+            }
         }
         else
         {
-            this.content[pos].Get_TextPr(ContentPos, Depth);
+            var CurPos = this.CurPos;
+
+            if ( CurPos >= 0 && CurPos < this.content.length )
+                TextPr = this.content[CurPos].Get_CompiledTextPr(Copy);
         }
 
+        return TextPr;
     },
     Get_Default_TPrp: function()
     {
         return this.Composition.Get_Default_TPrp();
     },
-    // перемещение по стрелкам
+    //////////////////////////////
+    // Перемещение по стрелкам
+    ////////////////////
     Get_LeftPos: function(SearchPos, ContentPos, Depth, UseContentPos, EndRun)
     {
         var result = false;

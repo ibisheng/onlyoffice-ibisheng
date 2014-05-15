@@ -2267,7 +2267,7 @@ COperator.prototype.init = function(properties, defaultProps)        // props (c
     var prp = this.getProps(properties, defaultProps);
     this.init_2(prp);
 }
-COperator.prototype.init_2 = function(props) // для копирования
+COperator.prototype.init_2 = function(props)
 {
     var operator = null,
         typeOper = null,
@@ -3283,7 +3283,7 @@ old_CSeparator.prototype.setPosition = function(pos)
     this.positions = pos;
 }
 
-function CDelimiter()
+function CDelimiter(props)
 {
     this.kind = MATH_DELIMITER;
 
@@ -3303,6 +3303,8 @@ function CDelimiter()
     ////
 
     CMathBase.call(this);
+
+    this.init(props);
 }
 extend(CDelimiter, CMathBase);
 CDelimiter.prototype.init = function(props)

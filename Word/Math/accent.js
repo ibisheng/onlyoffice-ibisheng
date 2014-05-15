@@ -1001,7 +1001,7 @@ CSign.prototype.getCodeCharacter = function()
     return this.sign.value;
 }
 
-function CAccent()
+function CAccent(props)
 {
     this.kind = MATH_ACCENT;
 
@@ -1009,7 +1009,10 @@ function CAccent()
     //this.code = null;      // храним код буквы и тип здесь
     //this.typeOper = null;  // т.к в класах, которые вызываем, не учитываем случаи, когда элементы (стрелки/скобки) переворачиваются
     this.loc = LOCATION_TOP;
+
     CMathBase.call(this);
+
+    this.init(props);
 }
 extend(CAccent, CMathBase);
 CAccent.prototype.init = function(props)
