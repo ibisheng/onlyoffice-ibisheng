@@ -13977,7 +13977,8 @@ Paragraph.prototype =
         }
 
         // TODO: Пока возвращаем всегда шрифт лежащий в Ascii, в будущем надо будет это переделать
-        TextPr.FontFamily = TextPr.RFonts.Ascii;
+        if ( undefined !== TextPr.RFonts && null !== TextPr.RFonts )
+            TextPr.FontFamily = TextPr.RFonts.Ascii;
 
         return TextPr;
     },
@@ -16561,6 +16562,8 @@ Paragraph.prototype =
 
                 this.Set_Spacing( { LineRule : linerule_Exact, Line : FramePr.Lines * LineH }, false );
                 this.Update_DropCapByLines( this.Internal_CalculateTextPr( this.Internal_GetStartPos() ), FramePr.Lines, LineH, LineTA, LineTD, Before );
+                
+                NewFramePr.Lines = FramePr.Lines;
             }
 
             if ( undefined != FramePr.FontFamily )
@@ -16872,7 +16875,13 @@ Paragraph.prototype =
                     break;
             }
 
-            var TextPr = FirstFramePara.Internal_CalculateTextPr(0);
+            var TextPr = FirstFramePara.Get_FirstRunPr();
+
+            if (undefined === TextPr.RFonts || undefined === TextPr.RFonts.Ascii)
+            {
+                TextPr = this.Get_CompiledPr2(false).TextPr;
+            }
+            
             FramePr.FontFamily =
             {
                 Name  : TextPr.RFonts.Ascii.Name,
