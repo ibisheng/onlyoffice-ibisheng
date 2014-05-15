@@ -30,6 +30,7 @@ function CBorderBox(props)
     CMathBase.call(this);
 
     this.init(props);
+    this.setCtrPrp(props.ctrPrp);
 }
 extend(CBorderBox, CMathBase);
 CBorderBox.prototype.init = function(props)
@@ -315,6 +316,7 @@ function CBox(props)
     CMathBase.call(this);
 
     this.init(props);
+    this.setCtrPrp(props.ctrPrp);
 }
 extend(CBox, CMathBase);
 CBox.prototype.init = function(props)
@@ -371,6 +373,7 @@ function CBar(props)
     CCharacter.call(this);
 
     this.init(props);
+    this.setCtrPrp(props.ctrPrp);
 }
 extend(CBar, CCharacter);
 CBar.prototype.init = function(props)
@@ -434,6 +437,7 @@ function CPhantom(props)
     CMathBase.call(this);
 
     this.init(props);
+    this.setCtrPrp(props.ctrPrp);
 }
 extend(CPhantom, CMathBase);
 CPhantom.prototype.init = function(props)

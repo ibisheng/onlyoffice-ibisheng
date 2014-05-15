@@ -1600,7 +1600,7 @@ CMathBase.prototype =
 
             start_y++;
 
-            if(start_x >= this.nCol)
+            if(start_y >= this.nCol)
             {
                 start_x++;
                 start_y = 0;
@@ -1622,6 +1622,10 @@ CMathBase.prototype =
         }
 
         return TextPr;
+    },
+    Get_CompiledPr: function(Copy)
+    {
+        return this.Get_CompiledTextPr(Copy);
     }
 
     //////////////////////////

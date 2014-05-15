@@ -895,6 +895,7 @@ function CRadical(props)
     CMathBase.call(this);
 
     this.init(props);
+    this.setCtrPrp(props.ctrPrp);
 }
 extend(CRadical, CMathBase);
 CRadical.prototype.init = function(props)

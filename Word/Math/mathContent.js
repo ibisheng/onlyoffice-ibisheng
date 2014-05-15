@@ -6263,8 +6263,9 @@ CMathContent.prototype =
 
             for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
             {
-                var CurTextPr = this.content[CurPos].Get_CompiledPr(false);
+                var CurTextPr;
 
+                    CurTextPr = this.content[CurPos].Get_CompiledPr(false);
                 if ( null !== CurTextPr )
                     TextPr = TextPr.Compare( CurTextPr );
             }

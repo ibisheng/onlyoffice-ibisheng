@@ -8,6 +8,7 @@ function CFraction(props)
     CMathBase.call(this);
 
     this.init(props);
+    this.setCtrPrp(props.ctrPrp);
 }
 extend(CFraction, CMathBase);
 CFraction.prototype.init = function(props)

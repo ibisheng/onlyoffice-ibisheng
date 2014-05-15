@@ -1013,6 +1013,7 @@ function CAccent(props)
     CMathBase.call(this);
 
     this.init(props);
+    this.setCtrPrp(props.ctrPrp);
 }
 extend(CAccent, CMathBase);
 CAccent.prototype.init = function(props)

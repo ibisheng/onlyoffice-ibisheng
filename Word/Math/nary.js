@@ -23,6 +23,7 @@ function CNary(props)
     CMathBase.call(this);
 
     this.init(props);
+    this.setCtrPrp(props.ctrPrp);
 }
 extend(CNary, CMathBase);
 CNary.prototype.init = function(props)
@@ -186,23 +187,19 @@ CNary.prototype.init = function(props)
     {
         if( this.supHide && !this.subHide )
         {
-            base = new CDegree();
             var prp = {type: DEGREE_SUBSCRIPT, indef: 2, oBase: sign};
-            //base.init_2(prp, sign);
+            base = new CDegree(prp);
         }
         else if( !this.supHide && this.subHide )
         {
-            base = new CDegree();
             var prp = {type: DEGREE_SUPERSCRIPT, indef: 2, oBase: sign};
-            //base.init_2(prp, sign);
+            base = new CDegree(prp);
         }
         else
         {
-            base = new CDegreeSubSup();
             var prp = {type: DEGREE_SubSup, indef: 2, oBase: sign};
-            //base.init_2(prp, sign);
+            base = new CDegreeSubSup(prp);
         }
-
     }
 
     if(!this.supHide || !this.subHide)

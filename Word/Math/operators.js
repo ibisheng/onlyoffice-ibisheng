@@ -3305,6 +3305,7 @@ function CDelimiter(props)
     CMathBase.call(this);
 
     this.init(props);
+    this.setCtrPrp(props.ctrPrp);
 }
 extend(CDelimiter, CMathBase);
 CDelimiter.prototype.init = function(props)
@@ -4114,7 +4115,7 @@ CCharacter.prototype.getBase = function()
 
 
 
-function CGroupCharacter()
+function CGroupCharacter(props)
 {
     this.kind = MATH_GROUP_CHARACTER;
 
@@ -4122,6 +4123,9 @@ function CGroupCharacter()
     this.loc = LOCATION_BOT;
 
     CCharacter.call(this);
+
+    this.init(props);
+    this.setCtrPrp(props.ctrPrp);
 }
 extend(CGroupCharacter, CCharacter);
 CGroupCharacter.prototype.init = function(props)

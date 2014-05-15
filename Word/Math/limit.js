@@ -6,6 +6,7 @@ function CLimit(props)
     CMathBase.call(this);
 
     this.init(props);
+    this.setCtrPrp(props.ctrPrp);
 }
 extend(CLimit, CMathBase);
 CLimit.prototype.init = function(props)
@@ -72,10 +73,13 @@ CLimit.prototype.getPropsForWrite = function()
     return props;
 }
 
-function CMathFunc()
+function CMathFunc(props)
 {
     this.kind = MATH_FUNCTION;
     CMathBase.call(this);
+
+    this.init(props);
+    this.setCtrPrp(props.ctrPrp);
 }
 extend(CMathFunc, CMathBase);
 CMathFunc.prototype.init = function()

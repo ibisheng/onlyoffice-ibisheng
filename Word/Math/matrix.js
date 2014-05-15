@@ -39,6 +39,7 @@ function CMathMatrix(props)
     CMathBase.call(this);
 
     this.init(props);
+    this.setCtrPrp(props.ctrPrp);
 }
 extend(CMathMatrix, CMathBase);
 CMathMatrix.prototype.init = function(props)
@@ -501,7 +502,7 @@ CMathMatrix.prototype.getPropsForWrite = function()
 }
 
 ////
-function CEqArray()
+function CEqArray(props)
 {
     this.kind = MATH_EQ_ARRAY;
 
@@ -509,6 +510,9 @@ function CEqArray()
     this.objDist = 0;
 
     CMathMatrix.call(this);
+
+    this.init(props);
+    this.setCtrPrp(props.ctrPrp);
 }
 extend(CEqArray, CMathMatrix);
 CEqArray.prototype.init = function(props)

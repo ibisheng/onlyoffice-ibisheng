@@ -155,7 +155,8 @@ ParaMath.prototype =
 			
 			var oMRun = new ParaRun(null, true);
 			oMRun.Pr = oStartContent.Pr;
-			for (i=nPosStart; i<nLenStart; i++)
+
+            for (i=nPosStart; i<nLenStart; i++)
 			{
 				var Pos = oMRun.Content.length;
 				var EndPos = Pos + 1;
@@ -288,9 +289,24 @@ ParaMath.prototype =
 			return this.RemoveElem(oContent, Direction, bOnAddText);
     },
 		
-	RemoveElem: function(oContent, nCount, bOnAdd)
+	RemoveElem: function(oContent, Direction, bOnAdd)
     {
+        var start = oContent.Start,
+            end   = oContent.End,
+            oMathContent = oContent.Content;
+
+        if(start == end)
+        {
+            var elem = oMathContent.content[start];
+
+            if(elem.typeObj == MATH_PARA_RUN && elem.Is_Empty())
+            {
+
+            }
+        }
+
         History.Create_NewPoint();
+
 		
 		var oStartContent = oContent.Content.content[oContent.Start];
 		var oEndContent = oContent.Content.content[oContent.End];		
@@ -302,6 +318,14 @@ ParaMath.prototype =
 		}
 		History.Add(oContent.Content, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: oContent.Start});
 		return;
+    },
+    SetSelectionForRemove: function(Content, pos)
+    {
+        this.bSelectionUse = true;
+
+
+
+
     },
 
     GetSelectContent: function()
@@ -323,8 +347,6 @@ ParaMath.prototype =
     Apply_TextPr : function(TextPr, IncFontSize, ApplyToAll)
     {
         // TODO: ParaMath.Apply_TextPr
-
-
 
     },
 
@@ -1287,7 +1309,6 @@ ParaMath.prototype =
         // TODO: ParaMath.Set_SelectionContentPos
 
         this.Root.Set_SelectionContentPos(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag);
-
         this.bSelectionUse = true;
     },
 

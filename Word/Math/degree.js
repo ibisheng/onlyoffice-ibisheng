@@ -10,6 +10,7 @@ function CDegree(props)
     CMathBase.call(this);
 
     this.init(props);
+    this.setCtrPrp(props.ctrPrp);
 }
 extend(CDegree, CMathBase);
 CDegree.prototype.init = function(props)
@@ -625,6 +626,7 @@ function CDegreeSubSup(props)
     CMathBase.call(this);
 
     this.init(props);
+    this.setCtrPrp(props.ctrPrp);
 }
 extend(CDegreeSubSup, CMathBase);
 CDegreeSubSup.prototype.init = function(props)
