@@ -3695,9 +3695,11 @@
 
 		WorksheetView.prototype.cleanSelection = function (range, isFrozen) {
 			isFrozen = !!isFrozen;
+			if (range === undefined)
+				range = this.visibleRange;
 			var ctx = this.overlayCtx;
 			var arn = this.activeRange.clone(true);
-			var arnIntersection = arn.intersectionSimple(range ? range : this.visibleRange);
+			var arnIntersection = arn.intersectionSimple(range);
 			var width = ctx.getWidth();
 			var height = ctx.getHeight();
 			var offsetX, offsetY, diffWidth = 0, diffHeight = 0;
@@ -3789,7 +3791,7 @@
 					for (i = 0; i < arrayElements.length; ++i) {
 						var arFormulaTmp = asc_Range (arrayElements[i].c1, arrayElements[i].r1, arrayElements[i].c2, arrayElements[i].r2);
 
-						var aFormulaIntersection = arFormulaTmp.intersection(range ? range : this.visibleRange);
+						var aFormulaIntersection = arFormulaTmp.intersection(range);
 
 						if (aFormulaIntersection) {
 							// Координаты для автозаполнения
@@ -3812,7 +3814,7 @@
 				for (i = 0; i < this.arrActiveFormulaRanges.length; ++i) {
 					var activeFormula = this.arrActiveFormulaRanges[i].clone(true);
 
-					activeFormula = activeFormula.intersection(range ? range : activeFormula);
+					activeFormula = activeFormula.intersection(range);
 					if (null === activeFormula) {
 						// это ссылка из формулы на еще не добавленный рэндж
 						continue;
@@ -3841,7 +3843,7 @@
 				for (i in this.arrActiveChartsRanges ) {
 					var activeFormula = this.arrActiveChartsRanges[i].clone(true);
 
-					activeFormula = activeFormula.intersection(range ? range : activeFormula);
+					activeFormula = activeFormula.intersection(range);
 					if (null === activeFormula) {
 						// это ссылка из формулы на еще не добавленный рэндж
 						continue;
