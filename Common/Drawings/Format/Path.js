@@ -395,7 +395,7 @@ Path.prototype = {
                             var Y1 = readString(r);
                             var X2 = readString(r);
                             var Y2 = readString(r);
-                            this.ArrPathCommandInfo.push({id: bezier3, X0: X0, Y0: Y0, X1: X1, Y1: Y1, X2: X2, Y2: Y2});
+                            this.ArrPathCommandInfo.push({id: bezier4, X0: X0, Y0: Y0, X1: X1, Y1: Y1, X2: X2, Y2: Y2});
                             break;
                         }
                         case arcTo:

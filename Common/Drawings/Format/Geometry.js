@@ -864,6 +864,7 @@ Geometry.prototype=
                 if(typeof name === "string" && typeof val === "string")
                 {
                     this.gdLst[name] = parseInt(val);
+                    this.avLst[name] = true;
                 }
                 if(oldAvVal)
                 {
