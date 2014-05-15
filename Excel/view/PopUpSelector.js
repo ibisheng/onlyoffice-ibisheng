@@ -70,7 +70,7 @@
 
 				// Для того, чтобы работал scroll
 				this.selectorListJQ = $('#apiPopUpList');
-				this.selectorListJQ.perfectScrollbar();
+				this.selectorListJQ.perfectScrollbar({minScrollbarLength: 50});
 			}
 		};
 		PopUpSelector.prototype.show = function (isFormula, arrItems, cellRect) {
