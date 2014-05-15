@@ -7128,7 +7128,7 @@ CDocument.prototype =
                     Result_TextPr = this.Content[this.CurPos.ContentPos].Get_Paragraph_TextPr();
                 }
             }
-
+            
             return Result_TextPr;
         }
     },

@@ -12353,7 +12353,7 @@ Paragraph.prototype =
                     var TextPr = Hyperlink.Get_TextPr();
 
                     // Удаляем все что было в гиперссылке
-                    Hyperlink.Remove_FromContent( 0, Hyperlink.Content.length - 1 );
+                    Hyperlink.Remove_FromContent( 0, Hyperlink.Content.length );
 
                     // Создаем текстовый ран в гиперссылке
                     var HyperRun = new ParaRun(this);
@@ -13975,6 +13975,9 @@ Paragraph.prototype =
                 TextPr = this.Content[this.CurPos.ContentPos].Get_CompiledTextPr(true);
             }
         }
+
+        // TODO: Пока возвращаем всегда шрифт лежащий в Ascii, в будущем надо будет это переделать
+        TextPr.FontFamily = TextPr.RFonts.Ascii;
 
         return TextPr;
     },
