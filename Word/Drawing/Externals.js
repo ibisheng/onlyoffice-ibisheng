@@ -1526,6 +1526,8 @@ CFontSelectList.prototype =
         _korean_lang.Ranges.push(0x318F);
         _korean_lang.Ranges.push(0xAC00);
         _korean_lang.Ranges.push(0xD7AF);
+        _korean_lang.Ranges.push(0xFF00);
+        _korean_lang.Ranges.push(0xFFEF);
         _korean_lang.CodePage1Mask = (1 << 19);
         _korean_lang.CodePage2Mask = 0;
         _korean_lang.DefaultFont = "Batang";
@@ -1547,6 +1549,8 @@ CFontSelectList.prototype =
         */
         _japan_lang.Ranges.push(0x3000);
         _japan_lang.Ranges.push(0x30FF);
+        _japan_lang.Ranges.push(0xFF00);
+        _japan_lang.Ranges.push(0xFFEF);
 
         _japan_lang.CodePage1Mask = (1 << 17) | (1 << 30);
         _japan_lang.CodePage2Mask = 0;
@@ -1567,6 +1571,8 @@ CFontSelectList.prototype =
         _chinese_lang.Ranges.push(0xFAFF);
         _chinese_lang.Ranges.push(0x2F800);
         _chinese_lang.Ranges.push(0x2FA1F);
+        _chinese_lang.Ranges.push(0xFF00);
+        _chinese_lang.Ranges.push(0xFFEF);
         _chinese_lang.CodePage1Mask = (1 << 18) | (1 << 20);
         _chinese_lang.CodePage2Mask = 0;
         _chinese_lang.DefaultFont = "SimSun";
@@ -1591,6 +1597,15 @@ CFontSelectList.prototype =
             console.log(f.m_wsFontPath + "_" + f.m_lIndex + " codepage1: " + f.m_ulCodePageRange1 + ", codepage2: " + f.m_ulCodePageRange2);
         }
         */
+    },
+
+    isEnglishChar : function(_code)
+    {
+        if (97 <= _code && _code <= 122)
+            return true;
+        if (65 <= _code && _code <= 90)
+            return true;
+        return false;
     },
 
     isMultiLanguageSymbol : function(_code)
@@ -1672,6 +1687,7 @@ CFontSelectList.prototype =
 
             var _is_support = true;
             var _no_multi_symbols = 0;
+            var _percent_by_english = 0;
             for (var i = 0; i < _text_len; i++)
             {
                 var _code = text.charCodeAt(i);
@@ -1680,16 +1696,28 @@ CFontSelectList.prototype =
                     _no_multi_symbols++;
                     if (!_language.checkChar(_code))
                     {
-                        _is_support = false;
-                        break;
+                        if (this.isEnglishChar(_code))
+                            _percent_by_english--;
+                        else
+                        {
+                            _is_support = false;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        _percent_by_english++;
                     }
                 }
             }
-            if (0 == _no_multi_symbols)
-                return -1;
 
-            if (_is_support)
+            if (0 == _no_multi_symbols)
+                return LanguagesFontSelectTypes.Unknown;
+
+            if (_is_support && (_percent_by_english > 0))
+            {
                 _array_detect_languages.push(_language.Type);
+            }
         }
 
         var _len = _array_detect_languages.length;
