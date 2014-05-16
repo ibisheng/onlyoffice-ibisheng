@@ -498,7 +498,8 @@
 				"getDCForCharts"			: function () { return self.drawingCtxCharts; },
 				"onRenameCellTextEnd"		: function (countFind, countReplace) {self.handlers.trigger("asc_onRenameCellTextEnd", countFind, countReplace);},
 				"onStopFormatPainter"		: function () {self.handlers.trigger("asc_onStopFormatPainter");},
-				"onDocumentPlaceChanged"	: function () {self._onDocumentPlaceChanged();}
+				"onDocumentPlaceChanged"	: function () {self._onDocumentPlaceChanged();},
+				"updateSheetSettings"		: function () {self.handlers.trigger("asc_onUpdateSheetSettings");}
 			}, this.buffers, this.stringRender, this.maxDigitWidth, this.collaborativeEditing, opt);
 		};
 
@@ -842,7 +843,6 @@
 			var ws = this.getWorksheet();
 			var arrValues = ws.getCellAutoCompleteValues(ws.activeRange.startCol, ws.activeRange.startRow);
 			this.popUpSelector.show(false, arrValues, this.getWorksheet().getActiveCellCoord());
-			//this.handlers.trigger("asc_onShowAutoComplete", false, arrValues);
 		};
 
 		WorkbookView.prototype._onAutoFiltersClick = function (idFilter) {
@@ -1417,7 +1417,6 @@
 			}
 			if (0 < arrResult.length) {
 				this.popUpSelector.show(true, arrResult, this.getWorksheet().getActiveCellCoord());
-				//this.handlers.trigger("asc_onShowAutoComplete", true, arrResult);
 				this.lastFormulaPos = formulaPos;
 				this.lastFormulaName = formulaName;
 			} else {

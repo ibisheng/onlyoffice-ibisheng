@@ -3175,11 +3175,14 @@
 				new UndoRedoData_BBox(new asc_Range(col, row, col, row)), null);
 			History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ChangeFrozenCell, this.model.getId(), null, oData);
 
-			if (0 === col && 0 === row) {
-				// Очистка
+			var isUpdate = false;
+			if (0 === col && 0 === row) { // Очистка
+				if (null !== this.topLeftFrozenCell)
+					isUpdate = true;
 				this.topLeftFrozenCell = this.model.sheetViews[0].pane = null;
-			} else {
-				// Создание
+			} else { // Создание
+				if (null === this.topLeftFrozenCell)
+					isUpdate = true;
 				var pane = this.model.sheetViews[0].pane = new asc.asc_CPane();
 				this.topLeftFrozenCell = pane.topLeftFrozenCell = new CellAddress(row, col, 0);
 			}
@@ -3189,6 +3192,10 @@
 			this.objectRender.drawingArea.init();
 			if (!lockDraw)
 				this.draw();
+
+			// Эвент на обновление
+			if (isUpdate)
+				this.handlers.trigger("updateSheetSettings");
 		};
 
 		/** */

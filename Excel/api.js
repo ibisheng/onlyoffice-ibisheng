@@ -1160,30 +1160,30 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			 * asc_onInitEditorFonts		(gui_fonts)
 			 * asc_onInitEditorStyles		(gui_styles)
 			 * asc_onOpenDocumentProgress	(_OpenDocumentProgress)
-			 * asc_onAdvancedOptions		(asc_CAdvancedOptions, ascAdvancedOptionsAction)			- эвент на получение дополнительных опций (открытие/сохранение CSV)
+			 * asc_onAdvancedOptions		(asc_CAdvancedOptions, ascAdvancedOptionsAction)	- эвент на получение дополнительных опций (открытие/сохранение CSV)
 			 * asc_onError					(c_oAscError.ID, c_oAscError.Level)
-			 * asc_onEditCell				(c_oAscCellEditorState)										- эвент на редактирование ячейки с состоянием (переходами из формулы и обратно)
-			 * asc_onSelectionChanged		(asc_CCellInfo)												- эвент на смену информации о выделении
-			 * asc_onSelectionNameChanged	(sName)														- эвент на смену имени выделения (Id-ячейки, число выделенных столбцов/строк, имя диаграммы и др.)
-			 * asc_onSelectionMathChanged	(asc_CSelectionMathInfo)									- эвент на смену математической информации о выделении
+			 * asc_onEditCell				(c_oAscCellEditorState)								- эвент на редактирование ячейки с состоянием (переходами из формулы и обратно)
+			 * asc_onSelectionChanged		(asc_CCellInfo)										- эвент на смену информации о выделении
+			 * asc_onSelectionNameChanged	(sName)												- эвент на смену имени выделения (Id-ячейки, число выделенных столбцов/строк, имя диаграммы и др.)
+			 * asc_onSelectionMathChanged	(asc_CSelectionMathInfo)							- эвент на смену математической информации о выделении
 			 * asc_onZoomChanged			(zoom)
-			 * asc_onSheetsChanged			()															- эвент на обновление списка листов
-			 * asc_onActiveSheetChanged		(indexActiveSheet)											- эвент на обновление активного листа
-			 * asc_onCanUndoChanged			(bCanUndo)													- эвент на обновление возможности undo
-			 * asc_onCanRedoChanged			(bCanRedo)													- эвент на обновление возможности redo
-			 * asc_onSaveUrl				(sUrl, callback(hasError))									- эвент на сохранение файла на сервер по url
-			 * asc_onDocumentModifiedChanged(bIsModified)												- эвент на обновление статуса "изменен ли файл"
-			 * asc_onMouseMove				(asc_CMouseMoveData)										- эвент на наведение мышкой на гиперлинк или комментарий
-			 * asc_onHyperlinkClick			(sUrl)														- эвент на нажатие гиперлинка
-			 * asc_onСoAuthoringDisconnect	()															- эвент об отключении от сервера без попытки reconnect
-			 * asc_onSelectionRangeChanged	(selectRange)												- эвент о выборе диапазона для диаграммы (после нажатия кнопки выбора)
-			 * asc_onRenameCellTextEnd		(countCellsFind, countCellsReplace)							- эвент об окончании замены текста в ячейках (мы не можем сразу прислать ответ)
-			 * asc_onWorkbookLocked			(result)													- эвент залочена ли работа с листами или нет
-			 * asc_onWorksheetLocked		(index, result)												- эвент залочен ли лист или нет
-			 * asc_onGetEditorPermissions	(permission)												- эвент о правах редактора
-			 * asc_onGetLicense				(license)													- эвент о лицензии
-			 * asc_onStopFormatPainter		()															- эвент об окончании форматирования по образцу
-			 //* asc_onShowAutoComplete		(isFormula, arrValues)										- эвент о вызове всплывающего меню для дополнения ячейки
+			 * asc_onSheetsChanged			()													- эвент на обновление списка листов
+			 * asc_onActiveSheetChanged		(indexActiveSheet)									- эвент на обновление активного листа
+			 * asc_onCanUndoChanged			(bCanUndo)											- эвент на обновление возможности undo
+			 * asc_onCanRedoChanged			(bCanRedo)											- эвент на обновление возможности redo
+			 * asc_onSaveUrl				(sUrl, callback(hasError))							- эвент на сохранение файла на сервер по url
+			 * asc_onDocumentModifiedChanged(bIsModified)										- эвент на обновление статуса "изменен ли файл"
+			 * asc_onMouseMove				(asc_CMouseMoveData)								- эвент на наведение мышкой на гиперлинк или комментарий
+			 * asc_onHyperlinkClick			(sUrl)												- эвент на нажатие гиперлинка
+			 * asc_onСoAuthoringDisconnect	()													- эвент об отключении от сервера без попытки reconnect
+			 * asc_onSelectionRangeChanged	(selectRange)										- эвент о выборе диапазона для диаграммы (после нажатия кнопки выбора)
+			 * asc_onRenameCellTextEnd		(countCellsFind, countCellsReplace)					- эвент об окончании замены текста в ячейках (мы не можем сразу прислать ответ)
+			 * asc_onWorkbookLocked			(result)											- эвент залочена ли работа с листами или нет
+			 * asc_onWorksheetLocked		(index, result)										- эвент залочен ли лист или нет
+			 * asc_onGetEditorPermissions	(permission)										- эвент о правах редактора
+			 * asc_onGetLicense				(license)											- эвент о лицензии
+			 * asc_onStopFormatPainter		()													- эвент об окончании форматирования по образцу
+			 * asc_onUpdateSheetSettings	()													- 'эвент об обновлении свойств листа (закрепленная область, показывать сетку/заголовки)
 			 */
 
 			asc_StartAction: function (type, id) {
