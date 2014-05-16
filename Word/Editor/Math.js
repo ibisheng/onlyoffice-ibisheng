@@ -177,7 +177,7 @@ ParaMath.prototype =
 		}
 	},
 
-    AddText : function(oElem, sText, props)
+    AddText : function(oElem, sText)
     {		
         if(sText)
         {			
@@ -198,10 +198,10 @@ ParaMath.prototype =
         }        
     },
 
-    CreateElem : function (oElem, oParent, props)
+    CreateElem : function (oElem, oParent)
     {
         oElem.relate(oParent);
-        oElem.init(props);
+        
 
 		var Pos = oParent.CurPos,
 				PosEnd = Pos + 1;
@@ -210,15 +210,15 @@ ParaMath.prototype =
         if (oParent)
 		{
             oParent.addElementToContent(oElem);
-			items.push(oElem);
-			History.Add(oParent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
+			//items.push(oElem);
+			//History.Add(oParent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
 		}
 
     },
 
-    CreateFraction : function (oFraction,oParentElem,props,sNumText,sDenText)
+    CreateFraction : function (oFraction,oParentElem,sNumText,sDenText)
     {
-        this.CreateElem(oFraction, oParentElem, props);
+        this.CreateElem(oFraction, oParentElem);
 
         var oElemDen = oFraction.getDenominator();		
         this.AddText(oElemDen, sDenText);
@@ -227,9 +227,9 @@ ParaMath.prototype =
         this.AddText(oElemNum, sNumText);
     },
 
-    CreateDegree : function (oDegree, oParentElem,props,sBaseText,sSupText,sSubText)
+    CreateDegree : function (oDegree, oParentElem,sBaseText,sSupText,sSubText)
     {
-        this.CreateElem(oDegree, oParentElem, props);
+        this.CreateElem(oDegree, oParentElem);
 
         var oElem = oDegree.getBase();
         this.AddText(oElem, sBaseText);
@@ -241,9 +241,9 @@ ParaMath.prototype =
         this.AddText(oSub, sSubText);
     },
 
-    CreateRadical : function (oRad,oParentElem,props,sElemText,sDegText)
+    CreateRadical : function (oRad,oParentElem,sElemText,sDegText)
     {
-        this.CreateElem(oRad, oParentElem, props);
+        this.CreateElem(oRad, oParentElem);
 
         var oElem = oRad.getBase();
         this.AddText(oElem, sElemText);
@@ -252,9 +252,9 @@ ParaMath.prototype =
         this.AddText(oDeg, sDegText);
     },
 
-    CreateNary : function (oNary,oParentElem,props,sElemText,sSubText,sSupText)
+    CreateNary : function (oNary,oParentElem,sElemText,sSubText,sSupText)
     {
-        this.CreateElem(oNary, oParentElem, props);
+        this.CreateElem(oNary, oParentElem);
 
         var oElem = oNary.getBase();
         this.AddText(oElem, sElemText);
@@ -266,9 +266,9 @@ ParaMath.prototype =
         this.AddText(oSup, sSupText);
     },
 
-    CreateBox : function (oBox,oParentElem,props,sElemText)
+    CreateBox : function (oBox,oParentElem,sElemText)
     {
-        this.CreateElem(oBox, oParentElem, props);
+        this.CreateElem(oBox, oParentElem);
 
         var oElem = oBox.getBase();
         this.AddText(oElem, sElemText);

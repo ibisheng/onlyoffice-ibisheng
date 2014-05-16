@@ -9622,15 +9622,18 @@ function Binary_oMathReader(stream)
 			oMatr.content = oMatrix;
 			
 			for(var i=0; i<props.row; i++)
+			{
+				arrContent[i] = new Array();
 				for(var j=0; j<props.column; j++)
 					arrContent[i][j] = oMatrix.getElement(i,j);
+			}
         }
 		else if (c_oSer_OMathContentType.Mr === type)
         {
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathMr(t,l,oMatr.content, arrContent);
             });			
-			oMatr.row++;
+			oMatr.content.row++;
         }
         else
             res = c_oSerConstants.ReadUnknown;
@@ -9843,6 +9846,7 @@ function Binary_oMathReader(stream)
 				{
 					var oText = new CMathText(false);
 					oText.addTxt(text[i]);
+					History.Add( this, { Type : historyitem_ParaRun_AddItem, Pos : i, EndPos : i, Items : oText } );
 					oMRun.Content.splice( i, 0, oText );
 				}
 				/*в будущем переделка под para_space
@@ -10558,6 +10562,7 @@ function Binary_oMathReader(stream)
             });
 			props.type = DEGREE_SUPERSCRIPT;
 			var oSSup = new CDegree(props);
+			oParent.addElementToContent(oSSup);
 			oSup.conten = oSSup.getUpperIterator();
 			oContent.content = oSSup.getBase();
         }
