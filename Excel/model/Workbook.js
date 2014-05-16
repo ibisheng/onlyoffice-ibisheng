@@ -2211,6 +2211,7 @@ Woorksheet.prototype.setSheetViewSettings = function (options) {
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_SetViewSettings, this.getId(), null, new UndoRedoData_FromTo(current, options.clone()));
 
 	this.sheetViews[0].setSettings(options);
+	this.workbook.handlers.trigger("asc_onUpdateSheetViewSettings");
 };
 Woorksheet.prototype.getRowsCount=function(){
 	return this.nRowsCount;
