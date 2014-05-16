@@ -499,7 +499,7 @@
 				"onRenameCellTextEnd"		: function (countFind, countReplace) {self.handlers.trigger("asc_onRenameCellTextEnd", countFind, countReplace);},
 				"onStopFormatPainter"		: function () {self.handlers.trigger("asc_onStopFormatPainter");},
 				"onDocumentPlaceChanged"	: function () {self._onDocumentPlaceChanged();},
-				"updateSheetSettings"		: function () {self.handlers.trigger("asc_onUpdateSheetSettings");}
+				"updateSheetViewSettings"		: function () {self.handlers.trigger("asc_onUpdateSheetViewSettings");}
 			}, this.buffers, this.stringRender, this.maxDigitWidth, this.collaborativeEditing, opt);
 		};
 

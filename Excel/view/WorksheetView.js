@@ -3195,7 +3195,7 @@
 
 			// Эвент на обновление
 			if (isUpdate)
-				this.handlers.trigger("updateSheetSettings");
+				this.handlers.trigger("updateSheetViewSettings");
 		};
 
 		/** */
