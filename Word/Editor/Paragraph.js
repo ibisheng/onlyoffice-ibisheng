@@ -3970,7 +3970,7 @@ Paragraph.prototype =
 
         this.Lines[CurLine].Set_RangeStartPos( CurRange, StartPos );
 
-        if ( 0 !== CurRange && 0 === CurLine && true === PRS.EmptyLine )
+        if ( true === PRS.UseFirstLine && 0 !== CurRange && true === PRS.EmptyLine )
         {
             if ( ParaPr.Ind.FirstLine < 0 )
             {
@@ -4066,10 +4066,24 @@ Paragraph.prototype =
 
         // Обнуляем параметры PRS для строки
         PRS.Reset_Line();
+        
+        // Проверим, нужно ли в данной строке учитывать FirstLine (т.к. не всегда это первая строка должна быть)
+        var UseFirstLine = true;
+        for ( var TempCurLine = CurLine - 1; TempCurLine >= 0; TempCurLine-- )
+        {
+            var TempLineInfo = this.Lines[TempCurLine].LineInfo;
+            if ( !(TempLineInfo & 1) || !(TempLineInfo & 2) )                
+            {
+                UseFirstLine = false;
+                break;
+            }
+        }
+        
+        PRS.UseFirstLine = UseFirstLine;
 
         // Заполняем строку отрезками обтекания. Выставляем начальные сдвиги для отрезков. Начало промежутка = конец вырезаемого промежутка
         this.Lines[CurLine].Reset();
-        this.Lines[CurLine].Add_Range( ( 0 == CurLine ? PRS.XStart + ParaPr.Ind.Left + ParaPr.Ind.FirstLine : PRS.XStart + ParaPr.Ind.Left ), (RangesCount == 0 ? PRS.XLimit : Ranges[0].X0) );
+        this.Lines[CurLine].Add_Range( ( true === UseFirstLine ? PRS.XStart + ParaPr.Ind.Left + ParaPr.Ind.FirstLine : PRS.XStart + ParaPr.Ind.Left ), (RangesCount == 0 ? PRS.XLimit : Ranges[0].X0) );
         for ( var Index = 1; Index < Ranges.length + 1; Index++ )
         {
             this.Lines[CurLine].Add_Range( Ranges[Index - 1].X1, (RangesCount == Index ? PRS.XLimit : Ranges[Index].X0) );
@@ -4305,6 +4319,18 @@ Paragraph.prototype =
 
         // Переносим строку по PageBreak. Если в строке ничего нет, кроме PageBreak, тогда нам не надо проверять высоту строки и обтекание.
         var bBreakPageLineEmpty = ( true === PRS.BreakPageLine && true === PRS.EmptyLine );
+        
+        // Сохраним это, чтобы знать, использовать ли FirstLine в следующей строке или нет 
+        this.Lines[CurLine].LineInfo = 0;
+        
+        if ( true === PRS.BreakPageLine )
+            this.Lines[CurLine].LineInfo |= 1;
+        
+        if ( true === PRS.EmptyLine )
+            this.Lines[CurLine].LineInfo |= 2;
+        
+        if ( true === PRS.End )
+            this.Lines[CurLine].LineInfo |= 4;
 
         // Сначала проверяем не нужно ли сделать перенос страницы в данном месте
         // Перенос не делаем, если это первая строка на новой странице
@@ -5379,6 +5405,10 @@ Paragraph.prototype =
             // TODO: Сделать проверку на добавление пробела и удаление
             return -1;
         }
+        
+        // Если у нас есть PageBreak в строке, запускаем обычный пересчет, либо если это пустой параграф.
+        if ( this.Lines[Line].LineInfo & 1 || (  this.Lines[Line].LineInfo & 2 &&  this.Lines[Line].LineInfo & 4 ) )
+            return  -1;
 
         // Если у нас отрезок, в котором произошли изменения является отрезком с нумерацией, тогда надо запустить
         // обычный пересчет.
@@ -5398,7 +5428,7 @@ Paragraph.prototype =
         // TODO: Улучишить данную проверку
         if ( 1 === this.Lines.length && true !== this.Is_Inline() )
             return -1;
-
+        
         // Мы должны пересчитать как минимум 3 отрезка: текущий, предыдущий и следующий, потому что при удалении элемента
         // или добавлении пробела первое слово в данном отрезке может убраться в предыдущем отрезке, и кроме того при
         // удалении возможен вариант, когда мы неправильно определили отрезок (т.е. более ранний взяли). Но возможен
@@ -20577,6 +20607,11 @@ function CParaLine(StartPos)
     this.RangeY    = false;
     this.StartPos  = StartPos; // Позиция в контенте параграфа, с которой начинается данная строка
     this.EndPos    = StartPos; // Позиция последнего элемента в данной строке
+    
+    this.LineInfo  = 0;        // Побитовая информация о строке:
+                               // 1 бит : есть ли PageBreak в строке
+                               // 2 бит : пустая ли строка (без учета PageBreak)
+                               // 3 бит : последняя ли это строка (т.е. строка с ParaEnd)
 }
 
 CParaLine.prototype =
@@ -21234,6 +21269,7 @@ function CParagraphRecalculateStateWrap()
     this.AddNumbering    = true;
 
     this.BreakPageLine   = false;
+    this.UseFirstLine    = false;
 
     this.ExtendBoundToBottom = false;
 
@@ -21291,6 +21327,7 @@ CParagraphRecalculateStateWrap.prototype =
         this.EmptyLine           = true;
         this.BreakPageLine       = false;
         this.End                 = false;
+        this.UseFirstLine        = false;
 
         this.LineTextAscent      = 0;
         this.LineTextAscent2     = 0;
