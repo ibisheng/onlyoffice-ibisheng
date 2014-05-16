@@ -2629,6 +2629,330 @@ var gUndoInsDelCellsFlag = true;
 				return this._getArrayOpenCells(indexFilter,curId);
 			},
 			
+			_checkValueInCells: function(n, k, cloneActiveRange)
+			{
+				var ws = this.worksheet;
+				var cell = ws.model._getCell(n, k);
+				var isEmptyCell = cell.isEmptyText();
+				var isEnd = true, cell, range, merged, valueMerg, isEmptyCell;
+				
+				//если мерженная ячейка
+				if(isEmptyCell)
+				{
+					range = ws.model.getRange3(n, k, n, k);
+					
+					merged = range.hasMerged();
+					valueMerg = null;
+					if(merged)
+					{
+						valueMerg = ws.model.getRange3(merged.r1, merged.c1, merged.r2, merged.c2).getValue();
+						if(valueMerg != null && valueMerg != "")
+						{	
+							if(merged.r1 < cloneActiveRange.r1)
+							{
+								cloneActiveRange.r1 = merged.r1;
+								n = cloneActiveRange.r1 - 1; isEnd = false
+							}	
+							if(merged.r2 > cloneActiveRange.r2)
+							{
+								cloneActiveRange.r2 = merged.r2;
+								n = cloneActiveRange.r2 - 1; isEnd = false
+							}
+							if(merged.c1 < cloneActiveRange.c1)
+							{
+								cloneActiveRange.c1 = merged.c1;
+								k = cloneActiveRange.c1 - 1; isEnd = false
+							}	
+							if(merged.c2 > cloneActiveRange.c2)
+							{
+								cloneActiveRange.c2 = merged.c2;
+								k = cloneActiveRange.c2 - 1; isEnd = false
+							}
+							if(n < 0)
+								n = 0;
+							if(k < 0)
+								k = 0;
+							cell = ws.model._getCell(n,k);	
+						};
+					};
+				};
+				
+				if(!isEmptyCell || (valueMerg != null && valueMerg != ""))
+				{
+					if(k < cloneActiveRange.c1)
+					{
+						cloneActiveRange.c1 = k; isEnd = false;
+					}	
+					else if(k > cloneActiveRange.c2)
+					{
+						cloneActiveRange.c2 = k; isEnd = false;
+					}	
+					if(n < cloneActiveRange.r1)
+					{
+						cloneActiveRange.r1 = n; isEnd = false;
+					}	
+					else if(n > cloneActiveRange.r2)
+					{
+						cloneActiveRange.r2 = n; isEnd = false;
+					};	
+				};
+				
+				return {isEmptyCell: isEmptyCell, isEnd: isEnd, cloneActiveRange: cloneActiveRange};
+			},
+			
+			//функция поиска среди смежных ячеек 
+			_getAdjacentCellsAF2: function(ar,aWs) 
+			{
+				var ws = this.worksheet;
+				var cloneActiveRange = ar.clone(true); // ToDo слишком много клонирования
+				
+				var isEnd = false, cell, isEndWhile, result;
+				
+				console.time("_getAdjacentCellsAF");
+				
+				var prevActiveRange = {r1: cloneActiveRange.r1, c1: cloneActiveRange.c1, r2: cloneActiveRange.r2, c2: cloneActiveRange.c2};
+				
+				while(isEnd === false)
+				{
+					//top
+					var isEndWhile = false;
+					var n = cloneActiveRange.r1;
+					var k = cloneActiveRange.c1 - 1;
+					while(!isEndWhile)
+					{
+						if(n < 0)
+							n++;
+						if(k < 0)
+							k++;
+						
+						result = this._checkValueInCells(n,  k, cloneActiveRange);
+						cloneActiveRange = result.cloneActiveRange;
+						if(n == 0)
+							isEndWhile = true;
+							
+						if(!result.isEmptyCell)
+						{
+							k = cloneActiveRange.c1 - 1; 
+							n--;
+						}
+						else if(k == cloneActiveRange.c2 + 1)
+							isEndWhile = true;
+						else 
+							k++;
+					};
+					
+					//bottom
+					isEndWhile = false;
+					n = cloneActiveRange.r2;
+					k = cloneActiveRange.c1 - 1;
+					while(!isEndWhile)
+					{
+						if(n < 0)
+							n++;
+						if(k < 0)
+							k++;
+						
+						result = this._checkValueInCells(n,  k, cloneActiveRange);
+						cloneActiveRange = result.cloneActiveRange;
+						if(n == ws.nRowsCount)
+							isEndWhile = true;
+							
+						if(!result.isEmptyCell)
+						{
+							k = cloneActiveRange.c1 - 1; 
+							n++;
+						}
+						else if(k == cloneActiveRange.c2 + 1)
+							isEndWhile = true;
+						else
+							k++;
+					};
+					
+					//left
+					isEndWhile = false;
+					n = cloneActiveRange.r1 - 1;
+					k = cloneActiveRange.c1;
+					while(!isEndWhile)
+					{
+						if(n < 0)
+							n++;
+						if(k < 0)
+							k++;
+						
+						result = this._checkValueInCells(n++,  k, cloneActiveRange);
+						cloneActiveRange = result.cloneActiveRange;
+						if(k == 0)
+							isEndWhile = true;
+							
+						if(!result.isEmptyCell)
+						{
+							n = cloneActiveRange.r1 - 1; 
+							k--;
+						}
+						else if(n == cloneActiveRange.r2 + 1)
+							isEndWhile = true;
+					};
+					
+					
+					//right
+					isEndWhile = false;
+					n = cloneActiveRange.r1 - 1;
+					k = cloneActiveRange.c2 + 1;
+					while(!isEndWhile)
+					{
+						if(n < 0)
+							n++;
+						if(k < 0)
+							k++;
+						
+						result = this._checkValueInCells(n++,  k, cloneActiveRange);
+						cloneActiveRange = result.cloneActiveRange;
+						if(k == ws.nColsCount)
+							isEndWhile = true;
+							
+						if(!result.isEmptyCell)
+						{
+							n = cloneActiveRange.r1 - 1; 
+							k++;
+						}
+						else if(n == cloneActiveRange.r2 + 1)
+							isEndWhile = true;
+					};
+					
+					if(prevActiveRange.r1 == cloneActiveRange.r1 && prevActiveRange.c1 == cloneActiveRange.c1 && prevActiveRange.r2 == cloneActiveRange.r2 && prevActiveRange.c2 == cloneActiveRange.c2)
+						isEnd = true;
+					
+					prevActiveRange = {r1: cloneActiveRange.r1, c1: cloneActiveRange.c1, r2: cloneActiveRange.r2, c2: cloneActiveRange.c2};
+				};
+				
+
+				console.timeEnd("_getAdjacentCellsAF");
+				
+
+				//проверяем есть ли пустые строчки и столбцы в диапазоне
+				if(ar.r1 == cloneActiveRange.r1)
+				{
+					for(var n = cloneActiveRange.c1; n <= cloneActiveRange.c2; n++)
+					{
+						cell = ws.model._getCell(cloneActiveRange.r1, n);
+						if(cell.getValueWithoutFormat() != '')
+							break;
+						if(n == cloneActiveRange.c2 && cloneActiveRange.c2 > cloneActiveRange.c1)
+							cloneActiveRange.r1++;
+					}
+				}
+				else if(ar.r1 == cloneActiveRange.r2)
+				{
+					for(var n = cloneActiveRange.c1; n <= cloneActiveRange.c2; n++)
+					{
+						cell = ws.model._getCell(cloneActiveRange.r2, n);
+						if(cell.getValueWithoutFormat() != '')
+							break;
+						if(n == cloneActiveRange.c2 && cloneActiveRange.r2 > cloneActiveRange.r1)
+							cloneActiveRange.r2--;
+					}
+				}
+				
+				if(ar.c1 == cloneActiveRange.c1)
+				{
+					for(var n = cloneActiveRange.r1; n <= cloneActiveRange.r2; n++)
+					{
+						cell = ws.model._getCell(n, cloneActiveRange.c1);
+						if(cell.getValueWithoutFormat() != '')
+							break;
+						if(n == cloneActiveRange.r2 && cloneActiveRange.r2 > cloneActiveRange.r1)
+							cloneActiveRange.c1++;
+					}
+				}
+				else if(ar.c1 == cloneActiveRange.c2)
+				{
+					for(var n = cloneActiveRange.r1; n <= cloneActiveRange.r2; n++)
+					{
+						cell = ws.model._getCell(n, cloneActiveRange.c2);
+						if(cell.getValueWithoutFormat() != '')
+							break;
+						if(n == cloneActiveRange.r2 && cloneActiveRange.c2 > cloneActiveRange.c1)
+							cloneActiveRange.c2--;
+					}
+				}
+				
+				//проверяем не вошёл ли другой фильтр в область нового фильтра
+				if(aWs.AutoFilter || aWs.TableParts)
+				{
+					//var oldFilters = this.allAutoFilter;
+					var oldFilters =[];
+							
+					if(aWs.AutoFilter)
+					{
+						oldFilters[0] = aWs.AutoFilter
+					}
+					
+					if(aWs.TableParts)
+					{
+						var s = 1;
+						if(!oldFilters[0])
+							s = 0;
+						for(k = 0; k < aWs.TableParts.length; k++)
+						{
+							if(aWs.TableParts[k].AutoFilter)
+							{
+								oldFilters[s] = aWs.TableParts[k];
+								s++;
+							}
+						}
+					}
+							
+					var newRange = {};
+					for(var i = 0; i < oldFilters.length; i++)
+					{
+						if(!oldFilters[i].Ref || oldFilters[i].Ref == "")
+							continue;
+						var fromCellId = oldFilters[i].Ref.split(':')[0];
+						var toCellId = oldFilters[i].Ref.split(':')[1];
+						var startId = ws.model.getCell( new CellAddress(fromCellId));
+						var endId = ws.model.getCell( new CellAddress(toCellId));
+						var oldRange = 
+						{
+							r1: startId.first.row - 1,
+							c1: startId.first.col - 1,
+							r2: endId.first.row - 1,
+							c2: endId.first.col - 1
+						};
+						if(cloneActiveRange.r1 <= oldRange.r1 && cloneActiveRange.r2 >= oldRange.r2 && cloneActiveRange.c1 <= oldRange.c1 && cloneActiveRange.c2 >= oldRange.c2)
+						{
+							if(oldRange.r2 > ar.r1 && ar.c2 >= oldRange.c1 && ar.c2 <= oldRange.c2)//top
+								newRange.r2 = oldRange.r1 - 1;
+							else if(oldRange.r1 < ar.r2 && ar.c2 >= oldRange.c1 && ar.c2 <= oldRange.c2)//bottom
+								newRange.r1 = oldRange.r2 + 1;
+							else if(oldRange.c2 < ar.c1)//left
+								newRange.c1 = oldRange.c2 + 1;
+							else if(oldRange.c1 > ar.c2)//right
+								newRange.c2 = oldRange.c1 - 1
+						}
+					}
+					
+					if(!newRange.r1)
+						newRange.r1 = cloneActiveRange.r1;
+					if(!newRange.c1)
+						newRange.c1 = cloneActiveRange.c1;
+					if(!newRange.r2)
+						newRange.r2 = cloneActiveRange.r2;
+					if(!newRange.c2)
+						newRange.c2 = cloneActiveRange.c2;
+					
+					newRange = Asc.Range(newRange.c1, newRange.r1, newRange.c2, newRange.r2);
+					
+					cloneActiveRange = newRange;
+				}
+			
+
+				if(cloneActiveRange)
+					return cloneActiveRange;
+				else
+					return ar;
+
+			},
+			
 			//функция поиска среди смежных ячеек 
 			_getAdjacentCellsAF: function(ar,aWs) 
 			{
