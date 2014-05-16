@@ -3244,8 +3244,8 @@ ParaRun.prototype =
 
         var CurTextPr = this.Get_CompiledPr( false );
 
-        var StrikeoutY = Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27;
-        var UnderlineY = Y + UndOff;
+        var StrikeoutY = Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27 -  this.YOffset;
+        var UnderlineY = Y + UndOff -  this.YOffset;
         var LineW      = (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm;
 
 
