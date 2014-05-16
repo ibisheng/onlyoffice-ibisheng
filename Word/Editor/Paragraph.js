@@ -723,7 +723,7 @@ Paragraph.prototype =
                     var CommentId = Item.CommentId;
 
                     if ( true === Item.Start )
-                        DocumentComments.Set_StartInfo( CommentId, 0, 0, 0, 0, null );
+                        DocumentComments.Set_StartInfo( CommentId, 0, 0, 0, 0, 0, null );
                     else
                         DocumentComments.Set_EndInfo( CommentId, 0, 0, 0, 0, null );
 
@@ -3759,7 +3759,7 @@ Paragraph.prototype =
                     var CommentY  = this.Pages[CurPage].Y + this.Lines[CurLine].Top;
                     var CommentH  = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
 
-                    DocumentComments.Set_StartInfo( CommentId, this.Get_StartPage_Absolute() + CurPage, X, CommentY, CommentH, this.Id );
+                    DocumentComments.Set_StartInfo( CommentId, this.Get_StartPage_Absolute() + CurPage, X, CommentY, CommentH, this.XLimit, this.Id );
 
                     break;
                 }
@@ -5009,9 +5009,12 @@ Paragraph.prototype =
 
     Internal_GetTabPos : function(X, ParaPr, CurPage)
     {
+        var PRS = this.m_oPRSW;
         var PageStart = this.Parent.Get_PageContentStartPos( this.PageNum + CurPage, this.Index );
         if ( undefined != this.Get_FramePr() )
             PageStart.X = 0;
+        else if ( PRS.RangesCount > 0 && Math.abs(PRS.Ranges[0].X0 - PageStart.X) < 0.001 )
+            PageStart.X = PRS.Ranges[0].X1;
 
         // Если у данного параграфа есть табы, тогда ищем среди них
         var TabsCount = ParaPr.Tabs.Get_Count();
@@ -5046,7 +5049,7 @@ Paragraph.prototype =
 
             // TODO: Пока здесь сделаем поправку на погрешность. Когда мы сделаем так, чтобы все наши значения хранились
             //       в тех же единицах, что и в формате Docx, тогда и здесь можно будет вернуть строгое равенство (см. баг 22586)
-            if ( (X - TempTab.Pos - PageStart.X) < 0.001 )
+            if ( X < TempTab.Pos + PageStart.X + 0.001 )
             {
                 Tab = TempTab;
                 break;
@@ -5069,7 +5072,8 @@ Paragraph.prototype =
         }
         else
         {
-            NewX = Tab.Pos + PageStart.X;
+            // Здесь 0.001 добавляется из-за замечания выше
+            NewX = Tab.Pos + PageStart.X + 0.001;
         }
 
         return { NewX : NewX, TabValue : ( null === Tab ? tab_Left : Tab.Value ) };
@@ -18700,7 +18704,7 @@ Paragraph.prototype =
                             {
                                 var Comment = g_oTableId.Get_ById( Element.Id );
                                 if ( null != Comment )
-                                    Comment.Set_StartInfo( 0, 0, 0, 0, this.Get_Id() );
+                                    Comment.Set_StartInfo( 0, 0, 0, 0, 0, this.Get_Id() );
                             }
                             else if ( Element instanceof ParaCommentEnd )
                             {
@@ -18745,7 +18749,7 @@ Paragraph.prototype =
                                 if ( null != Comment )
                                 {
                                     if ( true === Element.Start )
-                                        Comment.Set_StartInfo( 0, 0, 0, 0, this.Get_Id() );
+                                        Comment.Set_StartInfo( 0, 0, 0, 0, 0, this.Get_Id() );
                                     else
                                         Comment.Set_EndInfo( 0, 0, 0, 0, this.Get_Id() );
                                 }
@@ -19655,7 +19659,7 @@ Paragraph.prototype =
                     var Line    = this.Lines[PagePos.Internal.Line];
                     var LineA   = Line.Metrics.Ascent;
                     var LineH   = Line.Bottom - Line.Top;
-                    Comment.Set_StartInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.Get_Id() );
+                    Comment.Set_StartInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.XLimit, this.Get_Id() );
 
                     var Item = new ParaCommentStart(Comment.Get_Id());
                     this.Internal_Content_Add( CursorPos_min, Item );
@@ -19699,7 +19703,7 @@ Paragraph.prototype =
                         var Line    = this.Lines[PagePos.Internal.Line];
                         var LineA   = Line.Metrics.Ascent;
                         var LineH   = Line.Bottom - Line.Top;
-                        Comment.Set_StartInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.Get_Id() );
+                        Comment.Set_StartInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.XLimit, this.Get_Id() );
 
                         var Item = new ParaCommentStart(Comment.Get_Id());
                         this.Internal_Content_Add( StartPos, Item );
@@ -19729,7 +19733,7 @@ Paragraph.prototype =
                         var Line    = this.Lines[PagePos.Internal.Line];
                         var LineA   = Line.Metrics.Ascent;
                         var LineH   = Line.Bottom - Line.Top;
-                        Comment.Set_StartInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.Get_Id() );
+                        Comment.Set_StartInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.XLimit, this.Get_Id() );
 
                         var Item = new ParaCommentStart(Comment.Get_Id());
                         this.Internal_Content_Add( Pos, Item );
@@ -19925,7 +19929,7 @@ Paragraph.prototype =
             var Line    = this.Lines[PagePos.Internal.Line];
             var LineA   = Line.Metrics.Ascent;
             var LineH   = Line.Bottom - Line.Top;
-            Comment.Set_StartInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.Get_Id() );
+            Comment.Set_StartInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.XLimit, this.Get_Id() );
 
             var Item = new ParaCommentStart(Comment.Get_Id());
             this.Internal_Content_Add( StartPos, Item );
@@ -19952,7 +19956,7 @@ Paragraph.prototype =
                 if ( ( para_CommentStart === Item.Type || para_CommentEnd === Item.Type ) && Id === Item.Id )
                 {
                     if ( para_CommentStart === Item.Type )
-                        DocumentComments.Set_StartInfo( Item.Id, 0, 0, 0, 0, null );
+                        DocumentComments.Set_StartInfo( Item.Id, 0, 0, 0, 0, 0, null );
                     else
                         DocumentComments.Set_EndInfo( Item.Id, 0, 0, 0, 0, null );
 
