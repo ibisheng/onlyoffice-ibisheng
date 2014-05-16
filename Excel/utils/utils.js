@@ -308,7 +308,7 @@
 			
 			getName : function() {
 			    var sRes = "";
-			    if (0 == this.c1 && gc_nMaxCol0 == this.c2) {
+			    if (0 == this.c1 && gc_nMaxCol0 == this.c2 && false == this.c1Abs && false == this.c2Abs) {
 			        if (this.r1Abs)
 			            sRes += "$";
 			        sRes += (this.r1 + 1) + ":";
@@ -316,7 +316,7 @@
 			            sRes += "$";
 			        sRes += (this.r2 + 1);
 			    }
-			    else if (0 == this.r1 && gc_nMaxRow0 == this.r2) {
+			    else if (0 == this.r1 && gc_nMaxRow0 == this.r2 && false == this.r1Abs && false == this.r2Abs) {
 			        if (this.c1Abs)
 			            sRes += "$";
 			        sRes += g_oCellAddressUtils.colnumToColstr(this.c1 + 1) + ":";
