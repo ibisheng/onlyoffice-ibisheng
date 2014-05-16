@@ -281,23 +281,12 @@ var gUndoInsDelCellsFlag = true;
 				var bIsOpenFilter = undefined !== openFilter;
 				var activeCells = null === ar ? null : ar.clone(); // ToDo Слишком много клонирования, это долгая операция
 				var aWs = this._getCurrentWS();
-				var paramsForCallBack;
-				var paramsForCallBackAdd;
-				var filterChange;
 				if(openFilter != undefined)
 					History.TurnOff();
-				var t  = this;	
-				var newRes;
-				var rangeShift1;
-				var rangeShift;
-				var selectionTable;
-                var result;
-				var isInsertButton = true;
-				var startCell;
-				var endCell;
-				var rangeFilter;
-				var splitRange;
-				var addNameColumn, ref;
+				
+				var paramsForCallBack, paramsForCallBackAdd, filterChange, t  = this, newRes, rangeShift1, rangeShift, selectionTable, result, isInsertButton = true, startCell, endCell;
+				var rangeFilter, splitRange, addNameColumn, ref;
+
 				if(!addFormatTableOptionsObj)
 					addNameColumn = true;
 				else if(typeof addFormatTableOptionsObj == 'object')
@@ -310,8 +299,10 @@ var gUndoInsDelCellsFlag = true;
 				}
 				else if(addFormatTableOptionsObj)
 					addNameColumn = false;
+					
 				ws.expandColsOnScroll(true);
 				ws.expandRowsOnScroll(true);
+				
 				//callback
 				var onAddAutoFiltersCallback = function(success)
 				{
@@ -331,7 +322,7 @@ var gUndoInsDelCellsFlag = true;
 							}
 						}
 						History.StartTransaction();
-						if(paramsForCallBack)
+						if(paramsForCallBack)//меняем/удаляем/устанавливаем стиль для а/ф
 						{
 							switch(paramsForCallBack)
 							{
@@ -595,7 +586,8 @@ var gUndoInsDelCellsFlag = true;
 
 									break;
 								}
-							}
+							};
+							
 							if(paramsForCallBack == "setStyleTableForAutoFilter1" || paramsForCallBack == "setStyleTableForAutoFilter")
 							{
 								t._addHistoryObj(changesElemHistory, historyitem_AutoFilter_Add,
@@ -621,199 +613,51 @@ var gUndoInsDelCellsFlag = true;
 								if(isTurnOffHistory)
 									History.TurnOn();
 								return true;
-							}
+							};
 						} 
-						else if(paramsForCallBackAdd) 
+						else if(paramsForCallBackAdd)//добавляем а/ф
 						{
-							switch(paramsForCallBackAdd)
+							if(paramsForCallBackAdd == "addTableFilterOneCell" || paramsForCallBackAdd == "addTableFilterManyCells")
 							{
-								case "addTableFilterOneCell":
-								{
-									if(!isTurnOffHistory && addNameColumn)
-									{
-										rangeShift.addCellsShiftBottom();
-										ws.cellCommentator.updateCommentsDependencies(true, 4, rangeShift.bbox);
-										ws.objectRender.updateDrawingObject(true, 4, rangeShift.bbox);
-									}
-									if(lTable)
-									{
-										if(addNameColumn && !isTurnOffHistory)
-											ws.model.getRange3(mainAdjacentCells.r1, mainAdjacentCells.c1, mainAdjacentCells.r2 + 1, mainAdjacentCells.c2).unmerge();
-										else
-											ws.model.getRange3(mainAdjacentCells.r1, mainAdjacentCells.c1, mainAdjacentCells.r2, mainAdjacentCells.c2).unmerge();
-									}
-									if(addNameColumn)
-									{
-										for(col = mainAdjacentCells.c1; col <= mainAdjacentCells.c2; col++)
-										{
-											var cell = new CellAddress(mainAdjacentCells.r1, col, 0);
-											var range = ws.model.getCell(cell);
-											var strNum = "Column" + (col - mainAdjacentCells.c1 + 1).toString();
-											if(!isTurnOffHistory)
-												range.setValue(strNum);
-											tableColumns[j] = new TableColumn();
-											tableColumns[j].Name = strNum;
-
-											j++;
-										}
-									}
-									else
-									{
-										tableColumns = t._generateColumnNameWithoutTitle(mainAdjacentCells, isTurnOffHistory);
-									}
-									if(addNameColumn && !isTurnOffHistory)
-										mainAdjacentCells.r2 = mainAdjacentCells.r2 + 1;
-									break;
-								}
-								case "addTableFilterManyCells":
-								{
-									if(!isTurnOffHistory && addNameColumn)
-									{
-										rangeShift.addCellsShiftBottom();
-										ws.cellCommentator.updateCommentsDependencies(true, 4, rangeShift.bbox);
-										ws.objectRender.updateDrawingObject(true, 4, rangeShift.bbox);
-									}
-									if(lTable)
-									{
-										if(addNameColumn && !isTurnOffHistory)
-											ws.model.getRange3(activeCells.r1, activeCells.c1, activeCells.r2 + 1, activeCells.c2).unmerge();
-										else
-											ws.model.getRange3(activeCells.r1, activeCells.c1, activeCells.r2, activeCells.c2).unmerge();
-									}
-									if(addNameColumn)
-									{
-										for(col = activeCells.c1; col <= activeCells.c2; col++)
-										{
-											var cell = new CellAddress(activeCells.r1, col, 0);
-											var range = ws.model.getCell(cell);
-											var strNum = "Column" + (col - activeCells.c1 + 1).toString();
-											if(!isTurnOffHistory)
-												range.setValue(strNum);
-											tableColumns[j] = new TableColumn();
-											tableColumns[j].Name = strNum;
-											
-											j++;
-										}
-									}
-									else
-									{
-										tableColumns = t._generateColumnNameWithoutTitle(activeCells, isTurnOffHistory);
-									}
-									if(addNameColumn && !isTurnOffHistory)
-										activeCells.r2 = activeCells.r2 + 1;
-									break
-								}
-							}
-							if(paramsForCallBackAdd == "addTableFilterOneCell" || paramsForCallBackAdd == "addAutoFilterOneCell")
-							{
-								//при добавлении общего фильтра проверка на пустой диапазон
-								if(paramsForCallBackAdd == "addAutoFilterOneCell" && t._isEmptyRange(activeCells, true))
-								{
-									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
-									return;
-								}
-								result = [];
-								//в случае если добавляем фильтр общий, то откидываем пустую строку или столбец в конце
-								var isEndRowEmpty = true;
-								for(col = mainAdjacentCells.c1; col <= mainAdjacentCells.c2; col++)
-								{
-									 if(isEndRowEmpty && ws.model.getCell(new CellAddress(mainAdjacentCells.r2, col, 0)).getCells()[0].getValue() != '')
-									 {
-										isEndRowEmpty = false;
-									 }
-								}
-								if(isEndRowEmpty && !lTable && mainAdjacentCells.r1 != mainAdjacentCells.r2)
-									mainAdjacentCells.r2 = mainAdjacentCells.r2 - 1;
+								var tempCells = activeCells;
+								if(paramsForCallBackAdd == "addTableFilterOneCell")
+									tempCells = mainAdjacentCells;
 								
-								//если она пустая и имеет непустые смежные
-								if(mainAdjacentCells)
+								//при добавлении строки заголовков - сдвигаем диапазон на строку ниже
+								if(!isTurnOffHistory && addNameColumn)
 								{
-									var curCell;
-									var n = 0;
-									for(col = mainAdjacentCells.c1; col <= mainAdjacentCells.c2; col++)
-									{
-										var idCell = new CellAddress(mainAdjacentCells.r1, col, 0);
-										var idCellNext = new CellAddress(mainAdjacentCells.r2, col, 0);
-										curCell = ws.model.getCell( idCell ).getCells();
-										
-										result[n] = new Result();
-										result[n].x = ws.cols[col] ? ws.cols[col].left : null;
-										result[n].y = ws.rows[mainAdjacentCells.r1] ? ws.rows[mainAdjacentCells.r1].top : null;
-										result[n].width = ws.cols[col] ? ws.cols[col].width : null;
-										result[n].height = ws.rows[mainAdjacentCells.r1] ? ws.rows[mainAdjacentCells.r1].height : null;
-										result[n].id = idCell.getID();
-										result[n].idNext = idCellNext.getID();
-										
-										n++;
-									}
+									rangeShift.addCellsShiftBottom();
+									ws.cellCommentator.updateCommentsDependencies(true, 4, rangeShift.bbox);
+									ws.objectRender.updateDrawingObject(true, 4, rangeShift.bbox);
 								}
-								else if(val != '' && !mainAdjacentCells && !lTable)//если она не пустая и не имеет смежных
+								
+								//в случае добавления форматированной таблицы делаем unmerge
+								if(lTable)
 								{
-									var idCell = new CellAddress(activeCells.r1, activeCells.c1, 0);
-									var idCellNext = new CellAddress(activeCells.r2, activeCells.c2, 0);
-									
-									result[0] = new Result();
-									result[0].x = ws.cols[activeCells.c1] ? ws.cols[activeCells.c1].left : null;
-									result[0].y = ws.rows[activeCells.r1] ? ws.rows[activeCells.r1].top : null;
-									result[0].width = ws.cols[activeCells.c1] ? ws.cols[activeCells.c1].width : null;
-									result[0].height = ws.rows[activeCells.c1] ? ws.rows[activeCells.c1].height : null;
-									result[0].id = idCell.getID();
-									result[0].idNext = idCellNext.getID();
-									
-								}
-								else if(val == '' && !mainAdjacentCells || (lTable && !mainAdjacentCells))//если она непустая и не имеет непустые смежные
-								{
-									if(lTable)
-									{
-										var idCell = new CellAddress(activeCells.r1, activeCells.c1, 0);
-										var idCellNext = new CellAddress(activeCells.r2 + 1, activeCells.c2, 0);
-										
-										result[0] = new Result();
-										result[0].x = ws.cols[activeCells.c1] ? ws.cols[activeCells.c1].left : null;
-										result[0].y = ws.rows[activeCells.r1] ? ws.rows[activeCells.r1].top : null;
-										result[0].width = ws.cols[activeCells.c1] ? ws.cols[activeCells.c1].width : null;
-										result[0].height = ws.rows[activeCells.c1] ? ws.rows[activeCells.c1].height : null;
-										result[0].id = idCell.getID();
-										result[0].idNext = idCellNext.getID();
-										
-									}
+									if(addNameColumn && !isTurnOffHistory)
+										ws.model.getRange3(tempCells.r1, tempCells.c1, tempCells.r2 + 1, tempCells.c2).unmerge();
 									else
-									{
-										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
-										History.EndTransaction();
-										return false;
-									}
+										ws.model.getRange3(tempCells.r1, tempCells.c1, tempCells.r2, tempCells.c2).unmerge();
 								}
-								if(mainAdjacentCells)
-									activeCells = mainAdjacentCells;
+								
+								//генерируем строку заголовков
+								tableColumns = t._generateColumnsName(addNameColumn, tempCells, isTurnOffHistory);
+								
+								if(addNameColumn && !isTurnOffHistory)
+									tempCells.r2 = tempCells.r2 + 1;
+							};
+							
+							
+							result = t._getResultAddFilter(paramsForCallBackAdd, activeCells, mainAdjacentCells, lTable);
+							if(result !== false)
+							{
+								activeCells = result.activeCells;
+								mainAdjacentCells = result.mainAdjacentCells;
+								result = result.result;
 							}
-							else if(paramsForCallBackAdd == "addTableFilterManyCells" || paramsForCallBackAdd == "addAutoFilterManyCells")
-							{	
-								//при добавлении общего фильтра проверка на пустой диапазон
-								if(paramsForCallBackAdd == "addAutoFilterManyCells" && t._isEmptyRange(activeCells))
-								{
-									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
-									return;
-								}
-								var n = 0;
-								result = [];
-								for(col = activeCells.c1; col <= activeCells.c2; col++)
-								{
-									var idCell = new CellAddress(activeCells.r1, col, 0);
-									var idCellNext = new CellAddress(activeCells.r2, col, 0);
-									
-									result[n] = new Result();
-									result[n].x = ws.cols[col] ? ws.cols[col].left : null;
-									result[n].y = ws.rows[activeCells.r1] ? ws.rows[activeCells.r1].top : null;
-									result[n].width = ws.cols[col] ? ws.cols[col].width : null;
-									result[n].height = ws.rows[activeCells.r1] ? ws.rows[activeCells.r1].height : null;
-									result[n].id = idCell.getID();
-									result[n].idNext = idCellNext.getID();
-									
-									n++;
-								}
-							}
-						}
+							else
+								return false;
+						};
 						
 						//добавляем структуру нового фильтра
 						if(openFilter == undefined)
@@ -841,16 +685,19 @@ var gUndoInsDelCellsFlag = true;
 								aWs.AutoFilter.result = result;
 								aWs.AutoFilter.Ref = result[0].id + ':' + result[result.length -1].idNext;
 							}
-						}
+						};
+						
 						newRes = 
 						{
 							result: result,
 							isVis:  true
 						};
+						
 						var ref = 
 						{
 							Ref: result[0].id + ':' + result[result.length -1].idNext
 						};
+						
 						if(addNameColumn && addFormatTableOptionsObj)
 							addFormatTableOptionsObj.range = ref;
 						t._addHistoryObj(ref, historyitem_AutoFilter_Add,
@@ -864,6 +711,7 @@ var gUndoInsDelCellsFlag = true;
 						}
 						else if(!t.allButtonAF)
 							t.allButtonAF = [];
+							
 						//обновляем
 						if(arn && bIsActiveSheet && !bIsOpenFilter)
 						{
@@ -879,10 +727,12 @@ var gUndoInsDelCellsFlag = true;
 							// ToDo - и еще это обновление стоит после switch, в котором тоже происходит обновление - возможно будет 2 раза
 							rangeFilter =  new Asc.Range(arn.c1, arn.r1, arn.c2, arn.r2);
 							ws._updateCellsRange(rangeFilter, /*canChangeColWidth*/ c_oAscCanChangeColWidth.none);
-						}
+						};
+						
 						History.EndTransaction();
 						if(isTurnOffHistory)
 							History.TurnOn();
+							
 						return true;
 					}
 					else 
@@ -1041,7 +891,9 @@ var gUndoInsDelCellsFlag = true;
 					{
 						return true;
 					}
-				}
+				};
+				
+				
 				
 				//при открытии
 				if(openFilter != undefined)
@@ -1194,17 +1046,17 @@ var gUndoInsDelCellsFlag = true;
 							isInsertButton = false;
 						}
 						aWs.TableParts[openFilter].result = result;
-					}
+					};
 
 					newRes =
 					{
 						result: result,
 						isVis:  true
 					};
+					
 					if(isInsertButton){
-						//if (bIsActiveSheet)
-							//данные фунцкии не занимаются отрисовкой, а заполняют необходимые массивы. нужно для совместного редактировния в случае неактивного листа.
-							this._addButtonAF(newRes, bIsOpenFilter);
+						//данные фунцкии не занимаются отрисовкой, а заполняют необходимые массивы. нужно для совместного редактировния в случае неактивного листа.
+						this._addButtonAF(newRes, bIsOpenFilter);
 					}
 					else if(!this.allButtonAF)
 						this.allButtonAF = [];
@@ -1213,6 +1065,7 @@ var gUndoInsDelCellsFlag = true;
 					return true;
 				}
 			},
+			
 			//попал ли курсор на кнопку фильтра
 			checkCursor: function (x, y) {
 				if (!this.allButtonAF)
@@ -6091,6 +5944,153 @@ var gUndoInsDelCellsFlag = true;
 				}
 				return tableColumns;
 			},
+			
+			_generateColumnsName: function(addNameColumn, tempCells, isTurnOffHistory)
+			{
+				var tableColumns = [], j = 0, ws = this.worksheet, cell, range, strNum;
+				
+				if(addNameColumn)
+				{
+					for(var col = tempCells.c1; col <= tempCells.c2; col++)
+					{
+						cell = new CellAddress(tempCells.r1, col, 0);
+						range = ws.model.getCell(cell);
+						strNum = "Column" + (col - tempCells.c1 + 1).toString();
+						if(!isTurnOffHistory)
+							range.setValue(strNum);
+						tableColumns[j] = new TableColumn();
+						tableColumns[j].Name = strNum;
+
+						j++;
+					};
+				}
+				else
+					tableColumns = this._generateColumnNameWithoutTitle(tempCells, isTurnOffHistory);
+					
+				return tableColumns;
+			},
+			
+			
+			_getResultAddFilter: function(paramsForCallBackAdd, activeCells, mainAdjacentCells, lTable)
+			{
+				var result = [], isEndRowEmpty, ws = this.worksheet, idCell, idCellNext;
+				
+				if(paramsForCallBackAdd == "addTableFilterOneCell" || paramsForCallBackAdd == "addAutoFilterOneCell")
+				{
+					//при добавлении общего фильтра проверка на пустой диапазон
+					if(paramsForCallBackAdd == "addAutoFilterOneCell" && t._isEmptyRange(activeCells, true))
+					{
+						ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
+						return false;
+					};
+					
+					//в случае если добавляем фильтр общий, то откидываем пустую строку или столбец в конце
+					isEndRowEmpty = true;
+					for(var col = mainAdjacentCells.c1; col <= mainAdjacentCells.c2; col++)
+					{
+						 if(isEndRowEmpty && ws.model.getCell(new CellAddress(mainAdjacentCells.r2, col, 0)).getCells()[0].getValue() != '')
+						 {
+							isEndRowEmpty = false;
+						 }
+					};
+					if(isEndRowEmpty && !lTable && mainAdjacentCells.r1 != mainAdjacentCells.r2)
+						mainAdjacentCells.r2 = mainAdjacentCells.r2 - 1;
+					
+					//если она пустая и имеет непустые смежные
+					if(mainAdjacentCells)
+					{
+						var curCell;
+						var n = 0;
+						for(var col = mainAdjacentCells.c1; col <= mainAdjacentCells.c2; col++)
+						{
+							idCell = new CellAddress(mainAdjacentCells.r1, col, 0);
+							idCellNext = new CellAddress(mainAdjacentCells.r2, col, 0);
+							curCell = ws.model.getCell( idCell ).getCells();
+							
+							result[n] = new Result();
+							result[n].x = ws.cols[col] ? ws.cols[col].left : null;
+							result[n].y = ws.rows[mainAdjacentCells.r1] ? ws.rows[mainAdjacentCells.r1].top : null;
+							result[n].width = ws.cols[col] ? ws.cols[col].width : null;
+							result[n].height = ws.rows[mainAdjacentCells.r1] ? ws.rows[mainAdjacentCells.r1].height : null;
+							result[n].id = idCell.getID();
+							result[n].idNext = idCellNext.getID();
+							
+							n++;
+						}
+					}
+					else if(val != '' && !mainAdjacentCells && !lTable)//если она не пустая и не имеет смежных
+					{
+						idCell = new CellAddress(activeCells.r1, activeCells.c1, 0);
+						idCellNext = new CellAddress(activeCells.r2, activeCells.c2, 0);
+						
+						result[0] = new Result();
+						result[0].x = ws.cols[activeCells.c1] ? ws.cols[activeCells.c1].left : null;
+						result[0].y = ws.rows[activeCells.r1] ? ws.rows[activeCells.r1].top : null;
+						result[0].width = ws.cols[activeCells.c1] ? ws.cols[activeCells.c1].width : null;
+						result[0].height = ws.rows[activeCells.c1] ? ws.rows[activeCells.c1].height : null;
+						result[0].id = idCell.getID();
+						result[0].idNext = idCellNext.getID();
+						
+					}
+					else if(val == '' && !mainAdjacentCells || (lTable && !mainAdjacentCells))//если она непустая и не имеет непустые смежные
+					{
+						if(lTable)
+						{
+							idCell = new CellAddress(activeCells.r1, activeCells.c1, 0);
+							idCellNext = new CellAddress(activeCells.r2 + 1, activeCells.c2, 0);
+							
+							result[0] = new Result();
+							result[0].x = ws.cols[activeCells.c1] ? ws.cols[activeCells.c1].left : null;
+							result[0].y = ws.rows[activeCells.r1] ? ws.rows[activeCells.r1].top : null;
+							result[0].width = ws.cols[activeCells.c1] ? ws.cols[activeCells.c1].width : null;
+							result[0].height = ws.rows[activeCells.c1] ? ws.rows[activeCells.c1].height : null;
+							result[0].id = idCell.getID();
+							result[0].idNext = idCellNext.getID();
+							
+						}
+						else
+						{
+							ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
+							History.EndTransaction();
+							return false;
+						};
+					};
+					
+					if(mainAdjacentCells)
+						activeCells = mainAdjacentCells;
+				}
+				else if(paramsForCallBackAdd == "addTableFilterManyCells" || paramsForCallBackAdd == "addAutoFilterManyCells")
+				{	
+					//при добавлении общего фильтра проверка на пустой диапазон
+					if(paramsForCallBackAdd == "addAutoFilterManyCells" && t._isEmptyRange(activeCells))
+					{
+						ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
+						return false;
+					};
+					
+					var n = 0;
+					for(var col = activeCells.c1; col <= activeCells.c2; col++)
+					{
+						idCell = new CellAddress(activeCells.r1, col, 0);
+						idCellNext = new CellAddress(activeCells.r2, col, 0);
+						
+						result[n] = new Result();
+						result[n].x = ws.cols[col] ? ws.cols[col].left : null;
+						result[n].y = ws.rows[activeCells.r1] ? ws.rows[activeCells.r1].top : null;
+						result[n].width = ws.cols[col] ? ws.cols[col].width : null;
+						result[n].height = ws.rows[activeCells.r1] ? ws.rows[activeCells.r1].height : null;
+						result[n].id = idCell.getID();
+						result[n].idNext = idCellNext.getID();
+						
+						n++;
+					};
+				};
+				
+				return {result: result, mainAdjacentCells: mainAdjacentCells, activeCells: activeCells};
+			},
+							
+							
+			
 			
 			_renameTableColumn: function(range)
 			{
