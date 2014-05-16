@@ -25,6 +25,7 @@ var numFormat_Milliseconds = 18;
 var numFormat_AmPm = 19;
 var numFormat_DateSeparator = 20;
 var numFormat_TimeSeparator = 21;
+var numFormat_DecimalPointText = 22;
 //Вспомогательные типы, которые заменятюся в _prepareFormat
 var numFormat_MonthMinute = 101;
 var numFormat_Percent = 102;
@@ -705,8 +706,8 @@ NumFormat.prototype =
 
                     }
                     //преобразуем в текст все последующие
-                    // item.type = numFormat_Text;
-                    // item.val = gc_sFormatDecimalPoint;
+                    item.type = numFormat_DecimalPointText;
+                    item.val = null;
                 }
                 else if(FormatStates.Decimal == nReadState)
                     nReadState = FormatStates.Frac;
@@ -1294,8 +1295,10 @@ NumFormat.prototype =
             }
         }
     },
-    setFormat : function(format)
+    setFormat: function (format, cultureInfo)
     {
+        if (null == cultureInfo)
+            cultureInfo = g_oDefaultCultureInfo;
         this.formatString = format;
         this.length = this.formatString.length;
         if("general" == this.formatString.toLowerCase())
@@ -1315,7 +1318,7 @@ NumFormat.prototype =
 				if(this.valid)
 				{
 					//проверяем типы, которые мы не определяем в _prepareFormat
-					var aCurrencySymbols = ["$", "€", "£", "¥","р."];
+					var aCurrencySymbols = ["$", "€", "£", "¥","р.", cultureInfo.CurrencySymbol];
 					var sText = "";
 					for(var i = 0, length = this.aRawFormat.length; i < length; ++i)
 					{
@@ -1328,6 +1331,8 @@ NumFormat.prototype =
 								sText += item.CurrencyString;
 						}
 						else if(numFormat_DecimalPoint == item.type)
+						    sText += gc_sFormatDecimalPoint;
+						else if(numFormat_DecimalPointText == item.type)
 						    sText += gc_sFormatDecimalPoint;
 					}
 					if("" != sText)
@@ -1409,9 +1414,9 @@ NumFormat.prototype =
                 oCurText.text += "-";
             }
             var bNoDecFormat = false;
-            if(null == aDec || 0 == aDec.length && 0 != oParsedNumber.dec)
+            if((null == aDec || 0 == aDec.length) && 0 != oParsedNumber.dec)
             {
-                //случай ",00"
+                //случай ".00"
                 bNoDecFormat = true;
             }
             
@@ -1433,6 +1438,9 @@ NumFormat.prototype =
                     }
 					oCurText.text += cultureInfo.NumberDecimalSeparator;
                     nReadState = FormatStates.Frac;
+                }
+                else if (numFormat_DecimalPointText == item.type) {
+                    oCurText.text += cultureInfo.NumberDecimalSeparator;
                 }
                 else if(numFormat_Digit == item.type || numFormat_DigitNoDisp == item.type || numFormat_DigitSpace == item.type)
                 {
@@ -1788,6 +1796,9 @@ NumFormat.prototype =
                 nReadState = FormatStates.Frac;
                 if(0 != nNewFracLength && 0 != nShift)
                     res += gc_sFormatDecimalPoint;
+            }
+            else if (numFormat_DecimalPointText == item.type) {
+                res += gc_sFormatDecimalPoint;
             }
             else if(numFormat_Thousand == item.type)
             {
