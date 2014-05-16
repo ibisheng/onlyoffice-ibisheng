@@ -945,7 +945,7 @@ ParaRun.prototype =
 
             if ( para_Drawing === Element.Type && Id === Element.Get_Id() )
             {
-                this.Remove_FromContent( CurPos, 1 );
+                this.Remove_FromContent( CurPos, 1, true );
                 return;
             }
         }

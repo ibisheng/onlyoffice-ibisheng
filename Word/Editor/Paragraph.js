@@ -5184,7 +5184,9 @@ Paragraph.prototype =
         {
             var TempTab = TabsPos[Index];
 
-            if ( X < TempTab.Pos + PageStart.X )
+            // TODO: Пока здесь сделаем поправку на погрешность. Когда мы сделаем так, чтобы все наши значения хранились
+            //       в тех же единицах, что и в формате Docx, тогда и здесь можно будет вернуть строгое равенство (см. баг 22586)
+            if ( (X - TempTab.Pos - PageStart.X) < 0.001 )
             {
                 Tab = TempTab;
                 break;
@@ -7210,11 +7212,11 @@ Paragraph.prototype =
                         this.Internal_Content_Remove( StartPos );
                 }
 
-                this.Correct_Content(StartPos, EndPos);
-
                 if ( true !== this.Content[this.CurPos.ContentPos].Selection_IsUse() )
                 {
                     this.Selection_Remove();
+                    this.Correct_Content(StartPos, EndPos);
+
                 }
                 else
                 {
@@ -7223,6 +7225,8 @@ Paragraph.prototype =
                     this.Selection.Flag     = selectionflag_Common;
                     this.Selection.StartPos = this.CurPos.ContentPos;
                     this.Selection.EndPos   = this.CurPos.ContentPos;
+
+                    this.Correct_Content(StartPos, EndPos);
 
                     this.Document_SetThisElementCurrent(true);
 
@@ -7256,13 +7260,13 @@ Paragraph.prototype =
                 {
                     if ( true === this.Content[ContentPos].Selection_IsUse() )
                     {
-                        this.Correct_Content(ContentPos, ContentPos);
-
                         this.Selection.Use      = true;
                         this.Selection.Start    = false;
                         this.Selection.Flag     = selectionflag_Common;
                         this.Selection.StartPos = ContentPos;
                         this.Selection.EndPos   = ContentPos;
+
+                        this.Correct_Content(ContentPos, ContentPos);
 
                         this.Document_SetThisElementCurrent(true);
 

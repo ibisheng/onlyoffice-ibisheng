@@ -1836,8 +1836,9 @@ CDocument.prototype =
                 var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
                 if ( null != ParaDrawing )
                 {
-                    var Paragraph = ParaDrawing.Parent;
-                    this.CurPage = Paragraph.Get_CurrentPage_Absolute();
+                    this.CurPage = ParaDrawing.PageNum;
+                    //var Paragraph = ParaDrawing.Parent;
+                    //this.CurPage = Paragraph.Get_CurrentPage_Absolute();
                 }
             }
             else if ( this.CurPos.ContentPos >= 0 )
@@ -8538,31 +8539,39 @@ CDocument.prototype =
 
                 PrevClass.Add_ToContent( PrevPos + 1, NewElement );
 
+                // TODO: Заглушка для переноса автофигур и картинок. Когда разрулим ситуацию так, чтобы когда у нас 
+                //       в текста была выделена автофигура выделение шло для автофигур, тогда здесь можно будет убрать.
+                var bNeedSelect = (docpostype_DrawingObjects !== this.CurPos.Type ? true : false);
+
                 for ( var Index = 0; Index < NewElementsCount; Index++ )
                 {
                     var Item = NewPara.Content[Index];
                     PrevClass.Add_ToContent( PrevPos + 1 + Index, Item );
 
-                    Item.Select_All();
+                    if ( true === bNeedSelect )
+                        Item.Select_All();
                 }
 
-                PrevClass.Selection.Use = true;
-                PrevClass.Selection.StartPos = PrevPos + 1;
-                PrevClass.Selection.EndPos   = PrevPos + 1 + NewElementsCount - 1;
-
-                for ( var Index = 0; Index < ParaNearPos.Classes.length - 2; Index++ )
+                if ( true === bNeedSelect )
                 {
-                    var Class    = ParaNearPos.Classes[Index];
-                    var ClassPos = ParaNearPos.NearPos.ContentPos.Data[Index];
+                    PrevClass.Selection.Use = true;
+                    PrevClass.Selection.StartPos = PrevPos + 1;
+                    PrevClass.Selection.EndPos   = PrevPos + 1 + NewElementsCount - 1;
 
-                    Class.Selection.Use      = true;
-                    Class.Selection.StartPos = ClassPos;
-                    Class.Selection.EndPos   = ClassPos;
+                    for ( var Index = 0; Index < ParaNearPos.Classes.length - 2; Index++ )
+                    {
+                        var Class    = ParaNearPos.Classes[Index];
+                        var ClassPos = ParaNearPos.NearPos.ContentPos.Data[Index];
+
+                        Class.Selection.Use      = true;
+                        Class.Selection.StartPos = ClassPos;
+                        Class.Selection.EndPos   = ClassPos;
+                    }
+
+                    this.Selection.Use      = true;
+                    this.Selection.StartPos = DstIndex;
+                    this.Selection.EndPos   = DstIndex;
                 }
-
-                this.Selection.Use      = true;
-                this.Selection.StartPos = DstIndex;
-                this.Selection.EndPos   = DstIndex;
             }
         }
         else
