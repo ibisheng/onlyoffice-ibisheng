@@ -60,6 +60,30 @@ StartAddNewShape.prototype =
     {
         if(this.bStart)
         {
+            if(!this.bMoved && this instanceof StartAddNewShape)
+            {
+                var ext_x, ext_y;
+                if(typeof SHAPE_ASPECTS[this.presetGeom] === "number")
+                {
+                    var _aspect = SHAPE_ASPECTS[this.graphicObjects.currentPresetGeom];
+                    if(_aspect >= 1)
+                    {
+                        ext_y = 25.4;
+                        ext_x = ext_y*_aspect;
+                    }
+                    else
+                    {
+                        ext_x = 25.4;
+                        ext_y = ext_x/_aspect;
+                    }
+                }
+                else
+                {
+                    ext_x = 25.4;
+                    ext_y = 25.4;
+                }
+                this.onMouseMove({IsLocked: true}, this.startX + ext_x, this.startY + ext_y, this.pageIndex);
+            }
             History.Create_NewPoint();
             var bounds = this.drawingObjects.arrTrackObjects[0].getBounds();
             var shape = this.drawingObjects.arrTrackObjects[0].getShape(true, this.drawingObjects.drawingDocument);
