@@ -1347,13 +1347,9 @@ CGraphicObjects.prototype =
 
     selectionCheck: function( X, Y, Page_Abs, NearPos )
     {
-        var text_object;
-        if(this.selection.textSelection)
-            text_object = this.selection.textSelection;
-        else if(this.selection.groupSelection && this.selection.groupSelection.textSelection)
-            text_object = this.selection.groupSelection.textSelection;
+        var text_object = getTargetTextObject(this);
         if(text_object)
-            text_object.selectionCheck( X, Y, Page_Abs, NearPos );
+            return text_object.selectionCheck( X, Y, Page_Abs, NearPos );
         return false;
     },
 
