@@ -306,6 +306,35 @@ CGroupShape.prototype =
         return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
     },
 
+    convertToWord: function(document)
+    {
+        var sp_tree_copy = [].concat(this.spTree), i;
+        for(i = this.spTree.length-1; i > -1; --i)
+        {
+            this.removeFromSpTreeByPos(i);
+        }
+        for(i = 0; i < sp_tree_copy.length; ++i)
+        {
+            this.addToSpTree(this.spTree.length, sp_tree_copy[i].convertToWord(document));
+        }
+        return this;
+    },
+
+    convertToPPTX: function(drawingDocument, worksheet)
+    {
+        var sp_tree_copy = [].concat(this.spTree), i;
+        this.setWorksheet(worksheet);
+        for(i = this.spTree.length-1; i > -1; --i)
+        {
+            this.removeFromSpTreeByPos(i);
+        }
+        for(i = 0; i < sp_tree_copy.length; ++i)
+        {
+            this.addToSpTree(this.spTree.length, sp_tree_copy[i].convertToPPTX(drawingDocument, worksheet));
+        }
+        return this;
+    },
+
     isSimpleObject: function()
     {
         return false;

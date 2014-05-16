@@ -416,6 +416,17 @@ CImageShape.prototype =
         return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
     },
 
+    convertToWord: function(document)
+    {
+        return this;
+    },
+
+    convertToPPTX: function(drawingDocument, worksheet)
+    {
+        this.setWorksheet(worksheet);
+        return this;
+    },
+
     recalculateBrush: function()
     {
         var is_on = History.Is_On();

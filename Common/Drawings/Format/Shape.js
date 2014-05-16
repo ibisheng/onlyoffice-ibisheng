@@ -224,13 +224,35 @@ CShape.prototype =
             {
                 var new_content = new CDocumentContent(c, document.DrawingDocument, 0, 0, 0, 20000, false, false, false);
                 var paragraphs = this.txBody.content.Content;
-                //TODO: Обработать нумерацию
+
                 new_content.Internal_Content_RemoveAll();
                 for(var i = 0; i < paragraphs.length; ++i)
                 {
                     var cur_par = paragraphs[i];
                     var new_paragraph = cur_par.Copy(new_content);
                     new_content.Internal_Content_Add( i, new_paragraph, false );
+                    /*var bullet = cur_par.Pr.Bullet;
+                    if(bullet && bullet.bulletType && bullet.bulletType.type !== BULLET_TYPE_BULLET_NONE)
+                    {
+                        switch(bullet.bulletType.type)
+                        {
+                            case BULLET_TYPE_BULLET_CHAR:
+                            case BULLET_TYPE_BULLET_BLIP :
+                            {
+                                _bullet.m_nType = numbering_presentationnumfrmt_Char;
+                                _bullet.m_sChar = _final_bullet.bulletType.Char[0];
+                                _cur_paragraph.Add_PresentationNumbering(_bullet, true);
+                                break;
+                            }
+                            case BULLET_TYPE_BULLET_AUTONUM :
+                            {
+                                _bullet.m_nType = g_NumberingArr[_final_bullet.bulletType.AutoNumType];
+                                _bullet.m_nStartAt = _final_bullet.bulletType.startAt;
+                                _cur_paragraph.Add_PresentationNumbering(_bullet, true);
+                                break;
+                            }
+                        }
+                    } */
                 }
                 c.setTextBoxContent(new_content);
             }
@@ -238,11 +260,12 @@ CShape.prototype =
         return c;
     },
 
-    convertToPPTX: function(drawingDocument)
+    convertToPPTX: function(drawingDocument, worksheet)
     {
         var c = new CShape();
         c.setWordShape(false);
         c.setBDeleted(false);
+        c.setWorksheet(worksheet);
         if(this.nvSpPr)
         {
             c.setNvSpPr(this.nvSpPr.createDuplicate());
@@ -269,9 +292,8 @@ CShape.prototype =
             var paragraphs = this.textBoxContent.Content;
             for(var i = 0; i < paragraphs.length; ++i)
             {
-                //TODO: обработать нумерацию
                 var cur_par = paragraphs[i];
-                var new_paragraph = new Paragraph(drawingDocument, tx_body, 0, 0, 0, 0, 0);
+                var new_paragraph = new Paragraph(drawingDocument, tx_body, 0, 0, 0, 0, 0, true);
                 new_paragraph.Set_Pr(cur_par.Pr.Copy());
                 new_paragraph.TextPr.Set_Value( cur_par.TextPr.Value );
                 new_paragraph.Internal_Content_Remove2(0, new_paragraph.Content.length);
@@ -287,6 +309,7 @@ CShape.prototype =
                 new_content.Internal_Content_Add( i, new_paragraph, false );
             }
             tx_body.setContent(new_content);
+            c.setTxBody(tx_body);
         }
         return c;
     },

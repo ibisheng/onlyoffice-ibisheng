@@ -313,8 +313,6 @@ CShape.prototype.recalculate = function ()
             this.recalcInfo.recalculateWrapPolygon = false;
         }
         this.bNeedUpdatePosition = true;
-
-
     }, this, []);
 };
 

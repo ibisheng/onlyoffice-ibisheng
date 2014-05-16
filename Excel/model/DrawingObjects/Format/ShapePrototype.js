@@ -391,7 +391,7 @@ CShape.prototype.recalculateContent = function()
                     || (_full_rotate > 3*Math.PI*0.25 && _full_rotate < 5*Math.PI*0.25)
                     || (_full_rotate > 7*Math.PI*0.25 && _full_rotate < 2*Math.PI))
                 {
-                    if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
+                    if(!(body_pr.vert === nVertTTvert || body_pr.vert === nVertTTvert270))
                     {
 
                         this.txBody.contentWidth = w;
@@ -405,7 +405,7 @@ CShape.prototype.recalculateContent = function()
                 }
                 else
                 {
-                    if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
+                    if(!(body_pr.vert === nVertTTvert || body_pr.vert === nVertTTvert270))
                     {
 
                         this.txBody.contentWidth = h;

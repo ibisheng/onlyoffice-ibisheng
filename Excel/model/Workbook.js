@@ -1743,7 +1743,7 @@ function Woorksheet(wb, _index, sId){
 		    data.Ref.cleanFormat();
 	});
 	this.hyperlinkManager.setDependenceManager(this.mergeManager);
-
+    this.DrawingDocument = new CDrawingDocument()
 	this.sheetViews = [];
 	this.aConditionalFormatting = [];
 	this.sheetPr = null;

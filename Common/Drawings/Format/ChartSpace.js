@@ -377,12 +377,13 @@ CChartSpace.prototype =
 
     convertToWord: function(document)
     {
-        return this.createDuplicate();
+        return this;
     },
 
-    convertToPPTX: function(drawingDocument)
+    convertToPPTX: function(drawingDocument, worksheet)
     {
-
+        this.setWorksheet(worksheet);
+        return this;
     },
 
     Write_ToBinary2: function (w)

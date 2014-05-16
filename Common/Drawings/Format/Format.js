@@ -3325,7 +3325,7 @@ GradPath.prototype =
 
     Write_ToBinary: function(w)
     {
-        writeLong(this.path);
+        writeLong(w, this.path);
         w.WriteBool(isRealObject(this.rect));
         if(isRealObject(this.rect))
         {
