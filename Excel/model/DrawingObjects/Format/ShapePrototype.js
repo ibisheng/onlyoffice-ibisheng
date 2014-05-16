@@ -422,7 +422,7 @@ CShape.prototype.recalculateContent = function()
 
 
         content.Set_StartPage(0);
-        content.Reset(0, 0, w, h);
+        content.Reset(0, 0, w, 20000);
         content.Recalculate_Page(content.StartPage, true);
     }
 };

@@ -146,7 +146,7 @@ function PolyLine (drawingObjects, theme, master, layout, slide, pageIndex)
 
         if(drawingObjects)
         {
-            shape.setDrawingObjects(drawingObjects);
+            shape.setWorksheet(drawingObjects.getWorksheetModel());
             shape.addToDrawingObjects();
         }
         shape.setSpPr(new CSpPr());

@@ -639,7 +639,7 @@ CShape.prototype =
                     break;
                 }
             }
-            this.setLine(ln);
+            this.spPr.setLn(ln);
         }
     },
 
@@ -734,7 +734,7 @@ CShape.prototype =
         ln.Fill.fill.color = (new CUniColor());
         ln.Fill.fill.color.color = (new CPrstColor());
         ln.Fill.fill.color.color.id = ("black");
-        this.setLine(ln);
+        this.spPr.setLn(ln);
         this.setTextBody(new CTextBody(this));
     },
 
@@ -1886,12 +1886,16 @@ CShape.prototype =
     {
         var parent_objects = this.getParentObjects();
         var default_style = new CStyle("defaultStyle", null, null, null);
+        default_style.ParaPr.Spacing.LineRule = linerule_Auto;
+        default_style.ParaPr.Spacing.Line = 1;
+        default_style.ParaPr.Spacing.Before = 0;
+        default_style.ParaPr.Spacing.After = 0;
         if (isRealObject(parent_objects.presentation) && isRealObject(parent_objects.presentation.defaultTextStyle)
             && isRealObject(parent_objects.presentation.defaultTextStyle.levels[level]))
         {
             var default_ppt_style = parent_objects.presentation.defaultTextStyle.levels[level];
-            default_style.ParaPr = default_ppt_style.pPr.Copy();
-            default_style.TextPr = default_ppt_style.rPr.Copy();
+            default_style.ParaPr.Merge(default_ppt_style.pPr.Copy());
+            default_style.TextPr.Merge(default_ppt_style.rPr.Copy());
         }
 
         var master_style;
@@ -3588,10 +3592,10 @@ CShape.prototype =
             if (isRealObject(_new_line)) {
                 new_line2.merge(_new_line);
             }
-            this.setLine(new_line2);
+            this.spPr.setLn(new_line2);
         }
         else
-            this.setLine(_new_line);
+            this.spPr.setLn(_new_line);
     },
 
     setGeometry: function (geometry) {
@@ -3757,15 +3761,7 @@ CShape.prototype =
         return new MoveShapeImageTrackInGroup(this);
     },
 
-    applyAllTextProps: function (textPr) {
-        if (this.txBody) {
-            this.txBody.content.Set_ApplyToAll(true);
-            this.txBody.content.Paragraph_Add(textPr);
-            this.txBody.content.Set_ApplyToAll(false);
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-        }
-    },
+
 
     remove: function (Count, bOnlyText, bRemoveOnlySelection) {
         if (this.txBody) {

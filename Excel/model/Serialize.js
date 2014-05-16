@@ -5068,7 +5068,6 @@
                 this.aMerged = [];
                 this.aHyperlinks = [];
                 var oNewWorksheet = new Woorksheet(this.wb, wb.aWorksheets.length);
-                oNewWorksheet.DrawingDocument = new CDrawingDocument();
                 this.curWorksheet = oNewWorksheet;
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadWorksheet(t,l, oNewWorksheet);

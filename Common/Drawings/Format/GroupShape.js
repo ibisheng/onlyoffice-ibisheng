@@ -802,20 +802,8 @@ CGroupShape.prototype =
         return false;
     },
 
-
-    applyAllTextProps: function(textPr)
-    {
-        for(var i = 0; i < this.spTree.length; ++i)
-        {
-            if(typeof this.spTree[i].applyAllTextProps === "function")
-                this.spTree[i].applyAllTextProps(textPr);
-        }
-    },
-
-
     changeSize: function(kw, kh)
     {
-
         if(this.spPr.xfrm.isNotNullForGroup())
         {
             var xfrm = this.spPr.xfrm;

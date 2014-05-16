@@ -221,7 +221,13 @@ NullState.prototype =
     },
 
     onMouseMove: function(e, x, y, pageIndex)
-    {},
+    {
+        var text_object = getTargetTextObject(this.drawingObjects);
+        if(text_object && e.IsLocked)
+        {
+            text_object.selectionSetEnd(e, x, y, pageIndex);
+        }
+    },
 
     onMouseUp: function(e, x, y, pageIndex)
     {}

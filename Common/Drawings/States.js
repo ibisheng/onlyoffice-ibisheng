@@ -19,7 +19,7 @@ StartAddNewShape.prototype =
     onMouseDown: function(e, x, y)
     {
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
-            return {objectId: null, bMarker: true};
+            return {objectId: "1", bMarker: true};
         this.startX = x;
         this.startY = y;
         this.drawingObjects.arrPreTrackObjects.length = 0;
@@ -820,7 +820,7 @@ SplineBezierState.prototype =
     onMouseDown: function(e, x, y, pageIndex)
     {
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
-            return {objectId: null, bMarker: true};
+            return {objectId: "1", bMarker: true};
         this.drawingObjects.startTrackPos = {x: x, y: y, pageIndex: pageIndex};
         this.drawingObjects.clearTrackObjects();
         this.drawingObjects.addTrackObject(new Spline(this.drawingObjects, this.drawingObjects.getTheme(), null, null, null, pageIndex));
@@ -856,7 +856,7 @@ SplineBezierState33.prototype =
     onMouseDown: function(e, x, y, pageIndex)
     {
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
-            return {objectId: null, bMarker: true};
+            return {objectId: "1", bMarker: true};
     },
 
     onMouseMove: function(e, x, y, pageIndex)
@@ -900,7 +900,7 @@ SplineBezierState2.prototype =
     onMouseDown: function(e, x, y, pageIndex)
     {
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
-            return {objectId: null, bMarker: true};
+            return {objectId: "1", bMarker: true};
         if(e.ClickCount >= 2)
         {
             this.bStart = true;
@@ -965,7 +965,7 @@ SplineBezierState3.prototype =
     onMouseDown: function(e, x, y, pageIndex)
     {
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
-            return {objectId: null, bMarker: true};
+            return {objectId: "1", bMarker: true};
         if(e.ClickCount >= 2)
         {
             this.bStart = true;
@@ -1055,7 +1055,7 @@ SplineBezierState4.prototype =
     onMouseDown: function(e, x, y, pageIndex)
     {
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
-            return {objectId: null, bMarker: true};
+            return {objectId: "1", bMarker: true};
         if(e.ClickCount >= 2)
         {
             this.bStart = true;
@@ -1169,7 +1169,7 @@ SplineBezierState5.prototype =
     onMouseDown: function(e, x, y, pageIndex)
     {
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
-            return {objectId: null, bMarker: true};
+            return {objectId: "1", bMarker: true};
         if(e.ClickCount >= 2)
         {
             this.bStart = true;
@@ -1271,7 +1271,7 @@ PolyLineAddState.prototype =
     onMouseDown: function(e, x, y, pageIndex)
     {
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
-            return {objectId: null, bMarker: true};
+            return {objectId: "1", bMarker: true};
         this.drawingObjects.startTrackPos = {x: x, y: y, pageIndex:pageIndex};
         this.drawingObjects.clearTrackObjects();
         this.drawingObjects.addTrackObject(new PolyLine(this.drawingObjects, this.drawingObjects.getTheme(), null, null, null, pageIndex));
@@ -1305,7 +1305,7 @@ PolyLineAddState2.prototype =
     onMouseDown: function(e, x, y, pageIndex)
     {
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
-            return {objectId: null, bMarker: true};
+            return {objectId: "1", bMarker: true};
     },
 
     onMouseMove: function(e, x, y, pageIndex)
@@ -1365,7 +1365,7 @@ AddPolyLine2State.prototype =
     onMouseDown: function(e, x, y, pageIndex)
     {
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
-            return {objectId: null, bMarker: true};
+            return {objectId: "1", bMarker: true};
         this.drawingObjects.startTrackPos = {x: x, y: y, pageIndex : pageIndex};
         this.drawingObjects.resetSelection();
         this.drawingObjects.updateOverlay();
@@ -1397,7 +1397,7 @@ AddPolyLine2State2.prototype =
     onMouseDown: function(e, x, y, pageIndex)
     {
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
-            return {objectId: null, bMarker: true};
+            return {objectId: "1", bMarker: true};
         if(e.ClickCount > 1)
         {
             this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
@@ -1443,7 +1443,7 @@ AddPolyLine2State3.prototype =
     onMouseDown: function(e, x, y, pageIndex)
     {
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
-            return {objectId: null, bMarker: true};
+            return {objectId: "1", bMarker: true};
         var tr_x, tr_y;
         if(pageIndex === this.drawingObjects.startTrackPos.pageIndex)
         {

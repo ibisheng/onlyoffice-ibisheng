@@ -111,6 +111,20 @@ function CreateBlipFillUniFillFromUrl(url)
     return ret;
 }
 
+
+function getTargetTextObject(controller)
+{
+    if(controller.selection.textSelection)
+    {
+        return  controller.selection.textSelection;
+    }
+    else if(controller.selection.groupSelection && controller.selection.groupSelection.selection.textSelection)
+    {
+        return controller.selection.groupSelection.selection.textSelection;
+    }
+    return null;
+}
+
 function DrawingObjectsController(drawingObjects)
 {
     this.drawingObjects = drawingObjects;
@@ -752,16 +766,8 @@ DrawingObjectsController.prototype =
 
     getTargetDocContent: function()
     {
-        var content;
-        if(this.selection.textSelection)
-        {
-            content = this.selection.textSelection.getDocContent();
-        }
-        else if(this.selection.groupSelection && this.selection.groupSelection.selection.textSelection)
-        {
-            content =  this.selection.groupSelection.selection.textSelection.getDocContent();
-        }
-        return content;
+        var text_object = getTargetTextObject(this);
+        return text_object && text_object.getDocContent();
     },
 
 

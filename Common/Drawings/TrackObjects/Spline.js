@@ -246,7 +246,7 @@ function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
         var shape = new CShape();
         if(drawingObjects)
         {
-            shape.setDrawingObjects(drawingObjects);
+            shape.setWorksheet(drawingObjects.getWorksheetModel());
             shape.addToDrawingObjects();
         }
         shape.setSpPr(new CSpPr());
