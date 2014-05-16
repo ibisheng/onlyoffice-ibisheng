@@ -6573,6 +6573,9 @@ ParaRun.prototype =
 
                 this.Recalc_CompiledPr(true);
 
+                if ( undefined !== this.Paragraph && null !== this.Paragraph )
+                    this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
                 break;
             }
 
@@ -6587,6 +6590,9 @@ ParaRun.prototype =
                     this.Pr.Lang.Bidi = undefined;
 
                 this.Recalc_CompiledPr(true);
+
+                if ( undefined !== this.Paragraph && null !== this.Paragraph )
+                    this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
 
                 break;
             }
@@ -6603,6 +6609,9 @@ ParaRun.prototype =
 
                 this.Recalc_CompiledPr(true);
 
+                if ( undefined !== this.Paragraph && null !== this.Paragraph )
+                    this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
                 break;
             }
 
@@ -6617,6 +6626,9 @@ ParaRun.prototype =
                     this.Pr.Lang.Val = undefined;
 
                 this.Recalc_CompiledPr(true);
+
+                if ( undefined !== this.Paragraph && null !== this.Paragraph )
+                    this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
 
                 break;
             }
