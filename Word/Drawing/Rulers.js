@@ -112,7 +112,7 @@ RulerCheckSimpleChanges.prototype =
         if (!this.IsSimple)
             return;
 
-        if (Math.abs(global_mouseEvent.X - this.X) > 0 && Math.abs(global_mouseEvent.Y - this.Y) > 0)
+        if (Math.abs(global_mouseEvent.X - this.X) > 0 || Math.abs(global_mouseEvent.Y - this.Y) > 0)
             this.IsSimple = false;
     }
 };
