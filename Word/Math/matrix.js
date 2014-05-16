@@ -511,7 +511,6 @@ function CEqArray(props)
     this.objDist = 0;
 
     this.init_2(props);
-    this.setCtrPrp(props.ctrPrp);
 }
 extend(CEqArray, CMathMatrix);
 CEqArray.prototype.init_2 = function(props)
@@ -524,7 +523,8 @@ CEqArray.prototype.init_2 = function(props)
         rSpRule:    0,
         rSp:        0,
         maxDist:    0,
-        objDist:    0
+        objDist:    0,
+        ctrPrp:     new CTextPr()
 
     }; // default
 
@@ -543,6 +543,9 @@ CEqArray.prototype.init_2 = function(props)
 
     if(props.objDist !== "undefined" && props.objDist !== null)
         this.objDist = props.objDist;
+
+    if(props.ctrPrp !== "undefined" && props.ctrPrp !== null)
+        Pr.ctrPrp = props.ctrPrp;
 
 
     CMathMatrix.call(this, Pr);
