@@ -277,6 +277,9 @@ ParaMath.prototype =
     Remove : function(Direction, bOnAddText)
     {
 		var oContent = this.GetSelectContent();
+
+        this.Set_Select_ToMComp(Direction);
+
 		if (oContent.Start == oContent.End)
 		{
 			var oElem = oContent.Content.getElem(oContent.Start);
@@ -319,14 +322,6 @@ ParaMath.prototype =
 		History.Add(oContent.Content, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: oContent.Start});
 		return;
     },
-    SetSelectionForRemove: function(Content, pos)
-    {
-        this.bSelectionUse = true;
-
-
-
-
-    },
 
     GetSelectContent: function()
     {
@@ -343,10 +338,11 @@ ParaMath.prototype =
         return new CParaPos( this.StartRange, this.StartLine, 0, 0 );
     },
 
-
     Apply_TextPr : function(TextPr, IncFontSize, ApplyToAll)
     {
         // TODO: ParaMath.Apply_TextPr
+
+        this.Root.Apply_TextPr();
 
     },
 
@@ -1036,6 +1032,13 @@ ParaMath.prototype =
 
         return TextPrp;
     },
+    Set_Select_ToMComp: function(Direction)
+    {
+        this.bSelectionUse = true;
+        this.Root.Set_Select_ToMComp(Direction);
+
+        console.log("bSelectionUse : " + this.bSelectionUse);
+    },
 //-----------------------------------------------------------------------------------
 // Функции отрисовки
 //-----------------------------------------------------------------------------------
@@ -1085,6 +1088,7 @@ ParaMath.prototype =
             PDSL.X += this.Width;
         }
     },
+
 //-----------------------------------------------------------------------------------
 // Функции для работы с курсором
 //-----------------------------------------------------------------------------------
@@ -1217,14 +1221,14 @@ ParaMath.prototype =
         var Pos = ContentPos.Get(Depth);
         this.State.ContentPos = Pos;
 
-        console.log("Set_ParaContentPos");
+        /*console.log("Set_ParaContentPos");
         var str = "";
         for(var i = 0; i < ContentPos.Data.length; i++)
         {
             str += ContentPos.Data[i] + "  ";
         }
 
-        console.log(str);
+        console.log(str);*/
 
         this.Root.Set_ParaContentPos(ContentPos, Depth);
     },
@@ -1244,15 +1248,6 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Get_LeftPos
         var result = this.Root.Get_LeftPos(SearchPos, ContentPos, Depth, UseContentPos, false);
-
-        console.log("Get_LeftPos");
-        var str = "";
-        for(var i = 0; i < SearchPos.Pos.Data.length; i++)
-        {
-            str += SearchPos.Pos.Data[i] + "  ";
-        }
-
-        console.log(str);
 
         return result;
     },

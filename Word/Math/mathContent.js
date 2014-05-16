@@ -6483,6 +6483,29 @@ CMathContent.prototype =
 
         this.bSelectionUse = false;
     },
+    Set_Select_ToMComp: function(Direction)
+    {
+        this.bSelectionUse = true;
+
+        if(this.content[this.CurPos].typeObj == MATH_PARA_RUN)
+        {
+            if(Direction < 0 && this.CurPos > 0 && this.content[this.CurPos - 1].typeObj == MATH_COMP)
+            {
+                this.SelectStartPos = this.SelectEndPos = this.CurPos - 1;
+                this.content[this.CurPos - 1].SetSelectAll();
+            }
+            else if(this.CurPos < this.content.length - 1 && this.content[this.CurPos + 1].typeObj == MATH_COMP)
+            {
+                this.SelectStartPos = this.SelectEndPos = this.CurPos + 1;
+                this.content[this.CurPos + 1].SetSelectAll();
+            }
+        }
+        else
+        {
+            this.SelectStartPos = this.SelectEndPos = this.CurPos;
+            this.content[this.CurPos].Set_Select_ToMComp(Direction);
+        }
+    },
     getElem: function(nNum)
     {
         return this.content[nNum];

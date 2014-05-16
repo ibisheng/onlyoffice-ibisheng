@@ -1626,6 +1626,22 @@ CMathBase.prototype =
     Get_CompiledPr: function(Copy)
     {
         return this.Get_CompiledTextPr(Copy);
+    },
+    Set_Select_ToMComp: function(Direction)
+    {
+        this.SelectStart_X = this.SelectEnd_X = this.CurPos_X;
+        this.SelectStart_Y = this.SelectEnd_Y = this.CurPos_Y;
+
+        this.elements[this.CurPos_X][this.CurPos_Y].Set_Select_ToMComp(Direction);
+    },
+    SetSelectAll: function()
+    {
+        this.SelectStart_X = 0;
+        this.SelectStart_Y = 0;
+
+        this.SelectEnd_X = this.nRow - 1;
+        this.SelectEnd_Y = this.nCol - 1;
+
     }
 
     //////////////////////////
