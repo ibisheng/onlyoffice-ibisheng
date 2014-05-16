@@ -1331,6 +1331,11 @@ CGraphicObjects.prototype =
 
     getNearestPos: function(x, y, pageIndex, drawing)
     {
+        if(drawing && drawing.GraphicObj)
+        {
+            if(drawing.GraphicObj.getObjectType() !== historyitem_type_ImageShape && drawing.GraphicObj.getObjectType() !== historyitem_type_ChartSpace)
+                return null;
+        }
         this.handleEventMode = HANDLE_EVENT_MODE_CURSOR;
         var cursor_type = this.nullState.onMouseDown(global_mouseEvent, x, y, pageIndex);
         this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
