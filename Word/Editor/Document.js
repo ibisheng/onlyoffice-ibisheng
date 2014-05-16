@@ -5021,7 +5021,6 @@ CDocument.prototype =
                                     }
                                 }
                             }
-
                             break;
                         }
                         case 1: // Numbered
@@ -9765,7 +9764,7 @@ CDocument.prototype =
         }
         else
         {
-            if ( true === e.ShiftKey && ( docpostype_DrawingObjects !== this.CurPos.Type || true === this.DrawingObjects.isSelectedText() ) )
+            if ( true === e.ShiftKey && ( docpostype_DrawingObjects !== this.CurPos.Type || true === this.DrawingObjects.checkTextObject(X, Y, PageIndex) ) )
             {
                 if ( true === this.Is_SelectionUse() )
                 {
