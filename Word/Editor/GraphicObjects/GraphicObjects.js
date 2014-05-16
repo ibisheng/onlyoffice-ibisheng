@@ -1353,6 +1353,22 @@ CGraphicObjects.prototype =
         return false;
     },
 
+    checkTextObject: function(x, y, pageIndex)
+    {
+        var text_object = getTargetTextObject(this);
+        if(text_object && text_object.hitInTextRect)
+        {
+            if(text_object.selectStartPage === pageIndex)
+            {
+                if(text_object.hitInTextRect(x, y))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    },
+
     getParagraphParaPrCopy: function()
     {
         return this.getParagraphParaPr();
