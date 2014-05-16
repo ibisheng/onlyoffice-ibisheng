@@ -3070,8 +3070,6 @@ PasteProcessor.prototype =
 					
                 if(aContent)
                 {
-                    checkThemeFonts(aContent.fonts, this.oDocument.theme.themeElements.fontScheme)
-					
 					var fPrepasteCallback = function(){
                         if(false == oThis.bNested)
                         {

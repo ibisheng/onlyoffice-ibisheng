@@ -5573,7 +5573,8 @@ function BinaryFileReader(doc, openParams)
             aContent[Index].Document_Get_AllFontNames(AllFonts);
         var aPrepeareFonts = [];
 		
-		checkThemeFonts(AllFonts, this.Document.theme.themeElements.fontScheme)
+		var oDocument = this.Document && this.Document.LogicDocument ? this.Document.LogicDocument : this.Document;
+		checkThemeFonts(AllFonts, oDocument.theme.themeElements.fontScheme)
 		
         for (var i in AllFonts)
             aPrepeareFonts.push(new CFont(i, 0, "", 0));
