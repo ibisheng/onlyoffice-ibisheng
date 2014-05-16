@@ -2829,7 +2829,7 @@ Woorksheet.prototype.getRange=function(cellAdd1, cellAdd2){
 Woorksheet.prototype.getRange2=function(sRange){
 	var bbox = Asc.g_oRangeCache.getAscRange(sRange);
 	if(null != bbox)
-	return this.getRange3(bbox.r1, bbox.c1, bbox.r2, bbox.c2);
+		return Range.prototype.createFromBBox(this, bbox);
 	return null;
 };
 Woorksheet.prototype.getRange3=function(r1, c1, r2, c2){
@@ -4309,6 +4309,11 @@ function Range(worksheet, r1, c1, r2, c2){
 	//first last устарели, не убраны только для совместимости
 	this.first = new CellAddress(this.bbox.r1, this.bbox.c1, 0);
 	this.last = new CellAddress(this.bbox.r2, this.bbox.c2, 0);
+}
+Range.prototype.createFromBBox=function(worksheet, bbox){
+	var oRes = new Range(worksheet, bbox.r1, bbox.c1, bbox.r2, bbox.c2);
+	oRes.bbox = bbox.clone();
+	return oRes;
 }
 Range.prototype.clone=function(oNewWs){
 	if(!oNewWs)
