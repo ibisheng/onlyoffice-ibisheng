@@ -645,301 +645,135 @@ Paragraph.prototype =
 
     // Удаляем элемент из содержимого параграфа. (Здесь передвигаются все позиции
     // CurPos.ContentPos, Selection.StartPos, Selection.EndPos)
-    Internal_Content_Remove : function (Pos, bCorrectPos)
+    Internal_Content_Remove : function (Pos)
     {
-        if ( true !== Debug_ParaRunMode )
+        var Item = this.Content[Pos];
+        History.Add( this, { Type : historyitem_Paragraph_RemoveItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
+        this.Content.splice( Pos, 1 );
+
+        if ( this.Selection.StartPos > Pos )
+            this.Selection.StartPos--;
+
+        if ( this.Selection.EndPos > Pos )
+            this.Selection.EndPos--;
+
+        if ( this.CurPos.ContentPos > Pos )
+            this.CurPos.ContentPos--;
+
+        // Обновляем позиции в NearestPos
+        var NearPosLen = this.NearPosArray.length;
+        for ( var Index = 0; Index < NearPosLen; Index++ )
         {
-            var Item = this.Content[Pos];
-            if ( true === Item.Is_RealContent() )
-            {
-                var ClearPos = this.Internal_Get_ClearPos( Pos );
-                History.Add( this, { Type : historyitem_Paragraph_RemoveItem, Pos : ClearPos, EndPos : ClearPos, Items : [ Item ] } );
-            }
+            var ParaNearPos = this.NearPosArray[Index];
+            var ParaContentPos = ParaNearPos.NearPos.ContentPos;
 
-            if ( this.Selection.StartPos <= this.Selection.EndPos )
-            {
-                if ( this.Selection.StartPos > Pos )
-                    this.Selection.StartPos--;
-
-                if ( this.Selection.EndPos > Pos )
-                    this.Selection.EndPos--;
-            }
-            else
-            {
-                if ( this.Selection.StartPos > Pos )
-                    this.Selection.StartPos--;
-
-                if ( this.Selection.EndPos > Pos )
-                    this.Selection.EndPos--;
-            }
-
-            if ( this.Numbering.Pos > Pos )
-                this.Numbering.Pos--;
-
-            // Также передвинем всем метки переносов страниц и строк
-            var LinesCount = this.Lines.length;
-            for ( var CurLine = 0; CurLine < LinesCount; CurLine++ )
-            {
-                if ( this.Lines[CurLine].StartPos > Pos )
-                    this.Lines[CurLine].StartPos--;
-
-                if ( this.Lines[CurLine].EndPos >= Pos )
-                    this.Lines[CurLine].EndPos--;
-
-                var RangesCount = this.Lines[CurLine].Ranges.length;
-                for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
-                {
-                    if ( this.Lines[CurLine].Ranges[CurRange].StartPos > Pos )
-                        this.Lines[CurLine].Ranges[CurRange].StartPos--;
-                }
-            }
-
-            // TODO: Как только мы избавимся от ParaNumbering в контенте параграфа, можно будет здесь такую обработку убрать
-            //       и делать ее конкретно на Replace
-            // Передвинем все метки поиска
-            for ( var CurSearch in this.SearchResults )
-            {
-                if ( this.SearchResults[CurSearch].StartPos > Pos )
-                    this.SearchResults[CurSearch].StartPos--;
-
-                if ( this.SearchResults[CurSearch].EndPos > Pos )
-                    this.SearchResults[CurSearch].EndPos--;
-            }
-
-            for ( var Id in this.NearPosArray )
-            {
-                var NearPos = this.NearPosArray[Id];
-                if ( NearPos.ContentPos > Pos )
-                    NearPos.ContentPos--;
-            }
-
-            this.Content.splice( Pos, 1 );
-
-            if ( this.CurPos.ContentPos > Pos )
-                this.Set_ContentPos( this.CurPos.ContentPos - 1, bCorrectPos );
-
-            // Комментарий удаляем после, чтобы не нарушить позиции
-            if ( true === this.DeleteCommentOnRemove && ( para_CommentStart === Item.Type || para_CommentEnd === Item.Type ) )
-            {
-                // Удаляем комментарий, если у него было удалено начало или конец
-
-                if ( para_CommentStart === Item.Type )
-                    editor.WordControl.m_oLogicDocument.Comments.Set_StartInfo( Item.Id, 0, 0, 0, 0, null );
-                else
-                    editor.WordControl.m_oLogicDocument.Comments.Set_EndInfo( Item.Id, 0, 0, 0, 0, null );
-
-                editor.WordControl.m_oLogicDocument.Remove_Comment( Item.Id, true );
-            }
-
-            // Передвинем все метки слов для проверки орфографии
-            this.SpellChecker.Update_OnRemove( this, Pos, 1 );
+            if ( ParaContentPos.Data[0] > Pos )
+                ParaContentPos.Data[0]--;
         }
-        else
+
+        // Обновляем позиции в SearchResults
+        for ( var Id in this.SearchResults )
         {
-            var Item = this.Content[Pos];
-            History.Add( this, { Type : historyitem_Paragraph_RemoveItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
-            this.Content.splice( Pos, 1 );
+            var ContentPos = this.SearchResults[Id].StartPos;
 
-            if ( this.Selection.StartPos > Pos )
-                this.Selection.StartPos--;
+            if ( ContentPos.Data[0] > Pos )
+                ContentPos.Data[0]--;
 
-            if ( this.Selection.EndPos > Pos )
-                this.Selection.EndPos--;
+            ContentPos = this.SearchResults[Id].EndPos;
 
-            if ( this.CurPos.ContentPos > Pos )
-                this.CurPos.ContentPos--;
-
-            // Обновляем позиции в NearestPos
-            var NearPosLen = this.NearPosArray.length;
-            for ( var Index = 0; Index < NearPosLen; Index++ )
-            {
-                var ParaNearPos = this.NearPosArray[Index];
-                var ParaContentPos = ParaNearPos.NearPos.ContentPos;
-
-                if ( ParaContentPos.Data[0] > Pos )
-                    ParaContentPos.Data[0]--;
-            }
-
-            // Обновляем позиции в SearchResults
-            for ( var Id in this.SearchResults )
-            {
-                var ContentPos = this.SearchResults[Id].StartPos;
-
-                if ( ContentPos.Data[0] > Pos )
-                    ContentPos.Data[0]--;
-
-                ContentPos = this.SearchResults[Id].EndPos;
-
-                if ( ContentPos.Data[0] > Pos )
-                    ContentPos.Data[0]--;
-            }
-
-            // Удаляем комментарий, если это необходимо
-            if ( true === this.DeleteCommentOnRemove && para_Comment === Item.Type )
-                this.LogicDocument.Remove_Comment( Item.CommentId, true );
-
-            var SpellingsCount  = this.SpellChecker.Elements.length;
-            for ( var Pos = 0; Pos < SpellingsCount; Pos++ )
-            {
-                var Element = this.SpellChecker.Elements[Pos];
-                var ContentPos = Element.StartPos;
-
-                if ( ContentPos.Data[0] > Pos )
-                    ContentPos.Data[0]--;
-
-                ContentPos = Element.EndPos;
-
-                if ( ContentPos.Data[0] > Pos )
-                    ContentPos.Data[0]--;
-            }
-
-            // Передвинем все метки слов для проверки орфографии
-            this.SpellChecker.Update_OnRemove( this, Pos, 1 );
+            if ( ContentPos.Data[0] > Pos )
+                ContentPos.Data[0]--;
         }
+
+        // Удаляем комментарий, если это необходимо
+        if ( true === this.DeleteCommentOnRemove && para_Comment === Item.Type )
+            this.LogicDocument.Remove_Comment( Item.CommentId, true );
+
+        var SpellingsCount  = this.SpellChecker.Elements.length;
+        for ( var Pos = 0; Pos < SpellingsCount; Pos++ )
+        {
+            var Element = this.SpellChecker.Elements[Pos];
+            var ContentPos = Element.StartPos;
+
+            if ( ContentPos.Data[0] > Pos )
+                ContentPos.Data[0]--;
+
+            ContentPos = Element.EndPos;
+
+            if ( ContentPos.Data[0] > Pos )
+                ContentPos.Data[0]--;
+        }
+
+        // Передвинем все метки слов для проверки орфографии
+        this.SpellChecker.Update_OnRemove( this, Pos, 1 );
     },
 
     // Удаляем несколько элементов
     Internal_Content_Remove2 : function(Pos, Count)
     {
-        if ( true !== Debug_ParaRunMode )
+        var CommentsToDelete = new Array();
+        if ( true === this.DeleteCommentOnRemove && null !== this.LogicDocument )
         {
-            var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
-            var CommentsToDelete = new Object();
+            var DocumentComments = this.LogicDocument.Comments;
             for ( var Index = Pos; Index < Pos + Count; Index++ )
             {
-                var ItemType = this.Content[Index].Type;
-                if ( true === this.DeleteCommentOnRemove && (para_CommentStart === ItemType || para_CommentEnd === ItemType) )
+                var Item = this.Content[Index];
+                if ( para_Comment === Item.Type )
                 {
-                    if ( para_CommentStart === ItemType )
-                        DocumentComments.Set_StartInfo( this.Content[Index].Id, 0, 0, 0, 0, null );
+                    var CommentId = Item.CommentId;
+
+                    if ( true === Item.Start )
+                        DocumentComments.Set_StartInfo( CommentId, 0, 0, 0, 0, null );
                     else
-                        DocumentComments.Set_EndInfo( this.Content[Index].Id, 0, 0, 0, 0, null );
+                        DocumentComments.Set_EndInfo( CommentId, 0, 0, 0, 0, null );
 
-                    CommentsToDelete[this.Content[Index].Id] = 1;
+                    CommentsToDelete.push(CommentId);
                 }
             }
-
-            var LastArray = this.Content.slice( Pos, Pos + Count );
-
-            // Добавляем только постоянные элементы параграфа
-            var LastItems = new Array();
-            var ItemsCount = LastArray.length;
-            for ( var Index = 0; Index < ItemsCount; Index++ )
-            {
-                if ( true === LastArray[Index].Is_RealContent() )
-                    LastItems.push( LastArray[Index] );
-            }
-
-            History.Add( this, { Type : historyitem_Paragraph_RemoveItem, Pos : this.Internal_Get_ClearPos( Pos ), EndPos : this.Internal_Get_ClearPos(Pos + Count - 1), Items : LastItems } );
-
-            if ( this.CurPos.ContentPos > Pos )
-            {
-                if ( this.CurPos.ContentPos > Pos + Count )
-                    this.Set_ContentPos( this.CurPos.ContentPos - Count, true, -1 );
-                else
-                    this.Set_ContentPos( Pos, true, -1 );
-            }
-
-            if ( this.Selection.StartPos <= this.Selection.EndPos )
-            {
-                if ( this.Selection.StartPos > Pos )
-                {
-                    if ( this.Selection.StartPos > Pos + Count )
-                        this.Selection.StartPos -= Count;
-                    else
-                        this.Selection.StartPos = Pos;
-                }
-
-                if ( this.Selection.EndPos > Pos )
-                {
-                    if ( this.Selection.EndPos >= Pos + Count )
-                        this.Selection.EndPos -= Count;
-                    else
-                        this.Selection.EndPos = Math.max( 0, Pos - 1 );
-                }
-            }
-            else
-            {
-                if ( this.Selection.StartPos > Pos )
-                {
-                    if ( this.Selection.StartPos >= Pos + Count )
-                        this.Selection.StartPos -= Count;
-                    else
-                        this.Selection.StartPos = Math.max( 0, Pos - 1 );
-                }
-
-                if ( this.Selection.EndPos > Pos )
-                {
-                    if ( this.Selection.EndPos > Pos + Count )
-                        this.Selection.EndPos -= Count;
-                    else
-                        this.Selection.EndPos = Pos;
-                }
-            }
-
-            // Также передвинем всем метки переносов страниц и строк
-            var LinesCount = this.Lines.length;
-            for ( var CurLine = 0; CurLine < LinesCount; CurLine++ )
-            {
-                if ( this.Lines[CurLine].StartPos > Pos )
-                {
-                    if ( this.Lines[CurLine].StartPos > Pos + Count )
-                        this.Lines[CurLine].StartPos -= Count;
-                    else
-                        this.Lines[CurLine].StartPos = Math.max( 0 , Pos );
-                }
-
-                if ( this.Lines[CurLine].EndPos >= Pos )
-                {
-                    if ( this.Lines[CurLine].EndPos >= Pos + Count )
-                        this.Lines[CurLine].EndPos -= Count;
-                    else
-                        this.Lines[CurLine].EndPos = Math.max( 0 , Pos );
-                }
-
-                var RangesCount = this.Lines[CurLine].Ranges.length;
-                for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
-                {
-                    if ( this.Lines[CurLine].Ranges[CurRange].StartPos > Pos )
-                    {
-                        if ( this.Lines[CurLine].Ranges[CurRange].StartPos > Pos + Count )
-                            this.Lines[CurLine].Ranges[CurRange].StartPos -= Count;
-                        else
-                            this.Lines[CurLine].Ranges[CurRange].StartPos = Math.max( 0 , Pos );
-                    }
-                }
-            }
-
-            for ( var Id in this.NearPosArray )
-            {
-                var NearPos = this.NearPosArray[Id];
-
-                if ( NearPos.ContentPos > Pos + Count )
-                    NearPos.ContentPos -= Count;
-                else if ( NearPos.ContentPos > Pos )
-                    NearPos.ContentPos = Math.max( 0 , Pos );
-            }
-
-            this.Content.splice( Pos, Count );
-
-            // Комментарии удаляем после, чтобы не нарушить позиции
-            for ( var Id in CommentsToDelete )
-            {
-                editor.WordControl.m_oLogicDocument.Remove_Comment( Id, true );
-            }
-
-            // Передвинем все метки слов для проверки орфографии
-            this.SpellChecker.Update_OnRemove( this, Pos, Count );
         }
-        else
+
+        var DeletedItems = this.Content.slice( Pos, Pos + Count );
+        History.Add( this, { Type : historyitem_Paragraph_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
+
+        if ( this.Selection.StartPos > Pos + Count )
+            this.Selection.StartPos -= Count;
+        else if ( this.Selection.StartPos > Pos )
+            this.Selection.StartPos = Pos;
+
+        if ( this.Selection.EndPos > Pos + Count )
+            this.Selection.EndPos -= Count;
+        if ( this.Selection.EndPos > Pos )
+            this.Selection.EndPos = Pos;
+
+        if ( this.CurPos.ContentPos > Pos + Count )
+            this.CurPos.ContentPos -= Count;
+        else if ( this.CurPos.ContentPos > Pos )
+            this.CurPos.ContentPos = Pos;
+
+        // Обновляем позиции в NearestPos
+        var NearPosLen = this.NearPosArray.length;
+        for ( var Index = 0; Index < NearPosLen; Index++ )
         {
-            // TODO: Реализовать по нормальному данную функцию
+            var ParaNearPos = this.NearPosArray[Index];
+            var ParaContentPos = ParaNearPos.NearPos.ContentPos;
 
-            for ( var Temp = 0; Temp < Count; Temp++ )
-            {
-                this.Internal_Content_Remove( Pos, true );
-            }
+            if ( ParaContentPos.Data[0] > Pos + Count )
+                ParaContentPos.Data[0] -= Count;
+            else if ( ParaContentPos.Data[0] > Pos )
+                ParaContentPos.Data[0] = Math.max( 0, Pos );
         }
+
+        this.Content.splice( Pos, Count );
+
+        // Комментарии удаляем после, чтобы не нарушить позиции
+        var CountCommentsToDelete = CommentsToDelete.length;
+        for ( var Index = 0; Index < CountCommentsToDelete; Index++ )
+        {
+            this.LogicDocument.Remove_Comment( CommentsToDelete[Index], true );
+        }
+
+        // Передвинем все метки слов для проверки орфографии
+        this.SpellChecker.Update_OnRemove( this, Pos, Count );
     },
 
     Internal_Check_EmptyHyperlink : function(Pos)
@@ -7229,11 +7063,8 @@ Paragraph.prototype =
                         this.Content[EndPos].Cursor_MoveToStartPos();
                         this.Correct_ContentPos2();
                     }
-
-                    for ( var CurPos = EndPos - 1; CurPos > StartPos; CurPos-- )
-                    {
-                        this.Internal_Content_Remove( CurPos );
-                    }
+                    
+                    this.Internal_Content_Remove2( StartPos + 1, EndPos - StartPos - 1 );
 
                     this.Content[StartPos].Remove(nCount, bOnAddText);
 
@@ -16475,12 +16306,10 @@ Paragraph.prototype =
         // Кроме этого, если тут начинались или заканчивались комметарии, то их тоже
         // удаляем.
 
-        this.Internal_Remove_CollaborativeMarks(false);
-
         for ( var Index = 0; Index < this.Content.length; Index++ )
         {
             var Item = this.Content[Index];
-            if ( para_CommentEnd === Item.Type || para_CommentStart === Item.Type || para_Comment === Item.Type )
+            if ( para_Comment === Item.Type )
             {
                 editor.WordControl.m_oLogicDocument.Remove_Comment( Item.CommentId, true );
             }

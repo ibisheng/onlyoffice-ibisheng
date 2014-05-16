@@ -9765,7 +9765,7 @@ CDocument.prototype =
         }
         else
         {
-            if ( true === e.ShiftKey )
+            if ( true === e.ShiftKey && ( docpostype_DrawingObjects !== this.CurPos.Type || true === this.DrawingObjects.isSelectedText() ) )
             {
                 if ( true === this.Is_SelectionUse() )
                 {

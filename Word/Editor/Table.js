@@ -4984,6 +4984,13 @@ CTable.prototype =
     PreDelete : function()
     {
         this.DrawingDocument.EndTrackTable( this, false );
+        
+        var RowsCount = this.Content.length;
+        for ( var CurRow = 0; CurRow < RowsCount; CurRow++ )
+        {
+            var Row = this.Content[CurRow];
+            Row.PreDelete();
+        }        
     },
 
     Remove_InnerTable : function()
@@ -17710,6 +17717,8 @@ CTable.prototype =
     {
         if ( Index >= this.Content.length || Index < 0 )
             return;
+        
+        this.Content[Index].PreDelete();
 
         History.Add( this, { Type : historyitem_Table_RemoveRow, Pos : Index, Item : { Row : this.Content[Index], TableRowsBottom : this.TableRowsBottom[Index], RowsInfo : this.RowsInfo[Index] } } );
 
@@ -18900,6 +18909,22 @@ CTableRow.prototype =
         for ( var Index = 0; Index < Count; Index++ )
         {
             this.Content[Index].Prepare_RecalculateObject();
+        }
+    },
+    
+    PreDelete : function()
+    {
+        var CellsCount = this.Get_CellsCount();
+        for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
+        {
+            var Cell = this.Get_Cell( CurCell );
+
+            var CellContent = Cell.Content.Content;
+            var ContentCount = CellContent.length;
+            for ( var Pos = 0; Pos < ContentCount; Pos++ )
+            {
+                CellContent[Pos].PreDelete();
+            }
         }
     },
 //-----------------------------------------------------------------------------------
