@@ -3157,7 +3157,7 @@ CDocument.prototype =
                             }
                             else
                             {
-                                this.Internal_Content_Remove( StartPos, EndPos - StartPos + 1 );
+                                this.Internal_Content_Remove( StartPos, EndPos - StartPos + 1 );                                    
                             }
 
                             // Выставляем текущую позицию
@@ -3234,6 +3234,12 @@ CDocument.prototype =
                                 this.Internal_Content_Remove( StartPos + 1, 1 );
 
                                 this.Interface_Update_ParaPr();
+                            }
+                            else if ( this.Content.length === 1 && true === this.Content[0].IsEmpty() && Count > 0 )
+                            {
+                                var NewPara = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 );
+                                this.Internal_Content_Add( 0, NewPara );
+                                this.Internal_Content_Remove( 1, this.Content.length - 1 );
                             }
                         }
                     }

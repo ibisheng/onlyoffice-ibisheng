@@ -1121,8 +1121,13 @@ CDocumentContent.prototype =
         var bClip = false;
         if ( null != this.ClipInfo.X0 && null != this.ClipInfo.X1 )
         {
+            // TODO: При клипе, как правило, обрезается сверху и снизу по 1px, поэтому введем небольшую коррекцию
+            var Correction = 0;
+            if ( null !== this.DrawingDocument )
+                Correction = this.DrawingDocument.GetMMPerDot(1);
+            
             pGraphics.SaveGrState();
-            pGraphics.AddClipRect( this.ClipInfo.X0, Bounds.Top, Math.abs(this.ClipInfo.X1 - this.ClipInfo.X0), Bounds.Bottom - Bounds.Top);
+            pGraphics.AddClipRect( this.ClipInfo.X0, Bounds.Top - Correction, Math.abs(this.ClipInfo.X1 - this.ClipInfo.X0), Bounds.Bottom - Bounds.Top + Correction);
             bClip = true;
         }
 
@@ -2637,6 +2642,12 @@ CDocumentContent.prototype =
                                 // Соединяем текущий и предыдущий параграфы
                                 this.Content[StartPos].Concat( this.Content[StartPos + 1] );
                                 this.Internal_Content_Remove( StartPos + 1, 1 );
+                            }
+                            else if ( this.Content.length === 1 && true === this.Content[0].IsEmpty() && Count > 0 )
+                            {
+                                var NewPara = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 );
+                                this.Internal_Content_Add( 0, NewPara );
+                                this.Internal_Content_Remove( 1, this.Content.length - 1 );
                             }
                         }
                     }
