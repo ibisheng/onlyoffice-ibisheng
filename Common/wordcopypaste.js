@@ -2777,6 +2777,8 @@ PasteProcessor.prototype =
 						oInsertPar.Content.push(RRun);
 						bSplit = true;
 					}
+					else if(0 == oCurRunToSplit.State.ContentPos)
+						nCurContentContentPos--;
 					for(var i = 0, length = oInsertPar.Content.length; i < length; ++i){
 						var run = oInsertPar.Content[i];
 						if(run.Content.length > 0){
