@@ -134,6 +134,15 @@ Math.fact = function ( n ) {
     return res;
 };
 
+Math.factor = function ( n ) {
+    var res = 1;
+    n = this.floor( n );
+    while ( n !== 0 ) {
+        res = res * n--;
+    }
+    return res;
+};
+
 Math.ln = Math.log;
 
 Math.log10 = function ( x ) {
@@ -436,8 +445,8 @@ function cArea( val, ws ) {/*Area means "A1:E5" for example*/
     this._cells = val;
     this.isAbsolute = false;
     this.type = cElementType.cellsRange;
-    // this.range = this.wb.getWorksheetById(this.ws).getRange2(val);
-    // this._valid = this.range ? true : false;
+    this.range = null;
+//    this._valid = this.range ? true : false;
 }
 
 cArea.prototype = Object.create( cBaseType.prototype );
@@ -529,7 +538,10 @@ cArea.prototype.getValue2 = function ( cell ) {
     }
 };
 cArea.prototype.getRange = function () {
-    return this.ws.getRange2( this._cells );
+    if( !this.range ){
+        this.range = this.ws.getRange2( this._cells )
+    }
+    return this.range;
 };
 cArea.prototype.tocNumber = function () {
     return this.getValue()[0].tocNumber();
@@ -541,8 +553,7 @@ cArea.prototype.tocBool = function () {
     return this.getValue()[0].tocBool();
 };
 cArea.prototype.toString = function () {
-//    return this.getRange().getName();
-    return this._cells;
+    return this.getRange().getName();
 };
 cArea.prototype.setRange = function ( cell ) {
     this._cells = this.value = cell;
@@ -836,14 +847,15 @@ cArea3D.prototype.changeSheet = function ( lastName, newName ) {
 cArea3D.prototype.toString = function () {
     var wsFrom = this._wb.getWorksheetById( this.wsFrom ).getName(),
         wsTo = this._wb.getWorksheetById( this.wsTo ).getName(),
-//        name = Asc.g_oRangeCache.getActiveRange(this._cells ).getName();
-        name = this._cells;
-    if ( !rx_test_ws_name.test( wsFrom ) || !rx_test_ws_name.test( wsTo ) ) {
+        name = Asc.g_oRangeCache.getActiveRange(this._cells).getName();
+    if ( rx_test_ws_name.test( wsFrom ) && rx_test_ws_name.test( wsTo ) ) {
+        return (wsFrom !== wsTo ? wsFrom + ":" + wsTo : wsFrom) + "!" + name;
+    }
+    else{
         wsFrom = wsFrom.replace( /'/g, "''" );
         wsTo = wsTo.replace( /'/g, "''" );
         return "'" + (wsFrom !== wsTo ? wsFrom + ":" + wsTo : wsFrom) + "'!" + name;
     }
-    return (wsFrom !== wsTo ? wsFrom + ":" + wsTo : wsFrom) + "!" + name;
 };
 cArea3D.prototype.tocNumber = function () {
     return this.getValue()[0].tocNumber();
@@ -1190,11 +1202,11 @@ cRef3D.prototype.changeSheet = function ( lastName, newName ) {
 };
 cRef3D.prototype.toString = function () {
     var wsName = this.ws.getName();
-    if ( !rx_test_ws_name.test( wsName ) ) {
-        return "'" + wsName.replace( /'/g, "''" ) + "'" + "!" + this._cells;
+    if ( rx_test_ws_name.test( wsName ) ) {
+        return wsName + "!" + this._cells;
     }
     else {
-        return wsName + "!" + this._cells;
+        return "'" + wsName.replace( /'/g, "''" ) + "'" + "!" + this._cells;
     }
 };
 cRef3D.prototype.getWS = function () {

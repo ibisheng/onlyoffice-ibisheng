@@ -7437,8 +7437,8 @@
 				}
 			} else {
 				this.startCellMoveResizeRange.normalize();
-				var colDelta = colByX - this.startCellMoveResizeRange2.c1;
-				var rowDelta = rowByY - this.startCellMoveResizeRange2.r1;
+				var colDelta = this.startCellMoveResizeRange.type != c_oAscSelectionType.RangeRow && this.startCellMoveResizeRange.type != c_oAscSelectionType.RangeMax ? colByX - this.startCellMoveResizeRange2.c1 : 0;
+				var rowDelta = this.startCellMoveResizeRange.type != c_oAscSelectionType.RangeCol && this.startCellMoveResizeRange.type != c_oAscSelectionType.RangeMax ? rowByY - this.startCellMoveResizeRange2.r1 : 0;
 
 				ar.c1 = this.startCellMoveResizeRange.c1 + colDelta;
 				if (0 > ar.c1) {
