@@ -495,7 +495,6 @@
 				"slowOperation"				: function (isStart) {self.handlers.trigger((isStart ? "asc_onStartAction" : "asc_onEndAction"), c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.SlowOperation);},
 				"setAutoFiltersDialog"  	: function (arrVal) {self.handlers.trigger("asc_onSetAFDialog", arrVal);},
 				"selectionRangeChanged"		: function (val) {self.handlers.trigger("asc_onSelectionRangeChanged", val);},
-				"getDCForCharts"			: function () { return self.drawingCtxCharts; },
 				"onRenameCellTextEnd"		: function (countFind, countReplace) {self.handlers.trigger("asc_onRenameCellTextEnd", countFind, countReplace);},
 				"onStopFormatPainter"		: function () {self.handlers.trigger("asc_onStopFormatPainter");},
 				"onDocumentPlaceChanged"	: function () {self._onDocumentPlaceChanged();},

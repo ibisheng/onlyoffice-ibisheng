@@ -1055,12 +1055,6 @@
 			}
 		};
 
-		// ToDo переделать на полную отрисовку на нашем контексте
-		WorksheetView.prototype.getDrawingContextCharts = function () {
-			return this.handlers.trigger("getDCForCharts");
-		};
-
-
 		// ----- Initialization -----
 
 		WorksheetView.prototype._init = function () {
