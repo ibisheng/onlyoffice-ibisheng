@@ -6,11 +6,7 @@ function CLimit(props)
     CMathBase.call(this);
 
     this.init(props);
-    this.setCtrPrp(props.ctrPrp);
-}
-extend(CLimit, CMathBase);
-CLimit.prototype.init = function(props)
-{
+
     if(props.type === LIMIT_UP || props.type === LIMIT_LOW)
         this.type = props.type;
 
@@ -26,9 +22,13 @@ CLimit.prototype.init = function(props)
     else if(this.type == LIMIT_UP)
         this.addMCToContent(oIter, oBase);
 
+    this.setCtrPrp(props.ctrPrp);
+
     /// вызов этой функции обязательно в конце
     this.WriteContentsToHistory();
+
 }
+extend(CLimit, CMathBase);
 CLimit.prototype.getAscent = function()
 {
     var ascent;
@@ -78,18 +78,15 @@ function CMathFunc(props)
     this.kind = MATH_FUNCTION;
     CMathBase.call(this);
 
-    this.init(props);
-    this.setCtrPrp(props.ctrPrp);
-}
-extend(CMathFunc, CMathBase);
-CMathFunc.prototype.init = function()
-{
     this.setDimension(1, 2);
     this.setContent();
+
+    this.setCtrPrp(props.ctrPrp);
 
     /// вызов этой функции обязательно в конце
     this.WriteContentsToHistory();
 }
+extend(CMathFunc, CMathBase);
 CMathFunc.prototype.setDistance = function()
 {
     this.dW = this.getCtrPrp().FontSize/6*g_dKoef_pt_to_mm;
