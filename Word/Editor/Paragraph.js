@@ -721,11 +721,15 @@ Paragraph.prototype =
                 if ( para_Comment === Item.Type )
                 {
                     var CommentId = Item.CommentId;
-
-                    if ( true === Item.Start )
-                        DocumentComments.Set_StartInfo( CommentId, 0, 0, 0, 0, 0, null );
-                    else
-                        DocumentComments.Set_EndInfo( CommentId, 0, 0, 0, 0, null );
+                    var Comment = DocumentComments.Get_ById( CommentId );
+                    
+                    if ( null != Comment )
+                    {
+                        if ( true === Item.Start )
+                            Comment.Set_StartId( null );
+                        else
+                            Comment.Set_EndId( null );
+                    }
 
                     CommentsToDelete.push(CommentId);
                 }
@@ -5973,7 +5977,7 @@ Paragraph.prototype =
         var _Page = this.Pages[CurPage];
 
         var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
-        var CommentsFlag     = DocumentComments.Check_CurrentDraw();
+        var Page_abs = CurPage + this.Get_StartPage_Absolute();
 
         var DrawComm = ( DocumentComments.Is_Use() && true != editor.isViewMode);
         var DrawFind = editor.WordControl.m_oLogicDocument.SearchEngine.Selection;
@@ -6204,6 +6208,9 @@ Paragraph.prototype =
 
                     pGraphics.rect( Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0 );
                     pGraphics.df();
+
+                    DocumentComments.Add_DrawingRect(Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0, Page_abs, Element.Additional.CommentId);
+
                     Element = aComm.Get_Next();
                 }
 
@@ -18684,90 +18691,37 @@ Paragraph.prototype =
         {
             case  historyitem_Paragraph_AddItem:
             {
-                if ( true !== Debug_ParaRunMode )
+                // Long     : Количество элементов
+                // Array of :
+                //  {
+                //    Long     : Позиция
+                //    Variable : Id Элемента
+                //  }
+
+                var Count = Reader.GetLong();
+
+                for ( var Index = 0; Index < Count; Index++ )
                 {
-                    // Long     : Количество элементов
-                    // Array of :
-                    //  {
-                    //    Long     : Позиция
-                    //    Variable : Элемент
-                    //  }
+                    var Pos     = this.m_oContentChanges.Check( contentchanges_Add, Reader.GetLong() );
+                    var Element = g_oTableId.Get_ById( Reader.GetString2() );
 
-                    var Count = Reader.GetLong();
-
-                    for ( var Index = 0; Index < Count; Index++ )
+                    if ( null != Element )
                     {
-                        var Pos     = this.Internal_Get_RealPos( this.m_oContentChanges.Check( contentchanges_Add, Reader.GetLong() ) );
-                        var Element = ParagraphContent_Read_FromBinary(Reader);
-
-                        if ( null != Element )
+                        if ( para_Comment === Element.Type )
                         {
-                            if ( Element instanceof ParaCommentStart )
-                            {
-                                var Comment = g_oTableId.Get_ById( Element.Id );
-                                if ( null != Comment )
-                                    Comment.Set_StartInfo( 0, 0, 0, 0, 0, this.Get_Id() );
-                            }
-                            else if ( Element instanceof ParaCommentEnd )
-                            {
-                                var Comment = g_oTableId.Get_ById( Element.Id );
-                                if ( null != Comment )
-                                    Comment.Set_EndInfo( 0, 0, 0, 0, this.Get_Id() );
-                            }
+                            var Comment = g_oTableId.Get_ById( Element.CommentId );
 
-                            // TODO: Подумать над тем как по минимуму вставлять отметки совместного редактирования
-                            this.Content.splice( Pos, 0, new ParaCollaborativeChangesEnd() );
-                            this.Content.splice( Pos, 0, Element );
-                            this.Content.splice( Pos, 0, new ParaCollaborativeChangesStart() );
-
-                            CollaborativeEditing.Add_ChangedClass(this);
+                            if ( null != Comment )
+                            {
+                                if ( true === Element.Start )
+                                    Comment.Set_StartId( this.Get_Id() );
+                                else
+                                    Comment.Set_EndId( this.Get_Id() );
+                            }
                         }
+
+                        this.Content.splice( Pos, 0, Element );
                     }
-
-                    this.DeleteCollaborativeMarks = false;
-                }
-                else
-                {
-                    // Long     : Количество элементов
-                    // Array of :
-                    //  {
-                    //    Long     : Позиция
-                    //    Variable : Id Элемента
-                    //  }
-
-                    var Count = Reader.GetLong();
-
-                    for ( var Index = 0; Index < Count; Index++ )
-                    {
-                        var Pos     = this.m_oContentChanges.Check( contentchanges_Add, Reader.GetLong() );
-                        var Element = g_oTableId.Get_ById( Reader.GetString2() );
-
-                        if ( null != Element )
-                        {
-                            if ( para_Comment === Element.Type )
-                            {
-                                var Comment = g_oTableId.Get_ById( Element.CommentId );
-
-                                if ( null != Comment )
-                                {
-                                    if ( true === Element.Start )
-                                        Comment.Set_StartInfo( 0, 0, 0, 0, 0, this.Get_Id() );
-                                    else
-                                        Comment.Set_EndInfo( 0, 0, 0, 0, this.Get_Id() );
-                                }
-                            }
-
-                            // TODO: Нужно пометить, что это новый элемент, добавленный в совместном редактировании
-//                            this.Content.splice( Pos, 0, new ParaCollaborativeChangesEnd() );
-//                            this.Content.splice( Pos, 0, Element );
-//                            this.Content.splice( Pos, 0, new ParaCollaborativeChangesStart() );
-//                            CollaborativeEditing.Add_ChangedClass(this);
-
-                            this.Content.splice( Pos, 0, Element );
-                        }
-                    }
-
-                    //this.DeleteCollaborativeMarks = false;
                 }
 
                 break;
@@ -19636,121 +19590,68 @@ Paragraph.prototype =
 //-----------------------------------------------------------------------------------
     Add_Comment : function(Comment, bStart, bEnd)
     {
-        if ( true !== Debug_ParaRunMode )
+        if ( true == this.ApplyToAll )
         {
-            var CursorPos_max = this.Internal_GetEndPos();
-            var CursorPos_min = this.Internal_GetStartPos();
-
-            if ( true === this.ApplyToAll )
+            if ( true === bEnd )
             {
-                if ( true === bEnd )
-                {
-                    var PagePos = this.Internal_GetXYByContentPos( CursorPos_max );
-                    var Line    = this.Lines[PagePos.Internal.Line];
-                    var LineA   = Line.Metrics.Ascent;
-                    var LineH   = Line.Bottom - Line.Top;
-                    Comment.Set_EndInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.Get_Id() );
+                var EndContentPos = this.Get_EndPos( false );
 
-                    var Item = new ParaCommentEnd(Comment.Get_Id());
-                    this.Internal_Content_Add( CursorPos_max, Item );
+                var CommentEnd = new ParaComment( false, Comment.Get_Id() );
+
+                var EndPos = EndContentPos.Get(0);
+
+                // Любые другие элементы мы целиком включаем в комментарий
+                if ( para_Run === this.Content[EndPos].Type )
+                {
+                    var NewElement = this.Content[EndPos].Split( EndContentPos, 1 );
+
+                    if ( null !== NewElement )
+                        this.Internal_Content_Add( EndPos + 1, NewElement );
                 }
 
-                if ( true === bStart )
-                {
-                    var PagePos = this.Internal_GetXYByContentPos( CursorPos_min );
-                    var Line    = this.Lines[PagePos.Internal.Line];
-                    var LineA   = Line.Metrics.Ascent;
-                    var LineH   = Line.Bottom - Line.Top;
-                    Comment.Set_StartInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.XLimit, this.Get_Id() );
-
-                    var Item = new ParaCommentStart(Comment.Get_Id());
-                    this.Internal_Content_Add( CursorPos_min, Item );
-                }
+                this.Internal_Content_Add( EndPos + 1, CommentEnd );
             }
-            else
+
+            if ( true === bStart )
             {
-                if ( true === this.Selection.Use )
+                var StartContentPos = this.Get_StartPos();
+
+                var CommentStart = new ParaComment( true, Comment.Get_Id() );
+
+                var StartPos = StartContentPos.Get(0);
+
+                // Любые другие элементы мы целиком включаем в комментарий
+                if ( para_Run === this.Content[StartPos].Type )
                 {
-                    var StartPos, EndPos;
-                    if ( this.Selection.StartPos < this.Selection.EndPos )
-                    {
-                        StartPos = this.Selection.StartPos;
-                        EndPos   = this.Selection.EndPos;
-                    }
-                    else
-                    {
-                        StartPos = this.Selection.EndPos;
-                        EndPos   = this.Selection.StartPos;
-                    }
+                    var NewElement = this.Content[StartPos].Split( StartContentPos, 1 );
 
-                    if ( true === bEnd )
-                    {
-                        EndPos = Math.max( CursorPos_min, Math.min( CursorPos_max, EndPos ) );
+                    if ( null !== NewElement )
+                        this.Internal_Content_Add( StartPos + 1, NewElement );
 
-                        var PagePos = this.Internal_GetXYByContentPos( EndPos );
-                        var Line    = this.Lines[PagePos.Internal.Line];
-                        var LineA   = Line.Metrics.Ascent;
-                        var LineH   = Line.Bottom - Line.Top;
-                        Comment.Set_EndInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.Get_Id() );
-
-                        var Item = new ParaCommentEnd(Comment.Get_Id());
-                        this.Internal_Content_Add( EndPos, Item );
-                    }
-
-                    if ( true === bStart )
-                    {
-                        StartPos = Math.max( CursorPos_min, Math.min( CursorPos_max, StartPos ) );
-
-                        var PagePos = this.Internal_GetXYByContentPos( StartPos );
-                        var Line    = this.Lines[PagePos.Internal.Line];
-                        var LineA   = Line.Metrics.Ascent;
-                        var LineH   = Line.Bottom - Line.Top;
-                        Comment.Set_StartInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.XLimit, this.Get_Id() );
-
-                        var Item = new ParaCommentStart(Comment.Get_Id());
-                        this.Internal_Content_Add( StartPos, Item );
-                    }
+                    this.Internal_Content_Add( StartPos + 1, CommentStart );
                 }
                 else
                 {
-                    if ( true === bEnd )
-                    {
-                        var Pos = Math.max( CursorPos_min, Math.min( CursorPos_max, this.CurPos.ContentPos ) );
-
-                        var PagePos = this.Internal_GetXYByContentPos( Pos );
-                        var Line    = this.Lines[PagePos.Internal.Line];
-                        var LineA   = Line.Metrics.Ascent;
-                        var LineH   = Line.Bottom - Line.Top;
-                        Comment.Set_EndInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.Get_Id() );
-
-                        var Item = new ParaCommentEnd(Comment.Get_Id());
-                        this.Internal_Content_Add( Pos, Item );
-                    }
-
-                    if ( true === bStart )
-                    {
-                        var Pos = Math.max( CursorPos_min, Math.min( CursorPos_max, this.CurPos.ContentPos ) );
-
-                        var PagePos = this.Internal_GetXYByContentPos( Pos );
-                        var Line    = this.Lines[PagePos.Internal.Line];
-                        var LineA   = Line.Metrics.Ascent;
-                        var LineH   = Line.Bottom - Line.Top;
-                        Comment.Set_StartInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.XLimit, this.Get_Id() );
-
-                        var Item = new ParaCommentStart(Comment.Get_Id());
-                        this.Internal_Content_Add( Pos, Item );
-                    }
+                    this.Internal_Content_Add( StartPos, CommentStart );
                 }
             }
         }
         else
         {
-            if ( true == this.ApplyToAll )
+            if ( true === this.Selection.Use )
             {
+                var StartContentPos = this.Get_ParaContentPos( true, true );
+                var EndContentPos   = this.Get_ParaContentPos( true, false );
+
+                if ( StartContentPos.Compare( EndContentPos ) > 0 )
+                {
+                    var Temp = StartContentPos;
+                    StartContentPos = EndContentPos;
+                    EndContentPos   = Temp;
+                }
+
                 if ( true === bEnd )
                 {
-                    var EndContentPos = this.Get_EndPos( false );
-
                     var CommentEnd = new ParaComment( false, Comment.Get_Id() );
 
                     var EndPos = EndContentPos.Get(0);
@@ -19769,8 +19670,6 @@ Paragraph.prototype =
 
                 if ( true === bStart )
                 {
-                    var StartContentPos = this.Get_StartPos();
-
                     var CommentStart = new ParaComment( true, Comment.Get_Id() );
 
                     var StartPos = StartContentPos.Get(0);
@@ -19779,6 +19678,53 @@ Paragraph.prototype =
                     if ( para_Run === this.Content[StartPos].Type )
                     {
                         var NewElement = this.Content[StartPos].Split( StartContentPos, 1 );
+
+                        if ( null !== NewElement )
+                        {
+                            this.Internal_Content_Add( StartPos + 1, NewElement );
+                            NewElement.Select_All();
+                        }
+
+                        this.Internal_Content_Add( StartPos + 1, CommentStart );
+                    }
+                    else
+                    {
+                        this.Internal_Content_Add( StartPos, CommentStart );
+                    }
+                }
+            }
+            else
+            {
+                var ContentPos = this.Get_ParaContentPos( false, false );
+
+                if ( true === bEnd )
+                {
+                    var CommentEnd = new ParaComment( false, Comment.Get_Id() );
+
+                    var EndPos = ContentPos.Get(0);
+
+                    // Любые другие элементы мы целиком включаем в комментарий
+                    if ( para_Run === this.Content[EndPos].Type )
+                    {
+                        var NewElement = this.Content[EndPos].Split( ContentPos, 1 );
+
+                        if ( null !== NewElement )
+                            this.Internal_Content_Add( EndPos + 1, NewElement );
+                    }
+
+                    this.Internal_Content_Add( EndPos + 1, CommentEnd );
+                }
+
+                if ( true === bStart )
+                {
+                    var CommentStart = new ParaComment( true, Comment.Get_Id() );
+
+                    var StartPos = ContentPos.Get(0);
+
+                    // Любые другие элементы мы целиком включаем в комментарий
+                    if ( para_Run === this.Content[StartPos].Type )
+                    {
+                        var NewElement = this.Content[StartPos].Split( ContentPos, 1 );
 
                         if ( null !== NewElement )
                             this.Internal_Content_Add( StartPos + 1, NewElement );
@@ -19791,151 +19737,49 @@ Paragraph.prototype =
                     }
                 }
             }
-            else
-            {
-                if ( true === this.Selection.Use )
-                {
-                    var StartContentPos = this.Get_ParaContentPos( true, true );
-                    var EndContentPos   = this.Get_ParaContentPos( true, false );
-
-                    if ( StartContentPos.Compare( EndContentPos ) > 0 )
-                    {
-                        var Temp = StartContentPos;
-                        StartContentPos = EndContentPos;
-                        EndContentPos   = Temp;
-                    }
-
-                    if ( true === bEnd )
-                    {
-                        var CommentEnd = new ParaComment( false, Comment.Get_Id() );
-
-                        var EndPos = EndContentPos.Get(0);
-
-                        // Любые другие элементы мы целиком включаем в комментарий
-                        if ( para_Run === this.Content[EndPos].Type )
-                        {
-                            var NewElement = this.Content[EndPos].Split( EndContentPos, 1 );
-
-                            if ( null !== NewElement )
-                                this.Internal_Content_Add( EndPos + 1, NewElement );
-                        }
-
-                        this.Internal_Content_Add( EndPos + 1, CommentEnd );
-                    }
-
-                    if ( true === bStart )
-                    {
-                        var CommentStart = new ParaComment( true, Comment.Get_Id() );
-
-                        var StartPos = StartContentPos.Get(0);
-
-                        // Любые другие элементы мы целиком включаем в комментарий
-                        if ( para_Run === this.Content[StartPos].Type )
-                        {
-                            var NewElement = this.Content[StartPos].Split( StartContentPos, 1 );
-
-                            if ( null !== NewElement )
-                            {
-                                this.Internal_Content_Add( StartPos + 1, NewElement );
-                                NewElement.Select_All();
-                            }
-
-                            this.Internal_Content_Add( StartPos + 1, CommentStart );
-                        }
-                        else
-                        {
-                            this.Internal_Content_Add( StartPos, CommentStart );
-                        }
-                    }
-                }
-                else
-                {
-                    var ContentPos = this.Get_ParaContentPos( false, false );
-
-                    if ( true === bEnd )
-                    {
-                        var CommentEnd = new ParaComment( false, Comment.Get_Id() );
-
-                        var EndPos = ContentPos.Get(0);
-
-                        // Любые другие элементы мы целиком включаем в комментарий
-                        if ( para_Run === this.Content[EndPos].Type )
-                        {
-                            var NewElement = this.Content[EndPos].Split( ContentPos, 1 );
-
-                            if ( null !== NewElement )
-                                this.Internal_Content_Add( EndPos + 1, NewElement );
-                        }
-
-                        this.Internal_Content_Add( EndPos + 1, CommentEnd );
-                    }
-
-                    if ( true === bStart )
-                    {
-                        var CommentStart = new ParaComment( true, Comment.Get_Id() );
-
-                        var StartPos = ContentPos.Get(0);
-
-                        // Любые другие элементы мы целиком включаем в комментарий
-                        if ( para_Run === this.Content[StartPos].Type )
-                        {
-                            var NewElement = this.Content[StartPos].Split( ContentPos, 1 );
-
-                            if ( null !== NewElement )
-                                this.Internal_Content_Add( StartPos + 1, NewElement );
-
-                            this.Internal_Content_Add( StartPos + 1, CommentStart );
-                        }
-                        else
-                        {
-                            this.Internal_Content_Add( StartPos, CommentStart );
-                        }
-                    }
-                }
-            }
-
-            this.Correct_Content();
         }
+
+        this.Correct_Content();
     },
 
     Add_Comment2 : function(Comment, ObjectId)
     {
         // TODO: Реализовать добавление комментария по ID объекта
-        var Pos = -1;
-        var Count = this.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            var Item = this.Content[Index];
-            if ( para_Drawing === Item.Type )
-            {
-                Pos = Index;
-                break;
-            }
-        }
-
-        if ( -1 != Pos )
-        {
-            var StartPos = Pos;
-            var EndPos   = Pos + 1;
-
-            var PagePos = this.Internal_GetXYByContentPos( EndPos );
-            var Line    = this.Lines[PagePos.Internal.Line];
-            var LineA   = Line.Metrics.Ascent;
-            var LineH   = Line.Bottom - Line.Top;
-            Comment.Set_EndInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.Get_Id() );
-
-            var Item = new ParaCommentEnd(Comment.Get_Id());
-            this.Internal_Content_Add( EndPos, Item );
-
-            var PagePos = this.Internal_GetXYByContentPos( StartPos );
-            var Line    = this.Lines[PagePos.Internal.Line];
-            var LineA   = Line.Metrics.Ascent;
-            var LineH   = Line.Bottom - Line.Top;
-            Comment.Set_StartInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.XLimit, this.Get_Id() );
-
-            var Item = new ParaCommentStart(Comment.Get_Id());
-            this.Internal_Content_Add( StartPos, Item );
-        }
+//        var Pos = -1;
+//        var Count = this.Content.length;
+//        for ( var Index = 0; Index < Count; Index++ )
+//        {
+//            var Item = this.Content[Index];
+//            if ( para_Drawing === Item.Type )
+//            {
+//                Pos = Index;
+//                break;
+//            }
+//        }
+//
+//        if ( -1 != Pos )
+//        {
+//            var StartPos = Pos;
+//            var EndPos   = Pos + 1;
+//
+//            var PagePos = this.Internal_GetXYByContentPos( EndPos );
+//            var Line    = this.Lines[PagePos.Internal.Line];
+//            var LineA   = Line.Metrics.Ascent;
+//            var LineH   = Line.Bottom - Line.Top;
+//            Comment.Set_EndInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.Get_Id() );
+//
+//            var Item = new ParaCommentEnd(Comment.Get_Id());
+//            this.Internal_Content_Add( EndPos, Item );
+//
+//            var PagePos = this.Internal_GetXYByContentPos( StartPos );
+//            var Line    = this.Lines[PagePos.Internal.Line];
+//            var LineA   = Line.Metrics.Ascent;
+//            var LineH   = Line.Bottom - Line.Top;
+//            Comment.Set_StartInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.XLimit, this.Get_Id() );
+//
+//            var Item = new ParaCommentStart(Comment.Get_Id());
+//            this.Internal_Content_Add( StartPos, Item );
+//        }
     },
 
     CanAdd_Comment : function()
@@ -19948,38 +19792,15 @@ Paragraph.prototype =
 
     Remove_CommentMarks : function(Id)
     {
-        if ( true !== Debug_ParaRunMode )
+        var Count = this.Content.length;
+        for ( var Pos = 0; Pos < Count; Pos++ )
         {
-            var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
-            var Count = this.Content.length;
-            for ( var Pos = 0; Pos < Count; Pos++ )
+            var Item = this.Content[Pos];
+            if ( para_Comment === Item.Type && Id === Item.CommentId )
             {
-                var Item = this.Content[Pos];
-                if ( ( para_CommentStart === Item.Type || para_CommentEnd === Item.Type ) && Id === Item.Id )
-                {
-                    if ( para_CommentStart === Item.Type )
-                        DocumentComments.Set_StartInfo( Item.Id, 0, 0, 0, 0, 0, null );
-                    else
-                        DocumentComments.Set_EndInfo( Item.Id, 0, 0, 0, 0, null );
-
-                    this.Internal_Content_Remove( Pos );
-                    Pos--;
-                    Count--;
-                }
-            }
-        }
-        else
-        {
-            var Count = this.Content.length;
-            for ( var Pos = 0; Pos < Count; Pos++ )
-            {
-                var Item = this.Content[Pos];
-                if ( para_Comment === Item.Type && Id === Item.CommentId )
-                {
-                    this.Internal_Content_Remove( Pos );
-                    Pos--;
-                    Count--;
-                }
+                this.Internal_Content_Remove( Pos );
+                Pos--;
+                Count--;
             }
         }
     },

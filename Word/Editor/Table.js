@@ -607,7 +607,7 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
 
     this.TableGridNeedRecalc = true;
 
-    this.TableStyle = this.DrawingDocument.m_oLogicDocument.Styles.Get_Default_TableGrid();
+    this.TableStyle = (undefined !== this.DrawingDocument && null !== this.DrawingDocument ? this.DrawingDocument.m_oLogicDocument.Styles.Get_Default_TableGrid() : null);
     this.TableLook  = new CTableLook(true, true, false, false, true, false);
 
     this.TableSumGrid  = []; // данный массив будет заполнен после Internal_RecalculateGrid
@@ -20135,7 +20135,7 @@ function CTableCell(Row, ColW)
     this.Prev = null;
     this.Next = null;
 
-    this.Content = new CDocumentContent(this, this.Row.Table.DrawingDocument, 0, 0, 0, 0, false, false);
+    this.Content = new CDocumentContent(this, (undefined !== this.Row ? this.Row.Table.DrawingDocument : undefined), 0, 0, 0, 0, false, false);
     this.Content.Set_StartPage( ( Row ? this.Row.Table.PageNum : 0 ) );
 
     this.CompiledPr =

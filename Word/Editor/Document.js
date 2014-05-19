@@ -1875,7 +1875,7 @@ CDocument.prototype =
     // Отрисовка содержимого Документа
     Draw : function(nPageIndex, pGraphics)
     {
-        this.Comments.Reset_CurrentDraw( nPageIndex );
+        this.Comments.Reset_Drawing( nPageIndex );
 
         // Определим секцию
         var Page_StartPos = this.Pages[nPageIndex].Pos;

@@ -2933,6 +2933,8 @@ ParaRun.prototype =
         var Y0 = PDSH.Y0;
         var Y1 = PDSH.Y1;
 
+        var CommentsCount = PDSH.Comments.length;
+        var CommentId     = ( CommentsCount > 0 ? PDSH.Comments[CommentsCount - 1] : null );
         var CommentsFlag  = PDSH.CommentsFlag;
 
         var HighLight = this.Get_CompiledPr(false).HighLight;
@@ -2976,7 +2978,7 @@ ParaRun.prototype =
                         break;
 
                     if ( CommentsFlag != comments_NoComment )
-                        aComm.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false } );
+                        aComm.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false, CommentId : CommentId } );
                     else if ( highlight_None != HighLight )
                         aHigh.Add( Y0, Y1, X, X + Item.WidthVisible, 0, HighLight.r, HighLight.g, HighLight.b );
 
@@ -2996,7 +2998,7 @@ ParaRun.prototype =
                     if ( PDSH.Spaces > 0 )
                     {
                         if ( CommentsFlag != comments_NoComment )
-                            aComm.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false } );
+                            aComm.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false, CommentId : CommentId } );
                         else if ( highlight_None != HighLight )
                             aHigh.Add( Y0, Y1, X, X + Item.WidthVisible, 0, HighLight.r, HighLight.g, HighLight.b );
 

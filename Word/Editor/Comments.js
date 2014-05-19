@@ -159,6 +159,15 @@ function CCommentData()
     };
 }
 
+function CCommentDrawingRect(X, Y, W, H, CommentId)
+{
+    this.X = X;
+    this.Y = Y;
+    this.H = H;
+    this.W = W;
+    this.CommentId = CommentId;
+}
+
 var comment_type_Common = 1; // Комментарий к обычному тексу
 var comment_type_HdrFtr = 2; // Комментарий к колонтитулу
 
@@ -174,14 +183,16 @@ function CComment(Parent, Data)
         Type : comment_type_Common,
         Data : null
     };
+    
+    this.StartId = null; // Id объекта, в содержимом которого идет начало комментария
+    this.EndId   = null; // Id объекта, в содержимом которого идет конец комментария
 
     this.m_oStartInfo =
     {
         X       : 0,
         Y       : 0,
         H       : 0,
-        PageNum : 0,
-        ParaId  : null
+        PageNum : 0
     };
 
     this.m_oEndInfo =
@@ -189,8 +200,7 @@ function CComment(Parent, Data)
         X       : 0,
         Y       : 0,
         H       : 0,
-        PageNum : 0,
-        ParaId  : null
+        PageNum : 0
     };
 
     this.Lock = new CLock(); // Зажат ли комментарий другим пользователем
@@ -199,64 +209,31 @@ function CComment(Parent, Data)
         this.Lock.Set_Type( locktype_Mine, false );
         CollaborativeEditing.Add_Unlock2( this );
     }
-
-    this.Set_StartInfo = function(PageNum, X, Y, H, ParaId)
+    
+    this.Set_StartId = function(ObjId)
+    {
+        this.StartId = ObjId;        
+    };
+    
+    this.Set_EndId = function(ObjId)
+    {
+        this.EndId = ObjId;
+    };
+    
+    this.Set_StartInfo = function(PageNum, X, Y, H)
     {
         this.m_oStartInfo.X       = X;
         this.m_oStartInfo.Y       = Y;
         this.m_oStartInfo.H       = H;
-        this.m_oStartInfo.ParaId  = ParaId;
-
-        // Если у нас комментарий в колонтитуле, то номер страницы обновляется при нажатии на комментарий
-        if ( comment_type_Common === this.m_oTypeInfo.Type )
-            this.m_oStartInfo.PageNum = PageNum;
+        this.m_oStartInfo.PageNum = PageNum;        
     };
-
-    this.Set_EndInfo = function(PageNum, X, Y, H, ParaId)
+    
+    this.Set_EndInfo = function(PageNum, X, Y, H)
     {
         this.m_oEndInfo.X       = X;
         this.m_oEndInfo.Y       = Y;
         this.m_oEndInfo.H       = H;
-        this.m_oEndInfo.ParaId  = ParaId;
-
-        if ( comment_type_Common === this.m_oTypeInfo.Type )
-            this.m_oEndInfo.PageNum = PageNum;
-    };
-
-    this.Check_ByXY = function(PageNum, X, Y, Type)
-    {
-        if ( this.m_oTypeInfo.Type != Type )
-            return false;
-
-        if ( comment_type_Common === Type )
-        {
-            if ( PageNum < this.m_oStartInfo.PageNum || PageNum > this.m_oEndInfo.PageNum )
-                return false;
-
-            if ( PageNum === this.m_oStartInfo.PageNum && ( Y < this.m_oStartInfo.Y || ( Y < (this.m_oStartInfo.Y + this.m_oStartInfo.H) && X < this.m_oStartInfo.X ) ) )
-                return false;
-
-            if ( PageNum === this.m_oEndInfo.PageNum && ( Y > this.m_oEndInfo.Y + this.m_oEndInfo.H || ( Y > this.m_oEndInfo.Y && X > this.m_oEndInfo.X ) ) )
-                return false;
-        }
-        else if ( comment_type_HdrFtr === Type )
-        {
-            var HdrFtr = this.m_oTypeInfo.Data;
-
-            if ( null === HdrFtr || false === HdrFtr.Check_Page(PageNum) )
-                return false;
-
-            if ( Y < this.m_oStartInfo.Y || ( Y < (this.m_oStartInfo.Y + this.m_oStartInfo.H) && X < this.m_oStartInfo.X ) )
-                return false;
-
-            if ( Y > this.m_oEndInfo.Y + this.m_oEndInfo.H || ( Y > this.m_oEndInfo.Y && X > this.m_oEndInfo.X ) )
-                return false;
-
-            this.m_oStartInfo.PageNum = PageNum;
-            this.m_oEndInfo.PageNum   = PageNum;
-        }
-
-        return true;
+        this.m_oEndInfo.PageNum = PageNum;
     };
 
     this.Set_Data = function(Data)
@@ -267,21 +244,21 @@ function CComment(Parent, Data)
 
     this.Remove_Marks = function()
     {
-        var Para_start = g_oTableId.Get_ById(this.m_oStartInfo.ParaId);
-        var Para_end   = g_oTableId.Get_ById(this.m_oEndInfo.ParaId);
+        var ObjStart = g_oTableId.Get_ById(this.StartId);
+        var ObjEnd   = g_oTableId.Get_ById(this.EndId);
 
-        if ( Para_start === Para_end )
+        if ( ObjStart === ObjEnd )
         {
-            if ( null != Para_start )
-                Para_start.Remove_CommentMarks( this.Id );
+            if ( null != ObjStart )
+                ObjStart.Remove_CommentMarks( this.Id );
         }
         else
         {
-            if ( null != Para_start )
-                Para_start.Remove_CommentMarks( this.Id );
+            if ( null != ObjStart )
+                ObjStart.Remove_CommentMarks( this.Id );
 
-            if ( null != Para_end )
-                Para_end.Remove_CommentMarks( this.Id );
+            if ( null != ObjEnd )
+                ObjEnd.Remove_CommentMarks( this.Id );
         }
     };
 
@@ -525,19 +502,19 @@ function CComment(Parent, Data)
 
         var bUse = true;
 
-        if ( null != this.m_oStartInfo.ParaId )
+        if ( null != this.StartId )
         {
-            var Para_start = g_oTableId.Get_ById( this.m_oStartInfo.ParaId );
+            var ObjStart = g_oTableId.Get_ById( this.StartId );
 
-            if ( true != Para_start.Is_UseInDocument() )
+            if ( true != ObjStart.Is_UseInDocument() )
                 bUse = false;
         }
 
-        if ( true === bUse && null != this.m_oEndInfo.ParaId )
+        if ( true === bUse && null != this.EndId )
         {
-            var Para_end = g_oTableId.Get_ById( this.m_oEndInfo.ParaId );
+            var ObjEnd = g_oTableId.Get_ById( this.EndId );
 
-            if ( true != Para_end.Is_UseInDocument() )
+            if ( true != ObjEnd.Is_UseInDocument() )
                 bUse = false;
         }
 
@@ -561,7 +538,8 @@ function CComments()
 
     this.m_aComments    = {};    // ассоциативный  массив
     this.m_sCurrent     = null;  // текущий комментарий
-    this.m_aCurrentDraw = new Array();
+    
+    this.Pages = new Array();
 
     this.Get_Id = function()
     {
@@ -616,56 +594,14 @@ function CComments()
         return false;
     };
 
-    this.Reset_CurrentDraw = function(PageNum)
+    this.Reset_Drawing = function(PageNum)
     {
-        this.m_aCurrentDraw.length = 0;
-
-        for ( var Id in this.m_aComments )
-        {
-            var Comment = this.m_aComments[Id];
-
-            if ( PageNum > Comment.m_oStartInfo.PageNum && PageNum <= Comment.m_oEndInfo.PageNum )
-                this.m_aCurrentDraw.push( Comment.Get_Id() );
-        }
+        this.Pages[PageNum] = [];
     };
 
-    this.Add_CurrentDraw = function(Id)
+    this.Add_DrawingRect = function(X, Y, W, H, PageNum, CommentId)
     {
-        if ( null != this.Get_ById( Id ) )
-            this.m_aCurrentDraw.push( Id );
-    };
-
-    this.Remove_CurrentDraw = function(Id)
-    {
-        var Count = this.m_aCurrentDraw.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            if ( Id === this.m_aCurrentDraw[Index] )
-            {
-                this.m_aCurrentDraw.splice( Index, 1 );
-                return;
-            }
-        }
-    };
-
-    this.Check_CurrentDraw = function()
-    {
-        var Flag = comments_NoComment;
-
-        var Count = this.m_aCurrentDraw.length;
-        if ( Count > 0 )
-            Flag = comments_NonActiveComment;
-
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            if ( this.m_aCurrentDraw[Index] === this.m_sCurrent )
-            {
-                Flag = comments_ActiveComment;
-                return Flag;
-            }
-        }
-
-        return Flag;
+        this.Pages[PageNum].push( new CCommentDrawingRect(X, Y, W, H, CommentId) );        
     };
 
     this.Set_Current = function(Id)
@@ -673,28 +609,24 @@ function CComments()
         this.m_sCurrent = Id;
     };
 
-    this.Set_StartInfo = function(Id, PageNum, X, Y, H, ParaId)
-    {
-        var Comment = this.Get_ById( Id );
-        if ( null != Comment )
-            Comment.Set_StartInfo( PageNum, X, Y, H, ParaId);
-    };
-
-    this.Set_EndInfo = function(Id, PageNum, X, Y, H, ParaId)
-    {
-        var Comment = this.Get_ById( Id );
-        if ( null != Comment )
-            Comment.Set_EndInfo( PageNum, X, Y, H, ParaId );
-    };
-
     this.Get_ByXY = function(PageNum, X, Y, Type)
     {
-        for (var Id in this.m_aComments)
+        var Page = this.Pages[PageNum];
+        if ( undefined !== Page )
         {
-            var Comment = this.m_aComments[Id];
-            if ( true === Comment.Check_ByXY( PageNum, X, Y, Type ) )
-                return Comment;
-        }
+            var Count = Page.length;
+            for ( var Pos = 0; Pos < Count; Pos++ )
+            {
+                var DrawingRect = Page[Pos];
+                
+                if ( X >= DrawingRect.X && X <= DrawingRect.X + DrawingRect.W && Y >= DrawingRect.Y && Y <= DrawingRect.Y + DrawingRect.H )
+                {
+                    var Comment = this.Get_ById( DrawingRect.CommentId );
+                    if ( null != Comment )
+                        return Comment;
+                }
+            }
+        }       
 
         return null;
     };
@@ -1036,6 +968,9 @@ ParaComment.prototype =
     {
         var Para = PRSA.Paragraph;
         var DocumentComments = Para.LogicDocument.Comments;
+        var Comment = DocumentComments.Get_ById( this.CommentId );
+        if ( null === Comment )
+            return;
 
         var X    = PRSA.X;
         var Y    = Para.Pages[CurPage].Y      + Para.Lines[CurLine].Top;
@@ -1043,9 +978,15 @@ ParaComment.prototype =
         var Page = Para.Get_StartPage_Absolute() + CurPage;
 
         if ( true === this.Start )
-            DocumentComments.Set_StartInfo( this.CommentId, Page, X, Y, H, Para.Get_Id() );
+        {
+            Comment.Set_StartId( Para.Get_Id() );
+            Comment.Set_StartInfo( Page, X, Y, H );
+        }
         else
-            DocumentComments.Set_EndInfo( this.CommentId, Page, X, Y, H, Para.Get_Id() );
+        {
+            Comment.Set_EndId( Para.Get_Id() );
+            Comment.Set_EndInfo( Page, X, Y, H );
+        }
     },
 
     Recalculate_PageEndInfo : function(PRSI, _CurLine, _CurRange)
