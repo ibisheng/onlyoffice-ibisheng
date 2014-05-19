@@ -1009,7 +1009,6 @@ CDLbl.prototype =
         }
     },
 
-
     draw: CShape.prototype.draw,
 
 
@@ -18013,6 +18012,7 @@ CTitle.prototype =
     getCompiledLine: CDLbl.prototype.getCompiledLine,
     getCompiledTransparent: CDLbl.prototype.getCompiledTransparent,
     Get_Styles: CDLbl.prototype.Get_Styles,
+    check_bounds: CShape.prototype.check_bounds,
     draw: function(graphics)
     {
         if(this.chart)
@@ -18082,6 +18082,7 @@ CTitle.prototype =
     recalculateTransformText: CDLbl.prototype.recalculateTransformText,
 
     recalculateContent: CDLbl.prototype.recalculateContent,
+
 
     recalculate: function()
     {
