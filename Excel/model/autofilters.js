@@ -5978,7 +5978,7 @@ var gUndoInsDelCellsFlag = true;
 				if(paramsForCallBackAdd == "addTableFilterOneCell" || paramsForCallBackAdd == "addAutoFilterOneCell")
 				{
 					//при добавлении общего фильтра проверка на пустой диапазон
-					if(paramsForCallBackAdd == "addAutoFilterOneCell" && t._isEmptyRange(activeCells, true))
+					if(paramsForCallBackAdd == "addAutoFilterOneCell" && this._isEmptyRange(activeCells, true))
 					{
 						ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
 						return false;
@@ -6062,7 +6062,7 @@ var gUndoInsDelCellsFlag = true;
 				else if(paramsForCallBackAdd == "addTableFilterManyCells" || paramsForCallBackAdd == "addAutoFilterManyCells")
 				{	
 					//при добавлении общего фильтра проверка на пустой диапазон
-					if(paramsForCallBackAdd == "addAutoFilterManyCells" && t._isEmptyRange(activeCells))
+					if(paramsForCallBackAdd == "addAutoFilterManyCells" && this._isEmptyRange(activeCells))
 					{
 						ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
 						return false;
