@@ -5027,9 +5027,10 @@ Paragraph.prototype =
             var Tab = ParaPr.Tabs.Get(Index);
             var TabPos = Tab.Pos + PageStart.X;
 
-            if ( true === bCheckLeft && TabPos > PageStart.X + ParaPr.Ind.Left )
+            // Здесь 0.001 убавляется из-за замечания ниже
+            if ( true === bCheckLeft && TabPos > PageStart.X + ParaPr.Ind.Left - 0.001 )
             {
-                TabsPos.push( new CParaTab(tab_Left, ParaPr.Ind.Left) );
+                TabsPos.push( new CParaTab(tab_Left, ParaPr.Ind.Left - 0.001) );
                 bCheckLeft = false;
             }
 
@@ -5037,8 +5038,9 @@ Paragraph.prototype =
                 TabsPos.push( Tab );
         }
 
+        // Здесь 0.001 убавляется из-за замечания ниже
         if ( true === bCheckLeft )
-            TabsPos.push( new CParaTab(tab_Left, ParaPr.Ind.Left) );
+            TabsPos.push( new CParaTab(tab_Left, ParaPr.Ind.Left - 0.001) );
 
         TabsCount = TabsPos.length;
 
