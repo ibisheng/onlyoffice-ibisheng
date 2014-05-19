@@ -12395,6 +12395,9 @@ CDocument.prototype =
             CommentData.Set_QuoteText(null);
             var Comment = new CComment( this.Comments, CommentData );
             this.Comments.Add( Comment );
+
+            // Обновляем информацию для Undo/Redo
+            this.Document_UpdateInterfaceState();
         }
         else
         {
@@ -12464,7 +12467,7 @@ CDocument.prototype =
             if ( true === Debug_ParaRunMode )
             {
                 // TODO: Продумать, как избавиться от пересчета
-                this.Recalculate();
+                this.Recalculate();                
             }
             else
             {
