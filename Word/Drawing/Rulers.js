@@ -76,7 +76,10 @@ function RulerCorrectPosition(val, mm_1_8, mm_1_4, margin)
     if (undefined === margin)
         return (((val + mm_1_8) / mm_1_4) >> 0) * mm_1_4;
 
-    return margin + (((val - margin + mm_1_8) / mm_1_4) >> 0) * mm_1_4;
+    if (val >= margin)
+        return margin + (((val - margin + mm_1_8) / mm_1_4) >> 0) * mm_1_4;
+
+    return margin + (((val - margin - mm_1_8) / mm_1_4) >> 0) * mm_1_4;
 }
 
 function RulerCheckSimpleChanges()
@@ -1237,14 +1240,13 @@ function CHorRuler()
             var _bottom = 5.2;
 
             // tabs
-            if (_y >= 3 && _y <= _bottom && _x >= _margin_left && _x <= _margin_right)
+            if (_y >= 3 && _y <= _bottom && _x >= this.m_dIndentLeft && (_x + _margin_left) <= (_margin_right - this.m_dIndentRight))
             {
-                var _new_tab_pos = _x - _margin_left;
-
                 var mm_1_4 = 10 / 4;
                 var mm_1_8 = mm_1_4 / 2;
 
-                var _new_tab_pos = RulerCorrectPosition(_new_tab_pos, mm_1_8, mm_1_4, _margin_left);
+                var _new_tab_pos = RulerCorrectPosition(_x, mm_1_8, mm_1_4, _margin_left);
+                _new_tab_pos -= _margin_left;
 
                 this.m_arrTabs[this.m_arrTabs.length] = new CTab(_new_tab_pos, word_control.m_nTabsType);
                 //this.CorrectTabs();
@@ -1319,7 +1321,7 @@ function CHorRuler()
             {
                 // смотрим, сохраняем ли таб
                 var _y = (global_mouseEvent.Y - word_control.Y) * g_dKoef_pix_to_mm;
-                if (_y <= 3 || _y > 5.6 || this.m_dCurrentTabNewPosition < 0 || (this.m_dCurrentTabNewPosition + _margin_left) > _margin_right)
+                if (_y <= 3 || _y > 5.6 || this.m_dCurrentTabNewPosition < this.m_dIndentLeft || (this.m_dCurrentTabNewPosition + _margin_left) > (_margin_right - this.m_dIndentRight))
                 {
                     this.m_arrTabs.splice(this.m_lCurrentTab, 1);
                 }
@@ -1401,7 +1403,7 @@ function CHorRuler()
             {
                 // смотрим, сохраняем ли таб
                 var _y = (global_mouseEvent.Y - word_control.Y) * g_dKoef_pix_to_mm;
-                if (_y <= 3 || _y > 5.6 || this.m_dCurrentTabNewPosition < 0 || (this.m_dCurrentTabNewPosition + _margin_left) > _margin_right)
+                if (_y <= 3 || _y > 5.6 || this.m_dCurrentTabNewPosition < this.m_dIndentLeft || (this.m_dCurrentTabNewPosition + _margin_left) > (_margin_right - this.m_dIndentRight))
                 {
                     this.m_arrTabs.splice(this.m_lCurrentTab, 1);
                 }
@@ -1814,7 +1816,8 @@ function CHorRuler()
                     }
                     else
                     {
-                        if (tab.pos < 0 || tab.pos > this.m_dMarginRight)
+                        //if (tab.pos < 0 || tab.pos > this.m_dMarginRight)
+                        if (tab.pos < this.m_dIndentLeft || (tab.pos + _margin_left) > (_margin_right - this.m_dIndentRight))
                             continue;
 
                         _x = parseInt((_margin_left + tab.pos) * dKoef_mm_to_pix) + left;
