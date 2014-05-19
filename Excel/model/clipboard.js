@@ -1572,7 +1572,7 @@
 				} 
 				else if (base64FromWord && copyPasteFromWordUseBinary)//from word
 				{
-					var pasteData = this.ReadFromBinaryWord(base64FromWord);
+					var pasteData = this.ReadFromBinaryWord(base64FromWord, worksheet);
 					var pasteFromBinaryWord = new Asc.pasteFromBinaryWord(this, worksheet);
 					
 					pasteFromBinaryWord._paste(worksheet, pasteData);
@@ -2073,9 +2073,10 @@
 				return aResult;
 			},
 			
-			ReadFromBinaryWord : function(sBase64)
+			ReadFromBinaryWord : function(sBase64, worksheet)
 			{
-			    var oTempDrawingDocument = new CDrawingDocument();
+			    //передавать CDrawingDocument текущего worksheet
+				var oTempDrawingDocument = worksheet.objectRender;
 			    var newCDocument = new CDocument(oTempDrawingDocument);
 				newCDocument.bFromDocument = true;
 				newCDocument.theme = this.Api.wbModel.theme;
@@ -3137,6 +3138,96 @@
 				History.EndTransaction();
 			},
 			
+			_insertImagesFromBinaryWord: function(ws, data)
+			{
+				var activeRange = ws.activeRange;
+				var curCol, drawingObject, curRow, startCol, startRow, xfrm, drawingBase, graphicObject;
+
+				History.Create_NewPoint();
+				History.StartTransaction();
+				
+				//определяем стартовую позицию, если изображений несколько вставляется
+				for(var i = 0; i < data.length; i++)
+				{
+					graphicObject = data[i].image.GraphicObj;
+					
+					//convert from word
+					graphicObject = graphicObject.convertToPPTX(ws.model.DrawingDocument, ws.model)
+					
+					//create new drawingBase
+					drawingObject = ws.objectRender.createDrawingObject();
+					drawingObject.graphicObject = graphicObject;
+					
+					xfrm = drawingObject.graphicObject.spPr.xfrm;
+					if(xfrm)
+					{
+						if(i == 0)
+						{
+							startCol = xfrm.offX;
+							startRow = xfrm.offY;
+						}
+						else 
+						{
+							if(startCol > xfrm.offX)
+							{
+								startCol = xfrm.offX;
+							}	
+							if(startRow > xfrm.offY)
+							{
+								startRow = xfrm.offY;
+							}	
+						}
+					}
+					else
+					{
+						if(i == 0)
+						{
+							startCol = drawingObject.from.col;
+							startRow = drawingObject.from.row;
+						}
+						else 
+						{
+							if(startCol > drawingObject.from.col)
+							{
+								startCol = drawingObject.from.col;
+							}	
+							if(startRow > drawingObject.from.row)
+							{
+								startRow = drawingObject.from.row;
+							}	
+						}
+					};
+					
+					
+					if(i == 0)
+						window["Asc"]["editor"].isStartAddShape = true;
+
+					CheckSpPrXfrm(drawingObject.graphicObject);
+					xfrm = drawingObject.graphicObject.spPr.xfrm;
+
+					curCol = xfrm.offX - startCol + ws.objectRender.convertMetric(ws.cols[data[i].col].left - ws.getCellLeft(0, 1), 1, 3);
+					curRow = xfrm.offY - startRow + ws.objectRender.convertMetric(ws.rows[data[i].row].top  - ws.getCellTop(0, 1), 1, 3);
+					
+					xfrm.setOffX(curCol);
+					xfrm.setOffY(curRow);
+
+					drawingObject = ws.objectRender.cloneDrawingObject(drawingObject);
+					drawingObject.graphicObject.setDrawingBase(drawingObject);
+					
+					drawingObject.graphicObject.setDrawingObjects(ws.objectRender);
+					drawingObject.graphicObject.setWorksheet(ws.model);
+					
+					//drawingObject.graphicObject.setDrawingDocument(ws.objectRender.drawingDocument);
+					drawingObject.graphicObject.recalculate();
+					
+					drawingObject.graphicObject.addToDrawingObjects();
+					drawingObject.graphicObject.select(ws.objectRender.controller, 0);
+					
+				};
+				
+				History.EndTransaction();
+			},
+			
 			_getBinaryColor: function(c) 
 			{
 				var bin, m, x, type, r, g, b, a, s;
@@ -3585,6 +3676,13 @@
 							oNewItem = [];
 							s++;
 							break;
+						};
+						
+						case para_Drawing:
+						{
+							if(!aResult.addImagesFromWord)
+								aResult.addImagesFromWord = [];
+							aResult.addImagesFromWord[aResult.addImagesFromWord.length] = {image: paraRunContent[pR], col: s + c1, row: row};
 						};
 						
 						case para_End:

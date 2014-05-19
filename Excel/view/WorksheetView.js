@@ -8021,6 +8021,10 @@
 
 					api.ImageLoader.LoadDocumentImages(aImagesSync, null, t.objectRender.asyncImagesDocumentEndLoaded);
 				}
+				else if(val.addImagesFromWord && val.addImagesFromWord.length != 0)
+				{
+					window["Asc"]["editor"].wb.clipboard._insertImagesFromBinaryWord(t, val.addImagesFromWord);
+				};
 			});
 		};
 		
