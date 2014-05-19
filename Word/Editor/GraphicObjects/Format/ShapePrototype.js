@@ -799,6 +799,8 @@ CShape.prototype.getRecalcObject = function()
 
 CShape.prototype.setRecalcObject =  function(object)
 {
+    if(!object)
+        return;
     var content = this.getDocContent && this.getDocContent();
     if(content)
     {

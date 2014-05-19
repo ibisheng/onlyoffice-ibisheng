@@ -265,6 +265,16 @@ DrawingObjectsController.prototype =
 
     handleMoveHit: function(object, e, x, y, group, bInSelect, pageIndex, bWord)
     {
+        var b_is_inline;
+        if(isRealObject(group))
+        {
+            b_is_inline = group.parent && group.parent.Is_Inline();
+        }
+        else
+        {
+            b_is_inline = object.parent && object.parent.Is_Inline();
+        }
+        var b_is_selected_inline = this.selectedObjects.length === 1 && (this.selectedObjects[0].parent && this.selectedObjects[0].parent.Is_Inline());
         if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
             var selector = group ? group : this;
@@ -272,7 +282,7 @@ DrawingObjectsController.prototype =
             {
                 this.arrPreTrackObjects.length = 0;
                 var is_selected =  object.selected;
-                if(!(e.CtrlKey || e.ShiftKey) && !is_selected)
+                if(!(e.CtrlKey || e.ShiftKey) && !is_selected || b_is_inline || b_is_selected_inline)
                     selector.resetSelection();
                 selector.selectObject(object, pageIndex);
                 if(!is_selected)
@@ -281,7 +291,12 @@ DrawingObjectsController.prototype =
                 if(!isRealObject(group))
                 {
                     this.resetInternalSelection();
-                    this.changeCurrentState(new PreMoveState(this, x, y, e.ShiftKey, e.CtrlKey,  object, is_selected, true));
+                    if(!b_is_inline)
+                        this.changeCurrentState(new PreMoveState(this, x, y, e.ShiftKey, e.CtrlKey,  object, is_selected, true));
+                    else
+                    {
+                        this.changeCurrentState(new PreMoveInlineObject(this, object, is_selected, true));
+                    }
                 }
                 else
                 {
@@ -691,6 +706,24 @@ DrawingObjectsController.prototype =
             if(this.selectedObjects.length === 1 && this.selectedObjects[0].drawAdjustments && this.selectedObjects[0].selectStartPage === pageIndex)
             {
                 this.selectedObjects[0].drawAdjustments(drawingDocument);
+            }
+        }
+        if(this.document)
+        {
+            if(this.selectedObjects.length === 1 && this.selectedObjects[0].parent && !this.selectedObjects[0].parent.Is_Inline())
+            {
+                if(this.arrTrackObjects.length === 1)
+                {
+                    var bounds = this.arrTrackObjects[0].getBounds();
+                    var page_index = isRealNumber(this.arrTrackObjects[0].pageIndex) ? this.arrTrackObjects[0].pageIndex : (isRealNumber(this.arrTrackObjects[0].selectStartPage) ? this.arrTrackObjects[0].selectStartPage : 0);
+                    var nearest_pos = this.document.Get_NearestPos(page_index, bounds.min_x, bounds.min_y, true, this.selectedObjects[0].parent);
+                    drawingDocument.AutoShapesTrack.drawFlowAnchor(nearest_pos.Paragraph.X, nearest_pos.Paragraph.Y);
+                }
+                else
+                {
+                    var paragraph = this.selectedObjects[0].parent.Get_ParentParagraph();
+                    drawingDocument.AutoShapesTrack.drawFlowAnchor(paragraph.X, paragraph.Y);
+                }
             }
         }
         return;

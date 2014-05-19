@@ -283,10 +283,12 @@ PreChangeAdjState.prototype =
     }
 };
 
-function PreMoveInlineObject(drawingObjects, majorObject)
+function PreMoveInlineObject(drawingObjects, majorObject, isSelected, bInside)
 {
     this.drawingObjects = drawingObjects;
     this.majorObject = majorObject;
+    this.isSelected = isSelected;
+    this.bInside = bInside;
 }
 
 PreMoveInlineObject.prototype =
@@ -310,7 +312,7 @@ PreMoveInlineObject.prototype =
 
     onMouseUp: function(e, x,y,pageIndex)
     {
-        this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
+        return handleMouseUpPreMoveState(this.drawingObjects, e, x, y,pageIndex, true);
     }
 };
 
@@ -1327,7 +1329,6 @@ SplineBezierState.prototype =
     onMouseUp: function(e, X, Y, pageIndex)
     {
         this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
-        this.drawingObjects.curState.updateAnchorPos();
     }
 };
 

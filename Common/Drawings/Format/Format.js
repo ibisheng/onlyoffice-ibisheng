@@ -1,5 +1,3 @@
-"use strict";
-
 // COLOR -----------------------
 /*
  var map_color_scheme = {};
@@ -27,6 +25,13 @@ var historyitem_ChangeColorScheme = 0;
 var historyitem_ChangeFontScheme = 1;
 var historyitem_ChangeFmtScheme = 2;
 
+var g_oThemeFontsName = {};
+g_oThemeFontsName["+mj-cs"] = true;
+g_oThemeFontsName["+mj-ea"] = true;
+g_oThemeFontsName["+mj-lt"] = true;
+g_oThemeFontsName["+mn-cs"] = true;
+g_oThemeFontsName["+mn-ea"] = true;
+g_oThemeFontsName["+mn-lt"] = true;
 function isRealObject(o)
 {
     return o !== null && typeof o === "object";
@@ -1442,7 +1447,7 @@ CRGBColor.prototype =
     setColor: function(r, g, b)
     {
         var rgba = this.RGBA;
-       // History.Add(this, {Type: historyitem_RGBColor_SetColor, oldColor: {r: rgba.R, g: rgba.G, b: rgba.B}, newColor: {r: r, g: g, b: b}});
+        // History.Add(this, {Type: historyitem_RGBColor_SetColor, oldColor: {r: rgba.R, g: rgba.G, b: rgba.B}, newColor: {r: r, g: g, b: b}});
         this.RGBA.R = r;
         this.RGBA.G = g;
         this.RGBA.B = b;
@@ -3589,12 +3594,12 @@ CGradFill.prototype =
         {
             case historyitem_GradFill_AddColor:
             {
-               // w.WriteBool(isRealObject(data.color));
-               // if(isRealObject(data.color))
-               // {
-               //     w.WriteString2(data.color.Get_Id());
-               // }
-               // break;
+                // w.WriteBool(isRealObject(data.color));
+                // if(isRealObject(data.color))
+                // {
+                //     w.WriteString2(data.color.Get_Id());
+                // }
+                // break;
             }
             case historyitem_GradFill_SetLin:
             {
@@ -3608,12 +3613,12 @@ CGradFill.prototype =
 
             case historyitem_GradFill_SetPath:
             {
-               // w.WriteBool(isRealObject(data.newPath));
-               // if(isRealObject(data.newPath))
-               // {
-               //     w.WriteString2(data.newPath.Get_Id());
-               // }
-               // break;
+                // w.WriteBool(isRealObject(data.newPath));
+                // if(isRealObject(data.newPath))
+                // {
+                //     w.WriteString2(data.newPath.Get_Id());
+                // }
+                // break;
             }
         }
     },
@@ -4120,7 +4125,7 @@ function CUniFill()
 {
     this.fill = null;
     this.transparent = null;
-   // this.Id = g_oIdCounter.Get_NewId();
+    // this.Id = g_oIdCounter.Get_NewId();
 }
 
 CUniFill.prototype =
@@ -4544,7 +4549,7 @@ function CompareUnifillBool(u1, u2)
             for(var i = 0; i < u1.fill.colors.length; ++i)
             {
                 if(u1.fill.colors[i].pos !== u1.fill.colors[i].pos
-                || ! CompareUniColor(u1.fill.colors[i].color, u2.fill.colors[i].color))
+                    || ! CompareUniColor(u1.fill.colors[i].color, u2.fill.colors[i].color))
                     return false;
             }
             break;
@@ -4669,11 +4674,11 @@ function CompareShapeProperties(shapeProp1, shapeProp2)
         _result_shape_prop.stroke = shapeProp1.stroke.compare(shapeProp2.stroke)
     }
 
-   /* if(shapeProp1.verticalTextAlign === shapeProp2.verticalTextAlign)
-    {
-        _result_shape_prop.verticalTextAlign = shapeProp1.verticalTextAlign;
-    }
-    else */
+    /* if(shapeProp1.verticalTextAlign === shapeProp2.verticalTextAlign)
+     {
+     _result_shape_prop.verticalTextAlign = shapeProp1.verticalTextAlign;
+     }
+     else */
     {
         _result_shape_prop.verticalTextAlign = null;
     }
@@ -8453,36 +8458,36 @@ CSpPr.prototype =
             }
             case historyitem_SpPr_SetFill:
             {
-                 if(r.GetBool())
-                 {
-                     this.Fill = new CUniFill();
-                     this.Fill.Read_FromBinary(r);
+                if(r.GetBool())
+                {
+                    this.Fill = new CUniFill();
+                    this.Fill.Read_FromBinary(r);
 
 
-                     if(typeof CollaborativeEditing !== "undefined")
-                     {
-                         if(this.Fill.fill && this.Fill.fill.type === FILL_TYPE_BLIP && typeof this.Fill.fill.RasterImageId === "string" && this.Fill.fill.RasterImageId.length > 0)
-                         {
-                             var full_image_src_func;
-                             if(typeof getFullImageSrc === "function")
-                             {
-                                 full_image_src_func = getFullImageSrc;
-                             }
-                             else if(typeof _getFullImageSrc === "function")
-                             {
-                                 full_image_src_func = _getFullImageSrc;
-                             }
-                             if(full_image_src_func)
-                             {
-                                 CollaborativeEditing.Add_NewImage(full_image_src_func(this.Fill.fill.RasterImageId));
-                             }
-                         }
-                     }
-                 }
+                    if(typeof CollaborativeEditing !== "undefined")
+                    {
+                        if(this.Fill.fill && this.Fill.fill.type === FILL_TYPE_BLIP && typeof this.Fill.fill.RasterImageId === "string" && this.Fill.fill.RasterImageId.length > 0)
+                        {
+                            var full_image_src_func;
+                            if(typeof getFullImageSrc === "function")
+                            {
+                                full_image_src_func = getFullImageSrc;
+                            }
+                            else if(typeof _getFullImageSrc === "function")
+                            {
+                                full_image_src_func = _getFullImageSrc;
+                            }
+                            if(full_image_src_func)
+                            {
+                                CollaborativeEditing.Add_NewImage(full_image_src_func(this.Fill.fill.RasterImageId));
+                            }
+                        }
+                    }
+                }
                 else
-                 {
-                     this.Fill = null;
-                 }
+                {
+                    this.Fill = null;
+                }
                 this.handleUpdateFill();
                 break;
             }
@@ -9250,11 +9255,18 @@ FontScheme.prototype =
 
     checkFont: function(font)
     {
-        if(font)
+        if(g_oThemeFontsName[font])
         {
-            return this.fontMap[font] ? this.fontMap[font] : font;
+            if(this.fontMap[font])
+            {
+                return this.fontMap[font];
+            }
+            else
+            {
+                return "Arial";
+            }
         }
-        return "Arial";
+        return font;
     },
 
     getObjectType: function()
@@ -9898,11 +9910,11 @@ function CTheme()
         return historyitem_type_Theme;
     };
 
-        this.Write_ToBinary2 = function(w)
-        {
-            w.WriteLong(historyitem_type_Theme);
-            w.WriteString2(this.Id);
-        };
+    this.Write_ToBinary2 = function(w)
+    {
+        w.WriteLong(historyitem_type_Theme);
+        w.WriteString2(this.Id);
+    };
 
     this.Read_FromBinary2 = function(r)
     {
@@ -12327,7 +12339,7 @@ CBodyPr.prototype =
         }
     },
 
-     Read_FromBinary: function(r)
+    Read_FromBinary: function(r)
     {
         var flag = r.GetBool();
         if(flag)

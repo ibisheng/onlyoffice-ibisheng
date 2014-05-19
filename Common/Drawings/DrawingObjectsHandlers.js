@@ -153,66 +153,28 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
     for(var j = grouped_objects.length - 1; j > -1; --j)
     {
         var cur_grouped_object = grouped_objects[j];
-        if(cur_grouped_object instanceof CShape || cur_grouped_object instanceof CImageShape)
+        switch (cur_grouped_object.getObjectType())
         {
-            var hit_in_inner_area = cur_grouped_object.hitInInnerArea(x, y);
-            var hit_in_path = cur_grouped_object.hitInPath(x, y);
-            var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
-            if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+            case historyitem_type_Shape:
+            case historyitem_type_ImageShape:
+            case historyitem_type_ChartSpace:
             {
-                return drawingObjectsController.handleMoveHit(drawing, e, x, y, null, false, pageIndex, true);
-            }
-            else if(hit_in_text_rect)
-            {
-                return drawingObjectsController.handleTextHit(cur_grouped_object, e, x, y, drawing, pageIndex, bWord);
+                var hit_in_inner_area = cur_grouped_object.hitInInnerArea && cur_grouped_object.hitInInnerArea(x, y);
+                var hit_in_path = cur_grouped_object.hitInPath && cur_grouped_object.hitInPath(x, y);
+                var hit_in_text_rect = cur_grouped_object.hitInTextRect && cur_grouped_object.hitInTextRect(x, y);
+                if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                {
+                    return drawingObjectsController.handleMoveHit(drawing, e, x, y, null, false, pageIndex, true);
+                }
+                else if(hit_in_text_rect)
+                {
+                    return drawingObjectsController.handleTextHit(cur_grouped_object, e, x, y, drawing, pageIndex, bWord);
+                }
             }
         }
     }
     return false;
 }
-
-function handleTable(drawing, drawingObjects, drawingObjectsController, e, x, y, handleState)
-{
-    var hit_in_inner_area = drawing.hitInInnerArea(x, y);
-    var hit_in_bounding_rect = drawing.hitInBoundingRect(x, y);
-    if(hit_in_bounding_rect || hit_in_inner_area)
-    {
-        resetGroupChartSelection(drawingObjectsController.State);
-        if(e.CtrlKey && drawingObjectsController.selectedObjects.length > 0)
-        {
-            var b_selected = drawing.selected;
-            drawing.select(drawingObjectsController);
-            for(var j = 0; j < drawingObjectsController.selectedObjects.length; ++j)
-            {
-                drawingObjectsController.addPreTrackObject(drawingObjectsController.selectedObjects[j].createMoveTrack());
-            }
-            drawingObjectsController.changeCurrentState(new PreMoveState(drawingObjectsController, drawingObjects, x, y, e.ShiftKey, e.CtrlKey, drawing, b_selected, true));
-            drawingObjects.OnUpdateOverlay();
-            return true;
-        }
-        else
-        {
-            drawingObjectsController.resetSelection();
-            drawing.select(drawingObjectsController);
-            if(!(e.Button === g_mouse_button_right)&&(!drawing.isTableBorder(x, y)
-                || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false))
-            {
-                drawing.selectionSetStart(e, x, y);
-                drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, drawingObjects, drawing));
-            }
-            else if(e.Button === g_mouse_button_right && drawingObjectsController.State.textObject && drawingObjectsController.State.textObject === drawing && !(drawing.pointInSelectedText(x, y)))
-            {
-                drawing.selectionSetStart(e, x, y);
-                drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, drawingObjects, drawing));
-            }
-            drawingObjects.presentation.Document_UpdateSelectionState();
-            drawingObjects.OnUpdateOverlay();
-            return true;
-        }
-    }
-    return false;
-}
-
 
 function handleChart(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord)
 {
@@ -221,6 +183,23 @@ function handleChart(drawing, drawingObjectsController, e, x, y, group, pageInde
         return ret;
     return false;
 }
+
+
+function handleInlineShapeImage(drawing, drawingObjectsController, e, x, y, pageIndex)
+{
+    var _hit = drawing.hit && drawing.hit(x, y);
+    var _hit_to_path = drawing.hitToPath && drawing.hitToPath(x, y);
+    var b_hit_to_text = drawing.hitInTextRect && drawing.hitInTextRect(x, y);
+    if((_hit && !b_hit_to_text) || _hit_to_path)
+    {
+        return handleInlineHitNoText(drawing, drawingObjectsController, e, x, y, pageIndex);
+    }
+    else if(b_hit_to_text)
+    {
+        return drawingObjectsController.handleTextHit(drawing, e, x, y, null, pageIndex, true);
+    }
+}
+
 
 
 function handleInlineHitNoText(drawing, drawingObjects, e, x, y, pageIndex)
@@ -252,38 +231,29 @@ function handleInlineHitNoText(drawing, drawingObjects, e, x, y, pageIndex)
 function handleInlineObjects(drawingObjectsController, drawingArr, e, x, y, pageIndex, bWord)
 {
     var i;
-    var drawing;
+    var drawing, ret;
     for(i = drawingArr.length-1; i > -1; --i)
     {
         drawing = drawingArr[i];
+
         switch(drawing.getObjectType())
         {
             case historyitem_type_Shape:
             case historyitem_type_ImageShape:
-            case historyitem_type_ChartSpace:
+            case historyitem_type_ChartSpace://TODO
+            {
+                ret = handleInlineShapeImage(drawing, drawingObjectsController, e, x, y, pageIndex);
+                if(ret)
+                    return ret;
+                break;
+            }
             case historyitem_type_GroupShape:
             {
-                var _hit = drawing.hit && drawing.hit(x, y);
-                var _hit_to_path = drawing.hitToPath && drawing.hitToPath(x, y);
-                var b_hit_to_text = drawing.hitToTextRect && drawing.hitToTextRect(x, y);
-                if((_hit && !b_hit_to_text) || _hit_to_path)
-                {
-                    return handleInlineHitNoText(drawing, drawingObjectsController, e, x, y, pageIndex);
-                }
-                else if(b_hit_to_text)
-                {
-                    return false;
-                }
+                ret = handleGroup(drawing, drawingObjectsController, e, x, y, null, pageIndex, bWord);
+                if(ret)
+                    return ret;
+                break;
             }
-            // case historyitem_type_ChartSpace:
-            // {
-            //
-            //     break;
-            // }
-            // case historyitem_type_GroupShape:
-            // {
-            //     break;
-            // }
         }
     }
     return false;
@@ -313,23 +283,4 @@ function handleMouseUpPreMoveState(drawingObjects, e, x, y, pageIndex, bWord)
             }
         }
     }
-}
-
-function handleInlineShapeImage(drawingObjectsController, drawing, e, x, y, pageIndex, bWord)
-{
-    var selected_objects = drawingObjectsController.selectedObjects;
-    var hit = drawing.hit(x, y);
-    var hit_to_path = drawing.hitToPath(x, y);
-    var b_hit_to_text = drawing.hitToTextRect(x, y);
-    if((hit && !b_hit_to_text) || hit_to_path)
-    {
-        handleInlineHitNoText(drawing, drawingObjectsController, e, x, y, pageIndex, handleState);
-        return true;
-    }
-    else if(b_hit_to_text)
-    {
-
-        return true;
-    }
-    return false;
 }

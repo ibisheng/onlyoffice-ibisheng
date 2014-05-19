@@ -2638,7 +2638,7 @@ ZIndexManager.prototype =
         if(arrInd[0] > 0)
         {
             item = this.removeItem(arrInd[0]);
-            this.addItem(--arrInd[0]);
+            this.addItem(--arrInd[0], item);
         }
         for(i = 1; i < arrInd.length; ++i)
         {
