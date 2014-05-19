@@ -1183,7 +1183,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			 * asc_onGetEditorPermissions	(permission)										- эвент о правах редактора
 			 * asc_onGetLicense				(license)											- эвент о лицензии
 			 * asc_onStopFormatPainter		()													- эвент об окончании форматирования по образцу
-			 * asc_onUpdateSheetSettings	()													- 'эвент об обновлении свойств листа (закрепленная область, показывать сетку/заголовки)
+			 * asc_onUpdateSheetSettings	()													- эвент об обновлении свойств листа (закрепленная область, показывать сетку/заголовки)
+			 * asc_onUpdateTabColor			(index)												- эвент об обновлении цвета иконки листа
 			 */
 
 			asc_StartAction: function (type, id) {

@@ -2117,6 +2117,8 @@ Woorksheet.prototype.setTabColor=function(color){
 		new UndoRedoData_FromTo(this.sheetPr.TabColor ? this.sheetPr.TabColor.clone() : null, color ? color.clone() : null));
 
 	this.sheetPr.TabColor = color;
+
+	this.workbook.handlers.trigger("asc_onUpdateTabColor", this.getIndex());
 };
 Woorksheet.prototype.renameWsToCollaborate=function(name){
 	var lastname = this.getName();
