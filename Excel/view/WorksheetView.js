@@ -527,7 +527,7 @@
 				var cFrozen = this.topLeftFrozenCell.getCol0();
 				offsetX = (col < cFrozen) ? 0 : this.cols[this.visibleRange.c1].left - this.cols[cFrozen].left;
 			} else
-				offsetX = this.cols[this.visibleRange.c1].left - this.cellsTop;
+				offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
 
 			var u = units >= 0 && units <= 3 ? units : 0;
 			return (this.cols[col].left - offsetX) * asc_getcvt(1/*pt*/, u, this._getPPIX());
