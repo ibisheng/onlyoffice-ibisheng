@@ -1440,6 +1440,10 @@ cArray.prototype.fillFromArray = function ( arr ) {
     }
 };
 
+function cUndefined(){this.value = undefined;}
+cUndefined.prototype = Object.create( cBaseType.prototype );
+
+
 //функция для определения к какому типу относится значение val.
 function checkTypeCell( val ) {
     if ( val === "" ) {

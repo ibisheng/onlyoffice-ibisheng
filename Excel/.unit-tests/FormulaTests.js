@@ -4710,16 +4710,821 @@
 
         oParser = new parserFormula( "ODDFYIELD(DATE(1990;6;1);DATE(1995;12;31);DATE(1990;1;1);DATE(1990;12;31);6%;790;100;1;1)", "A2", ws );
         ok( oParser.parse() );
+        ok( oParser.assemble() == "ODDFYIELD(DATE(1990,6,1),DATE(1995,12,31),DATE(1990,1,1),DATE(1990,12,31),6%,790,100,1,1)" );
         ok( difBetween(oParser.calculate().getValue(),-0.2889178784774840 ) );
 
         oParser = new parserFormula( "ODDFYIELD(DATE(2008,11,11),DATE(2021,3,1),DATE(2008,10,15),DATE(2009,3,1),0.0575,84.5,100,2,0)", "A2", ws );
         ok( oParser.parse() );
+        ok( oParser.assemble() == "ODDFYIELD(DATE(2008,11,11),DATE(2021,3,1),DATE(2008,10,15),DATE(2009,3,1),0.0575,84.5,100,2,0)" );
         ok( difBetween(oParser.calculate().getValue(), 0.0772455415972989 ) );
 
         oParser = new parserFormula( "ODDFYIELD(DATE(2008;12;11);DATE(2021;4;1);DATE(2008;10;15);DATE(2009;4;1);6%;100;100;4;1)", "A2", ws );
         ok( oParser.parse() );
+        ok( oParser.assemble() == "ODDFYIELD(DATE(2008,12,11),DATE(2021,4,1),DATE(2008,10,15),DATE(2009,4,1),6%,100,100,4,1)" );
         ok( difBetween(oParser.calculate().getValue(), 0.0599769985558904 ) );
 
     } )
+
+    /*
+    * Engineering
+    * */
+
+    test( "Test: \"BIN2DEC\"", function () {
+
+        oParser = new parserFormula( "BIN2DEC(101010)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2DEC(101010)" );
+        strictEqual( oParser.calculate().getValue(), 42 );
+
+        oParser = new parserFormula( "BIN2DEC(\"101010\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2DEC(\"101010\")" );
+        strictEqual( oParser.calculate().getValue(), 42 );
+
+        oParser = new parserFormula( "BIN2DEC(111111111)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2DEC(111111111)" );
+        strictEqual( oParser.calculate().getValue(), 511 );
+
+        oParser = new parserFormula( "BIN2DEC(1000000000)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2DEC(1000000000)" );
+        strictEqual( oParser.calculate().getValue(), -512 );
+
+        oParser = new parserFormula( "BIN2DEC(1111111111)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2DEC(1111111111)" );
+        strictEqual( oParser.calculate().getValue(), -1 );
+
+        oParser = new parserFormula( "BIN2DEC(1234567890)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2DEC(1234567890)" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "BIN2DEC(\"Hello World!\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2DEC(\"Hello World!\")" );
+        strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+    })
+
+    test( "Test: \"BIN2HEX\"", function () {
+
+        oParser = new parserFormula( "BIN2HEX(101010)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2HEX(101010)" );
+        strictEqual( oParser.calculate().getValue(), "2A" );
+
+        oParser = new parserFormula( "BIN2HEX(\"101010\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2HEX(\"101010\")" );
+        strictEqual( oParser.calculate().getValue(), "2A" );
+
+        oParser = new parserFormula( "BIN2HEX(111111111)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2HEX(111111111)" );
+        strictEqual( oParser.calculate().getValue(), "1FF" );
+
+        oParser = new parserFormula( "BIN2HEX(1000000000)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2HEX(1000000000)" );
+        strictEqual( oParser.calculate().getValue(), "FFFFFFFE00" );
+
+        oParser = new parserFormula( "BIN2HEX(1111111111)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2HEX(1111111111)" );
+        strictEqual( oParser.calculate().getValue(), "FFFFFFFFFF" );
+
+        oParser = new parserFormula( "BIN2HEX(101010,2)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2HEX(101010,2)" );
+        strictEqual( oParser.calculate().getValue(), "2A" );
+
+        oParser = new parserFormula( "BIN2HEX(101010,4)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2HEX(101010,4)" );
+        strictEqual( oParser.calculate().getValue(), "002A" );
+
+        oParser = new parserFormula( "BIN2HEX(101010,4.5)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2HEX(101010,4.5)" );
+        strictEqual( oParser.calculate().getValue(), "002A" );
+
+        oParser = new parserFormula( "BIN2HEX(1234567890)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2HEX(1234567890)" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "BIN2HEX(\"Hello World!\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2HEX(\"Hello World!\")" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "BIN2HEX(101010101010)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2HEX(101010101010)" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "BIN2HEX(101010,1)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2HEX(101010,1)" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "BIN2HEX(101010,-4)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2HEX(101010,-4)" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "BIN2HEX(101010, \"Hello World!\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2HEX(101010,\"Hello World!\")" );
+        strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+    })
+
+    test( "Test: \"BIN2OCT\"", function () {
+
+        oParser = new parserFormula( "BIN2OCT(101010)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2OCT(101010)" );
+        strictEqual( oParser.calculate().getValue(), "52" );
+
+        oParser = new parserFormula( "BIN2OCT(\"101010\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2OCT(\"101010\")" );
+        strictEqual( oParser.calculate().getValue(), "52" );
+
+        oParser = new parserFormula( "BIN2OCT(111111111)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2OCT(111111111)" );
+        strictEqual( oParser.calculate().getValue(), "777" );
+
+        oParser = new parserFormula( "BIN2OCT(1000000000)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2OCT(1000000000)" );
+        strictEqual( oParser.calculate().getValue(), "7777777000" );
+
+        oParser = new parserFormula( "BIN2OCT(1111111111)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2OCT(1111111111)" );
+        strictEqual( oParser.calculate().getValue(), "7777777777" );
+
+        oParser = new parserFormula( "BIN2OCT(101010, 2)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2OCT(101010,2)" );
+        strictEqual( oParser.calculate().getValue(), "52" );
+
+        oParser = new parserFormula( "BIN2OCT(101010, 4)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2OCT(101010,4)" );
+        strictEqual( oParser.calculate().getValue(), "0052" );
+
+        oParser = new parserFormula( "BIN2OCT(101010, 4.5)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2OCT(101010,4.5)" );
+        strictEqual( oParser.calculate().getValue(), "0052" );
+
+        oParser = new parserFormula( "BIN2OCT(\"Hello World!\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2OCT(\"Hello World!\")" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "BIN2OCT(1234567890)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2OCT(1234567890)" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "BIN2OCT(101010101010)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2OCT(101010101010)" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "BIN2OCT(101010, 1)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2OCT(101010,1)" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "BIN2OCT(101010, -4)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2OCT(101010,-4)" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "BIN2OCT(101010, \"Hello World!\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "BIN2OCT(101010,\"Hello World!\")" );
+        strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+    })
+
+    test( "Test: \"DEC2BIN\"", function () {
+
+        oParser = new parserFormula( "DEC2BIN(42)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2BIN(42)" );
+        strictEqual( oParser.calculate().getValue(), "101010" );
+
+        oParser = new parserFormula( "DEC2BIN(\"42\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2BIN(\"42\")" );
+        strictEqual( oParser.calculate().getValue(), "101010" );
+
+        oParser = new parserFormula( "DEC2BIN(-512)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2BIN(-512)" );
+        strictEqual( oParser.calculate().getValue(), "1000000000" );
+
+        oParser = new parserFormula( "DEC2BIN(-511)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2BIN(-511)" );
+        strictEqual( oParser.calculate().getValue(), "1000000001" );
+
+        oParser = new parserFormula( "DEC2BIN(-1)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2BIN(-1)" );
+        strictEqual( oParser.calculate().getValue(), "1111111111" );
+
+        oParser = new parserFormula( "DEC2BIN(0)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2BIN(0)" );
+        strictEqual( oParser.calculate().getValue(), "0" );
+
+        oParser = new parserFormula( "DEC2BIN(1)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2BIN(1)" );
+        strictEqual( oParser.calculate().getValue(), "1" );
+
+        oParser = new parserFormula( "DEC2BIN(510)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2BIN(510)" );
+        strictEqual( oParser.calculate().getValue(), "111111110" );
+
+        oParser = new parserFormula( "DEC2BIN(511)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2BIN(511)" );
+        strictEqual( oParser.calculate().getValue(), "111111111" );
+
+        oParser = new parserFormula( "DEC2BIN(42, 6)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2BIN(42,6)" );
+        strictEqual( oParser.calculate().getValue(), "101010" );
+
+        oParser = new parserFormula( "DEC2BIN(42, 8)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2BIN(42,8)" );
+        strictEqual( oParser.calculate().getValue(), "00101010" );
+
+        oParser = new parserFormula( "DEC2BIN(\"Hello World!\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2BIN(\"Hello World!\")" );
+        strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+        oParser = new parserFormula( "DEC2BIN(\"2a\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2BIN(\"2a\")" );
+        strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+        oParser = new parserFormula( "DEC2BIN(-513)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2BIN(-513)" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "DEC2BIN(512)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2BIN(512)" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "DEC2BIN(42, -8)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2BIN(42,-8)" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+    })
+
+    test( "Test: \"DEC2HEX\"", function () {
+
+        oParser = new parserFormula( "DEC2HEX(42)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2HEX(42)" );
+        strictEqual( oParser.calculate().getValue(), "2A" );
+
+        oParser = new parserFormula( "DEC2HEX(\"42\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2HEX(\"42\")" );
+        strictEqual( oParser.calculate().getValue(), "2A" );
+
+        oParser = new parserFormula( "DEC2HEX(-549755813888)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2HEX(-549755813888)" );
+        strictEqual( oParser.calculate().getValue(), "8000000000" );
+
+        oParser = new parserFormula( "DEC2HEX(-549755813887)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2HEX(-549755813887)" );
+        strictEqual( oParser.calculate().getValue(), "8000000001" );
+
+        oParser = new parserFormula( "DEC2HEX(-1)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2HEX(-1)" );
+        strictEqual( oParser.calculate().getValue(), "FFFFFFFFFF" );
+
+        oParser = new parserFormula( "DEC2HEX(0)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2HEX(0)" );
+        strictEqual( oParser.calculate().getValue(), "0" );
+
+        oParser = new parserFormula( "DEC2HEX(1)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2HEX(1)" );
+        strictEqual( oParser.calculate().getValue(), "1" );
+
+        oParser = new parserFormula( "DEC2HEX(549755813886)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2HEX(549755813886)" );
+        strictEqual( oParser.calculate().getValue(), "7FFFFFFFFE" );
+
+        oParser = new parserFormula( "DEC2HEX(549755813887)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2HEX(549755813887)" );
+        strictEqual( oParser.calculate().getValue(), "7FFFFFFFFF" );
+
+        oParser = new parserFormula( "DEC2HEX(42, 2)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2HEX(42,2)" );
+        strictEqual( oParser.calculate().getValue(), "2A" );
+
+        oParser = new parserFormula( "DEC2HEX(42, 4)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2HEX(42,4)" );
+        strictEqual( oParser.calculate().getValue(), "002A" );
+
+        oParser = new parserFormula( "DEC2HEX(\"Hello World!\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2HEX(\"Hello World!\")" );
+        strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+        oParser = new parserFormula( "DEC2HEX(\"2a\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2HEX(\"2a\")" );
+        strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+    })
+
+    test( "Test: \"DEC2OCT\"", function () {
+
+        oParser = new parserFormula( "DEC2OCT(42)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2OCT(42)" );
+        strictEqual( oParser.calculate().getValue(), "52" );
+
+        oParser = new parserFormula( "DEC2OCT(\"42\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2OCT(\"42\")" );
+        strictEqual( oParser.calculate().getValue(), "52" );
+
+        oParser = new parserFormula( "DEC2OCT(-536870912)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2OCT(-536870912)" );
+        strictEqual( oParser.calculate().getValue(), "4000000000" );
+
+        oParser = new parserFormula( "DEC2OCT(-536870911)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2OCT(-536870911)" );
+        strictEqual( oParser.calculate().getValue(), "4000000001" );
+
+        oParser = new parserFormula( "DEC2OCT(-1)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2OCT(-1)" );
+        strictEqual( oParser.calculate().getValue(), "7777777777" );
+
+        oParser = new parserFormula( "DEC2OCT(0)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2OCT(0)" );
+        strictEqual( oParser.calculate().getValue(), "0" );
+
+        oParser = new parserFormula( "DEC2OCT(-0)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2OCT(-0)" );
+        strictEqual( oParser.calculate().getValue(), "0" );
+
+        oParser = new parserFormula( "DEC2OCT(1)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2OCT(1)" );
+        strictEqual( oParser.calculate().getValue(), "1" );
+
+        oParser = new parserFormula( "DEC2OCT(536870910)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2OCT(536870910)" );
+        strictEqual( oParser.calculate().getValue(), "3777777776" );
+
+        oParser = new parserFormula( "DEC2OCT(536870911)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2OCT(536870911)" );
+        strictEqual( oParser.calculate().getValue(), "3777777777" );
+
+        oParser = new parserFormula( "DEC2OCT(42, 2)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2OCT(42,2)" );
+        strictEqual( oParser.calculate().getValue(), "52" );
+
+        oParser = new parserFormula( "DEC2OCT(42, 4)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2OCT(42,4)" );
+        strictEqual( oParser.calculate().getValue(), "0052" );
+
+        oParser = new parserFormula( "DEC2OCT(\"Hello World!\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2OCT(\"Hello World!\")" );
+        strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+        oParser = new parserFormula( "DEC2OCT(\"2a\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2OCT(\"2a\")" );
+        strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+        oParser = new parserFormula( "DEC2OCT(-536870913)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2OCT(-536870913)" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "DEC2OCT(536870912)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2OCT(536870912)" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "DEC2OCT(42, 1)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "DEC2OCT(42,1)" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+    })
+
+    test( "Test: \"HEX2BIN\"", function () {
+
+        oParser = new parserFormula( "HEX2BIN(\"2a\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2BIN(\"2a\")" );
+        strictEqual( oParser.calculate().getValue(), "101010" );
+
+        oParser = new parserFormula( "HEX2BIN(\"fffffffe00\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2BIN(\"fffffffe00\")" );
+        strictEqual( oParser.calculate().getValue(), "1000000000" );
+
+        oParser = new parserFormula( "HEX2BIN(\"fffffffe01\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2BIN(\"fffffffe01\")" );
+        strictEqual( oParser.calculate().getValue(), "1000000001" );
+
+        oParser = new parserFormula( "HEX2BIN(\"ffffffffff\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2BIN(\"ffffffffff\")" );
+        strictEqual( oParser.calculate().getValue(), "1111111111" );
+
+        oParser = new parserFormula( "HEX2BIN(0)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2BIN(0)" );
+        strictEqual( oParser.calculate().getValue(), "0" );
+
+        oParser = new parserFormula( "HEX2BIN(1)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2BIN(1)" );
+        strictEqual( oParser.calculate().getValue(), "1" );
+
+        oParser = new parserFormula( "HEX2BIN(\"1fe\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2BIN(\"1fe\")" );
+        strictEqual( oParser.calculate().getValue(), "111111110" );
+
+        oParser = new parserFormula( "HEX2BIN(\"1ff\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2BIN(\"1ff\")" );
+        strictEqual( oParser.calculate().getValue(), "111111111" );
+
+        oParser = new parserFormula( "HEX2BIN(\"2a\",6)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2BIN(\"2a\",6)" );
+        strictEqual( oParser.calculate().getValue(), "101010" );
+
+        oParser = new parserFormula( "HEX2BIN(\"2a\",8)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2BIN(\"2a\",8)" );
+        strictEqual( oParser.calculate().getValue(), "00101010" );
+
+        oParser = new parserFormula( "HEX2BIN(\"Hello World!\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2BIN(\"Hello World!\")" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "HEX2BIN(\"fffffffdff\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2BIN(\"fffffffdff\")" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "HEX2BIN(\"200\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2BIN(\"200\")" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "HEX2BIN(\"2a\", 5)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2BIN(\"2a\",5)" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "HEX2BIN(\"2a\", -8)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2BIN(\"2a\",-8)" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "HEX2BIN(\"2a\", \"Hello World!\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2BIN(\"2a\",\"Hello World!\")" );
+        strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+    })
+
+    test( "Test: \"HEX2DEC\"", function () {
+
+        oParser = new parserFormula( "HEX2DEC(\"2a\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2DEC(\"2a\")" );
+        strictEqual( oParser.calculate().getValue(), 42);
+
+        oParser = new parserFormula( "HEX2DEC(\"8000000000\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2DEC(\"8000000000\")" );
+        strictEqual( oParser.calculate().getValue(), -549755813888);
+
+        oParser = new parserFormula( "HEX2DEC(\"ffffffffff\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2DEC(\"ffffffffff\")" );
+        strictEqual( oParser.calculate().getValue(), -1);
+
+        oParser = new parserFormula( "HEX2DEC(\"0\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2DEC(\"0\")" );
+        strictEqual( oParser.calculate().getValue(), 0);
+
+        oParser = new parserFormula( "HEX2DEC(\"1\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2DEC(\"1\")" );
+        strictEqual( oParser.calculate().getValue(), 1);
+
+        oParser = new parserFormula( "HEX2DEC(0)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2DEC(0)" );
+        strictEqual( oParser.calculate().getValue(), 0);
+
+        oParser = new parserFormula( "HEX2DEC(1)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2DEC(1)" );
+        strictEqual( oParser.calculate().getValue(), 1);
+
+        oParser = new parserFormula( "HEX2DEC(\"7fffffffff\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2DEC(\"7fffffffff\")" );
+        strictEqual( oParser.calculate().getValue(), 549755813887);
+
+    })
+
+    test( "Test: \"HEX2OCT\"", function () {
+
+        oParser = new parserFormula( "HEX2OCT(\"2a\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2OCT(\"2a\")" );
+        strictEqual( oParser.calculate().getValue(), "52");
+
+        oParser = new parserFormula( "HEX2OCT(\"ffe0000000\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2OCT(\"ffe0000000\")" );
+        strictEqual( oParser.calculate().getValue(), "4000000000");
+
+        oParser = new parserFormula( "HEX2OCT(\"ffe0000001\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2OCT(\"ffe0000001\")" );
+        strictEqual( oParser.calculate().getValue(), "4000000001");
+
+        oParser = new parserFormula( "HEX2OCT(0)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2OCT(0)" );
+        strictEqual( oParser.calculate().getValue(), "0");
+
+        oParser = new parserFormula( "HEX2OCT(1)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2OCT(1)" );
+        strictEqual( oParser.calculate().getValue(), "1");
+
+        oParser = new parserFormula( "HEX2OCT(\"1ffffffe\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2OCT(\"1ffffffe\")" );
+        strictEqual( oParser.calculate().getValue(), "3777777776");
+
+        oParser = new parserFormula( "HEX2OCT(\"1fffffff\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2OCT(\"1fffffff\")" );
+        strictEqual( oParser.calculate().getValue(), "3777777777");
+
+        oParser = new parserFormula( "HEX2OCT(\"2a\",2)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2OCT(\"2a\",2)" );
+        strictEqual( oParser.calculate().getValue(), "52");
+
+        oParser = new parserFormula( "HEX2OCT(\"2a\",4)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2OCT(\"2a\",4)" );
+        strictEqual( oParser.calculate().getValue(), "0052");
+
+        oParser = new parserFormula( "HEX2OCT(\"Hello World!\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2OCT(\"Hello World!\")" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!");
+
+        oParser = new parserFormula( "HEX2OCT(\"ffdfffffff\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2OCT(\"ffdfffffff\")" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!");
+
+        oParser = new parserFormula( "HEX2OCT(\"2a\", 1)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "HEX2OCT(\"2a\",1)" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!");
+
+    })
+
+    test( "Test: \"OCT2BIN\"", function () {
+
+        oParser = new parserFormula( "OCT2BIN(\"52\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2BIN(\"52\")" );
+        strictEqual( oParser.calculate().getValue(), "101010");
+
+        oParser = new parserFormula( "OCT2BIN(\"7777777000\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2BIN(\"7777777000\")" );
+        strictEqual( oParser.calculate().getValue(), "1000000000");
+
+        oParser = new parserFormula( "OCT2BIN(\"7777777001\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2BIN(\"7777777001\")" );
+        strictEqual( oParser.calculate().getValue(), "1000000001");
+
+        oParser = new parserFormula( "OCT2BIN(\"7777777777\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2BIN(\"7777777777\")" );
+        strictEqual( oParser.calculate().getValue(), "1111111111");
+
+        oParser = new parserFormula( "OCT2BIN(\"0\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2BIN(\"0\")" );
+        strictEqual( oParser.calculate().getValue(), "0");
+
+        oParser = new parserFormula( "OCT2BIN(\"1\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2BIN(\"1\")" );
+        strictEqual( oParser.calculate().getValue(), "1");
+
+        oParser = new parserFormula( "OCT2BIN(\"776\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2BIN(\"776\")" );
+        strictEqual( oParser.calculate().getValue(), "111111110");
+
+        oParser = new parserFormula( "OCT2BIN(\"777\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2BIN(\"777\")" );
+        strictEqual( oParser.calculate().getValue(), "111111111");
+
+        oParser = new parserFormula( "OCT2BIN(\"52\", 6)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2BIN(\"52\",6)" );
+        strictEqual( oParser.calculate().getValue(), "101010");
+
+        oParser = new parserFormula( "OCT2BIN(\"52\", 8)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2BIN(\"52\",8)" );
+        strictEqual( oParser.calculate().getValue(), "00101010");
+
+        oParser = new parserFormula( "OCT2BIN(\"Hello World!\", 8)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2BIN(\"Hello World!\",8)" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!");
+
+        oParser = new parserFormula( "OCT2BIN(\"52\",\"Hello World!\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2BIN(\"52\",\"Hello World!\")" );
+        strictEqual( oParser.calculate().getValue(), "#VALUE!");
+
+    })
+
+    test( "Test: \"OCT2DEC\"", function () {
+
+        oParser = new parserFormula( "OCT2DEC(\"52\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2DEC(\"52\")" );
+        strictEqual( oParser.calculate().getValue(), 42);
+
+        oParser = new parserFormula( "OCT2DEC(\"4000000000\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2DEC(\"4000000000\")" );
+        strictEqual( oParser.calculate().getValue(), -536870912);
+
+        oParser = new parserFormula( "OCT2DEC(\"7777777777\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2DEC(\"7777777777\")" );
+        strictEqual( oParser.calculate().getValue(), -1);
+
+        oParser = new parserFormula( "OCT2DEC(\"0\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2DEC(\"0\")" );
+        strictEqual( oParser.calculate().getValue(), 0);
+
+        oParser = new parserFormula( "OCT2DEC(\"1\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2DEC(\"1\")" );
+        strictEqual( oParser.calculate().getValue(), 1);
+
+        oParser = new parserFormula( "OCT2DEC(\"3777777776\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2DEC(\"3777777776\")" );
+        strictEqual( oParser.calculate().getValue(), 536870910);
+
+        oParser = new parserFormula( "OCT2DEC(\"3777777777\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2DEC(\"3777777777\")" );
+        strictEqual( oParser.calculate().getValue(), 536870911);
+
+        oParser = new parserFormula( "OCT2DEC(\"3777777777\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2DEC(\"3777777777\")" );
+        strictEqual( oParser.calculate().getValue(), 536870911);
+
+    })
+
+    test( "Test: \"OCT2HEX\"", function () {
+
+        oParser = new parserFormula( "OCT2HEX(\"52\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2HEX(\"52\")" );
+        strictEqual( oParser.calculate().getValue(), "2A");
+
+        oParser = new parserFormula( "OCT2HEX(\"4000000000\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2HEX(\"4000000000\")" );
+        strictEqual( oParser.calculate().getValue(), "FFE0000000");
+
+        oParser = new parserFormula( "OCT2HEX(\"4000000001\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2HEX(\"4000000001\")" );
+        strictEqual( oParser.calculate().getValue(), "FFE0000001");
+
+        oParser = new parserFormula( "OCT2HEX(\"7777777777\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2HEX(\"7777777777\")" );
+        strictEqual( oParser.calculate().getValue(), "FFFFFFFFFF");
+
+        oParser = new parserFormula( "OCT2HEX(\"0\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2HEX(\"0\")" );
+        strictEqual( oParser.calculate().getValue(), "0");
+
+        oParser = new parserFormula( "OCT2HEX(\"1\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2HEX(\"1\")" );
+        strictEqual( oParser.calculate().getValue(), "1");
+
+        oParser = new parserFormula( "OCT2HEX(\"3777777776\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2HEX(\"3777777776\")" );
+        strictEqual( oParser.calculate().getValue(), "1FFFFFFE");
+
+        oParser = new parserFormula( "OCT2HEX(\"3777777777\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2HEX(\"3777777777\")" );
+        strictEqual( oParser.calculate().getValue(), "1FFFFFFF");
+
+        oParser = new parserFormula( "OCT2HEX(\"52\", 2)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2HEX(\"52\",2)" );
+        strictEqual( oParser.calculate().getValue(), "2A");
+
+        oParser = new parserFormula( "OCT2HEX(\"52\", 4)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2HEX(\"52\",4)" );
+        strictEqual( oParser.calculate().getValue(), "002A");
+
+        oParser = new parserFormula( "OCT2HEX(\"Hello World!\", 4)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2HEX(\"Hello World!\",4)" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!");
+
+        oParser = new parserFormula( "OCT2HEX(\"52\", -4)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2HEX(\"52\",-4)" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!");
+
+        oParser = new parserFormula( "OCT2HEX(\"52\", \"Hello World!\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "OCT2HEX(\"52\",\"Hello World!\")" );
+        strictEqual( oParser.calculate().getValue(), "#VALUE!");
+
+    })
 
 } );
