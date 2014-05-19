@@ -1965,6 +1965,38 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.collaborativeEditing.onEndCheckLock(callback);
 			},
 
+			// Залочена ли панель для закрепления
+			_isLockedTabColor: function (index, callback) {
+				if (false === this.collaborativeEditing.isCoAuthoringExcellEnable()) {
+					// Запрещено совместное редактирование
+					asc_applyFunction(callback, true);
+					return;
+				}
+				var sheetId = this.wbModel.getWorksheet(index).getId();
+				var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId, c_oAscLockNameTabColor);
+
+				if (false === this.collaborativeEditing.getCollaborativeEditing()) {
+					// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
+					asc_applyFunction(callback, true);
+					callback = undefined;
+				}
+				if (false !== this.collaborativeEditing.getLockIntersection(lockInfo,
+					c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
+					// Редактируем сами
+					asc_applyFunction(callback, true);
+					return;
+				} else if (false !== this.collaborativeEditing.getLockIntersection(lockInfo,
+					c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
+					// Уже ячейку кто-то редактирует
+					asc_applyFunction(callback, false);
+					return;
+				}
+
+				this.collaborativeEditing.onStartCheckLock();
+				this.collaborativeEditing.addCheckLock(lockInfo);
+				this.collaborativeEditing.onEndCheckLock(callback);
+			},
+
 			// Toolbar interface
 
 			/*asc_getEditorFonts: function () {
@@ -2011,7 +2043,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				return this.wbModel.getWorksheet(index).getTabColor();
 			},
 			asc_setWorksheetTabColor: function (index, color) {
-				this.wbModel.getWorksheet(index).setTabColor(color);
+				var t = this;
+				var changeTabColorCallback = function (res) {
+					if (res) {
+						color = CorrectAscColor(color);
+						t.wbModel.getWorksheet(index).setTabColor(color);
+					}
+				};
+				this._isLockedTabColor(index, changeTabColorCallback);
 			},
 
 			asc_getActiveWorksheetIndex: function () {

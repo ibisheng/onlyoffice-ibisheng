@@ -357,6 +357,7 @@ var UndoRedoDataTypes = new function() {
     this.DocContentParaItemId = 66;
     this.ParagraphAddParaItem = 67;
     this.ParagraphParaItemAdd = 68;
+	this.SheetPr = 69;
 
     this.Create = function(nType)
 	{
@@ -3349,6 +3350,8 @@ UndoRedoWoorksheet.prototype = {
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
 			var updateData = bUndo ? Data.from : Data.to;
 			worksheetView._updateFreezePane(updateData.c1, updateData.r1, /*lockDraw*/true);
+		} else if (historyitem_Worksheet_SetTabColor === Type) {
+			ws.setTabColor(bUndo ? Data.from : Data.to);
 		}
 	}
 };

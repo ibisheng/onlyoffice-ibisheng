@@ -2106,11 +2106,16 @@ Woorksheet.prototype.setName=function(name){
 	}
 };
 Woorksheet.prototype.getTabColor=function(){
-	return this.sheetPr ? this.sheetPr.TabColor : null;
+	return this.sheetPr && this.sheetPr.TabColor ? Asc.colorObjToAscColor(this.sheetPr.TabColor) : null;
 };
 Woorksheet.prototype.setTabColor=function(color){
 	if (!this.sheetPr)
 		this.sheetPr = new Asc.asc_CSheetPr();
+
+	History.Create_NewPoint();
+	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_SetTabColor, this.getId(), null,
+		new UndoRedoData_FromTo(this.sheetPr.TabColor ? this.sheetPr.TabColor.clone() : null, color ? color.clone() : null));
+
 	this.sheetPr.TabColor = color;
 };
 Woorksheet.prototype.renameWsToCollaborate=function(name){

@@ -36,6 +36,7 @@ var historyitem_Worksheet_SetViewSettings = 23;
 var historyitem_Worksheet_RemoveCellFormula = 24;
 var historyitem_Worksheet_ChangeMerge = 25;
 var historyitem_Worksheet_ChangeHyperlink = 26;
+var historyitem_Worksheet_SetTabColor = 27;
 // Frozen cell
 var historyitem_Worksheet_ChangeFrozenCell = 30;
 

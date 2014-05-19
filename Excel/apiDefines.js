@@ -495,5 +495,6 @@ var c_oAscCoAuthoringDottedWidth					= 2;
 var c_oAscCoAuthoringDottedDistance					= 2;
 
 var c_oAscLockNameFrozenPane	= "frozenPane";
+var c_oAscLockNameTabColor		= "tabColor";
 
 var FONT_THUMBNAIL_HEIGHT = parseInt(7 * 96.0 / 25.4);
