@@ -1373,11 +1373,9 @@ BinaryChartWriter.prototype.WriteCT_Legend = function (oVal) {
             }
         }
     }
-    if (null != oVal.layout) {
-        this.bs.WriteItem(c_oserct_legendLAYOUT, function () {
-            oThis.WriteCT_Layout(oVal.layout);
-        });
-    }
+    this.bs.WriteItem(c_oserct_legendLAYOUT, function () {
+        oThis.WriteCT_Layout(oVal);
+    });
     if (null != oVal.overlay) {
         this.bs.WriteItem(c_oserct_legendOVERLAY, function () {
             oThis.WriteCT_Boolean(oVal.overlay);
@@ -1402,9 +1400,9 @@ BinaryChartWriter.prototype.WriteCT_Legend = function (oVal) {
 }
 BinaryChartWriter.prototype.WriteCT_Layout = function (oVal) {
     var oThis = this;
-    if (null != oVal) {
+    if (null != oVal.layout) {
         this.bs.WriteItem(c_oserct_layoutMANUALLAYOUT, function () {
-            oThis.WriteCT_ManualLayout(oVal);
+            oThis.WriteCT_ManualLayout(oVal.layout);
         });
     }
     // var oCurVal = oVal.m_extLst;
@@ -1729,11 +1727,9 @@ BinaryChartWriter.prototype.WriteCT_Title = function (oVal) {
             oThis.WriteCT_Tx(oVal.tx);
         });
     }
-    if (null != oVal.layout) {
-        this.bs.WriteItem(c_oserct_titleLAYOUT, function () {
-            oThis.WriteCT_Layout(oVal.layout);
-        });
-    }
+    this.bs.WriteItem(c_oserct_titleLAYOUT, function () {
+        oThis.WriteCT_Layout(oVal);
+    });
     if (null != oVal.overlay) {
         this.bs.WriteItem(c_oserct_titleOVERLAY, function () {
             oThis.WriteCT_Boolean(oVal.overlay);
@@ -2192,11 +2188,9 @@ BinaryChartWriter.prototype.WriteCT_CatAx = function (oVal) {
 }
 BinaryChartWriter.prototype.WriteCT_DispUnitsLbl = function (oVal) {
     var oThis = this;
-    if (null != oVal.layout) {
-        this.bs.WriteItem(c_oserct_dispunitslblLAYOUT, function () {
-            oThis.WriteCT_Layout(oVal.layout);
-        });
-    }
+    this.bs.WriteItem(c_oserct_dispunitslblLAYOUT, function () {
+        oThis.WriteCT_Layout(oVal);
+    });
     if (null != oVal.tx) {
         this.bs.WriteItem(c_oserct_dispunitslblTX, function () {
             oThis.WriteCT_Tx(oVal.tx);
@@ -2760,11 +2754,9 @@ BinaryChartWriter.prototype.WriteCT_DLbl = function (oVal) {
             oThis.WriteCT_Boolean(oVal.bDelete);
         });
     }
-    if (null != oVal.layout) {
-        this.bs.WriteItem(c_oserct_dlblLAYOUT, function () {
-            oThis.WriteCT_Layout(oVal.layout);
-        });
-    }
+    this.bs.WriteItem(c_oserct_dlblLAYOUT, function () {
+        oThis.WriteCT_Layout(oVal);
+    });
     if (null != oVal.numFmt) {
         this.bs.WriteItem(c_oserct_dlblNUMFMT, function () {
             oThis.WriteCT_NumFmt(oVal.numFmt);
@@ -2950,11 +2942,9 @@ BinaryChartWriter.prototype.WriteCT_Period = function (oVal) {
 }
 BinaryChartWriter.prototype.WriteCT_TrendlineLbl = function (oVal) {
     var oThis = this;
-    if (null != oVal.layout) {
-        this.bs.WriteItem(c_oserct_trendlinelblLAYOUT, function () {
-            oThis.WriteCT_Layout(oVal.layout);
-        });
-    }
+    this.bs.WriteItem(c_oserct_trendlinelblLAYOUT, function () {
+        oThis.WriteCT_Layout(oVal);
+    });
     if (null != oVal.tx) {
         this.bs.WriteItem(c_oserct_trendlinelblTX, function () {
             oThis.WriteCT_Tx(oVal.tx);
@@ -4742,11 +4732,9 @@ BinaryChartWriter.prototype.WriteCT_AreaChart = function (oVal) {
 }
 BinaryChartWriter.prototype.WriteCT_PlotArea = function (oVal) {
     var oThis = this;
-    if (null != oVal.layout) {
-        this.bs.WriteItem(c_oserct_plotareaLAYOUT, function () {
-            oThis.WriteCT_Layout(oVal.layout);
-        });
-    }
+    this.bs.WriteItem(c_oserct_plotareaLAYOUT, function () {
+        oThis.WriteCT_Layout(oVal);
+    });
     for (var i = 0, length = oVal.charts.length; i < length; ++i) {
         var chart = oVal.charts[i];
         if (chart instanceof CAreaChart) {
@@ -5890,11 +5878,9 @@ BinaryChartReader.prototype.ReadCT_Legend = function (type, length, val) {
         val.addLegendEntry(oNewVal);
     }
     else if (c_oserct_legendLAYOUT === type) {
-        var oNewVal = new CLayout();
         res = this.bcr.Read1(length, function (t, l) {
-            return oThis.ReadCT_Layout(t, l, oNewVal);
+            return oThis.ReadCT_Layout(t, l, val);
         });
-        val.setLayout(oNewVal);
     }
     else if (c_oserct_legendOVERLAY === type) {
         var oNewVal = { m_val: null };
@@ -5927,10 +5913,11 @@ BinaryChartReader.prototype.ReadCT_Layout = function (type, length, val) {
     var res = c_oSerConstants.ReadOk;
     var oThis = this;
     if (c_oserct_layoutMANUALLAYOUT === type) {
-        //todo  ?
+        var oNewVal = new CLayout();
         res = this.bcr.Read1(length, function (t, l) {
-            return oThis.ReadCT_ManualLayout(t, l, val);
+            return oThis.ReadCT_ManualLayout(t, l, oNewVal);
         });
+        val.setLayout(oNewVal);
     }
     else if (c_oserct_layoutEXTLST === type) {
         var oNewVal;
@@ -6383,11 +6370,9 @@ BinaryChartReader.prototype.ReadCT_Title = function (type, length, val) {
         val.setTx(oNewVal);
     }
     else if (c_oserct_titleLAYOUT === type) {
-        var oNewVal = new CLayout();
         res = this.bcr.Read1(length, function (t, l) {
-            return oThis.ReadCT_Layout(t, l, oNewVal);
+            return oThis.ReadCT_Layout(t, l, val);
         });
-        val.setLayout(oNewVal);
     }
     else if (c_oserct_titleOVERLAY === type) {
         var oNewVal = { m_val: null };
@@ -6999,11 +6984,9 @@ BinaryChartReader.prototype.ReadCT_DispUnitsLbl = function (type, length, val) {
     var res = c_oSerConstants.ReadOk;
     var oThis = this;
     if (c_oserct_dispunitslblLAYOUT === type) {
-        var oNewVal = new CLayout();
         res = this.bcr.Read1(length, function (t, l) {
-            return oThis.ReadCT_Layout(t, l, oNewVal);
+            return oThis.ReadCT_Layout(t, l, val);
         });
-        val.setLayout(oNewVal);
     }
     else if (c_oserct_dispunitslblTX === type) {
         var oNewVal = new CChartText();
@@ -7763,11 +7746,9 @@ BinaryChartReader.prototype.ReadCT_DLbl = function (type, length, val) {
             val.setDelete(oNewVal.m_val);
     }
     else if (c_oserct_dlblLAYOUT === type) {
-        var oNewVal = new CLayout();
         res = this.bcr.Read1(length, function (t, l) {
-            return oThis.ReadCT_Layout(t, l, oNewVal);
+            return oThis.ReadCT_Layout(t, l, val);
         });
-        val.setLayout(oNewVal);
     }
     else if (c_oserct_dlblNUMFMT === type) {
         var oNewVal = new CNumFmt();
@@ -8010,11 +7991,9 @@ BinaryChartReader.prototype.ReadCT_TrendlineLbl = function (type, length, val) {
     var res = c_oSerConstants.ReadOk;
     var oThis = this;
     if (c_oserct_trendlinelblLAYOUT === type) {
-        var oNewVal = new CLayout();
         res = this.bcr.Read1(length, function (t, l) {
-            return oThis.ReadCT_Layout(t, l, oNewVal);
+            return oThis.ReadCT_Layout(t, l, val);
         });
-        val.setLayout(oNewVal);
     }
     else if (c_oserct_trendlinelblTX === type) {
         var oNewVal = new CChartText();
@@ -10267,11 +10246,9 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
     var res = c_oSerConstants.ReadOk;
     var oThis = this;
     if (c_oserct_plotareaLAYOUT === type) {
-        var oNewVal = new CLayout();
         res = this.bcr.Read1(length, function (t, l) {
-            return oThis.ReadCT_Layout(t, l, oNewVal);
+            return oThis.ReadCT_Layout(t, l, val);
         });
-        val.setLayout(oNewVal);
     }
     else if (c_oserct_plotareaAREA3DCHART === type) {
         var oNewVal = new CAreaChart();
