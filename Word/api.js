@@ -8805,12 +8805,12 @@ asc_docs_api.prototype.asc_AddMath2 = function(Type)
 						MathElement.AddText(oArg, argText);
 						MathElement.AddText(MathElement.Root, "=");
 						
-						props = {ctrPrp: new CTextPr(), };
+						props = {ctrPrp: new CTextPr()};
 						var oFraction = new CFraction(props);
 						MathElement.CreateElem(oFraction, MathElement.Root);
 						
 						var oNum = oFraction.getNumerator();						
-						props = {ctrPrp: new CTextPr(), };
+						props = {ctrPrp: new CTextPr()};
 						var oFuncNum = new CMathFunc(props);
 						MathElement.CreateElem(oFuncNum,oNum);
 						var oFNameNum = oFuncNum.getFName();
@@ -8820,7 +8820,7 @@ asc_docs_api.prototype.asc_AddMath2 = function(Type)
 						MathElement.AddText(oArgNum, argText);
 						
 						var oDen = oFraction.getDenominator();
-						props = {ctrPrp: new CTextPr(), };
+						props = {ctrPrp: new CTextPr()};
 						var oFuncDen = new CMathFunc(props);
 						MathElement.CreateElem(oFuncDen,oDen);
 						var oFNameDen = oFuncDen.getFName();
@@ -9115,7 +9115,7 @@ asc_docs_api.prototype.asc_AddMath2 = function(Type)
 						var delElem = oDelimiter.getBase(0);
 						MathElement.AddText(delElem,"1+");
 						
-						props = {ctrPrp: new CTextPr(), };
+						props = {ctrPrp: new CTextPr()};
 						var oFraction = new CFraction(props);
 						MathElement.CreateFraction(oFraction,delElem,"1","n");
 						break;
