@@ -5207,6 +5207,7 @@ function BinaryFileReader(doc, openParams)
 		}
 		//запоминаем стили которые надо заменить
 		var oIdRenameMap = {};
+		//заменяем id стилей по умолчанию если они, если они совпали со стилями открываемого документа
 		for(var i in this.oReadResult.styles)
 		{
 			var elem = this.oReadResult.styles[i];
@@ -5214,18 +5215,6 @@ function BinaryFileReader(doc, openParams)
 			var oNewId = elem.param;
 		    if(g_nCurFileVersion < 2)
                 oNewStyle.qFormat = true;
-            //такой код для сранения имен есть в DrawingDocument.js
-            // как только меняется DrawingDocument - меняется и код здесь.
-            var sNewStyleName = oNewStyle.Name.toLowerCase().replace(/\s/g,"");
-			var oStartDocStyle = aStartDocStylesNames[sNewStyleName];
-            //Удаляем стили с тем же именем
-            if(oStartDocStyle)
-            {
-				var stId = oStartDocStyle.Get_Id();
-				oNewStyle.Name = oStartDocStyle.Name;
-				oIdRenameMap[stId] = {id: oNewId.id, def: oNewId.def, type: oNewStyle.Type, newName: sNewStyleName};
-				delete styles[stId];
-			}
 			var oCollisionStyle = styles[oNewId.id];
 			if(oCollisionStyle)
 			{
@@ -5237,7 +5226,7 @@ function BinaryFileReader(doc, openParams)
 					nCounter++;
 					sNewId = sOldId + "_" + nCounter;
 				}
-				var oNewId = {id: sNewId, def: false, type: oCollisionStyle.Type, newName: sNewStyleName};
+				var oNewId = {id: sNewId, def: false, type: oCollisionStyle.Type, newName: oCollisionStyle.Name.toLowerCase().replace(/\s/g,"")};
 				oIdRenameMap[sOldId] = oNewId;
 				if(stDefault.Numbering == sOldId || stDefault.Paragraph == sOldId || stDefault.Table == sOldId)
 					oNewId.def = true;
@@ -5246,32 +5235,72 @@ function BinaryFileReader(doc, openParams)
 				styles[sNewId] = oCollisionStyle;
 			}
 		}
+		//Удаляем стили с тем же именем
+		for(var i in this.oReadResult.styles)
+		{
+			var elem = this.oReadResult.styles[i];
+			var oNewStyle = elem.style;
+			var oNewId = elem.param;
+            //такой код для сранения имен есть в DrawingDocument.js
+            // как только меняется DrawingDocument - меняется и код здесь.
+            var sNewStyleName = oNewStyle.Name.toLowerCase().replace(/\s/g,"");
+			var oStartDocStyle = aStartDocStylesNames[sNewStyleName];
+            if(oStartDocStyle)
+            {
+				var stId = oStartDocStyle.Get_Id();
+				oNewStyle.Set_Name(oStartDocStyle.Name);
+				oIdRenameMap[stId] = {id: oNewId.id, def: oNewId.def, type: oNewStyle.Type, newName: sNewStyleName};
+				delete styles[stId];
+			}
+		}
+		//уменьшаем oIdRenameMap за счет последовательных ссылок
+		for(var stId in oIdRenameMap){
+			var oNewId = oIdRenameMap[stId];
+			while(null != oNewId){
+				var oNewId2 = oIdRenameMap[oNewId.id];
+				if(null != oNewId2){
+					delete oIdRenameMap[oNewId.id];
+					oIdRenameMap[stId] = oNewId2;
+				}
+				oNewId = oNewId2;
+			}
+		}
+		//меняем BasedOn и Next
+		for(var stId in styles)
+        {
+            var stObj = styles[stId];
+			var oNewId;
+			if(null != stObj.BasedOn){
+				oNewId = oIdRenameMap[stObj.BasedOn];
+				if(null != oNewId)
+					stObj.Set_BasedOn(oNewId.id);
+			}
+			if(null != stObj.Next){
+				oNewId = oIdRenameMap[stObj.Next];
+				if(null != oNewId)
+					stObj.Set_Next(oNewId.id);
+			}
+        }
+		//меняем Headings
+		for(var i = 0, length = stDefault.Headings.length; i < length; ++i)
+        {
+            var sHeading = stDefault.Headings[i];
+			var oNewId = oIdRenameMap[sHeading];
+			if(null != oNewId)
+				stDefault.Headings[i] = oNewId.id;
+        }
 		//меняем старые id
 		for(var sOldId in oIdRenameMap)
 		{
 			var oNewId = oIdRenameMap[sOldId];
 			var sNewStyleName = oNewId.newName;
 			var stId = sOldId;
-            for(var stId2 in styles)
-            {
-                var stObj2 = styles[stId2];
-                if (stObj2.BasedOn == stId)
-                    stObj2.BasedOn = oNewId.id;
-                if (stObj2.Next == stId)
-                    stObj2.Next = oNewId.id;
-            }
             if(stDefault.Paragraph == stId)
-                stDefault.Paragraph = oNewId.id;
+                stDefault.Paragraph = null;
             if(stDefault.Numbering == stId)
-                stDefault.Numbering = oNewId.id;
+                stDefault.Numbering = null;
             if(stDefault.Table == stId)
-                stDefault.Table = oNewId.id;
-            for(var j = 0, length2 = stDefault.Headings.length; j < length2; ++j)
-            {
-                var sHeading = stDefault.Headings[j];
-                if(sHeading == stId)
-                    stDefault.Headings[j] = oNewId.id;
-            }
+                stDefault.Table = null;
             if(stDefault.ParaList == stId)
                 stDefault.ParaList = oNewId.id;
             if(stDefault.Header == stId || "header" == sNewStyleName)
@@ -5297,6 +5326,23 @@ function BinaryFileReader(doc, openParams)
 			var elem = this.oReadResult.styles[i];
 			var oNewStyle = elem.style;
 			var oNewId = elem.param;
+			var sNewStyleName = oNewStyle.Name.toLowerCase().replace(/\s/g,"");
+			if(true == oNewId.def)
+            {
+                switch(oNewStyle.Type)
+                {
+                    case styletype_Character:break;
+                    case styletype_Numbering:stDefault.Numbering = oNewId.id;break;
+                    case styletype_Paragraph:stDefault.Paragraph = oNewId.id;break;
+                    case styletype_Table:stDefault.Table = oNewId.id;break;
+                }
+            }
+            if("header" == sNewStyleName)
+                stDefault.Header = oNewId.id;
+            if("footer" == sNewStyleName)
+                stDefault.Footer = oNewId.id;
+            if("hyperlink" == sNewStyleName)
+                stDefault.Hyperlink = oNewId.id;
 			styles[oNewId.id] = oNewStyle;
 		}
 		var oStyleTypes = {par: 1, table: 2, lvl: 3};
