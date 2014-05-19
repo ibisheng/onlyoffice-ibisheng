@@ -227,6 +227,9 @@
 
 			// Цвет закрепленных областей
 			this.frozenColor					= new CColor(105, 119, 62, 1);
+
+			// Число знаков для математической информации
+			this.mathMaxDigCount				= 9;
 			return this;
 		}
 
@@ -6154,8 +6157,17 @@
 				}
 			});
 			if (0 !== oSelectionMathInfo.countNumbers) {
-				oSelectionMathInfo.sum = sum;
-				oSelectionMathInfo.average = sum / oSelectionMathInfo.countNumbers;
+				// Мы должны отдавать в формате активной ячейки
+				var numFormat = range.getNumFormat();
+
+				oSelectionMathInfo.sum = numFormat.formatToMathInfo(sum, CellValueType.Number, this.mathMaxDigCount);
+				oSelectionMathInfo.average = numFormat.formatToMathInfo(sum / oSelectionMathInfo.countNumbers,
+					CellValueType.Number, this.mathMaxDigCount);
+
+				oSelectionMathInfo.min = numFormat.formatToMathInfo(oSelectionMathInfo.min, CellValueType.Number,
+					this.mathMaxDigCount);
+				oSelectionMathInfo.max = numFormat.formatToMathInfo(oSelectionMathInfo.max, CellValueType.Number,
+					this.mathMaxDigCount);
 			}
 			return oSelectionMathInfo;
 		};

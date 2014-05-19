@@ -90,27 +90,27 @@ function FormatObj(type, val)
 {
     this.type = type;
     this.val = val;//что здесь лежит определяется типом
-};
+}
 function FormatObjScientific(val, format, sign)
 {
     this.type = numFormat_Scientific;
     this.val = val;//E или e
     this.format = format;//array формата
     this.sign = sign;
-};
+}
 function FormatObjDecimalFrac(aLeft, aRight)
 {
     this.type = numFormat_DecimalFrac;
     this.aLeft = aLeft;//array формата левой части
     this.aRight = aRight;//array формата правой части
     this.bNumRight = false;
-};
+}
 function FormatObjDateVal(type, nCount, bElapsed)
 {
     this.type = type;
     this.val = nCount;//Количество знаков подряд
     this.bElapsed = bElapsed;//true == [hhh]; в квадратных скобках
-};
+}
 function FormatObjBracket(sData)
 {
     this.type = numFormat_Bracket;
@@ -214,7 +214,7 @@ function FormatObjBracket(sData)
         }
     };
     this.parse(sData);
-};
+}
 function NumFormat(bAddMinusIfNes)
 {
     //Stream чтения формата
@@ -249,7 +249,7 @@ function NumFormat(bAddMinusIfNes)
 	this.bGeneralChart = false;//если в формате только один текст(например в chart "Основной")
     this.bGeneral = false;//Форматирование не задано
     this.bAddMinusIfNes = bAddMinusIfNes;//когда не задано форматирование для отрицательных чисел иногда надо вставлять минус
-};
+}
 NumFormat.prototype =
 {
     _getChar : function()
@@ -1938,7 +1938,7 @@ NumFormat.prototype =
 function NumFormatCache()
 {
     this.oNumFormats = {};
-};
+}
 NumFormatCache.prototype =
 {
     get : function(format)
@@ -2085,7 +2085,7 @@ function CellFormat(format)
 		}
 	}
     this.formatCache = {};
-};
+}
 CellFormat.prototype =
 {
 	isTextFormat : function()
@@ -2290,6 +2290,25 @@ CellFormat.prototype =
 		}
         return bRes;
     },
+	formatToMathInfo : function(number, nValType, dDigitsCount)
+	{
+		var result = "";
+		var arrFormat = this.format(number, nValType, dDigitsCount, null, false);
+		for (var i = 0, item; i < arrFormat.length; ++i) {
+			item = arrFormat[i];
+			if (item.format) {
+				if (item.format.repeat)
+					continue;
+				if (item.format.skip) {
+					result += " ";
+					continue;
+				}
+			}
+			if (item.text)
+				result += item.text;
+		}
+		return result;
+	},
 	getType: function()
 	{
 		if(null != this.oPositiveFormat)
@@ -2502,7 +2521,7 @@ function DecodeGeneralFormat_Raw(val, nValType, dDigitsCount)
 function GeneralEditFormatCache()
 {
     this.oCache = {};
-};
+}
 GeneralEditFormatCache.prototype =
 {
     format: function (number, cultureInfo)
@@ -2621,7 +2640,7 @@ function FormatParser()
 	this.days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 	this.daysLeap = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 	this.bFormatMonthFirst = true;
-};
+}
 FormatParser.prototype =
 {
     isLocaleNumber: function (val, cultureInfo) {
@@ -3452,7 +3471,7 @@ FormatParser.prototype =
 	{
 		return (0 == (year % 4)) && (0 != (year % 100) || 0 == (year % 400))
 	}
-}
+};
 var g_oFormatParser = new FormatParser();
 function escapeRegExp(string) {
     return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
@@ -3810,5 +3829,5 @@ var g_aCultureInfos = {
     31837: { LCID: 31837, Name: "iu-Latn", CurrencyNegativePattern: 0, CurrencySymbol: "$", NumberDecimalSeparator: ".", NumberGroupSeparator: ",", NumberGroupSizes: [3, 0], DayNames: ["Naattiinguja", "Naggajjau", "Aippiq", "Pingatsiq", "Sitammiq", "Tallirmiq", "Sivataarvik"], AbbreviatedDayNames: ["Nat", "Nag", "Aip", "Pi", "Sit", "Tal", "Siv"], MonthNames: ["Jaannuari", "Viivvuari", "Maatsi", "Iipuri", "Mai", "Juuni", "Julai", "Aaggiisi", "Sitipiri", "Utupiri", "Nuvipiri", "Tisipiri", ""], AbbreviatedMonthNames: ["Jan", "Viv", "Mas", "Ipu", "Mai", "Jun", "Jul", "Agi", "Sii", "Uut", "Nuv", "Tis", ""], MonthGenitiveNames: [], AbbreviatedMonthGenitiveNames: [], AMDesignator: "AM", PMDesignator: "PM", DateSeparator: "/", TimeSeparator: ":", ShortDatePattern: "012" },
     31839: { LCID: 31839, Name: "tzm-Latn", CurrencyNegativePattern: 8, CurrencySymbol: "DZD", NumberDecimalSeparator: ",", NumberGroupSeparator: ".", NumberGroupSizes: [3], DayNames: ["Acer", "Arime", "Aram", "Ahad", "Amhadh", "Sem", "Sedh"], AbbreviatedDayNames: ["Ace", "Ari", "Ara", "Aha", "Amh", "Sem", "Sed"], MonthNames: ["Yenayer", "Furar", "Maghres", "Yebrir", "Mayu", "Yunyu", "Yulyu", "Ghuct", "Cutenber", "Ktuber", "Wambir", "Dujanbir", ""], AbbreviatedMonthNames: ["Yen", "Fur", "Mag", "Yeb", "May", "Yun", "Yul", "Ghu", "Cut", "Ktu", "Wam", "Duj", ""], MonthGenitiveNames: [], AbbreviatedMonthGenitiveNames: [], AMDesignator: "", PMDesignator: "", DateSeparator: "-", TimeSeparator: ":", ShortDatePattern: "012" },
     31848: { LCID: 31848, Name: "ha-Latn", CurrencyNegativePattern: 2, CurrencySymbol: "N", NumberDecimalSeparator: ".", NumberGroupSeparator: ",", NumberGroupSizes: [3], DayNames: ["Lahadi", "Litinin", "Talata", "Laraba", "Alhamis", "Juma'a", "Asabar"], AbbreviatedDayNames: ["Lah", "Lit", "Tal", "Lar", "Alh", "Jum", "Asa"], MonthNames: ["Januwaru", "Febreru", "Maris", "Afrilu", "Mayu", "Yuni", "Yuli", "Agusta", "Satumba", "Oktocba", "Nuwamba", "Disamba", ""], AbbreviatedMonthNames: ["Jan", "Feb", "Mar", "Afr", "May", "Yun", "Yul", "Agu", "Sat", "Okt", "Nuw", "Dis", ""], MonthGenitiveNames: [], AbbreviatedMonthGenitiveNames: [], AMDesignator: "Safe", PMDesignator: "Yamma", DateSeparator: "/", TimeSeparator: ":", ShortDatePattern: "012" }
-}
+};
 var g_oDefaultCultureInfo = g_aCultureInfos[1033];//en-US//1033//fr-FR//1036//basq//1069//ru-Ru//1049//hindi//1081
