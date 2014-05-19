@@ -518,6 +518,36 @@
 			return null;
 		};
 
+		WorksheetView.prototype.getCellLeftRelative = function (col, units) {
+			if (col < 0 || col >= this.cols.length)
+				return null;
+			// С учетом видимой области
+			var offsetX = 0;
+			if (this.topLeftFrozenCell) {
+				var cFrozen = this.topLeftFrozenCell.getCol0();
+				offsetX = (col < cFrozen) ? 0 : this.cols[this.visibleRange.c1].left - this.cols[cFrozen].left;
+			} else
+				offsetX = this.cols[this.visibleRange.c1].left - this.cellsTop;
+
+			var u = units >= 0 && units <= 3 ? units : 0;
+			return (this.cols[col].left - offsetX) * asc_getcvt(1/*pt*/, u, this._getPPIX());
+		};
+
+		WorksheetView.prototype.getCellTopRelative = function (row, units) {
+			if (row < 0 || row >= this.rows.length)
+				return null;
+			// С учетом видимой области
+			var offsetY = 0;
+			if (this.topLeftFrozenCell) {
+				var rFrozen = this.topLeftFrozenCell.getRow0();
+				offsetY = (row < rFrozen) ? 0 : this.rows[this.visibleRange.r1].top - this.rows[rFrozen].top;
+			} else
+				offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
+
+			var u = units >= 0 && units <= 3 ? units : 0;
+			return (this.rows[row].top - offsetY) * asc_getcvt(1/*pt*/, u, this._getPPIY());
+		};
+
 		WorksheetView.prototype.getColumnWidth = function (index, units) {
 			if (index >= 0 && index < this.cols.length) {
 				var u = units >= 0 && units <= 3 ? units : 0;
