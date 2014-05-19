@@ -604,6 +604,8 @@ function asc_docs_api(name)
     this._gui_control_colors = null;
     this._gui_color_schemes = null;
 
+    //window["USE_FONTS_WIN_PARAMS"] = true;
+
     //выставляем тип copypaste
     g_bIsDocumentCopyPaste = true;
     this.DocumentReaderMode = null;
@@ -3458,6 +3460,9 @@ asc_docs_api.prototype.sync_InitEditorFonts = function(gui_fonts){
 asc_docs_api.prototype.sync_InitEditorStyles = function(styles_painter){
     this._gui_styles = styles_painter;
     this.asc_fireCallback("asc_onInitEditorStyles", styles_painter);
+}
+asc_docs_api.prototype.sync_InitEditorStyles2 = function(){
+    this.asc_fireCallback("asc_onInitEditorStyles", this._gui_styles);
 }
 asc_docs_api.prototype.sync_InitEditorTableStyles = function(styles, is_retina_enabled){
     this.asc_fireCallback("asc_onInitTableTemplates",styles, is_retina_enabled);
@@ -6838,6 +6843,7 @@ asc_docs_api.prototype.SetViewMode = function( isViewMode )
         this.WordControl.checkNeedRules();
         this.WordControl.m_oDrawingDocument.ClearCachePages();
         this.WordControl.OnResize(true);
+        this.sync_InitEditorStyles2();
     }
 }
 
