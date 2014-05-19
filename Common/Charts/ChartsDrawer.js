@@ -3852,10 +3852,11 @@ drawBarChart.prototype =
 		if(this.cShapeDrawer.chart.plotArea.catAx.crossAx.crossBetween)
 			width = widthGraph / (numCache.ptCount - 1);
 		
+		var gapWidth = this.cShapeDrawer.chart.plotArea.chart.gapWidth ? this.cShapeDrawer.chart.plotArea.chart.gapWidth : 150;
 		
-		var individualBarWidth = width / (this.chartProp.seriesCount - (this.chartProp.seriesCount - 1) * (overlap / 100) + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
+		var individualBarWidth = width / (this.chartProp.seriesCount - (this.chartProp.seriesCount - 1) * (overlap / 100) + gapWidth / 100);
 		var widthOverLap       = individualBarWidth * (overlap / 100);
-		var hmargin            = (this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100 * individualBarWidth) / 2;
+		var hmargin            = (gapWidth / 100 * individualBarWidth) / 2;
 		
 		var height, startX, startY, diffYVal, val, paths, seriesHeight = [], tempValues = [], seria, startYColumnPosition, startXPosition, newStartX, newStartY, prevVal, idx, seriesCounter = 0;
 	
@@ -4981,10 +4982,11 @@ drawHBarChart.prototype =
 		var numCache       = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
         var height         = heightGraph / numCache.ptCount;
 		
+		var gapWidth = this.cShapeDrawer.chart.plotArea.chart.gapWidth ? this.cShapeDrawer.chart.plotArea.chart.gapWidth : 150;
 		
-		var individualBarHeight = height / (this.chartProp.seriesCount - (this.chartProp.seriesCount - 1) * (overlap / 100) + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
+		var individualBarHeight = height / (this.chartProp.seriesCount - (this.chartProp.seriesCount - 1) * (overlap / 100) + gapWidth / 100);
 		var widthOverLap = individualBarHeight * (overlap / 100);
-		var hmargin = (this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100 * individualBarHeight) / 2;
+		var hmargin = (gapWidth / 100 * individualBarHeight) / 2;
 		
 		var width, startX, startY, diffYVal, val, paths, seriesHeight = [], seria, startXColumnPosition, startYPosition, newStartX, newStartY, idx, seriesCounter = 0;
 		
@@ -6610,7 +6612,10 @@ drawStockChart.prototype =
 
 		var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
 		var koffX = trueWidth / numCache.pts.length;
-		var widthBar = koffX / (1 + this.cChartSpace.chart.plotArea.chart.upDownBars.gapWidth / 100);
+		
+		var gapWidth = this.cChartSpace.chart.plotArea.chart.upDownBars.gapWidth ? this.cChartSpace.chart.plotArea.chart.upDownBars.gapWidth : 150;
+		
+		var widthBar = koffX / (1 + gapWidth / 100);
 		
 		var val1, val2, val3, val4, xVal, yVal1, yVal2, yVal3, yVal4, curNumCache;
 		for (var i = 0; i < numCache.pts.length; i++) {
@@ -8606,11 +8611,13 @@ drawBar3DChart.prototype =
 		var overlap       = this.cShapeDrawer.chart.plotArea.chart.overlap ? this.cShapeDrawer.chart.plotArea.chart.overlap : defaultOverlap;
         var width         = widthGraph / this.chartProp.series[0].val.numRef.numCache.pts.length;
 		
-		var individualBarWidth = width / (this.chartProp.seriesCount - (this.chartProp.seriesCount - 1) * (overlap / 100) + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
+		var gapWidth = this.cShapeDrawer.chart.plotArea.chart.gapWidth ? this.cShapeDrawer.chart.plotArea.chart.gapWidth : 150;
+		
+		var individualBarWidth = width / (this.chartProp.seriesCount - (this.chartProp.seriesCount - 1) * (overlap / 100) + gapWidth / 100);
 		
 		var widthOverLap = individualBarWidth * (overlap / 100);
 		
-		var hmargin = (this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100 * individualBarWidth) / 2;
+		var hmargin = (gapWidth / 100 * individualBarWidth) / 2;
 		
 		
 		var val;
