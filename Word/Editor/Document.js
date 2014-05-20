@@ -8659,8 +8659,8 @@ CDocument.prototype =
                 _ParaE.Concat( ParaE );
                 _ParaE.Set_Pr( ParaE.Pr );
 
-                this.Internal_Content_Remove( ParaEIndex, 1 );
                 this.Internal_Content_Add( ParaEIndex, _ParaE );
+                this.Internal_Content_Remove( ParaEIndex + 1, 1 );
 
                 _ParaE.Selection.Use      = true;
                 _ParaE.Selection.StartPos = 0;
