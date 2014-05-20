@@ -3563,7 +3563,7 @@ cODDFYIELD.prototype.Calculate = function ( arg ) {
     function iterF(yld) {return pr - oddFPrice( settl, matur, iss, firstCoup, rate, yld, redemption, frequency, basis)}
 
     while ( eps > g_Eps && nMC < nIM ) {
-        xN = x - iterF( x ) / (iterF( x + g_Eps ) - iterF( x - g_Eps )) / (2 * g_Eps);
+        xN = x - iterF( x ) / ( (iterF( x + g_Eps ) - iterF( x - g_Eps )) / (2 * g_Eps) );
         nMC++;
         eps = Math.abs( xN - x );
         x = xN;
