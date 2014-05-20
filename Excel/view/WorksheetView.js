@@ -5351,6 +5351,31 @@
 
 		// ----- Selection -----
 
+		// x,y - абсолютные координаты относительно листа (без учета заголовков)
+		WorksheetView.prototype.findCellByXY = function (x, y) {
+			var r = 0, c = 0, result = new CCellObjectInfo();
+			x += this.cellsLeft;
+			y += this.cellsTop;
+			while (c < this.cols.length) {
+				if (x >= this.cols[c].left && this.width_1px <= this.cols[c].width) {
+					result.col = c;
+					break;
+				}
+				++c;
+			}
+			while (r < this.rows.length && y < this.rows[r].top) {
+				if (y >= this.rows[r].top && this.height_1px <= this.rows[r].height) {
+					result.row = r;
+					break;
+				}
+				++r;
+			}
+
+			result.colOff = this.cols[result.col].left - x;
+			result.rowOff = this.rows[result.row].top - y;
+			return result;
+		};
+
 		// dX = true - считать с половиной следующей ячейки
 		WorksheetView.prototype._findColUnderCursor = function (x, canReturnNull, dX) {
 			var c = this.visibleRange.c1,

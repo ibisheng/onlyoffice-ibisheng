@@ -1080,7 +1080,7 @@ Workbook.prototype.init=function(){
 Workbook.prototype.rebuildColors=function(){
 	g_oColorManager.rebuildColors();
 	for(var i = 0 , length = this.aWorksheets.length; i < length; ++i)
-		this.aWorksheets[i].rebuildColors();;
+		this.aWorksheets[i].rebuildColors();
 };
 Workbook.prototype.getDefaultFont=function(){
 	return g_oDefaultFont.fn;

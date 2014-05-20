@@ -528,8 +528,7 @@ function FrozenPlace(ws, type) {
 	
 	_this.calculateCell = function(x, y) {
 		
-		var cell = { col: 0, colOff: 0, colOffPx: 0,
-					 row: 0, rowOff: 0, rowOffPx: 0 };
+		var cell = new CCellObjectInfo();
 					 
 		if ( _this.isPointInside(x, y) ) {
 		
@@ -770,8 +769,7 @@ function DrawingArea(ws) {
 	};
 	
 	_this.calculateCell = function(x, y) {
-		var cell = { col: 0, colOff: 0, colOffPx: 0,
-					 row: 0, rowOff: 0, rowOffPx: 0 };
+		var cell = null;
 					 
 		for ( var i = 0; i < _this.frozenPlaces.length; i++ ) {
 			if ( _this.frozenPlaces[i].isPointInside(x, y) ) {
@@ -779,7 +777,7 @@ function DrawingArea(ws) {
 				break;
 			}
 		}
-		return cell;
+		return null !== cell ? cell : new CCellObjectInfo();
 	};
 	
 	_this.calculateCoords = function(cell) {

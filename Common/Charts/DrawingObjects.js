@@ -58,6 +58,16 @@ function roundPlus(x, n) { //x - число, n - количество знако
     return Math.round(x * m) / m;
 }
 
+// Класс для информации о ячейке для объектов ToDo возможно стоит поправить
+function CCellObjectInfo () {
+	this.col = 0;
+	this.row = 0;
+	this.colOff = 0;
+	this.rowOff = 0;
+	this.colOffPx = 0;
+	this.rowOffPx = 0;
+}
+
 
 //{ ASC Classes
 
@@ -2663,8 +2673,8 @@ function DrawingObjects() {
         _t.Type = c_oAscCellAnchorType.cellanchorTwoCell;
         _t.Pos = { X: 0, Y: 0 };
 
-        _t.from = { col: 0, colOff: 0, row: 0, rowOff: 0 };
-        _t.to = { col: 0, colOff: 0, row: 0, rowOff: 0 };
+        _t.from = new CCellObjectInfo();
+        _t.to = new CCellObjectInfo();
         _t.ext = { cx: 0, cy: 0 };
         _t.size = { width: 0, height: 0 };
 
@@ -5196,7 +5206,7 @@ function DrawingObjects() {
 
     _this.getPositionInfo = function(x, y) {
 
-        var info = { col: 0, colOff: 0, row: 0, rowOff: 0 };
+        var info = new CCellObjectInfo();
 
         var tmp = worksheet._findColUnderCursor(pxToPt(x), true);
         if (tmp) {
@@ -5443,8 +5453,7 @@ function CoordsManager(ws, bLog) {
 
     _t.calculateCell = function(x, y) {
 
-        var cell = { col: 0, colOff: 0, colOffPx: 0,
-            row: 0, rowOff: 0, rowOffPx: 0 };
+        var cell = new CCellObjectInfo();
 
         var _x = x + worksheet.getCellLeft(0, 0);
         var _y = y + worksheet.getCellTop(0, 0);
