@@ -5256,7 +5256,7 @@ function BinaryFileReader(doc, openParams)
 		//уменьшаем oIdRenameMap за счет последовательных ссылок
 		for(var stId in oIdRenameMap){
 			var oNewId = oIdRenameMap[stId];
-			while(null != oNewId){
+			while(null != oNewId && oNewId.id != stId){
 				var oNewId2 = oIdRenameMap[oNewId.id];
 				if(null != oNewId2){
 					delete oIdRenameMap[oNewId.id];
