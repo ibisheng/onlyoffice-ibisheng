@@ -3016,6 +3016,11 @@ CDocument.prototype =
                     StartPos = EndPos;
                     EndPos   = Temp;
                 }
+                
+                // Проверим, пустой ли селект в конечном элементе (для случая, когда конечный элемент параграф, и в нем 
+                // не заселекчен знак конца параграфа)
+                if ( StartPos !== EndPos && true === this.Content[EndPos].Selection_IsEmpty(true) )
+                    EndPos--;
 
                 // Убираем селект
                 this.Selection_Clear();
