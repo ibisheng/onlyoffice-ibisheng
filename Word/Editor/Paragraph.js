@@ -3041,7 +3041,7 @@ Paragraph.prototype =
             // тогда мы должны пересчитать предыдущую страницу, с учетом того, что предыдущий параграф
             // надо начать с новой страницы.
             var Curr = this.Get_DocumentPrev();
-            while ( null != Curr && type_Paragraph === Curr.GetType() )
+            while ( null != Curr && type_Paragraph === Curr.GetType() && undefined === Curr.Get_SectionPr() )
             {
                 var CurrKeepNext = Curr.Get_CompiledPr2(false).ParaPr.KeepNext;
                 if ( (true === CurrKeepNext && Curr.Pages.length > 1) || false === CurrKeepNext || true !== Curr.Is_Inline() )
@@ -3051,7 +3051,7 @@ Paragraph.prototype =
                 else
                 {
                     var Prev = Curr.Get_DocumentPrev();
-                    if ( null === Prev || type_Paragraph != Prev.GetType() )
+                    if ( null === Prev || type_Paragraph != Prev.GetType() || undefined !== Prev.Get_SectionPr() )
                         break;
 
                     var PrevKeepNext = Prev.Get_CompiledPr2(false).ParaPr.KeepNext;
@@ -14418,7 +14418,17 @@ Paragraph.prototype =
         }
         else if ( null === PrevEl )
         {
-            if ( true === Pr.ParaPr.Spacing.BeforeAutoSpacing )
+            if ( true === this.Parent.Is_TableCellContent() && true === Pr.ParaPr.ContextualSpacing  )
+            {
+                var Cell = this.Parent.Parent;
+                var PrevEl = Cell.Get_LastParagraphPrevCell();
+                
+                if ( (null !== PrevEl && type_Paragraph === PrevEl.GetType() && PrevEl.Style_Get() === StyleId) || (null === PrevEl && undefined === StyleId) )
+                {
+                    Pr.ParaPr.Spacing.Before = 0;
+                }
+            }
+            else if ( true === Pr.ParaPr.Spacing.BeforeAutoSpacing )
             {
                 Pr.ParaPr.Spacing.Before = 0;
             }
@@ -14488,7 +14498,18 @@ Paragraph.prototype =
         }
         else
         {
-            Pr.ParaPr.Spacing.After = this.Internal_CalculateAutoSpacing( Pr.ParaPr.Spacing.After, Pr.ParaPr.Spacing.AfterAutoSpacing, this );
+            if ( true === this.Parent.Is_TableCellContent() && true === Pr.ParaPr.ContextualSpacing  )
+            {
+                var Cell = this.Parent.Parent;
+                var NextEl = Cell.Get_FirstParagraphNextCell();
+
+                if ( (null !== NextEl && type_Paragraph === NextEl.GetType() && NextEl.Style_Get() === StyleId) || (null === NextEl && StyleId === undefined) )
+                {
+                    Pr.ParaPr.Spacing.After = 0;
+                }
+            }
+            else
+                Pr.ParaPr.Spacing.After = this.Internal_CalculateAutoSpacing( Pr.ParaPr.Spacing.After, Pr.ParaPr.Spacing.AfterAutoSpacing, this );
         }
 
         return Pr;

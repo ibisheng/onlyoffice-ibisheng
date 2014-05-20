@@ -20614,6 +20614,57 @@ CTableCell.prototype =
         else
             return CurTable.Parent.Check_TableCoincidence(Table);
     },
+    
+    Get_LastParagraphPrevCell : function()
+    {
+        if ( undefined === this.Row || null === this.Row )
+            return null;
+        
+        var CellIndex = this.Index;        
+        var Row = this.Row;
+        
+        // TODO: Разобраться, что делать в данном случае
+        if ( 0 === CellIndex )
+        {
+            if ( 0 === this.Row.Index && undefined !== this.Row.Table && null !== this.Row.Table )
+            {
+                var Prev = this.Row.Table.Get_DocumentPrev();
+                if ( type_Paragraph === Prev.GetType() )
+                    return Prev;
+            }
+            
+            return null;
+        }
+        
+        var PrevCell = Row.Get_Cell( CellIndex );
+        
+        var Count = PrevCell.Content.Content.length;
+        if ( Count <= 0 )
+            return null;
+                
+        var Element = PrevCell.Content.Content[Count - 1];
+        if ( type_Paragraph !== Element.GetType() )
+            return null;
+        
+        return Element;
+    },
+    
+    Get_FirstParagraphNextCell : function()
+    {
+        if ( undefined === this.Row || null === this.Row )
+            return null;
+
+        var CellIndex = this.Index;
+        var Row = this.Row;
+
+        // TODO: Разобраться, что делать в данном случае
+        if ( CellIndex >= this.Row.Get_CellsCount() - 1 )
+            return null;
+
+        var NextCell = Row.Get_Cell( CellIndex );
+        
+        return NextCell.Content.Get_FirstParagraph();
+    },
 //-----------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //-----------------------------------------------------------------------------------

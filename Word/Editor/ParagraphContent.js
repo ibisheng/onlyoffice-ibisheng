@@ -2364,6 +2364,9 @@ ParaEnd.prototype =
         {
             if ( null !== this.SectionPr )
             {
+                Context.b_color1( 0, 0, 0, 255);
+                Context.p_color( 0, 0, 0, 255);
+                
                 Context.SetFont( {FontFamily: { Name : "Courier New", Index : -1 }, FontSize: 8, Italic: false, Bold : false} );
                 var Widths          = this.SectionPr.Widths;
                 var strSectionBreak = this.SectionPr.Str;
