@@ -731,6 +731,29 @@ function LoadFontFile(library, stream_index, name, faceindex)
     font.m_lDescender = face.descender;
     font.m_lLineHeight = face.height;
 
+    if (window["USE_FONTS_WIN_PARAMS"] === true && face.horizontal && face.os2 && face.os2.version != 0xFFFF)
+    {
+        var bIsUseWin = false;
+        if (face.horizontal.Ascender == 0 || face.horizontal.Descender == 0)
+            bIsUseWin = true;
+        if (face.os2.sTypoAscender == 0 || face.os2.sTypoDescender == 0)
+            bIsUseWin = true;
+
+        var _h1 = face.horizontal.Ascender - face.horizontal.Descender + face.horizontal.Line_Gap;
+        var _h2 = face.os2.sTypoAscender - face.os2.sTypoDescender + face.os2.sTypoLineGap;
+        var _h3 = face.os2.usWinAscent + face.os2.usWinDescent;
+
+        if (_h1 != _h2 && _h2 != _h3 && _h1 != _h3 && (_h3 > _h1 && _h3 > _h2))
+            bIsUseWin = true;
+
+        if (bIsUseWin)
+        {
+            font.m_lAscender = face.os2.usWinAscent;
+            font.m_lDescender = -face.os2.usWinDescent;
+            font.m_lLineHeight = face.os2.usWinAscent + face.os2.usWinDescent;
+        }
+    }
+
     font.m_nNum_charmaps = face.num_charmaps;
     //if (null == face.charmap && 0 != this.m_nNum_charmaps)
     //    alert('loadCharmap');
