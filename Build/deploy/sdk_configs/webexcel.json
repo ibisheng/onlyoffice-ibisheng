@@ -168,12 +168,9 @@
 				"../../Word/Editor/Spelling.js",
 				
 				"../../Word/Math/mathTypes.js",
-				"../../Word/Math/print.js",
 				"../../Word/Math/mathText.js",
 				"../../Word/Math/mathContent.js",
-				"../../Word/Math/actions.js",
 				"../../Word/Math/base.js",
-				"../../Word/Math/subBase.js",
 				"../../Word/Math/fraction.js",
 				"../../Word/Math/degree.js",
 				"../../Word/Math/matrix.js",
@@ -182,9 +179,7 @@
 				"../../Word/Math/radical.js",
 				"../../Word/Math/operators.js",
 				"../../Word/Math/accent.js",
-				"../../Word/Math/drawingUnion.js",
 				"../../Word/Math/borderBox.js",
-				"../../Word/Math/test_composition.js",
 				
                 "../../Excel/model/DrawingObjects/GlobalCounters.js",
 
