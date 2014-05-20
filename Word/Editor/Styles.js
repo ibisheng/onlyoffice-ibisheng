@@ -6410,6 +6410,7 @@ function CTextPr()
     this.Lang       = new CLang();
     this.Unifill    = undefined;
     this.Shd        = undefined;
+    this.Vanish     = undefined;
 }
 
 CTextPr.prototype =
@@ -6441,6 +6442,7 @@ CTextPr.prototype =
         this.Lang       = new CLang();
         this.Unifill    = undefined;
         this.Shd        = undefined;
+        this.Vanish     = undefined;
     },
 
     Copy : function()
@@ -6490,6 +6492,8 @@ CTextPr.prototype =
         
         if (undefined !== this.Shd )
             TextPr.Shd = this.Shd.Copy();
+        
+        TextPr.Vanish     = this.Vanish;
 
         return TextPr;
     },
@@ -6573,6 +6577,9 @@ CTextPr.prototype =
         
         if ( undefined !== TextPr.Shd )
             this.Shd = TextPr.Shd.Copy();
+        
+        if ( undefined !== TextPr.Vanish )
+            this.Vanish = TextPr.Vanish;
     },
 
     Init_Default : function()
@@ -6604,7 +6611,8 @@ CTextPr.prototype =
         this.RTL        = false;
         this.Lang.Init_Default();
         this.Unifill    = undefined;
-        this.Shd        = undefined;      
+        this.Shd        = undefined;     
+        this.Vanish     = false;
     },
 
     Set_FromObject : function(TextPr)
@@ -6670,6 +6678,8 @@ CTextPr.prototype =
         }
         else
             this.Shd = undefined;
+        
+        this.Vanish       = TextPr.Vanish;
     },
 
     Compare : function(TextPr)
@@ -6759,7 +6769,11 @@ CTextPr.prototype =
 
         // Lang
         this.Lang.Compare( TextPr.Lang );
-        //Result_TextPr.Unifill = CompareUniFill(this.Unifill, TextPr.Unifill);        
+        //Result_TextPr.Unifill = CompareUniFill(this.Unifill, TextPr.Unifill);       
+        
+        // Vanish
+        if ( undefined !== this.Vanish && this.Vanish !== TextPr.Vanish )
+            this.Vanish = undefined;
 
         return this;
     },
@@ -6922,6 +6936,12 @@ CTextPr.prototype =
             this.Shd.Write_ToBinary(Writer);
             Flags |= 8388608;
         }
+        
+        if ( undefined !== this.Vanish )
+        {
+            Writer.WriteBool( this.Vanish );    
+            Flags |= 16777216;
+        }
 
         var EndPos = Writer.GetCurPosition();
         Writer.Seek( StartPos );
@@ -7046,6 +7066,10 @@ CTextPr.prototype =
             this.Shd = new CDocumentShd();
             this.Shd.Read_FromBinary( Reader );
         }
+        
+        // Vanish
+        if ( Flags & 16777216 )
+            this.Vanish = Reader.GetBool();
     },
 
     Check_NeedRecalc : function()
