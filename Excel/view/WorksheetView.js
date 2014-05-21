@@ -2901,12 +2901,11 @@
 				for (nextRow = row + 1; nextRow <= drawRange.r2 && nextRow < t.nRowsCount; ++nextRow)
 					if (r[nextRow].height >= t.height_1px) {break;}
 
-				if (isFirstRow) {
+				if (isFirstRow)
 					objMCRow = objectMergedCells[row];
-				} else {
-					objMCPrevRow = objMCRow;
+				else
 					objMCRow = objMCNextRow;
-				}
+
 				objMCNextRow = objectMergedCells[nextRow];
 
 				var rowCache = t._fetchRowCache(row);
@@ -2935,7 +2934,8 @@
 								t._getVisibleCell(prevCol, nextRow).getBorder() : null,
 								objMCNextRow ? objMCNextRow[prevCol] : null, prevCol, nextRow);
 							bBotCur = arrNextRow[col] =
-								new CellBorderObject(t._getVisibleCell(col, nextRow).getBorder(), mc, col, nextRow);
+								new CellBorderObject(t._getVisibleCell(col, nextRow).getBorder(),
+									objMCNextRow ? objMCNextRow[col] : null, col, nextRow);
 						} else {
 							bBotPrev = bBotCur;
 							bBotCur = bBotNext;
@@ -2944,7 +2944,8 @@
 
 					if (isFirstCol) {
 						bPrev = arrCurrRow[prevCol] = new CellBorderObject(isPrevColExist ?
-							t._getVisibleCell(prevCol, row).getBorder() : null, mc, prevCol, row);
+							t._getVisibleCell(prevCol, row).getBorder() : null,
+							objMCRow ? objMCRow[prevCol] : null, prevCol, row);
 						bCur = arrCurrRow[col] = new CellBorderObject(t._getVisibleCell(col, row).getBorder(), mc, col, row);
 						bTopPrev = arrPrevRow[prevCol];
 						bTopCur = arrPrevRow[col];
@@ -2960,14 +2961,16 @@
 						bTopNext = null;
 					} else {
 						bNext = arrCurrRow[nextCol] =
-							new CellBorderObject(t._getVisibleCell(nextCol, row).getBorder(), mc, nextCol, row);
+							new CellBorderObject(t._getVisibleCell(nextCol, row).getBorder(),
+								objMCRow ? objMCRow[nextCol] : null, nextCol, row);
 						bTopNext = arrPrevRow[nextCol];
 
 						if (row === t.nRowsCount)
 							bBotNext = null;
 						else
 							bBotNext = arrNextRow[nextCol] =
-								new CellBorderObject(t._getVisibleCell(nextCol, nextRow).getBorder(), mc, nextCol, nextRow);
+								new CellBorderObject(t._getVisibleCell(nextCol, nextRow).getBorder(),
+									objMCNextRow ? objMCNextRow[nextCol] : null, nextCol, nextRow);
 					}
 
 					if (mc && row !== mc.r1 && row !== mc.r2 && col !== mc.c1 && col !== mc.c2)
