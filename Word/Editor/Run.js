@@ -2738,8 +2738,9 @@ ParaRun.prototype =
                         nCurMaxWidth += nSpaceLen;
                         nSpaceLen     = 0;
                     }
-
-                    nCurMaxWidth += Item.Width;
+                    
+                    if ( true === Item.Is_Inline() || true === this.Paragraph.Parent.Is_DrawingShape() )
+                        nCurMaxWidth += Item.Width;
 
                     break;
                 }
