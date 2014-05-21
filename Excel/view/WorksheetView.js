@@ -5359,7 +5359,7 @@
 			while (c < this.cols.length) {
 				tmpCol = this.cols[c];
 				if (x <= tmpCol.left + tmpCol.width) {
-					result.col = c - 1;
+					result.col = c;
 					break;
 				}
 				++c;
@@ -5367,14 +5367,14 @@
 			while (r < this.rows.length) {
 				tmpRow = this.rows[r];
 				if (y <= tmpRow.top + tmpRow.height) {
-					result.row = r - 1;
+					result.row = r;
 					break;
 				}
 				++r;
 			}
 
-			result.colOff = this.cols[result.col].left - x;
-			result.rowOff = this.rows[result.row].top - y;
+			result.colOff = x - this.cols[result.col].left;
+			result.rowOff = y - this.rows[result.row].top;
 			return result;
 		};
 
