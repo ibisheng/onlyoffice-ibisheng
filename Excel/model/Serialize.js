@@ -6580,8 +6580,13 @@
         }
         this.Read = function(data, wb)
         {
-            this.stream = this.getbase64DecodedData(data);
-            History.TurnOff();
+            var pasteBinaryFromExcel = false;
+			if(this.copyPasteObj && this.copyPasteObj.isCopyPaste && typeof editor != "undefined" && editor)
+				pasteBinaryFromExcel = true;
+			
+			this.stream = this.getbase64DecodedData(data);
+			if(!pasteBinaryFromExcel)
+				History.TurnOff();
             this.ReadFile(wb);
 
             if(!this.copyPasteObj.isCopyPaste)
@@ -6590,7 +6595,8 @@
                 ReadDefTableStyles(wb, wb.TableStyles.DefaultStyles);
                 wb.TableStyles.concatStyles();
             }
-            History.TurnOn();
+			if(!pasteBinaryFromExcel)
+				History.TurnOn();
         };
         this.ReadFile = function(wb)
         {
