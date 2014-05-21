@@ -3883,7 +3883,7 @@ PasteProcessor.prototype =
 			for(var i = 0; i < drawings.length; i++)
 			{
 				drawing = drawings[i];
-				graphicObj = drawing.graphicObject.convertToWord(this.oLogicDocument.DrawingDocument);
+				graphicObj = drawing.graphicObject.convertToWord(this.oLogicDocument);
 				
 				tempParaRun = new ParaRun();
 				tempParaRun.Content.unshift(new ParaDrawing());
