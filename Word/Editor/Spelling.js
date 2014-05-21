@@ -1077,8 +1077,15 @@ Paragraph.prototype.Continue_CheckSpelling = function()
                 Item.Check_Spelling( SpellCheckerEngine, 1 );
             }
 
-            if ( true === this.SpellChecker.Compare_WithPrevious( OldElements ) )
-                ParaForceRedraw = this;
+            //if ( true === this.SpellChecker.Compare_WithPrevious( OldElements ) )
+            //    ParaForceRedraw = this;
+
+            // TODO: Мы не можем здесь проверить надо ли перерисовывать параграф или нет, потому что возможно у нас в
+            //       параграф вставили/удалили элемент, который не повлиял на орфографию, т.е. фактически ни 1 слова не
+            //       изменилось, но при этом изменились метки начала и конца подчеркивания орфографии. Если можно это 
+            //       отследить, тогда можно будет вернуться к предыдущему варианту.
+            this.SpellChecker.Compare_WithPrevious( OldElements );
+            ParaForceRedraw = this;
 
             // Не надо проверять отдельно языки
             CheckLang = false;
