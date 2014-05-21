@@ -1,5 +1,6 @@
 function CFraction(props)
 {
+	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_FRACTION;
 
     this.type     =   BAR_FRACTION;
@@ -9,6 +10,7 @@ function CFraction(props)
 
     this.init(props);
     this.setCtrPrp(props.ctrPrp);
+	g_oTableId.Add( this, this.Id );
 }
 extend(CFraction, CMathBase);
 CFraction.prototype.init = function(props)
@@ -52,7 +54,7 @@ CFraction.prototype.init = function(props)
     }
 
     /// вызов этой функции обязательно в конце
-    this.WriteContentsToHistory();
+   // this.WriteContentsToHistory();
 }
 CFraction.prototype.getType = function()
 {
@@ -419,6 +421,41 @@ CFraction.prototype.getPropsForWrite = function()
     return props;
 }
 
+CFraction.prototype.Save_Changes = function(Data, Writer)
+{
+	Writer.WriteLong( historyitem_type_frac );
+}
+CFraction.prototype.Load_Changes = function(Reader)
+{
+}
+CFraction.prototype.Refresh_RecalcData = function(Data)
+{
+}
+CFraction.prototype.Write_ToBinary2 = function( Writer )
+{
+	Writer.WriteLong( historyitem_type_frac );
+	Writer.WriteString2( this.elements[0][0].elements[0][0].Id );
+	Writer.WriteString2( this.elements[1][0].elements[0][0].Id );
+	
+}
+CFraction.prototype.Read_FromBinary2 = function( Reader )
+{
+	var Element = g_oTableId.Get_ById( Reader.GetString2() );
+	Element.Parent = this.elements[0][0];
+	this.elements[0][0].elements[0][0] = Element;
+	if (Element.content.length == 0)
+		this.elements[0][0].fillPlaceholders();
+		
+	var Element1 = g_oTableId.Get_ById( Reader.GetString2() );
+	Element1.Parent = this.elements[1][0];
+	this.elements[1][0].elements[0][0] = Element1;
+	if (Element1.content.length == 0)
+		this.elements[1][0].fillPlaceholders()
+}
+CFraction.prototype.Get_Id = function()
+{
+	return this.Id;
+}
 
 
 function CNumerator()

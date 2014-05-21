@@ -6610,19 +6610,21 @@ CMathContent.prototype =
         {
             case historyitem_Math_AddItem:
             {
-                var bArray = Data.UseArray;
-                var Count  = Data.Items.length;
-
-                Writer.WriteLong( Count );
-
-                for ( var Index = 0; Index < Count; Index++ )
-                {
-                    if ( true === bArray )
-                        Writer.WriteLong( Data.PosArray[Index] );
-                    else
-                        Writer.WriteLong( Data.Pos + Index );
-
-                    this.Write_MathElemToBinary(Writer, Data.Items[Index]);
+				var Count  = Data.Items.length;	
+				Writer.WriteLong( Count );
+			
+				for ( var Index = 0; Index < Count; Index++ )
+                {					
+					var typeObj = Data.Items[Index].typeObj;
+					
+					Writer.WriteLong( Data.Pos + Index );
+					Writer.WriteLong( typeObj );
+					
+					switch (typeObj)
+					{
+						case MATH_COMP: Writer.WriteString2( Data.Items[Index].Id );break;
+						case MATH_TEXT: Writer.WriteString2(String.fromCharCode(Data.Items[Index].value)); break;
+					}					                
                 }
                 break;
             }
@@ -6657,13 +6659,6 @@ CMathContent.prototype =
                 break;
             }
         }
-
-        /*var oThis = this;
-         this.bs = new BinaryCommonWriter(Writer);
-         this.boMaths = new Binary_oMathWriter(Writer);
-
-         this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteArgNodes(oThis.Data);});
-         */
     },
     Load_Changes : function(Reader)
     {
@@ -6685,52 +6680,31 @@ CMathContent.prototype =
 
                 for ( var Index = 0; Index < Count; Index++ )
                 {
-                    var Pos     = Reader.GetLong()
-                    var elem = this.Read_MathElemFromBinary(Reader);
-                    if ( null != elem )
-                    {
-                        this.content.splice( Pos, 0, elem );
-                        CollaborativeEditing.Add_ChangedClass(this);
-                    }
+                    var Pos     = Reader.GetLong();
+					var typeObj = Reader.GetLong();
+					
+					switch	(typeObj)
+					{
+						case MATH_COMP: 
+						{
+							var Element = g_oTableId.Get_ById( Reader.GetString2() );
+							this.content.splice( Pos, 0, Element );							
+						}
+						break;
+						case MATH_TEXT:
+						{
+							var text = Reader.GetString2();
+							var oText = new CMathText(false);
+							oText.addTxt(text);
+							this.content.splice( Pos, 0, oText );
+						}
+						break;
+					}
                 }
-
-                this.DeleteCollaborativeMarks = false;
-
                 break;
             }
         }
-        //this.Composition.Resize(g_oTextMeasurer);
     },
-    Write_MathElemToBinary : function(Writer, elem)
-    {
-        var oThis = this;
-        this.bs = new BinaryCommonWriter(Writer);
-        this.boMaths = new Binary_oMathWriter(Writer);
-
-        this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteMathElem(elem);});
-    },
-    Read_MathElemFromBinary : function(Reader)
-    {
-        var oThis = this;
-        this.boMathr = new Binary_oMathReader(Reader);
-        this.bcr = new Binary_CommonReader(Reader);
-
-        var length = Reader.GetUChar();
-        var res = false;
-        Reader.cur += 3;
-
-        //var obj = null;
-        var bCollaborative = true;
-        var obj = new CMathContent();
-        obj.setReferenceComposition(this.Composition);
-        var elem = null;
-        res = this.bcr.Read1(length, function(t, l){
-            oThis.boMathr.ReadMathArg(t,l,obj);
-        });
-        elem = obj.content[1];
-        return elem;
-    },
-    //добавление cmathcontent в формулу
     Write_ToBinary2 : function(Writer)
     {
         Writer.WriteLong( historyitem_type_MathContent );

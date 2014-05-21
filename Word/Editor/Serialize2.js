@@ -1866,102 +1866,18 @@ function Binary_oMathWriter(memory, oMathPara)
 				break;
 		}
 	},
-	this.WriteMathElemCollaborative = function(mathElem)
-	{
-		var oThis = this;
-		var item = mathElem;
-		switch ( item.typeObj)
-		{
-			case MATH_COMP:
-				{
-					switch (item.kind)
-					{
-						case MATH_ACCENT			: this.bs.WriteItem(c_oSer_OMathContentType.Acc, function(){oThis.WriteAccCollaborative(item);});			break;
-						case "ArgPr"				: this.bs.WriteItem(c_oSer_OMathContentType.ArgPr, function(){oThis.WriteArgPr(item);});		break;//нет обертки
-						case MATH_BAR				: this.bs.WriteItem(c_oSer_OMathContentType.Bar, function(){oThis.WriteBarCollaborative(item);});			break;
-						case MATH_BORDER_BOX		: this.bs.WriteItem(c_oSer_OMathContentType.BorderBox, function(){oThis.WriteBorderBoxCollaborative(item);});break;
-						case MATH_BOX				: this.bs.WriteItem(c_oSer_OMathContentType.Box, function(){oThis.WriteBoxCollaborative(item);});			break;
-						case "CCtrlPr"				: this.bs.WriteItem(c_oSer_OMathContentType.CtrlPr, function(){oThis.WriteCtrlPr(item);});		break;
-						case MATH_DELIMITER			: this.bs.WriteItem(c_oSer_OMathContentType.Delimiter, function(){oThis.WriteDelimiterCollaborative(item);});break;
-						case MATH_EQ_ARRAY			: this.bs.WriteItem(c_oSer_OMathContentType.EqArr, function(){oThis.WriteEqArrCollaborative(item);});		break;
-						case MATH_FRACTION			: this.bs.WriteItem(c_oSer_OMathContentType.Fraction, function(){oThis.WriteFractionCollaborative(item);});	break;
-						case MATH_FUNCTION			: this.bs.WriteItem(c_oSer_OMathContentType.Func, function(){oThis.WriteFuncCollaborative(item);});			break;
-						case MATH_GROUP_CHARACTER	: this.bs.WriteItem(c_oSer_OMathContentType.GroupChr, function(){oThis.WriteGroupChrCollaborative(item);});	break;
-						case MATH_LIMIT				: 
-							if (LIMIT_LOW  == item.type)
-								this.bs.WriteItem(c_oSer_OMathContentType.LimLow, function(){oThis.WriteLimLowCollaborative(item);});
-							else if (LIMIT_UP == item.type)
-								this.bs.WriteItem(c_oSer_OMathContentType.LimUpp, function(){oThis.WriteLimUppCollaborative(item);});
-							break;
-						case MATH_MATRIX			: this.bs.WriteItem(c_oSer_OMathContentType.Matrix, function(){oThis.WriteMatrixCollaborative(item);});		break;
-						case MATH_NARY			: this.bs.WriteItem(c_oSer_OMathContentType.Nary, function(){oThis.WriteNaryCollaborative(item);});			break;
-						case "OMath"			: this.bs.WriteItem(c_oSer_OMathContentType.OMath, function(){oThis.WriteArgNodesCollaborative(item);});			break;
-						case "OMathPara"		: this.bs.WriteItem(c_oSer_OMathContentType.OMathPara, function(){oThis.WriteOMathParaCollaborative(item);});break;
-						case MATH_PHANTOM		: this.bs.WriteItem(c_oSer_OMathContentType.Phant, function(){oThis.WritePhantCollaborative(item);});		break;
-						//case "MRun"			: this.bs.WriteItem(c_oSer_OMathContentType.MRun, function(){oThis.WriteMRun(item);});			break;
-						case MATH_RADICAL		: this.bs.WriteItem(c_oSer_OMathContentType.Rad, function(){oThis.WriteRadCollaborative(item);});			break;
-						case MATH_DEGREESubSup	: 
-							if (DEGREE_PreSubSup == item.type)
-								this.bs.WriteItem(c_oSer_OMathContentType.SPre, function(){oThis.WriteSPreCollaborative(item);});	
-							else if (DEGREE_SubSup == item.type)
-								this.bs.WriteItem(c_oSer_OMathContentType.SSubSup, function(){oThis.WriteSSubSupCollaborative(item);});
-							break;
-						case MATH_DEGREE		: 
-							if (DEGREE_SUBSCRIPT == item.type)
-								this.bs.WriteItem(c_oSer_OMathContentType.SSub, function(){oThis.WriteSSubCollaborative(item);});
-							else if (DEGREE_SUPERSCRIPT == item.type)
-								this.bs.WriteItem(c_oSer_OMathContentType.SSup, function(){oThis.WriteSSupCollaborative(item);});
-							break;
-					}
-					break;
-				}			
-			case MATH_TEXT: //сюда попадаем только при совместном редактировании
-				{
-					this.bs.WriteItem(c_oSer_OMathContentType.MText, function(){ oThis.memory.WriteString2(String.fromCharCode(item.value));}); //m:t
-				}
-				break;
-			case MATH_RUN_PRP:
-			case MATH_PLACEHOLDER:	
-			case MATH_EMPTY: 
-				break;
-		}
-	}
     this.WriteArgNodes = function(oElem)
 	{
 		if (oElem)
 		{			
 			var oThis = this;
 			var nStart = 0;
-			var nEnd   = oElem.content.length - 1;		
+			var nEnd   = oElem.content.length;		
 
-			for(var i = nStart; i <= nEnd; i++)
+			for(var i = nStart; i <= nEnd - 1; i++)
 			{
-				var item = oElem.content[i];	
-				
-				/*if (MATH_RUN_PRP == item.value.typeObj)
-				{
-					var nCurPos = 0;
-					this.memory.WriteByte(c_oSer_OMathContentType.MRun);
-					nCurPos = this.bs.WriteItemWithLengthStart();				
-					
-					var props = item.value.getPropsForWrite(); 
-					oThis.bs.WriteItem(c_oSer_OMathContentType.RPr, function(){oThis.brPrs.Write_rPr(props.textPrp);}); // w:rPr
-					if ( props.mathRunPrp != null)
-						this.bs.WriteItem(c_oSer_OMathContentType.MRPr, function(){oThis.WriteMRPr(props.mathRunPrp);}); // m:rPr
-						
-					var oText = "";
-					while (oElem.content[i+1] != null && oElem.content[i+1].value.typeObj == MATH_TEXT)
-					{
-						oText += String.fromCharCode(oElem.content[i+1].value.value);
-						i++;
-					}
-					if (null != oText)
-							this.bs.WriteItem(c_oSer_OMathContentType.MText, function(){ oThis.memory.WriteString2(oText);}); //m:t
-					
-					this.bs.WriteItemEnd(nCurPos);
-				}
-				else*/
-					this.WriteMathElem(item);
+				var item = oElem.content[i];
+				this.WriteMathElem(item);
 			}
 		}
 		
@@ -1989,45 +1905,6 @@ function Binary_oMathWriter(memory, oMathPara)
 		this.bs.WriteItem(c_oSer_OMathContentType.MRPr,	function(){oThis.WriteMRPr(props.mathRPrp);}); // m:rPr
 		if (oText != null)
 			this.bs.WriteItem(c_oSer_OMathContentType.MText, function(){ oThis.memory.WriteString2(oText);});	
-	}
-	this.WriteArgNodesCollaborative = function(oElem)
-	{
-		if (oElem)
-		{
-			var oThis = this;
-			var nStart = 0;
-			var nEnd   = oElem.content.length - 1; 
-			
-			for(var i = nStart; i <= nEnd; i++)
-			{
-				var item = oElem.content[i];	
-				
-				if (MATH_RUN_PRP == item.typeObj)
-				{
-					var nCurPos = 0;
-					this.memory.WriteByte(c_oSer_OMathContentType.MRun);
-					nCurPos = this.bs.WriteItemWithLengthStart();				
-					
-					var props = item.value.getPropsForWrite(); 
-					oThis.bs.WriteItem(c_oSerRunType.rPr, function(){oThis.brPrs.Write_rPr(props.textPrp);}); // w:rPr
-					if ( props.mathRunPrp != null)
-						this.bs.WriteItem(c_oSer_OMathContentType.MRPr, function(){oThis.WriteMRPr(props.mathRunPrp);}); // m:rPr
-						
-					var oText = "";
-					while (oElem.content[i+1] != null && oElem.content[i+1].value.typeObj == MATH_TEXT)
-					{
-						oText += String.fromCharCode(oElem.content[i+1].value.value);
-						i++;
-					}
-					if (null != oText)
-							this.bs.WriteItem(c_oSer_OMathContentType.MText, function(){ oThis.memory.WriteString2(oText);}); //m:t
-					
-					this.bs.WriteItemEnd(nCurPos);
-				}
-				else
-					this.WriteMathElemCollaborative(item);
-			}
-		}
 	}
 	this.WriteAcc = function(oAcc)
 	{

@@ -210,8 +210,8 @@ ParaMath.prototype =
         if (oParent)
 		{
             oParent.addElementToContent(oElem);
-			//items.push(oElem);
-			//History.Add(oParent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
+			items.push(oElem);
+			History.Add(oParent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
 		}
 
     },
@@ -285,8 +285,18 @@ ParaMath.prototype =
 			var oElem = oContent.Content.getElem(oContent.Start);
 			if (oElem.typeObj == MATH_COMP || oElem.typeObj == MATH_PLACEHOLDER)
 				this.RemoveElem(oContent, Direction, bOnAddText);
-			else	//mathrun
+			else	//pararun
+			{
+				History.Create_NewPoint();
 				oElem.Remove(Direction, bOnAddText);
+				if(oElem.Content.length == 0) //тк pararun пустой, удаляем его
+				{
+					var Items = new Array();
+					Items.push(oElem.Parent.content[0]);
+					oElem.Parent.content.splice( 0, 1 );
+					History.Add(oElem.Parent, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: 0});
+				}
+			}
 		}
 		else
 			return this.RemoveElem(oContent, Direction, bOnAddText);
@@ -1425,50 +1435,33 @@ ParaMath.prototype =
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
 //----------------------------------------------------------------------------------------------------------------------
-    /*Save_Changes : function(Data, Writer)
+    Save_Changes : function(Data, Writer)
     {
-
+		Writer.WriteLong( historyitem_type_Math );
     },
 
     Load_Changes : function(Reader)
     {
-		this.Math.CurrentContent.Load_Changes(Reader);
-    }*/
+				
+    },
 	Write_ToBinary : function(Writer)
     {
         // Long   : Type
         // String : Id
-
         Writer.WriteLong( this.Type );
         Writer.WriteString2( this.Id );
     },
 	Write_ToBinary2 : function(Writer)
     {
-		/*Writer.WriteLong( historyitem_type_Math );
-		
-		var oThis = this;
-		this.bs = new BinaryCommonWriter(Writer);
-		this.boMaths = new Binary_oMathWriter(Writer);
-
-		this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteOMathPara(oThis.Math);});
-		*/
+		Writer.WriteLong( historyitem_type_Math );
+		Writer.WriteString2( this.Root.Id );
 	},
 
     Read_FromBinary2 : function(Reader)
     {
-		/*
-		var oThis = this;
-		this.boMathr = new Binary_oMathReader(Reader);
-		this.bcr = new Binary_CommonReader(Reader);
-		
-		var length = Reader.GetUChar();
-		
-		var res = false;
-		Reader.cur += 3;
-		res = this.bcr.Read1(length, function(t, l){
-			return oThis.boMathr.ReadMathOMathPara(t,l,oThis.Math);
-		});
-		*/
+		var Element = g_oTableId.Get_ById( Reader.GetString2() );
+		Element.bRoot = true;
+		this.Root = Element;
 		
 	}
 };

@@ -1,5 +1,6 @@
 function CDegree(props)
 {
+	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_DEGREE;
 
     this.type = DEGREE_SUPERSCRIPT ;
@@ -11,6 +12,7 @@ function CDegree(props)
 
     this.init(props);
     this.setCtrPrp(props.ctrPrp);
+	g_oTableId.Add( this, this.Id );
 }
 extend(CDegree, CMathBase);
 CDegree.prototype.init = function(props)
@@ -38,7 +40,7 @@ CDegree.prototype.init = function(props)
     this.addMCToContent(oBase, oDegree);
 
     /// вызов этой функции обязательно в конце
-    this.WriteContentsToHistory();
+    //this.WriteContentsToHistory();
 }
 /*CDegree.prototype.init_2 = function(props, oBase)
 {
@@ -484,13 +486,49 @@ CDegree.prototype.IsPlhIterator = function()
 {
     return this.elements[0][1].IsPlaceholder();
 }
+CDegree.prototype.Save_Changes = function(Data, Writer)
+{
+	Writer.WriteLong( historyitem_type_deg );
+}
+CDegree.prototype.Load_Changes = function(Reader)
+{
+}
+CDegree.prototype.Refresh_RecalcData = function(Data)
+{
+}
+CDegree.prototype.Write_ToBinary2 = function( Writer )
+{
+	Writer.WriteLong( historyitem_type_deg );
+	Writer.WriteString2( this.elements[0][0].Id );
+	Writer.WriteString2( this.elements[0][1].Id );
+}
+CDegree.prototype.Read_FromBinary2 = function( Reader )
+{
+	var Element = g_oTableId.Get_ById( Reader.GetString2() );
+	Element.Parent = this;
+	this.elements[0][0] = Element;
+	if (Element.content.length == 0)
+		this.fillPlaceholders();
+		
+	var Element1 = g_oTableId.Get_ById( Reader.GetString2() );
+	Element1.Parent = this;
+	this.elements[0][1] = Element1;
+	if (Element1.content.length == 0)
+		this.fillPlaceholders();
+}
+CDegree.prototype.Get_Id = function()
+{
+	return this.Id;
+}
 
 function CIterators()
 {
+	this.Id = g_oIdCounter.Get_NewId();
     this.lUp = 0;   // центр основания
     this.lD = 0;    // высота - центр основания
     this.upper = 0; // смещение сверху для позиции основания
     CMathBase.call(this);
+	g_oTableId.Add( this, this.Id );
 }
 extend(CIterators, CMathBase);
 CIterators.prototype.init = function()
@@ -615,9 +653,44 @@ CIterators.prototype.getCtrPrp = function()
 {
     return this.Parent.getCtrPrp();
 }
+CIterators.prototype.Save_Changes = function(Data, Writer)
+{
+	Writer.WriteLong( historyitem_type_iterators );
+}
+CIterators.prototype.Load_Changes = function(Reader)
+{
+}
+CIterators.prototype.Refresh_RecalcData = function(Data)
+{
+}
+CIterators.prototype.Write_ToBinary2 = function( Writer )
+{
+	Writer.WriteLong( historyitem_type_iterators );
+	Writer.WriteString2( this.elements[0][0].Id );
+	Writer.WriteString2( this.elements[1][0].Id );
+}
+CIterators.prototype.Read_FromBinary2 = function( Reader )
+{
+	var Element = g_oTableId.Get_ById( Reader.GetString2() );
+	Element.Parent = this;
+	this.elements[0][0] = Element;
+	if (Element.content.length == 0)
+		this.fillPlaceholders();
+	
+	var Element1 = g_oTableId.Get_ById( Reader.GetString2() );
+	Element1.Parent = this;
+	this.elements[1][0] = Element1;
+	if (Element1.content.length == 0)
+		this.fillPlaceholders();
+}
+CIterators.prototype.Get_Id = function()
+{
+	return this.Id;
+}
 
 function CDegreeSubSup(props)
 {
+	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_DEGREESubSup;
 
     this.gapBase = 0;
@@ -627,6 +700,7 @@ function CDegreeSubSup(props)
 
     this.init(props);
     this.setCtrPrp(props.ctrPrp);
+	g_oTableId.Add( this, this.Id );
 }
 extend(CDegreeSubSup, CMathBase);
 CDegreeSubSup.prototype.init = function(props)
@@ -668,7 +742,7 @@ CDegreeSubSup.prototype.init = function(props)
     }
 
     /// вызов этой функции обязательно в конце
-    this.WriteContentsToHistory();
+    //this.WriteContentsToHistory();
 }
 /*CDegreeSubSup.prototype.init_2 = function(props, oBase)
 {
@@ -1102,6 +1176,40 @@ CDegreeSubSup.prototype.getPropsForWrite = function()
     props.alnScr = this.alnScr;
 
     return props;
+}
+CDegreeSubSup.prototype.Save_Changes = function(Data, Writer)
+{
+	Writer.WriteLong( historyitem_type_deg_subsup );
+}
+CDegreeSubSup.prototype.Load_Changes = function(Reader)
+{
+}
+CDegreeSubSup.prototype.Refresh_RecalcData = function(Data)
+{
+}
+CDegreeSubSup.prototype.Write_ToBinary2 = function( Writer )
+{
+	Writer.WriteLong( historyitem_type_deg_subsup );
+	Writer.WriteString2( this.elements[0][0].Id );
+	Writer.WriteString2( this.elements[0][1].Id );
+}
+CDegreeSubSup.prototype.Read_FromBinary2 = function( Reader )
+{
+	var Element = g_oTableId.Get_ById( Reader.GetString2() );
+	Element.Parent = this;
+	this.elements[0][0] = Element;
+	if (Element.content.length == 0)
+		this.fillPlaceholders();
+	
+	var Element1 = g_oTableId.Get_ById( Reader.GetString2() );
+	Element1.Parent = this;
+	this.elements[0][1] = Element1;
+	if (Element1.content.length == 0)
+		this.fillPlaceholders();
+}
+CDegreeSubSup.prototype.Get_Id = function()
+{
+	return this.Id;
 }
 
 //выяcнить: почему и с этой ф-ией и без нее работает всё ok...

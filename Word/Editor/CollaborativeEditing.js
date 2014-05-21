@@ -142,9 +142,7 @@ function CTableId()
             case historyitem_type_HdrFtr                   : Element = new CHeaderFooter(); break;
             case historyitem_type_AbstractNum              : Element = new CAbstractNum(); break;
             case historyitem_type_Comment                  : Element = new CComment(); break;
-            case historyitem_type_Style                    : Element = new CStyle(); break;
-			case historyitem_type_Math		               : Element = new ParaMath(false); break;
-			case historyitem_type_MathContent              : Element = new CMathContent(); break;
+            case historyitem_type_Style                    : Element = new CStyle(); break;				
             case historyitem_type_CommentMark              : Element = new ParaComment(); break;
             case historyitem_type_ParaRun                  : Element = new ParaRun(); break;
             case historyitem_type_Section                  : Element = new CSectionPr(); break;
@@ -243,6 +241,48 @@ function CTableId()
             case historyitem_type_WrapPolygon              : Element = new CWrapPolygon(); break;
             case historyitem_type_DateAx                   : Element = new CDateAx(); break;
             case historyitem_type_SerAx                    : Element = new CSerAx(); break;
+			
+			case historyitem_type_Math						: Element = new ParaMath(false); break;
+			case historyitem_type_MathContent				: Element = new CMathContent(); break;			
+			case historyitem_type_acc						: props = {ctrPrp: new CTextPr()}; 
+															  Element = new CAccent(props); break;
+			case historyitem_type_bar						: props = {ctrPrp: new CTextPr()}; 
+															  Element = new CBar(props); break;
+			case historyitem_type_box						: props = {ctrPrp: new CTextPr()}; 
+															  Element = new CBox(props); break;
+			case historyitem_type_borderBox					: props = {ctrPrp: new CTextPr()}; 
+															  Element = new CBorderBox(props); break;
+			case historyitem_type_delimiter					: props = {ctrPrp: new CTextPr()}; 
+															  Element = new CDelimiter(props); break;
+			case historyitem_type_eqArr						: props = {ctrPrp: new CTextPr()}; 
+															  Element = new CEqArray(props); break;
+			case historyitem_type_frac                      : props = {ctrPrp: new CTextPr()}; 
+															  Element = new CFraction(props); break;
+			case historyitem_type_mathFunc					: props = {ctrPrp: new CTextPr()}; 
+															  Element = new CMathFunc(props); break;
+			case historyitem_type_groupChr					: props = {ctrPrp: new CTextPr()}; 
+															  Element = new CGroupCharacter(props); break;															 
+			case historyitem_type_lim						: props = {ctrPrp: new CTextPr()}; 
+															  Element = new CLimit(props); break;
+			case historyitem_type_matrix					: props = {ctrPrp: new CTextPr()}; 
+															  Element = new CMathMatrix(props); break;
+			case historyitem_type_nary						: props = {ctrPrp: new CTextPr()}; 
+															  Element = new CNary(props); break;	
+			case historyitem_type_integral					: Element = new CIntegral(); break;	
+			case historyitem_type_double_integral			: Element = new CDoubleIntegral(); break;
+			case historyitem_type_triple_integral			: Element = new CTripleIntegral(); break;
+			case historyitem_type_contour_integral			: Element = new CContourIntegral(); break;
+			case historyitem_type_surface_integral			: Element = new CSurfaceIntegral(); break;
+			case historyitem_type_volume_integral			: Element = new CVolumeIntegral(); break;
+			case historyitem_type_phant						: props = {ctrPrp: new CTextPr()}; 
+															  Element = new CPhantom(props); break;
+			case historyitem_type_rad						: props = {ctrPrp: new CTextPr()}; 
+															  Element = new CRadical(props); break;
+			case historyitem_type_deg_subsup				: props = {ctrPrp: new CTextPr()}; 
+															  Element = new CDegreeSubSup(props); break;
+			case historyitem_type_iterators					: Element = new CIterators(); break;
+			case historyitem_type_deg						: props = {ctrPrp: new CTextPr()}; 
+															  Element = new CDegree(props); break;
         }
         
         if ( null !== Element )

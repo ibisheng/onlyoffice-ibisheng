@@ -1003,6 +1003,7 @@ CSign.prototype.getCodeCharacter = function()
 
 function CAccent(props)
 {
+	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_ACCENT;
 
     this.operator = new COperator(OPER_ACCENT);
@@ -1014,6 +1015,7 @@ function CAccent(props)
 
     this.init(props);
     this.setCtrPrp(props.ctrPrp);
+	g_oTableId.Add( this, this.Id );	
 }
 extend(CAccent, CMathBase);
 CAccent.prototype.init = function(props)
@@ -1039,7 +1041,7 @@ CAccent.prototype.init = function(props)
     this.elements[0][0].SetDot(true);
 
     /// вызов этой функции обязательно в конце
-    this.WriteContentsToHistory();
+    //this.WriteContentsToHistory();
 }
 CAccent.prototype.old_init = function(properties)
 {
@@ -1554,7 +1556,7 @@ CAccent.prototype.old_init = function(properties)
     this.elements[0][0].SetDot(true);
 
     /// вызов этой функции обязательно в конце
-    this.WriteContentsToHistory();
+    //this.WriteContentsToHistory();
 }
 CAccent.prototype.setPosition = function(pos)
 {
@@ -1686,4 +1688,31 @@ CAccent.prototype.findDisposition = function(pos)
         posCurs =    {x: curs_X, y: curs_Y};
 
     return {pos: posCurs, mCoord: mouseCoord, inside_flag: inside_flag};
+}
+CAccent.prototype.Save_Changes = function(Data, Writer)
+{
+	Writer.WriteLong( historyitem_type_acc );
+}
+CAccent.prototype.Load_Changes = function(Reader)
+{
+}
+CAccent.prototype.Refresh_RecalcData = function(Data)
+{
+}
+CAccent.prototype.Write_ToBinary2 = function( Writer )
+{
+	Writer.WriteLong( historyitem_type_acc );
+	Writer.WriteString2( this.elements[0][0].Id );
+}
+CAccent.prototype.Read_FromBinary2 = function( Reader )
+{
+	var Element = g_oTableId.Get_ById( Reader.GetString2() );
+	Element.Parent = this;
+	this.elements[0][0] = Element;
+	if (Element.content.length == 0)
+		this.fillPlaceholders();
+}
+CAccent.prototype.Get_Id = function()
+{
+	return this.Id;
 }

@@ -883,6 +883,7 @@ CSignRadical.prototype.relate = function(parent)
 
 function CRadical(props)
 {
+	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_RADICAL;
 
     this.type = DEGREE_RADICAL; // default
@@ -896,6 +897,7 @@ function CRadical(props)
 
     this.init(props);
     this.setCtrPrp(props.ctrPrp);
+	g_oTableId.Add( this, this.Id );
 }
 extend(CRadical, CMathBase);
 CRadical.prototype.init = function(props)
@@ -931,7 +933,7 @@ CRadical.prototype.init = function(props)
     }
 
     /// вызов этой функции обязательно в конце
-    this.WriteContentsToHistory();
+   // this.WriteContentsToHistory();
 }
 CRadical.prototype.recalculateSize = function(oMeasure)
 {
@@ -1219,5 +1221,40 @@ CRadical.prototype.getPropsForWrite = function()
     props.degHide = this.type;
 
     return props;
+}
+CRadical.prototype.Save_Changes = function(Data, Writer)
+{
+	Writer.WriteLong( historyitem_type_rad );
+}
+CRadical.prototype.Load_Changes = function(Reader)
+{
+}
+CRadical.prototype.Refresh_RecalcData = function(Data)
+{
+}
+CRadical.prototype.Write_ToBinary2 = function( Writer )
+{
+	Writer.WriteLong( historyitem_type_rad );
+	var len = this.elements[0].length 
+	Writer.WriteLong( len );
+	for(var i=0; i<len; i++)	
+		Writer.WriteString2( this.elements[0][i].Id );
+}
+CRadical.prototype.Read_FromBinary2 = function( Reader )
+{
+	var len = Reader.GetLong();
+	
+	for (var i=0; i<len; i++)
+	{
+		var Element = g_oTableId.Get_ById( Reader.GetString2() );
+		Element.Parent = this;
+		this.elements[0][i] = Element;
+		if (Element.content.length == 0)
+			this.fillPlaceholders();
+	}
+}
+CRadical.prototype.Get_Id = function()
+{
+	return this.Id;
 }
 

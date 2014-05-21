@@ -3292,7 +3292,8 @@ old_CSeparator.prototype.setPosition = function(pos)
 }
 
 function CDelimiter(props)
-{
+{	
+	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_DELIMITER;
 
     this.begOper = new COperator (OPER_DELIMITER);
@@ -3314,6 +3315,7 @@ function CDelimiter(props)
 
     this.init(props);
     this.setCtrPrp(props.ctrPrp);
+	g_oTableId.Add( this, this.Id );
 }
 extend(CDelimiter, CMathBase);
 CDelimiter.prototype.init = function(props)
@@ -3379,7 +3381,7 @@ CDelimiter.prototype.init = function(props)
     this.setContent();
 
     /// вызов этой функции обязательно в конце
-    this.WriteContentsToHistory();
+    //this.WriteContentsToHistory();
 }
 CDelimiter.prototype.old_recalculateSize = function()
 {
@@ -3971,7 +3973,33 @@ CDelimiter.prototype.getPropsForWrite = function()
 
     return props;
 }
-
+CDelimiter.prototype.Save_Changes = function(Data, Writer)
+{
+	Writer.WriteLong( historyitem_type_delimiter );
+}
+CDelimiter.prototype.Load_Changes = function(Reader)
+{
+}
+CDelimiter.prototype.Refresh_RecalcData = function(Data)
+{
+}
+CDelimiter.prototype.Write_ToBinary2 = function( Writer )
+{
+	Writer.WriteLong( historyitem_type_delimiter );
+	Writer.WriteString2( this.elements[0][0].Id );
+}
+CDelimiter.prototype.Read_FromBinary2 = function( Reader )
+{
+	var Element = g_oTableId.Get_ById( Reader.GetString2() );
+	Element.Parent = this;
+	this.elements[0][0] = Element;
+	if (Element.content.length == 0)
+		this.fillPlaceholders();
+}
+CDelimiter.prototype.Get_Id = function()
+{
+	return this.Id;
+}
 
 function CCharacter()
 {
@@ -4128,6 +4156,7 @@ CCharacter.prototype.getBase = function()
 
 function CGroupCharacter(props)
 {
+	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_GROUP_CHARACTER;
 
     this.vertJust = VJUST_TOP;
@@ -4161,7 +4190,8 @@ function CGroupCharacter(props)
     this.setCtrPrp(props.ctrPrp);
 
     /// вызов этой функции обязательно в конце
-    this.WriteContentsToHistory();
+    //this.WriteContentsToHistory();
+	g_oTableId.Add( this, this.Id );
 }
 extend(CGroupCharacter, CCharacter);
 CGroupCharacter.prototype.getAscent = function(oMeasure)
@@ -4353,4 +4383,31 @@ CGroupCharacter.prototype.getPropsForWrite = function()
     };
     return props;
 
+}
+CGroupCharacter.prototype.Save_Changes = function(Data, Writer)
+{
+	Writer.WriteLong( historyitem_type_groupChr );
+}
+CGroupCharacter.prototype.Load_Changes = function(Reader)
+{
+}
+CGroupCharacter.prototype.Refresh_RecalcData = function(Data)
+{
+}
+CGroupCharacter.prototype.Write_ToBinary2 = function( Writer )
+{
+	Writer.WriteLong( historyitem_type_groupChr );
+	Writer.WriteString2( this.elements[0][0].Id );
+}
+CGroupCharacter.prototype.Read_FromBinary2 = function( Reader )
+{
+	var Element = g_oTableId.Get_ById( Reader.GetString2() );
+	Element.Parent = this;
+	this.elements[0][0] = Element;
+	if (Element.content.length == 0)
+		this.fillPlaceholders();
+}
+CGroupCharacter.prototype.Get_Id = function()
+{
+	return this.Id;
 }

@@ -1,6 +1,6 @@
 function CLimit(props)
 {
-    this.kind = MATH_LIMIT;
+	this.Id = g_oIdCounter.Get_NewId();    this.kind = MATH_LIMIT;
 
     this.type = LIMIT_LOW;
     CMathBase.call(this);
@@ -25,8 +25,8 @@ function CLimit(props)
     this.setCtrPrp(props.ctrPrp);
 
     /// вызов этой функции обязательно в конце
-    this.WriteContentsToHistory();
-
+    //this.WriteContentsToHistory();
+	g_oTableId.Add( this, this.Id );
 }
 extend(CLimit, CMathBase);
 CLimit.prototype.getAscent = function()
@@ -72,9 +72,42 @@ CLimit.prototype.getPropsForWrite = function()
 
     return props;
 }
-
+CLimit.prototype.Save_Changes = function(Data, Writer)
+{
+	Writer.WriteLong( historyitem_type_lim );
+}
+CLimit.prototype.Load_Changes = function(Reader)
+{
+}
+CLimit.prototype.Refresh_RecalcData = function(Data)
+{
+}
+CLimit.prototype.Write_ToBinary2 = function( Writer )
+{	Writer.WriteLong( historyitem_type_lim );
+	Writer.WriteString2( this.elements[0][0].Id );
+	Writer.WriteString2( this.elements[1][0].Id );
+}
+CLimit.prototype.Read_FromBinary2 = function( Reader )
+{	
+	var Element = g_oTableId.Get_ById( Reader.GetString2() );
+	Element.Parent = this;
+	this.elements[0][0] = Element;
+	if (Element.content.length == 0)
+		this.fillPlaceholders();			
+	
+	var Element1 = g_oTableId.Get_ById( Reader.GetString2() );
+	Element1.Parent = this;
+	this.elements[1][0] = Element1;
+	if (Element1.content.length == 0)
+		this.fillPlaceholders();
+}
+CLimit.prototype.Get_Id = function()
+{
+	return this.Id;
+}
 function CMathFunc(props)
 {
+	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_FUNCTION;
     CMathBase.call(this);
 
@@ -84,7 +117,8 @@ function CMathFunc(props)
     this.setCtrPrp(props.ctrPrp);
 
     /// вызов этой функции обязательно в конце
-    this.WriteContentsToHistory();
+    //this.WriteContentsToHistory();
+	g_oTableId.Add( this, this.Id );
 }
 extend(CMathFunc, CMathBase);
 CMathFunc.prototype.setDistance = function()
@@ -104,5 +138,37 @@ CMathFunc.prototype.getPropsForWrite = function()
     var props = {};
     return props;
 }
-
+CMathFunc.prototype.Save_Changes = function(Data, Writer)
+{
+	Writer.WriteLong( historyitem_type_mathFunc );
+}CMathFunc.prototype.Load_Changes = function(Reader)
+{
+}
+CMathFunc.prototype.Refresh_RecalcData = function(Data)
+{
+}
+CMathFunc.prototype.Write_ToBinary2 = function( Writer )
+{
+	Writer.WriteLong( historyitem_type_mathFunc );
+	Writer.WriteString2( this.elements[0][0].Id );
+	Writer.WriteString2( this.elements[0][1].Id );
+}
+CMathFunc.prototype.Read_FromBinary2 = function( Reader )
+{
+	var Element = g_oTableId.Get_ById( Reader.GetString2() );
+	Element.Parent = this;
+	this.elements[0][0] = Element;
+	if (Element.content.length == 0)
+		this.fillPlaceholders();
+		
+	var Element1 = g_oTableId.Get_ById( Reader.GetString2() );
+	Element1.Parent = this;
+	this.elements[0][1] = Element1;
+	if (Element1.content.length == 0)
+		this.fillPlaceholders();
+}
+CMathFunc.prototype.Get_Id = function()
+{
+	return this.Id;
+}
 

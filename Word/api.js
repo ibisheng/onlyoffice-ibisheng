@@ -9584,7 +9584,7 @@ asc_docs_api.prototype.asc_AddMath2 = function(Type)
 						break;
 		}
 		g_oTableId.Add( MathElement, MathElement.Id );
-        
+		History.Add(MathElement, {Type: historyitem_Math_AddItem, Items: MathElement.Root, Pos: 0});        
         this.WordControl.m_oLogicDocument.Paragraph_Add( MathElement );
     }
 }

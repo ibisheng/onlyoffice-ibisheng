@@ -1169,6 +1169,29 @@ var historyitem_type_CommentMark      = 27;
 var historyitem_type_ParaRun          = 28;
 var historyitem_type_MathContent	  = 29;
 var historyitem_type_Section          = 30;
+var historyitem_type_acc			  = 31;
+var historyitem_type_bar			  = 32;
+var historyitem_type_borderBox		  = 33;
+var historyitem_type_box			  = 34;
+var historyitem_type_delimiter		  = 35;
+var historyitem_type_eqArr			  = 36;
+var historyitem_type_frac			  = 37;
+var historyitem_type_mathFunc		  = 38;
+var historyitem_type_groupChr		  = 39;
+var historyitem_type_lim			  = 40;
+var historyitem_type_matrix			  = 41;
+var historyitem_type_nary			  = 42;
+var historyitem_type_integral		  = 43;
+var historyitem_type_double_integral  = 44;
+var historyitem_type_triple_integral  = 45;
+var historyitem_type_contour_integral = 46;
+var historyitem_type_surface_integral = 47;
+var historyitem_type_volume_integral  = 48;
+var historyitem_type_phant			  = 49;
+var historyitem_type_rad              = 50;
+var historyitem_type_deg_subsup       = 51;
+var historyitem_type_iterators        = 52;
+var historyitem_type_deg              = 53;
 
 
 

@@ -1,5 +1,6 @@
 function CBorderBox(props)
 {
+	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_BORDER_BOX;
 
     this.gapBrd = 0;
@@ -31,6 +32,7 @@ function CBorderBox(props)
 
     this.init(props);
     this.setCtrPrp(props.ctrPrp);
+	g_oTableId.Add( this, this.Id );
 }
 extend(CBorderBox, CMathBase);
 CBorderBox.prototype.init = function(props)
@@ -63,7 +65,7 @@ CBorderBox.prototype.init = function(props)
     this.setContent();
 
     /// вызов этой функции обязательно в конце
-    this.WriteContentsToHistory();
+    //this.WriteContentsToHistory();
 }
 CBorderBox.prototype.recalculateSize = function()
 {
@@ -302,9 +304,37 @@ CBorderBox.prototype.getPropsForWrite = function()
 
     return props;
 }
+CBorderBox.prototype.Save_Changes = function(Data, Writer)
+{
+	Writer.WriteLong( historyitem_type_borderBox );
+}
+CBorderBox.prototype.Load_Changes = function(Reader)
+{
+}
+CBorderBox.prototype.Refresh_RecalcData = function(Data)
+{
+}
+CBorderBox.prototype.Write_ToBinary2 = function( Writer )
+{
+	Writer.WriteLong( historyitem_type_borderBox );
+	Writer.WriteString2( this.elements[0][0].Id );
+}
+CBorderBox.prototype.Read_FromBinary2 = function( Reader )
+{
+	var Element = g_oTableId.Get_ById( Reader.GetString2() );
+	Element.Parent = this;
+	this.elements[0][0] = Element;
+	if (Element.content.length == 0)
+		this.fillPlaceholders();
+}
+CBorderBox.prototype.Get_Id = function()
+{
+	return this.Id;
+}
 
 function CBox(props)
 {
+	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_BOX;
 
     this.aln  = false;
@@ -317,6 +347,7 @@ function CBox(props)
 
     this.init(props);
     this.setCtrPrp(props.ctrPrp);
+	g_oTableId.Add( this, this.Id );
 }
 extend(CBox, CMathBase);
 CBox.prototype.init = function(props)
@@ -343,7 +374,7 @@ CBox.prototype.init = function(props)
         this.elements[0][0].decreaseArgSize();
 
     /// вызов этой функции обязательно в конце
-    this.WriteContentsToHistory();
+    //this.WriteContentsToHistory();
 }
 CBox.prototype.getBase = function()
 {
@@ -362,9 +393,37 @@ CBox.prototype.getPropsForWrite = function()
 
     return props;
 }
+CBox.prototype.Save_Changes = function(Data, Writer)
+{
+	Writer.WriteLong( historyitem_type_box );
+}
+CBox.prototype.Load_Changes = function(Reader)
+{
+}
+CBox.prototype.Refresh_RecalcData = function(Data)
+{
+}
+CBox.prototype.Write_ToBinary2 = function( Writer )
+{
+	Writer.WriteLong( historyitem_type_box );
+	Writer.WriteString2( this.elements[0][0].Id );
+}
+CBox.prototype.Read_FromBinary2 = function( Reader )
+{
+	var Element = g_oTableId.Get_ById( Reader.GetString2() );
+	Element.Parent = this;
+	this.elements[0][0] = Element;
+	if (Element.content.length == 0)
+		this.fillPlaceholders();
+}
+CBox.prototype.Get_Id = function()
+{
+	return this.Id;
+}
 
 function CBar(props)
 {
+	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_BAR;
 
     this.loc = LOCATION_BOT;
@@ -374,6 +433,7 @@ function CBar(props)
 
     this.init(props);
     this.setCtrPrp(props.ctrPrp);
+	g_oTableId.Add( this, this.Id );
 }
 extend(CBar, CCharacter);
 CBar.prototype.init = function(props)
@@ -408,7 +468,7 @@ CBar.prototype.init = function(props)
 
 
     /// вызов этой функции обязательно в конце
-    this.WriteContentsToHistory();
+    //this.WriteContentsToHistory();
 }
 CBar.prototype.getAscent = function()
 {
@@ -430,14 +490,43 @@ CBar.prototype.getPropsForWrite = function()
 
     return props;
 }
+CBar.prototype.Save_Changes = function(Data, Writer)
+{
+	Writer.WriteLong( historyitem_type_bar );
+}
+CBar.prototype.Load_Changes = function(Reader)
+{
+}
+CBar.prototype.Refresh_RecalcData = function(Data)
+{
+}
+CBar.prototype.Write_ToBinary2 = function( Writer )
+{
+	Writer.WriteLong( historyitem_type_bar );
+	Writer.WriteString2( this.elements[0][0].Id );
+}
+CBar.prototype.Read_FromBinary2 = function( Reader )
+{
+	var Element = g_oTableId.Get_ById( Reader.GetString2() );
+	Element.Parent = this;
+	this.elements[0][0] = Element;
+	if (Element.content.length == 0)
+		this.fillPlaceholders();
+}
+CBar.prototype.Get_Id = function()
+{
+	return this.Id;
+}
 
 function CPhantom(props)
 {
+	this.Id = g_oIdCounter.Get_NewId();
     this.props = null;
     CMathBase.call(this);
 
     this.init(props);
     this.setCtrPrp(props.ctrPrp);
+	g_oTableId.Add( this, this.Id );
 }
 extend(CPhantom, CMathBase);
 CPhantom.prototype.init = function(props)
@@ -447,7 +536,7 @@ CPhantom.prototype.init = function(props)
     this.setContent();
 
     /// вызов этой функции обязательно в конце
-    this.WriteContentsToHistory();
+    //this.WriteContentsToHistory();
 }
 CPhantom.prototype.getPropsForWrite = function()
 {
@@ -456,4 +545,31 @@ CPhantom.prototype.getPropsForWrite = function()
 CPhantom.prototype.getBase = function()
 {
     return this.elements[0][0];
+}
+CPhantom.prototype.Save_Changes = function(Data, Writer)
+{
+	Writer.WriteLong( historyitem_type_phant );
+}
+CPhantom.prototype.Load_Changes = function(Reader)
+{
+}
+CPhantom.prototype.Refresh_RecalcData = function(Data)
+{
+}
+CPhantom.prototype.Write_ToBinary2 = function( Writer )
+{
+	Writer.WriteLong( historyitem_type_phant );
+	Writer.WriteString2( this.elements[0][0].Id );
+}
+CPhantom.prototype.Read_FromBinary2 = function( Reader )
+{
+	var Element = g_oTableId.Get_ById( Reader.GetString2() );
+	Element.Parent = this;
+	this.elements[0][0] = Element;
+	if (Element.content.length == 0)
+		this.fillPlaceholders();
+}
+CPhantom.prototype.Get_Id = function()
+{
+	return this.Id;
 }

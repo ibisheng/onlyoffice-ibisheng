@@ -1,5 +1,6 @@
 function CMathMatrix(props)
 {
+	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_MATRIX;
 
     this.lineGapColumn = 1.5;
@@ -41,6 +42,7 @@ function CMathMatrix(props)
 
     this.init(props);
     this.setCtrPrp(props.ctrPrp);
+	g_oTableId.Add( this, this.Id );
 }
 extend(CMathMatrix, CMathBase);
 CMathMatrix.prototype.init = function(props)
@@ -126,7 +128,7 @@ CMathMatrix.prototype.init = function(props)
 
 
     /// вызов этой функции обязательно в конце
-    this.WriteContentsToHistory();
+    //this.WriteContentsToHistory();
 }
 CMathMatrix.prototype.setRuleGap = function(space, rule, gap, minGap)
 {
@@ -501,16 +503,60 @@ CMathMatrix.prototype.getPropsForWrite = function()
 
     return props;
 }
+CMathMatrix.prototype.Save_Changes = function(Data, Writer)
+{
+	Writer.WriteLong( historyitem_type_matrix );
+}
+CMathMatrix.prototype.Load_Changes = function(Reader)
+{
+}
+CMathMatrix.prototype.Refresh_RecalcData = function(Data)
+{
+}
+CMathMatrix.prototype.Write_ToBinary2 = function( Writer )
+{	
+	Writer.WriteLong( historyitem_type_matrix );
+
+	Writer.WriteLong( this.nRow );
+	Writer.WriteLong( this.nCol );
+	for(var i=0; i<this.nRow; i++)
+		for(var j=0; j<this.nCol; j++)
+			Writer.WriteString2( this.elements[i][j].Id );
+}
+CMathMatrix.prototype.Read_FromBinary2 = function( Reader )
+{
+	var row = Reader.GetLong();
+	var col = Reader.GetLong();
+	for(var i=0; i<row; i++)
+	{
+		this.elements[i] = new Array();
+		for(var j=0; j<col; j++)
+		{
+			var Element = g_oTableId.Get_ById( Reader.GetString2() );
+			Element.Parent = this;
+			this.elements[i][j] = new Array();
+			this.elements[i][j] = Element;
+			if (Element.content.length == 0)
+				this.fillPlaceholders();
+		}
+	}
+}
+CMathMatrix.prototype.Get_Id = function()
+{
+	return this.Id;
+}
 
 ////
 function CEqArray(props)
 {
+	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_EQ_ARRAY;
 
     this.maxDist = 0;
     this.objDist = 0;
 
     this.init_2(props);
+	g_oTableId.Add( this, this.Id );
 }
 extend(CEqArray, CMathMatrix);
 CEqArray.prototype.init_2 = function(props)
@@ -583,4 +629,40 @@ CEqArray.prototype.getPropsForWrite = function()
     props.objDist = this.objDist;
 
     return props;
+}
+CEqArray.prototype.Save_Changes = function(Data, Writer)
+{
+	Writer.WriteLong( historyitem_type_eqArr );
+}
+CEqArray.prototype.Load_Changes = function(Reader)
+{
+}
+CEqArray.prototype.Refresh_RecalcData = function(Data)
+{
+}
+CEqArray.prototype.Write_ToBinary2 = function( Writer )
+{	
+	Writer.WriteLong( historyitem_type_eqArr );
+	
+	var row = this.elements.length;
+	Writer.WriteLong( row );
+	for(var i=0; i<row; i++)
+		Writer.WriteString2( this.elements[i][0].Id );
+}
+CEqArray.prototype.Read_FromBinary2 = function( Reader )
+{
+	var row = Reader.GetLong();
+	for(var i=0; i<row; i++)
+	{
+		var Element = g_oTableId.Get_ById( Reader.GetString2() );
+		Element.Parent = this;
+		this.elements[i] = new Array();
+		this.elements[i][0] = Element;
+		if (Element.content.length == 0)
+			this.fillPlaceholders();
+	}
+}
+CEqArray.prototype.Get_Id = function()
+{
+	return this.Id;
 }
