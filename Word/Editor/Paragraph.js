@@ -16480,9 +16480,6 @@ Paragraph.prototype =
             // Потому что undefined - нормальное значение (и W всегда заполняется в интерфейсе)
             NewFramePr.W = FramePr.W;
 
-            if ( undefined != FramePr.Wrap )
-                NewFramePr.Wrap = FramePr.Wrap;
-
             if ( undefined != FramePr.X )
                 NewFramePr.X = FramePr.X;
 
@@ -16494,6 +16491,14 @@ Paragraph.prototype =
 
             if ( undefined != FramePr.YAlign )
                 NewFramePr.YAlign = FramePr.YAlign;
+            
+            if ( undefined !== FramePr.Wrap )
+            {
+                if ( true !== FramePr.Wrap )
+                    NewFramePr.Wrap = wrap_NotBeside;
+                else
+                    NewFramePr.Wrap = wrap_Around;
+            }
 
             this.Pr.FramePr = NewFramePr;
         }

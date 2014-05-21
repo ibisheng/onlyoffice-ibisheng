@@ -1035,7 +1035,7 @@ CDocument.prototype =
         var MainStartPos = this.FullRecalc.MainStartPos;                
         if ( null !== OldPage && ( -1 === MainStartPos || MainStartPos > StartIndex ) )
         {
-            if ( OldPage.EndPos >= Count - 1 )
+            if ( OldPage.EndPos >= Count - 1 && PageIndex - this.Content[Count - 1].Get_StartPage_Absolute() >= this.Content[Count - 1].Pages.length - 1 )
             {
                 //console.log( "HdrFtr Recalc " + PageIndex );
                 
@@ -7397,8 +7397,6 @@ CDocument.prototype =
                 editor.Update_ParaTab( Default_Tab_Stop, ParaPr.Tabs );
 
             editor.UpdateParagraphProp( ParaPr );
-
-            //editor.
         }
     },
 
@@ -10315,8 +10313,6 @@ CDocument.prototype =
             {
                 var Header = new CHeaderFooter( this.HdrFtr, this, this.DrawingDocument, hdrftr_Header );
                 FirstSectPr.Set_Header_Even( Header );
-                
-                this.HdrFtr.CurHdrFtr = Header;
             }
             
             if ( null === FirstSectPr.Get_Footer_Even() )
@@ -10325,12 +10321,12 @@ CDocument.prototype =
                 FirstSectPr.Set_Footer_Even( Footer );
             }            
         }
-        
+                
+        this.Recalculate();
+
         if ( null !== this.HdrFtr.CurHdrFtr )
             this.HdrFtr.CurHdrFtr.Content.Cursor_MoveToStartPos();
-        
-        this.Recalculate();
-        
+
         this.Document_UpdateSelectionState();
         this.Document_UpdateInterfaceState();        
     },
