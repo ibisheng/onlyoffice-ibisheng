@@ -3694,6 +3694,9 @@ Woorksheet.prototype.getMergedByCell = function(row, col){
 	var oMergeInfo = this.mergeManager.getByCell(row, col);
 	return oMergeInfo ? oMergeInfo.bbox : null;
 };
+Woorksheet.prototype.getMergedByRange = function(bbox){
+	return this.mergeManager.get(bbox);
+};
 Woorksheet.prototype._expandRangeByMergedAddToOuter = function(aOuter, range, aMerged){
 	for(var i = 0, length = aMerged.all.length; i < length; i++)
 	{

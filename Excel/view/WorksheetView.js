@@ -297,6 +297,38 @@
 			return null !== this.merged;
 		};
 
+		function CellBorderObject (borders, mergeInfo, col, row) {
+			this.borders = borders;
+			this.mergeInfo = mergeInfo;
+
+			this.col = col;
+			this.row = row;
+		}
+		CellBorderObject.prototype.isMerge = function () {
+			return null != this.mergeInfo;
+		};
+		CellBorderObject.prototype.getLeftBorder = function () {
+			if (!this.borders || (this.isMerge() && (this.col !== this.mergeInfo.c1 || this.col - 1 !== this.mergeInfo.c2)))
+				return null;
+			return this.borders.l;
+		};
+		CellBorderObject.prototype.getRightBorder = function () {
+			if (!this.borders || (this.isMerge() && (this.col - 1 !== this.mergeInfo.c1 || this.col !== this.mergeInfo.c2)))
+				return null;
+			return this.borders.r;
+		};
+
+		CellBorderObject.prototype.getTopBorder = function () {
+			if (!this.borders || (this.isMerge() && (this.row !== this.mergeInfo.r1 || this.row - 1 !== this.mergeInfo.r2)))
+				return null;
+			return this.borders.t;
+		};
+		CellBorderObject.prototype.getBottomBorder = function () {
+			if (!this.borders || (this.isMerge() && (this.row - 1 !== this.mergeInfo.r1 || this.row !== this.mergeInfo.r2)))
+				return null;
+			return this.borders.b;
+		};
+
 
 		/**
 		 * Widget for displaying and editing Worksheet object
@@ -2711,6 +2743,26 @@
 			var r = this.rows;
 			var offsetX = (undefined !== leftFieldInPt) ? leftFieldInPt : c[this.visibleRange.c1].left - this.cellsLeft;
 			var offsetY = (undefined !== topFieldInPt) ? topFieldInPt : r[this.visibleRange.r1].top - this.cellsTop;
+			var mergedCells = this.model.getMergedByRange(drawRange);
+			var objectMergedCells = {}; // Двумерный массив вида строка-колонка {1: {1: true, 2: true}}
+			var i, length, arrMerged, mergeElem, col, row;
+			for (i = 0, arrMerged = mergedCells.inner, length = arrMerged.length; i < length; ++i) {
+				for (mergeElem = arrMerged[i].bbox, row = mergeElem.r1; row <= mergeElem.r2; ++row) {
+					if (!objectMergedCells.hasOwnProperty(row))
+						objectMergedCells[row] = {};
+					for (col = mergeElem.c1; col <= mergeElem.c2; ++col)
+						objectMergedCells[row][col] = arrMerged[i].bbox;
+				}
+			}
+			for (i = 0, arrMerged = mergedCells.outer, length = arrMerged.length; i < length; ++i) {
+				for (mergeElem = drawRange.intersectionSimple(arrMerged[i].bbox), row = mergeElem.r1; row <= mergeElem.r2; ++row) {
+					if (!objectMergedCells.hasOwnProperty(row))
+						objectMergedCells[row] = {};
+					for (col = mergeElem.c1; col <= mergeElem.c2; ++col)
+						objectMergedCells[row][col] = arrMerged[i].bbox;
+				}
+			}
+
 			var bc = undefined; // cached border color
 			if (undefined === drawingCtx && this.topLeftFrozenCell) {
 				if (undefined === leftFieldInPt) {
@@ -2763,8 +2815,10 @@
 				}
 			}
 
-			function drawVerticalBorder(borderLeft, borderRight, x, y1, y2) {
-				var border;
+			function drawVerticalBorder(borderLeftObject, borderRightObject, x, y1, y2) {
+				var border, borderLeft = borderLeftObject ? borderLeftObject.borders : null,
+					borderRight = borderRightObject ? borderRightObject.borders : null;
+
 				if (borderLeft && borderLeft.r.w)
 					border = borderLeft.r;
 				else if (borderRight && borderRight.l.w)
@@ -2772,16 +2826,20 @@
 				if (!border || border.w < 1) {return;}
 
 				// ToDo переделать рассчет
-				var tbw = t._calcMaxBorderWidth(borderLeft && borderLeft.t, borderRight && borderRight.t); // top border width
-				var bbw = t._calcMaxBorderWidth(borderLeft && borderLeft.b, borderRight && borderRight.b); // bottom border width
+				var tbw = t._calcMaxBorderWidth(borderLeftObject && borderLeftObject.getTopBorder(),
+						borderRightObject && borderRightObject.getTopBorder()); // top border width
+				var bbw = t._calcMaxBorderWidth(borderLeftObject && borderLeftObject.getBottomBorder(),
+						borderRightObject && borderRightObject.getBottomBorder()); // bottom border width
 				var dy1 = tbw > border.w ? tbw - 1 : (tbw > 1 ? -1 : 0);
 				var dy2 = bbw > border.w ? -2 : (bbw > 2 ? 1 : 0);
 
 				drawBorderVer(border, x, y1 + (-1 + dy1) * t.height_1px, y2 + (1 + dy2) * t.height_1px);
 			}
 
-			function drawHorizontalBorder(borderTop, borderBottom, x1, y, x2) {
-				var border;
+			function drawHorizontalBorder(borderTopObject, borderBottomObject, x1, y, x2) {
+				var border, borderTop = borderTopObject ? borderTopObject.borders : null,
+					borderBottom = borderBottomObject ? borderBottomObject.borders : null;
+
 				if (borderTop && borderTop.b.w)
 					border = borderTop.b;
 				else if (borderBottom && borderBottom.t.w)
@@ -2789,8 +2847,10 @@
 
 				if (border && border.w > 0) {
 					// ToDo переделать рассчет
-					var lbw = t._calcMaxBorderWidth(borderTop && borderTop.l, borderBottom && borderBottom.l);
-					var rbw = t._calcMaxBorderWidth(borderTop && borderTop.r, borderBottom && borderBottom.r);
+					var lbw = t._calcMaxBorderWidth(borderTopObject && borderTopObject.getLeftBorder(),
+							borderBottomObject && borderBottomObject.getLeftBorder());
+					var rbw = t._calcMaxBorderWidth(borderTopObject && borderTopObject.getRightBorder(),
+							borderTopObject && borderTopObject.getRightBorder());
 					var dx1 = border.w > lbw ? (lbw > 1 ? -1 : 0) : (lbw > 2 ? 2 : 1);
 					var dx2 = border.w > rbw ? (rbw > 2 ? 1 : 0) : (rbw > 1 ? -2 : -1);
 					drawBorderHor(border, x1 + (-1 + dx1) * t.width_1px, y, x2 + (1 + dx2) * t.width_1px);
@@ -2805,66 +2865,77 @@
 					.clip();
 			}
 
-			var arrPrevRow = [];
-			var arrCurrRow = [];
-			var arrNextRow = [];
+			var arrPrevRow = [], arrCurrRow = [], arrNextRow = [];
+			var objMCPrevRow = null, objMCRow = null, objMCNextRow = null;
 			var bCur, bPrev, bNext, bTopCur, bTopPrev, bTopNext, bBotCur, bBotPrev, bBotNext;
-			bCur = bPrev = bNext = bTopCur = bTopNext = bBotCur = bBotNext = undefined;
-			var row = drawRange.r1 - 1, col, prevCol = drawRange.c1 - 1;
+			bCur = bPrev = bNext = bTopCur = bTopNext = bBotCur = bBotNext = null;
+			row = drawRange.r1 - 1;
+			var prevCol = drawRange.c1 - 1;
+			// Определим первую колонку (т.к. могут быть скрытые колонки)
+			while (0 <= prevCol && c[prevCol].width < t.width_1px)
+				--prevCol;
+
 			// Сначала пройдемся по верхней строке (над отрисовываемым диапазоном)
 			while (0 <= row) {
 				if (r[row].height >= t.height_1px) {
+					objMCPrevRow = objectMergedCells[row];
 					for (col = prevCol; col <= drawRange.c2 && col < t.nColsCount; ++col) {
 						if (0 > col || c[col].width < t.width_1px) {continue;}
-						arrPrevRow[col] = t._getVisibleCell(col, row).getBorder();
+						arrPrevRow[col] = new CellBorderObject(t._getVisibleCell(col, row).getBorder(),
+							objMCPrevRow ? objMCPrevRow[col] : null, col, row);
 					}
 					break;
 				}
 				--row;
 			}
-			// Теперь определим первую колонку (т.к. могут быть скрытые колонки)
-			while (0 <= prevCol && c[prevCol].width < t.width_1px)
-				--prevCol;
 
-			var mc = undefined, isMerged;
+			var mc = null;
 			var isPrevColExist = (0 <= prevCol);
-			for (row = drawRange.r1; row <= drawRange.r2 && row < t.nRowsCount; ++row) {
+			for (row = drawRange.r1; row <= drawRange.r2 && row < t.nRowsCount; row = nextRow) {
 				if (r[row].height < t.height_1px) {continue;}
+
 				var isFirstRow = row === drawRange.r1;
 				var isLastRow  = row === drawRange.r2;
-				var nextRow = row + 1;
+				var nextRow;
+				// Нужно отсеять пустые снизу
+				for (nextRow = row + 1; nextRow <= drawRange.r2 && nextRow < t.nRowsCount; ++nextRow)
+					if (r[nextRow].height >= t.height_1px) {break;}
+
+				if (isFirstRow) {
+					objMCRow = objectMergedCells[row];
+				} else {
+					objMCPrevRow = objMCRow;
+					objMCRow = objMCNextRow;
+				}
+				objMCNextRow = objectMergedCells[nextRow];
 
 				var rowCache = t._fetchRowCache(row);
 				var y1 = r[row].top - offsetY;
-				var y2 = y1 + r[row].height - this.height_1px;
+				var y2 = y1 + r[row].height - t.height_1px;
 
 				var nextCol;
-				for (col = drawRange.c1, isMerged = false; col <= drawRange.c2 && col < t.nColsCount; col = nextCol, isMerged = false) {
-					if (c[col].width < this.width_1px) {continue;}
+				for (col = drawRange.c1; col <= drawRange.c2 && col < t.nColsCount; col = nextCol) {
+					if (c[col].width < t.width_1px) {continue;}
 					var isFirstCol = col === drawRange.c1;
 					var isLastCol = col === drawRange.c2;
 					// Нужно отсеять пустые справа
 					for (nextCol = col + 1; nextCol <= drawRange.c2 && nextCol < t.nColsCount; ++nextCol)
-						if (c[nextCol].width >= this.width_1px) {break;}
+						if (c[nextCol].width >= t.width_1px) {break;}
 
-					if (mc && mc.c2 >= col) {
-						isMerged = true;
-					} else {
-						mc = this.model.getMergedByCell(row, col);
-						if (mc)
-							isMerged = true;
-					}
+					mc = objMCRow ? objMCRow[col] : null;
 
 					var x1 = c[col].left - offsetX;
 					var x2 = x1 + c[col].width - this.width_1px;
 
 					if (row === t.nRowsCount) {
-						bBotPrev = bBotCur = bBotNext = undefined;
+						bBotPrev = bBotCur = bBotNext = null;
 					} else {
 						if (isFirstCol) {
-							bBotPrev = arrNextRow[prevCol] = isPrevColExist ?
-								t._getVisibleCell(prevCol, nextRow).getBorder() : undefined;
-							bBotCur = arrNextRow[col] = t._getVisibleCell(col, nextRow).getBorder();
+							bBotPrev = arrNextRow[prevCol] = new CellBorderObject(isPrevColExist ?
+								t._getVisibleCell(prevCol, nextRow).getBorder() : null,
+								objMCNextRow ? objMCNextRow[prevCol] : null, prevCol, nextRow);
+							bBotCur = arrNextRow[col] =
+								new CellBorderObject(t._getVisibleCell(col, nextRow).getBorder(), mc, col, nextRow);
 						} else {
 							bBotPrev = bBotCur;
 							bBotCur = bBotNext;
@@ -2872,9 +2943,9 @@
 					}
 
 					if (isFirstCol) {
-						bPrev = arrCurrRow[prevCol] = isPrevColExist ?
-							t._getVisibleCell(prevCol, row).getBorder() : undefined;
-						arrCurrRow[col] = bCur = t._getVisibleCell(col, row).getBorder();
+						bPrev = arrCurrRow[prevCol] = new CellBorderObject(isPrevColExist ?
+							t._getVisibleCell(prevCol, row).getBorder() : null, mc, prevCol, row);
+						bCur = arrCurrRow[col] = new CellBorderObject(t._getVisibleCell(col, row).getBorder(), mc, col, row);
 						bTopPrev = arrPrevRow[prevCol];
 						bTopCur = arrPrevRow[col];
 					} else {
@@ -2885,26 +2956,28 @@
 					}
 
 					if (col === t.nColsCount) {
-						bNext = undefined;
-						bTopNext = undefined;
+						bNext = null;
+						bTopNext = null;
 					} else {
-						bNext = arrCurrRow[nextCol] = t._getVisibleCell(nextCol, row).getBorder();
+						bNext = arrCurrRow[nextCol] =
+							new CellBorderObject(t._getVisibleCell(nextCol, row).getBorder(), mc, nextCol, row);
 						bTopNext = arrPrevRow[nextCol];
 
 						if (row === t.nRowsCount)
-							bBotNext = undefined;
+							bBotNext = null;
 						else
-							bBotNext = arrNextRow[nextCol] = t._getVisibleCell(nextCol, nextRow).getBorder();
+							bBotNext = arrNextRow[nextCol] =
+								new CellBorderObject(t._getVisibleCell(nextCol, nextRow).getBorder(), mc, nextCol, nextRow);
 					}
 
-					if (isMerged && row !== mc.r1 && row !== mc.r2 && col !== mc.c1 && col !== mc.c2)
+					if (mc && row !== mc.r1 && row !== mc.r2 && col !== mc.c1 && col !== mc.c2)
 						continue;
 
 					// draw diagonal borders
-					if ((bCur.dd || bCur.du) && (!isMerged || (row === mc.r1 && col === mc.c1))) {
+					if ((bCur.dd || bCur.du) && (!mc || (row === mc.r1 && col === mc.c1))) {
 						var x2Diagonal = x2;
 						var y2Diagonal = y2;
-						if (isMerged) {
+						if (mc) {
 							// Merge cells
 							x2Diagonal = c[mc.c2].left + c[mc.c2].width - offsetX - t.width_1px;
 							y2Diagonal = r[mc.r2].top + r[mc.r2].height - offsetY - t.height_1px;
@@ -2943,7 +3016,7 @@
 //						}
 					}
 					// draw right border
-					if ((!isMerged || col === mc.c2 || isLastCol) && !t._isRightBorderErased1(col, rowCache)) {
+					if ((!mc || col === mc.c2 || isLastCol) && !t._isRightBorderErased1(col, rowCache)) {
 						drawVerticalBorder(bCur, bNext, x2, y1, y2);
 					}
 					// draw top border
@@ -2955,13 +3028,11 @@
 //							drawHorizontalBorder.call(this, tb, lb, lbPrev, rb, rbPrev, x1, y1, x2);
 //						}
 					}
-					if (!isMerged || row === mc.r2 || isLastRow) {
+					if (!mc || row === mc.r2 || isLastRow) {
 						// draw bottom border
 						drawHorizontalBorder(bCur, bBotCur, x1, y2, x2);
 					}
 				}
-
-				mc = undefined;
 
 				arrPrevRow = arrCurrRow;
 				arrCurrRow = arrNextRow;
