@@ -3744,7 +3744,7 @@ cODDLPRICE.prototype.Calculate = function ( arg ) {
     basis = basis.getValue();
 
     if ( maturity <= settlement || settlement <= last_interest || basis < 0 || basis > 4 || yld < 0 || rate < 0 ||
-        frequency != 1 && frequency != 2 && frequency != 4 || redemption < 0 ){
+        frequency != 1 && frequency != 2 && frequency != 4 || redemption <= 0 ){
         return this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -3883,7 +3883,7 @@ cODDLYIELD.prototype.Calculate = function ( arg ) {
     basis = basis.getValue();
 
     if ( maturity <= settlement || settlement <= last_interest || basis < 0 || basis > 4 || pr < 0 || rate < 0 ||
-        frequency != 1 && frequency != 2 && frequency != 4 || redemption < 0 ){
+        frequency != 1 && frequency != 2 && frequency != 4 || redemption <= 0 ){
         return this.value = new cError( cErrorType.not_numeric );
     }
 
