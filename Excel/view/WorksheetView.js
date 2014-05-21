@@ -5353,19 +5353,21 @@
 
 		// x,y - абсолютные координаты относительно листа (без учета заголовков)
 		WorksheetView.prototype.findCellByXY = function (x, y) {
-			var r = 0, c = 0, result = new CCellObjectInfo();
+			var r = 0, c = 0, tmpRow, tmpCol, result = new CCellObjectInfo();
 			x += this.cellsLeft;
 			y += this.cellsTop;
 			while (c < this.cols.length) {
-				if (x >= this.cols[c].left && this.width_1px <= this.cols[c].width) {
-					result.col = c;
+				tmpCol = this.cols[c];
+				if (x <= tmpCol.left + tmpCol.width) {
+					result.col = c - 1;
 					break;
 				}
 				++c;
 			}
-			while (r < this.rows.length && y < this.rows[r].top) {
-				if (y >= this.rows[r].top && this.height_1px <= this.rows[r].height) {
-					result.row = r;
+			while (r < this.rows.length) {
+				tmpRow = this.rows[r];
+				if (y <= tmpRow.top + tmpRow.height) {
+					result.row = r - 1;
 					break;
 				}
 				++r;
