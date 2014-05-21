@@ -6811,6 +6811,25 @@ asc_docs_api.prototype.GetSectionInfo = function()
     return obj;
 }
 
+asc_docs_api.prototype.add_SectionBreak = function(_Type)
+{
+    var Type = section_type_Continuous;
+    switch(_Type)
+    {
+        case c_oAscSectionBreakType.NextPage   : Type = section_type_NextPage; break;
+        case c_oAscSectionBreakType.OddPage    : Type = section_type_OddPage; break;
+        case c_oAscSectionBreakType.EvenPage   : Type = section_type_EvenPage; break;
+        case c_oAscSectionBreakType.Continuous : Type = section_type_Continuous; break;
+        case c_oAscSectionBreakType.Column     : Type = section_type_Column; break;
+    }
+
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Add_SectionBreak(Type);
+    }
+}
+
 asc_docs_api.prototype.SetViewMode = function( isViewMode )
 {
     if (isViewMode)

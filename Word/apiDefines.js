@@ -338,4 +338,13 @@ var c_oAscDropCap =
     Margin : 2
 };
 
+var c_oAscSectionBreakType = 
+{
+    NextPage   : 0x00,
+    OddPage    : 0x01,
+    EvenPage   : 0x02,
+    Continuous : 0x03,
+    Column     : 0x04
+};
+
 window["flat_desine"] = false;
