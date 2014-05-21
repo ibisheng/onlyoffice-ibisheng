@@ -3134,7 +3134,7 @@
 					drawingObject.graphicObject.addToDrawingObjects();
 					drawingObject.graphicObject.select(ws.objectRender.controller, 0);
 				};
-				
+				ws.objectRender.showDrawingObjects(true);
 				History.EndTransaction();
 			},
 			
