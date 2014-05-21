@@ -156,8 +156,15 @@
 				"../../Word/Math/radical.js",
 				"../../Word/Math/operators.js",
 				"../../Word/Math/accent.js",
-				"../../Word/Math/borderBox.js"
+				"../../Word/Math/borderBox.js",
 				
+				"/../../Excel/utils/utils.js",
+				"/../../Excel/model/CellComment.js",
+				"/../../Excel/model/Serialize.js",
+				"/../../Excel/model/WorkbookElems.js",
+				"/../../Excel/model/Workbook.js",
+				"/../../Excel/model/CellInfo.js",
+				"/../../Excel/model/AdvancedOptions.js"
 				
             ],
             "dst": "../../Word/sdk-all.js",
