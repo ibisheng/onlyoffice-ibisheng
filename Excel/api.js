@@ -1655,7 +1655,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					}
 				};
 
-				this.CoAuthoringApi.init(t.User, t.documentId, 'fghhfgsjdgfjs', window.location.host, g_sMainServiceLocalUrl, function(){
+				this.CoAuthoringApi.init(t.User, t.documentId, 'fghhfgsjdgfjs', window.location.hostname,
+					window.location.port, g_sMainServiceLocalUrl, function(){
+
 				}, c_oEditorId.Speadsheet, t.documentFormatSave);
 			},
 

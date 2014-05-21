@@ -28,7 +28,8 @@
 		}
 	};
 
-	CDocsCoApi.prototype.init = function (user, docid, token, serverHost, serverPath, callback, editorType, documentFormatSave) {
+	CDocsCoApi.prototype.init = function (user, docid, token, serverHost, serverPort, serverPath, callback,
+										  editorType, documentFormatSave) {
 		if (this._CoAuthoringApi && this._CoAuthoringApi.isRightURL()) {
 			var t = this;
 			this._CoAuthoringApi.onAuthParticipantsChanged = function (e, count) {t.callback_OnAuthParticipantsChanged(e, count);};
@@ -46,7 +47,8 @@
 			// Callback есть пользователей больше 1
 			this._CoAuthoringApi.onStartCoAuthoring = function (e) {t.callback_OnStartCoAuthoring(e);};
 
-			this._CoAuthoringApi.init(user, docid, token, serverHost, serverPath, callback, editorType, documentFormatSave);
+			this._CoAuthoringApi.init(user, docid, token, serverHost, serverPort, serverPath, callback,
+				editorType, documentFormatSave);
 			this._onlineWork = true;
 		}
 		else {
@@ -738,6 +740,7 @@
                     "locks":docsCoApi.ownedLockBlocks,
                     "sessionId":docsCoApi._id,
 					"serverHost": docsCoApi._serverHost,
+					"serverPort": docsCoApi._serverPort,
 					"serverPath": docsCoApi._serverPath,
 					"documentFormatSave": docsCoApi._documentFormatSave
                 });
@@ -785,7 +788,8 @@
     }
 
 
-    DocsCoApi.prototype.init = function (user, docid, token, serverHost, serverPath, callback, editorType, documentFormatSave) {
+    DocsCoApi.prototype.init = function (user, docid, token, serverHost, serverPort, serverPath, callback,
+										 editorType, documentFormatSave) {
         this._user = user;
         this._docid = docid;
         this._token = token;
@@ -795,6 +799,7 @@
         var docsCoApi = this;
 		// Server info
 		this._serverHost = serverHost;
+		this._serverPort = serverPort;
 		this._serverPath = serverPath;
 		this.sockjs_url = this._url + '/doc/'+docid+'/c';
         this.sockjs = initSocksJs(this.sockjs_url, this);
