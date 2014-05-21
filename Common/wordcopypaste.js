@@ -3042,7 +3042,7 @@ PasteProcessor.prototype =
 
             if(copyPasteUseBinery)
             {
-                var base64 = null, base64FromExcel = null,classNode, aContent, aContentExcel;
+                var base64 = null, base64FromExcel = null,classNode, aContent, aContentExcel, pasteFromBinary = false;
 				
 				if(node.children[0] && node.children[0].getAttribute("class") != null && (node.children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].getAttribute("class").indexOf("docData;") > -1))
 					classNode = node.children[0].getAttribute("class");
@@ -3077,7 +3077,12 @@ PasteProcessor.prototype =
 				if(aContentExcel)
 					aContent = this._convertExcelBinary(aContentExcel);
 					
-                if(aContent)
+				if(base64 != null && aContent)
+					pasteFromBinary = true;
+				else if(aContentExcel != null && aContent && aContent.content)
+					pasteFromBinary = true;
+				
+				if(pasteFromBinary)
                 {
 					var fPrepasteCallback = function(){
                         if(false == oThis.bNested)
@@ -3865,7 +3870,7 @@ PasteProcessor.prototype =
 		var aContent = null;
 		
 		var drawings = aContentExcel.aWorksheets[0].Drawings;
-		if(drawings)
+		if(drawings && drawings.length)
 		{
 			var drawing, graphicObj, paraRun, tempParaRun;
 			
