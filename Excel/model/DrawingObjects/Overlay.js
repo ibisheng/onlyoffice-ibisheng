@@ -2085,6 +2085,12 @@ CSlideBoundsChecker.prototype =
     SetCurrentPage: function()
     {},
 
+    GetIntegerGrid: function()
+    {
+        return false;
+    },
+
+
     EndDraw : function(){},
     put_GlobalAlpha : function(enable, alpha)
     {
