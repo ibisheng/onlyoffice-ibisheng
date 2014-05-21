@@ -2204,18 +2204,16 @@ cDURATION.prototype.Calculate = function ( arg ) {
     if ( frequency instanceof cError ) return this.value = frequency;
     if ( basis instanceof cError ) return this.value = basis;
 
-    if ( settlement.getValue() >= maturity.getValue() ||
-        basis.getValue() < 0 || basis.getValue() > 4 ||
-        ( frequency.getValue() != 1 && frequency.getValue() != 2 && frequency.getValue() != 4 ) ||
-        yld.getValue() < 0 || coupon.getValue < 0 )
-        return this.value = new cError( cErrorType.not_numeric );
-
     settlement = settlement.getValue();
     maturity = maturity.getValue();
     coupon = coupon.getValue();
     yld = yld.getValue();
     frequency = frequency.getValue();
     basis = basis.getValue();
+
+    if ( settlement >= maturity || basis < 0 || basis > 4 || ( frequency != 1 && frequency != 2 && frequency != 4 ) || yld < 0 || coupon < 0 ){
+        return this.value = new cError( cErrorType.not_numeric );
+    }
 
     var settl = Date.prototype.getDateFromExcel( settlement ),
         matur = Date.prototype.getDateFromExcel( maturity );

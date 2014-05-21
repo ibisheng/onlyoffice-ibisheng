@@ -336,6 +336,10 @@
             coupD = getcoupdays(new Date( settlement ),new Date( maturity ),frequency,basis),
             numCoup = getcoupnum(new Date( settlement ),new Date( maturity ),frequency);
 
+        if ( settlement >= maturity || basis < 0 || basis > 4 || ( frequency != 1 && frequency != 2 && frequency != 4 ) || yld < 0 || coupon < 0 ){
+            return "#NUM!";
+        }
+
         var duration = 0, p = 0;
 
         var dsc = coupD - dbc;
@@ -4283,6 +4287,14 @@
         oParser = new parserFormula( "DURATION(DATE(2008,1,1),DATE(2016,1,1),0.08,0.09,2,1)", "A2", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), _duration( new Date(Date.UTC(2008,0,1)), new Date(Date.UTC(2016,0,1)), 0.08, 0.09, 2, 1 ) );
+
+        oParser = new parserFormula( "DURATION(DATE(2008,1,1),DATE(2016,1,1),-0.08,0.09,2,1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), _duration( new Date(Date.UTC(2008,0,1)), new Date(Date.UTC(2016,0,1)), -0.08, 0.09, 2, 1 ) );
+
+        oParser = new parserFormula( "DURATION(DATE(2008,1,1),DATE(2016,1,1),-0.08,0.09,5,1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), _duration( new Date(Date.UTC(2008,0,1)), new Date(Date.UTC(2016,0,1)), -0.08, 0.09, 5, 1 ) );
 
     } )
 
