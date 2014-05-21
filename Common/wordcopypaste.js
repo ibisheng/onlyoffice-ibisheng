@@ -3042,31 +3042,40 @@ PasteProcessor.prototype =
 
             if(copyPasteUseBinery)
             {
-                var base64 = null;
-                var classNode;
-                if(node.children[0] && node.children[0].getAttribute("class") != null && node.children[0].getAttribute("class").indexOf("docData;") > -1)
-					classNode = node.children[0].getAttribute("class");
-                else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].getAttribute("class") != null && node.children[0].children[0].getAttribute("class").indexOf("docData;") > -1)
-					classNode = node.children[0].children[0].getAttribute("class");
-				else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].children[0] && node.children[0].children[0].children[0].getAttribute("class") != null && node.children[0].children[0].children[0].getAttribute("class").indexOf("docData;") > -1)
-                    classNode = node.children[0].children[0].children[0].getAttribute("class");
+                var base64 = null, base64FromExcel = null,classNode, aContent, aContentExcel;
 				
-                if( classNode != null ){
-                    var cL = classNode.split(" ");
-                    for (var i = 0; i < cL.length; i++){
-                        if(cL[i].indexOf("docData;") > -1)
-                        {
-                            base64 = cL[i].split('docData;')[1];
-                        }
-                    }
-                }
-                var aContent;
+				if(node.children[0] && node.children[0].getAttribute("class") != null && (node.children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].getAttribute("class").indexOf("docData;") > -1))
+					classNode = node.children[0].getAttribute("class");
+				else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].getAttribute("class").indexOf("docData;") > -1))
+					classNode = node.children[0].children[0].getAttribute("class");
+				else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].children[0] && node.children[0].children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].children[0].getAttribute("class").indexOf("docData;") > -1))
+					classNode = node.children[0].children[0].children[0].getAttribute("class");
+				
+				if( classNode != null ){
+					var cL = classNode.split(" ");
+					for (var i = 0; i < cL.length; i++){
+						if(cL[i].indexOf("xslData;") > -1)
+						{
+							base64FromExcel = cL[i].split('xslData;')[1];
+						}
+						else if(cL[i].indexOf("docData;") > -1)
+						{
+							base64 = cL[i].split('docData;')[1];
+						}
+					}
+				};
+				
 				//если находимся внутри шейп, вставляем html
 				if(this.oDocument.Parent && this.oDocument.Parent instanceof CShape)
 					base64 = null;
 					
                 if(base64 != null)
                     aContent = this.ReadFromBinary(base64);
+				else if(base64FromExcel != null)
+					aContentExcel = this._readFromBinaryExcel(base64FromExcel);
+				
+				if(aContentExcel)
+					aContent = this._convertExcelBinary(aContentExcel);
 					
                 if(aContent)
                 {
@@ -3126,8 +3135,8 @@ PasteProcessor.prototype =
                     else
                         oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
                     return;
-                }
-            }
+                };
+            };
 
             var presentation = editor.WordControl.m_oLogicDocument;
             this.oRootNode = node;
@@ -3849,8 +3858,58 @@ PasteProcessor.prototype =
 
         }
     },
+	
+	_convertExcelBinary: function(aContentExcel)
+	{
+		//пока только распознаём только графические объекты
+		var aContent = null;
+		
+		var drawings = aContentExcel.aWorksheets[0].Drawings;
+		if(drawings)
+		{
+			var drawing, graphicObj, paraRun, tempParaRun;
+			
+			//var wrappingType = this.oDocument.DrawingObjects.selection.groupSelection.parent.wrappingType;
+			//var DrawingType = this.oDocument.DrawingObjects.selection.groupSelection.parent.DrawingType;
+			
+			var tempParagraph = new Paragraph(this.oDocument, this.oDocument, 0, 0, 0, 0, 0);
+			
+			//из excel в word они вставляются в один параграф
+			for(var i = 0; i < drawings.length; i++)
+			{
+				drawing = drawings[i];
+				graphicObj = drawing.graphicObject.convertToWord(this.oLogicDocument.DrawingDocument);
+				
+				tempParaRun = new ParaRun();
+				tempParaRun.Content.unshift(new ParaDrawing());
 
-
+				//paraRun.Content[index].wrappingType = wrappingType;
+				//paraRun.Content[index].DrawingType = DrawingType;
+				
+				tempParaRun.Content[0].GraphicObj = graphicObj;
+				tempParaRun.Content[0].GraphicObj.parent = tempParaRun.Content[0];
+				
+				tempParagraph.Content.unshift(tempParaRun);
+			};
+			
+			aContent = [];
+			aContent[0] = tempParagraph;
+		};
+		
+		return {content: aContent, aPastedImages: []};			
+	},
+	
+	_readFromBinaryExcel: function(base64)
+	{
+		var oBinaryFileReader = new Asc.BinaryFileReader(null, true);
+		var tempWorkbook = new Workbook;
+        tempWorkbook.theme = this.oDocument.theme;
+		Asc.getBinaryOtherTableGVar(tempWorkbook);
+		oBinaryFileReader.Read(base64, tempWorkbook);
+		
+		return tempWorkbook;
+	},
+	
     ReadPresentationText: function(stream)
     {
         var loader = new BinaryPPTYLoader();

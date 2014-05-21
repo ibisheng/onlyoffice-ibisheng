@@ -5068,6 +5068,10 @@
                 this.aMerged = [];
                 this.aHyperlinks = [];
                 var oNewWorksheet = new Woorksheet(this.wb, wb.aWorksheets.length);
+				
+				//TODO при copy/paste в word из excel необходимо подменить DrawingDocument из word - пересмотреть правку!
+				if(editor && editor.WordControl && editor.WordControl.m_oLogicDocument && editor.WordControl.m_oLogicDocument.DrawingDocument)
+					oNewWorksheet.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
                 this.curWorksheet = oNewWorksheet;
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadWorksheet(t,l, oNewWorksheet);
@@ -5632,7 +5636,9 @@
                         oNewDrawing.Type = ECellAnchorType.cellanchorAbsolute;
                     if(oNewDrawing.graphicObject)
                     {
-                        oNewDrawing.graphicObject.setWorksheet(ws);
+						//TODO при copy/paste в word из excel пропадает метод setWorksheet
+						if(typeof oNewDrawing.graphicObject.setWorksheet != "undefined")
+							oNewDrawing.graphicObject.setWorksheet(ws);
                     }
                     aDrawings.push(oNewDrawing);
                 }
@@ -5701,7 +5707,9 @@
                 if(null != oGraphicObject)
                 {
                     oDrawing.graphicObject = oGraphicObject;
-                    oGraphicObject.setDrawingBase(oDrawing);
+					//TODO при copy/paste в word из excel пропадает метод setDrawingBase
+					if(typeof oGraphicObject.setDrawingBase != "undefined")
+						oGraphicObject.setDrawingBase(oDrawing);
                 }
             }
             else
@@ -6277,49 +6285,9 @@
             this.wb.clrSchemeMap = GenerateDefaultColorMap();
             if(null == this.wb.theme)
                 this.wb.theme = GenerateDefaultTheme(this.wb);
-            g_oColorManager.setTheme(this.wb.theme);
 
-            var sMinorFont = null;
-            if(null != this.wb.theme.themeElements && null != this.wb.theme.themeElements.fontScheme && null != this.wb.theme.themeElements.fontScheme.minorFont)
-                sMinorFont = this.wb.theme.themeElements.fontScheme.minorFont.latin;
-            var sDefFont = "Calibri";
-            if(null != sMinorFont && "" != sMinorFont)
-                sDefFont = sMinorFont;
-            g_oDefaultFont = g_oDefaultFontAbs = new Font({
-                fn : sDefFont,
-                scheme : EFontScheme.fontschemeNone,
-                fs : 11,
-                b : false,
-                i : false,
-                u : EUnderline.underlineNone,
-                s : false,
-                c : g_oColorManager.getThemeColor(g_nColorTextDefault),
-                va : "baseline",
-                skip : false,
-                repeat : false
-            });
-            g_oDefaultFill = g_oDefaultFillAbs = new Fill({bg : null});
-            g_oDefaultBorder = g_oDefaultBorderAbs = new Border({
-                l : new BorderProp(),
-                t : new BorderProp(),
-                r : new BorderProp(),
-                b : new BorderProp(),
-                d : new BorderProp(),
-                ih : new BorderProp(),
-                iv : new BorderProp(),
-                dd : false,
-                du : false
-            });
-            g_oDefaultNum = g_oDefaultNumAbs = new Num({f : "General"});
-            g_oDefaultAlign = g_oDefaultAlignAbs = new Align({
-                hor : "none",
-                indent : 0,
-                RelativeIndent : 0,
-                shrink : false,
-                angle : 0,
-                ver : "bottom",
-                wrap : false
-            });
+            Asc.getBinaryOtherTableGVar(this.wb);
+
             return oRes;
         };
         this.ReadOtherContent = function(type, length)
@@ -6432,6 +6400,57 @@
             return res;
         };
     }
+
+    function getBinaryOtherTableGVar(workbook)
+    {
+        var wb = this.wb ? this.wb : workbook;
+
+        g_oColorManager.setTheme(wb.theme);
+
+        var sMinorFont = null;
+        if(null != wb.theme.themeElements && null != wb.theme.themeElements.fontScheme && null != wb.theme.themeElements.fontScheme.minorFont)
+            sMinorFont = wb.theme.themeElements.fontScheme.minorFont.latin;
+        var sDefFont = "Calibri";
+        if(null != sMinorFont && "" != sMinorFont)
+            sDefFont = sMinorFont;
+        g_oDefaultFont = g_oDefaultFontAbs = new Font({
+            fn : sDefFont,
+            scheme : EFontScheme.fontschemeNone,
+            fs : 11,
+            b : false,
+            i : false,
+            u : EUnderline.underlineNone,
+            s : false,
+            c : g_oColorManager.getThemeColor(g_nColorTextDefault),
+            va : "baseline",
+            skip : false,
+            repeat : false
+        });
+        g_oDefaultFill = g_oDefaultFillAbs = new Fill({bg : null});
+        g_oDefaultBorder = g_oDefaultBorderAbs = new Border({
+            l : new BorderProp(),
+            t : new BorderProp(),
+            r : new BorderProp(),
+            b : new BorderProp(),
+            d : new BorderProp(),
+            ih : new BorderProp(),
+            iv : new BorderProp(),
+            dd : false,
+            du : false
+        });
+        g_oDefaultNum = g_oDefaultNumAbs = new Num({f : "General"});
+        g_oDefaultAlign = g_oDefaultAlignAbs = new Align({
+            hor : "none",
+            indent : 0,
+            RelativeIndent : 0,
+            shrink : false,
+            angle : 0,
+            ver : "bottom",
+            wrap : false
+        });
+    }
+
+
     /** @constructor */
     function BinaryFileReader(sUrlPath, isCopyPaste)
     {
@@ -7595,5 +7614,7 @@
     window["Asc"].CTableStyleElement = CTableStyleElement;
     window["Asc"].BinaryFileReader = BinaryFileReader;
     window["Asc"].BinaryFileWriter = BinaryFileWriter;
+
+    window["Asc"].getBinaryOtherTableGVar = getBinaryOtherTableGVar;
 }
     )(jQuery, window);
