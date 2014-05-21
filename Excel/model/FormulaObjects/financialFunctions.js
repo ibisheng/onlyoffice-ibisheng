@@ -2887,18 +2887,16 @@ cMDURATION.prototype.Calculate = function ( arg ) {
     if ( frequency instanceof cError ) return this.value = frequency;
     if ( basis instanceof cError ) return this.value = basis;
 
-    if ( settlement.getValue() >= maturity.getValue() ||
-        basis.getValue() < 0 || basis.getValue() > 4 ||
-        ( frequency.getValue() != 1 && frequency.getValue() != 2 && frequency.getValue() != 4 ) ||
-        yld.getValue() < 0 || coupon.getValue < 0 )
-        return this.value = new cError( cErrorType.not_numeric );
-
     settlement = settlement.getValue();
     maturity = maturity.getValue();
     coupon = coupon.getValue();
     yld = yld.getValue();
     frequency = frequency.getValue();
     basis = basis.getValue();
+
+    if ( settlement >= maturity || basis < 0 || basis > 4 || ( frequency != 1 && frequency != 2 && frequency != 4 ) || yld < 0 || coupon < 0 ){
+        return this.value = new cError( cErrorType.not_numeric );
+    }
 
     var settl = Date.prototype.getDateFromExcel( settlement ),
         matur = Date.prototype.getDateFromExcel( maturity );
@@ -3989,13 +3987,19 @@ cPMT.prototype.Calculate = function ( arg ) {
 
     if ( type.getValue() != 1 && type.getValue() != 0 ) return this.value = new cError( cErrorType.not_numeric );
 
+    rate = rate.getValue();
+    nper = nper.getValue();
+    fv = fv.getValue();
+    type = type.getValue();
+    pv = pv.getValue();
+
     var res;
-    if ( rate.getValue() != 0 ) {
-        res = -1 * ( pv.getValue() * Math.pow( 1 + rate.getValue(), nper.getValue() ) + fv.getValue() ) /
-            ( ( 1 + rate.getValue() * type.getValue() ) * ( Math.pow( (1 + rate.getValue()), nper.getValue() ) - 1 ) / rate.getValue() );
+    if ( rate != 0 ) {
+        res = -1 * ( pv * Math.pow( 1 + rate, nper ) + fv ) /
+            ( ( 1 + rate * type ) * ( Math.pow( (1 + rate), nper ) - 1 ) / rate );
     }
     else {
-        res = -1 * ( pv.getValue() + fv.getValue() ) / nper.getValue();
+        res = -1 * ( pv + fv ) / nper;
     }
 
     return this.value = new cNumber( res );
@@ -5486,7 +5490,7 @@ cXNPV.prototype.Calculate = function ( arg ) {
             if ( vaTmp instanceof  cError || daTmp instanceof cError )
                 return new cError( cErrorType.not_numeric );
 
-            res += valueArray[i].getValue() / ( Math.pow( ( 1 + r ), ( dateArray[i].getValue() - d1.getValue() ) / 365 ) )
+            res += valueArray[i].getValue() / ( Math.pow( ( 1 + r ), ( dateArray[i].getValue() - d1.getValue() ) / 365 ) );
         }
 
         return new cNumber( res );
