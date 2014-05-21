@@ -7698,7 +7698,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		        if (null != oHyperlinkObj.Tooltip)
 		            oNewHyperlink.Set_ToolTip(oHyperlinkObj.Tooltip);
 		        oParStruct.addToContent(oNewHyperlink);
-		    }
+		    }            
+            oNewHyperlink.Check_Content();
 		}
 		else
 		    res = c_oSerConstants.ReadUnknown;

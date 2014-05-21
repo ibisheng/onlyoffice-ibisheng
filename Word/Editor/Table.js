@@ -9538,6 +9538,25 @@ CTable.prototype =
             this.CurCell.Content.Get_SelectedContent( SelectedContent );
         }
     },
+    
+    Set_ParagraphPrOnAdd : function(Para)
+    {
+        this.ApplyToAll = true;
+        
+        // Добавляем стиль во все параграфы
+        var PStyleId = Para.Style_Get();
+        if ( undefined !== PStyleId && null !== this.LogicDocument )
+        {
+            var Styles = this.LogicDocument.Get_Styles();
+            this.Set_ParagraphStyle( Styles.Get_Name( PStyleId ) );
+        }
+        
+        // Добавляем текстовые настройки во все параграфы
+        var TextPr = Para.Get_TextPr();
+        this.Paragraph_Add( new ParaTextPr( TextPr ) );
+        
+        this.ApplyToAll = false;
+    },
 
     Set_ParagraphAlign : function(Align)
     {

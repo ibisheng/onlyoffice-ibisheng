@@ -2112,6 +2112,7 @@ CDocumentContent.prototype =
                         Grid[Index] = W / Cols;
 
                     var NewTable = new CTable(this.DrawingDocument, this, true, 0, 0, 0, this.X, this.YLimit, Rows, Cols, Grid );
+                    NewTable.Set_ParagraphPrOnAdd( Item );
 
                     // Проверим позицию в текущем параграфе
                     if ( true === Item.Cursor_IsEnd() )

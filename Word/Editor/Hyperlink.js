@@ -202,6 +202,13 @@ ParaHyperlink.prototype =
 
         return TextPr;
     },
+    
+    Check_Content : function()
+    {
+        // Данная функция запускается при чтении файла. Заглушка, на случай, когда в Hyperlink ничего не будет
+        if ( this.Content.length <= 0 )
+            this.Add_ToContent( 0, new ParaRun(), false );
+    },
 
     Add_ToContent : function(Pos, Item, UpdatePosition)
     {
