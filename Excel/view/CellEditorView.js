@@ -1702,6 +1702,9 @@
 					return false;
 
 				case 35:  // "end"
+					// Отключим стандартную обработку браузера нажатия end
+					event.stopPropagation();
+					event.preventDefault();
 					if (!t.hasFocus) {break;}
 					if (hieroglyph) {t._syncEditors();}
 					kind = ctrlKey ? kEndOfText : kEndOfLine;
@@ -1709,6 +1712,9 @@
 					return false;
 
 				case 36:  // "home"
+					// Отключим стандартную обработку браузера нажатия home
+					event.stopPropagation();
+					event.preventDefault();
 					if (!t.hasFocus) {break;}
 					if (hieroglyph) {t._syncEditors();}
 					kind = ctrlKey ? kBeginOfText : kBeginOfLine;
