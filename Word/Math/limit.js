@@ -141,7 +141,8 @@ CMathFunc.prototype.getPropsForWrite = function()
 CMathFunc.prototype.Save_Changes = function(Data, Writer)
 {
 	Writer.WriteLong( historyitem_type_mathFunc );
-}CMathFunc.prototype.Load_Changes = function(Reader)
+}
+CMathFunc.prototype.Load_Changes = function(Reader)
 {
 }
 CMathFunc.prototype.Refresh_RecalcData = function(Data)
