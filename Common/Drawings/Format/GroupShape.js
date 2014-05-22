@@ -324,6 +324,7 @@ CGroupShape.prototype =
     {
         var sp_tree_copy = [].concat(this.spTree), i;
         this.setWorksheet(worksheet);
+        this.setParent(null);
         for(i = this.spTree.length-1; i > -1; --i)
         {
             this.removeFromSpTreeByPos(i);
