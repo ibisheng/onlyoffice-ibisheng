@@ -10365,6 +10365,27 @@
 			c = t._getVisibleCell(col, row);
 			if (!c) {throw "Can not get cell data (col=" + col + ", row=" + row + ")";}
 
+			if (this.topLeftFrozenCell) {
+				var cFrozen = this.topLeftFrozenCell.getCol0();
+				var rFrozen = this.topLeftFrozenCell.getRow0();
+				if (0 < cFrozen) {
+					if (col >= cFrozen)
+						offsetX = tc[cFrozen].left - tc[0].left;
+					else {
+						vr.c1 = 0;
+						vr.c2 = cFrozen - 1;
+					}
+				}
+				if (0 < rFrozen) {
+					if (row >= rFrozen)
+						offsetY = tr[rFrozen].top - tr[0].top;
+					else {
+						vr.r1 = 0;
+						vr.r2 = rFrozen - 1;
+					}
+				}
+			}
+
 			fl = t._getCellFlags(c);
 			isMerged = fl.isMerged();
 			if (isMerged) {
@@ -10396,27 +10417,6 @@
 
 				if (bIsUpdateX || bIsUpdateY) {
 					t.draw();
-				}
-			}
-
-			if (this.topLeftFrozenCell) {
-				var cFrozen = this.topLeftFrozenCell.getCol0();
-				var rFrozen = this.topLeftFrozenCell.getRow0();
-				if (0 < cFrozen) {
-					if (col >= cFrozen)
-						offsetX = tc[cFrozen].left - tc[0].left;
-					else {
-						vr.c1 = 0;
-						vr.c2 = cFrozen - 1;
-					}
-				}
-				if (0 < rFrozen) {
-					if (row >= rFrozen)
-						offsetY = tr[rFrozen].top - tr[0].top;
-					else {
-						vr.r1 = 0;
-						vr.r2 = rFrozen - 1;
-					}
 				}
 			}
 
