@@ -97,6 +97,8 @@
             this.vsbApiLockMouse = false;
             this.hsbApiLockMouse = false;
 
+			this.__handlers = null; // ToDo избавиться от этой переменной!
+
 
             return this;
 		}
@@ -657,13 +659,13 @@
 			var ctrlKey = event.metaKey || event.ctrlKey;
 			var shiftKey = event.shiftKey;
 
-			t.__retval = true;
+			var result = true;
 
 			function stop(immediate) {
 				event.stopPropagation();
 				immediate ? event.stopImmediatePropagation() : true;
 				event.preventDefault();
-				t.__retval = false;
+				result = false;
 			}
 
 			// для исправления Bug 15902 - Alt забирает фокус из приложения
@@ -675,7 +677,7 @@
 			var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
 			if (!t.isMousePressed && graphicObjects.length && t.enableKeyEvents) {
 				if (t.handlers.trigger("graphicObjectWindowKeyDown", event))
-					return true;
+					return result;
 			}
 
 			// Двигаемся ли мы в выделенной области
@@ -698,7 +700,7 @@
 					break;
 				}
 
-				return true;
+				return result;
 			}
 
 			t.skipKeyPress = true;
@@ -706,7 +708,7 @@
 			if (!t.isCellEditMode) {
 				if (!t.handlers.trigger("popUpSelectorKeyDown", event)) {
 					stop();
-					return t.__retval;
+					return result;
 				}
 			}
 
@@ -719,7 +721,7 @@
 					t.strictClose = true;
 					// При F2 выставляем фокус в редакторе
 					t.handlers.trigger("editCell", 0, 0, /*isCoord*/false, /*isFocus*/true, /*isClearCell*/false, /*isHideCursor*/undefined);
-					return t.__retval;
+					return result;
 
 				case 8: // backspace
 					if (isViewerMode || t.isCellEditMode || t.isSelectionDialogMode) {return true;}
@@ -734,7 +736,7 @@
 					if (isViewerMode || t.isCellEditMode || t.isSelectionDialogMode) {return true;}
 					// Удаляем содержимое
 					t.handlers.trigger("empty");
-					return true;
+					return result;
 
 				case 9: // tab
 					if (t.isCellEditMode) {return true;}
@@ -769,12 +771,12 @@
 					// Перехватим Esc и отключим дефалтовую обработку
 					stop();
 					t.handlers.trigger("stopFormatPainter");
-					return t.__retval;
+					return result;
 
 				case 144: //Num Lock
 				case 145: //Scroll Lock
 					if (AscBrowser.isOpera) {stop();}
-					return t.__retval;
+					return result;
 
 				case 32: // Spacebar
 					if (t.isCellEditMode) {return true;}
@@ -795,7 +797,7 @@
 					} else {
 						t.handlers.trigger("selectRowsByRange");
 					}
-					return t.__retval;
+					return result;
 
 				case 33: // PageUp
 					// Отключим стандартную обработку браузера нажатия PageUp
@@ -832,7 +834,7 @@
 					stop();                          // Отключим стандартную обработку браузера нажатия up
 					// Если у нас открыто меню для подстановки формулы, то мы не обрабатываем верх/вниз
 					if (t.isCellEditMode && t.handlers.trigger("isPopUpSelectorOpen"))
-						return t.__retval;
+						return result;
 					dr = ctrlKey ? -1.5 : -1;  // Движение стрелками (влево-вправо, вверх-вниз)
 					break;
 
@@ -845,11 +847,11 @@
 					stop();                          // Отключим стандартную обработку браузера нажатия down
 					// Если у нас открыто меню для подстановки формулы, то мы не обрабатываем верх/вниз
 					if (t.isCellEditMode && t.handlers.trigger("isPopUpSelectorOpen"))
-						return t.__retval;
+						return result;
 					// Обработка Alt + down
 					if (!isViewerMode && !t.isCellEditMode && !t.isSelectionDialogMode && event.altKey) {
 						t.handlers.trigger("showAutoComplete");
-						return t.__retval;
+						return result;
 					}
 					dr = ctrlKey ? +1.5 : +1;  // Движение стрелками (влево-вправо, вверх-вниз)
 					break;
@@ -877,28 +879,31 @@
 				case 88: // cut					Ctrl + x
 				case 89: // redo				Ctrl + y
 				case 90: // undo				Ctrl + z
-					if (isViewerMode || t.isSelectionDialogMode) {stop(); return false;}
+					if (isViewerMode || t.isSelectionDialogMode) {stop(); return result;}
 
 				case 65: // select all      Ctrl + a
 				case 67: // copy            Ctrl + c
 					if (t.isCellEditMode) { return true; }
 
 				case 80: // print           Ctrl + p
-					if (t.isCellEditMode) { stop(); return false; }
+					if (t.isCellEditMode) { stop(); return result; }
 
 					if (!ctrlKey) { t.skipKeyPress = false; return true; }
+
+					if (67 !== event.which && 86 !== event.which && 88 !== event.which)
+						stop();
 
 					// Вызовем обработчик
 					if (!t.__handlers) {
 						t.__handlers = {
-							53: function () {stop(); t.handlers.trigger("setFontAttributes", "s");},
-							65: function () {stop(); t.handlers.trigger("changeSelection", /*isStartPoint*/true,
+							53: function () {t.handlers.trigger("setFontAttributes", "s");},
+							65: function () {t.handlers.trigger("changeSelection", /*isStartPoint*/true,
 								0, 0, /*isCoord*/true, /*isSelectMode*/false);},
-							66: function () {stop(); t.handlers.trigger("setFontAttributes", "b");},
-							73: function () {stop(); t.handlers.trigger("setFontAttributes", "i");},
-							85: function () {stop(); t.handlers.trigger("setFontAttributes", "u");},
-							80: function () {stop(); t.handlers.trigger("print");},
-							//83: function () {stop(); t.handlers.trigger("save");},
+							66: function () {t.handlers.trigger("setFontAttributes", "b");},
+							73: function () {t.handlers.trigger("setFontAttributes", "i");},
+							85: function () {t.handlers.trigger("setFontAttributes", "u");},
+							80: function () {t.handlers.trigger("print");},
+							//83: function () {t.handlers.trigger("save");},
 							67: function () {t.handlers.trigger("copy");},
 							86: function () {
 								if (!window.GlobalPasteFlag)
@@ -925,12 +930,12 @@
 								}
 							},
 							88: function () {t.handlers.trigger("cut");},
-							89: function () {stop(); t.handlers.trigger("redo");},
-							90: function () {stop(); t.handlers.trigger("undo");}
+							89: function () {t.handlers.trigger("redo");},
+							90: function () {t.handlers.trigger("undo");}
 						};
 					}
 					t.__handlers[event.which]();
-					return t.__retval;
+					return result;
 
 				case 61:  // Firefox, Opera (+/=)
 				case 187: // +/=
@@ -986,7 +991,7 @@
 				}
 			}
 
-			return t.__retval;
+			return result;
 		};
 
 		/** @param event {KeyboardEvent} */
