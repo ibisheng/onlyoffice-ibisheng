@@ -383,6 +383,7 @@ CChartSpace.prototype =
     convertToPPTX: function(drawingDocument, worksheet)
     {
         this.setWorksheet(worksheet);
+        this.setParent(null);
         return this;
     },
 

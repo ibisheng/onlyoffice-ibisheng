@@ -3109,8 +3109,8 @@
 				
 				for(var i = 0; i < data.Drawings.length; i++)
 				{
-					if(i == 0)
-						window["Asc"]["editor"].isStartAddShape = true;
+					//if(i == 0)
+					//	window["Asc"]["editor"].isStartAddShape = true;
 					drawingObject = data.Drawings[i];
 
 					CheckSpPrXfrm(drawingObject.graphicObject);
@@ -3134,7 +3134,9 @@
 					drawingObject.graphicObject.addToDrawingObjects();
 					drawingObject.graphicObject.select(ws.objectRender.controller, 0);
 				};
+
 				ws.objectRender.showDrawingObjects(true);
+                ws.setSelectionShape(true);
 				History.EndTransaction();
 			},
 			
@@ -3199,8 +3201,8 @@
 					};
 					
 					
-					if(i == 0)
-						window["Asc"]["editor"].isStartAddShape = true;
+					//if(i == 0)
+					//	window["Asc"]["editor"].isStartAddShape = true;
 
 					CheckSpPrXfrm(drawingObject.graphicObject);
 					xfrm = drawingObject.graphicObject.spPr.xfrm;
