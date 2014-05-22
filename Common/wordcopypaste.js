@@ -3894,7 +3894,7 @@ PasteProcessor.prototype =
 				tempParaRun.Content[0].GraphicObj = graphicObj;
 				tempParaRun.Content[0].GraphicObj.parent = tempParaRun.Content[0];
 				
-				tempParagraph.Content.unshift(tempParaRun);
+				tempParagraph.Content.splice(tempParagraph.Content.length - 1, 0, tempParaRun); 
 			};
 			
 			aContent = [];
