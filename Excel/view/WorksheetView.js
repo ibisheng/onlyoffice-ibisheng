@@ -3692,7 +3692,7 @@
 				ctx.setStrokeStyle(new CColor(0, 0, 0))
 					.setLineWidth(1)
 					.beginPath();
-				var aActiveMoveRangeIntersection = this.activeMoveRange.intersection(this.visibleRange);
+				var aActiveMoveRangeIntersection = this.activeMoveRange.intersection(tmpRange !== undefined ? tmpRange : this.visibleRange);
 				if (aActiveMoveRangeIntersection) {
 					var drawLeftSideMoveRange   = aActiveMoveRangeIntersection.c1 === this.activeMoveRange.c1;
 					var drawRightSideMoveRange  = aActiveMoveRangeIntersection.c2 === this.activeMoveRange.c2;
@@ -7473,7 +7473,7 @@
 
 			// Перерисовываем
 			this._drawSelection();
-            var d = {}
+            var d = {};
 			/*var d = {
 				deltaX : this.activeMoveRange.c1 < this.visibleRange.c1 ? this.activeMoveRange.c1-this.visibleRange.c1 :
 					this.activeMoveRange.c2>this.visibleRange.c2 ? this.activeMoveRange.c2-this.visibleRange.c2 : 0,
