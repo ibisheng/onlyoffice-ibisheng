@@ -272,6 +272,36 @@ CNary.prototype.Write_ToBinary2 = function( Writer )
 	Writer.WriteLong( historyitem_type_nary );
 	Writer.WriteString2( this.elements[0][0].Id );
 	Writer.WriteString2( this.elements[0][1].Id );
+	
+	this.ctrlPr.Write_ToBinary(Writer);
+	
+	var StartPos = Writer.GetCurPosition();
+    Writer.Skip(4);
+    var Flags = 0;
+	if ( undefined != this.chr )
+    {
+		Writer.WriteLong(this.chr);
+		Flags |= 1;
+	}
+	if ( undefined != this.limLoc )
+    {
+		Writer.WriteLong(this.limLoc);
+		Flags |= 2;
+	}
+	if ( undefined != this.subHide )
+    {
+		Writer.WriteBool(this.subHide);
+		Flags |= 4;
+	}
+	if ( undefined != this.supHide )
+    {
+		Writer.WriteBool(this.supHide);
+		Flags |= 8;
+	}
+	var EndPos = Writer.GetCurPosition();
+    Writer.Seek( StartPos );
+    Writer.WriteLong( Flags );
+    Writer.Seek( EndPos );
 }
 CNary.prototype.Read_FromBinary2 = function( Reader )
 {
@@ -284,6 +314,18 @@ CNary.prototype.Read_FromBinary2 = function( Reader )
 	this.elements[0][1] = Element1;
 	if (Element1.content.length == 0)
 		this.fillPlaceholders();
+	
+	this.ctrlPr.Read_FromBinary(Reader);
+	
+	var Flags = Reader.GetLong();
+	if ( Flags & 1 )
+		this.chr = Reader.GetLong();
+	if ( Flags & 2 )
+		this.limLoc = Reader.GetLong();
+	if ( Flags & 4 )
+		this.subHide = Reader.GetBool();
+	if ( Flags & 8 )
+		this.supHide = Reader.GetBool();
 }
 CNary.prototype.Get_Id = function()
 {

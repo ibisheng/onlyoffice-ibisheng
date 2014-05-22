@@ -3850,6 +3850,41 @@ CDelimiter.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_delimiter );
 	Writer.WriteString2( this.elements[0][0].Id );
+	
+	this.ctrlPr.Write_ToBinary(Writer);
+	
+	var StartPos = Writer.GetCurPosition();
+    Writer.Skip(4);
+    var Flags = 0;
+	if ( undefined != this.begChr )
+    {
+		Writer.WriteLong(this.begChr);	
+		Flags |= 1;
+	}
+	if ( undefined != this.endChr )
+    {
+		Writer.WriteLong(this.endChr);	
+		Flags |= 2;
+	}
+	if ( undefined != this.grow )
+    {
+		Writer.WriteLong(this.grow);	
+		Flags |= 4;
+	}
+	if ( undefined != this.sepChr )
+    {
+		Writer.WriteLong(this.sepChr);	
+		Flags |= 8;
+	}
+	if ( undefined != this.shp )
+    {
+		Writer.WriteLong(this.shp);	
+		Flags |= 16;
+	}
+	var EndPos = Writer.GetCurPosition();
+    Writer.Seek( StartPos );
+    Writer.WriteLong( Flags );
+    Writer.Seek( EndPos );
 }
 CDelimiter.prototype.Read_FromBinary2 = function( Reader )
 {
@@ -3858,6 +3893,20 @@ CDelimiter.prototype.Read_FromBinary2 = function( Reader )
 	this.elements[0][0] = Element;
 	if (Element.content.length == 0)
 		this.fillPlaceholders();
+	
+	this.ctrlPr.Read_FromBinary(Reader);
+	
+	var Flags = Reader.GetLong();
+	if ( Flags & 1 )
+		this.begChr = Reader.GetLong();
+	if ( Flags & 2 )
+		this.endChr = Reader.GetLong();
+	if ( Flags & 4 )
+		this.grow = Reader.GetBool();
+	if ( Flags & 8 )
+		this.sepChr = Reader.GetLong();
+	if ( Flags & 16 )
+		this.shp = Reader.GetLong();
 }
 CDelimiter.prototype.Get_Id = function()
 {
@@ -4268,6 +4317,31 @@ CGroupCharacter.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_groupChr );
 	Writer.WriteString2( this.elements[0][0].Id );
+	
+	this.CtrPrp.Write_ToBinary(Writer);
+	
+	var StartPos = Writer.GetCurPosition();
+    Writer.Skip(4);
+    var Flags = 0;
+	if ( undefined != this.chr )
+    {
+		Writer.WriteLong(this.chr);
+		Flags |= 1;
+	}
+	if ( undefined != this.pos )
+    {
+		Writer.WriteLong(this.pos);
+		Flags |= 2;
+	}
+	if ( undefined != this.vertJc )
+    {
+		Writer.WriteLong(this.vertJc);
+		Flags |= 4;
+	}
+	var EndPos = Writer.GetCurPosition();
+    Writer.Seek( StartPos );
+    Writer.WriteLong( Flags );
+    Writer.Seek( EndPos );
 }
 CGroupCharacter.prototype.Read_FromBinary2 = function( Reader )
 {
@@ -4276,6 +4350,16 @@ CGroupCharacter.prototype.Read_FromBinary2 = function( Reader )
 	this.elements[0][0] = Element;
 	if (Element.content.length == 0)
 		this.fillPlaceholders();
+		
+	this.CtrPrp.Read_FromBinary(Reader);
+	
+	var Flags = Reader.GetLong();
+	if ( Flags & 1 )
+		this.chr = Reader.GetLong();
+	if ( Flags & 2 )
+		this.pos = Reader.GetLong();
+	if ( Flags & 4 )
+		this.vertJc = Reader.GetLong();
 }
 CGroupCharacter.prototype.Get_Id = function()
 {

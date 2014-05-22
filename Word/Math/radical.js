@@ -1239,11 +1239,25 @@ CRadical.prototype.Write_ToBinary2 = function( Writer )
 	Writer.WriteLong( len );
 	for(var i=0; i<len; i++)	
 		Writer.WriteString2( this.elements[0][i].Id );
+	
+	this.ctrlPr.Write_ToBinary(Writer);
+	
+	var StartPos = Writer.GetCurPosition();
+    Writer.Skip(4);
+    var Flags = 0;
+	if ( undefined != this.degHide )
+    {
+		Writer.WriteBool( this.degHide )
+		Flags |= 1;
+	}
+	var EndPos = Writer.GetCurPosition();
+    Writer.Seek( StartPos );
+    Writer.WriteLong( Flags );
+    Writer.Seek( EndPos );	
 }
 CRadical.prototype.Read_FromBinary2 = function( Reader )
 {
-	var len = Reader.GetLong();
-	
+	var len = Reader.GetLong();	
 	for (var i=0; i<len; i++)
 	{
 		var Element = g_oTableId.Get_ById( Reader.GetString2() );
@@ -1252,6 +1266,12 @@ CRadical.prototype.Read_FromBinary2 = function( Reader )
 		if (Element.content.length == 0)
 			this.fillPlaceholders();
 	}
+	
+	this.CtrPrp.Read_FromBinary(Reader);
+	
+	var Flags = Reader.GetLong();
+	if ( Flags & 1 )
+		this.degHide = Reader.GetBool();	
 }
 CRadical.prototype.Get_Id = function()
 {

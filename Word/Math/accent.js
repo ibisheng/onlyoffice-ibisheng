@@ -1712,6 +1712,21 @@ CAccent.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_acc );
 	Writer.WriteString2( this.elements[0][0].Id );
+	
+	this.CtrPrp.Write_ToBinary(Writer);
+	
+	var StartPos = Writer.GetCurPosition();
+    Writer.Skip(4);
+    var Flags = 0;
+	if ( undefined != this.chr )
+    {
+		Writer.WriteLong(this.chr);	
+		Flags |= 1;
+	}
+	var EndPos = Writer.GetCurPosition();
+    Writer.Seek( StartPos );
+    Writer.WriteLong( Flags );
+    Writer.Seek( EndPos );
 }
 CAccent.prototype.Read_FromBinary2 = function( Reader )
 {
@@ -1720,8 +1735,15 @@ CAccent.prototype.Read_FromBinary2 = function( Reader )
 	this.elements[0][0] = Element;
 	if (Element.content.length == 0)
 		this.fillPlaceholders();
+		
+	this.CtrPrp.Read_FromBinary(Reader);
+	
+	var Flags = Reader.GetLong();
+	if ( Flags & 1 )
+		this.chr = Reader.GetLong();	
 }
 CAccent.prototype.Get_Id = function()
 {
 	return this.Id;
 }
+

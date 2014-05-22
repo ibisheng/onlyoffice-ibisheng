@@ -318,6 +318,56 @@ CBorderBox.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_borderBox );
 	Writer.WriteString2( this.elements[0][0].Id );
+	
+	this.ctrlPr.Write_ToBinary(Writer);
+	
+	var StartPos = Writer.GetCurPosition();
+    Writer.Skip(4);
+    var Flags = 0;
+	if ( undefined != this.hideBot )
+    {
+		Writer.WriteBool( this.hideBot );	
+		Flags |= 1;
+	}
+	if ( undefined != this.hideLeft )
+    {
+		Writer.WriteBool( this.hideLeft );	
+		Flags |= 2;
+	}
+	if ( undefined != this.hideRight )
+    {
+		Writer.WriteBool( this.hideRight );	
+		Flags |= 4;
+	}
+	if ( undefined != this.hideTop )
+    {
+		Writer.WriteBool( this.hideTop );
+		Flags |= 8;
+	}
+	if ( undefined != this.strikeBLTR )
+    {
+		Writer.WriteBool( this.strikeBLTR );	
+		Flags |= 16;
+	}
+	if ( undefined != this.strikeH )
+    {
+		Writer.WriteBool( this.strikeH );
+		Flags |= 32;
+	}
+	if ( undefined != this.strikeTLBR )
+    {
+		Writer.WriteBool( this.strikeTLBR );	
+		Flags |= 64;
+	}
+	if ( undefined != this.strikeV )
+    {
+		Writer.WriteBool( this.strikeV );
+		Flags |= 128;
+	}
+	var EndPos = Writer.GetCurPosition();
+    Writer.Seek( StartPos );
+    Writer.WriteLong( Flags );
+    Writer.Seek( EndPos );
 }
 CBorderBox.prototype.Read_FromBinary2 = function( Reader )
 {
@@ -326,6 +376,26 @@ CBorderBox.prototype.Read_FromBinary2 = function( Reader )
 	this.elements[0][0] = Element;
 	if (Element.content.length == 0)
 		this.fillPlaceholders();
+		
+	this.ctrlPr.Read_FromBinary(Reader);
+	
+	var Flags = Reader.GetLong();
+	if ( Flags & 1 )
+		this.hideBot = Reader.GetBool();
+	if ( Flags & 2 )
+		this.hideLeft = Reader.GetBool();
+	if ( Flags & 4 )
+		this.hideRight = Reader.GetBool();
+	if ( Flags & 8 )
+		this.hideTop = Reader.GetBool();
+	if ( Flags & 16 )
+		this.strikeBLTR = Reader.GetBool();
+	if ( Flags & 32 )
+		this.strikeH = Reader.GetBool();
+	if ( Flags & 64 )
+		this.strikeTLBR = Reader.GetBool();
+	if ( Flags & 128 )
+		this.strikeV = Reader.GetBool();
 }
 CBorderBox.prototype.Get_Id = function()
 {
@@ -407,6 +477,41 @@ CBox.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_box );
 	Writer.WriteString2( this.elements[0][0].Id );
+	
+	this.ctrlPr.Write_ToBinary(Writer);
+	
+	var StartPos = Writer.GetCurPosition();
+    Writer.Skip(4);
+    var Flags = 0;
+	if ( undefined != this.aln )
+    {
+		Writer.WriteBool(this.aln);	
+		Flags |= 1;
+	}
+	if ( undefined != this.brk )
+    {
+		Writer.WriteLong(this.brk);	
+		Flags |= 2;
+	}
+	if ( undefined != this.diff )
+    {
+		Writer.WriteBool(this.diff);	
+		Flags |= 4;
+	}
+	if ( undefined != this.noBreak )
+    {
+		Writer.WriteBool(this.noBreak);	
+		Flags |= 8;
+	}
+	if ( undefined != this.opEmu )
+    {
+		Writer.WriteBool(this.opEmu);	
+		Flags |= 16;
+	}
+	var EndPos = Writer.GetCurPosition();
+    Writer.Seek( StartPos );
+    Writer.WriteLong( Flags );
+    Writer.Seek( EndPos );
 }
 CBox.prototype.Read_FromBinary2 = function( Reader )
 {
@@ -415,6 +520,20 @@ CBox.prototype.Read_FromBinary2 = function( Reader )
 	this.elements[0][0] = Element;
 	if (Element.content.length == 0)
 		this.fillPlaceholders();
+		
+	this.ctrlPr.Read_FromBinary(Reader);
+	
+	var Flags = Reader.GetLong();
+	if ( Flags & 1 )
+		this.aln = Reader.GetBool();
+	if ( Flags & 2 )
+		this.brk = Reader.GetLong();
+	if ( Flags & 4 )
+		this.diff = Reader.GetBool();
+	if ( Flags & 8 )
+		this.noBreak = Reader.GetBool();
+	if ( Flags & 16 )
+		this.opEmu = Reader.GetBool();
 }
 CBox.prototype.Get_Id = function()
 {
@@ -503,7 +622,23 @@ CBar.prototype.Refresh_RecalcData = function(Data)
 CBar.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_bar );
-	Writer.WriteString2( this.elements[0][0].Id );
+	Writer.WriteString2( this.elements[0][0].Id );	
+	
+	this.ctrlPr.Write_ToBinary(Writer);
+	
+	var StartPos = Writer.GetCurPosition();
+    Writer.Skip(4);
+    var Flags = 0;
+	if ( undefined != this.pos )
+    {
+		Writer.WriteString2( this.pos );	
+		Flags |= 1;
+	}
+	var EndPos = Writer.GetCurPosition();
+    Writer.Seek( StartPos );
+    Writer.WriteLong( Flags );
+    Writer.Seek( EndPos );
+
 }
 CBar.prototype.Read_FromBinary2 = function( Reader )
 {
@@ -511,7 +646,13 @@ CBar.prototype.Read_FromBinary2 = function( Reader )
 	Element.Parent = this;
 	this.elements[0][0] = Element;
 	if (Element.content.length == 0)
-		this.fillPlaceholders();
+		this.fillPlaceholders();		
+	
+	this.ctrlPr.Read_FromBinary(Reader);
+	
+	var Flags = Reader.GetLong();
+	if ( Flags & 1 )
+		this.pos = Reader.GetString2();
 }
 CBar.prototype.Get_Id = function()
 {
@@ -560,6 +701,41 @@ CPhantom.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_phant );
 	Writer.WriteString2( this.elements[0][0].Id );
+	
+	this.ctrlPr.Write_ToBinary(Writer);
+	
+	var StartPos = Writer.GetCurPosition();
+    Writer.Skip(4);
+    var Flags = 0;
+	if ( undefined != this.show )
+    {
+		Writer.WriteBool( this.show );
+		Flags |= 1;
+	}
+	if ( undefined != this.transp )
+    {
+		Writer.WriteBool( this.transp );
+		Flags |= 2;
+	}
+	if ( undefined != this.zeroAsc )
+    {
+		Writer.WriteBool( this.zeroAsc );
+		Flags |= 4;
+	}
+	if ( undefined != this.zeroDesc )
+    {
+		Writer.WriteBool( this.zeroDesc );
+		Flags |= 8;
+	}
+	if ( undefined != this.zeroWid )
+    {
+		Writer.WriteBool( this.zeroWid );
+		Flags |= 16;
+	}
+	var EndPos = Writer.GetCurPosition();
+    Writer.Seek( StartPos );
+    Writer.WriteLong( Flags );
+    Writer.Seek( EndPos );
 }
 CPhantom.prototype.Read_FromBinary2 = function( Reader )
 {
@@ -568,6 +744,20 @@ CPhantom.prototype.Read_FromBinary2 = function( Reader )
 	this.elements[0][0] = Element;
 	if (Element.content.length == 0)
 		this.fillPlaceholders();
+		
+	this.ctrlPr.Read_FromBinary(Reader);
+	
+	var Flags = Reader.GetLong();
+	if ( Flags & 1 )
+		this.show = Reader.GetBool();
+	if ( Flags & 2 )
+		this.transp = Reader.GetBool();
+	if ( Flags & 4 )
+		this.zeroAsc = Reader.GetBool();
+	if ( Flags & 8 )
+		this.zeroDesc = Reader.GetBool();
+	if ( Flags & 16 )
+		this.zeroWid = Reader.GetBool();
 }
 CPhantom.prototype.Get_Id = function()
 {

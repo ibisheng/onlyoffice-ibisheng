@@ -521,6 +521,56 @@ CMathMatrix.prototype.Write_ToBinary2 = function( Writer )
 	for(var i=0; i<this.nRow; i++)
 		for(var j=0; j<this.nCol; j++)
 			Writer.WriteString2( this.elements[i][j].Id );
+	
+	this.ctrlPr.Write_ToBinary(Writer);
+	
+	var StartPos = Writer.GetCurPosition();
+    Writer.Skip(4);
+    var Flags = 0;
+	if ( undefined != this.baseJc )
+    {
+		Writer.WriteLong( this.baseJc );
+		Flags |= 1;
+	}
+	if ( undefined != this.cGp )
+    {
+		Writer.WriteLong( this.cGp );
+		Flags |= 2;
+	}
+	if ( undefined != this.cGpRule )
+    {
+		Writer.WriteLong( this.cGpRule );
+		Flags |= 4;
+	}
+	if ( undefined != this.cSp )
+    {
+		Writer.WriteLong( this.cSp );
+		Flags |= 8;
+	}
+	if ( undefined != this.mcs )
+    {
+		Writer.WriteLong( this.mcs );
+		Flags |= 16;
+	}
+	if ( undefined != this.plcHide )
+    {
+		Writer.WriteBool( this.plcHide );
+		Flags |= 32;
+	}
+	if ( undefined != this.rSp )
+    {
+		Writer.WriteLong( this.rSp );
+		Flags |= 64;
+	}
+	if ( undefined != this.rSpRule )
+    {
+		Writer.WriteLong( this.rSpRule );
+		Flags |= 128;
+	}
+	var EndPos = Writer.GetCurPosition();
+    Writer.Seek( StartPos );
+    Writer.WriteLong( Flags );
+    Writer.Seek( EndPos );
 }
 CMathMatrix.prototype.Read_FromBinary2 = function( Reader )
 {
@@ -539,6 +589,26 @@ CMathMatrix.prototype.Read_FromBinary2 = function( Reader )
 				this.fillPlaceholders();
 		}
 	}
+	
+	this.CtrPrp.Read_FromBinary(Reader);
+	
+	var Flags = Reader.GetLong();
+	if ( Flags & 1 )
+		this.baseJc = Reader.GetLong();
+	if ( Flags & 2 )
+		this.cGp = Reader.GetLong();
+	if ( Flags & 4 )
+		this.cGpRule = Reader.GetLong();
+	if ( Flags & 8 )
+		this.cSp = Reader.GetLong();
+	if ( Flags & 16 )
+		this.mcs = Reader.GetLong();
+	if ( Flags & 32 )
+		this.plcHide = Reader.GetBool();
+	if ( Flags & 64 )
+		this.rSp = Reader.GetLong();
+	if ( Flags & 128 )
+		this.rSpRule = Reader.GetLong()
 }
 CMathMatrix.prototype.Get_Id = function()
 {
@@ -647,6 +717,41 @@ CEqArray.prototype.Write_ToBinary2 = function( Writer )
 	Writer.WriteLong( row );
 	for(var i=0; i<row; i++)
 		Writer.WriteString2( this.elements[i][0].Id );
+	
+	this.ctrlPr.Write_ToBinary(Writer);
+	
+	var StartPos = Writer.GetCurPosition();
+    Writer.Skip(4);
+    var Flags = 0;
+	if ( undefined != this.baseJc )
+    {
+		Writer.WriteLong( this.baseJc );	
+		Flags |= 1;
+	}
+	if ( undefined != this.maxDist )
+    {
+		Writer.WriteBool( this.maxDist );	
+		Flags |= 2;
+	}
+	if ( undefined != this.objDist )
+    {
+		Writer.WriteBool( this.objDist );	
+		Flags |= 4;
+	}
+	if ( undefined != this.rSp )
+    {
+		Writer.WriteLong( this.rSp );	
+		Flags |= 8;
+	}
+	if ( undefined != this.rSpRule )
+    {
+		Writer.WriteLong( this.rSpRule );
+		Flags |= 16;
+	}
+	var EndPos = Writer.GetCurPosition();
+    Writer.Seek( StartPos );
+    Writer.WriteLong( Flags );
+    Writer.Seek( EndPos );
 }
 CEqArray.prototype.Read_FromBinary2 = function( Reader )
 {
@@ -660,6 +765,20 @@ CEqArray.prototype.Read_FromBinary2 = function( Reader )
 		if (Element.content.length == 0)
 			this.fillPlaceholders();
 	}
+	
+	this.ctrlPr.Read_FromBinary(Reader);
+	
+	var Flags = Reader.GetLong();
+	if ( Flags & 1 )
+		this.baseJc = Reader.GetLong();
+	if ( Flags & 2 )
+		this.maxDist = Reader.GetBool();
+	if ( Flags & 4 )
+		this.objDist = Reader.GetBool();
+	if ( Flags & 8 )
+		this.rSp = Reader.GetLong();
+	if ( Flags & 16 )
+		this.rSpRule = Reader.GetLong();
 }
 CEqArray.prototype.Get_Id = function()
 {

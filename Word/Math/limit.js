@@ -81,9 +81,13 @@ CLimit.prototype.Refresh_RecalcData = function(Data)
 {
 }
 CLimit.prototype.Write_ToBinary2 = function( Writer )
-{	Writer.WriteLong( historyitem_type_lim );
+{	
+	Writer.WriteLong( historyitem_type_lim );
 	Writer.WriteString2( this.elements[0][0].Id );
 	Writer.WriteString2( this.elements[1][0].Id );
+	
+	this.CtrPrp.Write_ToBinary(Writer);
+	Writer.WriteLong(this.type);
 }
 CLimit.prototype.Read_FromBinary2 = function( Reader )
 {	
@@ -98,6 +102,9 @@ CLimit.prototype.Read_FromBinary2 = function( Reader )
 	this.elements[1][0] = Element1;
 	if (Element1.content.length == 0)
 		this.fillPlaceholders();
+		
+	this.CtrPrp.Read_FromBinary(Reader);
+	this.type = Reader.GetLong();
 }
 CLimit.prototype.Get_Id = function()
 {
@@ -151,6 +158,8 @@ CMathFunc.prototype.Write_ToBinary2 = function( Writer )
 	Writer.WriteLong( historyitem_type_mathFunc );
 	Writer.WriteString2( this.elements[0][0].Id );
 	Writer.WriteString2( this.elements[0][1].Id );
+	
+	this.CtrPrp.Write_ToBinary(Writer);
 }
 CMathFunc.prototype.Read_FromBinary2 = function( Reader )
 {
@@ -165,6 +174,8 @@ CMathFunc.prototype.Read_FromBinary2 = function( Reader )
 	this.elements[0][1] = Element1;
 	if (Element1.content.length == 0)
 		this.fillPlaceholders();
+		
+	this.CtrPrp.Read_FromBinary(Reader);
 }
 CMathFunc.prototype.Get_Id = function()
 {

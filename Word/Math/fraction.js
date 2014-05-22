@@ -437,6 +437,55 @@ CFraction.prototype.Write_ToBinary2 = function( Writer )
 	Writer.WriteString2( this.elements[0][0].elements[0][0].Id );
 	Writer.WriteString2( this.elements[1][0].elements[0][0].Id );
 	
+	this.CtrPrp.Write_ToBinary(Writer);
+	
+	var StartPos = Writer.GetCurPosition();
+    Writer.Skip(4);
+    var Flags = 0;
+	if ( undefined != this.baseJc )
+    {
+		Writer.WriteLong(this.baseJc);	
+		Flags |= 1;
+	}
+	if ( undefined != this.cGp )
+    {
+		Writer.WriteLong(this.cGp);
+		Flags |= 2;
+	}
+	if ( undefined != this.cGpRule )
+    {
+		Writer.WriteLong(this.cGpRule);
+		Flags |= 4;
+	}
+	if ( undefined != this.cSp )
+    {
+		Writer.WriteLong(this.cSp);
+		Flags |= 8;
+	}
+	if ( undefined != this.mcs )
+    {
+		Writer.WriteLong(this.mcs);	
+		Flags |= 16;
+	}
+	if ( undefined != this.plcHide )
+    {
+		Writer.WriteBool(this.plcHide);	
+		Flags |= 32;
+	}
+	if ( undefined != this.rSp )
+    {
+		Writer.WriteLong(this.rSp);	
+		Flags |= 64;
+	}
+	if ( undefined != this.rSpRule )
+    {
+		Writer.WriteLong(this.rSpRule);	
+		Flags |= 128;
+	}
+	var EndPos = Writer.GetCurPosition();
+    Writer.Seek( StartPos );
+    Writer.WriteLong( Flags );
+    Writer.Seek( EndPos );
 }
 CFraction.prototype.Read_FromBinary2 = function( Reader )
 {
@@ -450,7 +499,27 @@ CFraction.prototype.Read_FromBinary2 = function( Reader )
 	Element1.Parent = this.elements[1][0];
 	this.elements[1][0].elements[0][0] = Element1;
 	if (Element1.content.length == 0)
-		this.elements[1][0].fillPlaceholders()
+		this.elements[1][0].fillPlaceholders();
+	
+	this.CtrPrp.Read_FromBinary(Reader);
+	
+	var Flags = Reader.GetLong();
+	if ( Flags & 1 )
+		this.baseJc = Reader.GetLong();
+	if ( Flags & 2 )
+		this.cGp = Reader.GetLong();
+	if ( Flags & 4 )
+		this.cGpRule = Reader.GetLong();
+	if ( Flags & 8 )
+		this.cSp = Reader.GetLong();
+	if ( Flags & 16 )
+		this.mcs = Reader.GetLong();
+	if ( Flags & 32 )
+		this.plcHide = Reader.GetBool()
+	if ( Flags & 64 )
+		this.rSp = Reader.GetLong();
+	if ( Flags & 128 )
+		this.rSpRule = Reader.GetLong();
 }
 CFraction.prototype.Get_Id = function()
 {

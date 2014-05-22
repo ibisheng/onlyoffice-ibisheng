@@ -501,6 +501,10 @@ CDegree.prototype.Write_ToBinary2 = function( Writer )
 	Writer.WriteLong( historyitem_type_deg );
 	Writer.WriteString2( this.elements[0][0].Id );
 	Writer.WriteString2( this.elements[0][1].Id );
+	
+	this.ctrlPr.Write_ToBinary(Writer);
+	Writer.WriteLong( this.type );
+	
 }
 CDegree.prototype.Read_FromBinary2 = function( Reader )
 {
@@ -515,6 +519,9 @@ CDegree.prototype.Read_FromBinary2 = function( Reader )
 	this.elements[0][1] = Element1;
 	if (Element1.content.length == 0)
 		this.fillPlaceholders();
+	
+	this.CtrPrp.Read_FromBinary(Reader);
+	this.type = Reader.GetLong();
 }
 CDegree.prototype.Get_Id = function()
 {
@@ -1192,6 +1199,24 @@ CDegreeSubSup.prototype.Write_ToBinary2 = function( Writer )
 	Writer.WriteLong( historyitem_type_deg_subsup );
 	Writer.WriteString2( this.elements[0][0].Id );
 	Writer.WriteString2( this.elements[0][1].Id );
+	
+	this.ctrlPr.Write_ToBinary(Writer);
+	Writer.WriteLong( this.type );
+	if ( this.type == DEGREE_SubSup )
+	{
+		var StartPos = Writer.GetCurPosition();
+		Writer.Skip(4);
+		var Flags = 0;
+		if ( undefined != this.alnScr )
+		{
+			Writer.WriteBool( this.alnScr );
+			Flags |= 1;
+		}
+		var EndPos = Writer.GetCurPosition();
+		Writer.Seek( StartPos );
+		Writer.WriteLong( Flags );
+		Writer.Seek( EndPos );		
+	}
 }
 CDegreeSubSup.prototype.Read_FromBinary2 = function( Reader )
 {
@@ -1206,6 +1231,15 @@ CDegreeSubSup.prototype.Read_FromBinary2 = function( Reader )
 	this.elements[0][1] = Element1;
 	if (Element1.content.length == 0)
 		this.fillPlaceholders();
+		
+	this.CtrPrp.Read_FromBinary(Reader);
+	this.type = Reader.GetLong();	
+	if ( this.type == DEGREE_SubSup )
+	{
+		var Flags = Reader.GetLong();
+		if ( Flags & 1 )
+			this.alnScr = Writer.GetBool();	
+	}
 }
 CDegreeSubSup.prototype.Get_Id = function()
 {
