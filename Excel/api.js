@@ -66,6 +66,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.documentFormatSaveCsvDelimiter = c_oAscCsvDelimiter.Comma;
 			this.chartEditor = undefined;
 			this.documentOpenOptions = undefined;		// Опции при открытии (пока только опции для CSV)
+			this.documentOptions = null;
 			this.DocInfo = null;
 
 			// объекты, нужные для отправки в тулбар (шрифты, стили)
@@ -431,7 +432,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this.documentVKey   		= this.DocInfo["VKey"];
 					this.chartEditor			= this.DocInfo["ChartEditor"];
 					this.documentOpenOptions 	= this.DocInfo["Options"];
-					
+					if(null != this.documentOpenOptions)
+						this.documentOptions = JSON.stringify(this.documentOpenOptions);
 					if(this.documentFormat)
 					{
 						switch(this.documentFormat)
@@ -749,7 +751,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 							"title": this.documentTitle,
 							"embeddedfonts": this.isUseEmbeddedCutFonts,
 							"delimiter": option.asc_getDelimiter(),
-							"codepage": option.asc_getCodePage()};
+							"codepage": option.asc_getCodePage(),
+							"options": this.documentOptions};
 							
 							this._asc_sendCommand(function (response) {t._startOpenDocument(response);}, v);
 						} else if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Save)
@@ -1014,7 +1017,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                         "editorid"      : c_oEditorId.Speadsheet,
                         "url"           : this.documentUrl,
                         "title"         : this.documentTitle,
-                        "embeddedfonts" : this.isUseEmbeddedCutFonts
+                        "embeddedfonts" : this.isUseEmbeddedCutFonts,
+						"options"		: this.documentOptions
                     };
 					if (this.documentOpenOptions && this.documentOpenOptions["isEmpty"]) {
 						var sEmptyWorkbook = getEmptyWorkbook();

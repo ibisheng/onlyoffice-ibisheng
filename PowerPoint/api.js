@@ -11,6 +11,7 @@ var documentFormat = 'null';
 var documentVKey = null;
 var documentOrigin = "";
 var documentFormatSave = c_oAscFileType.PPTX;//пока не во что другое сохранять не можем.
+var documentOptions = null;
 
 var c_oSerFormat =
 {
@@ -816,7 +817,9 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 		documentUrl = this.DocInfo.get_Url();
 		documentTitle = this.DocInfo.get_Title();
 		documentFormat = this.DocInfo.get_Format();
-
+		var options = this.DocInfo.get_Options();
+		if(null != options)
+			documentOptions = JSON.stringify(options);
 		var nIndex = -1;
 		if(documentTitle)
 			nIndex = documentTitle.lastIndexOf(".");
@@ -862,7 +865,8 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 			"c":"open",
 			"url": documentUrl,
 			"title": documentTitle,
-			"embeddedfonts": this.isUseEmbeddedCutFonts};
+			"embeddedfonts": this.isUseEmbeddedCutFonts,
+			"options": documentOptions};
 			
         sendCommand( oThis, function(){}, rData );
 

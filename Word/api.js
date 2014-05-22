@@ -13,6 +13,7 @@ var documentVKey = null;
 var documentOrigin = "";
 var documentFormatSave = c_oAscFileType.DOCX;
 var documentFormatSaveTxtCodepage = 65001;//utf8
+var documentOptions = null;
 
 function CDocOpenProgress()
 {
@@ -926,6 +927,9 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 		documentUrl = this.DocInfo.get_Url();
 		documentTitle = this.DocInfo.get_Title();
 		documentFormat = this.DocInfo.get_Format();
+		var options = this.DocInfo.get_Options();
+		if(null != options)
+			documentOptions = JSON.stringify(options);
 		if(documentFormat)
 		{
 			switch(documentFormat)
@@ -992,7 +996,8 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 				"url": documentUrl,
 				"title": documentTitle,
 				"embeddedfonts": this.isUseEmbeddedCutFonts,
-				"data": g_sEmpty_bin};
+				"data": g_sEmpty_bin,
+				"options": documentOptions};
 				
 			sendCommand( oThis, function(){}, rData );
 			editor.OpenDocument2(g_sResourceServiceLocalUrl + documentId + "/", g_sEmpty_bin);
@@ -1015,7 +1020,8 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 				"c": "open",
 				"url": documentUrl,
 				"title": documentTitle,
-				"embeddedfonts": this.isUseEmbeddedCutFonts};
+				"embeddedfonts": this.isUseEmbeddedCutFonts,
+				"options": documentOptions};
 				
 			sendCommand( oThis, function(){}, rData );
 		}
@@ -7123,7 +7129,8 @@ function sendCommand(editor, fCallback, rdata){
 						"url": documentUrl,
 						"title": documentTitle,
 						"codepage": documentFormatSaveTxtCodepage,
-						"embeddedfonts": editor.isUseEmbeddedCutFonts};
+						"embeddedfonts": editor.isUseEmbeddedCutFonts,
+						"options": documentOptions};
 						
                     sendCommand(editor, fCallback,  rData)
                 break;
