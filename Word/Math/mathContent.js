@@ -6889,7 +6889,8 @@ CMathContent.prototype =
     },
     Refresh_RecalcData: function()
     {
-        this.Composition.Refresh_RecalcData2(); // Refresh_RecalcData сообщает родительскому классу, что у него произошли изменения, нужно пересчитать
+        if(this.ParaMath !== null)
+            this.ParaMath.Refresh_RecalcData(); // Refresh_RecalcData сообщает родительскому классу, что у него произошли изменения, нужно пересчитать
         // Refresh_RecalcData2 у родительского класса сообщает, что у внутреннего класса произошли изменения, нужен пересчет
         // временно
         //this.RecalculateReverse();

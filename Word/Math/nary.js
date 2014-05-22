@@ -591,12 +591,6 @@ CNaryOperator.prototype.Resize = function(Parent, ParaMath, oMeasure)
     this.Parent = Parent;
     this.ParaMath = ParaMath;
 
-    if(this.RecalcInfo.bCtrPrp == true)
-    {
-        this.Set_CompiledCtrPrp();
-        this.RecalcInfo.bCtrPrp = false;
-    }
-
     this.recalculateSize(); //обычный пересчет, oMeasure не нужен
 }
 /*CNaryOperator.prototype.setComposition = function(Compos)

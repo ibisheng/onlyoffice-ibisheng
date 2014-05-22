@@ -3223,12 +3223,6 @@ COperator.prototype.Resize = function(Parent, ParaMath, oMeasure)
     this.ParaMath = ParaMath;
     this.Parent   = Parent;
 
-    if(this.RecalcInfo.bCtrPrp == true)
-    {
-        this.Set_CompiledCtrPrp();
-        this.RecalcInfo.bCtrPrp = false;
-    }
-
     if(this.operator !== -1)
     {
         var bHor = this.operator.loc == 0 || this.operator.loc  == 1;
