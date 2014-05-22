@@ -3064,14 +3064,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_SendThemeColors : function (colors, standart_colors) {
 				this._gui_control_colors = { Colors : colors, StandartColors : standart_colors };
 				var ret = this.handlers.trigger("asc_onSendThemeColors", colors, standart_colors);
-				if (ret)
+				if (false !== ret)
 					this._gui_control_colors = null;
 			},
 			
 			asc_SendThemeColorSchemes : function (param) {
 				this._gui_color_schemes = param;
 				var ret = this.handlers.trigger("asc_onSendThemeColorSchemes", param);
-				if (ret)
+				if (false !== ret)
 					this._gui_color_schemes = null;
 			},
 			asc_ChangeColorScheme : function (index_scheme) {
