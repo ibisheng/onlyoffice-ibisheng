@@ -2345,17 +2345,23 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				return !!d;
 			},
 
-			asc_replaceText: function (findWhat, replaceWith, isReplaceAll, isMatchCase, isWholeCell) {
-				var temp = new asc.asc_CFindOptions();
-				temp.findWhat = findWhat;
-				temp.isMatchCase = isMatchCase;
-				temp.isWholeCell = isWholeCell;
-				temp.lookIn = c_oAscFindLookIn.Formulas; // При замене поиск только в формулах
+			asc_replaceText: function () {
+				var options = null;
+				if(1 != arguments.length) {
+					// Временная заглушка
+					options = new asc.asc_CFindOptions();
+					options.findWhat = arguments[0]; //findWhat
+					options.isMatchCase = arguments[3]; //isMatchCase
+					options.isWholeCell = arguments[4]; //isWholeCell
 
-				temp.replaceWith = replaceWith;
-				temp.isReplaceAll = isReplaceAll;
+					options.replaceWith = arguments[1]; //replaceWith
+					options.isReplaceAll = arguments[2]; //isReplaceAll
+				} else
+					options = arguments[0];
 
-				this.wb.replaceCellText(temp);
+				options.lookIn = c_oAscFindLookIn.Formulas; // При замене поиск только в формулах
+
+				this.wb.replaceCellText(options);
 			},
 
 			asc_endFindText: function () {
