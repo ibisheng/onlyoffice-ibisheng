@@ -2156,6 +2156,13 @@ function CEditorPage(api)
             return;
         }
 
+        if (oWordControl.m_bIsRuler && oWordControl.m_oHorRuler.m_bIsMouseDown)
+        {
+            check_KeyboardEvent2(e);
+            e.preventDefault();
+            return;
+        }
+
         if (oWordControl.m_bIsMouseLock === true)
         {
             if (!window.USER_AGENT_MACOS)
