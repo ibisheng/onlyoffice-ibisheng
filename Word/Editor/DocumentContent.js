@@ -8074,7 +8074,7 @@ CDocumentContent.prototype =
 
         var State = null;
 
-        if ( true === editor.isStartAddShape && docpostype_DrawingObjects === this.CurPos.Type )
+        if (this.LogicDocument && true === editor.isStartAddShape && docpostype_DrawingObjects === this.CurPos.Type )
         {
             DocState.CurPos.Type     = docpostype_Content;
             DocState.Selection.Start = false;
@@ -8620,6 +8620,25 @@ CDocumentContent.prototype =
         Writer.WriteLong(Count);
         for ( var Index = 0; Index < Count; Index++ )
             Writer.WriteString2( this.Content[Index].Get_Id() );
+
+        if(this.Parent && this.Parent.Get_Worksheet)
+        {
+            Writer.WriteBool(true);
+            var worksheet = this.Parent.Get_Worksheet();
+            if(worksheet)
+            {
+                Writer.WriteBool(true);
+                Writer.WriteString2(worksheet.getId())
+            }
+            else
+            {
+                Writer.WriteBool(false);
+            }
+        }
+        else
+        {
+            Writer.WriteBool(false);
+        }
     },
 
     Read_FromBinary2 : function(Reader)
@@ -8651,17 +8670,41 @@ CDocumentContent.prototype =
 
         CollaborativeEditing.Add_LinkData( this, LinkData );
 
-        var DrawingDocument = editor.WordControl.m_oDrawingDocument;
-        if ( undefined !== DrawingDocument && null !== DrawingDocument )
+        var b_worksheet = Reader.GetBool();
+        if(b_worksheet)
         {
-            this.DrawingDocument = DrawingDocument;
-
-            if ( undefined !== editor && true === editor.isDocumentEditor )
+            this.Parent = g_oTableId.Get_ById(LinkData.Parent);
+            var b_worksheet_id = Reader.GetBool();
+            if(b_worksheet_id)
             {
-                this.LogicDocument   = DrawingDocument.m_oLogicDocument;
-                this.Styles          = DrawingDocument.m_oLogicDocument.Get_Styles();
-                this.Numbering       = DrawingDocument.m_oLogicDocument.Get_Numbering();
-                this.DrawingObjects  = DrawingDocument.m_oLogicDocument.DrawingObjects; // Массив укзателей на все инлайновые графические объекты
+                var id = Reader.GetString2();
+                var api = window["Asc"]["editor"];
+                if ( api.wb )
+                {
+                    var worksheet = api.wbModel.getWorksheetById(id);
+                    if(worksheet)
+                    {
+                        this.DrawingDocument = worksheet.DrawingDocument;
+                    }
+                }
+            }
+        }
+        else
+        {
+            var DrawingDocument;
+            if(editor && editor.WordControl && editor.WordControl.m_oDrawingDocument)
+                DrawingDocument = editor.WordControl.m_oDrawingDocument;
+            if ( undefined !== DrawingDocument && null !== DrawingDocument )
+            {
+                this.DrawingDocument = DrawingDocument;
+
+                if ( undefined !== editor && true === editor.isDocumentEditor )
+                {
+                    this.LogicDocument   = DrawingDocument.m_oLogicDocument;
+                    this.Styles          = DrawingDocument.m_oLogicDocument.Get_Styles();
+                    this.Numbering       = DrawingDocument.m_oLogicDocument.Get_Numbering();
+                    this.DrawingObjects  = DrawingDocument.m_oLogicDocument.DrawingObjects; // Массив укзателей на все инлайновые графические объекты
+                }
             }
         }
     },

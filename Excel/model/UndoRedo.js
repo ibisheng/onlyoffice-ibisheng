@@ -13,6 +13,14 @@ var c_oUndoRedoSerializeType =
 	Object:8,
 	Array:9
 };
+
+function DrawingCollaborativeData()
+{
+    this.oClass = null;
+    this.oBinaryReader = null;
+    this.nPos = null;
+    this.isDrawingCollaborativeData = true;
+}
 //главный обьект для пересылки изменений
 function UndoRedoItemSerializable(oClass, nActionType, nSheetId, oRange, oData)
 {
@@ -25,7 +33,7 @@ function UndoRedoItemSerializable(oClass, nActionType, nSheetId, oRange, oData)
 UndoRedoItemSerializable.prototype = {
 	Serialize : function(oBinaryWriter, collaborativeEditing)
 	{
-		if(this.oData.getType)
+		if(this.oData.getType || this.oClass.Save_Changes)
 		{
 			var oThis = this;
 			var oBinaryCommonWriter = new BinaryCommonWriter(oBinaryWriter);
@@ -35,45 +43,60 @@ UndoRedoItemSerializable.prototype = {
 	SerializeInner : function(oBinaryWriter, collaborativeEditing)
 	{
 		//nClassType
-		var nClassType = this.oClass.getClassType();
-		oBinaryWriter.WriteByte(nClassType);
-		//nActionType
-		oBinaryWriter.WriteByte(this.nActionType);
-		//nSheetId
-		if(null != this.nSheetId)
-		{
-			oBinaryWriter.WriteBool(true);
-			oBinaryWriter.WriteString2(this.nSheetId.toString());
-		}
-		else
-			oBinaryWriter.WriteBool(false);
-		//oRange
-		if(null != this.oRange)
-		{
-			oBinaryWriter.WriteBool(true);
-			var c1 = this.oRange.c1;
-			var c2 = this.oRange.c2;
-			var r1 = this.oRange.r1;
-			var r2 = this.oRange.r2;
-			if(null != this.nSheetId && (0 != c1 || gc_nMaxCol0 != c2))
-			{
-				c1 = collaborativeEditing.getLockMeColumn2(this.nSheetId, c1);
-				c2 = collaborativeEditing.getLockMeColumn2(this.nSheetId, c2);
-			}
-			if(null != this.nSheetId && (0 != r1 || gc_nMaxRow0 != r2))
-			{
-				r1 = collaborativeEditing.getLockMeRow2(this.nSheetId, r1);
-				r2 = collaborativeEditing.getLockMeRow2(this.nSheetId, r2);
-			}
-			oBinaryWriter.WriteLong(c1);
-			oBinaryWriter.WriteLong(r1);
-			oBinaryWriter.WriteLong(c2);
-			oBinaryWriter.WriteLong(r2);
-		}
-		else
-			oBinaryWriter.WriteBool(false);
-		//oData
-		this.SerializeDataObject(oBinaryWriter, this.oData, this.nSheetId, collaborativeEditing);
+        if(!this.oClass.Save_Changes)
+        {
+            oBinaryWriter.WriteBool(true);
+            var nClassType = this.oClass.getClassType();
+            oBinaryWriter.WriteByte(nClassType);
+            //nActionType
+            oBinaryWriter.WriteByte(this.nActionType);
+            //nSheetId
+            if(null != this.nSheetId)
+            {
+                oBinaryWriter.WriteBool(true);
+                oBinaryWriter.WriteString2(this.nSheetId.toString());
+            }
+            else
+                oBinaryWriter.WriteBool(false);
+            //oRange
+            if(null != this.oRange)
+            {
+                oBinaryWriter.WriteBool(true);
+                var c1 = this.oRange.c1;
+                var c2 = this.oRange.c2;
+                var r1 = this.oRange.r1;
+                var r2 = this.oRange.r2;
+                if(null != this.nSheetId && (0 != c1 || gc_nMaxCol0 != c2))
+                {
+                    c1 = collaborativeEditing.getLockMeColumn2(this.nSheetId, c1);
+                    c2 = collaborativeEditing.getLockMeColumn2(this.nSheetId, c2);
+                }
+                if(null != this.nSheetId && (0 != r1 || gc_nMaxRow0 != r2))
+                {
+                    r1 = collaborativeEditing.getLockMeRow2(this.nSheetId, r1);
+                    r2 = collaborativeEditing.getLockMeRow2(this.nSheetId, r2);
+                }
+                oBinaryWriter.WriteLong(c1);
+                oBinaryWriter.WriteLong(r1);
+                oBinaryWriter.WriteLong(c2);
+                oBinaryWriter.WriteLong(r2);
+            }
+            else
+                oBinaryWriter.WriteBool(false);
+            //oData
+            this.SerializeDataObject(oBinaryWriter, this.oData, this.nSheetId, collaborativeEditing);
+
+        }
+        else
+        {
+            oBinaryWriter.WriteBool(false);
+            oBinaryWriter.WriteString2(this.oClass.Get_Id());
+
+            /*var api = window["Asc"]["editor"];
+            var userId =
+            oBinaryWriter.WriteLong()     */
+            this.oClass.Save_Changes(this.oData, oBinaryWriter);
+        }
 	},
 	SerializeDataObject : function(oBinaryWriter, oData, nSheetId, collaborativeEditing)
 	{
@@ -185,6 +208,9 @@ UndoRedoItemSerializable.prototype = {
 			}
 		}
 	},
+
+
+
 	Deserialize : function(oBinaryReader)
 	{
 		var res = c_oSerConstants.ReadOk;
@@ -193,24 +219,42 @@ UndoRedoItemSerializable.prototype = {
 		res = oBinaryReader.EnterFrame(nLength);
         if(c_oSerConstants.ReadOk != res)
             return res;
-		var nClassType = oBinaryReader.GetUChar();
-		this.oClass = UndoRedoClassTypes.Create(nClassType);
-		this.nActionType = oBinaryReader.GetUChar();
-		var bSheetId = oBinaryReader.GetBool();
-		if(bSheetId)
-			this.nSheetId = oBinaryReader.GetString2LE(oBinaryReader.GetULongLE());
-		var bRange = oBinaryReader.GetBool();
-		if(bRange)
-		{
-			var nC1 = oBinaryReader.GetULongLE();
-			var nR1 = oBinaryReader.GetULongLE();
-			var nC2 = oBinaryReader.GetULongLE();
-			var nR2 = oBinaryReader.GetULongLE();
-			this.oRange = new Asc.Range(nC1, nR1, nC2, nR2);
-		}
-		else
-			this.oRange = null;
-		this.oData = this.DeserializeData(oBinaryReader);
+        var bNoDrawing = oBinaryReader.GetBool();
+        if(bNoDrawing)
+        {
+            var nClassType = oBinaryReader.GetUChar();
+            this.oClass = UndoRedoClassTypes.Create(nClassType);
+            this.nActionType = oBinaryReader.GetUChar();
+            var bSheetId = oBinaryReader.GetBool();
+            if(bSheetId)
+                this.nSheetId = oBinaryReader.GetString2LE(oBinaryReader.GetULongLE());
+            var bRange = oBinaryReader.GetBool();
+            if(bRange)
+            {
+                var nC1 = oBinaryReader.GetULongLE();
+                var nR1 = oBinaryReader.GetULongLE();
+                var nC2 = oBinaryReader.GetULongLE();
+                var nR2 = oBinaryReader.GetULongLE();
+                this.oRange = new Asc.Range(nC1, nR1, nC2, nR2);
+            }
+            else
+                this.oRange = null;
+            this.oData = this.DeserializeData(oBinaryReader);
+        }
+        else
+        {
+            var changedObjectId = oBinaryReader.GetString2();
+            var changedObject = g_oTableId.Get_ById(changedObjectId);
+            if(changedObject)
+            {
+                this.nActionType = 1;
+                this.oClass = changedObject;
+                this.oData = new DrawingCollaborativeData();
+                this.oData.oClass = changedObject;
+                this.oData.oBinaryReader = oBinaryReader;
+                this.oData.nPos = oBinaryReader.pos;
+            }
+        }
 	},
 	DeserializeData : function(oBinaryReader)
 	{
@@ -2548,61 +2592,6 @@ UndoRedoDataSetAdjustmentValue.prototype =
             case this.Properties.gdName: this.gdName = value; break;
             case this.Properties.oldVal: this.oldVal = value; break;
             case this.Properties.newVal: this.newVal = value; break;
-        }
-    }
-};
-
-
-var g_oUndoRedoGraphicObjects = null;
-function UndoRedoGraphicObjects(wb)
-{
-    this.wb = wb;
-    this.nType = UndoRedoClassTypes.Add(function(){return g_oUndoRedoGraphicObjects;});
-}
-
-
-UndoRedoGraphicObjects.prototype =
-{
-    getClassType : function()
-    {
-        return this.nType;
-    },
-    Undo : function(Type, Data, nSheetId)
-    {
-        this.UndoRedo(Type, Data, nSheetId, true);
-    },
-    Redo : function(Type, Data, nSheetId)
-    {
-        this.UndoRedo(Type, Data, nSheetId, false);
-    },
-    UndoRedo : function(Type, Data, nSheetId, bUndo)
-    {
-        var target_object = g_oTableId.Get_ById(Data.objectId);
-        if(isRealObject(target_object))
-        {
-            if(bUndo)
-            {
-                if(typeof target_object.Undo === "function")
-                {
-                    target_object.Undo(Type, Data.drawingData);
-                    if(typeof target_object.Refresh_RecalcData === "function")
-                    {
-                        if(!(target_object instanceof CDocumentContent && (Type ===historyitem_AutoShapes_AddDrawingDocument
-                            || Type ===historyitem_AutoShapes_AddParent || Type ===historyitem_AutoShapes_AddParagraph)))
-                            target_object.Refresh_RecalcData(Type, Data);
-
-                    }
-                }
-            }
-            else
-            {
-                if(typeof target_object.Redo === "function")
-                {
-                    target_object.Redo(Type, Data.drawingData);
-                    if(typeof target_object.Refresh_RecalcData === "function")
-                        target_object.Refresh_RecalcData(Type, Data);
-                }
-            }
         }
     }
 };

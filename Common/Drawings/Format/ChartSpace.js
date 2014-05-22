@@ -653,6 +653,164 @@ CChartSpace.prototype =
         return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
     },
 
+
+
+    recalculateReferences: function()
+    {
+        var worksheet = this.worksheet;
+        if(!worksheet)
+            return;
+
+        var checkValByNumRef = function(oThis, ser, val)
+        {
+            if(val && val.numRef && !val.numRef.numCache)
+            {
+                var f1 = val.numRef.f.replace(/\(|\)/g,"");
+                var arr_f = f1.split(",");
+                var num_cache = new CNumLit();
+                num_cache.setFormatCode("General");
+                var pt_index = 0, i, j, cell, pt;
+                for(i = 0; i < arr_f.length; ++i)
+                {
+                    var parsed_ref = parserHelp.parse3DRef(arr_f[i]);
+                    if(parsed_ref)
+                    {
+                        var source_worksheet = oThis.worksheet.workbook.getWorksheetByName(parsed_ref.sheet);
+                        if(source_worksheet)
+                        {
+                            var range1 = source_worksheet.getRange2(parsed_ref.range);
+                            if(range1)
+                            {
+                                var range = range1.bbox;
+                                if(range.r1 === range.r2)
+                                {
+                                    for(j = range.c1;  j < range.c2; ++j)
+                                    {
+                                        cell = source_worksheet.getCell( new CellAddress(range.r1, j, 0) );
+                                        pt = new CNumericPoint();
+                                        pt.setIdx(pt_index++);
+                                        pt.setVal(parseFloat(cell.getValue()));
+                                        if(cell.getNumFormatStr() !== "General")
+                                        {
+                                            pt.setFormatCode(cell.getNumFormatStr())
+                                        }
+                                        num_cache.addPt(pt);
+                                    }
+                                }
+                                else
+                                {
+                                    for(j = range.r1; j < range.r2; ++j)
+                                    {
+                                        cell = source_worksheet.getCell( new CellAddress(j, range.c1, 0) );
+                                        pt = new CNumericPoint();
+                                        pt.setIdx(pt_index++);
+                                        pt.setVal(parseFloat(cell.getValue()));
+                                        if(cell.getNumFormatStr() !== "General")
+                                        {
+                                            pt.setFormatCode(cell.getNumFormatStr())
+                                        }
+                                        num_cache.addPt(pt);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                num_cache.setPtCount(pt_index);
+                val.numRef.setNumCache(num_cache);
+            }
+        };
+
+        var checkCatByNumRef = function(oThis, ser, cat)
+        {
+            if(cat && cat.strRef && !cat.strRef.strCache)
+            {
+                var f1 = cat.strRef.f.replace(/\(|\)/g,"");
+                var arr_f = f1.split(",");
+                var str_cache = new CStrCache();
+                str_cache.setFormatCode("General");
+                var pt_index = 0, i, j, cell, pt;
+                for(i = 0; i < arr_f.length; ++i)
+                {
+                    var parsed_ref = parserHelp.parse3DRef(arr_f[i]);
+                    if(parsed_ref)
+                    {
+                        var source_worksheet = oThis.worksheet.workbook.getWorksheetByName(parsed_ref.sheet);
+                        if(source_worksheet)
+                        {
+                            var range1 = source_worksheet.getRange2(parsed_ref.range);
+                            if(range1)
+                            {
+                                var range = range1.bbox;
+                                if(range.r1 === range.r2)
+                                {
+                                    for(j = range.c1;  j < range.c2; ++j)
+                                    {
+                                        cell = source_worksheet.getCell( new CellAddress(range.r1, j, 0) );
+                                        pt = new CStringPoint();
+                                        pt.setIdx(pt_index++);
+                                        pt.setVal(cell.getValue());
+                                        if(cell.getNumFormatStr() !== "General")
+                                        {
+                                            pt.setFormatCode(cell.getNumFormatStr())
+                                        }
+                                        str_cache.addPt(pt);
+                                    }
+                                }
+                                else
+                                {
+                                    for(j = range.r1;  j < range.r2; ++j)
+                                    {
+                                        cell = source_worksheet.getCell(new CellAddress(j, range.c1, 0));
+                                        pt = new CStringPoint();
+                                        pt.setIdx(pt_index++);
+                                        pt.setVal(cell.getValue());
+                                        if(cell.getNumFormatStr() !== "General")
+                                        {
+                                            pt.setFormatCode(cell.getNumFormatStr())
+                                        }
+                                        str_cache.addPt(pt);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                str_cache.setPtCount(pt_index);
+                cat.strRef.setStrCache(str_cache);
+            }
+        };
+
+        var charts, series, i, j, ser, val;
+        charts = this.chart.plotArea.charts;
+        for(i = 0; i < charts.length; ++i)
+        {
+            series = charts[i].series;
+            if(charts[i].getObjectType() !== historyitem_type_ScatterChart)
+            {
+                for(j = 0; j < series.length; ++j)
+                {
+                    ser = series[j];
+                    //val
+                    checkValByNumRef(this, ser, ser.val);
+                    //cat
+                    checkValByNumRef(this, ser, ser.cat);
+                    checkCatByNumRef(this, ser, ser.cat);
+
+                }
+            }
+            else
+            {
+                for(j = 0; j < series.length; ++j)
+                {
+                    ser = series[j];
+                    checkValByNumRef(this, ser, ser.xVal);
+                    checkValByNumRef(this, ser, ser.yVal);
+                }
+            }
+        }
+    },
+
     recalculateAxis: function()
     {
         if(this.chart && this.chart.plotArea && this.chart.plotArea.chart)
@@ -3255,7 +3413,7 @@ CChartSpace.prototype =
                         union_marker.marker.pen && union_marker.marker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
                         union_marker.marker.brush && union_marker.marker.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
                     }
-                    union_marker.marker.lineMarker && union_marker.marker.lineMarker.pen && union_marker.marker.lineMarker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                    union_marker.lineMarker && union_marker.lineMarker.pen && union_marker.lineMarker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
                 }
             }
             var marker_size;
@@ -5546,10 +5704,10 @@ CChartSpace.prototype =
             }
             case historyitem_AutoShapes_SetWorksheet:
             {
-                writeBool(isRealObject(data.newPr));
-                if(isRealObject(data.newPr))
+                writeBool(w,isRealObject(data.newPr));
+                if(isRealObject(w,data.newPr))
                 {
-                    writeString(data.newPr.getId());
+                    writeString(w,data.newPr.getId());
                 }
                 break;
             }

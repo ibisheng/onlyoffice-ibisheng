@@ -55,7 +55,7 @@ function FrozenPlace(ws, type) {
 			
 			case FrozenAreaType.Bottom: {
 				if (!_this.frozenCell.col && _this.frozenCell.row)
-					_this.range = new asc_Range(0, _this.frozenCell.row, _this.worksheet.getLastVisibleCol(), _this.worksheet.getLastVisibleRow());
+					_this.range = new asc_Range(0, _this.worksheet.getFirstVisibleRow(), _this.worksheet.getLastVisibleCol(), _this.worksheet.getLastVisibleRow());
 				else
 					_this.isValid = false;
 			}
@@ -71,7 +71,7 @@ function FrozenPlace(ws, type) {
 			
 			case FrozenAreaType.Right: {
 				if (_this.frozenCell.col && !_this.frozenCell.row)
-					_this.range = new asc_Range(_this.frozenCell.col, 0, _this.worksheet.getLastVisibleCol(), _this.worksheet.getLastVisibleRow());
+					_this.range = new asc_Range(_this.worksheet.getFirstVisibleCol(), 0, _this.worksheet.getLastVisibleCol(), _this.worksheet.getLastVisibleRow());
 				else
 					_this.isValid = false;
 			}
@@ -96,7 +96,7 @@ function FrozenPlace(ws, type) {
 			
 			case FrozenAreaType.RightTop: {
 				if (_this.frozenCell.col && _this.frozenCell.row)
-					_this.range = new asc_Range(_this.frozenCell.col, 0, _this.worksheet.getLastVisibleCol(), _this.frozenCell.row - 1);
+					_this.range = new asc_Range(_this.worksheet.getFirstVisibleCol(), 0, _this.worksheet.getLastVisibleCol(), _this.frozenCell.row - 1);
 				else
 					_this.isValid = false;
 			}
@@ -104,7 +104,7 @@ function FrozenPlace(ws, type) {
 			
 			case FrozenAreaType.LeftBottom: {
 				if (_this.frozenCell.col && _this.frozenCell.row)
-					_this.range = new asc_Range(0, _this.frozenCell.row, _this.frozenCell.col - 1, _this.worksheet.getLastVisibleRow());
+					_this.range = new asc_Range(0, _this.worksheet.getFirstVisibleRow(), _this.frozenCell.col - 1, _this.worksheet.getLastVisibleRow());
 				else
 					_this.isValid = false;
 			}
@@ -112,7 +112,7 @@ function FrozenPlace(ws, type) {
 			
 			case FrozenAreaType.RightBottom: {
 				if (_this.frozenCell.col && _this.frozenCell.row)
-					_this.range = new asc_Range(_this.frozenCell.col, _this.frozenCell.row, _this.worksheet.getLastVisibleCol(), _this.worksheet.getLastVisibleRow());
+					_this.range = new asc_Range(_this.frozenCell.col, _this.worksheet.getFirstVisibleRow(), _this.worksheet.getLastVisibleCol(), _this.worksheet.getLastVisibleRow());
 				else
 					_this.isValid = false;
 			}
@@ -183,10 +183,10 @@ function FrozenPlace(ws, type) {
 	
 	_this.getRect = function() {
 		var rect = { x: 0, y: 0, w: 0, h: 0 };
-		rect.x = _this.worksheet.getCellLeft(_this.range.c1, 0);
-		rect.y = _this.worksheet.getCellTop(_this.range.r1, 0);
-		rect.w = _this.worksheet.getCellLeft(_this.range.c2, 0) + _this.worksheet.getColumnWidth(_this.range.c2, 0) - rect.x;
-		rect.h = _this.worksheet.getCellTop(_this.range.r2, 0) + _this.worksheet.getRowHeight(_this.range.r2, 0) - rect.y;
+		rect.x = _this.worksheet.getCellLeftRelative(_this.range.c1, 0);
+		rect.y = _this.worksheet.getCellTopRelative(_this.range.r1, 0);
+		rect.w = _this.worksheet.getCellLeftRelative(_this.range.c2, 0) + _this.worksheet.getColumnWidth(_this.range.c2, 0) - rect.x;
+		rect.h = _this.worksheet.getCellTopRelative(_this.range.r2, 0) + _this.worksheet.getRowHeight(_this.range.r2, 0) - rect.y;
 
         switch (_this.type) {
 
@@ -254,12 +254,14 @@ function FrozenPlace(ws, type) {
 
     _this.getRect2 = function() {
         var rect = { x: 0, y: 0, w: 0, h: 0 };
-        rect.x = _this.worksheet.getCellLeft(_this.range.c1, 0);
-        rect.y = _this.worksheet.getCellTop(_this.range.r1, 0);
-        rect.w = _this.worksheet.getCellLeft(_this.range.c2, 0) + _this.worksheet.getColumnWidth(_this.range.c2, 0) - rect.x;
-        rect.h = _this.worksheet.getCellTop(_this.range.r2, 0) + _this.worksheet.getRowHeight(_this.range.r2, 0) - rect.y;
+        rect.x = _this.worksheet.getCellLeftRelative(_this.range.c1, 0);
+        rect.y = _this.worksheet.getCellTopRelative(_this.range.r1, 0);
+        rect.w = _this.worksheet.getCellLeftRelative(_this.range.c2, 0) + _this.worksheet.getColumnWidth(_this.range.c2, 0) - rect.x;
+        rect.h = _this.worksheet.getCellTopRelative(_this.range.r2, 0) + _this.worksheet.getRowHeight(_this.range.r2, 0) - rect.y;
         return rect;
     };
+
+
 
 	_this.getFirstVisible = function() {
 		var fv = { col: 0, row: 0 };
@@ -320,12 +322,13 @@ function FrozenPlace(ws, type) {
 		return fv;
 	};
 	
-	_this.isPointInside = function(x, y) {
-		var rect = _this.getRect();
-		var result = (x >= rect.x ) && (y >= rect.y) && (x <= rect.x + rect.w) && (y <= rect.y + rect.h);
-		if ( log && result )
-			console.log( x + "," + y + " in " + _this.type);
-		return result;			
+	_this.isPointInside = function(x, y)
+    {
+        var rect = _this.getRect();
+         var result = (x >= rect.x ) && (y >= rect.y) && (x <= rect.x + rect.w) && (y <= rect.y + rect.h);
+         if ( log && result )
+         console.log( x + "," + y + " in " + _this.type);
+         return result;
 	};
 	
 	_this.isCellInside = function(cell) {
@@ -532,8 +535,8 @@ function FrozenPlace(ws, type) {
 					 
 		if ( _this.isPointInside(x, y) ) {
 		
-			var _x = x + _this.worksheet.getCellLeft(0, 0);
-			var _y = y + _this.worksheet.getCellTop(0, 0);
+			var _x = x + _this.worksheet.getCellLeftRelative(0, 0);
+			var _y = y + _this.worksheet.getCellTopRelative(0, 0);
 		
 			var xPt = _this.worksheet.objectRender.convertMetric(_x, 0, 1);
 			var yPt = _this.worksheet.objectRender.convertMetric(_y, 0, 1);

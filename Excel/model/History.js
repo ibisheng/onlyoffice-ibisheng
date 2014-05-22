@@ -429,8 +429,6 @@ CHistory.prototype =
 			}
 			if (g_oUndoRedoWorksheet === Item.Class && historyitem_Worksheet_SetViewSettings === Item.Type)
 				isReInit = true;
-			if (g_oUndoRedoGraphicObjects === Item.Class)
-				isRedrawAll = false;
         }
         var wsViews = Asc["editor"].wb.wsViews;
         for(var i = 0; i < wsViews.length; ++i)
@@ -497,7 +495,20 @@ CHistory.prototype =
 		this.Add(Class, Type, sheetid, range, Data, LocalChange);
 		if(bNeedOff)
 			this.TurnOff();
-		Class.Redo( Type, Data, sheetid );
+        if(!Class.Load_Changes)
+        {
+            Class.Redo( Type, Data, sheetid );
+        }
+        else
+        {
+            if(!Data.isDrawingCollaborativeData)
+                Class.Redo(Data);
+            else
+            {
+                Data.oBinaryReader.Seek(Data.nPos);
+                Class.Load_Changes(Data.oBinaryReader, null, new CDocumentColor(255, 255, 255));
+            }
+        }
 		if (g_oUndoRedoWorksheet === Class && historyitem_Worksheet_SetViewSettings === Type)
 			oRedoObjectParam.bIsReInit = true;
 		if (g_oUndoRedoWorksheet === Class && (historyitem_Worksheet_RowProp == Type || historyitem_Worksheet_ColProp == Type))
@@ -512,10 +523,18 @@ CHistory.prototype =
         for ( var Index = 0; Index < Point.Items.length; Index++ )
         {
             var Item = Point.Items[Index];
-			if(!Item.Class.Read_FromBinary2)
+			if(!Item.Class.Load_Changes)
 				Item.Class.Redo( Item.Type, Item.Data, Item.SheetId );
 			else
-				Item.Class.Redo(Item.Data);
+            {
+                if(!Item.Data.isDrawingCollaborativeData)
+                    Item.Class.Redo(Item.Data);
+                else
+                {
+                    Item.Data.oBinaryReader.Seek(Item.Data.nPos);
+                    Item.Class.Load_Changes(Item.Data.oBinaryReader, null, new CDocumentColor(255, 255, 255));
+                }
+            }
 			if (g_oUndoRedoWorksheet === Item.Class && historyitem_Worksheet_SetViewSettings === Item.Type)
 				oRedoObjectParam.bIsReInit = true;
 			if (g_oUndoRedoWorksheet === Item.Class && (historyitem_Worksheet_RowProp == Item.Type || historyitem_Worksheet_ColProp == Item.Type))
@@ -524,6 +543,7 @@ CHistory.prototype =
 				oRedoObjectParam.oChangeWorksheetUpdate[Item.SheetId] = Item.SheetId;
 			}
         }
+        CollaborativeEditing.Apply_LinkData();
         var wsViews = Asc["editor"].wb.wsViews;
         for(var i = 0; i < wsViews.length; ++i)
         {
@@ -554,7 +574,17 @@ CHistory.prototype =
 		{
 			this._checkCurPoint();
 			Point = this.Points[this.Index];
+            CollaborativeEditing.Apply_LinkData();
+            var wsViews = Asc["editor"].wb.wsViews;
+            for(var i = 0; i < wsViews.length; ++i)
+            {
+                if(wsViews[i])
+                {
+                    wsViews[i].objectRender.controller.recalculate(true, null);
+                }
+            }
 		}
+
 		if(null == Point)
 			return;
 		var oSelectRange = null;

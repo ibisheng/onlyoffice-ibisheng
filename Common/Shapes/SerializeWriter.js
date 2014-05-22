@@ -2566,7 +2566,9 @@ function CBinaryFileWriter()
             image.spPr.geometry = CreateGeometry("rect");
         }
 
-        oThis.WriteRecord1(1, image.blipFill, oThis.WriteUniFill);
+        var unifill = new CUniFill();
+        unifill.fill = image.blipFill
+        oThis.WriteRecord1(1, unifill, oThis.WriteUniFill);
         oThis.WriteRecord1(2, image.spPr, oThis.WriteSpPr);
         oThis.WriteRecord2(3, image.style, oThis.WriteShapeStyle);
 

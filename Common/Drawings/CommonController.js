@@ -712,17 +712,27 @@ DrawingObjectsController.prototype =
         {
             if(this.selectedObjects.length === 1 && this.selectedObjects[0].parent && !this.selectedObjects[0].parent.Is_Inline())
             {
+                var anchor_pos;
                 if(this.arrTrackObjects.length === 1)
                 {
-                    var bounds = this.arrTrackObjects[0].getBounds();
                     var page_index = isRealNumber(this.arrTrackObjects[0].pageIndex) ? this.arrTrackObjects[0].pageIndex : (isRealNumber(this.arrTrackObjects[0].selectStartPage) ? this.arrTrackObjects[0].selectStartPage : 0);
-                    var nearest_pos = this.document.Get_NearestPos(page_index, bounds.min_x, bounds.min_y, true, this.selectedObjects[0].parent);
-                    drawingDocument.AutoShapesTrack.drawFlowAnchor(nearest_pos.Paragraph.X, nearest_pos.Paragraph.Y);
+                    if(page_index === pageIndex)
+                    {
+                        var bounds = this.arrTrackObjects[0].getBounds();
+                        var nearest_pos = this.document.Get_NearestPos(page_index, bounds.min_x, bounds.min_y, true, this.selectedObjects[0].parent);
+                        nearest_pos.Page = page_index;
+                        drawingDocument.AutoShapesTrack.drawFlowAnchor(nearest_pos.X, nearest_pos.Y);
+                    }
                 }
                 else
                 {
-                    var paragraph = this.selectedObjects[0].parent.Get_ParentParagraph();
-                    drawingDocument.AutoShapesTrack.drawFlowAnchor(paragraph.X, paragraph.Y);
+                    var page_index = this.selectedObjects[0].selectStartPage;
+                    if(page_index === pageIndex)
+                    {
+                        var paragraph = this.selectedObjects[0].parent.Get_ParentParagraph();
+                        anchor_pos = paragraph.Get_AnchorPos(this.selectedObjects[0].parent);
+                        drawingDocument.AutoShapesTrack.drawFlowAnchor(anchor_pos.X, anchor_pos.Y);
+                    }
                 }
             }
         }
@@ -3466,18 +3476,82 @@ DrawingObjectsController.prototype =
         return null;
     },
 
-    getSelectionState: function()
+    setSelectionState: function( state, stateIndex )
     {
-        var state = {};
-        return state;
-        //TODO
+
+        var _state_index = isRealNumber(stateIndex) ? stateIndex : state.length-1;
+        var selection_state = state[_state_index];
+        this.resetSelection();
+        if(selection_state.textObject)
+        {
+            this.selectObject(selection_state.textObject, selection_state.selectStartPage);
+            this.selection.textSelection = selection_state.textObject;
+            selection_state.textObject.getDocContent().Set_SelectionState(selection_state.textSelection, selection_state.textSelection.length-1);
+        }
+        else if(selection_state.groupObject)
+        {
+            this.selectObject(selection_state.groupObject, selection_state.selectStartPage);
+            this.selection.groupSelection = selection_state.groupObject;
+            selection_state.groupObject.setSelectionState(selection_state.groupSelection);
+        }
+        else if(selection_state.chartObject)
+        {
+            this.selectObject(selection_state.chartObject, selection_state.selectStartPage);
+            this.selection.chartSelection = selection_state.chartObject;
+            selection_state.chartObject.setSelectionState(selection_state.chartSelection);
+        }
+        else if(selection_state.wrapObject)
+        {
+            this.selectObject(selection_state.wrapObject, selection_state.selectStartPage);
+            this.selection.wrapPolygonSelection = selection_state.wrapObject;
+        }
+        else
+        {
+            for(var i = 0; i < selection_state.selection.length; ++i)
+            {
+                this.selectObject(selection_state.selection[i].object, selection_state.selection[i].pageIndex);
+            }
+        }
     },
 
-    setSelectionState: function(state)
+
+    getSelectionState: function()
     {
-        return;
-        //TODO
+        var selection_state = {};
+        if(this.selection.textSelection)
+        {
+            selection_state.textObject = this.selection.textSelection;
+            selection_state.selectStartPage = this.selection.textSelection.selectStartPage;
+            selection_state.textSelection = this.selection.textSelection.getDocContent().Get_SelectionState();
+        }
+        else if(this.selection.groupSelection)
+        {
+            selection_state.groupObject = this.selection.groupSelection;
+            selection_state.selectStartPage = this.selection.groupSelection.selectStartPage;
+            selection_state.groupSelection = this.selection.groupSelection.getSelectionState();
+        }
+        else if(this.selection.chartSelection)
+        {
+            selection_state.chartObject = this.selection.chartSelection;
+            selection_state.selectStartPage = this.selection.chartSelection.selectStartPage;
+            selection_state.chartSelection = this.selection.chartSelection.getSelectionState();
+        }
+        else if(this.selection.wrapPolygonSelection)
+        {
+            selection_state.wrapObject = this.selection.wrapPolygonSelection;
+            selection_state.selectStartPage = this.selection.wrapPolygonSelection.selectStartPage;
+        }
+        else
+        {
+            selection_state.selection = [];
+            for(var i = 0; i < this.selectedObjects.length; ++i)
+            {
+                selection_state.selection.push({object: this.selectedObjects[i], pageIndex: this.selectedObjects[i].selectStartPage});
+            }
+        }
+        return [selection_state];
     },
+
 
     drawTracks: function(overlay)
     {

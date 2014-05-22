@@ -2750,26 +2750,71 @@ function DrawingObjects() {
     // Считаем From/To исходя из graphicObject
     DrawingBase.prototype.setGraphicObjectCoords = function() {
         var _t = this;
+
+       /* var leftTop = worksheet.getCellsOffset(1), _x, _y, col, row, offsets;
+        _x = mmToPt(_t.graphicObject.x) + leftTop.left;
+        _y = mmToPt(_t.graphicObject.y) + leftTop.top;
+        offsets = _this.drawingArea.getOffsets(ptToPx(_x), ptToPx(_y));
+        col = _t.getColUnderCursor(_x - pxToPt(offsets.x) + leftTop.left);
+        row = _t.getRowUnderCursor(_y - pxToPt(offsets.y) + leftTop.top);
+        _t.from.col = col.col;
+        _t.from.colOff = ptToMm(_x - col.left);
+        _t.from.row = row.row;
+        _t.from.rowOff = ptToMm(_y - row.top);
+
+        _x = mmToPt(_t.graphicObject.x + _t.graphicObject.extX) + leftTop.left;
+        _y = mmToPt(_t.graphicObject.y + _t.graphicObject.extY) + leftTop.top;
+        offsets = _this.drawingArea.getOffsets(ptToPx(_x), ptToPx(_y));
+        col = _t.getColUnderCursor(_x - pxToPt(offsets.x) + leftTop.left);
+        row = _t.getRowUnderCursor(_y - pxToPt(offsets.y) + leftTop.top);
+        _t.to.col = col.col;
+        _t.to.colOff = ptToMm(_x - col.left);
+        _t.to.row = row.row;
+        _t.to.rowOff = ptToMm(_y - row.top);
+        return;        */
         if ( _t.isGraphicObject() ) {
 
             if ( (_t.graphicObject.x < 0) || (_t.graphicObject.y < 0) || (_t.graphicObject.extX <= 0) || (_t.graphicObject.extY <= 0) )
                 return;
 
-            ////var fromCell = _this.coordsManager.calculateCell( mmToPx(_t.graphicObject.x), mmToPx(_t.graphicObject.y) );
-            ////var toCell = _this.coordsManager.calculateCell( mmToPx(_t.graphicObject.x + _t.graphicObject.extX), mmToPx(_t.graphicObject.y + _t.graphicObject.extY) );
-            var leftTop = _t.worksheet.getCellsOffset(0);
-            var fromCell = _this.drawingArea.calculateCell(leftTop.left +  mmToPx(_t.graphicObject.x),leftTop.top +  mmToPx(_t.graphicObject.y) );
-            var toCell = _this.drawingArea.calculateCell(leftTop.left +  mmToPx(_t.graphicObject.x + _t.graphicObject.extX), leftTop.top + mmToPx(_t.graphicObject.y + _t.graphicObject.extY) );
+        //////var fromCell = _this.coordsManager.calculateCell( mmToPx(_t.graphicObject.x), mmToPx(_t.graphicObject.y) );
+        //////var toCell = _this.coordsManager.calculateCell( mmToPx(_t.graphicObject.x + _t.graphicObject.extX), mmToPx(_t.graphicObject.y + _t.graphicObject.extY) );
+        //var leftTop = _t.worksheet.getCellsOffset(0);
+        //var fromCell = _this.drawingArea.calculateCell(leftTop.left +  mmToPx(_t.graphicObject.x),leftTop.top +  mmToPx(_t.graphicObject.y) );
+        //var toCell = _this.drawingArea.calculateCell(leftTop.left +  mmToPx(_t.graphicObject.x + _t.graphicObject.extX), leftTop.top + mmToPx(_t.graphicObject.y + _t.graphicObject.extY) );
+        //
+        //ar _x = mmToPt(_t.graphicObject.x) + leftTop.left;
+        //ar _y = mmToPt(_t.graphicObject.y) + leftTop.top;
+        //ar offsets = _this.drawingArea.getOffsets(ptToPx(_x), ptToPx(_y));
+        //ar col = _t.getColUnderCursor(_x - pxToPt(offsets.x) + leftTop.left);
+        //ar row = _t.getRowUnderCursor(_y - pxToPt(offsets.y) + leftTop.top);
+        //_t.from.col = col.col;
+        //_t.from.colOff = ptToMm(_x - col.left);
+        //_t.from.row = row.row;
+        //_t.from.rowOff = ptToMm(_y - row.top);
+        //
+        //_t.from.col = fromCell.col;
+        //_t.from.colOff = fromCell.colOff;
+        //_t.from.row = fromCell.row;
+        //_t.from.rowOff = fromCell.rowOff;
+        //
+        //_t.to.col = toCell.col;
+        //_t.to.colOff = toCell.colOff;
+        //_t.to.row = toCell.row;
+        //_t.to.rowOff = toCell.rowOff;
+
+            var fromCell = worksheet. findCellByXY(mmToPt(_t.graphicObject.x), mmToPt(_t.graphicObject.y));//_this.drawingArea.calculateCell( mmToPx(_t.graphicObject.x), mmToPx(_t.graphicObject.y) );
+            var toCell =   worksheet. findCellByXY(mmToPt(_t.graphicObject.x + _t.graphicObject.extX), mmToPt(_t.graphicObject.y + _t.graphicObject.extY));
 
             _t.from.col = fromCell.col;
-            _t.from.colOff = fromCell.colOff;
+            _t.from.colOff = ptToMm(fromCell.colOff);
             _t.from.row = fromCell.row;
-            _t.from.rowOff = fromCell.rowOff;
+            _t.from.rowOff = ptToMm(fromCell.rowOff);
 
             _t.to.col = toCell.col;
-            _t.to.colOff = toCell.colOff;
+            _t.to.colOff = ptToMm(toCell.colOff);
             _t.to.row = toCell.row;
-            _t.to.rowOff = toCell.rowOff;
+            _t.to.rowOff = ptToMm(toCell.rowOff);
         }
     };
 
@@ -3057,6 +3102,20 @@ function DrawingObjects() {
                 }
                 worksheet.expandRowsOnScroll(true); 	// для rowOff
             }
+            var metrics = drawingObject.getGraphicObjectMetrics();
+            CheckSpPrXfrm(drawingObject.graphicObject);
+            drawingObject.graphicObject.spPr.xfrm.setOffX(metrics.x);
+            drawingObject.graphicObject.spPr.xfrm.setOffY(metrics.y);
+            drawingObject.graphicObject.spPr.xfrm.setExtX(metrics.extX);
+            drawingObject.graphicObject.spPr.xfrm.setExtY(metrics.extY);
+            if(drawingObject.graphicObject.getObjectType() === historyitem_type_GroupShape)
+            {
+                //drawingObject.graphicObject.spPr.xfrm.setChOffX(0);
+                //drawingObject.graphicObject.spPr.xfrm.setChOffY(0);
+                //drawingObject.graphicObject.spPr.xfrm.setChExtX(metrics.extX);
+                //drawingObject.graphicObject.spPr.xfrm.setChExtY(metrics.extY);
+            }
+
             drawingObject.graphicObject.drawingBase = aObjects[i];
             drawingObject.graphicObject.drawingObjects = _this;
             drawingObject.graphicObject.getAllRasterImages(aImagesSync);
@@ -3075,23 +3134,7 @@ function DrawingObjects() {
 
         // Загружаем все картинки листа
         _this.asyncImagesDocumentEndLoaded = function() {
-
-            //TODO: переделать
-            //for (var i = 0; i < aObjectsSync.length; i++) {
-            //
-            //    var drawingObject = aObjectsSync[i];
-            //    var image = api.ImageLoader.LoadImage(aImagesSync[i], 1);	// Должна быть в мапе
-            //
-            //    if ( image != null ) {
-            //
-            //        drawingObject.graphicObject.recalculate();
-            //        drawingObject.updateAnchorPosition();
-            //        drawingObject.graphicObject.draw(shapeCtx);
-            //
-            //        var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
-            //        aBoundsCheckers.push(boundsChecker);
-            //    }
-            //}
+            _this.showDrawingObjects(true);
         };
 
         api.ImageLoader.LoadDocumentImages(aImagesSync, null, _this.asyncImagesDocumentEndLoaded);
@@ -4413,9 +4456,9 @@ function DrawingObjects() {
                 drawingObject.graphicObject.chart.rebuildSeries();
                 drawingObject.graphicObject.recalculate();
 
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(drawingObject.graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_RangeInterval, null, null, new UndoRedoDataGraphicObjects(drawingObject.graphicObject.chart.Get_Id(), new UndoRedoDataGOSingleProp(_interval, drawingObject.graphicObject.chart.range.interval)));
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(drawingObject.graphicObject.chart.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+                //TODO: History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(drawingObject.graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+                //TODO: History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_RangeInterval, null, null, new UndoRedoDataGraphicObjects(drawingObject.graphicObject.chart.Get_Id(), new UndoRedoDataGOSingleProp(_interval, drawingObject.graphicObject.chart.range.interval)));
+                //TODO: History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(drawingObject.graphicObject.chart.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
             };
 
             var bRedraw = false;
@@ -4513,9 +4556,9 @@ function DrawingObjects() {
                 var _interval = graphicObject.chart.range.interval;
                 graphicObject.chart.range.interval = graphicObject.chart.range.interval.replace(oldWorksheet, newWorksheet);
 
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_RangeInterval, null, null, new UndoRedoDataGraphicObjects(graphicObject.chart.Get_Id(), new UndoRedoDataGOSingleProp(_interval, graphicObject.chart.range.interval)));
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(graphicObject.chart.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+                //TODO History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+                //TODO History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_RangeInterval, null, null, new UndoRedoDataGraphicObjects(graphicObject.chart.Get_Id(), new UndoRedoDataGOSingleProp(_interval, graphicObject.chart.range.interval)));
+                //TODO History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(graphicObject.chart.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
 
                 var _range = convertFormula(graphicObject.chart.range.interval, worksheet);
                 if ( _range ) {

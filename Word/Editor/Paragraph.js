@@ -19525,12 +19525,14 @@ Paragraph.prototype =
             CollaborativeEditing.Add_NewObject( this );
             
             this.bFromDocument = Reader.GetBool();
-
-            var DrawingDocument = editor.WordControl.m_oDrawingDocument;
-            if ( undefined !== DrawingDocument && null !== DrawingDocument )
+            if(this.bFromDocument)
             {
-                this.DrawingDocument = DrawingDocument;
-                this.LogicDocument   = this.bFromDocument ? this.DrawingDocument.m_oLogicDocument : null;
+                var DrawingDocument = editor.WordControl.m_oDrawingDocument;
+                if ( undefined !== DrawingDocument && null !== DrawingDocument )
+                {
+                    this.DrawingDocument = DrawingDocument;
+                    this.LogicDocument   = this.bFromDocument ? this.DrawingDocument.m_oLogicDocument : null;
+                }
             }
         }
     },
@@ -19541,6 +19543,14 @@ Paragraph.prototype =
             this.Parent = g_oTableId.Get_ById( LinkData.Parent );
         if ( "undefined" != typeof(LinkData.TextPr) )
             this.TextPr = g_oTableId.Get_ById( LinkData.TextPr );
+        if(this.Parent && this.Parent.Parent && this.Parent.Parent.Get_Worksheet)
+        {
+            var worksheet = this.Parent.Parent.Get_Worksheet();
+            if(worksheet)
+            {
+                this.DrawingDocument = worksheet.DrawingDocument;
+            }
+        }
     },
 
     Clear_CollaborativeMarks : function()

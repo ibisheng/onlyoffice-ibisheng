@@ -2019,10 +2019,10 @@ CGroupShape.prototype =
             }
             case historyitem_AutoShapes_SetWorksheet:
             {
-                writeBool(isRealObject(data.newPr));
+                writeBool(w,isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
                 {
-                    writeString(data.newPr.getId());
+                    writeString(w,data.newPr.getId());
                 }
                 break;
             }

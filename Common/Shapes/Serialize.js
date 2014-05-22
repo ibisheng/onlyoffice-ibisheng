@@ -4712,13 +4712,14 @@ function BinaryPPTYLoader()
                 }
                 case 1:
                 {
-                    pic.setBlipFill(this.ReadUniFill());
+                    pic.setBlipFill(this.ReadUniFill().fill);
                     break;
                 }
                 case 2:
                 {
 
                     var spPr = new CSpPr();
+                    spPr.setParent(pic);
                     this.ReadSpPr(spPr);
                     pic.setSpPr(spPr);
                     break;
@@ -4761,8 +4762,10 @@ function BinaryPPTYLoader()
                 case 1:
                 {
                     var spPr = new CSpPr();
+                    spPr.setParent(shape);
                     this.ReadSpPr(spPr);
                     shape.setSpPr(spPr);
+
                     break;
                 }
                 case 2:

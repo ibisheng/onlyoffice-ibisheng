@@ -279,43 +279,48 @@ CShape.prototype.getParentObjects = function ()
 
 CShape.prototype.recalculate = function ()
 {
-    if (this.recalcInfo.recalculateBrush) {
-        this.recalculateBrush();
-        this.recalcInfo.recalculateBrush = false;
-    }
+    ExecuteNoHistory(function(){
 
-    if (this.recalcInfo.recalculatePen) {
-        this.recalculatePen();
-        this.recalcInfo.recalculatePen = false;
-    }
-    if (this.recalcInfo.recalculateTransform) {
-        this.recalculateTransform();
-        this.recalcInfo.recalculateTransform = false;
-    }
 
-    if (this.recalcInfo.recalculateGeometry) {
-        this.recalculateGeometry();
-        this.recalcInfo.recalculateGeometry = false;
-    }
+        if (this.recalcInfo.recalculateBrush) {
+            this.recalculateBrush();
+            this.recalcInfo.recalculateBrush = false;
+        }
 
-    if (this.recalcInfo.recalculateContent) {
-        if (this.txBody)
-            this.txBody.recalcInfo.recalculateContent2 = true;
-        this.recalculateContent();
-    }
+        if (this.recalcInfo.recalculatePen) {
+            this.recalculatePen();
+            this.recalcInfo.recalculatePen = false;
+        }
+        if (this.recalcInfo.recalculateTransform) {
+            this.recalculateTransform();
+            this.recalcInfo.recalculateTransform = false;
+        }
 
-    if (this.recalcInfo.recalculateTransformText) {
-        this.recalculateTransformText();
-    }
-    if (this.recalcInfo.recalculateCursorTypes) {
-        this.recalculateCursorTypes();
-        this.recalcInfo.recalculateCursorTypes = false;
-    }
-    if(this.recalcInfo.recalculateBounds)
-    {
-        this.recalculateBounds();
-        this.recalcInfo.recalculateBounds = false;
-    }
+        if (this.recalcInfo.recalculateGeometry) {
+            this.recalculateGeometry();
+            this.recalcInfo.recalculateGeometry = false;
+        }
+
+        if (this.recalcInfo.recalculateContent) {
+            if (this.txBody)
+                this.txBody.recalcInfo.recalculateContent2 = true;
+            this.recalculateContent();
+        }
+
+        if (this.recalcInfo.recalculateTransformText) {
+            this.recalculateTransformText();
+        }
+        if (this.recalcInfo.recalculateCursorTypes) {
+            this.recalculateCursorTypes();
+            this.recalcInfo.recalculateCursorTypes = false;
+        }
+        if(this.recalcInfo.recalculateBounds)
+        {
+            this.recalculateBounds();
+            this.recalcInfo.recalculateBounds = false;
+        }
+
+    }, this, []);
 };
 CShape.prototype.recalculateBounds = function()
 {
@@ -435,4 +440,14 @@ CShape.prototype.Get_ColorMap = function()
 CShape.prototype.getStyles = function(index)
 {
     return this.Get_Styles(index);
+};
+
+CShape.prototype.Get_Worksheet = function()
+{
+    return this.worksheet;
+};
+
+CTextBody.prototype.Get_Worksheet = function()
+{
+    return this.parent && this.parent.Get_Worksheet && this.parent.Get_Worksheet();
 };

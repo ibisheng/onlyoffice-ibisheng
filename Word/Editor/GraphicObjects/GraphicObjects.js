@@ -964,81 +964,9 @@ CGraphicObjects.prototype =
         this.graphicPages[CurPage].documentStatistics(Statistics);
     },
 
-    setSelectionState: function( state, stateIndex )
-    {
-        var selection_state = state[stateIndex];
-        this.resetSelection();
-        if(selection_state.textObject)
-        {
-            this.selectObject(selection_state.textObject, selection_state.selectStartPage);
-            this.selection.textSelection = selection_state.textObject;
-            selection_state.textObject.getDocContent().Set_SelectionState(selection_state.textSelection, selection_state.textSelection.length-1);
-        }
-        else if(selection_state.groupObject)
-        {
-            this.selectObject(selection_state.groupObject, selection_state.selectStartPage);
-            this.selection.groupSelection = selection_state.groupObject;
-            selection_state.groupObject.setSelectionState(selection_state.groupSelection);
-        }
-        else if(selection_state.chartObject)
-        {
-            this.selectObject(selection_state.chartObject, selection_state.selectStartPage);
-            this.selection.chartSelection = selection_state.chartObject;
-            selection_state.chartObject.setSelectionState(selection_state.chartSelection);
-        }
-        else if(selection_state.wrapObject)
-        {
-            this.selectObject(selection_state.wrapObject, selection_state.selectStartPage);
-            this.selection.wrapPolygonSelection = selection_state.wrapObject;
-        }
-        else
-        {
-            for(var i = 0; i < selection_state.selection.length; ++i)
-            {
-                this.selectObject(selection_state.selection[i].object, selection_state.selection[i].pageIndex);
-            }
-        }
-    },
+    setSelectionState: DrawingObjectsController.prototype.setSelectionState,
 
-
-    getSelectionState: function()
-    {
-        var selection_state = {};
-        if(this.selection.textSelection)
-        {
-            selection_state.textObject = this.selection.textSelection;
-            selection_state.selectStartPage = this.selection.textSelection.selectStartPage;
-            selection_state.textSelection = this.selection.textSelection.getDocContent().Get_SelectionState();
-        }
-        else if(this.selection.groupSelection)
-        {
-            selection_state.groupObject = this.selection.groupSelection;
-            selection_state.selectStartPage = this.selection.groupSelection.selectStartPage;
-            selection_state.groupSelection = this.selection.groupSelection.getSelectionState();
-        }
-        else if(this.selection.chartSelection)
-        {
-            selection_state.chartObject = this.selection.chartSelection;
-            selection_state.selectStartPage = this.selection.chartSelection.selectStartPage;
-            selection_state.chartSelection = this.selection.chartSelection.getSelectionState();
-        }
-        else if(this.selection.wrapPolygonSelection)
-        {
-            selection_state.wrapObject = this.selection.wrapPolygonSelection;
-            selection_state.selectStartPage = this.selection.wrapPolygonSelection.selectStartPage;
-        }
-        else
-        {
-            selection_state.selection = [];
-            for(var i = 0; i < this.selectedObjects.length; ++i)
-            {
-                selection_state.selection.push({object: this.selectedObjects[i], pageIndex: this.selectedObjects[i].selectStartPage});
-            }
-        }
-        return [selection_state];
-    },
-
-
+    getSelectionState: DrawingObjectsController.prototype.getSelectionState,
 
     documentUpdateSelectionState: function()
     {
@@ -2435,7 +2363,9 @@ CGraphicObjects.prototype =
 
 function ComparisonByZIndexSimpleParent(obj1, obj2)
 {
-    return obj1.parent.RelativeHeight - obj2.parent.RelativeHeight;
+    if(obj1.parent && obj2.parent)
+        return obj1.parent.RelativeHeight - obj2.parent.RelativeHeight;
+    return 0;
 }
 
 function ComparisonByZIndexSimple(obj1, obj2)

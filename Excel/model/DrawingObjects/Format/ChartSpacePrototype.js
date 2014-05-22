@@ -53,7 +53,8 @@ CChartSpace.prototype.setRecalculateInfo = function()
         recalculatePlotAreaPen: true,
         recalculateHiLowLines: true,
         recalculateUpDownBars: true,
-        recalculateLegend: true
+        recalculateLegend: true,
+        recalculateReferences: true
     };
     this.baseColors = [];
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
@@ -201,6 +202,11 @@ CChartSpace.prototype.recalculate = function()
             this.recalculateTransform();
             this.rectGeometry.Recalculate(this.extX, this.extY);
             this.recalcInfo.recalculateTransform = false;
+        }
+        if(this.recalcInfo.recalculateReferences)
+        {
+            this.recalculateReferences();
+            this.recalcInfo.recalculateReferences = false;
         }
         if(this.recalcInfo.recalculateBaseColors)
         {

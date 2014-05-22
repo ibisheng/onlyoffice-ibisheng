@@ -1663,8 +1663,8 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 								oHistoryPositions = item;
 							else
                             {
-                                if(g_oUndoRedoGraphicObjects == item.oClass && item.oData.drawingData)
-                                    item.oData.drawingData.bCollaborativeChanges = true;
+                                // TODO if(g_oUndoRedoGraphicObjects == item.oClass && item.oData.drawingData)
+                                //     item.oData.drawingData.bCollaborativeChanges = true;
                                 History.RedoAdd(oRedoObjectParam, item.oClass, item.nActionType, item.nSheetId, item.oRange, item.oData);
                             }
 						}

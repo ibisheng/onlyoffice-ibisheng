@@ -8108,7 +8108,7 @@
 								if ( result ) {
 									for (var j = 0; j < a_drawings.length; ++j) {
 										a_drawings[j].recalculateTransform();
-										History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(a_drawings[j].Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+										//TODO History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(a_drawings[j].Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
 										a_drawings[j].addToDrawingObjects();
 										a_drawings[j].select( t.objectRender.controller);
 									}

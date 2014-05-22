@@ -1008,10 +1008,10 @@ CImageShape.prototype =
             }
             case historyitem_AutoShapes_SetWorksheet:
             {
-                writeBool(isRealObject(data.newPr));
+                writeBool(w,isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
                 {
-                    writeString(data.newPr.getId());
+                    writeString(w,data.newPr.getId());
                 }
                 break;
             }
@@ -1102,7 +1102,7 @@ CImageShape.prototype =
                         if(typeof this.blipFill.RasterImageId === "string" && this.blipFill.RasterImageId.length > 0)
                         {
                             var full_image_src_func;
-                            if(!editor.isDocumentEditor && typeof getFullImageSrc === "function")
+                            if((!editor || !editor.isDocumentEditor) && typeof getFullImageSrc === "function")
                             {
                                 full_image_src_func = getFullImageSrc;
                             }
@@ -1121,6 +1121,7 @@ CImageShape.prototype =
                 {
                     this.blipFill = null;
                 }
+                this.handleUpdateFill();
                 break;
             }
             case historyitem_ImageShapeSetParent:

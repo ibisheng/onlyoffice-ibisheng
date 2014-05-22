@@ -367,10 +367,12 @@ MoveInlineObject.prototype =
             {
                 History.Create_NewPoint();
                 var new_para_drawing = new ParaDrawing(this.majorObject.parent.W, this.majorObject.parent.H, null, this.drawingObjects.drawingDocument, null, null);
-                var drawing = this.majorObject.createDuplicate();
+                var drawing = this.majorObject.copy();
                 drawing.setParent(new_para_drawing);
                 new_para_drawing.Set_GraphicObject(drawing);
                 new_para_drawing.Add_ToDocument(this.InlinePos);
+                this.drawingObjects.resetSelection();
+                this.drawingObjects.selectObject(drawing, pageIndex);
                 this.drawingObjects.document.Recalculate();
             }
         }
@@ -526,14 +528,51 @@ RotateState.prototype =
                     if(j === check_paragraphs.length)
                         check_paragraphs.push(nearest_pos.Paragraph);
                 }
-                if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : check_paragraphs, CheckType : changestype_Paragraph_Content}))
+                if(!e.CtrlKey)
                 {
-                    History.Create_NewPoint();
                     for(i = 0; i < this.drawingObjects.arrTrackObjects.length; ++i)
                     {
-                        bounds = arr_bounds[i];
-                        this.drawingObjects.arrTrackObjects[i].trackEnd(true);
-                        this.drawingObjects.arrTrackObjects[i].originalObject.parent.OnEnd_ChangeFlow(bounds.min_x, bounds.min_y,this.drawingObjects.arrTrackObjects[i].originalObject.parent, bounds.max_x - bounds.min_x, bounds.max_y - bounds.min_y, arr_nearest_pos[i], true, false);
+                        if(this.drawingObjects.arrTrackObjects[i].originalObject && this.drawingObjects.arrTrackObjects[i].originalObject.parent)
+                        {
+                            var paragraph = this.drawingObjects.arrTrackObjects[i].originalObject.parent.Get_ParentParagraph();
+                            for(j = 0; j < check_paragraphs.length; ++j)
+                            {
+                                if(check_paragraphs[j] === paragraph)
+                                    break;
+                            }
+                            if(j === check_paragraphs.length)
+                            {
+                                check_paragraphs.push(paragraph);
+                            }
+                        }
+                    }
+                }
+                if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : check_paragraphs, CheckType : changestype_Paragraph_Content}))
+                {
+                    if(!(e.CtrlKey && this instanceof  MoveState))
+                    {
+                        History.Create_NewPoint();
+                        for(i = 0; i < this.drawingObjects.arrTrackObjects.length; ++i)
+                        {
+                            bounds = arr_bounds[i];
+                            this.drawingObjects.arrTrackObjects[i].trackEnd(true);
+                            this.drawingObjects.arrTrackObjects[i].originalObject.parent.OnEnd_ChangeFlow(bounds.min_x, bounds.min_y,this.drawingObjects.arrTrackObjects[i].originalObject.parent, bounds.max_x - bounds.min_x, bounds.max_y - bounds.min_y, arr_nearest_pos[i], true, false);
+                        }
+                    }
+                    else
+                    {
+                        History.Create_NewPoint();
+                        this.drawingObjects.resetSelection();
+                        for(i = 0; i < this.drawingObjects.arrTrackObjects.length; ++i)
+                        {
+                            var para_drawing = this.drawingObjects.arrTrackObjects[i].originalObject.parent.Copy();
+                            para_drawing.Set_GraphicObject(this.drawingObjects.arrTrackObjects[i].originalObject.copy());
+                            para_drawing.GraphicObj.setParent(para_drawing);
+                            bounds = arr_bounds[i];
+                            para_drawing.Set_XYForAdd(bounds.min_x, bounds.min_y, arr_nearest_pos[i], pageIndex);
+                            para_drawing.Add_ToDocument(arr_nearest_pos[i], false);
+                            this.drawingObjects.selectObject(para_drawing.GraphicObj, pageIndex);
+                        }
                     }
                     this.drawingObjects.document.Recalculate();
                 }

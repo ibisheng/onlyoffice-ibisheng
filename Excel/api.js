@@ -512,7 +512,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				g_oUndoRedoRow = new UndoRedoRowCol(wbModel, true);
 				g_oUndoRedoComment = new UndoRedoComment(wbModel);
 				g_oUndoRedoAutoFilters = new UndoRedoAutoFilters(wbModel);
-				g_oUndoRedoGraphicObjects = new UndoRedoGraphicObjects(wbModel);
 				CHART_STYLE_MANAGER = new CChartStyleManager();
 			},
 			

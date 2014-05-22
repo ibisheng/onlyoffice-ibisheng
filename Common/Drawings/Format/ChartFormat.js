@@ -1011,7 +1011,6 @@ CDLbl.prototype =
 
     draw: CShape.prototype.draw,
 
-
     isEmptyPlaceholder: function()
     {
         return false;

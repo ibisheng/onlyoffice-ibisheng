@@ -119,6 +119,7 @@ CImageShape.prototype.getHierarchy = CShape.prototype.getHierarchy;
 CImageShape.prototype.getParentObjects = CShape.prototype.getParentObjects;
 CImageShape.prototype.recalculate = function () 
 {
+    ExecuteNoHistory(function(){
     if (this.recalcInfo.recalculateBrush) {
         this.recalculateBrush();
         this.recalcInfo.recalculateBrush = false;
@@ -142,6 +143,7 @@ CImageShape.prototype.recalculate = function ()
         this.recalculateBounds();
         this.recalcInfo.recalculateBounds = false;
     }
+    }, this, []);
 };
 CImageShape.prototype.recalculateBounds = CShape.prototype.recalculateBounds;
 CImageShape.prototype.hitInInnerArea = CShape.prototype.hitInInnerArea;
