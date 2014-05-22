@@ -68,7 +68,7 @@ CDegree.prototype.old__recalculateSup = function(oMeasure)
     var base = this.elements[0][0].size,
         iter   = this.elements[0][1].size;
 
-    var mgCtrPrp = this.mergeCtrTPrp();
+    var mgCtrPrp = this.Get_CompiledCtrPrp();
     var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
 
     var height = 0,
@@ -109,12 +109,12 @@ CDegree.prototype.old_recalculateSubScript = function(oMeasure)
     var base = this.elements[0][0].size,
         iter   = this.elements[0][1].size;
 
-    /*var FontSize = this.getCtrPrp().FontSize,
+    /*var FontSize = this.Get_CompiledCtrPrp().FontSize,
      shiftCenter = 0.5*DIV_CENT*FontSize;*/
 
-    //var ctrPrp = this.getCtrPrp(); // выставить потом размер шрифта для итератора
+    //var ctrPrp = this.Get_CompiledCtrPrp(); // выставить потом размер шрифта для итератора
 
-    var mgCtrPrp = this.mergeCtrTPrp();
+    var mgCtrPrp = this.Get_CompiledCtrPrp();
     var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
 
     var width = base.width + iter.width + this.dW;
@@ -143,8 +143,8 @@ CDegree.prototype.recalculateSup = function(oMeasure)
     var base = this.elements[0][0].size,
         iter   = this.elements[0][1].size;
 
-    var mgCtrPrp = this.mergeCtrTPrp();
-    var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
+    var mgCtrPrp = this.Get_CompiledCtrPrp();
+    var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
     this.upBase = 0;
     this.upIter = 0;
@@ -192,8 +192,8 @@ CDegree.prototype.recalculateSubScript = function(oMeasure)
     var base = this.elements[0][0].size,
         iter   = this.elements[0][1].size;
 
-    var mgCtrPrp = this.mergeCtrTPrp();
-    var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
+    var mgCtrPrp = this.Get_CompiledCtrPrp();
+    var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
     var width = base.width + iter.width + this.dW;
     width += this.GapLeft + this.GapRight;
@@ -541,7 +541,7 @@ CIterators.prototype.old_old_setDistanceIters = function(oMeasure)
     var upIter  = this.elements[0][0].size,
         lowIter = this.elements[1][0].size;
 
-    var mgCtrPrp = this.mergeCtrTPrp();
+    var mgCtrPrp = this.Get_CompiledCtrPrp();
 
     var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
 
@@ -580,7 +580,7 @@ CIterators.prototype.old_setDistanceIters = function(oMeasure)
     var upIter  = this.elements[0][0].size,
         lowIter = this.elements[1][0].size;
 
-    var mgCtrPrp = this.mergeCtrTPrp();
+    var mgCtrPrp = this.Get_CompiledCtrPrp();
 
     var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
 
@@ -620,7 +620,7 @@ CIterators.prototype._setDistanceIters = function(oMeasure)
     var upIter  = this.elements[0][0].size,
         lowIter = this.elements[1][0].size;
 
-    var mgCtrPrp = this.mergeCtrTPrp();
+    var mgCtrPrp = this.Get_CompiledCtrPrp();
 
     var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
 
@@ -649,9 +649,9 @@ CIterators.prototype.getLowerIterator = function()
 {
     return this.elements[1][0];
 }
-CIterators.prototype.getCtrPrp = function()
+CIterators.prototype.Get_CompiledCtrPrp = function()
 {
-    return this.Parent.getCtrPrp();
+    return this.Parent.Get_CompiledCtrPrp();
 }
 CIterators.prototype.Save_Changes = function(Data, Writer)
 {
@@ -777,7 +777,7 @@ CDegreeSubSup.prototype.init = function(props)
 }*/
 CDegreeSubSup.prototype.old_old_recalculateSize = function(oMeasure)
 {
-    var mgCtrPrp = this.mergeCtrTPrp();
+    var mgCtrPrp = this.Get_CompiledCtrPrp();
 
     var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
     shCenter *= 1.2;
@@ -820,7 +820,7 @@ CDegreeSubSup.prototype.old_old_recalculateSize = function(oMeasure)
 }
 CDegreeSubSup.prototype.old_recalculateSize = function(oMeasure)
 {
-    var mgCtrPrp = this.mergeCtrTPrp();
+    var mgCtrPrp = this.Get_CompiledCtrPrp();
 
     var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
     shCenter *= 1.2;
@@ -849,7 +849,7 @@ CDegreeSubSup.prototype.old_recalculateSize = function(oMeasure)
     var lUp    = base.size.ascent - shCenter; // center of base
     var lDown  = base.size.height - lUp; // height - center of base
 
-    var ctrPrpIter = iters.mergeCtrTPrp();
+    var ctrPrpIter = iters.Get_CompiledCtrPrp();
     var shIter = this.Composition.GetShiftCenter(oMeasure, ctrPrpIter); //смещение
 
     //var upDesc = iterUp.height - iterUp.ascent + 1.2*shIter, // смещенный descent верхнего итератора
@@ -901,7 +901,7 @@ CDegreeSubSup.prototype.old_recalculateSize = function(oMeasure)
 }
 CDegreeSubSup.prototype._recalculateSize = function(oMeasure)
 {
-    var mgCtrPrp = this.mergeCtrTPrp();
+    var mgCtrPrp = this.Get_CompiledCtrPrp();
 
     var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
     shCenter *= 1.4;
@@ -930,7 +930,7 @@ CDegreeSubSup.prototype._recalculateSize = function(oMeasure)
     var lUp    = base.size.ascent - shCenter; // center of base
     var lDown  = base.size.height - lUp; // height - center of base
 
-    var ctrPrpIter = iters.mergeCtrTPrp();
+    var ctrPrpIter = iters.Get_CompiledCtrPrp();
     var shIter = this.Composition.GetShiftCenter(oMeasure, ctrPrpIter); //смещение
 
     //var upDesc = iterUp.height - iterUp.ascent + 1.2*shIter, // смещенный descent верхнего итератора
@@ -1015,9 +1015,9 @@ CDegreeSubSup.prototype._recalculateSize = function(oMeasure)
 }
 CDegreeSubSup.prototype.recalculateSize = function(oMeasure)
 {
-    var mgCtrPrp = this.mergeCtrTPrp();
+    var mgCtrPrp = this.Get_CompiledCtrPrp();
 
-    var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
+    var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
     shCenter *= 1.4;
 
     var iters, base;
@@ -1041,8 +1041,8 @@ CDegreeSubSup.prototype.recalculateSize = function(oMeasure)
     var lUp    = base.size.ascent - shCenter; // center of base
     var lDown  = base.size.height - lUp; // height - center of base
 
-    var ctrPrpIter = iters.mergeCtrTPrp();
-    var shIter = this.Composition.GetShiftCenter(oMeasure, ctrPrpIter); //смещение
+    var ctrPrpIter = iters.Get_CompiledCtrPrp();
+    var shIter = this.ParaMath.GetShiftCenter(oMeasure, ctrPrpIter); //смещение
 
     var minGap =  0.7*shIter;
 

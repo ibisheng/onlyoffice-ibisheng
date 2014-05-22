@@ -184,7 +184,7 @@ CMathMatrix.prototype.setRuleGap = function(space, rule, gap, minGap)
 }
 CMathMatrix.prototype.recalculateSize = function(oMeasure)
 {
-    var txtPrp = this.mergeCtrTPrp();
+    var txtPrp = this.Get_CompiledCtrPrp();
 
     var interval = this.getLineGap(txtPrp);
     this.gaps.column[0] = 0;
@@ -392,8 +392,7 @@ CMathMatrix.prototype.addRow = function()
     for(var j = 0; j < this.nCol; j++)
     {
         this.elements[this.nRow-1][j] = new CMathContent();
-        this.elements[this.nRow-1][j].relate(this);
-        this.elements[this.nRow-1][j].setComposition(this.Composition);
+        //this.elements[this.nRow-1][j].relate(this);
         //this.elements[this.nRow-1][j].setComposition(this.Composition);
     }
 

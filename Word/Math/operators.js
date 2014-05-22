@@ -396,7 +396,7 @@ CGlyphOperator.prototype.draw = function(pGraphics, XX, YY)
 }
 CGlyphOperator.prototype.getCtrPrp = function()
 {
-    return this.Parent.getCtrPrp();
+    return this.Parent.Get_CompiledCtrPrp();
 }
 CGlyphOperator.prototype.relate = function(parent)
 {
@@ -2943,9 +2943,6 @@ COperator.prototype.init_2 = function(props)
     this.operator = operator;
     this.code = codeChr;
     this.typeOper = typeOper;
-
-
-    this.operator.relate(this);
 }
 COperator.prototype.getProps = function(props, defaultProps)
 {
@@ -2993,7 +2990,7 @@ COperator.prototype.draw = function(x, y, pGraphics)
     {
         // выставляем font, если нужно отрисовать текст
         pGraphics.b_color1(0,0,0,255);
-        var ctrPrp = this.getCtrPrp();
+        var ctrPrp = this.Get_CompiledCtrPrp();
 
         var rPrp = new CTextPr();
         //var defaultRPrp = this.Parent.Composition.DEFAULT_RUN_PRP;
@@ -3077,7 +3074,7 @@ COperator.prototype.old_fixSize = function(oMeasure, stretch)
 
             oMeasure.SetFont(rPrp);
 
-            this.operator.Resize(oMeasure);
+            this.operator.Resize(this, oMeasure);
 
             if(this.operator.loc == 0 || this.operator.loc == 1)
             {
@@ -3129,7 +3126,7 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
 
         if(this.typeOper == OPERATOR_TEXT) // отдельный случай для текста в качестве оператора
         {
-            var ctrPrp = this.getCtrPrp();
+            var ctrPrp = this.Get_CompiledCtrPrp();
 
             var rPrp = new CTextPr();
             //var defaultRPrp = this.Parent.Composition.DEFAULT_RUN_PRP;
@@ -3141,7 +3138,7 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
 
             oMeasure.SetFont(rPrp);
 
-            this.operator.Resize(oMeasure);
+            this.operator.Resize(this, oMeasure);
 
             if(this.operator.loc == 0 || this.operator.loc == 1)
             {
@@ -3156,7 +3153,7 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
 
             var letterX = new CMathText(true);
             letterX.add(0x78);
-            letterX.Resize(oMeasure);
+            letterX.Resize(null, oMeasure);
             this.shiftAccent = letterX.size.ascent;
         }
         else
@@ -3180,7 +3177,7 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
 
         }
 
-        var mgCtrPrp = this.Parent.mergeCtrTPrp();
+        var mgCtrPrp = this.Parent.Get_CompiledCtrPrp();
         var shCenter = this.Parent.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
         if(this.operator.loc == 0 || this.operator.loc  == 1) // horizontal
@@ -3210,7 +3207,7 @@ COperator.prototype.setPosition = function(pos)
 
         if(this.type == OPER_ACCENT)
         {
-            this.operator.setPosition({x: pos.x, y: pos.y + this.shiftAccent});
+            this.operator.setPosition({x: pos.x, y: pos.y + this.shiftAccent + this.operator.size.height});
         }
         else
             this.operator.setPosition(pos);
@@ -3221,9 +3218,16 @@ COperator.prototype.IsJustDraw = function()
 {
     return true;
 }
-COperator.prototype.Resize = function(ParaMath, oMeasure)
+COperator.prototype.Resize = function(Parent, ParaMath, oMeasure)
 {
     this.ParaMath = ParaMath;
+    this.Parent   = Parent;
+
+    if(this.RecalcInfo.bCtrPrp == true)
+    {
+        this.Set_CompiledCtrPrp();
+        this.RecalcInfo.bCtrPrp = false;
+    }
 
     if(this.operator !== -1)
     {
@@ -3235,15 +3239,15 @@ COperator.prototype.Resize = function(ParaMath, oMeasure)
             this.fixSize(ParaMath, oMeasure, this.size.height);
     }
 }
-/*COperator.prototype.relate = function(parent)
+COperator.prototype.relate = function(parent)
 {
     this.Parent = parent;
     if(this.operator !== -1)
         this.operator.relate(this);
-}*/
-COperator.prototype.getCtrPrp = function()
+}
+COperator.prototype.Get_CompiledCtrPrp = function()
 {
-    return this.Parent.getCtrPrp();
+    return this.Parent.Get_CompiledCtrPrp();
 }
 COperator.prototype.getChr = function()
 {
@@ -3523,9 +3527,16 @@ CDelimiter.prototype.old_recalculateSize = function()
     this.size = {width: width, height: height, center: center};
 
 }
-CDelimiter.prototype.Resize = function(ParaMath, oMeasure)
+CDelimiter.prototype.Resize = function(Parent, ParaMath, oMeasure)
 {
+    this.Parent = Parent;
     this.ParaMath = ParaMath;
+
+    if(this.RecalcInfo.bCtrPrp == true)
+    {
+        this.Set_CompiledCtrPrp();
+        this.RecalcInfo.bCtrPrp = false;
+    }
 
     // размеры аргумента
     var heightG = 0, widthG = 0,
@@ -3535,7 +3546,7 @@ CDelimiter.prototype.Resize = function(ParaMath, oMeasure)
 
     for(var j = 0; j < this.nCol; j++)
     {
-        this.elements[0][j].Resize(ParaMath, oMeasure);
+        this.elements[0][j].Resize(this, ParaMath, oMeasure);
         var content = this.elements[0][j].size;
         widthG += content.width;
         ascentG = content.ascent > ascentG ? content.ascent : ascentG;
@@ -3545,7 +3556,7 @@ CDelimiter.prototype.Resize = function(ParaMath, oMeasure)
     heightG = ascentG + descentG;
 
 
-    var mgCtrPrp = this.mergeCtrTPrp();
+    var mgCtrPrp = this.Get_CompiledCtrPrp();
     var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
     var maxAD = ascentG - shCenter  > descentG + shCenter ? ascentG - shCenter: descentG + shCenter;
 
@@ -3628,148 +3639,6 @@ CDelimiter.prototype.Resize = function(ParaMath, oMeasure)
         ascent = ascentG;
         height = ascentG + descentG;
     }
-
-    this.size = {width: width, height: height, ascent: ascent};
-
-}
-CDelimiter.prototype.old_Resize = function(oMeasure)
-{
-    var height = 0,
-        width = 0;
-
-    var  ascent = 0,
-        descent = 0;
-
-
-    for(var j = 0; j < this.nCol; j++)
-        this.elements[0][j].Resize(oMeasure);
-
-    // временно
-
-    var FontSize = this.getCtrPrp().FontSize;
-    var Height = 0.4*FontSize; //  g_oTextMeasurer.GetHeight()
-
-    var plH = 0.275*FontSize, // плейсхолдер
-        H2 = 0.05*FontSize; // временно baseLine
-
-
-    if(this.shape == DELIMITER_SHAPE_CENTERED)
-    {
-        for(var j = 0; j < this.nCol; j++)
-        {
-            var content = this.elements[0][j].size;
-            width += content.width;
-            ascent = content.ascent > ascent ? content.ascent : ascent;
-            descent = content.height - content.ascent > descent ? content.height - content.ascent: descent;
-        }
-
-        _ascent  = ascent - DIV_CENT*FontSize;
-        _descent = descent + DIV_CENT*FontSize;
-
-        var maxDim = _ascent > _descent ? _ascent : _descent;
-
-        // для случая, когда в контенте степень и пр. элементы где нужно учитовать baseLine
-        if(_descent < plH || _ascent < plH)
-        {
-            if(maxDim < plH)
-            {
-                height = _ascent + _descent;
-            }
-            else
-            {
-                var div = _ascent - plH;
-                height = _ascent + _descent + div;
-            }
-        }
-        else
-        {
-            height = 2*maxDim;
-            ascent = height/2 + DIV_CENT*FontSize;
-        }
-    }
-    else
-    {
-        for(var j = 0; j < this.nCol; j++)
-        {
-            var content = this.elements[0][j].size;
-            width += content.width;
-            ascent = content.ascent > ascent ? content.ascent : ascent;
-            descent = content.height - content.ascent > descent ? content.height - content.ascent: descent;
-        }
-
-        height = ascent + descent;
-    }
-
-    this.begOper.fixSize(oMeasure, height);
-    width += this.begOper.size.width;
-
-    if(height < this.begOper.size.height)
-    {
-        ascent = this.begOper.size.height - H2;
-        height = this.begOper.size.height;
-        //center = this.begOper.size.center;
-
-    }
-
-    this.endOper.fixSize(oMeasure, height);
-    width += this.endOper.size.width;
-    if(height < this.endOper.size.height)
-    {
-        //center += (height - this.endOper.size.height)/2;
-        ascent = this.endOper.size.height - H2;
-        height = this.endOper.size.height;
-        //center = this.endOper.size.center;
-    }
-
-    this.sepOper.fixSize(oMeasure, height);
-    width += (this.nCol - 1)*this.sepOper.size.width;
-    if(height < this.sepOper.size.height)
-    {
-        //center += (height - this.sepOper.size.height)/2;
-        ascent = this.sepOper.size.height - H2;
-        height = this.sepOper.size.height;
-        //center = this.sepOper.size.center;
-    }
-
-
-    /*if(this.begOper !== -1)
-     {
-     this.begOper.fixSize(height);
-     width += this.begOper.size.width;
-
-     if(height < this.begOper.size.height)
-     {
-     center = this.begOper.size.center;
-     height = this.begOper.size.height;
-
-     }
-
-     //height = (height < this.begOper.size.height) ? this.begOper.size.height : height;
-     //center = (center < this.begOper.size.center) ? this.begOper.size.center : center;
-     }
-     if(this.endOper !== -1)
-     {
-     this.endOper.fixSize(height);
-     width += this.endOper.size.width;
-
-     //height = (height < this.endOper.size.height) ? this.endOper.size.height : height;
-     //center = (center < this.endOper.size.center) ? this.endOper.size.center : center;
-
-     if(height < this.endOper.size.height)
-     {
-     center = this.endOper.size.center;
-     height = this.endOper.size.height;
-
-     }
-     }
-     if(this.sepOper !== -1)
-     {
-     this.sepOper.fixSize(height);
-     width += (this.nCol - 1)*this.sepOper.size.width;
-
-     height = (height < this.sepOper.size.height) ? this.sepOper.size.height : height;
-     center = (center < this.sepOper.size.center) ? this.sepOper.size.center : center;
-     }*/
 
     this.size = {width: width, height: height, ascent: ascent};
 
@@ -4017,25 +3886,32 @@ CCharacter.prototype.setCharacter = function(props, defaultProps)
     this.setDimension(1, 1);
     this.setContent();
 }
-CCharacter.prototype.Resize = function(ParaMath, oMeasure)
+CCharacter.prototype.Resize = function(Parent, ParaMath, oMeasure)
 {
+    this.Parent = Parent;
     this.ParaMath = ParaMath;
 
+    if(this.RecalcInfo.bCtrPrp == true)
+    {
+        this.Set_CompiledCtrPrp();
+        this.RecalcInfo.bCtrPrp = false;
+    }
+
     var base = this.elements[0][0];
-    base.Resize(ParaMath, oMeasure);
+    base.Resize(this, ParaMath, oMeasure);
 
     this.operator.fixSize(ParaMath, oMeasure, base.size.width);
 
     var letterX = new CMathText(true);
     letterX.add(0x78);
-    letterX.Resize(oMeasure);
+    letterX.Resize(null, oMeasure);
     this.shiftX = base.size.ascent - letterX.size.ascent;
 
     var width  = base.size.width > this.operator.size.width ? base.size.width : this.operator.size.width,
         height = base.size.height + this.operator.size.height + this.shiftX,
         ascent = this.getAscent(oMeasure);
 
-    var ctrPrp = this.mergeCtrTPrp();
+    var ctrPrp = this.Get_CompiledCtrPrp();
     oMeasure.SetFont(ctrPrp);
 
     this.size = {height: height, width: width, ascent: ascent};
@@ -4080,7 +3956,7 @@ CCharacter.prototype.draw = function(x, y, pGraphics)
 {
     this.elements[0][0].draw(x, y, pGraphics);
 
-    var mgCtrPrp = this.mergeCtrTPrp();
+    var mgCtrPrp = this.Get_CompiledCtrPrp();
     var FontSize = mgCtrPrp.FontSize,
         FontFamily = {Name: "Cambria Math", Index: -1};
 
@@ -4199,7 +4075,7 @@ CGroupCharacter.prototype.getAscent = function(oMeasure)
     var ascent;
 
     //var shCent = DIV_CENT*this.getCtrPrp().FontSize;
-    var ctrPrp = this.getCtrPrp();
+    var ctrPrp = this.Get_CompiledCtrPrp();
     var shCent = this.ParaMath.GetShiftCenter(oMeasure, ctrPrp);
 
     if(this.vertJust === VJUST_TOP && this.loc === LOCATION_TOP)

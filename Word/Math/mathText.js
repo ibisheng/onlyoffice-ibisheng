@@ -235,13 +235,15 @@ CMathText.prototype =
     {
         this.bIterator = bIterator; // символы другие , чуть толще
     },
-    Resize: function(oMeasure)
+    Resize: function(Run, oMeasure)
     {
         /*
          var metricsTxt = g_oTextMeasurer.Measure2Code(letter);
          var _width = metricsTxt.Width;
          height = g_oTextMeasurer.GetHeight();
         */
+
+        this.Parent = Run;
 
         var letter = this.getCode();
 

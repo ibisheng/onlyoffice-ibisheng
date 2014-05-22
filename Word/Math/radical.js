@@ -65,7 +65,7 @@ function CSignRadical()
 }
 CSignRadical.prototype.new_draw = function(x, y, pGraphics)
 {
-    var txtPrp = this.Parent.getCtrPrp();
+    var txtPrp = this.Parent.Get_CompiledCtrPrp();
     //var txtPrp = this.Parent.getTxtPrp();
     var penW = txtPrp.FontSize*g_dKoef_pt_to_mm*0.042;
 
@@ -158,7 +158,7 @@ CSignRadical.prototype.new_draw = function(x, y, pGraphics)
 }
 CSignRadical.prototype.draw = function(x, y, pGraphics)
 {
-    var txtPrp = this.Parent.getCtrPrp();
+    var txtPrp = this.Parent.Get_CompiledCtrPrp();
     //var txtPrp = this.Parent.getTxtPrp();
     var penW = txtPrp.FontSize*g_dKoef_pt_to_mm*0.042;
 
@@ -256,7 +256,7 @@ CSignRadical.prototype.draw = function(x, y, pGraphics)
 }
 CSignRadical.prototype.recalculateSize = function()
 {
-    var txtPrp = this.Parent.getCtrPrp();
+    var txtPrp = this.Parent.Get_CompiledCtrPrp();
     var sizeArg = this.Parent.getBase().size;
 
     var height, width;
@@ -380,7 +380,7 @@ CSignRadical.prototype.recalculateSize = function()
 }
 CSignRadical.prototype.old_recalculateSize = function()
 {
-    var txtPrp = this.Parent.getCtrPrp();
+    var txtPrp = this.Parent.Get_CompiledCtrPrp();
     var sizeArg = this.Parent.getBase().size;
 
     var height, width;
@@ -559,7 +559,7 @@ CSignRadical.prototype.old_recalculateSize = function()
 }
 CSignRadical.prototype.old_old_recalculateSize = function()
 {
-    var txtPrp = this.Parent.getCtrPrp();
+    var txtPrp = this.Parent.Get_CompiledCtrPrp();
     var sizeArg = this.Parent.getBase().size;
 
     var height, width;
@@ -719,7 +719,7 @@ CSignRadical.prototype.old_old_recalculateSize = function()
 }
 CSignRadical.prototype.old_draw = function(x, y, pGraphics)
 {
-    var txtPrp = this.Parent.getCtrPrp();
+    var txtPrp = this.Parent.Get_CompiledCtrPrp();
     //var txtPrp = this.Parent.getTxtPrp();
     var penW = txtPrp.FontSize*g_dKoef_pt_to_mm*0.042;
 
@@ -794,7 +794,7 @@ CSignRadical.prototype.old_draw = function(x, y, pGraphics)
 CSignRadical.prototype.old_recalculateSize = function()
 {
     //var txtPrp = this.Parent.getTxtPrp();
-    var txtPrp = this.Parent.getCtrPrp();
+    var txtPrp = this.Parent.Get_CompiledCtrPrp();
     var sizeArg = this.Parent.getBase().size;
 
     var height, width;
@@ -939,7 +939,7 @@ CRadical.prototype.recalculateSize = function(oMeasure)
 {
     this.signRadical.recalculateSize(oMeasure);
 
-    var txtPrp = this.getCtrPrp();
+    var txtPrp = this.Get_CompiledCtrPrp();
     var sign = this.signRadical.size,
         gSign = this.signRadical.gapSign,
     // в случае смещения baseline контента тоже смещается, и по высоте артгумент может выйти чуть за пределы (т.о. значок интеграла будет расположен чуть выше, чем следовало бы, и размер аргумента выйде за аграницы)

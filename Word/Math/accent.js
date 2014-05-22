@@ -26,7 +26,7 @@ CCircumflex.prototype.init = function(props)
 }
 CCircumflex.prototype.fixSize = function(oMeasure, stretch, bIncl)
 {
-    var alpha = this.Parent.getCtrPrp().FontSize/36;
+    var alpha = this.Parent.Get_CompiledCtrPrp().FontSize/36;
 
     var width = 3.88*alpha;
     var height = 3.175*alpha;
@@ -78,7 +78,7 @@ CCircumflex.prototype.draw = function(x, y, pGraphics)
     var xx = this.pos.x + x,
         yy = this.pos.y + y;
 
-    var fontSize = this.Parent.getCtrPrp().FontSize;
+    var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
     var penW = fontSize*g_dKoef_pt_to_mm*this.PEN_W;
 
     penW *= 96/25.4;
@@ -190,7 +190,7 @@ function CAccentCircumflex()
 extend(CAccentCircumflex, CGlyphOperator);
 CAccentCircumflex.prototype.calcSize = function(stretch)
 {
-    var alpha = this.getCtrPrp().FontSize/36;
+    var alpha = this.Parent.Get_CompiledCtrPrp().FontSize/36;
 
     var width = 3.88*alpha;
     var height = 3.175*alpha;
@@ -208,7 +208,7 @@ CAccentCircumflex.prototype.calcSize = function(stretch)
 }
 CAccentCircumflex.prototype.calcCoord = function(stretch)
 {
-    var fontSize = this.getCtrPrp().FontSize;
+    var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
     //var penW = fontSize*g_dKoef_pt_to_mm*this.PEN_W;
     //penW *= 96/25.4;
 
@@ -297,7 +297,7 @@ CLine.prototype.init = function(props)
 }
 CLine.prototype.fixSize = function(oMeasure, stretch)
 {
-    var alpha = this.Parent.getCtrPrp().FontSize/36;
+    var alpha = this.Parent.Get_CompiledCtrPrp().FontSize/36;
 
     var height = 1.68*alpha;
     var width  = 4.938*alpha;
@@ -308,7 +308,7 @@ CLine.prototype.fixSize = function(oMeasure, stretch)
 }
 CLine.prototype.draw = function(x, y, pGraphics)
 {
-    var fontSize = this.Parent.getCtrPrp().FontSize;
+    var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
     var penW = fontSize*g_dKoef_pt_to_mm*this.PEN_W;
     //penW *= 96/25.4;
 
@@ -348,7 +348,7 @@ function CAccentLine()
 extend(CAccentLine, CGlyphOperator);
 CAccentLine.prototype.calcSize = function(stretch)
 {
-    var alpha = this.Parent.getCtrPrp().FontSize/36;
+    var alpha = this.Parent.Get_CompiledCtrPrp().FontSize/36;
 
     var height = 1.68*alpha;
     var width  = 4.938*alpha;
@@ -359,7 +359,7 @@ CAccentLine.prototype.calcSize = function(stretch)
 }
 CAccentLine.prototype.calcCoord = function(stretch)
 {
-    var fontSize = this.getCtrPrp().FontSize;
+    var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
 
     var X = new Array(),
         Y = new Array();
@@ -395,7 +395,7 @@ CDoubleLine.prototype.init = function(props)
 }
 CDoubleLine.prototype.fixSize = function(oMeasure, stretch)
 {
-    var alpha = this.Parent.getCtrPrp().FontSize/36;
+    var alpha = this.Parent.Get_CompiledCtrPrp().FontSize/36;
 
     var height = 2.843*alpha;
     var width  = 4.938*alpha;
@@ -410,7 +410,7 @@ CDoubleLine.prototype.setPosition = function(pos)
 }
 CDoubleLine.prototype.draw = function(x, y, pGraphics)
 {
-    var fontSize = this.Parent.getCtrPrp().FontSize;
+    var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
     var penW = fontSize*g_dKoef_pt_to_mm*this.PEN_W;
     //penW *= 96/25.4;
 
@@ -448,7 +448,7 @@ function CAccentDoubleLine()
 extend(CAccentDoubleLine, CGlyphOperator);
 CAccentDoubleLine.prototype.calcSize = function(stretch)
 {
-    var alpha = this.getCtrPrp().FontSize/36;
+    var alpha = this.Parent.Get_CompiledCtrPrp().FontSize/36;
 
     var height = 2.843*alpha;
     var width  = 4.938*alpha;
@@ -459,7 +459,7 @@ CAccentDoubleLine.prototype.calcSize = function(stretch)
 }
 CAccentDoubleLine.prototype.calcCoord = function(stretch)
 {
-    var fontSize = this.getCtrPrp().FontSize;
+    var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
 
     var X = new Array(),
         Y = new Array();
@@ -508,7 +508,7 @@ CTilde.prototype.init = function(props)
 }
 CTilde.prototype.fixSize = function()
 {
-    var betta = this.Parent.getCtrPrp().FontSize/36;
+    var betta = this.Parent.Get_CompiledCtrPrp().FontSize/36;
 
     var width = 9.047509765625*betta; // реальная на отрисовке width 7.495282031249999
     var height = 2.469444444444444*betta;
@@ -552,7 +552,7 @@ CTilde.prototype.draw = function(x, y, pGraphics)
     var XX = new Array(),
         YY = new Array();
 
-    var fontSize = this.Parent.getCtrPrp().FontSize;
+    var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
     var textScale = fontSize/1000, // 1000 pt
         alpha = textScale*25.4/96 /64 ; // g_dKoef_px_to_mm = 25.4/96
 
@@ -614,7 +614,7 @@ function CAccentTilde()
 extend(CAccentTilde, CGlyphOperator);
 CAccentTilde.prototype.calcSize = function(stretch)
 {
-    var betta = this.getCtrPrp().FontSize/36;
+    var betta = this.Parent.Get_CompiledCtrPrp().FontSize/36;
 
     var width = 9.047509765625*betta; // реальная на отрисовке width 7.495282031249999
     var height = 2.469444444444444*betta;
@@ -658,7 +658,7 @@ CAccentTilde.prototype.calcCoord = function(stretch)
     var XX = new Array(),
         YY = new Array();
 
-    var fontSize = this.Parent.getCtrPrp().FontSize;
+    var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
     var textScale = fontSize/1000, // 1000 pt
         alpha = textScale*25.4/96 /64 ; // g_dKoef_px_to_mm = 25.4/96
 
@@ -703,7 +703,7 @@ CBreve.prototype.init = function(props)
 }
 CBreve.prototype.fixSize = function()
 {
-    var betta = this.Parent.getCtrPrp().FontSize/36;
+    var betta = this.Parent.Get_CompiledCtrPrp().FontSize/36;
 
     var width =  4.2333333333333325*betta;
     var height = 2.469444444444445*betta;
@@ -747,7 +747,7 @@ CBreve.prototype.draw = function(x, y, pGraphics)
     var XX = new Array(),
         YY = new Array();
 
-    var fontSize = this.Parent.getCtrPrp().FontSize;
+    var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
     var textScale = fontSize/1000, // 1000 pt
         alpha = textScale*25.4/96 /64 ; // g_dKoef_px_to_mm = 25.4/96
 
@@ -816,7 +816,7 @@ function CAccentBreve()
 extend(CAccentBreve, CGlyphOperator);
 CAccentBreve.prototype.calcSize = function(stretch)
 {
-    var betta = this.getCtrPrp().FontSize/36;
+    var betta = this.Parent.Get_CompiledCtrPrp().FontSize/36;
 
     var width =  4.2333333333333325*betta;
     var height = 2.469444444444445*betta;
@@ -856,7 +856,7 @@ CAccentBreve.prototype.calcCoord = function(stretch)
     var XX = new Array(),
         YY = new Array();
 
-    var fontSize = this.getCtrPrp().FontSize;
+    var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
     var textScale = fontSize/1000, // 1000 pt
         alpha = textScale*25.4/96 /64 ; // g_dKoef_px_to_mm = 25.4/96
 
@@ -961,10 +961,10 @@ CSign.prototype.setPosition = function(pos)
 }*/
 CSign.prototype.fixSize = function(oMeasure, stretch, bIncline)
 {
-    var ctrPrp = this.Parent.getCtrPrp();
+    var ctrPrp = this.Parent.Get_CompiledCtrPrp();
 
     var rPrp = new CTextPr();
-    var defaultRPrp = this.Parent.Composition.Get_Default_TPrp();
+    var defaultRPrp = this.Parent.ParaMath.Get_Default_TPrp();
     rPrp.Merge(defaultRPrp);
     rPrp.Merge(ctrPrp);
     rPrp.Italic = false; // не меняем значок
@@ -972,7 +972,7 @@ CSign.prototype.fixSize = function(oMeasure, stretch, bIncline)
 
     oMeasure.SetFont(rPrp);
 
-    this.sign.Resize(oMeasure);
+    this.sign.Resize(this, oMeasure);
 
     /*if(this.typeOper == ACCENT_THREE_DOTS)
      this.dH = 1.2*ctrPrp.FontSize/36;
@@ -1604,24 +1604,33 @@ CAccent.prototype.getPropsForWrite = function()
 
     return props;
 }
-CAccent.prototype.Resize = function(oMeasure)
+CAccent.prototype.Resize = function(Parent, ParaMath, oMeasure)
 {
-    var base = this.elements[0][0];
-    base.Resize(oMeasure);
+    this.Parent = Parent;
+    this.ParaMath = ParaMath;
 
-    this.operator.fixSize(oMeasure, base.size.width);
+    if(this.RecalcInfo.bCtrPrp == true)
+    {
+        this.Set_CompiledCtrPrp();
+        this.RecalcInfo.bCtrPrp = false;
+    }
+
+    var base = this.elements[0][0];
+    base.Resize(this, ParaMath, oMeasure);
+
+    var ctrPrp = this.Get_CompiledCtrPrp();
+    oMeasure.SetFont(ctrPrp);
+
+    this.operator.fixSize(ParaMath, oMeasure, base.size.width);
 
     var letterX = new CMathText(true);
     letterX.add(0x78);
-    letterX.Resize(oMeasure);
+    letterX.Resize(null, oMeasure);
     this.shiftX = base.size.ascent - letterX.size.ascent;
 
     var width  = base.size.width > this.operator.size.width ? base.size.width : this.operator.size.width,
         height = base.size.height + this.operator.size.height + this.shiftX,
         ascent = this.getAscent(oMeasure);
-
-    var ctrPrp = this.mergeCtrTPrp();
-    oMeasure.SetFont(ctrPrp);
 
     this.size = {height: height, width: width, ascent: ascent};
 }
@@ -1633,8 +1642,8 @@ CAccent.prototype.draw = function(x, y, pGraphics)
 {
     this.elements[0][0].draw(x, y, pGraphics);
 
-    var mgCtrPrp = this.mergeCtrTPrp();
-    var FontSize = mgCtrPrp.FontSize,
+    var MergedCtrPrp = this.Get_CompiledCtrPrp();
+    var FontSize = MergedCtrPrp.FontSize,
         FontFamily = {Name: "Cambria Math", Index: -1};
 
     var obj = {FontSize: FontSize, FontFamily: FontFamily};

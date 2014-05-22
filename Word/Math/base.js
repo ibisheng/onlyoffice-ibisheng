@@ -12,9 +12,10 @@ function CMathBase()
     //  Properties
     this.argSize = 0;
     this.Parent = null;
-    this.Composition = null; // ссылка на общую формулу
+    this.ParaMath = null; // ссылка на общую формулу
 
     this.CtrPrp = new CTextPr();
+    this.CompiledCtrPrp = new CTextPr();
    /////////////////
 
     //this.RunPrp = new CMathRunPrp();
@@ -23,11 +24,11 @@ function CMathBase()
     this.CurPos_Y = 0;
 
 
-    this.selectPos =
+    /*this.selectPos =
     {
         startX:    0,
         startY:    0
-    };
+    };*/
 
     this.SelectStart_X = 0;
     this.SelectStart_Y = 0;
@@ -58,6 +59,11 @@ function CMathBase()
     this.GapLeft = 0;
     this.GapRight = 0;
 
+    this.RecalcInfo =
+    {
+        bCtrPrp:     true
+    };
+
     return this;
 }
 CMathBase.prototype =
@@ -72,12 +78,8 @@ CMathBase.prototype =
             for(var j = 0; j < this.nCol; j++)
             {
                 this.elements[i][j] = new CMathContent();
-                this.elements[i][j].relate(this);
-                this.elements[i][j].setComposition(this.Composition);
-                /*if( !this.elements[i][j].IsJustDraw())
-                    this.elements[i][j].setComposition(this.Composition);*/
-                //this.elements[i][j].setTxtPrp(this.TxtPrp);
-                //this.elements[i][j].setRunPrp(this.RunPrp);
+                //this.elements[i][j].relate(this);
+                //this.elements[i][j].setComposition(this.Composition);
             }
         }
     },
@@ -96,33 +98,35 @@ CMathBase.prototype =
             this.alignment.wdt[u] = CENTER;
     },
     ///////// RunPrp, CtrPrp
-    setCtrPrp: function(txtPrp)
+    setCtrPrp: function(txtPrp) // выставляем ctrPrp на чтение
     {
-        this.CtrPrp.Merge(txtPrp); // only runPrp for paragraph
+        this.CtrPrp.Merge(txtPrp);
         //this.RunPrp.setTxtPrp(txtPrp);
     },
-    getCtrPrp: function()
+    Get_CtrPrp: function()
     {
-        var ctrPrp = new CTextPr();
-        var defaultRPrp = this.Composition.GetFirstRPrp();
-        //var gWPrp = defaultRPrp.getMergedWPrp();
-        ctrPrp.Merge(defaultRPrp);
-        ctrPrp.Merge(this.CtrPrp);
-        return ctrPrp;
+        return this.CtrPrp.Copy();
     },
-    getRunPrp: function()
+    Set_CompiledCtrPrp: function()
     {
-        var runPrp = new CMathRunPrp();
-        var defaultRPrp = this.Composition.GetFirstRPrp();
-        runPrp.Merge(defaultRPrp);
-        runPrp.Merge(this.RunPrp);
+        var defaultRPrp = this.ParaMath.GetFirstRPrp();
 
-        return runPrp;
+        this.CompiledCtrPrp.Merge(defaultRPrp);
+        this.CompiledCtrPrp.Merge(this.CtrPrp);
     },
+    Get_CompiledCtrPrp: function()
+    {
+        var CompiledCtrPrp = this.CompiledCtrPrp.Copy();
+        this.ParaMath.ApplyArgSize(CompiledCtrPrp);
+
+        return CompiledCtrPrp;
+    },
+    // TO DO
+    // пересмотреть
     getCtrPrpForFirst: function()
     {
         var ctrPrp = new CTextPr();
-        var defaultRPrp = this.Composition.Get_Default_TPrp();
+        var defaultRPrp = this.ParaMath.Get_Default_TPrp();
         //var gWPrp = defaultRPrp.getMergedWPrp();
         ctrPrp.Merge(defaultRPrp);
         ctrPrp.Merge(this.CtrPrp);
@@ -134,7 +138,7 @@ CMathBase.prototype =
     getPrpToControlLetter: function()
     {
         var rPrp = new CTextPr();
-        rPrp.Merge( this.Composition.GetFirstRPrp() );
+        rPrp.Merge( this.ParaMath.GetFirstRPrp() );
 
         return rPrp;
     },
@@ -184,23 +188,23 @@ CMathBase.prototype =
     },
     // TO DO
     // посмотреть для всех мат. объектов, где используется эта функция
-    mergeCtrTPrp: function()
+    /*Get_FullCtrPrp: function()  // учитываем ArgSize
     {
-        var tPrp = this.getCtrPrp();
-        this.Composition.ApplyArgSize(tPrp);
+        var tPrp = this.Get_CompiledCtrPrp(true);
+        this.ParaMath.ApplyArgSize(tPrp);
 
-        /*if(this.argSize == -1)
+        *//*if(this.argSize == -1)
         //tPrp.FontSize *= 0.8;
             tPrp.FontSize *= 0.728;
         else if(this.argSize == -2)
         //tPrp.FontSize *= 0.65;
-            tPrp.FontSize *= 0.53;*/
+            tPrp.FontSize *= 0.53;*//*
 
         return tPrp;
-    },
+    },*/
     /////////
 
-    setComposition: function(Composition)
+    /*setComposition: function(Composition)
     {
         this.Composition = Composition;
 
@@ -215,7 +219,7 @@ CMathBase.prototype =
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
                 this.elements[i][j].setReferenceComposition(Comp);
-    },
+    },*/
     /*old_getTxtPrp: function()
     {
         var txtPrp = new CMathTextPrp();
@@ -288,11 +292,8 @@ CMathBase.prototype =
                 for(var j = 0; j < this.nCol; j++)
                 {
                     this.elements[i][j] = arguments[j + i*this.nCol];
-                    this.elements[i][j].relate(this);
-                    this.elements[i][j].setComposition(this.Composition);
-                    /*if( !this.elements[i][j].IsJustDraw())
-                        this.elements[i][j].setComposition(this.Composition);*/
-                    //this.elements[i][j].setTxtPrp(this.getTxtPrp());
+                    //this.elements[i][j].relate(this);
+                    //this.elements[i][j].setComposition(this.Composition);
                     this.elements[i][j].bMObjs = true;
                 }
             }
@@ -302,10 +303,10 @@ CMathBase.prototype =
             this.setContent();
         }
     },
-    relate: function(parent)
+    /*relate: function(parent)
     {
         this.Parent = parent;
-    },
+    },*/
     old_cursor_moveLeft: function()
     {
         var bUpperLevel = false;
@@ -983,11 +984,20 @@ CMathBase.prototype =
         this.recalculateSize();
         this.Parent.RecalculateReverse(oMeasure);
     },*/
-    Resize: function(oMeasure)
+    Resize: function(Parent, ParaMath, oMeasure)
     {
+        this.Parent = Parent;
+        this.ParaMath = ParaMath;
+
+        if(this.RecalcInfo.bCtrPrp == true)
+        {
+            this.Set_CompiledCtrPrp();
+            this.RecalcInfo.bCtrPrp = false;
+        }
+
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
-                this.elements[i][j].Resize(oMeasure);
+                this.elements[i][j].Resize(this, ParaMath, oMeasure);
 
         this.recalculateSize(oMeasure); // передаем oMeasure, для
     },
@@ -1012,8 +1022,8 @@ CMathBase.prototype =
         {
             Ascent = _height || this.size.height;
             Ascent /=2;
-            var mgCtrPrp = this.mergeCtrTPrp();
-            Ascent += this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
+            var MergedCtrPrp = this.Get_CompiledCtrPrp();
+            Ascent += this.ParaMath.GetShiftCenter(oMeasure, MergedCtrPrp);
         }
         else
             for(var i=0; i< this.nCol; i++)
@@ -1438,6 +1448,9 @@ CMathBase.prototype =
 
         this.bSelectionUse = false;
     },
+
+    // Перемещение по стрелкам
+
     Get_LeftPos: function(SearchPos, ContentPos, Depth, UseContentPos, EndRun)
     {
         var CurPos_X, CurPos_Y;
@@ -1463,7 +1476,7 @@ CMathBase.prototype =
                 var bJDraw = this.elements[CurPos_X][CurPos_Y].IsJustDraw(),
                     usePlh = !bJDraw && bUseContent && this.elements[CurPos_X][CurPos_Y].IsPlaceholder();
 
-                if(!bJDraw && ! usePlh)
+                if(!bJDraw && !usePlh)
                 {
                     this.elements[CurPos_X][CurPos_Y].Get_LeftPos(SearchPos, ContentPos, Depth + 2, bUseContent, EndRun);
                     SearchPos.Pos.Update(CurPos_X, Depth);
@@ -1545,15 +1558,61 @@ CMathBase.prototype =
         return result;
 
     },
+    Get_WordStartPos : function(SearchPos, ContentPos, Depth, UseContentPos)
+    {
+        var CurPos_X, CurPos_Y;
+
+        if(UseContentPos === true)
+        {
+            CurPos_X = ContentPos.Get(Depth);
+            CurPos_Y = ContentPos.Get(Depth + 1);
+        }
+        else
+        {
+            CurPos_X = this.nRow - 1;
+            CurPos_Y = this.nCol - 1;
+        }
+
+        this.elements[CurPos_X][CurPos_Y].Get_WordStartPos(SearchPos, ContentPos, Depth + 2, UseContentPos);
+
+        while(CurPos_X >= 0)
+        {
+            var bJDraw = this.elements[CurPos_X][CurPos_Y].IsJustDraw(),
+                usePlh = !bJDraw && UseContentPos && this.elements[CurPos_X][CurPos_Y].IsPlaceholder(); // при первом проходе на плейсхолдере Get_WordStartPos не произойдет (если UseContentPos = true)
+                                                                                                        // на втором проходе UseContentPos = false
+
+            if(!bJDraw && !usePlh)
+            {
+                this.elements[CurPos_X][CurPos_Y].Get_WordStartPos(SearchPos, ContentPos, Depth + 2, UseContentPos);
+                SearchPos.Pos.Update(CurPos_X, Depth);
+                SearchPos.Pos.Update(CurPos_Y, Depth+1);
+            }
+
+            if(SearchPos.Found === true)
+                break;
+
+            UseContentPos = false;
+
+            CurPos_Y--;
+
+            if(CurPos_Y < 0)
+            {
+                CurPos_X--;
+                CurPos_Y = this.nCol - 1;
+            }
+        }
+
+    },
+    Get_WordEndPos : function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
+    {
+
+    },
+    //////////////////////////////////
     IsPlaceholder: function()
     {
         return false;
     },
-    Get_TxtPrp: function()
-    {
-        return this.getCtrPrp();
-    },
-    Copy: function(Selected, Composition)
+    Copy: function(Selected)
     {
         var props = this.getPropsForWrite();
 
@@ -1561,7 +1620,7 @@ CMathBase.prototype =
         NewObj.init(props);
         NewObj.argSize = this.argSize;
 
-        NewObj.Composition = Composition;
+        //NewObj.Composition = Composition;
         var CtrPrp = this.CtrPrp.Copy();
 
         NewObj.setCtrPrp(CtrPrp);
@@ -1569,10 +1628,7 @@ CMathBase.prototype =
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
             {
-                NewObj.elements[i][j] = this.elements[i][j].Copy(Selected, Composition);
-                NewObj.elements[i][j].argSize = this.elements[i][j].argSize;
-
-                NewObj.elements[i][j].relate(NewObj);
+                NewObj.elements[i][j] = this.elements[i][j].Copy(Selected);
             }
 
         return NewObj;
@@ -1627,6 +1683,19 @@ CMathBase.prototype =
     {
         return this.Get_CompiledTextPr(Copy);
     },
+    Apply_TextPr: function(TextPr, IncFontSize, ApplyToAll)
+    {
+        this.CtrPrp.Merge(TextPr);
+
+        for(var i=0; i < this.nRow; i++)
+        {
+            for(var j = 0; j < this.nCol; j++)
+            {
+                if(!this.elements[i][j].IsJustDraw())
+                    this.elements[i][j].Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
+            }
+        }
+    },
     Set_Select_ToMComp: function(Direction)
     {
         this.SelectStart_X = this.SelectEnd_X = this.CurPos_X;
@@ -1641,6 +1710,34 @@ CMathBase.prototype =
 
         this.SelectEnd_X = this.nRow - 1;
         this.SelectEnd_Y = this.nCol - 1;
+
+    },
+    Check_NearestPos: function(ParaNearPos, Depth)
+    {
+        var ContentNearPos = new CParagraphElementNearPos();
+        ContentNearPos.NearPos = ParaNearPos.NearPos;
+        ContentNearPos.Depth   = Depth;
+
+        // CParagraphNearPos for ParaNearPos
+        this.NearPosArray.push( ContentNearPos );
+        ParaNearPos.Classes.push( this );
+
+        var CurPos_X = ParaNearPos.NearPos.ContentPos.Get(Depth),
+            CurPos_Y = ParaNearPos.NearPos.ContentPos.Get(Depth + 1);
+
+        this.Content[CurPos_X][CurPos_Y].Check_NearestPos( ParaNearPos, Depth + 2 );
+    },
+    Create_FontMap : function(Map)
+    {
+        var CtrPrp = this.Get_CompiledCtrPrp(false);
+        CtrPrp.Document_CreateFontMap( Map, this.ParaMath.Paragraph.Get_Theme().themeElements.fontScheme);
+
+        for(var i=0; i < this.nRow; i++)
+            for(var j = 0; j < this.nCol; j++)
+            {
+                if(!this.elements[i][j].IsJustDraw())
+                    this.elements[i][j].Create_FontMap( Map );
+            }
 
     }
 

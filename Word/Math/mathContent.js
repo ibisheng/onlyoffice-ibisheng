@@ -145,13 +145,14 @@ var COEFF_GAPS = new CCoeffGaps();
 // TODO
 // проконтролировать GapLeft и GapRight для setPosition всех элементов
 
-function CRecalculateInfo(oMeasure, Parent)
+function CRecalculateInfo(oMeasure, argSize)
 {
     this.measure = oMeasure;
-    this.Parent = Parent;
 
-    this.Composition = this.Parent.Composition; // для Para_Run
-    this.argSize = this.Parent.argSize;  // argSize выставляем один раз для всего контента
+    //this.Parent = Parent;
+    //this.ParaMath = this.Parent.ParaMath; // для Para_Run
+
+    this.argSize = argSize; // argSize выставляем один раз для всего контента
     this.leftRunPrp = null; // Run_Prp левого элемента
     this.currRunPrp = null;
 
@@ -526,7 +527,7 @@ CRecalculateInfo.prototype =
 
 // TO DO
 // убрать
-function dist(_left, _right, _top, _bottom)
+/*function dist(_left, _right, _top, _bottom)
 {
     this.left = _left;
     this.right = _right;
@@ -544,9 +545,9 @@ function mathElem(val)
         top: 0,
         bottom: 0
     }; //mm
-}
+}*/
 
-function CMathRunPrp()
+/*function CMathRunPrp()
 {
     this.typeObj = MATH_RUN_PRP;
     this.textPrp = new CTextPr();
@@ -570,11 +571,11 @@ CMathRunPrp.prototype =
     {
         this.textPrp.Merge(oWPrp);
     },
-    /*getWRunPrp: function()
+    *//*getWRunPrp: function()
     {
         // смержить c MRunPrp
         return this.textPrp;
-    },*/
+    },*//*
     getMergedWPrp: function()
     {
         var oWPrp = new CTextPr();
@@ -621,7 +622,7 @@ CMathRunPrp.prototype =
     {
         return this.mathPrp.getTxtSettings();
     }
-}
+}*/
 
 function CMPrp()
 {
@@ -692,7 +693,6 @@ CMPrp.prototype =
         this.SetBProp(this.brk, props.brk);
         this.SetBProp(this.lit, props.lit);
 
-
         // если приходит несколько параметров style из xml, то запоминается последний
         if(props.sty === STY_ITALIC)
             this.italic = true;
@@ -710,7 +710,6 @@ CMPrp.prototype =
         {
             this.typeText = TXT_PLAIN;  // буквы берутся обычные, не специальные для Cambria Math : то есть как для TXT_NORMAL
                                         // отличие от TXT_NORMAL w:rPrp не учитываются !
-
         }
 
         // TXT_DOUBLE_STRUCK        U+1D538 - U+1D56B
@@ -725,6 +724,15 @@ CMPrp.prototype =
 
         if(props.nor)
             this.typeText = TXT_NORMAL;
+
+    },
+    Apply_Pr: function(TextPr)
+    {
+        if(TextPr.Bold !== null && typeof(TextPr.Bold) !== "undefined")
+            this.bold = TextPr.Bold;
+
+        if(TextPr.Italic !== null && typeof(TextPr.Italic) !== "undefined")
+            this.italic = TextPr.Italic;
 
     },
     getPropsForWrite: function()
@@ -842,22 +850,25 @@ function CMathContent()
 
 
     this.content = new Array(); // array of mathElem
-    //this.length = 0;
 
     this.CurPos = 0;
     this.WidthToElement = [];
     this.pos = {x:0,    y:0};   // относительная позиция
 
     //  Properties
-    this.Composition = null; // ссылка на общую формулу
+    //this.Composition = null; // ссылка на общую формулу
+    this.ParaMath      = null;
     this.argSize     = 0;
     this.bDot       =   false;
     this.plhHide    =   false;
     this.bRoot      =   false;
     //////////////////
 
+/*
 
-    ////**  real select  **////
+    ///*/
+/**  real select  **//*
+///
     this.RealSelect =
     {
         startPos:   0,  // эти позиции идут на отрисовку селекта
@@ -865,7 +876,9 @@ function CMathContent()
     };
     ///////////////////////////////
 
-    ////**   logical select  **////
+    ///*/
+/**   logical select  **//*
+///
     this.LogicalSelect =
     {
         start:  0,      //  логические позиции селекта !!
@@ -876,9 +889,17 @@ function CMathContent()
 
     ///////////////////////////////
 
+*/
+
     this.bSelectionUse = false;
     this.SelectStartPos = 0;
     this.SelectEndPos   = 0;
+    this.RecalcInfo =
+    {
+        TextPr:     true
+    };
+
+    this.NearPosArray = new Array();
 
     this.size =
     {
@@ -1071,7 +1092,7 @@ CMathContent.prototype =
 
         if(obj.typeObj === MATH_COMP)
         {
-            obj.setComposition(this.Composition);
+            //obj.setComposition(this.Composition);
             obj.setArgSize(this.argSize);
 
             this.content.push(obj);
@@ -1084,7 +1105,7 @@ CMathContent.prototype =
         this.CurPos = this.content.length-1;
 
     },
-    addToContent_2: function(oSub)   // for "menu"
+    /*addToContent_2: function(oSub)   // for "menu"
     {
         // добавление к контенту элементов из другого контента в текущую позицию
         // первый элемент в добавляемом контенте CEmpty пропускаем
@@ -1149,8 +1170,8 @@ CMathContent.prototype =
 
         this.CurPos = pos;
         return middleContent;
-    },
-    setComposition: function(Composition)
+    },*/
+    /*setComposition: function(Composition)
     {
         this.Composition = Composition;
     },
@@ -1162,7 +1183,7 @@ CMathContent.prototype =
             if(this.content[i].value.typeObj == MATH_COMP)
                 this.content[i].value.setReferenceComposition(Comp);
         }
-    },
+    },*/
     createEquation: function(ind)
     {
         var Pos = this.CurPos + 1;
@@ -4132,7 +4153,7 @@ CMathContent.prototype =
         else if( this.selectUse() ) //т.к. после того как удалили тагет у нас эти 2 значения не равны, равенство их выставляется позднее, после добавления символа
             this.remove(1);
     },
-    relate: function(parent)
+    /*relate: function(parent)
     {
         if(parent === -1)
         {
@@ -4144,11 +4165,11 @@ CMathContent.prototype =
             this.bRoot = false;
             this.Parent = parent;
         }
-    },
+    },*/
     fillPlaceholders: function()
     {
         var placeholder = new CMathText(false);
-        placeholder.relate(this);
+        //placeholder.relate(this);
         placeholder.fillPlaceholders();
 
         this.content.push( placeholder );
@@ -5045,9 +5066,17 @@ CMathContent.prototype =
 
         this.size = {width: width, height: ascent + descent, ascent: ascent};
     },
-    Resize: function(oMeasure)      // пересчитываем всю формулу
+    Resize: function(Parent, ParaMath, oMeasure)      // пересчитываем всю формулу  a
     {
-        var RecalcInfo = new CRecalculateInfo(oMeasure, this);
+        var RecalcInfo = new CRecalculateInfo(oMeasure, this.argSize);
+
+        this.ParaMath = ParaMath;
+
+        if(Parent !== null)
+        {
+            this.bRoot = false;
+            this.Parent = Parent;
+        }
 
         for(var pos = 0; pos < this.content.length; pos++)
         {
@@ -5058,39 +5087,40 @@ CMathContent.prototype =
 
                 RecalcInfo.Current = this.content[pos];
 
-                //var currRPrp = this.content[pos].getRunPrp();
+                this.content[pos].Resize(this, ParaMath, oMeasure);
 
-                var runPrp = this.content[pos].getCtrPrp();
-                //var runPrp = this.content[pos].getRunPrp();
-                //var currRPrp = runPrp.getMergedWPrp();
-                //this.applyArgSize(currRPrp);
-                this.Composition.ApplyArgSize(runPrp); // в ParaMath
+                /*var runPrp = this.content[pos].getCtrPrp();
 
-                RecalcInfo.currRunPrp = runPrp;
+                this.ParaMath.ApplyArgSize(runPrp); // в ParaMath*/
+
+                var ctrPrp = this.content[pos].Get_CompiledCtrPrp();
+
+                RecalcInfo.currRunPrp = ctrPrp;
 
                 RecalcInfo.setGaps();
-
-                this.content[pos].Resize(oMeasure);
             }
             else if(this.content[pos].typeObj == MATH_PLACEHOLDER)
             {
                 if(!this.bRoot)
                 {
-                    var oWPrp = this.Parent.getCtrPrp();
+                    /*var oWPrp = this.Parent.getCtrPrp();
 
                     //this.applyArgSize(oWPrp);
-                    this.Composition.ApplyArgSize(oWPrp);
-                    oWPrp.Italic = false;
+                    this.ParaMath.ApplyArgSize(oWPrp);*/
 
-                    oMeasure.SetFont(oWPrp);
 
-                    this.content[pos].Resize(oMeasure);
+                    var ctrPrp = this.Parent.Get_CompiledCtrPrp();
+                    ctrPrp.Italic = false;
+
+                    oMeasure.SetFont(ctrPrp);
+
+                    this.content[pos].Resize(this, oMeasure);
                 }
             }
             else
             {
-                this.content[pos].Set_Paragraph(this.Composition.Paragraph);
-                this.content[pos].Math_Recalculate(RecalcInfo);
+                //this.content[pos].Set_Paragraph(this.ParaMath.Paragraph);
+                this.content[pos].Math_Recalculate(this, ParaMath.Paragraph, oMeasure, RecalcInfo);
             }
         }
 
@@ -5202,7 +5232,7 @@ CMathContent.prototype =
                     oWPrp.Merge(mgWPrp);
 
                     //this.applyArgSize(oWPrp);
-                    this.Composition.ApplyArgSize(oWPrp);
+                    this.ParaMath.ApplyArgSize(oWPrp);
 
                     pGraphics.SetFont(oWPrp);
                 }
@@ -5210,13 +5240,18 @@ CMathContent.prototype =
                 {
                     pGraphics.b_color1(0,0,0,255);
 
-                    var oWPrp = this.Parent.getCtrPrp();
+                    /*var oWPrp = this.Parent.getCtrPrp();
 
                     //this.applyArgSize(oWPrp);
-                    this.Composition.ApplyArgSize(oWPrp);
+                    this.ParaMath.ApplyArgSize(oWPrp);
 
                     oWPrp.Italic = false;
-                    pGraphics.SetFont(oWPrp);
+                    pGraphics.SetFont(oWPrp);*/
+
+                    var ctrPrp = this.Parent.Get_CompiledCtrPrp();
+                    ctrPrp.Italic = false;
+
+                    pGraphics.SetFont(ctrPrp);
 
                     this.content[i].draw(x, y, pGraphics);
                 }
@@ -5238,9 +5273,8 @@ CMathContent.prototype =
         }
         else if(this.content[this.CurPos].typeObj == MATH_PARA_RUN)
         {
-            //var absPos = this.Composition.absPos;
-            var X = this.pos.x + this.Composition.X + this.WidthToElement[this.CurPos],
-                Y = this.pos.y + this.Composition.Y + this.size.ascent;
+            var X = this.pos.x + this.ParaMath.X + this.WidthToElement[this.CurPos],
+                Y = this.pos.y + this.ParaMath.Y + this.size.ascent;
 
             result = this.content[this.CurPos].Math_Update_Cursor(X, Y, CurPage, UpdateTarget);
         }
@@ -5724,7 +5758,7 @@ CMathContent.prototype =
     {
         //var rPrp =  new CMathRunPrp();
         var rPrp = new CTextPr();
-        var defaultRPrp = this.Composition.Get_Default_TPrp();
+        var defaultRPrp = this.ParaMath.Get_Default_TPrp();
         rPrp.Merge(defaultRPrp);
 
         if(this.content.length > 1)
@@ -5836,32 +5870,29 @@ CMathContent.prototype =
         }
         else if(this.content[this.CurPos].typeObj == MATH_PARA_RUN)
         {
-            //var absPos = this.Composition.absPos;
-
-            Y = this.pos.y + this.Composition.Y + this.size.ascent;
-            _X = this.pos.x + this.Composition.X + this.WidthToElement[this.CurPos];
+            Y = this.pos.y + this.ParaMath.Y + this.size.ascent;
+            _X = this.pos.x + this.ParaMath.X + this.WidthToElement[this.CurPos];
 
 
             result = this.content[this.CurPos].Recalculate_CurPos(_X, Y, CurrentRun, 0, 0, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
         }
         else
         {
-            //var absPos = this.Composition.absPos;
+            Y = this.pos.y + this.ParaMath.Y + this.size.ascent;
+            _X = this.pos.x + this.ParaMath.X + this.size.width;
 
-            Y = this.pos.y + this.Composition.Y + this.size.ascent;
-            _X = this.pos.x + this.Composition.X + this.size.width;
+            /*var ctrPrp = this.Parent.getCtrPrp();
+            this.ParaMath.ApplyArgSize(ctrPrp);*/
 
-            var ctrPrp = this.Parent.getCtrPrp();
-            this.Composition.ApplyArgSize(ctrPrp);
-            //this.applyArgSize(ctrPrp);
+            var ctrPrp = this.Parent.Get_CompiledCtrPrp();
 
             var sizeCursor = ctrPrp.FontSize*g_dKoef_pt_to_mm;
 
             Y -= sizeCursor*0.8;
 
-            this.Composition.Paragraph.DrawingDocument.SetTargetSize(sizeCursor);
+            this.ParaMath.Paragraph.DrawingDocument.SetTargetSize(sizeCursor);
             //Para.DrawingDocument.UpdateTargetFromPaint = true;
-            this.Composition.Paragraph.DrawingDocument.UpdateTarget( _X, Y, this.Composition.Paragraph.Get_StartPage_Absolute() + _CurPage );
+            this.ParaMath.Paragraph.DrawingDocument.UpdateTarget( _X, Y, this.ParaMath.Paragraph.Get_StartPage_Absolute() + _CurPage );
 
 
             result = {X: _X, Y: Y};
@@ -5869,6 +5900,20 @@ CMathContent.prototype =
 
         return result;
     },
+    Check_NearestPos: function(ParaNearPos, Depth)
+    {
+        var ContentNearPos = new CParagraphElementNearPos();
+        ContentNearPos.NearPos = ParaNearPos.NearPos;
+        ContentNearPos.Depth   = Depth;
+
+        // CParagraphNearPos for ParaNearPos
+        this.NearPosArray.push( ContentNearPos );
+        ParaNearPos.Classes.push( this );
+
+        var CurPos = ParaNearPos.NearPos.ContentPos.Get(Depth);
+        this.Content[CurPos].Check_NearestPos( ParaNearPos, Depth + 1 );
+    },
+
 
     // Поиск позиции, селект
 
@@ -6071,9 +6116,9 @@ CMathContent.prototype =
 
             if(bCurrComp && !bLeftRun) // добавление пустого Run перед мат объектом
             {
-                var emptyRun = new ParaRun(this.Composition.Paragraph, true);
-                var txtPrp = current.Get_TxtPrp();
-                emptyRun.Set_Pr(txtPrp);
+                var emptyRun = new ParaRun(null, true);
+                //var txtPrp = current.Get_TxtPrp();
+                //emptyRun.Set_Pr(txtPrp);
 
                 NewContent.push(emptyRun);
                 NewContent.push(this.content[i]); // Math Object
@@ -6094,14 +6139,27 @@ CMathContent.prototype =
 
         if(len > 0 && this.content[len - 1].typeObj == MATH_COMP)
         {
-            var emptyRun = new ParaRun(this.Composition.Paragraph, true);
-            var txtPrp = current.Get_TxtPrp();
-            emptyRun.Set_Pr(txtPrp);
+            var emptyRun = new ParaRun(null, true);
+
+            //var emptyRun = new ParaRun(this.ParaMath.Paragraph, true);
+            //var txtPrp = current.Get_TxtPrp();
+            //emptyRun.Set_Pr(txtPrp);
 
             NewContent.push(emptyRun);
         }
 
         this.content = NewContent;
+
+    },
+    Create_FontMap : function(Map)
+    {
+        // TODO
+        // заделать для плейсхолдера
+        // т.к. для TXT_NORMAL можно выставить другой шрифт для одного плейсхолдера
+
+        for (var index = 0; index < this.content.length; index++)
+            if(this.content[index].typeObj !== MATH_PLACEHOLDER)
+                this.content[index].Create_FontMap( Map );
 
     },
 
@@ -6125,7 +6183,7 @@ CMathContent.prototype =
             }
             else if(this.content[pos].typeObj == MATH_PARA_RUN)      // проверка на gaps в findDisposition
             {
-                SearchPos.X += this.pos.x + this.Composition.X + this.WidthToElement[pos];
+                SearchPos.X += this.pos.x + this.ParaMath.X + this.WidthToElement[pos];
                 SearchPos.CurX += this.pos.x + this.WidthToElement[pos];
                 this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth, 0, 0);
             }
@@ -6288,9 +6346,64 @@ CMathContent.prototype =
 
         return TextPr;
     },
+    Apply_TextPr: function(TextPr, IncFontSize, ApplyToAll)
+    {
+        if ( true === ApplyToAll )
+        {
+            for ( var i = 0; i < this.content.length; i++ )
+            {
+                var typeElem = this.content[i].typeObj;
+
+                if( typeElem == MATH_COMP || typeElem == MATH_PARA_RUN)
+                    this.content[i].Apply_TextPr( TextPr, IncFontSize, true );
+            }
+        }
+        else
+        {
+            if(this.bSelectionUse == true)
+            {
+                var StartPos = this.SelectStartPos;
+                var EndPos   = this.SelectEndPos;
+
+                if(StartPos > EndPos)
+                {
+                    var temp = StartPos;
+                    EndPos = StartPos;
+                    StartPos = temp;
+                }
+
+                if ( StartPos === EndPos )
+                {
+                    var elem = this.content[StartPos];
+
+                    if( elem.typeObj == MATH_COMP)
+                        elem.Apply_TextPr( TextPr, IncFontSize, true );
+                    else if(elem.typeObj == MATH_PARA_RUN)
+                        elem.Apply_TextPr( TextPr, IncFontSize, false );
+                }
+                else
+                {
+                    for(var i = StartPos; i <= EndPos; i++)
+                    {
+                        var elem = this.content[i];
+
+                        if( elem.typeObj == MATH_COMP)
+                            elem.Apply_TextPr( TextPr, IncFontSize, true );
+                        else if(elem.typeObj == MATH_PARA_RUN)
+                            elem.Apply_TextPr( TextPr, IncFontSize, false );
+                    }
+
+                }
+            }
+            else
+            {
+                this.content[this.CurPos].Apply_TextPr( TextPr, IncFontSize, false );
+            }
+        }
+    },
     Get_Default_TPrp: function()
     {
-        return this.Composition.Get_Default_TPrp();
+        return this.ParaMath.Get_Default_TPrp();
     },
     //////////////////////////////
     // Перемещение по стрелкам
@@ -6326,7 +6439,6 @@ CMathContent.prototype =
             {
                 this.content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, bUseContent);
             }
-
 
             SearchPos.Pos.Update(CurPos, Depth);
 
@@ -6396,6 +6508,51 @@ CMathContent.prototype =
 
         return result;
     },
+    Get_WordStartPos : function(SearchPos, ContentPos, Depth, UseContentPos)
+    {
+        var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.content.length - 1 );
+
+        //this.content[CurPos].Get_WordStartPos(SearchPos, ContentPos, Depth + 1, UseContentPos);
+        //CurPos--;
+
+
+        //if ( true === SearchPos.UpdatePos )
+        //    SearchPos.Pos.Update( CurPos, Depth );
+
+        while(CurPos >= 0 && SearchPos.Found == false)
+        {
+            var item = this.content[CurPos];
+
+            SearchPos.Pos.Update(CurPos, Depth);
+
+            if(item.typeObj == MATH_PLACEHOLDER)
+            {
+                SearchPos.UpdatePos = true;
+                SearchPos.Found = true;
+                break;
+            }
+            else if(item.typeObj == MATH_COMP)
+            {
+                SearchPos.UpdatePos = true;
+                SearchPos.Found = true;
+                break;
+            }
+            else if(item.typeObj == MATH_PARA_RUN)
+            {
+                item.Get_WordStartPos(SearchPos, ContentPos, Depth + 1, UseContentPos);
+
+                if(true === SearchPos.UpdatePos)
+                    break;
+            }
+
+            CurPos--;
+        }
+
+    },
+    Get_WordEndPos : function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
+    {
+
+    },
     /////////////////////////
     getContent: function(stack, bCurrent)
     {
@@ -6417,7 +6574,7 @@ CMathContent.prototype =
     {
         return this.content.length == 1;
     },
-    Copy: function(Selected, Composition)
+    Copy: function(Selected)
     {
         var start, end;
 
@@ -6442,7 +6599,6 @@ CMathContent.prototype =
         }
 
         var NewContent = new CMathContent();
-        NewContent.setComposition(Composition);
         NewContent.plhHide = this.plhHide;
 
         for(var i = start; i <= end; i++)
@@ -6454,8 +6610,8 @@ CMathContent.prototype =
             }
             else
             {
-                element = this.content[i].Copy(false, Composition);
-                element.relate(this);
+                element = this.content[i].Copy(false);
+                //element.relate(this);
             }
 
             NewContent.content.push(element);
@@ -7698,7 +7854,7 @@ CMathComposition.prototype =
 }*/
 
 
-function CEmpty()
+/*function CEmpty()
 {
     this.typeObj = MATH_EMPTY;
     this.pos = null;
@@ -7720,7 +7876,7 @@ function CEmpty()
 
     this.IsHighElement =  function() { return false; };
     this.relate     = function() {};
-}
+}*/
 
 
 

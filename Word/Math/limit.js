@@ -5,8 +5,6 @@ function CLimit(props)
     this.type = LIMIT_LOW;
     CMathBase.call(this);
 
-    this.init(props);
-
     if(props.type === LIMIT_UP || props.type === LIMIT_LOW)
         this.type = props.type;
 
@@ -61,7 +59,7 @@ CLimit.prototype.getIterator = function()
 }
 CLimit.prototype.setDistance = function()
 {
-    this.dH = 0.03674768518518519*this.getCtrPrp().FontSize;
+    this.dH = 0.03674768518518519*this.Get_CompiledCtrPrp().FontSize;
 }
 CLimit.prototype.getPropsForWrite = function()
 {
@@ -123,7 +121,7 @@ function CMathFunc(props)
 extend(CMathFunc, CMathBase);
 CMathFunc.prototype.setDistance = function()
 {
-    this.dW = this.getCtrPrp().FontSize/6*g_dKoef_pt_to_mm;
+    this.dW = this.Get_CompiledCtrPrp().FontSize/6*g_dKoef_pt_to_mm;
 }
 CMathFunc.prototype.getFName = function()
 {

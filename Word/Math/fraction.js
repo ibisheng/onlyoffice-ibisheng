@@ -71,7 +71,7 @@ CFraction.prototype.draw = function(x, y, pGraphics)
 }
 CFraction.prototype.drawBarFraction = function(x, y, pGraphics)
 {
-    var mgCtrPrp = this.mergeCtrTPrp();
+    var mgCtrPrp = this.Get_CompiledCtrPrp();
     var penW = mgCtrPrp.FontSize* 25.4/96 * 0.08;
 
     var numHeight = this.elements[0][0].size.height;
@@ -112,8 +112,8 @@ CFraction.prototype.drawBarFraction = function(x, y, pGraphics)
 }
 CFraction.prototype.drawSkewedFraction = function(x, y, pGraphics)
 {
-    //var ctrPrp = this.getCtrPrp();
-    var mgCtrPrp = this.mergeCtrTPrp();
+    //var ctrPrp = this.Get_CompiledCtrPrp();
+    var mgCtrPrp = this.Get_CompiledCtrPrp();
 
     var penW = mgCtrPrp.FontSize/12.5*g_dKoef_pix_to_mm;
 
@@ -211,8 +211,8 @@ CFraction.prototype.drawLinearFraction = function(x, y, pGraphics)
         x2 = this.pos.x + x + this.elements[0][0].size.width + shift,
         y2 = this.pos.y + y + this.size.height;
 
-    //var ctrPrp = this.getCtrPrp();
-    var mgCtrPrp = this.mergeCtrTPrp();
+    //var ctrPrp = this.Get_CompiledCtrPrp();
+    var mgCtrPrp = this.Get_CompiledCtrPrp();
     var penW = mgCtrPrp.FontSize/12.5*g_dKoef_pix_to_mm;
 
     pGraphics.SetFont(mgCtrPrp);
@@ -264,12 +264,12 @@ CFraction.prototype.recalculateBarFraction = function(oMeasure)
     var num = this.elements[0][0].size,
         den = this.elements[1][0].size;
 
-    //var ctrPrp =  this.getCtrPrp();
-    var mgCtrPrp = this.mergeCtrTPrp();
+    //var ctrPrp =  this.Get_CompiledCtrPrp();
+    var mgCtrPrp = this.Get_CompiledCtrPrp();
 
     var width  = num.width > den.width ? num.width : den.width;
     var height = num.height + den.height;
-    var ascent = num.height + this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
+    var ascent = num.height + this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
     width += this.GapLeft + this.GapRight;
 
@@ -277,13 +277,13 @@ CFraction.prototype.recalculateBarFraction = function(oMeasure)
 }
 CFraction.prototype.recalculateSkewed = function(oMeasure)
 {
-    //var ctrPrp = this.getCtrPrp();
-    var mgCtrPrp = this.mergeCtrTPrp();
+    //var ctrPrp = this.Get_CompiledCtrPrp();
+    var mgCtrPrp = this.Get_CompiledCtrPrp();
 
     this.gapSlash = 5.011235894097222 * mgCtrPrp.FontSize/36;
     var width = this.elements[0][0].size.width + this.gapSlash + this.elements[0][1].size.width;
     var height = this.elements[0][0].size.height + this.elements[0][1].size.height;
-    var ascent = this.elements[0][0].size.height + this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
+    var ascent = this.elements[0][0].size.height + this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
     width += this.GapLeft + this.GapRight;
 
@@ -297,8 +297,8 @@ CFraction.prototype.recalculateLinear = function()
         DescentSecond = this.elements[0][1].size.height - this.elements[0][1].size.ascent;
 
     var H = AscentFirst + DescentSecond;
-    //var ctrPrp = this.getCtrPrp();
-    var mgCtrPrp = this.mergeCtrTPrp();
+    //var ctrPrp = this.Get_CompiledCtrPrp();
+    var mgCtrPrp = this.Get_CompiledCtrPrp();
 
     var gap = 5.011235894097222*mgCtrPrp.FontSize/36;
 
@@ -476,8 +476,8 @@ CNumerator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;
 
-    //var ctrPrp = this.getCtrPrp();
-    var mgCtrPrp = this.mergeCtrTPrp();
+    //var ctrPrp = this.Get_CompiledCtrPrp();
+    var mgCtrPrp = this.Get_CompiledCtrPrp();
 
     var Descent = arg.height - arg.ascent; // baseLine
     var gapNum = 7.832769097222222 * mgCtrPrp.FontSize/36,
@@ -517,13 +517,9 @@ CNumerator.prototype.getElement = function()
 {
     return this.elements[0][0];
 }
-CNumerator.prototype.getCtrPrp = function()
+CNumerator.prototype.Get_CompiledCtrPrp = function()
 {
-    return this.Parent.getCtrPrp();
-}
-CNumerator.prototype.getRunPrp = function()
-{
-    return this.Parent.getRunPrp();
+    return this.Parent.Get_CompiledCtrPrp();
 }
 CNumerator.prototype.getPropsForWrite = function()
 {
@@ -549,8 +545,8 @@ CDenominator.prototype.init = function()
 CDenominator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;
-    //var ctrPrp = this.getCtrPrp();
-    var mgCtrPrp = this.mergeCtrTPrp();
+    //var ctrPrp = this.Get_CompiledCtrPrp();
+    var mgCtrPrp = this.Get_CompiledCtrPrp();
 
     var gapDen = 7.325682539682539 * mgCtrPrp.FontSize/36,
         Ascent = arg.ascent -  4.938888888888888*mgCtrPrp.FontSize/36,
@@ -596,13 +592,9 @@ CDenominator.prototype.getElement = function(txt)
 {
     return this.elements[0][0];
 }
-CDenominator.prototype.getCtrPrp = function()
+CDenominator.prototype.Get_CompiledCtrPrp = function()
 {
-    return this.Parent.getCtrPrp();
-}
-CDenominator.prototype.getRunPrp = function()
-{
-    return this.Parent.getRunPrp();
+    return this.Parent.Get_CompiledCtrPrp();
 }
 CDenominator.prototype.getPropsForWrite = function()
 {

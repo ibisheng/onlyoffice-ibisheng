@@ -4293,7 +4293,7 @@ ParaRun.prototype =
                 TextPr.Merge(MPrp); // bold, italic
             }
 
-            this.Parent.Composition.ApplyArgSize(TextPr);
+            this.Parent.ParaMath.ApplyArgSize(TextPr);
         }
         else
             TextPr.Merge( this.Pr ); // Мержим прямые настройки данного рана
@@ -4553,6 +4553,14 @@ ParaRun.prototype =
     // В данной функции мы применяем приходящие настройки поверх старых, т.е. старые не удаляем
     Apply_Pr : function(TextPr)
     {
+        if(this.typeObj == MATH_PARA_RUN)
+        {
+            this.MathPrp.Apply_Pr(TextPr);
+            this.Recalc_CompiledPr(true);
+
+            return;
+        }
+
         if ( undefined != TextPr.Bold )
             this.Set_Bold( null === TextPr.Bold ? undefined : TextPr.Bold );
 
@@ -7004,8 +7012,7 @@ CRunCollaborativeMarks.prototype =
                 {
                     this.Ranges.splice( Index, 1 );
                     Len--;
-                    Index--;
-                    continue;
+                    Index--;continue;
                 }
                 else
                 {
@@ -7090,12 +7097,14 @@ ParaRun.prototype.Math_Draw = function(x, y, pGraphics)
     }
 
 }
-ParaRun.prototype.Math_Recalculate = function(RecalcInfo)
+ParaRun.prototype.Math_Recalculate = function(Parent, Paragraph, oMeasure, RecalcInfo)
 {
     var RangeStartPos = 0;
     var RangeEndPos = this.Content.length;
 
-    this.Parent = RecalcInfo.Parent;
+
+    this.Paragraph = Paragraph;
+    this.Parent    = Parent;
 
     // обновляем позиции start и end для Range
     this.Lines[0].Add_Range(0, RangeStartPos, RangeEndPos);
@@ -7120,8 +7129,7 @@ ParaRun.prototype.Math_Recalculate = function(RecalcInfo)
             RecalcInfo.Current = this.Content[Pos];
             RecalcInfo.setGaps();
 
-            this.Content[Pos].relate(this);
-            this.Content[Pos].Resize(g_oTextMeasurer);
+            this.Content[Pos].Resize(this, oMeasure);
 
             var oSize = this.Content[Pos].size;
             width += oSize.width;

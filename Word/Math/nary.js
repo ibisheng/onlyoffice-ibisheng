@@ -173,39 +173,45 @@ CNary.prototype.init = function(props)
         {
             base = new CNaryOvr();
             base.init(sign);
+
+            base.setCtrPrp(this.CtrPrp.Copy());
+
         }
         else if( !this.supHide && this.subHide )
         {
             base = new CNaryUnd();
             base.init(sign);
+            base.setCtrPrp(this.CtrPrp.Copy());
         }
         else
         {
             base = new CNaryUndOvr();
             base.init(sign);
+            base.setCtrPrp(this.CtrPrp.Copy());
         }
+
     }
     else
     {
         if( this.supHide && !this.subHide )
         {
-            var prp = {type: DEGREE_SUBSCRIPT, indef: 2, oBase: sign};
+            var prp = {type: DEGREE_SUBSCRIPT, indef: 2, oBase: sign, ctrPrp: this.CtrPrp.Copy() };
             base = new CDegree(prp);
         }
         else if( !this.supHide && this.subHide )
         {
-            var prp = {type: DEGREE_SUPERSCRIPT, indef: 2, oBase: sign};
+            var prp = {type: DEGREE_SUPERSCRIPT, indef: 2, oBase: sign, ctrPrp: this.CtrPrp.Copy()};
             base = new CDegree(prp);
         }
         else
         {
-            var prp = {type: DEGREE_SubSup, indef: 2, oBase: sign};
+            var prp = {type: DEGREE_SubSup, indef: 2, oBase: sign, ctrPrp: this.CtrPrp.Copy()};
             base = new CDegreeSubSup(prp);
         }
     }
 
-    if(!this.supHide || !this.subHide)
-        base.setCtrPrp(this.CtrPrp);    // выставляем аналогично как в CMathContent при добавлении элемента в addMComponent
+    /*if(!this.supHide || !this.subHide)
+        base.setCtrPrp(this.CtrPrp);  */  // выставляем аналогично как в CMathContent при добавлении элемента в addMComponent
 
     this.addMCToContent(base, arg);
 
@@ -217,14 +223,14 @@ CNary.prototype.setCtrPrp = function(txtPrp)
     this.CtrPrp.Merge(txtPrp); // only runPrp for paragraph
     //this.RunPrp.setTxtPrp(txtPrp);
 
-    if(this.elements !== null)
+    if(this.elements !== null && !this.elements[0][0].IsJustDraw())
     {
         this.elements[0][0].setCtrPrp(this.CtrPrp);
     }
 }
 CNary.prototype.setDistance = function()
 {
-    this.dW = this.getCtrPrp().FontSize/36*2.45;
+    this.dW = this.Get_CompiledCtrPrp().FontSize/36*2.45;
 }
 CNary.prototype.getBase = function()
 {
@@ -296,11 +302,13 @@ CNaryUnd.prototype.init = function(sign)
     var iter = new CMathContent();
     iter.decreaseArgSize();
 
+    //sign.relate(this);
+
     this.addMCToContent(iter, sign);
 }
 CNaryUnd.prototype.setDistance = function()
 {
-    var zetta = this.getCtrPrp().FontSize* 25.4/96;
+    var zetta = this.Get_CompiledCtrPrp().FontSize* 25.4/96;
     this.dH = zetta*0.25;
 }
 CNaryUnd.prototype.getAscent = function()
@@ -324,16 +332,18 @@ CNaryOvr.prototype.init = function(sign)
     var iter = new CMathContent();
     iter.decreaseArgSize();
 
+    //sign.relate(this);
+
     this.addMCToContent(sign, iter);
 }
 CNaryOvr.prototype.old_setDistance = function()
 {
-    var zetta = this.getCtrPrp().FontSize* 25.4/96;
+    var zetta = this.Get_CompiledCtrPrp().FontSize* 25.4/96;
     this.dH = zetta*0.1;
 }
 CNaryOvr.prototype.recalculateSize = function()
 {
-    var FontSize = this.getCtrPrp().FontSize;
+    var FontSize = this.Get_CompiledCtrPrp().FontSize;
     var zetta = FontSize*25.4/96;
 
     var minGapBottom = zetta*0.1,
@@ -382,7 +392,7 @@ CNaryUndOvr.prototype.init = function(sign)
 }
 CNaryUndOvr.prototype.recalculateSize = function()
 {
-    var FontSize = this.getCtrPrp().FontSize;
+    var FontSize = this.Get_CompiledCtrPrp().FontSize;
     var zetta = FontSize*25.4/96;
     this.gapTop = zetta*0.25;
     //this.gapBottom = zetta*0.1;
@@ -484,7 +494,7 @@ CNaryUndOvr.prototype.getUpperIterator = function()
 
 function CNaryOperator(flip)
 {
-    this.Composition = null;
+    this.ParaMath = null;
     this.bFlip = (flip == -1);
     this.sizeGlyph = null;
 }
@@ -506,7 +516,7 @@ CNaryOperator.prototype.drawGlyph = function(x, y,pGraphics)
         YY = new Array();
 
     //var textScale = this.getTxtPrp().FontSize/850; // 1000 pt
-    var textScale = this.getCtrPrp().FontSize/850; // 1000 pt
+    var textScale = this.Get_CompiledCtrPrp().FontSize/850; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
     // g_dKoef_px_to_mm = 25.4/96
 
@@ -546,7 +556,7 @@ CNaryOperator.prototype.drawTextElem = function(x, y, pGraphics)
 {
     pGraphics.b_color1(0,0,0,255);
     var rPrp = new CTextPr();
-    rPrp.Merge( this.getCtrPrp() );
+    rPrp.Merge( this.Get_CompiledCtrPrp() );
     rPrp.Italic = false;
     rPrp.Bold = false;
 
@@ -558,10 +568,10 @@ CNaryOperator.prototype.IsJustDraw = function()
 {
     return true;
 }
-CNaryOperator.prototype.relate = function(parent)
+/*CNaryOperator.prototype.relate = function(parent)
 {
     this.Parent = parent;
-}
+}*/
 CNaryOperator.prototype.setPosition = function(pos)
 {
     this.pos = {x: pos.x , y: pos.y};
@@ -572,26 +582,35 @@ CNaryOperator.prototype.recalculateSize = function()
 
     var height = this.sizeGlyph.height,
         width =  this.sizeGlyph.width,
-        ascent = this.sizeGlyph.height/2 + DIV_CENT*this.getCtrPrp().FontSize;
+        ascent = this.sizeGlyph.height/2 + DIV_CENT*this.Get_CompiledCtrPrp().FontSize;
 
     this.size = {height: height, width: width, ascent: ascent};
 }
-CNaryOperator.prototype.Resize = function()
+CNaryOperator.prototype.Resize = function(Parent, ParaMath, oMeasure)
 {
+    this.Parent = Parent;
+    this.ParaMath = ParaMath;
+
+    if(this.RecalcInfo.bCtrPrp == true)
+    {
+        this.Set_CompiledCtrPrp();
+        this.RecalcInfo.bCtrPrp = false;
+    }
+
     this.recalculateSize(); //обычный пересчет, oMeasure не нужен
 }
-CNaryOperator.prototype.setComposition = function(Compos)
+/*CNaryOperator.prototype.setComposition = function(Compos)
 {
     this.Composition = Compos;
-}
-CNaryOperator.prototype.getCtrPrp = function()
+}*/
+CNaryOperator.prototype.Get_CompiledCtrPrp = function()
 {
-    return this.Parent.getCtrPrp();
+    return this.Parent.Get_CompiledCtrPrp();
 }
-CNaryOperator.prototype.setReferenceComposition = function(Compos)
+/*CNaryOperator.prototype.setReferenceComposition = function(Compos)
 {
     this.Composition = Compos;
-}
+}*/
 CNaryOperator.prototype.IsOnlyText = function()
 {
     return false;
@@ -713,7 +732,7 @@ CSigma.prototype.getCoord = function()
 
 
     //var textScale =  this.getTxtPrp().FontSize/850; // 1000 pt
-    var textScale =  this.getCtrPrp().FontSize/850; // 1000 pt
+    var textScale =  this.Get_CompiledCtrPrp().FontSize/850; // 1000 pt
     var alpha = textScale*25.4/96 /64;
 
     var h1 = Y[0] - Y[21],
@@ -785,7 +804,7 @@ CSigma.prototype.calculateSizeGlyph = function()
     // пока размер не меняем в зависимости от высоты аргумента
 
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.getCtrPrp().FontSize/36;
+    var betta = this.Get_CompiledCtrPrp().FontSize/36;
 
     var _width = 8.997900390624999*betta,
         _height = 11.994444444444444*betta;
@@ -917,7 +936,7 @@ CProduct.prototype.getCoord = function()
 
 
     //var textScale = this.getTxtPrp().FontSize/850, // 1000 pt
-    var textScale = this.getCtrPrp().FontSize/850, // 1000 pt
+    var textScale = this.Get_CompiledCtrPrp().FontSize/850, // 1000 pt
         alpha = textScale*25.4/96 /64;
 
     var h1 = Y[9],
@@ -948,7 +967,7 @@ CProduct.prototype.getCoord = function()
 CProduct.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.getCtrPrp().FontSize/36;
+    var betta = this.Get_CompiledCtrPrp().FontSize/36;
 
     var _width = 10.312548828125*betta,
         _height = 11.994444444444444*betta;
@@ -1020,7 +1039,7 @@ CUnion.prototype.getCoord = function()
 CUnion.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.getCtrPrp().FontSize/36;
+    var betta = this.Get_CompiledCtrPrp().FontSize/36;
     this.gap = 0.93*betta;
 
     var _width = 9.38*betta,
@@ -1139,7 +1158,7 @@ CLogicalOr.prototype.getCoord = function()
     X[7] = 0; Y[7] = 0;
 
     //var textScale = this.getTxtPrp().FontSize/850, // 1000 pt
-    var textScale = this.getCtrPrp().FontSize/850, // 1000 pt
+    var textScale = this.Get_CompiledCtrPrp().FontSize/850, // 1000 pt
         alpha = textScale*25.4/96 /64;
 
     var w1 = X[1],
@@ -1171,7 +1190,7 @@ CLogicalOr.prototype.getCoord = function()
 CLogicalOr.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.getCtrPrp().FontSize/36;
+    var betta = this.Get_CompiledCtrPrp().FontSize/36;
 
     var _width = 9.6159*betta,
         _height = 11.994444444444444*betta;
@@ -1403,7 +1422,7 @@ CIntegral.prototype.old_drawPath = function(XX, YY)
 CIntegral.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.getCtrPrp().FontSize/36;
+    var betta = this.Get_CompiledCtrPrp().FontSize/36;
 
     var _width =  8.624*betta,
         _height = 13.7*betta;
@@ -1468,7 +1487,7 @@ CDoubleIntegral.prototype.drawPath = function(pGraphics, XX, YY)
 CDoubleIntegral.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.getCtrPrp().FontSize/36;
+    var betta = this.Get_CompiledCtrPrp().FontSize/36;
 
     var _width = 14.2296*betta,
         _height = 13.7*betta;
@@ -1543,7 +1562,7 @@ CTripleIntegral.prototype.drawPath = function(pGraphics, XX, YY)
 CTripleIntegral.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.getCtrPrp().FontSize/36;
+    var betta = this.Get_CompiledCtrPrp().FontSize/36;
 
     var _width = 18.925368*betta,
         _height = 13.7*betta;
@@ -3009,7 +3028,7 @@ CContourIntegral.prototype.draw = function(x, y, pGraphics)
         HH = coord2.H;
 
     //var textScale =  this.getTxtPrp().FontSize/850;// 1000 pt
-    var FontSize = this.getCtrPrp().FontSize;
+    var FontSize = this.Get_CompiledCtrPrp().FontSize;
     var textScale =  FontSize/850;// 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
 
@@ -3057,7 +3076,7 @@ CContourIntegral.prototype.draw = function(x, y, pGraphics)
 CContourIntegral.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.getCtrPrp().FontSize/36;
+    var betta = this.Get_CompiledCtrPrp().FontSize/36;
 
     var _width =  8.624*betta,
         _height = 13.7*betta;
@@ -3538,7 +3557,7 @@ CSurfaceIntegral.prototype.draw = function(x, y, pGraphics)
         WW = 1.6*coord2.W,
         HH = coord2.H;
 
-    var FontSize = this.getCtrPrp().FontSize;
+    var FontSize = this.Get_CompiledCtrPrp().FontSize;
     var textScale =  FontSize/850; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
 
@@ -3586,7 +3605,7 @@ CSurfaceIntegral.prototype.draw = function(x, y, pGraphics)
 CSurfaceIntegral.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.getCtrPrp().FontSize/36;
+    var betta = this.Get_CompiledCtrPrp().FontSize/36;
 
     var _width =  14.2296*betta,
         _height = 13.7*betta;
@@ -4137,7 +4156,7 @@ CVolumeIntegral.prototype.draw = function(x, y, pGraphics)
         WW = 2.1*coord2.W,
         HH = coord2.H;
 
-    var FontSize = this.getCtrPrp().FontSize;
+    var FontSize = this.Get_CompiledCtrPrp().FontSize;
     var textScale = FontSize/850; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
 
@@ -4184,7 +4203,7 @@ CVolumeIntegral.prototype.draw = function(x, y, pGraphics)
 CVolumeIntegral.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.getCtrPrp().FontSize/36;
+    var betta = this.Get_CompiledCtrPrp().FontSize/36;
 
     var _width =  18.925368*betta,
         _height = 13.7*betta;

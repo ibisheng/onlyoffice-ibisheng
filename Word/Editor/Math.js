@@ -13,7 +13,7 @@ function ParaMath(bAddMenu)
     //this.Root = this.Math.Root;
 
     this.Root       = new CMathContent();
-    this.Root.setComposition(this);
+    //this.Root.setComposition(this);
 
     this.X          = 0;
     this.Y          = 0;
@@ -34,6 +34,8 @@ function ParaMath(bAddMenu)
     this.LinesLength = 0;
 
     this.Range = this.Lines[0].Ranges[0];
+
+    this.NearPosArray = new Array();
 
     this.Width        = 0;
     this.WidthVisible = 0;
@@ -352,7 +354,7 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Apply_TextPr
 
-        this.Root.Apply_TextPr();
+        this.Root.Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
 
     },
 
@@ -363,6 +365,16 @@ ParaMath.prototype =
 
     Check_NearestPos : function(ParaNearPos, Depth)
     {
+        var MathNearPos = new CParagraphElementNearPos();
+        MathNearPos.NearPos = ParaNearPos.NearPos;
+        MathNearPos.Depth   = Depth;
+
+        // CParagraphNearPos for ParaNearPos
+        this.NearPosArray.push( MathNearPos );
+        ParaNearPos.Classes.push( this );
+
+        var CurPos = ParaNearPos.NearPos.ContentPos.Get(Depth);
+        this.Content[CurPos].Check_NearestPos( ParaNearPos, Depth + 1 );
     },
 
     Get_DrawingObjectRun : function(Id)
@@ -395,6 +407,9 @@ ParaMath.prototype =
     Create_FontMap : function(Map)
     {
         // TODO: ParaMath.Create_FontMap
+
+        this.Root.Create_FontMap(Map);
+
     },
 
     Get_AllFontNames : function(AllFonts)
@@ -429,7 +444,11 @@ ParaMath.prototype =
     {
         if ( true === DropCapText.Check )
             DropCapText.Mixed = true;
-    },    
+    },
+    Add_ToContent : function(Pos, Item, UpdatePosition)
+    {
+
+    },
 //-----------------------------------------------------------------------------------
 // Функции пересчета
 //-----------------------------------------------------------------------------------
@@ -464,7 +483,7 @@ ParaMath.prototype =
 
         //this.Math.RecalculateComposition(g_oTextMeasurer, TextPr);
 
-        this.Root.Resize(g_oTextMeasurer, TextPr);
+        this.Root.Resize(null, this, g_oTextMeasurer, TextPr);
         this.Root.setPosition({x: 0, y: 0});
 
         this.Width        = this.Root.size.width;
@@ -1047,7 +1066,7 @@ ParaMath.prototype =
         this.bSelectionUse = true;
         this.Root.Set_Select_ToMComp(Direction);
 
-        console.log("bSelectionUse : " + this.bSelectionUse);
+        //console.log("bSelectionUse : " + this.bSelectionUse);
     },
 //-----------------------------------------------------------------------------------
 // Функции отрисовки
@@ -1272,27 +1291,43 @@ ParaMath.prototype =
     Get_WordStartPos : function(SearchPos, ContentPos, Depth, UseContentPos)
     {
         // TODO: ParaMath.Get_StartEndPos
+        this.Root.Get_WordStartPos(SearchPos, ContentPos, Depth, UseContentPos);
     },
 
     Get_WordEndPos : function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
     {
         // TODO: ParaMath.Get_WordEndPos
+        this.Root.Get_WordEndPos(SearchPos, ContentPos, Depth, UseContentPos, StepEnd);
     },
 
     Get_EndRangePos : function(_CurLine, _CurRange, SearchPos, Depth)
     {
         // TODO: ParaMath.Get_EndRangePos
 
+        // Сделать для случая, когда формула будет занимать несколько строк
+
+        this.Root.Get_EndPos(false, SearchPos, Depth);
+
     },
 
     Get_StartRangePos : function(_CurLine, _CurRange, SearchPos, Depth)
     {
         // TODO: ParaMath.Get_StartRangePos
+
+        // Сделать для случая, когда формула будет занимать несколько строк, переделать
+
+        this.Root.Get_StartPos(SearchPos, Depth);
+
     },
 
     Get_StartRangePos2 : function(_CurLine, _CurRange, ContentPos, Depth)
     {
         // TODO: ParaMath.Get_StartRangePos2
+
+        // Сделать для случая, когда формула будет занимать несколько строк, переделать
+
+        this.Root.Get_StartPos(ContentPos, Depth);
+
     },
 
     Get_StartPos : function(ContentPos, Depth)
