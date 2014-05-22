@@ -202,9 +202,7 @@ ParaMath.prototype =
 
     CreateElem : function (oElem, oParent)
     {
-        oElem.relate(oParent);
-        
-
+		oElem.Parent = oParent;
 		var Pos = oParent.CurPos,
 				PosEnd = Pos + 1;
 		var items = new Array();
