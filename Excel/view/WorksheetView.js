@@ -5752,10 +5752,6 @@
 				};
 			}
 
-			var autoFilterInfo = this.autoFilters.checkCursor(x, y);
-			if (autoFilterInfo)
-				return {cursor: kCurAutoFilter, target: c_oTargetType.FilterObject, col: -1, row: -1, idFilter: autoFilterInfo.id};
-
 			offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
 			offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
 			if (this.topLeftFrozenCell) {
@@ -5775,6 +5771,13 @@
 			if (oFormulaOrChartCursor)
 				return oFormulaOrChartCursor;
 
+			var xWithOffset = x + offsetX;
+			var yWithOffset = y + offsetY;
+
+			var autoFilterInfo = this.autoFilters.checkCursor(xWithOffset, yWithOffset);
+			if (autoFilterInfo)
+				return {cursor: kCurAutoFilter, target: c_oTargetType.FilterObject, col: -1, row: -1, idFilter: autoFilterInfo.id};
+
 			isSelGraphicObject = this.objectRender.selectedGraphicObjectsExists();
 			if (!isViewerMode && !isSelGraphicObject) {
 				// Эпсилон для fillHandle
@@ -5787,8 +5790,6 @@
 				}
 
 				// Навели на выделение
-				var xWithOffset = x + offsetX;
-				var yWithOffset = y + offsetY;
 				if (this._isCursorOnSelectionBorder(ar, this.visibleRange, xWithOffset, yWithOffset))
 					return {cursor: kCurMove, target: c_oTargetType.MoveRange, col: -1, row: -1};
 			}
