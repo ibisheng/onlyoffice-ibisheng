@@ -1418,6 +1418,16 @@
 			this.countReplaceAll += this.countReplace;
 		};
 
+		asc_CFindOptions.prototype.asc_setFindWhat = function (val) {this.findWhat = val;};
+		asc_CFindOptions.prototype.asc_setScanByRows = function (val) {this.scanByRows = val;};
+		asc_CFindOptions.prototype.asc_setScanForward = function (val) {this.scanForward = val;};
+		asc_CFindOptions.prototype.asc_setIsMatchCase = function (val) {this.isMatchCase = val;};
+		asc_CFindOptions.prototype.asc_setIsWholeCell = function (val) {this.isWholeCell = val;};
+		asc_CFindOptions.prototype.asc_setScanOnOnlySheet = function (val) {this.scanOnOnlySheet = val;};
+		asc_CFindOptions.prototype.asc_setLookIn = function (val) {this.lookIn = val;};
+		asc_CFindOptions.prototype.asc_setReplaceWith = function (val) {this.replaceWith = val;};
+		asc_CFindOptions.prototype.asc_setIsReplaceAll = function (val) {this.isReplaceAll = val;};
+
 		/*
 		 * Export
 		 * -----------------------------------------------------------------------------
@@ -1560,6 +1570,15 @@
 		prot["asc_getMax"] = prot.asc_getMax;
 
 		window["Asc"]["asc_CFindOptions"] = window["Asc"].asc_CFindOptions = asc_CFindOptions;
-
+		prot = asc_CFindOptions.prototype;
+		prot["asc_setFindWhat"] = prot.asc_setFindWhat;
+		prot["asc_setScanByRows"] = prot.asc_setScanByRows;
+		prot["asc_setScanForward"] = prot.asc_setScanForward;
+		prot["asc_setIsMatchCase"] = prot.asc_setIsMatchCase;
+		prot["asc_setIsWholeCell"] = prot.asc_setIsWholeCell;
+		prot["asc_setScanOnOnlySheet"] = prot.asc_setScanOnOnlySheet;
+		prot["asc_setLookIn"] = prot.asc_setLookIn;
+		prot["asc_setReplaceWith"] = prot.asc_setReplaceWith;
+		prot["asc_setIsReplaceAll"] = prot.asc_setIsReplaceAll;
 }
 )(jQuery, window);
