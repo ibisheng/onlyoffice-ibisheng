@@ -799,7 +799,7 @@
         var docsCoApi = this;
 		// Server info
 		this._serverHost = serverHost;
-		this._serverPort = serverPort;
+		this._serverPort = serverPort ? serverPort : '';
 		this._serverPath = serverPath;
 		this.sockjs_url = this._url + '/doc/'+docid+'/c';
         this.sockjs = initSocksJs(this.sockjs_url, this);
