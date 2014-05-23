@@ -809,14 +809,13 @@ cAMORDEGRC.prototype.Calculate = function ( arg ) {
     cost = cost.getValue();
     salvage = salvage.getValue();
     period = period.getValue();
+    basis = basis.getValue();
 
-    if( cost < 0 || salvage < 0 || period < 0 || rate < 0 ){
+    if( cost < 0 || salvage < 0 || period < 0 || rate <= 0 || basis == 2 ){
         return this.value = new cError( cErrorType.not_numeric );
     }
 
-    var per = 1 / rate,
-        coeff;
-
+    var per = 1 / rate, coeff;
 
     if( cost == salvage || period > per ){
         return this.value = new cNumber( 0 );
@@ -833,13 +832,12 @@ cAMORDEGRC.prototype.Calculate = function ( arg ) {
 
     rate *= coeff;
 
-    var val0 = Date.prototype.getDateFromExcel( datePurch.getValue() );
-    var val1 = Date.prototype.getDateFromExcel( firstPer.getValue() );
+    var val0 = Date.prototype.getDateFromExcel( datePurch.getValue() ),
+        val1 = Date.prototype.getDateFromExcel( firstPer.getValue() );
 
-
-    var _rate = Math.round( yearFrac( val0, val1, basis.getValue() ) * rate * cost );
+    var _rate = Math.round( yearFrac( val0, val1, basis ) * rate * cost ), rest;
     cost -= _rate;
-    var rest = cost - salvage;
+    rest = cost - salvage;
 
     for ( var n = 0; n < period; n++ ) {
         _rate = Math.round( rate * cost );
