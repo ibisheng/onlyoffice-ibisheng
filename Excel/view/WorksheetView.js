@@ -6300,14 +6300,14 @@
 				// Мы должны отдавать в формате активной ячейки
 				var numFormat = range.getNumFormat();
 
-				oSelectionMathInfo.sum = numFormat.formatToMathInfo(sum, CellValueType.Number, this.mathMaxDigCount);
+				oSelectionMathInfo.sum = numFormat.formatToMathInfo(sum, CellValueType.Number, this.settings.mathMaxDigCount);
 				oSelectionMathInfo.average = numFormat.formatToMathInfo(sum / oSelectionMathInfo.countNumbers,
-					CellValueType.Number, this.mathMaxDigCount);
+					CellValueType.Number, this.settings.mathMaxDigCount);
 
 				oSelectionMathInfo.min = numFormat.formatToMathInfo(oSelectionMathInfo.min, CellValueType.Number,
-					this.mathMaxDigCount);
+					this.settings.mathMaxDigCount);
 				oSelectionMathInfo.max = numFormat.formatToMathInfo(oSelectionMathInfo.max, CellValueType.Number,
-					this.mathMaxDigCount);
+					this.settings.mathMaxDigCount);
 			}
 			return oSelectionMathInfo;
 		};
