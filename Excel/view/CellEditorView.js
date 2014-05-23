@@ -1880,7 +1880,19 @@
 			//t.setFocus(true);
 			t.isUpdateValue = false;
 
-			t._addChars(String.fromCharCode(event.which));
+			var tmpCursorPos;
+			var newChar = String.fromCharCode(event.which);
+			t._addChars(newChar);
+			// При первом быстром вводе стоит добавить в конце проценты (для процентного формата и только для числа)
+			if (t.options.isAddPersentFormat && isNumber(newChar)) {
+				t.options.isAddPersentFormat = false;
+				tmpCursorPos = t.cursorPos;
+				t.undoMode = true;
+				t._addChars("%");
+				t.cursorPos = tmpCursorPos;
+				t.undoMode = false;
+				t._updateCursorPosition();
+			}
 			if (t.textRender.getEndOfText() === t.cursorPos && !t.isFormula()) {
 				var s = t._getFragmentsText(t.options.fragments);
 				if (!isNumber(s)) {
@@ -1888,7 +1900,7 @@
 					var lengthInput = s.length;
 					if (1 === arrAutoComplete.length) {
 						var newValue = arrAutoComplete[0];
-						var tmpCursorPos = t.cursorPos;
+						tmpCursorPos = t.cursorPos;
 						t._addChars(newValue.substring(lengthInput));
 						t.selectionBegin = tmpCursorPos;
 						t._selectChars(kEndOfText);

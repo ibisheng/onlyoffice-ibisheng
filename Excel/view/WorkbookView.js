@@ -941,11 +941,12 @@
 
 				// При dbl клике фокус выставляем в зависимости от наличия текста в ячейке
 				this._onEditCell (x, y, /*isCoord*/true, /*isFocus*/undefined, /*isClearCell*/undefined,
-					/*isHideCursor*/isHideCursor);
+					/*isHideCursor*/isHideCursor, /*isQuickInput*/false);
 			}
 		};
 
-		WorkbookView.prototype._onEditCell = function (x, y, isCoord, isFocus, isClearCell, isHideCursor, callback, event) {
+		WorkbookView.prototype._onEditCell = function (x, y, isCoord, isFocus, isClearCell, isHideCursor,
+													   isQuickInput, callback, event) {
 			var t = this;
 
 			// Проверка глобального лока
@@ -961,7 +962,7 @@
 				ws.setCellEditMode(true);
 				if (!ws.openCellEditor(t.cellEditor, x, y, isCoord, /*fragments*/undefined,
 					/*cursorPos*/undefined, isFocus, isClearCell,
-					/*isHideCursor*/isHideCursor, /*activeRange*/arn)) {
+					/*isHideCursor*/isHideCursor, /*isQuickInput*/isQuickInput, /*activeRange*/arn)) {
 					t.controller.setCellEditMode(false);
 					t.controller.setStrictClose(false);
 					t.controller.setFormulaEditMode(false);

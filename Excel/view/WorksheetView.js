@@ -10305,7 +10305,7 @@
 		};
 
 		WorksheetView.prototype.openCellEditor = function (editor, x, y, isCoord, fragments, cursorPos,
-														   isFocus, isClearCell, isHideCursor, activeRange) {
+														   isFocus, isClearCell, isHideCursor, isQuickInput, activeRange) {
 			var t = this, vr = t.visibleRange.clone(), tc = t.cols, tr = t.rows, col, row, c, fl, mc, bg, isMerged;
 			var offsetX = 0, offsetY = 0;
 			var ar = t.activeRange;
@@ -10469,6 +10469,8 @@
 				focus: isFocus,
 				isClearCell: isClearCell,
 				isHideCursor: isHideCursor,
+				isQuickInput: isQuickInput,
+				isAddPersentFormat: isQuickInput && c_oAscNumFormatType.Percent === c.getNumFormat().getType(),
 				autoComplete: arrAutoComplete,
 				autoCompleteLC: arrAutoCompleteLC,
 				saveValueCallback: function (val, flags, skipNLCheck) {
@@ -10494,8 +10496,9 @@
 			copyValue = [];
 			copyValue[0] = new Fragment({text: text, format: v[0].format.clone()});
 
-			var bSuccess = t.openCellEditor(editor, 0, 0, /*isCoord*/false, /*fragments*/undefined, /*cursorPos*/undefined, isFocus, /*isClearCell*/true,
-				/*isHideCursor*/false, activeRange);
+			var bSuccess = t.openCellEditor(editor, 0, 0, /*isCoord*/false, /*fragments*/undefined,
+				/*cursorPos*/undefined, isFocus, /*isClearCell*/true, /*isHideCursor*/false,
+				/*isQuickInput*/false, activeRange);
 			if (bSuccess) {
 				editor.paste(copyValue, cursorPos);
 			}
