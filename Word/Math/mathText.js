@@ -426,12 +426,12 @@ CMathText.prototype =
         // Long : value
 
         Writer.WriteLong( this.Type );
-        Writer.WriteString2( this.value );
+        Writer.WriteLong( this.value );
     },
 
     Read_FromBinary : function(Reader)
     {
-        this.value      = Reader.GetString2();
+        this.value      = Reader.GetLong();
     }
 
 }
