@@ -502,7 +502,7 @@ CDegree.prototype.Write_ToBinary2 = function( Writer )
 	Writer.WriteString2( this.elements[0][0].Id );
 	Writer.WriteString2( this.elements[0][1].Id );
 	
-	this.ctrlPr.Write_ToBinary(Writer);
+	this.CtrPrp.Write_ToBinary(Writer);
 	Writer.WriteLong( this.type );
 	
 }
@@ -511,15 +511,11 @@ CDegree.prototype.Read_FromBinary2 = function( Reader )
 	var Element = g_oTableId.Get_ById( Reader.GetString2() );
 	Element.Parent = this;
 	this.elements[0][0] = Element;
-	if (Element.content.length == 0)
-		this.fillPlaceholders();
-		
+
 	var Element1 = g_oTableId.Get_ById( Reader.GetString2() );
 	Element1.Parent = this;
 	this.elements[0][1] = Element1;
-	if (Element1.content.length == 0)
-		this.fillPlaceholders();
-	
+
 	this.CtrPrp.Read_FromBinary(Reader);
 	this.type = Reader.GetLong();
 }
@@ -681,14 +677,11 @@ CIterators.prototype.Read_FromBinary2 = function( Reader )
 	var Element = g_oTableId.Get_ById( Reader.GetString2() );
 	Element.Parent = this;
 	this.elements[0][0] = Element;
-	if (Element.content.length == 0)
-		this.fillPlaceholders();
-	
+
 	var Element1 = g_oTableId.Get_ById( Reader.GetString2() );
 	Element1.Parent = this;
 	this.elements[1][0] = Element1;
-	if (Element1.content.length == 0)
-		this.fillPlaceholders();
+
 }
 CIterators.prototype.Get_Id = function()
 {
@@ -1200,7 +1193,7 @@ CDegreeSubSup.prototype.Write_ToBinary2 = function( Writer )
 	Writer.WriteString2( this.elements[0][0].Id );
 	Writer.WriteString2( this.elements[0][1].Id );
 	
-	this.ctrlPr.Write_ToBinary(Writer);
+	this.CtrPrp.Write_ToBinary(Writer);
 	Writer.WriteLong( this.type );
 	if ( this.type == DEGREE_SubSup )
 	{
@@ -1223,15 +1216,11 @@ CDegreeSubSup.prototype.Read_FromBinary2 = function( Reader )
 	var Element = g_oTableId.Get_ById( Reader.GetString2() );
 	Element.Parent = this;
 	this.elements[0][0] = Element;
-	if (Element.content.length == 0)
-		this.fillPlaceholders();
-	
+
 	var Element1 = g_oTableId.Get_ById( Reader.GetString2() );
 	Element1.Parent = this;
 	this.elements[0][1] = Element1;
-	if (Element1.content.length == 0)
-		this.fillPlaceholders();
-		
+	
 	this.CtrPrp.Read_FromBinary(Reader);
 	this.type = Reader.GetLong();	
 	if ( this.type == DEGREE_SubSup )

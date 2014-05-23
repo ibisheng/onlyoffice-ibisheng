@@ -3848,7 +3848,7 @@ CDelimiter.prototype.Write_ToBinary2 = function( Writer )
 	Writer.WriteLong( historyitem_type_delimiter );
 	Writer.WriteString2( this.elements[0][0].Id );
 	
-	this.ctrlPr.Write_ToBinary(Writer);
+	this.CtrPrp.Write_ToBinary(Writer);
 	
 	var StartPos = Writer.GetCurPosition();
     Writer.Skip(4);
@@ -3888,10 +3888,8 @@ CDelimiter.prototype.Read_FromBinary2 = function( Reader )
 	var Element = g_oTableId.Get_ById( Reader.GetString2() );
 	Element.Parent = this;
 	this.elements[0][0] = Element;
-	if (Element.content.length == 0)
-		this.fillPlaceholders();
-	
-	this.ctrlPr.Read_FromBinary(Reader);
+
+	this.CtrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();
 	if ( Flags & 1 )
@@ -4351,9 +4349,7 @@ CGroupCharacter.prototype.Read_FromBinary2 = function( Reader )
 	var Element = g_oTableId.Get_ById( Reader.GetString2() );
 	Element.Parent = this;
 	this.elements[0][0] = Element;
-	if (Element.content.length == 0)
-		this.fillPlaceholders();
-		
+	
 	this.CtrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();

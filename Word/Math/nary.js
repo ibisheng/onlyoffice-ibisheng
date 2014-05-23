@@ -273,7 +273,7 @@ CNary.prototype.Write_ToBinary2 = function( Writer )
 	Writer.WriteString2( this.elements[0][0].Id );
 	Writer.WriteString2( this.elements[0][1].Id );
 	
-	this.ctrlPr.Write_ToBinary(Writer);
+	this.CtrPrp.Write_ToBinary(Writer);
 	
 	var StartPos = Writer.GetCurPosition();
     Writer.Skip(4);
@@ -312,10 +312,8 @@ CNary.prototype.Read_FromBinary2 = function( Reader )
 	var Element1 = g_oTableId.Get_ById( Reader.GetString2() );
 	Element1.Parent = this;
 	this.elements[0][1] = Element1;
-	if (Element1.content.length == 0)
-		this.fillPlaceholders();
-	
-	this.ctrlPr.Read_FromBinary(Reader);
+
+	this.CtrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();
 	if ( Flags & 1 )

@@ -7745,8 +7745,11 @@ Paragraph.prototype =
                     if ( null !== NewElement )
                         this.Internal_Content_Add( CurPos + 1, NewElement );
 
+					var Elem = new ParaMath();
+					//Elem.Set_Paragraph(this);
+					Elem.Root.Load_FromMenu(Item.Menu, this);
                     // Добавляем гиперссылку в содержимое параграфа
-                    this.Internal_Content_Add( CurPos + 1, Item );
+                    this.Internal_Content_Add( CurPos + 1, Elem );
 
                     // TODO: ParaMath Сделать перемещение курсора в формулу
 

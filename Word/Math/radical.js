@@ -1240,7 +1240,7 @@ CRadical.prototype.Write_ToBinary2 = function( Writer )
 	for(var i=0; i<len; i++)	
 		Writer.WriteString2( this.elements[0][i].Id );
 	
-	this.ctrlPr.Write_ToBinary(Writer);
+	this.CtrPrp.Write_ToBinary(Writer);
 	
 	var StartPos = Writer.GetCurPosition();
     Writer.Skip(4);
@@ -1263,8 +1263,6 @@ CRadical.prototype.Read_FromBinary2 = function( Reader )
 		var Element = g_oTableId.Get_ById( Reader.GetString2() );
 		Element.Parent = this;
 		this.elements[0][i] = Element;
-		if (Element.content.length == 0)
-			this.fillPlaceholders();
 	}
 	
 	this.CtrPrp.Read_FromBinary(Reader);

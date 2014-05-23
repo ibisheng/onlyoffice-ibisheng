@@ -492,15 +492,11 @@ CFraction.prototype.Read_FromBinary2 = function( Reader )
 	var Element = g_oTableId.Get_ById( Reader.GetString2() );
 	Element.Parent = this.elements[0][0];
 	this.elements[0][0].elements[0][0] = Element;
-	if (Element.content.length == 0)
-		this.elements[0][0].fillPlaceholders();
-		
+	
 	var Element1 = g_oTableId.Get_ById( Reader.GetString2() );
 	Element1.Parent = this.elements[1][0];
 	this.elements[1][0].elements[0][0] = Element1;
-	if (Element1.content.length == 0)
-		this.elements[1][0].fillPlaceholders();
-	
+
 	this.CtrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();

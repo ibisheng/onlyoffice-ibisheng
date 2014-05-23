@@ -420,8 +420,19 @@ CMathText.prototype =
     {},
     setReferenceComposition: function() // заглушка
     {},
-    Write_ToBinary: function()
-    {}
+    Write_ToBinary : function(Writer)
+    {
+        // Long : Type
+        // Long : value
+
+        Writer.WriteLong( this.Type );
+        Writer.WriteString2( this.value );
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        this.value      = Reader.GetString2();
+    }
 
 }
 

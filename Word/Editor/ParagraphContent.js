@@ -8232,6 +8232,7 @@ function ParagraphContent_Read_FromBinary(Reader)
         case para_CommentStart      : Element = new ParaCommentStart();      break;
         case para_CommentEnd        : Element = new ParaCommentEnd();        break;
         case para_PresentationNumbering : Element = new ParaPresentationNumbering(); break;
+		case para_Math_Text			: Element = new CMathText();      		 break;
     }
 
     if ( null != Element )

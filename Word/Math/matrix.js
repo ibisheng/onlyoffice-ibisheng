@@ -522,7 +522,7 @@ CMathMatrix.prototype.Write_ToBinary2 = function( Writer )
 		for(var j=0; j<this.nCol; j++)
 			Writer.WriteString2( this.elements[i][j].Id );
 	
-	this.ctrlPr.Write_ToBinary(Writer);
+	this.CtrPrp.Write_ToBinary(Writer);
 	
 	var StartPos = Writer.GetCurPosition();
     Writer.Skip(4);
@@ -585,8 +585,6 @@ CMathMatrix.prototype.Read_FromBinary2 = function( Reader )
 			Element.Parent = this;
 			this.elements[i][j] = new Array();
 			this.elements[i][j] = Element;
-			if (Element.content.length == 0)
-				this.fillPlaceholders();
 		}
 	}
 	
@@ -718,7 +716,7 @@ CEqArray.prototype.Write_ToBinary2 = function( Writer )
 	for(var i=0; i<row; i++)
 		Writer.WriteString2( this.elements[i][0].Id );
 	
-	this.ctrlPr.Write_ToBinary(Writer);
+	this.CtrPrp.Write_ToBinary(Writer);
 	
 	var StartPos = Writer.GetCurPosition();
     Writer.Skip(4);
@@ -762,11 +760,9 @@ CEqArray.prototype.Read_FromBinary2 = function( Reader )
 		Element.Parent = this;
 		this.elements[i] = new Array();
 		this.elements[i][0] = Element;
-		if (Element.content.length == 0)
-			this.fillPlaceholders();
 	}
 	
-	this.ctrlPr.Read_FromBinary(Reader);
+	this.CtrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();
 	if ( Flags & 1 )

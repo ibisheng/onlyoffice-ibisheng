@@ -2,7 +2,12 @@
  * Created by Ilja.Kirillov on 18.03.14.
  */
 var g_oMathSettings = new Object();
-function ParaMath(bAddMenu)
+function MathMenu (type)
+{
+	this.Type = para_Math;
+	this.Menu = type;
+}
+function ParaMath()
 {
     this.Id = g_oIdCounter.Get_NewId();
     this.Type  = para_Math;
@@ -55,8 +60,7 @@ function ParaMath(bAddMenu)
     };
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
-    if (!bAddMenu)		
-		g_oTableId.Add( this, this.Id );
+	g_oTableId.Add( this, this.Id );
 }
 
 ParaMath.prototype =
@@ -155,7 +159,7 @@ ParaMath.prototype =
 			
 			History.Create_NewPoint();
 			
-			var oMRun = new ParaRun(null, true);
+			var oMRun = new ParaRun(this.Paragraph, true);
 			oMRun.Pr = oStartContent.Pr;
 
             for (i=nPosStart; i<nLenStart; i++)
@@ -163,116 +167,22 @@ ParaMath.prototype =
 				var Pos = oMRun.Content.length;
 				var EndPos = Pos + 1;
 				var oItem = oStartContent.Content[i];
-				History.Add( oMRun, { Type : historyitem_ParaRun_AddItem, Pos : Pos, EndPos : EndPos, Items : [ oItem ] } );
-				oMRun.Content.push(Item);
+				oMRun.Add(oItem);
 				oStartContent.Remove_FromContent(i, 1, false);
 			}
+
+			oContent.Content.Load_FromMenu(Item.Menu, this.Paragraph);
+
+			var items = new Array();
+			oContent.Content.addElementToContent(oMRun);
+			items.push(oMRun);
+			var Pos = oContent.Content.CurPos,
+				PosEnd = Pos + 1;
+			History.Add(oContent.Content, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
 			
-			//Item.Math.AddToComposition(Item.Math.Root);
-			var oNewContent = Item.Root.content;
-			for(var i = 0; i < oNewContent.length; i++)
-				oContent.Content.content.push(oNewContent[i]);
-
-			oContent.Content.content.push(oMRun);
-
 			oContent.Content.SetRunEmptyToContent(false);
 		}
 	},
-
-    AddText : function(oElem, sText)
-    {		
-        if(sText)
-        {			
-            var MathRun = new ParaRun(this.Paragraph, true);
-			
-			var Pos = oElem.CurPos,
-				PosEnd = Pos + 1;
-			var items = new Array();
-            for (var Pos=0; Pos < sText.length; Pos++)
-            {
-                var oText = new CMathText(false);
-                oText.addTxt(sText[Pos]);				
-                MathRun.Content.splice( Pos, 0, oText );
-				items.push(oText);
-            }
-            oElem.addElementToContent(MathRun);
-			History.Add(oElem, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
-        }        
-    },
-
-    CreateElem : function (oElem, oParent)
-    {
-		oElem.Parent = oParent;
-		var Pos = oParent.CurPos,
-				PosEnd = Pos + 1;
-		var items = new Array();
-		
-        if (oParent)
-		{
-            oParent.addElementToContent(oElem);
-			items.push(oElem);
-			History.Add(oParent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
-		}
-
-    },
-
-    CreateFraction : function (oFraction,oParentElem,sNumText,sDenText)
-    {
-        this.CreateElem(oFraction, oParentElem);
-
-        var oElemDen = oFraction.getDenominator();		
-        this.AddText(oElemDen, sDenText);
-
-        var oElemNum = oFraction.getNumerator();
-        this.AddText(oElemNum, sNumText);
-    },
-
-    CreateDegree : function (oDegree, oParentElem,sBaseText,sSupText,sSubText)
-    {
-        this.CreateElem(oDegree, oParentElem);
-
-        var oElem = oDegree.getBase();
-        this.AddText(oElem, sBaseText);
-
-        var oSup = oDegree.getUpperIterator();
-        this.AddText(oSup, sSupText);
-
-        var oSub = oDegree.getLowerIterator();
-        this.AddText(oSub, sSubText);
-    },
-
-    CreateRadical : function (oRad,oParentElem,sElemText,sDegText)
-    {
-        this.CreateElem(oRad, oParentElem);
-
-        var oElem = oRad.getBase();
-        this.AddText(oElem, sElemText);
-
-        var oDeg = oRad.getDegree();
-        this.AddText(oDeg, sDegText);
-    },
-
-    CreateNary : function (oNary,oParentElem,sElemText,sSubText,sSupText)
-    {
-        this.CreateElem(oNary, oParentElem);
-
-        var oElem = oNary.getBase();
-        this.AddText(oElem, sElemText);
-
-        var oSub = oNary.getLowerIterator();
-        this.AddText(oSub, sSubText);
-
-        var oSup = oNary.getUpperIterator();
-        this.AddText(oSup, sSupText);
-    },
-
-    CreateBox : function (oBox,oParentElem,sElemText)
-    {
-        this.CreateElem(oBox, oParentElem);
-
-        var oElem = oBox.getBase();
-        this.AddText(oElem, sElemText);
-    },
 
     Remove : function(Direction, bOnAddText)
     {

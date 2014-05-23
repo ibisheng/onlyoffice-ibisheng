@@ -319,7 +319,7 @@ CBorderBox.prototype.Write_ToBinary2 = function( Writer )
 	Writer.WriteLong( historyitem_type_borderBox );
 	Writer.WriteString2( this.elements[0][0].Id );
 	
-	this.ctrlPr.Write_ToBinary(Writer);
+	this.CtrPrp.Write_ToBinary(Writer);
 	
 	var StartPos = Writer.GetCurPosition();
     Writer.Skip(4);
@@ -374,10 +374,8 @@ CBorderBox.prototype.Read_FromBinary2 = function( Reader )
 	var Element = g_oTableId.Get_ById( Reader.GetString2() );
 	Element.Parent = this;
 	this.elements[0][0] = Element;
-	if (Element.content.length == 0)
-		this.fillPlaceholders();
 		
-	this.ctrlPr.Read_FromBinary(Reader);
+	this.CtrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();
 	if ( Flags & 1 )
@@ -478,7 +476,7 @@ CBox.prototype.Write_ToBinary2 = function( Writer )
 	Writer.WriteLong( historyitem_type_box );
 	Writer.WriteString2( this.elements[0][0].Id );
 	
-	this.ctrlPr.Write_ToBinary(Writer);
+	this.CtrPrp.Write_ToBinary(Writer);
 	
 	var StartPos = Writer.GetCurPosition();
     Writer.Skip(4);
@@ -518,10 +516,8 @@ CBox.prototype.Read_FromBinary2 = function( Reader )
 	var Element = g_oTableId.Get_ById( Reader.GetString2() );
 	Element.Parent = this;
 	this.elements[0][0] = Element;
-	if (Element.content.length == 0)
-		this.fillPlaceholders();
-		
-	this.ctrlPr.Read_FromBinary(Reader);
+
+	this.CtrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();
 	if ( Flags & 1 )
@@ -624,7 +620,7 @@ CBar.prototype.Write_ToBinary2 = function( Writer )
 	Writer.WriteLong( historyitem_type_bar );
 	Writer.WriteString2( this.elements[0][0].Id );	
 	
-	this.ctrlPr.Write_ToBinary(Writer);
+	this.CtrPrp.Write_ToBinary(Writer);
 	
 	var StartPos = Writer.GetCurPosition();
     Writer.Skip(4);
@@ -645,10 +641,8 @@ CBar.prototype.Read_FromBinary2 = function( Reader )
 	var Element = g_oTableId.Get_ById( Reader.GetString2() );
 	Element.Parent = this;
 	this.elements[0][0] = Element;
-	if (Element.content.length == 0)
-		this.fillPlaceholders();		
-	
-	this.ctrlPr.Read_FromBinary(Reader);
+
+	this.CtrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();
 	if ( Flags & 1 )
@@ -702,7 +696,7 @@ CPhantom.prototype.Write_ToBinary2 = function( Writer )
 	Writer.WriteLong( historyitem_type_phant );
 	Writer.WriteString2( this.elements[0][0].Id );
 	
-	this.ctrlPr.Write_ToBinary(Writer);
+	this.CtrPrp.Write_ToBinary(Writer);
 	
 	var StartPos = Writer.GetCurPosition();
     Writer.Skip(4);
@@ -742,10 +736,8 @@ CPhantom.prototype.Read_FromBinary2 = function( Reader )
 	var Element = g_oTableId.Get_ById( Reader.GetString2() );
 	Element.Parent = this;
 	this.elements[0][0] = Element;
-	if (Element.content.length == 0)
-		this.fillPlaceholders();
 		
-	this.ctrlPr.Read_FromBinary(Reader);
+	this.CtrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();
 	if ( Flags & 1 )

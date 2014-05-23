@@ -1762,9 +1762,7 @@ CAccent.prototype.Read_FromBinary2 = function( Reader )
 	var Element = g_oTableId.Get_ById( Reader.GetString2() );
 	Element.Parent = this;
 	this.elements[0][0] = Element;
-	if (Element.content.length == 0)
-		this.fillPlaceholders();
-		
+
 	this.CtrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();
