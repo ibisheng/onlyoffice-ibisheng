@@ -5103,16 +5103,17 @@ CMathContent.prototype =
             {
                 if(!this.bRoot)
                 {
-                    /*var oWPrp = this.Parent.getCtrPrp();
+                    var oWPrp = this.Parent.Get_CtrPrp();
 
                     //this.applyArgSize(oWPrp);
-                    this.ParaMath.ApplyArgSize(oWPrp);*/
+                    this.ParaMath.ApplyArgSize(oWPrp, this.argSize);
+                    oWPrp.Italic = false;
 
 
-                    var ctrPrp = this.Parent.Get_CompiledCtrPrp();
-                    ctrPrp.Italic = false;
+                    /*var ctrPrp = this.Parent.Get_CompiledCtrPrp();
+                    ctrPrp.Italic = false;*/
 
-                    oMeasure.SetFont(ctrPrp);
+                    oMeasure.SetFont(oWPrp);
 
                     this.content[pos].Resize(this, oMeasure);
                 }
@@ -5232,6 +5233,7 @@ CMathContent.prototype =
                     oWPrp.Merge(mgWPrp);
 
                     //this.applyArgSize(oWPrp);
+
                     this.ParaMath.ApplyArgSize(oWPrp, this.argSize);
 
                     pGraphics.SetFont(oWPrp);
@@ -5240,18 +5242,18 @@ CMathContent.prototype =
                 {
                     pGraphics.b_color1(0,0,0,255);
 
-                    /*var oWPrp = this.Parent.getCtrPrp();
+                    var oWPrp = this.Parent.Get_CtrPrp();
 
                     //this.applyArgSize(oWPrp);
-                    this.ParaMath.ApplyArgSize(oWPrp);
+                    this.ParaMath.ApplyArgSize(oWPrp, this.argSize);
 
                     oWPrp.Italic = false;
-                    pGraphics.SetFont(oWPrp);*/
+                    pGraphics.SetFont(oWPrp);
 
-                    var ctrPrp = this.Parent.Get_CompiledCtrPrp();
-                    ctrPrp.Italic = false;
+                    //var ctrPrp = this.Parent.Get_CompiledCtrPrp();
+                    //ctrPrp.Italic = false;
 
-                    pGraphics.SetFont(ctrPrp);
+                    pGraphics.SetFont(oWPrp);
 
                     this.content[i].draw(x, y, pGraphics);
                 }
