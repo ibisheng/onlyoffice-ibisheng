@@ -9,19 +9,26 @@ function CFraction(props)
     CMathBase.call(this);
 
     this.init(props);
-    this.setCtrPrp(props.ctrPrp);
+
 	g_oTableId.Add( this, this.Id );
 }
 extend(CFraction, CMathBase);
 CFraction.prototype.init = function(props)
 {
-    var bValid = typeof(props.type) !== "undefined" && props.type !== null;
+    this.setType(props.type);
+
+    if(props.ctrPrp !== null && typeof(props.ctrPrp) !== "undefined")
+        this.setCtrPrp(props.ctrPrp);
+}
+CFraction.prototype.setType = function(type)
+{
+    var bValid = typeof(type) !== "undefined" && type !== null;
 
     if(bValid)
     {
-        var bBar = props.type === BAR_FRACTION || props.type === NO_BAR_FRACTION,
-            bSkew = props.type === SKEWED_FRACTION,
-            bLin = props.type === LINEAR_FRACTION;
+        var bBar = type === BAR_FRACTION || type === NO_BAR_FRACTION,
+            bSkew = type === SKEWED_FRACTION,
+            bLin = type === LINEAR_FRACTION;
 
         if(bBar || bSkew || bLin) // на всякий случай
             this.type = props.type;
@@ -30,10 +37,8 @@ CFraction.prototype.init = function(props)
     if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
     {
         var num = new CNumerator();
-        //num.init();
 
         var den = new CDenominator();
-        //den.init();
 
         this.setDimension(2, 1);
 
@@ -52,9 +57,6 @@ CFraction.prototype.init = function(props)
         this.setDimension(1, 2);
         this.setContent();
     }
-
-    /// вызов этой функции обязательно в конце
-   // this.WriteContentsToHistory();
 }
 CFraction.prototype.getType = function()
 {

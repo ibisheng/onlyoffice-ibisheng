@@ -5,39 +5,39 @@ function CBorderBox(props)
 
     this.gapBrd = 0;
 
-    this.bLeft = true;
+    /*this.bLeft = true;
     this.bRight = true;
     this.bTop = true;
     this.bBot = true;
-
-    /*this.bLeft = false;
-    this.bRight = false;
-    this.bTop = true;
-    this.bBot = false;*/
-
 
     this.bLDiag = false;
     this.bRDiag = false;
 
     this.bHor = false;
-    this.bVert = false;
+    this.bVert = false;*/
 
-    /*this.bLDiag = true;
-    this.bRDiag = true;*/
-
-    /*this.bHor = true;
-    this.bVert = true;*/
+    this.Pr =
+    {
+        hideLeft:       false,
+        hideRight:      false,
+        hideTop:        false,
+        hideBot:        false,
+        strikeBLTR:     true,
+        strikeTLBR:     true,
+        strikeH:        true,
+        strikeV:        true
+    };
 
     CMathBase.call(this);
 
     this.init(props);
     this.setCtrPrp(props.ctrPrp);
-	g_oTableId.Add( this, this.Id );
+	g_oTableId.Add(this, this.Id);
 }
 extend(CBorderBox, CMathBase);
 CBorderBox.prototype.init = function(props)
 {
-    if(typeof(props) !== "undefined" && props !== null)
+    /*if(typeof(props) !== "undefined" && props !== null)
     {
         if(props.hideLeft === true || props.hideLeft === 1)
             this.bLeft = false;
@@ -59,13 +59,42 @@ CBorderBox.prototype.init = function(props)
 
         if(props.strikeV === true || props.strikeV === 1)
             this.bVert = true;
+    }*/
+
+    this.setBorders(props);
+this.setDimension(1, 1);
+    this.setContent();
+}
+CBorderBox.prototype.setBorders = function(props)
+{
+    if(typeof(props) !== "undefined" && props !== null)
+    {
+        if(typeof(this.Pr.hideLeft) !== "undefined" && this.Pr.hideLeft !== null)
+            this.Pr.hideLeft = props.hideLeft;
+
+        if(typeof(this.Pr.hideRight) !== "undefined" && this.Pr.hideRight !== null)
+            this.Pr.hideRight = props.hideRight;
+
+        if(typeof(this.Pr.hideTop) !== "undefined" && this.Pr.hideTop !== null)
+            this.Pr.hideTop = props.hideTop;
+
+        if(typeof(this.Pr.hideBot) !== "undefined" && this.Pr.hideBot !== null)
+            this.Pr.hideBot = props.hideBot;
+
+        if(typeof(this.Pr.strikeBLTR) !== "undefined" && this.Pr.strikeBLTR !== null) // right diagonal
+            this.Pr.strikeBLTR = props.strikeBLTR;
+
+        if(typeof(this.Pr.strikeTLBR) !== "undefined" && this.Pr.strikeTLBR !== null) // left diagonal
+            this.Pr.strikeTLBR = props.strikeTLBR;
+
+        if(typeof(this.Pr.strikeH) !== "undefined" && this.Pr.strikeH !== null)
+            this.Pr.strikeH = props.strikeH;
+
+        if(typeof(this.Pr.strikeV) !== "undefined" && this.Pr.strikeV !== null)
+            this.Pr.strikeV = props.strikeV;
     }
 
-    this.setDimension(1, 1);
-    this.setContent();
-
-    /// вызов этой функции обязательно в конце
-    //this.WriteContentsToHistory();
+    this.RecalcInfo.bProps = true;
 }
 CBorderBox.prototype.recalculateSize = function()
 {
@@ -77,17 +106,17 @@ CBorderBox.prototype.recalculateSize = function()
 
     this.gapBrd = this.Get_CompiledCtrPrp().FontSize*0.08104587131076388;
 
-    if(this.bTop)
+    if(this.Pr.hideTop == false)
     {
         height += this.gapBrd;
         ascent += this.gapBrd;
     }
-    if(this.bBot)
+    if(this.Pr.hideBot == false)
         height += this.gapBrd;
 
-    if(this.bLeft)
+    if(this.Pr.hideLeft == false)
         width += this.gapBrd;
-    if(this.bRight)
+    if(this.Pr.hideRight == false)
         width += this.gapBrd;
 
     width += this.GapLeft + this.GapRight;
@@ -100,7 +129,7 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
     //var penW = this.Get_CompiledCtrPrp().FontSize* 25.4/72 * 0.06 ;
     var penW = this.Get_CompiledCtrPrp().FontSize*0.02;
 
-    if(this.bTop)
+    if(this.Pr.hideTop == false)
     {
         var x1 = this.pos.x + x,
             x2 = this.pos.x + x + this.size.width - penW/2,
@@ -116,7 +145,7 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
         pGraphics.drawHorLine(0, y1 + penW, x1 + 2*25.4/96, x2 , 25.4/96);*/
     }
 
-    if(this.bBot)
+    if(this.Pr.hideBot == false)
     {
         var x1 = this.pos.x + x,
             x2 = this.pos.x + x + this.size.width - penW/2,
@@ -126,7 +155,7 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
             pGraphics.drawHorLine(0, y1, x1, x2, penW);
     }
 
-    if(this.bLeft)
+    if(this.Pr.hideLeft == false)
     {
         var x1 = this.pos.x + x,
             y1 = this.pos.y + y,
@@ -136,7 +165,7 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
         pGraphics.drawVerLine(0, x1, y1, y2, penW);
     }
 
-    if(this.bRight)
+    if(this.Pr.hideRight == false)
     {
         var x1 = this.pos.x + x + this.size.width - penW/2,
             y1 = this.pos.y + y,
@@ -146,7 +175,7 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
         pGraphics.drawVerLine(0, x1, y1, y2, penW);
     }
 
-    if(this.bLDiag)
+    if(this.Pr.strikeTLBR)  // left diagonal
     {
         var pW = penW*0.8;
         var x1 = this.pos.x + x , y1 = this.pos.y + y,
@@ -172,7 +201,7 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
 
     }
 
-    if(this.bRDiag)
+    if(this.Pr.strikeBLTR) // right diagonal
     {
         var pW = penW*0.8;
         var x1 = this.pos.x + x + this.size.width - pW - penW, y1 = this.pos.y + y,
@@ -225,9 +254,9 @@ CBorderBox.prototype.setPosition = function(pos)
 
     var x = this.pos.x + this.GapLeft, y = this.pos.y;
 
-    if(this.bLeft)
+    if(this.Pr.hideLeft == false)
         x += this.gapBrd;
-    if(this.bTop)
+    if(this.Pr.hideTop == false)
         y += this.gapBrd;
 
     this.elements[0][0].setPosition({x : x, y: y});
@@ -240,9 +269,9 @@ CBorderBox.prototype.findDisposition = function(mCoord)
 
     var shX = 0, shY = 0;
 
-    if(this.bLeft)
+    if(this.Pr.hideLeft == false)
         shX = this.gapBrd;
-    if(this.bTop)
+    if(this.Pr.hideTop == false)
         shY = this.gapBrd;
 
     var sCont = this.elements[0][0].size;
@@ -290,7 +319,7 @@ CBorderBox.prototype.getBase = function()
 }
 CBorderBox.prototype.getPropsForWrite = function()
 {
-    var props = {};
+    /*var props = {};
 
     props.hideLeft  = !this.bLeft;
     props.hideRight = !this.bRight;
@@ -302,7 +331,9 @@ CBorderBox.prototype.getPropsForWrite = function()
     props.strikeH    = this.bHor;
     props.strikeV    = this.bVert;
 
-    return props;
+    return props;*/
+
+    return this.Pr;
 }
 CBorderBox.prototype.Save_Changes = function(Data, Writer)
 {
@@ -414,7 +445,7 @@ function CBox(props)
     CMathBase.call(this);
 
     this.init(props);
-    this.setCtrPrp(props.ctrPrp);
+
 	g_oTableId.Add( this, this.Id );
 }
 extend(CBox, CMathBase);
@@ -441,8 +472,8 @@ CBox.prototype.init = function(props)
     if(this.opEmu)
         this.elements[0][0].decreaseArgSize();
 
-    /// вызов этой функции обязательно в конце
-    //this.WriteContentsToHistory();
+    if(props.ctrPrp !== null && typeof(props.ctrPrp) !== "undefined")
+        this.setCtrPrp(props.ctrPrp);
 }
 CBox.prototype.getBase = function()
 {
@@ -541,69 +572,76 @@ function CBar(props)
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_BAR;
 
-    this.loc = LOCATION_BOT;
+    this.Pr =
+    {
+        pos: LOCATION_BOT
+    };
+
+    //this.loc = LOCATION_BOT;
     this.operator = new COperator(OPER_BAR);
 
     CCharacter.call(this);
 
     this.init(props);
-    this.setCtrPrp(props.ctrPrp);
+
 	g_oTableId.Add( this, this.Id );
 }
 extend(CBar, CCharacter);
 CBar.prototype.init = function(props)
 {
     if(props.pos === LOCATION_TOP || props.location === LOCATION_TOP)
-        this.loc = LOCATION_TOP;
+        this.Pr.pos = LOCATION_TOP;
     else if(props.pos === LOCATION_BOT || props.location === LOCATION_BOT)
-        this.loc = LOCATION_BOT;
+        this.Pr.pos = LOCATION_BOT;
 
-    /*var glyph = new COperatorLine();
-    var props =
+    if(props.ctrPrp !== null && typeof(props.ctrPrp) !== "undefined")
+        this.setCtrPrp(props.ctrPrp);
+}
+CBar.prototype.setLocation = function(pos)
+{
+    this.Pr.pos = pos;
+    this.RecalcInfo.bProps = true;
+}
+CBar.prototype.Resize = function()
+{
+    if(this.RecalcInfo.bCtrPrp == true)
     {
-        location:    this.loc,
-        turn:        TURN_0
-    };
-    glyph.init(props);
+        this.Set_CompiledCtrPrp();
+        this.RecalcInfo.bCtrPrp = false;
+    }
 
-    this.setOperator( new COperator(glyph) );*/
-
-    var props =
+    if(this.RecalcInfo.bProps == true)
     {
-        location:    this.loc,
-        type:        DELIMITER_LINE
-    };
+        var prp =
+        {
+            loc:    this.Pr.pos,
+            type:   DELIMITER_LINE
+        };
 
-    var defaultProps =
-    {
-        loc:   LOCATION_BOT
-    };
+        var defaultProps =
+        {
+            loc:   LOCATION_BOT
+        };
 
-    this.setCharacter(props, defaultProps);
+        this.setCharacter(prp, defaultProps);
+    }
 
-
-    /// вызов этой функции обязательно в конце
-    //this.WriteContentsToHistory();
+    CBar.superclass.Resize.call(this);
 }
 CBar.prototype.getAscent = function()
 {
     var ascent;
 
-    if(this.loc === LOCATION_TOP )
+    if(this.Pr.pos === LOCATION_TOP )
         ascent = this.operator.size.height + this.elements[0][0].size.ascent;
-    else if(this.loc === LOCATION_BOT )
+    else if(this.Pr.pos === LOCATION_BOT )
         ascent = this.elements[0][0].size.ascent;
 
     return ascent;
 }
 CBar.prototype.getPropsForWrite = function()
 {
-    var props =
-    {
-        pos:    this.loc
-    };
-
-    return props;
+    return this.Pr;
 }
 CBar.prototype.Save_Changes = function(Data, Writer)
 {
@@ -669,9 +707,6 @@ CPhantom.prototype.init = function(props)
     this.props = props;
     this.setDimension(1, 1);
     this.setContent();
-
-    /// вызов этой функции обязательно в конце
-    //this.WriteContentsToHistory();
 }
 CPhantom.prototype.getPropsForWrite = function()
 {

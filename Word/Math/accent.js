@@ -1006,9 +1006,18 @@ function CAccent(props)
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_ACCENT;
 
-    this.chr  = null;
+    //// Properties
+    this.Pr =
+    {
+        chr:        null,
+        chrType:    null
+    };
+
+    /*this.chr  = null;
     this.chrType = null;
-    this.loc = LOCATION_TOP;
+    this.loc = LOCATION_TOP;*/
+
+    /////////////////
 
     this.operator = new COperator(OPER_ACCENT);
 
@@ -1019,17 +1028,13 @@ function CAccent(props)
 
     this.init(props);
 
-    if(props.ctrPrp !== null && typeof(props.ctrPrp) !== "undefined")
-        this.setCtrPrp(props.ctrPrp);
-
-
 	g_oTableId.Add( this, this.Id );	
 }
 extend(CAccent, CMathBase);
 CAccent.prototype.init = function(props)
 {
-    this.chr     = props.chr;
-    this.chrType = props.chrType;
+    this.Pr.chr     = props.chr;
+    this.Pr.chrType = props.chrType;
 
     //this.operator.init(prp, defaultPrp);
     //this.operator.relate(this);
@@ -1038,17 +1043,20 @@ CAccent.prototype.init = function(props)
     this.setContent();
 
     this.elements[0][0].SetDot(true);
+
+    if(props.ctrPrp !== null && typeof(props.ctrPrp) !== "undefined")
+        this.setCtrPrp(props.ctrPrp);
 }
 CAccent.prototype.setChr = function(chr)
 {
-    this.chr = chr;
-    this.chrType = null;
+    this.Pr.chr = chr;
+    this.Pr.chrType = null;
     this.RecalcInfo.bProps = true;
 }
 CAccent.prototype.setChrType = function(chrType)
 {
-    this.chr = null;
-    this.chrType = chrType;
+    this.Pr.chr = null;
+    this.Pr.chrType = chrType;
     this.RecalcInfo.bProps = true;
 }
 CAccent.prototype.old_init = function(properties)
@@ -1596,14 +1604,7 @@ CAccent.prototype.setPosition = function(pos)
 }
 CAccent.prototype.getAscent = function()
 {
-    var ascent;
-
-   if(this.loc === LOCATION_TOP )
-       ascent = this.operator.size.height + this.elements[0][0].size.ascent;
-    else if(this.loc === LOCATION_BOT )
-       ascent = this.elements[0][0].size.ascent;
-
-    return ascent;
+    return this.operator.size.height + this.elements[0][0].size.ascent;
 }
 CAccent.prototype.getPropsForWrite = function()
 {
@@ -1627,8 +1628,8 @@ CAccent.prototype.Resize = function(Parent, ParaMath, oMeasure)
     {
         var prp =
         {
-            type:   this.chrType,
-            chr:    this.chr,
+            type:   this.Pr.chrType,
+            chr:    this.Pr.chr,
             loc:    LOCATION_TOP
         };
 
@@ -1637,12 +1638,13 @@ CAccent.prototype.Resize = function(Parent, ParaMath, oMeasure)
             type:   ACCENT_CIRCUMFLEX
         };
 
-        this.operator.init(prp, defaultPrp);
-        this.operator.relate(this);
+        this.operator.setProperties(prp, defaultPrp);
 
         this.chr = String.fromCharCode(this.operator.code);
         this.chrType = this.operator.typeOper;
     }
+
+    this.operator.relate(this);
 
     var base = this.elements[0][0];
     base.Resize(this, ParaMath, oMeasure);

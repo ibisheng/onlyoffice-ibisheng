@@ -2264,7 +2264,7 @@ function COperator(type)
 
     this.shiftAccent = 0;
 }
-COperator.prototype.init = function(properties, defaultProps)   // props (chr, type, location), defaultProps (chr, location)
+COperator.prototype.setProperties = function(properties, defaultProps)   // props (chr, type, location), defaultProps (chr, location)
 {
     var props = this.getProps(properties, defaultProps);
 
@@ -3330,7 +3330,7 @@ CDelimiter.prototype.init = function(props)
     {
         type:  PARENTHESIS_LEFT
     };
-    this.begOper.init(begPrp, begDefaultPrp);
+    this.begOper.setProperties(begPrp, begDefaultPrp);
     this.begOper.relate(this);
 
     var endPrp =
@@ -3344,7 +3344,7 @@ CDelimiter.prototype.init = function(props)
         type:  PARENTHESIS_RIGHT
     };
 
-    this.endOper.init(endPrp, endDefaultPrp);
+    this.endOper.setProperties(endPrp, endDefaultPrp);
     this.endOper.relate(this);
 
     var sepPrp =
@@ -3361,7 +3361,7 @@ CDelimiter.prototype.init = function(props)
     if(props.column == 1 )
         sepPrp.type = OPERATOR_EMPTY;
 
-    this.sepOper.init(sepPrp, sepDefaultPrp);
+    this.sepOper.setProperties(sepPrp, sepDefaultPrp);
     this.sepOper.relate(this);
 
     if(props.shape == DELIMITER_SHAPE_MATH || props.shp == DELIMITER_SHAPE_MATH)

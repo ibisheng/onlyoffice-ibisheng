@@ -3,10 +3,15 @@ function CDegree(props)
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_DEGREE;
 
-    this.type = DEGREE_SUPERSCRIPT ;
+    //this.type = DEGREE_SUPERSCRIPT;
     this.upBase = 0; // отступ сверху для основания
     this.upIter = 0; // отступ сверху для итератора
-    this.alnScr = false;  // не выровнены, итераторы идут в соответствии с наклоном буквы/мат. объекта
+    //this.alnScr = false;  // не выровнены, итераторы идут в соответствии с наклоном буквы/мат. объекта
+
+    this.Pr =
+    {
+        type:   DEGREE_SUPERSCRIPT
+    };
 
     CMathBase.call(this);
 
@@ -17,10 +22,10 @@ function CDegree(props)
 extend(CDegree, CMathBase);
 CDegree.prototype.init = function(props)
 {
-    if(props.alnScr === true || props.alnScr === 1)
+    /*if(props.alnScr === true || props.alnScr === 1)
         this.alnScr = true;
     else if(props.alnScr === false || props.alnScr === 0)
-        this.alnScr = false;
+        this.alnScr = false;*/
 
     var oBase = new CMathContent();
 
@@ -28,9 +33,9 @@ CDegree.prototype.init = function(props)
         oBase = props.oBase;
 
     if(props.type === DEGREE_SUPERSCRIPT)
-        this.type = DEGREE_SUPERSCRIPT;
+        this.Pr.type = DEGREE_SUPERSCRIPT;
     else if(props.type === DEGREE_SUBSCRIPT)
-        this.type = DEGREE_SUBSCRIPT;
+        this.Pr.type = DEGREE_SUBSCRIPT;
 
     this.setDimension(1, 2);
 
@@ -38,9 +43,6 @@ CDegree.prototype.init = function(props)
     oDegree.decreaseArgSize();
 
     this.addMCToContent(oBase, oDegree);
-
-    /// вызов этой функции обязательно в конце
-    //this.WriteContentsToHistory();
 }
 /*CDegree.prototype.init_2 = function(props, oBase)
 {
@@ -58,9 +60,9 @@ CDegree.prototype.init = function(props)
 }*/
 CDegree.prototype.recalculateSize = function(oMeasure)
 {
-    if(this.type === DEGREE_SUPERSCRIPT)
+    if(this.Pr.type === DEGREE_SUPERSCRIPT)
         this.recalculateSup(oMeasure);
-    else if(this.type === DEGREE_SUBSCRIPT)
+    else if(this.Pr.type === DEGREE_SUBSCRIPT)
         this.recalculateSubScript(oMeasure);
 }
 CDegree.prototype.old__recalculateSup = function(oMeasure)
@@ -473,14 +475,18 @@ CDegree.prototype.getBase = function()
 {
     return this.elements[0][0];
 }
-CDegree.prototype.getPropsForWrite = function()
+/*CDegree.prototype.getPropsForWrite = function()
 {
     var props = {};
 
     props.type = this.type;
-    props.alnScr = this.alnScr;
+    //props.alnScr = this.alnScr;
 
     return props;
+}*/
+CDegree.prototype.getPropsForWrite = function()
+{
+    return this.Pr;
 }
 CDegree.prototype.IsPlhIterator = function()
 {
@@ -503,7 +509,7 @@ CDegree.prototype.Write_ToBinary2 = function( Writer )
 	Writer.WriteString2( this.elements[0][1].Id );
 	
 	this.CtrPrp.Write_ToBinary(Writer);
-	Writer.WriteLong( this.type );
+	Writer.WriteLong( this.Pr.type );
 	
 }
 CDegree.prototype.Read_FromBinary2 = function( Reader )
@@ -517,7 +523,7 @@ CDegree.prototype.Read_FromBinary2 = function( Reader )
 	this.elements[0][1] = Element1;
 
 	this.CtrPrp.Read_FromBinary(Reader);
-	this.type = Reader.GetLong();
+    this.Pr.type = Reader.GetLong();
 }
 CDegree.prototype.Get_Id = function()
 {
@@ -694,8 +700,16 @@ function CDegreeSubSup(props)
     this.kind = MATH_DEGREESubSup;
 
     this.gapBase = 0;
-    this.type = DEGREE_SubSup;
-    this.alnScr = false;    // не выровнены, итераторы идут в соответствии с наклоном буквы/мат. объекта
+
+    this.Pr =
+    {
+        type:       DEGREE_SubSup,
+        alnScr:     false
+    };
+
+    //this.type = DEGREE_SubSup;
+    //this.alnScr = false;    // не выровнены, итераторы идут в соответствии с наклоном буквы/мат. объекта
+
     CMathBase.call(this);
 
     this.init(props);
@@ -706,19 +720,17 @@ extend(CDegreeSubSup, CMathBase);
 CDegreeSubSup.prototype.init = function(props)
 {
     if(props.alnScr === true || props.alnScr === 1)
-        this.alnScr = true;
+        this.Pr.alnScr = true;
     else if(props.alnScr === false || props.alnScr === 0)
-        this.alnScr = false;
+        this.Pr.alnScr = false;
 
     var oBase = new CMathContent();
 
     if(props.indef == 2) /// props include Base for CNary
         oBase = props.oBase;
 
-    if(props.type === DEGREE_SubSup)
-        this.type = DEGREE_SubSup;
-    else if(props.type === DEGREE_PreSubSup)
-        this.type = DEGREE_PreSubSup;
+    if(props.type === DEGREE_SubSup || props.type === DEGREE_PreSubSup)
+        this.Pr.type = props.type;
 
     this.setDimension(1, 2);
 
@@ -730,12 +742,12 @@ CDegreeSubSup.prototype.init = function(props)
     oIters.lUp = 0;
     oIters.lD = 0;
 
-    if(this.type == DEGREE_SubSup)
+    if(this.Pr.type == DEGREE_SubSup)
     {
         oIters.alignHor(-1, 0);
         this.addMCToContent(oBase, oIters);
     }
-    else if(this.type == DEGREE_PreSubSup)
+    else if(this.Pr.type == DEGREE_PreSubSup)
     {
         oIters.alignHor(-1, 1);
         this.addMCToContent(oIters, oBase);
@@ -787,12 +799,12 @@ CDegreeSubSup.prototype.old_old_recalculateSize = function(oMeasure)
 
     var iters, base;
 
-    if(this.type == DEGREE_SubSup)
+    if(this.Pr.type == DEGREE_SubSup)
     {
         iters = this.elements[0][1];
         base  = this.elements[0][0];
     }
-    else if(this.type == DEGREE_PreSubSup)
+    else if(this.Pr.type == DEGREE_PreSubSup)
     {
         iters = this.elements[0][0];
         base  = this.elements[0][1];
@@ -830,12 +842,12 @@ CDegreeSubSup.prototype.old_recalculateSize = function(oMeasure)
 
     var iters, base;
 
-    if(this.type == DEGREE_SubSup)
+    if(this.Pr.type == DEGREE_SubSup)
     {
         iters = this.elements[0][1];
         base  = this.elements[0][0];
     }
-    else if(this.type == DEGREE_PreSubSup)
+    else if(this.Pr.type == DEGREE_PreSubSup)
     {
         iters = this.elements[0][0];
         base  = this.elements[0][1];
@@ -911,12 +923,12 @@ CDegreeSubSup.prototype._recalculateSize = function(oMeasure)
 
     var iters, base;
 
-    if(this.type == DEGREE_SubSup)
+    if(this.Pr.type == DEGREE_SubSup)
     {
         iters = this.elements[0][1];
         base  = this.elements[0][0];
     }
-    else if(this.type == DEGREE_PreSubSup)
+    else if(this.Pr.type == DEGREE_PreSubSup)
     {
         iters = this.elements[0][0];
         base  = this.elements[0][1];
@@ -1022,12 +1034,12 @@ CDegreeSubSup.prototype.recalculateSize = function(oMeasure)
 
     var iters, base;
 
-    if(this.type == DEGREE_SubSup)
+    if(this.Pr.type == DEGREE_SubSup)
     {
         iters = this.elements[0][1];
         base  = this.elements[0][0];
     }
-    else if(this.type == DEGREE_PreSubSup)
+    else if(this.Pr.type == DEGREE_PreSubSup)
     {
         iters = this.elements[0][0];
         base  = this.elements[0][1];
@@ -1089,7 +1101,7 @@ CDegreeSubSup.prototype.old_setPosition = function(pos)
 {
     this.pos = {x: pos.x, y: pos.y - this.size.ascent};
 
-    if(this.type == DEGREE_SubSup)
+    if(this.Pr.type == DEGREE_SubSup)
     {
         var iters = this.elements[0][1],
             base  = this.elements[0][0];
@@ -1105,7 +1117,7 @@ CDegreeSubSup.prototype.old_align = function(x, y)
 {
     var _x = 0, _y = 0;
 
-    if(this.type == DEGREE_SubSup)
+    if(this.Pr.type == DEGREE_SubSup)
     {
         if(x == 0 && y == 0)
             _y = this.elements[0][1].upper;
@@ -1122,7 +1134,7 @@ CDegreeSubSup.prototype.align = function(x, y)
 {
     var _x = 0, _y = 0;
 
-    if(this.type == DEGREE_SubSup)
+    if(this.Pr.type == DEGREE_SubSup)
     {
         if(x == 0 && y == 0)
             _y = this.gapBase;
@@ -1139,9 +1151,9 @@ CDegreeSubSup.prototype.getBase = function()
 {
     var base;
 
-    if(this.type == DEGREE_SubSup)
+    if(this.Pr.type == DEGREE_SubSup)
         base = this.elements[0][0];
-    else if(this.type == DEGREE_PreSubSup)
+    else if(this.Pr.type == DEGREE_PreSubSup)
         base = this.elements[0][1];
 
     return base;
@@ -1150,9 +1162,9 @@ CDegreeSubSup.prototype.getUpperIterator = function()
 {
     var iter;
 
-    if(this.type == DEGREE_SubSup)
+    if(this.Pr.type == DEGREE_SubSup)
         iter = this.elements[0][1].getUpperIterator();
-    else if(this.type == DEGREE_PreSubSup)
+    else if(this.Pr.type == DEGREE_PreSubSup)
         iter = this.elements[0][0].getUpperIterator();
 
     return iter;
@@ -1161,21 +1173,23 @@ CDegreeSubSup.prototype.getLowerIterator = function()
 {
     var iter;
 
-    if(this.type == DEGREE_SubSup)
+    if(this.Pr.type == DEGREE_SubSup)
         iter = this.elements[0][1].getLowerIterator();
-    else if(this.type == DEGREE_PreSubSup)
+    else if(this.Pr.type == DEGREE_PreSubSup)
         iter = this.elements[0][0].getLowerIterator();
 
     return iter;
 }
 CDegreeSubSup.prototype.getPropsForWrite = function()
 {
-    var props = {};
+    /*var props = {};
 
     props.type = this.type;
     props.alnScr = this.alnScr;
 
-    return props;
+    return props;*/
+
+    return this.Pr;
 }
 CDegreeSubSup.prototype.Save_Changes = function(Data, Writer)
 {
@@ -1194,8 +1208,8 @@ CDegreeSubSup.prototype.Write_ToBinary2 = function( Writer )
 	Writer.WriteString2( this.elements[0][1].Id );
 	
 	this.CtrPrp.Write_ToBinary(Writer);
-	Writer.WriteLong( this.type );
-	if ( this.type == DEGREE_SubSup )
+	Writer.WriteLong( this.Pr.type );
+	if ( this.Pr.type == DEGREE_SubSup )
 	{
 		var StartPos = Writer.GetCurPosition();
 		Writer.Skip(4);
@@ -1222,8 +1236,8 @@ CDegreeSubSup.prototype.Read_FromBinary2 = function( Reader )
 	this.elements[0][1] = Element1;
 	
 	this.CtrPrp.Read_FromBinary(Reader);
-	this.type = Reader.GetLong();	
-	if ( this.type == DEGREE_SubSup )
+    this.Pr.type = Reader.GetLong();
+	if ( this.Pr.type == DEGREE_SubSup )
 	{
 		var Flags = Reader.GetLong();
 		if ( Flags & 1 )
