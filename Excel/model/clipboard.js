@@ -169,6 +169,7 @@
 			this.ppix = 96;
 			this.ppiy = 96;
 			this.Api = null;
+			this.fullUrl;
 			this.activeRange = null;
 			this.lStorage = {};
 
@@ -289,17 +290,8 @@
 						this.lStorage.htmlInShape = text;
 					else
 					{
-					    var api = window["Asc"]["editor"];
-						var sProtocol = window.location.protocol;
-						var documentOrigin;
-						var sHost = window.location.host;
-						documentOrigin = "";
-						if(sProtocol && "" != sProtocol)
-							documentOrigin = sProtocol + "//" + sHost;
-						else
-							documentOrigin = sHost;
-						
-						window.global_pptx_content_writer.Start_UseFullUrl(documentOrigin + g_sResourceServiceLocalUrl + api.documentId + "/");
+						var fullUrl = this._getUseFullUrl();
+						window.global_pptx_content_writer.Start_UseFullUrl(fullUrl);
 						
 						var oBinaryFileWriter = new Asc.BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
 						var sBase64 = oBinaryFileWriter.Write();
@@ -741,6 +733,26 @@
 				doc.body.style.MozUserSelect = "text";
 			},
 
+			 _getUseFullUrl: function(recalculate)
+			 {
+				if(this.fullUrl == undefined || recalculate === true)
+				{
+					var api = window["Asc"]["editor"];
+					var sProtocol = window.location.protocol;
+					var documentOrigin;
+					var sHost = window.location.host;
+					documentOrigin = "";
+					if(sProtocol && "" != sProtocol)
+						documentOrigin = sProtocol + "//" + sHost;
+					else
+						documentOrigin = sHost;
+					
+					this.fullUrl = documentOrigin + g_sResourceServiceLocalUrl + api.documentId + "/";
+				}
+	
+				return this.fullUrl;
+			 },
+			 
 			 _getStylesSelect: function (worksheet){
 				document.body.style.MozUserSelect = "";
 				delete document.body.style["-khtml-user-select"];
