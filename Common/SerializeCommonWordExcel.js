@@ -674,19 +674,16 @@ function CellAddressUtils(){
 		var sResult = this._aColnumToColstr[num];
 		if(!sResult){
 			// convert 1 to A, 2 to B, ..., 27 to AA etc.
-			if(num == 0) return "";
-			var val;
 			sResult = "";
-			var n = num - 1;
-			if (n >= 702) {
-				val = (Math.floor(n / 676) - 1) % 26;
-				sResult += String.fromCharCode(val + 65);
+			if(num > 0){
+				var columnNumber = num;
+				var currentLetterNumber;
+				while(columnNumber > 0){
+					currentLetterNumber = (columnNumber - 1) % 26;
+					sResult = String.fromCharCode(currentLetterNumber + 65) + sResult;
+					columnNumber = (columnNumber - (currentLetterNumber + 1)) / 26;
+				}
 			}
-			if (n >= 26) {
-				val = (Math.floor(n / 26) - 1) % 26;
-				sResult += String.fromCharCode(val + 65);
-			}
-			sResult += String.fromCharCode( (n % 26) + 65);
 			this._aColnumToColstr[num] = sResult;
 		}
 		return sResult;
