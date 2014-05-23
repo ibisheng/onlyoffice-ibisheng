@@ -2549,6 +2549,16 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr)
             }
         }
     }
+    
+    if ( undefined !== ParaPr.FramePr && undefined !== ParaPr.FramePr.Wrap )
+    {
+        if ( wrap_NotBeside === ParaPr.FramePr.Wrap )
+            ParaPr.FramePr.Wrap = false;
+        else if ( wrap_Around === ParaPr.FramePr.Wrap )
+            ParaPr.FramePr.Wrap = true;
+        else
+            ParaPr.FramePr.Wrap = undefined;       
+    }
 
 	this.sync_ParaSpacingLine( ParaPr.Spacing );
 	this.Update_ParaInd(ParaPr.Ind);
@@ -5615,6 +5625,10 @@ asc_docs_api.prototype.asc_getDefaultLanguage = function()
     if (editor.WordControl.m_oLogicDocument)
         return editor.WordControl.m_oLogicDocument.Get_DefaultLanguage();
     return null;
+}
+
+asc_docs_api.prototype.asc_setSpellCheck = function(isOn)
+{
 }
 //-----------------------------------------------------------------
 // Функции для работы с комментариями
