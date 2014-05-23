@@ -570,7 +570,10 @@ cArea.prototype.tocBool = function () {
     return this.getValue()[0].tocBool();
 };
 cArea.prototype.toString = function () {
-    return this.getRange().getName();
+    if( this.getRange() ){
+        return this.getRange().getName();
+    }
+    return this._cells;
 };
 cArea.prototype.setRange = function ( cell ) {
     this._cells = this.value = cell;
@@ -864,7 +867,8 @@ cArea3D.prototype.changeSheet = function ( lastName, newName ) {
 cArea3D.prototype.toString = function () {
     var wsFrom = this._wb.getWorksheetById( this.wsFrom ).getName(),
         wsTo = this._wb.getWorksheetById( this.wsTo ).getName(),
-        name = Asc.g_oRangeCache.getActiveRange(this._cells).getName();
+        name = Asc.g_oRangeCache.getActiveRange(this._cells);
+        name = name ? name : this._cells;
     if ( rx_test_ws_name.test( wsFrom ) && rx_test_ws_name.test( wsTo ) ) {
         return (wsFrom !== wsTo ? wsFrom + ":" + wsTo : wsFrom) + "!" + name;
     }
