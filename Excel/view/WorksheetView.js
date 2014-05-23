@@ -5163,7 +5163,7 @@
 					this.expandRowsOnScroll(true);
 					this._calcVisibleRows();
 					if (this.rows[this.rows.length - 1].height < 0.000001) {break;}
-				} while (this._isVisibleY());
+				} while (this._isVisibleY() && gc_nMaxRow !== this.rows.length);
 				if (!skipScrollReinit) {
 					this.handlers.trigger("reinitializeScrollY");
 				}
@@ -5177,7 +5177,7 @@
 					this.expandColsOnScroll(true);
 					this._calcVisibleColumns();
 					if (this.cols[this.cols.length - 1].width < 0.000001) {break;}
-				} while (this._isVisibleX());
+				} while (this._isVisibleX() && gc_nMaxCol !== this.cols.length);
 				if (!skipScrollReinit) {
 					this.handlers.trigger("reinitializeScrollX");
 				}
