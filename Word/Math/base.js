@@ -61,7 +61,8 @@ function CMathBase()
 
     this.RecalcInfo =
     {
-        bCtrPrp:     true
+        bCtrPrp:     true,
+        bProps:      true
     };
 
     return this;
@@ -993,6 +994,7 @@ CMathBase.prototype =
         {
             this.Set_CompiledCtrPrp();
             this.RecalcInfo.bCtrPrp = false;
+            this.RecalcInfo.bProps  = false;
         }
 
         for(var i=0; i < this.nRow; i++)

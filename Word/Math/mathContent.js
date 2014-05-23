@@ -6460,7 +6460,7 @@ CMathContent.prototype =
         return result;
 
     },
-    Get_RightPos: function(SearchPos, ContentPos, Depth, UseContentPos, BegRun)
+    Get_RightPos: function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd, BegRun)
     {
         var result = false;
         var CurPos = UseContentPos ? ContentPos.Get(Depth) : 0;
@@ -6891,15 +6891,7 @@ CMathContent.prototype =
     {
         if(this.ParaMath !== null)
             this.ParaMath.Refresh_RecalcData(); // Refresh_RecalcData сообщает родительскому классу, что у него произошли изменения, нужно пересчитать
-        // Refresh_RecalcData2 у родительского класса сообщает, что у внутреннего класса произошли изменения, нужен пересчет
-        // временно
-        //this.RecalculateReverse();
-        //this.Root.Resize();
     },
-    /*Refresh_RecalcData2: function()
-     {
-     this.Composition.Refresh_RecalcData2();
-     },*/
     _Check_HistoryUninon: function(Data1, Data2)
     {
         var Type1 = Data1.Type;
