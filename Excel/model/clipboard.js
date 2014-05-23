@@ -289,7 +289,19 @@
 						this.lStorage.htmlInShape = text;
 					else
 					{
-					    var oBinaryFileWriter = new Asc.BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
+					    var api = window["Asc"]["editor"];
+						var sProtocol = window.location.protocol;
+						var documentOrigin;
+						var sHost = window.location.host;
+						documentOrigin = "";
+						if(sProtocol && "" != sProtocol)
+							documentOrigin = sProtocol + "//" + sHost;
+						else
+							documentOrigin = sHost;
+						
+						window.global_pptx_content_writer.Start_UseFullUrl(documentOrigin + g_sResourceServiceLocalUrl + api.documentId + "/");
+						
+						var oBinaryFileWriter = new Asc.BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
 						var sBase64 = oBinaryFileWriter.Write();
 						if(this.element.children && this.element.children.length == 1 /*&& window.USER_AGENT_SAFARI_MACOS*/)
 						{
@@ -301,6 +313,8 @@
 						
 						//for buttons copy/paste
 						this.lStorage = sBase64;
+						
+						window.global_pptx_content_writer.End_UseFullUrl()
 					}
 				}
 							
@@ -2087,12 +2101,19 @@
 			        oOldEditor = editor;
 			    //создается глобальная переменная
 			    editor = { isDocumentEditor: true, WordControl: { m_oLogicDocument: newCDocument } };
+				
+				window.global_pptx_content_loader.Clear();
+				window.global_pptx_content_loader.Start_UseFullUrl();
+				
 			    var openParams = { checkFileSize: false, charCount: 0, parCount: 0 };
 			    History.TurnOff();
 			    var oBinaryFileReader = new BinaryFileReader(newCDocument, openParams);
 			    var oRes = oBinaryFileReader.ReadFromString(sBase64);
 			    History.TurnOn();
 			    editor = oOldEditor;
+				
+				window.global_pptx_content_loader.End_UseFullUrl();
+				
 			    return oBinaryFileReader.oReadResult;
 
 				//TODO ПРОСМОТРЕТЬ ВСЕ ЗАКОММЕНТИРОВАННЫЕ ОБЛАСТИ!!!!
@@ -3057,7 +3078,7 @@
 			_insertImagesFromBinary: function(ws, data)
 			{
 				var activeRange = ws.activeRange;
-				var curCol, drawingObject, curRow, startCol, startRow, xfrm;
+				var curCol, drawingObject, curRow, startCol, startRow, xfrm, aImagesSync = [];
 
 				History.Create_NewPoint();
 				History.StartTransaction();
@@ -3133,8 +3154,13 @@
 					
 					drawingObject.graphicObject.addToDrawingObjects();
 					drawingObject.graphicObject.select(ws.objectRender.controller, 0);
+					
+					if(drawingObject.graphicObject.isImage())
+						aImagesSync.push(drawingObject.graphicObject.getImageUrl());
 				};
-
+				
+				window["Asc"]["editor"].ImageLoader.LoadDocumentImages(aImagesSync, null, ws.objectRender.asyncImagesDocumentEndLoaded);
+				
 				ws.objectRender.showDrawingObjects(true);
                 ws.setSelectionShape(true);
 				History.EndTransaction();
@@ -3143,7 +3169,7 @@
 			_insertImagesFromBinaryWord: function(ws, data)
 			{
 				var activeRange = ws.activeRange;
-				var curCol, drawingObject, curRow, startCol, startRow, xfrm, drawingBase, graphicObject;
+				var curCol, drawingObject, curRow, startCol, startRow, xfrm, drawingBase, graphicObject, aImagesSync = [];
 
 				History.Create_NewPoint();
 				History.StartTransaction();
@@ -3225,8 +3251,11 @@
 					drawingObject.graphicObject.addToDrawingObjects();
 					drawingObject.graphicObject.select(ws.objectRender.controller, 0);
 					
+					aImagesSync.push(drawingObject.graphicObject.getImageUrl());
 				};
 				
+				window["Asc"]["editor"].ImageLoader.LoadDocumentImages(aImagesSync, null, ws.objectRender.asyncImagesDocumentEndLoaded);
+				ws.objectRender.showDrawingObjects(true);
 				History.EndTransaction();
 			},
 			
