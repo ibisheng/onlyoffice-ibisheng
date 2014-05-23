@@ -2264,13 +2264,10 @@ function COperator(type)
 
     this.shiftAccent = 0;
 }
-COperator.prototype.init = function(properties, defaultProps)        // props (chr, type, location), defaultProps (chr, location)
+COperator.prototype.init = function(properties, defaultProps)   // props (chr, type, location), defaultProps (chr, location)
 {
-    var prp = this.getProps(properties, defaultProps);
-    this.init_2(prp);
-}
-COperator.prototype.init_2 = function(props)
-{
+    var props = this.getProps(properties, defaultProps);
+
     var operator = null,
         typeOper = null,
         codeChr  = null;
@@ -4083,13 +4080,16 @@ function CGroupCharacter(props)
 
     CCharacter.call(this);
 
+    this.init(props);
+}
+extend(CGroupCharacter, CCharacter);
+CGroupCharacter.prototype.init = function(props)
+{
     if(props.vertJc === VJUST_TOP || props.vertJc === VJUST_BOT)
         this.vertJust = props.vertJc;
 
-    if(props.pos === LOCATION_TOP || props.location === LOCATION_TOP)
+    if(props.pos === LOCATION_TOP || props.pos === LOCATION_BOT)
         this.loc = LOCATION_TOP;
-    else if(props.pos === LOCATION_BOT || props.location === LOCATION_BOT)
-        this.loc = LOCATION_BOT;
 
     var operDefaultPrp =
     {
@@ -4106,13 +4106,12 @@ function CGroupCharacter(props)
 
     this.setCharacter(operProps, operDefaultPrp);
 
-    this.setCtrPrp(props.ctrPrp);
+    if(props.ctrPrp !== null && typeof(props.ctrPrp)!== "undefined")
+        this.setCtrPrp(props.ctrPrp);
 
     /// вызов этой функции обязательно в конце
-    //this.WriteContentsToHistory();
-	g_oTableId.Add( this, this.Id );
+    g_oTableId.Add( this, this.Id );
 }
-extend(CGroupCharacter, CCharacter);
 CGroupCharacter.prototype.getAscent = function(oMeasure)
 {
     var ascent;
@@ -4292,6 +4291,10 @@ CGroupCharacter.prototype.old_getGlyph = function(code, type)
     }
 
     return operator;
+}
+CGroupCharacter.prototype.setPos = function() // change location
+{
+
 }
 CGroupCharacter.prototype.getPropsForWrite = function()
 {

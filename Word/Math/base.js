@@ -118,7 +118,7 @@ CMathBase.prototype =
     Get_CompiledCtrPrp: function()
     {
         var CompiledCtrPrp = this.CompiledCtrPrp.Copy();
-        this.ParaMath.ApplyArgSize(CompiledCtrPrp);
+        this.ParaMath.ApplyArgSize(CompiledCtrPrp, this.argSize);
 
         return CompiledCtrPrp;
     },

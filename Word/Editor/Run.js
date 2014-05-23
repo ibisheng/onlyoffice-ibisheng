@@ -44,7 +44,6 @@ function ParaRun(Paragraph, bMathRun)
     this.SearchMarks   = new Array();
     this.SpellingMarks = new Array();
 
-
     if(bMathRun)
     {
         this.typeObj = MATH_PARA_RUN;
@@ -4293,7 +4292,7 @@ ParaRun.prototype =
                 TextPr.Merge(MPrp); // bold, italic
             }
 
-            this.Parent.ParaMath.ApplyArgSize(TextPr);
+            this.Parent.ParaMath.ApplyArgSize(TextPr, this.Parent.argSize);
         }
         else
             TextPr.Merge( this.Pr ); // Мержим прямые настройки данного рана

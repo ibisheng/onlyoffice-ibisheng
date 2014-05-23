@@ -1006,42 +1006,50 @@ function CAccent(props)
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_ACCENT;
 
+    this.chr  = null;
+    this.chrType = null;
+    this.loc = LOCATION_TOP;
+
     this.operator = new COperator(OPER_ACCENT);
+
     //this.code = null;      // храним код буквы и тип здесь
     //this.typeOper = null;  // т.к в класах, которые вызываем, не учитываем случаи, когда элементы (стрелки/скобки) переворачиваются
-    this.loc = LOCATION_TOP;
 
     CMathBase.call(this);
 
     this.init(props);
-    this.setCtrPrp(props.ctrPrp);
+
+    if(props.ctrPrp !== null && typeof(props.ctrPrp) !== "undefined")
+        this.setCtrPrp(props.ctrPrp);
+
+
 	g_oTableId.Add( this, this.Id );	
 }
 extend(CAccent, CMathBase);
 CAccent.prototype.init = function(props)
 {
-    var prp =
-    {
-        type:   props.chrType,
-        chr:    props.chr,
-        loc:    LOCATION_TOP
-    };
+    this.chr     = props.chr;
+    this.chrType = props.chrType;
 
-    var defaultPrp =
-    {
-        type:   ACCENT_CIRCUMFLEX
-    };
-
-    this.operator.init(prp, defaultPrp);
-    this.operator.relate(this);
+    //this.operator.init(prp, defaultPrp);
+    //this.operator.relate(this);
 
     this.setDimension(1, 1);
     this.setContent();
 
     this.elements[0][0].SetDot(true);
-
-    /// вызов этой функции обязательно в конце
-    //this.WriteContentsToHistory();
+}
+CAccent.prototype.setChr = function(chr)
+{
+    this.chr = chr;
+    this.chrType = null;
+    this.RecalcInfo.bProps = true;
+}
+CAccent.prototype.setChrType = function(chrType)
+{
+    this.chr = null;
+    this.chrType = chrType;
+    this.RecalcInfo.bProps = true;
 }
 CAccent.prototype.old_init = function(properties)
 {
@@ -1615,6 +1623,27 @@ CAccent.prototype.Resize = function(Parent, ParaMath, oMeasure)
         this.RecalcInfo.bCtrPrp = false;
     }
 
+    if(this.RecalcInfo.bProps == true)
+    {
+        var prp =
+        {
+            type:   this.chrType,
+            chr:    this.chr,
+            loc:    LOCATION_TOP
+        };
+
+        var defaultPrp =
+        {
+            type:   ACCENT_CIRCUMFLEX
+        };
+
+        this.operator.init(prp, defaultPrp);
+        this.operator.relate(this);
+
+        this.chr = String.fromCharCode(this.operator.code);
+        this.chrType = this.operator.typeOper;
+    }
+
     var base = this.elements[0][0];
     base.Resize(this, ParaMath, oMeasure);
 
@@ -1742,8 +1771,3 @@ CAccent.prototype.Read_FromBinary2 = function( Reader )
 	if ( Flags & 1 )
 		this.chr = Reader.GetLong();	
 }
-CAccent.prototype.Get_Id = function()
-{
-	return this.Id;
-}
-

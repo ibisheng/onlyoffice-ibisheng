@@ -855,7 +855,7 @@ ParaMath.prototype =
 // Функция для работы с формулой
 // в тч с  дефолтными текстовыми настройками и argSize
 //-----------------------------------------------------------------------------------
-    ApplyArgSize : function(oWPrp)
+    ApplyArgSize : function(oWPrp, argSize)
     {
         var tPrp = new CTextPr();
         var defaultWPrp =
@@ -873,22 +873,16 @@ ParaMath.prototype =
 
         var FSize = tPrp.FontSize;
 
-        if(this.argSize == -1)
+        if(argSize == -1)
         {
-            //aa: 0.0013  bb: 0.66  cc: 0.5
-            //aa: 0.0009  bb: 0.68  cc: 0.26
             FSize = 0.0009*FSize*FSize + 0.68*FSize + 0.26;
-            //FSize = 0.001*FSize*FSize + 0.723*FSize - 1.318;
-            //FSize = 0.0006*FSize*FSize + 0.743*FSize - 1.53;
+            //FSize = 0.65*FSize;
+
         }
-        else if(this.argSize == -2)
+        else if(argSize == -2)
         {
-            // aa: -0.0004  bb: 0.66  cc: 0.87
-            // aa: -0.0014  bb: 0.71  cc: 0.39
-            // aa: 0  bb: 0.63  cc: 1.11
-            //FSize = 0.63*FSize + 1.11;
             FSize = -0.0004*FSize*FSize + 0.66*FSize + 0.87;
-            //tPrp.FontSize *= 0.473;
+            //FSize = 0.65*FSize*FSize;
         }
 
         tPrp.FontSize = FSize;

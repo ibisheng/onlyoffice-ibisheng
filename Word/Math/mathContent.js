@@ -5232,7 +5232,7 @@ CMathContent.prototype =
                     oWPrp.Merge(mgWPrp);
 
                     //this.applyArgSize(oWPrp);
-                    this.ParaMath.ApplyArgSize(oWPrp);
+                    this.ParaMath.ApplyArgSize(oWPrp, this.argSize);
 
                     pGraphics.SetFont(oWPrp);
                 }
