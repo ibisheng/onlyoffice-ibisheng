@@ -1561,7 +1561,7 @@ CopyProcessor.prototype =
                                 curParaRun.Selection.StartPos = inIndex;
                                 curParaRun.Selection.Use = true;
 								
-								paragraph.Selection.EndPos = paragraphIndex + 1;
+								paragraph.Selection.EndPos = paragraphIndex;
                                 paragraph.Selection.StartPos = paragraphIndex;
                                 paragraph.Selection.Use = true;
 
@@ -3868,6 +3868,8 @@ PasteProcessor.prototype =
 	{
 		//пока только распознаём только графические объекты
 		var aContent = null;
+		var aPastedImages = [];
+		var imageUrl, images = [];
 		
 		var drawings = aContentExcel.aWorksheets[0].Drawings;
 		if(drawings && drawings.length)
@@ -3894,14 +3896,22 @@ PasteProcessor.prototype =
 				tempParaRun.Content[0].GraphicObj = graphicObj;
 				tempParaRun.Content[0].GraphicObj.parent = tempParaRun.Content[0];
 				
-				tempParagraph.Content.splice(tempParagraph.Content.length - 1, 0, tempParaRun); 
+				tempParagraph.Content.splice(tempParagraph.Content.length - 1, 0, tempParaRun);
+				
+				if(graphicObj.isImage())
+				{	
+					imageUrl = graphicObj.getImageUrl();
+					
+					aPastedImages[aPastedImages.length] = new CBuilderImages(graphicObj.blipFill, imageUrl);
+					images[images.length] = imageUrl;
+				}
 			};
 			
 			aContent = [];
 			aContent[0] = tempParagraph;
 		};
 		
-		return {content: aContent, aPastedImages: []};			
+		return {content: aContent, aPastedImages: aPastedImages, images: images};			
 	},
 	
 	_readFromBinaryExcel: function(base64)
