@@ -1516,6 +1516,9 @@
 			} else if (undefined != event.detail && 0 !== event.detail) {
 				// FF
 				delta = event.detail;
+			} else if (undefined != event.deltaY && 0 !== event.deltaY) {
+				// FF
+				delta = event.deltaY;
 			}
 			delta /= 3;
 
