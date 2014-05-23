@@ -696,13 +696,19 @@ cACCRINTM.prototype.Calculate = function ( arg ) {
     if ( par instanceof cError ) return this.value = par;
     if ( basis instanceof cError ) return this.value = basis;
 
-    if ( issue.getValue() >= settlement.getValue() || rate.getValue() <= 0 || par.getValue() <= 0 || basis.getValue() < 0 || basis.getValue() > 4 ) {
+    issue = issue.getValue();
+    settlement = settlement.getValue();
+    rate = rate.getValue();
+    par = par.getValue();
+    basis = basis.getValue();
+
+    if ( issue >= settlement || rate <= 0 || par <= 0 || basis < 0 || basis > 4 ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
-    var res = yearFrac( Date.prototype.getDateFromExcel( issue.getValue() ), Date.prototype.getDateFromExcel( settlement.getValue() ), basis.getValue() );
+    var res = yearFrac( Date.prototype.getDateFromExcel( issue ), Date.prototype.getDateFromExcel( settlement ), basis );
 
-    res *= rate.getValue() * par.getValue();
+    res *= rate * par;
 
     return this.value = new cNumber( res )
 };
@@ -886,7 +892,7 @@ function cAMORLINC() {
 cAMORLINC.prototype = Object.create( cBaseFunction.prototype );
 cAMORLINC.prototype.Calculate = function ( arg ) {
     var cost = arg[0],
-        detePurch = arg[1],
+        datePurch = arg[1],
         firstPer = arg[2],
         salvage = arg[3],
         period = arg[4],
@@ -900,11 +906,11 @@ cAMORLINC.prototype.Calculate = function ( arg ) {
         cost = cost.getElementRowCol( 0, 0 );
     }
 
-    if ( detePurch instanceof cArea || detePurch instanceof cArea3D ) {
-        detePurch = detePurch.cross( arguments[1].first );
+    if ( datePurch instanceof cArea || datePurch instanceof cArea3D ) {
+        datePurch = datePurch.cross( arguments[1].first );
     }
-    else if ( detePurch instanceof cArray ) {
-        detePurch = detePurch.getElementRowCol( 0, 0 );
+    else if ( datePurch instanceof cArray ) {
+        datePurch = datePurch.getElementRowCol( 0, 0 );
     }
 
     if ( firstPer instanceof cArea || firstPer instanceof cArea3D ) {
@@ -943,7 +949,7 @@ cAMORLINC.prototype.Calculate = function ( arg ) {
     }
 
     cost = cost.tocNumber();
-    detePurch = detePurch.tocNumber();
+    datePurch = datePurch.tocNumber();
     firstPer = firstPer.tocNumber();
     salvage = salvage.tocNumber();
     period = period.tocNumber();
@@ -951,34 +957,43 @@ cAMORLINC.prototype.Calculate = function ( arg ) {
     basis = basis.tocNumber();
 
     if ( cost instanceof cError ) return this.value = cost;
-    if ( detePurch instanceof cError ) return this.value = detePurch;
+    if ( datePurch instanceof cError ) return this.value = datePurch;
     if ( firstPer instanceof cError ) return this.value = firstPer;
     if ( salvage instanceof cError ) return this.value = salvage;
     if ( period instanceof cError ) return this.value = period;
     if ( rate instanceof cError ) return this.value = rate;
     if ( basis instanceof cError ) return this.value = basis;
 
-    var fRate = rate.getValue(),
-        fCost = cost.getValue(),
-        fRestVal = salvage.getValue(),
-        nPer = period.getValue();
+    cost = cost.getValue();
+    datePurch = datePurch.getValue();
+    firstPer = firstPer.getValue();
+    salvage = salvage.getValue();
+    period = period.getValue();
+    rate = rate.getValue();
+    basis = basis.getValue();
 
+    if ( cost < 0 || salvage < 0 || period < 0 || rate <= 0 || basis == 2 ){
+        return this.value = new cError( cErrorType.not_numeric );
+    }
 
-    var val0 = Date.prototype.getDateFromExcel( detePurch.getValue() );
-    var val1 = Date.prototype.getDateFromExcel( firstPer.getValue() );
-    var fOneRate = fCost * fRate,
-        fCostDelta = fCost - fRestVal;
+    if( cost == salvage || period > 1/rate ){
+        return this.value = new cNumber( 0 );
+    }
 
-    var f0Rate = yearFrac( val0, val1, basis.getValue() ) * fRate * fCost;
+    var val0 = Date.prototype.getDateFromExcel( datePurch ),
+        val1 = Date.prototype.getDateFromExcel( firstPer );
 
-    var nNumOfFullPeriods = ( fCost - fRestVal - f0Rate) / fOneRate;
+    var costRate = cost * rate,
+        costDelta = cost - salvage,
+        _rate = yearFrac( val0, val1, basis ) * rate * cost,
+        countFullPeriods = ( cost - salvage - _rate) / costRate;
 
-    if ( nPer == 0 )
-        return this.value = new cNumber( f0Rate );
-    else if ( nPer <= nNumOfFullPeriods )
-        return this.value = new cNumber( fOneRate );
-    else if ( nPer == nNumOfFullPeriods + 1 )
-        return this.value = new cNumber( fCostDelta - fOneRate * nNumOfFullPeriods - f0Rate );
+    if ( period == 0 )
+        return this.value = new cNumber( _rate );
+    else if ( period <= countFullPeriods )
+        return this.value = new cNumber( costRate );
+    else if ( period == countFullPeriods + 1 )
+        return this.value = new cNumber( costDelta - costRate * countFullPeriods - _rate );
     else
         return this.value = new cNumber( 0 );
 
