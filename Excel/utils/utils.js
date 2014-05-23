@@ -398,7 +398,7 @@
 			this._updateAdditionalData();
 			return this;
 		};
-		ActiveRange.prototype.isEqual = function () {
+		ActiveRange.prototype.isEqualAll = function () {
 			var bRes = ActiveRange.superclass.isEqual.apply(this, arguments);
 			if(bRes && arguments.length > 0)
 			{
