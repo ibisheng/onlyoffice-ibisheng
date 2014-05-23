@@ -2375,6 +2375,26 @@ CTable.prototype =
         return DrawingObjs;
     },
 
+    Get_AllFloatElements : function(FloatObjs)
+    {
+        if ( undefined === FloatObjs )
+            FloatObjs = new Array();
+
+        var Rows_Count = this.Content.length;
+        for ( var CurRow = 0; CurRow < Rows_Count; CurRow++ )
+        {
+            var Row = this.Content[CurRow];
+            var Cells_Count = Row.Get_CellsCount();
+            for ( var CurCell = 0; CurCell < Cells_Count; CurCell++ )
+            {
+                var Cell = Row.Get_Cell( CurCell );
+                Cell.Content.Get_AllFloatElements( FloatObjs );
+            }
+        }
+
+        return FloatObjs;
+    },
+
     // Данная функция запрашивает новую позицию для содержимого у ячейки, разбивающейся на несколько страниц
     Get_PageContentStartPos : function(PageNum, RowIndex, CellIndex)
     {

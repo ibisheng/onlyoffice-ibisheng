@@ -1160,6 +1160,26 @@ CDocumentContent.prototype =
 
         return DrawingObjs;
     },
+    
+    Get_AllFloatElements : function(FloatObjs)
+    {
+        if ( undefined === FloatObjs )
+            FloatObjs = new Array();
+        
+        var Count = this.Content.length;
+        for (var Pos = 0; Pos < Count; Pos++)
+        {
+            var Item = this.Content[Pos];
+            
+            if ( true !== Item.Is_Inline() )
+                FloatObjs.push( Item );
+            
+            if ( type_Table === Item.GetType() )
+                Item.Get_AllFloatElements(FloatObjs);
+        }
+        
+        return FloatObjs;
+    },
 
     Shift : function(PageIndex, Dx, Dy)
     {
