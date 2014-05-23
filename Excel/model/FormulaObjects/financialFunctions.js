@@ -503,7 +503,7 @@ function cACCRINT() {
     this.value = null;
     this.argumentsMin = 6;
     this.argumentsCurrent = 0;
-    this.argumentsMax = 7;
+    this.argumentsMax = 8;
     this.formatType = {
         def:-1, //подразумевается формат первой ячейки входящей в формулу.
         noneFormat:-2
@@ -514,86 +514,106 @@ function cACCRINT() {
 
 cACCRINT.prototype = Object.create( cBaseFunction.prototype );
 cACCRINT.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1],
-        arg2 = arg[2], arg3 = arg[3],
-        arg4 = arg[4] && !(arg[4] instanceof cEmpty) ? arg[4] : new cNumber( 1000 ),
-        arg5 = arg[5],
-        arg6 = arg[6] && !(arg[6] instanceof cEmpty) ? arg[6] : new cNumber( 0 );
+    var issue = arg[0], firstInterest = arg[1],
+        settlement = arg[2], rate = arg[3],
+        par = arg[4] && !(arg[4] instanceof cEmpty) ? arg[4] : new cNumber( 1000 ),
+        frequency = arg[5],
+        basis = arg[6] && !(arg[6] instanceof cEmpty) ? arg[6] : new cNumber( 0 ),
+        calcMethod = arg[7] && !(arg[7] instanceof cEmpty) ? arg[7] : new cBool( true );
 
-    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+    if ( issue instanceof cArea || issue instanceof cArea3D ) {
+        issue = issue.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof cArray ) {
-        arg0 = arg0.getElementRowCol( 0, 0 );
-    }
-
-    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
-    }
-    else if ( arg1 instanceof cArray ) {
-        arg1 = arg1.getElementRowCol( 0, 0 );
+    else if ( issue instanceof cArray ) {
+        issue = issue.getElementRowCol( 0, 0 );
     }
 
-    if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
-        arg2 = arg2.cross( arguments[1].first );
+    if ( firstInterest instanceof cArea || firstInterest instanceof cArea3D ) {
+        firstInterest = firstInterest.cross( arguments[1].first );
     }
-    else if ( arg2 instanceof cArray ) {
-        arg2 = arg2.getElementRowCol( 0, 0 );
-    }
-
-    if ( arg3 instanceof cArea || arg3 instanceof cArea3D ) {
-        arg3 = arg3.cross( arguments[1].first );
-    }
-    else if ( arg3 instanceof cArray ) {
-        arg3 = arg3.getElementRowCol( 0, 0 );
+    else if ( firstInterest instanceof cArray ) {
+        firstInterest = firstInterest.getElementRowCol( 0, 0 );
     }
 
-    if ( arg4 instanceof cArea || arg4 instanceof cArea3D ) {
-        arg4 = arg4.cross( arguments[1].first );
+    if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
+        settlement = settlement.cross( arguments[1].first );
     }
-    else if ( arg4 instanceof cArray ) {
-        arg4 = arg4.getElementRowCol( 0, 0 );
-    }
-
-    if ( arg5 instanceof cArea || arg5 instanceof cArea3D ) {
-        arg5 = arg5.cross( arguments[1].first );
-    }
-    else if ( arg5 instanceof cArray ) {
-        arg5 = arg5.getElementRowCol( 0, 0 );
+    else if ( settlement instanceof cArray ) {
+        settlement = settlement.getElementRowCol( 0, 0 );
     }
 
-    if ( arg6 instanceof cArea || arg6 instanceof cArea3D ) {
-        arg6 = arg6.cross( arguments[1].first );
+    if ( rate instanceof cArea || rate instanceof cArea3D ) {
+        rate = rate.cross( arguments[1].first );
     }
-    else if ( arg6 instanceof cArray ) {
-        arg6 = arg6.getElementRowCol( 0, 0 );
+    else if ( rate instanceof cArray ) {
+        rate = rate.getElementRowCol( 0, 0 );
     }
 
-    arg0 = arg0.tocNumber();
-    arg1 = arg1.tocNumber();
-    arg2 = arg2.tocNumber();
-    arg3 = arg3.tocNumber();
-    arg4 = arg4.tocNumber();
-    arg5 = arg5.tocNumber();
-    arg6 = arg6.tocNumber();
+    if ( par instanceof cArea || par instanceof cArea3D ) {
+        par = par.cross( arguments[1].first );
+    }
+    else if ( par instanceof cArray ) {
+        par = par.getElementRowCol( 0, 0 );
+    }
 
-    if ( arg0 instanceof cError ) return this.value = arg0;
-    if ( arg1 instanceof cError ) return this.value = arg1;
-    if ( arg2 instanceof cError ) return this.value = arg2;
-    if ( arg3 instanceof cError ) return this.value = arg3;
-    if ( arg4 instanceof cError ) return this.value = arg4;
-    if ( arg5 instanceof cError ) return this.value = arg5;
-    if ( arg6 instanceof cError ) return this.value = arg6;
+    if ( frequency instanceof cArea || frequency instanceof cArea3D ) {
+        frequency = frequency.cross( arguments[1].first );
+    }
+    else if ( frequency instanceof cArray ) {
+        frequency = frequency.getElementRowCol( 0, 0 );
+    }
 
-    var _arg5 = arg5.getValue();
+    if ( basis instanceof cArea || basis instanceof cArea3D ) {
+        basis = basis.cross( arguments[1].first );
+    }
+    else if ( basis instanceof cArray ) {
+        basis = basis.getElementRowCol( 0, 0 );
+    }
 
-    if ( arg0.getValue() >= arg2.getValue() || arg3.getValue() <= 0 || arg4.getValue() <= 0 || arg6.getValue() < 0 || arg6.getValue() > 4 || (_arg5 != 1 && _arg5 != 2 && _arg5 != 4) ) {
+    if ( calcMethod instanceof cArea || calcMethod instanceof cArea3D ) {
+        calcMethod = calcMethod.cross( arguments[1].first );
+    }
+    else if ( calcMethod instanceof cArray ) {
+        calcMethod = calcMethod.getElementRowCol( 0, 0 );
+    }
+
+    issue = issue.tocNumber();
+    firstInterest = firstInterest.tocNumber();
+    settlement = settlement.tocNumber();
+    rate = rate.tocNumber();
+    par = par.tocNumber();
+    frequency = frequency.tocNumber();
+    basis = basis.tocNumber();
+    calcMethod = calcMethod.tocBool();
+
+    if ( issue instanceof cError ) return this.value = issue;
+    if ( firstInterest instanceof cError ) return this.value = firstInterest;
+    if ( settlement instanceof cError ) return this.value = settlement;
+    if ( rate instanceof cError ) return this.value = rate;
+    if ( par instanceof cError ) return this.value = par;
+    if ( frequency instanceof cError ) return this.value = frequency;
+    if ( basis instanceof cError ) return this.value = basis;
+    if ( calcMethod instanceof cError ) return this.value = calcMethod;
+
+    var _arg5 = frequency.getValue();
+
+    if ( issue.getValue() >= settlement.getValue() || rate.getValue() <= 0 || par.getValue() <= 0 || basis.getValue() < 0 || basis.getValue() > 4 || (_arg5 != 1 && _arg5 != 2 && _arg5 != 4) ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
-    var res = yearFrac( Date.prototype.getDateFromExcel( arg0.getValue() ), Date.prototype.getDateFromExcel( arg2.getValue() ), arg6.getValue() );
+    var res;
+    /*if ( settlement.getValue()>firstInterest.getValue() ){
+        res = calcMethod.toBool() ?
+            yearFrac( Date.prototype.getDateFromExcel( firstInterest.getValue() ), Date.prototype.getDateFromExcel( settlement.getValue() ), basis.getValue() ):
+            yearFrac( Date.prototype.getDateFromExcel( issue.getValue() ), Date.prototype.getDateFromExcel( settlement.getValue() ), basis.getValue() );
 
-    res *= arg4.getValue() * arg3.getValue();
+    }
+    else*/{
+        res = yearFrac( Date.prototype.getDateFromExcel( issue.getValue() ), Date.prototype.getDateFromExcel( settlement.getValue() ), basis.getValue() );
+    }
+
+
+    res *= par.getValue() * rate.getValue();
 
     return this.value = new cNumber( res );
 };
@@ -623,66 +643,66 @@ function cACCRINTM() {
 
 cACCRINTM.prototype = Object.create( cBaseFunction.prototype );
 cACCRINTM.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0],
-        arg1 = arg[1],
-        arg2 = arg[2],
-        arg3 = arg[3] && !(arg[3] instanceof cEmpty) ? arg[3] : new cNumber( 1000 ),
-        arg4 = arg[4] && !(arg[4] instanceof cEmpty) ? arg[4] : new cNumber( 0 );
+    var issue = arg[0],
+        settlement = arg[1],
+        rate = arg[2],
+        par = arg[3] && !(arg[3] instanceof cEmpty) ? arg[3] : new cNumber( 1000 ),
+        basis = arg[4] && !(arg[4] instanceof cEmpty) ? arg[4] : new cNumber( 0 );
 
-    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-        arg0 = arg0.cross( arguments[1].first );
+    if ( issue instanceof cArea || issue instanceof cArea3D ) {
+        issue = issue.cross( arguments[1].first );
     }
-    else if ( arg0 instanceof cArray ) {
-        arg0 = arg0.getElementRowCol( 0, 0 );
-    }
-
-    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
-    }
-    else if ( arg1 instanceof cArray ) {
-        arg1 = arg1.getElementRowCol( 0, 0 );
+    else if ( issue instanceof cArray ) {
+        issue = issue.getElementRowCol( 0, 0 );
     }
 
-    if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
-        arg2 = arg2.cross( arguments[1].first );
+    if ( settlement instanceof cArea || settlement instanceof cArea3D ) {
+        settlement = settlement.cross( arguments[1].first );
     }
-    else if ( arg2 instanceof cArray ) {
-        arg2 = arg2.getElementRowCol( 0, 0 );
-    }
-
-    if ( arg3 instanceof cArea || arg3 instanceof cArea3D ) {
-        arg3 = arg3.cross( arguments[1].first );
-    }
-    else if ( arg3 instanceof cArray ) {
-        arg3 = arg3.getElementRowCol( 0, 0 );
+    else if ( settlement instanceof cArray ) {
+        settlement = settlement.getElementRowCol( 0, 0 );
     }
 
-    if ( arg4 instanceof cArea || arg4 instanceof cArea3D ) {
-        arg4 = arg4.cross( arguments[1].first );
+    if ( rate instanceof cArea || rate instanceof cArea3D ) {
+        rate = rate.cross( arguments[1].first );
     }
-    else if ( arg4 instanceof cArray ) {
-        arg4 = arg4.getElementRowCol( 0, 0 );
+    else if ( rate instanceof cArray ) {
+        rate = rate.getElementRowCol( 0, 0 );
     }
 
-    arg0 = arg0.tocNumber();
-    arg1 = arg1.tocNumber();
-    arg2 = arg2.tocNumber();
-    arg3 = arg3.tocNumber();
-    arg4 = arg4.tocNumber();
+    if ( par instanceof cArea || par instanceof cArea3D ) {
+        par = par.cross( arguments[1].first );
+    }
+    else if ( par instanceof cArray ) {
+        par = par.getElementRowCol( 0, 0 );
+    }
 
-    if ( arg0 instanceof cError ) return this.value = arg0;
-    if ( arg1 instanceof cError ) return this.value = arg1;
-    if ( arg2 instanceof cError ) return this.value = arg2;
-    if ( arg3 instanceof cError ) return this.value = arg3;
-    if ( arg4 instanceof cError ) return this.value = arg4;
+    if ( basis instanceof cArea || basis instanceof cArea3D ) {
+        basis = basis.cross( arguments[1].first );
+    }
+    else if ( basis instanceof cArray ) {
+        basis = basis.getElementRowCol( 0, 0 );
+    }
 
-    if ( arg0.getValue() >= arg1.getValue() || arg3.getValue() <= 0 || arg4.getValue() < 0 || arg4.getValue() > 4 ) {
+    issue = issue.tocNumber();
+    settlement = settlement.tocNumber();
+    rate = rate.tocNumber();
+    par = par.tocNumber();
+    basis = basis.tocNumber();
+
+    if ( issue instanceof cError ) return this.value = issue;
+    if ( settlement instanceof cError ) return this.value = settlement;
+    if ( rate instanceof cError ) return this.value = rate;
+    if ( par instanceof cError ) return this.value = par;
+    if ( basis instanceof cError ) return this.value = basis;
+
+    if ( issue.getValue() >= settlement.getValue() || rate.getValue() <= 0 || par.getValue() <= 0 || basis.getValue() < 0 || basis.getValue() > 4 ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
-    var res = yearFrac( Date.prototype.getDateFromExcel( arg0.getValue() ), Date.prototype.getDateFromExcel( arg1.getValue() ), arg4.getValue() );
+    var res = yearFrac( Date.prototype.getDateFromExcel( issue.getValue() ), Date.prototype.getDateFromExcel( settlement.getValue() ), basis.getValue() );
 
-    res *= arg2.getValue() * arg3.getValue();
+    res *= rate.getValue() * par.getValue();
 
     return this.value = new cNumber( res )
 };
@@ -713,7 +733,7 @@ function cAMORDEGRC() {
 cAMORDEGRC.prototype = Object.create( cBaseFunction.prototype );
 cAMORDEGRC.prototype.Calculate = function ( arg ) {
     var cost = arg[0],
-        detePurch = arg[1],
+        datePurch = arg[1],
         firstPer = arg[2],
         salvage = arg[3],
         period = arg[4],
@@ -727,11 +747,11 @@ cAMORDEGRC.prototype.Calculate = function ( arg ) {
         cost = cost.getElementRowCol( 0, 0 );
     }
 
-    if ( detePurch instanceof cArea || detePurch instanceof cArea3D ) {
-        detePurch = detePurch.cross( arguments[1].first );
+    if ( datePurch instanceof cArea || datePurch instanceof cArea3D ) {
+        datePurch = datePurch.cross( arguments[1].first );
     }
-    else if ( detePurch instanceof cArray ) {
-        detePurch = detePurch.getElementRowCol( 0, 0 );
+    else if ( datePurch instanceof cArray ) {
+        datePurch = datePurch.getElementRowCol( 0, 0 );
     }
 
     if ( firstPer instanceof cArea || firstPer instanceof cArea3D ) {
@@ -770,7 +790,7 @@ cAMORDEGRC.prototype.Calculate = function ( arg ) {
     }
 
     cost = cost.tocNumber();
-    detePurch = detePurch.tocNumber();
+    datePurch = datePurch.tocNumber();
     firstPer = firstPer.tocNumber();
     salvage = salvage.tocNumber();
     period = period.tocNumber();
@@ -778,58 +798,67 @@ cAMORDEGRC.prototype.Calculate = function ( arg ) {
     basis = basis.tocNumber();
 
     if ( cost instanceof cError ) return this.value = cost;
-    if ( detePurch instanceof cError ) return this.value = detePurch;
+    if ( datePurch instanceof cError ) return this.value = datePurch;
     if ( firstPer instanceof cError ) return this.value = firstPer;
     if ( salvage instanceof cError ) return this.value = salvage;
     if ( period instanceof cError ) return this.value = period;
     if ( rate instanceof cError ) return this.value = rate;
     if ( basis instanceof cError ) return this.value = basis;
 
-    var fRate = rate.getValue(),
-        fCost = cost.getValue(),
-        fRestVal = salvage.getValue(),
-        nPer = period.getValue();
+    rate = rate.getValue();
+    cost = cost.getValue();
+    salvage = salvage.getValue();
+    period = period.getValue();
 
-    var fUsePer = 1 / fRate,
-        fAmorCoeff;
+    if( cost < 0 || salvage < 0 || period < 0 || rate < 0 ){
+        return this.value = new cError( cErrorType.not_numeric );
+    }
 
-    if ( fUsePer < 3 )
-        fAmorCoeff = 1;
-    else if ( fUsePer < 5 )
-        fAmorCoeff = 1.5;
-    else if ( fUsePer <= 6 )
-        fAmorCoeff = 2;
+    var per = 1 / rate,
+        coeff;
+
+
+    if( cost == salvage || period > per ){
+        return this.value = new cNumber( 0 );
+    }
+
+    if ( per < 3 )
+        coeff = 1;
+    else if ( per < 5 )
+        coeff = 1.5;
+    else if ( per <= 6 )
+        coeff = 2;
     else
-        fAmorCoeff = 2.5;
+        coeff = 2.5;
 
-    fRate *= fAmorCoeff;
+    rate *= coeff;
 
-    var val0 = Date.prototype.getDateFromExcel( detePurch.getValue() );
+    var val0 = Date.prototype.getDateFromExcel( datePurch.getValue() );
     var val1 = Date.prototype.getDateFromExcel( firstPer.getValue() );
 
 
-    var fNRate = Math.round( yearFrac( val0, val1, basis.getValue() ) * fRate * fCost );
-    fCost -= fNRate;
-    var fRest = fCost - fRestVal;
+    var _rate = Math.round( yearFrac( val0, val1, basis.getValue() ) * rate * cost );
+    cost -= _rate;
+    var rest = cost - salvage;
 
-    for ( var n = 0; n < nPer; n++ ) {
-        fNRate = Math.round( fRate * fCost );
-        fRest -= fNRate;
+    for ( var n = 0; n < period; n++ ) {
+        _rate = Math.round( rate * cost );
+        rest -= _rate;
 
-        if ( fRest < 0 ) {
-            switch ( nPer - n ) {
+        if ( rest < 0 ) {
+            switch ( period - n ) {
                 case 0:
                 case 1:
-                    return this.value = new cNumber( Math.round( fCost * 0.5 ) );
+                    return this.value = new cNumber( Math.round( cost * 0.5 ) );
                 default:
                     return this.value = new cNumber( 0 );
             }
         }
 
-        fCost -= fNRate;
+        cost -= _rate;
     }
 
-    return this.value = new cNumber( fNRate )
+    return this.value = new cNumber( _rate )
 
 };
 cAMORDEGRC.prototype.getInfo = function () {
