@@ -209,6 +209,52 @@ function GetDiffDate( d1, d2, nMode ) {
     return (bNeg ? -nRet : nRet) / c_msPerDay / pOptDaysIn1stYear;
 }
 
+function days360( date1, date2, flag ){
+    var sign;
+
+    var nY1 = date1.getUTCFullYear(), nM1 = date1.getUTCMonth()+1, nD1 = date1.getUTCDate(),
+        nY2 = date2.getUTCFullYear(), nM2 = date2.getUTCMonth()+1, nD2 = date2.getUTCDate();
+
+    if (flag && (date2 < date1))
+    {
+        sign = date1;
+        date1 = date2;
+        date2 = sign;
+        sign = -1.0;
+    }
+    else
+        sign = 1.0;
+    if (nD1 == 31)
+        nD1 -= 1;
+    else if (!flag)
+        {
+            if (nM1 == 2)
+            {
+                switch ( nD1 )
+                {
+                    case 28 :
+                        if ( !date1.isLeapYear() )
+                            nD1 = 30;
+                        break;
+                    case 29 :
+                        nD1 = 30;
+                        break;
+                }
+            }
+        }
+        if (nD2 == 31)
+        {
+            if (!flag )
+            {
+                if (nD1 == 30)
+                    nD2--;
+            }
+            else
+                nD2 = 30;
+        }
+        return  sign * ( nD2 - nD1 + ( nM2 - nM1 )* 30.0 + ( nY2 - nY1 ) * 360.0 ) ;
+}
+
 cFormulaFunction.DateAndTime = {
     'groupName':"DateAndTime",
     'DATE':cDATE,
@@ -611,8 +657,7 @@ cDAYS360.prototype.Calculate = function ( arg ) {
 
     var date1 = Date.prototype.getDateFromExcel( arg0.getValue() ), date2 = Date.prototype.getDateFromExcel( arg1.getValue() );
 
-    return this.value = new cNumber( GetDiffDate360( date1.getUTCDate(), date1.getUTCMonth() + 1, date1.getUTCFullYear(), date1.isLeapYear(),
-        date2.getUTCDate(), date2.getUTCMonth() + 1, date2.getUTCFullYear(), !arg2.toBool() ) )
+    return this.value = new cNumber( days360( date1, date2, arg2.toBool() ) );
 
 }
 cDAYS360.prototype.getInfo = function () {

@@ -134,6 +134,23 @@ Math.fact = function ( n ) {
     return res;
 };
 
+Math.doubleFact = function ( n ) {
+    var res = 1;
+    n = this.floor( n );
+    if ( n < 0 ) {
+        return NaN;
+    }
+    else if ( n > 170 ) {
+        return Infinity;
+    }
+//    n = Math.floor((n+1)/2);
+    while ( n > 0 ) {
+        res *= n;
+        n-=2;
+    }
+    return res;
+};
+
 Math.factor = function ( n ) {
     var res = 1;
     n = this.floor( n );
@@ -3837,26 +3854,44 @@ function matching( x, y, oper ) {
 }
 
 function GetDiffDate360( nDay1, nMonth1, nYear1, bLeapYear1, nDay2, nMonth2, nYear2, bUSAMethod ) {
-    if ( nDay1 == 31 )
-        nDay1--;
-    else if ( bUSAMethod && ( nMonth1 == 2 && ( nDay1 == 29 || ( nDay1 == 28 && !bLeapYear1 ) ) ) )
-        nDay1 = 30;
+    var nDayDiff;
+    var startTime = new Date( nYear1, nMonth1-1, nDay1 ),
+        endTime = new Date( nYear2, nMonth2-1, nDay2 ),
+        nY, nM, nD;
 
-    if ( nDay2 == 31 ) {
-        if ( bUSAMethod && nDay1 != 30 ) {
-            nDay2 = 1;
-            if ( nMonth2 == 12 ) {
-                nYear2++;
-                nMonth2 = 1;
-            }
-            else
-                nMonth2++;
-        }
-        else
-            nDay2 = 30;
+    if( startTime > endTime ){
+        nY = nYear1;nYear1 = nYear2; nYear2 = nY;
+        nM = nMonth1;nMonth1 = nMonth2; nMonth2 = nM;
+        nD = nDay1;nDay1 = nDay2; nDay2 = nD;
     }
 
-    return ( nDay2 - nDay1 ) + ( nMonth2 - nMonth1 ) * 30 + ( nYear2 - nYear1 ) * 360;
+    if ( bUSAMethod ) {
+        if ( nDay1 == 31 ) {
+            nDay1--;
+        }
+        if ( nDay1 == 30 && nDay2 == 31 ) {
+            nDay2--;
+        }
+        else {
+            if ( nMonth1 == 2 && nDay1 == ( new Date(nYear1, 0, 1).isLeapYear() ? 29 : 28 ) ) {
+                nDay1 = 30;
+                if ( nMonth2 == 2 && nDay2 == ( new Date(nYear2, 0, 1).isLeapYear() ? 29 : 28 ) ) {
+                    nDay2 = 30;
+                }
+            }
+        }
+        nDayDiff = ( nYear2 - nYear1 ) * 360 + ( nMonth2 - nMonth1 ) * 30 + ( nDay2 - nDay1 );
+    }
+    else {
+        if ( nDay1 == 31 ) {
+            nDay1--;
+        }
+        if ( nDay2 == 31 ) {
+            nDay2--;
+        }
+        nDayDiff = ( nYear2 - nYear1 ) * 360 + ( nMonth2 - nMonth1 ) * 30 + ( nDay2 - nDay1 );
+    }
+    return nDayDiff;
 }
 
 function searchRegExp( str, flags ) {
