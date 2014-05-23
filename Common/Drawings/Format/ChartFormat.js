@@ -736,7 +736,7 @@ CDLbl.prototype =
             if(compiled_string.length > 0)
                 compiled_string += separator;
             var num_format = oNumFormatCache.get(this.series.getFormatCode());
-            compiled_string += num_format.format(this.series.getValByIndex(this.pt.idx), CellValueType.Number, gc_nMaxDigCount, null, true)[0].text;
+            compiled_string += num_format.formatToChart(this.series.getValByIndex(this.pt.idx));
         }
         if(this.showPercent)
         {

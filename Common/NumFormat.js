@@ -2292,8 +2292,16 @@ CellFormat.prototype =
     },
 	formatToMathInfo : function(number, nValType, dDigitsCount)
 	{
+		return this._formatToText(number, nValType, dDigitsCount, false);
+	},
+	formatToChart : function(number)
+	{
+		return this._formatToText(number, CellValueType.Number, gc_nMaxDigCount, true);
+	},
+	_formatToText : function(number, nValType, dDigitsCount, bChart)
+	{
 		var result = "";
-		var arrFormat = this.format(number, nValType, dDigitsCount, null, false);
+		var arrFormat = this.format(number, nValType, dDigitsCount, null, bChart);
 		for (var i = 0, item; i < arrFormat.length; ++i) {
 			item = arrFormat[i];
 			if (item.format) {

@@ -848,8 +848,8 @@ CChartSpace.prototype =
                         for(i = 0; i < arr_val.length; ++i)
                         {
                             var calc_value = arr_val[i]*multiplier;
-                            var rich_value = num_format.format(calc_value, CellValueType.Number, gc_nMaxDigCount, null, true);
-                            arr_strings.push(rich_value[0].text);
+                            var rich_value = num_format.formatToChart(calc_value);
+                            arr_strings.push(rich_value);
                         }
                     }
                     else
@@ -898,8 +898,8 @@ CChartSpace.prototype =
                         for(i = 0; i < arr_x_val.length; ++i)
                         {
                             var calc_value = arr_x_val[i]*multiplier;
-                            var rich_value = num_format.format(calc_value, CellValueType.number, gc_nMaxDigCount, null, true);
-                            string_pts.push({val:rich_value[0].text});
+                            var rich_value = num_format.formatToChart(calc_value);
+                            string_pts.push({val:rich_value});
                         }
                     }
                     else
@@ -1496,8 +1496,8 @@ CChartSpace.prototype =
                         for(i = 0; i < arr_val.length; ++i)
                         {
                             var calc_value = arr_val[i]*multiplier;
-                            var rich_value = num_format.format(calc_value, CellValueType.Number, gc_nMaxDigCount, null, true);
-                            arr_strings.push(rich_value[0].text);
+                            var rich_value = num_format.formatToChart(calc_value);
+                            arr_strings.push(rich_value);
                         }
                     }
                     else
@@ -2519,8 +2519,8 @@ CChartSpace.prototype =
                         for(i = 0; i < arr_val.length; ++i)
                         {
                             var calc_value = arr_val[i]*multiplier;
-                            var rich_value = num_format.format(calc_value, CellValueType.number, gc_nMaxDigCount, null, true);
-                            arr_strings.push(rich_value[0].text);
+                            var rich_value = num_format.formatToChart(calc_value);
+                            arr_strings.push(rich_value);
                         }
                     }
                     else
@@ -4504,8 +4504,8 @@ CChartSpace.prototype =
                         for(i = 0; i < arr_val.length; ++i)
                         {
                             var calc_value = arr_val[i]*multiplier;
-                            var rich_value = num_format.format(calc_value, CellValueType.number, gc_nMaxDigCount, null, true);
-                            arr_strings.push(rich_value[0].text);
+                            var rich_value = num_format.formatToChart(calc_value);
+                            arr_strings.push(rich_value);
                         }
                     }
                     else
