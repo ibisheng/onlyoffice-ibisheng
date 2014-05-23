@@ -5482,6 +5482,13 @@
 				}
 				if (!canReturnNull) {return {col: c2, left: this.cols[c2].left - offset, right: x2};}
 			} else {
+				if (this.topLeftFrozenCell) {
+					cFrozen = this.topLeftFrozenCell.getCol0();
+					if (0 !== cFrozen) {
+						c = 0;
+						offset = this.cols[c].left - this.cellsLeft;
+					}
+				}
 				for (x2 = this.cellsLeft + this.cols[c].width, c2 = 0; c >= c2; --c, x2 = x1) {
 					x1 = this.cols[c].left - offset;
 					if (x1 <= x && x < x2) {
@@ -5539,6 +5546,13 @@
 				}
 				if (!canReturnNull) {return {row: r2, top: this.rows[r2].top - offset, bottom: y2};}
 			} else {
+				if (this.topLeftFrozenCell) {
+					rFrozen = this.topLeftFrozenCell.getRow0();
+					if (0 !== rFrozen) {
+						r = 0;
+						offset = this.rows[r].top - this.cellsTop;
+					}
+				}
 				for (y2 = this.cellsTop + this.rows[r].height, r2 = 0; r >= r2; --r, y2 = y1) {
 					y1 = this.rows[r].top - offset;
 					if (y1 <= y && y < y2) {
