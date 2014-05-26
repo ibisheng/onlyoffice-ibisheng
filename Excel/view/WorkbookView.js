@@ -1295,6 +1295,7 @@
 			this.canvas.height = this.canvasOverlay.height = this.canvasGraphic.height = this.canvasGraphicOverlay.height = height;
 
 			// При смене ориентации у планшета, сбрасываются флаги у canvas!
+			// ToDo перепроверить на новых исходниках, должно поправиться, был баг в отрисовке!!!!!!!!!!!!!
 			this.drawingCtx.initContextSmoothing();
 			this.overlayCtx.initContextSmoothing();
 			this.drawingCtxCharts.initContextSmoothing();

@@ -5218,8 +5218,7 @@
 				diffWidth = this.cols[cFrozen].left - this.cols[0].left;
 				diffHeight = this.rows[rFrozen].top - this.rows[0].top;
 				y += diffHeight;
-				if (dy > 0)
-					oldH -= diffHeight;
+				oldH -= diffHeight;
 			}
 			oldVRE_isPartial = this._isRowDrawnPartially(vr.r2, vr.r1, diffHeight);
 
@@ -5258,7 +5257,7 @@
 			}
 			ctx.setFillStyle(this.settings.cells.defaultState.background)
 				.fillRect(this.headersLeft, y + (dy > 0 && oldH > 0 ? oldH - dy : 0),
-					ctxW, ctxH - this.cellsTop - (oldH > 0 ? oldH : 0));
+					ctxW, Math.abs(dy));
 
 			var rangeGraphic = null;
 			if ( !(dy > 0 && vr.r2 === oldEnd && !oldVRE_isPartial && dx === 0) ) {
@@ -5358,8 +5357,7 @@
 				diffWidth = this.cols[cFrozen].left - this.cols[0].left;
 				diffHeight = this.rows[rFrozen].top - this.rows[0].top;
 				x += diffWidth;
-				if (dx > 0)
-					oldW -= diffWidth;
+				oldW -= diffWidth;
 			}
 			var oldVCE_isPartial = this._isColDrawnPartially(vr.c2, vr.c1, diffWidth);
 
@@ -5374,8 +5372,7 @@
 				ctx.drawImage(ctx.getCanvas(), x, y, oldW, ctxH, x - dx, y, oldW, ctxH);
 			}
 			ctx.setFillStyle(this.settings.cells.defaultState.background)
-				.fillRect(x + (dx > 0 && oldW > 0 ? oldW - dx : 0), y,
-				          ctxW - this.cellsLeft - (oldW > 0 ? oldW : 0), ctxH);
+				.fillRect(x + (dx > 0 && oldW > 0 ? oldW - dx : 0), y, Math.abs(dx), ctxH);
 
 			var rangeGraphic = null;
 			if ( !(dx > 0 && vr.c2 === oldEnd && !oldVCE_isPartial) ) {
