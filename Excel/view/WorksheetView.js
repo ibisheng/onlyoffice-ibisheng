@@ -8882,15 +8882,9 @@
 										if (comment.nCol == pasteCol && comment.nRow == pasteRow) {
 											var commentData = new asc_CCommentData(comment);
 											//change nRow, nCol
-											commentData.nCol = c + autoC*plCol;
-											commentData.nRow = r + autoR*plRow;
-											commentData.setId();
-											t.cellCommentator.addCommentSerialize(commentData);
-											
-											History.Create_NewPoint();
-											History.Add(g_oUndoRedoComment, historyitem_Comment_Add, t.model.getId(), null, commentData);
-											
-											t.cellCommentator.worksheet.model.workbook.handlers.trigger("asc_onAddComment", commentData.asc_getId(), commentData);
+											commentData.asc_putCol(c + autoC*plCol);
+											commentData.asc_putRow(r + autoR*plRow);
+											t.cellCommentator.asc_addComment(commentData, true);
 										}
 									}
 								}

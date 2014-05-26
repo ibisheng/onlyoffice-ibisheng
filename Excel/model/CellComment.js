@@ -1452,7 +1452,7 @@ CCellCommentator.prototype = {
 		return null;
 	},
 
-	asc_addComment: function(comment) {
+	asc_addComment: function(comment, bIsNotUpdate) {
 
 		var _this = this;
 		var oComment = comment;
@@ -1461,8 +1461,10 @@ CCellCommentator.prototype = {
 		oComment.setId();
 
 		if (!oComment.bDocument) {
-			oComment.asc_putCol(_this.worksheet.getSelectedColumnIndex());
-			oComment.asc_putRow(_this.worksheet.getSelectedRowIndex());
+			if (!bIsNotUpdate) {
+				oComment.asc_putCol(_this.worksheet.getSelectedColumnIndex());
+				oComment.asc_putRow(_this.worksheet.getSelectedRowIndex());
+			}
 
 			var existComments = _this.asc_getComments(oComment.nCol, oComment.nRow);
 			if ( existComments.length ) {
@@ -1490,13 +1492,18 @@ CCellCommentator.prototype = {
 					History.Add(g_oUndoRedoComment, historyitem_Comment_Add, _this.worksheet.model.getId(), null, new asc_CCommentData(oComment));
 
 					_this.aComments.push(oComment);
-					_this.drawCommentCells();
+
+					if (!bIsNotUpdate)
+						_this.drawCommentCells();
 				}
 				_this.worksheet.model.workbook.handlers.trigger("asc_onAddComment", oComment.asc_getId(), oComment);
 			}
 		}
-		
-		_this.isLockedComment(oComment, true, callbackFunc);
+
+		if (bIsNotUpdate)
+			callbackFunc(true);
+		else
+			_this.isLockedComment(oComment, true, callbackFunc);
 	},
 
 	asc_changeComment: function(id, oComment, bChangeCoords, bNoEvent) {
@@ -1567,7 +1574,7 @@ CCellCommentator.prototype = {
 		
 		function callbackFunc(result) {
 			if ( !result ) {
-				_this.worksheet.model.workbook.handlers.trigger("asc_onLockComment", comment.asc_getId(), oComment.asc_getUserId());
+				_this.worksheet.model.workbook.handlers.trigger("asc_onLockComment", comment.asc_getId(), comment.asc_getUserId());
 			} else {
 				_this.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", comment.asc_getId());
 				
