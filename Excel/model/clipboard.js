@@ -1679,7 +1679,7 @@
 				return false;
 			},
 			
-			_pasteInShape: function(worksheet, node)
+			_pasteInShape: function(worksheet, node, onlyFromLocalStorage)
 			{
 				if(onlyFromLocalStorage)
 				{
@@ -1703,7 +1703,8 @@
 					onlyFromLocalStorage = true;
 				
 				//если находимся внутри шейпа
-				if(worksheet.objectRender.controller.curState.textObject && worksheet.objectRender.controller.curState.textObject.txBody)
+				var isIntoShape = worksheet.objectRender.controller.getTargetDocContent();
+				if(isIntoShape)
 				{
 					this._pasteInShape(worksheet, node, onlyFromLocalStorage);
 					return;
