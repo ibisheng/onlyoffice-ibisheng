@@ -3265,7 +3265,8 @@
 					drawingObject.graphicObject.addToDrawingObjects();
 					drawingObject.graphicObject.select(ws.objectRender.controller, 0);
 					
-					aImagesSync.push(drawingObject.graphicObject.getImageUrl());
+					if(drawingObject.graphicObject.isImage())
+						aImagesSync.push(drawingObject.graphicObject.getImageUrl());
 				};
 				
 				window["Asc"]["editor"].ImageLoader.LoadDocumentImages(aImagesSync, null, ws.objectRender.asyncImagesDocumentEndLoaded);
