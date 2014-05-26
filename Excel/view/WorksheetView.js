@@ -7865,19 +7865,19 @@
 						if (isLargeRange) { callTrigger = true; t.handlers.trigger("slowOperation", true); }
 						/* отключаем отрисовку на случай необходимости пересчета ячеек, заносим ячейку, при необходимости в список перерисовываемых */
 						lockDraw(t.model.workbook);
-						if (val === c_oAscCleanOptions.All)
+						if (val === c_oAscCleanOptions.All) {
 							range.cleanAll();
-						if (val & c_oAscCleanOptions.Text || val & c_oAscCleanOptions.Formula)
+							// Удаляем комментарии
+							t.cellCommentator.deleteCommentsRange(arn);
+						} else if (val & c_oAscCleanOptions.Text || val & c_oAscCleanOptions.Formula)
 							range.cleanText();
-						if (val & c_oAscCleanOptions.Format)
+						else if (val & c_oAscCleanOptions.Format)
 							range.cleanFormat();
 
 						// Если нужно удалить автофильтры - удаляем
 						t.autoFilters.isEmptyAutoFilters(arn);
 						// Вызываем функцию пересчета для заголовков форматированной таблицы
 						t.autoFilters._renameTableColumn(arn);
-						// Удаляем комментарии
-						t.cellCommentator.deleteCommentsRange(arn);
 
 						/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
 						buildRecalc(t.model.workbook);
