@@ -195,10 +195,13 @@ function getcoupdaybs( settl, matur, frequency, basis ) {
 }
 
 function getcoupdays( settl, matur, frequency, basis ) {
-    var m = lcl_GetCouppcd( settl, matur, frequency ),
-        n = new Date( m );
-    n.addMonths( 12 / frequency );
-    return diffDate( m, n, basis );
+    if( basis == DayCountBasis.ActualActual ){
+        var m = lcl_GetCouppcd( settl, matur, frequency ),
+            n = new Date( m );
+        n.addMonths( 12 / frequency );
+        return diffDate( m, n, basis );
+    }
+    return daysInYear( 0, basis ) / frequency;
 }
 
 function getcoupnum( settl, matur, frequency ) {
@@ -1145,13 +1148,18 @@ cCOUPDAYS.prototype.Calculate = function ( arg ) {
     if ( frequency instanceof cError ) return this.value = frequency;
     if ( basis instanceof cError ) return this.value = basis;
 
-    if ( settlement.getValue() >= maturity.getValue() || basis.getValue() < 0 || basis.getValue() > 4 || ( frequency.getValue() != 1 && frequency.getValue() != 2 && frequency.getValue() != 4 ) )
+    settlement = settlement.getValue();
+    maturity = maturity.getValue();
+    frequency = frequency.getValue();
+    basis = basis.getValue();
+
+    if ( settlement >= maturity || basis < 0 || basis > 4 || ( frequency != 1 && frequency != 2 && frequency != 4 ) )
         return this.value = new cError( cErrorType.not_numeric );
 
-    var settl = Date.prototype.getDateFromExcel( settlement.getValue() ),
-        matur = Date.prototype.getDateFromExcel( maturity.getValue() );
+    var settl = Date.prototype.getDateFromExcel( settlement ),
+        matur = Date.prototype.getDateFromExcel( maturity );
 
-    return this.value = new cNumber( getcoupdays( settl, matur, frequency.getValue(), basis.getValue() ) );
+    return this.value = new cNumber( getcoupdays( settl, matur, frequency, basis ) );
 
 };
 cCOUPDAYS.prototype.getInfo = function () {

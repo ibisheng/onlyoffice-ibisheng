@@ -1,3 +1,11 @@
+/**
+ * Created with JetBrains WebStorm.
+ * User: Dmitry.Shahtanov
+ * Date: 27.06.13
+ * Time: 12:25
+ * To change this template use File | Settings | File Templates.
+ */
+
 "use strict";
 
 var NumberBase = {
@@ -112,14 +120,14 @@ function BesselI( x, n ) {
         fTerm = fTerm / nK * fXHalf;
     }*/
 
-    fTerm = Math.pow( fXHalf, n ) / Math.factor( n );
+    fTerm = Math.pow( fXHalf, n ) / Math.fact( n );
 
     fResult = fTerm;    // Start result with TERM(n,0).
     if ( fTerm !== 0 ) {
         nK = 1;
         do
         {
-            fTerm = Math.pow( fXHalf, n + 2 * nK ) / ( Math.factor( nK ) * Math.factor( n + nK ) );
+            fTerm = Math.pow( fXHalf, n + 2 * nK ) / ( Math.fact( nK ) * Math.fact( n + nK ) );
 
             /*  Calculation of TERM(n,k) from TERM(n,k-1):
 
@@ -335,6 +343,36 @@ function BesselY( fNum, nOrder ) {
     }
 }
 
+function erf( x ) {
+
+    var sqrtPI2 = 2 / Math.sqrt( Math.PI ), maxIter = 200, eps = 1e-14, res = x*sqrtPI2, v = 1, j = 1, i = 1, oldRes = 0, cont = true,
+        sqrtPI = Math.sqrt( Math.PI );
+
+    /*for ( i = 1; i < maxIter && cont; i++) {
+        oldRes = res;
+        for ( j = 1, v = 1; j <= i; j++ ) {
+            v *= -x * x / j;
+        }
+        res += sqrtPI2*x * v / (2 * i + 1);
+        cont = (Math.abs(oldRes-res) >= eps);
+    }*/
+
+/*    var r = -Math.exp(-x*x)/(x*sqrtPI), mo = -1
+    x = 2*x*x;
+
+    for ( i = 1, res = 1; i < maxIter && cont; i++) {
+        oldRes = res;
+
+        res += Math.pow( -1, i ) * Math.doubleFact( 2*i-1 ) / Math.pow( x, i );
+
+        cont = (Math.abs(oldRes-res) >= eps);
+
+    }
+    res = res * r;*/
+
+    return res /** sqrtPI2*/;
+}
+
 function validBINNumber(n){
     return rg_validBINNumber.test(n);
 }
@@ -375,13 +413,63 @@ function convertFromTo(src,from,to,charLim){
     }
 }
 
-/**
- * Created with JetBrains WebStorm.
- * User: Dmitry.Shahtanov
- * Date: 27.06.13
- * Time: 12:25
- * To change this template use File | Settings | File Templates.
- */
+function Complex(r,i,suffix){
+    this.real = r;
+    this.img = i;
+    this.suffix = suffix;
+}
+
+Complex.prototype = {
+
+    constructor:Complex,
+    toString:function () {
+        var res = [];
+        var hasImag = this.img != 0,
+            hasReal = !hasImag || (this.real != 0);
+
+        if ( hasReal ) {
+            res.push( this.real );
+        }
+        if ( hasImag ) {
+            if ( this.img == 1 ) {
+                if ( hasReal ) {
+                    res.push( '+' );
+                }
+            }
+            else if ( this.img == -1 ) {
+                res.push( "-" );
+            }
+            else {
+                this.img > 0 && hasReal ? res.push( "+"+this.img ) : res.push( this.img );
+            }
+            res.push( this.suffix );
+        }
+        return res.join( "" );
+    },
+    Real:function () {
+        return this.real;
+    },
+    Imag:function () {
+        return this.img;
+    },
+    Abs:function () {
+        return Math.sqrt( this.real * this.real + this.img * this.img );
+    },
+    Arg:function () {
+        if ( this.real == 0.0 && this.img == 0.0 ) {
+            return Number.NaN;
+        }
+
+        var phi = Math.acos( r / this.Abs() );
+
+        if ( this.img < 0.0 ) {
+            phi = -phi;
+        }
+
+        return phi;
+    }
+
+}
 
 cFormulaFunction.Engineering = {
     'groupName':"Engineering",
@@ -655,10 +743,65 @@ cBIN2OCT.prototype.getInfo = function () {
 }
 
 function cCOMPLEX() {
-    cBaseFunction.call( this, "COMPLEX" );
+    cBaseFunction.call( this, "COMPLEX", 2, 3 );
 }
 
 cCOMPLEX.prototype = Object.create( cBaseFunction.prototype );
+cCOMPLEX.prototype.Calculate = function ( arg ) {
+
+    var real = arg[0],
+        img = arg[1],
+        suf = !arg[2] || arg[2] instanceof cEmpty ? new cString("i") : arg[2];
+    if ( real instanceof cArea || img instanceof cArea3D ) {
+        real = real.cross( arguments[1].first );
+    }
+    else if ( real instanceof cArray ) {
+        real = real.getElement(0);
+    }
+
+    if ( img instanceof cArea || img instanceof cArea3D ) {
+        img = img.cross( arguments[1].first );
+    }
+    else if ( img instanceof cArray ) {
+        img = img.getElement(0);
+    }
+
+    if ( suf instanceof cArea || suf instanceof cArea3D ) {
+        suf = suf.cross( arguments[1].first );
+    }
+    else if ( suf instanceof cArray ) {
+        suf = suf.getElement(0);
+    }
+
+    real = real.tocNumber();
+    img = img.tocNumber();
+    suf = suf.tocString();
+
+    if ( real instanceof cError ) return this.value = real;
+    if ( img instanceof cError ) return this.value = img;
+    if ( suf instanceof cError ) return this.value = suf;
+
+    real = real.getValue();
+    img = img.getValue();
+    suf = suf.getValue();
+
+    if( suf != "i" && suf != "j" ){
+        return this.value = new cError( cErrorType.wrong_value_type );
+    }
+
+    var c = new Complex(real,img,suf);
+
+    this.value = new cString( c.toString() );
+
+    return this.value;
+
+}
+cCOMPLEX.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( real-number , imaginary-number [ , suffix ] )"
+    };
+}
 
 function cCONVERT() {
     cBaseFunction.call( this, "CONVERT" );
@@ -838,16 +981,94 @@ cDEC2OCT.prototype.getInfo = function () {
 }
 
 function cDELTA() {
-    cBaseFunction.call( this, "DELTA" );
+    cBaseFunction.call( this, "DELTA", 1, 2 );
 }
 
 cDELTA.prototype = Object.create( cBaseFunction.prototype );
+cDELTA.prototype.Calculate = function ( arg ) {
+
+    var number1 = arg[0], number2 = !arg[1] ? new cNumber(0) : arg[1];
+
+    if ( number1 instanceof cArea || number2 instanceof cArea3D ) {
+        number1 = number1.cross( arguments[1].first );
+    }
+    else if ( number1 instanceof cArray ) {
+        number1 = number1.getElement(0);
+    }
+
+    if ( number2 instanceof cArea || number2 instanceof cArea3D ) {
+        number2 = number2.cross( arguments[1].first );
+    }
+    else if ( number2 instanceof cArray ) {
+        number2 = number2.getElement(0);
+    }
+
+    number1 = number1.tocNumber();
+    number2 = number2.tocNumber();
+
+    if ( number1 instanceof cError ) return this.value = number1;
+    if ( number2 instanceof cError ) return this.value = number2;
+
+    number1 = number1.getValue();
+    number2 = number2.getValue();
+
+    this.value = new cNumber( number1 == number2 ? 1 : 0 );
+
+    return this.value;
+
+}
+cDELTA.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( number-1 [ , number-2 ] )"
+    };
+}
 
 function cERF() {
-    cBaseFunction.call( this, "ERF" );
+    cBaseFunction.call( this, "ERF", 1, 2 );
 }
 
 cERF.prototype = Object.create( cBaseFunction.prototype );
+/*cERF.prototype.Calculate = function ( arg ) {
+
+    var a = arg[0], b = arg[1] ? arg[1] : new cUndefined();
+    if ( a instanceof cArea || b instanceof cArea3D ) {
+        a = a.cross( arguments[1].first );
+    }
+    else if ( a instanceof cArray ) {
+        a = a.getElement(0);
+    }
+
+    if ( b instanceof cArea || b instanceof cArea3D ) {
+        b = b.cross( arguments[1].first );
+    }
+    else if ( b instanceof cArray ) {
+        b = b.getElement(0);
+    }
+
+    a = a.tocNumber();
+    if ( a instanceof cError ){ return this.value = a; }
+
+    if( !( b instanceof cUndefined ) ){
+        b = b.tocNumber();
+        if ( b instanceof cError ){ return this.value = b; }
+
+        this.value = new cNumber( erf( b.getValue() ) - erf( a.getValue() ) );
+
+    }
+    else{
+        this.value = new cNumber( erf( a.getValue() ) );
+    }
+
+    return this.value;
+
+}
+cERF.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( lower-bound [ , upper-bound ] )"
+    };
+}*/
 
 function cERFC() {
     cBaseFunction.call( this, "ERFC" );

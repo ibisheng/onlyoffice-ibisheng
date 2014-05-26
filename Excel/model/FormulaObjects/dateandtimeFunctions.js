@@ -255,6 +255,26 @@ function days360( date1, date2, flag ){
         return  sign * ( nD2 - nD1 + ( nM2 - nM1 )* 30.0 + ( nY2 - nY1 ) * 360.0 ) ;
 }
 
+function daysInYear( date, basis ){
+    switch( basis )
+    {
+        case DayCountBasis.UsPsa30_360:         // 0=USA (NASD) 30/360
+        case DayCountBasis.Actual360:         // 2=exact/360
+        case DayCountBasis.Europ30_360:         // 4=Europe 30/360
+            return new cNumber( 360 );
+        case DayCountBasis.ActualActual:         // 1=exact/exact
+        {
+            var d = Date.prototype.getDateFromExcel( date );
+            return new cNumber( d.isLeapYear() ? 366 : 365 );
+        }
+        case DayCountBasis.Actual365:         //3=exact/365
+            return new cNumber( 365 );
+        default:
+            return new cError( cErrorType.not_numeric );
+    }
+}
+
+
 cFormulaFunction.DateAndTime = {
     'groupName':"DateAndTime",
     'DATE':cDATE,
