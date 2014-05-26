@@ -297,7 +297,7 @@
 						var sBase64 = oBinaryFileWriter.Write();
 						if(this.element.children && this.element.children.length == 1 /*&& window.USER_AGENT_SAFARI_MACOS*/)
 						{
-							$(this.element.children[0]).css("font-weight", "normal");;
+							$(this.element.children[0]).css("font-weight", "normal");
 							$(this.element.children[0]).wrap(document.createElement("b"));
 						}
 						if(this.element.children[0])
@@ -2513,6 +2513,8 @@
 				var isChart = false;
 				
 				var objectRender = worksheet.objectRender;
+				var isIntoShape = objectRender.controller.getTargetDocContent();
+				
 				//копируем изображения
 				//если выделены графические объекты внутри группы
 				if(isSelectedImages && isSelectedImages != -1 && objectRender.controller.curState.group && objectRender.controller.curState.group.selectedObjects)
@@ -2574,15 +2576,15 @@
 						t._addLocalStorage(isImage,isChart,range.worksheet.getCell( new CellAddress(row, col, 0) ),bbox, image.from.row, image.from.col, worksheet, isCut);
 					}
 				}
-				else if(isSelectedImages && isSelectedImages != -1 && objectRender.controller.curState.textObject && objectRender.controller.curState.textObject.txBody)//если курсор находится внутри шейпа
+				else if(isIntoShape)//если курсор находится внутри шейпа
 				{
-					var htmlInShape = objectRender.controller.curState.textObject.txBody.getSelectedTextHtml();
-					if((activateLocalStorage || copyPasteUseBinary) && htmlInShape)
-					{
-						t._addLocalStorage(false,false,currentRange,bbox,row,col, worksheet, isCut, htmlInShape);
-					}
-					if(!htmlInShape)
-						htmlInShape = "";
+					var CopyProcessor = new Asc.CopyProcessor();
+					CopyProcessor.CopyDocument(document.createElement('div'), isIntoShape, true);
+					
+					var htmlInShape = "";
+					if(CopyProcessor.Para)
+						htmlInShape = CopyProcessor.Para;	
+							
 					return htmlInShape;
 				}
 				else if(isSelectedImages && isSelectedImages != -1)
@@ -4243,10 +4245,849 @@
 			}
 		};
 		
+		
+		
+		
+		//пользуется класс из word, для копирования внутреннего контента автофигуры
+		//TODO просмотреть, все ли функции необходимы
+		function CopyProcessor(api, ElemToSelect)
+		{
+			//this.api = api;
+			//this.oDocument = api.WordControl.m_oLogicDocument;
+			//this.oBinaryFileWriter = new BinaryFileWriter(this.oDocument);
+			//this.fontsArray = api.FontLoader.fontInfos;
+			//this.ElemToSelect = ElemToSelect;
+			this.Ul = document.createElement( "ul" );
+			this.Ol = document.createElement( "ol" );
+			this.Para;
+			this.bOccurEndPar;
+			this.oCurHyperlink = null;
+			this.oCurHyperlinkElem = null;
+			this.oPresentationWriter = new CBinaryFileWriter();
+			//this.oPresentationWriter.Start_UseFullUrl(documentOrigin + editor.DocumentUrl);
+			//this.oPresentationWriter.Start_UseDocumentOrigin(documentOrigin);
+		};
+		CopyProcessor.prototype =
+		{
+			getSrc : function(src)
+			{
+				//������� ����������� �� �� ��� editor.DocumentUrl ������������� ����.
+				//���������� ����� ����� ��� ����������� � word � docs.google
+				var start = src.substring(0, 6);
+				if(0 != src.indexOf("http:") && 0 != src.indexOf("data:") && 0 != src.indexOf("https:") && 0 != src.indexOf("ftp:") && 0 != src.indexOf("file:"))
+					return documentOrigin + src;
+				else
+					return src;
+			},
+			RGBToCSS : function(rgb)
+			{
+				var sResult = "#";
+				var sR = rgb.r.toString(16);
+				if(sR.length == 1)
+					sR = "0" + sR;
+				var sG = rgb.g.toString(16);
+				if(sG.length == 1)
+					sG = "0" + sG;
+				var sB = rgb.b.toString(16);
+				if(sB.length == 1)
+					sB = "0" + sB;
+				return "#" + sR + sG + sB;
+			},
+			CommitList : function(oDomTarget)
+			{
+				if(this.Ul.childNodes.length > 0)
+				{
+					this.Ul.style.paddingLeft = "40px";
+					oDomTarget.appendChild( this.Ul );
+					this.Ul = document.createElement( "ul" );
+				}
+				if(this.Ol.childNodes.length > 0)
+				{
+					this.Ol.style.paddingLeft = "40px";
+					oDomTarget.appendChild( this.Ol );
+					this.Ol = document.createElement( "ol" );
+				}
+			},
+			Commit_pPr : function(Item)
+			{
+				//pPr
+				var apPr = [];
+				var Def_pPr = this.oDocument.Styles.Default.ParaPr;
+				var Item_pPr = Item.CompiledPr.Pr.ParaPr;
+				if(Item_pPr)
+				{
+					//Ind
+					if(Def_pPr.Ind.Left != Item_pPr.Ind.Left)
+						apPr.push("margin-left:" + (Item_pPr.Ind.Left * g_dKoef_mm_to_pt) + "pt");
+					if(Def_pPr.Ind.Right != Item_pPr.Ind.Right)
+						apPr.push("margin-right:" + ( Item_pPr.Ind.Right * g_dKoef_mm_to_pt) + "pt");
+					if(Def_pPr.Ind.FirstLine != Item_pPr.Ind.FirstLine)
+						apPr.push("text-indent:" + (Item_pPr.Ind.FirstLine * g_dKoef_mm_to_pt) + "pt");
+					//Jc
+					if(Def_pPr.Jc != Item_pPr.Jc){
+						switch(Item_pPr.Jc)
+						{
+							case align_Left: apPr.push("text-align:left");break;
+							case align_Center: apPr.push("text-align:center");break;
+							case align_Right: apPr.push("text-align:right");break;
+							case align_Justify: apPr.push("text-align:justify");break;
+						}
+					}
+					//KeepLines , WidowControl
+					if(Def_pPr.KeepLines != Item_pPr.KeepLines || Def_pPr.WidowControl != Item_pPr.WidowControl)
+					{
+						if(Def_pPr.KeepLines != Item_pPr.KeepLines && Def_pPr.WidowControl != Item_pPr.WidowControl)
+							apPr.push("mso-pagination:none lines-together");
+						else if(Def_pPr.KeepLines != Item_pPr.KeepLines)
+							apPr.push("mso-pagination:widow-orphan lines-together");
+						else if(Def_pPr.WidowControl != Item_pPr.WidowControl)
+							apPr.push("mso-pagination:none");
+					}
+					//KeepNext
+					if(Def_pPr.KeepNext != Item_pPr.KeepNext)
+						apPr.push("page-break-after:avoid");
+					//PageBreakBefore
+					if(Def_pPr.PageBreakBefore != Item_pPr.PageBreakBefore)
+						apPr.push("page-break-before:always");
+					//Spacing
+					if(Def_pPr.Spacing.Line != Item_pPr.Spacing.Line)
+					{
+						if(linerule_AtLeast == Item_pPr.Spacing.LineRule)
+							apPr.push("line-height:"+(Item_pPr.Spacing.Line * g_dKoef_mm_to_pt)+"pt");
+						else if( linerule_Auto == Item_pPr.Spacing.LineRule)
+						{
+							if(1 == Item_pPr.Spacing.Line)
+								apPr.push("line-height:normal");
+							else
+								apPr.push("line-height:"+parseInt(Item_pPr.Spacing.Line * 100)+"%");
+						}
+					}
+					if(Def_pPr.Spacing.LineRule != Item_pPr.Spacing.LineRule)
+					{
+						if(linerule_Exact == Item_pPr.Spacing.LineRule)
+							apPr.push("mso-line-height-rule:exactly");
+					}
+					//��� ������� � word ����� ����� ��� �������� ������������ ������
+					//if(Def_pPr.Spacing.Before != Item_pPr.Spacing.Before)
+					apPr.push("margin-top:" + (Item_pPr.Spacing.Before * g_dKoef_mm_to_pt) + "pt");
+					//if(Def_pPr.Spacing.After != Item_pPr.Spacing.After)
+					apPr.push("margin-bottom:" + (Item_pPr.Spacing.After * g_dKoef_mm_to_pt) + "pt");
+					//Shd
+					if(Def_pPr.Shd.Value != Item_pPr.Shd.Value)
+						apPr.push("background-color:" + this.RGBToCSS(Item_pPr.Shd.Color));
+					//Tabs
+					if(Item_pPr.Tabs.Get_Count() > 0)
+					{
+						var sRes = "";
+						//tab-stops:1.0cm 3.0cm 5.0cm
+						for(var i = 0, length = Item_pPr.Tabs.Get_Count(); i < length; i++)
+						{
+							if(0 != i)
+								sRes += " ";
+							sRes += Item_pPr.Tabs.Get(i).Pos / 10 + "cm";
+						}
+						apPr.push("tab-stops:" + sRes);
+					}
+					//Border
+					if(null != Item_pPr.Brd)
+					{
+						apPr.push("border:none");
+						var borderStyle = this._BordersToStyle(Item_pPr.Brd, false, true, "mso-", "-alt");
+						if(null != borderStyle)
+						{
+							var nborderStyleLength = borderStyle.length;
+							if(nborderStyleLength> 0)
+								borderStyle = borderStyle.substring(0, nborderStyleLength - 1);
+							apPr.push(borderStyle);
+						}
+					}
+				}
+				if(apPr.length > 0)
+					this.Para.setAttribute("style", apPr.join(';'));
+			},
+			parse_para_TextPr : function(Value)
+			{
+				var aProp = [];
+				var aTagStart = [];
+				var aTagEnd = [];
+				var sRes = "";
+				if (null != Value.RFonts) {
+					var sFontName = null;
+					if (null != Value.RFonts.Ascii)
+						sFontName = Value.RFonts.Ascii.Name;
+					else if (null != Value.RFonts.HAnsi)
+						sFontName = Value.RFonts.HAnsi.Name;
+					else if (null != Value.RFonts.EastAsia)
+						sFontName = Value.RFonts.EastAsia.Name;
+					else if (null != Value.RFonts.CS)
+						sFontName = Value.RFonts.CS.Name;
+					if (null != sFontName)
+						aProp.push("font-family:" + "'" + CopyPasteCorrectString(sFontName) + "'");
+				}
+				if (null != Value.FontSize) {
+					//if (!this.api.DocumentReaderMode)
+						aProp.push("font-size:" + Value.FontSize + "pt");//font-size � pt ��� ��������� ������� � mm
+					/*else
+						aProp.push("font-size:" + this.api.DocumentReaderMode.CorrectFontSize(Value.FontSize));*/
+				}
+				if (true == Value.Bold) {
+					aTagStart.push("<b>");
+					aTagEnd.push("</b>");
+				}
+				if (true == Value.Italic) {
+					aTagStart.push("<i>");
+					aTagEnd.push("</i>");
+				}
+				if (true == Value.Strikeout) {
+					aTagStart.push("<u>");
+					aTagEnd.push("</u>");
+				}
+				if (null != Value.HighLight && highlight_None != Value.HighLight)
+					aProp.push("background-color:" + this.RGBToCSS(Value.HighLight));
+				if (null != Value.Color) {
+					var color = this.RGBToCSS(Value.Color);
+					aProp.push("color:" + color);
+					aProp.push("mso-style-textfill-fill-color:" + color);
+				}
+				if (null != Value.VertAlign) {
+					if(vertalign_SuperScript == Value.VertAlign)
+						aProp.push("vertical-align:super");
+					else if(vertalign_SubScript == Value.VertAlign)
+						aProp.push("vertical-align:sub");
+				}
+
+				return { style: aProp.join(';'), tagstart: aTagStart.join(''), tagend: aTagEnd.join('') };
+			},
+			ParseItem : function(ParaItem)
+			{
+				var sRes = "";
+				switch ( ParaItem.Type )
+				{
+					case para_Text:
+						//���������� �����������
+						var sValue = ParaItem.Value;
+						if(sValue)
+							sRes += CopyPasteCorrectString(sValue);
+						break;
+					case para_Space:    sRes += " "; break;
+					case para_Tab:        sRes += "<span style='mso-tab-count:1'>    </span>"; break;
+					case para_NewLine:
+						if( break_Page == ParaItem.BreakType)
+						{
+							//todo ��������� ���� �������� � ������ �����
+							sRes += "<br clear=\"all\" style=\"mso-special-character:line-break;page-break-before:always;\" />";
+						}
+						else
+							sRes += "<br style=\"mso-special-character:line-break;\" />";
+						break;
+					//������� ������� ����� ��������� ������ �� ���������� ��������
+					case para_End:        this.bOccurEndPar = true; break;
+					case para_Drawing:
+						var oGraphicObj = ParaItem.GraphicObj;
+						var sSrc = oGraphicObj.getBase64Img();
+						if(sSrc.length > 0)
+						{
+							sSrc = this.getSrc(sSrc);
+							sRes += "<img style=\"max-width:100%;\" width=\""+Math.round(ParaItem.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(ParaItem.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />";
+							break;
+						}
+						// var _canvas     = document.createElement('canvas');
+						// var w = img.width;
+						// var h = img.height;
+
+						// _canvas.width   = w;
+						// _canvas.height  = h;
+
+						// var _ctx        = _canvas.getContext('2d');
+						// _ctx.globalCompositeOperation = "copy";
+						// _ctx.drawImage(img, 0, 0);
+
+						// var _data = _ctx.getImageData(0, 0, w, h);
+						// _ctx = null;
+						// delete _canvas;
+						break;
+					case para_FlowObjectAnchor:
+						var oFlowObj = ParaItem.FlowObject;
+						if(flowobject_Image == oFlowObj.Get_Type())
+						{
+							var sSrc = oFlowObj.Img;
+							if(sSrc.length > 0)
+							{
+								sSrc = this.getSrc(sSrc);
+								var sStyle = "";
+								var nLeft = oFlowObj.X;
+								var nRight = nLeft + oFlowObj.W;
+								if(Math.abs(nLeft - X_Left_Margin) < Math.abs(Page_Width - nRight - X_Right_Margin))
+									sStyle = "float:left;";
+								else
+									sStyle = "float:right;";
+								if(!this.api.DocumentReaderMode)
+								{
+									if(null != oFlowObj.Paddings)
+										sStyle += "margin:" + (oFlowObj.Paddings.Top * g_dKoef_mm_to_pt) + "pt " + (oFlowObj.Paddings.Right * g_dKoef_mm_to_pt) + "pt " +  + (oFlowObj.Paddings.Bottom * g_dKoef_mm_to_pt) + "pt " + + (oFlowObj.Paddings.Left * g_dKoef_mm_to_pt) + "pt;";
+								}
+								else
+									sStyle += "margin:0pt 10pt 0pt 10pt;";
+
+								if (this.api.DocumentReaderMode)
+									sStyle += "max-width:100%;";
+
+								sRes += "<img style=\""+sStyle+"\" width=\""+Math.round(oFlowObj.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(oFlowObj.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />"; break;
+							}
+						}
+						break;
+				}
+				return sRes;
+			},
+			CopyRun: function (Item, bUseSelection) {
+				var sRes = "";
+				var ParaStart = 0;
+				var ParaEnd = Item.Content.length;
+				if (true == bUseSelection) {
+					ParaStart = Item.Selection.StartPos;
+					ParaEnd = Item.Selection.EndPos;
+					if (ParaStart > ParaEnd) {
+						var Temp2 = ParaEnd;
+						ParaEnd = ParaStart;
+						ParaStart = Temp2;
+					}
+				}
+				for (var i = ParaStart; i < ParaEnd; i++)
+					sRes += this.ParseItem(Item.Content[i]);
+				return sRes;
+			},
+			CopyRunContent: function (Container, bUseSelection) {
+				var sRes = "";
+				var ParaStart = 0;
+				var ParaEnd = Container.Content.length - 1;
+				if (true == bUseSelection) {
+					ParaStart = Container.Selection.StartPos;
+					ParaEnd = Container.Selection.EndPos;
+					if (ParaStart > ParaEnd) {
+						var Temp2 = ParaEnd;
+						ParaEnd = ParaStart;
+						ParaStart = Temp2;
+					}
+				}
+
+				for (var i = ParaStart; i <= ParaEnd; i++) {
+					var item = Container.Content[i];
+					if (para_Run == item.Type) {
+						var sRunContent = this.CopyRun(item, bUseSelection);
+						if(sRunContent)
+						{
+							sRes += "<span";
+							var oStyle = this.parse_para_TextPr(item.CompiledPr);
+							if (oStyle && oStyle.style)
+								sRes += " style=\"" + oStyle.style + "\"";
+							sRes += ">";
+							if (oStyle.tagstart)
+								sRes += oStyle.tagstart;
+							sRes += sRunContent;
+							if (oStyle.tagend)
+								sRes += oStyle.tagend;
+							sRes += "</span>";
+						}
+					}
+					else if (para_Hyperlink == item.Type) {
+						sRes += "<a";
+						var sValue = item.Get_Value();
+						var sToolTip = item.Get_ToolTip();
+						if (null != sValue && "" != sValue)
+							sRes += " href=\"" + CopyPasteCorrectString(sValue) + "\"";
+						if (null != sToolTip && "" != sToolTip)
+							sRes += " title=\"" + CopyPasteCorrectString(sToolTip) + "\"";
+						sRes += ">";
+						sRes += this.CopyRunContent(item);
+						sRes += "</a>";
+					}
+				}
+				return sRes;
+			},
+			CopyParagraph : function(oDomTarget, Item, bLast, bUseSelection, aDocumentContent, nDocumentContentIndex)
+			{
+				var oDocument = this.oDocument;
+				this.Para = null;
+				//��� heading ����� � h1
+				var styleId = Item.Style_Get();
+				if(styleId)
+				{
+					var styleName = oDocument.Styles.Get_Name( styleId ).toLowerCase();
+					//������ "heading n" (n=1:6)
+					if(0 == styleName.indexOf("heading"))
+					{
+						var nLevel = parseInt(styleName.substring("heading".length));
+						if(1 <= nLevel && nLevel <= 6)
+							this.Para = document.createElement( "h" + nLevel );
+					}
+				}
+				if(null == this.Para)
+					this.Para = document.createElement( "p" );
+
+				this.bOccurEndPar = false;
+				var oNumPr;
+				var bIsNullNumPr = false;
+			
+				oNumPr = Item.Numbering_Get();
+				bIsNullNumPr = (null == oNumPr || 0 == oNumPr.NumId);
+				
+				
+				if(bIsNullNumPr)
+					this.CommitList(oDomTarget);
+				else
+				{
+					var bBullet = false;
+					var sListStyle = "";
+
+					var aNum = this.oDocument.Numbering.Get_AbstractNum( oNumPr.NumId );
+					if(null != aNum)
+					{
+						var LvlPr = aNum.Lvl[oNumPr.Lvl];
+						if(null != LvlPr)
+						{
+							switch(LvlPr.Format)
+							{
+								case numbering_numfmt_Decimal: sListStyle = "decimal";break;
+								case numbering_numfmt_LowerRoman: sListStyle = "lower-roman";break;
+								case numbering_numfmt_UpperRoman: sListStyle = "upper-roman";break;
+								case numbering_numfmt_LowerLetter: sListStyle = "lower-alpha";break;
+								case numbering_numfmt_UpperLetter: sListStyle = "upper-alpha";break;
+								default:
+									sListStyle = "disc";
+									bBullet = true;
+									break;
+							}
+						}
+					}
+					
+
+					var Li = document.createElement( "li" );
+					Li.setAttribute("style", "list-style-type: " + sListStyle);
+					Li.appendChild( this.Para );
+					if(bBullet)
+						this.Ul.appendChild( Li );
+					else
+						this.Ol.appendChild( Li );
+				}
+				//pPr
+				//this.Commit_pPr(Item);
+
+				this.Para.innerHTML = this.CopyRunContent(Item, bUseSelection);
+
+				if(bLast && false == this.bOccurEndPar)
+				{
+					if(false == bIsNullNumPr)
+					{
+						//������ �������� � ������. ������� ������� �� ������. ���������� ����� ��� span
+						var li = this.Para.parentNode;
+						var ul = li.parentNode;
+						ul.removeChild(li);
+						this.CommitList(oDomTarget);
+					}
+					for(var i = 0; i < this.Para.childNodes.length; i++)
+						oDomTarget.appendChild( this.Para.childNodes[i].cloneNode(true) );
+				}
+				else
+				{
+					//����� ��������� ������ ���������
+					if(this.Para.childNodes.length == 0)
+						this.Para.appendChild( document.createTextNode( '\xa0' ) );
+					if(bIsNullNumPr)
+						oDomTarget.appendChild( this.Para );
+				}
+			},
+			_BorderToStyle : function(border, name)
+			{
+				var res = "";
+				if(border_None == border.Value)
+					res += name + ":none;";
+				else
+				{
+					var size = 0.5;
+					var color = { r : 0, g : 0, b : 0 };
+					if(null != border.Size)
+						size = border.Size * g_dKoef_mm_to_pt;
+					if(null != border.Color)
+						color = border.Color;
+					res += name + ":"+size+"pt solid "+this.RGBToCSS(color)+";";
+				}
+				return res;
+			},
+			_MarginToStyle : function(margins, styleName)
+			{
+				var res = "";
+				var nMarginLeft = 1.9;
+				var nMarginTop = 0;
+				var nMarginRight = 1.9;
+				var nMarginBottom = 0;
+				if(null != margins.Left && tblwidth_Mm == margins.Left.Type && null != margins.Left.W)
+					nMarginLeft = margins.Left.W;
+				if(null != margins.Top && tblwidth_Mm == margins.Top.Type && null != margins.Top.W)
+					nMarginTop = margins.Top.W;
+				if(null != margins.Right && tblwidth_Mm == margins.Right.Type && null != margins.Right.W)
+					nMarginRight = margins.Right.W;
+				if(null != margins.Bottom && tblwidth_Mm == margins.Bottom.Type && null != margins.Bottom.W)
+					nMarginBottom = margins.Bottom.W;
+				res = styleName + ":"+(nMarginTop * g_dKoef_mm_to_pt)+"pt "+(nMarginRight * g_dKoef_mm_to_pt)+"pt "+(nMarginBottom * g_dKoef_mm_to_pt)+"pt "+(nMarginLeft * g_dKoef_mm_to_pt)+"pt;";
+				return res;
+			},
+			_BordersToStyle : function(borders, bUseInner, bUseBetween, mso, alt)
+			{
+				var res = "";
+				if(null == mso)
+					mso = "";
+				if(null == alt)
+					alt = "";
+				if(null != borders.Left)
+					res += this._BorderToStyle(borders.Left, mso + "border-left" + alt);
+				if(null != borders.Top)
+					res += this._BorderToStyle(borders.Top, mso + "border-top" + alt);
+				if(null != borders.Right)
+					res += this._BorderToStyle(borders.Right, mso + "border-right" + alt);
+				if(null != borders.Bottom)
+					res += this._BorderToStyle(borders.Bottom, mso + "border-bottom" + alt);
+				if(bUseInner)
+				{
+					if(null != borders.InsideV)
+						res += this._BorderToStyle(borders.InsideV, "mso-border-insidev");
+					if(null != borders.InsideH)
+						res += this._BorderToStyle(borders.InsideH, "mso-border-insideh");
+				}
+				if(bUseBetween)
+				{
+					if(null != borders.Between)
+						res += this._BorderToStyle(borders.Between, "mso-border-between");
+				}
+				return res;
+			},
+			_MergeProp : function(elem1, elem2)
+			{
+				if( !elem1 || !elem2 )
+				{
+					return;
+				}
+
+				var p, v;
+				for(p in elem2)
+				{
+					if(elem2.hasOwnProperty(p) && false == elem1.hasOwnProperty(p))
+					{
+						v = elem2[p];
+						if(null != v)
+							elem1[p] = v;
+					}
+				}
+			},
+			CopyDocument : function(oDomTarget, oDocument, bUseSelection)
+			{
+				var Start = 0;
+				var End = 0;
+				if(bUseSelection)
+				{
+					if ( true === oDocument.Selection.Use)
+					{
+						if ( selectionflag_DrawingObject === oDocument.Selection.Flag )
+						{
+							this.Para = document.createElement("p");
+							this.Para.innerHTML = this.ParseItem(oDocument.Selection.Data.DrawingObject);
+
+							for(var i = 0; i < this.Para.childNodes.length; i++)
+								this.ElemToSelect.appendChild( this.Para.childNodes[i].cloneNode(true) );
+						}
+						else
+						{
+							Start = oDocument.Selection.StartPos;
+							End = oDocument.Selection.EndPos;
+							if ( Start > End )
+							{
+								var Temp = End;
+								End = Start;
+								Start = Temp;
+							}
+						}
+					}
+				}
+				else
+				{
+					Start = 0;
+					End = oDocument.Content.length - 1;
+				}
+				// HtmlText
+				for ( var Index = Start; Index <= End; Index++ )
+				{
+					var Item = oDocument.Content[Index];
+
+					if ( type_Paragraph === Item.GetType() )
+					{
+						//todo ����� ������ ��� �������� ������ ���� Index == End
+						//this.oBinaryFileWriter.CopyParagraph(Item);
+						this.CopyParagraph(oDomTarget, Item, Index == End, bUseSelection, oDocument.Content, Index);
+					}
+				}
+				this.CommitList(oDomTarget);
+			},
+			Start : function(node)
+			{
+				this.oBinaryFileWriter.CopyStart();
+				var oDocument = this.oDocument;
+				if(g_bIsDocumentCopyPaste)
+				{
+					if(!this.api.DocumentReaderMode)
+					{
+						var Def_pPr = oDocument.Styles.Default.ParaPr;
+						if(docpostype_HdrFtr === oDocument.CurPos.Type)
+						{
+							if(null != oDocument.HdrFtr && null != oDocument.HdrFtr.CurHdrFtr && null != oDocument.HdrFtr.CurHdrFtr.Content)
+								oDocument = oDocument.HdrFtr.CurHdrFtr.Content;
+						}
+						if ( oDocument.CurPos.Type == docpostype_FlowObjects )
+						{
+							var oData = oDocument.Selection.Data.FlowObject;
+							switch ( oData.Get_Type() )
+							{
+								case flowobject_Image:
+								{
+									this.Para = document.createElement("p");
+									var sInnerHtml = this.ParseItem(oData);
+									var oImg = oData;
+									var sSrc = oImg.Img;
+									if(sSrc.length > 0)
+									{
+										sSrc = this.getSrc(sSrc);
+
+										if (this.api.DocumentReaderMode)
+											sInnerHtml += "<img style=\"max-width:100%;\" width=\""+Math.round(oImg.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(oImg.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />";
+										else
+											sInnerHtml += "<img width=\""+Math.round(oImg.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(oImg.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />";
+									}
+									this.Para.innerHTML = sInnerHtml;
+									this.ElemToSelect.appendChild( this.Para );
+									return;
+								}
+								case flowobject_Table:
+								{
+									if(null != oData.Table && null != oData.Table.CurCell && null != oData.Table.CurCell.Content)
+										oDocument = oData.Table.CurCell.Content;
+									break;
+								}
+							}
+						}
+
+						if(oDocument.CurPos.Type === docpostype_DrawingObjects)
+						{
+							var content = oDocument.DrawingObjects.getTargetDocContent();
+							if(content)
+							{
+								oDocument = content;
+							}
+							else if(oDocument.DrawingObjects.selection.groupSelection && oDocument.DrawingObjects.selection.groupSelection.selectedObjects && oDocument.DrawingObjects.selection.groupSelection.selectedObjects.length)
+							{
+
+									var s_arr = oDocument.DrawingObjects.selection.groupSelection.selectedObjects;
+
+									this.Para = document.createElement( "p" );
+
+									if(copyPasteUseBinery)
+									{
+										var newArr = null;
+										var tempAr = null;
+										if(s_arr)
+										{
+											tempAr = [];
+											for(var k = 0; k < s_arr.length; k++)
+											{
+												tempAr[k] = s_arr[k].y;
+											}
+										}
+										tempAr.sort(function(a,b){return a-b;})
+										newArr = [];
+										for(var k = 0; k < tempAr.length; k++)
+										{
+											var absOffsetY = tempAr[k];
+											for(var i = 0; i < s_arr.length; i++)
+											{
+												if(absOffsetY == s_arr[i].y)
+												{
+													newArr[k] = s_arr[i];
+												}
+											}
+										}
+										if(newArr != null)
+											s_arr = newArr;
+									}
+
+									for(var i = 0; i < s_arr.length; ++i)
+									{
+										var paraDrawing = s_arr[i].parent ? s_arr[i].parent : s_arr[i].group.parent;
+										var graphicObj = s_arr[i];
+										
+										if(isRealObject(paraDrawing.Parent))
+										{
+											var base64_img = paraDrawing.getBase64Img();
+
+											if(copyPasteUseBinery)
+											{
+												var wrappingType = oDocument.DrawingObjects.selection.groupSelection.parent.wrappingType;
+												var DrawingType = oDocument.DrawingObjects.selection.groupSelection.parent.DrawingType;
+												var tempParagraph = new Paragraph(oDocument, oDocument, 0, 0, 0, 0, 0);
+												var index = 0;
+												
+												tempParagraph.Content.unshift(new ParaRun());
+												
+												var paraRun = tempParagraph.Content[index];
+												paraRun.Content.unshift(new ParaDrawing());
+												paraRun.Content[index].wrappingType = wrappingType;
+												paraRun.Content[index].DrawingType = DrawingType;
+												paraRun.Content[index].GraphicObj = graphicObj;
+												
+												paraRun.Selection.EndPos = index + 1;
+												paraRun.Selection.StartPos = index;
+												paraRun.Selection.Use = true;
+												
+												tempParagraph.Selection.EndPos = index + 1;
+												tempParagraph.Selection.StartPos = index;
+												tempParagraph.Selection.Use = true;
+												tempParagraph.bFromDocument = true;
+
+												this.oBinaryFileWriter.CopyParagraph(tempParagraph);
+											};
+
+											var src = this.getSrc(base64_img);
+											this.Para.innerHTML += "<img style=\"max-width:100%;\" width=\""+Math.round(paraDrawing.absExtX * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(paraDrawing.absExtY * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" />";
+
+											this.ElemToSelect.appendChild( this.Para );
+										}
+
+									}
+
+									if(copyPasteUseBinery)
+									{
+										this.oBinaryFileWriter.CopyEnd();
+										var sBase64 = this.oBinaryFileWriter.GetResult();
+										if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && window.USER_AGENT_SAFARI_MACOS)
+										{
+											$(this.ElemToSelect.children[0]).css("font-weight", "normal");
+											$(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
+										}
+										if(this.ElemToSelect.children[0])
+											$(this.ElemToSelect.children[0]).addClass("docData;" + sBase64);
+									}
+							}
+							else
+							{
+								var gr_objects = oDocument.DrawingObjects;
+								var selection_array = gr_objects.selectedObjects;
+
+								this.Para = document.createElement( "span" );
+								var selectionTrue;
+								var selectIndex;
+								for(var i = 0; i < selection_array.length; ++i)
+								{
+									var cur_element = selection_array[i].parent;
+									var base64_img = cur_element.getBase64Img();
+									var src = this.getSrc(base64_img);
+
+									this.Para.innerHTML = "<img style=\"max-width:100%;\" width=\""+Math.round(cur_element.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(cur_element.H * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" />";
+
+									this.ElemToSelect.appendChild( this.Para );
+
+									if(copyPasteUseBinery)
+									{
+										var paragraph = cur_element.Parent;
+										
+										var inIndex;
+										var paragraphIndex;
+										var content;
+										var curParaRun;
+										for(var k = 0; k < paragraph.Content.length;k++)
+										{
+											content = paragraph.Content[k].Content;
+											for(var n = 0; n < content.length; n++)
+											{
+												if(content[n] == cur_element)
+												{
+													curParaRun = paragraph.Content[k];
+													inIndex = n;
+													paragraphIndex = k;
+													break;
+												};
+											};
+										};
+										
+										selectionTrue =
+										{
+											EndPos : curParaRun.Selection.EndPos,
+											StartPos: curParaRun.Selection.StartPos,
+											EndPosParagraph : paragraph.Selection.EndPos,
+											StartPosParagraph: paragraph.Selection.StartPos
+										};
+										
+										//меняем Selection
+										curParaRun.Selection.EndPos = inIndex + 1;
+										curParaRun.Selection.StartPos = inIndex;
+										curParaRun.Selection.Use = true;
+										
+										paragraph.Selection.EndPos = paragraphIndex;
+										paragraph.Selection.StartPos = paragraphIndex;
+										paragraph.Selection.Use = true;
+
+										this.oBinaryFileWriter.CopyParagraph(paragraph);
+
+										//возвращаем Selection
+										curParaRun.Selection.StartPos = selectionTrue.StartPos;
+										curParaRun.Selection.EndPos = selectionTrue.EndPos;
+										
+										paragraph.Selection.StartPos = selectionTrue.StartPosParagraph;
+										paragraph.Selection.EndPos = selectionTrue.EndPosParagraph;
+									}
+								}
+								
+								if(copyPasteUseBinery)
+								{
+									this.oBinaryFileWriter.CopyEnd();
+									var sBase64 = this.oBinaryFileWriter.GetResult();
+									if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && window.USER_AGENT_SAFARI_MACOS)
+									{
+										$(this.ElemToSelect.children[0]).css("font-weight", "normal");
+										$(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
+									}
+									if(this.ElemToSelect.children[0])
+										$(this.ElemToSelect.children[0]).addClass("docData;" + sBase64);
+								}
+								return;
+							}
+						}
+						if ( true === oDocument.Selection.Use )
+						{
+							this.CopyDocument(this.ElemToSelect, oDocument, true);
+						}
+					}
+					else
+						this.CopyDocument(this.ElemToSelect, oDocument, false);
+				}
+				
+				
+				this.oBinaryFileWriter.CopyEnd();
+				if(copyPasteUseBinery && this.oBinaryFileWriter.copyParams.itemCount > 0)
+				{
+					var sBase64 = this.oBinaryFileWriter.GetResult();
+					if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && window.USER_AGENT_SAFARI_MACOS)
+					{
+						$(this.ElemToSelect.children[0]).css("font-weight", "normal");;
+						$(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
+					}
+					if(this.ElemToSelect.children[0])
+						$(this.ElemToSelect.children[0]).addClass("docData;" + sBase64);
+				}
+			}
+
+		};
+		
 		/*
 		 * Export
 		 * -----------------------------------------------------------------------------
 		 */
+		window["Asc"].CopyProcessor = CopyProcessor;
 		window["Asc"].Clipboard = Clipboard;
 		window["Asc"].pasteFromBinaryWord = pasteFromBinaryWord;
 		window["Asc"].DocumentContentBounds = DocumentContentBounds;
@@ -4272,6 +5113,17 @@ var PASTE_EMPTY_COUNTER_MAX = 10;
 var PASTE_EMPTY_COUNTER     = 0;
 var PASTE_EMPTY_USE         = AscBrowser.isMozilla;
 
+
+function CopyPasteCorrectString(str)
+{
+    var res = str;
+    res = res.replace(/&/g,'&amp;');
+    res = res.replace(/</g,'&lt;');
+    res = res.replace(/>/g,'&gt;');
+    res = res.replace(/'/g,'&apos;');
+    res = res.replace(/"/g,'&quot;');
+    return res;
+};
 
 if (window.USER_AGENT_SAFARI_MACOS)
 {
