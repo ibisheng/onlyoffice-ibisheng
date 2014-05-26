@@ -590,13 +590,34 @@ CGraphicObjects.prototype =
         {
             drawings = drawings.concat(FooterDrawings);
         }
+
+        var getFloatObjects = function(arrObjects)
+        {
+            var  ret = [];
+            for(var i = 0; i < arrObjects.length; ++i)
+            {
+                if(arrObjects[i].GetType() === type_Paragraph)
+                {
+                    var calc_frame = arrObjects[i].CalculatedFrame;
+                    var FramePr = arrObjects[i].Get_FramePr();
+                    var FrameDx = ( undefined === FramePr.HSpace ? 0 : FramePr.HSpace );
+                    var FrameDy = ( undefined === FramePr.VSpace ? 0 : FramePr.VSpace );
+                    ret.push(new CFlowParagraph(arrObjects[i], calc_frame.L2, calc_frame.T2, calc_frame.W2, calc_frame.H2, FrameDx, FrameDy, 0, 0, FramePr.Wrap));
+                }
+                else if(arrObjects[i].GetType() === type_Table)
+                {
+                    ret.push(new CFlowTable(arrObjects[i], 0));
+                }
+            }
+            return ret;
+        };
         if(HeaderTables)
         {
-            tables = tables.concat(HeaderTables)
+            tables = tables.concat(getFloatObjects(HeaderTables));
         }
         if(FooterTables)
         {
-            tables = tables.concat(FooterTables);
+            tables = tables.concat(getFloatObjects(FooterTables));
         }
 
         hdr_ftr_page.clear();
@@ -644,17 +665,18 @@ CGraphicObjects.prototype =
     addFloatTable: function(table)
     {
         var hdr_ftr = table.Table.Parent.Is_HdrFtr(true);
+        if(!this.graphicPages[table.PageNum + table.PageController])
+        {
+            this.graphicPages[table.PageNum + table.PageController] = new CGraphicPage(table.PageNum + table.PageController, this);
+        }
         if(!hdr_ftr)
         {
-            if(!this.graphicPages[table.PageNum + table.PageController])
-            {
-                this.graphicPages[table.PageNum + table.PageController] = new CGraphicPage(table.PageNum + table.PageController, this);
-            }
+
             this.graphicPages[table.PageNum + table.PageController].addFloatTable(table);
         }
         else
         {
-            //hdr_ftr.DrawingPage.addFloatTable(table);
+           // this.graphicPages[table.PageNum + table.PageController].hdrFtrPage.addFloatTable(table);
         }
     },
 

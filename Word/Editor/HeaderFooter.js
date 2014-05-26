@@ -1283,6 +1283,7 @@ CHeaderFooterController.prototype =
                     Header.Set_Page(PageIndex);
             }
             HeaderDrawings = Header.Content.Get_AllDrawingObjects([]);
+            HeaderTables = Header.Content.Get_AllFloatElements();
         }
         
         var bRecalcFooter = false;
@@ -1313,6 +1314,7 @@ CHeaderFooterController.prototype =
                     Footer.Set_Page(PageIndex);
             }
             FooterDrawings = Footer.Content.Get_AllDrawingObjects([]);
+            FooterTables = Footer.Content.Get_AllFloatElements();
         }
         this.LogicDocument.DrawingObjects.mergeDrawings(PageIndex, HeaderDrawings, HeaderTables, FooterDrawings, FooterTables);
         if ( true === bRecalcHeader || true === bRecalcFooter )

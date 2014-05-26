@@ -158,8 +158,6 @@ CGraphicPage.prototype =
 
     },
 
-
-
     getTableByXY: function(x, y, documentContent)
     {
         for(var index = this.flowTables.length -1; index > -1; --index)
