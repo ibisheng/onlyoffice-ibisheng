@@ -8889,6 +8889,11 @@
 											commentData.nRow = r + autoR*plRow;
 											commentData.setId();
 											t.cellCommentator.addCommentSerialize(commentData);
+											
+											History.Create_NewPoint();
+											History.Add(g_oUndoRedoComment, historyitem_Comment_Add, t.model.getId(), null, commentData);
+											
+											t.cellCommentator.worksheet.model.workbook.handlers.trigger("asc_onAddComment", commentData.asc_getId(), commentData);
 										}
 									}
 								}
@@ -9025,7 +9030,7 @@
 				arn.r2 = trueArn.r2;
 				arn.c2 = trueArn.c2;
 			}
-
+			
 			t.isChanged = true;
 			t.activeRange.c2 = arn.c2;
 			t.activeRange.r2 = arn.r2;
