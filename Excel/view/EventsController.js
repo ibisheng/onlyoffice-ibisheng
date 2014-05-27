@@ -918,7 +918,7 @@
 									{
 										if (0 === window.GlobalPasteFlagCounter)
 										{
-											SafariIntervalFocus();
+											SafariIntervalFocus2();
 											window.GlobalPasteFlag = true;
 											t.handlers.trigger("paste");
 										}

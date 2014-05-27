@@ -2566,7 +2566,7 @@ function Editor_Paste_Exec(api, pastebin, nodeDisplay)
 function trimString( str ){
     return str.replace(/^\s+|\s+$/g, '') ;
 };
-function PasteProcessor(api, bUploadImage, bUploadFonts, bNested)
+function PasteProcessor(api, bUploadImage, bUploadFonts, bNested, pasteInExcel)
 {
     this.oRootNode = null;
     this.api = api;
@@ -2581,6 +2581,8 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested)
     this.oFonts = {};
     this.oImages = {};
 	this.aContent = [];
+	
+	this.pasteInExcel = pasteInExcel;
 	
     //��� ������� ������ � ������, ��� ����������� �� word � chrome ���������� ������ ������� ��� <p>
     this.bIgnoreNoBlockText = false;
@@ -4464,7 +4466,7 @@ PasteProcessor.prototype =
 		}
         var oDocument = this.oDocument;
         //Heading
-        if(null != pNoHtmlPr.hLevel)
+        if(null != pNoHtmlPr.hLevel && oDocument.Styles)
             Para.Style_Add(oDocument.Styles.Get_Default_Heading(pNoHtmlPr.hLevel));
 
         var pPr = Para.Pr;
@@ -4684,7 +4686,7 @@ PasteProcessor.prototype =
                             NumId  = PrevNumPr.NumId;
                     }
                 }
-                if(null == NumId)
+                if(null == NumId && this.pasteInExcel !== true)
                 {
                     //������� ����� ������
                     NumId  = this.oLogicDocument.Numbering.Create_AbstractNum();
@@ -4744,7 +4746,8 @@ PasteProcessor.prototype =
 						}
                     }
                 }
-                Para.Numbering_Add( NumId, 0 );
+				if(this.pasteInExcel !== true)
+					Para.Numbering_Add( NumId, 0 );
             }
             else
             {
@@ -5701,7 +5704,7 @@ PasteProcessor.prototype =
                 return bAddParagraph;
             }
             var sNodeName = node.nodeName.toLowerCase();
-            if("table" == sNodeName)
+            if("table" == sNodeName && this.pasteInExcel !== true)
             {
                 if(g_bIsDocumentCopyPaste)
                 {
@@ -5749,7 +5752,7 @@ PasteProcessor.prototype =
                 }
             }
 
-            if("img" == sNodeName)
+            if("img" == sNodeName && this.pasteInExcel !== true)
             {
                 if(g_bIsDocumentCopyPaste)
                 {

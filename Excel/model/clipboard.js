@@ -187,11 +187,11 @@
 				var found = true;
 
 				if (!t.element) {
-					t.element = doc.getElementById(COPY_ELEMENT_ID);
+					t.element = doc.getElementById(COPY_ELEMENT_ID2);
 					if (!t.element) {found = false; t.element = doc.createElement("DIV");}
 				}
 
-				t.element.id = COPY_ELEMENT_ID;
+				t.element.id = COPY_ELEMENT_ID2;
 				t.element.setAttribute("class", COPYPASTE_ELEMENT_CLASS);
 				t.element.style.position = "absolute";
 				// Если сделать width маленьким, то параграф будет постоянно переноситься по span
@@ -202,7 +202,7 @@
 				t.element.style.height = '100px';
 				t.element.style.overflow = 'hidden';
 				t.element.style.zIndex = -1000;
-				t.element.style.display = ELEMENT_DISPAY_STYLE;
+				t.element.style.display = ELEMENT_DISPAY_STYLE2;
 				t.element.setAttribute("contentEditable", true);
 
 				if (!found) {doc.body.appendChild(t.element);}
@@ -228,7 +228,7 @@
 					t.elementText.style.overflow = 'hidden';
 					t.elementText.style.zIndex = -1000;
 					//if(AscBrowser.isIE)
-						t.elementText.style.display = ELEMENT_DISPAY_STYLE;
+						t.elementText.style.display = ELEMENT_DISPAY_STYLE2;
 					t.elementText.setAttribute("contentEditable", true);
 	
 					if (!foundText) {doc.body.appendChild(t.elementText);}
@@ -621,7 +621,7 @@
 				window.setTimeout(
 						function() {
 							// отменяем возможность выделения
-							t.element.style.display = ELEMENT_DISPAY_STYLE;
+							t.element.style.display = ELEMENT_DISPAY_STYLE2;
 							doc.body.style.MozUserSelect = "none";
 							doc.body.style["-khtml-user-select"] = "none";
 							doc.body.style["-o-user-select"] = "none";
@@ -636,7 +636,7 @@
 								}
 							}
 							
-							t.elementText.style.display = ELEMENT_DISPAY_STYLE;
+							t.elementText.style.display = ELEMENT_DISPAY_STYLE2;
 							var textInsert = t.elementText.value;
 							if(isOnlyLocalBufferSafari && navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac') && t.lStorageText)
 								textInsert = t.lStorageText;
@@ -848,10 +848,10 @@
 					if(!isTruePaste)
 						t._editorPasteExec(worksheet, pastebin);
 					
-					pastebin.style.display  = ELEMENT_DISPAY_STYLE;
+					pastebin.style.display  = ELEMENT_DISPAY_STYLE2;
 						
 					if(AscBrowser.isIE)
-						pastebin.style.display  = ELEMENT_DISPAY_STYLE;
+						pastebin.style.display  = ELEMENT_DISPAY_STYLE2;
 					
 					if (callback && callback.call) {callback();}
 				};
@@ -866,10 +866,10 @@
             {
                 //var oWordControl = api.WordControl;
                 var t = this;
-                var pastebin = document.getElementById(PASTE_ELEMENT_ID);
+                var pastebin = document.getElementById(PASTE_ELEMENT_ID2);
                 if(!pastebin){
                     pastebin = document.createElement("div");
-                    pastebin.setAttribute( 'id', PASTE_ELEMENT_ID );
+                    pastebin.setAttribute( 'id', PASTE_ELEMENT_ID2 );
 					pastebin.setAttribute( 'class', COPYPASTE_ELEMENT_CLASS );
                     pastebin.style.position = 'absolute';
                     pastebin.style.top = '100px';
@@ -1118,7 +1118,7 @@
 						
 						bExist = true;
 					}
-					ifr.style.display  = ELEMENT_DISPAY_STYLE;
+					ifr.style.display  = ELEMENT_DISPAY_STYLE2;
 				}
 				if(bExist)
 				{
@@ -1433,7 +1433,7 @@
 
 			_IsBlockElem : function(name)
 			{
-				if( "p" == name || "div" == name || "ul" == name || "ol" == name || "li" == name || "table" == name ||
+				if( "p" == name || "div" == name || "ul" == name || "ol" == name || "li" == name || "table" == name || "tbody" == name || "tr" == name || "td" == name || "th" == name ||
 					"h1" == name || "h2" == name || "h3" == name || "h4" == name || "h5" == name || "h6" == name || "center" == name)
 					return true;
 				return false;
@@ -1679,15 +1679,22 @@
 				return false;
 			},
 			
-			_pasteInShape: function(worksheet, node, onlyFromLocalStorage)
+			_pasteInShape: function(worksheet, node, onlyFromLocalStorage, targetDocContent)
 			{
-				if(onlyFromLocalStorage)
+				var oPasteProcessor = new PasteProcessor({WordControl:{m_oLogicDocument: targetDocContent}, FontLoader: {}}, false, false, true, true);
+				oPasteProcessor._Execute(node, {}, true, true, false);
+				
+				oPasteProcessor.InsertInPlace(targetDocContent , oPasteProcessor.aContent);
+				
+				//targetDocContent.Parent.parent.recalculate();
+				
+				/*if(onlyFromLocalStorage)
 				{
 					if(t.lStorage && t.lStorage.htmlInShape)
 						worksheet.objectRender.controller.curState.textObject.txBody.insertHtml(t.lStorage.htmlInShape);
 				}
 				else
-					worksheet.objectRender.controller.curState.textObject.txBody.insertHtml(node);
+					worksheet.objectRender.controller.curState.textObject.txBody.insertHtml(node);*/
 				window.GlobalPasteFlag = false;
 				window.GlobalPasteFlagCounter = 0;
 			},
@@ -1706,7 +1713,7 @@
 				var isIntoShape = worksheet.objectRender.controller.getTargetDocContent();
 				if(isIntoShape)
 				{
-					this._pasteInShape(worksheet, node, onlyFromLocalStorage);
+					this._pasteInShape(worksheet, node, onlyFromLocalStorage, isIntoShape);
 					return;
 				};
 				
@@ -2342,7 +2349,7 @@
 				window.setTimeout(
 						function() {
 							// отменяем возможность выделения
-							t.element.style.display = ELEMENT_DISPAY_STYLE;
+							t.element.style.display = ELEMENT_DISPAY_STYLE2;
 							doc.body.style.MozUserSelect = "none";
 							doc.body.style["-khtml-user-select"] = "none";
 							doc.body.style["-o-user-select"] = "none";
@@ -5104,9 +5111,9 @@ window.USER_AGENT_WEBKIT = AscBrowser.isWebkit;
 
 window.GlobalPasteFlag = false;
 window.GlobalPasteFlagCounter = 0;
-var COPY_ELEMENT_ID = "clipboard-helper";
-var PASTE_ELEMENT_ID = "wrd_pastebin";
-var ELEMENT_DISPAY_STYLE = "none";
+var COPY_ELEMENT_ID2 = "clipboard-helper";
+var PASTE_ELEMENT_ID2 = "wrd_pastebin";
+var ELEMENT_DISPAY_STYLE2 = "none";
 var COPYPASTE_ELEMENT_CLASS = "sdk-element";
 var kElementTextId = "clipboard-helper-text";
 var isNeedEmptyAfterCut = false;
@@ -5129,17 +5136,17 @@ function CopyPasteCorrectString(str)
 
 if (window.USER_AGENT_SAFARI_MACOS)
 {
-	var PASTE_ELEMENT_ID = "clipboard-helper";
-	var ELEMENT_DISPAY_STYLE = "block";
+	var PASTE_ELEMENT_ID2 = "clipboard-helper";
+	var ELEMENT_DISPAY_STYLE2 = "block";
 }
-function SafariIntervalFocus()
+function SafariIntervalFocus2()
 {
     var api = window["Asc"]["editor"];
 	if (api)
     {
 		if((api.wb && api.wb.cellEditor && api.wb.cellEditor != null && api.wb.cellEditor.isTopLineActive) || (api.wb && api.wb.getWorksheet() && api.wb.getWorksheet().isSelectionDialogMode))
 			return;
-		var pastebin = document.getElementById(COPY_ELEMENT_ID);
+		var pastebin = document.getElementById(COPY_ELEMENT_ID2);
 		var pastebinText = document.getElementById(kElementTextId);
 		if(pastebinText && (api.wb && api.wb.getWorksheet() && api.wb.getWorksheet().isCellEditMode) && api.IsFocus)
 		{
@@ -5150,15 +5157,15 @@ function SafariIntervalFocus()
         else if(!pastebin || !pastebinText)
         {
             // create
-            Editor_CopyPaste_Create(api);
+            Editor_CopyPaste_Create2(api);
         }
     }
 }
 
-function Editor_CopyPaste_Create(api)
+function Editor_CopyPaste_Create2(api)
 {
     var ElemToSelect = document.createElement("div");
-    ElemToSelect.id = COPY_ELEMENT_ID;
+    ElemToSelect.id = COPY_ELEMENT_ID2;
     ElemToSelect.setAttribute("class", COPYPASTE_ELEMENT_CLASS);
 
     ElemToSelect.style.left = '0px';
@@ -5224,7 +5231,7 @@ function Editor_CopyPaste_Create(api)
 	elementText.style.top = '-100px';
 	elementText.style.overflow = 'hidden';
 	elementText.style.zIndex = -1000;
-	elementText.style.display = ELEMENT_DISPAY_STYLE;
+	elementText.style.display = ELEMENT_DISPAY_STYLE2;
 	elementText.setAttribute("contentEditable", true);
 	elementText.setAttribute("class", COPYPASTE_ELEMENT_CLASS);
 	
@@ -5347,3 +5354,38 @@ function CreateBinaryReader(szSrc, offset, srcLen)
 
     return stream;
 }
+
+function Common_CmpObj2(Obj1, Obj2)
+{
+    if(!Obj1 || !Obj2 || typeof(Obj1) != typeof(Obj2))
+        return false;
+    var p, v1, v2;
+    //проверяем чтобы Obj1 имел теже свойства что и Obj2
+    for(p in Obj2)
+    {
+        if(!Obj1.hasOwnProperty(p))
+            return false;
+    }
+    //проверяем чтобы Obj2 имел теже свойства что и Obj1 и сравниваем их
+    for(p in Obj1)
+    {
+        if(Obj2.hasOwnProperty(p))
+        {
+            v1 = Obj1[p];
+            v2 = Obj2[p];
+            if(v1 && v2 && 'object' === typeof(v1) && 'object' === typeof(v2) )
+            {
+                if( false == Common_CmpObj2(v1, v2))
+                    return false;
+            }
+            else
+            {
+                if(v1 != v2)
+                    return false;
+            }
+        }
+        else
+            return false;
+    }
+    return true;
+};
