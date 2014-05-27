@@ -5314,12 +5314,12 @@
 			if (reinitScrollY)
 				this.handlers.trigger("reinitializeScrollY");
 
-			this.cellCommentator.updateCommentPosition();
 			this.handlers.trigger("onDocumentPlaceChanged");
-			this.cellCommentator.drawCommentCells();
 			//ToDo this.drawDepCells();
             if(this.objectRender && this.objectRender.drawingArea)
                 this.objectRender.drawingArea.reinitRanges();
+			this.cellCommentator.updateCommentPosition();
+			this.cellCommentator.drawCommentCells();
 			this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollVertical, rangeGraphic));
 			return this;
 		};
@@ -5413,13 +5413,13 @@
 			if (reinitScrollX)
 				this.handlers.trigger("reinitializeScrollX");
 
-			this.cellCommentator.updateCommentPosition();
 			this.handlers.trigger("onDocumentPlaceChanged");
-			this.cellCommentator.drawCommentCells();
 			//ToDo this.drawDepCells();
 
             if(this.objectRender && this.objectRender.drawingArea)
                 this.objectRender.drawingArea.reinitRanges();
+			this.cellCommentator.updateCommentPosition();
+			this.cellCommentator.drawCommentCells();
 			this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollHorizontal, rangeGraphic));
 			return this;
 		};
