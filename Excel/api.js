@@ -2321,19 +2321,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
             asc_searchEnabled: function(bIsEnabled) {
             },
 
-			asc_findText: function () {
-				var options = null;
-				if(1 != arguments.length) {
-					// Временная заглушка
-					options = new asc.asc_CFindOptions();
-					options.findWhat = arguments[0]; //text
-					options.scanByRows = arguments[1]; //scanByRows
-					options.scanForward = arguments[2]; //scanForward
-					options.isMatchCase = arguments[3]; //isMatchCase
-					options.isWholeCell = arguments[4]; //isWholeCell
-				} else
-					options = arguments[0];
-
+			asc_findText: function (options) {
 				var d = this.wb.findCellText(options);
 				if (d) {
 					if (d.deltaX) {this.controller.scrollHorizontal(d.deltaX);}
@@ -2342,22 +2330,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				return !!d;
 			},
 
-			asc_replaceText: function () {
-				var options = null;
-				if(1 != arguments.length) {
-					// Временная заглушка
-					options = new asc.asc_CFindOptions();
-					options.findWhat = arguments[0]; //findWhat
-					options.isMatchCase = arguments[3]; //isMatchCase
-					options.isWholeCell = arguments[4]; //isWholeCell
-
-					options.replaceWith = arguments[1]; //replaceWith
-					options.isReplaceAll = arguments[2]; //isReplaceAll
-				} else
-					options = arguments[0];
-
+			asc_replaceText: function (options) {
 				options.lookIn = c_oAscFindLookIn.Formulas; // При замене поиск только в формулах
-
 				this.wb.replaceCellText(options);
 			},
 
