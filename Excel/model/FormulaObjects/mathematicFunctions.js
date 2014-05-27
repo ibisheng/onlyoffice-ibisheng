@@ -2547,8 +2547,9 @@ cPOWER.prototype.Calculate = function ( arg ) {
         return this.value = arg1;
     }
 
-    if ( !(arg0 instanceof cNumber) || ( arg1 && !(arg0 instanceof cNumber) ) )
+    if ( !(arg0 instanceof cNumber) || ( arg1 && !(arg0 instanceof cNumber) ) ){
         return this.value = new cError( cErrorType.wrong_value_type );
+    }
 
     return this.value = powerHelper( arg0.getValue(), arg1.getValue() );
 

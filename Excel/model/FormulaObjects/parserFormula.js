@@ -36,6 +36,13 @@ var cExcelSignificantDigits = 15, //количество цифр в числе 
     c_sPerDay = 86400,
     c_msPerDay = c_sPerDay * 1000;
 
+Date.prototype.excelNullDate1900 = Date.UTC(1899, 11, 30, 0, 0, 0);
+Date.prototype.excelNullDate1904 = Date.UTC(1904,  0,  1, 0, 0, 0);
+
+Date.prototype.getExcelNullDate = function(){
+    return g_bDate1904 ? Date.prototype.excelNullDate1904 : Date.prototype.excelNullDate1900;
+}
+
 Date.prototype.isLeapYear = function () {
     var y = this.getUTCFullYear();
     return (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
@@ -59,23 +66,34 @@ Date.prototype.truncate = function () {
 };
 
 Date.prototype.getExcelDate = function () {
-    return Math.floor( ( this.getTime() / 1000 - this.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (g_bDate1904 ? 0 : 1) ) );
+//    return Math.floor( ( this.getTime() / 1000 - this.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (g_bDate1904 ? 0 : 1) ) );
+    var year =  this.getUTCFullYear(), month = this.getUTCMonth(), date = this.getUTCDate(), res;
+
+    if(1900 < year || (1900 == year && 1 < month))
+        res = (Date.UTC(year, month, date, this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds()) - this.getExcelNullDate() ) / c_msPerDay;
+    else if(1900 == year && 1 == month && 29 == date )
+        res = 60;
+    else
+        res = (Date.UTC(year, month, date, this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds()) - this.getExcelNullDate() ) / c_msPerDay - 1;
+
+    return Math.floor(res);
 };
 
 Date.prototype.getDateFromExcel = function ( val ) {
-    if ( !g_bDate1904 ) {
-        if ( val < 60 ) {
-            return new Date( (val - c_DateCorrectConst) * c_msPerDay );
-        }
-        else if ( val === 60 ) {
-            return new Date( (val - c_DateCorrectConst - 1) * c_msPerDay );
-        }
-        else {
-            return new Date( (val - c_DateCorrectConst - 1) * c_msPerDay );
-        }
+
+    if ( g_bDate1904 ) {
+        return new Date( val * c_msPerDay + this.getExcelNullDate() );
     }
     else {
-        return new Date( (val - c_DateCorrectConst) * c_msPerDay );
+        if ( val < 60 ) {
+            return new Date( val * c_msPerDay + this.getExcelNullDate() );
+        }
+        else if ( val === 60 ) {
+            return new Date( Date.UTC( 1900, 1, 29 ) );
+        }
+        else {
+            return new Date( val * c_msPerDay + this.getExcelNullDate() );
+        }
     }
 };
 
@@ -868,7 +886,7 @@ cArea3D.prototype.toString = function () {
     var wsFrom = this._wb.getWorksheetById( this.wsFrom ).getName(),
         wsTo = this._wb.getWorksheetById( this.wsTo ).getName(),
         name = Asc.g_oRangeCache.getActiveRange(this._cells);
-        name = name ? name : this._cells;
+        name = name && name.getName ? name.getName() : this._cells;
     if ( rx_test_ws_name.test( wsFrom ) && rx_test_ws_name.test( wsTo ) ) {
         return (wsFrom !== wsTo ? wsFrom + ":" + wsTo : wsFrom) + "!" + name;
     }

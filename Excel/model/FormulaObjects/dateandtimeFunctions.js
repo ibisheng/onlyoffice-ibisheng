@@ -274,7 +274,6 @@ function daysInYear( date, basis ){
     }
 }
 
-
 cFormulaFunction.DateAndTime = {
     'groupName':"DateAndTime",
     'DATE':cDATE,
@@ -361,7 +360,13 @@ cDATE.prototype.Calculate = function ( arg ) {
     if ( month == 0 ) {
         return this.setCA( new cError( cErrorType.not_numeric ), true );
     }
-    this.value = new cNumber( Math.round( new Date( Date.UTC( year, month - 1, day ) ).getExcelDate() ) )
+
+    if ( year == 1900 && month == 2 && day == 29){
+        this.value = new cNumber( 60 );
+    }
+    else{
+        this.value = new cNumber( Math.round( new Date( Date.UTC( year, month - 1, day ) ).getExcelDate() ) );
+    }
     this.value.numFormat = 14;
     this.value.ca = true;
     return this.value;
@@ -1229,7 +1234,7 @@ function cNOW() {
 cNOW.prototype = Object.create( cBaseFunction.prototype )
 cNOW.prototype.Calculate = function () {
     var d = new Date();
-    this.value = new cNumber( d.getExcelDate() + ( (d.getHours() * 60 * 60 + d.getMinutes() * 60 + d.getSeconds()) / c_sPerDay ) );
+    this.value = new cNumber( d.getExcelDate() + (d.getUTCHours() * 60 * 60 + d.getUTCMinutes() * 60 + d.getUTCSeconds()) / c_sPerDay );
     this.value.numFormat = 22;
     return this.setCA( this.value, true );
 }
@@ -1960,4 +1965,3 @@ cYEARFRAC.prototype.getInfo = function () {
         args:"(  start-date , end-date [ , basis ] )"
     };
 }
-
