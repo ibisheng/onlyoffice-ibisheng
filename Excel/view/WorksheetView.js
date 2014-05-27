@@ -5204,23 +5204,24 @@
 			var ctx = this.drawingCtx;
 			var ctxW   = ctx.getWidth();
 			var ctxH   = ctx.getHeight();
-			var dy     = this.rows[start].top - this.rows[vr.r1].top;
-			var oldEnd = vr.r2;
-			var oldDec = Math.max(calcDecades(oldEnd + 1), 3);
-			var offsetX, offsetY, diffWidth = 0, diffHeight = 0;
-			var oldVRE_isPartial;
-			var oldH = ctxH - this.cellsTop - Math.abs(dy);
-			var y    = this.cellsTop + (dy > 0 && oldH > 0 ? dy : 0);
-			var oldW, x, dx, cFrozen = 0, rFrozen = 0;
+			var offsetX, offsetY, diffWidth = 0, diffHeight = 0, cFrozen = 0, rFrozen = 0;
 			if (this.topLeftFrozenCell) {
 				cFrozen = this.topLeftFrozenCell.getCol0();
 				rFrozen = this.topLeftFrozenCell.getRow0();
 				diffWidth = this.cols[cFrozen].left - this.cols[0].left;
 				diffHeight = this.rows[rFrozen].top - this.rows[0].top;
-				y += diffHeight;
-				oldH -= diffHeight;
 			}
-			oldVRE_isPartial = this._isRowDrawnPartially(vr.r2, vr.r1, diffHeight);
+			var oldVRE_isPartial = this._isRowDrawnPartially(vr.r2, vr.r1, diffHeight);
+
+			var oldEnd = vr.r2;
+			var oldDec = Math.max(calcDecades(oldEnd + 1), 3);
+			var oldW, x, dx;
+			var dy   = this.rows[start].top - this.rows[vr.r1].top;
+			var oldH = ctxH - this.cellsTop - Math.abs(dy) - diffHeight;
+			var scrollDown = (dy > 0 && oldH > 0);
+			var y    = this.cellsTop + (scrollDown ? dy : 0) + diffHeight;
+			var lastRowHeight = (scrollDown && oldVRE_isPartial) ?
+				ctxH - (this.rows[oldEnd].top - this.rows[vr.r1].top + this.cellsTop + diffHeight) : 0;
 
 			if (this.isCellEditMode && editor) {editor.move(0, -dy);}
 
@@ -5242,9 +5243,8 @@
 				dx   = this.cellsLeft - x;
 				oldW = ctxW - x - Math.abs(dx);
 
-				if (rFrozen) {
+				if (rFrozen)
 					ctx.drawImage(ctx.getCanvas(), x, this.cellsTop, oldW, diffHeight, x + dx, this.cellsTop, oldW, diffHeight);
-				}
 				this._drawFrozenPane(true);
 			} else {
 				dx   = 0;
@@ -5253,16 +5253,16 @@
 			}
 
 			if (oldH > 0) {
-				ctx.drawImage(ctx.getCanvas(), x, y, oldW, oldH, x + dx, y - dy, oldW, oldH);
+				ctx.drawImage(ctx.getCanvas(), x, y, oldW, oldH - lastRowHeight, x + dx, y - dy, oldW, oldH - lastRowHeight);
 			}
 			ctx.setFillStyle(this.settings.cells.defaultState.background)
-				.fillRect(this.headersLeft, y + (dy > 0 && oldH > 0 ? oldH - dy : 0),
-					ctxW, Math.abs(dy));
+				.fillRect(this.headersLeft, y + (scrollDown ? oldH - dy - lastRowHeight : 0),
+					ctxW, Math.abs(dy) + lastRowHeight);
 
 			var rangeGraphic = null;
 			if ( !(dy > 0 && vr.r2 === oldEnd && !oldVRE_isPartial && dx === 0) ) {
 				var c1 = vr.c1;
-				var r1 = dy > 0 && oldH > 0 ? oldEnd + (oldVRE_isPartial ? 0 : 1) : vr.r1;
+				var r1 = scrollDown ? oldEnd + (oldVRE_isPartial ? 0 : 1) : vr.r1;
 				var c2 = vr.c2;
 				var r2 = dy > 0 || oldH <= 0 ? vr.r2 : vr.r1 - 1 - delta; /* delta < 0 here */
 				var range = asc_Range(c1, r1, c2, r2);
@@ -5348,7 +5348,8 @@
 			var oldEnd  = vr.c2;
 			var offsetX, offsetY, diffWidth = 0, diffHeight = 0;
 			var oldW = ctxW - this.cellsLeft - Math.abs(dx);
-			var x = this.cellsLeft + (dx > 0 && oldW > 0 ? dx : 0);
+			var scrollRight = (dx > 0 && oldW > 0);
+			var x = this.cellsLeft + (scrollRight ? dx : 0);
 			var y = this.headersTop;
 			var cFrozen, rFrozen;
 			if (this.topLeftFrozenCell) {
@@ -5361,6 +5362,9 @@
 			}
 			var oldVCE_isPartial = this._isColDrawnPartially(vr.c2, vr.c1, diffWidth);
 
+			var lastColWidth = (scrollRight && oldVCE_isPartial) ?
+				ctxW - (this.cols[oldEnd].left - this.cols[vr.c1].left + this.cellsLeft + diffWidth) : 0;
+
 			if (this.isCellEditMode && editor) {editor.move(-dx, 0);}
 
 			vr.c1 = start;
@@ -5369,14 +5373,14 @@
 			this.objectRender.setScrollOffset();
 
 			if (oldW > 0) {
-				ctx.drawImage(ctx.getCanvas(), x, y, oldW, ctxH, x - dx, y, oldW, ctxH);
+				ctx.drawImage(ctx.getCanvas(), x, y, oldW - lastColWidth, ctxH, x - dx, y, oldW - lastColWidth, ctxH);
 			}
 			ctx.setFillStyle(this.settings.cells.defaultState.background)
-				.fillRect(x + (dx > 0 && oldW > 0 ? oldW - dx : 0), y, Math.abs(dx), ctxH);
+				.fillRect(x + (scrollRight > 0 ? oldW - dx - lastColWidth : 0), y, Math.abs(dx) + lastColWidth, ctxH);
 
 			var rangeGraphic = null;
 			if ( !(dx > 0 && vr.c2 === oldEnd && !oldVCE_isPartial) ) {
-				var c1 = dx > 0 && oldW > 0 ? oldEnd + (oldVCE_isPartial ? 0 : 1) : vr.c1;
+				var c1 = scrollRight ? oldEnd + (oldVCE_isPartial ? 0 : 1) : vr.c1;
 				var r1 = vr.r1;
 				var c2 = dx > 0 || oldW <= 0 ? vr.c2 : vr.c1 - 1 - delta; /* delta < 0 here */
 				var r2 = vr.r2;
