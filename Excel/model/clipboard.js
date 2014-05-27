@@ -1686,6 +1686,8 @@
 				
 				oPasteProcessor.InsertInPlace(targetDocContent , oPasteProcessor.aContent);
 				
+				worksheet.objectRender.controller.startRecalculate();
+				
 				//targetDocContent.Parent.parent.recalculate();
 				
 				/*if(onlyFromLocalStorage)
