@@ -1756,7 +1756,7 @@ function CBinaryFileWriter()
 
         oThis.WriteUChar(g_nodeAttributeEnd);
 
-        oThis.WriteRecord1(1, rPr.unifill, oThis.WriteUniFill);
+        oThis.WriteRecord1(1, rPr.Unifill, oThis.WriteUniFill);
         oThis.WriteRecord2(3, rPr.FontFamily, oThis.WriteTextFontTypeface);
 
         if (hlinkObj != null && hlinkObj !== undefined)
@@ -2271,13 +2271,10 @@ function CBinaryFileWriter()
     this.WriteParagraph = function(paragraph, startPos, endPos)
     {
         var tPr = new CTextParagraphPr();
-        if(paragraph.bullet)
-        {
-            tPr.bullet = paragraph.bullet;
-        }
-        tPr.lvl = paragraph.PresentationPr.Level;
+        tPr.bullet = paragraph.Pr.Bullet;
+        tPr.lvl = paragraph.Pr.Lvl;
         tPr.pPr = paragraph.Pr;
-		tPr.rPr = null; // TODO: !!!
+		tPr.rPr = paragraph.Pr.DefaultRunPr;
         if (tPr.rPr == null)
             tPr.rPr = new CTextPr();
 
@@ -2291,9 +2288,6 @@ function CBinaryFileWriter()
 
         var _par_content = paragraph.Content;
 
-        var start_pos = startPos != null ? startPos : 0;
-        var end_pos = endPos != undefined ? endPos : _par_content.length;
-
         if(paragraph.f_id != undefined || paragraph.f_type != undefined || paragraph.f_text!= undefined)
         {
             oThis.StartRecord(0); // subtype
@@ -2302,113 +2296,145 @@ function CBinaryFileWriter()
 
             _count++;
         }
-        var _content_index;
-        var _cur_run_text = "";
 
-        _content_index = start_pos;
-        var _cur_run_text_pr = null;
-
-        var hlinkObj = null;
-
-        while(_content_index < end_pos)
+        var _content_len = _par_content.length;
+        for (var i = 0; i < _content_len; i++)
         {
-            switch (_par_content[_content_index].Type)
+            var _elem = _par_content[i];
+            switch (_elem.Type)
             {
-                case para_Text:
+                case para_Run:
                 {
-                    _cur_run_text += _par_content[_content_index].Value;
-                    break;
-                }
-                case para_Space :
-                {
-                    _cur_run_text += ' ';
-                    break;
-                }
-                case para_Tab :
-                {
-                    _cur_run_text += '\t';
-                    break;
-                }
-                case para_TextPr :
-                {
-                    if(("" != _cur_run_text) || (null != _cur_run_text_pr))
+                    var _run_len = _elem.Content.length;
+                    var _run_text = "";
+                    for (var j = 0; j < _run_len; j++)
+                    {
+                        switch (_elem.Content[j].Type)
+                        {
+                            case para_Text:
+                            {
+                                _run_text += _elem.Content[j].Value;
+                                break;
+                            }
+                            case para_Space :
+                            {
+                                _run_text += ' ';
+                                break;
+                            }
+                            case para_Tab :
+                            {
+                                _run_text += '\t';
+                                break;
+                            }
+                            case para_NewLine :
+                            {
+                                if("" != _run_text)
+                                {
+                                    oThis.StartRecord(0); // subtype
+                                    oThis.WriteTextRun(_elem.Pr, _run_text, null);
+                                    oThis.EndRecord();
+
+                                    _count++;
+
+                                    _run_text = "";
+                                }
+                                oThis.StartRecord(0); // subtype
+                                oThis.WriteLineBreak(_elem.Pr, null);
+                                oThis.EndRecord();
+
+                                _count++;
+
+                                break;
+                            }
+                        }
+                    }
+
+                    if ("" != _run_text)
                     {
                         oThis.StartRecord(0); // subtype
-                        oThis.WriteTextRun((null == _cur_run_text_pr) ? null : _cur_run_text_pr.Value, _cur_run_text, hlinkObj);
+                        oThis.WriteTextRun(_elem.Pr, _run_text, null);
                         oThis.EndRecord();
 
                         _count++;
-
-                        _cur_run_text = "";
-                        _cur_run_text_pr = null;
                     }
-                    _cur_run_text_pr = _par_content[_content_index];
                     break;
                 }
-                case para_NewLine :
+                case para_Hyperlink:
                 {
-                    if(("" != _cur_run_text) || (null != _cur_run_text_pr))
+                    var _hObj = { Value : _elem.Value };
+                    var _content_len_h = _elem.Content.length;
+
+                    for (var hi = 0; hi < _content_len_h; hi++)
                     {
-                        oThis.StartRecord(0); // subtype
-                        oThis.WriteTextRun((null == _cur_run_text_pr) ? null : _cur_run_text_pr.Value, _cur_run_text, hlinkObj);
-                        oThis.EndRecord();
+                        var _elem_h = _elem.Content[i];
+                        switch (_elem.Type)
+                        {
+                            case para_Run:
+                            {
+                                var _run_len = _elem.Content.length;
+                                var _run_text = "";
+                                for (var j = 0; j < _run_len; j++)
+                                {
+                                    switch (_elem.Content[j].Type)
+                                    {
+                                        case para_Text:
+                                        {
+                                            _run_text += _elem.Content[j].Value;
+                                            break;
+                                        }
+                                        case para_Space :
+                                        {
+                                            _run_text += ' ';
+                                            break;
+                                        }
+                                        case para_Tab :
+                                        {
+                                            _run_text += '\t';
+                                            break;
+                                        }
+                                        case para_NewLine :
+                                        {
+                                            if("" != _run_text)
+                                            {
+                                                oThis.StartRecord(0); // subtype
+                                                oThis.WriteTextRun(_elem.Pr, _run_text, _hObj);
+                                                oThis.EndRecord();
 
-                        _count++;
+                                                _count++;
 
-                        _cur_run_text = "";
-                        _cur_run_text_pr = null;
+                                                _run_text = "";
+                                            }
+                                            oThis.StartRecord(0); // subtype
+                                            oThis.WriteLineBreak(_elem.Pr, _hObj);
+                                            oThis.EndRecord();
+
+                                            _count++;
+
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if ("" != _run_text)
+                                {
+                                    oThis.StartRecord(0); // subtype
+                                    oThis.WriteTextRun(_elem.Pr, _run_text, _hObj);
+                                    oThis.EndRecord();
+
+                                    _count++;
+                                }
+                                break;
+                            }
+                            default:
+                                break;
+                        }
                     }
-                    oThis.StartRecord(0); // subtype
-                    oThis.WriteLineBreak(_cur_run_text_pr, hlinkObj);
-                    oThis.EndRecord();
-
-                    _count++;
 
                     break;
                 }
-                case para_HyperlinkStart:
-                {
-                    if("" != _cur_run_text)
-                    {
-                        oThis.StartRecord(0); // subtype
-                        oThis.WriteTextRun((null == _cur_run_text_pr) ? null : _cur_run_text_pr.Value, _cur_run_text, hlinkObj);
-                        oThis.EndRecord();
-
-                        _count++;
-
-                        _cur_run_text = "";
-                        // runPr оставляем таким же
-                    }
-                    hlinkObj = _par_content[_content_index];
+                default:
                     break;
-                }
-                case para_HyperlinkEnd:
-                {
-                    if("" != _cur_run_text)
-                    {
-                        oThis.StartRecord(0); // subtype
-                        oThis.WriteTextRun((null == _cur_run_text_pr) ? null : _cur_run_text_pr.Value, _cur_run_text, hlinkObj);
-                        oThis.EndRecord();
-
-                        _count++;
-
-                        _cur_run_text = "";
-                        // runPr оставляем таким же
-                    }
-
-                    hlinkObj = null;
-                    break;
-                }
             }
-            _content_index++;
-        }
-        if(_cur_run_text.length > 0)
-        {
-            oThis.StartRecord(0); // subtype
-            oThis.WriteTextRun((null == _cur_run_text_pr) ? null : _cur_run_text_pr.Value, _cur_run_text, hlinkObj);
-            oThis.EndRecord();
-
-            _count++;
         }
 
         var _new_pos = oThis.pos;
