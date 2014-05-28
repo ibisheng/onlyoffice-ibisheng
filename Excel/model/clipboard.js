@@ -257,7 +257,12 @@
 			copyRange: function (range, worksheet, isCut) {
 				var t = this;
 				t._cleanElement();
-				var text = t._makeTableNode(range, worksheet, isCut);
+				
+				var objectRender = worksheet.objectRender;
+				var isIntoShape = objectRender.controller.getTargetDocContent();
+				
+				var text = t._makeTableNode(range, worksheet, isCut, isIntoShape);
+				
 				if(text == false)
 					return;
 				//исключения для opera в случае копирования пустой html
@@ -286,8 +291,11 @@
 				//use binary strings
 				if(copyPasteUseBinary)
 				{	
-					if(worksheet.objectRender.controller.curState.textObject && worksheet.objectRender.controller.curState.textObject.txBody)
+					if(isIntoShape)
+					{
+						this.lStorage = {};
 						this.lStorage.htmlInShape = text;
+					}	
 					else
 					{
 						var fullUrl = this._getUseFullUrl();
@@ -381,18 +389,28 @@
 				else if(copyPasteUseBinary)
 				{
 					var t = this;
-					if(worksheet.objectRender.controller.curState.textObject && worksheet.objectRender.controller.curState.textObject.txBody)
+					var objectRender = worksheet.objectRender;
+					var isIntoShape = objectRender.controller.getTargetDocContent();
+					
+					var text = t._makeTableNode(range, worksheet, isCut, isIntoShape);
+					
+					if(isIntoShape)
 					{
-						var text = t._makeTableNode(range, worksheet, isCut);
-						t.lStorage.htmlInShape = text;
+						this.lStorage = {};
+						this.lStorage.htmlInShape = text;
 					}	
 					else
 					{
-						var  table = t._makeTableNode(range, worksheet, isCut);
-						t.copyText = t._getTextFromTable(table);
+						var fullUrl = this._getUseFullUrl();
+						window.global_pptx_content_writer.Start_UseFullUrl(fullUrl);
+						
 						var oBinaryFileWriter = new Asc.BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
 						var sBase64 = oBinaryFileWriter.Write();
-						t.lStorage = sBase64;
+						
+						//for buttons copy/paste
+						this.lStorage = sBase64;
+						
+						window.global_pptx_content_writer.End_UseFullUrl()
 					}
 					return true;
 				}
@@ -1682,6 +1700,10 @@
 			_pasteInShape: function(worksheet, node, onlyFromLocalStorage, targetDocContent)
 			{
 				var oPasteProcessor = new PasteProcessor({WordControl:{m_oLogicDocument: targetDocContent}, FontLoader: {}}, false, false, true, true);
+				
+				if(onlyFromLocalStorage)
+					node = this.lStorage.htmlInShape ? this.lStorage.htmlInShape : this.lStorage;
+					
 				oPasteProcessor._Execute(node, {}, true, true, false);
 				
 				oPasteProcessor.InsertInPlace(targetDocContent , oPasteProcessor.aContent);
@@ -2455,13 +2477,14 @@
 				}
 			},
 			
-			_makeTableNode: function (range, worksheet, isCut) {
+			_makeTableNode: function (range, worksheet, isCut, isIntoShape) {
 				var fn = range.worksheet.workbook.getDefaultFont();
 				var fs = range.worksheet.workbook.getDefaultSize();
 				var bbox = range.getBBox0();
 				var merged = [];
 				var t = this;
 				var table, tr, td, cell, j, row, col, mbbox, h, w, b;
+				var objectRender = worksheet.objectRender;
 
 				function skipMerged() {
 					var m = merged.filter(function(e){return row>=e.r1 && row<=e.r2 && col>=e.c1 && col<=e.c2});
@@ -2521,9 +2544,6 @@
 				var isSelectedImages = t._getSelectedDrawingIndex(worksheet);
 				var isImage = false;
 				var isChart = false;
-				
-				var objectRender = worksheet.objectRender;
-				var isIntoShape = objectRender.controller.getTargetDocContent();
 				
 				//копируем изображения
 				//если выделены графические объекты внутри группы
