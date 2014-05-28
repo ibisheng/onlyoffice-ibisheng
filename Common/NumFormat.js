@@ -3415,9 +3415,9 @@ FormatParser.prototype =
 						dValue = (Date.UTC(nYear,nMounth,nDay,nHour,nMinute,nSecond) - Date.UTC(1904,0,1,0,0,0)) / (86400 * 1000);
 					else
 					{
-						if(1900 < nYear || (1900 == nYear && 2 < nMounth ))
+						if(1900 < nYear || (1900 == nYear && 1 < nMounth ))
 							dValue = (Date.UTC(nYear,nMounth,nDay,nHour,nMinute,nSecond) - Date.UTC(1899,11,30,0,0,0)) / (86400 * 1000);
-						else if(1900 == nYear && 2 == nMounth && 29 == nDay)
+						else if(1900 == nYear && 1 == nMounth && 29 == nDay)
 							dValue = 60;
 						else
 							dValue = (Date.UTC(nYear,nMounth,nDay,nHour,nMinute,nSecond) - Date.UTC(1899,11,31,0,0,0)) / (86400 * 1000);
@@ -3457,10 +3457,12 @@ FormatParser.prototype =
 		{
 			if(nMounth < 0 || nMounth > 11)
 				return false;
-			else
-				return this.isValidDay(nYear, nMounth, nDay);
+			else if(this.isValidDay(nYear, nMounth, nDay))
+				return true;
+			else if(1900 == nYear && 1 == nMounth && 29 == nDay)
+				return true;
 		}
-		return true;
+		return false;
 	},
 	isValidDay : function(nYear, nMounth, nDay){
 		if(this.isLeapYear(nYear))
