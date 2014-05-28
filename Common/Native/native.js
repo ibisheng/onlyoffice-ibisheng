@@ -241,8 +241,7 @@ function NativeOpenFile()
     }
     else
     { 
-        _api = new window["Asc"]["spreadsheet_api"];
-        var doc_bin = window.native.GetFileString(g_file_path);
+        _api = new window["Asc"]["spreadsheet_api"]();
         _api.asc_nativeOpenFile(doc_bin);
     }
 }
@@ -264,9 +263,8 @@ function NativeOpenFile2()
     }
     else
     {
-        _api = new window["Asc"]["spreadsheet_api"];
-        var doc_bin = window.native.GetFileString(window.g_file_path);
-        _api.asc_nativeOpenFile(doc_bin);
+        _api = new window["Asc"]["spreadsheet_api"]();
+        _api.asc_nativeOpenFile(doc_bin);        
     }
 }
 
