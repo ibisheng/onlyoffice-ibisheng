@@ -5072,6 +5072,16 @@
 				//TODO при copy/paste в word из excel необходимо подменить DrawingDocument из word - пересмотреть правку!
 				if(typeof editor != "undefined" && editor && editor.WordControl && editor.WordControl.m_oLogicDocument && editor.WordControl.m_oLogicDocument.DrawingDocument)
 					oNewWorksheet.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
+				else if(this.copyPasteObj && this.copyPasteObj.isCopyPaste)
+				{
+					var api = window["Asc"]["editor"]
+					var nActiveSheet = api.wb.model.nActive;
+					var ws = api.wb.model.aWorksheets[nActiveSheet];
+					var DrawingDocument = ws.DrawingDocument;
+					
+					oNewWorksheet.DrawingDocument = DrawingDocument;
+				};
+				
                 this.curWorksheet = oNewWorksheet;
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadWorksheet(t,l, oNewWorksheet);
