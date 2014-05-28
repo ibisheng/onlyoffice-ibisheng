@@ -29,7 +29,7 @@
 	};
 
 	CDocsCoApi.prototype.init = function (user, docid, token, serverHost, serverPort, serverPath, callback,
-										  editorType, documentFormatSave) {
+										  editorType, documentFormatSave, isViewer) {
 		if (this._CoAuthoringApi && this._CoAuthoringApi.isRightURL()) {
 			var t = this;
 			this._CoAuthoringApi.onAuthParticipantsChanged = function (e, count) {t.callback_OnAuthParticipantsChanged(e, count);};
@@ -48,7 +48,7 @@
 			this._CoAuthoringApi.onStartCoAuthoring = function (e) {t.callback_OnStartCoAuthoring(e);};
 
 			this._CoAuthoringApi.init(user, docid, token, serverHost, serverPort, serverPath, callback,
-				editorType, documentFormatSave);
+				editorType, documentFormatSave, isViewer);
 			this._onlineWork = true;
 		}
 		else {
@@ -739,10 +739,13 @@
 					},
                     "locks":docsCoApi.ownedLockBlocks,
                     "sessionId":docsCoApi._id,
-					"serverHost": docsCoApi._serverHost,
-					"serverPort": docsCoApi._serverPort,
-					"serverPath": docsCoApi._serverPath,
-					"documentFormatSave": docsCoApi._documentFormatSave
+					"server": {
+						"host": docsCoApi._serverHost,
+						"port": docsCoApi._serverPort,
+						"path":docsCoApi._serverPath
+					},
+					"documentFormatSave": docsCoApi._documentFormatSave,
+					"isViewer": docsCoApi._isViewer
                 });
 
         };
@@ -789,7 +792,7 @@
 
 
     DocsCoApi.prototype.init = function (user, docid, token, serverHost, serverPort, serverPath, callback,
-										 editorType, documentFormatSave) {
+										 editorType, documentFormatSave, isViewer) {
         this._user = user;
         this._docid = docid;
         this._token = token;
@@ -807,6 +810,7 @@
 		this._isPresentation = c_oEditorId.Presentation === editorType;
 		this._isAuth = false;
 		this._documentFormatSave = documentFormatSave;
+		this._isViewer = isViewer;
 
         this.dataHandler =
         {
