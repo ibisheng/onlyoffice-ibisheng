@@ -2609,11 +2609,12 @@
 				else if(isIntoShape)//если курсор находится внутри шейпа
 				{
 					var CopyProcessor = new Asc.CopyProcessor();
-					CopyProcessor.CopyDocument(document.createElement('div'), isIntoShape, true);
+					var divContent = document.createElement('div');
+					CopyProcessor.CopyDocument(divContent, isIntoShape, true);
 					
 					var htmlInShape = "";
-					if(CopyProcessor.Para)
-						htmlInShape = CopyProcessor.Para;	
+					if(divContent)
+						htmlInShape = divContent;	
 							
 					return htmlInShape;
 				}
@@ -4470,13 +4471,30 @@
 					aTagEnd.push("</i>");
 				}
 				if (true == Value.Strikeout) {
+					aTagStart.push("<strike>");
+					aTagEnd.push("</strike>");
+				}
+				if (true == Value.Underline) {
 					aTagStart.push("<u>");
 					aTagEnd.push("</u>");
 				}
 				if (null != Value.HighLight && highlight_None != Value.HighLight)
 					aProp.push("background-color:" + this.RGBToCSS(Value.HighLight));
-				if (null != Value.Color) {
-					var color = this.RGBToCSS(Value.Color);
+				
+				var color;
+				if (null != Value.Unifill)
+				{
+					var Unifill = Value.Unifill.getRGBAColor();
+					if(Unifill)
+					{
+						color = this.RGBToCSS(new CDocumentColor(Unifill.R, Unifill.G, Unifill.B));
+						aProp.push("color:" + color);
+						aProp.push("mso-style-textfill-fill-color:" + color);
+					}
+				}
+				else if (null != Value.Color) 
+				{
+					color = this.RGBToCSS(Value.Color);
 					aProp.push("color:" + color);
 					aProp.push("mso-style-textfill-fill-color:" + color);
 				}
