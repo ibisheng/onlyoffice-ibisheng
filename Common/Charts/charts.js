@@ -425,6 +425,7 @@ function ChartPreviewManager() {
 		}
 		
 		for (var chartType in previewGroups) {
+			return;
 			
 			var group = [];
 			var maxCol = 2, maxRow = 2;
