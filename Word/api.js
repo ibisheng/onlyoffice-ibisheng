@@ -1418,6 +1418,19 @@ CChatMessage.prototype.get_Message = function() { return this.Message; }
     ToDo Register Callback OnCoAuthoringDisconnectUser возвращается userId
  */
 // Init CoAuthoring
+asc_docs_api.prototype._coAuthoringSetChanges = function(e, oColor)
+{
+    var Count = e.length;
+    for ( var Index = 0; Index < Count; Index++ )
+    {
+        var Changes = new CCollaborativeChanges();
+        Changes.Set_Id( e[Index]["Id"] );
+        Changes.Set_Data( e[Index]["Data"] );
+        Changes.Set_Color( oColor );
+        CollaborativeEditing.Add_Changes( Changes );
+    }
+}
+
 asc_docs_api.prototype._coAuthoringInit = function()
 {
     if (!this.CoAuthoringApi) {
@@ -1540,15 +1553,7 @@ asc_docs_api.prototype._coAuthoringInit = function()
 		var nColor = oUser ? oUser.asc_getColorValue() :  null;
         var oColor = null !== nColor ? new CDocumentColor( (nColor >> 16) & 0xFF, (nColor >> 8) & 0xFF, nColor & 0xFF ) : new CDocumentColor( 191, 255, 199 );
 
-        var Count = e.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            var Changes = new CCollaborativeChanges();
-            Changes.Set_Id( e[Index]["Id"] );
-            Changes.Set_Data( e[Index]["Data"] );
-            Changes.Set_Color( oColor );
-            CollaborativeEditing.Add_Changes( Changes );
-        }
+        t._coAuthoringSetChanges(e, oColor);
 
         // т.е. если bSendEvent не задан, то посылаем  сообщение + когда загрузился документ
         if ( Count > 0 && false != bSendEvent && t.bInit_word_control )
@@ -7597,7 +7602,7 @@ window["asc_docs_api"].prototype["asc_nativeCalculateFile"] = function()
 
 window["asc_docs_api"].prototype["asc_nativeApplyChanges"] = function(changes)
 {
-    this.CoAuthoringApi.onSaveChanges(changes, false);
+    this._coAuthoringSetChanges(changes, new CDocumentColor( 191, 255, 199 ));
 	CollaborativeEditing.Apply_OtherChanges();
 }
 
