@@ -1571,44 +1571,6 @@
 			return this.objAutoComplete[str] = arrResult;
 		};
 
-		CellEditor.prototype._updateFormulaSelectorPosition = function() {
-			var selector = document.getElementById("formulaSelector");
-			if ( selector ) {
-				var api = asc["editor"];
-				if ( api.wb ) {
-					var ws = api.wb.getWorksheet();
-					if ( ws ) {
-						var editedCol = ws.getSelectedColumnIndex();
-						var editedRow = ws.getSelectedRowIndex() + 1;
-
-						for (var n = 0; n < ws.drawingArea.frozenPlaces.length; n++) {
-							var frozenPlace = ws.drawingArea.frozenPlaces[n];
-							if ( !frozenPlace.isCellInside({ col: editedCol, row: editedRow }) )
-								continue;
-
-							var fv = frozenPlace.getFirstVisible();
-							if ( (editedCol < fv.col) || (editedRow < fv.row) ) {
-								selector.style["display"] = "none";
-								return;
-							}
-							else
-								selector.style["display"] = "";
-
-							var y = ws.getCellTop(editedRow, 0) + frozenPlace.getVerticalScroll() - ws.getCellTop(0, 0);
-							var x = ws.getCellLeft(editedCol, 0) + frozenPlace.getHorizontalScroll() - ws.getCellLeft(0, 0);
-
-							var canvasWidget = $("#" + api.HtmlElementName);
-							if ( canvasWidget ) {
-								selector.style["top"] = (y + canvasWidget.offset().top) + "px";
-								selector.style["left"] = (x + canvasWidget.offset().left) + "px";
-							}
-							return;
-						}
-					}
-				}
-			}
-		};
-
 		// Event handlers
 
 		/** @param event {KeyboardEvent} */
