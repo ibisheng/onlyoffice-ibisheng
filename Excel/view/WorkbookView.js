@@ -1721,6 +1721,7 @@
 			History.Create_NewPoint();
 			History.StartTransaction();
 
+			options.clearFindAll();
 			if (options.isReplaceAll) {
 				// На ReplaceAll ставим медленную операцию
 				this.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction,

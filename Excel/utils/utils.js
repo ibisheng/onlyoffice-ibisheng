@@ -1413,6 +1413,10 @@
 				this.isWholeCell === obj.isWholeCell && this.scanOnOnlySheet === obj.scanOnOnlySheet &&
 				this.lookIn === obj.lookIn;
 		};
+		asc_CFindOptions.prototype.clearFindAll = function () {
+			this.countFindAll = 0;
+			this.countReplaceAll = 0;
+		};
 		asc_CFindOptions.prototype.updateFindAll = function () {
 			this.countFindAll += this.countFind;
 			this.countReplaceAll += this.countReplace;
