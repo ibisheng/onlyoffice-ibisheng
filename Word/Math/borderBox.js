@@ -22,10 +22,10 @@ function CBorderBox(props)
         hideRight:      false,
         hideTop:        false,
         hideBot:        false,
-        strikeBLTR:     true,
-        strikeTLBR:     true,
-        strikeH:        true,
-        strikeV:        true
+        strikeBLTR:     false,
+        strikeTLBR:     false,
+        strikeH:        false,
+        strikeV:        false
     };
 
     CMathBase.call(this);
@@ -62,35 +62,36 @@ CBorderBox.prototype.init = function(props)
     }*/
 
     this.setBorders(props);
-this.setDimension(1, 1);
+    this.setDimension(1, 1);
+
     this.setContent();
 }
 CBorderBox.prototype.setBorders = function(props)
 {
     if(typeof(props) !== "undefined" && props !== null)
     {
-        if(typeof(this.Pr.hideLeft) !== "undefined" && this.Pr.hideLeft !== null)
+        if(typeof(props.hideLeft) !== "undefined" && props.hideLeft !== null)
             this.Pr.hideLeft = props.hideLeft;
 
-        if(typeof(this.Pr.hideRight) !== "undefined" && this.Pr.hideRight !== null)
+        if(typeof(props.hideRight) !== "undefined" && props.hideRight !== null)
             this.Pr.hideRight = props.hideRight;
 
-        if(typeof(this.Pr.hideTop) !== "undefined" && this.Pr.hideTop !== null)
+        if(typeof(props.hideTop) !== "undefined" && props.hideTop !== null)
             this.Pr.hideTop = props.hideTop;
 
-        if(typeof(this.Pr.hideBot) !== "undefined" && this.Pr.hideBot !== null)
+        if(typeof(props.hideBot) !== "undefined" && props.hideBot !== null)
             this.Pr.hideBot = props.hideBot;
 
-        if(typeof(this.Pr.strikeBLTR) !== "undefined" && this.Pr.strikeBLTR !== null) // right diagonal
+        if(typeof(props.strikeBLTR) !== "undefined" && props.strikeBLTR !== null) // right diagonal
             this.Pr.strikeBLTR = props.strikeBLTR;
 
-        if(typeof(this.Pr.strikeTLBR) !== "undefined" && this.Pr.strikeTLBR !== null) // left diagonal
+        if(typeof(props.strikeTLBR) !== "undefined" && props.strikeTLBR !== null) // left diagonal
             this.Pr.strikeTLBR = props.strikeTLBR;
 
-        if(typeof(this.Pr.strikeH) !== "undefined" && this.Pr.strikeH !== null)
+        if(typeof(props.strikeH) !== "undefined" && props.strikeH !== null)
             this.Pr.strikeH = props.strikeH;
 
-        if(typeof(this.Pr.strikeV) !== "undefined" && this.Pr.strikeV !== null)
+        if(typeof(props.strikeV) !== "undefined" && props.strikeV !== null)
             this.Pr.strikeV = props.strikeV;
     }
 
@@ -129,7 +130,7 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
     //var penW = this.Get_CompiledCtrPrp().FontSize* 25.4/72 * 0.06 ;
     var penW = this.Get_CompiledCtrPrp().FontSize*0.02;
 
-    if(this.Pr.hideTop == false)
+    if(!this.Pr.hideTop)
     {
         var x1 = this.pos.x + x,
             x2 = this.pos.x + x + this.size.width - penW/2,
@@ -145,7 +146,7 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
         pGraphics.drawHorLine(0, y1 + penW, x1 + 2*25.4/96, x2 , 25.4/96);*/
     }
 
-    if(this.Pr.hideBot == false)
+    if(!this.Pr.hideBot)
     {
         var x1 = this.pos.x + x,
             x2 = this.pos.x + x + this.size.width - penW/2,
@@ -155,7 +156,7 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
             pGraphics.drawHorLine(0, y1, x1, x2, penW);
     }
 
-    if(this.Pr.hideLeft == false)
+    if(!this.Pr.hideLeft)
     {
         var x1 = this.pos.x + x,
             y1 = this.pos.y + y,
@@ -165,7 +166,7 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
         pGraphics.drawVerLine(0, x1, y1, y2, penW);
     }
 
-    if(this.Pr.hideRight == false)
+    if(!this.Pr.hideRight)
     {
         var x1 = this.pos.x + x + this.size.width - penW/2,
             y1 = this.pos.y + y,
@@ -227,7 +228,7 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
 
     }
 
-    if(this.bHor)
+    if(this.Pr.strikeH)
     {
         var x1 = this.pos.x + x,
             x2 = this.pos.x + x + this.size.width - penW,
@@ -237,11 +238,140 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
         pGraphics.drawHorLine(0, y1, x1, x2, penW);
     }
 
-    if(this.bVert)
+    if(this.Pr.strikeV)
     {
         var x1 = this.pos.x + x + this.size.width/2 - penW/2,
             y1 = this.pos.y + y,
             y2 = this.pos.y + y + this.size.height - penW;
+
+        pGraphics.p_color(0,0,0, 255);
+        pGraphics.drawVerLine(0, x1, y1, y2, penW);
+    }
+
+}
+CBorderBox.prototype.old_draw = function(x, y, pGraphics)
+{
+    this.elements[0][0].draw(x, y, pGraphics);
+    //var penW = this.getCtrPrp().FontSize* 25.4/96 * 0.08 ;
+    var penW = this.Get_CompiledCtrPrp().FontSize*0.02;
+
+    if(!this.Pr.hideTop)
+    {
+
+        var x1 = this.pos.x + x,
+        //x2 = this.pos.x + x + this.size.width - 25.4/96,
+            x2 = this.pos.x + x + this.size.width - penW,
+            y1 = this.pos.y + y;
+
+        pGraphics.p_color(0,0,0, 255);
+        pGraphics.drawHorLine(0, y1, x1, x2, penW);
+    }
+
+    if(!this.Pr.hideBot)
+    {
+        var x1 = this.pos.x + x,
+        //x2 = this.pos.x + x + this.size.width - 25.4/96,
+            x2 = this.pos.x + x + this.size.width - penW,
+            y1 = this.pos.y + y + this.size.height - penW;
+
+        pGraphics.p_color(0,0,0, 255);
+        pGraphics.drawHorLine(0, y1, x1, x2, penW);
+    }
+
+    if(!this.Pr.hideLeft)
+    {
+        var x1 = this.pos.x + x,
+            y1 = this.pos.y + y,
+            y2 = this.pos.y + y + this.size.height - penW;
+        //y2 = this.pos.y + y + this.size.height - 25.4/96;
+
+        pGraphics.p_color(0,0,0, 255);
+        pGraphics.drawVerLine(0, x1, y1, y2, penW);
+    }
+
+    if(!this.Pr.hideRight)
+    {
+        var x1 = this.pos.x + x + this.size.width - penW,
+            y1 = this.pos.y + y,
+            y2 = this.pos.y + y + this.size.height - penW;
+        //y2 = this.pos.y + y + this.size.height - 25.4/96 ;
+
+        pGraphics.p_color(0,0,0, 255);
+        pGraphics.drawVerLine(0, x1, y1, y2, penW);
+    }
+
+    if(this.Pr.strikeTLBR)
+    {
+        var pW = penW*0.8;
+        var x1 = this.pos.x + x , y1 = this.pos.y + y,
+            x2 = x1 + pW, y2 = y1,
+        //x3 = x1 + this.size.width - 25.4/96, y3 = y1 + this.size.height - pW - 25.4/96,
+            x3 = x1 + this.size.width - penW, y3 = y1 + this.size.height - pW - penW,
+            x4 = x3, y4 = y3 + pW,
+            x5 = x4 - pW, y5 = y4,
+            x6 = x1, y6 = y1 + pW,
+            x7 = x1, y7 = y1;
+
+        pGraphics.p_width(1000);
+        pGraphics.b_color1(0,0,0, 255);
+
+        pGraphics._s();
+        pGraphics._m(x1, y1);
+        pGraphics._l(x2, y2);
+        pGraphics._l(x3, y3);
+        pGraphics._l(x4, y4);
+        pGraphics._l(x5, y5);
+        pGraphics._l(x6, y6);
+        pGraphics._l(x7, y7);
+        pGraphics.df();
+
+    }
+
+    if(this.Pr.strikeBLTR)
+    {
+        var pW = penW*0.8;
+        var x1 = this.pos.x + x + this.size.width - pW - penW, y1 = this.pos.y + y,
+        //x1 = this.pos.x + x + this.size.width - pW - 25.4/96, y1 = this.pos.y + y,
+            x2 = x1 + pW, y2 = y1,
+            x3 = x2, y3 = y2 + pW,
+            x4 = this.pos.x + x + pW, y4 = this.pos.y + y + this.size.height - penW,
+        //x4 = this.pos.x + x + pW, y4 = this.pos.y + y + this.size.height - 25.4/96,
+            x5 = x4 - pW, y5 = y4,
+            x6 = x5, y6 = y5 - pW,
+            x7 = x1, y7 = y1;
+
+        pGraphics.p_width(1000);
+        pGraphics.b_color1(0,0,0, 255);
+
+        pGraphics._s();
+        pGraphics._m(x1, y1);
+        pGraphics._l(x2, y2);
+        pGraphics._l(x3, y3);
+        pGraphics._l(x4, y4);
+        pGraphics._l(x5, y5);
+        pGraphics._l(x6, y6);
+        pGraphics._l(x7, y7);
+        pGraphics.df();
+
+    }
+
+    if(this.Pr.strikeH)
+    {
+        var x1 = this.pos.x + x,
+            x2 = this.pos.x + x + this.size.width - penW,
+        //x2 = this.pos.x + x + this.size.width - 25.4/96,
+            y1 = this.pos.y + y + this.size.height/2 - penW/2;
+
+        pGraphics.p_color(0,0,0, 255);
+        pGraphics.drawHorLine(0, y1, x1, x2, penW);
+    }
+
+    if(this.Pr.strikeV)
+    {
+        var x1 = this.pos.x + x + this.size.width/2 - penW/2,
+            y1 = this.pos.y + y,
+            y2 = this.pos.y + y + this.size.height - penW;
+        //y2 = this.pos.y + y + this.size.height - 25.4/96;
 
         pGraphics.p_color(0,0,0, 255);
         pGraphics.drawVerLine(0, x1, y1, y2, penW);
@@ -594,6 +724,20 @@ CBar.prototype.init = function(props)
     else if(props.pos === LOCATION_BOT || props.location === LOCATION_BOT)
         this.Pr.pos = LOCATION_BOT;
 
+    var prp =
+    {
+        loc:    this.Pr.pos,
+        type:   DELIMITER_LINE
+    };
+
+    var defaultProps =
+    {
+        loc:   LOCATION_BOT
+    };
+
+    this.setCharacter(prp, defaultProps);
+
+
     if(props.ctrPrp !== null && typeof(props.ctrPrp) !== "undefined")
         this.setCtrPrp(props.ctrPrp);
 }
@@ -602,14 +746,8 @@ CBar.prototype.setLocation = function(pos)
     this.Pr.pos = pos;
     this.RecalcInfo.bProps = true;
 }
-CBar.prototype.Resize = function()
+CBar.prototype.Resize = function(Parent, ParaMath, oMeasure)
 {
-    if(this.RecalcInfo.bCtrPrp == true)
-    {
-        this.Set_CompiledCtrPrp();
-        this.RecalcInfo.bCtrPrp = false;
-    }
-
     if(this.RecalcInfo.bProps == true)
     {
         var prp =
@@ -624,9 +762,10 @@ CBar.prototype.Resize = function()
         };
 
         this.setCharacter(prp, defaultProps);
+        this.RecalcInfo.bProps = false;
     }
 
-    CBar.superclass.Resize.call(this);
+    CBar.superclass.Resize.call(this, Parent, ParaMath, oMeasure);
 }
 CBar.prototype.getAscent = function()
 {

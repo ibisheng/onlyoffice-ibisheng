@@ -3,7 +3,12 @@ function CFraction(props)
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_FRACTION;
 
-    this.type     =   BAR_FRACTION;
+    this.Pr =
+    {
+        type:   BAR_FRACTION
+    };
+
+    //this.type     =   BAR_FRACTION;
     this.bHideBar =   false;
 
     CMathBase.call(this);
@@ -31,10 +36,10 @@ CFraction.prototype.setType = function(type)
             bLin = type === LINEAR_FRACTION;
 
         if(bBar || bSkew || bLin) // на всякий случай
-            this.type = props.type;
+            this.Pr.type = type;
     }
 
-    if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
+    if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
     {
         var num = new CNumerator();
 
@@ -42,17 +47,17 @@ CFraction.prototype.setType = function(type)
 
         this.setDimension(2, 1);
 
-        if(this.type == NO_BAR_FRACTION)
+        if(this.Pr.type == NO_BAR_FRACTION)
             this.bHideBar = true;
 
         this.addMCToContent(num, den);
     }
-    else if(this.type == SKEWED_FRACTION)
+    else if(this.Pr.type == SKEWED_FRACTION)
     {
         this.setDimension(1, 2);
         this.setContent();
     }
-    else if(this.type == LINEAR_FRACTION)
+    else if(this.Pr.type == LINEAR_FRACTION)
     {
         this.setDimension(1, 2);
         this.setContent();
@@ -60,15 +65,15 @@ CFraction.prototype.setType = function(type)
 }
 CFraction.prototype.getType = function()
 {
-    return this.type;
+    return this.Pr.type;
 }
 CFraction.prototype.draw = function(x, y, pGraphics)
 {
-    if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
+    if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
         this.drawBarFraction(x, y, pGraphics);
-    else if(this.type == SKEWED_FRACTION)
+    else if(this.Pr.type == SKEWED_FRACTION)
         this.drawSkewedFraction(x, y, pGraphics);
-    else if(this.type == LINEAR_FRACTION)
+    else if(this.Pr.type == LINEAR_FRACTION)
         this.drawLinearFraction(x, y, pGraphics);
 }
 CFraction.prototype.drawBarFraction = function(x, y, pGraphics)
@@ -234,7 +239,7 @@ CFraction.prototype.getNumerator = function()
 {
     var numerator;
 
-    if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
+    if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
         numerator = this.elements[0][0].getElement();
     else
         numerator = this.elements[0][0];
@@ -245,7 +250,7 @@ CFraction.prototype.getDenominator = function()
 {
     var denominator;
 
-    if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
+    if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
         denominator = this.elements[1][0].getElement();
     else
         denominator = this.elements[0][1];
@@ -254,11 +259,11 @@ CFraction.prototype.getDenominator = function()
 }
 CFraction.prototype.recalculateSize = function(oMeasure)
 {
-    if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
+    if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
         this.recalculateBarFraction(oMeasure);
-    else if(this.type == SKEWED_FRACTION)
+    else if(this.Pr.type == SKEWED_FRACTION)
         this.recalculateSkewed(oMeasure);
-    else if(this.type == LINEAR_FRACTION)
+    else if(this.Pr.type == LINEAR_FRACTION)
         this.recalculateLinear(oMeasure);
 }
 CFraction.prototype.recalculateBarFraction = function(oMeasure)
@@ -330,7 +335,7 @@ CFraction.prototype.recalculateLinear = function()
 }
 CFraction.prototype.setPosition = function(pos)
 {
-    if(this.type == SKEWED_FRACTION)
+    if(this.Pr.type == SKEWED_FRACTION)
     {
         this.pos = {x: pos.x, y: pos.y - this.size.ascent};
 
@@ -351,7 +356,7 @@ CFraction.prototype.findDisposition = function( mCoord )
 {
     var disposition;
 
-    if(this.type == SKEWED_FRACTION)
+    if(this.Pr.type == SKEWED_FRACTION)
     {
         var mouseCoord = {x: mCoord.x, y: mCoord.y},
             posCurs =    {x: null, y: null},
@@ -416,11 +421,7 @@ CFraction.prototype.findDisposition = function( mCoord )
 }
 CFraction.prototype.getPropsForWrite = function()
 {
-    var props = {
-        type: this.type
-    };
-
-    return props;
+    return this.Pr;
 }
 
 CFraction.prototype.Save_Changes = function(Data, Writer)

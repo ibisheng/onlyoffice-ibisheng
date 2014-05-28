@@ -786,13 +786,13 @@ ParaMath.prototype =
         if(argSize == -1)
         {
             //FSize = 0.0009*FSize*FSize + 0.68*FSize + 0.26;
-            FSize = 0.77*FSize;
+            FSize = 0.76*FSize;
 
         }
         else if(argSize == -2)
         {
             //FSize = -0.0004*FSize*FSize + 0.66*FSize + 0.87;
-            FSize = 0.77*0.77*FSize;
+            FSize = 0.76*0.855*FSize;
         }
 
         tPrp.FontSize = FSize;

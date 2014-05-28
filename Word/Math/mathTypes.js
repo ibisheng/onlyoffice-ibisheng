@@ -202,6 +202,3 @@ var extend = function(Child, Parent)
     Child.superclass = Parent.prototype;
 
 }
-
-//  default Txt Prp
-//  argSize

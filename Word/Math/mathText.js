@@ -11,6 +11,8 @@
 
 var DIV_CENT = 0.1386;
 
+
+
 var StartTextElement = 0x2B1A; // Cambria Math
 
 // TODO
@@ -278,6 +280,8 @@ CMathText.prototype =
 
         var X = this.pos.x + x,
             Y = this.pos.y + y;
+
+        //console.log(String.fromCharCode(this.getCode()) + ": X " + X);
 
 
         /*var tx = 0;

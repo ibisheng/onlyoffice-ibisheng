@@ -1,12 +1,18 @@
 function CLimit(props)
 {
-	this.Id = g_oIdCounter.Get_NewId();    this.kind = MATH_LIMIT;
+	this.Id = g_oIdCounter.Get_NewId();
 
-    this.type = LIMIT_LOW;
+    this.kind = MATH_LIMIT;
+
+    this.Pr =
+    {
+        type: LIMIT_LOW
+    };
+
     CMathBase.call(this);
 
     if(props.type === LIMIT_UP || props.type === LIMIT_LOW)
-        this.type = props.type;
+        this.Pr.type = props.type;
 
     this.setDimension(2, 1);
 
@@ -15,24 +21,22 @@ function CLimit(props)
     var oIter = new CMathContent();
     oIter.decreaseArgSize();
 
-    if(this.type == LIMIT_LOW)
+    if(this.Pr.type == LIMIT_LOW)
         this.addMCToContent(oBase, oIter);
-    else if(this.type == LIMIT_UP)
+    else if(this.Pr.type == LIMIT_UP)
         this.addMCToContent(oIter, oBase);
 
     this.setCtrPrp(props.ctrPrp);
 
-    /// вызов этой функции обязательно в конце
-    //this.WriteContentsToHistory();
 	g_oTableId.Add( this, this.Id );
 }
 extend(CLimit, CMathBase);
 CLimit.prototype.getAscent = function()
 {
     var ascent;
-    if(this.type == LIMIT_LOW)
+    if(this.Pr.type == LIMIT_LOW)
         ascent = this.elements[0][0].size.ascent;
-    else if(this.type == LIMIT_UP)
+    else if(this.Pr.type == LIMIT_UP)
         ascent = this.elements[0][0].size.height + this.dH + this.elements[1][0].size.ascent;
 
     return ascent;
@@ -40,9 +44,9 @@ CLimit.prototype.getAscent = function()
 CLimit.prototype.getFName = function()
 {
     var fName;
-    if(this.type == LIMIT_LOW)
+    if(this.Pr.type == LIMIT_LOW)
         fName = this.elements[0][0];
-    else if(this.type == LIMIT_UP)
+    else if(this.Pr.type == LIMIT_UP)
         fName = this.elements[1][0];
 
     return fName;
@@ -50,9 +54,9 @@ CLimit.prototype.getFName = function()
 CLimit.prototype.getIterator = function()
 {
     var iterator;
-    if(this.type == LIMIT_LOW)
+    if(this.Pr.type == LIMIT_LOW)
         iterator = this.elements[1][0];
-    else if(this.type == LIMIT_UP)
+    else if(this.Pr.type == LIMIT_UP)
         iterator = this.elements[0][0];
 
     return iterator;
@@ -63,12 +67,7 @@ CLimit.prototype.setDistance = function()
 }
 CLimit.prototype.getPropsForWrite = function()
 {
-    var props =
-    {
-        type:   this.type
-    };
-
-    return props;
+    return this.Pr;
 }
 CLimit.prototype.Save_Changes = function(Data, Writer)
 {
@@ -106,10 +105,14 @@ CLimit.prototype.Get_Id = function()
 {
 	return this.Id;
 }
+
 function CMathFunc(props)
 {
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_FUNCTION;
+
+    this.Pr = {};
+
     CMathBase.call(this);
 
     this.setDimension(1, 2);
@@ -117,8 +120,6 @@ function CMathFunc(props)
 
     this.setCtrPrp(props.ctrPrp);
 
-    /// вызов этой функции обязательно в конце
-    //this.WriteContentsToHistory();
 	g_oTableId.Add( this, this.Id );
 }
 extend(CMathFunc, CMathBase);

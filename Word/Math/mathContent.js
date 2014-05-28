@@ -5103,7 +5103,8 @@ CMathContent.prototype =
             {
                 if(!this.bRoot)
                 {
-                    var oWPrp = this.Parent.Get_CtrPrp();
+                    //var oWPrp = this.Parent.Get_CtrPrp();
+                    var oWPrp = this.Parent.Get_CompiledCtrPrp();
 
                     //this.applyArgSize(oWPrp);
                     this.ParaMath.ApplyArgSize(oWPrp, this.argSize);
@@ -5242,7 +5243,8 @@ CMathContent.prototype =
                 {
                     pGraphics.b_color1(0,0,0,255);
 
-                    var oWPrp = this.Parent.Get_CtrPrp();
+                    //var oWPrp = this.Parent.Get_CtrPrp();
+                    var oWPrp = this.Parent.Get_CompiledCtrPrp();
 
                     //this.applyArgSize(oWPrp);
                     this.ParaMath.ApplyArgSize(oWPrp, this.argSize);
@@ -6289,7 +6291,7 @@ CMathContent.prototype =
         var TextPr;
 
         if(this.IsPlaceholder())
-            TextPr = this.Parent.getCtrPrp();
+            TextPr = this.Parent.Get_CtrPrp();
         else
             TextPr = this.content[pos].Get_TextPr(ContentPos, Depth + 1);
 
@@ -6301,7 +6303,7 @@ CMathContent.prototype =
 
         if(this.IsPlaceholder())
         {
-            TextPr = this.Parent.getCtrPrp();
+            TextPr = this.Parent.Get_CompiledCtrPrp();
         }
         else if ( true === this.bSelectionUse || bAll == true)
         {

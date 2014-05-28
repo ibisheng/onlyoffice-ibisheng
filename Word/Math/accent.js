@@ -1640,8 +1640,8 @@ CAccent.prototype.Resize = function(Parent, ParaMath, oMeasure)
 
         this.operator.setProperties(prp, defaultPrp);
 
-        this.chr = String.fromCharCode(this.operator.code);
-        this.chrType = this.operator.typeOper;
+        this.Pr.chr = String.fromCharCode(this.operator.code);
+        this.Pr.chrType = this.operator.typeOper;
     }
 
     this.operator.relate(this);

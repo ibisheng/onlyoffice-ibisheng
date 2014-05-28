@@ -976,7 +976,7 @@ CMathBase.prototype =
         width += this.dW*(this.nCol - 1);
         width += this.GapLeft + this.GapRight;
 
-        var ascent = this.getAscent(height, oMeasure);
+        var ascent = this.getAscent(oMeasure, height);
 
         this.size = {width: width, height: height, ascent: ascent};
     },
@@ -994,7 +994,7 @@ CMathBase.prototype =
         {
             this.Set_CompiledCtrPrp();
             this.RecalcInfo.bCtrPrp = false;
-            this.RecalcInfo.bProps  = false;
+            //this.RecalcInfo.bProps  = false;
         }
 
         for(var i=0; i < this.nRow; i++)
@@ -1017,12 +1017,12 @@ CMathBase.prototype =
         
         return res;
     },
-    getAscent: function(_height, oMeasure)
+    getAscent: function(oMeasure, _height)
     {
         var Ascent = 0;
         if(this.nRow > 1)
         {
-            Ascent = _height || this.size.height;
+            Ascent = _height;
             Ascent /=2;
             var MergedCtrPrp = this.Get_CompiledCtrPrp();
             Ascent += this.ParaMath.GetShiftCenter(oMeasure, MergedCtrPrp);

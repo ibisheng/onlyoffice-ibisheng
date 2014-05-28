@@ -3121,6 +3121,7 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
     {
         var width, height, ascent;
 
+
         if(this.typeOper == OPERATOR_TEXT) // отдельный случай для текста в качестве оператора
         {
             var ctrPrp = this.Get_CompiledCtrPrp();
@@ -3148,10 +3149,10 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
                 height = this.operator.size.height;
             }
 
-            var letterX = new CMathText(true);
+            /*var letterX = new CMathText(true);
             letterX.add(0x78);
             letterX.Resize(null, oMeasure);
-            this.shiftAccent = letterX.size.ascent;
+            this.shiftAccent = letterX.size.ascent;*/
         }
         else
         {
@@ -3295,88 +3296,65 @@ function CDelimiter(props)
     this.endOper = new COperator (OPER_DELIMITER);
     this.sepOper = new COperator (OPER_SEPARATOR);
 
-    this.shape = DELIMITER_SHAPE_CENTERED;
-    this.grow = true;
+    this.Pr =
+    {
+        begChr:         null,
+        begChrType:     null,
 
+        endChr:         null,
+        endChrType:     null,
 
-    this.code = null;
-    this.typeOper = null;
+        sepChr:         null,
+        sepChrType:     null,
 
-    ////  special for "read"  ////
-	this.column = 0;
-    ////
+        ////  special for "read"  ////
+        column:         0,
+
+        shp:            DELIMITER_SHAPE_CENTERED,
+        grow:           true
+    };
+
+    //this.shape = DELIMITER_SHAPE_CENTERED;
+    //this.grow = true;
+
 
     CMathBase.call(this);
 
     this.init(props);
-    this.setCtrPrp(props.ctrPrp);
+
 	g_oTableId.Add( this, this.Id );
 }
 extend(CDelimiter, CMathBase);
 CDelimiter.prototype.init = function(props)
 {
     if(props.grow == true || props.grow == 1)
-        this.grow = true;
+        this.Pr.grow = true;
     else if(props.grow == false || props.grow == 0)
-        this.grow = false;
+        this.Pr.grow = false;
 
-    var begPrp =
-    {
-        chr:    props.begChr,
-        type:   props.begChrType,
-        loc:    LOCATION_LEFT
-    };
-    var begDefaultPrp =
-    {
-        type:  PARENTHESIS_LEFT
-    };
-    this.begOper.setProperties(begPrp, begDefaultPrp);
-    this.begOper.relate(this);
+    this.Pr.begChr     = props.begChr;
+    this.Pr.begChrType = props.begChrType;
 
-    var endPrp =
-    {
-        chr:    props.endChr,
-        type:   props.endChrType,
-        loc:    LOCATION_RIGHT
-    };
-    var endDefaultPrp =
-    {
-        type:  PARENTHESIS_RIGHT
-    };
+    this.Pr.endChr     = props.endChr;
+    this.Pr.endChrType = props.endChrType;
 
-    this.endOper.setProperties(endPrp, endDefaultPrp);
-    this.endOper.relate(this);
+    this.Pr.sepChr     = props.sepChr;
+    this.Pr.sepChrType = props.sepChrType;
 
-    var sepPrp =
-    {
-        chr:    props.sepChr,
-        type:   props.sepChrType,
-        loc:    LOCATION_SEP
-    };
-    var sepDefaultPrp =
-    {
-        type:  DELIMITER_LINE
-    };
-
-    if(props.column == 1 )
-        sepPrp.type = OPERATOR_EMPTY;
-
-    this.sepOper.setProperties(sepPrp, sepDefaultPrp);
-    this.sepOper.relate(this);
 
     if(props.shape == DELIMITER_SHAPE_MATH || props.shp == DELIMITER_SHAPE_MATH)
-        this.shape = DELIMITER_SHAPE_MATH;
+        this.Pr.shp = DELIMITER_SHAPE_MATH;
     else if(props.shape == DELIMITER_SHAPE_CENTERED || props.shp == DELIMITER_SHAPE_CENTERED)
-        this.shape = DELIMITER_SHAPE_CENTERED;
+        this.Pr.shp = DELIMITER_SHAPE_CENTERED;
 
-    if(props.column === null || typeof(props.column) === "undefined" )
+    if(props.column === null || typeof(props.column) === "undefined")
         props.column = 1;
+
+    if(props.ctrPrp !== null && typeof(props.ctrPrp) !== "undefined")
+        this.setCtrPrp(props.ctrPrp);
 
     this.setDimension(1, props.column);
     this.setContent();
-
-    /// вызов этой функции обязательно в конце
-    //this.WriteContentsToHistory();
 }
 CDelimiter.prototype.old_recalculateSize = function()
 {
@@ -3529,6 +3507,56 @@ CDelimiter.prototype.Resize = function(Parent, ParaMath, oMeasure)
         this.RecalcInfo.bCtrPrp = false;
     }
 
+    if(this.RecalcInfo.bProps == true)
+    {
+        var begPrp =
+        {
+            chr:    this.Pr.begChr,
+            type:   this.Pr.begChrType,
+            loc:    LOCATION_LEFT
+        };
+        var begDefaultPrp =
+        {
+            type:  PARENTHESIS_LEFT
+        };
+        this.begOper.setProperties(begPrp, begDefaultPrp);
+        this.begOper.relate(this);
+
+        var endPrp =
+        {
+            chr:    this.Pr.endChr,
+            type:   this.Pr.endChrType,
+            loc:    LOCATION_RIGHT
+        };
+        var endDefaultPrp =
+        {
+            type:  PARENTHESIS_RIGHT
+        };
+
+        this.endOper.setProperties(endPrp, endDefaultPrp);
+        this.endOper.relate(this);
+
+        var sepPrp =
+        {
+            chr:    this.Pr.sepChr,
+            type:   this.Pr.sepChrType,
+            loc:    LOCATION_SEP
+        };
+        var sepDefaultPrp =
+        {
+            type:  DELIMITER_LINE
+        };
+
+        if(this.nCol == 1 )
+            sepPrp.type = OPERATOR_EMPTY;
+
+        this.sepOper.setProperties(sepPrp, sepDefaultPrp);
+        this.sepOper.relate(this);
+
+
+        this.RecalcInfo.bProps = false;
+    }
+
     // размеры аргумента
     var heightG = 0, widthG = 0,
         ascentG = 0, descentG = 0;
@@ -3546,7 +3574,6 @@ CDelimiter.prototype.Resize = function(Parent, ParaMath, oMeasure)
 
     heightG = ascentG + descentG;
 
-
     var mgCtrPrp = this.Get_CompiledCtrPrp();
     var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
     var maxAD = ascentG - shCenter  > descentG + shCenter ? ascentG - shCenter: descentG + shCenter;
@@ -3554,7 +3581,7 @@ CDelimiter.prototype.Resize = function(Parent, ParaMath, oMeasure)
     var plH = 9.877777777777776 * mgCtrPrp.FontSize/36;
     var bTextContent = ascentG < plH || descentG < plH; // для текста операторы в случае центрирования не увеличиваем
 
-    var bCentered = this.shape == DELIMITER_SHAPE_CENTERED,
+    var bCentered = this.Pr.shp == DELIMITER_SHAPE_CENTERED,
         b2Max = bCentered && (2*maxAD - heightG > 0.001);
 
 
@@ -3580,7 +3607,7 @@ CDelimiter.prototype.Resize = function(Parent, ParaMath, oMeasure)
     var height, ascent, descent;
 
 
-    if(this.shape == DELIMITER_SHAPE_CENTERED)
+    if(this.Pr.shp == DELIMITER_SHAPE_CENTERED)
     {
         var deltaHeight = heightG - maxDimOper.height;
         if(deltaHeight < 0)
@@ -3671,12 +3698,12 @@ CDelimiter.prototype.alignOperator = function(operator) // в качестве �
 
     if(bAlign)
     {
-        if(this.shape == DELIMITER_SHAPE_CENTERED)
+        if(this.Pr.shp == DELIMITER_SHAPE_CENTERED)
         {
             align = this.size.ascent > dimOper.ascent ? this.size.ascent - dimOper.ascent : 0;
 
         }
-        else if(this.shape === DELIMITER_SHAPE_MATH)
+        else if(this.Pr.shp === DELIMITER_SHAPE_MATH)
         {
             var shCenter = dimOper.ascent - dimOper.height/2; // так получаем shCenter, иначе соотношение м/ду ascent и descent будет неверное
 
@@ -3911,14 +3938,13 @@ CDelimiter.prototype.Get_Id = function()
 function CCharacter()
 {
     this.operator = new COperator(OPER_GROUP_CHAR);
-    this.shiftX = 0;
 
     CMathBase.call(this);
 }
 extend(CCharacter, CMathBase);
 CCharacter.prototype.setCharacter = function(props, defaultProps)
 {
-    this.operator.init(props, defaultProps);
+    this.operator.setProperties(props, defaultProps);
     this.operator.relate(this);
 
     this.setDimension(1, 1);
@@ -3940,17 +3966,13 @@ CCharacter.prototype.Resize = function(Parent, ParaMath, oMeasure)
 
     this.operator.fixSize(ParaMath, oMeasure, base.size.width);
 
-    var letterX = new CMathText(true);
-    letterX.add(0x78);
-    letterX.Resize(null, oMeasure);
-    this.shiftX = base.size.ascent - letterX.size.ascent;
-
-    var width  = base.size.width > this.operator.size.width ? base.size.width : this.operator.size.width,
-        height = base.size.height + this.operator.size.height + this.shiftX,
-        ascent = this.getAscent(oMeasure);
-
     var ctrPrp = this.Get_CompiledCtrPrp();
     oMeasure.SetFont(ctrPrp);
+
+    var width  = base.size.width > this.operator.size.width ? base.size.width : this.operator.size.width,
+        height = base.size.height + this.operator.size.height,
+        ascent = this.getAscent(oMeasure);
+
 
     this.size = {height: height, width: width, ascent: ascent};
 }
@@ -3961,7 +3983,7 @@ CCharacter.prototype.setPosition = function(pos)
     var alignOp  =  this.align(this.operator),
         alignCnt = this.align(this.elements[0][0]);
 
-    if(this.loc === LOCATION_TOP)
+    if(this.Pr.pos === LOCATION_TOP)
     {
         var x1 = this.pos.x + this.GapLeft + alignOp,
             y1 = this.pos.y;
@@ -3969,11 +3991,11 @@ CCharacter.prototype.setPosition = function(pos)
         this.operator.setPosition({x: x1, y: y1});
 
         var x2 = this.pos.x + this.GapLeft + alignCnt,
-            y2 = this.pos.y + this.operator.size.height + this.shiftX;
+            y2 = this.pos.y + this.operator.size.height;
 
         this.elements[0][0].setPosition({x: x2, y: y2});
     }
-    else if(this.loc === LOCATION_BOT)
+    else if(this.Pr.pos === LOCATION_BOT)
     {
         var x1 = this.pos.x + this.GapLeft + alignCnt,
             y1 = this.pos.y;
@@ -4035,7 +4057,7 @@ CCharacter.prototype.findDisposition = function(pos)
     else
         X = pos.x - align;
 
-    if(this.loc === LOCATION_TOP)
+    if(this.Pr.pos === LOCATION_TOP)
     {
         if(pos.y < this.operator.size.height)
         {
@@ -4045,7 +4067,7 @@ CCharacter.prototype.findDisposition = function(pos)
         else
             Y = pos.y - this.operator.size.height;
     }
-    else if(this.loc === LOCATION_BOT)
+    else if(this.Pr.pos === LOCATION_BOT)
     {
         if(pos.y > content.size.height)
         {
@@ -4067,14 +4089,21 @@ CCharacter.prototype.getBase = function()
 }
 
 
-
 function CGroupCharacter(props)
 {
-	this.Id = g_oIdCounter.Get_NewId();
+	this.Id   = g_oIdCounter.Get_NewId();
     this.kind = MATH_GROUP_CHARACTER;
 
-    this.vertJust = VJUST_TOP;
-    this.loc = LOCATION_BOT;
+    this.Pr =
+    {
+        chr:      null,
+        chrType:  null,
+        vertJc:   VJUST_TOP,
+        pos:      LOCATION_BOT
+    };
+
+    //this.vertJust = VJUST_TOP;
+    //this.loc = LOCATION_BOT;
 
     CCharacter.call(this);
 
@@ -4084,10 +4113,15 @@ extend(CGroupCharacter, CCharacter);
 CGroupCharacter.prototype.init = function(props)
 {
     if(props.vertJc === VJUST_TOP || props.vertJc === VJUST_BOT)
-        this.vertJust = props.vertJc;
+        this.Pr.vertJc = props.vertJc;
 
     if(props.pos === LOCATION_TOP || props.pos === LOCATION_BOT)
-        this.loc = LOCATION_TOP;
+        this.Pr.pos = props.pos;
+
+    this.Pr.chr     = props.chr;
+    this.Pr.chrType = props.chrType;
+
+    ///////////////////////////////////////////////////////////////
 
     var operDefaultPrp =
     {
@@ -4097,12 +4131,18 @@ CGroupCharacter.prototype.init = function(props)
 
     var operProps =
     {
-        type:   props.chrType,
-        chr:    props.chr,
-        loc:    this.loc
+        type:   this.Pr.chrType,
+        chr:    this.Pr.chr,
+        loc:    this.Pr.pos
     };
 
     this.setCharacter(operProps, operDefaultPrp);
+
+    this.Pr.chrType = this.operator.typeOper;
+    this.Pr.chr     = String.fromCharCode(this.operator.code);
+
+
+    //////////////////////////////////////////////////////////////////
 
     if(props.ctrPrp !== null && typeof(props.ctrPrp)!== "undefined")
         this.setCtrPrp(props.ctrPrp);
@@ -4110,21 +4150,49 @@ CGroupCharacter.prototype.init = function(props)
     /// вызов этой функции обязательно в конце
     g_oTableId.Add( this, this.Id );
 }
+CGroupCharacter.prototype.Resize = function(Parent, ParaMath, oMeasure)
+{
+    if(this.RecalcInfo.bProps == true)
+    {
+        var operDefaultPrp =
+        {
+            type:   BRACKET_CURLY_BOTTOM,
+            loc:    LOCATION_BOT
+        };
+
+        var operProps =
+        {
+            type:   this.Pr.chrType,
+            chr:    this.Pr.chr,
+            loc:    this.Pr.pos
+        };
+
+        this.setCharacter(operProps, operDefaultPrp);
+
+        this.Pr.chrType = this.operator.typeOper;
+        this.Pr.chr     = String.fromCharCode(this.operator.code);
+
+        this.RecalcInfo.bProps = false;
+    }
+
+    CGroupCharacter.superclass.Resize.call(this, Parent, ParaMath, oMeasure);
+}
 CGroupCharacter.prototype.getAscent = function(oMeasure)
 {
     var ascent;
 
     //var shCent = DIV_CENT*this.getCtrPrp().FontSize;
+
     var ctrPrp = this.Get_CompiledCtrPrp();
     var shCent = this.ParaMath.GetShiftCenter(oMeasure, ctrPrp);
 
-    if(this.vertJust === VJUST_TOP && this.loc === LOCATION_TOP)
+    if(this.Pr.vertJc === VJUST_TOP && this.Pr.pos === LOCATION_TOP)
         ascent =  this.operator.size.ascent + shCent;
-    else if(this.vertJust === VJUST_BOT && this.loc === LOCATION_TOP )
+    else if(this.Pr.vertJc === VJUST_BOT && this.Pr.pos === LOCATION_TOP )
         ascent = this.operator.size.height + this.elements[0][0].size.ascent;
-    else if(this.vertJust === VJUST_TOP && this.loc === LOCATION_BOT )
+    else if(this.Pr.vertJc === VJUST_TOP && this.Pr.pos === LOCATION_BOT )
         ascent = this.elements[0][0].size.ascent;
-    else if(this.vertJust === VJUST_BOT && this.loc === LOCATION_BOT )
+    else if(this.Pr.vertJc === VJUST_BOT && this.Pr.pos === LOCATION_BOT )
         ascent = this.elements[0][0].size.height + shCent + this.operator.size.height - this.operator.size.ascent;
         //ascent = this.operator.size.height/2 + shCent + this.elements[0][0].size.height;
 
@@ -4290,19 +4358,9 @@ CGroupCharacter.prototype.old_getGlyph = function(code, type)
 
     return operator;
 }
-CGroupCharacter.prototype.setPos = function() // change location
-{
-
-}
 CGroupCharacter.prototype.getPropsForWrite = function()
 {
-    var props = {
-        chr:	this.operator.getChr(),
-        pos:	this.loc,
-        vertJc:	this.vertJc
-    };
-    return props;
-
+    return this.Pr;
 }
 CGroupCharacter.prototype.Save_Changes = function(Data, Writer)
 {

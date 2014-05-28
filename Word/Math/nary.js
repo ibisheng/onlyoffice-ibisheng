@@ -1,222 +1,257 @@
 //величина символа "сигма" не меняется в зависимости от аргумента
 //если не выставлено в настройках
 /////////////////////****//////////////////////////
-//  IterType:
-//  0 - без итераторов
-//  1 - итератор сверху
-//  2 - итератор снизу
-//  3 - оба итератора
 
-//  OrderType
-//  0 - итраторы по прямой линии
-//  1 - итераторы расположены также, как у степени
 
 function CNary(props)
 {
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_NARY;
 
-    this.type = null;
-    this.code = null;   // for "read"
-    this.grow = false;
-    this.supHide = false;
-    this.subHide = false;
+    this.Pr =
+    {
+        chr:        null,
+        chrType:    NARY_INTEGRAL,
+        supHide:    false,
+        subHide:    false,
+        grow:       false,
+        limLoc:     null
+    };
+
+    //this.limLoc = null;
+
+    //this.type = null;
+    //this.code = null;   // for "read"
+    //this.grow = false;
+    //this.supHide = false;
+    //this.subHide = false;
+
     CMathBase.call(this);
 
     this.init(props);
-    this.setCtrPrp(props.ctrPrp);
+    //this.setCtrPrp(props.ctrPrp);
 	g_oTableId.Add( this, this.Id );
 }
 extend(CNary, CMathBase);
 CNary.prototype.init = function(props)
 {
+    if(props.ctrPrp !== null && typeof(props.ctrPrp)!== "undefined")
+        this.setCtrPrp(props.ctrPrp);
+
     if(props.supHide === true || props.supHide === 1)
-        this.supHide = true;
+        this.Pr.supHide = true;
 
     if(props.subHide === true || props.subHide === 1)
-        this.subHide = true;
+        this.Pr.subHide = true;
 
     if(props.grow === true || props.grow === 1)
-        this.grow = true;
+        this.Pr.grow = true;
 
     this.setDimension(1, 2);
 
-    var signCode, sign;
-    var bChr = false;
+    var oSign = this.getSign(props.chr, props.signType);
 
-    if(typeof(props.chr) === "string")
-    {
-        signCode = props.chr.charCodeAt(0);
-        bChr = true;
-    }
+    //this.Pr.chrType = oSign.chrType;
+    //this.Pr.chr     = String.fromCharCode(oSign.chrCode);
+
+    this.Pr.chrType = props.chrType;
+    this.Pr.chr =     props.chr;
 
     if(props.limLoc == NARY_UndOvr)
-        this.limLoc = NARY_UndOvr;
+        this.Pr.limLoc = NARY_UndOvr;
     else if(props.limLoc  == NARY_SubSup)
-        this.limLoc = NARY_SubSup;
+        this.Pr.limLoc = NARY_SubSup;
     else
     {
-        var bIntegral = signCode > 0x222A && signCode < 0x2231;
+        var bIntegral = oSign.chrCode > 0x222A && oSign.chrCode < 0x2231;
 
         //var MPrp = this.Parent.Composition.GetMathPr();
 
         if(bIntegral)
-            this.limLoc = g_oMathSettings.intLim;
+            this.Pr.limLoc = g_oMathSettings.intLim;
         else
-            this.limLoc = g_oMathSettings.naryLim;
-    }
-
-
-    if(signCode == 0x222B || props.signType == NARY_INTEGRAL)
-    {
-        this.code = 0x222B;
-        this.type = NARY_INTEGRAL;
-        sign = new CIntegral();
-    }
-    else if(signCode == 0x222C || props.signType == NARY_DOUBLE_INTEGRAL)
-    {
-        this.code = 0x222C;
-        this.type = NARY_DOUBLE_INTEGRAL;
-        sign = new CDoubleIntegral();
-    }
-    else if(signCode == 0x222D || props.signType == NARY_TRIPLE_INTEGRAL)
-    {
-        this.code = 0x222D;
-        this.type = NARY_TRIPLE_INTEGRAL;
-        sign = new CTripleIntegral();
-    }
-    else if(signCode == 0x222E || props.signType == NARY_CONTOUR_INTEGRAL )
-    {
-        this.code = 0x222E;
-        this.type = NARY_CONTOUR_INTEGRAL;
-        sign = new CContourIntegral();
-    }
-    else if(signCode == 0x222F || props.signType == NARY_SURFACE_INTEGRAL )
-    {
-        this.code = 0x222F;
-        this.type = NARY_SURFACE_INTEGRAL;
-        sign = new CSurfaceIntegral();
-    }
-    else if(signCode == 0x2230 || props.signType == NARY_VOLUME_INTEGRAL)
-    {
-        this.code = 0x2230;
-        this.type = NARY_VOLUME_INTEGRAL;
-        sign = new CVolumeIntegral();
-    }
-    else if(signCode == 0x2211 || props.signType == NARY_SIGMA)
-    {
-        this.code = 0x2211;
-        this.type = NARY_SIGMA;
-        sign = new CSigma();
-    }
-    else if(signCode == 0x220F || props.signType == NARY_PRODUCT)
-    {
-        this.code = 0x220F;
-        this.type = NARY_PRODUCT;
-        sign = new CProduct();
-    }
-    else if(signCode == 0x2210 || props.signType == NARY_COPRODUCT)
-    {
-        this.code = 0x2210;
-        this.type = NARY_COPRODUCT;
-        sign = new CProduct(-1);
-    }
-    else if(signCode == 0x22C3 || props.signType == NARY_UNION)
-    {
-        this.code = 0x22C3;
-        this.type = NARY_UNION;
-        sign = new CUnion();
-    }
-    else if(signCode == 0x22C2 || props.signType == NARY_INTERSECTION)
-    {
-        this.code = 0x22C2;
-        this.type = NARY_INTERSECTION;
-        sign = new CUnion(-1);
-    }
-    else if(signCode == 0x22C1 || props.signType == NARY_LOGICAL_OR)
-    {
-        this.code = 0x22C1;
-        this.type = NARY_LOGICAL_OR;
-        sign  = new CLogicalOr();
-    }
-    else if(signCode == 0x22C0 || props.signType == NARY_LOGICAL_AND)
-    {
-        this.code = 0x22C0;
-        this.type = NARY_LOGICAL_AND;
-        sign  = new CLogicalOr(-1);
-    }
-    else if(bChr)
-    {
-        this.code = signCode;
-        this.type = NARY_TEXT_OPER;
-        sign = new CMathText(true);
-        sign.add(signCode);
-
-    }
-    else
-    {
-        this.code = 0x222B;
-        this.type = NARY_INTEGRAL;
-        sign = new CIntegral();
+            this.Pr.limLoc = g_oMathSettings.naryLim;
     }
 
     var arg = new CMathContent(),
         base;
 
-    if(this.limLoc === NARY_UndOvr)
+    if(this.Pr.limLoc === NARY_UndOvr)
     {
-        if(this.supHide && this.subHide)
+        if(this.Pr.supHide && this.Pr.subHide)
         {
-            base = sign;
+            base = oSign.operator;
         }
-        else if( this.supHide && !this.subHide )
+        else if( this.Pr.supHide && !this.Pr.subHide )
         {
             base = new CNaryOvr();
-            base.init(sign);
+            base.init(oSign.operator);
 
             base.setCtrPrp(this.CtrPrp.Copy());
 
         }
-        else if( !this.supHide && this.subHide )
+        else if( !this.Pr.supHide && this.Pr.subHide )
         {
             base = new CNaryUnd();
-            base.init(sign);
+            base.init(oSign.operator);
             base.setCtrPrp(this.CtrPrp.Copy());
         }
         else
         {
             base = new CNaryUndOvr();
-            base.init(sign);
+            base.init(oSign.operator);
             base.setCtrPrp(this.CtrPrp.Copy());
         }
 
     }
     else
     {
-        if( this.supHide && !this.subHide )
+        if( this.Pr.supHide && !this.Pr.subHide )
         {
-            var prp = {type: DEGREE_SUBSCRIPT, indef: 2, oBase: sign, ctrPrp: this.CtrPrp.Copy() };
+            var prp = {type: DEGREE_SUBSCRIPT, indef: 2, oBase: oSign.operator, ctrPrp: this.CtrPrp.Copy() };
             base = new CDegree(prp);
         }
-        else if( !this.supHide && this.subHide )
+        else if( !this.Pr.supHide && this.Pr.subHide )
         {
-            var prp = {type: DEGREE_SUPERSCRIPT, indef: 2, oBase: sign, ctrPrp: this.CtrPrp.Copy()};
+            var prp = {type: DEGREE_SUPERSCRIPT, indef: 2, oBase: oSign.operator, ctrPrp: this.CtrPrp.Copy()};
             base = new CDegree(prp);
         }
         else
         {
-            var prp = {type: DEGREE_SubSup, indef: 2, oBase: sign, ctrPrp: this.CtrPrp.Copy()};
+            var prp = {type: DEGREE_SubSup, indef: 2, oBase: oSign.operator, ctrPrp: this.CtrPrp.Copy()};
             base = new CDegreeSubSup(prp);
         }
     }
 
-    /*if(!this.supHide || !this.subHide)
-        base.setCtrPrp(this.CtrPrp);  */  // выставляем аналогично как в CMathContent при добавлении элемента в addMComponent
 
     this.addMCToContent(base, arg);
+}
+CNary.prototype.Resize = function(Parent, ParaMath, oMeasure)
+{
+    if(this.RecalcInfo.bProps)
+    {
+        var oSign = this.getSign(this.Pr.chr, this.Pr.chrType);
 
-    /// вызов этой функции обязательно в конце
-    //this.WriteContentsToHistory();
+        this.Pr.chrType = oSign.chrType;
+        this.Pr.chr     = String.fromCharCode(oSign.chrCode);
+    }
+
+    CNary.superclass.Resize.call(this, Parent, ParaMath, oMeasure);
+}
+CNary.prototype.getSign = function(chr, chrType)
+{    
+    var result = 
+    {
+        chrCode:   null,
+        chrType:   null,
+        operator:      null
+        
+    }
+  
+    var bChr = false;
+    var chrCode;
+
+
+    if(typeof(chr) === "string")
+    {
+        chrCode = chr.charCodeAt(0);
+        bChr = true;
+    }
+
+    if(chrCode == 0x222B || chrType == NARY_INTEGRAL)
+    {
+        result.chrCode = 0x222B;
+        result.chrType = NARY_INTEGRAL;
+        result.operator = new CIntegral();
+    }
+    else if(chrCode == 0x222C || chrType == NARY_DOUBLE_INTEGRAL)
+    {
+        result.chrCode = 0x222C;
+        result.chrType = NARY_DOUBLE_INTEGRAL;
+        result.operator = new CDoubleIntegral();
+    }
+    else if(chrCode == 0x222D || chrType == NARY_TRIPLE_INTEGRAL)
+    {
+        result.chrCode = 0x222D;
+        result.chrType = NARY_TRIPLE_INTEGRAL;
+        result.operator = new CTripleIntegral();
+    }
+    else if(chrCode == 0x222E || chrType == NARY_CONTOUR_INTEGRAL )
+    {
+        result.chrCode = 0x222E;
+        result.chrType = NARY_CONTOUR_INTEGRAL;
+        result.operator = new CContourIntegral();
+    }
+    else if(chrCode == 0x222F || chrType == NARY_SURFACE_INTEGRAL )
+    {
+        result.chrCode = 0x222F;
+        result.chrType = NARY_SURFACE_INTEGRAL;
+        result.operator = new CSurfaceIntegral();
+    }
+    else if(chrCode == 0x2230 || chrType == NARY_VOLUME_INTEGRAL)
+    {
+        result.chrCode = 0x2230;
+        result.chrType = NARY_VOLUME_INTEGRAL;
+        result.operator = new CVolumeIntegral();
+    }
+    else if(chrCode == 0x2211 || chrType == NARY_SIGMA)
+    {
+        result.chrCode = 0x2211;
+        result.chrType = NARY_SIGMA;
+        result.operator = new CSigma();
+    }
+    else if(chrCode == 0x220F || chrType == NARY_PRODUCT)
+    {
+        result.chrCode = 0x220F;
+        result.chrType = NARY_PRODUCT;
+        result.operator = new CProduct();
+    }
+    else if(chrCode == 0x2210 || chrType == NARY_COPRODUCT)
+    {
+        result.chrCode = 0x2210;
+        result.chrType = NARY_COPRODUCT;
+        result.operator = new CProduct(-1);
+    }
+    else if(chrCode == 0x22C3 || chrType == NARY_UNION)
+    {
+        result.chrCode = 0x22C3;
+        result.chrType = NARY_UNION;
+        result.operator = new CUnion();
+    }
+    else if(chrCode == 0x22C2 || chrType == NARY_INTERSECTION)
+    {
+        result.chrCode = 0x22C2;
+        result.chrType = NARY_INTERSECTION;
+        result.operator = new CUnion(-1);
+    }
+    else if(chrCode == 0x22C1 || chrType == NARY_LOGICAL_OR)
+    {
+        result.chrCode = 0x22C1;
+        result.chrType = NARY_LOGICAL_OR;
+        result.operator  = new CLogicalOr();
+    }
+    else if(chrCode == 0x22C0 || chrType == NARY_LOGICAL_AND)
+    {
+        result.chrCode = 0x22C0;
+        result.chrType = NARY_LOGICAL_AND;
+        result.operator  = new CLogicalOr(-1);
+    }
+    else if(bChr)
+    {
+        result.chrCode = chrCode;
+        result.chrType = NARY_TEXT_OPER;
+        result.operator = new CMathText(true);
+        result.operator.add(chrCode);
+
+    }
+    else
+    {
+        result.chrCode = 0x222B;
+        result.chrType = NARY_INTEGRAL;
+        result.operator = new CIntegral();
+    }
+
+    return result;
 }
 CNary.prototype.setCtrPrp = function(txtPrp)
 {
@@ -238,12 +273,12 @@ CNary.prototype.getBase = function()
 }
 CNary.prototype.getUpperIterator = function()
 {
-	if (!this.supHide)
+	if (!this.Pr.supHide)
 		return this.elements[0][0].getUpperIterator();
 }
 CNary.prototype.getLowerIterator = function()
 {
-	if (!this.subHide)
+	if (!this.Pr.subHide)
 		return this.elements[0][0].getLowerIterator();
 }
 CNary.prototype.getPropsForWrite = function()
