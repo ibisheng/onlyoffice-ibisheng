@@ -217,7 +217,9 @@ var c_oAscValAxUnits =
     TEN_MILLIONS: 6,
     TEN_THOUSANDS: 7,
     TRILLIONS: 8,
-    CUSTOM: 9
+    CUSTOM: 9,
+    THOUSANDS: 10
+
 };
 
 var c_oAscTickMark =
