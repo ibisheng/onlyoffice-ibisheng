@@ -3890,6 +3890,9 @@ Cell.prototype.setValue=function(val,callback){
 				val = "="+this.formulaParsed.assemble();
 			}
 		}
+        else{
+            this.formulaParsed = null;
+        }
 	}
 	//удаляем старые значения
 	this.oValue.clean();
@@ -3909,6 +3912,7 @@ Cell.prototype.setValue=function(val,callback){
 		}
 		else {
 			this.oValue.setValue(val);
+            this.formulaParsed = null;
 		}
 	}
 	if ( this.ws.workbook.isNeedCacheClean ){
@@ -3943,6 +3947,7 @@ Cell.prototype.setValue2=function(array){
 	if (this.sFormula)
 		wb.dependencyFormulas.deleteMasterNodes2( ws.Id, this.oId.getID(), true );
 	this.sFormula = null;
+    this.formulaParsed = null;
 	this.oValue.clean();
 	this.setFormulaCA(false);
 	this.oValue.setValue2(array);
