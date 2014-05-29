@@ -274,7 +274,7 @@ CShape.prototype.recalculateTxBoxContent = function()
 
 CShape.prototype.recalculate = function ()
 {
-    if(this.bDeleted)
+    if(this.bDeleted || !this.bWordShape)
         return;
     ExecuteNoHistory(function()
     {
@@ -318,6 +318,8 @@ CShape.prototype.recalculate = function ()
 
 CShape.prototype.recalculateText = function()
 {
+    if(!this.bWordShape)
+        return;
     ExecuteNoHistory(function()
     {
         if(this.bWordShape)
@@ -506,6 +508,7 @@ CShape.prototype.recalculateShapeStyleForParagraph = function()
 {
     var styles = editor.WordControl.m_oLogicDocument.Styles;
     this.textStyleForParagraph = {TextPr: styles.Default.TextPr.Copy(), ParaPr: styles.Default.ParaPr.Copy()};
+    //this.textStyleForParagraph.ParaPr.Spacing.Line = 1;
     this.textStyleForParagraph.TextPr.Color.Auto = false;
     if(this.style && this.style.fontRef)
     {
