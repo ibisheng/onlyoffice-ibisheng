@@ -886,8 +886,15 @@ function CRadical(props)
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_RADICAL;
 
-    this.type = DEGREE_RADICAL; // default
-    this.degHide = false;
+    this.Pr =
+    {
+        type:       DEGREE_RADICAL,
+        degHide:    false
+    };
+
+    //this.type = DEGREE_RADICAL; // default
+    //this.degHide = false;
+
     this.signRadical = null;
 
     this.gapDegree = 0;
@@ -903,12 +910,12 @@ extend(CRadical, CMathBase);
 CRadical.prototype.init = function(props)
 {
     if(props.type === SQUARE_RADICAL || props.type === DEGREE_RADICAL)
-        this.type = props.type;
+        this.Pr.type = props.type;
 
     if(props.degHide === true || props.degHide === 1)
-        this.type = SQUARE_RADICAL;
+        this.Pr.type = SQUARE_RADICAL;
     else if(props.degHide == false || props.degHide === 0)
-        this.type = DEGREE_RADICAL;
+        this.Pr.type = DEGREE_RADICAL;
 
     this.setDimension(1, 1);
     this.setContent();
@@ -916,12 +923,12 @@ CRadical.prototype.init = function(props)
     this.signRadical = new CSignRadical();
     this.signRadical.relate(this);
 
-    if(this.type == SQUARE_RADICAL)
+    if(this.Pr.type == SQUARE_RADICAL)
     {
         this.setDimension(1, 1);
         this.setContent();
     }
-    else if(this.type == DEGREE_RADICAL)
+    else if(this.Pr.type == DEGREE_RADICAL)
     {
         this.setDimension(1, 2);
         var oBase = new CMathContent();
@@ -948,7 +955,7 @@ CRadical.prototype.recalculateSize = function(oMeasure)
 
     var gapBase = gSign + gArg;
 
-    if(this.type == SQUARE_RADICAL)
+    if(this.Pr.type == SQUARE_RADICAL)
     {
         var base = this.elements[0][0].size;
         var shTop = (sign.height - gSign - base.height)/2;
@@ -963,7 +970,7 @@ CRadical.prototype.recalculateSize = function(oMeasure)
 
         this.size = {width: width, height: height, ascent: ascent};
     }
-    else if(this.type == DEGREE_RADICAL)
+    else if(this.Pr.type == DEGREE_RADICAL)
     {
         var degr = this.elements[0][0].size,
             base = this.elements[0][1].size;
@@ -1015,7 +1022,7 @@ CRadical.prototype.setPosition = function(pos)
 {
     this.pos = {x: pos.x, y: pos.y - this.size.ascent};
 
-    if(this.type == SQUARE_RADICAL)
+    if(this.Pr.type == SQUARE_RADICAL)
     {
         var gapLeft = this.size.width - this.elements[0][0].size.width;
         var gapTop = this.size.ascent - this.elements[0][0].size.ascent;
@@ -1029,7 +1036,7 @@ CRadical.prototype.setPosition = function(pos)
         this.signRadical.setPosition({x: x1, y: y1});
         this.elements[0][0].setPosition({x: x2, y: y2});
     }
-    else if(this.type == DEGREE_RADICAL)
+    else if(this.Pr.type == DEGREE_RADICAL)
     {
         var degr = this.elements[0][0].size,
             base = this.elements[0][1].size,
@@ -1058,7 +1065,7 @@ CRadical.prototype.findDisposition = function(mCoord)
 {
     var disposition;
 
-    if(this.type == SQUARE_RADICAL)
+    if(this.Pr.type == SQUARE_RADICAL)
     {
         var sizeBase = this.elements[0][0].size;
         var X, Y;
@@ -1095,7 +1102,7 @@ CRadical.prototype.findDisposition = function(mCoord)
 
         disposition = {pos: {x:0, y:0}, mCoord: {x: X, y: Y}, inside_flag: inside_flag};
     }
-    else if(this.type == DEGREE_RADICAL)
+    else if(this.Pr.type == DEGREE_RADICAL)
     {
         var mouseCoord = {x: null, y: null},
             posCurs =    {x: 0, y: null},
@@ -1195,9 +1202,9 @@ CRadical.prototype.getBase = function()
 {
     var base = null;
 
-    if(this.type == SQUARE_RADICAL)
+    if(this.Pr.type == SQUARE_RADICAL)
         base = this.elements[0][0];
-    else if(this.type == DEGREE_RADICAL)
+    else if(this.Pr.type == DEGREE_RADICAL)
         base = this.elements[0][1];
 
     return base;
@@ -1216,9 +1223,10 @@ CRadical.prototype.getDegree = function()
 }
 CRadical.prototype.getPropsForWrite = function()
 {
-    var props = {};
-
-    props.degHide = this.type;
+    var props =
+    {
+        degHide:    this.Pr.type == SQUARE_RADICAL
+    };
 
     return props;
 }
