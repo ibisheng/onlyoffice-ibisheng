@@ -532,12 +532,10 @@ CDegree.prototype.Get_Id = function()
 
 function CIterators()
 {
-	this.Id = g_oIdCounter.Get_NewId();
     this.lUp = 0;   // центр основания
     this.lD = 0;    // высота - центр основания
     this.upper = 0; // смещение сверху для позиции основания
     CMathBase.call(this);
-	g_oTableId.Add( this, this.Id );
 }
 extend(CIterators, CMathBase);
 CIterators.prototype.init = function()
@@ -661,37 +659,6 @@ CIterators.prototype.getLowerIterator = function()
 CIterators.prototype.Get_CompiledCtrPrp = function()
 {
     return this.Parent.Get_CompiledCtrPrp();
-}
-CIterators.prototype.Save_Changes = function(Data, Writer)
-{
-	Writer.WriteLong( historyitem_type_iterators );
-}
-CIterators.prototype.Load_Changes = function(Reader)
-{
-}
-CIterators.prototype.Refresh_RecalcData = function(Data)
-{
-}
-CIterators.prototype.Write_ToBinary2 = function( Writer )
-{
-	Writer.WriteLong( historyitem_type_iterators );
-	Writer.WriteString2( this.elements[0][0].Id );
-	Writer.WriteString2( this.elements[1][0].Id );
-}
-CIterators.prototype.Read_FromBinary2 = function( Reader )
-{
-	var Element = g_oTableId.Get_ById( Reader.GetString2() );
-	Element.Parent = this;
-	this.elements[0][0] = Element;
-
-	var Element1 = g_oTableId.Get_ById( Reader.GetString2() );
-	Element1.Parent = this;
-	this.elements[1][0] = Element1;
-
-}
-CIterators.prototype.Get_Id = function()
-{
-	return this.Id;
 }
 
 function CDegreeSubSup(props)
@@ -1214,9 +1181,9 @@ CDegreeSubSup.prototype.Write_ToBinary2 = function( Writer )
 		var StartPos = Writer.GetCurPosition();
 		Writer.Skip(4);
 		var Flags = 0;
-		if ( undefined != this.alnScr )
+		if ( undefined != this.Pr.alnScr )
 		{
-			Writer.WriteBool( this.alnScr );
+			Writer.WriteBool( this.Pr.alnScr );
 			Flags |= 1;
 		}
 		var EndPos = Writer.GetCurPosition();
@@ -1241,7 +1208,7 @@ CDegreeSubSup.prototype.Read_FromBinary2 = function( Reader )
 	{
 		var Flags = Reader.GetLong();
 		if ( Flags & 1 )
-			this.alnScr = Writer.GetBool();	
+			this.Pr.alnScr = Writer.GetBool();	
 	}
 }
 CDegreeSubSup.prototype.Get_Id = function()

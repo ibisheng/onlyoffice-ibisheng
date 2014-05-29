@@ -1915,16 +1915,6 @@ function Binary_oMathWriter(memory, oMathPara)
 		this.bs.WriteItem(c_oSer_OMathContentType.AccPr, function(){oThis.WriteAccPr(props, oAcc);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
 	}
-	this.WriteAccCollaborative = function(oAcc)
-	{
-		var oThis = this;
-		var oElem = oAcc.getBase();
-		var props = oAcc.getPropsForWrite();
-		
-		this.bs.WriteItem(c_oSer_OMathContentType.AccPr, function(){oThis.WriteAccPr(props, oAcc);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oAcc.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodesCollaborative(oElem);});
-	}
 	this.WriteAccPr = function(props,oAcc)
 	{
 		var oThis = this;
@@ -1965,16 +1955,6 @@ function Binary_oMathWriter(memory, oMathPara)
 		this.bs.WriteItem(c_oSer_OMathContentType.BarPr, function(){oThis.WriteBarPr(props, oBar);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
 	}
-	this.WriteBarCollaborative = function(oBar)
-	{
-		var oThis = this;
-		var oElem = oBar.getBase();
-		var props = oBar.getPropsForWrite();
-		
-		this.bs.WriteItem(c_oSer_OMathContentType.BarPr, function(){oThis.WriteBarPr(props, oBar);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oElem.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodesCollaborative(oElem);});
-	}
 	this.WriteBarPr = function(props,oBar)
 	{
 		var oThis = this;
@@ -2011,16 +1991,6 @@ function Binary_oMathWriter(memory, oMathPara)
 		this.bs.WriteItem(c_oSer_OMathContentType.BorderBoxPr, function(){oThis.WriteBorderBoxPr(props, oBorderBox);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
 	}
-	this.WriteBorderBoxCollaborative = function(oBorderBox)
-	{
-		var oThis = this;
-		var oElem = oBorderBox.getBase();
-		var props = oBorderBox.getPropsForWrite();
-		
-		this.bs.WriteItem(c_oSer_OMathContentType.BorderBoxPr, function(){oThis.WriteBorderBoxPr(props, oBorderBox);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oBorderBox.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodesCollaborative(oElem);});
-	}
 	this.WriteBorderBoxPr = function(props,oBorderBox)
 	{		
 		var oThis = this;
@@ -2051,16 +2021,6 @@ function Binary_oMathWriter(memory, oMathPara)
 		
 		this.bs.WriteItem(c_oSer_OMathContentType.BorderBoxPr, function(){oThis.WriteBoxPr(props, oBox);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
-	}
-	this.WriteBoxCollaborative = function(oBox)
-	{
-		var oThis = this;
-		var oElem = oBox.getBase();
-		var props = oBox.getPropsForWrite();
-		
-		this.bs.WriteItem(c_oSer_OMathContentType.BorderBoxPr, function(){oThis.WriteBoxPr(props, oBox);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oBox.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodesCollaborative(oElem);});
 	}
 	this.WriteBoxPr = function(props,oBox)
 	{
@@ -2146,22 +2106,6 @@ function Binary_oMathWriter(memory, oMathPara)
 			this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
 		}
 	}
-	this.WriteDelimiterCollaborative = function(oDelimiter)
-	{
-		var oThis = this;
-		var nStart = 0;
-        var nEnd   = oDelimiter.nCol;
-		var props = oDelimiter.getPropsForWrite();
-		
-		this.bs.WriteItem(c_oSer_OMathContentType.DelimiterPr, function(){oThis.WriteDelimiterPr(props, oDelimiter);});
-		
-		for(var i = nStart; i < nEnd; i++)	
-		{
-			var oElem = oDelimiter.getBase(i);
-			this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oElem.Id);});
-			this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodesCollaborative(oElem);});
-		}
-	}
 	this.WriteDelimiterPr = function(props,oDelimiter)
 	{
 		var oThis = this;
@@ -2201,22 +2145,6 @@ function Binary_oMathWriter(memory, oMathPara)
 			this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
 		}
 	}
-	this.WriteEqArrCollaborative = function(oEqArr)
-	{
-		var oThis = this;
-		var nStart = 0;
-        var nEnd   = oEqArr.elements.length;
-		var props = oEqArr.getPropsForWrite();
-		
-		this.bs.WriteItem(c_oSer_OMathContentType.EqArrPr, function(){oThis.WriteEqArrPr(props, oEqArr);});
-		
-		for(var i = nStart; i < nEnd; i++)	
-		{
-			var oElem = oEqArr.getBase(i);
-			this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oElem.Id);});
-			this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodesCollaborative(oElem);});
-		}
-	}
 	this.WriteEqArrPr = function(props,oEqArr)
 	{
 		var oThis = this;
@@ -2243,20 +2171,7 @@ function Binary_oMathWriter(memory, oMathPara)
 		this.bs.WriteItem(c_oSer_OMathContentType.FPr, function(){oThis.WriteFPr(props, oFraction);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Den, function(){oThis.WriteArgNodes(oDen);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Num, function(){oThis.WriteArgNodes(oNum);});
-	}	
-	this.WriteFractionCollaborative = function(oFraction)
-	{
-		var oThis = this;
-		var oDen = oFraction.getDenominator();
-		var oNum = oFraction.getNumerator();	
-		var props = oFraction.getPropsForWrite();
-		
-		this.bs.WriteItem(c_oSer_OMathContentType.FPr, function(){oThis.WriteFPr(props, oFraction);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oDen.Id);});		
-		this.bs.WriteItem(c_oSer_OMathContentType.Den, function(){oThis.WriteArgNodesCollaborative(oDen);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oNum.Id);});	
-		this.bs.WriteItem(c_oSer_OMathContentType.Num, function(){oThis.WriteArgNodesCollaborative(oNum);});
-	}	
+	}
 	this.WriteFPr = function(props,oFraction)
 	{
 		var oThis = this;
@@ -2275,18 +2190,6 @@ function Binary_oMathWriter(memory, oMathPara)
 		this.bs.WriteItem(c_oSer_OMathContentType.FName, function(){oThis.WriteArgNodes(oFName);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
 	}
-	this.WriteFuncCollaborative = function(oFunc)
-	{
-		var oThis = this;
-		var oFName = oFunc.getFName();
-		var oElem = oFunc.getArgument();	
-		
-		this.bs.WriteItem(c_oSer_OMathContentType.FPr, function(){oThis.WriteFuncPr(oFunc);});	
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oFName.Id);});		
-		this.bs.WriteItem(c_oSer_OMathContentType.FName, function(){oThis.WriteArgNodesCollaborative(oFName);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oElem.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodesCollaborative(oElem);});
-	}
 	this.WriteFuncPr = function(oFunc)
 	{
 		var oThis = this;
@@ -2301,16 +2204,6 @@ function Binary_oMathWriter(memory, oMathPara)
 		
 		this.bs.WriteItem(c_oSer_OMathContentType.GroupChrPr, function(){oThis.WriteGroupChrPr(props, oGroupChr);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
-	}
-	this.WriteGroupChrCollaborative = function(oGroupChr)
-	{
-		var oThis = this;		
-		var oElem = oGroupChr.getBase();
-		var props = oGroupChr.getPropsForWrite();
-		
-		this.bs.WriteItem(c_oSer_OMathContentType.GroupChrPr, function(){oThis.WriteGroupChrPr(props, oGroupChr);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oElem.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodesCollaborative(oElem);});
 	}
 	this.WriteGroupChrPr = function(props,oGroupChr)
 	{
@@ -2409,18 +2302,6 @@ function Binary_oMathWriter(memory, oMathPara)
 		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Lim, function(){oThis.WriteArgNodes(oLim);});
 	}
-	this.WriteLimLowCollaborative = function(oLimLow)
-	{
-		var oThis = this;		
-		var oElem = oLimLow.getFName();
-		var oLim  = oLimLow.getIterator();
-		
-		this.bs.WriteItem(c_oSer_OMathContentType.LimLowPr, function(){oThis.WriteLimLowPr(oLimLow);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oElem.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodesCollaborative(oElem);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oLim.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Lim, function(){oThis.WriteArgNodesCollaborative(oLim);});
-	}
 	this.WriteLimLowPr = function(oLimLow)
 	{
 		var oThis = this;
@@ -2436,18 +2317,6 @@ function Binary_oMathWriter(memory, oMathPara)
 		this.bs.WriteItem(c_oSer_OMathContentType.LimUppPr, function(){oThis.WriteLimUppPr(oLimUpp);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Lim, function(){oThis.WriteArgNodes(oLim);});
-	}
-	this.WriteLimUppCollaborative = function(oLimUpp)
-	{
-		var oThis = this;		
-		var oElem = oLimUpp.getFName();
-		var oLim  = oLimUpp.getIterator();
-		
-		this.bs.WriteItem(c_oSer_OMathContentType.LimUppPr, function(){oThis.WriteLimUppPr(oLimUpp);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oElem.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodesCollaborative(oElem);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oLim.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Lim, function(){oThis.WriteArgNodesCollaborative(oLim);});
 	}
 	this.WriteLimUppPr = function(oLimUpp)
 	{
@@ -2479,20 +2348,6 @@ function Binary_oMathWriter(memory, oMathPara)
 		for(var i = nStart; i < nEnd; i++)	
 		{	
 			this.bs.WriteItem(c_oSer_OMathContentType.Mr, function(){oThis.WriteMr(oMatrix,i);});
-		}
-	}
-	this.WriteMatrixCollaborative = function(oMatrix)
-	{
-		var oThis 	= this;		
-		var nStart = 0;
-        var nEnd   = oMatrix.nRow;
-		var props = oMatrix.getPropsForWrite();
-		
-		this.bs.WriteItem(c_oSer_OMathContentType.MPr, function(){oThis.WriteMPr(props, oMatrix);});
-		
-		for(var i = nStart; i < nEnd; i++)	
-		{	
-			this.bs.WriteItem(c_oSer_OMathContentType.Mr, function(){oThis.WriteMrCollaborative(oMatrix,i);});
 		}
 	}
 	this.WriteMc = function(props)
@@ -2571,20 +2426,7 @@ function Binary_oMathWriter(memory, oMathPara)
 			var oElem = oMatrix.getElement(nRow,i);
 			this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
 		}
-	}	
-	this.WriteMrCollaborative = function(oMatrix, nRow)
-	{
-		var oThis 	= this;		
-		var nStart = 0;
-        var nEnd   = oMatrix.nCol;
-
-		for(var i = nStart; i < nEnd; i++)	
-		{	
-			var oElem = oMatrix.getElement(nRow,i);
-			this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oElem.Id);});
-			this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodesCollaborative(oElem);});
-		}
-	}	
+	}
 	this.WriteNary = function(oNary)
 	{
 		var oThis = this;
@@ -2597,22 +2439,6 @@ function Binary_oMathWriter(memory, oMathPara)
 		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Sub, function(){oThis.WriteArgNodes(oSub);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Sup, function(){oThis.WriteArgNodes(oSup);});
-	}
-	this.WriteNaryCollaborative = function(oNary)
-	{
-		var oThis = this;
-		var oElem = oNary.getBase();
-		var oSub = oNary.getLowerIterator();
-		var oSup = oNary.getUpperIterator();
-		var props = oNary.getPropsForWrite();
-		
-		this.bs.WriteItem(c_oSer_OMathContentType.NaryPr, function(){oThis.WriteNaryPr(props, oNary);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oElem.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodesCollaborative(oElem);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oSub.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Sub, function(){oThis.WriteArgNodesCollaborative(oSub);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oSup.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Sup, function(){oThis.WriteArgNodesCollaborative(oSup);});
 	}
 	this.WriteNaryPr = function(props,oNary)
 	{
@@ -2656,15 +2482,6 @@ function Binary_oMathWriter(memory, oMathPara)
 		oThis.bs.WriteItem(c_oSer_OMathContentType.OMathParaPr, function(){oThis.WriteOMathParaPr(props);});	
 		oThis.bs.WriteItem(c_oSer_OMathContentType.OMath, function(){oThis.WriteArgNodes(oOMathPara.Root);});			
 	};
-	this.WriteOMathParaCollaborative = function(oOMathPara)
-	{
-		var oThis = this;
-		var props = {};//oOMathPara.getPropsForWrite();
-		
-		oThis.bs.WriteItem(c_oSer_OMathContentType.OMathParaPr, function(){oThis.WriteOMathParaPr(props);});			
-		oThis.bs.WriteItem(c_oSer_OMathContentType.Id, function(){ oThis.memory.WriteString2(oOMathPara.Root.Id);}); //id		
-		oThis.bs.WriteItem(c_oSer_OMathContentType.OMath, function(){oThis.WriteArgNodesCollaborative(oOMathPara.Root);});			
-	};
 	this.WriteOMathParaPr = function(props)
 	{
 		var oThis = this;
@@ -2685,16 +2502,6 @@ function Binary_oMathWriter(memory, oMathPara)
 		
 		this.bs.WriteItem(c_oSer_OMathContentType.PhantPr, function(){oThis.WritePhantPr(props, oPhant);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
-	}
-	this.WritePhantCollaborative = function(oPhant)
-	{
-		var oThis = this;
-		var oElem = oPhant.getBase();
-		var props = oPhant.getPropsForWrite();
-		
-		this.bs.WriteItem(c_oSer_OMathContentType.PhantPr, function(){oThis.WritePhantPr(props, oPhant);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oElem.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodesCollaborative(oElem);});
 	}
 	this.WritePhantPr = function(props,oPhant)
 	{
@@ -2756,19 +2563,6 @@ function Binary_oMathWriter(memory, oMathPara)
 		this.bs.WriteItem(c_oSer_OMathContentType.RadPr, function(){oThis.WriteRadPr(props, oRad);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Deg, function(){oThis.WriteArgNodes(oDeg);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
-	}
-	this.WriteRadCollaborative = function(oRad)
-	{
-		var oThis = this;
-		var oElem = oRad.getBase();
-		var oDeg  = oRad.getDegree();
-		var props = oRad.getPropsForWrite();
-		
-		this.bs.WriteItem(c_oSer_OMathContentType.RadPr, function(){oThis.WriteRadPr(props, oRad);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oDeg.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Deg, function(){oThis.WriteArgNodesCollaborative(oDeg);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oElem.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodesCollaborative(oElem);});
 	}
 	this.WriteRadPr = function(props,oRad)
 	{
@@ -2845,21 +2639,6 @@ function Binary_oMathWriter(memory, oMathPara)
 		this.bs.WriteItem(c_oSer_OMathContentType.Sup, function(){oThis.WriteArgNodes(oSup);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
 	}
-	this.WriteSPreCollaborative = function(oSPre)
-	{
-		var oThis = this;
-		var oSub  = oSPre.getLowerIterator();
-		var oSup  = oSPre.getUpperIterator();
-		var oElem = oSPre.getBase();	
-		
-		this.bs.WriteItem(c_oSer_OMathContentType.SPrePr, function(){oThis.WriteSPrePr(oSPre);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oSub.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Sub, function(){oThis.WriteArgNodesCollaborative(oSub);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oSup.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Sup, function(){oThis.WriteArgNodesCollaborative(oSup);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oElem.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodesCollaborative(oElem);});
-	}
 	this.WriteSPrePr = function(oSPre)
 	{
 		var oThis = this;
@@ -2875,18 +2654,6 @@ function Binary_oMathWriter(memory, oMathPara)
 		this.bs.WriteItem(c_oSer_OMathContentType.SSubPr, function(){oThis.WriteSSubPr(oSSub);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Sub, function(){oThis.WriteArgNodes(oSub);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
-	}
-	this.WriteSSubCollaborative = function(oSSub)
-	{
-		var oThis = this;
-		var oSub  = oSSub.getLowerIterator();
-		var oElem = oSSub.getBase();
-		
-		this.bs.WriteItem(c_oSer_OMathContentType.SSubPr, function(){oThis.WriteSSubPr(oSSub);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oSub.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Sub, function(){oThis.WriteArgNodesCollaborative(oSub);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oElem.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodesCollaborative(oElem);});
 	}
 	this.WriteSSubPr = function(oSSub)
 	{
@@ -2907,22 +2674,6 @@ function Binary_oMathWriter(memory, oMathPara)
 		this.bs.WriteItem(c_oSer_OMathContentType.Sup, function(){oThis.WriteArgNodes(oSup);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
 	}
-	this.WriteSSubSupCollaborative = function(oSSubSup)
-	{
-		var oThis = this;
-		var oSub  = oSSubSup.getLowerIterator();
-		var oSup  = oSSubSup.getUpperIterator();
-		var oElem = oSSubSup.getBase();
-		var props = oSSubSup.getPropsForWrite();
-		
-		this.bs.WriteItem(c_oSer_OMathContentType.SSubPr, function(){oThis.WriteSSubSupPr(props, oSSubSup);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oSub.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Sub, function(){oThis.WriteArgNodesCollaborative(oSub);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oSup.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Sup, function(){oThis.WriteArgNodesCollaborative(oSup);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oElem.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodesCollaborative(oElem);});
-	}
 	this.WriteSSubSupPr = function(props, oSSubSup)
 	{
 		var oThis = this;
@@ -2940,18 +2691,6 @@ function Binary_oMathWriter(memory, oMathPara)
 		this.bs.WriteItem(c_oSer_OMathContentType.SSupPr, function(){oThis.WriteSSupPr(oSSup);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Sup, function(){oThis.WriteArgNodes(oSup);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
-	}
-	this.WriteSSupCollaborative = function(oSSup)
-	{
-		var oThis = this;
-		var oSup  = oSSup.getUpperIterator();
-		var oElem = oSSup.getBase();
-		
-		this.bs.WriteItem(c_oSer_OMathContentType.SSupPr, function(){oThis.WriteSSupPr(oSSup);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oSup.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Sup, function(){oThis.WriteArgNodesCollaborative(oSup);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Id, function(){oThis.memory.WriteString2(oElem.Id);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodesCollaborative(oElem);});
 	}
 	this.WriteSSupPr = function(oSSup)
 	{
@@ -9762,7 +9501,7 @@ function Binary_oMathReader(stream)
 		
 		if (c_oSer_OMathContentType.MText === type)
         {
-			var text = this.stream.GetString2LE(length);
+			var text = this.stream.GetString2();
 			for (var i = 0; i < text.length; ++i)
             {
 				//управляющие символы
@@ -9967,22 +9706,6 @@ function Binary_oMathReader(stream)
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	
-	this.ReadMathText = function(length)
-	{
-		var text = this.stream.GetString2LE(length);
-		var res = "";
-		for (var i = 0, length = text.length; i < length; ++i)
-        {
-            if (text[i] != ' ')
-			{
-				//управляющие символы 
-				if (0x001F < text[i].charCodeAt(0))
-					res += text[i];
-			}
-        }
-		return res;
-	}
 	this.ReadMathOMathPara = function(type, length, oOMathPara)
     {
         var res = c_oSerConstants.ReadOk;
@@ -9994,33 +9717,6 @@ function Binary_oMathReader(stream)
                 return oThis.ReadMathArg(t,l,oOMathPara.Root);
             });
 			oOMathPara.Root.SetRunEmptyToContent(true);
-        }
-		else if (c_oSer_OMathContentType.OMathParaPr === type)
-		{
-			var props = new Object();
-			res = this.bcr.Read1(length, function(t, l){
-                return oThis.ReadMathOMathParaPr(t,l,props);
-            });
-		}
-        else
-            res = c_oSerConstants.ReadUnknown;
-        return res;
-    };
-	this.ReadMathOMathParaCollaborative = function(type, length, oOMathPara)
-    {
-        var res = c_oSerConstants.ReadOk;
-        var oThis = this;
-		
-		if (c_oSer_OMathContentType.Id === type) //id
-        {
-			oOMathPara.Root.Id = oThis.ReadMathText(length);
-            g_oTableId.m_aPairs[oOMathPara.Root.Id] = oOMathPara.Root;
-        }		
-		else if (c_oSer_OMathContentType.OMath === type)
-        {
-            res = this.bcr.Read1(length, function(t, l){
-                return oThis.ReadMathArgCollaborative(t,l,oOMathPara.Root);
-            });
         }
 		else if (c_oSer_OMathContentType.OMathParaPr === type)
 		{
