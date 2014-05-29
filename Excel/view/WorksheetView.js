@@ -8166,6 +8166,7 @@
 										a_drawings[j].addToDrawingObjects();
 										a_drawings[j].select( t.objectRender.controller);
 									}
+                                    t.objectRender.controller.startRecalculate();
 								}
 							}
 						for(var j = 0; j < a_drawings.length; ++j)
