@@ -1554,7 +1554,7 @@ asc_docs_api.prototype._coAuthoringInit = function()
         var oColor = null !== nColor ? new CDocumentColor( (nColor >> 16) & 0xFF, (nColor >> 8) & 0xFF, nColor & 0xFF ) : new CDocumentColor( 191, 255, 199 );
 
         t._coAuthoringSetChanges(e, oColor);
-
+		var Count = e.length;
         // т.е. если bSendEvent не задан, то посылаем  сообщение + когда загрузился документ
         if ( Count > 0 && false != bSendEvent && t.bInit_word_control )
             t.sync_CollaborativeChanges();
