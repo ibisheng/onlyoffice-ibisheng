@@ -132,13 +132,6 @@ function Editor_Copy_Button(api, bCut)
         delete document.body.style["user-select"];
         document.body.style["-webkit-user-select"] = "text";
 
-        if (window.USER_AGENT_IE)
-        {
-            // не убирать!!! это для ие. чтобы не селектились элементы
-            document.onselectstart= function() {
-            }
-        }
-
         if (null != api.WordControl.m_oLogicDocument)
         {
             var oCopyProcessor = new CopyProcessor(api, ElemToSelect);
@@ -168,14 +161,6 @@ function Editor_Copy_Button(api, bCut)
         document.body.style["-o-user-select"] = "none";
         document.body.style["user-select"] = "none";
         document.body.style["-webkit-user-select"] = "none";
-
-        if (window.USER_AGENT_IE)
-        {
-            // не убирать!!! это для ие. чтобы не селектились элементы
-            document.onselectstart= function() {
-                return false;
-            }
-        }
 
         if(true == bCut)
         {
@@ -225,13 +210,6 @@ function Editor_Copy(api, bCut)
     delete document.body.style["-o-user-select"];
     delete document.body.style["user-select"];
     document.body.style["-webkit-user-select"] = "text";
-
-    if (window.USER_AGENT_IE)
-    {
-        // не убирать!!! это для ие. чтобы не селектились элементы
-        document.onselectstart= function() {
-        }
-    }
 
     if (null != api.WordControl.m_oLogicDocument)
     {
@@ -305,14 +283,6 @@ function Editor_Copy(api, bCut)
         document.body.style["-o-user-select"] = "none";
         document.body.style["user-select"] = "none";
         document.body.style["-webkit-user-select"] = "none";
-
-        if (window.USER_AGENT_IE)
-        {
-            // не убирать!!! это для ие. чтобы не селектились элементы
-            document.onselectstart= function() {
-                return false;
-            }
-        }
 
         if(true == bCut)
         {
@@ -2195,13 +2165,6 @@ function Editor_Paste_Button(api)
         delete document.body.style["user-select"];
         document.body.style["-webkit-user-select"] = "text";
 
-        if (window.USER_AGENT_IE)
-        {
-            // не убирать!!! это для ие. чтобы не селектились элементы
-            document.onselectstart= function() {
-            }
-        }
-
         var pastebin = Editor_Paste_GetElem(api, true);
 
         pastebin.style.display  = "block";
@@ -2226,14 +2189,6 @@ function Editor_Paste_Button(api)
         document.body.style["-o-user-select"] = "none";
         document.body.style["user-select"] = "none";
         document.body.style["-webkit-user-select"] = "none";
-
-        if (window.USER_AGENT_IE)
-        {
-            // не убирать!!! это для ие. чтобы не селектились элементы
-            document.onselectstart= function() {
-                return false;
-            }
-        }
 
 		History.Create_NewPoint();
         Editor_Paste(api, false);
@@ -2309,13 +2264,6 @@ function Editor_Paste(api, bClean)
     delete document.body.style["user-select"];
     document.body.style["-webkit-user-select"] = "text";
 
-    if (window.USER_AGENT_IE)
-    {
-        // не убирать!!! это для ие. чтобы не селектились элементы
-        document.onselectstart= function() {
-        }
-    }
-
     var Text;
     var pastebin = Editor_Paste_GetElem(api, bClean);
     pastebin.style.display  = "block";
@@ -2372,14 +2320,6 @@ function Editor_Paste(api, bClean)
         document.body.style["-o-user-select"] = "none";
         document.body.style["user-select"] = "none";
         document.body.style["-webkit-user-select"] = "none";
-
-        if (window.USER_AGENT_IE)
-        {
-            // не убирать!!! это для ие. чтобы не селектились элементы
-            document.onselectstart= function() {
-                return false;
-            }
-        }
 
         if (!window.USER_AGENT_SAFARI_MACOS)
             pastebin.onpaste = null;

@@ -36,14 +36,6 @@ var orientation_Landscape = 0x01;
 
 var tableSpacingMinValue = 0.02;//0.02мм
 
-if (AscBrowser.isIE || window.opera)
-{
-    // не убирать!!! это для ие. чтобы не селектились элементы
-    document.onselectstart= function() {
-        return false;
-    }
-}
-
 var GlobalSkinTeamlab = {
     Name : "classic",
     RulersButton : true,

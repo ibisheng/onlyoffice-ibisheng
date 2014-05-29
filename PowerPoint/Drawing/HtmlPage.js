@@ -34,11 +34,6 @@ var selectionflag_DrawingObject = 0x002;
 var orientation_Portrait  = 0x00;
 var orientation_Landscape = 0x01;
 
-// не убирать!!! это для ие. чтобы не селектились элементы
-document.onselectstart= function() {
-    return false;
-}
-
 var GlobalSkinTeamlab = {
     BackgroundColor : "#B0B0B0",
     RulerDark : "#B0B0B0",
