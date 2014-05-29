@@ -2544,7 +2544,9 @@
 					var htmlInShape = "";
 					if(divContent)
 						htmlInShape = divContent;	
-							
+					
+					t.lStorageText = this._getTextFromHtml(htmlInShape);
+					
 					return htmlInShape;
 				}
 				else if(isSelectedImages && isSelectedImages != -1)
@@ -2708,6 +2710,19 @@
 				
 
 				return table;
+			},
+			
+			_getTextFromHtml: function(html)
+			{
+				var text = "";
+				for(var i = 0; i < html.children.length; i++)
+				{
+					if(html.children[i].nodeName.toLowerCase() == "p" && i != 0)
+						text += '\n';	
+					text += html.children[i].innerText;
+				};
+				
+				return text;
 			},
 			
 			_addLocalStorage : function (isImage,isChart,cell,activeRange,trueRow,trueCol, worksheet, isCut, htmlInShape) {
