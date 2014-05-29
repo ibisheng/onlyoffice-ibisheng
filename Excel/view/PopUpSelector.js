@@ -57,7 +57,8 @@
 				this.selector = document.createElement('div');
 				this.selectorStyle = this.selector.style;
 				this.selector.id = 'apiPopUpSelector';
-				this.selector.innerHTML = '<div style="max-height:210px;" class="combobox"><ul id="apiPopUpList" class="dropdown-menu"></ul></div>';
+				this.selector.className = 'combobox';
+				this.selector.innerHTML = '<ul id="apiPopUpList" class="dropdown-menu"></ul>';
 
 				this.element.appendChild(this.selector);
 				this.selectorList = document.getElementById("apiPopUpList");
@@ -90,7 +91,7 @@
 			this._clearList();
 			this.setPosition(cellRect);
 			if (!this.isVisible) {
-				this.selectorStyle.display = "block";
+				this.selector.className = 'combobox open';
 				this.isVisible = true;
 			}
 			this.isFormula = isFormula;
@@ -147,8 +148,8 @@
 			if (this.isVisible) {
 				// Чтобы не было непонятных анимаций
 				this.selectorListJQ.scrollTop(0);
-				
-				this.selectorStyle.display = "none";
+
+				this.selector.className = 'combobox;
 				this.isVisible = false;
 
 				this._clearList();
