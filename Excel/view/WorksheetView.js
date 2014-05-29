@@ -5789,7 +5789,7 @@
 			var yWithOffset = y + offsetY;
 
 			var autoFilterInfo = this.autoFilters.checkCursor(x, y);
-			if (autoFilterInfo)
+			if (autoFilterInfo && !isViewerMode)
 				return {cursor: kCurAutoFilter, target: c_oTargetType.FilterObject, col: -1, row: -1, idFilter: autoFilterInfo.id};
 
 			isSelGraphicObject = this.objectRender.selectedGraphicObjectsExists();
