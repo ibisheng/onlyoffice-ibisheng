@@ -763,7 +763,7 @@
 				if (false === isSuccess)
 					return;
 
-				t.model.setRowHeight(Math.min(t.maxRowHeight, Math.max(y2 - y1 + t.height_1px, 0)), row, row);
+				t.model.setRowHeight(Math.min(t.maxRowHeight, Math.max(y2 - y1, 0)), row, row);
 				t._cleanCache(asc_Range(0, row, t.cols.length - 1, row));
 				t.changeWorksheet("update");
 				t._updateVisibleRowsCount();
@@ -2736,6 +2736,8 @@
 				// ToDo возможно стоит оптимизировать, если будет тормозить
 				drawRange = range.clone(true);
 				this._fixSelectionOfMergedCells(drawRange);
+				// ToDo убрать это и переделать!!!
+				drawRange.normalize();
 			}
 			var t = this;
 			var ctx = (drawingCtx) ? drawingCtx : this.drawingCtx;
@@ -5924,6 +5926,7 @@
 
 			if (ar.type && ar.type !== c_oAscSelectionType.RangeCells) { return; }
 
+			// ToDo - переделать этот момент!!!!
 			var res = this.model.expandRangeByMerged(ar.clone(true));
 
 			if (ar.c1 !== res.c1 && ar.c1 !== res.c2) {ar.c1 = ar.c1 <= ar.c2 ? res.c1 : res.c2;}
