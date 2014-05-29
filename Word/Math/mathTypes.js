@@ -200,5 +200,4 @@ var extend = function(Child, Parent)
     Child.prototype = new F();
     Child.prototype.constructor = Child;
     Child.superclass = Parent.prototype;
-
 }

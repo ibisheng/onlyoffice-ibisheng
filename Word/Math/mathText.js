@@ -52,16 +52,21 @@ CMathTextPrp.prototype =
         this.Italic = prp.Italic;
     }
 }*/
+function CMathPosition()
+{
+    this.x  = 0;
+    this.y  = 0;
+}
 
 function CMathText(bJDraw)
 {
     this.typeObj = MATH_TEXT;
 
-    this.pos = null;
+    this.bJDraw = false;
     this.size = null;
     this.value = null;
+    this.pos = new CMathPosition();
 
-    this.bJDraw = false;
 
     if(bJDraw === false || bJDraw === true)
         this.bJDraw = bJDraw;
@@ -91,6 +96,7 @@ function CMathText(bJDraw)
 }
 CMathText.prototype =
 {
+    constructor: CMathText,
     add: function(code)
     {
         if(code == 0x2A)      // "*"
@@ -233,10 +239,6 @@ CMathText.prototype =
         this.typeObj = MATH_PLACEHOLDER;
         this.value = StartTextElement;
     },
-    setLIterator: function(bIterator)
-    {
-        this.bIterator = bIterator; // символы другие , чуть толще
-    },
     Resize: function(Run, oMeasure)
     {
         /*
@@ -277,11 +279,8 @@ CMathText.prototype =
     },
     draw: function(x, y, pGraphics)
     {
-
         var X = this.pos.x + x,
             Y = this.pos.y + y;
-
-        //console.log(String.fromCharCode(this.getCode()) + ": X " + X);
 
 
         /*var tx = 0;
@@ -314,13 +313,16 @@ CMathText.prototype =
     setPosition: function(pos)
     {
         if( ! this.bJDraw)                      // for text
-            this.pos = {x : pos.x + this.GapLeft, y: pos.y};
+        {
+            this.pos.x = pos.x + this.GapLeft;
+            this.pos.y = pos.y;
+
+            //this.pos = {x : pos.x + this.GapLeft, y: pos.y};
+        }
         else                                    // for symbol only drawing
         {
-            var x = pos.x - this.rasterOffsetX,
-                y = pos.y - this.rasterOffsetY;
-
-            this.pos = {x: x, y: y};
+            this.pos.x = pos.x - this.rasterOffsetX;
+            this.pos.y = pos.y - this.rasterOffsetY;
         }
     },
     setCoeffTransform: function(sx, shx, shy, sy)

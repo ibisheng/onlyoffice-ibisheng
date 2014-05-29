@@ -410,7 +410,6 @@ CMathMatrix.prototype.findDistance = function() // для получения п�
 
     return {w : w, h: h };
 }
-
 CMathMatrix.prototype.addRow = function()
 {
     this.nRow++;

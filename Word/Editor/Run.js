@@ -7069,7 +7069,10 @@ function CRunCollaborativeRange(PosS, PosE, Color)
 
 ParaRun.prototype.Math_SetPosition = function(_pos)
 {
-    var pos = {x: _pos.x, y: _pos.y - this.size.ascent};
+    var pos = new CMathPosition();
+
+    pos.x = _pos.x;
+    pos.y = _pos.y - this.size.ascent;
 
     for(var i = 0; i < this.Content.length; i++)
     {

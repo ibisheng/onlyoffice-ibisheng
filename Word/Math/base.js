@@ -6,7 +6,7 @@ function CMathBase()
 
     CENTER = -1;
 
-    this.pos = null;
+    this.pos = new CMathPosition();
     this.size = null;
 
     //  Properties
@@ -69,6 +69,7 @@ function CMathBase()
 }
 CMathBase.prototype =
 {
+    constructor: CMathBase,
     setContent: function()
     {
         this.elements = new Array();

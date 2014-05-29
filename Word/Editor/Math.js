@@ -399,7 +399,11 @@ ParaMath.prototype =
         //this.Math.RecalculateComposition(g_oTextMeasurer, TextPr);
 
         this.Root.Resize(null, this, g_oTextMeasurer, TextPr);
-        this.Root.setPosition({x: 0, y: 0});
+
+        var pos = new CMathPosition();
+        pos.x = 0;
+        pos.y = 0;
+        this.Root.setPosition(pos);
 
         this.Width        = this.Root.size.width;
         this.Height       = this.Root.size.height;

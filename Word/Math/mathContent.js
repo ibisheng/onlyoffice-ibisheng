@@ -914,6 +914,7 @@ function CMathContent()
 }
 CMathContent.prototype =
 {
+    constructor: CMathContent,
     init: function()
     {
 

@@ -30,8 +30,9 @@ function CBorderBox(props)
 
     CMathBase.call(this);
 
-    this.init(props);
-    this.setCtrPrp(props.ctrPrp);
+    if(props !== null && typeof(props) !== "undefined")
+        this.init(props);
+
 	g_oTableId.Add(this, this.Id);
 }
 extend(CBorderBox, CMathBase);
@@ -65,6 +66,9 @@ CBorderBox.prototype.init = function(props)
     this.setDimension(1, 1);
 
     this.setContent();
+
+    if(props.ctrPrp !== null && typeof(props.ctrPrp) !== "undefined")
+        this.setCtrPrp(props.ctrPrp);
 }
 CBorderBox.prototype.setBorders = function(props)
 {
@@ -574,7 +578,8 @@ function CBox(props)
 
     CMathBase.call(this);
 
-    this.init(props);
+    if(props !== null && typeof(props) !== "undefined")
+        this.init(props);
 
 	g_oTableId.Add( this, this.Id );
 }
@@ -712,7 +717,8 @@ function CBar(props)
 
     CCharacter.call(this);
 
-    this.init(props);
+    if(props !== null && typeof(props) !== "undefined")
+        this.init(props);
 
 	g_oTableId.Add( this, this.Id );
 }
@@ -823,7 +829,8 @@ CBar.prototype.Read_FromBinary2 = function( Reader )
 	
 	var Flags = Reader.GetLong();
 	if ( Flags & 1 )
-		this.pos = Reader.GetString2();
+        this.loc = Reader.GetString2();
+		//this.pos = Reader.GetString2();
 }
 CBar.prototype.Get_Id = function()
 {
@@ -837,7 +844,10 @@ function CPhantom(props)
     CMathBase.call(this);
 
     this.init(props);
-    this.setCtrPrp(props.ctrPrp);
+
+    if(props !== null && typeof(props) !== "undefined")
+        this.setCtrPrp(props.ctrPrp);
+
 	g_oTableId.Add( this, this.Id );
 }
 extend(CPhantom, CMathBase);
@@ -846,6 +856,9 @@ CPhantom.prototype.init = function(props)
     this.props = props;
     this.setDimension(1, 1);
     this.setContent();
+
+    if(props.ctrPrp !== null && typeof(props.ctrPrp) !== "undefined")
+        this.setCtrPrp(props.ctrPrp);
 }
 CPhantom.prototype.getPropsForWrite = function()
 {

@@ -4414,7 +4414,8 @@ CGroupCharacter.prototype.Read_FromBinary2 = function( Reader )
 	if ( Flags & 1 )
 		this.chr = Reader.GetLong();
 	if ( Flags & 2 )
-		this.pos = Reader.GetLong();
+        this.loc = Reader.GetLong();
+		//this.pos = Reader.GetLong();
 	if ( Flags & 4 )
 		this.vertJc = Reader.GetLong();
 }
