@@ -303,7 +303,7 @@
 						
 						var oBinaryFileWriter = new Asc.BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
 						var sBase64 = oBinaryFileWriter.Write();
-						if(this.element.children && this.element.children.length == 1 /*&& window.USER_AGENT_SAFARI_MACOS*/)
+						if(this.element.children && this.element.children.length == 1 && window.USER_AGENT_WEBKIT && (true !== window.USER_AGENT_SAFARI_MACOS))
 						{
 							$(this.element.children[0]).css("font-weight", "normal");
 							$(this.element.children[0]).wrap(document.createElement("b"));
@@ -333,6 +333,36 @@
 				{
 					this._cleanElement();
 					this.element.appendChild(this._makeTableNode(range, worksheet));
+					
+					//use binary strings
+					if(copyPasteUseBinary)
+					{	
+						if(isIntoShape)
+						{
+							this.lStorage = {};
+							this.lStorage.htmlInShape = text;
+						}	
+						else
+						{
+							var fullUrl = this._getUseFullUrl();
+							window.global_pptx_content_writer.Start_UseFullUrl(fullUrl);
+							
+							var oBinaryFileWriter = new Asc.BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
+							var sBase64 = oBinaryFileWriter.Write();
+							if(this.element.children && this.element.children.length == 1 && window.USER_AGENT_WEBKIT && (true !== window.USER_AGENT_SAFARI_MACOS))
+							{
+								$(this.element.children[0]).css("font-weight", "normal");
+								$(this.element.children[0]).wrap(document.createElement("b"));
+							}
+							if(this.element.children[0])
+								$(this.element.children[0]).addClass("xslData;" + sBase64);
+							
+							//for buttons copy/paste
+							this.lStorage = sBase64;
+							
+							window.global_pptx_content_writer.End_UseFullUrl()
+						}
+					}
 					
 					var t = this, selection, rangeToSelect;
 					
