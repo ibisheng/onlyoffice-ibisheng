@@ -5765,11 +5765,12 @@
 				};
 			}
 
+			var cFrozen, rFrozen;
 			offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
 			offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
 			if (this.topLeftFrozenCell) {
-				var cFrozen = this.topLeftFrozenCell.getCol0();
-				var rFrozen = this.topLeftFrozenCell.getRow0();
+				cFrozen = this.topLeftFrozenCell.getCol0();
+				rFrozen = this.topLeftFrozenCell.getRow0();
 				widthDiff = this.cols[cFrozen].left - this.cols[0].left;
 				heightDiff = this.rows[rFrozen].top - this.rows[0].top;
 				if (x < this.cellsLeft + widthDiff)
@@ -5805,6 +5806,25 @@
 				// Навели на выделение
 				if (this._isCursorOnSelectionBorder(ar, this.visibleRange, xWithOffset, yWithOffset))
 					return {cursor: kCurMove, target: c_oTargetType.MoveRange, col: -1, row: -1};
+				if (this.topLeftFrozenCell) {
+					var oFrozenRange;
+					cFrozen -= 1; rFrozen -= 1;
+					if (0 <= cFrozen && 0 <= rFrozen) {
+						oFrozenRange = new asc_Range(0, 0, cFrozen, rFrozen);
+						if (this._isCursorOnSelectionBorder(ar, oFrozenRange, x, y))
+							return {cursor: kCurMove, target: c_oTargetType.MoveRange, col: -1, row: -1};
+					}
+					if (0 <= cFrozen) {
+						oFrozenRange = new asc_Range(0, this.visibleRange.r1, cFrozen, this.visibleRange.r2);
+						if (this._isCursorOnSelectionBorder(ar, oFrozenRange, x, yWithOffset))
+							return {cursor: kCurMove, target: c_oTargetType.MoveRange, col: -1, row: -1};
+					}
+					if (0 <= rFrozen) {
+						oFrozenRange = new asc_Range(this.visibleRange.c1, 0, this.visibleRange.c2, rFrozen);
+						if (this._isCursorOnSelectionBorder(ar, oFrozenRange, xWithOffset, y))
+							return {cursor: kCurMove, target: c_oTargetType.MoveRange, col: -1, row: -1};
+					}
+				}
 			}
 
 			if (x > this.cellsLeft && y > this.cellsTop) {
