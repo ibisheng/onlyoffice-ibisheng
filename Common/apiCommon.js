@@ -210,9 +210,46 @@
             this.separator = null;
             this.horAxisProps = null;
             this.vertAxisProps = null;
+            this.range = null;
+            this.inColumns = null;
+
+            this.showMarker = null;
+            this.bLine = null;
+            this.smooth = null;
         }
         asc_ChartSettings.prototype =
         {
+            putShowMarker: function(v)
+            {
+                this.showMarker = v;
+            },
+
+            getShowMarker: function()
+            {
+                return this.showMarker;
+            },
+
+            putLine: function(v)
+            {
+                this.bLine = v;
+            },
+
+            getLine: function()
+            {
+                return this.bLine;
+            },
+
+
+            putSmooth: function(v)
+            {
+                this.smooth = v;
+            },
+
+            getSmooth: function()
+            {
+                return this.smooth;
+            },
+
             putStyle: function(index)
             {
                 this.style = index;
@@ -221,6 +258,26 @@
             getStyle: function()
             {
                 return this.style;
+            },
+
+            putRange: function(range)
+            {
+                this.range = range;
+            },
+
+            getRange: function()
+            {
+                return this.range;
+            },
+
+            putInColumns: function(inColumns)
+            {
+                this.inColumns = inColumns;
+            },
+
+            getInColumns: function()
+            {
+                return this.inColumns;
             },
 
             putTitle: function(v)
@@ -419,7 +476,16 @@
         prot["getHorAxisProps"]       = prot.getHorAxisProps;
         prot["putVertAxisProps"]       = prot.putVertAxisProps;
         prot["getVertAxisProps"]       = prot.getVertAxisProps;
-
+        prot["putRange"]       = prot.putRange;
+        prot["getRange"]       = prot.getRange;
+        prot["putInColumns"]   = prot.putInColumns;
+        prot["getInColumns"]   = prot.getInColumns;
+        prot["putShowMarker"]   = prot.putShowMarker;
+        prot["getShowMarker"]   = prot.getShowMarker;
+        prot["putLine"]   = prot.putLine;
+        prot["getLine"]   = prot.getLine;
+        prot["putSmooth"]   = prot.putSmooth;
+        prot["getSmooth"]   = prot.getSmooth;
 
         window["asc_ChartSettings"] = asc_ChartSettings;
 
