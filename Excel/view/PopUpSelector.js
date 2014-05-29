@@ -149,7 +149,7 @@
 				// Чтобы не было непонятных анимаций
 				this.selectorListJQ.scrollTop(0);
 
-				this.selector.className = 'combobox;
+				this.selector.className = 'combobox';
 				this.isVisible = false;
 
 				this._clearList();
