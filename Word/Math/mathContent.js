@@ -5077,6 +5077,8 @@ CMathContent.prototype =
             this.bRoot = false;
             this.Parent = Parent;
         }
+		if (this.content.length == 0)
+			this.fillPlaceholders();
 
         for(var pos = 0; pos < this.content.length; pos++)
         {
@@ -6771,6 +6773,21 @@ CMathContent.prototype =
             }
         }
     },
+	Add: function (oElem, Pos)
+	{
+        oElem.Parent = this;
+
+        if(oElem.typeObj === MATH_COMP)
+        {
+            oElem.setArgSize(this.argSize);
+            this.content.splice(Pos,0,oElem);
+        }
+        else
+        {
+            this.content.push(obj);
+        }
+		this.CurPos++;
+    },
     Save_Changes: function(Data, Writer)
     {
         Writer.WriteLong( historyitem_type_MathContent );
@@ -6877,6 +6894,27 @@ CMathContent.prototype =
 					
 					this.content.splice( Pos, 0, Element );
                 }
+                break;
+            }
+			case historyitem_Math_RemoveItem:
+            {
+                // Long          : Количество удаляемых элементов
+                // Array of Long : позиции удаляемых элементов
+
+                var Count = Reader.GetLong();
+
+                for ( var Index = 0; Index < Count; Index++ )
+                {
+                    var ChangesPos = this.m_oContentChanges.Check( contentchanges_Remove, Reader.GetLong() );
+
+                    // действие совпало, не делаем его
+                    if ( false === ChangesPos )
+                        continue;
+
+                    var Pos = ( true !== Debug_ParaRunMode ? this.Internal_Get_RealPos( ChangesPos ) : ChangesPos );
+                    this.Content.splice( Pos, 1 );
+                }
+
                 break;
             }
         }
@@ -9023,7 +9061,7 @@ CMathContent.prototype =
 		
         if (oParent)
 		{
-            oParent.addElementToContent(oElem);
+            oParent.Add(oElem,Pos);
 			items.push(oElem);
 			History.Add(oParent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
 		}
