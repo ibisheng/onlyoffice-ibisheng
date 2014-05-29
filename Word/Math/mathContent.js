@@ -5722,6 +5722,10 @@ CMathContent.prototype =
 
         return flag;
     },
+    IsCurrentPlh: function()
+    {
+        return this.IsPlaceholder();
+    },
     IsJustDraw: function()
     {
         return false;
@@ -6660,10 +6664,19 @@ CMathContent.prototype =
                 this.content[this.CurPos + 1].SetSelectAll();
             }
         }
-        else
+        else if(this.content[this.CurPos].typeObj == MATH_COMP )
         {
-            this.SelectStartPos = this.SelectEndPos = this.CurPos;
-            this.content[this.CurPos].Set_Select_ToMComp(Direction);
+            if(this.content[this.CurPos].IsCurrentPlh())
+            {
+                this.SelectStartPos = this.SelectEndPos = this.CurPos;
+                this.content[this.CurPos].SetSelectAll();
+            }
+            else
+            {
+                this.SelectStartPos = this.SelectEndPos = this.CurPos;
+                this.content[this.CurPos].Set_Select_ToMComp(Direction);
+            }
+
         }
     },
     getElem: function(nNum)

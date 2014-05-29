@@ -22,7 +22,6 @@ function CMathMatrix(props)
         plcHide:    false
     };
 
-
     this.spaceRow =
     {
         rule: 0,
@@ -53,8 +52,6 @@ function CMathMatrix(props)
     ////
 
     CMathBase.call(this);
-
-    //CMathMatrix.init.call(this, props);
 
     this.init(props);
     this.setCtrPrp(props.ctrPrp);

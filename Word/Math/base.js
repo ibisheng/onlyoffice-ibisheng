@@ -1450,6 +1450,10 @@ CMathBase.prototype =
 
         this.bSelectionUse = false;
     },
+    IsCurrentPlh:   function()
+    {
+        return this.elements[this.CurPos_X][this.CurPos_Y].IsCurrentPlh();
+    },
 
     // Перемещение по стрелкам
 
@@ -1707,8 +1711,8 @@ CMathBase.prototype =
     },
     SetSelectAll: function()
     {
-        this.SelectStart_X = 0;
-        this.SelectStart_Y = 0;
+        this.SelectStart_X = -1;
+        this.SelectStart_Y = -1;
 
         this.SelectEnd_X = this.nRow - 1;
         this.SelectEnd_Y = this.nCol - 1;
