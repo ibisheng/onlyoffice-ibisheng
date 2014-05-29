@@ -1646,6 +1646,8 @@
 					
 				oPasteProcessor._Execute(node, {}, true, true, false);
 				
+				targetDocContent.Remove(1, true, true);
+				
 				oPasteProcessor.InsertInPlace(targetDocContent , oPasteProcessor.aContent);
 				
 				worksheet.objectRender.controller.startRecalculate();
