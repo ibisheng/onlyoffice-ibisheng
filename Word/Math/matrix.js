@@ -8,6 +8,20 @@ function CMathMatrix(props)
     this.gaps = null;
     this.plcHide = false;
 
+    this.Pr =
+    {
+        cGp:        0,
+        cGpRule:    0,
+        cSp:        0,
+
+        rSp:        0,
+        rSpRule:    0,
+
+        mcJc:       MCJC_CENTER,
+        baseJc:     BASEJC_CENTER,
+        plcHide:    false
+    };
+
 
     this.spaceRow =
     {
@@ -15,6 +29,7 @@ function CMathMatrix(props)
         gap: 0,
         minGap: 13/12    //em
                          // 780 /20 (pt) for font 36 pt
+        //minGap: 0
     };
     this.spaceColumn =
     {
@@ -25,6 +40,7 @@ function CMathMatrix(props)
 
     this.plcHide = false;
     this.baseJc = BASEJC_CENTER;
+
     this.gaps =
     {
         row: new Array(),
@@ -79,8 +95,15 @@ CMathMatrix.prototype.init = function(props)
     if(props.mcJc == MCJC_CENTER || props.mcJc == MCJC_LEFT || props.mcJc == MCJC_RIGHT)
         this.mcJc = props.mcJc;
 
-    this.setRuleGap(this.spaceColumn, props.cGpRule, props.cGp, props.cSp);
-    this.setRuleGap(this.spaceRow, props.rSpRule, props.rSp);
+    this.Pr.cGpRule = props.cGpRule;
+    this.Pr.cGp     = props.cGp;
+    this.Pr.cSp     = props.cSp;
+
+    this.Pr.rSpRule = props.rSpRule;
+    this.Pr.rSp     = props.rSp;
+
+    //this.setRuleGap(this.spaceColumn, props.cGpRule, props.cGp, props.cSp);
+    //this.setRuleGap(this.spaceRow, props.rSpRule, props.rSp);
 
     if(props.plcHide === true || props.plcHide === 1)
     {
@@ -126,31 +149,28 @@ CMathMatrix.prototype.init = function(props)
         this.setRuleGap(this.spaceRow, props.rSpRule, props.rSp);
     }*/
 
-
-    /// вызов этой функции обязательно в конце
-    //this.WriteContentsToHistory();
 }
-CMathMatrix.prototype.setRuleGap = function(space, rule, gap, minGap)
+CMathMatrix.prototype.setRuleGap = function(oSpace, rule, gap, minGap)
 {
     var bInt  =  rule == rule - 0 && rule == rule^ 0,
         bRule =  rule >= 0 && rule <= 4;
 
     if(bInt && bRule)
-        space.rule = rule;
+        oSpace.rule = rule;
     else
-        space.rule = 0;
+        oSpace.rule = 0;
 
 
     if(gap == gap - 0 && gap == gap^0)
-        space.gap = gap;
+        oSpace.gap = gap;
     else
-        space.gap = 0;
+        oSpace.gap = 0;
 
     if(minGap == minGap - 0 && minGap == minGap^0)
-        space.minGap = gap;
+        oSpace.minGap = gap;
 
     /*else
-        space.minGap = 0;*/
+     oSpace.minGap = 0;*/
 
 
     /*var Value = 0, Rule;
@@ -178,23 +198,31 @@ CMathMatrix.prototype.setRuleGap = function(space, rule, gap, minGap)
     else
         Rule = 0;
 
-    space.rule = Rule;
-    space.value = Value;*/
+     oSpace.rule = Rule;
+     oSpace.value = Value;*/
 
 }
 CMathMatrix.prototype.recalculateSize = function(oMeasure)
 {
     var txtPrp = this.Get_CompiledCtrPrp();
 
-    var interval = this.getLineGap(txtPrp);
+    var intervalCol = this.getLineGap(txtPrp);
     this.gaps.column[0] = 0;
     for(var i = 0; i < this.nCol - 1; i++)
-        this.gaps.column[i + 1] = interval;
+        this.gaps.column[i + 1] = intervalCol;
 
-    interval = this.getRowSpace(txtPrp);
+    var intervalRow = this.getRowSpace(txtPrp);
 
     var divCenter = 0;
     var metrics = this.getMetrics();
+
+    if(this.RecalcInfo.bProps)
+    {
+        this.setRuleGap(this.spaceColumn, this.Pr.cGpRule, this.Pr.cGp, this.Pr.cSp);
+        this.setRuleGap(this.spaceRow, this.Pr.rSpRule, this.Pr.rSp);
+
+        this.RecalcInfo.bProps = false;
+    }
 
     var plH = 0.2743827160493827 * txtPrp.FontSize;
     var minGp = this.spaceRow.minGap*txtPrp.FontSize*g_dKoef_pt_to_mm;
@@ -202,8 +230,9 @@ CMathMatrix.prototype.recalculateSize = function(oMeasure)
     this.gaps.row[0] = 0;
     for(var j = 0; j < this.nRow - 1; j++)
     {
-        divCenter = interval - (metrics.descents[j] + metrics.ascents[j + 1]);
+        divCenter = intervalRow - (metrics.descents[j] + metrics.ascents[j + 1]);
         this.gaps.row[j + 1] = minGp > divCenter ? minGp : divCenter;
+        //this.gaps.row[j + 1] = divCenter;
     }
 
     var height = 0, width = 0;
@@ -234,7 +263,7 @@ CMathMatrix.prototype.recalculateSize = function(oMeasure)
         }
     }
     else /*this.baseJc == 0*/
-        ascent = this.getAscent(height, oMeasure);
+        ascent = this.getAscent(oMeasure, height);
         //center = height/2;
 
     width += this.GapLeft + this.GapRight;
