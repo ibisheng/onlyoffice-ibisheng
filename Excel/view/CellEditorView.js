@@ -365,6 +365,7 @@
 		};
 
 		CellEditor.prototype.undoAll = function () {
+			this.isUpdateValue = false;
 			this.undoAllMode = true;
 			while (this.undoList.length > 0) {
 				this.undo();
@@ -857,9 +858,8 @@
 			var isFormula = s.charAt(0) === "=";
 			var funcPos, funcName, match;
 
-			if (!t.isTopLineActive || !t.skipTLUpdate || t.undoMode) {
+			if (!t.isTopLineActive || !t.skipTLUpdate || t.undoMode)
 				t.input.value = s;
-			}
 
 			if (isFormula) {
 				funcPos = asc_lastidx(s, t.reNotFormula, t.cursorPos) + 1;
@@ -1796,6 +1796,8 @@
 				case 89:  // ctrl + y
 				case 90:  // ctrl + z
 					if (ctrlKey) {
+						event.stopPropagation();
+						event.preventDefault();
 						if (!t.hasFocus) {t.setFocus(true);}
 						event.which === 90 ? t.undo() : t.redo();
 						return false;
