@@ -784,6 +784,16 @@ CImageShape.prototype =
 
     draw: function(graphics, transform)
     {
+        if(graphics.updatedRect)
+        {
+            var rect = graphics.updatedRect;
+            var bounds = this.bounds;
+            if(bounds.x > rect.x + rect.w
+                || bounds.y > rect.y + rect.h
+                || bounds.x + bounds.w < rect.x
+                || bounds.y + bounds.h < rect.y)
+                return;
+        }
         var _transform = transform ? transform :this.transform;
         graphics.SetIntegerGrid(false);
         graphics.transform3(_transform, false);

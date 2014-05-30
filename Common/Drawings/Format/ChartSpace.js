@@ -201,6 +201,8 @@ function CChartSpace()
     this.snapArrayY = [];
 
 
+    this.bbox = null;
+
     this.setRecalculateInfo();
 
 
@@ -385,6 +387,136 @@ CChartSpace.prototype =
         this.setWorksheet(worksheet);
         this.setParent(null);
         return this;
+    },
+
+    rebuildSeriesFromAsc: function(asc_chart)
+    {
+        if(this.chart && this.chart.plotArea && this.chart.plotArea.charts[0])
+        {
+            var  asc_series = asc_chart.series;
+            var chart_type = this.chart.plotArea.charts[0];
+            var first_series = chart_type.series[0] ? chart_type.series[0] : new chart_type.getSeriesConstructor()();
+            removeAllSeriesFromChart(chart_type);
+            var parsedHeaders = asc_chart.parseSeriesHeaders();
+            if(chart_type.getObjectType() !== historyitem_type_ScatterChart)
+            {
+                for(var i = 0; i < asc_series.length; ++i)
+                {
+                    var series = first_series.createDuplicate();
+                    series.setIdx(i);
+                    series.setOrder(i);
+                    series.setVal(new CYVal());
+                    var val = series.val;
+                    val.setNumRef(new CNumRef());
+                    var num_ref = val.numRef;
+                    num_ref.setF(asc_series[i].Val.Formula);
+                    num_ref.setNumCache(new CNumLit());
+                    var num_cache = num_ref.numCache;
+                    num_cache.setPtCount(asc_series[i].Val.NumCache.length);
+                    for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
+                    {
+                        var pt = new CNumericPoint();
+                        pt.setIdx(j);
+                        pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
+                        pt.setVal(asc_series[i].Val.NumCache[j].val);
+                        num_cache.addPt(pt);
+                    }
+                    if(parsedHeaders.bTop)
+                    {
+                        series.setCat(new CCat());
+                        var cat = series.cat;
+                        cat.setStrRef(new CStrRef());
+                        var str_ref = cat.strRef;
+                        str_ref.setF(asc_series[i].Cat.Formula);
+                        str_ref.setStrCache(new CStrCache());
+                        var str_cache = str_ref.strCache;
+                        var cat_num_cache = asc_series[i].Cat.NumCache;
+                        str_cache.setPtCount(cat_num_cache.length);
+                        for(var j= 0; j < cat_num_cache.length; ++j)
+                        {
+                            var string_pt = new CStringPoint();
+                            string_pt.setIdx(j);
+                            string_pt.setVal(cat_num_cache[j].val);
+                            str_cache.addPt(string_pt);
+                        }
+                    }
+                    else
+                    {
+                        series.setCat(null);
+                    }
+                    if(parsedHeaders.bLeft && asc_series[i].TxCache)
+                    {
+                        series.setTx(new CTx());
+                        var tx= series.tx;
+                        tx.setStrRef(new CStrRef());
+                        var str_ref = tx.strRef;
+                        str_ref.setF(asc_series[i].TxCache.Formula);
+                        str_ref.setStrCache(new CStrCache());
+                        var str_cache = str_ref.strCache;
+                        str_cache.setPtCount(1);
+                        str_cache.addPt(new CStringPoint());
+                        var pt = str_cache.pt[0];
+                        pt.setIdx(0);
+                        pt.setVal(asc_series[i].TxCache.Tx);
+                    }
+                    else
+                    {
+                        series.setTx(null);
+                    }
+                    chart_type.addSer(series);
+                }
+            }
+            else
+            {
+                var first_series = asc_series.length > 1 ? asc_series[0] : null;
+                var start_index = asc_series.length > 1 ? 1 : 0;
+                var parsedHeaders = asc_chart.parseSeriesHeaders();
+                var minus = start_index === 1 ? 1 : 0;
+                for(var i = start_index; i < asc_series.length; ++i)
+                {
+                    var series = new CScatterSeries();
+                    series.setIdx(i - minus);
+                    series.setOrder(i - minus);
+                    if(first_series)
+                    {
+                        series.setXVal(new CXVal());
+                        var x_val = series.xVal;
+                        x_val.setNumRef(new CNumRef());
+                        var num_ref = x_val.numRef;
+                        num_ref.setF(first_series.Val.Formula);
+                        num_ref.setNumCache(new CNumLit());
+                        var num_cache = num_ref.numCache;
+                        num_cache.setPtCount(first_series.Val.NumCache.length);
+                        for(var j = 0; j < first_series.Val.NumCache.length; ++j)
+                        {
+                            var pt = new CNumericPoint();
+                            pt.setIdx(j);
+                            pt.setFormatCode(first_series.Val.NumCache[j].numFormatStr);
+                            pt.setVal(first_series.Val.NumCache[j].val);
+                            num_cache.addPt(pt);
+                        }
+                    }
+                    series.setYVal(new CYVal());
+                    var y_val = series.yVal;
+                    y_val.setNumRef(new CNumRef());
+                    var num_ref = y_val.numRef;
+                    num_ref.setF(asc_series[i].Val.Formula);
+                    num_ref.setNumCache(new CNumLit());
+                    var num_cache = num_ref.numCache;
+                    num_cache.setPtCount(asc_series[i].Val.NumCache.length);
+                    for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
+                    {
+                        var pt = new CNumericPoint();
+                        pt.setIdx(j);
+                        pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
+                        pt.setVal(asc_series[i].Val.NumCache[j].val);
+                        num_cache.addPt(pt);
+                    }
+                    chart_type.addSer(series);
+                }
+            }
+            this.setRecalculateInfo();
+        }
     },
 
     Write_ToBinary2: function (w)
@@ -654,7 +786,312 @@ CChartSpace.prototype =
         return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
     },
 
+    getRangeObjectStr: function()
+    {
+        if(!this.recalcInfo.recalculateBBox)
+        {
+            this.recalculateBBox();
+        }
+        var ret = {range: null, bVert: null};
+        if(this.bbox && this.bbox.seriesBBox)
+        {
+            var r1 = this.bbox.seriesBBox.r1, r2 = this.bbox.seriesBBox.r2, c1 = this.bbox.seriesBBox.c1, c2 = this.bbox.seriesBBox.c2;
+            if(this.bbox.seriesBBox.bVert)
+            {
+                ret.bVert = true;
+                if(this.bbox.catBBox)
+                {
+                    --r1;
+                }
+                if(this.bbox.serBBox)
+                {
+                    --c1;
+                }
+            }
+            else
+            {
+                ret.bVert = false;
+                if(this.bbox.catBBox)
+                {
+                    --c1;
+                }
+                if(this.bbox.serBBox)
+                {
+                    --r1;
+                }
+            }
+            var startCell = new CellAddress(r1, c1, 0);
+            var endCell = new CellAddress(r2, c2, 0);
 
+            if (startCell && endCell)
+            {
+                var wsName = this.worksheet.sName;
+                if ( !rx_test_ws_name.test(wsName) )
+                    wsName = "'" + wsName + "'";
+
+                if (startCell.getID() == endCell.getID())
+                    ret.range = wsName + "!" + startCell.getID();
+                else
+                    ret.range = wsName + "!" + startCell.getID() + ":" + endCell.getID();
+            }
+        }
+        return ret;
+    },
+
+    recalculateBBox: function()
+    {
+        this.bbox = null;
+        if(this.chart && this.chart.plotArea && this.chart.plotArea.charts[0] && this.worksheet)
+        {
+            var series = this.chart.plotArea.charts[0].series;
+            if(Array.isArray(series) && series.length > 0)
+            {
+                var series_title_f = [], cat_title_f, series_f = [], i, range1;
+                var ref;
+                if(series[0].cat && series[0].cat.strRef)
+                {
+                    ref = series[0].cat.strRef;
+                }
+                else if(series[0].xVal)
+                {
+                    if(series[0].xVal.strRef)
+                    {
+                        ref = series[0].xVal.strRef;
+                    }
+                    else if(series[0].xVal.numRef)
+                    {
+                        ref = series[0].xVal.numRef;
+                    }
+                }
+                if(ref)
+                {
+                    var cat_title_parsed_ref = parserHelp.parse3DRef(ref.f);
+                    if(cat_title_parsed_ref)
+                    {
+                        var cat_title_sheet = this.worksheet.workbook.getWorksheetByName(cat_title_parsed_ref.sheet);
+                        if(cat_title_sheet === this.worksheet)
+                        {
+                            range1 = cat_title_sheet.getRange2(cat_title_parsed_ref.range);
+                            if(range1 && range1.bbox)
+                            {
+                                cat_title_f = range1.bbox;
+                            }
+                        }
+                    }
+                }
+                var b_vert/*флаг означает, что значения в серии идут по горизонтали, а сами серии по вертикали сверху вниз*/
+                    , b_titles_vert;
+                for(i = 0; i < series.length; ++i)
+                {
+                    var numRef = null;
+                    if(series[i].val)
+                        numRef = series[i].val.numRef;
+                    else if(series[i].yVal)
+                        numRef = series[i].yVal.numRef;
+                    if(numRef)
+                    {
+                        var series_parsed_ref = parserHelp.parse3DRef(numRef.f);
+                        if(!series_parsed_ref)
+                            return;
+                        var series_sheet = this.worksheet.workbook.getWorksheetByName(series_parsed_ref.sheet);
+                        if(series_sheet !== this.worksheet)
+                            return;
+                        range1 =  series_sheet.getRange2(series_parsed_ref.range);
+                        if(range1 && range1.bbox)
+                        {
+                            if(range1.bbox.r1 !== range1.bbox.r2 && range1.bbox.c1 !== range1.bbox.c2)
+                                return;
+                            if(series_f.length > 0)
+                            {
+                                if(!isRealBool(b_vert))
+                                {
+                                    if(series_f[0].c1 === range1.bbox.c1 && series_f[0].c2 === range1.bbox.c2)
+                                    {
+                                        b_vert = true;
+                                    }
+                                    else if(series_f[0].r1 === range1.bbox.r1 && series_f[0].r2 === range1.bbox.r2)
+                                    {
+                                        b_vert = false;
+                                    }
+                                    else
+                                    {
+                                        return;
+                                    }
+                                }
+                                else
+                                {
+                                    if(b_vert)
+                                    {
+                                        if(!(series_f[0].c1 === range1.bbox.c1 && series_f[0].c2 === range1.bbox.c2))
+                                        {
+                                            return;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if(!(series_f[0].r1 === range1.bbox.r1 && series_f[0].r2 === range1.bbox.r2))
+                                        {
+                                            return;
+                                        }
+                                    }
+                                }
+                                if(b_vert)
+                                {
+                                    if(range1.bbox.r1 - series_f[series_f.length-1].r1 !== 1)
+                                        return;
+                                }
+                                else
+                                {
+                                    if(range1.bbox.c1 - series_f[series_f.length-1].c1 !== 1)
+                                        return;
+                                }
+                            }
+                            series_f.push(range1.bbox);
+                        }
+                        else
+                            return;
+                    }
+                    else
+                        return;
+                    if(Array.isArray(series_title_f))
+                    {
+                        if(series[i].tx && series[i].tx.strRef)
+                        {
+                            var series_cat_parsed_ref = parserHelp.parse3DRef(series[i].tx.strRef.f);
+                            if(!series_cat_parsed_ref)
+                            {
+                                series_title_f = null;
+                                continue;
+                            }
+                            var series_cat_sheet = this.worksheet.workbook.getWorksheetByName(series_cat_parsed_ref.sheet);
+                            if(series_cat_sheet !== this.worksheet)
+                            {
+                                series_title_f = null;
+                                continue;
+                            }
+                            range1 = series_cat_sheet.getRange2(series_cat_parsed_ref.range);
+                            if(range1 && range1.bbox)
+                            {
+                                if(range1.bbox.r1 !== range1.bbox.r2 || range1.bbox.c1 !== range1.bbox.c2)
+                                {
+                                    series_title_f = null;
+                                    continue;
+                                }
+                                if(!isRealBool(b_titles_vert))
+                                {
+                                    if(series_title_f.length > 0)
+                                    {
+                                        if( range1.bbox.r1 - series_title_f[0].r1 === 1)
+                                            b_titles_vert = true;
+                                        else if(range1.bbox.c1 - series_title_f[0].c1 === 1)
+                                            b_titles_vert = false;
+                                        else
+                                        {
+                                            series_title_f = null;
+                                            continue;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    if(b_titles_vert)
+                                    {
+                                        if( range1.bbox.r1 - series_title_f[series_title_f.length-1].r1 !== 1)
+                                        {
+                                            series_title_f = null;
+                                            continue;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if( range1.bbox.c1 - series_title_f[series_title_f.length-1].c1 !== 1)
+                                        {
+                                            series_title_f = null;
+                                            continue;
+                                        }
+                                    }
+                                }
+                                series_title_f.push(range1.bbox);
+                            }
+                            else
+                            {
+                                series_title_f = null;
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            series_title_f = null;
+                        }
+                    }
+                }
+                this.bbox =  {
+                    seriesBBox: null,
+                    catBBox: null,
+                    serBBox: null
+                };
+                //if(b_vert)
+                //{
+                this.bbox.seriesBBox = {
+                    r1: series_f[0].r1,
+                    r2: series_f[series_f.length-1].r2,
+                    c1: series_f[0].c1,
+                    c2: series_f[series_f.length-1].c2,
+                    bVert: b_vert
+                };
+                /* }
+                 else
+                 {
+                 this.bbox.seriesBox = {
+                 r1: series_f[0].
+                 };
+                 }*/
+                if(cat_title_f)
+                {
+                    if(b_vert)
+                    {
+                        if(cat_title_f.c1 !== this.bbox.seriesBBox.c1
+                            || cat_title_f.c2 !== this.bbox.seriesBBox.c2
+                            || cat_title_f.r1 !== cat_title_f.r1
+                            || cat_title_f.r1 !== this.bbox.seriesBBox.r1-1)
+                        {
+                            cat_title_f = null;
+                        }
+                    }
+                    else
+                    {
+                        if(cat_title_f.c1 !== cat_title_f.c2
+                            || cat_title_f.r1 !== this.bbox.seriesBBox.r1
+                            || cat_title_f.r2 !== this.bbox.seriesBBox.r2
+                            || cat_title_f.c1 !== this.bbox.seriesBBox.c1-1)
+                        {
+                            cat_title_f = null;
+                        }
+                    }
+                    this.bbox.catBBox = cat_title_f;
+                }
+                if(Array.isArray(series_title_f))
+                {
+                    // if(b_titles_vert)
+                    // {
+                    this.bbox.serBBox = {
+                        r1: series_title_f[0].r1,
+                        r2: series_title_f[series_title_f.length-1].r2,
+                        c1: series_title_f[0].c1,
+                        c2: series_title_f[series_title_f.length-1].c2
+                    };
+                    // }
+                    // else
+                    // {
+                    //     this.bbox.serBBox = {
+                    //         r1: series_title_f[0].r1,
+                    //         r2: series_title_f[0].r1,
+                    //     };
+                    // }
+                }
+            }
+        }
+    },
 
     recalculateReferences: function()
     {
@@ -3677,11 +4114,13 @@ CChartSpace.prototype =
                             for(i = 0; i < calc_entryes.length; ++i)
                             {
                                 calc_entry = calc_entryes[i];
-                                calc_entry.calcMarkerUnion.marker.localX = cur_left_x + distance_to_text + line_marker_width/2 - marker_size/2;
+                                if(calc_entry.calcMarkerUnion.marker)
+                                    calc_entry.calcMarkerUnion.marker.localX = cur_left_x + distance_to_text + line_marker_width/2 - marker_size/2;
                                 calc_entry.calcMarkerUnion.lineMarker.localX = cur_left_x + distance_to_text;
                                 calc_entry.calcMarkerUnion.lineMarker.localY = legend_height/2;
                                 cur_left_x += arr_width[i];
-                                calc_entry.calcMarkerUnion.marker.localY = legend_height/2 - marker_size/2;
+                                if(calc_entry.calcMarkerUnion.marker)
+                                    calc_entry.calcMarkerUnion.marker.localY = legend_height/2 - marker_size/2;
                                 calc_entry.localX = calc_entry.calcMarkerUnion.lineMarker.localX+line_marker_width+distance_to_text;
                                 calc_entry.localY = 0;
                             }
@@ -5426,6 +5865,16 @@ CChartSpace.prototype =
     {
         /*this.setRecalculateInfo();
          this.recalculate();*/
+        if(graphics.updatedRect)
+        {
+            var rect = graphics.updatedRect;
+            var bounds = this.bounds;
+            if(bounds.x > rect.x + rect.w
+                || bounds.y > rect.y + rect.h
+                || bounds.x + bounds.w < rect.x
+                || bounds.y + bounds.h < rect.y)
+                return;
+        }
         var intGrid = graphics.GetIntegerGrid();
         graphics.SetIntegerGrid(false);
         graphics.transform3(this.transform, false);
@@ -6604,7 +7053,8 @@ CPrintSettings.prototype =
 
     Load_Changes: function(r)
     {
-        switch (data.Type)
+        var type = r.GetLong();
+        switch (type)
         {
             case historyitem_PrintSettingsSetHeaderFooter:
             {
@@ -7440,14 +7890,14 @@ function CreateLineChart(asc_chart, type)
     chart.setPlotArea(new CPlotArea());
     chart.setLegend(new CLegend());
     chart.setPlotVisOnly(true);
-    chart.setTitle(new CTitle());
-    chart.title.setOverlay(false);
-    chart.title.setSpPr(new CSpPr());
-    chart.title.spPr.setFill(new CUniFill());
-    chart.title.spPr.Fill.setFill(new CSolidFill());
-    chart.title.spPr.Fill.fill.setColor(new CUniColor());
-    chart.title.spPr.Fill.fill.color.setColor(new CSchemeColor());
-    chart.title.spPr.Fill.fill.color.color.setId(0);
+    //chart.setTitle(new CTitle());
+    //chart.title.setOverlay(false);
+    //chart.title.setSpPr(new CSpPr());
+    //chart.title.spPr.setFill(new CUniFill());
+    //chart.title.spPr.Fill.setFill(new CSolidFill());
+    //chart.title.spPr.Fill.fill.setColor(new CUniColor());
+    //chart.title.spPr.Fill.fill.color.setColor(new CSchemeColor());
+    //chart.title.spPr.Fill.fill.color.color.setId(0);
     var disp_blanks_as;
     if(type === GROUPING_STANDARD)
     {
@@ -7463,16 +7913,16 @@ function CreateLineChart(asc_chart, type)
     plot_area.setLayout(new CLayout());
     plot_area.addChart(new CLineChart());
     plot_area.addAxis(new CCatAx());
-    plot_area.catAx.setTitle(new CTitle());
+    //plot_area.catAx.setTitle(new CTitle());
     plot_area.addAxis(new CValAx());
-    plot_area.valAx.setTitle(new CTitle());
-    var title = plot_area.valAx.title;
-    title.setTxPr(new CTextBody());
-    title.txPr.setBodyPr(new CBodyPr());
+    //plot_area.valAx.setTitle(new CTitle());
+    //var title = plot_area.valAx.title;
+    //title.setTxPr(new CTextBody());
+    //title.txPr.setBodyPr(new CBodyPr());
     var line_chart = plot_area.charts[0];
     line_chart.setGrouping(type);
     line_chart.setVaryColors(false);
-    line_chart.setDLbls(new CDLbls());
+    //line_chart.setDLbls(new CDLbls());
     line_chart.setMarker(true);
     line_chart.setSmooth(false);
     line_chart.addAxId(plot_area.catAx);
@@ -7534,13 +7984,14 @@ function CreateLineChart(asc_chart, type)
             str_cache.setPtCount(1);
             str_cache.addPt(new CStringPoint());
             var pt = str_cache.pt[0];
+            pt.setIdx(0);
             pt.setVal(asc_series[i].TxCache.Tx);
         }
         line_chart.addSer(series);
     }
-    var d_lbls = line_chart.dLbls;
-    d_lbls.setShowLegendKey(false);
-    d_lbls.setShowVal(true);
+    //var d_lbls = line_chart.dLbls;
+    //d_lbls.setShowLegendKey(false);
+    //d_lbls.setShowVal(true);
     var cat_ax = plot_area.catAx;
     cat_ax.setScaling(new CScaling());
     cat_ax.setDelete(false);
@@ -7679,17 +8130,18 @@ function CreateBarChart(asc_chart, type)
             str_cache.setPtCount(1);
             str_cache.addPt(new CStringPoint());
             var pt = str_cache.pt[0];
+            pt.setIdx(0);
             pt.setVal(asc_series[i].TxCache.Tx);
         }
         bar_chart.addSer(series);
     }
-    bar_chart.setDLbls(new CDLbls());
+    //bar_chart.setDLbls(new CDLbls());
     bar_chart.setGapWidth(150);
     bar_chart.addAxId(plot_area.catAx);
     bar_chart.addAxId(plot_area.valAx);
-    var d_lbls = bar_chart.dLbls;
-    d_lbls.setShowLegendKey(false);
-    d_lbls.setShowVal(true);
+    //var d_lbls = bar_chart.dLbls;
+    //d_lbls.setShowLegendKey(false);
+    //d_lbls.setShowVal(true);
     var cat_ax = plot_area.catAx;
     cat_ax.setScaling(new CScaling());
     cat_ax.setDelete(false);
@@ -7828,15 +8280,16 @@ function CreateHBarChart(asc_chart, type)
             str_cache.setPtCount(1);
             str_cache.addPt(new CStringPoint());
             var pt = str_cache.pt[0];
+            pt.setIdx(0);
             pt.setVal(asc_series[i].TxCache.Tx);
         }
 
         bar_chart.addSer(series);
     }
-    bar_chart.setDLbls(new CDLbls());
-    var d_lbls = bar_chart.dLbls;
-    d_lbls.setShowLegendKey(false);
-    d_lbls.setShowVal(true);
+    //bar_chart.setDLbls(new CDLbls());
+    //var d_lbls = bar_chart.dLbls;
+    //d_lbls.setShowLegendKey(false);
+    //d_lbls.setShowVal(true);
     bar_chart.setGapWidth(150);
     bar_chart.addAxId(plot_area.catAx);
     bar_chart.addAxId(plot_area.valAx);
@@ -7977,17 +8430,18 @@ function CreateAreaChart(asc_chart, type)
             str_cache.setPtCount(1);
             str_cache.addPt(new CStringPoint());
             var pt = str_cache.pt[0];
+            pt.setIdx(0);
             pt.setVal(asc_series[i].TxCache.Tx);
         }
 
         area_chart.addSer(series);
     }
-    area_chart.setDLbls(new CDLbls());
+    //area_chart.setDLbls(new CDLbls());
     area_chart.addAxId(plot_area.catAx);
     area_chart.addAxId(plot_area.valAx);
-    var d_lbls = area_chart.dLbls;
-    d_lbls.setShowLegendKey(false);
-    d_lbls.setShowVal(true);
+    //var d_lbls = area_chart.dLbls;
+    //d_lbls.setShowLegendKey(false);
+    //d_lbls.setShowVal(true);
     var cat_ax = plot_area.catAx;
     cat_ax.setScaling(new CScaling());
     cat_ax.setDelete(false);
@@ -8117,14 +8571,15 @@ function CreatePieChart(asc_chart, bDoughnut)
             str_cache.setPtCount(1);
             str_cache.addPt(new CStringPoint());
             var pt = str_cache.pt[0];
+            pt.setIdx(0);
             pt.setVal(asc_series[i].TxCache.Tx);
         }
 
         pie_chart.addSer(series);
     }
-    pie_chart.setDLbls(new CDLbls());
-    pie_chart.dLbls.setShowLegendKey(false);
-    pie_chart.dLbls.setShowVal(true);
+    //pie_chart.setDLbls(new CDLbls());
+    //pie_chart.dLbls.setShowLegendKey(false);
+    //pie_chart.dLbls.setShowVal(true);
     pie_chart.setFirstSliceAng(0);
     if(bDoughnut)
         pie_chart.setHoleSize(50);
@@ -8252,12 +8707,12 @@ function CreateScatterChart(asc_chart)
         //}
         scatter_chart.addSer(series);
     }
-    scatter_chart.setDLbls(new CDLbls());
+    //scatter_chart.setDLbls(new CDLbls());
     scatter_chart.addAxId(plot_area.catAx);
     scatter_chart.addAxId(plot_area.valAx);
-    var d_lbls = scatter_chart.dLbls;
-    d_lbls.setShowLegendKey(false);
-    d_lbls.setShowVal(true);
+    //var d_lbls = scatter_chart.dLbls;
+    //d_lbls.setShowLegendKey(false);
+    //d_lbls.setShowVal(true);
     var cat_ax = plot_area.catAx;
     cat_ax.setScaling(new CScaling());
     cat_ax.setDelete(false);
@@ -8330,7 +8785,7 @@ function CreateStockChart(asc_chart)
     plot_area.addAxis(new CCatAx());
     plot_area.addAxis(new CValAx());
     var line_chart = plot_area.charts[0];
-    line_chart.setDLbls(new CDLbls());
+    //line_chart.setDLbls(new CDLbls());
     line_chart.addAxId(plot_area.catAx);
     line_chart.addAxId(plot_area.valAx);
     line_chart.setHiLowLines(new CSpPr());
@@ -8395,14 +8850,15 @@ function CreateStockChart(asc_chart)
             str_cache.setPtCount(1);
             str_cache.addPt(new CStringPoint());
             var pt = str_cache.pt[0];
+            pt.setIdx(0);
             pt.setVal(asc_series[i].TxCache.Tx);
         }
 
         line_chart.addSer(series);
     }
-    var d_lbls = line_chart.dLbls;
-    d_lbls.setShowLegendKey(false);
-    d_lbls.setShowVal(true);
+    //var d_lbls = line_chart.dLbls;
+    //d_lbls.setShowLegendKey(false);
+    //d_lbls.setShowVal(true);
     var cat_ax = plot_area.catAx;
     cat_ax.setScaling(new CScaling());
     cat_ax.setDelete(false);
@@ -8488,8 +8944,8 @@ function CreateDefaultAxises(valFormatCode)
     scaling = val_ax.scaling;
     scaling.setOrientation(ORIENTATION_MIN_MAX);
     cat_ax.setCrossAx(val_ax);
-    cat_ax.setTitle(new CTitle());
-    val_ax.setTitle(new CTitle());
+    //cat_ax.setTitle(new CTitle());
+    //val_ax.setTitle(new CTitle());
     var title = val_ax.title;
     title.setTxPr(new CTextBody());
     title.txPr.setBodyPr(new CBodyPr());
@@ -8607,16 +9063,17 @@ function CreateRadarChart(asc_chart)
             str_cache.setPtCount(1);
             str_cache.addPt(new CStringPoint());
             var pt = str_cache.pt[0];
+            pt.setIdx(0);
             pt.setVal(asc_series[i].TxCache.Tx);
         }
         bar_chart.addSer(series);
     }
-    bar_chart.setDLbls(new CDLbls());
+    //bar_chart.setDLbls(new CDLbls());
     bar_chart.addAxId(plot_area.catAx);
     bar_chart.addAxId(plot_area.valAx);
-    var d_lbls = bar_chart.dLbls;
-    d_lbls.setShowLegendKey(false);
-    d_lbls.setShowVal(true);
+    //var d_lbls = bar_chart.dLbls;
+    //d_lbls.setShowLegendKey(false);
+    //d_lbls.setShowVal(true);
     var cat_ax = plot_area.catAx;
     cat_ax.setScaling(new CScaling());
     cat_ax.setDelete(false);

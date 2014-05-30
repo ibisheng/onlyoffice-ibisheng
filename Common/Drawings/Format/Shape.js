@@ -1884,160 +1884,164 @@ CShape.prototype =
 
     recalculateTextStyles: function (level)
     {
-        var parent_objects = this.getParentObjects();
-        var default_style = new CStyle("defaultStyle", null, null, null);
-        default_style.ParaPr.Spacing.LineRule = linerule_Auto;
-        default_style.ParaPr.Spacing.Line = 1;
-        default_style.ParaPr.Spacing.Before = 0;
-        default_style.ParaPr.Spacing.After = 0;
-        if (isRealObject(parent_objects.presentation) && isRealObject(parent_objects.presentation.defaultTextStyle)
-            && isRealObject(parent_objects.presentation.defaultTextStyle.levels[level]))
+        return ExecuteNoHistory(function()
         {
-            var default_ppt_style = parent_objects.presentation.defaultTextStyle.levels[level];
-            default_style.ParaPr.Merge(default_ppt_style.pPr.Copy());
-            default_style.TextPr.Merge(default_ppt_style.rPr.Copy());
-        }
 
-        var master_style;
-        if (isRealObject(parent_objects.master) && isRealObject(parent_objects.master.txStyles))
-        {
-            var master_ppt_styles;
-            master_style = new CStyle("masterStyele", null, null, null);
-            if (this.isPlaceholder())
+            var parent_objects = this.getParentObjects();
+            var default_style = new CStyle("defaultStyle", null, null, null);
+            default_style.ParaPr.Spacing.LineRule = linerule_Auto;
+            default_style.ParaPr.Spacing.Line = 1;
+            default_style.ParaPr.Spacing.Before = 0;
+            default_style.ParaPr.Spacing.After = 0;
+            if (isRealObject(parent_objects.presentation) && isRealObject(parent_objects.presentation.defaultTextStyle)
+                && isRealObject(parent_objects.presentation.defaultTextStyle.levels[level]))
             {
-                switch (this.getPlaceholderType())
+                var default_ppt_style = parent_objects.presentation.defaultTextStyle.levels[level];
+                default_style.ParaPr.Merge(default_ppt_style.pPr.Copy());
+                default_style.TextPr.Merge(default_ppt_style.rPr.Copy());
+            }
+
+            var master_style;
+            if (isRealObject(parent_objects.master) && isRealObject(parent_objects.master.txStyles))
+            {
+                var master_ppt_styles;
+                master_style = new CStyle("masterStyele", null, null, null);
+                if (this.isPlaceholder())
                 {
-                    case phType_ctrTitle:
-                    case phType_title:
+                    switch (this.getPlaceholderType())
                     {
-                        master_ppt_styles = parent_objects.master.txStyles.titleStyle;
-                        break;
-                    }
-                    case phType_body:
-                    case phType_subTitle:
-                    case phType_obj:
-                    case null:
-                    {
-                        master_ppt_styles = parent_objects.master.txStyles.bodyStyle;
-                        break;
-                    }
-                    default:
-                    {
-                        master_ppt_styles = parent_objects.master.txStyles.otherStyle;
-                        break;
+                        case phType_ctrTitle:
+                        case phType_title:
+                        {
+                            master_ppt_styles = parent_objects.master.txStyles.titleStyle;
+                            break;
+                        }
+                        case phType_body:
+                        case phType_subTitle:
+                        case phType_obj:
+                        case null:
+                        {
+                            master_ppt_styles = parent_objects.master.txStyles.bodyStyle;
+                            break;
+                        }
+                        default:
+                        {
+                            master_ppt_styles = parent_objects.master.txStyles.otherStyle;
+                            break;
+                        }
                     }
                 }
+                else
+                {
+                    master_ppt_styles = parent_objects.master.txStyles.otherStyle;
+                }
+
+                if (isRealObject(master_ppt_styles) && isRealObject(master_ppt_styles.levels) && isRealObject(master_ppt_styles.levels[level]))
+                {
+                    var master_ppt_style = master_ppt_styles.levels[level];
+                    master_style.ParaPr = master_ppt_style.pPr.Copy();
+                    master_style.TextPr = master_ppt_style.rPr.Copy();
+                }
             }
-            else
+
+            var hierarchy = this.getHierarchy();
+            var hierarchy_styles = [];
+            for (var i = 0; i < hierarchy.length; ++i)
             {
-                master_ppt_styles = parent_objects.master.txStyles.otherStyle;
+                var hierarchy_shape = hierarchy[i];
+                if (isRealObject(hierarchy_shape)
+                    && isRealObject(hierarchy_shape.txBody)
+                    && isRealObject(hierarchy_shape.txBody.lstStyle)
+                    && isRealObject(hierarchy_shape.txBody.lstStyle.levels)
+                    && isRealObject(hierarchy_shape.txBody.lstStyle.levels[level]))
+                {
+                    var hierarchy_ppt_style = hierarchy_shape.txBody.lstStyle.levels[level];
+                    var hierarchy_style = new CStyle("hierarchyStyle" + i, null, null, null);
+                    hierarchy_style.ParaPr = hierarchy_ppt_style.pPr.Copy();
+                    hierarchy_style.TextPr = hierarchy_ppt_style.rPr.Copy();
+                    hierarchy_styles.push(hierarchy_style);
+                }
             }
 
-            if (isRealObject(master_ppt_styles) && isRealObject(master_ppt_styles.levels) && isRealObject(master_ppt_styles.levels[level]))
+            var ownStyle;
+            if (isRealObject(this.txBody) && isRealObject(this.txBody.lstStyle) && isRealObject(this.txBody.lstStyle[level]))
             {
-                var master_ppt_style = master_ppt_styles.levels[level];
-                master_style.ParaPr = master_ppt_style.pPr.Copy();
-                master_style.TextPr = master_ppt_style.rPr.Copy();
+                ownStyle = new CStyle("ownStyle", null, null, null);
+                var own_ppt_style = this.txBody.lstStyle[level];
+                ownStyle.ParaPr = own_ppt_style.pPr.Copy();
+                ownStyle.TextPr = own_ppt_style.rPr.Copy();
             }
-        }
-
-        var hierarchy = this.getHierarchy();
-        var hierarchy_styles = [];
-        for (var i = 0; i < hierarchy.length; ++i)
-        {
-            var hierarchy_shape = hierarchy[i];
-            if (isRealObject(hierarchy_shape)
-                && isRealObject(hierarchy_shape.txBody)
-                && isRealObject(hierarchy_shape.txBody.lstStyle)
-                && isRealObject(hierarchy_shape.txBody.lstStyle.levels)
-                && isRealObject(hierarchy_shape.txBody.lstStyle.levels[level]))
+            var shape_text_style;
+            if (isRealObject(this.style) && isRealObject(this.style.fontRef))
             {
-                var hierarchy_ppt_style = hierarchy_shape.txBody.lstStyle.levels[level];
-                var hierarchy_style = new CStyle("hierarchyStyle" + i, null, null, null);
-                hierarchy_style.ParaPr = hierarchy_ppt_style.pPr.Copy();
-                hierarchy_style.TextPr = hierarchy_ppt_style.rPr.Copy();
-                hierarchy_styles.push(hierarchy_style);
+                shape_text_style = new CStyle("shapeTextStyle", null, null, null);
+                var first_name;
+                if(this.style.fontRef.idx === fntStyleInd_major)
+                    first_name = "+mj-";
+                else
+                    first_name = "+mn-";
+
+                shape_text_style.TextPr.RFonts.Ascii =  { Name: first_name + "lt", Index: -1 };
+                shape_text_style.TextPr.RFonts.EastAsia =  { Name: first_name +"ea", Index: -1 };
+                shape_text_style.TextPr.RFonts.CS =  { Name: first_name +"cs", Index: -1 };
+
+                if (this.style.fontRef.Color != null && this.style.fontRef.Color.color != null)
+                {
+                    var unifill = new CUniFill();
+                    unifill.fill = new CSolidFill();
+                    unifill.fill.color = this.style.fontRef.Color;
+                    shape_text_style.TextPr.Unifill = unifill;
+                }
             }
-        }
+            var Styles = new CStyles();
 
-        var ownStyle;
-        if (isRealObject(this.txBody) && isRealObject(this.txBody.lstStyle) && isRealObject(this.txBody.lstStyle[level]))
-        {
-            ownStyle = new CStyle("ownStyle", null, null, null);
-            var own_ppt_style = this.txBody.lstStyle[level];
-            ownStyle.ParaPr = own_ppt_style.pPr.Copy();
-            ownStyle.TextPr = own_ppt_style.rPr.Copy();
-        }
-        var shape_text_style;
-        if (isRealObject(this.style) && isRealObject(this.style.fontRef))
-        {
-            shape_text_style = new CStyle("shapeTextStyle", null, null, null);
-            var first_name;
-            if(this.style.fontRef.idx === fntStyleInd_major)
-                first_name = "+mj-";
-            else
-                first_name = "+mn-";
+            var last_style_id;
+            var isPlaceholder = this.isPlaceholder();
+            if (isPlaceholder) {
+                if (default_style) {
+                    Styles.Add(default_style);
+                    default_style.BasedOn = null;
+                    last_style_id = default_style.Id;
+                }
 
-            shape_text_style.TextPr.RFonts.Ascii =  { Name: first_name + "lt", Index: -1 };
-            shape_text_style.TextPr.RFonts.EastAsia =  { Name: first_name +"ea", Index: -1 };
-            shape_text_style.TextPr.RFonts.CS =  { Name: first_name +"cs", Index: -1 };
-
-            if (this.style.fontRef.Color != null && this.style.fontRef.Color.color != null)
-            {
-                var unifill = new CUniFill();
-                unifill.fill = new CSolidFill();
-                unifill.fill.color = this.style.fontRef.Color;
-                shape_text_style.TextPr.Unifill = unifill;
+                if (master_style) {
+                    Styles.Add(master_style);
+                    master_style.BasedOn = last_style_id;
+                    last_style_id = master_style.Id;
+                }
             }
-        }
-        var Styles = new CStyles();
+            else {
+                if (master_style) {
+                    Styles.Add(master_style);
+                    master_style.BasedOn = null;
+                    last_style_id = master_style.Id;
+                }
 
-        var last_style_id;
-        var isPlaceholder = this.isPlaceholder();
-        if (isPlaceholder) {
-            if (default_style) {
-                Styles.Add(default_style);
-                default_style.BasedOn = null;
-                last_style_id = default_style.Id;
-            }
-
-            if (master_style) {
-                Styles.Add(master_style);
-                master_style.BasedOn = last_style_id;
-                last_style_id = master_style.Id;
-            }
-        }
-        else {
-            if (master_style) {
-                Styles.Add(master_style);
-                master_style.BasedOn = null;
-                last_style_id = master_style.Id;
+                if (default_style) {
+                    Styles.Add(default_style);
+                    default_style.BasedOn = last_style_id;
+                    last_style_id = default_style.Id;
+                }
             }
 
-            if (default_style) {
-                Styles.Add(default_style);
-                default_style.BasedOn = last_style_id;
-                last_style_id = default_style.Id;
+            for (var i = hierarchy_styles.length - 1; i > -1; --i) {
+
+                if (hierarchy_styles[i]) {
+                    Styles.Add(hierarchy_styles[i]);
+                    hierarchy_styles[i].BasedOn = last_style_id;
+                    last_style_id = hierarchy_styles[i].Id;
+                }
             }
-        }
 
-        for (var i = hierarchy_styles.length - 1; i > -1; --i) {
-
-            if (hierarchy_styles[i]) {
-                Styles.Add(hierarchy_styles[i]);
-                hierarchy_styles[i].BasedOn = last_style_id;
-                last_style_id = hierarchy_styles[i].Id;
+            if (shape_text_style) {
+                Styles.Add(shape_text_style);
+                shape_text_style.BasedOn = last_style_id;
+                last_style_id = shape_text_style.Id;
             }
-        }
 
-        if (shape_text_style) {
-            Styles.Add(shape_text_style);
-            shape_text_style.BasedOn = last_style_id;
-            last_style_id = shape_text_style.Id;
-        }
-
-        this.compiledStyles[level] = {styles: Styles, lastId: last_style_id};
-        return this.compiledStyles[level];
+            this.compiledStyles[level] = {styles: Styles, lastId: last_style_id};
+            return this.compiledStyles[level];
+        }, this, []);
     },
 
     recalculateBrush: function () {
@@ -3080,6 +3084,16 @@ CShape.prototype =
 
     draw: function (graphics, transform, transformText, pageIndex) {
 
+        if(graphics.updatedRect)
+        {
+            var rect = graphics.updatedRect;
+            var bounds = this.bounds;
+            if(bounds.x > rect.x + rect.w
+                || bounds.y > rect.y + rect.h
+                || bounds.x + bounds.w < rect.x
+                || bounds.y + bounds.h < rect.y)
+                return;
+        }
         var _transform = transform ? transform : this.transform;
         var _transform_text = transformText ? transformText : this.transformText;
         if (graphics.IsSlideBoundsCheckerType === true) {
@@ -3686,12 +3700,12 @@ CShape.prototype =
     },
 
     hitInInnerArea: function (x, y) {
-        if (this.brush != null && this.brush.fill != null
+        if ((this.getObjectType && this.getObjectType() === historyitem_type_ChartSpace) || this.brush != null && this.brush.fill != null
             && this.brush.fill.type != FILL_TYPE_NOFILL) {
             var invert_transform = this.getInvertTransform();
             var x_t = invert_transform.TransformPointX(x, y);
             var y_t = invert_transform.TransformPointY(x, y);
-            if (isRealObject(this.spPr) && isRealObject(this.spPr.geometry))
+            if (isRealObject(this.spPr) && isRealObject(this.spPr.geometry) && !(this.getObjectType && this.getObjectType() === historyitem_type_ChartSpace))
                 return this.spPr.geometry.hitInInnerArea(this.getCanvasContext(), x_t, y_t);
             return x_t > 0 && x_t < this.extX && y_t > 0 && y_t < this.extY;
         }
