@@ -1640,29 +1640,43 @@
 			_pasteInShape: function(worksheet, node, onlyFromLocalStorage, targetDocContent)
 			{
 				var oPasteProcessor = new PasteProcessor({WordControl:{m_oLogicDocument: targetDocContent}, FontLoader: {}}, false, false, true, true);
+				var newFonts;
 				
 				if(onlyFromLocalStorage)
 					node = this.lStorage.htmlInShape ? this.lStorage.htmlInShape : this.lStorage;
+				
+				oPasteProcessor._Prepeare_recursive(node, true);
+				
+				oPasteProcessor.aContent = [];
+                 
+				newFonts = this._convertFonts(oPasteProcessor.oFonts);
+				
+				worksheet._loadFonts(newFonts, function () {
 					
-				oPasteProcessor._Execute(node, {}, true, true, false);
-				
-				targetDocContent.Remove(1, true, true);
-				
-				oPasteProcessor.InsertInPlace(targetDocContent , oPasteProcessor.aContent);
-				
-				worksheet.objectRender.controller.startRecalculate();
-				
-				//targetDocContent.Parent.parent.recalculate();
-				
-				/*if(onlyFromLocalStorage)
+					oPasteProcessor._Execute(node, {}, true, true, false);
+					
+					targetDocContent.Remove(1, true, true);
+					
+					oPasteProcessor.InsertInPlace(targetDocContent , oPasteProcessor.aContent);
+					
+					worksheet.objectRender.controller.startRecalculate();
+					
+					window.GlobalPasteFlag = false;
+					window.GlobalPasteFlagCounter = 0;
+				})				
+			},
+			
+			_convertFonts: function(oFonts)
+			{
+				var newFonts = {};
+				var fontName;
+				for(var i in oFonts)
 				{
-					if(t.lStorage && t.lStorage.htmlInShape)
-						worksheet.objectRender.controller.curState.textObject.txBody.insertHtml(t.lStorage.htmlInShape);
-				}
-				else
-					worksheet.objectRender.controller.curState.textObject.txBody.insertHtml(node);*/
-				window.GlobalPasteFlag = false;
-				window.GlobalPasteFlagCounter = 0;
+					fontName = oFonts[i].Name;
+					fontName = this._checkFonts(fontName);
+					newFonts[fontName] = 1;
+				};
+				return newFonts;
 			},
 			
             _editorPasteExec: function (worksheet, node, isText,onlyFromLocalStorage)
