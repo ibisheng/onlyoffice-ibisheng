@@ -1479,7 +1479,7 @@
 				 return newArr;
 			},
 			
-			_pasteFromBinary: function(worksheet, node, onlyFromLocalStorage)
+			_pasteFromBinary: function(worksheet, node, onlyFromLocalStorage, isIntoShape)
 			{
 				var base64 = null, base64FromWord = null, t = this;
 				
@@ -1540,7 +1540,7 @@
 					if (pasteData) {
 						History.TurnOn();
 						if(pasteData.Drawings && pasteData.Drawings.length)
-							t._insertImagesFromBinary(worksheet, pasteData);
+							t._insertImagesFromBinary(worksheet, pasteData, isIntoShape);
 						else {
 							var newFonts = {};
 							pasteData.generateFontMap(newFonts);
@@ -1709,7 +1709,7 @@
 				//****binary****
 				if(copyPasteUseBinary)
 				{
-					binaryResult = this._pasteFromBinary(worksheet, node, onlyFromLocalStorage);
+					binaryResult = this._pasteFromBinary(worksheet, node, onlyFromLocalStorage, isIntoShape);
 					
 					if(binaryResult === true)
 						return;
@@ -3087,10 +3087,10 @@
 				return true;
 			},
 			
-			_insertImagesFromBinary: function(ws, data)
+			_insertImagesFromBinary: function(ws, data, isIntoShape)
 			{
 				var activeRange = ws.activeRange;
-				var curCol, drawingObject, curRow, startCol, startRow, xfrm, aImagesSync = [];
+				var curCol, drawingObject, curRow, startCol, startRow, xfrm, aImagesSync = [], activeRow, activeCol;
 
 				History.Create_NewPoint();
 				History.StartTransaction();
@@ -3148,9 +3148,17 @@
 
 					CheckSpPrXfrm(drawingObject.graphicObject);
 					xfrm = drawingObject.graphicObject.spPr.xfrm;
-
-					curCol = xfrm.offX - startCol + ws.objectRender.convertMetric(ws.cols[activeRange.c1].left - ws.getCellLeft(0, 1), 1, 3);
-					curRow = xfrm.offY - startRow + ws.objectRender.convertMetric(ws.rows[activeRange.r1].top  - ws.getCellTop(0, 1), 1, 3);
+					
+					activeRow = activeRange.r1;
+					activeCol = activeRange.c1;
+					if(isIntoShape && isIntoShape.Parent &&  isIntoShape.Parent.parent && isIntoShape.Parent.parent.drawingBase && isIntoShape.Parent.parent.drawingBase.from)
+					{
+						activeRow = isIntoShape.Parent.parent.drawingBase.from.row;
+						activeCol = isIntoShape.Parent.parent.drawingBase.from.col;
+					};
+					
+					curCol = xfrm.offX - startCol + ws.objectRender.convertMetric(ws.cols[activeCol].left - ws.getCellLeft(0, 1), 1, 3);
+					curRow = xfrm.offY - startRow + ws.objectRender.convertMetric(ws.rows[activeRow].top  - ws.getCellTop(0, 1), 1, 3);
 					
 					xfrm.setOffX(curCol);
 					xfrm.setOffY(curRow);
