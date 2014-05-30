@@ -1657,13 +1657,21 @@
 					
 					targetDocContent.Remove(1, true, true);
 					
+					if(!oPasteProcessor.aContent || !oPasteProcessor.aContent.length)
+						return;
+						
 					oPasteProcessor.InsertInPlace(targetDocContent , oPasteProcessor.aContent);
 					
 					worksheet.objectRender.controller.startRecalculate();
 					
 					window.GlobalPasteFlag = false;
 					window.GlobalPasteFlagCounter = 0;
-				})				
+				})
+				
+				if(!oPasteProcessor.aContent || !oPasteProcessor.aContent.length)
+					return false;
+				else 
+					return true;
 			},
 			
 			_convertFonts: function(oFonts)
@@ -1693,8 +1701,9 @@
 				var isIntoShape = worksheet.objectRender.controller.getTargetDocContent();
 				if(isIntoShape)
 				{
-					this._pasteInShape(worksheet, node, onlyFromLocalStorage, isIntoShape);
-					return;
+					var resultPasteInShape = this._pasteInShape(worksheet, node, onlyFromLocalStorage, isIntoShape);
+					if(resultPasteInShape == true)
+						return;
 				};
 				
 				//****binary****
