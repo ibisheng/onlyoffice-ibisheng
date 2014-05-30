@@ -102,7 +102,14 @@ Date.prototype.addYears = function ( counts ) {
 };
 
 Date.prototype.addMonths = function ( counts ) {
-    this.setUTCMonth( this.getUTCMonth() + counts );
+    if( this.lastDayOfMonth() ){
+        this.setUTCDate(1);
+        this.setUTCMonth( this.getUTCMonth() + counts );
+        this.setUTCDate(this.getDaysInMonth());
+    }
+    else{
+        this.setUTCMonth( this.getUTCMonth() + counts );
+    }
 };
 
 Date.prototype.addDays = function ( counts ) {
@@ -3875,7 +3882,7 @@ function matching( x, y, oper ) {
     return res;
 }
 
-function GetDiffDate360( nDay1, nMonth1, nYear1, bLeapYear1, nDay2, nMonth2, nYear2, bUSAMethod ) {
+function GetDiffDate360( nDay1, nMonth1, nYear1, nDay2, nMonth2, nYear2, bUSAMethod ) {
     var nDayDiff;
     var startTime = new Date( nYear1, nMonth1-1, nDay1 ),
         endTime = new Date( nYear2, nMonth2-1, nDay2 ),
@@ -3902,7 +3909,7 @@ function GetDiffDate360( nDay1, nMonth1, nYear1, bLeapYear1, nDay2, nMonth2, nYe
                 }
             }
         }
-        nDayDiff = ( nYear2 - nYear1 ) * 360 + ( nMonth2 - nMonth1 ) * 30 + ( nDay2 - nDay1 );
+//        nDayDiff = ( nYear2 - nYear1 ) * 360 + ( nMonth2 - nMonth1 ) * 30 + ( nDay2 - nDay1 );
     }
     else {
         if ( nDay1 == 31 ) {
@@ -3911,8 +3918,8 @@ function GetDiffDate360( nDay1, nMonth1, nYear1, bLeapYear1, nDay2, nMonth2, nYe
         if ( nDay2 == 31 ) {
             nDay2--;
         }
-        nDayDiff = ( nYear2 - nYear1 ) * 360 + ( nMonth2 - nMonth1 ) * 30 + ( nDay2 - nDay1 );
     }
+    nDayDiff = ( nYear2 - nYear1 ) * 360 + ( nMonth2 - nMonth1 ) * 30 + ( nDay2 - nDay1 );
     return nDayDiff;
 }
 

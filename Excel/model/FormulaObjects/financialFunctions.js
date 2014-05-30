@@ -201,7 +201,7 @@ function getcoupdays( settl, matur, frequency, basis ) {
         n.addMonths( 12 / frequency );
         return diffDate( m, n, basis );
     }
-    return daysInYear( 0, basis ) / frequency;
+    return new cNumber( daysInYear( 0, basis ) / frequency );
 }
 
 function getcoupnum( settl, matur, frequency ) {
@@ -347,16 +347,16 @@ function oddFPrice(settl,matur,iss,firstCoup,rate,yld,redemption,frequency,basis
         return newDate;
     }
 
-    function coupNumber( mat, settl, numMonths, isWholeNumber ) {
-        var my = mat.getUTCFullYear(), mm = mat.getUTCMonth(), md = mat.getUTCDate(),
-            endOfMonthTemp = mat.lastDayOfMonth(),
-            endOfMonth = (!endOfMonthTemp && mm != 1 && md > 28 && md < new Date( my, mm ).getDaysInMonth()) ? settl.lastDayOfMonth() : endOfMonthTemp,
-            startDate = addMonth( settl, 0, endOfMonth ),
-            coupons = (isWholeNumber - 0) + (settl < startDate),
-            frontDate = addMonth( startDate, numMonths, endOfMonth );
+    function coupNumber( startDate, endDate, countMonths, isWholeNumber ) {
+        var my = startDate.getUTCFullYear(), mm = startDate.getUTCMonth(), md = startDate.getUTCDate(),
+            endOfMonthTemp = startDate.lastDayOfMonth(),
+            endOfMonth = (!endOfMonthTemp && mm != 1 && md > 28 && md < new Date( my, mm ).getDaysInMonth()) ? endDate.lastDayOfMonth() : endOfMonthTemp,
+            startDate = addMonth( endDate, 0, endOfMonth ),
+            coupons = (isWholeNumber - 0) + (endDate < startDate),
+            frontDate = addMonth( startDate, countMonths, endOfMonth );
 
-        while ( !(numMonths > 0 ? frontDate >= endDate : frontDate <= endDate) ) {
-            frontDate = addMonth( frontDate, numMonths, endOfMonth );
+        while ( !(countMonths > 0 ? frontDate >= endDate : frontDate <= endDate) ) {
+            frontDate = addMonth( frontDate, countMonths, endOfMonth );
             coupons++;
         }
 
@@ -366,7 +366,7 @@ function oddFPrice(settl,matur,iss,firstCoup,rate,yld,redemption,frequency,basis
 
     var res = 0, DSC,
         numMonths = 12 / frequency,
-        numMonthsNeg = -numMonths,
+        numMonthsNeg = - numMonths,
         E = getcoupdays( settl, new Date( firstCoup ), frequency, basis ).getValue(),
         coupNums = getcoupnum( settl, new Date( matur ), frequency ),
         dfc = positiveDaysBetween( new Date( iss ), new Date( firstCoup ), basis );
@@ -598,26 +598,72 @@ cACCRINT.prototype.Calculate = function ( arg ) {
     if ( basis instanceof cError ) return this.value = basis;
     if ( calcMethod instanceof cError ) return this.value = calcMethod;
 
-    var _arg5 = frequency.getValue();
+    issue = issue.getValue();
+    firstInterest = firstInterest.getValue();
+    settlement = settlement.getValue();
+    rate = rate.getValue();
+    par = par.getValue();
+    frequency = frequency.getValue();
+    basis = basis.getValue();
+    calcMethod = calcMethod.toBool();
 
-    if ( issue.getValue() >= settlement.getValue() || rate.getValue() <= 0 || par.getValue() <= 0 || basis.getValue() < 0 || basis.getValue() > 4 || (_arg5 != 1 && _arg5 != 2 && _arg5 != 4) ) {
+    if ( issue >= settlement || rate <= 0 || par <= 0 ||
+         basis < 0 || basis > 4 || (frequency != 1 && frequency != 2 && frequency != 4) ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
-    var res;
-    /*if ( settlement.getValue()>firstInterest.getValue() ){
-        res = calcMethod.toBool() ?
-            yearFrac( Date.prototype.getDateFromExcel( firstInterest.getValue() ), Date.prototype.getDateFromExcel( settlement.getValue() ), basis.getValue() ):
-            yearFrac( Date.prototype.getDateFromExcel( issue.getValue() ), Date.prototype.getDateFromExcel( settlement.getValue() ), basis.getValue() );
-
-    }
-    else*/{
-        res = yearFrac( Date.prototype.getDateFromExcel( issue.getValue() ), Date.prototype.getDateFromExcel( settlement.getValue() ), basis.getValue() );
+    function addMonth( orgDate, numMonths, returnLastDay ) {
+        var newDate = new Date( orgDate );
+        newDate.addMonths( numMonths );
+        if ( returnLastDay ) {
+            newDate.setUTCDate( newDate.getDaysInMonth() );
+        }
+        return newDate;
     }
 
+    var iss = Date.prototype.getDateFromExcel( issue ),
+        fInter = Date.prototype.getDateFromExcel( firstInterest ),
+        settl = Date.prototype.getDateFromExcel( settlement ),
+        numMonths = 12 / frequency, numMonthsNeg = - numMonths, endMonth = fInter.lastDayOfMonth(),
+        coupPCD, firstDate, startDate, endDate, res, days, coupDays;
 
-    res *= par.getValue() * rate.getValue();
+    if(settl > fInter && calcMethod){
+        coupPCD = new Date( fInter );
+        endDate = new Date( settl );
 
+        while ( !(numMonths > 0 ? coupPCD >= endDate : coupPCD <= endDate) ) {
+            endDate = coupPCD;
+            startDate = addMonth( coupPCD, numMonths, endMonth );
+        }
+
+    }
+    else{
+        coupPCD = addMonth( fInter, numMonthsNeg, endMonth );
+    }
+
+    firstDate = iss > coupPCD ? iss : coupPCD;
+    days = days360( firstDate, settl, basis );
+    coupDays = getcoupdays( coupPCD, fInter, frequency, basis ).getValue();
+    res = days / coupDays;
+    startDate = coupPCD;
+    endDate = iss;
+
+    while( !( numMonthsNeg > 0 ? startDate >= iss : startDate <= iss ) ) {
+        endDate = startDate;
+        startDate = addMonth( startDate, numMonthsNeg, endMonth );
+        firstDate = iss > startDate ? iss : startDate;
+        if( basis == DayCountBasis.UsPsa30_360 ){
+            days = days360( firstDate, endDate, !( iss > startDate ) );
+            coupDays = getcoupdays( startDate, endDate, frequency, basis ).getValue();
+        }
+        else{
+            days = diffDate( firstDate, endDate, basis ).getValue();
+            coupDays = ( basis == DayCountBasis.Actual365 ) ? ( 365 / frequency ) : diffDate( startDate, endDate, basis ).getValue();
+        }
+
+        res += (iss <= startDate) ? calcMethod : days / coupDays;
+    }
+    res *= par * rate / frequency;
     return this.value = new cNumber( res );
 };
 cACCRINT.prototype.getInfo = function () {
@@ -4982,7 +5028,7 @@ cTBILLEQ.prototype.Calculate = function ( arg ) {
     var date1 = d1.getUTCDate(), month1 = d1.getUTCMonth(), year1 = d1.getUTCFullYear(),
         date2 = d2.getUTCDate(), month2 = d2.getUTCMonth(), year2 = d2.getUTCFullYear();
 
-    var nDiff = GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, true );
+    var nDiff = GetDiffDate360( date1, month1, year1, date2, month2, year2, true );
 
     if ( settlement.getValue() >= maturity.getValue() || discount.getValue() <= 0 || nDiff > 360 )
         return this.value = new cError( cErrorType.not_numeric );
@@ -5138,7 +5184,7 @@ cTBILLYIELD.prototype.Calculate = function ( arg ) {
     var date1 = d1.getUTCDate(), month1 = d1.getUTCMonth(), year1 = d1.getUTCFullYear(),
         date2 = d2.getUTCDate(), month2 = d2.getUTCMonth(), year2 = d2.getUTCFullYear();
 
-    var nDiff = GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, true );
+    var nDiff = GetDiffDate360( date1, month1, year1, date2, month2, year2, true );
     nDiff++;
     if ( settlement.getValue() >= maturity.getValue() || pr.getValue() <= 0 || nDiff > 360 )
         return this.value = new cError( cErrorType.not_numeric );
