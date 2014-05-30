@@ -202,7 +202,8 @@ var c_oSerProp_rPrType = {
 	LangBidi: 26,
 	LangEA: 27,
 	ColorTheme: 28,
-	Shd: 29
+	Shd: 29,
+	Vanish: 30
 };
 var c_oSerProp_rowPrType = {
     CantSplit:0,
@@ -1796,6 +1797,12 @@ function Binary_rPrWriter(memory)
 			this.memory.WriteByte(c_oSerProp_rPrType.Shd);
             this.memory.WriteByte(c_oSerPropLenType.Variable);
             this.bs.WriteItemWithLength(function () { _this.bs.WriteShd(rPr.Shd); });
+		}
+		if(null != rPr.Vanish)
+		{
+			this.memory.WriteByte(c_oSerProp_rPrType.Vanish);
+            this.memory.WriteByte(c_oSerPropLenType.Byte);
+            this.memory.WriteBool(rPr.Vanish);
 		}
     };
 };
@@ -6238,6 +6245,9 @@ function Binary_rPrReader(doc, stream)
                     rPr.Shd.Unifill = unifill;
                 else if (null != rPr.Shd.Color && !rPr.Shd.Color.Auto)
                     rPr.Shd.Unifill = CreteSolidFillRGB(rPr.Shd.Color.r, rPr.Shd.Color.g, rPr.Shd.Color.b);
+                break;
+			case c_oSerProp_rPrType.Vanish:
+                rPr.Vanish = this.stream.GetBool();
                 break;
             default:
                 res = c_oSerConstants.ReadUnknown;
