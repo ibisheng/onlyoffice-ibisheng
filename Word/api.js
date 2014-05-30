@@ -1616,27 +1616,27 @@ asc_docs_api.prototype.asc_coAuthoringChatSendMessage = function(message)
     if (!this.CoAuthoringApi)
         return; // Error
     this.CoAuthoringApi.sendMessage(message);
-}
+};
 // get chart messages, возвращается массив CChatMessage
 asc_docs_api.prototype.asc_coAuthoringChatGetMessages = function()
 {
     if (!this.CoAuthoringApi)
 		return; // Error
 	this.CoAuthoringApi.getMessages();
-}
+};
 // get users, возвращается массив users
 asc_docs_api.prototype.asc_coAuthoringGetUsers = function()
 {
     if (!this.CoAuthoringApi)
 		return; // Error
 	this.CoAuthoringApi.getUsers();
-}
+};
 // server disconnect
 asc_docs_api.prototype.asc_coAuthoringDisconnect = function () {
 	if (!this.CoAuthoringApi)
 		return; // Error
 	this.CoAuthoringApi.disconnect();
-}
+};
 
 /////////////////////////////////////////////////////////////////////////
 //////////////////////////SpellChecking api//////////////////////////////

@@ -775,8 +775,7 @@
 
 
         function tryReconnect() {
-            if (reconnectTimeout)
-            {
+            if (reconnectTimeout) {
                 clearTimeout(reconnectTimeout);
             }
             attemptCount++;
@@ -877,6 +876,10 @@
 			},
 			"savePartChanges":function () {
 				docsCoApi._onSavePartChanges();
+			},
+			"drop":function(data) {
+				docsCoApi.disconnect();
+				docsCoApi.onDisconnect(data['description'], true, docsCoApi.isCloseCoAuthoring);
 			}
         };
     };
