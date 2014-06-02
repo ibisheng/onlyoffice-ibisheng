@@ -177,9 +177,7 @@ Path.prototype = {
     close: function()
     {
         this.addPathCommand({id:close});
-    }
-
-    ,
+    },
 
 
     Undo: function(data)
@@ -917,6 +915,217 @@ Path.prototype = {
             graphics._z();
             graphics.ds();
         }
+    },
+
+    isSmartLine : function()
+    {
+        if (this.ArrPathCommandInfo.length != 2)
+            return false;
+
+        if (this.ArrPathCommandInfo[0].id == moveTo && this.ArrPathCommandInfo[1].id == lineTo)
+        {
+            if (Math.abs(this.ArrPathCommandInfo[0].X - this.ArrPathCommandInfo[1].X) < 0.0001)
+                return true;
+
+            if (Math.abs(this.ArrPathCommandInfo[0].Y - this.ArrPathCommandInfo[1].Y) < 0.0001)
+                return true;
+        }
+
+        return false;
+    },
+
+    isSmartRect : function()
+    {
+        if (this.ArrPathCommandInfo.length != 5)
+            return false;
+
+        if (this.ArrPathCommandInfo[0].id != moveTo ||
+            this.ArrPathCommandInfo[1].id != lineTo ||
+            this.ArrPathCommandInfo[2].id != lineTo ||
+            this.ArrPathCommandInfo[3].id != lineTo ||
+            (this.ArrPathCommandInfo[4].id != lineTo && this.ArrPathCommandInfo[4].id != close))
+            return false;
+
+        var _float_eps = 0.0001;
+        if (Math.abs(this.ArrPathCommandInfo[0].X - this.ArrPathCommandInfo[1].X) < _float_eps)
+        {
+            if (Math.abs(this.ArrPathCommandInfo[1].Y - this.ArrPathCommandInfo[2].Y) < _float_eps)
+            {
+                if (Math.abs(this.ArrPathCommandInfo[2].X - this.ArrPathCommandInfo[3].X) < _float_eps &&
+                    Math.abs(this.ArrPathCommandInfo[3].Y - this.ArrPathCommandInfo[0].Y) < _float_eps)
+                {
+                    if (this.ArrPathCommandInfo[4].id == close)
+                        return true;
+
+                    if (Math.abs(this.ArrPathCommandInfo[0].X - this.ArrPathCommandInfo[4].X) < _float_eps &&
+                        Math.abs(this.ArrPathCommandInfo[0].Y - this.ArrPathCommandInfo[4].Y) < _float_eps)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        else if (Math.abs(this.ArrPathCommandInfo[0].Y - this.ArrPathCommandInfo[1].Y) < _float_eps)
+        {
+            if (Math.abs(this.ArrPathCommandInfo[1].X - this.ArrPathCommandInfo[2].X) < _float_eps)
+            {
+                if (Math.abs(this.ArrPathCommandInfo[2].Y - this.ArrPathCommandInfo[3].Y) < _float_eps &&
+                    Math.abs(this.ArrPathCommandInfo[3].X - this.ArrPathCommandInfo[0].X) < _float_eps)
+                {
+                    if (this.ArrPathCommandInfo[4].id == close)
+                        return true;
+
+                    if (Math.abs(this.ArrPathCommandInfo[0].X - this.ArrPathCommandInfo[4].X) < _float_eps &&
+                        Math.abs(this.ArrPathCommandInfo[0].Y - this.ArrPathCommandInfo[4].Y) < _float_eps)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    },
+
+    drawSmart : function(shape_drawer)
+    {
+        var _graphics   = shape_drawer.Graphics;
+        var _full_trans = _graphics.m_oFullTransform;
+
+        if (!_graphics || !_full_trans || undefined == _graphics.m_bIntegerGrid)
+            return this.draw(shape_drawer);
+
+        var bIsTransformed = (_full_trans.shx == 0 && _full_trans.shy == 0) ? false : true;
+
+        if (bIsTransformed)
+            return this.draw(shape_drawer);
+
+        var isLine = this.isSmartLine();
+        var isRect = false;
+        if (!isLine)
+            isRect = this.isSmartRect();
+
+        if (!isLine && !isRect)
+            return this.draw(shape_drawer);
+
+        var _old_int = _graphics.m_bIntegerGrid;
+
+        if (false == _old_int)
+            _graphics.SetIntegerGrid(true);
+
+        var dKoefMMToPx = Math.max(_graphics.m_oCoordTransform.sx, 0.001);
+
+        var _ctx = _graphics.m_oContext;
+        var bIsStroke = (shape_drawer.bIsNoStrokeAttack || (this.stroke !== true)) ? false : true;
+        var bIsEven = false;
+        if (bIsStroke)
+        {
+            var _lineWidth = Math.max((shape_drawer.StrokeWidth * dKoefMMToPx + 0.5) >> 0, 1);
+            _ctx.lineWidth = _lineWidth;
+
+            if (_lineWidth & 0x01 == 0x01)
+                bIsEven = true;
+        }
+
+        var bIsDrawLast = false;
+        var path = this.ArrPathCommand;
+        shape_drawer._s();
+
+        if (!isRect)
+        {
+            for(var j = 0, l = path.length; j < l; ++j)
+            {
+                var cmd=path[j];
+                switch(cmd.id)
+                {
+                    case moveTo:
+                    {
+                        bIsDrawLast = true;
+
+                        var _x = (_full_trans.TransformPointX(cmd.X, cmd.Y)) >> 0;
+                        var _y = (_full_trans.TransformPointY(cmd.X, cmd.Y)) >> 0;
+                        if (bIsEven)
+                        {
+                            _x -= 0.5;
+                            _y -= 0.5;
+                        }
+                        _ctx.moveTo(_x, _y);
+                        break;
+                    }
+                    case lineTo:
+                    {
+                        bIsDrawLast = true;
+
+                        var _x = (_full_trans.TransformPointX(cmd.X, cmd.Y)) >> 0;
+                        var _y = (_full_trans.TransformPointY(cmd.X, cmd.Y)) >> 0;
+                        if (bIsEven)
+                        {
+                            _x -= 0.5;
+                            _y -= 0.5;
+                        }
+                        _ctx.lineTo(_x, _y);
+                        break;
+                    }
+                    case close:
+                    {
+                        _ctx.closePath();
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            var minX = 100000;
+            var minY = 100000;
+            var maxX = -100000;
+            var maxY = -100000;
+            bIsDrawLast = true;
+            for(var j = 0, l = path.length; j < l; ++j)
+            {
+                var cmd=path[j];
+                switch(cmd.id)
+                {
+                    case moveTo:
+                    case lineTo:
+                    {
+                        if (minX > cmd.X)
+                            minX = cmd.X;
+                        if (minY > cmd.Y)
+                            minY = cmd.Y;
+
+                        if (maxX < cmd.X)
+                            maxX = cmd.X;
+                        if (maxY < cmd.Y)
+                            maxY = cmd.Y;
+
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+
+            var _x1 = (_full_trans.TransformPointX(minX, minY)) >> 0;
+            var _y1 = (_full_trans.TransformPointY(minX, minY)) >> 0;
+            var _x2 = (_full_trans.TransformPointX(maxX, maxY)) >> 0;
+            var _y2 = (_full_trans.TransformPointY(maxX, maxY)) >> 0;
+
+            if (bIsEven)
+                _ctx.rect(_x1 + 0.5, _y1 + 0.5, _x2 - _x1, _y2 - _y1);
+            else
+                _ctx.rect(_x1, _y1, _x2 - _x1, _y2 - _y1);
+        }
+
+        if (bIsDrawLast)
+        {
+            shape_drawer.drawFillStroke(true, this.fill, bIsStroke);
+        }
+
+        shape_drawer._e();
+
+        if (false == _old_int)
+            _graphics.SetIntegerGrid(false);
     }
 };
 
