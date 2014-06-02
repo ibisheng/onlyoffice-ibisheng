@@ -4679,6 +4679,7 @@ function Result() {
 	this.heigth = null;
 	this.id = null;
 	this.idNext = null;
+	this.hiddenRows = null;
 }
 Result.prototype.clone = function() {
 	var res = new Result();
@@ -4688,6 +4689,7 @@ Result.prototype.clone = function() {
 	res.heigth = this.heigth;
 	res.id = this.id;
 	res.idNext = this.idNext;
+	res.hiddenRows = this.hiddenRows;
 	
 	return res;
 };
