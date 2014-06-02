@@ -1822,7 +1822,7 @@ asc_docs_api.prototype.onSaveCallback = function (e) {
 		// Если не автосохранение, то продолжаем показывать Block-сообщение
 		if (!t.isAutoSave)
 			t.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
-		editor.processSavedFile("", true);
+		t.asc_OnSaveEnd(true);
 	} else {
 		nState = t.CoAuthoringApi.get_state();
 		if (3 === nState) {

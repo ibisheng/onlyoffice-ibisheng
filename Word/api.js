@@ -2739,7 +2739,7 @@ function OnSave_Callback(e)
 		// Если не автосохранение, то продолжаем показывать Block-сообщение
 		if (!editor.isAutoSave)
 			editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
-		editor.processSavedFile("", true);
+		editor.asc_OnSaveEnd(true);
     } else {
 		nState = editor.CoAuthoringApi.get_state();
 		if (3 === nState) {

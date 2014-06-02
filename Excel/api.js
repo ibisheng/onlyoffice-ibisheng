@@ -1906,7 +1906,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					// Если не автосохранение, то продолжаем показывать Block-сообщение
 					if (!this.isAutoSave)
 						this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
-					this.asc_processSavedFile("", true);
+					this.asc_OnSaveEnd(true);
 				} else {
 					nState = t.CoAuthoringApi.get_state();
 					if (3 === nState) {
