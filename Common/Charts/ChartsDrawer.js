@@ -7738,7 +7738,7 @@ catAxisChart.prototype =
 					{
 						posMinorX = posX + n * minorStep;
 						
-						if(posMinorX > xPoints[xPoints.length - 1].pos || posMinorX < xPoints[0].pos)
+						if(posMinorX > xPoints[xPoints.length - 1].pos)
 							break;
 						
 						if(!this.paths.minorTickMarks)
@@ -7900,11 +7900,12 @@ valAxisChart.prototype =
 	
 	_calculateTickMark : function()
 	{
-		var widthLine, widthMinorLine;
+		var widthLine = 0, widthMinorLine = 0;
 		switch ( this.chartSpace.chart.plotArea.valAx.majorTickMark )
 		{
 			case TICK_MARK_CROSS:
 			{
+				widthLine = 0;
 				break;
 			}
 			case TICK_MARK_IN:
@@ -7928,6 +7929,7 @@ valAxisChart.prototype =
 		{
 			case TICK_MARK_CROSS:
 			{
+				widthMinorLine = 3;
 				break;
 			}
 			case TICK_MARK_IN:
