@@ -1591,6 +1591,8 @@ CAbstractNum.prototype =
                 break;
             }
         }
+        
+        
 
         return Writer;
     },
@@ -1612,6 +1614,7 @@ CAbstractNum.prototype =
 
         var Type = Reader.GetLong();
 
+        var iLvl = 0;
         switch ( Type )
         {
             case historyitem_AbstractNum_LvlChange:
@@ -1619,7 +1622,7 @@ CAbstractNum.prototype =
                 // Long     : iLvl
                 // Variable : Lvl
 
-                var iLvl = Reader.GetLong();
+                iLvl = Reader.GetLong();
                 this.Read_Lvl_FromBinary( this.Lvl[iLvl], Reader );
 
                 break;
@@ -1630,13 +1633,16 @@ CAbstractNum.prototype =
                 // Long     : iLvl
                 // Vairable : TextPr
 
-                var iLvl = Reader.GetLong();
+                iLvl = Reader.GetLong();
                 this.Lvl[iLvl].TextPr = new CTextPr();
                 this.Lvl[iLvl].TextPr.Read_FromBinary(Reader);
 
                 break;
             }
         }
+
+        // Пересчитываем стили у все параграфов с данной нумерацией
+        this.Recalc_CompiledPr(iLvl);
     },
 
     Write_ToBinary2 : function(Writer)
@@ -1669,6 +1675,26 @@ CAbstractNum.prototype =
     Load_LinkData : function(LinkData)
     {
 
+    },
+    
+    Recalc_CompiledPr : function(iLvl)
+    {
+        // Ищем все параграфы, который используют данную нумерацию и проставляем у них, то что их стиль 
+        // нужно перекомпилировать.
+        
+        var NumPr = new CNumPr();
+        NumPr.NumId = this.Id;
+        NumPr.Lvl   = iLvl;
+
+        var LogicDocument = editor.WordControl.m_oLogicDocument;
+        var AllParagraphs = LogicDocument.Get_AllParagraphs_ByNumbering( NumPr );
+
+        var Count = AllParagraphs.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var Para = AllParagraphs[Index];
+            Para.Recalc_CompiledPr();
+        }
     },
 	
 	//сравниваем abstractNum

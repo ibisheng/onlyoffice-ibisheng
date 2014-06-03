@@ -223,7 +223,7 @@ Paragraph.prototype =
         // Копируем настройки
         Para.Set_Pr(this.Pr.Copy());
 
-        Para.TextPr.Set_Value( this.TextPr.Value );
+        Para.TextPr.Set_Value( this.TextPr.Value.Copy() );
 
         // Удаляем содержимое нового параграфа
         Para.Internal_Content_Remove2(0, Para.Content.length);
@@ -11364,14 +11364,14 @@ Paragraph.prototype =
 
                 // Подправим селект. Заметим, что метки выделения изменяются внутри функции Internal_Content_Add 
                 // за счет того, что EndPos - StartPos > 1.
-                if ( this.Selection.StartPos < this.Selection.EndPos && true === this.Content[this.Selection.StartPos].Selection_IsEmpty() )
+                if ( this.Selection.StartPos < this.Selection.EndPos && true === this.Content[this.Selection.StartPos].Selection_IsEmpty(true) )
                     this.Selection.StartPos++;
-                else if ( this.Selection.EndPos < this.Selection.StartPos && true === this.Content[this.Selection.EndPos].Selection_IsEmpty() )
+                else if ( this.Selection.EndPos < this.Selection.StartPos && true === this.Content[this.Selection.EndPos].Selection_IsEmpty(true) )
                     this.Selection.EndPos++;
 
-                if ( this.Selection.StartPos < this.Selection.EndPos && true === this.Content[this.Selection.EndPos].Selection_IsEmpty() )
+                if ( this.Selection.StartPos < this.Selection.EndPos && true === this.Content[this.Selection.EndPos].Selection_IsEmpty(true) )
                     this.Selection.EndPos--;
-                else if ( this.Selection.EndPos < this.Selection.StartPos && true === this.Content[this.Selection.StartPos].Selection_IsEmpty() )
+                else if ( this.Selection.EndPos < this.Selection.StartPos && true === this.Content[this.Selection.StartPos].Selection_IsEmpty(true) )
                     this.Selection.StartPos--;                    
             }
         }
@@ -13764,12 +13764,18 @@ Paragraph.prototype =
                 StartPos = this.Selection.EndPos;
                 EndPos   = this.Selection.StartPos;
             }
+            
+            if ( true === this.Selection_IsFromStart() && true === this.Selection_CheckParaEnd() )
+            {
+                DocContent.Add( new CSelectedElement( this.Copy(this.Parent), true ) );
+                return;
+            }
 
             var Para = new Paragraph(this.DrawingDocument, this.Parent, 0, 0, 0, 0, 0);
 
             // Копируем настройки
             Para.Set_Pr(this.Pr.Copy());
-            Para.TextPr.Set_Value( this.TextPr.Value );
+            Para.TextPr.Set_Value( this.TextPr.Value.Copy() );
 
             // Копируем содержимое параграфа
             for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
