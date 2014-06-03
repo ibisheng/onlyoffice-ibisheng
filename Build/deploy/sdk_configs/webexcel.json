@@ -117,6 +117,7 @@
                 "../../Common/Drawings/Format/ChartFormat.js",
                 "../../Common/Drawings/Format/TextBody.js",
                 "../../Common/Drawings/CommonController.js",
+				"../../Common/wordcopypaste.js",
                 "../../Excel/view/DrawingObjectsController.js",
 
                 "../../Excel/model/DrawingObjects/Graphics.js",
