@@ -228,29 +228,144 @@ var g_oStandartColors = [
     {R: 0x70, G: 0x30, B: 0xA0}
 ];
 
-var g_oThemeColorsDefaultMods = [
-    {lumMod: 20000, lumOff: 80000},
-    {lumMod: 40000, lumOff: 60000},
-    {lumMod: 60000, lumOff: 40000},
-    {lumMod: 75000},
-    {lumMod: 50000}
+var g_oThemeColorsDefaultModsWord = [
+    [
+        { name : "shade", val : 0xF2 },
+        { name : "shade", val : 0xD9 },
+        { name : "shade", val : 0xBF },
+        { name : "shade", val : 0xA6 },
+        { name : "shade", val : 0x80 }
+    ],
+    [
+        { name : "shade", val : 0xE6 },
+        { name : "shade", val : 0xBF },
+        { name : "shade", val : 0x80 },
+        { name : "shade", val : 0x40 },
+        { name : "shade", val : 0x1A }
+    ],
+    [
+        { name : "tint", val : 0x33 },
+        { name : "tint", val : 0x66 },
+        { name : "tint", val : 0x99 },
+        { name : "shade", val : 0xBF },
+        { name : "shade", val : 0x80 }
+    ],
+    [
+        { name : "tint", val : 0x1A },
+        { name : "tint", val : 0x40 },
+        { name : "tint", val : 0x80 },
+        { name : "tint", val : 0xBF },
+        { name : "tint", val : 0xE6 }
+    ],
+    [
+        { name : "tint", val : 0x80 },
+        { name : "tint", val : 0xA6 },
+        { name : "tint", val : 0xBF },
+        { name : "tint", val : 0xD9 },
+        { name : "tint", val : 0xF2 }
+    ]
 ];
 
-var g_oThemeColorsDefaultMods1 = [
-    {lumMod: 95000},
-    {lumMod: 85000},
-    {lumMod: 75000},
-    {lumMod: 65000},
-    {lumMod: 50000}
+var g_oThemeColorsDefaultModsPowerPoint = [
+    [
+        { lumMod : 95000, lumOff : -1 },
+        { lumMod : 85000, lumOff : -1 },
+        { lumMod : 75000, lumOff : -1 },
+        { lumMod : 65000, lumOff : -1 },
+        { lumMod : 50000, lumOff : -1 }
+    ],
+    [
+        { lumMod : 90000, lumOff : -1 },
+        { lumMod : 75000, lumOff : -1 },
+        { lumMod : 50000, lumOff : -1 },
+        { lumMod : 25000, lumOff : -1 },
+        { lumMod : 10000, lumOff : -1 }
+    ],
+    [
+        { lumMod : 20000, lumOff : 80000 },
+        { lumMod : 40000, lumOff : 60000 },
+        { lumMod : 60000, lumOff : 40000 },
+        { lumMod : 75000, lumOff : -1 },
+        { lumMod : 50000, lumOff : -1 }
+    ],
+    [
+        { lumMod : 10000, lumOff : 90000 },
+        { lumMod : 25000, lumOff : 75000 },
+        { lumMod : 50000, lumOff : 50000 },
+        { lumMod : 75000, lumOff : 25000 },
+        { lumMod : 90000, lumOff : 10000 }
+    ],
+    [
+        { lumMod : 50000, lumOff : 50000 },
+        { lumMod : 65000, lumOff : 35000 },
+        { lumMod : 75000, lumOff : 25000 },
+        { lumMod : 85000, lumOff : 15000 },
+        { lumMod : 90000, lumOff : 5000 }
+    ]
 ];
 
-var g_oThemeColorsDefaultMods2 = [
-    {lumMod: 50000, lumOff: 50000},
-    {lumMod: 65000, lumOff: 35000},
-    {lumMod: 75000, lumOff: 25000},
-    {lumMod: 85000, lumOff: 15000},
-    {lumMod: 95000, lumOff: 5000}
-];
+/* 0..4 */
+function GetDefaultColorModsIndex(r, g, b)
+{
+    var L = (Math.max(r, Math.max(g, b)) + Math.min(r, Math.min(g, b))) / 2;
+    L /= 255;
+    if (L == 1)
+        return 0;
+    if (L >= 0.8)
+        return 1;
+    if (L >= 0.2)
+        return 2;
+    if (L > 0)
+        return 3;
+    return 4;
+}
+
+/* 0 - ppt, 1 - word, 2 - excel */
+function GetDefaultMods(r, g, b, pos, editor_id)
+{
+    if (pos < 1 || pos > 5)
+        return [];
+
+    var index = GetDefaultColorModsIndex(r, g, b);
+
+    if (editor_id == 0)
+    {
+        var _obj = g_oThemeColorsDefaultModsPowerPoint[index][pos - 1];
+        var _mods = [];
+        var _mod = null;
+
+        if (_obj.lumMod != -1)
+        {
+            _mod = new CColorMod();
+            _mod.name = "lumMod";
+            _mod.val = _obj.lumMod;
+            _mods.push(_mod);
+        }
+        if (_obj.lumOff != -1)
+        {
+            _mod = new CColorMod();
+            _mod.name = "lumOff";
+            _mod.val = _obj.lumOff;
+            _mods.push(_mod);
+        }
+
+        return _mods;
+    }
+    if (editor_id == 1)
+    {
+        var _obj = g_oThemeColorsDefaultModsWord[index][pos - 1];
+        var _mods = [];
+
+        var _mod = new CColorMod();
+        _mod.name = _obj.name;
+        _mod.val = (_obj.val * 100000 / 255) >> 0;
+        _mods.push(_mod);
+
+        return _mods;
+    }
+    // TODO: excel
+    return [];
+}
 
 var g_oUserColorScheme = new Array();
 g_oUserColorScheme[0] = {

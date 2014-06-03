@@ -367,34 +367,19 @@ function CorrectUniColor(asc_color, unicolor)
             if (ret.Mods.Mods.length != 0)
                 ret.Mods.Mods.splice(0, ret.Mods.Mods.length);
 
-            var __mods = g_oThemeColorsDefaultMods;
+            var __mods =  null;
 
             if (editor && editor.WordControl && editor.WordControl.m_oDrawingDocument && editor.WordControl.m_oDrawingDocument.GuiControlColorsMap)
             {
                 var _map = editor.WordControl.m_oDrawingDocument.GuiControlColorsMap;
-
-                var __r = _map[_id].r;
-                var __g = _map[_id].g;
-                var __b = _map[_id].b;
-
-                if (__r > 200 && __g > 200 && __b > 200)
-                    __mods = g_oThemeColorsDefaultMods1;
-                else if (__r < 40 && __g < 40 && __b < 40)
-                    __mods = g_oThemeColorsDefaultMods2;
+				__mods = GetDefaultMods(_map[_id].r, _map[_id].g, _map[_id].b, _pos, 0);
             }
-
-            if (1 <= _pos && _pos <= 5)
-            {
-                var _mods = __mods[_pos - 1];
-                var _ind = 0;
-                for (var k in _mods)
-                {
-                    ret.Mods.Mods[_ind] = new CColorMod();
-                    ret.Mods.Mods[_ind].name = k;
-                    ret.Mods.Mods[_ind].val = _mods[k];
-                    _ind++;
-                }
-            }
+			
+			if (null != __mods)
+			{
+				for (var modInd = 0; modInd < __mods.length; modInd++)
+					ret.Mods.Mods[modInd] = __mods[modInd];
+			}
 
             break;
         }
