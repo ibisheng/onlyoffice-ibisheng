@@ -810,6 +810,106 @@ ParaHyperlink.prototype =
                 return;
         }
     },
+
+    Split : function (ContentPos, Depth)
+    {
+        var NewHyperlink = new ParaHyperlink();
+        NewHyperlink.Set_Value( this.Value );
+        NewHyperlink.Set_ToolTip( this.ToolTip );
+
+        var CurPos = ContentPos.Get(Depth);
+
+        var TextPr = this.Get_TextPr(ContentPos, Depth);
+
+        // Разделяем текущий элемент (возвращается правая, отделившаяся часть, если она null, тогда заменяем
+        // ее на пустой ран с заданными настройками).
+        var NewElement = this.Content[CurPos].Split( ContentPos, Depth + 1 );
+
+        if ( null === NewElement )
+        {
+            NewElement = new ParaRun();
+            NewElement.Set_Pr( TextPr.Copy() );
+        }        
+
+        // Теперь делим на три части:
+        // 1. До элемента с номером CurPos включительно (оставляем эту часть в исходном параграфе)
+        // 2. После элемента с номером CurPos (добавляем эту часть в новый параграф)
+        // 3. Новый элемент, полученный после разделения элемента с номером CurPos, который мы
+        //    добавляем в начало нового параграфа.
+
+        var NewContent = this.Content.slice( CurPos + 1 );
+        this.Remove_FromContent( CurPos + 1, this.Content.length - CurPos - 1, false );
+
+        // Добавляем в новую гиперссылку Right элемент и NewContent
+        var Count = NewContent.length;
+        for ( var Pos = 0; Pos < Count; Pos++ )
+            NewHyperlink.Add_ToContent( Pos, NewContent[Pos], false );
+        
+        NewHyperlink.Add_ToContent( 0, NewElement, false );
+
+        return NewHyperlink;
+    },
+
+    Split2 : function(CurPos)
+    {
+        // Создаем новый ран
+        var NewRun = new ParaRun(this.Paragraph);
+
+        // Копируем настройки
+        NewRun.Set_Pr( this.Pr.Copy() );
+
+        // TODO: Как только избавимся от para_End переделать тут
+        // Проверим, если наш ран содержит para_End, тогда мы должны para_End переметить в правый ран
+
+        var CheckEndPos = -1;
+        var CheckEndPos2 = Math.min( CurPos, this.Content.length );
+        for ( var Pos = 0; Pos < CheckEndPos2; Pos++ )
+        {
+            if ( para_End === this.Content[Pos].Type )
+            {
+                CheckEndPos = Pos;
+                break;
+            }
+        }
+
+        if ( -1 !== CheckEndPos )
+            CurPos = CheckEndPos;
+
+        // Разделяем содержимое по ранам
+        NewRun.Concat_ToContent( this.Content.slice(CurPos) );
+        this.Remove_FromContent( CurPos, this.Content.length - CurPos, true );
+
+        // Если были точки орфографии, тогда переместим их в новый ран
+        var SpellingMarksCount = this.SpellingMarks.length;
+        for ( var Index = 0; Index < SpellingMarksCount; Index++ )
+        {
+            var Mark    = this.SpellingMarks[Index];
+            var MarkPos = ( true === Mark.Start ? Mark.Element.StartPos.Get(Mark.Depth) : Mark.Element.EndPos.Get(Mark.Depth) );
+
+            if ( MarkPos >= CurPos )
+            {
+                var MarkElement = Mark.Element;
+                if ( true === Mark.Start )
+                {
+                    MarkElement.ClassesS[Mark.Depth]       = NewRun;
+                    MarkElement.StartPos.Data[Mark.Depth] -= CurPos;
+                }
+                else
+                {
+                    MarkElement.ClassesE[Mark.Depth]     = NewRun;
+                    MarkElement.EndPos.Data[Mark.Depth] -= CurPos;
+                }
+
+                NewRun.SpellingMarks.push( Mark );
+
+                this.SpellingMarks.splice( Index, 1 );
+                SpellingMarksCount--;
+                Index--;
+            }
+        }
+
+        return NewRun;
+    },
 //-----------------------------------------------------------------------------------
 // Функции пересчета
 //-----------------------------------------------------------------------------------
@@ -1117,7 +1217,7 @@ ParaHyperlink.prototype =
         {
             this.Content[CurPos].Shift_Range(Dx, Dy, _CurLine, _CurRange);
         }
-    },
+    },        
 //-----------------------------------------------------------------------------------
 // Функции отрисовки
 //-----------------------------------------------------------------------------------

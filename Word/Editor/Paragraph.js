@@ -5243,6 +5243,11 @@ Paragraph.prototype =
 
         var Line  = ParaPos.Line;
         var Range = ParaPos.Range;
+        
+        // TODO: Отключаем это ускорение в таблицах, т.к. в таблицах и так есть свое ускорение. Но можно и это ускорение 
+        // подключить, для этого надо проверять изменились ли MinMax ширины и набираем ли мы в строке заголовков.
+        if ( undefined === this.Parent || true === this.Parent.Is_TableCellContent() )
+            return -1;
 
         // Если мы находимся в строке, которая была полностью перенесена из-за обтекания,  и мы добавляем пробел, или
         // удаляем символ, тогда нам запускать обычный пересчет, т.к. первое слово может начать убираться в промежутках
@@ -8258,7 +8263,7 @@ Paragraph.prototype =
 
                 for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
                 {
-                    this.Content[CurPos].Apply_TextPr( undefined, bIncrease, false );
+                    this.Content[CurPos].Apply_TextPr( undefined, bIncrease, true );
                 }
             }
             else
@@ -16978,121 +16983,68 @@ Paragraph.prototype =
     // Разделяем данный параграф
     Split : function(NewParagraph, Pos)
     {
-        if ( true !== Debug_ParaRunMode )
+        NewParagraph.DeleteCommentOnRemove = false;
+        this.DeleteCommentOnRemove         = false;
+
+        // Обнулим селект и курсор
+        this.Selection_Remove();
+        NewParagraph.Selection_Remove();
+
+        // Переносим контент, идущий с текущей позиции в параграфе и до конца параграфа,
+        // в новый параграф.
+
+        var ContentPos = this.Get_ParaContentPos(false, false);
+        var CurPos = ContentPos.Get(0);
+
+        var TextPr = this.Get_TextPr(ContentPos);
+
+        // Разделяем текущий элемент (возвращается правая, отделившаяся часть, если она null, тогда заменяем
+        // ее на пустой ран с заданными настройками).
+        var NewElement = this.Content[CurPos].Split( ContentPos, 1 );
+
+        if ( null === NewElement )
         {
-            if ( "undefined" === typeof(Pos) || null === Pos )
-                Pos = this.CurPos.ContentPos;
-
-            // Копируем контент, начиная с текущей позиции в параграфе до конца параграфа,
-            // в новый параграф (первым элементом выставляем настройки текста, рассчитанные
-            // для текущей позиции). Проверим, находится ли данная позиция внутри гиперссылки,
-            // если да, тогда в текущем параграфе закрываем гиперссылку, а в новом создаем ее копию.
-
-            var Hyperlink = this.Check_Hyperlink2( Pos, false );
-
-            var TextPr = this.Internal_CalculateTextPr( Pos );
-
-            NewParagraph.DeleteCommentOnRemove = false;
-            NewParagraph.Internal_Content_Remove2(0, NewParagraph.Content.length);
-            NewParagraph.Internal_Content_Concat( this.Content.slice( Pos ) );
-            NewParagraph.Internal_Content_Add( 0, new ParaTextPr( TextPr ) );
-            NewParagraph.Set_ContentPos( 0 );
-            NewParagraph.DeleteCommentOnRemove = true;
-
-            NewParagraph.TextPr.Value = this.TextPr.Value.Copy();
-
-            if ( null != Hyperlink )
-                NewParagraph.Internal_Content_Add( 1, Hyperlink.Copy() );
-
-            // Удаляем все элементы после текущей позиции и добавляем признак окончания параграфа.
-            this.DeleteCommentOnRemove = false;
-            this.Internal_Content_Remove2( Pos, this.Content.length - Pos );
-            this.Internal_Remove_CollaborativeMarks(false);
-            this.DeleteCommentOnRemove = true;
-
-            if ( null != Hyperlink )
-            {
-                // Добавляем конец гиперссылки и пустые текстовые настройки
-                this.Internal_Content_Add( this.Content.length, new ParaHyperlinkEnd() );
-                this.Internal_Content_Add( this.Content.length, new ParaTextPr() );
-            }
-
-            this.Internal_Content_Add( this.Content.length, new ParaEnd() );
-            this.Internal_Content_Add( this.Content.length, new ParaEmpty() );
-
-            // Копируем все настройки в новый параграф. Делаем это после того как определили контент параграфов.
-            this.CopyPr( NewParagraph );
-
-            this.RecalcInfo.Set_Type_0(pararecalc_0_All);
-            NewParagraph.RecalcInfo.Set_Type_0(pararecalc_0_All);
+            NewElement = new ParaRun( NewParagraph );
+            NewElement.Set_Pr( TextPr.Copy() );
         }
-        else
+
+        // Теперь делим наш параграф на три части:
+        // 1. До элемента с номером CurPos включительно (оставляем эту часть в исходном параграфе)
+        // 2. После элемента с номером CurPos (добавляем эту часть в новый параграф)
+        // 3. Новый элемент, полученный после разделения элемента с номером CurPos, который мы
+        //    добавляем в начало нового параграфа.
+
+        var NewContent = this.Content.slice( CurPos + 1 );
+        this.Internal_Content_Remove2( CurPos + 1, this.Content.length - CurPos - 1 );
+
+        // В старый параграф добавим ран с концом параграфа
+        var EndRun = new ParaRun( this );
+        EndRun.Add_ToContent( 0, new ParaEnd() );
+
+        this.Internal_Content_Add( this.Content.length, EndRun );
+
+        // Очищаем новый параграф и добавляем в него Right элемент и NewContent
+        NewParagraph.Internal_Content_Remove2( 0, NewParagraph.Content.length );
+        NewParagraph.Internal_Content_Concat( NewContent );
+        NewParagraph.Internal_Content_Add( 0, NewElement );
+
+        // Копируем все настройки в новый параграф. Делаем это после того как определили контент параграфов.
+        NewParagraph.TextPr.Value = this.TextPr.Value.Copy();
+        this.CopyPr( NewParagraph );
+
+        // Если на данном параграфе заканчивалась секция, тогда переносим конец секции на новый параграф
+        var SectPr = this.Get_SectionPr();
+        if ( undefined !== SectPr )
         {
-            // TODO: Обработать здесь гиперссылки
-
-            NewParagraph.DeleteCommentOnRemove = false;
-            this.DeleteCommentOnRemove         = false;
-
-            // Обнулим селект и курсор
-            this.Selection_Remove();
-            NewParagraph.Selection_Remove();
-
-            // Переносим контент, идущий с текущей позиции в параграфе и до конца параграфа,
-            // в новый параграф.
-
-            var ContentPos = this.Get_ParaContentPos(false, false);
-            var CurPos = ContentPos.Get(0);
-
-            var TextPr = this.Get_TextPr(ContentPos);
-
-            // Разделяем текущий элемент (возвращается правая, отделившаяся часть, если она null, тогда заменяем
-            // ее на пустой ран с заданными настройками).
-            var NewElement = this.Content[CurPos].Split( ContentPos, 1 );
-
-            if ( null === NewElement )
-            {
-                NewElement = new ParaRun( NewParagraph );
-                NewElement.Set_Pr( TextPr.Copy() );
-            }
-
-            // Теперь делим наш параграф на три части:
-            // 1. До элемента с номером CurPos включительно (оставляем эту часть в исходном параграфе)
-            // 2. После элемента с номером CurPos (добавляем эту часть в новый параграф)
-            // 3. Новый элемент, полученный после разделения элемента с номером CurPos, который мы
-            //    добавляем в начало нового параграфа.
-
-            var NewContent = this.Content.slice( CurPos + 1 );
-            this.Internal_Content_Remove2( CurPos + 1, this.Content.length - CurPos - 1 );
-
-            // В старый параграф добавим ран с концом параграфа
-            var EndRun = new ParaRun( this );
-            EndRun.Add_ToContent( 0, new ParaEnd() );
-
-            this.Internal_Content_Add( this.Content.length, EndRun );
-
-            // Очищаем новый параграф и добавляем в него Right элемент и NewContent
-            NewParagraph.Internal_Content_Remove2( 0, NewParagraph.Content.length );
-            NewParagraph.Internal_Content_Concat( NewContent );
-            NewParagraph.Internal_Content_Add( 0, NewElement );
-
-            // Копируем все настройки в новый параграф. Делаем это после того как определили контент параграфов.
-            NewParagraph.TextPr.Value = this.TextPr.Value.Copy();
-            this.CopyPr( NewParagraph );
-
-            // Если на данном параграфе заканчивалась секция, тогда переносим конец секции на новый параграф
-            var SectPr = this.Get_SectionPr();
-            if ( undefined !== SectPr )
-            {
-                this.Set_SectionPr( undefined );
-                NewParagraph.Set_SectionPr( SectPr );
-            }
-
-            this.Cursor_MoveToEndPos( false, false );
-            NewParagraph.Cursor_MoveToStartPos( false );
-
-            NewParagraph.DeleteCommentOnRemove = true;
-            this.DeleteCommentOnRemove         = true;
+            this.Set_SectionPr( undefined );
+            NewParagraph.Set_SectionPr( SectPr );
         }
+
+        this.Cursor_MoveToEndPos( false, false );
+        NewParagraph.Cursor_MoveToStartPos( false );
+
+        NewParagraph.DeleteCommentOnRemove = true;
+        this.DeleteCommentOnRemove         = true;
     },
 
     // Присоединяем контент параграфа Para к текущему параграфу

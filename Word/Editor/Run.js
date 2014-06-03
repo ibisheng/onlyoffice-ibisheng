@@ -4334,6 +4334,40 @@ ParaRun.prototype =
 
                 this.Set_FontSize( FontSize_IncreaseDecreaseValue( IncFontSize, CurTextPr.FontSize ) );
             }
+
+            // Дополнительно проверим, если у нас para_End лежит в данном ране и попадает в выделение, тогда
+            // применим заданные настроки к символу конца параграфа
+
+            // TODO: Возможно, стоит на этапе пересчета запонимать, лежит ли para_End в данном ране. Чтобы в каждом
+            //       ране потом не бегать каждый раз по всему массиву в поисках para_End.
+            
+            var bEnd = false;
+            var Count = this.Content.length;
+            for ( var Pos = 0; Pos < Count; Pos++ )
+            {
+                if ( para_End === this.Content[Pos].Type ) 
+                {
+                    bEnd = true;
+                    break;
+                }
+            }
+
+            if ( true === bEnd )
+            {
+                if ( undefined === IncFontSize )
+                    this.Paragraph.TextPr.Apply_TextPr( TextPr );
+                else
+                {
+                    var Para = this.Paragraph;
+
+                    // Выставляем настройки для символа параграфа
+                    var EndTextPr = Para.Get_CompiledPr2(false).TextPr.Copy();
+                    EndTextPr.Merge( Para.TextPr.Value );
+
+                    // TODO: Как только перенесем историю изменений TextPr в сам класс CTextPr, переделать тут
+                    Para.TextPr.Set_FontSize( FontSize_IncreaseDecreaseValue( IncFontSize, EndTextPr.FontSize ) );
+                }
+            }
         }
         else
         {

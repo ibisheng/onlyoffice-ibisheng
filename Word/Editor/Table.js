@@ -8385,7 +8385,20 @@ CTable.prototype =
             }
         }
         else
+        {
             this.CurCell.Content.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
+            
+            if ( false === this.CurCell.Content.Is_SelectionUse() )
+            {
+                var Cell = this.CurCell;
+
+                this.Selection.Use   = false;
+                this.Selection.Start = false;
+
+                this.Selection.StartPos.Pos = { Row : Cell.Row.Index, Cell : Cell.Index };
+                this.Selection.EndPos.Pos   = { Row : Cell.Row.Index, Cell : Cell.Index };
+            }
+        }
     },
 
     Cursor_GetPos : function()
