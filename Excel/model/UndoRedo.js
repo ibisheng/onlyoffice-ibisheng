@@ -2964,12 +2964,19 @@ UndoRedoWoorksheet.prototype = {
 			index = Data.index;
 			if(false != this.wb.bCollaborativeChanges)
 			{
-				index = collaborativeEditing.getLockOtherColumn2(nSheetId, index);
-				oLockInfo = new Asc.asc_CLockInfo();
-				oLockInfo["sheetId"] = nSheetId;
-				oLockInfo["type"] = c_oAscLockTypeElem.Range;
-				oLockInfo["rangeOrObjectId"] = new Asc.Range(index, 0, index, gc_nMaxRow0);
-				this.wb.aCollaborativeChangeElements.push(oLockInfo);
+			    var range;
+			    if (g_nAllColIndex == index) {
+			        range = new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
+			    }
+			    else {
+			        index = collaborativeEditing.getLockOtherColumn2(nSheetId, index);
+			        range = new Asc.Range(index, 0, index, gc_nMaxRow0);
+			    }
+			    oLockInfo = new Asc.asc_CLockInfo();
+			    oLockInfo["sheetId"] = nSheetId;
+			    oLockInfo["type"] = c_oAscLockTypeElem.Range;
+			    oLockInfo["rangeOrObjectId"] = range;
+			    this.wb.aCollaborativeChangeElements.push(oLockInfo);
 			}
 			var col = ws._getCol(index);
 			if(bUndo)
@@ -3388,8 +3395,13 @@ UndoRedoRowCol.prototype = {
 			}
 			else
 			{
-				nIndex = collaborativeEditing.getLockOtherColumn2(nSheetId, nIndex);
-				oLockInfo["rangeOrObjectId"] = new Asc.Range(nIndex, 0, nIndex, gc_nMaxRow0);
+			    if (g_nAllColIndex == nIndex) {
+			        oLockInfo["rangeOrObjectId"] = new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
+			    }
+			    else{
+			        nIndex = collaborativeEditing.getLockOtherColumn2(nSheetId, nIndex);
+			        oLockInfo["rangeOrObjectId"] = new Asc.Range(nIndex, 0, nIndex, gc_nMaxRow0);
+			    }
 			}
 			this.wb.aCollaborativeChangeElements.push(oLockInfo);
 		}

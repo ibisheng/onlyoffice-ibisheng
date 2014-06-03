@@ -2528,7 +2528,7 @@ Woorksheet.prototype.setColWidth=function(width, start, stop){
 			var oNewProps = col.getWidthProp();
 			if(false == oOldProps.isEqual(oNewProps))
 				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, oThis.getId(),
-					new Asc.Range(col.index, 0, col.index, gc_nMaxRow0),
+					col._getUpdateRange(),
 					new UndoRedoData_IndexSimpleProp(col.index, false, oOldProps, oNewProps));
 		}
 	};
@@ -2578,7 +2578,7 @@ Woorksheet.prototype.setColHidden=function(bHidden, start, stop){
 			var oNewProps = col.getWidthProp();
 			if(false == oOldProps.isEqual(oNewProps))
 				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, oThis.getId(),
-					new Asc.Range(col.index, 0, col.index, gc_nMaxRow0),
+					col._getUpdateRange(),
 					new UndoRedoData_IndexSimpleProp(col.index, false, oOldProps, oNewProps));
 		}
 	};
@@ -2630,7 +2630,7 @@ Woorksheet.prototype.setColBestFit=function(bBestFit, width, start, stop){
 		var oNewProps = col.getWidthProp();
 		if(false == oOldProps.isEqual(oNewProps))
 			History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, oThis.getId(),
-				new Asc.Range(col.index, 0, col.index, gc_nMaxRow0),
+				col._getUpdateRange(),
 				new UndoRedoData_IndexSimpleProp(col.index, false, oOldProps, oNewProps));
 	};
 	if(0 != start && gc_nMaxCol0 == stop)
@@ -2979,7 +2979,7 @@ Woorksheet.prototype._removeRow=function(index){
 Woorksheet.prototype._getCol=function(index){
 	//0-based
 	var oCurCol;
-	if(-1 == index)
+	if (g_nAllColIndex == index)
 		oCurCol = this.getAllCol();
 	else
 	{
