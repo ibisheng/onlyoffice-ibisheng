@@ -14909,32 +14909,18 @@ Paragraph.prototype =
     // Проверяем находится ли курсор в начале параграфа
     Cursor_IsStart : function(_ContentPos)
     {
-        if ( true !== Debug_ParaRunMode )
-        {
-            if ( undefined === ContentPos )
-                ContentPos = this.CurPos.ContentPos;
+        // Просто попробуем переместится вправо от текущего положения, если мы не можем, значит
+        // мы стоим в конце параграфа.
 
-            var oPos = this.Internal_FindBackward( ContentPos - 1, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_Math] );
-            if ( true === oPos.Found )
-                return false;
-            else
-                return true;
-        }
+        var ContentPos = ( undefined === _ContentPos ? this.Get_ParaContentPos( false, false ) : _ContentPos );
+        var SearchPos  = new CParagraphSearchPos();
+
+        this.Get_LeftPos( SearchPos, ContentPos );
+
+        if ( true === SearchPos.Found )
+            return false;
         else
-        {
-            // Просто попробуем переместится вправо от текущего положения, если мы не можем, значит
-            // мы стоим в конце параграфа.
-
-            var ContentPos = ( undefined === _ContentPos ? this.Get_ParaContentPos( false, false ) : _ContentPos );
-            var SearchPos  = new CParagraphSearchPos();
-
-            this.Get_LeftPos( SearchPos, ContentPos );
-
-            if ( true === SearchPos.Found )
-                return false;
-            else
-                return true;
-        }
+            return true;
     },
 
     // Проверим, начинается ли выделение с начала параграфа
@@ -14942,8 +14928,12 @@ Paragraph.prototype =
     {
         if ( true === this.Is_SelectionUse() )
         {
-            var StartPos = ( this.Selection.StartPos > this.Selection.EndPos ? this.Selection.EndPos : this.Selection.StartPos );
-
+            var StartPos = this.Get_ParaContentPos(true, true);
+            var EndPos   = this.Get_ParaContentPos(true, false);
+            
+            if ( StartPos.Compare(EndPos) > 0 )
+                StartPos = EndPos;
+            
             if ( true != this.Cursor_IsStart( StartPos ) )
                 return false;
 
