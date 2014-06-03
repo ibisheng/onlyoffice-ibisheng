@@ -3477,18 +3477,26 @@ function DrawingObjects() {
                     //	var offsetX = worksheet.cols[worksheet.getFirstVisibleCol(true)].left - worksheet.cellsLeft;
                     //	var offsetY = worksheet.rows[worksheet.getFirstVisibleRow(true)].top - worksheet.cellsTop;
 
-                    var x1 = worksheet.cols[updatedRange.c1].left;// - offsetX;
-                    var y1 = worksheet.rows[updatedRange.r1].top ;//- offsetY;
-                    var x2 = worksheet.cols[updatedRange.c2].left;// - offsetX;
-                    var y2 = worksheet.rows[updatedRange.r2].top ;//- offsetY;
+                    var x1 = worksheet.getCellLeft(updatedRange.c1, 1);// - offsetX;
+                    var y1 = worksheet.getCellTop(updatedRange.r1, 1) ;//- offsetY;
+                    var x2 = worksheet.getCellLeft(updatedRange.c2, 1);// - offsetX;
+                    var y2 = worksheet.getCellTop(updatedRange.r2, 1);//- offsetY;
                     var w = x2 - x1;
                     var h = y2 - y1;
+					var offset = worksheet.getCellsOffset(1);
 
-                    updatedRect.x = worksheet.getCellLeft(updatedRange.c1, 3) - worksheet.getCellLeft(0, 3);//ptToMm(x1);
-                    updatedRect.y = worksheet.getCellTop(updatedRange.r1, 3) - worksheet.getCellTop(0, 3);//ptToMm(y1);
+                    updatedRect.x = ptToMm(x1 - offset.left);//ptToMm(x1);
+                    updatedRect.y = ptToMm(y1 - offset.top);//ptToMm(y1);
                     updatedRect.w = ptToMm(w);
                     updatedRect.h = ptToMm(h);
 
+
+					var offsetX = worksheet.getCellLeft(worksheet.getFirstVisibleCol(true), 1);
+					var offsetY = worksheet.getCellTop(worksheet.getFirstVisibleRow(true), 1);
+					shapeCtx.m_oContext.save();
+					shapeCtx.m_oContext.beginPath();
+					shapeCtx.m_oContext.rect(ptToPx(offset.left + x1 - offsetX), ptToPx(offset.top + y1 - offsetY), ptToPx(w), ptToPx(h));
+					shapeCtx.m_oContext.clip();
 
 
                     //coords.y = worksheet.getCellTop(cell.row, 0) + worksheet.objectRender.convertMetric(cell.rowOff, 3, 0) - worksheet.getCellTop(0, 0);
@@ -3564,6 +3572,9 @@ function DrawingObjects() {
                         }
                     }
                 }
+
+				if (graphicOption)
+					shapeCtx.m_oContext.restore();
             }
             worksheet.model.Drawings = aObjects;
         }
