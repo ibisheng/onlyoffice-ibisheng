@@ -895,7 +895,9 @@ var gUndoInsDelCellsFlag = true;
 				
 				
 				
-				var mergedRange = ws.model.getRange3(activeCells.r1, activeCells.c1, activeCells.r2, activeCells.c2).hasMerged()
+				var mergedRange;
+				if(activeCells && activeCells != null)
+					mergedRange = ws.model.getRange3(activeCells.r1, activeCells.c1, activeCells.r2, activeCells.c2).hasMerged()
 				
 				//при открытии
 				if(openFilter != undefined)
@@ -968,7 +970,7 @@ var gUndoInsDelCellsFlag = true;
 						}
 					}
 				}
-				else if((activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2) || (!lTable && activeCells.r1 == mergedRange.r1 && activeCells.c1 == mergedRange.c1 && activeCells.r2 == mergedRange.r2 && activeCells.c2 == mergedRange.c2))//если ячейка выделенная одна
+				else if((activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2) || (!lTable && mergedRange && activeCells.r1 == mergedRange.r1 && activeCells.c1 == mergedRange.c1 && activeCells.r2 == mergedRange.r2 && activeCells.c2 == mergedRange.c2))//если ячейка выделенная одна
 				{
 					var mainCell = ws.model.getCell( new CellAddress(activeCells.r1, activeCells.c1, 0)).getCells();
 					var val = mainCell[0].getValue();
