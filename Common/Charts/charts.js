@@ -118,36 +118,14 @@ function ChartPreviewManager() {
 	var _this = this;
 	var bReady = false;	
 	var previewGroups = [];
-	
-	previewGroups[c_oAscChartType.line] = [];
-	previewGroups[c_oAscChartType.line][c_oAscChartSubType.normal] = [];
-	previewGroups[c_oAscChartType.line][c_oAscChartSubType.stacked] = [];
-	previewGroups[c_oAscChartType.line][c_oAscChartSubType.stackedPer] = [];
-	
-	previewGroups[c_oAscChartType.bar] = [];
-	previewGroups[c_oAscChartType.bar][c_oAscChartSubType.normal] = [];
-	previewGroups[c_oAscChartType.bar][c_oAscChartSubType.stacked] = [];
-	previewGroups[c_oAscChartType.bar][c_oAscChartSubType.stackedPer] = [];
-	
-	previewGroups[c_oAscChartType.hbar] = [];
-	previewGroups[c_oAscChartType.hbar][c_oAscChartSubType.normal] = [];
-	previewGroups[c_oAscChartType.hbar][c_oAscChartSubType.stacked] = [];
-	previewGroups[c_oAscChartType.hbar][c_oAscChartSubType.stackedPer] = [];
-	
-	previewGroups[c_oAscChartType.area] = [];
-	previewGroups[c_oAscChartType.area][c_oAscChartSubType.normal] = [];
-	previewGroups[c_oAscChartType.area][c_oAscChartSubType.stacked] = [];
-	previewGroups[c_oAscChartType.area][c_oAscChartSubType.stackedPer] = [];
-	
-	previewGroups[c_oAscChartType.pie] = [];
-	previewGroups[c_oAscChartType.pie][c_oAscChartSubType.normal] = [];
-		
-	previewGroups[c_oAscChartType.scatter] = [];
-	previewGroups[c_oAscChartType.scatter][c_oAscChartSubType.normal] = [];
-	
-	previewGroups[c_oAscChartType.stock] = [];
-	previewGroups[c_oAscChartType.stock][c_oAscChartSubType.normal] = [];
-	
+
+    var chartsByTypes = [];
+
+    var CHART_PREVIEW_WIDTH_PIX = 50;
+    var CHART_PREVIEW_HEIGHT_PIX = 50;
+
+    var  _canvas_charts = null;
+
 	_this.init = function(options) {
 	
 		/** proprietary begin **/
@@ -177,63 +155,45 @@ function ChartPreviewManager() {
 				
 					switch (chart.subType) {
 						case c_oAscChartSubType.normal:
-							
 							var ser = new asc_CChartSeria();
 							ser.Val.NumCache = [ createItem(2), createItem(3), createItem(2), createItem(3) ];
-							ser.OutlineColor = uniColors[0];
 							chart.series.push(ser);
-							
 							ser = new asc_CChartSeria();
 							ser.Val.NumCache = [ createItem(1), createItem(2), createItem(3), createItem(2) ];
-							ser.OutlineColor = uniColors[1];
-							chart.series.push(ser);							
-							
+							chart.series.push(ser);
 							break;
 						case c_oAscChartSubType.stacked:
 							
 							var ser = new asc_CChartSeria();
 							ser.Val.NumCache = [ createItem(1), createItem(6), createItem(2), createItem(8) ];
-							ser.OutlineColor = uniColors[0];
 							chart.series.push(ser);
-							
 							ser = new asc_CChartSeria();
 							ser.Val.NumCache = [ createItem(4), createItem(4), createItem(4), createItem(5) ];
-							ser.OutlineColor = uniColors[1];
-							chart.series.push(ser);				
-							
+							chart.series.push(ser);
 							break;
 						case c_oAscChartSubType.stackedPer:
 							
 							var ser = new asc_CChartSeria();
 							ser.Val.NumCache = [ createItem(2), createItem(4), createItem(2), createItem(4) ];
-							ser.OutlineColor = uniColors[0];
 							chart.series.push(ser);
-							
 							ser = new asc_CChartSeria();
 							ser.Val.NumCache = [ createItem(2), createItem(2), createItem(2), createItem(2) ];
-							ser.OutlineColor = uniColors[1];
 							chart.series.push(ser);
-							
 							break;
 					}
 					
 					break;
 					
 				case c_oAscChartType.hbar:
-					
-					var uniColorsReverse = OfficeExcel.array_reverse(uniColors);
-					
 					switch (chart.subType) {
 						case c_oAscChartSubType.normal:
 							
 							var ser = new asc_CChartSeria();
 							ser.Val.NumCache = [ createItem(4) ];
-							ser.OutlineColor = uniColors[0];
 							chart.series.push(ser);
 							
 							var ser = new asc_CChartSeria();
 							ser.Val.NumCache = [ createItem(3) ];
-							ser.OutlineColor = uniColors[1];
 							chart.series.push(ser);
 							
 							var ser = new asc_CChartSeria();
@@ -493,27 +453,365 @@ function ChartPreviewManager() {
 	}
 	
 	_this.isReady = function() {
-		return bReady;
-	}
-	
-	_this.getChartPreviews = function(chartType, chartSubType) {
-		
-		if ( chartType && chartSubType && bReady ) {
-			var group = previewGroups[chartType][chartSubType];
+		return true;
+	};
+
+    _this.createAscChart = function(type)
+    {
+        function createItem(value) {
+            return { numFormatStr: "General", isDateTimeFormat: false, val: value, isHidden: false };
+        }
+
+        // Set data
+        var chart = new asc_CChart();
+        chart.data = [];
+        chart.series = [];
+        switch(type)
+        {
+            case c_oAscChartTypeSettings.lineNormal:
+            {
+                var ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(2), createItem(3), createItem(2), createItem(3) ];
+                chart.series.push(ser);
+                ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(1), createItem(2), createItem(3), createItem(2) ];
+                chart.series.push(ser);
+                break;
+            }
+            case c_oAscChartTypeSettings.lineStacked:
+            {
+                var ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(1), createItem(6), createItem(2), createItem(8) ];
+                chart.series.push(ser);
+                ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(4), createItem(4), createItem(4), createItem(5) ];
+                chart.series.push(ser);
+                break;
+            }
+            case c_oAscChartTypeSettings.lineStackedPer:
+            {
+                var ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(2), createItem(4), createItem(2), createItem(4) ];
+                chart.series.push(ser);
+
+                ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(2), createItem(2), createItem(2), createItem(2) ];
+                chart.series.push(ser);
+                break;
+            }
+
+            case c_oAscChartTypeSettings.hBarNormal:
+            {
+                var ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(4) ];
+                chart.series.push(ser);
+
+                var ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(3) ];
+                chart.series.push(ser);
+
+                var ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(2) ];
+                chart.series.push(ser);
+
+                var ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(1) ];
+                chart.series.push(ser);
+                break;
+            }
+
+            case c_oAscChartTypeSettings.hBarStacked:
+            {
+                var ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(4), createItem(3), createItem(2), createItem(1) ];
+                chart.series.push(ser);
+
+                ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(5), createItem(4), createItem(3), createItem(2) ];
+                break;
+            }
+
+            case c_oAscChartTypeSettings.hBarStackedPer:
+            {
+                var ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(7), createItem(5), createItem(3), createItem(1) ];
+                chart.series.push(ser);
+
+                ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(7), createItem(6), createItem(5), createItem(4) ];
+                chart.series.push(ser);
+                break;
+            }
+
+            case c_oAscChartTypeSettings.barNormal:
+            {
+                var ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(1) ];
+                chart.series.push(ser);
+
+                var ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(2) ];
+                chart.series.push(ser);
+
+                var ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(3) ];
+                chart.series.push(ser);
+
+                var ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(4) ];
+                chart.series.push(ser);
+                break;
+            }
+
+            case c_oAscChartTypeSettings.barStacked:
+            {
+                var ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(1), createItem(2), createItem(3), createItem(4) ];
+                chart.series.push(ser);
+
+                ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(2), createItem(3), createItem(4), createItem(5) ];
+                chart.series.push(ser);
+                break;
+            }
+
+            case c_oAscChartTypeSettings.barStackedPer:
+            {
+                var ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(1), createItem(3), createItem(5), createItem(7) ];
+                chart.series.push(ser);
+
+                ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(4), createItem(5), createItem(6), createItem(7) ];
+                chart.series.push(ser);
+                break;
+            }
+
+            case c_oAscChartTypeSettings.pie:
+            case c_oAscChartTypeSettings.doughnut:
+            {
+                var ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(3), createItem(1) ];
+                chart.series.push(ser);
+                break;
+            }
+
+            case c_oAscChartTypeSettings.areaNormal:
+            {
+                var ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(0), createItem(8), createItem(5), createItem(6) ];
+                chart.series.push(ser);
+
+                ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(0), createItem(4), createItem(2), createItem(9) ];
+                chart.series.push(ser);
+                break;
+            }
+
+            case c_oAscChartTypeSettings.areaStacked:
+            {
+                var ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(0), createItem(8), createItem(5), createItem(11) ];
+                chart.series.push(ser);
+
+                ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(4), createItem(4), createItem(4), createItem(4) ];
+                chart.series.push(ser);
+                break;
+            }
+
+            case c_oAscChartTypeSettings.areaStackedPer:
+            {
+                var ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(0), createItem(4), createItem(1), createItem(16) ];
+                chart.series.push(ser);
+
+                ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(4), createItem(4), createItem(4), createItem(4) ];
+                chart.series.push(ser);
+                break;
+            }
+
+            case c_oAscChartTypeSettings.scatter:
+            {
+                var ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(1), createItem(5) ];
+                chart.series.push(ser);
+
+                ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(2), createItem(6) ];
+                chart.series.push(ser);
+                break;
+            }
+
+            default:
+            {
+                var ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(3), createItem(5), createItem(7) ];
+                chart.series.push(ser);
+
+                ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(10), createItem(12), createItem(14) ];
+                chart.series.push(ser);
+
+                ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(1), createItem(3), createItem(5) ];
+                chart.series.push(ser);
+
+                ser = new asc_CChartSeria();
+                ser.Val.NumCache = [ createItem(8), createItem(10), createItem(12) ];
+                chart.series.push(ser);
+                break;
+            }
+        }
+        return chart;
+    };
+
+    _this.getChartByType = function(type)
+    {
+       return ExecuteNoHistory(function()
+        {
+
+            var asc_chart = _this.createAscChart(type);
+            var type_sub_type = TYPE_SUBTYPE_BY_TYPE[type];
+            if(type_sub_type)
+            {
+                asc_chart.type = type_sub_type.type;
+                asc_chart.subType = type_sub_type.subtype;
+            }
+            var chart_space = DrawingObjectsController.prototype.getChartSpace(asc_chart);
+
+            if(window["Asc"]["editor"])
+            {
+                var api_sheet = window["Asc"]["editor"];
+                chart_space.setWorksheet(api_sheet.wb.getWorksheet().model);
+            }
+            CheckSpPrXfrm(chart_space);
+            chart_space.spPr.xfrm.setOffX(0);
+            chart_space.spPr.xfrm.setOffY(0);
+            chart_space.spPr.xfrm.setExtX(50);
+            chart_space.spPr.xfrm.setExtY(50);
+            var settings = new asc_ChartSettings();
+            settings.putTitle(c_oAscChartTitleShowSettings.none);
+            settings.putHorAxisLabel(c_oAscChartTitleShowSettings.none);
+            settings.putVertAxisLabel(c_oAscChartTitleShowSettings.none);
+            settings.putLegendPos(c_oAscChartLegendShowSettings.none);
+            settings.putHorGridLines(c_oAscGridLinesSettings.none);
+            settings.putVertGridLines(c_oAscGridLinesSettings.none);
+            var vert_axis_settings = new asc_ValAxisSettings();
+            settings.putVertAxisProps(vert_axis_settings);
+            vert_axis_settings.putMinValRule(c_oAscValAxisRule.auto);
+            vert_axis_settings.putMaxValRule(c_oAscValAxisRule.auto);
+            vert_axis_settings.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
+            vert_axis_settings.putInvertValOrder(false);
+            vert_axis_settings.putDispUnitsRule(c_oAscValAxUnits.none);
+            vert_axis_settings.putMajorTickMark(c_oAscTickMark.TICK_MARK_NONE);
+            vert_axis_settings.putMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
+            vert_axis_settings.putCrossesRule(c_oAscCrossesRule.auto);
+            var hor_axis_settings = new asc_CatAxisSettings();
+            settings.putHorAxisProps(hor_axis_settings);
+            hor_axis_settings.putIntervalBetweenLabelsRule(c_oAscBetweenLabelsRule.auto);
+            hor_axis_settings.putLabelsPosition(c_oAscLabelsPosition.betweenDivisions);
+            hor_axis_settings.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
+            hor_axis_settings.putLabelsAxisDistance(100);
+            hor_axis_settings.putMajorTickMark(c_oAscTickMark.TICK_MARK_NONE);
+            hor_axis_settings.putMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
+            hor_axis_settings.putIntervalBetweenTick(1);
+            hor_axis_settings.putCrossesRule(c_oAscCrossesRule.auto);
+
+            DrawingObjectsController.prototype.applyPropsToChartSpace(settings, chart_space);
+            chart_space.setBDeleted(false);
+            chart_space.recalculate();
+            return chart_space;
+        }, _this, []);
+    };
+
+
+    _this.clearPreviews = function()
+    {
+        previewGroups.length = 0;
+    };
+    _this.createChartPreview = function(type, styleIndex)
+    {
+
+        if(!chartsByTypes[type])
+            chartsByTypes[type] = _this.getChartByType(type);
+        var chart_space = chartsByTypes[type];
+        if(chart_space.style !== styleIndex)
+        {
+            chart_space.style = styleIndex;
+            chart_space.recalculateSeriesColors();
+        }
+        chart_space.recalculatePenBrush();
+
+
+        if (_canvas_charts == null)
+        {
+            _canvas_charts = document.createElement('canvas');
+
+            var b_retina_support = false;
+            if(editor)
+            {
+                if(editor.m_oWordControl)
+                {
+                    b_retina_support = this.m_oWordControl.bIsRetinaSupport;
+                }
+                else if(editor.bIsRetinaSupport)
+                {
+                    b_retina_support = editor.bIsRetinaSupport;
+                }
+            }
+
+            if (!b_retina_support)
+            {
+                _canvas_charts.width = CHART_PREVIEW_WIDTH_PIX;
+                _canvas_charts.height = CHART_PREVIEW_HEIGHT_PIX;
+            }
+            else
+            {
+                _canvas_charts.width = (CHART_PREVIEW_WIDTH_PIX << 1);
+                _canvas_charts.height = (CHART_PREVIEW_HEIGHT_PIX << 1);
+            }
+        }
+
+        var _canvas = _canvas_charts;
+        var ctx = _canvas.getContext('2d');
+        var graphics = new CGraphics();
+        graphics.init(ctx, _canvas.width, _canvas.height, 50, 50);
+        graphics.m_oFontManager = g_fontManager;
+        graphics.transform(1,0,0,1,0,0);
+        chart_space.draw(graphics);
+        var image_url = _canvas.toDataURL("image/png");
+        return image_url;
+    };
+
+	_this.getChartPreviews = function(chartType) {
+
+		if (isRealNumber(chartType)) {
+            if(!Array.isArray(previewGroups[chartType]))
+            {
+                previewGroups[chartType] = [];
+                var arr = previewGroups[chartType];
+                for(var i = 1; i < 49; ++i)
+                {
+                    arr.push(_this.createChartPreview(chartType, i))
+                }
+            }
+			var group = previewGroups[chartType];
 			var objectGroup = [];
-			
-			for (var style in group) {
+
+			for (var style = 0; style <  group.length; ++style) {
 				var chartStyle = new asc_CChartStyle();
-				chartStyle.asc_setStyle(style);
+				chartStyle.asc_setStyle(style+1);
 				chartStyle.asc_setImageUrl(group[style]);
 				objectGroup.push(chartStyle);
 			}
-			
+
 			return objectGroup;
 		}
 		else
-			null;
-	}
+			return null;
+	};
 }
 
 //-----------------------------------------------------------------------------------
@@ -860,7 +1158,7 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 // Draw 
 //-----------------------------------------------------------------------------------
 
-function checkDataRange(type,subType,dataRange,isRows,worksheet) {
+function checkDataRange(type, dataRange,isRows,worksheet) {
 	var columns = false;
 	var rows = false;
 	if(isRows)
@@ -1059,7 +1357,7 @@ function insertChart(chart, options) {
 					orValue = col - firstCol + 1;
 				if('' != orValue)
 					isSkip[numSeries] = false;
-				var value =  parseFloat(orValue)
+				var value =  parseFloat(orValue);
 				if(!isEn && !isNaN(value))
 				{
 					min = value;

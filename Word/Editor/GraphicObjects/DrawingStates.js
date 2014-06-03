@@ -89,7 +89,7 @@ StartAddNewShape.prototype =
             var shape = this.drawingObjects.arrTrackObjects[0].getShape(true, this.drawingObjects.drawingDocument);
             var drawing = new ParaDrawing(bounds.max_x - bounds.min_x, bounds.max_y - bounds.min_y, shape, this.drawingObjects.drawingDocument, this.drawingObjects.document, null);
             var nearest_pos = this.drawingObjects.document.Get_NearestPos(this.pageIndex, bounds.min_x, bounds.min_y, true, drawing);
-            if(false === editor.isViewMode && nearest_pos!= null && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_None, {Type : changestype_2_Element_and_Type , Element : nearest_pos.Paragraph, CheckType : changestype_Paragraph_Content} ) && false === editor.isViewMode)
+            if(false === editor.isViewMode && nearest_pos && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_None, {Type : changestype_2_Element_and_Type , Element : nearest_pos.Paragraph, CheckType : changestype_Paragraph_Content} ) && false === editor.isViewMode)
             {
                 drawing.Set_DrawingType(drawing_Anchor);
                 drawing.Set_GraphicObject(shape);

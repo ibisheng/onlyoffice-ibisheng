@@ -152,6 +152,7 @@ CImageShape.prototype =
     },
 
     normalize: CShape.prototype.normalize,
+    checkHitToBounds: CShape.prototype.checkHitToBounds,
 
     sendMouseData: function()
     {

@@ -4307,6 +4307,8 @@ ParaDrawing.prototype =
             data.newId = null;
         }
         History.Add(this, data);
+        if(graphicObject.handleUpdateExtents)
+            graphicObject.handleUpdateExtents();
         this.GraphicObj = graphicObject;
 
     },
@@ -5039,7 +5041,10 @@ ParaDrawing.prototype =
                     this.GraphicObj = null;
                 }
                 if(isRealObject(this.GraphicObj))
+                {
                     this.GraphicObj.parent = this;
+                    this.GraphicObj.handleUpdateExtents && this.GraphicObj.handleUpdateExtents();
+                }
                 break;
             }
 
@@ -5181,8 +5186,13 @@ ParaDrawing.prototype =
                 {
                     this.GraphicObj = null;
                 }
+
                 if(isRealObject(this.GraphicObj))
+                {
                     this.GraphicObj.parent = this;
+                    this.GraphicObj.handleUpdateExtents && this.GraphicObj.handleUpdateExtents();
+                }
+
                 break;
             }
             case historyitem_SetSimplePos:
@@ -5798,6 +5808,11 @@ ParaDrawing.prototype =
                 }
                 if(isRealObject(this.GraphicObj))
                     this.GraphicObj.parent = this;
+                if(isRealObject(this.GraphicObj))
+                {
+                    this.GraphicObj.parent = this;
+                    this.GraphicObj.handleUpdateExtents && this.GraphicObj.handleUpdateExtents();
+                }
                 break;
             }
             case historyitem_CalculateAfterPaste:

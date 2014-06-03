@@ -264,7 +264,7 @@ function handleMouseUpPreMoveState(drawingObjects, e, x, y, pageIndex, bWord)
     var state = drawingObjects.curState;
     state.drawingObjects.clearPreTrackObjects();
     state.drawingObjects.changeCurrentState(new NullState(state.drawingObjects));
-    if(!state.shift && !state.ctrl && state.bInside)
+    if(!state.shift && !state.ctrl && state.bInside && state.majorObjectIsSelected)
     {
         switch (state.majorObject.getObjectType())
         {

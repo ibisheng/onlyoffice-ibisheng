@@ -2529,14 +2529,19 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			asc_getChartPreviews: function(chartType, chartSubType) {
 				
-				if ( this.chartPreviewManager.isReady() ) {
-					return this.chartPreviewManager.getChartPreviews(chartType, chartSubType);
+				if ( this.chartPreviewManager.isReady() )
+                {
+                    if(isRealNumber(REV_TYPE_SUBTYPE_BY_TYPE[chartType]))
+                        chartType = REV_TYPE_SUBTYPE_BY_TYPE[chartType];
+                    else if(Array.isArray(REV_TYPE_SUBTYPE_BY_TYPE[chartType]) && isRealNumber(REV_TYPE_SUBTYPE_BY_TYPE[chartType][chartSubType]))
+                        chartType = REV_TYPE_SUBTYPE_BY_TYPE[chartType][chartSubType];
+					return this.chartPreviewManager.getChartPreviews(chartType);
 				}
 			},
 			
-			asc_checkChartInterval: function(type, subtype, interval, isRows) {
+			asc_checkChartInterval: function(type, interval, isRows) {
 				var ws = this.wb.getWorksheet();
-				return ws.objectRender.checkChartInterval(type, subtype, interval, isRows);
+				return ws.objectRender.checkChartInterval(type, interval, isRows);
 			},
 			
 			// Для вставки диаграмм в Word
@@ -3137,6 +3142,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                     }
                 }
 
+                this.chartPreviewManager.clearPreviews();
 				var ws = this.wb.getWorksheet();
 				//ws.objectRender.controller.applyColorScheme();
 
@@ -3147,8 +3153,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				}
 					
 				if (bRedraw) {
-					this.chartStyleManager.init();
-					this.chartPreviewManager.init();
 					this.handlers.trigger("asc_onUpdateChartStyles");
 
 					// ToDo - от _reDrawFilters в будущем стоит избавиться, ведь она проставляет стили ячейкам, а это не нужно делать (сменить отрисовку)

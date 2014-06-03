@@ -1755,6 +1755,7 @@ CGroupShape.prototype =
 
     resetInternalSelection: DrawingObjectsController.prototype.resetInternalSelection,
     recalculateCurPos: DrawingObjectsController.prototype.recalculateCurPos,
+    checkHitToBounds: CShape.prototype.checkHitToBounds,
 
     hitToAdj: function(x, y)
     {

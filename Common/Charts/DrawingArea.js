@@ -702,16 +702,19 @@ function DrawingArea(ws) {
 		
 		if ( !_this.worksheet.objectRender.controller.selectedObjects.length && !api.isStartAddShape )
 			_this.worksheet._drawSelection();
-		
-		/*for ( var i = 0; i < _this.worksheet.objectRender.controller.selectedObjects.length; i++ ) {
-			if ( _this.worksheet.objectRender.controller.selectedObjects[i].isChart() ) {
-				_this.selectDrawingObjectRange(_this.controller.selectedObjects[i].Id);
-				shapeOverlayCtx.ClearMode = true;
-				_this.worksheet.objectRender.controller.selectedObjects[i].draw(shapeOverlayCtx);
-				shapeOverlayCtx.ClearMode = false;
-			}
-		}*/
-		
+
+
+        var chart;
+        var controller = _this.worksheet.objectRender.controller;
+        var selected_objects = controller.selection.groupSelection ? controller.selection.groupSelection.selectedObjects : controller.selectedObjects;
+        if(selected_objects.length === 1 && selected_objects[0].getObjectType() === historyitem_type_ChartSpace)
+        {
+            chart = selected_objects[0];
+            _this.worksheet.objectRender.selectDrawingObjectRange(chart);
+            //shapeOverlayCtx.ClearMode = true;
+            ////selected_objects[0].draw(shapeOverlayCtx);
+            //shapeOverlayCtx.ClearMode = false;
+        }
 		for ( var i = 0; i < _this.frozenPlaces.length; i++ ) {
 		
 			_this.frozenPlaces[i].setTransform(shapeCtx, shapeOverlayCtx, autoShapeTrack);

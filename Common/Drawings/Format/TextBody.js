@@ -1055,7 +1055,7 @@ CTextBody.prototype =
 
     Refresh_RecalcData2: function(pageIndex)
     {
-        this.parent && this.parent.Refresh_RecalcData2(pageIndex);
+        this.parent && this.parent.Refresh_RecalcData2 && this.parent.Refresh_RecalcData2(pageIndex);
     },
 
     getContentOneStringSizes: function()

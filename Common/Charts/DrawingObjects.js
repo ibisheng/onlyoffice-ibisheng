@@ -36,6 +36,19 @@ function convertFormula(formula, ws) {
     return range;
 }
 
+function convertFormula2(formula, ws) {
+    var range = null;
+
+    if (formula && ws) {
+        var result = parserHelp.parse3DRef(formula);
+        if (null !== result) {
+            var ws = ws.model.workbook.getWorksheetByName(result.sheet);
+            if (ws)
+                range = {ws: ws, range: ws.getRange2(result.range)};
+        }
+    }
+    return range;
+}
 function getFullImageSrc(src) {
     if ( 0 != src.indexOf("http:") && 0 != src.indexOf("data:") && 0 != src.indexOf("https:") && 0 != src.indexOf("ftp:") && 0 != src.indexOf("file:") ) {
         var api = window["Asc"]["editor"];
@@ -1184,6 +1197,12 @@ function asc_CChartBinary(chart) {
         var writer = new BinaryChartWriter(new CMemory(false));
         writer.WriteCT_ChartSpace(chart);
         this["binary"] = writer.memory.pos + ";" + writer.memory.GetBase64Memory();
+        if(chart.theme)
+        {
+            var pptx_writer = new CBinaryFileWriter();
+            pptx_writer.WriteTheme(chart.theme);
+            this["themeBinary"] = pptx_writer.pos + ";" + pptx_writer.GetBase64Memory();
+        }
     }
 }
 
@@ -1191,6 +1210,8 @@ asc_CChartBinary.prototype = {
 
     asc_getBinary: function() { return this["binary"]; },
     asc_setBinary: function(val) { this["binary"] = val; },
+    asc_getThemeBinary: function() { return this["themeBinary"]; },
+    asc_setThemeBinary: function(val) { this["themeBinary"] = val; },
     getChartSpace: function(workSheet)
     {
         var binary = this["binary"];
@@ -1199,6 +1220,25 @@ asc_CChartBinary.prototype = {
         var oBinaryChartReader = new BinaryChartReader(stream);
         oBinaryChartReader.ExternalReadCT_ChartSpace(stream.size , oNewChartSpace, workSheet);
         return oNewChartSpace;
+    },
+
+    getTheme: function()
+    {
+        var binary = this["themeBinary"];
+        if(binary)
+        {
+            var stream = CreateBinaryReader(binary, 0, binary.length);
+            var oBinaryReader = new BinaryPPTYLoader();
+
+            oBinaryReader.stream = new FileStream();
+            oBinaryReader.stream.obj    = stream.obj;
+            oBinaryReader.stream.data   = stream.data;
+            oBinaryReader.stream.size   = stream.size;
+            oBinaryReader.stream.pos    = stream.pos;
+            oBinaryReader.stream.cur    = stream.cur;
+            return oBinaryReader.ReadTheme();
+        }
+        return null;
     }
 
 };
@@ -1210,6 +1250,8 @@ prot = asc_CChartBinary.prototype;
 
 prot["asc_getBinary"] = prot.asc_getBinary;
 prot["asc_setBinary"] = prot.asc_setBinary;
+prot["asc_getThemeBinary"] = prot.asc_getThemeBinary;
+prot["asc_setThemeBinary"] = prot.asc_setThemeBinary;
 //}
 
 //-----------------------------------------------------------------------------------
@@ -3423,10 +3465,38 @@ function DrawingObjects() {
 
         if ( drawingCtx ) {
             if ( clearCanvas ) {
+                _this.drawingArea.clear();
             }
-			_this.drawingArea.clear();
 
             if ( aObjects.length ) {
+                if (graphicOption) {
+                    // Выставляем нужный диапазон для отрисовки
+                    var updatedRect = { x: 0, y: 0, w: 0, h: 0 };
+                    var updatedRange = graphicOption.getUpdatedRange();
+
+                    //	var offsetX = worksheet.cols[worksheet.getFirstVisibleCol(true)].left - worksheet.cellsLeft;
+                    //	var offsetY = worksheet.rows[worksheet.getFirstVisibleRow(true)].top - worksheet.cellsTop;
+
+                    var x1 = worksheet.cols[updatedRange.c1].left;// - offsetX;
+                    var y1 = worksheet.rows[updatedRange.r1].top ;//- offsetY;
+                    var x2 = worksheet.cols[updatedRange.c2].left;// - offsetX;
+                    var y2 = worksheet.rows[updatedRange.r2].top ;//- offsetY;
+                    var w = x2 - x1;
+                    var h = y2 - y1;
+
+                    updatedRect.x = worksheet.getCellLeft(updatedRange.c1, 3) - worksheet.getCellLeft(0, 3);//ptToMm(x1);
+                    updatedRect.y = worksheet.getCellTop(updatedRange.r1, 3) - worksheet.getCellTop(0, 3);//ptToMm(y1);
+                    updatedRect.w = ptToMm(w);
+                    updatedRect.h = ptToMm(h);
+
+
+
+                    //coords.y = worksheet.getCellTop(cell.row, 0) + worksheet.objectRender.convertMetric(cell.rowOff, 3, 0) - worksheet.getCellTop(0, 0);
+                    //coords.x = worksheet.getCellLeft(cell.col, 0) + worksheet.objectRender.convertMetric(cell.colOff, 3, 0) - worksheet.getCellLeft(0, 0);
+
+                    shapeCtx.updatedRect = updatedRect;
+                } else
+                    shapeCtx.updatedRect = null;
 
                 // Area for update
                 /*if ( graphicOption ) {
@@ -3465,7 +3535,6 @@ function DrawingObjects() {
                  }
                  else
                  shapeCtx.updatedRect = null;*/
-
                 for (var i = 0; i < aObjects.length; i++) {
                     var drawingObject = aObjects[i];
 
@@ -3491,7 +3560,7 @@ function DrawingObjects() {
                             }
                         }
                         else {
-							_this.drawingArea.drawObject(drawingObject);
+                            _this.drawingArea.drawObject(drawingObject);
                         }
                     }
                 }
@@ -3912,7 +3981,32 @@ function DrawingObjects() {
 
         worksheet.setSelectionShape(true);
 
-        if ( chart instanceof asc_CChart ) {
+        if ( chart instanceof asc_ChartSettings )
+        {
+            var asc_chart = new asc_CChart();
+            var rangeWs = convertFormula2(chart.range, worksheet);
+            asc_chart.range.intervalObject = rangeWs.range;
+            asc_chart.worksheet = rangeWs.ws;
+            var in_columns = chart.getInColumns();
+            if(in_columns)
+            {
+                asc_chart.range.rows = false;
+                asc_chart.range.cols = true;
+            }
+            else
+            {
+                asc_chart.range.rows = true;
+                asc_chart.range.cols = false;
+            }
+            ExecuteNoHistory(function()
+            {
+                asc_chart.rebuildSeries(true);
+            }, this, []);
+
+            return _this.controller.addChartDrawingObject(asc_chart, chart);
+        }
+        else if(chart instanceof asc_CChart)
+        {
             var _range = convertFormula(chart.range.interval, worksheet);
             if ( _range )
                 chart.range.intervalObject = _range;
@@ -3925,135 +4019,189 @@ function DrawingObjects() {
 
             return _this.controller.addChartDrawingObject(chart, options);
         }
-        else if ( isObject(chart) && chart["binary"] ) {
-
+        else if ( isObject(chart) && chart["binary"] )
+        {
             History.TurnOff();
-
+            var listRange = new Range(worksheet.model, 0, 0, worksheet.nRowsCount - 1, worksheet.nColsCount - 1);
+            listRange.cleanAll();
+            if ( worksheet.isChartAreaEditMode ) {
+                worksheet.isChartAreaEditMode = false;
+                worksheet.arrActiveChartsRanges = [];
+            }
             var asc_chart_binary = new Asc.asc_CChartBinary();
             asc_chart_binary.asc_setBinary(chart["binary"]);
+            asc_chart_binary.asc_setThemeBinary(chart["themeBinary"]);
             var oNewChartSpace = asc_chart_binary.getChartSpace(worksheet.model);
-            oNewChartSpace.getAllRasterImages(aImagesSync);
-
-            oNewChartSpace.drawingObjects = this;
-            oNewChartSpace.addToDrawingObjects();
-            oNewChartSpace.recalculate();
-           //var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
-           //aBoundsCheckers.push(boundsChecker);
-
-            // Формируем общий диапазон по сериям
-           /* var seriesCount = graphicObject.chart.series.length;
-            if ( seriesCount ) {
-
-                // Нужно переименовать лист для дальнейшего поиска
-                var resultRef = parserHelp.parse3DRef(graphicObject.chart.series[0].Val.Formula);
-                worksheet.model.workbook.aWorksheets[0].sName = resultRef.sheet;
-
-                if ( graphicObject.chart.range.interval ) {
-                    var _range = convertFormula(graphicObject.chart.range.interval, worksheet);
-                    if ( _range )
-                        graphicObject.chart.range.intervalObject = _range;
-
-                    while ( worksheet.cols.length < _range.bbox.c2 ) {
-                        worksheet.expandColsOnScroll(true);
-                    }
-                    while ( worksheet.rows.length < _range.bbox.r2 ) {
-                        worksheet.expandRowsOnScroll(true);
-                    }
-                }
+            var theme = asc_chart_binary.getTheme();
+            if(theme)
+            {
+                worksheet.model.workbook.theme = theme;
             }
+            var font_map = {};
+            oNewChartSpace.documentGetAllFontNames(font_map);
+            checkThemeFonts(font_map, worksheet.model.workbook.theme.themeElements.fontScheme);
+            window["Asc"]["editor"]._loadFonts(font_map,
+                function()
+                {
+                    oNewChartSpace.getAllRasterImages(aImagesSync);
+                    oNewChartSpace.setBDeleted(false);
+                    oNewChartSpace.setWorksheet(worksheet.model);
+                    oNewChartSpace.addToDrawingObjects();
+                    oNewChartSpace.recalculate();
+                    CheckSpPrXfrm(oNewChartSpace);
+                    oNewChartSpace.spPr.xfrm.setOffX(50);
+                    oNewChartSpace.spPr.xfrm.setOffY(36);
+                    oNewChartSpace.recalculate();
 
-            // Инжектим тему и перестраиваем превью диаграмм
-            if ( graphicObject.chart.themeColors ) {
+                    var min_r = 0, max_r = 0, min_c = 0, max_c = 0;
 
-                api.GuiControlColorsMap = [];
-                for (var i = 0; i < graphicObject.chart.themeColors.length; i++) {
+                    var series = oNewChartSpace.chart.plotArea.charts[0].series, ser;
+                    var worksheet_model = worksheet.model.workbook.aWorksheets[0];
+                    function fillTableFromRef(ref)
+                    {
+                        var cache = ref.numCache ? ref.numCache : (ref.strCache ? ref.strCache : null);
+                        if(cache)
+                        {
+                            var f1 = ref.f.replace(/\(|\)/g,"");
+                            var arr_f = f1.split(",");
+                            var pt_index = 0, i, j, cell, pt;
+                            for(i = 0; i < arr_f.length; ++i)
+                            {
+                                var parsed_ref = parserHelp.parse3DRef(arr_f[i]);
+                                if(parsed_ref)
+                                {
+                                    var source_worksheet = worksheet.model.workbook.getWorksheetByName(parsed_ref.sheet);
+                                    if(source_worksheet === worksheet.model)
+                                    {
+                                        var range1 = source_worksheet.getRange2(parsed_ref.range);
+                                        if(range1)
+                                        {
+                                            var range = range1.bbox;
+                                            while ( worksheet.cols.length < range.c2 ) {
+                                                worksheet.expandColsOnScroll(true);
+                                            }
+                                            while ( worksheet.rows.length < range.r2 ) {
+                                                worksheet.expandRowsOnScroll(true);
+                                            }
 
-                    var color = graphicObject.chart.themeColors[i];
-                    api.GuiControlColorsMap.push(new CColor(color.RGBA.R, color.RGBA.G, color.RGBA.B));
-                }
-                api.chartStyleManager.init();
-                api.chartPreviewManager.init();
-            }
+                                            if(range.r1 > max_r)
+                                                max_r = range.r1;
+                                            if(range.r2 > max_r)
+                                                max_r = range.r2;
+                                            if(range.r1 < min_r)
+                                                min_r = range.r1;
+                                            if(range.r2 < min_r)
+                                                min_r = range.r2;
 
-            if ( !wsCellCache.isInit ) {
+                                            if(range.c1 > max_c)
+                                                max_c = range.c1;
+                                            if(range.c2 > max_c)
+                                                max_c = range.c2;
+                                            if(range.c1 < min_c)
+                                                min_c = range.c1;
+                                            if(range.c2 < min_c)
+                                                min_c = range.c2;
 
-                wsCellCache.cols = [];
-                wsCellCache.rows = [];
-                var colsCount = worksheet.cols.length;		//worksheet.model.getColsCount();
-                var rowsCount = worksheet.rows.length;		//worksheet.model.getRowsCount();
+                                            if(range.r1 === range.r2)
+                                            {
+                                                for(j = range.c1;  j <= range.c2; ++j)
+                                                {
 
-                for (var i = 0; i < colsCount; i++) {
-                    wsCellCache.cols.push(worksheet.model.getColWidth(i));
-                }
-                for (var i = 0; i < rowsCount; i++) {
-                    wsCellCache.rows.push(worksheet.model.getRowHeight(i));
-                }
-                wsCellCache.isInit = true;
-            }
-
-            // Заполняем таблицу
-            if ( graphicObject.chart.series.length ) {
-
-                var restoreDataRange = function (data, bRows) {
-
-                    if ( data && data.Formula && data.NumCache.length ) {
-                        var range = convertFormula(data.Formula, worksheet);
-                        if ( range ) {
-                            if ( bRows ) {
-                                var index = 0;
-                                for (var j = range.bbox.c1; j <= range.bbox.c2; j++) {
-
-                                    var cell = graphicObject.chart.range.intervalObject.worksheet.getCell(new CellAddress(range.bbox.r1, j, 0));
-                                    cell.setNumFormat(data.NumCache[index].numFormatStr);
-                                    cell.setValue(data.NumCache[index].val);
-                                    index++;
+                                                    cell = source_worksheet.getCell( new CellAddress(range.r1, j, 0) );
+                                                    pt = cache.getPtByIndex(pt_index);
+                                                    if(pt)
+                                                    {
+                                                        cell.setNumFormat(typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : "General");
+                                                        cell.setValue(pt.val + "");
+                                                    }
+                                                    ++pt_index;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                for(j = range.r1; j <= range.r2; ++j)
+                                                {
+                                                    cell = source_worksheet.getCell( new CellAddress(j, range.c1, 0) );
+                                                    pt = cache.getPtByIndex(pt_index);
+                                                    if(pt)
+                                                    {
+                                                        cell.setNumFormat(typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : "General");
+                                                        cell.setValue(pt.val + "");
+                                                    }
+                                                    ++pt_index;
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
-                            else {
-                                var index = 0;
-                                for (var j = range.bbox.r1; j <= range.bbox.r2; j++) {
+                        }
 
-                                    var cell = graphicObject.chart.range.intervalObject.worksheet.getCell(new CellAddress(j, range.bbox.c1, 0));
-                                    cell.setNumFormat(data.NumCache[index].numFormatStr);
-                                    cell.setValue(data.NumCache[index].val);
-                                    index++;
+
+                    }
+
+                    var first_num_ref;
+                    if(series[0])
+                    {
+                        if(series[0].val)
+                            first_num_ref = series[0].val.numRef;
+                        else if(series[0].yVal)
+                            first_num_ref = series[0].yVal.numRef;
+                    }
+                    if(first_num_ref)
+                    {
+                        var resultRef = parserHelp.parse3DRef(first_num_ref.f);
+                        if(resultRef)
+                        {
+                            worksheet.model.workbook.aWorksheets[0].sName = resultRef.sheet;
+                            if(series[0] && series[0].xVal && series[0].xVal.numRef)
+                            {
+                                fillTableFromRef(series[0].xVal.numRef);
+                            }
+                            if(series[0].cat && series[0].cat.strRef)
+                            {
+                                fillTableFromRef(series[0].cat.strRef);
+                            }
+                            for(var i = 0; i < series.length; ++i)
+                            {
+                                ser = series[i];
+                                if(ser.val && ser.val.numRef)
+                                {
+                                    fillTableFromRef(ser.val.numRef);
+                                }
+                                if(ser.yVal && ser.yVal.numRef)
+                                {
+                                    fillTableFromRef(ser.yVal.numRef);
+                                }
+                                if(ser.cat && ser.cat.numRef)
+                                {
+                                    fillTableFromRef(ser.cat.numRef);
+                                }
+                                if(ser.cat && ser.cat.strRef)
+                                {
+                                    fillTableFromRef(ser.cat.strRef);
+                                }
+                                if(ser.tx && ser.tx.strRef)
+                                {
+                                    fillTableFromRef(ser.tx.strRef);
                                 }
                             }
                         }
                     }
-                };
+                    worksheet._updateCellsRange({r1: 0, r2: Math.max(worksheet.nRowsCount - 1, max_r), c1: 0, c2: Math.max(worksheet.nColsCount - 1, max_c)});
+                    _this.showDrawingObjects(false);
+                    History.TurnOn();
+                    window["Asc"]["editor"].ImageLoader.LoadDocumentImages(aImagesSync, null, function(){_this.showDrawingObjects(true)});
+                });
 
-                for (var i = 0; i < seriesCount; i++) {
 
-                    if ( graphicObject.chart.series[i].TxCache.Formula ) {
-                        var range = convertFormula(graphicObject.chart.series[i].TxCache.Formula, worksheet);
-                        if ( range ) {
-                            var cell = graphicObject.chart.range.intervalObject.worksheet.getCell(new CellAddress(range.bbox.r1, range.bbox.c1, 0));
-                            cell.setNumFormat("General");
-                            cell.setValue(graphicObject.chart.series[i].TxCache.Tx);
-                        }
-                    }
-
-                    restoreDataRange(graphicObject.chart.series[i].Val, graphicObject.chart.range.rows);
-                    restoreDataRange(graphicObject.chart.series[i].xVal, graphicObject.chart.range.rows);
-                    restoreDataRange(graphicObject.chart.series[i].Cat, graphicObject.chart.range.rows);
-                }
-            }
-            else {
-                var aCells = graphicObject.chart.range.intervalObject.getCells();
-                for ( var i = 0; i < aCells.length; i++ ) {
-                    aCells[i].setValue( (i + 1).toString() );
-                }
-            }  */
-           // worksheet._updateCellsRange(graphicObject.chart.range.intervalObject.getBBox0());
-            _this.showDrawingObjects(false);
-            History.TurnOn();
         }
     };
 
-    _this.editChartDrawingObject = function(chart) {
-
-        if ( chart ) {
+    _this.editChartDrawingObject = function(chart)
+    {
+        if ( chart )
+        {
             _this.controller.editChartDrawingObjects(chart);
             _this.showDrawingObjects(false);
         }
@@ -4445,60 +4593,78 @@ function DrawingObjects() {
 
     _this.moveRangeDrawingObject = function(oBBoxFrom, oBBoxTo, bResize) {
 
-        if ( oBBoxFrom && oBBoxTo ) {
-
-            var editChart = function (drawingObject) {
-
-                var _interval = drawingObject.graphicObject.chart.range.interval;
-
-                drawingObject.graphicObject.chart.range.intervalObject = worksheet._getRange(oBBoxTo.c1, oBBoxTo.r1, oBBoxTo.c2, oBBoxTo.r2);
-                _this.calcChartInterval(drawingObject.graphicObject.chart);
-                drawingObject.graphicObject.chart.rebuildSeries();
-                drawingObject.graphicObject.recalculate();
-
-                //TODO: History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(drawingObject.graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
-                //TODO: History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_RangeInterval, null, null, new UndoRedoDataGraphicObjects(drawingObject.graphicObject.chart.Get_Id(), new UndoRedoDataGOSingleProp(_interval, drawingObject.graphicObject.chart.range.interval)));
-                //TODO: History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(drawingObject.graphicObject.chart.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
-            };
-
-            var bRedraw = false;
-            History.Create_NewPoint();
-            History.StartTransaction();
-
-            var chartDrawings = [];
-            var callbackCheck = function (result) {
-                for (var i = 0; result && (i < chartDrawings.length); i++) {
-                    editChart(chartDrawings[i]);
-                    bRedraw = true;
-                }
-                if ( bRedraw )
-                    _this.showDrawingObjects(true);
-            };
-
-            for (var i = 0; i < aObjects.length; i++) {
-
-                var drawingObject = aObjects[i];
-                if ( drawingObject.isChart() ) {
-                    var bbox = drawingObject.graphicObject.chart.range.intervalObject.getBBox0();
-                    if ( oBBoxFrom.isEqual(bbox) ) {
-                        if ( bResize ) {
-                            if ( drawingObject.graphicObject.selected ) {
-                                chartDrawings.push(drawingObject);
-                                break;
-                            }
+        if ( oBBoxFrom && oBBoxTo )
+        {
+            var selected_objects = this.controller.groupSelection ? this.controller.groupSelection.selectedObjects : this.controller.selectedObjects;
+            var chart;
+            if(selected_objects.length === 1 && selected_objects[0].getObjectType() === historyitem_type_ChartSpace)
+            {
+                chart = selected_objects[0];
+            }
+            if(chart && !(!chart.bbox || !chart.bbox.seriesBBox || oBBoxTo.isEqual(chart.bbox.seriesBBox)))
+            {
+                var editChart = function (drawingObject)
+                {
+                    var asc_chart = new asc_CChart();
+                    var final_bbox = oBBoxTo.clone();
+                    if(chart.bbox.seriesBBox.bVert)
+                    {
+                        asc_chart.range.rows = true;
+                        asc_chart.range.cols = false;
+                        if(chart.bbox.catBBox && oBBoxTo.r1 === chart.bbox.seriesBBox.r1)
+                        {
+                            --final_bbox.r1;
                         }
-                        else
-                            chartDrawings.push(drawingObject);
+                        if(chart.bbox.serBBox && oBBoxTo.c1 === chart.bbox.seriesBBox.c1)
+                        {
+                            --final_bbox.c1;
+                        }
                     }
-                }
+                    else
+                    {
+                        asc_chart.range.rows = false;
+                        asc_chart.range.cols = true;
+                        if(chart.bbox.catBBox && oBBoxTo.c1 === chart.bbox.seriesBBox.c1)
+                        {
+                            --final_bbox.c1;
+                        }
+                        if(chart.bbox.serBBox && oBBoxTo.r1 === chart.bbox.seriesBBox.r1)
+                        {
+                            --final_bbox.r1;
+                        }
+                    }
+                    var startCell = new CellAddress(final_bbox.r1, final_bbox.c1, 0);
+                    var endCell = new CellAddress(final_bbox.r2, final_bbox.c2, 0);
+
+                    if (startCell && endCell)
+                    {
+                        var wsName = worksheet.model.sName;
+                        if ( !rx_test_ws_name.test(wsName) )
+                            wsName = "'" + wsName + "'";
+
+                        if (startCell.getID() == endCell.getID())
+                            asc_chart.range.interval = wsName + "!" + startCell.getID();
+                        else
+                            asc_chart.range.interval = wsName + "!" + startCell.getID() + ":" + endCell.getID();
+                    }
+                    asc_chart.worksheet = worksheet;
+                    _this.intervalToIntervalObject(asc_chart);
+                    asc_chart.rebuildSeries();
+                    drawingObject.rebuildSeriesFromAsc(asc_chart);
+                    _this.controller.startRecalculate();
+                };
+                var callbackCheck = function (result) {
+                    if(result)
+                    {
+                        History.Create_NewPoint();
+                        editChart(chart);
+                        _this.showDrawingObjects(true);
+                    }
+                };
+                _this.objectLocker.reset();
+                _this.objectLocker.addObjectId(chart.Get_Id());
+                _this.objectLocker.checkObjects(callbackCheck);
             }
-            // Проверяем локи
-            _this.objectLocker.reset();
-            for (var i = 0; i < chartDrawings.length; i++) {
-                this.objectLocker.addObjectId( chartDrawings[i].graphicObject.Get_Id() );
-            }
-            _this.objectLocker.checkObjects(callbackCheck);
-            History.EndTransaction();
         }
     };
 
@@ -4506,35 +4672,40 @@ function DrawingObjects() {
     // Chart
     //-----------------------------------------------------------------------------------
 
-    _this.checkChartInterval = function(type, subtype, interval, isRows) {
+    _this.checkChartInterval = function(type, interval, isRows) {
         var result = false;
         if (interval && worksheet) {
             var _range = convertFormula(interval, worksheet);
-            if (_range && checkDataRange(type, subtype, _range, isRows, worksheet))
+            if (_range && checkDataRange(TYPE_SUBTYPE_BY_TYPE[type].type, _range, isRows, worksheet))
                 result = true;
         }
         return result;
     };
 
     _this.calcChartInterval = function(chart) {
-        if (chart.range.intervalObject) {
-            var box = chart.range.intervalObject.getBBox0();
-            var startCell = new CellAddress(box.r1, box.c1, 0);
-            var endCell = new CellAddress(box.r2, box.c2, 0);
+        if (chart.range.intervalObject)
+        {
+            chart.range.interval = this.bboxToInterval(chart.range.intervalObject.getBBox0(), chart.range.intervalObject.worksheet.sName);
+        }
+    };
 
-            if (startCell && endCell) {
+    _this.bboxToInterval = function(box, wsName)
+    {
+        var startCell = new CellAddress(box.r1, box.c1, 0);
+        var endCell = new CellAddress(box.r2, box.c2, 0);
 
-                if (startCell.getID() == endCell.getID())
-                    chart.range.interval = startCell.getID();
-                else {
-                    var wsName = chart.range.intervalObject.worksheet.sName;
-                    if ( !rx_test_ws_name.test(wsName) )
-                        wsName = "'" + wsName + "'";
+        if (startCell && endCell) {
 
-                    chart.range.interval = wsName + "!" + startCell.getID() + ":" + endCell.getID();
-                }
+            if (startCell.getID() == endCell.getID())
+                return startCell.getID();
+            else {
+                if ( !rx_test_ws_name.test(wsName) )
+                    wsName = "'" + wsName + "'";
+
+                return wsName + "!" + startCell.getID() + ":" + endCell.getID();
             }
         }
+        return "";
     };
 
     _this.intervalToIntervalObject = function(chart) {
@@ -4734,7 +4905,7 @@ function DrawingObjects() {
                 var lastRow = worksheet.rows[gc_nMaxRow - 1];
                 if ( mmToPt(y + h) + scrollY > lastRow.top ) {
                     response.result = false;
-                    response.y = ptToMm( lastCol.top - (mmToPt(y + h) + scrollY) );
+                    response.y = ptToMm( lastRow.top - (mmToPt(y + h) + scrollY) );
                     result = true;
                 }
             }
@@ -5016,133 +5187,152 @@ function DrawingObjects() {
 
     _this.getAscChartObject = function() {
 
-        if ( !api.chartStyleManager.isReady() || !api.chartPreviewManager.isReady() ) {
-            api.chartStyleManager.init();
-            api.chartPreviewManager.init();
-            _this.callTrigger("asc_onUpdateChartStyles");
-        }
+      //  if ( !api.chartStyleManager.isReady() || !api.chartPreviewManager.isReady() ) {
+      //      api.chartStyleManager.init();
+      //      api.chartPreviewManager.init();
+      //      _this.callTrigger("asc_onUpdateChartStyles");
+      //  }
 
-        if ( api.isChartEditor ) {
-            if ( aObjects.length && aObjects[0].isChart() ) {
-                aObjects[0].graphicObject.syncAscChart();
-                return new asc_CChart(aObjects[0].graphicObject.chart);
-            }
-        }
+      // if ( api.isChartEditor ) {
+      //     if ( aObjects.length && aObjects[0].isChart() ) {
+      //         aObjects[0].graphicObject.syncAscChart();
+      //         return new asc_CChart(aObjects[0].graphicObject.chart);
+      //     }
+      // }
 
-        var chart = _this.controller.getAscChartObject();
-        if ( !chart ) {
+        if($("#chartPropsMenuDiv").length > 0) //TODO: убрать как будет всё готово в меню
+        {
+            var chart = _this.controller.getAscChartObject();
+            if ( !chart ) {
 
-            History.Create_NewPoint();
-            chart = new asc_CChart();
-            chart.header.title = api.chartTranslate.title;
-            chart.xAxis.title = api.chartTranslate.xAxis;
-            chart.yAxis.title = api.chartTranslate.yAxis;
+                History.Create_NewPoint();
+                chart = new asc_CChart();
+                chart.header.title = api.chartTranslate.title;
+                chart.xAxis.title = api.chartTranslate.xAxis;
+                chart.yAxis.title = api.chartTranslate.yAxis;
 
-            chart.range.interval = function() {
-                var result = "";
-                if (worksheet) {
-                    var selectedRange = worksheet.getSelectedRange();
-                    if (selectedRange) {
-                        var box = selectedRange.getBBox0();
+                chart.range.interval = function() {
+                    var result = "";
+                    if (worksheet) {
+                        var selectedRange = worksheet.getSelectedRange();
+                        if (selectedRange) {
+                            var box = selectedRange.getBBox0();
 
-                        // Rows/Columns
-                        if ( box.r2 - box.r1 < box.c2 - box.c1 ) {
-                            chart.range.rows = true;
-                            chart.range.columns = false;
-                        }
-                        else {
-                            chart.range.rows = false;
-                            chart.range.columns = true;
-                        }
+                            // Rows/Columns
+                            if ( box.r2 - box.r1 < box.c2 - box.c1 ) {
+                                chart.range.rows = true;
+                                chart.range.columns = false;
+                            }
+                            else {
+                                chart.range.rows = false;
+                                chart.range.columns = true;
+                            }
 
-                        var startCell = new CellAddress(box.r1, box.c1, 0);
-                        var endCell = new CellAddress(box.r2, box.c2, 0);
+                            var startCell = new CellAddress(box.r1, box.c1, 0);
+                            var endCell = new CellAddress(box.r2, box.c2, 0);
 
-                        if (startCell && endCell) {
-                            var wsName = worksheet.model.sName;
-                            if ( !rx_test_ws_name.test(wsName) )
-                                wsName = "'" + wsName + "'";
+                            if (startCell && endCell) {
+                                var wsName = worksheet.model.sName;
+                                if ( !rx_test_ws_name.test(wsName) )
+                                    wsName = "'" + wsName + "'";
 
-                            if (startCell.getID() == endCell.getID())
-                                result = wsName + "!" + startCell.getID();
-                            else
-                                result = wsName + "!" + startCell.getID() + ":" + endCell.getID();
+                                if (startCell.getID() == endCell.getID())
+                                    result = wsName + "!" + startCell.getID();
+                                else
+                                    result = wsName + "!" + startCell.getID() + ":" + endCell.getID();
+                            }
                         }
                     }
-                }
-                return result;
-            }();
-            chart.range.intervalObject = function() {
-                return worksheet ? worksheet.getSelectedRange() : null;
-            }();
+                    return result;
+                }();
+                chart.range.intervalObject = function() {
+                    return worksheet ? worksheet.getSelectedRange() : null;
+                }();
+            }
+            return chart;
         }
-        return chart;
+
+        var settings = _this.controller.getChartProps();
+        if ( !settings )
+        {
+            settings = new asc_ChartSettings();
+            var range = null;
+            var selectedRange = worksheet.getSelectedRange();
+            if (selectedRange)
+            {
+                var box = selectedRange.getBBox0();
+                settings.putInColumns(!(box.r2 - box.r1 < box.c2 - box.c1));
+                var startCell = new CellAddress(box.r1, box.c1, 0);
+                var endCell = new CellAddress(box.r2, box.c2, 0);
+                if (startCell && endCell)
+                {
+                    var wsName = worksheet.model.sName;
+                    if ( !rx_test_ws_name.test(wsName) )
+                        wsName = "'" + wsName + "'";
+                    if (startCell.getID() == endCell.getID())
+                        range = wsName + "!" + startCell.getID();
+                    else
+                        range = wsName + "!" + startCell.getID() + ":" + endCell.getID();
+                }
+            }
+            settings.putRange(range);
+            settings.putStyle(2);
+            settings.putType(c_oAscChartTypeSettings.lineNormal);
+            settings.putTitle(c_oAscChartTitleShowSettings.none);
+            settings.putLegendPos(c_oAscChartLegendShowSettings.right);
+            settings.putHorAxisLabel(c_oAscChartHorAxisLabelShowSettings.none);
+            settings.putVertAxisLabel(c_oAscChartVertAxisLabelShowSettings.none);
+            settings.putDataLabelsPos(c_oAscChartDataLabelsPos.none);
+            settings.putHorGridLines(c_oAscGridLinesSettings.major);
+            settings.putVertGridLines(c_oAscGridLinesSettings.none);
+            settings.putInColumns(false);
+            settings.putSeparator(",");
+
+            var vert_axis_settings = new asc_ValAxisSettings();
+            settings.putVertAxisProps(vert_axis_settings);
+            vert_axis_settings.setDefault();
+
+            var hor_axis_settings = new asc_CatAxisSettings();
+            settings.putHorAxisProps(hor_axis_settings);
+            hor_axis_settings.setDefault();
+        }
+        return settings;
     };
 
     //-----------------------------------------------------------------------------------
     // Selection
     //-----------------------------------------------------------------------------------
 
-    _this.selectDrawingObjectRange = function(id) {
+    _this.selectDrawingObjectRange = function(drawing) {
 
-        var strokeColor = new CColor(255, 0, 0);
         worksheet.arrActiveChartsRanges = [];
 
-        for (var i = 0; i < aObjects.length; i++) {
+        if(!drawing.bbox)
+            return;
 
-            var drawingObject = aObjects[i].graphicObject;
-            if ( drawingObject.isChart() && (drawingObject.Id == id) ) {
+        var stroke_color, fill_color;
+        if(drawing.bbox.serBBox)
+        {
 
-                if ( !drawingObject.chart.range.intervalObject )
-                    _this.intervalToIntervalObject(drawingObject.chart);
-
-                // Проверка для id листа				
-                if ( drawingObject.chart.range.intervalObject.worksheet.Id != worksheet.model.Id )
-                    return;
-
-                var BB = drawingObject.chart.range.intervalObject.getBBox0();
-                var range = asc.Range(BB.c1, BB.r1, BB.c2, BB.r2, true);
-
-                var fvr = worksheet.getFirstVisibleRow(true);
-                var fvc = worksheet.getFirstVisibleCol(true);
-                var headers = drawingObject.chart.parseSeriesHeaders();
-
-                var bbox = BB.clone();
-
-                // Top
-                if ( headers.bTop && (bbox.r1 + 1 - fvr > 0) && (bbox.c2 + 1 - fvc > 0) && (bbox.r1 != bbox.r2) ) {
-
-                    var y = worksheet.getCellTop(bbox.r1 + 1, 1) - worksheet.getCellTop(fvr, 1) + worksheet.getCellTop(0, 1);
-
-                    var bHide = bbox.c1 - fvc < 0;
-                    var x = ( bHide ? 0 : worksheet.getCellLeft(bbox.c1, 1) - worksheet.getCellLeft(fvc, 1) ) + worksheet.getCellLeft(0, 1);
-                    var w = worksheet.getCellLeft(bbox.c2 + 1, 1) - ( bHide ? worksheet.getCellLeft(fvc, 1) : worksheet.getCellLeft(bbox.c1, 1) );
-
-                    overlayCtx.setStrokeStyle(strokeColor);
-                    overlayCtx.beginPath();
-                    overlayCtx.lineHor(x, y - worksheet.height_1px, x + w);
-                    overlayCtx.stroke();
-                }
-                // Left
-                if ( headers.bLeft && (bbox.c1 + 1 - fvc > 0) && (bbox.r2 + 1 - fvr > 0) && (bbox.c1 != bbox.c2) ) {
-
-                    var x = worksheet.getCellLeft(bbox.c1 + 1, 1) - worksheet.getCellLeft(fvc, 1) + worksheet.getCellLeft(0, 1);
-
-                    var bHide = bbox.r1 - fvr < 0;
-                    var y = ( bHide ? 0 : worksheet.getCellTop(bbox.r1, 1) - worksheet.getCellTop(fvr, 1) ) + worksheet.getCellTop(0, 1);
-                    var h = worksheet.getCellTop(bbox.r2 + 1, 1) - ( bHide ? worksheet.getCellTop(fvr, 1) : worksheet.getCellTop(bbox.r1, 1) );
-
-                    overlayCtx.setStrokeStyle(strokeColor);
-                    overlayCtx.beginPath();
-                    overlayCtx.lineVer(x - worksheet.width_1px, y, y + h);
-                    overlayCtx.stroke();
-                }
-
-                worksheet.arrActiveChartsRanges.push(range);
-                worksheet.isChartAreaEditMode = true;
-                worksheet._drawFormulaRanges(worksheet.arrActiveChartsRanges);
-            }
+            stroke_color = fill_color = new CColor(0, 128, 0);
+            worksheet._drawElements(worksheet, worksheet._drawSelectionElement,
+                asc.Range(drawing.bbox.serBBox.c1, drawing.bbox.serBBox.r1, drawing.bbox.serBBox.c2, drawing.bbox.serBBox.r2, true),
+                false, 1,
+                stroke_color, fill_color);
         }
+        if(drawing.bbox.catBBox)
+        {
+            stroke_color = fill_color = new CColor(153, 0, 204);
+            worksheet._drawElements(worksheet, worksheet._drawSelectionElement,
+                asc.Range(drawing.bbox.catBBox.c1, drawing.bbox.catBBox.r1, drawing.bbox.catBBox.c2, drawing.bbox.catBBox.r2, true),
+                false, 1,
+                stroke_color, fill_color);
+        }
+        var BB = drawing.bbox.seriesBBox;
+        var range = asc.Range(BB.c1, BB.r1, BB.c2, BB.r2, true);
+        worksheet.arrActiveChartsRanges.push(range);
+        worksheet.isChartAreaEditMode = true;
+        worksheet._drawFormulaRanges(worksheet.arrActiveChartsRanges);
     };
 
     _this.unselectDrawingObjects = function() {

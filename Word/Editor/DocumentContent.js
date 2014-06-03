@@ -5530,7 +5530,8 @@ CDocumentContent.prototype =
 
                 this.Recalculate();
 
-                editor.Update_ParaTab( Default_Tab_Stop, Tabs );
+                if(editor)
+                    editor.Update_ParaTab( Default_Tab_Stop, Tabs );
 
                 return;
             }
@@ -5543,12 +5544,14 @@ CDocumentContent.prototype =
                 // Нам нужно пересчитать все изменения, начиная с текущего элемента
                 this.ContentLastChangePos = this.CurPos.ContentPos;
                 this.Recalculate();
-                editor.Update_ParaTab( Default_Tab_Stop, Tabs );
+                if(editor)
+                    editor.Update_ParaTab( Default_Tab_Stop, Tabs );
             }
             else if ( type_Table == Item.GetType() )
             {
                 Item.Set_ParagraphTabs( Tabs );
-                editor.Update_ParaTab( Default_Tab_Stop, Tabs );
+                if(editor)
+                    editor.Update_ParaTab( Default_Tab_Stop, Tabs );
             }
         }
     },
@@ -6702,10 +6705,11 @@ CDocumentContent.prototype =
         {
             ParaPr.CanAddDropCap = false;
 
-            if ( undefined != ParaPr.Tabs )
+            if ( undefined != ParaPr.Tabs  && editor)
                 editor.Update_ParaTab( Default_Tab_Stop, ParaPr.Tabs );
 
-            editor.UpdateParagraphProp( ParaPr );
+            if(editor)
+                editor.UpdateParagraphProp( ParaPr );
         }
     },
 

@@ -12,6 +12,63 @@ function findPrAndRemove(arr, pr)
     }
 }
 
+
+var TYPE_SUBTYPE_BY_TYPE = [];
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.barNormal           ] = {type: "Bar", subtype: "normal"};
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.barStacked          ] = {type: "Bar", subtype: "stacked"};
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.barStackedPer       ] = {type: "Bar", subtype: "stackedPer"};
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.lineNormal          ] = {type: "Line", subtype: "normal"};
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.lineStacked         ] = {type: "Line", subtype: "stacked"};
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.lineStackedPer      ] = {type: "Line", subtype: "stackedPer"};
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.lineNormalMarker    ] = {type: "Line", subtype: "normal"};
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.lineStackedMarker   ] = {type: "Line", subtype: "stacked"};
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.lineStackedPerMarker] = {type: "Line", subtype: "stackedPer"};
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.pie                 ] = {type: "Pie", subtype: "normal"};
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.hBarNormal          ] = {type: "HBar", subtype: "normal"};
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.hBarStacked         ] = {type: "HBar", subtype: "stacked"};
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.hBarStackedPer      ] = {type: "HBar", subtype: "stackedPer"};
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.areaNormal          ] = {type: "Area", subtype: "normal"};
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.areaStacked         ] = {type: "Area", subtype: "stacked"};
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.areaStackedPer      ] = {type: "Area", subtype: "stackedPer"};
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.doughnut            ] = {type: "Doughnut", subtype: "normal"};
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.stock               ] = {type: "Stock", subtype: "normal"};
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.scatter             ] = {type: "Scatter", subtype: "normal"};
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.scatterLine         ] = {type: "Scatter", subtype: "normal"};
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.scatterLineMarker   ] = {type: "Scatter", subtype: "normal"};
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.scatterMarker       ] = {type: "Scatter", subtype: "normal"};
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.scatterNone         ] = {type: "Scatter", subtype: "normal"};
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.scatterSmooth       ] = {type: "Scatter", subtype: "normal"};
+TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.scatterSmoothMarker ] = {type: "Scatter", subtype: "normal"};
+
+var REV_TYPE_SUBTYPE_BY_TYPE = [];
+REV_TYPE_SUBTYPE_BY_TYPE["Bar"] = [];
+REV_TYPE_SUBTYPE_BY_TYPE["Bar"]["normal"] = c_oAscChartTypeSettings.barNormal     ;
+REV_TYPE_SUBTYPE_BY_TYPE["Bar"]["stacked"] = c_oAscChartTypeSettings.barStacked    ;
+REV_TYPE_SUBTYPE_BY_TYPE["Bar"]["stackedPer"] = c_oAscChartTypeSettings.barStackedPer ;
+
+
+REV_TYPE_SUBTYPE_BY_TYPE["Line"] = [];
+REV_TYPE_SUBTYPE_BY_TYPE["Line"]["normal"] = c_oAscChartTypeSettings.lineNormal     ;
+REV_TYPE_SUBTYPE_BY_TYPE["Line"]["stacked"] = c_oAscChartTypeSettings.lineStacked    ;
+REV_TYPE_SUBTYPE_BY_TYPE["Line"]["stackedPer"] = c_oAscChartTypeSettings.lineStackedPer ;
+
+REV_TYPE_SUBTYPE_BY_TYPE["Pie"] = c_oAscChartTypeSettings.pie ;
+REV_TYPE_SUBTYPE_BY_TYPE["Doughnut"] = c_oAscChartTypeSettings.doughnut ;
+
+REV_TYPE_SUBTYPE_BY_TYPE["HBar"] = [];
+REV_TYPE_SUBTYPE_BY_TYPE["HBar"]["normal"] = c_oAscChartTypeSettings.hBarNormal     ;
+REV_TYPE_SUBTYPE_BY_TYPE["HBar"]["stacked"] = c_oAscChartTypeSettings.hBarStacked    ;
+REV_TYPE_SUBTYPE_BY_TYPE["HBar"]["stackedPer"] = c_oAscChartTypeSettings.hBarStackedPer ;
+
+REV_TYPE_SUBTYPE_BY_TYPE["Area"] = [];
+REV_TYPE_SUBTYPE_BY_TYPE["Area"]["normal"] = c_oAscChartTypeSettings.areaNormal     ;
+REV_TYPE_SUBTYPE_BY_TYPE["Area"]["stacked"] = c_oAscChartTypeSettings.areaStacked    ;
+REV_TYPE_SUBTYPE_BY_TYPE["Area"]["stackedPer"] = c_oAscChartTypeSettings.areaStackedPer ;
+
+
+REV_TYPE_SUBTYPE_BY_TYPE["Stock"] = c_oAscChartTypeSettings.stock ;
+REV_TYPE_SUBTYPE_BY_TYPE["Scatter"] = c_oAscChartTypeSettings.scatter ;
+
 function checkParagraphDefFonts(map, par)
 {
     par && par.Pr && par.Pr.DefaultRunPr && checkRFonts(map, par.Pr.DefaultRunPr.RFonts);
@@ -35,6 +92,14 @@ function checkRFonts(map, rFonts)
             map[rFonts.HAnsi.Name] = true;
     }
 }
+
+function removeAllSeriesFromChart(chart)
+{
+    for(var i = chart.series.length-1; i > -1; --i)
+        chart.removeSeries(i);
+}
+
+
 
 var SCALE_INSET_COEFF = 1.016;//Возможно придется уточнять
 
@@ -568,107 +633,110 @@ CDLbl.prototype =
 
     getStyles: function()
     {
-        //todo: доработать
-        var styles = new CStyles();
-        var style = new CStyle("dataLblStyle", null, null, null);
-        var text_pr = new CTextPr();
-        text_pr.FontSize = 10;
-        text_pr.Unifill = CreateUnfilFromRGB(0,0,0);
-        var parent_objects = this.chart.getParentObjects();
-        var theme = parent_objects.theme;
+        return ExecuteNoHistory(function(){
 
-        var para_pr = new CParaPr();
-        para_pr.Jc = align_Center;
-        para_pr.Spacing.Before = 0.0;
-        para_pr.Spacing.After = 0.0;
-        para_pr.Spacing.Line = 1;
-        para_pr.Spacing.LineRule = linerule_Auto;
-        style.ParaPr = para_pr;
+            //todo: доработать
+            var styles = new CStyles();
+            var style = new CStyle("dataLblStyle", null, null, null);
+            var text_pr = new CTextPr();
+            text_pr.FontSize = 10;
+            text_pr.Unifill = CreateUnfilFromRGB(0,0,0);
+            var parent_objects = this.chart.getParentObjects();
+            var theme = parent_objects.theme;
 
-        var minor_font = theme.themeElements.fontScheme.minorFont;
+            var para_pr = new CParaPr();
+            para_pr.Jc = align_Center;
+            para_pr.Spacing.Before = 0.0;
+            para_pr.Spacing.After = 0.0;
+            para_pr.Spacing.Line = 1;
+            para_pr.Spacing.LineRule = linerule_Auto;
+            style.ParaPr = para_pr;
+
+            var minor_font = theme.themeElements.fontScheme.minorFont;
 
 
-        if(minor_font)
-        {
-            if(typeof minor_font.latin === "string" && minor_font.latin.length > 0)
+            if(minor_font)
             {
-                text_pr.RFonts.Ascii = {Name: minor_font.latin, Index: -1};
+                if(typeof minor_font.latin === "string" && minor_font.latin.length > 0)
+                {
+                    text_pr.RFonts.Ascii = {Name: minor_font.latin, Index: -1};
+                }
+                if(typeof minor_font.ea === "string" && minor_font.ea.length > 0)
+                {
+                    text_pr.RFonts.EastAsia = {Name: minor_font.ea, Index: -1};
+                }
+                if(typeof minor_font.cs === "string" && minor_font.cs.length > 0)
+                {
+                    text_pr.RFonts.CS = {Name: minor_font.cs, Index: -1};
+                }
+
+                if(typeof minor_font.sym === "string" && minor_font.sym.length > 0)
+                {
+                    text_pr.RFonts.HAnsi = {Name: minor_font.sym, Index: -1};
+                }
             }
-            if(typeof minor_font.ea === "string" && minor_font.ea.length > 0)
+            style.TextPr = text_pr;
+
+            var chart_text_pr;
+
+            if(this.chart.txPr
+                && this.chart.txPr.content
+                && this.chart.txPr.content.Content[0]
+                && this.chart.txPr.content.Content[0].Pr)
             {
-                text_pr.RFonts.EastAsia = {Name: minor_font.ea, Index: -1};
+                style.ParaPr.Merge(this.chart.txPr.content.Content[0].Pr);
+                if(this.chart.txPr.content.Content[0].Pr.DefaultRunPr)
+                {
+                    chart_text_pr = this.chart.txPr.content.Content[0].Pr.DefaultRunPr;
+                    style.TextPr.Merge(chart_text_pr);
+                }
+
             }
-            if(typeof minor_font.cs === "string" && minor_font.cs.length > 0)
+            if(this instanceof  CTitle)
             {
-                text_pr.RFonts.CS = {Name: minor_font.cs, Index: -1};
+                style.TextPr.Bold = true;
+                if(this.parent instanceof CChart)
+                {
+                    if(chart_text_pr && typeof chart_text_pr.FontSize === "number")
+                        style.TextPr.FontSize = (chart_text_pr.FontSize*1.2) >> 0;
+                    else
+                        style.TextPr.FontSize = 18;
+                }
             }
-
-            if(typeof minor_font.sym === "string" && minor_font.sym.length > 0)
+            if(this instanceof  CalcLegendEntry
+                && this.legend
+                && this.legend.txPr
+                && this.legend.txPr.content
+                && this.legend.txPr.content.Content[0]
+                && this.legend.txPr.content.Content[0].Pr)
             {
-                text_pr.RFonts.HAnsi = {Name: minor_font.sym, Index: -1};
+                style.ParaPr.Merge(this.legend.txPr.content.Content[0].Pr);
+                if(this.legend.txPr.content.Content[0].Pr.DefaultRunPr)
+                    style.TextPr.Merge(this.legend.txPr.content.Content[0].Pr.DefaultRunPr);
             }
-        }
-        style.TextPr = text_pr;
 
-        var chart_text_pr;
-
-        if(this.chart.txPr
-            && this.chart.txPr.content
-            && this.chart.txPr.content.Content[0]
-            && this.chart.txPr.content.Content[0].Pr)
-        {
-            style.ParaPr.Merge(this.chart.txPr.content.Content[0].Pr);
-            if(this.chart.txPr.content.Content[0].Pr.DefaultRunPr)
+            if(!(this instanceof  CTitle) && this.parent && this.parent.txPr
+                && this.parent.txPr.content
+                && this.parent.txPr.content.Content[0]
+                && this.parent.txPr.content.Content[0].Pr)
             {
-                chart_text_pr = this.chart.txPr.content.Content[0].Pr.DefaultRunPr;
-                style.TextPr.Merge(chart_text_pr);
+                style.ParaPr.Merge(this.parent.txPr.content.Content[0].Pr);
+                if(this.parent.txPr.content.Content[0].Pr.DefaultRunPr)
+                    style.TextPr.Merge(this.parent.txPr.content.Content[0].Pr.DefaultRunPr);
             }
 
-        }
-        if(this instanceof  CTitle)
-        {
-            style.TextPr.Bold = true;
-            if(this.parent instanceof CChart)
+            if(this.txPr
+                && this.txPr.content
+                && this.txPr.content.Content[0]
+                && this.txPr.content.Content[0].Pr)
             {
-                if(chart_text_pr && typeof chart_text_pr.FontSize === "number")
-                    style.TextPr.FontSize = (chart_text_pr.FontSize*1.2) >> 0;
-                else
-                    style.TextPr.FontSize = 18;
+                style.ParaPr.Merge(this.txPr.content.Content[0].Pr);
+                if(this.txPr.content.Content[0].Pr.DefaultRunPr)
+                    style.TextPr.Merge(this.txPr.content.Content[0].Pr.DefaultRunPr);
             }
-        }
-        if(this instanceof  CalcLegendEntry
-            && this.legend
-            && this.legend.txPr
-            && this.legend.txPr.content
-            && this.legend.txPr.content.Content[0]
-            && this.legend.txPr.content.Content[0].Pr)
-        {
-            style.ParaPr.Merge(this.legend.txPr.content.Content[0].Pr);
-            if(this.legend.txPr.content.Content[0].Pr.DefaultRunPr)
-                style.TextPr.Merge(this.legend.txPr.content.Content[0].Pr.DefaultRunPr);
-        }
-
-        if(!(this instanceof  CTitle) && this.parent && this.parent.txPr
-            && this.parent.txPr.content
-            && this.parent.txPr.content.Content[0]
-            && this.parent.txPr.content.Content[0].Pr)
-        {
-            style.ParaPr.Merge(this.parent.txPr.content.Content[0].Pr);
-            if(this.parent.txPr.content.Content[0].Pr.DefaultRunPr)
-                style.TextPr.Merge(this.parent.txPr.content.Content[0].Pr.DefaultRunPr);
-        }
-
-        if(this.txPr
-            && this.txPr.content
-            && this.txPr.content.Content[0]
-            && this.txPr.content.Content[0].Pr)
-        {
-            style.ParaPr.Merge(this.txPr.content.Content[0].Pr);
-            if(this.txPr.content.Content[0].Pr.DefaultRunPr)
-                style.TextPr.Merge(this.txPr.content.Content[0].Pr.DefaultRunPr);
-        }
-        styles.Add(style);
-        return {lastId: style.Id, styles: styles};
+            styles.Add(style);
+            return {lastId: style.Id, styles: styles};
+        }, this, []);
     },
 
     Get_Theme: function()
@@ -1106,7 +1174,7 @@ CDLbl.prototype =
 
     Write_ToBinary2: function(w)
     {
-        w.Write_ToBinary2(this.getObjectType());
+        w.WriteLong(this.getObjectType());
         w.WriteString2(this.Id);
     },
 
@@ -2133,6 +2201,19 @@ CBarChart.prototype =
         return this.Id;
     },
 
+    getSeriesConstructor: function()
+    {
+        return CBarSeries;
+    },
+
+    removeSeries: function(idx)
+    {
+        if(this.series[idx])
+        {
+            History.Add(this, {Type: historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
+        }
+    },
+
     createDuplicate: function()
     {
         //axId будут выставлены из родительского класса
@@ -2293,6 +2374,11 @@ CBarChart.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                this.series.splice(data.oldPr, 0, data.newPr);
+                break;
+            }
             case historyitem_BarChart_AddAxId:
             {
                 for(var i = this.axId.length; i > -1; --i)
@@ -2359,6 +2445,11 @@ CBarChart.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                this.series.splice(data.oldPr, 1);
+                break;
+            }
             case historyitem_BarChart_AddAxId:
             {
                 this.axId.push(data.pr);
@@ -2413,6 +2504,12 @@ CBarChart.prototype =
 
         switch(data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                writeLong(w, data.oldPr);
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_BarChart_AddAxId:
             case historyitem_BarChart_AddSer:
             {
@@ -2446,6 +2543,13 @@ CBarChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                var pos = readLong(r);
+                var ser = readObject(r);
+                this.series.splice(pos, 0, ser);
+                break;
+            }
             case historyitem_BarChart_AddAxId:
             {
                 var ax = readObject(r);
@@ -2460,7 +2564,7 @@ CBarChart.prototype =
             }
             case historyitem_BarChart_SetDLbls:
             {
-                this.dLbls = readLong(r);
+                this.dLbls = readObject(r);
                 break;
             }
             case historyitem_BarChart_SetGapWidth:
@@ -2517,7 +2621,18 @@ CAreaChart.prototype =
     {
         return this.Id;
     },
+    removeSeries: function(idx)
+    {
+        if(this.series[idx])
+        {
+            History.Add(this, {Type: historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
+        }
+    },
 
+    getSeriesConstructor: function()
+    {
+        return CAreaSeries;
+    },
     createDuplicate: function()
     {
         //axId будут выставлены из родительского класса
@@ -2630,6 +2745,11 @@ CAreaChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                this.series.splice(data.oldPr, 0, data.newPr);
+                break;
+            }
             case historyitem_AreaChart_AddAxId:
             {
                 for(var i = this.axId.length - 1; i > -1; --i)
@@ -2669,6 +2789,11 @@ CAreaChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                this.series.splice(data.oldPr, 1);
+                break;
+            }
             case historyitem_AreaChart_AddAxId:
             {
                 this.axId.push(data.newPr);
@@ -2702,6 +2827,12 @@ CAreaChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                writeLong(w, data.oldPr);
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_AreaChart_AddAxId:
             case historyitem_AreaChart_SetDLbls:
             case historyitem_AreaChart_SetDropLines:
@@ -2727,6 +2858,13 @@ CAreaChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                var pos = readLong(r);
+                var ser = readObject(r);
+                this.series.splice(pos, 0, ser);
+                break;
+            }
             case historyitem_AreaChart_AddAxId:
             {
                 var ax = readObject(r);
@@ -3487,7 +3625,18 @@ CCatAx.prototype =
         if(isRealNumber(this.tickLblPos) && isRealNumber(REV_MENU_SETTINGS_LABELS_POS[this.tickLblPos]))
             ret.putTickLabelsPos(REV_MENU_SETTINGS_LABELS_POS[this.tickLblPos]);
         else
-            ret.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
+            ret.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
+
+        //настройки засечек на оси
+        if(isRealNumber(this.majorTickMark) && isRealNumber(REV_MENU_SETTINGS_TICK_MARK[this.majorTickMark]))
+            ret.putMajorTickMark(REV_MENU_SETTINGS_TICK_MARK[this.majorTickMark]);
+        else
+            ret.putMajorTickMark( c_oAscTickMark.TICK_MARK_NONE);
+
+        if(isRealNumber(this.minorTickMark) && isRealNumber(REV_MENU_SETTINGS_TICK_MARK[this.minorTickMark]))
+            ret.putMinorTickMark(REV_MENU_SETTINGS_TICK_MARK[this.minorTickMark]);
+        else
+            ret.putMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
         return ret;
     },
 
@@ -6216,7 +6365,7 @@ CValAx.prototype =
         if(isRealNumber(this.tickLblPos) && isRealNumber(REV_MENU_SETTINGS_LABELS_POS[this.tickLblPos]))
             ret.putTickLabelsPos(REV_MENU_SETTINGS_LABELS_POS[this.tickLblPos]);
         else
-            ret.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
+            ret.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
 
         //настройки пересечения с другой осью
         if(isRealNumber(this.crossesAt))
@@ -6583,6 +6732,11 @@ CBarSeries.prototype =
     {
         w.WriteLong(this.getObjectType());
         w.WriteString2(this.Get_Id());
+    },
+
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.GetString2();
     },
 
     getAllRasterImages: CAreaSeries.prototype.getAllRasterImages,
@@ -6981,6 +7135,17 @@ CBubbleChart.prototype =
     },
     Refresh_RecalcData: function()
     {},
+    removeSeries: function(idx)
+    {
+        if(this.series[idx])
+        {
+            History.Add(this, {Type: historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
+        }
+    },
+    getSeriesConstructor: function()
+    {
+        return CBubbleSeries;
+    },
     getObjectType: function()
     {
         return historyitem_type_BubbleChart;
@@ -7069,6 +7234,11 @@ CBubbleChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                this.series.splice(data.oldPr, 0, data.newPr);
+                break;
+            }
             case historyitem_BubbleChart_AddAxId:
             {
                 for(var i = this.axId.length - 1; i > -1; --i)
@@ -7130,6 +7300,11 @@ CBubbleChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                this.series.splice(data.oldPr, 1);
+                break;
+            }
             case historyitem_BubbleChart_AddAxId:
             {
                 this.axId.push(data.newPr);
@@ -7178,6 +7353,12 @@ CBubbleChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                writeLong(w, data.oldPr);
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_BubbleChart_AddAxId:
             case historyitem_BubbleChart_SetDLbls:
             {
@@ -7214,6 +7395,13 @@ CBubbleChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                var pos = readLong(r);
+                var ser = readObject(r);
+                this.series.splice(pos, 0, ser);
+                break;
+            }
             case historyitem_BubbleChart_AddAxId:
             {
                 var ax = readObject(r);
@@ -8234,7 +8422,7 @@ CDLbls.prototype =
         w.WriteString2(this.Get_Id());
     },
 
-    Read_FromBinary: function(r)
+    Read_FromBinary2: function(r)
     {
         this.Id = r.GetString2();
     },
@@ -9463,7 +9651,18 @@ CDoughnutChart.prototype =
     },
     Refresh_RecalcData: function()
     {},
+    removeSeries: function(idx)
+    {
+        if(this.series[idx])
+        {
+            History.Add(this, {Type: historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
+        }
+    },
 
+    getSeriesConstructor: function()
+    {
+        return CPieSeries;
+    },
     createDuplicate: function()
     {
         var c = new CDoughnutChart();
@@ -9558,6 +9757,11 @@ CDoughnutChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                this.series.splice(data.oldPr, 0, data.newPr);
+                break;
+            }
             case historyitem_DoughnutChart_SetDLbls :
             {
                 this.dLbls = data.oldPr;
@@ -9597,6 +9801,11 @@ CDoughnutChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                this.series.splice(data.oldPr, 1);
+                break;
+            }
             case historyitem_DoughnutChart_SetDLbls :
             {
                 this.dLbls = data.newPr;
@@ -9633,6 +9842,12 @@ CDoughnutChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                writeLong(w, data.oldPr);
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_DoughnutChart_SetDLbls :
             {
                 w.WriteBool(isRealObject(data.newPr));
@@ -9678,6 +9893,13 @@ CDoughnutChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                var pos = readLong(r);
+                var ser = readObject(r);
+                this.series.splice(pos, 0, ser);
+                break;
+            }
             case historyitem_DoughnutChart_SetDLbls :
             {
                 if(r.GetBool())
@@ -11214,8 +11436,20 @@ CLineChart.prototype =
     Refresh_RecalcData: function()
     {},
 
+    removeSeries: function(idx)
+    {
+        if(this.series[idx])
+        {
+            History.Add(this, {Type: historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
+        }
+    },
 
     documentCreateFontMap: CBarChart.prototype.documentCreateFontMap,
+
+    getSeriesConstructor: function()
+    {
+        return CLineSeries;
+    },
 
     getObjectType: function()
     {
@@ -11378,6 +11612,11 @@ CLineChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                this.series.splice(data.oldPr, 0, data.newPr);
+                break;
+            }
             case historyitem_LineChart_AddAxId:
             {
                 for(var i = this.axId.length-1; i > -1; --i)
@@ -11449,6 +11688,11 @@ CLineChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                this.series.splice(data.oldPr, 1);
+                break;
+            }
             case historyitem_LineChart_AddAxId:
             {
                 this.axId.push(data.newPr);
@@ -11507,6 +11751,12 @@ CLineChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                writeLong(w, data.oldPr);
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_LineChart_AddAxId:
             case historyitem_LineChart_SetDLbls:
             case historyitem_LineChart_SetDropLines:
@@ -11537,6 +11787,13 @@ CLineChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                var pos = readLong(r);
+                var ser = readObject(r);
+                this.series.splice(pos, 0, ser);
+                break;
+            }
             case historyitem_LineChart_AddAxId:
             {
                 var ax = readObject(r);
@@ -13341,6 +13598,18 @@ COfPieChart.prototype =
     Refresh_RecalcData: function()
     {},
 
+    getSeriesConstructor: function()
+    {
+        return CPieSeries;
+    },
+    removeSeries: function(idx)
+    {
+        if(this.series[idx])
+        {
+            History.Add(this, {Type: historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
+        }
+    },
+
     createDuplicate: function()
     {
         var c = new COfPieChart(), i;
@@ -13442,6 +13711,11 @@ COfPieChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                this.series.splice(data.oldPr, 0, data.newPr);
+                break;
+            }
             case historyitem_OfPieChart_AddCustSplit:
             {
                 if(this.custSplit[data.pos] === data.nSplit)
@@ -13507,6 +13781,11 @@ COfPieChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                this.series.splice(data.oldPr, 1);
+                break;
+            }
             case historyitem_OfPieChart_AddCustSplit:
             {
                 this.custSplit.splice(data.pos, data.nSplit);
@@ -13568,6 +13847,12 @@ COfPieChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                writeLong(w, data.oldPr);
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_OfPieChart_AddCustSplit:
             {
                 w.WriteBool(isRealNumber(data.pos) && isRealNumber(data.nSplit));
@@ -13635,6 +13920,13 @@ COfPieChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                var pos = readLong(r);
+                var ser = readObject(r);
+                this.series.splice(pos, 0, ser);
+                break;
+            }
             case historyitem_OfPieChart_AddCustSplit:
             {
                 if(r.GetBool())
@@ -13984,6 +14276,19 @@ CPieChart.prototype =
     Refresh_RecalcData: function()
     {},
 
+    removeSeries: function(idx)
+    {
+        if(this.series[idx])
+        {
+            History.Add(this, {Type: historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
+        }
+    },
+
+    getSeriesConstructor: function()
+    {
+        return CPieSeries;
+    },
+
     createDuplicate: function()
     {
         var c = new CPieChart();
@@ -14073,6 +14378,11 @@ CPieChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                this.series.splice(data.oldPr, 0, data.newPr);
+                break;
+            }
             case historyitem_PieChart_SetDLbls:
             {
                 this.dLbls = data.oldPr;
@@ -14100,6 +14410,11 @@ CPieChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                this.series.splice(data.oldPr, 1);
+                break;
+            }
             case historyitem_PieChart_SetDLbls:
             {
                 this.dLbls = data.newPr;
@@ -14128,6 +14443,12 @@ CPieChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                writeLong(w, data.oldPr);
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_PieChart_SetDLbls:
             {
                 w.WriteBool(isRealObject(data.newPr));
@@ -14171,6 +14492,13 @@ CPieChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                var pos = readLong(r);
+                var ser = readObject(r);
+                this.series.splice(pos, 0, ser);
+                break;
+            }
             case historyitem_PieChart_SetDLbls:
             {
                 if(r.GetBool())
@@ -14843,6 +15171,18 @@ CRadarChart.prototype =
         return this.Id;
     },
 
+    removeSeries: function(idx)
+    {
+        if(this.series[idx])
+        {
+            History.Add(this, {Type: historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
+        }
+    },
+
+    getSeriesConstructor: function()
+    {
+        return CRadarSeries;
+    },
 
     Refresh_RecalcData: function()
     {},
@@ -14910,6 +15250,11 @@ CRadarChart.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                this.series.splice(data.oldPr, 0, data.newPr);
+                break;
+            }
             case historyitem_RadarChart_AddAxId:
             {
                 for(var i = this.axId.length - 1; i > -1; --i)
@@ -14956,6 +15301,11 @@ CRadarChart.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                this.series.splice(data.oldPr, 1);
+                break;
+            }
             case historyitem_RadarChart_AddAxId:
             {
                 this.axId.push(data.newPr);
@@ -14989,6 +15339,12 @@ CRadarChart.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                writeLong(w, data.oldPr);
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_RadarChart_AddAxId:
             {
                 writeObject(w, data.newPr);
@@ -15031,6 +15387,13 @@ CRadarChart.prototype =
         var type = r.GetLong();
         switch(type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                var pos = readLong(r);
+                var ser = readObject(r);
+                this.series.splice(pos, 0, ser);
+                break;
+            }
             case historyitem_RadarChart_AddAxId:
             {
                 var axis = readObject(r);
@@ -15181,6 +15544,12 @@ CRadarSeries.prototype =
         w.WriteLong(this.getObjectType());
         w.WriteString2(this.Get_Id());
     },
+
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.GetString2();
+    },
+
     setCat: function(pr)
     {
         History.Add(this, {Type: historyitem_RadarSeries_SetCat, oldPr: this.cat, newPr: pr});
@@ -15655,6 +16024,19 @@ CScatterChart.prototype =
     Refresh_RecalcData: function()
     {},
 
+    removeSeries: function(idx)
+    {
+        if(this.series[idx])
+        {
+            History.Add(this, {Type: historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
+        }
+    },
+
+    getSeriesConstructor: function()
+    {
+        return CScatterSeries;
+    },
+
     createDuplicate: function()
     {
         var c = new CScatterChart();
@@ -15737,6 +16119,11 @@ CScatterChart.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                this.series.splice(data.oldPr, 0, data.newPr);
+                break;
+            }
             case historyitem_ScatterChart_AddAxId:
             {
                 for(var i = this.axId.length; i > -1; --i)
@@ -15782,6 +16169,11 @@ CScatterChart.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                this.series.splice(data.oldPr, 1);
+                break;
+            }
             case historyitem_ScatterChart_AddAxId:
             {
                 this.axId.push(data.newPr);
@@ -15815,6 +16207,12 @@ CScatterChart.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                writeLong(w, data.oldPr);
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_ScatterChart_SetDLbls:
             case historyitem_ScatterChart_SetScatterStyle:
             {
@@ -15851,8 +16249,16 @@ CScatterChart.prototype =
 
     Load_Changes: function(r)
     {
-        switch(data.Type)
+        var type = r.GetLong();
+        switch(type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                var pos = readLong(r);
+                var ser = readObject(r);
+                this.series.splice(pos, 0, ser);
+                break;
+            }
             case historyitem_ScatterChart_AddAxId:
             {
                 if(r.GetBool())
@@ -16268,7 +16674,7 @@ CScatterSeries.prototype =
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
                 {
-                    w.WriteString2(data.Get_Id());
+                    w.WriteString2(data.newPr.Get_Id());
                 }
                 break;
             }
@@ -16593,7 +16999,18 @@ CStockChart.prototype =
 
     Refresh_RecalcData: function()
     {},
+    removeSeries: function(idx)
+    {
+        if(this.series[idx])
+        {
+            History.Add(this, {Type: historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
+        }
+    },
 
+    getSeriesConstructor: function()
+    {
+        return CLineSeries;
+    },
     createDuplicate: function()
     {
         var c = new CStockChart();
@@ -16681,6 +17098,12 @@ CStockChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                this.series.splice(data.oldPr, 0, data.newPr);
+                break;
+            }
+
             case historyitem_StockChart_AddAxId:
             {
                 for(var i = this.axId.length-1; i > -1; --i)
@@ -16710,7 +17133,7 @@ CStockChart.prototype =
             }
             case historyitem_StockChart_AddSer:
             {
-                this.series = data.oldPr;
+                this.series.splice(data.oldPr, 1);
                 break
             }
             case historyitem_StockChart_SetUpDownBars:
@@ -16725,6 +17148,11 @@ CStockChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                this.series.splice(data.oldPr, 1);
+                break;
+            }
             case historyitem_StockChart_AddAxId:
             {
                 this.axId.push(data.newPr);
@@ -16763,6 +17191,12 @@ CStockChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                writeLong(w, data.oldPr);
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_StockChart_AddAxId:
             case historyitem_StockChart_SetDLbls:
             case historyitem_StockChart_SetDropLines:
@@ -16785,6 +17219,13 @@ CStockChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                var pos = readLong(r);
+                var ser = readObject(r);
+                this.series.splice(pos, 0, ser);
+                break;
+            }
             case historyitem_StockChart_AddAxId:
             {
                 var ax = readObject(r);
@@ -17377,6 +17818,19 @@ CSurfaceChart.prototype =
     Refresh_RecalcData: function()
     {},
 
+    removeSeries: function(idx)
+    {
+        if(this.series[idx])
+        {
+            History.Add(this, {Type: historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
+        }
+    },
+
+    getSeriesConstructor: function()
+    {
+        return CSurfaceSeries;
+    },
+
     createDuplicate: function()
     {
         var c = new CSurfaceChart(), i;
@@ -17384,7 +17838,7 @@ CSurfaceChart.prototype =
         {
             c.addBandFmt(this.bandFmts[i].craeteDuplicate());
         }
-        for(var  i =0 ; i < this.series.length; ++i)
+        for(i =0 ; i < this.series.length; ++i)
         {
             c.addSer(this.series[i].createDuplicate());
         }
@@ -17453,6 +17907,11 @@ CSurfaceChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                this.series.splice(data.oldPr, 0, data.newPr);
+                break;
+            }
             case historyitem_SurfaceChart_AddAxId:
             {
                 for(var i = this.axId.length - 1; i > -1; --i)
@@ -17501,6 +17960,11 @@ CSurfaceChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                this.series.splice(data.oldPr, 1);
+                break;
+            }
             case historyitem_SurfaceChart_AddAxId:
             {
                 this.axId.push(data.newPr);
@@ -17529,6 +17993,12 @@ CSurfaceChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                writeLong(w, data.oldPr);
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_SurfaceChart_AddAxId:
             case historyitem_SurfaceChart_AddBandFmt:
             case historyitem_SurfaceChart_AddSer:
@@ -17557,6 +18027,13 @@ CSurfaceChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChart_RemoveSeries:
+            {
+                var pos = readLong(r);
+                var ser = readObject(r);
+                this.series.splice(pos, 0, ser);
+                break;
+            }
             case historyitem_SurfaceChart_AddAxId:
             {
                 if(r.GetBool())
@@ -18974,6 +19451,19 @@ CYVal.prototype =
 
     Refresh_RecalcData: function()
     {},
+
+    createDuplicate: function()
+    {
+        var copy = new CYVal();
+        if(this.numLit)
+        {
+            copy.setNumLit(this.numLit.createDuplicate());
+        }
+        if(this.numRef)
+        {
+            copy.setNumRef(this.numRef.createDuplicate());
+        }
+    },
 
     getObjectType: function()
     {

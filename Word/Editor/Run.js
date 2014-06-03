@@ -6417,9 +6417,9 @@ ParaRun.prototype =
                 //   Bool : Caps
 
                 if ( true != Reader.GetBool() )
-                    this.Value.Caps = Reader.GetBool();
+                    this.Pr.Caps = Reader.GetBool();
                 else
-                    this.Value.Caps = undefined;
+                    this.Pr.Caps = undefined;
 
                 this.Recalc_CompiledPr(true);
 

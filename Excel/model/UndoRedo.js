@@ -1591,12 +1591,12 @@ UndoRedoData_ClrScheme.prototype = {
 	},
 	Write_ToBinary2 : function(writer)
 	{
-		this.newVal.Write_ToBinary2(writer);
+		this.newVal.Write_ToBinary(writer);
 	},
 	Read_FromBinary2 : function(reader)
 	{
 		this.newVal = new ClrScheme();
-		this.newVal.Read_FromBinary2(reader);
+		this.newVal.Read_FromBinary(reader);
 	}
 };
 

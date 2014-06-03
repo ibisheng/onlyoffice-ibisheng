@@ -168,38 +168,38 @@ function checkThemeFonts(oFontMap, font_scheme)
 {
     if(oFontMap["+mj-lt"])
     {
-        if(font_scheme.majorFont && font_scheme.majorFont.latin === "string" && font_scheme.majorFont.latin.length > 0)
+        if(font_scheme.majorFont && typeof font_scheme.majorFont.latin === "string" && font_scheme.majorFont.latin.length > 0)
             oFontMap[font_scheme.majorFont.latin] = 1;
         delete oFontMap["+mj-lt"];
     }
     if(oFontMap["+mj-ea"])
     {
-        if(font_scheme.majorFont && font_scheme.majorFont.ea === "string" && font_scheme.majorFont.ea.length > 0)
+        if(font_scheme.majorFont && typeof  font_scheme.majorFont.ea === "string" && font_scheme.majorFont.ea.length > 0)
             oFontMap[font_scheme.majorFont.ea] = 1;
         delete oFontMap["+mj-ea"];
     }
     if(oFontMap["+mj-cs"])
     {
-        if(font_scheme.majorFont && font_scheme.majorFont.cs === "string" && font_scheme.majorFont.cs.length > 0)
+        if(font_scheme.majorFont && typeof  font_scheme.majorFont.cs === "string" && font_scheme.majorFont.cs.length > 0)
             oFontMap[font_scheme.majorFont.cs] = 1;
         delete oFontMap["+mj-cs"];
     }
 
     if(oFontMap["+mn-lt"])
     {
-        if(font_scheme.minorFont && font_scheme.minorFont.latin === "string" && font_scheme.minorFont.latin.length > 0)
+        if(font_scheme.minorFont && typeof  font_scheme.minorFont.latin === "string" && font_scheme.minorFont.latin.length > 0)
             oFontMap[font_scheme.minorFont.latin] = 1;
         delete oFontMap["+mn-lt"];
     }
     if(oFontMap["+mn-ea"])
     {
-        if(font_scheme.minorFont && font_scheme.minorFont.ea === "string" && font_scheme.minorFont.ea.length > 0)
+        if(font_scheme.minorFont && typeof  font_scheme.minorFont.ea === "string" && font_scheme.minorFont.ea.length > 0)
             oFontMap[font_scheme.minorFont.ea] = 1;
         delete oFontMap["+mn-ea"];
     }
     if(oFontMap["+mn-cs"])
     {
-        if(font_scheme.minorFont && font_scheme.minorFont.cs === "string" && font_scheme.minorFont.cs.length > 0)
+        if(font_scheme.minorFont && typeof  font_scheme.minorFont.cs === "string" && font_scheme.minorFont.cs.length > 0)
             oFontMap[font_scheme.minorFont.cs] = 1;
         delete oFontMap["+mn-cs"];
     }
@@ -8096,7 +8096,8 @@ function CSpPr()
     {
         var duplicate = new CSpPr();
         duplicate.bwMode = this.bwMode;
-        duplicate.xfrm = this.xfrm.createDuplicate();
+        if(this.xfrm)
+            duplicate.xfrm = this.xfrm.createDuplicate();
         if(this.geometry!=null)
             duplicate.geometry = this.geometry.createDuplicate();
         if(this.geometry!=null)
@@ -9712,6 +9713,7 @@ ThemeElements.prototype =
 
     Save_Changes: function(data, w)
     {
+        w.WriteLong(data.Type);
         switch(data.Type)
         {
             case historyitem_ThemeElements_SetClrScheme:

@@ -516,6 +516,15 @@ DrawingContext.prototype = {
 		return this.units;
 	},
 
+	moveImageData: function (sx, sy, w, h, x, y) {
+		var sr = this._calcRect(sx, sy, w, h);
+		var r = this._calcRect(x, y);
+		var imgData = this.ctx.getImageData(sr.x, sr.y, sr.w, sr.h);
+		this.clear();
+		this.ctx.putImageData(imgData, r.x, r.y);
+		return this;
+	},
+
 	/**
 	 * Changes units of drawing context
 	 * @param {Number} units  New units of drawing context (0=px, 1=pt, 2=in, 3=mm)

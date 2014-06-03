@@ -2562,6 +2562,23 @@ CShape.prototype =
         return this.groupHierarchy;
     },
 
+    checkHitToBounds: function(x, y)
+    {
+        var _x, _y;
+        if(isRealNumber(this.posX) && isRealNumber(this.posY))
+        {
+            _x = x - this.posX - this.bounds.x;
+            _y = y - this.posY - this.bounds.y;
+        }
+        else
+        {
+            _x = x - this.bounds.x;
+            _y = y - this.bounds.y;
+        }
+        return _x >= 0 && _x <= this.bounds.w && _y >= 0 && _y <= this.bounds.h;
+
+    },
+
     hitToAdj: function (x, y) {
         if (this.spPr && isRealObject(this.spPr.geometry)) {
             var px, py;
@@ -2575,7 +2592,8 @@ CShape.prototype =
 
 
     hitToPath: function (x, y) {
-        if (this.spPr &&  isRealObject(this.spPr.geometry)) {
+
+        if (this.spPr &&  isRealObject(this.spPr.geometry) && this.checkHitToBounds(x, y)) {
             var px = this.invertTransform.TransformPointX(x, y);
             var py = this.invertTransform.TransformPointY(x, y);
             return this.spPr.geometry.hitInPath(this.getDrawingDocument().CanvasHitContext, px, py);
@@ -2584,7 +2602,7 @@ CShape.prototype =
     },
 
     hitToInnerArea: function (x, y) {
-        if (this.spPr &&  isRealObject(this.spPr.geometry)) {
+        if (this.spPr &&  isRealObject(this.spPr.geometry) && this.checkHitToBounds(x, y)) {
             var px = this.invertTransform.TransformPointX(x, y);
             var py = this.invertTransform.TransformPointY(x, y);
             return this.spPr.geometry.hitInInnerArea(this.getDrawingDocument().CanvasHitContext, px, py);
@@ -3084,7 +3102,7 @@ CShape.prototype =
 
     draw: function (graphics, transform, transformText, pageIndex) {
 
-        if(graphics.updatedRect)
+        if(graphics.updatedRect && this.bounds)
         {
             var rect = graphics.updatedRect;
             var bounds = this.bounds;
@@ -3689,6 +3707,8 @@ CShape.prototype =
     },
 
     hitInPath: function (x, y) {
+        if(!this.checkHitToBounds(x, y))
+            return;
         var invert_transform = this.getInvertTransform();
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
@@ -3701,7 +3721,7 @@ CShape.prototype =
 
     hitInInnerArea: function (x, y) {
         if ((this.getObjectType && this.getObjectType() === historyitem_type_ChartSpace) || this.brush != null && this.brush.fill != null
-            && this.brush.fill.type != FILL_TYPE_NOFILL) {
+            && this.brush.fill.type != FILL_TYPE_NOFILL && this.checkHitToBounds(x, y)) {
             var invert_transform = this.getInvertTransform();
             var x_t = invert_transform.TransformPointX(x, y);
             var y_t = invert_transform.TransformPointY(x, y);

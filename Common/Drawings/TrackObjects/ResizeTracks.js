@@ -183,7 +183,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
         this.resizedRot = originalObject.rot;
 
         this.transform = originalObject.transform.CreateDublicate();
-        this.geometry = originalObject.spPr && originalObject.spPr.geometry ?  originalObject.spPr.geometry.createDuplicate() : (function(){ var geometry = CreateGeometry("rect"); geometry.Recalculate(5, 5); return geometry})();
+        this.geometry = !(originalObject.getObjectType() === historyitem_type_ChartSpace) && originalObject.spPr && originalObject.spPr.geometry ?  originalObject.spPr.geometry.createDuplicate() : (function(){ var geometry = CreateGeometry("rect"); geometry.Recalculate(5, 5); return geometry})();
 
         if(!originalObject.isChart())
         {
@@ -637,6 +637,10 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
 
             global_MatrixTransformer.TranslateAppend(_transform, this.resizedPosX, this.resizedPosY);
             global_MatrixTransformer.TranslateAppend(_transform, _horizontal_center, _vertical_center);
+            if(this.originalObject.group)
+            {
+                global_MatrixTransformer.MultiplyAppend(_transform, this.originalObject.group.transform);
+            }
 
         };
 
@@ -1443,7 +1447,7 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
         this.bSwapCoef = !(this.rot < Math.PI*0.25 || this.rot>Math.PI*1.75 || (this.rot>Math.PI*0.75 && this.rot<Math.PI*1.25));
         this.centerDistX = this.x + this.extX*0.5 - this.parentTrack.extX*0.5;
         this.centerDistY = this.y + this.extY*0.5 - this.parentTrack.extY*0.5;
-        this.geometry = originalObject.spPr.geometry !== null ? originalObject.spPr.geometry.createDuplicate() : null;
+        this.geometry = !(originalObject.getObjectType() === historyitem_type_ChartSpace) && originalObject.spPr.geometry !== null ? originalObject.spPr.geometry.createDuplicate() : null;
         if(this.geometry)
         {
             this.geometry.Recalculate(this.extX, this.extY);

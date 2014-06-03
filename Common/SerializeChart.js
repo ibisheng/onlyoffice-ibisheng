@@ -1055,7 +1055,7 @@ BinaryChartWriter.prototype.WriteSpPr = function (oVal) {
     window.global_pptx_content_writer.WriteSpPr(this.memory, oVal);
 }
 BinaryChartWriter.prototype.WriteTxPr = function (oVal) {
-    //window.global_pptx_content_writer.WriteTextBody(this.memory, oVal);
+    window.global_pptx_content_writer.WriteTextBody(this.memory, oVal);
 }
 BinaryChartWriter.prototype.percentToString = function (val, bInteger, bSign) {
     var sRes;
@@ -1575,12 +1575,11 @@ BinaryChartWriter.prototype.WriteCT_SerAx = function (oVal) {
             oThis.WriteCT_ChartLines(oVal.minorGridlines);
         });
     }
-    //todo
-    // if (null != oVal.title) {
-    // this.bs.WriteItem(c_oserct_seraxTITLE, function () {
-    // oThis.WriteCT_Title(oVal.title);
-    // });
-    // }
+   if (null != oVal.title) {
+   this.bs.WriteItem(c_oserct_seraxTITLE, function () {
+    oThis.WriteCT_Title(oVal.title);
+    });
+   }
     if (null != oVal.numFmt) {
         this.bs.WriteItem(c_oserct_seraxNUMFMT, function () {
             oThis.WriteCT_NumFmt(oVal.numFmt);
@@ -1940,12 +1939,11 @@ BinaryChartWriter.prototype.WriteCT_DateAx = function (oVal) {
             oThis.WriteCT_ChartLines(oVal.minorGridlines);
         });
     }
-    //todo
-    // if (null != oVal.title) {
-    // this.bs.WriteItem(c_oserct_dateaxTITLE, function () {
-    // oThis.WriteCT_Title(oVal.title);
-    // });
-    // }
+   if (null != oVal.title) {
+    this.bs.WriteItem(c_oserct_dateaxTITLE, function () {
+        oThis.WriteCT_Title(oVal.title);
+        });
+   }
     if (null != oVal.numFmt) {
         this.bs.WriteItem(c_oserct_dateaxNUMFMT, function () {
             oThis.WriteCT_NumFmt(oVal.numFmt);
@@ -2098,12 +2096,11 @@ BinaryChartWriter.prototype.WriteCT_CatAx = function (oVal) {
             oThis.WriteCT_ChartLines(oVal.minorGridlines);
         });
     }
-    //todo
-    // if (null != oVal.title) {
-    // this.bs.WriteItem(c_oserct_cataxTITLE, function () {
-    // oThis.WriteCT_Title(oVal.title);
-    // });
-    // }
+     if (null != oVal.title) {
+     this.bs.WriteItem(c_oserct_cataxTITLE, function () {
+     oThis.WriteCT_Title(oVal.title);
+     });
+     }
     if (null != oVal.numFmt) {
         this.bs.WriteItem(c_oserct_cataxNUMFMT, function () {
             oThis.WriteCT_NumFmt(oVal.numFmt);
@@ -2301,12 +2298,11 @@ BinaryChartWriter.prototype.WriteCT_ValAx = function (oVal) {
             oThis.WriteCT_ChartLines(oVal.minorGridlines);
         });
     }
-    //todo
-    // if (null != oVal.title) {
-    // this.bs.WriteItem(c_oserct_valaxTITLE, function () {
-    // oThis.WriteCT_Title(oVal.title);
-    // });
-    // }
+     if (null != oVal.title) {
+     this.bs.WriteItem(c_oserct_valaxTITLE, function () {
+     oThis.WriteCT_Title(oVal.title);
+     });
+     }
     if (null != oVal.numFmt) {
         this.bs.WriteItem(c_oserct_valaxNUMFMT, function () {
             oThis.WriteCT_NumFmt(oVal.numFmt);
@@ -5025,12 +5021,12 @@ BinaryChartWriter.prototype.WriteCT_pivotFmts = function (oVal) {
 }
 BinaryChartWriter.prototype.WriteCT_Chart = function (oVal) {
     var oThis = this;
-    //todo
-    // if (null != oVal.title) {
-    // this.bs.WriteItem(c_oserct_chartTITLE, function () {
-    // oThis.WriteCT_Title(oVal.title);
-    // });
-    // }
+
+    if (null != oVal.title) {
+        this.bs.WriteItem(c_oserct_chartTITLE, function () {
+            oThis.WriteCT_Title(oVal.title);
+        });
+    }
     if (null != oVal.autoTitleDeleted) {
         this.bs.WriteItem(c_oserct_chartAUTOTITLEDELETED, function () {
             oThis.WriteCT_Boolean(oVal.autoTitleDeleted);

@@ -252,7 +252,7 @@
 
             putStyle: function(index)
             {
-                this.style = index;
+                this.style = parseInt(index, 10);
             },
 
             getStyle: function()
@@ -436,6 +436,103 @@
             getVertAxisProps: function()
             {
                 return this.vertAxisProps;
+            },
+
+            changeType: function(type)
+            {
+                if(this.type === type)
+                    return;
+                this.putType(type);
+                var hor_axis_settings = this.getHorAxisProps();
+                var vert_axis_settings = this.getVertAxisProps();
+                var new_hor_axis_settings, new_vert_axis_settings;
+                switch(type)
+                {
+                    case c_oAscChartTypeSettings.pie                 :
+                    case c_oAscChartTypeSettings.doughnut            :
+                    {
+                        this.putHorAxisProps(null);
+                        this.putVertAxisProps(null);
+                        this.putHorAxisLabel(null);
+                        this.putVertAxisLabel(null);
+                        break;
+                    }
+                    case c_oAscChartTypeSettings.barNormal           :
+                    case c_oAscChartTypeSettings.barStacked          :
+                    case c_oAscChartTypeSettings.barStackedPer       :
+                    case c_oAscChartTypeSettings.lineNormal          :
+                    case c_oAscChartTypeSettings.lineStacked         :
+                    case c_oAscChartTypeSettings.lineStackedPer      :
+                    case c_oAscChartTypeSettings.lineNormalMarker    :
+                    case c_oAscChartTypeSettings.lineStackedMarker   :
+                    case c_oAscChartTypeSettings.lineStackedPerMarker:
+                    case c_oAscChartTypeSettings.areaNormal          :
+                    case c_oAscChartTypeSettings.areaStacked         :
+                    case c_oAscChartTypeSettings.areaStackedPer      :
+                    case c_oAscChartTypeSettings.stock               :
+                    {
+                        if(!hor_axis_settings || hor_axis_settings.getAxisType() !== c_oAscAxisType.cat)
+                        {
+                            new_hor_axis_settings = new asc_CatAxisSettings();
+                            new_hor_axis_settings.setDefault();
+                            this.putHorAxisProps(new_hor_axis_settings);
+                        }
+                        if(!vert_axis_settings || vert_axis_settings.getAxisType() !== c_oAscAxisType.val)
+                        {
+                            new_vert_axis_settings = new asc_ValAxisSettings();
+                            new_vert_axis_settings.setDefault();
+                            this.putVertAxisProps(new_vert_axis_settings);
+                        }
+                        this.putHorGridLines(c_oAscGridLinesSettings.major);
+                        this.putVertGridLines(c_oAscGridLinesSettings.none);
+                        break;
+                    }
+                    case c_oAscChartTypeSettings.hBarNormal          :
+                    case c_oAscChartTypeSettings.hBarStacked         :
+                    case c_oAscChartTypeSettings.hBarStackedPer      :
+                    {
+                        if(!hor_axis_settings || hor_axis_settings.getAxisType() !== c_oAscAxisType.val)
+                        {
+                            new_hor_axis_settings = new asc_ValAxisSettings();
+                            new_hor_axis_settings.setDefault();
+                            this.putHorAxisProps(new_hor_axis_settings);
+                        }
+                        if(!vert_axis_settings || vert_axis_settings.getAxisType() !== c_oAscAxisType.cat)
+                        {
+                            new_vert_axis_settings = new asc_CatAxisSettings();
+                            new_vert_axis_settings.setDefault();
+                            this.putVertAxisProps(new_vert_axis_settings);
+                        }
+                        this.putHorGridLines(c_oAscGridLinesSettings.none);
+                        this.putVertGridLines(c_oAscGridLinesSettings.major);
+                        break;
+                    }
+                    case c_oAscChartTypeSettings.scatter             :
+                    case c_oAscChartTypeSettings.scatterLine         :
+                    case c_oAscChartTypeSettings.scatterLineMarker   :
+                    case c_oAscChartTypeSettings.scatterMarker       :
+                    case c_oAscChartTypeSettings.scatterNone         :
+                    case c_oAscChartTypeSettings.scatterSmooth       :
+                    case c_oAscChartTypeSettings.scatterSmoothMarker :
+                    {
+
+                        if(!hor_axis_settings || hor_axis_settings.getAxisType() !== c_oAscAxisType.val)
+                        {
+                            new_hor_axis_settings = new asc_ValAxisSettings();
+                            new_hor_axis_settings.setDefault();
+                            this.putHorAxisProps(new_hor_axis_settings);
+                        }
+                        if(!vert_axis_settings || vert_axis_settings.getAxisType() !== c_oAscAxisType.val)
+                        {
+                            new_vert_axis_settings = new asc_ValAxisSettings();
+                            new_vert_axis_settings.setDefault();
+                            this.putVertAxisProps(new_vert_axis_settings);
+                        }
+                        this.putHorGridLines(c_oAscGridLinesSettings.major);
+                        this.putVertGridLines(c_oAscGridLinesSettings.major);
+                        break;
+                    }
+                }
             }
         };
 
@@ -486,6 +583,7 @@
         prot["getLine"]   = prot.getLine;
         prot["putSmooth"]   = prot.putSmooth;
         prot["getSmooth"]   = prot.getSmooth;
+        prot["changeType"]   = prot.changeType;
 
         window["asc_ChartSettings"] = asc_ChartSettings;
 
@@ -650,6 +748,17 @@
             getCrosses: function()
             {
                 return this.crosses;
+            },
+            setDefault: function()
+            {
+                this.putMinValRule(c_oAscValAxisRule.auto);
+                this.putMaxValRule(c_oAscValAxisRule.auto);
+                this.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
+                this.putInvertValOrder(false);
+                this.putDispUnitsRule(c_oAscValAxUnits.none);
+                this.putMajorTickMark(c_oAscTickMark.TICK_MARK_OUT);
+                this.putMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
+                this.putCrossesRule(c_oAscCrossesRule.auto);
             }
         };
 
@@ -688,6 +797,7 @@
         prot["getTickLabelsPos"]    = prot.getTickLabelsPos    ;
         prot["getCrossesRule"]      = prot.getCrossesRule      ;
         prot["getCrosses"]          = prot.getCrosses          ;
+        prot["setDefault"]          = prot.setDefault          ;
 
     window["asc_ValAxisSettings"] = asc_ValAxisSettings;
 
@@ -813,6 +923,18 @@
         getLabelsPosition: function()
         {
             return this.labelsPosition;
+        },
+
+        setDefault: function()
+        {
+            this.putIntervalBetweenLabelsRule(c_oAscBetweenLabelsRule.auto);
+            this.putLabelsPosition(c_oAscLabelsPosition.betweenDivisions);
+            this.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
+            this.putLabelsAxisDistance(100);
+            this.putMajorTickMark(c_oAscTickMark.TICK_MARK_OUT);
+            this.putMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
+            this.putIntervalBetweenTick(1);
+            this.putCrossesRule(c_oAscCrossesRule.auto);
         }
     };
 
@@ -843,6 +965,7 @@
     prot["getCrosses"]     = prot.getCrosses                   ;
     prot["getAxisType"]     = prot.getAxisType                   ;
     prot["getLabelsPosition"] = prot.getLabelsPosition;
+    prot["setDefault"] = prot.setDefault;
 
 
     window["asc_CatAxisSettings"] = asc_CatAxisSettings;

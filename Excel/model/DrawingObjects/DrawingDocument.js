@@ -4574,118 +4574,111 @@ function CDrawingDocument(drawingObjects)
         if (!bIsChange)
             return;
 
-        History.TurnOff();
-        //var _oldTurn = editor.isViewMode;
-        //editor.isViewMode = true;
-
-        //var par = new Paragraph(this, this.m_oWordControl.m_oLogicDocument, 0, 0, 0, 1000, 1000);
-		
-		var shape = new CShape(null, this.drawingObjects);
-		shape.addTextBody(new CTextBody(shape));
-        var par = shape.txBody.content.Content[0];
-
-        par.Cursor_MoveToStartPos();
-
-        var _paraPr = new CParaPr();
-        par.Pr = _paraPr;
-        var _textPr = new CTextPr();
-        _textPr.FontFamily = { Name : "Arial", Index : -1 };
-
-        _textPr.Strikeout  = this.GuiLastTextProps.Strikeout;
-
-        if (true === this.GuiLastTextProps.Subscript)
-            _textPr.VertAlign  = vertalign_SubScript;
-        else if (true === this.GuiLastTextProps.Superscript)
-            _textPr.VertAlign  = vertalign_SuperScript;
-        else
-            _textPr.VertAlign = vertalign_Baseline;
-
-        _textPr.DStrikeout = this.GuiLastTextProps.DStrikeout;
-        _textPr.Caps       = this.GuiLastTextProps.AllCaps;
-        _textPr.SmallCaps  = this.GuiLastTextProps.SmallCaps;
-
-        _textPr.Spacing    = this.GuiLastTextProps.TextSpacing;
-        _textPr.Position   = this.GuiLastTextProps.Position;
-
-        par.Add(new ParaTextPr(_textPr));
-        par.Add(new ParaText("H"));
-        par.Add(new ParaText("e"));
-        par.Add(new ParaText("l"));
-        par.Add(new ParaText("l"));
-        par.Add(new ParaText("o"));
-        par.Add(new ParaSpace(1));
-        par.Add(new ParaText("W"));
-        par.Add(new ParaText("o"));
-        par.Add(new ParaText("r"));
-        par.Add(new ParaText("l"));
-        par.Add(new ParaText("d"));
-
-		shape.txBody.content.Reset(0, 0, 1000, 1000);
-		shape.txBody.content.Recalculate_Page(0,true);
-    
-
-        var baseLineOffset = par.Lines[0].Y;
-        var _bounds = par.Get_PageBounds(0);
-
-        var ctx = this.GuiCanvasTextProps.getContext('2d');
-        var _wPx = this.GuiCanvasTextProps.width;
-        var _hPx = this.GuiCanvasTextProps.height;
-
-        var _wMm = _wPx * g_dKoef_pix_to_mm;
-        var _hMm = _hPx * g_dKoef_pix_to_mm;
-
-        ctx.fillStyle = "#FFFFFF";
-        ctx.fillRect(0, 0, _wPx, _hPx);
-
-        var _pxBoundsW = par.Lines[0].W * g_dKoef_mm_to_pix;//(_bounds.Right - _bounds.Left) * g_dKoef_mm_to_pix;
-        var _pxBoundsH = (_bounds.Bottom - _bounds.Top) * g_dKoef_mm_to_pix;
-
-        if (this.GuiLastTextProps.Position !== undefined && this.GuiLastTextProps.Position != null && this.GuiLastTextProps.Position != 0)
+        ExecuteNoHistory(function()
         {
-            // TODO: нужна высота без учета Position
-            // _pxBoundsH -= (this.GuiLastTextProps.Position * g_dKoef_mm_to_pix);
-        }
+            var shape = new CShape();
+            shape.setTxBody(CreateTextBodyFromString("", this, shape));
+            //var par = new Paragraph(this, null, 0, 0, 0, 1000, 1000, true);
+            var par = shape.txBody.content.Content[0];
+            par.Reset(0, 0, 1000, 1000, 0);
+            par.Cursor_MoveToStartPos();
+            var _paraPr = new CParaPr();
+            par.Pr = _paraPr;
+            var _textPr = new CTextPr();
+            _textPr.FontFamily = { Name : "Arial", Index : -1 };
 
-        if (_pxBoundsH < _hPx && _pxBoundsW < _wPx)
-        {
-            // рисуем линию
-            var _lineY = (((_hPx + _pxBoundsH) / 2) >> 0) + 0.5;
-            var _lineW = (((_wPx - _pxBoundsW) / 4) >> 0);
+            _textPr.Strikeout  = this.GuiLastTextProps.Strikeout;
 
-            ctx.strokeStyle = "#000000";
-            ctx.lineWidth = 1;
+            if (true === this.GuiLastTextProps.Subscript)
+                _textPr.VertAlign  = vertalign_SubScript;
+            else if (true === this.GuiLastTextProps.Superscript)
+                _textPr.VertAlign  = vertalign_SuperScript;
+            else
+                _textPr.VertAlign = vertalign_Baseline;
 
-            ctx.beginPath();
-            ctx.moveTo(0, _lineY);
-            ctx.lineTo(_lineW, _lineY);
+            _textPr.DStrikeout = this.GuiLastTextProps.DStrikeout;
+            _textPr.Caps       = this.GuiLastTextProps.AllCaps;
+            _textPr.SmallCaps  = this.GuiLastTextProps.SmallCaps;
 
-            ctx.moveTo(_wPx - _lineW, _lineY);
-            ctx.lineTo(_wPx, _lineY);
+            _textPr.Spacing    = this.GuiLastTextProps.TextSpacing;
+            _textPr.Position   = this.GuiLastTextProps.Position;
 
-            ctx.stroke();
-            ctx.beginPath();
-        }
+            var parRun = new ParaRun(par); var Pos = 0;
+            parRun.Set_Pr(_textPr);
+            parRun.Add_ToContent(Pos++,new ParaText("H"), false);
+            parRun.Add_ToContent(Pos++,new ParaText("e"), false);
+            parRun.Add_ToContent(Pos++,new ParaText("l"), false);
+            parRun.Add_ToContent(Pos++,new ParaText("l"), false);
+            parRun.Add_ToContent(Pos++,new ParaText("o"), false);
+            parRun.Add_ToContent(Pos++,new ParaSpace(1), false);
+            parRun.Add_ToContent(Pos++, new ParaText("W"), false);
+            parRun.Add_ToContent(Pos++, new ParaText("o"), false);
+            parRun.Add_ToContent(Pos++, new ParaText("r"), false);
+            parRun.Add_ToContent(Pos++, new ParaText("l"), false);
+            parRun.Add_ToContent(Pos++, new ParaText("d"), false);
+            par.Add_ToContent(0, parRun);
 
-        var _yOffset = (((_hPx + _pxBoundsH) / 2) - baseLineOffset * g_dKoef_mm_to_pix) >> 0;
-        var _xOffset = ((_wPx - _pxBoundsW) / 2) >> 0;
+            par.Recalculate_Page(0);
 
-        var graphics = new CGraphics();
-        graphics.init(ctx, _wPx, _hPx, _wMm, _hMm);
-        graphics.m_oFontManager = g_fontManager;
+            par.Recalculate_Page(0);
 
-        graphics.m_oCoordTransform.tx = _xOffset;
-        graphics.m_oCoordTransform.ty = _yOffset;
+            var baseLineOffset = par.Lines[0].Y;
+            var _bounds = par.Get_PageBounds(0);
 
-        graphics.transform(1,0,0,1,0,0);
+            var ctx = this.GuiCanvasTextProps.getContext('2d');
+            var _wPx = this.GuiCanvasTextProps.width;
+            var _hPx = this.GuiCanvasTextProps.height;
 
-        //var old_marks = this.m_oWordControl.m_oApi.ShowParaMarks;
-        //this.m_oWordControl.m_oApi.ShowParaMarks = false;
-        par.Draw(0, graphics);
-        //this.m_oWordControl.m_oApi.ShowParaMarks = old_marks;
+            var _wMm = _wPx * g_dKoef_pix_to_mm;
+            var _hMm = _hPx * g_dKoef_pix_to_mm;
 
-        History.TurnOn();
-        //editor.isViewMode = _oldTurn;
-    }
+            ctx.fillStyle = "#FFFFFF";
+            ctx.fillRect(0, 0, _wPx, _hPx);
+
+            var _pxBoundsW = par.Lines[0].Ranges[0].W * g_dKoef_mm_to_pix;//(_bounds.Right - _bounds.Left) * g_dKoef_mm_to_pix;
+            var _pxBoundsH = (_bounds.Bottom - _bounds.Top) * g_dKoef_mm_to_pix;
+
+            if (this.GuiLastTextProps.Position !== undefined && this.GuiLastTextProps.Position != null && this.GuiLastTextProps.Position != 0)
+            {
+                // TODO: нужна высота без учета Position
+                // _pxBoundsH -= (this.GuiLastTextProps.Position * g_dKoef_mm_to_pix);
+            }
+
+            if (_pxBoundsH < _hPx && _pxBoundsW < _wPx)
+            {
+                // рисуем линию
+                var _lineY = (((_hPx + _pxBoundsH) / 2) >> 0) + 0.5;
+                var _lineW = (((_wPx - _pxBoundsW) / 4) >> 0);
+
+                ctx.strokeStyle = "#000000";
+                ctx.lineWidth = 1;
+
+                ctx.beginPath();
+                ctx.moveTo(0, _lineY);
+                ctx.lineTo(_lineW, _lineY);
+
+                ctx.moveTo(_wPx - _lineW, _lineY);
+                ctx.lineTo(_wPx, _lineY);
+
+                ctx.stroke();
+                ctx.beginPath();
+            }
+
+            var _yOffset = (((_hPx + _pxBoundsH) / 2) - baseLineOffset * g_dKoef_mm_to_pix) >> 0;
+            var _xOffset = ((_wPx - _pxBoundsW) / 2) >> 0;
+
+            var graphics = new CGraphics();
+            graphics.init(ctx, _wPx, _hPx, _wMm, _hMm);
+            graphics.m_oFontManager = g_fontManager;
+
+            graphics.m_oCoordTransform.tx = _xOffset;
+            graphics.m_oCoordTransform.ty = _yOffset;
+
+            graphics.transform(1,0,0,1,0,0);
+
+            par.Draw(0, graphics);
+        }, this, []);
+    };
 
     this.CheckTableStyles = function(tableLook)
     {

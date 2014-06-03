@@ -247,10 +247,12 @@ RotateState.prototype =
             var tracks = [].concat(this.drawingObjects.arrTrackObjects);
             var group = this.group;
             var drawingObjects = this.drawingObjects;
+            var oThis = this;
             this.drawingObjects.checkSelectedObjectsAndCallback(
                 function()
                 {
-                    for(var i = 0; i < tracks.length; ++i)
+                    var i;
+                    for(i = 0; i < tracks.length; ++i)
                     {
                         tracks[i].trackEnd(false);
                     }
@@ -258,7 +260,33 @@ RotateState.prototype =
                     {
                         group.updateCoordinatesAfterInternalResize();
                     }
-
+                    drawingObjects.recalculate();
+                    var arr_x = [], arr_y = [], transform, min_x, min_y, drawing;
+                    for(i = 0; i < oThis.drawingObjects.selectedObjects.length; ++i)
+                    {
+                        arr_x.length = 0;
+                        arr_y.length = 0;
+                        drawing = oThis.drawingObjects.selectedObjects[i];
+                        transform = drawing.transform;
+                        arr_x.push(transform.TransformPointX(0, 0));
+                        arr_y.push(transform.TransformPointY(0, 0));
+                        arr_x.push(transform.TransformPointX(drawing.extX, 0));
+                        arr_y.push(transform.TransformPointY(drawing.extX, 0));
+                        arr_x.push(transform.TransformPointX(drawing.extX, drawing.extY));
+                        arr_y.push(transform.TransformPointY(drawing.extX, drawing.extY));
+                        arr_x.push(transform.TransformPointX(0, drawing.extY));
+                        arr_y.push(transform.TransformPointY(0, drawing.extY));
+                        min_x = Math.min.apply(Math, arr_x);
+                        min_y = Math.min.apply(Math, arr_y);
+                        if(min_x < 0)
+                        {
+                            drawing.spPr.xfrm.setOffX(drawing.spPr.xfrm.offX - min_x);
+                        }
+                        if(min_y < 0)
+                        {
+                            drawing.spPr.xfrm.setOffY(drawing.spPr.xfrm.offY - min_y);
+                        }
+                    }
                     drawingObjects.startRecalculate();
                 }, []
             )
@@ -376,6 +404,26 @@ function MoveState(drawingObjects, majorObject, startX, startY)
 
     this.startX = startX;
     this.startY = startY;
+
+    var arr_x = [], arr_y = [];
+    for(var i = 0; i < this.drawingObjects.arrTrackObjects.length; ++i)
+    {
+        var track = this.drawingObjects.arrTrackObjects[i];
+        var transform = track.originalObject.transform;
+        arr_x.push(transform.TransformPointX(0, 0));
+        arr_y.push(transform.TransformPointY(0, 0));
+        arr_x.push(transform.TransformPointX(track.originalObject.extX, 0));
+        arr_y.push(transform.TransformPointY(track.originalObject.extX, 0));
+        arr_x.push(transform.TransformPointX(track.originalObject.extX, track.originalObject.extY));
+        arr_y.push(transform.TransformPointY(track.originalObject.extX, track.originalObject.extY));
+        arr_x.push(transform.TransformPointX(0, track.originalObject.extY));
+        arr_y.push(transform.TransformPointY(0, track.originalObject.extY));
+    }
+    this.rectX = Math.min.apply(Math, arr_x);
+    this.rectY = Math.min.apply(Math, arr_y);
+    this.rectW = Math.max.apply(Math, arr_x);
+    this.rectH = Math.max.apply(Math, arr_y);
+
 }
 
 MoveState.prototype =
@@ -592,8 +640,10 @@ MoveState.prototype =
             }
         }
 
+        var tx = result_x - this.startX + min_dx, ty = result_y - this.startY + min_dy;
+        var check_position = this.drawingObjects.drawingObjects.checkGraphicObjectPosition(this.rectX + tx, this.rectY + ty, this.rectW, this.rectH);
         for(_object_index = 0; _object_index < _objects_count; ++_object_index)
-            _arr_track_objects[_object_index].track(result_x - this.startX + min_dx, result_y - this.startY + min_dy, pageIndex);
+            _arr_track_objects[_object_index].track(tx + check_position.x, ty + check_position.y, pageIndex);
         this.drawingObjects.updateOverlay();
     },
 
@@ -646,6 +696,26 @@ function MoveInGroupState(drawingObjects, majorObject, group, startX, startY)
     this.group = group;
     this.startX = startX;
     this.startY = startY;
+
+
+    var arr_x = [], arr_y = [];
+    for(var i = 0; i < this.drawingObjects.arrTrackObjects.length; ++i)
+    {
+        var track = this.drawingObjects.arrTrackObjects[i];
+        var transform = track.originalObject.transform;
+        arr_x.push(transform.TransformPointX(0, 0));
+        arr_y.push(transform.TransformPointY(0, 0));
+        arr_x.push(transform.TransformPointX(track.originalObject.extX, 0));
+        arr_y.push(transform.TransformPointY(track.originalObject.extX, 0));
+        arr_x.push(transform.TransformPointX(track.originalObject.extX, track.originalObject.extY));
+        arr_y.push(transform.TransformPointY(track.originalObject.extX, track.originalObject.extY));
+        arr_x.push(transform.TransformPointX(0, track.originalObject.extY));
+        arr_y.push(transform.TransformPointY(0, track.originalObject.extY));
+    }
+    this.rectX = Math.min.apply(Math, arr_x);
+    this.rectY = Math.min.apply(Math, arr_y);
+    this.rectW = Math.max.apply(Math, arr_x);
+    this.rectH = Math.max.apply(Math, arr_y);
 }
 
 MoveInGroupState.prototype =

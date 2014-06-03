@@ -218,6 +218,7 @@ CChartSpace.prototype =
     },
 
     select: CShape.prototype.select,
+    checkHitToBounds: CShape.prototype.checkHitToBounds,
 
     getMainGroup: function()
     {
@@ -8946,10 +8947,10 @@ function CreateDefaultAxises(valFormatCode)
     cat_ax.setCrossAx(val_ax);
     //cat_ax.setTitle(new CTitle());
     //val_ax.setTitle(new CTitle());
-    var title = val_ax.title;
-    title.setTxPr(new CTextBody());
-    title.txPr.setBodyPr(new CBodyPr());
-    title.txPr.bodyPr.setVert(nVertTTvert);
+   // var title = val_ax.title;
+   // title.setTxPr(new CTextBody());
+   // title.txPr.setBodyPr(new CBodyPr());
+   // title.txPr.bodyPr.setVert(nVertTTvert);
     return {valAx: val_ax, catAx: cat_ax};
 }
 

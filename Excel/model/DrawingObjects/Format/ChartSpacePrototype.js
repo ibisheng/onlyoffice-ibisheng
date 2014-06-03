@@ -54,7 +54,8 @@ CChartSpace.prototype.setRecalculateInfo = function()
         recalculateHiLowLines: true,
         recalculateUpDownBars: true,
         recalculateLegend: true,
-        recalculateReferences: true
+        recalculateReferences: true,
+        recalculateBBox: true
     };
     this.baseColors = [];
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
@@ -207,6 +208,11 @@ CChartSpace.prototype.recalculate = function()
         {
             this.recalculateReferences();
             this.recalcInfo.recalculateReferences = false;
+        }
+        if(this.recalcInfo.recalculateBBox)
+        {
+            this.recalculateBBox();
+            this.recalcInfo.recalculateBBox = false;
         }
         if(this.recalcInfo.recalculateBaseColors)
         {

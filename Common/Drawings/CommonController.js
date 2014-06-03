@@ -61,6 +61,26 @@ function CheckSpPrXfrm(object)
 
 }
 
+function CheckSpPrXfrm2(object)
+{
+    if(!object.spPr)
+    {
+        object.spPr = new CSpPr();
+        object.spPr.parent = object;
+    }
+    if(!object.spPr.xfrm)
+    {
+        object.spPr.xfrm = new CXfrm();
+        object.spPr.xfrm.parent = object.spPr;
+        object.spPr.xfrm.offX = 0;//object.x;
+        object.spPr.xfrm.offY = 0;//object.y;
+        object.spPr.xfrm.extX = object.extX;
+        object.spPr.xfrm.extY = object.extY;
+    }
+
+}
+
+
 function getObjectsByTypesFromArr(arr, bGrouped)
 {
     var ret = {shapes: [], images: [], groups: [], charts: []};
@@ -699,7 +719,8 @@ DrawingObjectsController.prototype =
                 if(this.selectedObjects[i].selectStartPage === pageIndex)
                 {
                     drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selectedObjects[i].getTransformMatrix(), 0, 0, this.selectedObjects[i].extX, this.selectedObjects[i].extY, CheckObjectLine(this.selectedObjects[i]), this.selectedObjects[i].canRotate());
-                    //  this.drawingDocument.AutoShapesTrack.DrawEditWrapPointsPolygon(this.selectedObjects[i].parent.wrappingPolygon.calculatedPoints, new CMatrix());
+                    //if(this.document)
+                    //    this.drawingDocument.AutoShapesTrack.DrawEditWrapPointsPolygon(this.selectedObjects[i].parent.wrappingPolygon.calculatedPoints, new CMatrix());
                 }
 
             }
@@ -1457,6 +1478,13 @@ DrawingObjectsController.prototype =
                 objects_by_type.images[i].setBlipFill(CreateBlipFillUniFillFromUrl(props.ImageUrl).fill);
             }
         }
+        if(props.ChartProperties)
+        {
+            for(i = 0; i < objects_by_type.charts.length; ++i)
+            {
+                this.applyPropsToChartSpace(props.ChartProperties, objects_by_type.charts[i]);
+            }
+        }
         if(isRealNumber(props.Width) && isRealNumber(props.Height))
         {
             //Todo: может отсутствовать spPr и xfrm
@@ -2053,19 +2081,18 @@ DrawingObjectsController.prototype =
             if(axis.minorGridlines && !axis.majorGridlines)
                 return c_oAscGridLinesSettings.minor;
             return c_oAscGridLinesSettings.majorMinor;
-        }
+        };
         if(hor_axis)
             ret.putHorAxisProps(hor_axis.getMenuProps());
-        ret.putHorGridLines(calc_grid_lines(hor_axis));
+        ret.putHorGridLines(calc_grid_lines(vert_axis));
 
         if(vert_axis)
             ret.putVertAxisProps(vert_axis.getMenuProps());
-        ret.putVertGridLines(calc_grid_lines(vert_axis));
+        ret.putVertGridLines(calc_grid_lines(hor_axis));
 
 
-        //TODO: переделать ret.putHorAxisLabel(hor_axis ? (isRealObject(hor_axis.title) ? (hor_axis.title.overlay ? c_oAscChartTitleShowSettings.overlay : c_oAscChartTitleShowSettings.noOverlay) : c_oAscChartTitleShowSettings.none): null);
-        //TODO: переделать ret.putVertAxisLabel(vert_axis ? (isRealObject(vert_axis.title) ? (vert_axis.title.overlay ? c_oAscChartTitleShowSettings.overlay : c_oAscChartTitleShowSettings.noOverlay) : c_oAscChartTitleShowSettings.none): null);
-
+        ret.putHorAxisLabel(hor_axis && hor_axis.title ? c_oAscChartHorAxisLabelShowSettings.noOverlay : c_oAscChartTitleShowSettings.none);
+        ret.putVertAxisLabel(vert_axis && vert_axis.title ? c_oAscChartVertAxisLabelShowSettings.rotated : c_oAscChartVertAxisLabelShowSettings.none); //TODO
 
         var data_labels = plot_area.chart.dLbls;
         if(data_labels)
@@ -2074,7 +2101,7 @@ DrawingObjectsController.prototype =
             ret.putShowCatName(data_labels.showCatName === true);
             ret.putShowVal(data_labels.showVal === true);
             ret.putSeparator(data_labels.separator);
-            ret.putDataLabelsPos(REV_DLBL_POS_DEFINES_MAP[data_labels.dLblPos]);
+            ret.putDataLabelsPos(isRealNumber(REV_DLBL_POS_DEFINES_MAP[data_labels.dLblPos]) ? REV_DLBL_POS_DEFINES_MAP[data_labels.dLblPos] :  c_oAscChartDataLabelsPos.none);
         }
 
 
@@ -2508,17 +2535,14 @@ DrawingObjectsController.prototype =
                         }
                         else
                         {
-                            var para_drawing = cur_group.parent, para_drawing2 = null;
-                            var paragraph = cur_group.parent.Get_ParentParagraph();
                             if(cur_group.spTree.length === 0)
                             {
                                 this.resetInternalSelection();
-                                this.remove();
+                                this.removeCallback();
                                 return;
                             }
                             else if(cur_group.spTree.length === 1)
                             {
-                                sp.setDrawingObjects(this.drawingObjects);
                                 sp = cur_group.spTree[0];
                                 sp.spPr.xfrm.setOffX(cur_group.spPr.xfrm.offX + sp.spPr.xfrm.offX);
                                 sp.spPr.xfrm.setOffY(cur_group.spPr.xfrm.offY + sp.spPr.xfrm.offY);
@@ -2828,9 +2852,9 @@ DrawingObjectsController.prototype =
         {
             text_object = this.selection.textSelection;
         }
-        else if(this.selection.groupSelection && this.selection.groupSelection.textSelection)
+        else if(this.selection.groupSelection && this.selection.groupSelection.selection.textSelection)
         {
-            text_object = this.selection.groupSelection.textSelection;
+            text_object = this.selection.groupSelection.selection.textSelection;
         }
         if(text_object)
         {
@@ -2862,7 +2886,7 @@ DrawingObjectsController.prototype =
         }
         else if ( e.keyCode == 9 && false === isViewMode ) // Tab
         {
-            if(this.selection.textSelection || this.selection.groupSelection && this.selection.groupSelection.textSelection
+            if(this.selection.textSelection || this.selection.groupSelection && this.selection.groupSelection.selection.textSelection
                 || this.selection.chartSelection && this.selection.chartSelection.textSelection)
             {
                 this.checkSelectedObjectsAndCallback(this.paragraphAdd, [new ParaTab()])
@@ -2874,7 +2898,7 @@ DrawingObjectsController.prototype =
         }
         else if ( e.keyCode == 13 && false === isViewMode ) // Enter
         {
-            if(this.selection.textSelection || this.selection.groupSelection && this.selection.groupSelection.textSelection
+            if(this.selection.textSelection || this.selection.groupSelection && this.selection.groupSelection.selection.textSelection
                 || this.selection.chartSelection && this.selection.chartSelection.textSelection)
             {
                 this.checkSelectedObjectsAndCallback(this.addNewParagraph, [])
@@ -2900,9 +2924,9 @@ DrawingObjectsController.prototype =
             }
             else if(this.selection.groupSelection)
             {
-                if(this.selection.groupSelection.textSelection)
+                if(this.selection.groupSelection.selection.textSelection)
                 {
-                    this.selection.groupSelection.textSelection = null;
+                    this.selection.groupSelection.selection.textSelection = null;
                 }
                 else if(this.selection.groupSelection.chartSelection)
                 {
@@ -2934,7 +2958,7 @@ DrawingObjectsController.prototype =
         {
             if(!e.ctrlKey)
             {
-                if(this.selection.textSelection || this.selection.groupSelection && this.selection.groupSelection.textSelection
+                if(this.selection.textSelection || this.selection.groupSelection && this.selection.groupSelection.selection.textSelection
                     || this.selection.chartSelection && this.selection.chartSelection.textSelection)
                 {
                     this.checkSelectedObjectsAndCallback(this.paragraphAdd, [new ParaSpace(1)]);
@@ -3948,25 +3972,56 @@ DrawingObjectsController.prototype =
 
     putPrLineSpacing: function(type, value)
     {
+        this.checkSelectedObjectsAndCallback(this.setParagraphSpacing, [{ LineRule : type,  Line : value }]);
         //TODO
     },
 
-    putPrLineSpacingCallback: function(type, value)
-    {
-        //TODO
-    },
 
     putLineSpacingBeforeAfter: function(type, value)
     {
-        //TODO
+        var arg;
+        switch (type)
+        {
+            case 0:
+            {
+                if ( spacing_Auto === value )
+                    arg = { BeforeAutoSpacing : true };
+                else
+                    arg = { Before : value, BeforeAutoSpacing : false };
+
+                break;
+            }
+            case 1:
+            {
+                if ( spacing_Auto === value )
+                    arg = { AfterAutoSpacing : true };
+                else
+                    arg = { After : value, AfterAutoSpacing : false };
+
+                break;
+            }
+        }
+        if(arg)
+        {
+            this.checkSelectedObjectsAndCallback(this.setParagraphSpacing, [arg]);
+        }
     },
 
 
 
     setGraphicObjectProps: function(props)
     {
-        this.checkSelectedObjectsAndCallback(this.setGraphicObjectPropsCallBack, [props])
+        if(typeof asc_CParagraphProperty !== "undefined" && !(props instanceof asc_CParagraphProperty))
+        {
+            this.checkSelectedObjectsAndCallback(this.setGraphicObjectPropsCallBack, [props]);
+        }
+        else
+        {
+            this.checkSelectedObjectsAndCallback(this.paraApplyCallback, [props]);
+        }
     },
+
+
 
     checkSelectedObjectsAndCallback: function(callback, args)
     {
@@ -4004,6 +4059,124 @@ DrawingObjectsController.prototype =
             apply_props = props.ShapeProperties ? props.ShapeProperties : props;
         }
         var objects_by_types = this.applyDrawingProps(apply_props);
+    },
+
+    paraApplyCallback: function(Props)
+    {
+            if ( "undefined" != typeof(Props.ContextualSpacing) && null != Props.ContextualSpacing )
+                this.setParagraphContextualSpacing( Props.ContextualSpacing );
+
+            if ( "undefined" != typeof(Props.Ind) && null != Props.Ind )
+                this.setParagraphIndent( Props.Ind );
+
+            if ( "undefined" != typeof(Props.Jc) && null != Props.Jc )
+                this.setParagraphAlign( Props.Jc );
+
+            if ( "undefined" != typeof(Props.KeepLines) && null != Props.KeepLines )
+                this.setParagraphKeepLines( Props.KeepLines );
+
+            if ( undefined != Props.KeepNext && null != Props.KeepNext )
+                this.setParagraphKeepNext( Props.KeepNext );
+
+            if ( undefined != Props.WidowControl && null != Props.WidowControl )
+                this.setParagraphWidowControl( Props.WidowControl );
+
+            if ( "undefined" != typeof(Props.PageBreakBefore) && null != Props.PageBreakBefore )
+                this.setParagraphPageBreakBefore( Props.PageBreakBefore );
+
+            if ( "undefined" != typeof(Props.Spacing) && null != Props.Spacing )
+                this.setParagraphSpacing( Props.Spacing );
+
+            if ( "undefined" != typeof(Props.Shd) && null != Props.Shd )
+                this.setParagraphShd( Props.Shd );
+
+            if ( "undefined" != typeof(Props.Brd) && null != Props.Brd )
+            {
+                if(Props.Brd.Left && Props.Brd.Left.Color)
+                {
+                    Props.Brd.Left.Unifill = CreateUnifillFromAscColor(Props.Brd.Left.Color);
+                }
+                if(Props.Brd.Top && Props.Brd.Top.Color)
+                {
+                    Props.Brd.Top.Unifill = CreateUnifillFromAscColor(Props.Brd.Top.Color);
+                }
+                if(Props.Brd.Right && Props.Brd.Right.Color)
+                {
+                    Props.Brd.Right.Unifill = CreateUnifillFromAscColor(Props.Brd.Right.Color);
+                }
+                if(Props.Brd.Bottom && Props.Brd.Bottom.Color)
+                {
+                    Props.Brd.Bottom.Unifill = CreateUnifillFromAscColor(Props.Brd.Bottom.Color);
+                }
+                if(Props.Brd.InsideH && Props.Brd.InsideH.Color)
+                {
+                    Props.Brd.InsideH.Unifill = CreateUnifillFromAscColor(Props.Brd.InsideH.Color);
+                }
+                if(Props.Brd.InsideV && Props.Brd.InsideV.Color)
+                {
+                    Props.Brd.InsideV.Unifill = CreateUnifillFromAscColor(Props.Brd.InsideV.Color);
+                }
+
+                this.setParagraphBorders( Props.Brd );
+            }
+
+            if ( undefined != Props.Tabs )
+            {
+                var Tabs = new CParaTabs();
+                Tabs.Set_FromObject( Props.Tabs.Tabs );
+                this.setParagraphTabs( Tabs );
+            }
+
+            if ( undefined != Props.DefaultTab )
+            {
+                //this.setDefa( Props.DefaultTab );
+            }
+
+
+            // TODO: как только разъединят настройки параграфа и текста переделать тут
+            var TextPr = new CTextPr();
+
+            if ( true === Props.Subscript )
+                TextPr.VertAlign = vertalign_SubScript;
+            else if ( true === Props.Superscript )
+                TextPr.VertAlign = vertalign_SuperScript;
+            else if ( false === Props.Superscript || false === Props.Subscript )
+                TextPr.VertAlign = vertalign_Baseline;
+
+            if ( undefined != Props.Strikeout )
+            {
+                TextPr.Strikeout  = Props.Strikeout;
+                TextPr.DStrikeout = false;
+            }
+
+            if ( undefined != Props.DStrikeout )
+            {
+                TextPr.DStrikeout = Props.DStrikeout;
+                if ( true === TextPr.DStrikeout )
+                    TextPr.Strikeout = false;
+            }
+
+            if ( undefined != Props.SmallCaps )
+            {
+                TextPr.SmallCaps = Props.SmallCaps;
+                TextPr.AllCaps   = false;
+            }
+
+            if ( undefined != Props.AllCaps )
+            {
+                TextPr.Caps = Props.AllCaps;
+                if ( true === TextPr.AllCaps )
+                    TextPr.SmallCaps = false;
+            }
+
+            if ( undefined != Props.TextSpacing )
+                TextPr.Spacing = Props.TextSpacing;
+
+            if ( undefined != Props.Position )
+                TextPr.Position = Props.Position;
+
+            this.paragraphAdd( new ParaTextPr(TextPr) );
+        this.startRecalculate();
     },
 
 

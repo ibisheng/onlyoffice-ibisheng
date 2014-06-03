@@ -3462,7 +3462,7 @@
 			if (this.activeFillHandle !== null) {
 				// Мы в режиме автозаполнения
 				aFH = this.activeFillHandle.clone(true);
-				aFHIntersection = this.activeFillHandle.intersection(this.visibleRange);
+				aFHIntersection = this.activeFillHandle.intersection(tmpRange !== undefined ? tmpRange : this.visibleRange);
 			}
 
 			if (!range && !aFHIntersection && !this.isFormulaEditMode && !this.activeMoveRange && !this.isChartAreaEditMode) {
@@ -5245,8 +5245,10 @@
 				dx   = this.cellsLeft - x;
 				oldW = ctxW - x - Math.abs(dx);
 
-				if (rFrozen)
+				if (rFrozen) {
 					ctx.drawImage(ctx.getCanvas(), x, this.cellsTop, oldW, diffHeight, x + dx, this.cellsTop, oldW, diffHeight);
+					// ToDo Посмотреть с объектами!!!
+				}
 				this._drawFrozenPane(true);
 			} else {
 				dx   = 0;
@@ -5256,19 +5258,18 @@
 
 			if (oldH > 0) {
 				ctx.drawImage(ctx.getCanvas(), x, y, oldW, oldH - lastRowHeight, x + dx, y - dy, oldW, oldH - lastRowHeight);
+				this.drawingGraphicCtx.moveImageData(x, y, oldW, oldH - lastRowHeight, x + dx, y - dy);
 			}
 			ctx.setFillStyle(this.settings.cells.defaultState.background)
 				.fillRect(this.headersLeft, y + (scrollDown ? oldH - dy - lastRowHeight : 0),
 					ctxW, Math.abs(dy) + lastRowHeight);
 
-			var rangeGraphic = null;
 			if ( !(dy > 0 && vr.r2 === oldEnd && !oldVRE_isPartial && dx === 0) ) {
 				var c1 = vr.c1;
 				var r1 = scrollDown ? oldEnd + (oldVRE_isPartial ? 0 : 1) : vr.r1;
 				var c2 = vr.c2;
 				var r2 = dy > 0 || oldH <= 0 ? vr.r2 : vr.r1 - 1 - delta; /* delta < 0 here */
 				var range = asc_Range(c1, r1, c2, r2);
-				rangeGraphic = range.clone();
 				// Это необходимо для того, чтобы строки, у которых высота по тексту рассчитались (баг http://bugzserver/show_bug.cgi?id=21552)
 				this._prepareCellTextMetricsCache(range);
 				if (dx === 0) {
@@ -5294,6 +5295,7 @@
 				this._drawCells(/*drawingCtx*/undefined, range);
 				this._drawCellsBorders(/*drawingCtx*/undefined, range);
 				this._drawAutoF(range, offsetX, offsetY);
+				this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollVertical, range));
 				if (0 < cFrozen) {
 					range.c1 = 0;
 					range.c2 = cFrozen - 1;
@@ -5302,6 +5304,7 @@
 					this._drawCells(/*drawingCtx*/undefined, range, offsetX);
 					this._drawCellsBorders(/*drawingCtx*/undefined, range, offsetX);
 					this._drawAutoF(range, offsetX, offsetY);
+					this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollVertical, range));
 				}
 				// Отрисовывать нужно всегда, вдруг бордеры
 				this._drawFrozenPaneLines();
@@ -5320,7 +5323,6 @@
                 this.objectRender.drawingArea.reinitRanges();
 			this.cellCommentator.updateCommentPosition();
 			this.cellCommentator.drawCommentCells();
-			this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollVertical, rangeGraphic));
 			return this;
 		};
 

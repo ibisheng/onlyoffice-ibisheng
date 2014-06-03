@@ -324,6 +324,12 @@ DrawingObjectsController.prototype.createGroup = function()
 DrawingObjectsController.prototype.addChartDrawingObject = function(asc_chart, options)
 {
     History.Create_NewPoint();
+    var type_subtype = TYPE_SUBTYPE_BY_TYPE[options.type];
+    if(type_subtype)
+    {
+        asc_chart.type = type_subtype.type;
+        asc_chart.subType = type_subtype.subtype;
+    }
     var chart = this.getChartSpace(asc_chart, options);
     if(chart)
     {
@@ -356,9 +362,15 @@ DrawingObjectsController.prototype.addChartDrawingObject = function(asc_chart, o
         chart.setDrawingObjects(this.drawingObjects);
         chart.setWorksheet(this.drawingObjects.getWorksheetModel());
         chart.addToDrawingObjects();
+        this.resetSelection();
         this.selectObject(chart, 0);
+        if(options)
+        {
+            this.editChartCallback(options);
+        }
         chart.addToRecalculate();
         this.startRecalculate();
+        this.drawingObjects.sendGraphicObjectProps();
     }
 };
 
