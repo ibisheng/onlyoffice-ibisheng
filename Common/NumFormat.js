@@ -2784,6 +2784,7 @@ FormatParser.prototype =
 			if(!bError){
 				var oVal = this._parseThouthand(sVal, cultureInfo);
 				if (oVal) {
+					res = {format: null, value: null, bDateTime: false, bDate: false, bTime: false, bPercent: false, bCurrency: false};
 					var dVal = oVal.number;
 					if (bMinus)
 						dVal = -dVal;
@@ -2792,10 +2793,12 @@ FormatParser.prototype =
 						sFracFormat = gc_sFormatDecimalPoint + "00";
 					var sFormat = null;
 					if (bPercent) {
+						res.bPercent = true;
 						dVal /= 100;
 						sFormat = "0" + sFracFormat + "%";
 					}
 					else if (sCurrency) {
+						res.bCurrency = true;
 					    var sNumberFormat = "#" + gc_sFormatThousandSeparator + "##0" + sFracFormat;
 					    var sCurrencyFormat;
 					    if(sCurrency.length > 1)
@@ -2877,7 +2880,8 @@ FormatParser.prototype =
 					}
 					else
 						sFormat = "General";
-					res = { format: sFormat, value: dVal };
+					res.format = sFormat;
+					res.value = dVal;
 				}
 			}
         }
@@ -3442,7 +3446,7 @@ FormatParser.prototype =
 							else
 								sFormat = "h:mm:ss";
 						}
-						res = {format: sFormat, value: dValue, bDateTime: true};
+						res = {format: sFormat, value: dValue, bDateTime: true, bDate: bDate, bTime: bTime, bPercent: false, bCurrency: false};
 					}
 				}
             }

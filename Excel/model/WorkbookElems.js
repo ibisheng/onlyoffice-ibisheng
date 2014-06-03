@@ -3222,26 +3222,20 @@ CCellValue.prototype =
 				else
 				{
 					//распознаем формат
-					var bParsed = false;
 					var res = g_oFormatParser.parse(val);
 					if(null != res)
 					{
 						//Сравниваем с текущим форматом, если типы совпадают - меняем только значение ячейки
-						var oTargetFormat = null;
-						if(null != oNumFormat)
-							oTargetFormat = oNumFormat.getFormatByValue(res.value);
-						if(res.bDateTime)
-						{
-							if(null == oTargetFormat || res.bDateTime != oTargetFormat.bDateTime)
-								this.cell.setNumFormat(res.format);
-						}
-						else if(res.format != oNumFormat.sFormat)
+						var nFormatType = oNumFormat.getType();
+						if(!((c_oAscNumFormatType.Percent == nFormatType && res.bPercent) ||
+							(c_oAscNumFormatType.Currency == nFormatType && res.bCurrency) ||
+							(c_oAscNumFormatType.Date == nFormatType && res.bDate) ||
+							(c_oAscNumFormatType.Time == nFormatType && res.bTime)) && res.format != oNumFormat.sFormat)
 							this.cell.setNumFormat(res.format);
 						this.number = res.value;
 						this.type = CellValueType.Number;
-						bParsed = true;
 					}
-					if(false == bParsed)
+					else
 					{
 						this.type = CellValueType.String;
 						//проверяем QuotePrefix
