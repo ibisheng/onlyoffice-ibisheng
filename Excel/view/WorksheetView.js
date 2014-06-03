@@ -1925,7 +1925,7 @@
 			this._fixSelectionOfHiddenCells();
 			this._drawAutoF();
 			this.cellCommentator.drawCommentCells();
-			this.objectRender.showDrawingObjects(false);
+			this.objectRender.showDrawingObjects(true);
 			if (this.overlayCtx) {
 				this._drawSelection();
 			}

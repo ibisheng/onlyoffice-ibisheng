@@ -6222,8 +6222,7 @@ asc_docs_api.prototype.ChangeColorScheme = function(index_scheme)
         {
             History.TurnOff();
         }
-        //this.chartStyleManager.init();
-        //this.chartPreviewManager.init();
+        this.chartPreviewManager.clearPreviews();
         if(is_on)
         {
             History.TurnOn();

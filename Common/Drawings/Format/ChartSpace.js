@@ -827,8 +827,8 @@ CChartSpace.prototype =
             if (startCell && endCell)
             {
                 var wsName = this.worksheet.sName;
-                if ( !rx_test_ws_name.test(wsName) )
-                    wsName = "'" + wsName + "'";
+                 if ( !rx_test_ws_name.test(wsName) )
+                     wsName = "'" + wsName + "'";
 
                 if (startCell.getID() == endCell.getID())
                     ret.range = wsName + "!" + startCell.getID();

@@ -3179,7 +3179,8 @@ function DrawingObjects() {
             _this.showDrawingObjects(true);
         };
 
-        api.ImageLoader.LoadDocumentImages(aImagesSync, null, _this.asyncImagesDocumentEndLoaded);
+        if(aImagesSync.length > 0)
+            api.ImageLoader.LoadDocumentImages(aImagesSync, null, _this.asyncImagesDocumentEndLoaded);
 
         // Upload event
         if (window.addEventListener) {

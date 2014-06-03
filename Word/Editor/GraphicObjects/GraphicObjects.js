@@ -2405,6 +2405,8 @@ CGraphicObjects.prototype =
             {
                 this.document.theme.themeElements.clrScheme = data.oldScheme;
                 this.drawingDocument.CheckGuiControlColors();
+
+                editor.chartPreviewManager.clearPreviews();
                 break;
             }
         }
@@ -2418,6 +2420,7 @@ CGraphicObjects.prototype =
             {
                 this.document.theme.themeElements.clrScheme = data.newScheme;
                 this.drawingDocument.CheckGuiControlColors();
+                editor.chartPreviewManager.clearPreviews();
                 break;
             }
         }
@@ -2461,6 +2464,7 @@ CGraphicObjects.prototype =
                         this.drawingObjects[i].GraphicObj.handleUpdateLn();
                     }
                 }
+                editor.chartPreviewManager.clearPreviews();
                 break;
             }
         }
@@ -2478,6 +2482,7 @@ CGraphicObjects.prototype =
                 this.drawingObjects[i].GraphicObj.handleUpdateLn();
             }
         }
+        editor.chartPreviewManager.clearPreviews();
     }
 };
 
@@ -2551,18 +2556,19 @@ function CreateImageFromBinary(bin, nW, nH)
         h = nH;
     }
     var para_drawing = new ParaDrawing(w, h, null, editor.WordControl.m_oLogicDocument.DrawingDocument, editor.WordControl.m_oLogicDocument, null);
-    var word_image = new WordImage(para_drawing,  editor.WordControl.m_oLogicDocument, editor.WordControl.m_oLogicDocument.DrawingDocument, null);
-    word_image.init(bin, w, h, null, null);
+    var word_image = editor.WordControl.m_oLogicDocument.DrawingObjects.createImage(bin, 0, 0, w, h);
+    para_drawing.Set_GraphicObject(word_image);
+    word_image.setParent(para_drawing);
     para_drawing.Set_GraphicObject(word_image);
     return para_drawing;
 }
 
 function CreateImageFromBinary2(bin, w, h)
 {
-
     var para_drawing = new ParaDrawing(w, h, null, editor.WordControl.m_oLogicDocument.DrawingDocument, editor.WordControl.m_oLogicDocument, null);
-    var word_image = new WordImage(para_drawing,  editor.WordControl.m_oLogicDocument, editor.WordControl.m_oLogicDocument.DrawingDocument, null);
-    word_image.init(bin, w, h, null, null);
+    var word_image = editor.WordControl.m_oLogicDocument.DrawingObjects.createImage(bin, 0, 0, w, h);
+    para_drawing.Set_GraphicObject(word_image);
+    word_image.setParent(para_drawing);
     para_drawing.Set_GraphicObject(word_image);
     return para_drawing;
 }
