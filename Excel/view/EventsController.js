@@ -685,8 +685,8 @@
 
 			while (t.isCellEditMode && !t.hasFocus || !t.enableKeyEvents || t.isSelectMode || t.isFillHandleMode || t.isMoveRangeMode || t.isMoveResizeRange) {
 
-				if (t.isCellEditMode && !t.strictClose && event.which >= 37 && event.which <= 40) {
-					// обрабатываем нажатие клавиш со стрелками, если редактор открыт не по F2
+				if (t.isCellEditMode && !t.strictClose && t.enableKeyEvents && event.which >= 37 && event.which <= 40) {
+					// обрабатываем нажатие клавиш со стрелками, если редактор открыт не по F2 и включены эвенты
 					break;
 				}
 
