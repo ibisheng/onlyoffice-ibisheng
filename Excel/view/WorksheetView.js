@@ -6668,7 +6668,7 @@
 		};
 
 		WorksheetView.prototype.setSelectionUndoRedo = function (range, validRange) {
-			var ar = this.activeRange = (range instanceof asc_ActiveRange) ? range.clone() : new asc_ActiveRange(range);
+			var ar = (range instanceof asc_ActiveRange) ? range.clone() : new asc_ActiveRange(range);
 
 			// Проверка на валидность range.
 			if (validRange && (ar.c2 >= this.nColsCount || ar.r2 >= this.nRowsCount)) {
@@ -6678,10 +6678,12 @@
 					this.expandRowsOnScroll(false, true, ar.r2 + 1);
 			}
 			var oRes = null;
-			var type = this.activeRange.type;
+			var type = ar.type;
 			if (type == c_oAscSelectionType.RangeCells || type == c_oAscSelectionType.RangeCol ||
 				type == c_oAscSelectionType.RangeRow || type == c_oAscSelectionType.RangeMax) {
-				this.updateSelection();
+				this.cleanSelection();
+				this.activeRange = ar;
+				this._drawSelection();
 
 				this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
 				this.handlers.trigger("selectionChanged", this.getSelectionInfo());
