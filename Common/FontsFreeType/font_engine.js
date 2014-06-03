@@ -13563,6 +13563,7 @@ function tt_face_load_pclt(face, stream)
 
     /* optional table */
     face.goto_table(face, 1346587732, stream);
+	error = FT_Error;
     if (error != 0)
         return error;
 
