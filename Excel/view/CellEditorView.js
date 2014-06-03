@@ -1638,6 +1638,8 @@
 					return true;
 
 				case 37:  // "left"
+					event.stopPropagation();
+					event.preventDefault();
 					if (!t.hasFocus) {break;}
 					if (hieroglyph) {t._syncEditors();}
 					kind = ctrlKey ? kPrevWord : kPrevChar;
@@ -1645,6 +1647,8 @@
 					return false;
 
 				case 39:  // "right"
+					event.stopPropagation();
+					event.preventDefault();
 					if (!t.hasFocus) {break;}
 					if (hieroglyph) {t._syncEditors();}
 					kind = ctrlKey ? kNextWord : kNextChar;
@@ -1652,12 +1656,16 @@
 					return false;
 
 				case 38:  // "up"
+					event.stopPropagation();
+					event.preventDefault();
 					if (!t.hasFocus) {break;}
 					if (hieroglyph) {t._syncEditors();}
 					event.shiftKey ? t._selectChars(kPrevLine) : t._moveCursor(kPrevLine);
 					return false;
 
 				case 40:  // "down"
+					event.stopPropagation();
+					event.preventDefault();
 					if (!t.hasFocus) {break;}
 					if (hieroglyph) {t._syncEditors();}
 					event.shiftKey ? t._selectChars(kNextLine) : t._moveCursor(kNextLine);
