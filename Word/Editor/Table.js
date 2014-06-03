@@ -21353,16 +21353,17 @@ CTableCell.prototype =
         else
         {
             var NewBorder = new CDocumentBorder();
+
+            var DefBorder = DstBorder;
+            if ( undefined === DefBorder )
+                DefBorder = new CDocumentBorder();
             
-            if ( undefined === DstBorder )
-                DstBorder = new CDocumentBorder();
-            
-            NewBorder.Value   = ( null != Border.Value ? Border.Value   : DstBorder.Value );
-            NewBorder.Size    = ( null != Border.Size  ? Border.Size    : DstBorder.Size  );
-            NewBorder.Color.r = ( null != Border.Color ? Border.Color.r : DstBorder.Color.r );
-            NewBorder.Color.g = ( null != Border.Color ? Border.Color.g : DstBorder.Color.g );
-            NewBorder.Color.b = ( null != Border.Color ? Border.Color.b : DstBorder.Color.b );
-            NewBorder.Unifill = ( null != Border.Unifill ? Border.Unifill : DstBorder.Unifill);
+            NewBorder.Value   = ( null != Border.Value   ? Border.Value   : DefBorder.Value );
+            NewBorder.Size    = ( null != Border.Size    ? Border.Size    : DefBorder.Size  );
+            NewBorder.Color.r = ( null != Border.Color   ? Border.Color.r : DefBorder.Color.r );
+            NewBorder.Color.g = ( null != Border.Color   ? Border.Color.g : DefBorder.Color.g );
+            NewBorder.Color.b = ( null != Border.Color   ? Border.Color.b : DefBorder.Color.b );
+            NewBorder.Unifill = ( null != Border.Unifill ? Border.Unifill : DefBorder.Unifill);
 
             History.Add( this, { Type : HistoryType, Old : DstBorder, New : NewBorder } );
 

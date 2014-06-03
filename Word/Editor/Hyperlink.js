@@ -1319,9 +1319,26 @@ ParaHyperlink.prototype =
 
     Get_RunElementByPos : function(ContentPos, Depth)
     {
-        var Pos = ContentPos.Get(Depth);
+        if ( undefined !== ContentPos )
+        {
+            var Pos = ContentPos.Get(Depth);
 
-        return this.Content[Pos].Get_RunElementByPos( ContentPos, Depth + 1 );
+            return this.Content[Pos].Get_RunElementByPos( ContentPos, Depth + 1 );
+        }
+        else
+        {
+            var Count = this.Content.length;
+            if ( Count <= 0 )
+                return null;
+            
+            var Pos = 0;
+            var Element = this.Content[Pos];
+                        
+            while ( null === Element && Pos < Count - 1 )
+                Element = this.Content[++Pos];
+            
+            return Element;
+        } 
     },
 
     Get_LeftPos : function(SearchPos, ContentPos, Depth, UseContentPos)

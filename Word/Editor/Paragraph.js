@@ -13361,79 +13361,39 @@ Paragraph.prototype =
 
     Selection_Check : function(X, Y, Page_Abs, NearPos)
     {
-        if ( true !== Debug_ParaRunMode )
+        var SelSP = this.Get_ParaContentPos( true, true );
+        var SelEP = this.Get_ParaContentPos( true, false );
+
+        if ( SelSP.Compare( SelEP ) > 0 )
         {
-            if ( NearPos !== undefined  )
-            {
-                if ( NearPos.Paragraph === this && ( ( true === this.Selection.Use && NearPos.ContentPos >= this.Selection.StartPos && NearPos.ContentPos <= this.Selection.EndPos ) || ( true === this.ApplyToAll )  ) )
-                    return true;
-
-                return false;
-            }
-            else
-            {
-                var PageIndex = Page_Abs - this.Get_StartPage_Absolute();
-                if ( PageIndex < 0 || PageIndex >= this.Pages.length || true != this.Selection.Use )
-                    return false;
-
-                var Start = this.Selection.StartPos;
-                var End   = this.Selection.EndPos;
-
-                if ( Start > End )
-                {
-                    Start = this.Selection.EndPos;
-                    End   = this.Selection.StartPos;
-                }
-
-                var ContentPos = this.Internal_GetContentPosByXY( X, Y, false, PageIndex + this.PageNum, false );
-                var Pos  = ContentPos.Pos;
-                var Pos2 = ContentPos.Pos2;
-
-                if ( -1 != Pos2 && undefined !== this.Content[Pos2] && para_Math === this.Content[Pos2].Type )
-                    return this.Content[Pos2].Selection_Check( X, Y, Page_Abs );
-
-                if ( -1 != Pos && Start <= Pos && End >= Pos )
-                    return true;
-
-                return false;
-            }
+            var Temp = SelSP;
+            SelSP = SelEP;
+            SelEP = Temp;
         }
-        else
+
+        if ( undefined !== NearPos )
         {
-            var SelSP = this.Get_ParaContentPos( true, true );
-            var SelEP = this.Get_ParaContentPos( true, false );
-
-            if ( SelSP.Compare( SelEP ) > 0 )
-            {
-                var Temp = SelSP;
-                SelSP = SelEP;
-                SelEP = Temp;
-            }
-
-            if ( undefined !== NearPos )
-            {
-                if ( this === NearPos.Paragraph && ( ( true === this.Selection.Use && NearPos.ContentPos.Compare( SelSP ) >= 0 && NearPos.ContentPos.Compare( SelEP ) <= 0 ) || true === this.ApplyToAll ) )
-                    return true;
-
-                return false;
-            }
-            else
-            {
-                var PageIndex = Page_Abs - this.Get_StartPage_Absolute();
-                if ( PageIndex < 0 || PageIndex >= this.Pages.length || true != this.Selection.Use )
-                    return false;
-
-                var SearchPosXY = this.Get_ParaContentPosByXY( X, Y, PageIndex + this.PageNum, false, false );
-                var CurPos = SearchPosXY.Pos.Get(0);
-
-                if ( SearchPosXY.Pos.Compare( SelSP ) >= 0 && SearchPosXY.Pos.Compare( SelEP ) <= 0 && ( para_Math !== this.Content[CurPos].Type || true !== this.Content[CurPos].Selection_IsPlaceholder() ) )
-                    return true;
-
-                return false;
-            }
+            if ( this === NearPos.Paragraph && ( ( true === this.Selection.Use && ((NearPos.ContentPos.Compare( SelSP ) >= 0 && NearPos.ContentPos.Compare( SelEP ) <= 0) || (NearPos.SearchPos.Compare( SelSP ) >= 0 && NearPos.SearchPos.Compare( SelEP ) <= 0)) ) || true === this.ApplyToAll ) )
+                return true;
 
             return false;
         }
+        else
+        {
+            var PageIndex = Page_Abs - this.Get_StartPage_Absolute();
+            if ( PageIndex < 0 || PageIndex >= this.Pages.length || true != this.Selection.Use )
+                return false;
+
+            var SearchPosXY = this.Get_ParaContentPosByXY( X, Y, PageIndex + this.PageNum, false, false );
+            var CurPos = SearchPosXY.Pos.Get(0);
+
+            if ( SearchPosXY.Pos.Compare( SelSP ) >= 0 && SearchPosXY.Pos.Compare( SelEP ) <= 0 && ( para_Math !== this.Content[CurPos].Type || true !== this.Content[CurPos].Selection_IsPlaceholder() ) )
+                return true;
+
+            return false;
+        }
+
+        return false;
     },
 
     Selection_CalculateTextPr : function()
@@ -15494,39 +15454,22 @@ Paragraph.prototype =
     // Получем ближающую возможную позицию курсора
     Get_NearestPos : function(PageNum, X, Y, bAnchor, Drawing)
     {
-        if ( true !== Debug_ParaRunMode )
-        {
-            var ContentPos = this.Internal_GetContentPosByXY( X, Y, false, PageNum ).Pos;
-            var Result = this.Internal_Recalculate_CurPos( ContentPos, false, false, true );
+        var SearchPosXY = this.Get_ParaContentPosByXY( X, Y, PageNum, false, false );
 
-            // Сохраняем параграф и найденное место в параграфе
-            Result.ContentPos = ContentPos;
-            Result.Paragraph  = this;
+        this.Set_ParaContentPos( SearchPosXY.Pos, true, SearchPosXY.Line, SearchPosXY.Range );
+        var ContentPos = this.Get_ParaContentPos( false, false );
 
-            if ( true === bAnchor && undefined != Drawing && null != Drawing )
-                this.Internal_CorrectAnchorPos( Result, Drawing, PageNum - this.PageNum );
+        var Result = this.Internal_Recalculate_CurPos( ContentPos, false, false, true );
 
-            return Result;
-        }
-        else
-        {
-            var SearchPosXY = this.Get_ParaContentPosByXY( X, Y, PageNum, false, false );
+        // Сохраняем параграф и найденное место в параграфе
+        Result.ContentPos = ContentPos;
+        Result.SearchPos  = SearchPosXY.Pos;
+        Result.Paragraph  = this;
 
-            this.Set_ParaContentPos( SearchPosXY.Pos, true, SearchPosXY.Line, SearchPosXY.Range );
-            var ContentPos = this.Get_ParaContentPos( false, false );
+        if ( true === bAnchor && undefined != Drawing && null != Drawing )
+            this.Internal_CorrectAnchorPos( Result, Drawing, PageNum - this.PageNum );
 
-            var Result = this.Internal_Recalculate_CurPos( ContentPos, false, false, true );
-
-            // Сохраняем параграф и найденное место в параграфе
-            Result.ContentPos = ContentPos;
-            Result.Paragraph  = this;
-
-            if ( true === bAnchor && undefined != Drawing && null != Drawing )
-                this.Internal_CorrectAnchorPos( Result, Drawing, PageNum - this.PageNum );
-
-            return Result;
-
-        }
+        return Result;
     },
 
     Check_NearestPos : function(NearPos)

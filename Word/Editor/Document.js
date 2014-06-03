@@ -7795,7 +7795,7 @@ CDocument.prototype =
         var bFlowTable   = (null === this.DrawingObjects.getTableByXY( X, Y, this.CurPage, this ) ? false : true);
 
         // Сначала посмотрим, попалили мы в текстовый селект (но при этом не в границу таблицы и не более чем одинарным кликом)
-        if ( MouseEvent.ClickCount <= 1 && false === bTableBorder && ( nInDrawing < 0 || ( nInDrawing === DRAWING_ARRAY_TYPE_BEHIND && true === bInText ) ) && false === bFlowTable && true === this.Selection_Check( X, Y, this.CurPage, undefined ) )
+        if ( MouseEvent.ClickCount <= 1 && false === bTableBorder && ( nInDrawing < 0 || ( nInDrawing === DRAWING_ARRAY_TYPE_BEHIND && true === bInText ) ) && true === this.Selection_Check( X, Y, this.CurPage, undefined ) )
         {
             // Начинаем передвижение текста
             this.DrawingDocument.StartTrackText();
