@@ -10140,7 +10140,7 @@ CDocument.prototype =
         var ContentPos = this.Internal_GetContentPosByXY( X, Y, PageNum);
 
         // Делаем логику как в ворде
-        if ( true === bAnchor && (0 < ContentPos || PageNum > 0 ) && ContentPos === this.Pages[PageNum].Pos && this.Pages[PageNum].EndPos > this.Pages[PageNum].Pos && type_Paragraph === this.Content[ContentPos].GetType() && true === this.Content[ContentPos].Is_ContentOnFirstPage() )
+        if ( true === bAnchor && ContentPos > 0 && PageNum > 0 && ContentPos === this.Pages[PageNum].Pos && ContentPos === this.Pages[PageNum - 1].EndPos && this.Pages[PageNum].EndPos > this.Pages[PageNum].Pos && type_Paragraph === this.Content[ContentPos].GetType() && true === this.Content[ContentPos].Is_ContentOnFirstPage() )
             ContentPos++;
 
         return this.Content[ContentPos].Get_NearestPos( PageNum, X, Y, bAnchor, Drawing );

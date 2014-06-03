@@ -242,6 +242,9 @@ Paragraph.prototype =
         var EndRun = new ParaRun(Para);
         EndRun.Add_ToContent( 0, new ParaEnd() );
         Para.Internal_Content_Add( Para.Content.length, EndRun, false );
+        
+        Para.Selection_Remove();
+        Para.Cursor_MoveToStartPos(false);
 
         return Para;
     },
