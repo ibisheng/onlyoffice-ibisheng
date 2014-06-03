@@ -4361,7 +4361,7 @@ CDocument.prototype =
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
-            return this.HdrFtr.Cursor_MoveAt(X, Y, AddToSelect);
+            return this.HdrFtr.Cursor_MoveAt(X, Y, this.CurPage, AddToSelect);
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
@@ -8935,9 +8935,15 @@ CDocument.prototype =
         }
         else if ( e.KeyCode == 27 ) // Esc
         {
-            // 1. Если у нас выделена автофигура (в колонтитуле или документе), тогда снимаем выделение с нее
-            // 2. Если мы просто находимся в колонтитуле (автофигура не выделена) выходим из колонтитула
-            if ( docpostype_DrawingObjects === this.CurPos.Type || (docpostype_HdrFtr === this.CurPos.Type && null != this.HdrFtr.CurHdrFtr && docpostype_DrawingObjects === this.HdrFtr.CurHdrFtr.Content.CurPos.Type ) )
+            // 1. Если у нас сейчас происисходит выделение маркером, тогда его отменяем
+            // 2. Если у нас выделена автофигура (в колонтитуле или документе), тогда снимаем выделение с нее
+            // 3. Если мы просто находимся в колонтитуле (автофигура не выделена) выходим из колонтитула
+            if ( true === editor.isMarkerFormat )
+            {
+                editor.sync_MarkerFormatCallback( false );
+                this.Update_CursorType( this.CurPos.RealX, this.CurPos.RealY, this.CurPage, new CMouseEventHandler() );
+            }
+            else if ( docpostype_DrawingObjects === this.CurPos.Type || (docpostype_HdrFtr === this.CurPos.Type && null != this.HdrFtr.CurHdrFtr && docpostype_DrawingObjects === this.HdrFtr.CurHdrFtr.Content.CurPos.Type ) )
             {
                 this.DrawingObjects.resetSelection2();
                 this.Document_UpdateInterfaceState();

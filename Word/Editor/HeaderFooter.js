@@ -1648,10 +1648,10 @@ CHeaderFooterController.prototype =
             return this.CurHdrFtr.Cursor_MoveStartOfLine( AddToSelect );
     },
 
-    Cursor_MoveAt : function( X, Y, AddToSelect )
+    Cursor_MoveAt : function( X, Y, PageIndex, AddToSelect )
     {
         if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Cursor_MoveAt( X, Y, AddToSelect );
+            return this.CurHdrFtr.Cursor_MoveAt( X, Y, PageIndex, AddToSelect );
     },
 
     Cursor_MoveToStartPos : function(AddToSelect)
