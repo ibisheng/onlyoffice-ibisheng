@@ -787,6 +787,9 @@
 				this._onDocumentPlaceChanged();
 			}
 			ws.draw();
+
+			// Отсылаем окончание смены размеров (в FF не срабатывало обычное движение)
+			this.handlers.trigger("asc_onMouseMove", [new asc_CMM({type: c_oAscMouseMoveType.None})]);
 		};
 
 		// Обработка автозаполнения
