@@ -8423,7 +8423,7 @@ Paragraph.prototype =
     Correct_ContentPos2 : function()
     {
         var Count  = this.Content.length;
-        var CurPos = this.CurPos.ContentPos;
+        var CurPos = Math.min( Math.max( 0, this.CurPos.ContentPos ), Count - 1 );
 
         // Может так случиться, что текущий элемент окажется непригодным для расположения курсора, тогда мы ищем ближайший пригодный
         while ( CurPos > 0 && false === this.Content[CurPos].Is_CursorPlaceable() )
@@ -17891,7 +17891,7 @@ Paragraph.prototype =
                 X          : this.CurPos.X,
                 Y          : this.CurPos.Y,
                 Line       : this.CurPos.Line,
-                ContentPos : this.Get_ParaContentPos( false, false ),
+                ContentPos : ( true === this.Selection.Use ?  this.Get_ParaContentPos( true, false ) :  this.Get_ParaContentPos( false, false ) ),
                 RealX      : this.CurPos.RealX,
                 RealY      : this.CurPos.RealY,
                 PagesPos   : this.CurPos.PagesPos

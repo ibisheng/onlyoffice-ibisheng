@@ -3670,7 +3670,7 @@ ParaRun.prototype =
             }
 
             var Item = this.Content[CurPos];
-            if ( CurPos > Count || (para_Drawing !== Item.Type && (false !== StepEnd || para_End !== Item.Type) ) || (para_Drawing === Item.Type && false !== Item.Is_Inline()))
+            if ( CurPos > Count || (para_Drawing !== Item.Type && (false !== StepEnd || para_End !== this.Content[CurPos - 1].Type) ) || (para_Drawing === Item.Type && false !== Item.Is_Inline()))
                 break;
         }
 
