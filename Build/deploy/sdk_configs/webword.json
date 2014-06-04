@@ -40,6 +40,7 @@
 				"../../Common/SerializeChart.js",
                 "../../Common/Drawings/Format/Constants.js",
                 "../../Common/Drawings/Format/Format.js",
+				"../../Common/Shapes/EditorSettings.js",				
                 "../../Common/trackFile.js",
 				"../../Common/Charts/libraries/OfficeExcel.common.core.js",
                 "../../Common/Charts/libraries/OfficeExcel.common.key.js",
@@ -184,7 +185,6 @@
         },
         "defines": {
             "src": [
-                "../../Common/Shapes/EditorSettings.js",
                 "../../Common/commonDefines.js",
                 "../../Word/apiDefines.js"
             ],
