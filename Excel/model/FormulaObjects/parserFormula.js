@@ -3515,13 +3515,14 @@ parserFormula.prototype = {
         }
     },
 
-    stretchArea:function ( node, sNewName ) {
+    stretchArea: function (node, bboxTo, sNewName) {
         //todo absolute
         for ( var i = 0; i < this.outStack.length; i++ ) {
             var elem = this.outStack[i];
             if ( elem instanceof cArea ) {
                 if ( elem._cells.replace( /\$/ig, "" ) == node.cellId ) {
                     elem.value = elem._cells = sNewName;
+                    elem.range = bboxTo.clone();
                 }
             }
         }

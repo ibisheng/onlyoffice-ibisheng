@@ -731,7 +731,7 @@ Vertex.prototype = {
 			var slave = _sn[_id];
 			var cell = slave.returnCell();
 			if( cell && cell.formulaParsed ){
-				cell.formulaParsed.stretchArea( this, sNewName );
+				cell.formulaParsed.stretchArea( this, bboxTo, sNewName );
 				slave.setFormula(cell.formulaParsed.assemble(), true, false);
 			}
 		}
