@@ -4332,8 +4332,7 @@ asc_docs_api.prototype.sync_DocSizeCallback = function(width,height){
 	this.asc_fireCallback("asc_onDocSize",width,height);
 }
 asc_docs_api.prototype.sync_PageOrientCallback = function(isPortrait){
-    this.WordControl.m_oDrawingDocument.m_bIsUpdateDocSize = true;
-	this.asc_fireCallback("asc_onPageOrient",isPortrait);
+    this.asc_fireCallback("asc_onPageOrient",isPortrait);
 }
 asc_docs_api.prototype.sync_HeadersAndFootersPropCallback = function(hafProp)
 {
