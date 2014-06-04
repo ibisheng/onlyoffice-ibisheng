@@ -1651,27 +1651,23 @@
                  
 				newFonts = this._convertFonts(oPasteProcessor.oFonts);
 				
-				worksheet._loadFonts(newFonts, function () {
+				oPasteProcessor._Execute(node, {}, true, true, false);
 					
-					oPasteProcessor._Execute(node, {}, true, true, false);
+				targetDocContent.Remove(1, true, true);
+				
+				if(!oPasteProcessor.aContent || !oPasteProcessor.aContent.length)
+					return false;
 					
-					targetDocContent.Remove(1, true, true);
-					
-					if(!oPasteProcessor.aContent || !oPasteProcessor.aContent.length)
-						return;
-						
+				worksheet._loadFonts(newFonts, function () {	
 					oPasteProcessor.InsertInPlace(targetDocContent , oPasteProcessor.aContent);
 					
 					worksheet.objectRender.controller.startRecalculate();
 					
 					window.GlobalPasteFlag = false;
 					window.GlobalPasteFlagCounter = 0;
-				})
+				});
 				
-				if(!oPasteProcessor.aContent || !oPasteProcessor.aContent.length)
-					return false;
-				else 
-					return true;
+ 				return true;
 			},
 			
 			_convertFonts: function(oFonts)
