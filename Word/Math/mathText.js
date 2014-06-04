@@ -312,10 +312,8 @@ CMathText.prototype =
     },
     setPosition: function(pos)
     {
-        /*try
-        {*/
-
-
+        try
+        {
             if (!this.bJDraw)                      // for text
             {
                 this.pos.x = pos.x + this.GapLeft;
@@ -328,11 +326,11 @@ CMathText.prototype =
                 this.pos.x = pos.x - this.rasterOffsetX;
                 this.pos.y = pos.y - this.rasterOffsetY;
             }
-        /*}
+        }
         catch(e)
         {
 
-        }*/
+        }
 
     },
     setCoeffTransform: function(sx, shx, shy, sy)
