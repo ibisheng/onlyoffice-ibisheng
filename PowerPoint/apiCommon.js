@@ -378,7 +378,7 @@ function CorrectUniColor(asc_color, unicolor)
 			if (null != __mods)
 			{
 				for (var modInd = 0; modInd < __mods.length; modInd++)
-					ret.Mods.Mods[modInd] = __mods[modInd];
+					ret.Mods.Mods[modInd] = _create_mod(__mods[modInd]);
 			}
 
             break;

@@ -4215,7 +4215,7 @@ function CDrawingDocument(drawingObjects)
             for (var j = 0; j < _count_mods; ++j)
             {
                 var dst_mods = new CColorModifiers();
-                dst_mods.Mods = GetDefaultMods(_color_src.r, _color_src.g, _color_src.b, j + 1, 0);
+                dst_mods.Mods = _create_mods(GetDefaultMods(_color_src.r, _color_src.g, _color_src.b, j + 1, 0));
 				
                 var _rgba = {R:_color_src.r, G: _color_src.g, B:_color_src.b, A: 255};
                 dst_mods.Apply(_rgba);

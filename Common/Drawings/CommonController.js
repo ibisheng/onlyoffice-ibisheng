@@ -4536,7 +4536,7 @@ function CorrectUniColorEx(asc_color, unicolor) {
 			if (null != __mods)
 			{
 				for (var modInd = 0; modInd < __mods.length; modInd++)
-					ret.addMod(__mods[modInd]);
+					ret.addMod(_create_mod(__mods[modInd]));
 			}
 
             break;

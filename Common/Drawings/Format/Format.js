@@ -468,6 +468,22 @@ function CColorMod()
     //g_oTableId.Add(this, this.Id);
 }
 
+function _create_mod(default_obj)
+{
+	var ret = new CColorMod();
+	ret.name = default_obj["name"];
+	ret.val = default_obj["val"];
+	return ret;
+}
+
+function _create_mods(arr_defaults)
+{
+	var ret = [];
+	for (var i = 0; i < arr_defaults.length; i++)
+		ret.push(_create_mod(arr_defaults[i]));
+	return ret;
+}
+
 CColorMod.prototype =
 {
     getObjectType: function()
