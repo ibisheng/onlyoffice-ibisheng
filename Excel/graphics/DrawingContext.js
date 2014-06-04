@@ -30,7 +30,8 @@ function colorObjToAscColor(color) {
 		if(null != color.tint)
 			tintExcel = color.tint;
 		var tintPresentation = 0;
-		var oThemeColorTint = g_oThemeColorTint[color.theme];
+		var basecolor = g_oColorManager.getThemeColor(color.theme);
+		var oThemeColorTint = g_oThemeColorsDefaultModsSpreadsheet[GetDefaultColorModsIndex(basecolor.getR(), basecolor.getG(), basecolor.getB())];
 		if(null != oThemeColorTint)
 		{
 			for(var i = 0 , length = oThemeColorTint.length; i < length; ++i)

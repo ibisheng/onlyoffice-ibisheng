@@ -270,9 +270,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 				for (var i = 0; i < _count; ++i)
 				{
-					for(var j = 0, length = g_oThemeColorTint[i].length; j < length; ++j)
+				    var basecolor = g_oColorManager.getThemeColor(i);
+				    var aTints = g_oThemeColorsDefaultModsSpreadsheet[GetDefaultColorModsIndex(basecolor.getR(), basecolor.getG(), basecolor.getB())];
+				    for (var j = 0, length = aTints.length; j < length; ++j)
 					{
-						var tint = g_oThemeColorTint[i][j];
+				        var tint = aTints[j];
 						var color = g_oColorManager.getThemeColor(i, tint);
 						_ret_array[_cur_index] = new CColor(color.getR(), color.getG(), color.getB());
 						_cur_index++;
