@@ -89,7 +89,7 @@
 
         switch ( mode ) {
             case 0:
-                return Math.abs( GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, true ) );
+                return Math.abs( GetDiffDate360( date1, month1, year1, date2, month2, year2, true ) );
             case 1:
                 var yc = Math.abs( year2 - year1 ),
                     sd = year1 > year2 ? d2 : d1,
@@ -110,7 +110,7 @@
                 dayDiff /= c_msPerDay;
                 return dayDiff;
             case 4:
-                return Math.abs( GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, false ) );
+                return Math.abs( GetDiffDate360( date1, month1, year1, date2, month2, year2, false ) );
             default:
                 return "#NUM!";
         }
@@ -126,7 +126,7 @@
 
         switch ( mode ) {
             case 0:
-                return Math.abs( GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, true ) ) / 360;
+                return Math.abs( GetDiffDate360( date1, month1, year1, date2, month2, year2, true ) ) / 360;
             case 1:
                 var yc = /*Math.abs*/( year2 - year1 ),
                     sd = year1 > year2 ? new Date(d2) : new Date(d1),
@@ -147,7 +147,7 @@
                 dayDiff /= (365 * c_msPerDay);
                 return dayDiff;
             case 4:
-                return Math.abs( GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, false ) ) / 360;
+                return Math.abs( GetDiffDate360( date1, month1, year1, date2, month2, year2, false ) ) / 360;
             default:
                 return "#NUM!";
         }
@@ -386,7 +386,7 @@
         g_oUndoRedoRow = new UndoRedoRowCol(wb, true);
         g_oUndoRedoComment = new UndoRedoComment(wb);
         g_oUndoRedoAutoFilters = new UndoRedoAutoFilters(wb);
-        g_oUndoRedoGraphicObjects = new UndoRedoGraphicObjects(wb);
+//        g_oUndoRedoGraphicObjects = new UndoRedoGraphicObjects(wb);
         g_oIdCounter.Set_Load(false);
 
         var oBinaryFileReader = new Asc.BinaryFileReader( sUrlPath );
@@ -3599,6 +3599,18 @@
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 16.666666666666664 );
 
+        oParser = new parserFormula( "ACCRINT(DATE(2008,3,1),DATE(2008,8,31),DATE(2010,5,1),0.1,1000,2,0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 216.94444444444444 );
+
+        oParser = new parserFormula( "ACCRINT(DATE(2008,3,1),DATE(2008,8,31),DATE(2010,5,1),0.1,1000,2,0,TRUE)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 216.94444444444444 );
+
+        oParser = new parserFormula( "ACCRINT(DATE(2008,3,1),DATE(2008,8,31),DATE(2010,5,1),0.1,1000,2,0,FALSE)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 216.66666666666666 );
+
     } )
 
     test( "Test: \"ACCRINTM\"", function () {
@@ -3993,7 +4005,7 @@
             var date1 = d1.getDate(), month1 = d1.getMonth(), year1 = d1.getFullYear(),
                 date2 = d2.getDate(), month2 = d2.getMonth(), year2 = d2.getFullYear();
 
-            var nDiff = GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, true )
+            var nDiff = GetDiffDate360( date1, month1, year1, date2, month2, year2, true )
 
             if( settlement >= maturity || discount <= 0 || nDiff > 360 )
                 return "#NUM!"
@@ -4004,7 +4016,7 @@
 
         oParser = new parserFormula( "TBILLEQ(DATE(2008,3,31),DATE(2008,6,1),0.0914)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), tbilleq( new Date(2008,2,31), new Date(2008,5,1), 0.0914 ) );
+        strictEqual( oParser.calculate().getValue(), tbilleq( new Date(Date.UTC(2008,2,31)), new Date(Date.UTC(2008,5,1)), 0.0914 ) );
 
     } )
 
@@ -4028,7 +4040,7 @@
 
         oParser = new parserFormula( "TBILLPRICE(DATE(2008,3,31),DATE(2008,6,1),0.09)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), tbillprice( new Date(2008,2,31), new Date(2008,5,1), 0.09 ) );
+        strictEqual( oParser.calculate().getValue(), tbillprice( new Date(Date.UTC(2008,2,31)), new Date(Date.UTC(2008,5,1)), 0.09 ) );
 
     } )
 
@@ -4041,7 +4053,7 @@
             var date1 = d1.getDate(), month1 = d1.getMonth(), year1 = d1.getFullYear(),
                 date2 = d2.getDate(), month2 = d2.getMonth(), year2 = d2.getFullYear();
 
-            var nDiff = GetDiffDate360( date1, month1, year1, d1.isLeapYear(), date2, month2, year2, true )
+            var nDiff = GetDiffDate360( date1, month1, year1, date2, month2, year2, true )
             nDiff++;
             if( settlement >= maturity || pr <= 0 || nDiff > 360 )
                 return "#NUM!"
@@ -4136,7 +4148,7 @@
 
         oParser = new parserFormula( "COUPNCD(DATE(2007,1,25),DATE(2008,11,15),2,1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), coupncd( new Date(2007,0,25), new Date(2008,10,15), 2, 1 ) );
+        strictEqual( oParser.calculate().getValue(), coupncd( new Date(Date.UTC(2007,0,25)), new Date(Date.UTC(2008,10,15)), 2, 1 ) );
 
     } )
 
@@ -4161,7 +4173,7 @@
 
         oParser = new parserFormula( "COUPPCD(DATE(2007,1,25),DATE(2008,11,15),2,1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), couppcd( new Date(2007,0,25), new Date(2008,10,15), 2, 1 ) );
+        strictEqual( oParser.calculate().getValue(), couppcd( new Date(Date.UTC(2007,0,25)), new Date(Date.UTC(2008,10,15)), 2, 1 ) );
 
     } )
 
@@ -5536,6 +5548,55 @@
         ok( oParser.parse() );
         ok( oParser.assemble() == "OCT2HEX(\"52\",\"Hello World!\")" );
         strictEqual( oParser.calculate().getValue(), "#VALUE!");
+
+    })
+
+    test( "Test: \"COMPLEX\"", function () {
+
+        oParser = new parserFormula( "COMPLEX(-3.5,19.6)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "COMPLEX(-3.5,19.6)" );
+        strictEqual( oParser.calculate().getValue(), "-3.5+19.6i");
+
+        oParser = new parserFormula( "COMPLEX(3.5,-19.6,\"j\")", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "COMPLEX(3.5,-19.6,\"j\")" );
+        strictEqual( oParser.calculate().getValue(), "3.5-19.6j");
+
+        oParser = new parserFormula( "COMPLEX(3.5,0)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "COMPLEX(3.5,0)" );
+        strictEqual( oParser.calculate().getValue(), "3.5");
+
+        oParser = new parserFormula( "COMPLEX(0,2.4)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "COMPLEX(0,2.4)" );
+        strictEqual( oParser.calculate().getValue(), "2.4i");
+
+        oParser = new parserFormula( "COMPLEX(0,0)", "A2", ws );
+        ok( oParser.parse() );
+        ok( oParser.assemble() == "COMPLEX(0,0)" );
+        strictEqual( oParser.calculate().getValue(), "0");
+
+    })
+
+    test( "Test: \"DELTA\"", function () {
+
+        oParser = new parserFormula( "DELTA(10.5,10.5)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 1);
+
+        oParser = new parserFormula( "DELTA(10.5,10.6)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 0);
+
+        oParser = new parserFormula( "DELTA(10.5)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 0);
+
+        oParser = new parserFormula( "DELTA(0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 1);
 
     })
 
