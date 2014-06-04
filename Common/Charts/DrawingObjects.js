@@ -1891,6 +1891,7 @@ function asc_CShapeProperty() {
     this.paddings = null;
     this.canFill = true;
     this.canChangeArrows = false;
+    this.bFromChart = false;
 }
 
 asc_CShapeProperty.prototype = {
@@ -1906,7 +1907,9 @@ asc_CShapeProperty.prototype = {
     asc_getCanFill: function() { return this.canFill; },
     asc_putCanFill: function(v) { this.canFill = v; },
     asc_getCanChangeArrows: function() { return this.canChangeArrows; },
-    asc_setCanChangeArrows: function(v) { this.canChangeArrows = v; }
+    asc_setCanChangeArrows: function(v) { this.canChangeArrows = v; },
+    asc_getFromChart: function() { return this.bFromChart; },
+    asc_setFromChart: function(v) { this.bFromChart = v; }
 };
 
 //{ asc_CShapeProperty export

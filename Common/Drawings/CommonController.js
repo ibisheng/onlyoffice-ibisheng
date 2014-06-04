@@ -1459,6 +1459,10 @@ DrawingObjectsController.prototype =
             {
                 objects_by_type.groups[i].changeLine(props.stroke);
             }
+            for(i = 0; i < objects_by_type.charts.length; ++i)
+            {
+                objects_by_type.charts[i].changeLine(props.stroke);
+            }
         }
         if(isRealObject(props.fill))
         {
@@ -1469,6 +1473,10 @@ DrawingObjectsController.prototype =
             for(i = 0; i < objects_by_type.groups.length; ++i)
             {
                 objects_by_type.groups[i].changeFill(props.fill);
+            }
+            for(i = 0; i < objects_by_type.charts.length; ++i)
+            {
+                objects_by_type.charts[i].changeFill(props.fill);
             }
         }
         if(typeof props.ImageUrl === "string" && props.ImageUrl.length > 0)
@@ -3652,7 +3660,8 @@ DrawingObjectsController.prototype =
                         verticalTextAlign: drawing.getBodyPr().anchor,
                         w: drawing.extX,
                         h: drawing.extY ,
-                        canChangeArrows: drawing.canChangeArrows()
+                        canChangeArrows: drawing.canChangeArrows(),
+                        bFromChart: false
                     };
                     if(!shape_props)
                         shape_props = new_shape_props;
@@ -3719,6 +3728,26 @@ DrawingObjectsController.prototype =
                             chart_props.w = null;
                         if(chart_props.h != null && chart_props.h !== new_chart_props.h)
                             chart_props.h = null;
+                    }
+
+                    new_shape_props =
+                    {
+                        canFill: true,
+                        type: null,
+                        fill: drawing.getFill(),
+                        stroke: drawing.getStroke(),
+                        paddings: null,
+                        verticalTextAlign: null,
+                        w: drawing.extX,
+                        h: drawing.extY ,
+                        canChangeArrows: false,
+                        bFromChart: true
+                    };
+                    if(!shape_props)
+                        shape_props = new_shape_props;
+                    else
+                    {
+                        shape_props = CompareShapeProperties(shape_props, new_shape_props);
                     }
                     break;
                 }
@@ -3809,6 +3838,7 @@ DrawingObjectsController.prototype =
             shape_props.ShapeProperties.fill = props.shapeProps.fill;
             shape_props.ShapeProperties.stroke = props.shapeProps.stroke;
             shape_props.ShapeProperties.canChangeArrows = props.shapeProps.canChangeArrows;
+            shape_props.ShapeProperties.bFromChart = props.shapeProps.bFromChart;
 
             if(props.shapeProps.paddings)
             {

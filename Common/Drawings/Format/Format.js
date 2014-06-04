@@ -4699,6 +4699,11 @@ function CompareShapeProperties(shapeProp1, shapeProp2)
         _result_shape_prop.paddings.Bottom = isRealNumber(shapeProp1.paddings.Bottom) ? (shapeProp1.paddings.Bottom === shapeProp2.paddings.Bottom ? shapeProp1.paddings.Bottom : undefined) : undefined;
     }
     _result_shape_prop.canFill = shapeProp1.canFill === true || shapeProp2.canFill === true;
+
+    if(!shapeProp1.bFromChart || !shapeProp2.bFromChart)
+    {
+        _result_shape_prop.bFromChart = false;
+    }
     return _result_shape_prop;
 }
 
@@ -8237,9 +8242,9 @@ CSpPr.prototype =
     {
         History.Add(this, {Type: historyitem_SpPr_SetLn, oldPr: this.ln, newPr: pr});
         this.ln = pr;
-        if(this.parent && this.parent.recalcPen)
+        if(this.parent && this.parent.handleUpdateLn)
         {
-            this.parent.recalcPen();
+            this.parent.handleUpdateLn();
         }
     },
 

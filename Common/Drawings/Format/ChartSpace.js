@@ -227,6 +227,32 @@ CChartSpace.prototype =
         return this.group.getMainGroup();
     },
 
+    getFill: CShape.prototype.getFill,
+
+    getStroke: CShape.prototype.getStroke,
+
+    changeFill: function (unifill)
+    {
+        if(this.recalcInfo.recalculatePenBrush)
+        {
+            this.recalculatePenBrush();
+        }
+        this.spPr.setFill(CorrectUniFill(unifill, this.brush));
+    },
+    setFill: function (fill) {
+
+        this.spPr.setFill(fill);
+    },
+
+    changeLine: function (line)
+    {
+        if(this.recalcInfo.recalculatePenBrush)
+        {
+            this.recalculatePenBrush();
+        }
+        this.spPr.setLn(CorrectUniStroke(line, this.spPr.ln));
+    },
+
     getTypeSubType: function()
     {
         /*

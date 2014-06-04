@@ -778,6 +778,7 @@ function CAscShapeProp()
     this.stroke = null;
     this.paddings = null;
     this.canFill = true;
+    this.bFromChart = false;
 }
 CAscShapeProp.prototype.get_type = function(){return this.type}
 CAscShapeProp.prototype.put_type = function(v){this.type = v;}
@@ -790,6 +791,9 @@ CAscShapeProp.prototype.get_paddings = function(){return this.paddings}
 CAscShapeProp.prototype.put_paddings = function(v){this.paddings = v;}
 CAscShapeProp.prototype.get_CanFill = function(){return this.canFill}
 CAscShapeProp.prototype.put_CanFill = function(v){this.canFill = v;}
+
+CAscShapeProp.prototype.get_FromChart = function(){return this.bFromChart}
+CAscShapeProp.prototype.put_FromChart = function(v){this.bFromChart = v;}
 
 // эта функция ДОЛЖНА минимизироваться
 function CreateAscShapeProp(shape)
@@ -846,6 +850,7 @@ function CreateAscShapePropFromProp(shapeProp)
     {
         obj.canFill = shapeProp.canFill;
     }
+    obj.bFromChart = shapeProp.bFromChart;
     return obj;
 }
 

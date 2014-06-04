@@ -4637,19 +4637,19 @@ function BinaryFileReader(doc, openParams)
     };
     this.Read = function(data)
     {
-		try{
+		//try{
 			this.stream = this.getbase64DecodedData(data);
 			this.PreLoadPrepare();
 			this.ReadMainTable();
 			this.PostLoadPrepare();
-		}
-		catch(e)
-		{
-			if(e.message == g_sErrorCharCountMessage)
-				return false;
-			else
-				throw e;
-		}
+		//}
+		//catch(e)
+		//{
+		//	if(e.message == g_sErrorCharCountMessage)
+		//		return false;
+		//	else
+		//		throw e;
+		//}
 		return true;
     };
 	this.PreLoadPrepare = function()
