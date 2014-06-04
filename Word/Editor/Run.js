@@ -34,8 +34,8 @@ function ParaRun(Paragraph, bMathRun)
 
     this.Range = this.Lines[0].Ranges[0];
 
-    this.StartLine   = 0; // Строка, с которой начинается данный ран
-    this.StartRange  = 0;
+    this.StartLine   = -1; // Строка, с которой начинается данный ран
+    this.StartRange  = -1;
 
     this.CollaborativeMarks = new CRunCollaborativeMarks();
     this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
@@ -2552,7 +2552,26 @@ ParaRun.prototype =
 
     Refresh_RecalcData : function(Data)
     {
-        this.Paragraph.Refresh_RecalcData2(0);
+        var Para = this.Paragraph;
+
+        if ( -1 !== this.StartLine && undefined !== Para )
+        {
+            var CurLine = this.StartLine;
+            
+            var PagesCount = Para.Pages.length;
+            for (var CurPage = 0 ; CurPage < PagesCount; CurPage++ )
+            {
+                var Page = Para.Pages[CurPage];
+                if ( Page.StartLine <= CurLine && Page.EndLine >= CurLine  )
+                {
+                    Para.Refresh_RecalcData2(CurPage);
+                    return;
+                }
+                
+            }
+
+            Para.Refresh_RecalcData2(0);
+        }
     },
 
     Save_RecalculateObject : function(Copy)

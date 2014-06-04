@@ -1361,7 +1361,8 @@
             <div id="id_buttonZoomIn" class="block_elem buttonZoomIn"></div>
         </div>
 		<div id="editor_sdk" style="position:absolute;left:0px;top:80px;">
-            <script type="text/javascript">
+            <script type="text/javascript">                
+                
                 var html_element = document.getElementById("editor_sdk");
                 html_element.style.left = "0px";
                 html_element.style.top = "80px";
@@ -1369,6 +1370,7 @@
                 html_element.style.height = (_checkBodyHeight() - 80 - 22) + "px";
 
                 var editor = new asc_docs_api("editor_sdk");
+                editor.ShowParaMarks = true;
                 editor.CreateComponents();
                 editor.SetFontsPath("../Fonts/");
                 editor.Init();

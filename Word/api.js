@@ -2529,25 +2529,89 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr)
     else
         ParaPr.StyleName = this.WordControl.m_oLogicDocument.Styles.Style[ParaPr.PStyle].Name;
 
-    if ( null == ParaPr.NumPr || 0 === ParaPr.NumPr.NumId || "0" === ParaPr.NumPr.NumId )
-        ParaPr.ListType = {Type: -1, SubType : -1};
-    else
+    var NumType    = -1;
+    var NumSubType = -1;
+    if ( !(null == ParaPr.NumPr || 0 === ParaPr.NumPr.NumId || "0" === ParaPr.NumPr.NumId) )
     {
-        var NumFmt = this.WordControl.m_oLogicDocument.Numbering.Get_Format( ParaPr.NumPr.NumId, ParaPr.NumPr.Lvl );
-        switch(NumFmt)
+        var Numb = this.WordControl.m_oLogicDocument.Numbering.Get_AbstractNum( ParaPr.NumPr.NumId );
+        
+        if ( undefined !== Numb && undefined !== Numb.Lvl[ParaPr.NumPr.Lvl] )
         {
-            case numbering_numfmt_Bullet:
+            var Lvl = Numb.Lvl[ParaPr.NumPr.Lvl];
+            var NumFormat = Lvl.Format;
+            var NumText   = Lvl.LvlText;
+            
+            if ( numbering_numfmt_Bullet === NumFormat )
             {
-                ParaPr.ListType = { Type : 0, SubType : 0 };
-                break;
+                NumType    = 0;
+                NumSubType = 0;
+                
+                var TextLen = NumText.length;
+                if ( 1 === TextLen && numbering_lvltext_Text === NumText[0].Type )
+                {
+                    var NumVal = NumText[0].Value.charCodeAt(0);
+
+                    if ( 0x00B7 === NumVal )
+                        NumSubType = 1;
+                    else if ( 0x006F === NumVal )
+                        NumSubType = 2;
+                    else if ( 0x00A7 === NumVal )
+                        NumSubType = 3;
+                    else if ( 0x0076 === NumVal )
+                        NumSubType = 4;
+                    else if ( 0x00D8 === NumVal )
+                        NumSubType = 5;
+                    else if ( 0x00FC === NumVal )
+                        NumSubType = 6;
+                    else if ( 0x00A8 === NumVal )
+                        NumSubType = 7;
+                }
             }
-            default:
+            else
             {
-                ParaPr.ListType = { Type : 1, SubType : 0 };
-                break;
+                NumType    = 1;
+                NumSubType = 0;
+                
+                var TextLen = NumText.length;
+                if ( 2 === TextLen && numbering_lvltext_Num === NumText[0].Type && numbering_lvltext_Text === NumText[1].Type )
+                {
+                    var NumVal2 = NumText[1].Value;
+                    
+                    if ( numbering_numfmt_Decimal === NumFormat )
+                    {
+                        if ( "." === NumVal2 )
+                            NumSubType = 1;
+                        else if ( ")" === NumVal2 )
+                            NumSubType = 2;                        
+                    }
+                    else if ( numbering_numfmt_UpperRoman === NumFormat )
+                    {
+                        if ( "." === NumVal2 )
+                            NumSubType = 3;
+                    }
+                    else if ( numbering_numfmt_UpperLetter === NumFormat )
+                    {
+                        if ( "." === NumVal2 )
+                            NumSubType = 4;
+                    }
+                    else if ( numbering_numfmt_LowerLetter === NumFormat )
+                    {
+                        if ( ")" === NumVal2 )
+                            NumSubType = 5;
+                        else if ( "." === NumVal2 )
+                            NumSubType = 6;
+                    }
+                    else if ( numbering_numfmt_LowerRoman === NumFormat )
+                    {
+                        if ( "." === NumVal2 )
+                            NumSubType = 7;
+                    }
+                }
             }
         }
     }
+
+    ParaPr.ListType = { Type : NumType, SubType : NumSubType };
     
     if ( undefined !== ParaPr.FramePr && undefined !== ParaPr.FramePr.Wrap )
     {

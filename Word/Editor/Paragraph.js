@@ -226,7 +226,7 @@ Paragraph.prototype =
         Para.TextPr.Set_Value( this.TextPr.Value.Copy() );
 
         // Удаляем содержимое нового параграфа
-        Para.Internal_Content_Remove2(0, Para.Content.length);
+        Para.Internal_Content_Remove2(0, Para.Content.length);       
 
         // Копируем содержимое параграфа
         var Count = this.Content.length;
@@ -242,6 +242,14 @@ Paragraph.prototype =
         var EndRun = new ParaRun(Para);
         EndRun.Add_ToContent( 0, new ParaEnd() );
         Para.Internal_Content_Add( Para.Content.length, EndRun, false );
+
+        // Добавляем секцию в конце
+        if ( undefined !== this.SectPr )
+        {
+            var SectPr = new CSectionPr(this.SectPr.LogicDocument);
+            SectPr.Copy(this.SectPr);
+            Para.Set_SectionPr(SectPr);
+        }
         
         Para.Selection_Remove();
         Para.Cursor_MoveToStartPos(false);
@@ -13676,85 +13684,46 @@ Paragraph.prototype =
         if ( true !== this.Selection.Use )
             return;
 
-        if ( true !== Debug_ParaRunMode )
+        var StartPos = this.Selection.StartPos;
+        var EndPos   = this.Selection.EndPos;
+        if ( StartPos > EndPos )
         {
-            var StartPos = this.Selection.StartPos;
-            var EndPos   = this.Selection.EndPos;
-            if ( StartPos > EndPos )
-            {
-                StartPos = this.Selection.EndPos;
-                EndPos   = this.Selection.StartPos;
-            }
-
-            var _StartPos = this.Internal_GetStartPos();
-            var _EndPos   = this.Internal_GetEndPos();
-
-            // Если выделен параграф целиком, тогда просто его копируем
-            if ( StartPos <= _StartPos && EndPos >= _EndPos )
-            {
-                DocContent.Add( new CSelectedElement( this.Copy(this.Parent), true ) );
-                return;
-            }
-
-            var Para = new Paragraph(this.DrawingDocument, this.Parent, 0, 0, 0, 0, 0);
-
-            // Копируем настройки
-            Para.Set_Pr(this.Pr.Copy());
-            Para.TextPr.Set_Value( this.TextPr.Value );
-            Para.Internal_Content_Remove2(0, Para.Content.length);
-
-            var StartTextPr = this.Internal_GetTextPr( StartPos );
-            Para.Internal_Content_Add( Para.Content.length, new ParaTextPr( StartTextPr ), false );
-
-            // Копируем содержимое параграфа
-            for ( var Pos = StartPos; Pos < EndPos; Pos++ )
-            {
-                var Item     = this.Content[Pos];
-                var ItemType = Item.Type;
-                if ( true === Item.Is_RealContent() && para_End !== ItemType && para_Empty !== ItemType )
-                    Para.Internal_Content_Add( Para.Content.length, Item.Copy(), false );
-            }
-
-            Para.Internal_Content_Add( Para.Content.length, new ParaEnd(), false );
-            Para.Internal_Content_Add( Para.Content.length, new ParaEmpty(), false );
-
-            DocContent.Add( new CSelectedElement( Para, false ) );
+            StartPos = this.Selection.EndPos;
+            EndPos   = this.Selection.StartPos;
         }
-        else
+
+        if ( true === this.Selection_IsFromStart() && true === this.Selection_CheckParaEnd() )
         {
-            var StartPos = this.Selection.StartPos;
-            var EndPos   = this.Selection.EndPos;
-            if ( StartPos > EndPos )
-            {
-                StartPos = this.Selection.EndPos;
-                EndPos   = this.Selection.StartPos;
-            }
-            
-            if ( true === this.Selection_IsFromStart() && true === this.Selection_CheckParaEnd() )
-            {
-                DocContent.Add( new CSelectedElement( this.Copy(this.Parent), true ) );
-                return;
-            }
-
-            var Para = new Paragraph(this.DrawingDocument, this.Parent, 0, 0, 0, 0, 0);
-
-            // Копируем настройки
-            Para.Set_Pr(this.Pr.Copy());
-            Para.TextPr.Set_Value( this.TextPr.Value.Copy() );
-
-            // Копируем содержимое параграфа
-            for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
-            {
-                var Item = this.Content[Pos];
-
-                if ( StartPos === Pos || EndPos === Pos )
-                    Para.Internal_Content_Add( Pos - StartPos, Item.Copy(true), false );
-                else
-                    Para.Internal_Content_Add( Pos - StartPos, Item.Copy(false), false );
-            }
-
-            DocContent.Add( new CSelectedElement( Para, false ) );
+            DocContent.Add( new CSelectedElement( this.Copy(this.Parent), true ) );
+            return;
         }
+
+        var Para = new Paragraph(this.DrawingDocument, this.Parent, 0, 0, 0, 0, 0);
+
+        // Копируем настройки
+        Para.Set_Pr(this.Pr.Copy());
+        Para.TextPr.Set_Value( this.TextPr.Value.Copy() );
+        
+        // Копируем содержимое параграфа
+        for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
+        {
+            var Item = this.Content[Pos];
+
+            if ( StartPos === Pos || EndPos === Pos )
+                Para.Internal_Content_Add( Pos - StartPos, Item.Copy(true), false );
+            else
+                Para.Internal_Content_Add( Pos - StartPos, Item.Copy(false), false );
+        }
+
+        // Добавляем секцию в конце
+        if ( undefined !== this.SectPr )
+        {
+            var SectPr = new CSectionPr(this.SectPr.LogicDocument);
+            SectPr.Copy(this.SectPr);
+            Para.Set_SectionPr(SectPr);
+        }
+
+        DocContent.Add( new CSelectedElement( Para, false ) );
     },
 
     Get_Paragraph_TextPr : function()
