@@ -7522,7 +7522,7 @@ catAxisChart.prototype =
 	
 	_calculateTickMark : function()
 	{
-		var widthLine, widthMinorLine;
+		var widthLine = 0, widthMinorLine = 0;
 		switch ( this.chartSpace.chart.plotArea.catAx.majorTickMark )
 		{
 			case TICK_MARK_CROSS:
