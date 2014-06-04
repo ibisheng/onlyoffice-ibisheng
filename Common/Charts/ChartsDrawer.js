@@ -572,27 +572,22 @@ CChartsDrawer.prototype =
 		var catAx = chartSpace.chart.plotArea.catAx;
 		
 
-		if(isHBar === 'HBar' && catAx && valAx && catAx.yPoints && valAx.xPoints && valAx.labels)
+		if(isHBar === 'HBar' && catAx && valAx && catAx.yPoints && valAx.xPoints)
 		{
-			if(catAx.yPoints.length > 1)
+			if(catAx.scaling.orientation == ORIENTATION_MIN_MAX)
 			{
-				if(catAx.scaling.orientation == ORIENTATION_MIN_MAX)
-				{
-					if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
-						leftDownPointY = catAx.yPoints[0].pos + Math.abs((catAx.yPoints[1].pos - catAx.yPoints[0].pos) / 2);
-					else
-						leftDownPointY = catAx.yPoints[0].pos;
-				}
+				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+					leftDownPointY = catAx.yPoints[0].pos + Math.abs((catAx.interval) / 2);
 				else
-				{
-					if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
-						leftDownPointY = catAx.yPoints[catAx.yPoints.length - 1].pos + Math.abs((catAx.yPoints[1].pos - catAx.yPoints[0].pos) / 2);
-					else
-						leftDownPointY = catAx.yPoints[catAx.yPoints.length - 1].pos;
-				};
+					leftDownPointY = catAx.yPoints[0].pos;
 			}
 			else
-				leftDownPointY = valAx.labels.y;
+			{
+				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+					leftDownPointY = catAx.yPoints[catAx.yPoints.length - 1].pos + Math.abs((catAx.interval) / 2);
+				else
+					leftDownPointY = catAx.yPoints[catAx.yPoints.length - 1].pos;
+			};
 
 			
 			if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
@@ -601,26 +596,21 @@ CChartsDrawer.prototype =
 				leftDownPointX = valAx.xPoints[valAx.xPoints.length - 1].pos;
 			
 			
-			if(catAx.yPoints.length > 1)
-			{
-				if(catAx.scaling.orientation == ORIENTATION_MIN_MAX)
-				{
-					if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
-						rightUpPointY = catAx.yPoints[catAx.yPoints.length - 1].pos - Math.abs((catAx.yPoints[1].pos - catAx.yPoints[0].pos) / 2);
-					else
-						rightUpPointY = catAx.yPoints[catAx.yPoints.length - 1].pos;
-				}
-				else
-				{
-					if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
-						rightUpPointY = catAx.yPoints[0].pos - Math.abs((catAx.yPoints[1].pos - catAx.yPoints[0].pos) / 2);
-					else
-						rightUpPointY = catAx.yPoints[0].pos;
-				}
 			
+			if(catAx.scaling.orientation == ORIENTATION_MIN_MAX)
+			{
+				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+					rightUpPointY = catAx.yPoints[catAx.yPoints.length - 1].pos - Math.abs((catAx.interval) / 2);
+				else
+					rightUpPointY = catAx.yPoints[catAx.yPoints.length - 1].pos;
 			}
 			else
-				rightUpPointY = catAx.labels.x;
+			{
+				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+					rightUpPointY = catAx.yPoints[0].pos - Math.abs((catAx.interval) / 2);
+				else
+					rightUpPointY = catAx.yPoints[0].pos;
+			}
 
 			
 			if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
@@ -693,24 +683,17 @@ CChartsDrawer.prototype =
 		}
 		else if(isHBar !== undefined && valAx && catAx && catAx.xPoints && valAx.yPoints)
 		{
-			if(catAx.xPoints.length > 1)
+			if(catAx.scaling.orientation != ORIENTATION_MIN_MAX)
 			{
-				if(catAx.scaling.orientation != ORIENTATION_MIN_MAX)
-				{
-					leftDownPointX = catAx.xPoints[catAx.xPoints.length - 1].pos - Math.abs((catAx.xPoints[1].pos - catAx.xPoints[0].pos) / 2);
-				}
-				else
-				{
-					if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
-						leftDownPointX = catAx.xPoints[0].pos - (catAx.xPoints[1].pos - catAx.xPoints[0].pos) / 2;
-					else
-						leftDownPointX = catAx.xPoints[0].pos;
-				}
-				
+				leftDownPointX = catAx.xPoints[catAx.xPoints.length - 1].pos - Math.abs((catAx.interval) / 2);
 			}
-			else if(catAx.labels)
-				leftDownPointX = catAx.labels.x;
-
+			else
+			{
+				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+					leftDownPointX = catAx.xPoints[0].pos - (catAx.interval) / 2;
+				else
+					leftDownPointX = catAx.xPoints[0].pos;
+			}
 			
 			if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
 				leftDownPointY = valAx.yPoints[0].pos;
@@ -718,25 +701,19 @@ CChartsDrawer.prototype =
 				leftDownPointY = valAx.yPoints[valAx.yPoints.length - 1].pos;
 			
 			
-			if(catAx.xPoints.length > 1)
+			if(catAx.scaling.orientation != ORIENTATION_MIN_MAX)
 			{
-				if(catAx.scaling.orientation != ORIENTATION_MIN_MAX)
-				{
-					rightUpPointX = catAx.xPoints[0].pos;
-				}
-				else
-				{
-					if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
-						rightUpPointX = catAx.xPoints[catAx.xPoints.length - 1].pos + (catAx.xPoints[1].pos - catAx.xPoints[0].pos) / 2;
-					else
-						rightUpPointX = catAx.xPoints[catAx.xPoints.length - 1].pos;
-				}
-				
+				rightUpPointX = catAx.xPoints[0].pos;
 			}
-			else if(catAx.labels)
-				rightUpPointX = catAx.labels.x;
+			else
+			{
+				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+					rightUpPointX = catAx.xPoints[catAx.xPoints.length - 1].pos + (catAx.interval) / 2;
+				else
+					rightUpPointX = catAx.xPoints[catAx.xPoints.length - 1].pos;
+			}
 
-			
+
 			if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
 				rightUpPointY = valAx.yPoints[valAx.yPoints.length - 1].pos;
 			else
@@ -2672,8 +2649,8 @@ CChartsDrawer.prototype =
 		if(this.calcProp.subType == 'stackedPer' && manualMax != null)
 			manualMax = manualMax * 100;
 		
-		axisMin =  manualMin ? manualMin : trueMinMax.min;
-		axisMax =  manualMax ? manualMax : trueMinMax.max;
+		axisMin =  manualMin !== null && manualMin !== undefined ? manualMin : trueMinMax.min;
+		axisMax =  manualMax !== null && manualMax !== undefined ? manualMax : trueMinMax.max;
 		
 		var percentChartMax = 100;
 		if(this.calcProp.subType == 'stackedPer' && axisMax > percentChartMax)
