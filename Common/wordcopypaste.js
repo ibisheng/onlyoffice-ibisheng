@@ -3009,7 +3009,10 @@ PasteProcessor.prototype =
 				
 				//если находимся внутри шейп, вставляем html
 				if(this.oDocument.Parent && this.oDocument.Parent instanceof CShape)
+				{
 					base64 = null;
+					base64FromExcel = null;
+				}
 					
                 if(base64 != null)
                     aContent = this.ReadFromBinary(base64);
