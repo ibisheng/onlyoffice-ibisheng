@@ -7518,6 +7518,7 @@
 				this.activeMoveRange.r1 = 0;
 			}
 			this.activeMoveRange.r2 += rowDelta;
+			this.activeMoveRange._updateAdditionalData();
 
 			// Увеличиваем, если выходим за область видимости // Critical Bug 17413
 			while (!this.cols[this.activeMoveRange.c2]) {
@@ -7541,27 +7542,23 @@
 			while ( this._isColDrawnPartially( this.activeMoveRange.c2, this.visibleRange.c1 + d.deltaX) ) {++d.deltaX;}
 			while ( this._isRowDrawnPartially( this.activeMoveRange.r2, this.visibleRange.r1 + d.deltaY) ) {++d.deltaY;}*/
 
-            if ( y <= this.cellsTop + this.height_2px ){
+            if (y <= this.cellsTop + this.height_2px ){
                 d.deltaY = -1;
-            }else if ( y >= this.drawingCtx.getHeight() - this.height_2px ){
+            }else if ( y >= this.drawingCtx.getHeight() - this.height_2px)
                 d.deltaY = 1;
-            }
 
-            if ( x <= this.cellsLeft + this.width_2px ){
+            if (x <= this.cellsLeft + this.width_2px ){
                 d.deltaX = -1;
-            }else if ( x >= this.drawingCtx.getWidth() - this.width_2px ){
+            }else if ( x >= this.drawingCtx.getWidth() - this.width_2px)
                 d.deltaX = 1;
-            }
 
 			this.model.workbook.handlers.trigger("asc_onHideComment");
 
-            if( this.activeMoveRange.type == c_oAscSelectionType.RangeRow ){
+            if (this.activeMoveRange.type === c_oAscSelectionType.RangeRow)
                 d.deltaX = 0;
-            }
-            if( this.activeMoveRange.type == c_oAscSelectionType.RangeCol ){
+            else if (this.activeMoveRange.type === c_oAscSelectionType.RangeCol)
                 d.deltaY = 0;
-            }
-            if( this.activeMoveRange.type == c_oAscSelectionType.RangeMax ){
+            else if (this.activeMoveRange.type === c_oAscSelectionType.RangeMax) {
                 d.deltaX = 0;
                 d.deltaY = 0;
             }
