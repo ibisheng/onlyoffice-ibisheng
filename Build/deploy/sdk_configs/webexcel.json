@@ -83,7 +83,6 @@
                 "../../Word/Drawing/ColorArray.js",
                 "../../Common/Shapes/Serialize.js",
                 "../../Common/Shapes/SerializeWriter.js",
-
                 "../../Common/SerializeCommonWordExcel.js",
 				"../../Common/SerializeChart.js",
                 "../../Common/Charts/libraries/OfficeExcel.common.core.js",
@@ -118,7 +117,6 @@
                 "../../Common/Drawings/Format/ChartFormat.js",
                 "../../Common/Drawings/Format/TextBody.js",
                 "../../Common/Drawings/CommonController.js",
-				"../../Common/Shapes/EditorSettings.js",				
 				"../../Common/wordcopypaste.js",
                 "../../Excel/view/DrawingObjectsController.js",
 
@@ -193,6 +191,7 @@
         },
         "defines": {
             "src": [
+                "../../Common/Shapes/EditorSettings.js",
                 "../../Common/commonDefines.js",
                 "../../Excel/apiDefines.js"
             ],
