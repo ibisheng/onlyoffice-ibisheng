@@ -227,50 +227,33 @@ CDegree.prototype.recalculateSubScript = function(oMeasure)
 
     this.size = {width: width, height: height, ascent: ascent};
 }
-CDegree.prototype.old_old_setPosition = function(_pos)
-{
-    var pos = _pos;
-    if(this.bMObjs === true)
-    {
-        pos = {x: pos.x, y: pos.y + this.size.center };
-    }
-
-    this.elements[0][0].setPosition({x: pos.x, y: pos.y - this.elements[0][0].size.center });
-    this.elements[0][1].setPosition({x: pos.x + this.elements[0][0].size.width + this.dW, y: pos.y + this.shiftDegree - this.size.center});
-}
-CDegree.prototype.old_setPosition = function(pos)
-{
-    if(this.bMObjs === true)
-        this.pos = pos;
-    else
-        this.pos = {x: pos.x, y: pos.y - this.size.ascent};
-
-    var shBase = 0,
-        shIter = 0;
-
-    if(this.upper > 0)
-        shBase = this.upper;
-    else
-        shIter = - this.upper;
-
-    this.elements[0][0].setPosition({x: this.pos.x, y: this.pos.y + shBase});
-    this.elements[0][1].setPosition({x: this.pos.x + this.elements[0][0].size.width + this.dW, y: this.pos.y + shIter});
-}
 CDegree.prototype.setPosition = function(pos)
 {
+    this.pos.x = pos.x;
+
     if(this.bMObjs === true)
-        this.pos = pos;
+        this.pos.y = pos.y;
     else
-        this.pos = {x: pos.x, y: pos.y - this.size.ascent};
+        this.pos.y = pos.y - this.size.ascent;
 
-    var x1 = this.pos.x + this.GapLeft,
-        y1 = this.pos.y + this.upBase;
+    var PosBase = new CMathPosition();
 
-    var x2 = this.pos.x + this.GapLeft + this.elements[0][0].size.width + this.dW,
-        y2 = this.pos.y + this.upIter;
+    PosBase.x = this.pos.x + this.GapLeft;
+    PosBase.y = this.pos.y + this.upBase;
 
-    this.elements[0][0].setPosition({x: x1, y: y1});
-    this.elements[0][1].setPosition({x: x2, y: y2});
+    var PosIter = new CMathPosition();
+
+    PosIter.x = this.pos.x + this.GapLeft + this.elements[0][0].size.width + this.dW;
+    PosIter.y = this.pos.y + this.upIter;
+
+    //var x1 = this.pos.x + this.GapLeft,
+    //    y1 = this.pos.y + this.upBase;
+
+    //var x2 = this.pos.x + this.GapLeft + this.elements[0][0].size.width + this.dW,
+    //    y2 = this.pos.y + this.upIter;
+
+    this.elements[0][0].setPosition(PosBase);
+    this.elements[0][1].setPosition(PosIter);
 }
 CDegree.prototype.old_findDisposition = function(mCoord)
 {

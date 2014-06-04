@@ -521,7 +521,8 @@ function CAccent(props)
     //this.code = null;      // храним код буквы и тип здесь
     //this.typeOper = null;  // т.к в класах, которые вызываем, не учитываем случаи, когда элементы (стрелки/скобки) переворачиваются
 
-    CMathBase.call(this);
+    CAccent.superclass.constructor.call(this);
+    //CMathBase.call(this);
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
@@ -1105,10 +1106,6 @@ CAccent.prototype.setPosition = function(pos)
 
     this.elements[0][0].setPosition(PosBase);
 }
-CAccent.prototype.getAscent = function()
-{
-    return this.operator.size.height + this.elements[0][0].size.ascent;
-}
 CAccent.prototype.getPropsForWrite = function()
 {
     var props = {};
@@ -1164,7 +1161,7 @@ CAccent.prototype.Resize = function(Parent, ParaMath, oMeasure)
 
     var width  = base.size.width > this.operator.size.width ? base.size.width : this.operator.size.width,
         height = base.size.height + this.operator.size.height + this.shiftX,
-        ascent = this.getAscent(oMeasure);
+        ascent = this.operator.size.height + this.elements[0][0].size.ascent;
 
     this.size = {height: height, width: width, ascent: ascent};
 }

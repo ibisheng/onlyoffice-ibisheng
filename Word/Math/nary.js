@@ -494,19 +494,37 @@ CNaryUndOvr.prototype.recalculateSize = function()
 }
 CNaryUndOvr.prototype.setPosition = function(pos)
 {
-    this.pos = {x: pos.x, y : pos.y - this.size.ascent};
-    var xx = pos.x + this.GapLeft;
+    this.pos.x = pos.x;
+    this.pos.y = pos.y - this.size.ascent;
 
-    var x1 = xx + this.align(0, 0).x,
+    var PosUpIter = new CMathPosition();
+
+    PosUpIter.x = pos.x + this.GapLeft + this.align(0, 0).x;
+    PosUpIter.y = pos.y;
+
+
+    var PosSign = new CMathPosition();
+
+    PosSign.x = pos.x + this.GapLeft + this.align(1,0).x;
+    PosSign.y = pos.y + this.elements[0][0].size.height + this.gapTop;
+
+
+    var PosLowIter = new CMathPosition();
+
+    PosLowIter.x = pos.x + this.GapLeft + this.align(2,0).x;
+    PosLowIter.y = PosSign.y + this.elements[1][0].size.height + this.gapBottom;
+
+
+    /*var x1 = pos.x + this.GapLeft + this.align(0, 0).x,
         y1 = pos.y,
-        x2 = xx + this.align(1,0).x,
+        x2 = pos.x + this.GapLeft + this.align(1,0).x,
         y2 = y1 + this.elements[0][0].size.height + this.gapTop,
-        x3 = xx + this.align(2,0).x,
-        y3 = y2 + this.elements[1][0].size.height + this.gapBottom;
+        x3 = pos.x + this.GapLeft + this.align(2,0).x,
+        y3 = y2 + this.elements[1][0].size.height + this.gapBottom;*/
 
-    this.elements[0][0].setPosition({x: x1, y :y1});
-    this.elements[1][0].setPosition({x: x2, y :y2});
-    this.elements[2][0].setPosition({x: x3, y :y3});
+    this.elements[0][0].setPosition(PosUpIter);
+    this.elements[1][0].setPosition(PosSign);
+    this.elements[2][0].setPosition(PosLowIter);
 }
 CNaryUndOvr.prototype.findDisposition = function(mCoord)
 {
@@ -569,6 +587,7 @@ CNaryUndOvr.prototype.getUpperIterator = function()
 
 function CNaryOperator(flip)
 {
+    this.pos = new CMathPosition();
     this.ParaMath = null;
     this.bFlip = (flip == -1);
     this.sizeGlyph = null;
@@ -643,13 +662,10 @@ CNaryOperator.prototype.IsJustDraw = function()
 {
     return true;
 }
-/*CNaryOperator.prototype.relate = function(parent)
-{
-    this.Parent = parent;
-}*/
 CNaryOperator.prototype.setPosition = function(pos)
 {
-    this.pos = {x: pos.x , y: pos.y};
+    this.pos.x = pos.x;
+    this.pos.y = pos.y;
 }
 CNaryOperator.prototype.recalculateSize = function()
 {
@@ -668,18 +684,10 @@ CNaryOperator.prototype.Resize = function(Parent, ParaMath, oMeasure)
 
     this.recalculateSize(); //обычный пересчет, oMeasure не нужен
 }
-/*CNaryOperator.prototype.setComposition = function(Compos)
-{
-    this.Composition = Compos;
-}*/
 CNaryOperator.prototype.Get_CompiledCtrPrp = function()
 {
     return this.Parent.Get_CompiledCtrPrp();
 }
-/*CNaryOperator.prototype.setReferenceComposition = function(Compos)
-{
-    this.Composition = Compos;
-}*/
 CNaryOperator.prototype.IsOnlyText = function()
 {
     return false;

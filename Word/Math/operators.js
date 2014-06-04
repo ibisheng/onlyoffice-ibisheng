@@ -32,7 +32,7 @@ CGlyphOperator.prototype.init = function(props)
 CGlyphOperator.prototype.fixSize = function(stretch)
 {
     var sizeGlyph = this.calcSize(stretch);
-    var width, height, center;
+    var width, height, ascent;
 
     //var betta = this.getTxtPrp().FontSize/36;
     var bHor = this.loc == 0 || this.loc  == 1;
@@ -71,6 +71,8 @@ CGlyphOperator.prototype.draw_other = function() //  с выравнивание
     var X = coord.XX, Y = coord.YY,
         W =  this.size.width, H =  this.size.height,
         glW, glH;
+
+    var a1, a2, b1, b2, c1, c2;
 
     var bHor = this.loc == 0 || this.loc  == 1;
 
@@ -128,8 +130,6 @@ CGlyphOperator.prototype.draw_other = function() //  с выравнивание
         a2 *= -1; b2 *= -1; c2 += glH;
     }
 
-    var shW =  (W - glW)/ 2, // выравниваем глиф по длине
-        shH =  (H - glH)/2; // при повороте на 90 градусовы
 
     // A*x + B*y + C = 0
 
@@ -1022,7 +1022,8 @@ COperatorParenthesis.prototype.calcCoord = function(stretch)
 
     for(var i = 0; i < 10; i++)
     {
-        YY[19 - i] = YY[i] =  shiftY - Y[i]*alpha;
+        YY[19 - i] = shiftY - Y[i]*alpha;
+        YY[i] =  shiftY - Y[i]*alpha;
         XX[19 - i] =  X[i]*alpha;
         XX[i] = stretch - X[i]*alpha;
     }
@@ -2250,13 +2251,15 @@ old_old_CSeparator.prototype.drawHorLine = function()
 function COperator(type)
 {
     this.type = type; // delimiter, separator, group character, accent
-    this.operator = -1;
+    this.operator = null;
 
     this.code = null;
     this.typeOper = null;   // тип скобки : круглая и т.п.
     this.defaultType = null;
 
-    this.pos = null;
+    //this.pos = null;
+
+    this.Positions = new Array();
     this.coordGlyph = null;
     this.size = {width: 0, height: 0};
 
@@ -2823,12 +2826,12 @@ COperator.prototype.setProperties = function(properties, defaultProps)   // prop
         typeOper = BRACKET_CURLY_TOP;
 
         operator = new COperatorBracket();
-        var props =
+        prp =
         {
             location:   location,
             turn:       TURN_0
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x23DF || type === BRACKET_CURLY_BOTTOM)
     {
@@ -2836,12 +2839,12 @@ COperator.prototype.setProperties = function(properties, defaultProps)   // prop
         typeOper = BRACKET_CURLY_BOTTOM;
 
         operator = new COperatorBracket();
-        var props =
+        prp =
         {
             location:   location,
             turn:       TURN_MIRROR_0
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x2190 || type === ARROW_LEFT)
     {
@@ -2850,12 +2853,12 @@ COperator.prototype.setProperties = function(properties, defaultProps)   // prop
 
         operator = new CSingleArrow();
 
-        var props =
+        prp =
         {
             location:   location,
             turn:       TURN_0
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x2192 || type === ARROW_RIGHT)
     {
@@ -2863,12 +2866,12 @@ COperator.prototype.setProperties = function(properties, defaultProps)   // prop
         typeOper = ARROW_RIGHT;
 
         operator = new CSingleArrow();
-        var props =
+        prp =
         {
             location:   location,
             turn:       TURN_180
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x2194 || type === ARROW_LR)
     {
@@ -2876,12 +2879,12 @@ COperator.prototype.setProperties = function(properties, defaultProps)   // prop
         typeOper = ARROW_LR;
 
         operator = new CLeftRightArrow();
-        var props =
+        prp =
         {
             location:   location,
             turn:       TURN_0
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x21D0 || type === DOUBLE_LEFT_ARROW)
     {
@@ -2889,12 +2892,12 @@ COperator.prototype.setProperties = function(properties, defaultProps)   // prop
         typeOper = DOUBLE_LEFT_ARROW;
 
         operator = new CDoubleArrow();
-        var props =
+        prp =
         {
             location:   location,
             turn:       TURN_0
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x21D2 || type === DOUBLE_RIGHT_ARROW)
     {
@@ -2902,12 +2905,12 @@ COperator.prototype.setProperties = function(properties, defaultProps)   // prop
         typeOper = DOUBLE_RIGHT_ARROW;
 
         operator = new CDoubleArrow();
-        var props =
+        prp =
         {
             location:   location,
             turn:       TURN_180
         };
-        operator.init(props);
+        operator.init(prp);
     }
     else if(code === 0x21D4 || type === DOUBLE_ARROW_LR)
     {
@@ -2915,12 +2918,12 @@ COperator.prototype.setProperties = function(properties, defaultProps)   // prop
         typeOper = DOUBLE_ARROW_LR;
 
         operator = new CLR_DoubleArrow();
-        var props =
+        prp =
         {
             location:   location,
             turn:       TURN_0
         };
-        operator.init(props);
+        operator.init(prp);
     }
 
     //////////////////////////////////////////////////////
@@ -2932,7 +2935,6 @@ COperator.prototype.setProperties = function(properties, defaultProps)   // prop
 
         operator = new CMathText(true);
         operator.add(code);
-        operator.setJustDraw(true);
     }
     else
         operator = -1;
@@ -3013,16 +3015,19 @@ COperator.prototype.draw = function(x, y, pGraphics)
 }
 COperator.prototype.drawOperator = function(absX, absY, pGraphics)
 {
-    if(this.operator !== -1)
+    if(this.typeOper !== OPERATOR_EMPTY)
     {
         var lng = this.coordGlyph.XX.length;
 
         var X = new Array(),
             Y = new Array();
+
+        var PosOper = this.Positions[0];
+
         for(var j = 0; j < lng; j++)
         {
-            X.push(this.pos.x + absX + this.coordGlyph.XX[j]);
-            Y.push(this.pos.y + absY + this.coordGlyph.YY[j]);
+            X.push(PosOper.x + absX + this.coordGlyph.XX[j]);
+            Y.push(PosOper.y + absY + this.coordGlyph.YY[j]);
         }
 
         this.operator.draw(pGraphics, X, Y);
@@ -3030,18 +3035,21 @@ COperator.prototype.drawOperator = function(absX, absY, pGraphics)
 }
 COperator.prototype.drawSeparator = function(absX, absY, pGraphics)
 {
-    if(this.operator !== -1)
+    if(this.typeOper !== OPERATOR_EMPTY)
     {
         var lng = this.coordGlyph.XX.length;
 
-        for(var i = 0; i < this.pos.length; i++)
+        for(var i = 0; i < this.Positions.length; i++)
         {
             var X = new Array(),
                 Y = new Array();
+
+            var PosOper = this.Positions[i];
+
             for(var j = 0; j < lng; j++)
             {
-                X.push(this.pos[i].x + absX + this.coordGlyph.XX[j]);
-                Y.push(this.pos[i].y + absY + this.coordGlyph.YY[j]);
+                X.push(PosOper.x + absX + this.coordGlyph.XX[j]);
+                Y.push(PosOper.y + absY + this.coordGlyph.YY[j]);
             }
 
             this.operator.draw(pGraphics, X, Y);
@@ -3117,7 +3125,7 @@ COperator.prototype.old_fixSize = function(oMeasure, stretch)
 COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
 {
     this.ParaMath = ParaMath;
-    if(this.operator !== -1)
+    if(this.typeOper !== OPERATOR_EMPTY)
     {
         var width, height, ascent;
 
@@ -3183,13 +3191,21 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
         else // vertical
             ascent = height/2 + shCenter;
 
-        this.size = { width: width, height: height, ascent: ascent};
+        this.size = {width: width, height: height, ascent: ascent};
     }
 }
-COperator.prototype.setPosition = function(pos)
+COperator.prototype.setPosition = function(Positions)
 {
-    this.pos = pos; // для оператора, это будет просто позиция
-                    // для сепаратора - массив позиций
+    // для оператора, это будет просто позиция
+    // для сепаратора - массив позиций
+
+    if(this.type == OPER_SEPARATOR)
+        this.Positions = Positions;
+    else
+    {
+        this.Positions.length = 0;
+        this.Positions[0] = Positions;
+    }
 
     if(this.typeOper == OPERATOR_TEXT)
     {
@@ -3203,14 +3219,31 @@ COperator.prototype.setPosition = function(pos)
 
         this.operator.setPosition({x: x, y: y});*/
 
-        if(this.type == OPER_ACCENT)
-        {
-            this.operator.setPosition({x: pos.x, y: pos.y + this.shiftAccent + this.operator.size.height});
-        }
-        else
-            this.operator.setPosition(pos);
-    }
+        var NewPos = new CMathPosition();
+        NewPos.x = this.Positions[0].x;
 
+        if(this.type == OPER_ACCENT)
+            NewPos.y = this.Positions[0].y + this.shiftAccent + this.operator.size.height;
+        else
+            NewPos.y = this.Positions[0].y;
+
+
+        var operator = this.operator;
+        if (!operator.bJDraw)                      // for text
+        {
+            operator.pos.x = NewPos.x + operator.GapLeft;
+            operator.pos.y = NewPos.y;
+
+            //this.pos = {x : pos.x + this.GapLeft, y: pos.y};
+        }
+        else                                    // for symbol only drawing
+        {
+            operator.pos.x = NewPos.x - operator.rasterOffsetX;
+            operator.pos.y = NewPos.y - operator.rasterOffsetY;
+        }
+
+        this.operator.setPosition(NewPos);
+    }
 }
 COperator.prototype.IsJustDraw = function()
 {
@@ -3221,7 +3254,7 @@ COperator.prototype.Resize = function(Parent, ParaMath, oMeasure)
     this.ParaMath = ParaMath;
     this.Parent   = Parent;
 
-    if(this.operator !== -1)
+    if(this.typeOper !== OPERATOR_EMPTY)
     {
         var bHor = this.operator.loc == 0 || this.operator.loc  == 1;
 
@@ -3234,7 +3267,7 @@ COperator.prototype.Resize = function(Parent, ParaMath, oMeasure)
 COperator.prototype.relate = function(parent)
 {
     this.Parent = parent;
-    if(this.operator !== -1)
+    if(this.typeOper !== OPERATOR_EMPTY)
         this.operator.relate(this);
 }
 COperator.prototype.Get_CompiledCtrPrp = function()
@@ -3255,36 +3288,6 @@ COperator.prototype.getChr = function()
 COperator.prototype.IsArrow = function()
 {
     return this.operator.IsArrow();
-}
-
-function old_CSeparator(operator)
-{
-    COperator.call(this, operator);
-}
-extend(old_CSeparator, COperator);
-old_CSeparator.prototype.draw = function(pGraphics)
-{
-    if(this.operator !== -1)
-    {
-        var lng = this.coordGlyph.XX.length;
-
-        for(var i = 0; i < this.positions.length; i++)
-        {
-            var X = new Array(),
-                Y = new Array();
-            for(var j = 0; j < lng; j++)
-            {
-                X.push(this.positions[i].x + this.coordGlyph.XX[j]);
-                Y.push(this.positions[i].y + this.coordGlyph.YY[j]);
-            }
-
-            this.operator.draw(pGraphics, X, Y);
-        }
-    }
-}
-old_CSeparator.prototype.setPosition = function(pos)
-{
-    this.positions = pos;
 }
 
 function CDelimiter(props)
@@ -3722,38 +3725,74 @@ CDelimiter.prototype.alignOperator = function(operator) // в качестве �
 }
 CDelimiter.prototype.setPosition = function(position)
 {
-    this.pos = {x: position.x, y: position.y - this.size.ascent};
+    this.pos.x = position.x;
+    this.pos.y = position.y - this.size.ascent;
 
     var x = this.pos.x + this.GapLeft,
         y = this.pos.y;
 
-    var pos = {x: x, y: y + this.alignOperator(this.begOper)};
-    this.begOper.setPosition(pos);
+
+    var PosBegOper = new CMathPosition();
+    PosBegOper.x = x;
+    PosBegOper.y = y + this.alignOperator(this.begOper);
+
+
+    this.begOper.setPosition(PosBegOper);
     x += this.begOper.size.width;
 
     var content = this.elements[0][0];
-    pos = {x: x, y: y + this.align(content)};
-    content.setPosition(pos);
 
+    var PosContent = new CMathPosition();
+    PosContent.x = x;
+    PosContent.y = y + this.align(content);
     x += content.size.width;
 
+    content.setPosition(PosContent); // CMathContent
+
     var Positions = new Array();
+
     for(var j = 1 ; j < this.nCol; j++)
     {
-        pos = {x: x, y: y + this.alignOperator(this.sepOper)};
-        Positions.push(pos);
+        var PosSep = new CMathPosition();
+        PosSep.x = x;
+        PosSep.y = y + this.alignOperator(this.sepOper);
+
+        Positions.push(PosSep);
         x += this.sepOper.size.width;
 
         content = this.elements[0][j];
-        pos = {x: x, y: y + this.align(content)};
-        content.setPosition(pos);
+
+        var NewPosContent = new CMathPosition();
+        NewPosContent.x = x;
+        NewPosContent.y = y + this.align(content);
+
+        content.setPosition(NewPosContent);
         x += content.size.width;
     }
 
     this.sepOper.setPosition(Positions);
 
-    pos = {x: x, y: y + this.alignOperator(this.endOper)};
-    this.endOper.setPosition(pos);
+    var PosEndOper = new CMathPosition();
+    PosEndOper.x = x;
+    PosEndOper.y = y + this.alignOperator(this.endOper);
+
+    this.endOper.setPosition(PosEndOper);
+
+    /*this.pos.x = position.x;
+    this.pos.y = position.y - this.size.ascent;
+
+    var x = this.pos.x + this.GapLeft,
+        y = this.pos.y;
+
+    var content = this.elements[0][0];
+
+    var PosContent = new CMathPosition();
+    PosContent.x = x;
+    PosContent.y = y + this.align(content);
+    x += content.size.width;
+
+    content.setPosition(PosContent); // CMathContent*/
+
 }
 CDelimiter.prototype.findDisposition = function(pos)
 {
@@ -3978,34 +4017,38 @@ CCharacter.prototype.Resize = function(Parent, ParaMath, oMeasure)
 }
 CCharacter.prototype.setPosition = function(pos)
 {
-    this.pos = {x: pos.x, y: pos.y - this.size.ascent};
+    this.pos.x = pos.x;
+    this.pos.y = pos.y - this.size.ascent;
 
     var alignOp  =  this.align(this.operator),
-        alignCnt = this.align(this.elements[0][0]);
+        alignCnt =  this.align(this.elements[0][0]);
+
+    var PosOper = new CMathPosition(),
+        PosBase = new CMathPosition();
 
     if(this.Pr.pos === LOCATION_TOP)
     {
-        var x1 = this.pos.x + this.GapLeft + alignOp,
-            y1 = this.pos.y;
+        PosOper.x = this.pos.x + this.GapLeft + alignOp;
+        PosOper.y = this.pos.y;
 
-        this.operator.setPosition({x: x1, y: y1});
+        this.operator.setPosition(PosOper);
 
-        var x2 = this.pos.x + this.GapLeft + alignCnt,
-            y2 = this.pos.y + this.operator.size.height;
+        PosBase.x = this.pos.x + this.GapLeft + alignCnt;
+        PosBase.y = this.pos.y + this.operator.size.height;
 
-        this.elements[0][0].setPosition({x: x2, y: y2});
+        this.elements[0][0].setPosition(PosBase);
     }
     else if(this.Pr.pos === LOCATION_BOT)
     {
-        var x1 = this.pos.x + this.GapLeft + alignCnt,
-            y1 = this.pos.y;
+        PosBase.x = this.pos.x + this.GapLeft + alignCnt;
+        PosBase.y = this.pos.y;
 
-        this.elements[0][0].setPosition({x: x1, y: y1});
+        this.elements[0][0].setPosition(PosBase);
 
-        var x2 = this.pos.x + this.GapLeft + alignOp,
-            y2 = this.pos.y + this.elements[0][0].size.height;
+        PosOper.x = this.pos.x + this.GapLeft + alignOp;
+        PosOper.y = this.pos.y + this.elements[0][0].size.height;
 
-        this.operator.setPosition({x: x2, y: y2});
+        this.operator.setPosition(PosOper);
     }
 }
 CCharacter.prototype.align = function(element)
@@ -4342,7 +4385,7 @@ CGroupCharacter.prototype.old_getGlyph = function(code, type)
     /////
     else if(typeof(code) !=="undefined" && code !== null)
     {
-        operator = new CMathText();
+        operator = new CMathText(true);
         operator.add(code);
     }
     else

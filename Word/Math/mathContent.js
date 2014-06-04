@@ -527,25 +527,6 @@ CRecalculateInfo.prototype =
 
 // TO DO
 // убрать
-/*function dist(_left, _right, _top, _bottom)
-{
-    this.left = _left;
-    this.right = _right;
-    this.top = _top;
-    this.bottom = _bottom;
-}
-function mathElem(val)
-{
-    this.value = val;
-    this.widthToEl = 0; // width to this element
-    this.gaps =
-    {
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0
-    }; //mm
-}*/
 
 /*function CMathRunPrp()
 {
@@ -853,43 +834,15 @@ function CMathContent()
 
     this.CurPos = 0;
     this.WidthToElement = [];
-    this.pos = {x:0,    y:0};   // относительная позиция
+    this.pos = new CMathPosition();   // относительная позиция
 
     //  Properties
-    //this.Composition = null; // ссылка на общую формулу
     this.ParaMath      = null;
     this.argSize     = 0;
     this.bDot       =   false;
     this.plhHide    =   false;
     this.bRoot      =   false;
     //////////////////
-
-/*
-
-    ///*/
-/**  real select  **//*
-///
-    this.RealSelect =
-    {
-        startPos:   0,  // эти позиции идут на отрисовку селекта
-        endPos:     0   // и по ним удаляем элементы из контента
-    };
-    ///////////////////////////////
-
-    ///*/
-/**   logical select  **//*
-///
-    this.LogicalSelect =
-    {
-        start:  0,      //  логические позиции селекта !!
-        end:    0       //  откуда начали и где закончили селект
-                        //  особенно важна стартовая позиция
-    };
-    ///////////////////////////////
-
-    ///////////////////////////////
-
-*/
 
     this.bSelectionUse = false;
     this.SelectStartPos = 0;
@@ -4241,7 +4194,7 @@ CMathContent.prototype =
         }
         else
         {
-            if( ! this.bRoot )
+            if (!this.bRoot)
             {
                 var movement = this.Parent.cursor_moveRight();
                 SelectContent = CurrContent = movement.SelectContent;
@@ -4309,7 +4262,7 @@ CMathContent.prototype =
         }
         else
         {
-            if( ! this.bRoot )
+            if(!this.bRoot)
             {
                 var movement = this.Parent.cursor_moveRight();
                 SelectContent = CurrContent = movement.SelectContent;
@@ -4328,7 +4281,7 @@ CMathContent.prototype =
         {
             if( this.content[this.selection.startPos - 1].value.typeObj === MATH_COMP)
             {
-                if ( ! this.content[this.CurPos].value.select_moveRight() )
+                if ( !this.content[this.CurPos].value.select_moveRight() )
                 {
                     //выход за границы мат. объекта
                     var _active = this.selection.active;
@@ -4671,7 +4624,7 @@ CMathContent.prototype =
         x += this.content[this.CurPos].widthToEl - this.content[this.CurPos].value.size.width - this.content[this.CurPos].gaps.right;
         y = 0;
 
-        if( ! this.bRoot )
+        if( !this.bRoot )
         {
             var lowLevel = this.Parent.goToLowerLevel( {x: x, y: y} );
             bLow = lowLevel.bLow;
@@ -4696,7 +4649,7 @@ CMathContent.prototype =
         x += this.content[this.CurPos].widthToEl - this.content[this.CurPos].value.size.width - this.content[this.CurPos].gaps.right;
         y = 0;
 
-        if( ! this.bRoot )
+        if( !this.bRoot )
         {
             var upLevel = this.Parent.goToUpperLevel( {x: x, y: y} );
             bUp = upLevel.bUp;
@@ -4754,7 +4707,7 @@ CMathContent.prototype =
         var state = true,
             SelectContent = null, CurrContent = null;
 
-        if( ! this.bRoot )
+        if( !this.bRoot )
         {
             var coord = {x: this.content[this.CurPos].value.size.width, y: 0};
             var UpL = this.goToUpperLevel(coord);
@@ -4775,7 +4728,7 @@ CMathContent.prototype =
         var state = true,
             SelectContent = null, CurrContent = null;
 
-        if( ! this.bRoot )
+        if( !this.bRoot )
         {
             var coord = {x: this.content[this.CurPos].value.size.width, y: 0};
             var LowL = this.goToLowerLevel(coord);
@@ -4856,7 +4809,7 @@ CMathContent.prototype =
                 var coord = this.getCoordElem(this.CurPos, msCoord );
                 var movement = this.content[pos].value.mouseMove(coord);
 
-                if( ! movement.state )
+                if( !movement.state )
                 {
                     this.setEnd_Selection( pos + 1 );
                     SelectContent = this;
@@ -5536,7 +5489,7 @@ CMathContent.prototype =
         var bRun = start - 1 > 0 ? this.content[start - 1].value.typeObj === MATH_RUN_PRP : false,
             bNextText = start + 1 < this.content.length ?  this.content[start + 1].value.typeObj == MATH_TEXT : false; // start  < this.content.length - 1, значит последняя буква в контента
 
-        var bOnlyLetter = bRun && ! bNextText; // если все текстовые элементы удалили из Run, нужно удалить RunPrp
+        var bOnlyLetter = bRun && !bNextText; // если все текстовые элементы удалили из Run, нужно удалить RunPrp
 
         if(bOnlyLetter)
         {
@@ -5690,7 +5643,7 @@ CMathContent.prototype =
     },
     setPlaceholderAfterRemove: function()  // чтобы не выставлялся тагет при вставке, когда заселекчен весь контент и мы добавляем, например, другой мат элемент
     {
-        if(this.content.length == 1 && ! this.bRoot )//только CEmpty
+        if(this.content.length == 1 && !this.bRoot )//только CEmpty
             this.fillPlaceholders();
     },
     selectUse: function()
@@ -5705,7 +5658,7 @@ CMathContent.prototype =
             }
             else if(this.content[this.SelectStartPos].typeObj == MATH_COMP)
             {
-                result = ! this.content[this.SelectStartPos].IsSelectEmpty();
+                result = !this.content[this.SelectStartPos].IsSelectEmpty();
             }
         }
         else
@@ -5735,24 +5688,29 @@ CMathContent.prototype =
     },
     setPosition: function(pos)
     {
-        this.pos = {x: pos.x, y: pos.y};
+        this.pos.x = pos.x;
+        this.pos.y = pos.y;
 
-        var _pos = {x: pos.x, y: pos.y + this.size.ascent};   // y по baseline;
+        var NewPos = new CMathPosition();
+
+        NewPos.x = pos.x;
+        NewPos.y = pos.y + this.size.ascent;    // y по baseline;
+
 
         for(var i=0; i < this.content.length; i++)
         {
             if(this.content[i].typeObj == MATH_COMP)
             {
-                this.content[i].setPosition(_pos);
-                _pos.x += this.content[i].size.width;
+                this.content[i].setPosition(NewPos);
+                NewPos.x += this.content[i].size.width;
             }
             else if(this.content[i].typeObj == MATH_PARA_RUN)
             {
-                this.content[i].Math_SetPosition(_pos);
-                _pos.x += this.content[i].size.width;
+                this.content[i].Math_SetPosition(NewPos);
+                NewPos.x += this.content[i].size.width;
             }
             else if(this.content[i].typeObj == MATH_PLACEHOLDER)
-                this.content[i].setPosition(_pos);
+                this.content[i].setPosition(NewPos);
         }
     },
     ///// properties /////
@@ -6137,7 +6095,7 @@ CMathContent.prototype =
                 left = current;
 
             }
-            else if(! bDeleteEmptyRun )
+            else if(!bDeleteEmptyRun )
             {
                 NewContent.push(this.content[i]);
                 left = current;
@@ -9066,9 +9024,7 @@ CMathContent.prototype =
 			items.push(oElem);
 			History.Add(oParent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
 		}
-
     },
-
     CreateFraction : function (oFraction,oParentElem,sNumText,sDenText)
     {
         this.CreateElem(oFraction, oParentElem);

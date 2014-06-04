@@ -384,16 +384,23 @@ CBorderBox.prototype.old_draw = function(x, y, pGraphics)
 }
 CBorderBox.prototype.setPosition = function(pos)
 {
-    this.pos = {x: pos.x, y: pos.y - this.size.ascent};
+    this.pos.x = pos.x;
+    this.pos.y = pos.y - this.size.ascent;
 
-    var x = this.pos.x + this.GapLeft, y = this.pos.y;
+    var NewPos = new CMathPosition();
 
     if(this.Pr.hideLeft == false)
-        x += this.gapBrd;
-    if(this.Pr.hideTop == false)
-        y += this.gapBrd;
+        NewPos.x = this.pos.x + this.GapLeft + this.gapBrd;
+    else
+        NewPos.x = this.pos.x + this.GapLeft;
 
-    this.elements[0][0].setPosition({x : x, y: y});
+
+    if(this.Pr.hideTop == false)
+        NewPos.y = this.pos.y + this.gapBrd;
+    else
+        NewPos.y = this.pos.y;
+
+    this.elements[0][0].setPosition(NewPos);
 }
 CBorderBox.prototype.findDisposition = function(mCoord)
 {

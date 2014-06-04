@@ -62,14 +62,14 @@ function CMathText(bJDraw)
 {
     this.typeObj = MATH_TEXT;
 
-    this.bJDraw = false;
+    this.bJDraw = bJDraw;
     this.size = null;
     this.value = null;
     this.pos = new CMathPosition();
 
 
-    if(bJDraw === false || bJDraw === true)
-        this.bJDraw = bJDraw;
+//    if(bJDraw === false || bJDraw === true)
+//        this.bJDraw = bJDraw;
 
     this.type  = TXT_ROMAN;
 
@@ -312,18 +312,28 @@ CMathText.prototype =
     },
     setPosition: function(pos)
     {
-        if( ! this.bJDraw)                      // for text
-        {
-            this.pos.x = pos.x + this.GapLeft;
-            this.pos.y = pos.y;
+        /*try
+        {*/
 
-            //this.pos = {x : pos.x + this.GapLeft, y: pos.y};
-        }
-        else                                    // for symbol only drawing
+
+            if (!this.bJDraw)                      // for text
+            {
+                this.pos.x = pos.x + this.GapLeft;
+                this.pos.y = pos.y;
+
+                //this.pos = {x : pos.x + this.GapLeft, y: pos.y};
+            }
+            else                                    // for symbol only drawing
+            {
+                this.pos.x = pos.x - this.rasterOffsetX;
+                this.pos.y = pos.y - this.rasterOffsetY;
+            }
+        /*}
+        catch(e)
         {
-            this.pos.x = pos.x - this.rasterOffsetX;
-            this.pos.y = pos.y - this.rasterOffsetY;
-        }
+
+        }*/
+
     },
     setCoeffTransform: function(sx, shx, shy, sy)
     {

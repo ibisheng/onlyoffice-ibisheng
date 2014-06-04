@@ -1020,21 +1020,25 @@ CRadical.prototype.recalculateSize = function(oMeasure)
 }
 CRadical.prototype.setPosition = function(pos)
 {
-    this.pos = {x: pos.x, y: pos.y - this.size.ascent};
+    this.pos.x = pos.x;
+    this.pos.y = pos.y - this.size.ascent;
+
+    var PosBase    = new CMathPosition(),
+        PosRadical = new CMathPosition();
 
     if(this.Pr.type == SQUARE_RADICAL)
     {
         var gapLeft = this.size.width - this.elements[0][0].size.width;
         var gapTop = this.size.ascent - this.elements[0][0].size.ascent;
 
-        var x1 = this.pos.x + this.GapLeft,
-            y1 = this.pos.y;
+        PosRadical.x = this.pos.x + this.GapLeft;
+        PosRadical.y = this.pos.y;
 
-        var x2 = this.pos.x + this.GapLeft + gapLeft,
-            y2 = this.pos.y + gapTop;
+        PosBase.x = this.pos.x + this.GapLeft + gapLeft;
+        PosBase.y = this.pos.y + gapTop;
 
-        this.signRadical.setPosition({x: x1, y: y1});
-        this.elements[0][0].setPosition({x: x2, y: y2});
+        this.signRadical.setPosition(PosRadical);
+        this.elements[0][0].setPosition(PosBase);
     }
     else if(this.Pr.type == DEGREE_RADICAL)
     {
@@ -1044,21 +1048,25 @@ CRadical.prototype.setPosition = function(pos)
 
         var wTick = this.signRadical.measure.widthTick;
 
-        var x1 = this.pos.x + this.GapLeft + this.gapWidth,
-            y1 = this.pos.y + this.gapDegree;
+        var PosDegree = new CMathPosition();
 
-        this.elements[0][0].setPosition({x: x1, y: y1});
+        PosDegree.x = this.pos.x + this.GapLeft + this.gapWidth;
+        PosDegree.y = this.pos.y + this.gapDegree;
+
+        this.elements[0][0].setPosition(PosDegree);
 
         var wDegree = degr.width > wTick ? degr.width - wTick : 0;
-        var x2 = this.pos.x + this.GapLeft + wDegree,
-            y2 = this.pos.y + this.size.height - sign.height;
 
-        this.signRadical.setPosition({x: x2, y: y2});
+        PosRadical.x = this.pos.x + this.GapLeft + wDegree;
+        PosRadical.y = this.pos.y + this.size.height - sign.height;
 
-        var x3 = this.pos.x + this.GapLeft + this.size.width - base.width,
-            y3 = this.pos.y + this.size.ascent - base.ascent;
+        this.signRadical.setPosition(PosRadical);
 
-        this.elements[0][1].setPosition({x: x3, y: y3});
+        PosBase.x = this.pos.x + this.GapLeft + this.size.width - base.width;
+        PosBase.y = this.pos.y + this.size.ascent - base.ascent;
+
+
+        this.elements[0][1].setPosition(PosBase);
     }
 }
 CRadical.prototype.findDisposition = function(mCoord)

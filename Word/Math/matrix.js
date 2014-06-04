@@ -269,14 +269,18 @@ CMathMatrix.prototype.recalculateSize = function(oMeasure)
 }
 CMathMatrix.prototype.setPosition = function(pos)
 {
+    this.pos.x = pos.x;
+
     if(this.bMObjs === true)
-        this.pos = pos;
+        this.pos.y = pos.y;
     else
-        this.pos = {x: pos.x, y: pos.y - this.size.ascent}; ///!!!!!!!!!!!!!!!!!!!!!!!!!!
+        this.pos.y = pos.y - this.size.ascent; ///!!!!
 
     var maxWH = this.getWidthsHeights();
     var Widths = maxWH.widths;
     var Heights = maxWH.heights;
+
+    var NewPos = new CMathPosition();
 
     var h = 0, w = 0;
 
@@ -286,10 +290,10 @@ CMathMatrix.prototype.setPosition = function(pos)
         for(var j = 0; j < this.nCol; j++)
         {
             var al = this.align(i, j);
-            var X = this.pos.x + this.GapLeft + al.x + this.gaps.column[j] + w;
-            var Y = this.pos.y + al.y + this.gaps.row[i] + h;
+            NewPos.x = this.pos.x + this.GapLeft + al.x + this.gaps.column[j] + w;
+            NewPos.y = this.pos.y + al.y + this.gaps.row[i] + h;
 
-            this.elements[i][j].setPosition( {x: X, y: Y} );
+            this.elements[i][j].setPosition(NewPos);
             w += Widths[j] + this.gaps.column[j];
         }
         h += Heights[i] + this.gaps.row[i];

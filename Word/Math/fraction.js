@@ -337,17 +337,22 @@ CFraction.prototype.setPosition = function(pos)
 {
     if(this.Pr.type == SKEWED_FRACTION)
     {
-        this.pos = {x: pos.x, y: pos.y - this.size.ascent};
+        this.pos.x = pos.x;
+        this.pos.y = pos.y - this.size.ascent;
 
-        var x1 = this.pos.x + this.GapLeft,
-            y1 = this.pos.y;
+        var PosNum = new CMathPosition();
 
-        var x2 = this.pos.x + this.GapLeft + this.elements[0][0].size.width + this.gapSlash,
-            y2 = this.pos.y + this.elements[0][0].size.height;
+        PosNum.x = this.pos.x + this.GapLeft;
+        PosNum.y = this.pos.y;
 
-        this.elements[0][0].setPosition({x: x1, y: y1});
 
-        this.elements[0][1].setPosition({x: x2, y: y2});
+        var PosDen = new CMathPosition();
+
+        PosDen.x = this.pos.x + this.GapLeft + this.elements[0][0].size.width + this.gapSlash;
+        PosDen.y = this.pos.y + this.elements[0][0].size.height;
+
+        this.elements[0][0].setPosition(PosNum);
+        this.elements[0][1].setPosition(PosDen);
     }
     else
         CFraction.superclass.setPosition.call(this, pos);
@@ -576,10 +581,7 @@ CNumerator.prototype.findDisposition = function(mCoord)
 }
 CNumerator.prototype.setPosition = function(pos)
 {
-    var x = pos.x;
-    var y = pos.y ;
-
-    this.elements[0][0].setPosition({x: x, y: y});
+    this.elements[0][0].setPosition(pos);
 }
 CNumerator.prototype.getElement = function()
 {
@@ -651,10 +653,12 @@ CDenominator.prototype.findDisposition = function(mCoord)
 }
 CDenominator.prototype.setPosition = function(pos)
 {
-    var x = pos.x;
-    var y = pos.y + this.gap;
+    var NewPos = new CMathPosition();
 
-    this.elements[0][0].setPosition({x: x, y: y});
+    NewPos.x = pos.x;
+    NewPos.y = pos.y + this.gap;
+
+    this.elements[0][0].setPosition(NewPos);
 }
 CDenominator.prototype.getElement = function(txt)
 {

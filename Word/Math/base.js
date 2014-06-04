@@ -1,10 +1,9 @@
+var CENTER = -1;
 function CMathBase()
 {
     this.typeObj = MATH_COMP;
 
     // {align: {height: alpha, width: betta}}  alpha & betta коэффициенты в интервале от 0 до 1, либо CENTER
-
-    CENTER = -1;
 
     this.pos = new CMathPosition();
     this.size = null;
@@ -330,6 +329,7 @@ CMathBase.prototype =
                 break;
             }
         } while( this.elements[this.CurPos_X][this.CurPos_Y].IsJustDraw() )
+            ;
 
         //из цикла вышли если bJustDraw = false  or  bUpperLevel = true
 
@@ -367,6 +367,7 @@ CMathBase.prototype =
                 break;
             }
         } while( this.elements[this.CurPos_X][this.CurPos_Y].IsJustDraw() )
+            ;
 
         var content;
         if( bUpperLevel )
@@ -389,15 +390,11 @@ CMathBase.prototype =
     },
     select_moveRight: function()
     {
-        var res = this.elements[this.CurPos_X][this.CurPos_Y].select_moveRight();
-
-        return res;
+        return this.elements[this.CurPos_X][this.CurPos_Y].select_moveRight();
     },
     select_moveLeft: function()
     {
-        var res = this.elements[this.CurPos_X][this.CurPos_Y].select_moveLeft();
-
-        return res;
+        return this.elements[this.CurPos_X][this.CurPos_Y].select_moveLeft();
     },
     goToLastElement: function()
     {
@@ -684,7 +681,7 @@ CMathBase.prototype =
     },
     align: function(pos_x, pos_y)
     {
-        var _x, _y;
+        var PosAlign = new CMathPosition();
 
         if(this.alignment.hgt[pos_y] == CENTER)
         {
@@ -695,7 +692,7 @@ CMathBase.prototype =
                 var _ascent = this.elements[pos_x][j].size.ascent;
                 maxAsc = ( maxAsc > _ascent ) ? maxAsc : _ascent;
             }
-            _y = (maxAsc - this.elements[pos_x][pos_y].size.ascent);
+            PosAlign.y = (maxAsc - this.elements[pos_x][pos_y].size.ascent);
         }
         else
         {
@@ -706,7 +703,7 @@ CMathBase.prototype =
                 _h = this.elements[pos_x][j].size.height;
                 maxH = ( maxH > _h ) ? maxH : _h;
             }
-            _y = (maxH - this.elements[pos_x][pos_y].size.height)*this.alignment.hgt[pos_y];
+            PosAlign.y = (maxH - this.elements[pos_x][pos_y].size.height)*this.alignment.hgt[pos_y];
         }
 
         var maxW  = 0;
@@ -717,11 +714,11 @@ CMathBase.prototype =
         }
 
         if(this.alignment.wdt[pos_x] == CENTER)
-            _x = (maxW - this.elements[pos_x][pos_y].size.width)*0.5;
+            PosAlign.x = (maxW - this.elements[pos_x][pos_y].size.width)*0.5;
         else
-            _x = (maxW - this.elements[pos_x][pos_y].size.width)*this.alignment.wdt[pos_x];
+            PosAlign.x = (maxW - this.elements[pos_x][pos_y].size.width)*this.alignment.wdt[pos_x];
 
-        return {x: _x, y: _y};
+        return PosAlign;
     },
     findDisposition: function(mCoord)
     {
@@ -920,25 +917,29 @@ CMathBase.prototype =
     },
     setPosition: function(pos)
     {
+        this.pos.x = pos.x;
+
         if(this.bMObjs === true)
-            this.pos = {x: pos.x, y : pos.y};
+            this.pos.y = pos.y;
         else
-            this.pos = {x: pos.x, y: pos.y - this.size.ascent}; ///!!!!!!!!!!!!!!!!!!!!!!!!!!
+            this.pos.y = pos.y - this.size.ascent; ///!!!!
 
         var maxWH = this.getWidthsHeights();
         var Widths = maxWH.widths;
         var Heights = maxWH.heights;
 
         var h = 0, w = 0;
+        var NewPos = new CMathPosition();
+
         for(var i=0; i < this.nRow; i++)
         {
             w = 0;
             for(var j = 0; j < this.nCol; j++)
             {
                 var al = this.align(i, j);
-                var X = this.pos.x + this.GapLeft + al.x + this.dW*j + w;
-                var Y = this.pos.y + al.y + this.dH*i + h;
-                this.elements[i][j].setPosition( {x: X, y: Y} );
+                NewPos.x = this.pos.x + this.GapLeft + al.x + this.dW*j + w;
+                NewPos.y = this.pos.y + al.y + this.dH*i + h;
+                this.elements[i][j].setPosition(NewPos);
                 w += Widths[j];
             }
             h += Heights[i];
@@ -1167,6 +1168,7 @@ CMathBase.prototype =
                 break;
             }
         } while( this.elements[this.CurPos_X][this.CurPos_Y].IsJustDraw() )
+            ;
 
         //из цикла вышли если bJustDraw = false  or  bUpperLevel = true
 
@@ -1202,6 +1204,7 @@ CMathBase.prototype =
                 break;
             }
         } while( this.elements[this.CurPos_X][this.CurPos_Y].IsJustDraw() )
+            ;
 
         var SelectContent;
         if( bUpperLevel )
@@ -1536,7 +1539,7 @@ CMathBase.prototype =
                 var bJDraw = this.elements[CurPos_X][CurPos_Y].IsJustDraw(),
                     usePlh = !bJDraw && bUseContent && this.elements[CurPos_X][CurPos_Y].IsPlaceholder();
 
-                if(!bJDraw && ! usePlh)
+                if(!bJDraw && !usePlh)
                 {
                     this.elements[CurPos_X][CurPos_Y].Get_RightPos(SearchPos, ContentPos, Depth + 2, bUseContent, BegRun);
                     SearchPos.Pos.Update(CurPos_X, Depth);

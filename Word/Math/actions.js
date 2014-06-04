@@ -426,7 +426,7 @@ var inherit = function(obj, extObj)
             arguments.callee(obj, arguments[a]);
     else
         for(var i in extObj)
-            if( ! obj[i])
+            if (!obj[i])
                 obj[i] = extObj[i];
 
     return obj;
