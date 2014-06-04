@@ -395,6 +395,31 @@ CChartsDrawer.prototype =
 		this.calcProp.chartGutter._right = calculateRight ? calculateRight * pxToMM : right * pxToMM;
 		this.calcProp.chartGutter._top = calculateTop ? calculateTop * pxToMM : top * pxToMM;
 		this.calcProp.chartGutter._bottom = calculateBottom ? calculateBottom * pxToMM : bottom * pxToMM;
+		
+		this._checkMargins();
+	},
+	
+	_checkMargins: function()
+	{
+		var standartMargin = 13;
+		if(this.calcProp.chartGutter._left < 0)
+			this.calcProp.chartGutter._left = standartMargin;
+		if(this.calcProp.chartGutter._right < 0)
+			this.calcProp.chartGutter._right = standartMargin;
+		if(this.calcProp.chartGutter._top < 0)
+			this.calcProp.chartGutter._top = standartMargin;
+		if(this.calcProp.chartGutter._bottom < 0)
+			this.calcProp.chartGutter._bottom = standartMargin;
+			
+		if((this.calcProp.chartGutter._left + this.calcProp.chartGutter._right) > this.calcProp.widthCanvas)
+			this.calcProp.chartGutter._left = standartMargin;
+		if(this.calcProp.chartGutter._right > this.calcProp.widthCanvas)
+			this.calcProp.chartGutter._right = standartMargin;
+			
+		if((this.calcProp.chartGutter._top + this.calcProp.chartGutter._bottom) > this.calcProp.heightCanvas)
+			this.calcProp.chartGutter._top = 0;
+		if(this.calcProp.chartGutter._bottom > this.calcProp.heightCanvas)
+			this.calcProp.chartGutter._bottom = 0;
 	},
 	
 	_calculateMarginOnPoints: function(chartSpace, isHBar)
@@ -7417,7 +7442,7 @@ gridChart.prototype =
 			this.cChartDrawer.drawPath(path, pen);
 			
 			//промежуточные линии
-			if(this.paths.horisontalMinorLines[i])
+			if(this.paths.horisontalMinorLines && this.paths.horisontalMinorLines[i])
 			{
 				for(var n = 0; n < this.paths.horisontalMinorLines[i].length ; n++)
 				{
@@ -7448,7 +7473,7 @@ gridChart.prototype =
 			this.cChartDrawer.drawPath(path, pen);
 			
 			//промежуточные линии
-			if(this.paths.verticalMinorLines[i])
+			if(this.paths.verticalMinorLines && this.paths.verticalMinorLines[i])
 			{
 				for(var n = 0; n < this.paths.verticalMinorLines[i].length ; n++)
 				{
