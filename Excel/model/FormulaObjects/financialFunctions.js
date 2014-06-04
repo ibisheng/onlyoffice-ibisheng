@@ -629,11 +629,11 @@ cACCRINT.prototype.Calculate = function ( arg ) {
 
     if(settl > fInter && calcMethod){
         coupPCD = new Date( fInter );
-        endDate = new Date( settl );
+        startDate = endDate = new Date( settl );
 
-        while ( !(numMonths > 0 ? coupPCD >= endDate : coupPCD <= endDate) ) {
+        while ( !(numMonths > 0 ? coupPCD >= startDate : coupPCD <= startDate) ) {
             endDate = coupPCD;
-            startDate = addMonth( coupPCD, numMonths, endMonth );
+            coupPCD = addMonth( coupPCD, numMonths, endMonth );
         }
 
     }
@@ -641,11 +641,11 @@ cACCRINT.prototype.Calculate = function ( arg ) {
         coupPCD = addMonth( fInter, numMonthsNeg, endMonth );
     }
 
-    firstDate = iss > coupPCD ? iss : coupPCD;
+    firstDate = new Date( iss > coupPCD ? iss : coupPCD );
     days = days360( firstDate, settl, basis );
     coupDays = getcoupdays( coupPCD, fInter, frequency, basis ).getValue();
     res = days / coupDays;
-    startDate = coupPCD;
+    startDate = new Date( coupPCD );
     endDate = iss;
 
     while( !( numMonthsNeg > 0 ? startDate >= iss : startDate <= iss ) ) {
@@ -2132,6 +2132,8 @@ cDOLLARDE.prototype.Calculate = function ( arg ) {
     else if ( fraction == 0 )
         return this.value = new cError( cErrorType.division_by_zero );
 
+    fraction = Math.floor(fraction);
+
     var fInt = Math.floor( fractionalDollar ), res = fractionalDollar - fInt;
 
     res /= fraction;
@@ -2199,6 +2201,8 @@ cDOLLARFR.prototype.Calculate = function ( arg ) {
         return this.value = new cError( cErrorType.not_numeric );
     else if ( fraction == 0 )
         return this.value = new cError( cErrorType.division_by_zero );
+
+    fraction = Math.floor(fraction);
 
     var fInt = Math.floor( decimalDollar ), res = decimalDollar - fInt;
 
