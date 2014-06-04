@@ -1500,9 +1500,26 @@ var gUndoInsDelCellsFlag = true;
 					}
 					aWs.TableParts = newTableParts;
 				}
+				
+				this._isEmptyButtons(ar);
+				
 				History.EndTransaction();
 				if(turnOnHistory)
 					History.TurnOff();
+			},
+			
+			_isEmptyButtons: function(ar)
+			{
+				var rangeButton;
+				for(var i = 0; i < this.allButtonAF.length; i++)
+				{
+					rangeButton = this._idToRange(this.allButtonAF[i].id);
+					if(rangeButton.r1 >= ar.r1 && rangeButton.r2 <= ar.r2 && rangeButton.c1 >= ar.c1 && rangeButton.c2 <= ar.c2)
+					{
+						this.allButtonAF.splice(i, 1);
+						i--;
+					}
+				}
 			},
 			
 			getTablePictures: function(wb, fmgrGraphics, oFont)
