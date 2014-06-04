@@ -1582,6 +1582,7 @@ CChartSpace.prototype =
                             }
                         }
                     }
+                    x_ax.interval = hor_interval_width;
 
                     /*рассчитаем позицию блока с подписями горизонтальной оси*/
                     var y_ax_orientation = isRealObject(y_ax.scaling) && isRealNumber(y_ax.scaling.orientation) ? y_ax.scaling.orientation : ORIENTATION_MIN_MAX;
@@ -1787,7 +1788,7 @@ CChartSpace.prototype =
                             }
                         }
                     }
-
+                    y_ax.interval = vert_interval_height;
 
                     y_ax.yPoints = [];
                     for(i = 0; i < arr_val.length; ++i)
@@ -2326,6 +2327,8 @@ CChartSpace.prototype =
                         }
                     }
 
+                    cat_ax.interval = point_interval;
+
                     var diagram_width = point_interval*intervals_count;//размер области с самой диаграммой позже будет корректироватся;
                     var max_cat_label_width = diagram_width / string_pts.length; // максимальная ширина подписи горизонтальной оси;
 
@@ -2584,6 +2587,7 @@ CChartSpace.prototype =
                             }
                         }
                     }
+
                     //расчет позиции блока с подписями горизонтальной оси
                     var cat_labels_align_bottom = true;
                     /*-----------------------------------------------------------------------*/
@@ -2749,6 +2753,8 @@ CChartSpace.prototype =
                                 arr_val_labels_points[i] = rect.y + first_val_axis_label_half_height + (arr_val[i] - arr_val[0])*unit_height;
                         }
                     }
+
+                    cat_ax.interval = unit_height;
                     //запишем в оси необходимую информацию для отрисовщика plotArea  и выставим окончательные позиции для подписей
                     var arr_labels, transform_text, local_text_transform;
                     if(val_ax.labels)
@@ -3305,6 +3311,8 @@ CChartSpace.prototype =
                         }
                     }
 
+                    cat_ax.interval = point_interval;
+
                     var diagram_height = point_interval*intervals_count;//размер области с самой диаграммой позже будет корректироватся;
                     var max_cat_label_height = diagram_height / string_pts.length; // максимальная высота подписи горизонтальной оси;
 
@@ -3536,6 +3544,7 @@ CChartSpace.prototype =
                                 arr_val_labels_points[i] = cat_ax.xPos - (arr_val[i] - crosses_val_ax)*unit_width;
                         }
                     }
+                    val_ax.interval = unit_width;
                     //запишем в оси необходимую информацию для отрисовщика plotArea  и выставим окончательные позиции для подписей
                     var local_transform_text;
                     if(val_ax.labels)
@@ -5906,6 +5915,7 @@ CChartSpace.prototype =
         graphics.SetIntegerGrid(false);
         graphics.transform3(this.transform, false);
 
+        //graphics.AddClipRect(0, 0, this.extX, this.extY);
         this.chartObj.draw(this, graphics);
         graphics.reset();
         graphics.SetIntegerGrid(intGrid);
@@ -5954,6 +5964,7 @@ CChartSpace.prototype =
             }
         }
 
+       // graphics.reset();
     },
 
     addToSetPosition: function(dLbl)

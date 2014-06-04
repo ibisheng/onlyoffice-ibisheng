@@ -721,7 +721,24 @@ function ChartPreviewManager() {
 
             DrawingObjectsController.prototype.applyPropsToChartSpace(settings, chart_space);
             chart_space.setBDeleted(false);
+            chart_space.updateLinks();
+            if(chart_space.chart.plotArea.valAx)
+            {
+                chart_space.chart.plotArea.valAx.setDelete(true);
+            }
+            if(chart_space.chart.plotArea.catAx)
+            {
+                chart_space.chart.plotArea.catAx.setDelete(true);
+            }
+            if(!chart_space.spPr)
+            {
+                chart_space.setSpPr(new CSpPr());
+            }
+            var new_line = new CLn();
+            new_line.setFill(new CUniFill());
+            new_line.Fill.setFill(new CNoFill());
             chart_space.recalculate();
+
             return chart_space;
         }, _this, []);
     };
