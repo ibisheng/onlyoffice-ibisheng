@@ -1516,7 +1516,7 @@ var gUndoInsDelCellsFlag = true;
 				var rangeButton;
 				for(var i = 0; i < this.allButtonAF.length; i++)
 				{
-					rangeButton = this._idToRange(this.allButtonAF[i].id);
+					rangeButton = this._refToRange(this.allButtonAF[i].inFilter);
 					if(rangeButton.r1 >= ar.r1 && rangeButton.r2 <= ar.r2 && rangeButton.c1 >= ar.c1 && rangeButton.c2 <= ar.c2)
 					{
 						this.allButtonAF.splice(i, 1);
