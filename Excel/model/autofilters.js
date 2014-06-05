@@ -1509,7 +1509,10 @@ var gUndoInsDelCellsFlag = true;
 			},
 			
 			_isEmptyButtons: function(ar)
-			{
+			{	
+				if(!this.allButtonAF)
+					return;
+				
 				var rangeButton;
 				for(var i = 0; i < this.allButtonAF.length; i++)
 				{
