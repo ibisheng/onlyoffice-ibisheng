@@ -8395,6 +8395,11 @@ CDocument.prototype =
         }
         else
         {
+            // Создаем сразу точку в истории, т.к. при выполнении функции Get_SelectedContent нам надо, чтобы данная
+            // точка уже набивалась изменениями. Если из-за совместного редактирования действие сделать невозможно будет,
+            // тогда последнюю точку удаляем.
+            History.Create_NewPoint();
+
             NearPos.Paragraph.Check_NearestPos( NearPos );
 
             // Получим копию выделенной части документа, которую надо перенести в новое место, одновременно с этим
@@ -8416,8 +8421,6 @@ CDocument.prototype =
 
             if ( false === this.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : ArrayForCheck, CheckType : changestype_Paragraph_Content } ) )
             {
-                History.Create_NewPoint();
-
                 // Если надо удаляем выделенную часть (пересчет отключаем на время удаления)
                 if ( true !== bCopy )
                 {
@@ -8440,6 +8443,8 @@ CDocument.prototype =
                     this.Document_UpdateRulersState();
                 }
             }
+            else
+                History.Remove_LastPoint();
         }
     },
 
@@ -12380,7 +12385,8 @@ CDocument.prototype =
             if ( true !== bFlag )
             {
                 var TempElement = g_oTableId.Get_ById(CurId);
-                Pos = ( null != TempElement ? Math.min( this.Content.length - 1, TempElement.Index ) : 0 );
+                Pos = ( null != TempElement ? TempElement.Index : 0 );                
+                Pos = Math.max( 0, Math.min( Pos, this.Content.length - 1 ) );
             }
 
             this.Selection.Start    = false;

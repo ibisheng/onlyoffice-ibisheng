@@ -4229,6 +4229,9 @@ ParaRun.prototype =
         this.Set_RFonts2( undefined );
         this.Set_RStyle( undefined );
         this.Set_Shd( undefined );
+        
+        // Насильно заставим пересчитать стиль, т.к. как данная функция вызывается у параграфа, у которого мог смениться стиль
+        this.Recalc_CompiledPr(true);
     },
     
     Get_TextPr : function()

@@ -147,6 +147,12 @@ CHistory.prototype =
         // Удаляем ненужные точки
         this.Points.length = this.Index + 1;
     },
+    
+    Remove_LastPoint : function()
+    {
+        this.Index--;
+        this.Points.length = this.Index + 1;
+    },
 
     Clear_Redo : function()
     {
