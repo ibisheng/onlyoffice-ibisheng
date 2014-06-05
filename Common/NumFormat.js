@@ -2067,6 +2067,10 @@ function CellFormat(format)
 			this.oNegativeFormat = aParsedFormats[1];
 			this.oNullFormat = aParsedFormats[2];
 			this.oTextFormat = this.oPositiveFormat;
+			if (this.oNullFormat.bTextFormat) {
+			    this.oTextFormat = this.oNullFormat;
+			    this.oNullFormat = this.oPositiveFormat;
+			}
 		}
 		else if(2 == nFormatsLength)
 		{
@@ -2074,6 +2078,10 @@ function CellFormat(format)
 			this.oNegativeFormat = aParsedFormats[1];
 			this.oNullFormat = this.oPositiveFormat;
 			this.oTextFormat = this.oPositiveFormat;
+			if (this.oNegativeFormat.bTextFormat) {
+			    this.oTextFormat = this.oNegativeFormat;
+			    this.oNegativeFormat = this.oPositiveFormat;
+			}
 		}
 		else
 		{
@@ -2111,6 +2119,25 @@ CellFormat.prototype =
 		else if(null != this.aComporationFormats && this.aComporationFormats.length > 0)
 			return this.aComporationFormats[0].bDateTime;
 		return false;
+	},
+	getTextFormat: function () {
+	    var oRes = null;
+	    if (null == this.aComporationFormats) {
+	        if (null != this.oTextFormat && this.oTextFormat.bTextFormat)
+	            oRes = this.oTextFormat;
+	    }
+	    else {
+	        var nLength = this.aComporationFormats.length;
+	        var oDefaultComporationFormat = null;
+	        for (var i = 0, length = this.aComporationFormats.length; i < length ; ++i) {
+	            var oCurFormat = this.aComporationFormats[i];
+	            if (null == oCurFormat.ComporationOperator && oCurFormat.bTextFormat) {
+	                oRes = oCurFormat;
+	                break;
+	            }
+	        }
+	    }
+	    return oRes;
 	},
 	getFormatByValue : function(dNumber)
 	{

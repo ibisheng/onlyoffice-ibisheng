@@ -2918,22 +2918,20 @@ CCellValue.prototype =
 					}
 					else if(CellValueType.String == this.type)
 					{
-						if(null != this.text)
-						{
-							aText = oNumFormat.format(this.text, this.type, dDigitsCount, oAdditionalResult);
-							sText = null;
-						}
-						else if(null != this.multiText)
-						{
-							if("@" != oNumFormat.sFormat)
-							{
-								var sSimpleString = "";
-								for(var i = 0, length = this.multiText.length; i < length; ++i)
-									sSimpleString += this.multiText[i].text;
-								aText = oNumFormat.format(sSimpleString, this.type, dDigitsCount, oAdditionalResult);
-								sText = null;
-							}
-						}
+					    var oTextFormat = oNumFormat.getTextFormat();
+					    if (null != oTextFormat && "@" != oTextFormat.formatString) {
+					        if (null != this.text) {
+					            aText = oNumFormat.format(this.text, this.type, dDigitsCount, oAdditionalResult);
+					            sText = null;
+					        }
+					        else if (null != this.multiText) {
+					            var sSimpleString = "";
+					            for (var i = 0, length = this.multiText.length; i < length; ++i)
+					                sSimpleString += this.multiText[i].text;
+					            aText = oNumFormat.format(sSimpleString, this.type, dDigitsCount, oAdditionalResult);
+					            sText = null;
+					        }
+					    }
 					}
 				}
 				else if(CellValueType.Number == this.type && null != this.number)
