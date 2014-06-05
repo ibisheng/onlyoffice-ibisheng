@@ -1036,6 +1036,12 @@ Geometry.prototype=
             this.pathLst[i].draw(shape_drawer);
     },
 
+    drawSmart: function(shape_drawer)
+    {
+        for (var i=0, n=this.pathLst.length; i<n;++i)
+            this.pathLst[i].drawSmart(shape_drawer);
+    },
+
     check_bounds: function(checker)
     {
         for(var i=0, n=this.pathLst.length; i<n;++i)

@@ -722,13 +722,31 @@ function ChartPreviewManager() {
             DrawingObjectsController.prototype.applyPropsToChartSpace(settings, chart_space);
             chart_space.setBDeleted(false);
             chart_space.updateLinks();
-            if(chart_space.chart.plotArea.valAx)
+            if(!(asc_chart.type.toLowerCase() === "scatter" || asc_chart.type.toLowerCase() === "stock"))
             {
-                chart_space.chart.plotArea.valAx.setDelete(true);
+                if(chart_space.chart.plotArea.valAx)
+                {
+                    chart_space.chart.plotArea.valAx.setDelete(true);
+                }
+                if(chart_space.chart.plotArea.catAx)
+                {
+                    chart_space.chart.plotArea.catAx.setDelete(true);
+                }
             }
-            if(chart_space.chart.plotArea.catAx)
+            else
             {
-                chart_space.chart.plotArea.catAx.setDelete(true);
+                if(chart_space.chart.plotArea.valAx)
+                {
+                    chart_space.chart.plotArea.valAx.setTickLblPos(TICK_LABEL_POSITION_NONE);
+                    chart_space.chart.plotArea.valAx.setMajorTickMark(TICK_MARK_NONE);
+                    chart_space.chart.plotArea.valAx.setMinorTickMark(TICK_MARK_NONE);
+                }
+                if(chart_space.chart.plotArea.catAx)
+                {
+                    chart_space.chart.plotArea.catAx.setTickLblPos(TICK_LABEL_POSITION_NONE);
+                    chart_space.chart.plotArea.catAx.setMajorTickMark(TICK_MARK_NONE);
+                    chart_space.chart.plotArea.catAx.setMinorTickMark(TICK_MARK_NONE);
+                }
             }
             if(!chart_space.spPr)
             {

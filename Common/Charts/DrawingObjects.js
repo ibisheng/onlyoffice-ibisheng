@@ -1929,6 +1929,8 @@ prot["asc_getCanFill"] = prot.asc_getCanFill;
 prot["asc_putCanFill"] = prot.asc_putCanFill;
 prot["asc_getCanChangeArrows"] = prot.asc_getCanChangeArrows;
 prot["asc_setCanChangeArrows"] = prot.asc_setCanChangeArrows;
+prot["asc_getFromChart"] = prot.asc_getFromChart;
+prot["asc_setFromChart"] = prot.asc_setFromChart;
 //}
 
 //-----------------------------------------------------------------------------------

@@ -1809,6 +1809,14 @@ CChartSpace.prototype =
                     var arr_labels;
                     var text_transform;
                     var local_text_transform;
+                    if(x_ax.bDelete)
+                    {
+                        x_ax.labels = null;
+                    }
+                    if(y_ax.bDelete)
+                    {
+                        y_ax.labels = null;
+                    }
                     if(x_ax.labels)
                     {
                         arr_labels = x_ax.labels.arrLabels;
@@ -5327,11 +5335,11 @@ CChartSpace.prototype =
             var series = this.chart.plotArea.chart.series;
             var parents = this.getParentObjects();
             var RGBA = {R: 0, G: 0, B: 0, A: 255};
-            if(this.chart.plotArea.chart.varyColors && series.length === 1 || ((this.chart.plotArea.chart instanceof CPieChart || this.chart.plotArea.chart instanceof CDoughnutChart)  && this.chart.plotArea.chart.varyColors))
+            if(this.chart.plotArea.chart.varyColors && (series.length === 1 || this.chart.plotArea.chart.getObjectType() === historyitem_type_PieChart || this.chart.plotArea.chart.getObjectType() === historyitem_type_DoughnutChart))
             {
                 var ser = series[0];
                 var pts = getPtsFromSeries(ser);
-                if(!(this.chart.plotArea.chart instanceof CLineChart))
+                if(!(this.chart.plotArea.chart.getObjectType() === historyitem_type_LineChart || this.chart.plotArea.chart.getObjectType() === historyitem_type_ScatterChart))
                 {
                     var base_fills = getArrayFillsFromBase(style.fill2, getMaxIdx(pts));
                     for(var i = 0; i < pts.length; ++i)
@@ -5415,13 +5423,24 @@ CChartSpace.prototype =
                 }
                 else
                 {
-                    var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
+                    var default_line;
+                    if(this.chart.plotArea.chart.getObjectType() === historyitem_type_ScatterChart && this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_MARKER || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_NONE)
+                    {
+                        default_line = new CLn();
+                        default_line.setFill(new CUniFill());
+                        default_line.Fill.setFill(new CNoFill());
+                    }
+                    else
+                    {
+                        default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
+                    }
                     var base_line_fills = getArrayFillsFromBase(style.line4, getMaxIdx(pts));
                     for(var i = 0; i < pts.length; ++i)
                     {
                         var compiled_line = new CLn();
                         compiled_line.merge(default_line);
-                        compiled_line.Fill.merge(base_line_fills[pts[i].idx]);
+                        if(!(this.chart.plotArea.chart.getObjectType() === historyitem_type_ScatterChart && this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_MARKER || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_NONE))
+                            compiled_line.Fill.merge(base_line_fills[pts[i].idx]);
                         compiled_line.w *= style.line3;
                         if(ser.spPr && ser.spPr.ln)
                         {
@@ -5449,81 +5468,25 @@ CChartSpace.prototype =
             }
             else
             {
-                if(!(this.chart.plotArea.chart instanceof CLineChart || this.chart.plotArea.chart instanceof  CScatterChart || this.chart.plotArea.chart instanceof CRadarChart))
+                switch(this.chart.plotArea.chart.getObjectType())
                 {
-                    var base_fills = getArrayFillsFromBase(style.fill2, getMaxIdx(series));
-                    var base_line_fills = null;
-                    if(style.line1 === EFFECT_SUBTLE && this.style === 34)
-                        base_line_fills	= getArrayFillsFromBase(style.line2, getMaxIdx(series));
-                    for(var i = 0; i < series.length; ++i)
+                    case historyitem_type_LineChart:
+                    case historyitem_type_RadarChart:
                     {
-                        var ser = series[i];
-                        var pts = getPtsFromSeries(ser);
-                        for(var j = 0; j < pts.length; ++j)
+                        var base_line_fills = getArrayFillsFromBase(style.line4, getMaxIdx(series));
+                        for(var i = 0; i < series.length; ++i)
                         {
-                            var compiled_brush = new CUniFill();
-                            compiled_brush.merge(base_fills[ser.idx]);
-                            if(ser.spPr && ser.spPr.Fill)
-                            {
-                                compiled_brush.merge(ser.spPr.Fill);
-                            }
-                            if(j === 0)
-                                ser.compiledSeriesBrush = compiled_brush.createDuplicate();
-                            if(Array.isArray(ser.dPt))
-                            {
-                                for(var k = 0; k < ser.dPt.length; ++k)
-                                {
-                                    if(ser.dPt[k].idx === pts[j].idx)
-                                    {
-                                        if(ser.dPt[k].spPr)
-                                        {
-                                            compiled_brush.merge(ser.dPt[k].spPr.Fill);
-                                        }
-                                        break;
-                                    }
-                                }
-                            }
-                            pts[j].brush = compiled_brush;
-                            pts[j].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-                        }
-
-
-                        //
-                        {
-                            default_line =  new CLn();
-                            if(style.line1 === EFFECT_NONE)
-                            {
-                                default_line.w = 0;
-                            }
-                            else if(style.line1 === EFFECT_SUBTLE)
-                            {
-                                default_line.merge(parents.theme.themeElements.fmtScheme.lnStyleLst[0]);
-                            }
-                            else if(style.line1 === EFFECT_MODERATE)
-                            {
-                                default_line.merge(parents.theme.themeElements.fmtScheme.lnStyleLst[1]);
-                            }
-                            else if(style.line1 === EFFECT_INTENSE)
-                            {
-                                default_line.merge(parents.theme.themeElements.fmtScheme.lnStyleLst[2]);
-                            }
-                            var base_line_fills;
-                            if(this.style === 34)
-                                base_line_fills = getArrayFillsFromBase(style.line2, getMaxIdx(pts));
-
+                            var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
+                            var ser = series[i];
+                            var pts = getPtsFromSeries(ser);
                             for(var j = 0; j < pts.length; ++j)
                             {
                                 var compiled_line = new CLn();
                                 compiled_line.merge(default_line);
-                                compiled_line.Fill = new CUniFill();
-                                if(this.style !== 34)
-                                    compiled_line.Fill.merge(style.line2[0]);
-                                else
-                                    compiled_line.Fill.merge(base_line_fills[ser.idx]);
+                                compiled_line.Fill.merge(base_line_fills[ser.idx]);
+                                compiled_line.w *= style.line3;
                                 if(ser.spPr && ser.spPr.ln)
-                                {
                                     compiled_line.merge(ser.spPr.ln);
-                                }
                                 if(j === 0)
                                     ser.compiledSeriesPen = compiled_line.createDuplicate();
                                 if(Array.isArray(ser.dPt))
@@ -5540,48 +5503,164 @@ CChartSpace.prototype =
                                         }
                                     }
                                 }
+                                pts[j].brush = null;
                                 pts[j].pen = compiled_line;
                                 pts[j].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
                             }
                         }
+                        break;
                     }
-                }
-                else
-                {
-                    var base_line_fills = getArrayFillsFromBase(style.line4, getMaxIdx(series));
-                    for(var i = 0; i < series.length; ++i)
+                    case historyitem_type_ScatterChart:
                     {
-                        var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
-                        var ser = series[i];
-                        var pts = getPtsFromSeries(ser);
-                        for(var j = 0; j < pts.length; ++j)
+                        var base_line_fills = getArrayFillsFromBase(style.line4, getMaxIdx(series));
+                        for(var i = 0; i < series.length; ++i)
                         {
-                            var compiled_line = new CLn();
-                            compiled_line.merge(default_line);
-                            compiled_line.Fill.merge(base_line_fills[ser.idx]);
-                            compiled_line.w *= style.line3;
-                            if(ser.spPr && ser.spPr.ln)
-                                compiled_line.merge(ser.spPr.ln);
-                            if(j === 0)
-                                ser.compiledSeriesPen = compiled_line.createDuplicate();
-                            if(Array.isArray(ser.dPt))
+                            var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
+                            var ser = series[i];
+                            var pts = getPtsFromSeries(ser);
+                            if(this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_SMOOTH || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_SMOOTH_MARKER)
                             {
-                                for(var k = 0; k < ser.dPt.length; ++k)
+                                if(!isRealBool(ser.smooth))
                                 {
-                                    if(ser.dPt[k].idx === pts[j].idx)
-                                    {
-                                        if(ser.dPt[k].spPr)
-                                        {
-                                            compiled_line.merge(ser.dPt[k].spPr.ln);
-                                        }
-                                        break;
-                                    }
+                                    ser.smooth = true;
                                 }
                             }
-                            pts[j].brush = null;
-                            pts[j].pen = compiled_line;
-                            pts[j].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                            if(this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_MARKER || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_NONE)
+                            {
+                                default_line = new CLn();
+                                default_line.setFill(new CUniFill());
+                                default_line.Fill.setFill(new CNoFill());
+                            }
+
+                            for(var j = 0; j < pts.length; ++j)
+                            {
+                                var compiled_line = new CLn();
+                                compiled_line.merge(default_line);
+                                if(!(this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_MARKER || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_NONE))
+                                    compiled_line.Fill.merge(base_line_fills[ser.idx]);
+                                compiled_line.w *= style.line3;
+                                if(ser.spPr && ser.spPr.ln)
+                                    compiled_line.merge(ser.spPr.ln);
+                                if(j === 0)
+                                    ser.compiledSeriesPen = compiled_line.createDuplicate();
+                                if(Array.isArray(ser.dPt))
+                                {
+                                    for(var k = 0; k < ser.dPt.length; ++k)
+                                    {
+                                        if(ser.dPt[k].idx === pts[j].idx)
+                                        {
+                                            if(ser.dPt[k].spPr)
+                                            {
+                                                compiled_line.merge(ser.dPt[k].spPr.ln);
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
+                                pts[j].brush = null;
+                                pts[j].pen = compiled_line;
+                                pts[j].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                            }
                         }
+                        break;
+                    }
+                    default :
+                    {
+                        var base_fills = getArrayFillsFromBase(style.fill2, getMaxIdx(series));
+                        var base_line_fills = null;
+                        if(style.line1 === EFFECT_SUBTLE && this.style === 34)
+                            base_line_fills	= getArrayFillsFromBase(style.line2, getMaxIdx(series));
+                        for(var i = 0; i < series.length; ++i)
+                        {
+                            var ser = series[i];
+                            var pts = getPtsFromSeries(ser);
+                            for(var j = 0; j < pts.length; ++j)
+                            {
+                                var compiled_brush = new CUniFill();
+                                compiled_brush.merge(base_fills[ser.idx]);
+                                if(ser.spPr && ser.spPr.Fill)
+                                {
+                                    compiled_brush.merge(ser.spPr.Fill);
+                                }
+                                if(j === 0)
+                                    ser.compiledSeriesBrush = compiled_brush.createDuplicate();
+                                if(Array.isArray(ser.dPt))
+                                {
+                                    for(var k = 0; k < ser.dPt.length; ++k)
+                                    {
+                                        if(ser.dPt[k].idx === pts[j].idx)
+                                        {
+                                            if(ser.dPt[k].spPr)
+                                            {
+                                                compiled_brush.merge(ser.dPt[k].spPr.Fill);
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
+                                pts[j].brush = compiled_brush;
+                                pts[j].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                            }
+
+
+                            //
+                            {
+                                default_line =  new CLn();
+                                if(style.line1 === EFFECT_NONE)
+                                {
+                                    default_line.w = 0;
+                                }
+                                else if(style.line1 === EFFECT_SUBTLE)
+                                {
+                                    default_line.merge(parents.theme.themeElements.fmtScheme.lnStyleLst[0]);
+                                }
+                                else if(style.line1 === EFFECT_MODERATE)
+                                {
+                                    default_line.merge(parents.theme.themeElements.fmtScheme.lnStyleLst[1]);
+                                }
+                                else if(style.line1 === EFFECT_INTENSE)
+                                {
+                                    default_line.merge(parents.theme.themeElements.fmtScheme.lnStyleLst[2]);
+                                }
+                                var base_line_fills;
+                                if(this.style === 34)
+                                    base_line_fills = getArrayFillsFromBase(style.line2, getMaxIdx(pts));
+
+                                for(var j = 0; j < pts.length; ++j)
+                                {
+                                    var compiled_line = new CLn();
+                                    compiled_line.merge(default_line);
+                                    compiled_line.Fill = new CUniFill();
+                                    if(this.style !== 34)
+                                        compiled_line.Fill.merge(style.line2[0]);
+                                    else
+                                        compiled_line.Fill.merge(base_line_fills[ser.idx]);
+                                    if(ser.spPr && ser.spPr.ln)
+                                    {
+                                        compiled_line.merge(ser.spPr.ln);
+                                    }
+                                    if(j === 0)
+                                        ser.compiledSeriesPen = compiled_line.createDuplicate();
+                                    if(Array.isArray(ser.dPt))
+                                    {
+                                        for(var k = 0; k < ser.dPt.length; ++k)
+                                        {
+                                            if(ser.dPt[k].idx === pts[j].idx)
+                                            {
+                                                if(ser.dPt[k].spPr)
+                                                {
+                                                    compiled_line.merge(ser.dPt[k].spPr.ln);
+                                                }
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    pts[j].pen = compiled_line;
+                                    pts[j].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                                }
+                            }
+                        }
+                        break;
                     }
                 }
             }
@@ -5590,7 +5669,177 @@ CChartSpace.prototype =
 
     recalculateMarkers: function()
     {
-        if(this.chart.plotArea.chart.getObjectType() !== historyitem_type_LineChart && this.chart.plotArea.chart.getObjectType() !== historyitem_type_RadarChart  || this.chart.plotArea.chart.marker)
+        if(this.chart && this.chart.plotArea && this.chart.plotArea.chart)
+        {
+            var series = this.chart.plotArea.chart.series, pts;
+            for(var i = 0; i < series.length; ++i)
+            {
+                var ser = series[i];
+                ser.compiledSeriesMarker = null;
+                pts =  getPtsFromSeries(ser);
+                for(var j = 0; j < pts.length; ++j)
+                {
+                    pts[j].compiledMarker = null;
+                }
+            }
+
+            var oThis = this;
+            var recalculateMarkers2 = function()
+            {
+                var chart_style = CHART_STYLE_MANAGER.getStyleByIndex(oThis.style);
+                var effect_fill = chart_style.fill1;
+                var fill = chart_style.fill2;
+                var line = chart_style.line4;
+                var masrker_default_size = chart_style.markerSize;
+                var default_marker = new CMarker();
+                default_marker.setSize(masrker_default_size);
+                var parent_objects = oThis.getParentObjects();
+
+                if(parent_objects.theme  && parent_objects.theme.themeElements
+                    && parent_objects.theme.themeElements.fmtScheme
+                    && parent_objects.theme.themeElements.fmtScheme.lnStyleLst)
+                {
+                    default_marker.setSpPr(new CSpPr());
+                    default_marker.spPr.setLn(new CLn());
+                    default_marker.spPr.ln.merge(parent_objects.theme.themeElements.fmtScheme.lnStyleLst[0]);
+                }
+                var RGBA = {R:0, G:0, B:0, A: 255};
+                if(oThis.chart.plotArea.chart.varyColors && (oThis.chart.plotArea.chart.series.length === 1 || oThis.chart.plotArea.chart.getObjectType() === historyitem_type_PieChart || oThis.chart.plotArea.chart.getObjectType() === historyitem_type_DoughnutChart))
+                {
+                    var ser = oThis.chart.plotArea.chart.series[0], pts;
+                    pts = getPtsFromSeries(ser);
+                    var series_marker = ser.marker;
+                    var brushes = getArrayFillsFromBase(fill, getMaxIdx(pts));
+                    var pens_fills = getArrayFillsFromBase(line, getMaxIdx(pts));
+                    var compiled_markers = [];
+                    for(var i = 0;  i < pts.length; ++i)
+                    {
+                        var compiled_marker = new CMarker();
+                        compiled_marker.merge(default_marker);
+                        if(!compiled_marker.spPr)
+                        {
+                            compiled_marker.setSpPr(new CSpPr());
+                        }
+                        compiled_marker.spPr.setFill(brushes[pts[i].idx]);
+                        compiled_marker.spPr.Fill.merge(pts[i].brush);
+                        if(!compiled_marker.spPr.ln)
+                            compiled_marker.spPr.setLn(new CLn());
+                        compiled_marker.spPr.ln.merge(pts[i].pen);
+                        compiled_marker.merge(ser.marker);
+                        compiled_marker.setSymbol(GetTypeMarkerByIndex(j));
+
+                        if(Array.isArray(ser.dPt))
+                        {
+                            for(var j = 0; j < ser.dPt.length; ++j)
+                            {
+                                if(ser.dPt[j].idx === pts[i].idx)
+                                {
+
+                                    var d_pt = ser.dPt[j];
+                                    if(d_pt.spPr && (d_pt.spPr.Fill || d_pt.spPr.ln))
+                                    {
+                                        if(!compiled_marker.spPr)
+                                        {
+                                            compiled_marker.setSpPr(new CSpPr());
+                                        }
+                                        if(d_pt.spPr.Fill)
+                                        {
+                                            compiled_marker.spPr.setFill(d_pt.spPr.Fill.createDuplicate());
+                                        }
+                                        if(d_pt.spPr.ln)
+                                        {
+                                            if(!compiled_marker.spPr.ln)
+                                            {
+                                                compiled_marker.spPr.setLn(new CLn());
+                                            }
+                                            compiled_marker.spPr.ln.merge(d_pt.spPr.ln);
+                                        }
+                                    }
+
+                                    compiled_marker.merge(ser.dPt[j].marker);
+                                    break;
+                                }
+                            }
+                        }
+                        pts[i].compiledMarker = compiled_marker;
+                        pts[i].compiledMarker.pen = compiled_marker.spPr.ln;
+                        pts[i].compiledMarker.brush = compiled_marker.spPr.Fill;
+                        pts[i].compiledMarker.brush.calculate(parent_objects.theme, parent_objects.slide, parent_objects.layout, parent_objects.master, RGBA);
+                        pts[i].compiledMarker.pen.calculate(parent_objects.theme, parent_objects.slide, parent_objects.layout, parent_objects.master, RGBA);
+                    }
+                }
+                else
+                {
+                    var series = oThis.chart.plotArea.chart.series;
+                    var brushes = getArrayFillsFromBase(fill, getMaxIdx(series));
+                    var pens_fills = getArrayFillsFromBase(line, getMaxIdx(series));
+                    for(var i = 0; i < series.length; ++i)
+                    {
+                        var ser = series[i];
+                        pts = getPtsFromSeries(ser);
+                        for(var j = 0; j < pts.length; ++j)
+                        {
+                            var compiled_marker = new CMarker();
+                            compiled_marker.merge(default_marker);
+                            if(!compiled_marker.spPr)
+                            {
+                                compiled_marker.setSpPr(new CSpPr());
+                            }
+                            compiled_marker.spPr.setFill(brushes[series[i].idx]);
+                            if(!compiled_marker.spPr.ln)
+                                compiled_marker.spPr.setLn(new CLn());
+                            compiled_marker.spPr.ln.setFill(pens_fills[series[i].idx]);
+                            compiled_marker.setSymbol(GetTypeMarkerByIndex(series[i].idx));
+                            compiled_marker.merge(ser.marker);
+                            if(j === 0)
+                                ser.compiledSeriesMarker = compiled_marker.createDuplicate();
+                            if(Array.isArray(ser.dPt))
+                            {
+                                for(var k = 0; k < ser.dPt.length; ++k)
+                                {
+                                    if(ser.dPt[k].idx === pts[j].idx)
+                                    {
+                                        compiled_marker.merge(ser.dPt[k].marker);
+                                        break;
+                                    }
+                                }
+                            }
+                            pts[j].compiledMarker = compiled_marker;
+                            pts[j].compiledMarker.pen = compiled_marker.spPr.ln;
+                            pts[j].compiledMarker.brush = compiled_marker.spPr.Fill;
+                            pts[j].compiledMarker.brush.calculate(parent_objects.theme, parent_objects.slide, parent_objects.layout, parent_objects.master, RGBA);
+                            pts[j].compiledMarker.pen.calculate(parent_objects.theme, parent_objects.slide, parent_objects.layout, parent_objects.master, RGBA);
+                        }
+                    }
+                }
+            };
+            switch (this.chart.plotArea.chart.getObjectType())
+            {
+                case historyitem_type_LineChart:
+                case historyitem_type_RadarChart:
+                {
+                    if(this.chart.plotArea.chart.marker)
+                    {
+                        recalculateMarkers2();
+                    }
+                    break;
+                }
+                case historyitem_type_ScatterChart:
+                {
+                    if(this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_MARKER || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_LINE_MARKER || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_SMOOTH_MARKER)
+                    {
+                        recalculateMarkers2();
+                    }
+                    break;
+                }
+                default:
+                {
+                    recalculateMarkers2();
+                    break;
+                }
+            }
+        }
+        /*if(this.chart.plotArea.chart.getObjectType() !== historyitem_type_LineChart && this.chart.plotArea.chart.getObjectType() !== historyitem_type_RadarChart  || this.chart.plotArea.chart.marker)
         {
             var chart_style = CHART_STYLE_MANAGER.getStyleByIndex(this.style);
             var effect_fill = chart_style.fill1;
@@ -5732,8 +5981,7 @@ CChartSpace.prototype =
                     pts[j].compiledMarker = null;
                 }
             }
-        }
-
+        }  */
     },
 
     recalculateGridLines: function()
@@ -5927,7 +6175,8 @@ CChartSpace.prototype =
                 if(this.chart.plotArea.chart && this.chart.plotArea.chart.series)
                 {
                     var series = this.chart.plotArea.chart.series;
-                    for(var i = 0; i < series.length; ++i)
+                    var _len = this.chart.plotArea.chart.getObjectType() === historyitem_type_PieChart ? 1 : series.length;
+                    for(var i = 0; i < _len; ++i)
                     {
                         var ser = series[i];
                         var pts = getPtsFromSeries(ser);
@@ -8660,7 +8909,7 @@ function CreateScatterChart(asc_chart)
     plot_area.setLayout(new CLayout());
     plot_area.addChart(new CScatterChart());
     var scatter_chart = plot_area.charts[0];
-    scatter_chart.setScatterStyle(SCATTER_STYLE_LINE_MARKER);
+    scatter_chart.setScatterStyle(SCATTER_STYLE_MARKER);
     scatter_chart.setVaryColors(false);
     plot_area.addAxis(new CValAx());
     plot_area.addAxis(new CValAx());

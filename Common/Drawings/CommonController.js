@@ -2216,7 +2216,7 @@ DrawingObjectsController.prototype =
         }
         else if(chart_type_object_type === historyitem_type_LineChart)
         {
-            if(!chart_type.marker)
+          //  if(!chart_type.marker)
             {
                 switch(chart_type.grouping)
                 {
@@ -2237,7 +2237,7 @@ DrawingObjectsController.prototype =
                     }
                 }
             }
-            else
+          /*  else
             {
                 switch(chart_type.grouping)
                 {
@@ -2257,7 +2257,7 @@ DrawingObjectsController.prototype =
                         break;
                     }
                 }
-            }
+            }  */
         }
         else if(chart_type_object_type === historyitem_type_AreaChart)
         {
@@ -2282,7 +2282,9 @@ DrawingObjectsController.prototype =
         }
         else if(chart_type_object_type === historyitem_type_ScatterChart)
         {
-            switch (chart_type.scatterStyle)
+
+            calc_chart_type = c_oAscChartTypeSettings.scatter;
+            /*switch (chart_type.scatterStyle)
             {
                 case SCATTER_STYLE_LINE:
                 {
@@ -2319,7 +2321,7 @@ DrawingObjectsController.prototype =
                     calc_chart_type = c_oAscChartTypeSettings.scatterMarker;
                     break;
                 }
-            }
+            }  */
         }
         else
         {
