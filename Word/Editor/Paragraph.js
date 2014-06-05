@@ -12582,63 +12582,42 @@ Paragraph.prototype =
 
     Hyperlink_Check : function(bCheckEnd)
     {
-        if ( true !== Debug_ParaRunMode )
+        var Hyper = null;
+
+        if ( true === this.Selection.Use )
         {
-            if ( true === this.Selection.Use )
-            {
-                var Hyper_start = this.Check_Hyperlink2( this.Selection.StartPos );
-                var Hyper_end   = this.Check_Hyperlink2( this.Selection.EndPos );
+            // TODO: Если есть выделение, тогда Word не проверяем попадаение в гиперссылку 
+            //var StartPos = this.Selection.StartPos;
+            //var EndPos   = this.Selection.EndPos;
 
-                if ( Hyper_start === Hyper_end && null != Hyper_start )
-                    return Hyper_start
-            }
-            else
-            {
-                var Hyper_cur = this.Check_Hyperlink2( this.CurPos.ContentPos, bCheckEnd );
-                if ( null != Hyper_cur )
-                    return Hyper_cur;
-            }
+            //if ( StartPos > EndPos )
+            //{
+            //    StartPos = this.Selection.EndPos;
+            //    EndPos   = this.Selection.StartPos;
+            //}
 
-            return null;
+            //for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+            //{
+            //    var Element = this.Content[CurPos];
+
+            //    if ( para_Hyperlink === Element.Type && true !== Element.Selection_IsEmpty() )
+            //    {
+            //        if ( null === Hyper )
+            //            Hyper = Element;
+            //        else
+            //            return null;
+            //    }
+            //}
         }
         else
         {
-            var Hyper = null;
+            var Element = this.Content[this.CurPos.ContentPos];
 
-            if ( true === this.Selection.Use )
-            {
-                var StartPos = this.Selection.StartPos;
-                var EndPos   = this.Selection.EndPos;
-
-                if ( StartPos > EndPos )
-                {
-                    StartPos = this.Selection.EndPos;
-                    EndPos   = this.Selection.StartPos;
-                }
-
-                for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-                {
-                    var Element = this.Content[CurPos];
-
-                    if ( para_Hyperlink === Element.Type && true !== Element.Selection_IsEmpty() )
-                    {
-                        if ( null === Hyper )
-                            Hyper = Element;
-                        else
-                            return null;
-                    }
-                }
-            }
-            else
-            {
-                var Element = this.Content[this.CurPos.ContentPos];
-
-                if ( para_Hyperlink === Element.Type )
-                    Hyper = Element;
-            }
-
-            return Hyper;
+            if ( para_Hyperlink === Element.Type )
+                Hyper = Element;
         }
+
+        return Hyper;
     },
 
     Selection_SetStart : function(X,Y,PageNum, bTableBorder)

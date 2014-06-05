@@ -459,6 +459,9 @@ ParaHyperlink.prototype =
                 if ( true === this.Content[StartPos].Is_Empty() )
                     this.Remove_FromContent( StartPos, true );
             }
+
+            this.Selection_Remove();
+            this.State.ContentPos = StartPos;
         }
         else
         {

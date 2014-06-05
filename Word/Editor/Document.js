@@ -1811,10 +1811,11 @@ CDocument.prototype =
     {
         if ( docpostype_Content === this.CurPos.Type )
         {
-            if ( this.CurPos.ContentPos >= 0 && "undefined" != typeof(this.Content[this.CurPos.ContentPos].RecalculateCurPos) && ( null === this.FullRecalc.Id || this.FullRecalc.StartIndex > this.CurPos.ContentPos ) )
+            var Pos = ( true === this.Selection.Use ? this.Selection.EndPos : this.CurPos.ContentPos ); 
+            if ( Pos >= 0 && undefined !== this.Content[Pos].RecalculateCurPos && ( null === this.FullRecalc.Id || this.FullRecalc.StartIndex > Pos ) )
             {
                 this.Internal_CheckCurPage();
-                this.Content[this.CurPos.ContentPos].RecalculateCurPos();
+                this.Content[Pos].RecalculateCurPos();
             }
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
@@ -1829,21 +1830,18 @@ CDocument.prototype =
 
     Internal_CheckCurPage : function()
     {
-        if ( this.CurPos.ContentPos >= 0 && ( null === this.FullRecalc.Id || this.FullRecalc.StartIndex > this.CurPos.ContentPos ) )
+        if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
-            if ( docpostype_DrawingObjects === this.CurPos.Type )
+            var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
+            if ( null != ParaDrawing )
+                this.CurPage = ParaDrawing.PageNum;
+        }
+        else
+        {
+            var Pos = ( true === this.Selection.Use ? this.Selection.EndPos : this.CurPos.ContentPos );
+            if ( Pos >= 0 && ( null === this.FullRecalc.Id || this.FullRecalc.StartIndex > Pos ) )
             {
-                var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
-                if ( null != ParaDrawing )
-                {
-                    this.CurPage = ParaDrawing.PageNum;
-                    //var Paragraph = ParaDrawing.Parent;
-                    //this.CurPage = Paragraph.Get_CurrentPage_Absolute();
-                }
-            }
-            else if ( this.CurPos.ContentPos >= 0 )
-            {
-                this.CurPage = this.Content[this.CurPos.ContentPos].Get_CurrentPage_Absolute();
+                this.CurPage = this.Content[Pos].Get_CurrentPage_Absolute();
             }
         }
     },
@@ -2626,6 +2624,7 @@ CDocument.prototype =
                 }
 
                 this.Recalculate();
+                this.Document_UpdateInterfaceState();
                 this.Document_UpdateRulersState();
             }
         }
@@ -2678,6 +2677,7 @@ CDocument.prototype =
                     Last.Document_SetThisElementCurrent(true);
 
                     this.Recalculate();
+                    this.Document_UpdateInterfaceState();
                     this.Document_UpdateRulersState();
                 }
             }
@@ -2693,6 +2693,7 @@ CDocument.prototype =
                     }
 
                     this.Recalculate();
+                    this.Document_UpdateInterfaceState();
                     this.Document_UpdateRulersState();
                 }
             }
@@ -11328,6 +11329,12 @@ CDocument.prototype =
                         this.DrawingDocument.TargetEnd();
                         this.DrawingDocument.SelectEnabled(true);
                         this.DrawingDocument.SelectShow();
+
+                        if ( true !== this.Selection.Start )
+                        {
+                            this.Internal_CheckCurPage();
+                            this.RecalculateCurPos();
+                        }
                     }
                     else
                     {
