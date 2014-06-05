@@ -564,15 +564,37 @@ CGraphics.prototype =
         this.m_oPen.LineWidth = w / 1000;
 
         if (!this.m_bIntegerGrid)
-            this.m_oContext.lineWidth = this.m_oPen.LineWidth;
+        {
+            if (0 != this.m_oPen.LineWidth)
+            {
+                this.m_oContext.lineWidth = this.m_oPen.LineWidth;
+            }
+            else
+            {
+                var _x1 = this.m_oFullTransform.TransformPointX(0, 0);
+                var _y1 = this.m_oFullTransform.TransformPointY(0, 0);
+                var _x2 = this.m_oFullTransform.TransformPointX(1, 1);
+                var _y2 = this.m_oFullTransform.TransformPointY(1, 1);
+
+                var _koef = Math.sqrt(((_x2 - _x1)*(_x2 - _x1) + (_y2 - _y1)*(_y2 - _y1)) / 2);
+                this.m_oContext.lineWidth = 1 / _koef;
+            }
+        }
         else
         {
-            var _m = this.m_oFullTransform;
-            var x = _m.sx + _m.shx;
-            var y = _m.sy + _m.shy;
+            if (0 != this.m_oPen.LineWidth)
+            {
+                var _m = this.m_oFullTransform;
+                var x = _m.sx + _m.shx;
+                var y = _m.sy + _m.shy;
 
-            var koef = Math.sqrt((x * x + y * y) / 2);
-            this.m_oContext.lineWidth = this.m_oPen.LineWidth * koef;
+                var koef = Math.sqrt((x * x + y * y) / 2);
+                this.m_oContext.lineWidth = this.m_oPen.LineWidth * koef;
+            }
+            else
+            {
+                this.m_oContext.lineWidth = 1;
+            }
         }
     },
     // brush methods
