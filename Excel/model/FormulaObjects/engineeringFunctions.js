@@ -414,9 +414,15 @@ function convertFromTo(src,from,to,charLim){
 }
 
 function Complex(r,i,suffix){
-    this.real = r;
-    this.img = i;
-    this.suffix = suffix;
+    if( arguments.length == 1 ){
+        return this.parseComplexStr(arguments[0]);
+    }
+    else{
+        this.real = r;
+        this.img = i;
+        this.suffix = suffix ? suffix : "i";
+        return this;
+    }
 }
 
 Complex.prototype = {
@@ -460,13 +466,249 @@ Complex.prototype = {
             return Number.NaN;
         }
 
-        var phi = Math.acos( r / this.Abs() );
+        var phi = Math.acos( this.real / this.Abs() );
 
         if ( this.img < 0.0 ) {
             phi = -phi;
         }
 
         return phi;
+    },
+    Conj:function(){
+        var c = new Complex( this.real, -this.img, this.suffix );
+        return c.toString();
+    },
+    Cos:function(){
+        if( i ){
+            var a = Math.cos( this.real ) * Math.cosh( this.img );
+            this.img = -( Math.sin( this.real ) * Math.sinh( this.img ) );
+            this.real = a;
+        }
+        else
+            this.real = cos( this.real );
+    },
+    Sin:function(){
+        if( this.img ){
+            var a = Math.sin( this.real ) * Math.cosh( this.img );
+            this.img = Math.cos( this.real ) * Math.sinh( this.img );
+            this.real = a;
+        }
+        else{
+            this.real = Math.sin( this.real );
+        }
+    },
+    Div:function(comp){
+
+        var a = this.real, b = this.img,
+            c = comp.real, d = comp.img,
+            f = 1 / (c * c + d * d)
+
+        return new Complex( (a * c + b * d) * f, (b * c - a * d) * f, this.suffix );
+
+    },
+    Exp:function(){
+
+        var e = Math.exp( this.real ),
+            c = Math.cos( this.img ),
+            s = Math.sin( this.img );
+
+        this.real = e*c;
+        this.img = e*s;
+
+    },
+    Ln:function(){
+
+        var abs = this.Abs(),
+            arg = this.Arg();
+
+        this.real = Math.ln(abs);
+        this.img = arg;
+
+    },
+    Log10:function(){
+
+        var c = new Complex( Math.ln(10), 0 )
+        this.Ln();
+        c = this.Div(c);
+
+        this.real = c.real;
+        this.img = c.img;
+
+    },
+    Log2:function(){
+
+        var c = new Complex( Math.ln(2), 0 )
+        this.Ln();
+        c = this.Div(c);
+
+        this.real = c.real;
+        this.img = c.img;
+
+    },
+    Power:function(power){
+
+        if( this.real == 0 && this.img == 0 )
+        {
+            if( power > 0 )
+            {
+                this.real = this.img = 0;
+                return true;
+            }
+            else
+                return false;
+        }
+        else{
+
+            var p = this.Abs(),
+                phi;
+
+            phi = Math.acos( this.real / p );
+            if( i < 0 ){
+                phi = -phi;
+            }
+
+            p = Math.pow( p, power );
+            phi *= power;
+
+            this.real = Math.cos( phi ) * p;
+            this.img = Math.sin( phi ) * p;
+
+            return true;
+        }
+
+    },
+    Product:function(comp){
+
+        var a = this.real, b = this.img,
+            c = comp.real, d = comp.img;
+
+        this.real = a * c - b * d;
+        this.img = a * d + b * c;
+
+    },
+    SQRT:function(){
+
+        if( this.real || this.img ){
+            var abs = this.Abs(),
+                arg = this.Arg();
+
+            this.real = Math.sqrt(abs)*Math.cos(arg/2);
+            this.img = Math.sqrt(abs)*Math.sin(arg/2);
+
+        }
+
+    },
+    Sub:function(comp){
+
+        this.real -= comp.real;
+        this.img -= comp.img;
+
+    },
+    Sum:function(comp){
+
+        this.real += comp.real;
+        this.img += comp.img;
+
+    },
+    isImagUnit:function(c){
+        return c == 'i' || c == 'j';
+    },
+    parseComplexStr:function(s){
+        var match = rg_complex_number.xexec(s), r, i, suf;
+        if( match ){
+            r = match["real"];
+            i = match["img"];
+
+            if( !(r || i) ){
+                return new cError( cErrorType.not_numeric );
+            }
+
+            if( i ){
+                suf = i[i.length-1];
+                i = i.substr(0,i.length-1);
+                if( i.length == 1 && (i[0] == "-" || i[0]== "+" ) ){
+                    i = parseFloat( i+"1" );
+                }
+                else{
+                    i = parseFloat(i);
+                }
+            }
+            else{
+                i = 0;
+            }
+
+            if( r ){
+                r = parseFloat(r);
+            }
+            else{
+                r = 0;
+            }
+
+            return new Complex( r, i, suf ? suf : "i" );
+
+        }
+        else{
+            return new cError( cErrorType.not_numeric );
+        }
+    },
+    ParseString:function (rStr, rCompl){
+
+        var pStr = rStr;
+
+        if ( this.isImagUnit( pStr ) && rStr.length == 1 ) {
+
+            this.real = 0;
+            this.img = 1;
+            this.suffix = pStr;
+
+            return true;
+        }
+
+        var f;
+
+        if ( !ParseDouble( pStr, f ) )
+            return false;
+
+        switch ( pStr ) {
+            case '-':   // imag part follows
+            case '+':{
+                var r = f;
+                if ( this.isImagUnit( pStr[ 1 ] ) ) {
+                    rCompl.c = pStr[ 1 ];
+                    if ( pStr[ 2 ] == 0 ) {
+                        rCompl.r = f;
+                        rCompl.i = ( pStr == '+' ) ? 1.0 : -1.0;
+                        return true;
+                    }
+                }
+                else if ( ParseDouble( pStr, f ) && this.isImagUnit( pStr ) ){
+                    rCompl.c = pStr;
+                    pStr++;
+                    if ( pStr == 0 ){
+                        rCompl.r = r;
+                        rCompl.i = f;
+                        return true;
+                    }
+                }
+                break;
+            }
+            case 'j':
+            case 'i':
+                rCompl.c = pStr;
+                pStr++;
+                if ( pStr == 0 ){
+                    rCompl.i = f;
+                    rCompl.r = 0.0;
+                    return true;
+                }
+                break;
+            case 0:     // only real-part
+                rCompl.r = f;
+                rCompl.i = 0.0;
+                return true;
+        }
+
+        return sal_False;
     }
 
 }
@@ -1077,10 +1319,48 @@ function cERFC() {
 cERFC.prototype = Object.create( cBaseFunction.prototype );
 
 function cGESTEP() {
-    cBaseFunction.call( this, "GESTEP" );
+    cBaseFunction.call( this, "GESTEP", 1, 2 );
 }
 
 cGESTEP.prototype = Object.create( cBaseFunction.prototype );
+cGESTEP.prototype.Calculate = function ( arg ) {
+
+    var number1 = arg[0], number2 = !arg[1] ? new cNumber(0) : arg[1];
+
+    if ( number1 instanceof cArea || number2 instanceof cArea3D ) {
+        number1 = number1.cross( arguments[1].first );
+    }
+    else if ( number1 instanceof cArray ) {
+        number1 = number1.getElement(0);
+    }
+
+    if ( number2 instanceof cArea || number2 instanceof cArea3D ) {
+        number2 = number2.cross( arguments[1].first );
+    }
+    else if ( number2 instanceof cArray ) {
+        number2 = number2.getElement(0);
+    }
+
+    number1 = number1.tocNumber();
+    number2 = number2.tocNumber();
+
+    if ( number1 instanceof cError ) return this.value = number1;
+    if ( number2 instanceof cError ) return this.value = number2;
+
+    number1 = number1.getValue();
+    number2 = number2.getValue();
+
+    this.value = new cNumber( number1 >= number2 ? 1 : 0 );
+
+    return this.value;
+
+}
+cGESTEP.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( number [ , step ] )"
+    };
+}
 
 function cHEX2BIN() {
     cBaseFunction.call( this, "HEX2BIN", 1, 2 );
@@ -1256,106 +1536,755 @@ cHEX2OCT.prototype.getInfo = function () {
 }
 
 function cIMABS() {
-    cBaseFunction.call( this, "IMABS" );
+    cBaseFunction.call( this, "IMABS", 1, 1 );
 }
 
 cIMABS.prototype = Object.create( cBaseFunction.prototype );
+cIMABS.prototype.Calculate = function ( arg ) {
+
+    var arg0 = arg[0];
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocString();
+    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+
+    var c = new Complex(arg0.toString());
+
+    if( c instanceof cError ){
+        return this.value = c;
+    }
+
+    return this.value = new cNumber( c.Abs() );
+
+}
+cIMABS.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( complex-number )"
+    };
+}
 
 function cIMAGINARY() {
-    cBaseFunction.call( this, "IMAGINARY" );
+    cBaseFunction.call( this, "IMAGINARY", 1, 1 );
 }
 
 cIMAGINARY.prototype = Object.create( cBaseFunction.prototype );
+cIMAGINARY.prototype.Calculate = function ( arg ) {
+
+    var arg0 = arg[0];
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocString();
+    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+
+    var c = new Complex(arg0.toString());
+
+    if( c instanceof cError ){
+        return this.value = c;
+    }
+
+    return this.value = new cNumber( c.Imag() );
+
+}
+cIMAGINARY.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( complex-number )"
+    };
+}
 
 function cIMARGUMENT() {
-    cBaseFunction.call( this, "IMARGUMENT" );
+    cBaseFunction.call( this, "IMARGUMENT", 1, 1 );
 }
 
 cIMARGUMENT.prototype = Object.create( cBaseFunction.prototype );
+cIMARGUMENT.prototype.Calculate = function ( arg ) {
+
+    var arg0 = arg[0];
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocString();
+    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+
+    var c = new Complex(arg0.toString());
+
+    if( c instanceof cError ){
+        return this.value = c;
+    }
+
+    return this.value = new cNumber( c.Arg() );
+
+}
+cIMARGUMENT.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( complex-number )"
+    };
+}
 
 function cIMCONJUGATE() {
-    cBaseFunction.call( this, "IMCONJUGATE" );
+    cBaseFunction.call( this, "IMCONJUGATE", 1, 1 );
 }
 
 cIMCONJUGATE.prototype = Object.create( cBaseFunction.prototype );
+cIMCONJUGATE.prototype.Calculate = function ( arg ) {
+
+    var arg0 = arg[0];
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocString();
+    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+
+    var c = new Complex(arg0.toString());
+
+    if( c instanceof cError ){
+        return this.value = c;
+    }
+
+    return this.value = new cString( c.Conj() );
+
+}
+cIMCONJUGATE.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( complex-number )"
+    };
+}
 
 function cIMCOS() {
-    cBaseFunction.call( this, "IMCOS" );
+    cBaseFunction.call( this, "IMCOS", 1, 1 );
 }
 
 cIMCOS.prototype = Object.create( cBaseFunction.prototype );
+cIMCOS.prototype.Calculate = function ( arg ) {
+
+    var arg0 = arg[0];
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocString();
+    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+
+    var c = new Complex(arg0.toString());
+
+    if( c instanceof cError ){
+        return this.value = c;
+    }
+
+    c.Cos();
+
+    return this.value = new cString( c.toString() );
+
+}
+cIMCOS.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( complex-number )"
+    };
+}
 
 function cIMDIV() {
-    cBaseFunction.call( this, "IMDIV" );
+    cBaseFunction.call( this, "IMDIV", 2, 2 );
 }
 
 cIMDIV.prototype = Object.create( cBaseFunction.prototype );
+cIMDIV.prototype.Calculate = function ( arg ) {
+
+    var arg0 = arg[0],arg1 = arg[1];
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    else if ( arg1 instanceof cArray ) {
+        arg1 = arg1.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocString();
+    arg1 = arg1.tocString();
+    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+    if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+
+    var c1 = new Complex(arg0.toString()),
+        c2 = new Complex(arg1.toString() ),c3;
+
+    if( c1 instanceof cError || c2 instanceof cError ){
+        return this.value = new cError(cErrorType.not_numeric);
+    }
+
+    c3 = c1.Div(c2);
+
+    return this.value = new cString( c3.toString() );
+
+}
+cIMDIV.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( complex-number-1 , complex-number-2 )"
+    };
+}
 
 function cIMEXP() {
-    cBaseFunction.call( this, "IMEXP" );
+    cBaseFunction.call( this, "IMEXP", 1, 1 );
 }
 
 cIMEXP.prototype = Object.create( cBaseFunction.prototype );
+cIMEXP.prototype.Calculate = function ( arg ) {
+
+    var arg0 = arg[0];
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocString();
+    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+
+    var c = new Complex(arg0.toString());
+
+    if( c instanceof cError ){
+        return this.value = c;
+    }
+
+    c.Exp();
+
+    return this.value = new cString( c.toString() );
+
+}
+cIMEXP.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( complex-number )"
+    };
+}
 
 function cIMLN() {
-    cBaseFunction.call( this, "IMLN" );
+    cBaseFunction.call( this, "IMLN", 1, 1 );
 }
 
 cIMLN.prototype = Object.create( cBaseFunction.prototype );
+cIMLN.prototype.Calculate = function ( arg ) {
+
+    var arg0 = arg[0];
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocString();
+    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+
+    var c = new Complex(arg0.toString());
+
+    if( c instanceof cError ){
+        return this.value = c;
+    }
+
+    c.Ln();
+
+    return this.value = new cString( c.toString() );
+
+}
+cIMLN.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( complex-number )"
+    };
+}
 
 function cIMLOG10() {
-    cBaseFunction.call( this, "IMLOG10" );
+    cBaseFunction.call( this, "IMLOG10", 1, 1 );
 }
 
 cIMLOG10.prototype = Object.create( cBaseFunction.prototype );
+cIMLOG10.prototype.Calculate = function ( arg ) {
+
+    var arg0 = arg[0];
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocString();
+    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+
+    var c = new Complex(arg0.toString());
+
+    if( c instanceof cError ){
+        return this.value = c;
+    }
+
+    c.Log10();
+
+    return this.value = new cString( c.toString() );
+
+}
+cIMLOG10.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( complex-number )"
+    };
+}
 
 function cIMLOG2() {
-    cBaseFunction.call( this, "IMLOG2" );
+    cBaseFunction.call( this, "IMLOG2", 1, 1 );
 }
 
 cIMLOG2.prototype = Object.create( cBaseFunction.prototype );
+cIMLOG2.prototype.Calculate = function ( arg ) {
+
+    var arg0 = arg[0];
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocString();
+    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+
+    var c = new Complex(arg0.toString());
+
+    if( c instanceof cError ){
+        return this.value = c;
+    }
+
+    c.Log2();
+
+    return this.value = new cString( c.toString() );
+
+}
+cIMLOG2.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( complex-number )"
+    };
+}
 
 function cIMPOWER() {
-    cBaseFunction.call( this, "IMPOWER" );
+    cBaseFunction.call( this, "IMPOWER", 2, 2 );
 }
 
 cIMPOWER.prototype = Object.create( cBaseFunction.prototype );
+cIMPOWER.prototype.Calculate = function ( arg ) {
+
+    var arg0 = arg[0], arg1 = arg[1];
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    else if ( arg1 instanceof cArray ) {
+        arg1 = arg1.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocString();
+    arg1 = arg1.tocNumber();
+
+    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
+    if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
+
+    var c = new Complex(arg0.toString());
+
+    if( c instanceof cError ){
+        return this.value = c;
+    }
+
+    if( c.Power(arg1.getValue()) ){
+        this.value = new cString( c.toString() );
+    }
+    else{
+        this.value = new cError( cErrorType.not_numeric );
+    }
+
+    return this.value;
+
+}
+cIMPOWER.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( complex-number, power )"
+    };
+}
 
 function cIMPRODUCT() {
-    cBaseFunction.call( this, "IMPRODUCT" );
+    cBaseFunction.call( this, "IMPRODUCT", 1 );
 }
 
 cIMPRODUCT.prototype = Object.create( cBaseFunction.prototype );
+cIMPRODUCT.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0];
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocString();
+
+    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
+
+    var c = new Complex(arg0.toString() ), c1;
+
+    if( c instanceof cError ) return this.value = c;
+
+    for ( var i = 1; i < this.getArguments(); i++ ) {
+
+        var argI = arg[i];
+        if ( argI instanceof cArea || argI instanceof cArea3D ) {
+            var argIArr = argI.getValue(), _arg;
+            for ( var j = 0; j < argIArr.length; j++ ) {
+                _arg = argIArr[i].tocString();
+
+                if ( _arg instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
+
+                c1 = new Complex(_arg.toString());
+
+                if( c1 instanceof cError ) return this.value = c1;
+
+                c.Product(c1);
+
+            }
+            continue;
+        }
+        else if ( argI instanceof cArray ) {
+            argI.foreach( function ( elem ) {
+                var e = elem.tocString();
+                if ( e instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
+
+                c1 = new Complex(e.toString());
+
+                if( c1 instanceof cError ) return this.value = c1;
+
+                c.Product(c1);
+
+            } );
+            continue;
+        }
+
+        argI = argI.tocString();
+
+        if ( argI instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
+
+        c1 = new Complex(argI.toString());
+
+        c.Product(c1);
+
+    }
+
+    if( c instanceof cError ){
+        this.value = c;
+    }
+    else{
+        this.value = new cString( c.toString() );
+    }
+
+    return this.value;
+
+}
+cIMPRODUCT.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( argument-list )"
+    };
+}
 
 function cIMREAL() {
-    cBaseFunction.call( this, "IMREAL" );
+    cBaseFunction.call( this, "IMREAL", 1, 1 );
 }
 
 cIMREAL.prototype = Object.create( cBaseFunction.prototype );
+cIMREAL.prototype.Calculate = function ( arg ) {
+
+    var arg0 = arg[0];
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocString();
+    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+
+    var c = new Complex(arg0.toString());
+
+    if( c instanceof cError ){
+        return this.value = c;
+    }
+
+    return this.value = new cNumber( c.real );
+
+}
+cIMREAL.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( complex-number )"
+    };
+}
 
 function cIMSIN() {
-    cBaseFunction.call( this, "IMSIN" );
+    cBaseFunction.call( this, "IMSIN", 1, 1 );
 }
 
 cIMSIN.prototype = Object.create( cBaseFunction.prototype );
+cIMSIN.prototype.Calculate = function ( arg ) {
+
+    var arg0 = arg[0];
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocString();
+    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+
+    var c = new Complex(arg0.toString());
+
+    if( c instanceof cError ){
+        return this.value = c;
+    }
+
+    c.Sin();
+
+    return this.value = new cString( c.toString() );
+
+}
+cIMSIN.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( complex-number )"
+    };
+}
 
 function cIMSQRT() {
-    cBaseFunction.call( this, "IMSQRT" );
+    cBaseFunction.call( this, "IMSQRT", 1, 1 );
 }
 
 cIMSQRT.prototype = Object.create( cBaseFunction.prototype );
+cIMSQRT.prototype.Calculate = function ( arg ) {
+
+    var arg0 = arg[0];
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocString();
+    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+
+    var c = new Complex(arg0.toString());
+
+    if( c instanceof cError ){
+        return this.value = c;
+    }
+
+    c.SQRT();
+
+    return this.value = new cString( c.toString() );
+
+}
+cIMSQRT.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( complex-number )"
+    };
+}
 
 function cIMSUB() {
-    cBaseFunction.call( this, "IMSUB" );
+    cBaseFunction.call( this, "IMSUB", 2, 2 );
 }
 
 cIMSUB.prototype = Object.create( cBaseFunction.prototype );
+cIMSUB.prototype.Calculate = function ( arg ) {
+
+    var arg0 = arg[0],arg1 = arg[1];
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+
+    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    else if ( arg1 instanceof cArray ) {
+        arg1 = arg1.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocString();
+    arg1 = arg1.tocString();
+    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+    if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+
+    var c1 = new Complex(arg0.toString()),
+        c2 = new Complex(arg1.toString());
+
+    if( c1 instanceof cError || c2 instanceof cError ){
+        return this.value = new cError(cErrorType.not_numeric);
+    }
+
+    c1.Sub(c2);
+
+    return this.value = new cString( c1.toString() );
+
+}
+cIMSUB.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( complex-number-1 , complex-number-2 )"
+    };
+}
 
 function cIMSUM() {
-    cBaseFunction.call( this, "IMSUM" );
+    cBaseFunction.call( this, "IMSUM", 1 );
 }
 
 cIMSUM.prototype = Object.create( cBaseFunction.prototype );
+cIMSUM.prototype.Calculate = function ( arg ) {
+
+    var arg0 = arg[0], iStart = 1, res = 0, rate;
+
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElementRowCol( 0, 0 );
+    }
+
+    arg0 = arg0.tocString();
+
+    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
+
+    var c = new Complex(arg0.toString() ), c1;
+
+    if( c instanceof cError ) return this.value = c;
+
+    for ( var i = 1; i < this.getArguments(); i++ ) {
+
+        var argI = arg[i];
+        if ( argI instanceof cArea || argI instanceof cArea3D ) {
+            var argIArr = argI.getValue(), _arg;
+            for ( var j = 0; j < argIArr.length; j++ ) {
+                _arg = argIArr[i].tocString();
+
+                if ( _arg instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
+
+                c1 = new Complex(_arg.toString());
+
+                if( c1 instanceof cError ) return this.value = c1;
+
+                c.Sum(c1);
+
+            }
+            continue;
+        }
+        else if ( argI instanceof cArray ) {
+            argI.foreach( function ( elem ) {
+                var e = elem.tocString();
+                if ( e instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
+
+                c1 = new Complex(e.toString());
+
+                if( c1 instanceof cError ) return this.value = c1;
+
+                c.Sum(c1);
+
+            } );
+            continue;
+        }
+
+        argI = argI.tocString();
+
+        if ( argI instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
+
+        c1 = new Complex(argI.toString());
+
+        c.Sum(c1);
+
+    }
+
+    if( c instanceof cError ){
+        this.value = c;
+    }
+    else{
+        this.value = new cString( c.toString() );
+    }
+
+    return this.value;
+
+}
+cIMSUM.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( argument-list )"
+    };
+}
 
 function cOCT2BIN() {
     cBaseFunction.call( this, "OCT2BIN", 1, 2 );
