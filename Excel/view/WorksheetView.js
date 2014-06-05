@@ -5376,18 +5376,17 @@
 
 			if (oldW > 0) {
 				ctx.drawImage(ctx.getCanvas(), x, y, oldW - lastColWidth, ctxH, x - dx, y, oldW - lastColWidth, ctxH);
+				this.drawingGraphicCtx.moveImageData(x, y, oldW - lastColWidth, ctxH, x - dx, y);
 			}
 			ctx.setFillStyle(this.settings.cells.defaultState.background)
 				.fillRect(x + (scrollRight > 0 ? oldW - dx - lastColWidth : 0), y, Math.abs(dx) + lastColWidth, ctxH);
 
-			var rangeGraphic = null;
 			if ( !(dx > 0 && vr.c2 === oldEnd && !oldVCE_isPartial) ) {
 				var c1 = scrollRight ? oldEnd + (oldVCE_isPartial ? 0 : 1) : vr.c1;
 				var r1 = vr.r1;
 				var c2 = dx > 0 || oldW <= 0 ? vr.c2 : vr.c1 - 1 - delta; /* delta < 0 here */
 				var r2 = vr.r2;
 				var range = asc_Range(c1, r1, c2, r2);
-				rangeGraphic = range.clone();
 				offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft - diffWidth;
 				offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop - diffHeight;
 				this._drawColumnHeaders(/*drawingCtx*/ undefined, c1, c2);
@@ -5395,6 +5394,7 @@
 				this._drawCells(/*drawingCtx*/undefined, range);
 				this._drawCellsBorders(/*drawingCtx*/undefined, range);
 				this._drawAutoF(range, offsetX, offsetY);
+				this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollHorizontal, range));
 				if (rFrozen) {
 					range.r1 = 0;
 					range.r2 = rFrozen - 1;
@@ -5403,6 +5403,7 @@
 					this._drawCells(/*drawingCtx*/undefined, range, undefined, offsetY);
 					this._drawCellsBorders(/*drawingCtx*/undefined, range, undefined, offsetY);
 					this._drawAutoF(range, offsetX, offsetY);
+					this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollHorizontal, range));
 				}
 				// Отрисовывать нужно всегда, вдруг бордеры
 				this._drawFrozenPaneLines();
@@ -5420,7 +5421,6 @@
                 this.objectRender.drawingArea.reinitRanges();
 			this.cellCommentator.updateCommentPosition();
 			this.cellCommentator.drawCommentCells();
-			this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollHorizontal, rangeGraphic));
 			return this;
 		};
 
