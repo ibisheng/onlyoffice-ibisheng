@@ -2369,12 +2369,14 @@ cEFFECT.prototype.Calculate = function ( arg ) {
     if ( nominalRate instanceof cError ) return this.value = nominalRate;
     if ( npery instanceof cError ) return this.value = npery;
 
-    var nr = nominalRate.getValue(), np = npery.getValue();
-    if ( nominalRate.getValue() <= 0 || npery.getValue() < 1 ) {
+    nominalRate = nominalRate.getValue();
+    npery = Math.floor( npery.getValue() );
+
+    if ( nominalRate <= 0 || npery < 1 ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
-    return this.value = new cNumber( Math.pow( (1 + nr / np), np ) - 1 );
+    return this.value = new cNumber( Math.pow( (1 + nominalRate / npery), npery ) - 1 );
 };
 cEFFECT.prototype.getInfo = function () {
     return {
