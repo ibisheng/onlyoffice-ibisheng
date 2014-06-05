@@ -6266,6 +6266,9 @@
 			var notEmpty = false;
 			var r, c;
 
+			if (this.cellCommentator.isMissComments(arn))
+				return true;
+
 			switch (options) {
 				case c_oAscMergeOptions.Merge:
 				case c_oAscMergeOptions.MergeCenter:
@@ -7869,13 +7872,21 @@
 					case "merge":
 						if (isLargeRange) { callTrigger = true; t.handlers.trigger("slowOperation", true); }
 						switch (val) {
-							case c_oAscMergeOptions.Unmerge:     range.unmerge(); break;
-							case c_oAscMergeOptions.MergeCenter: range.merge(val); break;
-							case c_oAscMergeOptions.MergeAcross:
-								for (res = arn.r1; res <= arn.r2; ++res)
-									t.model.getRange3(res, arn.c1, res, arn.c2).merge(val);
+							case c_oAscMergeOptions.MergeCenter:
+							case c_oAscMergeOptions.Merge:
+								range.merge(val);
+								t.cellCommentator.mergeComments(range.getBBox0());
 								break;
-							case c_oAscMergeOptions.Merge:       range.merge(val); break;
+							case c_oAscMergeOptions.Unmerge:
+								range.unmerge();
+								break;
+							case c_oAscMergeOptions.MergeAcross:
+								for (res = arn.r1; res <= arn.r2; ++res) {
+									t.model.getRange3(res, arn.c1, res, arn.c2).merge(val);
+									cell = new asc_Range(arn.c1, res, arn.c2, res);
+									t.cellCommentator.mergeComments(cell);
+								}
+								break;
 						}
 						break;
 

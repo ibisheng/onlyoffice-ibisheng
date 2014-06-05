@@ -492,1302 +492,1329 @@ CompositeCommentData.prototype = {
 //-----------------------------------------------------------------------------------
 /** @constructor */
 function CCellCommentator(currentSheet) {
-
-	var _this = this;
-	var asc = window["Asc"];
-	var asc_applyFunction = asc.applyFunction;
-	var asc_CCollaborativeRange = asc.asc_CCollaborativeRange;
-	var isViewerMode =  function() { return _this.worksheet.handlers.trigger("getViewerMode"); };
-	
-	_this.worksheet = currentSheet;
-	_this.overlayCtx = currentSheet.overlayCtx;
-	_this.drawingCtx = currentSheet.drawingCtx;
+	this.worksheet = currentSheet;
+	this.overlayCtx = currentSheet.overlayCtx;
+	this.drawingCtx = currentSheet.drawingCtx;
 
 	// Drawing settings
-	_this.bShow = true;
-	_this.commentIconColor = new CColor(255, 144, 0);
-	_this.commentFillColor = new CColor(255, 255, 0);
-	_this.commentBorderWidth = 1; // px
-	_this.commentPadding = 4; 	// px
-	_this.minAreaWidth = 160; 	// px
-	_this.minAreaHeight = 80; 	// px
-
-	_this.aComments = [];
-	_this.aCommentCoords = [];
-	_this.lastSelectedId = null;
-	_this.bSaveHistory = true;
-
-	//-----------------------------------------------------------------------------------
-	// Public methods
-	//-----------------------------------------------------------------------------------
-	
-	_this.isLockedComment = function(oComment, lockByDefault, callbackFunc) {
-	
-		var _this = this;
-		var lockInfo;
-
-		var model = _this.worksheet.model;
-		var sheetId = model.getId();
-
-		var objectGuid = oComment.asc_getId();
-		if (objectGuid) {
-
-			if (false === _this.worksheet.collaborativeEditing.isCoAuthoringExcellEnable()) {
-				// Запрещено совместное редактирование
-				asc_applyFunction(callbackFunc, true);
-				return;
-			}
-
-			if ( lockByDefault )
-				_this.worksheet.collaborativeEditing.onStartCheckLock();
-
-			// Комментарий к документу блокируем как Range
-			if ( !oComment.asc_getDocumentFlag() ) {
-				var c = oComment.asc_getCol();
-				var r = oComment.asc_getRow();
-				var c1, r1, c2, r2;
-				var mergedRange = model.getMergedByCell(r, c);
-				if (mergedRange) {
-					c1 = mergedRange.c1;
-					r1 = mergedRange.r1;
-					c2 = mergedRange.c2;
-					r2 = mergedRange.r2;
-				} else {
-					c1 = c2 = c;
-					r1 = r2 = r;
-				}
-
-				lockInfo = _this.worksheet.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null, sheetId, new asc_CCollaborativeRange(c1, r1, c2, r2));
-			} else
-				lockInfo = _this.worksheet.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null, sheetId, objectGuid);
-
-			if (false === _this.worksheet.collaborativeEditing.getCollaborativeEditing()) {
-				// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-				asc_applyFunction(callbackFunc, true);
-				callbackFunc = undefined;
-			}
-			if (false !== _this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
-				// Редактируем сами
-				asc_applyFunction(callbackFunc, true);
-				return;
-			}
-			else if (false !== _this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
-				// Уже ячейку кто-то редактирует
-				asc_applyFunction(callbackFunc, false);
-				return;
-			}
-
-			// Блокируем
-			if ( lockByDefault ) {
-				_this.worksheet.collaborativeEditing.addCheckLock(lockInfo);
-				_this.worksheet.collaborativeEditing.onEndCheckLock(callbackFunc);
-			}
-			else
-				asc_applyFunction(callbackFunc, true);
-		}
-	};
-	
-	_this.callLockComments = function(range) {
-		
-		if ( range ) {
-			for (var i = 0; i < _this.aComments.length; i++) {
-				var comment = _this.aComments[i];
-				if ( (comment.nCol >= range.c1) && (comment.nCol <= range.c2) && (comment.nRow >= range.r1) && (comment.nRow <= range.r2) )
-					_this.worksheet.model.workbook.handlers.trigger("asc_onLockComment", comment.asc_getId(), comment.asc_getUserId());
-			}
-		}
-	};
-	
-	_this.unlockComments = function() {
-		for (var i = 0; i < _this.aComments.length; i++) {
-			_this.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", _this.aComments[i].asc_getId());
-		}
-	};
-	
-	_this.tryUnlockComment = function(id) {
-		for (var i = 0; i < _this.aComments.length; i++) {
-			if ( _this.aComments[i].asc_getId() == id ) {
-				_this.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", id);
-				break;
-			}
-		}
-	};
-
-	_this.moveRangeComments = function(rangeFrom, rangeTo) {
-		if ( rangeFrom && rangeTo ) {
-			var colOffset = rangeTo.c1 - rangeFrom.c1;
-			var rowOffset = rangeTo.r1 - rangeFrom.r1;
-			
-			_this.worksheet.model.workbook.handlers.trigger("asc_onHideComment");
-			
-			for (var i = 0; i < _this.aComments.length; i++) {
-				var comment = _this.aComments[i];
-				
-				if ( (comment.nCol >= rangeFrom.c1) && (comment.nCol <= rangeFrom.c2) && (comment.nRow >= rangeFrom.r1) && (comment.nRow <= rangeFrom.r2) ) {
-
-					var commentBefore = new asc_CCommentData(comment);
-				
-					comment.nCol += colOffset;
-					comment.nRow += rowOffset;
-					var cellAddress = new CellAddress(comment.nRow, comment.nCol, 0);
-					comment.sQuoteText = cellAddress.getID() + " : " + _this.worksheet.model.getCell(cellAddress).getValueWithFormat();
-					_this.worksheet.model.workbook.handlers.trigger("asc_onChangeCommentData", comment.asc_getId(), comment);
-					
-					var commentAfter = new asc_CCommentData(comment);
-					
-					var compositeComment = new CompositeCommentData();
-					compositeComment.commentBefore = commentBefore;
-					compositeComment.commentAfter = commentAfter;
-
-					History.Create_NewPoint();
-					History.Add(g_oUndoRedoComment, historyitem_Comment_Change, _this.worksheet.model.getId(), null, compositeComment);
-				}
-			}
-		}
-	};
-	
-	_this.deleteCommentsRange = function(range) {
-		if ( range ) {
-			var aCommentId = [], i;
-			for (i = 0; i < _this.aComments.length; ++i) {
-				var comment = _this.aComments[i];
-				if ( (comment.nCol >= range.c1) && (comment.nCol <= range.c2) && (comment.nRow >= range.r1) && (comment.nRow <= range.r2) ) {
-					aCommentId.push(comment.asc_getId());
-				}
-			}
-			History.StartTransaction();
-			for (i = 0; i < aCommentId.length; i++) {
-				_this.asc_removeComment(aCommentId[i]);
-			}
-			History.EndTransaction();
-		}
-	};
-
-	_this.prepareComments = function(arrComments) {
-		var commentList = [];
-		for (var i = 0; i < arrComments.length; ++i) {
-			var comment = {"Id": arrComments[i].asc_getId(), "Comment": arrComments[i]};
-			_this.addCommentSerialize(comment["Comment"]);
-			commentList.push(comment);
-		}
-		return commentList;
-	};
-	
-	_this.addCommentSerialize = function(oComment) {
-
-		var _this = this;
-
-		if (oComment) {
-			if ( !oComment.bDocument && (oComment.nCol != null) && (oComment.nRow != null) ) {
-				var cellAddress = new CellAddress(oComment.nRow, oComment.nCol, 0);
-				oComment.sQuoteText = cellAddress.getID() + " : " + _this.worksheet.model.getCell(cellAddress).getValueWithFormat();
-			}
-			_this.aComments.push(oComment);
-		}
-	};
-
-	_this.getCommentsXY = function(x, y) {
-
-		var _this = this;
-
-		var findCol = _this.worksheet._findColUnderCursor(_this.pxToPt(x), true);
-		var findRow = _this.worksheet._findRowUnderCursor(_this.pxToPt(y), true);
-
-		return (findCol && findRow) ? _this.asc_getComments(findCol.col, findRow.row) : [];
-	};
-
-	_this.drawCommentCells = function() {
-	
-		if ( isViewerMode() || !_this.bShow )
-			return;
-
-		var drawCells = []; 	// Associative array
-		function getCellId(col, row) { return (col + "_" + row); }
-
-		for (var n = 0; n < _this.worksheet.drawingArea.frozenPlaces.length; n++) {
-			var frozenPlace = _this.worksheet.drawingArea.frozenPlaces[n];
-			var fv = frozenPlace.getFirstVisible();
-			var lvr = _this.worksheet.getLastVisibleRow();
-			var lvc = _this.worksheet.getLastVisibleCol();
-			
-			for (var i = 0; i < _this.aComments.length; i++) {
-				// Get cell metrics
-				var commentCell = _this.aComments[i];
-				if (commentCell.asc_getDocumentFlag() || commentCell.asc_getHiddenFlag() || commentCell.asc_getSolved())
-					continue;
-				
-				var mergedRange = _this.worksheet.model.getMergedByCell(commentCell.nRow, commentCell.nCol);
-				var drawCol = mergedRange ? mergedRange.c2 : commentCell.nCol;
-				var drawRow = mergedRange ? mergedRange.r1 : commentCell.nRow;
-				if (drawCol < fv.col || drawRow < fv.row || drawCol > lvc || drawRow > lvr)
-					continue;
-
-				if ( !frozenPlace.isCellInside({ col: drawCol, row: drawRow }) )
-					continue;
-
-				var cellId = getCellId(commentCell.nCol, commentCell.nRow);
-				if (drawCells[cellId])
-					continue;
-
-				var metrics = _this.getCellMetrics(drawCol, drawRow);
-				if ( !metrics.result || (metrics.width <= 0) || (metrics.height <= 0) )
-					continue;
-
-				_this.drawingCtx.beginPath();
-				_this.drawingCtx.setFillStyle(_this.commentIconColor);
-
-				_this.drawingCtx.moveTo(metrics.left + metrics.width - _this.pxToPt(7), metrics.top);
-				_this.drawingCtx.lineTo(metrics.left + metrics.width - _this.pxToPt(1), metrics.top);
-				_this.drawingCtx.lineTo(metrics.left + metrics.width - _this.pxToPt(1), metrics.top + _this.pxToPt(6));
-				_this.drawingCtx.closePath();
-				_this.drawingCtx.fill();
-
-				drawCells[cellId] = cellId;
-			}
-		}
-		//if (_this.lastSelectedId)
-		//	_this.asc_selectComment(_this.lastSelectedId, false);
-	};
-
-	_this.getTextMetrics = function(text, units) {
-
-		var _this = this;
-		var metrics = { width: 0, height: 0 };
-
-		if (text && text.length && ((typeof (text) == 'string') || (typeof (text) == 'number'))) {
-			var textOptions = _this.overlayCtx.measureText(text, units);
-			metrics.width = textOptions.width;
-			metrics.height = textOptions.lineHeight;
-		}
-		return metrics;
-	};
-
-	_this.getCellMetrics = function(col, row) {
-
-		var metrics = { top: 0, left: 0, width: 0, height: 0, result: false }; 	// px
-
-		for (var n = 0; n < _this.worksheet.drawingArea.frozenPlaces.length; n++) {
-			var frozenPlace = _this.worksheet.drawingArea.frozenPlaces[n];
-			if ( !frozenPlace.isCellInside({ col: col, row: row }) )
-				continue;
-			
-			var fv = frozenPlace.getFirstVisible();
-			var mergedRange = _this.worksheet.model.getMergedByCell(row, col);
-
-			if (mergedRange && (fv.col < mergedRange.c2) && (fv.row < mergedRange.r2)) {
-
-				var startCol = (mergedRange.c1 > fv.col) ? mergedRange.c1 : fv.col;
-				var startRow = (mergedRange.r1 > fv.row) ? mergedRange.r1 : fv.row;
-
-				metrics.top = _this.worksheet.getCellTop(startRow, 1) /*- _this.worksheet.getCellTop(fv.row, 1) + _this.worksheet.getCellTop(0, 1)*/ + _this.pxToPt(frozenPlace.getVerticalScroll()) - _this.worksheet.getCellTop(0, 1);
-				metrics.left = _this.worksheet.getCellLeft(startCol, 1) /*- _this.worksheet.getCellLeft(fv.col, 1) + _this.worksheet.getCellLeft(0, 1)*/ + _this.pxToPt(frozenPlace.getHorizontalScroll()) - _this.worksheet.getCellLeft(0, 1);
-
-				var i;
-				for (i = startCol; i <= mergedRange.c2; i++) {
-					metrics.width += _this.worksheet.getColumnWidth(i, 1)
-				}
-				for (i = startRow; i <= mergedRange.r2; i++) {
-					metrics.height += _this.worksheet.getRowHeight(i, 1)
-				}
-				metrics.result = true;
-			}
-			else if ((fv.row <= row) && (fv.col <= col)) {
-
-				metrics.top = _this.worksheet.getCellTop(row, 1) /*- _this.worksheet.getCellTop(fv.row, 1) + _this.worksheet.getCellTop(0, 1)*/ + _this.pxToPt(frozenPlace.getVerticalScroll()) - _this.worksheet.getCellTop(0, 1);
-				metrics.left = _this.worksheet.getCellLeft(col, 1) /*- _this.worksheet.getCellLeft(fv.col, 1) + _this.worksheet.getCellLeft(0, 1)*/ + _this.pxToPt(frozenPlace.getHorizontalScroll()) - _this.worksheet.getCellLeft(0, 1);
-				metrics.width = _this.worksheet.getColumnWidth(col, 1);
-				metrics.height = _this.worksheet.getRowHeight(row, 1);
-				metrics.result = true;
-			}
-		}
-
-		return metrics;
-	};
-
-	_this.updateCommentPosition = function() {
-		var _this = this;
-
-		if (_this.lastSelectedId) {
-			var comment = _this.asc_findComment(_this.lastSelectedId);
-			if (comment) {
-
-				var commentList = _this.asc_getComments(comment.asc_getCol(), comment.asc_getRow());
-				if (commentList.length) {
-
-					_this.drawCommentCells();
-					var coords = _this.getCommentsCoords(commentList);
-
-					var indexes = [];
-					for (var i = 0; i < commentList.length; i++) {
-						indexes.push(commentList[i].asc_getId());
-					}
-					var metrics = _this.getCellMetrics(comment.asc_getCol(), comment.asc_getRow());
-
-					_this.worksheet.model.workbook.handlers.trigger( "asc_onUpdateCommentPosition", indexes,
-																									(metrics.result ? coords.asc_getLeftPX() : -1),
-																									(metrics.result ? coords.asc_getTopPX() : -1),
-																									(metrics.result ? coords.asc_getReverseLeftPX() : -1) );
-				}
-			}
-		}
-	};
-	
-	_this.updateCommentsDependencies = function(bInsert, operType, updateRange) {
-		
-		var UpdatePair = function(comment, bChange) {
-			this.comment = comment;
-			this.bChange = bChange;
-		};
-		var aChangedComments = [];		// Array of UpdatePair
-		
-		function updateCommentsList(aComments) {
-			if ( aComments.length ) {
-				
-				_this.bSaveHistory = false;
-				var changeArray = [];
-				var removeArray = [];
-				
-				for (var i = 0; i < aComments.length; i++) {
-					if ( aComments[i].bChange ) {
-						_this.asc_changeComment(aComments[i].comment.asc_getId(), aComments[i].comment, /*bChangeCoords*/true, /*bNoEvent*/true);
-						changeArray.push({"Id": aComments[i].comment.asc_getId(), "Comment": aComments[i].comment});
-					}
-					else {
-						_this.asc_removeComment(aComments[i].comment.asc_getId(), /*bNoEvent*/true);
-						removeArray.push(aComments[i].comment.asc_getId());
-					}
-				}
-				
-				if ( changeArray.length )
-					_this.worksheet.model.workbook.handlers.trigger("asc_onChangeComments", changeArray);
-				if ( removeArray.length )
-					_this.worksheet.model.workbook.handlers.trigger("asc_onRemoveComments", removeArray);
-				
-				_this.bSaveHistory = true;
-				_this.drawCommentCells();
-			}
-		}	
-
-		var i, comment;
-		if ( bInsert ) {
-			switch (operType) {
-			
-				case c_oAscInsertOptions.InsertCellsAndShiftDown: {
-					for (i = 0; i < _this.aComments.length; i++) {
-						comment = new asc_CCommentData(_this.aComments[i]);
-						if ( (comment.nRow >= updateRange.r1) && (comment.nCol >= updateRange.c1) && (comment.nCol <= updateRange.c2) ) {
-							comment.nRow += updateRange.r2 - updateRange.r1 + 1;
-							aChangedComments.push( new UpdatePair(comment, true) );
-						}
-					}
-					updateCommentsList(aChangedComments);
-				}
-				break;
-				
-				case c_oAscInsertOptions.InsertCellsAndShiftRight: {
-					for (i = 0; i < _this.aComments.length; i++) {
-						comment = new asc_CCommentData(_this.aComments[i]);
-						if ( (comment.nCol >= updateRange.c1) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2) ) {
-							comment.nCol += updateRange.c2 - updateRange.c1 + 1;
-							aChangedComments.push( new UpdatePair(comment, true) );
-						}
-					}
-					updateCommentsList(aChangedComments);
-				}
-				break;
-				
-				case c_oAscInsertOptions.InsertColumns: {
-					for (i = 0; i < _this.aComments.length; i++) {
-						comment = new asc_CCommentData(_this.aComments[i]);
-						if (comment.nCol >= updateRange.c1) {
-							comment.nCol += updateRange.c2 - updateRange.c1 + 1;
-							aChangedComments.push( new UpdatePair(comment, true) );
-						}
-					}
-					updateCommentsList(aChangedComments);
-				}
-				break;
-				
-				case c_oAscInsertOptions.InsertRows: {
-					for (i = 0; i < _this.aComments.length; i++) {
-						comment = new asc_CCommentData(_this.aComments[i]);
-						if (comment.nRow >= updateRange.r1) {
-							comment.nRow += updateRange.r2 - updateRange.r1 + 1;
-							aChangedComments.push( new UpdatePair(comment, true) );
-						}
-					}
-					updateCommentsList(aChangedComments);
-				}
-				break;
-			}
-		}
-		else {
-			switch (operType) {
-				
-				case "deleteAllComments": {
-					for (i = 0; i < _this.aComments.length; i++) {
-						comment = new asc_CCommentData(_this.aComments[i]);
-						if ( (updateRange.c1 <= comment.nCol) && (updateRange.c2 >= comment.nCol) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2) ) {
-							aChangedComments.push( new UpdatePair(comment, false) );
-						}
-					}
-					updateCommentsList(aChangedComments);
-				}
-				break;
-				
-				case c_oAscDeleteOptions.DeleteCellsAndShiftTop: {
-					for (i = 0; i < _this.aComments.length; i++) {
-						comment = new asc_CCommentData(_this.aComments[i]);
-						if ( (comment.nRow > updateRange.r1) && (comment.nCol >= updateRange.c1) && (comment.nCol <= updateRange.c2) ) {
-							comment.nRow -= updateRange.r2 - updateRange.r1 + 1;
-							aChangedComments.push( new UpdatePair(comment, true) );
-						}
-						else if ( (updateRange.c1 <= comment.nCol) && (updateRange.c2 >= comment.nCol) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2) ) {
-							aChangedComments.push( new UpdatePair(comment, false) );
-						}
-					}
-					updateCommentsList(aChangedComments);
-				}
-				break;
-				
-				case c_oAscDeleteOptions.DeleteCellsAndShiftLeft: {
-					for (i = 0; i < _this.aComments.length; i++) {
-						comment = new asc_CCommentData(_this.aComments[i]);
-						if ( (comment.nCol > updateRange.c2) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2) ) {
-							comment.nCol -= updateRange.c2 - updateRange.c1 + 1;
-							aChangedComments.push( new UpdatePair(comment, true) );
-						}
-						else if ( (updateRange.c1 <= comment.nCol) && (updateRange.c2 >= comment.nCol) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2) ) {
-							aChangedComments.push( new UpdatePair(comment, false) );
-						}
-					}
-					updateCommentsList(aChangedComments);
-				}
-				break;
-				
-				case c_oAscDeleteOptions.DeleteColumns: {
-					for (i = 0; i < _this.aComments.length; i++) {
-						comment = new asc_CCommentData(_this.aComments[i]);
-						if (comment.nCol > updateRange.c2) {
-							comment.nCol -= updateRange.c2 - updateRange.c1 + 1;
-							aChangedComments.push( new UpdatePair(comment, true) );
-						}
-						else if ( (updateRange.c1 <= comment.nCol) && (updateRange.c2 >= comment.nCol) ) {
-							aChangedComments.push( new UpdatePair(comment, false) );
-						}
-					}
-					updateCommentsList(aChangedComments);
-				}
-				break;
-				
-				case c_oAscDeleteOptions.DeleteRows: {
-					for (i = 0; i < _this.aComments.length; i++) {
-						comment = new asc_CCommentData(_this.aComments[i]);
-						if (comment.nRow > updateRange.r2) {
-							comment.nRow -= updateRange.r2 - updateRange.r1 + 1;
-							aChangedComments.push( new UpdatePair(comment, true) );
-						}
-						else if ( (updateRange.r1 <= comment.nRow) && (updateRange.r2 >= comment.nRow) ) {
-							aChangedComments.push( new UpdatePair(comment, false) );
-						}
-					}
-					updateCommentsList(aChangedComments);
-				}
-				break;
-			}
-		}		
-	};
-
-	_this.showHideComments = function(bHide, bColumn, start, stop) {
-		
-		var aChangedComments = [];
-		
-		function updateCommentsList(aComments) {
-			if ( aComments.length ) {
-			
-				History.StartTransaction();
-				for (var i = 0; i < aComments.length; i++) {
-					_this.asc_changeComment(aComments[i].asc_getId(), aComments[i]);
-				}
-				History.EndTransaction();
-				_this.drawCommentCells();
-			}
-		}
-		
-		
-		for (var i = 0; i < _this.aComments.length; i++) {
-			var comment = new asc_CCommentData(_this.aComments[i]);
-			
-			if ( bColumn ) {
-				if ( (comment.nCol >= start) && (comment.nCol <= stop) ) {
-					comment.asc_putHiddenFlag(bHide);
-					aChangedComments.push(comment);
-				}
-			}
-			else {
-				if ( (comment.nRow >= start) && (comment.nRow <= stop) ) {
-					comment.asc_putHiddenFlag(bHide);
-					aChangedComments.push(comment);
-				}
-			}
-		}
-		updateCommentsList(aChangedComments);
-	};
-	
-	_this.sortComments = function(activeRange, changes) {
-		
-		if (changes && activeRange) {
-		
-			var updateCommentsList = function(aComments) {
-				if ( aComments.length ) {
-					History.StartTransaction();
-					
-					for (var i = 0; i < aComments.length; i++) {
-						_this.asc_changeComment(aComments[i].asc_getId(), aComments[i], true);
-					}
-					
-					History.EndTransaction();
-					_this.drawCommentCells();
-				}
-			};
-			
-			var aChangedComments = [];
-			for (var i = 0; i < changes.places.length; i++) {
-				
-				var list = _this.asc_getComments(activeRange.c1, changes.places[i].from);
-				for (var j = 0; j < list.length; j++) {
-					var comment = new asc_CCommentData(list[j]);
-					comment.nRow = changes.places[i].to;
-					aChangedComments.push(comment);
-				}
-			}			
-			updateCommentsList(aChangedComments);
-		}
-	};
-	
-	_this.resetLastSelectedId = function() {
-		_this.cleanLastSelection();
-		_this.lastSelectedId = null;
-	};
-	
-	_this.cleanLastSelection = function() {
-		if ( _this.lastSelectedId ) {
-			var lastComment = _this.asc_findComment(_this.lastSelectedId);
-			if ( lastComment ) {
-				var lastMetrics = _this.getCellMetrics(lastComment.nCol, lastComment.nRow);
-				if ( lastMetrics.result ) {
-					var extraOffset = _this.pxToPt(1);
-					_this.overlayCtx.clearRect(lastMetrics.left, lastMetrics.top, lastMetrics.width - extraOffset, lastMetrics.height - extraOffset);
-				}
-			}
-		}
-	};
-
-	_this.calcCommentsCoords = function(bSave) {
-
-		_this.aCommentCoords = [];
-
-		for (var i = 0; i < _this.aComments.length; i++) {
-
-			var commentCell = _this.aComments[i];
-			if (commentCell.asc_getDocumentFlag() || !_this.commentCoordsExist(commentCell.asc_getCol(), commentCell.asc_getRow())) {
-
-				var commentList = _this.asc_getComments(commentCell.asc_getCol(), commentCell.asc_getRow());
-
-				// Calculate coords for document comments
-				if (bSave && (commentCell.asc_getCol() == 0) && (commentCell.asc_getRow() == 0)) {
-					var documentComments = _this.asc_getDocumentComments();
-					for (var j = 0; j < documentComments.length; j++) {
-						commentList.push(documentComments[j]);
-					}
-				}
-
-				if (commentList.length)
-					_this.aCommentCoords.push(_this.getCommentsCoords(commentList));
-			}
-		}
-	};
-
-	_this.getCommentsCoords = function(comments) {
-
-		// bWithScroll - учитывать вертикальный и горизонтальный скроллы
-
-		var _this = this;
-		var coords = new asc_CCommentCoords();
-
-		function calcCommentArea(comment, coords) {
-
-			/*	User name
-			*	Time
-			*	Text
-			*/
-
-			var originalFont = _this.overlayCtx.getFont();
-			var outputFont = originalFont.clone();
-
-			// Set to bold
-			outputFont.Bold = true;
-			outputFont.FontSize = 9;
-			_this.overlayCtx.setFont(outputFont);
-
-			// Title
-			var txtMetrics = _this.getTextMetrics(comment.sUserName, 1);
-			coords.dHeightPX += _this.ptToPx(txtMetrics.height);
-			var userWidth = _this.ptToPx(txtMetrics.width);
-
-			if (coords.dWidthPX < userWidth)
-				coords.dWidthPX = userWidth;
-
-			txtMetrics = _this.getTextMetrics(comment.sTime, 1);
-			coords.dHeightPX += _this.ptToPx(txtMetrics.height);
-			var timeWidth = _this.ptToPx(txtMetrics.width);
-
-			if (coords.dWidthPX < timeWidth)
-				coords.dWidthPX = timeWidth;
-
-			// Set to normal
-			outputFont.Bold = false;
-			outputFont.FontSize = 9;
-			_this.overlayCtx.setFont(outputFont);
-
-			// Comment text
-			var commentSpl = comment.sText.split('\n'), i;
-			for (i = 0; i < commentSpl.length; i++) {
-			
-				txtMetrics = _this.getTextMetrics(commentSpl[i], 1);
-				coords.dHeightPX += _this.ptToPx(txtMetrics.height);
-				var lineWidth = _this.ptToPx(txtMetrics.width);
-				if (coords.dWidthPX < lineWidth)
-					coords.dWidthPX = lineWidth;
-			}
-
-			for (i = 0; i < comment.aReplies.length; i++) {
-				calcCommentArea(comment.aReplies[i], coords);
-			}
-
-			// Min values
-			if (coords.dWidthPX < _this.minAreaWidth)
-				coords.dWidthPX = _this.minAreaWidth;
-
-			if (coords.dHeightPX < _this.minAreaHeight)
-				coords.dHeightPX = _this.minAreaHeight;
-
-			// Calc other coords
-			coords.dWidthMM = _this.pxToMm(coords.dWidthPX);
-			coords.dHeightMM = _this.pxToMm(coords.dHeightPX);
-
-			var headerRowOffPx = _this.worksheet.getCellTop(0, 0);
-			var headerColOffPx = _this.worksheet.getCellLeft(0, 0);
-
-			coords.nCol = comment.nCol;
-			coords.nRow = comment.nRow;
-
-			var mergedRange = _this.worksheet.model.getMergedByCell(comment.nRow, comment.nCol);
-
-			coords.nLeft = (mergedRange ? mergedRange.c2 : comment.nCol) + 1;
-			if ( !_this.worksheet.cols[coords.nLeft] ) {
-				_this.worksheet.expandColsOnScroll(true);
-				_this.worksheet.handlers.trigger("reinitializeScrollX");
-			}
-			
-			coords.nTop = mergedRange ? mergedRange.r1 : comment.nRow;
-			coords.nLeftOffset = 0;
-			coords.nTopOffset = 0;
-			
-			var fvr = _this.worksheet.getFirstVisibleRow(true);
-			var fvc = _this.worksheet.getFirstVisibleCol(true);
-			
-			var frozenOffset = _this.getFrozenOffset();
-			if ( _this.worksheet.topLeftFrozenCell ) {
-				if ( comment.nCol >= _this.worksheet.getFirstVisibleCol(false) )
-					frozenOffset.offsetX = 0;
-				if ( comment.nRow >= _this.worksheet.getFirstVisibleRow(false) )
-					frozenOffset.offsetY = 0;
-			}
-
-			// Tooltip coords
-			coords.dReverseLeftPX = _this.worksheet.getCellLeft(comment.nCol, 0) - _this.worksheet.getCellLeft(fvc, 0) + headerColOffPx + _this.ptToPx(frozenOffset.offsetX);
-			coords.dLeftPX = _this.worksheet.getCellLeft(coords.nLeft, 0) - _this.worksheet.getCellLeft(fvc, 0) + headerColOffPx + _this.ptToPx(frozenOffset.offsetX);
-			coords.dTopPX = _this.worksheet.getCellTop(coords.nTop, 0) - _this.worksheet.getCellTop(fvr, 0) + headerRowOffPx + _this.ptToPx(frozenOffset.offsetY);
-
-			// Correction for merged cell
-			var fvrPx = _this.worksheet.getCellTop(0, 0);
-			if (coords.dTopPX < fvrPx)
-				coords.dTopPX = fvrPx;
-
-			coords.dLeftMM = _this.worksheet.getCellLeft(coords.nLeft, 3) - _this.worksheet.getCellLeft(fvc, 3);
-			coords.dTopMM = _this.worksheet.getCellTop(coords.nTop, 3) - _this.worksheet.getCellTop(fvr, 3);
-
-			var findCol = _this.worksheet._findColUnderCursor(_this.worksheet.getCellLeft(coords.nLeft, 1) + _this.pxToPt(coords.dWidthPX + headerColOffPx) - _this.worksheet.getCellLeft(fvc, 1), true);
-			var findRow = _this.worksheet._findRowUnderCursor(_this.worksheet.getCellTop(coords.nTop, 1) + _this.pxToPt(coords.dHeightPX + headerRowOffPx) - _this.worksheet.getCellTop(fvr, 1), true);
-
-			coords.nRight = findCol ? findCol.col : 0;
-			coords.nBottom = findRow ? findRow.row : 0;
-
-			coords.nRightOffset = _this.worksheet.getCellLeft(coords.nLeft, 0) + coords.nLeftOffset + coords.dWidthPX + headerColOffPx - _this.worksheet.getCellLeft(coords.nRight, 0);
-			coords.nBottomOffset = _this.worksheet.getCellTop(coords.nTop, 0) + coords.nTopOffset + coords.dHeightPX + headerRowOffPx - _this.worksheet.getCellTop(coords.nBottom, 0);
-
-			// Return original font
-			_this.overlayCtx.setFont(originalFont);
-		}
-
-		for (var i = 0; i < comments.length; i++) {
-			calcCommentArea(comments[i], coords);
-		}
-
-		if (comments.length) {
-			coords.dWidthPX += _this.commentPadding * 2;
-			coords.dWidthMM = _this.pxToMm(coords.dWidthPX);
-
-			coords.dHeightPX += _this.commentPadding * 2;
-			coords.dHeightMM = _this.pxToMm(coords.dHeightPX);
-		}
-
-		return coords;
-	};
-
-	_this.commentCoordsExist = function(col, row) {
-
-		var result = false;
-		for (var i = 0; i < _this.aCommentCoords.length; i++) {
-			if ((col == _this.aCommentCoords[i].nCol) && (row == _this.aCommentCoords[i].nRow))
-				return true;
-		}
-		return result;
-	};
-
-	_this.prepareCommentsToSave = function() {
-
-		/*	Calculate the coords of comments for:
-		*	first visible col = 0
-		*	first visible row = 0
-		*	+ document comments -> A1
-		*/
-
-		_this.calcCommentsCoords(true);
-	};
-
-	_this.cleanSelectedComment = function() {
-		if ( _this.lastSelectedId ) {
-			var comment = _this.asc_findComment(_this.lastSelectedId);
-			if ( comment && !comment.asc_getDocumentFlag() && !comment.asc_getSolved() ) {
-				var metrics = _this.getCellMetrics(comment.asc_getCol(), comment.asc_getRow());
-				if (metrics.result) 
-					_this.overlayCtx.clearRect(metrics.left, metrics.top, metrics.width, metrics.height);
-			}
-		}
-	};
-	
-	_this.getFrozenOffset = function() {
-		
-		var offsetX = 0, offsetY = 0, cFrozen = 0, rFrozen = 0, diffWidth = 0, diffHeight = 0;
-		if ( _this.worksheet.topLeftFrozenCell ) {
-			cFrozen = _this.worksheet.topLeftFrozenCell.getCol0();
-			rFrozen = _this.worksheet.topLeftFrozenCell.getRow0();
-			diffWidth = _this.worksheet.cols[cFrozen].left - _this.worksheet.cols[0].left;
-			diffHeight = _this.worksheet.rows[rFrozen].top - _this.worksheet.rows[0].top;
-			
-			offsetX = _this.worksheet.cols[_this.worksheet.visibleRange.c1].left - _this.worksheet.cellsLeft - diffWidth;
-			offsetY = _this.worksheet.rows[_this.worksheet.visibleRange.r1].top - _this.worksheet.cellsTop - diffHeight;
-		}
-		return { offsetX: offsetX, offsetY: offsetY };
-	};
-	
-	//-----------------------------------------------------------------------------------
-	// Misc methods
-	//-----------------------------------------------------------------------------------
-
-	_this.pxToPt = function(val) {
-		return val * _this.ascCvtRatio(0, 1);
-	};
-
-	_this.ptToPx = function(val) {
-		return val * _this.ascCvtRatio(1, 0);
-	};
-
-	_this.mmToPx = function(val) {
-		return val * _this.ascCvtRatio(3, 0);
-	};
-
-	_this.pxToMm = function(val) {
-		return val * _this.ascCvtRatio(0, 3);
-	};
-
-	_this.ascCvtRatio = function(fromUnits, toUnits) {
-		return Asc.getCvtRatio(fromUnits, toUnits, _this.overlayCtx.getPPIX());
-	}
+	this.bShow = true;
+	this.commentIconColor = new CColor(255, 144, 0);
+	this.commentFillColor = new CColor(255, 255, 0);
+	this.commentPadding = 4; 	// px
+	this.minAreaWidth = 160; 	// px
+	this.minAreaHeight = 80; 	// px
+
+	this.aComments = [];
+	this.aCommentCoords = [];
+	this.lastSelectedId = null;
+	this.bSaveHistory = true;
 }
 
-// Prototype
-CCellCommentator.prototype = {
+//-----------------------------------------------------------------------------------
+// Public methods
+//-----------------------------------------------------------------------------------
 
-	// Show/Hide
+CCellCommentator.prototype.isViewerMode = function () {
+	return this.worksheet.handlers.trigger("getViewerMode");
+};
 
-	asc_showComments: function() {
-		var _this = this;
-		if ( !_this.bShow ) {
-			_this.bShow = true;
-			_this.drawCommentCells();
+CCellCommentator.prototype.isLockedComment = function(oComment, lockByDefault, callbackFunc) {
+	var lockInfo;
+
+	var model = this.worksheet.model;
+	var sheetId = model.getId();
+
+	var objectGuid = oComment.asc_getId();
+	if (objectGuid) {
+
+		if (false === this.worksheet.collaborativeEditing.isCoAuthoringExcellEnable()) {
+			// Запрещено совместное редактирование
+			Asc.applyFunction(callbackFunc, true);
+			return;
 		}
-	},
 
-	asc_hideComments: function() {
-		var _this = this;
-		_this.bShow = false;
-		_this.drawCommentCells();
-		_this.worksheet.model.workbook.handlers.trigger("asc_onHideComment");
-	},
+		if ( lockByDefault )
+			this.worksheet.collaborativeEditing.onStartCheckLock();
 
-	// Main
+		// Комментарий к документу блокируем как Range
+		if ( !oComment.asc_getDocumentFlag() ) {
+			var c = oComment.asc_getCol();
+			var r = oComment.asc_getRow();
+			var c1, r1, c2, r2;
+			var mergedRange = model.getMergedByCell(r, c);
+			if (mergedRange) {
+				c1 = mergedRange.c1;
+				r1 = mergedRange.r1;
+				c2 = mergedRange.c2;
+				r2 = mergedRange.r2;
+			} else {
+				c1 = c2 = c;
+				r1 = r2 = r;
+			}
 
-	asc_showComment: function(id, bNew) {
+			lockInfo = this.worksheet.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null, sheetId, new Asc.asc_CCollaborativeRange(c1, r1, c2, r2));
+		} else
+			lockInfo = this.worksheet.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null, sheetId, objectGuid);
 
-		var _this = this;
-		var comment = _this.asc_findComment(id);
+		if (false === this.worksheet.collaborativeEditing.getCollaborativeEditing()) {
+			// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
+			Asc.applyFunction(callbackFunc, true);
+			callbackFunc = undefined;
+		}
+		if (false !== this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
+			// Редактируем сами
+			Asc.applyFunction(callbackFunc, true);
+			return;
+		}
+		else if (false !== this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
+			// Уже ячейку кто-то редактирует
+			Asc.applyFunction(callbackFunc, false);
+			return;
+		}
 
+		// Блокируем
+		if ( lockByDefault ) {
+			this.worksheet.collaborativeEditing.addCheckLock(lockInfo);
+			this.worksheet.collaborativeEditing.onEndCheckLock(callbackFunc);
+		}
+		else
+			Asc.applyFunction(callbackFunc, true);
+	}
+};
+CCellCommentator.prototype.callLockComments = function(range) {
+	if ( range ) {
+		for (var i = 0; i < this.aComments.length; i++) {
+			var comment = this.aComments[i];
+			if ( (comment.nCol >= range.c1) && (comment.nCol <= range.c2) && (comment.nRow >= range.r1) && (comment.nRow <= range.r2) )
+				this.worksheet.model.workbook.handlers.trigger("asc_onLockComment", comment.asc_getId(), comment.asc_getUserId());
+		}
+	}
+};
+
+CCellCommentator.prototype.unlockComments = function() {
+	for (var i = 0; i < this.aComments.length; i++) {
+		this.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", this.aComments[i].asc_getId());
+	}
+};
+
+CCellCommentator.prototype.tryUnlockComment = function(id) {
+	for (var i = 0; i < this.aComments.length; i++) {
+		if ( this.aComments[i].asc_getId() == id ) {
+			this.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", id);
+			break;
+		}
+	}
+};
+
+CCellCommentator.prototype.moveRangeComments = function(rangeFrom, rangeTo) {
+	if ( rangeFrom && rangeTo ) {
+		var colOffset = rangeTo.c1 - rangeFrom.c1;
+		var rowOffset = rangeTo.r1 - rangeFrom.r1;
+
+		this.worksheet.model.workbook.handlers.trigger("asc_onHideComment");
+
+		for (var i = 0; i < this.aComments.length; i++) {
+			var comment = this.aComments[i];
+
+			if ( (comment.nCol >= rangeFrom.c1) && (comment.nCol <= rangeFrom.c2) && (comment.nRow >= rangeFrom.r1) && (comment.nRow <= rangeFrom.r2) ) {
+
+				var commentBefore = new asc_CCommentData(comment);
+
+				comment.nCol += colOffset;
+				comment.nRow += rowOffset;
+				var cellAddress = new CellAddress(comment.nRow, comment.nCol, 0);
+				comment.sQuoteText = cellAddress.getID() + " : " + this.worksheet.model.getCell(cellAddress).getValueWithFormat();
+				this.worksheet.model.workbook.handlers.trigger("asc_onChangeCommentData", comment.asc_getId(), comment);
+
+				var commentAfter = new asc_CCommentData(comment);
+
+				var compositeComment = new CompositeCommentData();
+				compositeComment.commentBefore = commentBefore;
+				compositeComment.commentAfter = commentAfter;
+
+				History.Create_NewPoint();
+				History.Add(g_oUndoRedoComment, historyitem_Comment_Change, this.worksheet.model.getId(), null, compositeComment);
+			}
+		}
+	}
+};
+
+CCellCommentator.prototype.deleteCommentsRange = function(range) {
+	if ( range ) {
+		var aCommentId = [], i;
+		for (i = 0; i < this.aComments.length; ++i) {
+			var comment = this.aComments[i];
+			if ( (comment.nCol >= range.c1) && (comment.nCol <= range.c2) && (comment.nRow >= range.r1) && (comment.nRow <= range.r2) ) {
+				aCommentId.push(comment.asc_getId());
+			}
+		}
+		History.StartTransaction();
+		for (i = 0; i < aCommentId.length; i++) {
+			this.asc_removeComment(aCommentId[i]);
+		}
+		History.EndTransaction();
+	}
+};
+
+CCellCommentator.prototype.prepareComments = function(arrComments) {
+	var commentList = [];
+	for (var i = 0; i < arrComments.length; ++i) {
+		var comment = {"Id": arrComments[i].asc_getId(), "Comment": arrComments[i]};
+		this.addCommentSerialize(comment["Comment"]);
+		commentList.push(comment);
+	}
+	return commentList;
+};
+
+CCellCommentator.prototype.addCommentSerialize = function(oComment) {
+	if (oComment) {
+		if ( !oComment.bDocument && (oComment.nCol != null) && (oComment.nRow != null) ) {
+			var cellAddress = new CellAddress(oComment.nRow, oComment.nCol, 0);
+			oComment.sQuoteText = cellAddress.getID() + " : " + this.worksheet.model.getCell(cellAddress).getValueWithFormat();
+		}
+		this.aComments.push(oComment);
+	}
+};
+
+CCellCommentator.prototype.getCommentsXY = function(x, y) {
+	var findCol = this.worksheet._findColUnderCursor(this.pxToPt(x), true);
+	var findRow = this.worksheet._findRowUnderCursor(this.pxToPt(y), true);
+
+	return (findCol && findRow) ? this.asc_getComments(findCol.col, findRow.row) : [];
+};
+
+CCellCommentator.prototype.drawCommentCells = function() {
+
+	if ( this.isViewerMode() || !this.bShow )
+		return;
+
+	var drawCells = []; 	// Associative array
+	function getCellId(col, row) { return (col + "_" + row); }
+
+	for (var n = 0; n < this.worksheet.drawingArea.frozenPlaces.length; n++) {
+		var frozenPlace = this.worksheet.drawingArea.frozenPlaces[n];
+		var fv = frozenPlace.getFirstVisible();
+		var lvr = this.worksheet.getLastVisibleRow();
+		var lvc = this.worksheet.getLastVisibleCol();
+
+		for (var i = 0; i < this.aComments.length; i++) {
+			// Get cell metrics
+			var commentCell = this.aComments[i];
+			if (commentCell.asc_getDocumentFlag() || commentCell.asc_getHiddenFlag() || commentCell.asc_getSolved())
+				continue;
+
+			var mergedRange = this.worksheet.model.getMergedByCell(commentCell.nRow, commentCell.nCol);
+			var drawCol = mergedRange ? mergedRange.c2 : commentCell.nCol;
+			var drawRow = mergedRange ? mergedRange.r1 : commentCell.nRow;
+			if (drawCol < fv.col || drawRow < fv.row || drawCol > lvc || drawRow > lvr)
+				continue;
+
+			if ( !frozenPlace.isCellInside({ col: drawCol, row: drawRow }) )
+				continue;
+
+			var cellId = getCellId(commentCell.nCol, commentCell.nRow);
+			if (drawCells[cellId])
+				continue;
+
+			var metrics = this.getCellMetrics(drawCol, drawRow);
+			if ( !metrics.result || (metrics.width <= 0) || (metrics.height <= 0) )
+				continue;
+
+			this.drawingCtx.beginPath();
+			this.drawingCtx.setFillStyle(this.commentIconColor);
+
+			this.drawingCtx.moveTo(metrics.left + metrics.width - this.pxToPt(7), metrics.top);
+			this.drawingCtx.lineTo(metrics.left + metrics.width - this.pxToPt(1), metrics.top);
+			this.drawingCtx.lineTo(metrics.left + metrics.width - this.pxToPt(1), metrics.top + this.pxToPt(6));
+			this.drawingCtx.closePath();
+			this.drawingCtx.fill();
+
+			drawCells[cellId] = cellId;
+		}
+	}
+	//if (this.lastSelectedId)
+	//	this.asc_selectComment(this.lastSelectedId, false);
+};
+
+CCellCommentator.prototype.getTextMetrics = function(text, units) {
+	var metrics = { width: 0, height: 0 };
+
+	if (text && text.length && ((typeof (text) == 'string') || (typeof (text) == 'number'))) {
+		var textOptions = this.overlayCtx.measureText(text, units);
+		metrics.width = textOptions.width;
+		metrics.height = textOptions.lineHeight;
+	}
+	return metrics;
+};
+
+CCellCommentator.prototype.getCellMetrics = function(col, row) {
+	var metrics = { top: 0, left: 0, width: 0, height: 0, result: false }; 	// px
+
+	for (var n = 0; n < this.worksheet.drawingArea.frozenPlaces.length; n++) {
+		var frozenPlace = this.worksheet.drawingArea.frozenPlaces[n];
+		if ( !frozenPlace.isCellInside({ col: col, row: row }) )
+			continue;
+
+		var fv = frozenPlace.getFirstVisible();
+		var mergedRange = this.worksheet.model.getMergedByCell(row, col);
+
+		if (mergedRange && (fv.col < mergedRange.c2) && (fv.row < mergedRange.r2)) {
+
+			var startCol = (mergedRange.c1 > fv.col) ? mergedRange.c1 : fv.col;
+			var startRow = (mergedRange.r1 > fv.row) ? mergedRange.r1 : fv.row;
+
+			metrics.top = this.worksheet.getCellTop(startRow, 1) /*- this.worksheet.getCellTop(fv.row, 1) + this.worksheet.getCellTop(0, 1)*/ + this.pxToPt(frozenPlace.getVerticalScroll()) - this.worksheet.getCellTop(0, 1);
+			metrics.left = this.worksheet.getCellLeft(startCol, 1) /*- this.worksheet.getCellLeft(fv.col, 1) + this.worksheet.getCellLeft(0, 1)*/ + this.pxToPt(frozenPlace.getHorizontalScroll()) - this.worksheet.getCellLeft(0, 1);
+
+			var i;
+			for (i = startCol; i <= mergedRange.c2; i++) {
+				metrics.width += this.worksheet.getColumnWidth(i, 1)
+			}
+			for (i = startRow; i <= mergedRange.r2; i++) {
+				metrics.height += this.worksheet.getRowHeight(i, 1)
+			}
+			metrics.result = true;
+		}
+		else if ((fv.row <= row) && (fv.col <= col)) {
+
+			metrics.top = this.worksheet.getCellTop(row, 1) /*- this.worksheet.getCellTop(fv.row, 1) + this.worksheet.getCellTop(0, 1)*/ + this.pxToPt(frozenPlace.getVerticalScroll()) - this.worksheet.getCellTop(0, 1);
+			metrics.left = this.worksheet.getCellLeft(col, 1) /*- this.worksheet.getCellLeft(fv.col, 1) + this.worksheet.getCellLeft(0, 1)*/ + this.pxToPt(frozenPlace.getHorizontalScroll()) - this.worksheet.getCellLeft(0, 1);
+			metrics.width = this.worksheet.getColumnWidth(col, 1);
+			metrics.height = this.worksheet.getRowHeight(row, 1);
+			metrics.result = true;
+		}
+	}
+
+	return metrics;
+};
+
+CCellCommentator.prototype.updateCommentPosition = function() {
+	if (this.lastSelectedId) {
+		var comment = this.asc_findComment(this.lastSelectedId);
 		if (comment) {
-			
-			var callbackFunc = function(result) {
-			
-				if ( !result )
-					_this.worksheet.model.workbook.handlers.trigger("asc_onLockComment", comment.asc_getId(), comment.asc_getUserId());
-				else
-					_this.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", comment.asc_getId());
-				
-				var commentList = _this.asc_getComments(comment.asc_getCol(), comment.asc_getRow());
-				var coords = _this.getCommentsCoords(commentList);
+
+			var commentList = this.asc_getComments(comment.asc_getCol(), comment.asc_getRow());
+			if (commentList.length) {
+
+				this.drawCommentCells();
+				var coords = this.getCommentsCoords(commentList);
 
 				var indexes = [];
 				for (var i = 0; i < commentList.length; i++) {
 					indexes.push(commentList[i].asc_getId());
 				}
+				var metrics = this.getCellMetrics(comment.asc_getCol(), comment.asc_getRow());
 
-				// Second click - hide comment
-				if (indexes.length) {
-					if ( _this.lastSelectedId != id )
-						_this.worksheet.model.workbook.handlers.trigger("asc_onHideComment");
-					
-					_this.worksheet.model.workbook.handlers.trigger("asc_onShowComment", indexes, coords.asc_getLeftPX(), coords.asc_getTopPX(), coords.asc_getReverseLeftPX(), bNew);
-					_this.drawCommentCells();
-				}
-				_this.lastSelectedId = id;
-			};
-			
-			_this.isLockedComment(comment, false, callbackFunc);
-		}
-		else
-			_this.lastSelectedId = null;
-	},
-
-	asc_selectComment: function(id, bMove) {
-
-		var _this = this;
-		var comment = _this.asc_findComment(id);
-		
-		// Чистим предыдущий селект
-		_this.cleanLastSelection();
-		_this.lastSelectedId = null;
-
-		if (comment && !comment.asc_getDocumentFlag() && !comment.asc_getSolved()) {
-			
-			_this.lastSelectedId = id;
-			
-			var col = comment.asc_getCol();
-			var row = comment.asc_getRow();
-			var fvc = _this.worksheet.getFirstVisibleCol(true);
-			var fvr = _this.worksheet.getFirstVisibleRow(true);
-			var lvc = _this.worksheet.getLastVisibleCol();
-			var lvr = _this.worksheet.getLastVisibleRow();
-
-			var offset;
-			if ( bMove ) {
-				if ( (row < fvr) || (row > lvr) ) {
-					offset = row - fvr - Math.round(( lvr - fvr ) / 2);
-					_this.worksheet.scrollVertical(offset);
-					_this.worksheet.handlers.trigger("reinitializeScrollY");
-				}
-				if ( (col < fvc) || (col > lvc) ) {
-					offset = col - fvc - Math.round(( lvc - fvc ) / 2);
-					_this.worksheet.scrollHorizontal(offset);
-					_this.worksheet.handlers.trigger("reinitializeScrollX");
-				}
-			}
-			
-			var metrics = _this.getCellMetrics(col, row);
-			if (metrics.result) {
-				var extraOffset = _this.pxToPt(1);
-				_this.overlayCtx.ctx.globalAlpha = 0.2;
-				_this.overlayCtx.beginPath();
-				_this.overlayCtx.clearRect(metrics.left, metrics.top, metrics.width - extraOffset, metrics.height - extraOffset);
-				_this.overlayCtx.setFillStyle(_this.commentFillColor);
-				_this.overlayCtx.fillRect(metrics.left, metrics.top, metrics.width - extraOffset, metrics.height - extraOffset);
-				_this.overlayCtx.ctx.globalAlpha = 1;
+				this.worksheet.model.workbook.handlers.trigger( "asc_onUpdateCommentPosition", indexes,
+					(metrics.result ? coords.asc_getLeftPX() : -1),
+					(metrics.result ? coords.asc_getTopPX() : -1),
+					(metrics.result ? coords.asc_getReverseLeftPX() : -1) );
 			}
 		}
-	},
+	}
+};
 
-	asc_findComment: function(id) {
+CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operType, updateRange) {
+	var t = this;
+	var UpdatePair = function(comment, bChange) {
+		this.comment = comment;
+		this.bChange = bChange;
+	};
+	var aChangedComments = [];		// Array of UpdatePair
 
-		var _this = this;
+	function updateCommentsList(aComments) {
+		if ( aComments.length ) {
 
-		function checkCommentId(id, commentObject) {
+			t.bSaveHistory = false;
+			var changeArray = [];
+			var removeArray = [];
 
-			if (commentObject.asc_getId() == id)
-				return commentObject;
-
-			for (var i = 0; i < commentObject.aReplies.length; i++) {
-				var comment = checkCommentId(id, commentObject.aReplies[i]);
-				if (comment)
-					return comment;
+			for (var i = 0; i < aComments.length; i++) {
+				if ( aComments[i].bChange ) {
+					t.asc_changeComment(aComments[i].comment.asc_getId(), aComments[i].comment, /*bChangeCoords*/true, /*bNoEvent*/true);
+					changeArray.push({"Id": aComments[i].comment.asc_getId(), "Comment": aComments[i].comment});
+				}
+				else {
+					t.asc_removeComment(aComments[i].comment.asc_getId(), /*bNoEvent*/true);
+					removeArray.push(aComments[i].comment.asc_getId());
+				}
 			}
-			return null;
+
+			if ( changeArray.length )
+				t.worksheet.model.workbook.handlers.trigger("asc_onChangeComments", changeArray);
+			if ( removeArray.length )
+				t.worksheet.model.workbook.handlers.trigger("asc_onRemoveComments", removeArray);
+
+			t.bSaveHistory = true;
+			t.drawCommentCells();
+		}
+	}
+
+	var i, comment;
+	if ( bInsert ) {
+		switch (operType) {
+
+			case c_oAscInsertOptions.InsertCellsAndShiftDown: {
+				for (i = 0; i < this.aComments.length; i++) {
+					comment = new asc_CCommentData(this.aComments[i]);
+					if ( (comment.nRow >= updateRange.r1) && (comment.nCol >= updateRange.c1) && (comment.nCol <= updateRange.c2) ) {
+						comment.nRow += updateRange.r2 - updateRange.r1 + 1;
+						aChangedComments.push( new UpdatePair(comment, true) );
+					}
+				}
+				updateCommentsList(aChangedComments);
+			}
+				break;
+
+			case c_oAscInsertOptions.InsertCellsAndShiftRight: {
+				for (i = 0; i < this.aComments.length; i++) {
+					comment = new asc_CCommentData(this.aComments[i]);
+					if ( (comment.nCol >= updateRange.c1) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2) ) {
+						comment.nCol += updateRange.c2 - updateRange.c1 + 1;
+						aChangedComments.push( new UpdatePair(comment, true) );
+					}
+				}
+				updateCommentsList(aChangedComments);
+			}
+				break;
+
+			case c_oAscInsertOptions.InsertColumns: {
+				for (i = 0; i < this.aComments.length; i++) {
+					comment = new asc_CCommentData(this.aComments[i]);
+					if (comment.nCol >= updateRange.c1) {
+						comment.nCol += updateRange.c2 - updateRange.c1 + 1;
+						aChangedComments.push( new UpdatePair(comment, true) );
+					}
+				}
+				updateCommentsList(aChangedComments);
+			}
+				break;
+
+			case c_oAscInsertOptions.InsertRows: {
+				for (i = 0; i < this.aComments.length; i++) {
+					comment = new asc_CCommentData(this.aComments[i]);
+					if (comment.nRow >= updateRange.r1) {
+						comment.nRow += updateRange.r2 - updateRange.r1 + 1;
+						aChangedComments.push( new UpdatePair(comment, true) );
+					}
+				}
+				updateCommentsList(aChangedComments);
+			}
+				break;
+		}
+	}
+	else {
+		switch (operType) {
+
+			case "deleteAllComments": {
+				for (i = 0; i < this.aComments.length; i++) {
+					comment = new asc_CCommentData(this.aComments[i]);
+					if ( (updateRange.c1 <= comment.nCol) && (updateRange.c2 >= comment.nCol) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2) ) {
+						aChangedComments.push( new UpdatePair(comment, false) );
+					}
+				}
+				updateCommentsList(aChangedComments);
+			}
+				break;
+
+			case c_oAscDeleteOptions.DeleteCellsAndShiftTop: {
+				for (i = 0; i < this.aComments.length; i++) {
+					comment = new asc_CCommentData(this.aComments[i]);
+					if ( (comment.nRow > updateRange.r1) && (comment.nCol >= updateRange.c1) && (comment.nCol <= updateRange.c2) ) {
+						comment.nRow -= updateRange.r2 - updateRange.r1 + 1;
+						aChangedComments.push( new UpdatePair(comment, true) );
+					}
+					else if ( (updateRange.c1 <= comment.nCol) && (updateRange.c2 >= comment.nCol) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2) ) {
+						aChangedComments.push( new UpdatePair(comment, false) );
+					}
+				}
+				updateCommentsList(aChangedComments);
+			}
+				break;
+
+			case c_oAscDeleteOptions.DeleteCellsAndShiftLeft: {
+				for (i = 0; i < this.aComments.length; i++) {
+					comment = new asc_CCommentData(this.aComments[i]);
+					if ( (comment.nCol > updateRange.c2) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2) ) {
+						comment.nCol -= updateRange.c2 - updateRange.c1 + 1;
+						aChangedComments.push( new UpdatePair(comment, true) );
+					}
+					else if ( (updateRange.c1 <= comment.nCol) && (updateRange.c2 >= comment.nCol) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2) ) {
+						aChangedComments.push( new UpdatePair(comment, false) );
+					}
+				}
+				updateCommentsList(aChangedComments);
+			}
+				break;
+
+			case c_oAscDeleteOptions.DeleteColumns: {
+				for (i = 0; i < this.aComments.length; i++) {
+					comment = new asc_CCommentData(this.aComments[i]);
+					if (comment.nCol > updateRange.c2) {
+						comment.nCol -= updateRange.c2 - updateRange.c1 + 1;
+						aChangedComments.push( new UpdatePair(comment, true) );
+					}
+					else if ( (updateRange.c1 <= comment.nCol) && (updateRange.c2 >= comment.nCol) ) {
+						aChangedComments.push( new UpdatePair(comment, false) );
+					}
+				}
+				updateCommentsList(aChangedComments);
+			}
+				break;
+
+			case c_oAscDeleteOptions.DeleteRows: {
+				for (i = 0; i < this.aComments.length; i++) {
+					comment = new asc_CCommentData(this.aComments[i]);
+					if (comment.nRow > updateRange.r2) {
+						comment.nRow -= updateRange.r2 - updateRange.r1 + 1;
+						aChangedComments.push( new UpdatePair(comment, true) );
+					}
+					else if ( (updateRange.r1 <= comment.nRow) && (updateRange.r2 >= comment.nRow) ) {
+						aChangedComments.push( new UpdatePair(comment, false) );
+					}
+				}
+				updateCommentsList(aChangedComments);
+			}
+				break;
+		}
+	}
+};
+
+CCellCommentator.prototype.showHideComments = function(bHide, bColumn, start, stop) {
+
+	var t = this;
+	var aChangedComments = [];
+
+	function updateCommentsList(aComments) {
+		if ( aComments.length ) {
+
+			History.StartTransaction();
+			for (var i = 0; i < aComments.length; i++) {
+				this.asc_changeComment(aComments[i].asc_getId(), aComments[i]);
+			}
+			History.EndTransaction();
+			t.drawCommentCells();
+		}
+	}
+
+
+	for (var i = 0; i < this.aComments.length; i++) {
+		var comment = new asc_CCommentData(this.aComments[i]);
+
+		if ( bColumn ) {
+			if ( (comment.nCol >= start) && (comment.nCol <= stop) ) {
+				comment.asc_putHiddenFlag(bHide);
+				aChangedComments.push(comment);
+			}
+		}
+		else {
+			if ( (comment.nRow >= start) && (comment.nRow <= stop) ) {
+				comment.asc_putHiddenFlag(bHide);
+				aChangedComments.push(comment);
+			}
+		}
+	}
+	updateCommentsList(aChangedComments);
+};
+
+CCellCommentator.prototype.sortComments = function(activeRange, changes) {
+	var t = this;
+
+	if (changes && activeRange) {
+
+		var updateCommentsList = function(aComments) {
+			if ( aComments.length ) {
+				History.StartTransaction();
+
+				for (var i = 0; i < aComments.length; i++) {
+					this.asc_changeComment(aComments[i].asc_getId(), aComments[i], true);
+				}
+
+				History.EndTransaction();
+				t.drawCommentCells();
+			}
+		};
+
+		var aChangedComments = [];
+		for (var i = 0; i < changes.places.length; i++) {
+
+			var list = this.asc_getComments(activeRange.c1, changes.places[i].from);
+			for (var j = 0; j < list.length; j++) {
+				var comment = new asc_CCommentData(list[j]);
+				comment.nRow = changes.places[i].to;
+				aChangedComments.push(comment);
+			}
+		}
+		updateCommentsList(aChangedComments);
+	}
+};
+
+CCellCommentator.prototype.resetLastSelectedId = function() {
+	this.cleanLastSelection();
+	this.lastSelectedId = null;
+};
+
+CCellCommentator.prototype.cleanLastSelection = function() {
+	if ( this.lastSelectedId ) {
+		var lastComment = this.asc_findComment(this.lastSelectedId);
+		if ( lastComment ) {
+			var lastMetrics = this.getCellMetrics(lastComment.nCol, lastComment.nRow);
+			if ( lastMetrics.result ) {
+				var extraOffset = this.pxToPt(1);
+				this.overlayCtx.clearRect(lastMetrics.left, lastMetrics.top, lastMetrics.width - extraOffset, lastMetrics.height - extraOffset);
+			}
+		}
+	}
+};
+
+CCellCommentator.prototype.calcCommentsCoords = function(bSave) {
+
+	this.aCommentCoords = [];
+
+	for (var i = 0; i < this.aComments.length; i++) {
+
+		var commentCell = this.aComments[i];
+		if (commentCell.asc_getDocumentFlag() || !this.commentCoordsExist(commentCell.asc_getCol(), commentCell.asc_getRow())) {
+
+			var commentList = this.asc_getComments(commentCell.asc_getCol(), commentCell.asc_getRow());
+
+			// Calculate coords for document comments
+			if (bSave && (commentCell.asc_getCol() == 0) && (commentCell.asc_getRow() == 0)) {
+				var documentComments = this.asc_getDocumentComments();
+				for (var j = 0; j < documentComments.length; j++) {
+					commentList.push(documentComments[j]);
+				}
+			}
+
+			if (commentList.length)
+				this.aCommentCoords.push(this.getCommentsCoords(commentList));
+		}
+	}
+};
+
+CCellCommentator.prototype.getCommentsCoords = function(comments) {
+
+	// bWithScroll - учитывать вертикальный и горизонтальный скроллы
+
+	var t = this;
+	var coords = new asc_CCommentCoords();
+
+	function calcCommentArea(comment, coords) {
+
+		/*	User name
+		 *	Time
+		 *	Text
+		 */
+
+		var originalFont = t.overlayCtx.getFont();
+		var outputFont = originalFont.clone();
+
+		// Set to bold
+		outputFont.Bold = true;
+		outputFont.FontSize = 9;
+		t.overlayCtx.setFont(outputFont);
+
+		// Title
+		var txtMetrics = t.getTextMetrics(comment.sUserName, 1);
+		coords.dHeightPX += t.ptToPx(txtMetrics.height);
+		var userWidth = t.ptToPx(txtMetrics.width);
+
+		if (coords.dWidthPX < userWidth)
+			coords.dWidthPX = userWidth;
+
+		txtMetrics = t.getTextMetrics(comment.sTime, 1);
+		coords.dHeightPX += t.ptToPx(txtMetrics.height);
+		var timeWidth = t.ptToPx(txtMetrics.width);
+
+		if (coords.dWidthPX < timeWidth)
+			coords.dWidthPX = timeWidth;
+
+		// Set to normal
+		outputFont.Bold = false;
+		outputFont.FontSize = 9;
+		t.overlayCtx.setFont(outputFont);
+
+		// Comment text
+		var commentSpl = comment.sText.split('\n'), i;
+		for (i = 0; i < commentSpl.length; i++) {
+
+			txtMetrics = t.getTextMetrics(commentSpl[i], 1);
+			coords.dHeightPX += t.ptToPx(txtMetrics.height);
+			var lineWidth = t.ptToPx(txtMetrics.width);
+			if (coords.dWidthPX < lineWidth)
+				coords.dWidthPX = lineWidth;
 		}
 
-		for (var i = 0; i < _this.aComments.length; i++) {
-			var commentCell = _this.aComments[i];
-			var obj = checkCommentId(id, commentCell);
-			if (obj)
-				return obj;
+		for (i = 0; i < comment.aReplies.length; i++) {
+			calcCommentArea(comment.aReplies[i], coords);
+		}
+
+		// Min values
+		if (coords.dWidthPX < t.minAreaWidth)
+			coords.dWidthPX = t.minAreaWidth;
+
+		if (coords.dHeightPX < t.minAreaHeight)
+			coords.dHeightPX = t.minAreaHeight;
+
+		// Calc other coords
+		coords.dWidthMM = t.pxToMm(coords.dWidthPX);
+		coords.dHeightMM = t.pxToMm(coords.dHeightPX);
+
+		var headerRowOffPx = t.worksheet.getCellTop(0, 0);
+		var headerColOffPx = t.worksheet.getCellLeft(0, 0);
+
+		coords.nCol = comment.nCol;
+		coords.nRow = comment.nRow;
+
+		var mergedRange = t.worksheet.model.getMergedByCell(comment.nRow, comment.nCol);
+
+		coords.nLeft = (mergedRange ? mergedRange.c2 : comment.nCol) + 1;
+		if ( !t.worksheet.cols[coords.nLeft] ) {
+			t.worksheet.expandColsOnScroll(true);
+			t.worksheet.handlers.trigger("reinitializeScrollX");
+		}
+
+		coords.nTop = mergedRange ? mergedRange.r1 : comment.nRow;
+		coords.nLeftOffset = 0;
+		coords.nTopOffset = 0;
+
+		var fvr = t.worksheet.getFirstVisibleRow(true);
+		var fvc = t.worksheet.getFirstVisibleCol(true);
+
+		var frozenOffset = t.getFrozenOffset();
+		if ( t.worksheet.topLeftFrozenCell ) {
+			if ( comment.nCol >= t.worksheet.getFirstVisibleCol(false) )
+				frozenOffset.offsetX = 0;
+			if ( comment.nRow >= t.worksheet.getFirstVisibleRow(false) )
+				frozenOffset.offsetY = 0;
+		}
+
+		// Tooltip coords
+		coords.dReverseLeftPX = t.worksheet.getCellLeft(comment.nCol, 0) - t.worksheet.getCellLeft(fvc, 0) + headerColOffPx + t.ptToPx(frozenOffset.offsetX);
+		coords.dLeftPX = t.worksheet.getCellLeft(coords.nLeft, 0) - t.worksheet.getCellLeft(fvc, 0) + headerColOffPx + t.ptToPx(frozenOffset.offsetX);
+		coords.dTopPX = t.worksheet.getCellTop(coords.nTop, 0) - t.worksheet.getCellTop(fvr, 0) + headerRowOffPx + t.ptToPx(frozenOffset.offsetY);
+
+		// Correction for merged cell
+		var fvrPx = t.worksheet.getCellTop(0, 0);
+		if (coords.dTopPX < fvrPx)
+			coords.dTopPX = fvrPx;
+
+		coords.dLeftMM = t.worksheet.getCellLeft(coords.nLeft, 3) - t.worksheet.getCellLeft(fvc, 3);
+		coords.dTopMM = t.worksheet.getCellTop(coords.nTop, 3) - t.worksheet.getCellTop(fvr, 3);
+
+		var findCol = t.worksheet._findColUnderCursor(t.worksheet.getCellLeft(coords.nLeft, 1) + t.pxToPt(coords.dWidthPX + headerColOffPx) - t.worksheet.getCellLeft(fvc, 1), true);
+		var findRow = t.worksheet._findRowUnderCursor(t.worksheet.getCellTop(coords.nTop, 1) + t.pxToPt(coords.dHeightPX + headerRowOffPx) - t.worksheet.getCellTop(fvr, 1), true);
+
+		coords.nRight = findCol ? findCol.col : 0;
+		coords.nBottom = findRow ? findRow.row : 0;
+
+		coords.nRightOffset = t.worksheet.getCellLeft(coords.nLeft, 0) + coords.nLeftOffset + coords.dWidthPX + headerColOffPx - t.worksheet.getCellLeft(coords.nRight, 0);
+		coords.nBottomOffset = t.worksheet.getCellTop(coords.nTop, 0) + coords.nTopOffset + coords.dHeightPX + headerRowOffPx - t.worksheet.getCellTop(coords.nBottom, 0);
+
+		// Return original font
+		t.overlayCtx.setFont(originalFont);
+	}
+
+	for (var i = 0; i < comments.length; i++) {
+		calcCommentArea(comments[i], coords);
+	}
+
+	if (comments.length) {
+		coords.dWidthPX += this.commentPadding * 2;
+		coords.dWidthMM = this.pxToMm(coords.dWidthPX);
+
+		coords.dHeightPX += this.commentPadding * 2;
+		coords.dHeightMM = this.pxToMm(coords.dHeightPX);
+	}
+
+	return coords;
+};
+
+CCellCommentator.prototype.commentCoordsExist = function(col, row) {
+
+	var result = false;
+	for (var i = 0; i < this.aCommentCoords.length; i++) {
+		if ((col == this.aCommentCoords[i].nCol) && (row == this.aCommentCoords[i].nRow))
+			return true;
+	}
+	return result;
+};
+
+CCellCommentator.prototype.prepareCommentsToSave = function() {
+
+	/*	Calculate the coords of comments for:
+	 *	first visible col = 0
+	 *	first visible row = 0
+	 *	+ document comments -> A1
+	 */
+
+	this.calcCommentsCoords(true);
+};
+
+CCellCommentator.prototype.cleanSelectedComment = function() {
+	if ( this.lastSelectedId ) {
+		var comment = this.asc_findComment(this.lastSelectedId);
+		if ( comment && !comment.asc_getDocumentFlag() && !comment.asc_getSolved() ) {
+			var metrics = this.getCellMetrics(comment.asc_getCol(), comment.asc_getRow());
+			if (metrics.result)
+				this.overlayCtx.clearRect(metrics.left, metrics.top, metrics.width, metrics.height);
+		}
+	}
+};
+
+CCellCommentator.prototype.getFrozenOffset = function() {
+
+	var offsetX = 0, offsetY = 0, cFrozen = 0, rFrozen = 0, diffWidth = 0, diffHeight = 0;
+	if ( this.worksheet.topLeftFrozenCell ) {
+		cFrozen = this.worksheet.topLeftFrozenCell.getCol0();
+		rFrozen = this.worksheet.topLeftFrozenCell.getRow0();
+		diffWidth = this.worksheet.cols[cFrozen].left - this.worksheet.cols[0].left;
+		diffHeight = this.worksheet.rows[rFrozen].top - this.worksheet.rows[0].top;
+
+		offsetX = this.worksheet.cols[this.worksheet.visibleRange.c1].left - this.worksheet.cellsLeft - diffWidth;
+		offsetY = this.worksheet.rows[this.worksheet.visibleRange.r1].top - this.worksheet.cellsTop - diffHeight;
+	}
+	return { offsetX: offsetX, offsetY: offsetY };
+};
+
+//-----------------------------------------------------------------------------------
+// Misc methods
+//-----------------------------------------------------------------------------------
+
+CCellCommentator.prototype.pxToPt = function(val) {
+	return val * this.ascCvtRatio(0, 1);
+};
+
+CCellCommentator.prototype.ptToPx = function(val) {
+	return val * this.ascCvtRatio(1, 0);
+};
+
+CCellCommentator.prototype.mmToPx = function(val) {
+	return val * this.ascCvtRatio(3, 0);
+};
+
+CCellCommentator.prototype.pxToMm = function(val) {
+	return val * this.ascCvtRatio(0, 3);
+};
+
+CCellCommentator.prototype.ascCvtRatio = function(fromUnits, toUnits) {
+	return Asc.getCvtRatio(fromUnits, toUnits, this.overlayCtx.getPPIX());
+};
+
+// Show/Hide
+CCellCommentator.prototype.asc_showComments = function() {
+	if ( !this.bShow ) {
+		this.bShow = true;
+		this.drawCommentCells();
+	}
+};
+
+CCellCommentator.prototype.asc_hideComments = function() {
+	this.bShow = false;
+	this.drawCommentCells();
+	this.worksheet.model.workbook.handlers.trigger("asc_onHideComment");
+};
+
+// Main
+
+CCellCommentator.prototype.asc_showComment = function(id, bNew) {
+
+	var t = this;
+	var comment = this.asc_findComment(id);
+
+	if (comment) {
+
+		var callbackFunc = function(result) {
+
+			if ( !result )
+				t.worksheet.model.workbook.handlers.trigger("asc_onLockComment", comment.asc_getId(), comment.asc_getUserId());
+			else
+				t.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", comment.asc_getId());
+
+			var commentList = t.asc_getComments(comment.asc_getCol(), comment.asc_getRow());
+			var coords = t.getCommentsCoords(commentList);
+
+			var indexes = [];
+			for (var i = 0; i < commentList.length; i++) {
+				indexes.push(commentList[i].asc_getId());
+			}
+
+			// Second click - hide comment
+			if (indexes.length) {
+				if ( t.lastSelectedId != id )
+					t.worksheet.model.workbook.handlers.trigger("asc_onHideComment");
+
+				t.worksheet.model.workbook.handlers.trigger("asc_onShowComment", indexes, coords.asc_getLeftPX(), coords.asc_getTopPX(), coords.asc_getReverseLeftPX(), bNew);
+				t.drawCommentCells();
+			}
+			t.lastSelectedId = id;
+		};
+
+		t.isLockedComment(comment, false, callbackFunc);
+	}
+	else
+		t.lastSelectedId = null;
+};
+
+CCellCommentator.prototype.asc_selectComment = function(id, bMove) {
+	var comment = this.asc_findComment(id);
+
+	// Чистим предыдущий селект
+	this.cleanLastSelection();
+	this.lastSelectedId = null;
+
+	if (comment && !comment.asc_getDocumentFlag() && !comment.asc_getSolved()) {
+
+		this.lastSelectedId = id;
+
+		var col = comment.asc_getCol();
+		var row = comment.asc_getRow();
+		var fvc = this.worksheet.getFirstVisibleCol(true);
+		var fvr = this.worksheet.getFirstVisibleRow(true);
+		var lvc = this.worksheet.getLastVisibleCol();
+		var lvr = this.worksheet.getLastVisibleRow();
+
+		var offset;
+		if ( bMove ) {
+			if ( (row < fvr) || (row > lvr) ) {
+				offset = row - fvr - Math.round(( lvr - fvr ) / 2);
+				this.worksheet.scrollVertical(offset);
+				this.worksheet.handlers.trigger("reinitializeScrollY");
+			}
+			if ( (col < fvc) || (col > lvc) ) {
+				offset = col - fvc - Math.round(( lvc - fvc ) / 2);
+				this.worksheet.scrollHorizontal(offset);
+				this.worksheet.handlers.trigger("reinitializeScrollX");
+			}
+		}
+
+		var metrics = this.getCellMetrics(col, row);
+		if (metrics.result) {
+			var extraOffset = this.pxToPt(1);
+			this.overlayCtx.ctx.globalAlpha = 0.2;
+			this.overlayCtx.beginPath();
+			this.overlayCtx.clearRect(metrics.left, metrics.top, metrics.width - extraOffset, metrics.height - extraOffset);
+			this.overlayCtx.setFillStyle(this.commentFillColor);
+			this.overlayCtx.fillRect(metrics.left, metrics.top, metrics.width - extraOffset, metrics.height - extraOffset);
+			this.overlayCtx.ctx.globalAlpha = 1;
+		}
+	}
+};
+
+CCellCommentator.prototype.asc_findComment = function(id) {
+	function checkCommentId(id, commentObject) {
+
+		if (commentObject.asc_getId() == id)
+			return commentObject;
+
+		for (var i = 0; i < commentObject.aReplies.length; i++) {
+			var comment = checkCommentId(id, commentObject.aReplies[i]);
+			if (comment)
+				return comment;
 		}
 		return null;
-	},
+	}
 
-	asc_addComment: function(comment, bIsNotUpdate) {
+	for (var i = 0; i < this.aComments.length; i++) {
+		var commentCell = this.aComments[i];
+		var obj = checkCommentId(id, commentCell);
+		if (obj)
+			return obj;
+	}
+	return null;
+};
 
-		var _this = this;
-		var oComment = comment;
-		var bChange = false;
-		oComment.wsId = _this.worksheet.model.getId();
-		oComment.setId();
+CCellCommentator.prototype.asc_addComment = function(comment, bIsNotUpdate) {
 
-		if (!oComment.bDocument) {
-			if (!bIsNotUpdate) {
-				oComment.asc_putCol(_this.worksheet.getSelectedColumnIndex());
-				oComment.asc_putRow(_this.worksheet.getSelectedRowIndex());
-			}
+	var t = this;
+	var oComment = comment;
+	var bChange = false;
+	oComment.wsId = this.worksheet.model.getId();
+	oComment.setId();
 
-			var existComments = _this.asc_getComments(oComment.nCol, oComment.nRow);
-			if ( existComments.length ) {
-				oComment = existComments[0];
-				bChange = true;
-			}
-			else {
-				if ((oComment.nCol != null) && (oComment.nRow != null)) {
-					var cellAddress = new CellAddress(oComment.nRow, oComment.nCol, 0);
-					oComment.sQuoteText = cellAddress.getID() + " : " + _this.worksheet.model.getCell(cellAddress).getValueWithFormat();
-				}
-			}
-		}
-		
-		function callbackFunc(result) {
-			if ( !result ) {
-				_this.worksheet.model.workbook.handlers.trigger("asc_onLockComment", oComment.asc_getId(), oComment.asc_getUserId());
-			}
-			else {
-				_this.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", oComment.asc_getId());
-				
-				// Add new comment
-				if ( !bChange ) {
-					History.Create_NewPoint();
-					History.Add(g_oUndoRedoComment, historyitem_Comment_Add, _this.worksheet.model.getId(), null, new asc_CCommentData(oComment));
-
-					_this.aComments.push(oComment);
-
-					if (!bIsNotUpdate)
-						_this.drawCommentCells();
-				}
-				_this.worksheet.model.workbook.handlers.trigger("asc_onAddComment", oComment.asc_getId(), oComment);
-			}
+	if (!oComment.bDocument) {
+		if (!bIsNotUpdate) {
+			oComment.asc_putCol(this.worksheet.getSelectedColumnIndex());
+			oComment.asc_putRow(this.worksheet.getSelectedRowIndex());
 		}
 
-		if (bIsNotUpdate)
-			callbackFunc(true);
-		else
-			_this.isLockedComment(oComment, true, callbackFunc);
-	},
-
-	asc_changeComment: function(id, oComment, bChangeCoords, bNoEvent) {
-
-		var _this = this;
-		var comment = _this.asc_findComment(id);
-		if (null === comment)
-			return;
-		
-		function callbackFunc(result) {
-			if ( !result ) {
-				_this.worksheet.model.workbook.handlers.trigger("asc_onLockComment", comment.asc_getId(), comment.asc_getUserId());
-			} else {
-				_this.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", comment.asc_getId());
-				
-				var commentBefore = new asc_CCommentData(comment);
-				if (comment) {
-					if ( bChangeCoords ) {
-						comment.asc_putCol(oComment.asc_getCol());
-						comment.asc_putRow(oComment.asc_getRow());
-					}
-					comment.asc_putText(oComment.asc_getText());
-					comment.asc_putQuoteText(oComment.asc_getQuoteText());
-					comment.asc_putUserId(oComment.asc_getUserId());
-					comment.asc_putUserName(oComment.asc_getUserName());
-					comment.asc_putTime(oComment.asc_getTime());
-					comment.asc_putSolved(oComment.asc_getSolved());
-					comment.asc_putHiddenFlag(oComment.asc_getHiddenFlag());
-					comment.aReplies = [];
-					
-					if ( !comment.bDocument && (comment.nCol != null) && (comment.nRow != null) ) {
-						var cellAddress = new CellAddress(comment.nRow, comment.nCol, 0);
-						comment.sQuoteText = cellAddress.getID() + " : " + _this.worksheet.model.getCell(cellAddress).getValueWithFormat();
-					}
-
-					var count = oComment.asc_getRepliesCount();
-					for (var i = 0; i < count; i++) {
-						comment.asc_addReply(oComment.asc_getReply(i));
-					}
-					if ( !bNoEvent )
-						_this.worksheet.model.workbook.handlers.trigger("asc_onChangeCommentData", comment.asc_getId(), comment);
-				}
-
-				if ( _this.bSaveHistory ) {
-					var commentAfter = new asc_CCommentData(comment);
-
-					var compositeComment = new CompositeCommentData();
-					compositeComment.commentBefore = commentBefore;
-					compositeComment.commentAfter = commentAfter;
-
-					History.Create_NewPoint();
-					History.Add(g_oUndoRedoComment, historyitem_Comment_Change, _this.worksheet.model.getId(), null, compositeComment);
-				}
-				
-				_this.drawCommentCells();
+		var existComments = this.asc_getComments(oComment.nCol, oComment.nRow);
+		if ( existComments.length ) {
+			oComment = existComments[0];
+			bChange = true;
+		}
+		else {
+			if ((oComment.nCol != null) && (oComment.nRow != null)) {
+				var cellAddress = new CellAddress(oComment.nRow, oComment.nCol, 0);
+				oComment.sQuoteText = cellAddress.getID() + " : " + this.worksheet.model.getCell(cellAddress).getValueWithFormat();
 			}
 		}
+	}
 
-		_this.isLockedComment(comment, true, callbackFunc);
-	},
+	function callbackFunc(result) {
+		if ( !result ) {
+			t.worksheet.model.workbook.handlers.trigger("asc_onLockComment", oComment.asc_getId(), oComment.asc_getUserId());
+		}
+		else {
+			t._addComment(oComment, bChange, bIsNotUpdate);
+		}
+	}
 
-	asc_removeComment: function(id, bNoEvent) {
+	if (bIsNotUpdate)
+		callbackFunc(true);
+	else
+		this.isLockedComment(oComment, true, callbackFunc);
+};
 
-		var _this = this;
-		var comment = _this.asc_findComment(id);
-		if (null === comment)
-			return;
-		
-		function callbackFunc(result) {
-			if ( !result ) {
-				_this.worksheet.model.workbook.handlers.trigger("asc_onLockComment", comment.asc_getId(), comment.asc_getUserId());
-			} else {
-				_this.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", comment.asc_getId());
-				
-				if (comment) {
-					var i;
-					if (comment.oParent) {
-						for (i = 0; i < comment.oParent.aReplies.length; i++) {
-							if (comment.asc_getId() == comment.oParent.aReplies[i].asc_getId()) {
+CCellCommentator.prototype.asc_changeComment = function(id, oComment, bChangeCoords, bNoEvent) {
 
-								if ( _this.bSaveHistory ) {
-									History.Create_NewPoint();
-									History.Add(g_oUndoRedoComment, historyitem_Comment_Remove, _this.worksheet.model.getId(), null, new asc_CCommentData(comment.oParent.aReplies[i]));
-								}
+	var t = this;
+	var comment = this.asc_findComment(id);
+	if (null === comment)
+		return;
 
-								comment.oParent.aReplies.splice(i, 1);
-								break;
-							}
-						}
-					} else {
-						for (i = 0; i < _this.aComments.length; i++) {
-							if (comment.asc_getId() == _this.aComments[i].asc_getId()) {
+	function callbackFunc(result) {
+		if ( !result ) {
+			t.worksheet.model.workbook.handlers.trigger("asc_onLockComment", comment.asc_getId(), comment.asc_getUserId());
+		} else {
+			t.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", comment.asc_getId());
 
-								if ( _this.bSaveHistory ) {
-									History.Create_NewPoint();
-									History.Add(g_oUndoRedoComment, historyitem_Comment_Remove, _this.worksheet.model.getId(), null, new asc_CCommentData(_this.aComments[i]));
-								}
-
-								_this.aComments.splice(i, 1);
-								break;
-							}
-						}
-						_this.worksheet.draw();
-					}
-					_this.drawCommentCells();
-					if ( !bNoEvent ) 
-						_this.worksheet.model.workbook.handlers.trigger("asc_onRemoveComment", id);
+			var commentBefore = new asc_CCommentData(comment);
+			if (comment) {
+				if ( bChangeCoords ) {
+					comment.asc_putCol(oComment.asc_getCol());
+					comment.asc_putRow(oComment.asc_getRow());
 				}
+				comment.asc_putText(oComment.asc_getText());
+				comment.asc_putQuoteText(oComment.asc_getQuoteText());
+				comment.asc_putUserId(oComment.asc_getUserId());
+				comment.asc_putUserName(oComment.asc_getUserName());
+				comment.asc_putTime(oComment.asc_getTime());
+				comment.asc_putSolved(oComment.asc_getSolved());
+				comment.asc_putHiddenFlag(oComment.asc_getHiddenFlag());
+				comment.aReplies = [];
+
+				if ( !comment.bDocument && (comment.nCol != null) && (comment.nRow != null) ) {
+					var cellAddress = new CellAddress(comment.nRow, comment.nCol, 0);
+					comment.sQuoteText = cellAddress.getID() + " : " + t.worksheet.model.getCell(cellAddress).getValueWithFormat();
+				}
+
+				var count = oComment.asc_getRepliesCount();
+				for (var i = 0; i < count; i++) {
+					comment.asc_addReply(oComment.asc_getReply(i));
+				}
+				if ( !bNoEvent )
+					t.worksheet.model.workbook.handlers.trigger("asc_onChangeCommentData", comment.asc_getId(), comment);
 			}
+
+			if ( t.bSaveHistory ) {
+				var commentAfter = new asc_CCommentData(comment);
+
+				var compositeComment = new CompositeCommentData();
+				compositeComment.commentBefore = commentBefore;
+				compositeComment.commentAfter = commentAfter;
+
+				History.Create_NewPoint();
+				History.Add(g_oUndoRedoComment, historyitem_Comment_Change, t.worksheet.model.getId(), null, compositeComment);
+			}
+
+			t.drawCommentCells();
+		}
+	}
+
+	this.isLockedComment(comment, true, callbackFunc);
+};
+
+CCellCommentator.prototype.asc_removeComment = function(id, bNoEvent) {
+
+	var t = this;
+	var comment = this.asc_findComment(id);
+	if (null === comment)
+		return;
+
+	function callbackFunc(result) {
+		if ( !result ) {
+			t.worksheet.model.workbook.handlers.trigger("asc_onLockComment", comment.asc_getId(), comment.asc_getUserId());
+		} else {
+			t.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", comment.asc_getId());
 		}
 
-		_this.isLockedComment(comment, true, callbackFunc);
-	},
+		t._removeComment(comment, bNoEvent, true);
+	}
 
-	// Extra functions
+	this.isLockedComment(comment, true, callbackFunc);
+};
 
-	asc_getComments: function(col, row) {
+// Extra functions
 
-		// Array of root items
-		var comments = [];
-		var _this = this;
-		var _col = col, _row = row, mergedRange = null;
-		var length = _this.aComments.length;
+CCellCommentator.prototype.asc_getComments = function(col, row) {
 
-		if (!this.bShow)
-			return comments;
+	// Array of root items
+	var comments = [];
+	var _col = col, _row = row, mergedRange = null;
+	var length = this.aComments.length;
 
-		if (0 < length) {
-			if (null == _col || null == _row) {
-				var selectedCell = _this.worksheet.getSelectedRange();
-				var oFirst = selectedCell.getFirst();
-				_col = oFirst.col - 1;
-				_row = oFirst.row - 1;
-			} else
-				mergedRange = _this.worksheet.model.getMergedByCell(row, col);
-
-			for (var i = 0; i < length; i++) {
-				var commentCell = _this.aComments[i];
-
-				if ( !commentCell.asc_getDocumentFlag() /*&& !commentCell.asc_getSolved()*/ && !commentCell.asc_getHiddenFlag() && (commentCell.nLevel == 0) ) {
-					if ( !mergedRange ) {
-						if ( (_col == commentCell.nCol) && (_row == commentCell.nRow) )
-							comments.push(commentCell);
-					}
-					else {
-						if ( (commentCell.nCol >= mergedRange.c1) && (commentCell.nRow >= mergedRange.r1) && (commentCell.nCol <= mergedRange.c2) && (commentCell.nRow <= mergedRange.r2) )
-							comments.push(commentCell);
-					}
-				}
-			}
-		}
+	if (!this.bShow)
 		return comments;
-	},
 
-	asc_getDocumentComments: function() {
+	if (0 < length) {
+		if (null == _col || null == _row) {
+			var selectedCell = this.worksheet.getSelectedRange();
+			var oFirst = selectedCell.getFirst();
+			_col = oFirst.col - 1;
+			_row = oFirst.row - 1;
+		} else
+			mergedRange = this.worksheet.model.getMergedByCell(row, col);
 
-		// Array of root items
-		var comments = [];
-
-		for (var i = 0; i < this.aComments.length; i++) {
+		for (var i = 0; i < length; i++) {
 			var commentCell = this.aComments[i];
-			if ((commentCell.nLevel == 0) && commentCell.asc_getDocumentFlag())
-				comments.push(commentCell);
+
+			if ( !commentCell.asc_getDocumentFlag() /*&& !commentCell.asc_getSolved()*/ && !commentCell.asc_getHiddenFlag() && (commentCell.nLevel == 0) ) {
+				if ( !mergedRange ) {
+					if ( (_col == commentCell.nCol) && (_row == commentCell.nRow) )
+						comments.push(commentCell);
+				}
+				else {
+					if ( (commentCell.nCol >= mergedRange.c1) && (commentCell.nRow >= mergedRange.r1) && (commentCell.nCol <= mergedRange.c2) && (commentCell.nRow <= mergedRange.r2) )
+						comments.push(commentCell);
+				}
+			}
 		}
-		return comments;
-	},
+	}
+	return comments;
+};
 
-	// Undo/Redo
+CCellCommentator.prototype.asc_getDocumentComments = function() {
 
-	Undo: function(type, data) {
+	// Array of root items
+	var comments = [];
 
-		var _this = this, i, parentComment;
-		switch (type) {
+	for (var i = 0; i < this.aComments.length; i++) {
+		var commentCell = this.aComments[i];
+		if ((commentCell.nLevel == 0) && commentCell.asc_getDocumentFlag())
+			comments.push(commentCell);
+	}
+	return comments;
+};
 
-			case historyitem_Comment_Add:
-				if (data.oParent) {
-					parentComment = _this.asc_findComment(data.oParent.asc_getId());
-					for (i = 0; i < parentComment.aReplies.length; i++) {
-						if (parentComment.aReplies[i].asc_getId() == data.asc_getId()) {
-							parentComment.aReplies.splice(i, 1);
-							break;
-						}
-					}
-				} else {
-					for (i = 0; i < _this.aComments.length; i++) {
-						if (_this.aComments[i].asc_getId() == data.asc_getId()) {
-							_this.aComments.splice(i, 1);
-							_this.worksheet.model.workbook.handlers.trigger("asc_onRemoveComment", data.asc_getId());
-							break;
-						}
-					}
+CCellCommentator.prototype._addComment = function (oComment, bChange, bIsNotUpdate) {
+	this.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", oComment.asc_getId());
+
+	// Add new comment
+	if (!bChange) {
+		History.Create_NewPoint();
+		History.Add(g_oUndoRedoComment, historyitem_Comment_Add, this.worksheet.model.getId(), null, new asc_CCommentData(oComment));
+
+		this.aComments.push(oComment);
+
+		if (!bIsNotUpdate)
+			this.drawCommentCells();
+	}
+	this.worksheet.model.workbook.handlers.trigger("asc_onAddComment", oComment.asc_getId(), oComment);
+};
+
+CCellCommentator.prototype._removeComment = function (comment, bNoEvent, isDraw) {
+	if (!comment)
+		return;
+
+	var i, id = comment.asc_getId();
+	if (comment.oParent) {
+		for (i = 0; i < comment.oParent.aReplies.length; ++i) {
+			if (comment.asc_getId() == comment.oParent.aReplies[i].asc_getId()) {
+
+				if (this.bSaveHistory) {
+					History.Create_NewPoint();
+					History.Add(g_oUndoRedoComment, historyitem_Comment_Remove, this.worksheet.model.getId(), null, new asc_CCommentData(comment.oParent.aReplies[i]));
 				}
-				break;
 
-			case historyitem_Comment_Remove:
-				if (data.oParent) {
-					parentComment = _this.asc_findComment(data.oParent.asc_getId());
-					parentComment.aReplies.push(data);
-				} else {
-					_this.aComments.push(data);
-					_this.worksheet.model.workbook.handlers.trigger("asc_onAddComment", data.asc_getId(), data);
-				}
+				comment.oParent.aReplies.splice(i, 1);
 				break;
-
-			case historyitem_Comment_Change:
-				if (data.commentAfter.oParent) {
-					parentComment = _this.asc_findComment(data.commentAfter.oParent.asc_getId());
-					for (i = 0; i < parentComment.aReplies.length; i++) {
-						if (parentComment.aReplies[i].asc_getId() == data.asc_getId()) {
-							parentComment.aReplies.splice(i, 1);
-							parentComment.aReplies.push(data.commentBefore);
-							break;
-						}
-					}
-				} else {
-					for (i = 0; i < _this.aComments.length; i++) {
-						if (_this.aComments[i].asc_getId() == data.commentAfter.asc_getId()) {
-							_this.aComments.splice(i, 1);
-							_this.aComments.push(data.commentBefore);
-							_this.worksheet.model.workbook.handlers.trigger("asc_onChangeCommentData", data.commentBefore.asc_getId(), data.commentBefore);
-							break;
-						}
-					}
-				}
-				break;
+			}
 		}
-	},
+	} else {
+		for (i = 0; i < this.aComments.length; i++) {
+			if (comment.asc_getId() == this.aComments[i].asc_getId()) {
 
-	Redo: function(type, data) {
-
-		var _this = this, parentComment, i;
-		switch (type) {
-
-			case historyitem_Comment_Add:
-				if (data.oParent) {
-					parentComment = _this.asc_findComment(data.oParent.asc_getId());
-					parentComment.aReplies.push(data);
-				} else {
-					_this.aComments.push(data);
-					_this.worksheet.model.workbook.handlers.trigger("asc_onAddComment", data.asc_getId(), data);
+				if (this.bSaveHistory) {
+					History.Create_NewPoint();
+					History.Add(g_oUndoRedoComment, historyitem_Comment_Remove, this.worksheet.model.getId(), null, new asc_CCommentData(this.aComments[i]));
 				}
-				break;
 
-			case historyitem_Comment_Remove:
-				if (data.oParent) {
-					parentComment = _this.asc_findComment(data.oParent.asc_getId());
-					for (i = 0; i < parentComment.aReplies.length; i++) {
-						if (parentComment.aReplies[i].asc_getId() == data.asc_getId()) {
-							parentComment.aReplies.splice(i, 1);
-							break;
-						}
-					}
-				} else {
-					for (i = 0; i < _this.aComments.length; i++) {
-						if (_this.aComments[i].asc_getId() == data.asc_getId()) {
-							_this.aComments.splice(i, 1);
-							_this.worksheet.model.workbook.handlers.trigger("asc_onRemoveComment", data.asc_getId());
-							break;
-						}
-					}
-				}
+				this.aComments.splice(i, 1);
 				break;
-
-			case historyitem_Comment_Change:
-				if (data.commentBefore.oParent) {
-					parentComment = _this.asc_findComment(data.commentBefore.oParent.asc_getId());
-					for (i = 0; i < parentComment.aReplies.length; i++) {
-						if (parentComment.aReplies[i].asc_getId() == data.asc_getId()) {
-							parentComment.aReplies.splice(i, 1);
-							parentComment.aReplies.push(data.commentAfter);
-							break;
-						}
-					}
-				} else {
-					for (i = 0; i < _this.aComments.length; i++) {
-						if (_this.aComments[i].asc_getId() == data.commentBefore.asc_getId()) {
-							_this.aComments.splice(i, 1);
-							_this.aComments.push(data.commentAfter);
-							_this.worksheet.model.workbook.handlers.trigger("asc_onChangeCommentData", data.commentAfter.asc_getId(), data.commentAfter);
-							break;
-						}
-					}
-				}
-				break;
+			}
 		}
+		if (isDraw)
+			this.worksheet.draw();
+	}
+
+	if (isDraw)
+		this.drawCommentCells();
+	if (!bNoEvent)
+		this.worksheet.model.workbook.handlers.trigger("asc_onRemoveComment", id);
+};
+
+CCellCommentator.prototype.isMissComments = function (range) {
+	var oComment, bMiss = false;
+	for (var i = 0, length = this.aComments.length; i < length; ++i) {
+		oComment = this.aComments[i];
+		if (!oComment.bHidden && range.contains(oComment.nCol, oComment.nRow)) {
+			if (bMiss)
+				return true;
+			bMiss = true;
+		}
+	}
+
+	return false;
+};
+
+CCellCommentator.prototype.mergeComments = function (range) {
+	var i, length, deleteComments = [], oComment, r1 = range.r1, c1 = range.c1, mergeComment = null;
+	for (i = 0, length = this.aComments.length; i < length; ++i) {
+		oComment = this.aComments[i];
+		if (range.contains(oComment.nCol, oComment.nRow)) {
+			if (null === mergeComment)
+				mergeComment = oComment;
+			else if (oComment.nRow <= mergeComment.nRow && oComment.nCol < mergeComment.nCol) {
+				deleteComments.push(mergeComment);
+				mergeComment = oComment;
+			} else
+				deleteComments.push(oComment);
+		}
+	}
+
+	if (mergeComment && (mergeComment.nCol !== c1 || mergeComment.nRow !== r1)) {
+		this._removeComment(mergeComment, false, false);
+
+		// add Comment
+		mergeComment.nCol = c1;
+		mergeComment.nRow = r1;
+		var cellAddress = new CellAddress(mergeComment.nRow, mergeComment.nCol, 0);
+		mergeComment.sQuoteText = cellAddress.getID() + " : " + this.worksheet.model.getCell(cellAddress).getValueWithFormat();
+
+		this._addComment(mergeComment, false, true);
+	}
+	for (i = 0, length = deleteComments.length; i < length; ++i) {
+		this._removeComment(deleteComments[i], false, false);
+	}
+};
+
+// Undo/Redo
+
+CCellCommentator.prototype.Undo = function(type, data) {
+
+	var i, parentComment;
+	switch (type) {
+
+		case historyitem_Comment_Add:
+			if (data.oParent) {
+				parentComment = this.asc_findComment(data.oParent.asc_getId());
+				for (i = 0; i < parentComment.aReplies.length; i++) {
+					if (parentComment.aReplies[i].asc_getId() == data.asc_getId()) {
+						parentComment.aReplies.splice(i, 1);
+						break;
+					}
+				}
+			} else {
+				for (i = 0; i < this.aComments.length; i++) {
+					if (this.aComments[i].asc_getId() == data.asc_getId()) {
+						this.aComments.splice(i, 1);
+						this.worksheet.model.workbook.handlers.trigger("asc_onRemoveComment", data.asc_getId());
+						break;
+					}
+				}
+			}
+			break;
+
+		case historyitem_Comment_Remove:
+			if (data.oParent) {
+				parentComment = this.asc_findComment(data.oParent.asc_getId());
+				parentComment.aReplies.push(data);
+			} else {
+				this.aComments.push(data);
+				this.worksheet.model.workbook.handlers.trigger("asc_onAddComment", data.asc_getId(), data);
+			}
+			break;
+
+		case historyitem_Comment_Change:
+			if (data.commentAfter.oParent) {
+				parentComment = this.asc_findComment(data.commentAfter.oParent.asc_getId());
+				for (i = 0; i < parentComment.aReplies.length; i++) {
+					if (parentComment.aReplies[i].asc_getId() == data.asc_getId()) {
+						parentComment.aReplies.splice(i, 1);
+						parentComment.aReplies.push(data.commentBefore);
+						break;
+					}
+				}
+			} else {
+				for (i = 0; i < this.aComments.length; i++) {
+					if (this.aComments[i].asc_getId() == data.commentAfter.asc_getId()) {
+						this.aComments.splice(i, 1);
+						this.aComments.push(data.commentBefore);
+						this.worksheet.model.workbook.handlers.trigger("asc_onChangeCommentData", data.commentBefore.asc_getId(), data.commentBefore);
+						break;
+					}
+				}
+			}
+			break;
+	}
+};
+
+CCellCommentator.prototype.Redo = function(type, data) {
+
+	var parentComment, i;
+	switch (type) {
+
+		case historyitem_Comment_Add:
+			if (data.oParent) {
+				parentComment = this.asc_findComment(data.oParent.asc_getId());
+				parentComment.aReplies.push(data);
+			} else {
+				this.aComments.push(data);
+				this.worksheet.model.workbook.handlers.trigger("asc_onAddComment", data.asc_getId(), data);
+			}
+			break;
+
+		case historyitem_Comment_Remove:
+			if (data.oParent) {
+				parentComment = this.asc_findComment(data.oParent.asc_getId());
+				for (i = 0; i < parentComment.aReplies.length; i++) {
+					if (parentComment.aReplies[i].asc_getId() == data.asc_getId()) {
+						parentComment.aReplies.splice(i, 1);
+						break;
+					}
+				}
+			} else {
+				for (i = 0; i < this.aComments.length; i++) {
+					if (this.aComments[i].asc_getId() == data.asc_getId()) {
+						this.aComments.splice(i, 1);
+						this.worksheet.model.workbook.handlers.trigger("asc_onRemoveComment", data.asc_getId());
+						break;
+					}
+				}
+			}
+			break;
+
+		case historyitem_Comment_Change:
+			if (data.commentBefore.oParent) {
+				parentComment = this.asc_findComment(data.commentBefore.oParent.asc_getId());
+				for (i = 0; i < parentComment.aReplies.length; i++) {
+					if (parentComment.aReplies[i].asc_getId() == data.asc_getId()) {
+						parentComment.aReplies.splice(i, 1);
+						parentComment.aReplies.push(data.commentAfter);
+						break;
+					}
+				}
+			} else {
+				for (i = 0; i < this.aComments.length; i++) {
+					if (this.aComments[i].asc_getId() == data.commentBefore.asc_getId()) {
+						this.aComments.splice(i, 1);
+						this.aComments.push(data.commentAfter);
+						this.worksheet.model.workbook.handlers.trigger("asc_onChangeCommentData", data.commentAfter.asc_getId(), data.commentAfter);
+						break;
+					}
+				}
+			}
+			break;
 	}
 };

@@ -1830,8 +1830,7 @@
 
 		WorkbookView.prototype._initCommentsToSave  = function () {
 			var isFirst = true;
-			for (var wsKey in this.wsViews)
-			{
+			for (var wsKey in this.wsViews) if (this.wsViews.hasOwnProperty(wsKey)) {
 				var wsView = this.wsViews[wsKey];
 				var wsModel = wsView.model;
 				wsView.cellCommentator.prepareCommentsToSave();

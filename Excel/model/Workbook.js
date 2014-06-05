@@ -735,7 +735,7 @@ Vertex.prototype = {
 				slave.setFormula(cell.formulaParsed.assemble(), true, false);
 			}
 		}
-		this.bbox = bboxTo
+		this.bbox = bboxTo;
 		this.cellId = sNewName;
 		this.nodeId = getVertexId(this.sheetId, this.cellId);
 		this.wb.needRecalc.nodes[this.nodeId] = [this.sheetId, this.cellId ];
@@ -1250,7 +1250,7 @@ Workbook.prototype.replaceWorksheet=function(indexFrom, indexTo){
 					wTN: oWsTo.getName(),
 					wTI: indexTo,
 					wTId: oWsTo.getId()
-				}
+				};
 		//переводим обратно в индекс sheet перед которым надо вставить
 		if(tempW.wFI < tempW.wTI)
 			tempW.wTI++;
@@ -1280,7 +1280,7 @@ Workbook.prototype.replaceWorksheet=function(indexFrom, indexTo){
 		}
 		History.TurnOn();
 		var movedSheet = this.aWorksheets.splice(indexFrom, 1);
-		this.aWorksheets.splice(indexTo, 0, movedSheet[0])
+		this.aWorksheets.splice(indexTo, 0, movedSheet[0]);
 		this._updateWorksheetIndexes();
 		
 		this._insertWorksheetFormula(tempW.wTI);
@@ -3040,7 +3040,7 @@ Woorksheet.prototype._prepareMoveRangeGetCleanRanges=function(oBBoxFrom, oBBoxTo
 		{
 			if(r1 <= r2 && c1 <= c2)
 				aRangesToCheck.push(oThis.getRange3(r1, c1, r2, c2));
-		}
+		};
 		if(intersection.r1 == oBBoxTo.r1 && intersection.c1 == oBBoxTo.c1)
 		{
 			fAddToRangesToCheck(aRangesToCheck, oBBoxTo.r1, intersection.c2 + 1, intersection.r2, oBBoxTo.c2);
@@ -4329,7 +4329,7 @@ Range.prototype.createFromBBox=function(worksheet, bbox){
 	var oRes = new Range(worksheet, bbox.r1, bbox.c1, bbox.r2, bbox.c2);
 	oRes.bbox = bbox.clone();
 	return oRes;
-}
+};
 Range.prototype.clone=function(oNewWs){
 	if(!oNewWs)
 		oNewWs = this.worksheet;
@@ -4697,9 +4697,7 @@ Range.prototype.getCells=function(){
 };
 Range.prototype.setValue=function(val,callback){
 	History.Create_NewPoint();
-	var oBBox = this.bbox;
 	History.StartTransaction();
-	var oThis = this;
 	this._foreach(function(cell){
 		cell.setValue(val,callback);
 		// if(cell.isEmpty())
@@ -4709,11 +4707,8 @@ Range.prototype.setValue=function(val,callback){
 };
 Range.prototype.setValue2=function(array){
 	History.Create_NewPoint();
-	var oBBox = this.bbox;
 	History.StartTransaction();
-	var wb = this.worksheet.workbook, ws = this.worksheet, ar =[];
     //[{"text":"qwe","format":{"b":true, "i":false, "u":Asc.EUnderline.underlineNone, "s":false, "fn":"Arial", "fs": 12, "c": 0xff00ff, "va": "subscript"  }},{}...]
-	var oThis = this;
 	/*
 		Устанавливаем значение в Range ячеек. В отличае от setValue, сюда мы попадаем только в случае ввода значения отличного от формулы. Таким образом, если в ячейке была формула, то для нее в графе очищается список ячеек от которых зависела. После чего выставляем флаг о необходимости пересчета.
 	*/
@@ -4726,7 +4721,6 @@ Range.prototype.setValue2=function(array){
 };
 Range.prototype.setCellStyle=function(val){
 	History.Create_NewPoint();
-	var oBBox = this.bbox;
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -4770,7 +4764,6 @@ Range.prototype.setTableStyle=function(val){
 };
 Range.prototype.setNumFormat=function(val){
 	History.Create_NewPoint();
-	var oBBox = this.bbox;
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -4793,9 +4786,7 @@ Range.prototype.setNumFormat=function(val){
 };
 Range.prototype.shiftNumFormat=function(nShift, aDigitsCount){
 	History.Create_NewPoint();
-	var oBBox = this.bbox;
 	var bRes = false;
-	var oThis = this;
 	this._setPropertyNoEmpty(null, null, function(cell, nRow0, nCol0, nRowStart, nColStart){
 		bRes |= cell.shiftNumFormat(nShift, aDigitsCount[nCol0 - nColStart] || 8);
 	});
@@ -4825,7 +4816,6 @@ Range.prototype.setFont=function(val){
 };
 Range.prototype.setFontname=function(val){
 	History.Create_NewPoint();
-	var oBBox = this.bbox;
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -4848,7 +4838,6 @@ Range.prototype.setFontname=function(val){
 };
 Range.prototype.setFontsize=function(val){
 	History.Create_NewPoint();
-	var oBBox = this.bbox;
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -4871,7 +4860,6 @@ Range.prototype.setFontsize=function(val){
 };
 Range.prototype.setFontcolor=function(val){
 	History.Create_NewPoint();
-	var oBBox = this.bbox;
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -4894,7 +4882,6 @@ Range.prototype.setFontcolor=function(val){
 };
 Range.prototype.setBold=function(val){
 	History.Create_NewPoint();
-	var oBBox = this.bbox;
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -4917,7 +4904,6 @@ Range.prototype.setBold=function(val){
 };
 Range.prototype.setItalic=function(val){
 	History.Create_NewPoint();
-	var oBBox = this.bbox;
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -4962,7 +4948,6 @@ Range.prototype.setUnderline=function(val){
 };
 Range.prototype.setStrikeout=function(val){
 	History.Create_NewPoint();
-	var oBBox = this.bbox;
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -4985,7 +4970,6 @@ Range.prototype.setStrikeout=function(val){
 };
 Range.prototype.setFontAlign=function(val){
 	History.Create_NewPoint();
-	var oBBox = this.bbox;
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -5054,7 +5038,6 @@ Range.prototype.setAlignHorizontal=function(val){
 };
 Range.prototype.setFill=function(val){
 	History.Create_NewPoint();
-	var oBBox = this.bbox;
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -5077,7 +5060,6 @@ Range.prototype.setFill=function(val){
 };
 Range.prototype.setBorderSrc=function(border){
 	History.Create_NewPoint();
-	var oBBox = this.bbox;
 	History.StartTransaction();
 	if (null == border)
 		border = new Border();
@@ -5269,7 +5251,6 @@ Range.prototype.setBorder=function(border){
 };
 Range.prototype.setShrinkToFit=function(val){
 	History.Create_NewPoint();
-	var oBBox = this.bbox;
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -5292,7 +5273,6 @@ Range.prototype.setShrinkToFit=function(val){
 };
 Range.prototype.setWrap=function(val){
 	History.Create_NewPoint();
-	var oBBox = this.bbox;
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -5315,7 +5295,6 @@ Range.prototype.setWrap=function(val){
 };
 Range.prototype.setAngle=function(val){
     History.Create_NewPoint();
-    var oBBox = this.bbox;
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -5338,7 +5317,6 @@ Range.prototype.setAngle=function(val){
 };
 Range.prototype.setVerticalText=function(val){
     History.Create_NewPoint();
-    var oBBox = this.bbox;
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -7596,7 +7574,7 @@ Range.prototype._promoteFromTo=function(from, to, bIsPromote, oCanPromote, bCtrl
 	History.EndTransaction();
 	buildRecalc(this.worksheet.workbook);
 	unLockDraw(this.worksheet.workbook);
-}
+};
 Range.prototype.createCellOnRowColCross=function(){
 	var oThis = this;
 	var bbox = this.bbox;
