@@ -165,6 +165,8 @@ function DrawingObjectsController(drawingObjects)
 
     this.objectsForRecalculate = {};
 
+    this.chartForProps = null;
+
     this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
 }
 
@@ -201,6 +203,23 @@ DrawingObjectsController.prototype =
                 return {objectId: selectedObject.Get_Id(), cursorType: "crosshair", bMarker: true};
             else
                 return {objectId: selectedObject.Get_Id(), cursorType: "crosshair", bMarker: true};
+        }
+    },
+
+    checkChartForProps: function()
+    {
+        if(this.chartForProps)
+            return;
+        if(this.selection.groupSelection)
+        {
+            if(this.selection.groupSelection.selectedObjects.length === 1 && this.selection.groupSelection.selectedObjects[0].getObjectType() === historyitem_type_ChartSpace)
+            {
+                this.chartForProps = this.selection.groupSelection.selectedObjects[0];
+            }
+        }
+        else if(this.selectedObjects.length === 1 && this.selectedObjects[0].getObjectType() === historyitem_type_ChartSpace)
+        {
+            this.chartForProps = this.selectedObjects[0];
         }
     },
 
@@ -1402,6 +1421,25 @@ DrawingObjectsController.prototype =
 
     editChartDrawingObjects: function(chart)
     {
+
+        if(this.chartForProps)
+        {
+            this.resetSelection();
+            if(this.chartForProps.group)
+            {
+                var main_group = this.chartForProps.getMainGroup();
+                this.selectObject(main_group, 0);
+                this.selection.groupSelection = main_group;
+                main_group.selectObject(this.chartForProps, 0);
+            }
+            else
+            {
+                this.selectObject(this.chartForProps);
+            }
+            this.chartForProps = null;
+
+        }
+
         if(this.selectedObjects.length === 1
             && (this.selectedObjects[0].isChart()
             || (isRealObject(this.curState.group) && this.curState.group.selectedObjects.length === 1 && this.curState.group.selectedObjects[0].isChart())))
@@ -1558,6 +1596,27 @@ DrawingObjectsController.prototype =
     {
         var chart_space = chartSpace;
         var style_index = chartSettings.getStyle();
+        var sRange = chartSettings.getRange();
+        if(this.drawingObjects && this.drawingObjects.getWorksheet && typeof sRange === "string" && sRange.length > 0)
+        {
+            var asc_chart = new asc_CChart();
+            asc_chart.range.interval = sRange;
+            asc_chart.worksheet = this.drawingObjects.getWorksheet();
+            this.drawingObjects.intervalToIntervalObject(asc_chart);
+            if(chartSettings.getInColumns())
+            {
+                asc_chart.range.rows = false;
+                asc_chart.range.columns = true;
+            }
+            else
+            {
+                asc_chart.range.rows = true;
+                asc_chart.range.columns = false;
+            }
+            asc_chart.rebuildSeries();
+            chart_space.rebuildSeriesFromAsc(asc_chart);
+        }
+
         if(isRealNumber(style_index) && style_index > 0 && style_index < 49)
         {
             chart_space.setStyle(style_index);

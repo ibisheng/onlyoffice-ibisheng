@@ -36,6 +36,14 @@ function convertFormula(formula, ws) {
     return range;
 }
 
+function DrawingBounds(minX, maxX, minY, maxY)
+{
+    this.minX = minX;
+    this.maxX = maxX;
+    this.minY = minY;
+    this.maxY = maxY;
+}
+
 function convertFormula2(formula, ws) {
     var range = null;
 
@@ -3430,6 +3438,20 @@ function DrawingObjects() {
                 worksheet._drawCellsBorders(/*drawingCtx*/undefined, r_);
             }
         }
+    };
+
+    _this.getDrawingObjectsBounds = function()
+    {
+        var arr_x = [], arr_y = [], bounds;
+        for(var i = 0; i < aObjects.length; ++i)
+        {
+            bounds = aObjects[i].graphicObject.bounds;
+            arr_x.push(bounds.l);
+            arr_x.push(bounds.r);
+            arr_y.push(bounds.t);
+            arr_y.push(bounds.b);
+        }
+        return new DrawingBounds(Math.min.apply(Math, arr_x), Math.max.apply(Math, arr_x), Math.min.apply(Math, arr_y), Math.max.apply(Math, arr_y));
     };
 
     //-----------------------------------------------------------------------------------

@@ -10246,8 +10246,8 @@
 					}
 				}
 			}
-
 			this._drawSelection();
+            this.objectRender.controller.checkChartForProps();
 		};
 
 		// Получаем свойство: редактируем мы сейчас или нет

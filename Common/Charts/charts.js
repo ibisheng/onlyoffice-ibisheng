@@ -698,26 +698,53 @@ function ChartPreviewManager() {
             settings.putLegendPos(c_oAscChartLegendShowSettings.none);
             settings.putHorGridLines(c_oAscGridLinesSettings.none);
             settings.putVertGridLines(c_oAscGridLinesSettings.none);
-            var vert_axis_settings = new asc_ValAxisSettings();
+
+
+            var val_ax_props = new asc_ValAxisSettings();
+            val_ax_props.putMinValRule(c_oAscValAxisRule.auto);
+            val_ax_props.putMaxValRule(c_oAscValAxisRule.auto);
+            val_ax_props.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
+            val_ax_props.putInvertValOrder(false);
+            val_ax_props.putDispUnitsRule(c_oAscValAxUnits.none);
+            val_ax_props.putMajorTickMark(c_oAscTickMark.TICK_MARK_NONE);
+            val_ax_props.putMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
+            val_ax_props.putCrossesRule(c_oAscCrossesRule.auto);
+
+
+            var cat_ax_props = new asc_CatAxisSettings();
+            cat_ax_props.putIntervalBetweenLabelsRule(c_oAscBetweenLabelsRule.auto);
+            cat_ax_props.putLabelsPosition(c_oAscLabelsPosition.betweenDivisions);
+            cat_ax_props.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
+            cat_ax_props.putLabelsAxisDistance(100);
+            cat_ax_props.putMajorTickMark(c_oAscTickMark.TICK_MARK_NONE);
+            cat_ax_props.putMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
+            cat_ax_props.putIntervalBetweenTick(1);
+            cat_ax_props.putCrossesRule(c_oAscCrossesRule.auto);
+            var vert_axis_settings, hor_axis_settings;
+            switch(asc_chart.type)
+            {
+                case "HBar":
+                {
+                    vert_axis_settings = cat_ax_props;
+                    hor_axis_settings = val_ax_props;
+                    break;
+                }
+                case "Scatter":
+                {
+                    vert_axis_settings = val_ax_props;
+                    hor_axis_settings = val_ax_props;
+                    break;
+                }
+                default :
+                {
+                    vert_axis_settings = val_ax_props;
+                    hor_axis_settings = cat_ax_props;
+                    break;
+                }
+            }
+
             settings.putVertAxisProps(vert_axis_settings);
-            vert_axis_settings.putMinValRule(c_oAscValAxisRule.auto);
-            vert_axis_settings.putMaxValRule(c_oAscValAxisRule.auto);
-            vert_axis_settings.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
-            vert_axis_settings.putInvertValOrder(false);
-            vert_axis_settings.putDispUnitsRule(c_oAscValAxUnits.none);
-            vert_axis_settings.putMajorTickMark(c_oAscTickMark.TICK_MARK_NONE);
-            vert_axis_settings.putMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
-            vert_axis_settings.putCrossesRule(c_oAscCrossesRule.auto);
-            var hor_axis_settings = new asc_CatAxisSettings();
             settings.putHorAxisProps(hor_axis_settings);
-            hor_axis_settings.putIntervalBetweenLabelsRule(c_oAscBetweenLabelsRule.auto);
-            hor_axis_settings.putLabelsPosition(c_oAscLabelsPosition.betweenDivisions);
-            hor_axis_settings.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
-            hor_axis_settings.putLabelsAxisDistance(100);
-            hor_axis_settings.putMajorTickMark(c_oAscTickMark.TICK_MARK_NONE);
-            hor_axis_settings.putMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
-            hor_axis_settings.putIntervalBetweenTick(1);
-            hor_axis_settings.putCrossesRule(c_oAscCrossesRule.auto);
 
             DrawingObjectsController.prototype.applyPropsToChartSpace(settings, chart_space);
             chart_space.setBDeleted(false);
@@ -775,6 +802,7 @@ function ChartPreviewManager() {
         if(chart_space.style !== styleIndex)
         {
             chart_space.style = styleIndex;
+            chart_space.recalculateMarkers();
             chart_space.recalculateSeriesColors();
         }
         chart_space.recalculatePenBrush();

@@ -366,7 +366,10 @@ DrawingObjectsController.prototype.addChartDrawingObject = function(asc_chart, o
         this.selectObject(chart, 0);
         if(options)
         {
+            var old_range = options.getRange();
+            options.putRange(null);
             this.editChartCallback(options);
+            options.putRange(old_range);
         }
         chart.addToRecalculate();
         this.startRecalculate();
