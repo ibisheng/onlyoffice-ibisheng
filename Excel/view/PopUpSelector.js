@@ -176,15 +176,19 @@
 			var retVal = false;
 			switch (event.which) {
 				case 9: // Tab
-					if (this.isFormula)
+					if (this.isFormula) {
+						event.stopPropagation();
+						event.preventDefault();
 						this._onMouseDblClick();
-					else
+					} else
 						retVal = true;
 					break;
 				case 13:  // "enter"
-					if (!this.isFormula && null !== this.selectElement)
+					if (!this.isFormula && null !== this.selectElement) {
+						event.stopPropagation();
+						event.preventDefault();
 						this._onInsert(this.selectElement.getAttribute("val"));
-					else
+					} else
 						retVal = true;
 					break;
 				case 27: // Esc
