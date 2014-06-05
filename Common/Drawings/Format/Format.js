@@ -2162,6 +2162,19 @@ function CreteSolidFillRGB(r, g, b)
     return ret;
 }
 
+function CreateSolidFillRGBA(r, g, b, a)
+{
+    var ret = new CUniFill();
+    ret.setFill(new CSolidFill());
+    ret.fill.setColor(new CUniColor());
+    var _uni_color = ret.fill.color;
+	_uni_color.RGBA.R = r;
+	_uni_color.RGBA.G = g;
+	_uni_color.RGBA.B = b;
+	_uni_color.RGBA.A = a;
+    return ret;
+}
+
 // -----------------------------
 
 // FILL ------------------------

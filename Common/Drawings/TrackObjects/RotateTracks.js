@@ -47,18 +47,43 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform)
         }
         else
         {
-            overlay.SetIntegerGrid(false);
-            overlay.transform3(this.TransformMatrix);
-            overlay._m(0, 0);
-            overlay._l(this.ext.cx, 0);
-            overlay._l(this.ext.cx, this.ext.cy);
-            overlay._l(0, this.ext.cy);
-            overlay._z();
-            overlay.p_color(0,0,0,160);
-            overlay.p_width(500);
-            overlay.ds();
-            overlay.b_color1(255,255,255,128);
-            overlay.df();
+            if (window["NATIVE_EDITOR_ENJINE"] === true)
+            {
+                var _shape = new CShape();
+				_shape.extX = this.ext.cx;
+				_shape.extY = this.ext.cy;
+				
+				_shape.brush = CreateSolidFillRGBA(255, 255, 255, 128);
+				_shape.pen = new CLn();
+				_shape.pen.Fill = CreateSolidFillRGBA(0, 0, 0, 160);
+				_shape.pen.w = 18000;
+				
+				overlay.SaveGrState();
+	            overlay.SetIntegerGrid(false);
+	            overlay.transform3(this.TransformMatrix, false);
+	            this.shapeDrawer.fromShape2(_shape, overlay, null);
+	            this.shapeDrawer.draw(null);
+	            overlay.RestoreGrState();
+            }
+            else
+            {
+                overlay.SaveGrState();
+                overlay.SetIntegerGrid(false);
+                overlay.transform3(this.TransformMatrix);
+                overlay._s();
+                overlay._m(0, 0);
+                overlay._l(this.ext.cx, 0);
+                overlay._l(this.ext.cx, this.ext.cy);
+                overlay._l(0, this.ext.cy);
+                overlay._z();
+                overlay.p_color(0,0,0,160);
+                overlay.p_width(500);
+                overlay.ds();
+                overlay.b_color1(255,255,255,128);
+                overlay.df();
+                overlay._e();
+                overlay.RestoreGrState();
+            }
         }
     };
 
