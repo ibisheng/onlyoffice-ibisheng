@@ -775,8 +775,15 @@ CShapeDrawer.prototype =
         if (this.Graphics.IsSlideBoundsCheckerType === true)
             return;
 
+        var bIsIntegerGridTRUE = false;
         if (this.bIsTexture)
         {
+            if (this.Graphics.m_bIntegerGrid === true)
+            {
+                this.Graphics.SetIntegerGrid(false);
+                bIsIntegerGridTRUE = true;
+            }
+
             if (this.Graphics.RENDERER_PDF_FLAG)
             {
                 if (null == this.UniFill.fill.tile || this.Graphics.m_oContext === undefined)
@@ -786,6 +793,11 @@ CShapeDrawer.prototype =
                 else
                 {
                     this.Graphics.put_brushTexture(_getFullImageSrc(this.UniFill.fill.RasterImageId), 1);
+                }
+
+                if (bIsIntegerGridTRUE)
+                {
+                    this.Graphics.SetIntegerGrid(true);
                 }
                 return;
             }
@@ -901,6 +913,11 @@ CShapeDrawer.prototype =
                     _ctx.restore();
                 }
             }
+
+            if (bIsIntegerGridTRUE)
+            {
+                this.Graphics.SetIntegerGrid(true);
+            }
             return;
         }
 
@@ -909,6 +926,12 @@ CShapeDrawer.prototype =
             var _fill = this.UniFill.fill;
             if (_fill.type == FILL_TYPE_PATT)
             {
+                if (this.Graphics.m_bIntegerGrid === true)
+                {
+                    this.Graphics.SetIntegerGrid(false);
+                    bIsIntegerGridTRUE = true;
+                }
+
                 var _is_ctx = false;
                 if (this.Graphics.IsNoSupportTextDraw === true || undefined === this.Graphics.m_oContext || (null == this.UniFill.transparent) || (this.UniFill.transparent == 255))
                 {
@@ -969,10 +992,21 @@ CShapeDrawer.prototype =
                 }
 
                 _ctx.restore();
+
+                if (bIsIntegerGridTRUE)
+                {
+                    this.Graphics.SetIntegerGrid(true);
+                }
                 return;
             }
             else if (_fill.type == FILL_TYPE_GRAD)
             {
+                if (this.Graphics.m_bIntegerGrid === true)
+                {
+                    this.Graphics.SetIntegerGrid(false);
+                    bIsIntegerGridTRUE = true;
+                }
+
                 var _is_ctx = false;
                 if (this.Graphics.IsNoSupportTextDraw === true || undefined === this.Graphics.m_oContext || (null == this.UniFill.transparent) || (this.UniFill.transparent == 255))
                 {
@@ -1022,6 +1056,11 @@ CShapeDrawer.prototype =
                 else
                 {
                     _ctx.fill();
+                }
+
+                if (bIsIntegerGridTRUE)
+                {
+                    this.Graphics.SetIntegerGrid(true);
                 }
                 return;
             }
