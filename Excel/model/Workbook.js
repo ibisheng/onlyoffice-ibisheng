@@ -1136,7 +1136,7 @@ Workbook.prototype.createWorksheet=function(indexBefore, sName, sId){
 	}
     oNewWorksheet.init();
 	oNewWorksheet.initPostOpen();
-	if(indexBefore >= 0 && indexBefore < this.aWorksheets.length)
+	if(null != indexBefore && indexBefore >= 0 && indexBefore < this.aWorksheets.length)
 		this.aWorksheets.splice(indexBefore, 0, oNewWorksheet);
 	else
 	{

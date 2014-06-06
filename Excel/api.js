@@ -2195,8 +2195,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				return true;
 			},
 
-			asc_addWorksheet: function () {
-				var active = this.wbModel.createWorksheet();
+			asc_addWorksheet: function (name) {
+				var active = this.wbModel.createWorksheet(null, name);
 				this.asc_showWorksheet (active);
 				// Посылаем callback об изменении списка листов
 				this.sheetsChanged();
