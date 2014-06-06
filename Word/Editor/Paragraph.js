@@ -6065,7 +6065,7 @@ Paragraph.prototype =
                 //----------------------------------------------------------------------------------------------------------
                 // Заливка параграфа
                 //----------------------------------------------------------------------------------------------------------
-                if ( (_Range.W > 0.001 || true === this.IsEmpty() ) && ( ( this.Pages.length - 1 === CurPage ) || ( CurLine < this.Pages[CurPage + 1].FirstLine ) ) && shd_Clear === Pr.ParaPr.Shd.Value )
+                if ( (_Range.W > 0.001 || true === this.IsEmpty() ) && ( ( this.Pages.length - 1 === CurPage ) || ( CurLine < this.Pages[CurPage + 1].FirstLine ) ) && shd_Clear === Pr.ParaPr.Shd.Value && (Pr.ParaPr.Shd.Unifill || (Pr.ParaPr.Shd.Color && true !== Pr.ParaPr.Shd.Color.Auto)) )
                 {
                     var TempX0 = this.Lines[CurLine].Ranges[CurRange].X;
                     if ( 0 === CurRange )

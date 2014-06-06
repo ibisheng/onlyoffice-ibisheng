@@ -1811,7 +1811,7 @@ CDocument.prototype =
     {
         if ( docpostype_Content === this.CurPos.Type )
         {
-            var Pos = ( true === this.Selection.Use ? this.Selection.EndPos : this.CurPos.ContentPos ); 
+            var Pos = ( true === this.Selection.Use && selectionflag_Numbering !== this.Selection.Flag ? this.Selection.EndPos : this.CurPos.ContentPos ); 
             if ( Pos >= 0 && undefined !== this.Content[Pos].RecalculateCurPos && ( null === this.FullRecalc.Id || this.FullRecalc.StartIndex > Pos ) )
             {
                 this.Internal_CheckCurPage();
@@ -1838,7 +1838,7 @@ CDocument.prototype =
         }
         else
         {
-            var Pos = ( true === this.Selection.Use ? this.Selection.EndPos : this.CurPos.ContentPos );
+            var Pos = ( true === this.Selection.Use && selectionflag_Numbering !== this.Selection.Flag ? this.Selection.EndPos : this.CurPos.ContentPos );
             if ( Pos >= 0 && ( null === this.FullRecalc.Id || this.FullRecalc.StartIndex > Pos ) )
             {
                 this.CurPage = this.Content[Pos].Get_CurrentPage_Absolute();

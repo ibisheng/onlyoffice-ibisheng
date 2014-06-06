@@ -4558,7 +4558,7 @@ CDocumentShd.prototype =
         Shd.Value = this.Value;
 
         if ( undefined !== this.Color )
-            Shd.Color.Set( this.Color.r, this.Color.g, this.Color.b );
+            Shd.Color.Set( this.Color.r, this.Color.g, this.Color.b, this.Color.Auto );
         
         if( undefined !== this.Unifill )
             Shd.Unifill = this.Unifill.createDuplicate();
@@ -4615,7 +4615,7 @@ CDocumentShd.prototype =
     Init_Default : function()
     {
         this.Value = shd_Nil;
-        this.Color.Set( 0, 0, 0 );
+        this.Color.Set( 0, 0, 0, false );
         this.Unifill = undefined;
     },
 
