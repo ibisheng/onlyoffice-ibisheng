@@ -695,7 +695,7 @@ function asc_docs_api(name)
 asc_docs_api.prototype.LoadFontsFromServer = function(_fonts)
 {
     if (undefined === _fonts)
-        _fonts = ["Arial","Symbol","Wingdings","Wingdings 3","Courier New","Times New Roman"];
+        _fonts = ["Arial","Symbol","Wingdings","Courier New","Times New Roman"];
     this.FontLoader.LoadFontsFromServer(_fonts);
 }
 

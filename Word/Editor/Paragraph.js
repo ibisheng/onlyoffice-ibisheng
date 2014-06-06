@@ -6414,7 +6414,7 @@ Paragraph.prototype =
 
                                 var X0 = TempWidth / 2 - TempRealWidth / 2;
 
-                                pGraphics.SetFont( {FontFamily: { Name : "ASCWngds3", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
+                                pGraphics.SetFont( {FontFamily: { Name : "ASCW3", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
 
                                 if ( X0 > 0 )
                                     pGraphics.FillText2( X1 + X0, Y, String.fromCharCode( tab_Symbol ), 0, TempWidth );

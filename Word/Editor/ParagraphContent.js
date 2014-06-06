@@ -2544,7 +2544,7 @@ ParaNewLine.prototype =
             {
                 case break_Line:
                 {
-                    Context.SetFont( {FontFamily: { Name : "ASCWngds3", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
+                    Context.SetFont( {FontFamily: { Name : "ASCW3", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
                     Context.FillText( X, Y, String.fromCharCode( 0x0038/*0x21B5*/ ) );
                     break;
                 }
@@ -2591,7 +2591,7 @@ ParaNewLine.prototype =
                 this.Width  = 0;
                 this.Height = 0;
 
-                Context.SetFont( {FontFamily: { Name : "ASCWngds3", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
+                Context.SetFont( {FontFamily: { Name : "ASCW3", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
                 var Temp = Context.Measure( String.fromCharCode( 0x0038 ) );
 
                 // Почему-то в шрифте Wingding 3 символ 0x0038 имеет неправильную ширину
@@ -3035,7 +3035,7 @@ ParaTab.prototype =
         {
             var X0 = this.Width / 2 - this.RealWidth / 2;
 
-            Context.SetFont( {FontFamily: { Name : "ASCWngds3", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
+            Context.SetFont( {FontFamily: { Name : "ASCW3", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
 
             if ( X0 > 0 )
                 Context.FillText2( X + X0, Y, String.fromCharCode( tab_Symbol ), 0, this.Width );
@@ -3046,7 +3046,7 @@ ParaTab.prototype =
 
     Measure : function (Context)
     {
-        Context.SetFont( {FontFamily: { Name : "ASCWngds3", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
+        Context.SetFont( {FontFamily: { Name : "ASCW3", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
         this.RealWidth = Context.Measure( String.fromCharCode( tab_Symbol ) ).Width;
     },
 
