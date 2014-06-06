@@ -4430,6 +4430,7 @@ function AutoFilter() {
 AutoFilter.prototype.clone = function() {
 	var i, res = new AutoFilter();
 	res.Ref = this.Ref;
+	res.refTable = this.refTable;
 	if (this.FilterColumns) {
 		res.FilterColumns = [];
 		for (i = 0; i < this.FilterColumns.length; ++i)
