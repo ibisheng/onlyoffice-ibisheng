@@ -2267,7 +2267,7 @@ function COperator(type)
 
     this.shiftAccent = 0;
 }
-COperator.prototype.setProperties = function(properties, defaultProps)   // props (chr, type, location), defaultProps (chr, location)
+COperator.prototype.mergeProperties = function(properties, defaultProps)   // props (chr, type, location), defaultProps (chr, location)
 {
     var props = this.getProps(properties, defaultProps);
 
@@ -3522,7 +3522,7 @@ CDelimiter.prototype.Resize = function(Parent, ParaMath, oMeasure)
         {
             type:  PARENTHESIS_LEFT
         };
-        this.begOper.setProperties(begPrp, begDefaultPrp);
+        this.begOper.mergeProperties(begPrp, begDefaultPrp);
         this.begOper.relate(this);
 
         var endPrp =
@@ -3536,7 +3536,7 @@ CDelimiter.prototype.Resize = function(Parent, ParaMath, oMeasure)
             type:  PARENTHESIS_RIGHT
         };
 
-        this.endOper.setProperties(endPrp, endDefaultPrp);
+        this.endOper.mergeProperties(endPrp, endDefaultPrp);
         this.endOper.relate(this);
 
         var sepPrp =
@@ -3553,7 +3553,7 @@ CDelimiter.prototype.Resize = function(Parent, ParaMath, oMeasure)
         if(this.nCol == 1 )
             sepPrp.type = OPERATOR_EMPTY;
 
-        this.sepOper.setProperties(sepPrp, sepDefaultPrp);
+        this.sepOper.mergeProperties(sepPrp, sepDefaultPrp);
         this.sepOper.relate(this);
 
 
@@ -3983,11 +3983,11 @@ function CCharacter()
 extend(CCharacter, CMathBase);
 CCharacter.prototype.setCharacter = function(props, defaultProps)
 {
-    this.operator.setProperties(props, defaultProps);
+    this.operator.mergeProperties(props, defaultProps);
     this.operator.relate(this);
 
-    this.setDimension(1, 1);
-    this.setContent();
+    //this.setDimension(1, 1);
+    //this.setContent();
 }
 CCharacter.prototype.Resize = function(Parent, ParaMath, oMeasure)
 {

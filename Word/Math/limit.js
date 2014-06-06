@@ -11,26 +11,17 @@ function CLimit(props)
 
     CMathBase.call(this);
 
-    if(props.type === LIMIT_UP || props.type === LIMIT_LOW)
-        this.Pr.type = props.type;
-
-    this.setDimension(2, 1);
-
-    var oBase = new CMathContent();
-
-    var oIter = new CMathContent();
-    oIter.decreaseArgSize();
-
-    if(this.Pr.type == LIMIT_LOW)
-        this.addMCToContent(oBase, oIter);
-    else if(this.Pr.type == LIMIT_UP)
-        this.addMCToContent(oIter, oBase);
-
-    this.setCtrPrp(props.ctrPrp);
+    if(props !== null && typeof(props) !== "undefined")
+        this.init(props);
 
 	g_oTableId.Add( this, this.Id );
 }
 extend(CLimit, CMathBase);
+CLimit.prototype.init = function(props)
+{
+    this.setProperties(props);
+    this.fillContent();
+}
 CLimit.prototype.getAscent = function()
 {
     var ascent;
@@ -64,6 +55,50 @@ CLimit.prototype.getIterator = function()
 CLimit.prototype.setDistance = function()
 {
     this.dH = 0.03674768518518519*this.Get_CompiledCtrPrp().FontSize;
+}
+CLimit.prototype.setProperties = function(props)
+{
+    if(props.type === LIMIT_UP || props.type === LIMIT_LOW)
+        this.Pr.type = props.type;
+
+    this.setCtrPrp(props.ctrPrp);
+}
+CLimit.prototype.fillContent = function()
+{
+    this.setDimension(2, 1);
+
+    var oBase = new CMathContent();
+
+    var oIter = new CMathContent();
+    oIter.decreaseArgSize();
+
+    if(this.Pr.type == LIMIT_LOW)
+        this.addMCToContent(oBase, oIter);
+    else if(this.Pr.type == LIMIT_UP)
+        this.addMCToContent(oIter, oBase);
+}
+CLimit.prototype.fillMathComposition = function(props, contents /*array*/)
+{
+    this.setProperties(props);
+    this.fillContent();
+
+    if(this.Pr.type == LIMIT_LOW)
+    {
+        // Base
+        this.elements[0][0] = contents[0];
+
+        // Iterator
+        this.elements[1][0] = contents[1];
+    }
+    else
+    {
+        // Iterator
+        this.elements[0][0] = contents[1];
+
+        // Base
+        this.elements[1][0] = contents[0];
+    }
+
 }
 CLimit.prototype.getPropsForWrite = function()
 {
@@ -115,14 +150,17 @@ function CMathFunc(props)
 
     CMathBase.call(this);
 
-    this.setDimension(1, 2);
-    this.setContent();
-
-    this.setCtrPrp(props.ctrPrp);
+    if(props !== null && typeof(props) !== "undefined")
+        this.init(props);
 
 	g_oTableId.Add( this, this.Id );
 }
 extend(CMathFunc, CMathBase);
+CMathFunc.prototype.init = function(props)
+{
+    this.setProperties(props);
+    this.fillContent();
+}
 CMathFunc.prototype.setDistance = function()
 {
     this.dW = this.Get_CompiledCtrPrp().FontSize/6*g_dKoef_pt_to_mm;
@@ -134,6 +172,27 @@ CMathFunc.prototype.getFName = function()
 CMathFunc.prototype.getArgument = function()
 {
     return this.elements[0][1];
+}
+CMathFunc.prototype.setProperties = function(props)
+{
+    this.setCtrPrp(props.ctrPrp);
+}
+CMathFunc.prototype.fillContent = function()
+{
+    this.setDimension(1, 2);
+    this.setContent();
+}
+CMathFunc.prototype.fillMathComposition = function(props, contents /*array*/)
+{
+    this.setProperties(props);
+    this.fillContent();
+
+    // FName
+    this.elements[0][0] = contents[0];
+
+    // Argument
+    this.element[0][1] = contents[1];
+
 }
 CMathFunc.prototype.getPropsForWrite = function()
 {

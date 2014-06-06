@@ -101,8 +101,8 @@ CMathBase.prototype =
     ///////// RunPrp, CtrPrp
     setCtrPrp: function(txtPrp) // выставляем ctrPrp на чтение
     {
-        this.CtrPrp.Merge(txtPrp);
-        //this.RunPrp.setTxtPrp(txtPrp);
+        if(txtPrp !== null && typeof(txtPrp) !== "undefined")
+            this.CtrPrp.Merge(txtPrp);
     },
     Get_CtrPrp: function()
     {

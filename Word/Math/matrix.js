@@ -3,10 +3,7 @@ function CMathMatrix(props)
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_MATRIX;
 
-    this.lineGapColumn = 1.5;
-    this.lineGapRow = 1;
     this.gaps = null;
-    this.plcHide = false;
 
     this.Pr =
     {
@@ -26,9 +23,9 @@ function CMathMatrix(props)
     {
         rule: 0,
         gap: 0,
-        minGap: 13/12    //em
+        minGap: 13/12    // em
                          // 780 /20 (pt) for font 36 pt
-        //minGap: 0
+                         // minGap: 0
     };
     this.spaceColumn =
     {
@@ -36,9 +33,6 @@ function CMathMatrix(props)
         gap: 0,
         minGap: 0       // minGap / 20 pt
     };
-
-    this.plcHide = false;
-    this.baseJc = BASEJC_CENTER;
 
     this.gaps =
     {
@@ -51,101 +45,19 @@ function CMathMatrix(props)
     this.column = 0;
     ////
 
-    CMathBase.call(this);
+    CMathMatrix.superclass.constructor.call(this);
 
-    this.init(props);
-    this.setCtrPrp(props.ctrPrp);
+    if(props !== null && typeof(props) !== "undefined")
+        this.init(props);
+        //this.constructor.superclass.init.call(this, props);
+
 	g_oTableId.Add( this, this.Id );
 }
 extend(CMathMatrix, CMathBase);
 CMathMatrix.prototype.init = function(props)
 {
-    if(typeof(props.row) === "undefined" || props.row === null)
-        props.row = 1;
-
-    if(typeof(props.column) === "undefined" || props.column === null)
-        props.column = 1;
-
-    this.setDimension(props.row, props.column);
-    this.setContent();
-
-    /*if(typeof(props.baseJc) !== "undefined" && props.baseJc !== null)
-    {
-        if(props.baseJc === "center")
-            this.baseJc = MATRIX_CENTER;
-        else if(props.baseJc === "top")
-            this.baseJc = MATRIX_TOP;
-        else if(props.baseJc === "bottom")
-            this.baseJc = MATRIX_BOTTOM;
-    }*/
-
-    /*if(props.baseJc === BASEJC_CENTER)
-        this.baseJc = BASEJC_CENTER;
-    else if(props.baseJc === BASEJC_TOP)
-        this.baseJc = BASEJC_TOP;
-    else if(props.baseJc === BASEJC_BOTTOM)
-        this.baseJc = BASEJC_BOTTOM;*/
-
-    if(props.baseJc === BASEJC_CENTER || props.baseJc === BASEJC_TOP || props.baseJc === BASEJC_BOTTOM)
-        this.baseJc = props.baseJc;
-
-    if(props.mcJc == MCJC_CENTER || props.mcJc == MCJC_LEFT || props.mcJc == MCJC_RIGHT)
-        this.mcJc = props.mcJc;
-
-    this.Pr.cGpRule = props.cGpRule;
-    this.Pr.cGp     = props.cGp;
-    this.Pr.cSp     = props.cSp;
-
-    this.Pr.rSpRule = props.rSpRule;
-    this.Pr.rSp     = props.rSp;
-
-    //this.setRuleGap(this.spaceColumn, props.cGpRule, props.cGp, props.cSp);
-    //this.setRuleGap(this.spaceRow, props.rSpRule, props.rSp);
-
-    if(props.plcHide === true || props.plcHide === 1)
-    {
-        this.plcHide = true;
-        this.hidePlaceholder(true);
-    }
-
-
-    /*if(props.cGpRule !== "undefined" && props.cGpRule !== null)
-    {
-        this.setRuleGap(this.spaceColumn, props.cGpRule, props.cGp);
-
-
-        *//*this.spaceColumn.value = 0;
-
-        if(props.cGpRule == 0)
-            this.spaceColumn.rule = 0;
-        else if(props.cGpRule == 1)
-            this.spaceColumn.rule = 1;
-        else if(props.cGpRule == 2)
-            this.spaceColumn.rule = 2;
-        else if(props.cGpRule == 3)
-        {
-            this.spaceColumn.rule = 3;
-
-            if(props.cGp !== "undefined" || props.cGp !== null)
-                this.spaceColumn.value = props.cGp;
-        }
-        else if(props.cGpRule == 4)
-        {
-            this.spaceColumn.rule = 4;
-
-            if(props.cGp !== "undefined" || props.cGp !== null)
-                this.spaceColumn.value = props.cGp;
-        }
-        else
-            this.spaceColumn.rule = 0;*//*
-    }
-
-    if(props.rSpRule !== "undefined" && props.rSpRule !== null)
-    {
-        // если rSpRule не выставлено, то какое выставлено rSp не имеет значение
-        this.setRuleGap(this.spaceRow, props.rSpRule, props.rSp);
-    }*/
-
+    this.setProperties(props);
+    this.fillContent();
 }
 CMathMatrix.prototype.setRuleGap = function(oSpace, rule, gap, minGap)
 {
@@ -165,42 +77,18 @@ CMathMatrix.prototype.setRuleGap = function(oSpace, rule, gap, minGap)
 
     if(minGap == minGap - 0 && minGap == minGap^0)
         oSpace.minGap = gap;
-
-    /*else
-     oSpace.minGap = 0;*/
-
-
-    /*var Value = 0, Rule;
-
-    if(rule == 0)
-        Rule = 0;
-    else if(rule == 1)
-        Rule = 1;
-    else if(rule == 2)
-        Rule = 2;
-    else if(rule == 3)
-    {
-        Rule = 3;
-
-        if(gap !== "undefined" || gap !== null)
-            Value = gap;
-    }
-    else if(rule == 4)
-    {
-        Rule = 4;
-
-        if(gap !== "undefined" || gap !== null)
-            Value = gap;
-    }
-    else
-        Rule = 0;
-
-     oSpace.rule = Rule;
-     oSpace.value = Value;*/
-
 }
 CMathMatrix.prototype.recalculateSize = function(oMeasure)
 {
+
+    if(this.RecalcInfo.bProps)
+    {
+        this.setRuleGap(this.spaceColumn, this.Pr.cGpRule, this.Pr.cGp, this.Pr.cSp);
+        this.setRuleGap(this.spaceRow, this.Pr.rSpRule, this.Pr.rSp);
+
+        this.RecalcInfo.bProps = false;
+    }
+
     var txtPrp = this.Get_CompiledCtrPrp();
 
     var intervalCol = this.getLineGap(txtPrp);
@@ -213,14 +101,6 @@ CMathMatrix.prototype.recalculateSize = function(oMeasure)
     var divCenter = 0;
     var metrics = this.getMetrics();
 
-    if(this.RecalcInfo.bProps)
-    {
-        this.setRuleGap(this.spaceColumn, this.Pr.cGpRule, this.Pr.cGp, this.Pr.cSp);
-        this.setRuleGap(this.spaceRow, this.Pr.rSpRule, this.Pr.rSp);
-
-        this.RecalcInfo.bProps = false;
-    }
-
     var plH = 0.2743827160493827 * txtPrp.FontSize;
     var minGp = this.spaceRow.minGap*txtPrp.FontSize*g_dKoef_pt_to_mm;
     minGp -= plH;
@@ -229,7 +109,6 @@ CMathMatrix.prototype.recalculateSize = function(oMeasure)
     {
         divCenter = intervalRow - (metrics.descents[j] + metrics.ascents[j + 1]);
         this.gaps.row[j + 1] = minGp > divCenter ? minGp : divCenter;
-        //this.gaps.row[j + 1] = divCenter;
     }
 
     var height = 0, width = 0;
@@ -242,12 +121,12 @@ CMathMatrix.prototype.recalculateSize = function(oMeasure)
 
     var ascent = 0;
 
-    if(this.baseJc == BASEJC_TOP)
+    if(this.Pr.baseJc == BASEJC_TOP)
     {
         for(var j = 0; j < this.nCol; j++)
             ascent = this.elements[0][j].size.ascent > ascent ? this.elements[0][j].size.ascent : ascent;
     }
-    else if(this.baseJc == BASEJC_BOTTOM)
+    else if(this.Pr.baseJc == BASEJC_BOTTOM)
     {
         var descent = 0,
             currDsc;
@@ -259,9 +138,9 @@ CMathMatrix.prototype.recalculateSize = function(oMeasure)
             ascent = height - descent;
         }
     }
-    else /*this.baseJc == 0*/
+    else /*this.Pr.baseJc == 0*/
         ascent = this.getAscent(oMeasure, height);
-        //center = height/2;
+
 
     width += this.GapLeft + this.GapRight;
 
@@ -504,23 +383,67 @@ CMathMatrix.prototype.getRowSpace = function(txtPrp)
 }
 CMathMatrix.prototype.baseJustification = function(type)
 {
-
-    // 0 - center
-    // 1 - top
-    // 2 - bottom
-
-    this.baseJc = type;
-
+    this.Pr.baseJc = type;
 }
 ////
+CMathMatrix.prototype.setProperties = function(props)
+{
+    this.setCtrPrp(props.ctrPrp);
+
+    if(typeof(props.row) !== "undefined" || props.row !== null)
+        this.nRow = props.row;
+
+    if(typeof(props.column) !== "undefined" || props.column !== null)
+        this.nCol = props.column;
+
+    if(props.plcHide === true || props.plcHide === 1)
+    {
+        this.Pr.plcHide = true;
+        this.hidePlaceholder(true);
+    }
+
+    if(props.baseJc === BASEJC_CENTER || props.baseJc === BASEJC_TOP || props.baseJc === BASEJC_BOTTOM)
+        this.Pr.baseJc = props.baseJc;
+
+    if(props.mcJc == MCJC_CENTER || props.mcJc == MCJC_LEFT || props.mcJc == MCJC_RIGHT)
+        this.mcJc = props.mcJc;
+
+    this.Pr.cGpRule = props.cGpRule;
+    this.Pr.cGp     = props.cGp;
+    this.Pr.cSp     = props.cSp;
+
+    this.Pr.rSpRule = props.rSpRule;
+    this.Pr.rSp     = props.rSp;
+}
+CMathMatrix.prototype.fillContent = function()
+{
+    if(this.nRow == 0)
+        this.nRow = 1;
+
+    if(this.nCol == 0)
+        this.nCol = 1;
+
+    this.setDimension(this.nRow, this.nCol);
+    this.setContent();
+}
+CMathMatrix.prototype.fillMathComposition = function(props, contents /*array*/)
+{
+    this.setProperties(props);
+    this.fillContent();
+
+    for(var i = 0; i < this.nRow; i++)
+        for(var j = 0; j < this.nCol; j++)
+            this.elements[i][j] = contents[j + i*this.nCol];
+
+}
 CMathMatrix.prototype.getPropsForWrite = function()
 {
     var props = {};
 
-    props.baseJc  = this.baseJc;
-    props.row     = this.nRow;
-    props.column  = this.nCol;
-    props.plcHide = this.plcHide;
+    props.baseJc  = this.Pr.baseJc;
+    props.row     = this.Pr.nRow;
+    props.column  = this.Pr.nCol;
+    props.plcHide = this.Pr.plcHide;
 
     props.cGpRule = this.spaceColumn.rule;
     props.cGp     = this.spaceColumn.gap;
@@ -690,27 +613,19 @@ CEqArray.prototype.init_2 = function(props)
         Pr.ctrPrp = props.ctrPrp;
 
 
-    CMathMatrix.call(this, Pr);
-    
-    //CEqArray.superclass.init.call(this, Pr);
-}
-CEqArray.prototype.old_init = function(props)
-{
-    var prps =
-    {
-        column:     1,
-        row:        props.row,
-        baseJc:     "center",
-        rSpRule:    4,
-        rSp:        0
-
-    };
-
-    CEqArray.superclass.init.call(this, prps);
+    CEqArray.superclass.constructor.call(this, Pr);
 }
 CEqArray.prototype.getElement = function(num)
 {
     return this.elements[num][0];
+}
+CEqArray.prototype.fillMathComposition = function(props, contents /*array*/)
+{
+    this.setProperties(props);
+    this.fillContent();
+
+    for(var i = 0; i < this.nRow; i++)
+        this.elements[i][0] = contents[i];
 }
 CEqArray.prototype.getPropsForWrite = function()
 {

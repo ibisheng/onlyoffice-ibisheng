@@ -38,66 +38,42 @@ function CBorderBox(props)
 extend(CBorderBox, CMathBase);
 CBorderBox.prototype.init = function(props)
 {
-    /*if(typeof(props) !== "undefined" && props !== null)
-    {
-        if(props.hideLeft === true || props.hideLeft === 1)
-            this.bLeft = false;
-        if(props.hideRight === true || props.hideRight === 1)
-            this.bRight = false;
-        if(props.hideTop === true || props.hideTop === 1)
-            this.bTop = false;
-        if(props.hideBot === true || props.hideBot === 1)
-            this.bBot = false;
-
-        if(props.strikeBLTR === true || props.strikeBLTR === 1)
-            this.bRDiag = true;
-
-        if(props.strikeTLBR === true || props.strikeTLBR === 1)
-            this.bLDiag = true;
-
-        if(props.strikeH === true || props.strikeH === 1)
-            this.bHor = true;
-
-        if(props.strikeV === true || props.strikeV === 1)
-            this.bVert = true;
-    }*/
-
-    this.setBorders(props);
-    this.setDimension(1, 1);
-
-    this.setContent();
-
-    if(props.ctrPrp !== null && typeof(props.ctrPrp) !== "undefined")
-        this.setCtrPrp(props.ctrPrp);
+    this.setProperties(props);
+    this.fillContent();
 }
-CBorderBox.prototype.setBorders = function(props)
+CBorderBox.prototype.fillContent = function()
 {
-    if(typeof(props) !== "undefined" && props !== null)
-    {
-        if(typeof(props.hideLeft) !== "undefined" && props.hideLeft !== null)
-            this.Pr.hideLeft = props.hideLeft;
+    this.setDimension(1, 1);
+    this.setContent();
+}
+CBorderBox.prototype.setProperties = function(props)
+{
+    if(typeof(props.hideLeft) !== "undefined" && props.hideLeft !== null)
+        this.Pr.hideLeft = props.hideLeft;
 
-        if(typeof(props.hideRight) !== "undefined" && props.hideRight !== null)
-            this.Pr.hideRight = props.hideRight;
+    if(typeof(props.hideRight) !== "undefined" && props.hideRight !== null)
+        this.Pr.hideRight = props.hideRight;
 
-        if(typeof(props.hideTop) !== "undefined" && props.hideTop !== null)
-            this.Pr.hideTop = props.hideTop;
+    if(typeof(props.hideTop) !== "undefined" && props.hideTop !== null)
+        this.Pr.hideTop = props.hideTop;
 
-        if(typeof(props.hideBot) !== "undefined" && props.hideBot !== null)
-            this.Pr.hideBot = props.hideBot;
+    if(typeof(props.hideBot) !== "undefined" && props.hideBot !== null)
+        this.Pr.hideBot = props.hideBot;
 
-        if(typeof(props.strikeBLTR) !== "undefined" && props.strikeBLTR !== null) // right diagonal
-            this.Pr.strikeBLTR = props.strikeBLTR;
+    if(typeof(props.strikeBLTR) !== "undefined" && props.strikeBLTR !== null) // right diagonal
+        this.Pr.strikeBLTR = props.strikeBLTR;
 
-        if(typeof(props.strikeTLBR) !== "undefined" && props.strikeTLBR !== null) // left diagonal
-            this.Pr.strikeTLBR = props.strikeTLBR;
+    if(typeof(props.strikeTLBR) !== "undefined" && props.strikeTLBR !== null) // left diagonal
+        this.Pr.strikeTLBR = props.strikeTLBR;
 
-        if(typeof(props.strikeH) !== "undefined" && props.strikeH !== null)
-            this.Pr.strikeH = props.strikeH;
+    if(typeof(props.strikeH) !== "undefined" && props.strikeH !== null)
+        this.Pr.strikeH = props.strikeH;
 
-        if(typeof(props.strikeV) !== "undefined" && props.strikeV !== null)
-            this.Pr.strikeV = props.strikeV;
-    }
+    if(typeof(props.strikeV) !== "undefined" && props.strikeV !== null)
+        this.Pr.strikeV = props.strikeV;
+
+    this.setCtrPrp(props.ctrPrp);
+
 
     this.RecalcInfo.bProps = true;
 }
@@ -458,6 +434,14 @@ CBorderBox.prototype.getBase = function()
 {
     return this.elements[0][0];
 }
+CBorderBox.prototype.fillMathComposition = function(props, contents /*array*/)
+{
+    this.setProperties(props);
+    this.fillContent();
+
+    // Base
+    this.elements[0][0] = contents[0];
+}
 CBorderBox.prototype.getPropsForWrite = function()
 {
     /*var props = {};
@@ -572,6 +556,8 @@ CBorderBox.prototype.Get_Id = function()
 	return this.Id;
 }
 
+
+
 function CBox(props)
 {
 	this.Id = g_oIdCounter.Get_NewId();
@@ -593,6 +579,19 @@ function CBox(props)
 extend(CBox, CMathBase);
 CBox.prototype.init = function(props)
 {
+    this.setProperties(props);
+    this.fillContent();
+}
+CBox.prototype.fillContent = function()
+{
+    this.setDimension(1, 1);
+    this.setContent();
+
+    if(this.opEmu)
+        this.elements[0][0].decreaseArgSize();
+}
+CBox.prototype.setProperties = function(props)
+{
     if(props.opEmu === true || props.opEmu === 1)
         this.opEmu = true;
 
@@ -608,14 +607,17 @@ CBox.prototype.init = function(props)
     if(props.aln === true || props.aln === 1)
         this.aln = true;
 
-    this.setDimension(1, 1);
-    this.setContent();
+    this.setCtrPrp(props.ctrPrp);
 
-    if(this.opEmu)
-        this.elements[0][0].decreaseArgSize();
+    this.RecalcInfo.bProps = true;
+}
+CBox.prototype.fillMathComposition = function(props, contents /*array*/)
+{
+    this.setProperties(props);
+    this.fillContent();
 
-    if(props.ctrPrp !== null && typeof(props.ctrPrp) !== "undefined")
-        this.setCtrPrp(props.ctrPrp);
+    // Base
+    this.elements[0][0] = contents[0];
 }
 CBox.prototype.getBase = function()
 {
@@ -732,32 +734,13 @@ function CBar(props)
 extend(CBar, CCharacter);
 CBar.prototype.init = function(props)
 {
-    if(props.pos === LOCATION_TOP || props.location === LOCATION_TOP)
-        this.Pr.pos = LOCATION_TOP;
-    else if(props.pos === LOCATION_BOT || props.location === LOCATION_BOT)
-        this.Pr.pos = LOCATION_BOT;
-
-    var prp =
-    {
-        loc:    this.Pr.pos,
-        type:   DELIMITER_LINE
-    };
-
-    var defaultProps =
-    {
-        loc:   LOCATION_BOT
-    };
-
-    this.setCharacter(prp, defaultProps);
-
-
-    if(props.ctrPrp !== null && typeof(props.ctrPrp) !== "undefined")
-        this.setCtrPrp(props.ctrPrp);
+    this.setProperties(props);
+    this.fillContent();
 }
-CBar.prototype.setLocation = function(pos)
+CBar.prototype.fillContent = function()
 {
-    this.Pr.pos = pos;
-    this.RecalcInfo.bProps = true;
+    this.setDimension(1, 1);
+    this.setContent();
 }
 CBar.prototype.Resize = function(Parent, ParaMath, oMeasure)
 {
@@ -790,6 +773,23 @@ CBar.prototype.getAscent = function()
         ascent = this.elements[0][0].size.ascent;
 
     return ascent;
+}
+CBar.prototype.setProperties = function(props)
+{
+    if(props.pos === LOCATION_TOP || props.pos === LOCATION_BOT)
+        this.Pr.pos = LOCATION_TOP;
+
+    this.setCtrPrp(props.ctrPrp);
+
+    this.RecalcInfo.bProps = true;
+}
+CBar.prototype.fillMathComposition = function(props, contents /*array*/)
+{
+    this.setProperties(props);
+    this.fillContent();
+
+    // Base
+    this.elements[0][0] = contents[0];
 }
 CBar.prototype.getPropsForWrite = function()
 {
@@ -850,30 +850,68 @@ function CPhantom(props)
     this.props = null;
     CMathBase.call(this);
 
-    this.init(props);
+    this.Pr =
+    {
+        show:       true,
+        transp:     false,
+        zeroAsc:    false,
+        zeroDesc:   false,
+        zeroWid:    false
+    };
 
     if(props !== null && typeof(props) !== "undefined")
-        this.setCtrPrp(props.ctrPrp);
+        this.init(props);
 
 	g_oTableId.Add( this, this.Id );
 }
 extend(CPhantom, CMathBase);
 CPhantom.prototype.init = function(props)
 {
-    this.props = props;
+    this.setProperties(props);
+    this.fillContent();
+}
+CPhantom.prototype.fillContent = function()
+{
     this.setDimension(1, 1);
     this.setContent();
-
-    if(props.ctrPrp !== null && typeof(props.ctrPrp) !== "undefined")
-        this.setCtrPrp(props.ctrPrp);
-}
-CPhantom.prototype.getPropsForWrite = function()
-{
-    return this.props;
 }
 CPhantom.prototype.getBase = function()
 {
     return this.elements[0][0];
+}
+CPhantom.prototype.setProperties = function(props)
+{
+    if(props.show == true || props.show == false)
+        this.Pr.show = props.show;
+
+    if(props.transp == false || props.transp == true)
+        this.Pr.transp = props.transp;
+
+    if(props.zeroAsc == false || props.zeroAsc == true)
+        this.Pr.zeroAsc = props.zeroAsc;
+
+    if(props.zeroDesc == false || props.zeroDesc == true)
+        this.Pr.zeroDesc = props.zeroDesc;
+
+    if(props.zeroWid == false || props.zeroWid == true)
+        this.Pr.zeroWid = props.zeroWid;
+
+
+    this.setCtrPrp(props.ctrPrp);
+
+    this.RecalcInfo.bProps = true;
+}
+CPhantom.prototype.fillMathComposition = function(props, contents /*array*/)
+{
+    this.setProperties(props);
+    this.fillContent();
+
+    // Base
+    this.elements[0][0] = contents[0];
+}
+CPhantom.prototype.getPropsForWrite = function()
+{
+    return this.props;
 }
 CPhantom.prototype.Save_Changes = function(Data, Writer)
 {

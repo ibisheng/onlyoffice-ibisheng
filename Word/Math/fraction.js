@@ -13,55 +13,16 @@ function CFraction(props)
 
     CMathBase.call(this);
 
-    this.init(props);
+    if(props !== null && typeof(props) !== "undefined")
+        this.init(props);
 
 	g_oTableId.Add( this, this.Id );
 }
 extend(CFraction, CMathBase);
 CFraction.prototype.init = function(props)
 {
-    this.setType(props.type);
-
-    if(props.ctrPrp !== null && typeof(props.ctrPrp) !== "undefined")
-        this.setCtrPrp(props.ctrPrp);
-}
-CFraction.prototype.setType = function(type)
-{
-    var bValid = typeof(type) !== "undefined" && type !== null;
-
-    if(bValid)
-    {
-        var bBar = type === BAR_FRACTION || type === NO_BAR_FRACTION,
-            bSkew = type === SKEWED_FRACTION,
-            bLin = type === LINEAR_FRACTION;
-
-        if(bBar || bSkew || bLin) // на всякий случай
-            this.Pr.type = type;
-    }
-
-    if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
-    {
-        var num = new CNumerator();
-
-        var den = new CDenominator();
-
-        this.setDimension(2, 1);
-
-        if(this.Pr.type == NO_BAR_FRACTION)
-            this.bHideBar = true;
-
-        this.addMCToContent(num, den);
-    }
-    else if(this.Pr.type == SKEWED_FRACTION)
-    {
-        this.setDimension(1, 2);
-        this.setContent();
-    }
-    else if(this.Pr.type == LINEAR_FRACTION)
-    {
-        this.setDimension(1, 2);
-        this.setContent();
-    }
+    this.setProperties(props);
+    this.fillContent();
 }
 CFraction.prototype.getType = function()
 {
@@ -424,11 +385,71 @@ CFraction.prototype.findDisposition = function( mCoord )
 
     return disposition;
 }
+CFraction.prototype.setProperties = function(props)
+{
+    var bBar = props.type === BAR_FRACTION || props.type === NO_BAR_FRACTION,
+        bSkew = props.type === SKEWED_FRACTION,
+        bLin = props.type === LINEAR_FRACTION;
+
+    if(bBar || bSkew || bLin)
+        this.Pr.type = props.type;
+
+    this.setCtrPrp(props.ctrPrp);
+}
+CFraction.prototype.fillContent = function()
+{
+    if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
+    {
+        var num = new CNumerator();
+
+        var den = new CDenominator();
+
+        this.setDimension(2, 1);
+
+        if(this.Pr.type == NO_BAR_FRACTION)
+            this.bHideBar = true;
+
+        this.addMCToContent(num, den);
+    }
+    else if(this.Pr.type == SKEWED_FRACTION)
+    {
+        this.setDimension(1, 2);
+        this.setContent();
+    }
+    else if(this.Pr.type == LINEAR_FRACTION)
+    {
+        this.setDimension(1, 2);
+        this.setContent();
+    }
+}
+CFraction.prototype.fillMathComposition = function(props, contents /*array*/)
+{
+    this.setProperties(props);
+    this.fillContent();
+
+
+    if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
+    {
+        // Numerator
+        this.elements[0][0].fillMathComposition(contents[0]);
+
+        // Denominator
+        this.elements[1][0].fillMathComposition(contents[1]);
+    }
+    else
+    {
+        // Numerator
+        this.elements[0][0] = contents[0];
+
+        // Denominator
+        this.elements[0][1] = contents[1];
+    }
+
+}
 CFraction.prototype.getPropsForWrite = function()
 {
     return this.Pr;
 }
-
 CFraction.prototype.Save_Changes = function(Data, Writer)
 {
 	Writer.WriteLong( historyitem_type_frac );
@@ -587,6 +608,10 @@ CNumerator.prototype.getElement = function()
 {
     return this.elements[0][0];
 }
+CNumerator.prototype.fillMathComposition = function(content)
+{
+    this.elements[0][0] = content;
+}
 CNumerator.prototype.Get_CompiledCtrPrp = function()
 {
     return this.Parent.Get_CompiledCtrPrp();
@@ -663,6 +688,10 @@ CDenominator.prototype.setPosition = function(pos)
 CDenominator.prototype.getElement = function(txt)
 {
     return this.elements[0][0];
+}
+CDenominator.prototype.fillMathComposition = function(content)
+{
+    this.elements[0][0] = content;
 }
 CDenominator.prototype.Get_CompiledCtrPrp = function()
 {

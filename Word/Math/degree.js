@@ -3,10 +3,8 @@ function CDegree(props)
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_DEGREE;
 
-    //this.type = DEGREE_SUPERSCRIPT;
     this.upBase = 0; // отступ сверху для основания
     this.upIter = 0; // отступ сверху для итератора
-    //this.alnScr = false;  // не выровнены, итераторы идут в соответствии с наклоном буквы/мат. объекта
 
     this.Pr =
     {
@@ -15,27 +13,26 @@ function CDegree(props)
 
     CMathBase.call(this);
 
-    this.init(props);
-    this.setCtrPrp(props.ctrPrp);
+    if(props !== null && typeof(props) !== "undefined")
+        this.init(props);
+
 	g_oTableId.Add( this, this.Id );
 }
 extend(CDegree, CMathBase);
 CDegree.prototype.init = function(props)
 {
-    /*if(props.alnScr === true || props.alnScr === 1)
-        this.alnScr = true;
-    else if(props.alnScr === false || props.alnScr === 0)
-        this.alnScr = false;*/
-
+    this.setProperties(props);
+    this.fillContent();
+}
+CDegree.prototype.fillContent = function()
+{
     var oBase = new CMathContent();
 
     if(props.indef == 2) /// props include Base for CNary
+    {
         oBase = props.oBase;
-
-    if(props.type === DEGREE_SUPERSCRIPT)
-        this.Pr.type = DEGREE_SUPERSCRIPT;
-    else if(props.type === DEGREE_SUBSCRIPT)
-        this.Pr.type = DEGREE_SUBSCRIPT;
+        oBase.setCtrPrp(props.ctrPrp);
+    }
 
     this.setDimension(1, 2);
 
@@ -44,20 +41,6 @@ CDegree.prototype.init = function(props)
 
     this.addMCToContent(oBase, oDegree);
 }
-/*CDegree.prototype.init_2 = function(props, oBase)
-{
-    if(props.type === DEGREE_SUPERSCRIPT)
-        this.type = DEGREE_SUPERSCRIPT;
-    else if(props.type === DEGREE_SUBSCRIPT)
-        this.type = DEGREE_SUBSCRIPT;
-
-    this.setDimension(1, 2);
-
-    var oDegree = new CMathContent();
-    oDegree.decreaseArgSize();
-
-    this.addMCToContent(oBase, oDegree);
-}*/
 CDegree.prototype.recalculateSize = function(oMeasure)
 {
     if(this.Pr.type === DEGREE_SUPERSCRIPT)
@@ -458,22 +441,35 @@ CDegree.prototype.getBase = function()
 {
     return this.elements[0][0];
 }
-/*CDegree.prototype.getPropsForWrite = function()
-{
-    var props = {};
-
-    props.type = this.type;
-    //props.alnScr = this.alnScr;
-
-    return props;
-}*/
-CDegree.prototype.getPropsForWrite = function()
-{
-    return this.Pr;
-}
 CDegree.prototype.IsPlhIterator = function()
 {
     return this.elements[0][1].IsPlaceholder();
+}
+CDegree.prototype.setProperties = function(props)
+{
+    if(props.type === DEGREE_SUPERSCRIPT)
+        this.Pr.type = DEGREE_SUPERSCRIPT;
+    else if(props.type === DEGREE_SUBSCRIPT)
+        this.Pr.type = DEGREE_SUBSCRIPT;
+
+    this.setCtrPrp(props.ctrPrp);
+
+    this.RecalcInfo.bProps = true;
+}
+CDegree.prototype.fillMathComposition = function(props, contents /*array*/)
+{
+    this.setProperties(props);
+    this.fillContent();
+
+    // Base
+    this.elements[0][0] = contents[0];
+
+    // Iterator
+    this.elements[0][1] = contents[1];
+}
+CDegree.prototype.getPropsForWrite = function()
+{
+    return this.Pr;
 }
 CDegree.prototype.Save_Changes = function(Data, Writer)
 {
@@ -643,6 +639,11 @@ CIterators.prototype.Get_CompiledCtrPrp = function()
 {
     return this.Parent.Get_CompiledCtrPrp();
 }
+CIterators.prototype.fillMathComposition = function(upperIterator, lowerIterator)
+{
+    this.elements[0][0] = upperIterator;
+    this.elements[1][0] = lowerIterator;
+}
 
 function CDegreeSubSup(props)
 {
@@ -662,25 +663,26 @@ function CDegreeSubSup(props)
 
     CMathBase.call(this);
 
-    this.init(props);
-    this.setCtrPrp(props.ctrPrp);
+    if(props !== null && typeof(props) !== "undefined")
+        this.init(props);
+
 	g_oTableId.Add( this, this.Id );
 }
 extend(CDegreeSubSup, CMathBase);
 CDegreeSubSup.prototype.init = function(props)
 {
-    if(props.alnScr === true || props.alnScr === 1)
-        this.Pr.alnScr = true;
-    else if(props.alnScr === false || props.alnScr === 0)
-        this.Pr.alnScr = false;
-
+    this.setProperties(props);
+    this.fillContent();
+}
+CDegreeSubSup.prototype.fillContent = function()
+{
     var oBase = new CMathContent();
 
     if(props.indef == 2) /// props include Base for CNary
+    {
         oBase = props.oBase;
-
-    if(props.type === DEGREE_SubSup || props.type === DEGREE_PreSubSup)
-        this.Pr.type = props.type;
+        oBase.setCtrPrp(props.ctrPrp);
+    }
 
     this.setDimension(1, 2);
 
@@ -702,41 +704,7 @@ CDegreeSubSup.prototype.init = function(props)
         oIters.alignHor(-1, 1);
         this.addMCToContent(oIters, oBase);
     }
-
-    /// вызов этой функции обязательно в конце
-    //this.WriteContentsToHistory();
 }
-/*CDegreeSubSup.prototype.init_2 = function(props, oBase)
-{
-    if(props.type === DEGREE_SubSup)
-        this.type = DEGREE_SubSup;
-    else if(props.type === DEGREE_PreSubSup)
-        this.type = DEGREE_PreSubSup;
-
-    this.setDimension(1, 2);
-
-    var oIters = new CIterators();
-    oIters.init();
-    oIters.decreaseArgSize();
-
-
-    oIters.lUp = 0;
-    oIters.lD = 0;
-
-    if(this.type == DEGREE_SubSup)
-    {
-        oIters.alignHor(-1, 0);
-        this.addMCToContent(oBase, oIters);
-    }
-    else if(this.type == DEGREE_PreSubSup)
-    {
-        oIters.alignHor(-1, 1);
-        this.addMCToContent(oIters, oBase);
-    }
-
-    /// вызов этой функции обязательно в конце
-    this.WriteContentsToHistory();
-}*/
 CDegreeSubSup.prototype.old_old_recalculateSize = function(oMeasure)
 {
     var mgCtrPrp = this.Get_CompiledCtrPrp();
@@ -1130,15 +1098,44 @@ CDegreeSubSup.prototype.getLowerIterator = function()
 
     return iter;
 }
+CDegreeSubSup.prototype.setProperties = function(props)
+{
+    if(props.alnScr === true || props.alnScr === 1)
+        this.Pr.alnScr = true;
+    else if(props.alnScr === false || props.alnScr === 0)
+        this.Pr.alnScr = false;
+
+    if(props.type === DEGREE_SubSup || props.type === DEGREE_PreSubSup)
+        this.Pr.type = props.type;
+
+    this.setCtrPrp(props.ctrPrp);
+
+    this.RecalcInfo.bProps = true;
+}
+CDegreeSubSup.prototype.fillMathComposition = function(props, contents /*array*/)
+{
+    this.setProperties(props);
+    this.fillContent();
+
+    if(this.Pr.type == DEGREE_SubSup)
+    {
+        // Base
+        this.elements[0][0] = contents[0];
+
+        // Iterators
+        this.elements[0][1].fillMathComposition(contents[1]/*upper iterator*/, contents[2]/*lower iterator*/);
+    }
+    else
+    {
+        // Base
+        this.elements[0][1] = contents[0];
+
+        // Iterators
+        this.elements[0][0].fillMathComposition(contents[1]/*upper iterator*/, contents[2]/*lower iterator*/);
+    }
+}
 CDegreeSubSup.prototype.getPropsForWrite = function()
 {
-    /*var props = {};
-
-    props.type = this.type;
-    props.alnScr = this.alnScr;
-
-    return props;*/
-
     return this.Pr;
 }
 CDegreeSubSup.prototype.Save_Changes = function(Data, Writer)
@@ -1198,16 +1195,3 @@ CDegreeSubSup.prototype.Get_Id = function()
 {
 	return this.Id;
 }
-
-//выяcнить: почему и с этой ф-ией и без нее работает всё ok...
-//всё ok, т.к. в контенте 2 элемента, и их center сравниваем
-/*CDegreeSubSup.prototype.getCenter = function()
-{
-    var center = 0;
-    if(this.type == 0)
-        center = this.elements[0][1].size.center;
-    else
-        center = this.elements[0][0].size.center;
-
-    return center;
-}*/

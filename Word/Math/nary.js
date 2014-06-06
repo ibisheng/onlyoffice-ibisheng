@@ -18,25 +18,18 @@ function CNary(props)
         limLoc:     null
     };
 
-    //this.limLoc = null;
-
-    //this.type = null;
-    //this.code = null;   // for "read"
-    //this.grow = false;
-    //this.supHide = false;
-    //this.subHide = false;
 
     CMathBase.call(this);
 
-    this.init(props);
-    //this.setCtrPrp(props.ctrPrp);
+    if(props !== null && typeof(props) !== "undefined")
+        this.init(props);
+
 	g_oTableId.Add( this, this.Id );
 }
 extend(CNary, CMathBase);
 CNary.prototype.init = function(props)
 {
-    if(props.ctrPrp !== null && typeof(props.ctrPrp)!== "undefined")
-        this.setCtrPrp(props.ctrPrp);
+    this.setCtrPrp(props.ctrPrp);
 
     if(props.supHide === true || props.supHide === 1)
         this.Pr.supHide = true;
@@ -51,8 +44,6 @@ CNary.prototype.init = function(props)
 
     var oSign = this.getSign(props.chr, props.signType);
 
-    //this.Pr.chrType = oSign.chrType;
-    //this.Pr.chr     = String.fromCharCode(oSign.chrCode);
 
     this.Pr.chrType = props.chrType;
     this.Pr.chr =     props.chr;
@@ -64,8 +55,6 @@ CNary.prototype.init = function(props)
     else
     {
         var bIntegral = oSign.chrCode > 0x222A && oSign.chrCode < 0x2231;
-
-        //var MPrp = this.Parent.Composition.GetMathPr();
 
         if(bIntegral)
             this.Pr.limLoc = g_oMathSettings.intLim;
@@ -106,19 +95,20 @@ CNary.prototype.init = function(props)
     }
     else
     {
+        var prp;
         if( this.Pr.supHide && !this.Pr.subHide )
         {
-            var prp = {type: DEGREE_SUBSCRIPT, indef: 2, oBase: oSign.operator, ctrPrp: this.CtrPrp.Copy() };
+            prp = {type: DEGREE_SUBSCRIPT, indef: 2, oBase: oSign.operator, ctrPrp: this.CtrPrp.Copy() };
             base = new CDegree(prp);
         }
         else if( !this.Pr.supHide && this.Pr.subHide )
         {
-            var prp = {type: DEGREE_SUPERSCRIPT, indef: 2, oBase: oSign.operator, ctrPrp: this.CtrPrp.Copy()};
+            prp = {type: DEGREE_SUPERSCRIPT, indef: 2, oBase: oSign.operator, ctrPrp: this.CtrPrp.Copy()};
             base = new CDegree(prp);
         }
         else
         {
-            var prp = {type: DEGREE_SubSup, indef: 2, oBase: oSign.operator, ctrPrp: this.CtrPrp.Copy()};
+            prp = {type: DEGREE_SubSup, indef: 2, oBase: oSign.operator, ctrPrp: this.CtrPrp.Copy()};
             base = new CDegreeSubSup(prp);
         }
     }
@@ -283,14 +273,7 @@ CNary.prototype.getLowerIterator = function()
 }
 CNary.prototype.getPropsForWrite = function()
 {
-    var props = {
-        chr:		String.fromCharCode(this.code),
-        grow:		this.grow,
-        limLoc: 	this.limLoc,
-        subHide:	this.subHide,
-        supHide:	this.supHide
-    };
-    return props;
+    return this.Pr;
 }
 CNary.prototype.Save_Changes = function(Data, Writer)
 {

@@ -510,10 +510,6 @@ function CAccent(props)
         chrType:    null
     };
 
-    /*this.chr  = null;
-    this.chrType = null;
-    this.loc = LOCATION_TOP;*/
-
     /////////////////
 
     this.operator = new COperator(OPER_ACCENT);
@@ -532,19 +528,12 @@ function CAccent(props)
 extend(CAccent, CMathBase);
 CAccent.prototype.init = function(props)
 {
-    this.Pr.chr     = props.chr;
-    this.Pr.chrType = props.chrType;
-
-    //this.operator.init(prp, defaultPrp);
-    //this.operator.relate(this);
+    this.setProperties(props);
 
     this.setDimension(1, 1);
     this.setContent();
 
     this.elements[0][0].SetDot(true);
-
-    if(props.ctrPrp !== null && typeof(props.ctrPrp) !== "undefined")
-        this.setCtrPrp(props.ctrPrp);
 }
 CAccent.prototype.setChr = function(chr)
 {
@@ -1138,7 +1127,7 @@ CAccent.prototype.Resize = function(Parent, ParaMath, oMeasure)
             type:   ACCENT_CIRCUMFLEX
         };
 
-        this.operator.setProperties(prp, defaultPrp);
+        this.operator.mergeProperties(prp, defaultPrp);
 
         this.Pr.chr = String.fromCharCode(this.operator.code);
         this.Pr.chrType = this.operator.typeOper;
@@ -1228,6 +1217,22 @@ CAccent.prototype.findDisposition = function(pos)
         posCurs =    {x: curs_X, y: curs_Y};
 
     return {pos: posCurs, mCoord: mouseCoord, inside_flag: inside_flag};
+}
+CAccent.prototype.setProperties = function(props)
+{
+    this.Pr.chr     = props.chr;
+    this.Pr.chrType = props.chrType;
+
+    this.setCtrPrp(props.ctrPrp);
+
+    this.RecalcInfo.bProps = true;
+}
+CAccent.prototype.fillMathComposition = function(props, contents /*array*/)
+{
+    this.init(props);
+
+    // Base
+    this.elements[0][0] = contents[0];
 }
 CAccent.prototype.Save_Changes = function(Data, Writer)
 {
