@@ -5699,7 +5699,7 @@ asc_docs_api.prototype.asc_setSpellCheck = function(isOn)
 //-----------------------------------------------------------------
 // Функции для работы с комментариями
 //-----------------------------------------------------------------
-function asc_CCommentData( obj )
+function asc_CCommentDataWord( obj )
 {
     if( obj )
     {
@@ -5715,7 +5715,7 @@ function asc_CCommentData( obj )
             var Count = obj.m_aReplies.length;
             for ( var Index = 0; Index < Count; Index++ )
             {
-                var Reply = new asc_CCommentData( obj.m_aReplies[Index] );
+                var Reply = new asc_CCommentDataWord( obj.m_aReplies[Index] );
                 this.m_aReplies.push( Reply );
             }
         }
@@ -5732,21 +5732,21 @@ function asc_CCommentData( obj )
     }
 }
 
-asc_CCommentData.prototype.asc_getText         = function()  { return this.m_sText; }
-asc_CCommentData.prototype.asc_putText         = function(v) { this.m_sText = v; }
-asc_CCommentData.prototype.asc_getTime         = function()  { return this.m_sTime; }
-asc_CCommentData.prototype.asc_putTime         = function(v) { this.m_sTime = v; }
-asc_CCommentData.prototype.asc_getUserId       = function()  { return this.m_sUserId; }
-asc_CCommentData.prototype.asc_putUserId       = function(v) { this.m_sUserId = v; }
-asc_CCommentData.prototype.asc_getUserName     = function()  { return this.m_sUserName; }
-asc_CCommentData.prototype.asc_putUserName     = function(v) { this.m_sUserName = v; }
-asc_CCommentData.prototype.asc_getQuoteText    = function()  { return this.m_sQuoteText; };
-asc_CCommentData.prototype.asc_putQuoteText    = function(v) { this.m_sQuoteText = v; };
-asc_CCommentData.prototype.asc_getSolved       = function()  { return this.m_bSolved; };
-asc_CCommentData.prototype.asc_putSolved       = function(v) { this.m_bSolved = v; };
-asc_CCommentData.prototype.asc_getReply        = function(i) { return this.m_aReplies[i]; }
-asc_CCommentData.prototype.asc_addReply        = function(v) { this.m_aReplies.push( v ); }
-asc_CCommentData.prototype.asc_getRepliesCount = function(v) { return this.m_aReplies.length; }
+asc_CCommentDataWord.prototype.asc_getText         = function()  { return this.m_sText; }
+asc_CCommentDataWord.prototype.asc_putText         = function(v) { this.m_sText = v; }
+asc_CCommentDataWord.prototype.asc_getTime         = function()  { return this.m_sTime; }
+asc_CCommentDataWord.prototype.asc_putTime         = function(v) { this.m_sTime = v; }
+asc_CCommentDataWord.prototype.asc_getUserId       = function()  { return this.m_sUserId; }
+asc_CCommentDataWord.prototype.asc_putUserId       = function(v) { this.m_sUserId = v; }
+asc_CCommentDataWord.prototype.asc_getUserName     = function()  { return this.m_sUserName; }
+asc_CCommentDataWord.prototype.asc_putUserName     = function(v) { this.m_sUserName = v; }
+asc_CCommentDataWord.prototype.asc_getQuoteText    = function()  { return this.m_sQuoteText; };
+asc_CCommentDataWord.prototype.asc_putQuoteText    = function(v) { this.m_sQuoteText = v; };
+asc_CCommentDataWord.prototype.asc_getSolved       = function()  { return this.m_bSolved; };
+asc_CCommentDataWord.prototype.asc_putSolved       = function(v) { this.m_bSolved = v; };
+asc_CCommentDataWord.prototype.asc_getReply        = function(i) { return this.m_aReplies[i]; }
+asc_CCommentDataWord.prototype.asc_addReply        = function(v) { this.m_aReplies.push( v ); }
+asc_CCommentDataWord.prototype.asc_getRepliesCount = function(v) { return this.m_aReplies.length; }
 
 
 asc_docs_api.prototype.asc_showComments = function()
@@ -5843,7 +5843,7 @@ asc_docs_api.prototype.sync_RemoveComment = function(Id)
 
 asc_docs_api.prototype.sync_AddComment = function(Id, CommentData)
 {
-    var AscCommentData = new asc_CCommentData(CommentData);
+    var AscCommentData = new asc_CCommentDataWord(CommentData);
     this.asc_fireCallback("asc_onAddComment", Id, AscCommentData);
 }
 
@@ -5866,7 +5866,7 @@ asc_docs_api.prototype.sync_UpdateCommentPosition = function(Id, X, Y)
 
 asc_docs_api.prototype.sync_ChangeCommentData = function(Id, CommentData)
 {
-    var AscCommentData = new asc_CCommentData(CommentData);
+    var AscCommentData = new asc_CCommentDataWord(CommentData);
     this.asc_fireCallback("asc_onChangeCommentData", Id, AscCommentData);
 }
 
@@ -5889,7 +5889,7 @@ asc_docs_api.prototype.asc_getComments = function()
         var DocComments = LogicDocument.Comments;
         for ( var Id in DocComments.m_aComments )
         {
-            var AscCommentData = new asc_CCommentData(DocComments.m_aComments[Id].Data);
+            var AscCommentData = new asc_CCommentDataWord(DocComments.m_aComments[Id].Data);
             ResComments.push( { "Id" : Id, "Comment" : AscCommentData } );
         }
     }

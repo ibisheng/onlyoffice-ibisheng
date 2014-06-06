@@ -1227,7 +1227,7 @@ CDocumentContent.prototype =
         }
     },
 
-    Get_PageBounds : function(PageNum)
+    Get_PageBounds : function(PageNum, Height)
     {
         if ( this.Pages.length <= 0 )
             return { Top : 0, Left : 0, Right : 0, Bottom : 0 };
@@ -1237,17 +1237,31 @@ CDocumentContent.prototype =
 
         var Bounds = this.Pages[PageNum].Bounds;
 
+        // В колонтитуле не учитывается.
         if ( true != this.Is_HdrFtr(false) )
         {
-            // Учитываем только Drawing-объекты с врапом (объекты над и под текстом не учитываются при пересчете размера)
-            // В колонтитуле не учитывается.
+            
+            // Учитываем все Drawing-оьъекты с обтеканием. Объекты без обтекания (над и под текстом) учитываем только в 
+            // случае, когда начальная точка (левый верхний угол) попадает в this.Y + Height
+                        
             var AllDrawingObjects = this.Get_AllDrawingObjects();
             var Count = AllDrawingObjects.length;
             for ( var Index = 0; Index < Count; Index++ )
             {
                 var Obj = AllDrawingObjects[Index];
-                if ( true === Obj.Use_TextWrap() && Obj.Y + Obj.H > Bounds.Bottom )
-                    Bounds.Bottom = Obj.Y + Obj.H;
+                
+                if ( true === Obj.Use_TextWrap() )
+                {
+                    if ( Obj.Y + Obj.H > Bounds.Bottom )
+                        Bounds.Bottom = Obj.Y + Obj.H;
+                }
+                else if ( undefined !== Height && Obj.Y < this.Y + Height )
+                {
+                    if ( Obj.Y + Obj.H >= this.Y + Height )
+                        Bounds.Bottom = this.Y + Height;
+                    else if ( Obj.Y + Obj.H > Bounds.Bottom )
+                        Bounds.Bottom = Obj.Y + Obj.H;                        
+                }
             }
 
             // Кроме этого пробежимся по всем Flow-таблицам и учтем их границы
@@ -1266,7 +1280,7 @@ CDocumentContent.prototype =
 
         return Bounds;
     },
-
+    
     Get_PagesCount : function()
     {
         return this.Pages.length;

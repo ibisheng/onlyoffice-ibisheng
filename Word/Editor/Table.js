@@ -15450,7 +15450,7 @@ CTable.prototype =
                         var Y_1 = HeaderPage.RowsInfo[CurRow].TableRowsBottom - CellMar.Bottom.W;
                         var CellHeight = Y_1 - Y_0;
 
-                        var CellContentBounds = Cell.Content.Get_PageBounds( CellPageIndex );
+                        var CellContentBounds = Cell.Content.Get_PageBounds( CellPageIndex, CellHeight );
                         var ContentHeight = CellContentBounds.Bottom - CellContentBounds.Top;
 
                         var Dy = 0;
@@ -15976,7 +15976,7 @@ CTable.prototype =
                 var Y_1 = this.TableRowsBottom[CurRow][CurPage] - CellMar.Bottom.W;
                 var CellHeight = Y_1 - Y_0;
 
-                var CellContentBounds = Cell.Content.Get_PageBounds( CellPageIndex );
+                var CellContentBounds = Cell.Content.Get_PageBounds( CellPageIndex, CellHeight );
                 var ContentHeight = CellContentBounds.Bottom - CellContentBounds.Top;
 
                 var Dy = 0;

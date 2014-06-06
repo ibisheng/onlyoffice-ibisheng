@@ -615,43 +615,19 @@ Paragraph.prototype =
     // Добавляем несколько элементов в конец параграфа.
     Internal_Content_Concat : function(Items)
     {
-        if ( true !== Debug_ParaRunMode )
+        var StartPos = this.Content.length;
+        this.Content = this.Content.concat( Items );
+
+        History.Add( this, { Type : historyitem_Paragraph_AddItem, Pos : StartPos, EndPos : this.Content.length - 1, Items : Items } );
+
+        // Нам нужно сбросить рассчет всех добавленных элементов и выставить у них родительский класс и параграф
+        for ( var CurPos = StartPos; CurPos < this.Content.length; CurPos++ )
         {
-            // Добавляем только постоянные элементы параграфа
-            var NewItems = new Array();
-            var ItemsCount = Items.length;
-            for ( var Index = 0; Index < ItemsCount; Index++ )
-            {
-                if ( true === Items[Index].Is_RealContent() )
-                    NewItems.push( Items[Index] );
-            }
-
-            if ( NewItems.length <= 0 )
-                return;
-
-            var StartPos = this.Content.length;
-            this.Content = this.Content.concat( NewItems );
-
-            History.Add( this, { Type : historyitem_Paragraph_AddItem, Pos : this.Internal_Get_ClearPos( StartPos ), EndPos : this.Internal_Get_ClearPos( this.Content.length - 1 ), Items : NewItems } );
-
-            this.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+            this.Content[CurPos].Set_Paragraph( this );
         }
-        else
-        {
-            var StartPos = this.Content.length;
-            this.Content = this.Content.concat( Items );
 
-            History.Add( this, { Type : historyitem_Paragraph_AddItem, Pos : StartPos, EndPos : this.Content.length - 1, Items : Items } );
-
-            // Нам нужно сбросить рассчет всех добавленных элементов и выставить у них родительский класс и параграф
-            for ( var CurPos = StartPos; CurPos < this.Content.length; CurPos++ )
-            {
-                this.Content[CurPos].Set_Paragraph( this );
-            }
-
-            // Обновлять позиции в NearestPos не надо, потому что мы добавляем новые элементы в конец массива
-            this.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
-        }
+        // Обновлять позиции в NearestPos не надо, потому что мы добавляем новые элементы в конец массива
+        this.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
     },
 
     // Удаляем элемент из содержимого параграфа. (Здесь передвигаются все позиции
@@ -15427,28 +15403,21 @@ Paragraph.prototype =
 
     Check_NearestPos : function(NearPos)
     {
-        if ( true !== Debug_ParaRunMode )
+        var ParaNearPos = new CParagraphNearPos();
+        ParaNearPos.NearPos = NearPos;
+
+        var Count = this.NearPosArray.length;
+        for ( var Index = 0; Index < Count; Index++ )
         {
-            this.NearPosArray.push( NearPos );
+            if ( this.NearPosArray[Index].NearPos === NearPos )
+                return;
         }
-        else
-        {
-            var ParaNearPos = new CParagraphNearPos();
-            ParaNearPos.NearPos = NearPos;
 
-            var Count = this.NearPosArray.length;
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                if ( this.NearPosArray[Index].NearPos === NearPos )
-                    return;
-            }
+        this.NearPosArray.push( ParaNearPos );
+        ParaNearPos.Classes.push( this );
 
-            this.NearPosArray.push( ParaNearPos );
-            ParaNearPos.Classes.push( this );
-
-            var CurPos = NearPos.ContentPos.Get(0);
-            this.Content[CurPos].Check_NearestPos( ParaNearPos, 1 );
-        }
+        var CurPos = NearPos.ContentPos.Get(0);
+        this.Content[CurPos].Check_NearestPos( ParaNearPos, 1 );
     },
 
     Clear_NearestPosArray : function()
@@ -16998,43 +16967,40 @@ Paragraph.prototype =
     // Присоединяем контент параграфа Para к текущему параграфу
     Concat : function(Para)
     {
-        if ( true !== Debug_ParaRunMode )
+        this.DeleteCommentOnRemove = false;
+
+        // Убираем метку конца параграфа у данного параграфа
+        this.Remove_ParaEnd();
+        
+        // Если в параграфе Para были точки NearPos, за которыми нужно следить перенесем их в этот параграф
+        var NearPosCount = Para.NearPosArray.length;
+        for ( var Pos = 0; Pos < NearPosCount; Pos++ )
         {
-            this.DeleteCommentOnRemove = false;
-            this.Internal_Content_Remove2( this.Content.length - 2, 2 );
-            this.DeleteCommentOnRemove = true;
-
-            // Убираем нумерацию, если она была у следующего параграфа
-            Para.Numbering_Remove();
-            Para.Remove_PresentationNumbering();
-
-            this.Internal_Content_Concat( Para.Content );
-
-            this.RecalcInfo.Set_Type_0(pararecalc_0_All);
+            var ParaNearPos = Para.NearPosArray[Pos];
+            
+            // Подменяем ссылки на параграф (вложенные ссылки менять не надо, т.к. мы добавляем объекты целиком)
+            ParaNearPos.Classes[0] = this;
+            ParaNearPos.NearPos.Paragraph = this;
+            ParaNearPos.NearPos.ContentPos.Data[0] += this.Content.length;
+            
+            this.NearPosArray.push(ParaNearPos);
         }
-        else
+        
+        // Добавляем содержимое второго параграфа к первому
+        this.Internal_Content_Concat( Para.Content );
+
+        // Если на данном параграфе оканчивалась секция, тогда удаляем эту секцию
+        this.Set_SectionPr( undefined );
+
+        // Если на втором параграфе оканчивалась секция, тогда переносим конец секции на данный параграф
+        var SectPr = Para.Get_SectionPr()
+        if ( undefined !== SectPr )
         {
-            this.DeleteCommentOnRemove = false;
-
-            // Убираем метку конца параграфа у данного параграфа
-            this.Remove_ParaEnd();
-
-            // Добавляем содержимое второго параграфа к первому
-            this.Internal_Content_Concat( Para.Content );
-
-            // Если на данном параграфе оканчивалась секция, тогда удаляем эту секцию
-            this.Set_SectionPr( undefined );
-
-            // Если на втором параграфе оканчивалась секция, тогда переносим конец секции на данный параграф
-            var SectPr = Para.Get_SectionPr()
-            if ( undefined !== SectPr )
-            {
-                Para.Set_SectionPr( undefined );
-                this.Set_SectionPr( SectPr );
-            }
-
-            this.DeleteCommentOnRemove = true;
+            Para.Set_SectionPr( undefined );
+            this.Set_SectionPr( SectPr );
         }
+
+        this.DeleteCommentOnRemove = true;
     },
 
     // Копируем настройки параграфа и последние текстовые настройки в новый параграф
