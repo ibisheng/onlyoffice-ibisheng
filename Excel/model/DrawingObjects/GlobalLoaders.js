@@ -470,7 +470,6 @@
                 this.AddLoadFonts(this.fontInfos[this.map_font_index["Arial"]], 0x0F);
                 this.AddLoadFonts(this.fontInfos[this.map_font_index["Symbol"]], 0x0F);
                 this.AddLoadFonts(this.fontInfos[this.map_font_index["Wingdings"]], 0x0F);
-                this.AddLoadFonts(this.fontInfos[this.map_font_index["Wingdings 3"]], 0x0F);
                 this.AddLoadFonts(this.fontInfos[this.map_font_index["Courier New"]], 0x0F);
                 //if (is_default === true)
                 {
