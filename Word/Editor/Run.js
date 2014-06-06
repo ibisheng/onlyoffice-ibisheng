@@ -2978,7 +2978,7 @@ ParaRun.prototype =
                     PDSH.SearchCounter++;
             }
 
-            var DrawSearch = ( PDSH.SearchCounter > 0 ? true : false );
+            var DrawSearch = ( PDSH.SearchCounter > 0 && true === bDrawFind ? true : false );
 
             var DrawColl = this.CollaborativeMarks.Check( Pos );
 

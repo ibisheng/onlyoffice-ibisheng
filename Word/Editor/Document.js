@@ -7528,7 +7528,11 @@ CDocument.prototype =
         for ( var Index = StartPos; Index <= EndPos; Index++ )
         {
             var Item = this.Content[Index];
-            if ( false != Item.Is_Inline() && ( type_Table === Item.GetType() || undefined === Item.Get_SectionPr() || true !== Item.IsEmpty() ) )
+            
+            var PrevItem = Item.Get_DocumentPrev();
+            var bEmptySectPara = ( type_Paragraph === Item.GetType() && undefined !== Item.Get_SectionPr() && true === Item.IsEmpty() && null !== PrevItem && ( type_Table === PrevItem.GetType() || undefined === PrevItem.Get_SectionPr() ) ) ? true : false;
+            
+            if ( false != Item.Is_Inline() && ( type_Table === Item.GetType() || false === bEmptySectPara ) )
                 InlineElements.push( Index );
         }
 

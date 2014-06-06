@@ -2351,7 +2351,7 @@ function ParaEnd()
 
     this.Width        = 0;
     this.Height       = 0;
-    this.WidthVisible = 0;
+    this.WidthVisible = 0;    
 }
 
 ParaEnd.prototype =

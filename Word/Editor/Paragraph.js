@@ -69,6 +69,11 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
     this.Lines = new Array(); // Массив строк (CParaLine)
 
     this.Numbering = new ParaNumbering();
+    this.ParaEnd   =
+    {
+        Line  : 0,
+        Range : 0
+    }; //new ParaEnd();
 
     this.CurPos  =
     {
@@ -136,19 +141,10 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
 
     // Добавляем в контент элемент "конец параграфа"
     this.Content = new Array();
+    var EndRun = new ParaRun(this);
+    EndRun.Add_ToContent( 0, new ParaEnd() );
 
-    if ( true !== Debug_ParaRunMode )
-    {
-        this.Content[0] = new ParaEnd();
-        this.Content[1] = new ParaEmpty();
-    }
-    else
-    {
-        var EndRun = new ParaRun(this);
-        EndRun.Add_ToContent( 0, new ParaEnd() );
-
-        this.Content[0] = EndRun;
-    }
+    this.Content[0] = EndRun;
 
     this.m_oPRSW = new CParagraphRecalculateStateWrap();
     this.m_oPRSC = new CParagraphRecalculateStateCounter();
@@ -3013,7 +3009,7 @@ Paragraph.prototype =
         var Pr     = this.Get_CompiledPr();
         var ParaPr = Pr.ParaPr;
 
-        var StartLine = ( CurPage > 0 ? this.Pages[CurPage - 1].EndLine + 1 : 0 );
+        var StartLine = ( CurPage > 0 ? this.Pages[CurPage - 1].EndLine + 1 : 0 );       
 
         //-------------------------------------------------------------------------------------------------------------
         // Обрабатываем настройку "не отрывать от следующего"
@@ -3914,6 +3910,10 @@ Paragraph.prototype =
             this.Lines[CurLine].Add_Range( Ranges[Index - 1].X1, (RangesCount == Index ? PRS.XLimit : Ranges[Index].X0) );
         }
 
+        // При пересчете любой строки обновляем эти поля
+        this.ParaEnd.Line  = -1;
+        this.ParaEnd.Range = -1;
+
         while ( CurRange <= RangesCount )
         {
             PRS.Range = CurRange;
@@ -3925,6 +3925,12 @@ Paragraph.prototype =
                 this.Lines[CurLine].Ranges.length = CurRange + 1;
                 
                 break;
+            }
+            
+            if ( -1 === this.ParaEnd.Line && true === PRS.End )
+            {
+                this.ParaEnd.Line  = CurLine;
+                this.ParaEnd.Range = CurRange;
             }
 
             CurRange++;
@@ -4342,7 +4348,7 @@ Paragraph.prototype =
             }
         }
         else
-        {
+        {           
             // В последней строке могут быть заполнены не все отрезки обтекания
             for ( var TempRange = CurRange + 1; TempRange <= RangesCount; TempRange++ )
                 this.Lines[CurLine].Set_RangeStartPos( TempRange, Pos );
@@ -4550,6 +4556,13 @@ Paragraph.prototype =
                         X = Range.X;
                         break;
                     }
+                }
+                
+                // В последнем отрезке последней строки не делаем текст "по ширине"
+                if ( CurLine === this.ParaEnd.Line && CurRange === this.ParaEnd.Range )
+                {
+                    JustifyWord  = 0;
+                    JustifySpace = 0;
                 }
 
                 PRSA.X    = X;
