@@ -324,9 +324,6 @@ CHistory.prototype =
         if ( this.Points.length < 2 )
             return;
 
-        if ( this.Index < this.SavedIndex )
-            this.SavedIndex = this.Index;
-
         var Point1 = this.Points[this.Points.length - 2];
         var Point2 = this.Points[this.Points.length - 1];
 
@@ -366,6 +363,9 @@ CHistory.prototype =
             Additional : {}
         };
 
+		if ( this.SavedIndex >= this.Points.length - 2 )
+			this.SavedIndex = this.Points.length - 3;
+
         this.Points.splice( this.Points.length - 2, 2, NewPoint );
         if ( this.Index >= this.Points.length )
         {
@@ -373,7 +373,7 @@ CHistory.prototype =
             this.Index    += DiffIndex;
             this.RecIndex  = Math.max( -1, this.RecIndex + DiffIndex);
         }
-    },
+	},
 
     TurnOff : function()
     {
