@@ -45,7 +45,7 @@ CHistory.prototype =
     Clear : function()
     {
         this.Index         = -1;
-        this.SavedIndex    = -1;
+        this.SavedIndex    = null;
         this.Points.length = 0;
         this.Internal_RecalcData_Clear();
     },
@@ -127,7 +127,7 @@ CHistory.prototype =
 
     Create_NewPoint : function()
     {
-        if ( this.Index < this.SavedIndex )
+        if ( this.Index < this.SavedIndex && null !== this.SavedIndex )
             this.SavedIndex = this.Index;
 
         this.Clear_Additional();
@@ -363,7 +363,7 @@ CHistory.prototype =
             Additional : {}
         };
 
-		if ( this.SavedIndex >= this.Points.length - 2 )
+		if ( this.SavedIndex >= this.Points.length - 2 && null !== this.SavedIndex )
 			this.SavedIndex = this.Points.length - 3;
 
         this.Points.splice( this.Points.length - 2, 2, NewPoint );
