@@ -3309,8 +3309,6 @@ function CDelimiter(props)
 
         sepChr:         null,
         sepChrType:     null,
-
-        ////  special for "read"  ////
         column:         0,
 
         shp:            DELIMITER_SHAPE_CENTERED,
@@ -3321,14 +3319,23 @@ function CDelimiter(props)
     //this.grow = true;
 
 
+    ////  special for "read"  ////
+    this.column = 0;
+
     CMathBase.call(this);
 
-    this.init(props);
+    if(props !== null && typeof(props) !== "undefined")
+        this.init(props);
 
 	g_oTableId.Add( this, this.Id );
 }
 extend(CDelimiter, CMathBase);
 CDelimiter.prototype.init = function(props)
+{
+    this.setProperties(props);
+    this.fillContent();
+}
+CDelimiter.prototype.setProperties = function(props)
 {
     if(props.grow == true || props.grow == 1)
         this.Pr.grow = true;
@@ -3344,20 +3351,29 @@ CDelimiter.prototype.init = function(props)
     this.Pr.sepChr     = props.sepChr;
     this.Pr.sepChrType = props.sepChrType;
 
+    if(props.column !== null || typeof(props.column) !== "undefined")
+        this.Pr.column = props.column;
+    else
+        this.Pr.column = 1;
 
-    if(props.shape == DELIMITER_SHAPE_MATH || props.shp == DELIMITER_SHAPE_MATH)
-        this.Pr.shp = DELIMITER_SHAPE_MATH;
-    else if(props.shape == DELIMITER_SHAPE_CENTERED || props.shp == DELIMITER_SHAPE_CENTERED)
-        this.Pr.shp = DELIMITER_SHAPE_CENTERED;
-
-    if(props.column === null || typeof(props.column) === "undefined")
-        props.column = 1;
+    if(props.shp == DELIMITER_SHAPE_MATH || props.shp == DELIMITER_SHAPE_CENTERED)
+        this.Pr.shp = props.shp;
 
     if(props.ctrPrp !== null && typeof(props.ctrPrp) !== "undefined")
         this.setCtrPrp(props.ctrPrp);
-
-    this.setDimension(1, props.column);
+}
+CDelimiter.prototype.fillContent = function()
+{
+    this.setDimension(1, this.Pr.column);
     this.setContent();
+}
+CDelimiter.prototype.fillMathComposition = function(props, contents /*array*/)
+{
+    this.setProperties(props);
+    this.fillContent();
+
+    for(var j = 0; j < this.nCol; j++)
+        this.elements[0][j] = contents[j];
 }
 CDelimiter.prototype.old_recalculateSize = function()
 {
@@ -4150,23 +4166,20 @@ function CGroupCharacter(props)
 
     CCharacter.call(this);
 
-    this.init(props);
+    if(props !== null && typeof(props)!== "undefined")
+        this.init(props);
+
+    /// вызов этой функции обязательно в конце
+    g_oTableId.Add( this, this.Id );
 }
 extend(CGroupCharacter, CCharacter);
 CGroupCharacter.prototype.init = function(props)
 {
-    if(props.vertJc === VJUST_TOP || props.vertJc === VJUST_BOT)
-        this.Pr.vertJc = props.vertJc;
 
-    if(props.pos === LOCATION_TOP || props.pos === LOCATION_BOT)
-        this.Pr.pos = props.pos;
+    this.setProperties(props);
+    this.fillContent();
 
-    this.Pr.chr     = props.chr;
-    this.Pr.chrType = props.chrType;
-
-    ///////////////////////////////////////////////////////////////
-
-    var operDefaultPrp =
+    /*var operDefaultPrp =
     {
         type:   BRACKET_CURLY_BOTTOM,
         loc:    LOCATION_BOT
@@ -4182,16 +4195,8 @@ CGroupCharacter.prototype.init = function(props)
     this.setCharacter(operProps, operDefaultPrp);
 
     this.Pr.chrType = this.operator.typeOper;
-    this.Pr.chr     = String.fromCharCode(this.operator.code);
+    this.Pr.chr     = String.fromCharCode(this.operator.code);*/
 
-
-    //////////////////////////////////////////////////////////////////
-
-    if(props.ctrPrp !== null && typeof(props.ctrPrp)!== "undefined")
-        this.setCtrPrp(props.ctrPrp);
-
-    /// вызов этой функции обязательно в конце
-    g_oTableId.Add( this, this.Id );
 }
 CGroupCharacter.prototype.Resize = function(Parent, ParaMath, oMeasure)
 {
@@ -4219,6 +4224,31 @@ CGroupCharacter.prototype.Resize = function(Parent, ParaMath, oMeasure)
     }
 
     CGroupCharacter.superclass.Resize.call(this, Parent, ParaMath, oMeasure);
+}
+CGroupCharacter.prototype.setProperties = function(props)
+{
+    if(props.vertJc === VJUST_TOP || props.vertJc === VJUST_BOT)
+        this.Pr.vertJc = props.vertJc;
+
+    if(props.pos === LOCATION_TOP || props.pos === LOCATION_BOT)
+        this.Pr.pos = props.pos;
+
+    this.Pr.chr     = props.chr;
+    this.Pr.chrType = props.chrType;
+
+    this.setCtrPrp(props.ctrPrp);
+}
+CGroupCharacter.prototype.fillContent = function()
+{
+    this.setDimension(1, 1);
+    this.setContent();
+}
+CGroupCharacter.prototype.fillMathComposition = function(props, contents /*array*/)
+{
+    this.setProperties(props);
+    this.fillContent();
+
+    this.elements[0][0] = contents[0];
 }
 CGroupCharacter.prototype.getAscent = function(oMeasure)
 {

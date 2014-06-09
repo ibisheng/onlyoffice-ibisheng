@@ -18,7 +18,6 @@ function CNary(props)
         limLoc:     null
     };
 
-
     CMathBase.call(this);
 
     if(props !== null && typeof(props) !== "undefined")
@@ -28,6 +27,11 @@ function CNary(props)
 }
 extend(CNary, CMathBase);
 CNary.prototype.init = function(props)
+{
+    this.setProperties(props);
+    this.fillContent();
+}
+CNary.prototype.setProperties = function(props)
 {
     this.setCtrPrp(props.ctrPrp);
 
@@ -40,87 +44,114 @@ CNary.prototype.init = function(props)
     if(props.grow === true || props.grow === 1)
         this.Pr.grow = true;
 
-    this.setDimension(1, 2);
-
-    var oSign = this.getSign(props.chr, props.signType);
-
-
     this.Pr.chrType = props.chrType;
     this.Pr.chr =     props.chr;
 
-    if(props.limLoc == NARY_UndOvr)
-        this.Pr.limLoc = NARY_UndOvr;
-    else if(props.limLoc  == NARY_SubSup)
-        this.Pr.limLoc = NARY_SubSup;
-    else
-    {
-        var bIntegral = oSign.chrCode > 0x222A && oSign.chrCode < 0x2231;
 
-        if(bIntegral)
-            this.Pr.limLoc = g_oMathSettings.intLim;
-        else
-            this.Pr.limLoc = g_oMathSettings.naryLim;
-    }
+    if(props.limLoc == NARY_UndOvr || props.limLoc  == NARY_SubSup)
+        this.Pr.limLoc = props.limLoc;
+}
+CNary.prototype.fillContent = function()
+{
+    this.setDimension(1, 2);
 
     var arg = new CMathContent(),
         base;
+
+    var ctrPrp = this.CtrPrp.Copy();
 
     if(this.Pr.limLoc === NARY_UndOvr)
     {
         if(this.Pr.supHide && this.Pr.subHide)
         {
-            base = oSign.operator;
+            base = new CMathText(true);
         }
         else if( this.Pr.supHide && !this.Pr.subHide )
         {
             base = new CNaryOvr();
-            base.init(oSign.operator);
+            //base.init(oBase);
 
-            base.setCtrPrp(this.CtrPrp.Copy());
+            base.setCtrPrp(ctrPrp);
 
         }
         else if( !this.Pr.supHide && this.Pr.subHide )
         {
             base = new CNaryUnd();
-            base.init(oSign.operator);
-            base.setCtrPrp(this.CtrPrp.Copy());
+            //base.init(oBase);
+            base.setCtrPrp(ctrPrp);
         }
         else
         {
             base = new CNaryUndOvr();
-            base.init(oSign.operator);
-            base.setCtrPrp(this.CtrPrp.Copy());
+            //base.init(oBase);
+            base.setCtrPrp(ctrPrp);
         }
 
     }
     else
     {
         var prp;
+
         if( this.Pr.supHide && !this.Pr.subHide )
         {
-            prp = {type: DEGREE_SUBSCRIPT, indef: 2, oBase: oSign.operator, ctrPrp: this.CtrPrp.Copy() };
+            prp = {type: DEGREE_SUBSCRIPT, ctrPrp:  ctrPrp };
             base = new CDegree(prp);
         }
         else if( !this.Pr.supHide && this.Pr.subHide )
         {
-            prp = {type: DEGREE_SUPERSCRIPT, indef: 2, oBase: oSign.operator, ctrPrp: this.CtrPrp.Copy()};
+            prp = {type: DEGREE_SUPERSCRIPT, ctrPrp: ctrPrp};
             base = new CDegree(prp);
         }
         else
         {
-            prp = {type: DEGREE_SubSup, indef: 2, oBase: oSign.operator, ctrPrp: this.CtrPrp.Copy()};
+            prp = {type: DEGREE_SubSup, ctrPrp: ctrPrp};
             base = new CDegreeSubSup(prp);
         }
     }
 
-
     this.addMCToContent(base, arg);
+
+}
+CNary.prototype.fillMathComposition = function(props, contents /*array*/)
+{
+    this.setProperties(props);
+    this.fillContent();
+
+    // Base
+    this.elements[0][1] = contents[0];
+
+
+    // Upper iterator
+    if(!this.Pr.subHide)
+        this.elements[0][0].changeUpperIterator(contents[1]);
+
+    // Lower iterator
+    if(!this.Pr.subHide)
+        this.elements[0][0].changeLowerIterator(contents[2]);
+
+
 }
 CNary.prototype.Resize = function(Parent, ParaMath, oMeasure)
 {
     if(this.RecalcInfo.bProps)
     {
         var oSign = this.getSign(this.Pr.chr, this.Pr.chrType);
+
+        if(this.Pr.limLoc == null || typeof(this.Pr.limLoc) == "undefined")
+        {
+            var bIntegral = oSign.chrCode > 0x222A && oSign.chrCode < 0x2231;
+
+            if(bIntegral)
+                this.Pr.limLoc = g_oMathSettings.intLim;
+            else
+                this.Pr.limLoc = g_oMathSettings.naryLim;
+        }
+
+        if(this.Pr.supHide && this.Pr.subHide)
+            this.elements[0][0] = oSign.operator;
+        else
+            this.elements[0][0].changeBase(oSign.operator);
+
 
         this.Pr.chrType = oSign.chrType;
         this.Pr.chr     = String.fromCharCode(oSign.chrCode);
@@ -354,15 +385,27 @@ function CNaryUnd()
     CMathBase.call(this);
 }
 extend(CNaryUnd, CMathBase);
-CNaryUnd.prototype.init = function(sign)
+CNaryUnd.prototype.init = function()
+{
+    this.setDimension(2, 1);
+    var iter = new CMathContent();
+    iter.decreaseArgSize();
+
+    var base = new CMathContent();
+
+    this.addMCToContent(iter, base);
+}
+CNaryUnd.prototype.old_init = function(sign)
 {
     this.setDimension(2,1);
     var iter = new CMathContent();
     iter.decreaseArgSize();
 
-    //sign.relate(this);
-
     this.addMCToContent(iter, sign);
+}
+CNaryUnd.prototype.changeBase = function(base)
+{
+    this.elements[1][0] = base;
 }
 CNaryUnd.prototype.setDistance = function()
 {
@@ -377,6 +420,10 @@ CNaryUnd.prototype.getUpperIterator = function()
 {
     return this.elements[0][0];
 }
+CNaryUnd.prototype.changeUpperIterator = function(iterator)
+{
+    this.elements[0][0] = iterator;
+}
 
 
 function CNaryOvr()
@@ -384,7 +431,17 @@ function CNaryOvr()
     CMathBase.call(this);
 }
 extend(CNaryOvr, CMathBase);
-CNaryOvr.prototype.init = function(sign)
+CNaryOvr.prototype.init = function()
+{
+    this.setDimension(2, 1);
+    var iter = new CMathContent();
+    iter.decreaseArgSize();
+
+    var base = new CMathContent();
+
+    this.addMCToContent(base, iter);
+}
+CNaryOvr.prototype.old_init = function(sign)
 {
     this.setDimension(2,1);
     var iter = new CMathContent();
@@ -393,6 +450,10 @@ CNaryOvr.prototype.init = function(sign)
     //sign.relate(this);
 
     this.addMCToContent(sign, iter);
+}
+CNaryOvr.prototype.changeBase = function(base)
+{
+    this.elements[0][0] = base;
 }
 CNaryOvr.prototype.old_setDistance = function()
 {
@@ -424,9 +485,13 @@ CNaryOvr.prototype.old_getAscent = function()
 {
     return this.elements[0][0].size.ascent;
 }
-CNaryOvr.prototype.getLowerIterator= function()
+CNaryOvr.prototype.getLowerIterator = function()
 {
     return this.elements[1][0];
+}
+CNaryOvr.prototype.changeLowerIterator = function(iterator)
+{
+    this.elements[1][0] = iterator;
 }
 
 function CNaryUndOvr()
@@ -436,7 +501,7 @@ function CNaryUndOvr()
     CMathBase.call(this);
 }
 extend(CNaryUndOvr, CMathBase);
-CNaryUndOvr.prototype.init = function(sign)
+CNaryUndOvr.prototype.init = function()
 {
     this.setDimension(3,1);
 
@@ -446,7 +511,13 @@ CNaryUndOvr.prototype.init = function(sign)
     var iter2 = new CMathContent();
     iter2.decreaseArgSize();
 
-    this.addMCToContent(iter1, sign, iter2);
+    var base = new CMathContent();
+
+    this.addMCToContent(iter1, base, iter2);
+}
+CNaryUndOvr.prototype.changeBase = function(base)
+{
+    this.elements[1][0] = base;
 }
 CNaryUndOvr.prototype.recalculateSize = function()
 {
@@ -557,6 +628,14 @@ CNaryUndOvr.prototype.findDisposition = function(mCoord)
         X = mCoord.x - align.x;
 
     return {pos: {x: pos_x, y: pos_y}, mCoord: {x: X, y: Y}, inside_flag: inside_flag};
+}
+CNaryUndOvr.prototype.changeUpperIterator = function(iterator)
+{
+    this.elements[0][0] = iterator;
+}
+CNaryUndOvr.prototype.changeLowerIterator = function(iterator)
+{
+    this.elements[2][0] = iterator;
 }
 CNaryUndOvr.prototype.getLowerIterator = function()
 {

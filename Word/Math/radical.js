@@ -902,12 +902,19 @@ function CRadical(props)
 
     CMathBase.call(this);
 
-    this.init(props);
-    this.setCtrPrp(props.ctrPrp);
+    if(props !== null && typeof(props)!== "undefined")
+        this.init(props);
+
+
 	g_oTableId.Add( this, this.Id );
 }
 extend(CRadical, CMathBase);
 CRadical.prototype.init = function(props)
+{
+    this.setProperties(props);
+    this.fillContent();
+}
+CRadical.prototype.setProperties = function(props)
 {
     if(props.type === SQUARE_RADICAL || props.type === DEGREE_RADICAL)
         this.Pr.type = props.type;
@@ -917,9 +924,10 @@ CRadical.prototype.init = function(props)
     else if(props.degHide == false || props.degHide === 0)
         this.Pr.type = DEGREE_RADICAL;
 
-    this.setDimension(1, 1);
-    this.setContent();
-
+    this.setCtrPrp(props.ctrPrp);
+}
+CRadical.prototype.fillContent = function()
+{
     this.signRadical = new CSignRadical();
     this.signRadical.relate(this);
 
@@ -933,14 +941,23 @@ CRadical.prototype.init = function(props)
         this.setDimension(1, 2);
         var oBase = new CMathContent();
         var oDegree = new CMathContent();
-        //oDegree.decreaseArgSize();
         oDegree.setArgSize(-2);
 
         this.addMCToContent(oDegree, oBase);
     }
+}
+CRadical.prototype.fillMathComposition = function(props, contents /*array*/)
+{
+    this.setProperties(props);
+    this.fillContent();
 
-    /// вызов этой функции обязательно в конце
-   // this.WriteContentsToHistory();
+    if(this.Pr.type == SQUARE_RADICAL)
+        this.elements[0][0] = contents[0];
+    else if(this.Pr.type == DEGREE_RADICAL)
+        this.elements[0][1] = contents[0];
+
+    if(this.Pr.degHide == false)
+        this.elements[0][0] = contents[1];
 }
 CRadical.prototype.recalculateSize = function(oMeasure)
 {

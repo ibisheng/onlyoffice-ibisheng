@@ -184,7 +184,7 @@ CMathBase.prototype =
 
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
-                if( !this.elements[i][j].IsJustDraw())
+                if( !this.elements[i][j].IsJustDraw() )
                     this.elements[i][j].setArgSize(argSize);
     },
     // TO DO
@@ -328,8 +328,7 @@ CMathBase.prototype =
                 bUpperLevel = true;
                 break;
             }
-        } while( this.elements[this.CurPos_X][this.CurPos_Y].IsJustDraw() )
-            ;
+        } while( this.elements[this.CurPos_X][this.CurPos_Y].IsJustDraw() );
 
         //из цикла вышли если bJustDraw = false  or  bUpperLevel = true
 
@@ -366,8 +365,7 @@ CMathBase.prototype =
                 bUpperLevel = true;
                 break;
             }
-        } while( this.elements[this.CurPos_X][this.CurPos_Y].IsJustDraw() )
-            ;
+        } while( this.elements[this.CurPos_X][this.CurPos_Y].IsJustDraw() );
 
         var content;
         if( bUpperLevel )
