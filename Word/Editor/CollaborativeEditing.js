@@ -743,7 +743,7 @@ function CCollaborativeEditing()
         this.OnStart_Load_Objects();
     };
 
-    this.Send_Changes = function()
+    this.Send_Changes2 = function()
     {
         // Пересчитываем позиции
         this.Refresh_DCChanges();
@@ -801,6 +801,74 @@ function CCollaborativeEditing()
         editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
         editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
 
+        editor.WordControl.m_oLogicDocument.DrawingDocument.ClearCachePages();
+        editor.WordControl.m_oLogicDocument.DrawingDocument.FirePaint();
+    };
+    
+    this.Send_Changes = function()
+    {
+        // Пересчитываем позиции
+        this.Refresh_DCChanges();
+
+        // Генерируем свои изменения
+        var StartPoint = History.SavedIndex + 1;
+        var LastPoint  = -1;
+        if ( true === this.m_bUse )
+        {
+            // (ненужные точки предварительно удаляем)
+            History.Clear_Redo();
+            LastPoint = History.Points.length - 1;
+        }
+        else
+        {
+            LastPoint = History.Index + 1;
+        }
+
+        var aChanges = new Array();
+        for ( var PointIndex = StartPoint; PointIndex < LastPoint; PointIndex++ )
+        {
+            var Point = History.Points[PointIndex];
+
+            for ( var Index = 0; Index < Point.Items.length; Index++ )
+            {
+                var Item = Point.Items[Index];
+                var oChanges = new CCollaborativeChanges();
+                oChanges.Set_FromUndoRedo( Item.Class, Item.Data, Item.Binary );
+
+                var oChanges2 = new Object();
+                oChanges2["Id"]   = oChanges.m_sId;
+                oChanges2["Data"] = oChanges.m_pData;
+                aChanges.push( oChanges2 );
+            }
+        }
+
+        this.Release_Locks();
+
+        var UnlockCount2 = this.m_aNeedUnlock2.length;
+        for ( var Index = 0; Index < UnlockCount2; Index++ )
+        {
+            var Class = this.m_aNeedUnlock2[Index];
+            Class.Lock.Set_Type( locktype_None, false);
+            editor.CoAuthoringApi.releaseLocks( Class.Get_Id() );
+        }
+
+        this.m_aNeedUnlock.length  = 0;
+        this.m_aNeedUnlock2.length = 0;
+
+        editor.CoAuthoringApi.saveChanges(aChanges, StartPoint);
+
+        // Чистим Undo/Redo только во время совместного редактирования
+        if ( true === this.m_bUse )
+            History.Clear();
+
+        // Обновляем точку последнего сохранения в истории
+        History.Reset_SavedIndex();
+
+        // Обновляем интерфейс        
+        editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+        editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
+
+        // Перерисовываем документ (для обновления локов)
         editor.WordControl.m_oLogicDocument.DrawingDocument.ClearCachePages();
         editor.WordControl.m_oLogicDocument.DrawingDocument.FirePaint();
     };

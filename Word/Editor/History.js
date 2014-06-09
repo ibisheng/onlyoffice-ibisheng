@@ -127,10 +127,13 @@ CHistory.prototype =
 
     Create_NewPoint : function()
     {
+        if ( this.Index < this.SavedIndex )
+            this.SavedIndex = this.Index;
+
         this.Clear_Additional();
 
         this.Check_UninonLastPoints();
-
+        
         var State = this.Document.Get_SelectionState();
         var Items = new Array();
         var Time  = new Date().getTime();
@@ -318,8 +321,11 @@ CHistory.prototype =
     Check_UninonLastPoints : function()
     {
         // Не объединяем точки истории, если на предыдущей точке произошло сохранение
-        if ( this.Points.length < 2 || this.SavedIndex >= this.Points.length - 2 )
+        if ( this.Points.length < 2 )
             return;
+
+        if ( this.Index < this.SavedIndex )
+            this.SavedIndex = this.Index;
 
         var Point1 = this.Points[this.Points.length - 2];
         var Point2 = this.Points[this.Points.length - 1];
