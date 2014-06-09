@@ -415,8 +415,8 @@ asc_CChart.prototype = {
             var bbox = _t.range.intervalObject.getBBox0();
 
             if ( bbox.c2 - bbox.c1 > 0 ) {
-                for (var i = bbox.r1 + 1; i <= bbox.r2; i++) {
-
+                for (var i = bbox.r1 + 1; i <= bbox.r2; i++)
+                {
                     var cell = _t.range.intervalObject.worksheet.getCell( new CellAddress(i, bbox.c1, 0) );
                     var value = cell.getValue();
                     if ( !isNumber(value) && (value != "") )
@@ -497,13 +497,40 @@ asc_CChart.prototype = {
         }
 
         var parsedHeaders = _t.parseSeriesHeaders();
+        var data_bbox = {
+            r1: parsedHeaders.bTop ? bbox.r1 + 1 : bbox.r1,
+            r2: bbox.r2,
+            c1: parsedHeaders.bLeft ? bbox.c1 + 1 : bbox.c1,
+            c2: bbox.c2
+        };
 
-        if ( _t.range.rows ) {
-            for (var i = bbox.r1 + (parsedHeaders.bTop ? 1 : 0); i <= bbox.r2; i++) {
+        var top_header_bbox, left_header_bbox;
+        if ( _t.range.rows )
+        {
+            if(parsedHeaders.bTop)
+            {
+                top_header_bbox = {r1: bbox.r1, c1: data_bbox.c1, r2: bbox.r1, c2: data_bbox.c2};
+            }
+            else if(_t.range.catHeadersBBox && _t.range.catHeadersBBox.c1 === data_bbox.c1 && _t.range.catHeadersBBox.c2 === data_bbox.c2 && _t.range.catHeadersBBox.r1 === _t.range.catHeadersBBox.r2)
+            {
 
+                top_header_bbox = {r1: _t.range.catHeadersBBox.r1, c1: _t.range.catHeadersBBox.c1, r2: _t.range.catHeadersBBox.r1, c2: _t.range.catHeadersBBox.c2};
+            }
+
+            if(parsedHeaders.bLeft)
+            {
+                left_header_bbox = {r1: data_bbox.r1, r2: data_bbox.r2, c1: bbox.c1, c2: bbox.c1};
+            }
+            else if(_t.range.serHeadersBBox && _t.range.serHeadersBBox.c1 === _t.range.serHeadersBBox.c2 && _t.range.serHeadersBBox.r1 === data_bbox.r1 && _t.range.serHeadersBBox.r2 === data_bbox.r2)
+            {
+                left_header_bbox = {r1: _t.range.serHeadersBBox.r1, c1: _t.range.serHeadersBBox.c1, r2: _t.range.serHeadersBBox.r1, c2: _t.range.serHeadersBBox.c2};
+            }
+
+            for (var i = data_bbox.r1; i <= data_bbox.r2; i++)
+            {
                 var ser = new asc_CChartSeria();
-                var startCell = new CellAddress(i, bbox.c1 + (parsedHeaders.bLeft ? 1 : 0), 0);
-                var endCell = new CellAddress(i, bbox.c2, 0);
+                var startCell = new CellAddress(i, data_bbox.c1, 0);
+                var endCell = new CellAddress(i, data_bbox.c2, 0);
 
                 if ( _t.range.intervalObject.worksheet._getRow(i).hd === true )
                     ser.isHidden = true;
@@ -511,52 +538,76 @@ asc_CChart.prototype = {
                 // Val
                 if (startCell && endCell) {
                     if (startCell.getID() == endCell.getID())
-                        ser.Val.Formula = startCell.getID();
+                        ser.Val.Formula =  ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
+                            + "!" + startCell.getID();
                     else {
                         ser.Val.Formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
                             + "!" + startCell.getID() + ":" + endCell.getID();
                     }
                 }
-                ser.Val.NumCache = getNumCache(bbox.c1 + (parsedHeaders.bLeft ? 1 : 0), bbox.c2, i, i);
+                ser.Val.NumCache = getNumCache(data_bbox.c1, data_bbox.c2, i, i);
 
+                if(left_header_bbox)
+                {
+                    var formulaCell = new CellAddress( i, left_header_bbox.c1, 0 );
+                    ser.TxCache.Formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
+                        + "!" + formulaCell.getID();
+                }
                 // xVal
-                if ( parsedHeaders.bTop ) {
 
-                    var start = new CellAddress(bbox.r1, bbox.c1 + (parsedHeaders.bLeft ? 1 : 0), 0);
-                    var end = new CellAddress(bbox.r1, bbox.c2, 0);
+                if(top_header_bbox)
+                {
+                    var start = new CellAddress(top_header_bbox.r1, top_header_bbox.c1, 0);
+                    var end = new CellAddress(top_header_bbox.r1, top_header_bbox.c2, 0);
 
                     var formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
                         + "!" + start.getID() + ":" + end.getID();
-                    var numCache = getNumCache( bbox.c1 + (parsedHeaders.bLeft ? 1 : 0), bbox.c2, bbox.r1, bbox.r1 );
+                    var numCache = getNumCache(top_header_bbox.c1, top_header_bbox.c2, top_header_bbox.r1, top_header_bbox.r1 );
 
-                    if ( _t.type == c_oAscChartType.scatter ) {
+                    if ( _t.type == c_oAscChartType.scatter )
+                    {
                         ser.xVal.Formula = formula;
                         ser.xVal.NumCache = numCache;
                     }
-                    else {
+                    else
+                    {
                         ser.Cat.Formula = formula;
                         ser.Cat.NumCache = numCache;
                     }
                 }
 
-                if ( parsedHeaders.bLeft ) {
-                    var formulaCell = new CellAddress( i, bbox.c1, 0 );
-                    ser.TxCache.Formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
-                        + "!" + formulaCell.getID();
-                }
-
-                var seriaName = parsedHeaders.bLeft ? ( _t.range.intervalObject.worksheet.getCell(new CellAddress(i, bbox.c1, 0)).getValue() ) : (api.chartTranslate.series + " " + nameIndex);
+                var seriaName = left_header_bbox ? ( _t.range.intervalObject.worksheet.getCell(new CellAddress(i, left_header_bbox.c1, 0)).getValue() ) : (api.chartTranslate.series + " " + nameIndex);
                 ser.TxCache.Tx = seriaName;
                 _t.series.push(ser);
                 nameIndex++;
             }
         }
-        else {
-            for (var i = bbox.c1 + (parsedHeaders.bLeft ? 1 : 0); i <= bbox.c2; i++) {
+        else
+        {
+            if(parsedHeaders.bTop)
+            {
+                top_header_bbox = {r1: bbox.r1, c1: data_bbox.c1, r2: bbox.r1, c2: data_bbox.c2};
+            }
+            else if(_t.range.serHeadersBBox && _t.range.serHeadersBBox.r1 === _t.range.serHeadersBBox.r2 && _t.range.serHeadersBBox.c1 === data_bbox.c1 && _t.range.serHeadersBBox.c2 === data_bbox.c2)
+            {
+                top_header_bbox = {r1: _t.range.serHeadersBBox.r1, c1: _t.range.serHeadersBBox.c1, r2: _t.range.serHeadersBBox.r2, c2: _t.range.serHeadersBBox.c2};
+            }
+
+            if(parsedHeaders.bLeft)
+            {
+                left_header_bbox = {r1: data_bbox.r1, c1: bbox.c1, r2: data_bbox.r2, c2: bbox.c1};
+            }
+            else if(_t.range.catHeadersBBox && _t.range.catHeadersBBox.c1 === _t.range.catHeadersBBox.c2 && _t.range.catHeadersBBox.r1 === data_bbox.r1 && _t.range.catHeadersBBox.r2 === data_bbox.r2)
+            {
+                left_header_bbox = {r1: _t.range.catHeadersBBox.r1, c1: _t.range.catHeadersBBox.c1, r2: _t.range.catHeadersBBox.r2, c2: _t.range.catHeadersBBox.c2};
+            }
+
+
+            for (var i = data_bbox.c1; i <= data_bbox.c2; i++) {
 
                 var ser = new asc_CChartSeria();
-                var startCell = new CellAddress(bbox.r1 + (parsedHeaders.bTop ? 1 : 0), i, 0);
-                var endCell = new CellAddress(bbox.r2, i, 0);
+                var startCell = new CellAddress(data_bbox.r1, i, 0);
+                var endCell = new CellAddress(data_bbox.r2, i, 0);
 
                 if ( _t.range.intervalObject.worksheet._getCol(i).hd === true )
                     ser.isHidden = true;
@@ -570,17 +621,17 @@ asc_CChart.prototype = {
                             + "!" + startCell.getID() + ":" + endCell.getID();
                     }
                 }
-                ser.Val.NumCache = getNumCache(i, i, bbox.r1 + (parsedHeaders.bTop ? 1 : 0), bbox.r2);
+                ser.Val.NumCache = getNumCache(i, i, data_bbox.r1, bbox.r2);
 
-                // xVal
-                if ( parsedHeaders.bLeft ) {
 
-                    var start = new CellAddress(bbox.r1 + (parsedHeaders.bTop ? 1 : 0), bbox.c1, 0);
-                    var end = new CellAddress(bbox.r2, bbox.c1, 0);
+                if ( left_header_bbox )
+                {
+                    var start = new CellAddress(left_header_bbox.r1, left_header_bbox.c1, 0);
+                    var end = new CellAddress(left_header_bbox.r2, left_header_bbox.c1, 0);
 
                     var formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
                         + "!" + start.getID() + ":" + end.getID();
-                    var numCache = getNumCache( bbox.c1, bbox.c1, bbox.r1 + (parsedHeaders.bTop ? 1 : 0), bbox.r2 );
+                    var numCache = getNumCache( left_header_bbox.c1, left_header_bbox.c1, left_header_bbox.r1, left_header_bbox.r2 );
 
                     if ( _t.type == c_oAscChartType.scatter ) {
                         ser.xVal.Formula = formula;
@@ -592,19 +643,19 @@ asc_CChart.prototype = {
                     }
                 }
 
-                if ( parsedHeaders.bTop ) {
-                    var formulaCell = new CellAddress( bbox.r1, i, 0 );
+                if (top_header_bbox)
+                {
+                    var formulaCell = new CellAddress( top_header_bbox.r1, i, 0 );
                     ser.TxCache.Formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
                         + "!" + formulaCell.getID();
                 }
 
-                var seriaName = parsedHeaders.bTop ? ( _t.range.intervalObject.worksheet.getCell(new CellAddress(bbox.r1, i, 0)).getValue() ) : (api.chartTranslate.series + " " + nameIndex);
+                var seriaName = top_header_bbox ? ( _t.range.intervalObject.worksheet.getCell(new CellAddress(top_header_bbox.r1, i, 0)).getValue() ) : (api.chartTranslate.series + " " + nameIndex);
                 ser.TxCache.Tx = seriaName;
                 _t.series.push(ser);
                 nameIndex++;
             }
         }
-
         // Colors
         var seriaUniColors = _t.generateUniColors(_t.series.length);
 
@@ -1274,6 +1325,8 @@ function asc_CChartRange(object) {
     this.intervalObject = bCopy ? object.intervalObject : null;
     this.rows = bCopy ? object.rows : false;
     this.columns = bCopy ? object.columns : true;
+    this.catHeadersBBox = null;
+    this.serHeadersBBox = null;
 }
 
 asc_CChartRange.prototype = {
@@ -3161,10 +3214,10 @@ function DrawingObjects() {
             CheckSpPrXfrm(drawingObject.graphicObject);
             drawingObject.graphicObject.spPr.xfrm.setOffX(metrics.x);
             drawingObject.graphicObject.spPr.xfrm.setOffY(metrics.y);
-            drawingObject.graphicObject.spPr.xfrm.setExtX(metrics.extX);
-            drawingObject.graphicObject.spPr.xfrm.setExtY(metrics.extY);
-            if(drawingObject.graphicObject.getObjectType() === historyitem_type_GroupShape)
+            if(drawingObject.graphicObject.getObjectType() !== historyitem_type_GroupShape)
             {
+                drawingObject.graphicObject.spPr.xfrm.setExtX(metrics.extX);
+                drawingObject.graphicObject.spPr.xfrm.setExtY(metrics.extY);
                 //drawingObject.graphicObject.spPr.xfrm.setChOffX(0);
                 //drawingObject.graphicObject.spPr.xfrm.setChOffY(0);
                 //drawingObject.graphicObject.spPr.xfrm.setChExtX(metrics.extX);
@@ -4648,29 +4701,75 @@ function DrawingObjects() {
                     var final_bbox = oBBoxTo.clone();
                     if(chart.bbox.seriesBBox.bVert)
                     {
+
                         asc_chart.range.rows = true;
                         asc_chart.range.cols = false;
-                        if(chart.bbox.catBBox && oBBoxTo.r1 === chart.bbox.seriesBBox.r1)
+
+                        if(chart.bbox.catBBox && chart.bbox.catBBox.r1 === chart.bbox.catBBox.r2 && oBBoxTo.r1 > chart.bbox.catBBox.r1)
                         {
-                            --final_bbox.r1;
+                            asc_chart.range.catHeadersBBox = {
+                                r1: chart.bbox.catBBox.r1,
+                                r2: chart.bbox.catBBox.r1,
+                                c1: oBBoxTo.c1,
+                                c2: oBBoxTo.c2
+                            };
                         }
-                        if(chart.bbox.serBBox && oBBoxTo.c1 === chart.bbox.seriesBBox.c1)
+
+
+                        if(chart.bbox.serBBox && chart.bbox.serBBox && chart.bbox.serBBox.c1 === chart.bbox.serBBox.c2 && chart.bbox.serBBox.c1 < oBBoxTo.c1)
                         {
-                            --final_bbox.c1;
+                            asc_chart.range.serHeadersBBox = {
+                                r1: oBBoxTo.r1,
+                                r2: oBBoxTo.r2,
+                                c1: chart.bbox.serBBox.c1,
+                                c2: chart.bbox.serBBox.c2
+                            };
                         }
+                      //
+                      //  if(chart.bbox.catBBox && oBBoxTo.r1 === chart.bbox.seriesBBox.r1)
+                      //  {
+                      //      --final_bbox.r1;
+                      //  }
+                      //  if(chart.bbox.serBBox && oBBoxTo.c1 === chart.bbox.seriesBBox.c1)
+                      //  {
+                      //      --final_bbox.c1;
+                      //  }
                     }
                     else
                     {
                         asc_chart.range.rows = false;
                         asc_chart.range.cols = true;
-                        if(chart.bbox.catBBox && oBBoxTo.c1 === chart.bbox.seriesBBox.c1)
+
+                        if(chart.bbox.catBBox && chart.bbox.catBBox.c1 === chart.bbox.catBBox.c2 && oBBoxTo.c1 > chart.bbox.catBBox.c1)
                         {
-                            --final_bbox.c1;
+                            asc_chart.range.catHeadersBBox = {
+                                r1: oBBoxTo.r1,
+                                r2: oBBoxTo.r2,
+                                c1: chart.bbox.catBBox.c1,
+                                c2: chart.bbox.catBBox.c2
+                            };
                         }
-                        if(chart.bbox.serBBox && oBBoxTo.r1 === chart.bbox.seriesBBox.r1)
+
+
+                        if(chart.bbox.serBBox && chart.bbox.serBBox && chart.bbox.serBBox.r1 === chart.bbox.serBBox.r2 && chart.bbox.serBBox.r1 < oBBoxTo.r1)
                         {
-                            --final_bbox.r1;
+                            asc_chart.range.serHeadersBBox = {
+                                r1: chart.bbox.serBBox.r1,
+                                r2: chart.bbox.serBBox.r2,
+                                c1: oBBoxTo.c1,
+                                c2: oBBoxTo.c2
+                            };
                         }
+
+
+                        //if(chart.bbox.catBBox && oBBoxTo.c1 === chart.bbox.seriesBBox.c1)
+                        //{
+                        //    --final_bbox.c1;
+                        //}
+                        //if(chart.bbox.serBBox && oBBoxTo.r1 === chart.bbox.seriesBBox.r1)
+                        //{
+                        //    --final_bbox.r1;
+                        //}
                     }
                     var startCell = new CellAddress(final_bbox.r1, final_bbox.c1, 0);
                     var endCell = new CellAddress(final_bbox.r2, final_bbox.c2, 0);
@@ -5346,7 +5445,7 @@ function DrawingObjects() {
 
         worksheet.arrActiveChartsRanges = [];
 
-        if(!drawing.bbox)
+        if(!drawing.bbox || drawing.bbox.worksheet !== worksheet.model)
             return;
 
         var stroke_color, fill_color;

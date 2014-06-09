@@ -7263,6 +7263,12 @@ CDocument.prototype =
         return ParaArray;
     },
 
+
+    Get_PageSizesByDrawingObjects : function()
+    {
+        return this.DrawingObjects.getPageSizesByDrawingObjects();
+    },
+
     Set_DocumentMargin : function(MarPr)
     {
         // TODO: Document.Set_DocumentOrientation Сделать в зависимости от выделения

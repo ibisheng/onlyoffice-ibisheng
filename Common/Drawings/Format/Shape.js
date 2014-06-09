@@ -3140,7 +3140,12 @@ CShape.prototype =
                 }
 
                 graphics.transform3(transform_text);
+
+                if (graphics.CheckUseFonts2 !== undefined)
+                    graphics.CheckUseFonts2(transform_text);
                 this.txBody.draw(graphics);
+                if (graphics.UncheckUseFonts2 !== undefined)
+                    graphics.UncheckUseFonts2(transform_text);
                 graphics.SetIntegerGrid(true);
             }
 

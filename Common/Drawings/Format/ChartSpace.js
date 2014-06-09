@@ -448,7 +448,7 @@ CChartSpace.prototype =
                         pt.setVal(asc_series[i].Val.NumCache[j].val);
                         num_cache.addPt(pt);
                     }
-                    if(parsedHeaders.bTop)
+                    if(asc_series[i].Cat && asc_series[i].Cat.NumCache)
                     {
                         series.setCat(new CCat());
                         var cat = series.cat;
@@ -471,7 +471,7 @@ CChartSpace.prototype =
                     {
                         series.setCat(null);
                     }
-                    if(parsedHeaders.bLeft && asc_series[i].TxCache)
+                    if(asc_series[i].TxCache && typeof asc_series[i].TxCache.Formula === "string" && asc_series[i].TxCache.Formula.length > 0)
                     {
                         series.setTx(new CTx());
                         var tx= series.tx;
@@ -866,7 +866,7 @@ CChartSpace.prototype =
         return ret;
     },
 
-    recalculateBBox: function()
+    recalculateBBox2: function()
     {
         this.bbox = null;
         if(this.chart && this.chart.plotArea && this.chart.plotArea.charts[0] && this.worksheet)
@@ -1120,6 +1120,577 @@ CChartSpace.prototype =
             }
         }
     },
+
+
+    recalculateBBox4: function()
+    {
+        this.bbox = null;
+        if(this.chart && this.chart.plotArea && this.chart.plotArea.charts[0] && this.worksheet)
+        {
+            var series = this.chart.plotArea.charts[0].series;
+            if(Array.isArray(series) && series.length > 0)
+            {
+                var series_title_f = [], cat_title_f, series_f = [], i, range1;
+                var ref;
+
+                var b_vert/*флаг означает, что значения в серии идут по горизонтали, а сами серии по вертикали сверху вниз*/
+                    , b_titles_vert;
+                var first_series_sheet;
+                for(i = 0; i < series.length; ++i)
+                {
+                    var numRef = null;
+                    if(series[i].val)
+                        numRef = series[i].val.numRef;
+                    else if(series[i].yVal)
+                        numRef = series[i].yVal.numRef;
+                    if(numRef)
+                    {
+                        var series_parsed_ref = parserHelp.parse3DRef(numRef.f);
+                        if(!series_parsed_ref)
+                            return;
+                        var series_sheet = this.worksheet.workbook.getWorksheetByName(series_parsed_ref.sheet);
+                        if(!first_series_sheet)
+                            first_series_sheet = series_sheet;
+                        if(series_sheet !== first_series_sheet)
+                            return;
+                        range1 =  series_sheet.getRange2(series_parsed_ref.range);
+                        if(range1 && range1.bbox)
+                        {
+                            if(range1.bbox.r1 !== range1.bbox.r2 && range1.bbox.c1 !== range1.bbox.c2)
+                                return;
+                            if(series_f.length > 0)
+                            {
+                                if(!isRealBool(b_vert))
+                                {
+                                    if(series_f[0].c1 === range1.bbox.c1 && series_f[0].c2 === range1.bbox.c2)
+                                    {
+                                        b_vert = true;
+                                    }
+                                    else if(series_f[0].r1 === range1.bbox.r1 && series_f[0].r2 === range1.bbox.r2)
+                                    {
+                                        b_vert = false;
+                                    }
+                                    else
+                                    {
+                                        return;
+                                    }
+                                }
+                                else
+                                {
+                                    if(b_vert)
+                                    {
+                                        if(!(series_f[0].c1 === range1.bbox.c1 && series_f[0].c2 === range1.bbox.c2))
+                                        {
+                                            return;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if(!(series_f[0].r1 === range1.bbox.r1 && series_f[0].r2 === range1.bbox.r2))
+                                        {
+                                            return;
+                                        }
+                                    }
+                                }
+                                if(b_vert)
+                                {
+                                    if(range1.bbox.r1 - series_f[series_f.length-1].r1 !== 1)
+                                        return;
+                                }
+                                else
+                                {
+                                    if(range1.bbox.c1 - series_f[series_f.length-1].c1 !== 1)
+                                        return;
+                                }
+                            }
+                            series_f.push(range1.bbox);
+                        }
+                        else
+                            return;
+                    }
+                    else
+                        return;
+                    if(Array.isArray(series_title_f))
+                    {
+                        if(series[i].tx && series[i].tx.strRef)
+                        {
+                            var series_cat_parsed_ref = parserHelp.parse3DRef(series[i].tx.strRef.f);
+                            if(!series_cat_parsed_ref)
+                            {
+                                series_title_f = null;
+                                continue;
+                            }
+                            var series_cat_sheet = this.worksheet.workbook.getWorksheetByName(series_cat_parsed_ref.sheet);
+                            if(series_cat_sheet !== first_series_sheet)
+                            {
+                                series_title_f = null;
+                                continue;
+                            }
+                            range1 = series_cat_sheet.getRange2(series_cat_parsed_ref.range);
+                            if(range1 && range1.bbox)
+                            {
+                                if(range1.bbox.r1 !== range1.bbox.r2 || range1.bbox.c1 !== range1.bbox.c2)
+                                {
+                                    series_title_f = null;
+                                    continue;
+                                }
+                                if(!isRealBool(b_titles_vert))
+                                {
+                                    if(series_title_f.length > 0)
+                                    {
+                                        if( range1.bbox.r1 - series_title_f[0].r1 === 1)
+                                            b_titles_vert = true;
+                                        else if(range1.bbox.c1 - series_title_f[0].c1 === 1)
+                                            b_titles_vert = false;
+                                        else
+                                        {
+                                            series_title_f = null;
+                                            continue;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    if(b_titles_vert)
+                                    {
+                                        if( range1.bbox.r1 - series_title_f[series_title_f.length-1].r1 !== 1)
+                                        {
+                                            series_title_f = null;
+                                            continue;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if( range1.bbox.c1 - series_title_f[series_title_f.length-1].c1 !== 1)
+                                        {
+                                            series_title_f = null;
+                                            continue;
+                                        }
+                                    }
+                                }
+                                series_title_f.push(range1.bbox);
+                            }
+                            else
+                            {
+                                series_title_f = null;
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            series_title_f = null;
+                        }
+                    }
+                }
+
+
+                if(series[0].cat && series[0].cat.strRef)
+                {
+                    ref = series[0].cat.strRef;
+                }
+                else if(series[0].xVal)
+                {
+                    if(series[0].xVal.strRef)
+                    {
+                        ref = series[0].xVal.strRef;
+                    }
+                    else if(series[0].xVal.numRef)
+                    {
+                        ref = series[0].xVal.numRef;
+                    }
+                }
+                if(ref)
+                {
+                    var cat_title_parsed_ref = parserHelp.parse3DRef(ref.f);
+                    if(cat_title_parsed_ref)
+                    {
+                        var cat_title_sheet = this.worksheet.workbook.getWorksheetByName(cat_title_parsed_ref.sheet);
+                        if(cat_title_sheet === first_series_sheet)
+                        {
+                            range1 = cat_title_sheet.getRange2(cat_title_parsed_ref.range);
+                            if(range1 && range1.bbox)
+                            {
+                                cat_title_f = range1.bbox;
+                            }
+                        }
+                    }
+                }
+
+
+                this.bbox =  {
+                    seriesBBox: null,
+                    catBBox: null,
+                    serBBox: null,
+                    worksheet: first_series_sheet
+                };
+                //if(b_vert)
+                //{
+                this.bbox.seriesBBox = {
+                    r1: series_f[0].r1,
+                    r2: series_f[series_f.length-1].r2,
+                    c1: series_f[0].c1,
+                    c2: series_f[series_f.length-1].c2,
+                    bVert: b_vert
+                };
+                /* }
+                 else
+                 {
+                 this.bbox.seriesBox = {
+                 r1: series_f[0].
+                 };
+                 }*/
+                if(cat_title_f)
+                {
+                    if(b_vert)
+                    {
+                        if(cat_title_f.c1 !== this.bbox.seriesBBox.c1
+                            || cat_title_f.c2 !== this.bbox.seriesBBox.c2
+                            || cat_title_f.r1 !== cat_title_f.r1
+                            || cat_title_f.r1 !== this.bbox.seriesBBox.r1-1)
+                        {
+                            cat_title_f = null;
+                        }
+                    }
+                    else
+                    {
+                        if(cat_title_f.c1 !== cat_title_f.c2
+                            || cat_title_f.r1 !== this.bbox.seriesBBox.r1
+                            || cat_title_f.r2 !== this.bbox.seriesBBox.r2
+                            || cat_title_f.c1 !== this.bbox.seriesBBox.c1-1)
+                        {
+                            cat_title_f = null;
+                        }
+                    }
+                    this.bbox.catBBox = cat_title_f;
+                }
+                if(Array.isArray(series_title_f))
+                {
+                    // if(b_titles_vert)
+                    // {
+                    this.bbox.serBBox = {
+                        r1: series_title_f[0].r1,
+                        r2: series_title_f[series_title_f.length-1].r2,
+                        c1: series_title_f[0].c1,
+                        c2: series_title_f[series_title_f.length-1].c2
+                    };
+                    // }
+                    // else
+                    // {
+                    //     this.bbox.serBBox = {
+                    //         r1: series_title_f[0].r1,
+                    //         r2: series_title_f[0].r1,
+                    //     };
+                    // }
+                }
+            }
+        }
+    },
+
+    recalculateBBox: function()
+    {
+        this.bbox = null;
+        if(this.chart && this.chart.plotArea && this.chart.plotArea.charts[0] && this.worksheet)
+        {
+            var series = this.chart.plotArea.charts[0].series;
+            if(Array.isArray(series) && series.length > 0)
+            {
+                var series_title_f = [], cat_title_f, series_f = [], i, range1;
+                var ref;
+
+                var b_vert/*флаг означает, что значения в серии идут по горизонтали, а сами серии по вертикали сверху вниз*/
+                    , b_titles_vert;
+                var first_series_sheet;
+                for(i = 0; i < series.length; ++i)
+                {
+                    var numRef = null;
+                    if(series[i].val)
+                        numRef = series[i].val.numRef;
+                    else if(series[i].yVal)
+                        numRef = series[i].yVal.numRef;
+                    if(numRef)
+                    {
+                        var series_parsed_ref = parserHelp.parse3DRef(numRef.f);
+                        if(!series_parsed_ref)
+                            return;
+                        var series_sheet = this.worksheet.workbook.getWorksheetByName(series_parsed_ref.sheet);
+                        if(!first_series_sheet)
+                            first_series_sheet = series_sheet;
+                        if(series_sheet !== first_series_sheet)
+                            return;
+                        range1 =  series_sheet.getRange2(series_parsed_ref.range);
+                        if(range1 && range1.bbox)
+                        {
+                            if(range1.bbox.r1 !== range1.bbox.r2 && range1.bbox.c1 !== range1.bbox.c2)
+                                return;
+                            if(series_f.length > 0)
+                            {
+                                if(!isRealBool(b_vert))
+                                {
+                                    if(series_f[0].c1 === range1.bbox.c1 && series_f[0].c2 === range1.bbox.c2)
+                                    {
+                                        b_vert = true;
+                                    }
+                                    else if(series_f[0].r1 === range1.bbox.r1 && series_f[0].r2 === range1.bbox.r2)
+                                    {
+                                        b_vert = false;
+                                    }
+                                    else
+                                    {
+                                        return;
+                                    }
+                                }
+                                else
+                                {
+                                    if(b_vert)
+                                    {
+                                        if(!(series_f[0].c1 === range1.bbox.c1 && series_f[0].c2 === range1.bbox.c2))
+                                        {
+                                            return;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if(!(series_f[0].r1 === range1.bbox.r1 && series_f[0].r2 === range1.bbox.r2))
+                                        {
+                                            return;
+                                        }
+                                    }
+                                }
+                                if(b_vert)
+                                {
+                                    if(range1.bbox.r1 - series_f[series_f.length-1].r1 !== 1)
+                                        return;
+                                }
+                                else
+                                {
+                                    if(range1.bbox.c1 - series_f[series_f.length-1].c1 !== 1)
+                                        return;
+                                }
+                            }
+                            series_f.push(range1.bbox);
+                        }
+                        else
+                            return;
+                    }
+                    else
+                        return;
+                    if(Array.isArray(series_title_f))
+                    {
+                        if(series[i].tx && series[i].tx.strRef)
+                        {
+                            var series_cat_parsed_ref = parserHelp.parse3DRef(series[i].tx.strRef.f);
+                            if(!series_cat_parsed_ref)
+                            {
+                                series_title_f = null;
+                                continue;
+                            }
+                            var series_cat_sheet = this.worksheet.workbook.getWorksheetByName(series_cat_parsed_ref.sheet);
+                            if(series_cat_sheet !== first_series_sheet)
+                            {
+                                series_title_f = null;
+                                continue;
+                            }
+                            range1 = series_cat_sheet.getRange2(series_cat_parsed_ref.range);
+                            if(range1 && range1.bbox)
+                            {
+                                if(range1.bbox.r1 !== range1.bbox.r2 || range1.bbox.c1 !== range1.bbox.c2)
+                                {
+                                    series_title_f = null;
+                                    continue;
+                                }
+                                if(!isRealBool(b_titles_vert))
+                                {
+                                    if(series_title_f.length > 0)
+                                    {
+                                        if( range1.bbox.r1 - series_title_f[0].r1 === 1)
+                                            b_titles_vert = true;
+                                        else if(range1.bbox.c1 - series_title_f[0].c1 === 1)
+                                            b_titles_vert = false;
+                                        else
+                                        {
+                                            series_title_f = null;
+                                            continue;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    if(b_titles_vert)
+                                    {
+                                        if( range1.bbox.r1 - series_title_f[series_title_f.length-1].r1 !== 1)
+                                        {
+                                            series_title_f = null;
+                                            continue;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if( range1.bbox.c1 - series_title_f[series_title_f.length-1].c1 !== 1)
+                                        {
+                                            series_title_f = null;
+                                            continue;
+                                        }
+                                    }
+                                }
+                                series_title_f.push(range1.bbox);
+                            }
+                            else
+                            {
+                                series_title_f = null;
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            series_title_f = null;
+                        }
+                    }
+                }
+
+
+                if(series[0].cat && series[0].cat.strRef)
+                {
+                    ref = series[0].cat.strRef;
+                }
+                else if(series[0].xVal)
+                {
+                    if(series[0].xVal.strRef)
+                    {
+                        ref = series[0].xVal.strRef;
+                    }
+                    else if(series[0].xVal.numRef)
+                    {
+                        ref = series[0].xVal.numRef;
+                    }
+                }
+                if(ref)
+                {
+                    var cat_title_parsed_ref = parserHelp.parse3DRef(ref.f);
+                    if(cat_title_parsed_ref)
+                    {
+                        var cat_title_sheet = this.worksheet.workbook.getWorksheetByName(cat_title_parsed_ref.sheet);
+                        if(cat_title_sheet === first_series_sheet)
+                        {
+                            range1 = cat_title_sheet.getRange2(cat_title_parsed_ref.range);
+                            if(range1 && range1.bbox)
+                            {
+                                cat_title_f = range1.bbox;
+                            }
+                        }
+                    }
+                }
+
+
+                if(series.length === 1)
+                {
+                    if(series_f[0].r1 === series_f[0].r2 && series_f[0].c1 !== series_f[0].c2)
+                    {
+                        b_vert = true;
+                    }
+                    else if(series_f[0].c1 === series_f[0].c2 && series_f[0].r1 !== series_f[0].r2)
+                    {
+                        b_vert = false;
+                    }
+
+                    if(!isRealBool(b_vert) && Array.isArray(series_title_f) )
+                    {
+                        if(series_f[0].r1 === series_f[0].r2 && series_title_f[0].r1 === series_f[0].r1)
+                        {
+                            b_vert = true;
+                        }
+                        else if(series_f[0].c1 === series_f[0].c2 && series_title_f[0].c1 === series_f[0].c1)
+                        {
+                            b_vert = false;
+                        }
+                    }
+                    if(!isRealBool(b_vert))
+                    {
+                        if(cat_title_f)
+                        {
+                            if(series_f[0].r1 === series_f[0].r2 && cat_title_f.c1 === series_f[0].c1 && cat_title_f.c2 === series_f[0].c2)
+                            {
+                                b_vert = true;
+                            }
+                            else if(series_f[0].c1 === series_f[0].c2 && cat_title_f.r1 === series_f[0].r1 && cat_title_f.r2 === series_f[0].r2)
+                            {
+                                b_vert = false;
+                            }
+                        }
+                        if(!isRealBool(b_vert))
+                        {
+                            b_vert = true;
+                        }
+                    }
+                }
+
+                this.bbox =  {
+                    seriesBBox: null,
+                    catBBox: null,
+                    serBBox: null,
+                    worksheet: first_series_sheet
+                };
+                //if(b_vert)
+                //{
+
+                this.bbox.seriesBBox = {
+                    r1: series_f[0].r1,
+                    r2: series_f[series_f.length-1].r2,
+                    c1: series_f[0].c1,
+                    c2: series_f[series_f.length-1].c2,
+                    bVert: b_vert
+                };
+                /* }
+                 else
+                 {
+                 this.bbox.seriesBox = {
+                 r1: series_f[0].
+                 };
+                 }*/
+                if(cat_title_f)
+                {
+                    if(b_vert)
+                    {
+                        if(cat_title_f.c1 !== this.bbox.seriesBBox.c1
+                            || cat_title_f.c2 !== this.bbox.seriesBBox.c2
+                            || cat_title_f.r1 !== cat_title_f.r1)
+                        {
+                            cat_title_f = null;
+                        }
+                    }
+                    else
+                    {
+                        if(cat_title_f.c1 !== cat_title_f.c2
+                            || cat_title_f.r1 !== this.bbox.seriesBBox.r1
+                            || cat_title_f.r2 !== this.bbox.seriesBBox.r2)
+                        {
+                            cat_title_f = null;
+                        }
+                    }
+                    this.bbox.catBBox = cat_title_f;
+                }
+                if(Array.isArray(series_title_f))
+                {
+                    // if(b_titles_vert)
+                    // {
+                    this.bbox.serBBox = {
+                        r1: series_title_f[0].r1,
+                        r2: series_title_f[series_title_f.length-1].r2,
+                        c1: series_title_f[0].c1,
+                        c2: series_title_f[series_title_f.length-1].c2
+                    };
+                    // }
+                    // else
+                    // {
+                    //     this.bbox.serBBox = {
+                    //         r1: series_title_f[0].r1,
+                    //         r2: series_title_f[0].r1,
+                    //     };
+                    // }
+                }
+            }
+        }
+    },
+
 
     recalculateReferences: function()
     {
@@ -4024,7 +4595,7 @@ CChartSpace.prototype =
                         legend.extY = legend_height;
                         var summ_h = 0;
                         calc_entryes.splice(cut_index, calc_entryes.length - cut_index);
-                        for(i = 0; i <  cut_index; ++i)
+                        for(i = 0; i <  cut_index && i < calc_entryes.length; ++i)
                         {
                             calc_entry = calc_entryes[i];
                             if(calc_entry.calcMarkerUnion.marker)
@@ -4105,7 +4676,7 @@ CChartSpace.prototype =
                         legend.extY = legend_height;
                         var summ_h = 0;
                         calc_entryes.splice(cut_index, calc_entryes.length - cut_index);
-                        for(i = 0; i <  cut_index; ++i)
+                        for(i = 0; i <  cut_index && i < calc_entryes.length; ++i)
                         {
                             calc_entry = calc_entryes[i];
                             if(calc_entry.calcMarkerUnion.marker)
@@ -4211,7 +4782,7 @@ CChartSpace.prototype =
                             legend.extX = legend_width;
                             legend.extY = legend_height;
                             calc_entryes.splice(cut_index, calc_entryes.length - cut_index);
-                            for(i = 0; i <cut_index; ++i)
+                            for(i = 0; i <cut_index && i < calc_entryes.length; ++i)
                             {
                                 calc_entry = calc_entryes[i];
                                 calc_entry.calcMarkerUnion.lineMarker.localX = (i - hor_count*((i/hor_count) >> 0))*(max_entry_width + line_marker_width + 2*distance_to_text)  + distance_to_text;
@@ -4283,7 +4854,7 @@ CChartSpace.prototype =
                             var summ_h = 0;
 
                             calc_entryes.splice(cut_index, calc_entryes.length - cut_index);
-                            for(i = 0; i <  cut_index; ++i)
+                            for(i = 0; i <  cut_index && i < calc_entryes.length; ++i)
                             {
                                 calc_entry = calc_entryes[i];
                                 calc_entry.calcMarkerUnion.marker.localX = distance_to_text;
@@ -4377,7 +4948,7 @@ CChartSpace.prototype =
                             legend.extY = legend_height;
 
                             calc_entryes.splice(cut_index, calc_entryes.length - cut_index);
-                            for(i = 0; i <cut_index; ++i)
+                            for(i = 0; i <cut_index && i < calc_entryes.length; ++i)
                             {
                                 calc_entry = calc_entryes[i];
                                 calc_entry.calcMarkerUnion.marker.localX = (i - hor_count*((i/hor_count) >> 0))*(max_entry_width + marker_size + 2*distance_to_text)  + distance_to_text;
@@ -4444,7 +5015,7 @@ CChartSpace.prototype =
                             var summ_h = 0;
 
                             calc_entryes.splice(cut_index, calc_entryes.length - cut_index);
-                            for(i = 0; i <  cut_index; ++i)
+                            for(i = 0; i <  cut_index && i < calc_entryes.length; ++i)
                             {
                                 calc_entry = calc_entryes[i];
                                 calc_entry.calcMarkerUnion.marker.localX = distance_to_text;
@@ -8289,7 +8860,7 @@ function CreateLineChart(asc_chart, type)
                 str_cache.addPt(string_pt);
             }
         }
-        if(parsedHeaders.bLeft && asc_series[i].TxCache)
+        if(parsedHeaders.bLeft && asc_series[i].TxCache && typeof asc_series[i].TxCache.Formula === "string" && asc_series[i].TxCache.Formula.length > 0)
         {
             series.setTx(new CTx());
             var tx= series.tx;
@@ -8435,7 +9006,7 @@ function CreateBarChart(asc_chart, type)
                 str_cache.addPt(string_pt);
             }
         }
-        if(parsedHeaders.bLeft && asc_series[i].TxCache)
+        if(parsedHeaders.bLeft && asc_series[i].TxCache && typeof asc_series[i].TxCache.Formula === "string" && asc_series[i].TxCache.Formula.length > 0)
         {
             series.setTx(new CTx());
             var tx= series.tx;
@@ -8585,7 +9156,7 @@ function CreateHBarChart(asc_chart, type)
                 str_cache.addPt(string_pt);
             }
         }
-        if(parsedHeaders.bLeft && asc_series[i].TxCache)
+        if(parsedHeaders.bLeft && asc_series[i].TxCache && typeof asc_series[i].TxCache.Formula === "string" && asc_series[i].TxCache.Formula.length > 0)
         {
             series.setTx(new CTx());
             var tx= series.tx;
@@ -8735,7 +9306,7 @@ function CreateAreaChart(asc_chart, type)
                 str_cache.addPt(string_pt);
             }
         }
-        if(parsedHeaders.bLeft && asc_series[i].TxCache)
+        if(parsedHeaders.bLeft && asc_series[i].TxCache && typeof asc_series[i].TxCache.Formula === "string" && asc_series[i].TxCache.Formula.length > 0)
         {
             series.setTx(new CTx());
             var tx= series.tx;
@@ -8876,7 +9447,7 @@ function CreatePieChart(asc_chart, bDoughnut)
                 str_cache.addPt(string_pt);
             }
         }
-        if(parsedHeaders.bLeft && asc_series[i].TxCache)
+        if(parsedHeaders.bLeft && asc_series[i].TxCache && typeof asc_series[i].TxCache.Formula === "string" && asc_series[i].TxCache.Formula.length > 0)
         {
             series.setTx(new CTx());
             var tx= series.tx;
@@ -9155,7 +9726,7 @@ function CreateStockChart(asc_chart)
                 str_cache.addPt(string_pt);
             }
         }
-        if(parsedHeaders.bLeft && asc_series[i].TxCache)
+        if(parsedHeaders.bLeft && asc_series[i].TxCache && typeof asc_series[i].TxCache.Formula === "string" && asc_series[i].TxCache.Formula.length > 0)
         {
             series.setTx(new CTx());
             var tx= series.tx;
@@ -9368,7 +9939,7 @@ function CreateRadarChart(asc_chart)
                 str_cache.addPt(string_pt);
             }
         }
-        if(parsedHeaders.bLeft && asc_series[i].TxCache)
+        if(parsedHeaders.bLeft && asc_series[i].TxCache && typeof asc_series[i].TxCache.Formula === "string" && asc_series[i].TxCache.Formula.length > 0)
         {
             series.setTx(new CTx());
             var tx= series.tx;

@@ -1195,11 +1195,14 @@ DrawingObjectsController.prototype =
         this.checkSelectedObjectsAndCallback(this.paragraphAdd, [new ParaTextPr({Unifill: unifill})]);
     },
 
-    setCellBackgroundColor: function (color) {
-        var unifill = new CUniFill();
-        unifill.setFill(new CSolidFill());
-        unifill.fill.setColor(CorrectUniColor(color, null));
-        this.checkSelectedObjectsAndCallback(this.applyDrawingProps, [{fill:CreateAscFill(unifill)}]);
+    setCellBackgroundColor: function (color)
+    {
+        var fill = new CAscFill();
+        fill.type = c_oAscFill.FILL_TYPE_SOLID;
+        fill.fill = new CAscFillSolid();
+        fill.fill.color = color;
+
+        this.checkSelectedObjectsAndCallback(this.applyDrawingProps, [{fill: fill}]);
     },
 
 
@@ -1588,7 +1591,6 @@ DrawingObjectsController.prototype =
             this.applyPropsToChartSpace(chartSettings, chart_space);
             chart_space.addToRecalculate();  //TODO
             chart_space.setRecalculateInfo();//TODO: обязательно переделать
-            this.startRecalculate();
         }
     },
 
@@ -1599,22 +1601,55 @@ DrawingObjectsController.prototype =
         var sRange = chartSettings.getRange();
         if(this.drawingObjects && this.drawingObjects.getWorksheet && typeof sRange === "string" && sRange.length > 0)
         {
-            var asc_chart = new asc_CChart();
-            asc_chart.range.interval = sRange;
-            asc_chart.worksheet = this.drawingObjects.getWorksheet();
-            this.drawingObjects.intervalToIntervalObject(asc_chart);
-            if(chartSettings.getInColumns())
+
+            var ws_view = this.drawingObjects.getWorksheet();
+            var parsed_formula = parserHelp.parse3DRef(sRange);
+            var ws = ws_view.model.workbook.getWorksheetByName(parsed_formula.sheet);
+            var new_bbox;
+            var range_object = ws.getRange2(parsed_formula.range);
+            if(range_object)
             {
-                asc_chart.range.rows = false;
-                asc_chart.range.columns = true;
+                new_bbox = range_object.bbox;
             }
-            else
+            if( parsed_formula && ws && new_bbox )
             {
-                asc_chart.range.rows = true;
-                asc_chart.range.columns = false;
+
+                var b_equal_bbox = chart_space.bbox.seriesBBox.r1 === new_bbox.r1
+                    && chart_space.bbox.seriesBBox.r2 === new_bbox.r2
+                    && chart_space.bbox.seriesBBox.c1 === new_bbox.c1
+                    && chart_space.bbox.seriesBBox.c2 === new_bbox.c2;
+                var b_equal_ws = chart_space.bbox.worksheet === ws;
+                var b_equal_vert = chartSettings.getInColumns() === !chart_space.bbox.seriesBBox.bVert;
+
+                if(!(chart_space.bbox && chart_space.bbox.seriesBBox && b_equal_ws
+                    && b_equal_bbox && b_equal_vert))
+                {
+                    var asc_chart = new asc_CChart();
+                    asc_chart.range.interval = sRange;
+                    asc_chart.worksheet = this.drawingObjects.getWorksheet();
+                    this.drawingObjects.intervalToIntervalObject(asc_chart);
+                    if(chart_space.bbox && b_equal_bbox && b_equal_ws && !b_equal_vert)
+                    {
+                        if(chart_space.bbox.catBBox)
+                            asc_chart.range.serHeadersBBox = {r1: chart_space.bbox.catBBox.r1, r2: chart_space.bbox.catBBox.r2, c1: chart_space.bbox.catBBox.c1, c2: chart_space.bbox.catBBox.c2};
+                        if(chart_space.bbox.serBBox)
+                            asc_chart.range.catHeadersBBox = {r1: chart_space.bbox.serBBox.r1, r2: chart_space.bbox.serBBox.r2, c1: chart_space.bbox.serBBox.c1, c2: chart_space.bbox.serBBox.c2};
+                    }
+                    if(chartSettings.getInColumns())
+                    {
+                        asc_chart.range.rows = false;
+                        asc_chart.range.columns = true;
+                    }
+                    else
+                    {
+                        asc_chart.range.rows = true;
+                        asc_chart.range.columns = false;
+                    }
+                    asc_chart.rebuildSeries();
+                    chart_space.rebuildSeriesFromAsc(asc_chart);
+                }
+
             }
-            asc_chart.rebuildSeries();
-            chart_space.rebuildSeriesFromAsc(asc_chart);
         }
 
         if(isRealNumber(style_index) && style_index > 0 && style_index < 49)
@@ -1640,9 +1675,6 @@ DrawingObjectsController.prototype =
             }
             chart.title.setOverlay(title_show_settings === c_oAscChartTitleShowSettings.overlay);
         }
-        //Row/Cols
-        if(chartSettings.getRowCols() !== null)
-            chart_space.swapData();
         var plot_area = chart.plotArea;
         //horAxisLabel
 

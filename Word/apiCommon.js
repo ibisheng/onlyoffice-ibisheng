@@ -202,6 +202,26 @@ function CorrectUniColor(asc_color, unicolor)
                 var _map = editor.WordControl.m_oDrawingDocument.GuiControlColorsMap;
 				__mods = GetDefaultMods(_map[_id].r, _map[_id].g, _map[_id].b, _pos, 0);
             }
+            else
+            {
+                var _editor = window["Asc"] && window["Asc"]["editor"];
+                if (_editor && _editor.wbModel)
+                {
+                    var _theme = _editor.wbModel.theme;
+                    var _clrMap = _editor.wbModel.clrSchemeMap;
+
+                    if (_theme && _clrMap)
+                    {
+                        var _schemeClr = new CSchemeColor();
+                        _schemeClr.id = array_colors_types[_id];
+
+                        var _rgba = {R:0, G:0, B:0, A:255};
+                        _schemeClr.Calculate(_theme, _clrMap.color_map, _rgba);
+
+                        __mods = GetDefaultMods(_schemeClr.RGBA.R, _schemeClr.RGBA.G, _schemeClr.RGBA.B, _pos, 2);
+                    }
+                }
+            }
 			
 			if (null != __mods)
 			{

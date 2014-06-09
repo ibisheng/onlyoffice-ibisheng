@@ -280,6 +280,29 @@ CGraphicObjects.prototype =
     getSelectedObjectsByTypes: DrawingObjectsController.prototype.getSelectedObjectsByTypes,
 
 
+    getPageSizesByDrawingObjects: function()
+    {
+        var aW = [], aH = [];
+        var aBPages = [];
+        var page_limits;
+        if(this.selectedObjects.length > 0)
+        {
+            for(var i = 0; i < this.selectedObjects.length; ++i)
+            {
+                if(!aBPages[this.selectedObjects[i].selectStartPage])
+                {
+                    page_limits = this.document.Get_PageLimits(this.selectedObjects[i].selectStartPage);
+                    aW.push(page_limits.XLimit);
+                    aH.push(page_limits.YLimit);
+                    aBPages[this.selectedObjects[i].selectStartPage] = true;
+                }
+            }
+            return {W: Math.min.apply(Math, aW), H: Math.min.apply(Math, aH)};
+        }
+        page_limits = this.document.Get_PageLimits(0);
+        return {W: page_limits.XLimit, H: page_limits.YLimit};
+    },
+
     Get_Props: function()
     {
         var props_by_types = DrawingObjectsController.prototype.getDrawingProps.call(this);
