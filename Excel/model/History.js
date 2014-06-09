@@ -411,6 +411,8 @@ CHistory.prototype =
 		var isRedrawAll = true;
 		var bChangeWorksheetUpdate = false;
 		var oChangeWorksheetUpdate = {};
+		var bUpdateWorksheetByModel = false;
+		var bOnSheetsChanged = false;
 		var oCurWorksheet = this.workbook.getWorksheet(this.workbook.getActive());
 		if(null != Point.nLastSheetId && Point.nLastSheetId != oCurWorksheet.getId())
 			this.workbook.handlers.trigger("showWorksheet", Point.nLastSheetId);
@@ -427,8 +429,14 @@ CHistory.prototype =
 				bChangeWorksheetUpdate = true;
 				oChangeWorksheetUpdate[Item.SheetId] = Item.SheetId;
 			}
-			if (g_oUndoRedoWorksheet === Item.Class && historyitem_Worksheet_SetViewSettings === Item.Type)
-				isReInit = true;
+			else if (g_oUndoRedoWorksheet === Item.Class && historyitem_Worksheet_SetViewSettings === Item.Type)
+			    isReInit = true;
+			else if (g_oUndoRedoWorkbook === Item.Class && (historyitem_Workbook_SheetAdd === Item.Type || historyitem_Workbook_SheetRemove === Item.Type || historyitem_Workbook_SheetMove === Item.Type || historyitem_Workbook_SheetPositions === Item.Type)) {
+			    bUpdateWorksheetByModel = true;
+			    bOnSheetsChanged = true;
+			}
+			else if (g_oUndoRedoWorksheet === Item.Class && (historyitem_Worksheet_Rename === Item.Type || historyitem_Worksheet_Hide === Item.Type))
+			    bOnSheetsChanged = true;
         }
         var wsViews = Asc["editor"].wb.wsViews;
         for(var i = 0; i < wsViews.length; ++i)
@@ -450,7 +458,10 @@ CHistory.prototype =
 			for(var i in oChangeWorksheetUpdate)
 				this.workbook.handlers.trigger("changeWorksheetUpdate", oChangeWorksheetUpdate[i]);
 		}
-
+		if (bUpdateWorksheetByModel)
+		    this.workbook.handlers.trigger("updateWorksheetByModel");
+		if (bOnSheetsChanged)
+		    this.workbook.handlers.trigger("asc_onSheetsChanged");
 
 		this._sendCanUndoRedo();
 
@@ -511,11 +522,17 @@ CHistory.prototype =
         }
 		if (g_oUndoRedoWorksheet === Class && historyitem_Worksheet_SetViewSettings === Type)
 			oRedoObjectParam.bIsReInit = true;
-		if (g_oUndoRedoWorksheet === Class && (historyitem_Worksheet_RowProp == Type || historyitem_Worksheet_ColProp == Type))
+		else if (g_oUndoRedoWorksheet === Class && (historyitem_Worksheet_RowProp == Type || historyitem_Worksheet_ColProp == Type))
 		{
 			oRedoObjectParam.bChangeWorksheetUpdate = true;
 			oRedoObjectParam.oChangeWorksheetUpdate[sheetid] = sheetid;
 		}
+		else if (g_oUndoRedoWorkbook === Class && (historyitem_Workbook_SheetAdd === Type || historyitem_Workbook_SheetRemove === Type || historyitem_Workbook_SheetMove === Type || historyitem_Workbook_SheetPositions === Type)) {
+		    oRedoObjectParam.bUpdateWorksheetByModel = true;
+		    oRedoObjectParam.bOnSheetsChanged = true;
+		}
+		else if (g_oUndoRedoWorksheet === Class && (historyitem_Worksheet_Rename === Type || historyitem_Worksheet_Hide === Type))
+		    oRedoObjectParam.bOnSheetsChanged = true;
 	},
 	RedoExecute : function(Point, oRedoObjectParam)
 	{
@@ -537,11 +554,17 @@ CHistory.prototype =
             }
 			if (g_oUndoRedoWorksheet === Item.Class && historyitem_Worksheet_SetViewSettings === Item.Type)
 				oRedoObjectParam.bIsReInit = true;
-			if (g_oUndoRedoWorksheet === Item.Class && (historyitem_Worksheet_RowProp == Item.Type || historyitem_Worksheet_ColProp == Item.Type))
+			else if (g_oUndoRedoWorksheet === Item.Class && (historyitem_Worksheet_RowProp == Item.Type || historyitem_Worksheet_ColProp == Item.Type))
 			{
 				oRedoObjectParam.bChangeWorksheetUpdate = true;
 				oRedoObjectParam.oChangeWorksheetUpdate[Item.SheetId] = Item.SheetId;
 			}
+			else if (g_oUndoRedoWorkbook === Item.Class && (historyitem_Workbook_SheetAdd === Item.Type || historyitem_Workbook_SheetRemove === Item.Type || historyitem_Workbook_SheetMove === Item.Type || historyitem_Workbook_SheetPositions === Item.Type)) {
+			    oRedoObjectParam.bUpdateWorksheetByModel = true;
+			    oRedoObjectParam.bOnSheetsChanged = true;
+			}
+			else if (g_oUndoRedoWorksheet === Item.Class && (historyitem_Worksheet_Rename === Item.Type || historyitem_Worksheet_Hide === Item.Type))
+			    oRedoObjectParam.bOnSheetsChanged = true;
         }
         CollaborativeEditing.Apply_LinkData();
         var wsViews = Asc["editor"].wb.wsViews;
@@ -601,6 +624,10 @@ CHistory.prototype =
 			for(var i in oRedoObjectParam.oChangeWorksheetUpdate)
 				this.workbook.handlers.trigger("changeWorksheetUpdate", oRedoObjectParam.oChangeWorksheetUpdate[i]);
 		}
+		if (oRedoObjectParam.bUpdateWorksheetByModel)
+		    this.workbook.handlers.trigger("updateWorksheetByModel");
+		if (oRedoObjectParam.bOnSheetsChanged)
+		    this.workbook.handlers.trigger("asc_onSheetsChanged");
 		//if (Point.SelectionState != null)
 		//	this.workbook.handlers.trigger("setSelectionState", Point.SelectionState);
 		

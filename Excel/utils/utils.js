@@ -1161,6 +1161,8 @@
 			this.bIsReInit = false;
 			this.bChangeWorksheetUpdate = false;
 			this.oChangeWorksheetUpdate = {};
+			this.bUpdateWorksheetByModel = false;
+			this.bOnSheetsChanged = false;
 		}
 
 		/** @constructor */

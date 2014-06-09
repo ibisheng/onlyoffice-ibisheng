@@ -2772,11 +2772,6 @@ UndoRedoWorkbook.prototype = {
 				this.wb.theme.themeElements.clrScheme = Data.newVal;
 			this.wb.oApi.asc_AfterChangeColorScheme();
 		}
-		if(bNeedTrigger)
-		{
-			this.wb.handlers.trigger("updateWorksheetByModel");
-			this.wb.handlers.trigger("asc_onSheetsChanged");
-		}
 	}
 };
 
@@ -3243,7 +3238,6 @@ UndoRedoWoorksheet.prototype = {
 				}
 				ws.setName(name);
 			}
-			ws.workbook.handlers.trigger("asc_onSheetsChanged");
 		}
 		else if(historyitem_Worksheet_Hide == Type)
 		{
@@ -3251,7 +3245,6 @@ UndoRedoWoorksheet.prototype = {
 				ws.setHidden(Data.from);
 			else
 				ws.setHidden(Data.to);
-			ws.workbook.handlers.trigger("asc_onSheetsChanged");
 		}
 		else if(historyitem_Worksheet_CreateRow == Type)
 		{
