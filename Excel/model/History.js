@@ -351,7 +351,8 @@ function CHistory(workbook)
 	this.IsModify = false;
     this.TurnOffHistory = 0;
 	this.Transaction = 0;
-    this.RecIndex = -1;
+	this.RecIndex = -1;
+	this.lastDrawingObjects = null;
 }
 CHistory.prototype =
 {
@@ -387,32 +388,16 @@ CHistory.prototype =
         // Проверяем можно ли сделать Undo
         if ( true != this.Can_Undo() )
             return null;
-		var bIsOn = false;
-
+        
         if ( this.Index === this.Points.length - 1 )
             this.LastState = this.workbook.handlers.trigger("getSelectionState");
 
 		this._checkCurPoint();
 
 		var Point = this.Points[this.Index--];
-		
-		if(this.Is_On())
-		{
-			bIsOn = true;
-			this.TurnOff();
-		}
-		/* отключаем отрисовку на случай необходимости пересчета ячеек, заносим ячейку, при необходимости в список перерисовываемых */
-		lockDraw(this.workbook);
-		
-		this.workbook.handlers.trigger("lockDraw");
-		this.workbook.bUndoChanges = true;
+		var oRedoObjectParam = new Asc.RedoObjectParam();
+		this.UndoRedoPrepare(oRedoObjectParam, true);
 
-		var isReInit = false;
-		var isRedrawAll = true;
-		var bChangeWorksheetUpdate = false;
-		var oChangeWorksheetUpdate = {};
-		var bUpdateWorksheetByModel = false;
-		var bOnSheetsChanged = false;
 		var oCurWorksheet = this.workbook.getWorksheet(this.workbook.getActive());
 		if(null != Point.nLastSheetId && Point.nLastSheetId != oCurWorksheet.getId())
 			this.workbook.handlers.trigger("showWorksheet", Point.nLastSheetId);
@@ -423,67 +408,12 @@ CHistory.prototype =
 			if(!Item.Class.Read_FromBinary2)
 				Item.Class.Undo( Item.Type, Item.Data, Item.SheetId );
 			else	
-				Item.Class.Undo(Item.Data);
-			if (g_oUndoRedoWorksheet === Item.Class && (historyitem_Worksheet_RowProp == Item.Type || historyitem_Worksheet_ColProp == Item.Type))
-			{
-				bChangeWorksheetUpdate = true;
-				oChangeWorksheetUpdate[Item.SheetId] = Item.SheetId;
-			}
-			else if (g_oUndoRedoWorksheet === Item.Class && historyitem_Worksheet_SetViewSettings === Item.Type)
-			    isReInit = true;
-			else if (g_oUndoRedoWorkbook === Item.Class && (historyitem_Workbook_SheetAdd === Item.Type || historyitem_Workbook_SheetRemove === Item.Type || historyitem_Workbook_SheetMove === Item.Type || historyitem_Workbook_SheetPositions === Item.Type)) {
-			    bUpdateWorksheetByModel = true;
-			    bOnSheetsChanged = true;
-			}
-			else if (g_oUndoRedoWorksheet === Item.Class && (historyitem_Worksheet_Rename === Item.Type || historyitem_Worksheet_Hide === Item.Type))
-			    bOnSheetsChanged = true;
+			    Item.Class.Undo(Item.Data);
+			this._addRedoObjectParam(oRedoObjectParam, Item);
         }
-        var wsViews = Asc["editor"].wb.wsViews;
-        for(var i = 0; i < wsViews.length; ++i)
-        {
-            if(wsViews[i])
-            {
-                wsViews[i].objectRender.controller.recalculate(undefined, Point);
-            }
-        }
-		gUndoInsDelCellsFlag = true;
-		for(var i in Point.UpdateRigions)
-			this.workbook.handlers.trigger("cleanCellCache", i, Point.UpdateRigions[i]);
-		if(null != Point.SelectRange)
-			this.workbook.handlers.trigger("setSelection", Point.SelectRange.clone(), /*validRange*/false);
-		if ( Point.SelectionState != null )
-			this.workbook.handlers.trigger("setSelectionState", Point.SelectionState);
-		if(bChangeWorksheetUpdate)
-		{
-			for(var i in oChangeWorksheetUpdate)
-				this.workbook.handlers.trigger("changeWorksheetUpdate", oChangeWorksheetUpdate[i]);
-		}
-		if (bUpdateWorksheetByModel)
-		    this.workbook.handlers.trigger("updateWorksheetByModel");
-		if (bOnSheetsChanged)
-		    this.workbook.handlers.trigger("asc_onSheetsChanged");
-
-		this._sendCanUndoRedo();
-
-		this.workbook.bUndoChanges = false;
-		if (isReInit)
-			this.workbook.handlers.trigger("reInit");
-		if (isRedrawAll)
-			this.workbook.handlers.trigger("drawWS");
-		else
-			this.workbook.handlers.trigger("showDrawingObjects", true);
-		if(isRealObject(this.lastDrawingObjects))
-        {
-            this.lastDrawingObjects.sendGraphicObjectProps();
-            this.lastDrawingObjects = null;
-        }
-		/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
-		buildRecalc(this.workbook);
-		unLockDraw(this.workbook);
-		if(bIsOn)
-			this.TurnOn();
+        this.UndoRedoEnd(Point, oRedoObjectParam, true);
     },
-	RedoPrepare : function (oRedoObjectParam) {
+	UndoRedoPrepare : function (oRedoObjectParam, bUndo) {
 		if (this.Is_On()) {
 			oRedoObjectParam.bIsOn = true;
 			this.TurnOff();
@@ -492,7 +422,10 @@ CHistory.prototype =
         lockDraw(this.workbook);
 		
 		this.workbook.handlers.trigger("lockDraw");
-		this.workbook.bRedoChanges = true;
+        if (bUndo)
+            this.workbook.bUndoChanges = true;
+        else
+            this.workbook.bRedoChanges = true;
 	},
 	RedoAdd : function(oRedoObjectParam, Class, Type, sheetid, range, Data, LocalChange)
 	{
@@ -520,19 +453,7 @@ CHistory.prototype =
                 Class.Load_Changes(Data.oBinaryReader, null, new CDocumentColor(255, 255, 255));
             }
         }
-		if (g_oUndoRedoWorksheet === Class && historyitem_Worksheet_SetViewSettings === Type)
-			oRedoObjectParam.bIsReInit = true;
-		else if (g_oUndoRedoWorksheet === Class && (historyitem_Worksheet_RowProp == Type || historyitem_Worksheet_ColProp == Type))
-		{
-			oRedoObjectParam.bChangeWorksheetUpdate = true;
-			oRedoObjectParam.oChangeWorksheetUpdate[sheetid] = sheetid;
-		}
-		else if (g_oUndoRedoWorkbook === Class && (historyitem_Workbook_SheetAdd === Type || historyitem_Workbook_SheetRemove === Type || historyitem_Workbook_SheetMove === Type || historyitem_Workbook_SheetPositions === Type)) {
-		    oRedoObjectParam.bUpdateWorksheetByModel = true;
-		    oRedoObjectParam.bOnSheetsChanged = true;
-		}
-		else if (g_oUndoRedoWorksheet === Class && (historyitem_Worksheet_Rename === Type || historyitem_Worksheet_Hide === Type))
-		    oRedoObjectParam.bOnSheetsChanged = true;
+        this._addRedoObjectParam(oRedoObjectParam, this.CurPoint.Items[this.CurPoint.Items.length - 1]);
 	},
 	RedoExecute : function(Point, oRedoObjectParam)
 	{
@@ -551,20 +472,8 @@ CHistory.prototype =
                     Item.Data.oBinaryReader.Seek(Item.Data.nPos);
                     Item.Class.Load_Changes(Item.Data.oBinaryReader, null, new CDocumentColor(255, 255, 255));
                 }
-            }
-			if (g_oUndoRedoWorksheet === Item.Class && historyitem_Worksheet_SetViewSettings === Item.Type)
-				oRedoObjectParam.bIsReInit = true;
-			else if (g_oUndoRedoWorksheet === Item.Class && (historyitem_Worksheet_RowProp == Item.Type || historyitem_Worksheet_ColProp == Item.Type))
-			{
-				oRedoObjectParam.bChangeWorksheetUpdate = true;
-				oRedoObjectParam.oChangeWorksheetUpdate[Item.SheetId] = Item.SheetId;
 			}
-			else if (g_oUndoRedoWorkbook === Item.Class && (historyitem_Workbook_SheetAdd === Item.Type || historyitem_Workbook_SheetRemove === Item.Type || historyitem_Workbook_SheetMove === Item.Type || historyitem_Workbook_SheetPositions === Item.Type)) {
-			    oRedoObjectParam.bUpdateWorksheetByModel = true;
-			    oRedoObjectParam.bOnSheetsChanged = true;
-			}
-			else if (g_oUndoRedoWorksheet === Item.Class && (historyitem_Worksheet_Rename === Item.Type || historyitem_Worksheet_Hide === Item.Type))
-			    oRedoObjectParam.bOnSheetsChanged = true;
+			this._addRedoObjectParam(oRedoObjectParam, Item);
         }
         CollaborativeEditing.Apply_LinkData();
         var wsViews = Asc["editor"].wb.wsViews;
@@ -591,58 +500,80 @@ CHistory.prototype =
             this.lastDrawingObjects = null;
         }
 	},
-	RedoEnd : function(Point, oRedoObjectParam)
-	{
-		if(null == Point)
-		{
-			this._checkCurPoint();
-			Point = this.Points[this.Index];
-            CollaborativeEditing.Apply_LinkData();
-            var wsViews = Asc["editor"].wb.wsViews;
-            for(var i = 0; i < wsViews.length; ++i)
-            {
-                if(wsViews[i])
-                {
-                    wsViews[i].objectRender.controller.recalculate(true, null);
-                }
-            }
-		}
+	UndoRedoEnd: function (Point, oRedoObjectParam, bUndo) {
+	    if (!bUndo && null == Point) {
+	        this._checkCurPoint();
+	        Point = this.Points[this.Index];
+	        CollaborativeEditing.Apply_LinkData();
+	        var wsViews = Asc["editor"].wb.wsViews;
+	        for (var i = 0; i < wsViews.length; ++i) {
+	            if (wsViews[i]) {
+	                wsViews[i].objectRender.controller.recalculate(true, null);
+	            }
+	        }
+	    }
 
-		if(null == Point)
-			return;
-		var oSelectRange = null;
-		if(null != Point.SelectRangeRedo)
-			oSelectRange = Point.SelectRangeRedo;
-		else if(null != Point.SelectRange)
-			oSelectRange = Point.SelectRange;
-		for(var i in Point.UpdateRigions)
-			this.workbook.handlers.trigger("cleanCellCache", i, Point.UpdateRigions[i]);
-		if(null != oSelectRange)
-			this.workbook.handlers.trigger("setSelection", oSelectRange.clone());
-		if(oRedoObjectParam.bChangeWorksheetUpdate)
-		{
-			for(var i in oRedoObjectParam.oChangeWorksheetUpdate)
-				this.workbook.handlers.trigger("changeWorksheetUpdate", oRedoObjectParam.oChangeWorksheetUpdate[i]);
-		}
-		if (oRedoObjectParam.bUpdateWorksheetByModel)
-		    this.workbook.handlers.trigger("updateWorksheetByModel");
-		if (oRedoObjectParam.bOnSheetsChanged)
-		    this.workbook.handlers.trigger("asc_onSheetsChanged");
-		//if (Point.SelectionState != null)
-		//	this.workbook.handlers.trigger("setSelectionState", Point.SelectionState);
-		
-		this._sendCanUndoRedo();
+	    if (null != Point) {
+	        if (bUndo) {
+	            var wsViews = Asc["editor"].wb.wsViews;
+	            for (var i = 0; i < wsViews.length; ++i) {
+	                if (wsViews[i]) {
+	                    wsViews[i].objectRender.controller.recalculate(undefined, Point);
+	                }
+	            }
+	            gUndoInsDelCellsFlag = true;
+	        }
+	        for (var i in Point.UpdateRigions)
+	            this.workbook.handlers.trigger("cleanCellCache", i, Point.UpdateRigions[i]);
+	        if (bUndo) {
+	            this.workbook.handlers.trigger("setSelection", Point.SelectRange.clone(), /*validRange*/false);
+	            if (Point.SelectionState != null)
+	                this.workbook.handlers.trigger("setSelectionState", Point.SelectionState);
+	        }
+	        else {
+	            var oSelectRange = null;
+	            if (null != Point.SelectRangeRedo)
+	                oSelectRange = Point.SelectRangeRedo;
+	            else if (null != Point.SelectRange)
+	                oSelectRange = Point.SelectRange;
+	            if (null != oSelectRange)
+	                this.workbook.handlers.trigger("setSelection", oSelectRange.clone());
+	        }
+	        for (var i in oRedoObjectParam.oChangeWorksheetUpdate)
+	            this.workbook.handlers.trigger("changeWorksheetUpdate", oRedoObjectParam.oChangeWorksheetUpdate[i]);
+	        if (oRedoObjectParam.bUpdateWorksheetByModel)
+	            this.workbook.handlers.trigger("updateWorksheetByModel");
+	        if (oRedoObjectParam.bOnSheetsChanged)
+	            this.workbook.handlers.trigger("asc_onSheetsChanged");
+	        for (var i in oRedoObjectParam.oOnUpdateTabColor) {
+	            var curSheet = this.workbook.getWorksheetById(i);
+	            if (curSheet)
+	                this.workbook.handlers.trigger("asc_onUpdateTabColor", curSheet.getIndex());
+	        }
+	        if (oRedoObjectParam.oOnUpdateSheetViewSettings[this.workbook.getWorksheet(this.workbook.getActive()).getId()])
+	            this.workbook.handlers.trigger("asc_onUpdateSheetViewSettings");
 
-		this.workbook.bRedoChanges = false;
-		if (oRedoObjectParam.bIsReInit)
-			this.workbook.handlers.trigger("reInit");
-		this.workbook.handlers.trigger("drawWS");
-		
-		/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
-		buildRecalc(this.workbook);
-		unLockDraw(this.workbook);
-		if(oRedoObjectParam.bIsOn)
-			this.TurnOn();
+	        this._sendCanUndoRedo();
+	        if (bUndo)
+	            this.workbook.bUndoChanges = false;
+	        else
+	            this.workbook.bRedoChanges = false;
+	        if (oRedoObjectParam.bIsReInit)
+	            this.workbook.handlers.trigger("reInit");
+	        this.workbook.handlers.trigger("drawWS");
+	        if (bUndo) {
+	            if (isRealObject(this.lastDrawingObjects)) {
+	                this.lastDrawingObjects.sendGraphicObjectProps();
+	                this.lastDrawingObjects = null;
+	            }
+	        }
+	    }
+
+	    /* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
+	    buildRecalc(this.workbook);
+	    unLockDraw(this.workbook);
+	    if (oRedoObjectParam.bIsOn)
+	        this.TurnOn();
 	},
     Redo : function()
 	{
@@ -651,7 +582,7 @@ CHistory.prototype =
             return null;
 
 		var oRedoObjectParam = new Asc.RedoObjectParam();
-		this.RedoPrepare(oRedoObjectParam);
+		this.UndoRedoPrepare(oRedoObjectParam, false);
 		
 		this.CurPoint = null;
         var Point = this.Points[++this.Index];
@@ -661,9 +592,26 @@ CHistory.prototype =
 			this.workbook.handlers.trigger("showWorksheet", Point.nLastSheetId);
 		this.RedoExecute(Point, oRedoObjectParam);
 		
-		this.RedoEnd(Point, oRedoObjectParam);
+		this.UndoRedoEnd(Point, oRedoObjectParam, false);
 	},
-
+    _addRedoObjectParam: function (oRedoObjectParam, Point) {
+        if (g_oUndoRedoWorksheet === Point.Class && historyitem_Worksheet_SetViewSettings === Point.Type) {
+            oRedoObjectParam.bIsReInit = true;
+            oRedoObjectParam.oOnUpdateSheetViewSettings[Point.SheetId] = Point.SheetId;
+        }
+        else if (g_oUndoRedoWorksheet === Point.Class && (historyitem_Worksheet_RowProp == Point.Type || historyitem_Worksheet_ColProp == Point.Type))
+            oRedoObjectParam.oChangeWorksheetUpdate[Point.SheetId] = Point.SheetId;
+        else if (g_oUndoRedoWorkbook === Point.Class && (historyitem_Workbook_SheetAdd === Point.Type || historyitem_Workbook_SheetRemove === Point.Type || historyitem_Workbook_SheetMove === Point.Type || historyitem_Workbook_SheetPositions === Point.Type)) {
+            oRedoObjectParam.bUpdateWorksheetByModel = true;
+            oRedoObjectParam.bOnSheetsChanged = true;
+        }
+        else if (g_oUndoRedoWorksheet === Point.Class && (historyitem_Worksheet_Rename === Point.Type || historyitem_Worksheet_Hide === Point.Type))
+            oRedoObjectParam.bOnSheetsChanged = true;
+        else if (g_oUndoRedoWorksheet === Point.Class && historyitem_Worksheet_SetTabColor === Point.Type)
+            oRedoObjectParam.oOnUpdateTabColor[Point.SheetId] = Point.SheetId;
+        else if (g_oUndoRedoWorksheet === Point.Class && historyitem_Worksheet_ChangeFrozenCell === Point.Type)
+            oRedoObjectParam.oOnUpdateSheetViewSettings[Point.SheetId] = Point.SheetId;
+    },
     Get_RecalcData : function(Point2)
     {
         //if ( this.Index >= 0 )

@@ -3297,7 +3297,7 @@
 				this.draw();
 
 			// Эвент на обновление
-			if (isUpdate)
+			if (isUpdate && !this.model.workbook.bUndoChanges && !this.model.workbook.bRedoChanges)
 				this.handlers.trigger("updateSheetViewSettings");
 		};
 

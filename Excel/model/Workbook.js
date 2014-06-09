@@ -1647,7 +1647,7 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 				History.SetSelectionRedo(null);
 				var oHistoryPositions = null;//нужен самый последний historyitem_Workbook_SheetPositions
 				var oRedoObjectParam = new Asc.RedoObjectParam();
-				History.RedoPrepare(oRedoObjectParam);
+				History.UndoRedoPrepare(oRedoObjectParam, false);
 				for(var i = 0, length = aChanges.length; i < length; ++i)
 				{
 					var sChange = aChanges[i];
@@ -1673,7 +1673,7 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 				if(null != oHistoryPositions)
 					History.RedoAdd(oRedoObjectParam, oHistoryPositions.oClass, oHistoryPositions.nActionType, oHistoryPositions.nSheetId, oHistoryPositions.oRange, oHistoryPositions.oData);
 			
-				History.RedoEnd(null, oRedoObjectParam);
+				History.UndoRedoEnd(null, oRedoObjectParam, false);
 				oThis.bCollaborativeChanges = false;
 				History.Clear();
 				if(null != fCallback)
@@ -2117,8 +2117,8 @@ Woorksheet.prototype.setTabColor=function(color){
 		new UndoRedoData_FromTo(this.sheetPr.TabColor ? this.sheetPr.TabColor.clone() : null, color ? color.clone() : null));
 
 	this.sheetPr.TabColor = color;
-
-	this.workbook.handlers.trigger("asc_onUpdateTabColor", this.getIndex());
+	if (!this.workbook.bUndoChanges && !this.workbook.bRedoChanges)
+	    this.workbook.handlers.trigger("asc_onUpdateTabColor", this.getIndex());
 };
 Woorksheet.prototype.renameWsToCollaborate=function(name){
 	var lastname = this.getName();
@@ -2218,7 +2218,8 @@ Woorksheet.prototype.setSheetViewSettings = function (options) {
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_SetViewSettings, this.getId(), null, new UndoRedoData_FromTo(current, options.clone()));
 
 	this.sheetViews[0].setSettings(options);
-	this.workbook.handlers.trigger("asc_onUpdateSheetViewSettings");
+	if (!this.workbook.bUndoChanges && !this.workbook.bRedoChanges)
+	    this.workbook.handlers.trigger("asc_onUpdateSheetViewSettings");
 };
 Woorksheet.prototype.getRowsCount=function(){
 	return this.nRowsCount;
