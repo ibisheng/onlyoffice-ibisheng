@@ -821,11 +821,11 @@ function CCollaborativeEditing()
         }
         else
         {
-            LastPoint = History.Index + 1;
+            LastPoint = History.Index;
         }
 
         var aChanges = new Array();
-        for ( var PointIndex = StartPoint; PointIndex < LastPoint; PointIndex++ )
+        for ( var PointIndex = StartPoint; PointIndex <= LastPoint; PointIndex++ )
         {
             var Point = History.Points[PointIndex];
 
@@ -841,6 +841,14 @@ function CCollaborativeEditing()
                 aChanges.push( oChanges2 );
             }
         }
+        
+        // Просчитаем сколько изменений на сервер пересылать не надо
+        var SumIndex = 0;
+        for ( var PointIndex = 0; PointIndex < StartPoint; PointIndex++ )
+        {
+            var Point = History.Points[PointIndex];
+            SumIndex += Point.Items.length;
+        }
 
         this.Release_Locks();
 
@@ -855,7 +863,7 @@ function CCollaborativeEditing()
         this.m_aNeedUnlock.length  = 0;
         this.m_aNeedUnlock2.length = 0;
 
-        editor.CoAuthoringApi.saveChanges(aChanges, StartPoint);
+        editor.CoAuthoringApi.saveChanges(aChanges, SumIndex);
 
         // Чистим Undo/Redo только во время совместного редактирования
         if ( true === this.m_bUse )
