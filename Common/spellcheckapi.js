@@ -153,7 +153,9 @@
             //Get data type
             var dataObject = JSON.parse(e.data);
             var type = dataObject.type;
-            docsCoApi.dataHandler[type](dataObject);
+			switch (type) {
+				case 'spellCheck'	: docsCoApi._onSpellCheck(dataObject); break;
+			}
         };
         sockjs.onclose = function (evt) {
 			docsCoApi._state = -1; // Reconnect state
@@ -194,12 +196,6 @@
         var docsCoApi = this;
 		this.sockjs_url = this._url + '/doc/'+docid+'/c';
         this.sockjs = initSocksJs(this.sockjs_url, this);
-
-        this.dataHandler = {
-			"spellCheck":function (data) {
-				docsCoApi._onSpellCheck(data);
-			}
-        };
     };
     global["CSpellCheckApi"] = CSpellCheckApi;
 

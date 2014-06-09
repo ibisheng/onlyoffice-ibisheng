@@ -252,7 +252,6 @@
         this._participants = {};
 		this._countEditUsers = 0;
 
-        this._user = "Anonymous";
         this._locks = {};
         this._msgBuffer = [];
         this._lockCallbacks = {};
@@ -276,6 +275,26 @@
 		this.arrayChanges = null;
 		
 		this._url = "";
+
+		this.reconnectTimeout = null;
+		this.attemptCount = 0;
+
+		this._docid = null;
+		this._token = null;
+		this._user = "Anonymous";
+		this._initCallback = null;
+		this.ownedLockBlocks = [];
+		// Server info
+		this._serverHost = null;
+		this._serverPort = null;
+		this._serverPath = null;
+		this.sockjs_url = null;
+		this.sockjs = null;
+		this._isExcel = false;
+		this._isPresentation = false;
+		this._isAuth = false;
+		this._documentFormatSave = 0;
+		this._isViewer = false;
     };
 	
 	DocsCoApi.prototype.isRightURL = function () {
@@ -702,96 +721,51 @@
 		}
 	};
 
-    var reconnectTimeout, attemptCount=0;
+	DocsCoApi.prototype._onDrop = function (data) {
+		this.disconnect();
+		this.onDisconnect(data['description'], true, this.isCloseCoAuthoring);
+	};
 
-    function initSocksJs(url,docsCoApi)  {
-        var sockjs = new SockJS(url, null, {debug: true});
+	DocsCoApi.prototype._onAuth = function (data) {
+		if (true === this._isAuth) {
+			// Мы уже авторизовывались, это просто reconnect
+			return;
+		}
+		if (data["result"] === 1) {
+			// Выставляем флаг, что мы уже авторизовывались
+			this._isAuth = true;
 
-        sockjs.onopen = function () {
-            if (reconnectTimeout) {
-                clearTimeout(reconnectTimeout);
-                attemptCount = 0;
-            }
-            docsCoApi._state = 1; // Opened state
-            if (docsCoApi.onConnect) {
-                docsCoApi.onConnect();
-            }
-            if (docsCoApi._locks) {
-                docsCoApi.ownedLockBlocks = [];
-                //If we already have locks
-                for (var block in docsCoApi._locks) {
-                    if (docsCoApi._locks.hasOwnProperty(block)) {
-                        var lock = docsCoApi._locks[block];
-                        if (lock["state"] === 2) {
-                            //Our lock.
-                            docsCoApi.ownedLockBlocks.push(lock["block"]);
-                        }
-                    }
-                }
-                docsCoApi._locks = {};
-            }
-            docsCoApi._send(
-                {
-                    "type":"auth",
-                    "docid":docsCoApi._docid,
-                    "token":docsCoApi._token,
-					"user": {
-						"id":docsCoApi._user.asc_getId(),
-						"name":docsCoApi._user.asc_getUserName(),
-						"color":docsCoApi._user.asc_getColorValue()
-					},
-                    "locks":docsCoApi.ownedLockBlocks,
-                    "sessionId":docsCoApi._id,
-					"server": {
-						"host": docsCoApi._serverHost,
-						"port": docsCoApi._serverPort,
-						"path":docsCoApi._serverPath
-					},
-					"documentFormatSave": docsCoApi._documentFormatSave,
-					"isViewer": docsCoApi._isViewer
-                });
+			//TODO: add checks
+			this._state = 2; // Authorized
+			this._id = data["sessionId"];
 
-        };
+			this._onAuthParticipantsChanged(data["participants"]);
 
-        sockjs.onmessage = function (e) {
-            //TODO: add checks and error handling
-            //Get data type
-            var dataObject = JSON.parse(e.data);
-            var type = dataObject.type;
-            docsCoApi.dataHandler[type](dataObject);
-        };
-        sockjs.onclose = function (evt) {
-			docsCoApi._state = -1; // Reconnect state
-			var bIsDisconnectAtAll = attemptCount >= 20 || docsCoApi.isCloseCoAuthoring;
-			if (bIsDisconnectAtAll)
-				docsCoApi._state = 3; // Closed state
-			if (docsCoApi.onDisconnect) {
-                docsCoApi.onDisconnect(evt.reason, bIsDisconnectAtAll, docsCoApi.isCloseCoAuthoring);
-            }
-			if (docsCoApi.isCloseCoAuthoring)
-				return;
-            //Try reconect
-            if (attemptCount < 20) {
-                tryReconnect();
-            }
-        };
+			if (data["indexUser"]) {
+				this._indexuser = data["indexUser"];
+				this._onSetIndexUser (this._indexuser);
+			}
 
+			if (data["messages"] && this.onMessage) {
+				this._onMessages(data);
+			}
+			if (data["locks"]) {
+				if (this.ownedLockBlocks && this.ownedLockBlocks.length > 0) {
+					this._onPreviousLocks(data["locks"], this.ownedLockBlocks);
+				}
+				this._onGetLock(data);
+			}
+			// Нужно послать фиктивное завершение (эта функция означает что мы соединились)
+			this._onFirstLoadChanges(data["changes"] || []);
 
-        function tryReconnect() {
-            if (reconnectTimeout) {
-                clearTimeout(reconnectTimeout);
-            }
-            attemptCount++;
-            reconnectTimeout = setTimeout(function(){
-                delete docsCoApi.sockjs;
-                docsCoApi.sockjs = initSocksJs(url,docsCoApi);
-            },500*attemptCount);
-
-        }
-
-        return sockjs;
-    }
-
+			//Send prebuffered
+			this._sendPrebuffered();
+		}
+		//TODO: Add errors
+		if (this._initCallback) {
+			this._initCallback({result:data["result"]});
+		}
+	};
 
     DocsCoApi.prototype.init = function (user, docid, token, serverHost, serverPort, serverPath, callback,
 										 editorType, documentFormatSave, isViewer) {
@@ -799,92 +773,120 @@
         this._docid = docid;
         this._token = token;
         this._initCallback = callback;
-        this.ownedLockBlocks=[];
-        //Begin send auth
-        var docsCoApi = this;
+        this.ownedLockBlocks = [];
 		// Server info
 		this._serverHost = serverHost;
 		this._serverPort = serverPort ? serverPort : '';
 		this._serverPath = serverPath;
 		this.sockjs_url = this._url + '/doc/'+docid+'/c';
-        this.sockjs = initSocksJs(this.sockjs_url, this);
 		this._isExcel = c_oEditorId.Speadsheet === editorType;
 		this._isPresentation = c_oEditorId.Presentation === editorType;
 		this._isAuth = false;
 		this._documentFormatSave = documentFormatSave;
 		this._isViewer = isViewer;
 
-        this.dataHandler =
-        {
-            "auth":function (data) {
-				if (true === docsCoApi._isAuth) {
-					// Мы уже авторизовывались, это просто reconnect
-					return;
-				}
-                if (data["result"] === 1) {
-					// Выставляем флаг, что мы уже авторизовывались
-					docsCoApi._isAuth = true;
-
-                    //TODO: add checks
-                    docsCoApi._state = 2; // Authorized
-                    docsCoApi._id = data["sessionId"];
-					
-					docsCoApi._onAuthParticipantsChanged(data["participants"]);
-					
-					if (data["indexUser"]) {
-						docsCoApi._indexuser = data["indexUser"];
-						docsCoApi._onSetIndexUser (docsCoApi._indexuser);
-					}
-					
-                    if (data["messages"] && docsCoApi.onMessage) {
-                        docsCoApi._onMessages(data);
-                    }
-                    if (data["locks"]) {
-                        if (docsCoApi.ownedLockBlocks && docsCoApi.ownedLockBlocks.length>0) {
-                            docsCoApi._onPreviousLocks(data["locks"],docsCoApi.ownedLockBlocks);
-                        }
-                        docsCoApi._onGetLock(data);
-                    }
-					// Нужно послать фиктивное завершение (эта функция означает что мы соединились)
-					docsCoApi._onFirstLoadChanges(data["changes"] || []);
-
-                    //Send prebuffered
-                    docsCoApi._sendPrebuffered();
-                }
-                //TODO: Add errors
-                if (docsCoApi._initCallback) {
-                    docsCoApi._initCallback({result:data["result"]});
-                }
-            },
-            "message":function (data) {
-                docsCoApi._onMessages(data);
-            },
-            "getlock":function (data) {
-                docsCoApi._onGetLock(data);
-            },
-            "releaselock":function (data) {
-                docsCoApi._onReleaseLock(data);
-            },
-			"connectstate":function (data) {
-				docsCoApi._onConnectionStateChanged(data);
-			},
-            "savechanges":function (data) {
-                docsCoApi._onSaveChanges(data);
-            },
-			"savelock":function (data) {
-				docsCoApi._onSaveLock(data);
-			},
-			"unsavelock":function (data) {
-				docsCoApi._onUnSaveLock(data);
-			},
-			"savePartChanges":function () {
-				docsCoApi._onSavePartChanges();
-			},
-			"drop":function(data) {
-				docsCoApi.disconnect();
-				docsCoApi.onDisconnect(data['description'], true, docsCoApi.isCloseCoAuthoring);
-			}
-        };
+		this._initSocksJs()
     };
+
+	DocsCoApi.prototype._initSocksJs = function ()  {
+		var t = this;
+		var sockjs = this.sockjs = new SockJS(this.sockjs_url, null, {debug: true});
+
+		sockjs.onopen = function () {
+			if (t.reconnectTimeout) {
+				clearTimeout(t.reconnectTimeout);
+				t.attemptCount = 0;
+			}
+
+			t._state = 1; // Opened state
+			if (t.onConnect) {
+				t.onConnect();
+			}
+			if (t._locks) {
+				t.ownedLockBlocks = [];
+				//If we already have locks
+				for (var block in t._locks) {
+					if (t._locks.hasOwnProperty(block)) {
+						var lock = t._locks[block];
+						if (lock["state"] === 2) {
+							//Our lock.
+							t.ownedLockBlocks.push(lock["block"]);
+						}
+					}
+				}
+				t._locks = {};
+			}
+			t._send(
+				{
+					"type":"auth",
+					"docid":t._docid,
+					"token":t._token,
+					"user": {
+						"id":t._user.asc_getId(),
+						"name":t._user.asc_getUserName(),
+						"color":t._user.asc_getColorValue()
+					},
+					"locks":t.ownedLockBlocks,
+					"sessionId":t._id,
+					"server": {
+						"host": t._serverHost,
+						"port": t._serverPort,
+						"path":t._serverPath
+					},
+					"documentFormatSave": t._documentFormatSave,
+					"isViewer": t._isViewer
+				});
+
+		};
+		sockjs.onmessage = function (e) {
+			//TODO: add checks and error handling
+			//Get data type
+			var dataObject = JSON.parse(e.data);
+			var type = dataObject.type;
+			switch (type) {
+				case 'auth'				: t._onAuth(dataObject); break;
+				case 'message'			: t._onMessages(dataObject); break;
+				case 'getlock'			: t._onGetLock(dataObject); break;
+				case 'releaselock'		: t._onReleaseLock(dataObject); break;
+				case 'connectstate'		: t._onConnectionStateChanged(dataObject); break;
+				case 'savechanges'		: t._onSaveChanges(dataObject); break;
+				case 'savelock'			: t._onSaveLock(dataObject); break;
+				case 'unsavelock'		: t._onUnSaveLock(dataObject); break;
+				case 'savePartChanges'	: t._onSavePartChanges(); break;
+				case 'drop'				: t._onDrop(dataObject); break;
+			}
+		};
+		sockjs.onclose = function (evt) {
+			t._state = -1; // Reconnect state
+			var bIsDisconnectAtAll = t.attemptCount >= 20 || t.isCloseCoAuthoring;
+			if (bIsDisconnectAtAll)
+				t._state = 3; // Closed state
+			if (t.onDisconnect) {
+				t.onDisconnect(evt.reason, bIsDisconnectAtAll, t.isCloseCoAuthoring);
+			}
+			if (t.isCloseCoAuthoring)
+				return;
+			//Try reconect
+			if (t.attemptCount < 20) {
+				t._tryReconnect();
+			}
+		};
+
+		return sockjs;
+	};
+
+	DocsCoApi.prototype._tryReconnect = function () {
+		var t = this;
+		if (this.reconnectTimeout) {
+			clearTimeout(this.reconnectTimeout);
+		}
+		++this.attemptCount;
+		this.reconnectTimeout = setTimeout(function () {
+			delete t.sockjs;
+			t._initSocksJs();
+		}, 500 * t.attemptCount);
+
+	};
+
     global["CDocsCoApi"] = CDocsCoApi;
 })(window);
