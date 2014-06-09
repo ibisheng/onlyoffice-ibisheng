@@ -1463,9 +1463,15 @@ asc_docs_api.prototype._coAuthoringInit = function()
         t.asc_fireCallback("asc_onParticipantsChanged", e, CountEditUsers);
 
         if ( 1 >= CountEditUsers )
+        {
+            CollaborativeEditing.Start_CollaborationEditing();
             editor.asc_setDrawCollaborationMarks(false);
+        }
         else
+        {
+            CollaborativeEditing.End_CollaborationEditing();
             editor.asc_setDrawCollaborationMarks(true);
+        }
     };
 	this.CoAuthoringApi.onAuthParticipantsChanged  	= function (e, count) { t.asc_fireCallback("asc_onAuthParticipantsChanged", e, count); };
     this.CoAuthoringApi.onMessage               	= function (e, count) { t.asc_fireCallback("asc_onCoAuthoringChatReceiveMessage", e); };

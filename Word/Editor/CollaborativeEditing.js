@@ -627,6 +627,11 @@ function CCollaborativeEditing()
     {
         this.m_bUse = true;
     };
+    
+    this.End_CollaborationEditing = function()
+    {
+        this.m_bUse = false;
+    };
 
     this.Add_User = function(UserId)
     {
@@ -811,7 +816,7 @@ function CCollaborativeEditing()
         this.Refresh_DCChanges();
 
         // Генерируем свои изменения
-        var StartPoint = History.SavedIndex + 1;
+        var StartPoint = ( null === History.SavedIndex ? 0 : History.SavedIndex + 1 );
         var LastPoint  = -1;
         if ( true === this.m_bUse )
         {
@@ -863,14 +868,18 @@ function CCollaborativeEditing()
         this.m_aNeedUnlock.length  = 0;
         this.m_aNeedUnlock2.length = 0;
 
-        editor.CoAuthoringApi.saveChanges(aChanges, SumIndex);
+        editor.CoAuthoringApi.saveChanges(aChanges, ( null === History.SavedIndex ? null : SumIndex ) );
 
-        // Чистим Undo/Redo только во время совместного редактирования
         if ( true === this.m_bUse )
+        {
+            // Чистим Undo/Redo только во время совместного редактирования
             History.Clear();
-
-        // Обновляем точку последнего сохранения в истории
-        History.Reset_SavedIndex();
+        }
+        else
+        {
+            // Обновляем точку последнего сохранения в истории
+            History.Reset_SavedIndex();
+        }
 
         // Обновляем интерфейс        
         editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
