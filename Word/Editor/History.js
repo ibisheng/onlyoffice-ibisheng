@@ -397,6 +397,9 @@ CHistory.prototype =
 
     Have_Changes : function()
     {
+        if ( -1 === this.Index && null === this.SavedIndex )
+            return false;
+        
         if ( this.Index != this.SavedIndex )
             return true;
 
