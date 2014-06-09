@@ -738,8 +738,6 @@ asc_docs_api.prototype.TranslateStyleName = function(style_name)
 
 asc_docs_api.prototype.SetUnchangedDocument = function()
 {
-    History.Reset_SavedIndex();
-
     this.isDocumentModify = false;
     //this.WordControl.m_oDrawingDocument.m_bIsSendApiDocChanged = false;
 
