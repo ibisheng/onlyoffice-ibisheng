@@ -12861,6 +12861,7 @@ CDocument.prototype =
                 Element.Refresh_RecalcData2(0, 0);
 
                 this.Recalculate();
+                this.Document_UpdateSelectionState();
 
                 return true;
             }

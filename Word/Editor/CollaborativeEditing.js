@@ -849,7 +849,7 @@ function CCollaborativeEditing()
         
         // Просчитаем сколько изменений на сервер пересылать не надо
         var SumIndex = 0;
-        var StartPoint2 = Math.min( StartPoint, LastPoint );
+        var StartPoint2 = Math.min( StartPoint, LastPoint + 1 );
         for ( var PointIndex = 0; PointIndex < StartPoint2; PointIndex++ )
         {
             var Point = History.Points[PointIndex];
