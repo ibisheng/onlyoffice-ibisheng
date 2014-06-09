@@ -124,9 +124,9 @@
 		}
 	};
 
-	CDocsCoApi.prototype.saveChanges = function (arrayChanges) {
+	CDocsCoApi.prototype.saveChanges = function (arrayChanges, deleteIndex) {
 		if (this._CoAuthoringApi && this._onlineWork) {
-			this._CoAuthoringApi.saveChanges(arrayChanges);
+			this._CoAuthoringApi.saveChanges(arrayChanges, null, deleteIndex);
 		}
 	};
 	
@@ -270,6 +270,8 @@
 		this.maxCountSaveChanges = 20000;
 		// Текущий индекс для колличества изменений
 		this.currentIndex = 0;
+		// Индекс, с которого мы начинаем сохранять изменения
+		this.deleteIndex = 0;
 		// Массив изменений
 		this.arrayChanges = null;
 		
@@ -404,8 +406,9 @@
         }
     };
 	
-	DocsCoApi.prototype.saveChanges = function (arrayChanges, currentIndex) {
-		if (undefined === currentIndex) {
+	DocsCoApi.prototype.saveChanges = function (arrayChanges, currentIndex, deleteIndex) {
+		if (null === currentIndex) {
+			this.deleteIndex = deleteIndex;
 			this.currentIndex = 0;
 			this.arrayChanges = arrayChanges;
 		} else {
@@ -414,7 +417,7 @@
 		var startIndex = this.currentIndex * this.maxCountSaveChanges;
 		var endIndex = Math.min(this.maxCountSaveChanges * (this.currentIndex + 1), arrayChanges.length);
 		if (endIndex === arrayChanges.length) {
-			for (var key in this._locks) {
+			for (var key in this._locks) if (this._locks.hasOwnProperty(key)) {
 				if (2 === this._locks[key].state /*lock is ours*/)
 					delete this._locks[key];
 			}
@@ -422,7 +425,7 @@
 
 		this._send({"type": "savechanges", "changes": JSON.stringify(arrayChanges.slice(startIndex, endIndex)),
 			"startSaveChanges": (startIndex === 0), "endSaveChanges": (endIndex === arrayChanges.length),
-			"isCoAuthoring": this.isCoAuthoring, "isExcel": this._isExcel});
+			"isCoAuthoring": this.isCoAuthoring, "isExcel": this._isExcel, "deleteIndex": this.deleteIndex});
 	};
 
     DocsCoApi.prototype.getUsers = function () {
@@ -828,8 +831,8 @@
 					
 					docsCoApi._onAuthParticipantsChanged(data["participants"]);
 					
-					if (data["indexuser"]) {
-						docsCoApi._indexuser = data["indexuser"];
+					if (data["indexUser"]) {
+						docsCoApi._indexuser = data["indexUser"];
 						docsCoApi._onSetIndexUser (docsCoApi._indexuser);
 					}
 					
