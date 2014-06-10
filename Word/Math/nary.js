@@ -69,21 +69,17 @@ CNary.prototype.fillContent = function()
         else if( this.Pr.supHide && !this.Pr.subHide )
         {
             base = new CNaryOvr();
-            //base.init(oBase);
-
             base.setCtrPrp(ctrPrp);
 
         }
         else if( !this.Pr.supHide && this.Pr.subHide )
         {
             base = new CNaryUnd();
-            //base.init(oBase);
             base.setCtrPrp(ctrPrp);
         }
         else
         {
             base = new CNaryUndOvr();
-            //base.init(oBase);
             base.setCtrPrp(ctrPrp);
         }
 
@@ -383,6 +379,8 @@ CNary.prototype.Get_Id = function()
 function CNaryUnd()
 {
     CMathBase.call(this);
+
+    this.init();
 }
 extend(CNaryUnd, CMathBase);
 CNaryUnd.prototype.init = function()
@@ -429,6 +427,8 @@ CNaryUnd.prototype.changeUpperIterator = function(iterator)
 function CNaryOvr()
 {
     CMathBase.call(this);
+
+    this.init();
 }
 extend(CNaryOvr, CMathBase);
 CNaryOvr.prototype.init = function()
@@ -499,6 +499,8 @@ function CNaryUndOvr()
     this.gapTop = 0;
     this.gapBottom = 0;
     CMathBase.call(this);
+
+    this.init();
 }
 extend(CNaryUndOvr, CMathBase);
 CNaryUndOvr.prototype.init = function()
