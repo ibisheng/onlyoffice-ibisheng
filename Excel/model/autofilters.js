@@ -3507,7 +3507,7 @@ var gUndoInsDelCellsFlag = true;
 									case 7:
 										if(type == 1)
 										{
-											if(newVal.search("?") || newVal.search("*"))
+											//if(newVal.search("?") || newVal.search("*"))
 											if(newVal.search(filterVal) == 0)//beginsWith
 												result[s] = true;
 										}
