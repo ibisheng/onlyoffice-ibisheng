@@ -6443,6 +6443,9 @@ var gUndoInsDelCellsFlag = true;
 						if(!data)
 							this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Move, {worksheet: ws, arnTo: arnTo, arnFrom: arnFrom, activeCells: ws.activeRange})
 					}
+					
+					this._cleanStyleTable(aWs, arnFrom);
+					
 					this._reDrawFilters(null, true);
 				}
 				else
