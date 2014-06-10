@@ -4347,7 +4347,8 @@ ParaDrawing.prototype =
             this.PositionV.Value        = this.PositionV_Old.Value2;
         }
 
-        this.DocumentContent = this.Parent.Parent;
+        this.DocumentContent   = this.Parent.Parent;
+        this.GraphicObj.parent = this;
 
         var PageNum = ParaLayout.PageNum;
 
