@@ -961,13 +961,7 @@
                 //get range for copy/paste
                 if(this.isCopyPaste)
                 {
-                    var parseRef = aTables[i].Ref.split(":");
-                    if(parseRef[0] && parseRef[1])
-                    {
-                        var startRange = new CellAddress(parseRef[0]);
-                        var endRange = new CellAddress(parseRef[1]);
-                        rangeTable = Asc.Range(startRange.col - 1, startRange.row - 1, endRange.col - 1, endRange.row - 1);
-                    }
+                    var rangeTable = aTables[i].Ref;
                 }
                 if(!this.isCopyPaste || (this.isCopyPaste && rangeTable && this.isCopyPaste.containsRange(rangeTable)))
                     this.bs.WriteItem(c_oSer_TablePart.Table, function(){oThis.WriteTable(aTables[i]);});
@@ -980,7 +974,7 @@
             if(null != table.Ref)
             {
                 this.memory.WriteByte(c_oSer_TablePart.Ref);
-                this.memory.WriteString2(table.Ref);
+                this.memory.WriteString2(table.Ref.getName());
             }
             //HeaderRowCount
             if(null != table.HeaderRowCount)
@@ -1013,8 +1007,8 @@
             //Ref
             if(null != autofilter.Ref)
             {
-                this.memory.WriteByte(c_oSer_AutoFilter.Ref);
-                this.memory.WriteString2(autofilter.Ref);
+				this.memory.WriteByte(c_oSer_AutoFilter.Ref);
+                this.memory.WriteString2(autofilter.Ref.getName());
             }
             //FilterColumns
             if(null != autofilter.FilterColumns)
@@ -3555,7 +3549,7 @@
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
             if ( c_oSer_TablePart.Ref == type )
-                oTable.Ref = this.stream.GetString2LE(length);
+                oTable.Ref = Asc.g_oRangeCache.getAscRange(this.stream.GetString2LE(length));
             else if ( c_oSer_TablePart.HeaderRowCount == type )
                 oTable.HeaderRowCount = this.stream.GetULongLE();
             else if ( c_oSer_TablePart.TotalsRowCount == type )
@@ -3599,7 +3593,7 @@
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
             if ( c_oSer_AutoFilter.Ref == type )
-                oAutoFilter.Ref = this.stream.GetString2LE(length);
+                oAutoFilter.Ref = Asc.g_oRangeCache.getAscRange(this.stream.GetString2LE(length));
             else if ( c_oSer_AutoFilter.FilterColumns == type )
             {
                 oAutoFilter.FilterColumns = [];

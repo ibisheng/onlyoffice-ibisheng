@@ -4392,7 +4392,7 @@ function TablePart() {
 }
 TablePart.prototype.clone = function(ws) {
 	var i, res = new TablePart();
-	res.Ref = this.Ref;
+	res.Ref = this.Ref ? this.Ref.clone() : null;
 	res.HeaderRowCount = this.HeaderRowCount;
 	res.TotalsRowCount = this.TotalsRowCount;
 	if (this.AutoFilter)
@@ -4429,8 +4429,8 @@ function AutoFilter() {
 }
 AutoFilter.prototype.clone = function() {
 	var i, res = new AutoFilter();
-	res.Ref = this.Ref;
-	res.refTable = this.refTable;
+	res.Ref = this.Ref ? this.Ref.clone() : null;
+	res.refTable = this.refTable ? this.refTable.clone() : null;
 	if (this.FilterColumns) {
 		res.FilterColumns = [];
 		for (i = 0; i < this.FilterColumns.length; ++i)

@@ -8061,7 +8061,7 @@
 				var diffCol;
 				for(var aF = 0; aF < aFilters.length; aF++)
 				{
-					tablePartRange = t.autoFilters._refToRange(aFilters[aF].Ref);
+					tablePartRange = aFilters[aF].Ref;
 					diffRow = tablePartRange.r1 - refInsertBinary.r1;
 					diffCol = tablePartRange.c1 - refInsertBinary.c1;
 					range = t.model.getRange3(diffRow + selectionRange.r1, diffCol + selectionRange.c1, diffRow + selectionRange.r1 + (tablePartRange.r2 - tablePartRange.r1), diffCol + selectionRange.c1 + (tablePartRange.c2 - tablePartRange.c1));
