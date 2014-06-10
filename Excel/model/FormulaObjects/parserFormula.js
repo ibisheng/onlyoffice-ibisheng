@@ -3972,15 +3972,17 @@ function searchRegExp2( s, mask ) {
     var nMaskLastIndex = 0;
     var nSLength = s.length;
     var nMaskLength = mask.length;
+    var t = false;
     for ( ; nSIndex < nSLength; nMaskIndex++, nSIndex++ ) {
         var cCurMask = mask[nMaskIndex];
         if ( '~' == cCurMask ) {
             nMaskIndex++;
             cCurMask = mask[nMaskIndex];
+            t = true;
         }
         else if ( '*' == cCurMask )
             break;
-        if ( cCurMask != s[nSIndex] && '?' != cCurMask ) {
+        if ( ( cCurMask != s[nSIndex] && '?' != cCurMask ) || ( cCurMask != s[nSIndex] && t) ) {
             bRes = false;
             break;
         }

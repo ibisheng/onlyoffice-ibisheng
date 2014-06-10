@@ -503,14 +503,13 @@ cINDEX.prototype.Calculate = function ( arg ) {
         arg0 = arg0.getMatrix();
     }
     else {
-        arg0 = [
-            [arg0.tryConvert()]
-        ]
+        arg0 = [[arg0.tryConvert()]];
     }
 
     res = arg0[arg1.getValue() - 1];
-    if ( res )
+    if ( res ){
         res = res[arg2.getValue() - 1];
+    }
 
     return this.value = res ? res : new cError( cErrorType.bad_reference );
 
@@ -846,6 +845,7 @@ cMATCH.prototype.Calculate = function ( arg ) {
                 for ( var i = 0; i < arr.length; i++ ) {
                     if ( searchRegExp2( arr[i].toString(), a0Value ) ) {
                         index = i;
+                        break;
                     }
                 }
             }
@@ -853,6 +853,7 @@ cMATCH.prototype.Calculate = function ( arg ) {
                 for ( var i = 0; i < arr.length; i++ ) {
                     if ( arr[i] == a0Value ) {
                         index = i;
+                        break;
                     }
                 }
             }
