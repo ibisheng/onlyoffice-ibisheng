@@ -383,12 +383,12 @@ DrawingObjectsController.prototype.isPointInDrawingObjects = function(x, y, e)
     var ret = this.curState.onMouseDown(e || {}, x, y);
     this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
     return ret;
-}
+};
 
 DrawingObjectsController.prototype.handleDoubleClickOnChart = function(chart)
 {
     this.changeCurrentState(new NullState());
-}
+};
 
 DrawingObjectsController.prototype.addImageFromParams = function(rasterImageId, x, y, extX, extY)
 {
@@ -401,7 +401,7 @@ DrawingObjectsController.prototype.addImageFromParams = function(rasterImageId, 
     this.selectObject(image, 0);
     image.addToRecalculate();
     this.startRecalculate();
-}
+};
 
 DrawingObjectsController.prototype.isViewMode= function()
 {

@@ -18,16 +18,15 @@
 			this.handlers		= new asc_HL(handlers);
 
 			this.scrollOptions = {
-				wheelSpeed			: 20,
 				wheelPropagation	: false,
-				minScrollbarLength	: 50,
+				minScrollbarLength	: null,
 				useBothWheelAxes	: false,
 				useKeyboard			: true,
 				suppressScrollX		: false,
 				suppressScrollY		: false,
 				scrollXMarginOffset	: 5,
-				scrollYMarginOffset	: 5,
-				includePadding		: true
+				scrollYMarginOffset	: 40,
+				includePadding		: false
 			};
 
 			this.element		= element;
@@ -61,19 +60,19 @@
 				this.selector.innerHTML = '<ul id="apiPopUpList" class="dropdown-menu"></ul>';
 
 				this.element.appendChild(this.selector);
-				this.selectorList = document.getElementById("apiPopUpList");
+				this.selectorList = document.getElementById('apiPopUpList');
 
 				this.fMouseDown = function (event) {t._onMouseDown(event);};
 				this.fMouseDblClick = function (event) {t._onMouseDblClick(event);};
 				this.fMouseOver = function (event) {t._onMouseOver(event);};
 
 				if (this.selector.addEventListener) {
-					this.selector.addEventListener("mousedown", function () {
+					this.selector.addEventListener('mousedown', function () {
 						t.skipClose = true;
 					}, false);
 				}
 				if (window.addEventListener) {
-					window.addEventListener("mousedown", function () {
+					window.addEventListener('mousedown', function () {
 						if (t.skipClose) {
 							t.skipClose = false;
 							return;
@@ -98,7 +97,7 @@
 
 			var item, isFirst, value, selectElement = null;
 			for (var i = 0; i < arrItems.length; ++i) {
-				item = document.createElement("li");
+				item = document.createElement('li');
 				isFirst = (0 === i);
 				if (isFirst)
 					this.firstElement = item;
@@ -108,36 +107,24 @@
 						selectElement = item;
 
 					value = arrItems[i].name;
-					item.setAttribute("title", arrItems[i].arg);
+					item.setAttribute('title', arrItems[i].arg);
 				} else
 					value = arrItems[i];
 
-				item.innerHTML = "<a>" + value + "</a>";
-				item.setAttribute("val", value);
+				item.innerHTML = '<a>' + value + '</a>';
+				item.setAttribute('val', value);
 
 				if (item.addEventListener) {
-					item.addEventListener("mousedown"	, this.fMouseDown		, false);
-					item.addEventListener("dblclick"	, this.fMouseDblClick	, false);
+					item.addEventListener('mousedown'	, this.fMouseDown		, false);
+					item.addEventListener('dblclick'	, this.fMouseDblClick	, false);
 					if (!this.isFormula) {
-						item.addEventListener("mouseover", this.fMouseOver, false);
+						item.addEventListener('mouseover', this.fMouseOver, false);
 					}
 				}
 
 				this.selectorList.appendChild(item);
 				this.selectorListEl.push(item);
 			}
-
-			// Selection hack
-			/*var clearSelection = function() {
-				if (document.selection && document.selection.empty) {
-					document.selection.empty();
-				}
-				else if (window.getSelection) {
-					var sel = window.getSelection();
-					sel.removeAllRanges();
-				}
-			}*/
-			// TODO: В Mozilla избавиться от селекта текста при dblclick
 
 			// Для того, чтобы работал scroll
 			this.selectorListJQ.perfectScrollbar("update");
@@ -156,8 +143,8 @@
 			}
 		};
 		PopUpSelector.prototype.setPosition = function (cellRect) {
-			this.selectorStyle["left"] = (cellRect.asc_getX() + 10) + "px";
-			this.selectorStyle["top"] = (cellRect.asc_getY() + cellRect.asc_getHeight()) + "px";
+			this.selectorStyle['left'] = (cellRect.asc_getX() + 10) + 'px';
+			this.selectorStyle['top'] = (cellRect.asc_getY() + cellRect.asc_getHeight()) + 'px';
 		};
 		PopUpSelector.prototype.getVisible = function () {
 			return this.isVisible;
@@ -183,11 +170,11 @@
 					} else
 						retVal = true;
 					break;
-				case 13:  // "enter"
+				case 13:  // Enter
 					if (!this.isFormula && null !== this.selectElement) {
 						event.stopPropagation();
 						event.preventDefault();
-						this._onInsert(this.selectElement.getAttribute("val"));
+						this._onInsert(this.selectElement.getAttribute('val'));
 					} else
 						retVal = true;
 					break;
@@ -214,7 +201,7 @@
 
 		PopUpSelector.prototype._onInsert = function (value) {
 			this.hide();
-			this.handlers.trigger("insert", value);
+			this.handlers.trigger('insert', value);
 		};
 
 		PopUpSelector.prototype._onMouseDown = function (event) {
@@ -223,7 +210,7 @@
 			if (this.isFormula)
 				this._onChangeSelection(element);
 			else
-				this._onInsert(element.getAttribute("val"));
+				this._onInsert(element.getAttribute('val'));
 		};
 		PopUpSelector.prototype._onMouseDblClick = function (event) {
 			if (!this.isVisible)
@@ -233,7 +220,7 @@
 				this._onMouseDown(event);
 				return;
 			}
-			var elementVal = (event ? event.currentTarget : this.selectElement).getAttribute("val") + "(";
+			var elementVal = (event ? event.currentTarget : this.selectElement).getAttribute('val') + '(';
 			this._onInsert(elementVal);
 		};
 		PopUpSelector.prototype._onMouseOver = function (event) {
@@ -243,14 +230,14 @@
 			this._onChangeSelection(event.currentTarget);
 		};
 		PopUpSelector.prototype._onChangeSelection = function (newElement) {
-			if (null === newElement || null === newElement.getAttribute("val"))
+			if (null === newElement || null === newElement.getAttribute('val'))
 				return;
 
 			if (null !== this.selectElement)
-				this.selectElement.className = "";
+				this.selectElement.className = '';
 
 			this.selectElement = newElement;
-			this.selectElement.className = "selected";
+			this.selectElement.className = 'selected';
 
 			this.scrollToRecord();
 		};
@@ -261,7 +248,7 @@
 			var div = $(this.selectElement);
 			var div_top = div.offset().top;
 
-			if (div_top < inner_top || div_top+div.height() > inner_top + innerEl.height()) {
+			if (div_top < inner_top || div_top + div.height() > inner_top + innerEl.height()) {
 				this.selectorListJQ.scrollTop(this.selectorListJQ.scrollTop() + div_top - inner_top);
 			}
 		};
