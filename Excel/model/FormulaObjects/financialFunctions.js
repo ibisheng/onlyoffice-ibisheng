@@ -3221,12 +3221,14 @@ cNOMINAL.prototype.Calculate = function ( arg ) {
     if ( effectRate instanceof cError ) return this.value = effectRate;
     if ( npery instanceof cError ) return this.value = npery;
 
-    var eR = effectRate.getValue(),
-        np = npery.getValue();
+    effectRate = effectRate.getValue();
+    npery = npery.getValue();
 
-    if ( eR <= 0 || npery < 1 )
+    npery = Math.floor( npery );
+
+    if ( effectRate <= 0 || npery < 1 )
         return this.value = new cError( cErrorType.not_numeric );
-    this.value = new cNumber( ( Math.pow( eR + 1, 1 / np ) - 1 ) * np );
+    this.value = new cNumber( ( Math.pow( effectRate + 1, 1 / npery ) - 1 ) * npery );
 //    this.value.numFormat = 9;
     return this.value;
 
