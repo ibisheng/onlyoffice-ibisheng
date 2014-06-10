@@ -1748,6 +1748,20 @@ CPlotArea.prototype =
             c.addAxis(this.axId[i].createDuplicate());
         }
         //TODO: разобраться с осями в дочерних объектах
+
+        if ( this.valAx )
+            c.valAx = this.valAx.createDuplicate();
+        
+        if ( this.catAx )
+            c.catAx = this.catAx.createDuplicate();
+        
+        if ( this.dateAx )
+            c.dateAx = this.dateAx.createDuplicate();
+        
+        if ( this.chart )
+            c.chart = this.chart.createDuplicate();
+        
+        return c;
     },
 
     Write_ToBinary2: function(w)
@@ -11576,7 +11590,7 @@ CLineChart.prototype =
         return  historyitem_type_LineChart;
     },
 
-    craeteDuplicate: function()
+    createDuplicate: function()
     {
         var c = new CLineChart();
         if(this.dLbls)
@@ -12717,7 +12731,7 @@ CMinusPlus.prototype =
         }
         if(this.numLit)
         {
-            c.setNumLit(this.numLit.craeteDuplicate());
+            c.setNumLit(this.numLit.createDuplicate());
         }
         return c;
     },
@@ -13115,6 +13129,7 @@ CNumRef.prototype =
         {
             c.setNumCache(this.numCache.createDuplicate());
         }
+        return c;        
     },
 
     getObjectType: function()
@@ -15133,7 +15148,7 @@ CPivotFmt.prototype =
         }
         if(this.txPr)
         {
-            c.setTxPr(this.txPr.craeteDuplicate());
+            c.setTxPr(this.txPr.createDuplicate());
         }
         return c;
     },
@@ -15379,7 +15394,7 @@ CRadarChart.prototype =
         var c = new CRadarChart();
         if(this.dLbls)
         {
-            c.setDLbls(this.dLbls.craeteDuplicate());
+            c.setDLbls(this.dLbls.createDuplicate());
         }
         c.setRadarStyle(this.radarStyle);
         for(var  i = 0; i < this.series.length; ++i)
@@ -15694,7 +15709,7 @@ CRadarSeries.prototype =
         }
         if(this.dLbls)
         {
-            c.setDLbls(this.dLbls.craeteDuplicate());
+            c.setDLbls(this.dLbls.createDuplicate());
         }
         for(var i = 0; i < this.dPt.length; ++i)
         {
@@ -16615,7 +16630,7 @@ CScatterSeries.prototype =
         c.setSmooth(this.smooth);
         if(this.spPr)
         {
-            c.setSpPr(this.spPr.craeteDuplicate());
+            c.setSpPr(this.spPr.createDuplicate());
         }
         if(this.trendline)
         {
@@ -18104,7 +18119,7 @@ CSurfaceChart.prototype =
         var c = new CSurfaceChart(), i;
         for(i = 0; i < this.bandFmts.length; ++i)
         {
-            c.addBandFmt(this.bandFmts[i].craeteDuplicate());
+            c.addBandFmt(this.bandFmts[i].createDuplicate());
         }
         for(i =0 ; i < this.series.length; ++i)
         {
@@ -18726,7 +18741,7 @@ CTitle.prototype =
         }
         if(this.tx)
         {
-            c.setTx(this.tx.craeteDuplicate());
+            c.setTx(this.tx.createDuplicate());
         }
         if(this.txPr)
         {
@@ -19813,6 +19828,8 @@ CYVal.prototype =
         {
             copy.setNumRef(this.numRef.createDuplicate());
         }
+        
+        return copy;
     },
 
     getObjectType: function()
@@ -19960,7 +19977,36 @@ CChart.prototype =
 
     createDuplicate: function()
     {
+        // TODO: Проверить данную функцию
         var c = new CChart();
+        
+        c.autoTitleDeleted = this.autoTitleDeleted;
+        c.backWall         = this.backWall;
+
+        c.dispBlanksAs     = this.dispBlanksAs;
+        c.floor            = this.floor;
+        
+        if ( this.legend )
+            c.legend = this.legend.createDuplicate();
+        
+        var Count = this.pivotFmts;
+        for ( var i = 0; i < this.pivotFmts; i++ )        
+            c.pivotFmts[i] = this.pivotFmts[i];
+        
+        if ( this.plotArea )
+            c.plotArea = this.plotArea.createDuplicate();
+
+        c.plotVisOnly      = this.plotVisOnly;
+        c.showDLblsOverMax = this.showDLblsOverMax;
+        c.sideWall         = this.sideWall;
+        
+        if ( this.title )
+            c.title = this.title.createDuplicate();
+        
+        if ( this.view3D )
+            c.view3D = this.view3D.createDuplicate();
+        
+        return c;
     },
 
     Write_ToBinary2: function(w)

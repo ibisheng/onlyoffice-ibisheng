@@ -7983,6 +7983,21 @@ CPrintSettings.prototype =
         return this.Id;
     },
 
+    createDuplicate : function()
+    {
+        var oPS = new CPrintSettings();
+        
+        if ( this.headerFooter )
+            oPS.headerFooter = this.headerFooter.createDuplicate();
+        
+        if ( this.pageMargins )
+            oPS.pageMargins  = this.pageMargins.createDuplicate();
+        
+        if ( this.pageSetup )
+            oPS.pageSetup    = this.pageSetup.createDuplicate();
+        
+        return oPS;
+    },
 
     Refresh_RecalcData: function()
     {},
@@ -8124,6 +8139,36 @@ CHeaderFooterChart.prototype =
     Get_Id: function()
     {
         return this.Id;
+    },
+
+    createDuplicate : function()
+    {
+        // TODO: Проверить работу данной функции        
+        var oHFC = new CHeaderFooterChart();
+
+        oHFC.alignWithMargins = this.alignWithMargins;
+        oHFC.differentFirst   = this.differentFirst;
+        oHFC.differentOddEven = this.differentOddEven;
+
+        if ( this.evenFooter )
+            oHFC.evenFooter = this.evenFooter.createDuplicate();
+
+        if ( this.evenHeader )
+            oHFC.evenHeader = this.evenHeader.createDuplicate();
+
+        if ( this.firstFooter )
+            oHFC.firstFooter = this.firstFooter.createDuplicate();
+
+        if ( this.firstHeader )
+            oHFC.firstHeader = this.firstHeader.createDuplicate();
+
+        if ( this.oddFooter )
+            oHFC.oddFooter = this.oddFooter.createDuplicate();
+
+        if ( this.oddHeader )
+            oHFC.oddHeader = this.oddHeader.createDuplicate();
+
+        return oHFC;
     },
 
 
@@ -8396,6 +8441,19 @@ CPageMarginsChart.prototype =
         return this.Id;
     },
 
+    createDuplicate : function()
+    {
+        var oPMC = new CPageMarginsChart();
+
+        oPMC.b      = this.b;
+        oPMC.footer = this.footer;
+        oPMC.header = this.header;
+        oPMC.l      = this.l;
+        oPMC.r      = this.r;
+        oPMC.t      = this.t;
+
+        return oPMC;
+    },
 
     Refresh_RecalcData: function()
     {},
@@ -8605,6 +8663,25 @@ CPageSetup.prototype =
     Get_Id: function()
     {
         return this.Id;
+    },
+    
+    createDuplicate : function()
+    {
+        var oPS = new CPageSetup();
+        
+        oPS.blackAndWhite    = this.blackAndWhite;
+        oPS.copies           = this.copies;
+        oPS.draft            = this.draft;
+        oPS.firstPageNumber  = this.firstPageNumber;
+        oPS.horizontalDpi    = this.horizontalDpi;
+        oPS.orientation      = this.orientation;
+        oPS.paperHeight      = this.paperHeight;
+        oPS.paperSize        = this.paperSize;
+        oPS.paperWidth       = this.paperWidth;
+        oPS.useFirstPageNumb = this.useFirstPageNumb;
+        oPS.verticalDpi      = this.verticalDpi;
+                
+        return oPS;
     },
 
 
