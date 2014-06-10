@@ -203,6 +203,19 @@ function CChartSpace()
 
     this.bbox = null;
 
+
+    this.selection =
+    {
+        title: null,
+        legend: null,
+        legendEntry: null,
+        axisLbls: null,
+        dataLbls: null,
+        dataLbl: null,
+        textSelection: null,
+        plotArea: null
+    };
+
     this.setRecalculateInfo();
 
 
@@ -219,6 +232,79 @@ CChartSpace.prototype =
 
     select: CShape.prototype.select,
     checkHitToBounds: CShape.prototype.checkHitToBounds,
+
+
+    resetInternalSelection: function()
+    {
+        if(this.selection.textSelection)
+        {
+            var content = this.selection.textSelection.getDocContent();
+            content && content.Selection_Remove();
+            this.selection.textSelection = null;
+        }
+    },
+
+    resetSelection: function()
+    {
+        this.resetInternalSelection();
+        this.selection.title = null;
+        this.selection.legend = null;
+        this.selection.legendEntry = null;
+        this.selection.axisLbls = null;
+        this.selection.dataLbls = null;
+        this.selection.dataLbl = null;
+        this.selection.textSelection = null;
+        this.selection.plotArea = null;
+    },
+
+
+
+    selectTitle: function(title, pageIndex)
+    {
+        title.select(this, pageIndex);
+        this.resetInternalSelection();
+        this.selection.legend = null;
+        this.selection.legendEntry = null;
+        this.selection.axisLbls = null;
+        this.selection.dataLbls = null;
+        this.selection.dataLbl = null;
+        this.selection.textSelection = null;
+        this.selection.plotArea = null;
+    },
+
+    recalculateCurPos: DrawingObjectsController.prototype.recalculateCurPos,
+
+    documentUpdateSelectionState: function()
+    {
+        if(this.selection.textSelection)
+        {
+            this.selection.textSelection.updateSelectionState();
+        }
+    },
+
+    getAllTitles: function()
+    {
+        var ret = [];
+        if(this.chart )
+        {
+            if(this.chart.title)
+            {
+                ret.push(this.chart.title);
+            }
+            if(this.chart.plotArea)
+            {
+                if(this.chart.plotArea.catAx && this.chart.plotArea.catAx.title)
+                {
+                    ret.push(this.chart.plotArea.catAx.title);
+                }
+                if(this.chart.plotArea.valAx && this.chart.plotArea.valAx.title)
+                {
+                    ret.push(this.chart.plotArea.valAx.title);
+                }
+            }
+        }
+        return ret;
+    },
 
     getMainGroup: function()
     {
@@ -356,6 +442,59 @@ CChartSpace.prototype =
 
         }
         return {type: type, subtype: subtype};
+    },
+
+    clearFormatting: function()
+    {
+        if(this.chart)
+        {
+            if(this.chart.spPr)
+            {
+                this.chart.spPr.Fill && this.chart.spPr.setFill(null);
+                this.chart.spPr.ln && this.chart.spPr.setLn(null);
+            }
+            if(this.chart.plotArea)
+            {
+                if(this.chart.plotArea.spPr)
+                {
+                    this.chart.plotArea.spPr.Fill && this.plotArea.chart.spPr.setFill(null);
+                    this.chart.plotArea.spPr.ln && this.plotArea.chart.spPr.setLn(null);
+                }
+                var i, j, k, series, pts, chart, ser;
+                for(i = this.chart.plotArea.charts.length-1; i > -1; --i)
+                {
+                    chart = this.chart.plotArea.charts[i];
+                    if(chart.upDownBars)
+                    {
+                        if(chart.upDownBars.upBars)
+                        {
+                            chart.upDownBars.setUpBars(null);
+                        }
+                        if(chart.upDownBars.downBars)
+                        {
+                            chart.upDownBars.setDownBars(null);
+                        }
+                    }
+                    series = chart.series;
+                    for(j = series.length - 1; j > -1; --j)
+                    {
+                        ser = series[i];
+                        if(ser.spPr)
+                        {
+                            if(ser.spPr.Fill)
+                            {
+                                ser.spPr.setFill(null);
+                            }
+                            if(ser.spPr.ln)
+                            {
+                                ser.spPr.setLn(null);
+                            }
+                        }
+                        removeDPtsFromSeries(ser)
+                    }
+                }
+            }
+        }
     },
 
     copy: function()

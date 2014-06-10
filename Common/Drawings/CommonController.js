@@ -142,6 +142,10 @@ function getTargetTextObject(controller)
     {
         return controller.selection.groupSelection.selection.textSelection;
     }
+    else if(controller.selection.chartSelection && controller.selection.chartSelection.textSelection)
+    {
+        return controller.selection.chartSelection.textSelection;
+    }
     return null;
 }
 
@@ -235,6 +239,11 @@ DrawingObjectsController.prototype =
             var content = this.selection.textSelection.getDocContent();
             content && content.Selection_Remove();
             this.selection.textSelection = null;
+        }
+        if(this.selection.chartSelection)
+        {
+            this.selection.chartSelection.resetSelection();
+            this.selection.chartSelection = null;
         }
         if(this.selection.wrapPolygonSelection)
         {
@@ -350,6 +359,8 @@ DrawingObjectsController.prototype =
             return {objectId: object.Get_Id(), cursorType: "move", bMarker: bInSelect};
         }
     },
+
+
     recalculateCurPos: function()
     {
         if(this.selection.textSelection)
@@ -725,6 +736,42 @@ DrawingObjectsController.prototype =
         }
         else if(this.selection.chartSelection)
         {
+            if(this.selection.chartSelection.selectStartPage === pageIndex)
+            {
+                drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.chartSelection.getTransformMatrix(), 0, 0, this.selection.chartSelection.extX, this.selection.chartSelection.extY, false, this.selection.chartSelection.canRotate());
+                if(this.selection.chartSelection.selection.textSelection)
+                {
+                    drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.selection.chartSelection.selection.textSelection.transform, 0, 0, this.selection.chartSelection.selection.textSelection.extX, this.selection.chartSelection.selection.textSelection.extY, false, false);
+                }
+                else if(this.selection.chartSelection.selection.title)
+                {
+                    drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.chartSelection.selection.title.transform, 0, 0, this.selection.chartSelection.selection.title.extX, this.selection.chartSelection.selection.title.extY, false, false);
+                }
+                else if(this.selection.chartSelection.selection.dataLbls)
+                {
+                    for(i = 0; i < this.selection.chartSelection.selection.dataLbls.length; ++i)
+                    {
+                        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.chartSelection.selection.dataLbls[i].transform, 0, 0, this.selection.chartSelection.selection.dataLbls[i].extX, this.selection.chartSelection.selection.dataLbls[i].extY, false, false);
+                    }
+                }
+                else if(this.selection.chartSelection.selection.dataLbl)
+                {
+                    drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.chartSelection.selection.dataLbl.transform, 0, 0, this.selection.chartSelection.selection.dataLbl.extX, this.selection.chartSelection.selection.dataLbl.extY, false, false);
+                }
+                else if(this.selection.chartSelection.selection.legend)
+                {
+                    drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.chartSelection.selection.legend.transform, 0, 0, this.selection.chartSelection.selection.legend.extX, this.selection.chartSelection.selection.legend.extY, false, false);
+                }
+                else if(this.selection.chartSelection.selection.legendEntry)
+                {
+                    drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.chartSelection.selection.legendEntry.transform, 0, 0, this.selection.chartSelection.selection.legendEntry.extX, this.selection.chartSelection.selection.legendEntry.extY, false, false);
+                }
+                else if(this.selection.chartSelection.selection.axisLbls)
+                {
+                    drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.chartSelection.selection.axisLbls.transform, 0, 0, this.selection.chartSelection.selection.axisLbls.extX, this.selection.chartSelection.selection.axisLbls.extY, false, false);
+                }
+            }
+
         }
         else if(this.selection.wrapPolygonSelection)
         {
@@ -1652,8 +1699,9 @@ DrawingObjectsController.prototype =
             }
         }
 
-        if(isRealNumber(style_index) && style_index > 0 && style_index < 49)
+        if(isRealNumber(style_index) && style_index > 0 && style_index < 49 && chart_space.style !== style_index)
         {
+            chart_space.clearFormatting();
             chart_space.setStyle(style_index);
         }
         //Title Settings
@@ -1697,6 +1745,19 @@ DrawingObjectsController.prototype =
                         {
                             hor_axis.setTitle(new CTitle());
                         }
+                        if(!hor_axis.title.txPr)
+                        {
+                            hor_axis.title.setTxPr(new CTextBody());
+                        }
+                        if(!hor_axis.title.txPr.bodyPr)
+                        {
+                            hor_axis.title.txPr.setBodyPr(new CBodyPr());
+                        }
+                        if( hor_axis.title.txPr.content)
+                        {
+                            hor_axis.title.txPr.setContent(new CDocumentContent(vert_axis.title.txPr, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
+                        }
+                        hor_axis.title.txPr.bodyPr.reset();
                         if(hor_axis.title.overlay)
                             hor_axis.title.setOverlay(false);
                         break;
@@ -1746,6 +1807,10 @@ DrawingObjectsController.prototype =
                             if(!vert_axis.title.txPr.bodyPr)
                             {
                                 vert_axis.title.txPr.setBodyPr(new CBodyPr());
+                            }
+                            if( vert_axis.title.txPr.content)
+                            {
+                                vert_axis.title.txPr.setContent(new CDocumentContent(vert_axis.title.txPr, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
                             }
                             vert_axis.title.txPr.bodyPr.reset();
                             if(vert_axis_labels_settings === c_oAscChartVertAxisLabelShowSettings.rotated)

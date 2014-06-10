@@ -178,7 +178,54 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
 
 function handleChart(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord)
 {
-    var ret = handleShapeImage(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord);
+    var ret, i, title;
+    var chart_titles = drawing.getAllTitles();
+    var selector = group ? group : drawingObjectsController;
+    for(i = 0; i < chart_titles.length; ++i)
+    {
+        title = chart_titles[i];
+        var hit_in_inner_area = title.hitInInnerArea(x, y);
+        var hit_in_path = title.hitInPath(x, y);
+        var hit_in_text_rect = title.hitInTextRect(x, y);
+        if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+        {
+            if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+            {
+                var is_selected =  drawing.selected;
+                selector.resetSelection();
+                selector.selectObject(drawing, pageIndex);
+                selector.selection.chartSelection = drawing;
+                drawing.selectTitle(title, pageIndex);
+                drawingObjectsController.updateSelectionState();
+                return true;
+            }
+            else
+            {
+                return {objectId: drawing.Get_Id(), cursorType: "move", bMarker: false};
+            }
+        }
+        else if(hit_in_text_rect)
+        {
+            if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+            {
+                drawingObjectsController.resetSelection();
+                selector.selectObject(drawing, pageIndex);
+                selector.selection.chartSelection = drawing;
+                drawing.selectTitle(title, pageIndex);
+                drawing.selection.textSelection = title;
+                title.selectionSetStart(e, x, y, pageIndex);
+                drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, title));
+                drawingObjectsController.updateSelectionState();
+                return true;
+            }
+            else
+            {
+                return {objectId: drawing.Get_Id(), cursorType: "text"};
+            }
+        }
+    }
+
+    ret = handleShapeImage(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord);
     if(ret)
         return ret;
     return false;
@@ -188,7 +235,7 @@ function handleChart(drawing, drawingObjectsController, e, x, y, group, pageInde
 function handleInlineShapeImage(drawing, drawingObjectsController, e, x, y, pageIndex)
 {
     var _hit = drawing.hit && drawing.hit(x, y);
-    var _hit_to_path = drawing.hitToPath && drawing.hitToPath(x, y);
+    var _hit_to_path = drawing.hitInPath && drawing.hitInPath(x, y);
     var b_hit_to_text = drawing.hitInTextRect && drawing.hitInTextRect(x, y);
     if((_hit && !b_hit_to_text) || _hit_to_path)
     {

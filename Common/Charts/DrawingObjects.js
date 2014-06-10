@@ -2596,6 +2596,15 @@ prot["asc_getIndex"] = prot.asc_getIndex;
 // Manager
 //-----------------------------------------------------------------------------------
 
+
+function CChangeTableData(changedRange, added, hided, removed)
+{
+    this.changedRange = changedRange;
+    this.added = added;
+    this.hided = hided;
+    this.removed = removed;
+}
+
 function GraphicOption(ws, type, range, aId) {
     var _this = this;
 
@@ -4299,22 +4308,8 @@ function DrawingObjects() {
         }
     };
 
-    _this.rebuildChartGraphicObjects = function(range) {
-        /*var bRebuild = true;
-         for (var i = 0; i < aObjects.length; i++) {
-         var graphicObject = aObjects[i].graphicObject;
-         if ( graphicObject.isChart() && graphicObject.chart.range.intervalObject ) {
-         bRebuild = true;
-         if ( range ) {
-         if ( !range.intersection(graphicObject.chart.range.intervalObject.bbox) )
-         bRebuild = false;
-         }
-         if ( bRebuild )	{
-         graphicObject.chart.rebuildSeries();
-         graphicObject.recalculate();
-         }
-         }
-         }*/
+    _this.rebuildChartGraphicObjects = function(data) {
+
     };
 
     _this.updateDrawingObject = function(bInsert, operType, updateRange) {
@@ -4687,7 +4682,7 @@ function DrawingObjects() {
 
         if ( oBBoxFrom && oBBoxTo )
         {
-            var selected_objects = this.controller.groupSelection ? this.controller.groupSelection.selectedObjects : this.controller.selectedObjects;
+            var selected_objects = this.controller.selection.groupSelection ? this.controller.selection.groupSelection.selectedObjects : this.controller.selectedObjects;
             var chart;
             if(selected_objects.length === 1 && selected_objects[0].getObjectType() === historyitem_type_ChartSpace)
             {
