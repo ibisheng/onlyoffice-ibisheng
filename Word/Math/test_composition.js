@@ -1,3 +1,5 @@
+"use strict";
+
 var MATH_EDIT = 0;
 var MATH_READ = 1;
 
@@ -110,7 +112,7 @@ function simulatorMComposition( MComposition, ttype)
 
     root.getDegree().addTxt("3");
 
-    base = root.getBase();
+    var base = root.getBase();
     base.addTxt("F");
 
     var integral = new CNary();

@@ -1,3 +1,5 @@
+"use strict";
+
 // 0x300  accent grave
 // 0x301  accent acute
 // 0x307  one dot

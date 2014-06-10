@@ -1,3 +1,5 @@
+"use strict";
+
 /// TODO
 
 //  1.  Пересмотреть схему для findDisposition(base.js), т.к. если нажали за границами элемента, то происходит селект, т.к. теперь на mouseDown и mouseDown одни и те же функции
@@ -901,7 +903,7 @@ CMathContent.prototype =
     // переделать для селекта
     getSelectTPrp: function(bSelect)
     {
-        var start, end;
+        var start, end, tmp;
 
         if(bSelect)
         {
@@ -932,7 +934,7 @@ CMathContent.prototype =
 
             for(var i = start + 1; i < end; i++)
             {
-                txtPrp2 = this.content[i].value.getOwnTPrp();
+                var txtPrp2 = this.content[i].value.getOwnTPrp();
                 if(txtPrp.FontSize !== -1)
                 {
                     if(txtPrp.FontSize !== txtPrp2.FontSize)
@@ -1318,7 +1320,7 @@ CMathContent.prototype =
                 rad.init({type: SQUARE_RADICAL});
                 var base = rad.getBase();
 
-                degr1 = base.addMComponent(MATH_DEGREE);
+                var degr1 = base.addMComponent(MATH_DEGREE);
                 degr1.init({type: DEGREE_SUPERSCRIPT});
                 var base1 = degr1.getBase();
                 base1.addTxt("a");
@@ -3802,16 +3804,16 @@ CMathContent.prototype =
                     column:     2
                 };
                 matrix.init(props);
-                elem1 = matrix.getElement(0,0);
+                var elem1 = matrix.getElement(0,0);
                 elem1.addTxt("1");
 
-                elem2 = matrix.getElement(0,1);
+               	var elem2 = matrix.getElement(0,1);
                 elem2.addTxt("0");
 
-                elem3 = matrix.getElement(1,0);
+                var elem3 = matrix.getElement(1,0);
                 elem3.addTxt("0");
 
-                elem4 = matrix.getElement(1,1);
+                var elem4 = matrix.getElement(1,1);
                 elem4.addTxt("1");
                 break;
             case 220:
@@ -3857,19 +3859,19 @@ CMathContent.prototype =
                 elem4 = matrix.getElement(1,0);
                 elem4.addTxt("0");
 
-                elem5 = matrix.getElement(1,1);
+                var elem5 = matrix.getElement(1,1);
                 elem5.addTxt("1");
 
-                elem6 = matrix.getElement(1,2);
+                var elem6 = matrix.getElement(1,2);
                 elem6.addTxt("0");
 
-                elem7 = matrix.getElement(2,0);
+                var elem7 = matrix.getElement(2,0);
                 elem7.addTxt("0");
 
-                elem8 = matrix.getElement(2,1);
+                var elem8 = matrix.getElement(2,1);
                 elem8.addTxt("0");
 
-                elem9 = matrix.getElement(2,2);
+                var elem9 = matrix.getElement(2,2);
                 elem9.addTxt("1");
 
                 break;
@@ -4618,6 +4620,7 @@ CMathContent.prototype =
     },
     goToLowerLevel: function( coord )
     {
+		var content;
         var x = coord.x, y = coord.y;
         var bLow = false;
 
@@ -4643,6 +4646,7 @@ CMathContent.prototype =
     },
     goToUpperLevel: function( coord )
     {
+		var content;
         var x = coord.x, y = coord.y;
         var bUp = false;
 
@@ -5345,7 +5349,7 @@ CMathContent.prototype =
             bAddRPrp:               false
         };
 
-        var CurrContent = SelectContent = null,
+        var CurrContent = null, SelectContent = null,
             items = null;
 
         var currType = this.content[this.CurPos].value.typeObj;
@@ -6908,6 +6912,7 @@ CMathContent.prototype =
     },
 	Load_FromMenu: function(Type, Paragraph)
 	{
+		var oFName;
 		this.Paragraph = Paragraph;
 		var props = {ctrPrp: new CTextPr()};
 		switch (Type)
@@ -6916,12 +6921,12 @@ CMathContent.prototype =
 						this.CreateFraction(oFraction, this, null, null);
 						oFraction.fillPlaceholders();
 						break;
-			case 2: 	props = {ctrPrp: new CTextPr(), ctrPrp: new CTextPr(), type:SKEWED_FRACTION};
+			case 2: 	props = {ctrPrp: new CTextPr(), type:SKEWED_FRACTION};
 						var oFraction = new CFraction(props);
 						this.CreateFraction(oFraction, this, null, null);
 						oFraction.fillPlaceholders();
 						break;
-			case 3: 	props = {ctrPrp: new CTextPr(), ctrPrp: new CTextPr(), type:LINEAR_FRACTION};
+			case 3: 	props = {ctrPrp: new CTextPr(), type:LINEAR_FRACTION};
 						var oFraction = new CFraction(props);
 						this.CreateFraction(oFraction, this, null, null);
 						oFraction.fillPlaceholders();
@@ -6960,12 +6965,12 @@ CMathContent.prototype =
 						var oFraction = new CFraction(props);
 						this.CreateFraction(oFraction, this, sNum, sDen);
 						break;
-			case 10:	props = {ctrPrp: new CTextPr(), ctrPrp: new CTextPr(), type:DEGREE_SUPERSCRIPT};
+			case 10:	props = {ctrPrp: new CTextPr(), type:DEGREE_SUPERSCRIPT};
 						var oDegree = new CDegree(props);
 						this.CreateDegree(oDegree, this, null, null, null);
 						oDegree.fillPlaceholders();
 						break;
-			case 11:	props = {ctrPrp: new CTextPr(), ctrPrp: new CTextPr(), type:DEGREE_SUBSCRIPT};
+			case 11:	props = {ctrPrp: new CTextPr(), type:DEGREE_SUBSCRIPT};
 						var oDegree = new CDegree(props);
 						this.CreateDegree(oDegree, this, null, null, null);
 						oDegree.fillPlaceholders();

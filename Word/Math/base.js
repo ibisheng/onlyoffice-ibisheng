@@ -1,3 +1,5 @@
+"use strict";
+
 var CENTER = -1;
 function CMathBase()
 {
@@ -698,7 +700,7 @@ CMathBase.prototype =
 
             for(j=0; j < this.nCol; j++)
             {
-                _h = this.elements[pos_x][j].size.height;
+                var _h = this.elements[pos_x][j].size.height;
                 maxH = ( maxH > _h ) ? maxH : _h;
             }
             PosAlign.y = (maxH - this.elements[pos_x][pos_y].size.height)*this.alignment.hgt[pos_y];
@@ -965,7 +967,7 @@ CMathBase.prototype =
         var Widths = maxWH.widths;
         var Heights = maxWH.heights;
 
-        for( j = 0 ; j < this.nRow; j++ )
+        for( var j = 0 ; j < this.nRow; j++ )
             height += Heights[j];
 
         height += this.dH*(this.nRow - 1);

@@ -1,3 +1,5 @@
+"use strict";
+
 // При добавлении нового элемента ParagraphContent, добавить его обработку в
 // следующие функции:
 // Internal_Recalculate1, Internal_Recalculate2, Draw, Internal_RemoveBackward,
@@ -929,6 +931,7 @@ Paragraph.prototype =
         var TextAscent  = 0;
         var TextHeight  = 0;
         var TextDescent = 0;
+		var TextAscent2 = 0;
 
         g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
         TextHeight  = g_oTextMeasurer.GetHeight();
@@ -4182,7 +4185,6 @@ Paragraph.prototype =
                 if ( true === ParaPr.KeepLines && null != this.Get_DocumentPrev() && true != this.Parent.Is_TableCellContent() && 0 === CurPage )
                 {
                     CurLine       = 0;
-                    LineStart_Pos = 0;
                 }
 
                 // Восстанавливаем позицию нижней границы предыдущей страницы
@@ -15898,7 +15900,7 @@ Paragraph.prototype =
             this.FontMap.NeedRecalc = false;
         }
 
-        for ( Key in this.FontMap.Map )
+        for ( var Key in this.FontMap.Map )
         {
             FontMap[Key] = this.FontMap.Map[Key];
         }
@@ -17834,8 +17836,8 @@ Paragraph.prototype =
                 Use      : this.Selection.Use,
                 StartPos : this.Internal_Get_ClearPos(this.Selection.StartPos),
                 EndPos   : this.Internal_Get_ClearPos(this.Selection.EndPos),
-                StartPos : this.Internal_Get_ClearPos(this.Selection.StartPos2),
-                EndPos   : this.Internal_Get_ClearPos(this.Selection.EndPos2),
+                StartPos2: this.Internal_Get_ClearPos(this.Selection.StartPos2),
+                EndPos2  : this.Internal_Get_ClearPos(this.Selection.EndPos2),
                 Flag     : this.Selection.Flag
             };
 

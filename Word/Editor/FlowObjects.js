@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * User: Ilja.Kirillov
  * Date: 25.10.11

@@ -1,3 +1,5 @@
+"use strict";
+
 function CGlyphOperator()
 {
     this.loc =  null;
@@ -171,8 +173,8 @@ CGlyphOperator.prototype.draw_other = function() //  с выравнивание
     var XX = new Array(),
         YY = new Array();
 
-    var x = this.pos.x;
-    y = this.pos.y;
+    var x = this.pos.x,
+		y = this.pos.y;
 
     for(var i = 0; i < X.length; i++)
     {
@@ -420,6 +422,7 @@ COperatorBracket.prototype.calcSize = function( stretch )
     // перевернутая скобка
     var minBoxH = 4.917529296874999 *betta, //width of 0x28
         widthBr = 12.347222222222221*betta;
+	var maxBoxH;
 
     var rx = stretch / widthBr;
     if(rx < 1)
@@ -658,7 +661,7 @@ COperatorBracket.prototype.calcCoord = function(stretch)
         {
             for(var j = 1; j < 3; j ++)
             {
-                t = j + i*2;
+                var t = j + i*2;
                 XX[28 + t] = XX[27 + t] + (X[28+t] - X[27+t])*hh1[i];
                 XX[25 - t] = XX[26 - t] + (X[25-t] - X[26-t])*hh2[i];
             }
@@ -2173,7 +2176,7 @@ old_CSeparatorDelimiter.prototype.mouseMove = function(mCoord)
 
     if(elem.pos.x == this.CurPos_X && elem.pos.y == this.CurPos_Y && elem.inside_flag === -1 )
     {
-        movement = this.elements[this.CurPos_X][this.CurPos_Y].mouseMove(elem.mCoord);
+        var movement = this.elements[this.CurPos_X][this.CurPos_Y].mouseMove(elem.mCoord);
         SelectContent = movement.SelectContent;
         state = movement.state;
     }
@@ -2222,7 +2225,7 @@ old_old_CSeparator.prototype.drawHorLine = function()
     MathControl.pGraph.p_width(1000);
     MathControl.pGraph.b_color1(0,0,0, 255);
 
-    pW = this.getTxtPrp().FontSize/18*g_dKoef_pt_to_mm;
+    var pW = this.getTxtPrp().FontSize/18*g_dKoef_pt_to_mm;
 
     for(var i = 0; i < this.nCol - 1; i++)
     {
@@ -3404,7 +3407,7 @@ CDelimiter.prototype.old_recalculateSize = function()
             descent = content.height - content.center > descent ? content.height - content.center: descent;
         }
 
-        maxH = ascent > descent ? ascent : descent;
+        var maxH = ascent > descent ? ascent : descent;
 
         // для случая, когда в контенте степень и пр. элементы где нужно учитовать baseLine
         if(descent < plH || ascent < plH)
@@ -4273,7 +4276,7 @@ CGroupCharacter.prototype.getAscent = function(oMeasure)
 }
 CGroupCharacter.prototype.old_getGlyph = function(code, type)
 {
-    var operator, props;
+    var operator, props, accent;
 
     if(code === 0x23DE || type == BRACKET_CURLY_TOP)
     {

@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * User: Ilja.Kirillov
  * Date: 03.12.13
@@ -3145,8 +3147,6 @@ ParaRun.prototype =
                 {
                     if ( para_Drawing != Item.Type || drawing_Anchor != Item.DrawingType )
                     {
-                        bFirstLineItem = false;
-
                         Item.Draw( X, Y - this.YOffset, pGraphics );
 
                         X += Item.WidthVisible;
@@ -3212,7 +3212,6 @@ ParaRun.prototype =
                                 pGraphics.b_color1(EndTextPr.Color.r, EndTextPr.Color.g, EndTextPr.Color.b, 255);
                         }
 
-                        bEnd = true;
                         var bEndCell = false;
                         if (null === Para.Get_DocumentNext() && true === Para.Parent.Is_TableCellContent())
                             bEndCell = true;

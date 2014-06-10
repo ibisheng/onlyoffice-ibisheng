@@ -1,3 +1,5 @@
+"use strict";
+
 var MATH_FRACTION           	=  0;
 var MATH_DEGREE             	=  1;
 var MATH_DEGREESubSup       	=  2;

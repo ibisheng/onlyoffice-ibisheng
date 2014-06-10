@@ -1,3 +1,5 @@
+"use strict";
+
 function CFraction(props)
 {
 	this.Id = g_oIdCounter.Get_NewId();
@@ -92,6 +94,7 @@ CFraction.prototype.drawSkewedFraction = function(x, y, pGraphics)
         middleHeight = plh*4/3,
         maxHeight = (3*this.gapSlash + 5*plh)*2/3;
 
+	var tg;
     var tg1 = -2.22,
         tg2 = -3.7;
 
@@ -130,7 +133,7 @@ CFraction.prototype.drawSkewedFraction = function(x, y, pGraphics)
         heightSlash = maxHeight;
         tg = tg2;
         var coeff = this.elements[0][0].size.height/this.size.height;
-        shift = heightSlash*coeff;
+        var shift = heightSlash*coeff;
 
         var minVal = plh/2,
             maxVal = heightSlash - minVal;

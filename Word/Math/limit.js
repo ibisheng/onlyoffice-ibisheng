@@ -1,3 +1,5 @@
+"use strict";
+
 function CLimit(props)
 {
 	this.Id = g_oIdCounter.Get_NewId();

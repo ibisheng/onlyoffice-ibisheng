@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * User: Ilja.Kirillov
  * Date: 13.12.11
@@ -349,11 +351,6 @@ CHeaderFooter.prototype =
     Get_Numbering : function()
     {
         return this.LogicDocument.Get_Numbering();
-    },
-
-    Get_Styles : function()
-    {
-        return this.LogicDocument.Get_Styles();
     },
 
     Get_Bounds : function()

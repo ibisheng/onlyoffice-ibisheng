@@ -1,3 +1,5 @@
+"use strict";
+
 var global_hatch_data = [
     /* cross */
     0,0,0,0,0,0,0,0,
@@ -654,7 +656,7 @@ var global_hatch_names = [
 "weave",
 "zigZag"];
 
-global_hatch_offsets_count = 54;
+var global_hatch_offsets_count = 54;
 
 var global_hatch_brushes = {};
 

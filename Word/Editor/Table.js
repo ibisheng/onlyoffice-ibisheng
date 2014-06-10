@@ -1,3 +1,5 @@
+"use strict";
+
 /**
 * User: Ilja.Kirillov
 * Date: 20.12.11
@@ -4647,12 +4649,6 @@ CTable.prototype =
     Get_Parent : function()
     {
         return this.Parent;
-    },
-
-    Set_Id : function(newId)
-    {
-        g_oTableId.Reset_Id( this, newId, this.Id );
-        this.Id = newId;
     },
 
     Get_Id : function()
@@ -12810,6 +12806,7 @@ CTable.prototype =
                     var CellMargins  = Cell.Get_Margins();
                     var CellMarginsW = CellMargins.Left.W + CellMargins.Right.W;
                     var CellW        = Cell.Get_W();
+					var CellWW;
 
                     var Add = ( ( 0 === CurCell || CellsCount - 1 === CurCell ) ? 3 / 2 * SpacingW : SpacingW );
 
@@ -18008,7 +18005,7 @@ CTable.prototype =
 
                 if ( Col >= CurGridCol && Col < CurGridCol + GridSpan )
                 {
-                    CellWType = Cell.Get_W().Type;
+                    var CellWType = Cell.Get_W().Type;
                     if ( tblwidth_Auto != CellWType && tblwidth_Nil != CellWType )
                     {
                         var W = 0;

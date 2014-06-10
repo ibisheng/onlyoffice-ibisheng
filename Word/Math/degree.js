@@ -1,3 +1,5 @@
+"use strict";
+
 function CDegree(props)
 {
 	this.Id = g_oIdCounter.Get_NewId();
@@ -627,7 +629,7 @@ CIterators.prototype._setDistanceIters = function(oMeasure)
 
     var minGap = 0.78*shCenter;
 
-    var gapUpper = upIter.height - 1.668*shCenter;
+    var gapUpper = upIter.height - 1.668*shCenter,
         gapLower = lowIter.height - 1.668*shCenter;
 
     this.dH = 0.78*shCenter;

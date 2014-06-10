@@ -1,3 +1,5 @@
+"use strict";
+
 //HTMLPage.js
 var C_SIZE = 72;
 function coeff()
@@ -348,7 +350,7 @@ function SetHeigthBracket_3()
         {
             for(var j = 1; j < 3; j ++)
             {
-                t = j + i*2;
+                var t = j + i*2;
                 YY[28 + t] = YY[27 + t] + (Y[28+t] - Y[27+t])*hh1[i];
                 YY[25 - t] = YY[26 - t] + (Y[25-t] - Y[26-t])*hh2[i];
             }
@@ -884,7 +886,7 @@ function SetHeigthBracket()
         {
             for(var j = 1; j < 3; j ++)
             {
-                t = j + i*2;
+                var t = j + i*2;
                 YY[28 + t] = YY[27 + t] + (Y[28+t] - Y[27+t])*hh1[i];
                 YY[25 - t] = YY[26 - t] + (Y[25-t] - Y[26-t])*hh2[i];
             }
@@ -1373,7 +1375,7 @@ function checkBracket(font, Aug)
     {
         for(var j = 1; j < 3; j ++)
         {
-            t = j + i*2;
+            var t = j + i*2;
             YY[28 + t] = YY[27 + t] + (Y[28+t] - Y[27+t])*hh1[i];
             YY[25 - t] = YY[26 - t] + (Y[25-t] - Y[26-t])*hh2[i];
         }

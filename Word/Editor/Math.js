@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * Created by Ilja.Kirillov on 18.03.14.
  */
@@ -153,9 +155,9 @@ ParaMath.prototype =
 		}
 		else if ( para_Math === Type )
 		{
-			nPosStart = oStartContent.State.ContentPos;
-			nLenStart = oStartContent.Content.length;
-			nPosEnd = oEndContent.State.ContentPos;
+			var nPosStart = oStartContent.State.ContentPos;
+			var nLenStart = oStartContent.Content.length;
+			var nPosEnd = oEndContent.State.ContentPos;
 			
 			History.Create_NewPoint();
 			
@@ -164,7 +166,7 @@ ParaMath.prototype =
 				var oMRun = new ParaRun(this.Paragraph, true);
 				oMRun.Pr = oStartContent.Pr;
 
-				for (i=nPosStart; i<nLenStart; i++)
+				for (var i=nPosStart; i<nLenStart; i++)
 				{
 					var Pos = oMRun.Content.length;
 					var EndPos = Pos + 1;

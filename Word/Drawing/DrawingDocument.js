@@ -1,3 +1,5 @@
+"use strict";
+
 var g_fontManager = new CFontManager();
 g_fontManager.Initialize(true);
 

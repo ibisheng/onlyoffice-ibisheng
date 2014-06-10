@@ -1,3 +1,5 @@
+"use strict";
+
 //величина символа "сигма" не меняется в зависимости от аргумента
 //если не выставлено в настройках
 /////////////////////****//////////////////////////
@@ -3160,8 +3162,8 @@ CContourIntegral.prototype.draw = function(x, y, pGraphics)
         W = coord.W,
         H = coord.H;
 
-    var integr = new CIntegral();
-    coord2 = integr.getCoord();
+    var integr = new CIntegral(),
+		coord2 = integr.getCoord();
 
     var XX = coord2.X,
         YY = coord2.Y,
@@ -3690,8 +3692,8 @@ CSurfaceIntegral.prototype.draw = function(x, y, pGraphics)
         W = coord.W,
         H = coord.H;
 
-    var integr = new CDoubleIntegral();
-    coord2 = integr.getCoord();
+    var integr = new CDoubleIntegral(),
+    	coord2 = integr.getCoord();
 
     var XX = coord2.X,
         YY = coord2.Y,
@@ -4289,8 +4291,8 @@ CVolumeIntegral.prototype.draw = function(x, y, pGraphics)
         W = coord.W,
         H = coord.H;
 
-    var integr = new CTripleIntegral();
-    coord2 = integr.getCoord();
+    var integr = new CTripleIntegral(),
+    	coord2 = integr.getCoord();
 
     var XX = coord2.X,
         YY = coord2.Y,

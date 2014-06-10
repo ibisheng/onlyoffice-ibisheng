@@ -1,4 +1,6 @@
-﻿var translations_map = {};
+﻿"use strict";
+
+var translations_map = {};
 var styles_index_map = {};
 styles_index_map["Normal"]          = 0;
 styles_index_map["No list"]         = 1;

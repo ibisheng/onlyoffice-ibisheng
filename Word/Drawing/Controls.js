@@ -1,3 +1,5 @@
+"use strict";
+
 function CBounds()
 {
     this.L      = 0;    // ����� �������

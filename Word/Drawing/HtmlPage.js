@@ -1,4 +1,6 @@
-﻿var g_dDpiX = 96.0;
+﻿"use strict";
+
+var g_dDpiX = 96.0;
 var g_dDpiY = 96.0;
 
 var g_dKoef_mm_to_pix = g_dDpiX / 25.4;

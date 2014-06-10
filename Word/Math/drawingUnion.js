@@ -1,3 +1,5 @@
+"use strict";
+
 var CF_X1 =  0.29;
 var CF_X2 =  0.34;
 var CF_X3 = 0.07;
@@ -186,8 +188,8 @@ function DrawUnion()
 
     for(var i = 0; i < 23; i++)
     {
-        xxx = X[i] + 7100;
-        str = "X[" + i +"] = " + xxx  + "; Y[" + i + "] = " + Y[i] + ";";
+        var xxx = X[i] + 7100;
+        var str = "X[" + i +"] = " + xxx  + "; Y[" + i + "] = " + Y[i] + ";";
         console.log(str);
     }
 

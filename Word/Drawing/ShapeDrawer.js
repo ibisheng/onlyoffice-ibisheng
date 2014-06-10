@@ -1,3 +1,5 @@
+"use strict";
+
 window.IsShapeToImageConverter = false;
 function DrawLineEnd(xEnd, yEnd, xPrev, yPrev, type, w, len, drawer, trans)
 {

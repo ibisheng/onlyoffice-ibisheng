@@ -1,3 +1,5 @@
+"use strict";
+
 /*var SIGN_GAP = 0;
 var RADICAL_GAP = 0.2513;
 var RADICAL_H4  = 1.1715;
@@ -855,7 +857,7 @@ CSignRadical.prototype.old_recalculateSize = function()
     ////// width //////
     //var widthSlash = plH * 0.9385498046875003;
     var widthSlash = plH * 0.81171875;
-    gap = 0.12683105468750022* plH;
+    var gap = 0.12683105468750022* plH;
     width = widthSlash + gap + widthArg;
     //////
 

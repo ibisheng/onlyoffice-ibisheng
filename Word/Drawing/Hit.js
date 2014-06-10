@@ -1,3 +1,5 @@
+"use strict";
+
 var double_eps = 0.00001;
 var hit_error_eps = 0.5;
 function HitInLine(context, px, py, x0, y0, x1, y1)

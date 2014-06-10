@@ -1,3 +1,5 @@
+"use strict";
+
 function CMathMatrix(props)
 {
 	this.Id = g_oIdCounter.Get_NewId();

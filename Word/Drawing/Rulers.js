@@ -1,4 +1,6 @@
-﻿function CTab(pos,type)
+﻿"use strict";
+
+function CTab(pos,type)
 {
     this.pos   = pos;
     this.type  = type;

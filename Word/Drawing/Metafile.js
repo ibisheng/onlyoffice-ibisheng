@@ -1,3 +1,5 @@
+"use strict";
+
 function CGrRFonts()
 {
     this.Ascii    = {Name: "Empty", Index: -1};
@@ -466,8 +468,6 @@ function CMemory(bIsNoInit)
         this.ImData = _ctx.createImageData(this.len / 4, 1);
         this.data = this.ImData.data;
         this.pos = 0;
-
-        delete _canvas;
     }
     
     this.ImData = null;
@@ -505,8 +505,6 @@ function CMemory(bIsNoInit)
 
             for (var i=0;i<this.pos;i++)
                 newData[i]=oldData[i];
-
-            delete _canvas;
         }
     }
     this.GetBase64Memory = function()

@@ -1,3 +1,5 @@
+"use strict";
+
 // Класс Документ
 //
 // Логическая часть:
@@ -905,7 +907,7 @@ CDocument.prototype =
 
             ChangeIndex = RecalcData.Inline.Pos;
 
-            ChangeIndex2 = ( 0 === SectPrIndex ? 0 : this.SectionsInfo.Get_SectPr2( SectPrIndex - 1).Index + 1 );
+            var ChangeIndex2 = ( 0 === SectPrIndex ? 0 : this.SectionsInfo.Get_SectPr2( SectPrIndex - 1).Index + 1 );
             
             if ( ChangeIndex2 <= ChangeIndex )
             {

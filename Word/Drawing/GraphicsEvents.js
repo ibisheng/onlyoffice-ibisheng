@@ -1,3 +1,5 @@
+"use strict";
+
 function scrollUpHover(elem)
 {
     elem.style.backgroundPosition = "0px -19px";

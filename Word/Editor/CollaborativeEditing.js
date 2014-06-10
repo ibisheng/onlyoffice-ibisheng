@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * User: Ilja.Kirillov
  * Date: 25.07.12
@@ -123,6 +125,7 @@ function CTableId()
 //-----------------------------------------------------------------------------------
     this.Read_Class_FromBinary = function(Reader)
     {
+		var props = null;
         var ElementType = Reader.GetLong();
         var Element = null;
 

@@ -1,3 +1,5 @@
+"use strict";
+
 var DEGR_REDUCT = 0.728;
 
 
@@ -117,12 +119,7 @@ function getStateHeight_2(height, GFont)
 function getTypeDegree(IFont, flag)
 {
     var fontSize = null;
-
-    if(flag)
-        CONST_INDEX = 0.62;
-    else
-        CONST_INDEX = 0.728;
-
+	var CONST_INDEX = flag ? 0.62 : 0.728;
 
     var sD = IFont.FontSize*CONST_INDEX;
     if( sD - Math.floor(sD) > 0.65 )

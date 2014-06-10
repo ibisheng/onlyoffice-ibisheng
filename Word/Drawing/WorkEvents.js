@@ -1,3 +1,5 @@
+"use strict";
+
 // ��������� ��� ����
 var g_mouse_event_type_down  = 0;
 var g_mouse_event_type_move  = 1;

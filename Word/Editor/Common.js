@@ -1,3 +1,5 @@
+"use strict";
+
 // Функция копирует объект или массив. (Обычное равенство в javascript приравнивает указатели)
 function Common_CopyObj(Obj)
 {

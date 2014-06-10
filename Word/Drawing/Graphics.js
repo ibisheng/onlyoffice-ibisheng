@@ -1,3 +1,5 @@
+"use strict";
+
 var g_fontManager2 = null;
 
 function CClipManager()

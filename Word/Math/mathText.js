@@ -1,3 +1,5 @@
+"use strict";
+
 //change FontSize
 // api 2003: asc_docs_api.prototype.put_TextPrFontSize
 //Document: Paragraph_Add

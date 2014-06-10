@@ -1,3 +1,5 @@
+"use strict";
+
 function CPageMeta()
 {
     this.width_mm = 0;

@@ -1,3 +1,5 @@
+"use strict";
+
 function CPPTXContentLoader()
 {
     this.Reader = new BinaryPPTYLoader();

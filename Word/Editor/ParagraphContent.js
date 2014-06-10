@@ -1,3 +1,5 @@
+"use strict";
+
 // Содержимое параграфа должно иметь:
 //
 // 1. Type    - тип
@@ -2444,7 +2446,6 @@ ParaEnd.prototype =
         else
         {
             var Count = parseInt( W / nSymWidth );
-            MesureArray = [];
             for ( var Index = 0; Index < Count; Index++ )
             {
                 strResult += strSymbol;
@@ -2655,7 +2656,6 @@ ParaNewLine.prototype =
             else
             {
                 var Count = parseInt(W / nSymWidth);
-                MesureArray = [];
                 for (var Index = 0; Index < Count; Index++)
                 {
                     strResult += strSymbol;
@@ -7330,15 +7330,6 @@ ParaHyperlinkStart.prototype =
         return false;
     },
 
-    Copy : function()
-    {
-        var Hyper = new ParaHyperlinkStart();
-        Hyper.Value   = this.Value;
-        Hyper.Visited = this.Visited;
-        Hyper.ToolTip = this.ToolTip;
-        return Hyper;
-    },
-
     Set_Visited : function(Value)
     {
         this.Visited = Value;
@@ -7947,7 +7938,7 @@ ParaMath.prototype =
                      text[i].Replace("<",	"&lt;");
                      text[i].Replace(">",	"&gt;");
                      text[i].Replace("\"",	"&quot;");*/
-                    oText = new CMathText();
+                    var oText = new CMathText();
                     oText.addTxt(sText[i]);
                     oElem.addElementToContent(oText);
                 }

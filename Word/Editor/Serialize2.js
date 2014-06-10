@@ -1,3 +1,5 @@
+"use strict";
+
 var c_oSerFormat = {
     Version:5, //1.0.0.5
     Signature: "DOCY"
@@ -944,7 +946,7 @@ function BinaryStyleTableWriter(memory, doc, oNumIdMap, oUsedStyleMap)
 		var oStyleToWrite = styles;
 		if(null != this.oUsedStyleMap)
 			oStyleToWrite = this.oUsedStyleMap;
-        for( styleId in oStyleToWrite)
+        for(var styleId in oStyleToWrite)
         {
             var style = styles[styleId];
             var bDefault = false;
@@ -3507,7 +3509,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
             //проверяем что pPr_rPr не пустые
             var pPr_rPr = null;
             var propCount = 0;
-            for(prop in par.TextPr.Value)
+            for(var prop in par.TextPr.Value)
             {
                 if(par.TextPr.Value.hasOwnProperty(prop))
                 {
@@ -10580,6 +10582,7 @@ function Binary_CommentsTableReader(doc, oReadResult, stream, oComments)
 	{
 		var numericKeys = [ 1, 4, 5, 6, 7, 10, 11 ];
 		var minutesOffset = 0;
+		var struct;
 		if ((struct = /^(\d{4}|[+\-]\d{6})(?:-(\d{2})(?:-(\d{2}))?)?(?:T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{3}))?)?(?:(Z)|([+\-])(\d{2})(?::(\d{2}))?)?)?$/.exec(sDate))) {
             // avoid NaN timestamps caused by “undefined” values being passed to Date.UTC
             for (var i = 0, k; (k = numericKeys[i]); ++i) {
@@ -10600,7 +10603,7 @@ function Binary_CommentsTableReader(doc, oReadResult, stream, oComments)
 
             return new Date(Date.UTC(struct[1], struct[2], struct[3], struct[4], struct[5] + minutesOffset, struct[6], struct[7]));
         }
-		return null
+		return null;
 	};
 	this.ReadReplies = function(type, length, Replies)
     {

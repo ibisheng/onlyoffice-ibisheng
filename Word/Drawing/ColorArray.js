@@ -1,3 +1,5 @@
+"use strict";
+
 function CShapeColor(r, g, b)
 {
     this.r = r;
