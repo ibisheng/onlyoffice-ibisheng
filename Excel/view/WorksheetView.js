@@ -8099,7 +8099,7 @@
 					t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
 					
 				var a_drawings = [];
-				if (val.addImages && val.addImages.length != 0) {
+				if (val.addImages && val.addImages.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor)) {
 					var api = asc["editor"];
 					var aImagesSync = [];
 					for (var im = 0; im < val.addImages.length; im++) {
@@ -8190,7 +8190,7 @@
 
 					api.ImageLoader.LoadDocumentImages(aImagesSync, null, t.objectRender.asyncImagesDocumentEndLoaded);
 				}
-				else if(val.addImagesFromWord && val.addImagesFromWord.length != 0)
+				else if(val.addImagesFromWord && val.addImagesFromWord.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
 				{
 					window["Asc"]["editor"].wb.clipboard._insertImagesFromBinaryWord(t, val.addImagesFromWord);
 				};

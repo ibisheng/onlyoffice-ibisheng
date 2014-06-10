@@ -1539,7 +1539,7 @@
 						pasteData = tempWorkbook.aWorksheets[0];
 					if (pasteData) {
 						History.TurnOn();
-						if(pasteData.Drawings && pasteData.Drawings.length)
+						if(pasteData.Drawings && pasteData.Drawings.length && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
 							t._insertImagesFromBinary(worksheet, pasteData, isIntoShape);
 						else {
 							var newFonts = {};
@@ -1734,7 +1734,8 @@
 				aResult = this._parseHtml(pasteFragment, node, worksheet, isText);
 				
 				//insert into document content
-				worksheet.setSelectionInfo('paste',aResult,t);
+				if(!(aResult.onlyImages && window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
+					worksheet.setSelectionInfo('paste',aResult,t);
 				
 				window.GlobalPasteFlagCounter = 0;
 				window.GlobalPasteFlag = false;
