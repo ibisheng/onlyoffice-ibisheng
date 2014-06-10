@@ -1,3 +1,5 @@
+"use strict";
+
 function CheckCoordsNeedPage(x, y, pageIndex, needPageIndex, drawingDocument)
 {
     if(pageIndex === needPageIndex)

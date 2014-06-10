@@ -1,3 +1,5 @@
+"use strict";
+
 // COLOR -----------------------
 /*
  var map_color_scheme = {};

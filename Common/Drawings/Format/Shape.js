@@ -1,4 +1,5 @@
 "use strict";
+
 function CheckObjectLine(obj)
 {
     return (obj instanceof CShape && obj.spPr && obj.spPr.geometry && obj.spPr.geometry.preset === "line");

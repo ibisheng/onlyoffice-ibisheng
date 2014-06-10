@@ -1,3 +1,5 @@
+"use strict";
+
 var c_dScalePPTXSizes = 36000;
 function IsHiddenObj(object)
 {

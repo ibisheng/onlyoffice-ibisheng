@@ -1,3 +1,5 @@
+"use strict";
+
 var MOVE_DELTA = 1/100000;
 var SNAP_DISTANCE = 1.27;
 

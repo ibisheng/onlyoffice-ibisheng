@@ -1,4 +1,5 @@
 "use strict";
+
 function MoveShapeImageTrack(originalObject)
 {
     this.originalObject = originalObject;

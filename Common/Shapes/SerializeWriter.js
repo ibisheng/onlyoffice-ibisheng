@@ -1,3 +1,5 @@
+"use strict";
+
 var c_oMainTables = {
     Main			: 255,
     App				: 1,
@@ -63,8 +65,6 @@ function CBinaryFileWriter()
         this.ImData = _ctx.createImageData(this.len / 4, 1);
         this.data = this.ImData.data;
         this.pos = 0;
-
-        delete _canvas;
     };
 
     this.IsWordWriter = false;
@@ -125,8 +125,6 @@ function CBinaryFileWriter()
 
             for (var i=0;i<this.pos;i++)
                 newData[i]=oldData[i];
-
-            delete _canvas;
         }
     };
     this.GetBase64Memory = function()
