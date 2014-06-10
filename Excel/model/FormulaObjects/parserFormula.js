@@ -724,6 +724,19 @@ cArea.prototype.getMatrix = function () {
     } );
     return arr;
 };
+cArea.prototype.index = function ( r, c, n ) {
+
+    var bbox = this.getBBox();
+    bbox.normalize();
+    var box = {c1:1, c2:bbox.c2-bbox.c1+1, r1:1, r2:bbox.r2-bbox.r1+1}
+
+    if( r < box.r1 || r > box.r2 || c < box.c1 || c > box.c2 ){
+        return new cError( cErrorType.bad_reference );
+    }
+
+
+
+};
 
 /** @constructor */
 function cArea3D( val, wsFrom, wsTo, wb ) {/*Area3D means "Sheat1!A1:E5" for example*/
@@ -1304,7 +1317,7 @@ cName.prototype = Object.create( cBaseType.prototype );
 cName.prototype.toRef = function ( wsID ) {
     var _3DRefTmp,
         ref = this.wb.getDefinesNames( this.value, wsID ).Ref;
-    if ( (_3DRefTmp = parserHelp.is3DRef( ref, 0 ))[0] ) {
+    if ( ref && (_3DRefTmp = parserHelp.is3DRef( ref, 0 ))[0] ) {
         var _wsFrom, _wsTo;
         _wsFrom = _3DRefTmp[1];
         _wsTo = ( (_3DRefTmp[2] !== null) && (_3DRefTmp[2] !== undefined) ) ? _3DRefTmp[2] : _wsFrom;
@@ -1320,7 +1333,7 @@ cName.prototype.toRef = function ( wsID ) {
             return new cRef3D( parserHelp.operand_str, _wsFrom, this.wb );
         }
     }
-    return new cError( "#REF!" );
+    return new cError( "#NAME!" );
 };
 
 /** @constructor */
@@ -3223,7 +3236,8 @@ parserFormula.prototype = {
                     this.outStack = [];
                     this.elemArr = [];
                     return false;*/
-                    this.outStack.push( new cError(cErrorType.wrong_name) );
+//                    this.outStack.push( new cError(cErrorType.wrong_name) );
+                    this.outStack.push(  new cName( this.operand_str, this.wb ) );
                     operand_expected = false;
                     if( this.operand_str != null ){
                         this.pCurrPos += this.operand_str.length;
