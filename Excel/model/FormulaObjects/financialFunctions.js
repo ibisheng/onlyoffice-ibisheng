@@ -2759,67 +2759,97 @@ cIRR.prototype = Object.create( cBaseFunction.prototype );
 cIRR.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cNumber( 0.1 );
 
-    function irr( arr, x ) {
-        x = x.getValue();
-
-        var count = 0, g_Eps = 1e-7, eps = 1, funcVal = 0, derivVal = 0, xN = 0, nIM = 100, nMC = 0, arr0 = arr[0], arrI, wasNegative = false, wasPositive = false;
-
-        if ( arr0 instanceof cError ) {
-            return new cError( cErrorType.not_available );
+    function npv(r,cf){
+        var res = 0;
+        for(var i = 1; i<=cf.length;i++){
+            res += cf[i-1].getValue() / Math.pow( 1 + r, i );
         }
+        return res;
+    }
 
-        if ( arr0.getValue() < 0 )
-            wasNegative = true;
-        else if ( arr0.getValue() > 0 )
-            wasPositive = true;
-        if ( arr.length < 2 )
-            return new cError( cErrorType.not_numeric );
+    function irr2(x, arr){
+        var g_Eps = 1e-7, nIM = 500, eps = 1, nMC= 0, xN, guess = x;
 
         while ( eps > g_Eps && nMC < nIM ) {
-            count = 0;
-            funcVal = 0;
-            derivVal = 0;
-            funcVal += arr0.getValue() / Math.pow( 1 + x, count );
-            derivVal += -count * arr0.getValue() / Math.pow( 1 + x, count + 1 );
-            count++;
-            for ( var i = 1; i < arr.length; i++ ) {
-                if ( arr[i] instanceof cError ) {
-                    return new cError( cErrorType.not_available );
-                }
-                arrI = arr[i].getValue();
-                funcVal += arrI / Math.pow( 1 + x, count );
-                derivVal += -count * arrI / Math.pow( 1 + x, count + 1 );
-                if ( arrI < 0 )
-                    wasNegative = true;
-                else if ( arrI > 0 )
-                    wasPositive = true;
-                count++
-            }
-            xN = x - funcVal / derivVal;
+            xN = x - npv(x,arr) / ( (npv( x +  g_Eps, arr ) - npv( x -  g_Eps, arr )) / (2 * g_Eps) );
             nMC++;
             eps = Math.abs( xN - x );
             x = xN;
         }
+        if ( isNaN( x ) || Infinity == Math.abs(x) ) {
+            var max = Number.MAX_VALUE, min = -Number.MAX_VALUE,
+                step = 1.6,
+                low = guess - 0.01 <= min ? min + g_Eps : guess - 0.01,
+                high = guess + 0.01 >= max ? max - g_Eps : guess + 0.01,
+                i, xBegin, xEnd, x, y, currentIter = 0;
 
-        if ( !(wasNegative && wasPositive) )
-            return new cError( cErrorType.not_numeric );
+            if ( guess <= min || guess >= max ) {
+                return new cError( cErrorType.not_numeric );
+            }
 
-        if ( eps < g_Eps )
-            return new cNumber( x );
+            for ( i = 0; i < nIM; i++ ) {
+                xBegin = low <= min ? min + g_Eps : low;
+                xEnd = high >= max ? max - g_Eps : high;
+                x = npv( xBegin, arr );
+                y = npv( xEnd, arr );
+                if ( x * y <= 0 ) {
+                    break;
+                }
+                else if ( x * y > 0 ) {
+                    low = (xBegin + step * (xBegin - xEnd));
+                    high = (xEnd + step * (xEnd - xBegin));
+                }
+                else {
+                    return new cError( cErrorType.not_numeric );
+                }
+            }
+
+            if ( i == nIM ) {
+                return new cError( cErrorType.not_numeric );
+            }
+
+            var fXbegin = npv( xBegin, arr ), fXend = npv( xEnd, arr ), fXi, xI;
+
+            if ( Math.abs( fXbegin ) < g_Eps ) {
+                return new cNumber( fXbegin );
+            }
+            if ( Math.abs( fXend ) < g_Eps ) {
+                return new cNumber( fXend );
+            }
+            do {
+                xI = xBegin + (xEnd - xBegin) / 2;
+                fXi = npv( xI, arr );
+                if ( fXbegin * fXi < 0 ) {
+                    xEnd = xI;
+                }
+                else {
+                    xBegin = xI;
+                }
+                fXbegin = npv( xBegin, arr );
+                currentIter++;
+            } while ( Math.abs( fXi ) > g_Eps && currentIter < nIM )
+
+            return new cNumber( xI );
+        }
         else
-            return new cError( cErrorType.not_numeric );
+            return new cNumber( x );
+
     }
 
     var arr = [];
     if ( arg0 instanceof cArray ) {
         arg0.foreach( function ( v ) {
-            arr.push( v.tocNumber() )
-        } )
+            if( v instanceof cNumber ){
+                arr.push( v );
+            }
+        } );
     }
     else if ( arg0 instanceof cArea ) {
         arg0.foreach2( function ( v ) {
-            arr.push( v.tocNumber() )
-        } )
+            if( v instanceof cNumber ){
+                arr.push( v );
+            }
+        } );
     }
 
     arg1 = arg1.tocNumber();
@@ -2827,7 +2857,20 @@ cIRR.prototype.Calculate = function ( arg ) {
     if ( arg1 instanceof cError ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
-    this.value = irr( arr, arg1 );
+
+    var wasNeg = false, wasPos = false;
+    for(var i = 0; i<arr.length;i++){
+        if( arr[i].getValue() > 0 )
+            wasNeg = true;
+        if( arr[i].getValue() < 0 )
+            wasPos = true;
+    }
+
+    if( !(wasNeg && wasPos) ){
+        return this.value = new cError( cErrorType.not_numeric );
+    }
+
+    this.value = irr2( arg1.getValue(), arr );
     this.value.numFormat = 9;
     return this.value;
 
@@ -2897,6 +2940,10 @@ cISPMT.prototype.Calculate = function ( arg ) {
     if ( per instanceof cError ) return this.value = per;
     if ( nper instanceof cError ) return this.value = nper;
     if ( pv instanceof cError ) return this.value = pv;
+
+    if( nper.getValue() < 0 ){
+        return this.value = new cError( cErrorType.division_by_zero );
+    }
 
     return this.value = new cNumber( pv.getValue() * rate.getValue() * (per.getValue() / nper.getValue() - 1) );
 };
@@ -3682,7 +3729,7 @@ cODDFYIELD.prototype.Calculate = function ( arg ) {
             xEnd = high >= max ? max - g_Eps : high;
             x = iterF( xBegin );
             y = iterF( xEnd );
-            if ( x * y == 0 || x * y < 0 ) {
+            if ( x * y <= 0 ) {
                 break;
             }
             else if ( x * y > 0 ) {
