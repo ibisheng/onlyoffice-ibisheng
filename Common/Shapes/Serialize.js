@@ -4851,20 +4851,15 @@ function BinaryPPTYLoader()
                     _stream.size = s.size;
 
                     _chart = new CChartSpace();
-                    var oBinaryChartReader = new BinaryChartReader(this.stream);
-                    oBinaryChartReader.ExternalReadCT_ChartSpace(length, _chart);
+                    var oBinaryChartReader = new BinaryChartReader(_stream);
+                    oBinaryChartReader.ExternalReadCT_ChartSpace(_length, _chart);
+                    _chart.setBDeleted(false);
+    
+                    if(!_chart.spPr)
+                        _chart.setSpPr(new CSpPr());
+
                     if (_xfrm)
-                    {
-						if (_chart.setXfrm)
-						{
-							_chart.setXfrm(_xfrm.offX, _xfrm.offY, _xfrm.extX, _xfrm.extY, _xfrm.rot, _xfrm.flipH, _xfrm.flipV);
-						}
-						else
-						{
-							_chart.setPosition(_xfrm.offX, _xfrm.offY);
-							_chart.setExtents(_xfrm.extX, _xfrm.extY);
-						}
-                    }
+                        _chart.spPr.setXfrm(_xfrm);
 					
                     s.Seek2(_pos + _length);
                     break;

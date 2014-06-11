@@ -233,7 +233,6 @@ CChartSpace.prototype =
     select: CShape.prototype.select,
     checkHitToBounds: CShape.prototype.checkHitToBounds,
 
-
     resetInternalSelection: function()
     {
         if(this.selection.textSelection)
@@ -7277,7 +7276,7 @@ CChartSpace.prototype =
 
             case historyitem_ShapeSetGroup:
             {
-                //TODO: Реализовать!!!!
+                writeObject(w, data.oldPr);
                 break;
             }
         }
@@ -7393,7 +7392,7 @@ CChartSpace.prototype =
             }
             case historyitem_ShapeSetGroup:
             {
-                //TODO: Реализовать!!!!
+                this.group = readObject(r);
                 break;
             }                
         }
