@@ -168,9 +168,9 @@ ParaMath.prototype =
 			}
 			else
 			{
-				nPosStart = oStartContent.State.ContentPos;
-				nLenStart = oStartContent.Content.length;
-				nPosEnd = oEndContent.State.ContentPos;
+				var nPosStart = oStartContent.State.ContentPos,
+					nLenStart = oStartContent.Content.length,
+					nPosEnd = oEndContent.State.ContentPos;
 				
 				History.Create_NewPoint();
 				
@@ -179,7 +179,7 @@ ParaMath.prototype =
 					var oMRun = new ParaRun(this.Paragraph, true);
 					oMRun.Pr = oStartContent.Pr;
 
-					for (i=nPosStart; i<nLenStart; i++)
+					for (var i=nPosStart; i<nLenStart; i++)
 					{
 						var Pos = oMRun.Content.length;
 						var EndPos = Pos + 1;
