@@ -283,7 +283,7 @@ function CPresentation(DrawingDocument)
     };
 
     // Здесь мы храним инфрмацию, связанную с разбивкой на страницы и самими страницами
-    this.Pages = new Array();
+    this.Pages = [];
 
     this.RecalcInfo =
     {
@@ -1836,7 +1836,7 @@ CPresentation.prototype =
 
     Get_AllParagraphs_ByNumbering : function(NumPr)
     {
-        var ParaArray = new Array();
+        var ParaArray = [];
 
         this.HdrFtr.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
 
@@ -2035,7 +2035,7 @@ CPresentation.prototype =
             EndPos = Math.min( this.Pages[PageNum + 1].Pos, EndPos );
 
         // Сохраним позиции всех Inline элементов на данной странице
-        var InlineElements = new Array();
+        var InlineElements = [];
         for ( var Index = StartPos; Index <= EndPos; Index++ )
         {
             var Item = this.Content[Index];
@@ -2841,7 +2841,7 @@ CPresentation.prototype =
 
         this.Selection.Use  = true;
         this.Selection.Flag = selectionflag_Numbering;
-        this.Selection.Data = new Array();
+        this.Selection.Data = [];
 
         for ( var Index = 0; Index < this.Content.length; Index++ )
         {
@@ -5165,7 +5165,7 @@ CPresentation.prototype =
             {
                 // Выделение нумерации
                 if ( selectionflag_Numbering == this.Selection.Flag )
-                    State = new Array();
+                    State = [];
                 else
                 {
                     var StartPos = this.Selection.StartPos;
@@ -5177,9 +5177,9 @@ CPresentation.prototype =
                         EndPos   = Temp;
                     }
 
-                    State = new Array();
+                    State = [];
 
-                    var TempState = new Array();
+                    var TempState = [];
                     for ( var Index = StartPos; Index <= EndPos; Index++ )
                     {
                         TempState.push( this.Content[Index].Get_SelectionState() );

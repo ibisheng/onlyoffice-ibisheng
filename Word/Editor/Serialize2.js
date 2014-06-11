@@ -1035,7 +1035,7 @@ function BinaryStyleTableWriter(memory, doc, oNumIdMap, oUsedStyleMap)
         if(null != style.TableCellPr)
             this.bs.WriteItem(c_oSer_sts.Style_CellPr, function(){oThis.btblPrs.WriteCellPr(style.TableCellPr);});
 		//TblStylePr
-		var aTblStylePr = new Array();
+		var aTblStylePr = [];
 		if(null != style.TableBand1Horz)
 			aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeBand1Horz, val: style.TableBand1Horz});
 		if(null != style.TableBand1Vert)
@@ -4694,7 +4694,7 @@ function BinaryFileReader(doc, openParams)
         if(c_oSerConstants.ReadOk != res)
             return res;
         var mtLen = this.stream.GetUChar();
-        var aSeekTable = new Array();
+        var aSeekTable = [];
         var nOtherTableSeek = -1;
         var nNumberingTableSeek = -1;
 		var nCommentTableSeek = -1;
@@ -6919,7 +6919,7 @@ function Binary_NumberingTableReader(doc, oReadResult, stream)
         }
         else if ( c_oSerNumTypes.lvl_LvlText === type )
         {
-            oNewLvl.LvlText = new Array();
+            oNewLvl.LvlText = [];
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadLevelText(t, l, oNewLvl.LvlText);
             });
@@ -7059,7 +7059,7 @@ function Binary_HdrFtrTableReader(doc, oReadResult, openParams, stream)
         var res = c_oSerConstants.ReadOk;
         if ( c_oSerHdrFtrTypes.HdrFtr_Content === type )
         {
-			oNewItem.Content = new Array();
+			oNewItem.Content = [];
 			oThis.bdtr.Read(length, oNewItem.Content);
         }
         else
@@ -7578,7 +7578,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             var bNextLink = false;
             var bNextTooltip = false;
             //разбиваем по пробелам, но с учетом кавычек
-            var aItems = new Array();
+            var aItems = [];
             var sCurItem = "";
             var bDQuot = false;
             for(var i = 0, length = fld.length; i < length; ++i)
@@ -8116,7 +8116,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         }
         else if( c_oSerDocTableType.Cell_Content === type )
         {
-			var oCellContent = new Array();
+			var oCellContent = [];
 			var oCellContentReader = new Binary_DocumentTableReader(cell.Content, this.oReadResult, this.openParams, this.stream, false, this.oComments);
 			oCellContentReader.aFields = this.aFields;
 			oCellContentReader.nCurCommentsCount = this.nCurCommentsCount;
@@ -8266,14 +8266,14 @@ function Binary_oMathReader(stream)
         }
 		else if (c_oSer_OMathContentType.Delimiter === type)
         {
-			var arrContent = new Array();
+			var arrContent = [];
             res = this.bcr.Read1(length, function(t, l){				
                 return oThis.ReadMathDelimiter(t,l,props,oElem,arrContent);
             });			
         }	
 		else if (c_oSer_OMathContentType.EqArr === type)
         {				
-			var arrContent = new Array();
+			var arrContent = [];
             res = this.bcr.Read1(length, function(t, l){				
                 return oThis.ReadMathEqArr(t,l,props,oElem,arrContent);
             });			
@@ -8320,7 +8320,7 @@ function Binary_oMathReader(stream)
 		else if (c_oSer_OMathContentType.Matrix === type)
         {
 			var oMatrix = new Object();
-			var arrContent = new Array();
+			var arrContent = [];
             res = this.bcr.Read1(length, function(t, l){				
                 return oThis.ReadMathMatrix(t,l,props,oElem,oMatrix,arrContent);
             });			
@@ -9300,7 +9300,7 @@ function Binary_oMathReader(stream)
 			
 			for(var i=0; i<props.row; i++)
 			{
-				arrContent[i] = new Array();
+				arrContent[i] = [];
 				for(var j=0; j<props.column; j++)
 					arrContent[i][j] = oMatrix.getElement(i,j);
 			}
@@ -10441,7 +10441,7 @@ function Binary_OtherTableReader(doc, oReadResult, stream)
 		else if ( c_oSerOtherTableTypes.EmbeddedFonts === type )
         {
             var _count = this.stream.GetULongLE();
-			var _embedded_fonts = new Array();
+			var _embedded_fonts = [];
             for (var i = 0; i < _count; i++)
             {
                 var _at = this.stream.GetUChar();
@@ -10569,7 +10569,7 @@ function Binary_CommentsTableReader(doc, oReadResult, stream, oComments)
 			oNewImage.Solved = (this.stream.GetUChar() != 0);
 		else if ( c_oSer_CommentsType.Replies === type )
 		{
-			oNewImage.Replies = new Array();
+			oNewImage.Replies = [];
 			res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadReplies(t,l,oNewImage.Replies);
                 });

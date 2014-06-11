@@ -4,8 +4,8 @@
 var C_SIZE = 72;
 function coeff()
 {
-    this.hh1 = new Array();
-    this.hh2 = new Array();
+    this.hh1 = [];
+    this.hh2 = [];
 }
 coeff.prototype.init_2 = function()
 {
@@ -89,8 +89,8 @@ function SetHeigthBracket_3()
     var x = 23,
         y = 27;
 
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     Y[0] = 26467; X[0] = 18871;
     Y[1] = 25967; X[1] = 18871;
@@ -200,20 +200,20 @@ function SetHeigthBracket_3()
     // при рисовании используем координаты в миллиметрах, умноженные на 100
     // g_dKoef_px_to_mm = 25.4/96
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
-    var hh1 = new Array(),
-        hh2 = new Array();
+    var hh1 = [],
+        hh2 = [];
 
-    var c1 = new Array(),
-        c2 = new Array();
+    var c1 = [],
+        c2 = [];
 
     var delta = augm < 7 ? augm : 7;
 
     if(augm < 7)
     {
-        var RX = new Array();
+        var RX = [];
 
         if(delta < 5.1)
         {
@@ -495,7 +495,7 @@ function SetHeigthBracket_3()
         YY[53] = YY[52] + 2*c1[11]*hh1[11];
         YY[0]  = YY[1]  + 2*c2[11]*hh2[11];
 
-        var RX = new Array();
+        var RX = [];
 
         for(var i = 0; i < 27; i++)
             RX[i] = 0.17*delta + 0.83;
@@ -627,8 +627,8 @@ function SetHeigthBracket()
     var x = 23,
         y = 27;
 
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     Y[0] = 26467; X[0] = 18871;
     Y[1] = 25967; X[1] = 18871;
@@ -738,20 +738,20 @@ function SetHeigthBracket()
     // при рисовании используем координаты в миллиметрах, умноженные на 100
     // g_dKoef_px_to_mm = 25.4/96
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
-    var hh1 = new Array(),
-        hh2 = new Array();
+    var hh1 = [],
+        hh2 = [];
 
-    var c1 = new Array(),
-        c2 = new Array();
+    var c1 = [],
+        c2 = [];
 
     var delta = augm < 7 ? augm : 7;
 
     if(augm < 7)
     {
-        var RX = new Array(),
+        var RX = [],
             RX1, RX2;
 
         if(delta < 5.1)
@@ -1031,7 +1031,7 @@ function SetHeigthBracket()
         YY[53] = YY[52] + 2*c1[11]*hh1[11];
         YY[0]  = YY[1]  + 2*c2[11]*hh2[11];
 
-        var RX = new Array();
+        var RX = [];
 
         for(var i = 0; i < 27; i++)
             RX[i] = 0.182*delta + 0.818;
@@ -1164,8 +1164,8 @@ function checkBracket(font, Aug)
     var x = 23,
         y = 27;
 
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     Y[0] = 26467; X[0] = 18871;
     Y[1] = 25967; X[1] = 18871;
@@ -1278,14 +1278,14 @@ function checkBracket(font, Aug)
 
     var augm = Aug;
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
-    var hh1 = new Array(),
-        hh2 = new Array();
+    var hh1 = [],
+        hh2 = [];
 
-    var c1 = new Array(),
-        c2 = new Array();
+    var c1 = [],
+        c2 = [];
 
     for(var i = 0; i < 4; i++)
     {

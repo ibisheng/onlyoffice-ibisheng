@@ -37,8 +37,8 @@ function Path(extrusionOk, fill, stroke, w, h)
     }
 
 
-    this.ArrPathCommandInfo = new Array();
-    this.ArrPathCommand = new Array();
+    this.ArrPathCommandInfo = [];
+    this.ArrPathCommand = [];
 
     this.createDuplicate = function()
     {

@@ -12,7 +12,7 @@ var clearPropObj = false;
 var ColorChart_timer = null;
 
 var globalCurentUser = "";
-var g_arrLockedInfo = new Array();
+var g_arrLockedInfo = [];
 
 var g_oTextPr    = new Object(); // CTextPr
 var g_oImagePr   = new Object();//
@@ -1296,7 +1296,7 @@ $(document).ready(function(){
         });
 
         // searching
-        window.SearchResult = new Array();
+        window.SearchResult = [];
         editor.asc_registerCallback("asc_onSearchFound", function(){
             window.SearchResult[window.SearchResult.length] = arguments[0];
         });

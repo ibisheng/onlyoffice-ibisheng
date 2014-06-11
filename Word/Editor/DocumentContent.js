@@ -47,13 +47,13 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
 
     this.TurnOffInnerWrap = TurnOffInnerWrap;
 
-    this.Pages = new Array();
+    this.Pages = [];
 
     this.RecalcInfo = new CDocumentRecalcInfo();
 
     this.Split = Split; // Разделяем ли на страницы
 
-    this.Content = new Array();
+    this.Content = [];
     this.Content[0] = new Paragraph( DrawingDocument, this, 0, X, Y, XLimit, YLimit, bPresentation );
     this.Content[0].Set_DocumentNext( null );
     this.Content[0].Set_DocumentPrev( null );
@@ -1151,7 +1151,7 @@ CDocumentContent.prototype =
     Get_AllDrawingObjects : function(DrawingObjs)
     {
         if ( undefined === DrawingObjs )
-            DrawingObjs = new Array();
+            DrawingObjs = [];
 
         var Count = this.Content.length;
         for ( var Pos = 0; Pos < Count; Pos++ )
@@ -1166,7 +1166,7 @@ CDocumentContent.prototype =
     Get_AllFloatElements : function(FloatObjs)
     {
         if ( undefined === FloatObjs )
-            FloatObjs = new Array();
+            FloatObjs = [];
         
         var Count = this.Content.length;
         for (var Pos = 0; Pos < Count; Pos++)
@@ -2882,7 +2882,7 @@ CDocumentContent.prototype =
                                     Item.Selection.StartPos.Pos = { Row : LastRow.Index, Cell : LastRow.Get_CellsCount() - 1 };
                                     Item.Selection.EndPos.Pos   = { Row : LastRow.Index, Cell : 0 };
                                     Item.CurCell = LastRow.Get_Cell( 0 );
-                                    Item.Selection.Data = new Array();
+                                    Item.Selection.Data = [];
 
                                     for ( var CellIndex = 0; CellIndex < LastRow.Get_CellsCount(); CellIndex++ )
                                     {
@@ -2978,7 +2978,7 @@ CDocumentContent.prototype =
                                     Item.Selection.StartPos.Pos = { Row : LastRow.Index, Cell : LastRow.Get_CellsCount() - 1 };
                                     Item.Selection.EndPos.Pos   = { Row : LastRow.Index, Cell : 0 };
                                     Item.CurCell = LastRow.Get_Cell( 0 );
-                                    Item.Selection.Data = new Array();
+                                    Item.Selection.Data = [];
 
                                     for ( var CellIndex = 0; CellIndex < LastRow.Get_CellsCount(); CellIndex++ )
                                     {
@@ -3077,7 +3077,7 @@ CDocumentContent.prototype =
                                     Item.Selection.StartPos.Pos = { Row : 0, Cell : 0 };
                                     Item.Selection.EndPos.Pos   = { Row : 0, Cell : FirstRow.Get_CellsCount() - 1 };
                                     Item.CurCell = FirstRow.Get_Cell( FirstRow.Get_CellsCount() - 1 );
-                                    Item.Selection.Data = new Array();
+                                    Item.Selection.Data = [];
 
                                     for ( var CellIndex = 0; CellIndex < FirstRow.Get_CellsCount(); CellIndex++ )
                                     {
@@ -3167,7 +3167,7 @@ CDocumentContent.prototype =
                                     Item.Selection.StartPos.Pos = { Row : 0, Cell : 0 };
                                     Item.Selection.EndPos.Pos   = { Row : 0, Cell : FirstRow.Get_CellsCount() - 1 };
                                     Item.CurCell = FirstRow.Get_Cell( FirstRow.Get_CellsCount() - 1 );
-                                    Item.Selection.Data = new Array();
+                                    Item.Selection.Data = [];
 
                                     for ( var CellIndex = 0; CellIndex < FirstRow.Get_CellsCount(); CellIndex++ )
                                     {
@@ -7551,7 +7551,7 @@ CDocumentContent.prototype =
 
         this.Selection.Use  = true;
         this.Selection.Flag = selectionflag_Numbering;
-        this.Selection.Data = new Array();
+        this.Selection.Data = [];
 
         for ( var Index = 0; Index < this.Content.length; Index++ )
         {
@@ -7855,7 +7855,7 @@ CDocumentContent.prototype =
             EndPos = Math.min( this.Pages[PageNum + 1].Pos, EndPos );
 
         // Сохраним позиции всех Inline элементов на данной странице
-        var InlineElements = new Array();
+        var InlineElements = [];
         for ( var Index = StartPos; Index <= EndPos; Index++ )
         {
             var Item = this.Content[Index];
@@ -8007,7 +8007,7 @@ CDocumentContent.prototype =
     Internal_Content_RemoveAll : function()
     {
         History.Add( this, { Type : historyitem_DocumentContent_RemoveItem, Pos : 0, Items : this.Content.slice( 0, this.Content.length ) } );
-        this.Content = new Array();
+        this.Content = [];
     },
 
 //-----------------------------------------------------------------------------------
@@ -8134,7 +8134,7 @@ CDocumentContent.prototype =
                 {
                     // Выделение нумерации
                     if ( selectionflag_Numbering == this.Selection.Flag )
-                        State = new Array();
+                        State = [];
                     else
                     {
                         var StartPos = this.Selection.StartPos;
@@ -8146,9 +8146,9 @@ CDocumentContent.prototype =
                             EndPos   = Temp;
                         }
 
-                        State = new Array();
+                        State = [];
 
-                        var TempState = new Array();
+                        var TempState = [];
                         for ( var Index = StartPos; Index <= EndPos; Index++ )
                         {
                             TempState.push( this.Content[Index].Get_SelectionState() );
@@ -8700,7 +8700,7 @@ CDocumentContent.prototype =
         this.Split              = Reader.GetBool();
 
         var Count = Reader.GetLong();
-        this.Content = new Array();
+        this.Content = [];
         for ( var Index = 0; Index < Count; Index++ )
         {
             var Element = g_oTableId.Get_ById( Reader.GetString2() );

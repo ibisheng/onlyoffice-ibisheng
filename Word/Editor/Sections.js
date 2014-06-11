@@ -1771,7 +1771,7 @@ function CSectionColumns()
     this.Sep        = false;
     this.Space      = 30;
     
-    this.Cols       = new Array();
+    this.Cols       = [];
     
     this.Cols[0] = new CSectionColumn();
     this.Cols[0].W = 100;
@@ -1849,5 +1849,5 @@ function CSectionLayoutInfo(X, Y, XLimit, YLimit)
     this.Y       = Y;
     this.XLimit  = XLimit;
     this.YLimit  = YLimit;
-    this.Columns = new Array();
+    this.Columns = [];
 }

@@ -117,7 +117,7 @@ CDocumentSpelling.prototype =
 //----------------------------------------------------------------------------------------------------------------------
 function CParaSpellChecker(Paragraph)
 {
-    this.Elements  = new Array();
+    this.Elements  = [];
     this.RecalcId  = -1;
     this.ParaId    = -1;
     this.Paragraph = Paragraph;
@@ -149,7 +149,7 @@ CParaSpellChecker.prototype =
             }
         }
 
-        this.Elements = new Array();
+        this.Elements = [];
     },
 
     Add : function(StartPos, EndPos, Word, Lang)
@@ -185,8 +185,8 @@ CParaSpellChecker.prototype =
                 CurPos = Paragraph.Get_ParaContentPos( false, false );
         }
 
-        var usrWords = new Array();
-        var usrLang  = new Array();
+        var usrWords = [];
+        var usrLang  = [];
 
         var Count = this.Elements.length;
         for ( var Index = 0; Index < Count; Index++ )
@@ -557,8 +557,8 @@ CParaSpellChecker.prototype =
 
     Get_ElementsBeforeAfterPos : function(StartPos,EndPos)
     {
-        var Before = new Array();
-        var After  = new Array();
+        var Before = [];
+        var After  = [];
 
         var Count = this.Elements.length;
         for ( var Index = 0; Index < Count; Index++ )
@@ -657,8 +657,8 @@ function CParaSpellCheckerElement(StartPos, EndPos, Word, Lang)
     this.CurPos   = false;
     this.Variants = null;
 
-    this.ClassesS = new Array();
-    this.ClassesE = new Array();
+    this.ClassesS = [];
+    this.ClassesE = [];
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1067,7 +1067,7 @@ Paragraph.prototype.Continue_CheckSpelling = function()
         {
             var OldElements = this.SpellChecker.Elements;
 
-            this.SpellChecker.Elements = new Array();
+            this.SpellChecker.Elements = [];
             var SpellCheckerEngine = new CParagraphSpellCheckerEngine( this.SpellChecker );
 
             var ContentLen = this.Content.length;
@@ -1167,7 +1167,7 @@ Paragraph.prototype.Add_SpellCheckerElement = function(Element)
 //----------------------------------------------------------------------------------------------------------------------
 ParaRun.prototype.Check_Spelling = function(SpellCheckerEngine, Depth)
 {
-    this.SpellingMarks = new Array();
+    this.SpellingMarks = [];
 
     // Пропускаем пустые раны
     if ( true === this.Is_Empty() )
@@ -1255,14 +1255,14 @@ ParaRun.prototype.Add_SpellCheckerElement = function(Element, Start, Depth)
 
 ParaRun.prototype.Clear_SpellingMarks = function()
 {
-    this.SpellingMarks = new Array();
+    this.SpellingMarks = [];
 };
 //----------------------------------------------------------------------------------------------------------------------
 // ParaHyperlink
 //----------------------------------------------------------------------------------------------------------------------
 ParaHyperlink.prototype.Check_Spelling = function(SpellCheckerEngine, Depth)
 {
-    this.SpellingMarks = new Array();
+    this.SpellingMarks = [];
 
     var ContentLen = this.Content.length;
     for ( var Pos = 0; Pos < ContentLen; Pos++ )
@@ -1292,7 +1292,7 @@ ParaHyperlink.prototype.Add_SpellCheckerElement = function(Element, Start, Depth
 
 ParaHyperlink.prototype.Clear_SpellingMarks = function()
 {
-    this.SpellingMarks = new Array();
+    this.SpellingMarks = [];
 };
 
 //----------------------------------------------------------------------------------------------------------------------

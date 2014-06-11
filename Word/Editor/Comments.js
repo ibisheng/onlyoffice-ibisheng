@@ -14,7 +14,7 @@ function CCommentData()
     this.m_sUserName  = "";
     this.m_sQuoteText = null;
     this.m_bSolved    = false;
-    this.m_aReplies   = new Array();
+    this.m_aReplies   = [];
 
     this.Add_Reply = function(CommentData)
     {
@@ -541,7 +541,7 @@ function CComments()
     this.m_aComments    = {};    // ассоциативный  массив
     this.m_sCurrent     = null;  // текущий комментарий
     
-    this.Pages = new Array();
+    this.Pages = [];
 
     this.Get_Id = function()
     {
@@ -845,7 +845,7 @@ function ParaComment(Start, Id)
     this.StartLine  = 0;
     this.StartRange = 0;
 
-    this.Lines = new Array();
+    this.Lines = [];
     this.LinesLength = 0;
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)

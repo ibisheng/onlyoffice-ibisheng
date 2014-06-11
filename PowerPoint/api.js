@@ -107,7 +107,7 @@ function asc_docs_api(name)
 
     this.DocumentOrientation = orientation_Portrait ? true : false;
 
-    this.SelectedObjectsStack = new Array();
+    this.SelectedObjectsStack = [];
 
     this.OpenDocumentProgress = new CDocOpenProgress();
     this._lastConvertProgress = 0;
@@ -3456,7 +3456,7 @@ function asc_CCommentData( obj )
         this.m_sQuoteText = (undefined != obj.m_sQuoteText) ? obj.m_sQuoteText : null;
         this.m_bSolved    = (undefined != obj.m_bSolved   ) ? obj.m_bSolved    : false;
         this.m_sUserName  = (undefined != obj.m_sUserName ) ? obj.m_sUserName  : "";
-        this.m_aReplies   = new Array();
+        this.m_aReplies   = [];
         if ( undefined != obj.m_aReplies )
         {
             var Count = obj.m_aReplies.length;
@@ -3475,7 +3475,7 @@ function asc_CCommentData( obj )
         this.m_sQuoteText = null;
         this.m_bSolved    = false;
         this.m_sUserName  = "";
-        this.m_aReplies   = new Array();
+        this.m_aReplies   = [];
     }
 }
 

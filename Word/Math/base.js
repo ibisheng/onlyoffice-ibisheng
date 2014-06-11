@@ -73,11 +73,11 @@ CMathBase.prototype =
     constructor: CMathBase,
     setContent: function()
     {
-        this.elements = new Array();
+        this.elements = [];
 
         for(var i=0; i < this.nRow; i++)
         {
-            this.elements[i] = new Array();
+            this.elements[i] = [];
             for(var j = 0; j < this.nCol; j++)
             {
                 this.elements[i][j] = new CMathContent();
@@ -91,8 +91,8 @@ CMathBase.prototype =
         this.nRow = countRow;
         this.nCol = countCol;
 
-        this.alignment.hgt = new Array();
-        this.alignment.wdt = new Array();
+        this.alignment.hgt = [];
+        this.alignment.wdt = [];
 
         for(var u = 0; u < this.nCol ; u++)
             this.alignment.hgt[u] = CENTER;
@@ -288,10 +288,10 @@ CMathBase.prototype =
     {
         if(arguments.length == this.nRow*this.nCol)
         {
-            this.elements = new Array();
+            this.elements = [];
             for(var i = 0; i < this.nRow; i++)
             {
-                this.elements[i] = new Array();
+                this.elements[i] = [];
                 for(var j = 0; j < this.nCol; j++)
                 {
                     this.elements[i][j] = arguments[j + i*this.nCol];

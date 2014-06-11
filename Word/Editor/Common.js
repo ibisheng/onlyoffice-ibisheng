@@ -49,7 +49,7 @@ function Common_CopyObj2(Dst, Obj)
                 if ( "object" != typeof(Dst[p]) )
                 {
                     if ( "undefined" != typeof(v.splice) )
-                        Dst[p] = new Array();
+                        Dst[p] = [];
                     else
                         Dst[p] = new Object();
                 }

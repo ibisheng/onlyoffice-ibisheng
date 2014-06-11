@@ -38,8 +38,8 @@ function CMathMatrix(props)
 
     this.gaps =
     {
-        row: new Array(),
-        column: new Array()
+        row: [],
+        column: []
     };
 
     ////  special for "read"  ////
@@ -532,12 +532,12 @@ CMathMatrix.prototype.Read_FromBinary2 = function( Reader )
 	var col = Reader.GetLong();
 	for(var i=0; i<row; i++)
 	{
-		this.elements[i] = new Array();
+		this.elements[i] = [];
 		for(var j=0; j<col; j++)
 		{
 			var Element = g_oTableId.Get_ById( Reader.GetString2() );
 			Element.Parent = this;
-			this.elements[i][j] = new Array();
+			this.elements[i][j] = [];
 			this.elements[i][j] = Element;
 		}
 	}
@@ -704,7 +704,7 @@ CEqArray.prototype.Read_FromBinary2 = function( Reader )
 	{
 		var Element = g_oTableId.Get_ById( Reader.GetString2() );
 		Element.Parent = this;
-		this.elements[i] = new Array();
+		this.elements[i] = [];
 		this.elements[i][0] = Element;
 	}
 	

@@ -170,7 +170,7 @@ CGraphicFrame.prototype =
                                 Type2    : table_Selection_Common,
                                 Data2    : null
                             };
-                            TableState.Selection.Data = new Array();
+                            TableState.Selection.Data = [];
                             TableState.CurCell = { Row : i, Cell : j};
                             s_arr[t].push( TableState );
                             s.textSelectionState = s_arr[t];

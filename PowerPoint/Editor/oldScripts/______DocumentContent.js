@@ -32,7 +32,7 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
 
     this.TurnOffInnerWrap = TurnOffInnerWrap;
 
-    this.Pages = new Array();
+    this.Pages = [];
     this.Pages[0] =
     {
         Pos : 0,
@@ -56,11 +56,11 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
     this.Split = Split; // Разделяем ли на страницы
 
     CollaborativeEditing.Add_NewDC(this);
-    this.m_aContentChanges = new Array(); // список изменений(добавление/удаление элементов)
+    this.m_aContentChanges = []; // список изменений(добавление/удаление элементов)
 
     this.IdCounter = 0;
 
-    this.Content = new Array();
+    this.Content = [];
     this.Content[0] = new Paragraph( DrawingDocument, this, 0, X, Y, XLimit, YLimit, ++this.IdCounter);
     this.Content[0].Set_DocumentNext( null );
     this.Content[0].Set_DocumentPrev( null );
@@ -732,7 +732,7 @@ CDocumentContent.prototype =
             LastChangeIndex = 0;
 
         var OldPages  = this.Pages.length;
-        var OldBottom = new Array();
+        var OldBottom = [];
         for ( var Index = 0; Index < OldPages; Index++ )
               OldBottom[Index] = this.Pages[Index].Bounds.Bottom;
 
@@ -823,7 +823,7 @@ CDocumentContent.prototype =
         }
 
         var NewPages  = this.Pages.length;
-        var NewBottom = new Array();
+        var NewBottom = [];
         for ( var Index = 0; Index < NewPages; Index++ )
             NewBottom[Index] = this.Pages[Index].Bounds.Bottom;
 
@@ -1836,7 +1836,7 @@ CDocumentContent.prototype =
     {
         if ( true === this.ApplyToAll )
         {
-            this.Pages = new Array();
+            this.Pages = [];
             this.Pages[0] =
             {
                 Pos : 0,
@@ -2290,7 +2290,7 @@ CDocumentContent.prototype =
                                 Item.Selection.StartPos.Pos = { Row : LastRow.Index, Cell : LastRow.Get_CellsCount() - 1 };
                                 Item.Selection.EndPos.Pos   = { Row : LastRow.Index, Cell : 0 };
                                 Item.CurCell = LastRow.Get_Cell( 0 );
-                                Item.Selection.Data = new Array();
+                                Item.Selection.Data = [];
 
                                 for ( var CellIndex = 0; CellIndex < LastRow.Get_CellsCount(); CellIndex++ )
                                 {
@@ -2377,7 +2377,7 @@ CDocumentContent.prototype =
                                 Item.Selection.StartPos.Pos = { Row : LastRow.Index, Cell : LastRow.Get_CellsCount() - 1 };
                                 Item.Selection.EndPos.Pos   = { Row : LastRow.Index, Cell : 0 };
                                 Item.CurCell = LastRow.Get_Cell( 0 );
-                                Item.Selection.Data = new Array();
+                                Item.Selection.Data = [];
 
                                 for ( var CellIndex = 0; CellIndex < LastRow.Get_CellsCount(); CellIndex++ )
                                 {
@@ -2497,7 +2497,7 @@ CDocumentContent.prototype =
                                 Item.Selection.StartPos.Pos = { Row : 0, Cell : 0 };
                                 Item.Selection.EndPos.Pos   = { Row : 0, Cell : FirstRow.Get_CellsCount() - 1 };
                                 Item.CurCell = FirstRow.Get_Cell( FirstRow.Get_CellsCount() - 1 );
-                                Item.Selection.Data = new Array();
+                                Item.Selection.Data = [];
 
                                 for ( var CellIndex = 0; CellIndex < FirstRow.Get_CellsCount(); CellIndex++ )
                                 {
@@ -2587,7 +2587,7 @@ CDocumentContent.prototype =
                                 Item.Selection.StartPos.Pos = { Row : 0, Cell : 0 };
                                 Item.Selection.EndPos.Pos   = { Row : 0, Cell : FirstRow.Get_CellsCount() - 1 };
                                 Item.CurCell = FirstRow.Get_Cell( FirstRow.Get_CellsCount() - 1 );
-                                Item.Selection.Data = new Array();
+                                Item.Selection.Data = [];
 
                                 for ( var CellIndex = 0; CellIndex < FirstRow.Get_CellsCount(); CellIndex++ )
                                 {
@@ -6728,7 +6728,7 @@ CDocumentContent.prototype =
 
         this.Selection.Use  = true;
         this.Selection.Flag = selectionflag_Numbering;
-        this.Selection.Data = new Array();
+        this.Selection.Data = [];
 
         for ( var Index = 0; Index < this.Content.length; Index++ )
         {
@@ -7260,7 +7260,7 @@ CDocumentContent.prototype =
     Internal_Content_RemoveAll : function()
     {
         History.Add( this, { Type : historyitem_DocumentContent_RemoveItem, Pos : 0, Items : this.Content.slice( 0, this.Content.length ) } );
-        this.Content = new Array();
+        this.Content = [];
     },
 
 //-----------------------------------------------------------------------------------
@@ -7392,14 +7392,14 @@ CDocumentContent.prototype =
         if ( docpostype_HdrFtr === this.CurPos.Type )
             State = this.HdrFtr.Get_SelectionState();
         else if ( docpostype_Content == this.CurPos.Type && selectionflag_DrawingObject == this.Selection.Flag )
-            State = new Array();
+            State = [];
         else if ( docpostype_FlowObjects == this.CurPos.Type )
         {
             switch ( this.Selection.Data.FlowObject.Get_Type() )
             {
                 case flowobject_Image:
                 {
-                    State = new Array();
+                    State = [];
                     break;
                 }
                 case flowobject_Table:
@@ -7413,7 +7413,7 @@ CDocumentContent.prototype =
         {
             // Выделение нумерации
             if ( selectionflag_Numbering == this.Selection.Flag )
-                State = new Array();
+                State = [];
             else
             {
                 var StartPos = this.Selection.StartPos;
@@ -7425,9 +7425,9 @@ CDocumentContent.prototype =
                     EndPos   = Temp;
                 }
 
-                State = new Array();
+                State = [];
 
-                var TempState = new Array();
+                var TempState = [];
                 for ( var Index = StartPos; Index <= EndPos; Index++ )
                 {
                     TempState.push( this.Content[Index].Get_SelectionState() );

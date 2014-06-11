@@ -54,7 +54,7 @@ function GUID()
 function CBinaryFileWriter()
 {
     // temp members
-    this.tableStylesGuides = new Array();
+    this.tableStylesGuides = [];
 
     // memory functions ----------
     this.Init = function()
@@ -212,9 +212,9 @@ function CBinaryFileWriter()
     }
     // ---------------------------
 
-    this.m_arStack = new Array();
+    this.m_arStack = [];
     this.m_lStackPosition = 0;
-    this.m_arMainTables = new Array();
+    this.m_arMainTables = [];
 
     this.StartRecord = function(lType)
     {
@@ -468,7 +468,7 @@ function CBinaryFileWriter()
             {
                 _dst_masters[_len_dst] = _m;
 
-                var _m_rels = { ThemeIndex : 0, Layouts : new Array() };
+                var _m_rels = { ThemeIndex : 0, Layouts : [] };
                 var _lay_c = _m.sldLayoutLst.length;
 
                 var _ind_l = _dst_layouts.length;
@@ -2711,7 +2711,7 @@ function CBinaryFileWriter()
         for (var i = 0; i < _rows_count; i++)
         {
             TableGrid.Rows[i] = new Object();
-            TableGrid.Rows[i].Cells = new Array();
+            TableGrid.Rows[i].Cells = [];
 
             var _index = 0;
             var _cells_len = _rows[i].Content.length;

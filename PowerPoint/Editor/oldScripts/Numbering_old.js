@@ -418,7 +418,7 @@ function CAbstractNum(Type)
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add( this, this.Id );
 
-    this.Lvl = new Array();
+    this.Lvl = [];
     for ( var Index = 0; Index < 9; Index++ )
     {
         this.Lvl[Index] = new Object();
@@ -434,7 +434,7 @@ function CAbstractNum(Type)
         Lvl.Jc     = align_Left;
         Lvl.Format = numbering_numfmt_Bullet;
 
-        Lvl.LvlText = new Array();
+        Lvl.LvlText = [];
 
         Lvl.ParaPr = new Object();
         /*Lvl.ParaPr.Ind =
@@ -522,7 +522,7 @@ function CAbstractNum(Type)
                 FirstLine  = -9 * g_dKoef_pt_to_mm;
             }
 
-            Lvl.LvlText = new Array();
+            Lvl.LvlText = [];
             Lvl.LvlText.push( new CLvlText_Num( Index ) );
             Lvl.LvlText.push( new CLvlText_Text( "." ) );
 
@@ -569,7 +569,7 @@ function CAbstractNum(Type)
                 Lvl.Format = numbering_numfmt_LowerRoman;
             }
 
-            Lvl.LvlText = new Array();
+            Lvl.LvlText = [];
             Lvl.LvlText.push( new CLvlText_Num( Index ) );
             Lvl.LvlText.push( new CLvlText_Text( ")" ) );
 
@@ -644,7 +644,7 @@ function CAbstractNum(Type)
             Lvl.Jc     = align_Left;
             Lvl.Format = numbering_numfmt_Decimal;
 
-            Lvl.LvlText = new Array();
+            Lvl.LvlText = [];
             for ( var Index2 = 0; Index2 <= Index; Index2++ )
             {
                 Lvl.LvlText.push( new CLvlText_Num( Index2 ) );
@@ -697,7 +697,7 @@ function CAbstractNum(Type)
                 FirstLine  = -9 * g_dKoef_pt_to_mm;
             }
 
-            Lvl.LvlText = new Array();
+            Lvl.LvlText = [];
             switch( Index )
             {
                 case 0:
@@ -763,7 +763,7 @@ function CAbstractNum(Type)
             Lvl.Jc     = align_Left;
             Lvl.Format = numbering_numfmt_Bullet;
 
-            Lvl.LvlText = new Array();
+            Lvl.LvlText = [];
 
             Lvl.ParaPr = new Object();
             /*Lvl.ParaPr.Ind =
@@ -803,7 +803,7 @@ function CAbstractNum(Type)
         var Lvl_old = this.Internal_CopyLvl( Lvl );
 
         Lvl.Format = numbering_numfmt_Bullet;
-        Lvl.LvlText = new Array();
+        Lvl.LvlText = [];
         Lvl.LvlText.push( new CLvlText_Text( LvlText ) );
         Lvl.TextPr = TextPr;
 
@@ -823,7 +823,7 @@ function CAbstractNum(Type)
 
         Lvl.Jc = align_Right;
         Lvl.Format = numbering_numfmt_Decimal;
-        Lvl.LvlText = new Array();
+        Lvl.LvlText = [];
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
 
@@ -842,7 +842,7 @@ function CAbstractNum(Type)
 
         Lvl.Jc = align_Right;
         Lvl.Format = numbering_numfmt_Decimal;
-        Lvl.LvlText = new Array();
+        Lvl.LvlText = [];
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( ")" ) );
         Lvl.TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
@@ -863,7 +863,7 @@ function CAbstractNum(Type)
 
         Lvl.Jc = align_Right;
         Lvl.Format = numbering_numfmt_Decimal;
-        Lvl.LvlText = new Array();
+        Lvl.LvlText = [];
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( "." ) );
         Lvl.TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
@@ -884,7 +884,7 @@ function CAbstractNum(Type)
 
         Lvl.Jc = align_Left;
         Lvl.Format = numbering_numfmt_Decimal;
-        Lvl.LvlText = new Array();
+        Lvl.LvlText = [];
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( "." ) );
         Lvl.TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
@@ -905,7 +905,7 @@ function CAbstractNum(Type)
 
         Lvl.Jc = align_Left;
         Lvl.Format = numbering_numfmt_Decimal;
-        Lvl.LvlText = new Array();
+        Lvl.LvlText = [];
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( ")" ) );
         Lvl.TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
@@ -926,7 +926,7 @@ function CAbstractNum(Type)
 
         Lvl.Jc = align_Right;
         Lvl.Format = numbering_numfmt_UpperRoman;
-        Lvl.LvlText = new Array();
+        Lvl.LvlText = [];
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( "." ) );
         Lvl.TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
@@ -947,7 +947,7 @@ function CAbstractNum(Type)
 
         Lvl.Jc = align_Left;
         Lvl.Format = numbering_numfmt_UpperLetter;
-        Lvl.LvlText = new Array();
+        Lvl.LvlText = [];
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( "." ) );
         Lvl.TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
@@ -968,7 +968,7 @@ function CAbstractNum(Type)
 
         Lvl.Jc = align_Left;
         Lvl.Format = numbering_numfmt_LowerLetter;
-        Lvl.LvlText = new Array();
+        Lvl.LvlText = [];
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( ")" ) );
         Lvl.TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
@@ -989,7 +989,7 @@ function CAbstractNum(Type)
 
         Lvl.Jc = align_Left;
         Lvl.Format = numbering_numfmt_LowerLetter;
-        Lvl.LvlText = new Array();
+        Lvl.LvlText = [];
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( "." ) );
         Lvl.TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
@@ -1010,7 +1010,7 @@ function CAbstractNum(Type)
 
         Lvl.Jc = align_Right;
         Lvl.Format = numbering_numfmt_LowerRoman;
-        Lvl.LvlText = new Array();
+        Lvl.LvlText = [];
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( "." ) );
         Lvl.TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
@@ -1883,7 +1883,7 @@ function CAbstractNum(Type)
         Lvl_new.Jc      = Lvl.Jc;
         Lvl_new.Format  = Lvl.Format;
 
-        Lvl_new.LvlText = new Array();
+        Lvl_new.LvlText = [];
         for ( var Index = 0; Index < Lvl.LvlText.length; Index++ )
         {
             var Item = Lvl.LvlText[Index];
@@ -1950,8 +1950,8 @@ function CAbstractNum(Type)
 
 function CNumbering()
 {
-    this.AbstractNum = new Array();
-    this.Num         = new Array();
+    this.AbstractNum = [];
+    this.Num         = [];
 }
 
 CNumbering.prototype =

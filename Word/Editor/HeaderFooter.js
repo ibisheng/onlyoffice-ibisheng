@@ -122,7 +122,7 @@ CHeaderFooter.prototype =
         
         var OldSumH    = 0;
         var OldBounds  = null;
-        var OldFlowPos = new Array();
+        var OldFlowPos = [];
             
         if ( undefined === RecalcObj )
             bChanges = true;
@@ -159,7 +159,7 @@ CHeaderFooter.prototype =
 
         if ( false === bChanges )
         {
-            var NewFlowPos = new Array();
+            var NewFlowPos = [];
             var AllDrawingObjects = this.Content.Get_AllDrawingObjects();
             var Count = AllDrawingObjects.length;
 
@@ -2112,7 +2112,7 @@ CHeaderFooterController.prototype =
         if ( null != this.CurHdrFtr )
             State = this.CurHdrFtr.Content.Get_SelectionState();
         else
-            State = new Array();
+            State = [];
 
         State.push( HdrFtrState );
 

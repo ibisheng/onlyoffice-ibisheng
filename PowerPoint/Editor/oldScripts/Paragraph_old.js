@@ -77,10 +77,10 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
         Bottom : Y
     };
 
-    this.Lines   = new Array();
+    this.Lines   = [];
 
     // Данная структура нужна для (возможной) разбивки на страницы
-    this.Pages    = new Array();
+    this.Pages    = [];
     this.Pages[0] =
     {
         X         : X,
@@ -91,7 +91,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
     };
 
     // Добавляем в контент элемент "конец параграфа"
-    this.Content = new Array();
+    this.Content = [];
     this.Content[0] = new ParaEnd();
     this.Content[1] = new ParaEmpty();
 
@@ -489,7 +489,7 @@ Paragraph.prototype =
         var LineDescent     = 0;
 
         // Выставляем начальные сдвиги для промежутков. Началао промежутка = конец вырезаемого промежутка
-        this.Lines[CurLine].Ranges = new Array();
+        this.Lines[CurLine].Ranges = [];
         this.Lines[CurLine].Ranges.push( new Object() );
 
         this.Lines[CurLine].Ranges[0].X      = X;
@@ -2040,7 +2040,7 @@ Paragraph.prototype =
                         RangesCount = Ranges.length;
 
                         // Выставляем начальные сдвиги для промежутков. Началао промежутка = конец вырезаемого промежутка
-                        this.Lines[CurLine].Ranges = new Array();
+                        this.Lines[CurLine].Ranges = [];
                         this.Lines[CurLine].Ranges.push( new Object() );
                         this.Lines[CurLine].Ranges[0].X      = X;
                         this.Lines[CurLine].Ranges[0].Words  = 0;
@@ -8396,7 +8396,7 @@ Paragraph.prototype =
 
         var StartPage = this.Get_StartPage_Absolute();
 
-        var SearchResults = new Array();
+        var SearchResults = [];
 
         // Сначала найдем элементы поиска в данном параграфе
         for ( var Pos = 0; Pos < this.Content.length; Pos++ )
@@ -8442,7 +8442,7 @@ Paragraph.prototype =
         var MaxShowValue = 100;
         for ( var FoundIndex = 0; FoundIndex < SearchResults.length; FoundIndex++ )
         {
-            var Rects = new Array();
+            var Rects = [];
 
             // Делаем подсветку
             var StartPos = SearchResults[FoundIndex].StartPos;
@@ -9002,7 +9002,7 @@ Paragraph.prototype =
         else if ( true != this.Selection.Use )
             return [];
 
-        var Result = new Array();
+        var Result = [];
         for ( var Index = StartPos; Index <= EndPos; Index++ )
         {
             var Item = this.Content[Index];
@@ -10498,7 +10498,7 @@ Paragraph.prototype =
                 var Pos   = Reader.GetLong();
                 var Count = Reader.GetLong();
 
-                var Items = new Array();
+                var Items = [];
 
                 for ( var Index = 0; Index < Count; Index++ )
                 {
@@ -11200,7 +11200,7 @@ Paragraph.prototype =
 
         this.TextPr = g_oTableId.Get_ById( Reader.GetString2() );
 
-        this.Content = new Array();
+        this.Content = [];
         var Count = Reader.GetLong();
         for ( var Index = 0; Index < Count; Index++ )
         {

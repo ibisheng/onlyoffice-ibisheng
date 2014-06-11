@@ -48,7 +48,7 @@ function CFontFile(fileName, faceIndex)
     this.m_lLineHeight = 0;
     this.m_lUnits_Per_Em = 0;
 
-    this.m_arrCacheSizes = new Array();
+    this.m_arrCacheSizes = [];
 
     this.m_bUseDefaultFont = false;
     this.m_pDefaultFont = null;

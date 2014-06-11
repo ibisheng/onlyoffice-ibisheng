@@ -358,8 +358,8 @@ function BinaryPPTYLoader()
         }
 
         this.presentation.ImageMap = new Object();
-        this.presentation.Fonts = new Array();
-        this.presentation.EmbeddedFonts = new Array();
+        this.presentation.Fonts = [];
+        this.presentation.EmbeddedFonts = [];
 
         if (presentation.globalTableStyles)
             this.NextTableStyleId = this.presentation.globalTableStyles.length;
@@ -378,8 +378,8 @@ function BinaryPPTYLoader()
         this.stream.obj = null;
 
         this.presentation.ImageMap = new Object();
-        this.presentation.Fonts = new Array();
-        this.presentation.EmbeddedFonts = new Array();
+        this.presentation.Fonts = [];
+        this.presentation.EmbeddedFonts = [];
 
         if (presentation.globalTableStyles)
             this.NextTableStyleId = this.presentation.globalTableStyles.length;
@@ -1454,7 +1454,7 @@ function BinaryPPTYLoader()
                 s.Skip2(1);
 
                 if (null == _ret)
-                    _ret = new Array();
+                    _ret = [];
 
                 var _mod = new CColorMod();
                 _ret[_ret.length] = _mod;
@@ -4591,7 +4591,7 @@ function BinaryPPTYLoader()
     {
         var s = this.stream;
 
-        var shapes = new Array();
+        var shapes = [];
 
         var _rec_start = s.cur;
         var _end_rec = _rec_start + s.GetULong() + 4;
@@ -7051,8 +7051,8 @@ function CApp()
     this.HiddenSlides = null;
     this.MMClips = null;
     this.ScaleCrop = null;
-    this.HeadingPairs = new Array();
-    this.TitlesOfParts = new Array();
+    this.HeadingPairs = [];
+    this.TitlesOfParts = [];
     this.Company = null;
     this.LinksUpToDate = null;
     this.SharedDoc = null;

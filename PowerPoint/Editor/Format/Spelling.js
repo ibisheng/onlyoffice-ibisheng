@@ -95,7 +95,7 @@ CDocumentSpelling.prototype =
 //----------------------------------------------------------------------------------------------------------------------
 function CParaSpellChecker()
 {
-    this.Elements = new Array();
+    this.Elements = [];
     this.RecalcId = -1;
     this.ParaId   = -1;
 }
@@ -104,7 +104,7 @@ CParaSpellChecker.prototype =
 {
     Clear : function()
     {
-        this.Elements = new Array();
+        this.Elements = [];
     },
 
     Add : function(StartPos, EndPos, Word, Lang)
@@ -121,8 +121,8 @@ CParaSpellChecker.prototype =
         if ( true === bCurrent && false === Paragraph.Selection.Use )
             CurPos = Paragraph.CurPos.ContentPos;
 
-        var usrWords = new Array();
-        var usrLang  = new Array();
+        var usrWords = [];
+        var usrLang  = [];
 
         var Count = this.Elements.length;
         for ( var Index = 0; Index < Count; Index++ )
@@ -371,8 +371,8 @@ CParaSpellChecker.prototype =
 
     Get_ElementsBeforeAfterPos : function(StartPos,EndPos)
     {
-        var Before = new Array();
-        var After  = new Array();
+        var Before = [];
+        var After  = [];
 
         var Count = this.Elements.length;
         for ( var Index = 0; Index < Count; Index++ )

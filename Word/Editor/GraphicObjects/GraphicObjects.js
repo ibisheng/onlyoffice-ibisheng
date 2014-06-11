@@ -2360,7 +2360,7 @@ CGraphicObjects.prototype =
         {
             var Ranges = this.graphicPages[PageNum].CheckRange(X0, Y0, X1, Y1, Y0Sp, Y1Sp, LeftField, RightField, HdrFtrRanges, docContent);
 
-            var ResultRanges = new Array();
+            var ResultRanges = [];
 
             // Уберем лишние отрезки
             var Count = Ranges.length;

@@ -369,7 +369,7 @@ function GetDefaultMods(r, g, b, pos, editor_id)
     return [];
 }
 
-var g_oUserColorScheme = new Array();
+var g_oUserColorScheme = [];
 g_oUserColorScheme[0] = {
 	dk1:	{R: 0, G: 0, B: 0},
 	lt1:	{R: 255, G: 255, B: 255},

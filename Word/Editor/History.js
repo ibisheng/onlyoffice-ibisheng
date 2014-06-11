@@ -13,14 +13,14 @@ function CHistory(Document)
     this.Index      = -1;
     this.SavedIndex = null;        // Номер точки отката, на которой произошло последнее сохранение
     this.RecIndex   = -1;          // Номер точки, на которой произошел последний пересчет
-    this.Points     = new Array(); // Точки истории, в каждой хранится массив с изменениями после текущей точки
+    this.Points     = []; // Точки истории, в каждой хранится массив с изменениями после текущей точки
     this.Document   = Document;
 
     this.RecalculateData =
     {
         Inline : { Pos : -1, PageNum : 0 },
-        Flow   : new Array(),
-        HdrFtr : new Array(),
+        Flow   : [],
+        HdrFtr : [],
         Drawings:
         {
             All: false,
@@ -137,7 +137,7 @@ CHistory.prototype =
         this.Check_UninonLastPoints();
         
         var State = this.Document.Get_SelectionState();
-        var Items = new Array();
+        var Items = [];
         var Time  = new Date().getTime();
 
         // Создаем новую точку
@@ -237,8 +237,8 @@ CHistory.prototype =
         this.RecalculateData =
         {
             Inline : { Pos : -1, PageNum : 0 },
-            Flow   : new Array(),
-            HdrFtr : new Array(),
+            Flow   : [],
+            HdrFtr : [],
             Drawings:
             {
                 All: false,
@@ -495,7 +495,7 @@ CHistory.prototype =
     {
         var Count = this.Points.length;
 
-        var TimeLine = new Array();
+        var TimeLine = [];
         for ( var Index = 0; Index < Count; Index++ )
         {
             var PointTime = this.Points[Index].Time;

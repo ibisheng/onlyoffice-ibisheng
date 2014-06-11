@@ -42,7 +42,7 @@ function ParaMath()
 
     this.Range = this.Lines[0].Ranges[0];
 
-    this.NearPosArray = new Array();
+    this.NearPosArray = [];
 
     this.Width        = 0;
     this.WidthVisible = 0;
@@ -181,7 +181,7 @@ ParaMath.prototype =
 
 			if(nPosStart != nLenStart)
 			{
-				var items = new Array();
+				var items = [];
 				oContent.Content.addElementToContent(oMRun);
 				items.push(oMRun);
 				var Pos = oContent.Content.CurPos,
@@ -210,7 +210,7 @@ ParaMath.prototype =
 				oElem.Remove(Direction, bOnAddText);
 				if(oElem.Content.length == 0) //тк pararun пустой, удаляем его
 				{
-					var Items = new Array();
+					var Items = [];
 					Items.push(oElem.Parent.content[0]);
 					oElem.Parent.content.splice( 0, 1 );
 					History.Add(oElem.Parent, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: 0});
@@ -242,7 +242,7 @@ ParaMath.prototype =
 		
 		var oStartContent = oContent.Content.content[oContent.Start];
 		var oEndContent = oContent.Content.content[oContent.End];		
-		var Items = new Array();
+		var Items = [];
 		for (var i=oContent.Start; i<=oContent.End; i++)
 		{
 			Items.push(oContent.Content.content[i]);

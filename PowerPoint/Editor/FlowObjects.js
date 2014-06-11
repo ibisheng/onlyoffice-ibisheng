@@ -76,7 +76,7 @@ function FlowObjects_CompareRanges(Range1, Range2)
 
 function FlowObjects(Parent, PageNum)
 {
-    this.Objects = new Array();
+    this.Objects = [];
 
     this.Parent  = Parent;
     this.PageNum = PageNum;
@@ -129,7 +129,7 @@ FlowObjects.prototype =
 
     CheckRange : function(X0, Y0, X1, Y1, StartArray)
     {
-        var Ranges = new Array();
+        var Ranges = [];
         if ( "undefined" != typeof(StartArray) && null != StartArray )
             Ranges = StartArray;
 
@@ -266,7 +266,7 @@ FlowObjects.prototype =
         if ( this.Objects.length > 0 )
         {
             History.Add( this, { Type : historyitem_FlowObjects_RemoveItem, Pos : this.Internal_Get_ClearPos( 0 ), EndPos : this.Internal_Get_ClearPos( this.Objects.length - 1 ), Items : [ this.Objects ] } );
-            this.Objects = new Array();
+            this.Objects = [];
         }
     },
 
@@ -723,7 +723,7 @@ function FlowTable(PageController, Table, DrawingDocument, LogicDocument, X, Y, 
     this.TurnOffRecalc = false;
     if ( 0 === PageController )
     {
-        this.Pages = new Array();
+        this.Pages = [];
         this.Pages[0] = this.Id;
 
         this.TurnOffRecalc = true;

@@ -704,7 +704,7 @@ function CCollaborativeEditing()
     this.Get_SelfChanges = function()
     {
         // Генерируем свои изменения
-        var aChanges = new Array();
+        var aChanges = [];
         var PointsCount = History.Points.length;
         for ( var PointIndex = 0; PointIndex < PointsCount; PointIndex++ )
         {
@@ -769,7 +769,7 @@ function CCollaborativeEditing()
             PointsCount = History.Index + 1;
         }
 
-        var aChanges = new Array();
+        var aChanges = [];
         for ( var PointIndex = 0; PointIndex < PointsCount; PointIndex++ )
         {
             var Point = History.Points[PointIndex];
@@ -832,7 +832,7 @@ function CCollaborativeEditing()
             LastPoint = History.Index;
         }
 
-        var aChanges = new Array();
+        var aChanges = [];
         for ( var PointIndex = StartPoint; PointIndex <= LastPoint; PointIndex++ )
         {
             var Point = History.Points[PointIndex];
@@ -941,8 +941,8 @@ function CCollaborativeEditing()
         var RecalculateData =
         {
             Inline : { Pos : 0, PageNum : 0 },
-            Flow   : new Array(),
-            HdrFtr : new Array(),
+            Flow   : [],
+            HdrFtr : [],
             Drawings: {
                 All: true,
                 Map:{}
@@ -1009,7 +1009,7 @@ function CCollaborativeEditing()
 
     this.OnEnd_CheckLock = function()
     {
-        var aIds = new Array();
+        var aIds = [];
 
         var Count = this.m_aCheckLocks.length;
         for ( var Index = 0; Index < Count; Index++ )
@@ -1412,7 +1412,7 @@ function CContentChangesElement(Type, Pos, Count, Data)
     this.Make_ArrayOfSimpleActions = function(Type, Pos, Count)
     {
         // Разбиваем действие на простейшие
-        var Positions = new Array();
+        var Positions = [];
         if ( contentchanges_Add === Type )
         {
             for ( var Index = 0; Index < Count; Index++ )
@@ -1433,7 +1433,7 @@ function CContentChangesElement(Type, Pos, Count, Data)
 
 function CContentChanges()
 {
-    this.m_aChanges = new Array();
+    this.m_aChanges = [];
 
     this.Add = function(Changes)
     {

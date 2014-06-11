@@ -1429,7 +1429,7 @@ function CGradFill()
 {
     this.type = FILL_TYPE_GRAD;
     // пока просто front color
-    this.colors = new Array();
+    this.colors = [];
 
     this.lin = null;
     this.path = null;
@@ -3300,7 +3300,7 @@ var tx2     = 16;
 function ClrScheme()
 {
     this.name = "";
-    this.colors = new Array();
+    this.colors = [];
 
     for (var i = g_clr_MIN; i <= g_clr_MAX; i++)
         this.colors[i] = null;
@@ -3370,7 +3370,7 @@ function ClrScheme()
 
 function ClrMap()
 {
-    this.color_map = new Array();
+    this.color_map = [];
 
     for (var i = 0; i < 17; i++)
         this.color_map[i] = null;
@@ -3498,10 +3498,10 @@ function FontScheme()
 function FmtScheme()
 {
     this.name = "";
-    this.fillStyleLst = new Array();
-    this.lnStyleLst = new Array();
+    this.fillStyleLst = [];
+    this.lnStyleLst = [];
     this.effectStyleLst = null;
-    this.bgFillStyleLst = new Array();
+    this.bgFillStyleLst = [];
 
     this.GetFillStyle = function(number)
     {
@@ -3584,7 +3584,7 @@ function CTheme()
     this.lnDef = null;
     this.txDef = null;
 
-    this.extraClrSchemeLst = new Array();
+    this.extraClrSchemeLst = [];
 
     // pointers
     this.presentation = null;

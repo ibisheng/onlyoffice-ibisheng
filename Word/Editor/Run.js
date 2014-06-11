@@ -12,7 +12,7 @@ function ParaRun(Paragraph, bMathRun)
     this.Type       = para_Run;                  // тип данного элемента
     this.Paragraph  = Paragraph;                 // Ссылка на параграф
     this.Pr         = new CTextPr();             // Текстовые настройки данного run
-    this.Content    = new Array();               // Содержимое данного run
+    this.Content    = [];               // Содержимое данного run
     this.State      = new CParaRunState();       // Положение курсора и селекта в данного run
     this.Selection  = this.State.Selection;
     this.CompiledPr = new CTextPr();             // Скомпилированные настройки
@@ -42,9 +42,9 @@ function ParaRun(Paragraph, bMathRun)
     this.CollaborativeMarks = new CRunCollaborativeMarks();
     this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
 
-    this.NearPosArray  = new Array();
-    this.SearchMarks   = new Array();
-    this.SpellingMarks = new Array();
+    this.NearPosArray  = [];
+    this.SearchMarks   = [];
+    this.SpellingMarks = [];
 
     if(bMathRun)
     {
@@ -6758,7 +6758,7 @@ ParaRun.prototype =
         this.Pr.Read_FromBinary( Reader );
 
         var Count = Reader.GetLong();
-        this.Content = new Array();
+        this.Content = [];
         for ( var Index = 0; Index < Count; Index++ )
         {
             var Element = ParagraphContent_Read_FromBinary( Reader );
@@ -6954,7 +6954,7 @@ function FontSize_IncreaseDecreaseValue(bIncrease, Value)
 
 function CRunCollaborativeMarks()
 {
-    this.Ranges = new Array();
+    this.Ranges = [];
     this.DrawingObj = new Object();
 }
 
@@ -7088,7 +7088,7 @@ CRunCollaborativeMarks.prototype =
 
     Clear : function()
     {
-        this.Ranges = new Array();
+        this.Ranges = [];
     },
 
     Init_Drawing  : function()

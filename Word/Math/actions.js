@@ -164,7 +164,7 @@ function RedefList()
 
     var arr1 = new Array(16,17,18,20,21,22,24,25,28,32,36);
     var arr2 = new Array(11,12,13,14,15,16,17,18,20,23,26);
-    var ans = new Array();
+    var ans = [];
 
     var t, p;
     var temp = 0;
@@ -194,9 +194,9 @@ function RedefList()
             }
         }
 
-    var mas1 = new Array();
-    var mas2 = new Array();
-    var mas3 = new Array();
+    var mas1 = [];
+    var mas2 = [];
+    var mas3 = [];
 
     for(var y = 16; y < 49; y++)
         mas2.push(y);
@@ -218,7 +218,7 @@ function RedefList()
 
 function CControlComposition()
 {
-    this.Content = new Array();
+    this.Content = [];
     this.CurPos = null;
     this.coord = null;
     this.pGraph = null;

@@ -51,15 +51,15 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
 
     this.Bounds = new CDocumentBounds( X, Y, X_Right_Field, Y );
 
-    this.Lines      = new Array(); // Массив элементов CParaLine
+    this.Lines      = []; // Массив элементов CParaLine
     this.RecalcInfo = new CParaRecalcInfo();
 
     // Данная структура нужна для (возможной) разбивки на страницы
-    this.Pages    = new Array();
+    this.Pages    = [];
     this.Pages[0] = new CParaPage(X, Y, XLimit, YLimit, 0);
 
     // Добавляем в контент элемент "конец параграфа"
-    this.Content = new Array();
+    this.Content = [];
     this.Content[0] = new ParaPresentationNumbering();
     this.Content[1] = new ParaEnd();
     this.Content[2] = new ParaEmpty();
@@ -500,7 +500,7 @@ Paragraph.prototype =
     Internal_Content_Concat : function(Items)
     {
         // Добавляем только постоянные элементы параграфа
-        var NewItems = new Array();
+        var NewItems = [];
         var ItemsCount = Items.length;
         for ( var Index = 0; Index < ItemsCount; Index++ )
         {
@@ -586,7 +586,7 @@ Paragraph.prototype =
         var LastArray = this.Content.slice( Pos, Pos + Count );
 
         // Добавляем только постоянные элементы параграфа
-        var LastItems = new Array();
+        var LastItems = [];
         var ItemsCount = LastArray.length;
         for ( var Index = 0; Index < ItemsCount; Index++ )
         {
@@ -7946,7 +7946,7 @@ Paragraph.prototype =
 
         var StartPage = this.Get_StartPage_Absolute();
 
-        var SearchResults = new Array();
+        var SearchResults = [];
 
         // Сначала найдем элементы поиска в данном параграфе
         for ( var Pos = 0; Pos < this.Content.length; Pos++ )
@@ -7990,7 +7990,7 @@ Paragraph.prototype =
         var MaxShowValue = 100;
         for ( var FoundIndex = 0; FoundIndex < SearchResults.length; FoundIndex++ )
         {
-            var Rects = new Array();
+            var Rects = [];
 
             // Делаем подсветку
             var StartPos = SearchResults[FoundIndex].StartPos;
@@ -8513,7 +8513,7 @@ Paragraph.prototype =
         else if ( true != this.Selection.Use )
             return [];
 
-        var Result = new Array();
+        var Result = [];
         for ( var Index = StartPos; Index <= EndPos; Index++ )
         {
             var Item = this.Content[Index];
@@ -10499,7 +10499,7 @@ Paragraph.prototype =
 
         this.TextPr = g_oTableId.Get_ById( Reader.GetString2() );
 
-        this.Content = new Array();
+        this.Content = [];
         var Count = Reader.GetLong();
         for ( var Index = 0; Index < Count; Index++ )
         {
@@ -10763,7 +10763,7 @@ function CParaLine()
     this.Words   = 0;
     this.Spaces  = 0; // Количество пробелов между словами в строке (пробелы, идущие в конце строки, не учитываются)
     this.Metrics = new CParaLineMetrics();
-    this.Ranges  = new Array(); // Массив CParaLineRanges
+    this.Ranges  = []; // Массив CParaLineRanges
 }
 
 CParaLine.prototype =
@@ -10781,7 +10781,7 @@ CParaLine.prototype =
         this.Words   = 0;
         this.Spaces  = 0; // Количество пробелов между словами в строке (пробелы, идущие в конце строки, не учитываются)
         this.Metrics = new CParaLineMetrics();
-        this.Ranges  = new Array(); // Массив CParaLineRanges
+        this.Ranges  = []; // Массив CParaLineRanges
     }
 };
 

@@ -832,7 +832,7 @@ function CMathContent()
 	this.Id = g_oIdCounter.Get_NewId();		
 
 
-    this.content = new Array(); // array of mathElem
+    this.content = []; // array of mathElem
 
     this.CurPos = 0;
     this.WidthToElement = [];
@@ -854,7 +854,7 @@ function CMathContent()
         TextPr:     true
     };
 
-    this.NearPosArray = new Array();
+    this.NearPosArray = [];
 
     this.size =
     {
@@ -9003,7 +9003,7 @@ CMathContent.prototype =
 			
 			var Pos = oElem.CurPos,
 				PosEnd = Pos + 1;
-			var items = new Array();
+			var items = [];
             for (var i=0; i < sText.length; i++)
             {
                 var oText = new CMathText(false);
@@ -9021,7 +9021,7 @@ CMathContent.prototype =
 		oElem.Parent = oParent;
 		var Pos = oParent.CurPos,
 				PosEnd = Pos + 1;
-		var items = new Array();
+		var items = [];
 		
         if (oParent)
 		{
@@ -9861,7 +9861,7 @@ CMathComposition.prototype =
 		
 		var oStartContent = oContent.Content.content[oContent.Start];
 		var oEndContent = oContent.Content.content[oContent.End];		
-		var Items = new Array();
+		var Items = [];
 		for (var i=oContent.Start; i<=oContent.End; i++)
 		{
 			Items.push(oContent.Content.content[i]);
@@ -9972,14 +9972,14 @@ CMathComposition.prototype =
     {
         var State = new Object();
 
-        var stackCurrent = new Array();
+        var stackCurrent = [];
         this.CurrentContent.getStackPositions( stackCurrent );
         State.Current =
         {
             stack:              stackCurrent
         };
 
-        var stackSelect = new Array();
+        var stackSelect = [];
         this.SelectContent.getStackPositions( stackSelect );
 
         State.Select =

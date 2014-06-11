@@ -27,10 +27,10 @@ function CTableMarkup(Table)
     this.Table = Table;
     this.X = 0; // Смещение таблицы от начала страницы до первой колонки
 
-    this.Cols    = new Array(); // массив ширин колонок
-    this.Margins = new Array(); // массив левых и правых маргинов
+    this.Cols    = []; // массив ширин колонок
+    this.Margins = []; // массив левых и правых маргинов
 
-    this.Rows    = new Array(); // массив позиций, высот строк(для данной страницы)
+    this.Rows    = []; // массив позиций, высот строк(для данной страницы)
     // Rows = [ { Y : , H :  }, ... ]
 
     this.CurCol = 0; // текущая колонка
@@ -812,7 +812,7 @@ function CCacheImage()
 
 function CCacheManager()
 {
-    this.arrayImages = new Array();
+    this.arrayImages = [];
     this.arrayCount = 0;
     this.countValidImage = 1;
 
@@ -2462,7 +2462,7 @@ function CDrawingDocument()
     this.CheckFontNeeds = function()
     {
         var map_keys = this.m_oWordControl.m_oLogicDocument.Document_Get_AllFontNames();
-        var dstfonts = new Array();
+        var dstfonts = [];
         for (var i in map_keys)
         {
             dstfonts[dstfonts.length] = new CFont(i, 0, "", 0, null);
@@ -2627,7 +2627,7 @@ function CDrawingDocument()
 
     this.SendThemeColorScheme = function()
     {
-        var infos = new Array();
+        var infos = [];
         var _index = 0;
 
         var _c = null;
@@ -3193,7 +3193,7 @@ function CThumbnailsManager()
     this.m_oFontManager = new CFontManager();
 
     this.m_bIsScrollVisible = true;
-    this.DigitWidths = new Array();
+    this.DigitWidths = [];
 
     this.backgroundColor = "#B0B0B0";
     this.overColor = "#D3D3D3";
@@ -3211,7 +3211,7 @@ function CThumbnailsManager()
     this.m_bIsVisible = false;
     this.m_nCurrentPage = -1;
     this.m_bIsUpdate = false;
-    this.m_arrPages = new Array();
+    this.m_arrPages = [];
     this.m_lDrawingFirst = -1;
     this.m_lDrawingEnd = -1;
 
@@ -4344,7 +4344,7 @@ function CThumbnailsManager()
 
     this.GetSelectedArray = function()
     {
-        var _array = new Array();
+        var _array = [];
         var pages_count = this.m_arrPages.length;
         for (var i = 0; i < pages_count; i++)
         {

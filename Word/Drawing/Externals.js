@@ -1473,7 +1473,7 @@ var LanguagesFontSelectTypes =
 
 function CFontSelectList()
 {
-    this.List = new Array();
+    this.List = [];
     this.ListMap = {};
 
     this.Languages = [];
@@ -1694,7 +1694,7 @@ CFontSelectList.prototype =
         if (_text_len == 0)
             return LanguagesFontSelectTypes.Unknown;
 
-        var _array_detect_languages = new Array();
+        var _array_detect_languages = [];
         var _detect_languages_length = this.Languages.length;
 
         for (var _lang = 0; _lang < _detect_languages_length; _lang++)

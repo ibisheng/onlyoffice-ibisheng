@@ -174,7 +174,7 @@ function CCommentData()
     this.m_sUserName  = "";
     this.m_sQuoteText = null;
     this.m_bSolved    = false;
-    this.m_aReplies   = new Array();
+    this.m_aReplies   = [];
 
     this.Add_Reply = function(CommentData)
     {
@@ -804,7 +804,7 @@ function CComments()
 
     this.m_aComments    = {};    // ассоциативный  массив
     this.m_sCurrent     = null;  // текущий комментарий
-    this.m_aCurrentDraw = new Array();
+    this.m_aCurrentDraw = [];
 
     this.Get_Id = function()
     {

@@ -956,7 +956,7 @@ function CGlyphString()
 	this.m_nGlyphsCount  = 0;
 	this.m_pGlyphsBuffer = new Array(100);
 
-	this.m_arrCTM = new Array();
+	this.m_arrCTM = [];
 	this.m_dIDet = 1;
 
 	this.m_fTransX = 0;

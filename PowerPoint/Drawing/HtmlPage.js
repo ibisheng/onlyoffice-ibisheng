@@ -178,7 +178,7 @@ function CEditorPage(api)
     this.m_bIsUpdateVerRuler    = false;
     this.m_bIsUpdateTargetNoAttack = false;
 
-    this.arrayEventHandlers     = new Array();
+    this.arrayEventHandlers     = [];
 
     this.m_oTimerScrollSelect   = -1;
     this.IsFocus = true;

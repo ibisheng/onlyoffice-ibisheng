@@ -79,7 +79,7 @@ CDocInfo.prototype.put_Options = function(v){this.Options = v;}
 
 function CAscColorScheme()
 {
-    this.Colors = new Array();
+    this.Colors = [];
     this.Name = "";
 }
 CAscColorScheme.prototype.get_colors = function() { return this.Colors; }
@@ -259,7 +259,7 @@ function CAscColor()
     this.b = 0;
     this.a = 255;
 
-    this.Mods = new Array();
+    this.Mods = [];
     this.ColorSchemeId = -1;
 }
 CAscColor.prototype.get_r = function(){return this.r}
@@ -511,8 +511,8 @@ function CreateAscFill(unifill)
             {
                 if (0 == i)
                 {
-                    ret.fill.Colors = new Array();
-                    ret.fill.Positions = new Array();
+                    ret.fill.Colors = [];
+                    ret.fill.Positions = [];
                 }
 
                 ret.fill.Colors.push(CreateAscColor(_fill.colors[i].color));
@@ -1035,8 +1035,8 @@ CAscThemeInfo.prototype.get_Index = function() { return this.Index; }
 
 function CAscThemes()
 {
-    this.EditorThemes = new Array();
-    this.DocumentThemes = new Array();
+    this.EditorThemes = [];
+    this.DocumentThemes = [];
 
     var _count = _presentation_editor_themes.length;
     for (var i = 0; i < _count; i++)
@@ -2282,7 +2282,7 @@ CParagraphTab.prototype.put_Pos = function (v){ this.Pos = v; }
 
 function CParagraphTabs (obj)
 {
-    this.Tabs = new Array();
+    this.Tabs = [];
 
     if ( undefined != obj )
     {

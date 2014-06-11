@@ -170,8 +170,8 @@ CGlyphOperator.prototype.draw_other = function() //  с выравнивание
     if(this.loc == 3)
         gpX = - this.penW*25.4/96;
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
     var x = this.pos.x,
 		y = this.pos.y;
@@ -371,8 +371,8 @@ CGlyphOperator.prototype.getCoordinateGlyph = function()
     if(this.loc == 3)
         gpX = - this.penW*25.4/96;
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
     for(var i = 0; i < X.length; i++)
     {
@@ -444,8 +444,8 @@ COperatorBracket.prototype.calcSize = function( stretch )
 }
 COperatorBracket.prototype.calcCoord = function(stretch)
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 26467; Y[0] = 18871;
     X[1] = 25967; Y[1] = 18871;
@@ -513,20 +513,20 @@ COperatorBracket.prototype.calcCoord = function(stretch)
     if(augm < 1)
         augm = 1;
 
-    var YY = new Array(),
-        XX = new Array();
+    var YY = [],
+        XX = [];
 
-    var hh1 = new Array(),
-        hh2 = new Array();
+    var hh1 = [],
+        hh2 = [];
 
-    var c1 = new Array(),
-        c2 = new Array();
+    var c1 = [],
+        c2 = [];
 
     var delta = augm < 7 ? augm : 7;
 
     if(augm < 7)
     {
-        var RX = new Array(),
+        var RX = [],
             RX1, RX2;
 
         if(delta < 5.1)
@@ -806,7 +806,7 @@ COperatorBracket.prototype.calcCoord = function(stretch)
         XX[53] = XX[52] + 2*c1[11]*hh1[11];
         XX[0]  = XX[1]  + 2*c2[11]*hh2[11];
 
-        var RX = new Array();
+        var RX = [];
 
         for(var i = 0; i < 27; i++)
             RX[i] = 0.182*delta + 0.818;
@@ -953,8 +953,8 @@ COperatorParenthesis.prototype.calcCoord = function(stretch)
 {
     //cкобка перевернутая на 90 градусов
 
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 39887; Y[0] = 18995;
     X[1] = 25314; Y[1] = 18995;
@@ -989,7 +989,7 @@ COperatorParenthesis.prototype.calcCoord = function(stretch)
         RY = 1 + (aug - 1)*0.19;
     }
 
-    var DistH = new Array();
+    var DistH = [];
     for(var i= 0; i< 5; i++)
         DistH[i] = Y[9-i] - Y[i];
 
@@ -1000,7 +1000,7 @@ COperatorParenthesis.prototype.calcCoord = function(stretch)
     }
 
     // X
-    var DistW = new Array();
+    var DistW = [];
     for(var j= 0; j< 5; j++)
         DistW[j] = X[18-j] - X[9+j];
 
@@ -1013,8 +1013,8 @@ COperatorParenthesis.prototype.calcCoord = function(stretch)
         X[9-i] = X[i] + DistW[9-i];
     }
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
     var shiftY =  1.1*Y[9]*alpha;
 
@@ -1081,8 +1081,8 @@ COperatorAngleBracket.prototype.calcSize = function(stretch)
 }
 COperatorAngleBracket.prototype.calcCoord = function(stretch)
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 38990; Y[0] = 7665;
     X[1] = 1583; Y[1] = 21036;
@@ -1144,8 +1144,8 @@ COperatorAngleBracket.prototype.calcCoord = function(stretch)
     /*var hh1 = 0.1*augm,
      hh2 = (augm*X[0] - X[])*/
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
     for(var i = 0; i < X.length; i++)
     {
@@ -1177,8 +1177,8 @@ function CSquareBracket()
 extend(CSquareBracket, CGlyphOperator);
 CSquareBracket.prototype.calcCoord = function(stretch)
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 3200;  Y[0] = 6912;
     X[1] = 3200;  Y[1] = 18592;
@@ -1202,8 +1202,8 @@ CSquareBracket.prototype.calcCoord = function(stretch)
         X[4+i] += lng;
 
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
     var shY =  Y[0]*alpha;
 
@@ -1248,8 +1248,8 @@ function CHalfSquareBracket()
 extend(CHalfSquareBracket, CGlyphOperator);
 CHalfSquareBracket.prototype.calcCoord = function(stretch)
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 0; Y[0] = 0;
     X[1] = 0; Y[1] = 7000;
@@ -1272,8 +1272,8 @@ CHalfSquareBracket.prototype.calcCoord = function(stretch)
     for(var i = 0; i < 4; i++)
         X[2+i] += lng;
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
     var shY = Y[1]*alpha;
 
@@ -1329,8 +1329,8 @@ COperatorLine.prototype.calcSize = function()
 }
 COperatorLine.prototype.calcCoord = function(stretch)
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 0;     Y[0] = 0;
     X[1] = 0;     Y[1] = 5520;
@@ -1341,8 +1341,8 @@ COperatorLine.prototype.calcCoord = function(stretch)
     var textScale = this.getCtrPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
     //var shY = 2*Y[1]*alpha;
     var shY = 0;
@@ -1393,8 +1393,8 @@ CWhiteSquareBracket.prototype.calcSize = function()
 }
 CWhiteSquareBracket.prototype.calcCoord = function(stretch)
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     /*X[0] = 77529; Y[0] = 26219;
      X[1] = 77529; Y[1] = 0;
@@ -1430,8 +1430,8 @@ CWhiteSquareBracket.prototype.calcCoord = function(stretch)
     var textScale = this.getCtrPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
     var shY = (Y[1] - Y[0])*alpha;
 
@@ -1492,8 +1492,8 @@ COperatorDoubleLine.prototype.calcSize = function()
 }
 COperatorDoubleLine.prototype.calcCoord = function(stretch)
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     //X[0] = 77504; Y[0] = 6400;
 
@@ -1512,8 +1512,8 @@ COperatorDoubleLine.prototype.calcCoord = function(stretch)
     var textScale = this.getCtrPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
     //var shY = 1.5*Y[1]*alpha;
     var shY = 0;
@@ -1568,8 +1568,8 @@ CSingleArrow.prototype.calcSize = function()
 }
 CSingleArrow.prototype.calcCoord = function(stretch)
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 56138; Y[0] = 12300;
     X[1] = 8363; Y[1] = 12300;
@@ -1586,8 +1586,8 @@ CSingleArrow.prototype.calcCoord = function(stretch)
     var textScale = this.getCtrPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
     for(var i = 0; i < X.length; i++)
     {
@@ -1645,8 +1645,8 @@ CLeftRightArrow.prototype.calcSize = function()
 }
 CLeftRightArrow.prototype.calcCoord = function(stretch)
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 16950; Y[0] = 28912;
     X[1] = 14738; Y[1] = 30975;
@@ -1669,8 +1669,8 @@ CLeftRightArrow.prototype.calcCoord = function(stretch)
     var textScale = this.getCtrPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
     for(var i = 0; i < X.length; i++)
     {
@@ -1734,8 +1734,8 @@ CDoubleArrow.prototype.calcSize = function()
 }
 CDoubleArrow.prototype.calcCoord = function(stretch)
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 14738;  Y[0] = 29764;
     X[1] = 20775;  Y[1] = 37002;
@@ -1760,8 +1760,8 @@ CDoubleArrow.prototype.calcCoord = function(stretch)
     var textScale = this.getCtrPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
     for(var i = 0; i < X.length; i++)
     {
@@ -1833,8 +1833,8 @@ CLR_DoubleArrow.prototype.calcSize = function()
 }
 CLR_DoubleArrow.prototype.calcCoord = function(stretch)
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 14775; Y[0] = 9225;
     X[1] = 56063; Y[1] = 9225;
@@ -1865,8 +1865,8 @@ CLR_DoubleArrow.prototype.calcCoord = function(stretch)
     var textScale = this.getCtrPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64;
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
     for(var i = 0; i < X.length; i++)
     {
@@ -1949,8 +1949,8 @@ CCombiningArrow.prototype.calcCoord = function(stretch)
     // YY[..]                   height
     // penW
 
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 0; Y[0] = 8137;
     X[1] = 9413; Y[1] = 0;
@@ -1967,8 +1967,8 @@ CCombiningArrow.prototype.calcCoord = function(stretch)
     var textScale =  this.getCtrPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
     for(var i = 0; i < X.length; i++)
     {
@@ -2032,8 +2032,8 @@ CCombiningHalfArrow.prototype.calcCoord = function(stretch)
     // YY[..]                   height
     // penW
 
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 0; Y[0] = 8137;
     X[1] = 9413; Y[1] = 0;
@@ -2047,8 +2047,8 @@ CCombiningHalfArrow.prototype.calcCoord = function(stretch)
     var textScale = this.getCtrPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
     for(var i = 0; i < X.length; i++)
     {
@@ -2101,8 +2101,8 @@ CCombining_LR_Arrow.prototype.drawPath = function(pGraphics, XX, YY)
 }
 CCombining_LR_Arrow.prototype.calcCoord = function(stretch)
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 0; Y[0] = 8137;
     X[1] = 9413; Y[1] = 0;
@@ -2125,8 +2125,8 @@ CCombining_LR_Arrow.prototype.calcCoord = function(stretch)
     var textScale = this.getCtrPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
     for(var i = 0; i < X.length; i++)
     {
@@ -2262,7 +2262,7 @@ function COperator(type)
 
     //this.pos = null;
 
-    this.Positions = new Array();
+    this.Positions = [];
     this.coordGlyph = null;
     this.size = {width: 0, height: 0};
 
@@ -3022,8 +3022,8 @@ COperator.prototype.drawOperator = function(absX, absY, pGraphics)
     {
         var lng = this.coordGlyph.XX.length;
 
-        var X = new Array(),
-            Y = new Array();
+        var X = [],
+            Y = [];
 
         var PosOper = this.Positions[0];
 
@@ -3044,8 +3044,8 @@ COperator.prototype.drawSeparator = function(absX, absY, pGraphics)
 
         for(var i = 0; i < this.Positions.length; i++)
         {
-            var X = new Array(),
-                Y = new Array();
+            var X = [],
+                Y = [];
 
             var PosOper = this.Positions[i];
 
@@ -3768,7 +3768,7 @@ CDelimiter.prototype.setPosition = function(position)
 
     content.setPosition(PosContent); // CMathContent
 
-    var Positions = new Array();
+    var Positions = [];
 
     for(var j = 1 ; j < this.nCol; j++)
     {

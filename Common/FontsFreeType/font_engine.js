@@ -3299,10 +3299,10 @@ function FT_Face()
     this.style_name = "";
 
     this.num_fixed_sizes = 0;
-    this.available_sizes = new Array();
+    this.available_sizes = [];
 
     this.num_charmaps = 0;
-    this.charmaps = new Array();
+    this.charmaps = [];
 
     this.generic = new FT_Generic();
 
@@ -3331,9 +3331,9 @@ function FT_Face()
     this.memory = null;
     this.stream = null;
 
-    this.sizes_list = new Array();
+    this.sizes_list = [];
 
-    this.autohint = new Array();
+    this.autohint = [];
     this.extensions = null;
 
     this.internal = null;
@@ -3398,7 +3398,7 @@ function FT_GlyphSlot()
     this.outline = new FT_Outline();
 
     this.num_subglyphs = 0;
-    this.subglyphs = new Array();
+    this.subglyphs = [];
 
     this.control_data = null;
     this.control_len = 0;
@@ -3562,7 +3562,7 @@ function FT_Driver()
 {
     this.root = new FT_Module();
     this.clazz = new FT_Driver_Class();
-    this.faces_list = new Array();
+    this.faces_list = [];
     this.extensions = null;
     this.glyph_loader = null;
 }
@@ -8362,10 +8362,10 @@ function T1_Face()
     this.style_name = "";
 
     this.num_fixed_sizes = 0;
-    this.available_sizes = new Array();
+    this.available_sizes = [];
 
     this.num_charmaps = 0;
-    this.charmaps = new Array();
+    this.charmaps = [];
 
     this.generic = new FT_Generic();
 
@@ -8394,9 +8394,9 @@ function T1_Face()
     this.memory = null;
     this.stream = null;
 
-    this.sizes_list = new Array();
+    this.sizes_list = [];
 
-    this.autohint = new Array();
+    this.autohint = [];
     this.extensions = null;
 
     this.internal = null;
@@ -8451,10 +8451,10 @@ function CID_Face()
     this.style_name = "";
 
     this.num_fixed_sizes = 0;
-    this.available_sizes = new Array();
+    this.available_sizes = [];
 
     this.num_charmaps = 0;
-    this.charmaps = new Array();
+    this.charmaps = [];
 
     this.generic = new FT_Generic();
 
@@ -8483,9 +8483,9 @@ function CID_Face()
     this.memory = null;
     this.stream = null;
 
-    this.sizes_list = new Array();
+    this.sizes_list = [];
 
-    this.autohint = new Array();
+    this.autohint = [];
     this.extensions = null;
 
     this.internal = null;
@@ -27155,9 +27155,9 @@ function TT_Face()
     this.memory = null;
     this.stream = null;
 
-    this.sizes_list = new Array();
+    this.sizes_list = [];
 
-    this.autohint = new Array();
+    this.autohint = [];
     this.extensions = null;
 
     this.internal = null;
@@ -27238,7 +27238,7 @@ function TT_Face()
     // the format 0 kerning table, if any
     this.num_kern_pairs = 0;
     this.kern_table_index = 0;
-    this.kern_pairs = new Array();
+    this.kern_pairs = [];
     //#endif
 
     // A pointer to the bytecode interpreter to use.  This is also
@@ -30674,7 +30674,7 @@ function TT_Driver()
     this.generic = null;    // FT_Generic
 
     this.clazz = new TT_Driver_Class();
-    this.faces_list = new Array();
+    this.faces_list = [];
     this.extensions = null;
     this.glyph_loader = null;
 
@@ -31043,7 +31043,7 @@ function CFF_SubFontRec()
     this.private_dict = new CFF_PrivateRec();
 
     this.local_subrs_index = new CFF_IndexRec();
-    this.local_subrs = new Array(); /* array of pointers into Local Subrs INDEX data */
+    this.local_subrs = []; /* array of pointers into Local Subrs INDEX data */
 }
 
 function CFF_FontRec()
@@ -31074,7 +31074,7 @@ function CFF_FontRec()
     this.font_name = "";
 
     /* array of pointers into Global Subrs INDEX data */
-    this.global_subrs = new Array();
+    this.global_subrs = [];
 
     /* array of pointers into String INDEX data stored at string_pool */
     this.num_strings = 0;
@@ -36712,7 +36712,7 @@ function CFF_Driver()
     this.generic = null;    // FT_Generic
 
     this.clazz = new CFF_Driver_Class();
-    this.faces_list = new Array();
+    this.faces_list = [];
     this.extensions = null;
     this.glyph_loader = null;
 
@@ -40350,7 +40350,7 @@ function T1_Driver()
     this.generic = null;    // FT_Generic
 
     this.clazz = new T1_Driver_Class();
-    this.faces_list = new Array();
+    this.faces_list = [];
     this.extensions = null;
     this.glyph_loader = null;
 
@@ -40408,8 +40408,8 @@ function FT_Library()
     this.version_minor = 4;
     this.version_patch = 8;
 
-    this.modules = new Array();
-    this.renderers = new Array();
+    this.modules = [];
+    this.renderers = [];
     this.cur_renderer = null;
     this.auto_hinter = null;
 

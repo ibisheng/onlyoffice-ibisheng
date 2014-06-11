@@ -74,14 +74,14 @@ function CSelectedElement(Element, SelectedAll)
 
 function CSelectedContent()
 {
-    this.Elements = new Array();
+    this.Elements = [];
 }
 
 CSelectedContent.prototype =
 {
     Reset : function()
     {
-        this.Elements = new Array();
+        this.Elements = [];
     },
 
     Add : function(Element)
@@ -130,7 +130,7 @@ function CDocumentPage()
     this.XLimit = 0;
     this.YLimit = 0;
 
-    this.EndSectionParas = new Array();
+    this.EndSectionParas = [];
 }
 
 CDocumentPage.prototype =
@@ -431,7 +431,7 @@ function CDocument(DrawingDocument)
     this.SectPr = new CSectionPr(this);
     this.SectionsInfo = new CDocumentSectionsInfo();
 
-    this.Content = new Array();
+    this.Content = [];
     this.Content[0] = new Paragraph( DrawingDocument, this, 0, 0, 0, 0, 0 );
     this.Content[0].Set_DocumentNext( null );
     this.Content[0].Set_DocumentPrev( null );
@@ -460,7 +460,7 @@ function CDocument(DrawingDocument)
     };
 
     // Здесь мы храним инфрмацию, связанную с разбивкой на страницы и самими страницами
-    this.Pages = new Array();
+    this.Pages = [];
 
     this.RecalcInfo = new CDocumentRecalcInfo();
 
@@ -3645,7 +3645,7 @@ CDocument.prototype =
                                     Item.Selection.StartPos.Pos = { Row : LastRow.Index, Cell : LastRow.Get_CellsCount() - 1 };
                                     Item.Selection.EndPos.Pos   = { Row : LastRow.Index, Cell : 0 };
                                     Item.CurCell = LastRow.Get_Cell( 0 );
-                                    Item.Selection.Data = new Array();
+                                    Item.Selection.Data = [];
 
                                     for ( var CellIndex = 0; CellIndex < LastRow.Get_CellsCount(); CellIndex++ )
                                     {
@@ -3735,7 +3735,7 @@ CDocument.prototype =
                                     Item.Selection.StartPos.Pos = { Row : LastRow.Index, Cell : LastRow.Get_CellsCount() - 1 };
                                     Item.Selection.EndPos.Pos   = { Row : LastRow.Index, Cell : 0 };
                                     Item.CurCell = LastRow.Get_Cell( 0 );
-                                    Item.Selection.Data = new Array();
+                                    Item.Selection.Data = [];
 
                                     for ( var CellIndex = 0; CellIndex < LastRow.Get_CellsCount(); CellIndex++ )
                                     {
@@ -3839,7 +3839,7 @@ CDocument.prototype =
                                     Item.Selection.StartPos.Pos = { Row : 0, Cell : 0 };
                                     Item.Selection.EndPos.Pos   = { Row : 0, Cell : FirstRow.Get_CellsCount() - 1 };
                                     Item.CurCell = FirstRow.Get_Cell( FirstRow.Get_CellsCount() - 1 );
-                                    Item.Selection.Data = new Array();
+                                    Item.Selection.Data = [];
 
                                     for ( var CellIndex = 0; CellIndex < FirstRow.Get_CellsCount(); CellIndex++ )
                                     {
@@ -3932,7 +3932,7 @@ CDocument.prototype =
                                     Item.Selection.StartPos.Pos = { Row : 0, Cell : 0 };
                                     Item.Selection.EndPos.Pos   = { Row : 0, Cell : FirstRow.Get_CellsCount() - 1 };
                                     Item.CurCell = FirstRow.Get_Cell( FirstRow.Get_CellsCount() - 1 );
-                                    Item.Selection.Data = new Array();
+                                    Item.Selection.Data = [];
 
                                     for ( var CellIndex = 0; CellIndex < FirstRow.Get_CellsCount(); CellIndex++ )
                                     {
@@ -7251,7 +7251,7 @@ CDocument.prototype =
 
     Get_AllParagraphs_ByNumbering : function(NumPr)
     {
-        var ParaArray = new Array();
+        var ParaArray = [];
 
         this.SectionsInfo.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
 
@@ -7532,7 +7532,7 @@ CDocument.prototype =
         var EndPos   = Math.min( this.Pages[PageNum].EndPos, this.Content.length - 1 );
 
         // Сохраним позиции всех Inline элементов на данной странице
-        var InlineElements = new Array();
+        var InlineElements = [];
         for ( var Index = StartPos; Index <= EndPos; Index++ )
         {
             var Item = this.Content[Index];
@@ -8423,7 +8423,7 @@ CDocument.prototype =
             var Para = NearPos.Paragraph;
 
             // Заполним массив для проверки лока
-            var ArrayForCheck = new Array();
+            var ArrayForCheck = [];
             var Count = DocContent.Elements.length;
             for ( var Index = 0; Index < Count; Index++ )
             {
@@ -8708,7 +8708,7 @@ CDocument.prototype =
 
         this.Selection.Use  = true;
         this.Selection.Flag = selectionflag_Numbering;
-        this.Selection.Data = new Array();
+        this.Selection.Data = [];
 
         for ( var Index = 0; Index < this.Content.length; Index++ )
         {
@@ -11528,7 +11528,7 @@ CDocument.prototype =
                 {
                     // Выделение нумерации
                     if ( selectionflag_Numbering == this.Selection.Flag )
-                        State = new Array();
+                        State = [];
                     else
                     {
                         var StartPos = this.Selection.StartPos;
@@ -11540,9 +11540,9 @@ CDocument.prototype =
                             EndPos   = Temp;
                         }
 
-                        State = new Array();
+                        State = [];
 
-                        var TempState = new Array();
+                        var TempState = [];
                         for ( var Index = StartPos; Index <= EndPos; Index++ )
                         {
                             TempState.push( this.Content[Index].Get_SelectionState() );
@@ -12954,7 +12954,7 @@ CDocument.prototype =
         var PageNumStart = this.SectionsInfo.Get_SectPr2(SectIndex).SectPr.Get_PageNum_Start();
         var BreakType    = this.SectionsInfo.Get_SectPr2(SectIndex).SectPr.Get_Type();
         
-        var StartInfo = new Array();
+        var StartInfo = [];
         StartInfo.push( { FirstPage : FirstPage, BreakType : BreakType } );
 
         while ( PageNumStart < 0 && SectIndex > 0 )
@@ -13200,7 +13200,7 @@ function CDocumentSelectionState()
 
 function CDocumentSectionsInfo()
 {
-    this.Elements = new Array();
+    this.Elements = [];
 }
 
 CDocumentSectionsInfo.prototype =

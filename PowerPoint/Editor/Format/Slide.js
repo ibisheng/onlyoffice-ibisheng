@@ -40,8 +40,8 @@ function Slide(presentation, slideLayout, slideNum)
     this.Width = 254;
     this.Height = 190.5;
 
-    this.searchingArray = new Array();  // массив объектов для селекта
-    this.selectionArray = new Array();  // массив объектов для поиска
+    this.searchingArray = [];  // массив объектов для селекта
+    this.selectionArray = [];  // массив объектов для поиска
 
 
     this.comments = [];

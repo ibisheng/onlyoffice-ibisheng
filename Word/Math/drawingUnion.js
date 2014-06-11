@@ -49,8 +49,8 @@ function DrawUnion()
 
     var gap = 0.93*betta;
 
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     /*X[0] = 10125;  Y[0] = 56563;
     X[1] = 10125;  Y[1] = 0;
@@ -183,8 +183,8 @@ function DrawUnion()
         Y[22 - i] = Y[i];
     }
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
     for(var i = 0; i < 23; i++)
     {

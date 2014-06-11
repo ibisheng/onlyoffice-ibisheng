@@ -45,11 +45,11 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
 
     this.RecalcInfo = new CParaRecalcInfo();
 
-    this.Pages = new Array(); // Массив страниц (CParaPage)
-    this.Lines = new Array(); // Массив строк (CParaLine)
+    this.Pages = []; // Массив страниц (CParaPage)
+    this.Lines = []; // Массив строк (CParaLine)
 
     // Добавляем в контент элемент "конец параграфа"
-    this.Content = new Array();
+    this.Content = [];
     this.Content[0] = new ParaEnd();
     this.Content[1] = new ParaEmpty();
 
@@ -203,7 +203,7 @@ Paragraph.prototype =
 
     Get_AllDrawingObjects: function (DrawingObjs) {
         if (undefined === DrawingObjs)
-            DrawingObjs = new Array();
+            DrawingObjs = [];
 
         var Count = this.Content.length;
         for (var Pos = 0; Pos < Count; Pos++) {
@@ -400,7 +400,7 @@ Paragraph.prototype =
     // Добавляем несколько элементов в конец параграфа.
     Internal_Content_Concat: function (Items) {
         // Добавляем только постоянные элементы параграфа
-        var NewItems = new Array();
+        var NewItems = [];
         var ItemsCount = Items.length;
         for (var Index = 0; Index < ItemsCount; Index++) {
             if (true === Items[Index].Is_RealContent())
@@ -512,7 +512,7 @@ Paragraph.prototype =
         var LastArray = this.Content.slice(Pos, Pos + Count);
 
         // Добавляем только постоянные элементы параграфа
-        var LastItems = new Array();
+        var LastItems = [];
         var ItemsCount = LastArray.length;
         for (var Index = 0; Index < ItemsCount; Index++) {
             if (true === LastArray[Index].Is_RealContent())
@@ -1064,7 +1064,7 @@ Paragraph.prototype =
                                         var TabsCount = ParaPr.Tabs.Get_Count();
 
                                         // Добавим в качестве таба левую границу
-                                        var TabsPos = new Array();
+                                        var TabsPos = [];
                                         var bCheckLeft = true;
                                         for (var Index = 0; Index < TabsCount; Index++) {
                                             var Tab = ParaPr.Tabs.Get(Index);
@@ -1598,7 +1598,7 @@ Paragraph.prototype =
                         var TabsCount = ParaPr.Tabs.Get_Count();
 
                         // Добавим в качестве таба левую границу
-                        var TabsPos = new Array();
+                        var TabsPos = [];
                         var bCheckLeft = true;
                         for (var Index = 0; Index < TabsCount; Index++) {
                             var Tab = ParaPr.Tabs.Get(Index);
@@ -2114,7 +2114,7 @@ Paragraph.prototype =
                 if (true === this.Use_Wrap())
                     Ranges2 = this.Parent.CheckRange(Left, Top, Right, Bottom, Top2, Bottom2, PageFields.X, PageFields.XLimit, this.PageNum + CurPage, true);
                 else
-                    Ranges2 = new Array();
+                    Ranges2 = [];
 
                 // Проверяем совпали ли промежутки. Если совпали, тогда данная строчка рассчитана верно,
                 // и мы переходим к следующей, если нет, тогда заново рассчитываем данную строчку, но
@@ -7916,7 +7916,7 @@ Paragraph.prototype =
         // Рассчитаем количество табов, идущих в начале параграфа
         var Count = this.Content.length;
         var TabsCount = 0;
-        var TabsPos = new Array();
+        var TabsPos = [];
         for (var Pos = 0; Pos < Count; Pos++) {
             var Item = this.Content[Pos];
             var ItemType = Item.Type;
@@ -9144,7 +9144,7 @@ Paragraph.prototype =
 
         var StartPage = this.Get_StartPage_Absolute();
 
-        var SearchResults = new Array();
+        var SearchResults = [];
 
         // Сначала найдем элементы поиска в данном параграфе
         for (var Pos = 0; Pos < this.Content.length; Pos++) {
@@ -11726,7 +11726,7 @@ Paragraph.prototype =
         CollaborativeEditing.Add_LinkData(this, LinkData);
 
 
-        this.Content = new Array();
+        this.Content = [];
         var Count = Reader.GetLong();
         for (var Index = 0; Index < Count; Index++) {
             var Element = ParagraphContent_Read_FromBinary(Reader);
@@ -12167,7 +12167,7 @@ function CParaLine(StartPos)
     this.Words     = 0;
     this.Spaces    = 0; // Количество пробелов между словами в строке (пробелы, идущие в конце строки, не учитываются)
     this.Metrics   = new CParaLineMetrics();
-    this.Ranges    = new Array(); // Массив CParaLineRanges
+    this.Ranges    = []; // Массив CParaLineRanges
     this.RangeY    = false;
     this.StartPos  = StartPos; // Позиция в контенте параграфа, с которой начинается данная строка
     this.EndPos    = StartPos; // Позиция последнего элемента в данной строке
@@ -12205,7 +12205,7 @@ CParaLine.prototype =
         this.Words    = 0;
         this.Spaces   = 0; // Количество пробелов между словами в строке (пробелы, идущие в конце строки, не учитываются)
         this.Metrics  = new CParaLineMetrics();
-        this.Ranges   = new Array(); // Массив CParaLineRanges
+        this.Ranges   = []; // Массив CParaLineRanges
         //this.RangeY   = false;
         this.StartPos = StartPos;
     },
@@ -12479,7 +12479,7 @@ function CParaDrawingRangeLinesElement(y0, y1, x0, x1, w, r, g, b, Additional)
 
 function CParaDrawingRangeLines()
 {
-    this.Elements = new Array();
+    this.Elements = [];
 }
 
 CParaDrawingRangeLines.prototype =
@@ -12523,7 +12523,7 @@ CParaDrawingRangeLines.prototype =
         if ( Count <= 0 )
             return;
 
-        var CurElements = new Array();
+        var CurElements = [];
         for ( var Index = 0; Index < Count; Index++ )
         {
             var Element = this.Elements[Index];

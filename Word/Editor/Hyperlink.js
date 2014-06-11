@@ -16,7 +16,7 @@ function ParaHyperlink()
     this.State = new CParaRunState();
     this.Selection = this.State.Selection;
 
-    this.Content = new Array();
+    this.Content = [];
 
     this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
 
@@ -29,9 +29,9 @@ function ParaHyperlink()
 
     this.Range = this.Lines[0].Ranges[0];
 
-    this.NearPosArray  = new Array();
-    this.SearchMarks   = new Array();
-    this.SpellingMarks = new Array();
+    this.NearPosArray  = [];
+    this.SearchMarks   = [];
+    this.SpellingMarks = [];
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -2226,7 +2226,7 @@ ParaHyperlink.prototype =
         this.ToolTip = Reader.GetString2();
 
         var Count = Reader.GetLong();
-        this.Content = new Array();
+        this.Content = [];
 
         for ( var Index = 0; Index < Count; Index++ )
         {

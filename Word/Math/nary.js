@@ -672,8 +672,8 @@ CNaryOperator.prototype.drawGlyph = function(x, y,pGraphics)
     var X = coord.X,
         Y = coord.Y;
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
     //var textScale = this.getTxtPrp().FontSize/850; // 1000 pt
     var textScale = this.Get_CompiledCtrPrp().FontSize/850; // 1000 pt
@@ -796,8 +796,8 @@ CSigma.prototype.drawPath = function(pGraphics, XX, YY)
 }
 CSigma.prototype.getCoord = function()
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     /*X[0] = 13560; Y[0] = 4332;
      X[1] = 33847; Y[1] = 35130;
@@ -1010,8 +1010,8 @@ CProduct.prototype.drawPath = function(pGraphics, XX, YY)
 }
 CProduct.prototype.getCoord = function()
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 67894; Y[0] = 0;
     X[1] = 67894; Y[1] = 2245;
@@ -1150,8 +1150,8 @@ CUnion.prototype.drawPath = function(pGraphics, XX, YY)
 }
 CUnion.prototype.getCoord = function()
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 49526.184566929136; Y[0] = 127087.84;
     X[1] = 33974.37429971653; Y[1] = 127877.20000000001;
@@ -1213,8 +1213,8 @@ CLogicalOr.prototype.drawPath = function(pGraphics, XX, YY)
 }
 CLogicalOr.prototype.old_getCoord = function()
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 73240; Y[0] = 0;
     X[1] = 38428; Y[1] = 89801;
@@ -1288,8 +1288,8 @@ CLogicalOr.prototype.old_getCoord = function()
 }
 CLogicalOr.prototype.getCoord = function()
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 0; Y[0] = 0;
     X[1] = 34812; Y[1] = 89801;
@@ -1355,8 +1355,8 @@ function CIntegral()
 extend(CIntegral, CNaryOperator);
 CIntegral.prototype.getCoord = function()
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     //top
     X[0] = 20407; Y[0] = 65723;
@@ -1436,8 +1436,8 @@ CIntegral.prototype.getCoord = function()
 }
 CIntegral.prototype.old_getCoord = function()
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 20407; Y[0] = 65723;
     X[1] = 20407; Y[1] = 60840;
@@ -1611,8 +1611,8 @@ CDoubleIntegral.prototype.drawPath = function(pGraphics, XX, YY)
 {
     // XX[9] - ширина
 
-    var XX2 = new Array(),
-        YY2 = new Array();
+    var XX2 = [],
+        YY2 = [];
     var w = (XX[9] - XX[29])*0.6;
 
     for(var i = 0; i < XX.length; i++)
@@ -1676,12 +1676,12 @@ CTripleIntegral.prototype.drawPath = function(pGraphics, XX, YY)
 {
     // XX[9] - ширина
 
-    var XX2 = new Array(),
-        YY2 = new Array();
+    var XX2 = [],
+        YY2 = [];
     var w = (XX[9] - XX[29])*0.6;
 
-    var XX3 = new Array(),
-        YY3 = new Array();
+    var XX3 = [],
+        YY3 = [];
 
     for(var i = 0; i < XX.length; i++)
     {
@@ -1895,8 +1895,8 @@ function old_CCircle()
 }
 old_CCircle.prototype.getCoord = function()
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     // black circle
     X[0] = 21427.6; Y[0] = 29688.65;
@@ -1973,8 +1973,8 @@ function CCircle()
 }
 CCircle.prototype.getCoord = function()
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 18345.98; Y[0] = 0;
     X[1] = 25288.35; Y[1] = 1008.1;
@@ -2056,8 +2056,8 @@ function old_CSurface()
 }
 old_CSurface.prototype.getCoord = function()
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 42579; Y[0] = 9454;
     X[1] = 38281; Y[1] = 9454;
@@ -2316,8 +2316,8 @@ function CSurface()
 }
 CSurface.prototype.getCoord = function()
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 24855.55; Y[0] = 312.82;
     X[1] = 27995.71; Y[1] = 0;
@@ -2428,8 +2428,8 @@ function CVolume()
 }
 CVolume.prototype.getCoord = function()
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 24086.6; Y[0] = 1584.99;
     X[1] = 25878.03; Y[1] = 1268.19;
@@ -2559,8 +2559,8 @@ function _old_CContourIntegral()
 extend(_old_CContourIntegral, CNaryOperator);
 _old_CContourIntegral.prototype.old_getCoord = function()
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 40566; Y[0] = 9456;
     X[1] = 36276; Y[1] = 9456;
@@ -2687,8 +2687,8 @@ _old_CContourIntegral.prototype.old_getCoord = function()
 }
 _old_CContourIntegral.prototype.calculate_getCoord = function()
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     /*X[0] = 40566; Y[0] = 9456;
      X[1] = 36276; Y[1] = 9456;
@@ -2862,8 +2862,8 @@ _old_CContourIntegral.prototype.calculate_getCoord = function()
 }
 _old_CContourIntegral.prototype.getCoord = function()
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     // black circle
     X[0] = 21427.6; Y[0] = 29688.65;
@@ -3261,8 +3261,8 @@ function old_CSurfaceIntegral()
 extend(old_CSurfaceIntegral, CNaryOperator);
 old_CSurfaceIntegral.prototype.draw = function()
 {
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
     XX[0] = 42579; YY[0] = 9454;
     XX[1] = 38281; YY[1] = 9454;
@@ -3792,8 +3792,8 @@ old_CVolumeIntegral.prototype.draw = function()
     var textScale = this.params.font.FontSize/850; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
 
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 34850; Y[0] = 8038;
     X[1] = 31195; Y[1] = 8038;
@@ -4010,8 +4010,8 @@ old_CVolumeIntegral.prototype.draw = function()
     X[212] = 76956; Y[212] = 47552;
 
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
     for(var i = 0 ; i < X.length; i++)
     {

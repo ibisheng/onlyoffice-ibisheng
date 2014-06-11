@@ -49,8 +49,8 @@ CAccentCircumflex.prototype.calcCoord = function(stretch)
     var textScale = fontSize/1000, // 1000 pt
         alpha = textScale*25.4/96 /64;
 
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 0; Y[0] = 2373;
     X[1] = 9331; Y[1] = 15494;
@@ -63,8 +63,8 @@ CAccentCircumflex.prototype.calcCoord = function(stretch)
     X[8] = 0; Y[8] = 2373;
 
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
     var W = stretch/alpha;
 
@@ -72,7 +72,7 @@ CAccentCircumflex.prototype.calcCoord = function(stretch)
         a2 = X[4] - X[7], b2 = W - 2*X[7],   c2 = X[5] - X[6] ; //X[8] = 0
 
 
-    var RX = new Array();
+    var RX = [];
     for(var i = 0; i < X.length; i++)
         RX[i] = 1;
 
@@ -138,8 +138,8 @@ CAccentLine.prototype.calcCoord = function(stretch)
 {
     var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
 
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 0;          Y[0] = 0;
     X[1] = stretch;    Y[1] = 0;
@@ -182,8 +182,8 @@ CAccentDoubleLine.prototype.calcCoord = function(stretch)
 {
     var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
 
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 0;          Y[0] = 0;
     X[1] = stretch;    Y[1] = 0;
@@ -237,8 +237,8 @@ CAccentTilde.prototype.calcSize = function(stretch)
 }
 CAccentTilde.prototype.calcCoord = function(stretch)
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 0; Y[0] = 3066;
     X[1] = 2125; Y[1] = 7984;
@@ -269,8 +269,8 @@ CAccentTilde.prototype.calcCoord = function(stretch)
     X[26] = 0; Y[26] = 3066;
 
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
     var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
     var textScale = fontSize/1000, // 1000 pt
@@ -324,8 +324,8 @@ CAccentBreve.prototype.calcSize = function(stretch)
 }
 CAccentBreve.prototype.calcCoord = function(stretch)
 {
-    var X = new Array(),
-        Y = new Array();
+    var X = [],
+        Y = [];
 
     X[0] = 25161; Y[0] = 11372;
     X[1] = 24077; Y[1] = 5749;
@@ -352,8 +352,8 @@ CAccentBreve.prototype.calcCoord = function(stretch)
     X[22] = 25161; Y[22] = 11372;
 
 
-    var XX = new Array(),
-        YY = new Array();
+    var XX = [],
+        YY = [];
 
     var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
     var textScale = fontSize/1000, // 1000 pt

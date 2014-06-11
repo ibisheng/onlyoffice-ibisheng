@@ -18,8 +18,8 @@ function CParagraphSearchElement(StartPos, EndPos, Type, Id)
     this.ResultStr = "";
     this.Id        = Id;
 
-    this.ClassesS = new Array();
-    this.ClassesE = new Array();
+    this.ClassesS = [];
+    this.ClassesE = [];
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ function CDocumentSearch()
 
     this.Id            = 0;
     this.Count         = 0;
-    this.Elements      = new Array();
+    this.Elements      = [];
     this.CurId         = -1;
     this.Direction     = true; // направление true - вперед, false - назад
     this.ClearOnRecalc = true; // Флаг, говорящий о том, запустился ли пересчет из-за Replace
@@ -538,7 +538,7 @@ CDocumentSectionsInfo.prototype.Search = function(Str, Props, SearchEngine)
 
 CDocumentSectionsInfo.prototype.Search_GetId = function(bNext, CurHdrFtr)
 {       
-    var HdrFtrs = new Array();
+    var HdrFtrs = [];
     var CurPos  = -1;
 
     var bEvenOdd = EvenAndOddHeaders;
@@ -1204,7 +1204,7 @@ Paragraph.prototype.Remove_SearchResult = function(Id)
 //----------------------------------------------------------------------------------------------------------------------
 ParaRun.prototype.Search = function(ParaSearch, Depth)
 {
-    this.SearchMarks = new Array();
+    this.SearchMarks = [];
 
     var Para         = ParaSearch.Paragraph;
     var Str          = ParaSearch.Str;
@@ -1269,7 +1269,7 @@ ParaRun.prototype.Add_SearchResult = function(SearchResult, Start, ContentPos, D
 
 ParaRun.prototype.Clear_SearchResults = function()
 {
-    this.SearchMarks = new Array();
+    this.SearchMarks = [];
 };
 
 ParaRun.prototype.Remove_SearchResult = function(SearchResult)
@@ -1376,7 +1376,7 @@ ParaRun.prototype.Search_GetId = function(bNext, bUseContentPos, ContentPos, Dep
 //----------------------------------------------------------------------------------------------------------------------
 ParaHyperlink.prototype.Search = function(ParaSearch, Depth)
 {
-    this.SearchMarks = new Array();
+    this.SearchMarks = [];
 
     var ContentLen = this.Content.length;
     for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
@@ -1403,7 +1403,7 @@ ParaHyperlink.prototype.Add_SearchResult = function(SearchResult, Start, Content
 
 ParaHyperlink.prototype.Clear_SearchResults = function()
 {
-    this.SearchMarks = new Array();
+    this.SearchMarks = [];
 };
 
 ParaHyperlink.prototype.Remove_SearchResult = function(SearchResult)

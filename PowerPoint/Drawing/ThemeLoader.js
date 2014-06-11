@@ -7,7 +7,7 @@ function CThemeLoadInfo()
 
     this.Theme = null;
     this.Master = null;
-    this.Layouts = new Array();
+    this.Layouts = [];
 }
 
 function CThemeLoader()
@@ -15,12 +15,12 @@ function CThemeLoader()
     this.Themes = new CAscThemes();
 
     // editor themes info
-    this.themes_info_editor     = new Array();
+    this.themes_info_editor     = [];
     var count = this.Themes.EditorThemes.length;
     for (var i = 0; i < count; i++)
         this.themes_info_editor[i] = null;
 
-    this.themes_info_document   = new Array();
+    this.themes_info_document   = [];
 
     this.Api = null;
     this.CurrentLoadThemeIndex = -1;
@@ -109,9 +109,9 @@ function CThemeLoader()
             _loader.IsThemeLoader = true;
 
             var pres = new Object();
-            pres.themes = new Array();
-            pres.slideMasters = new Array();
-            pres.slideLayouts = new Array();
+            pres.themes = [];
+            pres.slideMasters = [];
+            pres.slideLayouts = [];
 
             _loader.Load(g_th, pres);
 

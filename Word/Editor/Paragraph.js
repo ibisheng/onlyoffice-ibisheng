@@ -67,8 +67,8 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
 
     this.RecalcInfo = new CParaRecalcInfo();
 
-    this.Pages = new Array(); // Массив страниц (CParaPage)
-    this.Lines = new Array(); // Массив строк (CParaLine)
+    this.Pages = []; // Массив страниц (CParaPage)
+    this.Lines = []; // Массив строк (CParaLine)
 
     this.Numbering = new ParaNumbering();
     this.ParaEnd   =
@@ -139,10 +139,10 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
 
     this.SpellChecker  = new CParaSpellChecker(this);
 
-    this.NearPosArray  = new Array();
+    this.NearPosArray  = [];
 
     // Добавляем в контент элемент "конец параграфа"
-    this.Content = new Array();
+    this.Content = [];
     var EndRun = new ParaRun(this);
     EndRun.Add_ToContent( 0, new ParaEnd() );
 
@@ -266,7 +266,7 @@ Paragraph.prototype =
     Get_AllDrawingObjects : function(DrawingObjs)
     {
         if ( undefined === DrawingObjs )
-            DrawingObjs = new Array();
+            DrawingObjs = [];
 
         var Count = this.Content.length;
         for ( var Pos = 0; Pos < Count; Pos++ )
@@ -696,7 +696,7 @@ Paragraph.prototype =
     // Удаляем несколько элементов
     Internal_Content_Remove2 : function(Pos, Count)
     {
-        var CommentsToDelete = new Array();
+        var CommentsToDelete = [];
         if ( true === this.DeleteCommentOnRemove && null !== this.LogicDocument )
         {
             var DocumentComments = this.LogicDocument.Comments;
@@ -1382,7 +1382,7 @@ Paragraph.prototype =
                                         var TabsCount = ParaPr.Tabs.Get_Count();
 
                                         // Добавим в качестве таба левую границу
-                                        var TabsPos = new Array();
+                                        var TabsPos = [];
                                         var bCheckLeft = true;
                                         for ( var Index = 0; Index < TabsCount; Index++ )
                                         {
@@ -2000,7 +2000,7 @@ Paragraph.prototype =
                         var TabsCount = ParaPr.Tabs.Get_Count();
 
                         // Добавим в качестве таба левую границу
-                        var TabsPos = new Array();
+                        var TabsPos = [];
                         var bCheckLeft = true;
                         for ( var Index = 0; Index < TabsCount; Index++ )
                         {
@@ -2572,7 +2572,7 @@ Paragraph.prototype =
                 if ( true === this.Use_Wrap() )
                     Ranges2 = this.Parent.CheckRange( Left, Top, Right, Bottom, Top2, Bottom2, PageFields.X, PageFields.XLimit, this.PageNum + CurPage, true );
                 else
-                    Ranges2 = new Array();
+                    Ranges2 = [];
 
                 // Проверяем совпали ли промежутки. Если совпали, тогда данная строчка рассчитана верно,
                 // и мы переходим к следующей, если нет, тогда заново рассчитываем данную строчку, но
@@ -4213,7 +4213,7 @@ Paragraph.prototype =
         if ( true === this.Use_Wrap() )
             Ranges2 = this.Parent.CheckRange( Left, Top, Right, Bottom, Top2, Bottom2, PageFields.X, PageFields.XLimit, this.PageNum + CurPage, true );
         else
-            Ranges2 = new Array();
+            Ranges2 = [];
 
         // Проверяем совпали ли промежутки. Если совпали, тогда данная строчка рассчитана верно, и мы переходим к
         // следующей, если нет, тогда заново рассчитываем данную строчку, но с новыми промежутками.
@@ -4666,7 +4666,7 @@ Paragraph.prototype =
                     DrawingObjects.removeById( Item.PageNum, Item.Get_Id() );
                 }
 
-                this.Pages[TempPage].Drawings = new Array();
+                this.Pages[TempPage].Drawings = [];
             }
         }
 
@@ -5026,7 +5026,7 @@ Paragraph.prototype =
         var TabsCount = ParaPr.Tabs.Get_Count();
 
         // Добавим в качестве таба левую границу
-        var TabsPos = new Array();
+        var TabsPos = [];
         var bCheckLeft = true;
         for ( var Index = 0; Index < TabsCount; Index++ )
         {
@@ -5521,7 +5521,7 @@ Paragraph.prototype =
         if ( true !== Debug_ParaRunMode )
         {
             // Сбрасываем массив NearPos
-            this.NearPosArray = new Array();
+            this.NearPosArray = [];
 
             // Во время пересчета сбрасываем привязку курсора к строке.
             this.CurPos.Line = -1;
@@ -13885,7 +13885,7 @@ Paragraph.prototype =
         // Рассчитаем количество табов, идущих в начале параграфа
         var Count = this.Content.length;
         var TabsCount = 0;
-        var TabsPos = new Array();
+        var TabsPos = [];
         for ( var Pos = 0; Pos < Count; Pos++ )
         {
             var Item = this.Content[Pos];
@@ -15449,11 +15449,11 @@ Paragraph.prototype =
             for ( var Pos2 = 1; Pos2 < ArrayLen2; Pos2++ )
             {
                 var Class = ParaNearPos.Classes[Pos2];
-                Class.NearPosArray = new Array();
+                Class.NearPosArray = [];
             }
         }
 
-        this.NearPosArray = new Array();
+        this.NearPosArray = [];
     },
 
     Get_ParaNearestPos : function(NearPos)
@@ -16483,7 +16483,7 @@ Paragraph.prototype =
 
     Internal_Get_FrameParagraphs : function()
     {
-        var FrameParas = new Array();
+        var FrameParas = [];
 
         var FramePr = this.Get_FramePr();
         if ( undefined === FramePr )
@@ -19303,7 +19303,7 @@ Paragraph.prototype =
             CollaborativeEditing.Add_LinkData(this, LinkData);
 
 
-            this.Content = new Array();
+            this.Content = [];
             var Count = Reader.GetLong();
             for ( var Index = 0; Index < Count; Index++ )
             {
@@ -19338,7 +19338,7 @@ Paragraph.prototype =
             LinkData.TextPr = Reader.GetString2();
             CollaborativeEditing.Add_LinkData(this, LinkData);
 
-            this.Content = new Array();
+            this.Content = [];
             var Count = Reader.GetLong();
             for ( var Index = 0; Index < Count; Index++ )
             {
@@ -20121,7 +20121,7 @@ function CParaLine(StartPos)
     this.Words     = 0;
     this.Spaces    = 0; // Количество пробелов между словами в строке (пробелы, идущие в конце строки, не учитываются)
     this.Metrics   = new CParaLineMetrics();
-    this.Ranges    = new Array(); // Массив CParaLineRanges
+    this.Ranges    = []; // Массив CParaLineRanges
     this.RangeY    = false;
     this.StartPos  = StartPos; // Позиция в контенте параграфа, с которой начинается данная строка
     this.EndPos    = StartPos; // Позиция последнего элемента в данной строке
@@ -20204,7 +20204,7 @@ CParaLine.prototype =
         this.Words    = 0;
         this.Spaces   = 0; // Количество пробелов между словами в строке (пробелы, идущие в конце строки, не учитываются)
         this.Metrics  = new CParaLineMetrics();
-        this.Ranges   = new Array(); // Массив CParaLineRanges
+        this.Ranges   = []; // Массив CParaLineRanges
         //this.RangeY   = false;
         this.StartPos = StartPos;
     },
@@ -20418,7 +20418,7 @@ CDocumentBounds.prototype =
 
 function CParagraphPageEndInfo()
 {
-    this.Comments = new Array(); // Массив незакрытых комментариев на данной странице (комментарии, которые были
+    this.Comments = []; // Массив незакрытых комментариев на данной странице (комментарии, которые были
     // открыты до данной страницы и не закрыты на этой тут тоже присутствуют)
 
     this.RunRecalcInfo = null;
@@ -20452,7 +20452,7 @@ function CParaPage(X, Y, XLimit, YLimit, FirstLine)
     this.EndLine   = FirstLine; // Номер последней строки на данной странице
     this.TextPr    = null;      // Расситанные текстовые настройки для начала страницы
 
-    this.Drawings  = new Array();
+    this.Drawings  = [];
     this.EndInfo   = new CParagraphPageEndInfo();
 }
 
@@ -20467,7 +20467,7 @@ CParaPage.prototype =
         this.FirstLine = FirstLine;
         this.Bounds    = new CDocumentBounds( X, Y, XLimit, Y );
         this.StartLine = FirstLine;
-        this.Drawings  = new Array();
+        this.Drawings  = [];
     },
 
     Shift : function(Dx, Dy)
@@ -20546,14 +20546,14 @@ function CParaDrawingRangeLinesElement(y0, y1, x0, x1, w, r, g, b, Additional)
 
 function CParaDrawingRangeLines()
 {
-    this.Elements = new Array();
+    this.Elements = [];
 }
 
 CParaDrawingRangeLines.prototype =
 {
     Clear : function()
     {
-        this.Elements = new Array();
+        this.Elements = [];
     },
 
     Add : function (y0, y1, x0, x1, w, r, g, b, Additional)
@@ -20596,7 +20596,7 @@ CParaDrawingRangeLines.prototype =
         if ( Count <= 0 )
             return;
 
-        var CurElements = new Array();
+        var CurElements = [];
         for ( var Index = 0; Index < Count; Index++ )
         {
             var Element = this.Elements[Index];
@@ -20777,7 +20777,7 @@ function CParagraphRecalculateStateWrap()
     this.Line            = 0;
     this.Range           = 0;
 
-    this.Ranges          = new Array();
+    this.Ranges          = [];
     this.RangesCount     = 0;
 
     this.FirstItemOnLine = true;
@@ -20898,7 +20898,7 @@ CParagraphRecalculateStateWrap.prototype =
 
     Reset_Ranges : function()
     {
-        this.Ranges      = new Array();
+        this.Ranges      = [];
         this.RangesCount = 0;
     },
 
@@ -20960,7 +20960,7 @@ function CParagraphRecalculateStateAlign()
 
 function CParagraphRecalculateStateInfo()
 {
-    this.Comments = new Array();
+    this.Comments = [];
 }
 
 CParagraphRecalculateStateInfo.prototype =
@@ -20973,7 +20973,7 @@ CParagraphRecalculateStateInfo.prototype =
         }
         else
         {
-            this.Comments = new Array();
+            this.Comments = [];
         }
     },
 
@@ -21018,7 +21018,7 @@ function CParagraphDrawStateHightlights()
     this.Comm   = new CParaDrawingRangeLines();
     this.Shd    = new CParaDrawingRangeLines();
 
-    this.Comments     = new Array();
+    this.Comments     = [];
     this.CommentsFlag = comments_NoComment;
 
     this.SearchCounter = 0;
@@ -21050,7 +21050,7 @@ CParagraphDrawStateHightlights.prototype =
         if ( null !== PageEndInfo )
             this.Comments = PageEndInfo.Comments;
         else
-            this.Comments = new Array();
+            this.Comments = [];
 
         this.Check_CommentsFlag();
     },
@@ -21302,7 +21302,7 @@ function CParagraphGetText()
 function CParagraphNearPos()
 {
     this.NearPos = null;
-    this.Classes = new Array();
+    this.Classes = [];
 }
 
 function CParagraphElementNearPos()
@@ -21343,10 +21343,10 @@ function CRunRecalculateObject(StartLine, StartRange)
     this.StartLine   = StartLine;
     this.StartRange  = StartRange
 
-    this.Lines       = new Array(); // CParaRunLines
+    this.Lines       = []; // CParaRunLines
     this.LinesLength = 0;
 
-    this.Content = new Array();
+    this.Content = [];
 }
 
 
@@ -21482,7 +21482,7 @@ CRunRecalculateObject.prototype =
 function CParagraphRunElements(ContentPos, Count)
 {
     this.ContentPos = ContentPos;
-    this.Elements   = new Array();
+    this.Elements   = [];
     this.Count      = Count;
 }
 

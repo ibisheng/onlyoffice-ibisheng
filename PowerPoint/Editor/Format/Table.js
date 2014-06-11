@@ -573,7 +573,7 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
     this.Cols = Cols;
 
     // Массив строк
-    this.Content = new Array();
+    this.Content = [];
     for ( var Index = 0; Index < Rows; Index++ )
     {
         this.Content[Index] = new CTableRow( this, Cols, TableGrid );
@@ -582,14 +582,14 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
     this.Internal_ReIndexing(0);
 
     // Информация о строках (расположение, высота и остальные метрики)
-    this.RowsInfo = new Array();
+    this.RowsInfo = [];
     this.TableRowsBottom = [];
     this.HeaderInfo =
     {
         Count     : 0, // Количество строк, входящих в заголовок
         H         : 0, // Суммарная высота, занимаемая заголовком
         PageIndex : 0, // Страница, на которой лежит исходный заголовок (либо 0, либо 1)
-        Pages     : new Array()
+        Pages     : []
     };
 
     this.Selection =
@@ -657,12 +657,12 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
 
     this.AnchorPosition = new CTableAnchorPosition();
     
-    this.Pages    = new Array();
+    this.Pages    = [];
     this.Pages[0] = new CTablePage(X, Y, XLimit, YLimit, 0, 0 );
 
-    this.MaxTopBorder = new Array();
-    this.MaxBotBorder = new Array();
-    this.MaxBotMargin = new Array();
+    this.MaxTopBorder = [];
+    this.MaxBotBorder = [];
+    this.MaxBotMargin = [];
 
     // Выставляем текущую ячейку
     if ( this.Content.length > 0 )
@@ -1760,7 +1760,7 @@ CTable.prototype =
                 bRecalc_All = true;
 
                 // При изменении Spacing мы должны изменить сетку таблицы
-                var GridKoeff = new Array();
+                var GridKoeff = [];
                 for ( var Index = 0; Index < this.TableGrid.length; Index++ )
                     GridKoeff.push(1);
 
@@ -1775,7 +1775,7 @@ CTable.prototype =
                 }
 
                 var TableGrid_old = this.TableGrid;
-                this.TableGrid = new Array();
+                this.TableGrid = [];
 
                 for ( var Index = 0; Index < TableGrid_old.length; Index++ )
                 {
@@ -2258,7 +2258,7 @@ CTable.prototype =
 
             if(bAllTable)
             {
-                Cells_array = new Array();
+                Cells_array = [];
                 for ( var CurRow = 0; CurRow < this.Content.length; CurRow++ )
                 {
                     var Row = this.Content[CurRow];
@@ -2280,7 +2280,7 @@ CTable.prototype =
                         Cells_array = this.Selection.Data;
                     else if ( false === Props.CellSelect )
                     {
-                        Cells_array = new Array();
+                        Cells_array = [];
                         for ( var CurRow = 0; CurRow < this.Content.length; CurRow++ )
                         {
                             var Row = this.Content[CurRow];
@@ -2800,7 +2800,7 @@ CTable.prototype =
     Get_AllDrawingObjects : function(DrawingObjs)
     {
         if ( undefined === DrawingObjs )
-            DrawingObjs = new Array();
+            DrawingObjs = [];
 
         var Rows_Count = this.Content.length;
         for ( var CurRow = 0; CurRow < Rows_Count; CurRow++ )
@@ -3029,7 +3029,7 @@ CTable.prototype =
 
     Copy : function(Parent)
     {
-        var TableGrid = new Array();
+        var TableGrid = [];
         for ( var Index = 0; Index < this.TableGrid.length; Index++ )
         {
             TableGrid[Index] = this.TableGrid[Index];
@@ -3352,7 +3352,7 @@ CTable.prototype =
 
     Recalculate_MinMaxContentWidth : function()
     {
-        var MinMargin = new Array(), MinContent = new Array(), MaxContent = new Array(), MaxFlags = new Array();
+        var MinMargin = [], MinContent = [], MaxContent = [], MaxFlags = [];
 
         var GridCount = this.TableGrid.length;
         for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
@@ -5169,7 +5169,7 @@ CTable.prototype =
             return;
         }
 
-        var NewSelectionData = new Array();
+        var NewSelectionData = [];
 
         switch ( Type )
         {
@@ -5196,7 +5196,7 @@ CTable.prototype =
 
             case c_oAscTableSelectionType.Row :
             {
-                var Rows_to_select = new Array();
+                var Rows_to_select = [];
 
                 if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type )
                 {
@@ -5949,7 +5949,7 @@ CTable.prototype =
             Data2    : null
         };
 
-        TableState.Selection.Data = new Array();
+        TableState.Selection.Data = [];
         if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type )
         {
             for ( var Index = 0; Index < this.Selection.Data.length; Index++ )
@@ -5963,7 +5963,7 @@ CTable.prototype =
         if ( false === this.Selection.Use || ( true === this.Selection.Use && table_Selection_Text === this.Selection.Type ) )
             State = this.CurCell.Content.Get_SelectionState();
         else
-            State = new Array();
+            State = [];
 
         State.push( TableState );
         return State;
@@ -5998,7 +5998,7 @@ CTable.prototype =
             Data2    : null
         };
 
-        this.Selection.Data = new Array();
+        this.Selection.Data = [];
         if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type )
         {
             for ( var Index = 0; Index < TableState.Selection.Data.length; Index++ )
@@ -6912,7 +6912,7 @@ CTable.prototype =
                 // Array of doubles : массив с размерами сетки
 
                 var Count = Reader.GetLong();
-                var NewGrid = new Array();
+                var NewGrid = [];
 
                 for ( var Index = 0; Index < Count; Index++ )
                     NewGrid.push( Reader.GetDouble() );
@@ -7125,7 +7125,7 @@ CTable.prototype =
         this.Inline = Reader.GetBool();
 
         var GridCount = Reader.GetLong();
-        this.TableGrid = new Array();
+        this.TableGrid = [];
         for ( var Index = 0; Index < GridCount; Index++ )
             this.TableGrid.push( Reader.GetDouble() );
 
@@ -7140,7 +7140,7 @@ CTable.prototype =
         this.Recalc_CompiledPr();
 
         var Count = Reader.GetLong();
-        this.Content = new Array();
+        this.Content = [];
         for ( var Index = 0; Index < Count; Index++ )
         {
             var Row = g_oTableId.Get_ById( Reader.GetString2() );
@@ -7555,16 +7555,16 @@ CTable.prototype =
                     var Dx = _X - (this.X + this.TableSumGrid[Col - 1]);
 
                     // Строим новую секту для таблицы
-                    var Rows_info = new Array();
+                    var Rows_info = [];
 
                     // Если граница, которую мы двигаем не попадает в селект, тогда работает, как будто селекта и нет
                     var bBorderInSelection = false;
                     if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 )
                     {
-                        var CellsFlag = new Array();
+                        var CellsFlag = [];
                         for ( CurRow = 0; CurRow < this.Content.length; CurRow++ )
                         {
-                            CellsFlag[CurRow] = new Array();
+                            CellsFlag[CurRow] = [];
                             Row = this.Content[CurRow];
                             var CellsCount = Row.Get_CellsCount();
                             for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
@@ -7654,7 +7654,7 @@ CTable.prototype =
 
                         for ( CurRow = 0; CurRow < this.Content.length; CurRow++ )
                         {
-                            Rows_info[CurRow]   = new Array();
+                            Rows_info[CurRow]   = [];
                             Row = this.Content[CurRow];
                             var Before_Info = Row.Get_Before();
 
@@ -7795,7 +7795,7 @@ CTable.prototype =
 
                         for ( CurRow = 0; CurRow < this.Content.length; CurRow++ )
                         {
-                            Rows_info[CurRow]   = new Array();
+                            Rows_info[CurRow]   = [];
                             Row = this.Content[CurRow];
                             var Before_Info = Row.Get_Before();
 
@@ -10959,7 +10959,7 @@ CTable.prototype =
         var Grid_start = -1;
         var Grid_end   = -1;
 
-        var RowsInfo = new Array();
+        var RowsInfo = [];
 
         for ( var Index = 0; Index < this.Selection.Data.length; Index++ )
         {
@@ -11130,7 +11130,7 @@ CTable.prototype =
         var Grid_start = -1;
         var Grid_end   = -1;
 
-        var RowsInfo = new Array();
+        var RowsInfo = [];
 
         var Temp = this.Internal_CheckMerge();
         bCanMerge  = Temp.bCanMerge;
@@ -11463,9 +11463,9 @@ CTable.prototype =
         }
 
 
-        var Cells     = new Array();
-        var Cells_pos = new Array();
-        var Rows_     = new Array();
+        var Cells     = [];
+        var Cells_pos = [];
+        var Rows_     = [];
 
         if ( Rows <= 1 )
         {
@@ -11579,7 +11579,7 @@ CTable.prototype =
 
             // Данный массив содержит информацию о том сколько новых колонок
             // было добавлено после i-ой колонки
-            var Grid_Info = new Array();
+            var Grid_Info = [];
             for ( var Index = 0; Index < this.TableGridCalc.length; Index++ )
                 Grid_Info[Index] = 0;
 
@@ -11656,7 +11656,7 @@ CTable.prototype =
                 }
             }
 
-            var TableGrid_old = new Array();
+            var TableGrid_old = [];
             for ( var Index = 0; Index < this.TableGrid.length; Index++ )
                 TableGrid_old[Index] = this.TableGrid[Index];
 
@@ -11757,7 +11757,7 @@ CTable.prototype =
         if ( true === bApplyToInnerTable )
             return;
 
-        var Cells_pos = new Array();
+        var Cells_pos = [];
 
         // Количество, вставляемых строк зависит от того сколько содержится
         // строк в выделении. Если вставляем до, тогда копируем верхнюю строку
@@ -11799,7 +11799,7 @@ CTable.prototype =
 
         // Сначала пробежимся по строке, которую мы будем копировать, и получим
         // всю необходимую информацию.
-        var Cells_info = new Array();
+        var Cells_info = [];
         for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
         {
             var Cell      = Row.Get_Cell( CurCell );
@@ -11863,7 +11863,7 @@ CTable.prototype =
         if ( null != this.Selection.Data )
             this.Selection.Data.length = 0;
         else
-            this.Selection.Data = new Array();
+            this.Selection.Data = [];
 
         this.Selection.Use  = true;
         this.Selection.Type = table_Selection_Cell;
@@ -11898,7 +11898,7 @@ CTable.prototype =
         if ( true === bApplyToInnerTable )
             return true;
 
-        var Rows_to_delete = new Array();
+        var Rows_to_delete = [];
 
         if ( "undefined" === typeof(Ind) || null === Ind )
         {
@@ -12000,7 +12000,7 @@ CTable.prototype =
         if ( false == this.Selection.Use || table_Selection_Text == this.Selection.Type )
             return true;
 
-        var Rows_to_delete = new Array();
+        var Rows_to_delete = [];
         for ( var Index = 0; Index < this.Content.length; Index++ )
             Rows_to_delete[Index] = 0;
 
@@ -12042,7 +12042,7 @@ CTable.prototype =
             return true;
 
         // Найдем правую и левую границы выделенных ячеек.
-        var Cells_pos = new Array();
+        var Cells_pos = [];
 
         if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type )
             Cells_pos = this.Selection.Data;
@@ -12073,13 +12073,13 @@ CTable.prototype =
         // есть пересечение с отрезком [Grid_start, Grid_end], тогда удаляем
         // данную ячейку.
 
-        var Delete_info = new Array();
-        var Rows_info   = new Array();
+        var Delete_info = [];
+        var Rows_info   = [];
 
         for ( var CurRow = 0; CurRow < this.Content.length; CurRow++ )
         {
-            Delete_info[CurRow] = new Array();
-            Rows_info[CurRow]   = new Array();
+            Delete_info[CurRow] = [];
+            Rows_info[CurRow]   = [];
 
             var Row = this.Content[CurRow];
 
@@ -12220,7 +12220,7 @@ CTable.prototype =
         if ( true === bApplyToInnerTable )
             return;
 
-        var Cells_pos = new Array();
+        var Cells_pos = [];
 
         // Количество, вставляемых столбцов зависит от того сколько содержится
         // ячеек в первой строке выделения. Ширина берется у первой ячейки, если
@@ -12276,8 +12276,8 @@ CTable.prototype =
             Width = this.TableSumGrid[LastCell_Grid_end] - this.TableSumGrid[LastCell_Grid_start - 1];
         }
 
-        var Rows_info = new Array();
-        var Add_info = new Array();
+        var Rows_info = [];
+        var Add_info = [];
         if ( true === bBefore )
         {
             // Ищем левую границу выделенных ячеек
@@ -12296,7 +12296,7 @@ CTable.prototype =
             for ( var CurRow = 0; CurRow < this.Content.length; CurRow++ )
             {
                 var Row = this.Content[CurRow];
-                Rows_info[CurRow] = new Array();
+                Rows_info[CurRow] = [];
                 Add_info[CurRow] = 0;
 
                 var Before_Info = Row.Get_Before();
@@ -12369,7 +12369,7 @@ CTable.prototype =
             for ( var CurRow = 0; CurRow < this.Content.length; CurRow++ )
             {
                 var Row = this.Content[CurRow];
-                Rows_info[CurRow] = new Array();
+                Rows_info[CurRow] = [];
                 Add_info[CurRow] = -1;
 
                 var Before_Info = Row.Get_Before();
@@ -12425,7 +12425,7 @@ CTable.prototype =
         if ( null != this.Selection.Data )
             this.Selection.Data.length = 0;
         else
-            this.Selection.Data = new Array();
+            this.Selection.Data = [];
 
         this.Selection.Use  = true;
         this.Selection.Type = table_Selection_Cell;
@@ -12451,7 +12451,7 @@ CTable.prototype =
         var TablePr = this.Get_CompiledPr(false).TablePr;
         if ( true === bCol )
         {
-            var TableGrid_old = new Array();
+            var TableGrid_old = [];
             for ( var TempIndex = 0; TempIndex < this.TableGrid.length; TempIndex++ )
                 TableGrid_old[TempIndex] = this.TableGrid[TempIndex];
 
@@ -12560,11 +12560,11 @@ CTable.prototype =
                     }
                     else
                     {
-                        var Rows_info   = new Array();
+                        var Rows_info   = [];
 
                         for ( var CurRow = 0; CurRow < this.Content.length; CurRow++ )
                         {
-                            Rows_info[CurRow]   = new Array();
+                            Rows_info[CurRow]   = [];
 
                             var Row = this.Content[CurRow];
 
@@ -12672,7 +12672,7 @@ CTable.prototype =
         var TablePr = this.Get_CompiledPr(false).TablePr;
 
         var Grid   = this.TableGrid;
-        var SumGrid = new Array();
+        var SumGrid = [];
 
         var TempSum = 0;
         SumGrid[-1] = 0;
@@ -12747,7 +12747,7 @@ CTable.prototype =
         else if ( MinWidth > SumGrid[SumGrid.length - 1] )
             SumGrid = this.Internal_ScaleTableWidth( SumGrid, SumGrid[SumGrid.length - 1] );
 
-        var TableGrid_old = new Array();
+        var TableGrid_old = [];
         for ( var Index = 0; Index < this.TableGrid.length; Index++ )
             TableGrid_old[Index] = this.TableGrid[Index];
 
@@ -12768,7 +12768,7 @@ CTable.prototype =
             //---------------------------------------------------------------------------
             // 2 часть пересчета ширины таблицы : Рассчитываем ширину по содержимому
             //---------------------------------------------------------------------------
-            var MinMargin = new Array(), MinContent = new Array(), MaxContent = new Array(), MaxFlags = new Array();
+            var MinMargin = [], MinContent = [], MaxContent = [], MaxFlags = [];
 
             var GridCount = this.TableGridCalc.length;
             for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
@@ -13006,9 +13006,9 @@ CTable.prototype =
                 MaxTableW += 2 * TableSpacing;
 
             // 4. Рассчитаем желаемую ширину таблицы таблицы
-            var MaxContent2 = new Array();
+            var MaxContent2 = [];
             var SumMin = 0, SumMinMargin = 0, SumMinContent = 0, SumMax = 0, SumMaxContent2 = 0;
-            var TableGrid2 = new Array();
+            var TableGrid2 = [];
             for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
             {
                 var Temp = MinMargin[CurCol] + MinContent[CurCol];
@@ -13068,7 +13068,7 @@ CTable.prototype =
                 else
                 {
                     // 6. Равномерно уменьшаем все колонки до достижения суммарного значения MaxTableW
-                    var ColsDiff = new Array();
+                    var ColsDiff = [];
                     var SumColsDiff = 0;
                     for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
                     {
@@ -13085,7 +13085,7 @@ CTable.prototype =
                     // 7. Ищем колонки, у которых текущая ширина меньше MinContent (заодно ищем недостоющую сумму).
                     //    Также запоминаем остальные колонки и находим у них избыточную сумму.
                     var SumN = 0, SumI = 0;
-                    var GridCols = new Array();
+                    var GridCols = [];
                     for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
                     {
                         var Temp = TableGrid2[CurCol] - (MinMargin[CurCol] + MinContent[CurCol]);
@@ -13202,15 +13202,15 @@ CTable.prototype =
         // Обнуляем таблицу суммарных высот ячеек
         for ( var Index = -1; Index < this.Content.length; Index++ )
         {
-            this.TableRowsBottom[Index] = new Array();
+            this.TableRowsBottom[Index] = [];
             this.TableRowsBottom[Index][0] = 0;
         }
 
         // Изначально найдем верхние границы и (если нужно) нижние границы
         // для каждой ячейки.
-        var MaxTopBorder = new Array();
-        var MaxBotBorder = new Array();
-        var MaxBotMargin = new Array();
+        var MaxTopBorder = [];
+        var MaxBotBorder = [];
+        var MaxBotMargin = [];
 
         for ( var Index = 0; Index < this.Content.length; Index++ )
         {
@@ -13311,7 +13311,7 @@ CTable.prototype =
                         if ( border_Single === Result_Border.Value && MaxTopBorder[CurRow] < Result_Border.Size )
                             MaxTopBorder[CurRow] = Result_Border.Size;
 
-                        var BorderInfo_Top = new Array();
+                        var BorderInfo_Top = [];
                         for ( var TempIndex = 0; TempIndex < GridSpan; TempIndex++ )
                             BorderInfo_Top.push( Result_Border );
 
@@ -13342,7 +13342,7 @@ CTable.prototype =
                             Prev_GridCol += Prev_GridSpan;
                         }
 
-                        var Border_Top_Info = new Array();
+                        var Border_Top_Info = [];
 
                         // Сначала посмотрим пересечение с GridBefore предыдущей строки
                         if ( CurGridCol <= Prev_BeforeInfo.GridBefore - 1 )
@@ -13458,7 +13458,7 @@ CTable.prototype =
                         var Next_BeforeInfo = Next_Row.Get_Before();
                         var Next_AfterInfo  = Next_Row.Get_After();
 
-                        var Border_Bottom_Info = new Array();
+                        var Border_Bottom_Info = [];
 
                         // Сначала посмотрим пересечение с GridBefore предыдущей строки
                         var BeforeCount = 0;
@@ -13566,8 +13566,8 @@ CTable.prototype =
 
             // Разбивается ли данная строка на несколько страниц
             var LastPage = CurPage;
-            var Pages_Y_Pos = new Array();
-            var Pages_Max_Top_Border = new Array();
+            var Pages_Y_Pos = [];
+            var Pages_Max_Top_Border = [];
 
             // Дополнительный параметр для случая, если данная строка начнется с новой страницы.
             // Мы запоминаем максимальное значение нижней границы(первой страницы (текущей)) у ячеек,
@@ -13677,8 +13677,8 @@ CTable.prototype =
                         var Max_l_w = 0;
                         var Borders_Info =
                         {
-                            Right     : new Array(),
-                            Left      : new Array(),
+                            Right     : [],
+                            Left      : [],
 
                             Right_Max : 0,
                             Left_Max  : 0
@@ -13876,7 +13876,7 @@ CTable.prototype =
                         if ( "undefined" === typeof(this.TableRowsBottom[CurRow]) || "undefined" === typeof(this.TableRowsBottom[CurRow][CurPage + PageIndex]) || this.TableRowsBottom[CurRow][CurPage + PageIndex] < CellContentBounds_Bottom )
                         {
                             if ( "undefined" === typeof(this.TableRowsBottom[CurRow]) )
-                                this.TableRowsBottom[CurRow] = new Array();
+                                this.TableRowsBottom[CurRow] = [];
 
                             this.TableRowsBottom[CurRow][CurPage + PageIndex] = CellContentBounds_Bottom;
                         }
@@ -13928,7 +13928,7 @@ CTable.prototype =
                             if ( "undefined" === typeof(this.TableRowsBottom[TempRow]) || "undefined" === typeof(this.TableRowsBottom[TempRow][CurPage + PageIndex]) || this.TableRowsBottom[TempRow][CurPage + PageIndex] < CellContentBounds_Bottom )
                             {
                                 if ( "undefined" === typeof(this.TableRowsBottom[TempRow]) )
-                                    this.TableRowsBottom[TempRow] = new Array();
+                                    this.TableRowsBottom[TempRow] = [];
 
                                 this.TableRowsBottom[TempRow][CurPage + PageIndex] = CellContentBounds_Bottom;
                             }
@@ -13940,7 +13940,7 @@ CTable.prototype =
                             if ( "undefined" === typeof(this.TableRowsBottom[TempRow - 1]) || "undefined" === typeof(this.TableRowsBottom[TempRow - 1][CurPage + PageIndex]) || this.TableRowsBottom[TempRow - 1][CurPage + PageIndex] < CellContentBounds_Bottom )
                             {
                                 if ( "undefined" === typeof(this.TableRowsBottom[TempRow - 1]) )
-                                    this.TableRowsBottom[TempRow - 1] = new Array();
+                                    this.TableRowsBottom[TempRow - 1] = [];
 
                                 this.TableRowsBottom[TempRow - 1][CurPage + PageIndex] = CellContentBounds_Bottom;
                             }
@@ -13963,10 +13963,10 @@ CTable.prototype =
 
             this.RowsInfo[CurRow] = new Object();
             this.RowsInfo[CurRow].Pages = LastPage - CurPage + 1;
-            this.RowsInfo[CurRow].Y            = new Array();
-            this.RowsInfo[CurRow].H            = new Array();
-            this.RowsInfo[CurRow].TopDy        = new Array();
-            this.RowsInfo[CurRow].MaxTopBorder = new Array();
+            this.RowsInfo[CurRow].Y            = [];
+            this.RowsInfo[CurRow].H            = [];
+            this.RowsInfo[CurRow].TopDy        = [];
+            this.RowsInfo[CurRow].MaxTopBorder = [];
             this.RowsInfo[CurRow].FirstPage    = true;
             this.RowsInfo[CurRow].StartPage    = CurPage;
 
@@ -14207,14 +14207,14 @@ CTable.prototype =
                 // Если таблица сразу переносится на следующую страницу, то на первой
                 // мы и рисовать ничего не будем.
                 this.Pages[Index].MaxBotBorder = 0;
-                this.Pages[Index].BotBorders   = new Array();
+                this.Pages[Index].BotBorders   = [];
                 continue;
             }
             else if ( false === this.RowsInfo[CurRow].FirstPage )
                 CurRow--;
 
             var MaxBotBorder = 0;
-            var BotBorders   = new Array();
+            var BotBorders   = [];
 
             // Для ряда CurRow вычисляем нижнюю границу
             if ( this.Content.length - 1 === CurRow )
@@ -14297,7 +14297,7 @@ CTable.prototype =
         this.Pages[CurPage].Bounds.Right  = X_max;
         this.Pages[CurPage].Height        = TableHeight;
         this.Pages[CurPage].MaxBotBorder  = 0;           // можно не заполнять, т.к. на последней странице
-        this.Pages[CurPage].BotBorders    = new Array(); // нижняя граница обрабатывается у последней строки
+        this.Pages[CurPage].BotBorders    = []; // нижняя граница обрабатывается у последней строки
 
         this.TurnOffRecalc = false;
 
@@ -14370,15 +14370,15 @@ CTable.prototype =
         // Обнуляем таблицу суммарных высот ячеек
         for ( var Index = -1; Index < this.Content.length; Index++ )
         {
-            this.TableRowsBottom[Index] = new Array();
+            this.TableRowsBottom[Index] = [];
             this.TableRowsBottom[Index][0] = 0;
         }
 
         // Изначально найдем верхние границы и (если нужно) нижние границы
         // для каждой ячейки.
-        var MaxTopBorder = new Array();
-        var MaxBotBorder = new Array();
-        var MaxBotMargin = new Array();
+        var MaxTopBorder = [];
+        var MaxBotBorder = [];
+        var MaxBotMargin = [];
 
         for ( var Index = 0; Index < this.Content.length; Index++ )
         {
@@ -14477,7 +14477,7 @@ CTable.prototype =
                         if ( border_Single === Result_Border.Value && MaxTopBorder[CurRow] < Result_Border.Size )
                             MaxTopBorder[CurRow] = Result_Border.Size;
 
-                        var BorderInfo_Top = new Array();
+                        var BorderInfo_Top = [];
                         for ( var TempIndex = 0; TempIndex < GridSpan; TempIndex++ )
                             BorderInfo_Top.push( Result_Border );
 
@@ -14508,7 +14508,7 @@ CTable.prototype =
                             Prev_GridCol += Prev_GridSpan;
                         }
 
-                        var Border_Top_Info = new Array();
+                        var Border_Top_Info = [];
 
                         // Сначала посмотрим пересечение с GridBefore предыдущей строки
                         if ( CurGridCol <= Prev_BeforeInfo.GridBefore - 1 )
@@ -14624,7 +14624,7 @@ CTable.prototype =
                         var Next_BeforeInfo = Next_Row.Get_Before();
                         var Next_AfterInfo  = Next_Row.Get_After();
 
-                        var Border_Bottom_Info = new Array();
+                        var Border_Bottom_Info = [];
 
                         // Сначала посмотрим пересечение с GridBefore предыдущей строки
                         var BeforeCount = 0;
@@ -14787,8 +14787,8 @@ CTable.prototype =
                         var Max_l_w = 0;
                         var Borders_Info =
                         {
-                            Right     : new Array(),
-                            Left      : new Array(),
+                            Right     : [],
+                            Left      : [],
 
                             Right_Max : 0,
                             Left_Max  : 0
@@ -15053,7 +15053,7 @@ CTable.prototype =
             // Обнуляем таблицу суммарных высот ячеек
             for ( var Index = -1; Index < this.Content.length; Index++ )
             {
-                this.TableRowsBottom[Index] = new Array();
+                this.TableRowsBottom[Index] = [];
                 this.TableRowsBottom[Index][0] = 0;
             }
         }
@@ -15102,14 +15102,14 @@ CTable.prototype =
         if ( this.HeaderInfo.Count > 0 && this.HeaderInfo.PageIndex != -1 && CurPage > this.HeaderInfo.PageIndex )
         {
             this.HeaderInfo.Pages[CurPage] = new Object();
-            this.HeaderInfo.Pages[CurPage].RowsInfo = new Array();
+            this.HeaderInfo.Pages[CurPage].RowsInfo = [];
             var HeaderPage = this.HeaderInfo.Pages[CurPage];
 
             // Рисуем ли заголовок на данной странице
             HeaderPage.Draw = true;
 
             // Скопируем целиком строки
-            HeaderPage.Rows = new Array();
+            HeaderPage.Rows = [];
 
             // Временно отключаем регистрацию новых классов
             g_oTableId.m_bTurnOff = true;
@@ -15434,17 +15434,17 @@ CTable.prototype =
             {
                 this.RowsInfo[CurRow] = new Object();
                 this.RowsInfo[CurRow].Pages        = 1;
-                this.RowsInfo[CurRow].Y            = new Array();
-                this.RowsInfo[CurRow].H            = new Array();
-                this.RowsInfo[CurRow].TopDy        = new Array();
-                this.RowsInfo[CurRow].MaxTopBorder = new Array();
+                this.RowsInfo[CurRow].Y            = [];
+                this.RowsInfo[CurRow].H            = [];
+                this.RowsInfo[CurRow].TopDy        = [];
+                this.RowsInfo[CurRow].MaxTopBorder = [];
                 this.RowsInfo[CurRow].FirstPage    = true;
                 this.RowsInfo[CurRow].StartPage    = CurPage;
             }
             else
                 this.RowsInfo[CurRow].Pages++;
 
-            this.TableRowsBottom[CurRow] = new Array();
+            this.TableRowsBottom[CurRow] = [];
 
             var Row         = this.Content[CurRow];
             var CellsCount  = Row.Get_CellsCount();
@@ -15521,7 +15521,7 @@ CTable.prototype =
 
             var RowH = Row.Get_Height();
 
-            var Merged_Cell = new Array();
+            var Merged_Cell = [];
 
             for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
             {
@@ -15910,7 +15910,7 @@ CTable.prototype =
         {
             // Таблица сразу переносится на следующую страницу
             this.Pages[0].MaxBotBorder = 0;
-            this.Pages[0].BotBorders   = new Array();
+            this.Pages[0].BotBorders   = [];
         }
         else
         {
@@ -15920,7 +15920,7 @@ CTable.prototype =
                 CurRow--;
 
             var MaxBotBorder = 0;
-            var BotBorders   = new Array();
+            var BotBorders   = [];
 
             // Для ряда CurRow вычисляем нижнюю границу
             if ( this.Content.length - 1 === CurRow )
@@ -16043,9 +16043,9 @@ CTable.prototype =
         var bNeedDocumentRecalculate = false;
         var TableBorders = this.Get_Borders();
 
-        var Pages_new = new Array();
-        var TableRowsBottom_new = new Array();
-        var RowsInfo_new = new Array();
+        var Pages_new = [];
+        var TableRowsBottom_new = [];
+        var RowsInfo_new = [];
 
         var Pages_old = this.Pages;
         this.Pages = Pages_new;
@@ -16074,7 +16074,7 @@ CTable.prototype =
         // Обнуляем таблицу суммарных высот ячеек
         for ( var Index = -1; Index < this.Content.length; Index++ )
         {
-            TableRowsBottom_new[Index] = new Array();
+            TableRowsBottom_new[Index] = [];
             TableRowsBottom_new[Index][0] = 0;
         }
 
@@ -16147,8 +16147,8 @@ CTable.prototype =
 
             // Разбивается ли данная строка на несколько страниц
             var LastPage = CurPage;
-            var Pages_Y_Pos = new Array();
-            var Pages_Max_Top_Border = new Array();
+            var Pages_Y_Pos = [];
+            var Pages_Max_Top_Border = [];
 
             // Дополнительный параметр для случая, если данная строка начнется с новой страницы.
             // Мы запоминаем максимальное значение нижней границы(первой страницы (текущей)) у ячеек,
@@ -16200,7 +16200,7 @@ CTable.prototype =
                         if ( "undefined" === typeof(TableRowsBottom_new[CurRow]) || "undefined" === typeof(TableRowsBottom_new[CurRow][CurPage + PageIndex]) || TableRowsBottom_new[CurRow][CurPage + PageIndex] < CellContentBounds_Bottom )
                         {
                             if ( "undefined" === typeof(TableRowsBottom_new[CurRow]) )
-                                TableRowsBottom_new[CurRow] = new Array();
+                                TableRowsBottom_new[CurRow] = [];
 
                             TableRowsBottom_new[CurRow][CurPage + PageIndex] = CellContentBounds_Bottom;
                         }
@@ -16252,7 +16252,7 @@ CTable.prototype =
                             if ( "undefined" === typeof(TableRowsBottom_new[TempRow]) || "undefined" === typeof(TableRowsBottom_new[TempRow][CurPage + PageIndex]) || TableRowsBottom_new[TempRow][CurPage + PageIndex] < CellContentBounds_Bottom )
                             {
                                 if ( "undefined" === typeof(TableRowsBottom_new[TempRow]) )
-                                    TableRowsBottom_new[TempRow] = new Array();
+                                    TableRowsBottom_new[TempRow] = [];
 
                                 TableRowsBottom_new[TempRow][CurPage + PageIndex] = CellContentBounds_Bottom;
                             }
@@ -16264,7 +16264,7 @@ CTable.prototype =
                             if ( "undefined" === typeof(TableRowsBottom_new[TempRow - 1]) || "undefined" === typeof(TableRowsBottom_new[TempRow - 1][CurPage + PageIndex]) || TableRowsBottom_new[TempRow - 1][CurPage + PageIndex] < CellContentBounds_Bottom )
                             {
                                 if ( "undefined" === typeof(TableRowsBottom_new[TempRow - 1]) )
-                                    TableRowsBottom_new[TempRow - 1] = new Array();
+                                    TableRowsBottom_new[TempRow - 1] = [];
 
                                 TableRowsBottom_new[TempRow - 1][CurPage + PageIndex] = CellContentBounds_Bottom;
                             }
@@ -16281,10 +16281,10 @@ CTable.prototype =
 
             RowsInfo_new[CurRow] = new Object();
             RowsInfo_new[CurRow].Pages = LastPage - CurPage + 1;
-            RowsInfo_new[CurRow].Y            = new Array();
-            RowsInfo_new[CurRow].H            = new Array();
-            RowsInfo_new[CurRow].TopDy        = new Array();
-            RowsInfo_new[CurRow].MaxTopBorder = new Array();
+            RowsInfo_new[CurRow].Y            = [];
+            RowsInfo_new[CurRow].H            = [];
+            RowsInfo_new[CurRow].TopDy        = [];
+            RowsInfo_new[CurRow].MaxTopBorder = [];
             RowsInfo_new[CurRow].FirstPage    = true;
             RowsInfo_new[CurRow].StartPage    = CurPage;
 
@@ -16547,8 +16547,8 @@ CTable.prototype =
 
                 // Разбивается ли данная строка на несколько страниц
                 var LastPage = CurPage;
-                var Pages_Y_Pos = new Array();
-                var Pages_Max_Top_Border = new Array();
+                var Pages_Y_Pos = [];
+                var Pages_Max_Top_Border = [];
 
                 // Дополнительный параметр для случая, если данная строка начнется с новой страницы.
                 // Мы запоминаем максимальное значение нижней границы(первой страницы (текущей)) у ячеек,
@@ -16756,7 +16756,7 @@ CTable.prototype =
                             if ( "undefined" === typeof(TableRowsBottom_new[CurRow]) || "undefined" === typeof(TableRowsBottom_new[CurRow][CurPage + PageIndex]) || TableRowsBottom_new[CurRow][CurPage + PageIndex] < CellContentBounds_Bottom )
                             {
                                 if ( "undefined" === typeof(TableRowsBottom_new[CurRow]) )
-                                    TableRowsBottom_new[CurRow] = new Array();
+                                    TableRowsBottom_new[CurRow] = [];
 
                                 TableRowsBottom_new[CurRow][CurPage + PageIndex] = CellContentBounds_Bottom;
                             }
@@ -16808,7 +16808,7 @@ CTable.prototype =
                                 if ( "undefined" === typeof(TableRowsBottom_new[TempRow]) || "undefined" === typeof(TableRowsBottom_new[TempRow][CurPage + PageIndex]) || TableRowsBottom_new[TempRow][CurPage + PageIndex] < CellContentBounds_Bottom )
                                 {
                                     if ( "undefined" === typeof(TableRowsBottom_new[TempRow]) )
-                                        TableRowsBottom_new[TempRow] = new Array();
+                                        TableRowsBottom_new[TempRow] = [];
 
                                     TableRowsBottom_new[TempRow][CurPage + PageIndex] = CellContentBounds_Bottom;
                                 }
@@ -16820,7 +16820,7 @@ CTable.prototype =
                                 if ( "undefined" === typeof(TableRowsBottom_new[TempRow - 1]) || "undefined" === typeof(TableRowsBottom_new[TempRow - 1][CurPage + PageIndex]) || TableRowsBottom_new[TempRow - 1][CurPage + PageIndex] < CellContentBounds_Bottom )
                                 {
                                     if ( "undefined" === typeof(TableRowsBottom_new[TempRow - 1]) )
-                                        TableRowsBottom_new[TempRow - 1] = new Array();
+                                        TableRowsBottom_new[TempRow - 1] = [];
 
                                     TableRowsBottom_new[TempRow - 1][CurPage + PageIndex] = CellContentBounds_Bottom;
                                 }
@@ -16837,10 +16837,10 @@ CTable.prototype =
 
                 RowsInfo_new[CurRow] = new Object();
                 RowsInfo_new[CurRow].Pages = LastPage - CurPage + 1;
-                RowsInfo_new[CurRow].Y            = new Array();
-                RowsInfo_new[CurRow].H            = new Array();
-                RowsInfo_new[CurRow].TopDy        = new Array();
-                RowsInfo_new[CurRow].MaxTopBorder = new Array();
+                RowsInfo_new[CurRow].Y            = [];
+                RowsInfo_new[CurRow].H            = [];
+                RowsInfo_new[CurRow].TopDy        = [];
+                RowsInfo_new[CurRow].MaxTopBorder = [];
                 RowsInfo_new[CurRow].FirstPage    = true;
                 RowsInfo_new[CurRow].StartPage    = CurPage;
 
@@ -17084,14 +17084,14 @@ CTable.prototype =
                     // Если таблица сразу переносится на следующую страницу, то на первой
                     // мы и рисовать ничего не будем.
                     this.Pages[Index].MaxBotBorder = 0;
-                    this.Pages[Index].BotBorders   = new Array();
+                    this.Pages[Index].BotBorders   = [];
                     continue;
                 }
                 else if ( false === this.RowsInfo[CurRow].FirstPage )
                     CurRow--;
 
                 var MaxBotBorder = 0;
-                var BotBorders   = new Array();
+                var BotBorders   = [];
 
                 // Для ряда CurRow вычисляем нижнюю границу
                 if ( this.Content.length - 1 === CurRow )
@@ -17175,7 +17175,7 @@ CTable.prototype =
             this.Pages[CurPage].Bounds.Right  = X_max;
             this.Pages[CurPage].Height        = TableHeight;
             this.Pages[CurPage].MaxBotBorder  = 0;           // можно не заполнять, т.к. на последней странице
-            this.Pages[CurPage].BotBorders    = new Array(); // нижняя граница обрабатывается у последней строки
+            this.Pages[CurPage].BotBorders    = []; // нижняя граница обрабатывается у последней строки
 
             bNeedDocumentRecalculate = true;
         }
@@ -17238,14 +17238,14 @@ CTable.prototype =
                     // Если таблица сразу переносится на следующую страницу, то на первой
                     // мы и рисовать ничего не будем.
                     this.Pages[Index].MaxBotBorder = 0;
-                    this.Pages[Index].BotBorders   = new Array();
+                    this.Pages[Index].BotBorders   = [];
                     continue;
                 }
                 else if ( false === this.RowsInfo[CurRow].FirstPage )
                     CurRow--;
 
                 var MaxBotBorder = 0;
-                var BotBorders   = new Array();
+                var BotBorders   = [];
 
                 // Для ряда CurRow вычисляем нижнюю границу
                 if ( this.Content.length - 1 === CurRow )
@@ -17562,9 +17562,9 @@ CTable.prototype =
         // параметр WBefore или WAfter ненулевой
 
         // Сначала пробежимся по строкам и узнаем, какие строки нужно удалить
-        var Rows_to_Delete = new Array();
-        var Rows_to_CalcH  = new Array();
-        var Rows_to_CalcH2 = new Array();
+        var Rows_to_Delete = [];
+        var Rows_to_CalcH  = [];
+        var Rows_to_CalcH2 = [];
         for ( var CurRow = 0; CurRow < this.Content.length; CurRow++ )
         {
             var Row = this.Content[CurRow];
@@ -17772,8 +17772,8 @@ CTable.prototype =
     // котором для каждой ячейки(пропуска) указан GridSpan.
     Internal_CreateNewGrid : function( RowsInfo )
     {
-        var CurPos = new Array();
-        var CurX   = new Array();
+        var CurPos = [];
+        var CurX   = [];
         for ( var Index = 0; Index < RowsInfo.length; Index++ )
         {
             CurPos[Index] = 0;
@@ -17796,7 +17796,7 @@ CTable.prototype =
             }
         }
 
-        var TableGrid = new Array();
+        var TableGrid = [];
         var bEnd = false;
         var PrevX = 0;
         while ( true != bEnd )
@@ -18094,8 +18094,8 @@ CTable.prototype =
         var GridBefore = Row.Get_Before().GridBefore;
         this.Markup.X += this.TableSumGrid[GridBefore - 1];
 
-        this.Markup.Cols = new Array();
-        this.Markup.Margins = new Array();
+        this.Markup.Cols = [];
+        this.Markup.Margins = [];
         for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
         {
             var Cell = Row.Get_Cell( CurCell );
@@ -18137,7 +18137,7 @@ CTable.prototype =
         else
             Row_last = this.Content.length - 1;
 
-        this.Markup.Rows = new Array();
+        this.Markup.Rows = [];
         for ( var CurRow = Row_start; CurRow <= Row_last; CurRow++ )
         {
             this.Markup.Rows.push( { Y : this.RowsInfo[CurRow].Y[PageNum], H : this.RowsInfo[CurRow].H[PageNum] } );
@@ -18233,7 +18233,7 @@ CTable.prototype =
             bForceSelectByLines = false;
 
         this.Selection.Type = table_Selection_Cell;
-        this.Selection.Data = new Array();
+        this.Selection.Data = [];
 
         if ( true === this.Parent.Selection_Is_OneElement() && false == bForceSelectByLines )
         {
@@ -18438,7 +18438,7 @@ CTable.prototype =
         var SelectionArray = null;
         if ( true === this.ApplyToAll )
         {
-            SelectionArray = new Array();
+            SelectionArray = [];
             for ( var CurRow = 0; CurRow < this.Content.length; CurRow++ )
             {
                 var Row = this.Content[CurRow];
@@ -18495,7 +18495,7 @@ CTable.prototype =
     Internal_Get_MinSumGrid : function()
     {
         var ColsCount = this.TableGrid.length;
-        var SumGrid = new Array();
+        var SumGrid = [];
         for (var Index = -1; Index < ColsCount; Index++ )
             SumGrid[Index] = 0;
 
@@ -18538,18 +18538,18 @@ CTable.prototype =
         var SumGrid_min = this.Internal_Get_MinSumGrid();
 
         // Массив означает, какие колонки таблицы нам надо изменить
-        var Grids_to_scale = new Array();
+        var Grids_to_scale = [];
         for ( var Index = 0; Index < SumGrid.length; Index++ )
             Grids_to_scale[Index] = true;
 
         var Grids_to_scale_count = Grids_to_scale.length;
 
-        var TableGrid = new Array();
+        var TableGrid = [];
         TableGrid[0] = SumGrid[0];
         for ( var Index = 1; Index < SumGrid.length; Index++ )
             TableGrid[Index] = SumGrid[Index] - SumGrid[Index - 1];
 
-        var TableGrid_min = new Array();
+        var TableGrid_min = [];
         TableGrid_min[0] = SumGrid_min[0];
         for ( var Index = 1; Index < SumGrid_min.length; Index++ )
             TableGrid_min[Index] = SumGrid_min[Index] - SumGrid_min[Index - 1];
@@ -18560,7 +18560,7 @@ CTable.prototype =
             // Пробуем ужать колонки таблицы
             var Koef = TableW / CurrentW;
 
-            var TableGrid_cur = new Array();
+            var TableGrid_cur = [];
             for ( var Index = 0; Index < TableGrid.length; Index++ )
                 TableGrid_cur[Index] = TableGrid[Index];
 
@@ -18600,7 +18600,7 @@ CTable.prototype =
             }
         }
 
-        var SumGrid_new = new Array();
+        var SumGrid_new = [];
         SumGrid_new[-1] = 0;
         for ( var Index = 0; Index < TableGrid.length; Index++ )
             SumGrid_new[Index] = TableGrid[Index] + SumGrid_new[Index - 1];
@@ -18700,7 +18700,7 @@ function CTableRow(Table, Cols, TableGrid)
     this.Next = null;
     this.Prev = null;
 
-    this.Content = new Array();
+    this.Content = [];
     for ( var Index = 0; Index < Cols; Index++ )
     {
         var ColW = ( undefined != TableGrid && undefined != TableGrid[Index] ? TableGrid[Index] : undefined );
@@ -18710,7 +18710,7 @@ function CTableRow(Table, Cols, TableGrid)
     this.Internal_ReIndexing();
 
     // Информация о рассчитанных метриках ячеек
-    this.CellsInfo = new Array();
+    this.CellsInfo = [];
 
     // Метрика строки
     this.Metrics =
@@ -19984,7 +19984,7 @@ CTableRow.prototype =
         this.Recalc_CompiledPr();
 
         var Count = Reader.GetLong();
-        this.Content = new Array();
+        this.Content = [];
         for ( var Index = 0; Index < Count; Index++ )
         {
             var Cell = g_oTableId.Get_ById( Reader.GetString2() );
@@ -20059,7 +20059,7 @@ function CTableCell(Row, ColW)
     {
         Y       : 0,
         CurPage : 0,
-        Y_VAlign_offset : new Array() // Сдвиг, который нужно сделать из-за VAlign (массив по страницам)
+        Y_VAlign_offset : [] // Сдвиг, который нужно сделать из-за VAlign (массив по страницам)
     };
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
@@ -21604,7 +21604,7 @@ CTableCell.prototype =
             // пересчитывать таблицу надо с самого начала.
             var CurCol;
             var ColsCount = Table.TableGrid.length;
-            var TableGrid_old = new Array();
+            var TableGrid_old = [];
             for ( CurCol = 0; CurCol < ColsCount; CurCol++ )
                 TableGrid_old[CurCol] = Table.TableGrid[CurCol];
 
