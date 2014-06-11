@@ -224,14 +224,14 @@ ParaMath.prototype =
 			{
 				History.Create_NewPoint();
 				
-				var Items = new Array();
+				var Items = [];
 				Items.push(oContent.Content.content[0]);
 				oContent.Content.content.splice( 0, 1 );
 				History.Add(oContent.Content, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: 0});
 				
 				var oMRun = new ParaRun(this.Paragraph, true);
 				oContent.Content.addElementToContent(oMRun);
-				var items = new Array();
+				var items = [];
 				items.push(oMRun);
 				var Pos = oContent.Content.CurPos,
 					PosEnd = Pos + 1;

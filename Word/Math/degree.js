@@ -498,8 +498,8 @@ CDegree.prototype.Refresh_RecalcData = function(Data)
 CDegree.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_deg );
-	Writer.WriteString2( this.elements[0][0].Id );
-	Writer.WriteString2( this.elements[0][1].Id );
+	Writer.WriteString2( this.getBase().Id );
+	Writer.WriteString2( this.getLowerIterator().Id );
 	
 	this.CtrPrp.Write_ToBinary(Writer);
 	Writer.WriteLong( this.Pr.type );
@@ -507,16 +507,16 @@ CDegree.prototype.Write_ToBinary2 = function( Writer )
 }
 CDegree.prototype.Read_FromBinary2 = function( Reader )
 {
-	var Element = g_oTableId.Get_ById( Reader.GetString2() );
-	Element.Parent = this;
-	this.elements[0][0] = Element;
+	var props = {ctrPrp: new CTextPr()};
+	var arrElems = [];
+	
+	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
+	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
 
-	var Element1 = g_oTableId.Get_ById( Reader.GetString2() );
-	Element1.Parent = this;
-	this.elements[0][1] = Element1;
-
-	this.CtrPrp.Read_FromBinary(Reader);
-    this.Pr.type = Reader.GetLong();
+	props.ctrPrp.Read_FromBinary(Reader);
+    props.type = Reader.GetLong();
+	
+	this.fillMathComposition (props, arrElems);
 }
 CDegree.prototype.Get_Id = function()
 {
@@ -1188,8 +1188,9 @@ CDegreeSubSup.prototype.Refresh_RecalcData = function(Data)
 CDegreeSubSup.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_deg_subsup );
-	Writer.WriteString2( this.elements[0][0].Id );
-	Writer.WriteString2( this.elements[0][1].Id );
+	Writer.WriteString2( this.getBase().Id );
+	Writer.WriteString2( this.getUpperIterator().Id );
+	Writer.WriteString2( this.getLowerIterator().Id );
 	
 	this.CtrPrp.Write_ToBinary(Writer);
 	Writer.WriteLong( this.Pr.type );
@@ -1211,22 +1212,22 @@ CDegreeSubSup.prototype.Write_ToBinary2 = function( Writer )
 }
 CDegreeSubSup.prototype.Read_FromBinary2 = function( Reader )
 {
-	var Element = g_oTableId.Get_ById( Reader.GetString2() );
-	Element.Parent = this;
-	this.elements[0][0] = Element;
-
-	var Element1 = g_oTableId.Get_ById( Reader.GetString2() );
-	Element1.Parent = this;
-	this.elements[0][1] = Element1;
+	var props = {ctrPrp: new CTextPr()};
+	var arrElems = new Array();
 	
-	this.CtrPrp.Read_FromBinary(Reader);
-    this.Pr.type = Reader.GetLong();
-	if ( this.Pr.type == DEGREE_SubSup )
+	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
+	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
+	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
+	
+	props.ctrPrp.Read_FromBinary(Reader);
+    props.type = Reader.GetLong();
+	if ( props.type == DEGREE_SubSup )
 	{
 		var Flags = Reader.GetLong();
 		if ( Flags & 1 )
-			this.Pr.alnScr = Writer.GetBool();	
+			props.alnScr = Writer.GetBool();	
 	}
+	this.fillMathComposition (props, arrElems);
 }
 CDegreeSubSup.prototype.Get_Id = function()
 {

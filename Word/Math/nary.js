@@ -317,32 +317,50 @@ CNary.prototype.Refresh_RecalcData = function(Data)
 CNary.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_nary );
-	Writer.WriteString2( this.elements[0][0].Id );
-	Writer.WriteString2( this.elements[0][1].Id );
+	Writer.WriteString2( this.oNary.getBase().Id );
+	
+	var StartPos = Writer.GetCurPosition();
+    Writer.Skip(4);
+    var Flags = 0;
+	if ( undefined != this.getUpperIterator() )
+    {
+		Writer.WriteLong(this.getUpperIterator().Id);
+		Flags |= 1;
+	}
+	if ( undefined != this.getLowerIterator())
+    {
+		Writer.WriteLong(this.getLowerIterator().Id);
+		Flags |= 2;
+	}
+	var EndPos = Writer.GetCurPosition();
+    Writer.Seek( StartPos );
+    Writer.WriteLong( Flags );
+    Writer.Seek( EndPos );
+
 	
 	this.CtrPrp.Write_ToBinary(Writer);
 	
 	var StartPos = Writer.GetCurPosition();
     Writer.Skip(4);
     var Flags = 0;
-	if ( undefined != this.chr )
+	if ( undefined != this.Pr.chr )
     {
-		Writer.WriteLong(this.chr);
+		Writer.WriteLong(this.Pr.chr);
 		Flags |= 1;
 	}
-	if ( undefined != this.limLoc )
+	if ( undefined != this.Pr.limLoc )
     {
-		Writer.WriteLong(this.limLoc);
+		Writer.WriteLong(this.Pr.limLoc);
 		Flags |= 2;
 	}
-	if ( undefined != this.subHide )
+	if ( undefined != this.Pr.subHide )
     {
-		Writer.WriteBool(this.subHide);
+		Writer.WriteBool(this.Pr.subHide);
 		Flags |= 4;
 	}
-	if ( undefined != this.supHide )
+	if ( undefined != this.Pr.supHide )
     {
-		Writer.WriteBool(this.supHide);
+		Writer.WriteBool(this.Pr.supHide);
 		Flags |= 8;
 	}
 	var EndPos = Writer.GetCurPosition();
@@ -352,25 +370,29 @@ CNary.prototype.Write_ToBinary2 = function( Writer )
 }
 CNary.prototype.Read_FromBinary2 = function( Reader )
 {
-	var Element = g_oTableId.Get_ById( Reader.GetString2() );
-	Element.Parent = this;
-	this.elements[0][0] = Element;
+	var props = {ctrPrp: new CTextPr()};
+	var arrElems = [];
 	
-	var Element1 = g_oTableId.Get_ById( Reader.GetString2() );
-	Element1.Parent = this;
-	this.elements[0][1] = Element1;
+	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
+	var Flags = Reader.GetLong();
+	if ( Flags & 1 )
+		arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
+	if ( Flags & 2 )
+		arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
 
-	this.CtrPrp.Read_FromBinary(Reader);
+	props.ctrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();
 	if ( Flags & 1 )
-		this.chr = Reader.GetLong();
+		props.chr = Reader.GetLong();
 	if ( Flags & 2 )
-		this.limLoc = Reader.GetLong();
+		props.limLoc = Reader.GetLong();
 	if ( Flags & 4 )
-		this.subHide = Reader.GetBool();
+		props.subHide = Reader.GetBool();
 	if ( Flags & 8 )
-		this.supHide = Reader.GetBool();
+		props.supHide = Reader.GetBool();
+		
+	this.fillMathComposition (props, arrElems);
 }
 CNary.prototype.Get_Id = function()
 {
@@ -1348,9 +1370,7 @@ CLogicalOr.prototype.calculateSizeGlyph = function()
 
 function CIntegral()
 {
-	this.Id = g_oIdCounter.Get_NewId();
     CNaryOperator.call(this);
-	g_oTableId.Add( this, this.Id );
 }
 extend(CIntegral, CNaryOperator);
 CIntegral.prototype.getCoord = function()
@@ -1577,34 +1597,10 @@ CIntegral.prototype.calculateSizeGlyph = function()
 
     return {width : width, height : height};
 }
-CIntegral.prototype.Save_Changes = function(Data, Writer)
-{
-	Writer.WriteLong( historyitem_type_integral );
-}
-CIntegral.prototype.Load_Changes = function(Reader)
-{
-}
-CIntegral.prototype.Refresh_RecalcData = function(Data)
-{
-}
-CIntegral.prototype.Write_ToBinary2 = function( Writer )
-{
-	Writer.WriteLong( historyitem_type_integral );
-}
-CIntegral.prototype.Read_FromBinary2 = function( Reader )
-{
-
-}
-CIntegral.prototype.Get_Id = function()
-{
-	return this.Id;
-}
 
 function CDoubleIntegral()
 {
-	this.Id = g_oIdCounter.Get_NewId();
     CIntegral.call(this);
-	g_oTableId.Add( this, this.Id );
 }
 extend(CDoubleIntegral, CIntegral);
 CDoubleIntegral.prototype.drawPath = function(pGraphics, XX, YY)
@@ -1642,34 +1638,10 @@ CDoubleIntegral.prototype.calculateSizeGlyph = function()
 
     return {width : width, height : height};
 }
-CDoubleIntegral.prototype.Save_Changes = function(Data, Writer)
-{
-	Writer.WriteLong( historyitem_type_double_integral );
-}
-CDoubleIntegral.prototype.Load_Changes = function(Reader)
-{
-}
-CDoubleIntegral.prototype.Refresh_RecalcData = function(Data)
-{
-}
-CDoubleIntegral.prototype.Write_ToBinary2 = function( Writer )
-{
-	Writer.WriteLong( historyitem_type_double_integral );
-}
-CDoubleIntegral.prototype.Read_FromBinary2 = function( Reader )
-{
-
-}
-CDoubleIntegral.prototype.Get_Id = function()
-{
-	return this.Id;
-}
 
 function CTripleIntegral()
 {
-	this.Id = g_oIdCounter.Get_NewId();
     CIntegral.call(this);
-	g_oTableId.Add( this, this.Id );
 }
 extend(CTripleIntegral, CIntegral);
 CTripleIntegral.prototype.drawPath = function(pGraphics, XX, YY)
@@ -1716,28 +1688,6 @@ CTripleIntegral.prototype.calculateSizeGlyph = function()
         height = 2*_height;
 
     return {width : width, height : height};
-}
-CTripleIntegral.prototype.Save_Changes = function(Data, Writer)
-{
-	Writer.WriteLong( historyitem_type_triple_integral );
-}
-CTripleIntegral.prototype.Load_Changes = function(Reader)
-{
-}
-CTripleIntegral.prototype.Refresh_RecalcData = function(Data)
-{
-}
-CTripleIntegral.prototype.Write_ToBinary2 = function( Writer )
-{
-	Writer.WriteLong( historyitem_type_triple_integral );
-}
-CTripleIntegral.prototype.Read_FromBinary2 = function( Reader )
-{
-
-}
-CTripleIntegral.prototype.Get_Id = function()
-{
-	return this.Id;
 }
 
 function old_CContourIntegral()
@@ -3147,9 +3097,7 @@ _old_CContourIntegral.prototype.drawPath = function(XX, YY)
 
 function CContourIntegral()
 {
-	this.Id = g_oIdCounter.Get_NewId();
     CNaryOperator.call(this);
-	g_oTableId.Add( this, this.Id );
 }
 extend(CContourIntegral, CNaryOperator);
 CContourIntegral.prototype.draw = function(x, y, pGraphics)
@@ -3231,28 +3179,6 @@ CContourIntegral.prototype.calculateSizeGlyph = function()
 
     return {width : width, height : height};
 }
-CContourIntegral.prototype.Save_Changes = function(Data, Writer)
-{
-	Writer.WriteLong( historyitem_type_contour_integral );
-}
-CContourIntegral.prototype.Load_Changes = function(Reader)
-{
-}
-CContourIntegral.prototype.Refresh_RecalcData = function(Data)
-{
-}
-CContourIntegral.prototype.Write_ToBinary2 = function( Writer )
-{
-	Writer.WriteLong( historyitem_type_contour_integral );
-}
-CContourIntegral.prototype.Read_FromBinary2 = function( Reader )
-{
-}
-CContourIntegral.prototype.Get_Id = function()
-{
-	return this.Id;
-}
-
 
 function old_CSurfaceIntegral()
 {
@@ -3677,9 +3603,7 @@ old_CSurfaceIntegral.prototype.calculateSizeGlyph = function()
 
 function CSurfaceIntegral()
 {
-	this.Id = g_oIdCounter.Get_NewId();
     CNaryOperator.call(this);
-	g_oTableId.Add( this, this.Id );
 }
 extend(CSurfaceIntegral, CNaryOperator);
 CSurfaceIntegral.prototype.draw = function(x, y, pGraphics)
@@ -3759,27 +3683,6 @@ CSurfaceIntegral.prototype.calculateSizeGlyph = function()
         height = 2*_height;
 
     return {width : width, height : height};
-}
-CSurfaceIntegral.prototype.Save_Changes = function(Data, Writer)
-{
-	Writer.WriteLong( historyitem_type_surface_integral );
-}
-CSurfaceIntegral.prototype.Load_Changes = function(Reader)
-{
-}
-CSurfaceIntegral.prototype.Refresh_RecalcData = function(Data)
-{
-}
-CSurfaceIntegral.prototype.Write_ToBinary2 = function( Writer )
-{
-	Writer.WriteLong( historyitem_type_surface_integral );
-}
-CSurfaceIntegral.prototype.Read_FromBinary2 = function( Reader )
-{
-}
-CSurfaceIntegral.prototype.Get_Id = function()
-{
-	return this.Id;
 }
 
 function old_CVolumeIntegral()
@@ -4276,9 +4179,7 @@ old_CVolumeIntegral.prototype.calculateSizeGlyph = function()
 
 function CVolumeIntegral()
 {
-	this.Id = g_oIdCounter.Get_NewId();
     CNaryOperator.call(this);
-	g_oTableId.Add( this, this.Id );
 }
 extend(CVolumeIntegral, CNaryOperator);
 CVolumeIntegral.prototype.draw = function(x, y, pGraphics)
@@ -4358,25 +4259,3 @@ CVolumeIntegral.prototype.calculateSizeGlyph = function()
 
     return {width : width, height : height};
 }
-CVolumeIntegral.prototype.Save_Changes = function(Data, Writer)
-{
-	Writer.WriteLong( historyitem_type_volume_integral );
-}
-CVolumeIntegral.prototype.Load_Changes = function(Reader)
-{
-}
-CVolumeIntegral.prototype.Refresh_RecalcData = function(Data)
-{
-}
-CVolumeIntegral.prototype.Write_ToBinary2 = function( Writer )
-{
-	Writer.WriteLong( historyitem_type_volume_integral );
-}
-CVolumeIntegral.prototype.Read_FromBinary2 = function( Reader )
-{
-}
-CVolumeIntegral.prototype.Get_Id = function()
-{
-	return this.Id;
-}
-

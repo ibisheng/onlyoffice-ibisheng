@@ -474,51 +474,51 @@ CMathMatrix.prototype.Write_ToBinary2 = function( Writer )
 	Writer.WriteLong( this.nCol );
 	for(var i=0; i<this.nRow; i++)
 		for(var j=0; j<this.nCol; j++)
-			Writer.WriteString2( this.elements[i][j].Id );
+			Writer.WriteString2( this.getElement(i,j).Id );
 	
 	this.CtrPrp.Write_ToBinary(Writer);
 	
 	var StartPos = Writer.GetCurPosition();
     Writer.Skip(4);
     var Flags = 0;
-	if ( undefined != this.baseJc )
+	if ( undefined != this.Pr.baseJc )
     {
-		Writer.WriteLong( this.baseJc );
+		Writer.WriteLong( this.Pr.baseJc );
 		Flags |= 1;
 	}
-	if ( undefined != this.cGp )
+	if ( undefined != this.Pr.cGp )
     {
-		Writer.WriteLong( this.cGp );
+		Writer.WriteLong( this.Pr.cGp );
 		Flags |= 2;
 	}
-	if ( undefined != this.cGpRule )
+	if ( undefined != this.Pr.cGpRule )
     {
-		Writer.WriteLong( this.cGpRule );
+		Writer.WriteLong( this.Pr.cGpRule );
 		Flags |= 4;
 	}
-	if ( undefined != this.cSp )
+	if ( undefined != this.Pr.cSp )
     {
-		Writer.WriteLong( this.cSp );
+		Writer.WriteLong( this.Pr.cSp );
 		Flags |= 8;
 	}
-	if ( undefined != this.mcs )
+	if ( undefined != this.Pr.mcs )
     {
-		Writer.WriteLong( this.mcs );
+		Writer.WriteLong( this.Pr.mcs );
 		Flags |= 16;
 	}
-	if ( undefined != this.plcHide )
+	if ( undefined != this.Pr.plcHide )
     {
-		Writer.WriteBool( this.plcHide );
+		Writer.WriteBool( this.Pr.plcHide );
 		Flags |= 32;
 	}
-	if ( undefined != this.rSp )
+	if ( undefined != this.Pr.rSp )
     {
-		Writer.WriteLong( this.rSp );
+		Writer.WriteLong( this.Pr.rSp );
 		Flags |= 64;
 	}
-	if ( undefined != this.rSpRule )
+	if ( undefined != this.Pr.rSpRule )
     {
-		Writer.WriteLong( this.rSpRule );
+		Writer.WriteLong( this.Pr.rSpRule );
 		Flags |= 128;
 	}
 	var EndPos = Writer.GetCurPosition();
@@ -528,39 +528,36 @@ CMathMatrix.prototype.Write_ToBinary2 = function( Writer )
 }
 CMathMatrix.prototype.Read_FromBinary2 = function( Reader )
 {
-	var row = Reader.GetLong();
-	var col = Reader.GetLong();
-	for(var i=0; i<row; i++)
-	{
-		this.elements[i] = [];
-		for(var j=0; j<col; j++)
-		{
-			var Element = g_oTableId.Get_ById( Reader.GetString2() );
-			Element.Parent = this;
-			this.elements[i][j] = [];
-			this.elements[i][j] = Element;
-		}
-	}
+	var props = {ctrPrp: new CTextPr()};
+	var arrElems = [];
 	
-	this.CtrPrp.Read_FromBinary(Reader);
+	props.row = Reader.GetLong();
+	props.col = Reader.GetLong();
+	for(var i=0; i<props.row; i++)
+		for(var j=0; j<props.col; j++)
+			arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
+	
+	props.ctrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();
 	if ( Flags & 1 )
-		this.baseJc = Reader.GetLong();
+		props.baseJc = Reader.GetLong();
 	if ( Flags & 2 )
-		this.cGp = Reader.GetLong();
+		props.cGp = Reader.GetLong();
 	if ( Flags & 4 )
-		this.cGpRule = Reader.GetLong();
+		props.cGpRule = Reader.GetLong();
 	if ( Flags & 8 )
-		this.cSp = Reader.GetLong();
+		props.cSp = Reader.GetLong();
 	if ( Flags & 16 )
-		this.mcs = Reader.GetLong();
+		props.mcs = Reader.GetLong();
 	if ( Flags & 32 )
-		this.plcHide = Reader.GetBool();
+		props.plcHide = Reader.GetBool();
 	if ( Flags & 64 )
-		this.rSp = Reader.GetLong();
+		props.rSp = Reader.GetLong();
 	if ( Flags & 128 )
-		this.rSpRule = Reader.GetLong()
+		props.rSpRule = Reader.GetLong()
+		
+	this.fillMathComposition (props, arrElems);
 }
 CMathMatrix.prototype.Get_Id = function()
 {
@@ -660,36 +657,36 @@ CEqArray.prototype.Write_ToBinary2 = function( Writer )
 	var row = this.elements.length;
 	Writer.WriteLong( row );
 	for(var i=0; i<row; i++)
-		Writer.WriteString2( this.elements[i][0].Id );
+		Writer.WriteString2( this.getElement(i).Id );
 	
 	this.CtrPrp.Write_ToBinary(Writer);
 	
 	var StartPos = Writer.GetCurPosition();
     Writer.Skip(4);
     var Flags = 0;
-	if ( undefined != this.baseJc )
+	if ( undefined != this.Pr.baseJc )
     {
-		Writer.WriteLong( this.baseJc );	
+		Writer.WriteLong( this.Pr.baseJc );	
 		Flags |= 1;
 	}
-	if ( undefined != this.maxDist )
+	if ( undefined != this.Pr.maxDist )
     {
-		Writer.WriteBool( this.maxDist );	
+		Writer.WriteBool( this.Pr.maxDist );	
 		Flags |= 2;
 	}
-	if ( undefined != this.objDist )
+	if ( undefined != this.Pr.objDist )
     {
-		Writer.WriteBool( this.objDist );	
+		Writer.WriteBool( this.Pr.objDist );	
 		Flags |= 4;
 	}
-	if ( undefined != this.rSp )
+	if ( undefined != this.Pr.rSp )
     {
-		Writer.WriteLong( this.rSp );	
+		Writer.WriteLong( this.Pr.rSp );	
 		Flags |= 8;
 	}
-	if ( undefined != this.rSpRule )
+	if ( undefined != this.Pr.rSpRule )
     {
-		Writer.WriteLong( this.rSpRule );
+		Writer.WriteLong( this.Pr.rSpRule );
 		Flags |= 16;
 	}
 	var EndPos = Writer.GetCurPosition();
@@ -699,28 +696,28 @@ CEqArray.prototype.Write_ToBinary2 = function( Writer )
 }
 CEqArray.prototype.Read_FromBinary2 = function( Reader )
 {
-	var row = Reader.GetLong();
-	for(var i=0; i<row; i++)
-	{
-		var Element = g_oTableId.Get_ById( Reader.GetString2() );
-		Element.Parent = this;
-		this.elements[i] = [];
-		this.elements[i][0] = Element;
-	}
+	var props = {ctrPrp: new CTextPr()};
+	var arrElems = [];
 	
-	this.CtrPrp.Read_FromBinary(Reader);
+	props.row = Reader.GetLong();
+	for(var i=0; i<props.row; i++)
+		arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
+	
+	props.ctrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();
 	if ( Flags & 1 )
-		this.baseJc = Reader.GetLong();
+		props.baseJc = Reader.GetLong();
 	if ( Flags & 2 )
-		this.maxDist = Reader.GetBool();
+		props.maxDist = Reader.GetBool();
 	if ( Flags & 4 )
-		this.objDist = Reader.GetBool();
+		props.objDist = Reader.GetBool();
 	if ( Flags & 8 )
-		this.rSp = Reader.GetLong();
+		props.rSp = Reader.GetLong();
 	if ( Flags & 16 )
-		this.rSpRule = Reader.GetLong();
+		props.rSpRule = Reader.GetLong();
+		
+	this.fillMathComposition (props, arrElems);
 }
 CEqArray.prototype.Get_Id = function()
 {

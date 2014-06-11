@@ -1270,10 +1270,9 @@ CRadical.prototype.Refresh_RecalcData = function(Data)
 CRadical.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_rad );
-	var len = this.elements[0].length 
-	Writer.WriteLong( len );
-	for(var i=0; i<len; i++)	
-		Writer.WriteString2( this.elements[0][i].Id );
+
+	Writer.WriteString2( this.getBase().Id );
+	Writer.WriteString2( this.getDegree().Id );
 	
 	this.CtrPrp.Write_ToBinary(Writer);
 	
@@ -1292,19 +1291,19 @@ CRadical.prototype.Write_ToBinary2 = function( Writer )
 }
 CRadical.prototype.Read_FromBinary2 = function( Reader )
 {
-	var len = Reader.GetLong();	
-	for (var i=0; i<len; i++)
-	{
-		var Element = g_oTableId.Get_ById( Reader.GetString2() );
-		Element.Parent = this;
-		this.elements[0][i] = Element;
-	}
+	var props = {ctrPrp: new CTextPr()};
+	var arrElems = [];
 	
-	this.CtrPrp.Read_FromBinary(Reader);
+	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
+	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
+	
+	props.ctrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();
 	if ( Flags & 1 )
-		this.degHide = Reader.GetBool();	
+		props.degHide = Reader.GetBool();	
+	
+	this.fillMathComposition (props, arrElems);
 }
 CRadical.prototype.Get_Id = function()
 {

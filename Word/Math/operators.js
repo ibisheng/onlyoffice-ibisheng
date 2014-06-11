@@ -3931,36 +3931,39 @@ CDelimiter.prototype.Refresh_RecalcData = function(Data)
 CDelimiter.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_delimiter );
-	Writer.WriteString2( this.elements[0][0].Id );
+	Writer.WriteLong(this.column);	
+	
+	for (var i=0; i<this.column; i++)
+		Writer.WriteString2( this.getBase(i).Id );
 	
 	this.CtrPrp.Write_ToBinary(Writer);
 	
 	var StartPos = Writer.GetCurPosition();
     Writer.Skip(4);
     var Flags = 0;
-	if ( undefined != this.begChr )
+	if ( undefined != this.Pr.begChr )
     {
-		Writer.WriteLong(this.begChr);	
+		Writer.WriteLong(this.Pr.begChr);	
 		Flags |= 1;
 	}
-	if ( undefined != this.endChr )
+	if ( undefined != this.Pr.endChr )
     {
-		Writer.WriteLong(this.endChr);	
+		Writer.WriteLong(this.Pr.endChr);	
 		Flags |= 2;
 	}
-	if ( undefined != this.grow )
+	if ( undefined != this.Pr.grow )
     {
-		Writer.WriteLong(this.grow);	
+		Writer.WriteLong(this.Pr.grow);	
 		Flags |= 4;
 	}
-	if ( undefined != this.sepChr )
+	if ( undefined != this.Pr.sepChr )
     {
-		Writer.WriteLong(this.sepChr);	
+		Writer.WriteLong(this.Pr.sepChr);	
 		Flags |= 8;
 	}
-	if ( undefined != this.shp )
+	if ( undefined != this.Pr.shp )
     {
-		Writer.WriteLong(this.shp);	
+		Writer.WriteLong(this.Pr.shp);	
 		Flags |= 16;
 	}
 	var EndPos = Writer.GetCurPosition();
@@ -3970,23 +3973,28 @@ CDelimiter.prototype.Write_ToBinary2 = function( Writer )
 }
 CDelimiter.prototype.Read_FromBinary2 = function( Reader )
 {
-	var Element = g_oTableId.Get_ById( Reader.GetString2() );
-	Element.Parent = this;
-	this.elements[0][0] = Element;
+	var props = {ctrPrp: new CTextPr()};
+	var arrElems = [];
+	props.column = Reader.GetLong();
+	
+	for (var i=0; i<props.column; i++)
+		arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
 
-	this.CtrPrp.Read_FromBinary(Reader);
+	props.ctrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();
 	if ( Flags & 1 )
-		this.begChr = Reader.GetLong();
+		props.begChr = Reader.GetLong();
 	if ( Flags & 2 )
-		this.endChr = Reader.GetLong();
+		props.endChr = Reader.GetLong();
 	if ( Flags & 4 )
-		this.grow = Reader.GetBool();
+		props.grow = Reader.GetBool();
 	if ( Flags & 8 )
-		this.sepChr = Reader.GetLong();
+		props.sepChr = Reader.GetLong();
 	if ( Flags & 16 )
-		this.shp = Reader.GetLong();
+		props.shp = Reader.GetLong();
+		
+	this.fillMathComposition (props, arrElems);
 }
 CDelimiter.prototype.Get_Id = function()
 {
@@ -4451,26 +4459,26 @@ CGroupCharacter.prototype.Refresh_RecalcData = function(Data)
 CGroupCharacter.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_groupChr );
-	Writer.WriteString2( this.elements[0][0].Id );
+	Writer.WriteString2( this.getBase().Id );
 	
 	this.CtrPrp.Write_ToBinary(Writer);
 	
 	var StartPos = Writer.GetCurPosition();
     Writer.Skip(4);
     var Flags = 0;
-	if ( undefined != this.chr )
+	if ( undefined != this.Pr.chr )
     {
-		Writer.WriteLong(this.chr);
+		Writer.WriteLong(this.Pr.chr);
 		Flags |= 1;
 	}
-	if ( undefined != this.pos )
+	if ( undefined != this.Pr.pos )
     {
-		Writer.WriteLong(this.pos);
+		Writer.WriteLong(this.Pr.pos);
 		Flags |= 2;
 	}
-	if ( undefined != this.vertJc )
+	if ( undefined != this.Pr.vertJc )
     {
-		Writer.WriteLong(this.vertJc);
+		Writer.WriteLong(this.Pr.vertJc);
 		Flags |= 4;
 	}
 	var EndPos = Writer.GetCurPosition();
@@ -4480,20 +4488,22 @@ CGroupCharacter.prototype.Write_ToBinary2 = function( Writer )
 }
 CGroupCharacter.prototype.Read_FromBinary2 = function( Reader )
 {
-	var Element = g_oTableId.Get_ById( Reader.GetString2() );
-	Element.Parent = this;
-	this.elements[0][0] = Element;
+	var props = {ctrPrp: new CTextPr()};
+	var arrElems = [];
 	
-	this.CtrPrp.Read_FromBinary(Reader);
+	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
+	
+	props.ctrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();
 	if ( Flags & 1 )
-		this.chr = Reader.GetLong();
+		props.chr = Reader.GetLong();
 	if ( Flags & 2 )
-        this.loc = Reader.GetLong();
-		//this.pos = Reader.GetLong();
+		props.pos = Reader.GetLong();
 	if ( Flags & 4 )
-		this.vertJc = Reader.GetLong();
+		props.vertJc = Reader.GetLong();
+		
+	this.fillMathComposition (props, arrElems);
 }
 CGroupCharacter.prototype.Get_Id = function()
 {

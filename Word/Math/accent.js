@@ -1249,16 +1249,16 @@ CAccent.prototype.Refresh_RecalcData = function(Data)
 CAccent.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_acc );
-	Writer.WriteString2( this.elements[0][0].Id );
+	Writer.WriteString2( this.getBase().Id );
 	
 	this.CtrPrp.Write_ToBinary(Writer);
 	
 	var StartPos = Writer.GetCurPosition();
     Writer.Skip(4);
     var Flags = 0;
-	if ( undefined != this.chr )
+	if ( undefined != this.Pr.chr )
     {
-		Writer.WriteLong(this.chr);	
+		Writer.WriteString2(this.Pr.chr);	
 		Flags |= 1;
 	}
 	var EndPos = Writer.GetCurPosition();
@@ -1268,13 +1268,16 @@ CAccent.prototype.Write_ToBinary2 = function( Writer )
 }
 CAccent.prototype.Read_FromBinary2 = function( Reader )
 {
-	var Element = g_oTableId.Get_ById( Reader.GetString2() );
-	Element.Parent = this;
-	this.elements[0][0] = Element;
+	var props = {ctrPrp: new CTextPr()};
+	var arrElems = [];
+	
+	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
 
-	this.CtrPrp.Read_FromBinary(Reader);
+	props.ctrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();
 	if ( Flags & 1 )
-		this.chr = Reader.GetLong();	
+		props.chr = Reader.GetString2();	
+		
+	this.fillMathComposition (props, arrElems);
 }

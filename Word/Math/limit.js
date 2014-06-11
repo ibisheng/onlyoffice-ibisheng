@@ -119,24 +119,24 @@ CLimit.prototype.Refresh_RecalcData = function(Data)
 CLimit.prototype.Write_ToBinary2 = function( Writer )
 {	
 	Writer.WriteLong( historyitem_type_lim );
-	Writer.WriteString2( this.elements[0][0].Id );
-	Writer.WriteString2( this.elements[1][0].Id );
+	Writer.WriteString2( this.getFName().Id );
+	Writer.WriteString2( this.getIterator().Id );
 	
 	this.CtrPrp.Write_ToBinary(Writer);
-	Writer.WriteLong(this.type);
+	Writer.WriteLong(this.Pr.type);
 }
 CLimit.prototype.Read_FromBinary2 = function( Reader )
 {	
-	var Element = g_oTableId.Get_ById( Reader.GetString2() );
-	Element.Parent = this;
-	this.elements[0][0] = Element;
-
-	var Element1 = g_oTableId.Get_ById( Reader.GetString2() );
-	Element1.Parent = this;
-	this.elements[1][0] = Element1;
+	var props = {ctrPrp: new CTextPr()};
+	var arrElems = [];
 	
-	this.CtrPrp.Read_FromBinary(Reader);
-	this.type = Reader.GetLong();
+	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
+	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
+	
+	props.ctrPrp.Read_FromBinary(Reader);
+	props.type = Reader.GetLong();
+	
+	this.fillMathComposition (props, arrElems);
 }
 CLimit.prototype.Get_Id = function()
 {
@@ -193,7 +193,7 @@ CMathFunc.prototype.fillMathComposition = function(props, contents /*array*/)
     this.elements[0][0] = contents[0];
 
     // Argument
-    this.element[0][1] = contents[1];
+    this.elements[0][1] = contents[1];
 
 }
 CMathFunc.prototype.getPropsForWrite = function()
@@ -214,22 +214,22 @@ CMathFunc.prototype.Refresh_RecalcData = function(Data)
 CMathFunc.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_mathFunc );
-	Writer.WriteString2( this.elements[0][0].Id );
-	Writer.WriteString2( this.elements[0][1].Id );
+	Writer.WriteString2( this.getFName().Id );
+	Writer.WriteString2( this.getArgument().Id );
 	
 	this.CtrPrp.Write_ToBinary(Writer);
 }
 CMathFunc.prototype.Read_FromBinary2 = function( Reader )
 {
-	var Element = g_oTableId.Get_ById( Reader.GetString2() );
-	Element.Parent = this;
-	this.elements[0][0] = Element;
+	var props = {ctrPrp: new CTextPr()};
+	var arrElems = [];
 	
-	var Element1 = g_oTableId.Get_ById( Reader.GetString2() );
-	Element1.Parent = this;
-	this.elements[0][1] = Element1;
+	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
+	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
 	
-	this.CtrPrp.Read_FromBinary(Reader);
+	props.ctrPrp.Read_FromBinary(Reader);
+	
+	this.fillMathComposition (props, arrElems);
 }
 CMathFunc.prototype.Get_Id = function()
 {

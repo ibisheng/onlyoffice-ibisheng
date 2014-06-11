@@ -6749,7 +6749,6 @@ CMathContent.prototype =
         {
             this.content.push(obj);
         }
-		this.CurPos++;
     },
     Save_Changes: function(Data, Writer)
     {

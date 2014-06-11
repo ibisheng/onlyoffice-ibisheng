@@ -475,51 +475,51 @@ CBorderBox.prototype.Refresh_RecalcData = function(Data)
 CBorderBox.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_borderBox );
-	Writer.WriteString2( this.elements[0][0].Id );
+	Writer.WriteString2( this.getBase().Id );
 	
 	this.CtrPrp.Write_ToBinary(Writer);
 	
 	var StartPos = Writer.GetCurPosition();
     Writer.Skip(4);
     var Flags = 0;
-	if ( undefined != this.hideBot )
+	if ( undefined != this.Pr.hideBot )
     {
-		Writer.WriteBool( this.hideBot );	
+		Writer.WriteBool( this.Pr.hideBot );	
 		Flags |= 1;
 	}
-	if ( undefined != this.hideLeft )
+	if ( undefined != this.Pr.hideLeft )
     {
-		Writer.WriteBool( this.hideLeft );	
+		Writer.WriteBool( this.Pr.hideLeft );	
 		Flags |= 2;
 	}
-	if ( undefined != this.hideRight )
+	if ( undefined != this.Pr.hideRight )
     {
-		Writer.WriteBool( this.hideRight );	
+		Writer.WriteBool( this.Pr.hideRight );	
 		Flags |= 4;
 	}
-	if ( undefined != this.hideTop )
+	if ( undefined != this.Pr.hideTop )
     {
-		Writer.WriteBool( this.hideTop );
+		Writer.WriteBool( this.Pr.hideTop );
 		Flags |= 8;
 	}
-	if ( undefined != this.strikeBLTR )
+	if ( undefined != this.Pr.strikeBLTR )
     {
-		Writer.WriteBool( this.strikeBLTR );	
+		Writer.WriteBool( this.Pr.strikeBLTR );	
 		Flags |= 16;
 	}
-	if ( undefined != this.strikeH )
+	if ( undefined != this.Pr.strikeH )
     {
-		Writer.WriteBool( this.strikeH );
+		Writer.WriteBool( this.Pr.strikeH );
 		Flags |= 32;
 	}
-	if ( undefined != this.strikeTLBR )
+	if ( undefined != this.Pr.strikeTLBR )
     {
-		Writer.WriteBool( this.strikeTLBR );	
+		Writer.WriteBool( this.Pr.strikeTLBR );	
 		Flags |= 64;
 	}
-	if ( undefined != this.strikeV )
+	if ( undefined != this.Pr.strikeV )
     {
-		Writer.WriteBool( this.strikeV );
+		Writer.WriteBool( this.Pr.strikeV );
 		Flags |= 128;
 	}
 	var EndPos = Writer.GetCurPosition();
@@ -529,29 +529,32 @@ CBorderBox.prototype.Write_ToBinary2 = function( Writer )
 }
 CBorderBox.prototype.Read_FromBinary2 = function( Reader )
 {
-	var Element = g_oTableId.Get_ById( Reader.GetString2() );
-	Element.Parent = this;
-	this.elements[0][0] = Element;
+	var props = {ctrPrp: new CTextPr()};
+	var arrElems = [];
+	
+	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
 		
-	this.CtrPrp.Read_FromBinary(Reader);
+	props.ctrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();
 	if ( Flags & 1 )
-		this.hideBot = Reader.GetBool();
+		props.hideBot = Reader.GetBool();
 	if ( Flags & 2 )
-		this.hideLeft = Reader.GetBool();
+		props.hideLeft = Reader.GetBool();
 	if ( Flags & 4 )
-		this.hideRight = Reader.GetBool();
+		props.hideRight = Reader.GetBool();
 	if ( Flags & 8 )
-		this.hideTop = Reader.GetBool();
+		props.hideTop = Reader.GetBool();
 	if ( Flags & 16 )
-		this.strikeBLTR = Reader.GetBool();
+		props.strikeBLTR = Reader.GetBool();
 	if ( Flags & 32 )
-		this.strikeH = Reader.GetBool();
+		props.strikeH = Reader.GetBool();
 	if ( Flags & 64 )
-		this.strikeTLBR = Reader.GetBool();
+		props.strikeTLBR = Reader.GetBool();
 	if ( Flags & 128 )
-		this.strikeV = Reader.GetBool();
+		props.strikeV = Reader.GetBool();
+		
+	this.fillMathComposition (props, arrElems);
 }
 CBorderBox.prototype.Get_Id = function()
 {
@@ -651,7 +654,7 @@ CBox.prototype.Refresh_RecalcData = function(Data)
 CBox.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_box );
-	Writer.WriteString2( this.elements[0][0].Id );
+	Writer.WriteString2( this.getBase().Id );
 	
 	this.CtrPrp.Write_ToBinary(Writer);
 	
@@ -690,23 +693,26 @@ CBox.prototype.Write_ToBinary2 = function( Writer )
 }
 CBox.prototype.Read_FromBinary2 = function( Reader )
 {
-	var Element = g_oTableId.Get_ById( Reader.GetString2() );
-	Element.Parent = this;
-	this.elements[0][0] = Element;
+	var props = {ctrPrp: new CTextPr()};
+	var arrElems = [];
+	
+	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
 
-	this.CtrPrp.Read_FromBinary(Reader);
+	props.ctrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();
 	if ( Flags & 1 )
-		this.aln = Reader.GetBool();
+		props.aln = Reader.GetBool();
 	if ( Flags & 2 )
-		this.brk = Reader.GetLong();
+		props.brk = Reader.GetLong();
 	if ( Flags & 4 )
-		this.diff = Reader.GetBool();
+		props.diff = Reader.GetBool();
 	if ( Flags & 8 )
-		this.noBreak = Reader.GetBool();
+		props.noBreak = Reader.GetBool();
 	if ( Flags & 16 )
-		this.opEmu = Reader.GetBool();
+		props.opEmu = Reader.GetBool();
+		
+	this.fillMathComposition (props, arrElems);
 }
 CBox.prototype.Get_Id = function()
 {
@@ -810,16 +816,16 @@ CBar.prototype.Refresh_RecalcData = function(Data)
 CBar.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_bar );
-	Writer.WriteString2( this.elements[0][0].Id );	
+	Writer.WriteString2( this.getBase().Id );	
 	
 	this.CtrPrp.Write_ToBinary(Writer);
 	
 	var StartPos = Writer.GetCurPosition();
     Writer.Skip(4);
     var Flags = 0;
-	if ( undefined != this.pos )
+	if ( undefined != this.Pr.pos )
     {
-		Writer.WriteString2( this.pos );	
+		Writer.WriteLong( this.Pr.pos );	
 		Flags |= 1;
 	}
 	var EndPos = Writer.GetCurPosition();
@@ -830,16 +836,18 @@ CBar.prototype.Write_ToBinary2 = function( Writer )
 }
 CBar.prototype.Read_FromBinary2 = function( Reader )
 {
-	var Element = g_oTableId.Get_ById( Reader.GetString2() );
-	Element.Parent = this;
-	this.elements[0][0] = Element;
+	var props = {ctrPrp: new CTextPr()};
+	var arrElems = [];
+	
+	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
 
-	this.CtrPrp.Read_FromBinary(Reader);
+	props.ctrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();
 	if ( Flags & 1 )
-        this.loc = Reader.GetString2();
-		//this.pos = Reader.GetString2();
+		props.pos = Reader.GetLong();
+		
+	this.fillMathComposition (props, arrElems);
 }
 CBar.prototype.Get_Id = function()
 {
@@ -928,36 +936,36 @@ CPhantom.prototype.Refresh_RecalcData = function(Data)
 CPhantom.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_phant );
-	Writer.WriteString2( this.elements[0][0].Id );
+	Writer.WriteString2( this..getBase().Id );
 	
 	this.CtrPrp.Write_ToBinary(Writer);
 	
 	var StartPos = Writer.GetCurPosition();
     Writer.Skip(4);
     var Flags = 0;
-	if ( undefined != this.show )
+	if ( undefined != this.Pr.show )
     {
-		Writer.WriteBool( this.show );
+		Writer.WriteBool( this.Pr.show );
 		Flags |= 1;
 	}
-	if ( undefined != this.transp )
+	if ( undefined != this.Pr.transp )
     {
-		Writer.WriteBool( this.transp );
+		Writer.WriteBool( this.Pr.transp );
 		Flags |= 2;
 	}
-	if ( undefined != this.zeroAsc )
+	if ( undefined != this.Pr.zeroAsc )
     {
-		Writer.WriteBool( this.zeroAsc );
+		Writer.WriteBool( this.Pr.zeroAsc );
 		Flags |= 4;
 	}
-	if ( undefined != this.zeroDesc )
+	if ( undefined != this.Pr.zeroDesc )
     {
-		Writer.WriteBool( this.zeroDesc );
+		Writer.WriteBool( this.Pr.zeroDesc );
 		Flags |= 8;
 	}
-	if ( undefined != this.zeroWid )
+	if ( undefined != this.Pr.zeroWid )
     {
-		Writer.WriteBool( this.zeroWid );
+		Writer.WriteBool( this.Pr.zeroWid );
 		Flags |= 16;
 	}
 	var EndPos = Writer.GetCurPosition();
@@ -967,23 +975,26 @@ CPhantom.prototype.Write_ToBinary2 = function( Writer )
 }
 CPhantom.prototype.Read_FromBinary2 = function( Reader )
 {
-	var Element = g_oTableId.Get_ById( Reader.GetString2() );
-	Element.Parent = this;
-	this.elements[0][0] = Element;
+	var props = {ctrPrp: new CTextPr()};
+	var arrElems = [];
+	
+	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
 		
-	this.CtrPrp.Read_FromBinary(Reader);
+	props.ctrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();
 	if ( Flags & 1 )
-		this.show = Reader.GetBool();
+		props.show = Reader.GetBool();
 	if ( Flags & 2 )
-		this.transp = Reader.GetBool();
+		props.transp = Reader.GetBool();
 	if ( Flags & 4 )
-		this.zeroAsc = Reader.GetBool();
+		props.zeroAsc = Reader.GetBool();
 	if ( Flags & 8 )
-		this.zeroDesc = Reader.GetBool();
+		props.zeroDesc = Reader.GetBool();
 	if ( Flags & 16 )
-		this.zeroWid = Reader.GetBool();
+		props.zeroWid = Reader.GetBool();
+		
+	this.fillMathComposition (props, arrElems);
 }
 CPhantom.prototype.Get_Id = function()
 {
