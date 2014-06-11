@@ -7255,8 +7255,9 @@ ParaRun.prototype.getPropsForWrite = function()
 
     return {wRPrp: wRPrp, mathRPrp: mathRPrp};
 }
-ParaRun.prototype.Math_SetGaps = function(Paragraph, RecalcInfo)
+ParaRun.prototype.Math_SetGaps = function(Parent, Paragraph, RecalcInfo)
 {
+    this.Parent = Parent;
     this.Paragraph = Paragraph;
 
     var oWPrp = this.Get_CompiledPr(true);

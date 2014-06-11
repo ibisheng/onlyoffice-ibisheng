@@ -5063,7 +5063,7 @@ CMathContent.prototype =
             if(this.content[pos].typeObj == MATH_COMP)
                 this.content[pos].SetGaps(this, ParaMath, RecalcInfo);
             else
-                this.content[pos].Math_SetGaps(ParaMath.Paragraph, RecalcInfo);
+                this.content[pos].Math_SetGaps(this, ParaMath.Paragraph, RecalcInfo);
 
         }
 
