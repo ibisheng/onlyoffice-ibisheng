@@ -155,41 +155,55 @@ ParaMath.prototype =
 		}
 		else if ( para_Math === Type )
 		{
-			var nPosStart = oStartContent.State.ContentPos;
-			var nLenStart = oStartContent.Content.length;
-			var nPosEnd = oEndContent.State.ContentPos;
-			
-			History.Create_NewPoint();
-			
-			if(nPosStart != nLenStart)
+			if (oStartContent.typeObj == MATH_PLACEHOLDER)
 			{
-				var oMRun = new ParaRun(this.Paragraph, true);
-				oMRun.Pr = oStartContent.Pr;
-
-				for (var i=nPosStart; i<nLenStart; i++)
+				History.Create_NewPoint();
+				
+				var Items = [];
+				Items.push(oContent.Content.content[0]);
+				oContent.Content.content.splice( 0, 1 );
+				History.Add(oContent.Content, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: 0});
+				
+				oContent.Content.Load_FromMenu(Item.Menu, this.Paragraph);
+			}
+			else
+			{
+				nPosStart = oStartContent.State.ContentPos;
+				nLenStart = oStartContent.Content.length;
+				nPosEnd = oEndContent.State.ContentPos;
+				
+				History.Create_NewPoint();
+				
+				if(nPosStart != nLenStart) //вставка идет в mathcontent
 				{
-					var Pos = oMRun.Content.length;
-					var EndPos = Pos + 1;
-					var oItem = oStartContent.Content[i];
-					oMRun.Add(oItem);
-					oStartContent.Remove_FromContent(i, 1, false);
+					var oMRun = new ParaRun(this.Paragraph, true);
+					oMRun.Pr = oStartContent.Pr;
+
+					for (i=nPosStart; i<nLenStart; i++)
+					{
+						var Pos = oMRun.Content.length;
+						var EndPos = Pos + 1;
+						var oItem = oStartContent.Content[i];
+						oMRun.Add(oItem);
+						oStartContent.Remove_FromContent(i, 1, false);
+					}
 				}
-			}
 
-			oContent.Content.CurPos++;
-			oContent.Content.Load_FromMenu(Item.Menu, this.Paragraph);
+				oContent.Content.CurPos++;
+				oContent.Content.Load_FromMenu(Item.Menu, this.Paragraph);
 
-			if(nPosStart != nLenStart)
-			{
-				var items = [];
-				oContent.Content.addElementToContent(oMRun);
-				items.push(oMRun);
-				var Pos = oContent.Content.CurPos,
-					PosEnd = Pos + 1;
-				History.Add(oContent.Content, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
+				if(nPosStart != nLenStart)
+				{
+					var items = [];
+					oContent.Content.addElementToContent(oMRun);
+					items.push(oMRun);
+					var Pos = oContent.Content.CurPos,
+						PosEnd = Pos + 1;
+					History.Add(oContent.Content, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
+				}
+				
+				oContent.Content.SetRunEmptyToContent(false);
 			}
-			
-			oContent.Content.SetRunEmptyToContent(false);
 		}
 	},
 
@@ -202,8 +216,27 @@ ParaMath.prototype =
 		if (oContent.Start == oContent.End)
 		{
 			var oElem = oContent.Content.getElem(oContent.Start);
-			if (oElem.typeObj == MATH_COMP || oElem.typeObj == MATH_PLACEHOLDER)
+			if (oElem.typeObj == MATH_COMP)
 				this.RemoveElem(oContent, Direction, bOnAddText);
+			else if (oElem.typeObj == MATH_PLACEHOLDER && bOnAddText == false)
+				return;
+			else if (oElem.typeObj == MATH_PLACEHOLDER && bOnAddText == true)
+			{
+				History.Create_NewPoint();
+				
+				var Items = new Array();
+				Items.push(oContent.Content.content[0]);
+				oContent.Content.content.splice( 0, 1 );
+				History.Add(oContent.Content, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: 0});
+				
+				var oMRun = new ParaRun(this.Paragraph, true);
+				oContent.Content.addElementToContent(oMRun);
+				var items = new Array();
+				items.push(oMRun);
+				var Pos = oContent.Content.CurPos,
+					PosEnd = Pos + 1;
+				History.Add(oContent.Content, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
+			}
 			else	//pararun
 			{
 				History.Create_NewPoint();
