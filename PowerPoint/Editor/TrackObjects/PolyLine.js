@@ -1,3 +1,5 @@
+"use strict";
+
 function PolyLine (drawingObjects)
 {
     this.drawingObjects = drawingObjects;

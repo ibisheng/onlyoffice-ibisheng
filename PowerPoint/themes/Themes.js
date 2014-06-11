@@ -1,3 +1,5 @@
+"use strict";
+
 var _presentation_editor_themes = [];
 
 _presentation_editor_themes[0] = {

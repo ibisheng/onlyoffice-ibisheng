@@ -1,3 +1,5 @@
+"use strict";
+
 function CDocOpenProgress()
 {
     this.Type = c_oAscAsyncAction.Open;

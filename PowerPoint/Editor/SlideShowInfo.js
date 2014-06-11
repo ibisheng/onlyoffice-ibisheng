@@ -1,3 +1,5 @@
+"use strict";
+
 function CTransition() {
     this.bAudioPresent		= false;
     this.m_nEffectType		= 0;

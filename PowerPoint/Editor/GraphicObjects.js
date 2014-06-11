@@ -1,3 +1,5 @@
+"use strict";
+
 function CGraphicObjects(slide)
 {
     this.slide = slide;

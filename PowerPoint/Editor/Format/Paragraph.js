@@ -1,3 +1,5 @@
+"use strict";
+
 // При добавлении нового элемента ParagraphContent, добавить его обработку в
 // следующие функции:
 // Internal_Recalculate1, Internal_Recalculate2, Draw, Internal_RemoveBackward,
@@ -710,6 +712,7 @@ Paragraph.prototype =
         var TextAscent = 0;
         var TextHeight = 0;
         var TextDescent = 0;
+		var TextAscent2 = 0;
 
         g_oTextMeasurer.SetFontSlot(fontslot_ASCII);
 
@@ -9314,7 +9317,7 @@ Paragraph.prototype =
             this.FontMap.NeedRecalc = false;
         }
 
-        for (Key in this.FontMap.Map) {
+        for (var Key in this.FontMap.Map) {
             FontMap[Key] = this.FontMap.Map[Key];
         }
     },

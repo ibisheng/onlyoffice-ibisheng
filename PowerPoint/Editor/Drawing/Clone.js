@@ -1,3 +1,5 @@
+"use strict";
+
 function clone(obj) {
 
     if(obj == null || typeof(obj) != 'object')

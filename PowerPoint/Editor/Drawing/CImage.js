@@ -1,3 +1,5 @@
+"use strict";
+
 function CompareImageProperties(imgProps1, imgProps2)
 {
     var _result_image_properties = {};

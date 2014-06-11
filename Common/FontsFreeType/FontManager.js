@@ -1,4 +1,6 @@
-﻿var g_bIsAppleDevices = AscBrowser.isAppleDevices;
+﻿"use strict";
+
+var g_bIsAppleDevices = AscBrowser.isAppleDevices;
 
 function get_raster_bounds(data, width, height, stride)
 {

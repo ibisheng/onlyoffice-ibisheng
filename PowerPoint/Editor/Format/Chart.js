@@ -1,3 +1,4 @@
+"use strict";
 
 var CLASS_TYPE_CHART_DATA = 9999;
 function CChartAsGroup(parent)

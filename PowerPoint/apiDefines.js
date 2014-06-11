@@ -1,4 +1,6 @@
-﻿var c_oAscZoomType = {
+﻿"use strict";
+
+var c_oAscZoomType = {
 	Current :0,		
 	FitWidth:1,
 	FitPage :2

@@ -1,3 +1,5 @@
+"use strict";
+
 function HitInLine(context, px, py, x0, y0, x1, y1)
 {
     var tx, ty, dx, dy, d;

@@ -1,3 +1,5 @@
+"use strict";
+
 function CCMapIndex()
 {
     this.index = 0;
@@ -920,17 +922,11 @@ function CFontFile(fileName, faceIndex)
                     {
                         unGID = this.m_nDefaultChar;
                         oSizes.eState = EGlyphState.glyphstateNormal;
-
-                        pFace = this.m_pFace;
-                        pCurentGliph = pFace.glyph;
                     }
                 }
                 else
                 {
                     oSizes.eState = EGlyphState.glyphstateDeafault;
-
-                    pFace = this.m_pDefaultFont.m_pFace;
-                    pCurentGliph = this.m_pDefaultFont.m_pFace.glyph;
                 }
             }
             else

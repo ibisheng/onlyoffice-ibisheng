@@ -1,3 +1,5 @@
+"use strict";
+
 function CThemeLoadInfo()
 {
     this.FontMap = null;

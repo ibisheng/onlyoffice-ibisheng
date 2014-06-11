@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * User: Ilja.Kirillov
  * Date: 10.10.12
@@ -34,6 +36,7 @@ CWriteCommentData.prototype =
     {
         var numericKeys = [ 1, 4, 5, 6, 7, 10, 11 ];
         var minutesOffset = 0;
+		var struct;
         if ((struct = /^(\d{4}|[+\-]\d{6})(?:-(\d{2})(?:-(\d{2}))?)?(?:T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{3}))?)?(?:(Z)|([+\-])(\d{2})(?::(\d{2}))?)?)?$/.exec(sDate))) {
             // avoid NaN timestamps caused by “undefined” values being passed to Date.UTC
             for (var i = 0, k; (k = numericKeys[i]); ++i) {

@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * Created with JetBrains WebStorm.
  * User: Sergey.Luzyanin
@@ -3387,7 +3389,7 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
     this.snapX = snap.snapX;
     this.snapY = snap.snapY;
 
-    trackSnap = this.drawingObjectsController.getSnapArraysTrackObjects();
+    var trackSnap = this.drawingObjectsController.getSnapArraysTrackObjects();
     this.trackSnapX = trackSnap.snapX;
     this.trackSnapY = trackSnap.snapY;
 
@@ -4191,7 +4193,7 @@ function MoveInGroupState(drawingObjectsController, drawingObjects, group, start
     this.snapX = snap.snapX;
     this.snapY = snap.snapY;
 
-    trackSnap = this.drawingObjectsController.getSnapArraysTrackObjects();
+    var trackSnap = this.drawingObjectsController.getSnapArraysTrackObjects();
     this.trackSnapX = trackSnap.snapX;
     this.trackSnapY = trackSnap.snapY;
 

@@ -1,3 +1,5 @@
+"use strict";
+
 /** @define {boolean} */
 var ASC_DOCS_API_DEBUG = true;
 
@@ -2467,9 +2469,9 @@ asc_docs_api.prototype.put_AddPageBreak = function()
 	this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaNewLine( break_Page ) );
 }
 asc_docs_api.prototype.Update_ParaInd = function( Ind ){
-	FirstLine = 0;
-	Left = 0;
-	Right = 0;
+	var FirstLine = 0;
+	var Left = 0;
+	var Right = 0;
 	if ( "undefined" != typeof(Ind) )
 	{
 		if("undefined" != typeof(Ind.FirstLine))

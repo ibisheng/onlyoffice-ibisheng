@@ -1,3 +1,5 @@
+"use strict";
+
 // TODO: Что надо сделать в параграфе:
 //       0. !!!!! Сделать статистику следующих элементов: Число слов, Абзацев, Знаков, Знаков и пробелов.
 //       1. При пересчете параграфа, если он начинается с новой страницы, тогда не надо вверху добавлять
@@ -2123,8 +2125,8 @@ Paragraph.prototype =
                 }
                 case para_End:
                 {
-                    bWord  = false;
-                    bSpace = false;
+                    var bWord  = false;
+                    var bSpace = false;
 
                     var bEndCell = false;
                     if ( null === this.Get_DocumentNext() && true === this.Parent.Is_TableCellContent() )

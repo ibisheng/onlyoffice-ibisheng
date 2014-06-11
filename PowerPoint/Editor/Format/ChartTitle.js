@@ -1,3 +1,5 @@
+"use strict";
+
 var CHART_TITLE_TYPE_TITLE = 0x00;
 var CHART_TITLE_TYPE_H_AXIS = 0x01;
 var CHART_TITLE_TYPE_V_AXIS = 0x02;

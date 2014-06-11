@@ -1,3 +1,5 @@
+"use strict";
+
 function CGroupShape(parent)
 {
     this.group = null;

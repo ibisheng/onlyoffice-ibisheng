@@ -1,3 +1,5 @@
+"use strict";
+
 function CCacheSlideImage()
 {
     this.Image = null;

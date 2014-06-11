@@ -1,3 +1,5 @@
+"use strict";
+
 var g_dDpiX = 96.0;
 var g_dDpiY = 96.0;
 

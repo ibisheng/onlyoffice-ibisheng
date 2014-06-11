@@ -1,3 +1,5 @@
+"use strict";
+
 // COLOR -----------------------
 /*
 var map_color_scheme = {};
@@ -3664,8 +3666,8 @@ function CTheme()
         var _slide_count = _slides.length;
         for(var _slide_index = 0; _slide_index < _slide_count; ++_slide_index)
         {
-            _cur_slide =_slides[_slide_index];
-            _cur_theme = _cur_slide.Layout.Master.Theme;
+            var _cur_slide =_slides[_slide_index];
+            var _cur_theme = _cur_slide.Layout.Master.Theme;
             if(_cur_theme === this)
             {
                 _cur_slide.recalcAllColors();
@@ -3704,8 +3706,8 @@ function CTheme()
         var _slide_count = _slides.length;
         for(var _slide_index = 0; _slide_index < _slide_count; ++_slide_index)
         {
-            _cur_slide =_slides[_slide_index];
-            _cur_theme = _cur_slide.Layout.Master.Theme;
+            var _cur_slide =_slides[_slide_index];
+            var _cur_theme = _cur_slide.Layout.Master.Theme;
             if(_cur_theme === this)
             {
                 _cur_slide.recalcAllColors();
@@ -3747,6 +3749,7 @@ function CTheme()
 
     this.Load_Changes = function(r)
     {
+		var _cur_slide, _cur_theme;
         if(r.GetLong() === historyitem_type_Theme)
         {
             var type = r.GetLong();

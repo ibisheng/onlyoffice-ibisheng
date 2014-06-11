@@ -1,3 +1,4 @@
+"use strict";
 
 var LAYOUT_MODE_EDGE = 0x00;
 var LAYOUT_MODE_FACTOR = 0x01;

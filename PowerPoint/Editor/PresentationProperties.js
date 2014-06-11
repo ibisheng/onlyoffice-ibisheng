@@ -1,3 +1,5 @@
+"use strict";
+
 var nPrColPrBW  = 0;//черно-белая печать
 var nPrColPrClr = 1;//цветная печать
 var nPrColPrGray = 2;//печать в оттенках серого

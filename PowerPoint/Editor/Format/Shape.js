@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * Created with JetBrains WebStorm.
  * User: Sergey.Luzyanin
@@ -3030,6 +3032,7 @@ CShape.prototype =
         var _final_preset;
         var _old_line;
         var _new_line;
+		var _arrow_flag;
 
 
         if (this.spPr.ln == null) {

@@ -1,3 +1,5 @@
+"use strict";
+
 function _FT_Common()
 {    
     this.UintToInt = function(v){
@@ -9316,7 +9318,7 @@ function afm_parse_kern_pairs(parser)
                 shared_vals[1].type = 5;
                 shared_vals[2].type = 3;
                 shared_vals[3].type = 3;
-                r = afm_parser_read_vals(parser, shared_vals, 4);
+                var r = afm_parser_read_vals(parser, shared_vals, 4);
                 if (r < 3)
                     return 160;
 
@@ -13907,7 +13909,7 @@ function load_format_20(face, stream, post_limit)
 function load_format_25(face, stream, post_limit)
 {
     var num_glyphs = stream.ReadUShort();
-    error = FT_Error;
+    var error = FT_Error;
     if (error != 0)
         return error;
 
@@ -14209,7 +14211,7 @@ function Load_SBit_Range(range, stream)
             return error;
         range.glyph_offsets = new Array(num_glyphs);
 
-        for (n = 0; n < num_glyphs; n++)
+        for (var n = 0; n < num_glyphs; n++)
             range.glyph_offsets[n] = (range.image_offset + ((large == 1) ? stream.GetULong() : stream.GetUShort()));
         stream.ExitFrame();
         break;
@@ -16086,7 +16088,7 @@ function tt_cmap10_class_rec()
 
         var length = FT_NEXT_ULONG(p);
         p.pos = base + 16;
-        count = FT_NEXT_ULONG(p);
+        var count = FT_NEXT_ULONG(p);
 
         if (length > (valid.limit - base) || length < 20 + count * 2)
             return 8;
@@ -17217,7 +17219,7 @@ function sfnt_get_name_index(face, glyph_name)
     for (var i = 0; i < max_gid; i++)
     {
         var gname = tt_face_get_ps_name(face, i);
-        error = FT_Error;
+        var error = FT_Error;
         if (error != 0)
             continue;
 
@@ -18409,6 +18411,7 @@ function FT_Outline_Get_Orientation(outline)
     /* only which is spanned up by the control points.                */
     var points = outline.points;
 
+	var v_cur;
     var first = 0;
     var area = 0;
     for (var c = 0; c < outline.n_contours; c++)
@@ -40466,7 +40469,6 @@ function FT_Library()
             error = this.ft_add_renderer(module);
             if (0 != error)
             {
-                delete module;
                 return error;
             }
         }
@@ -40615,7 +40617,7 @@ function FT_Library()
                 slot = null;
                 if (FT_Error != 0)
                 {
-                    delete face;
+					face = null;
                     return null;
                 }
 
@@ -40624,7 +40626,7 @@ function FT_Library()
                     var size = FT_New_Size(face);
                     if (FT_Error != 0)
                     {
-                        delete face;
+						face = null;
                         return null;
                     }
 

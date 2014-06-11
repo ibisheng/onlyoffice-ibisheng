@@ -1,3 +1,5 @@
+"use strict";
+
 // Содержимое параграфа должно иметь:
 //
 // 1. Type    - тип
@@ -6286,15 +6288,6 @@ ParaHyperlinkStart.prototype =
     Can_AddNumbering : function()
     {
         return false;
-    },
-
-    Copy : function()
-    {
-        var Hyper = new ParaHyperlinkStart();
-        Hyper.Value   = this.Value;
-        Hyper.Visited = this.Visited;
-        Hyper.ToolTip = this.ToolTip;
-        return Hyper;
     },
 
     Set_Visited : function(Value)

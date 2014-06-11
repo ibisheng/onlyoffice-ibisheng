@@ -1,3 +1,5 @@
+"use strict";
+
 var LEGEND_ELEMENT_TYPE_RECT = 0x00;
 var LEGEND_ELEMENT_TYPE_LINE = 0x01;
 
