@@ -936,7 +936,7 @@ CPhantom.prototype.Refresh_RecalcData = function(Data)
 CPhantom.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_phant );
-	Writer.WriteString2( this..getBase().Id );
+	Writer.WriteString2( this.getBase().Id );
 	
 	this.CtrPrp.Write_ToBinary(Writer);
 	
