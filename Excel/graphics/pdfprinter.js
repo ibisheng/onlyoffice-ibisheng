@@ -264,7 +264,7 @@ CPdfPrinter.prototype =
     getFontMetrix : function()
     {
         console.log("error");
-        return new FontMetrics(0, 0, 0);
+        return new FontMetrics();
     },
     setFont : function(font)
     {
