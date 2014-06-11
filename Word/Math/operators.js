@@ -3750,7 +3750,6 @@ CDelimiter.prototype.setPosition = function(position)
     var x = this.pos.x + this.GapLeft,
         y = this.pos.y;
 
-
     var PosBegOper = new CMathPosition();
     PosBegOper.x = x;
     PosBegOper.y = y + this.alignOperator(this.begOper);

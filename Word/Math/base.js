@@ -189,24 +189,6 @@ CMathBase.prototype =
                 if( !this.elements[i][j].IsJustDraw() )
                     this.elements[i][j].setArgSize(argSize);
     },
-    // TO DO
-    // посмотреть для всех мат. объектов, где используется эта функция
-    /*Get_FullCtrPrp: function()  // учитываем ArgSize
-    {
-        var tPrp = this.Get_CompiledCtrPrp(true);
-        this.ParaMath.ApplyArgSize(tPrp);
-
-        *//*if(this.argSize == -1)
-        //tPrp.FontSize *= 0.8;
-            tPrp.FontSize *= 0.728;
-        else if(this.argSize == -2)
-        //tPrp.FontSize *= 0.65;
-            tPrp.FontSize *= 0.53;*//*
-
-        return tPrp;
-    },*/
-    /////////
-
     /*setComposition: function(Composition)
     {
         this.Composition = Composition;
@@ -686,10 +668,11 @@ CMathBase.prototype =
         if(this.alignment.hgt[pos_y] == CENTER)
         {
             var maxAsc = 0;
+            var _ascent;
 
             for(var j = 0; j < this.nCol; j++)
             {
-                var _ascent = this.elements[pos_x][j].size.ascent;
+                _ascent = this.elements[pos_x][j].size.ascent;
                 maxAsc = ( maxAsc > _ascent ) ? maxAsc : _ascent;
             }
             PosAlign.y = (maxAsc - this.elements[pos_x][pos_y].size.ascent);
@@ -697,8 +680,9 @@ CMathBase.prototype =
         else
         {
             var maxH = 0;
+            var _h;
 
-            for(j=0; j < this.nCol; j++)
+            for(var j=0; j < this.nCol; j++)
             {
                 var _h = this.elements[pos_x][j].size.height;
                 maxH = ( maxH > _h ) ? maxH : _h;
@@ -976,7 +960,7 @@ CMathBase.prototype =
             width += Widths[i];
 
         width += this.dW*(this.nCol - 1);
-        width += this.GapLeft + this.GapRight;
+        //width += this.GapLeft + this.GapRight;
 
         var ascent = this.getAscent(oMeasure, height);
 
@@ -1458,7 +1442,32 @@ CMathBase.prototype =
     {
         return this.elements[this.CurPos_X][this.CurPos_Y].IsCurrentPlh();
     },
+    SetGaps:  function(Parent, ParaMath, RecalcInfo)
+    {
+        this.Parent = Parent;
+        this.ParaMath = ParaMath;
 
+        RecalcInfo.Left = RecalcInfo.Current;
+        RecalcInfo.leftRunPrp = RecalcInfo.currRunPrp;
+
+
+        RecalcInfo.Current = this;
+        RecalcInfo.currRunPrp = this.Get_CompiledCtrPrp();
+
+        RecalcInfo.setGaps();
+
+    },
+    ApplyGaps: function()
+    {
+        this.size.width += this.GapLeft + this.GapRight;
+    },
+    Recalculate_Reset: function(StartRange, StartLine)
+    {
+        for(var i=0; i < this.nRow; i++)
+            for(var j = 0; j < this.nCol; j++)
+                if(this.elements[i][j].IsJustDraw() == false)
+                    this.elements[i][j].Recalculate_Reset(StartRange, StartLine);
+    },
     // Перемещение по стрелкам
 
     Get_LeftPos: function(SearchPos, ContentPos, Depth, UseContentPos, EndRun)

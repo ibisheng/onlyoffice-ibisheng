@@ -102,7 +102,7 @@ CBorderBox.prototype.recalculateSize = function()
     if(this.Pr.hideRight == false)
         width += this.gapBrd;
 
-    width += this.GapLeft + this.GapRight;
+    //width += this.GapLeft + this.GapRight;
 
     this.size = {width : width, height: height, ascent: ascent};
 }

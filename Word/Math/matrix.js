@@ -144,7 +144,7 @@ CMathMatrix.prototype.recalculateSize = function(oMeasure)
         ascent = this.getAscent(oMeasure, height);
 
 
-    width += this.GapLeft + this.GapRight;
+    //width += this.GapLeft + this.GapRight;
 
     this.size = {width: width, height: height, ascent: ascent};
 }

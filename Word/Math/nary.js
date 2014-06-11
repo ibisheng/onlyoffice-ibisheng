@@ -499,7 +499,7 @@ CNaryOvr.prototype.recalculateSize = function()
 
     var ascent = nOper.ascent;
     var width = nOper.width > iter.width ? nOper.width : iter.width;
-    width += this.GapLeft + this.GapRight;
+    //width += this.GapLeft + this.GapRight;
 
     var height = nOper.height + this.dH + iter.height;
 
@@ -567,7 +567,7 @@ CNaryUndOvr.prototype.recalculateSize = function()
         height += this.elements[i][0].size.height;
     }
 
-    width += this.GapLeft + this.GapRight;
+    //width += this.GapLeft + this.GapRight;
     height += this.gapTop + this.gapBottom;
 
     this.size = {width: width, height: height, ascent: ascent};

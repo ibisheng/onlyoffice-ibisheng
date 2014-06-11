@@ -46,28 +46,11 @@ CFraction.prototype.drawBarFraction = function(x, y, pGraphics)
 
     var numHeight = this.elements[0][0].size.height;
 
-    var x1 = this.pos.x + x ,
-        x2 = this.pos.x + x + this.size.width,
+    var width = this.size.width - this.GapLeft - this.GapRight;
+
+    var x1 = this.pos.x + x + this.GapLeft,
+        x2 = x1 + width,
         y1 = this.pos.y + y + numHeight- penW;
-
-    /*var xx1 = x1, yy1 = this.pos.y + y,
-        xx2 = xx1 + this.size.width, yy2 = yy1 + this.elements[0][0].size.height;
-
-    var xxx1 =  x1, yyy1 = this.pos.y + y + this.elements[0][0].size.height,
-        xxx2 =  xxx1 + this.size.width, yyy2 = yyy1 + this.elements[1][0].size.height;
-
-    pGraphics.p_color(255,0,0, 255);
-    pGraphics.drawHorLine(0, yy1, xx1, xx2, 0.1);
-    pGraphics.drawVerLine(0, xx2, yy1, yy2, 0.1);
-    pGraphics.drawHorLine(0, yy2, xx1, xx2, 0.1);
-    pGraphics.drawVerLine(0, xx1, yy1, yy2, 0.1);
-
-
-    pGraphics.p_color(0,255,0, 255);
-    pGraphics.drawHorLine(0, yyy1, xxx1, xxx2, 0.1);
-    pGraphics.drawVerLine(0, xxx2, yyy1, yyy2, 0.1);
-    pGraphics.drawHorLine(0, yyy2, xxx1, xxx2, 0.1);
-    pGraphics.drawVerLine(0, xxx1, yyy1, yyy2, 0.1);*/
 
     if( !this.bHideBar )
     {
@@ -242,7 +225,7 @@ CFraction.prototype.recalculateBarFraction = function(oMeasure)
     var height = num.height + den.height;
     var ascent = num.height + this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
-    width += this.GapLeft + this.GapRight;
+    //width += this.GapLeft + this.GapRight;
 
     this.size =  {width: width, height: height, ascent: ascent};
 }
@@ -256,7 +239,7 @@ CFraction.prototype.recalculateSkewed = function(oMeasure)
     var height = this.elements[0][0].size.height + this.elements[0][1].size.height;
     var ascent = this.elements[0][0].size.height + this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
-    width += this.GapLeft + this.GapRight;
+    //width += this.GapLeft + this.GapRight;
 
     this.size =  {width: width, height: height, ascent: ascent};
 }
@@ -293,7 +276,7 @@ CFraction.prototype.recalculateLinear = function()
 
     var width = this.elements[0][0].size.width + this.dW + this.elements[0][1].size.width;
 
-    width += this.GapLeft + this.GapRight;
+    //width += this.GapLeft + this.GapRight;
 
     this.size = {height: height, width: width, ascent: ascent};
 }

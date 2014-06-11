@@ -974,16 +974,19 @@ CRadical.prototype.recalculateSize = function(oMeasure)
 
     var gapBase = gSign + gArg;
 
+    var base, degr, shTop,
+        height, width, ascent;
+
     if(this.Pr.type == SQUARE_RADICAL)
     {
-        var base = this.elements[0][0].size;
-        var shTop = (sign.height - gSign - base.height)/2;
+        base = this.elements[0][0].size;
+        shTop = (sign.height - gSign - base.height)/2;
         shTop = shTop > 0 ? shTop : 0;
 
-        var height = sign.height,
-            width  = sign.width,
-            ascent = gapBase + shTop + base.ascent;
-            //ascent = height - (base.height - base.ascent);
+        height = sign.height;
+        width  = sign.width;
+        ascent = gapBase + shTop + base.ascent;
+        //ascent = height - (base.height - base.ascent);
 
         width += this.GapLeft + this.GapRight;
 
@@ -991,8 +994,8 @@ CRadical.prototype.recalculateSize = function(oMeasure)
     }
     else if(this.Pr.type == DEGREE_RADICAL)
     {
-        var degr = this.elements[0][0].size,
-            base = this.elements[0][1].size;
+        degr = this.elements[0][0].size;
+        base = this.elements[0][1].size;
 
         var wTick = this.signRadical.measure.widthTick,
             hTick = this.signRadical.measure.heightTick;
@@ -1004,7 +1007,7 @@ CRadical.prototype.recalculateSize = function(oMeasure)
         this.gapWidth = 0.011*txtPrp.FontSize;
 
         var wDegree = degr.width > wTick ? degr.width - wTick : 0;
-        var width = wDegree + sign.width + this.gapWidth;
+        width = wDegree + sign.width + this.gapWidth;
 
         width += this.GapLeft + this.GapRight;
 
@@ -1017,9 +1020,7 @@ CRadical.prototype.recalculateSize = function(oMeasure)
         var h1 = gapHeight + degr.height + gapDegree + hTick,
             h2 = sign.height;
 
-
-        var height, ascent;
-        var shTop = (sign.height - gSign - base.height)/2;
+        shTop = (sign.height - gSign - base.height)/2;
 
         if(h1 > h2)
         {
@@ -1091,12 +1092,12 @@ CRadical.prototype.setPosition = function(pos)
 CRadical.prototype.findDisposition = function(mCoord)
 {
     var disposition;
+    var inside_flag = -1;
 
     if(this.Pr.type == SQUARE_RADICAL)
     {
         var sizeBase = this.elements[0][0].size;
         var X, Y;
-        var inside_flag = -1;
 
         var gapLeft = this.size.width - this.elements[0][0].size.width;
         var gapTop = this.size.ascent - this.elements[0][0].size.ascent;
@@ -1132,8 +1133,7 @@ CRadical.prototype.findDisposition = function(mCoord)
     else if(this.Pr.type == DEGREE_RADICAL)
     {
         var mouseCoord = {x: null, y: null},
-            posCurs =    {x: 0, y: null},
-            inside_flag = -1;
+            posCurs =    {x: 0, y: null};
 
         var degr = this.elements[0][0].size,
             base = this.elements[0][1].size;

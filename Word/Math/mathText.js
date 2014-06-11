@@ -271,13 +271,21 @@ CMathText.prototype =
         var width;
 
         if(this.bJDraw)
-            width = metricsTxt.WidthG + this.GapLeft + this.GapRight;
+            width = metricsTxt.WidthG;
+            //width = metricsTxt.WidthG + this.GapLeft + this.GapRight;
         else
-            width = metricsTxt.Width + this.GapLeft + this.GapRight;
+            width = metricsTxt.Width;
+            //width = metricsTxt.Width + this.GapLeft + this.GapRight;
 
         this.WidthVisible = width;
 
         this.size = {width: width, widthG: width, height: height, ascent: ascent};
+    },
+    ApplyGaps: function()
+    {
+        this.size.width += this.GapLeft + this.GapRight;
+
+        this.WidthVisible = this.size.width;
     },
     draw: function(x, y, pGraphics)
     {

@@ -170,7 +170,7 @@ CDegree.prototype.recalculateSup = function(oMeasure)
         this.dW = 0.01*mgCtrPrp.FontSize;
 
     var width = base.width + iter.width + this.dW;
-    width += this.GapLeft + this.GapRight;
+    //width += this.GapLeft + this.GapRight;
 
     this.size = {width: width, height: height, ascent: ascent};
 }
@@ -183,7 +183,7 @@ CDegree.prototype.recalculateSubScript = function(oMeasure)
     var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
     var width = base.width + iter.width + this.dW;
-    width += this.GapLeft + this.GapRight;
+    //width += this.GapLeft + this.GapRight;
 
     var bBaseOnlyText = this.elements[0][0].IsOnlyText();
 
