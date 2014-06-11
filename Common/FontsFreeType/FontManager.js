@@ -774,9 +774,9 @@ function LoadFontFile(library, stream_index, name, faceindex)
     font.ResetTextMatrix();
     font.ResetFontMatrix();
 
-    if (true === this.m_bUseKerning)
+    if (true === font.m_bUseKerning)
     {
-        this.m_bUseKerning = ((face.face_flags & 64) != 0 ? true : false);
+        font.m_bUseKerning = ((face.face_flags & 64) != 0 ? true : false);
     }
 
     return font;
