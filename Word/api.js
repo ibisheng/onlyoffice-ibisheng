@@ -323,11 +323,28 @@ CImgProperty.prototype.put_VerticalTextAlign = function(v) { this.verticalTextAl
 
 CImgProperty.prototype.get_OriginSize = function(api)
 {
+    var _section_select = api.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
+    var _page_width             = Page_Width;
+    var _page_height            = Page_Height;
+    var _page_x_left_margin     = X_Left_Margin;
+    var _page_y_top_margin      = Y_Top_Margin;
+    var _page_x_right_margin    = X_Right_Margin;
+    var _page_y_bottom_margin   = Y_Bottom_Margin;
+
+    if (_section_select)
+    {
+        if (_section_select.W)
+            _page_width = _section_select.W;
+
+        if (_section_select.H)
+            _page_height = _section_select.H;
+    }
+
     var _image = api.ImageLoader.map_image_index[_getFullImageSrc(this.ImageUrl)];
     if (_image != undefined && _image.Image != null && _image.Status == ImageLoadStatus.Complete)
     {
-        var _w = Math.max(1, Page_Width - (X_Left_Margin + X_Right_Margin));
-        var _h = Math.max(1, Page_Height - (Y_Top_Margin + Y_Bottom_Margin));
+        var _w = Math.max(1, _page_width - (_page_x_left_margin + _page_x_right_margin));
+        var _h = Math.max(1, _page_height - (_page_y_top_margin + _page_y_bottom_margin));
 
         var bIsCorrect = false;
         if (_image.Image != null)
