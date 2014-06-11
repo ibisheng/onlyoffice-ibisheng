@@ -7065,6 +7065,11 @@ CChartSpace.prototype =
                 this.themeOverride = data.oldPr;
                 break;
             }
+            case historyitem_ShapeSetGroup:
+            {
+                this.group = data.oldPr;
+                break;
+            }
         }
     },
 
@@ -7160,6 +7165,11 @@ CChartSpace.prototype =
             case historyitem_ChartSpace_SetThemeOverride:
             {
                 this.themeOverride = data.newPr;
+                break;
+            }
+            case historyitem_ShapeSetGroup:
+            {
+                this.group = data.newPr;
                 break;
             }
         }
@@ -7262,6 +7272,12 @@ CChartSpace.prototype =
             case historyitem_ChartSpace_SetThemeOverride:
             {
                 writeObject(w, data.oldPr);
+                break;
+            }
+
+            case historyitem_ShapeSetGroup:
+            {
+                //TODO: Реализовать!!!!
                 break;
             }
         }
@@ -7375,6 +7391,11 @@ CChartSpace.prototype =
                 this.themeOverride = readObject(r);
                 break;
             }
+            case historyitem_ShapeSetGroup:
+            {
+                //TODO: Реализовать!!!!
+                break;
+            }                
         }
     }
 
