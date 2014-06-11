@@ -1743,23 +1743,32 @@ CPlotArea.prototype =
         {
             c.setSpPr(this.spPr.createDuplicate());
         }
-        for(i = 0; i < this.axId.length; ++i)
+        
+        var len = this.axId.length;
+        for(i = 0; i < len; i++)
         {
-            c.addAxis(this.axId[i].createDuplicate());
+            var oAxis = this.axId[i].createDuplicate();
+            c.addAxis(oAxis);
+            
+            if ( oAxis instanceof CCatAx )
+                this.catAx = oAxis;
+            else if ( oAxis instanceof CValAx )
+                this.valAx = oAxis;
+            else if ( oAxis instanceof CDateAx )
+                this.dateAx = oAxis;
         }
-        //TODO: разобраться с осями в дочерних объектах
 
-        if ( this.valAx )
-            c.valAx = this.valAx.createDuplicate();
-        
-        if ( this.catAx )
-            c.catAx = this.catAx.createDuplicate();
-        
-        if ( this.dateAx )
-            c.dateAx = this.dateAx.createDuplicate();
-        
-        if ( this.chart )
-            c.chart = this.chart.createDuplicate();
+        // выставляем axis в chart        
+        // TODO: Диаграмм может быть больше, но мы пока работаем только с одной
+        var oZeroChart = c.charts[0];
+        if ( oZeroChart )
+        {
+            len = c.axId.length;
+            for ( var i = 0; i < len; i++ )
+                oZeroChart.addAxId(c.axId[i]);
+            
+            c.chart = oZeroChart;
+        }
         
         return c;
     },

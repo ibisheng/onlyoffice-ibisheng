@@ -10721,16 +10721,18 @@ BinaryChartReader.prototype.ReadCT_Chart = function (type, length, val) {
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_PlotArea(t, l, oNewVal, oIdToAxisMap, aChartWithAxis);
         });
-        //выставляем axis в chart
-        for (var i = 0, length = aChartWithAxis.length; i < length; ++i) {
-            var item = aChartWithAxis[i];
-            var axis = oIdToAxisMap[item.axisId];
-            if (null != axis && null != item.chart) {
-                if (item.surface && axis instanceof CValAx)
-                    this.ConvertSurfaceValAxToLineValAx(axis);
-                item.chart.addAxId(axis);
-            }
+        
+        // выставляем axis в chart        
+        // TODO: 1. Диаграмм может быть больше, но мы пока работаем только с одной
+        // TODO: 2. Избавиться от oIdToAxisMap, aChartWithAxis, т.к. они здесь больше не нужны
+        var oZeroChart = oNewVal.charts[0];
+        if ( oZeroChart )
+        {
+            var len = oNewVal.axId.length
+            for ( var i = 0; i < len; i++ )
+                oZeroChart.addAxId(oNewVal.axId[i]);
         }
+        
         val.setPlotArea(oNewVal);
     }
     else if (c_oserct_chartLEGEND === type) {
