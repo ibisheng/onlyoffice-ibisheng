@@ -105,6 +105,8 @@
                 "../../Common/Drawings/TrackObjects/Spline.js",
                 "../../Common/Drawings/TrackObjects/MoveTracks.js",
 
+
+                "../../Common/Drawings/CommonController.js",
                 "../../Common/Drawings/Format/Constants.js",
                 "../../Common/Drawings/Format/Format.js",
                 "../../Common/Drawings/Format/CreateGeometry.js",
@@ -116,7 +118,6 @@
                 "../../Common/Drawings/Format/ChartSpace.js",
                 "../../Common/Drawings/Format/ChartFormat.js",
                 "../../Common/Drawings/Format/TextBody.js",
-                "../../Common/Drawings/CommonController.js",
 				"../../Common/wordcopypaste.js",
                 "../../Excel/view/DrawingObjectsController.js",
 
