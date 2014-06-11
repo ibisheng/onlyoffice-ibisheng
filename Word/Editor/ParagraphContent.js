@@ -7945,7 +7945,7 @@ ParaMath.prototype =
                      text[i].Replace("<",	"&lt;");
                      text[i].Replace(">",	"&gt;");
                      text[i].Replace("\"",	"&quot;");*/
-                    var oText = new CMathText();
+                    var oText = new CMathText(false);
                     oText.addTxt(sText[i]);
                     oElem.addElementToContent(oText);
                 }
@@ -8246,7 +8246,7 @@ function ParagraphContent_Read_FromBinary(Reader)
         case para_CommentStart      : Element = new ParaCommentStart();      break;
         case para_CommentEnd        : Element = new ParaCommentEnd();        break;
         case para_PresentationNumbering : Element = new ParaPresentationNumbering(); break;
-		case para_Math_Text			: Element = new CMathText();      		 break;
+		case para_Math_Text			: Element = new CMathText(false);      		 break;
     }
 
     if ( null != Element )
