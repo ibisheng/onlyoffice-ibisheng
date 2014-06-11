@@ -3087,7 +3087,7 @@
 			_insertImagesFromBinary: function(ws, data, isIntoShape)
 			{
 				var activeRange = ws.activeRange;
-				var curCol, drawingObject, curRow, startCol, startRow, xfrm, aImagesSync = [], activeRow, activeCol;
+				var curCol, drawingObject, curRow, startCol, startRow, xfrm, aImagesSync = [], activeRow, activeCol, tempArr;
 
 				History.Create_NewPoint();
 				History.StartTransaction();
@@ -3172,8 +3172,16 @@
 					drawingObject.graphicObject.addToDrawingObjects();
 					drawingObject.graphicObject.select(ws.objectRender.controller, 0);
 					
-					if(drawingObject.graphicObject.isImage())
-						aImagesSync.push(drawingObject.graphicObject.getImageUrl());
+					tempArr = [];
+					drawingObject.graphicObject.getAllRasterImages(tempArr);
+					
+					if(tempArr.length)
+					{	
+						for(var n = 0; n < tempArr.length; n++)
+						{
+							aImagesSync.push(tempArr[n]);
+						}
+					};
 				};
 				
 				window["Asc"]["editor"].ImageLoader.LoadDocumentImages(aImagesSync, null, ws.objectRender.asyncImagesDocumentEndLoaded);
