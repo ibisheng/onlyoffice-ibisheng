@@ -3925,22 +3925,10 @@ Cell.prototype.setValue2=function(array){
 	if(History.Is_On())
 		DataOld = this.getValueData();
 	//[{text:"",format:TextFormat},{}...]
-	
-	//удаляем сторое значение
-	var ws = this.ws;
-	var wb = this.ws.workbook;
-	var sheetId = this.ws.getId();
-	if (this.sFormula)
-		wb.dependencyFormulas.deleteMasterNodes2( ws.Id, this.oId.getID(), true );
-	this.sFormula = null;
-    this.formulaParsed = null;
-	this.oValue.clean();
-	this.setFormulaCA(false);
-	this.oValue.setValue2(array);
-	
-	wb.needRecalc.nodes[getVertexId(sheetId,this.oId.getID())] = [sheetId, this.oId.getID()];
-		wb.needRecalc.length++;
-		sortDependency(this.ws.workbook);
+	this.setValueCleanFormula();
+    this.oValue.clean();
+    this.oValue.setValue2(array);
+    sortDependency(this.ws.workbook);
 	var DataNew = null;
 	if(History.Is_On())
 		DataNew = this.getValueData();
@@ -3953,6 +3941,22 @@ Cell.prototype.setValue2=function(array){
 		cell.removeHyperlink();
 	}
 };
+Cell.prototype.setValueCleanFormula = function (array) {
+    //удаляем сторое значение
+    var ws = this.ws;
+    var wb = this.ws.workbook;
+    var sheetId = this.ws.getId();
+    var cellId = this.oId.getID();
+    if (this.sFormula)
+        wb.dependencyFormulas.deleteMasterNodes2(ws.Id, cellId);
+
+    this.sFormula = null;
+    this.formulaParsed = null;
+    this.setFormulaCA(false);
+
+    wb.needRecalc.nodes[getVertexId(sheetId, cellId)] = [sheetId, cellId];
+    wb.needRecalc.length++;
+}
 Cell.prototype.setType=function(type){
 	return this.oValue.type = type;
 };
@@ -4283,14 +4287,9 @@ Cell.prototype.setValueData = function(Val){
 		this.setValue("=" + Val.formula);
 	else if(null != Val.value)
 	{
-		if(null != Val.value.number)
-			this.setValue(Val.value.number.toString());
-		else if(null != Val.value.text)
-			this.setValue(Val.value.text);
-		else if(null != Val.value.multiText)
-			this.setValue2(Val.value._cloneMultiText());
-		else
-			this.setValue("");
+	    this.setValueCleanFormula();
+	    this.oValue = Val.value.clone(this);
+	    sortDependency(this.ws.workbook);
 	}
 	else
 		this.setValue("");
