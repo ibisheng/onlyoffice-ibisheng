@@ -42,7 +42,7 @@ var g_oIdCounter = new CIdCounter();
 
 function CTableId()
 {
-    this.m_aPairs   = new Object();
+    this.m_aPairs   = {};
     this.m_bTurnOff = false;
 
     this.Add = function(Class, Id)
@@ -656,7 +656,7 @@ function CCollaborativeEditing()
                 var Item = Point.Items[Index];
                 var oChanges = new CCollaborativeChanges();
                 oChanges.Set_FromUndoRedo( Item.Class, Item.Data, Item.Binary );
-                var oChanges2 = new Object();
+                var oChanges2 = {};
                 oChanges2["Id"]   = oChanges.m_sId;
                 oChanges2["Data"] = oChanges.m_pData;
                 aChanges.push( oChanges2 );

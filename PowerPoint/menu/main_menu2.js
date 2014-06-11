@@ -1727,7 +1727,7 @@ $(".colorWatch").mouseover(function(){
 		editor.ImgApply( oImgProp );
 	});
 	$("#tblApply").click(function(){
-		var tblOBJ = new Object();
+		var tblOBJ = {};
 		if (document.getElementById("tblWOn").checked )
 			tblOBJ.TableWidth = parseFloat( document.getElementById("tblW").value );
 		else tblOBJ.TableWidth = null

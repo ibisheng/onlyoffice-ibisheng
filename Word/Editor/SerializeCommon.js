@@ -11,7 +11,7 @@ function CPPTXContentLoader()
     this.LogicDocument = null;
     this.BaseReader = null;
 
-    this.ImageMapChecker = new Object();
+    this.ImageMapChecker = {};
 
     this.Start_UseFullUrl = function()
     {
@@ -713,7 +713,7 @@ function CPPTXContentLoader()
     this.CheckImagesNeeds = function(logicDoc)
     {
         var index = 0;
-        logicDoc.ImageMap = new Object();
+        logicDoc.ImageMap = {};
         for (var i in this.ImageMapChecker)
         {
             logicDoc.ImageMap[index++] = i;
@@ -724,7 +724,7 @@ function CPPTXContentLoader()
     {
         //вызывается пока только перед вставкой
         this.stream = null;
-        this.ImageMapChecker = new Object();
+        this.ImageMapChecker = {};
     }
 }
 

@@ -4,7 +4,7 @@ var DEGR_REDUCT = 0.728;
 
 
 var default_font = {FontFamily : {Name  : "Cambria Math", Index : -1 }, FontSize   : 36};
-//var metricsDF = new Object();
+//var metricsDF = {};
 
 function GetMathFont(GFont)
 {

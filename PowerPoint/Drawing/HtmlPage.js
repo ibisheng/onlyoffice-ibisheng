@@ -2893,7 +2893,7 @@ function CEditorPage(api)
 
     this.CreateBackgroundHorRuler = function(margins)
     {
-        var cachedPage = new Object();
+        var cachedPage = {};
         cachedPage.width_mm = this.m_oLogicDocument.Width;
         cachedPage.height_mm = this.m_oLogicDocument.Height;
 
@@ -2916,7 +2916,7 @@ function CEditorPage(api)
     }
     this.CreateBackgroundVerRuler = function(margins)
     {
-        var cachedPage = new Object();
+        var cachedPage = {};
         cachedPage.width_mm = this.m_oLogicDocument.Width;
         cachedPage.height_mm = this.m_oLogicDocument.Height;
 

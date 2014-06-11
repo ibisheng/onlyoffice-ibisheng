@@ -108,7 +108,7 @@ function CThemeLoader()
             _loader.Api = oThis.Api;
             _loader.IsThemeLoader = true;
 
-            var pres = new Object();
+            var pres = {};
             pres.themes = [];
             pres.slideMasters = [];
             pres.slideLayouts = [];

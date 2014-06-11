@@ -212,7 +212,7 @@ function BinaryPPTYLoader()
     this.IsThemeLoader = false;
     this.Api = null;
 
-    this.map_table_styles = new Object();
+    this.map_table_styles = {};
     this.NextTableStyleId = 0;
 
     this.ImageMapChecker = null;
@@ -238,7 +238,7 @@ function BinaryPPTYLoader()
     this.Load = function(base64_ppty, presentation)
     {
         this.presentation = presentation;
-        this.ImageMapChecker = new Object();
+        this.ImageMapChecker = {};
 
         var srcLen = base64_ppty.length;
         var nWritten = 0;
@@ -357,7 +357,7 @@ function BinaryPPTYLoader()
             }
         }
 
-        this.presentation.ImageMap = new Object();
+        this.presentation.ImageMap = {};
         this.presentation.Fonts = [];
         this.presentation.EmbeddedFonts = [];
 
@@ -627,7 +627,7 @@ function BinaryPPTYLoader()
                 if (_at != g_nodeAttributeStart)
                     break;
 
-                var _f_i = new Object();
+                var _f_i = {};
 
                 while (true)
                 {
@@ -5277,7 +5277,7 @@ function BinaryPPTYLoader()
         var _rec_start = s.cur;
         var _end_rec = _rec_start + s.GetULong() + 4;
 
-        props.TableCellMar = new Object();
+        props.TableCellMar = {};
        props.TableCellMar.Top    = new CTableMeasurement(tblwidth_Mm, 1.27);
         props.TableCellMar.Left   = new CTableMeasurement(tblwidth_Mm, 2.54);
         props.TableCellMar.Bottom = new CTableMeasurement(tblwidth_Mm, 1.27);
@@ -5438,7 +5438,7 @@ function BinaryPPTYLoader()
 
         s.Skip2(1); // start attributes
 
-        var obj = new Object();
+        var obj = {};
         obj.props = new CTablePr();
         obj.look = new CTableLook(false, false, false, false, false, false);
         obj.style = -1;
@@ -6216,7 +6216,7 @@ function BinaryPPTYLoader()
                 case 5:
                 {
                     if (undefined === tPr.pPr.Ind)
-                        tPr.pPr.Ind = new Object();
+                        tPr.pPr.Ind = {};
 
                     tPr.pPr.Ind.FirstLine = s.GetLong()/36000;
                     break;
@@ -6234,7 +6234,7 @@ function BinaryPPTYLoader()
                 case 8:
                 {
                     if (undefined === tPr.pPr.Ind)
-                        tPr.pPr.Ind = new Object();
+                        tPr.pPr.Ind = {};
 
                     tPr.pPr.Ind.Left = s.GetLong()/36000;
                     break;
@@ -6242,7 +6242,7 @@ function BinaryPPTYLoader()
                 case 9:
                 {
                     if (undefined === tPr.pPr.Ind)
-                        tPr.pPr.Ind = new Object();
+                        tPr.pPr.Ind = {};
 
                     tPr.pPr.Ind.Right = s.GetLong()/36000;
                     break;
@@ -7319,7 +7319,7 @@ function CPres()
                 case 4: { s.SkipRecord(); break; }
                 case 5:
                 {
-                    this.SldSz = new Object();
+                    this.SldSz = {};
                     s.Skip2(5); // len + start attributes
 
                     while (true)

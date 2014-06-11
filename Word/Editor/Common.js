@@ -36,7 +36,7 @@ function Common_CopyObj2(Dst, Obj)
     }
 
     if (Dst == null)
-        Dst = new Object();
+        Dst = {};
 
     var p, v;
     for(p in Obj)
@@ -51,7 +51,7 @@ function Common_CopyObj2(Dst, Obj)
                     if ( "undefined" != typeof(v.splice) )
                         Dst[p] = [];
                     else
-                        Dst[p] = new Object();
+                        Dst[p] = {};
                 }
                 Common_CopyObj2(Dst[p], v);
             }

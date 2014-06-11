@@ -3,7 +3,7 @@
 /**
  * Created by Ilja.Kirillov on 18.03.14.
  */
-var g_oMathSettings = new Object();
+var g_oMathSettings = {};
 function MathMenu (type)
 {
 	this.Type = para_Math;

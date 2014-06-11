@@ -3872,7 +3872,7 @@ CTableCellPr.prototype =
             CellPr.TableCellMar = null;
         else
         {
-            CellPr.TableCellMar = new Object();
+            CellPr.TableCellMar = {};
             CellPr.TableCellMar.Bottom = this.TableCellMar.Bottom.Copy();
             CellPr.TableCellMar.Left   = this.TableCellMar.Left.Copy();
             CellPr.TableCellMar.Right  = this.TableCellMar.Right.Copy();
@@ -3913,7 +3913,7 @@ CTableCellPr.prototype =
             this.TableCellMar = null;
         else
         {
-            this.TableCellMar = new Object();
+            this.TableCellMar = {};
             if(CellPr.TableCellMar.Bottom )
                 this.TableCellMar.Bottom = CellPr.TableCellMar.Bottom.Copy();
             if(CellPr.TableCellMar.Left )
@@ -3978,7 +3978,7 @@ CTableCellPr.prototype =
             this.TableCellMar = null;
         else
         {
-            this.TableCellMar = new Object();
+            this.TableCellMar = {};
 
             if ( undefined != CellPr.TableCellMar.Bottom )
                 this.TableCellMar.Bottom = new CTableMeasurement( CellPr.TableCellMar.Bottom.Type, CellPr.TableCellMar.Bottom.W );
@@ -4170,7 +4170,7 @@ CTableCellPr.prototype =
             this.TableCellMar = null;
         else
         {
-            this.TableCellMar = new Object();
+            this.TableCellMar = {};
             if ( 8 & Flags )
             {
                 this.TableCellMar.Bottom = new CTableMeasurement(tblwidth_Auto, 0);
@@ -4288,7 +4288,7 @@ CTextPr.prototype =
 
         if ( undefined != this.FontFamily )
         {
-            TextPr.FontFamily = new Object();
+            TextPr.FontFamily = {};
             TextPr.FontFamily.Name  = this.FontFamily.Name;
             TextPr.FontFamily.Index = this.FontFamily.Index;
             TextPr.FontFamily.themeFont = this.FontFamily.themeFont;
@@ -4337,7 +4337,7 @@ CTextPr.prototype =
 
         if ( undefined != TextPr.FontFamily )
         {
-            this.FontFamily = new Object();
+            this.FontFamily = {};
             this.FontFamily.Name  = TextPr.FontFamily.Name;
             this.FontFamily.Index = TextPr.FontFamily.Index;
             this.FontFamily.themeFont = TextPr.FontFamily.themeFont;
@@ -4747,7 +4747,7 @@ CTextPr.prototype =
 
         if ( undefined != this.FontFamily )
         {
-            TextPr.FontFamily = new Object();
+            TextPr.FontFamily = {};
             TextPr.FontFamily.Name  = this.FontFamily.Name;
             TextPr.FontFamily.Index = this.FontFamily.Index;
         }
@@ -4802,7 +4802,7 @@ CTextPr.prototype =
 
         if ( undefined != TextPr.FontFamily )
         {
-            this.FontFamily = new Object();
+            this.FontFamily = {};
             this.FontFamily.Name  = TextPr.FontFamily.Name;
             this.FontFamily.Index = TextPr.FontFamily.Index;
         }
@@ -4904,7 +4904,7 @@ CTextPr.prototype =
 
         if ( undefined != TextPr.FontFamily )
         {
-            this.FontFamily = new Object();
+            this.FontFamily = {};
             this.FontFamily.Name  = TextPr.FontFamily.Name;
             this.FontFamily.Index = TextPr.FontFamily.Index;
         }

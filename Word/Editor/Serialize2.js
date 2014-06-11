@@ -795,10 +795,10 @@ function BinaryFileWriter(doc)
 		this.WriteTable(c_oSerTableTypes.Settings, new BinarySettingsTableWriter(this.memory, this.Document));
 		
 		//Write Comments
-		var oMapCommentId = new Object();
+		var oMapCommentId = {};
 		this.WriteTable(c_oSerTableTypes.Comments, new BinaryCommentsTableWriter(this.memory, this.Document, oMapCommentId));
         //Write Numbering
-		var oNumIdMap = new Object();
+		var oNumIdMap = {};
         this.WriteTable(c_oSerTableTypes.Numbering, new BinaryNumberingTableWriter(this.memory, this.Document, oNumIdMap));		
         //Write StyleTable
         this.WriteTable(c_oSerTableTypes.Style, new BinaryStyleTableWriter(this.memory, this.Document, oNumIdMap));
@@ -828,9 +828,9 @@ function BinaryFileWriter(doc)
         window.global_pptx_content_writer._Start();
 		this.copyParams.bLockCopyElems = 0;
 		this.copyParams.itemCount = 0;
-		this.copyParams.oUsedNumIdMap = new Object();
+		this.copyParams.oUsedNumIdMap = {};
 		this.copyParams.nNumIdIndex = 1;
-		this.copyParams.oUsedStyleMap = new Object();		
+		this.copyParams.oUsedStyleMap = {};
 		this.copyParams.bdtw = new BinaryDocumentTableWriter(this.memory, this.Document, null, this.copyParams.oUsedNumIdMap, this.copyParams, null);
 		this.copyParams.nDocumentWriterTablePos = 0;
 		this.copyParams.nDocumentWriterPos = 0;
@@ -863,7 +863,7 @@ function BinaryFileWriter(doc)
 		this.bs.WriteItemWithLengthEnd(this.copyParams.nDocumentWriterPos);
 		this.WriteTableEnd(this.copyParams.nDocumentWriterTablePos);
 		
-        this.WriteTable(c_oSerTableTypes.Numbering, new BinaryNumberingTableWriter(this.memory, this.Document, new Object(), this.copyParams.oUsedNumIdMap));		
+        this.WriteTable(c_oSerTableTypes.Numbering, new BinaryNumberingTableWriter(this.memory, this.Document, {}, this.copyParams.oUsedNumIdMap));
         this.WriteTable(c_oSerTableTypes.Style, new BinaryStyleTableWriter(this.memory, this.Document, this.copyParams.oUsedNumIdMap, this.copyParams.oUsedStyleMap));
 		
 		this.WriteMainTableEnd();
@@ -3505,7 +3505,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
         if(null != pPr || null != ParaStyle || pPr_rPr)
         {
             if(null == pPr)
-                pPr = new Object();
+                pPr = {};
             //проверяем что pPr_rPr не пустые
             var pPr_rPr = null;
             var propCount = 0;
@@ -5055,7 +5055,7 @@ function BinaryFileReader(doc, openParams)
 			}
 			return oCommentObj;
 		}
-		var oCommentsNewId = new Object();
+		var oCommentsNewId = {};
 		for(var i in this.oReadResult.oComments)
 		{
 			var oOldComment = this.oReadResult.oComments[i];
@@ -5327,7 +5327,7 @@ function BinaryStyleTableReader(doc, oReadResult, stream)
         {
             var oThis = this;
             var oNewStyle = new CStyle(null, null, null, null);
-            var oNewId = new Object();
+            var oNewId = {};
             res = this.bcr.Read1(length, function(t, l){
                     return oThis.ReadStyleContent(t, l, oNewStyle, oNewId);
                 });
@@ -6117,25 +6117,25 @@ function Binary_rPrReader(doc, stream)
                 break;
             case c_oSerProp_rPrType.FontAscii:
                 if ( undefined === rPr.RFonts )
-                    rPr.RFonts = new Object();
+                    rPr.RFonts = {};
 
                 rPr.RFonts.Ascii = { Name : this.stream.GetString2LE(length), Index : -1 };
                 break;
             case c_oSerProp_rPrType.FontHAnsi:
                 if ( undefined === rPr.RFonts )
-                    rPr.RFonts = new Object();
+                    rPr.RFonts = {};
 
                 rPr.RFonts.HAnsi = { Name : this.stream.GetString2LE(length), Index : -1 };
                 break;
             case c_oSerProp_rPrType.FontAE:
                 if ( undefined === rPr.RFonts )
-                    rPr.RFonts = new Object();
+                    rPr.RFonts = {};
 
                 rPr.RFonts.EastAsia = { Name : this.stream.GetString2LE(length), Index : -1 };
                 break;
             case c_oSerProp_rPrType.FontCS:
                 if ( undefined === rPr.RFonts )
-                    rPr.RFonts = new Object();
+                    rPr.RFonts = {};
 
                 rPr.RFonts.CS = { Name : this.stream.GetString2LE(length), Index : -1 };
                 break;
@@ -6759,8 +6759,8 @@ function Binary_NumberingTableReader(doc, oReadResult, stream)
     this.Document = doc;
 	this.oReadResult = oReadResult;
     this.stream = stream;
-	this.m_oNumToANum = new Object();
-	this.m_oANumToNumClass = new Object();
+	this.m_oNumToANum = {};
+	this.m_oANumToNumClass = {};
     this.bcr = new Binary_CommonReader(this.stream);
     this.brPrr = new Binary_rPrReader(this.Document, this.stream);
     this.bpPrr = new Binary_pPrReader(this.Document, this.oReadResult, this.stream);
@@ -6808,7 +6808,7 @@ function Binary_NumberingTableReader(doc, oReadResult, stream)
         var res = c_oSerConstants.ReadOk;
         if ( c_oSerNumTypes.Num === type )
         {
-            var oNewItem = new Object();
+            var oNewItem = {};
             res = this.bcr.Read2(length, function(t, l){
                 return oThis.ReadNum(t, l, oNewItem);
             });
@@ -6992,7 +6992,7 @@ function Binary_HdrFtrTableReader(doc, oReadResult, openParams, stream)
 	this.openParams = openParams;
     this.stream = stream;
     this.bcr = new Binary_CommonReader(this.stream);
-    this.bdtr = new Binary_DocumentTableReader(this.Document, this.oReadResult, this.openParams, this.stream, true, new Object());
+    this.bdtr = new Binary_DocumentTableReader(this.Document, this.oReadResult, this.openParams, this.stream, true, {});
     this.Read = function()
     {
         var oThis = this;
@@ -7245,7 +7245,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         }
 		else if (c_oSerParType.CommentStart === type)
         {
-			var oCommon = new Object();
+			var oCommon = {};
 			res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadComment(t,l, oCommon);
 			});
@@ -7269,7 +7269,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         }
 		else if (c_oSerParType.CommentEnd === type)
         {
-			var oCommon = new Object();
+			var oCommon = {};
 			res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadComment(t,l, oCommon);
             });
@@ -7542,7 +7542,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         }
         else if (c_oSerRunType.CommentReference === type)
         {
-            var oCommon = new Object();
+            var oCommon = {};
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadComment(t,l, oCommon);
             });
@@ -8221,10 +8221,10 @@ function Binary_oMathReader(stream)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
-		var props = new Object();		
+		var props = {};
 		if (c_oSer_OMathContentType.Acc === type)
         {
-			var oContent = new Object();
+			var oContent = {};
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathAcc(t,l,props,oElem,oContent);
             });			
@@ -8238,21 +8238,21 @@ function Binary_oMathReader(stream)
         }		
 		else if (c_oSer_OMathContentType.Bar === type)
         {
-			var oContent = new Object();
+			var oContent = {};
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathBar(t,l,props,oElem, oContent);
             });			
         }
 		else if (c_oSer_OMathContentType.BorderBox === type)
         {			
-			var oContent = new Object();
+			var oContent = {};
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathBorderBox(t,l,props,oElem, oContent);
             });			
         }
 		else if (c_oSer_OMathContentType.Box === type)
         {
-			var oContent = new Object();
+			var oContent = {};
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathBox(t,l,props,oElem,oContent);
             });			
@@ -8280,46 +8280,46 @@ function Binary_oMathReader(stream)
         }
 		else if (c_oSer_OMathContentType.Fraction === type)
         {
-			var oElemDen = new Object();
-			var oElemNum = new Object();
+			var oElemDen = {};
+			var oElemNum = {};
             res = this.bcr.Read1(length, function(t, l){				
                 return oThis.ReadMathFraction(t,l,props,oElem,oElemDen,oElemNum);
             });			
         }
 		else if (c_oSer_OMathContentType.Func === type)
         {
-			var oContent = new Object();
-			var oName = new Object();
+			var oContent = {};
+			var oName = {};
             res = this.bcr.Read1(length, function(t, l){				
                 return oThis.ReadMathFunc(t,l,props,oElem,oContent,oName);
             });			
         }
 		else if (c_oSer_OMathContentType.GroupChr === type)
         {
-			var oContent = new Object();
+			var oContent = {};
             res = this.bcr.Read1(length, function(t, l){				
                 return oThis.ReadMathGroupChr(t,l,props,oElem,oContent);
             });			
         }
 		else if (c_oSer_OMathContentType.LimLow === type)
         {
-			var oContent = new Object();
-			var oLim = new Object();
+			var oContent = {};
+			var oLim = {};
             res = this.bcr.Read1(length, function(t, l){				
                 return oThis.ReadMathLimLow(t,l,props,oElem,oContent,oLim);
             });			
         }
 		else if (c_oSer_OMathContentType.LimUpp === type)
         {
-			var oContent = new Object();
-			var oLim = new Object();
+			var oContent = {};
+			var oLim = {};
             res = this.bcr.Read1(length, function(t, l){				
                 return oThis.ReadMathLimUpp(t,l,props,oElem,oContent,oLim);
             });			
         }
 		else if (c_oSer_OMathContentType.Matrix === type)
         {
-			var oMatrix = new Object();
+			var oMatrix = {};
 			var arrContent = [];
             res = this.bcr.Read1(length, function(t, l){				
                 return oThis.ReadMathMatrix(t,l,props,oElem,oMatrix,arrContent);
@@ -8327,9 +8327,9 @@ function Binary_oMathReader(stream)
         }			
 		else if (c_oSer_OMathContentType.Nary === type)
         {
-			var oContent = new Object();
-			var oSub = new Object();
-			var oSup = new Object();
+			var oContent = {};
+			var oSub = {};
+			var oSup = {};
             res = this.bcr.Read1(length, function(t, l){				
                 return oThis.ReadMathNary(t,l,props,oElem,oContent,oSub,oSup);
             });			
@@ -8342,7 +8342,7 @@ function Binary_oMathReader(stream)
         }
 		else if (c_oSer_OMathContentType.Phant === type)
         {
-			var oContent = new Object();
+			var oContent = {};
             res = this.bcr.Read1(length, function(t, l){				
                 return oThis.ReadMathPhant(t,l,props,oElem,oContent);
             });			
@@ -8356,42 +8356,42 @@ function Binary_oMathReader(stream)
         }
 		else if (c_oSer_OMathContentType.Rad === type)
         {
-			var oContent = new Object();
-			var oDeg = new Object();
+			var oContent = {};
+			var oDeg = {};
             res = this.bcr.Read1(length, function(t, l){				
                 return oThis.ReadMathRad(t,l,props,oElem,oContent,oDeg);
             });			
         }
 		else if (c_oSer_OMathContentType.SPre === type)
         {
-			var oContent = new Object();
-			var oSub = new Object();
-			var oSup = new Object();
+			var oContent = {};
+			var oSub = {};
+			var oSup = {};
             res = this.bcr.Read1(length, function(t, l){				
                 return oThis.ReadMathSPre(t,l,props,oElem,oContent,oSub,oSup);
             });			
         }
 		else if (c_oSer_OMathContentType.SSub === type)
         {
-			var oContent = new Object();
-			var oSub = new Object();
+			var oContent = {};
+			var oSub = {};
             res = this.bcr.Read1(length, function(t, l){				
                 return oThis.ReadMathSSub(t,l,props,oElem,oContent,oSub);
             });			
         }
 		else if (c_oSer_OMathContentType.SSubSup === type)
         {
-			var oContent = new Object();
-			var oSub = new Object();
-			var oSup = new Object();
+			var oContent = {};
+			var oSub = {};
+			var oSup = {};
             res = this.bcr.Read1(length, function(t, l){				
                 return oThis.ReadMathSSubSup(t,l,props,oElem,oContent,oSub,oSup);
             });			
         }
 		else if (c_oSer_OMathContentType.SSup === type)
         {
-			var oContent = new Object();
-			var oSup = new Object();
+			var oContent = {};
+			var oSup = {};
             res = this.bcr.Read1(length, function(t, l){				
                 return oThis.ReadMathSSup(t,l,props,oElem,oContent,oSup);
             });			
@@ -8406,7 +8406,7 @@ function Binary_oMathReader(stream)
         var oThis = this;
 		if (c_oSer_OMathBottomNodesType.ArgSz === type)
         {
-			var props = new Object();
+			var props = {};
             res = this.bcr.Read2(length, function(t, l){
                 return oThis.ReadMathArgSz(t,l,props);
             });
@@ -9734,7 +9734,7 @@ function Binary_oMathReader(stream)
         }
 		else if (c_oSer_OMathContentType.OMathParaPr === type)
 		{
-			var props = new Object();
+			var props = {};
 			res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathOMathParaPr(t,l,props);
             });
@@ -10448,7 +10448,7 @@ function Binary_OtherTableReader(doc, oReadResult, stream)
                 if (_at != g_nodeAttributeStart)
                     break;
 
-                var _f_i = new Object();
+                var _f_i = {};
 
                 while (true)
                 {
@@ -10536,7 +10536,7 @@ function Binary_CommentsTableReader(doc, oReadResult, stream, oComments)
 		var oThis = this;
         if ( c_oSer_CommentsType.Comment === type )
         {
-            var oNewComment = new Object();
+            var oNewComment = {};
             res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadCommentContent(t,l,oNewComment);
                 });
@@ -10611,7 +10611,7 @@ function Binary_CommentsTableReader(doc, oReadResult, stream, oComments)
 		var oThis = this;
         if ( c_oSer_CommentsType.Comment === type )
         {
-            var oNewComment = new Object();
+            var oNewComment = {};
             res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadCommentContent(t,l,oNewComment);
                 });
@@ -11087,7 +11087,7 @@ function CFontCharMap()
     this.Id         = "";
     this.FaceIndex  = -1;
     this.IsEmbedded = false;
-    this.CharArray  = new Object();
+    this.CharArray  = {};
 }
 
 function CFontsCharMap()

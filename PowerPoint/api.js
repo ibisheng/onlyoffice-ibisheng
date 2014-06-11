@@ -1290,7 +1290,7 @@ asc_docs_api.prototype.sync_VerticalTextAlign = function(align)
 
 asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr){
 	// var prgrhPr = this.get_TextProps();
-	// var prProp = new Object();
+	// var prProp = {};
 	// prProp.Ind = prgrhPr.ParaPr.Ind;
 	// prProp.ContextualSpacing = prgrhPr.ParaPr.ContextualSpacing;
 	// prProp.Spacing = prgrhPr.ParaPr.Spacing;
@@ -1799,7 +1799,7 @@ asc_docs_api.prototype.onSaveCallback = function (e) {
 
 		// Сохраняем файл на сервер
 		/*var data = this.WordControl.SaveDocument();
-		var oAdditionalData = new Object();
+		var oAdditionalData = {};
 		oAdditionalData["c"] = "save";
 		oAdditionalData["id"] = documentId;
 		oAdditionalData["userid"] = documentUserId;
@@ -3162,7 +3162,7 @@ CImgProperty заменяет пережнюю структуру:
 	}
 */
 asc_docs_api.prototype.ImgApply = function(obj){
-    var ImagePr = new Object();
+    var ImagePr = {};
 	
     ImagePr.Width  = null === obj.Width ? null : parseFloat(obj.Width);
     ImagePr.Height = null === obj.Height ? null : parseFloat(obj.Height);
@@ -3867,7 +3867,7 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                 for (var j = 0; j < _lay_cnt; j++)
                     theme_load_info.Layouts[j] = _masters[i].sldLayoutLst[j];
 
-                var th_info = new Object();
+                var th_info = {};
                 th_info["Name"] = "Doc Theme " + i;
                 th_info["Url"] = "";
                 th_info["Thumbnail"] = _masters[i].ImageBase64;
@@ -5113,7 +5113,7 @@ function sendTrack(fCallback, url, rdata){
 function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey)
 {
 	var sData;
-	var oAdditionalData = new Object();
+	var oAdditionalData = {};
 	oAdditionalData["c"] = "save";
 	oAdditionalData["id"] = documentId;
 	oAdditionalData["userid"] = documentUserId;

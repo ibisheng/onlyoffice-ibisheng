@@ -847,7 +847,7 @@ CHistory.prototype =
     {
         if ( this.Index >= 0 )
         {
-            this.Points[this.Index].Additional = new Object();
+            this.Points[this.Index].Additional = {};
         }
     },
 

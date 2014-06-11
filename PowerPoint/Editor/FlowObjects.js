@@ -1129,7 +1129,7 @@ FlowTable.prototype =
                 NewFlowTable.TopObject = this;
                 if ( "undefined" === typeof(this.LogicDocument.Pages[this.PageNum + Index]) )
                 {
-                    this.LogicDocument.Pages[this.PageNum + Index] = new Object();
+                    this.LogicDocument.Pages[this.PageNum + Index] = {};
                     this.LogicDocument.Pages[this.PageNum + Index].FlowObjects = new FlowObjects(this.LogicDocument, this.PageNum + Index);
 
                     this.LogicDocument.Pages[this.PageNum + Index].Width   = Page_Width;

@@ -794,8 +794,8 @@ var g_aLcidNameIdArray = [
  "iu-Latn", 0x7c5d ,
  "tzm-Latn", 0x7c5f ,
  "ha-Latn", 0x7c68 ];
-var g_oLcidNameToIdMap = new Object();
-var g_oLcidIdToNameMap = new Object();
+var g_oLcidNameToIdMap = {};
+var g_oLcidIdToNameMap = {};
 
 (function(document){
 	for(var i = 0, length = g_aLcidNameIdArray.length; i + 1< length; i+=2)

@@ -204,7 +204,7 @@ function CAbstractNum(Type)
     this.Lvl = [];
     for ( var Index = 0; Index < 9; Index++ )
     {
-        this.Lvl[Index] = new Object();
+        this.Lvl[Index] = {};
         var Lvl = this.Lvl[Index];
 
         Lvl.Start   = 1;
@@ -219,14 +219,14 @@ function CAbstractNum(Type)
 
         Lvl.LvlText = [];
 
-        Lvl.ParaPr = new Object();
+        Lvl.ParaPr = {};
         Lvl.ParaPr.Ind =
         {
             Left      : Left,
             FirstLine : FirstLine
         };
 
-        var TextPr = new Object();
+        var TextPr = {};
         if ( 0 == Index % 3 )
         {
             TextPr.FontFamily = { Name : "Symbol", Index : -1 };
@@ -279,7 +279,7 @@ CAbstractNum.prototype =
         {
             var Lvl_old = this.Internal_CopyLvl( this.Lvl[Index] );
 
-            this.Lvl[Index] = new Object();
+            this.Lvl[Index] = {};
             var Lvl = this.Lvl[Index];
 
             Lvl.Start   = 1;
@@ -310,14 +310,14 @@ CAbstractNum.prototype =
             Lvl.LvlText.push( new CLvlText_Num( Index ) );
             Lvl.LvlText.push( new CLvlText_Text( "." ) );
 
-            Lvl.ParaPr = new Object();
+            Lvl.ParaPr = {};
             Lvl.ParaPr.Ind =
             {
                 Left      : Left,
                 FirstLine : FirstLine
             };
 
-            var TextPr = new Object();
+            var TextPr = {};
             TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
 
             Lvl.TextPr = TextPr;
@@ -333,7 +333,7 @@ CAbstractNum.prototype =
         {
             var Lvl_old = this.Internal_CopyLvl( this.Lvl[Index] );
 
-            this.Lvl[Index] = new Object();
+            this.Lvl[Index] = {};
             var Lvl = this.Lvl[Index];
 
             Lvl.Start   = 1;
@@ -362,14 +362,14 @@ CAbstractNum.prototype =
             Lvl.LvlText.push( new CLvlText_Num( Index ) );
             Lvl.LvlText.push( new CLvlText_Text( ")" ) );
 
-            Lvl.ParaPr = new Object();
+            Lvl.ParaPr = {};
             Lvl.ParaPr.Ind =
             {
                 Left      : Left,
                 FirstLine : FirstLine
             };
 
-            var TextPr = new Object();
+            var TextPr = {};
             TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
 
             Lvl.TextPr = TextPr;
@@ -385,7 +385,7 @@ CAbstractNum.prototype =
         {
             var Lvl_old = this.Internal_CopyLvl( this.Lvl[Index] );
 
-            this.Lvl[Index] = new Object();
+            this.Lvl[Index] = {};
             var Lvl = this.Lvl[Index];
 
             Lvl.Start   = 1;
@@ -445,14 +445,14 @@ CAbstractNum.prototype =
                 Lvl.LvlText.push( new CLvlText_Text( "." ) );
             }
 
-            Lvl.ParaPr = new Object();
+            Lvl.ParaPr = {};
             Lvl.ParaPr.Ind =
             {
                 Left      : Left,
                 FirstLine : FirstLine
             };
 
-            var TextPr = new Object();
+            var TextPr = {};
             TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
 
             Lvl.TextPr = TextPr;
@@ -468,7 +468,7 @@ CAbstractNum.prototype =
         {
             var Lvl_old = this.Internal_CopyLvl( this.Lvl[Index] );
 
-            this.Lvl[Index] = new Object();
+            this.Lvl[Index] = {};
             var Lvl = this.Lvl[Index];
 
             Lvl.Start   = 1;
@@ -528,14 +528,14 @@ CAbstractNum.prototype =
                     break;
             }
 
-            Lvl.ParaPr = new Object();
+            Lvl.ParaPr = {};
             Lvl.ParaPr.Ind =
             {
                 Left      : Left,
                 FirstLine : FirstLine
             };
 
-            var TextPr = new Object();
+            var TextPr = {};
             if ( 3 === Index || 4 === Index || 7 === Index || 8 === Index )
                 TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
             else
@@ -554,7 +554,7 @@ CAbstractNum.prototype =
         {
             var Lvl_old = this.Internal_CopyLvl( this.Lvl[Index] );
 
-            this.Lvl[Index] = new Object();
+            this.Lvl[Index] = {};
             var Lvl = this.Lvl[Index];
 
             Lvl.Start   = 1;
@@ -569,14 +569,14 @@ CAbstractNum.prototype =
 
             Lvl.LvlText = [];
 
-            Lvl.ParaPr = new Object();
+            Lvl.ParaPr = {};
             Lvl.ParaPr.Ind =
             {
                 Left      : Left,
                 FirstLine : FirstLine
             };
 
-            var TextPr = new Object();
+            var TextPr = {};
             if ( 0 == Index % 3 )
             {
                 TextPr.FontFamily = { Name : "Symbol", Index : -1 };
@@ -1126,7 +1126,7 @@ CAbstractNum.prototype =
     // Копируем информацию о заданном уровне
     Internal_CopyLvl : function(Lvl)
     {
-        var Lvl_new = new Object();
+        var Lvl_new = {};
 
         Lvl_new.Start   = Lvl.Start;
         Lvl_new.Restart = Lvl.Restart;
@@ -1192,7 +1192,7 @@ CAbstractNum.prototype =
         Lvl.Jc     = Reader.GetLong();
         Lvl.Format = Reader.GetLong();
 
-        Lvl.TextPr = new Object();
+        Lvl.TextPr = {};
         Styles_Read_TextPr_FromBinary(Lvl.TextPr, Reader);
         Styles_Read_ParaPr_FromBinary(Reader, Lvl.ParaPr);
 
@@ -1345,7 +1345,7 @@ CAbstractNum.prototype =
                 // Vairable : TextPr
 
                 var iLvl = Reader.GetLong();
-                this.Lvl[iLvl].TextPr = new Object();
+                this.Lvl[iLvl].TextPr = {};
                 Styles_Read_TextPr_FromBinary(this.Lvl[iLvl].TextPr, Reader);
 
                 break;

@@ -67,14 +67,14 @@ CDocumentSearch.prototype =
             var Paragraph = this.Elements[Id];
 
             if ( true !== Debug_ParaRunMode )
-                Paragraph.SearchResults = new Object();
+                Paragraph.SearchResults = {};
             else
                 Paragraph.Clear_SearchResults();
         }
 
         this.Id        = 0;
         this.Count     = 0;
-        this.Elements  = new Object();
+        this.Elements  = {};
         this.CurId     = -1;
         this.Direction = true;
     },
@@ -1175,7 +1175,7 @@ Paragraph.prototype.Clear_SearchResults = function()
         }
     }
 
-    this.SearchResults = new Object();
+    this.SearchResults = {};
 };
 
 Paragraph.prototype.Remove_SearchResult = function(Id)

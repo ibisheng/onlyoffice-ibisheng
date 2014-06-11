@@ -338,14 +338,14 @@ function GetDefaultMods(r, g, b, pos, editor_id)
 
         if (_obj.lumMod != -1)
         {
-            _mod = new Object();
+            _mod = {};
             _mod["name"] = "lumMod";
             _mod["val"] = _obj.lumMod;
             _mods.push(_mod);
         }
         if (_obj.lumOff != -1)
         {
-            _mod = new Object();
+            _mod = {};
             _mod["name"] = "lumOff";
             _mod["val"] = _obj.lumOff;
             _mods.push(_mod);
@@ -358,7 +358,7 @@ function GetDefaultMods(r, g, b, pos, editor_id)
         var _obj = g_oThemeColorsDefaultModsWord[index][pos - 1];
         var _mods = [];
 
-        var _mod = new Object();
+        var _mod = {};
         _mod["name"] = _obj.name;
         _mod["val"] = (_obj.val * 100000 / 255) >> 0;
         _mods.push(_mod);

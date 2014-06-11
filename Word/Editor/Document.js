@@ -11104,7 +11104,7 @@ CDocument.prototype =
     {
         var StartTime = new Date().getTime();
         
-        var FontMap = new Object();
+        var FontMap = {};
         this.SectionsInfo.Document_CreateFontMap(FontMap);
 
         var CurPage = 0;
@@ -11141,7 +11141,7 @@ CDocument.prototype =
 
     Document_Get_AllFontNames : function()
     {
-        var AllFonts = new Object();
+        var AllFonts = {};
 
         this.SectionsInfo.Document_Get_AllFontNames( AllFonts );
         this.Numbering.Document_Get_AllFontNames( AllFonts );
@@ -11480,7 +11480,7 @@ CDocument.prototype =
 
     Get_SelectionState : function()
     {
-        var DocState = new Object();
+        var DocState = {};
         DocState.CurPos =
         {
             X          : this.CurPos.X,
@@ -13195,7 +13195,7 @@ function CDocumentSelectionState()
 {
     this.Id        = null;
     this.Type      = docpostype_Content;
-    this.Data      = new Object(); // Объект с текущей позицией
+    this.Data      = {}; // Объект с текущей позицией
 }
 
 function CDocumentSectionsInfo()

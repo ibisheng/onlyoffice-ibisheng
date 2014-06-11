@@ -1171,7 +1171,7 @@ CHeaderFooterController.prototype =
     {
         if ( null != this.CurHdrFtr && -1 !== this.CurHdrFtr.RecalcInfo.CurPage )
         {
-            var Pr = new Object();
+            var Pr = {};
             Pr.Type = this.CurHdrFtr.Type;
             
             if ( undefined === this.LogicDocument.Pages[this.CurHdrFtr.RecalcInfo.CurPage] )
@@ -1933,7 +1933,7 @@ CHeaderFooterController.prototype =
             this.CurHdrFtr.Selection_SetStart( X, Y, PageIndex, MouseEvent );
             if ( true === bActivate )
             {
-                var NewMouseEvent = new Object();
+                var NewMouseEvent = {};
                 NewMouseEvent.Type       = g_mouse_event_type_up;
                 NewMouseEvent.ClickCount = 1;
                 this.CurHdrFtr.Selection_SetEnd( X, Y, PageIndex, NewMouseEvent );
@@ -2105,7 +2105,7 @@ CHeaderFooterController.prototype =
 //-----------------------------------------------------------------------------------
     Get_SelectionState : function()
     {
-        var HdrFtrState = new Object();
+        var HdrFtrState = {};
         HdrFtrState.CurHdrFtr = this.CurHdrFtr;
 
         var State = null;

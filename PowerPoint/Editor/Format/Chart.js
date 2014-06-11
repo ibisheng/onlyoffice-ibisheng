@@ -350,7 +350,7 @@ CChartAsGroup.prototype =
 
     Get_Props: function(OtherProps)
     {
-        var Props = new Object();
+        var Props = {};
         Props.Width  = this.extX;
         Props.Height = this.extY;
 

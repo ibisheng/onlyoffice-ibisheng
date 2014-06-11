@@ -239,7 +239,7 @@ function CPoint2()
 
 function CFontManager()
 {
-    this.m_oLibrary = new Object();
+    this.m_oLibrary = {};
     this.Initialize = function(){};
 };
 

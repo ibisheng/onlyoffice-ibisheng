@@ -40,10 +40,10 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
         Pr         : null,  // Скомпилированный (окончательный стиль параграфа)
         NeedRecalc : true   // Нужно ли пересчитать скомпилированный стиль
     };
-    this.Pr = new Object();
+    this.Pr = {};
     //this.Pr.Jc = align_Left;
 
-    this.Pr.Spacing = new Object();
+    this.Pr.Spacing = {};
     /*
      {
      Line     : 1,              // Расстояние между строками внутри абзаца
@@ -53,7 +53,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
      };
      */
 
-    this.Pr.Ind = new Object();
+    this.Pr.Ind = {};
     /*
      {
      Left      : 0,
@@ -399,7 +399,7 @@ Paragraph.prototype =
                 X = PageStart.X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
                 Y = PageStart.Y;
 
-                this.Pages[CurPage] = new Object();
+                this.Pages[CurPage] = {};
                 this.Pages[CurPage].X         = PageStart.X;
                 this.Pages[CurPage].Y         = PageStart.Y;
                 this.Pages[CurPage].XLimit    = PageStart.XLimit;
@@ -470,7 +470,7 @@ Paragraph.prototype =
         var LineGap     = TextHeight * ( ParaPr.Spacing.Line - 1 );
 
         this.Lines.length = 0;
-        this.Lines[CurLine] = new Object();
+        this.Lines[CurLine] = {};
         this.Lines[CurLine].Y      = 0;
         this.Lines[CurLine].Words  = 0;
         this.Lines[CurLine].Spaces = 0; // Количество пробелов между словами в строке (пробелы, идущие в конце строки, не учитываются)
@@ -490,7 +490,7 @@ Paragraph.prototype =
 
         // Выставляем начальные сдвиги для промежутков. Началао промежутка = конец вырезаемого промежутка
         this.Lines[CurLine].Ranges = [];
-        this.Lines[CurLine].Ranges.push( new Object() );
+        this.Lines[CurLine].Ranges.push( {} );
 
         this.Lines[CurLine].Ranges[0].X      = X;
         this.Lines[CurLine].Ranges[0].Words  = 0;
@@ -499,7 +499,7 @@ Paragraph.prototype =
 
         for ( var Index = 1; Index < Ranges.length + 1; Index++ )
         {
-            this.Lines[CurLine].Ranges.push( new Object() );
+            this.Lines[CurLine].Ranges.push( {} );
             this.Lines[CurLine].Ranges[Index].X      = Ranges[Index - 1].X1;
             this.Lines[CurLine].Ranges[Index].Words  = 0;
             this.Lines[CurLine].Ranges[Index].Spaces = 0;
@@ -1705,7 +1705,7 @@ Paragraph.prototype =
 
                     Y = PageStart.Y;
 
-                    this.Pages[CurPage] = new Object();
+                    this.Pages[CurPage] = {};
                     this.Pages[CurPage].X         = PageStart.X;
                     this.Pages[CurPage].Y         = PageStart.Y;
                     this.Pages[CurPage].XLimit    = PageStart.XLimit;
@@ -1763,7 +1763,7 @@ Paragraph.prototype =
 
                     // Выставляем начальные сдвиги для промежутков. Начало промежутка = конец вырезаемого промежутка
                     this.Lines[CurLine].Ranges.length = 0;
-                    this.Lines[CurLine].Ranges.push( new Object() );
+                    this.Lines[CurLine].Ranges.push( {} );
                     this.Lines[CurLine].Ranges[0].X      = ( 0 == CurLine ? this.X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine : this.X + ParaPr.Ind.Left );
                     this.Lines[CurLine].Ranges[0].Words  = 0;
                     this.Lines[CurLine].Ranges[0].Spaces = 0;
@@ -1771,7 +1771,7 @@ Paragraph.prototype =
 
                     for ( var Index = 1; Index < Ranges.length + 1; Index++ )
                     {
-                        this.Lines[CurLine].Ranges.push( new Object() );
+                        this.Lines[CurLine].Ranges.push( {} );
                         this.Lines[CurLine].Ranges[Index].X      = Ranges[Index - 1].X1;
                         this.Lines[CurLine].Ranges[Index].Words  = 0;
                         this.Lines[CurLine].Ranges[Index].Spaces = 0;
@@ -1879,7 +1879,7 @@ Paragraph.prototype =
 
                     // Выставляем начальные сдвиги для промежутков. Начало промежутка = конец вырезаемого промежутка
                     this.Lines[CurLine].Ranges.length = 0;
-                    this.Lines[CurLine].Ranges.push( new Object() );
+                    this.Lines[CurLine].Ranges.push( {} );
                     this.Lines[CurLine].Ranges[0].X      = ( 0 == CurLine ? this.X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine : this.X + ParaPr.Ind.Left );
                     this.Lines[CurLine].Ranges[0].Words  = 0;
                     this.Lines[CurLine].Ranges[0].Spaces = 0;
@@ -1887,7 +1887,7 @@ Paragraph.prototype =
 
                     for ( var Index = 1; Index < Ranges.length + 1; Index++ )
                     {
-                        this.Lines[CurLine].Ranges.push( new Object() );
+                        this.Lines[CurLine].Ranges.push( {} );
                         this.Lines[CurLine].Ranges[Index].X      = Ranges[Index - 1].X1;
                         this.Lines[CurLine].Ranges[Index].Words  = 0;
                         this.Lines[CurLine].Ranges[Index].Spaces = 0;
@@ -1964,7 +1964,7 @@ Paragraph.prototype =
 
                         Y = PageStart.Y;
 
-                        this.Pages[CurPage] = new Object();
+                        this.Pages[CurPage] = {};
                         this.Pages[CurPage].X         = PageStart.X;
                         this.Pages[CurPage].Y         = PageStart.Y;
                         this.Pages[CurPage].XLimit    = PageStart.XLimit;
@@ -1990,7 +1990,7 @@ Paragraph.prototype =
                     {
 
                         CurLine++;
-                        this.Lines[CurLine] = new Object();
+                        this.Lines[CurLine] = {};
                         this.Lines[CurLine].Y      = 0;
                         this.Lines[CurLine].Words  = 0;
                         this.Lines[CurLine].Spaces = 0; // Количество пробелов между словами в строке (пробелы, идущие в конце строки, не учитываются)
@@ -2041,7 +2041,7 @@ Paragraph.prototype =
 
                         // Выставляем начальные сдвиги для промежутков. Началао промежутка = конец вырезаемого промежутка
                         this.Lines[CurLine].Ranges = [];
-                        this.Lines[CurLine].Ranges.push( new Object() );
+                        this.Lines[CurLine].Ranges.push( {} );
                         this.Lines[CurLine].Ranges[0].X      = X;
                         this.Lines[CurLine].Ranges[0].Words  = 0;
                         this.Lines[CurLine].Ranges[0].Spaces = 0;
@@ -2049,7 +2049,7 @@ Paragraph.prototype =
 
                         for ( var Index = 1; Index < Ranges.length + 1; Index++ )
                         {
-                            this.Lines[CurLine].Ranges.push( new Object() );
+                            this.Lines[CurLine].Ranges.push( {} );
                             this.Lines[CurLine].Ranges[Index].X      = Ranges[Index - 1].X1;
                             this.Lines[CurLine].Ranges[Index].Words  = 0;
                             this.Lines[CurLine].Ranges[Index].Spaces = 0;
@@ -4244,7 +4244,7 @@ Paragraph.prototype =
 
     Internal_GetTextPr : function(LetterPos)
     {
-        var TextPr = new Object();
+        var TextPr = {};
         // Ищем ближайший TextPr
         if ( LetterPos < 0 )
             return TextPr;
@@ -7399,7 +7399,7 @@ Paragraph.prototype =
 
     Get_Paragraph_ParaPr_Copy : function()
     {
-        var ParaPr = new Object();
+        var ParaPr = {};
 
         // Ind
         if ( "undefined" != typeof(this.Pr.Ind) )
@@ -7487,7 +7487,7 @@ Paragraph.prototype =
         // Brd
         if ( "undefined" != typeof(this.Pr.Brd) )
         {
-            ParaPr.Brd = new Object();
+            ParaPr.Brd = {};
 
             if ( "undefined" != typeof(this.Pr.Brd.Between) )
                 ParaPr.Brd.Between = Styles_Copy_Brd( this.Pr.Brd.Between );
@@ -7918,7 +7918,7 @@ Paragraph.prototype =
     Set_Ind : function(Ind)
     {
         if ( "undefined" === typeof(this.Pr.Ind) )
-            this.Pr.Ind = new Object();
+            this.Pr.Ind = {};
 
         if ( "undefined" != typeof(Ind.FirstLine) )
         {
@@ -7957,7 +7957,7 @@ Paragraph.prototype =
     Set_Spacing : function(Spacing)
     {
         if ( "undefined" === typeof(this.Pr.Spacing) )
-            this.Pr.Spacing = new Object();
+            this.Pr.Spacing = {};
 
         if ( "undefined" != typeof(Spacing.Line) )
         {
@@ -8043,7 +8043,7 @@ Paragraph.prototype =
     Set_Shd : function(Shd)
     {
         if ( "undefined" === typeof(this.Pr.Shd) )
-            this.Pr.Shd = new Object();
+            this.Pr.Shd = {};
 
         if ( "undefined" != typeof(Shd.Value) )
         {
@@ -8124,7 +8124,7 @@ Paragraph.prototype =
 
         var OldBrds = this.Get_CompiledPr2().ParaPr.Brd;
         if ( "undefined" === typeof(this.Pr.Brd ) )
-            this.Pr.Brd = new Object();
+            this.Pr.Brd = {};
 
         if ( false === Styles_CheckNullBorder(Borders.Between) )
         {
@@ -9178,7 +9178,7 @@ Paragraph.prototype =
                 if ( null != Old )
                 {
                     if ( "undefined" === typeof(this.Pr.Ind) )
-                        this.Pr.Ind = new Object();
+                        this.Pr.Ind = {};
 
                     this.Pr.Ind.FirstLine = Old;
                 }
@@ -9196,7 +9196,7 @@ Paragraph.prototype =
                 if ( null != Old )
                 {
                     if ( "undefined" === typeof(this.Pr.Ind) )
-                        this.Pr.Ind = new Object();
+                        this.Pr.Ind = {};
 
                     this.Pr.Ind.Left = Old;
                 }
@@ -9214,7 +9214,7 @@ Paragraph.prototype =
                 if ( null != Old )
                 {
                     if ( "undefined" === typeof(this.Pr.Ind) )
-                        this.Pr.Ind = new Object();
+                        this.Pr.Ind = {};
 
                     this.Pr.Ind.Right = Old;
                 }
@@ -9284,7 +9284,7 @@ Paragraph.prototype =
                 if ( null != Old )
                 {
                     if ( "undefined" === typeof(this.Pr.Spacing) )
-                        this.Pr.Spacing = new Object();
+                        this.Pr.Spacing = {};
 
                     this.Pr.Spacing.Line = Old;
                 }
@@ -9302,7 +9302,7 @@ Paragraph.prototype =
                 if ( null != Old )
                 {
                     if ( "undefined" === typeof(this.Pr.Spacing) )
-                        this.Pr.Spacing = new Object();
+                        this.Pr.Spacing = {};
 
                     this.Pr.Spacing.LineRule = Old;
                 }
@@ -9320,7 +9320,7 @@ Paragraph.prototype =
                 if ( null != Old )
                 {
                     if ( "undefined" === typeof(this.Pr.Spacing) )
-                        this.Pr.Spacing = new Object();
+                        this.Pr.Spacing = {};
 
                     this.Pr.Spacing.Before = Old;
                 }
@@ -9338,7 +9338,7 @@ Paragraph.prototype =
                 if ( null != Old )
                 {
                     if ( "undefined" === typeof(this.Pr.Spacing) )
-                        this.Pr.Spacing = new Object();
+                        this.Pr.Spacing = {};
 
                     this.Pr.Spacing.After = Old;
                 }
@@ -9356,7 +9356,7 @@ Paragraph.prototype =
                 if ( null != Old )
                 {
                     if ( "undefined" === typeof(this.Pr.Spacing) )
-                        this.Pr.Spacing = new Object();
+                        this.Pr.Spacing = {};
 
                     this.Pr.Spacing.AfterAutoSpacing = Old;
                 }
@@ -9374,7 +9374,7 @@ Paragraph.prototype =
                 if ( null != Old )
                 {
                     if ( "undefined" === typeof(this.Pr.Spacing) )
-                        this.Pr.Spacing = new Object();
+                        this.Pr.Spacing = {};
 
                     this.Pr.Spacing.BeforeAutoSpacing = Old;
                 }
@@ -9392,7 +9392,7 @@ Paragraph.prototype =
                 if ( null != Old )
                 {
                     if ( "undefined" === typeof(this.Pr.Shd) )
-                        this.Pr.Shd = new Object();
+                        this.Pr.Shd = {};
 
                     this.Pr.Shd.Value = Old;
                 }
@@ -9410,7 +9410,7 @@ Paragraph.prototype =
                 if ( null != Old )
                 {
                     if ( "undefined" === typeof(this.Pr.Shd) )
-                        this.Pr.Shd = new Object();
+                        this.Pr.Shd = {};
 
                     this.Pr.Shd.Color = Old;
                 }
@@ -9482,7 +9482,7 @@ Paragraph.prototype =
             case historyitem_Paragraph_Borders_Between:
             {
                 if ( "undefined" === typeof(this.Pr.Brd) )
-                    this.Pr.Brd = new Object();
+                    this.Pr.Brd = {};
 
                 var Border = Data.Old;
                 if ( null != Border )
@@ -9498,7 +9498,7 @@ Paragraph.prototype =
             case historyitem_Paragraph_Borders_Bottom:
             {
                 if ( "undefined" === typeof(this.Pr.Brd) )
-                    this.Pr.Brd = new Object();
+                    this.Pr.Brd = {};
 
                 var Border = Data.Old;
                 if ( null != Border )
@@ -9514,7 +9514,7 @@ Paragraph.prototype =
             case historyitem_Paragraph_Borders_Left:
             {
                 if ( "undefined" === typeof(this.Pr.Brd) )
-                    this.Pr.Brd = new Object();
+                    this.Pr.Brd = {};
 
                 var Border = Data.Old;
                 if ( null != Border )
@@ -9530,7 +9530,7 @@ Paragraph.prototype =
             case historyitem_Paragraph_Borders_Right:
             {
                 if ( "undefined" === typeof(this.Pr.Brd) )
-                    this.Pr.Brd = new Object();
+                    this.Pr.Brd = {};
 
                 var Border = Data.Old;
                 if ( null != Border )
@@ -9546,7 +9546,7 @@ Paragraph.prototype =
             case historyitem_Paragraph_Borders_Top:
             {
                 if ( "undefined" === typeof(this.Pr.Brd) )
-                    this.Pr.Brd = new Object();
+                    this.Pr.Brd = {};
 
                 var Border = Data.Old;
                 if ( null != Border )
@@ -9565,7 +9565,7 @@ Paragraph.prototype =
                 if ( null != Old )
                     this.Pr = Old;
                 else
-                    this.Pr = new Object();
+                    this.Pr = {};
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -9641,7 +9641,7 @@ Paragraph.prototype =
                 if ( null != New )
                 {
                     if ( "undefined" === typeof(this.Pr.Ind) )
-                        this.Pr.Ind = new Object();
+                        this.Pr.Ind = {};
 
                     this.Pr.Ind.FirstLine = New;
                 }
@@ -9659,7 +9659,7 @@ Paragraph.prototype =
                 if ( null != New )
                 {
                     if ( "undefined" === typeof(this.Pr.Ind) )
-                        this.Pr.Ind = new Object();
+                        this.Pr.Ind = {};
 
                     this.Pr.Ind.Left = New;
                 }
@@ -9677,7 +9677,7 @@ Paragraph.prototype =
                 if ( null != New )
                 {
                     if ( "undefined" === typeof(this.Pr.Ind) )
-                        this.Pr.Ind = new Object();
+                        this.Pr.Ind = {};
 
                     this.Pr.Ind.Right = New;
                 }
@@ -9747,7 +9747,7 @@ Paragraph.prototype =
                 if ( null != New )
                 {
                     if ( "undefined" === typeof(this.Pr.Spacing) )
-                        this.Pr.Spacing = new Object();
+                        this.Pr.Spacing = {};
 
                     this.Pr.Spacing.Line = New;
                 }
@@ -9765,7 +9765,7 @@ Paragraph.prototype =
                 if ( null != New )
                 {
                     if ( "undefined" === typeof(this.Pr.Spacing) )
-                        this.Pr.Spacing = new Object();
+                        this.Pr.Spacing = {};
 
                     this.Pr.Spacing.LineRule = New;
                 }
@@ -9783,7 +9783,7 @@ Paragraph.prototype =
                 if ( null != New )
                 {
                     if ( "undefined" === typeof(this.Pr.Spacing) )
-                        this.Pr.Spacing = new Object();
+                        this.Pr.Spacing = {};
 
                     this.Pr.Spacing.Before = New;
                 }
@@ -9801,7 +9801,7 @@ Paragraph.prototype =
                 if ( null != New )
                 {
                     if ( "undefined" === typeof(this.Pr.Spacing) )
-                        this.Pr.Spacing = new Object();
+                        this.Pr.Spacing = {};
 
                     this.Pr.Spacing.After = New;
                 }
@@ -9819,7 +9819,7 @@ Paragraph.prototype =
                 if ( null != New )
                 {
                     if ( "undefined" === typeof(this.Pr.Spacing) )
-                        this.Pr.Spacing = new Object();
+                        this.Pr.Spacing = {};
 
                     this.Pr.Spacing.AfterAutoSpacing = New;
                 }
@@ -9837,7 +9837,7 @@ Paragraph.prototype =
                 if ( null != New )
                 {
                     if ( "undefined" === typeof(this.Pr.Spacing) )
-                        this.Pr.Spacing = new Object();
+                        this.Pr.Spacing = {};
 
                     this.Pr.Spacing.BeforeAutoSpacing = New;
                 }
@@ -9855,7 +9855,7 @@ Paragraph.prototype =
                 if ( null != New )
                 {
                     if ( "undefined" === typeof(this.Pr.Shd) )
-                        this.Pr.Shd = new Object();
+                        this.Pr.Shd = {};
 
                     this.Pr.Shd.Value = New;
                 }
@@ -9873,7 +9873,7 @@ Paragraph.prototype =
                 if ( null != New )
                 {
                     if ( "undefined" === typeof(this.Pr.Shd) )
-                        this.Pr.Shd = new Object();
+                        this.Pr.Shd = {};
 
                     this.Pr.Shd.Color = New;
                 }
@@ -9945,7 +9945,7 @@ Paragraph.prototype =
             case historyitem_Paragraph_Borders_Between:
             {
                 if ( "undefined" === typeof(this.Pr.Brd) )
-                    this.Pr.Brd = new Object();
+                    this.Pr.Brd = {};
 
                 var Border = Data.New;
                 if ( null != Border )
@@ -9961,7 +9961,7 @@ Paragraph.prototype =
             case historyitem_Paragraph_Borders_Bottom:
             {
                 if ( "undefined" === typeof(this.Pr.Brd) )
-                    this.Pr.Brd = new Object();
+                    this.Pr.Brd = {};
 
                 var Border = Data.New;
                 if ( null != Border )
@@ -9977,7 +9977,7 @@ Paragraph.prototype =
             case historyitem_Paragraph_Borders_Left:
             {
                 if ( "undefined" === typeof(this.Pr.Brd) )
-                    this.Pr.Brd = new Object();
+                    this.Pr.Brd = {};
 
                 var Border = Data.New;
                 if ( null != Border )
@@ -9993,7 +9993,7 @@ Paragraph.prototype =
             case historyitem_Paragraph_Borders_Right:
             {
                 if ( "undefined" === typeof(this.Pr.Brd) )
-                    this.Pr.Brd = new Object();
+                    this.Pr.Brd = {};
 
                 var Border = Data.New;
                 if ( null != Border )
@@ -10009,7 +10009,7 @@ Paragraph.prototype =
             case historyitem_Paragraph_Borders_Top:
             {
                 if ( "undefined" === typeof(this.Pr.Brd) )
-                    this.Pr.Brd = new Object();
+                    this.Pr.Brd = {};
 
                 var Border = Data.New;
                 if ( null != Border )
@@ -10028,7 +10028,7 @@ Paragraph.prototype =
                 if ( null != New )
                     this.Pr = New;
                 else
-                    this.Pr = new Object();
+                    this.Pr = {};
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -10045,7 +10045,7 @@ Paragraph.prototype =
 
     Get_SelectionState : function()
     {
-        var ParaState = new Object();
+        var ParaState = {};
         ParaState.CurPos  =
         {
             X          : this.CurPos.X,
@@ -10549,7 +10549,7 @@ Paragraph.prototype =
                     delete this.NumPr;
                 else
                 {
-                    this.NumPr = new Object();
+                    this.NumPr = {};
                     this.NumPr.NumId = Reader.GetString2();
                     this.NumPr.Lvl   = Reader.GetLong();
                 }
@@ -10593,7 +10593,7 @@ Paragraph.prototype =
                 else
                 {
                     if ( "undefined" === typeof(this.Pr.Ind) )
-                        this.Pr.Ind = new Object();
+                        this.Pr.Ind = {};
 
                     this.Pr.Ind.FirstLine = Reader.GetDouble();
                 }
@@ -10619,7 +10619,7 @@ Paragraph.prototype =
                 else
                 {
                     if ( "undefined" === typeof(this.Pr.Ind) )
-                        this.Pr.Ind = new Object();
+                        this.Pr.Ind = {};
 
                     this.Pr.Ind.Left = Reader.GetDouble();
                 }
@@ -10645,7 +10645,7 @@ Paragraph.prototype =
                 else
                 {
                     if ( "undefined" === typeof(this.Pr.Ind) )
-                        this.Pr.Ind = new Object();
+                        this.Pr.Ind = {};
 
                     this.Pr.Ind.Right = Reader.GetDouble();
                 }
@@ -10738,7 +10738,7 @@ Paragraph.prototype =
                 if ( false === bDelete )
                 {
                     if ( "undefined" === typeof(this.Pr.Spacing) )
-                        this.Pr.Spacing = new Object();
+                        this.Pr.Spacing = {};
 
                     this.Pr.Spacing.Line = Reader.GetDouble();
                 }
@@ -10760,7 +10760,7 @@ Paragraph.prototype =
                 if ( false === bDelete )
                 {
                     if ( "undefined" === typeof(this.Pr.Spacing) )
-                        this.Pr.Spacing = new Object();
+                        this.Pr.Spacing = {};
 
                     this.Pr.Spacing.LineRule = Reader.GetLong();
                 }
@@ -10783,7 +10783,7 @@ Paragraph.prototype =
                 if ( false === bDelete )
                 {
                     if ( "undefined" === typeof(this.Pr.Spacing) )
-                        this.Pr.Spacing = new Object();
+                        this.Pr.Spacing = {};
 
                     this.Pr.Spacing.Before = Reader.GetDouble();
                 }
@@ -10806,7 +10806,7 @@ Paragraph.prototype =
                 if ( false === bDelete )
                 {
                     if ( "undefined" === typeof(this.Pr.Spacing) )
-                        this.Pr.Spacing = new Object();
+                        this.Pr.Spacing = {};
 
                     this.Pr.Spacing.After = Reader.GetDouble();
                 }
@@ -10829,7 +10829,7 @@ Paragraph.prototype =
                 if ( false === bDelete )
                 {
                     if ( "undefined" === typeof(this.Pr.Spacing) )
-                        this.Pr.Spacing = new Object();
+                        this.Pr.Spacing = {};
 
                     this.Pr.Spacing.AfterAutoSpacing = Reader.GetBool();
                 }
@@ -10852,7 +10852,7 @@ Paragraph.prototype =
                 if ( false === bDelete )
                 {
                     if ( "undefined" === typeof(this.Pr.Spacing) )
-                        this.Pr.Spacing = new Object();
+                        this.Pr.Spacing = {};
 
                     this.Pr.Spacing.BeforeAutoSpacing = Reader.GetBool();
                 }
@@ -10874,7 +10874,7 @@ Paragraph.prototype =
                 if ( false === bDelete )
                 {
                     if ( "undefined" === typeof(this.Pr.Shd) )
-                        this.Pr.Shd = new Object();
+                        this.Pr.Shd = {};
 
                     this.Pr.Shd.Value = Reader.GetByte();
                 }
@@ -10899,9 +10899,9 @@ Paragraph.prototype =
                 if ( false === bDelete )
                 {
                     if ( "undefined" === typeof(this.Pr.Shd) )
-                        this.Pr.Shd       = new Object();
+                        this.Pr.Shd       = {};
                     if ( "undefined" === typeof(this.Pr.Shd.Color) )
-                        this.Pr.Shd.Color = new Object();
+                        this.Pr.Shd.Color = {};
 
                     this.Pr.Shd.Color.r = Reader.GetByte();
                     this.Pr.Shd.Color.g = Reader.GetByte();
@@ -10968,7 +10968,7 @@ Paragraph.prototype =
             {
                 // String : Id элемента
 
-                var LinkData = new Object();
+                var LinkData = {};
                 LinkData.Type = Type;
                 LinkData.Next = Reader.GetString2();
 
@@ -10980,7 +10980,7 @@ Paragraph.prototype =
             {
                 // String : Id элемента
 
-                var LinkData = new Object();
+                var LinkData = {};
                 LinkData.Type = Type;
                 LinkData.Prev = Reader.GetString2();
 
@@ -10992,7 +10992,7 @@ Paragraph.prototype =
             {
                 // String : Id элемента
 
-                var LinkData = new Object();
+                var LinkData = {};
                 LinkData.Type   = Type;
                 LinkData.Parent = Reader.GetString2();
 
@@ -11004,7 +11004,7 @@ Paragraph.prototype =
             case historyitem_Paragraph_Borders_Between:
             {
                 if ( "undefined" === typeof(this.Pr.Brd) )
-                    this.Pr.Brd = new Object();
+                    this.Pr.Brd = {};
 
                 var Border = Styles_Read_Brd_FromBinary(Reader);
                 if ( null != Border )
@@ -11020,7 +11020,7 @@ Paragraph.prototype =
             case historyitem_Paragraph_Borders_Bottom:
             {
                 if ( "undefined" === typeof(this.Pr.Brd) )
-                    this.Pr.Brd = new Object();
+                    this.Pr.Brd = {};
 
                 var Border = Styles_Read_Brd_FromBinary(Reader);
                 if ( null != Border )
@@ -11036,7 +11036,7 @@ Paragraph.prototype =
             case historyitem_Paragraph_Borders_Left:
             {
                 if ( "undefined" === typeof(this.Pr.Brd) )
-                    this.Pr.Brd = new Object();
+                    this.Pr.Brd = {};
 
                 var Border = Styles_Read_Brd_FromBinary(Reader);
                 if ( null != Border )
@@ -11052,7 +11052,7 @@ Paragraph.prototype =
             case historyitem_Paragraph_Borders_Right:
             {
                 if ( "undefined" === typeof(this.Pr.Brd) )
-                    this.Pr.Brd = new Object();
+                    this.Pr.Brd = {};
 
                 var Border = Styles_Read_Brd_FromBinary(Reader);
                 if ( null != Border )
@@ -11068,7 +11068,7 @@ Paragraph.prototype =
             case historyitem_Paragraph_Borders_Top:
             {
                 if ( "undefined" === typeof(this.Pr.Brd) )
-                    this.Pr.Brd = new Object();
+                    this.Pr.Brd = {};
 
                 var Border = Styles_Read_Brd_FromBinary(Reader);
                 if ( null != Border )
@@ -11087,10 +11087,10 @@ Paragraph.prototype =
 
                 var bDelete = Reader.GetBool();
                 if ( true === bDelete )
-                    this.Pr = new Object();
+                    this.Pr = {};
                 else
                 {
-                    this.Pr = new Object();
+                    this.Pr = {};
                     Styles_Read_ParaPr_FromBinary( Reader, this.Pr );
                 }
 
@@ -11179,7 +11179,7 @@ Paragraph.prototype =
         this.Id = Reader.GetString2();
         this.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
 
-        var LinkData = new Object();
+        var LinkData = {};
         LinkData.Parent = Reader.GetString2();
         CollaborativeEditing.Add_LinkData(this, LinkData);
 
@@ -11195,7 +11195,7 @@ Paragraph.prototype =
             };
         }
 
-        this.Pr = new Object();
+        this.Pr = {};
         Styles_Read_ParaPr_FromBinary( Reader, this.Pr );
 
         this.TextPr = g_oTableId.Get_ById( Reader.GetString2() );

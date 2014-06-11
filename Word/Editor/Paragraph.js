@@ -135,7 +135,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
         NeedRecalc : true
     };
 
-    this.SearchResults = new Object();
+    this.SearchResults = {};
 
     this.SpellChecker  = new CParaSpellChecker(this);
 
@@ -15844,7 +15844,7 @@ Paragraph.prototype =
     {
         if ( true === this.FontMap.NeedRecalc )
         {
-            this.FontMap.Map = new Object();
+            this.FontMap.Map = {};
 
             if ( true === this.CompiledPr.NeedRecalc )
             {
@@ -17818,7 +17818,7 @@ Paragraph.prototype =
     {
         if ( true !== Debug_ParaRunMode )
         {
-            var ParaState = new Object();
+            var ParaState = {};
             ParaState.CurPos  =
             {
                 X          : this.CurPos.X,
@@ -17845,7 +17845,7 @@ Paragraph.prototype =
         }
         else
         {
-            var ParaState = new Object();
+            var ParaState = {};
             ParaState.CurPos  =
             {
                 X          : this.CurPos.X,
@@ -19292,7 +19292,7 @@ Paragraph.prototype =
             this.Id = Reader.GetString2();
             this.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
 
-            var LinkData = new Object();
+            var LinkData = {};
             LinkData.Parent = Reader.GetString2();
 
             this.Pr = new CParaPr();
@@ -19328,7 +19328,7 @@ Paragraph.prototype =
             this.Id     = Reader.GetString2();
             //this.Parent = g_oTableId.Get_ById( Reader.GetString2() );
 
-            var LinkData = new Object();
+            var LinkData = {};
             LinkData.Parent = Reader.GetString2();
 
             this.Pr = new CParaPr();
@@ -19395,7 +19395,7 @@ Paragraph.prototype =
 
     Get_SelectionState2 : function()
     {
-        var ParaState = new Object();
+        var ParaState = {};
 
         ParaState.Id      = this.Get_Id();
         ParaState.CurPos  =

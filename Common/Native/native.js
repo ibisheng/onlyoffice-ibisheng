@@ -1,9 +1,9 @@
 var editor = undefined;
-var window = new Object();
-var navigator = new Object();
+var window = {};
+var navigator = {};
 navigator.userAgent = "chrome";
 window.navigator = navigator;
-window.location = new Object();
+window.location = {};
 
 window.location.protocol = "";
 window.location.host = "";
@@ -12,7 +12,7 @@ window.location.href = "";
 window.NATIVE_EDITOR_ENJINE = true;
 window.NATIVE_EDITOR_ENJINE_SYNC_RECALC = true;
 
-var document = new Object();
+var document = {};
 window.document = document;
 
 function ConvertJSC_Array(_array)
@@ -145,9 +145,9 @@ native_canvas.prototype =
     } 
 };
 
-window["Asc"] = new Object();
+window["Asc"] = {};
 
-var _null_object = new Object();
+var _null_object = {};
 _null_object.length = 0;
 _null_object.nodeType = 1;
 _null_object.offsetWidth = 1;
@@ -156,7 +156,7 @@ _null_object.clientWidth = 1;
 _null_object.clientHeight = 1;
 _null_object.scrollWidth = 1;
 _null_object.scrollHeight = 1;
-_null_object.style = new Object();
+_null_object.style = {};
 _null_object.documentElement = _null_object;
 _null_object.body = _null_object;
 _null_object.ownerDocument = _null_object;

@@ -3296,7 +3296,7 @@ ParaRun.prototype =
             }
         }
 
-        var SpellingMarksArray = new Object();
+        var SpellingMarksArray = {};
         var SpellingMarksCount = this.SpellingMarks.length;
         for ( var SPos = 0; SPos < SpellingMarksCount; SPos++)
         {
@@ -6955,7 +6955,7 @@ function FontSize_IncreaseDecreaseValue(bIncrease, Value)
 function CRunCollaborativeMarks()
 {
     this.Ranges = [];
-    this.DrawingObj = new Object();
+    this.DrawingObj = {};
 }
 
 CRunCollaborativeMarks.prototype =
@@ -7093,7 +7093,7 @@ CRunCollaborativeMarks.prototype =
 
     Init_Drawing  : function()
     {
-        this.DrawingObj = new Object();
+        this.DrawingObj = {};
 
         var Count = this.Ranges.length;
         for ( var CurPos = 0; CurPos < Count; CurPos++ )

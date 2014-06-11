@@ -228,7 +228,7 @@ function ParaTextPr(Props)
     this.Id = g_oIdCounter.Get_NewId();
 
     this.Type   = para_TextPr;
-    this.Value  = new Object();
+    this.Value  = {};
     this.Parent = null;
 
     if ( "object" == typeof(Props) )
@@ -478,7 +478,7 @@ ParaTextPr.prototype =
         this.Type = Reader.GetLong();
         this.Id   = Reader.GetString2();
 
-        this.Value = new Object();
+        this.Value = {};
         Styles_Read_TextPr_FromBinary( this.Value, Reader );
     },
 
@@ -501,7 +501,7 @@ ParaTextPr.prototype =
             {
                 // Variable : TextPr
 
-                var TextPr = new Object();
+                var TextPr = {};
                 TextPr[Data.Prop] = Data.New;
 
                 Styles_Write_TextPr_ToBinary( TextPr, Writer );
@@ -583,7 +583,7 @@ ParaTextPr.prototype =
             {
                 // Variable : TextPr
 
-                var TextPr = new Object();
+                var TextPr = {};
                 Styles_Read_TextPr_FromBinary( TextPr, Reader );
                 Common_CopyObj2( this.Value, TextPr );
 
@@ -615,7 +615,7 @@ ParaTextPr.prototype =
                 var bNull = Reader.GetBool();
                 if ( true != bNull )
                 {
-                    this.Value.Color = new Object();
+                    this.Value.Color = {};
                     this.Value.Color.r = Reader.GetByte();
                     this.Value.Color.g = Reader.GetByte();
                     this.Value.Color.b = Reader.GetByte();
@@ -699,7 +699,7 @@ function ParaNewLine(BreakType)
     this.Type = para_NewLine;
     this.BreakType = BreakType;
 
-    this.Flags = new Object(); // специальные флаги для разных break
+    this.Flags = {}; // специальные флаги для разных break
 
     if ( break_Page === this.BreakType )
         this.Flags.NewLine = true;

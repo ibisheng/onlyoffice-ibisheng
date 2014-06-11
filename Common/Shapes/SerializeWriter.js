@@ -755,7 +755,7 @@ function CBinaryFileWriter()
         this.EndRecord();
 
         // 3
-        pres.NotesSz = new Object();
+        pres.NotesSz = {};
         pres.NotesSz.cx = (presentation.Height * c_dScalePPTXSizes) >> 0;
         pres.NotesSz.cy = (presentation.Width * c_dScalePPTXSizes) >> 0;
 
@@ -2659,7 +2659,7 @@ function CBinaryFileWriter()
 
     this.WriteTable2 = function(table)
     {
-        var obj = new Object();
+        var obj = {};
         obj.props = table.Pr;
         obj.look = table.TableLook;
         obj.style = table.styleIndex;
@@ -2698,7 +2698,7 @@ function CBinaryFileWriter()
 
     this.GenerateTableWriteGrid = function(table)
     {
-        var TableGrid = new Object();
+        var TableGrid = {};
 
         var _rows = table.Content;
         var _cols = table.TableGrid;
@@ -2710,7 +2710,7 @@ function CBinaryFileWriter()
 
         for (var i = 0; i < _rows_count; i++)
         {
-            TableGrid.Rows[i] = new Object();
+            TableGrid.Rows[i] = {};
             TableGrid.Rows[i].Cells = [];
 
             var _index = 0;
@@ -2719,7 +2719,7 @@ function CBinaryFileWriter()
             {
                 var _cell = _rows[i].Content[j];
 
-                var _cell_info = new Object();
+                var _cell_info = {};
                 _cell_info.Cell = _cell;
                 _cell_info.row_span = 1;
                 _cell_info.grid_span = (_cell.Pr.GridSpan === undefined || _cell.Pr.GridSpan == null) ? 1 : _cell.Pr.GridSpan;
@@ -2735,7 +2735,7 @@ function CBinaryFileWriter()
                 {
                     for (var t = _cell_info.grid_span - 1; t > 0; t--)
                     {
-                        var _cell_info_empty = new Object();
+                        var _cell_info_empty = {};
                         _cell_info_empty.isEmpty = true;
                         _cell_info_empty.vMerge = _cell_info.vMerge;
 

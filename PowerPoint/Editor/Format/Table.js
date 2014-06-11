@@ -699,7 +699,7 @@ CTable.prototype =
     {
         var TablePr = this.Get_CompiledPr(false).TablePr;
 
-        var Pr = new Object();
+        var Pr = {};
 
         if ( tblwidth_Auto === TablePr.TableW.Type )
             Pr.TableWidth = null;
@@ -1120,13 +1120,13 @@ CTable.prototype =
             Pr.TableIndent        = this.X_origin - X_Left_Field;
             Pr.TableWrappingStyle = c_oAscWrapStyle.Flow;
 
-            Pr.PositionH = new Object();
+            Pr.PositionH = {};
             Pr.PositionH.RelativeFrom = this.PositionH.RelativeFrom;
             Pr.PositionH.UseAlign     = this.PositionH.Align;
             Pr.PositionH.Align        = ( true === Pr.PositionH.UseAlign ? this.PositionH.Value : undefined );
             Pr.PositionH.Value        = ( true === Pr.PositionH.UseAlign ? 0 : this.PositionH.Value );
 
-            Pr.PositionV = new Object();
+            Pr.PositionV = {};
             Pr.PositionV.RelativeFrom = this.PositionV.RelativeFrom;
             Pr.PositionV.UseAlign     = this.PositionV.Align;
             Pr.PositionV.Align        = ( true === Pr.PositionV.UseAlign ? this.PositionV.Value : undefined );
@@ -1176,7 +1176,7 @@ CTable.prototype =
     {
         var TablePr = this.Get_CompiledPr(false).TablePr;
 
-        var Pr = new Object();
+        var Pr = {};
 
         if ( tblwidth_Auto === TablePr.TableW.Type )
             Pr.TableWidth = null;
@@ -5926,7 +5926,7 @@ CTable.prototype =
 
     Get_SelectionState : function()
     {
-        var TableState = new Object();
+        var TableState = {};
         TableState.Selection =
         {
             Start    : this.Selection.Start,
@@ -6617,7 +6617,7 @@ CTable.prototype =
             {
                 // String : Id элемента
 
-                var LinkData = new Object();
+                var LinkData = {};
                 LinkData.Parent = Reader.GetString2();
                 LinkData.Type   = historyitem_Table_Parent;
                 CollaborativeEditing.Add_LinkData( this, LinkData );
@@ -7114,7 +7114,7 @@ CTable.prototype =
         Reader.GetLong();
         this.Id = Reader.GetString2();
 
-        var LinkData = new Object();
+        var LinkData = {};
         LinkData.Parent = Reader.GetString2();
         LinkData.Type   = historyitem_Table_Parent;
         CollaborativeEditing.Add_LinkData( this, LinkData );
@@ -7154,7 +7154,7 @@ CTable.prototype =
         this.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
 
         // Добавляем, чтобы в конце выставить CurCell
-        var LinkData = new Object();
+        var LinkData = {};
         LinkData.CurCell = true;
         CollaborativeEditing.Add_LinkData( this, LinkData );
     },
@@ -7395,7 +7395,7 @@ CTable.prototype =
         {
             this.Internal_Update_TableMarkup( Pos.Row, Pos.Cell, PageNum );
             this.Selection.Type2 = table_Selection_Border;
-            this.Selection.Data2 = new Object();
+            this.Selection.Data2 = {};
             this.Selection.Data2.PageNum = PageNum;
 
             var Row = this.Content[Pos.Row];
@@ -13961,7 +13961,7 @@ CTable.prototype =
 
             var RowH = Row.Get_Height();
 
-            this.RowsInfo[CurRow] = new Object();
+            this.RowsInfo[CurRow] = {};
             this.RowsInfo[CurRow].Pages = LastPage - CurPage + 1;
             this.RowsInfo[CurRow].Y            = [];
             this.RowsInfo[CurRow].H            = [];
@@ -15101,7 +15101,7 @@ CTable.prototype =
 
         if ( this.HeaderInfo.Count > 0 && this.HeaderInfo.PageIndex != -1 && CurPage > this.HeaderInfo.PageIndex )
         {
-            this.HeaderInfo.Pages[CurPage] = new Object();
+            this.HeaderInfo.Pages[CurPage] = {};
             this.HeaderInfo.Pages[CurPage].RowsInfo = [];
             var HeaderPage = this.HeaderInfo.Pages[CurPage];
 
@@ -15124,7 +15124,7 @@ CTable.prototype =
             var bHeaderNextPage = false;
             for ( var CurRow = 0; CurRow < this.HeaderInfo.Count; CurRow++  )
             {
-                HeaderPage.RowsInfo[CurRow] = new Object();
+                HeaderPage.RowsInfo[CurRow] = {};
                 HeaderPage.RowsInfo[CurRow].Y               = 0;
                 HeaderPage.RowsInfo[CurRow].H               = 0;
                 HeaderPage.RowsInfo[CurRow].TopDy           = 0;
@@ -15423,7 +15423,7 @@ CTable.prototype =
         }
         else
         {
-            this.HeaderInfo.Pages[CurPage] = new Object();
+            this.HeaderInfo.Pages[CurPage] = {};
             this.HeaderInfo.Pages[CurPage].Draw = false;
         }
 
@@ -15432,7 +15432,7 @@ CTable.prototype =
         {
             if ( (0 === CurRow && 0 === CurPage) || CurRow != FirstRow  )
             {
-                this.RowsInfo[CurRow] = new Object();
+                this.RowsInfo[CurRow] = {};
                 this.RowsInfo[CurRow].Pages        = 1;
                 this.RowsInfo[CurRow].Y            = [];
                 this.RowsInfo[CurRow].H            = [];
@@ -16279,7 +16279,7 @@ CTable.prototype =
 
             var RowH = Row.Get_Height();
 
-            RowsInfo_new[CurRow] = new Object();
+            RowsInfo_new[CurRow] = {};
             RowsInfo_new[CurRow].Pages = LastPage - CurPage + 1;
             RowsInfo_new[CurRow].Y            = [];
             RowsInfo_new[CurRow].H            = [];
@@ -16835,7 +16835,7 @@ CTable.prototype =
 
                 var RowH = Row.Get_Height();
 
-                RowsInfo_new[CurRow] = new Object();
+                RowsInfo_new[CurRow] = {};
                 RowsInfo_new[CurRow].Pages = LastPage - CurPage + 1;
                 RowsInfo_new[CurRow].Y            = [];
                 RowsInfo_new[CurRow].H            = [];
@@ -19975,7 +19975,7 @@ CTableRow.prototype =
 
         this.Id = Reader.GetString2();
 
-        var LinkData = new Object();
+        var LinkData = {};
         LinkData.Table = Reader.GetString2();
         CollaborativeEditing.Add_LinkData( this, LinkData );
 
@@ -22081,7 +22081,7 @@ CTableCell.prototype =
 
         this.Id = Reader.GetString2();
 
-        var LinkData = new Object();
+        var LinkData = {};
         LinkData.Row = Reader.GetString2();
         CollaborativeEditing.Add_LinkData( this, LinkData );
 

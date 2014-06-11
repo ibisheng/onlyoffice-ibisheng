@@ -1403,7 +1403,7 @@ CDocumentContent.prototype =
 
                 if ( "undefined" == typeof(this.Pages[++CurPage]) )
                 {
-                    this.Pages[CurPage] = new Object();
+                    this.Pages[CurPage] = {};
                 }
 
                 var StartPos = this.Get_PageContentStartPos( CurPage );
@@ -6936,7 +6936,7 @@ CDocumentContent.prototype =
 
     Interface_Update_DrawingPr : function(Flag)
     {
-        var ImagePr = new Object();
+        var ImagePr = {};
 
         if ( docpostype_DrawingObjects === this.CurPos.Type )
             ImagePr = this.LogicDocument.DrawingObjects.getProps();
@@ -8218,7 +8218,7 @@ CDocumentContent.prototype =
 
     Get_SelectionState : function()
     {
-        var DocState = new Object();
+        var DocState = {};
         DocState.CurPos =
         {
             X          : this.CurPos.X,
@@ -8756,7 +8756,7 @@ CDocumentContent.prototype =
         // Long   : Количество элементов в массиве this.Content
         // Array of string : массив Id элементов
 
-        var LinkData = new Object();
+        var LinkData = {};
 
         this.Id                 = Reader.GetString2();
         this.StartPage          = Reader.GetLong();

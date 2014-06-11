@@ -2471,7 +2471,7 @@ ParaEnd.prototype =
             Widths[Index] += AddW;
         }
 
-        this.SectionPr = new Object();
+        this.SectionPr = {};
         this.SectionPr.OldWidth = this.Width;
         this.SectionPr.Str      = strResult;
         this.SectionPr.Widths   = Widths;
@@ -2519,7 +2519,7 @@ function ParaNewLine(BreakType)
     this.Type = para_NewLine;
     this.BreakType = BreakType;
 
-    this.Flags = new Object(); // специальные флаги для разных break
+    this.Flags = {}; // специальные флаги для разных break
     this.Flags.Use = true;
 
     if ( break_Page === this.BreakType )
@@ -2681,7 +2681,7 @@ ParaNewLine.prototype =
                 Widths[Index] += AddW;
             }
 
-            this.Flags.BreakPageInfo = new Object();
+            this.Flags.BreakPageInfo = {};
             this.Flags.BreakPageInfo.Str = strResult;
             this.Flags.BreakPageInfo.Widths = Widths;
 
@@ -3964,7 +3964,7 @@ ParaDrawing.prototype =
     {
         // Сначала заполняем свойства
 
-        var Props = new Object();
+        var Props = {};
         Props.Width  = this.GraphicObj.extX;
         Props.Height = this.GraphicObj.extY;
         if ( drawing_Inline === this.DrawingType )
@@ -4212,7 +4212,7 @@ ParaDrawing.prototype =
 
     Save_RecalculateObject : function(Copy)
     {
-        var DrawingObj = new Object();
+        var DrawingObj = {};
 
         DrawingObj.Type         = this.Type;
         DrawingObj.DrawingType  = this.DrawingType;

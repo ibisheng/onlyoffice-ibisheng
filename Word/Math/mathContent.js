@@ -9970,7 +9970,7 @@ CMathComposition.prototype =
     /////////  for Undo/Redo ////////
     Get_SelectionState : function()
     {
-        var State = new Object();
+        var State = {};
 
         var stackCurrent = [];
         this.CurrentContent.getStackPositions( stackCurrent );

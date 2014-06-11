@@ -112,7 +112,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
 
 
 
-    this.SearchResults = new Object();
+    this.SearchResults = {};
 
     this.SpellChecker = new CParaSpellChecker();
 
@@ -496,7 +496,7 @@ Paragraph.prototype =
     // Удаляем несколько элементов
     Internal_Content_Remove2: function (Pos, Count) {
         var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
-        var CommentsToDelete = new Object();
+        var CommentsToDelete = {};
         for (var Index = Pos; Index < Pos + Count; Index++) {
             var ItemType = this.Content[Index].Type;
             if (true === this.DeleteCommentOnRemove && (para_CommentStart === ItemType || para_CommentEnd === ItemType)) {
@@ -9280,7 +9280,7 @@ Paragraph.prototype =
 
     Document_CreateFontMap: function (FontMap) {
         if (true === this.FontMap.NeedRecalc) {
-            this.FontMap.Map = new Object();
+            this.FontMap.Map = {};
 
             if (true === this.CompiledPr.NeedRecalc) {
                 this.CompiledPr.Pr = this.Internal_CompileParaPr();
@@ -10431,7 +10431,7 @@ Paragraph.prototype =
     },
 
     Get_SelectionState: function () {
-        var ParaState = new Object();
+        var ParaState = {};
         ParaState.CurPos =
         {
             X: this.CurPos.X,
@@ -11715,7 +11715,7 @@ Paragraph.prototype =
         this.Id = Reader.GetString2();
         this.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
 
-        var LinkData = new Object();
+        var LinkData = {};
         LinkData.Parent = Reader.GetString2();
 
         this.Pr = new CParaPr();

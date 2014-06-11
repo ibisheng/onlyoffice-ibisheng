@@ -206,7 +206,7 @@ function CAbstractNum(Type)
     this.Lvl = [];
     for ( var Index = 0; Index < 9; Index++ )
     {
-        this.Lvl[Index] = new Object();
+        this.Lvl[Index] = {};
         var Lvl = this.Lvl[Index];
 
         Lvl.PStyle  = undefined;
@@ -340,7 +340,7 @@ CAbstractNum.prototype =
         {
             var Lvl_old = this.Internal_CopyLvl( this.Lvl[Index] );
 
-            this.Lvl[Index] = new Object();
+            this.Lvl[Index] = {};
             var Lvl = this.Lvl[Index];
 
             Lvl.Start   = 1;
@@ -391,7 +391,7 @@ CAbstractNum.prototype =
         {
             var Lvl_old = this.Internal_CopyLvl( this.Lvl[Index] );
 
-            this.Lvl[Index] = new Object();
+            this.Lvl[Index] = {};
             var Lvl = this.Lvl[Index];
 
             Lvl.Start   = 1;
@@ -440,7 +440,7 @@ CAbstractNum.prototype =
         {
             var Lvl_old = this.Internal_CopyLvl( this.Lvl[Index] );
 
-            this.Lvl[Index] = new Object();
+            this.Lvl[Index] = {};
             var Lvl = this.Lvl[Index];
 
             Lvl.Start   = 1;
@@ -520,7 +520,7 @@ CAbstractNum.prototype =
         {
             var Lvl_old = this.Internal_CopyLvl( this.Lvl[Index] );
 
-            this.Lvl[Index] = new Object();
+            this.Lvl[Index] = {};
             var Lvl = this.Lvl[Index];
 
             Lvl.Start   = 1;
@@ -603,7 +603,7 @@ CAbstractNum.prototype =
         {
             var Lvl_old = this.Internal_CopyLvl( this.Lvl[Index] );
 
-            this.Lvl[Index] = new Object();
+            this.Lvl[Index] = {};
             var Lvl = this.Lvl[Index];
 
             Lvl.Start   = 1;
@@ -1396,7 +1396,7 @@ CAbstractNum.prototype =
     // Копируем информацию о заданном уровне
     Internal_CopyLvl : function(Lvl)
     {
-        var Lvl_new = new Object();
+        var Lvl_new = {};
 
         Lvl_new.Start   = Lvl.Start;
         Lvl_new.Restart = Lvl.Restart;

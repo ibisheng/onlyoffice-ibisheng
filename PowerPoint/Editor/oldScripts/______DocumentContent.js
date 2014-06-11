@@ -784,7 +784,7 @@ CDocumentContent.prototype =
 
                 if ( "undefined" == typeof(this.Pages[++CurPage]) )
                 {
-                    this.Pages[CurPage] = new Object();
+                    this.Pages[CurPage] = {};
                 }
 
                 var StartPos = this.Get_PageContentStartPos( CurPage );
@@ -5541,7 +5541,7 @@ CDocumentContent.prototype =
 
     Get_Paragraph_ParaPr : function()
     {
-        var Result_ParaPr = new Object();
+        var Result_ParaPr = {};
 
         if ( true === this.ApplyToAll )
         {
@@ -5820,7 +5820,7 @@ CDocumentContent.prototype =
             {
                 case flowobject_Image:
                 {
-                    Result_TextPr = new Object();
+                    Result_TextPr = {};
                     Result_TextPr.Bold       = false;
                     Result_TextPr.Italic     = false;
                     Result_TextPr.Underline  = false;
@@ -5941,7 +5941,7 @@ CDocumentContent.prototype =
             {
                 case flowobject_Image:
                 {
-                    Result_TextPr = new Object();
+                    Result_TextPr = {};
                     Result_TextPr.Bold       = false;
                     Result_TextPr.Italic     = false;
                     Result_TextPr.Underline  = false;
@@ -6046,7 +6046,7 @@ CDocumentContent.prototype =
 
     Interface_Update_ImagePr : function(Flag)
     {
-        var ImagePr = new Object();
+        var ImagePr = {};
         if ( docpostype_Content == this.CurPos.Type && selectionflag_DrawingObject == this.Selection.Flag )
         {
             var Drawing = this.Selection.Data.DrawingObject;
@@ -7345,7 +7345,7 @@ CDocumentContent.prototype =
 
     Get_SelectionState : function()
     {
-        var DocState = new Object();
+        var DocState = {};
         DocState.CurPos =
         {
             X          : this.CurPos.X,

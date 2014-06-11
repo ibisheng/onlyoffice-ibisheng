@@ -14,13 +14,13 @@ var ColorChart_timer = null;
 var globalCurentUser = "";
 var g_arrLockedInfo = [];
 
-var g_oTextPr    = new Object(); // CTextPr
-var g_oImagePr   = new Object();//
+var g_oTextPr    = {}; // CTextPr
+var g_oImagePr   = {};//
 var g_nImageWrap = 0;//c_oAscWrapStyle2.Inline;
 var g_nParaWrap  = 1;//c_oAscWrapStyle2.Square;
 var g_bImageCanBeFlow = true;
-var g_oTablePr   = new Object();
-var g_oSpellCheck = new Object();
+var g_oTablePr   = {};
+var g_oSpellCheck = {};
 //var oChartEditor = new ChartEditor();
 
 var Drag = {
@@ -3580,7 +3580,7 @@ $(".colorWatch").mouseover(function(){
 
 	$("#tblApply").click(function()
     {
-		var tblOBJ = new Object();
+		var tblOBJ = {};
 
 
         if ( true === document.getElementById("tblAllowOverlap").checked )

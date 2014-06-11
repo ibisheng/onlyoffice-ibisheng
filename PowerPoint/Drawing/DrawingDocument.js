@@ -4839,7 +4839,7 @@ function DrawBackground(graphics, unifill, w, h)
 
     graphics.SetIntegerGrid(false);
 
-    var _shape = new Object();
+    var _shape = {};
 
     _shape.brush = unifill;
     _shape.pen = null;

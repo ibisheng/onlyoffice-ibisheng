@@ -148,7 +148,7 @@ CGraphicFrame.prototype =
 
 
 
-                            var TableState = new Object();
+                            var TableState = {};
                             TableState.Selection =
                             {
                                 Start    : true,

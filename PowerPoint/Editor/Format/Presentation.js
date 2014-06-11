@@ -295,7 +295,7 @@ function CPresentation(DrawingDocument)
         WidowControlLine          : -1      // Номер строки, перед которой надо поставить разрыв страницы
     };
     this.RecalcId   = 0; // Номер пересчета
-    this.FullRecalc = new Object();
+    this.FullRecalc = {};
     this.FullRecalc.Id = null;
     this.FullRecalc.X  = 0;
     this.FullRecalc.Y  = 0;
@@ -4803,7 +4803,7 @@ CPresentation.prototype =
         return;
         var StartTime = new Date().getTime();
 
-        var FontMap = new Object();
+        var FontMap = {};
         this.HdrFtr.Document_CreateFontMap(FontMap);
 
         var CurPage = 0;
@@ -4842,7 +4842,7 @@ CPresentation.prototype =
 
     Document_Get_AllFontNames : function()
     {
-        var AllFonts = new Object();
+        var AllFonts = {};
         for(var i =0 ; i < this.Slides.length; ++i)
         {
             this.Slides[i].getAllFonts(AllFonts)
@@ -5128,7 +5128,7 @@ CPresentation.prototype =
         if(this.CurPage > -1)
             s.slideSelection = this.Slides[this.CurPage].graphicObjects.getSelectionState();
         return s;
-        var DocState = new Object();
+        var DocState = {};
         DocState.CurPos =
         {
             X          : this.CurPos.X,
@@ -6688,7 +6688,7 @@ CPresentation.prototype =
 
         // Сохраняем Id ближайшего элемента в текущем классе
 
-        var State = new Object();
+        var State = {};
         /*if ( docpostype_HdrFtr === this.CurPos.Type )
         {
             State.Type = docpostype_HdrFtr;
