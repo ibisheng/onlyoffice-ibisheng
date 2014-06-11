@@ -1549,6 +1549,13 @@
 			var offs = $(this.element).offset();
 			var x = event.pageX - offs.left;
 			var y = event.pageY - offs.top;
+
+			// ToDo возможно стоит переделать
+			if (AscBrowser.isRetina) {
+				x <<= 1;
+				y <<= 1;
+			}
+
 			return {x: x, y: y};
 		};
 

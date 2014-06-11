@@ -935,18 +935,36 @@
 		CellEditor.prototype._adjustCanvas = function () {
 			var t = this;
 			var z = t.defaults.canvasZIndex;
+			var left = t.left * t.kx;
+			var top = t.top * t.ky;
+			var widthStyle = (t.right - t.left) * t.kx - 1;
+			var heightStyle = (t.bottom - t.top) * t.ky - 1;
+			var isRetina = AscBrowser.isRetina;
+			var width = widthStyle, height = heightStyle;
 
-			t.canvasOuterStyle.left = (t.left * t.kx) + "px";
-			t.canvasOuterStyle.top = (t.top * t.ky) + "px";
-			t.canvasOuterStyle.width = ((t.right - t.left) * t.kx - 1) + "px";
-			t.canvasOuterStyle.height = ((t.bottom - t.top) * t.ky - 1) + "px";
+			if (isRetina) {
+				left >>= 1;
+				top >>= 1;
+
+				widthStyle >>= 1;
+				heightStyle >>= 1;
+			}
+
+			t.canvasOuterStyle.left = left + 'px';
+			t.canvasOuterStyle.top = top + 'px';
+			t.canvasOuterStyle.width = widthStyle + 'px';
+			t.canvasOuterStyle.height = heightStyle + 'px';
 			t.canvasOuterStyle.zIndex = t.top <= 0 ? -1 : z;
 
-			t.canvas.width = t.canvasOverlay.width = (t.right - t.left) * t.kx - 1;
-			t.canvas.height = t.canvasOverlay.height = (t.bottom - t.top) * t.ky - 1;
+			t.canvas.width = t.canvasOverlay.width = width;
+			t.canvas.height = t.canvasOverlay.height = height;
+			if (isRetina) {
+				t.canvas.style.width = t.canvasOverlay.style.width = widthStyle + 'px';
+				t.canvas.style.height = t.canvasOverlay.style.height = heightStyle + 'px';
+			}
 
 			// show
-			t.canvasOuterStyle.display = "block";
+			t.canvasOuterStyle.display = 'block';
 		};
 
 		CellEditor.prototype._renderText = function (dy) {

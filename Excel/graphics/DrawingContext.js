@@ -420,6 +420,12 @@ function DrawingContext(settings) {
 			.appendTo("body");
 	this.ppiX = asc_round(ppiTest[0] ? (ppiTest[0].offsetWidth * 0.1) : 96);
 	this.ppiY = asc_round(ppiTest[0] ? (ppiTest[0].offsetHeight * 0.1) : 96);
+
+    if (AscBrowser.isRetina) {
+        this.ppiX <<= 1;
+        this.ppiY <<= 1;
+    }
+
 	ppiTest.remove();
 
 	this._mct  = new Matrix();  // units transform
@@ -437,12 +443,16 @@ function DrawingContext(settings) {
 	this.changeUnits(undefined !== settings.units ? settings.units : this.units);
 
 	this.fmgrGraphics = undefined !== settings.fmgrGraphics ? settings.fmgrGraphics : null;
-	if (null === this.fmgrGraphics) {return null;}
+	if (null === this.fmgrGraphics) {
+		throw "Can not set graphics in DrawingContext";
+	}
 
 	/** @type FontProperties */
 	this.font = undefined !== settings.font ? settings.font : null;
 	// Font должен быть передан (он общий для всех DrawingContext, т.к. может возникнуть ситуация как в баге http://bugzserver/show_bug.cgi?id=19784)
-	if (null === this.font) {return null;}
+	if (null === this.font) {
+		throw "Can not set font in DrawingContext";
+	}
 
 	// CColor
 	this.fillColor = new CColor(255, 255, 255);

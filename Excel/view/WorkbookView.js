@@ -182,11 +182,16 @@
 				this.canvasGraphicOverlay = document.getElementById("ws-canvas-graphic-overlay");
 			}
 
+			// Для мобильных не поддерживаем ретину
+			if (this.Api.isMobileVersion) {
+				AscBrowser.isRetina = false;
+			}
+
 			this.buffers.main = asc_DC({canvas: this.canvas, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
 			this.buffers.overlay = asc_DC({canvas: this.canvasOverlay, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
 			
 			this.buffers.mainGraphic = asc_DC({canvas: this.canvasGraphic, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
-			this.buffers.overlayGraphic = asc_DC({canvas: this.canvasGraphicOverlay, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});			
+			this.buffers.overlayGraphic = asc_DC({canvas: this.canvasGraphicOverlay, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
 			
 			this.drawingCtx = this.buffers.main;
 			this.overlayCtx = this.buffers.overlay;
@@ -468,7 +473,7 @@
 
 			this.fReplaceCallback = function () {self._replaceCellTextCallback.apply(self, arguments);};
 
-            if (this.Api.isMobileVersion){
+            if (this.Api.isMobileVersion) {
                 this.MobileTouchManager = new CMobileTouchManager();
                 this.MobileTouchManager.Init(this);
             }
@@ -1290,12 +1295,28 @@
 			var oldHeight = this.canvas.height;
 			var width = this.element.offsetWidth - (this.Api.isMobileVersion ? 0 : this.defaults.scroll.widthPx);
 			var height = this.element.offsetHeight - (this.Api.isMobileVersion ? 0 : this.defaults.scroll.heightPx);
+			var styleWidth, styleHeight, isRetina = AscBrowser.isRetina;
+
+			if (isRetina) {
+				styleWidth = width;
+				styleHeight = height;
+				width <<= 1;
+				height <<= 1;
+			}
 
 			if (oldWidth === width && oldHeight === height)
 				return false;
 
-			this.canvas.width = this.canvasOverlay.width = this.canvasGraphic.width = this.canvasGraphicOverlay.width = width;
-			this.canvas.height = this.canvasOverlay.height = this.canvasGraphic.height = this.canvasGraphicOverlay.height = height;
+			this.canvas.width = this.canvasOverlay.width = this.canvasGraphic.width =
+				this.canvasGraphicOverlay.width = width;
+			this.canvas.height = this.canvasOverlay.height = this.canvasGraphic.height =
+				this.canvasGraphicOverlay.height = height;
+			if (isRetina) {
+				this.canvas.style.width = this.canvasOverlay.style.width = this.canvasGraphic.style.width
+					= this.canvasGraphicOverlay.style.width = styleWidth + 'px';
+				this.canvas.style.height = this.canvasOverlay.style.height = this.canvasGraphic.style.height
+					= this.canvasGraphicOverlay.style.height = styleHeight + 'px';
+			}
 
 			// При смене ориентации у планшета, сбрасываются флаги у canvas!
 			// ToDo перепроверить на новых исходниках, должно поправиться, был баг в отрисовке!!!!!!!!!!!!!
