@@ -371,26 +371,29 @@ function TextMetrics(width, height, lineHeight, baseline, descender, fontSize, c
  * Creates font metrics
  * -----------------------------------------------------------------------------
  * @constructor
- * @param {Number} ascender
- * @param {Number} descender
- * @param {Number} lineGap
  *
  * @memberOf Asc
  */
-function FontMetrics(ascender, descender, lineGap) {
-	if ( !(this instanceof FontMetrics) ) {
-		return new FontMetrics(ascender, descender, lineGap);
-	}
+function FontMetrics () {
+	this.ascender = 0;
+	this.descender = 0;
+	this.lineGap = 0;
 
-	this.ascender  = ascender !== undefined ? ascender : 0;
-	this.descender = descender !== undefined ? descender : 0;
-	this.lineGap   = lineGap !== undefined ? lineGap : 0;
-
-	return this;
+	this.nat_scale = 0;
+	this.nat_y1 = 0;
+	this.nat_y2 = 0;
 }
 
 FontMetrics.prototype.clone = function () {
-	return new FontMetrics(this.ascender, this.descender, this.lineGap);
+	var res = new FontMetrics();
+	res.ascender = this.ascender;
+	res.descender = this.descender;
+	res.lineGap = this.lineGap;
+
+	res.nat_scale = this.nat_scale;
+	res.nat_y1 = this.nat_y1;
+	res.nat_y2 = this.nat_y2;
+	return res;
 };
 
 
@@ -797,15 +800,21 @@ DrawingContext.prototype = {
 	 * @return {FontMetrics}
 	 */
 	getFontMetrics: function (units) {
-		var fm = this.fmgrGraphics[0],
-		    d  = Math.abs(fm.m_lDescender),
-		    r  = getCvtRatio(0/*px*/, units >= 0 && units <=3 ? units : this.units, this.ppiX),
-		    factor = this.getFontSize() * r / fm.m_lUnits_Per_Em;
-		return new FontMetrics(
-			factor * fm.m_lAscender,
-			factor * d,
-			factor * (fm.m_lLineHeight - fm.m_lAscender - d)
-		);
+		var fm = this.fmgrGraphics[0];
+		var d  = Math.abs(fm.m_lDescender);
+		var r  = getCvtRatio(0/*px*/, units >= 0 && units <=3 ? units : this.units, this.ppiX);
+		var factor = this.getFontSize() * r / fm.m_lUnits_Per_Em;
+			
+		var res = new FontMetrics();
+		res.ascender = factor * fm.m_lAscender;
+		res.descender = factor * d;
+		res.lineGap	= factor * (fm.m_lLineHeight - fm.m_lAscender - d);
+			
+		var face = fm.m_pFont.m_pFace;
+		res.nat_scale = face.header.Units_Per_EM;
+		res.nat_y1 = face.header.yMax;
+		res.nat_y2 = face.header.yMin;
+		return res;
 	},
 
     setFont: function (font, angle) {

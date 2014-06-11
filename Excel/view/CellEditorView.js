@@ -937,7 +937,7 @@
 			var z = t.defaults.canvasZIndex;
 			var left = t.left * t.kx;
 			var top = t.top * t.ky;
-			var widthStyle = (t.right - t.left) * t.kx - 1;
+			var widthStyle = (t.right - t.left) * t.kx - 1; // ToDo разобраться с '-1'
 			var heightStyle = (t.bottom - t.top) * t.ky - 1;
 			var isRetina = AscBrowser.isRetina;
 			var width = widthStyle, height = heightStyle;
