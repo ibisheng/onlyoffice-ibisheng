@@ -82,11 +82,13 @@ CMathMatrix.prototype.setRuleGap = function(oSpace, rule, gap, minGap)
 }
 CMathMatrix.prototype.recalculateSize = function(oMeasure)
 {
-
     if(this.RecalcInfo.bProps)
     {
         this.setRuleGap(this.spaceColumn, this.Pr.cGpRule, this.Pr.cGp, this.Pr.cSp);
         this.setRuleGap(this.spaceRow, this.Pr.rSpRule, this.Pr.rSp);
+
+        if(this.Pr.plcHide)
+            this.hidePlaceholder(true);
 
         this.RecalcInfo.bProps = false;
     }
@@ -399,10 +401,7 @@ CMathMatrix.prototype.setProperties = function(props)
         this.nCol = props.column;
 
     if(props.plcHide === true || props.plcHide === 1)
-    {
         this.Pr.plcHide = true;
-        this.hidePlaceholder(true);
-    }
 
     if(props.baseJc === BASEJC_CENTER || props.baseJc === BASEJC_TOP || props.baseJc === BASEJC_BOTTOM)
         this.Pr.baseJc = props.baseJc;

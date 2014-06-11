@@ -1071,7 +1071,10 @@ CMathBase.prototype =
     {
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
-                this.elements[i][j].hidePlaceholder(flag);
+            {
+                if( this.elements[i][j].IsJustDraw() == false )
+                    this.elements[i][j].hidePlaceholder(flag);
+            }
     },
      // ф-ия используется, для того чтобы добавить в контент элемента текст/др формулы
     getElement: function(x, y)
