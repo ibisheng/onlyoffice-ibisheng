@@ -3973,7 +3973,7 @@ function searchRegExp2( s, mask ) {
     var nSLength = s.length;
     var nMaskLength = mask.length;
     var t = false;
-    for ( ; nSIndex < nSLength; nMaskIndex++, nSIndex++ ) {
+    for ( ; nSIndex < nSLength; nMaskIndex++, nSIndex++, t = false ) {
         var cCurMask = mask[nMaskIndex];
         if ( '~' == cCurMask ) {
             nMaskIndex++;
