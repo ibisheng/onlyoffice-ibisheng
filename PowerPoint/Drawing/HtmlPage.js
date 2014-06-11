@@ -468,10 +468,7 @@ function CEditorPage(api)
         var old = this.bIsRetinaSupport;
         if (!this.bIsRetinaNoSupportAttack)
         {
-            if (window.devicePixelRatio != 2)
-                this.bIsRetinaSupport = false;
-            else
-                this.bIsRetinaSupport = true;
+			this.bIsRetinaSupport = AscBrowser.isRetina;
         }
         else
         {

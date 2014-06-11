@@ -14,7 +14,8 @@ var AscBrowser = {
     isWebkit : false,
     isSafari : false,
     isArm : false,
-    isMozilla : false
+    isMozilla : false,
+	isRetina : false
 };
 
 // user agent lower case
@@ -67,3 +68,6 @@ AscBrowser.isWebkit = (AscBrowser.userAgent.indexOf("webkit") > -1);
 AscBrowser.isArm = (AscBrowser.userAgent.indexOf("arm") > -1);
 
 AscBrowser.isMozilla = ((AscBrowser.userAgent.indexOf("firefox") > -1) && (!AscBrowser.isIE));
+
+// detect retina (http://habrahabr.ru/post/159419/)
+AscBrowser.isRetina = 2 === window.devicePixelRatio;
