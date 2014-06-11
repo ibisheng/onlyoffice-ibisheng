@@ -1908,6 +1908,9 @@ CFontSelectList.prototype =
             var _id = _info.GetFontID(window.g_font_loader, _style);
             var _select = this.List[this.ListMap[_id.id]];
 
+            if (!_select)
+                continue;
+
             var _bIsNeed = false;
             if (0 != _lang.CodePage1Mask)
             {
