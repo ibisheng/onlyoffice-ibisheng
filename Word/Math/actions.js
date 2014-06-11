@@ -1,3 +1,5 @@
+"use strict";
+
 function addMathFunc(fname)
 {
     var indef;
@@ -419,18 +421,6 @@ CControlComposition.prototype =
     }
 }
 
-var inherit = function(obj, extObj)
-{
-    if(arguments.length > 2)
-        for (var a=1, L = arguments.length; a < L; a++)
-            arguments.callee(obj, arguments[a]);
-    else
-        for(var i in extObj)
-            if (!obj[i])
-                obj[i] = extObj[i];
-
-    return obj;
-}
 var extend = function(Child, Parent)
 {
     var F = function() { };
