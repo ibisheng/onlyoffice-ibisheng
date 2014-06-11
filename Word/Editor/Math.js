@@ -20,6 +20,7 @@ function ParaMath()
     //this.Root = this.Math.Root;
 
     this.Root       = new CMathContent();
+    this.Root.bRoot = true;
     //this.Root.setComposition(this);
 
     this.X          = 0;
@@ -408,6 +409,8 @@ ParaMath.prototype =
         this.StartLine   = StartLine;
         this.StartRange  = StartRange;
         this.LinesLength = 0;
+
+        this.Root.Recalculate_Reset(StartRange, StartLine);
     },
 
     Recalculate_Range : function(PRS, ParaPr, Depth)
@@ -1014,7 +1017,6 @@ ParaMath.prototype =
         this.bSelectionUse = true;
         this.Root.Set_Select_ToMComp(Direction);
 
-        //console.log("bSelectionUse : " + this.bSelectionUse);
     },
 //-----------------------------------------------------------------------------------
 // Функции отрисовки
@@ -1348,8 +1350,11 @@ ParaMath.prototype =
 
                 SelectionDraw.StartX += oCont.pos.x + oCont.WidthToElement[Start];
 
+
                 if(Start == End)
+                {
                     oCont.content[Start].Selection_DrawRange(0, 0, SelectionDraw);
+                }
                 else
                 {
                     oCont.content[Start].Selection_DrawRange(0, 0, SelectionDraw);
@@ -1377,6 +1382,7 @@ ParaMath.prototype =
             }
 
         }
+
     },
 
     Selection_IsEmpty : function(CheckEnd)

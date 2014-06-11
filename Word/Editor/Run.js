@@ -7168,37 +7168,56 @@ ParaRun.prototype.Math_Recalculate = function(Parent, Paragraph, oMeasure, Recal
 
     var width = 0,
         ascent = 0, descent = 0;
+
+
     var oWPrp = this.Get_CompiledPr(true);
 
     if(TXT_NORMAL !== this.Math_GetTypeText()) // выставляем false, чтобы не применился наклон к спец символам
         oWPrp.Italic = false;
 
-
     g_oTextMeasurer.SetFont(oWPrp);
 
     for (var Pos = 0 ; Pos < this.Content.length; Pos++ )
     {
+        this.Content[Pos].Resize(this, oMeasure);
+        this.Content[Pos].ApplyGaps();
 
-            RecalcInfo.leftRunPrp = RecalcInfo.currRunPrp;
-            RecalcInfo.Left = RecalcInfo.Current;
+        var oSize = this.Content[Pos].size;
+        width += oSize.width;
 
-            RecalcInfo.currRunPrp = oWPrp;
-            RecalcInfo.Current = this.Content[Pos];
-            RecalcInfo.setGaps();
-
-            this.Content[Pos].Resize(this, oMeasure);
-
-            var oSize = this.Content[Pos].size;
-            width += oSize.width;
-
-            ascent = ascent > oSize.ascent ? ascent : oSize.ascent;
-            var oDescent = oSize.height - oSize.ascent;
-            descent =  descent < oDescent ? oDescent : descent;
+        ascent = ascent > oSize.ascent ? ascent : oSize.ascent;
+        var oDescent = oSize.height - oSize.ascent;
+        descent =  descent < oDescent ? oDescent : descent;
 
     }
 
+    /*if(this.Parent.bRoot)
+    {
+        var lng = this.Content.length;
+        for(var i = 0; i < lng; i++)
+        {
+            var left  = this.Content[i].GapLeft,
+                right = this.Content[i].GapRight;
+
+            console.log(RecalcInfo.TEST_COUNT + ". Left : " + left + ",  Right : " + right);
+
+            RecalcInfo.TEST_COUNT++;
+        }
+
+    }*/
+
     this.size = {width: width, height: ascent + descent, ascent: ascent};
 }
+/*ParaRun.prototype.ApplyGaps = function()
+{
+    if(this.Is_Empty() == false)
+    {
+        var lng = this.Content.length;
+
+        this.Content[lng - 1].ApplyGaps();
+        this.size.width += this.Content[lng - 1].size.width;
+    }
+}*/
 ParaRun.prototype.Math_Update_Cursor = function(X, Y, CurPage, UpdateTarget)
 {
     var runPrp = this.Get_CompiledPr(true);
@@ -7235,4 +7254,25 @@ ParaRun.prototype.getPropsForWrite = function()
         mathRPrp = this.MathPrp.getPropsForWrite();
 
     return {wRPrp: wRPrp, mathRPrp: mathRPrp};
+}
+ParaRun.prototype.Math_SetGaps = function(Paragraph, RecalcInfo)
+{
+    this.Paragraph = Paragraph;
+
+    var oWPrp = this.Get_CompiledPr(true);
+
+    if(TXT_NORMAL !== this.Math_GetTypeText()) // выставляем false, чтобы не применился наклон к спец символам
+        oWPrp.Italic = false;
+
+    g_oTextMeasurer.SetFont(oWPrp);
+
+    for (var Pos = 0 ; Pos < this.Content.length; Pos++ )
+    {
+        RecalcInfo.leftRunPrp = RecalcInfo.currRunPrp;
+        RecalcInfo.Left = RecalcInfo.Current;
+
+        RecalcInfo.currRunPrp = oWPrp;
+        RecalcInfo.Current = this.Content[Pos];
+        RecalcInfo.setGaps();
+    }
 }
