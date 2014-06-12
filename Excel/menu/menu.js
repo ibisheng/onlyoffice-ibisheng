@@ -2150,11 +2150,11 @@
 		chartForm.find("#titlesField").show();
 		chartForm.find("#legendField").show();
 		chartForm.find("#typeField").show();
-		
-		function setTitleFont() { showChartFontDialog(chart.asc_getHeader().asc_getFont()) }
-		function setAxisXFont() { showChartFontDialog(chart.asc_getXAxis().asc_getTitleFont()) }
-		function setAxisYFont() { showChartFontDialog(chart.asc_getYAxis().asc_getTitleFont()) }
-
+	//
+	//	function setTitleFont() { showChartFontDialog(chart.asc_getHeader().asc_getFont()) }
+	//	function setAxisXFont() { showChartFontDialog(chart.asc_getXAxis().asc_getTitleFont()) }
+	//	function setAxisYFont() { showChartFontDialog(chart.asc_getYAxis().asc_getTitleFont()) }
+    //
 		api.asc_setSelectionDialogMode(true);
 
 		chartForm.css("visibility", "visible");
@@ -2216,7 +2216,7 @@
 							text: "Ok",
 							click: function() {
 
-								var chartForm = $("#chartSelector");
+							/*	var chartForm = $("#chartSelector");
 								var isSelected = (chart.type != null) && (chart.type != "");
 								var range = chart.asc_getRange();
 									
@@ -2272,8 +2272,8 @@
 
                                     if (isSelected)
                                         api.asc_editChartDrawingObject(chart);
-                                    else
-                                        api.asc_addChartDrawingObject(chart);
+                                    else     */
+                                api.asc_addChartDrawingObject(chart);
 								$(this).dialog("close");
 							}
 						},

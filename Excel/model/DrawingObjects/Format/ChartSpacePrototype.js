@@ -55,7 +55,9 @@ CChartSpace.prototype.setRecalculateInfo = function()
         recalculateUpDownBars: true,
         recalculateLegend: true,
         recalculateReferences: true,
-        recalculateBBox: true
+        recalculateBBox: true,
+        recalculateFormulas: true,
+        recalculatePenBrush: true
     };
     this.baseColors = [];
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
