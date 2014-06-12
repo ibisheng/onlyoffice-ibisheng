@@ -6,6 +6,7 @@ var historyitem_AutoShapes_AddToDrawingObjects = 3;
 var historyitem_AutoShapes_RemoveFromDrawingObjects = 4;
 var historyitem_CommonChart_RemoveSeries = 5;
 var historyitem_CommonSeries_RemoveDPt = 6;
+var historyitem_CommonLit_RemoveDPt = 6;
 var historyitem_ColorMod_SetName = 2001;
 var historyitem_ColorMod_SetVal = 2002;
 var historyitem_ColorModifiers_AddColorMod = 2003;

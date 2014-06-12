@@ -227,6 +227,11 @@ function handleChart(drawing, drawingObjectsController, e, x, y, group, pageInde
         }
     }
 
+    if(drawing.chart.legend)
+    {
+
+    }
+
     ret = handleShapeImage(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord);
     if(ret)
         return ret;

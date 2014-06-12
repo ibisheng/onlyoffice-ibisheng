@@ -12,6 +12,16 @@ function findPrAndRemove(arr, pr)
     }
 }
 
+function removePtsFromLit(lit)
+{
+    var i;
+    var start_idx = Array.isArray(lit.pts) ? lit.pts.length - 1 : (Array.isArray(lit.pt) ? lit.pt.length - 1 : -1);
+    for(i = start_idx; i > -1; --i)
+    {
+        lit.removeDPt(i);
+    }
+}
+
 
 function removeDPtsFromSeries(series)
 {
@@ -13571,6 +13581,15 @@ CNumLit.prototype =
     {},
 
 
+    removeDPt: function(idx)
+    {
+        if(this.pts[idx])
+        {
+            History.Add(this, {Type: historyitem_CommonLit_RemoveDPt, idx: idx, pt: this.pts[idx]});
+            this.pts.splice(idx, 1);
+        }
+    },
+
     createDuplicate: function()
     {
         var c = new CNumLit();
@@ -13654,6 +13673,12 @@ CNumLit.prototype =
                 this.ptCount = data.oldPr;
                 break;
             }
+
+            case historyitem_CommonLit_RemoveDPt:
+            {
+                this.pts.splice(data.idx, 0, data.pt);
+                break;
+            }
         }
     },
 
@@ -13676,6 +13701,11 @@ CNumLit.prototype =
             case historyitem_NumLit_SetPtCount:
             {
                 this.ptCount = data.newPr;
+                break;
+            }
+            case historyitem_CommonLit_RemoveDPt:
+            {
+                this.pts.splice(data.idx, 1);
                 break;
             }
         }
@@ -13701,6 +13731,12 @@ CNumLit.prototype =
             case historyitem_NumLit_SetPtCount:
             {
                 writeLong(w, data.newPr);
+                break;
+            }
+
+            case historyitem_CommonLit_RemoveDPt:
+            {
+                w.WriteLong(data.idx);
                 break;
             }
         }
@@ -13730,6 +13766,12 @@ CNumLit.prototype =
             case historyitem_NumLit_SetPtCount:
             {
                 this.ptCount = readLong(r);
+                break;
+            }
+            case historyitem_CommonLit_RemoveDPt:
+            {
+                var idx = r.GetLong();
+                this.pts.splice(idx, 1);
                 break;
             }
         }
@@ -17580,6 +17622,16 @@ CStrCache.prototype =
     Refresh_RecalcData: function()
     {},
 
+    removeDPt: function(idx)
+    {
+        if(this.pt[idx])
+        {
+            History.Add(this, {Type: historyitem_CommonLit_RemoveDPt, idx: idx, pt: this.pt[idx]});
+            this.pt.splice(idx, 1);
+        }
+    },
+
+
     createDuplicate: function()
     {
         var c = new CStrCache();
@@ -17650,6 +17702,11 @@ CStrCache.prototype =
                 this.ptCount = data.oldPr;
                 break;
             }
+            case historyitem_CommonLit_RemoveDPt:
+            {
+                this.pt.splice(data.idx, 0, data.pt);
+                break;
+            }
         }
     },
 
@@ -17665,6 +17722,11 @@ CStrCache.prototype =
             case historyitem_StrCache_SetPtCount:
             {
                 this.ptCount = data.newPr;
+                break;
+            }
+            case historyitem_CommonLit_RemoveDPt:
+            {
+                this.pt.splice(data.idx, 1);
                 break;
             }
         }
@@ -17683,6 +17745,11 @@ CStrCache.prototype =
             case historyitem_StrCache_SetPtCount:
             {
                 writeLong(w, data.newPr);
+                break;
+            }
+            case historyitem_CommonLit_RemoveDPt:
+            {
+                w.WriteLong(data.idx);
                 break;
             }
         }
@@ -17705,6 +17772,13 @@ CStrCache.prototype =
             case historyitem_StrCache_SetPtCount:
             {
                 this.ptCount = readLong(r);
+                break;
+            }
+
+            case historyitem_CommonLit_RemoveDPt:
+            {
+                var idx = r.GetLong();
+                this.pt.splice(idx, 1);
                 break;
             }
         }

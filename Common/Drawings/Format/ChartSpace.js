@@ -216,6 +216,8 @@ function CChartSpace()
         plotArea: null
     };
 
+    this.parsedFromulas = [];
+
     this.setRecalculateInfo();
 
 
@@ -232,6 +234,34 @@ CChartSpace.prototype =
 
     select: CShape.prototype.select,
     checkHitToBounds: CShape.prototype.checkHitToBounds,
+
+
+    getSelectionState: function()
+    {
+        return {
+            title:         this.selection.title,
+            legend:        this.selection.legend,
+            legendEntry:   this.selection.legendEntry,
+            axisLbls:      this.selection.axisLbls,
+            dataLbls:      this.selection.dataLbls,
+            dataLbl:       this.selection.dataLbl,
+            textSelection: this.selection.textSelection,
+            plotArea:      this.selection.plotArea
+        }
+    },
+
+
+    setSelectionState: function(state)
+    {
+       this.selectiontitle          = state.title;
+       this.selectionlegend         = state.legend;
+       this.selectionlegendEntry    = state.legendEntry;
+       this.selectionaxisLbls       = state.axisLbls;
+       this.selectiondataLbls       = state.dataLbls;
+       this.selectiondataLbl        = state.dataLbl;
+       this.selectiontextSelection  = state.textSelection;
+       this.selectionplotArea       = state.plotArea;
+    },
 
     resetInternalSelection: function()
     {
@@ -256,7 +286,18 @@ CChartSpace.prototype =
         this.selection.plotArea = null;
     },
 
+    paragraphAdd: function(paraItem, bRecalculate)
+    {
+        if(paraItem.Type === para_TextPr)
+        {
+            //TODO
+        }
+        else
+        {
 
+        }
+
+    },
 
     selectTitle: function(title, pageIndex)
     {
@@ -338,15 +379,211 @@ CChartSpace.prototype =
         this.spPr.setLn(CorrectUniStroke(line, this.spPr.ln));
     },
 
+    parseChartFormula: function(sFormula)
+    {
+        if(this.worksheet && typeof sFormula === "string" && sFormula.length > 0)
+        {
+            var ret = [];
+            var f1 = sFormula.replace(/\(|\)/g,"");
+            var arr_f = f1.split(",");
+            var i, j;
+            for(i = 0; i < arr_f.length; ++i)
+            {
+                var parsed_ref = parserHelp.parse3DRef(arr_f[i]);
+                if(parsed_ref)
+                {
+                    var source_worksheet = this.worksheet.workbook.getWorksheetByName(parsed_ref.sheet);
+                    var range1 = source_worksheet.getRange2(parsed_ref.range);
+                    if(range1)
+                    {
+                        var range = range1.bbox;
+                        ret.push({worksheet: source_worksheet, bbox: range});
+                    }
+                }
+            }
+            return ret;
+        }
+        return null;
+    },
+
+
+
+
+
+    checkBBoxIntersection: function(bbox1, bbox2)
+    {
+        return !(bbox1.r1 > bbox2.r2 || bbox2.r1 > bbox1.r2 || bbox1.c1 > bbox2.c2 || bbox2.c1 > bbox1.c2)
+    },
+
+    checkSeriesIntersection: function(val, bbox, worksheet)
+    {
+        if(val && bbox && worksheet)
+        {
+            var parsed_formulas = val.parsedFormulas;
+            for(var i = 0; i < parsed_formulas.length; ++i)
+            {
+                if(parsed_formulas[i].worksheet === worksheet && this.checkBBoxIntersection(parsed_formulas[i].bbox, bbox))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    },
+
+    checkVal: function(val)
+    {
+        if(val)
+        {
+            if(val.numRef)
+            {
+                val.numRef.parsedFormulas = this.parseChartFormula(val.numRef.f);
+            }
+            if(val.strRef)
+            {
+                val.strRef.parsedFormulas = this.parseChartFormula(val.strRef.f);
+            }
+        }
+    },
+
+    recalculateSeriesFormulas: function()
+    {
+        this.checkSeriesRefs(this.checkVal);
+    },
+
+    checkChartIntersection: function(bbox, worksheet)
+    {
+        return this.checkSeriesRefs(this.checkSeriesIntersection, bbox, worksheet);
+    },
+
+    checkSeriesRefs: function(callback, bbox, worksheet)
+    {
+        if(this.chart && this.chart.plotArea)
+        {
+            var charts = this.chart.plotArea.charts, i, j, series, ser;
+            for(i = 0; i < charts.length; ++i)
+            {
+                series = charts[i].series;
+                if(charts[i].getObjectType() === historyitem_type_ScatterChart)
+                {
+                    for(j = 0; j < series.length; ++j)
+                    {
+                        ser = series[j];
+                        if(callback(ser.xVal, bbox, worksheet))
+                            return true;
+                        if(callback(ser.yVal, bbox, worksheet))
+                            return true;
+                        if(callback(ser.tx, bbox, worksheet))
+                            return true;
+                    }
+                }
+                else
+                {
+                    for(j = 0; j < series.length; ++j)
+                    {
+                        ser = series[j];
+                        if(callback(ser.val, bbox, worksheet))
+                            return true;
+                        if(callback(ser.cat, bbox, worksheet))
+                            return true;
+                        if(callback(ser.tx, bbox, worksheet))
+                            return true;
+                    }
+                }
+
+            }
+        }
+        return false;
+    },
+
+    rebuildVal: function(val)
+    {
+        if(val)
+        {
+            var i, j, k, parsed_formula, idx, cell, pt, bbox, worksheet;
+            var buildCache = function (ref, cache, pointConstructor)
+            {
+                idx = 0;
+                removePtsFromLit(cache);
+                for(i = 0; i < ref.parsedFormulas.length; ++i)
+                {
+                    parsed_formula = ref.parsedFormulas[i];
+                    bbox = parsed_formula.bbox;
+                    worksheet = parsed_formula.worksheet;
+                    for(j = bbox.r1; j <= bbox.r2; ++j)
+                    {
+                        for(k = bbox.c1; k <= bbox.c2; ++k)
+                        {
+                            if(!worksheet._getCol(i).hd  && !worksheet._getRow(row).hd)
+                            {
+                                cell = worksheet.getCell(new CellAddress(j, k, 0));
+                                pt = new pointConstructor();
+                                pt.setIdx(idx);
+                                pt.setFormatCode(cell.getNumFormatStr());
+                                pt.setVal(cell.getValue());
+                                cache.addPt(pt);
+                            }
+                            ++idx;
+                        }
+                    }
+                }
+            };
+
+            if(val.numRef)
+            {
+                if(!val.numRef.numCache)
+                {
+                    val.numRef.setNumCache(new CNumLit());
+                }
+                if(Array.isArray(val.numRef.parsedFormulas))
+                {
+                    buildCache(val.numRef, val.numRef.numCache, CNumericPoint);
+                }
+            }
+            if(val.strRef)
+            {
+                if(!val.strRef.strCache)
+                {
+                    val.strRef.setStrCache(new CStrCache());
+                }
+                if(Array.isArray(val.strRef.parsedFormulas))
+                {
+                    buildCache(val.strRef, val.strRef.strCache, CStringPoint);
+                }
+            }
+        }
+    },
+
+    clearCacheVal: function(val)
+    {
+        if(!val)
+            return;
+        if(val.numRef)
+        {
+            if(val.numRef.numCache)
+            {
+                val.numRef.setNumCache(null);
+            }
+        }
+        if(val.strRef)
+        {
+            if(val.strRef.strCache)
+            {
+                val.strRef.setStrCache(null);
+            }
+        }
+    },
+
+    rebuildSeries: function()
+    {
+        this.setRecalculateInfo();
+        this.checkSeriesRefs(this.clearCacheVal);
+        this.recalculate();
+        //this.checkSeriesRefs(this.rebuildVal);
+    },
+
     getTypeSubType: function()
     {
-        /*
-         *
-         *
-         normal: "normal",
-         stacked: "stacked",
-         stackedPer: "stackedPer"
-         */
         var type = null, subtype = null;
         if(this.chart && this.chart.plotArea && this.chart.plotArea.chart)
         {
@@ -1859,7 +2096,7 @@ CChartSpace.prototype =
                                 var range = range1.bbox;
                                 if(range.r1 === range.r2)
                                 {
-                                    for(j = range.c1;  j < range.c2; ++j)
+                                    for(j = range.c1;  j <= range.c2; ++j)
                                     {
                                         cell = source_worksheet.getCell( new CellAddress(range.r1, j, 0) );
                                         pt = new CNumericPoint();
@@ -1874,7 +2111,7 @@ CChartSpace.prototype =
                                 }
                                 else
                                 {
-                                    for(j = range.r1; j < range.r2; ++j)
+                                    for(j = range.r1; j <= range.r2; ++j)
                                     {
                                         cell = source_worksheet.getCell( new CellAddress(j, range.c1, 0) );
                                         pt = new CNumericPoint();
@@ -1903,7 +2140,7 @@ CChartSpace.prototype =
                 var f1 = cat.strRef.f.replace(/\(|\)/g,"");
                 var arr_f = f1.split(",");
                 var str_cache = new CStrCache();
-                str_cache.setFormatCode("General");
+                //str_cache.setFormatCode("General");
                 var pt_index = 0, i, j, cell, pt;
                 for(i = 0; i < arr_f.length; ++i)
                 {
@@ -1919,7 +2156,7 @@ CChartSpace.prototype =
                                 var range = range1.bbox;
                                 if(range.r1 === range.r2)
                                 {
-                                    for(j = range.c1;  j < range.c2; ++j)
+                                    for(j = range.c1;  j <= range.c2; ++j)
                                     {
                                         cell = source_worksheet.getCell( new CellAddress(range.r1, j, 0) );
                                         pt = new CStringPoint();
@@ -1934,7 +2171,7 @@ CChartSpace.prototype =
                                 }
                                 else
                                 {
-                                    for(j = range.r1;  j < range.r2; ++j)
+                                    for(j = range.r1;  j <= range.r2; ++j)
                                     {
                                         cell = source_worksheet.getCell(new CellAddress(j, range.c1, 0));
                                         pt = new CStringPoint();
@@ -1971,6 +2208,8 @@ CChartSpace.prototype =
                     //cat
                     checkValByNumRef(this, ser, ser.cat);
                     checkCatByNumRef(this, ser, ser.cat);
+                    //tx
+                    checkCatByNumRef(this, ser, ser.tx);
 
                 }
             }
@@ -1981,6 +2220,7 @@ CChartSpace.prototype =
                     ser = series[j];
                     checkValByNumRef(this, ser, ser.xVal);
                     checkValByNumRef(this, ser, ser.yVal);
+                    checkCatByNumRef(this, ser, ser.tx);
                 }
             }
         }
@@ -2054,9 +2294,6 @@ CChartSpace.prototype =
                             max_width = cur_width;
                         y_ax.labels.arrLabels.push(dlbl);
                     }
-
-
-
 
                     //пока расстояние между подписями и краем блока с подписями берем размер шрифта.
                     var hor_gap = y_ax.labels.arrLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*(25.4/72);
@@ -2507,9 +2744,6 @@ CChartSpace.prototype =
                     }
 
 
-
-
-
                     x_ax.xPoints = [];
                     for(i = 0; i < arr_x_val.length; ++i)
                     {
@@ -2897,7 +3131,7 @@ CChartSpace.prototype =
                                 for(i = 0; i < string_pts.length; ++i)
                                     arr_cat_labels_points[i] = rect.x + val_ax.labels.extX + point_interval/2 + point_interval*i;
                             }
-                            val_ax.posX = val_ax.labels.x + val_ax.labels.extX + point_interval*(crosses-1);;
+                            val_ax.posX = val_ax.labels.x + val_ax.labels.extX + point_interval*(crosses-1);
                         }
                         else if(labels_pos === TICK_LABEL_POSITION_HIGH)//подписи справа от области построения
                         {

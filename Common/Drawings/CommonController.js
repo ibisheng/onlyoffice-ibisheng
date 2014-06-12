@@ -138,13 +138,20 @@ function getTargetTextObject(controller)
     {
         return  controller.selection.textSelection;
     }
-    else if(controller.selection.groupSelection && controller.selection.groupSelection.selection.textSelection)
+    else if(controller.selection.groupSelection )
     {
-        return controller.selection.groupSelection.selection.textSelection;
+        if(controller.selection.groupSelection.selection.textSelection)
+        {
+            return controller.selection.groupSelection.selection.textSelection;
+        }
+        else if(controller.selection.groupSelection.selection.chartSelection && controller.selection.groupSelection.selection.chartSelection.selection.textSelection)
+        {
+            return controller.selection.groupSelection.selection.chartSelection.selection.textSelection;
+        }
     }
-    else if(controller.selection.chartSelection && controller.selection.chartSelection.textSelection)
+    else if(controller.selection.chartSelection && controller.selection.chartSelection.selection.textSelection)
     {
-        return controller.selection.chartSelection.textSelection;
+        return controller.selection.chartSelection.selection.textSelection;
     }
     return null;
 }
@@ -359,7 +366,6 @@ DrawingObjectsController.prototype =
             return {objectId: object.Get_Id(), cursorType: "move", bMarker: bInSelect};
         }
     },
-
 
     recalculateCurPos: function()
     {
@@ -719,7 +725,43 @@ DrawingObjectsController.prototype =
                     }
                 }
                 else if(this.selection.groupSelection.selection.chartSelection)
-                {}
+                {
+                    if(this.selection.groupSelection.selection.chartSelection.selectStartPage === pageIndex)
+                    {
+                        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.groupSelection.selection.chartSelection.getTransformMatrix(), 0, 0, this.selection.groupSelection.selection.chartSelection.extX, this.selection.groupSelection.selection.chartSelection.extY, false, this.selection.groupSelection.selection.chartSelection.canRotate());
+                        if(this.selection.groupSelection.selection.chartSelection.selection.textSelection)
+                        {
+                            drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.selection.groupSelection.selection.chartSelection.selection.textSelection.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.textSelection.extX, this.selection.groupSelection.selection.chartSelection.selection.textSelection.extY, false, false);
+                        }
+                        else if(this.selection.groupSelection.selection.chartSelection.selection.title)
+                        {
+                            drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.groupSelection.selection.chartSelection.selection.title.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.title.extX, this.selection.groupSelection.selection.chartSelection.selection.title.extY, false, false);
+                        }
+                        else if(this.selection.groupSelection.selection.chartSelection.selection.dataLbls)
+                        {
+                            for(i = 0; i < this.selection.groupSelection.selection.chartSelection.selection.dataLbls.length; ++i)
+                            {
+                                drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.groupSelection.selection.chartSelection.selection.dataLbls[i].transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.dataLbls[i].extX, this.selection.groupSelection.selection.chartSelection.selection.dataLbls[i].extY, false, false);
+                            }
+                        }
+                        else if(this.selection.groupSelection.selection.chartSelection.selection.dataLbl)
+                        {
+                            drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.groupSelection.selection.chartSelection.selection.dataLbl.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.dataLbl.extX, this.selection.groupSelection.selection.chartSelection.selection.dataLbl.extY, false, false);
+                        }
+                        else if(this.selection.groupSelection.selection.chartSelection.selection.legend)
+                        {
+                            drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.groupSelection.selection.chartSelection.selection.legend.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.legend.extX, this.selection.groupSelection.selection.chartSelection.selection.legend.extY, false, false);
+                        }
+                        else if(this.selection.groupSelection.selection.chartSelection.selection.legendEntry)
+                        {
+                            drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.groupSelection.selection.chartSelection.selection.legendEntry.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.legendEntry.extX, this.selection.groupSelection.selection.chartSelection.selection.legendEntry.extY, false, false);
+                        }
+                        else if(this.selection.groupSelection.selection.chartSelection.selection.axisLbls)
+                        {
+                            drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.groupSelection.selection.chartSelection.selection.axisLbls.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.axisLbls.extX, this.selection.groupSelection.selection.chartSelection.selection.axisLbls.extY, false, false);
+                        }
+                    }
+                }
                 else
                 {
                     for(i = 0; i < this.selection.groupSelection.selectedObjects.length ; ++i)
@@ -771,7 +813,6 @@ DrawingObjectsController.prototype =
                     drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.chartSelection.selection.axisLbls.transform, 0, 0, this.selection.chartSelection.selection.axisLbls.extX, this.selection.chartSelection.selection.axisLbls.extY, false, false);
                 }
             }
-
         }
         else if(this.selection.wrapPolygonSelection)
         {
@@ -1648,7 +1689,6 @@ DrawingObjectsController.prototype =
         var sRange = chartSettings.getRange();
         if(this.drawingObjects && this.drawingObjects.getWorksheet && typeof sRange === "string" && sRange.length > 0)
         {
-
             var ws_view = this.drawingObjects.getWorksheet();
             var parsed_formula = parserHelp.parse3DRef(sRange);
             var ws = ws_view.model.workbook.getWorksheetByName(parsed_formula.sheet);
@@ -1661,12 +1701,12 @@ DrawingObjectsController.prototype =
             if( parsed_formula && ws && new_bbox )
             {
 
-                var b_equal_bbox = chart_space.bbox.seriesBBox.r1 === new_bbox.r1
+                var b_equal_bbox = chart_space.bbox && chart_space.bbox.seriesBBox.r1 === new_bbox.r1
                     && chart_space.bbox.seriesBBox.r2 === new_bbox.r2
                     && chart_space.bbox.seriesBBox.c1 === new_bbox.c1
                     && chart_space.bbox.seriesBBox.c2 === new_bbox.c2;
-                var b_equal_ws = chart_space.bbox.worksheet === ws;
-                var b_equal_vert = chartSettings.getInColumns() === !chart_space.bbox.seriesBBox.bVert;
+                var b_equal_ws = chart_space.bbox && chart_space.bbox.worksheet === ws;
+                var b_equal_vert = chart_space.bbox && chartSettings.getInColumns() === !chart_space.bbox.seriesBBox.bVert;
 
                 if(!(chart_space.bbox && chart_space.bbox.seriesBBox && b_equal_ws
                     && b_equal_bbox && b_equal_vert))
@@ -1695,7 +1735,6 @@ DrawingObjectsController.prototype =
                     asc_chart.rebuildSeries();
                     chart_space.rebuildSeriesFromAsc(asc_chart);
                 }
-
             }
         }
 
@@ -2614,7 +2653,18 @@ DrawingObjectsController.prototype =
         }
         else if(this.selection.groupSelection && this.selection.groupSelection.selection.textSelection)
         {
-            text_object = this.selection.groupSelection.selection.textSelection;
+            if(this.selection.groupSelection.selection.textSelection)
+            {
+                text_object = this.selection.groupSelection.selection.textSelection;
+            }
+            else if(this.selection.groupSelection.chartSelection && this.selection.groupSelection.chartSelection.textSelection)
+            {
+                text_object = this.selection.groupSelection.chartSelection.textSelection;
+            }
+        }
+        else if(this.selection.chartSelection && this.selection.chartSelection.selection.textSelection)
+        {
+            text_object = this.selection.chartSelection.selection.textSelection;
         }
         if(isRealObject(text_object))
         {
@@ -3770,14 +3820,22 @@ DrawingObjectsController.prototype =
 
     getTargetTransform: function()
     {
-        var content;
         if(this.selection.textSelection)
         {
             return this.selection.textSelection.transformText;
         }
-        else if(this.selection.groupSelection && this.selection.groupSelection.selection.textSelection)
+        else if(this.selection.groupSelection )
         {
-            return this.selection.groupSelection.selection.textSelection.transformText;
+            if(this.selection.groupSelection.selection.textSelection)
+                return this.selection.groupSelection.selection.textSelection.transformText;
+            else if(this.selection.groupSelection.selection.chartSelection && this.selection.groupSelection.selection.chartSelection.selection.textSelection)
+            {
+                return this.selection.groupSelection.selection.chartSelection.selection.textSelection.transformText;
+            }
+        }
+        else if(this.selection.chartSelection && this.selection.chartSelection.selection.textSelection)
+        {
+            return this.selection.chartSelection.selection.textSelection.transformText;
         }
         return new CMatrix();
     },

@@ -4308,8 +4308,15 @@ function DrawingObjects() {
         }
     };
 
-    _this.rebuildChartGraphicObjects = function(data) {
-
+    _this.rebuildChartGraphicObjects = function(data)
+    {
+        for(var i = 0; i < aObjects.length; ++i)
+        {
+            if(aObjects[i].graphicObject.getObjectType() === historyitem_type_ChartSpace)
+            {
+                aObjects[i].graphicObject.rebuildSeries();
+            }
+        }
     };
 
     _this.updateDrawingObject = function(bInsert, operType, updateRange) {
@@ -5333,7 +5340,7 @@ function DrawingObjects() {
       //     }
       // }
 
-        if($("#chartPropsMenuDiv").length > 0) //TODO: убрать как будет всё готово в меню
+        /*if($("#chartPropsMenuDiv").length > 0) //TODO: убрать как будет всё готово в меню
         {
             var chart = _this.controller.getAscChartObject();
             if ( !chart ) {
@@ -5383,7 +5390,7 @@ function DrawingObjects() {
                 }();
             }
             return chart;
-        }
+        }   */
 
         var settings = _this.controller.getChartProps();
         if ( !settings )
