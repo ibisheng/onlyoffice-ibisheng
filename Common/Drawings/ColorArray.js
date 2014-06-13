@@ -1,31 +1,29 @@
 "use strict";
 
-function CShapeColor(r, g, b)
-{
+function CShapeColor(r, g, b){
     this.r = r;
     this.g = g;
     this.b = b;
 
-    this.darken = function()
+    this.darken = function ()
     {
         var hslColor  = RGBToHSL(this);
-        hslColor.l*=0.9;
+        hslColor.l *= 0.9;
 
         return HSLToRGB(hslColor);
     };
 
-    this.darkenLess = function()
+    this.darkenLess = function ()
     {
         var hslColor  = RGBToHSL(this);
-        hslColor.l*=0.85;
+        hslColor.l *= 0.85;
 
         return HSLToRGB(hslColor);
     };
 
-    this.lighten  = function()
-    {
+        this.lighten  = function () {
         var hslColor  = RGBToHSL(this);
-        hslColor.l*= 1.1;
+        hslColor.l *= 1.1;
         if(hslColor.l > 1)
         {
             hslColor.l = 1;

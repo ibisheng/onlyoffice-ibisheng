@@ -278,6 +278,7 @@ DrawingObjectsController.prototype.onMouseDown = function(e, x, y)
 {
     e.ShiftKey = e.shiftKey;
     e.CtrlKey = e.metaKey || e.ctrlKey;
+    e.Button = e.button;
     var ret = this.curState.onMouseDown(e, x, y, 0);
     this.updateOverlay();
     this.updateSelectionState();
@@ -290,6 +291,7 @@ DrawingObjectsController.prototype.onMouseMove = function(e, x, y)
 {
     e.ShiftKey = e.shiftKey;
     e.CtrlKey = e.metaKey || e.ctrlKey;
+    e.Button = e.button;
     this.curState.onMouseMove(e, x, y, 0);
 };
 DrawingObjectsController.prototype.OnMouseMove = DrawingObjectsController.prototype.onMouseMove;
@@ -299,6 +301,7 @@ DrawingObjectsController.prototype.onMouseUp = function(e, x, y)
 {
     e.ShiftKey = e.shiftKey;
     e.CtrlKey = e.metaKey || e.ctrlKey;
+    e.Button = e.button;
     this.curState.onMouseUp(e, x, y, 0);
 };
 DrawingObjectsController.prototype.OnMouseUp = DrawingObjectsController.prototype.onMouseUp;
