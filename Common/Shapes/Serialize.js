@@ -3745,6 +3745,7 @@ function BinaryPPTYLoader()
                 case 0:
                 {
                     spPr.setXfrm(this.ReadXfrm());
+                    spPr.xfrm.setParent(spPr);
                     break;
                 }
                 case 1:
@@ -4495,6 +4496,7 @@ function BinaryPPTYLoader()
                     var spPr = new CSpPr();
                     this.ReadGrSpPr(spPr);
                     shape.setSpPr(spPr);
+                    spPr.setParent(shape);
                     break;
                 }
                 case 2:

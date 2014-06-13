@@ -347,7 +347,7 @@ DrawingObjectsController.prototype =
                 {
                     this.resetInternalSelection();
                     if(!b_is_inline)
-                        this.changeCurrentState(new PreMoveState(this, x, y, e.ShiftKey, e.CtrlKey,  object, is_selected, true));
+                        this.changeCurrentState(new PreMoveState(this, x, y, e.ShiftKey, e.CtrlKey,  object, is_selected, /*true*/!bInSelect));
                     else
                     {
                         this.changeCurrentState(new PreMoveInlineObject(this, object, is_selected, true));
@@ -3641,7 +3641,6 @@ DrawingObjectsController.prototype =
 
     unGroupCallback: function()
     {
-        History.Create_NewPoint();
         var ungroup_arr = this.canUnGroup(true);
         if(ungroup_arr.length > 0)
         {
@@ -3652,6 +3651,7 @@ DrawingObjectsController.prototype =
             for(i = 0; i < ungroup_arr.length; ++i)
             {
                 cur_group = ungroup_arr[i];
+                cur_group.normalize();
                 sp_tree = cur_group.spTree;
                 for(j = 0; j < sp_tree.length; ++j)
                 {
@@ -3760,6 +3760,14 @@ DrawingObjectsController.prototype =
                 this.selectObject(selection_state.selection[i].object, selection_state.selection[i].pageIndex);
             }
         }
+       //if(this.drawingObjects && this.selectedObjects.length > 0)
+       //{
+       //    var ws_view = this.drawingObjects.getWorksheet();
+       //    if(ws_view)
+       //    {
+       //        ws_view.isSelectOnShape = true;
+       //    }
+       //}
     },
 
 

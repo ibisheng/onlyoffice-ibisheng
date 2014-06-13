@@ -1496,10 +1496,20 @@ CGroupShape.prototype =
 
     updateCoordinatesAfterInternalResize: function()
     {
+        this.normalize();
+        //var scale_coeffs = this.getResultScaleCoefficients();
         for(var i = 0; i < this.spTree.length; ++i)
         {
             if(this.spTree[i].isGroup())
                 this.spTree[i].updateCoordinatesAfterInternalResize();
+          /*  else
+            {
+                var xfrm2 = this.spTree[i].spPr.xfrm;
+                xfrm2.setOffX(xfrm2.offX*scale_coeffs.cx);
+                xfrm2.setOffY(xfrm2.offY*scale_coeffs.cy);
+                xfrm2.setExtX(xfrm2.extX*scale_coeffs.cx);
+                xfrm2.setExtY(xfrm2.extY*scale_coeffs.cy);
+            }*/
         }
 
         var sp_tree = this.spTree;
@@ -1604,6 +1614,8 @@ CGroupShape.prototype =
         xfrm.setExtY(Math.abs(max_y - min_y));
         xfrm.setChExtX(Math.abs(max_x - min_x));
         xfrm.setChExtY(Math.abs(max_y - min_y));
+        xfrm.setChOffX(0);
+        xfrm.setChOffY(0);
         for(i = 0; i < sp_tree.length; ++i)
         {
             sp_tree[i].spPr.xfrm.setOffX(sp_tree[i].spPr.xfrm.offX - x_min_clear);
