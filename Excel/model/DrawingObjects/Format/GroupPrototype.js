@@ -146,9 +146,9 @@ CGroupShape.prototype.handleUpdatePosition = function()
     this.addToRecalculate();
     for(var i = 0; i < this.spTree.length; ++i)
     {
-        if(this.spTree[i].recalcTransform)
+        if(this.spTree[i].handleUpdatePosition)
         {
-            this.spTree[i].recalcTransform();
+            this.spTree[i].handleUpdatePosition();
         }
     }
     this.addToRecalculate();

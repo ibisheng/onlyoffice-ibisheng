@@ -606,7 +606,7 @@
             ws.objectRender.controller.updateSelectionState();
 			
 			// Селектим после выставления состояния
-			if (state && state.selectedObjects && 0 < state.selectedObjects.length)
+			if (0 < ws.objectRender.controller.selectedObjects.length)
 				ws.setSelectionShape(true);
 		};
 
