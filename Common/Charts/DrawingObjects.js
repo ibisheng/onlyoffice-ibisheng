@@ -4310,6 +4310,19 @@ function DrawingObjects() {
 
     _this.rebuildChartGraphicObjects = function(data)
     {
+        var wsViews = Asc["editor"].wb.wsViews;
+        for(var i = 0; i < wsViews.length; ++i)
+        {
+            if(wsViews[i])
+            {
+                wsViews[i].objectRender.rebuildCharts(data);
+            }
+        }
+
+    };
+
+    _this.rebuildCharts = function(data)
+    {
         for(var i = 0; i < aObjects.length; ++i)
         {
             if(aObjects[i].graphicObject.getObjectType() === historyitem_type_ChartSpace)
@@ -4856,30 +4869,19 @@ function DrawingObjects() {
         }
     };
 
-    _this.updateChartReferences = function(oldWorksheet, newWorksheet) {
-
-        History.Create_NewPoint();
-        History.StartTransaction();
-        for (var i = 0; i < aObjects.length; i++) {
-            var graphicObject = aObjects[i].graphicObject;
-            if ( graphicObject.isChart() && (graphicObject.chart.range.interval.indexOf(oldWorksheet) == 0) ) {
-
-                var _interval = graphicObject.chart.range.interval;
-                graphicObject.chart.range.interval = graphicObject.chart.range.interval.replace(oldWorksheet, newWorksheet);
-
-                //TODO History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
-                //TODO History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_RangeInterval, null, null, new UndoRedoDataGraphicObjects(graphicObject.chart.Get_Id(), new UndoRedoDataGOSingleProp(_interval, graphicObject.chart.range.interval)));
-                //TODO History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(graphicObject.chart.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
-
-                var _range = convertFormula(graphicObject.chart.range.interval, worksheet);
-                if ( _range ) {
-                    graphicObject.chart.range.intervalObject = _range;
-                    graphicObject.chart.rebuildSeries();
-                    graphicObject.recalculate();
+    _this.updateChartReferences = function(oldWorksheet, newWorksheet)
+    {
+        ExecuteNoHistory(function(){
+            for (var i = 0; i < aObjects.length; i++) {
+                var graphicObject = aObjects[i].graphicObject;
+                if ( graphicObject.getObjectType() === historyitem_type_ChartSpace )
+                {
+                    graphicObject.updateChartReferences(oldWorksheet, newWorksheet);
+                    this.controller.startRecalculate();
                 }
             }
-        }
-        History.EndTransaction();
+        }, this, []);
+
     };
 
     //-----------------------------------------------------------------------------------

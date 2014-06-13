@@ -456,6 +456,59 @@ CChartSpace.prototype =
         return this.checkSeriesRefs(this.checkSeriesIntersection, bbox, worksheet);
     },
 
+    changeListName: function(val, oldName, newName)
+    {
+        if(val)
+        {
+            if(val.numRef && typeof val.numRef.f === "string")
+            {
+                val.numRef.setF(val.numRef.f.replace(new RegExp(oldName,'g'), newName));
+            }
+            if(val.strRef && typeof val.strRef.f === "string")
+            {
+                val.strRef.setF(val.strRef.f.replace(new RegExp(oldName,'g'), newName));
+            }
+        }
+    },
+
+    checkListName: function(val, oldName)
+    {
+        if(val)
+        {
+            if(val.numRef && typeof val.numRef.f === "string")
+            {
+                if(val.numRef.f.indexOf(oldName) > -1)
+                    return true;
+            }
+            if(val.strRef && typeof val.strRef.f === "string")
+            {
+                if(val.strRef.f.indexOf(oldName) > -1)
+                    return true;
+            }
+        }
+        return false;
+    },
+
+
+    changeChartReferences: function(oldWorksheetName, newWorksheetName)
+    {
+        this.checkSeriesRefs(this.changeListName, oldWorksheetName, newWorksheetName);
+    },
+
+    checkChartReferences: function(oldWorksheetName)
+    {
+        return this.checkSeriesRefs(this.checkListName, oldWorksheetName);
+    },
+
+    updateChartReferences: function(oldWorksheetName, newWorksheetName)
+    {
+        if(this.checkChartReferences(oldWorksheetName))
+        {
+            this.changeChartReferences(oldWorksheetName, newWorksheetName);
+            this.rebuildSeries();
+        }
+    },
+
     checkSeriesRefs: function(callback, bbox, worksheet)
     {
         if(this.chart && this.chart.plotArea)

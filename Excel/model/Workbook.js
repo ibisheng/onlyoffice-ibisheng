@@ -2090,19 +2090,18 @@ Woorksheet.prototype.setName=function(name){
 		for(var id in this.workbook.cwf) {
 			this.workbook.getWorksheetById(id)._ReBuildFormulas(this.workbook.cwf[id].cells,lastName,this.sName);
 		}
-			
-		if ( this.Drawings ) {
-			for (var i = 0; i < this.Drawings.length; i++) {
-				var drawingObject = this.Drawings[i];
-				if ( drawingObject.graphicObject && drawingObject.isChart() ) {
-						var _lastName =  !rx_test_ws_name.test(lastName) ? "'" + lastName + "'" : lastName;
-						if ( drawingObject.graphicObject.chart.range.interval.indexOf(_lastName + "!") >= 0 ) {
-							drawingObject.graphicObject.chart.range.interval = drawingObject.graphicObject.chart.range.interval.replace(_lastName, !rx_test_ws_name.test(this.sName) ? "'" + this.sName + "'" : this.sName);
-						drawingObject.graphicObject.chart.rebuildSeries();
-					}
-				}
-			}
-		}
+
+        var _lastName =  !rx_test_ws_name.test(lastName) ? "'" + lastName + "'" : lastName;
+        var _newName = !rx_test_ws_name.test(this.sName) ? "'" + this.sName + "'" : this.sName;
+
+        var t = window["Asc"]["editor"];
+        for (var key in t.wb.model.aWorksheets)
+        {
+            var wsModel = t.wb.model.aWorksheets[key];
+            var ws = t.wb.getWorksheet(wsModel.index);
+            if ( ws )
+                ws.objectRender.updateChartReferences(_lastName, _newName);
+        }
 	}
 };
 Woorksheet.prototype.getTabColor=function(){
