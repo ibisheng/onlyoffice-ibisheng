@@ -1044,13 +1044,13 @@ function CPPTXContentWriter()
         _writer.StartRecord(4);
 
         group.spPr.WriteXfrm = group.spPr.xfrm;
-        if (group.spPr.WriteXfrm)
-        {
-            group.spPr.WriteXfrm.chOffX = 0;
-            group.spPr.WriteXfrm.chOffY = 0;
-            group.spPr.WriteXfrm.chExtX = group.spPr.WriteXfrm.extX;
-            group.spPr.WriteXfrm.chExtY = group.spPr.WriteXfrm.extY;
-        }
+       //if (group.spPr.WriteXfrm)
+       //{
+       //    group.spPr.WriteXfrm.chOffX = 0;
+       //    group.spPr.WriteXfrm.chOffY = 0;
+       //    group.spPr.WriteXfrm.chExtX = group.spPr.WriteXfrm.extX;
+       //    group.spPr.WriteXfrm.chExtY = group.spPr.WriteXfrm.extY;
+       //}
 
         //_writer.WriteRecord1(0, group.nvGrpSpPr, oThis.WriteUniNvPr);
         _writer.WriteRecord1(1, group.spPr, _writer.WriteGrpSpPr);
