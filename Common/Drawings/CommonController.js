@@ -3998,9 +3998,9 @@ DrawingObjectsController.prototype =
                             if(image_props.imageUrl !== null && image_props.imageUrl !== group_drawing_props.imageProps.imageUrl)
                                 image_props.imageUrl = null;
 
-                            if(image_props.w != null && image_props.w !== new_image_props.w)
+                            if(image_props.w != null && image_props.w !== group_drawing_props.imageProps.w)
                                 image_props.w = null;
-                            if(image_props.h != null && image_props.h !== new_image_props.h)
+                            if(image_props.h != null && image_props.h !== group_drawing_props.imageProps.h)
                                 image_props.h = null;
                         }
                     }
