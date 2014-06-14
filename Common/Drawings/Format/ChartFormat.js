@@ -1738,11 +1738,8 @@ CPlotArea.prototype =
 
     createDuplicate: function()
     {
-        var c = new CPlotArea(), i;
-        for(i = 0; i < this.charts.length; ++i)
-        {
-            c.addChart(this.charts[i].createDuplicate(), c.charts.length);
-        }
+        var c = new CPlotArea(), i, j, k;
+
         if(this.dTable)
         {
             c.setDTable(this.dTable.createDuplicate());
@@ -1762,26 +1759,62 @@ CPlotArea.prototype =
             var oAxis = this.axId[i].createDuplicate();
             c.addAxis(oAxis);
             
-            if ( oAxis instanceof CCatAx )
-                this.catAx = oAxis;
-            else if ( oAxis instanceof CValAx )
-                this.valAx = oAxis;
-            else if ( oAxis instanceof CDateAx )
-                this.dateAx = oAxis;
+           // if ( oAxis instanceof CCatAx )
+           //     this.catAx = oAxis;
+           // else if ( oAxis instanceof CValAx )
+           //     this.valAx = oAxis;
+           // else if ( oAxis instanceof CDateAx )
+           //     this.dateAx = oAxis;
+        }
+
+        var cur_chart, cur_axis;
+        for(i = 0; i < this.charts.length; ++i)
+        {
+            cur_chart = this.charts[i];
+            c.addChart(cur_chart.createDuplicate(), c.charts.length);
+            if(Array.isArray(cur_chart.axId))
+            {
+                for(j = 0; j < cur_chart.axId.length; ++j)
+                {
+                    cur_axis = cur_chart.axId[j];
+                    for(k = 0; k < this.axId.length; ++k)
+                    {
+                        if(cur_axis === this.axId[k])
+                        {
+                            c.charts[i].addAxId(c.axId[k]);
+                        }
+                    }
+                }
+            }
+        }
+
+        //выставим пересечения осей в копии
+
+        for(i = 0; i < this.axId.length; ++i)
+        {
+            cur_axis = this.axId[i];
+            for(j = 0; j < this.axId.length; ++j)
+            {
+                if(cur_axis.crossAx === this.axId[j].crossAx)
+                {
+                    c.axId[i].setCrossAx(c.axId[j]);
+                    break;
+                }
+            }
         }
 
         // выставляем axis в chart        
         // TODO: Диаграмм может быть больше, но мы пока работаем только с одной
-        var oZeroChart = c.charts[0];
-        if ( oZeroChart )
-        {
-            len = c.axId.length;
-            for ( var i = 0; i < len; i++ )
-                oZeroChart.addAxId(c.axId[i]);
-            
-            c.chart = oZeroChart;
-        }
-        
+       // var oZeroChart = c.charts[0];
+       // if ( oZeroChart )
+       // {
+       //     len = c.axId.length;
+       //     for ( var i = 0; i < len; i++ )
+       //         oZeroChart.addAxId(c.axId[i]);
+       //
+       //     c.chart = oZeroChart;
+       // }
+       //
         return c;
     },
 
