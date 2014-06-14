@@ -2217,6 +2217,8 @@ DrawingObjectsController.prototype =
                     axis_obj = CreateScatterAxis(); //cat - 0, val - 1
                     new_chart_type.addAxId(axis_obj.catAx);
                     new_chart_type.addAxId(axis_obj.valAx);
+                    plot_area.addAxis(axis_obj.catAx);
+                    plot_area.addAxis(axis_obj.valAx);
                 }
                 break;
             }

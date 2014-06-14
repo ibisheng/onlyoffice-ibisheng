@@ -1712,6 +1712,8 @@ function CPlotArea()
     this.dateAx = null;
     this.chart = null;
 
+
+
     //
 
     this.Id = g_oIdCounter.Get_NewId();
@@ -12384,7 +12386,6 @@ CLineSeries.prototype =
             case historyitem_LineSeries_SetVal:
             {
                 writeObject(w, data.newPr);
-                this.cat = data.newPr;
                 break;
             }
             case historyitem_LineSeries_SetIdx:

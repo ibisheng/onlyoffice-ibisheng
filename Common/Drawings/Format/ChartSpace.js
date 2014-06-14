@@ -4566,6 +4566,10 @@ CChartSpace.prototype =
                                 text_transform.Reset();
                                 global_MatrixTransformer.TranslateAppend(text_transform, arr_val_labels_points[i] - val_ax.labels.arrLabels[i].tx.rich.content.XLimit/2, y_pos);
                                 global_MatrixTransformer.MultiplyAppend(text_transform, this.getTransformMatrix());
+
+                                var local_transform_text = val_ax.labels.arrLabels[i].localTransformText;
+                                local_transform_text.Reset();
+                                global_MatrixTransformer.TranslateAppend(local_transform_text, arr_val_labels_points[i] - val_ax.labels.arrLabels[i].tx.rich.content.XLimit/2, y_pos);
                             }
                         }
                         else
@@ -4576,6 +4580,11 @@ CChartSpace.prototype =
                                 text_transform.Reset();
                                 global_MatrixTransformer.TranslateAppend(text_transform, arr_val_labels_points[i] - val_ax.labels.arrLabels[i].tx.rich.content.XLimit/2, val_ax.labels.y + val_ax.labels.extY - val_axis_labels_gap - val_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight());
                                 global_MatrixTransformer.MultiplyAppend(text_transform, this.getTransformMatrix());
+
+
+                                var local_transform_text = val_ax.labels.arrLabels[i].localTransformText;
+                                local_transform_text.Reset();
+                                global_MatrixTransformer.TranslateAppend(local_transform_text, arr_val_labels_points[i] - val_ax.labels.arrLabels[i].tx.rich.content.XLimit/2, val_ax.labels.y + val_ax.labels.extY - val_axis_labels_gap - val_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight());
                             }
                         }
                     }
