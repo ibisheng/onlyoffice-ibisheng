@@ -2565,6 +2565,10 @@ CShape.prototype =
 
     checkHitToBounds: function(x, y)
     {
+        if(this.getObjectType() === historyitem_type_ImageShape && this.parent && this.parent.isShapeChild())
+        {
+            return true;
+        }
         var _x, _y;
         if(isRealNumber(this.posX) && isRealNumber(this.posY))
         {
@@ -3475,6 +3479,53 @@ CShape.prototype =
     },
 
     changePresetGeom: function (sPreset) {
+
+
+        if(sPreset === "textRect")
+        {
+            this.spPr.setGeometry(CreateGeometry("rect"));
+            this.spPr.geometry.setParent(this.spPr);
+            this.setStyle(CreateDefaultTextRectStyle());
+            var fill = new CUniFill();
+            fill.setFill(new CSolidFill());
+            fill.fill.setColor(new CUniColor());
+            fill.fill.color.setColor(new CSchemeColor());
+            fill.fill.color.color.setId(12);
+            this.spPr.setFill(fill);
+
+            var ln = new CLn();
+            ln.setW(6350);
+            ln.setFill(new CUniFill());
+            ln.Fill.setFill(new CSolidFill());
+            ln.Fill.fill.setColor(new CUniColor());
+            ln.Fill.fill.color.setColor(new CPrstColor());
+            ln.Fill.fill.color.color.setId("black");
+            this.spPr.setLn(ln);
+            if(this.bWordShape)
+            {
+                if(!this.textBoxContent)
+                {
+                    this.setTextBoxContent(new CDocumentContent(this, this.getDrawingDocument(), 0, 0, 0, 0, false, false, false));
+                    var body_pr = new CBodyPr();
+                    body_pr.setDefault();
+                    this.setBodyPr(body_pr);
+                }
+            }
+            else
+            {
+                if(!this.txBody)
+                {
+                    this.setTxBody(new CTextBody());
+                    var content = new CDocumentContent(this.txBody, this.getDrawingDocument(), 0, 0, 0, 0, false, false, true);
+                    this.txBody.setParent(this);
+                    this.txBody.setContent(content);
+                    var body_pr = new CBodyPr();
+                    body_pr.setDefault();
+                    this.txBody.setBodyPr(body_pr);
+                }
+            }
+            return;
+        }
         var _final_preset;
         var _old_line;
         var _new_line;

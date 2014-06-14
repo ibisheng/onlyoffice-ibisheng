@@ -86,7 +86,7 @@ CChartSpace.prototype.setRecalculateInfo = function()
         recalculatePenBrush: true
     };
     this.baseColors = [];
-    this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
+
     this.chartObj = null;
     this.localTransform = new CMatrix();
     this.snapArrayX = [];
@@ -526,6 +526,9 @@ CChartSpace.prototype.checkShapeChildTransform = function()
 CChartSpace.prototype.recalculateLocalTransform = CShape.prototype.recalculateLocalTransform;
 CChartSpace.prototype.updateTransformMatrix  = function()
 {
+
+    var posX = this.localTransform.tx + this.posX;
+    var posY = this.localTransform.ty + this.posY;
     this.transform = this.localTransform.CreateDublicate();
     global_MatrixTransformer.TranslateAppend(this.transform, this.posX, this.posY);
     this.invertTransform = global_MatrixTransformer.Invert(this.transform);
@@ -533,7 +536,7 @@ CChartSpace.prototype.updateTransformMatrix  = function()
     if(this.localTransformText)
     {
         this.transformText = this.localTransformText.CreateDublicate();
-        global_MatrixTransformer.TranslateAppend(this.transformText, this.posX, this.posY);
+        global_MatrixTransformer.TranslateAppend(this.transformText, posX, posY);
         this.invertTransformText = global_MatrixTransformer.Invert(this.transformText);
     }
 
@@ -552,7 +555,7 @@ CChartSpace.prototype.updateTransformMatrix  = function()
                     {
                         if(pts[j].compiledDlb)
                         {
-                            pts[j].compiledDlb.updatePosition(this.posX, this.posY);
+                            pts[j].compiledDlb.updatePosition(posX, posY);
                         }
                     }
                 }
@@ -560,22 +563,22 @@ CChartSpace.prototype.updateTransformMatrix  = function()
             if(this.chart.plotArea.catAx)
             {
                 if(this.chart.plotArea.catAx.title)
-                    this.chart.plotArea.catAx.title.updatePosition(this.posX, this.posY);
+                    this.chart.plotArea.catAx.title.updatePosition(posX, posY);
                 if(this.chart.plotArea.catAx.labels)
-                    this.chart.plotArea.catAx.labels.updatePosition(this.posX, this.posY);
+                    this.chart.plotArea.catAx.labels.updatePosition(posX, posY);
             }
             if(this.chart.plotArea.valAx)
             {
                 if(this.chart.plotArea.valAx.title)
-                    this.chart.plotArea.valAx.title.updatePosition(this.posX, this.posY);
+                    this.chart.plotArea.valAx.title.updatePosition(posX, posY);
                 if(this.chart.plotArea.valAx.labels)
-                    this.chart.plotArea.valAx.labels.updatePosition(this.posX, this.posY);
+                    this.chart.plotArea.valAx.labels.updatePosition(posX, posY);
             }
 
         }
         if(this.chart.title)
         {
-            this.chart.title.updatePosition(this.posX, this.posY);
+            this.chart.title.updatePosition(posX, posY);
         }
         if(this.chart.legend)
         {

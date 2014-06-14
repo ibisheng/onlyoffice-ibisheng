@@ -973,7 +973,7 @@ CGroupShape.prototype =
 
     setSelectionState: function(selection_state)
     {
-        this.resetSelection();
+        this.resetSelection(this);
         if(selection_state.textObject)
         {
             this.selectObject(selection_state.textObject, selection_state.selectStartPage);
@@ -1761,7 +1761,11 @@ CGroupShape.prototype =
         this.selection.chartSelection = null;
         for(var i = this.selectedObjects.length - 1; i > -1; --i)
         {
-            this.selectedObjects[i].deselect(graphicObjects);
+            var old_gr = this.selectedObjects[i].group;
+            var obj = this.selectedObjects[i];
+            obj.group = this;
+            obj.deselect(graphicObjects);
+            obj.group = old_gr;
         }
     },
 

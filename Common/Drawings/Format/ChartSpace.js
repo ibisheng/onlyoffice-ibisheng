@@ -216,6 +216,7 @@ function CChartSpace()
         plotArea: null
     };
 
+    this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0, x: 0, y: 0};
     this.parsedFromulas = [];
 
     this.setRecalculateInfo();

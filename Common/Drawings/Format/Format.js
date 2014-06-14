@@ -8128,26 +8128,6 @@ function CSpPr()
          }  */
     };
 
-    this.createDuplicate = function()
-    {
-        var duplicate = new CSpPr();
-        duplicate.bwMode = this.bwMode;
-        if(this.xfrm)
-            duplicate.xfrm = this.xfrm.createDuplicate();
-        if(this.geometry!=null)
-            duplicate.geometry = this.geometry.createDuplicate();
-        if(this.geometry!=null)
-            duplicate.geometry = this.geometry.createDuplicate();
-        if(this.Fill!=null)
-        {
-            duplicate.Fill = this.Fill.createDuplicate();
-        }
-        if(this.ln!=null)
-        {
-            duplicate.ln = this.ln.createDuplicate();
-        }
-        return duplicate;
-    };
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -8196,6 +8176,31 @@ CSpPr.prototype =
 
     Refresh_RecalcData2: function(data)
     {
+    },
+
+    createDuplicate: function()
+    {
+        var duplicate = new CSpPr();
+        duplicate.setBwMode(this.bwMode);
+        if(this.xfrm)
+        {
+            duplicate.setXfrm(this.xfrm.createDuplicate());
+            duplicate.xfrm.setParent(duplicate);
+        }
+        if(this.geometry!=null)
+        {
+            duplicate.setGeometry(this.geometry.createDuplicate());
+            duplicate.setParent(duplicate);
+        }
+        if(this.Fill!=null)
+        {
+            duplicate.setFill(this.Fill.createDuplicate());
+        }
+        if(this.ln!=null)
+        {
+            duplicate.setLn(this.ln.createDuplicate());
+        }
+        return duplicate;
     },
 
     checkUniFillRasterImageId: function(unifill)

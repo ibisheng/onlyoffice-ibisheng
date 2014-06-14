@@ -576,8 +576,8 @@ CGraphicObjects.prototype =
                 if(parent_group.spTree[i] === this.selection.groupSelection.selectedObjects[0])
                 {
                     parent_group.removeFromSpTreeByPos(i);
-                    chart_space.spPr.xfrm.setOffX(this.selection.groupSelection.selectedObjects[0].offX);
-                    chart_space.spPr.xfrm.setOffY(this.selection.groupSelection.selectedObjects[0].offY);
+                    chart_space.spPr.xfrm.setOffX(this.selection.groupSelection.selectedObjects[0].spPr.xfrm.offX);
+                    chart_space.spPr.xfrm.setOffY(this.selection.groupSelection.selectedObjects[0].spPr.xfrm.offY);
                     parent_group.addToSpTree(i, chart_space);
                     parent_group.updateCoordinatesAfterInternalResize();
                     major_group.recalculate();

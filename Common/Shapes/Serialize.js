@@ -4856,13 +4856,19 @@ function BinaryPPTYLoader()
                     var oBinaryChartReader = new BinaryChartReader(_stream);
                     oBinaryChartReader.ExternalReadCT_ChartSpace(_length, _chart);
                     _chart.setBDeleted(false);
-    
-                    if(!_chart.spPr)
-                        _chart.setSpPr(new CSpPr());
 
-                    if (_xfrm)
+                    if(_xfrm)
+                    {
+                        if(!_chart.spPr)
+                        {
+                            _chart.setSpPr(new CSpPr());
+                            _chart.spPr.setParent(_chart);
+                        }
+
                         _chart.spPr.setXfrm(_xfrm);
-					
+                        _xfrm.setParent(_chart.spPr);
+                    }
+
                     s.Seek2(_pos + _length);
                     break;
                 }
