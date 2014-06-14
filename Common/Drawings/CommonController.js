@@ -1792,9 +1792,9 @@ DrawingObjectsController.prototype =
                         {
                             hor_axis.title.txPr.setBodyPr(new CBodyPr());
                         }
-                        if( hor_axis.title.txPr.content)
+                        if(!hor_axis.title.txPr.content)
                         {
-                            hor_axis.title.txPr.setContent(new CDocumentContent(vert_axis.title.txPr, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
+                            hor_axis.title.txPr.setContent(new CDocumentContent(hor_axis.title.txPr, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
                         }
                         hor_axis.title.txPr.bodyPr.reset();
                         if(hor_axis.title.overlay)
@@ -1847,7 +1847,7 @@ DrawingObjectsController.prototype =
                             {
                                 vert_axis.title.txPr.setBodyPr(new CBodyPr());
                             }
-                            if( vert_axis.title.txPr.content)
+                            if( !vert_axis.title.txPr.content)
                             {
                                 vert_axis.title.txPr.setContent(new CDocumentContent(vert_axis.title.txPr, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
                             }
