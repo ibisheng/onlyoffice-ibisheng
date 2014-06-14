@@ -144,11 +144,11 @@ function PolyLine (drawingObjects, theme, master, layout, slide, pageIndex)
 
         var shape = new CShape();
 
-        if(drawingObjects)
-        {
-            shape.setWorksheet(drawingObjects.getWorksheetModel());
-            shape.addToDrawingObjects();
-        }
+     //  if(drawingObjects)
+     //  {
+     //      shape.setWorksheet(drawingObjects.getWorksheetModel());
+     //      shape.addToDrawingObjects();
+     //  }
         shape.setSpPr(new CSpPr());
         shape.spPr.setParent(shape);
         shape.spPr.setXfrm(new CXfrm());

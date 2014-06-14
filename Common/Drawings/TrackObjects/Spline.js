@@ -244,11 +244,11 @@ function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
         yMin = min_y;
         yMax = max_y;
         var shape = new CShape();
-        if(drawingObjects)
-        {
-            shape.setWorksheet(drawingObjects.getWorksheetModel());
-            shape.addToDrawingObjects();
-        }
+        //if(drawingObjects)
+        //{
+        //    shape.setWorksheet(drawingObjects.getWorksheetModel());
+        //    shape.addToDrawingObjects();
+        //}
         shape.setSpPr(new CSpPr());
         shape.spPr.setParent(shape);
         shape.spPr.setXfrm(new CXfrm());
