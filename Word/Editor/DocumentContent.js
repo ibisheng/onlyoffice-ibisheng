@@ -2084,6 +2084,7 @@ CDocumentContent.prototype =
                     var Image = this.DrawingObjects.getChartSpace(Chart,null);
                     Image.setParent(Drawing);
                     Drawing.Set_GraphicObject(Image);
+                    Drawing.Update_Size( Image.spPr.xfrm.extX, Image.spPr.xfrm.extY );
                 }
                 if ( true === bFlow )
                 {

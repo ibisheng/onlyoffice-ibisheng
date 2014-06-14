@@ -1208,6 +1208,7 @@
 				ws.changeZoom(true);
 			
 			ws.draw();
+            ws.objectRender.OnUpdateOverlay();
 			if (isSendInfo) {
 				this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
 				this._onWSSelectionChanged(ws.getSelectionInfo());
