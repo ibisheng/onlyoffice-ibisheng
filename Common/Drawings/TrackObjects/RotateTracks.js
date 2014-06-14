@@ -174,6 +174,15 @@ function RotateTrackShapeImage(originalObject)
         {
             global_MatrixTransformer.MultiplyAppend(this.transform, this.originalObject.group.transform);
         }
+        if(this.originalObject.parent)
+        {
+            var parent_shape = this.originalObject.parent.isShapeChild(true);
+            if(parent_shape)
+            {
+                global_MatrixTransformer.MultiplyAppend(this.transform, parent_shape.transformText);
+            }
+
+        }
     };
 
     this.trackEnd = function()

@@ -534,6 +534,16 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
             {
                 global_MatrixTransformer.MultiplyAppend(_transform, this.originalObject.group.transform);
             }
+
+            if(this.originalObject.parent)
+            {
+                var parent_shape = this.originalObject.parent.isShapeChild(true);
+                if(parent_shape)
+                {
+                    global_MatrixTransformer.MultiplyAppend(_transform, parent_shape.transformText);
+                }
+
+            }
         };
 
         this.resizeRelativeCenter = function(kd1, kd2, ShiftKey)
@@ -640,6 +650,15 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
             if(this.originalObject.group)
             {
                 global_MatrixTransformer.MultiplyAppend(_transform, this.originalObject.group.transform);
+            }
+            if(this.originalObject.parent)
+            {
+                var parent_shape = this.originalObject.parent.isShapeChild(true);
+                if(parent_shape)
+                {
+                    global_MatrixTransformer.MultiplyAppend(_transform, parent_shape.transformText);
+                }
+
             }
 
         };
