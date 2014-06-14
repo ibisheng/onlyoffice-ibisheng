@@ -250,6 +250,15 @@ function handleInlineShapeImage(drawing, drawingObjectsController, e, x, y, page
     }
     else if(b_hit_to_text)
     {
+        var all_drawings = drawing.getDocContent().Get_AllDrawingObjects();
+        var drawings2 = [];
+        for(var i = 0; i < all_drawings.length; ++i)
+        {
+            drawings2.push(all_drawings[i].GraphicObj);
+        }
+        var ret = handleInlineObjects(drawingObjectsController, drawings2, e, x, y, pageIndex, true);
+        if(ret)
+            return ret;
         return drawingObjectsController.handleTextHit(drawing, e, x, y, null, pageIndex, true);
     }
 }
