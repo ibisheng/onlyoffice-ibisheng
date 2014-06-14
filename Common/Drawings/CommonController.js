@@ -2684,6 +2684,11 @@ DrawingObjectsController.prototype =
 
     remove: function(dir)
     {
+        var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
+        if(asc["editor"] && asc["editor"].isChartEditor)
+        {
+            return;
+        }
         this.checkSelectedObjectsAndCallback(this.removeCallback, [dir]);
     },
 

@@ -4084,6 +4084,12 @@ function DrawingObjects() {
 
         if ( chart instanceof asc_ChartSettings )
         {
+            if(api.isChartEditor)
+            {
+                this.controller.selectObject(aObjects[0].graphicObject, 0);
+                this.controller.editChartDrawingObjects(chart);
+                return;
+            }
             var asc_chart = new asc_CChart();
             var rangeWs = convertFormula2(chart.range, worksheet);
             asc_chart.range.intervalObject = rangeWs.range;
@@ -4303,6 +4309,10 @@ function DrawingObjects() {
     {
         if ( chart )
         {
+            if(api.isChartEditor)
+            {
+                this.controller.selectObject(aObjects[0].graphicObject, 0);
+            }
             _this.controller.editChartDrawingObjects(chart);
             _this.showDrawingObjects(false);
         }
@@ -5394,7 +5404,15 @@ function DrawingObjects() {
             return chart;
         }   */
 
-        var settings = _this.controller.getChartProps();
+
+
+
+        var settings;
+        if(api.isChartEditor)
+        {
+            return this.controller.getPropsFromChart(aObjects[0].graphicObject);
+        }
+        settings = _this.controller.getChartProps();
         if ( !settings )
         {
             settings = new asc_ChartSettings();
