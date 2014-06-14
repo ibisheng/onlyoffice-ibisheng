@@ -2209,9 +2209,8 @@ CGraphicObjects.prototype =
 
     canChangeWrapPolygon: function()
     {
-
         return !this.selection.groupSelection && !this.selection.textSelection && !this.selection.chartSelection
-            && this.selectedObjects.length === 1 && this.selectedObjects[0].canChangeWrapPolygon && this.selectedObjects[0].canChangeWrapPolygon();
+            && this.selectedObjects.length === 1 && this.selectedObjects[0].canChangeWrapPolygon && this.selectedObjects[0].canChangeWrapPolygon() && !this.selectedObjects[0].parent.Is_Inline();
     },
 
     startChangeWrapPolygon: function()
