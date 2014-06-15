@@ -343,8 +343,13 @@ CopyProcessor.prototype =
         else
             return src;
     },
-    RGBToCSS : function(rgb)
+    RGBToCSS : function(rgb, unifill)
     {
+        if (null == rgb && null != unifill) {
+            unifill.check(this.oDocument.Get_Theme(), this.oDocument.Get_ColorMap());
+            var RGBA = unifill.getRGBAColor();
+            rgb = new CDocumentColor(RGBA.R, RGBA.G, RGBA.B);
+        }
         var sResult = "#";
         var sR = rgb.r.toString(16);
         if(sR.length == 1)
@@ -437,8 +442,8 @@ CopyProcessor.prototype =
             //if(Def_pPr.Spacing.After != Item_pPr.Spacing.After)
             apPr.push("margin-bottom:" + (Item_pPr.Spacing.After * g_dKoef_mm_to_pt) + "pt");
             //Shd
-            if(Def_pPr.Shd.Value != Item_pPr.Shd.Value)
-                apPr.push("background-color:" + this.RGBToCSS(Item_pPr.Shd.Color));
+            if (null != Item_pPr.Shd && shd_Nil != Item_pPr.Shd.Value && (null != Item_pPr.Shd.Color || null != Item_pPr.Shd.Unifill))
+                apPr.push("background-color:" + this.RGBToCSS(Item_pPr.Shd.Color, Item_pPr.Shd.Unifill));
             //Tabs
             if(Item_pPr.Tabs.Get_Count() > 0)
             {
@@ -506,10 +511,12 @@ CopyProcessor.prototype =
             aTagStart.push("<u>");
             aTagEnd.push("</u>");
         }
-        if (null != Value.HighLight && highlight_None != Value.HighLight)
-            aProp.push("background-color:" + this.RGBToCSS(Value.HighLight));
-        if (null != Value.Color) {
-            var color = this.RGBToCSS(Value.Color);
+        if (null != Value.Shd && shd_Nil != Value.Shd.Value && (null != Value.Shd.Color || null != Value.Shd.Unifill))
+            aProp.push("background-color:" + this.RGBToCSS(Value.Shd.Color, Value.Shd.Unifill));
+        else if (null != Value.HighLight && highlight_None != Value.HighLight)
+            aProp.push("background-color:" + this.RGBToCSS(Value.HighLight, null));
+        if (null != Value.Color || null != Value.Unifill) {
+            var color = this.RGBToCSS(Value.Color, Value.Unifill);
             aProp.push("color:" + color);
             aProp.push("mso-style-textfill-fill-color:" + color);
         }
@@ -806,12 +813,13 @@ CopyProcessor.prototype =
         else
         {
             var size = 0.5;
-            var color = { r : 0, g : 0, b : 0 };
+            var color = border.Color;
+            var unifill = border.Unifill;
             if(null != border.Size)
                 size = border.Size * g_dKoef_mm_to_pt;
-            if(null != border.Color)
-                color = border.Color;
-            res += name + ":"+size+"pt solid "+this.RGBToCSS(color)+";";
+            if (null == color)
+                color = { r: 0, g: 0, b: 0 };
+            res += name + ":" + size + "pt solid " + this.RGBToCSS(color, unifill) + ";";
         }
         return res;
     },
@@ -902,13 +910,13 @@ CopyProcessor.prototype =
         }
         if(null != cellPr && null != cellPr.Shd)
         {
-            if(shd_Nil != cellPr.Shd.Value)
-                tcStyle += "background-color:"+this.RGBToCSS(cellPr.Shd.Color)+";";
+            if (shd_Nil != cellPr.Shd.Value && (null != cellPr.Shd.Color || null != cellPr.Shd.Unifill))
+                tcStyle += "background-color:" + this.RGBToCSS(cellPr.Shd.Color, cellPr.Shd.Unifill) + ";";
         }
         else if(null != tablePr && null != tablePr.Shd)
         {
-            if(shd_Nil != tablePr.Shd.Value)
-                tcStyle += "background-color:"+this.RGBToCSS(tablePr.Shd.Color)+";";
+            if (shd_Nil != tablePr.Shd.Value && (null != tablePr.Shd.Color || null != tablePr.Shd.Unifill))
+                tcStyle += "background-color:" + this.RGBToCSS(tablePr.Shd.Color, tablePr.Shd.Unifill) + ";";
         }
         var oCellMar = {};
         if(null != cellPr && null != cellPr.TableCellMar)
@@ -1087,8 +1095,8 @@ CopyProcessor.prototype =
 				DomTable.setAttribute("align", align);
             if(null != Pr.TableInd)
                 tblStyle += "margin-left:"+(Pr.TableInd * g_dKoef_mm_to_pt)+"pt;";
-            if(null != Pr.Shd && shd_Nil != Pr.Shd.Value)
-                tblStyle += "background:"+this.RGBToCSS(Pr.Shd.Color)+";";
+            if (null != Pr.Shd && shd_Nil != Pr.Shd.Value && (null != Pr.Shd.Color || null != Pr.Shd.Unifill))
+                tblStyle += "background:" + this.RGBToCSS(Pr.Shd.Color, Pr.Shd.Unifill) + ";";
             if(null != Pr.TableCellMar)
                 tblStyle += this._MarginToStyle(Pr.TableCellMar, "mso-padding-alt");
             if(null != Pr.TableBorders)
