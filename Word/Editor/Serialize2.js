@@ -1667,10 +1667,17 @@ function Binary_rPrWriter(memory)
             this.memory.WriteLong(rPr.FontSize * 2);
         }
         //Color
-        if(null != rPr.Color && !rPr.Color.Auto)
-        {
-            this.bs.WriteColor(c_oSerProp_rPrType.Color, rPr.Color);
+        var color = null;
+        if (null != rPr.Color )
+            color = rPr.Color;
+        else if (null != rPr.Unifill) {
+            var doc = editor.WordControl.m_oLogicDocument;
+            rPr.Unifill.check(doc.Get_Theme(), doc.Get_ColorMap());
+            var RGBA = rPr.Unifill.getRGBAColor();
+            color = new CDocumentColor(RGBA.R, RGBA.G, RGBA.B);
         }
+        if (null != color && !color.Auto)
+            this.bs.WriteColor(c_oSerProp_rPrType.Color, color);
         //VertAlign
         if(null != rPr.VertAlign)
         {

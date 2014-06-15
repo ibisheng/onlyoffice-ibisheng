@@ -124,8 +124,17 @@ BinaryCommonWriter.prototype.WriteBorder = function(border)
 	var _this = this;
     if(border_None != border.Value)
     {
-        if(null != border.Color && !border.Color.Auto)
-            this.WriteColor(c_oSerBorderType.Color, border.Color);
+        var color = null;
+        if (null != border.Color)
+            color = border.Color;
+        else if (null != border.Unifill) {
+            var doc = editor.WordControl.m_oLogicDocument;
+            border.Unifill.check(doc.Get_Theme(), doc.Get_ColorMap());
+            var RGBA = border.Unifill.getRGBAColor();
+            color = new CDocumentColor(RGBA.R, RGBA.G, RGBA.B);
+        }
+        if (null != color && !color.Auto)
+            this.WriteColor(c_oSerBorderType.Color, color);
         if(null != border.Space)
         {
             this.memory.WriteByte(c_oSerBorderType.Space);
@@ -196,10 +205,17 @@ BinaryCommonWriter.prototype.WriteShd = function(Shd)
         this.memory.WriteByte(Shd.Value);
     }
     //Value
-    if(null != Shd.Color && !Shd.Color.Auto)
-    {
-        this.WriteColor(c_oSerShdType.Color, Shd.Color);
+    var color = null;
+    if (null != Shd.Color)
+        color = Shd.Color;
+    else if (null != Shd.Unifill) {
+        var doc = editor.WordControl.m_oLogicDocument;
+        Shd.Unifill.check(doc.Get_Theme(), doc.Get_ColorMap());
+        var RGBA = Shd.Unifill.getRGBAColor();
+        color = new CDocumentColor(RGBA.R, RGBA.G, RGBA.B);
     }
+    if (null != color && !color.Auto)
+        this.WriteColor(c_oSerShdType.Color, color);
 	if(null != Shd.Unifill || (null != Shd.Color && Shd.Color.Auto))
     {
 		this.memory.WriteByte(c_oSerShdType.ColorTheme);
