@@ -4286,10 +4286,19 @@ Cell.prototype.setValueData = function(Val){
 		this.setValue("=" + Val.formula);
 	else if(null != Val.value)
 	{
+	    var DataOld = null;
+	    var DataNew = null;
+	    if (History.Is_On())
+	        DataOld = this.getValueData();
 	    this.setValueCleanFormula();
 	    this.oValue = Val.value.clone(this);
 	    sortDependency(this.ws.workbook);
-	}
+	    if (History.Is_On()) {
+	        DataNew = this.getValueData();
+	        if (false == DataOld.isEqual(DataNew))
+	            History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), DataOld, DataNew));
+	    }
+    }
 	else
 		this.setValue("");
 };
