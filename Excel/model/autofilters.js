@@ -967,12 +967,13 @@ var gUndoInsDelCellsFlag = true;
 						
 						var startCol = allFil.c1;
 						var endCol = allFil.c2;
+						var endRow = allFil.r2;
 						
 						//проверяем диапазон
-						if(ws.cols.length < eCell.first.col)
-							ws.expandColsOnScroll(false,true,eCell.first.col);
-						if(ws.rows.length < eCell.first.row)
-							ws.expandColsOnScroll(false,true,eCell.first.row);
+						if (ws.cols.length < endCol)
+						    ws.expandColsOnScroll(false, true, endCol);
+						if (ws.rows.length < endRow)
+						    ws.expandRowsOnScroll(false, true, endRow);
 						for(var col = startCol; col <= endCol; col++)
 						{
 							var idCell = new CellAddress(allFil.r1, col, 0);
