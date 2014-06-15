@@ -168,8 +168,10 @@ CChartSpace.prototype.handleUpdateChart = function()
 };
 CChartSpace.prototype.handleUpdateStyle = function()
 {
-    this.setRecalculateInfo();
-
+    this.recalcInfo.recalculateSeriesColors = true;
+    this.recalcInfo.recalculateLegend = true;
+    this.recalcInfo.recalculatePlotAreaBrush = true;
+    this.recalcInfo.recalculatePlotAreaPen = true;
     this.addToRecalculate();
 };
 CChartSpace.prototype.canGroup = CShape.prototype.canGroup;

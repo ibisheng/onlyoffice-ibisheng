@@ -736,13 +736,13 @@ CChartSpace.prototype =
 
     clearFormatting: function()
     {
+        if(this.spPr)
+        {
+            this.spPr.Fill && this.spPr.setFill(null);
+            this.spPr.ln && this.spPr.setLn(null);
+        }
         if(this.chart)
         {
-            if(this.chart.spPr)
-            {
-                this.chart.spPr.Fill && this.chart.spPr.setFill(null);
-                this.chart.spPr.ln && this.chart.spPr.setLn(null);
-            }
             if(this.chart.plotArea)
             {
                 if(this.chart.plotArea.spPr)
@@ -971,7 +971,6 @@ CChartSpace.prototype =
                     chart_type.addSer(series);
                 }
             }
-            this.setRecalculateInfo();
         }
     },
 
@@ -986,8 +985,78 @@ CChartSpace.prototype =
         this.Id = r.GetString2();
     },
 
-    Refresh_RecalcData: function()
-    {},
+
+    handleUpdateType: function()
+    {
+        this.recalcInfo.recalculateChart =  true;
+        this.recalcInfo.recalculateSeriesColors = true;
+        this.recalcInfo.recalculateMarkers = true;
+        this.recalcInfo.recalculateGridLines = true;
+        this.recalcInfo.recalculateDLbls = true;
+        this.recalcInfo.recalculateAxisLabels = true;
+        this.recalcInfo.dataLbls.length = 0;
+        this.recalcInfo.axisLabels.length = 0;
+        this.recalcInfo.recalculateAxisVal = true;
+        this.recalcInfo.recalculateAxisTickMark = true;
+        this.recalcInfo.recalculateHiLowLines = true;
+        this.recalcInfo.recalculateUpDownBars = true;
+        this.recalcInfo.recalculateLegend = true;
+        this.recalcInfo.recalculateReferences = true;
+        this.recalcInfo.recalculateBBox = true;
+        this.recalcInfo.recalculateFormulas = true;
+        this.chartObj = null;
+        this.addToRecalculate();
+    },
+
+    handleUpdateInternalChart: function()
+    {
+        this.recalcInfo.recalculateChart =  true;
+        this.recalcInfo.recalculateSeriesColors = true;
+        this.recalcInfo.recalculateDLbls = true;
+        this.recalcInfo.recalculateAxisLabels = true;
+        this.recalcInfo.dataLbls.length = 0;
+        this.recalcInfo.axisLabels.length = 0;
+        this.recalcInfo.recalculateAxisVal = true;
+        this.recalcInfo.recalculateLegend = true;
+        this.chartObj = null;
+        this.addToRecalculate();
+
+    },
+
+    handleUpdateGridlines: function()
+    {
+        this.recalcInfo.recalculateGridLines = true;
+        this.addToRecalculate();
+    },
+
+    handleUpdateDataLabels: function()
+    {
+        this.recalcInfo.recalculateDLbls = true;
+        this.addToRecalculate();
+    },
+
+    Refresh_RecalcData: function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_ChartSpace_SetStyle:
+            {
+                this.handleUpdateStyle();
+                break;
+            }
+            case historyitem_ChartSpace_SetTxPr:
+            {
+                this.recalcInfo.recalculateChart = true;
+                this.recalcInfo.recalculateLegend = true;
+                this.recalcInfo.recalculateDLbls = true;
+                this.recalcInfo.recalculateAxisVal = true;
+                this.recalcInfo.recalculateAxisCat = true;
+                this.recalcInfo.recalculateAxisLabels = true;
+                this.addToRecalculate();
+                break;
+            }
+        }
+    },
 
     getObjectType: function()
     {
@@ -1137,6 +1206,10 @@ CChartSpace.prototype =
     {
         History.Add(this, {Type: historyitem_ChartSpace_SetChart, oldChart: this.chart, newChart: chart});
         this.chart = chart;
+        if(chart)
+        {
+            chart.setParent(this);
+        }
     },
     setClrMapOvr: function(clrMapOvr)
     {
@@ -2300,6 +2373,10 @@ CChartSpace.prototype =
                     /*new recalc*/
                     y_ax.labels  = null;
                     x_ax.labels  = null;
+                    y_ax.posX  = null;
+                    x_ax.posY  = null;
+                    y_ax.posY  = null;
+                    x_ax.posX  = null;
                     var sizes = this.getChartSizes();
                     var rect = {x: sizes.startX, y:sizes.startY, w:sizes.w, h: sizes.h};
                     var arr_val =  this.getValAxisValues();
@@ -2950,6 +3027,11 @@ CChartSpace.prototype =
                 {
                     val_ax.labels  = null;
                     cat_ax.labels  = null;
+
+                    val_ax.posX  = null;
+                    cat_ax.posY  = null;
+                    val_ax.posY  = null;
+                    cat_ax.posX  = null;
                     var sizes = this.getChartSizes();
                     var rect = {x: sizes.startX, y:sizes.startY, w:sizes.w, h: sizes.h};
                     var arr_val =  this.getValAxisValues();
@@ -3978,6 +4060,11 @@ CChartSpace.prototype =
                     /*---------------------new version---------------------------------------*/
                     val_ax.labels  = null;
                     cat_ax.labels  = null;
+
+                    val_ax.posX  = null;
+                    cat_ax.posY  = null;
+                    val_ax.posY  = null;
+                    cat_ax.posX  = null;
                     var sizes = this.getChartSizes();
                     var rect = {x: sizes.startX, y:sizes.startY, w:sizes.w, h: sizes.h};
                     var arr_val =  this.getValAxisValues();
@@ -7670,6 +7757,7 @@ CChartSpace.prototype =
             case historyitem_ChartSpace_SetStyle:
             {
                 this.style = readLong(r);
+                this.handleUpdateStyle();
                 break;
             }
             case historyitem_ChartSpace_SetTxPr:

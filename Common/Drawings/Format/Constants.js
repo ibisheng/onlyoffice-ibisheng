@@ -1,12 +1,13 @@
 ﻿"use strict";
 
-var historyitem_ChartFormatSetChart = 1;
-var historyitem_AutoShapes_SetWorksheet = 2;
-var historyitem_AutoShapes_AddToDrawingObjects = 3;
-var historyitem_AutoShapes_RemoveFromDrawingObjects = 4;
-var historyitem_CommonChart_RemoveSeries = 5;
-var historyitem_CommonSeries_RemoveDPt = 6;
-var historyitem_CommonLit_RemoveDPt = 6;
+var historyitem_ChartFormatSetChart = 1001;
+var historyitem_AutoShapes_SetWorksheet = 1002;
+var historyitem_AutoShapes_AddToDrawingObjects = 1003;
+var historyitem_AutoShapes_RemoveFromDrawingObjects = 1004;
+var historyitem_CommonChart_RemoveSeries = 1005;
+var historyitem_CommonSeries_RemoveDPt = 1006;
+var historyitem_CommonLit_RemoveDPt = 1007;
+var historyitem_CommonChartFormat_SetParent = 1008;
 var historyitem_ColorMod_SetName = 2001;
 var historyitem_ColorMod_SetVal = 2002;
 var historyitem_ColorModifiers_AddColorMod = 2003;

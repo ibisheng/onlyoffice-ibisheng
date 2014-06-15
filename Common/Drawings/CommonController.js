@@ -1624,7 +1624,6 @@ DrawingObjectsController.prototype =
         }
         if(isRealNumber(props.Width) && isRealNumber(props.Height))
         {
-            //Todo: может отсутствовать spPr и xfrm
             for(i = 0; i < objects_by_type.shapes.length; ++i)
             {
                 CheckSpPrXfrm(objects_by_type.shapes[i]);
@@ -1677,8 +1676,6 @@ DrawingObjectsController.prototype =
         {
             var chart_space = objects_by_types.charts[0];
             this.applyPropsToChartSpace(chartSettings, chart_space);
-            chart_space.addToRecalculate();  //TODO
-            chart_space.setRecalculateInfo();//TODO: обязательно переделать
         }
     },
 
@@ -1775,7 +1772,8 @@ DrawingObjectsController.prototype =
                 {
                     case c_oAscChartHorAxisLabelShowSettings.none:
                     {
-                        hor_axis.setTitle(null);
+                        if(hor_axis.title)
+                            hor_axis.setTitle(null);
                         break;
                     }
                     case c_oAscChartHorAxisLabelShowSettings.noOverlay:
@@ -1791,12 +1789,12 @@ DrawingObjectsController.prototype =
                         if(!hor_axis.title.txPr.bodyPr)
                         {
                             hor_axis.title.txPr.setBodyPr(new CBodyPr());
+                            hor_axis.title.txPr.bodyPr.reset();
                         }
                         if(!hor_axis.title.txPr.content)
                         {
                             hor_axis.title.txPr.setContent(new CDocumentContent(hor_axis.title.txPr, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
                         }
-                        hor_axis.title.txPr.bodyPr.reset();
                         if(hor_axis.title.overlay)
                             hor_axis.title.setOverlay(false);
                         break;
@@ -1846,13 +1844,13 @@ DrawingObjectsController.prototype =
                             if(!vert_axis.title.txPr.bodyPr)
                             {
                                 vert_axis.title.txPr.setBodyPr(new CBodyPr());
+                                vert_axis.title.txPr.bodyPr.reset();
                             }
-                            if( !vert_axis.title.txPr.content)
+                            if(!vert_axis.title.txPr.content)
                             {
                                 vert_axis.title.txPr.setContent(new CDocumentContent(vert_axis.title.txPr, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
                             }
-                            vert_axis.title.txPr.bodyPr.reset();
-                            if(vert_axis_labels_settings === c_oAscChartVertAxisLabelShowSettings.rotated)
+                            if(vert_axis_labels_settings === c_oAscChartVertAxisLabelShowSettings.rotated && vert_axis.title.txPr.bodyPr.vert !== nVertTTvert)
                                 vert_axis.title.txPr.bodyPr.setVert(nVertTTvert);
                         }
                     }
@@ -1879,7 +1877,8 @@ DrawingObjectsController.prototype =
                 }
                 if(isRealNumber(LEGEND_POS_MAP[legend_pos_settings]))
                 {
-                    chart.legend.setLegendPos(LEGEND_POS_MAP[legend_pos_settings]);
+                    if(chart.legendPos !== LEGEND_POS_MAP[legend_pos_settings])
+                        chart.legend.setLegendPos(LEGEND_POS_MAP[legend_pos_settings]);
                     var b_overlay = c_oAscChartLegendShowSettings.leftOverlay === legend_pos_settings || legend_pos_settings === c_oAscChartLegendShowSettings.rightOverlay;
                     if(chart.legend.overlay !== b_overlay)
                     {
@@ -1943,7 +1942,8 @@ DrawingObjectsController.prototype =
         {
             if(data_labels_pos_setting === c_oAscChartDataLabelsPos.none)
             {
-                chart_type.setDLbls(null);
+                if(chart_type.dLbls)
+                    chart_type.setDLbls(null);
             }
             else
             {
@@ -1955,15 +1955,11 @@ DrawingObjectsController.prototype =
                         d_lbls.setShowVal(true);
                         chart_type.setDLbls(d_lbls);
                     }
-                    chart_type.dLbls.setDLblPos(DLBL_POS_DEFINES_MAP[data_labels_pos_setting]);
+                    if(chart_type.dLbls.dLblPos !== DLBL_POS_DEFINES_MAP[data_labels_pos_setting])
+                        chart_type.dLbls.setDLblPos(DLBL_POS_DEFINES_MAP[data_labels_pos_setting]);
                 }
             }
         }
-        //Vert Axis
-        //TODO
-
-        //Hor Axis
-        //TODO
         var i;
         var type = chartSettings.getType();
         var need_groupping, need_num_fmt, need_bar_dir;
@@ -2205,10 +2201,7 @@ DrawingObjectsController.prototype =
             case c_oAscChartTypeSettings.scatterLine:
             case c_oAscChartTypeSettings.scatterSmooth:
             {
-                if(chart_type.getObjectType() === historyitem_type_ScatterChart)
-                {
-                }
-                else
+                if(chart_type.getObjectType() !== historyitem_type_ScatterChart)
                 {
                     new_chart_type = new CScatterChart();
                     plot_area.addChart(new_chart_type, 0);

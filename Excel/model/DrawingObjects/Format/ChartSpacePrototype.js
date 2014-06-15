@@ -102,10 +102,15 @@ CChartSpace.prototype.handleUpdatePosition = function()
 };
 CChartSpace.prototype.handleUpdateExtents = function()
 {
-    this.recalcChart();
-    this.recalcBounds();
-    this.recalcDLbls();
-    this.setRecalculateInfo();
+    this.recalcInfo.recalculateChart =  true;
+    this.recalcInfo.recalculateSeriesColors = true;
+    this.recalcInfo.recalculateDLbls = true;
+    this.recalcInfo.recalculateAxisLabels = true;
+    this.recalcInfo.dataLbls.length = 0;
+    this.recalcInfo.axisLabels.length = 0;
+    this.recalcInfo.recalculateAxisVal = true;
+    this.recalcInfo.recalculateLegend = true;
+    this.chartObj = null;
     this.addToRecalculate();
 };
 CChartSpace.prototype.handleUpdateFlip = function()
@@ -122,7 +127,10 @@ CChartSpace.prototype.handleUpdateChart = function()
 };
 CChartSpace.prototype.handleUpdateStyle = function()
 {
-    this.setRecalculateInfo();
+    this.recalcInfo.recalculateSeriesColors = true;
+    this.recalcInfo.recalculateLegend = true;
+    this.recalcInfo.recalculatePlotAreaBrush = true;
+    this.recalcInfo.recalculatePlotAreaPen = true;
     this.addToRecalculate();
 };
 CChartSpace.prototype.handleUpdateFill = function()
@@ -283,6 +291,7 @@ CChartSpace.prototype.recalculate = function()
             this.recalcInfo.recalculateUpDownBars = false;
         }
 
+
         var b_recalc_legend = false;
         if(this.recalcInfo.recalculateLegend)
         {
@@ -299,13 +308,13 @@ CChartSpace.prototype.recalculate = function()
             b_recalc_labels = true;
         }
 
-
-
         if(this.recalcInfo.recalculateAxisVal)
         {
             this.recalculateAxis();
             this.recalcInfo.recalculateAxisVal = false;
         }
+
+
 
         if(this.recalcInfo.recalculatePenBrush)
         {

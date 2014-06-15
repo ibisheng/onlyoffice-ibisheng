@@ -1712,7 +1712,7 @@ function CPlotArea()
     this.dateAx = null;
     this.chart = null;
 
-
+    this.parent = null;
 
     //
 
@@ -1728,8 +1728,65 @@ CPlotArea.prototype =
     },
 
 
-    Refresh_RecalcData: function()
-    {},
+    Refresh_RecalcData: function(data)
+    {
+        switch (data.Type)
+        {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                break;
+            }
+            case historyitem_PlotArea_RemoveAxis:
+            {
+                break;
+            }
+            case historyitem_PlotArea_RemoveChart:
+            {
+                break;
+            }
+            case historyitem_PlotArea_AddChart:
+            {
+                if(this.parent && this.parent.parent)
+                    this.parent.parent.handleUpdateType();
+                break;
+            }
+            case historyitem_PlotArea_SetCatAx:
+            {
+                break;
+            }
+            case historyitem_PlotArea_SetDateAx:
+            {
+                break;
+            }
+            case historyitem_PlotArea_SetDTable:
+            {
+                break;
+            }
+            case historyitem_PlotArea_SetLayout:
+            {
+                break;
+            }
+            case historyitem_PlotArea_SetSerAx:
+            {
+                break;
+            }
+            case historyitem_PlotArea_SetSpPr:
+            {
+                break;
+            }
+            case historyitem_PlotArea_SetValAx:
+            {
+                break;
+            }
+            case historyitem_PlotArea_AddAxis:
+            {
+                break;
+            }
+        }
+    },
+
+
+
 
     getObjectType: function()
     {
@@ -1842,6 +1899,7 @@ CPlotArea.prototype =
         //если такой оси нет, можно добавлять.
         History.Add(this, {Type: historyitem_PlotArea_AddAxis, newPr:axis});
         this.axId.push(axis);
+        axis.setParent(this);
 
         //TODO: полей catAx и valAx не должно быть все оси будут лежать в одном массиве
         if(axis instanceof CCatAx)
@@ -1859,6 +1917,9 @@ CPlotArea.prototype =
             pos = this.charts.length;
         History.Add(this, {Type: historyitem_PlotArea_AddChart, newPr:pr, pos: pos});
         this.charts.splice(pos, 0, pr);
+        pr.setParent(this);
+        if(this.parent && this.parent.parent)
+            this.parent.parent.handleUpdateType();
     },
 
 
@@ -1951,6 +2012,10 @@ CPlotArea.prototype =
     {
         History.Add(this, {Type: historyitem_PlotArea_SetSpPr, oldPr: this.spPr, newPr:pr});
         this.spPr = pr;
+        if(pr)
+        {
+            pr.setParent(this);
+        }
     },
 
     setValAx: function(pr)
@@ -2022,10 +2087,21 @@ CPlotArea.prototype =
         return ret;
     },
 
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
+
     Undo: function(data)
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_PlotArea_RemoveAxis:
             {
                 this.axId.splice(data.pos, 0, data.newPr);
@@ -2046,6 +2122,8 @@ CPlotArea.prototype =
                         break;
                     }
                 }
+                if(this.parent && this.parent.parent)
+                    this.parent.parent.handleUpdateType();
                 break;
             }
             case historyitem_PlotArea_SetCatAx:
@@ -2102,6 +2180,11 @@ CPlotArea.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_PlotArea_RemoveAxis:
             {
                 this.axId.splice(data.pos, 1);
@@ -2115,6 +2198,8 @@ CPlotArea.prototype =
             case historyitem_PlotArea_AddChart:
             {
                 this.charts.splice(data.pos, 0, data.newPr);
+                if(this.parent && this.parent.parent)
+                    this.parent.parent.handleUpdateType();
                 break;
             }
             case historyitem_PlotArea_SetCatAx:
@@ -2173,6 +2258,7 @@ CPlotArea.prototype =
             case historyitem_PlotArea_SetSpPr:
             case historyitem_PlotArea_SetValAx:
             case historyitem_PlotArea_AddAxis:
+            case historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -2198,11 +2284,18 @@ CPlotArea.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_PlotArea_AddChart:
             {
                 var chart = readObject(r);
                 var pos = readLong(r);
                 this.charts.splice(pos, 0, chart);
+                if(this.parent && this.parent.parent)
+                    this.parent.parent.handleUpdateType();
                 break;
             }
             case historyitem_PlotArea_SetCatAx:
@@ -2276,6 +2369,8 @@ function CBarChart()
     this.series      = [];
     this.serLines    = null;
     this.varyColors  = null;
+
+    this.parent = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -2419,12 +2514,20 @@ CBarChart.prototype =
     {
         History.Add(this, {Type: historyitem_BarChart_SetBarDir, oldPr: this.barDir, newPr:pr});
         this.barDir = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
 
     setDLbls     : function(pr)
     {
         History.Add(this, {Type: historyitem_BarChart_SetDLbls, oldPr: this.dLbls, newPr:pr});
         this.dLbls = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateDataLabels();
+        }
     },
     setGapWidth: function(pr)
     {
@@ -2435,6 +2538,10 @@ CBarChart.prototype =
     {
         History.Add(this, {Type: historyitem_BarChart_SetGrouping, oldPr: this.grouping, newPr:pr});
         this.grouping = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setOverlap: function(pr)
     {
@@ -2445,6 +2552,11 @@ CBarChart.prototype =
     {
         History.Add(this, {Type: historyitem_BarChart_AddSer, pr: pr});
         this.series.push(pr);
+        pr.setParent(this);
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateType();
+        }
     },
     setSerLines: function(pr)
     {
@@ -2457,10 +2569,21 @@ CBarChart.prototype =
         this.varyColors = pr;
     },
 
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
+
     Undo: function(data)
     {
         switch(data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 0, data.newPr);
@@ -2481,11 +2604,19 @@ CBarChart.prototype =
             case historyitem_BarChart_SetBarDir:
             {
                 this.barDir = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_BarChart_SetDLbls:
             {
                 this.dLbls = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_BarChart_SetGapWidth:
@@ -2496,6 +2627,10 @@ CBarChart.prototype =
             case historyitem_BarChart_SetGrouping:
             {
                 this.grouping = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_BarChart_SetOverlap:
@@ -2512,6 +2647,10 @@ CBarChart.prototype =
                         this.series.splice(i, 1);
                         break;
                     }
+                }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
                 }
                 break;
             }
@@ -2532,6 +2671,11 @@ CBarChart.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 1);
@@ -2545,11 +2689,19 @@ CBarChart.prototype =
             case historyitem_BarChart_SetBarDir:
             {
                 this.barDir = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_BarChart_SetDLbls:
             {
                 this.dLbls = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_BarChart_SetGapWidth:
@@ -2560,6 +2712,10 @@ CBarChart.prototype =
             case historyitem_BarChart_SetGrouping:
             {
                 this.grouping = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_BarChart_SetOverlap:
@@ -2570,6 +2726,10 @@ CBarChart.prototype =
             case historyitem_BarChart_AddSer:
             {
                 this.series.push(data.pr);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
                 break;
             }
             case historyitem_BarChart_SetSerLines:
@@ -2591,6 +2751,11 @@ CBarChart.prototype =
 
         switch(data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
@@ -2630,6 +2795,11 @@ CBarChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
@@ -2647,11 +2817,19 @@ CBarChart.prototype =
             case historyitem_BarChart_SetBarDir:
             {
                 this.barDir = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_BarChart_SetDLbls:
             {
                 this.dLbls = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_BarChart_SetGapWidth:
@@ -2662,6 +2840,10 @@ CBarChart.prototype =
             case historyitem_BarChart_SetGrouping:
             {
                 this.grouping = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_BarChart_SetOverlap:
@@ -2674,6 +2856,10 @@ CBarChart.prototype =
                 var ser = readObject(r);
                 if(isRealObject(ser))
                     this.series.push(ser);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
                 break;
             }
             case historyitem_BarChart_SetSerLines:
@@ -2698,6 +2884,7 @@ function CAreaChart()
     this.grouping     = null;
     this.series       = [];
     this.varyColors   = null;
+    this.parent  = null;
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -2805,6 +2992,14 @@ CAreaChart.prototype =
     {
         History.Add(this, {Type: historyitem_AreaChart_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
+        if(this.dLbls)
+        {
+            this.dLbls.setParent(this);
+        }
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateDataLabels();
+        }
     },
 
     setDropLines: function(pr)
@@ -2816,11 +3011,20 @@ CAreaChart.prototype =
     {
         History.Add(this, {Type: historyitem_AreaChart_SetGrouping, oldPr: this.grouping, newPr: pr});
         this.grouping = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     addSer: function(ser)
     {
         History.Add(this, {Type: historyitem_AreaChart_AddSer, ser: ser});
         this.series.push(ser);
+        ser.setParent(this);
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateType();
+        }
     },
     setVaryColors: function(pr)
     {
@@ -2828,10 +3032,21 @@ CAreaChart.prototype =
         this.varyColors = pr;
     },
 
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
+
     Undo: function(data)
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 0, data.newPr);
@@ -2852,6 +3067,10 @@ CAreaChart.prototype =
             case historyitem_AreaChart_SetDLbls:
             {
                 this.dLbls = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break
             }
             case historyitem_AreaChart_SetDropLines:
@@ -2862,6 +3081,10 @@ CAreaChart.prototype =
             case historyitem_AreaChart_SetGrouping:
             {
                 this.grouping = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break
             }
             case historyitem_AreaChart_SetVaryColors:
@@ -2876,6 +3099,11 @@ CAreaChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 1);
@@ -2889,6 +3117,10 @@ CAreaChart.prototype =
             case historyitem_AreaChart_SetDLbls:
             {
                 this.dLbls = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break
             }
             case historyitem_AreaChart_SetDropLines:
@@ -2899,6 +3131,10 @@ CAreaChart.prototype =
             case historyitem_AreaChart_SetGrouping:
             {
                 this.grouping = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break
             }
             case historyitem_AreaChart_SetVaryColors:
@@ -2914,6 +3150,11 @@ CAreaChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
@@ -2945,6 +3186,11 @@ CAreaChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
@@ -2964,6 +3210,10 @@ CAreaChart.prototype =
             case historyitem_AreaChart_SetDLbls:
             {
                 this.dLbls = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break
             }
             case historyitem_AreaChart_SetDropLines:
@@ -2974,6 +3224,10 @@ CAreaChart.prototype =
             case historyitem_AreaChart_SetGrouping:
             {
                 this.grouping = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break
             }
             case historyitem_AreaChart_SetVaryColors:
@@ -2997,6 +3251,8 @@ function CAreaSeries()
     this.pictureOptions = null;
     this.spPr           = null;
     this.trendline      = null;
+
+    this.parent = null;
 
     this.tx  = null;
     this.val = null;
@@ -3354,10 +3610,22 @@ CAreaSeries.prototype =
         History.Add(this, {Type: historyitem_AreaSeries_SetTrendline, oldPr: this.trendline, newPr: pr});
         this.val = pr;
     },
+
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
+
     Undo: function(data)
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 0, data.pt);
@@ -3415,6 +3683,11 @@ CAreaSeries.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 1);
@@ -3473,6 +3746,11 @@ CAreaSeries.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_AreaSeries_SetCat:
             case historyitem_AreaSeries_SetDLbls:
             case historyitem_AreaSeries_SetDPt:
@@ -3503,6 +3781,11 @@ CAreaSeries.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_AreaSeries_SetCat:
             {
                 this.cat = readObject(r);
@@ -3621,6 +3904,10 @@ function CCatAx()
     this.tickMarkSkip    = null;
     this.title           = null;
     this.txPr            = null;
+
+    this.parent = null;
+
+
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 
@@ -3816,7 +4103,6 @@ CCatAx.prototype =
             //TODO
         }
 
-
         if(isRealNumber(majorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[majorTickMark]))
             this.setMajorTickMark(MENU_SETTINGS_TICK_MARK[majorTickMark]);
 
@@ -3869,10 +4155,20 @@ CCatAx.prototype =
         this.Id = r.GetString2();
     },
 
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
+
     setAuto: function(pr)
     {
         History.Add(this, {Type: historyitem_CatAxSetAuto, oldPr: this.auto, newPr:pr});
         this.auto = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setAxId: function(pr)
     {
@@ -3883,26 +4179,46 @@ CCatAx.prototype =
     {
         History.Add(this, {Type: historyitem_CatAxSetAxPos, oldPr: this.axPos, newPr:pr});
         this.axPos = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setCrossAx: function(pr)
     {
         History.Add(this, {Type: historyitem_CatAxSetCrossAx, oldPr: this.crossAx, newPr:pr});
         this.crossAx = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setCrosses: function(pr)
     {
         History.Add(this, {Type: historyitem_CatAxSetCrosses, oldPr: this.crosses, newPr:pr});
         this.crosses = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setCrossesAt: function(pr)
     {
         History.Add(this, {Type: historyitem_CatAxSetCrossesAt, oldPr: this.crossesAt, newPr:pr});
         this.crossesAt = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setDelete: function(pr)
     {
         History.Add(this, {Type: historyitem_CatAxSetDelete, oldPr: this.bDelete, newPr:pr});
         this.bDelete = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setExtLst: function(pr)
     {
@@ -3913,56 +4229,101 @@ CCatAx.prototype =
     {
         History.Add(this, {Type: historyitem_CatAxSetLblAlgn, oldPr: this.lblAlgn, newPr:pr});
         this.lblAlgn = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setLblOffset: function(pr)
     {
         History.Add(this, {Type: historyitem_CatAxSetLblOffset, oldPr: this.lblOffset, newPr:pr});
         this.lblOffset = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setMajorGridlines: function(pr)
     {
         History.Add(this, {Type: historyitem_CatAxSetMajorGridlines, oldPr: this.majorGridlines, newPr:pr});
         this.majorGridlines = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateGridlines();
+        }
     },
     setMajorTickMark: function(pr)
     {
         History.Add(this, {Type: historyitem_CatAxSetMajorTickMark, oldPr: this.majorTickMark, newPr:pr});
         this.majorTickMark = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setMinorGridlines: function(pr)
     {
         History.Add(this, {Type: historyitem_CatAxSetMinorGridlines, oldPr: this.minorGridlines, newPr:pr});
         this.minorGridlines = pr;
+
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateGridlines();
+        }
     },
     setMinorTickMark: function(pr)
     {
         History.Add(this, {Type: historyitem_CatAxSetMinorTickMark, oldPr: this.minorTickMark, newPr:pr});
         this.minorTickMark = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setNoMultiLvlLbl: function(pr)
     {
         History.Add(this, {Type: historyitem_CatAxSetNoMultiLvlLbl, oldPr: this.noMultiLvlLbl, newPr:pr});
         this.noMultiLvlLbl = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setNumFmt: function(pr)
     {
         History.Add(this, {Type: historyitem_CatAxSetNumFmt, oldPr: this.numFmt, newPr:pr});
         this.numFmt = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setScaling: function(pr)
     {
         History.Add(this, {Type: historyitem_CatAxSetScaling, oldPr: this.scaling, newPr:pr});
         this.scaling = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setSpPr: function(pr)
     {
         History.Add(this, {Type: historyitem_CatAxSetSpPr, oldPr: this.spPr, newPr:pr});
         this.spPr = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setTickLblPos: function(pr)
     {
         History.Add(this, {Type: historyitem_CatAxSetTickLblPos, oldPr: this.tickLblPos, newPr:pr});
         this.tickLblPos = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setTickLblSkip: function(pr)
     {
@@ -3973,25 +4334,51 @@ CCatAx.prototype =
     {
         History.Add(this, {Type: historyitem_CatAxSetTickMarkSkip, oldPr: this.tickMarkSkip, newPr:pr});
         this.tickMarkSkip = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setTitle: function(pr)
     {
         History.Add(this, {Type: historyitem_CatAxSetTitle, oldPr: this.title, newPr:pr});
         this.title = pr;
+        if(pr)
+        {
+            pr.setParent(this);
+        }
+
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setTxPr: function(pr)
     {
         History.Add(this, {Type: historyitem_CatAxSetTxPr, oldPr: this.txPr, newPr:pr});
         this.txPr = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
 
     Undo: function(data)
     {
         switch(data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_CatAxSetAuto:
             {
                 this.auto = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetAxId:
@@ -4007,21 +4394,37 @@ CCatAx.prototype =
             case historyitem_CatAxSetCrossAx:
             {
                 this.crossAx = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetCrosses:
             {
                 this.crosses = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetCrossesAt:
             {
                 this.crossesAt = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetDelete:
             {
                 this.bDelete = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetExtLst:
@@ -4032,76 +4435,136 @@ CCatAx.prototype =
             case historyitem_CatAxSetLblAlgn:
             {
                 this.lblAlgn = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetLblOffset:
             {
                 this.lblOffset = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetMajorGridlines:
             {
                 this.majorGridlines = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateGridlines();
+                }
                 break;
             }
             case historyitem_CatAxSetMajorTickMark:
             {
                 this.majorTickMark = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetMinorGridlines:
             {
                 this.minorGridlines = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateGridlines();
+                }
                 break;
             }
             case historyitem_CatAxSetMinorTickMark:
             {
                 this.minorTickMark = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetNoMultiLvlLbl:
             {
                 this.noMultiLvlLbl = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetNumFmt:
             {
                 this.numFmt = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetScaling:
             {
                 this.scaling = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetSpPr:
             {
                 this.spPr = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetTickLblPos:
             {
                 this.tickLblPos = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetTickLblSkip:
             {
                 this.tickLblSkip = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetTickMarkSkip:
             {
                 this.tickMarkSkip = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetTitle:
             {
                 this.title = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetTxPr:
             {
                 this.txPr = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
         }
@@ -4111,9 +4574,18 @@ CCatAx.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_CatAxSetAuto:
             {
                 this.auto = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetAxId:
@@ -4124,21 +4596,37 @@ CCatAx.prototype =
             case historyitem_CatAxSetAxPos:
             {
                 this.axPos = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetCrossAx:
             {
                 this.crossAx = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetCrosses:
             {
                 this.crosses = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetCrossesAt:
             {
                 this.crossesAt = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetDelete:
@@ -4149,81 +4637,145 @@ CCatAx.prototype =
             case historyitem_CatAxSetExtLst:
             {
                 this.extLst = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetLblAlgn:
             {
                 this.lblAlgn = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetLblOffset:
             {
                 this.lblOffset = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetMajorGridlines:
             {
                 this.majorGridlines = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateGridlines();
+                }
                 break;
             }
             case historyitem_CatAxSetMajorTickMark:
             {
                 this.majorTickMark = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetMinorGridlines:
             {
                 this.minorGridlines = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateGridlines();
+                }
                 break;
             }
             case historyitem_CatAxSetMinorTickMark:
             {
                 this.minorTickMark = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetNoMultiLvlLbl:
             {
                 this.noMultiLvlLbl = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetNumFmt:
             {
                 this.numFmt = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetScaling:
             {
                 this.scaling = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetSpPr:
             {
                 this.spPr = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetTickLblPos:
             {
                 this.tickLblPos = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetTickLblSkip:
             {
                 this.tickLblSkip = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetTickMarkSkip:
             {
                 this.tickMarkSkip = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetTitle:
             {
                 this.title = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetTxPr:
             {
                 this.txPr = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
         }
@@ -4235,6 +4787,11 @@ CCatAx.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_CatAxSetAuto:
             {
                 writeBool(w, data.newPr);
@@ -4353,9 +4910,18 @@ CCatAx.prototype =
         var type = r.GetLong();
         switch(type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_CatAxSetAuto:
             {
                 this.auto = readBool(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetAxId:
@@ -4366,101 +4932,181 @@ CCatAx.prototype =
             case historyitem_CatAxSetAxPos:
             {
                 this.axPos = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetCrossAx:
             {
                 this.crossAx = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetCrosses:
             {
                 this.crosses = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetCrossesAt:
             {
                 this.crossesAt = readDouble(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetDelete:
             {
                 this.bDelete = readBool(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetLblAlgn:
             {
                 this.lblAlgn = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetLblOffset:
             {
                 this.lblOffset = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetMajorGridlines:
             {
                 this.majorGridlines = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateGridlines();
+                }
                 break;
             }
             case historyitem_CatAxSetMajorTickMark:
             {
                 this.majorTickMark = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetMinorGridlines:
             {
                 this.majorGridlines = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateGridlines();
+                }
                 break;
             }
             case historyitem_CatAxSetMinorTickMark:
             {
                 this.minorTickMark = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetNoMultiLvlLbl:
             {
                 this.noMultiLvlLbl = readBool(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetNumFmt:
             {
                 this.numFmt = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetScaling:
             {
                 this.scaling = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetSpPr:
             {
                 this.spPr = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetTickLblPos:
             {
                 this.tickLblPos = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetTickLblSkip:
             {
                 this.tickLblSkip = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetTickMarkSkip:
             {
                 this.tickMarkSkip = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetTitle:
             {
                 this.title = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_CatAxSetTxPr:
             {
                 this.txPr = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
         }
@@ -4496,6 +5142,8 @@ function CDateAx()
     this.tickLblPos     = null;
     this.title          = null;
     this.txPr           = null;
+
+    this.parent = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -4563,6 +5211,10 @@ CDateAx.prototype =
     {
         History.Add(this, {Type:historyitem_DateAxAuto, oldPr: this.auto, newPr: pr});
         this.auto = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
 
     },
     setAxId: function(pr)
@@ -4575,120 +5227,208 @@ CDateAx.prototype =
     {
         History.Add(this, {Type:historyitem_DateAxAxPos, oldPr: this.axPos, newPr: pr});
         this.axPos = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
 
     },
     setBaseTimeUnit: function(pr)
     {
         History.Add(this, {Type:historyitem_DateAxBaseTimeUnit, oldPr: this.baseTimeUnit, newPr: pr});
         this.baseTimeUnit = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
 
     },
     setCrossAx: function(pr)
     {
         History.Add(this, {Type:historyitem_DateAxCrossAx, oldPr: this.crossAx, newPr: pr});
         this.crossAx = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
 
     },
     setCrosses: function(pr)
     {
         History.Add(this, {Type:historyitem_DateAxCrosses, oldPr: this.crosses, newPr: pr});
         this.crosses = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
 
     },
     setCrossesAt: function(pr)
     {
         History.Add(this, {Type:historyitem_DateAxCrossesAt, oldPr: this.crossesAt, newPr: pr});
         this.crossesAt = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
 
     },
     setDelete: function(pr)
     {
         History.Add(this, {Type:historyitem_DateAxDelete, oldPr: this.bDelete, newPr: pr});
         this.bDelete = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
 
     },
     setLblOffset: function(pr)
     {
         History.Add(this, {Type:historyitem_DateAxLblOffset, oldPr: this.lblOffset, newPr: pr});
         this.lblOffset = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
 
     },
     setMajorGridlines: function(pr)
     {
         History.Add(this, {Type:historyitem_DateAxMajorGridlines, oldPr: this.majorGridlines, newPr: pr});
         this.majorGridlines = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateGridlines();
+        }
 
     },
     setMajorTickMark: function(pr)
     {
         History.Add(this, {Type:historyitem_DateAxMajorTickMark, oldPr: this.majorTickMark, newPr: pr});
         this.majorTickMark = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
 
     },
     setMajorTimeUnit: function(pr)
     {
         History.Add(this, {Type:historyitem_DateAxMajorTimeUnit, oldPr: this.majorTimeUnit, newPr: pr});
         this.majorTimeUnit = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
 
     },
     setMajorUnit: function(pr)
     {
         History.Add(this, {Type:historyitem_DateAxMajorUnit, oldPr: this.majorUnit, newPr: pr});
         this.majorUnit = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
 
     },
     setMinorGridlines: function(pr)
     {
         History.Add(this, {Type:historyitem_DateAxMajorGridlines, oldPr: this.majorGridlines, newPr: pr});
         this.majorGridlines = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateGridlines();
+        }
 
     },
     setMinorTickMark: function(pr)
     {
         History.Add(this, {Type:historyitem_DateAxMinorTickMark, oldPr: this.minorTickMark, newPr: pr});
         this.minorTickMark = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
 
     },
     setMinorTimeUnit: function(pr)
     {
         History.Add(this, {Type:historyitem_DateAxMinorTimeUnit, oldPr: this.minorTimeUnit, newPr: pr});
         this.minorTimeUnit = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     ///
     setMinorUnit: function(pr)
     {
         History.Add(this, {Type:historyitem_DateAxMinorUnit, oldPr: this.minorUnit, newPr: pr});
         this.minorUnit = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setNumFmt: function(pr)
     {
         History.Add(this, {Type:historyitem_DateAxNumFmt, oldPr: this.numFmt, newPr: pr});
         this.numFmt = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setScaling: function(pr)
     {
         History.Add(this, {Type:historyitem_DateAxScaling, oldPr: this.scaling, newPr: pr});
         this.scaling = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setSpPr: function(pr)
     {
         History.Add(this, {Type:historyitem_DateAxSpPr, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setTickLblPos: function(pr)
     {
         History.Add(this, {Type:historyitem_DateAxTickLblPos, oldPr: this.tickLblPos, newPr: pr});
         this.tickLblPos = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setTitle: function(pr)
     {
         History.Add(this, {Type:historyitem_DateAxTitle, oldPr: this.title, newPr: pr});
         this.title = pr;
+        if(pr)
+        {
+            pr.setParent(this);
+        }
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setTxPr: function(pr)
     {
         History.Add(this, {Type:historyitem_DateAxTxPr, oldPr: this.txPr, newPr: pr});
         this.txPr = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     //
 
@@ -4704,14 +5444,28 @@ CDateAx.prototype =
         this.Id = r.GetString2();
     },
 
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
 
     Undo: function(data)
     {
         switch(data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_DateAxAuto:
             {
                 this.auto = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxAxId:
@@ -4722,107 +5476,191 @@ CDateAx.prototype =
             case historyitem_DateAxAxPos:
             {
                 this.axPos = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxBaseTimeUnit:
             {
                 this.baseTimeUnit = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxCrossAx:
             {
                 this.crossAx = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxCrosses:
             {
                 this.crosses = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxCrossesAt:
             {
                 this.crossesAt = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxDelete:
             {
                 this.bDelete = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxLblOffset:
             {
                 this.lblOffset = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxMajorGridlines:
             {
                 this.majorGridlines = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateGridlines();
+                }
                 break;
             }
             case historyitem_DateAxMajorTickMark:
             {
                 this.majorTickMark = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxMajorTimeUnit:
             {
                 this.majorTimeUnit = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxMajorUnit:
             {
                 this.majorUnit = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxMinorGridlines:
             {
                 this.minorGridlines = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateGridlines();
+                }
                 break;
             }
             case historyitem_DateAxMinorTickMark:
             {
                 this.minorTickMark = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxMinorTimeUnit:
             {
                 this.minorTimeUnit = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
 
             case historyitem_DateAxMinorUnit:
             {
                 this.minorUnit = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxNumFmt:
             {
                 this.numFmt = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxScaling:
             {
                 this.scaling = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxSpPr:
             {
                 this.spPr = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxTickLblPos:
             {
                 this.tickLblPos = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxTitle:
             {
                 this.title = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxTxPr:
             {
                 this.txPr = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
         }
@@ -4832,84 +5670,154 @@ CDateAx.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
+
             case historyitem_DateAxAuto:
             {
                 this.auto = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxAxId:
             {
                 this.axId = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxAxPos:
             {
                 this.axPos = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxBaseTimeUnit:
             {
                 this.baseTimeUnit = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxCrossAx:
             {
                 this.crossAx = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxCrosses:
             {
                 this.crosses = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxCrossesAt:
             {
                 this.crossesAt = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxDelete:
             {
                 this.bDelete = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxLblOffset:
             {
                 this.lblOffset = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxMajorGridlines:
             {
                 this.majorGridlines = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateGridlines();
+                }
                 break;
             }
             case historyitem_DateAxMajorTickMark:
             {
                 this.majorTickMark = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxMajorTimeUnit:
             {
                 this.majorTimeUnit = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxMajorUnit:
             {
                 this.majorUnit = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxMinorGridlines:
             {
                 this.minorGridlines = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateGridlines();
+                }
                 break;
             }
             case historyitem_DateAxMinorTickMark:
             {
                 this.minorTickMark = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxMinorTimeUnit:
             {
                 this.minorTimeUnit = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
 
@@ -4917,36 +5825,64 @@ CDateAx.prototype =
             case historyitem_DateAxMinorUnit:
             {
                 this.minorUnit = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxNumFmt:
             {
                 this.numFmt = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxScaling:
             {
                 this.scaling = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxSpPr:
             {
                 this.spPr = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxTickLblPos:
             {
                 this.tickLblPos = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxTitle:
             {
                 this.title = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxTxPr:
             {
                 this.txPr = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
         }
@@ -4954,8 +5890,14 @@ CDateAx.prototype =
 
     Save_Changes: function(data, w)
     {
+        w.WriteLong(data.Type);
         switch(data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_DateAxAuto:
             {
                 writeBool(w, data.newPr);
@@ -5076,11 +6018,21 @@ CDateAx.prototype =
 
     Load_Changes: function(r)
     {
-        switch(data.Type)
+        var type = r.GetLong();
+        switch(type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_DateAxAuto:
             {
                 this.auto = readBool(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxAxId:
@@ -5091,106 +6043,190 @@ CDateAx.prototype =
             case historyitem_DateAxAxPos:
             {
                 this.axPos = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxBaseTimeUnit:
             {
                 this.baseTimeUnit = readDouble(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxCrossAx:
             {
                 this.crossAx = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxCrosses:
             {
                 this.crosses = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxCrossesAt:
             {
                 this.crossesAt = readDouble(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxDelete:
             {
                 this.bDelete = readBool(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxLblOffset:
             {
                 this.lblOffset = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxMajorGridlines:
             {
                 this.majorGridlines = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateGridlines();
+                }
                 break;
             }
             case historyitem_DateAxMajorTickMark:
             {
                 this.majorTickMark = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxMajorTimeUnit:
             {
                 this.majorTimeUnit = readDouble(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxMajorUnit:
             {
                 this.majorUnit = readDouble(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxMinorGridlines:
             {
                 this.minorGridlines = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateGridlines();
+                }
                 break;
             }
             case historyitem_DateAxMinorTickMark:
             {
                 this.minorTickMark = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxMinorTimeUnit:
             {
                 this.minorTimeUnit = readDouble(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxMinorUnit:
             {
                 this.minorUnit = readDouble(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxNumFmt:
             {
                 this.numFmt = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxScaling:
             {
                 this.scaling = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxSpPr:
             {
                 this.spPr = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxTickLblPos:
             {
                 this.tickLblPos = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxTitle:
             {
                 this.title = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DateAxTxPr:
             {
                 this.txPr = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
         }
@@ -5218,6 +6254,8 @@ function CSerAx()
     this.tickMarkSkip   = null;
     this.title          = null;
     this.txPr           = null;
+
+    this.parent = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -5287,92 +6325,179 @@ CSerAx.prototype =
     {
         History.Add(this, {Type: historyitem_SerAxSetAxPos, oldPr: this.axPos, newPr: pr});
         this.axPos = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setCrossAx: function(pr)
     {
         History.Add(this, {Type: historyitem_SerAxSetCrossAx, oldPr: this.crossAx, newPr: pr});
         this.crossAx = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setCrosses: function(pr)
     {
         History.Add(this, {Type: historyitem_SerAxSetCrosses, oldPr: this.crosses, newPr: pr});
         this.crosses = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setCrossesAt: function(pr)
     {
         History.Add(this, {Type: historyitem_SerAxSetCrossesAt, oldPr: this.crossesAt, newPr: pr});
         this.crossesAt = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setDelete: function(pr)
     {
         History.Add(this, {Type: historyitem_SerAxSetDelete, oldPr: this.bDelete, newPr: pr});
         this.bDelete = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setMajorGridlines: function(pr)
     {
         History.Add(this, {Type: historyitem_SerAxSetMajorGridlines, oldPr: this.majorGridlines, newPr: pr});
         this.majorGridlines = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateGridlines();
+        }
     },
     setMajorTickMark: function(pr)
     {
         History.Add(this, {Type: historyitem_SerAxSetMajorTickMark, oldPr: this.majorTickMark, newPr: pr});
         this.majorTickMark = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateGridlines();
+        }
     },
     setMinorGridlines: function(pr)
     {
         History.Add(this, {Type: historyitem_SerAxSetMinorGridlines, oldPr: this.majorGridlines, newPr: pr});
         this.majorGridlines = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateGridlines();
+        }
     },
     setMinorTickMark: function(pr)
     {
         History.Add(this, {Type: historyitem_SerAxSetMinorTickMark, oldPr: this.minorTickMark, newPr: pr});
         this.minorTickMark = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setNumFmt: function(pr)
     {
         History.Add(this, {Type: historyitem_SerAxSetNumFmt, oldPr: this.numFmt, newPr: pr});
         this.numFmt = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setScaling: function(pr)
     {
         History.Add(this, {Type: historyitem_SerAxSetScaling, oldPr: this.scaling, newPr: pr});
         this.scaling = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setSpPr: function(pr)
     {
         History.Add(this, {Type: historyitem_SerAxSetSpPr, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setTickLblPos: function(pr)
     {
         History.Add(this, {Type: historyitem_SerAxSetTickLblPos, oldPr: this.tickLblPos, newPr: pr});
         this.tickLblPos = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setTickLblSkip: function(pr)
     {
         History.Add(this, {Type: historyitem_SerAxSetTickLblSkip, oldPr: this.tickLblSkip, newPr: pr});
         this.tickLblSkip = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setTickMarkSkip: function(pr)
     {
         History.Add(this, {Type: historyitem_SerAxSetTickMarkSkip, oldPr: this.tickMarkSkip, newPr: pr});
         this.tickMarkSkip = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setTitle: function(pr)
     {
         History.Add(this, {Type: historyitem_SerAxSetTitle, oldPr: this.title, newPr: pr});
         this.title = pr;
+        if(pr)
+        {
+            pr.setParent(this);
+        }
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setTxPr: function(pr)
     {
         History.Add(this, {Type: historyitem_SerAxSetTxPr, oldPr: this.txPr, newPr: pr});
         this.txPr = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
+    },
+
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
     },
 
     Undo: function(data)
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
+                break;
+            }
             case historyitem_SerAxSetAxId:
             {
                 this.axId = data.oldPr;
@@ -5381,86 +6506,154 @@ CSerAx.prototype =
             case historyitem_SerAxSetAxPos:
             {
                 this.axPos = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetCrossAx:
             {
                 this.crossAx = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetCrosses:
             {
                 this.crosses = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetCrossesAt:
             {
                 this.crossesAt = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetDelete:
             {
                 this.bDelete = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetMajorGridlines:
             {
                 this.majorGridlines = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateGridlines();
+                }
                 break;
             }
             case historyitem_SerAxSetMajorTickMark:
             {
                 this.majorTickMark = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetMinorGridlines:
             {
                 this.minorGridlines = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateGridlines();
+                }
                 break;
             }
             case historyitem_SerAxSetMinorTickMark:
             {
                 this.minorTickMark = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetNumFmt:
             {
                 this.numFmt = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetScaling:
             {
                 this.scaling = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetSpPr:
             {
                 this.spPr = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetTickLblPos:
             {
                 this.tickLblPos = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetTickLblSkip:
             {
                 this.tickLblSkip = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetTickMarkSkip:
             {
                 this.tickMarkSkip = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetTitle:
             {
                 this.title = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetTxPr:
             {
                 this.txPr = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
         }
@@ -5470,6 +6663,11 @@ CSerAx.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_SerAxSetAxId:
             {
                 this.axId = data.newPr;
@@ -5478,86 +6676,154 @@ CSerAx.prototype =
             case historyitem_SerAxSetAxPos:
             {
                 this.axPos = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetCrossAx:
             {
                 this.crossAx = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetCrosses:
             {
                 this.crosses = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetCrossesAt:
             {
                 this.crossesAt = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetDelete:
             {
                 this.bDelete = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetMajorGridlines:
             {
                 this.majorGridlines = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateGridlines();
+                }
                 break;
             }
             case historyitem_SerAxSetMajorTickMark:
             {
                 this.majorTickMark = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetMinorGridlines:
             {
                 this.minorGridlines = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateGridlines();
+                }
                 break;
             }
             case historyitem_SerAxSetMinorTickMark:
             {
                 this.minorTickMark = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetNumFmt:
             {
                 this.numFmt = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetScaling:
             {
                 this.scaling = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetSpPr:
             {
                 this.spPr = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetTickLblPos:
             {
                 this.tickLblPos = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetTickLblSkip:
             {
                 this.tickLblSkip = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetTickMarkSkip:
             {
                 this.tickMarkSkip = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetTitle:
             {
                 this.title = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetTxPr:
             {
                 this.txPr = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
         }
@@ -5579,6 +6845,12 @@ CSerAx.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_SerAxSetAxId:
             {
                 writeString(w, data.newPr);
@@ -5677,6 +6949,15 @@ CSerAx.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
+                break;
+            }
             case historyitem_SerAxSetAxId:
             {
                 this.axId = readString(r);
@@ -5685,86 +6966,154 @@ CSerAx.prototype =
             case historyitem_SerAxSetAxPos:
             {
                 this.axPos = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetCrossAx:
             {
                 this.crossAx = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetCrosses:
             {
                 this.crosses = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetCrossesAt:
             {
                 this.crossesAt = readDouble(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetDelete:
             {
                 this.bDelete = readDouble(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetMajorGridlines:
             {
                 this.majorGridlines = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateGridlines();
+                }
                 break;
             }
             case historyitem_SerAxSetMajorTickMark:
             {
                 this.majorTickMark = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetMinorGridlines:
             {
                 this.minorGridlines = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateGridlines();
+                }
                 break;
             }
             case historyitem_SerAxSetMinorTickMark:
             {
                 this.minorTickMark = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetNumFmt:
             {
                 this.numFmt = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetScaling:
             {
                 this.scaling = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetSpPr:
             {
                 this.spPr = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetTickLblPos:
             {
                 this.tickLblPos = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetTickLblSkip:
             {
                 this.tickLblSkip = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetTickMarkSkip:
             {
                 this.tickMarkSkip = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetTitle:
             {
                 this.title = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_SerAxSetTxPr:
             {
-                this.txPr = readObject(r);;
+                this.txPr = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
         }
@@ -5796,6 +7145,8 @@ function CValAx()
     this.tickLblPos     = null;
     this.title          = null;
     this.txPr           = null;
+
+    this.parent = null;
 
 
     this.Id = g_oIdCounter.Get_NewId();
@@ -5875,36 +7226,69 @@ CValAx.prototype =
     {
         History.Add(this, {Type: historyitem_ValAxSetAxPos, oldPr: this.axPos, newPr: pr});
         this.axPos = pr;
+
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setCrossAx: function(pr)
     {
         History.Add(this, {Type: historyitem_ValAxSetCrossAx, oldPr: this.crossAx, newPr: pr});
         this.crossAx = pr;
+
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setCrossBetween: function(pr)
     {
         History.Add(this, {Type: historyitem_ValAxSetCrossBetween, oldPr: this.crossBetween, newPr: pr});
         this.crossBetween = pr;
+
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setCrosses: function(pr)
     {
         History.Add(this, {Type: historyitem_ValAxSetCrosses, oldPr: this.crosses, newPr: pr});
         this.crosses = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setCrossesAt: function(pr)
     {
         History.Add(this, {Type: historyitem_ValAxSetCrossesAt, oldPr: this.crossesAt, newPr: pr});
         this.crossesAt = pr;
+
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setDelete: function(pr)
     {
         History.Add(this, {Type: historyitem_ValAxSetDelete, oldPr: this.bDelete, newPr: pr});
         this.bDelete = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setDispUnits: function(pr)
     {
         History.Add(this, {Type: historyitem_ValAxSetDispUnits, oldPr: this.dispUnits, newPr: pr});
         this.dispUnits = pr;
+
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setExtLst: function(pr)
     {
@@ -5915,145 +7299,285 @@ CValAx.prototype =
     {
         History.Add(this, {Type: historyitem_ValAxSetMajorGridlines, oldPr: this.majorGridlines, newPr: pr});
         this.majorGridlines = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateGridlines();
+        }
     },
     setMajorTickMark: function(pr)
     {
         History.Add(this, {Type: historyitem_ValAxSetMajorTickMark, oldPr: this.majorTickMark, newPr: pr});
         this.majorTickMark = pr;
+
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setMajorUnit: function(pr)
     {
         History.Add(this, {Type: historyitem_ValAxSetMajorUnit, oldPr: this.majorUnit, newPr: pr});
         this.majorUnit = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setMinorGridlines: function(pr)
     {
         History.Add(this, {Type: historyitem_ValAxSetMinorGridlines, oldPr: this.minorGridlines, newPr: pr});
         this.minorGridlines = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateGridlines();
+        }
     },
     setMinorTickMark: function(pr)
     {
         History.Add(this, {Type: historyitem_ValAxSetMinorTickMark, oldPr: this.minorTickMark, newPr: pr});
         this.minorTickMark = pr;
+
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setMinorUnit: function(pr)
     {
         History.Add(this, {Type: historyitem_ValAxSetMinorUnit, oldPr: this.minorUnit, newPr: pr});
         this.minorUnit = pr;
+
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setNumFmt: function(pr)
     {
         History.Add(this, {Type: historyitem_ValAxSetNumFmt, oldPr: this.numFmt, newPr: pr});
         this.numFmt = pr;
+
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setScaling: function(pr)
     {
         History.Add(this, {Type: historyitem_ValAxSetScaling, oldPr: this.scaling, newPr: pr});
         this.scaling = pr;
+
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setSpPr: function(pr)
     {
         History.Add(this, {Type: historyitem_ValAxSetSpPr, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
+
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setTickLblPos: function(pr)
     {
         History.Add(this, {Type: historyitem_ValAxSetTickLblPos, oldPr: this.tickLblPos, newPr: pr});
         this.tickLblPos = pr;
+
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setTitle: function(pr)
     {
         History.Add(this, {Type: historyitem_ValAxSetTitle, oldPr: this.title, newPr: pr});
         this.title = pr;
+        if(pr)
+        {
+            pr.setParent(this);
+        }
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setTxPr: function(pr)
     {
         History.Add(this, {Type: historyitem_ValAxSetTxPr, oldPr: this.txPr, newPr: pr});
         this.txPr = pr;
+
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
+    },
+
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
     },
 
     Undo: function(data)
     {
         switch(data.Type)
         {
+
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
+                break;
+            }
             case historyitem_ValAxSetAxId:
             {
                 this.axId = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetAxPos:
             {
                 this.axPos = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetCrossAx:
             {
                 this.crossAx = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetCrossBetween:
             {
                 this.crossBetween = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetCrosses:
             {
                 this.crosses = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetCrossesAt:
             {
                 this.crossesAt = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetDelete:
             {
                 this.bDelete = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetDispUnits:
             {
                 this.dispUnits = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetMajorGridlines:
             {
                 this.majorGridlines = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateGridlines();
+                }
                 break;
             }
             case historyitem_ValAxSetMajorTickMark:
             {
                 this.majorTickMark = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetMajorUnit:
             {
                 this.majorUnit = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetMinorGridlines:
             {
                 this.minorGridlines = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateGridlines();
+                }
                 break;
             }
             case historyitem_ValAxSetMinorTickMark:
             {
                 this.minorTickMark = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetMinorUnit:
             {
                 this.minorUnit = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetNumFmt:
             {
                 this.numFmt = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetScaling:
             {
                 this.scaling = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetSpPr:
@@ -6064,16 +7588,28 @@ CValAx.prototype =
             case historyitem_ValAxSetTickLblPos:
             {
                 this.tickLblPos = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetTitle:
             {
                 this.title = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetTxPr:
             {
                 this.txPr = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
         }
@@ -6084,104 +7620,189 @@ CValAx.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_ValAxSetAxId:
             {
                 this.axId = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetAxPos:
             {
                 this.axPos = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetCrossAx:
             {
                 this.crossAx = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetCrossBetween:
             {
                 this.crossBetween = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetCrosses:
             {
                 this.crosses = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetCrossesAt:
             {
                 this.crossesAt = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetDelete:
             {
                 this.bDelete = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetDispUnits:
             {
                 this.dispUnits = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetMajorGridlines:
             {
                 this.majorGridlines = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateGridlines();
+                }
                 break;
             }
             case historyitem_ValAxSetMajorTickMark:
             {
                 this.majorTickMark = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetMajorUnit:
             {
                 this.majorUnit = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetMinorGridlines:
             {
                 this.minorGridlines = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateGridlines();
+                }
                 break;
             }
             case historyitem_ValAxSetMinorTickMark:
             {
                 this.minorTickMark = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetMinorUnit:
             {
                 this.minorUnit = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetNumFmt:
             {
                 this.numFmt = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetScaling:
             {
                 this.scaling = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetSpPr:
             {
                 this.axId = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetTickLblPos:
             {
                 this.tickLblPos = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetTitle:
             {
                 this.title = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetTxPr:
             {
                 this.txPr = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
         }
@@ -6192,6 +7813,11 @@ CValAx.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_ValAxSetAxId:
             {
                 writeString(w, data.newPr);
@@ -6300,6 +7926,11 @@ CValAx.prototype =
         var type = r.GetLong();
         switch(type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_ValAxSetAxId:
             {
                 this.axId = readString(r);
@@ -6308,96 +7939,172 @@ CValAx.prototype =
             case historyitem_ValAxSetAxPos:
             {
                 this.axPos = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetCrossAx:
             {
                 this.crossAx = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetCrossBetween:
             {
                 this.crossBetween = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetCrosses:
             {
                 this.crosses = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetCrossesAt:
             {
                 this.crossesAt = readDouble(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetDelete:
             {
                 this.bDelete = readBool(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetDispUnits:
             {
                 this.dispUnits = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetMajorGridlines:
             {
                 this.majorGridlines = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateGridlines();
+                }
                 break;
             }
             case historyitem_ValAxSetMajorTickMark:
             {
                 this.majorTickMark = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetMajorUnit:
             {
                 this.majorUnit = readDouble(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetMinorGridlines:
             {
                 this.minorGridlines = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateGridlines();
+                }
                 break;
             }
             case historyitem_ValAxSetMinorTickMark:
             {
                 this.minorTickMark = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetMinorUnit:
             {
                 this.minorUnit = readDouble(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetNumFmt:
             {
                 this.numFmt = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetScaling:
             {
                 this.scaling = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetSpPr:
             {
                 this.spPr = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetTickLblPos:
             {
                 this.tickLblPos = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetTitle:
             {
                 this.title = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_ValAxSetTxPr:
             {
                 this.txPr = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
         }
@@ -6783,6 +8490,8 @@ function CBarSeries()
     this.tx              = null;
     this.val             = null;
 
+    this.parent = null;
+
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -6987,10 +8696,21 @@ CBarSeries.prototype =
         this.val = pr;
     },
 
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
+
     Undo: function(data)
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 0, data.pt);
@@ -7068,6 +8788,11 @@ CBarSeries.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 1);
@@ -7147,6 +8872,11 @@ CBarSeries.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_BarSeries_SetCat:
             case historyitem_BarSeries_SetDLbls:
             case historyitem_BarSeries_SetDPt:
@@ -7185,6 +8915,11 @@ CBarSeries.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_BarSeries_SetCat:
             {
                 this.cat = readObject(r);
@@ -7277,6 +9012,9 @@ function CBubbleChart()
     this.showNegBubbles = null;
     this.sizeRepresents = null;
     this.varyColors     = null;
+
+    this.parent = null;
+
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -7362,11 +9100,24 @@ CBubbleChart.prototype =
     {
         History.Add(this, {Type:historyitem_BubbleChart_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
+        if(this.dLbls)
+        {
+            this.dLbls.setParent(this);
+        }
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateDataLabels();
+        }
     },
     addSer: function(ser)
     {
         History.Add(this, {Type:historyitem_BubbleChart_AddSerie, newPr: ser});
         this.series.push(ser);
+        ser.setParent(this);
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateType();
+        }
     },
     setShowNegBubbles: function(pr)
     {
@@ -7384,10 +9135,22 @@ CBubbleChart.prototype =
         this.varyColors = pr;
     },
 
+
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
+
     Undo: function(data)
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 0, data.newPr);
@@ -7418,6 +9181,10 @@ CBubbleChart.prototype =
             case historyitem_BubbleChart_SetDLbls:
             {
                 this.dLbls = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_BubbleChart_AddSerie:
@@ -7454,6 +9221,11 @@ CBubbleChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 1);
@@ -7477,6 +9249,10 @@ CBubbleChart.prototype =
             case historyitem_BubbleChart_SetDLbls:
             {
                 this.dLbls = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_BubbleChart_AddSerie:
@@ -7507,6 +9283,11 @@ CBubbleChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
@@ -7549,6 +9330,11 @@ CBubbleChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
@@ -7578,6 +9364,10 @@ CBubbleChart.prototype =
             case historyitem_BubbleChart_SetDLbls:
             {
                 this.dLbls = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_BubbleChart_AddSerie:
@@ -7624,6 +9414,8 @@ function CBubbleSeries()
     this.tx               = null;
     this.xVal             = null;
     this.yVal             = null;
+
+    this.parent = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -7724,10 +9516,22 @@ CBubbleSeries.prototype =
         this.Id = r.GetString2();
     },
 
+
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
+
     Undo: function(data)
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 0, data.pt);
@@ -7805,6 +9609,11 @@ CBubbleSeries.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 1);
@@ -7883,6 +9692,11 @@ CBubbleSeries.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_BubbleSeries_SetBubble3D:
             case historyitem_BubbleSeries_SetInvertIfNegative:
             {
@@ -7921,7 +9735,11 @@ CBubbleSeries.prototype =
         var type = r.GetLong();
         switch (type)
         {
-
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_CommonSeries_RemoveDPt:
             {
                 var pos = readLong(r);
@@ -8522,6 +10340,8 @@ function CDLbls()
     this.spPr            = null;
     this.txPr            = null;
 
+    this.parent = null;
+
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -8534,6 +10354,14 @@ CDLbls.prototype =
     },
     Refresh_RecalcData: function()
     {},
+
+
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
+
 
     createDuplicate: function()
     {
@@ -8619,6 +10447,10 @@ CDLbls.prototype =
     {
         History.Add(this, {Type: historyitem_DLbls_SetDelete, oldPr: this.bDelete, newPr: pr});
         this.bDelete = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+        {
+            this.parent.parent.parent.parent.handleUpdateDataLabels();
+        }
     },
     addDLbl: function(pr)
     {
@@ -8629,6 +10461,10 @@ CDLbls.prototype =
     {
         History.Add(this, {Type: historyitem_DLbls_SetDLblPos, oldPr: this.dLblPos, newPr: pr});
         this.dLblPos = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+        {
+            this.parent.parent.parent.parent.handleUpdateDataLabels();
+        }
     },
     setLeaderLines: function(pr)
     {
@@ -8644,6 +10480,10 @@ CDLbls.prototype =
     {
         History.Add(this, {Type: historyitem_DLbls_SetSeparator, oldPr: this.separator, newPr: pr});
         this.separator = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+        {
+            this.parent.parent.parent.parent.handleUpdateDataLabels();
+        }
     },
     setShowBubbleSize: function(pr)
     {
@@ -8654,16 +10494,28 @@ CDLbls.prototype =
     {
         History.Add(this, {Type: historyitem_DLbls_SetShowCatName, oldPr: this.showCatName, newPr: pr});
         this.showCatName = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+        {
+            this.parent.parent.parent.parent.handleUpdateDataLabels();
+        }
     },
     setShowLeaderLines: function(pr)
     {
         History.Add(this, {Type: historyitem_DLbls_SetShowLeaderLines, oldPr: this.showLeaderLines, newPr: pr});
         this.showLeaderLines = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+        {
+            this.parent.parent.parent.parent.handleUpdateDataLabels();
+        }
     },
     setShowLegendKey: function(pr)
     {
         History.Add(this, {Type: historyitem_DLbls_SetShowLegendKey, oldPr: this.showLegendKey, newPr: pr});
         this.showLegendKey = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+        {
+            this.parent.parent.parent.parent.handleUpdateDataLabels();
+        }
     },
     setShowPercent: function(pr)
     {
@@ -8674,27 +10526,48 @@ CDLbls.prototype =
     {
         History.Add(this, {Type: historyitem_DLbls_SetShowSerName, oldPr: this.showSerName, newPr: pr});
         this.showSerName = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+        {
+            this.parent.parent.parent.parent.handleUpdateDataLabels();
+        }
     },
     setShowVal: function(pr)
     {
         History.Add(this, {Type: historyitem_DLbls_SetShowVal, oldPr: this.showVal, newPr: pr});
         this.showVal = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+        {
+            this.parent.parent.parent.parent.handleUpdateDataLabels();
+        }
     },
     setSpPr: function(pr)
     {
         History.Add(this, {Type: historyitem_DLbls_SetSpPr, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+        {
+            this.parent.parent.parent.parent.handleUpdateDataLabels();
+        }
     },
     setTxPr: function(pr)
     {
         History.Add(this, {Type: historyitem_DLbls_SetTxPr, oldPr: this.txPr, newPr: pr});
         this.txPr = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+        {
+            this.parent.parent.parent.parent.handleUpdateDataLabels();
+        }
     },
 
     Undo: function(data)
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_DLbls_SetDelete:
             {
                 this.bDelete = data.oldPr;
@@ -8778,12 +10651,21 @@ CDLbls.prototype =
                 break;
             }
         }
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+        {
+            this.parent.parent.parent.parent.handleUpdateDataLabels();
+        }
     },
 
     Redo: function(data)
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_DLbls_SetDelete:
             {
                 this.bDelete = data.newPr;
@@ -8860,6 +10742,10 @@ CDLbls.prototype =
                 break;
             }
         }
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+        {
+            this.parent.parent.parent.parent.handleUpdateDataLabels();
+        }
     },
 
     Save_Changes: function(data, w)
@@ -8867,6 +10753,11 @@ CDLbls.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_DLbls_SetDelete:
             case historyitem_DLbls_SetShowBubbleSize:
             case historyitem_DLbls_SetShowCatName:
@@ -8906,6 +10797,11 @@ CDLbls.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_DLbls_SetDelete:
             {
                 this.bDelete = readBool(r);
@@ -8985,6 +10881,10 @@ CDLbls.prototype =
                 this.txPr = readObject(r);
                 break;
             }
+        }
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+        {
+            this.parent.parent.parent.parent.handleUpdateDataLabels();
         }
     }
 };
@@ -9827,6 +11727,8 @@ function CDoughnutChart()
     this.holeSize = null;
     this.series = [];
     this.varyColors  = null;
+
+    this.parent = null;
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -9917,6 +11819,14 @@ CDoughnutChart.prototype =
     {
         History.Add(this, {Type: historyitem_DoughnutChart_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
+        if(this.dLbls)
+        {
+            this.dLbls.setParent(this);
+        }
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateDataLabels();
+        }
     },
     setFirstSliceAng: function(pr)
     {
@@ -9933,6 +11843,11 @@ CDoughnutChart.prototype =
     {
         History.Add(this, {Type: historyitem_DoughnutChart_AddSer, ser: ser});
         this.series.push(ser);
+        ser.setParent(this);
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateType();
+        }
     },
 
     setVaryColors: function(pr)
@@ -9941,10 +11856,21 @@ CDoughnutChart.prototype =
         this.varyColors = pr;
     },
 
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
+
     Undo: function(data)
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 0, data.newPr);
@@ -9953,6 +11879,10 @@ CDoughnutChart.prototype =
             case historyitem_DoughnutChart_SetDLbls :
             {
                 this.dLbls = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_DoughnutChart_SetFirstSliceAng :
@@ -9975,6 +11905,10 @@ CDoughnutChart.prototype =
                         break;
                     }
                 }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
                 break;
             }
             case historyitem_DoughnutChart_SetVaryColor :
@@ -9989,6 +11923,11 @@ CDoughnutChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 1);
@@ -9997,6 +11936,10 @@ CDoughnutChart.prototype =
             case historyitem_DoughnutChart_SetDLbls :
             {
                 this.dLbls = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_DoughnutChart_SetFirstSliceAng :
@@ -10015,6 +11958,10 @@ CDoughnutChart.prototype =
                 {
                     this.series.push(data.ser);
                 }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
                 break;
             }
             case historyitem_DoughnutChart_SetVaryColor :
@@ -10030,6 +11977,11 @@ CDoughnutChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
@@ -10081,6 +12033,11 @@ CDoughnutChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
@@ -10097,6 +12054,10 @@ CDoughnutChart.prototype =
                 else
                 {
                     this.dLbls = null;
+                }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
                 }
                 break;
             }
@@ -10133,6 +12094,10 @@ CDoughnutChart.prototype =
                     {
                         this.series.push(ser);
                     }
+                }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
                 }
                 break;
             }
@@ -10932,6 +12897,9 @@ function CLegend()
     this.extX = null;
     this.extY = null;
     this.calcEntryes = [];
+
+    this.parent = null;
+
     this.transform = new CMatrix();
 
     this.localTransform = new CMatrix();
@@ -11187,10 +13155,21 @@ CLegend.prototype =
         return null;
     },
 
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
+
     Undo: function(data)
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_Legend_SetLayout:
             {
                 this.layout = data.oldPr;
@@ -11236,6 +13215,12 @@ CLegend.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
+
             case historyitem_Legend_SetLayout:
             {
                 this.layout = data.newPr;
@@ -11276,6 +13261,11 @@ CLegend.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_Legend_SetLayout:
             case historyitem_Legend_SetSpPr:
             case historyitem_Legend_SetTxPr:
@@ -11324,6 +13314,11 @@ CLegend.prototype =
         var type = r.GetLong();
         switch(type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_Legend_SetLayout:
             {
                 if(r.GetBool())
@@ -11610,6 +13605,8 @@ function CLineChart()
     this.upDownBars = null;
     this.varyColors = null;
 
+    this.parent = null;
+
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -11751,6 +13748,14 @@ CLineChart.prototype =
     {
         History.Add(this, {Type: historyitem_LineChart_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
+        if(this.dLbls)
+        {
+            this.dLbls.setParent(this);
+        }
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateDataLabels();
+        }
     },
 
     setDropLines: function(pr)
@@ -11762,6 +13767,10 @@ CLineChart.prototype =
     {
         History.Add(this, {Type: historyitem_LineChart_SetGrouping, oldPr: this.grouping, newPr: pr});
         this.grouping = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setHiLowLines: function(pr)
     {
@@ -11777,6 +13786,11 @@ CLineChart.prototype =
     {
         History.Add(this, {Type: historyitem_LineChart_AddSer, newPr: ser});
         this.series.push(ser);
+        ser.setParent(this);
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateType();
+        }
     },
     setSmooth: function(pr)
     {
@@ -11787,6 +13801,10 @@ CLineChart.prototype =
     {
         History.Add(this, {Type: historyitem_LineChart_SetUpDownBars, oldPr: this.upDownBars, newPr: pr});
         this.upDownBars = pr;
+        if(pr)
+        {
+            pr.setParent(this);
+        }
     },
     setVaryColors: function(pr)
     {
@@ -11794,12 +13812,21 @@ CLineChart.prototype =
         this.varyColors = pr;
     },
 
-
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
 
     Undo: function(data)
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 0, data.newPr);
@@ -11820,6 +13847,10 @@ CLineChart.prototype =
             case historyitem_LineChart_SetDLbls:
             {
                 this.dLbls = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break
             }
             case historyitem_LineChart_SetDropLines:
@@ -11830,6 +13861,10 @@ CLineChart.prototype =
             case historyitem_LineChart_SetGrouping:
             {
                 this.grouping = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break
             }
             case historyitem_LineChart_SetHiLowLines:
@@ -11851,6 +13886,10 @@ CLineChart.prototype =
                         this.series.splice(i, 1);
                         break;
                     }
+                }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
                 }
                 break
             }
@@ -11876,6 +13915,11 @@ CLineChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 1);
@@ -11889,6 +13933,10 @@ CLineChart.prototype =
             case historyitem_LineChart_SetDLbls:
             {
                 this.dLbls = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break
             }
             case historyitem_LineChart_SetDropLines:
@@ -11899,6 +13947,10 @@ CLineChart.prototype =
             case historyitem_LineChart_SetGrouping:
             {
                 this.grouping = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break
             }
             case historyitem_LineChart_SetHiLowLines:
@@ -11914,6 +13966,10 @@ CLineChart.prototype =
             case historyitem_LineChart_AddSer:
             {
                 this.series.push(data.newPr);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
                 break
             }
             case historyitem_LineChart_SetSmooth:
@@ -11939,6 +13995,11 @@ CLineChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
@@ -11975,6 +14036,11 @@ CLineChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
@@ -11994,6 +14060,10 @@ CLineChart.prototype =
             case historyitem_LineChart_SetDLbls:
             {
                 this.dLbls = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break
             }
             case historyitem_LineChart_SetDropLines:
@@ -12004,6 +14074,10 @@ CLineChart.prototype =
             case historyitem_LineChart_SetGrouping:
             {
                 this.grouping = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break
             }
             case historyitem_LineChart_SetHiLowLines:
@@ -12022,6 +14096,10 @@ CLineChart.prototype =
                 if(isRealObject(ser))
                 {
                     this.series.push(ser);
+                }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
                 }
                 break
             }
@@ -12059,6 +14137,7 @@ function CLineSeries()
     this.tx            = null;
     this.val           = null;
 
+    this.parent = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -12069,6 +14148,12 @@ CLineSeries.prototype =
     Get_Id: function()
     {
         return this.Id;
+    },
+
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
     },
 
 
@@ -12263,6 +14348,11 @@ CLineSeries.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 0, data.pt);
@@ -12335,6 +14425,11 @@ CLineSeries.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 1);
@@ -12408,6 +14503,11 @@ CLineSeries.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_LineSeries_SetCat:
             case historyitem_LineSeries_SetDLbls:
             case historyitem_LineSeries_SetDPt:
@@ -12445,6 +14545,11 @@ CLineSeries.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_LineSeries_SetCat:
             {
                 this.cat = readObject(r);
@@ -13835,6 +15940,8 @@ function COfPieChart()
     this.splitType     = null;
     this.varyColors    = null;
 
+    this.parent = null;
+
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -13919,6 +16026,14 @@ COfPieChart.prototype =
     {
         History.Add(this, {Type: historyitem_OfPieChart_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
+        if(this.dLbls)
+        {
+            this.dLbls.setParent(this);
+        }
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateDataLabels();
+        }
     },
     setGapWidth: function(pr)
     {
@@ -13939,6 +16054,11 @@ COfPieChart.prototype =
     {
         History.Add(this, {Type: historyitem_OfPieChart_AddSer, ser: ser});
         this.series.push(ser);
+        ser.setParent(this);
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateType();
+        }
     },
     setSerLines: function(pr)
     {
@@ -13961,10 +16081,21 @@ COfPieChart.prototype =
         this.varyColors = pr;
     },
 
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
+
     Undo: function(data)
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 0, data.newPr);
@@ -13979,6 +16110,10 @@ COfPieChart.prototype =
             case historyitem_OfPieChart_SetDLbls:
             {
                 this.dLbls = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_OfPieChart_SetGapWidth:
@@ -14005,6 +16140,10 @@ COfPieChart.prototype =
                         this.series.splice(i, 1);
                         break;
                     }
+                }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
                 }
                 break;
             }
@@ -14035,6 +16174,11 @@ COfPieChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 1);
@@ -14048,6 +16192,10 @@ COfPieChart.prototype =
             case historyitem_OfPieChart_SetDLbls:
             {
                 this.dLbls = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_OfPieChart_SetGapWidth:
@@ -14070,6 +16218,10 @@ COfPieChart.prototype =
                 if(isRealObject(data.ser))
                 {
                     this.series.push(data.ser);
+                }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
                 }
                 break;
             }
@@ -14101,6 +16253,11 @@ COfPieChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
@@ -14174,6 +16331,11 @@ COfPieChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
@@ -14200,6 +16362,10 @@ COfPieChart.prototype =
                 else
                 {
                     this.dLbls = null;
+                }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
                 }
                 break;
             }
@@ -14248,6 +16414,10 @@ COfPieChart.prototype =
                     {
                         this.series.push(ser);
                     }
+                }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
                 }
                 break;
             }
@@ -14514,6 +16684,8 @@ function CPieChart()
     this.firstSliceAng = null;
     this.series        = [];
     this.varyColors    = null;
+    this.parent = null;
+
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -14609,6 +16781,14 @@ CPieChart.prototype =
     {
         History.Add(this, {Type: historyitem_PieChart_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
+        if(this.dLbls)
+        {
+            this.dLbls.setParent(this);
+        }
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateDataLabels();
+        }
     },
 
     setFirstSliceAng: function(pr)
@@ -14621,6 +16801,11 @@ CPieChart.prototype =
     {
         History.Add(this, {Type: historyitem_PieChart_SetFirstSliceAng, ser: ser});
         this.series.push(ser);
+        ser.setParent(this);
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateType();
+        }
     },
     setVaryColors: function(pr)
     {
@@ -14628,10 +16813,21 @@ CPieChart.prototype =
         this.varyColors = pr;
     },
 
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
+
     Undo: function(data)
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 0, data.newPr);
@@ -14640,6 +16836,10 @@ CPieChart.prototype =
             case historyitem_PieChart_SetDLbls:
             {
                 this.dLbls = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_PieChart_SetFirstSliceAng:
@@ -14650,6 +16850,10 @@ CPieChart.prototype =
             case historyitem_PieChart_AddSer:
             {
                 this.series.push(data.ser);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
                 break;
             }
             case historyitem_PieChart_SetVaryColors:
@@ -14664,6 +16868,11 @@ CPieChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 1);
@@ -14672,6 +16881,10 @@ CPieChart.prototype =
             case historyitem_PieChart_SetDLbls:
             {
                 this.dLbls = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_PieChart_SetFirstSliceAng:
@@ -14682,6 +16895,10 @@ CPieChart.prototype =
             case historyitem_PieChart_AddSer:
             {
                 this.series.push(data.ser);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
                 break;
             }
             case historyitem_PieChart_SetVaryColors:
@@ -14697,6 +16914,11 @@ CPieChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
@@ -14746,6 +16968,11 @@ CPieChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
@@ -14762,6 +16989,10 @@ CPieChart.prototype =
                 else
                 {
                     this.dLbls = null;
+                }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
                 }
                 break;
             }
@@ -14786,6 +17017,10 @@ CPieChart.prototype =
                     {
                         this.series.push(ser);
                     }
+                }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
                 }
                 break;
             }
@@ -14818,6 +17053,9 @@ function CPieSeries()
     this.spPr      = null;
     this.tx        = null;
     this.val       = null;
+
+
+    this.parent = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -14986,10 +17224,21 @@ CPieSeries.prototype =
         this.val = pr;
     },
 
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
+
     Undo: function(data)
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 0, data.pt);
@@ -15047,6 +17296,11 @@ CPieSeries.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 1);
@@ -15105,6 +17359,11 @@ CPieSeries.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_PieSeries_SetCat:
             case historyitem_PieSeries_SetDLbls:
             case historyitem_PieSeries_SetDPt:
@@ -15135,6 +17394,11 @@ CPieSeries.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_CommonSeries_RemoveDPt:
             {
                 var pos = readLong(r);
@@ -15447,6 +17711,7 @@ function CRadarChart()
     this.radarStyle  = null;
     this.series      = [];
     this.varyColors  = null;
+    this.parent = null;
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -15513,6 +17778,14 @@ CRadarChart.prototype =
     {
         History.Add(this, {Type: historyitem_RadarChart_SetDLbls, oldPr: this.dLbls, newPr:pr});
         this.dLbls = pr;
+        if(this.dLbls)
+        {
+            this.dLbls.setParent(this);
+        }
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateDataLabels();
+        }
     },
 
     setRadarStyle: function(pr)
@@ -15525,6 +17798,11 @@ CRadarChart.prototype =
     {
         History.Add(this, {Type: historyitem_RadarChart_AddSer, ser: ser});
         this.series.push(ser);
+        ser.setParent(this);
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateType();
+        }
     },
 
     setVaryColors: function(pr)
@@ -15533,10 +17811,22 @@ CRadarChart.prototype =
         this.varyColors = pr;
     },
 
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
+
+
     Undo: function(data)
     {
         switch(data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 0, data.newPr);
@@ -15557,6 +17847,10 @@ CRadarChart.prototype =
             case historyitem_RadarChart_SetDLbls:
             {
                 this.dLbls = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_RadarChart_SetRadarStyle:
@@ -15574,6 +17868,10 @@ CRadarChart.prototype =
                         break;
                     }
                 }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
                 break;
             }
             case historyitem_RadarChart_SetVaryColors:
@@ -15588,6 +17886,11 @@ CRadarChart.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 1);
@@ -15601,6 +17904,10 @@ CRadarChart.prototype =
             case historyitem_RadarChart_SetDLbls:
             {
                 this.dLbls = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_RadarChart_SetRadarStyle:
@@ -15611,6 +17918,10 @@ CRadarChart.prototype =
             case historyitem_RadarChart_AddSer:
             {
                 this.series.push(data.ser);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
                 break;
             }
             case historyitem_RadarChart_SetVaryColors:
@@ -15626,6 +17937,11 @@ CRadarChart.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
@@ -15674,6 +17990,11 @@ CRadarChart.prototype =
         var type = r.GetLong();
         switch(type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
@@ -15698,6 +18019,10 @@ CRadarChart.prototype =
                 {
                     this.dLbls = null;
                 }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_RadarChart_SetRadarStyle:
@@ -15721,6 +18046,10 @@ CRadarChart.prototype =
                     {
                         this.series.push(ser);
                     }
+                }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
                 }
                 break;
             }
@@ -15760,6 +18089,8 @@ function CRadarSeries()
     this.spPr    = null;
     this.tx      = null;
     this.val     = null;
+
+    this.parent = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -15927,11 +18258,22 @@ CRadarSeries.prototype =
         this.val = pr;
     },
 
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
+
     Undo: function(data)
     {
         switch (data.Type)
         {
 
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 0, data.pt);
@@ -15989,6 +18331,11 @@ CRadarSeries.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 1);
@@ -16047,6 +18394,11 @@ CRadarSeries.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_RadarSeries_SetCat:
             case historyitem_RadarSeries_SetDLbls:
             case historyitem_RadarSeries_SetDPt:
@@ -16077,6 +18429,11 @@ CRadarSeries.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_CommonSeries_RemoveDPt:
             {
                 var pos = readLong(r);
@@ -16330,6 +18687,8 @@ function CScatterChart()
     this.series      = [];
     this.varyColors  = null;
 
+    this.parent = null;
+
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -16428,6 +18787,14 @@ CScatterChart.prototype =
     {
         History.Add(this, {Type: historyitem_ScatterChart_SetDLbls, oldPr: this.dLbls, newPr:pr});
         this.dLbls = pr;
+        if(this.dLbls)
+        {
+            this.dLbls.setParent(this);
+        }
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateDataLabels();
+        }
     },
 
     setScatterStyle: function(pr)
@@ -16440,6 +18807,11 @@ CScatterChart.prototype =
     {
         History.Add(this, {Type: historyitem_ScatterChart_AddSer, newPr: ser});
         this.series.push(ser);
+        ser.setParent(this);
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateType();
+        }
     },
 
     setVaryColors: function(pr)
@@ -16448,10 +18820,21 @@ CScatterChart.prototype =
         this.varyColors = pr;
     },
 
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
+
     Undo: function(data)
     {
         switch(data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 0, data.newPr);
@@ -16471,6 +18854,10 @@ CScatterChart.prototype =
             case historyitem_ScatterChart_SetDLbls:
             {
                 this.dLbls = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_ScatterChart_SetScatterStyle:
@@ -16488,6 +18875,10 @@ CScatterChart.prototype =
                         break;
                     }
                 }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
                 break;
             }
             case historyitem_ScatterChart_SetVaryColors:
@@ -16502,6 +18893,11 @@ CScatterChart.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 1);
@@ -16515,6 +18911,10 @@ CScatterChart.prototype =
             case historyitem_ScatterChart_SetDLbls:
             {
                 this.dLbls = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_ScatterChart_SetScatterStyle:
@@ -16525,6 +18925,10 @@ CScatterChart.prototype =
             case historyitem_ScatterChart_AddSer:
             {
                 this.series.push(data.newPr);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
                 break;
             }
             case historyitem_ScatterChart_SetVaryColors:
@@ -16540,6 +18944,11 @@ CScatterChart.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
@@ -16585,6 +18994,11 @@ CScatterChart.prototype =
         var type = r.GetLong();
         switch(type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
@@ -16614,6 +19028,10 @@ CScatterChart.prototype =
                 {
                     this.dLbls = null;
                 }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_ScatterChart_SetScatterStyle:
@@ -16637,6 +19055,10 @@ CScatterChart.prototype =
                     {
                         this.series.push(ser);
                     }
+                }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
                 }
                 break;
             }
@@ -16671,6 +19093,7 @@ function CScatterSeries()
     this.tx        = null;
     this.xVal      = null;
     this.yVal      = null;
+    this.parent = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -16680,6 +19103,12 @@ CScatterSeries.prototype =
     Get_Id: function()
     {
         return this.Id;
+    },
+
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
     },
 
     documentCreateFontMap: CAreaSeries.prototype.documentCreateFontMap,
@@ -16869,7 +19298,11 @@ CScatterSeries.prototype =
     {
         switch (data.Type)
         {
-
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 0, data.pt);
@@ -16942,6 +19375,11 @@ CScatterSeries.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 1);
@@ -17015,6 +19453,11 @@ CScatterSeries.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_ScatterSer_SetDLbls:
             case historyitem_ScatterSer_SetDPt:
             case historyitem_ScatterSer_SetErrBars:
@@ -17064,6 +19507,11 @@ CScatterSeries.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_ScatterSer_SetDLbls:
             {
                 if(r.GetBool())
@@ -17352,6 +19800,7 @@ function CStockChart()
     this.hiLowLines = null;
     this.series      = [];
     this.upDownBars = null;
+    this.parent = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -17439,6 +19888,14 @@ CStockChart.prototype =
     {
         History.Add(this, {Type: historyitem_StockChart_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
+        if(this.dLbls)
+        {
+            this.dLbls.setParent(this);
+        }
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateDataLabels();
+        }
     },
 
     setDropLines: function(pr)
@@ -17455,17 +19912,37 @@ CStockChart.prototype =
     {
         History.Add(this, {Type: historyitem_StockChart_AddSer, ser: ser});
         this.series.push(ser);
+        ser.setParent(this);
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateType();
+        }
     },
     setUpDownBars: function(pr)
     {
         History.Add(this, {Type: historyitem_StockChart_SetUpDownBars, oldPr: this.upDownBars, newPr: pr});
         this.upDownBars = pr;
+        if(pr)
+        {
+            pr.setParent(this);
+        }
+    },
+
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
     },
 
     Undo: function(data)
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 0, data.newPr);
@@ -17487,6 +19964,10 @@ CStockChart.prototype =
             case historyitem_StockChart_SetDLbls:
             {
                 this.dLbls = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break
             }
             case historyitem_StockChart_SetDropLines:
@@ -17502,6 +19983,10 @@ CStockChart.prototype =
             case historyitem_StockChart_AddSer:
             {
                 this.series.splice(data.oldPr, 1);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
                 break
             }
             case historyitem_StockChart_SetUpDownBars:
@@ -17516,6 +20001,11 @@ CStockChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 1);
@@ -17529,6 +20019,10 @@ CStockChart.prototype =
             case historyitem_StockChart_SetDLbls:
             {
                 this.dLbls = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break
             }
             case historyitem_StockChart_SetDropLines:
@@ -17544,6 +20038,10 @@ CStockChart.prototype =
             case historyitem_StockChart_AddSer:
             {
                 this.series.push(data.newPr);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
                 break
             }
             case historyitem_StockChart_SetUpDownBars:
@@ -17559,6 +20057,12 @@ CStockChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
@@ -17587,6 +20091,11 @@ CStockChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
@@ -17606,6 +20115,10 @@ CStockChart.prototype =
             case historyitem_StockChart_SetDLbls:
             {
                 this.dLbls = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break
             }
             case historyitem_StockChart_SetDropLines:
@@ -18205,6 +20718,8 @@ function CSurfaceChart()
     this.series = [];
     this.wireframe = null;
 
+    this.parent = null;
+
     this.Id = g_oIdCounter.Get_NewId();
 }
 
@@ -18295,6 +20810,11 @@ CSurfaceChart.prototype =
     {
         History.Add(this, {Type: historyitem_SurfaceChart_AddSer, newPr: ser});
         this.series.push(ser);
+        ser.setParent(this);
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateType();
+        }
     },
 
     setWireframe: function(pr)
@@ -18303,10 +20823,21 @@ CSurfaceChart.prototype =
         this.wireframe = pr;
     },
 
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
+
     Undo: function(data)
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 0, data.newPr);
@@ -18346,6 +20877,10 @@ CSurfaceChart.prototype =
                         break;
                     }
                 }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
                 break;
             }
             case historyitem_SurfaceChart_SetWireframe:
@@ -18360,6 +20895,11 @@ CSurfaceChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 1);
@@ -18378,6 +20918,10 @@ CSurfaceChart.prototype =
             case historyitem_SurfaceChart_AddSer:
             {
                 this.series.push(data.newPr);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
                 break;
             }
             case historyitem_SurfaceChart_SetWireframe:
@@ -18393,6 +20937,11 @@ CSurfaceChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
@@ -18427,6 +20976,11 @@ CSurfaceChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
@@ -18468,6 +21022,10 @@ CSurfaceChart.prototype =
                         this.series.push(ser);
                     }
                 }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
                 break;
             }
             case historyitem_SurfaceChart_SetWireframe:
@@ -18497,6 +21055,8 @@ function CSurfaceSeries()
     this.tx    = null;
     this.val   = null;
 
+    this.parent = null;
+
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -18511,6 +21071,12 @@ CSurfaceSeries.prototype =
 
     Refresh_RecalcData: function()
     {},
+
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
 
     removeDPt: function(idx)
     {
@@ -18603,6 +21169,11 @@ CSurfaceSeries.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 0, data.pt);
@@ -18645,6 +21216,11 @@ CSurfaceSeries.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 1);
@@ -18688,6 +21264,11 @@ CSurfaceSeries.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_SurfaceSeries_SetCat:
             case historyitem_SurfaceSeries_SetSpPr:
             case historyitem_SurfaceSeries_SetTx:
@@ -18715,6 +21296,11 @@ CSurfaceSeries.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_SurfaceSeries_SetCat:
             {
                 this.cat = readObject(r);
@@ -19116,10 +21702,22 @@ CTitle.prototype =
         this.txPr = pr;
     },
 
+
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
+
     Undo: function(data)
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_Title_SetLayout:
             {
                 this.layout = data.oldPr;
@@ -19152,6 +21750,11 @@ CTitle.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_Title_SetLayout:
             {
                 this.layout = data.newPr;
@@ -19185,6 +21788,11 @@ CTitle.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_Title_SetLayout:
             case historyitem_Title_SetSpPr:
             case historyitem_Title_SetTx:
@@ -19206,6 +21814,11 @@ CTitle.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_Title_SetLayout:
             {
                 this.layout = readObject(r);
@@ -20073,6 +22686,8 @@ function CChart()
     this.title = null;
     this.view3D = null;
 
+    this.parent = null;
+
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -20161,6 +22776,10 @@ CChart.prototype =
     {
         History.Add(this, {Type: historyitem_Chart_SetLegend, oldLegend: this.legend, newLegend: legend});
         this.legend = legend;
+        if(legend)
+        {
+            legend.setParent(this);
+        }
     },
     setPivotFmts: function(pivotFmt)
     {
@@ -20171,6 +22790,10 @@ CChart.prototype =
     {
         History.Add(this, {Type: historyitem_Chart_SetPlotArea, oldPlotArea: this.plotArea, newPlotArea: plotArea});
         this.plotArea = plotArea;
+        if(plotArea)
+        {
+            plotArea.setParent(this);
+        }
     },
     setPlotVisOnly: function(plotVisOnly)
     {
@@ -20191,6 +22814,14 @@ CChart.prototype =
     {
         History.Add(this, {Type: historyitem_Chart_SetTitle, oldTitle: this.title, newTitle: title});
         this.title = title;
+        if(title)
+        {
+            title.setParent(this);
+        }
+        if(this.parent)
+        {
+            this.parent.handleUpdateInternalChart();
+        }
     },
     setView3D: function(view3D)
     {
@@ -20198,10 +22829,22 @@ CChart.prototype =
         this.view3D = view3D;
     },
 
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
+
     Undo: function(data)
     {
         switch (data.Type)
         {
+
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_Chart_SetAutoTitleDeleted:
             {
                 this.autoTitleDeleted = data.oldAutoTitleDeleted;
@@ -20257,6 +22900,11 @@ CChart.prototype =
             case historyitem_Chart_SetTitle:
             {
                 this.title = data.oldTitle;
+
+                if(this.parent)
+                {
+                    this.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_Chart_SetSideWall:
@@ -20276,6 +22924,11 @@ CChart.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_Chart_SetAutoTitleDeleted:
             {
                 this.autoTitleDeleted = data.newAutoTitleDeleted;
@@ -20324,6 +22977,10 @@ CChart.prototype =
             case historyitem_Chart_SetTitle:
             {
                 this.title = data.newTitle;
+                if(this.parent)
+                {
+                    this.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_Chart_SetSideWall:
@@ -20344,6 +23001,11 @@ CChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_Chart_SetAutoTitleDeleted:
             {
                 writeBool(w, data.newAutoTitleDeleted);
@@ -20412,9 +23074,14 @@ CChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_Chart_SetAutoTitleDeleted:
             {
-                this.autoTitleDeleted = r.GetBool();
+                this.autoTitleDeleted = readBool(r);
                 break;
             }
             case historyitem_Chart_SetBackWall:
@@ -20464,6 +23131,10 @@ CChart.prototype =
             case historyitem_Chart_SetTitle:
             {
                 this.title = readObject(r);
+                if(this.parent)
+                {
+                    this.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_Chart_SetSideWall:
