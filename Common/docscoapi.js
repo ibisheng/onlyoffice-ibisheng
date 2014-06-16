@@ -25,6 +25,7 @@
 			this.onSetIndexUser = options.onSetIndexUser;
 			this.onSaveChanges = options.onSaveChanges;
 			this.onStartCoAuthoring = options.onStartCoAuthoring;
+			this.onEndCoAuthoring = options.onEndCoAuthoring;
 		}
 	};
 
@@ -46,6 +47,7 @@
 			this._CoAuthoringApi.onSaveChanges = function (e, userId) {t.callback_OnSaveChanges(e, userId);};
 			// Callback есть пользователей больше 1
 			this._CoAuthoringApi.onStartCoAuthoring = function (e) {t.callback_OnStartCoAuthoring(e);};
+			this._CoAuthoringApi.onEndCoAuthoring = function (e) {t.callback_OnEndCoAuthoring(e);};
 
 			this._CoAuthoringApi.init(user, docid, token, serverHost, serverPort, serverPath, callback,
 				editorType, documentFormatSave, isViewer);
@@ -228,6 +230,10 @@
 	CDocsCoApi.prototype.callback_OnStartCoAuthoring = function (e) {
 		if (this.onStartCoAuthoring)
 			this.onStartCoAuthoring(e);
+	};
+	CDocsCoApi.prototype.callback_OnEndCoAuthoring = function (e) {
+		if (this.onEndCoAuthoring)
+			this.onEndCoAuthoring(e);
 	};
 
     /** States
@@ -606,6 +612,15 @@
 			}
 		}
 	};
+
+	DocsCoApi.prototype._onEndCoAuthoring = function (isStartEvent) {
+		if (true === this.isCoAuthoring) {
+			this.isCoAuthoring = false;
+			if (this.onEndCoAuthoring) {
+				this.onEndCoAuthoring(isStartEvent);
+			}
+		}
+	};
 	
 	DocsCoApi.prototype._onSaveLock = function (data) {
 		if (undefined != data["saveLock"] && null != data["saveLock"]) {
@@ -644,9 +659,6 @@
 			// Посылать нужно всегда, т.к. на это рассчитываем при открытии
 			if (t.onFirstLoadChangesEnd)
 				t.onFirstLoadChangesEnd();
-			// Если были изменения, то мы все еще в совместном редактировании (иначе при сохранениях мы будем затирать изменения на сервере)
-			if (hasChanges)
-				t._onStartCoAuthoring(/*isStartEvent*/ true);
         }
     };
 	
@@ -704,6 +716,8 @@
 			// Посылаем эвент о совместном редактировании
 			if (1 < this._countEditUsers)
 				this._onStartCoAuthoring(/*isStartEvent*/true);
+			else
+				this._onEndCoAuthoring(/*isStartEvent*/true);
 		}
 	};
 
@@ -715,14 +729,16 @@
 			if (userStateChanged.asc_getState()) {
 				this._participants[userStateChanged.asc_getId()] = userStateChanged;
 				++this._countEditUsers;
-
-				// Посылаем эвент о совместном редактировании
-				if (1 < this._countEditUsers)
-					this._onStartCoAuthoring(/*isStartEvent*/false);
 			} else {
 				delete this._participants[userStateChanged.asc_getId()];
 				--this._countEditUsers;
 			}
+
+			// Посылаем эвент о совместном редактировании
+			if (1 < this._countEditUsers)
+				this._onStartCoAuthoring(/*isStartEvent*/false);
+			else
+				this._onEndCoAuthoring(/*isStartEvent*/false);
 
 			this.onParticipantsChanged(this._participants, this._countEditUsers);
 			this.onConnectionStateChanged(userStateChanged);

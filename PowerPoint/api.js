@@ -504,6 +504,9 @@ asc_docs_api.prototype._coAuthoringInit = function () {
 		} else
 			t.isStartCoAuthoringOnEndLoad = true;
     };
+	this.CoAuthoringApi.onEndCoAuthoring			= function (isStartEvent) {
+		// ToDo add code
+	};
 	/**
 	 * Event об отсоединении от сервера
 	 * @param {jQuery} e  event об отсоединении с причиной

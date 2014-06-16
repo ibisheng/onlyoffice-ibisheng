@@ -76,6 +76,11 @@
 			this.m_bIsCollaborative = true;
 		};
 
+		// Временное окончание совместного редактирования
+		CCollaborativeEditing.prototype.endCollaborationEditing = function() {
+			this.m_bIsCollaborative = false;
+		};
+
 		// Выставление режима view
 		CCollaborativeEditing.prototype.setViewerMode = function (isViewerMode) {
 			this.m_bIsViewerMode = isViewerMode;

@@ -1634,6 +1634,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						t.collaborativeEditing.sendChanges();
 					}
 				};
+				this.CoAuthoringApi.onEndCoAuthoring			= function (isStartEvent) {
+					t.endCollaborationEditing();
+				};
 				/**
 				 * Event об отсоединении от сервера
 				 * @param {jQuery} e  event об отсоединении с причиной
@@ -1809,6 +1812,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			startCollaborationEditing: function () {
 				// Начинаем совместное редактирование
 				this.collaborativeEditing.startCollaborationEditing();
+			},
+
+			endCollaborationEditing: function () {
+				// Временно заканчиваем совместное редактирование
+				this.collaborativeEditing.endCollaborationEditing();
 			},
 
 			// End Load document
