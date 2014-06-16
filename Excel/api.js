@@ -1625,10 +1625,15 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 					// На старте не нужно ничего делать
 					if (!isStartEvent) {
-						// Принимаем чужие изменения
-						t.collaborativeEditing.applyChanges();
-						// Пересылаем свои изменения
-						t.collaborativeEditing.sendChanges();
+						// Когда документ еще не загружен, нужно отпустить lock (при быстром открытии 2-мя пользователями)
+						if (!t.IsSendDocumentLoadCompleate)
+							t.CoAuthoringApi.unLockDocument();
+						else {
+							// Принимаем чужие изменения
+							t.collaborativeEditing.applyChanges();
+							// Пересылаем свои изменения
+							t.collaborativeEditing.sendChanges();
+						}
 					}
 				};
 				this.CoAuthoringApi.onEndCoAuthoring			= function (isStartEvent) {
