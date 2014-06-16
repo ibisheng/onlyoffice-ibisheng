@@ -1481,12 +1481,12 @@ asc_docs_api.prototype._coAuthoringInit = function()
 
         if ( 1 >= CountEditUsers )
         {
-            CollaborativeEditing.Start_CollaborationEditing();
+            CollaborativeEditing.End_CollaborationEditing();
             editor.asc_setDrawCollaborationMarks(false);
         }
         else
         {
-            CollaborativeEditing.End_CollaborationEditing();
+            CollaborativeEditing.Start_CollaborationEditing();
             editor.asc_setDrawCollaborationMarks(true);
         }
     };
@@ -7678,7 +7678,7 @@ window["asc_docs_api"].prototype["asc_nativeCalculateFile"] = function()
     if (this.isApplyChangesOnOpenEnabled)
     {
         this.isApplyChangesOnOpenEnabled = false;
-        if (CollaborativeEditing.m_bUse == true)
+        if (1 === CollaborativeEditing.m_nUseType)
         {
             this.isApplyChangesOnOpen = true;
             CollaborativeEditing.Apply_Changes();
