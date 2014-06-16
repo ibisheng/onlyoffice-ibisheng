@@ -3801,7 +3801,7 @@ parserFormula.prototype = {
 
 
             if ( (ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea) && ref.isValid() ) {
-                var nTo = this.wb.dependencyFormulas.addNode( ref.getWsId(), ref._cells );
+                var nTo = this.wb.dependencyFormulas.addNode( ref.getWsId(), ref._cells.replace( /\$/g, "" ) );
 
                 ref.setNode( nTo );
 
