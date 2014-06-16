@@ -1311,7 +1311,7 @@ function cRIGHT() {
 //    this.setArgumentsMin( 1 );
 //    this.setArgumentsMax( 2 );
 
-    this.name = "RIGTH";
+    this.name = "RIGHT";
     this.type = cElementType.func;
     this.value = null;
     this.argumentsMin = 1;
