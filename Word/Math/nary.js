@@ -317,19 +317,19 @@ CNary.prototype.Refresh_RecalcData = function(Data)
 CNary.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_nary );
-	Writer.WriteString2( this.oNary.getBase().Id );
+	Writer.WriteString2( this.getBase().Id );
 	
 	var StartPos = Writer.GetCurPosition();
     Writer.Skip(4);
     var Flags = 0;
 	if ( undefined != this.getUpperIterator() )
     {
-		Writer.WriteLong(this.getUpperIterator().Id);
+		Writer.WriteString2(this.getUpperIterator().Id);
 		Flags |= 1;
 	}
 	if ( undefined != this.getLowerIterator())
     {
-		Writer.WriteLong(this.getLowerIterator().Id);
+		Writer.WriteString2(this.getLowerIterator().Id);
 		Flags |= 2;
 	}
 	var EndPos = Writer.GetCurPosition();

@@ -6779,29 +6779,12 @@ CMathContent.prototype =
             {
                 var bArray = Data.UseArray;
                 var Count  = Data.Items.length;
-
-                var StartPos = Writer.GetCurPosition();
-                Writer.Skip(4);
-                var RealCount = Count;
-
+				Writer.WriteLong( Count );
+				
                 for ( var Index = 0; Index < Count; Index++ )
                 {
-                    if ( true === bArray )
-                    {
-                        if ( false === Data.PosArray[Index] )
-                            RealCount--;
-                        else
-                            Writer.WriteLong( Data.PosArray[Index] );
-                    }
-                    else
-                        Writer.WriteLong( Data.Pos );
-
+					Writer.WriteLong( Data.Pos );
                 }
-
-                var EndPos = Writer.GetCurPosition();
-                Writer.Seek( StartPos );
-                Writer.WriteLong( RealCount );
-                Writer.Seek( EndPos );
 
                 break;
             }
@@ -6849,20 +6832,11 @@ CMathContent.prototype =
             }
 			case historyitem_Math_RemoveItem:
             {
-                // Long          : Количество удаляемых элементов
-                // Array of Long : позиции удаляемых элементов
-
                 var Count = Reader.GetLong();
 
                 for ( var Index = 0; Index < Count; Index++ )
                 {
-                    var ChangesPos = this.m_oContentChanges.Check( contentchanges_Remove, Reader.GetLong() );
-
-                    // действие совпало, не делаем его
-                    if ( false === ChangesPos )
-                        continue;
-
-                    var Pos = ( true !== Debug_ParaRunMode ? this.Internal_Get_RealPos( ChangesPos ) : ChangesPos );
+					var Pos = Reader.GetLong();
                     this.Content.splice( Pos, 1 );
                 }
 
@@ -8722,7 +8696,7 @@ CMathContent.prototype =
 						oGroupChr.fillPlaceholders();
 						break;
 			case 205:	props = {ctrPrp: new CTextPr(), opEmu:1};
-						var oBox = new CBoxprops
+						var oBox = new CBox(props);
 						this.CreateElem(oBox,this);
 						var oElem = oBox.getBase();
 						
@@ -9000,7 +8974,9 @@ CMathContent.prototype =
             }			
             oElem.addElementToContent(MathRun);
 			items.push(MathRun);
-			History.Add(oElem, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});			
+			History.Add(oElem, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});	
+
+			oElem.CurPos++;
         }        
     },
 
@@ -9016,6 +8992,8 @@ CMathContent.prototype =
             oParent.Add(oElem,Pos);
 			items.push(oElem);
 			History.Add(oParent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
+			
+			oElem.CurPos++;
 		}
     },
     CreateFraction : function (oFraction,oParentElem,sNumText,sDenText)

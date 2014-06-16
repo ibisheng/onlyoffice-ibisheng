@@ -1225,7 +1225,7 @@ CDegreeSubSup.prototype.Read_FromBinary2 = function( Reader )
 	{
 		var Flags = Reader.GetLong();
 		if ( Flags & 1 )
-			props.alnScr = Writer.GetBool();	
+			props.alnScr = Reader.GetBool();	
 	}
 	this.fillMathComposition (props, arrElems);
 }
