@@ -4024,64 +4024,64 @@ Cell.prototype.setFont=function(val, bModifyValue){
 	this.oValue.cleanCache();
 };
 Cell.prototype.setFontname=function(val){
+    var oRes = this.sm.setFontname(this, val);
 	this.oValue.setFontname(val);
-	var oRes = this.sm.setFontname(this, val);
 	if(History.Is_On() && oRes.oldVal != oRes.newVal)
 		History.Add(g_oUndoRedoCell, historyitem_Cell_Fontname, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
 	this.oValue.cleanCache();
 };
 Cell.prototype.setFontsize=function(val){
+    var oRes = this.sm.setFontsize(this, val);
 	this.oValue.setFontsize(val);
-	var oRes = this.sm.setFontsize(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
         History.Add(g_oUndoRedoCell, historyitem_Cell_Fontsize, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
 	this.oValue.cleanCache();
 };
 Cell.prototype.setFontcolor=function(val){
+    var oRes = this.sm.setFontcolor(this, val);
 	this.oValue.setFontcolor(val);
-	var oRes = this.sm.setFontcolor(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
         History.Add(g_oUndoRedoCell, historyitem_Cell_Fontcolor, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
 	this.oValue.cleanCache();
 };
 Cell.prototype.setBold=function(val){
+    var oRes = this.sm.setBold(this, val);
 	this.oValue.setBold(val);
-	var oRes = this.sm.setBold(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
         History.Add(g_oUndoRedoCell, historyitem_Cell_Bold, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
 	this.oValue.cleanCache();
 };
 Cell.prototype.setItalic=function(val){
+    var oRes = this.sm.setItalic(this, val);
 	this.oValue.setItalic(val);
-	var oRes = this.sm.setItalic(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
         History.Add(g_oUndoRedoCell, historyitem_Cell_Italic, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
 	this.oValue.cleanCache();
 };
 Cell.prototype.setUnderline=function(val){
+    var oRes = this.sm.setUnderline(this, val);
 	this.oValue.setUnderline(val);
-	var oRes = this.sm.setUnderline(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
         History.Add(g_oUndoRedoCell, historyitem_Cell_Underline, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
 	this.oValue.cleanCache();
 };
 Cell.prototype.setStrikeout=function(val){
+    var oRes = this.sm.setStrikeout(this, val);
 	this.oValue.setStrikeout(val);
-	var oRes = this.sm.setStrikeout(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
         History.Add(g_oUndoRedoCell, historyitem_Cell_Strikeout, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
 	this.oValue.cleanCache();
 };
 Cell.prototype.setFontAlign=function(val){
+    var oRes = this.sm.setFontAlign(this, val);
 	this.oValue.setFontAlign(val);
-	var oRes = this.sm.setFontAlign(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
         History.Add(g_oUndoRedoCell, historyitem_Cell_FontAlign, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
