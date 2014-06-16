@@ -4785,7 +4785,7 @@ cSTDEVPA.prototype.Calculate = function ( arg ) {
                 else if ( elem instanceof  cBool ) {
                     arr0.push( elem.tocNumber() );
                 }
-                else {
+                else if ( elem instanceof  cString ) {
                     arr0.push( new cNumber( 0 ) );
                 }
             } );
@@ -4798,7 +4798,7 @@ cSTDEVPA.prototype.Calculate = function ( arg ) {
             else if ( a instanceof  cBool ) {
                 arr0.push( a.tocNumber() );
             }
-            else {
+            else if ( a instanceof  cString ) {
                 arr0.push( new cNumber( 0 ) );
             }
         }
@@ -4810,7 +4810,7 @@ cSTDEVPA.prototype.Calculate = function ( arg ) {
                 else if ( elem instanceof  cBool ) {
                     arr0.push( elem.tocNumber() );
                 }
-                else {
+                else if ( elem instanceof  cString ) {
                     arr0.push( new cNumber( 0 ) );
                 }
             } );
@@ -4818,7 +4818,7 @@ cSTDEVPA.prototype.Calculate = function ( arg ) {
         else if ( arg[j] instanceof cNumber || arg[j] instanceof cBool ) {
             arr0.push( arg[j].tocNumber() );
         }
-        else if ( arg[j] instanceof cString || arg[j] instanceof  cEmpty ) {
+        else if ( arg[j] instanceof cString ) {
             arr0.push( new cNumber( 0 ) );
         }
         else
