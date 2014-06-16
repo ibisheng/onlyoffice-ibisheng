@@ -1879,7 +1879,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			onSaveCallback: function (e) {
 				var t = this;
 				var nState;
-				if (false == e["savelock"]) {
+				if (false == e["saveLock"]) {
 					if (this.isAutoSave) {
 						this.asc_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 						this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);

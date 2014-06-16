@@ -112,7 +112,7 @@
 			window.setTimeout(function () {
 				if (callback && _.isFunction(callback)) {
 					// Фиктивные вызовы
-					callback({"savelock": false});
+					callback({"saveLock": false});
 				}
 			}, 100);
 		}
@@ -127,6 +127,12 @@
 	CDocsCoApi.prototype.saveChanges = function (arrayChanges, deleteIndex) {
 		if (this._CoAuthoringApi && this._onlineWork) {
 			this._CoAuthoringApi.saveChanges(arrayChanges, null, deleteIndex);
+		}
+	};
+
+	CDocsCoApi.prototype.unLockDocument = function () {
+		if (this._CoAuthoringApi && this._onlineWork) {
+			this._CoAuthoringApi.unLockDocument();
 		}
 	};
 	
@@ -360,11 +366,11 @@
                 }, 5000);//5 sec to signal lock failure
             }
 			if (this._isExcel)
-				this._send({"type": "getlockrange", "block": arrayBlockId});
+				this._send({"type": "getLockRange", "block": arrayBlockId});
 			else if (this._isPresentation)
-				this._send({"type": "getlockpresentation", "block": arrayBlockId});
+				this._send({"type": "getLockPresentation", "block": arrayBlockId});
 			else
-            	this._send({"type": "getlock", "block": arrayBlockId});
+            	this._send({"type": "getLock", "block": arrayBlockId});
 		} else {
 			// Вернем ошибку, т.к. залочены элементы
 			window.setTimeout(function () {
@@ -411,11 +417,11 @@
 				}
 			}, 5000);//5 sec to signal lock failure
 		}
-		this._send({"type": "issavelock"});
+		this._send({"type": "isSaveLock"});
 	};
 	
 	DocsCoApi.prototype.unSaveChanges = function () {
-		this._send({"type": "unsavelock"});
+		this._send({"type": "unSaveLock"});
 	};
 
     DocsCoApi.prototype.releaseLocks = function (blockId) {
@@ -442,9 +448,13 @@
 			}
 		}
 
-		this._send({"type": "savechanges", "changes": JSON.stringify(arrayChanges.slice(startIndex, endIndex)),
+		this._send({"type": "saveChanges", "changes": JSON.stringify(arrayChanges.slice(startIndex, endIndex)),
 			"startSaveChanges": (startIndex === 0), "endSaveChanges": (endIndex === arrayChanges.length),
 			"isCoAuthoring": this.isCoAuthoring, "isExcel": this._isExcel, "deleteIndex": this.deleteIndex});
+	};
+
+	DocsCoApi.prototype.unLockDocument = function () {
+		this._send({"type": "unLockDocument"});
 	};
 
     DocsCoApi.prototype.getUsers = function () {
@@ -464,7 +474,7 @@
     };
 
     DocsCoApi.prototype.getMessages = function () {
-        this._send({"type": "getmessages"});
+        this._send({"type": "getMessages"});
     };
 
     DocsCoApi.prototype.sendMessage = function (message) {
@@ -598,7 +608,7 @@
 	};
 	
 	DocsCoApi.prototype._onSaveLock = function (data) {
-		if (undefined != data["savelock"] && null != data["savelock"]) {
+		if (undefined != data["saveLock"] && null != data["saveLock"]) {
 			var indexCallback = this._saveCallback.length - 1;
 			var oTmpCallback = this._saveCallback[indexCallback];
 			if (oTmpCallback) {
@@ -624,8 +634,6 @@
 			var hasChanges = false;
 			for (var changeId in allServerChanges) if (allServerChanges.hasOwnProperty(changeId)){
 				var change = allServerChanges[changeId];
-				if (change["skipChange"])
-					continue;
 				var changesOneUser = change["changes"];
 				if (changesOneUser) {
 					hasChanges = true;
@@ -846,14 +854,15 @@
 			switch (type) {
 				case 'auth'				: t._onAuth(dataObject); break;
 				case 'message'			: t._onMessages(dataObject); break;
-				case 'getlock'			: t._onGetLock(dataObject); break;
-				case 'releaselock'		: t._onReleaseLock(dataObject); break;
-				case 'connectstate'		: t._onConnectionStateChanged(dataObject); break;
-				case 'savechanges'		: t._onSaveChanges(dataObject); break;
-				case 'savelock'			: t._onSaveLock(dataObject); break;
-				case 'unsavelock'		: t._onUnSaveLock(dataObject); break;
+				case 'getLock'			: t._onGetLock(dataObject); break;
+				case 'releaseLock'		: t._onReleaseLock(dataObject); break;
+				case 'connectState'		: t._onConnectionStateChanged(dataObject); break;
+				case 'saveChanges'		: t._onSaveChanges(dataObject); break;
+				case 'saveLock'			: t._onSaveLock(dataObject); break;
+				case 'unSaveLock'		: t._onUnSaveLock(dataObject); break;
 				case 'savePartChanges'	: t._onSavePartChanges(); break;
 				case 'drop'				: t._onDrop(dataObject); break;
+				case 'waitAuth'			: /*Ждем, когда придет auth, документ залочен*/break;
 			}
 		};
 		sockjs.onclose = function (evt) {

@@ -1597,12 +1597,15 @@ asc_docs_api.prototype._coAuthoringInit = function()
 	this.CoAuthoringApi.onStartCoAuthoring		= function (isStartEvent) {
 		if (t.ParcedDocument) {
 			CollaborativeEditing.Start_CollaborationEditing();
-			editor.asc_setDrawCollaborationMarks(true);
-			editor.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
+			t.asc_setDrawCollaborationMarks(true);
+			t.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
 
 			if (true != History.Is_Clear()) {
 				CollaborativeEditing.Apply_Changes();
 				CollaborativeEditing.Send_Changes();
+			} else {
+				// Изменений нет, но нужно сбросить lock
+				t.CoAuthoringApi.unLockDocument();
 			}
 		} else
 			t.isStartCoAuthoringOnEndLoad = true;
@@ -2773,7 +2776,7 @@ function safe_Apply_Changes()
 function OnSave_Callback(e)
 {
 	var nState;
-    if ( false == e["savelock"] ) {
+    if ( false == e["saveLock"] ) {
 		if (editor.isAutoSave) {
 			editor.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 			editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
