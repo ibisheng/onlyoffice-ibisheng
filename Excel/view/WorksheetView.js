@@ -5256,9 +5256,10 @@
 				oldW = ctxW;
 			}
 
-			if (oldH > 0) {
-				ctx.drawImage(ctx.getCanvas(), x, y, oldW, oldH - lastRowHeight, x + dx, y - dy, oldW, oldH - lastRowHeight);
-				this.drawingGraphicCtx.moveImageData(x, y, oldW, oldH - lastRowHeight, x + dx, y - dy);
+			var moveHeight = oldH - lastRowHeight;
+			if (moveHeight > 0) {
+				ctx.drawImage(ctx.getCanvas(), x, y, oldW, moveHeight, x + dx, y - dy, oldW, moveHeight);
+				this.drawingGraphicCtx.moveImageData(x, y, oldW, moveHeight, x + dx, y - dy);
 			}
 			ctx.setFillStyle(this.settings.cells.defaultState.background)
 				.fillRect(this.headersLeft, y + (scrollDown ? oldH - dy - lastRowHeight : 0),
@@ -5374,9 +5375,10 @@
 
 			this.objectRender.setScrollOffset();
 
+			var moveWidth = oldW - lastColWidth;
 			if (oldW > 0) {
-				ctx.drawImage(ctx.getCanvas(), x, y, oldW - lastColWidth, ctxH, x - dx, y, oldW - lastColWidth, ctxH);
-				this.drawingGraphicCtx.moveImageData(x, y, oldW - lastColWidth, ctxH, x - dx, y);
+				ctx.drawImage(ctx.getCanvas(), x, y, moveWidth, ctxH, x - dx, y, moveWidth, ctxH);
+				this.drawingGraphicCtx.moveImageData(x, y, moveWidth, ctxH, x - dx, y);
 			}
 			ctx.setFillStyle(this.settings.cells.defaultState.background)
 				.fillRect(x + (scrollRight > 0 ? oldW - dx - lastColWidth : 0), y, Math.abs(dx) + lastColWidth, ctxH);
