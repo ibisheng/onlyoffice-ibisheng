@@ -163,7 +163,7 @@ function RateIteration( nper, payment, pv, fv, payType, guess ) {
         return new cNumber( x );
     }
     else{
-        return new cError( cErrorType.wrong_value_type );
+        return new cError( cErrorType.not_numeric );
     }
 }
 
@@ -4576,7 +4576,7 @@ cPRICEMAT.prototype.Calculate = function ( arg ) {
 
     if ( settlement >= maturity ||
         basis < 0 || basis > 4 ||
-        rate <= 0 || yld <= 0 )
+        rate < 0 || yld < 0 )
         return this.value = new cError( cErrorType.not_numeric );
 
     var settl = Date.prototype.getDateFromExcel( settlement ),
@@ -4712,7 +4712,10 @@ function cRATE() {
 cRATE.prototype = Object.create( cBaseFunction.prototype );
 cRATE.prototype.Calculate = function ( arg ) {
 
-    var nper = arg[0], pmt = arg[1], pv = arg[2], fv = arg[3] ? arg[3] : new cNumber( 0 ), type = arg[4] ? arg[4] : new cNumber( 0 ), quess = arg[5] ? arg[5] : new cNumber( 0.1 );
+    var nper = arg[0], pmt = arg[1], pv = arg[2],
+        fv = arg[3] ? arg[3] : new cNumber( 0 ),
+        type = arg[4] ? arg[4] : new cNumber( 0 ),
+        quess = arg[5] ? arg[5] : new cNumber( 0.1 );
 
     if ( nper instanceof cArea || nper instanceof cArea3D ) {
         nper = nper.cross( arguments[1].first );
@@ -4770,9 +4773,16 @@ cRATE.prototype.Calculate = function ( arg ) {
     if ( type instanceof cError ) return this.value = type;
     if ( quess instanceof cError ) return this.value = quess;
 
-    if ( type.getValue() != 1 && type.getValue() != 0 ) return this.value = new cError( cErrorType.not_numeric );
+    nper = nper.getValue();
+    pmt = pmt.getValue();
+    pv = pv.getValue();
+    fv = fv.getValue();
+    type = type.getValue();
+    quess = quess.getValue();
 
-    this.value = new cNumber( RateIteration( nper.getValue(), pmt.getValue(), pv.getValue(), fv.getValue(), type.getValue(), quess.getValue() ) );
+    if ( type != 1 && type != 0 || nper <= 0 || pmt >= 0 ) return this.value = new cError( cErrorType.not_numeric );
+
+    this.value = new cNumber( RateIteration( nper, pmt, pv, fv, type, quess ) );
     this.value.numFormat = 9;
     return this.value;
 };

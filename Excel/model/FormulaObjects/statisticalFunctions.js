@@ -1639,8 +1639,9 @@ cFREQUENCY.prototype.getInfo = function () {
 
 function cFTEST() {
     cBaseFunction.call( this, "FTEST" );
-    cFTEST.prototype = Object.create( cBaseFunction.prototype )
 }
+
+cFTEST.prototype = Object.create( cBaseFunction.prototype )
 
 function cGAMMADIST() {
     cBaseFunction.call( this, "GAMMADIST" );
