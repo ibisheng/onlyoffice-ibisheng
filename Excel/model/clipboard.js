@@ -1510,7 +1510,7 @@
 						}
 						else
 						{
-							worksheet.setSelectionInfo('paste',t,false,true);
+							//worksheet.setSelectionInfo('paste',t,false,true);
 							
 							window.GlobalPasteFlag = false;
 							window.GlobalPasteFlagCounter = 0;
