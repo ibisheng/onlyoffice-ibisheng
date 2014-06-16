@@ -2539,12 +2539,16 @@ ParaNewLine.prototype =
         if ( false === this.Flags.Use )
             return;
         
-        if ( typeof (editor) !== "undefined" && editor.ShowParaMarks )
+        if ( undefined !== editor && editor.ShowParaMarks )
         {
+            // Цвет и шрифт можно не запоминать и не выставлять старый, т.к. на данном элемента всегда заканчивается
+            // отрезок обтекания или целая строка. 
+            
             switch( this.BreakType )
             {
                 case break_Line:
                 {
+                    Context.b_color1(0, 0, 0, 255);
                     Context.SetFont( {FontFamily: { Name : "ASCW3", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
                     Context.FillText( X, Y, String.fromCharCode( 0x0038/*0x21B5*/ ) );
                     break;
@@ -2554,8 +2558,6 @@ ParaNewLine.prototype =
                     var strPageBreak = this.Flags.BreakPageInfo.Str;
                     var Widths       = this.Flags.BreakPageInfo.Widths;
 
-                    var OldColor = Common_CopyObj( Context.m_oBrush.Color1 );
-                    var OldFont  = Context.GetFont();
                     Context.b_color1( 0, 0 , 0, 255);
                     Context.SetFont( {FontFamily: { Name : "Courier New", Index : -1 }, FontSize: 8, Italic: false, Bold : false} );
 
@@ -2565,9 +2567,6 @@ ParaNewLine.prototype =
                         Context.FillText( X, Y, strPageBreak[Index] );
                         X += Widths[Index];
                     }
-
-                    Context.b_color1( OldColor.R, OldColor.G, OldColor.B, OldColor.A);
-                    Context.SetFont( OldFont );
 
                     break;
                 }

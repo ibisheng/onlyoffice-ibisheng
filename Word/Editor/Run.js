@@ -788,6 +788,13 @@ ParaRun.prototype =
             return false;
 
         var Type = Changes[0].Data.Type;
+        var Item = Changes[0].Data.Items[0];
+        
+        // Добавление/удаление картинок может изменить размер строки. 
+        // TODO: Но на самом деле стоило бы сделать нормальную проверку на высоту строки в функции Recalculate_Fast
+        if ( undefined === Item || para_Drawing === Item.Type )
+            return false;
+        
         if ( historyitem_ParaRun_AddItem === Type || historyitem_ParaRun_RemoveItem === Type )
             return true;
 

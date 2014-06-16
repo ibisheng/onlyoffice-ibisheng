@@ -746,7 +746,7 @@ CDocument.prototype =
         this.RecalcId++;
 
         // Если задан параметр _RecalcData, тогда мы не можем ориентироваться на историю
-        if ( true === Debug_ParaRunMode && undefined === _RecalcData )
+        if ( undefined === _RecalcData )
         {
             // Проверяем можно ли сделать быстрый пересчет
             var SimpleChanges = History.Is_SimpleChanges();

@@ -532,22 +532,6 @@ CAbstractNum.prototype =
             Lvl.Format = numbering_numfmt_Bullet;
             Lvl.Jc     = align_Left;
 
-            if ( 0 == Index % 3 )
-            {
-                Lvl.Jc     = align_Left;
-            }
-            else if ( 1 == Index % 3 )
-            {
-                Lvl.Jc     = align_Left;
-                Lvl.Format = numbering_numfmt_LowerLetter;
-            }
-            else
-            {
-                Lvl.Jc     = align_Right;
-                Lvl.Format = numbering_numfmt_LowerRoman;
-                FirstLine  = -9 * g_dKoef_pt_to_mm;
-            }
-
             Lvl.LvlText = [];
             switch( Index )
             {
@@ -586,7 +570,7 @@ CAbstractNum.prototype =
 
             var TextPr = new CTextPr();
             if ( 3 === Index || 4 === Index || 7 === Index || 8 === Index )
-                TextPr.RFonts.Set_All( "Times New Roman", -1 );
+                TextPr.RFonts.Set_All( "Symbol", -1 );
             else
                 TextPr.RFonts.Set_All( "Wingdings", -1 );
 

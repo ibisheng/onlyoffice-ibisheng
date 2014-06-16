@@ -650,15 +650,19 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
         Use      : false,
         StartPos :
         {
-            Pos : { Row : 0, Cell : 0 },
-            X   : 0,
-            Y   : 0
+            Pos        : { Row : 0, Cell : 0 },
+            X          : 0,
+            Y          : 0,
+            PageIndex  : 0,
+            MouseEvent : { ClickCount : 1, Type : g_mouse_event_type_down, CtrlKey : false }
         },
         EndPos   :
         {
-            Pos : { Row : 0, Cell : 0 },
-            X   : 0,
-            Y   : 0
+            Pos        : { Row : 0, Cell : 0 },
+            X          : 0,
+            Y          : 0,
+            PageIndex  : 0,
+            MouseEvent : { ClickCount : 1, Type : g_mouse_event_type_down, CtrlKey : false }
         },
         Type     : table_Selection_Text,
         Data     : null,
