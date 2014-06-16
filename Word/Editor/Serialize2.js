@@ -1845,9 +1845,9 @@ function Binary_oMathWriter(memory, oMathPara)
 						case MATH_FUNCTION			: this.bs.WriteItem(c_oSer_OMathContentType.Func, function(){oThis.WriteFunc(item);});			break;
 						case MATH_GROUP_CHARACTER	: this.bs.WriteItem(c_oSer_OMathContentType.GroupChr, function(){oThis.WriteGroupChr(item);});	break;
 						case MATH_LIMIT				: 
-							if (LIMIT_LOW  == item.type)
+							if (LIMIT_LOW  == item.Pr.type)
 								this.bs.WriteItem(c_oSer_OMathContentType.LimLow, function(){oThis.WriteLimLow(item);});
-							else if (LIMIT_UP == item.type)
+							else if (LIMIT_UP == item.Pr.type)
 								this.bs.WriteItem(c_oSer_OMathContentType.LimUpp, function(){oThis.WriteLimUpp(item);});
 							break;
 						case MATH_MATRIX			: this.bs.WriteItem(c_oSer_OMathContentType.Matrix, function(){oThis.WriteMatrix(item);});		break;
@@ -1858,15 +1858,15 @@ function Binary_oMathWriter(memory, oMathPara)
 						case MATH_RUN			: this.bs.WriteItem(c_oSer_OMathContentType.MRun, function(){oThis.WriteMRun(item);});			break;
 						case MATH_RADICAL		: this.bs.WriteItem(c_oSer_OMathContentType.Rad, function(){oThis.WriteRad(item);});			break;
 						case MATH_DEGREESubSup	: 
-							if (DEGREE_PreSubSup == item.type)
+							if (DEGREE_PreSubSup == item.Pr.type)
 								this.bs.WriteItem(c_oSer_OMathContentType.SPre, function(){oThis.WriteSPre(item);});	
-							else if (DEGREE_SubSup == item.type)
+							else if (DEGREE_SubSup == item.Pr.type)
 								this.bs.WriteItem(c_oSer_OMathContentType.SSubSup, function(){oThis.WriteSSubSup(item);});
 							break;
 						case MATH_DEGREE		: 
-							if (DEGREE_SUBSCRIPT == item.type)
+							if (DEGREE_SUBSCRIPT == item.Pr.type)
 								this.bs.WriteItem(c_oSer_OMathContentType.SSub, function(){oThis.WriteSSub(item);});
-							else if (DEGREE_SUPERSCRIPT == item.type)
+							else if (DEGREE_SUPERSCRIPT == item.Pr.type)
 								this.bs.WriteItem(c_oSer_OMathContentType.SSup, function(){oThis.WriteSSup(item);});
 							break;
 					}

@@ -7759,6 +7759,7 @@ Paragraph.prototype =
 					var Elem = new ParaMath();
 					//Elem.Set_Paragraph(this);
 					Elem.Root.Load_FromMenu(Item.Menu, this);
+					Elem.Root.SetRunEmptyToContent(true);
                     // Добавляем гиперссылку в содержимое параграфа
                     this.Internal_Content_Add( CurPos + 1, Elem );
 

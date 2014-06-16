@@ -203,8 +203,9 @@ ParaMath.prototype =
 					History.Add(oContent.Content, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
 				}
 				
-				oContent.Content.SetRunEmptyToContent(false);
+				
 			}
+			oContent.Content.SetRunEmptyToContent(true);
 		}
 	},
 
@@ -231,6 +232,7 @@ ParaMath.prototype =
 				History.Add(oContent.Content, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: 0});
 				
 				var oMRun = new ParaRun(this.Paragraph, true);
+				oMRun.StartLine = 0; oMRun.StartRange = 0;
 				oContent.Content.addElementToContent(oMRun);
 				var items = [];
 				items.push(oMRun);
@@ -242,7 +244,7 @@ ParaMath.prototype =
 			{
 				History.Create_NewPoint();
 				oElem.Remove(Direction, bOnAddText);
-				if(oElem.Content.length == 0) //тк pararun пустой, удаляем его
+				if(oElem.Content.length == 0 && !bOnAddText) //тк pararun пустой, удаляем его
 				{
 					var Items = [];
 					Items.push(oElem.Parent.content[0]);
