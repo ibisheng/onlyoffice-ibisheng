@@ -1,5 +1,8 @@
 "use strict";
 
+var MATH_MC_JC = MCJC_CENTER;
+
+
 function CMathMatrix(props)
 {
 	this.Id = g_oIdCounter.Get_NewId();
@@ -16,7 +19,7 @@ function CMathMatrix(props)
         rSp:        0,
         rSpRule:    0,
 
-        mcJc:       MCJC_CENTER,
+        mcJc:       new Array(),
         baseJc:     BASEJC_CENTER,
         plcHide:    false
     };
@@ -87,11 +90,15 @@ CMathMatrix.prototype.recalculateSize = function(oMeasure)
         this.setRuleGap(this.spaceColumn, this.Pr.cGpRule, this.Pr.cGp, this.Pr.cSp);
         this.setRuleGap(this.spaceRow, this.Pr.rSpRule, this.Pr.rSp);
 
+        for(var j = 0; j < this.nCol; j++)
+            this.alignment.wdt[j] = this.Pr.mcJc[j];
+
         if(this.Pr.plcHide)
             this.hidePlaceholder(true);
 
         this.RecalcInfo.bProps = false;
     }
+
 
     var txtPrp = this.Get_CompiledCtrPrp();
 
@@ -406,8 +413,23 @@ CMathMatrix.prototype.setProperties = function(props)
     if(props.baseJc === BASEJC_CENTER || props.baseJc === BASEJC_TOP || props.baseJc === BASEJC_BOTTOM)
         this.Pr.baseJc = props.baseJc;
 
-    if(props.mcJc == MCJC_CENTER || props.mcJc == MCJC_LEFT || props.mcJc == MCJC_RIGHT)
-        this.mcJc = props.mcJc;
+
+    if(props.mcJc.constructor.name == "Array" && props.mcJc.length == props.column)
+    {
+        for(var i = 0; i < this.nCol; i++)
+        {
+            if(props.mcJc[i] == MCJC_LEFT || props.mcJc[i] == MCJC_RIGHT || props.mcJc[i] == MCJC_CENTER)
+                this.Pr.mcJc[i] = props.mcJc[i];
+            else
+                this.Pr.mcJc[i] = MCJC_CENTER;
+        }
+    }
+    else
+    {
+        for(var j = 0; j < this.nCol; j++)
+            this.Pr.mcJc[j] = MCJC_CENTER;
+    }
+
 
     this.Pr.cGpRule = props.cGpRule;
     this.Pr.cGp     = props.cGp;
@@ -721,4 +743,19 @@ CEqArray.prototype.Read_FromBinary2 = function( Reader )
 CEqArray.prototype.Get_Id = function()
 {
 	return this.Id;
+}
+
+function TEST_MATH_JUCTIFICATION(mcJc)
+{
+    MATH_MC_JC = mcJc;
+
+    editor.WordControl.m_oLogicDocument.Content[0].Content[0].Root.Resize(null, editor.WordControl.m_oLogicDocument.Content[0].Content[0] , g_oTextMeasurer);
+
+    var pos = new CMathPosition();
+    pos.x = 0;
+    pos.y = 0;
+    editor.WordControl.m_oLogicDocument.Content[0].Content[0].Root.setPosition(pos);
+
+    editor.WordControl.m_oLogicDocument.DrawingDocument.ClearCachePages();
+    editor.WordControl.m_oLogicDocument.DrawingDocument.FirePaint();
 }

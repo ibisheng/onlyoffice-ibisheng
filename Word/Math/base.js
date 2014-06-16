@@ -5,8 +5,6 @@ function CMathBase()
 {
     this.typeObj = MATH_COMP;
 
-    // {align: {height: alpha, width: betta}}  alpha & betta коэффициенты в интервале от 0 до 1, либо CENTER
-
     this.pos = new CMathPosition();
     this.size = null;
 
@@ -19,17 +17,8 @@ function CMathBase()
     this.CompiledCtrPrp = new CTextPr();
    /////////////////
 
-    //this.RunPrp = new CMathRunPrp();
-
     this.CurPos_X = 0;
     this.CurPos_Y = 0;
-
-
-    /*this.selectPos =
-    {
-        startX:    0,
-        startY:    0
-    };*/
 
     this.SelectStart_X = 0;
     this.SelectStart_Y = 0;
@@ -94,11 +83,17 @@ CMathBase.prototype =
         this.alignment.hgt = [];
         this.alignment.wdt = [];
 
-        for(var u = 0; u < this.nCol ; u++)
-            this.alignment.hgt[u] = CENTER;
+        /*for(var u = 0; u < this.nCol ; u++)
+            this.alignment.hgt[u] = MCJC_CENTER;
 
         for(u=0; u < this.nRow; u++)
-            this.alignment.wdt[u] = CENTER;
+            this.alignment.wdt[u] = MCJC_CENTER;*/
+
+        for(var i = 0; i < this.nCol ; i++)
+            this.alignment.wdt[i] = MCJC_CENTER;
+
+        for(var j=0; j < this.nRow; j++)
+            this.alignment.hgt[j] = MCJC_CENTER;
     },
     ///////// RunPrp, CtrPrp
     setCtrPrp: function(txtPrp) // выставляем ctrPrp на чтение
@@ -665,7 +660,7 @@ CMathBase.prototype =
     {
         var PosAlign = new CMathPosition();
 
-        if(this.alignment.hgt[pos_y] == CENTER)
+        if(this.alignment.hgt[pos_x] == MCJC_CENTER)
         {
             var maxAsc = 0;
             var _ascent;
@@ -684,10 +679,17 @@ CMathBase.prototype =
 
             for(var j=0; j < this.nCol; j++)
             {
-                var _h = this.elements[pos_x][j].size.height;
+                _h = this.elements[pos_x][j].size.height;
                 maxH = ( maxH > _h ) ? maxH : _h;
             }
-            PosAlign.y = (maxH - this.elements[pos_x][pos_y].size.height)*this.alignment.hgt[pos_y];
+
+            var coeffHgt;
+            if(this.alignment.hgt[pos_x] == MCJC_RIGHT)
+                coeffHgt = 1;
+            else
+                coeffHgt = 0;
+
+            PosAlign.y = (maxH - this.elements[pos_x][pos_y].size.height)*coeffHgt;
         }
 
         var maxW  = 0;
@@ -697,10 +699,18 @@ CMathBase.prototype =
             maxW = ( maxW > _w ) ? maxW : _w;
         }
 
-        if(this.alignment.wdt[pos_x] == CENTER)
+        if(this.alignment.wdt[pos_y] == MCJC_CENTER)
             PosAlign.x = (maxW - this.elements[pos_x][pos_y].size.width)*0.5;
         else
-            PosAlign.x = (maxW - this.elements[pos_x][pos_y].size.width)*this.alignment.wdt[pos_x];
+        {
+            var coeffWdt;
+            if(this.alignment.wdt[pos_y] == MCJC_RIGHT)
+                coeffWdt = 1;
+            else
+                coeffWdt = 0;
+
+            PosAlign.x = (maxW - this.elements[pos_x][pos_y].size.width)*coeffWdt;
+        }
 
         return PosAlign;
     },
@@ -966,11 +976,6 @@ CMathBase.prototype =
 
         this.size = {width: width, height: height, ascent: ascent};
     },
-    /*RecalculateReverse: function(oMeasure)
-    {
-        this.recalculateSize();
-        this.Parent.RecalculateReverse(oMeasure);
-    },*/
     Resize: function(Parent, ParaMath, oMeasure)
     {
         this.Parent = Parent;
@@ -988,20 +993,6 @@ CMathBase.prototype =
                 this.elements[i][j].Resize(this, ParaMath, oMeasure);
 
         this.recalculateSize(oMeasure); // передаем oMeasure, для
-    },
-    old_getCenter: function(_height)
-    {
-        var res = 0;
-        if(this.nRow > 1)
-        {
-            res = _height || this.size.height;
-            res /=2;
-        }
-        else
-            for(var i=0; i< this.nCol; i++)
-                res = (this.elements[0][i].size.center > res) ?  this.elements[0][i].size.center : res;
-        
-        return res;
     },
     getAscent: function(oMeasure, _height)
     {
