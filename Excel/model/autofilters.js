@@ -1168,7 +1168,7 @@ var gUndoInsDelCellsFlag = true;
 				//проверяем, затрагивают ли данные кнопки визуальную область
 				if (buttons) {
 					for (var i = 0; i < buttons.length; i++) {
-						if (!this._isNeedDrawButton(buttons[i]))
+						if (!this._isNeedDrawButton(buttons[i], updatedRange))
 							continue;
 
 						var range = ws.model.getCell(new CellAddress(buttons[i].id)).getCells();
@@ -6963,10 +6963,10 @@ var gUndoInsDelCellsFlag = true;
 				return true;
 			},
 			
-			_isNeedDrawButton: function(button) {
-				var visibleRange = this.worksheet.visibleRange; 
+			_isNeedDrawButton: function(button, range) {
+				// ToDo уйти от перевода id в диапазон
 				var buttonRange = this._idToRange(button.id);
-				return (buttonRange.r1 >= visibleRange.r1 && buttonRange.r1 <= visibleRange.r2 && buttonRange.c1 >= visibleRange.c1 && buttonRange.c1 <= visibleRange.c2)
+				return range.contains(buttonRange.c1, buttonRange.r1);
 			},
 			
 			_clearFormatTableStyle: function(range)
