@@ -9529,7 +9529,6 @@ function Binary_oMathReader(stream)
 				{
 					var oText = new CMathText(false);
 					oText.addTxt(text[i]);
-					History.Add( this, { Type : historyitem_ParaRun_AddItem, Pos : i, EndPos : i, Items : oText } );
 					oMRun.Content.splice( i, 0, oText );
 				}
 				/*в будущем переделка под para_space
