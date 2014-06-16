@@ -380,7 +380,8 @@
                 standarts = [];
                 for (var i = 0; i < window.g_font_infos.length; i++)
                 {
-                    standarts.push(window.g_font_infos[i].Name);
+                    if (window.g_font_infos[i].Name != "ASCW3")
+                        standarts.push(window.g_font_infos[i].Name);
                 }
             }
 
@@ -443,8 +444,11 @@
                     
                     if (info.Type == FONT_TYPE_ADDITIONAL)
                     {
-                        var __font = new CFont(info.Name, "", info.Type, info.Thumbnail);
-                        gui_fonts[gui_count++] = __font;
+                        if (info.name != "ASCW3")
+                        {
+                            var __font = new CFont(info.Name, "", info.Type, info.Thumbnail);
+                            gui_fonts[gui_count++] = __font;
+                        }
                     }
                 }
                 else
