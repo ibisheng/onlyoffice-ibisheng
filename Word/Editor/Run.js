@@ -4344,7 +4344,8 @@ ParaRun.prototype =
         this.Recalc_CompiledPr(true);
 
         // TODO: Орфография: пока сделаем так, в будущем надо будет переделать
-        this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+        if(undefined !== this.Paragraph && this.Paragraph !== null)
+            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
     },
 
     Apply_TextPr : function(TextPr, IncFontSize, ApplyToAll)

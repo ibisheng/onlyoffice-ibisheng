@@ -6079,8 +6079,8 @@ CMathContent.prototype =
             if(bCurrComp && !bLeftRun) // добавление пустого Run перед мат объектом
             {
                 var emptyRun = new ParaRun(null, true);
-                //var txtPrp = current.Get_TxtPrp();
-                //emptyRun.Set_Pr(txtPrp);
+                var txtPrp = current.Get_CtrPrp();
+                emptyRun.Set_Pr(txtPrp);
 
                 NewContent.push(emptyRun);
                 NewContent.push(this.content[i]); // Math Object
@@ -6104,8 +6104,8 @@ CMathContent.prototype =
             var emptyRun = new ParaRun(null, true);
 
             //var emptyRun = new ParaRun(this.ParaMath.Paragraph, true);
-            //var txtPrp = current.Get_TxtPrp();
-            //emptyRun.Set_Pr(txtPrp);
+            var txtPrp = current.Get_CtrPrp();
+            emptyRun.Set_Pr(txtPrp);
 
             NewContent.push(emptyRun);
         }

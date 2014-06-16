@@ -814,6 +814,48 @@ ParaMath.prototype =
 // Функция для работы с формулой
 // в тч с  дефолтными текстовыми настройками и argSize
 //-----------------------------------------------------------------------------------
+    MathToImageConverter: function()
+    {
+        window.IsShapeToImageConverter = true;
+
+        var dKoef = g_dKoef_mm_to_pix;
+        var w_mm = this.Width;
+        var h_mm = this.Height;
+        var w_px = (w_mm * dKoef) >> 0;
+        var h_px = (h_mm * dKoef) >> 0;
+
+        var _need_pix_width     = this.Width + 1;
+        var _need_pix_height    = this.Height + 1;
+
+        var _canvas = document.createElement('canvas');
+        _canvas.width = w_px;
+        _canvas.height = h_px;
+
+        var _ctx = _canvas.getContext('2d');
+
+        var g = new CGraphics();
+        g.init(_ctx, w_px, h_px, w_mm, h_mm);
+        g.m_oFontManager = g_fontManager;
+
+        g.m_oCoordTransform.tx = 0;
+        g.m_oCoordTransform.ty = 0;
+        g.transform(1,0,0,1,0,0);
+
+        this.Root.draw( 0, 0, g);
+
+        window.IsShapeToImageConverter = false;
+
+        var _ret = { ImageNative : _canvas, ImageUrl : "" };
+        try
+        {
+            _ret.ImageUrl = _canvas.toDataURL("image/png");
+        }
+        catch (err)
+        {
+            _ret.ImageUrl = "";
+        }
+        return _ret;
+    },
     ApplyArgSize : function(oWPrp, argSize)
     {
         var tPrp = new CTextPr();
@@ -1454,3 +1496,13 @@ ParaMath.prototype =
 		
 	}
 };
+
+var MATH_CTX = null;
+
+function TEST_MATH_ImageConverter()
+{
+    var dataImg = editor.WordControl.m_oLogicDocument.Content[0].Content[0].MathToImageConverter();
+
+    console.log(dataImg.ImageUrl);
+
+}

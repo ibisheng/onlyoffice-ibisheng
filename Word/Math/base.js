@@ -677,7 +677,7 @@ CMathBase.prototype =
             var maxH = 0;
             var _h;
 
-            for(var j=0; j < this.nCol; j++)
+            for(var j = 0; j < this.nCol; j++)
             {
                 _h = this.elements[pos_x][j].size.height;
                 maxH = ( maxH > _h ) ? maxH : _h;
