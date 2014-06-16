@@ -401,10 +401,10 @@ CMathMatrix.prototype.setProperties = function(props)
 {
     this.setCtrPrp(props.ctrPrp);
 
-    if(typeof(props.row) !== "undefined" || props.row !== null)
+    if(typeof(props.row) !== "undefined" && props.row !== null)
         this.nRow = props.row;
 
-    if(typeof(props.column) !== "undefined" || props.column !== null)
+    if(typeof(props.column) !== "undefined" && props.column !== null)
         this.nCol = props.column;
 
     if(props.plcHide === true || props.plcHide === 1)
@@ -414,7 +414,7 @@ CMathMatrix.prototype.setProperties = function(props)
         this.Pr.baseJc = props.baseJc;
 
 
-    if(props.mcJc.constructor.name == "Array" && props.mcJc.length == props.column)
+    if(typeof(props.mcJc) !== "undefined" && props.mcJc !== null && props.mcJc.constructor.name == "Array" && props.mcJc.length == props.column)
     {
         for(var i = 0; i < this.nCol; i++)
         {
