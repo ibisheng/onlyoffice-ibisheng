@@ -13128,11 +13128,19 @@ CLegend.prototype =
     {
         History.Add(this, {Type: historyitem_Legend_SetLegendPos,oldPr: this.legendPos, newPr: legendPos});
         this.legendPos = legendPos;
+        if(this.parent && this.parent.parent)
+        {
+            this.parent.parent.handleUpdateInternalChart();
+        }
     },
     setOverlay: function(overlay)
     {
         History.Add(this, {Type: historyitem_Legend_SetOverlay,oldPr: this.overlay, newPr: overlay});
         this.overlay = overlay;
+        if(this.parent && this.parent.parent)
+        {
+            this.parent.parent.handleUpdateInternalChart();
+        }
     },
     setSpPr: function(spPr)
     {
@@ -13190,11 +13198,19 @@ CLegend.prototype =
             case historyitem_Legend_SetLegendPos:
             {
                 this.legendPos = data.oldPr;
+                if(this.parent && this.parent.parent)
+                {
+                    this.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_Legend_SetOverlay:
             {
                 this.overlay = data.oldPr;
+                if(this.parent && this.parent.parent)
+                {
+                    this.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_Legend_SetSpPr:
@@ -13234,11 +13250,19 @@ CLegend.prototype =
             case historyitem_Legend_SetLegendPos:
             {
                 this.legendPos = data.newPr;
+                if(this.parent && this.parent.parent)
+                {
+                    this.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_Legend_SetOverlay:
             {
                 this.overlay = data.newPr;
+                if(this.parent && this.parent.parent)
+                {
+                    this.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_Legend_SetSpPr:
@@ -13353,6 +13377,10 @@ CLegend.prototype =
                 {
                     this.legendPos = null;
                 }
+                if(this.parent && this.parent.parent)
+                {
+                    this.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_Legend_SetOverlay:
@@ -13364,6 +13392,10 @@ CLegend.prototype =
                 else
                 {
                     this.overlay = null;
+                }
+                if(this.parent && this.parent.parent)
+                {
+                    this.parent.parent.handleUpdateInternalChart();
                 }
                 break;
             }
