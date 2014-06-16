@@ -275,6 +275,7 @@
 		};
 
 		CCollaborativeEditing.prototype.getRecalcIndexSave = function (oRecalcIndex) {
+			var bHasIndex = false;
 			var result = {};
 			var element = null;
 			for (var sheetId in oRecalcIndex) {
@@ -282,6 +283,7 @@
 					continue;
 				result[sheetId] = {"_arrElements": []};
 				for (var i = 0, length = oRecalcIndex[sheetId]._arrElements.length; i < length; ++i) {
+					bHasIndex = true;
 					element = oRecalcIndex[sheetId]._arrElements[i];
 					result[sheetId]["_arrElements"].push({"_recalcType" : element._recalcType,
 						"_position" : element._position, "_count" : element._count,
@@ -289,7 +291,7 @@
 				}
 			}
 
-			return result;
+			return bHasIndex ? result : null;
 		};
 
 		CCollaborativeEditing.prototype.S4 = function () {
@@ -489,12 +491,12 @@
 
 				oRangeOrObjectId = element["rangeOrObjectId"];
 
-				if (oRecalcIndexColumns.hasOwnProperty(sheetId)) {
+				if (oRecalcIndexColumns && oRecalcIndexColumns.hasOwnProperty(sheetId)) {
 					// Пересчет колонок
 					oRangeOrObjectId["c1"] = oRecalcIndexColumns[sheetId].getLockMe(oRangeOrObjectId["c1"]);
 					oRangeOrObjectId["c2"] = oRecalcIndexColumns[sheetId].getLockMe(oRangeOrObjectId["c2"]);
 				}
-				if (oRecalcIndexRows.hasOwnProperty(sheetId)) {
+				if (oRecalcIndexRows && oRecalcIndexRows.hasOwnProperty(sheetId)) {
 					// Пересчет строк
 					oRangeOrObjectId["r1"] = oRecalcIndexRows[sheetId].getLockMe(oRangeOrObjectId["r1"]);
 					oRangeOrObjectId["r2"] = oRecalcIndexRows[sheetId].getLockMe(oRangeOrObjectId["r2"]);

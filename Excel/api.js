@@ -1599,15 +1599,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 								oRecalcIndexRows = t.collaborativeEditing.addRecalcIndex(oElement["type"], oElement["index"]);
 							}
 						}
+					}
 
-						// Теперь нужно пересчитать индексы для lock-элементов
-						if (null !== oRecalcIndexColumns && null !== oRecalcIndexRows) {
-							t.collaborativeEditing._recalcLockArray(c_oAscLockTypes.kLockTypeMine, oRecalcIndexColumns, oRecalcIndexRows);
-							t.collaborativeEditing._recalcLockArray(c_oAscLockTypes.kLockTypeOther, oRecalcIndexColumns, oRecalcIndexRows);
-
-							oRecalcIndexColumns = null;
-							oRecalcIndexRows = null;
-						}
+					// Теперь нужно пересчитать индексы для lock-элементов
+					if (null !== oRecalcIndexColumns || null !== oRecalcIndexRows) {
+						t.collaborativeEditing._recalcLockArray(c_oAscLockTypes.kLockTypeMine, oRecalcIndexColumns, oRecalcIndexRows);
+						t.collaborativeEditing._recalcLockArray(c_oAscLockTypes.kLockTypeOther, oRecalcIndexColumns, oRecalcIndexRows);
 					}
 
 					// т.е. если bSendEvent не задан, то посылаем  сообщение + если мы уже открыли документ
@@ -1676,10 +1673,15 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					var arrChanges = this.wbModel.SerializeHistory();
 					if (this.collaborativeEditing.getCollaborativeEditing()) {
 						// Пересчетные индексы добавляем только если мы не одни
-						arrChanges.push({"index" : recalcIndexColumns, "type" : "0"});
-						arrChanges.push({"index" : recalcIndexRows, "type" : "1"});
+						if (recalcIndexColumns)
+							arrChanges.push({"index" : recalcIndexColumns, "type" : "0"});
+						if (recalcIndexRows)
+							arrChanges.push({"index" : recalcIndexRows, "type" : "1"});
 					}
-					this.CoAuthoringApi.saveChanges(arrChanges);
+					if (0 < arrChanges.length)
+						this.CoAuthoringApi.saveChanges(arrChanges);
+					else
+						this.CoAuthoringApi.unLockDocument();
 				}
 			},
 
