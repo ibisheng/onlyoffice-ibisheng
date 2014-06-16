@@ -1906,14 +1906,14 @@ function Binary_oMathWriter(memory, oMathPara)
 		//var oText = {Text: ""};
 		//oMRun.Get_Text(oText);
 		var props = oMRun.getPropsForWrite();
-		var oText = null;
+		var oText = "";
 		var ContentLen = oMRun.Content.length;
         for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
 		{
 			var Item = oMRun.Content[CurPos];
-			switch ( Item.type )
+			switch ( Item.Type )
             {
-				case para_Text : oText += String.fromCharCode(Item.value); break;
+				case para_Math_Text : oText += String.fromCharCode(Item.value); break;
             	case para_Space:
             	case para_Tab  : oText += " "; break;
             }
@@ -1921,8 +1921,7 @@ function Binary_oMathWriter(memory, oMathPara)
 		
 		this.bs.WriteItem(c_oSer_OMathContentType.RPr,	function(){oThis.brPrs.Write_rPr(props.wRPrp);}); // w:rPr
 		this.bs.WriteItem(c_oSer_OMathContentType.MRPr,	function(){oThis.WriteMRPr(props.mathRPrp);}); // m:rPr
-		if (oText != null)
-			this.bs.WriteItem(c_oSer_OMathContentType.MText, function(){ oThis.memory.WriteString2(oText);});	
+		this.bs.WriteItem(c_oSer_OMathContentType.MText, function(){ oThis.memory.WriteString2(oText);});	
 	}
 	this.WriteAcc = function(oAcc)
 	{
