@@ -4678,7 +4678,7 @@ cSTDEVP.prototype.Calculate = function ( arg ) {
 
         }
 
-        return new cNumber( Math.sqrt( sumSQRDeltaX / xLength ) );
+        return new cNumber( isNaN(_x) ? new cError( cErrorType.division_by_zero ) : Math.sqrt( sumSQRDeltaX / xLength ) );
 
     }
 

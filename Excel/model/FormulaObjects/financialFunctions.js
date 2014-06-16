@@ -4865,12 +4865,19 @@ cRECEIVED.prototype.Calculate = function ( arg ) {
     if ( discount instanceof cError ) return this.value = discount;
     if ( basis instanceof cError ) return this.value = basis;
 
-    if ( settlement.getValue() >= maturity.getValue() || investment.getValue() <= 0 || discount.getValue() <= 0 || basis.getValue() < 0 || basis.getValue() > 4 )
+    settlement = settlement.getValue();
+    maturity = maturity.getValue();
+    investment = investment.getValue();
+    discount = discount.getValue();
+    basis = basis.getValue();
+
+    if ( settlement >= maturity || investment <= 0 || discount <= 0 || basis < 0 || basis > 4 ){
         return this.value = new cError( cErrorType.not_numeric );
+    }
 
-    var res = investment.getValue() / ( 1 - ( discount.getValue() * yearFrac( Date.prototype.getDateFromExcel( settlement.getValue() ), Date.prototype.getDateFromExcel( maturity.getValue() ), basis.getValue() ) ) );
+    var res = investment / ( 1 - ( discount * yearFrac( Date.prototype.getDateFromExcel( settlement ), Date.prototype.getDateFromExcel( maturity ), basis ) ) );
 
-    this.value = new cNumber( res );
+    this.value = res >= 0 ? new cNumber( res ) : new cError( cErrorType.not_numeric );
 //    this.value.numFormat = 9;
     return this.value;
 
