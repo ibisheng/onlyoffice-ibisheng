@@ -2904,7 +2904,7 @@ var gUndoInsDelCellsFlag = true;
 						}
 					}
 							
-					var newRange = {};
+					var newRange = {}, oldRange;
 					for(var i = 0; i < oldFilters.length; i++)
 					{
 						if(!oldFilters[i].Ref || oldFilters[i].Ref == "")
