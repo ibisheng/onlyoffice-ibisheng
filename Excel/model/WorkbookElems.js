@@ -2756,14 +2756,8 @@ CCellValue.prototype =
 	{
 		if(null != this.number || (null != this.text && "" != this.text))
 			return false;
-		if(null != this.multiText)
-		{
-			var sText = "";
-			for(var i = 0, length = this.multiText.length; i < length; ++i)
-				sText += this.multiText[i].text;
-			if("" != sText)
-				return false;
-		}
+		if(null != this.multiText && "" != this.getStringFromMultiText())
+			return false;
 		return true;
 	},
 	isEqual : function(val)
@@ -2822,16 +2816,24 @@ CCellValue.prototype =
 		this.textValueForEdit = null;
 		this.textValueForEdit2 = null;
 	},
+	getStringFromMultiText: function () {
+	    var sRes = "";
+	    if (null != this.multiText) {
+	        for (var i = 0, length = this.multiText.length; i < length; ++i) {
+	            var elem = this.multiText[i];
+	            if (null != elem.text)
+	                sRes += elem.text;
+	        }
+	    }
+	    return sRes;
+	},
 	makeSimpleText : function()
 	{
 		var bRes = false;
 		if(null != this.multiText)
 		{
-			var sRes = "";
-			for(var i = 0, length = this.multiText.length; i < length; ++i)
-				sRes += this.multiText[i].text;
-			this.multiText = null;
-			this.text = sRes;
+		    this.text = this.getStringFromMultiText();
+		    this.multiText = null;
 			bRes = true;
 		}
 		return bRes;
@@ -2850,11 +2852,7 @@ CCellValue.prototype =
 		else if(null != this.text)
 			sResult = this.text;
 		else if(null != this.multiText)
-		{
-			for(var i = 0, length = this.multiText.length; i < length; i++){
-				sResult += this.multiText[i].text;
-			}
-		}
+		    sResult = this.getStringFromMultiText();
 		return sResult;
 	},
 	getValue : function()
@@ -2925,9 +2923,7 @@ CCellValue.prototype =
 					            sText = null;
 					        }
 					        else if (null != this.multiText) {
-					            var sSimpleString = "";
-					            for (var i = 0, length = this.multiText.length; i < length; ++i)
-					                sSimpleString += this.multiText[i].text;
+					            var sSimpleString = this.getStringFromMultiText();
 					            aText = oNumFormat.format(sSimpleString, this.type, dDigitsCount, oAdditionalResult);
 					            sText = null;
 					        }
@@ -3337,22 +3333,35 @@ CCellValue.prototype =
 			bSetCellFont = true;
 		if(null != this.multiText && this.multiText.length > 0)
 		{
-			var aVal = this.multiText;
-			var oIntersectFont = aVal[0].format.clone();
-			for(var i = 1, length = aVal.length; i < length; i++)
-				oIntersectFont.intersect(aVal[i].format, g_oDefaultFont);
+		    var range = this.cell.ws.getCell3(this.cell.oId.getRow0(), this.cell.oId.getCol0());
+		    var cellFont = range.getFont();
+		    var oIntersectFont;
+		    for (var i = 0, length = this.multiText.length; i < length; i++) {
+		        var elem = this.multiText[i];
+			    if (null != elem.format) {
+			        if (null == oIntersectFont)
+			            oIntersectFont = elem.format.clone();
+			        oIntersectFont.intersect(elem.format, cellFont);
+			    }
+			    else {
+			        oIntersectFont = cellFont.clone();
+			        break;
+			    }
+			}
+				
 			if(bSetCellFont)
 			{
-				if(oIntersectFont.isEqual(g_oDefaultFont))
+			    if (oIntersectFont.isEqual(cellFont))
 					this.cell.setFont(null, false);
 				else
 					this.cell.setFont(oIntersectFont, false);
 			}
 			//если у всех элементов один формат, то сохраняем только текст
 			var bIsEqual = true;
-			for(var i = 0, length = aVal.length; i < length; i++)
+			for (var i = 0, length = this.multiText.length; i < length; i++)
 			{
-				if(false == oIntersectFont.isEqual(aVal[i].format))
+			    var elem = this.multiText[i];
+			    if (null != elem.format && false == oIntersectFont.isEqual(elem.format))
 				{
 					bIsEqual = false;
 					break;
@@ -3375,7 +3384,8 @@ CCellValue.prototype =
 			var bChange = false;
 			for(var i = 0, length = this.multiText.length; i < length; ++i)
 			{
-				if(true == fCheck(this.multiText[i].format))
+			    var elem = this.multiText[i];
+			    if (null != elem.format && true == fCheck(elem.format))
 				{
 					bChange = true;
 					break;
@@ -3384,8 +3394,11 @@ CCellValue.prototype =
 			if(bChange)
 			{
 				var backupObj = this.cell.getValueData();
-				for(var i = 0, length = this.multiText.length; i < length; ++i)
-					fAction(this.multiText[i].format);
+				for (var i = 0, length = this.multiText.length; i < length; ++i) {
+				    var elem = this.multiText[i];
+				    if (null != elem.format)
+				        fAction(elem.format)
+				}
 				//пробуем преобразовать в простую строку
 				var cell = this.cell;
 				if(this.miminizeMultiText(false))
