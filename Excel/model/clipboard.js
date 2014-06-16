@@ -301,7 +301,24 @@
 						var fullUrl = this._getUseFullUrl();
 						window.global_pptx_content_writer.Start_UseFullUrl(fullUrl);
 						
-						var oBinaryFileWriter = new Asc.BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
+						//TODO стоит убрать заглушку при правке бага с activeRange
+						var cloneActiveRange = worksheet.activeRange.clone();
+						var temp;
+						if(cloneActiveRange.c1 > cloneActiveRange.c2)
+						{
+							temp = cloneActiveRange.c1;
+							cloneActiveRange.c1 = cloneActiveRange.c2;
+							cloneActiveRange.c2 = temp;
+						};
+						
+						if(cloneActiveRange.r1 > cloneActiveRange.r2)
+						{
+							temp = cloneActiveRange.r1;
+							cloneActiveRange.r1 = cloneActiveRange.r2;
+							cloneActiveRange.r2 = temp;
+						};
+						
+						var oBinaryFileWriter = new Asc.BinaryFileWriter(worksheet.model.workbook, cloneActiveRange);
 						var sBase64 = oBinaryFileWriter.Write();
 						if(this.element.children && this.element.children.length == 1 && window.USER_AGENT_WEBKIT && (true !== window.USER_AGENT_SAFARI_MACOS))
 						{
