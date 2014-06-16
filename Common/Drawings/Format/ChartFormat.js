@@ -21501,6 +21501,17 @@ CTitle.prototype =
         this.Id = r.GetString2();
     },
 
+
+
+    paragraphAdd: function(paraItem, bRecalculate)
+    {
+        var content = this.getDocContent();
+        if(content)
+        {
+            content.Paragraph_Add(paraItem, bRecalculate);
+        }
+    },
+
     setPosition: CDLbl.prototype.setPosition,
 
 
@@ -21519,7 +21530,33 @@ CTitle.prototype =
         return _x >= 0 && _x <= this.extX && _y >= 0 && _y < this.extY;
     },
 
-    getDocContent: CShape.prototype.getDocContent,
+    checkDocContent: function()
+    {
+        if(this.tx && this.tx.rich && this.tx.rich.content)
+        {
+            return;
+        }
+        else if(this.txBody && this.txBody.content)
+        {
+            if(!this.tx)
+            {
+                this.setTx(new CChartText());
+            }
+            this.tx.setRich(this.txBody.createDuplicate());
+            this.tx.rich.setParent(this);
+            var selection_state = this.txBody.content.Get_SelectionState();
+            this.txBody = this.tx.rich;
+            this.txBody.content.Set_SelectionState(selection_state, selection_state.length - 1);
+        }
+    },
+
+    getDocContent: function()
+    {
+        if(this.txBody && this.txBody.content)
+        {
+            return this.txBody.content;
+        }
+    },
 
     selectionSetStart: CShape.prototype.selectionSetStart,
 

@@ -977,7 +977,28 @@ DrawingObjectsController.prototype =
                 }
             }
         }
-
+        function applyToChartSelection(chart)
+        {
+            var content;
+            if(chart.selection.textSelection)
+            {
+                content = chart.selection.textSelection.getDocContent();
+                if(content)
+                {
+                    f.apply(content, args);
+                }
+            }
+            else if(chart.selection.title)
+            {
+                content = chart.selection.title.getDocContent();
+                if(content)
+                {
+                    content.Set_ApplyToAll(true);
+                    f.apply(content, args);
+                    content.Set_ApplyToAll(false);
+                }
+            }
+        }
         if(this.selection.textSelection)
         {
             f.apply(this.selection.textSelection.getDocContent(), args);
@@ -987,12 +1008,16 @@ DrawingObjectsController.prototype =
             if(this.selection.groupSelection.selection.textSelection)
                 f.apply(this.selection.groupSelection.selection.textSelection.getDocContent(), args);
             else if(this.selection.groupSelection.selection.chartSelection)
-            {/*todo*/}
+            {
+                applyToChartSelection(this.selection.groupSelection.selection.chartSelection);
+            }
             else
                 applyToArrayDrawings(this.selection.groupSelection.selectedObjects);
         }
         else if(this.selection.chartSelection)
-        {/*todo*/}
+        {
+            applyToChartSelection(this.selection.chartSelection);
+        }
         else
         {
             applyToArrayDrawings(this.selectedObjects);

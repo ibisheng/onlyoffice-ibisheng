@@ -1194,7 +1194,7 @@ Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFrom
 		History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_SheetAdd, null, null, new UndoRedoData_SheetAdd(insertBefore, newSheet.getName(), wsFrom.getId(), newSheet.getId()));
         if(!(bFromRedo === true))
         {
-            wsFrom.copyDrawingObjects(newSheet);
+            wsFrom.copyDrawingObjects(newSheet, wsFrom);
         }
 	}
 };
@@ -1871,63 +1871,21 @@ Woorksheet.prototype.clone=function(sNewId){
 		oNewWs.sheetPr = this.sheetPr.clone();
 	return oNewWs;
 };
-Woorksheet.prototype.copyDrawingObjects=function(oNewWs)
+Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
 {
     if(null != this.Drawings && this.Drawings.length > 0)
     {
+        var drawingObjects = new DrawingObjects();
         oNewWs.Drawings = [];
-        var w = new CMemory();
         for(var i = 0; i < this.Drawings.length; ++i)
         {
-            this.Drawings[i].graphicObject.writeToBinaryForCopyPaste(w);
+            var drawingObject = drawingObjects.cloneDrawingObject(this.Drawings[i]);
+            drawingObject.graphicObject = this.Drawings[i].graphicObject.copy();
+            drawingObject.graphicObject.setWorksheet(oNewWs);
+            oNewWs.Drawings.push(drawingObject);
         }
-        var binary = w.pos + ";" + w.GetBase64Memory();
-        var stream = CreateBinaryReader(binary, 0, binary.length);
-        var drawingObjects;
-        if(this.Drawings[0] && this.Drawings[0].graphicObject && this.Drawings[0].graphicObject.drawingObjects)
-        {
-            drawingObjects = this.Drawings[0].graphicObject.drawingObjects;
-        }
-        else
-        {
-            drawingObjects = new DrawingObjects();
-            drawingObjects.drawingDocument = new CDrawingDocument(drawingObjects);
-        }
-        for(var i = 0; i < this.Drawings.length; ++i)
-        {
-            var obj = null;
-            var objectType = stream.GetLong();
-            switch (objectType)
-            {
-                case CLASS_TYPE_SHAPE:
-                {
-                    obj = new CShape(null, null, null);
-                    break;
-                }
-                case CLASS_TYPE_IMAGE:
-                {
-                    obj = new CImageShape(null, null);
-                    break;
-                }
-                case CLASS_TYPE_GROUP:
-                {
-                    obj = new CGroupShape(null, null);
-                    break;
-                }
-                case CLASS_TYPE_CHART_AS_GROUP:
-                {
-                    obj = new CChartAsGroup(null, null);
-                    break;
-                }
-            }
-            if(isRealObject(obj))
-            {
-                var drawingObject = drawingObjects.cloneDrawingObject(this.Drawings[i]);
-                obj.readFromBinaryForCopyPaste2(stream, null, drawingObjects, null, null);
-                drawingObject.graphicObject = obj;
-                oNewWs.Drawings.push(drawingObject);
-            }
-        }
+        drawingObjects.pushToAObjects(oNewWs.Drawings);
+        drawingObjects.updateChartReferences(wsFrom.sName, oNewWs.sName);
     }
 };
 Woorksheet.prototype.init=function(){

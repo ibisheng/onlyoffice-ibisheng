@@ -152,6 +152,7 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
 {
     var grouped_objects = drawing.getArrGraphicObjects();
     var selected_objects = drawingObjectsController.selectedObjects;
+
     for(var j = grouped_objects.length - 1; j > -1; --j)
     {
         var cur_grouped_object = grouped_objects[j];

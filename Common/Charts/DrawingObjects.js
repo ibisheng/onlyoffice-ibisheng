@@ -4331,6 +4331,15 @@ function DrawingObjects() {
 
     };
 
+    _this.pushToAObjects = function(aDrawing)
+    {
+        aObjects = [];
+        for(var i = 0; i < aDrawing.length; ++i)
+        {
+            aObjects.push(aDrawing[i]);
+        }
+    };
+
     _this.rebuildCharts = function(data)
     {
         for(var i = 0; i < aObjects.length; ++i)
@@ -4887,9 +4896,10 @@ function DrawingObjects() {
                 if ( graphicObject.getObjectType() === historyitem_type_ChartSpace )
                 {
                     graphicObject.updateChartReferences(oldWorksheet, newWorksheet);
-                    this.controller.startRecalculate();
                 }
             }
+            if(this.controller)
+                this.controller.startRecalculate();
         }, this, []);
 
     };

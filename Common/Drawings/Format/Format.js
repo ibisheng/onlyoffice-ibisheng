@@ -8190,7 +8190,7 @@ CSpPr.prototype =
         if(this.geometry!=null)
         {
             duplicate.setGeometry(this.geometry.createDuplicate());
-            duplicate.setParent(duplicate);
+            duplicate.geometry.setParent(duplicate);
         }
         if(this.Fill!=null)
         {

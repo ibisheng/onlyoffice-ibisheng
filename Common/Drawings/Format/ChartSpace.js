@@ -254,14 +254,14 @@ CChartSpace.prototype =
 
     setSelectionState: function(state)
     {
-       this.selectiontitle          = state.title;
-       this.selectionlegend         = state.legend;
-       this.selectionlegendEntry    = state.legendEntry;
-       this.selectionaxisLbls       = state.axisLbls;
-       this.selectiondataLbls       = state.dataLbls;
-       this.selectiondataLbl        = state.dataLbl;
-       this.selectiontextSelection  = state.textSelection;
-       this.selectionplotArea       = state.plotArea;
+       this.selection.title          = state.title;
+       this.selection.legend         = state.legend;
+       this.selection.legendEntry    = state.legendEntry;
+       this.selection.axisLbls       = state.axisLbls;
+       this.selection.dataLbls       = state.dataLbls;
+       this.selection.dataLbl        = state.dataLbl;
+       this.selection.textSelection  = state.textSelection;
+       this.selection.plotArea       = state.plotArea;
     },
 
     resetInternalSelection: function()
@@ -272,6 +272,16 @@ CChartSpace.prototype =
             content && content.Selection_Remove();
             this.selection.textSelection = null;
         }
+    },
+
+
+    getDocContent: function()
+    {
+        if(!this.txPr)
+        {
+            this.setTxPr(CreateTextBodyFromString("", this.getDrawingDocument(), this));
+        }
+        return this.txPr.content;
     },
 
     resetSelection: function()
@@ -287,15 +297,113 @@ CChartSpace.prototype =
         this.selection.plotArea = null;
     },
 
+    getStyles: function()
+    {
+        return ExecuteNoHistory(function(){
+
+            //todo: доработать
+            var styles = new CStyles();
+            var style = new CStyle("dataLblStyle", null, null, null);
+            var text_pr = new CTextPr();
+            text_pr.FontSize = 10;
+            text_pr.Unifill = CreateUnfilFromRGB(0,0,0);
+            var parent_objects = this.getParentObjects();
+            var theme = parent_objects.theme;
+
+            var para_pr = new CParaPr();
+            para_pr.Jc = align_Center;
+            para_pr.Spacing.Before = 0.0;
+            para_pr.Spacing.After = 0.0;
+            para_pr.Spacing.Line = 1;
+            para_pr.Spacing.LineRule = linerule_Auto;
+            style.ParaPr = para_pr;
+
+            var minor_font = theme.themeElements.fontScheme.minorFont;
+
+
+            if(minor_font)
+            {
+                if(typeof minor_font.latin === "string" && minor_font.latin.length > 0)
+                {
+                    text_pr.RFonts.Ascii = {Name: minor_font.latin, Index: -1};
+                }
+                if(typeof minor_font.ea === "string" && minor_font.ea.length > 0)
+                {
+                    text_pr.RFonts.EastAsia = {Name: minor_font.ea, Index: -1};
+                }
+                if(typeof minor_font.cs === "string" && minor_font.cs.length > 0)
+                {
+                    text_pr.RFonts.CS = {Name: minor_font.cs, Index: -1};
+                }
+
+                if(typeof minor_font.sym === "string" && minor_font.sym.length > 0)
+                {
+                    text_pr.RFonts.HAnsi = {Name: minor_font.sym, Index: -1};
+                }
+            }
+            style.TextPr = text_pr;
+
+            var chart_text_pr;
+
+            if(this.txPr
+                && this.txPr.content
+                && this.txPr.content.Content[0]
+                && this.txPr.content.Content[0].Pr)
+            {
+                style.ParaPr.Merge(this.txPr.content.Content[0].Pr);
+                if(this.txPr.content.Content[0].Pr.DefaultRunPr)
+                {
+                    chart_text_pr = this.txPr.content.Content[0].Pr.DefaultRunPr;
+                    style.TextPr.Merge(chart_text_pr);
+                }
+
+            }
+
+            if(this.txPr
+                && this.txPr.content
+                && this.txPr.content.Content[0]
+                && this.txPr.content.Content[0].Pr)
+            {
+                style.ParaPr.Merge(this.txPr.content.Content[0].Pr);
+                if(this.txPr.content.Content[0].Pr.DefaultRunPr)
+                    style.TextPr.Merge(this.txPr.content.Content[0].Pr.DefaultRunPr);
+            }
+            styles.Add(style);
+            return {lastId: style.Id, styles: styles};
+        }, this, []);
+    },
+
     paragraphAdd: function(paraItem, bRecalculate)
     {
+        var content;
         if(paraItem.Type === para_TextPr)
         {
-            //TODO
+            if(this.selection.title)
+            {
+                this.selection.title.checkDocContent();
+                content = this.selection.title.getDocContent();
+                content.Set_ApplyToAll(true);
+                content.Paragraph_Add(paraItem, bRecalculate);
+                content.Set_ApplyToAll(false);
+            }
+            else if(this.selection.textSelection)
+            {
+                this.selection.textSelection.checkDocContent();
+                content = this.selection.textSelection.getDocContent();
+                content.Paragraph_Add(paraItem, bRecalculate);
+            }
+            else
+            {
+                //TODO: другие случаи будут обработаны в след. версиях
+            }
         }
         else
         {
-
+            if(this.selection.textSelection)
+            {
+                this.selection.textSelection.checkDocContent();
+                this.selection.textSelection.paragraphAdd(paraItem, bRecalculate);
+            }
         }
 
     },
@@ -459,15 +567,20 @@ CChartSpace.prototype =
 
     changeListName: function(val, oldName, newName)
     {
+        var _new_name;
+        if(!rx_test_ws_name.test(newName))
+        {
+            _new_name = "'" + newName + "'";
+        }
         if(val)
         {
             if(val.numRef && typeof val.numRef.f === "string")
             {
-                val.numRef.setF(val.numRef.f.replace(new RegExp(oldName,'g'), newName));
+                val.numRef.setF(val.numRef.f.replace(new RegExp(oldName,'g'), _new_name));
             }
             if(val.strRef && typeof val.strRef.f === "string")
             {
-                val.strRef.setF(val.strRef.f.replace(new RegExp(oldName,'g'), newName));
+                val.strRef.setF(val.strRef.f.replace(new RegExp(oldName,'g'), _new_name));
             }
         }
     },
@@ -1266,6 +1379,10 @@ CChartSpace.prototype =
     {
         History.Add(this, {Type: historyitem_ChartSpace_SetTxPr, oldTxPr: this.txPr, newTxPr: txPr});
         this.txPr = txPr;
+        if(txPr)
+        {
+            txPr.setParent(this);
+        }
     },
     setUserShapes: function(userShapes)
     {
@@ -1353,9 +1470,9 @@ CChartSpace.prototype =
             var startCell = new CellAddress(r1, c1, 0);
             var endCell = new CellAddress(r2, c2, 0);
 
-            if (startCell && endCell)
+            if (startCell && endCell && this.bbox.worksheet)
             {
-                var wsName = this.worksheet.sName;
+                var wsName = this.bbox.worksheet.sName;
                  if ( !rx_test_ws_name.test(wsName) )
                      wsName = "'" + wsName + "'";
 
@@ -2204,7 +2321,20 @@ CChartSpace.prototype =
         {
             if(val && val.numRef && !val.numRef.numCache)
             {
-                var f1 = val.numRef.f.replace(/\(|\)/g,"");
+                var first_slice = 0, last_slice = 0;
+                if(val.numRef.f[0] === "(")
+                {
+                    first_slice = 1;
+                }
+                if(val.numRef.f[val.numRef.f.length - 1] === ")")
+                {
+                    last_slice = -1;
+                }
+                else
+                {
+                    last_slice = val.numRef.f.length;
+                }
+                var f1 = val.numRef.f.slice(first_slice, last_slice);
                 var arr_f = f1.split(",");
                 var num_cache = new CNumLit();
                 num_cache.setFormatCode("General");

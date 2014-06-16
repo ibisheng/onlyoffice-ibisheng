@@ -209,7 +209,7 @@ CGroupShape.prototype =
         if(this.spPr)
         {
             copy.setSpPr(this.spPr.createDuplicate());
-            this.spPr.setParent(this);
+            copy.spPr.setParent(copy);
         }
         for(var i = 0; i < this.spTree.length; ++i)
         {
