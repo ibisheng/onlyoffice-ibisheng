@@ -51,6 +51,15 @@ function ParaMath()
     this.Ascent       = 0;
     this.Descent      = 0;
 
+    this.DefaultTextPr = new CTextPr();
+    this.DefaultTextPr.Init_Default();
+
+    this.DefaultTextPr.Italic     = true;
+    this.DefaultTextPr.FontFamily = {Name  : "Cambria Math", Index : -1 };
+    this.DefaultTextPr.RFonts.Set_All("Cambria Math", -1);
+
+
+
     this.MathPr =
     {
         naryLim:    NARY_UndOvr,
@@ -65,6 +74,8 @@ function ParaMath()
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
 	g_oTableId.Add( this, this.Id );
 }
+
+var BFIRST = true;
 
 ParaMath.prototype =
 {
@@ -212,7 +223,7 @@ ParaMath.prototype =
     Remove : function(Direction, bOnAddText)
     {
 		var oContent = this.GetSelectContent();
-		if (oContent.Start == oContent.End)
+		/*if (oContent.Start == oContent.End)
 		{
 			var oElem = oContent.Content.getElem(oContent.Start);
 			
@@ -257,7 +268,7 @@ ParaMath.prototype =
 			}
 		}
 		else
-			return this.RemoveElem(oContent, Direction, bOnAddText);
+			return this.RemoveElem(oContent, Direction, bOnAddText);*/
 		
     },
 		
@@ -433,6 +444,8 @@ ParaMath.prototype =
         //this.Math.RecalculateComposition(g_oTextMeasurer, TextPr);
 
         this.Root.Resize(null, this, g_oTextMeasurer, TextPr);
+
+        BFIRST = false;
 
         var pos = new CMathPosition();
         pos.x = 0;
@@ -820,9 +833,6 @@ ParaMath.prototype =
         var w_px = (w_mm * dKoef) >> 0;
         var h_px = (h_mm * dKoef) >> 0;
 
-        var _need_pix_width     = this.Width + 1;
-        var _need_pix_height    = this.Height + 1;
-
         var _canvas = document.createElement('canvas');
         _canvas.width = w_px;
         _canvas.height = h_px;
@@ -837,7 +847,7 @@ ParaMath.prototype =
         g.m_oCoordTransform.ty = 0;
         g.transform(1,0,0,1,0,0);
 
-        this.Root.draw( 0, 0, g);
+        this.Root.draw(0, 0, g);
 
         window.IsShapeToImageConverter = false;
 
@@ -855,7 +865,7 @@ ParaMath.prototype =
     ApplyArgSize : function(oWPrp, argSize)
     {
         var tPrp = new CTextPr();
-        var defaultWPrp =
+        /*var defaultWPrp =
         {
             FontFamily:     {Name  : "Cambria Math", Index : -1 },
             FontSize:       11,
@@ -863,9 +873,9 @@ ParaMath.prototype =
             Bold:           false,
             RFonts:         {},
             Lang:           {}
-        };
+        };*/
 
-        tPrp.Merge(defaultWPrp);
+        tPrp.Merge(this.DefaultTextPr);
         tPrp.Merge(oWPrp);
 
         var FSize = tPrp.FontSize;
@@ -1013,7 +1023,7 @@ ParaMath.prototype =
     },
     Get_Default_TPrp: function()
     {
-        var TextPrp = new CTextPr();
+        /*var TextPrp = new CTextPr();
         TextPrp.Init_Default();
 
         var mathFont = new CTextPr();
@@ -1030,7 +1040,7 @@ ParaMath.prototype =
         mathFont.Set_FromObject(obj);
 
 
-        TextPrp.Merge(mathFont);
+        TextPrp.Merge(mathFont);*/
 
 
         /*var DefaultPrp =
@@ -1048,13 +1058,15 @@ ParaMath.prototype =
 
          TextPrp.Set_FromObject(DefaultPrp);*/
 
-        return TextPrp;
+        var DefaultTextPrp = this.DefaultTextPr.Copy();
+        DefaultTextPrp.Italic = false;
+
+        return DefaultTextPrp;
     },
     Set_Select_ToMComp: function(Direction)
     {
         this.bSelectionUse = true;
         this.Root.Set_Select_ToMComp(Direction);
-
     },
 //-----------------------------------------------------------------------------------
 // Функции отрисовки
@@ -1228,26 +1240,34 @@ ParaMath.prototype =
 
         this.Root.Get_ParaContentPos(bSelection, bStart, ContentPos);
 
+        console.log("Get_ParaContentPos");
+        var str = "";
+        for(var i = 0; i < ContentPos.Data.length; i++)
+        {
+            str += ContentPos.Data[i] + ", ";
+        }
+
+        console.log(str);
+
         return ContentPos;
     },
     Set_ParaContentPos : function(ContentPos, Depth) // выставить логическую позицию в контенте
     {
         // TODO: ParaMath.Set_ParaContentPos
 
+        this.State.ContentPos = ContentPos.Get(Depth);
 
-        var Pos = ContentPos.Get(Depth);
-        this.State.ContentPos = Pos;
-
-        /*console.log("Set_ParaContentPos");
+        console.log("Set_ParaContentPos");
         var str = "";
         for(var i = 0; i < ContentPos.Data.length; i++)
         {
             str += ContentPos.Data[i] + "  ";
         }
 
-        console.log(str);*/
+        console.log(str);
 
         this.Root.Set_ParaContentPos(ContentPos, Depth);
+
     },
     Get_PosByElement : function(Class, ContentPos, Depth, UseRange, Range, Line)
     {
@@ -1500,5 +1520,4 @@ function TEST_MATH_ImageConverter()
     var dataImg = editor.WordControl.m_oLogicDocument.Content[0].Content[0].MathToImageConverter();
 
     console.log(dataImg.ImageUrl);
-
 }

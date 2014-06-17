@@ -5013,8 +5013,7 @@ CMathContent.prototype =
             {
                 if(!this.bRoot)
                 {
-                    var oWPrp = this.Parent.Get_CompiledCtrPrp();
-
+                    var oWPrp = this.Parent.Get_CompiledCtrPrp_2(); // without arg Size
                     this.ParaMath.ApplyArgSize(oWPrp, this.argSize);
                     oWPrp.Italic = false;
 
@@ -5165,16 +5164,15 @@ CMathContent.prototype =
 
         if( !bHidePlh )
         {
+            var oWPrp;
             for(var i=0; i < this.content.length;i++)
             {
                 if(this.content[i].typeObj == MATH_RUN_PRP)
                 {
                     pGraphics.b_color1(0,0,0,255);
                     var mgWPrp = this.content[i].value.getMergedWPrp();
-                    var oWPrp = new CTextPr();
+                    oWPrp = new CTextPr();
                     oWPrp.Merge(mgWPrp);
-
-                    //this.applyArgSize(oWPrp);
 
                     this.ParaMath.ApplyArgSize(oWPrp, this.argSize);
 
@@ -5184,17 +5182,13 @@ CMathContent.prototype =
                 {
                     pGraphics.b_color1(0,0,0,255);
 
-                    //var oWPrp = this.Parent.Get_CtrPrp();
-                    var oWPrp = this.Parent.Get_CompiledCtrPrp();
-
-                    //this.applyArgSize(oWPrp);
+                    oWPrp = this.Parent.Get_CompiledCtrPrp_2();
                     this.ParaMath.ApplyArgSize(oWPrp, this.argSize);
 
                     oWPrp.Italic = false;
                     pGraphics.SetFont(oWPrp);
 
-                    //var ctrPrp = this.Parent.Get_CompiledCtrPrp();
-                    //ctrPrp.Italic = false;
+
 
                     pGraphics.SetFont(oWPrp);
 
@@ -6441,7 +6435,7 @@ CMathContent.prototype =
             }
             else if(curType == MATH_COMP)
             {
-                this.content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, bUseContent, BegRun);
+                this.content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, bUseContent, StepEnd, BegRun);
             }
             else if(BegRun)
             {
@@ -6450,7 +6444,7 @@ CMathContent.prototype =
             }
             else
             {
-                this.content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, bUseContent);
+                this.content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, bUseContent, StepEnd);
             }
 
             SearchPos.Pos.Update(CurPos, Depth);
@@ -6480,6 +6474,9 @@ CMathContent.prototype =
 
         //if ( true === SearchPos.UpdatePos )
         //    SearchPos.Pos.Update( CurPos, Depth );
+
+
+        var bFirst = true;
 
         while(CurPos >= 0 && SearchPos.Found == false)
         {

@@ -3601,7 +3601,8 @@ CDelimiter.prototype.Resize = function(Parent, ParaMath, oMeasure)
     var maxAD = ascentG - shCenter  > descentG + shCenter ? ascentG - shCenter: descentG + shCenter;
 
     var plH = 9.877777777777776 * mgCtrPrp.FontSize/36;
-    var bTextContent = ascentG < plH || descentG < plH; // для текста операторы в случае центрирования не увеличиваем
+    //var bTextContent = ascentG < plH || descentG < plH ; // для текста операторы в случае центрирования не увеличиваем
+    var bTextContent = ascentG < plH && heightG < 1.5*plH; // для текста операторы в случае центрирования не увеличиваем
 
     var bCentered = this.Pr.shp == DELIMITER_SHAPE_CENTERED,
         b2Max = bCentered && (2*maxAD - heightG > 0.001);

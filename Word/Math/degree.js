@@ -160,6 +160,14 @@ CDegree.prototype.recalculateSup = function(oMeasure)
             this.upBase = iter.height - ascBase;
     }
 
+    if(this.Parent.bRoot)
+    {
+        console.log("ArgSize of Base : " + this.elements[0][0].argSize);
+        console.log("ArgSize of Iterator : " + this.elements[0][1].argSize);
+    }
+
+
+
     var height = this.upBase + base.height;
     var ascent = this.upBase + base.ascent;
 

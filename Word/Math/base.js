@@ -119,6 +119,10 @@ CMathBase.prototype =
 
         return CompiledCtrPrp;
     },
+    Get_CompiledCtrPrp_2: function() // without arg Size
+    {
+        return this.CompiledCtrPrp.Copy();
+    },
     // TO DO
     // пересмотреть
     getCtrPrpForFirst: function()
@@ -1517,7 +1521,7 @@ CMathBase.prototype =
 
         return result;
     },
-    Get_RightPos: function(SearchPos, ContentPos, Depth, UseContentPos, BegRun)
+    Get_RightPos: function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd, BegRun)
     {
         var CurPos_X, CurPos_Y;
         var result = false;
@@ -1544,7 +1548,7 @@ CMathBase.prototype =
 
                 if(!bJDraw && !usePlh)
                 {
-                    this.elements[CurPos_X][CurPos_Y].Get_RightPos(SearchPos, ContentPos, Depth + 2, bUseContent, BegRun);
+                    this.elements[CurPos_X][CurPos_Y].Get_RightPos(SearchPos, ContentPos, Depth + 2, bUseContent, StepEnd, BegRun);
                     SearchPos.Pos.Update(CurPos_X, Depth);
                     SearchPos.Pos.Update(CurPos_Y, Depth+1);
                 }

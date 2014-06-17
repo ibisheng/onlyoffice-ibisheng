@@ -7157,9 +7157,7 @@ ParaRun.prototype.Math_Draw = function(x, y, pGraphics)
     pGraphics.b_color1(0,0,0,255);
 
     for(var i=0; i < this.Content.length;i++)
-    {
         this.Content[i].draw(X, Y, pGraphics);
-    }
 
 }
 ParaRun.prototype.Math_Recalculate = function(Parent, Paragraph, oMeasure, RecalcInfo)
@@ -7199,33 +7197,8 @@ ParaRun.prototype.Math_Recalculate = function(Parent, Paragraph, oMeasure, Recal
 
     }
 
-    /*if(this.Parent.bRoot)
-    {
-        var lng = this.Content.length;
-        for(var i = 0; i < lng; i++)
-        {
-            var left  = this.Content[i].GapLeft,
-                right = this.Content[i].GapRight;
-
-            console.log(RecalcInfo.TEST_COUNT + ". Left : " + left + ",  Right : " + right);
-
-            RecalcInfo.TEST_COUNT++;
-        }
-
-    }*/
-
     this.size = {width: width, height: ascent + descent, ascent: ascent};
 }
-/*ParaRun.prototype.ApplyGaps = function()
-{
-    if(this.Is_Empty() == false)
-    {
-        var lng = this.Content.length;
-
-        this.Content[lng - 1].ApplyGaps();
-        this.size.width += this.Content[lng - 1].size.width;
-    }
-}*/
 ParaRun.prototype.Math_Update_Cursor = function(X, Y, CurPage, UpdateTarget)
 {
     var runPrp = this.Get_CompiledPr(true);
