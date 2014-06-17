@@ -231,10 +231,11 @@ function getcoupncd( settl, matur, frequency ) {
 function getprice( settle, mat, rate, yld, redemp, freq, base ) {
 
     var cdays = getcoupdays( new Date( settle ), new Date( mat ), freq, base ),
-        cdaysnc = getcoupdaysnc( new Date( settle ), new Date( mat ), freq, base ) / cdays,
         cnum = getcoupnum( new Date( settle ), (mat), freq ),
         cdaybs = getcoupdaybs( new Date( settle ), new Date( mat ), freq, base ),
-        fT1 = 100 * rate / freq, fT2 = 1 + yld / freq,
+        cdaysnc = ( cdays - cdaybs ) / cdays,
+        fT1 = 100 * rate / freq,
+        fT2 = 1 + yld / freq,
         res = redemp / ( Math.pow( 1 + yld / freq, cnum - 1 + cdaysnc ) );
 
     res -= 100 * rate / freq * cdaybs / cdays;
@@ -4473,7 +4474,7 @@ cPRICEDISC.prototype.Calculate = function ( arg ) {
     var settl = Date.prototype.getDateFromExcel( settlement ),
         matur = Date.prototype.getDateFromExcel( maturity );
 
-    var res = redemption * ( 1 - discount * GetDiffDate( settl, matur, basis ) );
+    var res = redemption * ( 1 - discount * yearFrac( settl, matur, basis ) );
 
     return this.value = new cNumber( res );
 
