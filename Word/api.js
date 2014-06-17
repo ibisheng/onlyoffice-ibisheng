@@ -27,11 +27,11 @@ function CDocOpenProgress()
     this.CurrentImage = 0;
 }
 
-CDocOpenProgress.prototype.get_Type = function(){return this.Type}
-CDocOpenProgress.prototype.get_FontsCount = function(){return this.FontsCount}
-CDocOpenProgress.prototype.get_CurrentFont = function(){return this.CurrentFont}
-CDocOpenProgress.prototype.get_ImagesCount = function(){return this.ImagesCount}
-CDocOpenProgress.prototype.get_CurrentImage = function(){return this.CurrentImage}
+CDocOpenProgress.prototype.get_Type = function(){return this.Type};
+CDocOpenProgress.prototype.get_FontsCount = function(){return this.FontsCount};
+CDocOpenProgress.prototype.get_CurrentFont = function(){return this.CurrentFont};
+CDocOpenProgress.prototype.get_ImagesCount = function(){return this.ImagesCount};
+CDocOpenProgress.prototype.get_CurrentImage = function(){return this.CurrentImage};
 
 function CDocInfo (obj){
 	if(obj){
@@ -73,24 +73,24 @@ function CDocInfo (obj){
 		this.Options = null;
 	}
 }
-CDocInfo.prototype.get_Id = function(){return this.Id}
-CDocInfo.prototype.put_Id = function(v){this.Id = v;}
-CDocInfo.prototype.get_Url = function(){return this.Url;}
-CDocInfo.prototype.put_Url = function(v){this.Url = v;}
-CDocInfo.prototype.get_Title = function(){return this.Title;}
-CDocInfo.prototype.put_Title = function(v){this.Title = v;}
-CDocInfo.prototype.get_Format = function(){return this.Format;}
-CDocInfo.prototype.put_Format = function(v){this.Format = v;}
-CDocInfo.prototype.get_VKey = function(){return this.VKey;}
-CDocInfo.prototype.put_VKey = function(v){this.VKey = v;}
-CDocInfo.prototype.get_OfflineApp = function(){return this.OfflineApp;}
-CDocInfo.prototype.put_OfflineApp = function(v){this.OfflineApp = v;}
-CDocInfo.prototype.get_UserId = function(){return this.UserId;}
-CDocInfo.prototype.put_UserId = function(v){this.UserId = v;}
-CDocInfo.prototype.get_UserName = function(){return this.UserName;}
-CDocInfo.prototype.put_UserName = function(v){this.UserName = v;}
-CDocInfo.prototype.get_Options = function(){return this.Options;}
-CDocInfo.prototype.put_Options = function(v){this.Options = v;}
+CDocInfo.prototype.get_Id = function(){return this.Id};
+CDocInfo.prototype.put_Id = function(v){this.Id = v;};
+CDocInfo.prototype.get_Url = function(){return this.Url;};
+CDocInfo.prototype.put_Url = function(v){this.Url = v;};
+CDocInfo.prototype.get_Title = function(){return this.Title;};
+CDocInfo.prototype.put_Title = function(v){this.Title = v;};
+CDocInfo.prototype.get_Format = function(){return this.Format;};
+CDocInfo.prototype.put_Format = function(v){this.Format = v;};
+CDocInfo.prototype.get_VKey = function(){return this.VKey;};
+CDocInfo.prototype.put_VKey = function(v){this.VKey = v;};
+CDocInfo.prototype.get_OfflineApp = function(){return this.OfflineApp;};
+CDocInfo.prototype.put_OfflineApp = function(v){this.OfflineApp = v;};
+CDocInfo.prototype.get_UserId = function(){return this.UserId;};
+CDocInfo.prototype.put_UserId = function(v){this.UserId = v;};
+CDocInfo.prototype.get_UserName = function(){return this.UserName;};
+CDocInfo.prototype.put_UserName = function(v){this.UserName = v;};
+CDocInfo.prototype.get_Options = function(){return this.Options;};
+CDocInfo.prototype.put_Options = function(v){this.Options = v;};
 
 function CListType(obj)
 {
@@ -105,8 +105,8 @@ function CListType(obj)
 		this.SubType = null;
 	}
 }
-CListType.prototype.get_ListType = function() { return this.Type; }
-CListType.prototype.get_ListSubType = function() { return this.SubType; }
+CListType.prototype.get_ListType = function() { return this.Type; };
+CListType.prototype.get_ListSubType = function() { return this.SubType; };
 
 function CAscSection()
 {
@@ -118,12 +118,12 @@ function CAscSection()
     this.MarginTop = 0;
     this.MarginBottom = 0;
 }
-CAscSection.prototype.get_PageWidth = function() { return this.PageWidth; }
-CAscSection.prototype.get_PageHeight = function() { return this.PageHeight; }
-CAscSection.prototype.get_MarginLeft = function() { return this.MarginLeft; }
-CAscSection.prototype.get_MarginRight = function() { return this.MarginRight; }
-CAscSection.prototype.get_MarginTop = function() { return this.MarginTop; }
-CAscSection.prototype.get_MarginBottom = function() { return this.MarginBottom; }
+CAscSection.prototype.get_PageWidth = function() { return this.PageWidth; };
+CAscSection.prototype.get_PageHeight = function() { return this.PageHeight; };
+CAscSection.prototype.get_MarginLeft = function() { return this.MarginLeft; };
+CAscSection.prototype.get_MarginRight = function() { return this.MarginRight; };
+CAscSection.prototype.get_MarginTop = function() { return this.MarginTop; };
+CAscSection.prototype.get_MarginBottom = function() { return this.MarginBottom; };
 
 function CImagePositionH(obj)
 {
@@ -143,14 +143,14 @@ function CImagePositionH(obj)
     }
 }
 
-CImagePositionH.prototype.get_RelativeFrom = function()  { return this.RelativeFrom; }
-CImagePositionH.prototype.put_RelativeFrom = function(v) { this.RelativeFrom = v; }
-CImagePositionH.prototype.get_UseAlign = function()  { return this.UseAlign; }
-CImagePositionH.prototype.put_UseAlign = function(v) { this.UseAlign = v; }
-CImagePositionH.prototype.get_Align = function()  { return this.Align; }
-CImagePositionH.prototype.put_Align = function(v) { this.Align = v; }
-CImagePositionH.prototype.get_Value = function()  { return this.Value; }
-CImagePositionH.prototype.put_Value = function(v) { this.Value = v; }
+CImagePositionH.prototype.get_RelativeFrom = function()  { return this.RelativeFrom; };
+CImagePositionH.prototype.put_RelativeFrom = function(v) { this.RelativeFrom = v; };
+CImagePositionH.prototype.get_UseAlign = function()  { return this.UseAlign; };
+CImagePositionH.prototype.put_UseAlign = function(v) { this.UseAlign = v; };
+CImagePositionH.prototype.get_Align = function()  { return this.Align; };
+CImagePositionH.prototype.put_Align = function(v) { this.Align = v; };
+CImagePositionH.prototype.get_Value = function()  { return this.Value; };
+CImagePositionH.prototype.put_Value = function(v) { this.Value = v; };
 
 function CImagePositionV(obj)
 {
@@ -170,14 +170,14 @@ function CImagePositionV(obj)
     }
 }
 
-CImagePositionV.prototype.get_RelativeFrom = function()  { return this.RelativeFrom; }
-CImagePositionV.prototype.put_RelativeFrom = function(v) { this.RelativeFrom = v; }
-CImagePositionV.prototype.get_UseAlign = function()  { return this.UseAlign; }
-CImagePositionV.prototype.put_UseAlign = function(v) { this.UseAlign = v; }
-CImagePositionV.prototype.get_Align = function()  { return this.Align; }
-CImagePositionV.prototype.put_Align = function(v) { this.Align = v; }
-CImagePositionV.prototype.get_Value = function()  { return this.Value; }
-CImagePositionV.prototype.put_Value = function(v) { this.Value = v; }
+CImagePositionV.prototype.get_RelativeFrom = function()  { return this.RelativeFrom; };
+CImagePositionV.prototype.put_RelativeFrom = function(v) { this.RelativeFrom = v; };
+CImagePositionV.prototype.get_UseAlign = function()  { return this.UseAlign; };
+CImagePositionV.prototype.put_UseAlign = function(v) { this.UseAlign = v; };
+CImagePositionV.prototype.get_Align = function()  { return this.Align; };
+CImagePositionV.prototype.put_Align = function(v) { this.Align = v; };
+CImagePositionV.prototype.get_Value = function()  { return this.Value; };
+CImagePositionV.prototype.put_Value = function(v) { this.Value = v; };
 
 function CPosition( obj )
 {
@@ -192,10 +192,10 @@ function CPosition( obj )
 		this.Y = null;
 	}
 }
-CPosition.prototype.get_X = function() { return this.X; }
-CPosition.prototype.put_X = function(v) { this.X = v; }
-CPosition.prototype.get_Y = function() { return this.Y; }
-CPosition.prototype.put_Y = function(v) { this.Y = v; }
+CPosition.prototype.get_X = function() { return this.X; };
+CPosition.prototype.put_X = function(v) { this.X = v; };
+CPosition.prototype.get_Y = function() { return this.Y; };
+CPosition.prototype.put_Y = function(v) { this.Y = v; };
 
 
 
@@ -206,9 +206,9 @@ function CImageSize( width, height, isCorrect )
     this.IsCorrect = isCorrect;
 }
 
-CImageSize.prototype.get_ImageWidth = function() { return this.Width; }
-CImageSize.prototype.get_ImageHeight = function() { return this.Height; }
-CImageSize.prototype.get_IsCorrect = function() { return this.IsCorrect; }
+CImageSize.prototype.get_ImageWidth = function() { return this.Width; };
+CImageSize.prototype.get_ImageHeight = function() { return this.Height; };
+CImageSize.prototype.get_IsCorrect = function() { return this.IsCorrect; };
 
 function CImgProperty( obj )
 {
@@ -275,48 +275,48 @@ function CImgProperty( obj )
 CImgProperty.prototype.get_ChangeLevel = function() { return this.ChangeLevel; };
 CImgProperty.prototype.put_ChangeLevel = function(v) { this.ChangeLevel = v; };
 
-CImgProperty.prototype.get_CanBeFlow = function() { return this.CanBeFlow; }
-CImgProperty.prototype.get_Width = function() { return this.Width; }
-CImgProperty.prototype.put_Width = function(v) { this.Width = v; }
-CImgProperty.prototype.get_Height = function() { return this.Height; }
-CImgProperty.prototype.put_Height = function(v) { this.Height = v; }
-CImgProperty.prototype.get_WrappingStyle = function() { return this.WrappingStyle; }
-CImgProperty.prototype.put_WrappingStyle = function(v) { this.WrappingStyle = v; }
+CImgProperty.prototype.get_CanBeFlow = function() { return this.CanBeFlow; };
+CImgProperty.prototype.get_Width = function() { return this.Width; };
+CImgProperty.prototype.put_Width = function(v) { this.Width = v; };
+CImgProperty.prototype.get_Height = function() { return this.Height; };
+CImgProperty.prototype.put_Height = function(v) { this.Height = v; };
+CImgProperty.prototype.get_WrappingStyle = function() { return this.WrappingStyle; };
+CImgProperty.prototype.put_WrappingStyle = function(v) { this.WrappingStyle = v; };
 // Возвращается объект класса CPaddings
-CImgProperty.prototype.get_Paddings = function() { return this.Paddings; }
+CImgProperty.prototype.get_Paddings = function() { return this.Paddings; };
 // Аргумент объект класса CPaddings
-CImgProperty.prototype.put_Paddings = function(v) { this.Paddings = v; }
-CImgProperty.prototype.get_AllowOverlap = function() {return this.AllowOverlap;}
-CImgProperty.prototype.put_AllowOverlap = function(v) {this.AllowOverlap = v;}
+CImgProperty.prototype.put_Paddings = function(v) { this.Paddings = v; };
+CImgProperty.prototype.get_AllowOverlap = function() {return this.AllowOverlap;};
+CImgProperty.prototype.put_AllowOverlap = function(v) {this.AllowOverlap = v;};
 // Возвращается объект класса CPosition
-CImgProperty.prototype.get_Position = function() { return this.Position; }
+CImgProperty.prototype.get_Position = function() { return this.Position; };
 // Аргумент объект класса CPosition
-CImgProperty.prototype.put_Position = function(v) { this.Position = v; }
-CImgProperty.prototype.get_PositionH = function()  { return this.PositionH; }
-CImgProperty.prototype.put_PositionH = function(v) { this.PositionH = v; }
-CImgProperty.prototype.get_PositionV = function()  { return this.PositionV; }
-CImgProperty.prototype.put_PositionV = function(v) { this.PositionV = v; }
-CImgProperty.prototype.get_Value_X = function(RelativeFrom) { if ( null != this.Internal_Position ) return this.Internal_Position.Calculate_X_Value(RelativeFrom);  return 0; }
-CImgProperty.prototype.get_Value_Y = function(RelativeFrom) { if ( null != this.Internal_Position ) return this.Internal_Position.Calculate_Y_Value(RelativeFrom);  return 0; }
+CImgProperty.prototype.put_Position = function(v) { this.Position = v; };
+CImgProperty.prototype.get_PositionH = function()  { return this.PositionH; };
+CImgProperty.prototype.put_PositionH = function(v) { this.PositionH = v; };
+CImgProperty.prototype.get_PositionV = function()  { return this.PositionV; };
+CImgProperty.prototype.put_PositionV = function(v) { this.PositionV = v; };
+CImgProperty.prototype.get_Value_X = function(RelativeFrom) { if ( null != this.Internal_Position ) return this.Internal_Position.Calculate_X_Value(RelativeFrom);  return 0; };
+CImgProperty.prototype.get_Value_Y = function(RelativeFrom) { if ( null != this.Internal_Position ) return this.Internal_Position.Calculate_Y_Value(RelativeFrom);  return 0; };
 
-CImgProperty.prototype.get_ImageUrl = function() { return this.ImageUrl; }
-CImgProperty.prototype.put_ImageUrl = function(v) { this.ImageUrl = v; }
-CImgProperty.prototype.get_Group = function() { return this.Group; }
-CImgProperty.prototype.put_Group = function(v) { this.Group = v; }
-CImgProperty.prototype.get_FromGroup = function() { return this.fromGroup; }
-CImgProperty.prototype.put_FromGroup = function(v) { this.fromGroup = v; }
+CImgProperty.prototype.get_ImageUrl = function() { return this.ImageUrl; };
+CImgProperty.prototype.put_ImageUrl = function(v) { this.ImageUrl = v; };
+CImgProperty.prototype.get_Group = function() { return this.Group; };
+CImgProperty.prototype.put_Group = function(v) { this.Group = v; };
+CImgProperty.prototype.get_FromGroup = function() { return this.fromGroup; };
+CImgProperty.prototype.put_FromGroup = function(v) { this.fromGroup = v; };
 
-CImgProperty.prototype.get_isChartProps = function() { return this.isChartProps; }
-CImgProperty.prototype.put_isChartPross = function(v) { this.isChartProps = v; }
+CImgProperty.prototype.get_isChartProps = function() { return this.isChartProps; };
+CImgProperty.prototype.put_isChartPross = function(v) { this.isChartProps = v; };
 
 
-CImgProperty.prototype.get_SeveralCharts = function() { return this.severalCharts; }
-CImgProperty.prototype.put_SeveralCharts = function(v) { this.severalCharts = v; }
-CImgProperty.prototype.get_SeveralChartTypes = function() { return this.severalChartTypes; }
-CImgProperty.prototype.put_SeveralChartTypes = function(v) { this.severalChartTypes = v; }
+CImgProperty.prototype.get_SeveralCharts = function() { return this.severalCharts; };
+CImgProperty.prototype.put_SeveralCharts = function(v) { this.severalCharts = v; };
+CImgProperty.prototype.get_SeveralChartTypes = function() { return this.severalChartTypes; };
+CImgProperty.prototype.put_SeveralChartTypes = function(v) { this.severalChartTypes = v; };
 
-CImgProperty.prototype.get_SeveralChartStyles = function() { return this.severalChartStyles; }
-CImgProperty.prototype.put_SeveralChartStyles = function(v) { this.severalChartStyles = v; }
+CImgProperty.prototype.get_SeveralChartStyles = function() { return this.severalChartStyles; };
+CImgProperty.prototype.put_SeveralChartStyles = function(v) { this.severalChartStyles = v; };
 
 CImgProperty.prototype.get_VerticalTextAlign = function() { return this.verticalTextAlign; };
 CImgProperty.prototype.put_VerticalTextAlign = function(v) { this.verticalTextAlign = v; };
@@ -370,8 +370,8 @@ CImgProperty.prototype.get_OriginSize = function(api)
         return new CImageSize( parseInt(_w), parseInt(_h), bIsCorrect);
     }
     return new CImageSize( 50, 50, false );
-}
-CImgProperty.prototype.get_Locked = function() { return this.Locked; }
+};
+CImgProperty.prototype.get_Locked = function() { return this.Locked; };
 
 CImgProperty.prototype.get_ChartProperties = function()
 {
@@ -421,16 +421,16 @@ function CHeaderProp( obj )
 	}
 }
 
-CHeaderProp.prototype.get_Type = function(){ return this.Type; }
-CHeaderProp.prototype.put_Type = function(v){ this.Type = v; }
-CHeaderProp.prototype.get_Position = function(){ return this.Position; }
-CHeaderProp.prototype.put_Position = function(v){ this.Position = v; }
-CHeaderProp.prototype.get_DifferentFirst = function(){ return this.DifferentFirst; }
-CHeaderProp.prototype.put_DifferentFirst = function(v){ this.DifferentFirst = v; }
-CHeaderProp.prototype.get_DifferentEvenOdd = function(){ return this.DifferentEvenOdd; }
-CHeaderProp.prototype.put_DifferentEvenOdd = function(v){ this.DifferentEvenOdd = v; }
-CHeaderProp.prototype.get_LinkToPrevious = function() { return this.LinkToPrevious; }
-CHeaderProp.prototype.get_Locked = function() { return this.Locked; }
+CHeaderProp.prototype.get_Type = function(){ return this.Type; };
+CHeaderProp.prototype.put_Type = function(v){ this.Type = v; };
+CHeaderProp.prototype.get_Position = function(){ return this.Position; };
+CHeaderProp.prototype.put_Position = function(v){ this.Position = v; };
+CHeaderProp.prototype.get_DifferentFirst = function(){ return this.DifferentFirst; };
+CHeaderProp.prototype.put_DifferentFirst = function(v){ this.DifferentFirst = v; };
+CHeaderProp.prototype.get_DifferentEvenOdd = function(){ return this.DifferentEvenOdd; };
+CHeaderProp.prototype.put_DifferentEvenOdd = function(v){ this.DifferentEvenOdd = v; };
+CHeaderProp.prototype.get_LinkToPrevious = function() { return this.LinkToPrevious; };
+CHeaderProp.prototype.get_Locked = function() { return this.Locked; };
 
 function CSelectedObject( type, val )
 {
@@ -438,33 +438,33 @@ function CSelectedObject( type, val )
 	this.Value = (undefined != val) ? val : null;
 }
 // Возвращает тип объекта c_oAscTypeSelectElement
-CSelectedObject.prototype.get_ObjectType = function() { return this.Type; }
+CSelectedObject.prototype.get_ObjectType = function() { return this.Type; };
 
 // Возвращает собственно сам объект класса в зависимости от типа
 // c_oAscTypeSelectElement.Paragraph CParagraphProp
 // c_oAscTypeSelectElement.Image CImgProperty
 // c_oAscTypeSelectElement.Table CTableProp
 // c_oAscTypeSelectElement.Header CHeaderProp
-CSelectedObject.prototype.get_ObjectValue = function() { return this.Value; }
+CSelectedObject.prototype.get_ObjectValue = function() { return this.Value; };
 
 // [!dirty hack for minimizer - don't delete this comment!] function CStylesPainter ()
 // [!dirty hack for minimizer - don't delete this comment!] function CStyleImage ()
 // [!dirty hack for minimizer - don't delete this comment!] function CFont ()
-CStylesPainter.prototype.get_DefaultStylesImage = function() { return this.defaultStylesImage; }
-CStylesPainter.prototype.get_DocStylesImage = function() { return this.docStylesImage; }
-CStylesPainter.prototype.get_MergedStyles = function() { return this.mergedStyles; }
-CStylesPainter.prototype.get_STYLE_THUMBNAIL_WIDTH = function() { return this.STYLE_THUMBNAIL_WIDTH; }
-CStylesPainter.prototype.get_STYLE_THUMBNAIL_HEIGHT = function() { return this.STYLE_THUMBNAIL_HEIGHT; }
-CStylesPainter.prototype.get_IsRetinaEnabled = function() { return this.IsRetinaEnabled; }
+CStylesPainter.prototype.get_DefaultStylesImage = function() { return this.defaultStylesImage; };
+CStylesPainter.prototype.get_DocStylesImage = function() { return this.docStylesImage; };
+CStylesPainter.prototype.get_MergedStyles = function() { return this.mergedStyles; };
+CStylesPainter.prototype.get_STYLE_THUMBNAIL_WIDTH = function() { return this.STYLE_THUMBNAIL_WIDTH; };
+CStylesPainter.prototype.get_STYLE_THUMBNAIL_HEIGHT = function() { return this.STYLE_THUMBNAIL_HEIGHT; };
+CStylesPainter.prototype.get_IsRetinaEnabled = function() { return this.IsRetinaEnabled; };
 
-CStyleImage.prototype.get_ThumbnailOffset = function() { return this.ThumbnailOffset; }
-CStyleImage.prototype.get_Type = function() { return this.Type; }
-CStyleImage.prototype.get_Name = function() { return this.Name; }
+CStyleImage.prototype.get_ThumbnailOffset = function() { return this.ThumbnailOffset; };
+CStyleImage.prototype.get_Type = function() { return this.Type; };
+CStyleImage.prototype.get_Name = function() { return this.Name; };
 
-CFont.prototype.asc_getFontId = function() { return this.id; }
-CFont.prototype.asc_getFontName = function() { return this.name; }
-CFont.prototype.asc_getFontThumbnail = function() { return this.thumbnail; }
-CFont.prototype.asc_getFontType = function() { return this.type; }
+CFont.prototype.asc_getFontId = function() { return this.id; };
+CFont.prototype.asc_getFontName = function() { return this.name; };
+CFont.prototype.asc_getFontThumbnail = function() { return this.thumbnail; };
+CFont.prototype.asc_getFontType = function() { return this.type; };
 
 var DocumentPageSize = new function() {
     this.oSizes = [{name:"US Letter", w_mm: 215.9, h_mm: 279.4, w_tw: 12240, h_tw: 15840},
@@ -716,34 +716,34 @@ asc_docs_api.prototype.LoadFontsFromServer = function(_fonts)
     if (undefined === _fonts)
         _fonts = ["Arial","Symbol","Wingdings","Courier New","Times New Roman"];
     this.FontLoader.LoadFontsFromServer(_fonts);
-}
+};
 
 asc_docs_api.prototype.SetCollaborativeMarksShowType = function(Type)
 {
     this.CollaborativeMarksShowType = Type;
-}
+};
 
 asc_docs_api.prototype.GetCollaborativeMarksShowType = function(Type)
 {
     return this.CollaborativeMarksShowType;
-}
+};
 
 asc_docs_api.prototype.Clear_CollaborativeMarks = function()
 {
     CollaborativeEditing.Clear_CollaborativeMarks(true);
-}
+};
 
 asc_docs_api.prototype.SetLanguage = function(langId)
 {
     langId = langId.toLowerCase();
     if (undefined !== translations_map[langId])
         this.CurrentTranslate = translations_map[langId];
-}
+};
 
 asc_docs_api.prototype.asc_GetFontThumbnailsPath = function()
 {
     return "../Common/Images/";
-}
+};
 
 asc_docs_api.prototype.TranslateStyleName = function(style_name)
 {
@@ -753,13 +753,13 @@ asc_docs_api.prototype.TranslateStyleName = function(style_name)
         return ret;
 
     return style_name;
-}
+};
 
 asc_docs_api.prototype.SetUnchangedDocument = function()
 {
     this.isDocumentModify = false;
     this.asc_fireCallback("asc_onDocumentModifiedChanged");
-}
+};
 
 asc_docs_api.prototype.isDocumentModified = function()
 {
@@ -768,7 +768,7 @@ asc_docs_api.prototype.isDocumentModified = function()
 		return true;
 	}
     return this.isDocumentModify;
-}
+};
 
 asc_docs_api.prototype.sync_BeginCatchSelectedElements = function()
 {
@@ -777,21 +777,21 @@ asc_docs_api.prototype.sync_BeginCatchSelectedElements = function()
 
     if (this.WordControl && this.WordControl.m_oDrawingDocument)
         this.WordControl.m_oDrawingDocument.StartTableStylesCheck();
-}
+};
 asc_docs_api.prototype.sync_EndCatchSelectedElements = function()
 {
     if (this.WordControl && this.WordControl.m_oDrawingDocument)
         this.WordControl.m_oDrawingDocument.EndTableStylesCheck();
 
     this.asc_fireCallback("asc_onFocusObject", this.SelectedObjectsStack);
-}
+};
 asc_docs_api.prototype.getSelectedElements = function(bUpdate)
 {
     if ( true === bUpdate )
         this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 
     return this.SelectedObjectsStack;
-}
+};
 asc_docs_api.prototype.sync_ChangeLastSelectedElement = function(type, obj)
 {			
 	var oUnkTypeObj = null;
@@ -826,12 +826,12 @@ asc_docs_api.prototype.sync_ChangeLastSelectedElement = function(type, obj)
     {
         this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( type, oUnkTypeObj );
     }
-}
+};
 
 asc_docs_api.prototype.Init = function()
 {
 	this.WordControl.Init();
-}
+};
 asc_docs_api.prototype.asc_getEditorPermissions = function()
 {
 	if (undefined != window['qtDocBridge'])
@@ -911,7 +911,7 @@ asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(incomeObject)
 			editor.TrackFile.Start();							
 		}
 	}
-}
+};
 
 asc_docs_api.prototype._onGetLicense = function (response) {
 	if (null != response && "getlicense" == response.type){
@@ -924,11 +924,11 @@ asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo)
 {
 	if(c_DocInfo)
 		this.DocInfo = c_DocInfo;
-}
+};
 asc_docs_api.prototype.asc_setLocale = function(val)
 {
 	this.InterfaceLocale = val;
-}
+};
 asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 {
 
@@ -1049,40 +1049,40 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
     }
 
     this.asyncServerIdStartLoaded();
-}
+};
 
 asc_docs_api.prototype.SetFontsPath = function(path)
 {
 	this.FontLoader.fontFilesPath = path;
-}
+};
 
 asc_docs_api.prototype.SetTextBoxInputMode = function(bIsEA)
 {
     this.WordControl.SetTextBoxMode(bIsEA);
-}
+};
 asc_docs_api.prototype.GetTextBoxInputMode = function()
 {
     return this.WordControl.TextBoxInputMode;
-}
+};
 
 asc_docs_api.prototype.ChangeReaderMode = function()
 {
     return this.WordControl.ChangeReaderMode();
-}
+};
 asc_docs_api.prototype.SetReaderModeOnly = function()
 {
     this.isOnlyReaderMode = true;
     this.ImageLoader.bIsAsyncLoadDocumentImages = false;
-}
+};
 
 asc_docs_api.prototype.IncreaseReaderFontSize = function()
 {
     return this.WordControl.IncreaseReaderFontSize();
-}
+};
 asc_docs_api.prototype.DecreaseReaderFontSize = function()
 {
     return this.WordControl.DecreaseReaderFontSize();
-}
+};
 
 asc_docs_api.prototype.CreateCSS = function()
 {
@@ -1133,7 +1133,7 @@ background-position: 0px -48px;\
 background-repeat: no-repeat;\
 }";
     _head.appendChild(style4);
-}
+};
 
 asc_docs_api.prototype.CreateComponents = function()
 {
@@ -1168,14 +1168,14 @@ asc_docs_api.prototype.CreateComponents = function()
 										<div id=\"panel_hor_scroll\" class=\"block_elem\" style=\"left:0;top:0;width:6000px;height:16px;\"></div>\
 									</div>\
 									</div>";
-}
+};
 
 asc_docs_api.prototype.GetCopyPasteDivId = function()
 {
     if (this.isMobileVersion)
         return this.WordControl.Name;
     return "";
-}
+};
 
 asc_docs_api.prototype.ContentToHTML = function(bIsRet)
 {
@@ -1186,7 +1186,7 @@ asc_docs_api.prototype.ContentToHTML = function(bIsRet)
     copyPasteUseBinery = _old;
     this.DocumentReaderMode = null;
     return document.getElementById("SelectId").innerHTML;
-}
+};
 
 asc_docs_api.prototype.InitEditor = function()
 {
@@ -1195,17 +1195,17 @@ asc_docs_api.prototype.InitEditor = function()
 
     if (this.WordControl.MobileTouchManager)
         this.WordControl.MobileTouchManager.LogicDocument = this.WordControl.m_oLogicDocument;
-}
+};
 
 asc_docs_api.prototype.SetInterfaceDrawImagePlaceShape = function(div_id)
 {
     this.WordControl.m_oDrawingDocument.InitGuiCanvasShape(div_id);
-}
+};
 
 asc_docs_api.prototype.InitViewer = function()
 {
     this.WordControl.m_oDrawingDocument.m_oDocumentRenderer = new CDocMeta();
-}
+};
 
 asc_docs_api.prototype.OpenNewDocument = function()
 {
@@ -1218,7 +1218,7 @@ asc_docs_api.prototype.OpenNewDocument = function()
 	{
 		this.OpenEmptyDocument();
 	}
-}
+};
 
 asc_docs_api.prototype.LoadDocumentFromDisk = function()
 {
@@ -1231,7 +1231,7 @@ asc_docs_api.prototype.LoadDocumentFromDisk = function()
 	{
 		// may be it's useful for online version too
 	}
-}
+};
 
 asc_docs_api.prototype.OpenTestDocumentViewer = function()
 {
@@ -1242,7 +1242,7 @@ asc_docs_api.prototype.OpenTestDocumentViewer = function()
     this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.Load("./Document/", window["document_base64"]);
     delete window["document_base64"];
 	this.FontLoader.LoadDocumentFonts(this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.Fonts, true);
-}
+};
 
 asc_docs_api.prototype.OpenDocument = function(url, gObject)
 {
@@ -1254,7 +1254,7 @@ asc_docs_api.prototype.OpenDocument = function(url, gObject)
 
     this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.Load(url, gObject);
     this.FontLoader.LoadDocumentFonts(this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.Fonts, true);
-}
+};
 
 asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 {
@@ -1311,11 +1311,11 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 
     if (window.USER_AGENT_SAFARI_MACOS)
         setInterval(SafariIntervalFocus, 10);
-}
+};
 asc_docs_api.prototype.get_DocumentName = function()
 {
 	return this.DocumentName;
-}
+};
 // Callbacks
 /* все имена callback'оф начинаются с On. Пока сделаны:
 	OnBold,
@@ -1345,7 +1345,7 @@ asc_docs_api.prototype.asc_registerCallback = function(name, callback) {
 	if (!_callbacks.hasOwnProperty(name))
 		_callbacks[name] = [];
 	_callbacks[name].push(callback);
-}
+};
 
 asc_docs_api.prototype.asc_unregisterCallback = function(name, callback) {
 	if (_callbacks.hasOwnProperty(name)) {
@@ -1356,7 +1356,7 @@ asc_docs_api.prototype.asc_unregisterCallback = function(name, callback) {
 	}
 		_callbacks[name] = []
 	_callbacks[name].push(callback);
-}
+};
 
 asc_docs_api.prototype.asc_fireCallback = function(name) {
 	if (_callbacks.hasOwnProperty(name))
@@ -1368,7 +1368,7 @@ asc_docs_api.prototype.asc_fireCallback = function(name) {
         return true;
 	}
     return false;
-}
+};
 
 asc_docs_api.prototype.asc_checkNeedCallback = function(name) {
     if (_callbacks.hasOwnProperty(name))
@@ -1376,18 +1376,18 @@ asc_docs_api.prototype.asc_checkNeedCallback = function(name) {
         return true;
     }
     return false;
-}
+};
 
 // тут методы, замены евентов
 asc_docs_api.prototype.get_PropertyEditorShapes = function()
 {
     var ret = [g_oAutoShapesGroups, g_oAutoShapesTypes];
     return ret;
-}
+};
 asc_docs_api.prototype.get_PropertyEditorFonts = function()
 {
     return this._gui_fonts;
-}
+};
 asc_docs_api.prototype.get_PropertyStandartTextures = function()
 {
     var _count = g_oUserTexturePresets.length;
@@ -1399,20 +1399,20 @@ asc_docs_api.prototype.get_PropertyStandartTextures = function()
         arr[i].Image = g_oUserTexturePresets[i];
     }
     return arr;
-}
+};
 asc_docs_api.prototype.get_PropertyEditorStyles = function()
 {
     return this._gui_styles;
-}
+};
 asc_docs_api.prototype.get_PropertyThemeColors = function()
 {
     var _ret = [this._gui_control_colors.Colors, this._gui_control_colors.StandartColors];
     return _ret;
-}
+};
 asc_docs_api.prototype.get_PropertyThemeColorSchemes = function()
 {
     return this._gui_color_schemes;
-}
+};
 // -------
 
 /////////////////////////////////////////////////////////////////////////
@@ -1598,15 +1598,22 @@ asc_docs_api.prototype._coAuthoringInit = function()
 			t.asc_setDrawCollaborationMarks(true);
 			t.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
 
-			if (true != History.Is_Clear()) {
-				CollaborativeEditing.Apply_Changes();
-				CollaborativeEditing.Send_Changes();
-			} else {
-				// Изменений нет, но нужно сбросить lock
+			if (!isStartEvent) {
+				if (true != History.Is_Clear()) {
+					CollaborativeEditing.Apply_Changes();
+					CollaborativeEditing.Send_Changes();
+				} else {
+					// Изменений нет, но нужно сбросить lock
+					t.CoAuthoringApi.unLockDocument();
+				}
+			}
+		} else {
+			t.isStartCoAuthoringOnEndLoad = true;
+			if (!isStartEvent) {
+				// Документ еще не подгрузился, но нужно сбросить lock
 				t.CoAuthoringApi.unLockDocument();
 			}
-		} else
-			t.isStartCoAuthoringOnEndLoad = true;
+		}
 	};
 	this.CoAuthoringApi.onEndCoAuthoring			= function (isStartEvent) {
 		// ToDo add code
@@ -1635,7 +1642,7 @@ asc_docs_api.prototype._coAuthoringInit = function()
     }, c_oEditorId.Word, documentFormatSave, this.isViewMode);
 
     // ToDo init other callbacks
-}
+};
 
 // send chart message
 asc_docs_api.prototype.asc_coAuthoringChatSendMessage = function(message)
@@ -4749,56 +4756,56 @@ function CTableProp (tblProp)
 	}
 }
 
-CTableProp.prototype.get_Width = function (){return this.TableWidth;}
-CTableProp.prototype.put_Width = function (v){this.TableWidth = v;}
-CTableProp.prototype.get_Spacing = function (){return this.TableSpacing;}
-CTableProp.prototype.put_Spacing = function (v){this.TableSpacing = v;}
-CTableProp.prototype.get_DefaultMargins = function (){return this.TableDefaultMargins;}
-CTableProp.prototype.put_DefaultMargins = function (v){this.TableDefaultMargins = v;}
-CTableProp.prototype.get_CellMargins = function (){return this.CellMargins;}
-CTableProp.prototype.put_CellMargins = function (v){ this.CellMargins = v;}
-CTableProp.prototype.get_TableAlignment = function (){return this.TableAlignment;}
-CTableProp.prototype.put_TableAlignment = function (v){this.TableAlignment = v;}
-CTableProp.prototype.get_TableIndent = function (){return this.TableIndent;}
-CTableProp.prototype.put_TableIndent = function (v){this.TableIndent = v;}
-CTableProp.prototype.get_TableWrap = function (){return this.TableWrappingStyle;}
-CTableProp.prototype.put_TableWrap = function (v){this.TableWrappingStyle = v;}
-CTableProp.prototype.get_TablePaddings = function (){return this.TablePaddings;}
-CTableProp.prototype.put_TablePaddings = function (v){this.TablePaddings = v;}
-CTableProp.prototype.get_TableBorders = function (){return this.TableBorders;}
-CTableProp.prototype.put_TableBorders = function (v){this.TableBorders = v;}
-CTableProp.prototype.get_CellBorders = function (){return this.CellBorders;}
-CTableProp.prototype.put_CellBorders = function (v){this.CellBorders = v;}
-CTableProp.prototype.get_TableBackground = function (){return this.TableBackground;}
-CTableProp.prototype.put_TableBackground = function (v){this.TableBackground = v;}
-CTableProp.prototype.get_CellsBackground = function (){return this.CellsBackground;}
-CTableProp.prototype.put_CellsBackground = function (v){this.CellsBackground = v;}
-CTableProp.prototype.get_Position = function (){return this.Position;}
-CTableProp.prototype.put_Position = function (v){this.Position = v;}
-CTableProp.prototype.get_PositionH = function(){return this.PositionH;}
-CTableProp.prototype.put_PositionH = function(v){this.PositionH = v;}
-CTableProp.prototype.get_PositionV = function(){return this.PositionV;}
-CTableProp.prototype.put_PositionV = function(v){this.PositionV = v;}
-CTableProp.prototype.get_Value_X = function(RelativeFrom) { if ( undefined != this.Internal_Position ) return this.Internal_Position.Calculate_X_Value(RelativeFrom);  return 0; }
-CTableProp.prototype.get_Value_Y = function(RelativeFrom) { if ( undefined != this.Internal_Position ) return this.Internal_Position.Calculate_Y_Value(RelativeFrom);  return 0; }
-CTableProp.prototype.get_ForSelectedCells = function (){return this.ForSelectedCells;}
-CTableProp.prototype.put_ForSelectedCells = function (v){this.ForSelectedCells = v;}
-CTableProp.prototype.put_CellSelect = function(v){this.CellSelect = v;}
+CTableProp.prototype.get_Width = function (){return this.TableWidth;};
+CTableProp.prototype.put_Width = function (v){this.TableWidth = v;};
+CTableProp.prototype.get_Spacing = function (){return this.TableSpacing;};
+CTableProp.prototype.put_Spacing = function (v){this.TableSpacing = v;};
+CTableProp.prototype.get_DefaultMargins = function (){return this.TableDefaultMargins;};
+CTableProp.prototype.put_DefaultMargins = function (v){this.TableDefaultMargins = v;};
+CTableProp.prototype.get_CellMargins = function (){return this.CellMargins;};
+CTableProp.prototype.put_CellMargins = function (v){ this.CellMargins = v;};
+CTableProp.prototype.get_TableAlignment = function (){return this.TableAlignment;};
+CTableProp.prototype.put_TableAlignment = function (v){this.TableAlignment = v;};
+CTableProp.prototype.get_TableIndent = function (){return this.TableIndent;};
+CTableProp.prototype.put_TableIndent = function (v){this.TableIndent = v;};
+CTableProp.prototype.get_TableWrap = function (){return this.TableWrappingStyle;};
+CTableProp.prototype.put_TableWrap = function (v){this.TableWrappingStyle = v;};
+CTableProp.prototype.get_TablePaddings = function (){return this.TablePaddings;};
+CTableProp.prototype.put_TablePaddings = function (v){this.TablePaddings = v;};
+CTableProp.prototype.get_TableBorders = function (){return this.TableBorders;};
+CTableProp.prototype.put_TableBorders = function (v){this.TableBorders = v;};
+CTableProp.prototype.get_CellBorders = function (){return this.CellBorders;};
+CTableProp.prototype.put_CellBorders = function (v){this.CellBorders = v;};
+CTableProp.prototype.get_TableBackground = function (){return this.TableBackground;};
+CTableProp.prototype.put_TableBackground = function (v){this.TableBackground = v;};
+CTableProp.prototype.get_CellsBackground = function (){return this.CellsBackground;};
+CTableProp.prototype.put_CellsBackground = function (v){this.CellsBackground = v;};
+CTableProp.prototype.get_Position = function (){return this.Position;};
+CTableProp.prototype.put_Position = function (v){this.Position = v;};
+CTableProp.prototype.get_PositionH = function(){return this.PositionH;};
+CTableProp.prototype.put_PositionH = function(v){this.PositionH = v;};
+CTableProp.prototype.get_PositionV = function(){return this.PositionV;};
+CTableProp.prototype.put_PositionV = function(v){this.PositionV = v;};
+CTableProp.prototype.get_Value_X = function(RelativeFrom) { if ( undefined != this.Internal_Position ) return this.Internal_Position.Calculate_X_Value(RelativeFrom);  return 0; };
+CTableProp.prototype.get_Value_Y = function(RelativeFrom) { if ( undefined != this.Internal_Position ) return this.Internal_Position.Calculate_Y_Value(RelativeFrom);  return 0; };
+CTableProp.prototype.get_ForSelectedCells = function (){return this.ForSelectedCells;};
+CTableProp.prototype.put_ForSelectedCells = function (v){this.ForSelectedCells = v;};
+CTableProp.prototype.put_CellSelect = function(v){this.CellSelect = v;};
 CTableProp.prototype.get_CellSelect = function(){return this.CellSelect};
-CTableProp.prototype.get_CanBeFlow = function(){return this.CanBeFlow;}
+CTableProp.prototype.get_CanBeFlow = function(){return this.CanBeFlow;};
 CTableProp.prototype.get_RowsInHeader = function(){return this.RowsInHeader;};
 CTableProp.prototype.put_RowsInHeader = function(v){this.RowsInHeader = v;};
-CTableProp.prototype.get_Locked = function() { return this.Locked; }
-CTableProp.prototype.get_CellsVAlign = function() { return this.CellsVAlign; }
-CTableProp.prototype.put_CellsVAlign = function(v){ this.CellsVAlign = v; }
-CTableProp.prototype.get_TableLook = function() {return this.TableLook;}
-CTableProp.prototype.put_TableLook = function(v){this.TableLook = v;}
-CTableProp.prototype.get_TableStyle = function() {return this.TableStyle;}
-CTableProp.prototype.put_TableStyle = function(v){this.TableStyle = v;}
-CTableProp.prototype.get_AllowOverlap = function() {return this.AllowOverlap;}
-CTableProp.prototype.put_AllowOverlap = function(v){this.AllowOverlap = v;}
-CTableProp.prototype.get_TableLayout = function() {return this.TableLayout;}
-CTableProp.prototype.put_TableLayout = function(v){this.TableLayout = v;}
+CTableProp.prototype.get_Locked = function() { return this.Locked; };
+CTableProp.prototype.get_CellsVAlign = function() { return this.CellsVAlign; };
+CTableProp.prototype.put_CellsVAlign = function(v){ this.CellsVAlign = v; };
+CTableProp.prototype.get_TableLook = function() {return this.TableLook;};
+CTableProp.prototype.put_TableLook = function(v){this.TableLook = v;};
+CTableProp.prototype.get_TableStyle = function() {return this.TableStyle;};
+CTableProp.prototype.put_TableStyle = function(v){this.TableStyle = v;};
+CTableProp.prototype.get_AllowOverlap = function() {return this.AllowOverlap;};
+CTableProp.prototype.put_AllowOverlap = function(v){this.AllowOverlap = v;};
+CTableProp.prototype.get_TableLayout = function() {return this.TableLayout;};
+CTableProp.prototype.put_TableLayout = function(v){this.TableLayout = v;};
 
 function CBorders (obj)
 {
@@ -4822,18 +4829,18 @@ function CBorders (obj)
 		this.InsideV = null;
 	}*/
 }
-CBorders.prototype.get_Left = function(){return this.Left; }
-CBorders.prototype.put_Left = function(v){this.Left = (v) ? new CBorder (v) : null;}
-CBorders.prototype.get_Top = function(){return this.Top; }
-CBorders.prototype.put_Top = function(v){this.Top = (v) ? new CBorder (v) : null;}
-CBorders.prototype.get_Right = function(){return this.Right; }
-CBorders.prototype.put_Right = function(v){this.Right = (v) ? new CBorder (v) : null;}
-CBorders.prototype.get_Bottom = function(){return this.Bottom; }
-CBorders.prototype.put_Bottom = function(v){this.Bottom = (v) ? new CBorder (v) : null;}
-CBorders.prototype.get_InsideH = function(){return this.InsideH; }
-CBorders.prototype.put_InsideH = function(v){this.InsideH = (v) ? new CBorder (v) : null;}
-CBorders.prototype.get_InsideV = function(){return this.InsideV; }
-CBorders.prototype.put_InsideV = function(v){this.InsideV = (v) ? new CBorder (v) : null;}
+CBorders.prototype.get_Left = function(){return this.Left; };
+CBorders.prototype.put_Left = function(v){this.Left = (v) ? new CBorder (v) : null;};
+CBorders.prototype.get_Top = function(){return this.Top; };
+CBorders.prototype.put_Top = function(v){this.Top = (v) ? new CBorder (v) : null;};
+CBorders.prototype.get_Right = function(){return this.Right; };
+CBorders.prototype.put_Right = function(v){this.Right = (v) ? new CBorder (v) : null;};
+CBorders.prototype.get_Bottom = function(){return this.Bottom; };
+CBorders.prototype.put_Bottom = function(v){this.Bottom = (v) ? new CBorder (v) : null;};
+CBorders.prototype.get_InsideH = function(){return this.InsideH; };
+CBorders.prototype.put_InsideH = function(v){this.InsideH = (v) ? new CBorder (v) : null;};
+CBorders.prototype.get_InsideV = function(){return this.InsideV; };
+CBorders.prototype.put_InsideV = function(v){this.InsideV = (v) ? new CBorder (v) : null;};
 
 function CBorder (obj)
 {
@@ -4852,16 +4859,16 @@ function CBorder (obj)
 		this.Space = 0;
 	}
 }
-CBorder.prototype.get_Color = function(){return this.Color; }
-CBorder.prototype.put_Color = function(v){this.Color = v;}
-CBorder.prototype.get_Size = function(){return this.Size; }
-CBorder.prototype.put_Size = function(v){this.Size = v;}
-CBorder.prototype.get_Value = function(){return this.Value; }
-CBorder.prototype.put_Value = function(v){this.Value = v;}
-CBorder.prototype.get_Space = function(){return this.Space; }
-CBorder.prototype.put_Space = function(v){this.Space = v;}
-CBorder.prototype.get_ForSelectedCells = function(){return this.ForSelectedCells; }
-CBorder.prototype.put_ForSelectedCells = function(v){this.ForSelectedCells = v;}
+CBorder.prototype.get_Color = function(){return this.Color; };
+CBorder.prototype.put_Color = function(v){this.Color = v;};
+CBorder.prototype.get_Size = function(){return this.Size; };
+CBorder.prototype.put_Size = function(v){this.Size = v;};
+CBorder.prototype.get_Value = function(){return this.Value; };
+CBorder.prototype.put_Value = function(v){this.Value = v;};
+CBorder.prototype.get_Space = function(){return this.Space; };
+CBorder.prototype.put_Space = function(v){this.Space = v;};
+CBorder.prototype.get_ForSelectedCells = function(){return this.ForSelectedCells; };
+CBorder.prototype.put_ForSelectedCells = function(v){this.ForSelectedCells = v;};
 
 // CMargins
 function CMargins (obj)
@@ -4883,16 +4890,16 @@ function CMargins (obj)
 		this.Flag = null;
 	}
 }
-CMargins.prototype.get_Left = function(){return this.Left; }
-CMargins.prototype.put_Left = function(v){this.Left = v;}
-CMargins.prototype.get_Right = function(){return this.Right; }
-CMargins.prototype.put_Right = function(v){this.Right = v;}
-CMargins.prototype.get_Top = function(){return this.Top; }
-CMargins.prototype.put_Top = function(v){this.Top = v;}
-CMargins.prototype.get_Bottom = function(){return this.Bottom; }
-CMargins.prototype.put_Bottom = function(v){this.Bottom = v;}
-CMargins.prototype.get_Flag = function(){return this.Flag; }
-CMargins.prototype.put_Flag = function(v){this.Flag = v;}
+CMargins.prototype.get_Left = function(){return this.Left; };
+CMargins.prototype.put_Left = function(v){this.Left = v;};
+CMargins.prototype.get_Right = function(){return this.Right; };
+CMargins.prototype.put_Right = function(v){this.Right = v;};
+CMargins.prototype.get_Top = function(){return this.Top; };
+CMargins.prototype.put_Top = function(v){this.Top = v;};
+CMargins.prototype.get_Bottom = function(){return this.Bottom; };
+CMargins.prototype.put_Bottom = function(v){this.Bottom = v;};
+CMargins.prototype.get_Flag = function(){return this.Flag; };
+CMargins.prototype.put_Flag = function(v){this.Flag = v;};
 
 /*
 	{
@@ -5092,14 +5099,14 @@ asc_docs_api.prototype.tblApply = function(obj)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Set_TableProps(obj);
     }
-}
+};
 /*callbacks*/
 asc_docs_api.prototype.sync_AddTableCallback = function(){
 	this.asc_fireCallback("asc_onAddTable");
-}
+};
 asc_docs_api.prototype.sync_AlignCellCallback = function(align){
 	this.asc_fireCallback("asc_onAlignCell",align);
-}
+};
 asc_docs_api.prototype.sync_TblPropCallback = function(tblProp)
 {
     //if ( true === CollaborativeEditing.Get_GlobalLock() )
@@ -5108,13 +5115,13 @@ asc_docs_api.prototype.sync_TblPropCallback = function(tblProp)
     // TODO: вызвать функцию asc_onInitTableTemplatesв зависимости от TableLook
 
     this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( c_oAscTypeSelectElement.Table, new CTableProp( tblProp ));
-}
+};
 asc_docs_api.prototype.sync_TblWrapStyleChangedCallback = function(style){
 	this.asc_fireCallback("asc_onTblWrapStyleChanged",style);
-}
+};
 asc_docs_api.prototype.sync_TblAlignChangedCallback = function(style){
 	this.asc_fireCallback("asc_onTblAlignChanged",style);
-}
+};
 
 /*----------------------------------------------------------------*/
 /*functions for working with images*/
@@ -5122,12 +5129,12 @@ asc_docs_api.prototype.ChangeImageFromFile = function()
 {
     this.isImageChangeUrl = true;
     this.AddImage();
-}
+};
 asc_docs_api.prototype.ChangeShapeImageFromFile = function()
 {
     this.isShapeImageChangeUrl = true;
     this.AddImage();
-}
+};
 
 asc_docs_api.prototype.AddImage = function(){
 	if (undefined != window['qtDocBridge'])
@@ -5170,12 +5177,12 @@ asc_docs_api.prototype.AddImage = function(){
 		else
 			fileName.click();
 	}
-}
+};
 
 asc_docs_api.prototype.AddImageUrl2 = function(url)
 {
     this.AddImageUrl(_getFullImageSrc(url));
-}
+};
 
 asc_docs_api.prototype.AddImageUrl = function(url, imgProp)
 {
@@ -5203,7 +5210,7 @@ asc_docs_api.prototype.AddImageUrl = function(url, imgProp)
 				}, rData );
 		}
     }
-}
+};
 asc_docs_api.prototype.AddImageUrlAction = function(url, imgProp)
 {
     var _image = this.ImageLoader.LoadImage(url, 1);
@@ -5302,7 +5309,7 @@ asc_docs_api.prototype.AddImageUrlAction = function(url, imgProp)
             this.asyncImageEndLoaded2 = null;
         }
     }
-}
+};
 /* В качестве параметра  передается объект класса CImgProperty, он же приходит на OnImgProp
 CImgProperty заменяет пережнюю структуру:
 если параметр не имеет значения то передвать следует null, напримере inline-картинок: в качестве left,top,bottom,right,X,Y,ImageUrl необходимо передавать null.
@@ -5386,10 +5393,10 @@ asc_docs_api.prototype.ImgApply = function(obj)
             this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
         }
     }
-}
+};
 asc_docs_api.prototype.set_Size = function(width, height){
 
-}
+};
 asc_docs_api.prototype.set_ConstProportions = function(isOn){
 	if (isOn){
 
@@ -5397,19 +5404,19 @@ asc_docs_api.prototype.set_ConstProportions = function(isOn){
 	else{
 
 	}
-}
+};
 asc_docs_api.prototype.set_WrapStyle = function(type){
 
-}
+};
 asc_docs_api.prototype.deleteImage = function(){
 
-}
+};
 asc_docs_api.prototype.set_ImgDistanceFromText = function(left,top,right,bottom){
 
-}
+};
 asc_docs_api.prototype.set_PositionOnPage = function(X,Y){//расположение от начала страницы
 
-}
+};
 asc_docs_api.prototype.get_OriginalSizeImage = function(){
 	if (0 == this.SelectedObjectsStack.length)
         return null;
@@ -5418,7 +5425,7 @@ asc_docs_api.prototype.get_OriginalSizeImage = function(){
         return null;
     if (obj.Type == c_oAscTypeSelectElement.Image)
         return obj.Value.get_OriginSize(this);
-}
+};
 
 asc_docs_api.prototype.ShapeApply = function(shapeProps)
 {
@@ -5472,21 +5479,21 @@ asc_docs_api.prototype.ShapeApply = function(shapeProps)
     {
         this.WordControl.m_oLogicDocument.ShapeApply(shapeProps);
     }
-}
+};
 /*callbacks*/
 asc_docs_api.prototype.sync_AddImageCallback = function(){
 	this.asc_fireCallback("asc_onAddImage");
-}
+};
 asc_docs_api.prototype.sync_ImgPropCallback = function(imgProp)
 {
     //if ( true === CollaborativeEditing.Get_GlobalLock() )
     //    imgProp.Locked = true;
 
     this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( c_oAscTypeSelectElement.Image, new CImgProperty( imgProp ) );
-}
+};
 asc_docs_api.prototype.sync_ImgWrapStyleChangedCallback = function(style){
 	this.asc_fireCallback("asc_onImgWrapStyleChanged",style);
-}
+};
 
 //-----------------------------------------------------------------
 // События контекстного меню
@@ -5519,16 +5526,16 @@ function CContextMenuData( obj )
     }
 }
 
-CContextMenuData.prototype.get_Type  = function()  { return this.Type; }
-CContextMenuData.prototype.get_X = function()  { return this.X_abs; }
-CContextMenuData.prototype.get_Y = function()  { return this.Y_abs; }
-CContextMenuData.prototype.get_PageNum = function()  { return this.PageNum; }
-CContextMenuData.prototype.is_Header = function()  { return this.Header; }
+CContextMenuData.prototype.get_Type  = function()  { return this.Type; };
+CContextMenuData.prototype.get_X = function()  { return this.X_abs; };
+CContextMenuData.prototype.get_Y = function()  { return this.Y_abs; };
+CContextMenuData.prototype.get_PageNum = function()  { return this.PageNum; };
+CContextMenuData.prototype.is_Header = function()  { return this.Header; };
 
 asc_docs_api.prototype.sync_ContextMenuCallback = function(Data)
 {
     this.asc_fireCallback("asc_onContextMenu", new CContextMenuData( Data ) );
-}
+};
 
 //-----------------------------------------------------------------
 // События движения мыши
@@ -5566,10 +5573,10 @@ function CMouseMoveData( obj )
     }
 }
 
-CMouseMoveData.prototype.get_Type  = function()  { return this.Type; }
-CMouseMoveData.prototype.get_X = function()  { return this.X_abs; }
-CMouseMoveData.prototype.get_Y = function()  { return this.Y_abs; }
-CMouseMoveData.prototype.get_Hyperlink = function()  { return this.Hyperlink; }
+CMouseMoveData.prototype.get_Type  = function()  { return this.Type; };
+CMouseMoveData.prototype.get_X = function()  { return this.X_abs; };
+CMouseMoveData.prototype.get_Y = function()  { return this.Y_abs; };
+CMouseMoveData.prototype.get_Hyperlink = function()  { return this.Hyperlink; };
 CMouseMoveData.prototype.get_UserId = function() { return this.UserId; };
 CMouseMoveData.prototype.get_HaveChanges = function() { return this.HaveChanges; };
 CMouseMoveData.prototype.get_LockedObjectType = function() { return this.LockedObjectType; };
@@ -5577,17 +5584,17 @@ CMouseMoveData.prototype.get_LockedObjectType = function() { return this.LockedO
 asc_docs_api.prototype.sync_MouseMoveStartCallback = function()
 {
     this.asc_fireCallback("asc_onMouseMoveStart");
-}
+};
 
 asc_docs_api.prototype.sync_MouseMoveEndCallback = function()
 {
     this.asc_fireCallback("asc_onMouseMoveEnd");
-}
+};
 
 asc_docs_api.prototype.sync_MouseMoveCallback = function(Data)
 {
     this.asc_fireCallback("asc_onMouseMove", Data );
-}
+};
 
 //-----------------------------------------------------------------
 // Функции для работы с гиперссылками
@@ -5602,7 +5609,7 @@ asc_docs_api.prototype.can_AddHyperlink = function()
         return this.WordControl.m_oLogicDocument.Get_SelectedText(true);
 
     return false;
-}
+};
 
 // HyperProps - объект CHyperlinkProperty
 asc_docs_api.prototype.add_Hyperlink = function(HyperProps)
@@ -5612,7 +5619,7 @@ asc_docs_api.prototype.add_Hyperlink = function(HyperProps)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Hyperlink_Add( HyperProps );
     }
-}
+};
 
 // HyperProps - объект CHyperlinkProperty
 asc_docs_api.prototype.change_Hyperlink = function(HyperProps)
@@ -5622,7 +5629,7 @@ asc_docs_api.prototype.change_Hyperlink = function(HyperProps)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Hyperlink_Modify( HyperProps );
     }
-}
+};
 
 asc_docs_api.prototype.remove_Hyperlink = function()
 {
@@ -5631,7 +5638,7 @@ asc_docs_api.prototype.remove_Hyperlink = function()
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Hyperlink_Remove();
     }
-}
+};
 
 function CHyperlinkProperty( obj )
 {
@@ -5649,22 +5656,22 @@ function CHyperlinkProperty( obj )
     }
 }
 
-CHyperlinkProperty.prototype.get_Value   = function()  { return this.Value; }
-CHyperlinkProperty.prototype.put_Value   = function(v) { this.Value = v; }
-CHyperlinkProperty.prototype.get_ToolTip = function()  { return this.ToolTip; }
-CHyperlinkProperty.prototype.put_ToolTip = function(v) { this.ToolTip = v; }
-CHyperlinkProperty.prototype.get_Text    = function()  { return this.Text; }
-CHyperlinkProperty.prototype.put_Text    = function(v) { this.Text = v; }
+CHyperlinkProperty.prototype.get_Value   = function()  { return this.Value; };
+CHyperlinkProperty.prototype.put_Value   = function(v) { this.Value = v; };
+CHyperlinkProperty.prototype.get_ToolTip = function()  { return this.ToolTip; };
+CHyperlinkProperty.prototype.put_ToolTip = function(v) { this.ToolTip = v; };
+CHyperlinkProperty.prototype.get_Text    = function()  { return this.Text; };
+CHyperlinkProperty.prototype.put_Text    = function(v) { this.Text = v; };
 
 asc_docs_api.prototype.sync_HyperlinkPropCallback = function(hyperProp)
 {
     this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( c_oAscTypeSelectElement.Hyperlink, new CHyperlinkProperty( hyperProp ) );
-}
+};
 
 asc_docs_api.prototype.sync_HyperlinkClickCallback = function(Url)
 {
     this.asc_fireCallback("asc_onHyperlinkClick", Url);
-}
+};
 
 asc_docs_api.prototype.sync_CanAddHyperlinkCallback = function(bCanAdd)
 {
@@ -5672,17 +5679,17 @@ asc_docs_api.prototype.sync_CanAddHyperlinkCallback = function(bCanAdd)
     //    this.asc_fireCallback("asc_onCanAddHyperlink", false);
     //else
         this.asc_fireCallback("asc_onCanAddHyperlink", bCanAdd);
-}
+};
 
 asc_docs_api.prototype.sync_DialogAddHyperlink = function()
 {
     this.asc_fireCallback("asc_onDialogAddHyperlink");
-}
+};
 
 asc_docs_api.prototype.sync_DialogAddHyperlink = function()
 {
     this.asc_fireCallback("asc_onDialogAddHyperlink");
-}
+};
 
 //-----------------------------------------------------------------
 // Функции для работы с орфографией
@@ -5697,19 +5704,19 @@ function asc_CSpellCheckProperty( Word, Checked, Variants, ParaId, ElemId )
     this.ElemId   = ElemId;
 }
 
-asc_CSpellCheckProperty.prototype.get_Word     = function()  { return this.Word; }
-asc_CSpellCheckProperty.prototype.get_Checked  = function()  { return this.Checked; }
-asc_CSpellCheckProperty.prototype.get_Variants = function()  { return this.Variants; }
+asc_CSpellCheckProperty.prototype.get_Word     = function()  { return this.Word; };
+asc_CSpellCheckProperty.prototype.get_Checked  = function()  { return this.Checked; };
+asc_CSpellCheckProperty.prototype.get_Variants = function()  { return this.Variants; };
 
 asc_docs_api.prototype.sync_SpellCheckCallback = function(Word, Checked, Variants, ParaId, ElemId)
 {
     this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( c_oAscTypeSelectElement.SpellCheck, new asc_CSpellCheckProperty( Word, Checked, Variants, ParaId, ElemId ) );
-}
+};
 
 asc_docs_api.prototype.sync_SpellCheckVariantsFound = function()
 {
     this.asc_fireCallback("asc_onSpellCheckVariantsFound");
-}
+};
 
 asc_docs_api.prototype.asc_replaceMisspelledWord = function(Word, SpellCheckProperty)
 {
@@ -5724,7 +5731,7 @@ asc_docs_api.prototype.asc_replaceMisspelledWord = function(Word, SpellCheckProp
         this.WordControl.m_oLogicDocument.Recalculate();
         Paragraph.Document_SetThisElementCurrent(true);
     }
-}
+};
 
 asc_docs_api.prototype.asc_ignoreMisspelledWord = function(SpellCheckProperty, bAll)
 {
@@ -5746,24 +5753,24 @@ asc_docs_api.prototype.asc_ignoreMisspelledWord = function(SpellCheckProperty, b
         LogicDocument.DrawingDocument.ClearCachePages();
         LogicDocument.DrawingDocument.FirePaint();
     }
-}
+};
 
 asc_docs_api.prototype.asc_setDefaultLanguage = function(Lang)
 {
     if (editor.WordControl.m_oLogicDocument)
         editor.WordControl.m_oLogicDocument.Set_DefaultLanguage(Lang);
-}
+};
 
 asc_docs_api.prototype.asc_getDefaultLanguage = function()
 {
     if (editor.WordControl.m_oLogicDocument)
         return editor.WordControl.m_oLogicDocument.Get_DefaultLanguage();
     return null;
-}
+};
 
 asc_docs_api.prototype.asc_setSpellCheck = function(isOn)
 {
-}
+};
 //-----------------------------------------------------------------
 // Функции для работы с комментариями
 //-----------------------------------------------------------------
@@ -5800,21 +5807,21 @@ function asc_CCommentDataWord( obj )
     }
 }
 
-asc_CCommentDataWord.prototype.asc_getText         = function()  { return this.m_sText; }
-asc_CCommentDataWord.prototype.asc_putText         = function(v) { this.m_sText = v; }
-asc_CCommentDataWord.prototype.asc_getTime         = function()  { return this.m_sTime; }
-asc_CCommentDataWord.prototype.asc_putTime         = function(v) { this.m_sTime = v; }
-asc_CCommentDataWord.prototype.asc_getUserId       = function()  { return this.m_sUserId; }
-asc_CCommentDataWord.prototype.asc_putUserId       = function(v) { this.m_sUserId = v; }
-asc_CCommentDataWord.prototype.asc_getUserName     = function()  { return this.m_sUserName; }
-asc_CCommentDataWord.prototype.asc_putUserName     = function(v) { this.m_sUserName = v; }
+asc_CCommentDataWord.prototype.asc_getText         = function()  { return this.m_sText; };
+asc_CCommentDataWord.prototype.asc_putText         = function(v) { this.m_sText = v; };
+asc_CCommentDataWord.prototype.asc_getTime         = function()  { return this.m_sTime; };
+asc_CCommentDataWord.prototype.asc_putTime         = function(v) { this.m_sTime = v; };
+asc_CCommentDataWord.prototype.asc_getUserId       = function()  { return this.m_sUserId; };
+asc_CCommentDataWord.prototype.asc_putUserId       = function(v) { this.m_sUserId = v; };
+asc_CCommentDataWord.prototype.asc_getUserName     = function()  { return this.m_sUserName; };
+asc_CCommentDataWord.prototype.asc_putUserName     = function(v) { this.m_sUserName = v; };
 asc_CCommentDataWord.prototype.asc_getQuoteText    = function()  { return this.m_sQuoteText; };
 asc_CCommentDataWord.prototype.asc_putQuoteText    = function(v) { this.m_sQuoteText = v; };
 asc_CCommentDataWord.prototype.asc_getSolved       = function()  { return this.m_bSolved; };
 asc_CCommentDataWord.prototype.asc_putSolved       = function(v) { this.m_bSolved = v; };
-asc_CCommentDataWord.prototype.asc_getReply        = function(i) { return this.m_aReplies[i]; }
-asc_CCommentDataWord.prototype.asc_addReply        = function(v) { this.m_aReplies.push( v ); }
-asc_CCommentDataWord.prototype.asc_getRepliesCount = function(v) { return this.m_aReplies.length; }
+asc_CCommentDataWord.prototype.asc_getReply        = function(i) { return this.m_aReplies[i]; };
+asc_CCommentDataWord.prototype.asc_addReply        = function(v) { this.m_aReplies.push( v ); };
+asc_CCommentDataWord.prototype.asc_getRepliesCount = function(v) { return this.m_aReplies.length; };
 
 
 asc_docs_api.prototype.asc_showComments = function()
@@ -5823,7 +5830,7 @@ asc_docs_api.prototype.asc_showComments = function()
         return;
 
     this.WordControl.m_oLogicDocument.Show_Comments();
-}
+};
 
 asc_docs_api.prototype.asc_hideComments = function()
 {
@@ -5832,7 +5839,7 @@ asc_docs_api.prototype.asc_hideComments = function()
 
     this.WordControl.m_oLogicDocument.Hide_Comments();
     editor.sync_HideComment();
-}
+};
 
 asc_docs_api.prototype.asc_addComment = function(AscCommentData)
 {
@@ -5852,7 +5859,7 @@ asc_docs_api.prototype.asc_addComment = function(AscCommentData)
         this.sync_AddComment( Comment.Get_Id(), CommentData );
     
     return Comment.Get_Id();
-}
+};
 
 asc_docs_api.prototype.asc_removeComment = function(Id)
 {
@@ -5864,7 +5871,7 @@ asc_docs_api.prototype.asc_removeComment = function(Id)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Remove_Comment( Id, true );
     }
-}
+};
 
 asc_docs_api.prototype.asc_changeComment = function(Id, AscCommentData)
 {
@@ -5881,7 +5888,7 @@ asc_docs_api.prototype.asc_changeComment = function(Id, AscCommentData)
 
         this.sync_ChangeCommentData( Id, CommentData );
     }
-}
+};
 
 asc_docs_api.prototype.asc_selectComment = function(Id)
 {
@@ -5889,12 +5896,12 @@ asc_docs_api.prototype.asc_selectComment = function(Id)
         return;
 
     this.WordControl.m_oLogicDocument.Select_Comment(Id);
-}
+};
 
 asc_docs_api.prototype.asc_showComment = function(Id)
 {
     this.WordControl.m_oLogicDocument.Show_Comment(Id);
-}
+};
 
 asc_docs_api.prototype.can_AddQuotedComment = function()
 {
@@ -5902,51 +5909,51 @@ asc_docs_api.prototype.can_AddQuotedComment = function()
     //    return false;
 
     return this.WordControl.m_oLogicDocument.CanAdd_Comment();
-}
+};
 
 asc_docs_api.prototype.sync_RemoveComment = function(Id)
 {
     this.asc_fireCallback("asc_onRemoveComment", Id);
-}
+};
 
 asc_docs_api.prototype.sync_AddComment = function(Id, CommentData)
 {
     var AscCommentData = new asc_CCommentDataWord(CommentData);
     this.asc_fireCallback("asc_onAddComment", Id, AscCommentData);
-}
+};
 
 asc_docs_api.prototype.sync_ShowComment = function(Id, X, Y)
 {
     // TODO: Переделать на нормальный массив
     this.asc_fireCallback("asc_onShowComment", [ Id ], X, Y);
-}
+};
 
 asc_docs_api.prototype.sync_HideComment = function()
 {
     this.asc_fireCallback("asc_onHideComment");
-}
+};
 
 asc_docs_api.prototype.sync_UpdateCommentPosition = function(Id, X, Y)
 {
     // TODO: Переделать на нормальный массив
     this.asc_fireCallback("asc_onUpdateCommentPosition", [ Id ], X, Y);
-}
+};
 
 asc_docs_api.prototype.sync_ChangeCommentData = function(Id, CommentData)
 {
     var AscCommentData = new asc_CCommentDataWord(CommentData);
     this.asc_fireCallback("asc_onChangeCommentData", Id, AscCommentData);
-}
+};
 
 asc_docs_api.prototype.sync_LockComment = function(Id, UserId)
 {
     this.asc_fireCallback("asc_onLockComment", Id, UserId);
-}
+};
 
 asc_docs_api.prototype.sync_UnLockComment = function(Id)
 {
     this.asc_fireCallback("asc_onUnLockComment", Id);
-}
+};
 
 asc_docs_api.prototype.asc_getComments = function()
 {
@@ -5963,90 +5970,90 @@ asc_docs_api.prototype.asc_getComments = function()
     }
 
     return ResComments;
-}
+};
 //-----------------------------------------------------------------
 asc_docs_api.prototype.sync_LockHeaderFooters = function()
 {
     this.asc_fireCallback("asc_onLockHeaderFooters");
-}
+};
 
 asc_docs_api.prototype.sync_LockDocumentProps = function()
 {
     this.asc_fireCallback("asc_onLockDocumentProps");
-}
+};
 
 asc_docs_api.prototype.sync_UnLockHeaderFooters = function()
 {
     this.asc_fireCallback("asc_onUnLockHeaderFooters");
-}
+};
 
 asc_docs_api.prototype.sync_UnLockDocumentProps = function()
 {
     this.asc_fireCallback("asc_onUnLockDocumentProps");
-}
+};
 
 asc_docs_api.prototype.sync_CollaborativeChanges = function()
 {
     this.asc_fireCallback("asc_onCollaborativeChanges");
-}
+};
 
 asc_docs_api.prototype.sync_LockDocumentSchema = function()
 {
     this.asc_fireCallback("asc_onLockDocumentSchema");
-}
+};
 
 asc_docs_api.prototype.sync_UnLockDocumentSchema = function()
 {
     this.asc_fireCallback("asc_onUnLockDocumentSchema");
-}
+};
 
 
 /*----------------------------------------------------------------*/
 /*functions for working with zoom & navigation*/
 asc_docs_api.prototype.zoomIn = function(){
     this.WordControl.zoom_In();
-}
+};
 asc_docs_api.prototype.zoomOut = function(){
     this.WordControl.zoom_Out();
-}
+};
 asc_docs_api.prototype.zoomFitToPage = function(){
     this.WordControl.zoom_FitToPage();
-}
+};
 asc_docs_api.prototype.zoomFitToWidth = function(){
     this.WordControl.zoom_FitToWidth();
-}
+};
 asc_docs_api.prototype.zoomCustomMode = function(){
     this.WordControl.m_nZoomType = 0;
     this.WordControl.zoom_Fire(0, this.WordControl.m_nZoomValue);
-}
+};
 asc_docs_api.prototype.zoom100 = function(){
 	this.zoom(100);
-}
+};
 asc_docs_api.prototype.zoom = function(percent){
     var _old_val = this.WordControl.m_nZoomValue;
     this.WordControl.m_nZoomValue = percent;
     this.WordControl.m_nZoomType = 0;
     this.WordControl.zoom_Fire(0, _old_val);
-}
+};
 asc_docs_api.prototype.goToPage = function(number){
 	this.WordControl.GoToPage(number);
-}
+};
 asc_docs_api.prototype.getCountPages = function(){
 	return this.WordControl.m_oDrawingDocument.m_lPagesCount;
-}
+};
 asc_docs_api.prototype.getCurrentPage = function(){
 	return this.WordControl.m_oDrawingDocument.m_lCurrentPage;
-}
+};
 /*callbacks*/
 asc_docs_api.prototype.sync_zoomChangeCallback = function(percent,type){	//c_oAscZoomType.Current, c_oAscZoomType.FitWidth, c_oAscZoomType.FitPage
 	this.asc_fireCallback("asc_onZoomChange",percent,type);
-}
+};
 asc_docs_api.prototype.sync_countPagesCallback = function(count){
 	this.asc_fireCallback("asc_onCountPages",count);
-}
+};
 asc_docs_api.prototype.sync_currentPageCallback = function(number){
 	this.asc_fireCallback("asc_onCurrentPage",number);
-}
+};
 
 asc_docs_api.prototype.async_SaveToPdf = function(){
 
@@ -6061,7 +6068,7 @@ asc_docs_api.prototype.async_SaveToPdf = function(){
             clearInterval(pdf_interval);
         }
     }, 10);
-}
+};
 
 asc_docs_api.prototype.async_SaveToPdf_PartCallback = function(part64, is_end)
 {
@@ -6069,14 +6076,14 @@ asc_docs_api.prototype.async_SaveToPdf_PartCallback = function(part64, is_end)
 	{
 		window['qtDocBridge']['printedDocumentPart'] (part64, is_end);
 	}
-}
+};
 asc_docs_api.prototype.async_SaveToPdf_Progress = function(progress)
 {
 	if (undefined != window['qtDocBridge'])
 	{
 		window['qtDocBridge']['progressedSaveToPDF'] (progress);
 	}
-}
+};
 
 /*----------------------------------------------------------------*/
 asc_docs_api.prototype.asc_enableKeyEvents = function(value){
@@ -6088,20 +6095,20 @@ asc_docs_api.prototype.asc_enableKeyEvents = function(value){
 
 		this.asc_fireCallback("asc_onEnableKeyEventsChanged", value);
 	}
-}
+};
 
 asc_docs_api.prototype.asyncServerIdStartLoaded = function()
 {
 	this._coSpellCheckInit();
 	this._coAuthoringInit();
-}
+};
 
 asc_docs_api.prototype.asyncServerIdEndLoaded = function()
 {
     this.ServerIdWaitComplete = true;
     if (true == this.ServerImagesWaitComplete)
         this.OpenDocumentEndCallback();
-}
+};
 
 // работа с шрифтами
 asc_docs_api.prototype.asyncFontsDocumentStartLoaded = function()
@@ -6133,7 +6140,7 @@ asc_docs_api.prototype.asyncFontsDocumentStartLoaded = function()
         _progress.ImagesCount = _count;
         _progress.CurrentImage = 0;
     }
-}
+};
 asc_docs_api.prototype.GenerateStyles = function()
 {
     var StylesPainter = new CStylesPainter();
@@ -6145,7 +6152,7 @@ asc_docs_api.prototype.GenerateStyles = function()
     {
         StylesPainter.GenerateStyles(this, this.LoadedObjectDS);
     }
-}
+};
 asc_docs_api.prototype.asyncFontsDocumentEndLoaded = function()
 {
     // все, шрифты загружены. Теперь нужно подгрузить картинки
@@ -6239,7 +6246,7 @@ asc_docs_api.prototype.asyncFontsDocumentEndLoaded = function()
 
     this.ImageLoader.bIsLoadDocumentFirst = true;
 	this.ImageLoader.LoadDocumentImages(_loader_object.ImageMap, true);
-}
+};
 
 asc_docs_api.prototype.CreateFontsCharMap = function()
 {
@@ -6249,17 +6256,17 @@ asc_docs_api.prototype.CreateFontsCharMap = function()
     this.WordControl.m_oLogicDocument.Document_CreateFontCharMap(_info);
 
     return _info.EndWork();
-}
+};
 
 asc_docs_api.prototype.sync_SendThemeColors = function(colors,standart_colors)
 {
     this._gui_control_colors = { Colors : colors, StandartColors : standart_colors };
     this.asc_fireCallback("asc_onSendThemeColors",colors,standart_colors);
-}
+};
 asc_docs_api.prototype.sync_SendThemeColorSchemes = function(param)
 {
     this._gui_color_schemes = param;
-}
+};
 
 asc_docs_api.prototype.ChangeColorScheme = function(index_scheme)
 {
@@ -6370,13 +6377,13 @@ asc_docs_api.prototype.ChangeColorScheme = function(index_scheme)
         this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
     }
 
-}
+};
 
 asc_docs_api.prototype.asyncImagesDocumentStartLoaded = function()
 {
 	// евент о заморозке не нужен... оно и так заморожено
 	// просто нужно вывести информацию в статус бар (что началась загрузка картинок)
-}
+};
 asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
 {
     if (this.EndActionLoadImages == 1)
@@ -6449,7 +6456,7 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
                 this.SyncLoadImages_callback();
         }
     }
-}
+};
 
 asc_docs_api.prototype.OpenDocumentEndCallback = function()
 {
@@ -6524,7 +6531,7 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
 
 	// Запускаем таймер автосохранения
 	this.autoSaveInit();
-}
+};
 
 asc_docs_api.prototype.UpdateInterfaceState = function()
 {
@@ -6532,13 +6539,13 @@ asc_docs_api.prototype.UpdateInterfaceState = function()
     {
         this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
     }
-}
+};
 
 asc_docs_api.prototype.asyncFontStartLoaded = function()
 {
 	// здесь прокинуть евент о заморозке меню
     this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
-}
+};
 asc_docs_api.prototype.asyncFontEndLoaded = function(fontinfo)
 {
     this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
@@ -6569,12 +6576,12 @@ asc_docs_api.prototype.asyncFontEndLoaded = function(fontinfo)
         this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
     }
 	// отжать заморозку меню
-}
+};
 
 asc_docs_api.prototype.asyncImageStartLoaded = function()
 {
     // здесь прокинуть евент о заморозке меню
-}
+};
 asc_docs_api.prototype.asyncImageEndLoaded = function(_image)
 {
     // отжать заморозку меню
@@ -6598,16 +6605,16 @@ asc_docs_api.prototype.asyncImageEndLoaded = function(_image)
             }
         }
 	}
-}
+};
 
 asc_docs_api.prototype.asyncImageEndLoadedBackground = function(_image)
 {
     this.WordControl.m_oDrawingDocument.CheckRasterImageOnScreen(_image.src);
-}
+};
 asc_docs_api.prototype.IsAsyncOpenDocumentImages = function()
 {
     return true;
-}
+};
 
 asc_docs_api.prototype.SendOpenProgress = function()
 {
@@ -6621,7 +6628,7 @@ asc_docs_api.prototype.SendOpenProgress = function()
     _percents = this._lastConvertProgress + _percents * (100.0 - this._lastConvertProgress) / 100.0;
     return this.sync_SendProgress(_percents);
     //console.log("" + this.OpenDocumentProgress.CurrentFont);
-}
+};
 
 asc_docs_api.prototype.sync_SendProgress = function(Percents)
 {
@@ -6631,7 +6638,7 @@ asc_docs_api.prototype.sync_SendProgress = function(Percents)
         // push data to native QT code
         window['qtDocBridge']['openedProgress'] (Percents);
     }
-}
+};
 
 asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
 {
@@ -6654,7 +6661,7 @@ asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
 
     this.isPasteFonts_Images = true;
     this.FontLoader.LoadDocumentFonts2(_fonts);
-}
+};
 
 asc_docs_api.prototype.pre_Save = function(_images)
 {
@@ -6662,7 +6669,7 @@ asc_docs_api.prototype.pre_Save = function(_images)
     this.saveImageMap = _images;
     this.WordControl.m_oDrawingDocument.CheckFontNeeds();
     this.FontLoader.LoadDocumentFonts2(this.WordControl.m_oLogicDocument.Fonts);
-}
+};
 
 asc_docs_api.prototype.SyncLoadImages = function(_images)
 {
@@ -6692,11 +6699,11 @@ asc_docs_api.prototype.SyncLoadImages = function(_images)
     }
 
     this.ImageLoader.LoadDocumentImages(this.loadCustomImageMap, false);
-}
+};
 asc_docs_api.prototype.SyncLoadImages_callback = function()
 {
     this.WordControl.OnRePaintAttack();
-}
+};
 
 asc_docs_api.prototype.pre_SaveCallback = function()
 {
@@ -6707,32 +6714,32 @@ asc_docs_api.prototype.pre_SaveCallback = function()
         this.isApplyChangesOnOpen = false;
         this.OpenDocumentEndCallback();
     }
-}
+};
 
 asc_docs_api.prototype.initEvents2MobileAdvances = function()
 {
     //this.WordControl.initEvents2MobileAdvances();
-}
+};
 asc_docs_api.prototype.ViewScrollToX = function(x)
 {
     this.WordControl.m_oScrollHorApi.scrollToX(x);
-}
+};
 asc_docs_api.prototype.ViewScrollToY = function(y)
 {
     this.WordControl.m_oScrollVerApi.scrollToY(y);
-}
+};
 asc_docs_api.prototype.GetDocWidthPx = function()
 {
     return this.WordControl.m_dDocumentWidth;
-}
+};
 asc_docs_api.prototype.GetDocHeightPx = function()
 {
     return this.WordControl.m_dDocumentHeight;
-}
+};
 asc_docs_api.prototype.ClearSearch = function()
 {
     return this.WordControl.m_oDrawingDocument.EndSearch(true);
-}
+};
 asc_docs_api.prototype.GetCurrentVisiblePage = function()
 {
     var lPage1 = this.WordControl.m_oDrawingDocument.m_lDrawingFirst;
@@ -6765,7 +6772,7 @@ asc_docs_api.prototype.asc_SetDocumentPlaceChangedEnabled = function(bEnabled)
 {
     if (this.WordControl)
         this.WordControl.m_bDocumentPlaceChangedEnabled = bEnabled;
-}
+};
 
 asc_docs_api.prototype.asc_SetViewRulers = function(bRulers)
 {
@@ -6778,7 +6785,7 @@ asc_docs_api.prototype.asc_SetViewRulers = function(bRulers)
         this.WordControl.checkNeedRules();
         this.WordControl.OnResize(true);
     }
-}
+};
 asc_docs_api.prototype.asc_SetViewRulersChange = function()
 {
     //if (false === this.bInit_word_control || true === this.isViewMode)
@@ -6788,11 +6795,11 @@ asc_docs_api.prototype.asc_SetViewRulersChange = function()
     this.WordControl.checkNeedRules();
     this.WordControl.OnResize(true);
     return this.WordControl.m_bIsRuler;
-}
+};
 asc_docs_api.prototype.asc_GetViewRulers = function()
 {
     return this.WordControl.m_bIsRuler;
-}
+};
 
 asc_docs_api.prototype.SetMobileVersion = function(val)
 {
@@ -6824,7 +6831,7 @@ asc_docs_api.prototype.GoToHeader = function(pageNumber)
     this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 
     global_mouseEvent.ClickCount = oldClickCount;
-}
+};
 
 asc_docs_api.prototype.GoToFooter = function(pageNumber)
 {
@@ -6842,7 +6849,7 @@ asc_docs_api.prototype.GoToFooter = function(pageNumber)
     this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 
     global_mouseEvent.ClickCount = oldClickCount;
-}
+};
 
 asc_docs_api.prototype.ExitHeader_Footer = function(pageNumber)
 {
@@ -6857,29 +6864,29 @@ asc_docs_api.prototype.ExitHeader_Footer = function(pageNumber)
     this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 
     global_mouseEvent.ClickCount = oldClickCount;
-}
+};
 
 asc_docs_api.prototype.GetCurrentPixOffsetY = function()
 {
     return this.WordControl.m_dScrollY;
-}
+};
 
 asc_docs_api.prototype.SetPaintFormat = function(value)
 {
     this.isPaintFormat = value;
     this.WordControl.m_oLogicDocument.Document_Format_Copy();
-}
+};
 
 asc_docs_api.prototype.ChangeShapeType = function(value)
 {
     this.ImgApply(new CImgProperty({ShapeProperties:{type:value}}));
-}
+};
 
 asc_docs_api.prototype.sync_PaintFormatCallback = function(value)
 {
     this.isPaintFormat = value;
     return this.asc_fireCallback("asc_onPaintFormatChanged", value);
-}
+};
 asc_docs_api.prototype.SetMarkerFormat = function(value, is_flag, r, g, b)
 {
     this.isMarkerFormat = value;
@@ -6889,13 +6896,13 @@ asc_docs_api.prototype.SetMarkerFormat = function(value, is_flag, r, g, b)
         this.WordControl.m_oLogicDocument.Paragraph_SetHighlight(is_flag, r, g, b);
         this.WordControl.m_oLogicDocument.Document_Format_Copy();
     }
-}
+};
 
 asc_docs_api.prototype.sync_MarkerFormatCallback = function(value)
 {
     this.isMarkerFormat = value;
     return this.asc_fireCallback("asc_onMarkerFormatChanged", value);
-}
+};
 
 asc_docs_api.prototype.StartAddShape = function(sPreset, is_apply)
 {
@@ -6910,33 +6917,33 @@ asc_docs_api.prototype.StartAddShape = function(sPreset, is_apply)
         editor.sync_EndAddShape();
         editor.sync_StartAddShapeCallback(false);
     }
-}
+};
 
 asc_docs_api.prototype.sync_StartAddShapeCallback = function(value)
 {
     this.isStartAddShape = value;
     return this.asc_fireCallback("asc_onStartAddShapeChanged", value);
-}
+};
 
 asc_docs_api.prototype.CanGroup = function()
 {
     return this.WordControl.m_oLogicDocument.CanGroup();
-}
+};
 
 asc_docs_api.prototype.CanUnGroup = function()
 {
     return this.WordControl.m_oLogicDocument.CanUnGroup();
-}
+};
 
 asc_docs_api.prototype.CanChangeWrapPolygon = function()
 {
     return this.WordControl.m_oLogicDocument.CanChangeWrapPolygon();
-}
+};
 
 asc_docs_api.prototype.StartChangeWrapPolygon = function()
 {
     return this.WordControl.m_oLogicDocument.StartChangeWrapPolygon();
-}
+};
 
 
 asc_docs_api.prototype.ClearFormating = function()
@@ -6946,7 +6953,7 @@ asc_docs_api.prototype.ClearFormating = function()
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Paragraph_ClearFormatting();
     }
-}
+};
 
 asc_docs_api.prototype.GetSectionInfo = function()
 {
@@ -6962,7 +6969,7 @@ asc_docs_api.prototype.GetSectionInfo = function()
     obj.MarginBottom = 20;
 
     return obj;
-}
+};
 
 asc_docs_api.prototype.add_SectionBreak = function(_Type)
 {
@@ -6981,7 +6988,7 @@ asc_docs_api.prototype.add_SectionBreak = function(_Type)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Add_SectionBreak(Type);
     }
-}
+};
 
 asc_docs_api.prototype.SetViewMode = function( isViewMode )
 {
@@ -7019,24 +7026,24 @@ asc_docs_api.prototype.SetViewMode = function( isViewMode )
         this.WordControl.OnResize(true);
         this.sync_InitEditorStyles2();
     }
-}
+};
 
 asc_docs_api.prototype.SetUseEmbeddedCutFonts = function(bUse)
 {
     this.isUseEmbeddedCutFonts = bUse;
-}
+};
 
 asc_docs_api.prototype.IsNeedDefaultFonts = function()
 {
     if (this.WordControl.m_oLogicDocument != null)
         return true;
     return false;
-}
+};
 
 asc_docs_api.prototype.OnMouseUp = function(x, y)
 {
     this.WordControl.onMouseUpExternal(x, y);
-}
+};
 asc_docs_api.prototype.OnHandleMessage = function(event)
 {
 	if (null != event && null != event.data)
@@ -7064,7 +7071,7 @@ asc_docs_api.prototype.OnHandleMessage = function(event)
         {
         }
 	}
-}
+};
 asc_docs_api.prototype.asyncImageEndLoaded2 = null;
 
 asc_docs_api.prototype.OfflineAppDocumentStartLoad = function()
@@ -7092,7 +7099,7 @@ asc_docs_api.prototype.OfflineAppDocumentStartLoad = function()
     scriptElem.setAttribute('src',documentUrl + "editor.js");
     scriptElem.setAttribute('type','text/javascript');
     document.getElementsByTagName('head')[0].appendChild(scriptElem);
-}
+};
 
 asc_docs_api.prototype.OfflineAppDocumentEndLoad = function()
 {
@@ -7115,29 +7122,29 @@ asc_docs_api.prototype.OfflineAppDocumentEndLoad = function()
         editor.OpenDocument(documentUrl, window["editor_bin"]);
     else
         editor.OpenDocument2(documentUrl, window["editor_bin"]);
-}
+};
 
 asc_docs_api.prototype.SetDrawImagePlaceParagraph = function(element_id, props)
 {
     this.WordControl.m_oDrawingDocument.InitGuiCanvasTextProps(element_id);
     this.WordControl.m_oDrawingDocument.DrawGuiCanvasTextProps(props);
-}
+};
 
 asc_docs_api.prototype.asc_setCoAuthoringEnable = function (isCoAuthoringEnable)
 {
 	this.isCoAuthoringEnable = !!isCoAuthoringEnable;
-}
+};
 
 asc_docs_api.prototype.asc_getMasterCommentId = function()
 {
     return -1;
-}
+};
 
 asc_docs_api.prototype.asc_getAnchorPosition = function()
 {
     var AnchorPos = this.WordControl.m_oLogicDocument.Get_SelectionAnchorPos();    
     return new asc_CRect(AnchorPos.X0, AnchorPos.Y, AnchorPos.X1 - AnchorPos.X0, 0);
-}
+};
 
 var cCharDelimiter = String.fromCharCode(5);
 
@@ -7347,7 +7354,7 @@ function sendCommand(editor, fCallback, rdata){
 		}
 	})
 
-	};
+	}
 function sendTrack(fCallback, url, rdata){
 	asc_ajax({
         type: 'POST',
@@ -7363,7 +7370,7 @@ function sendTrack(fCallback, url, rdata){
 				fCallback(incomeObject);			
 		}
 	})
-};
+}
 function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey)
 {
 	var sData;
@@ -7402,7 +7409,7 @@ function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey)
 		oAdditionalData["data"] = oBinaryFileWriter.Write();
 		sendCommand(editor, fCallback, oAdditionalData);
 	}
-};
+}
 
 function _addImageUrl2 (url)
 {
@@ -7439,7 +7446,7 @@ function _getFullImageSrc(src)
     }
 	else
 		return src;
-};
+}
 function _mapAscServerErrorToAscError(nServerError)
 {
 	var nRes = c_oAscError.ID.Unknown;
@@ -7581,7 +7588,7 @@ asc_docs_api.prototype.asc_getChartObject = function(type, subtype)
 
 
     return this.WordControl.m_oLogicDocument.Get_ChartObject(type, subtype);
-}
+};
 
 asc_docs_api.prototype.asc_addChartDrawingObject = function(options)
 {
@@ -7590,7 +7597,7 @@ asc_docs_api.prototype.asc_addChartDrawingObject = function(options)
         History.Create_NewPoint();
         this.WordControl.m_oLogicDocument.Add_InlineImage( null, null, null, options );
     }
-}
+};
 
 asc_docs_api.prototype.asc_editChartDrawingObject = function(chartBinary)
 {
@@ -7606,7 +7613,7 @@ asc_docs_api.prototype.asc_editChartDrawingObject = function(chartBinary)
             this.WordControl.m_oLogicDocument.Edit_Chart(binary);
         }
 	}
-}
+};
 
 asc_docs_api.prototype.asc_getChartPreviews = function(chartType, chartSubType)
 {
@@ -7617,12 +7624,12 @@ asc_docs_api.prototype.asc_getChartPreviews = function(chartType, chartSubType)
             chartType = REV_TYPE_SUBTYPE_BY_TYPE[chartType][chartSubType];
 		return this.chartPreviewManager.getChartPreviews(chartType, chartSubType);
 	}
-}
+};
 
 asc_docs_api.prototype.sync_closeChartEditor = function()
 {
     this.asc_fireCallback("asc_onCloseChartEditor");
-}
+};
 
 asc_docs_api.prototype.asc_setDrawCollaborationMarks = function (bDraw)
 {
@@ -7632,7 +7639,7 @@ asc_docs_api.prototype.asc_setDrawCollaborationMarks = function (bDraw)
         this.WordControl.m_oDrawingDocument.ClearCachePages();
         this.WordControl.m_oDrawingDocument.FirePaint();
     }
-}
+};
 
 asc_docs_api.prototype.asc_AddMath = function(Type)
 {
@@ -7649,7 +7656,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
         this.FontAsyncLoadType = 1;
         this.FontAsyncLoadParam = Type;
     }
-}
+};
 
 asc_docs_api.prototype.asc_AddMath2 = function(Type)
 {
@@ -7659,7 +7666,7 @@ asc_docs_api.prototype.asc_AddMath2 = function(Type)
 		var MathElement = new MathMenu (Type)
         this.WordControl.m_oLogicDocument.Paragraph_Add( MathElement );
     }
-}
+};
 
 window["asc_docs_api"] = asc_docs_api;
 window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File)
@@ -7705,7 +7712,7 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File)
 		sizeMM = DocumentPageSize.getSize(Page_Height, Page_Width);
 	this.sync_DocSizeCallback(sizeMM.w_mm, sizeMM.h_mm);
 	this.sync_PageOrientCallback(editor.get_DocumentOrientation());
-}
+};
 
 window["asc_docs_api"].prototype["asc_nativeCalculateFile"] = function()
 {
@@ -7736,19 +7743,19 @@ window["asc_docs_api"].prototype["asc_nativeCalculateFile"] = function()
     Document.Recalculate();
     
     this.ShowParaMarks = false;
-}
+};
 
 window["asc_docs_api"].prototype["asc_nativeApplyChanges"] = function(changes)
 {
     this._coAuthoringSetChanges(changes, new CDocumentColor( 191, 255, 199 ));
 	CollaborativeEditing.Apply_OtherChanges();
-}
+};
 
 window["asc_docs_api"].prototype["asc_nativeGetFile"] = function()
 {
 	var oBinaryFileWriter = new BinaryFileWriter(this.WordControl.m_oLogicDocument);
     return oBinaryFileWriter.Write();
-}
+};
 
 window["asc_docs_api"].prototype["asc_nativeCheckPdfRenderer"] = function(_memory1, _memory2)
 {
@@ -7779,11 +7786,11 @@ window["asc_docs_api"].prototype["asc_nativeCheckPdfRenderer"] = function(_memor
 	_printer.Memory				    = _memory1;
 	_printer.VectorMemoryForPrint	= _memory2;
 	return _printer;
-}
+};
 
 window["asc_docs_api"].prototype["asc_nativeCalculate"] = function()
 {
-}
+};
 
 window["asc_docs_api"].prototype["asc_nativePrint"] = function(_printer, _page)
 {
@@ -7791,9 +7798,9 @@ window["asc_docs_api"].prototype["asc_nativePrint"] = function(_printer, _page)
     _printer.BeginPage(page.width_mm, page.height_mm);
     this.WordControl.m_oLogicDocument.DrawPage(_page, _printer);
     _printer.EndPage();
-}
+};
 
 window["asc_docs_api"].prototype["asc_nativePrintPagesCount"] = function()
 {
 	return this.WordControl.m_oDrawingDocument.m_lPagesCount;
-}
+};
