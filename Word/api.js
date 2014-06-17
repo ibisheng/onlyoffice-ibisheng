@@ -758,8 +758,6 @@ asc_docs_api.prototype.TranslateStyleName = function(style_name)
 asc_docs_api.prototype.SetUnchangedDocument = function()
 {
     this.isDocumentModify = false;
-    //this.WordControl.m_oDrawingDocument.m_bIsSendApiDocChanged = false;
-
     this.asc_fireCallback("asc_onDocumentModifiedChanged");
 }
 
@@ -2736,6 +2734,47 @@ asc_docs_api.prototype.Paste = function()
 asc_docs_api.prototype.Share = function(){
 
 }
+
+asc_docs_api.prototype.asc_Save2 = function()
+{
+    if (true === this.canSave)
+    {
+        this.canSave = false;
+        this.CoAuthoringApi.askSaveChanges(OnSave_Callback2);
+    }
+}
+
+function OnSave_Callback2(e)
+{
+    if ( false == e["saveLock"] ) 
+    {
+        editor.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+
+        if ( c_oAscCollaborativeMarksShowType.LastChanges === editor.CollaborativeMarksShowType )
+            CollaborativeEditing.Clear_CollaborativeMarks();
+
+        // Принимаем чужие изменения
+        safe_Apply_Changes();
+
+        // Пересылаем свои изменения
+        CollaborativeEditing.Send_Changes();
+        
+        // Выставляем, что документ не модифицирован
+        editor.SetUnchangedDocument();
+
+        editor.canSave = true;
+
+        editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+
+        // Снимаем лок с функции сохранения на сервере
+        editor.CoAuthoringApi.unSaveChanges();
+    } 
+    else 
+    {
+        setTimeout( function(){ editor.CoAuthoringApi.askSaveChanges( OnSave_Callback2 ); }, 1000 );
+    }
+}
+
 asc_docs_api.prototype.asc_Save = function (isAutoSave) {
 	if(true === this.canSave) {
 		this.canSave = false;
