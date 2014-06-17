@@ -1755,7 +1755,14 @@ function CBinaryFileWriter()
         oThis.WriteUChar(g_nodeAttributeEnd);
 
         oThis.WriteRecord1(1, rPr.Unifill, oThis.WriteUniFill);
-        oThis.WriteRecord2(3, rPr.FontFamily, oThis.WriteTextFontTypeface);
+
+        if (rPr.RFonts)
+        {
+            if (rPr.RFonts.Ascii)
+                oThis.WriteRecord2(3, rPr.RFonts.Ascii, oThis.WriteTextFontTypeface);
+            if (rPr.RFonts.EastAsia)
+                oThis.WriteRecord2(4, rPr.RFonts.EastAsia, oThis.WriteTextFontTypeface);
+        }
 
         if (hlinkObj != null && hlinkObj !== undefined)
         {
