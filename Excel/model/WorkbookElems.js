@@ -3351,7 +3351,7 @@ CCellValue.prototype =
 				
 			if(bSetCellFont)
 			{
-			    if (oIntersectFont.isEqual(cellFont))
+			    if (oIntersectFont.isEqual(g_oDefaultFont))
 					this.cell.setFont(null, false);
 				else
 					this.cell.setFont(oIntersectFont, false);
