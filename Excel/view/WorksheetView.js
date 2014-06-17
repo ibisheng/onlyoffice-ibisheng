@@ -9291,6 +9291,7 @@
 			var _updateRangeIns, _updateRangeDel, bUndoRedo;
 			var functionModelAction = null;
 			var lockDraw = false;	// Параметр, при котором не будет отрисовки (т.к. мы просто обновляем информацию на неактивном листе)
+			var oChangeData = new CChangeTableData(null, null, null, null); // Обновление для диаграмм
 
 			var onChangeWorksheetCallback = function (isSuccess) {
 				if (false === isSuccess)
@@ -9315,7 +9316,7 @@
 				if (isUpdateCols) { t._updateVisibleColsCount(); }
 				if (isUpdateRows) { t._updateVisibleRowsCount(); }
 
-				t.objectRender.rebuildChartGraphicObjects();
+				t.objectRender.rebuildChartGraphicObjects(oChangeData);
 				t.objectRender.showDrawingObjects(true);
 			};
 
@@ -9336,31 +9337,39 @@
 						t.autoFilters.insertColumn(prop, val, arn);
 						t.model.insertColsBefore(arn.c1, val);
 					};
-					return this._isLockedCells (new asc_Range(arn.c1, 0, arn.c1 + val - 1, gc_nMaxRow0), c_oAscLockTypeElemSubType.InsertColumns, onChangeWorksheetCallback);
+					oChangeData.added = new asc_Range(arn.c1, 0, arn.c1 + val - 1, gc_nMaxRow0);
+					return this._isLockedCells(oChangeData.added, c_oAscLockTypeElemSubType.InsertColumns,
+						onChangeWorksheetCallback);
 				case "insColAfter":
 					functionModelAction = function () {
 						fullRecalc = true;
 						t.autoFilters.insertColumn(prop, val, arn);
 						t.model.insertColsAfter(arn.c2, val);
 					};
-					return this._isLockedCells (new asc_Range(arn.c2, 0, arn.c2 + val - 1, gc_nMaxRow0), c_oAscLockTypeElemSubType.InsertColumns, onChangeWorksheetCallback);
+					oChangeData.added = new asc_Range(arn.c2, 0, arn.c2 + val - 1, gc_nMaxRow0);
+					return this._isLockedCells (oChangeData.added, c_oAscLockTypeElemSubType.InsertColumns,
+						onChangeWorksheetCallback);
 				case "delCol":
 					functionModelAction = function () {
 						fullRecalc = true;
 						t.model.removeCols(arn.c1, arn.c2);
 					};
-					return this._isLockedCells (new asc_Range(arn.c1, 0, arn.c2, gc_nMaxRow0), c_oAscLockTypeElemSubType.DeleteColumns, onChangeWorksheetCallback);
+					oChangeData.removed = new asc_Range(arn.c1, 0, arn.c2, gc_nMaxRow0);
+					return this._isLockedCells (oChangeData.removed, c_oAscLockTypeElemSubType.DeleteColumns,
+						onChangeWorksheetCallback);
 				case "showCols":
 					functionModelAction = function () {
 						t.model.setColHidden(/*bHidden*/false, arn.c1, arn.c2);
 						fullRecalc = true;
 					};
+					oChangeData.hided = new asc_Range(arn.c1, 0, arn.c2, gc_nMaxRow0);
 					return this._isLockedAll (onChangeWorksheetCallback);
 				case "hideCols":
 					functionModelAction = function () {
 						t.model.setColHidden(/*bHidden*/true, arn.c1, arn.c2);
 						fullRecalc = true;
 					};
+					oChangeData.hided = new asc_Range(arn.c1, 0, arn.c2, gc_nMaxRow0);
 					return this._isLockedAll (onChangeWorksheetCallback);
 
 				case "rowHeight":
@@ -9377,30 +9386,38 @@
 						fullRecalc = true;
 						t.model.insertRowsBefore(arn.r1, val);
 					};
-					return this._isLockedCells (new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r1 + val - 1), c_oAscLockTypeElemSubType.InsertRows, onChangeWorksheetCallback);
+					oChangeData.added = new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r1 + val - 1);
+					return this._isLockedCells (oChangeData.added, c_oAscLockTypeElemSubType.InsertRows,
+						onChangeWorksheetCallback);
 				case "insRowAfter":
 					functionModelAction = function () {
 						fullRecalc = true;
 						t.model.insertRowsAfter(arn.r2, val);
 					};
-					return this._isLockedCells (new asc_Range(0, arn.r2, gc_nMaxCol0, arn.r2 + val - 1), c_oAscLockTypeElemSubType.InsertRows, onChangeWorksheetCallback);
+					oChangeData.added = new asc_Range(0, arn.r2, gc_nMaxCol0, arn.r2 + val - 1);
+					return this._isLockedCells (oChangeData.added, c_oAscLockTypeElemSubType.InsertRows,
+						onChangeWorksheetCallback);
 				case "delRow":
 					functionModelAction = function () {
 						fullRecalc = true;
 						t.model.removeRows(arn.r1, arn.r2);
 					};
-					return this._isLockedCells (new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r1), c_oAscLockTypeElemSubType.DeleteRows, onChangeWorksheetCallback);
+					oChangeData.removed = new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r1);
+					return this._isLockedCells (oChangeData.removed, c_oAscLockTypeElemSubType.DeleteRows,
+						onChangeWorksheetCallback);
 				case "showRows":
 					functionModelAction = function () {
 						t.model.setRowHidden(/*bHidden*/false, arn.r1, arn.r2);
 						fullRecalc = true;
 					};
+					oChangeData.hided = new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r2);
 					return this._isLockedAll (onChangeWorksheetCallback);
 				case "hideRows":
 					functionModelAction = function () {
 						t.model.setRowHidden(/*bHidden*/true, arn.r1, arn.r2);
 						fullRecalc = true;
 					};
+					oChangeData.hided = new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r2);
 					return this._isLockedAll (onChangeWorksheetCallback);
 
 				case "insCell":
@@ -9435,9 +9452,11 @@
 
 							if(bUndoRedo)
 								onChangeWorksheetCallback(true);
-							else
-								this._isLockedCells (new asc_Range(_updateRangeIns.c1, _updateRangeIns.r1,
-									gc_nMaxCol0, _updateRangeIns.r2), null, onChangeWorksheetCallback);
+							else {
+								oChangeData.changedRange = new asc_Range(_updateRangeIns.c1, _updateRangeIns.r1,
+									gc_nMaxCol0, _updateRangeIns.r2);
+								this._isLockedCells(oChangeData.changedRange, null, onChangeWorksheetCallback);
+							}
 							return;
 						case c_oAscInsertOptions.InsertCellsAndShiftDown:
 							functionModelAction = function () {
@@ -9461,9 +9480,11 @@
 
 							if(bUndoRedo)
 								onChangeWorksheetCallback(true);
-							else
-								this._isLockedCells (new asc_Range(_updateRangeIns.c1, _updateRangeIns.r1,
-									_updateRangeIns.c2, gc_nMaxRow0), null, onChangeWorksheetCallback);
+							else {
+								oChangeData.changedRange = new asc_Range(_updateRangeIns.c1, _updateRangeIns.r1,
+									_updateRangeIns.c2, gc_nMaxRow0);
+								this._isLockedCells(oChangeData.changedRange, null, onChangeWorksheetCallback);
+							}
 							return;
 						case c_oAscInsertOptions.InsertColumns:
 							functionModelAction = function () {
@@ -9479,10 +9500,12 @@
 							};
 							if(bUndoRedo)
 								onChangeWorksheetCallback(true);
-							else
-								this._isLockedCells (new asc_Range(_updateRangeIns.c1, 0, _updateRangeIns.c2,
-									gc_nMaxRow0), c_oAscLockTypeElemSubType.InsertColumns,
+							else {
+								oChangeData.added = new asc_Range(_updateRangeIns.c1, 0, _updateRangeIns.c2,
+									gc_nMaxRow0);
+								this._isLockedCells(oChangeData.added, c_oAscLockTypeElemSubType.InsertColumns,
 									onChangeWorksheetCallback);
+							}
 							return;
 						case c_oAscInsertOptions.InsertRows:
 							functionModelAction = function () {
@@ -9498,10 +9521,11 @@
 							};
 							if(bUndoRedo)
 								onChangeWorksheetCallback(true);
-							else
-								this._isLockedCells (new asc_Range(0, _updateRangeIns.r1, gc_nMaxCol0,
-									_updateRangeIns.r2), c_oAscLockTypeElemSubType.InsertRows,
+							else {
+								oChangeData.added = new asc_Range(0, _updateRangeIns.r1, gc_nMaxCol0, _updateRangeIns.r2);
+								this._isLockedCells(oChangeData.added, c_oAscLockTypeElemSubType.InsertRows,
 									onChangeWorksheetCallback);
+							}
 							return;
 						default: return;
 					}
@@ -9539,9 +9563,11 @@
 
 							if(bUndoRedo)
 								onChangeWorksheetCallback(true);
-							else
-								this._isLockedCells (new asc_Range(_updateRangeDel.c1, _updateRangeDel.r1,
-									gc_nMaxCol0, _updateRangeDel.r2), null, onChangeWorksheetCallback);
+							else {
+								oChangeData.changedRange = new asc_Range(_updateRangeDel.c1, _updateRangeDel.r1,
+									gc_nMaxCol0, _updateRangeDel.r2);
+								this._isLockedCells(oChangeData.changedRange, null, onChangeWorksheetCallback);
+							}
 							return;
 						case c_oAscDeleteOptions.DeleteCellsAndShiftTop:
 							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteCellsAndShiftTop, prop, bUndoRedo);
@@ -9564,9 +9590,11 @@
 
 							if(bUndoRedo)
 								onChangeWorksheetCallback(true);
-							else
-								this._isLockedCells (new asc_Range(_updateRangeDel.c1, _updateRangeDel.r1,
-									_updateRangeDel.c2, gc_nMaxRow0), null, onChangeWorksheetCallback);
+							else {
+								oChangeData.changedRange = new asc_Range(_updateRangeDel.c1, _updateRangeDel.r1,
+									_updateRangeDel.c2, gc_nMaxRow0);
+								this._isLockedCells(oChangeData.changedRange, null, onChangeWorksheetCallback);
+							}
 							return;
 						case c_oAscDeleteOptions.DeleteColumns:
 							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteColumns, prop, bUndoRedo);
@@ -9585,10 +9613,12 @@
 							};
 							if(bUndoRedo)
 								onChangeWorksheetCallback(true);
-							else
-								this._isLockedCells (new asc_Range(_updateRangeDel.c1, 0, _updateRangeDel.c2,
-									gc_nMaxRow0), c_oAscLockTypeElemSubType.DeleteColumns,
+							else {
+								oChangeData.removed = new asc_Range(_updateRangeDel.c1, 0, _updateRangeDel.c2,
+									gc_nMaxRow0);
+								this._isLockedCells(oChangeData.removed, c_oAscLockTypeElemSubType.DeleteColumns,
 									onChangeWorksheetCallback);
+							}
 							return;
 						case c_oAscDeleteOptions.DeleteRows:
 							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteRows, prop, bUndoRedo);
@@ -9607,10 +9637,11 @@
 							};
 							if(bUndoRedo)
 								onChangeWorksheetCallback(true);
-							else
-								this._isLockedCells (new asc_Range(0, _updateRangeDel.r1, gc_nMaxCol0,
-									_updateRangeDel.r2), c_oAscLockTypeElemSubType.DeleteRows,
+							else {
+								oChangeData.removed = new asc_Range(0, _updateRangeDel.r1, gc_nMaxCol0, _updateRangeDel.r2);
+								this._isLockedCells(oChangeData.removed, c_oAscLockTypeElemSubType.DeleteRows,
 									onChangeWorksheetCallback);
+							}
 							return;
 						default: return;
 					}
@@ -10625,7 +10656,7 @@
 				t.handlers.trigger("selectionMathInfoChanged", t.getSelectionMathInfo());
 			}
 
-			t.objectRender.rebuildChartGraphicObjects(t.activeRange.clone(true));
+			t.objectRender.rebuildChartGraphicObjects(new CChangeTableData(range, null, null, null));
 			t.cellCommentator.updateCommentPosition();
 			t.handlers.trigger("onDocumentPlaceChanged");
 			t.draw(lockDraw);
