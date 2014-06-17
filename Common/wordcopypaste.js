@@ -676,6 +676,23 @@ CopyProcessor.prototype =
                 sRes += this.CopyRunContent(item);
                 sRes += "</a>";
             }
+			else if(para_Math == item.Type){
+                var sSrc = item.MathToImageConverter();
+				var width = item.Width;
+				var height = item.Height;
+				
+				sRes += "<img";
+				
+                if (null != width && "" != width)
+                    sRes += " width=\"" + width + "\"";
+                if (null != height && "" != height)
+                    sRes += " height=\"" + height + "\"";
+				if (null != sSrc && "" != sSrc && null != sSrc.ImageUrl)
+                    sRes += " src=\"" + sSrc.ImageUrl + "\"";
+				
+                sRes += ">";
+                sRes += "</img>";
+			}
         }
         return sRes;
     },
