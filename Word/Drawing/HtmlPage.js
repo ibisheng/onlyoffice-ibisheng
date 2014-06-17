@@ -3720,10 +3720,11 @@ function CEditorPage(api)
         return 5 + dKoef * x;
     }
 
-    this.ReinitTB = function()
+    this.ReinitTB = function(bIsNoResetValue)
     {
         this.TextBoxChangedValueEvent = false;
-        this.TextBoxInput.value = "";
+        if (true !== bIsNoResetValue)
+            this.TextBoxInput.value = "";
         this.TextBoxChangedValueEvent = true;
     }
 
@@ -3821,7 +3822,7 @@ function CEditorPage(api)
         oThis.TextBoxInputFocus = true;
         CollaborativeEditing.m_bGlobalLock = true;
         oThis.CheckTextBoxInputPos();
-        this.ReinitTB();
+        this.ReinitTB(true);
         oThis.TextBoxInput.style.zIndex = 1000;
     }
 
