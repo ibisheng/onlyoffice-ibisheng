@@ -1807,7 +1807,7 @@
 						if (t.isTopLineActive) {
 							// чтобы поставить выполнение в очередь после вставки из клипборда используется двойной setTimeout
 							setTimeout(
-									function(){setTimeout(function(){t._updateTopLineCurPos(); t.input.focus();}, 0);},
+									function(){setTimeout(function(){t._updateTopLineCurPos(); t.input.focus(); t._topLineMouseUp();}, 0);},
 									0);
 						}
 						switch (event.which) {
