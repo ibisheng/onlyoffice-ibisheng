@@ -5053,7 +5053,7 @@ CMathContent.prototype =
             this.bRoot = false;
             this.Parent = Parent;
         }
-		if (this.content.length == 0)
+		if (!this.bRoot && this.content.length == 0)
 			this.fillPlaceholders();
 
         var lng = this.content.length;
@@ -6837,7 +6837,7 @@ CMathContent.prototype =
                 for ( var Index = 0; Index < Count; Index++ )
                 {
 					var Pos = Reader.GetLong();
-                    this.Content.splice( Pos, 1 );
+                    this.content.splice( Pos, 1 );
                 }
 
                 break;

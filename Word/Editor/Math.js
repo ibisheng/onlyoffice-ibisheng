@@ -212,12 +212,10 @@ ParaMath.prototype =
     Remove : function(Direction, bOnAddText)
     {
 		var oContent = this.GetSelectContent();
-
-        this.Set_Select_ToMComp(Direction);
-
 		if (oContent.Start == oContent.End)
 		{
 			var oElem = oContent.Content.getElem(oContent.Start);
+			
 			if (oElem.typeObj == MATH_COMP)
 				this.RemoveElem(oContent, Direction, bOnAddText);
 			else if (oElem.typeObj == MATH_PLACEHOLDER && bOnAddText == false)
@@ -242,6 +240,11 @@ ParaMath.prototype =
 			}
 			else	//pararun
 			{
+				if ((Direction > 0 && oElem.State.ContentPos + 1 > oElem.Content.length) || (Direction < 0 && oElem.State.ContentPos - 1 < 0))
+				{
+					this.Set_Select_ToMComp(Direction);
+					return;
+				}
 				History.Create_NewPoint();
 				oElem.Remove(Direction, bOnAddText);
 				if(oElem.Content.length == 0 && !bOnAddText) //тк pararun пустой, удаляем его
@@ -255,6 +258,7 @@ ParaMath.prototype =
 		}
 		else
 			return this.RemoveElem(oContent, Direction, bOnAddText);
+		
     },
 		
 	RemoveElem: function(oContent, Direction, bOnAdd)
@@ -263,19 +267,8 @@ ParaMath.prototype =
             end   = oContent.End,
             oMathContent = oContent.Content;
 
-        if(start == end)
-        {
-            var elem = oMathContent.content[start];
-
-            if(elem.typeObj == MATH_PARA_RUN && elem.Is_Empty())
-            {
-
-            }
-        }
-
+        History.Create_NewPoint();		
         History.Create_NewPoint();
-
-		
 		var oStartContent = oContent.Content.content[oContent.Start];
 		var oEndContent = oContent.Content.content[oContent.End];		
 		var Items = [];
@@ -283,6 +276,7 @@ ParaMath.prototype =
 		{
 			Items.push(oContent.Content.content[i]);
 			oContent.Content.content.splice( i, 1 );
+			oContent.Content.CurPos--;
 		}
 		History.Add(oContent.Content, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: oContent.Start});
 		return;
