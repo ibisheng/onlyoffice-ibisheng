@@ -721,6 +721,8 @@
 				delete doc.body.style["user-select"];
 				doc.body.style["-webkit-user-select"] = "text";
 				doc.body.style.MozUserSelect = "text";
+				
+				this.element.style.MozUserSelect = "all";
 			},
 
 			 _getUseFullUrl: function(recalculate)
@@ -2352,6 +2354,8 @@
 							doc.body.style["-o-user-select"] = "none";
 							doc.body.style["user-select"] = "none";
 							doc.body.style["-webkit-user-select"] = "none";
+							
+							t.element.style.MozUserSelect = "none";
 							
 							// for paste event
 							if (callback && callback.call) {callback();}
@@ -5206,7 +5210,7 @@ function Editor_CopyPaste_Create2(api)
     ElemToSelect.setAttribute("class", COPYPASTE_ELEMENT_CLASS);
 
     ElemToSelect.style.left = '0px';
-    ElemToSelect.style.top = '-100px';
+    ElemToSelect.style.top = '100px';
     ElemToSelect.style.width = '1000px';
     ElemToSelect.style.height = '100px';
     ElemToSelect.style.overflow = 'hidden';
@@ -5265,7 +5269,7 @@ function Editor_CopyPaste_Create2(api)
 	elementText.style.width = '10000px';
 	elementText.style.height = '100px';
 	elementText.style.left = '0px';
-	elementText.style.top = '-100px';
+	elementText.style.top = '100px';
 	elementText.style.overflow = 'hidden';
 	elementText.style.zIndex = -1000;
 	elementText.style.display = ELEMENT_DISPAY_STYLE2;

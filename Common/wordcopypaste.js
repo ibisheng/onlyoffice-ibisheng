@@ -210,7 +210,9 @@ function Editor_Copy(api, bCut)
     delete document.body.style["-o-user-select"];
     delete document.body.style["user-select"];
     document.body.style["-webkit-user-select"] = "text";
-
+	
+	ElemToSelect.style.MozUserSelect = "all";
+	
     if (null != api.WordControl.m_oLogicDocument)
     {
         var oCopyProcessor = new CopyProcessor(api, ElemToSelect);
@@ -283,6 +285,8 @@ function Editor_Copy(api, bCut)
         document.body.style["-o-user-select"] = "none";
         document.body.style["user-select"] = "none";
         document.body.style["-webkit-user-select"] = "none";
+		
+		ElemToSelect.style.MozUserSelect = "none";
 
         if(true == bCut)
         {
@@ -3757,7 +3761,7 @@ PasteProcessor.prototype =
 	_readFromBinaryExcel: function(base64)
 	{
 		var oBinaryFileReader = new Asc.BinaryFileReader(null, true);
-		var tempWorkbook = new Workbook;
+		var tempWorkbook = new Workbook();
         tempWorkbook.theme = this.oDocument.theme;
 		Asc.getBinaryOtherTableGVar(tempWorkbook);
 		oBinaryFileReader.Read(base64, tempWorkbook);
