@@ -1398,8 +1398,14 @@ CFontSelect.prototype =
 
         _len = fs.GetLong();
         this.m_wsFontPath = fs.GetString(_len >> 1);
-        if (1 < this.m_wsFontPath.length)
-            this.m_wsFontPath = this.m_wsFontPath.substring(1);
+
+        // удаляем все, кроме имени файла
+        var _found1 = this.m_wsFontPath.lastIndexOf("/");
+        var _found2 = this.m_wsFontPath.lastIndexOf("\\");
+        var _found = Math.max(_found1, _found2);
+
+        if (0 <= _found)
+            this.m_wsFontPath = this.m_wsFontPath.substring(_found + 1);
 
         this.m_lIndex = fs.GetLong();
 
