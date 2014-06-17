@@ -1476,17 +1476,6 @@ asc_docs_api.prototype._coAuthoringInit = function()
     var t = this;
     this.CoAuthoringApi.onParticipantsChanged   	= function (e, CountEditUsers) {
         t.asc_fireCallback("asc_onParticipantsChanged", e, CountEditUsers);
-
-        if ( 1 >= CountEditUsers )
-        {
-            CollaborativeEditing.End_CollaborationEditing();
-            editor.asc_setDrawCollaborationMarks(false);
-        }
-        else
-        {
-            CollaborativeEditing.Start_CollaborationEditing();
-            editor.asc_setDrawCollaborationMarks(true);
-        }
     };
 	this.CoAuthoringApi.onAuthParticipantsChanged  	= function (e, count) { t.asc_fireCallback("asc_onAuthParticipantsChanged", e, count); };
     this.CoAuthoringApi.onMessage               	= function (e, count) { t.asc_fireCallback("asc_onCoAuthoringChatReceiveMessage", e); };
@@ -1593,9 +1582,10 @@ asc_docs_api.prototype._coAuthoringInit = function()
 		g_oIdCounter.Set_UserId("" + e);
 	};
 	this.CoAuthoringApi.onStartCoAuthoring		= function (isStartEvent) {
+		CollaborativeEditing.Start_CollaborationEditing();
+		t.asc_setDrawCollaborationMarks(true);
+
 		if (t.ParcedDocument) {
-			CollaborativeEditing.Start_CollaborationEditing();
-			t.asc_setDrawCollaborationMarks(true);
 			t.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
 
 			if (!isStartEvent) {
@@ -1616,7 +1606,8 @@ asc_docs_api.prototype._coAuthoringInit = function()
 		}
 	};
 	this.CoAuthoringApi.onEndCoAuthoring			= function (isStartEvent) {
-		// ToDo add code
+		CollaborativeEditing.End_CollaborationEditing();
+		editor.asc_setDrawCollaborationMarks(false);
 	};
 	/**
 	 * Event об отсоединении от сервера
