@@ -4941,7 +4941,6 @@ var gUndoInsDelCellsFlag = true;
 			//change current filter after insert column
 			_editFilterAfterInsertColumn: function(cRange,val,col,type,activeCells)
 			{
-				console.time("test");
 				var bUndoChanges = this.worksheet.model.workbook.bUndoChanges;
 				var bRedoChanges = this.worksheet.model.workbook.bRedoChanges;
 				var ws = this.worksheet;
@@ -5124,7 +5123,6 @@ var gUndoInsDelCellsFlag = true;
 				{
 					aWs.TableParts[cRange.index] = filter;
 				};
-				console.timeEnd("test");
 			},
 			
 			_changeInfoFilterAfterInsertCols: function(filter, type, col, cRange, val, filterColums, activeCells)
