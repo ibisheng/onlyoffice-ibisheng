@@ -16886,7 +16886,8 @@ Paragraph.prototype =
         }
         
         // Добавляем содержимое второго параграфа к первому
-        this.Internal_Content_Concat( Para.Content );
+        var NewContent = Para.Content.slice(0); // чтобы передать новый массив, а не ссылку на старый
+        this.Internal_Content_Concat( NewContent );
 
         // Если на данном параграфе оканчивалась секция, тогда удаляем эту секцию
         this.Set_SectionPr( undefined );

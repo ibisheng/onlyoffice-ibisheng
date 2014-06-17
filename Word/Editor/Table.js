@@ -20685,7 +20685,7 @@ CTableCell.prototype =
             if ( 0 === this.Row.Index && undefined !== this.Row.Table && null !== this.Row.Table )
             {
                 var Prev = this.Row.Table.Get_DocumentPrev();
-                if ( type_Paragraph === Prev.GetType() )
+                if ( null !== Prev && type_Paragraph === Prev.GetType() )
                     return Prev;
             }
             
