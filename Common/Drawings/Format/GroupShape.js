@@ -318,6 +318,7 @@ CGroupShape.prototype =
         for(i = 0; i < sp_tree_copy.length; ++i)
         {
             this.addToSpTree(this.spTree.length, sp_tree_copy[i].convertToWord(document));
+            this.spTree[this.spTree.length - 1].setGroup(this);
         }
         return this;
     },
