@@ -5,6 +5,7 @@
 	
 	var asc			= window["Asc"];
 	var asc_user	= asc.asc_CUser;
+	var asc_coAuthV	= '3.0.0';
 
 	// Класс надстройка, для online и offline работы
 	var CDocsCoApi = function (options) {
@@ -747,7 +748,7 @@
 
 	DocsCoApi.prototype._onDrop = function (data) {
 		this.disconnect();
-		this.onDisconnect(data['description'], true, this.isCloseCoAuthoring);
+		this.onDisconnect(data['description'], true, false);
 	};
 
 	DocsCoApi.prototype._onAuth = function (data) {
@@ -858,7 +859,8 @@
 						"path":t._serverPath
 					},
 					"documentFormatSave": t._documentFormatSave,
-					"isViewer": t._isViewer
+					"isViewer": t._isViewer,
+					"version": asc_coAuthV
 				});
 
 		};
@@ -879,6 +881,7 @@
 				case 'savePartChanges'	: t._onSavePartChanges(); break;
 				case 'drop'				: t._onDrop(dataObject); break;
 				case 'waitAuth'			: /*Ждем, когда придет auth, документ залочен*/break;
+				case 'error'			: /*Старая версия sdk*/t._onDrop(dataObject); break;
 			}
 		};
 		sockjs.onclose = function (evt) {
