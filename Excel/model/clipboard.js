@@ -764,6 +764,9 @@
                 delete document.body.style["user-select"];
                 document.body.style["-webkit-user-select"] = "text";
 				
+				var overflowBody = document.body.style.overflow;
+				document.body.style.overflow = 'hidden';
+				
                 var Text;
                 var pastebin = t._editorPasteGetElem(worksheet,true);
                 pastebin.style.display  = "block";
@@ -821,6 +824,8 @@
 					document.body.style["-o-user-select"] = "none";
 					document.body.style["user-select"] = "none";
 					document.body.style["-webkit-user-select"] = "none";
+					
+					document.body.style.overflow = overflowBody;
 
 					if(!isTruePaste)
 						t._editorPasteExec(worksheet, pastebin);
@@ -2314,7 +2319,10 @@
 			},
 			
 			_selectElement: function (callback) {
-				var t = this, selection, rangeToSelect;
+				var t = this, selection, rangeToSelect, overflowBody;
+				
+				overflowBody = document.body.style.overflow;
+				document.body.style.overflow = 'hidden';
 				
 				if (window.getSelection) {// all browsers, except IE before version 9
 					selection = window.getSelection();
@@ -2356,6 +2364,8 @@
 							doc.body.style["-webkit-user-select"] = "none";
 							
 							t.element.style.MozUserSelect = "none";
+							
+							document.body.style.overflow = overflowBody;
 							
 							// for paste event
 							if (callback && callback.call) {callback();}
