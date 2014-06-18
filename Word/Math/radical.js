@@ -922,9 +922,15 @@ CRadical.prototype.setProperties = function(props)
         this.Pr.type = props.type;
 
     if(props.degHide === true || props.degHide === 1)
+    {
+        this.Pr.degHide = true;
         this.Pr.type = SQUARE_RADICAL;
+    }
     else if(props.degHide == false || props.degHide === 0)
+    {
+        this.Pr.degHide = false;
         this.Pr.type = DEGREE_RADICAL;
+    }
 
     this.setCtrPrp(props.ctrPrp);
 }
@@ -1257,7 +1263,7 @@ CRadical.prototype.getPropsForWrite = function()
 {
     var props =
     {
-        degHide:    this.Pr.type == SQUARE_RADICAL
+        degHide:    this.Pr.degHide
     };
 
     return props;
@@ -1286,7 +1292,7 @@ CRadical.prototype.Write_ToBinary2 = function( Writer )
     var Flags = 0;
 	if ( undefined != this.degHide )
     {
-		Writer.WriteBool( this.degHide )
+		Writer.WriteBool( this.degHide );
 		Flags |= 1;
 	}
 	var EndPos = Writer.GetCurPosition();
