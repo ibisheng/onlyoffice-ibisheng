@@ -220,7 +220,7 @@ var rx_operators = /^ *[-+*\/^&%<=>:] */,
     rx_ref3D_quoted = new XRegExp( "^'(?<name_from>(?:''|[^\\[\\]'\\/*?:])*)(?::(?<name_to>(?:''|[^\\[\\]'\\/*?:])*))?'!" ),
     rx_ref3D = /^\D*[\D\d]*\!/,
     rx_before_operators = /^ *[,()]/,
-    rx_number = /^[+-]?\d*(\d|\.)\d*([eE][+-]?\d+)?/,
+    rx_number = /^ *[+-]?\d*(\d|\.)\d*([eE][+-]?\d+)?/,
     rx_LeftParentheses = /^ *\( */,
     rx_RightParentheses = /^ *\)/,
     rx_Comma = /^ *[,;] */,
@@ -240,7 +240,8 @@ var rx_operators = /^ *[-+*\/^&%<=>:] */,
     rg_validDEC2OCTNumber = /^-?[0-9]{1,9}$/,
     rg_validDEC2HEXNumber = /^-?[0-9]{1,12}$/,
     rg_validHEXNumber = /^[0-9A-Fa-f]{1,10}$/,
-    rg_validOCTNumber = /^[0-7]{1,10}$/;
+    rg_validOCTNumber = /^[0-7]{1,10}$/,
+    rg_complex_number = new XRegExp( "^(?<real>[-+]?(?:\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?))?(?<img>([-+]?(\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?)?[ij])?)", "g" )
 
 
 //вспомогательный объект для парсинга формул и проверки строки по регуляркам указанным выше.
