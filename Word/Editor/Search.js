@@ -65,11 +65,7 @@ CDocumentSearch.prototype =
         for ( var Id in this.Elements )
         {
             var Paragraph = this.Elements[Id];
-
-            if ( true !== Debug_ParaRunMode )
-                Paragraph.SearchResults = {};
-            else
-                Paragraph.Clear_SearchResults();
+            Paragraph.Clear_SearchResults();
         }
 
         this.Id        = 0;
@@ -748,399 +744,158 @@ CTable.prototype.Search_GetId = function(bNext, bCurrent)
 Paragraph.prototype.Search = function(Str, Props, SearchEngine, Type)
 {
     var bMatchCase = Props.MatchCase;
-
-    if ( true !== Debug_ParaRunMode )
+    var ParaSearch = new CParagraphSearch(this, Str, Props, SearchEngine, Type);
+    var ContentLen = this.Content.length;
+    for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
     {
+        var Element = this.Content[CurPos];
 
-        // Сначала найдем элементы поиска в данном параграфе
-        for ( var Pos = 0; Pos < this.Content.length; Pos++ )
-        {
-            var Item = this.Content[Pos];
-            if ( para_Numbering === Item.Type || para_PresentationNumbering === Item.Type || para_TextPr === Item.Type || para_CommentStart === Item.Type || para_CommentEnd === Item.Type || para_CollaborativeChangesStart === Item.Type || para_CollaborativeChangesEnd === Item.Type || para_HyperlinkStart === Item.Type || para_HyperlinkEnd === Item.Type )
-                continue;
+        ParaSearch.ContentPos.Update( CurPos, 0 );
 
-            if ( para_Drawing === Item.Type )
-                Item.Search(Str, Props, SearchEngine, Type);
-
-            if ( (" " === Str[0] && para_Space === Item.Type) || ( para_Text === Item.Type && (  ( true != bMatchCase && (Item.Value).toLowerCase() === Str[0].toLowerCase() ) || ( true === bMatchCase && Item.Value === Str[0] ) ) ) )
-            {
-                if ( 1 === Str.length )
-                {
-                    var Id = SearchEngine.Add( this );
-                    this.SearchResults[Id] = new CParagraphSearchElement(Pos, Pos + 1, Type );
-                }
-                else
-                {
-                    var bFind = true;
-                    var Pos2 = Pos + 1;
-                    // Проверяем
-                    for ( var Index = 1; Index < Str.length; Index++ )
-                    {
-                        var _TempType = this.Content[Pos2].Type;
-
-                        // Пропускаем записи TextPr
-                        while ( Pos2 < this.Content.length && ( para_Numbering === _TempType || para_PresentationNumbering === _TempType || para_TextPr === _TempType || para_CommentStart === _TempType || para_CommentEnd === _TempType || para_CollaborativeChangesStart === _TempType || para_CollaborativeChangesEnd === _TempType || para_HyperlinkStart === _TempType || para_HyperlinkEnd === _TempType ) )
-                        {
-                            Pos2++;
-                            _TempType = this.Content[Pos2].Type;
-                        }
-
-                        if ( ( Pos2 >= this.Content.length ) || (" " === Str[Index] && para_Space != this.Content[Pos2].Type) || ( " " != Str[Index] && ( ( para_Text != this.Content[Pos2].Type ) || ( para_Text === this.Content[Pos2].Type && !(  ( true != bMatchCase && (this.Content[Pos2].Value).toLowerCase() === Str[Index].toLowerCase() ) || ( true === bMatchCase && this.Content[Pos2].Value === Str[Index] ) ) ) ) ) )
-                        {
-                            bFind = false;
-                            break;
-                        }
-
-                        Pos2++;
-                    }
-
-                    if ( true === bFind )
-                    {
-                        var Id = SearchEngine.Add( this );
-                        this.SearchResults[Id] = new CParagraphSearchElement(Pos, Pos2, Type );
-                    }
-                }
-            }
-        }
-
-        var MaxShowValue = 100;
-        for ( var FoundId in this.SearchResults )
-        {
-            var StartPos = this.SearchResults[FoundId].StartPos;
-            var EndPos   = this.SearchResults[FoundId].EndPos;
-            var ResultStr = new String();
-
-            var _Str = "";
-            for ( var Pos = StartPos; Pos < EndPos; Pos++ )
-            {
-                Item = this.Content[Pos];
-
-                if ( para_Text === Item.Type )
-                    _Str += Item.Value;
-                else if ( para_Space === Item.Type )
-                    _Str += " ";
-            }
-
-            // Теперь мы должны сформировать строку
-            if ( _Str.length >= MaxShowValue )
-            {
-                ResultStr = "\<b\>";
-                for ( var Index = 0; Index < MaxShowValue - 1; Index++ )
-                    ResultStr += _Str[Index];
-
-                ResultStr += "\</b\>...";
-            }
-            else
-            {
-                ResultStr = "\<b\>" + _Str + "\</b\>";
-
-                var Pos_before = StartPos - 1;
-                var Pos_after  = EndPos;
-                var LeaveCount = MaxShowValue - _Str.length;
-
-                var bAfter = true;
-                while ( LeaveCount > 0 && ( Pos_before >= 0 || Pos_after < this.Content.length ) )
-                {
-                    var TempPos = ( true === bAfter ? Pos_after : Pos_before );
-                    var Flag = 0;
-                    while ( ( ( TempPos >= 0 && false === bAfter ) || ( TempPos < this.Content.length && true === bAfter ) ) && para_Text != this.Content[TempPos].Type && para_Space != this.Content[TempPos].Type )
-                    {
-                        if ( true === bAfter )
-                        {
-                            TempPos++;
-                            if ( TempPos >= this.Content.length )
-                            {
-                                TempPos = Pos_before;
-                                bAfter = false;
-                                Flag++;
-                            }
-                        }
-                        else
-                        {
-                            TempPos--;
-                            if ( TempPos < 0 )
-                            {
-                                TempPos = Pos_after;
-                                bAfter = true;
-                                Flag++;
-                            }
-                        }
-
-                        // Дошли до обоих концов параграфа
-                        if ( Flag >= 2 )
-                            break;
-                    }
-
-                    if ( Flag >= 2 || !( ( TempPos >= 0 && false === bAfter ) || ( TempPos < this.Content.length && true === bAfter ) ) )
-                        break;
-
-                    if ( true === bAfter )
-                    {
-                        ResultStr += (para_Space === this.Content[TempPos].Type ? " " : this.Content[TempPos].Value);
-                        Pos_after = TempPos + 1;
-                        LeaveCount--;
-
-                        if ( Pos_before >= 0 )
-                            bAfter = false;
-
-                        if ( Pos_after >= this.Content.length )
-                            bAfter = false;
-                    }
-                    else
-                    {
-                        ResultStr = (para_Space === this.Content[TempPos].Type ? " " : this.Content[TempPos].Value) + ResultStr;
-                        Pos_before = TempPos - 1;
-                        LeaveCount--;
-
-                        if ( Pos_after < this.Content.length )
-                            bAfter = true;
-
-                        if ( Pos_before < 0 )
-                            bAfter = true;
-                    }
-                }
-            }
-
-            this.SearchResults[FoundId].ResultStr = ResultStr;
-        }
+        Element.Search( ParaSearch, 1 );
     }
-    else
+
+    var MaxShowValue = 100;
+    for ( var FoundId in this.SearchResults )
     {
-        var ParaSearch = new CParagraphSearch(this, Str, Props, SearchEngine, Type);
+        var StartPos = this.SearchResults[FoundId].StartPos;
+        var EndPos   = this.SearchResults[FoundId].EndPos;
+        var ResultStr = new String();
 
-        var ContentLen = this.Content.length;
-        for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
+        var _Str = Str;
+
+        // Теперь мы должны сформировать строку
+        if ( _Str.length >= MaxShowValue )
         {
-            var Element = this.Content[CurPos];
+            ResultStr = "\<b\>";
+            for ( var Index = 0; Index < MaxShowValue - 1; Index++ )
+                ResultStr += _Str[Index];
 
-            ParaSearch.ContentPos.Update( CurPos, 0 );
-
-            Element.Search( ParaSearch, 1 );
+            ResultStr += "\</b\>...";
         }
-
-        var MaxShowValue = 100;
-        for ( var FoundId in this.SearchResults )
+        else
         {
-            var StartPos = this.SearchResults[FoundId].StartPos;
-            var EndPos   = this.SearchResults[FoundId].EndPos;
-            var ResultStr = new String();
+            ResultStr = "\<b\>" + _Str + "\</b\>";
 
-            var _Str = Str;
+            var LeaveCount = MaxShowValue - _Str.length;
+            var RunElementsAfter  = new CParagraphRunElements(EndPos, LeaveCount);
+            var RunElementsBefore = new CParagraphRunElements(StartPos, LeaveCount);
 
-            // Теперь мы должны сформировать строку
-            if ( _Str.length >= MaxShowValue )
+            this.Get_NextRunElements(RunElementsAfter);
+            this.Get_PrevRunElements(RunElementsBefore);
+
+            var LeaveCount_2 = LeaveCount / 2;
+
+            if ( RunElementsAfter.Elements.length >= LeaveCount_2 && RunElementsBefore.Elements.length >= LeaveCount_2 )
             {
-                ResultStr = "\<b\>";
-                for ( var Index = 0; Index < MaxShowValue - 1; Index++ )
-                    ResultStr += _Str[Index];
+                for ( var Index = 0; Index < LeaveCount_2; Index++ )
+                {
+                    var ItemB = RunElementsBefore.Elements[Index];
+                    var ItemA = RunElementsAfter.Elements[Index];
 
-                ResultStr += "\</b\>...";
+                    ResultStr = (para_Text === ItemB.Type ? ItemB.Value : " ") + ResultStr + (para_Text === ItemA.Type ? ItemA.Value : " ");
+                }
+            }
+            else if ( RunElementsAfter.Elements.length < LeaveCount_2 )
+            {
+                var TempCount = RunElementsAfter.Elements.length;
+                for ( var Index = 0; Index < TempCount; Index++ )
+                {
+                    var ItemA = RunElementsAfter.Elements[Index];
+                    ResultStr = ResultStr + (para_Text === ItemA.Type ? ItemA.Value : " ");
+                }
+
+                var TempCount = Math.min( 2 * LeaveCount_2 - RunElementsAfter.Elements.length, RunElementsBefore.Elements.length );
+                for ( var Index = 0; Index < TempCount; Index++ )
+                {
+                    var ItemB = RunElementsBefore.Elements[Index];
+                    ResultStr = (para_Text === ItemB.Type ? ItemB.Value : " ") + ResultStr;
+                }
             }
             else
             {
-                ResultStr = "\<b\>" + _Str + "\</b\>";
-
-                var LeaveCount = MaxShowValue - _Str.length;
-                var RunElementsAfter  = new CParagraphRunElements(EndPos, LeaveCount);
-                var RunElementsBefore = new CParagraphRunElements(StartPos, LeaveCount);
-
-                this.Get_NextRunElements(RunElementsAfter);
-                this.Get_PrevRunElements(RunElementsBefore);
-
-                var LeaveCount_2 = LeaveCount / 2;
-
-                if ( RunElementsAfter.Elements.length >= LeaveCount_2 && RunElementsBefore.Elements.length >= LeaveCount_2 )
+                var TempCount = RunElementsAfter.Elements.length;
+                for ( var Index = 0; Index < TempCount; Index++ )
                 {
-                    for ( var Index = 0; Index < LeaveCount_2; Index++ )
-                    {
-                        var ItemB = RunElementsBefore.Elements[Index];
-                        var ItemA = RunElementsAfter.Elements[Index];
-
-                        ResultStr = (para_Text === ItemB.Type ? ItemB.Value : " ") + ResultStr + (para_Text === ItemA.Type ? ItemA.Value : " ");
-                    }
+                    var ItemA = RunElementsAfter.Elements[Index];
+                    ResultStr = ResultStr + (para_Text === ItemA.Type ? ItemA.Value : " ");
                 }
-                else if ( RunElementsAfter.Elements.length < LeaveCount_2 )
-                {
-                    var TempCount = RunElementsAfter.Elements.length;
-                    for ( var Index = 0; Index < TempCount; Index++ )
-                    {
-                        var ItemA = RunElementsAfter.Elements[Index];
-                        ResultStr = ResultStr + (para_Text === ItemA.Type ? ItemA.Value : " ");
-                    }
 
-                    var TempCount = Math.min( 2 * LeaveCount_2 - RunElementsAfter.Elements.length, RunElementsBefore.Elements.length );
-                    for ( var Index = 0; Index < TempCount; Index++ )
-                    {
-                        var ItemB = RunElementsBefore.Elements[Index];
-                        ResultStr = (para_Text === ItemB.Type ? ItemB.Value : " ") + ResultStr;
-                    }
-                }
-                else
+                var TempCount = RunElementsBefore.Elements.length;
+                for ( var Index = 0; Index < TempCount; Index++ )
                 {
-                    var TempCount = RunElementsAfter.Elements.length;
-                    for ( var Index = 0; Index < TempCount; Index++ )
-                    {
-                        var ItemA = RunElementsAfter.Elements[Index];
-                        ResultStr = ResultStr + (para_Text === ItemA.Type ? ItemA.Value : " ");
-                    }
-
-                    var TempCount = RunElementsBefore.Elements.length;
-                    for ( var Index = 0; Index < TempCount; Index++ )
-                    {
-                        var ItemB = RunElementsBefore.Elements[Index];
-                        ResultStr = (para_Text === ItemB.Type ? ItemB.Value : " ") + ResultStr;
-                    }
+                    var ItemB = RunElementsBefore.Elements[Index];
+                    ResultStr = (para_Text === ItemB.Type ? ItemB.Value : " ") + ResultStr;
                 }
             }
-
-            this.SearchResults[FoundId].ResultStr = ResultStr;
         }
+
+        this.SearchResults[FoundId].ResultStr = ResultStr;
     }
 };
 
 Paragraph.prototype.Search_GetId = function(bNext, bCurrent)
 {
-    if ( true !== Debug_ParaRunMode )
+    // Определим позицию, начиная с которой мы будем искать ближайший найденный элемент
+    var ContentPos = null;
+
+    if ( true === bCurrent )
     {
-        var Pos = -1;
-        if ( true === bCurrent )
+        if ( true === this.Selection.Use )
         {
-            Pos = this.CurPos.ContentPos;
-            if ( true == this.Selection.Use )
-                Pos = ( true === bNext ? Math.max(this.Selection.StartPos,this.Selection.EndPos) : Math.min(this.Selection.StartPos,this.Selection.EndPos)  );
-        }
-        else
-        {
+            var SSelContentPos = this.Get_ParaContentPos( true, true );
+            var ESelContentPos = this.Get_ParaContentPos( true, false );
+
+            if ( SSelContentPos.Compare( ESelContentPos ) > 0 )
+            {
+                var Temp = ESelContentPos;
+                ESelContentPos = SSelContentPos;
+                SSelContentPos = Temp;
+            }
+
             if ( true === bNext )
-                Pos = -1;
+                ContentPos = ESelContentPos;
             else
-                Pos = this.Content.length - 1;
-        }
-
-        var NearElementId  = null;
-        var NearElementPos = -1;
-
-        if ( true === bNext )
-        {
-            // Найдем ближайший элемент среди найденных элементов в самом параграфе
-            for ( var ElemId in this.SearchResults )
-            {
-                var Element = this.SearchResults[ElemId];
-                if ( Pos <= Element.StartPos && ( -1 === NearElementPos || NearElementPos > Element.StartPos ) )
-                {
-                    NearElementPos = Element.StartPos;
-                    NearElementId  = ElemId;
-                }
-            }
-
-            var StartPos = Math.max( Pos, 0 );
-            var EndPos   = Math.min( ( null === NearElementId ? this.Content.length - 1 : Element.StartPos ), this.Content.length - 1 );
-
-            // Проверяем автофигуры между StartPos и EndPos
-            for ( var TempPos = StartPos; TempPos < EndPos; TempPos++ )
-            {
-                var Item = this.Content[TempPos];
-                if ( para_Drawing === Item.Type )
-                {
-                    var TempElementId = Item.Search_GetId( true, false );
-                    if ( null != TempElementId )
-                        return TempElementId;
-                }
-            }
+                ContentPos = SSelContentPos;
         }
         else
-        {
-            for ( var ElemId in this.SearchResults )
-            {
-                var Element = this.SearchResults[ElemId];
-                if ( Pos >= Element.EndPos && ( -1 === NearElementPos || NearElementPos < Element.EndPos ) )
-                {
-                    NearElementPos = Element.EndPos;
-                    NearElementId  = ElemId;
-                }
-            }
-
-            var StartPos = Math.max( ( null === NearElementId ? 0 : Element.EndPos ), 0 );
-            var EndPos   = Math.min( Pos, this.Content.length - 1 );
-
-            // Проверяем автофигуры между StartPos и EndPos
-            for ( var TempPos = EndPos - 1; TempPos >= StartPos; TempPos-- )
-            {
-                var Item = this.Content[TempPos];
-                if ( para_Drawing === Item.Type )
-                {
-                    var TempElementId = Item.Search_GetId( false, false );
-                    if ( null != TempElementId )
-                        return TempElementId;
-                }
-            }
-        }
-
-        return NearElementId;
+            ContentPos = this.Get_ParaContentPos( false, false );
     }
     else
     {
-        // Определим позицию, начиная с которой мы будем искать ближайший найденный элемент
-        var ContentPos = null;
-
-        if ( true === bCurrent )
-        {
-            if ( true === this.Selection.Use )
-            {
-                var SSelContentPos = this.Get_ParaContentPos( true, true );
-                var ESelContentPos = this.Get_ParaContentPos( true, false );
-
-                if ( SSelContentPos.Compare( ESelContentPos ) > 0 )
-                {
-                    var Temp = ESelContentPos;
-                    ESelContentPos = SSelContentPos;
-                    SSelContentPos = Temp;
-                }
-
-                if ( true === bNext )
-                    ContentPos = ESelContentPos;
-                else
-                    ContentPos = SSelContentPos;
-            }
-            else
-                ContentPos = this.Get_ParaContentPos( false, false );
-        }
-        else
-        {
-            if ( true === bNext )
-                ContentPos = this.Get_StartPos();
-            else
-                ContentPos = this.Get_EndPos( false );
-        }
-
-        // Производим поиск ближайшего элемента
         if ( true === bNext )
-        {
-            var StartPos = ContentPos.Get(0);
-            var ContentLen = this.Content.length;
-
-            for ( var CurPos = StartPos; CurPos < ContentLen; CurPos++ )
-            {
-                var ElementId = this.Content[CurPos].Search_GetId( true, CurPos === StartPos ? true : false, ContentPos, 1 );
-                if ( null !== ElementId )
-                    return ElementId;
-            }
-        }
+            ContentPos = this.Get_StartPos();
         else
-        {
-            var StartPos = ContentPos.Get(0);
-            var ContentLen = this.Content.length;
-
-            for ( var CurPos = StartPos; CurPos >= 0; CurPos-- )
-            {
-                var ElementId = this.Content[CurPos].Search_GetId( false, CurPos === StartPos ? true : false, ContentPos, 1 );
-                if ( null !== ElementId )
-                    return ElementId;
-            }
-        }
-
-        return null;
+            ContentPos = this.Get_EndPos( false );
     }
+
+    // Производим поиск ближайшего элемента
+    if ( true === bNext )
+    {
+        var StartPos = ContentPos.Get(0);
+        var ContentLen = this.Content.length;
+
+        for ( var CurPos = StartPos; CurPos < ContentLen; CurPos++ )
+        {
+            var ElementId = this.Content[CurPos].Search_GetId( true, CurPos === StartPos ? true : false, ContentPos, 1 );
+            if ( null !== ElementId )
+                return ElementId;
+        }
+    }
+    else
+    {
+        var StartPos = ContentPos.Get(0);
+        var ContentLen = this.Content.length;
+
+        for ( var CurPos = StartPos; CurPos >= 0; CurPos-- )
+        {
+            var ElementId = this.Content[CurPos].Search_GetId( false, CurPos === StartPos ? true : false, ContentPos, 1 );
+            if ( null !== ElementId )
+                return ElementId;
+        }
+    }
+
+    return null;
 };
 
 Paragraph.prototype.Add_SearchResult = function(Id, StartContentPos, EndContentPos, Type)

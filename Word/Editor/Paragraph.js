@@ -15,8 +15,6 @@ var type_Paragraph = 0x0001;
 
 var UnknownValue  = null;
 
-var Debug_ParaRunMode = true;
-
 // Класс Paragraph
 function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFromPresentation)
 {
@@ -82,7 +80,6 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
         X           : 0,
         Y           : 0,
         ContentPos  : 0,  // Ближайшая позиция в контенте (между элементами)
-        ContentPos2 : -1, // Реальный элемент
         Line        : -1,
         Range       : -1,
         RealX       : 0, // позиция курсора, без учета расположения букв
@@ -12653,8 +12650,6 @@ function CParaLineRange(X, XEnd)
     this.EndPos    = 0;  // Позиция в контенте параграфа, на которой заканчиваетсяданный отрезок
 
     this.SpacePos  = -1; // Позиция, с которой начинаем считать пробелы
-    this.StartPos2 = -1; // Позиции начала и конца отрисовки выделения
-    this.EndPos2   = -1; // текста(а также подчеркивания и зачеркивания)
 }
 
 CParaLineRange.prototype =
@@ -12696,8 +12691,6 @@ CParaLineRange.prototype =
         NewRange.EndPos      = this.EndPos;
 
         NewRange.SpacePos    = this.SpacePos;
-        NewRange.StartPos2   = this.StartPos2;
-        NewRange.EndPos2     = this.EndPos2;
 
         return NewRange;
     }
@@ -13177,9 +13170,7 @@ function CParagraphSelection()
     this.Use       = false;
     this.StartPos  = 0;
     this.EndPos    = 0;
-    this.StartPos2 = 0;
-    this.EndPos2   = 0,
-        this.Flag      = selectionflag_Common;
+    this.Flag      = selectionflag_Common;
 }
 
 CParagraphSelection.prototype =
@@ -13187,13 +13178,11 @@ CParagraphSelection.prototype =
     Set_StartPos : function(Pos1, Pos2)
     {
         this.StartPos  = Pos1;
-        this.StartPos2 = ( undefined != Pos2 ? Pos2 : Pos1 );
     },
 
     Set_EndPos : function(Pos1, Pos2)
     {
         this.EndPos  = Pos1;
-        this.EndPos2 = ( undefined != Pos2 ? Pos2 : Pos1 );
     }
 };
 

@@ -2869,22 +2869,8 @@ CDocumentContent.prototype =
                             var Item = this.Content[this.Selection.EndPos];
                             if ( type_Paragraph == Item.GetType() )
                             {
-                                if ( true !== Debug_ParaRunMode )
-                                {
-                                    if ( false === Item.Is_SelectionUse() )
-                                    {
-                                        Item.CurPos.ContentPos  = Item.Content.length - 1;
-                                        Item.Selection.Use      = true;
-                                        Item.Selection.StartPos = Item.Content.length - 1;
-                                        Item.Selection.EndPos   = Item.Content.length - 1;
-                                    }
-                                    Item.Cursor_MoveLeft( 1, true, Word );
-                                }
-                                else
-                                {
-                                    Item.Cursor_MoveToEndPos( true );
-                                    Item.Cursor_MoveLeft( 1, true, Word );
-                                }
+                                Item.Cursor_MoveToEndPos( true );
+                                Item.Cursor_MoveLeft( 1, true, Word );
                             }
                             else if ( type_Table == Item.GetType() )
                             {
@@ -2964,23 +2950,8 @@ CDocumentContent.prototype =
 
                             if ( type_Paragraph == Item.GetType() )
                             {
-                                if ( true !== Debug_ParaRunMode )
-                                {
-                                    if ( false === Item.Is_SelectionUse() )
-                                    {
-                                        Item.CurPos.ContentPos  = Item.Content.length - 1;
-                                        Item.Selection.Use      = true;
-                                        Item.Selection.StartPos = Item.Content.length - 1;
-                                        Item.Selection.EndPos   = Item.Content.length - 1;
-                                    }
-                                    Item.Cursor_MoveLeft( 1, true, Word );
-                                }
-                                else
-                                {
-                                    Item.Cursor_MoveToEndPos( true );
-                                    Item.Cursor_MoveLeft( 1, true, Word );
-                                }
-
+                                Item.Cursor_MoveToEndPos( true );
+                                Item.Cursor_MoveLeft( 1, true, Word );
                             }
                             else if ( type_Table == Item.GetType() )
                             {
@@ -3890,91 +3861,56 @@ CDocumentContent.prototype =
         var FirstElement = SelectedContent.Elements[0];
         if ( 1 === ElementsCount && true !== FirstElement.SelectedAll && type_Paragraph === FirstElement.Element.GetType() )
         {
-            if ( true !== Debug_ParaRunMode )
+            // Нам нужно в заданный параграф вставить выделенный текст
+            var NewPara = FirstElement.Element;
+            var NewElementsCount = NewPara.Content.length - 1; // Последний ран с para_End не добавляем
+
+            var ParaNearPos = Para.Get_ParaNearestPos( NearPos );
+            if ( null === ParaNearPos || ParaNearPos.Classes.length < 2 )
+                return;
+
+            var LastClass = ParaNearPos.Classes[ParaNearPos.Classes.length - 1];
+            if ( para_Run !== LastClass.Type )
+                return;
+
+            var NewElement = LastClass.Split( ParaNearPos.NearPos.ContentPos, ParaNearPos.Classes.length - 1 );
+            var PrevClass = ParaNearPos.Classes[ParaNearPos.Classes.length - 2];
+            var PrevPos   = ParaNearPos.NearPos.ContentPos.Data[ParaNearPos.Classes.length - 2];
+
+            PrevClass.Add_ToContent( PrevPos + 1, NewElement );
+
+            // TODO: Заглушка для переноса автофигур и картинок. Когда разрулим ситуацию так, чтобы когда у нас 
+            //       в текста была выделена автофигура выделение шло для автофигур, тогда здесь можно будет убрать.
+            var bNeedSelect = (docpostype_DrawingObjects !== this.CurPos.Type && ( null === this.LogicDocument || docpostype_DrawingObjects !== this.LogicDocument.CurPos.Type ) ? true : false);
+
+            for ( var Index = 0; Index < NewElementsCount; Index++ )
             {
-                // Нам нужно в заданный параграф вставить выделенный текст
-                var NewPara = FirstElement.Element;
-                var NewElementsCount = NewPara.Content.length;
-                var InsertedCount = 0;
+                var Item = NewPara.Content[Index];
+                PrevClass.Add_ToContent( PrevPos + 1 + Index, Item );
 
-                var OldTextPr = Para.Internal_GetTextPr( NearContentPos );
+                if ( true === bNeedSelect )
+                    Item.Select_All();
+            }
 
-                for ( var Index = 0; Index < NewElementsCount; Index++ )
+            if ( true === bNeedSelect )
+            {
+                PrevClass.Selection.Use = true;
+                PrevClass.Selection.StartPos = PrevPos + 1;
+                PrevClass.Selection.EndPos   = PrevPos + 1 + NewElementsCount - 1;
+
+                for ( var Index = 0; Index < ParaNearPos.Classes.length - 2; Index++ )
                 {
-                    var Item = NewPara.Content[Index];
-                    var ItemType = Item.Type;
-                    if ( para_Empty !== ItemType && para_End !== ItemType )
-                    {
-                        Para.Internal_Content_Add( NearContentPos + InsertedCount, Item, false );
-                        InsertedCount++;
-                    }
+                    var Class    = ParaNearPos.Classes[Index];
+                    var ClassPos = ParaNearPos.NearPos.ContentPos.Data[Index];
+
+                    Class.Selection.Use      = true;
+                    Class.Selection.StartPos = ClassPos;
+                    Class.Selection.EndPos   = ClassPos;
                 }
 
-                Para.Internal_Content_Add( NearContentPos + InsertedCount, new ParaTextPr(OldTextPr), false );
-                InsertedCount++;
-
-                Para.Selection.Use      = true;
-                Para.Selection.StartPos = NearContentPos;
-                Para.Selection.EndPos   = NearContentPos + InsertedCount;
-
-                this.Selection.Start    = false;
                 this.Selection.Use      = true;
                 this.Selection.StartPos = DstIndex;
                 this.Selection.EndPos   = DstIndex;
-            }
-            else
-            {
-                // Нам нужно в заданный параграф вставить выделенный текст
-                var NewPara = FirstElement.Element;
-                var NewElementsCount = NewPara.Content.length - 1; // Последний ран с para_End не добавляем
-
-                var ParaNearPos = Para.Get_ParaNearestPos( NearPos );
-                if ( null === ParaNearPos || ParaNearPos.Classes.length < 2 )
-                    return;
-
-                var LastClass = ParaNearPos.Classes[ParaNearPos.Classes.length - 1];
-                if ( para_Run !== LastClass.Type )
-                    return;
-
-                var NewElement = LastClass.Split( ParaNearPos.NearPos.ContentPos, ParaNearPos.Classes.length - 1 );
-                var PrevClass = ParaNearPos.Classes[ParaNearPos.Classes.length - 2];
-                var PrevPos   = ParaNearPos.NearPos.ContentPos.Data[ParaNearPos.Classes.length - 2];
-
-                PrevClass.Add_ToContent( PrevPos + 1, NewElement );
-
-                // TODO: Заглушка для переноса автофигур и картинок. Когда разрулим ситуацию так, чтобы когда у нас 
-                //       в текста была выделена автофигура выделение шло для автофигур, тогда здесь можно будет убрать.
-                var bNeedSelect = (docpostype_DrawingObjects !== this.CurPos.Type && ( null === this.LogicDocument || docpostype_DrawingObjects !== this.LogicDocument.CurPos.Type ) ? true : false);
-
-                for ( var Index = 0; Index < NewElementsCount; Index++ )
-                {
-                    var Item = NewPara.Content[Index];
-                    PrevClass.Add_ToContent( PrevPos + 1 + Index, Item );
-
-                    if ( true === bNeedSelect )
-                        Item.Select_All();
-                }
-
-                if ( true === bNeedSelect )
-                {
-                    PrevClass.Selection.Use = true;
-                    PrevClass.Selection.StartPos = PrevPos + 1;
-                    PrevClass.Selection.EndPos   = PrevPos + 1 + NewElementsCount - 1;
-
-                    for ( var Index = 0; Index < ParaNearPos.Classes.length - 2; Index++ )
-                    {
-                        var Class    = ParaNearPos.Classes[Index];
-                        var ClassPos = ParaNearPos.NearPos.ContentPos.Data[Index];
-
-                        Class.Selection.Use      = true;
-                        Class.Selection.StartPos = ClassPos;
-                        Class.Selection.EndPos   = ClassPos;
-                    }
-
-                    this.Selection.Use      = true;
-                    this.Selection.StartPos = DstIndex;
-                    this.Selection.EndPos   = DstIndex;
-                }
             }
         }
         else
@@ -4018,23 +3954,14 @@ CDocumentContent.prototype =
 
                 StartIndex++;
 
-                if ( true !== Debug_ParaRunMode )
-                {
-                    ParaS.Selection.Use      = true;
-                    ParaS.Selection.StartPos = NearContentPos;
-                    ParaS.Selection.EndPos   = ParaS.Content.length - 1;
-                }
-                else
-                {
-                    var TempPara = Elements[0].Element;
+                var TempPara = Elements[0].Element;
 
-                    // Вызываем так, чтобы выделить все внутренние элементы
-                    TempPara.Select_All();
+                // Вызываем так, чтобы выделить все внутренние элементы
+                TempPara.Select_All();
 
-                    ParaS.Selection.Use      = true;
-                    ParaS.Selection.StartPos = ParaS.Content.length - TempPara.Content.length;
-                    ParaS.Selection.EndPos   = ParaS.Content.length - 1;
-                }
+                ParaS.Selection.Use      = true;
+                ParaS.Selection.StartPos = ParaS.Content.length - TempPara.Content.length;
+                ParaS.Selection.EndPos   = ParaS.Content.length - 1;
             }
 
             var EndIndex = ElementsCount - 1;
@@ -4042,13 +3969,9 @@ CDocumentContent.prototype =
             {
                 var _ParaE = Elements[ElementsCount - 1].Element;
 
-                var TempCount = ( true !== Debug_ParaRunMode ? _ParaE.Internal_GetEndPos() : _ParaE.Content.length - 1 );
-
-                if ( true === Debug_ParaRunMode )
-                {
-                    _ParaE.Select_All();
-                }
-
+                var TempCount = _ParaE.Content.length - 1;
+                
+                _ParaE.Select_All();
                 _ParaE.Concat( ParaE );
                 _ParaE.Set_Pr( ParaE.Pr );
 
@@ -6469,50 +6392,17 @@ CDocumentContent.prototype =
         if ( true === this.ApplyToAll )
         {
             var VisTextPr;
+            this.Content[0].Set_ApplyToAll(true);
+            VisTextPr = this.Content[0].Get_Paragraph_TextPr();
+            this.Content[0].Set_ApplyToAll(false);
 
-            if ( true !== Debug_ParaRunMode )
+            var Count = this.Content.length;
+            for ( var Index = 1; Index < Count; Index++ )
             {
-                this.Content[0].Set_ApplyToAll(true);
-
-                if ( type_Paragraph == this.Content[0].GetType() )
-                    VisTextPr = this.Content[0].Selection_CalculateTextPr();
-                else if ( type_Table == this.Content[0].GetType() )
-                    VisTextPr = this.Content[0].Get_Paragraph_TextPr();
-
-                this.Content[0].Set_ApplyToAll(false);
-
-                for ( var Index = 1; Index < this.Content.length; Index++ )
-                {
-                    var Item = this.Content[Index];
-
-                    var CurPr;
-
-                    Item.Set_ApplyToAll(true);
-
-                    if ( type_Paragraph == Item.GetType() )
-                        CurPr = Item.Selection_CalculateTextPr();
-                    else if ( type_Table == Item.GetType() )
-                        CurPr = Item.Get_Paragraph_TextPr();
-
-                    Item.Set_ApplyToAll(false);
-
-                    VisTextPr = VisTextPr.Compare(CurPr);
-                }
-            }
-            else
-            {
-                this.Content[0].Set_ApplyToAll(true);
-                VisTextPr = this.Content[0].Get_Paragraph_TextPr();
-                this.Content[0].Set_ApplyToAll(false);
-
-                var Count = this.Content.length;
-                for ( var Index = 1; Index < Count; Index++ )
-                {
-                    this.Content[Index].Set_ApplyToAll(true);
-                    var CurPr = this.Content[Index].Get_Paragraph_TextPr();
-                    VisTextPr = VisTextPr.Compare( CurPr );
-                    this.Content[Index].Set_ApplyToAll(false);
-                }
+                this.Content[Index].Set_ApplyToAll(true);
+                var CurPr = this.Content[Index].Get_Paragraph_TextPr();
+                VisTextPr = VisTextPr.Compare( CurPr );
+                this.Content[Index].Set_ApplyToAll(false);
             }
 
             Result_TextPr = VisTextPr;
@@ -6540,35 +6430,12 @@ CDocumentContent.prototype =
                             EndPos   = Temp;
                         }
 
-                        if ( true !== Debug_ParaRunMode )
+                        VisTextPr = this.Content[StartPos].Get_Paragraph_TextPr();
+
+                        for ( var Index = StartPos + 1; Index <= EndPos; Index++ )
                         {
-                            if ( type_Paragraph == this.Content[StartPos].GetType() )
-                                VisTextPr = this.Content[StartPos].Selection_CalculateTextPr();
-                            else if ( type_Table == this.Content[StartPos].GetType() )
-                                VisTextPr = this.Content[StartPos].Get_Paragraph_TextPr();
-
-                            for ( var Index = StartPos + 1; Index <= EndPos; Index++ )
-                            {
-                                var Item = this.Content[Index];
-
-                                var CurPr;
-                                if ( type_Paragraph == Item.GetType() )
-                                    CurPr = Item.Selection_CalculateTextPr();
-                                else if ( type_Table == Item.GetType() )
-                                    CurPr = Item.Get_Paragraph_TextPr();
-
-                                VisTextPr = VisTextPr.Compare(CurPr);
-                            }
-                        }
-                        else
-                        {
-                            VisTextPr = this.Content[StartPos].Get_Paragraph_TextPr();
-
-                            for ( var Index = StartPos + 1; Index <= EndPos; Index++ )
-                            {
-                                var CurPr = this.Content[Index].Get_Paragraph_TextPr();
-                                VisTextPr = VisTextPr.Compare( CurPr );
-                            }
+                            var CurPr = this.Content[Index].Get_Paragraph_TextPr();
+                            VisTextPr = VisTextPr.Compare( CurPr );
                         }
 
                         break;
@@ -6596,22 +6463,7 @@ CDocumentContent.prototype =
             }
             else
             {
-                if ( true !== Debug_ParaRunMode )
-                {
-                    var Item = this.Content[this.CurPos.ContentPos];
-                    if ( type_Paragraph == Item.GetType() )
-                    {
-                        Result_TextPr = Item.Internal_CalculateTextPr( Item.CurPos.ContentPos - 1 );
-                    }
-                    else if ( type_Table == Item.GetType() )
-                    {
-                        Result_TextPr = Item.Get_Paragraph_TextPr();
-                    }
-                }
-                else
-                {
-                    Result_TextPr = this.Content[this.CurPos.ContentPos].Get_Paragraph_TextPr();
-                }
+                Result_TextPr = this.Content[this.CurPos.ContentPos].Get_Paragraph_TextPr();
             }
 
             return Result_TextPr;
@@ -7273,17 +7125,7 @@ CDocumentContent.prototype =
 
                     if ( type_Paragraph === ItemType )
                     {
-                        if ( true !== Debug_ParaRunMode )
-                        {
-                            if ( Direction > 0 )
-                                Item.Selection.EndPos   = Item.Content.length - 1;
-                            else
-                                Item.Selection.StartPos = Item.Content.length - 1;
-                        }
-                        else
-                        {
-                            Item.Selection_SetBegEnd( ( Direction > 0 ? false : true ), false );
-                        }
+                        Item.Selection_SetBegEnd( ( Direction > 0 ? false : true ), false );
                     }
                     else //if ( type_Table === ItemType )
                     {
@@ -7305,17 +7147,7 @@ CDocumentContent.prototype =
 
                     if ( type_Paragraph === ItemType )
                     {
-                        if ( true !== Debug_ParaRunMode )
-                        {
-                            if ( Direction > 0 )
-                                Item.Selection.StartPos = Item.Internal_GetStartPos();
-                            else
-                                Item.Selection.EndPos   = Item.Internal_GetStartPos();
-                        }
-                        else
-                        {
-                            Item.Selection_SetBegEnd( ( Direction > 0 ? true : false ), true );
-                        }
+                        Item.Selection_SetBegEnd( ( Direction > 0 ? true : false ), true );
                     }
                     else //if ( type_Table === ItemType )
                     {
@@ -7335,23 +7167,7 @@ CDocumentContent.prototype =
 
                     if ( type_Paragraph === ItemType )
                     {
-                        if ( true !== Debug_ParaRunMode )
-                        {
-                            if ( Direction > 0 )
-                            {
-                                Item.Selection.Set_StartPos(Item.Internal_GetStartPos(), -1);
-                                Item.Selection.Set_EndPos(Item.Content.length - 1, -1);
-                            }
-                            else
-                            {
-                                Item.Selection.Set_EndPos(Item.Internal_GetStartPos(), -1);
-                                Item.Selection.Set_StartPos(Item.Content.length - 1, -1);
-                            }
-                        }
-                        else
-                        {
-                            Item.Select_All( Direction );
-                        }
+                        Item.Select_All( Direction );
                     }
                     else //if ( type_Table === ItemType )
                     {

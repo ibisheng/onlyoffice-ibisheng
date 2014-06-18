@@ -4717,23 +4717,10 @@ ParaDrawing.prototype =
 
     OnEnd_MoveInline : function(NearPos)
     {
-        if ( true !== Debug_ParaRunMode )
-        {
-            var bCorrectIndex = this.Parent === NearPos.Paragraph ? true : false;
-            var Index = this.Remove_FromDocument( false );
+        NearPos.Paragraph.Check_NearestPos( NearPos );
 
-            if ( true === bCorrectIndex && Index < NearPos.ContentPos )
-                NearPos.ContentPos--;
-
-            this.Add_ToDocument( NearPos, true );
-        }
-        else
-        {
-            NearPos.Paragraph.Check_NearestPos( NearPos );
-
-            var RunPr = this.Remove_FromDocument( false );
-            this.Add_ToDocument( NearPos, true, RunPr );
-        }
+        var RunPr = this.Remove_FromDocument( false );
+        this.Add_ToDocument( NearPos, true, RunPr );
     },
 
     OnEnd_ResizeInline : function(W, H)
@@ -4807,31 +4794,19 @@ ParaDrawing.prototype =
 
     Remove_FromDocument : function(bRecalculate)
     {
-        if ( true !== Debug_ParaRunMode )
+        var Result = null;
+        var Run = this.Parent.Get_DrawingObjectRun( this.Id );
+
+        if ( null !== Run )
         {
-            var Res = this.Parent.Remove_DrawingObject( this.Id );
-
-            if ( false != bRecalculate )
-                editor.WordControl.m_oLogicDocument.Recalculate();
-
-            return Res;
+            Run.Remove_DrawingObject( this.Id );
+            Result = Run.Get_TextPr();
         }
-        else
-        {
-            var Result = null;
-            var Run = this.Parent.Get_DrawingObjectRun( this.Id );
 
-            if ( null !== Run )
-            {
-                Run.Remove_DrawingObject( this.Id );
-                Result = Run.Get_TextPr();
-            }
+        if ( false != bRecalculate )
+            editor.WordControl.m_oLogicDocument.Recalculate();
 
-            if ( false != bRecalculate )
-                editor.WordControl.m_oLogicDocument.Recalculate();
-
-            return Result;
-        }
+        return Result;
     },
 
 
@@ -4848,54 +4823,35 @@ ParaDrawing.prototype =
 
     Add_ToDocument : function(NearPos, bRecalculate, RunPr)
     {
-        if ( true !== Debug_ParaRunMode )
-        {
-            this.Parent = NearPos.Paragraph;
-            NearPos.Paragraph.Internal_Content_Add( Math.min( NearPos.ContentPos, NearPos.Paragraph.Content.length - 2 ), this );
+        NearPos.Paragraph.Check_NearestPos( NearPos );
 
-            if ( false != bRecalculate )
-                editor.WordControl.m_oLogicDocument.Recalculate();
-        }
-        else
-        {
-            NearPos.Paragraph.Check_NearestPos( NearPos );
+        var LogicDocument = this.DrawingDocument.m_oLogicDocument;
 
-            var LogicDocument = this.DrawingDocument.m_oLogicDocument;
+        var Para = new Paragraph(this.DrawingDocument, LogicDocument);
+        var DrawingRun = new ParaRun( Para );
+        DrawingRun.Add_ToContent( 0, this );
 
-            var Para = new Paragraph(this.DrawingDocument, LogicDocument);
-            var DrawingRun = new ParaRun( Para );
-            DrawingRun.Add_ToContent( 0, this );
+        if ( undefined !== RunPr )
+            DrawingRun.Set_Pr( RunPr.Copy() );
 
-            if ( undefined !== RunPr )
-                DrawingRun.Set_Pr( RunPr.Copy() );
+        Para.Add_ToContent( 0, DrawingRun );
 
-            Para.Add_ToContent( 0, DrawingRun );
+        var SelectedElement = new CSelectedElement(Para, false)
+        var SelectedContent = new CSelectedContent();
+        SelectedContent.Add( SelectedElement );
 
-            var SelectedElement = new CSelectedElement(Para, false)
-            var SelectedContent = new CSelectedContent();
-            SelectedContent.Add( SelectedElement );
+        NearPos.Paragraph.Parent.Insert_Content( SelectedContent, NearPos );
 
-            NearPos.Paragraph.Parent.Insert_Content( SelectedContent, NearPos );
-
-            if ( false != bRecalculate )
-                LogicDocument.Recalculate();
-        }
+        if ( false != bRecalculate )
+            LogicDocument.Recalculate();
     },
 
     Add_ToDocument2 : function(Paragraph)
     {
-        if ( true !== Debug_ParaRunMode )
-        {
-            this.Parent = Paragraph;
-            Paragraph.Internal_Content_Add( Paragraph.Internal_GetStartPos(), this );
-        }
-        else
-        {
-            var DrawingRun = new ParaRun( Paragraph );
-            DrawingRun.Add_ToContent( 0, this );
+        var DrawingRun = new ParaRun( Paragraph );
+        DrawingRun.Add_ToContent( 0, this );
 
-            Paragraph.Add_ToContent( 0, DrawingRun );
-        }
+        Paragraph.Add_ToContent( 0, DrawingRun );
     },
 
     Update_CursorType : function(X, Y, PageIndex)
