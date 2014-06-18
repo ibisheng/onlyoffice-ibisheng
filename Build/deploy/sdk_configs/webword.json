@@ -158,7 +158,6 @@
 				"../../Word/Math/accent.js",
 				"../../Word/Math/borderBox.js",
 				
-				"../../Excel/apiDefines.js",
 				"../../Excel/utils/utils.js",
 				"../../Excel/model/CellComment.js",
 				"../../Excel/model/Serialize.js",
