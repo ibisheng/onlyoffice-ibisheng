@@ -1908,6 +1908,23 @@ function CEditorPage(api)
         else if (0 != deltaY)
             oThis.m_oScrollVerApi.scrollBy(0, deltaY, false);
 
+        // здесь - имитируем моус мув ---------------------------
+        var _e = {};
+        _e.pageX = global_mouseEvent.X;
+        _e.pageY = global_mouseEvent.Y;
+
+        _e.clientX = global_mouseEvent.X;
+        _e.clientY = global_mouseEvent.Y;
+
+        _e.altKey   = global_mouseEvent.AltKey;
+        _e.shiftKey = global_mouseEvent.ShiftKey;
+        _e.ctrlKey  = global_mouseEvent.CtrlKey;
+        _e.metaKey  = global_mouseEvent.CtrlKey;
+
+        _e.srcElement = global_mouseEvent.Sender;
+
+        oThis.onMouseMove(_e);
+        // ------------------------------------------------------
 
         if (e.preventDefault)
             e.preventDefault();
