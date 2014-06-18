@@ -1244,9 +1244,14 @@ CRadical.prototype.getDegree = function()
     else if(this.type = SQUARE_RADICAL)
         degree = this.elements[0][0];*/
 
-    // для стремной ситуации, когда руками в xml выставили в degHide true, а объект со степенью имеется. Возвращаем основание
+    // для стремной ситуации, когда руками в xml выставили в degHide true, а объект со степенью имеется, возвращаем основание
 
-    return  this.elements[0][0];
+    var iterator = null;
+
+    if(this.Pr.degHide == false)
+        iterator = this.elements[0][0];
+
+    return iterator;
 }
 CRadical.prototype.getPropsForWrite = function()
 {
