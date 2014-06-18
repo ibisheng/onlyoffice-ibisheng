@@ -4785,7 +4785,7 @@ var gUndoInsDelCellsFlag = true;
 						isCurrenCell = false;
 						if(!isCurrenCell && cellId == buttons[num].id)
 							isCurrenCell = true;
-						if(buttons[num].hiddenRows[row])
+						if(null != buttons[num].hiddenRows && buttons[num].hiddenRows[row])
 						{
 							if(!isCurrenCell && cellId == buttons[num].id)
 								return false;
