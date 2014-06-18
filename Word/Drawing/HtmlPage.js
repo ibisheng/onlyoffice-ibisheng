@@ -3536,7 +3536,7 @@ function CEditorPage(api)
             oWordControl.m_oDrawingDocument.CheckTrackTable();
         }
 
-        if (oWordControl.m_oApi.isAutoSave)
+        if (oWordControl.m_oApi.autoSaveGap != 0)
         {
             var _curTime = new Date().getTime();
             if (-1 == oWordControl.m_nLastAutosaveTime)
