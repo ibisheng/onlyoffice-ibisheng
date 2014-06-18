@@ -660,16 +660,7 @@ CShape.prototype.getNearestPos = function(x, y, pageIndex)
     }
     return null;
 };
-CShape.prototype.selectionCheck = function( X, Y, Page_Abs, NearPos)
-{
-    if(isRealObject(this.textBoxContent))
-    {
-        var t_x = this.invertTransformText.TransformPointX(X, Y);
-        var t_y = this.invertTransformText.TransformPointY(X, Y);
-        return this.textBoxContent.Selection_Check(t_x, t_y, Page_Abs,  NearPos);
-    }
-    return false;
-};
+
 
 CShape.prototype.cursorGetPos = function()
 {

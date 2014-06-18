@@ -806,6 +806,7 @@ var historyitem_type_ValAx = 1111;
 var historyitem_type_WrapPolygon = 1112;
 var historyitem_type_DateAx = 1113;
 var historyitem_type_SerAx = 1114;
+var historyitem_type_Title = 1115;
 
 
 

@@ -255,6 +255,33 @@ Paragraph.prototype =
         return Para;
     },
 
+    Copy2 : function(Parent)
+    {
+        var Para = new Paragraph(this.DrawingDocument, Parent, 0, 0, 0, 0, 0);
+
+        // Копируем настройки
+        Para.Set_Pr(this.Pr.Copy());
+
+        Para.TextPr.Set_Value( this.TextPr.Value.Copy() );
+
+        // Удаляем содержимое нового параграфа
+        Para.Internal_Content_Remove2(0, Para.Content.length);
+
+        // Копируем содержимое параграфа
+        var Count = this.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var Item = this.Content[Index];
+            Para.Internal_Content_Add( Para.Content.length, Item.Copy2(), false );
+        }
+
+
+        Para.Selection_Remove();
+        Para.Cursor_MoveToStartPos(false);
+
+        return Para;
+    },
+
     Get_FirstRunPr : function()
     {
         if ( this.Content.length <= 0 || para_Run !== this.Content[0].Type )

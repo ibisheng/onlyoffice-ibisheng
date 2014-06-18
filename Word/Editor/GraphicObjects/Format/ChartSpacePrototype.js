@@ -62,6 +62,7 @@ CChartSpace.prototype.setRecalculateInfo = function()
 {
     this.recalcInfo =
     {
+        recalcTitle: null,
         recalculateTransform: true,
         recalculateBounds:    true,
         recalculateChart:     true,
@@ -188,7 +189,33 @@ CChartSpace.prototype.recalculateChart = function()
 };
 CChartSpace.prototype.canResize = CShape.prototype.canResize;
 CChartSpace.prototype.canMove = CShape.prototype.canMove;
-CChartSpace.prototype.setStartPage = CShape.prototype.setStartPage;
+CChartSpace.prototype.setStartPage = function(pageIndex)
+{
+    var title, content;
+    if(this.chart && this.chart.title)
+    {
+        title = this.chart.title;
+        content = title.getDocContent();
+        content && content.Set_StartPage(pageIndex);
+    }
+    if(this.chart && this.chart.plotArea)
+    {
+        var hor_axis = this.chart.plotArea.getHorizontalAxis();
+        if(hor_axis && hor_axis.title)
+        {
+            title = hor_axis.title;
+            content = title.getDocContent();
+            content && content.Set_StartPage(pageIndex);
+        }
+        var vert_axis = this.chart.plotArea.getVerticalAxis();
+        if(vert_axis && vert_axis.title)
+        {
+            title = vert_axis.title;
+            content = title.getDocContent();
+            content && content.Set_StartPage(pageIndex);
+        }
+    }
+};
 CChartSpace.prototype.getRecalcObject = CShape.prototype.getRecalcObject;
 CChartSpace.prototype.setRecalcObject = CShape.prototype.setRecalcObject;
 CChartSpace.prototype.canRotate = function()
@@ -266,6 +293,20 @@ CChartSpace.prototype.recalculate = function()
     {
         this.updateLinks();
 
+        if(this.recalcInfo.recalcTitle)
+        {
+            var pos_x, pos_y;
+            pos_x = this.recalcInfo.recalcTitle.x;
+            pos_y = this.recalcInfo.recalcTitle.y;
+            var pos_cx = pos_x +  this.recalcInfo.recalcTitle.extX/2;
+            this.recalculateAxisLabels();
+            this.recalcInfo.recalcTitle.setPosition(pos_cx - this.recalcInfo.recalcTitle.extX/2, pos_y);
+            var posX = this.localTransform.tx + this.posX;
+            var posY = this.localTransform.ty + this.posY;
+            this.recalcInfo.recalcTitle.updatePosition(posX, posY);
+            this.recalcInfo.recalcTitle = null;
+            this.recalcInfo.bRecalculatedTitle = true;
+        }
         if(this.recalcInfo.recalculateTransform)
         {
             this.recalculateTransform();

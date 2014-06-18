@@ -49,6 +49,7 @@ StartAddNewShape.prototype =
             var shape = this.drawingObjects.arrTrackObjects[0].getShape(false, this.drawingObjects.getDrawingDocument(), this.drawingObjects.drawingObjects);
             shape.setWorksheet(this.drawingObjects.drawingObjects.getWorksheetModel());
             shape.addToDrawingObjects();
+            this.drawingObjects.checkChartTextSelection();
             this.drawingObjects.resetSelection();
             shape.select(this.drawingObjects, 0);
             if(this.preset === "textRect")
@@ -97,6 +98,7 @@ NullState.prototype =
         {}
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
+            this.drawingObjects.checkChartTextSelection();
             this.drawingObjects.resetInternalSelection();
         }
         if(!b_no_handle_selected)
@@ -898,6 +900,7 @@ SplineBezierState.prototype =
         this.drawingObjects.addTrackObject(new Spline(this.drawingObjects, this.drawingObjects.getTheme(), null, null, null, pageIndex));
         this.drawingObjects.arrTrackObjects[0].path.push(new SplineCommandMoveTo(x, y));
         this.drawingObjects.changeCurrentState(new SplineBezierState33(this.drawingObjects, x, y,pageIndex));
+        this.drawingObjects.checkChartTextSelection();
         this.drawingObjects.resetSelection();
         this.drawingObjects.updateOverlay();
     },
@@ -1348,6 +1351,7 @@ PolyLineAddState.prototype =
         this.drawingObjects.clearTrackObjects();
         this.drawingObjects.addTrackObject(new PolyLine(this.drawingObjects, this.drawingObjects.getTheme(), null, null, null, pageIndex));
         this.drawingObjects.arrTrackObjects[0].arrPoint.push({x : x, y: y});
+        this.drawingObjects.checkChartTextSelection();
         this.drawingObjects.resetSelection();
         this.drawingObjects.updateOverlay();
         var _min_distance = this.drawingObjects.convertPixToMM(1);
@@ -1439,6 +1443,7 @@ AddPolyLine2State.prototype =
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
             return {objectId: "1", bMarker: true};
         this.drawingObjects.startTrackPos = {x: x, y: y, pageIndex : pageIndex};
+        this.drawingObjects.checkChartTextSelection();
         this.drawingObjects.resetSelection();
         this.drawingObjects.updateOverlay();
         this.drawingObjects.clearTrackObjects();

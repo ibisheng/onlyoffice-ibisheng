@@ -239,15 +239,23 @@ CChartSpace.prototype =
 
     getSelectionState: function()
     {
+        var content_selection = null;
+        if(this.selection.textSelection)
+        {
+            var content = this.selection.textSelection.getDocContent();
+            if(content)
+                content_selection = content.Get_SelectionState();
+        }
         return {
-            title:         this.selection.title,
-            legend:        this.selection.legend,
-            legendEntry:   this.selection.legendEntry,
-            axisLbls:      this.selection.axisLbls,
-            dataLbls:      this.selection.dataLbls,
-            dataLbl:       this.selection.dataLbl,
-            textSelection: this.selection.textSelection,
-            plotArea:      this.selection.plotArea
+            title:            this.selection.title,
+            legend:           this.selection.legend,
+            legendEntry:      this.selection.legendEntry,
+            axisLbls:         this.selection.axisLbls,
+            dataLbls:         this.selection.dataLbls,
+            dataLbl:          this.selection.dataLbl,
+            textSelection:    this.selection.textSelection,
+            plotArea:         this.selection.plotArea,
+            contentSelection: content_selection
         }
     },
 
@@ -262,6 +270,15 @@ CChartSpace.prototype =
        this.selection.dataLbl        = state.dataLbl;
        this.selection.textSelection  = state.textSelection;
        this.selection.plotArea       = state.plotArea;
+       if(state.contentSelection)
+       {
+           if(this.selection.textSelection)
+           {
+               var content = this.selection.textSelection.getDocContent();
+               if(content)
+                   content.Set_SelectionState(state.contentSelection, state.contentSelection.length - 1);
+           }
+       }
     },
 
     resetInternalSelection: function()
@@ -378,7 +395,7 @@ CChartSpace.prototype =
         var content;
         if(paraItem.Type === para_TextPr)
         {
-            if(this.selection.title)
+            if(this.selection.title && !this.selection.textSelection)
             {
                 this.selection.title.checkDocContent();
                 content = this.selection.title.getDocContent();
@@ -386,11 +403,10 @@ CChartSpace.prototype =
                 content.Paragraph_Add(paraItem, bRecalculate);
                 content.Set_ApplyToAll(false);
             }
-            else if(this.selection.textSelection)
+            else  if(this.selection.textSelection)
             {
                 this.selection.textSelection.checkDocContent();
-                content = this.selection.textSelection.getDocContent();
-                content.Paragraph_Add(paraItem, bRecalculate);
+                this.selection.textSelection.paragraphAdd(paraItem, bRecalculate);
             }
             else
             {
@@ -1145,6 +1161,19 @@ CChartSpace.prototype =
     handleUpdateDataLabels: function()
     {
         this.recalcInfo.recalculateDLbls = true;
+        this.addToRecalculate();
+    },
+
+    Refresh_RecalcData2: function(pageIndex, object)
+    {
+        if(object && object.getObjectType && object.getObjectType() === historyitem_type_Title && this.selection.title === object)
+        {
+            this.recalcInfo.recalcTitle = object;
+        }
+        else
+        {
+            this.setRecalculateInfo();
+        }
         this.addToRecalculate();
     },
 
@@ -7327,7 +7356,7 @@ CChartSpace.prototype =
         if(this.chart && this.chart.title)
         {
             var title = this.chart.title;
-            title.parent = this.chart;
+            //title.parent = this.chart;
             title.chart = this;
             title.recalculate();
         }
@@ -7337,7 +7366,7 @@ CChartSpace.prototype =
             if(hor_axis && hor_axis.title)
             {
                 var title = hor_axis.title;
-                title.parent = hor_axis;
+                //title.parent = hor_axis;
                 title.chart = this;
                 title.recalculate();
             }
@@ -7345,7 +7374,7 @@ CChartSpace.prototype =
             if(vert_axis && vert_axis.title)
             {
                 var title = vert_axis.title;
-                title.parent = vert_axis;
+                //title.parent = vert_axis;
                 title.chart = this;
                 title.recalculate();
             }

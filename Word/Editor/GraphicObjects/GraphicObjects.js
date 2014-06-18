@@ -2294,6 +2294,10 @@ CGraphicObjects.prototype =
                 this.selection.groupSelection.drawSelectionPage(pageIndex);
             }
         }
+        else if(this.selection.chartSelection && this.selection.chartSelection.selectStartPage === pageIndex && this.selection.chartSelection.selection.textSelection)
+        {
+            this.selection.chartSelection.selection.textSelection.getDocContent().Selection_Draw_Page(pageIndex);
+        }
     },
     getAllRasterImagesOnPage: function(pageIndex)
     {
@@ -2311,8 +2315,11 @@ CGraphicObjects.prototype =
         return ret;
     },
 
+    checkChartTextSelection: DrawingObjectsController.prototype.checkChartTextSelection,
+
 
     addNewParagraph: DrawingObjectsController.prototype.addNewParagraph,
+
 
     paragraphClearFormatting: DrawingObjectsController.prototype.paragraphClearFormatting,
 

@@ -935,23 +935,31 @@ DrawingObjectsController.prototype =
     {
     },
 
-    getTargetDocContent: function()
+    getTargetDocContent: function(bCheckChartTitle)
     {
         var text_object = getTargetTextObject(this);
-        return text_object && text_object.getDocContent();
+        if(text_object)
+        {
+            if(bCheckChartTitle && text_object.checkDocContent)
+            {
+                text_object.checkDocContent();
+            }
+            return text_object.getDocContent();
+        }
+        return null;
     },
 
 
     addNewParagraph: function(bRecalculate)
     {
-        var content = this.getTargetDocContent();
+        var content = this.getTargetDocContent(true);
         content && content.Add_NewParagraph(bRecalculate);
     },
 
 
     paragraphClearFormatting: function()
     {
-        var content = this.getTargetDocContent();
+        var content = this.getTargetDocContent(true);
         content && content.Paragraph_ClearFormatting();
     },
 
@@ -1035,7 +1043,7 @@ DrawingObjectsController.prototype =
 
     setParagraphTabs: function(Tabs)
     {
-        var content = this.getTargetDocContent();
+        var content = this.getTargetDocContent(true);
         if(content)
         {
             content.Set_ParagraphTabs(Tabs);
@@ -1066,7 +1074,7 @@ DrawingObjectsController.prototype =
 
     setParagraphPageBreakBefore: function(Value)
     {
-        var content = this.getTargetDocContent();
+        var content = this.getTargetDocContent(true);
         if(content)
         {
             content.Set_ParagraphPageBreakBefore(Value);
@@ -1074,7 +1082,7 @@ DrawingObjectsController.prototype =
     },
     setParagraphKeepLines: function(Value)
     {
-        var content = this.getTargetDocContent();
+        var content = this.getTargetDocContent(true);
         if(content)
         {
             content.Set_ParagraphKeepLines(Value);
@@ -1083,7 +1091,7 @@ DrawingObjectsController.prototype =
 
     setParagraphKeepNext: function(Value)
     {
-        var content = this.getTargetDocContent();
+        var content = this.getTargetDocContent(true);
         if(content)
         {
             content.Set_ParagraphKeepNext(Value);
@@ -1092,7 +1100,7 @@ DrawingObjectsController.prototype =
 
     setParagraphWidowControl: function(Value)
     {
-        var content = this.getTargetDocContent();
+        var content = this.getTargetDocContent(true);
         if(content)
         {
             content.Set_ParagraphWidowControl(Value);
@@ -1101,7 +1109,7 @@ DrawingObjectsController.prototype =
 
     setParagraphBorders: function(Value)
     {
-        var content = this.getTargetDocContent();
+        var content = this.getTargetDocContent(true);
         if(content)
         {
             content.Set_ParagraphBorders(Value);
@@ -1163,7 +1171,7 @@ DrawingObjectsController.prototype =
 
     setParagraphIndent: function(indent)
     {
-        var content = this.getTargetDocContent();
+        var content = this.getTargetDocContent(true);
         if(content)
         {
             content.Set_ParagraphIndent(indent);
@@ -1353,7 +1361,7 @@ DrawingObjectsController.prototype =
 
     hyperlinkCheck: function(bCheckEnd)
     {
-        var content = this.getTargetDocContent();
+        var content = this.getTargetDocContent(true);
         if(content)
             return content.Hyperlink_Check(bCheckEnd);
         return null;
@@ -1361,25 +1369,25 @@ DrawingObjectsController.prototype =
 
     hyperlinkCanAdd: function(bCheckInHyperlink)
     {
-        var content = this.getTargetDocContent();
+        var content = this.getTargetDocContent(true);
         return content && content.Hyperlink_CanAdd(bCheckInHyperlink);
     },
 
     hyperlinkRemove: function()
     {
-        var content = this.getTargetDocContent();
+        var content = this.getTargetDocContent(true);
         return content && content.Hyperlink_Remove();
     },
 
     hyperlinkModify: function( HyperProps )
     {
-        var content = this.getTargetDocContent();
+        var content = this.getTargetDocContent(true);
         return content && content.Hyperlink_Modify(HyperProps);
     },
 
     hyperlinkAdd: function( HyperProps )
     {
-        var content = this.getTargetDocContent();
+        var content = this.getTargetDocContent(true);
         return content && content.Hyperlink_Add(HyperProps);
     },
 
@@ -1820,7 +1828,7 @@ DrawingObjectsController.prototype =
                         {
                             hor_axis.title.txPr.setContent(new CDocumentContent(hor_axis.title.txPr, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
                         }
-                        if(hor_axis.title.overlay)
+                        if(hor_axis.title.overlay !== false)
                             hor_axis.title.setOverlay(false);
                         break;
                     }
@@ -1877,6 +1885,10 @@ DrawingObjectsController.prototype =
                             }
                             if(vert_axis_labels_settings === c_oAscChartVertAxisLabelShowSettings.rotated && vert_axis.title.txPr.bodyPr.vert !== nVertTTvert)
                                 vert_axis.title.txPr.bodyPr.setVert(nVertTTvert);
+                            if(vert_axis.title.overlay !== false)
+                            {
+                                vert_axis.title.setOverlay(false);
+                            }
                         }
                     }
                 }
@@ -2712,7 +2724,7 @@ DrawingObjectsController.prototype =
 
     removeCallback: function(dir)
     {
-        var content = this.getTargetDocContent();
+        var content = this.getTargetDocContent(true);
         if(content)
         {
             content.Remove(dir, true)
@@ -3199,16 +3211,16 @@ DrawingObjectsController.prototype =
         {
             if(!e.ctrlKey)
             {
-                if(this.selection.textSelection || this.selection.groupSelection && this.selection.groupSelection.selection.textSelection
-                    || this.selection.chartSelection && this.selection.chartSelection.textSelection)
-                {
+                //if(this.selection.textSelection || this.selection.groupSelection && this.selection.groupSelection.selection.textSelection
+                //    || this.selection.chartSelection && this.selection.chartSelection.textSelection)
+                //{
                     this.checkSelectedObjectsAndCallback(this.paragraphAdd, [new ParaSpace(1)]);
                     this.recalculate();
-                }
-                else
-                {
-                    //TODO: this.selectNextObject(!e.shiftKey ? 1 : -1);
-                }
+                //}
+               // else
+               // {
+               //     //TODO: this.selectNextObject(!e.shiftKey ? 1 : -1);
+               // }
             }
 
             bRetValue = true;
@@ -3478,6 +3490,7 @@ DrawingObjectsController.prototype =
     {
         if(this.bNoResetSeclectionState === true)
             return;
+        this.checkChartTextSelection();
         this.resetSelection();
         this.changeCurrentState(new NullState(this, this.drawingObjects));
         this.updateSelectionState();
@@ -3498,8 +3511,85 @@ DrawingObjectsController.prototype =
 
     },
 
+
+    checkChartTextSelection: function()
+    {
+        var chart_selection;
+        if(this.selection.chartSelection)
+        {
+            chart_selection = this.selection.chartSelection;
+        }
+        else if(this.selection.groupSelection && this.selection.groupSelection.chartSelection)
+        {
+            chart_selection = this.selection.groupSelection.chartSelection;
+        }
+        if(chart_selection && chart_selection.selection.textSelection)
+        {
+            var content = chart_selection.selection.textSelection.getDocContent();
+            if(content)
+            {
+                if(content.Is_Empty())
+                {
+                    if(chart_selection.selection.title && chart_selection.selection.title.parent)
+                    {
+                        History.Create_NewPoint();
+                        chart_selection.selection.title.parent.setTitle(null);
+                    }
+                }
+            }
+            if(chart_selection.recalcInfo.bRecalculatedTitle)
+            {
+                chart_selection.recalcInfo.recalcTitle = null;
+                chart_selection.handleUpdateInternalChart();
+                chart_selection.addToRecalculate();
+                if(this.document)
+                {
+                    var para_drawing;
+                    if(chart_selection.group)
+                    {
+                        var cur_group = chart_selection.group;
+                        while(cur_group.group)
+                            cur_group = cur_group.group;
+                        para_drawing = cur_group.parent;
+                    }
+                    else
+                    {
+                        para_drawing = chart_selection.parent;
+                    }
+                    if(para_drawing && para_drawing.GraphicObj)
+                    {
+                        if(para_drawing.Is_Inline())
+                        {
+                            para_drawing.OnEnd_ResizeInline(para_drawing.GraphicObj.bounds.w, para_drawing.GraphicObj.bounds.h);
+                        }
+                        else
+                        {
+
+                            var pos_x = para_drawing.GraphicObj.bounds.x + para_drawing.GraphicObj.posX;
+                            var pos_y = para_drawing.GraphicObj.bounds.y + para_drawing.GraphicObj.posY;
+                            var nearest_pos = this.document.Get_NearestPos(para_drawing.GraphicObj.selectStartPage, pos_x, pos_y, true, para_drawing);
+                            para_drawing.Remove_FromDocument(false);
+                            para_drawing.Set_XYForAdd(pos_x, pos_y, nearest_pos, para_drawing.GraphicObj.selectStartPage);
+                            para_drawing.Add_ToDocument2(para_drawing.Get_ParentParagraph());
+                        }
+                    }
+                    this.document.Recalculate();
+                }
+                else
+                {
+                    this.startRecalculate();
+                }
+                chart_selection.recalcInfo.bRecalculatedTitle = false;
+            }
+        }
+    },
+
     resetSelection: function()
     {
+        if(this.document)
+        {
+            this.checkChartTextSelection();
+        }
         this.resetInternalSelection();
         for(var i = 0; i < this.selectedObjects.length; ++i)
         {

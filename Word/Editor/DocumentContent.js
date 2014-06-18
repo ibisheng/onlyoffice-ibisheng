@@ -136,6 +136,21 @@ CDocumentContent.prototype =
             this.Internal_Content_Add( Index, OtherDC.Content[Index].Copy(this), false );
         }
     },
+
+    Copy3: function(Parent)//для заголовков диаграмм
+    {
+        var DC = new CDocumentContent(Parent, this.DrawingDocument, 0, 0, 0, 0, this.Split, this.TurnOffInnerWrap);
+
+        // Копируем содержимое
+        DC.Internal_Content_RemoveAll();
+
+        var Count = this.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            DC.Internal_Content_Add( Index, this.Content[Index].Copy2(DC), false );
+        }
+        return DC;
+    },
 //-----------------------------------------------------------------------------------
 // Функции, к которым идет обращение из контента
 //-----------------------------------------------------------------------------------

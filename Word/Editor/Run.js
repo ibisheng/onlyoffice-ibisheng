@@ -129,6 +129,23 @@ ParaRun.prototype =
         return NewRun;
     },
 
+    Copy2 : function()
+    {
+        var NewRun = new ParaRun(this.Paragraph);
+
+        NewRun.Set_Pr( this.Pr.Copy() );
+
+        var StartPos = 0;
+        var EndPos   = this.Content.length;
+
+        for ( var CurPos = StartPos; CurPos < EndPos; CurPos++ )
+        {
+            var Item = this.Content[CurPos];
+            NewRun.Add_ToContent( CurPos - StartPos, Item.Copy(), false );
+        }
+        return NewRun;
+    },
+
     Get_AllDrawingObjects : function(DrawingObjs)
     {
         var Count = this.Content.length;

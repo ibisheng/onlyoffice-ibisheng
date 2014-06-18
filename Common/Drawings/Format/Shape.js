@@ -1837,6 +1837,17 @@ CShape.prototype =
         this.bWordShape = pr;
     },
 
+    selectionCheck: function( X, Y, Page_Abs, NearPos)
+    {
+        if(isRealObject(this.textBoxContent))
+        {
+            var t_x = this.invertTransformText.TransformPointX(X, Y);
+            var t_y = this.invertTransformText.TransformPointY(X, Y);
+            return this.textBoxContent.Selection_Check(t_x, t_y, Page_Abs,  NearPos);
+        }
+        return false;
+    },
+
     copy: function ()
     {
         var copy = new CShape();
@@ -3240,7 +3251,12 @@ CShape.prototype =
                 transform_text = _transform_text;
             }
             graphics.transform3(transform_text);
+            if (graphics.CheckUseFonts2 !== undefined)
+                graphics.CheckUseFonts2(transform_text);
             this.txBody.draw(graphics);
+            if (graphics.UncheckUseFonts2 !== undefined)
+                graphics.UncheckUseFonts2(transform_text);
+            graphics.SetIntegerGrid(true);
             /*if (graphics.FreeFont !== undefined)
              graphics.FreeFont(); */
 

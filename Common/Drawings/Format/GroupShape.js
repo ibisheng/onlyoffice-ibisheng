@@ -112,8 +112,10 @@ CGroupShape.prototype =
             this.getDrawingDocument().UpdateTargetTransform(this.selection.textSelection.transformText);
             this.selection.textSelection.getDocContent().Selection_Draw_Page(pageIndex);
         }
-        else if(this.selection.chartSelection)
-        {}
+        else if(this.selection.chartSelection && this.selection.chartSelection.selection.textSelection)
+        {
+            this.selection.chartSelection.selection.textSelection.getDocContent().Selection_Draw_Page(pageIndex);
+        }
     },
     Write_ToBinary2: function(w)
     {

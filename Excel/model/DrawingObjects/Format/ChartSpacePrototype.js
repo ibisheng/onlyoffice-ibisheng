@@ -34,6 +34,8 @@ CChartSpace.prototype.setRecalculateInfo = function()
 {
     this.recalcInfo =
     {
+        recalcTitle: null,
+        bRecalculatedTitle: false,
         recalculateTransform: true,
         recalculateBounds:    true,
         recalculateChart:     true,
@@ -211,6 +213,17 @@ CChartSpace.prototype.recalculate = function()
     {
         this.updateLinks();
 
+        if(this.recalcInfo.recalcTitle)
+        {
+            var pos_x, pos_y;
+            pos_x = this.recalcInfo.recalcTitle.x;
+            pos_y = this.recalcInfo.recalcTitle.y;
+            var pos_cx = pos_x +  this.recalcInfo.recalcTitle.extX/2;
+            this.recalculateAxisLabels();
+            this.recalcInfo.recalcTitle.setPosition(pos_cx - this.recalcInfo.recalcTitle.extX/2, pos_y);
+            this.recalcInfo.recalcTitle = null;
+            this.recalcInfo.bRecalculatedTitle = true;
+        }
         if(this.recalcInfo.recalculateTransform)
         {
             this.recalculateTransform();

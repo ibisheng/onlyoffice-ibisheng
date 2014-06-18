@@ -6090,7 +6090,6 @@ ParaDrawing.prototype =
             }
 
         }
-
         return parent_paragraph;
     },
 

@@ -134,6 +134,18 @@ CTextBody.prototype =
         return ret;
     },
 
+    createDuplicate2: function()
+    {
+        var ret = new CTextBody();
+        if(this.bodyPr)
+            ret.setBodyPr(this.bodyPr.createDuplicate());
+        if(this.lstStyle)
+            ret.setLstStyle(this.lstStyle.createDuplicate());
+        if(this.content)
+            ret.setContent(this.content.Copy3(ret));
+        return ret;
+    },
+
     Get_Id: function()
     {
         return this.Id;
@@ -185,6 +197,11 @@ CTextBody.prototype =
     {
         History.Add(this, {Type:historyitem_TextBodySetLstStyle, oldPr: this.lstStyle, newPr: lstStyle});
         this.lstStyle = lstStyle;
+    },
+
+    getObjectType: function()
+    {
+        return historyitem_type_TextBody;
     },
 
     Undo: function(data)
@@ -939,9 +956,10 @@ CTextBody.prototype =
                 var _h = this.content.Get_SummaryHeight();
                 graphics.rect(this.content.X, this.content.Y, _w, _h);
             }
+            var old_start_page = this.content.StartPage;
             this.content.Set_StartPage(0);
             this.content.Draw(0, graphics);
-
+            this.content.Set_StartPage(old_start_page);
         }
     },
 
@@ -1055,7 +1073,7 @@ CTextBody.prototype =
 
     Refresh_RecalcData2: function(pageIndex)
     {
-        this.parent && this.parent.Refresh_RecalcData2 && this.parent.Refresh_RecalcData2(pageIndex);
+        this.parent && this.parent.Refresh_RecalcData2 && this.parent.Refresh_RecalcData2(pageIndex, this);
     },
 
     getContentOneStringSizes: function()

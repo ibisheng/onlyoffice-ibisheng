@@ -3926,6 +3926,11 @@ CCatAx.prototype =
     Refresh_RecalcData: function()
     {},
 
+    Refresh_RecalcData2: function(pageIndex, object)
+    {
+        this.parent && this.parent.parent && this.parent.parent.Refresh_RecalcData2(pageIndex, object);
+    },
+
     createDuplicate: function()
     {
         var c = new CCatAx();
@@ -5161,6 +5166,11 @@ CDateAx.prototype =
         return historyitem_type_DateAx;
     },
 
+    Refresh_RecalcData2: function(pageIndex, object)
+    {
+        this.parent && this.parent.parent && this.parent.parent.Refresh_RecalcData2(pageIndex, object);
+    },
+
     createDuplicate: function()
     {
         var c = new CDateAx();
@@ -6273,6 +6283,11 @@ CSerAx.prototype =
         return this.Id;
     },
 
+    Refresh_RecalcData2: function(pageIndex, object)
+    {
+        this.parent && this.parent.parent && this.parent.parent.Refresh_RecalcData2(pageIndex, object);
+    },
+
     createDuplicate: function()
     {
         var c = new CSerAx();
@@ -7164,6 +7179,12 @@ CValAx.prototype =
 
     Refresh_RecalcData: function()
     {},
+
+
+    Refresh_RecalcData2: function(pageIndex, object)
+    {
+        this.parent && this.parent.parent && this.parent.parent.Refresh_RecalcData2(pageIndex, object);
+    },
 
     createDuplicate: function()
     {
@@ -21462,6 +21483,17 @@ CTitle.prototype =
     Refresh_RecalcData: function()
     {},
 
+    Refresh_RecalcData2: function(pageIndex)
+    {
+        this.recalcInfo.recalculateTxBody = true;
+        this.recalcInfo.recalcTransform = true;
+        this.recalcInfo.recalcTransformText = true;
+        this.recalcInfo.recalcContent = true;
+        this.recalcInfo.recalculateContent = true;
+
+        this.parent && this.parent.Refresh_RecalcData2 && this.parent.Refresh_RecalcData2(pageIndex, this);
+    },
+
     createDuplicate: function()
     {
         var c = new CTitle();
@@ -21487,7 +21519,7 @@ CTitle.prototype =
 
     getObjectType: function()
     {
-        return  historyitem_type_Chart;
+        return  historyitem_type_Title;
     },
 
     Write_ToBinary2: function(w)
@@ -21542,7 +21574,7 @@ CTitle.prototype =
             {
                 this.setTx(new CChartText());
             }
-            this.tx.setRich(this.txBody.createDuplicate());
+            this.tx.setRich(this.txBody.createDuplicate2());
             this.tx.rich.setParent(this);
             var selection_state = this.txBody.content.Get_SelectionState();
             this.txBody = this.tx.rich;
@@ -21609,6 +21641,7 @@ CTitle.prototype =
     getCompiledTransparent: CDLbl.prototype.getCompiledTransparent,
     Get_Styles: CDLbl.prototype.Get_Styles,
     check_bounds: CShape.prototype.check_bounds,
+    selectionCheck: CShape.prototype.selectionCheck,
     getInvertTransform: CShape.prototype.getInvertTransform,
     getCanvasContext: function()
     {
@@ -22819,6 +22852,12 @@ CChart.prototype =
     Read_FromBinary2: function(r)
     {
         this.Id = r.GetString2();
+    },
+
+
+    Refresh_RecalcData2: function(pageIndex, object)
+    {
+        this.parent && this.parent.Refresh_RecalcData2 && this.parent.Refresh_RecalcData2(pageIndex, object);
     },
 
     setAutoTitleDeleted: function(autoTitleDeleted)

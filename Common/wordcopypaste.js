@@ -2618,7 +2618,7 @@ PasteProcessor.prototype =
 
             if(oDocument.CurPos.Type === docpostype_DrawingObjects)
             {
-                var content = oDocument.DrawingObjects.getTargetDocContent();
+                var content = oDocument.DrawingObjects.getTargetDocContent(true);
                 if(content)
                 {
                     oDocument = content;

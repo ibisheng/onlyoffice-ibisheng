@@ -151,7 +151,7 @@ function CreateUnifillFromAscColor(asc_color)
     return Unifill;
 }
 
-function CorrectUniColor(asc_color, unicolor)
+function CorrectUniColor(asc_color, unicolor, flag)
 {
     if (null == asc_color)
         return unicolor;
@@ -199,10 +199,12 @@ function CorrectUniColor(asc_color, unicolor)
 
             var __mods = null;
 
+            var _flag;
             if (editor && editor.WordControl && editor.WordControl.m_oDrawingDocument && editor.WordControl.m_oDrawingDocument.GuiControlColorsMap)
             {
                 var _map = editor.WordControl.m_oDrawingDocument.GuiControlColorsMap;
-				__mods = GetDefaultMods(_map[_id].r, _map[_id].g, _map[_id].b, _pos, 0);
+                _flag = isRealNumber(flag) ? flag : 0;
+				__mods = GetDefaultMods(_map[_id].r, _map[_id].g, _map[_id].b, _pos, _flag);
             }
             else
             {
@@ -219,8 +221,8 @@ function CorrectUniColor(asc_color, unicolor)
 
                         var _rgba = {R:0, G:0, B:0, A:255};
                         _schemeClr.Calculate(_theme, _clrMap.color_map, _rgba);
-
-                        __mods = GetDefaultMods(_schemeClr.RGBA.R, _schemeClr.RGBA.G, _schemeClr.RGBA.B, _pos, 2);
+                        _flag = isRealNumber(flag) ? flag : 0;
+                        __mods = GetDefaultMods(_schemeClr.RGBA.R, _schemeClr.RGBA.G, _schemeClr.RGBA.B, _pos, _flag);
                     }
                 }
             }

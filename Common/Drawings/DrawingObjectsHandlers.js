@@ -195,6 +195,7 @@ function handleChart(drawing, drawingObjectsController, e, x, y, group, pageInde
             if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
             {
                 var is_selected =  drawing.selected;
+                drawingObjectsController.checkChartTextSelection();
                 selector.resetSelection();
                 selector.selectObject(drawing, pageIndex);
                 selector.selection.chartSelection = drawing;
@@ -211,6 +212,7 @@ function handleChart(drawing, drawingObjectsController, e, x, y, group, pageInde
         {
             if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
             {
+                drawingObjectsController.checkChartTextSelection();
                 drawingObjectsController.resetSelection();
                 selector.selectObject(drawing, pageIndex);
                 selector.selection.chartSelection = drawing;
@@ -275,6 +277,7 @@ function handleInlineHitNoText(drawing, drawingObjects, e, x, y, pageIndex)
     {
         if(drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
+            drawingObjects.checkChartTextSelection();
             drawingObjects.resetSelection();
             drawing.select(drawingObjects, pageIndex);
             drawingObjects.changeCurrentState(new PreMoveInlineObject(drawingObjects, drawing));
@@ -334,6 +337,7 @@ function handleMouseUpPreMoveState(drawingObjects, e, x, y, pageIndex, bWord)
         {
             case historyitem_type_GroupShape:
             {
+                state.drawingObjects.checkChartTextSelection();
                 state.drawingObjects.resetSelection();
                 state.drawingObjects.selectObject(state.majorObject, pageIndex);
                 state.drawingObjects.selection.groupSelection = state.majorObject;

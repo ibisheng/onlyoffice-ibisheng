@@ -4000,7 +4000,7 @@ asc_docs_api.prototype.put_TextColor = function(color)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         var Unifill = new CUniFill();
         Unifill.fill = new CSolidFill();
-        Unifill.fill.color = CorrectUniColor(color, Unifill.fill.color);
+        Unifill.fill.color = CorrectUniColor(color, Unifill.fill.color, 1);
         this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Unifill : Unifill} ) );
 
         if ( true === this.isMarkerFormat )
@@ -4018,7 +4018,7 @@ asc_docs_api.prototype.put_ParagraphShade = function(is_flag, color)
         {
             var Unifill = new CUniFill();
             Unifill.fill = new CSolidFill();
-            Unifill.fill.color = CorrectUniColor(color, Unifill.fill.color);
+            Unifill.fill.color = CorrectUniColor(color, Unifill.fill.color, 1);
             this.WordControl.m_oLogicDocument.Set_ParagraphShd( { Value : shd_Clear, Color : { r : color.get_r(), g : color.get_g(), b : color.get_b() }, Unifill: Unifill } );
         }
     }
