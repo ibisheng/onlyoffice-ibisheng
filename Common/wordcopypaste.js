@@ -2929,10 +2929,11 @@ PasteProcessor.prototype =
 					base64 = null;
 					base64FromExcel = null;
 				}
-					
+				
+				var isImageInNode = node.getElementsByTagName('img') && node.getElementsByTagName('img').length ? true : false;
                 if(base64 != null)
                     aContent = this.ReadFromBinary(base64);
-				else if(base64FromExcel != null)
+				else if(base64FromExcel != null && isImageInNode)
 					aContentExcel = this._readFromBinaryExcel(base64FromExcel);
 				
 				if(aContentExcel)

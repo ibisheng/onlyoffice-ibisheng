@@ -155,32 +155,6 @@ var c_oAscBorderOptions = {
 	InnerH	: 7
 };
 
-// Толщина бордера
-var c_oAscBorderWidth = {
-	None	: 0,	// 0px
-	Thin	: 1,	// 1px
-	Medium	: 2,	// 2px
-	Thick	: 3		// 3px
-};
-
-// Располагаются в порядке значимости для отрисовки
-var c_oAscBorderStyles = {
-	None				: 0,
-	Double				: 1,
-	Hair				: 2,
-	DashDotDot			: 3,
-	DashDot				: 4,
-	Dotted				: 5,
-	Dashed				: 6,
-	Thin				: 7,
-	MediumDashDotDot	: 8,
-	SlantDashDot		: 9,
-	MediumDashDot		: 10,
-	MediumDashed		: 11,
-	Medium				: 12,
-	Thick				: 13
-};
-
 var c_oAscCleanOptions = {
 	All		: 0,
 	Text	: 1,
@@ -246,12 +220,6 @@ var c_oAscColor = {
     COLOR_TYPE_PRST		: 2,
     COLOR_TYPE_SCHEME	: 3
 };
- 
- // PageOrientation
-var c_oAscPageOrientation = {
-	PagePortrait	: 1,
-	PageLandscape	: 2
-};
 
 // Print default options (in mm)
 var c_oAscPrintDefaultSettings = {
@@ -268,18 +236,6 @@ var c_oAscPrintDefaultSettings = {
 
 	PageGridLines	: 0,
 	PageHeadings	: 0
-};
-
-/**
- * lock types
- * @const
- */
-var c_oAscLockTypes = {
-	kLockTypeNone	: 1, // никто не залочил данный объект
-	kLockTypeMine	: 2, // данный объект залочен текущим пользователем
-	kLockTypeOther	: 3, // данный объект залочен другим(не текущим) пользователем
-	kLockTypeOther2	: 4, // данный объект залочен другим(не текущим) пользователем (обновления уже пришли)
-	kLockTypeOther3	: 5  // данный объект был залочен (обновления пришли) и снова стал залочен
 };
 
 var c_oAscLockTypeElem = {
