@@ -801,7 +801,7 @@ ParaRun.prototype =
     // Проверяем, произошло ли простейшее изменение (набор или удаление текста)
     Is_SimpleChanges : function(Changes)
     {
-        if ( Changes.length !== 1 )
+        if ( Changes.length !== 1 || undefined === Changes[0].Data.Items || Changes[0].Data.Items.length <= 0 )
             return false;
 
         var Type = Changes[0].Data.Type;
