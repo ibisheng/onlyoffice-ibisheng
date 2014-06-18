@@ -1446,6 +1446,21 @@ ParaHyperlink.prototype =
         } 
     },
 
+    Get_LastRunInRange : function(_CurLine, _CurRange)
+    {
+        var CurLine = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+        
+        if ( undefined !== this.Lines[CurLine] && undefined !== this.Lines[CurLine].Ranges[CurRange] )
+        {
+            var LastItem = this.Content[this.Lines[CurLine].Ranges[CurRange].EndPos];
+            if ( undefined !== LastItem )
+                return LastItem.Get_LastRunInRange(_CurLine, _CurRange);
+        }
+        
+        return null;
+    },
+
     Get_LeftPos : function(SearchPos, ContentPos, Depth, UseContentPos)
     {
         var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.Content.length - 1 );

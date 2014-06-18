@@ -980,7 +980,7 @@ CDocument.prototype =
             var CurSectInfo  = this.SectionsInfo.Get_SectPr( StartIndex );
             var PrevSectInfo = this.SectionsInfo.Get_SectPr( PrevStartIndex );
             
-            if ( PrevSectInfo !== CurSectInfo ) 
+            if ( PrevSectInfo !== CurSectInfo && (section_type_Continuous !== CurSectInfo.SectPr.Get_Type() || true !== CurSectInfo.SectPr.Compare_PageSize( PrevSectInfo.SectPr ) ) ) 
                 bNewSection = true;
         }
         
@@ -10035,7 +10035,7 @@ CDocument.prototype =
             var Item = this.Content[Index];
 
             var ItemNumPr = null;
-            if ( type_Paragraph == Item.GetType() && undefined != ( ItemNumPr = Item.Numbering_Get() ) && ItemNumPr.NumId == NumPr.NumId  )
+            if ( type_Paragraph == Item.GetType() && undefined != ( ItemNumPr = Item.Numbering_Get() ) && ItemNumPr.NumId == NumPr.NumId && ( undefined === Item.Get_SectionPr() || true !== Item.IsEmpty() ) )
             {
                 // Делаем рестарты, если они нужны
                 if ( -1 != PrevLvl && PrevLvl < ItemNumPr.Lvl )

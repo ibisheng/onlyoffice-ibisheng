@@ -2381,7 +2381,7 @@ ParaRun.prototype =
         if ( para_Numbering === NumberingType )
         {
             var NumPr = ParaPr.NumPr;
-            if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId )
+            if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId || ( undefined !== Para.Get_SectionPr() && true === Para.IsEmpty() ) )
             {
                 // Так мы обнуляем все рассчитанные ширины данного элемента
                 NumberingItem.Measure( g_oTextMeasurer, undefined );
@@ -3631,6 +3631,14 @@ ParaRun.prototype =
         }
     },
 
+    Get_LastRunInRange : function(_CurLine, _CurRange)
+    {
+        var CurLine = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+        
+        return this;
+    },
+
     Get_LeftPos : function(SearchPos, ContentPos, Depth, UseContentPos)
     {
         var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.Content.length );
@@ -4802,7 +4810,7 @@ ParaRun.prototype =
 
     Set_VertAlign : function(Value)
     {
-        if ( Value !== this.Pr.Value )
+        if ( Value !== this.Pr.VertAlign )
         {
             var OldValue = this.Pr.VertAlign;
             this.Pr.VertAlign = Value;

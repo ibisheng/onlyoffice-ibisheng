@@ -3978,20 +3978,24 @@ Paragraph.prototype =
             }
             else if ( undefined !== LastItem )
             {
-                if ( PRS.LineTextAscent < LastItem.TextAscent )
-                    PRS.LineTextAscent = LastItem.TextAscent;
+                var LastRun = LastItem.Get_LastRunInRange(PRS.Line, PRS.Range);
+                if ( undefined !== LastRun && null !== LastRun )
+                {
+                    if ( PRS.LineTextAscent < LastRun.TextAscent )
+                        PRS.LineTextAscent = LastRun.TextAscent;
 
-                if ( PRS.LineTextAscent2 < LastItem.TextAscent2 )
-                    PRS.LineTextAscent2 = LastItem.TextAscent2;
+                    if ( PRS.LineTextAscent2 < LastRun.TextAscent2 )
+                        PRS.LineTextAscent2 = LastRun.TextAscent2;
 
-                if ( PRS.LineTextDescent < LastItem.TextDescent )
-                    PRS.LineTextDescent = LastItem.TextDescent;
+                    if ( PRS.LineTextDescent < LastRun.TextDescent )
+                        PRS.LineTextDescent = LastRun.TextDescent;
 
-                if ( PRS.LineAscent < LastItem.TextAscent )
-                    PRS.LineAscent = LastItem.TextAscent;
+                    if ( PRS.LineAscent < LastRun.TextAscent )
+                        PRS.LineAscent = LastRun.TextAscent;
 
-                if ( PRS.LineDescent < LastItem.TextDescent )
-                    PRS.LineDescent = LastItem.TextDescent;
+                    if ( PRS.LineDescent < LastRun.TextDescent )
+                        PRS.LineDescent = LastRun.TextDescent;
+                }
             }
         }
 
@@ -6334,7 +6338,7 @@ Paragraph.prototype =
                     if ( para_Numbering === NumberingItem.Type )
                     {
                         var NumPr = Pr.ParaPr.NumPr;
-                        if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId )
+                        if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId || ( undefined !== this.Get_SectionPr() && true === this.IsEmpty() ) )
                         {
                             // Ничего не делаем
                         }
@@ -14623,6 +14627,7 @@ Paragraph.prototype =
         var DefNumId = this.Parent.Get_Styles().Get_Default_ParaList();
         if ( Id != DefNumId && ( Id_old != DefNumId || Id != this.Parent.Get_Styles().Get_Default_Paragraph() ) )
         {
+            this.Numbering_Remove();
             this.Set_ContextualSpacing( undefined );
             this.Set_Ind( new CParaInd(), true );
             this.Set_Align( undefined );
@@ -19630,6 +19635,9 @@ Paragraph.prototype =
 
     Set_SectionPr : function(SectPr)
     {
+        if ( this.LogicDocument !== this.Parent )
+            return;
+        
         if ( SectPr !== this.SectPr )
         {
             History.Add( this, { Type : historyitem_Paragraph_SectionPr, Old : this.SectPr, New : SectPr } );

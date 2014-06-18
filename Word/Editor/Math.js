@@ -1281,6 +1281,11 @@ ParaMath.prototype =
         return null;
     },
 
+    Get_LastRunInRange : function(_CurLine, _CurRange)
+    {
+        return null;
+    },
+
     Get_LeftPos : function(SearchPos, ContentPos, Depth, UseContentPos)
     {
         // TODO: ParaMath.Get_LeftPos

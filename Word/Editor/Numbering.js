@@ -283,7 +283,7 @@ CAbstractNum.prototype =
         for ( var Index = 0; Index < 9; Index++ )
         {
             var Lvl_new = this.Internal_CopyLvl( this.Lvl[Index] );
-            var Lvl_old = this.Lvl[Index];
+            var Lvl_old = this.Internal_CopyLvl( this.Lvl[Index] );
             Lvl_new.ParaPr.Ind.Left = Lvl_old.ParaPr.Ind.Left - OldLeft + NewLeft;
 
             this.Internal_SetLvl( Index, Lvl_new );
@@ -1469,12 +1469,18 @@ CAbstractNum.prototype =
             case historyitem_AbstractNum_LvlChange:
             {
                 this.Internal_SetLvl( Data.Index, Data.Old );
+
+                // Пересчитываем стили у все параграфов с данной нумерацией
+                this.Recalc_CompiledPr(Data.Index);
                 break;
             }
 
             case historyitem_AbstractNum_TextPrChange:
             {
                 this.Lvl[Data.Index].TextPr = Data.Old;
+
+                // Пересчитываем стили у все параграфов с данной нумерацией
+                this.Recalc_CompiledPr(Data.Index);
                 break;
             }
         }
@@ -1489,12 +1495,18 @@ CAbstractNum.prototype =
             case historyitem_AbstractNum_LvlChange:
             {
                 this.Internal_SetLvl( Data.Index, Data.New );
+
+                // Пересчитываем стили у все параграфов с данной нумерацией
+                this.Recalc_CompiledPr(Data.Index);
                 break;
             }
 
             case historyitem_AbstractNum_TextPrChange:
             {
                 this.Lvl[Data.Index].TextPr = Data.New;
+
+                // Пересчитываем стили у все параграфов с данной нумерацией
+                this.Recalc_CompiledPr(Data.Index);
                 break;
             }
         }
