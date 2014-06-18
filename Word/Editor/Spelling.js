@@ -13,6 +13,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 function CDocumentSpelling()
 {
+    this.Use         = true; 
     this.Paragraphs  = {}; // Параграфы, в которых есть ошибки в орфографии (объект с ключом - Id параграфа)
     this.Words       = {}; // Слова, которые пользователь решил пропустить(нажал "пропустить все") при проверке орфографии
     this.CheckPara   = {}; // Параграфы, в которых нужно запустить проверку орфографии
@@ -338,98 +339,49 @@ CParaSpellChecker.prototype =
 
     Document_UpdateInterfaceState : function(StartPos, EndPos)
     {
-        if ( true !== Debug_ParaRunMode )
+        // Надо определить, попадает ли какое-либо неверно набранное слово в заданный промежуток, и одно ли оно
+        var Count = this.Elements.length;
+        var FoundElement = null;
+        var FoundIndex   = -1;
+        for ( var Index = 0; Index < Count; Index++ )
         {
-            // Надо определить, попадает ли какое-либо неверно набранное слово в заданный промежуток, и одно ли оно
-            var Count = this.Elements.length;
-            var FoundElement = null;
-            var FoundIndex   = -1;
-            for ( var Index = 0; Index < Count; Index++ )
+            var Element = this.Elements[Index];
+            if ( Element.StartPos.Compare(EndPos) <= 0 && Element.EndPos.Compare(StartPos) >= 0 && false === Element.Checked )
             {
-                var Element = this.Elements[Index];
-                if ( Element.StartPos <= EndPos && Element.EndPos >= StartPos && false === Element.Checked )
+                if ( null != FoundElement )
                 {
-                    if ( null != FoundElement )
-                    {
-                        FoundElement = null;
-                        break;
-                    }
-                    else
-                    {
-                        FoundIndex   = Index;
-                        FoundElement = Element;
-                    }
+                    FoundElement = null;
+                    break;
+                }
+                else
+                {
+                    FoundIndex   = Index;
+                    FoundElement = Element;
                 }
             }
-
-            var Word     = "";
-            var Variants = null;
-            var Checked  = null;
-
-            if ( null != FoundElement )
-            {
-                Word     = FoundElement.Word;
-                Variants = FoundElement.Variants;
-                Checked  = FoundElement.Checked;
-
-                if ( null === Variants )
-                {
-                    spellCheck(editor, {"type": "suggest", "ParagraphId": this.ParaId, "RecalcId" : this.RecalcId, "ElementId" : FoundIndex, "usrWords" : [Word], "usrLang" : [FoundElement.Lang] });
-                }
-            }
-
-            // Неопределенное слово посылаем как хорошее в интерфейс
-            if ( null === Checked )
-                Checked = true;
-
-            editor.sync_SpellCheckCallback( Word, Checked, Variants, this.ParaId, FoundIndex );
         }
-        else
+
+        var Word     = "";
+        var Variants = null;
+        var Checked  = null;
+
+        if ( null != FoundElement )
         {
-            // Надо определить, попадает ли какое-либо неверно набранное слово в заданный промежуток, и одно ли оно
-            var Count = this.Elements.length;
-            var FoundElement = null;
-            var FoundIndex   = -1;
-            for ( var Index = 0; Index < Count; Index++ )
+            Word     = FoundElement.Word;
+            Variants = FoundElement.Variants;
+            Checked  = FoundElement.Checked;
+
+            if ( null === Variants )
             {
-                var Element = this.Elements[Index];
-                if ( Element.StartPos.Compare(EndPos) <= 0 && Element.EndPos.Compare(StartPos) >= 0 && false === Element.Checked )
-                {
-                    if ( null != FoundElement )
-                    {
-                        FoundElement = null;
-                        break;
-                    }
-                    else
-                    {
-                        FoundIndex   = Index;
-                        FoundElement = Element;
-                    }
-                }
+                spellCheck(editor, {"type": "suggest", "ParagraphId": this.ParaId, "RecalcId" : this.RecalcId, "ElementId" : FoundIndex, "usrWords" : [Word], "usrLang" : [FoundElement.Lang] });
             }
-
-            var Word     = "";
-            var Variants = null;
-            var Checked  = null;
-
-            if ( null != FoundElement )
-            {
-                Word     = FoundElement.Word;
-                Variants = FoundElement.Variants;
-                Checked  = FoundElement.Checked;
-
-                if ( null === Variants )
-                {
-                    spellCheck(editor, {"type": "suggest", "ParagraphId": this.ParaId, "RecalcId" : this.RecalcId, "ElementId" : FoundIndex, "usrWords" : [Word], "usrLang" : [FoundElement.Lang] });
-                }
-            }
-
-            // Неопределенное слово посылаем как хорошее в интерфейс
-            if ( null === Checked )
-                Checked = true;
-
-            editor.sync_SpellCheckCallback( Word, Checked, Variants, this.ParaId, FoundIndex );
         }
+
+        // Неопределенное слово посылаем как хорошее в интерфейс
+        if ( null === Checked )
+            Checked = true;
+
+        editor.sync_SpellCheckCallback( Word, Checked, Variants, this.ParaId, FoundIndex );
     },
 
     Check_CallBack2: function(RecalcId, ElementId, usrVariants)

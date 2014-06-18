@@ -9527,7 +9527,7 @@ CTable.prototype =
 
                         // Добавляем ячейку
                         Row.Content[CurCell] = CellInfo.Cell.Copy(Row);
-                        History.Add( Row, { Type : historyitem_TableRow_AddCell, Pos : Index, Item : { Cell : Row.Content[CurCell], CellInfo : {}  } } );
+                        History.Add( Row, { Type : historyitem_TableRow_AddCell, Pos : CurCell, Item : { Cell : Row.Content[CurCell], CellInfo : {}  } } );
                         CurCell++;
 
                         var VMerge = CellInfo.Cell.Get_VMerge();
@@ -9555,7 +9555,7 @@ CTable.prototype =
 
                 // Добавляем строку в новую таблицу
                 Table.Content[CurRow2] = Row;
-                History.Add( Table, { Type : historyitem_Table_AddRow, Pos : Index, Item : { Row : Table.Content[CurRow2], TableRowsBottom : {}, RowsInfo : {} } } );
+                History.Add( Table, { Type : historyitem_Table_AddRow, Pos : CurRow2, Item : { Row : Table.Content[CurRow2], TableRowsBottom : {}, RowsInfo : {} } } );
                 CurRow2++;
             }
 

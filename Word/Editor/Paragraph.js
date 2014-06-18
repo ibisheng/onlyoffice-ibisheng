@@ -6590,7 +6590,7 @@ Paragraph.prototype =
             }
 
             // Рисуем подчеркивание орфографии
-            if(this.bFromDocument)
+            if(this.bFromDocument && this.LogicDocument && true === this.LogicDocument.Spelling.Use)
             {
                 pGraphics.p_color( 255, 0, 0, 255 );
                 var SpellingW = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
@@ -15938,195 +15938,69 @@ Paragraph.prototype =
     // Пока мы здесь проверяем только, находимся ли мы внутри гиперссылки
     Document_UpdateInterfaceState : function()
     {
-        if ( true !== Debug_ParaRunMode )
+        var StartPos, EndPos;
+        if ( true === this.Selection.Use )
         {
-            if ( true === this.Selection.Use )
-            {
-                var StartPos = this.Selection.StartPos;
-                var EndPos   = this.Selection.EndPos;
-
-                if ( StartPos > EndPos )
-                {
-                    StartPos = this.Selection.EndPos;
-                    EndPos   = this.Selection.StartPos;
-                }
-
-                var Hyper_start = this.Check_Hyperlink2( this.Selection.StartPos );
-                var Hyper_end   = this.Check_Hyperlink2( this.Selection.EndPos );
-
-                if ( Hyper_start === Hyper_end && null != Hyper_start )
-                {
-                    // Вычислим строку
-                    var Find = this.Internal_FindBackward( this.Selection.StartPos, [para_HyperlinkStart] );
-                    if ( true != Find.Found )
-                        return;
-
-                    var Str = "";
-
-                    for ( var Pos = Find.LetterPos + 1; Pos < this.Content.length; Pos++ )
-                    {
-                        var Item = this.Content[Pos];
-                        var bBreak = false;
-
-                        switch ( Item.Type )
-                        {
-                            case para_Drawing:
-                            case para_End:
-                            case para_Numbering:
-                            case para_PresentationNumbering:
-                            case para_PageNum:
-                            {
-                                Str = null;
-                                bBreak = true;
-                                break;
-                            }
-
-                            case para_Text : Str += Item.Value; break;
-                            case para_Space:
-                            case para_Tab  : Str += " "; break;
-                            case para_HyperlinkEnd:
-                            {
-                                bBreak = true;
-                                break;
-                            }
-
-                            case para_HyperlinkStart:
-                                return;
-                        }
-
-                        if ( true === bBreak )
-                            break;
-                    }
-
-                    var HyperProps = new CHyperlinkProperty( Hyper_start );
-                    HyperProps.put_Text( Str );
-
-                    editor.sync_HyperlinkPropCallback( HyperProps );
-                }
-
-                this.SpellChecker.Document_UpdateInterfaceState( StartPos, EndPos );
-            }
-            else
-            {
-                var Hyper_cur = this.Check_Hyperlink2( this.CurPos.ContentPos, false, true );
-                if ( null != Hyper_cur )
-                {
-                    // Вычислим строку
-                    var Find = this.Internal_FindBackward( this.CurPos.ContentPos, [para_HyperlinkStart] );
-                    if ( true != Find.Found )
-                        return;
-
-                    var Str = "";
-
-                    for ( var Pos = Find.LetterPos + 1; Pos < this.Content.length; Pos++ )
-                    {
-                        var Item = this.Content[Pos];
-                        var bBreak = false;
-
-                        switch ( Item.Type )
-                        {
-                            case para_Drawing:
-                            case para_End:
-                            case para_Numbering:
-                            case para_PresentationNumbering:
-                            case para_PageNum:
-                            {
-                                Str = null;
-                                bBreak = true;
-                                break;
-                            }
-
-                            case para_Text : Str += Item.Value; break;
-                            case para_Space:
-                            case para_Tab  : Str += " "; break;
-                            case para_HyperlinkEnd:
-                            {
-                                bBreak = true;
-                                break;
-                            }
-
-                            case para_HyperlinkStart:
-                                return;
-                        }
-
-                        if ( true === bBreak )
-                            break;
-                    }
-
-                    var HyperProps = new CHyperlinkProperty( Hyper_cur );
-                    HyperProps.put_Text( Str );
-
-                    editor.sync_HyperlinkPropCallback( HyperProps );
-                }
-
-                this.SpellChecker.Document_UpdateInterfaceState( this.CurPos.ContentPos, this.CurPos.ContentPos );
-            }
+            StartPos = this.Get_ParaContentPos( true, true );
+            EndPos = this.Get_ParaContentPos( true, false );
         }
         else
         {
-            var StartPos, EndPos;
-            if ( true === this.Selection.Use )
-            {
-                StartPos = this.Get_ParaContentPos( true, true );
-                EndPos = this.Get_ParaContentPos( true, false );
-            }
-            else
-            {
-                var CurPos = this.Get_ParaContentPos( false, false );
-                StartPos = CurPos;
-                EndPos   = CurPos;
-            }
+            var CurPos = this.Get_ParaContentPos( false, false );
+            StartPos = CurPos;
+            EndPos   = CurPos;
+        }
 
+        if ( this.bFromDocument && this.LogicDocument && true === this.LogicDocument.Spelling.Use )
             this.SpellChecker.Document_UpdateInterfaceState( StartPos, EndPos );
 
-            var HyperPos = -1;
+        var HyperPos = -1;
 
-            if ( true === this.Selection.Use )
+        if ( true === this.Selection.Use )
+        {
+            var StartPos = this.Selection.StartPos;
+            var EndPos   = this.Selection.EndPos;
+            if ( StartPos > EndPos )
             {
-                var StartPos = this.Selection.StartPos;
-                var EndPos   = this.Selection.EndPos;
-                if ( StartPos > EndPos )
-                {
-                    StartPos = this.Selection.EndPos;
-                    EndPos   = this.Selection.StartPos;
-                }
+                StartPos = this.Selection.EndPos;
+                EndPos   = this.Selection.StartPos;
+            }
 
-                for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-                {
-                    var Element = this.Content[CurPos];
+            for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+            {
+                var Element = this.Content[CurPos];
 
-                    if ( true !== Element.Selection_IsEmpty() && para_Hyperlink !== Element.Type )
+                if ( true !== Element.Selection_IsEmpty() && para_Hyperlink !== Element.Type )
+                    break;
+                else if ( true !== Element.Selection_IsEmpty() && para_Hyperlink === Element.Type )
+                {
+                    if ( -1 === HyperPos )
+                        HyperPos = CurPos;
+                    else
                         break;
-                    else if ( true !== Element.Selection_IsEmpty() && para_Hyperlink === Element.Type )
-                    {
-                        if ( -1 === HyperPos )
-                            HyperPos = CurPos;
-                        else
-                            break;
-                    }
                 }
-
-                if ( this.Selection.StartPos === this.Selection.EndPos && para_Hyperlink === this.Content[this.Selection.StartPos].Type )
-                    HyperPos = this.Selection.StartPos;
-            }
-            else
-            {
-                if ( para_Hyperlink === this.Content[this.CurPos.ContentPos].Type )
-                    HyperPos = this.CurPos.ContentPos;
             }
 
-            if ( -1 !== HyperPos )
-            {
-                var Hyperlink = this.Content[HyperPos];
+            if ( this.Selection.StartPos === this.Selection.EndPos && para_Hyperlink === this.Content[this.Selection.StartPos].Type )
+                HyperPos = this.Selection.StartPos;
+        }
+        else
+        {
+            if ( para_Hyperlink === this.Content[this.CurPos.ContentPos].Type )
+                HyperPos = this.CurPos.ContentPos;
+        }
 
-                var HyperText = new CParagraphGetText();
-                Hyperlink.Get_Text( HyperText );
+        if ( -1 !== HyperPos )
+        {
+            var Hyperlink = this.Content[HyperPos];
 
-                var HyperProps = new CHyperlinkProperty( Hyperlink );
-                HyperProps.put_Text( HyperText.Text );
+            var HyperText = new CParagraphGetText();
+            Hyperlink.Get_Text( HyperText );
 
-                editor.sync_HyperlinkPropCallback( HyperProps );
-            }
+            var HyperProps = new CHyperlinkProperty( Hyperlink );
+            HyperProps.put_Text( HyperText.Text );
+
+            editor.sync_HyperlinkPropCallback( HyperProps );
         }
     },
 

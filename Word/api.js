@@ -5761,6 +5761,12 @@ asc_docs_api.prototype.asc_getDefaultLanguage = function()
 
 asc_docs_api.prototype.asc_setSpellCheck = function(isOn)
 {
+    if (editor.WordControl.m_oLogicDocument)
+    {
+        editor.WordControl.m_oLogicDocument.Spelling.Use = isOn;
+        editor.WordControl.m_oDrawingDocument.ClearCachePages();
+        editor.WordControl.m_oDrawingDocument.FirePaint();
+    }
 };
 //-----------------------------------------------------------------
 // Функции для работы с комментариями
