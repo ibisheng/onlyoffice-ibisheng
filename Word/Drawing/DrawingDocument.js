@@ -456,6 +456,10 @@ function CTableOutlineDr()
         this.IsChangeSmall = true;
         this.ChangeSmallPoint = pos;
 
+        this.CurPos = { X: this.ChangeSmallPoint.X, Y : this.ChangeSmallPoint.Y, Page: this.ChangeSmallPoint.Page };
+        this.TrackOffsetX = 0;
+        this.TrackOffsetY = 0;
+
         if (!this.TableMatrix || global_MatrixTransformer.IsIdentity(this.TableMatrix))
         {
             if (word_control.MobileTouchManager)
@@ -495,6 +499,9 @@ function CTableOutlineDr()
                     {
                         this.TrackOffsetX = pos.X - _x;
                         this.TrackOffsetY = pos.Y - _b;
+
+                        this.CurPos.X -= this.TrackOffsetX;
+                        this.CurPos.Y -= this.TrackOffsetY;
                         return true;
                     }
                     return false;
@@ -525,6 +532,9 @@ function CTableOutlineDr()
                     {
                         this.TrackOffsetX = pos.X - _r;
                         this.TrackOffsetY = pos.Y - _y;
+
+                        this.CurPos.X -= this.TrackOffsetX;
+                        this.CurPos.Y -= this.TrackOffsetY;
                         return true;
                     }
                     return false;
@@ -541,6 +551,9 @@ function CTableOutlineDr()
                     {
                         this.TrackOffsetX = pos.X - _r;
                         this.TrackOffsetY = pos.Y - _b;
+
+                        this.CurPos.X -= this.TrackOffsetX;
+                        this.CurPos.Y -= this.TrackOffsetY;
                         return true;
                     }
                     return false;
@@ -591,6 +604,9 @@ function CTableOutlineDr()
                     {
                         this.TrackOffsetX = _posx - _x;
                         this.TrackOffsetY = _posy - _b;
+
+                        this.CurPos.X -= this.TrackOffsetX;
+                        this.CurPos.Y -= this.TrackOffsetY;
                         return true;
                     }
                     return false;
@@ -606,6 +622,9 @@ function CTableOutlineDr()
                     {
                         this.TrackOffsetX = _posx - _x;
                         this.TrackOffsetY = _posy - _y;
+
+                        this.CurPos.X -= this.TrackOffsetX;
+                        this.CurPos.Y -= this.TrackOffsetY;
                         return true;
                     }
                     return false;
@@ -621,6 +640,9 @@ function CTableOutlineDr()
                     {
                         this.TrackOffsetX = _posx - _r;
                         this.TrackOffsetY = _posy - _y;
+
+                        this.CurPos.X -= this.TrackOffsetX;
+                        this.CurPos.Y -= this.TrackOffsetY;
                         return true;
                     }
                     return false;
@@ -637,6 +659,9 @@ function CTableOutlineDr()
                     {
                         this.TrackOffsetX = _posx - _r;
                         this.TrackOffsetY = _posy - _b;
+
+                        this.CurPos.X -= this.TrackOffsetX;
+                        this.CurPos.Y -= this.TrackOffsetY;
                         return true;
                     }
                     return false;
