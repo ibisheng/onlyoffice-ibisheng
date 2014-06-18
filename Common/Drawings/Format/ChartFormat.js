@@ -21579,6 +21579,10 @@ CTitle.prototype =
             var selection_state = this.txBody.content.Get_SelectionState();
             this.txBody = this.tx.rich;
             this.txBody.content.Set_SelectionState(selection_state, selection_state.length - 1);
+            //if(editor && editor.isDocumentEditor)
+            //{
+            //    this.recalculateContent();
+            //}
         }
     },
 

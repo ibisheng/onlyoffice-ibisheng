@@ -266,6 +266,58 @@ function handleInlineShapeImage(drawing, drawingObjectsController, e, x, y, page
     }
 }
 
+function handleInlineChart(drawing, drawingObjectsController, e, x, y, pageIndex)
+{
+    var ret, i, title;
+    var chart_titles = drawing.getAllTitles();
+    for(i = 0; i < chart_titles.length; ++i)
+    {
+        title = chart_titles[i];
+        var hit_in_inner_area = title.hitInInnerArea(x, y);
+        var hit_in_path = title.hitInPath(x, y);
+        var hit_in_text_rect = title.hitInTextRect(x, y);
+        if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+        {
+            if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+            {
+                var is_selected =  drawing.selected;
+                drawingObjectsController.checkChartTextSelection();
+                drawingObjectsController.resetSelection();
+                drawingObjectsController.selectObject(drawing, pageIndex);
+                drawingObjectsController.selection.chartSelection = drawing;
+                drawing.selectTitle(title, pageIndex);
+                drawingObjectsController.updateSelectionState();
+                return true;
+            }
+            else
+            {
+                return {objectId: drawing.Get_Id(), cursorType: "move", bMarker: false};
+            }
+        }
+        else if(hit_in_text_rect)
+        {
+            if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+            {
+                drawingObjectsController.checkChartTextSelection();
+                drawingObjectsController.resetSelection();
+                drawingObjectsController.selectObject(drawing, pageIndex);
+                drawingObjectsController.selection.chartSelection = drawing;
+                drawing.selectTitle(title, pageIndex);
+                drawing.selection.textSelection = title;
+                title.selectionSetStart(e, x, y, pageIndex);
+                drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, title));
+                drawingObjectsController.updateSelectionState();
+                return true;
+            }
+            else
+            {
+                return {objectId: drawing.Get_Id(), cursorType: "text"};
+            }
+        }
+    }
+    return handleInlineShapeImage(drawing, drawingObjectsController, e, x, y, pageIndex);
+}
+
 
 
 function handleInlineHitNoText(drawing, drawingObjects, e, x, y, pageIndex)
@@ -307,9 +359,15 @@ function handleInlineObjects(drawingObjectsController, drawingArr, e, x, y, page
         {
             case historyitem_type_Shape:
             case historyitem_type_ImageShape:
-            case historyitem_type_ChartSpace://TODO
             {
                 ret = handleInlineShapeImage(drawing, drawingObjectsController, e, x, y, pageIndex);
+                if(ret)
+                    return ret;
+                break;
+            }
+            case historyitem_type_ChartSpace:
+            {
+                ret  = handleInlineChart(drawing, drawingObjectsController, e, x, y, pageIndex);
                 if(ret)
                     return ret;
                 break;

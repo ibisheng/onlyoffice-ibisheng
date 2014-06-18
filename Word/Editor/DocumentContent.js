@@ -139,7 +139,7 @@ CDocumentContent.prototype =
 
     Copy3: function(Parent)//для заголовков диаграмм
     {
-        var DC = new CDocumentContent(Parent, this.DrawingDocument, 0, 0, 0, 0, this.Split, this.TurnOffInnerWrap);
+        var DC = new CDocumentContent(Parent, this.DrawingDocument, 0, 0, 0, 0, this.Split, this.TurnOffInnerWrap, true);
 
         // Копируем содержимое
         DC.Internal_Content_RemoveAll();

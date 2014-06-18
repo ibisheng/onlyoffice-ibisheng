@@ -1361,7 +1361,7 @@ DrawingObjectsController.prototype =
 
     hyperlinkCheck: function(bCheckEnd)
     {
-        var content = this.getTargetDocContent(true);
+        var content = this.getTargetDocContent();
         if(content)
             return content.Hyperlink_Check(bCheckEnd);
         return null;
@@ -1369,7 +1369,7 @@ DrawingObjectsController.prototype =
 
     hyperlinkCanAdd: function(bCheckInHyperlink)
     {
-        var content = this.getTargetDocContent(true);
+        var content = this.getTargetDocContent();
         return content && content.Hyperlink_CanAdd(bCheckInHyperlink);
     },
 

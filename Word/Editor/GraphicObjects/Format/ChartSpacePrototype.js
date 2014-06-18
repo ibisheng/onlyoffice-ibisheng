@@ -149,10 +149,8 @@ CChartSpace.prototype.handleUpdateExtents = function()
     this.recalcChart();
     this.recalcBounds();
     this.recalcTransform();
-    this.recalcDLbls();
     this.recalcWrapPolygon();
-    this.setRecalculateInfo();
-    this.addToRecalculate();
+    this.handleUpdateInternalChart();
 };
 CChartSpace.prototype.handleUpdateFlip = function()
 {
