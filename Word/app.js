@@ -106,10 +106,12 @@ require([
             'LeftMenu',
             'Main',
             'Common.Controllers.Fonts'
+            /** coauthoring begin **/
+            ,'Common.Controllers.Chat'
+            ,'Common.Controllers.Comments'
+            /** coauthoring end **/
             /** proprietary begin **/
-            ,'Common.Controllers.Chat',
-            'Common.Controllers.Comments',
-            'Common.Controllers.ExternalDiagramEditor'
+            ,'Common.Controllers.ExternalDiagramEditor'
             /** proprietary end **/
         ]
     });
@@ -128,16 +130,16 @@ require([
         'documenteditor/main/app/view/HeaderFooterSettings',
         'documenteditor/main/app/view/ImageSettings',
         'documenteditor/main/app/view/TableSettings',
-        /** proprietary begin **/
-        'documenteditor/main/app/view/ChartSettings',
-        /** proprietary end **/
         'documenteditor/main/app/view/ShapeSettings',
         'common/main/lib/util/utils',
         'common/main/lib/controller/Fonts'
+        /** coauthoring begin **/
+        ,'common/main/lib/controller/Comments'
+        ,'common/main/lib/controller/Chat'
+        /** coauthoring end **/
         /** proprietary begin **/
-        ,'common/main/lib/controller/Comments',
-        'common/main/lib/controller/Chat',
-        'common/main/lib/controller/ExternalDiagramEditor'
+        ,'documenteditor/main/app/view/ChartSettings'
+        ,'common/main/lib/controller/ExternalDiagramEditor'
         /** proprietary end **/
     ], function() {
         app.start();
