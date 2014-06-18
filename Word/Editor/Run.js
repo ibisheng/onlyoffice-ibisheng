@@ -3747,7 +3747,7 @@ ParaRun.prototype =
                 else
                 {
                     // Если мы остановились на нетекстовом элементе, тогда его и возвращаем
-                    if ( para_Text !== this.Content[CurPos].Type )
+                    if ( para_Text !== this.Content[CurPos].Type && para_Math_Text !== this.Content[CurPos].Type)
                     {
                         SearchPos.Pos.Update( CurPos, Depth );
                         SearchPos.Found     = true;
@@ -3775,10 +3775,10 @@ ParaRun.prototype =
         while ( CurPos > 0 )
         {
             CurPos--;
-            var Item = this.Content[CurPos]
+            var Item = this.Content[CurPos];
             var TempType = Item.Type;
 
-            if ( para_Text !== TempType || true === Item.Is_NBSP() || ( true === SearchPos.Punctuation && true !== Item.Is_Punctuation() ) || ( false === SearchPos.Punctuation && false !== Item.Is_Punctuation() ) )
+            if ( (para_Text !== TempType && para_Math_Text !== TempType) || true === Item.Is_NBSP() || ( true === SearchPos.Punctuation && true !== Item.Is_Punctuation() ) || ( false === SearchPos.Punctuation && false !== Item.Is_Punctuation() ) )
             {
                 SearchPos.Found = true;
                 break;
@@ -3812,7 +3812,7 @@ ParaRun.prototype =
                 var Type = Item.Type;
                 var bText = false;
 
-                if ( para_Text === Type && true != Item.Is_NBSP() && ( true === SearchPos.First || ( SearchPos.Punctuation === Item.Is_Punctuation() ) ) )
+                if ( (para_Text === Type || para_Math_Text === Type) && true != Item.Is_NBSP() && ( true === SearchPos.First || ( SearchPos.Punctuation === Item.Is_Punctuation() ) ) )
                     bText = true;
 
                 if ( true === bText )

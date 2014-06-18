@@ -1575,7 +1575,7 @@ CMathBase.prototype =
         return result;
 
     },
-    Get_WordStartPos : function(SearchPos, ContentPos, Depth, UseContentPos)
+    old_Get_WordStartPos : function(SearchPos, ContentPos, Depth, UseContentPos)
     {
         var CurPos_X, CurPos_Y;
 
@@ -1620,9 +1620,101 @@ CMathBase.prototype =
         }
 
     },
-    Get_WordEndPos : function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
+    Get_WordStartPos: function(SearchPos, ContentPos, Depth, UseContentPos, EndRun)
     {
+        var CurPos_X, CurPos_Y;
 
+        if(UseContentPos === true)
+        {
+            CurPos_X = ContentPos.Get(Depth);
+            CurPos_Y = ContentPos.Get(Depth + 1);
+        }
+        else
+        {
+            CurPos_X = this.nRow - 1;
+            CurPos_Y = this.nCol - 1;
+        }
+
+        var bUseContent = UseContentPos;
+
+        while(CurPos_X >= 0)
+        {
+            while(CurPos_Y >= 0)
+            {
+                var bJDraw = this.elements[CurPos_X][CurPos_Y].IsJustDraw(),
+                    usePlh = !bJDraw && bUseContent && this.elements[CurPos_X][CurPos_Y].IsPlaceholder();
+
+                if(!bJDraw && !usePlh)
+                {
+                    this.elements[CurPos_X][CurPos_Y].Get_WordStartPos(SearchPos, ContentPos, Depth + 2, bUseContent, EndRun);
+                    SearchPos.Pos.Update(CurPos_X, Depth);
+                    SearchPos.Pos.Update(CurPos_Y, Depth+1);
+                }
+
+                if(SearchPos.Found === true)
+                    break;
+
+                CurPos_Y--;
+
+                bUseContent = false;
+                EndRun      = true;
+            }
+
+            if(SearchPos.Found === true)
+                break;
+
+            CurPos_X--;
+            CurPos_Y = this.nCol - 1;
+
+        }
+    },
+    Get_WordEndPos : function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd, BegRun)
+    {
+        var CurPos_X, CurPos_Y;
+
+        if(UseContentPos === true)
+        {
+            CurPos_X = ContentPos.Get(Depth);
+            CurPos_Y = ContentPos.Get(Depth + 1);
+        }
+        else
+        {
+            CurPos_X = 0;
+            CurPos_Y = 0;
+        }
+
+        var bUseContent = UseContentPos;
+
+        while(CurPos_X < this.nRow)
+        {
+            while(CurPos_Y < this.nCol)
+            {
+                var bJDraw = this.elements[CurPos_X][CurPos_Y].IsJustDraw(),
+                    usePlh = !bJDraw && bUseContent && this.elements[CurPos_X][CurPos_Y].IsPlaceholder();
+
+                if(!bJDraw && !usePlh)
+                {
+                    this.elements[CurPos_X][CurPos_Y].Get_WordEndPos(SearchPos, ContentPos, Depth + 2, bUseContent, StepEnd, BegRun);
+                    SearchPos.Pos.Update(CurPos_X, Depth);
+                    SearchPos.Pos.Update(CurPos_Y, Depth+1);
+                }
+
+                if(SearchPos.Found === true)
+                    break;
+
+                CurPos_Y++;
+
+                bUseContent = false;
+                BegRun      = true;
+            }
+
+            if(SearchPos.Found === true)
+                break;
+
+            CurPos_X++;
+            CurPos_Y = 0;
+
+        }
     },
     //////////////////////////////////
     IsPlaceholder: function()

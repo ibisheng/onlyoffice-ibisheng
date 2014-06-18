@@ -398,6 +398,20 @@ CMathText.prototype =
         this.type = type;
     },
 
+    // For ParaRun
+    Is_Punctuation: function()
+    {
+        var bPunc     = 1 === g_aPunctuation[this.value],
+            bMathSign = this.value ==  0x2217 || this.value == 0x2212;
+
+        return bPunc || bMathSign;
+    },
+    Is_NBSP: function()
+    {
+        return false;
+    },
+    ////
+
     // for Para Math
     // for placeholder
     Set_SelectionContentPos: function(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag)

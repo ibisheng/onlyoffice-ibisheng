@@ -6464,7 +6464,7 @@ CMathContent.prototype =
 
         return result;
     },
-    Get_WordStartPos : function(SearchPos, ContentPos, Depth, UseContentPos)
+    old_Get_WordStartPos : function(SearchPos, ContentPos, Depth, UseContentPos)
     {
         var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.content.length - 1 );
 
@@ -6508,9 +6508,104 @@ CMathContent.prototype =
         }
 
     },
-    Get_WordEndPos : function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
+    Get_WordStartPos : function(SearchPos, ContentPos, Depth, UseContentPos, EndRun)
     {
+        var CurPos = UseContentPos ? ContentPos.Get(Depth) : this.content.length-1;
 
+        var bUseContent = UseContentPos;
+
+        while(CurPos >= 0 && SearchPos.Found == false)
+        {
+            var curType = this.content[CurPos].typeObj,
+                prevType = CurPos > 0 ? this.content[CurPos - 1].typeObj : null;
+
+            if(curType == MATH_PLACEHOLDER)
+            {
+                SearchPos.Pos.Update(0, Depth + 1);
+                SearchPos.Found = true;
+
+            }
+            else if(curType == MATH_COMP)
+            {
+                this.content[CurPos].Get_WordStartPos(SearchPos, ContentPos, Depth + 1, bUseContent, EndRun);
+            }
+            else if(EndRun)
+            {
+                SearchPos.Pos.Update(this.content[CurPos].Content.length, Depth + 1);
+                SearchPos.Found = true;
+            }
+            else
+            {
+                this.content[CurPos].Get_WordStartPos(SearchPos, ContentPos, Depth + 1, bUseContent);
+
+                if(SearchPos.Found == false && SearchPos.Shift == true)
+                {
+                    this.content[CurPos].Get_StartPos(SearchPos.Pos, Depth + 1);
+                    SearchPos.Found = true;
+                }
+            }
+
+            SearchPos.Pos.Update(CurPos, Depth);
+
+
+            if(curType == MATH_PARA_RUN && prevType == MATH_PARA_RUN)
+                EndRun = false;
+            else
+                EndRun = true;
+
+            CurPos--;
+            bUseContent = false;
+        }
+
+    },
+    Get_WordEndPos : function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd, BegRun)
+    {
+        var CurPos = UseContentPos ? ContentPos.Get(Depth) : 0;
+
+        var bUseContent = UseContentPos;
+
+        while(CurPos < this.content.length && SearchPos.Found == false)
+        {
+            var curType = this.content[CurPos].typeObj,
+                nextType = CurPos < this.content.length - 1 ? this.content[CurPos + 1].typeObj : null;
+
+            if(curType == MATH_PLACEHOLDER)
+            {
+                SearchPos.Pos.Update(0, Depth + 1);
+                SearchPos.Found = true;
+            }
+            else if(curType == MATH_COMP)
+            {
+                this.content[CurPos].Get_WordEndPos(SearchPos, ContentPos, Depth + 1, bUseContent, StepEnd, BegRun);
+            }
+            else if(BegRun)
+            {
+                SearchPos.Pos.Update(0, Depth + 1);
+                SearchPos.Found = true;
+            }
+            else
+            {
+                this.content[CurPos].Get_WordEndPos(SearchPos, ContentPos, Depth + 1, bUseContent, StepEnd);
+
+                if(SearchPos.Found == false && SearchPos.Shift == true)
+                {
+                    this.content[CurPos].Get_EndPos(false, SearchPos.Pos, Depth + 1);
+                    SearchPos.Found = true;
+                }
+            }
+
+            SearchPos.Pos.Update(CurPos, Depth);
+
+
+            if(curType == MATH_PARA_RUN && nextType == MATH_PARA_RUN)
+                BegRun = false;
+            else
+                BegRun = true;
+
+            CurPos++;
+            bUseContent = false;
+
+        }
     },
     /////////////////////////
     getContent: function(stack, bCurrent)

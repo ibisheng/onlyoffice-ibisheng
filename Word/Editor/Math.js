@@ -1304,13 +1304,13 @@ ParaMath.prototype =
     Get_WordStartPos : function(SearchPos, ContentPos, Depth, UseContentPos)
     {
         // TODO: ParaMath.Get_StartEndPos
-        this.Root.Get_WordStartPos(SearchPos, ContentPos, Depth, UseContentPos);
+        this.Root.Get_WordStartPos(SearchPos, ContentPos, Depth, UseContentPos, false);
     },
 
     Get_WordEndPos : function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
     {
         // TODO: ParaMath.Get_WordEndPos
-        this.Root.Get_WordEndPos(SearchPos, ContentPos, Depth, UseContentPos, StepEnd);
+        this.Root.Get_WordEndPos(SearchPos, ContentPos, Depth, UseContentPos, StepEnd, false);
     },
 
     Get_EndRangePos : function(_CurLine, _CurRange, SearchPos, Depth)
