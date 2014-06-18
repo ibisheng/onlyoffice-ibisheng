@@ -10139,34 +10139,8 @@
 		};
 
 		WorksheetView.prototype.findCell = function (reference) {
-			var t = this;
-			var match = (/(?:R(\d+)C(\d+)|([A-Z]+[0-9]+))(?::(?:R(\d+)C(\d+)|([A-Z]+[0-9]+)))?/i).exec(reference);
-			if (!match) {return null;}
-
-			function _findCell(match1, match2, match3) {
-				var addr = typeof match1 === "string" ?
-						new CellAddress(parseInt(match1), parseInt(match2)) :
-						typeof match3 === "string" ? new CellAddress(match3) : null;
-				if (addr && addr.isValid() && addr.getRow0() >= t.rows.length) {
-					t.nRowsCount = addr.getRow0() + 1;
-					t._calcRowHeights(/*fullRecalc*/2);
-				}
-				if (addr && addr.isValid() && addr.getCol0() >= t.cols.length) {
-					t.nColsCount = addr.getCol0() + 1;
-					t._calcColumnWidths(/*fullRecalc*/2);
-				}
-				return addr && addr.isValid() ? addr : null;
-			}
-
-			var addr1 = _findCell(match[1], match[2], match[3]);
-			var addr2 = _findCell(match[4], match[5], match[6]);
-			if (!addr1 && !addr2) {
-				return {};
-			}
-			var delta = t._setActiveCell(addr1.getCol0(), addr1.getRow0());
-			return !addr2 ? delta :
-				t.changeSelectionEndPoint(addr2.getCol0() - addr1.getCol0(), addr2.getRow0() - addr1.getRow0(),
-				/*isCoord*/false, /*isSelectMode*/false);
+			var range = asc.g_oRangeCache.getAscRange(reference);
+			return range ? this.setSelection(range, true) : null;
 		};
 
 		/* Ищет дополнение для ячейки */
