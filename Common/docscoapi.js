@@ -723,26 +723,31 @@
 	};
 
 	DocsCoApi.prototype._onConnectionStateChanged = function (data) {
-		var userStateChanged = null;
+		var userStateChanged = null, userId, stateChanged = false;
 		if (undefined !== data["state"] && this.onConnectionStateChanged) {
 			userStateChanged = new asc_user(data);
 
+			userId = userStateChanged.asc_getId();
 			if (userStateChanged.asc_getState()) {
-				this._participants[userStateChanged.asc_getId()] = userStateChanged;
+				this._participants[userId] = userStateChanged;
 				++this._countEditUsers;
-			} else {
-				delete this._participants[userStateChanged.asc_getId()];
+				stateChanged = true;
+			} else if (this._participants.hasOwnProperty(userId)){
+				delete this._participants[userId];
 				--this._countEditUsers;
+				stateChanged = true;
 			}
 
-			// Посылаем эвент о совместном редактировании
-			if (1 < this._countEditUsers)
-				this._onStartCoAuthoring(/*isStartEvent*/false);
-			else
-				this._onEndCoAuthoring(/*isStartEvent*/false);
+			if (stateChanged) {
+				// Посылаем эвент о совместном редактировании
+				if (1 < this._countEditUsers)
+					this._onStartCoAuthoring(/*isStartEvent*/false);
+				else
+					this._onEndCoAuthoring(/*isStartEvent*/false);
 
-			this.onParticipantsChanged(this._participants, this._countEditUsers);
-			this.onConnectionStateChanged(userStateChanged);
+				this.onParticipantsChanged(this._participants, this._countEditUsers);
+				this.onConnectionStateChanged(userStateChanged);
+			}
 		}
 	};
 
