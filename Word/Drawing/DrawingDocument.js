@@ -2094,7 +2094,7 @@ function CDrawingDocument()
 
             if (bIsSendCurPage)
             {
-                this.m_oWordControl.SetCurrentPage();
+                this.m_oWordControl.SetCurrentPage(false);
             }
 		}
 
