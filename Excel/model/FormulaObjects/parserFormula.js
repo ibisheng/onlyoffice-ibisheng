@@ -3557,8 +3557,8 @@ parserFormula.prototype = {
     },
 
     /* Сборка функции в инфиксную форму */
-    assemble:function () {/*При сборке формул вида A1+A2+A3 формула получает вид (A1+A2)+A3. Добавить проверку приоритета операций.*/
-        if ( this.outStack.length == 1 && this.outStack[this.outStack.length-1] instanceof cError ) {
+    assemble:function (rFormula) {/*При сборке формул вида A1+A2+A3 формула получает вид (A1+A2)+A3. Добавить проверку приоритета операций.*/
+        if ( !rFormula && this.outStack.length == 1 && this.outStack[this.outStack.length-1] instanceof cError ) {
             return this.Formula;
         }
         var elemArr = [],
