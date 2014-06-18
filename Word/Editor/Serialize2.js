@@ -2203,7 +2203,7 @@ function Binary_oMathWriter(memory, oMathPara)
 		var oFName = oFunc.getFName();
 		var oElem = oFunc.getArgument();	
 		
-		this.bs.WriteItem(c_oSer_OMathContentType.FPr, function(){oThis.WriteFuncPr(oFunc);});		
+		this.bs.WriteItem(c_oSer_OMathContentType.FuncPr, function(){oThis.WriteFuncPr(oFunc);});		
 		this.bs.WriteItem(c_oSer_OMathContentType.FName, function(){oThis.WriteArgNodes(oFName);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
 	}
