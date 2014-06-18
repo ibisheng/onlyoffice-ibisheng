@@ -9284,6 +9284,8 @@ CDocument.prototype =
                 editor.DecreaseIndent();
             else // Ctrl + M - увеличиваем левый отступ
                 editor.IncreaseIndent();
+            
+            bRetValue = true;
         }
         else if ( e.KeyCode == 80 && true === e.CtrlKey ) // Ctrl + P + ...
         {
