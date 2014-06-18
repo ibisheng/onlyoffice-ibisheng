@@ -8631,7 +8631,7 @@ Paragraph.prototype =
         return null;
     },
 
-    Internal_CorrectAnchorPos : function(Result, Drawing, PageNum)
+    Internal_CorrectAnchorPos : function(Result, Drawing)
     {
         // Поправляем позицию
         var RelH = Drawing.PositionH.RelativeFrom;
@@ -8689,7 +8689,7 @@ Paragraph.prototype =
         Result.Paragraph  = this;
 
         if ( true === bAnchor && undefined != Drawing && null != Drawing )
-            this.Internal_CorrectAnchorPos( Result, Drawing, PageNum - this.PageNum );
+            this.Internal_CorrectAnchorPos( Result, Drawing );
 
         return Result;
     },
@@ -8800,7 +8800,7 @@ Paragraph.prototype =
         Result.Paragraph  = this;
         Result.ContentPos = ContentPos;
 
-        this.Internal_CorrectAnchorPos( Result, Drawing, CurPage );
+        this.Internal_CorrectAnchorPos( Result, Drawing );
 
         return Result;
     },
