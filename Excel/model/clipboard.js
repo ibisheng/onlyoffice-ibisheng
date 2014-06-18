@@ -1758,7 +1758,7 @@
 				aResult = this._parseHtml(pasteFragment, node, worksheet, isText);
 				
 				//insert into document content
-				if(!(aResult.onlyImages && window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
+				if(aResult && !(aResult.onlyImages && window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
 					worksheet.setSelectionInfo('paste',aResult,t);
 				
 				window.GlobalPasteFlagCounter = 0;
@@ -1767,6 +1767,9 @@
 			
 			_parseHtml: function(pasteFragment, node, worksheet, isText)
 			{
+				if(node.children && node.children.length === 0)
+					return false;
+				
 				var cellCountAll = [], rowSpanPlus = 0, tableRowCount = 0, l = 0, n = 0, s = 0, countEmptyRow = 0, rowCount = 0, arrTags = [], t = this, aResult = [];
 				var range = worksheet.activeRange.clone(true);
 				
