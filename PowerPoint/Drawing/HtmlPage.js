@@ -3159,7 +3159,7 @@ function CEditorPage(api)
         oThis.TextBoxInputFocus = true;
         CollaborativeEditing.m_bGlobalLock = true;
         oThis.CheckTextBoxInputPos();
-        oThis.TextBoxInput.style.zIndex = 1000;
+        oThis.TextBoxInput.style.zIndex = 90;
     }
 
     this.OnTextBoxInput = function()
@@ -3216,7 +3216,7 @@ function CEditorPage(api)
 
         // вот такая заглушка под firefox если этого не делать, то будет плохо перерисовываться border)
         var oldZindex = parseInt(this.TextBoxInput.style.zIndex);
-        var newZindex = (oldZindex == 1000) ? "999" : "1000";
+        var newZindex = (oldZindex == 90) ? "89" : "90";
         this.TextBoxInput.style.zIndex = newZindex;
     }
 
