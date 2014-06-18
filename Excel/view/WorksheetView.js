@@ -6019,14 +6019,15 @@
 				c2 !== undefined ? c2 : ar.c2,
 				r2 !== undefined ? r2 : ar.r2);
 
+			// ToDo возможно это избыточные проверки
 			if (c1 >= 0) {ar.startCol = c1;}
 			if (r1 >= 0) {ar.startRow = r1;}
 
-			if (t.cols[ar.startCol].width < t.width_1px) {
+			if (0 !== dc && t.cols[ar.startCol].width < t.width_1px) {
 				c1 = findVisibleCol(ar.startCol, dc);
 				if (c1 >= 0) {ar.startCol = c1;}
 			}
-			if (t.rows[ar.startRow].height < t.height_1px) {
+			if (0 !== dr && t.rows[ar.startRow].height < t.height_1px) {
 				r1 = findVisibleRow(ar.startRow, dr);
 				if (r1 >= 0) {ar.startRow = r1;}
 			}
