@@ -2126,8 +2126,8 @@ function Binary_oMathWriter(memory, oMathPara)
 	this.WriteDelimiterPr = function(props,oDelimiter)
 	{
 		var oThis = this;
-		//if (null != oDelimiter.column)
-		//	this.bs.WriteItem(c_oSer_OMathContentType.Column, function(){oThis.WriteColumn(oDelimiter.column);});
+		if (null != props.column)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Column, function(){oThis.WriteCount(props.column);});
 		if (null != props.begChr)
 			this.bs.WriteItem(c_oSer_OMathBottomNodesType.BegChr, function(){oThis.WriteBegChr(props.begChr);});
 		if (null != props.endChr)
@@ -9521,7 +9521,9 @@ function Binary_oMathReader(stream)
 		
 		if (c_oSer_OMathContentType.MText === type)
         {
-			var text = this.stream.GetString2();
+			var text = "";
+			if (length > 0)
+				text = this.stream.GetString2();
 			for (var i = 0; i < text.length; ++i)
             {
 				//управляющие символы
