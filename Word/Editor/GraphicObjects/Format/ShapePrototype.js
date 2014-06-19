@@ -575,7 +575,37 @@ CShape.prototype.Get_TableStyleForPara = function()
 CShape.prototype.Is_Cell = function()
 {
     return false;
-};CShape.prototype.Get_StartPage_Relative = function()
+};
+
+CShape.prototype.Set_CurrentElement = function(bUpdate, pageIndex)
+{
+    var drawing_objects = editor.WordControl.m_oLogicDocument.DrawingObjects;
+    drawing_objects.resetSelection();
+    if(this.group)
+    {
+        var main_group = this.group.getMainGroup();
+        drawing_objects.selectObject(main_group, pageIndex);
+        main_group.selectObject(this, pageIndex);
+        main_group.selection.textSelection = this;
+        drawing_objects.selection.groupSelection = main_group;
+    }
+    else
+    {
+        drawing_objects.selectObject(this, pageIndex);
+        drawing_objects.selection.textSelection = this;
+    }
+    var hdr_ftr = main_group.DocumentContent.Is_HdrFtr(true);
+    if(hdr_ftr)
+    {
+        hdr_ftr.Content.CurPos.Type = docpostype_DrawingObjects;
+        hdr_ftr.Set_CurrentElement(bUpdate);
+    }
+    else
+    {
+        drawing_objects.document.CurPos.Type = docpostype_DrawingObjects;
+    }
+};
+CShape.prototype.Get_StartPage_Relative = function()
 {
     return 0;
 };

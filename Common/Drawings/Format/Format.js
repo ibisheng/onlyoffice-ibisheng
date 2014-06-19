@@ -7596,23 +7596,6 @@ function CXfrm()
         }
     }
 
-    this.createDuplicate = function()
-    {
-        var duplicate = new CXfrm();
-        duplicate.offX = this.offX;
-        duplicate.offY = this.offY;
-        duplicate.extX = this.extX;
-        duplicate.extY = this.extY;
-        duplicate.chOffX = this.chOffX;
-        duplicate.chOffY = this.chOffY;
-        duplicate.chExtX = this.chExtX;
-        duplicate.chExtY = this.chExtY;
-
-        duplicate.flipH = this.flipH;
-        duplicate.flipV = this.flipV;
-        duplicate.rot = this.rot;
-        return duplicate;
-    }
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -7639,6 +7622,25 @@ CXfrm.prototype =
     Read_FromBinary2: function (r)
     {
         this.Id = r.GetString2();
+    },
+
+
+    createDuplicate: function()
+    {
+        var duplicate = new CXfrm();
+        duplicate.setOffX(this.offX);
+        duplicate.setOffY(this.offY);
+        duplicate.setExtX(this.extX);
+        duplicate.setExtY(this.extY);
+        duplicate.setChOffX(this.chOffX);
+        duplicate.setChOffY(this.chOffY);
+        duplicate.setChExtX(this.chExtX);
+        duplicate.setChExtY(this.chExtY);
+
+        duplicate.setFlipH(this.flipH);
+        duplicate.setFlipV(this.flipV);
+        duplicate.setRot(this.rot);
+        return duplicate;
     },
 
     setParent: function(pr)

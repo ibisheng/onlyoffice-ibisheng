@@ -1891,8 +1891,7 @@ CShape.prototype =
         return this.compiledStyles[_level];
     },
 
-    Set_CurrentElement: function ()
-    { },
+
 
     recalculateTextStyles: function (level)
     {
