@@ -1332,7 +1332,7 @@
 			if (this._canResize()) {
 				var item;
 				var activeIndex = this.model.getActive();
-				for(var i in this.wsViews) if (this.wsViews.hasOwnProperty(i)) {
+				for(var i in this.wsViews) {
 					item = this.wsViews[i];
 					// Делаем resize (для не активных сменим как только сделаем его активным)
 					item.resize(/*isDraw*/i == activeIndex);
@@ -1374,7 +1374,7 @@
 
 			var item;
 			var activeIndex = this.model.getActive();
-			for(i in this.wsViews) if (this.wsViews.hasOwnProperty(i)) {
+			for(i in this.wsViews) {
 				item = this.wsViews[i];
 				// Меняем zoom (для не активных сменим как только сделаем его активным)
 				item.changeZoom(/*isDraw*/i == activeIndex);
@@ -1852,7 +1852,7 @@
 
 		WorkbookView.prototype._initCommentsToSave  = function () {
 			var isFirst = true;
-			for (var wsKey in this.wsViews) if (this.wsViews.hasOwnProperty(wsKey)) {
+			for (var wsKey in this.wsViews) {
 				var wsView = this.wsViews[wsKey];
 				var wsModel = wsView.model;
 				wsView.cellCommentator.prepareCommentsToSave();

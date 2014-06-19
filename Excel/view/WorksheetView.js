@@ -338,7 +338,7 @@
 		 * @param {Array} buffers    DrawingContext + Overlay
 		 * @param {StringRender} stringRender    StringRender
 		 * @param {Number} maxDigitWidth    Максимальный размер цифры
-		 * @param {asc_CCollaborativeEditing} collaborativeEditing
+		 * @param {asc.CCollaborativeEditing} collaborativeEditing
 		 * @param {Object} settings  Settings
 		 *
 		 * @constructor
@@ -1143,15 +1143,10 @@
 			var tmp;
 			var arrayCells = [];
 			for (var i in aCFs) {
-				if (!aCFs.hasOwnProperty(i) )
-					continue;
 				aRules = aCFs[i].aRules;
 				if (0 >= aRules.length)
 					continue;
 				for (var j in aRules) {
-					if (!aRules.hasOwnProperty(j))
-						continue;
-
 					oRule = aRules[j];
 					// ToDo aboveAverage, beginsWith, cellIs, containsBlanks, containsErrors,
 					// ToDo containsText, dataBar, duplicateValues, endsWith, expression, iconSet, notContainsBlanks,
@@ -1182,11 +1177,9 @@
 								oGradient.init(min, max);
 
 								for (var cell in arrayCells) {
-									if (arrayCells.hasOwnProperty(cell)) {
-										var dxf = new CellXfs();
-										dxf.fill = new Fill({bg:oGradient.calculateColor(arrayCells[cell].val)});
-										arrayCells[cell].cell.setConditionalFormattingStyle(dxf);
-									}
+									var dxf = new CellXfs();
+									dxf.fill = new Fill({bg:oGradient.calculateColor(arrayCells[cell].val)});
+									arrayCells[cell].cell.setConditionalFormattingStyle(dxf);
 								}
 							}
 
@@ -2377,7 +2370,7 @@
 				          this._drawRowText(drawingCtx, row, range.c1, range.c2, offsetX, offsetY) );
 			}
 			// draw merged cells at last stage to fix cells background issue
-			for (i in mergedCells) if (mergedCells.hasOwnProperty(i)) {
+			for (i in mergedCells) {
 				mc = mergedCells[i];
 				this._drawRowBG(drawingCtx, mc.r1, mc.c1, mc.c1, offsetX, offsetY, mc);
 				this._drawCellText(drawingCtx, mc.c1, mc.r1, range.c1, range.c2, offsetX, offsetY, true);
@@ -2466,23 +2459,23 @@
 		WorksheetView.prototype._drawRowText = function (drawingCtx, row, colStart, colEnd, offsetX, offsetY) {
 			if (this.rows[row].height < this.height_1px) {return {};}
 
-			var dependentCells = {}, mergedCells = {}, i = undefined, mc;
+			var dependentCells = {}, mergedCells = {}, i, mc, col;
 			// draw cells' text
-			for (var col = colStart; col <= colEnd; ++col) {
+			for (col = colStart; col <= colEnd; ++col) {
 				if (this.cols[col].width < this.width_1px) {continue;}
 				mc = this._drawCellText(drawingCtx, col, row, colStart, colEnd, offsetX, offsetY, false);
 				if (mc !== null) {mergedCells[mc.index] = {c1: mc.c1, r1: mc.r1, c2: mc.c2, r2: mc.r2};}
 				// check if long text overlaps this cell
 				i = this._findSourceOfCellText(col, row);
-					if (i >= 0) {
-						dependentCells[i] = (dependentCells[i] || []);
-						dependentCells[i].push(col);
-					}
+				if (i >= 0) {
+					dependentCells[i] = (dependentCells[i] || []);
+					dependentCells[i].push(col);
+				}
 			}
 			// draw long text that overlaps own cell's borders
-			for (i in dependentCells) if (dependentCells.hasOwnProperty(i)) {
+			for (i in dependentCells) {
 				var arr = dependentCells[i], j = arr.length - 1;
-				col = parseInt(i, 10);
+				col = i >> 0;
 				// if source cell belongs to cells range then skip it (text has been drawn already)
 				if (col >= arr[0] && col <= arr[j]) {continue;}
 				// draw long text fragment
@@ -3732,8 +3725,6 @@
 				opt = this.settings, lengthColors = opt.formulaRangeBorderColor.length;
 			var strokeColor, fillColor;
 			for (var i in arrRanges) {
-				if (!arrRanges.hasOwnProperty(i))
-					continue;
 				var oFormulaRange = arrRanges[i].clone(true);
 				strokeColor = fillColor = opt.formulaRangeBorderColor[i%lengthColors];
 				this._drawElements(this, this._drawSelectionElement, oFormulaRange, isDashLine, lineWidth,
@@ -4183,8 +4174,6 @@
 					continue;
 				rowCells = rowModel.getCells();
 				for (cellColl in rowCells) {
-					if (!rowCells.hasOwnProperty(cellColl))
-						continue;
 					cellColl = cellColl - 0;
 					if (this.width_1px > this.cols[cellColl].width) {continue;}
 
@@ -4195,18 +4184,17 @@
 		};
 
 		WorksheetView.prototype._fetchRowCache = function (row) {
-			var rc = this.cache.rows[row] = ( this.cache.rows[row] || new CacheElement() );
-			return rc;
+			return (this.cache.rows[row] = ( this.cache.rows[row] || new CacheElement() ));
 		};
 
 		WorksheetView.prototype._fetchCellCache = function (col, row) {
-			var r = this._fetchRowCache(row), c = r.columns[col] = ( r.columns[col] || {} );
-			return c;
+			var r = this._fetchRowCache(row);
+			return (r.columns[col] = ( r.columns[col] || {} ));
 		};
 
 		WorksheetView.prototype._fetchCellCacheText = function (col, row) {
-			var r = this._fetchRowCache(row), cwt = r.columnsWithText[col] = ( r.columnsWithText[col] || {} );
-			return cwt;
+			var r = this._fetchRowCache(row);
+			return (r.columnsWithText[col] = ( r.columnsWithText[col] || {} ));
 		};
 
 		WorksheetView.prototype._getRowCache = function (row) {
@@ -4554,7 +4542,7 @@
 					if (!r.columns[i] || 0 === this.cols[i].width) {continue;}
 					var ct = r.columns[i].text;
 					if (!ct) {continue;}
-					i = parseInt(i);
+					i >>= 0;
 					var lc = i - ct.sideL,
 						rc = i + ct.sideR;
 					if (col >= lc && col <= rc) {return i;}
@@ -5591,8 +5579,6 @@
 				var arrRanges = this.isFormulaEditMode ? this.arrActiveFormulaRanges : this.arrActiveChartsRanges,
 					targetArr = this.isFormulaEditMode ? 0 : -1;
 				for (i in arrRanges) {
-					if (!arrRanges.hasOwnProperty(i))
-						continue;
 					oFormulaRange = arrRanges[i].clone(true);
 
 					oFormulaIn = oFormulaRange.intersection(this.visibleRange);
