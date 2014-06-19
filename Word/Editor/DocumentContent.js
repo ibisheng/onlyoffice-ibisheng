@@ -3999,7 +3999,7 @@ CDocumentContent.prototype =
             this.Selection.EndPos   = DstIndex + ElementsCount - 1;
         }
 
-        this.Parent.Set_CurrentElement(false);
+        this.Parent.Set_CurrentElement(false, this.Get_StartPage_Absolute());
     },
 
     Set_ParagraphAlign : function(Align)
@@ -7361,7 +7361,7 @@ CDocumentContent.prototype =
         this.DrawingDocument.TargetEnd();
         this.DrawingDocument.SetCurrentPage( this.Get_StartPage_Absolute() + this.CurPage );
 
-        this.Parent.Set_CurrentElement(true);
+        this.Parent.Set_CurrentElement(true, this.Get_StartPage_Absolute() + this.CurPage);
 
         var HdrFtr = this.Is_HdrFtr(true);
         if ( null != HdrFtr )
