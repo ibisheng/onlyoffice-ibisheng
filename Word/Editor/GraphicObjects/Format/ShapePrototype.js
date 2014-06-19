@@ -581,6 +581,7 @@ CShape.prototype.Set_CurrentElement = function(bUpdate, pageIndex)
 {
     var drawing_objects = editor.WordControl.m_oLogicDocument.DrawingObjects;
     drawing_objects.resetSelection();
+    var para_drawing;
     if(this.group)
     {
         var main_group = this.group.getMainGroup();
@@ -588,13 +589,15 @@ CShape.prototype.Set_CurrentElement = function(bUpdate, pageIndex)
         main_group.selectObject(this, pageIndex);
         main_group.selection.textSelection = this;
         drawing_objects.selection.groupSelection = main_group;
+        para_drawing = main_group.parent;
     }
     else
     {
         drawing_objects.selectObject(this, pageIndex);
         drawing_objects.selection.textSelection = this;
+        para_drawing = this.parent;
     }
-    var hdr_ftr = main_group.DocumentContent.Is_HdrFtr(true);
+    var hdr_ftr = para_drawing.DocumentContent.Is_HdrFtr(true);
     if(hdr_ftr)
     {
         hdr_ftr.Content.CurPos.Type = docpostype_DrawingObjects;
