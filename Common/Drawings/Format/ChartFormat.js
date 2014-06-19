@@ -3924,7 +3924,13 @@ CCatAx.prototype =
 
 
     Refresh_RecalcData: function()
-    {},
+    {
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+            this.parent.parent.parent.addToRecalculate();
+        }
+    },
 
     Refresh_RecalcData2: function(pageIndex, object)
     {
@@ -5170,6 +5176,14 @@ CDateAx.prototype =
     {
         this.parent && this.parent.parent && this.parent.parent.Refresh_RecalcData2(pageIndex, object);
     },
+    Refresh_RecalcData: function(pageIndex, object)
+    {
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+            this.parent.parent.parent.addToRecalculate();
+        }
+    },
 
     createDuplicate: function()
     {
@@ -6287,6 +6301,14 @@ CSerAx.prototype =
     {
         this.parent && this.parent.parent && this.parent.parent.Refresh_RecalcData2(pageIndex, object);
     },
+    Refresh_RecalcData: function(pageIndex, object)
+    {
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+            this.parent.parent.parent.addToRecalculate();
+        }
+    },
 
     createDuplicate: function()
     {
@@ -7178,7 +7200,13 @@ CValAx.prototype =
 
 
     Refresh_RecalcData: function()
-    {},
+    {
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateInternalChart();
+            this.parent.parent.parent.addToRecalculate();
+        }
+    },
 
 
     Refresh_RecalcData2: function(pageIndex, object)
@@ -22806,7 +22834,9 @@ CChart.prototype =
     },
 
     Refresh_RecalcData: function()
-    {},
+    {
+        this.parent && this.parent.addToRecalculate();
+    },
 
     getObjectType: function()
     {

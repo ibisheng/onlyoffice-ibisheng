@@ -1164,6 +1164,34 @@ CChartSpace.prototype =
         this.addToRecalculate();
     },
 
+
+    recalcTitles: function()
+    {
+        if(this.chart && this.chart.title)
+        {
+            this.chart.title.recalcInfo.recalculateContent = true;
+            this.chart.title.recalcInfo.recalculateTransform = true;
+            this.chart.title.recalcInfo.recalculateTransformText = true;
+        }
+        if(this.chart && this.chart.plotArea)
+        {
+            var hor_axis = this.chart.plotArea.getHorizontalAxis();
+            if(hor_axis && hor_axis.title)
+            {
+                hor_axis.title.recalcInfo.recalculateContent = true;
+                hor_axis.title.recalcInfo.recalculateTransform = true;
+                hor_axis.title.recalcInfo.recalculateTransformText = true;
+            }
+            var vert_axis = this.chart.plotArea.getVerticalAxis();
+            if(vert_axis && vert_axis.title)
+            {
+                vert_axis.title.recalcInfo.recalculateContent = true;
+                hor_axis.title.recalcInfo.recalculateTransform = true;
+                hor_axis.title.recalcInfo.recalculateTransformText = true;
+            }
+        }
+    },
+
     Refresh_RecalcData2: function(pageIndex, object)
     {
         if(object && object.getObjectType && object.getObjectType() === historyitem_type_Title && this.selection.title === object)

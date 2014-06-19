@@ -52,6 +52,7 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
     this.RecalcInfo = new CDocumentRecalcInfo();
 
     this.Split = Split; // Разделяем ли на страницы
+    this.bPresentation = bPresentation; // Разделяем ли на страницы
 
     this.Content = [];
     this.Content[0] = new Paragraph( DrawingDocument, this, 0, X, Y, XLimit, YLimit, bPresentation );
@@ -1357,8 +1358,8 @@ CDocumentContent.prototype =
         this.Internal_Content_RemoveAll();
 
         // Добавляем 2 новых параграфа
-        var Para1 = new Paragraph( this.DrawingDocument, this, 0, this.X, this.Y, this.XLimit, this.YLimit );
-        var Para2 = new Paragraph( this.DrawingDocument, this, 0, this.X, this.Y, this.XLimit, this.YLimit );
+        var Para1 = new Paragraph( this.DrawingDocument, this, 0, this.X, this.Y, this.XLimit, this.YLimit, this.bPresentation === true );
+        var Para2 = new Paragraph( this.DrawingDocument, this, 0, this.X, this.Y, this.XLimit, this.YLimit, this.bPresentation === true );
 
         this.Internal_Content_Add( 0, Para1 );
         this.Internal_Content_Add( 1, Para2 );
@@ -1397,7 +1398,7 @@ CDocumentContent.prototype =
         this.Internal_Content_RemoveAll();
 
         // Добавляем новый параграф
-        var Para = new Paragraph( this.DrawingDocument, this, 0, this.X, this.Y, this.XLimit, this.YLimit );
+        var Para = new Paragraph( this.DrawingDocument, this, 0, this.X, this.Y, this.XLimit, this.YLimit, this.bPresentation === true);
         this.Internal_Content_Add( 0, Para );
     },
 
@@ -1928,7 +1929,7 @@ CDocumentContent.prototype =
                 else
                 {
                     // Создаем новый параграф
-                    var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 );
+                    var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0, this.bPresentation === true );
 
                     // Проверим позицию в текущем параграфе
                     if ( true === Item.Cursor_IsEnd() )
@@ -1979,7 +1980,7 @@ CDocumentContent.prototype =
                 if (  0 === this.CurPos.ContentPos && Item.Cursor_IsStart(true) )
                 {
                     // Создаем новый параграф
-                    var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 );
+                    var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0, this.bPresentation === true );
                     this.Internal_Content_Add( 0, NewParagraph );
 
                     this.CurPos.ContentPos = 0;
@@ -2003,7 +2004,7 @@ CDocumentContent.prototype =
 
         while ( true )
         {
-            var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 );
+            var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0, this.bPresentation === true );
 
             var StyleId = LastPara.Style_Get();
             var NextId  = undefined;
@@ -2178,7 +2179,7 @@ CDocumentContent.prototype =
                     else
                     {
                         // Создаем новый параграф
-                        var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 );
+                        var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0, this.bPresentation === true );
                         Item.Split( NewParagraph );
 
                         // Добавляем новый параграф
@@ -2463,7 +2464,7 @@ CDocumentContent.prototype =
         if ( true === this.ApplyToAll )
         {
             this.Internal_Content_RemoveAll();
-            this.Internal_Content_Add( 0, new Paragraph( this.DrawingDocument, this, 0, this.X, this.Y, this.XLimit, this.YLimit ) );
+            this.Internal_Content_Add( 0, new Paragraph( this.DrawingDocument, this, 0, this.X, this.Y, this.XLimit, this.YLimit, this.bPresentation === true ) );
 
             this.CurPos  =
             {
@@ -2636,7 +2637,7 @@ CDocumentContent.prototype =
                             // При таком удалении надо убедиться, что в документе останется хотя бы один элемент
                             if ( 0 === StartPos && (EndPos - StartPos + 1) >= this.Content.length )
                             {
-                                var NewPara = new Paragraph( this.DrawingDocument, this, 0, 0, 0, this.XLimit, this.YLimit );
+                                var NewPara = new Paragraph( this.DrawingDocument, this, 0, 0, 0, this.XLimit, this.YLimit, this.bPresentation === true );
                                 this.Internal_Content_Add( 0, NewPara );
                                 this.Internal_Content_Remove( 1, this.Content.length - 1 );
                             }
@@ -2703,7 +2704,7 @@ CDocumentContent.prototype =
                             }
                             else if ( this.Content.length === 1 && true === this.Content[0].IsEmpty() && Count > 0 )
                             {
-                                var NewPara = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 );
+                                var NewPara = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0, this.bPresentation === true);
                                 this.Internal_Content_Add( 0, NewPara );
                                 this.Internal_Content_Remove( 1, this.Content.length - 1 );
                             }
@@ -3937,7 +3938,7 @@ CDocumentContent.prototype =
             else
             {
                 // Создаем новый параграф
-                var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 );
+                var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0, this.bPresentation === true );
                 Para.Split( NewParagraph );
                 this.Internal_Content_Add( DstIndex + 1, NewParagraph );
 
@@ -7787,7 +7788,7 @@ CDocumentContent.prototype =
 
         // Проверим, что последний элемент не таблица
         if ( false != bCheckTable && type_Table == this.Content[this.Content.length - 1].GetType() )
-            this.Internal_Content_Add(this.Content.length, new Paragraph( this.DrawingDocument, this, 0, 50, 50, this.XLimit, this.YLimit ) );
+            this.Internal_Content_Add(this.Content.length, new Paragraph( this.DrawingDocument, this, 0, 50, 50, this.XLimit, this.YLimit, this.bPresentation === true ) );
     },
 
     Internal_Content_Remove : function(Position, Count)
@@ -7818,7 +7819,7 @@ CDocumentContent.prototype =
 
         // Проверим, что последний элемент не таблица
         if ( type_Table == this.Content[this.Content.length - 1].GetType() )
-            this.Internal_Content_Add(this.Content.length, new Paragraph( this.DrawingDocument, this, 0, 50, 50, this.XLimit, this.YLimit ) );
+            this.Internal_Content_Add(this.Content.length, new Paragraph( this.DrawingDocument, this, 0, 50, 50, this.XLimit, this.YLimit, this.bPresentation === true ) );
     },
 
     Clear_ContentChanges : function()

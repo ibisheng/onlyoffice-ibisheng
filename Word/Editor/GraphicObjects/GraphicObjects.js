@@ -968,6 +968,23 @@ CGraphicObjects.prototype =
         {
             content.Add_InlineImage(W, H, Img, Chart, bFlow );
         }
+        else
+        {
+            if(this.selectedObjects[0] && this.selectedObjects[0].parent && this.selectedObjects[0].parent.Is_Inline())
+            {
+                this.resetInternalSelection();
+                this.document.Remove(1, true);
+                this.document.Add_InlineImage(W, H, Img, Chart, bFlow );
+            }
+            else
+            {
+                if(this.selectedObjects.length > 0)
+                {
+                    this.resetSelection2();
+                    this.document.Add_InlineImage(W, H, Img, Chart, bFlow );
+                }
+            }
+        }
     },
 
     addInlineTable: function( Cols, Rows )
@@ -1461,7 +1478,7 @@ CGraphicObjects.prototype =
 
     isSelectedText: function()
     {
-        return isRealObject(this.selection.textSelection || this.selection.groupSelection && this.selection.groupSelection.selection.textSelection);
+        return isRealObject(/*this.selection.textSelection || this.selection.groupSelection && this.selection.groupSelection.selection.textSelection*/this.getTargetDocContent());
     },
 
     selectAll: DrawingObjectsController.prototype.selectAll,
@@ -1976,7 +1993,7 @@ CGraphicObjects.prototype =
 
     remove: function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
     {
-        var content = this.getTargetDocContent();
+        var content = this.getTargetDocContent(true);
         if(content)
         {
             content.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
@@ -1985,9 +2002,17 @@ CGraphicObjects.prototype =
         {
             if(this.selection.groupSelection)
             {
-                if(this.selection.groupSelection.chartSelection)
+                if(this.selection.groupSelection.selection.chartSelection)
                 {
-                    //TODO
+                    if(this.selection.groupSelection.selection.chartSelection.selection.title)
+                    {
+                        if(this.selection.groupSelection.selection.chartSelection.selection.title.parent)
+                        {
+                            this.selection.groupSelection.selection.chartSelection.selection.title.parent.setTitle(null);
+                            this.selection.groupSelection.selection.chartSelection.resetSelection();
+                        }
+                        this.document.Recalculate();
+                    }
                 }
                 else
                 {
@@ -2108,8 +2133,18 @@ CGraphicObjects.prototype =
                     }
                 }
             }
-            //else if(this.selection.chartSelection) TODO
-            //{}
+            else if(this.selection.chartSelection)
+            {
+                if(this.selection.chartSelection.selection.title)
+                {
+                    if(this.selection.chartSelection.selection.title.parent)
+                    {
+                        this.selection.chartSelection.selection.title.parent.setTitle(null);
+                        this.selection.chartSelection.resetSelection();
+                    }
+                    this.document.Recalculate();
+                }
+            }
             else
             {
                 this.selectedObjects[0].parent.GoTo_Text();

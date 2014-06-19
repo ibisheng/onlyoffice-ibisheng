@@ -150,6 +150,7 @@ CChartSpace.prototype.handleUpdateExtents = function()
     this.recalcBounds();
     this.recalcTransform();
     this.recalcWrapPolygon();
+    this.recalcTitles();
     this.handleUpdateInternalChart();
 };
 CChartSpace.prototype.handleUpdateFlip = function()
