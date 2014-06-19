@@ -6360,9 +6360,9 @@
 
 		WorksheetView.prototype.getSelectionRangeValue = function () {
 			// ToDo стоит добавлять $ и проблема с выбором целого столбца/строки
-			var sListName = this.model.getName();
-			var tmpRange = this.activeRange.clone(true);
-			return sListName + "!" + tmpRange.getName();
+			var sName = this.activeRange.clone(true).getName();
+			return (c_oAscSelectionDialogType.FormatTable === this.selectionDialogType) ? sName :
+				parserHelp.get3DRef(this.model.getName(), sName);
 		};
 
 		WorksheetView.prototype.getSelectionInfo = function (bExt) {
