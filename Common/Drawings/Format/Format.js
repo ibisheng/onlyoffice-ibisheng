@@ -6916,13 +6916,7 @@ function StyleRef()
 
 
 
-    this.createDuplicate = function()
-    {
-        var duplicate  = new StyleRef();
-        duplicate.idx = this.idx;
-        duplicate.Color = this.Color.createDuplicate();
-        return duplicate;
-    }
+
 
     this.isIdentical = function(styleRef)
     {
@@ -6970,6 +6964,15 @@ StyleRef.prototype =
     {
         History.Add(this, {Type: historyitem_StyleRef_SetColor, oldColor:this.Color, newColor: color});
         this.Color = color;
+    },
+
+    createDuplicate: function()
+    {
+        var duplicate  = new StyleRef();
+        duplicate.setIdx(this.idx);
+        if(this.Color)
+            duplicate.setColor(this.Color.createDuplicate());
+        return duplicate;
     },
 
     Refresh_RecalcData: function()
@@ -7093,14 +7096,7 @@ function FontRef()
     this.idx = fntStyleInd_none;
     this.Color = null;//new CUniColor();
 
-    this.createDuplicate = function()
-    {
-        var duplicate  = new FontRef();
-        duplicate.idx = this.idx;
-        if(this.Color)
-            duplicate.Color = this.Color.createDuplicate();
-        return duplicate;
-    }
+
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -7130,6 +7126,15 @@ FontRef.prototype =
     {
         History.Add(this, {Type: historyitem_FontRef_SetColor, oldColor:this.Color, newColor: color});
         this.Color = color;
+    },
+
+    createDuplicate: function()
+    {
+        var duplicate  = new FontRef();
+        duplicate.setIdx(this.idx);
+        if(this.Color)
+            duplicate.setColor(this.Color.createDuplicate());
+        return duplicate;
     },
 
     Undo: function(data)
@@ -7277,28 +7282,7 @@ function CShapeStyle()
         }
     }
 
-    this.createDuplicate =  function()
-    {
 
-        var duplicate = new CShapeStyle();
-        if(this.lnRef!=null)
-        {
-            duplicate.lnRef = this.lnRef.createDuplicate();
-        }
-        if(this.fillRef!=null)
-        {
-            duplicate.fillRef = this.fillRef.createDuplicate();
-        }
-        if(this.effectRef!=null)
-        {
-            duplicate.effectRef = this.effectRef.createDuplicate();
-        }
-        if(this.fontRef!=null)
-        {
-            duplicate.fontRef = this.fontRef.createDuplicate();
-        }
-        return duplicate;
-    }
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -7323,6 +7307,28 @@ CShapeStyle.prototype =
     Read_FromBinary2: function (r)
     {
         this.Id = r.GetString2();
+    },
+
+    createDuplicate:  function()
+    {
+        var duplicate = new CShapeStyle();
+        if(this.lnRef!=null)
+        {
+            duplicate.setLnRef(this.lnRef.createDuplicate());
+        }
+        if(this.fillRef!=null)
+        {
+            duplicate.setFillRef(this.fillRef.createDuplicate());
+        }
+        if(this.effectRef!=null)
+        {
+            duplicate.setEffectRef(this.effectRef.createDuplicate());
+        }
+        if(this.fontRef!=null)
+        {
+            duplicate.setFontRef(this.fontRef.createDuplicate());
+        }
+        return duplicate;
     },
 
     getObjectType: function()
