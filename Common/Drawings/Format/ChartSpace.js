@@ -584,6 +584,10 @@ CChartSpace.prototype =
         {
             _new_name = "'" + newName + "'";
         }
+        else
+        {
+            _new_name = newName;
+        }
         if(val)
         {
             if(val.numRef && typeof val.numRef.f === "string")
