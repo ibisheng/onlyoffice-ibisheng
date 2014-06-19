@@ -1128,6 +1128,11 @@ var historyitem_Section_TitlePage          = 18; // Меняем настрой�
 var historyitem_Section_PageMargins_Header = 19; // Меняем расстояние от верха страницы до верхнего колонтитула
 var historyitem_Section_PageMargins_Footer = 20; // Меняем расстояние от низа страницы до нижнего колонтитула
 var historyitem_Section_PageNumType_Start  = 21; // Изменяем начальное значение для нумерации страниц
+var historyitem_Section_Columns_EqualWidth = 22;
+var historyitem_Section_Columns_Space      = 23;
+var historyitem_Section_Columns_Num        = 24;
+var historyitem_Section_Columns_Sep        = 25;
+var historyitem_Section_Columns_Col        = 26;
 
 // Тип класса, к которому относится данный элемент истории
 var historyitem_State_Unknown         = 0;
