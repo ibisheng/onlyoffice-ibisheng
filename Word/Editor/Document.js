@@ -9601,7 +9601,9 @@ CDocument.prototype =
         }
         else
         {
-            if ( true === e.ShiftKey && ( docpostype_DrawingObjects !== this.CurPos.Type || true === this.DrawingObjects.checkTextObject(X, Y, PageIndex) ) )
+            if ( true === e.ShiftKey &&
+                ( (docpostype_DrawingObjects !== this.CurPos.Type && !(docpostype_HdrFtr === this.CurPos.Type && this.HdrFtr.CurHdrFtr && this.HdrFtr.CurHdrFtr.Content.CurPos.Type === docpostype_DrawingObjects))
+                    || true === this.DrawingObjects.checkTextObject(X, Y, PageIndex) ) )
             {
                 if ( true === this.Is_SelectionUse() )
                 {
