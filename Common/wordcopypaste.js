@@ -2718,7 +2718,8 @@ PasteProcessor.prototype =
     {
         if(!g_bIsDocumentCopyPaste)
             return;
-        var NearPos = oDoc.Get_NearestPos(this.oLogicDocument.TargetPos.PageNum, this.oLogicDocument.TargetPos.X, this.oLogicDocument.TargetPos.Y);
+        //делаем небольшой сдвиг по y, потому что сама точка TargetPos для двухстрочного параграфа определяется как верхняя
+        var NearPos = oDoc.Get_NearestPos(this.oLogicDocument.TargetPos.PageNum, this.oLogicDocument.TargetPos.X, this.oLogicDocument.TargetPos.Y + 0.05);//0.05 == 2pix
         var oSelectedContent = new CSelectedContent();
         for (var i = 0, length = aNewContent.length; i < length; ++i) {
             var oSelectedElement = new CSelectedElement();
