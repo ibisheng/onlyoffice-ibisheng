@@ -7718,7 +7718,7 @@ window["asc_docs_api"].prototype["asc_nativeCalculateFile"] = function()
 
     var Document = this.WordControl.m_oLogicDocument;
 
-    if (this.isApplyChangesOnOpenEnabled)
+    if ((window["NATIVE_EDITOR_ENJINE"] === undefined) && this.isApplyChangesOnOpenEnabled)
     {
         this.isApplyChangesOnOpenEnabled = false;
         if (1 === CollaborativeEditing.m_nUseType)
