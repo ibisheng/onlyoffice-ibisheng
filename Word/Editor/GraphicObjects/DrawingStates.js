@@ -1252,6 +1252,10 @@ ChangeWrapContour.prototype.onMouseUp = function(e, x, y, pageIndex)
         }
         this.majorObject.parent.wrappingPolygon.setEdited(true);
         this.majorObject.parent.wrappingPolygon.setArrRelPoints(calc_points2);
+        var nearest_pos = this.drawingObjects.document.Get_NearestPos(this.majorObject.selectStartPage, this.majorObject.posX + this.majorObject.bounds.x, this.majorObject.posY + this.majorObject.bounds.y, true, this.majorObject.parent);
+        this.majorObject.parent.Remove_FromDocument(false);
+        this.majorObject.parent.Set_XYForAdd(this.majorObject.posX + this.majorObject.bounds.x, this.majorObject.posY + this.majorObject.bounds.y, nearest_pos, this.majorObject.selectStartPage);
+        this.majorObject.parent.Add_ToDocument2(this.majorObject.parent.Get_ParentParagraph());
         this.drawingObjects.document.Recalculate();
     }
     this.drawingObjects.clearTrackObjects();
@@ -1336,6 +1340,10 @@ ChangeWrapContourAddPoint.prototype.onMouseUp = function(e, x, y, pageIndex)
         }
         this.majorObject.parent.wrappingPolygon.setEdited(true);
         this.majorObject.parent.wrappingPolygon.setArrRelPoints(calc_points2);
+        var nearest_pos = this.drawingObjects.document.Get_NearestPos(this.majorObject.selectStartPage, this.majorObject.posX + this.majorObject.bounds.x, this.majorObject.posY + this.majorObject.bounds.y, true, this.majorObject.parent);
+        this.majorObject.parent.Remove_FromDocument(false);
+        this.majorObject.parent.Set_XYForAdd(this.majorObject.posX + this.majorObject.bounds.x, this.majorObject.posY + this.majorObject.bounds.y, nearest_pos, this.majorObject.selectStartPage);
+        this.majorObject.parent.Add_ToDocument2(this.majorObject.parent.Get_ParentParagraph());
         this.drawingObjects.document.Recalculate();
     }
     this.drawingObjects.clearTrackObjects();
