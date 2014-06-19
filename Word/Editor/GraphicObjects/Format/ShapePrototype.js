@@ -577,6 +577,53 @@ CShape.prototype.Is_Cell = function()
     return false;
 };
 
+CShape.prototype.hitInTextRect = function(x, y)
+{
+    var content = this.getDocContent && this.getDocContent();
+    if (content)
+    {
+        var t_x, t_y;
+        t_x = this.invertTransform.TransformPointX(x, y);
+        t_y = this.invertTransform.TransformPointY(x, y);
+
+        var w, h, x, y;
+        var l_ins, t_ins, r_ins, b_ins;
+        var body_pr = this.bodyPr;
+        if(body_pr)
+        {
+            l_ins = isRealNumber(body_pr.lIns) ? body_pr.lIns : 2.54;
+            r_ins = isRealNumber(body_pr.rIns) ? body_pr.rIns : 2.54;
+            t_ins = isRealNumber(body_pr.tIns) ? body_pr.tIns : 1.27;
+            b_ins = isRealNumber(body_pr.bIns) ? body_pr.bIns : 1.27;
+        }
+        else
+        {
+            l_ins = 2.54;
+            r_ins = 2.54;
+            t_ins = 1.27;
+            b_ins = 1.27;
+        }
+        if(this.spPr && this.spPr.geometry && this.spPr.geometry.rect
+            && isRealNumber(this.spPr.geometry.rect.l) && isRealNumber(this.spPr.geometry.rect.t)
+            && isRealNumber(this.spPr.geometry.rect.r) && isRealNumber(this.spPr.geometry.rect.r))
+        {
+            x = this.spPr.geometry.rect.l;
+            y = this.spPr.geometry.rect.t;
+            w = this.spPr.geometry.rect.r - this.spPr.geometry.rect.l - (l_ins + r_ins);
+            h = this.spPr.geometry.rect.b - this.spPr.geometry.rect.t - (t_ins + b_ins);
+        }
+        else
+        {
+            x = 0;
+            y = 0;
+            w = this.extX - (l_ins + r_ins);
+            h = this.extY - (t_ins + b_ins);
+        }
+        return t_x > x + l_ins && t_x < x + w - r_ins && t_y > y + t_ins && t_y < y + h - b_ins;
+    }
+    return false;
+};
+
 CShape.prototype.Set_CurrentElement = function(bUpdate, pageIndex)
 {
     var drawing_objects = editor.WordControl.m_oLogicDocument.DrawingObjects;
