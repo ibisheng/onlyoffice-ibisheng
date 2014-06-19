@@ -2104,10 +2104,10 @@
 		
 		addFilterDialog.dialog({ autoOpen: false, closeOnEscape: false, dialogClass: 'dialogClass',
 			open: function() { 
-				api.asc_setSelectionDialogMode(true);
+				api.asc_setSelectionDialogMode(c_oAscSelectionDialogType.FormatTable, null);
 				aDialogNames.push("addFilterDialog"); 
 			},
-			close: function() { aDialogNames.pop(); api.asc_setSelectionDialogMode(false);},
+			close: function() { aDialogNames.pop(); api.asc_setSelectionDialogMode(c_oAscSelectionDialogType.None, null);},
 			resizable: false, modal: false, width: '350px',
 			buttons: [
 				{
@@ -2155,7 +2155,7 @@
 	//	function setAxisXFont() { showChartFontDialog(chart.asc_getXAxis().asc_getTitleFont()) }
 	//	function setAxisYFont() { showChartFontDialog(chart.asc_getYAxis().asc_getTitleFont()) }
     //
-		api.asc_setSelectionDialogMode(true);
+		api.asc_setSelectionDialogMode(c_oAscSelectionDialogType.Chart, null);
 
 		chartForm.css("visibility", "visible");
 		chartForm.dialog({ autoOpen: false, closeOnEscape: true, height: 'auto', width: 400,
@@ -2286,7 +2286,7 @@
 					],
 					close: function() {
 						if (!bIsReopenDialog)
-							api.asc_setSelectionDialogMode(false);
+							api.asc_setSelectionDialogMode(c_oAscSelectionDialogType.None, null);
 						api.asc_enableKeyEvents(true);
 						
 						// chart font unbinding
@@ -2341,7 +2341,7 @@
 					],
 					close: function() {
 						if (!bIsReopenDialog)
-							api.asc_setSelectionDialogMode(false);
+							api.asc_setSelectionDialogMode(c_oAscSelectionDialogType.None, null);
 						api.asc_enableKeyEvents(true);
 					},
 					create: function() {
