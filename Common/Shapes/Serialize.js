@@ -4854,7 +4854,7 @@ function BinaryPPTYLoader()
 
                     _chart = new CChartSpace();
                     var oBinaryChartReader = new BinaryChartReader(_stream);
-                    oBinaryChartReader.ExternalReadCT_ChartSpace(_length, _chart);
+                    oBinaryChartReader.ExternalReadCT_ChartSpace(_length, _chart, this.presentation);
                     _chart.setBDeleted(false);
 
                     if(_xfrm)
