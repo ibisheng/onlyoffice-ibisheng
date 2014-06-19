@@ -8,7 +8,6 @@
  * To change this template use File | Settings | File Templates.
  */
 
-
 var DayCountBasis = {
     // US 30/360
     UsPsa30_360:0,
@@ -75,16 +74,7 @@ function diffDate( d1, d2, mode ) {
         case DayCountBasis.UsPsa30_360:
             return new cNumber( GetDiffDate360( date1, month1, year1, date2, month2, year2, true ) );
         case DayCountBasis.ActualActual:
-            var yc = /*Math.abs*/( year2 - year1 ),
-                sd = year1 > year2 ? new Date( d2 ) : new Date( d1 ),
-                yearAverage = sd.isLeapYear() ? 366 : 365, dayDiff = d2 - d1;
-            for ( var i = 0; i < yc; i++ ) {
-                sd.addYears( 1 );
-                yearAverage += sd.isLeapYear() ? 366 : 365;
-            }
-            yearAverage /= (yc + 1);
-            dayDiff /= c_msPerDay;
-            return new cNumber( dayDiff );
+            return new cNumber( (d2 - d1)/c_msPerDay );
         case DayCountBasis.Actual360:
             var dayDiff = d2 - d1;
             dayDiff /= c_msPerDay;
@@ -155,7 +145,7 @@ function diffDate2( d1, d2, mode ) {
     }
 }
 
-function GetDiffDate( d1, d2, nMode ) {
+function GetDiffDate( d1, d2, nMode, av ) {
     var bNeg = d1 > d2, nRet, pOptDaysIn1stYear;
 
     if ( bNeg ) {
@@ -164,32 +154,25 @@ function GetDiffDate( d1, d2, nMode ) {
         d1 = n;
     }
 
-    var nD1 = d1.getUTCDate(),
-        nM1 = d1.getUTCMonth(),
-        nY1 = d1.getUTCFullYear(),
-        nD2 = d2.getUTCDate(),
-        nM2 = d2.getUTCMonth(),
-        nY2 = d2.getUTCFullYear();
+    var nD1 = d1.getUTCDate(), nM1 = d1.getUTCMonth(), nY1 = d1.getUTCFullYear(),
+        nD2 = d2.getUTCDate(), nM2 = d2.getUTCMonth(), nY2 = d2.getUTCFullYear();
 
     switch ( nMode ) {
         case DayCountBasis.UsPsa30_360:            // 0=USA (NASD) 30/360
-        case DayCountBasis.Europ30_360:            // 4=Europe 30/360
-        {
-            var bLeap = d1.isLeapYear()
-            var nDays, nMonths/*, nYears*/;
+        case DayCountBasis.Europ30_360:{            // 4=Europe 30/360
+            var bLeap = d1.isLeapYear(), nDays, nMonths/*, nYears*/;
 
             nMonths = nM2 - nM1;
             nDays = nD2 - nD1;
-
             nMonths += ( nY2 - nY1 ) * 12;
-
             nRet = nMonths * 30 + nDays;
-            if ( nMode == 0 && nM1 == 2 && nM2 != 2 && nY1 == nY2 )
+            if ( nMode == 0 && nM1 == 2 && nM2 != 2 && nY1 == nY2 ){
                 nRet -= bLeap ? 1 : 2;
+            }
 
             pOptDaysIn1stYear = 360;
-        }
             break;
+        }
         case DayCountBasis.ActualActual:            // 1=exact/exact
             pOptDaysIn1stYear = d1.isLeapYear() ? 366 : 365;
             nRet = d2 - d1;
@@ -204,7 +187,7 @@ function GetDiffDate( d1, d2, nMode ) {
             break;
     }
 
-    return (bNeg ? -nRet : nRet) / c_msPerDay / pOptDaysIn1stYear;
+    return (bNeg ? -nRet : nRet) / c_msPerDay / (av ? 1 : pOptDaysIn1stYear);
 }
 
 function days360( date1, date2, flag ){
@@ -213,55 +196,47 @@ function days360( date1, date2, flag ){
     var nY1 = date1.getUTCFullYear(), nM1 = date1.getUTCMonth()+1, nD1 = date1.getUTCDate(),
         nY2 = date2.getUTCFullYear(), nM2 = date2.getUTCMonth()+1, nD2 = date2.getUTCDate();
 
-    if (flag && (date2 < date1))
-    {
+    if (flag && (date2 < date1)){
         sign = date1;
         date1 = date2;
         date2 = sign;
-        sign = -1.0;
+        sign = -1;
     }
     else
-        sign = 1.0;
+        sign = 1;
     if (nD1 == 31)
         nD1 -= 1;
-    else if (!flag)
-        {
-            if (nM1 == 2)
-            {
-                switch ( nD1 )
-                {
-                    case 28 :
-                        if ( !date1.isLeapYear() )
-                            nD1 = 30;
-                        break;
-                    case 29 :
+    else if (!flag){
+        if (nM1 == 2){
+            switch ( nD1 ){
+                case 28 :
+                    if ( !date1.isLeapYear() )
                         nD1 = 30;
-                        break;
-                }
+                    break;
+                case 29 :
+                    nD1 = 30;
+                    break;
             }
         }
-        if (nD2 == 31)
-        {
-            if (!flag )
-            {
-                if (nD1 == 30)
-                    nD2--;
-            }
-            else
-                nD2 = 30;
+    }
+    if (nD2 == 31){
+        if (!flag ){
+            if (nD1 == 30)
+                nD2--;
         }
-        return  sign * ( nD2 - nD1 + ( nM2 - nM1 )* 30.0 + ( nY2 - nY1 ) * 360.0 ) ;
+        else
+            nD2 = 30;
+    }
+    return  sign * ( nD2 - nD1 + ( nM2 - nM1 )* 30 + ( nY2 - nY1 ) * 360 ) ;
 }
 
 function daysInYear( date, basis ){
-    switch( basis )
-    {
+    switch( basis ){
         case DayCountBasis.UsPsa30_360:         // 0=USA (NASD) 30/360
         case DayCountBasis.Actual360:         // 2=exact/360
         case DayCountBasis.Europ30_360:         // 4=Europe 30/360
             return new cNumber( 360 );
-        case DayCountBasis.ActualActual:         // 1=exact/exact
-        {
+        case DayCountBasis.ActualActual:{         // 1=exact/exact
             var d = Date.prototype.getDateFromExcel( date );
             return new cNumber( d.isLeapYear() ? 366 : 365 );
         }

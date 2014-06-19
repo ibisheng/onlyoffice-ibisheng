@@ -2582,7 +2582,7 @@ function cPRODUCT() {
 
 cPRODUCT.prototype = Object.create( cBaseFunction.prototype )
 cPRODUCT.prototype.Calculate = function ( arg ) {
-    var arg0 = new cNumber( 1 ), _aVal = null;
+    var arg0 = new cNumber( 1 );
     for ( var i = 0; i < arg.length; i++ ) {
         if ( arg[i] instanceof cArea || arg[i] instanceof cArea3D ) {
             var _arrVal = arg[i].getValue();
@@ -3784,7 +3784,7 @@ function cSUM() {
 
 cSUM.prototype = Object.create( cBaseFunction.prototype )
 cSUM.prototype.Calculate = function ( arg ) {
-    var arg0 = new cNumber( 0 ), _aVal = null;
+    var arg0 = new cNumber( 0 );
     for ( var i = 0; i < arg.length; i++ ) {
         if ( arg[i] instanceof cArea || arg[i] instanceof cArea3D ) {
             var _arrVal = arg[i].getValue();
@@ -4027,7 +4027,7 @@ function cSUMSQ() {
 
 cSUMSQ.prototype = Object.create( cBaseFunction.prototype )
 cSUMSQ.prototype.Calculate = function ( arg ) {
-    var arg0 = new cNumber( 0 ), _aVal = null;
+    var arg0 = new cNumber( 0 );
 
     function sumsqHelper( a, b ) {
         var c = _func[b.type][b.type]( b, b, "*" );
