@@ -4294,8 +4294,13 @@ function DrawingObjects() {
                     }
                     worksheet._updateCellsRange({r1: 0, r2: Math.max(worksheet.nRowsCount - 1, max_r), c1: 0, c2: Math.max(worksheet.nColsCount - 1, max_c)});
                     _this.showDrawingObjects(false);
+                    _this.controller.selectObject(oNewChartSpace, 0);
+                    _this.sendGraphicObjectProps();
                     History.TurnOn();
-                    window["Asc"]["editor"].ImageLoader.LoadDocumentImages(aImagesSync, null, function(){_this.showDrawingObjects(true)});
+                    if(aImagesSync.length > 0)
+                    {
+                        window["Asc"]["editor"].ImageLoader.LoadDocumentImages(aImagesSync, null, function(){_this.showDrawingObjects(true)});
+                    }
                 });
 
 
