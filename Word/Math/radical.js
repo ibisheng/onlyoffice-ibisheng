@@ -947,12 +947,12 @@ CRadical.prototype.setProperties = function(props)
     if(props.degHide === true || props.degHide === 1)
     {
         this.Pr.degHide = true;
-        //this.Pr.type = SQUARE_RADICAL;
+        this.Pr.type = SQUARE_RADICAL;
     }
     else if(props.degHide == false || props.degHide === 0)
     {
         this.Pr.degHide = false;
-        //this.Pr.type = DEGREE_RADICAL;
+        this.Pr.type = DEGREE_RADICAL;
     }
 
     this.setCtrPrp(props.ctrPrp);
@@ -982,8 +982,8 @@ CRadical.prototype.fillMathComposition = function(props, contents /*array*/)
     this.Iterator = contents[0];
     this.Base     = contents[1];
 
-    if(this.Iterator != null && props.degHide == false)
-        this.Iterator.setArgSize(-2);
+    //if(this.Iterator != null && props.degHide == false)
+
 
     /*if(this.Pr.type == SQUARE_RADICAL)
         this.elements[0][0] = contents[0];
@@ -1023,7 +1023,6 @@ CRadical.prototype.Resize = function(Parent, ParaMath, oMeasure)
     {
         if(this.Pr.degHide == true)
         {
-            this.Pr.type = SQUARE_RADICAL;
             this.setDimension(1, 1);
 
             if(this.Iterator !== null)
@@ -1047,9 +1046,12 @@ CRadical.prototype.Resize = function(Parent, ParaMath, oMeasure)
         }
         else
         {
-            this.Pr.type == DEGREE_RADICAL;
+            this.setDimension(1, 2);
             this.elements[0][0] = this.Iterator;
             this.elements[0][1] = this.Base;
+
+            this.Iterator.setArgSize(-2);
+
             this.RealBase       = this.Base;
 
         }
