@@ -340,8 +340,8 @@ DrawingObjectsController.prototype.addChartDrawingObject = function(asc_chart, o
         chart.setStyle(2);
         chart.setBDeleted(false);
         this.resetSelection();
-        var chartLeft = this.drawingObjects.convertMetric(options && options.left ? ptToPx(options.left) : (parseInt($("#ws-canvas").css('width')) / 2) - c_oAscChartDefines.defaultChartWidth / 2, 0, 3);
-        var chartTop = this.drawingObjects.convertMetric(options && options.top ? ptToPx(options.top) : (parseInt($("#ws-canvas").css('height')) / 2) - c_oAscChartDefines.defaultChartHeight / 2, 0, 3);
+        var chartLeft = this.drawingObjects.convertMetric(options && options.left ? options.left : (this.drawingObjects.getContextWidth() / 2) - c_oAscChartDefines.defaultChartWidth / 2, 1, 3);
+        var chartTop = this.drawingObjects.convertMetric(options && options.top ? options.top : (this.drawingObjects.getContextHeight() / 2) - c_oAscChartDefines.defaultChartHeight / 2, 1, 3);
         var w, h;
         if(isRealObject(options) && isRealNumber(options.width) && isRealNumber(options.height))
         {

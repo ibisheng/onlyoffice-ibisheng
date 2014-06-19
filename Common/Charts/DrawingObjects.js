@@ -3352,6 +3352,13 @@ function DrawingObjects() {
         return worksheet;
     };
 
+	_this.getContextWidth = function () {
+		return drawingCtx.getWidth();
+	};
+	_this.getContextHeight = function () {
+		return drawingCtx.getHeight();
+	};
+
     _this.getWorksheetModel = function() {
         return worksheet.model;
     };
