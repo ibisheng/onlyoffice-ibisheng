@@ -2052,11 +2052,10 @@ Woorksheet.prototype.setName=function(name){
         var _lastName =  !rx_test_ws_name.test(lastName) ? "'" + lastName + "'" : lastName;
         var _newName = !rx_test_ws_name.test(this.sName) ? "'" + this.sName + "'" : this.sName;
 
-        var t = window["Asc"]["editor"];
-        for (var key in t.wb.model.aWorksheets)
+        for (var key in this.workbook.aWorksheets)
         {
-            var wsModel = t.wb.model.aWorksheets[key];
-            var ws = t.wb.getWorksheet(wsModel.index);
+            var wsModel = this.workbook.aWorksheets[key];
+            var ws = this.workbook.oApi.wb.getWorksheet(wsModel.index);
             if ( ws )
                 ws.objectRender.updateChartReferences(_lastName, _newName);
         }
