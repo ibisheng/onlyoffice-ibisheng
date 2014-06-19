@@ -579,24 +579,15 @@ CChartSpace.prototype =
 
     changeListName: function(val, oldName, newName)
     {
-        var _new_name;
-        if(!rx_test_ws_name.test(newName))
-        {
-            _new_name = "'" + newName + "'";
-        }
-        else
-        {
-            _new_name = newName;
-        }
         if(val)
         {
             if(val.numRef && typeof val.numRef.f === "string")
             {
-                val.numRef.setF(val.numRef.f.replace(new RegExp(oldName,'g'), _new_name));
+                val.numRef.setF(val.numRef.f.replace(new RegExp(oldName,'g'), newName));
             }
             if(val.strRef && typeof val.strRef.f === "string")
             {
-                val.strRef.setF(val.strRef.f.replace(new RegExp(oldName,'g'), _new_name));
+                val.strRef.setF(val.strRef.f.replace(new RegExp(oldName,'g'), newName));
             }
         }
     },
@@ -1527,16 +1518,9 @@ CChartSpace.prototype =
             var startCell = new CellAddress(r1, c1, 0);
             var endCell = new CellAddress(r2, c2, 0);
 
-            if (startCell && endCell && this.bbox.worksheet)
-            {
-                var wsName = this.bbox.worksheet.sName;
-                 if ( !rx_test_ws_name.test(wsName) )
-                     wsName = "'" + wsName + "'";
-
-                if (startCell.getID() == endCell.getID())
-                    ret.range = wsName + "!" + startCell.getID();
-                else
-                    ret.range = wsName + "!" + startCell.getID() + ":" + endCell.getID();
+            if (startCell && endCell && this.bbox.worksheet) {
+				ret.range = parserHelp.get3DRef(this.bbox.worksheet.sName, startCell.getID() === endCell.getID() ?
+					startCell.getID() : startCell.getID() + ':' + endCell.getID());
             }
         }
         return ret;

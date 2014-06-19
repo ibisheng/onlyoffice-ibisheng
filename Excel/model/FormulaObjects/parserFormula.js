@@ -907,14 +907,8 @@ cArea3D.prototype.toString = function () {
         wsTo = this._wb.getWorksheetById( this.wsTo ).getName(),
         name = Asc.g_oRangeCache.getActiveRange(this._cells);
         name = name && name.getName ? name.getName() : this._cells;
-    if ( rx_test_ws_name.test( wsFrom ) && rx_test_ws_name.test( wsTo ) ) {
-        return (wsFrom !== wsTo ? wsFrom + ":" + wsTo : wsFrom) + "!" + name;
-    }
-    else{
-        wsFrom = wsFrom.replace( /'/g, "''" );
-        wsTo = wsTo.replace( /'/g, "''" );
-        return "'" + (wsFrom !== wsTo ? wsFrom + ":" + wsTo : wsFrom) + "'!" + name;
-    }
+
+	return parserHelp.get3DRef(wsFrom !== wsTo ? wsFrom + ':' + wsTo : wsFrom, name);
 };
 cArea3D.prototype.tocNumber = function () {
     return this.getValue()[0].tocNumber();
@@ -1260,13 +1254,7 @@ cRef3D.prototype.changeSheet = function ( lastName, newName ) {
     }
 };
 cRef3D.prototype.toString = function () {
-    var wsName = this.ws.getName();
-    if ( rx_test_ws_name.test( wsName ) ) {
-        return wsName + "!" + this._cells;
-    }
-    else {
-        return "'" + wsName.replace( /'/g, "''" ) + "'" + "!" + this._cells;
-    }
+	return parserHelp.get3DRef(this.ws.getName(), this._cells);
 };
 cRef3D.prototype.getWS = function () {
     return this.ws;

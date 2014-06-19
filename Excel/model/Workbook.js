@@ -2040,7 +2040,7 @@ Woorksheet.prototype.setName=function(name){
 	if(name.length <= g_nSheetNameMaxLength)
 	{
 		var lastName = this.sName;
-			this.sName = name;
+		this.sName = name;
 		History.Create_NewPoint();
 		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_Rename, this.getId(), null, new UndoRedoData_FromTo(lastName, name));
 
@@ -2049,8 +2049,8 @@ Woorksheet.prototype.setName=function(name){
 			this.workbook.getWorksheetById(id)._ReBuildFormulas(this.workbook.cwf[id].cells,lastName,this.sName);
 		}
 
-        var _lastName =  !rx_test_ws_name.test(lastName) ? "'" + lastName + "'" : lastName;
-        var _newName = !rx_test_ws_name.test(this.sName) ? "'" + this.sName + "'" : this.sName;
+        var _lastName = parserHelp.getEscapeSheetName(lastName);
+        var _newName = parserHelp.getEscapeSheetName(this.sName);
 
         for (var key in this.workbook.aWorksheets)
         {
@@ -7945,13 +7945,9 @@ NameGenerator.prototype = {
 		this.addName(oDefinedName.Name);
 	},
 	addTableName : function(sName, ws, Ref){
-		var sDefinedNameRef = ws.getName();
-		if(false == rx_test_ws_name.test(sDefinedNameRef))
-			sDefinedNameRef = "'" + sDefinedNameRef + "'";
-		sDefinedNameRef += "!" + Ref;
 		var oNewDefinedName = new DefinedName();
 		oNewDefinedName.Name = sName;
-		oNewDefinedName.Ref = sDefinedNameRef;
+		oNewDefinedName.Ref = parserHelp.get3DRef(ws.getName(), Ref);
 		oNewDefinedName.bTable = true;
 		this.addDefinedName(oNewDefinedName);
 	},

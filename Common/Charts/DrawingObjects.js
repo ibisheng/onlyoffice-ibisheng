@@ -452,6 +452,7 @@ asc_CChart.prototype = {
         var bbox = _t.range.intervalObject.getBBox0();
         var nameIndex = 1;
         var api = window["Asc"]["editor"];
+		var ws = _t.range.intervalObject.worksheet;
 
         // Save old series colors
         var oldSeriaData = [];
@@ -468,26 +469,26 @@ asc_CChart.prototype = {
 
             if ( c1 == c2 ) {		// vertical cache
                 for (var row = r1; row <= r2; row++) {
-                    var cell = _t.range.intervalObject.worksheet.getCell( new CellAddress(row, c1, 0) );
+                    var cell = ws.getCell( new CellAddress(row, c1, 0) );
 
                     var item = {};
                     item.numFormatStr = cell.getNumFormatStr();
                     item.isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
                     item.val = cell.getValue();
-                    item.isHidden = (_t.range.intervalObject.worksheet._getCol(c1).hd === true) || (_t.range.intervalObject.worksheet._getRow(row).hd === true);
+                    item.isHidden = (ws._getCol(c1).hd === true) || (ws._getRow(row).hd === true);
 
                     cache.push(item);
                 }
             }
             else /*r1 == r2*/ {		// horizontal cache
                 for (var col = c1; col <= c2; col++) {
-                    var cell = _t.range.intervalObject.worksheet.getCell( new CellAddress(r1, col, 0) );
+                    var cell = ws.getCell( new CellAddress(r1, col, 0) );
 
                     var item = {};
                     item.numFormatStr = cell.getNumFormatStr();
                     item.isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
                     item.val = cell.getValue();
-                    item.isHidden = (_t.range.intervalObject.worksheet._getCol(col).hd === true) || (_t.range.intervalObject.worksheet._getRow(r1).hd === true);
+                    item.isHidden = (ws._getCol(col).hd === true) || (ws._getRow(r1).hd === true);
 
                     cache.push(item);
                 }
@@ -532,26 +533,20 @@ asc_CChart.prototype = {
                 var startCell = new CellAddress(i, data_bbox.c1, 0);
                 var endCell = new CellAddress(i, data_bbox.c2, 0);
 
-                if ( _t.range.intervalObject.worksheet._getRow(i).hd === true )
+                if (ws._getRow(i).hd === true)
                     ser.isHidden = true;
 
                 // Val
                 if (startCell && endCell) {
-                    if (startCell.getID() == endCell.getID())
-                        ser.Val.Formula =  ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
-                            + "!" + startCell.getID();
-                    else {
-                        ser.Val.Formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
-                            + "!" + startCell.getID() + ":" + endCell.getID();
-                    }
+					ser.Val.Formula = parserHelp.get3DRef(ws.sName, startCell.getID() === endCell.getID() ?
+						startCell.getID() : startCell.getID() + ':' + endCell.getID());
                 }
                 ser.Val.NumCache = getNumCache(data_bbox.c1, data_bbox.c2, i, i);
 
                 if(left_header_bbox)
                 {
                     var formulaCell = new CellAddress( i, left_header_bbox.c1, 0 );
-                    ser.TxCache.Formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
-                        + "!" + formulaCell.getID();
+					ser.TxCache.Formula = parserHelp.get3DRef(ws.sName, formulaCell.getID());
                 }
                 // xVal
 
@@ -560,8 +555,7 @@ asc_CChart.prototype = {
                     var start = new CellAddress(top_header_bbox.r1, top_header_bbox.c1, 0);
                     var end = new CellAddress(top_header_bbox.r1, top_header_bbox.c2, 0);
 
-                    var formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
-                        + "!" + start.getID() + ":" + end.getID();
+					var formula = parserHelp.get3DRef(ws.sName, start.getID() + ':' + end.getID());
                     var numCache = getNumCache(top_header_bbox.c1, top_header_bbox.c2, top_header_bbox.r1, top_header_bbox.r1 );
 
                     if ( _t.type == c_oAscChartType.scatter )
@@ -576,7 +570,7 @@ asc_CChart.prototype = {
                     }
                 }
 
-                var seriaName = left_header_bbox ? ( _t.range.intervalObject.worksheet.getCell(new CellAddress(i, left_header_bbox.c1, 0)).getValue() ) : (api.chartTranslate.series + " " + nameIndex);
+                var seriaName = left_header_bbox ? (ws.getCell(new CellAddress(i, left_header_bbox.c1, 0)).getValue()) : (api.chartTranslate.series + " " + nameIndex);
                 ser.TxCache.Tx = seriaName;
                 _t.series.push(ser);
                 nameIndex++;
@@ -609,17 +603,15 @@ asc_CChart.prototype = {
                 var startCell = new CellAddress(data_bbox.r1, i, 0);
                 var endCell = new CellAddress(data_bbox.r2, i, 0);
 
-                if ( _t.range.intervalObject.worksheet._getCol(i).hd === true )
+                if (ws._getCol(i).hd === true)
                     ser.isHidden = true;
 
                 // Val
                 if (startCell && endCell) {
                     if (startCell.getID() == endCell.getID())
                         ser.Val.Formula = startCell.getID();
-                    else {
-                        ser.Val.Formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
-                            + "!" + startCell.getID() + ":" + endCell.getID();
-                    }
+                    else
+						ser.Val.Formula = parserHelp.get3DRef(ws.sName, startCell.getID() + ':' + endCell.getID());
                 }
                 ser.Val.NumCache = getNumCache(i, i, data_bbox.r1, bbox.r2);
 
@@ -629,8 +621,7 @@ asc_CChart.prototype = {
                     var start = new CellAddress(left_header_bbox.r1, left_header_bbox.c1, 0);
                     var end = new CellAddress(left_header_bbox.r2, left_header_bbox.c1, 0);
 
-                    var formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
-                        + "!" + start.getID() + ":" + end.getID();
+                    var formula = parserHelp.get3DRef(ws.sName, start.getID() + ':' + end.getID());
                     var numCache = getNumCache( left_header_bbox.c1, left_header_bbox.c1, left_header_bbox.r1, left_header_bbox.r2 );
 
                     if ( _t.type == c_oAscChartType.scatter ) {
@@ -646,11 +637,10 @@ asc_CChart.prototype = {
                 if (top_header_bbox)
                 {
                     var formulaCell = new CellAddress( top_header_bbox.r1, i, 0 );
-                    ser.TxCache.Formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
-                        + "!" + formulaCell.getID();
+                    ser.TxCache.Formula = parserHelp.get3DRef(ws.sName, formulaCell.getID());
                 }
 
-                var seriaName = top_header_bbox ? ( _t.range.intervalObject.worksheet.getCell(new CellAddress(top_header_bbox.r1, i, 0)).getValue() ) : (api.chartTranslate.series + " " + nameIndex);
+                var seriaName = top_header_bbox ? (ws.getCell(new CellAddress(top_header_bbox.r1, i, 0)).getValue()) : (api.chartTranslate.series + " " + nameIndex);
                 ser.TxCache.Tx = seriaName;
                 _t.series.push(ser);
                 nameIndex++;
@@ -4817,14 +4807,9 @@ function DrawingObjects() {
 
                     if (startCell && endCell)
                     {
-                        var wsName = worksheet.model.sName;
-                        if ( !rx_test_ws_name.test(wsName) )
-                            wsName = "'" + wsName + "'";
-
-                        if (startCell.getID() == endCell.getID())
-                            asc_chart.range.interval = wsName + "!" + startCell.getID();
-                        else
-                            asc_chart.range.interval = wsName + "!" + startCell.getID() + ":" + endCell.getID();
+						asc_chart.range.interval = parserHelp.get3DRef(worksheet.model.sName,
+								startCell.getID() === endCell.getID() ? startCell.getID() :
+									startCell.getID() + ':' + endCell.getID());
                     }
                     asc_chart.worksheet = worksheet;
                     _this.intervalToIntervalObject(asc_chart);
@@ -4873,17 +4858,9 @@ function DrawingObjects() {
         var startCell = new CellAddress(box.r1, box.c1, 0);
         var endCell = new CellAddress(box.r2, box.c2, 0);
 
-        if (startCell && endCell) {
-
-            if (startCell.getID() == endCell.getID())
-                return startCell.getID();
-            else {
-                if ( !rx_test_ws_name.test(wsName) )
-                    wsName = "'" + wsName + "'";
-
-                return wsName + "!" + startCell.getID() + ":" + endCell.getID();
-            }
-        }
+        if (startCell && endCell)
+			return startCell.getID() === endCell.getID() ? startCell.getID() :
+				parserHelp.get3DRef(wsName, startCell.getID() + ':' + endCell.getID());
         return "";
     };
 
@@ -5401,14 +5378,8 @@ function DrawingObjects() {
                             var endCell = new CellAddress(box.r2, box.c2, 0);
 
                             if (startCell && endCell) {
-                                var wsName = worksheet.model.sName;
-                                if ( !rx_test_ws_name.test(wsName) )
-                                    wsName = "'" + wsName + "'";
-
-                                if (startCell.getID() == endCell.getID())
-                                    result = wsName + "!" + startCell.getID();
-                                else
-                                    result = wsName + "!" + startCell.getID() + ":" + endCell.getID();
+		 						result = parserHelp.get3DRef(worksheet.model.sName, startCell.getID() === endCell.getID() ?
+		 							startCell.getID() : startCell.getID() + ':' + endCell.getID());
                             }
                         }
                     }
@@ -5443,13 +5414,8 @@ function DrawingObjects() {
                 var endCell = new CellAddress(box.r2, box.c2, 0);
                 if (startCell && endCell)
                 {
-                    var wsName = worksheet.model.sName;
-                    if ( !rx_test_ws_name.test(wsName) )
-                        wsName = "'" + wsName + "'";
-                    if (startCell.getID() == endCell.getID())
-                        range = wsName + "!" + startCell.getID();
-                    else
-                        range = wsName + "!" + startCell.getID() + ":" + endCell.getID();
+					range = parserHelp.get3DRef(worksheet.model.sName, startCell.getID() === endCell.getID() ?
+						startCell.getID() : startCell.getID() + ':' + endCell.getID());
                 }
             }
             settings.putRange(range);

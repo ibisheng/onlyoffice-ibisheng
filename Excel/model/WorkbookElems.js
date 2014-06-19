@@ -2054,10 +2054,8 @@ Hyperlink.prototype = {
 		this.bUpdateLocation = false;
 		if (null === this.LocationSheet || null === this.LocationRange)
 			this.Location = null;
-		else {
-			this.Location = (false == rx_test_ws_name.test(this.LocationSheet)) ? "'" + this.LocationSheet + "'" : this.LocationSheet;
-			this.Location += "!" + this.LocationRange;
-		}
+		else
+			this.Location = parserHelp.get3DRef(this.LocationSheet, this.LocationRange);
 	},
 	setVisited : function (bVisited) {
 		this.bVisited = bVisited;
@@ -2078,13 +2076,7 @@ Hyperlink.prototype = {
 	},
 	getProperty : function (nType) {
 		switch (nType) {
-			case this.Properties.Ref:
-				var sRes = this.Ref.worksheet.getName();
-				if(false == rx_test_ws_name.test(sRes))
-					sRes = "'" + sRes + "'";
-				sRes += "!" + this.Ref.getName();
-				return sRes;
-				break;
+			case this.Properties.Ref: return parserHelp.get3DRef(this.Ref.worksheet.getName(), this.Ref.getName()); break;
 			case this.Properties.Location: return this.getLocation();break;
 			case this.Properties.Hyperlink: return this.Hyperlink;break;
 			case this.Properties.Tooltip: return this.Tooltip;break;

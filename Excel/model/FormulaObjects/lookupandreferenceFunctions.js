@@ -126,31 +126,21 @@ cADDRESS.prototype.Calculate = function ( arg ) {
             break;
     }
 
-    if ( sheetName instanceof cEmpty ) {
-        return this.value = new cString( strRef );
-    }
-    else {
-        if ( !rx_test_ws_name.test( sheetName.toString() ) ) {
-            return this.value = new cString( "'" + sheetName.toString().replace( /'/g, "''" ) + "'" + "!" + strRef );
-        }
-        else {
-            return this.value = new cString( sheetName.toString() + "!" + strRef );
-        }
-    }
-
-}
+	return this.value = new cString((sheetName instanceof cEmpty) ? strRef :
+		parserHelp.get3DRef(sheetName.toString(), strRef));
+};
 cADDRESS.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( row-number , col-number [ , [ ref-type ] [ , [ A1-ref-style-flag ] [ , sheet-name ] ] ] )"
     };
-}
+};
 
 function cAREAS() {
     cBaseFunction.call( this, "AREAS" );
 }
 
-cAREAS.prototype = Object.create( cBaseFunction.prototype )
+cAREAS.prototype = Object.create( cBaseFunction.prototype );
 
 function cCHOOSE() {
 //    cBaseFunction.call( this, "CHOOSE" );

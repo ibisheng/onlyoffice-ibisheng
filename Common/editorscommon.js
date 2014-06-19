@@ -15,6 +15,9 @@ function fSortDescending( a, b ) {
     return b - a;
 }
 
+/**
+ * @constructor
+ */
 function test_ws_name() {
     var self = new XRegExp( "[^\\p{L}(\\p{L}\\d._)*]" );
     self.regexp_letter = new XRegExp( "^\\p{L}[\\p{L}\\d.]*$" );
@@ -244,7 +247,10 @@ var rx_operators = /^ *[-+*\/^&%<=>:] */,
     rg_complex_number = new XRegExp( "^(?<real>[-+]?(?:\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?))?(?<img>([-+]?(\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?)?[ij])?)", "g" )
 
 
-//вспомогательный объект для парсинга формул и проверки строки по регуляркам указанным выше.
+/**
+ * вспомогательный объект для парсинга формул и проверки строки по регуляркам указанным выше.
+ * @constructor
+ */
 function parserHelper() {
 }
 parserHelper.prototype = {
@@ -258,12 +264,12 @@ parserHelper.prototype = {
             this._reset();
         }
 
-        var str = formula.substring( start_pos )
+        var str = formula.substring( start_pos );
         var match = str.match( rx_operators );
         if ( match == null || match == undefined )
             return false;
         else {
-            var mt = str.match( rx_LG )
+            var mt = str.match( rx_LG );
             if ( mt ) match = mt;
             this.operand_str = match[0].replace( rx_space_g, "" );
             this.pCurrPos += match[0].length;
@@ -568,6 +574,17 @@ parserHelper.prototype = {
         }
         // Возвращаем ошибку
         return null;
-    }
+    },
+
+	// Возвращает ссылку на диапазон с листом (название листа экранируется)
+	get3DRef: function (sheet, range) {
+		var result = rx_test_ws_name.test(sheet) ? sheet : "'" + sheet.replace(/'/g, "''") + "'";
+		return result + '!' + range;
+	},
+
+	// Возвращает экранируемое название листа
+	getEscapeSheetName: function (sheet) {
+		return rx_test_ws_name.test(sheet) ? sheet : "'" + sheet.replace(/'/g, "''") + "'";
+	}
 };
 var parserHelp = new parserHelper();
