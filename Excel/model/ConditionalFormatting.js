@@ -234,7 +234,7 @@
 		this.b2 = this.c2.getB();
 	};
 	CGradient.prototype.calculateColor = function (indexColor) {
-		indexColor = parseInt((indexColor - this.min) * this.koef);
+		indexColor = ((indexColor - this.min) * this.koef) >> 0;
 
 		var r = (this.r1 + ((FT_Common.IntToUInt(this.r2 - this.r1) * indexColor) >> this.base_shift)) & 0xFF;
 		var g = (this.g1 + ((FT_Common.IntToUInt(this.g2 - this.g1) * indexColor) >> this.base_shift)) & 0xFF;

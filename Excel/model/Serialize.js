@@ -6477,7 +6477,7 @@
                     dst_len += String.fromCharCode(_c);
             }
 
-            var dstLen = parseInt(dst_len);
+            var dstLen = dst_len >> 0;
             var pointer = g_memory.Alloc(dstLen);
             var stream = new FT_Stream2(pointer.data, dstLen);
             stream.obj = pointer.obj;

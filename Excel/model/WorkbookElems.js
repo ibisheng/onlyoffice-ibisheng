@@ -291,7 +291,7 @@ function CorrectAscColor(asc_color)
 		case c_oAscColor.COLOR_TYPE_SCHEME:
 		{
 			// тут выставляется ТОЛЬКО из меню. поэтому:
-			var _index = parseInt(asc_color.get_value());
+			var _index = asc_color.get_value() >> 0;
 			var _id = (_index / 6) >> 0;
 			var _pos = _index - _id * 6;
 			var basecolor = g_oColorManager.getThemeColor(_id);
