@@ -1664,8 +1664,8 @@
 			}
 		};
 
-		WorkbookView.prototype.setSelectionDialogMode = function (isSelectionDialogMode, selectRange) {
-			this.getWorksheet().setSelectionDialogMode(isSelectionDialogMode, selectRange);
+		WorkbookView.prototype.setSelectionDialogMode = function (selectionDialogType, selectRange) {
+			this.getWorksheet().setSelectionDialogMode(selectionDialogType, selectRange);
 		};
 
 		WorkbookView.prototype._cleanFindResults = function () {

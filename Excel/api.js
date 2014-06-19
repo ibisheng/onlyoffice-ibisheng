@@ -3051,13 +3051,13 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			/**
 			 * Режим выбора диапазона
-			 * @param {Boolean} isSelectionDialogMode
+			 * @param {c_oAscSelectionDialogType} selectionDialogType
 			 * @param selectRange
 			 */
-			asc_setSelectionDialogMode: function (isSelectionDialogMode, selectRange) {
-				this.controller.setSelectionDialogMode(isSelectionDialogMode);
+			asc_setSelectionDialogMode: function (selectionDialogType, selectRange) {
+				this.controller.setSelectionDialogMode(c_oAscSelectionDialogType.None !== selectionDialogType);
 				if (this.wb)
-					this.wb.setSelectionDialogMode(isSelectionDialogMode, selectRange);
+					this.wb.setSelectionDialogMode(selectionDialogType, selectRange);
 			},
 
 			asc_SendThemeColors : function (colors, standart_colors) {

@@ -433,6 +433,7 @@
 
 			this.isFormatPainter = false;
 
+			this.selectionDialogType = c_oAscSelectionDialogType.None;
 			this.isSelectionDialogMode = false;
 			this.copyOfActiveRange = null;
 
@@ -10214,10 +10215,11 @@
 			return this.isFormulaEditMode;
 		};
 
-		WorksheetView.prototype.setSelectionDialogMode = function (isSelectionDialogMode, selectRange) {
-			if (isSelectionDialogMode === this.isSelectionDialogMode)
+		WorksheetView.prototype.setSelectionDialogMode = function (selectionDialogType, selectRange) {
+			if (selectionDialogType === this.selectionDialogType)
 				return;
-			this.isSelectionDialogMode = isSelectionDialogMode;
+			this.selectionDialogType = selectionDialogType;
+			this.isSelectionDialogMode = c_oAscSelectionDialogType.None !== this.selectionDialogType;
 			this.cleanSelection();
 
 			if (false === this.isSelectionDialogMode) {

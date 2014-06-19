@@ -182,6 +182,12 @@ var c_oAscSelectionType = {
 	RangeFrozen		: 10
 };
 
+var c_oAscSelectionDialogType = {
+	None		: 0,
+	FormatTable	: 1,
+	Chart		: 2
+};
+
 var c_oAscGraphicOption = {
 	ScrollVertical			: 1,
 	ScrollHorizontal		: 2,
