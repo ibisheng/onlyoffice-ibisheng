@@ -390,7 +390,7 @@ CDocumentContent.prototype =
             this.Selection.EndPos   = ContentPos;
         }
 
-        this.Parent.Set_CurrentElement(bUpdateStates);
+        this.Parent.Set_CurrentElement(bUpdateStates, this.Get_StartPage_Absolute());
     },
 
     Is_ThisElementCurrent : function()
