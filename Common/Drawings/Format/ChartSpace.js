@@ -1182,8 +1182,8 @@ CChartSpace.prototype =
             if(vert_axis && vert_axis.title)
             {
                 vert_axis.title.recalcInfo.recalculateContent = true;
-                hor_axis.title.recalcInfo.recalculateTransform = true;
-                hor_axis.title.recalcInfo.recalculateTransformText = true;
+                vert_axis.title.recalcInfo.recalculateTransform = true;
+                vert_axis.title.recalcInfo.recalculateTransformText = true;
             }
         }
     },
