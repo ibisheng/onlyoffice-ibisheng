@@ -342,7 +342,7 @@ DrawingObjectsController.prototype =
                 selector.selectObject(object, pageIndex);
                 if(!is_selected)
                     this.updateOverlay();
-                this.checkSelectedObjectsForMove(group);
+                this.checkSelectedObjectsForMove(group, pageIndex);
                 if(!isRealObject(group))
                 {
                     this.resetInternalSelection();
@@ -427,12 +427,13 @@ DrawingObjectsController.prototype =
     },
 
 
-    checkSelectedObjectsForMove: function(group)
+    checkSelectedObjectsForMove: function(group, pageIndex)
     {
         var selected_object = group ? group.selectedObjects : this.selectedObjects;
+        var b_check_page = isRealNumber(pageIndex);
         for(var i = 0; i < selected_object.length; ++i)
         {
-            if(selected_object[i].canMove())
+            if(selected_object[i].canMove() && (!b_check_page || selected_object[i].selectStartPage === pageIndex))
             {
                 this.arrPreTrackObjects.push(selected_object[i].createMoveTrack());
             }
