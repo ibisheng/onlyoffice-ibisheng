@@ -922,7 +922,7 @@ CGraphicObjects.prototype =
         arr = page.wrappingObjects.concat(page.behindDocObjects.concat(page.beforeTextObjects));
         for(i = 0; i < arr.length; ++i)
         {
-            if(arr[i].parent.DocumentContent === docContent)
+            if(arr[i].parent && arr[i].parent.DocumentContent === docContent)
             {
                 ret.push(arr[i].parent);
             }
