@@ -524,7 +524,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						"userid"	: this.DocInfo["UserId"],
 						"format"	: this.DocInfo["Format"],
 						"vkey"		: this.DocInfo["VKey"],
-						"editorid"	: c_oEditorId.Speadsheet
+						"editorid"	: c_oEditorId.Spreadsheet
 					};
 					this._asc_sendCommand(function (response) {t._onGetEditorPermissions(response);}, rdata);
 				} else {
@@ -743,7 +743,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 							"userid": this.documentUserId,
 							"format": this.documentFormat,
 							"vkey": this.documentVKey,
-							"editorid": c_oEditorId.Speadsheet,
+							"editorid": c_oEditorId.Spreadsheet,
 							"c":"reopen",
 							"url": this.documentUrl,
 							"title": this.documentTitle,
@@ -1011,7 +1011,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						"userid"		: this.documentUserId,
                         "format"        : this.documentFormat,
                         "vkey"          : this.documentVKey,
-                        "editorid"      : c_oEditorId.Speadsheet,
+                        "editorid"      : c_oEditorId.Spreadsheet,
                         "url"           : this.documentUrl,
                         "title"         : this.documentTitle,
                         "embeddedfonts" : this.isUseEmbeddedCutFonts
@@ -1662,7 +1662,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.CoAuthoringApi.init(t.User, t.documentId, 'fghhfgsjdgfjs', window.location.hostname,
 					window.location.port, g_sMainServiceLocalUrl, function(){
 
-				}, c_oEditorId.Speadsheet, t.documentFormatSave, t.asc_getViewerMode());
+				}, c_oEditorId.Spreadsheet, t.documentFormatSave, t.asc_getViewerMode());
 			},
 
 			// Set CoAuthoring server url

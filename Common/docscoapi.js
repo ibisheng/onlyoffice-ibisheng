@@ -809,7 +809,7 @@
 		this._serverPort = serverPort ? serverPort : '';
 		this._serverPath = serverPath;
 		this.sockjs_url = this._url + '/doc/'+docid+'/c';
-		this._isExcel = c_oEditorId.Speadsheet === editorType;
+		this._isExcel = c_oEditorId.Spreadsheet === editorType;
 		this._isPresentation = c_oEditorId.Presentation === editorType;
 		this._isAuth = false;
 		this._documentFormatSave = documentFormatSave;

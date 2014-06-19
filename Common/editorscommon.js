@@ -74,7 +74,7 @@ function test_ws_name() {
 
 var c_oEditorId = {
     Word:0,
-    Speadsheet:1,
+    Spreadsheet:1,
     Presentation:2
 };
 
