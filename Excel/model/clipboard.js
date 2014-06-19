@@ -1757,13 +1757,75 @@
 				//parse HTML
 				aResult = this._parseHtml(pasteFragment, node, worksheet, isText);
 				
+				this._correctImageUrl(aResult, worksheet);
+            },
+			
+			_correctImageUrl: function (aResult, worksheet)
+			{
+				var api = asc["editor"];
+				var aImagesToDownload = [];
+				var t = this;
+				var addImages = aResult.addImages ? aResult.addImages : [];
+				
+				for(var k = 0; k < addImages.length; k++)
+				{
+					var src = addImages[k].tag.src;
+					//TODO просмотреть для локальных ссылок
+					/*if(0 == src.indexOf("file:"))
+						this.oImages[image] = "local";
+					else*/ 
+					if(false == (0 == src.indexOf("data:") || 0 == src.indexOf(api.documentUrl) || 0 == src.indexOf(api.documentUrl)))
+						aImagesToDownload.push(src);
+				};
+				
+				if(aImagesToDownload.length > 0)
+				{
+					var rData = {"id": api.documentId, "c":"imgurls", "vkey": api.documentVKey, "data": JSON.stringify(aImagesToDownload)};
+					
+					api._asc_sendCommand(function(incomeObject){
+							if(incomeObject && "imgurls" == incomeObject.type)
+							{
+								var oFromTo = JSON.parse(incomeObject.data);
+								var nC, height, width;
+								
+								for(var i = 0, length = addImages.length; i < length; ++i)
+								{	
+									var sTo = oFromTo[aResult.addImages[i].tag.src];
+									
+									if(sTo)
+									{									
+										if(aResult.addImages[i])
+										{
+											height = aResult.addImages[i].tag.height;
+											width = aResult.addImages[i].tag.width;
+											aResult.addImages[i].tag = 
+											{
+												height: height,
+												width: width, 
+												src: sTo
+											};	
+										}																
+									};						
+								};
+							};
+							
+							t._pasteResult(aResult, worksheet);
+							
+						}, rData );
+				}
+				else
+					t._pasteResult(aResult, worksheet);
+			},
+			
+			_pasteResult: function(aResult, worksheet)
+			{
 				//insert into document content
 				if(aResult && !(aResult.onlyImages && window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
-					worksheet.setSelectionInfo('paste',aResult,t);
+					worksheet.setSelectionInfo('paste',aResult,this);
 				
 				window.GlobalPasteFlagCounter = 0;
 				window.GlobalPasteFlag = false;
-            },
+			},
 			
 			_parseHtml: function(pasteFragment, node, worksheet, isText)
 			{
