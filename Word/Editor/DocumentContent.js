@@ -3858,6 +3858,8 @@ CDocumentContent.prototype =
 
         if ( -1 === DstIndex )
             return;
+        
+        var bNeedSelect = true;
 
         var FirstElement = SelectedContent.Elements[0];
         if ( 1 === ElementsCount && true !== FirstElement.SelectedAll && type_Paragraph === FirstElement.Element.GetType() )
@@ -3882,7 +3884,7 @@ CDocumentContent.prototype =
 
             // TODO: Заглушка для переноса автофигур и картинок. Когда разрулим ситуацию так, чтобы когда у нас 
             //       в текста была выделена автофигура выделение шло для автофигур, тогда здесь можно будет убрать.
-            var bNeedSelect = (docpostype_DrawingObjects !== this.CurPos.Type && ( null === this.LogicDocument || docpostype_DrawingObjects !== this.LogicDocument.CurPos.Type ) ? true : false);
+            bNeedSelect = (docpostype_DrawingObjects !== this.CurPos.Type && ( null === this.LogicDocument || docpostype_DrawingObjects !== this.LogicDocument.CurPos.Type ) ? true : false);
 
             for ( var Index = 0; Index < NewElementsCount; Index++ )
             {
@@ -3999,7 +4001,8 @@ CDocumentContent.prototype =
             this.Selection.EndPos   = DstIndex + ElementsCount - 1;
         }
 
-        this.Parent.Set_CurrentElement(false, this.Get_StartPage_Absolute());
+        if ( true === bNeedSelect )
+            this.Parent.Set_CurrentElement(false, this.Get_StartPage_Absolute());
     },
 
     Set_ParagraphAlign : function(Align)

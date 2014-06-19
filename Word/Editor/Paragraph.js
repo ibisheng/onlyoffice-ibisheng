@@ -9312,10 +9312,12 @@ Paragraph.prototype =
             
             if ( undefined !== FramePr.Wrap )
             {
-                if ( true !== FramePr.Wrap )
+                if ( false === FramePr.Wrap )
                     NewFramePr.Wrap = wrap_NotBeside;
-                else
+                else if ( true === FramePr.Wrap )
                     NewFramePr.Wrap = wrap_Around;
+                else
+                    NewFramePr.Wrap = FramePr.Wrap;
             }
 
             this.Pr.FramePr = NewFramePr;
