@@ -35,7 +35,7 @@ function CMathBase()
     // убрать !!!
     this.bMObjs = false;
 
-    this.elements = null;
+    this.elements = new Array();
 
     this.dW = 0; //column gap, gap width
     this.dH = 0; //row gap, gap height
@@ -62,8 +62,6 @@ CMathBase.prototype =
     constructor: CMathBase,
     setContent: function()
     {
-        this.elements = [];
-
         for(var i=0; i < this.nRow; i++)
         {
             this.elements[i] = [];
@@ -93,7 +91,11 @@ CMathBase.prototype =
             this.alignment.wdt[i] = MCJC_CENTER;
 
         for(var j=0; j < this.nRow; j++)
+        {
+            this.elements[j] = new Array();
             this.alignment.hgt[j] = MCJC_CENTER;
+        }
+
     },
     ///////// RunPrp, CtrPrp
     setCtrPrp: function(txtPrp) // выставляем ctrPrp на чтение
@@ -1185,8 +1187,7 @@ CMathBase.prototype =
                 bUpperLevel = true;
                 break;
             }
-        } while( this.elements[this.CurPos_X][this.CurPos_Y].IsJustDraw() )
-            ;
+        } while( this.elements[this.CurPos_X][this.CurPos_Y].IsJustDraw() );
 
         var SelectContent;
         if( bUpperLevel )
@@ -1260,6 +1261,10 @@ CMathBase.prototype =
         //
         // Word
         // в случае, если в xml отсутствуют элементы в контенте, то выставляются плейсхолдеры
+
+
+        /*if(this.Parent.constructor.name == "CRadical")
+            console.log("X : " + disp.pos.x + ", " + " Y : " + disp.pos.y);*/
 
         var pos = disp.pos;
 

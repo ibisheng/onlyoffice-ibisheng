@@ -853,7 +853,7 @@ function CMathContent()
     {
         width: 0,
         height: 0,
-        center: 0
+        ascent: 0
     };
 
 	

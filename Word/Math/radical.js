@@ -256,10 +256,9 @@ CSignRadical.prototype.draw = function(x, y, pGraphics)
 
 
 }
-CSignRadical.prototype.recalculateSize = function()
+CSignRadical.prototype.recalculateSize = function(oMeasure, sizeArg)
 {
     var txtPrp = this.Parent.Get_CompiledCtrPrp();
-    var sizeArg = this.Parent.getBase().size;
 
     var height, width;
     var plH = 9.877777777777776 * txtPrp.FontSize/36;
@@ -888,16 +887,19 @@ function CRadical(props)
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_RADICAL;
 
+    this.Iterator = null;
+    this.Base     = null;
+
+    this.RealBase = null;
+
+    this.signRadical = new CSignRadical();
+    this.signRadical.relate(this);
+
     this.Pr =
     {
         type:       DEGREE_RADICAL,
         degHide:    false
     };
-
-    //this.type = DEGREE_RADICAL; // default
-    //this.degHide = false;
-
-    this.signRadical = null;
 
     this.gapDegree = 0;
     this.gapWidth = 0; //  в случае со степенью, если ширина степени не нулевая, добавляется расстояние для ширины
@@ -914,7 +916,28 @@ extend(CRadical, CMathBase);
 CRadical.prototype.init = function(props)
 {
     this.setProperties(props);
-    this.fillContent();
+
+
+    /////
+    //TEST
+    /*var contents = new Array();
+
+    if(props.degHide)
+    {
+        contents.push(new CMathContent());
+        contents.push(new CMathContent());
+    }
+    else
+    {
+        contents.push(new CMathContent());
+        contents.push(new CMathContent());
+    }
+
+    this.fillMathComposition(props, contents);*/
+    //
+    /////
+
+    //this.fillContent();
 }
 CRadical.prototype.setProperties = function(props)
 {
@@ -924,21 +947,18 @@ CRadical.prototype.setProperties = function(props)
     if(props.degHide === true || props.degHide === 1)
     {
         this.Pr.degHide = true;
-        this.Pr.type = SQUARE_RADICAL;
+        //this.Pr.type = SQUARE_RADICAL;
     }
     else if(props.degHide == false || props.degHide === 0)
     {
         this.Pr.degHide = false;
-        this.Pr.type = DEGREE_RADICAL;
+        //this.Pr.type = DEGREE_RADICAL;
     }
 
     this.setCtrPrp(props.ctrPrp);
 }
 CRadical.prototype.fillContent = function()
 {
-    this.signRadical = new CSignRadical();
-    this.signRadical.relate(this);
-
     if(this.Pr.type == SQUARE_RADICAL)
     {
         this.setDimension(1, 1);
@@ -959,39 +979,111 @@ CRadical.prototype.fillMathComposition = function(props, contents /*array*/)
     this.setProperties(props);
     this.fillContent();
 
-    if(this.Pr.type == SQUARE_RADICAL)
+    this.Iterator = contents[0];
+    this.Base     = contents[1];
+
+    if(this.Iterator != null && props.degHide == false)
+        this.Iterator.setArgSize(-2);
+
+    /*if(this.Pr.type == SQUARE_RADICAL)
         this.elements[0][0] = contents[0];
     else if(this.Pr.type == DEGREE_RADICAL)
         this.elements[0][1] = contents[0];
 
     if(this.Pr.degHide == false)
-        this.elements[0][0] = contents[1];
+        this.elements[0][0] = contents[1];*/
 }
-CRadical.prototype.recalculateSize = function(oMeasure)
+CRadical.prototype.Recalculate_Reset = function(StartRange, StartLine)
 {
-    this.signRadical.recalculateSize(oMeasure);
+    if(this.Iterator != null)
+        this.Iterator.Recalculate_Reset(StartRange, StartLine);
+
+    this.Base.Recalculate_Reset(StartRange, StartLine);
+
+    if(this.RealBase != null)
+        this.RealBase.Recalculate_Reset(StartRange, StartLine);
+
+}
+CRadical.prototype.Resize = function(Parent, ParaMath, oMeasure)
+{
+    this.Parent = Parent;
+    this.ParaMath = ParaMath;
+
+    if(this.RecalcInfo.bCtrPrp == true)
+    {
+        this.Set_CompiledCtrPrp();
+        this.RecalcInfo.bCtrPrp = false;
+    }
+
+    //var base, degr;
+    var shTop,
+        height, width, ascent;
+
+    if(this.RecalcInfo.bProps)
+    {
+        if(this.Pr.degHide == true)
+        {
+            this.Pr.type = SQUARE_RADICAL;
+            this.setDimension(1, 1);
+
+            if(this.Iterator !== null)
+            {
+                var Item = new CMathBase();
+                Item.setDimension(1, 2);
+                Item.bMObjs = true;
+                Item.elements[0][0] = this.Iterator;
+                Item.elements[0][1] = this.Base;
+
+                //Item.addMCToContent(this.Iterator, this.Base);
+
+                this.elements[0][0] = Item;
+            }
+            else
+            {
+                this.elements[0][0] = this.Base;
+            }
+
+            this.RealBase = this.elements[0][0];
+        }
+        else
+        {
+            this.Pr.type == DEGREE_RADICAL;
+            this.elements[0][0] = this.Iterator;
+            this.elements[0][1] = this.Base;
+            this.RealBase       = this.Base;
+
+        }
+    }
+
+    if(this.Pr.type == SQUARE_RADICAL)
+        this.RealBase.Resize(this, ParaMath, oMeasure);
+    else
+    {
+        this.Iterator.Resize(this, ParaMath, oMeasure);
+        this.RealBase.Resize(this, ParaMath, oMeasure);
+    }
+
+
+    this.signRadical.recalculateSize(oMeasure, this.RealBase.size);
 
     var txtPrp = this.Get_CompiledCtrPrp();
     var sign = this.signRadical.size,
         gSign = this.signRadical.gapSign,
     // в случае смещения baseline контента тоже смещается, и по высоте артгумент может выйти чуть за пределы (т.о. значок интеграла будет расположен чуть выше, чем следовало бы, и размер аргумента выйде за аграницы)
         gArg = this.signRadical.gapArg > 2*g_dKoef_pt_to_mm ? this.signRadical.gapArg : 2*g_dKoef_pt_to_mm; // делаем смещение, т.к. для fontSize 11, 14 и меньше высота плейсхолдера не совпадает
-                                                                                                        // с высотой отрисовки плейсхолдера и происходит наложение черты значка радикала и плейсхолдера
+    // с высотой отрисовки плейсхолдера и происходит наложение черты значка радикала и плейсхолдера
 
     var gapBase = gSign + gArg;
 
-    var base, degr, shTop,
-        height, width, ascent;
-
     if(this.Pr.type == SQUARE_RADICAL)
     {
-        base = this.elements[0][0].size;
-        shTop = (sign.height - gSign - base.height)/2;
+        //base = this.elements[0][0].size;
+        shTop = (sign.height - gSign - this.RealBase.size.height)/2;
         shTop = shTop > 0 ? shTop : 0;
 
         height = sign.height;
         width  = sign.width;
-        ascent = gapBase + shTop + base.ascent;
+        ascent = gapBase + shTop + this.RealBase.size.ascent;
         //ascent = height - (base.height - base.ascent);
 
         width += this.GapLeft + this.GapRight;
@@ -1000,8 +1092,8 @@ CRadical.prototype.recalculateSize = function(oMeasure)
     }
     else if(this.Pr.type == DEGREE_RADICAL)
     {
-        degr = this.elements[0][0].size;
-        base = this.elements[0][1].size;
+        //degr = this.elements[0][0].size;
+        //base = this.elements[0][1].size;
 
         var wTick = this.signRadical.measure.widthTick,
             hTick = this.signRadical.measure.heightTick;
@@ -1012,31 +1104,31 @@ CRadical.prototype.recalculateSize = function(oMeasure)
         var gapHeight = 0.011*txtPrp.FontSize; // добавляем это расстояние к общей высоте радикала, также как и gapWidth
         this.gapWidth = 0.011*txtPrp.FontSize;
 
-        var wDegree = degr.width > wTick ? degr.width - wTick : 0;
+        var wDegree = this.Iterator.size.width > wTick ? this.Iterator.size.width - wTick : 0;
         width = wDegree + sign.width + this.gapWidth;
 
         width += this.GapLeft + this.GapRight;
 
         var gapDegree;
-        if( base.height < plH )
+        if( this.RealBase.size.height < plH )
             gapDegree = 1.5*txtPrp.FontSize/36;
         else
             gapDegree = 3*txtPrp.FontSize/36;
 
-        var h1 = gapHeight + degr.height + gapDegree + hTick,
+        var h1 = gapHeight + this.Iterator.size.height + gapDegree + hTick,
             h2 = sign.height;
 
-        shTop = (sign.height - gSign - base.height)/2;
+        shTop = (sign.height - gSign - this.RealBase.size.height)/2;
 
         if(h1 > h2)
         {
             height =  h1;
-            ascent = height - sign.height + gapBase + shTop + base.ascent;
+            ascent = height - sign.height + gapBase + shTop + this.RealBase.size.ascent;
         }
         else
         {
             height =  h2;
-            ascent = gapBase + shTop + base.ascent;
+            ascent = gapBase + shTop + this.RealBase.size.ascent;
         }
 
         this.gapDegree = height - h1 + gapHeight;
@@ -1054,8 +1146,8 @@ CRadical.prototype.setPosition = function(pos)
 
     if(this.Pr.type == SQUARE_RADICAL)
     {
-        var gapLeft = this.size.width - this.elements[0][0].size.width;
-        var gapTop = this.size.ascent - this.elements[0][0].size.ascent;
+        var gapLeft = this.size.width - this.RealBase.size.width;
+        var gapTop = this.size.ascent - this.RealBase.size.ascent;
 
         PosRadical.x = this.pos.x + this.GapLeft;
         PosRadical.y = this.pos.y;
@@ -1064,13 +1156,13 @@ CRadical.prototype.setPosition = function(pos)
         PosBase.y = this.pos.y + gapTop;
 
         this.signRadical.setPosition(PosRadical);
-        this.elements[0][0].setPosition(PosBase);
+        this.RealBase.setPosition(PosBase);
     }
     else if(this.Pr.type == DEGREE_RADICAL)
     {
-        var degr = this.elements[0][0].size,
+        /*var degr = this.elements[0][0].size,
             base = this.elements[0][1].size,
-            sign = this.signRadical.size;
+            sign = this.signRadical.size;*/
 
         var wTick = this.signRadical.measure.widthTick;
 
@@ -1079,20 +1171,20 @@ CRadical.prototype.setPosition = function(pos)
         PosDegree.x = this.pos.x + this.GapLeft + this.gapWidth;
         PosDegree.y = this.pos.y + this.gapDegree;
 
-        this.elements[0][0].setPosition(PosDegree);
+        this.Iterator.setPosition(PosDegree);
 
-        var wDegree = degr.width > wTick ? degr.width - wTick : 0;
+        var wDegree = this.Iterator.size.width > wTick ? this.Iterator.size.width - wTick : 0;
 
         PosRadical.x = this.pos.x + this.GapLeft + wDegree;
-        PosRadical.y = this.pos.y + this.size.height - sign.height;
+        PosRadical.y = this.pos.y + this.size.height - this.signRadical.size.height;
 
         this.signRadical.setPosition(PosRadical);
 
-        PosBase.x = this.pos.x + this.GapLeft + this.size.width - base.width;
-        PosBase.y = this.pos.y + this.size.ascent - base.ascent;
+        PosBase.x = this.pos.x + this.GapLeft + this.size.width - this.RealBase.size.width;
+        PosBase.y = this.pos.y + this.size.ascent - this.RealBase.size.ascent;
 
 
-        this.elements[0][1].setPosition(PosBase);
+        this.RealBase.setPosition(PosBase);
     }
 }
 CRadical.prototype.findDisposition = function(mCoord)
@@ -1205,6 +1297,9 @@ CRadical.prototype.findDisposition = function(mCoord)
         disposition = {pos: posCurs, mCoord: mouseCoord, inside_flag: inside_flag};
     }
 
+    //console.log("x : " + disposition.pos.x + ", y : " + disposition.pos.y);
+
+
     return disposition;
 }
 CRadical.prototype.draw = function(x, y, pGraphics)
@@ -1233,14 +1328,14 @@ CRadical.prototype.draw = function(x, y, pGraphics)
 }
 CRadical.prototype.getBase = function()
 {
-    var base = null;
+    /*var base = null;
 
     if(this.Pr.type == SQUARE_RADICAL)
         base = this.elements[0][0];
     else if(this.Pr.type == DEGREE_RADICAL)
-        base = this.elements[0][1];
+        base = this.elements[0][1];*/
 
-    return base;
+    return this.Base;
 }
 CRadical.prototype.getDegree = function()
 {
@@ -1252,12 +1347,12 @@ CRadical.prototype.getDegree = function()
 
     // для стремной ситуации, когда руками в xml выставили в degHide true, а объект со степенью имеется, возвращаем основание
 
-    var iterator = null;
+    /*var iterator = null;
 
     if(this.Pr.degHide == false)
-        iterator = this.elements[0][0];
+        iterator = this.elements[0][0];*/
 
-    return iterator;
+    return this.Iterator;
 }
 CRadical.prototype.getPropsForWrite = function()
 {
