@@ -84,10 +84,10 @@ DependencyGraph.prototype = {
     },
     addNode:function ( sheetId, cellId ) {
 		var _this = this;
-        var nodeId = getVertexId( sheetId, cellId )
+        var nodeId = getVertexId( sheetId, cellId );
         var oRes = this.nodesId[nodeId];
         if ( null == oRes ) {
-            var node = new Vertex( sheetId, cellId, this.wb )
+            var node = new Vertex( sheetId, cellId, this.wb );
             var oBBoxNode = node.getBBox();
             if ( node.isArea ) {
                 var nodesSheetArea = this.nodesArea[node.sheetId];
@@ -888,7 +888,7 @@ function buildRecalc(_wb,notrec){
 	    sortDependency(_wb)
 }
 
-function sortDependency( wb ) {
+function sortDependency( wb, setCellFormat ) {
 	if ( wb.isNeedCacheClean ){
 		buildRecalc(wb, true);
 		arrRecalc = {};
@@ -900,11 +900,11 @@ function sortDependency( wb ) {
 		var oNodeDependence = wb.dependencyFormulas.getNodeDependence(nR.nodes);
         for ( var i in oNodeDependence.oMasterNodes ) {
             var node = oNodeDependence.oMasterNodes[i];
-            _sortDependency( wb, node, oNodeDependence.oWeightMap, false, oCleanCellCacheArea );
+            _sortDependency( wb, node, oNodeDependence.oWeightMap, false, oCleanCellCacheArea, setCellFormat );
         }
         for ( var i in oNodeDependence.oMasterAreaNodes ) {
             var node = oNodeDependence.oMasterAreaNodes[i];
-            _sortDependency( wb, node, oNodeDependence.oWeightMap, false, oCleanCellCacheArea );
+            _sortDependency( wb, node, oNodeDependence.oWeightMap, false, oCleanCellCacheArea, setCellFormat );
         }
         for ( var sheetId in oCleanCellCacheArea ) {
             var sheetArea = oCleanCellCacheArea[sheetId];
@@ -924,7 +924,7 @@ function sortDependency( wb ) {
     }
 	wb.needRecalc = {nodes: {}, length:0};
 }
-function _sortDependency( wb, node, oWeightMap, bBad, oCleanCellCacheArea ) {
+function _sortDependency( wb, node, oWeightMap, bBad, oCleanCellCacheArea, setCellFormat ) {
     if ( node ) {
         var oWeightMapElem = oWeightMap[node.nodeId];
         if ( oWeightMapElem ) {
@@ -933,7 +933,7 @@ function _sortDependency( wb, node, oWeightMap, bBad, oCleanCellCacheArea ) {
                 bBad = oWeightMapElem.bad;
                 //пересчитываем функцию
                 var ws = wb.getWorksheetById( node.sheetId );
-                ws._RecalculatedFunctions( node.cellId, bBad );
+                ws._RecalculatedFunctions( node.cellId, bBad, setCellFormat );
                 //запоминаем области для удаления cache
                 var sheetArea = oCleanCellCacheArea[node.sheetId];
                 if ( null == sheetArea ) {
@@ -3189,7 +3189,7 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 		/*
 			Если необходим пересчет, то по списку пересчитываемых ячеек сортируем граф зависимостей и пересчиываем в получившемся порядке. Плохим ячейкам с цикличискими ссылками выставляем ошибку "#REF!".
 		*/
-    sortDependency(this.workbook);
+        sortDependency(this.workbook);
 	}
 	// ToDo возможно нужно уменьшить диапазон обновления
     History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_MoveRange,
@@ -3507,7 +3507,7 @@ function inCacheStrcmp(str1, str2, RefPos, aRefs)
 	}
 	return bRes;
 }
-Woorksheet.prototype._RecalculatedFunctions=function(cell,bad){
+Woorksheet.prototype._RecalculatedFunctions=function(cell,bad,setCellFormat){
     function adjustCellFormat( c ) {
         // ищет в формуле первый рэндж и устанавливает формат ячейки как формат первой ячейки в рэндже
         var elem = null;
@@ -3590,15 +3590,17 @@ Woorksheet.prototype._RecalculatedFunctions=function(cell,bad){
 		g_oVLOOKUPCache.remove(__cell);
 		g_oHLOOKUPCache.remove(__cell);
 		__cell.setFormulaCA(res.ca);
-		if( res.numFormat !== undefined && res.numFormat >= 0){
+        if(setCellFormat){
+            if( res.numFormat !== undefined && res.numFormat >= 0){
 
-            if( aStandartNumFormatsId[__cell.getNumFormatStr()] == 0 )
-			    __cell.setNumFormat(aStandartNumFormats[res.numFormat])
+                if( aStandartNumFormatsId[__cell.getNumFormatStr()] == 0 )
+                    __cell.setNumFormat(aStandartNumFormats[res.numFormat])
 
-		}
-		else if( res.numFormat !== undefined && res.numFormat == -1 ){
-			adjustCellFormat(__cell,__cell.sFormula);
-		}
+            }
+            else if( res.numFormat !== undefined && res.numFormat == -1 ){
+                adjustCellFormat(__cell,__cell.sFormula);
+            }
+        }
 	}
 };
 Woorksheet.prototype._ReBuildFormulas=function(cellRange){
@@ -3831,6 +3833,7 @@ Cell.prototype.setValue=function(val,callback){
 			else{
 				val = "="+this.formulaParsed.assemble();
 			}
+
 		}
         else{
             this.formulaParsed = null;
@@ -3861,7 +3864,7 @@ Cell.prototype.setValue=function(val,callback){
 		/*
 			Если необходим пересчет, то по списку пересчитываемых ячеек сортируем граф зависимостей и пересчиываем в получившемся порядке. Плохим ячейкам с цикличискими ссылками выставляем ошибку "#REF!".
 		*/
-		sortDependency(this.ws.workbook);
+		sortDependency(this.ws.workbook,true);
 	}
 	var DataNew = null;
 	if(History.Is_On())
@@ -3942,11 +3945,11 @@ Cell.prototype.setCellStyle=function(val){
 };
 Cell.prototype.setNumFormat=function(val){
 	var oRes;
-    if( val == aStandartNumFormats[0] &&
+    /*if( val == aStandartNumFormats[0] &&
         this.formulaParsed && this.formulaParsed.value && this.formulaParsed.value.numFormat !== null &&
         this.formulaParsed.value.numFormat !== undefined && aStandartNumFormats[this.formulaParsed.value.numFormat] )
         oRes = this.sm.setNumFormat(this, aStandartNumFormats[this.formulaParsed.value.numFormat]);
-    else
+    else*/
         oRes = this.sm.setNumFormat(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
         History.Add(g_oUndoRedoCell, historyitem_Cell_Numformat, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
