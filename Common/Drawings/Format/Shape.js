@@ -1839,7 +1839,7 @@ CShape.prototype =
 
     selectionCheck: function( X, Y, Page_Abs, NearPos)
     {
-        if(isRealObject(this.textBoxContent))
+        if(isRealObject(this.textBoxContent) && this.hitInTextRect(x, y))
         {
             var t_x = this.invertTransformText.TransformPointX(X, Y);
             var t_y = this.invertTransformText.TransformPointY(X, Y);
