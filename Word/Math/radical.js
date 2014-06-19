@@ -887,8 +887,8 @@ function CRadical(props)
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_RADICAL;
 
-    this.Iterator = null;
-    this.Base     = null;
+    this.Iterator = new CMathContent();
+    this.Base     = new CMathContent();
 
     this.RealBase = null;
 
