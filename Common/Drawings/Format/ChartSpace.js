@@ -531,10 +531,6 @@ CChartSpace.prototype =
         return null;
     },
 
-
-
-
-
     checkBBoxIntersection: function(bbox1, bbox2)
     {
         return !(bbox1.r1 > bbox2.r2 || bbox2.r1 > bbox1.r2 || bbox1.c1 > bbox2.c2 || bbox2.c1 > bbox1.c2)

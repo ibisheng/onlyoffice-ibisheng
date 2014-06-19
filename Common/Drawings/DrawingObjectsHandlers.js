@@ -333,6 +333,11 @@ function handleInlineHitNoText(drawing, drawingObjects, e, x, y, pageIndex)
             drawingObjects.resetSelection();
             drawing.select(drawingObjects, pageIndex);
             drawingObjects.changeCurrentState(new PreMoveInlineObject(drawingObjects, drawing));
+            if(e.ClickCount > 1 && !e.ShiftKey && !e.CtrlKey && ((drawingObjects.selection.groupSelection && drawingObjects.selection.groupSelection.selectedObjects.length === 1) || drawingObjects.selectedObjects.length === 1)
+                && drawing.getObjectType() === historyitem_type_ChartSpace && drawingObjects.handleChartDoubleClick)
+            {
+                drawingObjects.handleChartDoubleClick(drawing.parent, drawing);
+            }
             drawingObjects.updateOverlay();
             return true;
         }

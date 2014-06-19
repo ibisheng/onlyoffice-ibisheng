@@ -352,11 +352,18 @@ DrawingObjectsController.prototype =
                     {
                         this.changeCurrentState(new PreMoveInlineObject(this, object, is_selected, true));
                     }
+
                 }
                 else
                 {
                     group.resetInternalSelection();
                     this.changeCurrentState(new PreMoveInGroupState(this, group, x, y, e.ShiftKey, e.CtrlKey, object,  is_selected));
+                }
+                if(e.ClickCount > 1 && !e.ShiftKey && !e.CtrlKey && ((this.selection.groupSelection && this.selection.groupSelection.selectedObjects.length === 1) || this.selectedObjects.length === 1)
+                    && object.getObjectType() === historyitem_type_ChartSpace && !bInSelect && this.handleChartDoubleClick)
+                {
+                    var drawing = this.selectedObjects[0].parent;
+                    this.handleChartDoubleClick(drawing, object);
                 }
             }
             return true;

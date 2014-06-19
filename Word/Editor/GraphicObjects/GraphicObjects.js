@@ -961,6 +961,15 @@ CGraphicObjects.prototype =
 
     getTargetDocContent: DrawingObjectsController.prototype.getTargetDocContent,
 
+    handleChartDoubleClick: function(drawing, chart)
+    {
+        if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : drawing, CheckType : changestype_Paragraph_Content} ))
+        {
+            editor.asc_fireCallback("asc_doubleClickOnChart", chart);
+            this.changeCurrentState(new NullState(this));
+        }
+    },
+
     addInlineImage: function( W, H, Img, Chart, bFlow )
     {
         var content = this.getTargetDocContent();

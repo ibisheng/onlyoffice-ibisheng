@@ -927,6 +927,8 @@ function PreMoveInGroupState(drawingObjects, group, startX, startY, ShiftKey, Ct
     this.CtrlKey  = CtrlKey;
     this.majorObject = majorObject;
     this.majorObjectIsSelected = majorObjectIsSelected;
+
+
 }
 
 PreMoveInGroupState.prototype =
