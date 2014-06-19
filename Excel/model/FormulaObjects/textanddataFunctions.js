@@ -1684,6 +1684,7 @@ cTEXT.prototype.Calculate = function ( arg ) {
     }
 
     return this.value = new cString( text );
+    this.numFormat = this.formatType.noneFormat;
 }
 cTEXT.prototype.getInfo = function () {
     return {

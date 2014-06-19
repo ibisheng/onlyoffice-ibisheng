@@ -5024,8 +5024,9 @@ cSYD.prototype.Calculate = function ( arg ) {
     life = life.getValue();
     per = per.getValue();
 
-    if ( life == 1 || life == 0 )
+    if ( life == 1 || life <= 0 || cost < 0 || salvage < 0 || per < 0 ){
         return this.value = new cError( cErrorType.not_numeric );
+    }
 
     var res = 2;
     res *= cost - salvage;
@@ -5172,24 +5173,26 @@ cTBILLPRICE.prototype.Calculate = function ( arg ) {
     if ( maturity instanceof cError ) return this.value = maturity;
     if ( discount instanceof cError ) return this.value = discount;
 
-    var nMat = maturity.getValue();
-    nMat++;
+    settlement = Math.floor( settlement.getValue() );
+    maturity = Math.floor( maturity.getValue() );
+    discount = discount.getValue();
 
-    var d1 = Date.prototype.getDateFromExcel( settlement.getValue() );
-    var d2 = Date.prototype.getDateFromExcel( nMat );
-
-    var fFraction = yearFrac( d1, d2, 0 );
-
-    if ( fFraction - Math.floor( fFraction ) == 0 )
+    if ( settlement >= maturity || discount <= 0 ){
         return this.value = new cError( cErrorType.not_numeric );
+    }
 
-    var res = 100 * ( 1 - discount.getValue() * fFraction );
+    var d1 = Date.prototype.getDateFromExcel( settlement ),
+        d2 = Date.prototype.getDateFromExcel( maturity ),
+        d3 = new Date(d1);
 
-    if ( settlement.getValue() >= maturity.getValue() || discount.getValue() <= 0 )
+    d3.addYears(1);
+    if( d2 > d3 ){
         return this.value = new cError( cErrorType.not_numeric );
+    }
 
-    this.value = new cNumber( res );
-//    this.value.numFormat = 9;
+    discount *= diffDate( d1, d2, DayCountBasis.ActualActual );
+
+    this.value = new cNumber( 100 * ( 1 - discount / 360 ) );
     return this.value;
 
 };
