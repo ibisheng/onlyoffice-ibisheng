@@ -5249,6 +5249,9 @@
 			if (moveHeight > 0) {
 				ctx.drawImage(ctx.getCanvas(), x, y, oldW, moveHeight, x + dx, y - dy, oldW, moveHeight);
 				this.drawingGraphicCtx.moveImageData(x, y, oldW, moveHeight, x + dx, y - dy);
+			} else {
+				// Scroll на весь экран
+				this.drawingGraphicCtx.clear();
 			}
 			ctx.setFillStyle(this.settings.cells.defaultState.background)
 				.fillRect(this.headersLeft, y + (scrollDown ? oldH - dy - lastRowHeight : 0),
@@ -5368,6 +5371,9 @@
 			if (oldW > 0) {
 				ctx.drawImage(ctx.getCanvas(), x, y, moveWidth, ctxH, x - dx, y, moveWidth, ctxH);
 				this.drawingGraphicCtx.moveImageData(x, y, moveWidth, ctxH, x - dx, y);
+			} else {
+				// Scroll на весь экран
+				this.drawingGraphicCtx.clear();
 			}
 			ctx.setFillStyle(this.settings.cells.defaultState.background)
 				.fillRect(x + (scrollRight > 0 ? oldW - dx - lastColWidth : 0), y, Math.abs(dx) + lastColWidth, ctxH);
