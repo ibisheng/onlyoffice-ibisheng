@@ -3626,9 +3626,14 @@ CChartsDrawer.prototype =
 		var secPart = val.toString().split('.');
 		var numPow = 1,tempMax;
 		
-		if(secPart[1] && secPart[1].toString().search('e+') != -1 && secPart[0] && secPart[0].toString().length == 1)
+		if(secPart[1] && secPart[1].toString().indexOf('e+') != -1 && secPart[0] && secPart[0].toString().length == 1)
 		{
 			var expNum = secPart[1].toString().split('e+');
+			numPow = Math.pow(10, expNum[1]);
+		}
+		else if(secPart[1] && secPart[1].toString().indexOf('e-') != -1 && secPart[0] && secPart[0].toString().length == 1)
+		{
+			var expNum = secPart[1].toString().split('e');
 			numPow = Math.pow(10, expNum[1]);
 		}
 		else if(0 != secPart[0])
@@ -3636,18 +3641,17 @@ CChartsDrawer.prototype =
 		else if(0 == secPart[0])
 		{
 			var tempMax = val;
-			var num = -1;
-			while(0 == tempMax.toString().split('.')[0])
+			var num = 0;
+			while(1 > tempMax)
 			{
-				tempMax = val;
-				numPow = Math.pow(10, num);
-				tempMax = tempMax / numPow;
-				num--;
+				tempMax = tempMax * 10;
+                num--;
 			}
+            numPow = Math.pow(10, num);
 			val = tempMax;
-		}
-		
-		if(tempMax == undefined)	
+		};
+
+		if(tempMax == undefined)
 			val = val / numPow;
 		
 		return {val: val, numPow: numPow};
