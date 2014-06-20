@@ -1194,12 +1194,19 @@
 			this.styleThumbnailHeight	= 18;
 			this.styleThumbnailWidthPt	= this.styleThumbnailWidth * 72 / 96;
 			this.styleThumbnailHeightPt	= this.styleThumbnailHeight * 72 / 96;
+
+			this.styleThumbnailWidthWithRetina	= this.styleThumbnailWidth;
+			this.styleThumbnailHeightWithRetina	= this.styleThumbnailHeight;
+			if (AscBrowser.IsRetinaEnabled) {
+				this.styleThumbnailWidthWithRetina <<= 1;
+				this.styleThumbnailHeightWithRetina <<= 1;
+			}
 		}
 
 		asc_CStylesPainter.prototype = {
 			constructor: asc_CStylesPainter,
-			asc_getStyleThumbnailWidth: function () { return this.styleThumbnailWidth; },
-			asc_getStyleThumbnailHeight: function () { return this.styleThumbnailHeight; },
+			asc_getStyleThumbnailWidth: function () { return this.styleThumbnailWidthWithRetina; },
+			asc_getStyleThumbnailHeight: function () { return this.styleThumbnailHeightWithRetina; },
 			asc_getDefaultStyles: function () { return this.defaultStyles; },
 			asc_getDocStyles: function () { return this.docStyles; },
 			asc_getDefaultStylesImage: function () { return this.defaultStylesImage; },
@@ -1213,8 +1220,8 @@
 				var cellStyles = cellStylesAll.DefaultStyles;
 				var nLength = cellStyles.length;
 				var oCanvas = document.createElement('canvas');
-				oCanvas.width = this.styleThumbnailWidth;
-				oCanvas.height = nDefaultStylesCount * this.styleThumbnailHeight;
+				oCanvas.width = this.styleThumbnailWidthWithRetina;
+				oCanvas.height = nDefaultStylesCount * this.styleThumbnailHeightWithRetina;
 				var ctx = oCanvas.getContext('2d');
 				ctx.fillStyle = "#FFFFFF";
 				ctx.fillRect(0, 0, oCanvas.width, oCanvas.height);
@@ -1239,8 +1246,8 @@
 				var cellStyles = cellStylesAll.CustomStyles;
 				var nLength = cellStyles.length;
 				var oCanvas = document.createElement('canvas');
-				oCanvas.width = this.styleThumbnailWidth;
-				oCanvas.height = nDocumentStylesCount * this.styleThumbnailHeight;
+				oCanvas.width = this.styleThumbnailWidthWithRetina;
+				oCanvas.height = nDocumentStylesCount * this.styleThumbnailHeightWithRetina;
 				var ctx = oCanvas.getContext('2d');
 				ctx.fillStyle = "#FFFFFF";
 				ctx.fillRect(0, 0, oCanvas.width, oCanvas.height);
