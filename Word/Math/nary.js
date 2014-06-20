@@ -277,7 +277,7 @@ CNary.prototype.setCtrPrp = function(txtPrp)
     this.CtrPrp.Merge(txtPrp); // only runPrp for paragraph
     //this.RunPrp.setTxtPrp(txtPrp);
 
-    if(this.elements !== null && !this.elements[0][0].IsJustDraw())
+    if(this.elements.length > 0 && !this.elements[0][0].IsJustDraw())
     {
         this.elements[0][0].setCtrPrp(this.CtrPrp);
     }
