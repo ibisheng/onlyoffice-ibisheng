@@ -151,8 +151,6 @@ function handleShapeImage(drawing, drawingObjectsController, e, x, y, group, pag
 function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord)
 {
     var grouped_objects = drawing.getArrGraphicObjects();
-    var selected_objects = drawingObjectsController.selectedObjects;
-
     for(var j = grouped_objects.length - 1; j > -1; --j)
     {
         var cur_grouped_object = grouped_objects[j];
@@ -160,7 +158,6 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
         {
             case historyitem_type_Shape:
             case historyitem_type_ImageShape:
-            case historyitem_type_ChartSpace:
             {
                 var hit_in_inner_area = cur_grouped_object.hitInInnerArea && cur_grouped_object.hitInInnerArea(x, y);
                 var hit_in_path = cur_grouped_object.hitInPath && cur_grouped_object.hitInPath(x, y);
@@ -171,8 +168,22 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
                 }
                 else if(hit_in_text_rect)
                 {
+                    var all_drawings = cur_grouped_object.getDocContent().Get_AllDrawingObjects();
+                    var drawings2 = [];
+                    for(var i = 0; i < all_drawings.length; ++i)
+                    {
+                        drawings2.push(all_drawings[i].GraphicObj);
+                    }
+                    var ret = handleInlineObjects(drawingObjectsController, drawings2, e, x, y, pageIndex, true);
+                    if(ret)
+                        return ret;
                     return drawingObjectsController.handleTextHit(cur_grouped_object, e, x, y, drawing, pageIndex, bWord);
                 }
+                break;
+            }
+            case historyitem_type_ChartSpace:
+            {
+                break;
             }
         }
     }

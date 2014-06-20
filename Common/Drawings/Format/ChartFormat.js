@@ -3266,6 +3266,9 @@ CAreaSeries.prototype =
         return this.Id;
     },
 
+
+
+
     Refresh_RecalcData: function()
     {},
 
@@ -3329,6 +3332,11 @@ CAreaSeries.prototype =
         w.WriteString2(this.Get_Id());
     },
 
+
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.GetString2();
+    },
 
     getAllRasterImages: function(images)
     {
