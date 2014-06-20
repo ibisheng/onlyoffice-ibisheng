@@ -937,11 +937,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 									break;									
 								case "err":
 									var nErrorLevel = c_oAscError.Level.NoCritical;
+									var errorId = incomeObject["data"] >> 0;
 									//todo передалеть работу с callback
 									if("getsettings" == rdata["c"] || "open" == rdata["c"] || "chopen" == rdata["c"] || "create" == rdata["c"])
 										nErrorLevel = c_oAscError.Level.Critical;
-									result = {returnCode: nErrorLevel, val:parseInt(incomeObject["data"])};
-									oThis.handlers.trigger("asc_onError", oThis.asc_mapAscServerErrorToAscError(parseInt(incomeObject["data"])), nErrorLevel);
+									result = {returnCode: nErrorLevel, val:errorId};
+									oThis.handlers.trigger("asc_onError", oThis.asc_mapAscServerErrorToAscError(errorId), nErrorLevel);
 									if(callback)
 										callback(result);
 									break;

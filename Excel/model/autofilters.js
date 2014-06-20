@@ -2006,12 +2006,9 @@ var gUndoInsDelCellsFlag = true;
 				//имеется ввиду то, что при выставленном флаге title используется первая строка в качестве заголовка, в противном случае - добавлются заголовки
 				var isTitle = this._isAddNameColumn(mainAdjacentCells);
 				objOptions.asc_setIsTitle(isTitle);
-				var firstCellId = this._rangeToId(mainAdjacentCells); 
-				var endCellId = this._rangeToId({r1: mainAdjacentCells.r2, c1: mainAdjacentCells.c2, r2: mainAdjacentCells.r2, c2: mainAdjacentCells.c2}); 
-				var sListName = ws.model.getName();
-				var ref = sListName + "!" + firstCellId + ":" + endCellId;
-				objOptions.asc_setRange(ref);
-				this.AddFormatTableOptions = objOptions;
+				var tmpRange = mainAdjacentCells.clone();
+				tmpRange.r1Abs = tmpRange.c1Abs = tmpRange.r2Abs = tmpRange.c2Abs = true;
+				objOptions.asc_setRange(tmpRange.getName());
 				return objOptions;
 			},
 			//если селект затрагивает часть хотя бы одной форматированной таблицы(для случая insert(delete) cells)
