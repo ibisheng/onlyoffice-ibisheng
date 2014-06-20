@@ -333,7 +333,7 @@
 		/**
 		 * Widget for displaying and editing Worksheet object
 		 * -----------------------------------------------------------------------------
-		 * @param {Worksheet} model  Worksheet
+		 * @param {Woorksheet} model  Worksheet
 		 * @param {Object} handlers  Event handlers
 		 * @param {Array} buffers    DrawingContext + Overlay
 		 * @param {StringRender} stringRender    StringRender
@@ -8138,7 +8138,7 @@
 				else if(val.addImagesFromWord && val.addImagesFromWord.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
 				{
 					window["Asc"]["editor"].wb.clipboard._insertImagesFromBinaryWord(t, val.addImagesFromWord);
-				};
+				}
 			});
 		};
 		
