@@ -75,6 +75,8 @@ function CSelectedElement(Element, SelectedAll)
 function CSelectedContent()
 {
     this.Elements = [];
+    
+    this.HaveShape = false;
 }
 
 CSelectedContent.prototype =
@@ -87,6 +89,11 @@ CSelectedContent.prototype =
     Add : function(Element)
     {
         this.Elements.push( Element );
+    },
+    
+    Set_Shape : function(Value)
+    {
+       this.HaveShape = Value; 
     }
 };
 
@@ -2990,8 +2997,11 @@ CDocument.prototype =
         {
             var Res = this.HdrFtr.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
 
-            this.Selection_Remove();
-            this.Selection.Use = false;
+            if ( null !== this.HdrFtr.CurHdtr && docpostype_DrawingObjects !== this.HdrFtr.CurHdrFtr.Content.CurPos.Type )
+            {
+                this.Selection_Remove();
+                this.Selection.Use = false;
+            }
 
             this.Document_UpdateInterfaceState();
             this.Document_UpdateRulersState();
@@ -8274,6 +8284,13 @@ CDocument.prototype =
             this.Get_SelectedContent( DocContent );
 
             var Para = NearPos.Paragraph;
+            
+            // Автофигуры не вставляем в другие автофигуры
+            if ( true === Para.Parent.Is_DrawingShape() && true === DocContent.HaveShape )
+            {
+                History.Remove_LastPoint();
+                return;
+            }
 
             // Заполним массив для проверки лока
             var ArrayForCheck = [];

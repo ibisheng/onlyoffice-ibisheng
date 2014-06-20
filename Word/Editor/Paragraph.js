@@ -4767,6 +4767,7 @@ Paragraph.prototype =
             else
             {
                 var SearchPos = new CParagraphSearchPos();
+                SearchPos.ForSelection = true;
 
                 if ( true === Word )
                     this.Get_WordStartPos( SearchPos, EndSelectionPos );
@@ -4866,6 +4867,7 @@ Paragraph.prototype =
             else
             {
                 var SearchPos = new CParagraphSearchPos();
+                SearchPos.ForSelection = true;
 
                 if ( true === Word )
                     this.Get_WordEndPos( SearchPos, EndSelectionPos, true );
@@ -7069,38 +7071,59 @@ Paragraph.prototype =
             EndPos   = this.Selection.StartPos;
         }
 
+        var Para = null;
         if ( true === this.Selection_IsFromStart() && true === this.Selection_CheckParaEnd() )
         {
-            DocContent.Add( new CSelectedElement( this.Copy(this.Parent), true ) );
-            return;
+            Para = this.Copy(this.Parent);
+            DocContent.Add( new CSelectedElement( Para, true ) );
         }
+        else
+        {
+            Para = new Paragraph(this.DrawingDocument, this.Parent, 0, 0, 0, 0, 0);
 
-        var Para = new Paragraph(this.DrawingDocument, this.Parent, 0, 0, 0, 0, 0);
+            // Копируем настройки
+            Para.Set_Pr(this.Pr.Copy());
+            Para.TextPr.Set_Value( this.TextPr.Value.Copy() );
 
-        // Копируем настройки
-        Para.Set_Pr(this.Pr.Copy());
-        Para.TextPr.Set_Value( this.TextPr.Value.Copy() );
+            // Копируем содержимое параграфа
+            for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
+            {
+                var Item = this.Content[Pos];
+
+                if ( StartPos === Pos || EndPos === Pos )
+                    Para.Internal_Content_Add( Pos - StartPos, Item.Copy(true), false );
+                else
+                    Para.Internal_Content_Add( Pos - StartPos, Item.Copy(false), false );
+            }
+
+            // Добавляем секцию в конце
+            if ( undefined !== this.SectPr )
+            {
+                var SectPr = new CSectionPr(this.SectPr.LogicDocument);
+                SectPr.Copy(this.SectPr);
+                Para.Set_SectionPr(SectPr);
+            }
+            DocContent.Add( new CSelectedElement( Para, false ) );
+        }
         
-        // Копируем содержимое параграфа
-        for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
+        if ( null !== Para && false === DocContent.HaveShape )
         {
-            var Item = this.Content[Pos];
+            // Проверим есть ли у нас автофигуры в параграфе
+            var DrawingObjects = Para.Get_AllDrawingObjects();
 
-            if ( StartPos === Pos || EndPos === Pos )
-                Para.Internal_Content_Add( Pos - StartPos, Item.Copy(true), false );
-            else
-                Para.Internal_Content_Add( Pos - StartPos, Item.Copy(false), false );
+            var Count = DrawingObjects.length;
+            for ( var Index = 0; Index < Count; Index++ )
+            {
+                var DrawingObj = DrawingObjects[Index];
+                var ShapeType = DrawingObj.GraphicObj.getObjectType();
+
+                if ( historyitem_type_Shape === ShapeType || historyitem_type_GroupShape === ShapeType )
+                {
+                    DocContent.Set_Shape( true );
+                    break;
+                }
+            }
         }
-
-        // Добавляем секцию в конце
-        if ( undefined !== this.SectPr )
-        {
-            var SectPr = new CSectionPr(this.SectPr.LogicDocument);
-            SectPr.Copy(this.SectPr);
-            Para.Set_SectionPr(SectPr);
-        }
-
-        DocContent.Add( new CSelectedElement( Para, false ) );
     },
 
     Get_Paragraph_TextPr : function()
@@ -13791,6 +13814,8 @@ function CParagraphSearchPos()
     this.Punctuation = false;
     this.First       = true;
     this.UpdatePos   = false;
+    
+    this.ForSelection = false;
 }
 
 function CParagraphSearchPosXY()

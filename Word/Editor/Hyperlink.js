@@ -439,7 +439,7 @@ ParaHyperlink.prototype =
 
                 if ( StartPos !== this.Content.length - 1 && true === this.Content[StartPos].Is_Empty() )
                 {
-                    this.Remove_FromContent( StartPos, true );
+                    this.Remove_FromContent( StartPos, 1, true );
                 }
             }
             else
@@ -448,18 +448,18 @@ ParaHyperlink.prototype =
 
                 if ( EndPos !== this.Content.length - 1 && true === this.Content[EndPos].Is_Empty() )
                 {
-                    this.Remove_FromContent( EndPos, true );
+                    this.Remove_FromContent( EndPos, 1, true );
                 }
 
                 for ( var CurPos = EndPos - 1; CurPos > StartPos; CurPos-- )
                 {
-                    this.Remove_FromContent( EndPos, true );
+                    this.Remove_FromContent( EndPos, 1, true );
                 }
 
                 this.Content[StartPos].Remove(Direction, bOnAddText);
 
                 if ( true === this.Content[StartPos].Is_Empty() )
-                    this.Remove_FromContent( StartPos, true );
+                    this.Remove_FromContent( StartPos, 1, true );
             }
 
             this.Selection_Remove();
@@ -497,7 +497,7 @@ ParaHyperlink.prototype =
                 else
                 {
                     if ( ContentPos !== this.Content.length - 1 && true === this.Content[ContentPos].Is_Empty() )
-                        this.Remove_FromContent( ContentPos, true );
+                        this.Remove_FromContent( ContentPos, 1, true );
 
                     this.State.ContentPos = ContentPos;
                 }
