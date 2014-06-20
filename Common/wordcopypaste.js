@@ -2687,7 +2687,7 @@ PasteProcessor.prototype =
         if(false == this.bNested)
         {
             //������� ���������
-            this.oRecalcDocument.Remove(1, true, true);
+            this.oRecalcDocument.Remove(1, true, true, true);
         }
 
         var nInsertLength = this.aContent.length;
