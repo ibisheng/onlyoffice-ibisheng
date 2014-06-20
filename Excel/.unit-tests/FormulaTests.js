@@ -370,7 +370,7 @@
         sData = data + "";
     if ( Asc.c_oSerFormat.Signature === sData.substring( 0, Asc.c_oSerFormat.Signature.length ) ) {
         var sUrlPath = "offlinedocs/";
-        wb = new Workbook( sUrlPath, new Asc.asc_CHandlersList(), {} );
+        wb = new Workbook( sUrlPath, new Asc.asc_CHandlersList(), {wb:{getWorksheet:function(){}}} );
 
         History = new CHistory(wb);
 
@@ -783,21 +783,15 @@
         ok( oParser.parse() );
         // strictEqual( oParser.parse(), true)
         strictEqual( oParser.changeSheet( "Лист2", "Лист3" ).assemble(), "Лист3!A2" );
-    } )
 
-    test( "Test: rename sheet #2", function () {
         oParser = new parserFormula( "Лист2:Лист3!A2", "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.changeSheet( "Лист2", "Лист1" ).assemble(), "Лист1:Лист3!A2" );
-    } )
 
-    test( "Test: rename sheet #3", function () {
         oParser = new parserFormula( "Лист2!A2:A5", "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.changeSheet( "Лист2", "Лист3" ).assemble(), "Лист3!A2:A5" );
-    } )
 
-    test( "Test: rename sheet #4", function () {
         ws = wb.getWorksheet( 0 );
         ws.getRange2( "S95" ).setValue( "2" );
         ws = wb.getWorksheet( 1 );
@@ -3569,23 +3563,24 @@
 
         }
 
+
         oParser = new parserFormula( "IRR({-70000,12000,15000,18000,21000})", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), irr( [-70000,12000,15000,18000,21000] ) );
+        strictEqual( oParser.calculate().getValue(), -0.021244848273410923 );
 
         ws.getRange2( "A705" ).setValue( "43191" );
 
         oParser = new parserFormula( "IRR({-70000,12000,15000,18000,21000,26000})", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), irr([-70000,12000,15000,18000,21000,26000] ) );
+        strictEqual( oParser.calculate().getValue(), 0.08663094803653171 );
 
         oParser = new parserFormula( "IRR({-70000,12000,15000},-0.1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), irr([-70000,12000,15000],-0.1 ) );
+        strictEqual( oParser.calculate().getValue(), -0.44350694133450463 );
 
         oParser = new parserFormula( "IRR({-70000},-0.1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), irr([-70000],-0.1 ) );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
 
     } )
 
@@ -4336,7 +4331,7 @@
             res *= life+1-per;
             res /= (life+1)*life;
 
-            return res;
+            return res < 0 ? "#NUM!" : res;
         }
 
         oParser = new parserFormula( "SYD(30000,7500,10,1)", "A2", ws );

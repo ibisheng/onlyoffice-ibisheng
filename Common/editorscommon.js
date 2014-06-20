@@ -578,8 +578,17 @@ parserHelper.prototype = {
 
 	// Возвращает ссылку на диапазон с листом (название листа экранируется)
 	get3DRef: function (sheet, range) {
-		var result = rx_test_ws_name.test(sheet) ? sheet : "'" + sheet.replace(/'/g, "''") + "'";
-		return result + '!' + range;
+        sheet = sheet.split(":");
+        var wsFrom = sheet[0],
+            wsTo = sheet[1] === undefined ? wsFrom : sheet[1];
+        if ( rx_test_ws_name.test( wsFrom ) && rx_test_ws_name.test( wsTo ) ) {
+            return (wsFrom !== wsTo ? wsFrom + ":" + wsTo : wsFrom) + "!" + range;
+        }
+        else{
+            wsFrom = wsFrom.replace( /'/g, "''" );
+            wsTo = wsTo.replace( /'/g, "''" );
+            return "'" + (wsFrom !== wsTo ? wsFrom + ":" + wsTo : wsFrom) + "'!" + range;
+        }
 	},
 
 	// Возвращает экранируемое название листа
