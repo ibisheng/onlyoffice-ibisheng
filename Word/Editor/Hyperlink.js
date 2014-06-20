@@ -1415,7 +1415,23 @@ ParaHyperlink.prototype =
 
             ContentPos.Update( CurPos, Depth );
 
-            if ( true === Element.Get_PosByElement(Class, ContentPos, 1, true, CurRange, CurLine) )
+            if ( true === Element.Get_PosByElement(Class, ContentPos, Depth + 1, true, CurRange, CurLine) )
+                return true;
+        }
+
+        return false;
+    },
+
+    Get_PosByDrawing : function(Id, ContentPos, Depth)
+    {
+        var Count = this.Content.length;
+        for ( var CurPos = 0; CurPos < Count; CurPos++ )
+        {
+            var Element = this.Content[CurPos];
+
+            ContentPos.Update( CurPos, Depth );
+
+            if ( true === Element.Get_PosByDrawing(Id, ContentPos, Depth + 1) )
                 return true;
         }
 

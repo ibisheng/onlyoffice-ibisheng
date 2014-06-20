@@ -3627,6 +3627,22 @@ ParaRun.prototype =
         return false;
     },
 
+    Get_PosByDrawing : function(Id, ContentPos, Depth)
+    {
+        var Count = this.Content.length;
+        for ( var CurPos = 0; CurPos < Count; CurPos++ )
+        {
+            var Item = this.Content[CurPos];
+            if ( para_Drawing === Item.Type && Id === Item.Get_Id() )
+            {
+                ContentPos.Update( CurPos, Depth );
+                return true;
+            }
+        }
+
+        return false;
+    },
+
     Get_RunElementByPos : function(ContentPos, Depth)
     {
         if ( undefined !== ContentPos )

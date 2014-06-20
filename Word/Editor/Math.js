@@ -1276,6 +1276,12 @@ ParaMath.prototype =
 
         // TODO: ParaMath.Get_PosByElement
     },
+
+    Get_PosByDrawing : function(Id, ContentPos, Depth)
+    {
+        return false;
+    },
+
     Get_RunElementByPos : function(ContentPos, Depth)
     {
         return null;

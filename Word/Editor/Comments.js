@@ -1116,7 +1116,11 @@ ParaComment.prototype =
 
         return false;
     },
-
+    
+    Get_PosByDrawing : function(Id, ContentPos, Depth)
+    {
+        return false;
+    },
 
     Get_RunElementByPos : function(ContentPos, Depth)
     {

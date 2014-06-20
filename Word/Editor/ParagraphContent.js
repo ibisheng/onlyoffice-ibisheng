@@ -4783,12 +4783,12 @@ ParaDrawing.prototype =
             editor.WordControl.m_oLogicDocument.Recalculate();
     },
 
-    GoTo_Text : function(bBefore)
-    {
+    GoTo_Text : function(bBefore, bUpdateStates)
+    {                
         if ( undefined != this.Parent && null != this.Parent )
         {
             this.Parent.Cursor_MoveTo_Drawing( this.Id, bBefore );
-            this.Parent.Document_SetThisElementCurrent(true);
+            this.Parent.Document_SetThisElementCurrent(undefined === bUpdateStates? true : bUpdateStates);
         }
     },
 

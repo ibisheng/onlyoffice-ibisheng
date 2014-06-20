@@ -5736,23 +5736,33 @@ Paragraph.prototype =
         if ( undefined === bBefore )
             bBefore = true;
 
-        // Ставим курсор перед автофигурой с заданным Id
-        var Pos = -1;
-        var Count = this.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
+        var ContentPos = new CParagraphContentPos();
+
+        var ContentLen = this.Content.length;
+        
+        var bFind = false;
+        
+        for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
         {
-            var Item = this.Content[Index];
-            if ( para_Drawing === Item.Type && Id === Item.Get_Id() )
-                Pos = Index;
+            var Element = this.Content[CurPos];
+
+            ContentPos.Update( CurPos, 0 );
+
+            if ( true === Element.Get_PosByDrawing(Id, ContentPos, 1) )
+            {
+                bFind = true;
+                break;
+            }
         }
 
-        if ( -1 === Pos )
+        if ( false === bFind || ContentPos.Depth <= 0 )
             return;
 
         if ( true != bBefore )
-            Pos = Pos + 1;
+            ContentPos.Data[ContentPos.Depth - 1]++;
 
-        this.Set_ContentPos( Pos, false, -1 );
+        this.Set_ParaContentPos(ContentPos, false, -1, -1);
+
         this.RecalculateCurPos();
         this.CurPos.RealX = this.CurPos.X;
         this.CurPos.RealY = this.CurPos.Y;

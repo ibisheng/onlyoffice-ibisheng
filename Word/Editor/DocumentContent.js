@@ -380,8 +380,15 @@ CDocumentContent.prototype =
     {
         var ContentPos = Math.max( 0, Math.min( this.Content.length - 1, Index ) );
         this.CurPos.Type = docpostype_Content;
-        this.Selection_Remove();
-        this.CurPos.ContentPos = Math.max( 0, Math.min( this.Content.length - 1, Index ) );
+
+        var CurPos = Math.max( 0, Math.min( this.Content.length - 1, Index ) );
+        
+        this.Selection.Use      = false;
+        this.Selection.Start    = false;
+        this.Selection.Flag     = selectionflag_Common;
+        this.Selection.StartPos = CurPos;
+        this.Selection.EndPos   = CurPos;        
+        this.CurPos.ContentPos  = CurPos;
 
         if ( true === this.Content[ContentPos].Is_SelectionUse() )
         {

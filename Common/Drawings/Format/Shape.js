@@ -456,18 +456,23 @@ CShape.prototype =
         }, this, []);
     },
 
-
-
-
-    documentSearch: function(String, search_Common)
+    Search : function(Str, Props, SearchEngine, Type)
     {
         if(this.textBoxContent)
         {
             var dd = this.getDrawingDocument();
             dd.StartSearchTransform(this.transformText);
-            this.textBoxContent.DocumentSearch(String, search_Common);
+            this.textBoxContent.Search(Str, Props, SearchEngine, Type);
             dd.EndSearchTransform();
         }
+    },
+    
+    Search_GetId : function(bNext, bCurrent)
+    {
+        if(this.textBoxContent)
+            return this.textBoxContent.Search_GetId(bNext, bCurrent);
+        
+        return null;
     },
 
     documentUpdateRulersState: function()

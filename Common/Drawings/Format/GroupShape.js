@@ -1022,15 +1022,66 @@ CGroupShape.prototype =
         }
     },
 
-    documentSearch: function(String, search_Common)
+    Search : function(Str, Props, SearchEngine, Type)
     {
-        for(var i = 0;  i< this.spTree.length; ++i)
+        var Len = this.arrGraphicObjects.length;
+        for(var i = 0; i < Len; ++i)
         {
-            if(this.spTree[i].documentSearch)
+            if(this.arrGraphicObjects[i].Search)
             {
-                this.spTree[i].documentSearch(String, search_Common);
+                this.arrGraphicObjects[i].Search(Str, Props, SearchEngine, Type);
             }
         }
+    },
+
+    Search_GetId : function(bNext, bCurrent)
+    {
+        var Current = -1;
+        var Len = this.arrGraphicObjects.length;
+       
+        var Id = null;
+        if ( true === bCurrent )
+        {
+            for(var i = 0; i < Len; ++i)
+            {                
+                if(this.arrGraphicObjects[i] === this.selection.textSelection)
+                {
+                    Current = i;
+                    break;
+                }
+            } 
+        }
+        
+        if ( true === bNext )
+        {      
+            var Start = ( -1 !== Current ? Current : 0 );
+            
+            for ( var i = Start; i < Len; i++ )
+            {
+                if ( this.arrGraphicObjects[i].Search_GetId )
+                {
+                    Id = this.arrGraphicObjects[i].Search_GetId(true, i === Current ? true : false);
+                    if ( null !== Id )
+                        return Id;
+                }
+            }
+        }        
+        else
+        {
+            var Start = ( -1 !== Current ? Current : Len - 1 );
+
+            for ( var i = Start; i >= 0; i-- )
+            {
+                if ( this.arrGraphicObjects[i].Search_GetId )
+                {
+                    Id = this.arrGraphicObjects[i].Search_GetId(false, i === Current ? true : false);
+                    if ( null !== Id )
+                        return Id;
+                }
+            }
+        }
+                
+        return null;
     },
 
     checkNotNullTransform: function()

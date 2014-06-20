@@ -278,7 +278,7 @@ CDocument.prototype.Search_GetId = function(bNext)
         if ( null != Id )
             return Id;
 
-        ParaDrawing.GoTo_Text( true === bNext ? false : true );
+        ParaDrawing.GoTo_Text( true === bNext ? false : true, false );
         this.DrawingObjects.resetSelection();
     }
 
@@ -410,7 +410,7 @@ CDocumentContent.prototype.Search_GetId = function(bNext, bCurrent)
             if ( null != Id )
                 return Id;
 
-            ParaDrawing.GoTo_Text( true === bNext ? false : true );
+            ParaDrawing.GoTo_Text( true === bNext ? false : true, false );
         }
 
         var Pos = this.CurPos.ContentPos;
@@ -1109,7 +1109,7 @@ ParaRun.prototype.Search_GetId = function(bNext, bUseContentPos, ContentPos, Dep
             }
         }
 
-        StartPos = Math.min( this.Content.length - 1, StartPos );
+        StartPos = Math.min( this.Content.length - 1, StartPos - 1 );
         for ( var CurPos = StartPos; CurPos > NearPos; CurPos-- )
         {
             var Item = this.Content[CurPos];
