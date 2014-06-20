@@ -2707,6 +2707,7 @@ PasteProcessor.prototype =
         if(false == this.bNested && nInsertLength > 0)
         {
             this.oRecalcDocument.Recalculate();
+            oDocument.Cursor_MoveRight(false, false);
             this.oLogicDocument.Document_UpdateInterfaceState();
         }
 
@@ -2716,136 +2717,25 @@ PasteProcessor.prototype =
     {
         if(!g_bIsDocumentCopyPaste)
             return;
-        var nNewContentLength = aNewContent.length;
-        //����� ���� �� Document.Add_NewParagraph
-        var Item = oDoc.Content[oDoc.CurPos.ContentPos];
-
-        if( type_Paragraph == Item.GetType() )
-        {
-            if(true != this.bInBlock && 1 == nNewContentLength && type_Paragraph == aNewContent[0].GetType())
-            {
-                //������� ������ � ��������
-                var oInsertPar = aNewContent[0];
-				// Убираем метку конца параграфа у данного параграфа
-				oInsertPar.Remove_ParaEnd();
-				//Ищем в глубину run который нужно разбить
-				var oCurContent = Item;
-				var nCurContentContentPos = oCurContent.CurPos.ContentPos;
-				var oCurRunToSplit = oCurContent.Content[nCurContentContentPos];
-				while(null != oCurRunToSplit && para_Run != oCurRunToSplit.Type ){
-					oCurContent = oCurRunToSplit;
-					if(null != oCurRunToSplit.CurPos && null != oCurRunToSplit.CurPos.ContentPos)
-						nCurContentContentPos = oCurRunToSplit.CurPos.ContentPos;
-					else if(null != oCurRunToSplit.State && null != oCurRunToSplit.State.ContentPos)
-						nCurContentContentPos = oCurRunToSplit.State.ContentPos;
-					oCurRunToSplit = oCurContent.Content[nCurContentContentPos];
-				}
-				if(null != oCurRunToSplit && null != oCurContent){
-				    //разбиваем run, если находимся в середине
-				    var bSplit = false;
-					if ( oCurRunToSplit.State.ContentPos > 0 && oCurRunToSplit.State.ContentPos < oCurRunToSplit.Content.length ){
-						var RRun = oCurRunToSplit.Split_Run( oCurRunToSplit.State.ContentPos );
-						oInsertPar.Content.push(RRun);
-						bSplit = true;
-					}
-					else if(0 == oCurRunToSplit.State.ContentPos)
-						nCurContentContentPos--;
-					for(var i = 0, length = oInsertPar.Content.length; i < length; ++i){
-						var run = oInsertPar.Content[i];
-						if(run.Content.length > 0){
-							if(null != oCurContent.Internal_Content_Add)
-								oCurContent.Internal_Content_Add(++nCurContentContentPos, run, false);
-							else if(null != oCurContent.Add_ToContent)
-								oCurContent.Add_ToContent(++nCurContentContentPos, run, false);
-						}
-					}
-					if (bSplit)
-					    nCurContentContentPos--;
-					oCurContent.Content[nCurContentContentPos].Cursor_MoveToEndPos();
-					if (null != oCurContent.Set_ContentPos)
-					    oCurContent.Set_ContentPos(nCurContentContentPos, false, -1);
-					else
-					    oCurContent.State.ContentPos = nCurContentContentPos;
-					
-					Item.RecalcInfo.Set_Type_0(pararecalc_0_All);
-					Item.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
-					this.oRecalcDocument.ContentLastChangePos = this.oRecalcDocument.CurPos.ContentPos;
-				}
+        var paragraph = oDoc.Content[oDoc.CurPos.ContentPos];
+        if (null != paragraph && type_Paragraph == paragraph.GetType()) {
+            var NearPos = { Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false) };
+            paragraph.Check_NearestPos(NearPos);
+            //делаем небольшой сдвиг по y, потому что сама точка TargetPos для двухстрочного параграфа определяется как верхняя
+            //var NearPos = oDoc.Get_NearestPos(this.oLogicDocument.TargetPos.PageNum, this.oLogicDocument.TargetPos.X, this.oLogicDocument.TargetPos.Y + 0.05);//0.05 == 2pix
+            var oSelectedContent = new CSelectedContent();
+            for (var i = 0, length = aNewContent.length; i < length; ++i) {
+                var oSelectedElement = new CSelectedElement();
+                oSelectedElement.Element = aNewContent[i];
+                if (i == length - 1 && true != this.bInBlock && type_Paragraph == oSelectedElement.Element.GetType())
+                    oSelectedElement.SelectedAll = false;
+                else
+                    oSelectedElement.SelectedAll = true;
+                oSelectedContent.Add(oSelectedElement);
             }
-            else
-            {
-                var LastPos = this.oRecalcDocument.CurPos.ContentPos;
-                var LastPosCurDoc = oDoc.CurPos.ContentPos;
-                //����� ��������� ��������
-                var oSourceFirstPar = Item;
-                var oSourceLastPar = new Paragraph(oDoc.DrawingDocument, oDoc, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
-				if(true !== oSourceFirstPar.Cursor_IsEnd())
-					oSourceFirstPar.Split(oSourceLastPar);
-                var oInsFirstPar = aNewContent[0];
-                var oInsLastPar = null;
-                if(nNewContentLength > 1)
-                    oInsLastPar = aNewContent[nNewContentLength - 1];
-
-                var nStartIndex = 0;
-                var nEndIndex = nNewContentLength - 1;
-
-                if(type_Paragraph == oInsFirstPar.GetType())
-                {
-                    //�������� �������� ������� ������������ ��������� � ������ �������� ��������
-                    //CopyPr_Open - ������� � �������, �.�. ���� �������� ��� � ���������
-                    oInsFirstPar.CopyPr_Open( oSourceFirstPar );
-                    //�������� ���������� ������������ ���������
-                    oSourceFirstPar.Concat(oInsFirstPar);
-                    //�������� ��������� ������ ����� ������ �� ��������� ���� ��������
-                    nStartIndex++;
-                }
-                else if(type_Table == oInsFirstPar.GetType())
-                {
-                    //���� ��������� ������� � ������ ��������, �� �� ��������� ���
-                    if(oSourceFirstPar.IsEmpty())
-                    {
-                        oSourceFirstPar = null;
-                    }
-                }
-                //���� �� ���������� ������ ����� ���������, �� ��������� ���������� ���������� ��������� � ������ ������ �������� ��������� ���������
-                if(null != oInsLastPar && type_Paragraph == oInsLastPar.GetType() && true != this.bInBlock)
-                {
-                    var nNewContentPos = oInsLastPar.Content.length - 2;
-                    //�������� �������� ���������� ��������� ��������� � ���������  ����������� ��������
-                    //CopyPr - �� ������� � �������, �.�. � ������� ��������� ������� ����� ��������� � ��������
-                    if(null != oInsLastPar)
-                        oSourceLastPar.CopyPr(oInsLastPar);
-                    oInsLastPar.Cursor_MoveToEndPos(false, false);
-                    oInsLastPar.Concat(oSourceLastPar);
-                    oSourceLastPar = oInsLastPar;
-                    nEndIndex--;
-                }
-                //���������
-                for(var i = nStartIndex; i <= nEndIndex; ++i )
-                {
-                    var oElemToAdd = aNewContent[i];
-                    LastPosCurDoc++;
-                    oDoc.Internal_Content_Add(LastPosCurDoc, oElemToAdd);
-                }
-                if(null != oSourceLastPar)
-                {
-                    //��������� ��������� ��������
-                    LastPosCurDoc++;
-                    oDoc.Internal_Content_Add(LastPosCurDoc, oSourceLastPar);
-                }
-                if(null == oSourceFirstPar)
-                {
-                    //������� ������ ��������, ������ ��� ����� ������ ���� � ��������� �� ����� �� ������ ���������
-                    oDoc.Internal_Content_Remove(LastPosCurDoc, 1);
-                    LastPosCurDoc--;
-                }
-                this.oRecalcDocument.ContentLastChangePos = LastPos;
-				Item.RecalcInfo.Set_Type_0(pararecalc_0_All);
-				Item.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
-                oDoc.CurPos.ContentPos = LastPosCurDoc;
-            }
+            oDoc.Insert_Content(oSelectedContent, NearPos);
+            paragraph.Clear_NearestPosArray();
         }
-
     },
 
 
