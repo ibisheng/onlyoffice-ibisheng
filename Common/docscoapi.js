@@ -264,6 +264,7 @@
 		// Online-пользователи в документе
         this._participants = {};
 		this._countEditUsers = 0;
+		this._countUsers = 0;
 
         this._locks = {};
         this._msgBuffer = [];
@@ -467,7 +468,7 @@
     DocsCoApi.prototype.getUsers = function () {
 		// Специально для возможности получения после прохождения авторизации (Стоит переделать)
 		if (this.onAuthParticipantsChanged)
-			this.onAuthParticipantsChanged(this._participants, this._countEditUsers);
+			this.onAuthParticipantsChanged(this._participants, this._countUsers);
     };
 
 	DocsCoApi.prototype.getUser = function (userId) {
@@ -701,18 +702,21 @@
 	DocsCoApi.prototype._onAuthParticipantsChanged = function (participants) {
 		this._participants = {};
 		this._countEditUsers = 0;
+		this._countUsers = 0;
 
 		if (participants) {
 			var tmpUser;
 			for (var i = 0; i < participants.length; ++i) {
 				tmpUser = new asc_user(participants[i]);
 				this._participants[tmpUser.asc_getId()] = tmpUser;
-				// Считаем число всех пользователей (и тех кто просматривает тоже)
-				++this._countEditUsers;
+				// Считаем только число редакторов
+				if (!tmpUser.asc_getView())
+					++this._countEditUsers;
+				++this._countUsers;
 			}
 
 			if (this.onAuthParticipantsChanged)
-				this.onAuthParticipantsChanged(this._participants, this._countEditUsers);
+				this.onAuthParticipantsChanged(this._participants, this._countUsers);
 			
 			// Посылаем эвент о совместном редактировании
 			if (1 < this._countEditUsers)
@@ -723,18 +727,23 @@
 	};
 
 	DocsCoApi.prototype._onConnectionStateChanged = function (data) {
-		var userStateChanged = null, userId, stateChanged = false;
+		var userStateChanged = null, userId, stateChanged = false, isEditUser = true;
 		if (undefined !== data["state"] && this.onConnectionStateChanged) {
 			userStateChanged = new asc_user(data);
 
 			userId = userStateChanged.asc_getId();
+			isEditUser = !userStateChanged.asc_getView();
 			if (userStateChanged.asc_getState()) {
 				this._participants[userId] = userStateChanged;
-				++this._countEditUsers;
+				++this._countUsers;
+				if (isEditUser)
+					++this._countEditUsers;
 				stateChanged = true;
 			} else if (this._participants.hasOwnProperty(userId)){
 				delete this._participants[userId];
-				--this._countEditUsers;
+				--this._countUsers;
+				if (isEditUser)
+					--this._countEditUsers;
 				stateChanged = true;
 			}
 
@@ -745,7 +754,7 @@
 				else
 					this._onEndCoAuthoring(/*isStartEvent*/false);
 
-				this.onParticipantsChanged(this._participants, this._countEditUsers);
+				this.onParticipantsChanged(this._participants, this._countUsers);
 				this.onConnectionStateChanged(userStateChanged);
 			}
 		}
