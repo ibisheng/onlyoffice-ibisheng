@@ -6443,6 +6443,12 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
             this.isSaveFonts_Images = false;
             this.saveImageMap = null;
             this.pre_SaveCallback();
+
+            if (this.bInit_word_control === false)
+            {
+                this.bInit_word_control = true;
+                this.asc_fireCallback("asc_onDocumentContentReady");
+            }
         }
         else if (this.isLoadImagesCustom)
         {
@@ -6493,10 +6499,11 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                 //Recalculate для Document
                 Document.CurPos.ContentPos = 0;
                 History.RecalcData_Add({Type: historyrecalctype_Drawing, All: true});
-                Document.DrawingObjects.addToZIndexManagerAfterOpen();
                 if (!this.isOnlyReaderMode)
                 {
-                    Document.Recalculate();
+                    if (false === this.isSaveFonts_Images)
+                        Document.Recalculate();
+
                     this.WordControl.m_oDrawingDocument.TargetStart();
                 }
                 else
@@ -6513,8 +6520,11 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
     this.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
     this.LoadedObject = null;
 
-    this.bInit_word_control = true;
-    this.asc_fireCallback("asc_onDocumentContentReady");
+    if (false === this.isSaveFonts_Images)
+    {
+        this.bInit_word_control = true;
+        this.asc_fireCallback("asc_onDocumentContentReady");
+    }
 
     this.WordControl.InitControl();
 
@@ -7008,11 +7018,14 @@ asc_docs_api.prototype.SetViewMode = function( isViewMode )
             return;
         }
 
+        // быстрого перехода больше нет
+        /*
         if ( this.bInit_word_control === true )
         {
             CollaborativeEditing.Apply_Changes();
             CollaborativeEditing.Release_Locks();
         }
+        */
 
         this.isUseEmbeddedCutFonts = false;
 

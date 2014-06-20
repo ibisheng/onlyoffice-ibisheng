@@ -3553,7 +3553,7 @@ function CEditorPage(api)
             oWordControl.m_oDrawingDocument.CheckTrackTable();
         }
 
-        if (oWordControl.m_oApi.autoSaveGap != 0)
+        if (oWordControl.m_oApi.autoSaveGap != 0 && !oWordControl.m_oApi.isViewMode && !oWordControl.TextBoxInputFocus)
         {
             var _curTime = new Date().getTime();
             if (-1 == oWordControl.m_nLastAutosaveTime)

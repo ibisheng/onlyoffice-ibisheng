@@ -612,6 +612,7 @@ CDocument.prototype =
     On_EndLoad : function()
     {
         this.Update_SectionsInfo();
+        this.DrawingObjects.addToZIndexManagerAfterOpen();
     },
 
     LoadEmptyDocument : function()
