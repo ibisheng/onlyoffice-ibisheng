@@ -4788,6 +4788,9 @@ Paragraph.prototype =
         {
             var SearchPos  = new CParagraphSearchPos();
             var ContentPos = this.Get_ParaContentPos( false, false );
+            
+            if ( true === AddToSelect )
+                SearchPos.ForSelection = true;
 
             if ( true === Word )
                 this.Get_WordStartPos( SearchPos, ContentPos );
@@ -4888,6 +4891,9 @@ Paragraph.prototype =
         {
             var SearchPos  = new CParagraphSearchPos();
             var ContentPos = this.Get_ParaContentPos( false, false );
+
+            if ( true === AddToSelect )
+                SearchPos.ForSelection = true;
 
             if ( true === Word )
                 this.Get_WordEndPos( SearchPos, ContentPos, AddToSelect );
