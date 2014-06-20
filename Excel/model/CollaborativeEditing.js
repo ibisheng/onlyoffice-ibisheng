@@ -92,7 +92,7 @@
 		CCollaborativeEditing.prototype.getCollaborativeEditing = function () {
 			if (true !== this.isCoAuthoringExcellEnable() || this.m_bIsViewerMode)
 				return false;
-			return 1 === this.m_nUseType;
+			return 1 !== this.m_nUseType;
 		};
 
 		//-----------------------------------------------------------------------------------
