@@ -3532,6 +3532,9 @@ function CEditorPage(api)
 
         if (!oWordControl.m_oApi.bInit_word_control)
             return;
+
+        if (oWordControl.IsFocus && oWordControl.TextBoxInputMode && oWordControl.TextBoxInput && !window.USER_AGENT_SAFARI_MACOS)
+            oWordControl.TextBoxInput.focus();
         
         oWordControl.m_nTimeDrawingLast = new Date().getTime();
         if (oWordControl.m_bIsScroll)
