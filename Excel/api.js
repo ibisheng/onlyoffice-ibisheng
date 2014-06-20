@@ -1328,7 +1328,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			_loadFonts: function (fonts, callback) {
 			    if (window["NATIVE_EDITOR_ENJINE"])
 			        return callback();
-			        
+			    var aFonts = [];
+			    for (var i in fonts)
+			        aFonts.push(i);
+			    History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_AddFont, null, null, new UndoRedoData_SingleProperty(aFonts), true);
 				this.asyncMethodCallback = callback;
 				var arrLoadFonts = [];
 				for(var i in fonts)

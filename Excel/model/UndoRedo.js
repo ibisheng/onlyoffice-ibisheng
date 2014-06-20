@@ -22,13 +22,14 @@ function DrawingCollaborativeData()
     this.isDrawingCollaborativeData = true;
 }
 //главный обьект для пересылки изменений
-function UndoRedoItemSerializable(oClass, nActionType, nSheetId, oRange, oData)
+function UndoRedoItemSerializable(oClass, nActionType, nSheetId, oRange, oData, LocalChange)
 {
 	this.oClass = oClass;
 	this.nActionType = nActionType;
 	this.nSheetId = nSheetId;
 	this.oRange = oRange;
 	this.oData = oData;
+	this.LocalChange = LocalChange;
 }
 UndoRedoItemSerializable.prototype = {
 	Serialize : function(oBinaryWriter, collaborativeEditing)

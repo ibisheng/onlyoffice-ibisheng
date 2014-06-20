@@ -1663,6 +1663,16 @@ Workbook.prototype.recalcDependency = function(f,bad,notRecalc){
         return sr;
     }
 };
+Workbook.prototype._SerializeHistoryBase64 = function (oMemory, item, aPointChangesBase64) {
+    if (!item.LocalChange) {
+        var nPosStart = oMemory.GetCurPosition();
+        item.Serialize(oMemory, this.oApi.collaborativeEditing);
+        var nPosEnd = oMemory.GetCurPosition();
+        var nLen = nPosEnd - nPosStart;
+        if (nLen > 0)
+            aPointChangesBase64.push(nLen + ";" + oMemory.GetBase64Memory2(nPosStart, nLen));
+    }
+}
 Workbook.prototype.SerializeHistory = function(){
 	var aRes = [];
 	//соединяем изменения, которые были до приема данных с теми, что получились после.
@@ -1677,23 +1687,42 @@ Workbook.prototype.SerializeHistory = function(){
 	{
 		var oMemory = new CMemory();
 		var oThis = this;
-		//создаем еще один элемент в undo/redo - взаимное расположение Sheet, чтобы не запутываться в add, move событиях
-		var oSheetPlaceData = [];
-		for(var i = 0, length = this.aWorksheets.length; i < length; ++i)
-			oSheetPlaceData.push(this.aWorksheets[i].getId());
-		aActions.push(new UndoRedoItemSerializable(g_oUndoRedoWorkbook, historyitem_Workbook_SheetPositions, null, null, new UndoRedoData_SheetPositions(oSheetPlaceData)));
+		var oFontMap = {};
+		var bChangeSheetPlace = false;
+		var aPointChangesBase64;
 		for(var i = 0, length = aActions.length; i < length; ++i)
 		{
-			var nPosStart = oMemory.GetCurPosition();
-			var item = aActions[i];
-			item.Serialize(oMemory, this.oApi.collaborativeEditing);
-			var nPosEnd = oMemory.GetCurPosition();
-			var nLen = nPosEnd - nPosStart;
-			if(nLen > 0)
-				aRes.push(nLen + ";" + oMemory.GetBase64Memory2(nPosStart, nLen));
+		    var aPointChanges = aActions[i];
+		    aPointChangesBase64 = [];
+		    for (var j = 0, length2 = aPointChanges.length; j < length2; ++j) {
+		        var item = aPointChanges[j];
+		        if (g_oUndoRedoWorkbook == item.oClass) {
+		            if (historyitem_Workbook_AddFont == item.nActionType) {
+		                for (var k = 0, length3 = item.oData.elem.length; k < length3; ++k)
+		                    oFontMap[item.oData.elem[k]] = 1;
+		            }
+		            else if (historyitem_Workbook_SheetAdd == item.nActionType || historyitem_Workbook_SheetRemove == item.nActionType || historyitem_Workbook_SheetMove == item.nActionType)
+		                bChangeSheetPlace = true;
+		        }
+		        this._SerializeHistoryBase64(oMemory, item, aPointChangesBase64);
+		    }
+		    aRes.push(aPointChangesBase64);
 		}
-		//добавляем элемент, который содержит все используемые шрифты, чтобы их можно было загрузить в начале
-		aRes.push("0;fontmap" + this.generateFontMap().join(","));
+		aPointChangesBase64 = [];
+		var aFonts = [];
+		for (var i in oFontMap)
+		    aFonts.push(i);
+		if (aFonts.length > 0)
+		    this._SerializeHistoryBase64(oMemory, new UndoRedoItemSerializable(g_oUndoRedoWorkbook, historyitem_Workbook_AddFont2, null, null, new UndoRedoData_SingleProperty(aFonts)), aPointChangesBase64);
+		if (bChangeSheetPlace) {
+		    //создаем еще один элемент в undo/redo - взаимное расположение Sheet, чтобы не запутываться в add, move событиях
+		    var oSheetPlaceData = [];
+		    for (var i = 0, length = this.aWorksheets.length; i < length; ++i)
+		        oSheetPlaceData.push(this.aWorksheets[i].getId());
+		    this._SerializeHistoryBase64(oMemory, new UndoRedoItemSerializable(g_oUndoRedoWorkbook, historyitem_Workbook_SheetPositions, null, null, new UndoRedoData_SheetPositions(oSheetPlaceData)), aPointChangesBase64);
+		}
+		if (aPointChangesBase64.length > 0)
+		    aRes.push(aPointChangesBase64);
 		this.aCollaborativeActions = [];
 	}
 	return aRes;
@@ -1710,14 +1739,18 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 		var aIndexes = [];
 		for(var i = 0, length = aChanges.length;i < length; ++i)
 		{
-			var sChange = aChanges[i];
-			var nIndex = sChange.indexOf(";");
-			if(-1 != nIndex)
-			{
-				dstLen += parseInt(sChange.substring(0, nIndex));
-				nIndex++;
-			}
-			aIndexes.push(nIndex);
+		    var aPointChanges = aChanges[i];
+		    var aIndexesPoint = [];
+		    for (var j = 0, length2 = aPointChanges.length; j < length2; ++j) {
+		        var sChange = aPointChanges[j];
+		        var nIndex = sChange.indexOf(";");
+		        if (-1 != nIndex) {
+		            dstLen += parseInt(sChange.substring(0, nIndex));
+		            nIndex++;
+		        }
+		        aIndexesPoint.push(nIndex);
+		    }
+		    aIndexes.push(aIndexesPoint);
 		}
 		var pointer = g_memory.Alloc(dstLen);
 		var stream = new FT_Stream2(pointer.data, dstLen);
@@ -1725,19 +1758,23 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 		var nCurOffset = 0;
 		//пробегаемся первый раз чтобы заполнить oFontMap
 		var oFontMap = {};//собираем все шрифтры со всех изменений
-		var sFontMapString = "0;fontmap";
-		for(var i = 0, length = aChanges.length; i < length; ++i)
-		{
-			var sChange = aChanges[i];
-			if(sFontMapString == sChange.substring(0, sFontMapString.length))
-			{
-				var sFonts = sChange.substring(sFontMapString.length);
-				var aFonts = sFonts.split(",");
-				for(var j = 0, length2 = aFonts.length; j < length2; ++j)
-					oFontMap[aFonts[j]] = 1;
-			}
+		var aUndoRedoElems = [];
+		for (var i = 0, length = aChanges.length; i < length; ++i) {
+		    var aPointChanges = aChanges[i];
+		    var aIndexesPoint = aIndexes[i];
+		    for (var j = 0, length2 = aPointChanges.length; j < length2; ++j) {
+		        var sChange = aPointChanges[j];
+		        var oBinaryFileReader = new Asc.BinaryFileReader();
+		        nCurOffset = oBinaryFileReader.getbase64DecodedData2(sChange, aIndexesPoint[j], stream, nCurOffset);
+		        var item = new UndoRedoItemSerializable();
+		        item.Deserialize(stream);
+		        if (g_oUndoRedoWorkbook == item.oClass && historyitem_Workbook_AddFont2 == item.nActionType) {
+		            for (var k = 0, length3 = item.oData.elem.length; k < length3; ++k)
+		                oFontMap[item.oData.elem[k]] = 1;
+		        }
+		        aUndoRedoElems.push(item);
+		    }
 		}
-		
 		window["Asc"]["editor"]._loadFonts(oFontMap, function(){
 				History.Clear();
 				History.Create_NewPoint();
@@ -1746,27 +1783,18 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 				var oHistoryPositions = null;//нужен самый последний historyitem_Workbook_SheetPositions
 				var oRedoObjectParam = new Asc.RedoObjectParam();
 				History.UndoRedoPrepare(oRedoObjectParam, false);
-				for(var i = 0, length = aChanges.length; i < length; ++i)
+				for (var i = 0, length = aUndoRedoElems.length; i < length; ++i)
 				{
-					var sChange = aChanges[i];
-					if(sFontMapString != sChange.substring(0, sFontMapString.length))
-					{
-					    var oBinaryFileReader = new Asc.BinaryFileReader();
-						nCurOffset = oBinaryFileReader.getbase64DecodedData2(sChange, aIndexes[i], stream, nCurOffset);
-						var item = new UndoRedoItemSerializable();
-						item.Deserialize(stream);
-						if(null != item.oClass && null != item.nActionType)
-						{
-							if(g_oUndoRedoWorkbook == item.oClass && historyitem_Workbook_SheetPositions == item.nActionType)
-								oHistoryPositions = item;
-							else
-                            {
-                                // TODO if(g_oUndoRedoGraphicObjects == item.oClass && item.oData.drawingData)
-                                //     item.oData.drawingData.bCollaborativeChanges = true;
-                                History.RedoAdd(oRedoObjectParam, item.oClass, item.nActionType, item.nSheetId, item.oRange, item.oData);
-                            }
-						}
-					}
+				    var item = aUndoRedoElems[i];
+				    if (null != item.oClass && null != item.nActionType) {
+				        if (g_oUndoRedoWorkbook == item.oClass && historyitem_Workbook_SheetPositions == item.nActionType)
+				            oHistoryPositions = item;
+				        else {
+				            // TODO if(g_oUndoRedoGraphicObjects == item.oClass && item.oData.drawingData)
+				            //     item.oData.drawingData.bCollaborativeChanges = true;
+				            History.RedoAdd(oRedoObjectParam, item.oClass, item.nActionType, item.nSheetId, item.oRange, item.oData);
+				        }
+				    }
 				}
 				if(null != oHistoryPositions)
 					History.RedoAdd(oRedoObjectParam, oHistoryPositions.oClass, oHistoryPositions.nActionType, oHistoryPositions.nSheetId, oHistoryPositions.oRange, oHistoryPositions.oData);

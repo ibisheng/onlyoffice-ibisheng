@@ -7,6 +7,8 @@ var historyitem_Workbook_SheetRemove = 2;
 var historyitem_Workbook_SheetMove = 3;
 var historyitem_Workbook_SheetPositions = 4;
 var historyitem_Workbook_ChangeColorScheme = 5;
+var historyitem_Workbook_AddFont = 6;
+var historyitem_Workbook_AddFont2 = 7;
 
 var historyitem_Worksheet_RemoveCell = 1;
 var historyitem_Worksheet_RemoveRows = 2;
@@ -929,25 +931,21 @@ CHistory.prototype =
     },
 	GetSerializeArray : function()
 	{
-		var aRes = [];
-		for(var i = 0; i <= this.Index; ++i)
+	    var aRes = [];
+	    this._checkCurPoint();
+	    var i = 0;
+	    if (null != this.SavedIndex)
+	        i = this.SavedIndex + 1;
+		for(; i <= this.Index; ++i)
 		{
-			var point = this.Points[i];
+		    var point = this.Points[i];
+		    var aPointChanges = [];
 			for(var j = 0, length2 = point.Items.length; j < length2; ++j)
 			{
 				var elem = point.Items[j];
-				if(true != elem.LocalChange)
-					aRes.push(new UndoRedoItemSerializable(elem.Class, elem.Type, elem.SheetId, elem.Range, elem.Data));
+				aPointChanges.push(new UndoRedoItemSerializable(elem.Class, elem.Type, elem.SheetId, elem.Range, elem.Data, elem.LocalChange));
 			}
-		}
-		if(null != this.CurPoint)
-		{
-			for(var j = 0, length2 = this.CurPoint.Items.length; j < length2; ++j)
-			{
-				var elem = this.CurPoint.Items[j];
-				if(true != elem.LocalChange)
-					aRes.push(new UndoRedoItemSerializable(elem.Class, elem.Type, elem.SheetId, elem.Range, elem.Data));
-			}
+			aRes.push(aPointChanges);
 		}
 		return aRes;
 	},
