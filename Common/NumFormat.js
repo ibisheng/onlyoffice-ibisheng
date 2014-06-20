@@ -2983,12 +2983,17 @@ FormatParser.prototype =
         }
         if (!bError) {
             if (0 != nPrevIndex) {
-                val = val.replace(new RegExp(escapeRegExp(cultureInfo.NumberGroupSeparator), "g"), '');
-                bThouthand = true;
+                //чтобы не распознавалось 0,001
+                if (nPrevIndex < val.length && parseInt(val.substr(0, val.length - nPrevIndex)) > 0) {
+                    val = val.replace(new RegExp(escapeRegExp(cultureInfo.NumberGroupSeparator), "g"), '');
+                    bThouthand = true;
+                }
             }
-            var dNumber = parseFloat(val);
-            if (!isNaN(dNumber))
-                oRes = { number: dNumber, thouthand: bThouthand };
+            if (Asc.isNumber(val)) {
+                var dNumber = parseFloat(val);
+                if (!isNaN(dNumber))
+                    oRes = { number: dNumber, thouthand: bThouthand };
+            }
         }
 		return oRes;
 	},
