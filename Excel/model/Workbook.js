@@ -45,7 +45,8 @@ function DependencyGraph( wb ) {
     this.nodesCell = null;
     this.nodesArea = null;
     this.nodeslength = null;
-	this.bSetRefError = false;
+    this.bSetRefError = false;
+    this.oChangeNodeSlave = null;
     this.clear();
 }
 DependencyGraph.prototype = {
@@ -177,6 +178,7 @@ DependencyGraph.prototype = {
 	deleteNodes : function(sheetId, bbox){
 		var bSetRefErrorOld = this.bSetRefError;
 		this.bSetRefError = true;
+		this.oChangeNodeSlave = { toDelete: {}, toMove: {} };
 		var nodesSheetArea = this.nodesArea[sheetId];
 		var oGetRes;
 		if(nodesSheetArea)
@@ -192,6 +194,7 @@ DependencyGraph.prototype = {
 			for(var i = 0, length = oGetRes.length; i < length; ++i)
 				nodesSheetCell.removeElement(oGetRes[i]);
 		}
+		this.changeNodeEnd();
 		this.bSetRefError = bSetRefErrorOld;
     },
     deleteMasterNodes:function ( sheetId, cellId ) {
@@ -211,6 +214,14 @@ DependencyGraph.prototype = {
 		if(node && node.refCount <= 0)
 			this.deleteNode(node);
 		return node;
+	},
+	deleteMasterNodes3:function ( node ) {
+	    var arr = node.deleteAllMasterEdges();
+	    for (var i in arr) {
+	        var nodeMaster = arr[i];
+	        if (nodeMaster.refCount <= 0)
+	            this.deleteNode(nodeMaster);
+	    }
 	},
     getSlaveNodes:function ( sheetId, cellId ) {
         //todo
@@ -233,13 +244,67 @@ DependencyGraph.prototype = {
 		var sShiftGetBBoxName = oShiftGetBBox.getName();
 		this.wb.needRecalc.nodes[getVertexId(wsId, sShiftGetBBoxName)] = [wsId, sShiftGetBBoxName];
 		this.wb.needRecalc.length++;
+		this.oChangeNodeSlave = { toDelete: {}, toMove: {}};
         var nodesSheetArea = this.nodesArea[wsId];
 		if(nodesSheetArea)
 			nodesSheetArea.shift(BBox, !toDelete, bHor);
         var nodesSheetCell = this.nodesCell[wsId];
 		if(nodesSheetCell)
             nodesSheetCell.shift( BBox, !toDelete, bHor );
+		this.changeNodeEnd();
 		this.bSetRefError = bSetRefErrorOld;
+    },
+    changeNodeProcessDelete: function (node, oFormulas, toDelete) {
+        //todo deleteAllSlaveEdges deleteMasterNodes
+        var oSlaves = node.deleteAllSlaveEdges();
+        if (this.bSetRefError) {
+            //выставляем #REF!
+            for (var i in oSlaves) {
+                var slave = oSlaves[i];
+                if (null == toDelete || slave != toDelete[slave.nodeId]) {
+                    var formula = slave.setRefError(node);
+                    if (null != formula) {
+                        if (oFormulas)
+                            oFormulas[slave.nodeId] = { node: slave, formula: formula };
+                        else
+                            slave.setFormula(formula, true, false);
+                    }
+                }
+            }
+        }
+        this.deleteMasterNodes3(node);
+    },
+    changeNodeProcessMove: function (node, from, to, oFormulas, toDelete) {
+        if (null == toDelete || node != toDelete[node.nodeId])
+            node.moveOuter(from, to, oFormulas);
+    },
+    changeNodeEnd : function(){
+        var oChangeNodeSlave = this.oChangeNodeSlave;
+        //обнуляем, потому что в цикле можем опять попасть в _changeNode со старым this.oChangeNodeSlave
+        this.oChangeNodeSlave = null;
+        //накапливаем формулы, потому что когда мы меняем формулу мы удаляем masterNodes, а эти node могут быть необработаными и влиять на формулу(C2=A2+B2 -> C1=A1+B2)
+        var oFormulas = {};
+        for (var i in oChangeNodeSlave.toDelete) {
+            var elem = oChangeNodeSlave.toDelete[i];
+            this.changeNodeProcessDelete(elem.node, oFormulas, oChangeNodeSlave.toDelete);
+        }
+        for (var i in oChangeNodeSlave.toMove) {
+            var elem = oChangeNodeSlave.toMove[i];
+            this.changeNodeProcessMove(elem.node, elem.from, elem.to, oFormulas, oChangeNodeSlave.toDelete);
+        }
+        for (var i in oFormulas) {
+            var elem = oFormulas[i];
+            if (null == elem.formula) {
+                var node = elem.node;
+                var cell = node.returnCell();
+                if (cell && cell.formulaParsed) {
+                    this.wb.dependencyFormulas.deleteMasterNodes2(node.sheetId, node.cellId);
+                    addToArrRecalc(node.sheetId, cell);
+                }
+            }
+            else
+                elem.node.setFormula(elem.formula, true, false);
+        }
     },
 	_changeNode : function(node, from, to)
 	{
@@ -254,31 +319,25 @@ DependencyGraph.prototype = {
 		}
 		else if(toDelete)
 		{
-			var oSlaves = node.deleteAllSlaveEdges();
-			if(this.bSetRefError)
-			{
-				//выставляем #REF!
-				for(var i in oSlaves)
-				{
-					var slave = oSlaves[i];
-					slave.setRefError(wsId, node.cellId);
-				}
+			if (this.oChangeNodeSlave)
+			    this.oChangeNodeSlave.toDelete[node.nodeId] = { node: node, from: from, to: to };
+			else {
+			    this.changeNodeProcessDelete(node, null);
 			}
-			this.deleteMasterNodes(node.sheetId, node.cellId);
 			delete this.nodesId[node.nodeId];
 			this.nodeslength--;
 		}
-        else {
-            var sOldnodeId = node.nodeId;
-			if((from.r1 == to.r1 && from.c1 == to.c1) || (from.r2 == to.r2 && from.c2 == to.c2))
-				node.moveStretch(to);
-            else
-				node.move({offsetCol: to.c1 - from.c1, offsetRow: to.r1 - from.r1}, wsId, toDelete);
-
+		else {
+		    var sOldnodeId = node.nodeId;
+		    node.moveInner(to);
+		    if (this.oChangeNodeSlave)
+		        this.oChangeNodeSlave.toMove[node.nodeId] = { node: node, from: from, to: to };
+		    else
+		        this.changeNodeProcessMove(node, from, to, null);
             delete this.nodesId[sOldnodeId];
             this.nodesId[node.nodeId] = node;
 		}
-		//важно что ячейки уже сдвинулись, поэтому до вызова returnCell нужно сделать node.move
+		//важно что ячейки уже сдвинулись, поэтому до вызова returnCell нужно сделать node.move и сдвинуть ячейки в aGCells
 		if(!node.isArea)
 		{
             var cwf = this.wb.cwf[wsId];
@@ -322,12 +381,14 @@ DependencyGraph.prototype = {
 	},
 	helper : function(BBoxFrom, oBBoxTo, wsId){
 		var oGetRes, node, nodesSheetCell = this.nodesCell[wsId], nodesSheetArea = this.nodesArea[wsId];
-		var offset = {offsetCol: oBBoxTo.c1 - BBoxFrom.c1, offsetRow: oBBoxTo.r1 - BBoxFrom.r1};
+		var offset = { offsetCol: oBBoxTo.c1 - BBoxFrom.c1, offsetRow: oBBoxTo.r1 - BBoxFrom.r1 };
+		this.oChangeNodeSlave = { toDelete: {}, toMove: {} };
 		var elem, bbox;
 		if(nodesSheetCell)
 			oGetRes = nodesSheetCell.move(BBoxFrom, oBBoxTo);
 		if(nodesSheetArea)
-			oGetRes = nodesSheetArea.move(BBoxFrom, oBBoxTo);
+		    oGetRes = nodesSheetArea.move(BBoxFrom, oBBoxTo);
+		this.changeNodeEnd();
 	},
     drawDep:function ( cellId, se ) {
         // ToDo неиспользуемая функция, реализовать после выпуска
@@ -492,13 +553,15 @@ DependencyGraph.prototype = {
         else
             h( m, rc );
     },
-    removeNodeBySheetId:function ( sheetId ) {
+    removeNodeBySheetId: function (sheetId) {
+        this.oChangeNodeSlave = { toDelete: {}, toMove: {} };
 		var nodesSheetArea = this.nodesArea[sheetId];
 		if(nodesSheetArea)
 			nodesSheetArea.removeAll();
         var nodesSheetCell = this.nodesCell[sheetId];
 		if(nodesSheetCell)
-            nodesSheetCell.removeAll();
+		    nodesSheetCell.removeAll();
+		this.changeNodeEnd();
     },
     getNodeDependence:function ( aElems ) {
         var oRes = {oMasterNodes:{}, oMasterAreaNodes:{}, oWeightMap:{}};
@@ -677,10 +740,10 @@ Vertex.prototype = {
 	},
 	setFormula : function(sFormula, bAddToHistory, bAddNeedRecalc)
 	{
-		var cell = this.returnCell();
-		if(null != sFormula)
-			cell.setFormula(sFormula, bAddToHistory);
-		this.wb.dependencyFormulas.deleteMasterNodes2( this.sheetId, this.cellId );
+	    this.wb.dependencyFormulas.deleteMasterNodes2(this.sheetId, this.cellId);
+	    var cell = this.returnCell();
+	    if (null != sFormula)
+	        cell.setFormula(sFormula, bAddToHistory);
 		addToArrRecalc(this.sheetId, cell);
 		if(bAddNeedRecalc)
 		{
@@ -690,56 +753,87 @@ Vertex.prototype = {
 	},
 	setRefError : function(wsId, cellId)
 	{
+	    var sRes = null;
 		var cell = this.returnCell();
 		if( cell && cell.formulaParsed )
 		{
-			cell.formulaParsed.setRefError(wsId, cellId);
-			this.setFormula(cell.formulaParsed.assemble(), true, false);
+		    cell.formulaParsed.setRefError(wsId, cellId);
+		    sRes = cell.formulaParsed.assemble(true);
 		}
+		return sRes;
 	},
-	move : function(offset, wsId, toDelete)
-	{
-		var oNewBBox = new Asc.Range(this.bbox.c1 + offset.offsetCol, this.bbox.r1 + offset.offsetRow, this.bbox.c2 + offset.offsetCol, this.bbox.r2 + offset.offsetRow);
-		var sNewBBoxName = oNewBBox.getName();
-		var _sn = this.getSlaveEdges();
-		var cell = this.returnCell();
-		if( cell && cell.formulaParsed )
-		{
-			this.wb.dependencyFormulas.deleteMasterNodes2(wsId, this.bbox.getName());
-			addToArrRecalc(wsId, cell);
-		}
-		for( var _id in _sn ){
-			var slave = _sn[_id]
-			cell = slave.returnCell();
-			if( cell && cell.formulaParsed )
-			{
-				cell.formulaParsed.shiftCells( offset, null, this, slave.sheetId, toDelete);
-				slave.setFormula(cell.formulaParsed.assemble(), true, false);
-			}
-		}
-		this.bbox = oNewBBox;
-		this.cellId = sNewBBoxName;
-		this.nodeId = getVertexId(this.sheetId, this.cellId);
-		this.wb.needRecalc.nodes[this.nodeId] = [this.sheetId, this.cellId ];
-		this.wb.needRecalc.length++;
+	moveInner: function (bboxTo) {
+	    //удаляем старые ссылки slave и master
+	    for (var i in this.slaveEdges) {
+	        var slave = this.slaveEdges[i];
+	        slave.deleteMasterEdge(this);
+	    }
+	    for (var i in this.masterEdges) {
+	        var master = this.masterEdges[i];
+	        master.deleteSlaveEdge(this);
+	    }
+	    var sOldNodeId = this.nodeId;
+	    this.bbox = bboxTo;
+	    this.cellId = bboxTo.getName();
+	    this.nodeId = getVertexId(this.sheetId, this.cellId);
+	    this.wb.needRecalc.nodes[this.nodeId] = [this.sheetId, this.cellId ];
+	    this.wb.needRecalc.length++;
+	    //добавляем новые slave и master
+	    for (var i in this.slaveEdges) {
+	        var slave = this.slaveEdges[i];
+	        slave.addMasterEdge(this);
+	    }
+	    for (var i in this.masterEdges) {
+	        var master = this.masterEdges[i];
+	        master.addSlaveEdge(this);
+	    }
 	},
-	moveStretch : function(bboxTo)
-	{
-		var sNewName = bboxTo.getName();
-		var _sn = this.getSlaveEdges();
-		for( var _id in _sn ){
-			var slave = _sn[_id];
-			var cell = slave.returnCell();
-			if( cell && cell.formulaParsed ){
-				cell.formulaParsed.stretchArea( this, bboxTo, sNewName );
-				slave.setFormula(cell.formulaParsed.assemble(), true, false);
-			}
-		}
-		this.bbox = bboxTo;
-		this.cellId = sNewName;
-		this.nodeId = getVertexId(this.sheetId, this.cellId);
-		this.wb.needRecalc.nodes[this.nodeId] = [this.sheetId, this.cellId ];
-		this.wb.needRecalc.length++;
+	moveOuter: function (from, to, oFormulas) {
+	    if ((from.r1 == to.r1 && from.c1 == to.c1) || (from.r2 == to.r2 && from.c2 == to.c2)) {
+	        var _sn = this.getSlaveEdges();
+	        for (var _id in _sn) {
+	            var slave = _sn[_id];
+	            var cell = slave.returnCell();
+	            if (cell && cell.formulaParsed) {
+	                cell.formulaParsed.stretchArea(this, from, to);
+	                var formula = cell.formulaParsed.assemble();
+	                if (null != formula) {
+	                    if (oFormulas)
+	                        oFormulas[slave.nodeId] = { node: slave, formula: formula };
+	                    else
+	                        slave.setFormula(formula, true, false);
+	                }
+	            }
+	        }
+	    }
+	    else {
+	        if (oFormulas) {
+	            if (null == oFormulas[this.nodeId])
+	                oFormulas[this.nodeId] = { node: this, formula: null };
+	        }
+	        else {
+	            var cell = this.returnCell();
+	            if (cell && cell.formulaParsed) {
+	                this.wb.dependencyFormulas.deleteMasterNodes2(this.sheetId, this.cellId);
+	                addToArrRecalc(this.sheetId, cell);
+	            }
+	        }
+	        var _sn = this.getSlaveEdges();
+	        for (var _id in _sn) {
+	            var slave = _sn[_id]
+	            var cell = slave.returnCell();
+	            if (cell && cell.formulaParsed) {
+	                cell.formulaParsed.shiftCells(this, from, to);
+	                var formula = cell.formulaParsed.assemble();
+	                if (null != formula) {
+	                    if (oFormulas)
+	                        oFormulas[slave.nodeId] = { node: slave, formula: formula };
+	                    else
+	                        slave.setFormula(formula, true, false);
+	                }
+	            }
+	        }
+	    }
 	},
 	//добавляем ведущую ячейку.
 	addMasterEdge : function(node){
@@ -784,17 +878,21 @@ Vertex.prototype = {
 	},
 	
 	//удаляем ребро между конкретной ведущей ячейки.
-	deleteMasterEdge : function(node){
-		this.masterEdges[node.nodeId] = null;
-		delete this.masterEdges[node.nodeId];
-		this.refCount--;
+	deleteMasterEdge: function (node) {
+	    if (this.masterEdges) {
+	        this.masterEdges[node.nodeId] = null;
+	        delete this.masterEdges[node.nodeId];
+	        this.refCount--;
+	    }
 	},
 
 	//удаляем ребро между конкретной зависимой(ведомой) ячейки.
-	deleteSlaveEdge : function(node){
-		this.slaveEdges[node.nodeId] = null;
-		delete this.slaveEdges[node.nodeId];
-		this.refCount--;
+	deleteSlaveEdge: function (node) {
+	    if (this.slaveEdges) {
+	        this.slaveEdges[node.nodeId] = null;
+	        delete this.slaveEdges[node.nodeId];
+	        this.refCount--;
+	    }
 	},
 
 	//очищаем все ребра по ведущим ячейкам.
@@ -2228,6 +2326,8 @@ Woorksheet.prototype._removeRows=function(start, stop){
             delete this.aGCells[nIndex];
 		}
 	}
+	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveRows, this.getId(), new Asc.Range(0, start, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, start, stop));
+
 	var oActualRange = {r1: start, c1: 0, r2: stop, c2: gc_nMaxCol0};
 	var res = this.renameDependencyNodes( {offsetRow:nDif,offsetCol:0}, oActualRange );
 	buildRecalc(this.workbook);
@@ -2236,7 +2336,6 @@ Woorksheet.prototype._removeRows=function(start, stop){
 //	for(var id  in res)
 //		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
 		
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveRows, this.getId(), new Asc.Range(0, start, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, start, stop));
 	return true;
 };
 Woorksheet.prototype.insertRowsBefore=function(index, count){
@@ -2248,7 +2347,6 @@ Woorksheet.prototype._insertRowsBefore=function(index, count){
 	var oActualRange = {r1: index, c1: 0, r2: index + count - 1, c2: gc_nMaxCol0};
 	History.Create_NewPoint();
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_AddRows, this.getId(), new Asc.Range(0, index, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, index, index + count - 1));
-	History.TurnOff();
 	//index 0 based
 	var aIndexes = [];
 	for(var i in this.aGCells)
@@ -2292,8 +2390,7 @@ Woorksheet.prototype._insertRowsBefore=function(index, count){
 	
 //	for(var id  in res)
 //		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
-		
-	History.TurnOn();
+
 	return true;
 };
 Woorksheet.prototype.insertRowsAfter=function(index, count){
@@ -2339,10 +2436,6 @@ Woorksheet.prototype._removeCols=function(start, stop){
 			}
 		}
 	}
-	var oActualRange = {r1: 0, c1: start, r2: gc_nMaxRow0, c2: stop};
-	var res = this.renameDependencyNodes( {offsetRow:0,offsetCol:nDif}, oActualRange );
-	buildRecalc(this.workbook);
-	unLockDraw(this.workbook);
 	
 	var oDefColPr = new UndoRedoData_ColProp();
 	for(var i = start; i <= stop; ++i)
@@ -2363,11 +2456,17 @@ Woorksheet.prototype._removeCols=function(start, stop){
 		if(null != elem)
 			elem.moveHor(nDif);
 	}
+
+	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCols, this.getId(), new Asc.Range(start, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, start, stop));
+
+	var oActualRange = { r1: 0, c1: start, r2: gc_nMaxRow0, c2: stop };
+	var res = this.renameDependencyNodes({ offsetRow: 0, offsetCol: nDif }, oActualRange);
+	buildRecalc(this.workbook);
+	unLockDraw(this.workbook);
 	
 //	for(var id  in res)
 //		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
 		
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCols, this.getId(), new Asc.Range(start, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, start, stop));
 	return true;
 };
 Woorksheet.prototype.insertColsBefore=function(index, count){
@@ -2379,7 +2478,6 @@ Woorksheet.prototype._insertColsBefore=function(index, count){
 	var oActualRange = {r1: 0, c1: index, r2: gc_nMaxRow0, c2: index + count - 1};
 	History.Create_NewPoint();
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_AddCols, this.getId(), new Asc.Range(index, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, index, index + count - 1));
-	History.TurnOff();
 	//index 0 based
 	for(var i in this.aGCells)
 	{
@@ -2433,7 +2531,6 @@ Woorksheet.prototype._insertColsBefore=function(index, count){
 //	for(var id  in res)
 //		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
 	
-	History.TurnOn();
 	return true;
 };
 Woorksheet.prototype.insertColsAfter=function(index, count){

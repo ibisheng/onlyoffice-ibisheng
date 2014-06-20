@@ -2947,13 +2947,10 @@ UndoRedoWoorksheet.prototype = {
             nCol = Data.nCol;
             if(bUndo)
             {
-                cell = ws._getCellNoEmpty(nRow, nCol);
-				if(cell)
-				{
-					var node = ws.workbook.dependencyFormulas.getNode(ws.getId(), cell.getName());
-					if(node)
-						node.setFormula(Data.sFormula, false, true);
-				}
+                var oCellAddres = new CellAddress(nRow, nCol, 0);
+                var node = ws.workbook.dependencyFormulas.addNode(ws.getId(), oCellAddres.getID());
+                if (node)
+                    node.setFormula(Data.sFormula, false, true);
             }
         }
 		else if(historyitem_Worksheet_ColProp == Type)

@@ -3406,16 +3406,17 @@ parserFormula.prototype = {
         return this;
     },
 
-    setRefError:function ( wsId, cellId ) {
-        for ( var i = 0; i < this.outStack.length; i++ ) {
-            var node = this.outStack[i];
-            if ( node instanceof cRef || node instanceof cArea || node instanceof cRef3D ) {
-                if ( wsId == node.ws.getId() && cellId == node._cells )
-                    this.outStack[i] = new cError( cErrorType.bad_reference );
+    setRefError: function (node) {
+        for (var i = 0; i < this.outStack.length; i++) {
+            var elem = this.outStack[i];
+            if (elem instanceof cRef || elem instanceof cArea || elem instanceof cRef3D) {
+                if (node.sheetId == elem.ws.getId() && node.cellId == elem.node.cellId)
+                    this.outStack[i] = new cError(cErrorType.bad_reference);
             }
-            else if ( node instanceof cArea3D ) {
-                if ( node.wsFrom == node.wsTo && wsId == node.wsFrom && cellId == node._cells )
-                    this.outStack[i] = new cError( cErrorType.bad_reference );
+            else if (elem instanceof cArea3D) {
+                //когда выставляется setRefError node не сдвигаются, поэтому node.cellId совпадает с elem._cells
+                if (elem.wsFrom == elem.wsTo && node.sheetId == elem.wsFrom && node.cellId == elem._cells)
+                    this.outStack[i] = new cError(cErrorType.bad_reference);
             }
         }
     },
@@ -3424,108 +3425,44 @@ parserFormula.prototype = {
      offset - на сколько сдвигаем ячейку (offset = {offsetCol:intNumber, offsetRow:intNumber})
      cellId - какую ячейку сдвигаем
      */
-    shiftCells:function ( offset, oBBox, node, wsId, toDelete ) {
-        for ( var i = 0; i < this.outStack.length; i++ ) {
-            if ( this.outStack[i] instanceof cRef ) {
-                if ( this.ws.Id != wsId ) {
-                    continue;
-                }
-                if ( toDelete ) {
-                    this.outStack[i] = new cError( cErrorType.bad_reference );
-                    continue;
-                }
-                if ( node.cellId == this.outStack[i].node.cellId/*_cells.replace( /\$/ig, "" )*/ ) {
-                    if ( this.outStack[i].isAbsolute ) {
-                        this._changeOffsetHelper( this.outStack[i], offset );
-                    }
-                    else {
-                        var r = this.outStack[i].getRange();
-                        r.setOffset( offset );
-                        var a = r.first.getID(),
-                            b = r.last.getID();
-                        if ( a != b )
-                            this.outStack[i].value = this.outStack[i]._cells = a + ":" + b;
-                        else this.outStack[i].value = this.outStack[i]._cells = a;
-                        node.newCellId = this.outStack[i].value;
-                    }
+    shiftCells: function (node, from, to) {
+        var sFromName = from.getName();
+        for (var i = 0; i < this.outStack.length; i++) {
+            var elem = this.outStack[i];
+            if (elem instanceof cRef || elem instanceof cArea) {
+                if (node.sheetId == elem.ws.getId() && node.cellId == elem.node.cellId) {
+                    elem.value = elem._cells = node.cellId;
+                    elem.range = node.getBBox().clone();
                 }
             }
-            else if ( this.outStack[i] instanceof cRef3D ) {
-                if ( node.nodeId == this.outStack[i].node.nodeId /*_cells.replace( /\$/ig, "" ) && this.outStack[i].ws == node.sheetId*/ ) {
-
-                    if ( toDelete ) {
-                        this.outStack[i] = new cError( cErrorType.bad_reference );
-                        continue;
-                    }
-
-                    if ( this.outStack[i].isAbsolute ) {
-                        this._changeOffsetHelper( this.outStack[i], offset );
-                    }
-                    else {
-                        var r = this.outStack[i].getRange();
-                        r.setOffset( offset );
-                        var a = r.first.getID(),
-                            b = r.last.getID();
-                        if ( a != b )
-                            this.outStack[i].value = this.outStack[i]._cells = a + ":" + b;
-                        else this.outStack[i].value = this.outStack[i]._cells = a;
-                        node.newCellId = this.outStack[i].value;
-                    }
+            else if (elem instanceof cRef3D) {
+                if (node.sheetId == elem.ws.getId() && node.cellId == elem.node.cellId) {
+                    elem.value = elem._cells = node.cellId;
                 }
             }
-            else if ( this.outStack[i] instanceof cArea3D ) {
-
-                if ( this.outStack[i].wsFrom.Id == this.outStack[i].wsTo.Id == node.sheetId && node.cellId == this.outStack[i]._cells.replace( /\$/ig, "" ) ) {
-
-                    if ( this.outStack[i].isAbsolute ) {
-                        this._changeOffsetHelper( this.outStack[i], offset );
-                    }
-                    else {
-                        var r = this.outStack[i].getRange();
-                        r[0].setOffset( offset );
-                        this.outStack[i].value = this.outStack[i]._cells = r[0].getName();
-                        node.newCellId = this.outStack[i].value;
-                    }
-
+            else if (elem instanceof cArea3D) {
+                //node.cellId содержит уже сдвинутое значение
+                if (elem.wsFrom == elem.wsTo && node.sheetId == elem.wsFrom && sFromName == elem._cells) {
+                    elem.value = elem._cells = node.cellId;
                 }
-            }
-            else if ( this.outStack[i] instanceof cArea ) {
-
-                if ( this.ws.Id != wsId ) {
-                    continue;
-                }
-
-                if ( toDelete ) {
-                    this.outStack[i] = new cError( cErrorType.bad_reference );
-                    continue;
-                }
-
-                if ( node.cellId == this.outStack[i].node.cellId /*_cells.replace( /\$/ig, "" )*/ ) {
-
-                    if ( this.outStack[i].isAbsolute ) {
-                        this._changeOffsetHelper( this.outStack[i], offset );
-                    }
-                    else {
-                        var r = this.outStack[i].getRange();
-                        r.setOffset( offset );
-                        this.outStack[i].value = this.outStack[i]._cells = r.getName();
-                    }
-                    node.newCellId = this.outStack[i].value;
-                }
-
             }
         }
     },
 
-    stretchArea: function (node, bboxTo, sNewName) {
-        //todo absolute
-        for ( var i = 0; i < this.outStack.length; i++ ) {
+    stretchArea: function (node, from, to) {
+        var sFromName = from.getName();
+        for (var i = 0; i < this.outStack.length; i++) {
             var elem = this.outStack[i];
-            if ( elem instanceof cArea ) {
-                if ( elem._cells.replace( /\$/ig, "" ) == node.cellId ) {
-                    elem.value = elem._cells = sNewName;
-                    elem.range = bboxTo.clone();
+            if (elem instanceof cArea) {
+                if (node.sheetId == elem.ws.getId() && node.cellId == elem.node.cellId) {
+                    elem.value = elem._cells = node.cellId;
+                    elem.range = node.getBBox().clone();
                 }
+            }
+            else if (elem instanceof cArea3D) {
+                //node.cellId содержит уже сдвинутое значение
+                if (elem.wsFrom == elem.wsTo && node.sheetId == elem.wsFrom && sFromName == elem._cells)
+                    elem.value = elem._cells = node.cellId;
             }
         }
     },

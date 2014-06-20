@@ -61,9 +61,9 @@ function shiftSort(a, b, bAsc, bRow)
 		if(null == a.to && null == b.to)
 			nRes = 0;
 		else if(null == a.to)
-			nRes = 1;
-		else if(null == b.to)
 			nRes = -1;
+		else if(null == b.to)
+			nRes = 1;
 	}
 	else
 	{
