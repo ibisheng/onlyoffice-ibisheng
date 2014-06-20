@@ -13882,7 +13882,7 @@ CLineChart.prototype =
     {
         History.Add(this, {Type: historyitem_LineChart_SetUpDownBars, oldPr: this.upDownBars, newPr: pr});
         this.upDownBars = pr;
-        if(pr)
+        if(pr && pr.setParent)
         {
             pr.setParent(this);
         }
@@ -20003,7 +20003,7 @@ CStockChart.prototype =
     {
         History.Add(this, {Type: historyitem_StockChart_SetUpDownBars, oldPr: this.upDownBars, newPr: pr});
         this.upDownBars = pr;
-        if(pr)
+        if(pr && pr.setParent)
         {
             pr.setParent(this);
         }

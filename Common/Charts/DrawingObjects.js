@@ -4126,6 +4126,7 @@ function DrawingObjects() {
         else if ( isObject(chart) && chart["binary"] )
         {
             History.TurnOff();
+            aObjects.length = 0;
             var listRange = new Range(worksheet.model, 0, 0, worksheet.nRowsCount - 1, worksheet.nColsCount - 1);
             listRange.cleanAll();
             if ( worksheet.isChartAreaEditMode ) {
