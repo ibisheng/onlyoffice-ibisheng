@@ -3830,9 +3830,7 @@ CDocument.prototype =
                         if ( this.Content.length - 1 === this.CurPos.ContentPos )
                         {
                             var Item = this.Content[this.CurPos.ContentPos];
-                            var StartPos = Item.Internal_GetEndPos();
-
-                            Item.CurPos.ContentPos  = StartPos;
+                            Item.Cursor_MoveToEndPos(false);
                         }
                     }
 

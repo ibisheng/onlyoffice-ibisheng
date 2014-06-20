@@ -366,7 +366,7 @@ CHistory.prototype =
         };
 
 		if ( this.SavedIndex >= this.Points.length - 2 && null !== this.SavedIndex )
-			this.SavedIndex = this.Points.length - 3;
+			this.SavedIndex = this.Points.length - 2;
 
         this.Points.splice( this.Points.length - 2, 2, NewPoint );
         if ( this.Index >= this.Points.length )
