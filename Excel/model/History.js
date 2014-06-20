@@ -353,6 +353,8 @@ function CHistory(workbook)
 	this.Transaction = 0;
 	this.RecIndex = -1;
 	this.lastDrawingObjects = null;
+
+	this.SavedIndex = null;			// Номер точки отката, на которой произошло последнее сохранение
 }
 CHistory.prototype =
 {
@@ -365,6 +367,9 @@ CHistory.prototype =
 		this.IsModify = false;
 		this.TurnOffHistory = 0;
 		this.Transaction = 0;
+
+		this.SavedIndex = null;
+
 		this._sendCanUndoRedo();
     },
     Can_Undo : function()
@@ -722,6 +727,10 @@ CHistory.prototype =
     {
 		if ( 0 !== this.TurnOffHistory || 0 !== this.Transaction )
             return;
+
+		if (null !== this.SavedIndex && this.Index < this.SavedIndex)
+			this.SavedIndex = this.Index;
+
 		this._checkCurPoint();
         var Items = [];
 		var UpdateRigions = {};
@@ -890,6 +899,10 @@ CHistory.prototype =
 			this.IsModify = !this.IsModify;
 			this.workbook.handlers.trigger("setDocumentModified", this.IsModify);
 		}
+	},
+	Reset_SavedIndex : function()
+	{
+		this.SavedIndex = this.Index;
 	},
 	Is_Modified : function()
     {

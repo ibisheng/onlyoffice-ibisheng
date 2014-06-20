@@ -32,6 +32,8 @@
 				return new CCollaborativeEditing ();
 			}
 
+			this.m_nUseType					= 1;  // 1 - 1 клиент и мы сохраняем историю, -1 - несколько клиентов, 0 - переход из -1 в 1
+
 			this.handlers					= new asc.asc_CHandlersList(handlers);
 			this.m_bIsViewerMode			= !!isViewerMode; // Режим Viewer-а
 			this.m_bIsCollaborative			= false; // Совместное ли редактирование
@@ -73,12 +75,13 @@
 
 		// Начало совместного редактирования
 		CCollaborativeEditing.prototype.startCollaborationEditing = function() {
-			this.m_bIsCollaborative = true;
+			this.m_nUseType = -1;
 		};
 
 		// Временное окончание совместного редактирования
 		CCollaborativeEditing.prototype.endCollaborationEditing = function() {
-			this.m_bIsCollaborative = false;
+			if (this.m_nUseType <= 0)
+				this.m_nUseType = 0;
 		};
 
 		// Выставление режима view
@@ -89,7 +92,7 @@
 		CCollaborativeEditing.prototype.getCollaborativeEditing = function () {
 			if (true !== this.isCoAuthoringExcellEnable() || this.m_bIsViewerMode)
 				return false;
-			return this.m_bIsCollaborative;
+			return 1 === this.m_nUseType;
 		};
 
 		//-----------------------------------------------------------------------------------
@@ -243,7 +246,7 @@
 			}
 
 			// Отправляем на сервер изменения
-			this.handlers.trigger("sendChanges", this.getRecalcIndexSave(this.m_oRecalcIndexColumns), this.getRecalcIndexSave(this.m_oRecalcIndexRows));
+			this.handlers.trigger("sendChanges", History.SavedIndex, this.getRecalcIndexSave(this.m_oRecalcIndexColumns), this.getRecalcIndexSave(this.m_oRecalcIndexRows));
 
 			if (bIsCollaborative) {
 				// Пересчитываем lock-и от чужих пользователей
@@ -271,6 +274,12 @@
 
 				if (bCheckRedraw || bRedrawGraphicObjects)
 					this.handlers.trigger("showDrawingObjects");
+
+				if (0 === this.m_nUseType)
+					this.m_nUseType = 1;
+			} else {
+				// Обновляем точку последнего сохранения в истории
+				History.Reset_SavedIndex();
 			}
 		};
 

@@ -1674,7 +1674,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.CoAuthoringApi.set_url(url);
 			},
 
-			_onSaveChanges: function (recalcIndexColumns, recalcIndexRows) {
+			_onSaveChanges: function (deleteIndex, recalcIndexColumns, recalcIndexRows) {
 				if (this.IsSendDocumentLoadCompleate) {
 					var arrChanges = this.wbModel.SerializeHistory();
 					if (this.collaborativeEditing.getCollaborativeEditing()) {
@@ -1685,7 +1685,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 							arrChanges.push({"index" : recalcIndexRows, "type" : "1"});
 					}
 					if (0 < arrChanges.length)
-						this.CoAuthoringApi.saveChanges(arrChanges);
+						this.CoAuthoringApi.saveChanges(arrChanges, deleteIndex);
 					else
 						this.CoAuthoringApi.unLockDocument();
 				}
